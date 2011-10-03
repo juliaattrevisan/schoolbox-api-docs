@@ -415,16 +415,16 @@ ALTER TABLE `submission_return`
 INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'date_timezone','Australia/Victoria','Timezone','Set the local timezone for the server, use the PHP timezones available on the site','select','Australia/Victoria:Australia/NSW:Australia/Queensland:Australia/West:Australia/South','Localisation','true','false','true');
 
 /* Adds in Default Categories to QuestionBank */
-INSERT INTO assess_question_category (NAME,availability) VALUES('Maths','assess');
-INSERT INTO assess_question_category (NAME,availability) VALUES('English','assess');
-INSERT INTO assess_question_category (NAME,availability) VALUES('Geography','assess');
-INSERT INTO assess_question_category (NAME,availability) VALUES('Science','assess');
-INSERT INTO assess_question_category (NAME,availability) VALUES('History','assess');
-INSERT INTO assess_question_category (NAME,availability) VALUES('LOTE','assess');
+INSERT IGNORE INTO assess_question_category (question_category_id,NAME,availability) VALUES('1','Maths','assess');
+INSERT IGNORE INTO assess_question_category (question_category_id,NAME,availability) VALUES('2','English','assess');
+INSERT IGNORE INTO assess_question_category (question_category_id,NAME,availability) VALUES('3','Geography','assess');
+INSERT IGNORE INTO assess_question_category (question_category_id,NAME,availability) VALUES('4','Science','assess');
+INSERT IGNORE INTO assess_question_category (question_category_id,NAME,availability) VALUES('5','History','assess');
+INSERT IGNORE INTO assess_question_category (question_category_id,NAME,availability) VALUES('6','LOTE','assess');
 
-INSERT INTO assess_question_category (NAME,availability) VALUES('Elective Selection','survey');
-INSERT INTO assess_question_category (NAME,availability) VALUES('Teacher Review','survey');
-INSERT INTO assess_question_category (NAME,availability) VALUES('Medical','survey');
+INSERT IGNORE INTO assess_question_category (question_category_id,NAME,availability) VALUES('7','Elective Selection','survey');
+INSERT IGNORE INTO assess_question_category (question_category_id,NAME,availability) VALUES('8','Teacher Review','survey');
+INSERT IGNORE INTO assess_question_category (question_category_id,NAME,availability) VALUES('9','Medical','survey');
 
 /* Update question type table */
 TRUNCATE `assess_luQuestionType`;
