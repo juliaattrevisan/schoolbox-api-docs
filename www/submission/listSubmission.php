@@ -76,9 +76,9 @@ if (is_array($subList)) {
 		else {
 			$this->setVar(array(
 				'ID' => $sub['id'],
-				'ASSDESC' => Scrub::text($sub['description']),
+				'ASSDESC' => Scrub::text($sub['name']),
 				'TYPE' => $sub['type'],
-				'JAVAASSDESC' => addslashes(Scrub::text($sub['description'])),
+				'JAVAASSDESC' => addslashes(Scrub::text($sub['name'])),
 				'OPENDATE' => $sub['accept_submission'] ? $sub['open_date'] : '',
 				'DUEDATE' => $sub['date'],
 				'MARKED' => (int)$totals['marked'],
