@@ -137,6 +137,7 @@ h2 {
 	-moz-background-clip: padding;
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
+	padding: 0 12px;
 
 }
 
@@ -235,6 +236,13 @@ CALENDAR
 	color: #000;
 }
 
+.cal-bubble .middle  {
+	border-color: #C6D9F2;
+}
+.cal-bubble .bottom{
+border-right-color: #C6D9F2;
+}
+.cal-bubble .middle .close{color:#000; background: #C6D9F2;}
 /**********
 Buttons
 **********/
