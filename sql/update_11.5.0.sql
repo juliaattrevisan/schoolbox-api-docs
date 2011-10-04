@@ -79,7 +79,7 @@ ALTER TABLE `eportfolio_comp`
 ALTER TABLE `eportfolio_comp_location`
 	ADD KEY `fk_eportfolio_comp_location_eportfolio_comp1`(`component`);
 
-ALTER TABLE `eportfolio_comp` 
+ALTER TABLE `eportfolio_comp`
 	ADD KEY `fk_eportfolio_comp_eportfolio_comp_category1`(`eportfolioCategoryID`);
 
 ALTER TABLE `eportfolio_comp_location`
@@ -93,7 +93,7 @@ ALTER TABLE `eportfolioTemplateLayout`
 ALTER TABLE `event`
 	ADD FULLTEXT KEY `fulltext`(`note`,`detail`,`location`);
 
-	
+
 
 /* New welcome page DB stuff. */
 CREATE TABLE `component_definition`(
@@ -174,7 +174,7 @@ ALTER TABLE `config` DROP KEY `configName`, ADD UNIQUE `configName` (`name`);
 /* Eportfolio textbox component
  */
 ALTER TABLE `eportfolio_textBox`
-	ADD COLUMN `componentLocationID` int(11)   NULL after `userID`,  
+	ADD COLUMN `componentLocationID` int(11)   NULL after `userID`,
 	DROP KEY `categoryID`, add KEY `categoryID`(`componentLocationID`);
 
 /* New category column widths
@@ -256,7 +256,7 @@ UPDATE `config` SET `field`='bytes', description='The maximum size of a single f
 /* Alter table in target */
 ALTER TABLE `news_items`  ADD COLUMN `item_datetime_published` datetime   NOT NULL after `item_datetime_posted`;
 
-ALTER TABLE `subject_news` ADD COLUMN `datetime_published` datetime   NULL after `datetime_posted`; 
+ALTER TABLE `subject_news` ADD COLUMN `datetime_published` datetime   NULL after `datetime_posted`;
 
 /* EPORTFOLIO BITS
  */
@@ -346,10 +346,13 @@ INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCateg
 -- INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputResumeStandard', 'Standard Resume', 'A standard resume', 2, 'resume/standard.html', 'false');
 -- INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputResumeExtended', 'Extended Resume', 'An extended resume', 2, 'resume/extended.html', 'false');
 
+/* Eportfolio Image Scroller Component Definition
+ */
+INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputImageScroller', 'Image Scroller', 'An image scroller', 1, 'imageScroller.html', 'false');
+
 /* Add in 3rd column css support (top area) */
 ALTER TABLE `homepage_config`     ADD COLUMN `top_head_font` CHAR(7) NULL AFTER `right_hover`,     ADD COLUMN `top_head_bg` CHAR(7) NULL AFTER `top_head_font`,     ADD COLUMN `top_font` CHAR(7) NULL AFTER `top_head_bg`,     ADD COLUMN `top_bg_primary` CHAR(7) NULL AFTER `top_font`,     ADD COLUMN `top_bg_secondary` CHAR(7) NULL AFTER `top_bg_primary`,     ADD COLUMN `top_link` CHAR(7) NULL AFTER `top_bg_secondary`,     ADD COLUMN `top_hover` CHAR(7) NULL AFTER `top_link`;
 ALTER TABLE `eportfolio_config`     ADD COLUMN `top_head_font` CHAR(7) NULL AFTER `right_hover`,     ADD COLUMN `top_head_bg` CHAR(7) NULL AFTER `top_head_font`,     ADD COLUMN `top_font` CHAR(7) NULL AFTER `top_head_bg`,     ADD COLUMN `top_bg_primary` CHAR(7) NULL AFTER `top_font`,     ADD COLUMN `top_bg_secondary` CHAR(7) NULL AFTER `top_bg_primary`,     ADD COLUMN `top_link` CHAR(7) NULL AFTER `top_bg_secondary`,     ADD COLUMN `top_hover` CHAR(7) NULL AFTER `top_link`;
-
 
 /* Convert default colours to config options */
 ALTER TABLE `config` CHANGE `type` `type` enum('Site','Security','Paths','Resources','Email','Welcome','Localisation','External DB','Colours')  COLLATE utf8_general_ci NULL after `options`;
