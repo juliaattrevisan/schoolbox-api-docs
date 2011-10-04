@@ -130,6 +130,9 @@ mv /tmp/schoolbox_config.php $schoolbox_dir/www/conf/conf.php;
 errorCheck;
 }
 confirmPermissions() {
+echo -e "Ensuring Alaress is the Owner user on the Installation...";
+chown -R alaress:alaress $schoolbox_dir;
+errorCheck;
 echo -e "Resetting all Permissions on install Directory..."
 chmod -R 775 $schoolbox_dir;
 errorCheck;
