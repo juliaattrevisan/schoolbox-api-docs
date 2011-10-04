@@ -7,10 +7,9 @@ $categoryHandler = new Category();
 $suggestions = array();
 $data = array();
 
-$group = $_GET['groupID'];
-$query = $_GET['query'];
+$query = Scrub::text($_GET['query']);
 
-$allResults = $categoryHandler->search($group);
+$allResults = $categoryHandler->searchByName($query);
 
 if (is_array($allResults) && count($allResults)) {
 	foreach($allResults as $currentResult) {
@@ -28,4 +27,3 @@ $result = array(
 header('Content-type: application/json');
 echo json_encode($result);
 
-?>

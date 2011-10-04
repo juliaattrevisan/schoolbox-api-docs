@@ -19,7 +19,11 @@ class Category extends DeprecatedModel {
 	 * @return array|bool
 	 */
 	public function searchByName($name) {
-		$query = "SELECT * FROM category WHERE name LIKE \"%{$name}%\"";
+		$query = "SELECT category.*
+				  FROM category
+				  LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
+				  WHERE category.name LIKE \"%{$name}%\"
+				  OR categoryCode.code LIKE \"%{$name}%\"";
 
 		return $this->db->getAll($query);
 	}

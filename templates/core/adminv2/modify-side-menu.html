@@ -7,7 +7,7 @@ $j(function() {
 	$j('#form').validate();
 
 	$j('#url').autocomplete({
-		serviceUrl: '/ajax/findCategory.php?groupID=0',
+		serviceUrl: '/ajax/findCategory.php',
 		minChars: 2,
 		maxHeight: 300,
 		width: 275,
@@ -102,7 +102,7 @@ $j(function() {
 				</tr>
 		  		<tr>
 					<td>&nbsp;
-						
+
 					</td>
 					<td>
 						<input type="hidden" name="id" value="{ID}" />
