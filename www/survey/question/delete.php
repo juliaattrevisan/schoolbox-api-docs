@@ -8,7 +8,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-//require_once '../library/survey/Survey.php';
+require_once '../library/survey/Survey.php';
 require_once '../library/survey/SurveyQuestion.php';
 require_once '../library/survey/SurveyAnswer.php';
 require_once '../library/survey/SurveySection.php';

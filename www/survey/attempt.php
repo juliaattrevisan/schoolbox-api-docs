@@ -160,7 +160,8 @@ if ($allQuestions) {
 
         /* Load answer template into answerOption block
          */
-        $this->setFile('answerFormFragment', 'survey/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/answer.html');
+		$path = 'survey/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/answer.html';
+        $this->setFile('answerFormFragment', $path);
         $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
         /* Reset answer options from previous iteration

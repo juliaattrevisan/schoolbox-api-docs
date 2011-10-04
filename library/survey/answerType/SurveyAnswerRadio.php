@@ -10,6 +10,7 @@
  * @version     SVN: $Id$
  */
 class SurveyAnswerRadio extends AnswerRadio {
+	protected $templateFile = 'survey/answer/radio/graph.html';
 
 	/**
 	 * Get an instance of a responseHandler upon instantiation
@@ -30,7 +31,7 @@ class SurveyAnswerRadio extends AnswerRadio {
 	public function graphResults($page, $currentQuestion) {
 		$componentHandle = 'temp' . $currentQuestion['question_id'];
 
-		$page->setFile($componentHandle, 'survey/answer/radio/graph.html');
+		$page->setFile($componentHandle, $this->getTemplateFile());
 		$page->setBlock($componentHandle, 'series', 'series_block');
 		$page->setBlock('series', 'series_separator', 'series_separator_block');
 
@@ -50,6 +51,7 @@ class SurveyAnswerRadio extends AnswerRadio {
 				$page->setVar(array(
 					'SERIES_LABEL' => $value['text'],
 					'SERIES_DATA' => $value['values'],
+					'SERIES_INDEX' => $i
 				));
 
 				if ($i < (count($currentQuestion['summary'])-1)) {
@@ -76,5 +78,24 @@ class SurveyAnswerRadio extends AnswerRadio {
 		}
 
 		$page->parse('graph_block', $componentHandle);
+	}
+
+	/**
+	 * Get template file
+	 *
+	 * @return string
+	 */
+	protected function getTemplateFile() {
+		return $this->templateFile;
+	}
+
+	/**
+	 * Set template file
+	 *
+	 * @param  $val
+	 * @return void
+	 */
+	protected function setTemplateFile($val) {
+		$this->templateFile = $val;
 	}
 }

@@ -11,8 +11,8 @@ $j(document).ready(function() {
 	var validator = $j("#createQuestionForm").submit(function() {
 		 // update underlying textarea before submit validation
 		 tinyMCE.triggerSave();
-	 
-	 }).validate({
+
+	}).validate({
 
 		submitHandler: function() {
    		    var theForm = $j('#createQuestionForm');
@@ -20,18 +20,18 @@ $j(document).ready(function() {
              */
 			var answerCollection = new Array();
 			tinyMCE.triggerSave();
-			
+
 			var content = tinyMCE.activeEditor.getContent(); // get the content
    			$j('#question').val(content); // put it in the textarea
-			
+
 			/* Collate possible answers and their correctness status
 			 */
 			$j.each($j('#answerCollection').find('li'), function(index, element) {
 				var elem = $j(element);
-	
+
 				var description = elem.find('.answerDescription').val();
 				var code = elem.find('.answerCode').attr('value');
-	
+
 				/* Ignore empty answers that weren't removed
 				 */
 				if (($j.trim(description) != '') && ($j.trim(code) != '')) {
@@ -42,15 +42,16 @@ $j(document).ready(function() {
 					});
 				}
 			});
-	
+
 			/* Collate the usual fields containing ids.
 			 * Collate the checkboxes too but append all the possibilities as well!
 			 */
 			var data = {
+				question: tinyMCE.get('question').getContent(),
+				question_id: theForm.find('input[name=question_id]').val(),
 				section_id: theForm.find('input[name=section_id]').val(),
 				sequence: theForm.find('input[name=sequence]').val(),
-				type_id: theForm.find('select[name=type_id]').val(),
-				question: tinyMCE.get('question').getContent(),
+				type_id: theForm.find('input[name=type_id]').val(),
 				marks: theForm.find('input[name=marks]').val(),
 				allAnswers: JSON.stringify(answerCollection)
 			};
@@ -60,13 +61,13 @@ $j(document).ready(function() {
 			$j.post(theForm.attr('action'), data, function(responseText) {
 				window.location = '/survey/question/create/' + data.section_id;
 			});
-			
+
 			tinyMCE.triggerSave();
 
-			return false; 
+			return false;
 		},
 
-		rules: { 
+		rules: {
 			question: {
 				required: true,
 				minlength: 2
@@ -75,17 +76,17 @@ $j(document).ready(function() {
 				emptyInputs: true
 			}
 		},
-		
+
         errorPlacement: function(error, element) {
             error.addClass('message');  // add a class to the wrapper
-			
+
             var pos = $j('#answerCollection').height();
-			
+
 			if (element.hasClass("answerDescription")) {
 				error.insertAfter(element.closest('#answerCollection'))
 			} else if (element.hasClass("answerCorrect") ) {
 				error.insertAfter(element.closest('#answerCollection'))
-			
+
 			} else {
 				 error.insertAfter(element.parent().children(':last-child'))
 			}
@@ -105,7 +106,7 @@ $j(document).ready(function() {
              */
             if ($j.trim(description) == '') {
                 fieldsAreFilled = false;
-            }	
+            }
         });
 
         return fieldsAreFilled;
@@ -115,7 +116,7 @@ $j(document).ready(function() {
 	 */
 	jQuery.validator.addMethod('nothingChecked', function(value, element) {
         var countDracula = 0;
-	   
+
 	    var oneFieldChecked = true;
 
         $j.each($j('#answerCollection').find('li'), function(index, element) {
@@ -131,7 +132,7 @@ $j(document).ready(function() {
 		if (countDracula == 0) {
 			oneFieldChecked = false;
 		}
-		 
+
 		return oneFieldChecked;
 
     }, 'Tick at least one checkbox');
@@ -139,45 +140,45 @@ $j(document).ready(function() {
 	jQuery.validator.addMethod("greaterThanZero", function(value, element) {
    		return this.optional(element) || (parseFloat(value) > 0);
 	}, "Amount must be greater than zero");
-	
+
     /* Add a new answer option
      */
     $j('#makeNewAnswer').live('click', function() {
 		var thing = $j('.hidden-clone li:first-child').clone();
 		$j('ul#answerCollection').append(thing);
 		refreshList();
-		
+
 		return false;
     });
-	
+
 	/* Remove an answer option
 	 */
 	$j('.delete').live('click', function(){
 		if (($j('.inputs').length) !== 3) {
 			$j(this).parent().remove();
-		}	
+		}
 		refreshList();
-    });	
-	
+    });
+
 	$j('.answerCorrect').live('click', function() {
 		refreshList();
 		$j(this).parent().parent().toggleClass("highlight");
 	});
-	
+
 	function refreshList() {
-		
+
 		var alphabetStart = 65;
 
-		$j('li.inputs > .list-item').each(function() {	
+		$j('li.inputs > .list-item').each(function() {
 			var $this = $j(this);
 			$this.children('span').html('&#' + alphabetStart + ';)');
 			var convert = String.fromCharCode(alphabetStart);
 			$this.children('input').val(convert);
 			alphabetStart++;
 		});
-		
+
 		var pos = $j('#answerCollection').height();
-		
+
 		$j('#listItems').css({
 			'top': pos
 		});

@@ -34,7 +34,7 @@ if ($currentQuestion['type_id']) {
 
 	/* Load answer template into answerOption block
 	 */
-	$this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionTemplate($currentQuestion['type_id']) . '/exportToMoodle.html');
+	$this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/exportToMoodle.html');
 	$this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
 	$this->setVar(array(

@@ -2,14 +2,13 @@
 /**
  * SurveyAnswerRating
  *
- * Handler for rating questions.
- *
- * @author      James Leckie <jleckie@alaress.com.au>
- * @copyright   2010 Alaress Pty Ltd
- * @link        http://www.alaress.com.au
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class SurveyAnswerRating extends AnswerRating {
+abstract class SurveyAnswerRating extends AnswerRatingAgree {
+	protected $templateFile = 'survey/answer/multi/graph.html';
 
 	/**
 	 * Get an instance of a responseHandler upon instantiation
@@ -30,7 +29,7 @@ class SurveyAnswerRating extends AnswerRating {
 	public function graphResults($page, $currentQuestion) {
 		$componentHandle = 'temp' . $currentQuestion['question_id'];
 
-		$page->setFile($componentHandle, 'survey/answer/multi/graph.html');
+		$page->setFile($componentHandle, $this->getTemplateFile());
 		$page->setBlock($componentHandle, 'series', 'series_block');
 		$page->setBlock('series', 'series_separator', 'series_separator_block');
 
@@ -77,5 +76,24 @@ class SurveyAnswerRating extends AnswerRating {
 		}
 
 		$page->parse('graph_block', $componentHandle);
+	}
+
+	/**
+	 * Get template file
+	 *
+	 * @return string
+	 */
+	protected function getTemplateFile() {
+		return $this->templateFile;
+	}
+
+	/**
+	 * Set template file
+	 *
+	 * @param  $val
+	 * @return void
+	 */
+	protected function setTemplateFile($val) {
+		$this->templateFile = $val;
 	}
 }

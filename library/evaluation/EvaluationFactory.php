@@ -66,10 +66,11 @@ abstract class EvaluationFactory extends DeprecatedModel {
 
 				$superclassFile = $_SERVER['DOCUMENT_ROOT'] . "/$superclassPath/{$superclass}.php";
                 $subclassFile = $_SERVER['DOCUMENT_ROOT'] . "/$subclassPath/{$subclass}.php";
- 
+
                 /* Instantiate specific question model
                  */
                 if (!is_readable($superclassFile) || !is_readable($subclassFile)) {
+					print_r("$superclassFile, $subclassFile");
                     error(133);
                 }
 
@@ -108,13 +109,13 @@ abstract class EvaluationFactory extends DeprecatedModel {
 	 * @param  $type_id
 	 * @return
 	 */
-    public function getQuestionTemplate($type_id) {
-        $query = "SELECT template_dir
-          FROM assess_luQuestionType
-          WHERE type_id = '$type_id'";
-
-        return $this->db->getOne($query);
-    }
+//    public function getQuestionTemplate($type_id) {
+//        $query = "SELECT template_dir
+//          FROM assess_luQuestionType
+//          WHERE type_id = '$type_id'";
+//
+//        return $this->db->getOne($query);
+//    }
 
 	/**
 	 * Find out the moodle name

@@ -5,8 +5,8 @@ $j(document).ready(function() {
 	var validator = $j("#createQuestionForm").submit(function() {
 		 // update underlying textarea before submit validation
 		 tinyMCE.triggerSave();
-	 
-	 }).validate({
+
+	}).validate({
 
 		submitHandler: function() {
    		    var theForm = $j('#createQuestionForm');
@@ -14,18 +14,18 @@ $j(document).ready(function() {
              */
 			var answerCollection = new Array();
 			tinyMCE.triggerSave();
-			
+
 			var content = tinyMCE.activeEditor.getContent(); // get the content
    			$j('#question').val(content); // put it in the textarea
-			
+
 			/* Collate possible answers and their correctness status
 			 */
 			$j.each($j('#answerCollection').find('li'), function(index, element) {
 				var elem = $j(element);
-	
+
 				var description = elem.find('.answerDescription').val();
 				var code = elem.find('.answerCode').attr('value');
-	
+
 				/* Ignore empty answers that weren't removed
 				 */
 				if (($j.trim(description) != '') && ($j.trim(code) != '')) {
@@ -36,7 +36,7 @@ $j(document).ready(function() {
 					});
 				}
 			});
-	
+
 			/* Collate the usual fields containing ids.
 			 * Collate the checkboxes too but append all the possibilities as well!
 			 */
@@ -54,13 +54,13 @@ $j(document).ready(function() {
 			$j.post(theForm.attr('action'), data, function(responseText) {
 				window.location = '/survey/question/create/' + data.section_id;
 			});
-			
+
 			tinyMCE.triggerSave();
 
-			return false; 
+			return false;
 		},
 
-		rules: { 
+		rules: {
 			question: {
 				required: true,
 				minlength: 2
@@ -69,17 +69,17 @@ $j(document).ready(function() {
 				emptyInputs: true
 			}
 		},
-		
+
         errorPlacement: function(error, element) {
             error.addClass('message');  // add a class to the wrapper
-			
+
             var pos = $j('#answerCollection').height();
-			
+
 			if (element.hasClass("answerDescription")) {
 				error.insertAfter(element.closest('#answerCollection'))
 			} else if (element.hasClass("answerCorrect") ) {
 				error.insertAfter(element.closest('#answerCollection'))
-			
+
 			} else {
 				 error.insertAfter(element.parent().children(':last-child'))
 			}
@@ -99,7 +99,7 @@ $j(document).ready(function() {
              */
             if ($j.trim(description) == '') {
                 fieldsAreFilled = false;
-            }	
+            }
         });
 
         return fieldsAreFilled;
@@ -109,7 +109,7 @@ $j(document).ready(function() {
 	 */
 	jQuery.validator.addMethod('nothingChecked', function(value, element) {
         var countDracula = 0;
-	   
+
 	    var oneFieldChecked = true;
 
         $j.each($j('#answerCollection').find('li'), function(index, element) {
@@ -125,7 +125,7 @@ $j(document).ready(function() {
 		if (countDracula == 0) {
 			oneFieldChecked = false;
 		}
-		 
+
 		return oneFieldChecked;
 
     }, 'Tick at least one checkbox');
@@ -133,45 +133,45 @@ $j(document).ready(function() {
 	jQuery.validator.addMethod("greaterThanZero", function(value, element) {
    		return this.optional(element) || (parseFloat(value) > 0);
 	}, "Amount must be greater than zero");
-	
+
     /* Add a new answer option
      */
     $j('#makeNewAnswer').live('click', function() {
 		var thing = $j('.hidden-clone li:first-child').clone();
 		$j('ul#answerCollection').append(thing);
 		refreshList();
-		
+
 		return false;
     });
-	
+
 	/* Remove an answer option
 	 */
 	$j('.delete').live('click', function(){
 		if (($j('.inputs').length) !== 3) {
 			$j(this).parent().remove();
-		}	
+		}
 		refreshList();
-    });	
-	
+    });
+
 	$j('.answerCorrect').live('click', function() {
 		refreshList();
 		$j(this).parent().parent().toggleClass("highlight");
 	});
-	
+
 	function refreshList() {
-		
+
 		var alphabetStart = 65;
 
-		$j('li.inputs > .list-item').each(function() {	
+		$j('li.inputs > .list-item').each(function() {
 			var $this = $j(this);
 			$this.children('span').html('&#' + alphabetStart + ';)');
 			var convert = String.fromCharCode(alphabetStart);
 			$this.children('input').val(convert);
 			alphabetStart++;
 		});
-		
+
 		var pos = $j('#answerCollection').height();
-		
+
 		$j('#listItems').css({
 			'top': pos
 		});
@@ -188,7 +188,7 @@ $j(document).ready(function() {
         <ul id="answerCollection" >
 			<li class="inputs clearfix">
 
-				<label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="A)" /><span>A)</span></label>
+				<label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="A" /><span>A)</span></label>
 				<label class="check-it">
 					<input name="answer[]" class="answerCorrect hide" type="radio" value=""/>
 				</label>
@@ -196,7 +196,7 @@ $j(document).ready(function() {
 			</li>
             <li class="inputs clearfix">
 
-				<label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="B)" /><span>B)</span></label>
+				<label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="B" /><span>B)</span></label>
 				<label class="check-it">
 					<input name="answer[]" class="answerCorrect hide" type="radio" value=""/>
 				</label>
@@ -204,7 +204,7 @@ $j(document).ready(function() {
 			</li>
                         <li class="inputs clearfix">
 
-				<label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="C)" /><span>C)</span></label>
+				<label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="C" /><span>C)</span></label>
 				<label class="check-it">
 					<input name="answer[]" class="answerCorrect hide" type="radio" value=""/>
 				</label>
@@ -212,7 +212,7 @@ $j(document).ready(function() {
 			</li>
                         <li class="inputs clearfix">
 
-				<label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="D)" /><span>D)</span></label>
+				<label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="D" /><span>D)</span></label>
 				<label class="check-it">
 					<input name="answer[]" class="answerCorrect hide" type="radio" value=""/>
 				</label>
@@ -220,7 +220,7 @@ $j(document).ready(function() {
 			</li>
                         <li class="inputs clearfix">
 
-				<label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="E)" /><span>E)</span></label>
+				<label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="E" /><span>E)</span></label>
 				<label class="check-it">
 					<input name="answer[]" class="answerCorrect hide" type="radio" value=""/>
 				</label>
@@ -228,7 +228,7 @@ $j(document).ready(function() {
 			</li>
                         <li class="inputs clearfix">
 
-				<label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="F)" /><span>F)</span></label>
+				<label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="F" /><span>F)</span></label>
 				<label class="check-it">
 					<input name="answer[]" class="answerCorrect hide" type="radio" value=""/>
 				</label>
@@ -236,7 +236,7 @@ $j(document).ready(function() {
 				<div class="delete"></div>
 			</li>
         </ul>
-		
+
 		<label for="answerDescription[]" generated="true" id="listItems" class="error">Please fill out all answers</label>
 
     </div>
@@ -244,7 +244,7 @@ $j(document).ready(function() {
 	<div class="hide hidden-clone">
         <ul>
 			<li class="inputs clearfix">
-				<label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="A)" /><span>A)</span></label>
+				<label class="list-item"><input name="answerCode[]" class="answerCode text-box" type="hidden" value="A" /><span>A)</span></label>
 				<label class="check-it"><input name="answer[]" class="answerCorrect hide"  type="radio" value="" /></label>
 				<label class="answer-value"><input name="answerDescription[]" class="answerDescription text-box" type="text" value="" /></label>
 				<div class="delete"></div>

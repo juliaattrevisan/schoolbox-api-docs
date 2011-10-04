@@ -4,13 +4,9 @@
 <script type="text/javascript">
 $j(document).ready(function() {
 
-    $j('.evaluation-header form').submit(function() {
+    $j('.evaluation-content form').submit(function() {
         $j.post($j(this).attr('action'), $j(this).serialize(), function(responseText) {
-
-		   console.log('return ' + responseText);
-
 		    var dataFunction = new Function('return ' + responseText);
-
 		    var result = dataFunction();
 
             /* Save successful, so hide form and disable submit butan.
@@ -36,21 +32,21 @@ $j(document).ready(function() {
     /* Submit all the questions before switching between sections
      */
     $j('.step-nav, .go-back, .go-to, .tick').click(function() {
-		$j('.evaluation-header form').each(function(elem, value) {
+		$j('.evaluation-content form').each(function(elem, value) {
 			$j(this).submit();
 		});
 	});
 
 	$j('.checkbox').click(function() {
-		$j(this).closest('.evaluation-header form').submit();
+		$j(this).closest('.evaluation-content form').submit();
 	});
 
 	$j('.textarea-container textarea').blur(function() {
-        $j(this).closest('.evaluation-header form').submit();
+        $j(this).closest('.evaluation-content form').submit();
 	});
 
 	$j('.evaluation-body input').blur(function() {
-		$j(this).closest('.evaluation-header form').submit();
+		$j(this).closest('.evaluation-content form').submit();
 	});
 
     /* Set up countdown
@@ -63,7 +59,7 @@ $j(document).ready(function() {
             layout: '{hn} : {mn} : {sn}',
             alwaysExpire: true,
             onExpiry: function() {
-                window.location = '/assess/end/{ASSESS_ASSESS_ID}';
+                window.location = '/survey/end/{ASSESS_ASSESS_ID}';
             }
         });
 	 }
@@ -91,7 +87,7 @@ $j(document).ready(function() {
 	<p class="pad-it wysywig">{SECTION_DESCRIPTION}</p>
 
 		<!-- BEGIN question -->
-		<form action="/assess/saveResponse/{QUESTION_QUESTION_ID}" method="post" class="questionForm">
+		<form action="/survey/saveResponse/{QUESTION_QUESTION_ID}" method="post" class="questionForm">
 			<div class="wysiwyg no-pad clearfix">
 			<h3><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION}</h3>
 			</div>
@@ -104,15 +100,15 @@ $j(document).ready(function() {
 
 		<p class="clearfix text-align-right" >
 			<!-- BEGIN endAssess -->
-			<a href="/assess/end/{ASSESS_ASSESS_ID}" class="btn tick finish-assessment"><span></span>Finish</a>
+			<a href="/survey/end/{ASSESS_ASSESS_ID}" class="btn tick finish-assessment"><span></span>Finish</a>
 			<!-- END endAssess --> .
 
 			<!-- BEGIN prevSection -->
-			<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}" class="btn go-back float-left"><span></span>Previous Section</a>
+			<a href="/survey/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}" class="btn go-back float-left"><span></span>Previous Section</a>
 			<!-- END prevSection -->
 
 			<!-- BEGIN nextSection -->
-			<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}" class="btn go-to"><span></span>Next Section</a>
+			<a href="/survey/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}" class="btn go-to"><span></span>Next Section</a>
 			<!-- END nextSection -->
 		</p>
 </div>

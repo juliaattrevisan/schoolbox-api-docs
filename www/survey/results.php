@@ -67,7 +67,7 @@ if (is_array($sectionValues) && count($sectionValues)) {
 
 				/* Answer and Response data
 				 */
-                
+
 				$answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
 
 				$answerHandler->graphResults($this, $currentQuestion);
