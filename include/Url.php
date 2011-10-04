@@ -2,7 +2,7 @@
 /**
  * Url
  *
- * Formats urls into more meaningful stuff
+ * Formats urls into more meaningful stuff.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -13,7 +13,11 @@ class Url {
 	private $url = '';
 	private $useCfg = false;
 
-	public function __construct($url, $useCfg = false) {
+    /**
+     * @param $url
+     * @param bool $useCfg Decouples the class for unit testing
+     */
+	public function __construct($url, $useCfg = true) {
 		$this->setUrl(trim($url));
 
 		$this->setUseCfg($useCfg);
@@ -64,13 +68,12 @@ class Url {
 	/**
 	 * Returns true if the url is for a local page
 	 *
-	 * @param  $url
 	 * @return int
 	 */
 	public function isLocalURL() {
 		list($hostname, $domain) = explode('.', $this->getServerHost(), 2);
 
-		$pattern = '#^(http(s)?://)('.$hostname.')|('.$this->getServerHost().')|('.$this->getSiteHostname().'(.'.$this->getSiteDomain().'))/(.*)?#i';
+		$pattern = '#^(http(s)?://)('.preg_quote($hostname).')|('.preg_quote($this->getServerHost()).')|('.preg_quote($this->getSiteHostname()).'(.'.preg_quote($this->getSiteDomain()).'))/(.*)?#i';
 
 		return preg_match($pattern, $this->getUrl());
 	}

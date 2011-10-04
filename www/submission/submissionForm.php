@@ -105,6 +105,10 @@ else if ($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_PO
 
 	$page->localRedir("/submission/listSubmission/");
 }
+/* Exceeded PHP max file size */
+elseif ( $_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0 && empty($_POST) && empty($_FILES) ) {
+    error(10);
+}
 else if (isset($_GET['deleteBox']) && is_numeric($_GET['deleteBox'])) {
 	$submission_box_handler->delete($_GET['deleteBox']);
 

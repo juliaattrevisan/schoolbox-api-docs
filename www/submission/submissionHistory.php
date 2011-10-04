@@ -193,7 +193,7 @@ else {
 	 * Show Submit form
 	 */
 	$this->setVar(array(
-		'WORK_BOX_ID' => $submissionBox['id']
+		'WORK_BOX_ID'   => $submissionBox['id'],
 	));
 
     if($userID == $_SESSION['id'] && mktime() > strtotime($submissionBox['open_date']) && mktime() < strtotime($submissionBox['late_date']) && $submissionBox['accept_submission'])

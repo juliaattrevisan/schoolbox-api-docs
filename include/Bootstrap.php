@@ -14,6 +14,9 @@ require_once dirname(__FILE__) . '/../www/conf/conf.php';
 /* Load HTML Purifier */
 require_once dirname(__FILE__) . '/HTMLPurifier/HTMLPurifier.auto.php';
 
+/* Stdfuncs */
+require_once(WEB_root.'/include/stdfuncs.php');
+
 /* Load the Autoloader */
 require_once dirname(__FILE__) . '/Autoloader.php';
 $autoloader = Autoloader::initialise();

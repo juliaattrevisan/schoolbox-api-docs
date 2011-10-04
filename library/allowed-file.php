@@ -43,19 +43,23 @@ class AllowedFile extends DeprecatedModel {
 		return substr(strrchr($filename, "."), 1);
 	}
 
-        function isAllowed($filename) {
+    function isAllowed ($filename) {
 
-            $extension = $this->getExtension($filename);
+        $extension = $this->getExtension($filename);
 
-            $query = "SELECT mime FROM allowedFileExtension afe
+        $query = "SELECT mime FROM allowedFileExtension afe
                         JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
                         WHERE extension = '$extension' AND enable = 'true'";
-            if(!$this->db->getOne($query)) {
-		return array('code' => 11, 'message' => "Your file, ".$file['name']." with the extension '$extension'");
-            }
+        
+        if ( !$this->db->getOne($query) ) {
+            return array(
+                'code' => 11,
+                'message' => "Your file, " . $file['name'] . " with the extension '$extension'"
+            );
         }
+    }
 
-	function getMime($extension) {
+    function getMime($extension) {
 
                 $query = "SELECT mime FROM allowedFileExtension afe JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID WHERE extension = '$extension'";
                 $mime = $this->db->getOne($query);
@@ -74,8 +78,8 @@ class AllowedFile extends DeprecatedModel {
 		}
 
 		//file size test
-		if ($file['size'] <= 0) {
-			return array('code' => 10);
+		if ($file['size'] <= 0 || $file['size'] > Config::get('max_file_size')) {
+			return array('code' => 10, 'message' => 'The size of the uploaded file exceeds the file size restrictions.');
 		}
 
 		if ($typeCheck) {

@@ -29,7 +29,7 @@ if( is_numeric($_POST['uid']) && is_numeric($_POST['box_id']) && $_POST['markUpd
 
         if (is_array($result)) {
 			$return['id'] = $result[0]['id'];
-			
+
 			$returnHandler->update($return);
 		}
         else {
@@ -38,21 +38,21 @@ if( is_numeric($_POST['uid']) && is_numeric($_POST['box_id']) && $_POST['markUpd
     }
 }
 else if ( (
-	 
-	  ( isset($_POST['comment']) && $_POST['comment'] ) || 
-	  ( isset($_POST['mark']) && $_POST['mark'] ) || 
-	  ( isset($_FILES['file']['name']) && $_FILES['file']['name'] ) 
-	 
-	 ) && 
-	
-	 ( isset($_POST['uid']) && $_POST['uid'] ) && 
-	 ( isset($_POST['box_id']) && $_POST['box_id'] ) 
+
+	  ( isset($_POST['comment']) && $_POST['comment'] ) ||
+	  ( isset($_POST['mark']) && $_POST['mark'] ) ||
+	  ( isset($_FILES['file']['name']) && $_FILES['file']['name'] )
+
+	 ) &&
+
+	 ( isset($_POST['uid']) && $_POST['uid'] ) &&
+	 ( isset($_POST['box_id']) && $_POST['box_id'] )
   )
 {
 
         $returnHandler->securityCheck($_POST['box_id'], $_POST['uid']);
-		
-		
+
+
         if($_FILES['file']['name']) {
             $allowedFileHandler = new AllowedFile;
             $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
@@ -68,8 +68,12 @@ else if ( (
 
         $page->backToTheFuture(2);
 }
-
-else
+/* Exceeded PHP max file size */
+elseif ( $_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0 && empty($_POST) && empty($_FILES) ) {
+    error(10);
+}
+else {
     error(2);
+}
 
 ?>
