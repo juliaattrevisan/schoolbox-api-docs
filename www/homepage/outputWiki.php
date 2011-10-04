@@ -12,7 +12,7 @@ $userHandler = new User();
 
 /* Dodge around addComponent when config for this instance is empty
  */
-if (count($config)) {
+if (is_array($config) && count($config)) {
 	$wikiList = $wikiHandler->getByCategory($categoryID, strtolower($config['sort']), $config['sortdir'], $config['size']);
 }
 else {
