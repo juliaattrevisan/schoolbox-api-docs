@@ -28,7 +28,7 @@ if (!empty($_POST)) {
         error(130);
     }
 
-    $sectionHandler = new AssessSection();
+    $sectionHandler = new SurveySection();
 
     $sectionHandler->update(array(
         'assess_id' => Scrub::text($_POST['assess_id']),
