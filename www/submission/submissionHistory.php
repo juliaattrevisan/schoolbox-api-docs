@@ -65,9 +65,10 @@ $emailObj = new Email();
 $emailAddress = $emailObj->formatEmailFromArray($owner);
 
 $this->setVar(array(
-	'BOX_CATEGORYNAME' => $submissionBox['categoryName'],
+	'BOX_CATEGORYNAME' => Scrub::text($submissionBox['categoryName']),
     'BOX_CATEGORYID'    => $submissionBox['cid'],
-	'BOX_DESCRIPTION' => $submissionBox['name'],
+	'BOX_NAME' => Scrub::text($submissionBox['name']),
+    'BOX_DESCRIPTION' => Scrub::text($submissionBox['description']),
 	'BOX_OWNER' => '<a href="'.$_SESSION['mailhandle'].$emailAddress.'">'.$userHandler->formatName($owner).'</a>',
 	'BOX_DUEDATE' => date(Cfg::get('date_short'), strtotime($submissionBox['date'])),
 ));
@@ -100,8 +101,8 @@ if (is_array($allWork) && count($allWork)) {
 
 		$this->setVar(array(
 			'WORK_DATE' => $workDate->getLong(),
-			'WORK_MARK' => $currentWork['mark'],
-			'WORK_COMMENT' => $currentWork['comment'],
+			'WORK_MARK' => Scrub::Text($currentWork['mark']),
+			'WORK_COMMENT' => Scrub::Text($currentWork['comment']),
 			'WORK_BOX_ID' => $currentWork['bid'],
 			'WORK_FILE_ID' => $currentWork['fid'],
 			'WORK_SUBMIT_FILE_ID' => $currentWork['sid'],
@@ -209,8 +210,8 @@ else {
  */
 if (is_numeric($returnedWork['fileID'])) {
 	$this->setVar(array(
-		'RETURNED_WORK_COMMENT' => $returnedWork['comment'],
-		'RETURNED_WORK_MARK' => $returnedWork['mark'],
+		'RETURNED_WORK_COMMENT' => Scrub::Text($returnedWork['comment']),
+		'RETURNED_WORK_MARK' => Scrub::Text($returnedWork['mark']),
 		'RETURNED_WORK_FILE_ID' => $returnedWork['fileID'],
 	));
 

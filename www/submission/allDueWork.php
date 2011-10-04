@@ -89,8 +89,8 @@ if (is_array($allWork)) {
 		$dueDate = new Alaress_Date_Format($currentWork['dueDate'], 'U');
 
 		$this->setVar(array(
-			'WORK_CATEGORYNAME' => $currentWork['categoryName'],
-			'WORK_DESCRIPTION' => $currentWork['name'],
+			'WORK_CATEGORYNAME' => Scrub::Text($currentWork['categoryName']),
+			'WORK_DESCRIPTION' => Scrub::Text($currentWork['name']),
 			'WORK_DUEDATE' => $dueDate->getDateOnly(),
 			'WORK_MARK' => $currentWork['mark'],
 			'WORK_ACTION' => '',
@@ -180,7 +180,7 @@ if ($allAssessments) {
             $this->setVar(array(
                 'ASSESS_CATEGORY' => $categoryLookup[$currentAssessment['category_id']],
                 'ASSESS_ASSESS_ID' => $currentAssessment['assess_id'],
-                'ASSESS_TITLE' => $currentAssessment['title'],
+                'ASSESS_TITLE' => Scrub::Text($currentAssessment['title']),
                 'ASSESS_FINISH' => '',
                 'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
                 'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
@@ -236,7 +236,7 @@ if ($allAssessments) {
             $this->setVar(array(
                 'ASSESS_CATEGORY' => $categoryLookup[$currentAssessment['category_id']],
                 'ASSESS_ASSESS_ID' => $currentAssessment['assess_id'],
-                'ASSESS_TITLE' => $currentAssessment['title'],
+                'ASSESS_TITLE' => Scrub::Text($currentAssessment['title']),
                 'ASSESS_FINISH' => date('jS F Y, g:i:sa', strtotime($currentAttempt['finish'])),
                 'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
                 'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
