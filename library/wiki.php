@@ -93,7 +93,7 @@ class Wiki extends DeprecatedModel
 
 		/* Adjust the table in which to sort -_-
 		 */
-		if ($orderBy == 'created') {
+		if (($orderBy == 'created') || !strlen($orderBy)) {
 			$orderBy = 'w.created';
 		}
 		else {
