@@ -17,7 +17,7 @@ $type = Scrub::text($_GET['type']);
  */
 $destinationID = Scrub::text($_GET['destinationID']);
 
-if ($type == 'system') {
+if ($type == 'system' && !empty($_POST['systemGroupID'])) {
 
 	/* Add from this group...
 	 */
@@ -31,7 +31,7 @@ if ($type == 'system') {
 		}
 	}
 }
-else {
+elseif ($type == 'individual' && !empty($_POST['individualGroupID'])) {
 	/* Add from this group...
 	 */
 	$groupID = Scrub::text($_POST['individualGroupID']);
