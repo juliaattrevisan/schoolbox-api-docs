@@ -110,7 +110,22 @@ $.widget("ui.chat",  {
 
     _send: function ($self) {
         var $d = new Date();
-        var $time = $d.getFullYear() + '-' + $d.getMonth() + '-' + $d.getDay() + ' ' + $d.getHours() + ':' + $d.getMinutes() + ':' + $d.getSeconds();
+
+        var $hours = $d.getHours();
+
+        var $minutes = ($d.getMinutes() > 9 ? '' : '0') + $d.getMinutes();
+        var $seconds = ($d.getSeconds() > 9 ? '' : '0') + $d.getSeconds();
+
+        var $meridian = 'am';
+
+        if ($hours > 13 ) {
+            $hours -= 12;
+            $meridian = 'pm'
+        }
+
+        var $hours = ($hours > 9 ? '' : '0') + $hours;
+
+        var $time = $hours + ':' + $minutes + ':' + $seconds + ' ' + $meridian;
 
         var $message = {
             method: 'send',

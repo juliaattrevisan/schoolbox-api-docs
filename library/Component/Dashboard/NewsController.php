@@ -36,6 +36,7 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
 
         $this->setVar("topic_block", "");
         $this->setVar("topic_header_block", "");
+        $this->setVar("news_block", "");
 
         if ( is_array($this->headlineList) ) {
 
