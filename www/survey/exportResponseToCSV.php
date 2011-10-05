@@ -41,5 +41,4 @@ if (is_numeric($this->arg[1])) {
 	$surveyExporter->setFilterByQuestion($this->arg[1]);
 }
 
-$surveyExporter->exportResponsesToCSV($assess['assess_id'], $this->arg[1]);
-?>
+$surveyExporter->exportResponsesToCSV($assess['assess_id'], $this->arg[1], $this->arg[2]);

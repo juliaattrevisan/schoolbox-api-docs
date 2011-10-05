@@ -220,7 +220,7 @@ class EvaluationExporter {
 	 * @param  $question_id
 	 * @return void
 	 */
-	public function exportResponsesToCSV($assess_id, $question_id) {
+	public function exportResponsesToCSV($assess_id, $question_id, $questionIndex) {
 		$sectionValues = $this->getSectionValues();
 
 		/* Format output
@@ -242,7 +242,7 @@ class EvaluationExporter {
 
 					/* Question index
 					 */
-					$i = 1;
+					$i = $questionIndex;
 
 					foreach($currentSection['questions'] as $currentQuestion) {
 						echo "Q$i. {$currentQuestion['question']}\n";
