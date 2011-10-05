@@ -99,7 +99,7 @@ class Alaress_Date_Relative extends Alaress_Date_Format {
 		/* If it can't be measured using weeks, just return the date using the
 		 * superclass methods
 		 */
-		return $this->getPrefix() . ' ' . $this->getAustralian();
+		return $this->getPrefix() . ' ' . $this->getDateOnly();
 		//date(Cfg::get('date_notime'), $date);
 	}
 

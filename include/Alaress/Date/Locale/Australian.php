@@ -19,14 +19,14 @@ class Alaress_Date_Locale_Australian extends Alaress_Date_Locale_Abstract {
 
 	/* Pretty formatting
 	 */
-	protected $local = 'd-m-Y H:i:s';
+	protected $local = 'd/m/Y g:ia';
 	protected $localShort = 'd/m/Y';
 
 	protected $long = 'l F jS Y g:ia';
 	protected $short = 'jS M Y g:ia'; // Closest to 'r'
 
 	protected $noTime = 'jS M Y';
-	protected $time = 'h:ia';
+	protected $time = 'g:ia';
 
 	/* Database specific formatting
 	 */
