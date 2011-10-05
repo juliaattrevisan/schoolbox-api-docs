@@ -245,7 +245,7 @@ class EvaluationExporter {
 					$i = $questionIndex;
 
 					foreach($currentSection['questions'] as $currentQuestion) {
-						echo "Q$i. {$currentQuestion['question']}\n";
+						echo "Q$i. " . str_replace(',', '', strip_tags($currentQuestion['question'])) . "\n";
 
 						$this->outputCSV2(array(array("Synergy ID", "Respondent", "Response", "Teacher's Comment")));
 
