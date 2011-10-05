@@ -74,6 +74,11 @@ cur_ver=`echo "SELECT value FROM config WHERE NAME = 'site_version'"|mysql -u $s
 cur_ver=`echo $cur_ver|cut -d " " -f2`;
 echo "... $cur_ver"
 }
+setNewVersion() {
+echo -e "Setting New Version to $new_ver...";
+`echo "UPDATE config SET value = '$new_ver' where value = '$cur_ver'"|mysql -u $sqluser --password=$sqlpass $sqldb`;
+errorCheck;
+}
 phpVersionCheck() {
 echo "Beginning PHP Version Check...";
 php_major=`php -v|grep built|cut -d "-" -f1|cut -d " " -f2|cut -d "." -f1`
@@ -202,4 +207,5 @@ updateDatabase;
 restoreAfterBackup;
 runCustomScripts;
 confirmPermissions;
+setNewVersion;
 cleanup;
