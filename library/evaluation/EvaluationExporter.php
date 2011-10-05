@@ -74,7 +74,6 @@ class EvaluationExporter {
 			$currentResponse = $answerHandler->exportResponseToArray($currentAttempt['attempt_id'], $currentQuestion['question_id']);
 
 			if (is_array($currentResponse)) {
-
 				foreach($currentResponse as $individualResponse) {
 
 					/* Find out if you need to extract the response text for the
@@ -97,6 +96,30 @@ class EvaluationExporter {
 			 */
 			else if ($currentResponse) {
 				$this->sectionValues[$sectionIndex]['questions'][$questionIndex]['summary'][$currentResponse]['values']++;
+			}
+		}
+	}
+
+	/**
+	 * Set all the possible answers that could be given in each question
+	 * for a section
+	 *
+	 * @param  $allQuestions
+	 * @param  $sectionIndex
+	 * @return void
+	 */
+	private function accumulatePossibleQuestions($allQuestions, $sectionIndex) {
+		for ($i = 0; $i < count($allQuestions); $i++) {
+			if ($allQuestions[$i]['type_id']) {
+				$answerHandler = $this->getFactory()->createAnswerModel($allQuestions[$i]['type_id']);
+
+				$answerRecord = $answerHandler->getForQuestion($allQuestions[$i]['question_id']);
+				$allAnswers = unserialize($answerRecord['answer']);
+
+				foreach($allAnswers as $currentAnswer) {
+					$this->sectionValues[$sectionIndex]['questions'][$i]['summary'][$currentAnswer->value]['values'] = 0;
+					$this->sectionValues[$sectionIndex]['questions'][$i]['summary'][$currentAnswer->value]['text'] = $currentAnswer->description;
+				}
 			}
 		}
 	}
@@ -146,6 +169,13 @@ class EvaluationExporter {
 					$currentAttempt = $allAttempts[$j];
 
 					if ($allQuestions) {
+
+						/* Initialise all possible responses
+						 */
+						$this->accumulatePossibleQuestions($allQuestions, $k);
+
+						/* Accumulate attempt data
+						 */
 						for ($i = 0; $i < count($allQuestions); $i++) {
 							$this->updateResponseSummary($allQuestions[$i], $allAttempts[$j], $k, $i);
 
