@@ -42,10 +42,10 @@ if (is_array($subList)) {
 			$this->setVar('STUDENTS', count($studentList));
 
 			if ($prevCat['code'] != "") {
-				$this->setVar('CATEGORY', Scrub::text($prevCat['name']) . " (" . $prevCat['code'] . ")");
+				$this->setVar('CATEGORY', Scrub::text($prevCat['category_name']) . " (" . $prevCat['code'] . ")");
 			}
 			else {
-				$this->setVar('CATEGORY', Scrub::text($prevCat['name']));
+				$this->setVar('CATEGORY', Scrub::text($prevCat['category_name']));
 			}
 
 			$this->setVar('CATEGORY_ID', $prevCat['catid']);
@@ -111,10 +111,10 @@ if (is_array($subList)) {
 	$this->setVar('STUDENTS', count($studentList));
 
 	if ($prevCat['code'] != "") {
-		$this->setVar("CATEGORY", Scrub::text($prevCat['name']) . " (" . $prevCat['code'] . ")");
+		$this->setVar("CATEGORY", Scrub::text($prevCat['category_name']) . " (" . $prevCat['code'] . ")");
 	}
 	else {
-		$this->setVar("CATEGORY", Scrub::text($prevCat['name']));
+		$this->setVar("CATEGORY", Scrub::text($prevCat['category_name']));
 	}
 
 	$this->setVar('CATEGORY_ID', $prevCat['catid']);

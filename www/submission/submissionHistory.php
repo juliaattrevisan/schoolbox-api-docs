@@ -64,13 +64,15 @@ if (!in_array($submissionBox['category'], $categoryIDList)) {
 $emailObj = new Email();
 $emailAddress = $emailObj->formatEmailFromArray($owner);
 
+$dueDate = new Alaress_Date_Format($submissionBox['date'],'y-m-d');
+
 $this->setVar(array(
 	'BOX_CATEGORYNAME' => Scrub::text($submissionBox['categoryName']),
     'BOX_CATEGORYID'    => $submissionBox['cid'],
 	'BOX_NAME' => Scrub::text($submissionBox['name']),
     'BOX_DESCRIPTION' => Scrub::text($submissionBox['description']),
 	'BOX_OWNER' => '<a href="'.$_SESSION['mailhandle'].$emailAddress.'">'.$userHandler->formatName($owner).'</a>',
-	'BOX_DUEDATE' => date(Cfg::get('date_short'), strtotime($submissionBox['date'])),
+	'BOX_DUEDATE' => $dueDate->getLong(),
 ));
 
 /* Check whether a file is associated with the work
@@ -97,10 +99,10 @@ if (is_array($allWork) && count($allWork)) {
 	$this->setVar('action_submit_block', '');
 
 	foreach($allWork as $currentWork) {
-		$workDate = new Alaress_Date_Format($currentWork['date']);
+		$workDate = new Alaress_Date_Format($currentWork['date'], 'U');
 
 		$this->setVar(array(
-			'WORK_DATE' => $workDate->getLong(),
+			'WORK_DATE' => $workDate->getShort(),
 			'WORK_MARK' => Scrub::Text($currentWork['mark']),
 			'WORK_COMMENT' => Scrub::Text($currentWork['comment']),
 			'WORK_BOX_ID' => $currentWork['bid'],
