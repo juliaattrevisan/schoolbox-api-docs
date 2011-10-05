@@ -371,10 +371,6 @@ UPDATE `eportfolio_comp` SET eportfolioCategoryID = (SELECT eportfolioComponentC
 
 /* Add in seperation of questionbank */
 
-
-/* Add in support for new question templates */
-ALTER TABLE `assess_luQuestionType`     ADD COLUMN `template_dir` VARCHAR(255) NULL AFTER `filename`;
-
 ALTER TABLE `allowedFileExtension`
 	CHANGE `extension` `extension` char(12)  COLLATE utf8_general_ci NULL after `fileTypeID`;
 
@@ -424,11 +420,24 @@ INSERT IGNORE INTO assess_question_category (question_category_id,NAME,availabil
 INSERT IGNORE INTO assess_question_category (question_category_id,NAME,availability) VALUES('4','Science','assess');
 INSERT IGNORE INTO assess_question_category (question_category_id,NAME,availability) VALUES('5','History','assess');
 INSERT IGNORE INTO assess_question_category (question_category_id,NAME,availability) VALUES('6','LOTE','assess');
-
 INSERT IGNORE INTO assess_question_category (question_category_id,NAME,availability) VALUES('7','Elective Selection','survey');
 INSERT IGNORE INTO assess_question_category (question_category_id,NAME,availability) VALUES('8','Teacher Review','survey');
 INSERT IGNORE INTO assess_question_category (question_category_id,NAME,availability) VALUES('9','Medical','survey');
 
-/* Update question type table */
-TRUNCATE `assess_luQuestionType`;
-insert  into `assess_luQuestionType`(`type_id`,`filename`,`template_dir`,`description`,`moodle`,`automated_marking`,`availability`,`has_legend`) values (1,'short','short','Short Answer','shortanswer','false','assess','false'),(2,'multi','multi','Multiple Choice','multichoice','true','all','true'),(3,'fillgap','fillgap','Cloze Exercise','cloze','true','assess','true'),(4,'match','match','Matching Pairs','matching','true','assess','true'),(5,'radio','radio','Single Answer','radio','true','survey','true'),(6,'rating','ratingAgree','Rating Scale (Agree)',NULL,'false','survey','true'),(7,'rating','ratingLike','Rating Scale (Like)',NULL,'false','survey','true'),(8,'rating','ratingImportant','Rating Scale (Important)',NULL,'false','survey','true'),(9,'rating','ratingSatisfied','Rating Scale (Satisfied)',NULL,'false','survey','true'),(10,'radio','yesno','Yes/No',NULL,'false','survey','true'),(11,'radio','truefalse','True/False',NULL,'false','survey','true');
+/* Update question type table (add the new question types)
+ */
+ TRUNCATE `assess_luQuestionType`;
+ALTER TABLE `assess_luQuestionType` DROP `template_dir`;
+INSERT INTO `assess_luQuestionType`(`type_id`,`filename`,`description`,`moodle`,`automated_marking`,`availability`,`has_legend`) VALUES
+(1,'short','Short Answer','shortanswer','false','assess','false'),
+(2,'multi','Multiple Choice','multichoice','true','all','true'),
+(3,'fillgap','Cloze Exercise','cloze','true','assess','true'),
+(4,'match','Matching Pairs','matching','true','assess','true'),
+(5,'radio','Single Answer','radio','true','survey','true'),
+(6,'ratingAgree','Rating Scale (Agree)',NULL,'false','survey','true'),
+(7,'ratingLike','Rating Scale (Like)',NULL,'false','survey','true'),
+(8,'ratingImportant','Rating Scale (Important)',NULL,'false','survey','true'),
+(9,'ratingSatisfied','Rating Scale (Satisfied)',NULL,'false','survey','true'),
+(10,'yesno','Yes/No',NULL,'false','survey','true'),
+(11,'truefalse','True/False',NULL,'false','survey','true');
+
