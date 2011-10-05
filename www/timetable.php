@@ -114,7 +114,7 @@ if(is_array($outputList)) {
                         }
 
                         if($catCache[$period['code']] && $groupHandler->getPermission($catCache[$period['code']]) >= READ_ACCESS)
-                            $outputPeriod['PERIOD_ONCLICK'] = 'onClick="window.location=\'/homepage.php?code='.urlencode($period['code']).'\'"';
+                            $outputPeriod['PERIOD_ONCLICK'] = 'onClick="window.location=\'/homepage/'.urlencode($period['code']).'\'"';
 
                                         }
                                 }
