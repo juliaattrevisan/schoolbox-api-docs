@@ -119,7 +119,7 @@ CREATE TABLE `component_instance`(
 	KEY `fk_dashboard_component_instance_dashboard_component1`(`component_definition_id`) ,
 	KEY `fk_dashboard_component_instance_groups1`(`identifier`)
 ) ENGINE=MyISAM DEFAULT CHARSET='utf8';
-
+TRUNCATE `component_instance`;
 CREATE TABLE `component_option`(
 	`id` int(10) unsigned NOT NULL  auto_increment ,
 	`component_option_default_id` int(10) unsigned NOT NULL  ,
