@@ -210,9 +210,9 @@ define('HOMEPAGE_colors', serialize(array(
 )));
 
 //module config options
-//define('HELPDESK_enable', true);
-//define('HELPDESK_location', '/var/www/helpdesk');
-//define('HELPDESK_db', 'helpdesk');
+define('HELPDESK_enable', true);
+define('HELPDESK_location', '/var/www/helpdesk');
+define('HELPDESK_db', 'helpdesk');
 
 
 ?>
