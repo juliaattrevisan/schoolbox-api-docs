@@ -10,7 +10,7 @@
  * @version     SVN: $Id$
  */
 class SurveyAnswerRatingSatisfied extends AnswerRatingSatisfied {
-	protected $templateFile = 'survey/answer/multi/graph.html';
+	protected $graphTemplateFile = 'survey/answer/ratingSatisfied/graph.html';
 
 	/**
 	 * Get an instance of a responseHandler upon instantiation
@@ -29,28 +29,9 @@ class SurveyAnswerRatingSatisfied extends AnswerRatingSatisfied {
 	 * @return void
 	 */
 	public function graphResults($page, $currentQuestion) {
-		require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/survey/Graph/Bar.php');
+		require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/survey/Graph/Render.php');
 
-		$graph = new Survey_Graph_Barchart($page, $currentQuestion, $this->getTemplateFile());
+		$graph = new Survey_Graph_Render($page, $currentQuestion, $this->getGraphTemplateFile());
 		$graph->graph();
-	}
-
-	/**
-	 * Get template file
-	 *
-	 * @return string
-	 */
-	protected function getTemplateFile() {
-		return $this->templateFile;
-	}
-
-	/**
-	 * Set template file
-	 *
-	 * @param  $val
-	 * @return void
-	 */
-	protected function setTemplateFile($val) {
-		$this->templateFile = $val;
 	}
 }

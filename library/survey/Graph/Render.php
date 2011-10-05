@@ -1,15 +1,30 @@
 <?php
 /**
- * Survey_Graph_Barchart
+ * Survey_Graph_Render
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/survey/Graph/Abstract.php');
+class Survey_Graph_Render {
+	protected $currentQuestion = array();
+	protected $templateFile = null;
+	protected $page = null;
 
-class Survey_Graph_Barchart extends Survey_Graph_Abstract {
+	/**
+	 * Constructor
+	 *
+	 * @param  $page
+	 * @param  $currentQuestion
+	 * @param  $templateFile
+	 */
+	public function __construct($page, $currentQuestion, $templateFile) {
+		$this->setPage($page);
+		$this->setTemplateFile($templateFile);
+		$this->setCurrentQuestion($currentQuestion);
+		$this->setComponentHandle('temp' . $currentQuestion['question_id']);
+	}
 
 	/**
 	 * Graph a barchart
@@ -68,4 +83,79 @@ class Survey_Graph_Barchart extends Survey_Graph_Abstract {
 		$this->getPage()->parse('graph_block', $this->getComponentHandle());
 	}
 
+	/**
+	 * Set current question
+	 *
+	 * @param  $val
+	 * @return void
+	 */
+	protected function setCurrentQuestion($val) {
+		$this->currentQuestion = $val;
+	}
+
+	/**
+	 * Get current question
+	 *
+	 * @return array
+	 */
+	protected function getCurrentQuestion() {
+		return $this->currentQuestion;
+	}
+
+	/**
+	 * Set template file
+	 *
+	 * @param  $val
+	 * @return void
+	 */
+	protected function setTemplateFile($val) {
+		$this->templateFile = $val;
+	}
+
+	/**
+	 * Get template file
+	 *
+	 * @return null
+	 */
+	protected function getTemplateFile() {
+		return $this->templateFile;
+	}
+
+	/**
+	 * Set page
+	 *
+	 * @param  $val
+	 * @return void
+	 */
+	protected function setPage($val) {
+		$this->page = $val;
+	}
+
+	/**
+	 * Get page
+	 *
+	 * @return null
+	 */
+	protected function getPage() {
+		return $this->page;
+	}
+
+	/**
+	 * Set component handle
+	 *
+	 * @param  $val
+	 * @return void
+	 */
+	protected function setComponentHandle($val) {
+		$this->componentHandle = $val;
+	}
+
+	/**
+	 * Get component handle
+	 *
+	 * @return
+	 */
+	protected function getComponentHandle() {
+		return $this->componentHandle;
+	}
 }

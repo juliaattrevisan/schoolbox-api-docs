@@ -12,12 +12,17 @@
 abstract class EvaluationAnswer extends DeprecatedModel {
     public $_table = 'assess_answer';
     public $_index = 'answer_id';
-    public $responseHandler;
+
+    public $responseHandler = null;
     protected $allowedFields = array('answer_id', 'question_id', 'sequence', 'answer', 'deleted_at');
 
 	/* Whether or not to include HTML formatting when exporting CSV results
 	 */
 	protected $legendHTML = false;
+
+	/* Template file used for graphing
+	 */
+	protected $graphTemplateFile = null;
 
 	/**
 	 * Constructor.
@@ -134,4 +139,13 @@ abstract class EvaluationAnswer extends DeprecatedModel {
 
         return array();
     }
+
+	/**
+	 * Get graph template file
+	 *
+	 * @return string
+	 */
+	protected function getGraphTemplateFile() {
+		return $this->graphTemplateFile;
+	}
 }

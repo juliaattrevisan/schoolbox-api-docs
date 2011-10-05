@@ -10,6 +10,7 @@
  * @version     SVN: $Id$
  */
 class SurveyAnswerShort extends AnswerShort {
+	protected $graphTemplateFile ='survey/answer/short/graph.html';
 
 	/**
 	 * Get an instance of a responseHandler upon instantiation
@@ -30,7 +31,7 @@ class SurveyAnswerShort extends AnswerShort {
 	public function graphResults($page, $currentQuestion) {
 		$componentHandle = 'temp' . $currentQuestion['question_id'];
 
-		$page->setFile($componentHandle, 'survey/answer/short/graph.html');
+		$page->setFile($componentHandle, $this->getGraphTemplateFile());
 
 		$page->parse('graph_block', $componentHandle);
 	}
