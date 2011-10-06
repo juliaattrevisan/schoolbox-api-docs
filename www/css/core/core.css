@@ -2404,6 +2404,26 @@ ul.section-options a.drop-arrow {
 .evaluation-legend ul li a.active, .evaluation-response ul li a.active{background:#cae9b9 }
 .evaluation-legend ul li span{font-weight:normal;}
 
+
+/*Graphs*/
+.evaluation-graph-holder .graph{width:600px; height:300px; float:left;
+
+	margin-bottom:16px
+}
+.evaluation-graph-holder .legend{float:left; margin-left:16px; border:1px solid #e0e0e0;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px; 
+          border-radius: 4px;
+
+margin-bottom:16px;
+
+	-webkit-box-shadow: 1px 1px 2px #e0e0e0;
+	   -moz-box-shadow: 1px 1px 2px #e0e0e0;
+			box-shadow: 1px 1px 2px #e0e0e0;
+
+  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
+}
+.evaluation-graph-holder .legend td{font-size:12px;}
 /************************
  END EVALUATION
  ************************/
@@ -3948,7 +3968,6 @@ p.forgotten { margin:10px 0; }
 	padding: 0;
 	margin: 0;
 	height: 1%;
-
 }
 
 /************ WYSYWIG STYLES *************/
