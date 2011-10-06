@@ -44,7 +44,13 @@ class Component_DefinitionMapper extends Mapper {
 
         $this->hasMap(array(
             'column'     => 'visible',
-            'property'   => 'visble',
+            'property'   => 'visible',
+            'type'       => Mapper::TYPE_STRING,
+        ));
+
+        $this->hasMap(array(
+            'column'     => 'multiple',
+            'property'   => 'multiple',
             'type'       => Mapper::TYPE_STRING,
         ));
 

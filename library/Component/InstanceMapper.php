@@ -98,13 +98,35 @@ class Component_InstanceMapper extends Mapper {
 
             $instanceMapper = Component_InstanceMapper::getInstance();
 
+            $definitionMapper = Component_DefinitionMapper::getInstance();
+
+            $dirtyInstance->definition = $definitionMapper->findById($dirtyInstance->definitionId);
+
+            /* Check for multiple instances with the same definition if disallowed */
+            if ( $dirtyInstance->definition->multiple == 'false' ) {
+                $similarInstanceCollection = $instanceMapper->findByColumnList(array(
+                    'module'     => 'dashboard',
+                    'identifier' => $dirtyInstance->identifier,
+                    'component_definition_id' => $dirtyInstance->definition->id
+                ));
+
+                foreach ( $similarInstanceCollection as $similarInstance ) {
+                    if ( $similarInstance->id != $dirtyInstance->id ) {
+                        return false;
+                    }
+                }
+            }
+
             /* Find original instance otherwise use blank instance for following conditional statements */
-            if ( !$cleanInstance = $instanceMapper->findById($dirtyInstance->id) ) {
+            $cleanInstance = $instanceMapper->findById($dirtyInstance->id);
+
+            if ( !$cleanInstance ) {
                 $cleanInstance = new Component_Instance;
             }
 
             if ( $dirtyInstance->position != $cleanInstance->position || $dirtyInstance->sequence != $cleanInstance->sequence ) {
 
+                /* Resequence source components */
                 if ( !empty($cleanInstance->id) ) {
                     $sourceInstanceCollection = $instanceMapper->findByColumnList(array(
                         'module'     => 'dashboard',
@@ -116,14 +138,15 @@ class Component_InstanceMapper extends Mapper {
                         if ( $sourceInstance->id == $cleanInstance->id ) {
                             unset($sourceInstanceCollection[$index]);
                         }
-                        else if ( $sourceInstance->sequence > $dirtyInstance->sequence ) {
-                            $sourceInstance->sequence--;
+                        else if ( $sourceInstance->sequence > $cleanInstance->sequence ) {
+                            $sourceInstanceCollection[$index]->sequence--;
                         }
                     }
 
                     parent::save($sourceInstanceCollection);
                 }
 
+                /* Resequence destination components */
                 $destinationInstanceCollection = $instanceMapper->findByColumnList(array(
                     'module'     => 'dashboard',
                     'identifier' => $dirtyInstance->identifier,

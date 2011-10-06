@@ -17,4 +17,10 @@ class Component_Definition extends Model {
     public $class;
 
     public $description;
+
+    public $module;
+
+    public $visible;
+
+    public $multiple;
 }

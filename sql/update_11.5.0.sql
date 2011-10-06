@@ -441,3 +441,21 @@ INSERT INTO `assess_luQuestionType`(`type_id`,`filename`,`description`,`moodle`,
 (10,'yesno','Yes/No',NULL,'false','survey','true'),
 (11,'truefalse','True/False',NULL,'false','survey','true');
 
+/* Add multiple flag for component definitions */
+ALTER TABLE `component_definition` ADD COLUMN `multiple` ENUM('false','true') NULL AFTER `visible` ;
+
+UPDATE `component_definition` SET `multiple`='false' WHERE `id`='1';
+UPDATE `component_definition` SET `multiple`='false' WHERE `id`='2';
+UPDATE `component_definition` SET `multiple`='false' WHERE `id`='3';
+UPDATE `component_definition` SET `multiple`='false' WHERE `id`='4';
+UPDATE `component_definition` SET `multiple`='false' WHERE `id`='5';
+UPDATE `component_definition` SET `multiple`='false' WHERE `id`='6';
+UPDATE `component_definition` SET `multiple`='false' WHERE `id`='7';
+UPDATE `component_definition` SET `multiple`='false' WHERE `id`='8';
+UPDATE `component_definition` SET `multiple`='false' WHERE `id`='9';
+UPDATE `component_definition` SET `multiple`='false' WHERE `id`='11';
+UPDATE `component_definition` SET `multiple`='false' WHERE `id`='13';
+UPDATE `component_definition` SET `multiple`='false' WHERE `id`='14';
+UPDATE `component_definition` SET `multiple`='false' WHERE `id`='15';
+UPDATE `component_definition` SET `multiple`='false' WHERE `id`='16';
+UPDATE `component_definition` SET `multiple`='false' WHERE `id`='17';

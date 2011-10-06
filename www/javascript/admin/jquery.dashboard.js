@@ -57,6 +57,8 @@
 
                     $.post('/adminv2/dashboard/save-instance', $component, function ($instance) {
                         $(ui.item).attr('id', 'instance-id-'+$instance.id);
+
+                        refreshPalette();
                     });
                 },
                 placeholder: 'marker',
@@ -74,20 +76,42 @@
                 helper: 'clone',
                 connectToSortable: '#dashboard-layout .component-holder'
             });
+
+            refreshPalette();
+        }
+
+        function refreshPalette () {
+            $('#definition-palette .component').each( function () {
+                var $definitionElement = $(this);
+
+                var $definitionIdClass = $definitionElement.attr('class').match(/(definition\-id\-\d+)/)[1];
+
+                if ( !$('#dashboard-layout .component').hasClass($definitionIdClass) ) {
+                    $definitionElement
+                        .draggable('enable')
+                        .removeClass('disabled');
+                }
+                else {
+                    $definitionElement
+                        .draggable('disable')
+                        .addClass('disabled');
+                }
+            } );
         }
 
         initializeLayout();
 
         $('.delete-this').live('click',function() {
             var $instanceId = $(this).parent().attr('id').match(/^instance\-id\-(\d+)$/)[1];
+            console.log($(this).parent());
 
             $(this).parent().slideUp(100,function(){
                 $(this).remove();
+                refreshPalette();
             })
 
-
             $.post('/adminv2/dashboard/remove-instance', {instanceId: $instanceId}, function () {
-
+                
             });
 
             return false;
