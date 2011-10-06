@@ -55,7 +55,7 @@ class News extends DeprecatedModel {
 	}
 	
 	function getCampusList() {
-		$query = "SELECT id, name FROM luCampus;
+		$query = "SELECT id, name FROM luCampus";
 		$campusList = $this->db->getAll($query);
 		if (is_array($campusList)) {
 			$i = 0;
