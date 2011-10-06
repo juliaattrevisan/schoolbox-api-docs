@@ -76,7 +76,7 @@ echo "... $cur_ver"
 }
 setNewVersion() {
 echo -e "Setting New Version to $new_ver...";
-`echo "UPDATE config SET value = '$new_ver' where value = '$cur_ver'"|mysql -u $sqluser --password=$sqlpass $sqldb`;
+`echo "UPDATE config SET value = '$new_ver' where name = 'site_version'"|mysql -u $sqluser --password=$sqlpass $sqldb`;
 errorCheck;
 }
 phpVersionCheck() {
