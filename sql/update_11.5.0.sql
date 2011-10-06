@@ -459,3 +459,14 @@ UPDATE `component_definition` SET `multiple`='false' WHERE `id`='14';
 UPDATE `component_definition` SET `multiple`='false' WHERE `id`='15';
 UPDATE `component_definition` SET `multiple`='false' WHERE `id`='16';
 UPDATE `component_definition` SET `multiple`='false' WHERE `id`='17';
+
+/* Set colours for new top position on hompages to colours of the left position */
+UPDATE `homepage_config` SET
+	top_head_font = left_head_font,
+	top_head_bg = left_head_bg,
+	top_font = left_font,
+	top_bg_primary = left_bg_primary,
+	top_bg_secondary = left_bg_secondary,
+	top_link = left_link,
+	top_hover = left_hover
+WHERE top_head_font IS NULL;
