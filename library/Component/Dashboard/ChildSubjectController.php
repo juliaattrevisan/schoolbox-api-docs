@@ -38,7 +38,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             if ( !( Cfg::get('site_location') == 'wenona' && $child['gid'] == 3 ) ) {
                 $i++;
                 $query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
-                $user = $this->db->getRow($query);
+                $user = DeprecatedDatabase::getInstance()->getRow($query);
                 $this->setVar("STUDENT_ID", $child['id']);
                 $this->setVar("STUDENT_NAME", $this->user->formatName($user, '{firstname} {lastname}'));
                 $this->setVar("STUDENT_YEAR", $user['year'] == 0 ? 'K' : $user['year']);

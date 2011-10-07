@@ -481,6 +481,8 @@ class Group extends DeprecatedModel {
             $groupID = $user['group_id'];
         } elseif (is_numeric($_SESSION['gid'])) {
             $groupID = $_SESSION['gid'];
+        }
+        else {
             return false;
         }
 

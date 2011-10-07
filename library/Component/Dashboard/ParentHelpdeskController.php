@@ -42,7 +42,7 @@ class Component_Dashboard_ParentHelpdeskController extends Component_Dashboard_C
 
             foreach ( $this->children as $child ) {
                 $query = "SELECT title, firstname, lastname, year FROM " . SQL_db . ".user WHERE id = {$child['id']}";
-                $user = $this->db->getRow($query);
+                $user = DeprecatedDatabase::getInstance()->getRow($query);
                 $this->setVar("STUDENT_ID", $child['id']);
                 $this->setVar("STUDENT_NAME", $this->user->formatName($user, '{firstname} {lastname}'));
                 $this->setVar("STUDENT_YEAR", $user['year']);

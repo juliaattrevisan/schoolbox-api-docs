@@ -234,9 +234,9 @@ class Session {
 
     }
 
-    function setSynergyInfo($userHandler) {
-        require_once dirname(__FILE__) .'/../library/group.php';
-        require_once dirname(__FILE__) .'/../library/category.php';
+    function setSynergyInfo ($userHandler) {
+        require_once dirname(__FILE__) . '/../library/group.php';
+        require_once dirname(__FILE__) . '/../library/category.php';
         $synUser = new ExternalUser;
         $groupHandler = new Group;
         $catHandler = new Category;
@@ -246,30 +246,34 @@ class Session {
         $semester = $synUser->getCurrentSemester();
 
         $synergy_id = $_SESSION['sid'];
-        if ($synergy_id && $_SESSION['FileSemester'] && $_SESSION['FileYear']) {
+        if ( $synergy_id ) {
 
             //if user is parent get information regarding enrolled students
-            if ($groupHandler->isParent()) {
-                if (Cfg::get('external_sync_data') ) {
+            if ( $groupHandler->isParent() ) {
+                if ( Cfg::get('external_sync_data') ) {
                     //Updates parents email from synergetic
                     $email = $synUser->getEmail($synergy_id);
-                    $mydb->update('user', 'id', array('id' => $_SESSION['id'], 'alt_email' => $email));
+                    $mydb->update('user', 'id', array( 'id' => $_SESSION['id'], 'alt_email' => $email ));
                 }
 
-                if ($synergy_id) {
+                if ( $synergy_id ) {
                     $children = $synUser->getEnrolledStudents($synergy_id);
-                    if (is_array($children)) {
-                        foreach ($children as $child) {
+
+                    if ( is_array($children) ) {
+                        foreach ( $children as $child ) {
                             $portal = $userHandler->getBySynergy($child['RelatedID']);
                             $subjects = array();
-                            if ($portal['uid']) {
+
+                            if ( $portal['uid'] ) {
                                 $subjectList = $synUser->getSubjectList($child['RelatedID'], $portal['uid']);
-                                if (is_array($subjectList)) {
-                                    foreach ($subjectList as $subject) {
+
+                                if ( is_array($subjectList) ) {
+                                    foreach ( $subjectList as $subject ) {
                                         //check subject exists.. we cant link to subjects that dont exist its ugly
                                         $cat = $catHandler->getByCode($subject['code']);
-                                        if(is_array($cat) && is_numeric($cat['id'])) {
-                                            if ($groupHandler->getPermission($cat['id']) >= READ_ACCESS) {
+
+                                        if ( is_array($cat) && is_numeric($cat['id']) ) {
+                                            if ( $groupHandler->getPermission($cat['id']) >= READ_ACCESS ) {
                                                 $subject['id'] = $cat['categoryID'];
                                                 $subjects[] = $subject;
                                             }
@@ -278,26 +282,24 @@ class Session {
                                 }
 
                                 $_SESSION['children'][] = array(
-									'id' => $portal['uid'],
-									'sid' => $child['RelatedID'],
-									'gid' => $portal['group_id'],
-									'name' => $userHandler->formatName($portal),
-									'subjects' => $subjects
-								);
+                                    'id' => $portal['uid'], 'sid' => $child['RelatedID'], 'gid' => $portal['group_id'],
+                                    'name' => $userHandler->formatName($portal), 'subjects' => $subjects
+                                );
                             }
-                       }
-                   }
-               }
-            } else { //user is not parent so get timetable information
+                        }
+                    }
+                }
+            }
+            else { //user is not parent so get timetable information
                 $subjectList = $synUser->getSubjectList($synergy_id, $_SESSION['id']);
 
                 $catList = array();
-                if (is_array($subjectList)) {
-                    foreach ($subjectList as $subject) {
+                if ( is_array($subjectList) ) {
+                    foreach ( $subjectList as $subject ) {
                         //check subject exists.. we cant link to subjects that dont exist its ugly
                         $result = $catHandler->getByCode($subject['code']);
-                        if (is_array($result) && is_numeric($result['id'])) {
-                            if (!in_array($result['id'], $catList)) {
+                        if ( is_array($result) && is_numeric($result['id']) ) {
+                            if ( !in_array($result['id'], $catList) ) {
                                 $subject['id'] = $result['id'];
                                 $subject['name'] = $result['name'];
 
@@ -308,11 +310,12 @@ class Session {
                     }
                     $_SESSION['timetable'] = 1;
                 }
-                else
+                else {
                     $_SESSION['timetable'] = 0;
+                }
 
             }
 
-      }
-   }
+        }
+    }
 }
