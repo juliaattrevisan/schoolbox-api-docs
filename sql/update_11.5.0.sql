@@ -470,3 +470,14 @@ UPDATE `homepage_config` SET
 	top_link = left_link,
 	top_hover = left_hover
 WHERE top_head_font IS NULL;
+
+/* reCAPTCHA keys */
+INSERT INTO `config` (`name`, `value`, `title`, `description`, `field`, `type`, `editable`, `hidden`, `required`) VALUES ('recaptcha_private_api_key', '6LfS0sgSAAAAADh12n8weyLb8irboBWfhseikfCF', 'reCAPTCHA Private Key', 'The reCAPTCHA private key', 'input', 'External DB', 'false', 'true', 'false');
+INSERT INTO `config` (`name`, `value`, `title`, `description`, `field`, `type`, `editable`, `hidden`, `required`) VALUES ('recaptcha_public_api_key', '6LfS0sgSAAAAALQEAZ9Di5rG_RZ7saoLKsgNo6Iq', 'reCAPTCHA Public Key', 'The reCAPTCHA public key', 'input', 'External DB', 'false', 'true', 'false');
+
+/* reCAPTCHA error */
+INSERT INTO `error` (`id`, `message`) VALUES (137, 'The words you entered in to the human checker are incorrect.');
+
+/* Added descriptions to PlagScan config items */
+UPDATE `config` SET `description`='A key key generated in the PlagScan administration interface' WHERE `configID`='73';
+UPDATE `config` SET `description`='The username you used when registering for the PlagScan service.' WHERE `configID`='74';

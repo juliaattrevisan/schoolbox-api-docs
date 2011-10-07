@@ -16,10 +16,15 @@ session_start();
 require_once dirname(__FILE__) . '/conf/conf.php';
 require_once dirname(__FILE__) . '/../include/SitePage.php';
 require_once SITE_root . '/include/Mailer.php';
-require_once SITE_root . '/library/reCaptcha.php';
 
-if(validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $_POST['template'])
-	&& (isset($_SESSION['id']) || ReCaptcha::checkResponse($_POST['recaptcha_answer'], $_POST['recaptcha_challenge']))) {
+$recaptcha = new ReCaptcha( Config::get('recaptcha_public_api_key'), Config::get('recaptcha_private_api_key') );
+
+if ( !isset($_SESSION['id']) && !$recaptcha->check_answer($_SERVER['REMOTE_ADDR'], $_POST['recaptcha_challenge_field'], $_POST['recaptcha_response_field']) ) {
+    $page = new SitePage( false );
+    //error(137);
+}
+
+if(validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $_POST['template'])) {
 
 	$mailHandler = new Mailer($_POST['template'], 'OurSchool Feedback - ' . $_POST['subject'], Cfg::get('mail_support_address'));
 
@@ -50,7 +55,6 @@ if(validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.ht
 		$receiptHandler->send();
 
 	}
-
 }
 
 if(preg_match("/^[a-zA-Z0-9\/\-\_]+/", $_POST['confirmation']) )

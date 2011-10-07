@@ -2,14 +2,8 @@
 <script language="JavaScript" type="text/javascript">
 $j(function () {
 
+	$j('#feedbackForm').submit(function ($event) {
 
-	var justSubmit = false;
-	
-	$j('#feedbackForm').submit(function () {
-
-		if (justSubmit)
-			return true;
-		
 		var message = '', form = $j(this);
 		if ($j('#name').val() == '')
 			message += 'Please enter your name.\n';
@@ -17,20 +11,18 @@ $j(function () {
 		if ($j('#email').val() == '')
 			message += 'Please enter your email address.\n';
 		
-		if ($j('#message').val() == '')
-			message += 'Please enter a message.\n';
-		
+        if ($j('#message').val() == '')
+            message += 'Please enter a message.\n';
+
+        if ($j('#recaptcha_response_field').val() == '')
+            message += 'Please enter the two corrosponding words for the human checker.\n';
+
 		if (message != '') {
 			alert(message);
-			return false;
-		
-		}
+            return false;
+        }
 	});
-	
-	$j('input').change(function () {
-		justSubmit = false;
-	});
-		
+
 });
 </script>
 <!-- END custom_head -->
@@ -59,12 +51,7 @@ $j(function () {
     <tr>
       <td><h4>Human Checker</h4>
       	<em>Please type out these two words so that we know you're not a bot </em><br />
-		<div id='recaptcha'><img src="{RECAPTCHA_IMAGE}" alt="" /></div>
-        
-        <input type="hidden" name="recaptcha_challenge" id="recaptcha_challenge" value="{RECAPTCHA_CHALLENGE}" />
-        <input type="text" name="recaptcha_answer" id="recaptcha_answer" size="35" autocomplete="off" />
-        <a href="#" id="recaptcha_reload" title="Get new words">Get new words</a>
-	
+          {RECAPTCHA}
 		</td>
     </tr>
     <!-- END recaptcha -->
