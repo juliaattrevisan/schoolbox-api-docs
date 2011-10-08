@@ -35,11 +35,7 @@ $j(function() {
 		});
 
 	});
-	
-	$j('.show-options').click(function() {
-		$j(this).parent().siblings('p').slideToggle("fast");
-		return false;
-	});
+
 	
 });
 </script>
@@ -68,19 +64,14 @@ $j(function() {
 				<li>
 					<strong>Q{QUESTION_SEQUENCE})</strong> 
 					{QUESTION_QUESTION}
-					<a href="/survey/question/export/{QUESTION_QUESTION_ID}">Export</a> | 
 					<a href="/survey/question/modify/{QUESTION_QUESTION_ID}">Edit</a> | 
 					<a class="delete" href="/survey/question/delete/{QUESTION_QUESTION_ID}">Delete</a>
 				</li>
 				<!-- END question -->
 				<li class="clearfix">
 					<p class="clearfix no-marg">
-						<a class="btn add show-options" href="#"><span></span>Add a Question</a> 
-					</p>
-					<p class="hide clearfix border">
-						<span class="arrow"></span>
-						<a class="btn download marg" href="/survey/questionbank/contents/{SECTION_SECTION_ID}"><span></span>QuestionBank</a>
-						<a class="btn add marg" href="/survey/question/create/{SECTION_SECTION_ID}"><span></span>New</a>
+						<a class="btn add marg" href="/survey/question/create/{SECTION_SECTION_ID}"><span></span>New Question</a>
+                        <a class="btn download marg" href="/survey/questionbank/contents/0/{ASSESS_ASSESS_ID}/{SECTION_SECTION_ID}"><span></span>Import Question</a>
 					</p>
 				</li>
 			</ul>

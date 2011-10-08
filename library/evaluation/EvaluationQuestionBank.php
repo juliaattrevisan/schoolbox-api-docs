@@ -15,26 +15,24 @@ abstract class EvaluationQuestionBank extends DeprecatedModel {
 
 	/**
 	 * Get a list of all the questions in the question bank, and show what types
-	 * they are, and what categories they belong to
+	 * they are,
 	 *
 	 * @return array|bool
 	 */
-	public function getContents() {
+	public function getContents($category_id) {
 		$query = "SELECT
 			assess_question_bank.question_bank_id,
-			assess_question_category.question_category_id,
-			assess_question_category.name,
 			assess_question_bank.question,
 			assess_luQuestionType.description,
 			assess_question_bank.marks
 			FROM assess_question_bank
-			LEFT JOIN assess_question_category ON assess_question_bank.question_category_id = assess_question_category.question_category_id
 			LEFT JOIN assess_luQuestionType ON assess_question_bank.type_id = assess_luQuestionType.type_id
-			WHERE assess_question_bank.deleted_at IS NULL
-			ORDER BY name";
+			WHERE question_category_id = '$category_id' AND assess_question_bank.deleted_at IS NULL";
 
 		return $this->db->getAll($query);
 	}
+
+
 
 	/**
 	 * Adds a question to the question bank, by copying its question text and
