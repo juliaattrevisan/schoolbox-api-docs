@@ -26,8 +26,13 @@ $j(function() {
     });
 
 	$j('.next-to-input').click(function() {
-		 window.open('/adminv2/modify-user/'+$j('#user-to-mod').val(), '_self');
-		 return false;
+
+		if (!$j(this).hasClass('disabled')){
+			window.open('/adminv2/modify-user/'+$j('#user-to-mod').val(), '_self');
+		}
+
+		return false;
+
 	});
 
 	$j('h3 span').qtip({
