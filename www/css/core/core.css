@@ -1400,7 +1400,7 @@ input.timeField {
 	top: 2px;
 }
 
-.btn.disabled{color:#aaa !important;}
+.btn.disabled{color:#aaa !important;border-color:#ddd;}
 
 a.icons {
 	display: block;
