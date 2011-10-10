@@ -69,14 +69,21 @@ $j(document).ready(function() {
 	 }
 
 	 $j('input[type=checkbox], input[type=radio]').each(function() {
-		if ($j(this).is(':selected')) {
+		if ($j(this).is(':checked')) {
 			$j(this).parent().addClass('selected');
 		}
 	 });
 
-	 $j('label').click(function() {
-		 $j(this).toggleClass('selected');
-	 });
+	$j('input[type=checkbox]').click(function() {
+		$j(this).parent().toggleClass('selected');
+	});
+
+	$j('input[type=radio]').click(function() {
+		$j(this).parent().siblings('label').each(function() {
+			$j(this).removeClass('selected');
+		})
+		$j(this).parent().addClass('selected')
+	})
 
 });
 </script>
