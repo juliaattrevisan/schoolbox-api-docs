@@ -148,7 +148,7 @@ CREATE TABLE `component_option_definition`(
 
 /* Survey homepage component
  */
-INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`homepageCategoryID`,`filename`,`config`,`invisible`,`allowMultiple`) VALUES ( '44','1','outputSurvey','Surveys','Create surveys for your homepage visitors with various question types and graphical summaries','3','survey.html','','false','false');
+INSERT IGNORE INTO `homepage_comp`(`size`,`method`,`name`,`description`,`homepageCategoryID`,`filename`,`config`,`invisible`,`allowMultiple`) VALUES ('1','outputSurvey','Surveys','Create surveys for your homepage visitors with various question types and graphical summaries','3','survey.html','','false','false');
 
 /* Whether or not exported responses for a question have a legend
  * Also applicable for View All Responses for a Survey question
