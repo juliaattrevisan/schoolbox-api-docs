@@ -28,8 +28,11 @@ if (is_numeric($_REQUEST['uid'])) {
 
             /* Update the db */
             foreach ($components[$key] as $ckey => $component) {
-                $ckey++;
-                $eportfolioHandler->updateComponentPosition($component, $key, $ckey);
+                if ( !empty($component) ) {
+                    $ckey++;
+
+                    $eportfolioHandler->updateComponentPosition($component, $key, $ckey);
+                }
             }
         }
     }
