@@ -5,11 +5,13 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage();
 
+$groupHandler = new Group();
+
 if (is_numeric($_REQUEST['uid'])) {
 
     /* Check that you own the current ePortfolio being viewed
      */
-    if ($_SESSION['id'] != $_REQUEST['uid']) {
+    if ($_SESSION['id'] != $_REQUEST['uid'] && !$groupHandler->isSuperuser($_SESSION['id'])) {
         error(19);
     }
 

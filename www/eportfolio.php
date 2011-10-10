@@ -14,6 +14,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 
 $userHandler = new User();
+$groupHandler = new Group();
 $eportfolioHandler = new ePortfolio($this->arg[0]);
 $allowedFiles = new AllowedFile();
 
@@ -197,7 +198,7 @@ if ($eportfolioHandler->canEdit($userID)) {
 
 	/* Has elevated privileges, can write to page
 	 */
-	if ($_SESSION['id'] == $this->arg[0]) {
+	if ($_SESSION['id'] == $this->arg[0] || $groupHandler->isSuperuser($_SESSION['id'])) {
 		$this->parse('edit_page_block', 'edit_page');
 		$this->parse('modify_layout_block', 'modify_layout');
 	}
