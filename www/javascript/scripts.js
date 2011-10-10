@@ -19,7 +19,7 @@ $j(function() {
 	
 	$j('.standardForm tr:last td').css("border", "0") 
 	
-	$j('.submit').click(function(event) {
+	$j('.submit, .submit-this').click(function(event) {
 		event.preventDefault();
 		$j(this).closest('form').submit();
 	});
