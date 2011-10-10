@@ -82,7 +82,7 @@ if (is_array($_SESSION['children'])) {
 	$this->parse('is_parent_block', 'is_parent');
 }
 
-$categoryList = $groupHandler->involvedCategoryList($user['uid']);
+$categoryList = $groupHandler->involvedInCategoryList($user['uid']);
 
 if (is_array($categoryList)) {
 	foreach($categoryList as $category) {
