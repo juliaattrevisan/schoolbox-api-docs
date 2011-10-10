@@ -278,7 +278,7 @@ CREATE TABLE eportfolio_objective_skill (
 	body TEXT,
 PRIMARY KEY (id));
 
-INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveSkill', 'Skills', 'A list of your skills for your resume', 2, 'objectiveSkill.html', 'false');
+INSERT IGNORE INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveSkill', 'Skills', 'A list of your skills for your resume', 2, 'objectiveSkill.html', 'false');
 
 /* Eportfolio Objective: Goals
  */
@@ -288,7 +288,7 @@ CREATE TABLE eportfolio_objective_goal (
 	body TEXT,
 PRIMARY KEY (id));
 
-INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveGoal', 'Goals', 'A list of your goals for your resume', 2, 'objectiveGoal.html', 'false');
+INSERT IGNORE INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveGoal', 'Goals', 'A list of your goals for your resume', 2, 'objectiveGoal.html', 'false');
 
 /* Eportfolio Objective: Awards
  */
@@ -298,7 +298,7 @@ CREATE TABLE eportfolio_objective_award (
 	body TEXT,
 PRIMARY KEY (id));
 
-INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveAward', 'Awards', 'A list of your awards for your resume', 2, 'objectiveAward.html', 'false');
+INSERT IGNORE INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveAward', 'Awards', 'A list of your awards for your resume', 2, 'objectiveAward.html', 'false');
 
 /* Eportfolio Objective: Cover Letter
  */
@@ -308,7 +308,7 @@ CREATE TABLE eportfolio_objective_coverletter (
 	body TEXT,
 PRIMARY KEY (id));
 
-INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveCoverLetter', 'Cover Letter', 'A cover letter for your resume', 2, 'objectiveCoverLetter.html', 'false');
+INSERT IGNORE INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveCoverLetter', 'Cover Letter', 'A cover letter for your resume', 2, 'objectiveCoverLetter.html', 'false');
 
 /* Eportfolio Objective: Interest
  */
@@ -318,7 +318,7 @@ CREATE TABLE eportfolio_objective_interest (
 	body TEXT,
 PRIMARY KEY (id));
 
-INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveInterest', 'Interests', 'A list of interests for your resume', 2, 'objectiveInterest.html', 'false');
+INSERT IGNORE INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveInterest', 'Interests', 'A list of interests for your resume', 2, 'objectiveInterest.html', 'false');
 
 /* Eportfolio Objective: Employment History
  */
@@ -328,7 +328,7 @@ CREATE TABLE eportfolio_objective_employmenthistory (
 	body TEXT,
 PRIMARY KEY (id));
 
-INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveEmploymentHistory', 'Employment History', 'An employment history for your resume', 2, 'objectiveEmploymentHistory.html', 'false');
+INSERT IGNORE INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveEmploymentHistory', 'Employment History', 'An employment history for your resume', 2, 'objectiveEmploymentHistory.html', 'false');
 
 /* Eportfolio Objective: Education History
  */
@@ -338,17 +338,17 @@ CREATE TABLE eportfolio_objective_educationhistory (
 	body TEXT,
 PRIMARY KEY (id));
 
-INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveEducationHistory', 'Education History', 'An education history for your resume', 2, 'objectiveEducationHistory.html', 'false');
+INSERT IGNORE INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputObjectiveEducationHistory', 'Education History', 'An education history for your resume', 2, 'objectiveEducationHistory.html', 'false');
 
 /* Resume (Objective Component composite)
  * Uncomment when you need a standard format
  */
--- INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputResumeStandard', 'Standard Resume', 'A standard resume', 2, 'resume/standard.html', 'false');
--- INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputResumeExtended', 'Extended Resume', 'An extended resume', 2, 'resume/extended.html', 'false');
+-- INSERT IGNORE INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputResumeStandard', 'Standard Resume', 'A standard resume', 2, 'resume/standard.html', 'false');
+-- INSERT IGNORE INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputResumeExtended', 'Extended Resume', 'An extended resume', 2, 'resume/extended.html', 'false');
 
 /* Eportfolio Image Scroller Component Definition
  */
-INSERT INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputImageScroller', 'Image Scroller', 'An image scroller', 1, 'imageScroller.html', 'false');
+INSERT IGNORE INTO eportfolio_comp (size,  method, `name`, description, eportfolioCategoryID, filename, allowMultiple) VALUES (1,  'outputImageScroller', 'Image Scroller', 'An image scroller', 1, 'imageScroller.html', 'false');
 
 /* Add in 3rd column css support (top area) */
 ALTER TABLE `homepage_config`     ADD COLUMN `top_head_font` CHAR(7) NULL AFTER `right_hover`,     ADD COLUMN `top_head_bg` CHAR(7) NULL AFTER `top_head_font`,     ADD COLUMN `top_font` CHAR(7) NULL AFTER `top_head_bg`,     ADD COLUMN `top_bg_primary` CHAR(7) NULL AFTER `top_font`,     ADD COLUMN `top_bg_secondary` CHAR(7) NULL AFTER `top_bg_primary`,     ADD COLUMN `top_link` CHAR(7) NULL AFTER `top_bg_secondary`,     ADD COLUMN `top_hover` CHAR(7) NULL AFTER `top_link`;
