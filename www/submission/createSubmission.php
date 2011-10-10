@@ -97,7 +97,7 @@ else if($this->arg[0] == 'new') {
     /* Output category information */
 	$this->setVar('CURRENT_CAT', '');
 
-	$categoryList = $groupHandler->involvedCategoryList($_SESSION['id']);
+	$categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
 	$length = count($categoryList);
 	for ($i = 0; $i < $length; $i++) {
 		if (!empty($categoryList[$i]['code']))
