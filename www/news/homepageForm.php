@@ -10,15 +10,15 @@ if($_POST['heading'] && is_numeric($_POST['code'])) {
 	if (($permission = $groupHandler->getPermission($_POST['code'])) < WRITE_ACCESS)
 		error(19);
 
-    $publishedDate = new DateTime( str_replace('/', '-', $_POST['datetime_published']) );
-    $expiryDate = new DateTime( str_replace('/', '-', $_POST['datetime_expires']) );
+    $publishedDate = new Alaress_Date_Format($_POST['datetime_published'], 'd/m/y');
+    $expiryDate = new Alaress_Date_Format($_POST['datetime_expires'], 'd/m/y');
 
     $news = array(
         'heading' => $_POST['heading'],
         'body' => $_POST['body'],
         'code' => $_POST['code'],
-        'datetime_published' => $publishedDate->format(Cfg::get('date_database')),
-        'datetime_expires' => $expiryDate->format(Cfg::get('date_database')),
+        'datetime_published' => $publishedDate->getDatabaseDate(),
+        'datetime_expires' => $expiryDate->getDatabaseDate(),
     );
 
 	if(is_numeric($_POST['id'])) {
