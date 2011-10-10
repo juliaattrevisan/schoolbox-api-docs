@@ -67,7 +67,9 @@ class Link extends DeprecatedModel {
 
         if(isset($data['url'])) 
             $data['url'] = $this->appendHTTP(trim($data['url']));
-		
+
+        $data['modified'] = 'NOW()';
+
 		parent::update($data);
 		
 		/* Update log entry */
@@ -77,7 +79,8 @@ class Link extends DeprecatedModel {
 	
 	function create($data) {
 		
-		$data['submitted'] = 'NOW()';
+        $data['submitted'] = 'NOW()';
+        $data['modified'] = 'NOW()';
 		$data['url'] = $this->appendHTTP(trim($data['url']));
 		
 		$linkID = parent::create($data);

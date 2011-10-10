@@ -481,3 +481,6 @@ INSERT INTO `error` (`id`, `message`) VALUES (137, 'The words you entered in to 
 /* Added descriptions to PlagScan config items */
 UPDATE `config` SET `description`='A key key generated in the PlagScan administration interface' WHERE `configID`='73';
 UPDATE `config` SET `description`='The username you used when registering for the PlagScan service.' WHERE `configID`='74';
+
+/* Set link modified date to submitted date if null */
+UPDATE `link` SET `modified` = `submitted` WHERE `modified` IS NULL;
