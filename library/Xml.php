@@ -1,48 +1,88 @@
 <?php
-
-define('RSS_cache_time', 3000);
-
+/**
+ * Alaress_Rss_Cache
+ *
+ * Originally written by Alex Tworowsky
+ * Refactored/recomposed by moi
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
 class Xml {
-    public $xml;
+    public $xml = null;
+	private $cache = null;
 
-    function __construct ($url, $cache_time = 7200) {
+	/**
+	 * Constructor
+	 *
+	 * @param  $url
+	 * @param int $cache_time
+	 */
+    public function __construct($url, $cache_time = RSS_cache_time) {
+		if (empty($url)) {
+			return false;
+		}
 
-		libxml_use_internal_errors(true);
-		
-        if(empty($url))
-            return false;
+		$cache_file = Cfg::get('xml_dir') . '/' . md5($url);
 
-        $cache_file = Cfg::get('xml_dir') . '/' . md5($url);
-        //$cache_time = is_numeric($caching) ? $caching : 2*60*60;
+		/* Set up cached file
+		 */
+		$this->setCache(new Alaress_Rss_Cache($cache_file, $cache_time, $url));
 
-        if(!file_exists($cache_file) || filectime($cache_file) < (time() - $cache_time))   {
-            $xml_handle = @fopen($url, 'r');
-            $cache_handle = @fopen($cache_file, 'w');
-
-            if(!$xml_handle || !$cache_handle)
-                return false;
-
-            while(!feof($xml_handle)) {
-                fwrite($cache_handle, fread($xml_handle, 8192), 8192);
-            }
-
-            fclose($xml_handle);
-            fclose($cache_handle);
-        }
-
+		/* Load from cached file
+		 * Delete the cached file if it can't be loaded correctly
+		 */
         try {
-            $this->xml = new SimpleXMLElement($cache_file, null, true);
-        } catch (Exception $e) {
-            unlink($cache_file);
+            $this->setXml($this->getCache()->load());
+        }
+		catch (Exception $e) {
+            $this->getCache()->remove();
+
             return false;
         }
     }
 
-    function __get ($property) {
-        if(isset($this->xml->$property)) {
+	/**
+	 * Set xml
+	 *
+	 * @param  $val
+	 * @return void
+	 */
+	private function setXml($val) {
+		$this->xml = $val;
+	}
+
+	/**
+	 * Set cached file
+	 *
+	 * @param  $val
+	 * @return void
+	 */
+	private function setCache($val) {
+		$this->cache = $val;
+	}
+
+	/**
+	 * Get cached file
+	 *
+	 * @return null
+	 */
+	private function getCache() {
+		return $this->cache;
+	}
+
+	/**
+	 * Arbitrary get a property
+	 *
+	 * @param  $property
+	 * @return
+	 */
+    public function __get($property) {
+        if (isset($this->xml->$property)) {
             return $this->xml->$property;
         }
     }
 }
 
-?>

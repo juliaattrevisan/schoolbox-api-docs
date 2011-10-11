@@ -26,7 +26,7 @@ class Alaress_Rss_Stream {
 	/**
 	 * Constructor
 	 *
-	 * Optionally akes a source url as an input. You can override
+	 * Optionally takes a source url as an input. You can override
 	 * this by using setSource() after instantiation
 	 *
 	 * @param null $source
@@ -44,6 +44,9 @@ class Alaress_Rss_Stream {
 	 */
 	public function setup() {
 		if ($this->getSource() != null) {
+
+			/* The Xml class already uses caching
+			 */
 			$this->setInput(new Xml($this->getSource()));
 
 			/* Decide if the feed is an ATOM feed or a regular RSS 2.0

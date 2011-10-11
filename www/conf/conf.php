@@ -169,7 +169,7 @@ define('TIMETABLE_day_count',serialize(array(1=>7,7,5)));
 //define('RSS_url', 'http://www.abc.net.au/news/indexes/justin/rss.xml');
 //define('RSS_limit', 6);
 
-
+define('RSS_cache_time', 3000);
 
 //Weather options
 
