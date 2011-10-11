@@ -82,7 +82,7 @@ class Alaress_Rss_Cache {
 	 *
 	 * @return void
 	 */
-	private function remove() {
+	public function remove() {
 		unlink($this->getCacheFile());
 	}
 
