@@ -1,5 +1,11 @@
 #!/bin/bash
-
+# This script backs up to a File Share that requires authentication. (Samba Share)
+# Damian Alexander, 2011
+# Should be placed in /usr/sbin/backup.sh on the destination server
+if [ $EUID -ne 0 ]; then
+        echo -e "This script requires Administrator Privileges. You must run this with the sudo command or as root.\n";
+        exit 1
+fi
 date=`date +%y``date +%m``date +%d``date +%H``date +%M`
 logfile="/var/log/schoolboxbackup_$date.log";
 
