@@ -308,6 +308,22 @@ class PortfolioWebDAV {
                     }
                     return new self($pathList , "cathedral/".$_SESSION['username'], $_SESSION['password']);
                 }
+                else if(Cfg::get('site_location') == 'bialik') {
+                    if ($groupHandler->isStaff()) {
+                       if($_SESSION['campus'][0] == 2) {
+                            $pathList = array( 'https://webdav.bialik.vic.edu.au/H-DRIVE/USERS/STAFF/TEACHERS/ELC/'.$_SESSION['username'].'/',);
+                       }
+                       else {
+                            $pathList = array( 'https://webdav.bialik.vic.edu.au/H-DRIVE/USERS/STAFF/TEACHERS/YEAR02-12/'.$_SESSION['username'].'/',);
+                       }
+
+                    } else if ($groupHandler->isStudent()) {
+                                 $pathList = array( 'https://webdav.bialik.vic.edu.au/H-DRIVE/USERS/STUDENTS/YEAR'.str_pad($_SESSION['year'],2,'0',STR_PAD_LEFT).'/'.$_SESSION['username'].'/',
+                                                              );
+                    }
+
+                    return new self($pathList , "bialik/".$_SESSION['username'], $_SESSION['password']);
+                }
 		
 		
 	}
