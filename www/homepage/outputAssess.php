@@ -64,6 +64,7 @@ if (is_array($allAssess)) {
 			 * 3. The current time has passed the test's starting time
 			 * 4. You aren't the owner of the test
 			 */
+
             if(is_array($attempt)) {
                 // If the last assess is not completed provide resume link
                 if ($attempt['finish'] == '0000-00-00 00:00:00' && ($attemptTimeRemaining < 0 || $currentAssess['duration'] == Assess::UNLIMITED_DURATION)) {
@@ -96,12 +97,13 @@ if (is_array($allAssess)) {
 			}
 			else {
 
-                /* only show test link to owner and enrolled students */
-                if (strtotime($currentSurvey['finish']) < mktime()) {
+                /* Do not show link if past finish date */
+                if (strtotime($currentAssess['finish']) < mktime()) {
                     $this->parse('assessNoLink_block', 'assessNoLink');
 					$this->setVar('assessLink_block', '');
                     $this->setVar('resumeLink_block', '');
 				}
+                /* only show test link to owner and enrolled students */
                 else if($enroled || $currentAssess['user_id'] == $_SESSION['uid'] ) {
 					$this->parse('assessLink_block', 'assessLink');
                     $this->setVar('assessNoLink_block', '');
