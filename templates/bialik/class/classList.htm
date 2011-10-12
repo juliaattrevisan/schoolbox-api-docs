@@ -45,15 +45,14 @@
         </td>
     </tr>
     <!-- END student_list -->
-  </tbody>
-  <thead>
+ <!-- BEGIN email_class -->
     <tr>
       <td>&nbsp;</td>
       <td>&nbsp;</td>
       <td>&nbsp;</td>
       <td>&nbsp;</td>
       <td>&nbsp;</td>
-      <td><br />
+      <td>
         <form action="/mail/createMail.php" method="post">
           <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;" />
           <input type="hidden" name="bcc" value="{CLASSEMAIL}" />
@@ -62,5 +61,6 @@
         </form></td>
       <td>&nbsp;</td>
     </tr>
-  </thead>
+   <!-- END email_class -->
+  </tbody>
 </table>

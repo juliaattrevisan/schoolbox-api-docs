@@ -543,13 +543,12 @@ class Category extends DeprecatedModel {
 					WHERE (`perms`.cid OR `userAccess`.sid)
 						AND (
 							MATCH(`name`) AGAINST (\"*$keyword*\" IN BOOLEAN MODE)
-							OR MATCH(`name`,`categoryCode`.code) AGAINST (\"*$keyword*\" IN BOOLEAN MODE)
+							OR MATCH(`categoryCode`.code) AGAINST (\"*$keyword*\" IN BOOLEAN MODE)
 						)
 					ORDER BY `$sort_by` $sort_dir
 					LIMIT $offset, $limit;
 		";
-
-
+        
 		$count_query = "SELECT COUNT(*)
 						FROM `category`
 						LEFT JOIN `perms` ON `category`.id = `perms`.cid
@@ -560,7 +559,10 @@ class Category extends DeprecatedModel {
 							AND `userAccess`.uid = {$_SESSION['id']}
 						LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
 						WHERE (`perms`.cid OR `userAccess`.sid)
-							AND MATCH(`name`,`categoryCode`.code) AGAINST (\"*$keyword*\" IN BOOLEAN MODE)
+						AND (
+							MATCH(`name`) AGAINST (\"*$keyword*\" IN BOOLEAN MODE)
+							OR MATCH(`categoryCode`.code) AGAINST (\"*$keyword*\" IN BOOLEAN MODE)
+						)
 		";
 
 		$count = $this->db->getOne($count_query);

@@ -16,6 +16,7 @@ if($groupHandler->isStaff()) {
 
 	$this->setFile(TEMPLATE_content, 'class/classList.htm');
 	$this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
+    $this->setBlock(TEMPLATE_content, 'email_class', 'email_class_block');
     $this->setBlock('student_list', 'medical', 'medical_block');
     $this->setBlock('student_list', 'special', 'special_block');
     $this->setBlock('student_list', 'eportfolio', 'eportfolio_block');
@@ -131,9 +132,14 @@ if($groupHandler->isStaff()) {
 	$emailObj = new Email();
 	$email = $emailObj->formatEmailFromArray($_SESSION);
 
-	$this->setVar("REPLYTO", $email);
-	$this->setVar("CLASSEMAIL", $classEmail);
-
+    if($email) {
+	    $this->setVar("REPLYTO", $email);
+	    $this->setVar("CLASSEMAIL", $classEmail);
+        $this->parse('email_class_block','email_class');
+    }
+    else {
+        $this->setVar('email_class_block','');
+    }
 }
 else {
 	error(19);
