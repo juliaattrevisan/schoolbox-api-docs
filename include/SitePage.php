@@ -398,13 +398,7 @@ class SitePage extends Page
 					$this->setVar("WEBMAIL_LOCATION", 'href="https://owa.mgs.vic.edu.au/owa" rel="external"');
 				}
 				else {
-					if (in_array($_SESSION['year'], array('7'))) {
-						$this->setVar('WEBMAIL_LOCATION', 'href="https://owa.mgs.vic.edu.au/owa" rel="external"');
-					}
-					else
-					{
-						$this->setVar("WEBMAIL_LOCATION", 'href="https://owa.mgs.vic.edu.au/OWA"');
-					}
+					$this->setVar("WEBMAIL_LOCATION", 'href="https://owa.mgs.vic.edu.au/OWA"');
 				}
 
 			}

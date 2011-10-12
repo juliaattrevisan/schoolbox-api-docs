@@ -16,32 +16,23 @@ $j(function() {
 </script>
 <div class="evaluation-content question-bank">
 <h2>Online Assessment Question Bank</h2>
+    <span class="header_option"><a href="/assess/modify/{ASSESS_ID}" class="btn go-back"><span></span>Return To Survey</a></span>
 	<form id='questionBankForm' action='/assess/questionbank/addToSection' method='post'>
 		<input name='section_id' type='hidden' value='{SECTION_ID}' />
 
-		<!-- BEGIN question_category -->
-
-				<h3><strong>{QUESTION_CATEGORY_NAME}</strong></h3>
-
 					<!-- BEGIN question -->
 					<div class="question">
-
-						{QUESTION}({QUESTION_TYPE}, {MARKS} marks)
-
-						<!-- BEGIN show_input -->
-						<label><input name='question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}' /> Add to Assessment</label>
-						<!-- END show_input -->
-						<label><input name='delete_question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}' />Delete from QuestionBank</label>
+						<label><input name='question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}' />{QUESTION}<span>({QUESTION_TYPE})</span></label>
 					</div>
 
 					<!-- END question -->
 
 
-		<!-- END question_category -->
+
 
 		<p class="clearfix">
 		<!-- BEGIN show_submit -->
-		<input type='submit' value='Copy to section' class="submit-btn-plain"/>
+		<input type='submit' value='Copy to Assessment' class="submit-btn-plain"/>
 		<!-- END show_submit -->
 
 		<!-- BEGIN show_delete -->
@@ -49,9 +40,18 @@ $j(function() {
 		<!-- END show_delete -->
 
 		<!-- BEGIN no_questions -->
-		There are no questions in the Question Bank.
+		<p>There are no questions in the Question Bank.</p>
 		<!-- END no_questions -->
+        <!-- BEGIN welcome -->
+        <p>Welcome to the assessment question bank.  Here you will find questions that can be used in your survey.  You can also store your own questions here for later use.  To begin browse to the appropriate category and select the questions you wish to add.  These questions will automatically be added to your survey in the current section.</p>
+		<!-- END welcome -->
+
 		</p>
 	</form>
+</div>
+<div>
+    <!-- BEGIN question_category -->
+        <h3><a href="/assess/questionbank/contents/{CATEGORY_ID}/{ASSESS_ID}/{SECTION_ID}">{CATEGORY_NAME}</h3>
+    <!-- END question_category -->
 </div>
 
