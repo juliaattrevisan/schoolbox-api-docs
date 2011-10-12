@@ -11,12 +11,11 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 		'body' => $_POST['body'],
 	);
 
-	if (is_numeric($_POST['wikiID'])) {
-
+	if (is_numeric($_POST['wikiID']) && strlen($_POST['slug'])) {
 
 		/* Wiki exists
 		 */
-		$wiki = $wikiHandler->getByID($_POST['wikiID']);
+		$wiki = $wikiHandler->getByCategoryAndSlug($_POST['categoryID'], $_POST['slug']);
 
 		if (!isset($wiki['wikiID'])) {
 			error(2);
@@ -52,23 +51,40 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 		if ($_POST['revision'] < $latestRevision['revisionID']) {
 			SitePage::localRedir("/wiki/merge/$wiki[wikiID]");
 		}
-	}
-	else {
-		if ($_POST['categoryID']) {
-			/* Check permission
-			 */
-			if (($permission = $groupHandler->getPermission($_POST['categoryID'])) < READ_ACCESS) {
-				error(19);
-			}
-
-			$data['categoryID'] = $_POST['categoryID'];
-			$data = $wikiHandler->createStubLinks($data);
-
-			$wiki['wikiID'] = $wikiHandler->create($data);
+		else {
+			$redir = '/wiki/' . $wiki['categoryID'] . '/' . $_POST['slug'];
 		}
 	}
+	else if ($_POST['categoryID']) {
 
-	SitePage::localRedir("/wiki/" . $wiki['wikiID']);
+		/* Check permission
+		 */
+		if (($permission = $groupHandler->getPermission($_POST['categoryID'])) < READ_ACCESS) {
+			error(19);
+		}
+
+		$data['categoryID'] = $_POST['categoryID'];
+
+		/* If a slug was already provided, don't modify it
+		 * Otherwise determine a slug
+		 */
+		if (strlen($_POST['slug'])) {
+			$data['slug'] = $_POST['slug'];
+		}
+		else {
+			$url = new Url($_POST['heading']);
+
+			$data['slug'] = $url->getSlug();
+		}
+
+		$data = $wikiHandler->createStubLinks($data);
+
+		$wikiHandler->create($data);
+
+		$redir = '/wiki/' . $data['categoryID'] . '/' . $data['slug'];
+	}
+
+	SitePage::localRedir($redir);
 }
 else {
 	if (is_numeric($_GET['revert']) && is_numeric($_GET['wikiID'])) {

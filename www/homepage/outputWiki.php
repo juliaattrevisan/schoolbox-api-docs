@@ -25,6 +25,8 @@ if (is_array($wikiList)) {
 
 		$this->setVar(array(
 			'WIKI_ID' => $wiki['wikiID'],
+			'WIKI_CATEGORYID' => $wiki['categoryID'],
+			'WIKI_SLUG' => $wiki['slug'],
 			'WIKI_HEADING' => Scrub::text($wiki['heading']),
 			'WIKI_AUTHOR' => $userHandler->formatName($wiki),
 			'WIKI_AUTHOR_ID' => $wiki['userID'],

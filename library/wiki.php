@@ -55,7 +55,7 @@ class Wiki extends DeprecatedModel
 	 * @return array|bool
 	 */
 	public function getByID($wikiID, $revisionID = 0) {
-		$query = "SELECT r.*, w.categoryID, w.locked, w.stub, UNIX_TIMESTAMP(w.created) created, UNIX_TIMESTAMP(r.created) modified, latestRevision,
+		$query = "SELECT r.*, w.categoryID, w.locked, w.stub, w.slug, UNIX_TIMESTAMP(w.created) created, UNIX_TIMESTAMP(r.created) modified, latestRevision,
 				  u.title, u.firstname, u.lastname, r.userID authorID
 				  FROM " . $this->_revisionTable . " r
 				  LEFT JOIN " . $this->_table . " w ON w.wikiID = r.wikiID
@@ -100,7 +100,8 @@ class Wiki extends DeprecatedModel
 			$orderBy = 'ORDER BY r.' . $orderBy;
 		}
 
-		$query = "SELECT r.*, w.locked, UNIX_TIMESTAMP(r.created) modified, u.title, u.firstname, u.lastname
+		$query = "SELECT r.*, UNIX_TIMESTAMP(r.created) modified, u.title, u.firstname, u.lastname,
+				  w.locked, w.categoryID, w.slug
 				  FROM wiki w
 				  LEFT JOIN " . $this->_revisionTable . " r ON r.revisionID = (SELECT r.revisionID FROM " . $this->_revisionTable . " r WHERE r.wikiID = w.wikiID ORDER BY r.created DESC LIMIT 1)
 				  LEFT JOIN user u ON u.id = r.userID
@@ -285,28 +286,14 @@ class Wiki extends DeprecatedModel
 				 * Otherwise ignore creation of empty stubs
 				 */
 				if (strlen(trim($currentMatch))) {
-					$stubData = array();
 
-					$stubData['categoryID'] = $data['categoryID'];
-					$stubData['stub'] = 'true';
-					$stubData['heading'] = trim($currentMatch);
-					$stubData['body'] = "This is a stub page for $stubData[heading].";
-
-					/* Replacement links. Create a link to the stub if it
-					 * already exists, otherwise create the stub then link
-					 * to it.
+					/* Generate a slug for a new article that wonn't exist
 					 */
-					$existingStub = $this->getWikiByHeading($stubData['heading']);
-
-					if ($existingStub) {
-						$index = $existingStub['wikiID'];
-					}
-					else {
-						$index = $this->create($stubData);
-					}
+					$url = new Url(trim($currentMatch));
+					$slug = $url->getSlug();
 
 					$pattern[] = $allMatches[0][$i];
-					$replace[] = "<a href='/wiki/{$index}'>";
+					$replace[] = "<a href='/wiki/{$data['categoryID']}/{$slug}'>";
 				}
 			}
 		}
@@ -343,17 +330,19 @@ class Wiki extends DeprecatedModel
 	public function activateStubLinks($body) {
 		$allMatches = array();
 
-		preg_match_all("/<a\ href=['\"]+\/wiki\/(\d+)['\"]+>/", $body, $allMatches, PREG_SET_ORDER);
+		$pattern = "/<a\ href=['\"]+\/wiki\/(\d+)\/([a-zA-Z0-9\-_]+)['\"]+>/";
+
+		preg_match_all($pattern, $body, $allMatches, PREG_SET_ORDER);
 
 		if (count($allMatches)) {
 			for ($i=0; $i < count($allMatches); $i++) {
 				$currentMatch = $allMatches[$i];
 
-				$wiki = $this->getByID($currentMatch[1]);
+				$wiki = $this->getByCategoryAndSlug($currentMatch[1], $currentMatch[2]);
 
 				/* Append a link class to change link colour
 				 */
-				if ($wiki['stub'] == 'true') {
+				if (!$wiki) {
 					$link = str_replace('<a', '<a class="red"', $allMatches[$i][0]);
 					$body = str_replace($allMatches[$i][0], $link, $body);
 				}
@@ -361,6 +350,35 @@ class Wiki extends DeprecatedModel
 		}
 
 		return $body;
+	}
+
+	/**
+	 * Gets a wiki by its category id and its slug.
+	 * This can also be used to check for uniqueness
+	 *
+	 * @param  $wikiID
+	 * @param int $revisionID
+	 * @return array|bool
+	 */
+	public function getByCategoryAndSlug($categoryID, $slug, $revisionID = 0) {
+		$query = "SELECT r.*,
+					w.categoryID, w.locked, w.stub, UNIX_TIMESTAMP(w.created) created,
+				  	UNIX_TIMESTAMP(r.created) modified, latestRevision, r.userID authorID,
+				  	u.title, u.firstname, u.lastname
+				  FROM {$this->_revisionTable} r
+				  LEFT JOIN {$this->_table} w ON w.wikiID = r.wikiID
+				  LEFT JOIN user u ON u.id = r.userID
+				  WHERE w.deleted = 'false'
+				  AND w.categoryID = '{$categoryID}'
+				  AND w.slug = '{$slug}'";
+
+		if ($revisionID > 0 && is_numeric($revisionID)) {
+			$query .= "AND r.revisionID = '{$revisionID}' ";
+		}
+
+		$query .= "ORDER BY r.created DESC LIMIT 1";
+
+		return $this->db->getRow($query);
 	}
 }
 
