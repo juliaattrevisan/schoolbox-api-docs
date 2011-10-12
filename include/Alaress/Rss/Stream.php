@@ -49,24 +49,31 @@ class Alaress_Rss_Stream {
 			 */
 			$this->setInput(new Xml($this->getSource()));
 
-			/* Decide if the feed is an ATOM feed or a regular RSS 2.0
+			/* If there was data, try to interpret it
 			 */
-			if ($this->isInputAtom()) {
-				$this->setRssStrategy(new Alaress_Rss_Strategy_Atom());
-			}
-			else if ($this->isInputRss20()) {
-				$this->setRssStrategy(new Alaress_Rss_Strategy_Rss20());
-			}
-			else {
-				/* Special case for feedburner: needs to use LastRSS to
-				 * interpret the content, for some reason Xml won't do it
+			if (count($this->getInput()->xml)) {
+
+				/* Decide if the feed is an ATOM feed or a regular RSS 2.0
 				 */
-				$lastRss = new Alaress_Rss_Strategy_LastRss();
+				if ($this->isInputAtom()) {
+					$this->setRssStrategy(new Alaress_Rss_Strategy_Atom());
+				}
+				else if ($this->isInputRss20()) {
+					$this->setRssStrategy(new Alaress_Rss_Strategy_Rss20());
+				}
+				else {
+					/* Special case for feedburner: needs to use LastRSS to
+					 * interpret the content, for some reason Xml won't do it
+					 */
+					$lastRss = new Alaress_Rss_Strategy_LastRss();
 
-				$this->setInput($lastRss->get($this->getSource()));
+					$this->setInput($lastRss->get($this->getSource()));
 
-				$this->setRssStrategy(new Alaress_Rss_Strategy_Feedburner());
+					$this->setRssStrategy(new Alaress_Rss_Strategy_Feedburner());
+				}
 			}
+
+			return false;
 		}
 	}
 
@@ -115,7 +122,7 @@ class Alaress_Rss_Stream {
 	}
 
 	/**
-	 * Get an RSS stream
+	 * Get an RSS stream if a source was provided
 	 *
 	 * @return
 	 */
@@ -123,7 +130,11 @@ class Alaress_Rss_Stream {
 		if ($this->getSource() != null) {
 			$this->setup();
 
-			$this->setOutput($this->getRssStrategy()->get($this->getInput(), $this->getLimit()));
+			/* If a strategy was devised, stream it
+			 */
+			if ($this->getRssStrategy() != null) {
+				$this->setOutput($this->getRssStrategy()->get($this->getInput(), $this->getLimit()));
+			}
 		}
 	}
 
@@ -133,7 +144,7 @@ class Alaress_Rss_Stream {
 	 * @return
 	 */
 	public function getTitle() {
-		if ($this->getSource() != null) {
+		if (($this->getSource() != null) && ($this->getRssStrategy() != null)) {
 			return $this->getRssStrategy()->getTitle($this->getInput());
 		}
 
@@ -146,7 +157,7 @@ class Alaress_Rss_Stream {
 	 * @return
 	 */
 	public function getLink() {
-		if ($this->getSource() != null) {
+		if (($this->getSource() != null) && ($this->getRssStrategy() != null)) {
 			return $this->getRssStrategy()->getLink($this->getInput());
 		}
 
