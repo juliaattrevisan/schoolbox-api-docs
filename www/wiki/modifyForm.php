@@ -33,7 +33,7 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 
 		$data['wikiID'] = $wiki['wikiID'];
 		$data['categoryID'] = $wiki['categoryID'];
-		$data['stub'] = 'false';
+
 		$data = $wikiHandler->createStubLinks($data);
 
 		/* Check if there has been a revision added for this wiki since you

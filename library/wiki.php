@@ -55,7 +55,7 @@ class Wiki extends DeprecatedModel
 	 * @return array|bool
 	 */
 	public function getByID($wikiID, $revisionID = 0) {
-		$query = "SELECT r.*, w.categoryID, w.locked, w.stub, w.slug, UNIX_TIMESTAMP(w.created) created, UNIX_TIMESTAMP(r.created) modified, latestRevision,
+		$query = "SELECT r.*, w.categoryID, w.locked, w.slug, UNIX_TIMESTAMP(w.created) created, UNIX_TIMESTAMP(r.created) modified, latestRevision,
 				  u.title, u.firstname, u.lastname, r.userID authorID
 				  FROM " . $this->_revisionTable . " r
 				  LEFT JOIN " . $this->_table . " w ON w.wikiID = r.wikiID
@@ -171,7 +171,7 @@ class Wiki extends DeprecatedModel
 	 * @return void
 	 */
 	public function update($data) {
-		$coreFields = array('categoryID', 'locked', 'stub');
+		$coreFields = array('categoryID', 'locked');
 
 		foreach ($coreFields as $field) {
 			if ($data[$field]) {
@@ -362,7 +362,7 @@ class Wiki extends DeprecatedModel
 	 */
 	public function getByCategoryAndSlug($categoryID, $slug, $revisionID = 0) {
 		$query = "SELECT r.*,
-					w.categoryID, w.locked, w.stub, UNIX_TIMESTAMP(w.created) created,
+					w.categoryID, w.locked, UNIX_TIMESTAMP(w.created) created,
 				  	UNIX_TIMESTAMP(r.created) modified, latestRevision, r.userID authorID,
 				  	u.title, u.firstname, u.lastname
 				  FROM {$this->_revisionTable} r

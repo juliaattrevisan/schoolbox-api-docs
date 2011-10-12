@@ -484,3 +484,9 @@ UPDATE `config` SET `description`='The username you used when registering for th
 
 /* Set link modified date to submitted date if null */
 UPDATE `link` SET `modified` = `submitted` WHERE `modified` IS NULL;
+
+/* Wiki
+ */
+ALTER TABLE `wiki` ADD COLUMN `slug` VARCHAR(255) NULL AFTER `latestRevision`;
+ALTER TABLE `wiki` ADD INDEX `category_slug` (`categoryID`, `slug`);
+ALTER TABLE `wiki` DROP `stub`;
