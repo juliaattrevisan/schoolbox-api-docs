@@ -1,9 +1,6 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/wiki.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/page.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/include/stdfuncs.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 
 $page = new SitePage;
 $wikiHandler = new Wiki;
@@ -35,15 +32,14 @@ if (isset($_GET['wikiID'])) {
       'AUTHOR' => $wikiContents['firstname'] . ' ' . $wikiContents['lastname'],
       'HEADING' => $wikiContents['heading'],
       'BODY' => $wikiContents['body'],
-      'LASTMODIFIED' => $modifeidDate->getLong(),
+      'LASTMODIFIED' => $modifiedDate->getLong(),
    );
 
    /* Load Page templating, to keep consistent, rather than dumping raw output.
     * This also allows you to format the exported wiki page.
     */
-   $page->setFile(TEMPLATE_body, 'core/wiki/exportedPage.html');
+   $page->setFile(TEMPLATE_body, '/wiki/exportedPage.html');
    $page->setVar($output);
-   $page->parse('finaloutput', TEMPLATE_body);
 
    /* Construct headers so this pops up a Save-As dialog
     */
@@ -51,7 +47,7 @@ if (isset($_GET['wikiID'])) {
 
    header('Content-type: text/html');
    header("Content-Disposition: attachment filename=\"".$filename."\"");
-   $page->outputPage();
+   $page->outputPage(true);
 }
 else {
 	error(2);
