@@ -168,7 +168,7 @@ errorCheck;
 runCustomScripts() {
 if [ -d $schoolbox_dir/updates/$new_ver ]; then
 cd $schoolbox_dir/updates/$new_ver/;
-if [ -s ./script_index ]; then
+if [ -s ./scripts ]; then
 for script in `cat script_index`; do
 file=`echo $script`;
 if [[ `echo $file|grep -v "#"|grep .sh$` ]]; then
