@@ -169,7 +169,8 @@ runCustomScripts() {
 if [ -d $schoolbox_dir/updates/$new_ver ]; then
 cd $schoolbox_dir/updates/$new_ver/;
 if [ -s ./scripts ]; then
-for script in `cat script_index`; do
+echo -e "Reading Script Processing List...\n";
+for script in `cat scripts`; do
 file=`echo $script`;
 if [[ `echo $file|grep -v "#"|grep .sh$` ]]; then
 echo -e "Running Shell Script: $file\n";
