@@ -113,6 +113,7 @@ $responseHandler = new AssessResponse();
 $assessHandler = new Assess();
 $attemptHandler = new AssessAttempt();
 $sectionHandler = new AssessSection();
+$userHandler = new User();
 $groupHandler = new Group();
 $categoryHandler = new Category();
 
@@ -151,7 +152,6 @@ $categoryCode = $categoryHandler->getCodeForCategory($assess['category_id']);
 if (($categoryCode['codes'] != '') && Cfg::get('external_enable')) {
 	/* If synergy code get synergy students
 	 */
-	require_once(dirname(__FILE__) . '/../../library/Synergetic/ExternalUser.php');
 	$synHandler = new ExternalClass();
 	$allStudents = $synHandler->getStudents($categoryCode['codes']);
 }
@@ -175,7 +175,7 @@ if (is_array($allStudents) && count($allStudents)) {
 
 				/* Match up attempt with student then remove from list
 				 */
-				if ($currentAttempt['user_id'] == $currentStudent['uid']) {
+				if ($currentAttempt['user_id'] == $currentStudent['uid'] || $currentAttempt['synergy_id'] == $currentStudent['synergy_id']) {
 					if ($allAttempts[$i]['processed'] != true) {
 						processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this, $currentStudent);
 
@@ -220,8 +220,6 @@ else {
 /* Deal with remainder attempts
  */
 if ($allAttempts && count($allAttempts)) {
-
-    $userHandler = new User;
 
 	foreach($allAttempts as $currentAttempt) {
 		if ($currentAttempt['processed'] != true) {
