@@ -5,12 +5,14 @@ require_once('../library/assess/AssessQuestionBank.php');
 require_once('../library/assess/AssessQuestionCategory.php');
 
 $this->setFile(TEMPLATE_content, 'assess/questionbank/contents.html');
-$this->setBlock(TEMPLATE_content, 'question_category', 'question_category_block');
-$this->setBlock(TEMPLATE_content, 'show_submit', 'show_submit_block');
-$this->setBlock(TEMPLATE_content, 'show_delete', 'show_delete_block');
-$this->setBlock(TEMPLATE_content, 'no_questions', 'no_questions_block');
 $this->setBlock(TEMPLATE_content, 'welcome', 'welcome_block');
-$this->setBlock(TEMPLATE_content, 'question', 'question_block');
+$this->setBlock(TEMPLATE_content, 'category_selected', 'category_selected_block');
+$this->setBlock(TEMPLATE_content, 'question_category', 'question_category_block');
+$this->setBlock('category_selected', 'show_submit', 'show_submit_block');
+$this->setBlock('category_selected', 'show_delete', 'show_delete_block');
+$this->setBlock('category_selected', 'no_questions', 'no_questions_block');
+
+$this->setBlock('category_selected', 'question', 'question_block');
 
 
 $this->setVar(array(
@@ -18,7 +20,7 @@ $this->setVar(array(
 	'SECTION_ID' => $this->arg[2],
 ));
 
-$questionBankHandler = new AssessQuestionBank();
+$questionBankHandler = new AssesQuestionBank();
 
 /* output question bank categories */
 $questionBankCategoryHandler = new AssessQuestionCategory();
@@ -30,7 +32,11 @@ if(is_array($categoryList) ) {
 
         $this->setVar(array(
             'CATEGORY_NAME' => $category['name'],
-            'CATEGORY_ID'   => $category['question_category_id'],));
+            'CATEGORY_ID'   => $category['question_category_id'],
+            'CATEGORY_SELECTED' => $category['question_category_id']==$this->arg[0]?'selected':''));
+
+        if($category['question_category_id']==$this->arg[0])
+            $categoryName = $category['name'];
 
         $this->parse('question_category_block', 'question_category', true);
     }
@@ -42,6 +48,7 @@ else
 if($this->arg[0] > 0) {
 
     $allQuestions = $questionBankHandler->getContents($this->arg[0]);
+    $this->setVar('QUESTION_CATEGORY', $categoryName);
 
     /* Iterate and show
      */
@@ -63,6 +70,7 @@ if($this->arg[0] > 0) {
             $previous = $currentQuestion['question_category_id'];
         }
 
+        $this->parse('category_selected_block','category_selected');
 
         /* Hide submit button if we aren't adding contents to a section
          */
@@ -96,8 +104,5 @@ if($this->arg[0] > 0) {
 }
 else {
     $this->parse('welcome_block', 'welcome');
-    $this->setVar('show_submit_block', '');
-    $this->setVar('show_delete_block', '');
-    $this->setVar('no_questions_block', '');
-    $this->setVar('question_block', '');
+    $this->setVar('category_selected_block','');
 }
