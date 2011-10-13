@@ -2423,25 +2423,6 @@ EVALUATION
 	background: none;
 }
 
-.evaluation-content.question-bank .question {
-	border: 1px solid #e0e0e0;
-	background: #f8f8f8;
-	margin-bottom: 16px;
-	padding: 7px 16px;
-}
-
-.evaluation-content.question-bank .question p {
-	padding: 7px 16px;
-	background: #fff;
-}
-
-.evaluation-content.question-bank h3 {
-	background: #fff;
-	font-size: 16px;
-	padding: 7px 16px;
-	margin-bottom: 16px;
-	border: 1px solid #000;
-}
 
 .evaluation-content label {
 	font-weight: bold;
@@ -3347,6 +3328,75 @@ ul.section-options a.drop-arrow {
 .evaluation-graph-holder .legend td {
 	font-size: 12px;
 }
+
+/* Question bank */
+.evaluation-content.question-bank .question {
+	border: 1px solid #e0e0e0;
+	background: #f8f8f8;
+	margin-bottom: 0;
+	padding:0;
+}
+
+
+
+.evaluation-content.question-bank .question p {
+	padding: 7px 16px;
+	background: #fff;
+}
+
+.evaluation-content.question-bank h3 {
+	background: #fff;
+	font-size: 16px;
+	padding: 7px 16px;
+	margin-bottom: 16px;
+	border: 1px solid #000;
+}
+
+.evaluation-content.question-bank .question-answers{display:none; padding:7px 16px; background:#fff;}
+
+.evaluation-content.question-bank  .add-to-survey{margin-bottom:16px;}
+
+.question-bank .question .question-checkbox {
+	float:left;
+	width:5%
+}
+
+.question-bank .question .question-checkbox input[type=checkbox]{
+	display:block;
+	margin: 10px auto;
+}
+
+
+.question-bank .question-content {float:left; display:block; width:95%; }
+.question-bank .question-content p{margin:0;}
+
+.question-bank .show-answers{background: #ebebeb /*url(/images/core/icons/chat-down.png) no-repeat 50% 50%*/;
+	display:block; text-align:center; padding:2px 0;
+}
+
+
+ul.evaluation-category-select {list-style:none; padding:8px;}
+.evaluation-category-select li a{
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+
+color:#000;
+  -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
+display:block; padding:7px 16px;
+  background-color: #FBFBFB;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#FBFBFB), to(#f7f7f7));
+  background-image: -webkit-linear-gradient(top, #FBFBFB, #f7f7f7);
+  background-image:    -moz-linear-gradient(top, #FBFBFB, #f7f7f7);
+  background-image:     -ms-linear-gradient(top, #FBFBFB, #f7f7f7);
+  background-image:      -o-linear-gradient(top, #FBFBFB, #f7f7f7);
+  background-image:         linear-gradient(top, #FBFBFB, #f7f7f7);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#FBFBFB', EndColorStr='#f7f7f7');
+     text-shadow: 0px 1px 0px #fff;
+
+ border:1px solid #ccc; margin-bottom:8px;}
+
+.evaluation-content.question-bank .question.checked, .evaluation-category-select li a.selected {background:#CAE9B9}
 
 /************************
  END EVALUATION
