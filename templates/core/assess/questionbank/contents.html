@@ -1,57 +1,94 @@
 <script type='text/javascript'>
-$j(function() {
-	$j('#deleteButton').mouseup(function() {
-		var allQuestions = $j('#questionBankForm').find('input[name="delete_question_bank_id[]"]:checked');
+	$j(function() {
+		$j('#deleteButton').click(function() {
+			var allQuestions = $j('#questionBankForm').find('input[name="delete_question_bank_id[]"]:checked');
 
-		if (allQuestions.length && confirm('Do you want to remove the selected questions from the Question Bank?')) {
-			$j.post('/assess/questionbank/delete', $j('#questionBankForm').serialize(), function(response) {
-				alert(response);
+			if (allQuestions.length && confirm('Do you want to remove the selected questions from the Question Bank?')) {
+				$j.post('/assess/questionbank/delete', $j('#questionBankForm').serialize(), function(response) {
+					alert(response);
+					location.reload();
+				});
+			}
+		});
 
-				location.reload();
-			});
-		}
+		$j('input[type=checkbox]').click(function() {
+			$j(this).closest('.question').toggleClass('checked')
+		})
+
+		$j('.show-answers').click(function() {
+			$j(this).siblings('.question-answers').slideToggle();
+			return false;
+		});
+
 	});
-});
 
 </script>
-<div class="evaluation-content question-bank">
-<h2>Online Assessment Question Bank</h2>
-    <span class="header_option"><a href="/assess/modify/{ASSESS_ID}" class="btn go-back"><span></span>Return To Survey</a></span>
-	<form id='questionBankForm' action='/assess/questionbank/addToSection' method='post'>
-		<input name='section_id' type='hidden' value='{SECTION_ID}' />
 
-					<!-- BEGIN question -->
-					<div class="question">
-						<label><input name='question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}' />{QUESTION}<span>({QUESTION_TYPE})</span></label>
-					</div>
-
-					<!-- END question -->
-
-
-
-
-		<p class="clearfix">
-		<!-- BEGIN show_submit -->
-		<input type='submit' value='Copy to Assessment' class="submit-btn-plain"/>
-		<!-- END show_submit -->
-
-		<!-- BEGIN show_delete -->
-		<input id='deleteButton' type='submit' value='Remove from QuestionBank' class="submit-btn-plain"/>
-		<!-- END show_delete -->
-
-		<!-- BEGIN no_questions -->
-		<p>There are no questions in the Question Bank.</p>
-		<!-- END no_questions -->
-        <!-- BEGIN welcome -->
-        <p>Welcome to the assessment question bank.  Here you will find questions that can be used in your survey.  You can also store your own questions here for later use.  To begin browse to the appropriate category and select the questions you wish to add.  These questions will automatically be added to your survey in the current section.</p>
+<h1>Question Bank</h1>
+<span class="header_option"><a href="/assess/modify/{ASSESS_ID}"
+   class="btn go-back "><span></span>Return To
+	Assess</a></span>
+        <!-- BEGIN welcome --><div class="evaluation-content question-bank">
+        <h2>Welcome</h2>
+		<p class="pad-it">Welcome to the assessment question bank. Here you will find questions
+			that can be used in your assessment. You can also store your own
+			questions here for later use. To begin browse to the appropriate
+			category and select the questions you wish to add. These questions
+			will automatically be added to your assessment in the current
+			section.</p></div>
 		<!-- END welcome -->
 
+<!-- BEGIN category_selected -->
+
+<div class="evaluation-content question-bank"><h2>{QUESTION_CATEGORY}</h2>
+	<form id='questionBankForm' action='/assess/questionbank/addToSection'
+		  method='post'>
+		<input name='section_id' type='hidden' value='{SECTION_ID}'/>
+
+		<!-- BEGIN question -->
+		<div class="add-to-evaluation">
+			<label class="question clearfix">
+				<div class="question-checkbox"><input name='question_bank_id[]'
+													  type='checkbox'
+													  value='{QUESTION_BANK_ID}'/>
+				</div>
+				<span class="question-content">{QUESTION}</span>
+			</label>
+
+			<a href="#" class="show-answers">Show Question Type </a>
+
+			<div class="question question-answers">({QUESTION_TYPE})</div>
+		</div>
+		<!-- END question -->
+
+		<p class="clearfix">
+			<!-- BEGIN show_submit -->
+			<input type='submit' value='Copy to assess'
+				   class="submit-btn-plain"/>
+			<!-- END show_submit -->
+
+			<!-- BEGIN show_delete -->
+			<input id='deleteButton' type='submit'
+				   value='Remove from QuestionBank' class="submit-btn-plain"/>
+			<!-- END show_delete -->
 		</p>
+		<!-- BEGIN no_questions -->
+		<p>There are no questions in this category's Question Bank.</p>
+		<!-- END no_questions -->
+
 	</form>
 </div>
-<div>
-    <!-- BEGIN question_category -->
-        <h3><a href="/assess/questionbank/contents/{CATEGORY_ID}/{ASSESS_ID}/{SECTION_ID}">{CATEGORY_NAME}</h3>
-    <!-- END question_category -->
+<!-- END category_selected -->
+
+<div class="evaluation-menu">
+	<h2>Categories</h2>
+	<ul class="evaluation-category-select">
+		<!-- BEGIN question_category -->
+		<li>
+			<a href="/assess/questionbank/contents/{CATEGORY_ID}/{ASSESS_ID}/{SECTION_ID}"
+			   class="{CATEGORY_SELECTED}">{CATEGORY_NAME}</a>
+		</li>
+		<!-- END question_category -->
+	</ul>
 </div>
 
