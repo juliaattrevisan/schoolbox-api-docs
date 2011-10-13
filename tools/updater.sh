@@ -44,9 +44,9 @@ index="$working_dir/versions.txt";
 }
 
 grabVersion() {
-echo -e "Grabbing the v$new_ver database update file...\n";
-wget -q http://schoolbox.com.au/schoolboxinstaller/update_$new_ver.sql -O $working_dir/update_$new_ver.sql
-errorCheck 1;
+#echo -e "Grabbing the v$new_ver database update file...\n";
+#wget -q http://schoolbox.com.au/schoolboxinstaller/update_$new_ver.sql -O $working_dir/update_$new_ver.sql
+#errorCheck 1;
 echo -e "Grabbing the v$new_ver core files update archive...\n";
 wget -q http://schoolbox.com.au/schoolboxinstaller/release_$new_ver.tgz -O $working_dir/release_$new_ver.tgz;
 errorCheck 1;
@@ -166,34 +166,33 @@ rm -Rf $schoolbox_dir/www/conf/conf.php;
 errorCheck;
 }
 runCustomScripts() {
-cd $schoolbox_dir/tools/$new_ver/;
-echo -e "Searching for Scripts for update to v$new_ver and executing...\n";
-for script in `ls`; do
-if [[ `echo $script|grep -v "_executed_"|grep .php$` ]]; then
-echo -e "Running PHP Script: $script\n";
-php -f $script >> /dev/null;
-errorCheck;
-echo -e "Marking $script as executed so will not be repeated..\n";
-mv $script "_executed_$script";
-errorCheck;
-fi;
-if [[ `echo $script|grep -v "_executed_"|grep .sh$` ]]; then
-echo -e "Running Shell Script: $script\n";
-./$script >> /dev/null;
-errorCheck;
-echo -e "Marking $script as executed so will not be repeated..\n";
-mv $script "_executed_$script";
+if [ -d $schoolbox_dir/updates/$new_ver ]; then
+cd $schoolbox_dir/updates/$new_ver/;
+if [ -s ./script_index ]; then
+for script in `cat script_index`; do
+file=`echo $script`;
+if [[ `echo $file|grep -v "#"|grep .sh$` ]]; then
+echo -e "Running Shell Script: $file\n";
+./$file >> /dev/null;
 errorCheck;
 fi;
-if [[ `echo $script|grep -v "_executed_"|grep .sql$` ]]; then
-echo -e "Running SQL Script: $script (EXPERIMENTAL)\n";
-mysql -f -u $sqluser --password=$sqlpass $sqldb < $script  >> /dev/null;
+if [[ `echo $file|grep -v "#"|grep .php$` ]]; then
+echo -e "Running PHP Script: $file\n";
+php -f ./$file >> /dev/null;
 errorCheck;
-echo -e "Marking $script as executed so will not be repeated..\n";
-mv $script "_executed_$script";
+fi;
+if [[ `echo $file|grep -v "#"|grep .sql$` ]]; then
+echo -e "Running SQL Script: $file\n";
+mysql -f -u $sqluser --password=$sqlpass $sqldb < ./$file  >> /dev/null;
 errorCheck;
 fi;
 done;
+else
+echo -e "No Scripts index found for $new_ver.. Ignoring any existing scripts...\n ";
+fi;
+else
+echo -e "No Custom Scripts Directory Found\n";
+fi;
 echo -e "Custom Scripts Queue Processing Complete...\n";
 }
 cleanup(){
@@ -211,7 +210,10 @@ phpVersionCheck;
 grabVersion;
 backupInstall;
 updateFiles;
-updateDatabase;
+##
+#Replaced with the Custom Scripts / SQL functions.
+#updateDatabase;
+##
 restoreAfterBackup;
 runCustomScripts;
 confirmPermissions;
