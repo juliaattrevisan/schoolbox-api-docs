@@ -27,6 +27,19 @@
    class="btn go-back "><span></span>Return To
 	Survey</a>
 <h1>Question Bank</h1>
+
+        <!-- BEGIN welcome -->
+        <h2>Welcome</h2>
+		<p>Welcome to the survey question bank. Here you will find questions
+			that can be used in your survey. You can also store your own
+			questions here for later use. To begin browse to the appropriate
+			category and select the questions you wish to add. These questions
+			will automatically be added to your survey in the current
+			section.</p>
+		<!-- END welcome -->
+
+<!-- BEGIN category_selected -->
+<h2>{QUESTION_CATEGORY}</h2>
 <div class="evaluation-content question-bank">
 	<form id='questionBankForm' action='/survey/questionbank/addToSection'
 		  method='post'>
@@ -62,16 +75,10 @@
 		<!-- BEGIN no_questions -->
 		<p>There are no questions in this category's Question Bank.</p>
 		<!-- END no_questions -->
-		<!-- BEGIN welcome -->
-		<p>Welcome to the survey question bank. Here you will find questions
-			that can be used in your survey. You can also store your own
-			questions here for later use. To begin browse to the appropriate
-			category and select the questions you wish to add. These questions
-			will automatically be added to your survey in the current
-			section.</p>
-		<!-- END welcome -->
+
 	</form>
 </div>
+<!-- END category_selected -->
 
 <div class="evaluation-menu">
 	<h2>Categories</h2>
@@ -79,7 +86,7 @@
 		<!-- BEGIN question_category -->
 		<li>
 			<a href="/survey/questionbank/contents/{CATEGORY_ID}/{SURVEY_ID}/{SECTION_ID}"
-			   class="">{CATEGORY_NAME}</a>
+			   class="{CATEGORY_SELECTED}">{CATEGORY_NAME}</a>
 		</li>
 		<!-- END question_category -->
 	</ul>
