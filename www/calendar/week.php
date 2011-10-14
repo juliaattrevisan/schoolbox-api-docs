@@ -60,7 +60,6 @@ else {
 
 
 $output = array('YEAR'	 => date("Y",$startOfWeek),
-				'TITLE'	 => HEADING." - Calendar",
 				'DAY'	 => $selectedDay,
 				);
 $this->setVar($output);

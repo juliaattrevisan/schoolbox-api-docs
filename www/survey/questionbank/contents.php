@@ -13,7 +13,7 @@ $this->setBlock('category_selected', 'show_delete', 'show_delete_block');
 $this->setBlock('category_selected', 'no_questions', 'no_questions_block');
 
 $this->setBlock('category_selected', 'question', 'question_block');
-
+$this->setBlock('question', 'answers', 'answers_block');
 
 $this->setVar(array(
     'SURVEY_ID' => $this->arg[1],
@@ -62,8 +62,16 @@ if($this->arg[0] > 0) {
                 'QUESTION_TYPE' => $currentQuestion['description'],
                 'QUESTION' => $currentQuestion['question'],
                 'MARKS' => $currentQuestion['marks'],
+                'answers_block'  => '',
             ));
 
+            if($currentQuestion['answer']) {
+                $answerList = unserialize($currentQuestion['answer']);
+                 foreach($answerList as $answer) {
+                    $this->setVar('ANSWER_DESCRIPTION', $answer->description);
+                    $this->parse('answers_block','answers',true);
+                 }
+            }
 
             $this->parse('question_block', 'question', true);
 

@@ -26,14 +26,18 @@ if (isset($_GET['wikiID'])) {
 
    $wikiContents = $wikiHandler->getByID($_GET['wikiID']);
 
+    $hostURL = SitePage::conType() . $_SERVER['HTTP_HOST'];
+
 	$modifiedDate = new Alaress_Date_Format($wikiContents['modified'], 'U');
 
    $output = array(
       'AUTHOR' => $wikiContents['firstname'] . ' ' . $wikiContents['lastname'],
-      'HEADING' => $wikiContents['heading'],
-      'BODY' => $wikiContents['body'],
+      'HEADING' => Scrub::text($wikiContents['heading']),
+      'BODY' =>  str_replace('<a href="/', "<a href=\"$hostURL/", $wikiContents['body']),
       'LASTMODIFIED' => $modifiedDate->getLong(),
    );
+
+
 
    /* Load Page templating, to keep consistent, rather than dumping raw output.
     * This also allows you to format the exported wiki page.

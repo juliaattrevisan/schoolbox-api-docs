@@ -24,7 +24,8 @@ abstract class EvaluationQuestionBank extends DeprecatedModel {
 			assess_question_bank.question_bank_id,
 			assess_question_bank.question,
 			assess_luQuestionType.description,
-			assess_question_bank.marks
+			assess_question_bank.marks,
+			assess_question_bank.answer
 			FROM assess_question_bank
 			LEFT JOIN assess_luQuestionType ON assess_question_bank.type_id = assess_luQuestionType.type_id
 			WHERE question_category_id = '$category_id' AND assess_question_bank.deleted_at IS NULL";
