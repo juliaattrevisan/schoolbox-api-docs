@@ -81,8 +81,8 @@ errorCheck;
 }
 phpVersionCheck() {
 echo -e "Beginning PHP Version Check...\n";
-php_major=`php -v|grep built|cut -d "-" -f1|cut -d " " -f2|cut -d "." -f1`
-php_minor=`php -v|grep built|cut -d "-" -f1|cut -d " " -f2|cut -d "." -f2`
+php_major=`php -v|grep built|cut -d "-" -f1|cut -d " " -f2|cut -d "." -f1` &> /dev/null;
+php_minor=`php -v|grep built|cut -d "-" -f1|cut -d " " -f2|cut -d "." -f2` &> /dev/null;
 desired_major=`expr $desired_major - 1`;
 desired_minor=`expr $desired_minor - 1`;
 if [[ $php_major -gt $desired_major && $php_minor -gt $desired_minor ]]; then
@@ -117,7 +117,7 @@ echo -e "Moving Data Directory out of Installation Directory...\n";
 mv $schoolbox_dir/data $schoolbox_dir/../data
 errorCheck;
 echo -e "Backing up Installation Directory...\n";
-tar -cvzf /tmp/schoolbox_$cur_ver.tgz $schoolbox_dir >> /dev/null;
+tar -cvzf /tmp/schoolbox.tgz $schoolbox_dir >> /dev/null;
 errorCheck;
 echo -e "Backing up Config File...\n";
 cp $schoolbox_dir/www/conf/conf.php /tmp/schoolbox_config.php >> /dev/null;
@@ -173,18 +173,18 @@ echo -e "Reading Script Processing List...\n";
 for script in `cat scripts`; do
 file=`echo $script`;
 if [[ `echo $file|grep -v "#"|grep .sh$` ]]; then
-echo -e "Running Shell Script: $file\n";
+echo -e "Running Shell Script: $file\n" &> /tmp/update_$new_ver.errlog;
 ./$file >> /dev/null;
 errorCheck;
 fi;
 if [[ `echo $file|grep -v "#"|grep .php$` ]]; then
 echo -e "Running PHP Script: $file\n";
-php -f ./$file >> /dev/null;
+php -f ./$file >> /dev/null &> /tmp/update_$new_ver.errlog;
 errorCheck;
 fi;
 if [[ `echo $file|grep -v "#"|grep .sql$` ]]; then
 echo -e "Running SQL Script: $file\n";
-mysql -f -u $sqluser --password=$sqlpass $sqldb < ./$file  >> /dev/null;
+mysql -f -u $sqluser --password=$sqlpass $sqldb < ./$file  >> /dev/null &> /tmp/update_$new_ver.errlog;
 errorCheck;
 fi;
 done;
@@ -204,6 +204,13 @@ echo -e "Removing Minifier Cache...\n";
 rm -Rf /tmp/minify*
 errorCheck;
 }
+isErrors() {
+if [ -s /tmp/update_$new_ver.errlog ]; then
+echo -e "There were errors found during the update,See them in /tmp/update_$new_ver.errlog...\n";
+else
+echo -e "No errors found...\n";
+fi;
+}
 loadConfig;
 isdir;
 compareVersions;
@@ -212,11 +219,14 @@ grabVersion;
 backupInstall;
 updateFiles;
 ##
-#Replaced with the Custom Scripts / SQL functions.
+#Replaced updateDatabase with the Custom Scripts / SQL functions. (Include the file there)
 #updateDatabase;
 ##
 restoreAfterBackup;
 runCustomScripts;
 confirmPermissions;
 setNewVersion;
+isErrors;
 cleanup;
+
+
