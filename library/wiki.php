@@ -171,7 +171,7 @@ class Wiki extends DeprecatedModel
 	 * @return void
 	 */
 	public function update($data) {
-		$coreFields = array('categoryID', 'locked');
+		$coreFields = array('categoryID', 'locked', 'slug');
 
 		foreach ($coreFields as $field) {
 			if ($data[$field]) {
