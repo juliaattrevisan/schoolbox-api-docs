@@ -74,7 +74,14 @@ class Eportfolio_Private_Notes extends Eportfolio_Private_Abstract {
      * @param <type> $privateNotes
      */
 	public function update($privateNotes) {
-        parent::update($privateNotes);
+		$existing = $this->getByID($this->getUserId());
+
+		if ($existing) {
+	        parent::update($privateNotes);
+		}
+		else {
+			parent::create($privateNotes);
+		}
 
 		SitePage::localRedir('/eportfolio/' . $this->getUserId());
 	}
