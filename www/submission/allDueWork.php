@@ -67,6 +67,9 @@ if (count($categoryList) == 0) {
 	error(135);
 }
 
+$this->setVar(array('WORK_USER_ID'  => $userID,
+                    'WORK_USER_NAME'=> $userID==$_SESSION['id']?'My':$userHandler->formatName($user)."'s",
+              ));
 
 $allWork = $submissionHandler->getAllDueWork($userID, $categoryIDList);
 

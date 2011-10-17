@@ -111,7 +111,8 @@ $output = array(
 	'NEXT_MONTH'	=> date('Y-m-d', strtotime('+1 month', $selectedDate)),
 	'PREV_MONTH'	=> date('Y-m-d', strtotime('-1 month', $selectedDate)),
 	'SELECTED_DATE'	=> $selectedDateObj->getLocalShort(),
-	'WORK_USER_ID'  => is_numeric($this->arg[1])?$this->arg[1]:$_SESSION['id'],
+	'WORK_USER_ID'  => $userID,
+    'WORK_USER_NAME' => $userID==$_SESSION['id']?'My':$userHandler->formatName($user)."'s",
 );
 
 $this->setVar($output);
