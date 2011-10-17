@@ -18,3 +18,4 @@ php/add_dsn.php
 php/add_web_root.php
 php/updateColours.php
 php/welcomePageUpdate.php
+php/update-wiki.php
