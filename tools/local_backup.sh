@@ -5,6 +5,16 @@ if [ $EUID -eq 0 ]; then
         echo -e "This script does not run with Administrator Privileges. Do NOT run as root OR with sudo.\n";
         exit 1
 fi
+diskCheck() {
+spaceused=`df -h /tmp/|cut -d " " -f21|grep %|cut -d "%" -f1`
+spacefree=`expr 100 - $spaceused`
+if [ $spacefree -lt "50" ]; then
+echo "Not enough space to perform backup!";
+exit;
+else
+echo "Space OK: $spaceused% used, $spacefree% free"
+fi;
+}
 errorCheck() {
 if [ $? -eq 0 ]; then
         echo -e "... OK";
@@ -22,6 +32,7 @@ else
 echo "Config File not found";
 exit 1;
 fi;
+diskCheck;
 echo -e "Archiving local copy of Install... (destination: /tmp/)\n";
 tar -cvzf /tmp/schoolboxBackup_$sqldb.$date.tgz ../
 errorCheck;

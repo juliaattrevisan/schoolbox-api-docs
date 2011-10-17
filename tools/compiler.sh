@@ -5,7 +5,7 @@
 # before sending it to schoolbox.com.au and making it available.
 
 # Depends on the TAG existing, /sql/update_TAG.sql existing and there being an entry in /sql/versions.txt for this tag.
-# The three must be identical for everything to work OK!
+# The three must be identical for everything to work OK! (Not anymore!)
 
 if [[ $# -lt 1 ]]; then
 echo "Exiting due to no Version supplied (SVN Tag)";
@@ -44,9 +44,9 @@ errorCheck 1;
 echo -e "... Now Performing a Subversion Export of the tag $@";
 svn export --username=damian.alexander --password=Maybe123 http://192.168.1.50/svn/portal/tags/$@/ &> /dev/null
 errorCheck 1;
-echo -e "Attempting to process the v$@ SQL Update file (File:/sql/update_$@.sql)";
-cp /tmp/exported/$@/sql/update_$@.sql /tmp/ &>> /dev/null;
-errorCheck 1;
+#echo -e "Attempting to process the v$@ SQL Update file (File:/sql/update_$@.sql)";
+#cp /tmp/exported/$@/sql/update_$@.sql /tmp/ &>> /dev/null;
+#errorCheck 1;
 echo -e "Attempting to process the intitial Database File (For installs only)...";
 cp /tmp/exported/$@/sql/initialDatabase.sql /tmp/initialDatabase.sql &>> /dev/null;
 errorCheck 1;
@@ -72,9 +72,9 @@ errorCheck 1;
 echo -e "Removing Temporary Files...";
 rm -Rf /tmp/exported/$@
 errorCheck 1;
-echo -e "Transferring Update SQL File to Upload Directory..";
-cp /tmp/update_$@.sql /tmp/exported/update_$@.sql;
-errorCheck 1;
+#echo -e "Transferring Update SQL File to Upload Directory..";
+#cp /tmp/update_$@.sql /tmp/exported/update_$@.sql;
+#errorCheck 1;
 echo -e "Transferring Versions index to Upload Directory..";
 cp /tmp/versions.txt /tmp/exported;
 errorCheck 1;
