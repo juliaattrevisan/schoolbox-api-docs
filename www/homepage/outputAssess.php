@@ -104,7 +104,7 @@ if (is_array($allAssess)) {
                     $this->setVar('resumeLink_block', '');
 				}
                 /* only show test link to owner and enrolled students */
-                else if($enroled || $currentAssess['user_id'] == $_SESSION['uid'] ) {
+                else if($enroled || $currentAssess['user_id'] == $_SESSION['id'] ) {
 					$this->parse('assessLink_block', 'assessLink');
                     $this->setVar('assessNoLink_block', '');
                     $this->setVar('resumeLink_block', '');
@@ -119,7 +119,7 @@ if (is_array($allAssess)) {
 			/* Modified this check so that only the owner or a superuser can get
 			 * these links which allow you to modify the assessment
 			 */
-			if ($currentAssess['user_id'] == $_SESSION['uid'] || $groupHandler->isSuperuser()) {
+			if ($currentAssess['user_id'] == $_SESSION['id'] || $groupHandler->isSuperuser()) {
 				$this->parse('teacherLink_block', 'teacherLink');
 			}
 			else {

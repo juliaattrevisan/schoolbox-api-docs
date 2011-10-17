@@ -104,7 +104,7 @@ if (is_array($allSurveys)) {
 			/* Modified this check so that only the owner or a superuser can get
 			 * these links which allow you to modify the assessment
 			 */
-			if ($currentSurvey['user_id'] == $_SESSION['uid'] || $groupHandler->isSuperuser()) {
+			if ($currentSurvey['user_id'] == $_SESSION['id'] || $groupHandler->isSuperuser()) {
 				$this->parse('teacherLink_block', 'teacherLink');
 			}
 			else {
