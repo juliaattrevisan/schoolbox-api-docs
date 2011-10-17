@@ -38,9 +38,9 @@ fi;
 }
 grabIndex() {
 echo -e "Grabbing Versions Index...\n";
-wget -q http://schoolbox.com.au/schoolboxinstaller/versions.txt -O $working_dir/versions.txt;
+wget -q http://schoolbox.com.au/schoolboxinstaller/version_index -O $working_dir/version_index;
 errorCheck 1;
-index="$working_dir/versions.txt";
+index="$working_dir/version_index";
 }
 
 grabVersion() {
@@ -52,9 +52,9 @@ wget -q http://schoolbox.com.au/schoolboxinstaller/release_$new_ver.tgz -O $work
 errorCheck 1;
 }
 listVersions() {
-wget -q http://schoolbox.com.au/schoolboxinstaller/versions.txt
+wget -q http://schoolbox.com.au/schoolboxinstaller/version_index
 errorCheck 1;
-cat $working_dir/versions.txt|cut -d ":" -f2
+cat $working_dir/version_index|cut -d ":" -f2
 }
 loadConfig() {
 confloc=`echo -e "$schoolbox_dir/www/conf/conf.php"`;
@@ -171,9 +171,9 @@ errorCheck;
 runCustomScripts() {
 if [ -d $schoolbox_dir/updates/$new_ver ]; then
 cd $schoolbox_dir/updates/$new_ver/;
-if [ -s ./scripts ]; then
+if [ -s ./scripts_list ]; then
 echo -e "Reading Script Processing List...\n";
-for script in `cat scripts`; do
+for script in `cat scripts_list`; do
 file=`echo $script`;
 if [[ `echo $file|grep -v "#"|grep .sh$` ]]; then
 echo -e "Running Shell Script: $file\n" &> /tmp/update_$new_ver.errlog;
@@ -209,7 +209,7 @@ errorCheck;
 }
 isErrors() {
 if [ -s /tmp/update_$new_ver.errlog ]; then
-echo -e "There were errors found during the update,See them in /tmp/update_$new_ver.errlog...\n";
+echo -e "There were errors found during the update,\nSee them in /tmp/update_$new_ver.errlog...\n";
 else
 echo -e "No errors found...\n";
 fi;

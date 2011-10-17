@@ -51,14 +51,14 @@ echo -e "Attempting to process the intitial Database File (For installs only)...
 cp /tmp/exported/$@/sql/initialDatabase.sql /tmp/initialDatabase.sql &>> /dev/null;
 errorCheck 1;
 echo -e "Proceeding to Process new versions index...";
-if [[ `cat /tmp/exported/$@/sql/versions.txt|grep $@` ]]; then
-echo -e "... Passed Processing";
+if [[ `cat /tmp/exported/$@/updates/version_index|grep $@` ]]; then
+echo -e "... Passed Processing found $@ in the Version Index";
 else
 echo "... Failed... new Versions index does not contain new version ($@)";
 exit;
 fi;
 echo -e "Finalising Processing on new Index...";
-cp /tmp/exported/$@/sql/versions.txt /tmp/versions.txt
+cp /tmp/exported/$@/updates/version_index /tmp/version_index
 errorCheck 1;
 echo -e "Entering Temporary Directory...";
 cd /tmp/exported/$@;
