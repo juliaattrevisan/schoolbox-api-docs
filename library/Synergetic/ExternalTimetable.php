@@ -152,13 +152,18 @@ class ExternalTimetable extends MSSQL{
 			$result = $this->query($query);
 			//Cache all date and days into variable
 			while($day = $this->getNextArray($result)) {
+
 				//cut out d from CalenderType string
-				$this->synergeticDay[strtotime($day['startDate'])] = substr($day['type'], -1);
+				preg_match('/d([0-9]+)/i', $day['type'], $match);
+
+                if($match[1] > 0 AND $match[1] <= $this->days[$campus] ) {
+                    $this->synergeticDay[strtotime($day['startDate'])] = $match[1];
+                }
 			}
 
 			//yes this is meant to get the first element and return it
 			if(is_array($this->synergeticDay)) {
-				foreach($this->synergeticDay as $date => $day){
+                foreach($this->synergeticDay as $date => $day){
 					return $date;
 				}
 			} else {
@@ -174,7 +179,10 @@ class ExternalTimetable extends MSSQL{
                 //Cache all date and days into variable
                 while($day = $this->getNextArray($result)) {
                     //cut out d from CalenderType string
-                    $this->synergeticDay[strtotime($day['startDate'])] = substr($day['type'], -1);
+				    preg_match('/d([0-9]+)/i', $day['type'], $match);
+                    if($match[1] > 0 AND $match[1] <= $this->days[$campus] ) {
+                        $this->synergeticDay[strtotime($day['startDate'])] = $match[1];
+                    }
                 }
 
                if(is_array($this->synergeticDay)) {
