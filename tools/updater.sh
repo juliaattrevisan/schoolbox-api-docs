@@ -128,7 +128,7 @@ errorCheck;
 }
 restoreAfterBackup() {
 echo -e "Restoring Data Directory...\n";
-mv $schoolbox_dir/../data $schoolbox_dir/data;
+mv $schoolbox_dir/../data $schoolbox_dir/;
 errorCheck;
 echo -e "Restoring Configuration File...\n";
 mv /tmp/schoolbox_config.php $schoolbox_dir/www/conf/conf.php;
