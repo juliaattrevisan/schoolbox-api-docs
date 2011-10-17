@@ -164,6 +164,9 @@ errorCheck 1;
 echo -e "Removing Template Config File...\n";
 rm -Rf $schoolbox_dir/www/conf/conf.php;
 errorCheck;
+echo -e "Removing Template Data Directory...\n";
+rm -Rf $schoolbox_dir/data;
+errorCheck;
 }
 runCustomScripts() {
 if [ -d $schoolbox_dir/updates/$new_ver ]; then
