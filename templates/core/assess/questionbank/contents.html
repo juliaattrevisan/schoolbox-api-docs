@@ -1,7 +1,7 @@
 <script type='text/javascript'>
 	$j(function() {
 		$j('#deleteButton').click(function() {
-			var allQuestions = $j('#questionBankForm').find('input[name="delete_question_bank_id[]"]:checked');
+			var allQuestions = $j('#questionBankForm').find('input[name="question_bank_id[]"]:checked');
 
 			if (allQuestions.length && confirm('Do you want to remove the selected questions from the Question Bank?')) {
 				$j.post('/assess/questionbank/delete', $j('#questionBankForm').serialize(), function(response) {
@@ -74,8 +74,7 @@
 			<!-- END show_submit -->
 
 			<!-- BEGIN show_delete -->
-			<input id='deleteButton' type='submit'
-				   value='Remove from QuestionBank' class="submit-btn-plain"/>
+			<input id='deleteButton' type='button' value='Remove from QuestionBank' class="submit-btn-plain"/>
 			<!-- END show_delete -->
 		</p>
 		<!-- BEGIN no_questions -->

@@ -108,6 +108,7 @@ if($this->arg[0] > 0) {
         $this->setVar('question_block', '');
         $this->setVar('welcome_block','');
         $this->parse('no_questions_block', 'no_questions');
+        $this->parse('category_selected_block','category_selected');
     }
 }
 else {

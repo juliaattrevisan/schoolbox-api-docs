@@ -17,11 +17,12 @@ $this->setBlock('question', 'answers', 'answers_block');
 
 
 $this->setVar(array(
-    'SURVEY_ID' => $this->arg[1],
+    'ASSESS_ID' => $this->arg[1],
 	'SECTION_ID' => $this->arg[2],
+
 ));
 
-$questionBankHandler = new AssesQuestionBank();
+$questionBankHandler = new AssessQuestionBank();
 
 /* output question bank categories */
 $questionBankCategoryHandler = new AssessQuestionCategory();
@@ -109,6 +110,7 @@ if($this->arg[0] > 0) {
         $this->setVar('question_block', '');
         $this->setVar('welcome_block','');
         $this->parse('no_questions_block', 'no_questions');
+        $this->parse('category_selected_block','category_selected');
     }
 }
 else {

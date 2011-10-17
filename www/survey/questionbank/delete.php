@@ -22,7 +22,7 @@ $questionBankHandler = new SurveyQuestionBank();
 if (!empty($_POST)) {
 	$i = 0;
 
-	foreach($_POST['delete_question_bank_id'] as $questionBankId) {
+	foreach($_POST['question_bank_id'] as $questionBankId) {
 		$questionBankHandler->update(array(
 			'question_bank_id' => Scrub::text($questionBankId),
 			'deleted_at' => 'NOW()',
