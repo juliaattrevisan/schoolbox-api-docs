@@ -9,7 +9,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class UpdateParentSynergeticSyncStrategy extends SynergeticSyncStrategy implements SynergeticSyncStrategyInterface {
+class Synchronise_Synergetic_Mggs_Strategy_Parent extends Synchronise_Synergetic_Strategy_Abstract {
 	protected $strategyTitle = "Update Schoolbox Parent Details Synchronisation";
 
 	/**
