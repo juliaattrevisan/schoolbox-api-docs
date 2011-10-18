@@ -17,10 +17,7 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
  * Otherwise it will echo out a plan
  */
 $allStrategies = array(
-//	'UpdateParentSynergeticSyncStrategy',
-	'Synchronise_Synergetic_Bialik_Strategy_Staff',
-	'Synchronise_Synergetic_Bialik_Strategy_Parent',
-	'Synchronise_Synergetic_Bialik_Strategy_Student',
+	'Synchronise_Synergetic_Mggs_Strategy_Parent',
 );
 
 /* Do each strat
