@@ -9,7 +9,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Synchronise_Synergetic_Mggs_Strategy_Parent extends Synchronise_Synergetic_Strategy_Abstract {
+class Synchronise_Synergetic_Mggs_Strategy_Parent extends Synchronise_Synergetic_Mggs_Strategy_Abstract {
 	protected $strategyTitle = "Update Schoolbox Parent Details Synchronisation";
 
 	/**
@@ -80,12 +80,15 @@ class Synchronise_Synergetic_Mggs_Strategy_Parent extends Synchronise_Synergetic
 					 */
 					if ($this->getPerformUpdate() === true) {
 						$this->getUserHandler()->update($updatedUser);
-					}
 
-					$this->updateVerboseResult($user, $currentSynergyId, $updatedUser, $currentParent);
+						$this->getVerboseFilter()->performUpdate($user, $currentSynergyId, $updatedUser, $currentParent);
+					}
+					else {
+						$this->getVerboseFilter()->planUpdate($user, $currentSynergyId, $updatedUser, $currentParent);
+					}
 				}
 				else {
-					$this->ignoreVerboseResult($user, $currentSynergyId);
+					$this->getVerboseFilter()->skip($user, $currentSynergyId);
 				}
 			}
 		}
@@ -103,57 +106,5 @@ class Synchronise_Synergetic_Mggs_Strategy_Parent extends Synchronise_Synergetic
 		}
 
 		return true;
-	}
-
-	/**
-	 * Verbose feedback for potential update action
-	 *
-	 * @param  $currentUser
-	 * @return void
-	 */
-	private function updateVerboseResult($user, $currentSynergyId, $updatedUser, $currentParent) {
-		if ($this->getVerbose() === true) {
-			if ($this->getPerformUpdate() === true) {
-				$action = 'Updating';
-			}
-			else {
-				$action = 'Planning update';
-			}
-
-			/* Update email addresses for publicly listed people
-			 * Otherwise clear email address for those who aren't publicly listed
-			 */
-			if ($this->isPubliclyListed($currentParent)) {
-				 $emailString = 'and updating email address';
-			}
-			else {
-				$emailString  = 'and clearing email address';
-			}
-
-			$str = array();
-			$str[] = "$action on";
-			$str[] = "#$user[uid] (Synergetic #$currentSynergyId) $user[title] $user[firstname] $user[lastname] ($user[alt_email])";
-			$str[] = "to $updatedUser[title] $updatedUser[firstname] $updatedUser[lastname] ($updatedUser[alt_email])";
-			$str[] = "$emailString\n";
-
-			print_r(implode(' ', $str));
-		}
-	}
-
-	/**
-	 * Verbose feedback for ignore-update action
-	 *
-	 * @param  $user
-	 * @param  $currentSynergyId
-	 * @return void
-	 */
-	private function ignoreVerboseResult($user, $currentSynergyId) {
-		if ($this->getVerbose() === true) {
-			$str = array();
-			$str[] = 'Ignoring';
-			$str[] = "#$user[uid] (Synergetic #$currentSynergyId) $user[title] $user[firstname] $user[lastname] ($user[alt_email])\n";
-
-			print_r(implode(' ', $str));
-		}
 	}
 }
