@@ -9,7 +9,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class SynergeticSync {
+class Synchronise_Synergetic_Main {
 	private $strategy = null;
 
 	/**
@@ -50,7 +50,7 @@ class SynergeticSync {
 	 * @return void
 	 */
 	public function setVerbose($val) {
-		$this->getStrategy()->setVerbose($val);
+		$this->getStrategy()->getVerboseFilter()->setVerbose($val);
 	}
 
 	/**

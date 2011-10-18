@@ -1,0 +1,85 @@
+<?php
+/**
+ * Adds Staff in Synergetic to the Schoolbox User table. Applies Campus based
+ * on the Staff's campus field.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+class Synchronise_Synergetic_Bialik_Strategy_Staff extends Synchronise_Synergetic_Bialik_Strategy_Abstract {
+	protected $strategyTitle = "Staff Synchronisation";
+	const STAFF_GROUP_ID = 2;
+
+	/**
+	 * Get a list of users' Synergy IDs to sync
+	 *
+	 * @return void
+	 */
+	public function generateList() {
+		$this->collateList($this->getExternalUserHandler()->getStaffUserAccountInfo());
+	}
+
+	/**
+	 * Set up the new user's details
+	 *
+	 * @param  $currentUser
+	 * @return array
+	 */
+	public function setupUserDetails($currentUser) {
+		$newUser = array();
+
+		/* Login details
+		 * We don't know how the password is given to us
+		 */
+		$newUser['username'] = $currentUser['NetworkLogin'];
+		$newUser['password'] = '1234';
+
+		/* User details
+		 */
+		$newUser['title'] = $currentUser['StaffTitle'];
+		$newUser['firstname'] = $currentUser['StaffPreferredName'];
+		$newUser['lastname'] = $currentUser['StaffSurname'];
+		$newUser['alt_email'] = $currentUser['preferredEmail'];
+
+		/* Campus config: needs to map to a campus id
+		 */
+		$newUser['defaultCampus'] = 1;
+		$newUser['campus'] = array($this->getCampusFromCode($currentUser['StaffCampus']));
+
+		/* Staff Group ID
+		 */
+		$newUser['group_id'] = self::STAFF_GROUP_ID;
+
+		/* This person is not a superuser
+		 */
+		$newUser['su'] = false;
+
+		return $newUser;
+	}
+
+	/**
+	 * If the users exist in Synergy but not in Schoolbox, create an account for
+	 * them
+	 *
+	 * @return void
+	 */
+	public function createIfExists() {
+		foreach($this->getList() as $currentUser) {
+
+			/* The drop down in Synergetic's Phone and Occupation tabs indicates
+			 * which email the person prefers to use. Create a field in the
+			 * $currentUser structure to remember this email address
+			 */
+			if ($currentUser['DefaultEmailCode'] == 'O') {
+				$currentUser['preferredEmail'] = $currentUser['OccupEmail'];
+			}
+			else {
+				$currentUser['preferredEmail'] = $currentUser['Email'];
+			}
+
+			$this->executeCreateUpdate($currentUser);
+		}
+	}
+}

@@ -8,7 +8,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-interface SynergeticSyncStrategyInterface {
+interface Synchronise_Synergetic_Strategy_Interface {
 
 	/**
 	 * Get a list of records to process.

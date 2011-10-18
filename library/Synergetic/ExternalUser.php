@@ -244,7 +244,7 @@ class ExternalUser extends MSSQL{
     public function getStudentUserAccountInfo() {
 		$query = "
 			SELECT
-				vStudents.StudentID, NetworkLogin, vStudents.StudentTitle, vStudents.StudentPreferred, vStudents.StudentSurname,
+				vStudents.StudentID, NetworkLogin, vStudents.StudentTitle, vStudents.StudentPreferred, vStudents.StudentSurname, StudentEmail,
 				vStudents.StudentYearLevel, vStudents.StudentHouse, StudentCampus
 			FROM SynergyOne.dbo.vStudents vStudents
 			LEFT JOIN Community ON Community.ID = StudentID

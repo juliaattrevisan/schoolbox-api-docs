@@ -9,7 +9,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-abstract class SynergeticSyncStrategy implements SynergeticSyncStrategyInterface {
+abstract class Synchronise_Synergetic_Strategy_Abstract implements Synchronise_Synergetic_Strategy_Interface {
 	protected $userHandler;
 	protected $groupHandler;
 	protected $externalUserHandler;
@@ -188,21 +188,21 @@ abstract class SynergeticSyncStrategy implements SynergeticSyncStrategyInterface
 	}
 
 	/**
-	 * Set Verbose estting
+	 * Set verbose filter, the class to handle verbose messages
 	 *
 	 * @param  $val
 	 * @return void
 	 */
-	public function setVerbose($val) {
-		$this->verbose = $val;
+	protected function setVerboseFilter($val) {
+		$this->verboseFilter = $val;
 	}
 
 	/**
-	 * Get Verbose setting
+	 * Get verbose filter
 	 *
-	 * @return bool
+	 * @return
 	 */
-	public function getVerbose() {
-		return $this->verbose;
+	public function getVerboseFilter() {
+		return $this->verboseFilter;
 	}
 }
