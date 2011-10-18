@@ -123,14 +123,13 @@ abstract class Synchronise_Synergetic_Bialik_Strategy_Abstract extends Synchroni
 	/**
 	 * Identical algorithm used to create/update a user
 	 *
-	 * @param  $currentUser
+	 * @param  $newUser
 	 * @return void
 	 */
-	protected function executeCreateUpdate($currentUser) {
-		/* Generate details about the new user
-		 * Prepare verbosity
+	protected function executeCreateUpdate($newUser) {
+
+		/* Prepare verbosity
 		 */
-		$newUser = $this->setupUserDetails($currentUser);
 		$this->getVerboseFilter()->setNewUser($newUser);
 
 		/* Does this person have a username? If not, skip them
@@ -150,11 +149,13 @@ abstract class Synchronise_Synergetic_Bialik_Strategy_Abstract extends Synchroni
 					$this->getUserHandler()->update($newUser);
 
 					$this->getVerboseFilter()->performUpdate();
+					$this->getVerboseFilter()->incrementUpdated();
 				}
 				/* Report intentions
 				 */
 				else {
 					$this->getVerboseFilter()->planUpdate();
+					$this->getVerboseFilter()->incrementUpdated();
 				}
 			}
 			/* Otherwise create them
@@ -166,11 +167,13 @@ abstract class Synchronise_Synergetic_Bialik_Strategy_Abstract extends Synchroni
 
 					$this->getUserHandler()->create($newUser);
 					$this->getVerboseFilter()->performCreation();
+					$this->getVerboseFilter()->incrementCreated();
 				}
 				/* Report intentions
 				 */
 				else {
 					$this->getVerboseFilter()->planCreation();
+					$this->getVerboseFilter()->incrementCreated();
 				}
 			}
 		}
@@ -178,6 +181,7 @@ abstract class Synchronise_Synergetic_Bialik_Strategy_Abstract extends Synchroni
 		 */
 		else {
 			$this->getVerboseFilter()->skip();
+			$this->getVerboseFilter()->incrementSkipped();
 		}
 	}
 

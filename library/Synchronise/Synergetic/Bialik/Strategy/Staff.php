@@ -79,7 +79,11 @@ class Synchronise_Synergetic_Bialik_Strategy_Staff extends Synchronise_Synergeti
 				$currentUser['preferredEmail'] = $currentUser['Email'];
 			}
 
-			$this->executeCreateUpdate($currentUser);
+			/* Generate details about the new user
+			 */
+			$this->executeCreateUpdate($this->setupUserDetails($currentUser));
 		}
+
+		$this->getVerboseFilter()->summary();
 	}
 }

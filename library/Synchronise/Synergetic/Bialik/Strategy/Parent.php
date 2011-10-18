@@ -66,8 +66,47 @@ class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synerget
 	 * @return void
 	 */
 	public function createIfExists() {
+		$previousUser = null;
+		$compiledCampus = array();
+
 		foreach($this->getList() as $currentUser) {
-			$this->executeCreateUpdate($currentUser);
+			$newUser = $this->setupUserDetails($currentUser);
+
+			/* First iteration
+			 */
+			if ($previousUser == null) {
+				if (is_array($newUser['campus'])) {
+					$compiledCampus = $newUser['campus'];
+				}
+
+				$previousUser = $newUser;
+			}
+			/* Previous was different person to Current
+			 */
+			else if ($previousUser['username'] != $newUser['username']) {
+				$previousUser['campus'] = $compiledCampus;
+
+				/* Uniquify campus list
+				 */
+				$previousUser['campus'] = array_unique($previousUser['campus']);
+
+				/* Update previous user
+				 */
+				$this->executeCreateUpdate($previousUser);
+
+				/* Recompile
+				 */
+				$compiledCampus = $newUser['campus'];
+
+				$previousUser = $newUser;
+			}
+			/* They are the same person
+			 */
+			else {
+				$compiledCampus = array_merge($compiledCampus, $newUser['campus']);
+			}
 		}
+
+		$this->getVerboseFilter()->summary();
 	}
 }

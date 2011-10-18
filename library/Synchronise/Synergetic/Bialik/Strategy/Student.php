@@ -71,7 +71,12 @@ class Synchronise_Synergetic_Bialik_Strategy_Student extends Synchronise_Synerge
 	 */
 	public function createIfExists() {
 		foreach($this->getList() as $currentUser) {
-			$this->executeCreateUpdate($currentUser);
+
+			/* Generate details about the new user
+			 */
+			$this->executeCreateUpdate($this->setupUserDetails($currentUser));
 		}
+
+		$this->getVerboseFilter()->summary();
 	}
 }

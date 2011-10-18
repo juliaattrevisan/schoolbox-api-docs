@@ -13,6 +13,12 @@ class Synchronise_Synergetic_Bialik_Verbose {
 	private $verbose = false;
 	private $newUser = array();
 
+	/* Stats
+	 */
+	private $numCreated = 0;
+	private $numUpdated = 0;
+	private $numSkipped = 0;
+
 	/**
 	 * Echo message about skipping all actions
 	 *
@@ -83,10 +89,10 @@ class Synchronise_Synergetic_Bialik_Verbose {
 		$data[] = "firstname: {$newUser['firstname']}";
 		$data[] = "lastname: {$newUser['lastname']}";
 		$data[] = "alt_email: {$newUser['alt_email']}";
-		$data[] = "campus: " . implode($newUser['campus']);
+		$data[] = "campus: " . '[' . implode(',', $newUser['campus']) . ']';
 		$data[] = "groupIDs: " . $newUser['group_id'];
 
-		return '[' . implode(', ', $data) . ']';
+		return '(' . implode(', ', $data) . ')';
 	}
 
 	/**
@@ -125,5 +131,42 @@ class Synchronise_Synergetic_Bialik_Verbose {
 	 */
 	private function getVerbose() {
 		return $this->verbose;
+	}
+
+	public function incrementCreated() {
+		$this->numCreated++;
+	}
+
+	public function incrementUpdated() {
+		$this->numUpdated++;
+	}
+
+	public function incrementSkipped() {
+		$this->numSkipped++;
+	}
+
+	public function getNumCreated() {
+		return $this->numCreated;
+	}
+
+	public function getNumUpdated() {
+		return $this->numUpdated;
+	}
+
+	public function getNumSkipped() {
+		return $this->numSkipped;
+	}
+
+	/**
+	 * A summary count of changes
+	 *
+	 * @return void
+	 */
+	public function summary() {
+		echo "\n";
+		echo "Created: {$this->getNumCreated()}, ";
+		echo "Updated: {$this->getNumUpdated()}, ";
+		echo "Skipped: {$this->getNumSkipped()}";
+		echo "\n\n";
 	}
 }
