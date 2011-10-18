@@ -704,8 +704,7 @@ h4 .hide-on-small {
 	overflow: hidden;
 	width: 100%;
 	background: #fff;
-	-ms-word-break: break-all;
-	word-break: break-all;
+
 }
 
 .box .text {
