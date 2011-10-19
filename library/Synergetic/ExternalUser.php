@@ -279,16 +279,20 @@ class ExternalUser extends MSSQL{
 	}
 
 	/**
-	 * Gets all Staff's account info from Synergetic
+	 * Gets all active Staff's account info from Synergetic
 	 *
 	 * @return array|bool
 	 */
     public function getStaffUserAccountInfo() {
 		$query = "
 			SELECT
-				*, StaffID, NetworkLogin, StaffTitle, StaffPreferredName, StaffSurname, Email, StaffCampus
+				StaffID, NetworkLogin, ActiveFlag,
+				StaffTitle, StaffPreferredName, StaffSurname,
+				DefaultEmailCode, OccupEmail, Email,
+				StaffCampus
 			FROM SynergyOne.dbo.vStaff vStaff
 			LEFT JOIN Community ON Community.ID = StaffID
+			AND ActiveFlag = 1
 		";
 
         return $this->getAll($query);

@@ -147,7 +147,6 @@ abstract class Synchronise_Synergetic_Bialik_Strategy_Abstract extends Synchroni
 					$newUser['id'] = $existing['uid'];
 
 					$this->getUserHandler()->update($newUser);
-
 					$this->getVerboseFilter()->performUpdate();
 					$this->getVerboseFilter()->incrementUpdated();
 				}
@@ -164,7 +163,6 @@ abstract class Synchronise_Synergetic_Bialik_Strategy_Abstract extends Synchroni
 				/* Perform action; report what happened
 				 */
 				if ($this->getPerformUpdate() === true) {
-
 					$this->getUserHandler()->create($newUser);
 					$this->getVerboseFilter()->performCreation();
 					$this->getVerboseFilter()->incrementCreated();

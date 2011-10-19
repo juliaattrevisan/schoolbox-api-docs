@@ -11,6 +11,7 @@
 class Synchronise_Synergetic_Bialik_Strategy_Staff extends Synchronise_Synergetic_Bialik_Strategy_Abstract {
 	protected $strategyTitle = "Staff Synchronisation";
 	const STAFF_GROUP_ID = 2;
+	const STAFF_DEFAULT_CAMPUS = 1;
 
 	/**
 	 * Get a list of users' Synergy IDs to sync
@@ -81,7 +82,17 @@ class Synchronise_Synergetic_Bialik_Strategy_Staff extends Synchronise_Synergeti
 
 			/* Generate details about the new user
 			 */
-			$this->executeCreateUpdate($this->setupUserDetails($currentUser));
+			$newUser = $this->setupUserDetails($currentUser);
+
+			/* Default campus to 1, as per James' email
+			 * but only if no campuses were determined
+			 * (use array filter to remove empty elements)
+			 */
+			if (!count(array_filter($newUser['campus']))) {
+				$newUser['campus'] = array(self::STAFF_DEFAULT_CAMPUS);
+			}
+
+			$this->executeCreateUpdate($newUser);
 		}
 
 		$this->getVerboseFilter()->summary();
