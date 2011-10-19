@@ -83,7 +83,7 @@ errorCheck 1;
 #cp /tmp/update_$@.sql /tmp/exported/update_$@.sql;
 #errorCheck 1;
 echo -e "Transferring Versions index to Upload Directory..";
-cp /tmp/versions.txt /tmp/exported;
+cp /tmp/version_index /tmp/exported;
 errorCheck 1;
 echo -e "Transferring Initial Database file to Upload Directory..";
 cp /tmp/initialDatabase.sql /tmp/exported;
