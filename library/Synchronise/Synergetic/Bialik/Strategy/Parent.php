@@ -69,6 +69,8 @@ class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synerget
 		$previousUser = null;
 		$compiledCampus = array();
 
+		$this->getVerboseFilter()->intro();
+
 		foreach($this->getList() as $currentUser) {
 			$newUser = $this->setupUserDetails($currentUser);
 

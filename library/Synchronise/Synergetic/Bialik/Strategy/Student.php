@@ -70,6 +70,8 @@ class Synchronise_Synergetic_Bialik_Strategy_Student extends Synchronise_Synerge
 	 * @return void
 	 */
 	public function createIfExists() {
+		$this->getVerboseFilter()->intro();
+
 		foreach($this->getList() as $currentUser) {
 
 			/* Generate details about the new user

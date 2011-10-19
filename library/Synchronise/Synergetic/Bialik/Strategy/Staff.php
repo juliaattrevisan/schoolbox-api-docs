@@ -67,6 +67,8 @@ class Synchronise_Synergetic_Bialik_Strategy_Staff extends Synchronise_Synergeti
 	 * @return void
 	 */
 	public function createIfExists() {
+		$this->getVerboseFilter()->intro();
+
 		foreach($this->getList() as $currentUser) {
 
 			/* The drop down in Synergetic's Phone and Occupation tabs indicates

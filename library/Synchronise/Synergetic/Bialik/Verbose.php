@@ -96,6 +96,47 @@ class Synchronise_Synergetic_Bialik_Verbose {
 	}
 
 	/**
+	 * Create an intro
+	 *
+	 * @return void
+	 */
+	public function intro() {
+		echo "This script automatically updates Schoolbox with data found in Synergetic.\n\n";
+
+		echo "There are two modes: 'Planning' and 'Performing'.\n\n";
+
+		echo "Planning mode: activated using \$sync->setPerformUpdate(false);\n";
+		echo "This allows you to see a preview of what is going to happen. No database changes are made.\n\n";
+
+		echo "Performing mode: activated using \$sync->setPerformUpdate(true);\n";
+		echo "This allows the script to modify the database.\n\n\n";
+
+		echo "Legend ------------------------------------------------------\n\n";
+		echo "+  Planning create: The script intends to create a Schoolbox account with data found in Synergetic.\n";
+		echo "^  Planning update: The script intends to update a Schoolbox account with data found in Synergetic.\n\n";
+
+		echo "+  Performing create: The script will create a Schoolbox account with data found in Synergetic.\n";
+		echo "^  Performing update: The script will to update a Schoolbox account with data found in Synergetic.\n\n";
+
+		echo "o  Sipping create/update: The script intends to ignore this record altogether, regardless of mode.\n\n";
+		echo "-------------------------------------------------------------\n";
+		echo "\n\n";
+	}
+
+	/**
+	 * A summary count of changes
+	 *
+	 * @return void
+	 */
+	public function summary() {
+		echo "\n";
+		echo "Created: {$this->getNumCreated()}, ";
+		echo "Updated: {$this->getNumUpdated()}, ";
+		echo "Skipped: {$this->getNumSkipped()}";
+		echo "\n\n";
+	}
+
+	/**
 	 * Set new user
 	 *
 	 * @param  $val
@@ -133,40 +174,57 @@ class Synchronise_Synergetic_Bialik_Verbose {
 		return $this->verbose;
 	}
 
+	/**
+	 * Increment the number of items created
+	 *
+	 * @return void
+	 */
 	public function incrementCreated() {
 		$this->numCreated++;
 	}
 
+	/**
+	 * Increment the number of items updated
+	 *
+	 * @return void
+	 */
 	public function incrementUpdated() {
 		$this->numUpdated++;
 	}
 
+	/**
+	 * Increment the number of items skipped
+	 *
+	 * @return void
+	 */
 	public function incrementSkipped() {
 		$this->numSkipped++;
 	}
 
+	/**
+	 * Get number of items created
+	 *
+	 * @return int
+	 */
 	public function getNumCreated() {
 		return $this->numCreated;
 	}
 
+	/**
+	 * Get number of items updated
+	 *
+	 * @return int
+	 */
 	public function getNumUpdated() {
 		return $this->numUpdated;
 	}
 
+	/**
+	 * Get number of items skipped
+	 *
+	 * @return int
+	 */
 	public function getNumSkipped() {
 		return $this->numSkipped;
-	}
-
-	/**
-	 * A summary count of changes
-	 *
-	 * @return void
-	 */
-	public function summary() {
-		echo "\n";
-		echo "Created: {$this->getNumCreated()}, ";
-		echo "Updated: {$this->getNumUpdated()}, ";
-		echo "Skipped: {$this->getNumSkipped()}";
-		echo "\n\n";
 	}
 }
