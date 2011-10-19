@@ -60,6 +60,16 @@ fi;
 echo -e "Finalising Processing on new Index...";
 cp /tmp/exported/$@/updates/version_index /tmp/version_index
 errorCheck 1;
+if [ -d /tmp/exported/$@/updates/$@ ]; then
+echo -e "Found Directory for Custom Scripts...\n";
+else
+echo -e "Warning: Did not find custom scripts directory /updates/$@\n";
+fi;
+if [ -s /tmp/exported/$@/updates/$@/scripts_list ]; then
+echo -e "Found Script Processing List...\n";
+else
+echo -e "Warning: Did not find custom scripts processing list...";
+fi;
 echo -e "Entering Temporary Directory...";
 cd /tmp/exported/$@;
 errorCheck 1;
