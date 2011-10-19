@@ -37,7 +37,7 @@ class Synchronise_Synergetic_Bialik_Verbose {
 	 */
 	public function planCreation() {
 		if ($this->getVerbose() === true) {
-			echo "+  Planning creation of " . $this->verboseUserSummary($this->getNewUser()) . "\n";
+			echo "+  Planning create of " . $this->verboseUserSummary($this->getNewUser()) . "\n";
 		}
 	}
 
@@ -48,7 +48,7 @@ class Synchronise_Synergetic_Bialik_Verbose {
 	 */
 	public function performCreation() {
 		if ($this->getVerbose() === true) {
-			echo "+  Performing creation of " . $this->verboseUserSummary($this->getNewUser()) . "\n";
+			echo "+  Performing create of " . $this->verboseUserSummary($this->getNewUser()) . "\n";
 		}
 	}
 
