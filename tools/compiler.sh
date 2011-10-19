@@ -47,14 +47,11 @@ errorCheck 1;
 #echo -e "Attempting to process the v$@ SQL Update file (File:/sql/update_$@.sql)";
 #cp /tmp/exported/$@/sql/update_$@.sql /tmp/ &>> /dev/null;
 #errorCheck 1;
-echo -e "Attempting to process the intitial Database File (For installs only)...";
-cp /tmp/exported/$@/sql/initialDatabase.sql /tmp/initialDatabase.sql &>> /dev/null;
-errorCheck 1;
 echo -e "Proceeding to Process new versions index...";
 if [[ `cat /tmp/exported/$@/updates/version_index|grep $@` ]]; then
 echo -e "... Passed Processing found $@ in the Version Index";
 else
-echo "... Failed... new Versions index does not contain new version ($@)";
+echo -e "... Failed... new Versions index does not contain new version ($@)\n";
 exit;
 fi;
 echo -e "Finalising Processing on new Index...";
