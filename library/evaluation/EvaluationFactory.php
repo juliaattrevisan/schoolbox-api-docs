@@ -70,7 +70,6 @@ abstract class EvaluationFactory extends DeprecatedModel {
                 /* Instantiate specific question model
                  */
                 if (!is_readable($superclassFile) || !is_readable($subclassFile)) {
-					print_r("$superclassFile, $subclassFile");
                     error(133);
                 }
 
