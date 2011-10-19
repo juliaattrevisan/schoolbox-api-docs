@@ -85,9 +85,6 @@ errorCheck 1;
 echo -e "Transferring Versions index to Upload Directory..";
 cp /tmp/version_index /tmp/exported;
 errorCheck 1;
-echo -e "Transferring Initial Database file to Upload Directory..";
-cp /tmp/initialDatabase.sql /tmp/exported;
-errorCheck 1;
 echo -e "Succesfully Compiled... Sending to update server (schoolbox.com.au)";
 scp /tmp/exported/* schoolbo@schoolbox.com.au:/home/schoolbo/www/schoolboxinstaller/
 errorCheck 1;
