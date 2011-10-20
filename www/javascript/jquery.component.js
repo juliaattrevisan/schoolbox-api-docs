@@ -109,8 +109,42 @@ setupCustomise = {
 					data: data,
 					success: function(data){
 						$j(data).hide().prependTo('.left').css('opacity','0').slideDown(400,function(){
-							setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left')])
+							setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left')]);
 							$j(this).animate({opacity:1}, 300);
+							/*
+							* When a new component is added in we need it to
+							* be able to get the colours that have been changed before
+							* the component is added.
+							* 1. Colour is changed
+							* 2. "add" is clicked on any component
+							* 3. Apply the colour change to this new component's DOM elements.
+							* */
+							var newComponent = $j(this);
+
+							newComponent.find('h2').css({
+								'background-color': $j('#left_head_bg').css('background-color'),
+								'color': $j('#left_head_font').css('background-color')
+							});
+
+							newComponent.find('.text, .listing').css({
+								'background-color': $j('#left_bg_primary').css('background-color')
+							});
+
+							newComponent.css({
+								'color': $j('#left_font').css('background-color')
+							});
+
+							newComponent.find('p').css({
+								'color': $j('#left_font').css('background-color')
+							});
+
+							newComponent.find('.dark').css({
+								'background-color' : $j('#left_bg_secondary').css('background-color')
+							});
+
+							newComponent.find('a').css({
+								'color' : $j('#left_link').css('background-color')
+							});
 
 						});
 					},
