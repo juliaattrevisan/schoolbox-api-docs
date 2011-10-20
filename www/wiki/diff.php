@@ -5,6 +5,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 // pear libs
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/PEAR/Text/Diff.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/PEAR/Text/Diff/Renderer/inline.php';
 
 $wiki  = new Wiki;
 $group = new Group(HOMEPAGE_SERVICE);
