@@ -12,10 +12,6 @@ define("WEB_root", SITE_root . '/www');
 define('TEMPLATE_body', 		'bodyTpl');
 define('TEMPLATE_content', 		'contentTpl');
 
-//PEAR required for mail
-$path = SITE_root.'/include/PEAR';
-set_include_path('.' . PATH_SEPARATOR . get_include_path() . PATH_SEPARATOR . $path);
-
 //MySQL config options
 
 define("SQL_host", "localhost");

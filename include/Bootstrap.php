@@ -17,6 +17,9 @@ require_once dirname(__FILE__) . '/HTMLPurifier/HTMLPurifier.auto.php';
 /* Stdfuncs */
 require_once(WEB_root.'/include/stdfuncs.php');
 
+/* Set include path */
+set_include_path('.' . PATH_SEPARATOR . SITE_root . PATH_SEPARATOR . SITE_root . '/include/PEAR' . PATH_SEPARATOR . get_include_path());
+
 /* Load the Autoloader */
 require_once dirname(__FILE__) . '/Autoloader.php';
 $autoloader = Autoloader::initialise();
