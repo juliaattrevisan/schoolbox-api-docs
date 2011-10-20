@@ -80,7 +80,7 @@ if(!empty($blogs)) {
 				));
 
 				if($comment['owner'] == $_SESSION['id'] || $permission >= WRITE_ACCESS)
-					$this->setVar('DELETE_COMMENT', "<a href=\"/blog/comment/delete/{$comment['id']}\">Delete</a>");
+					$this->setVar('DELETE_COMMENT', "<a class=\"delete-comment\" href=\"/blog/comment/delete/{$comment['id']}\">Delete</a>");
 				else
 					$this->setVar('DELETE_COMMENT', '');
 

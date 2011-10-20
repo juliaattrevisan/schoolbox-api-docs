@@ -1,7 +1,15 @@
+<script type="text/javascript" src="/javascript/jquery.confirm.1.3.js"></script>
 <script type="text/javascript">
 $j(function() {
-	$j('.header_option a:first-child').addClass('btn modify');
-	$j('.header_option a:first-child').html('<span></span>Modify');
+		$j('a.delete-comment').click(function(){
+			location.href = $j(this).attr('href');
+		}).confirm({
+		buttons: {
+			wrapper:'<button></button>',
+			separator:'  '
+		}
+	});
+
 });
 
 

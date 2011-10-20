@@ -18,7 +18,7 @@ if(is_numeric($this->arg[0])) {
 		error(29);
 
 	if($blog['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS || NEWS_teacher_edit_other)
-		$this->setVar('MODIFY_BLOG', "<a href=\"/blog/modify/{$blog['id']}\">Modify</a>");
+		$this->setVar('MODIFY_BLOG', "<a class=\"btn modify\" href=\"/blog/modify/{$blog['id']}\"><span></span>Modify</a>");
 	else
 		$this->setVar('MODIFY_BLOG', '');
 
@@ -45,11 +45,11 @@ if(is_numeric($this->arg[0])) {
 				'COMMENT_BODY'    => $comment['body'],
 				'COMMENT_OWNER'   => $userHandler->formatName($comment),
 				'COMMENT_CREATED' => $actionDate->getRelativeTime(),
-				'DELETE_COMMENT'  => "<a href=\"/blog/comment/delete/{$comment['id']}\">Delete</a>"
+				'DELETE_COMMENT'  => "<a class=\"delete-comment\" href=\"/blog/comment/delete/{$comment['id']}\"><span></span>Delete</a>"
 			));
 
 			if($comment['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS || NEWS_teacher_edit_other)
-				$this->setVar('DELETE_COMMENT', "<a href=\"/blog/comment/delete/{$comment['id']}\">Delete</a> | ");
+				$this->setVar('DELETE_COMMENT', "<a class=\"delete-comment\" href=\"/blog/comment/delete/{$comment['id']}\">Delete</a> | ");
 			else
 				$this->setVar('DELETE_COMMENT', '');
 

@@ -24,14 +24,10 @@ tinyMCE.init({
 	convert_urls : false
 });
 
-function verify() {
-	if(document.getElementById('blogForm').heading.value == ""){
-        alert("You need to enter a heading\n");
-        return false;
-	} else {
-		return true;
-	}
-}
+	$j(function() {
+		$j('#blogForm').validate();
+	})
+
 </script>
 <!-- END custom_head -->
 
@@ -40,7 +36,7 @@ function verify() {
 	<table class="standardForm">
 		<tr>
 			<td class="formLabelWidth"><h4>Title</h4></td>
-			<td><input type="text" name="heading" size="35" maxlength="50" value="{ENTRY_HEADING}" /></td>
+			<td><label><input type="text" name="heading" size="35" maxlength="50" class="required" value="{ENTRY_HEADING}" /></label></td>
 		</tr>
 		<tr>
 			<td><h4>Body</h4></td>
