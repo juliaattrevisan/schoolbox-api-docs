@@ -5,13 +5,12 @@ $page = new SitePage;
 $calendarHandler = new Calendar;
 $groupHandler = new Group;
 
-
 if (isset($_POST['date'])) {
 
-	$dateObj = new Alaress_Date_Format($_POST['date']);
+	$dateObj = new Alaress_Date_Format($_POST['date'], 'd/m/y');
 	$date = $dateObj->getUnixTimestamp();
 
-	$untilObj = new Alaress_Date_Format($_POST['repeat_until']);
+	$untilObj = new Alaress_Date_Format($_POST['repeat_until'], 'd/m/y');
 	$until = $untilObj->getUnixTimestamp();
 
 	$event = array('owner' 		=> $_SESSION['id'],
