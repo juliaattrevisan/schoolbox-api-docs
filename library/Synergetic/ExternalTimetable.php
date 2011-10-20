@@ -111,7 +111,7 @@ class ExternalTimetable extends MSSQL{
             }
             else {
                     $day =  date('w',$date) + 5;
-                    if($day < 6); //on sundays move it forward
+                    if($day < 6) //on sundays move it forward
                         $day = 6;
 
             }
