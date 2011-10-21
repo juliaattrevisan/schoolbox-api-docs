@@ -3375,11 +3375,12 @@ ul.section-options a.drop-arrow {
 
 
 ul.evaluation-category-select {list-style:none; padding:8px;}
-.evaluation-category-select li a{
+.evaluation-category-select li a
+
+{
   -webkit-border-radius: 4px;
      -moz-border-radius: 4px;
           border-radius: 4px;
-
 color:#000;
   -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
 display:block; padding:7px 16px;
@@ -3395,7 +3396,7 @@ display:block; padding:7px 16px;
 
  border:1px solid #ccc; margin-bottom:8px;}
 
-.evaluation-content.question-bank .question.checked, .evaluation-category-select li a.selected {background:#CAE9B9}
+.evaluation-content.question-bank .question.checked, .evaluation-category-select li a.selected {background:#CAE9B9; filter:none;}
 
 /************************
  END EVALUATION
@@ -3431,10 +3432,51 @@ display:block; padding:7px 16px;
 }
 
 /************************
- END BLOG
+BLOG ARCHIVE
  ************************/
+.blog-archive .blog-archive-menu{
+	float:left; width:17%;
+}
 
-/*CALENDAR*/
+.blog-archive .blog-posts{
+	width:82%;
+	float:right;
+}
+
+.blog-archive-menu ul li a{
+-webkit-border-radius: 4px;
+-moz-border-radius: 4px;
+border-radius: 4px;
+color: black;
+-moz-background-clip: padding;
+-webkit-background-clip: padding-box;
+background-clip: padding-box;
+display: block;
+padding: 7px 16px;
+background-color: #FBFBFB;
+background-image: -webkit-gradient(linear, left top, left bottom, from(#FBFBFB), to(#f7f7f7));
+background-image: -webkit-linear-gradient(top, #FBFBFB, #f7f7f7);
+background-image: -moz-linear-gradient(top, #FBFBFB, #f7f7f7);
+background-image: -ms-linear-gradient(top, #FBFBFB, #f7f7f7);
+background-image: -o-linear-gradient(top, #FBFBFB, #f7f7f7);
+background-image: linear-gradient(top, #FBFBFB, #f7f7f7);
+filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#FBFBFB', EndColorStr='#f7f7f7');
+text-shadow: 0px 1px 0px white;
+border: 1px solid #CCC;
+margin-bottom: 8px;
+	
+}
+
+.blog-archive-menu ul li a.selected{
+	background:#CAE9B9;
+	filter:none;
+}
+
+.blog-archive-menu h3{font-size:16px; color:#000; font-weight:bold; margin-bottom:8px;}
+
+/************************
+CALENDAR
+ ************************/
 #calendar {
 	overflow: hidden
 }

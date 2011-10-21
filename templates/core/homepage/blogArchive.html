@@ -1,83 +1,105 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.confirm.1.3.js"></script>
 <script type="text/javascript">
-	$j(function(){
+	$j(function() {
 
-		$j('a.show_comments').click(function(){
-				$j(this).closest('li').find('.blog-comments').toggle();
-				$j(this).children('span').toggle();
-				return false;
+		$j('a.show_comments').click(function() {
+			$j(this).closest('li').find('.blog-comments').toggle();
+			$j(this).children('span').toggle();
+			return false;
 		});
 
-		$j('a.post_comment').click(function(){
-				$j(this).closest('li').find('form').toggle();
-				return false;
+		$j('a.post_comment').click(function() {
+			$j(this).closest('li').find('form').toggle();
+			return false;
 		});
-		$j('a.delete-comment').click(function(){
-				location.href = $j(this).attr('href');
-			}).confirm({
-			buttons: {
-				wrapper:'<button></button>',
-				separator:'  '
-			}
-		});
+		$j('a.delete-comment').click(
+				function() {
+					location.href = $j(this).attr('href');
+				}).confirm({
+					buttons: {
+						wrapper:'<button></button>',
+						separator:'  '
+					}
+				});
 	});
 </script>
 <!-- END custom_head -->
+<div class="blog-archive clearfix">
 
-<h1>Blog Archive for {CATEGORY_NAME}</h1>
 
-<!-- BEGIN submit_blog -->
-<a href="/blog/modify/new/{ID}" class="btn up-arrow"><span></span>Post Blog</a>
-<!-- END submit_blog -->
-<a href="/homepage/{ID}" class="btn go-back"><span></span>Return to Homepage</a>
 
-<ul>
-    <!-- BEGIN year -->
-    <li class="{YEAR_ClASS}"><strong>{YEAR}</strong>
-        <!-- BEGIN month -->
-        <p class="{MONTH_ClASS}"><a class="blogArchiveNav" href="/homepage/blogArchive/{ID}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a></p>
-        <!-- END month -->
-    </li>
-    <!-- END year -->
-</ul>
+	<h1>Blog Archive for {CATEGORY_NAME}</h1>
+	<span class="header_option">
+	<!-- BEGIN submit_blog -->
+	<a href="/blog/modify/new/{ID}" class="btn up-arrow"><span></span>Post Blog</a>
+	<!-- END submit_blog -->
+	<a href="/homepage/{ID}" class="btn go-back"><span></span>Return to Homepage</a>
+	</span>
+	<div class="blog-archive-menu">
+		<ul>
+			<!-- BEGIN year -->
+			<li class="{YEAR_ClASS}"><h3>{YEAR}</h3>
+				<ul>
+				<!-- BEGIN month -->
+					<li><a class="{MONTH_ClASS} blogArchiveNav"
+						href="/homepage/blogArchive/{ID}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a>
+					</li>
+				<!-- END month -->
+				</ul>
+			</li>
+			<!-- END year -->
+		</ul>
+	</div>
 
-<ul class="blogPost">
-    <!-- BEGIN blog -->
-    <li>
-        <a name="{BLOG_ID}"></a>
-        <h2>{BLOG_HEADING}</h2>
-        <div class="pad-it">
-            {BLOG_BODY}
+	<ul class="blog-posts">
+		<!-- BEGIN blog -->
+		<li>
+			<a name="{BLOG_ID}"></a>
 
-            <div class="blog-comments hide-it">
-                <!-- BEGIN comment -->
-                <div class="box clearfix"> {COMMENT_BODY}
-                    <p class="interact">{COMMENT_OWNER} | {COMMENT_CREATED} | {DELETE_COMMENT}</p>
-                </div>
-                <!-- END comment -->
+			<h2>{BLOG_HEADING}</h2>
 
-                <!-- BEGIN show_all -->
-                <p class="interact"><a href="/blog/{BLOG_ID}">Show All {BLOG_TOTAL_COMMENTS} Comments</a></p>
-                <!-- END show_all -->
-            </div>
-            <p class="links-house">
-                <!-- BEGIN show_comment -->
-                <a class="show_comments" href="javascript:void();"><span>Show</span><span class="hide-it">Hide</span> {BLOG_COMMENTS} Comments</a> -
-                <!-- END show_comment -->
-                <a class="interact post_comment" href="javascript:void();">Post comment</a>
-            </p>
-            <form class="hide" method="post" action="/blog/comment/new/{BLOG_ID}">
-                <p>
-                    <textarea name="body" style="width: 100%;"></textarea>
-                </p>
-                <p>
-                    <input type="submit" class="submit-btn-plain" name="comment" value="Comment"/>
-                </p>
-            </form>
-            
-            <span class="element_footer">Posted by {EMAIL_CONTACT} on {POSTED_DATE} {MOD_BLOG}</span>
-        </div>
-    </li>
-    <!-- END blog -->
-</ul>
+			<div class="pad-it">
+				{BLOG_BODY}
+
+				<div class="blog-comments hide-it">
+					<!-- BEGIN comment -->
+					<div class="box clearfix"> {COMMENT_BODY}
+						<p class="interact">{COMMENT_OWNER} | {COMMENT_CREATED}
+							| {DELETE_COMMENT}</p>
+					</div>
+					<!-- END comment -->
+
+					<!-- BEGIN show_all -->
+					<p class="interact"><a href="/blog/{BLOG_ID}">Show All
+						{BLOG_TOTAL_COMMENTS} Comments</a></p>
+					<!-- END show_all -->
+				</div>
+				<p class="links-house">
+					<!-- BEGIN show_comment -->
+					<a class="show_comments" href="javascript:void();"><span>Show</span><span
+							class="hide-it">Hide</span> {BLOG_COMMENTS} Comments</a>
+					-
+					<!-- END show_comment -->
+					<a class="interact post_comment" href="javascript:void();">Post
+						comment</a>
+				</p>
+
+				<form class="hide" method="post"
+					  action="/blog/comment/new/{BLOG_ID}">
+					<p>
+						<textarea name="body" style="width: 100%;"></textarea>
+					</p>
+
+					<p>
+						<input type="submit" class="submit-btn-plain"
+							   name="comment" value="Comment"/>
+					</p>
+				</form>
+
+				<span class="element_footer">Posted by {EMAIL_CONTACT} on {POSTED_DATE} {MOD_BLOG}</span>
+			</div>
+		</li>
+		<!-- END blog -->
+	</ul>
+</div>
