@@ -78,18 +78,21 @@ if($groupHandler->isStaff()) {
 
 				$this->setVar($studentOutput);
 
-				if ($student['StudentMedicalAlert']) {
-                    $this->parse('medical_block','medical');
+				$student['StudentMedicalAlert'] = trim($student['StudentMedicalAlert']);
+				$student['StudentSpecialNeedsFlag'] = trim($student['StudentSpecialNeedsFlag']);
+
+				if ( !empty($student['StudentMedicalAlert']) ) {
+                    $this->parse('medical_block', 'medical');
 				}
                 else {
-                    $this->setVar('medical_block','');
+                    $this->setVar('medical_block', '');
 				}
 
-                if ($student['StudentSpecialNeedsFlag']) {
-                    $this->parse('special_block','special');
+                if ( !empty($student['StudentSpecialNeedsFlag']) ) {
+                    $this->parse('special_block', 'special');
 				}
                 else {
-                    $this->setVar('special_block','');
+                    $this->setVar('special_block', '');
 				}
 
 				/* If the user has an enabled eportfolio, enable link
