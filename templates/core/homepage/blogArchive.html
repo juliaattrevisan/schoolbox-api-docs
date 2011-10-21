@@ -1,15 +1,3 @@
-<script type="text/javascript">
-	$j(document).ready(function() {
-		$j('.blogPost').hide();
-
-		$j('.blogArchiveNav').click(function() {
-			var showClass = $j(this).attr('rel');
-
-			$j('.' + showClass).toggle();
-		});
-	});
-</script>
-
 <h1>Blog Archive for {CATEGORY_NAME}</h1>
 
 <!-- BEGIN submit_blog -->
@@ -17,31 +5,26 @@
 <!-- END submit_blog -->
 <a href="/homepage/{ID}" class="btn go-back"><span></span>Return to Homepage</a>
 
-<ul id="categoryclass="blogArchive">
-	<!-- BEGIN year -->
-	<li><strong>{YEAR}</strong>
-		<!-- BEGIN month -->
-			<!-- BEGIN monthLink -->
-			<p>
-				<a class="blogArchiveNav"
-				   rel="blog_{YEAR}_{MONTH}">{MONTH}</a>
-			</p>
-			<!-- END monthLink -->
-				<ul class="blogPost blog_{YEAR}_{MONTH}">
-					<!-- BEGIN blog -->
-					<li>
-						<a name="{BLOG_ID}"></a>
-						<h2>{BLOG_HEADING}</h2>
-						<div class="pad-it">
-							{BLOG_BODY}
-							<hr>
-							<span class="element_footer">Posted by {EMAIL_CONTACT} on {POSTED_DATE} {MOD_BLOG}</span>
-						</div>
-					</li>
-					<!-- END blog -->
-				</ul>
+<ul>
+    <!-- BEGIN year -->
+    <li class="{YEAR_ClASS}"><strong>{YEAR}</strong>
+        <!-- BEGIN month -->
+        <p class="{MONTH_ClASS}"><a class="blogArchiveNav" href="/homepage/blogArchive/{ID}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a></p>
+        <!-- END month -->
+    </li>
+    <!-- END year -->
+</ul>
 
-			<!-- END month -->
-	</li>
-	<!-- END year -->
+<ul class="blogPost">
+    <!-- BEGIN blog -->
+    <li>
+        <a name="{BLOG_ID}"></a>
+        <h2>{BLOG_HEADING}</h2>
+        <div class="pad-it">
+            {BLOG_BODY}
+            <hr>
+            <span class="element_footer">Posted by {EMAIL_CONTACT} on {POSTED_DATE} {MOD_BLOG}</span>
+        </div>
+    </li>
+    <!-- END blog -->
 </ul>

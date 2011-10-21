@@ -55,20 +55,48 @@ class Blog extends DeprecatedModel {
 		return $this->db->getAll($query);
 	}
 
-    /**
-     * Gets the years in which blog posts were made.
-     * 
-     * @param <type> $cid
-     */
-    function postYears($cid) {
-        $query = "SELECT LEFT(created,4) AS year
-                  FROM blog
-                  WHERE cid = '$cid'
-                  GROUP BY year DESC";
+	public function getByYearAndMonth ($cid, $year, $month) {
+		$query = "SELECT {$this->_table}.*, user.title, user.firstname, user.lastname, created, UNIX_TIMESTAMP(created) AS createdTimestamp
+			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner = user.id
+			WHERE cid = $cid AND deleted IS NULL
+				AND CAST( SUBSTRING(`created`, 1, 4) AS SIGNED) = {$year}
+				AND CAST( SUBSTRING(`created`, 6, 2) AS SIGNED) = {$month}
+			ORDER BY {$this->_table}.created DESC";
+		$query = $this->_config['size'] > 0 ? "$query LIMIT 0, {$this->_config['size']}" : $query;
 
-        return $this->db->getAll($query);
-    }
+		return $this->db->getAll($query);
+	}
+
+	/**
+	 * Gets the years in which blog posts were made.
+	 *
+	 * @param <type> $cid
+	 */
+	function postYears($cid) {
+		$query = "SELECT LEFT(created,4) AS year
+				  FROM blog
+				  WHERE cid = '$cid'
+				  GROUP BY year DESC";
+
+		return $this->db->getAll($query);
+	}
 	
+	/**
+	 * Gets the months in which blog posts were made.
+	 *
+	 * @param Integer $cid
+	 * @param Integer $cid
+	 */
+	function postMonths ($cid, $year) {
+		$query = "SELECT `created` as `month`
+				  FROM `blog`
+				  WHERE `cid` = '$cid'
+				  	AND LEFT(`created`, 4) = '$year'
+				  GROUP BY SUBSTRING(`created`, 6, 2) DESC";
+
+		return $this->db->getAll($query);
+	}
+
 	function create($blog) {
 		$blog = array_merge(array(
 			'owner'   => $_SESSION['id'],
