@@ -143,6 +143,16 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface {
 	}
 
 	/**
+	 * Delegation method to get the datetime in an arbitrary format
+	 *
+	 * @param  $format
+	 * @return string
+	 */
+	public function getUsingFormat($format) {
+		return $this->getStrategy()->getUsingFormat($format);
+	}
+
+	/**
 	 * Set strategy object
 	 *
 	 * @param  $val

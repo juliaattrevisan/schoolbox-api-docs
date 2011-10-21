@@ -1,3 +1,30 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.confirm.1.3.js"></script>
+<script type="text/javascript">
+	$j(function(){
+
+		$j('a.show_comments').click(function(){
+				$j(this).closest('li').find('.blog-comments').toggle();
+				$j(this).children('span').toggle();
+				return false;
+		});
+
+		$j('a.post_comment').click(function(){
+				$j(this).closest('li').find('form').toggle();
+				return false;
+		});
+		$j('a.delete-comment').click(function(){
+				location.href = $j(this).attr('href');
+			}).confirm({
+			buttons: {
+				wrapper:'<button></button>',
+				separator:'  '
+			}
+		});
+	});
+</script>
+<!-- END custom_head -->
+
 <h1>Blog Archive for {CATEGORY_NAME}</h1>
 
 <!-- BEGIN submit_blog -->
@@ -22,7 +49,33 @@
         <h2>{BLOG_HEADING}</h2>
         <div class="pad-it">
             {BLOG_BODY}
-            <hr>
+
+            <div class="blog-comments hide-it">
+                <!-- BEGIN comment -->
+                <div class="box clearfix"> {COMMENT_BODY}
+                    <p class="interact">{COMMENT_OWNER} | {COMMENT_CREATED} | {DELETE_COMMENT}</p>
+                </div>
+                <!-- END comment -->
+
+                <!-- BEGIN show_all -->
+                <p class="interact"><a href="/blog/{BLOG_ID}">Show All {BLOG_TOTAL_COMMENTS} Comments</a></p>
+                <!-- END show_all -->
+            </div>
+            <p class="links-house">
+                <!-- BEGIN show_comment -->
+                <a class="show_comments" href="javascript:void();"><span>Show</span><span class="hide-it">Hide</span> {BLOG_COMMENTS} Comments</a> -
+                <!-- END show_comment -->
+                <a class="interact post_comment" href="javascript:void();">Post comment</a>
+            </p>
+            <form class="hide" method="post" action="/blog/comment/new/{BLOG_ID}">
+                <p>
+                    <textarea name="body" style="width: 100%;"></textarea>
+                </p>
+                <p>
+                    <input type="submit" class="submit-btn-plain" name="comment" value="Comment"/>
+                </p>
+            </form>
+            
             <span class="element_footer">Posted by {EMAIL_CONTACT} on {POSTED_DATE} {MOD_BLOG}</span>
         </div>
     </li>
