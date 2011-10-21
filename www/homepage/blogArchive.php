@@ -56,29 +56,29 @@ else {
 }
 
 /* Year and Month List */
-if ( $yearList = $blogHandler->postYears($category['id']) ) {
-	foreach ($yearList as $key => $year) {
+if ( $dateList = $blogHandler->getOccupiedDateList($category['id']) ) {
+	foreach ($dateList as $i => $date) {
 		$this->setVar( array(
-			'YEAR' => $year['year'],
-			'YEAR_ClASS' => $year['year'] == $yearNumber ? 'selected' : ''
+			'YEAR' => $date['year'],
+			'YEAR_ClASS' => $date['year'] == $yearNumber ? 'selected' : ''
 		) );
 
-		$monthList = $blogHandler->postMonths($category['id'], $year['year']);
+		$month = new Alaress_Date_Format($date['created'], 'y-m-d');
 
-		foreach ( $monthList as $month ) {
-			$monthFormat = new Alaress_Date_Format($month['month'], 'y-m-d');
+		$this->setVar( array(
+		   'MONTH' => $month->getUsingFormat('F'),
+		   'MONTH_NUMBER' => $month->getUsingFormat('m'),
+		   'MONTH_ClASS' => $month->getUsingFormat('m') == $monthNumber ? 'selected' : ''
+		) );
 
-			$this->setVar( array(
-			   'MONTH' => $monthFormat->getUsingFormat('F'),
-			   'MONTH_NUMBER' => $monthFormat->getUsingFormat('m'),
-			   'MONTH_ClASS' => $monthFormat->getUsingFormat('m') == $monthNumber ? 'selected' : ''
-			) );
+		$this->parse('month_block', 'month', true);
 
-			$this->parse('month_block', 'month', true);
+		$nextYear = $dateList[$i+1]['year'];
+
+		if ( $date['year'] != $nextYear || empty($nextYear) ) {
+			$this->parse('year_block', 'year', true);
+			$this->setVar('month_block', '');
 		}
-
-		$this->parse('year_block', 'year', true);
-		$this->setVar('month_block', '');
 	}
 }
 

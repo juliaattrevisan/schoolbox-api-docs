@@ -68,31 +68,16 @@ class Blog extends DeprecatedModel {
 	}
 
 	/**
-	 * Gets the years in which blog posts were made.
+	 * Returns a list of years and months which have blog posts
 	 *
-	 * @param <type> $cid
+	 * @param Integer $categoryId
+	 * @return Array|Bool
 	 */
-	function postYears($cid) {
-		$query = "SELECT LEFT(created,4) AS year
-				  FROM blog
-				  WHERE cid = '$cid'
-				  GROUP BY year DESC";
-
-		return $this->db->getAll($query);
-	}
-	
-	/**
-	 * Gets the months in which blog posts were made.
-	 *
-	 * @param Integer $cid
-	 * @param Integer $cid
-	 */
-	function postMonths ($cid, $year) {
-		$query = "SELECT `created` as `month`
+	public function getOccupiedDateList ($categoryId) {
+		$query = "SELECT YEAR(`created`) as 'year', `created`, MONTH(`created`) as 'month'
 				  FROM `blog`
-				  WHERE `cid` = '$cid'
-				  	AND LEFT(`created`, 4) = '$year'
-				  GROUP BY SUBSTRING(`created`, 6, 2) DESC";
+				  WHERE `cid` = '$categoryId'
+				  GROUP BY `year` DESC, `month` DESC";
 
 		return $this->db->getAll($query);
 	}
