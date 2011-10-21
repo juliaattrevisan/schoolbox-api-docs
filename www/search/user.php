@@ -216,7 +216,7 @@ if (is_numeric($this->arg[0])) {
 				'EMERGENCY_ALT_PHONE' =>Scrub::text($synInfo['StudentEmergencyPhoneAlt']),
 				'MEDICAL_NOTE' => Scrub::text($synInfo['StudentMedicalAlert']),
 				'CONTACT_ALERT_MESSAGE' => Scrub::text($synInfo['AlertMessage']),
-				'STUDENT_TYPE' => Scrub::text($synInfo['StudentBoarder']),
+				'STUDENT_TYPE' => Scrub::text($synInfo['StudentBoarder'])=='B'?'Boarder':'Day',
 			);
 
 			$this->setVar($output);

@@ -25,7 +25,7 @@ class Scrub {
 	 * @param  $text
 	 * @return string
 	 */
-	public function text($text) {
+	static public function text($text) {
 		/* This in built function encode html chars
 		 * the ENT_QUOTES converts all talking marks
 		 */
@@ -43,7 +43,7 @@ class Scrub {
 	 * @param  $html
 	 * @return
 	 */
-	public function html($html) {
+	static public function html($html) {
 		require_once dirname(__FILE__) . '/HTMLPurifier/HTMLPurifier.auto.php';
 
 		$config = HTMLPurifier_Config::createDefault();
