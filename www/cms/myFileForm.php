@@ -1,6 +1,8 @@
 <?php
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
+$page = new SitePage();
+
 if (Cfg::get('webdav_enable')) {
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
 	$fileHandler = PortfolioWebDAV::factory();
@@ -9,8 +11,6 @@ else {
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
 	$fileHandler = new MyFile();
 }
-
-$page = new SitePage();
 
 if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
 
