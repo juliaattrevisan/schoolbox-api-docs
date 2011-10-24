@@ -122,6 +122,11 @@ errorCheck;
 echo -e "Backing up Config File...\n";
 cp $schoolbox_dir/www/conf/conf.php /tmp/schoolbox_config.php >> /dev/null;
 errorCheck;
+
+echo -e "Backing up HTACCESS File...\n";
+cp $schoolbox_dir/www/.htaccess /tmp/htaccess.file >> /dev/null;
+errorCheck;
+
 echo -e "Backing up Database...\n";
 mysqldump --user=$sqluser --password=$sqlpass $sqldb >> /tmp/$sqldb.sql
 errorCheck;
@@ -133,6 +138,10 @@ errorCheck;
 echo -e "Restoring Configuration File...\n";
 mv /tmp/schoolbox_config.php $schoolbox_dir/www/conf/conf.php;
 errorCheck;
+echo -e "Restoring HTACCESS File...\n";
+cp /tmp/htaccess.file $schoolbox_dir/www/.htaccess  >> /dev/null;
+errorCheck;
+
 }
 confirmPermissions() {
 echo -e "Ensuring Alaress is the Owner user on the Installation...\n";
@@ -163,6 +172,9 @@ tar --overwrite --overwrite-dir -xvzf $working_dir/release_$new_ver.tgz -C $scho
 errorCheck 1;
 echo -e "Removing Template Config File...\n";
 rm -Rf $schoolbox_dir/www/conf/conf.php;
+errorCheck;
+echo -e "Removing Template HTACCESS File...\n";
+rm -Rf $schoolbox_dir/www/.htacess;
 errorCheck;
 echo -e "Removing Template Data Directory...\n";
 rm -Rf $schoolbox_dir/data;
@@ -231,5 +243,3 @@ confirmPermissions;
 setNewVersion;
 isErrors;
 cleanup;
-
-
