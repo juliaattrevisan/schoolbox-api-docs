@@ -15,7 +15,7 @@ if (!Cfg::get('external_enable'))
 
 $groupHandler = new Group;
 $userHandler = new User;
-$timetableHandler = new ExternalTimetable;
+$timetableHandler = new External_Timetable;
 $categoryHandler = new Category;
 
 $this->setFile(TEMPLATE_content, 'class/timetable.html');

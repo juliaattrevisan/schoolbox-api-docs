@@ -1,7 +1,6 @@
 <?php
 require_once(dirname(__FILE__) . '/../../../include/Config.php');
 require_once(dirname(__FILE__) . '/../../../library/group.php');
-require_once( dirname(__FILE__) . '/../../../library/Synergetic/ExternalUser.php' );
 require_once(dirname(__FILE__) . '/../../include/stdfuncs.php');
 
 $this->setTitle('Parent Contact info');
@@ -30,7 +29,7 @@ if ($groupHandler->isParent() || $groupHandler->isSuperuser() || $groupHandler->
 		'YEAR' => $this->arg[0],
 	));
 
-	$externalUserHandler = new ExternalUser();
+	$externalUserHandler = new External_User();
 	$externalUserHandler->getCurrentSemester();
 
 	$allContacts = $externalUserHandler->getStudentContactListExtended($this->arg[0]);

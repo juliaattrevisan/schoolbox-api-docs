@@ -25,7 +25,7 @@ abstract class Synchronise_Synergetic_Strategy_Abstract implements Synchronise_S
 	public function __construct() {
 		$this->setUserHandler(new User());
 		$this->setGroupHandler(new Group());
-		$this->setExternalUserHandler(new ExternalUser());
+		$this->setExternalUserHandler(new External_User());
 
 		/* Set up ninja variable
 		 */

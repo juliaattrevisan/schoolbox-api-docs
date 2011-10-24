@@ -152,7 +152,7 @@ $categoryCode = $categoryHandler->getCodeForCategory($assess['category_id']);
 if (($categoryCode['codes'] != '') && Cfg::get('external_enable')) {
 	/* If synergy code get synergy students
 	 */
-	$synHandler = new ExternalClass();
+	$synHandler = new External_Class();
 	$allStudents = $synHandler->getStudents($categoryCode['codes']);
 }
 else {

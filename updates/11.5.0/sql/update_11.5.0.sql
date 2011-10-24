@@ -490,3 +490,7 @@ UPDATE `link` SET `modified` = `submitted` WHERE `modified` IS NULL;
 ALTER TABLE `wiki` ADD COLUMN `slug` VARCHAR(255) NULL AFTER `latestRevision`;
 ALTER TABLE `wiki` ADD INDEX `category_slug` (`categoryID`, `slug`);
 ALTER TABLE `wiki` DROP `stub`;
+
+/* Denbigh Integration */
+UPDATE `config` SET `options`='synergetic:tass:denbigh' WHERE `configID`='51';
+ALTER TABLE `luCampus` ADD COLUMN `timetable_period_count` INT NULL  AFTER `name` , ADD COLUMN `timetable_day_count` INT NULL  AFTER `timetable_period_count` ;

@@ -6,12 +6,12 @@
 ************************************************************/
 //ClassList object..displays class list with most recent visit
 
-$groupHandler=new Group;
+$groupHandler = new Group;
 
 if($groupHandler->isStaff()) {
 	$userHandler = new User;
 	$categoryHandler = new Category;
-	$synergeticClass = new ExternalClass;
+	$synergeticClass = new External_Class;
 
 
 	$this->setFile(TEMPLATE_content, 'class/classList.htm');

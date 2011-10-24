@@ -66,10 +66,6 @@ class Autoloader {
         /* Determine path */
         $path = '';
 
-        if ( strstr($pathSegments[0], 'External') ) {
-            array_unshift($pathSegments, ucfirst(Config::get('external_type')));
-        }
-
         while ( array_pop($pathSegments) ) {
             $currentPath = implode('/', $pathSegments);
 
@@ -107,10 +103,6 @@ class Autoloader {
 
         /* Determine path */
         $path = '';
-
-        if ( $pathSegments[0] == 'external') {
-            array_unshift($pathSegments, Config::get('external_type'));
-        }
 
         while ( count($pathSegments) ) {
             $currentPath = implode('/', $pathSegments);

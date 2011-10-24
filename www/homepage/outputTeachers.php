@@ -5,9 +5,8 @@ $this->setVar('staff_teacher_block', '');
 
 if (($code != '') && Cfg::get('external_enable')) {
 	require_once SITE_root.'/library/user.php';
-	require_once(dirname(__FILE__) . '/../../library/Synergetic/ExternalClass.php');
 
-	$externalClassHandler = new ExternalClass();
+	$externalClassHandler = new External_Class();
 	$userHandler = new User();
 
 	$listSyns = $externalClassHandler->getTeacherName($code);

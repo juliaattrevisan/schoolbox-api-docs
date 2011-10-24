@@ -28,7 +28,7 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
     if ($category['code'] && Cfg::get('external_enable')) {
 
         //if synergy code get synergy students
-        $synHandler = new ExternalClass();
+        $synHandler = new External_Class();
         $studentList = $synHandler->getStudents($category['code']);
 
 		for ($x=0; is_array($studentList[$x]);$x++){
@@ -139,7 +139,7 @@ else if(is_numeric($this->arg[0])) {
     if ($category['code'] && Cfg::get('external_enable')) {
 
         //if synergy code get synergy students
-        $synHandler = new ExternalClass();
+        $synHandler = new External_Class();
         $studentList = $synHandler->getStudents($category['code']);
 
 		for ($x=0; is_array($studentList[$x]);$x++){

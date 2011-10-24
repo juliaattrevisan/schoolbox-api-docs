@@ -6,7 +6,7 @@ $this->setBlock("timetable", "timetable_header", "timetable_header_block");
 
 //if user has timetable show it on the homepage
 if($_SESSION['timetable'] && Cfg::get('external_enable') ) {
-	$timetableHandler = new ExternalTimetable;
+	$timetableHandler = new External_Timetable;
 	//get current day and period
 	$daynumber = $timetableHandler->getDayNumber($_SESSION['campus'][0]);
 	$current_period = $timetableHandler->getPeriodNumber($_SESSION['campus'][0]);

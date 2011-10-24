@@ -19,7 +19,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
     private $timetable;
 
-    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage, ExternalTimetable $externalTimetable) {
+    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage, External_Timetable $externalTimetable) {
         parent::__construct($instance, $user, $sitepage);
 
         $this->externalTimetable = $externalTimetable;

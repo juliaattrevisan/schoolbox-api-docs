@@ -543,7 +543,7 @@ class Group extends DeprecatedModel {
                 $userHandler = new User;
                 $user = $userHandler->getByID($userID);
 
-                $externalUser = new ExternalUser;
+                $externalUser = new External_User;
 	            $externalSubjectList = $externalUser->getSubjectList($user['synergy_id'], $user['uid']);
                 foreach ($externalSubjectList as $subject) {
                     //convert code to id and get name

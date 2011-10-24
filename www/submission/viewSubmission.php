@@ -30,7 +30,7 @@ if (is_numeric($this->arg[0])) {
      * If synergy code get synergy students
      */
     if ($subBox['code'] && Cfg::get('external_enable')) {
-        $synHandler = new ExternalClass();
+        $synHandler = new External_Class();
         $studentList = $synHandler->getStudents($subBox['code']);
     }
 	/* Retrieve student list from group membership

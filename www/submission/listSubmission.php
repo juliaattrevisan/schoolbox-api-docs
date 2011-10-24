@@ -2,7 +2,6 @@
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/Assess.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessAttempt.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Synergetic/ExternalClass.php';
 
 $this->setFile(TEMPLATE_content, 'submission/listSubmission.html');
 $this->setTitle('Submissions');
@@ -19,7 +18,7 @@ $attemptHandler = new AssessAttempt();
 $groupHandler = new Group();
 
 if (Cfg::get('external_enable')) {
-	$synHandler = new ExternalClass();
+	$synHandler = new External_Class();
 }
 
 if (is_array($subList)) {

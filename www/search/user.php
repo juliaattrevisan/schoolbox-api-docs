@@ -112,7 +112,7 @@ if (is_numeric($this->arg[0])) {
 	//advanced synergetic information
 	if (Cfg::get('external_enable') && $user['synergy_id']) {
 
-		$synUserHandler = new ExternalUser();
+		$synUserHandler = new External_User();
 
 		if ($groupHandler->isParent($user['uid']) && !$groupHandler->isStudent()) {
 			$parent = $synUserHandler->getParent($user['synergy_id']);
