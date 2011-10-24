@@ -318,7 +318,7 @@ class PortfolioWebDAV {
                        }
 
                     } else if ($groupHandler->isStudent()) {
-                                 $pathList = array( 'https://webdav.bialik.vic.edu.au/H-DRIVE/USERS/STUDENTS/YEAR'.str_pad($_SESSION['year'],2,'0',STR_PAD_LEFT).'/'.$_SESSION['username'].'/',
+                                 $pathList = array( 'https://webdav.bialik.vic.edu.au/H-DRIVE/USERS/STUDENTS/YEAR%20'.str_pad($_SESSION['year'],2,'0',STR_PAD_LEFT).'/'.$_SESSION['username'].'/',
                                                               );
                     }
                     else {
