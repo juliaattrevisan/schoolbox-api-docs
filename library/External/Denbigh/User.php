@@ -36,13 +36,14 @@ class External_Denbigh_User implements External_UserInterface {
 
     public function getParent ($externalUserId) {
 		$statement = $this->getExternalDatabase()->query("
-			SELECT pe.denbighID, pe.surname, pe.given_names, pe.preferred_name, pe.title, pe.gender, pe.dateOfBirth, pa.relationship
+			SELECT pe.denbighID, pe.surname, pe.given_names, pe.preferred_name, pe.title, pe.gender, pe.dateOfBirth,
+				pa.relationship, a.telephoneHome
 			FROM People
 			LEFT JOIN Parents ON Parents.peopleDenbighID = People.denbighID
 			LEFT JOIN Parents pa ON pa.familyDenbighID = Parents.familyDenbighID
 			LEFT JOIN People pe ON pe.denbighID = pa.peopleDenbighID
+			LEFT JOIN Addresses a ON a.familyDenbighID = pa.familyDenbighID
 			WHERE People.denbighID = $externalUserId
-			ORDER BY pe.denbighID = $externalUserId
 		");
 
 		$parentList = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -53,6 +54,8 @@ class External_Denbigh_User implements External_UserInterface {
 			'Surname' => '',
 			'Email' => '',
 			'MobilePhone' => '',
+			'HomePhone' => '',
+			'SilentPhoneFlag' => '',
 			'DirectoryIncludeFlag' => '',
 			'SpouseID' => '',
 			'SpouseTitle' => '',
@@ -67,14 +70,16 @@ class External_Denbigh_User implements External_UserInterface {
 			$adaption['Title'] = $parentList[0]['title'];
 			$adaption['Preferred'] = $parentList[0]['preferred_name'];
 			$adaption['Surname'] = $parentList[0]['surname'];
+			$adaption['HomePhone'] = $parentList[0]['telephoneHome'];
+			$adaption['SilentPhoneFlag'] = false;
 			$adaption['DirectoryIncludeFlag'] = 1;
 		}
 
 		if ( !empty($parentList[1]) ) {
 			$adaption['SpouseID'] = $parentList[1]['denbighID'];
-			$adaption['Title'] = $parentList[1]['title'];
-			$adaption['Preferred'] = $parentList[1]['preferred_name'];
-			$adaption['Surname'] = $parentList[1]['surname'];
+			$adaption['SpouseTitle'] = $parentList[1]['title'];
+			$adaption['SpousePreferred'] = $parentList[1]['preferred_name'];
+			$adaption['SpouseSurname'] = $parentList[1]['surname'];
 			$adaption['SpouseDirectoryIncludeFlag'] = 1;
 		}
 
