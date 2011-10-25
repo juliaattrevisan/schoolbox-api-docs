@@ -222,6 +222,9 @@ errorCheck;
 isErrors() {
 if [ -s /tmp/update_$new_ver.errlog ]; then
 echo -e "There were errors found during the update,\nSee them in /tmp/update_$new_ver.errlog...\n";
+echo -e "Attempting to mail error Log to support@schoolbox.com.au for review...\n";
+mail -s "Schoolbox Update Error Log" support@schoolbox.com.au < /tmp/update_$new_ver.errlog;
+errorCheck;
 else
 echo -e "No errors found...\n";
 fi;
