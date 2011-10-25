@@ -96,22 +96,35 @@ exit;
 fi;
 }
 
+
 compareVersions() {
 cd $working_dir;
 grabIndex;
 getCurrentVersion;
 cur_ver_id=`cat $index|grep $cur_ver|cut -d ":" -f1`
-#echo -e "Your Identifier for this update is: $cur_ver_id\n";
-echo -e "Determining if a new version is available...\n";
+if [[ -z "$cur_ver_id" ]]; then
+echo -e "Your Version is $cur_ver and is not supported by this updater.\nPlease Contact support@schoolbox.com.au for further assistance\n";
+exit;
+else
+echo -e "...$cur_ver is Supported! \nYour Identifier for this update is: $cur_ver_id\n";
+fi;
+echo -e "Determining if a new version is available...\n"
 new_ver_id=`expr $cur_ver_id + 1`;
 new_ver=`cat $index|grep "$new_ver_id:"|cut -d ":" -f2`;
 if [[ ${#new_ver} -gt 3 ]]; then
+if [[ ${#new_ver} -lt 6 ]]; then
 echo -e "... Update to v$new_ver Found! Continuing...\n";
+else
+echo -e "Error with Target Version with id \"$new_ver_id\" - Version name is appearing as follows..\n";
+echo "$new_ver";
+exit;
+fi;
 else
 echo -e "Your Version is current($cur_ver) or you do not have any access to any new updates Exiting!\n";
 exit;
 fi;
 }
+
 backupInstall() {
 echo -e "Moving Data Directory out of Installation Directory...\n";
 mv $schoolbox_dir/data $schoolbox_dir/../data
