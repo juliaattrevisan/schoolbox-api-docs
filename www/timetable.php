@@ -60,8 +60,10 @@ if (is_array($outputList)) {
 
         $timetable = $timetableHandler->getFullTimetable($user['synergy_id'], $user['uid'], $user['campus']);
 
+		$timetableDefinition = $timetableHandler->getTimetableDefinition($user['campus']);
+
         if (is_array($timetable)) {
-            $days = count($timetable[0]['day']);
+            $days = $timetableDefinition['dayCount'];
             //timetable field width
 
             $this->setVar('TIMETABLE_FIELD_WIDTH', round((95 / ($days + 1)), 1));

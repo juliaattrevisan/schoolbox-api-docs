@@ -12,6 +12,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
 
 	private $externalDatabase;
 
+	private $group;
+
 	public function __construct () {
 		/* Set internal database */
 		$this->setInternalDatabase( Database::getInstance() );
@@ -27,6 +29,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
 		$database->connect("mysql:host=$hostName;dbname=$databaseName", $username, $password);
 
 		$this->setExternalDatabase($database);
+
+		$this->setGroup( new Group );
 	}
 
 	public function getTimetableDefinition ($campusId) {
@@ -78,14 +82,28 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
 		}
 
 		/* Fill timetable */
-		$statement = $this->getExternalDatabase()->query("
-			SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
-			FROM Enrolments e
-			RIGHT JOIN Lessons l ON l.classCode = e.classCode
-			RIGHT JOIN Classes cl ON cl.classCode = l.classCode
-			RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-			WHERE e.studentID = $externalUserId
-		");
+		if ( $this->getGroup()->isStaff($userId) ) {
+			$statement = $this->getExternalDatabase()->query("
+				SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
+				FROM People p
+				RIGHT JOIN Staff s ON s.peopleDenbighID = p.denbighID
+				RIGHT JOIN Lessons l ON l.staffCode = s.staffCode
+				RIGHT JOIN Classes cl ON cl.classCode = l.classCode
+				RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
+				WHERE p.denbighID = $externalUserId
+			");
+		}
+		else {
+			$statement = $this->getExternalDatabase()->query("
+				SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
+				FROM People p
+				RIGHT JOIN Enrolments e ON e.studentID = p.denbighID
+				RIGHT JOIN Lessons l ON l.classCode = e.classCode
+				RIGHT JOIN Classes cl ON cl.classCode = l.classCode
+				RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
+				WHERE p.denbighID = $externalUserId
+			");
+		}
 
 		$lessonList = $statement->fetchAll(PDO::FETCH_ASSOC);
 
@@ -127,15 +145,30 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
 		}
 
 		/* Fill timetable */
-		$statement = $this->getExternalDatabase()->query("
-			SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
-			FROM Enrolments e
-			RIGHT JOIN Lessons l ON l.classCode = e.classCode
-			RIGHT JOIN Classes cl ON cl.classCode = l.classCode
-			RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-			WHERE e.studentID = $externalUserId
-				AND l.day = $dayNumber
-		");
+		if ( $this->getGroup()->isStaff($userId) ) {
+			$statement = $this->getExternalDatabase()->query("
+				SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
+				FROM People p
+				RIGHT JOIN Staff s ON s.peopleDenbighID = p.denbighID
+				RIGHT JOIN Lessons l ON l.staffCode = s.staffCode
+				RIGHT JOIN Classes cl ON cl.classCode = l.classCode
+				RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
+				WHERE p.denbighID = $externalUserId
+					AND l.day = $dayNumber
+			");
+		}
+		else {
+			$statement = $this->getExternalDatabase()->query("
+				SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
+				FROM People p
+				RIGHT JOIN Enrolments e ON e.studentID = p.denbighID
+				RIGHT JOIN Lessons l ON l.classCode = e.classCode
+				RIGHT JOIN Classes cl ON cl.classCode = l.classCode
+				RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
+				WHERE p.denbighID = $externalUserId
+					AND l.day = $dayNumber
+			");
+		}
 
 		$lessonList = $statement->fetchAll(PDO::FETCH_ASSOC);
 
@@ -198,6 +231,21 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
 	 */
 	private function getExternalDatabase () {
 		return $this->externalDatabase;
+	}
+
+	/**
+	 * @param Group $group
+	 * @return void
+	 */
+	private function setGroup (Group $group) {
+		$this->group = $group;
+	}
+
+	/**
+	 * @return Group
+	 */
+	private function getGroup () {
+		return $this->group;
 	}
 }
 

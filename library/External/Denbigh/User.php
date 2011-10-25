@@ -13,6 +13,8 @@ class External_Denbigh_User implements External_UserInterface {
 
 	private $externalDatabase;
 
+	private $group;
+
 	public function __construct () {
 		/* Set internal database */
 		$this->setInternalDatabase( Database::getInstance() );
@@ -28,6 +30,8 @@ class External_Denbigh_User implements External_UserInterface {
 		$database->connect("mysql:host=$hostName;dbname=$databaseName", $username, $password);
 
 		$this->setExternalDatabase($database);
+
+		$this->setGroup( new Group );
 	}
 
     public function getParent ($externalUserId) {
@@ -246,15 +250,27 @@ class External_Denbigh_User implements External_UserInterface {
 
 	}
 
-	function getSubjectList ($externalUserId, $userID) {
-		$statement = $this->getExternalDatabase()->query("
-			SELECT cl.classCode as code, co.subjectName as name
-			FROM People p
-			RIGHT JOIN Enrolments e ON e.studentID = p.denbighID
-			RIGHT JOIN Classes cl ON cl.classCode = e.classCode
-			RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-			WHERE p.denbighID = $externalUserId
-		");
+	function getSubjectList ($externalUserId, $userId) {
+		if ( $this->getGroup()->isStaff($userId) ) {
+			$statement = $this->getExternalDatabase()->query("
+				SELECT cl.classCode as code, co.subjectName as name
+				FROM People p
+				RIGHT JOIN Staff s ON s.peopleDenbighID = p.denbighID
+				RIGHT JOIN Classes cl ON cl.staffCode = s.staffCode
+				RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
+				WHERE p.denbighID = $externalUserId
+			");
+		}
+		else {
+			$statement = $this->getExternalDatabase()->query("
+				SELECT cl.classCode as code, co.subjectName as name
+				FROM People p
+				RIGHT JOIN Enrolments e ON e.studentID = p.denbighID
+				RIGHT JOIN Classes cl ON cl.classCode = e.classCode
+				RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
+				WHERE p.denbighID = $externalUserId
+			");
+		}
 
 		$subjectList = $statement->fetchAll(PDO::FETCH_ASSOC);
 
@@ -319,5 +335,20 @@ class External_Denbigh_User implements External_UserInterface {
 	 */
 	private function getExternalDatabase () {
 		return $this->externalDatabase;
+	}
+
+	/**
+	 * @param Group $group
+	 * @return void
+	 */
+	private function setGroup (Group $group) {
+		$this->group = $group;
+	}
+
+	/**
+	 * @return Group
+	 */
+	private function getGroup () {
+		return $this->group;
 	}
 }
