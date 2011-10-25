@@ -63,6 +63,7 @@ if (is_array($outputList)) {
         if (is_array($timetable)) {
             $days = count($timetable[0]['day']);
             //timetable field width
+
             $this->setVar('TIMETABLE_FIELD_WIDTH', round((95 / ($days + 1)), 1));
             $periodCount = 1;
             //for each period
