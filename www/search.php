@@ -428,15 +428,16 @@ if (!empty($result['wiki'])) {
 		$createdTime = new Alaress_Date_Relative($wiki['created']);
 
         $page->setVar(array(
-            'WIKI_ID'         => $wiki['wikiID'],
-            'WIKI_CID'        => $wiki['categoryID'],
-            'WIKI_HEADING'    => Scrub::text($wiki['heading']),
-            'WIKI_BODY'       => TextFormatter::cutSentence(Scrub::text(strip_tags($wiki['body'])), 150),
-            'WIKI_OWNER'      => $wiki['userID'],
-            'WIKI_OWNER_NAME' => $userHandler->formatName($wiki),
-            'WIKI_CREATED'    => $createdTime->getRelativeTime(),
-            'WIKI_BREADCRUMB' => $wiki['breadcrumb'],
-            'WIKI_COUNT'      => $count['wiki'],
+            'WIKI_ID' => $wiki['wikiID'],
+			'WIKI_CID' => $wiki['categoryID'],
+			'WIKI_HEADING' => Scrub::text($wiki['heading']),
+			'WIKI_BODY' => TextFormatter::cutSentence(Scrub::text(strip_tags($wiki['body'])), 150),
+			'WIKI_OWNER' => $wiki['userID'],
+			'WIKI_OWNER_NAME' => $userHandler->formatName($wiki),
+			'WIKI_CREATED' => $createdTime->getRelativeTime(),
+			'WIKI_BREADCRUMB' => $wiki['breadcrumb'],
+			'WIKI_COUNT' => $count['wiki'],
+			'WIKI_SLUG' => $wiki['slug'],
         ));
 
         $page->parse('wiki_block', 'wiki', true);
