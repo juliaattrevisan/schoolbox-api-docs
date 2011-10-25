@@ -112,7 +112,7 @@ echo -e "Determining if a new version is available...\n"
 new_ver_id=`expr $cur_ver_id + 1`;
 new_ver=`cat $index|grep "$new_ver_id:"|cut -d ":" -f2`;
 if [[ ${#new_ver} -gt 3 ]]; then
-if [[ ${#new_ver} -lt 6 ]]; then
+if [[ ${#new_ver} -lt 12 ]]; then
 echo -e "... Update to v$new_ver Found! Continuing...\n";
 else
 echo -e "Error with Target Version with id \"$new_ver_id\" - Version name is appearing as follows..\n";
