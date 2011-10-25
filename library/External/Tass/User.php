@@ -11,7 +11,7 @@ class External_Tass_User implements External_UserInterface {
 
 	private $database;
 
-    function ExternalUser() {
+	function __construct () {
 		$this->setDatabase( new MSSQL() );
 
 		$this->groupHandler = new Group;
