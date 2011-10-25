@@ -68,6 +68,7 @@ if (isset($_POST['date'])) {
 
 	$page->setFile(TEMPLATE_content, 'calendar/modify.html');
 	$page->setTab("calendar");
+    $page->setTitle('Update Calender Event');
 
 	$page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
 	$page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
@@ -91,8 +92,7 @@ if (isset($_POST['date'])) {
 	else
 		$endTime = array('','','','');
 
-	$output = array('TITLE'			=> HEADING." - Update Calender Event",
-					'FUNCTION'		=> 'Update',
+	$output = array('FUNCTION'		=> 'Update',
 					'EVENT_ID'		=> $event['id'],
 					'DATE'			=> date('d/m/Y', strtotime($event['date'])),
 					'HOUR'			=> $startTime[1],
@@ -146,6 +146,7 @@ if (isset($_POST['date'])) {
 	$page->setTab("calendar");
 	$page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
 	$page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
+    $page->setTitle('Add Calendar Event');
 
 	list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $_GET['date']);
 
@@ -153,8 +154,7 @@ if (isset($_POST['date'])) {
 	if ($selectedDate <= 0)
 		$selectedDate = time();
 
-	$output = array('TITLE'			=> HEADING." - Add Single Event",
-					'FUNCTION'		=> 'Add',
+	$output = array('FUNCTION'		=> 'Add',
 					'EVENT_ID'		=> '',
 					'DATE'			=> date("d/m/Y", $selectedDate),
 					'HOUR'			=> '',
