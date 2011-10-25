@@ -85,7 +85,7 @@ class External_User {
 	}
 
 	/**
-	 * Used in search
+	 * Compiles a list of contacts relevant to a student
 	 *
 	 * @param Integer $externalUserId
 	 * @return Array
@@ -95,7 +95,7 @@ class External_User {
 	}
 
 	/**
-	 * Used in report module
+	 * Used in report module, determines the current semester
 	 *
 	 * @return Integer
 	 */
@@ -104,7 +104,7 @@ class External_User {
 	}
 
 	/**
-	 * Used in login
+	 * Retrieves a teacher or student's subject list
 	 *
 	 * @param Integer $externalUserId
 	 * @param Integer $userID
@@ -115,7 +115,7 @@ class External_User {
 	}
 
 	/**
-	 * Used in login
+	 * Retrieves a parent's enrolled students
 	 *
 	 * @param Integer $externalUserId
 	 * @return Array
@@ -125,7 +125,7 @@ class External_User {
 	}
 
 	/**
-	 * Used in login
+	 * Return a user's email
 	 *
 	 * @param Integer $externalUserId
 	 * @return String
@@ -136,7 +136,8 @@ class External_User {
 
 	/**
 	 * No usages found
-	 *
+	 * 
+	 * @todo Review usage of method
 	 * @return Array
 	 */
 	public function getStudentUserAccountInfo () {
@@ -146,6 +147,7 @@ class External_User {
 	/**
 	 * No usages found
 	 *
+	 * @todo Review usage of method
 	 * @return Array
 	 */
 	public function getParentUserAccountInfo () {
@@ -155,6 +157,7 @@ class External_User {
 	/**
 	 * No usages found
 	 *
+	 * @todo Review usage of method
 	 * @return Array
 	 */
 	public function getStaffUserAccountInfo () {
