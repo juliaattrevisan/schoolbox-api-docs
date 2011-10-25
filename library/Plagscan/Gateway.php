@@ -55,26 +55,18 @@ class Plagscan_Gateway {
         $documentData = file_get_contents($documentFile);
         $documentType = $fileInfo->buffer($documentData);
 
-        /* Workaround for DOCX mime coming up as a ZIP mime */
         $documentExtension = strtolower( trim( array_pop( explode('.', $documentName) ) ) );
 
-        if ( $documentExtension == 'docx' ) {
-            $documentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-        }
-
-        $validDocumentTypeList = array(
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'application/msword',
-            'application/pdf',
-            'text/plain',
-            'text/richtext',
-            'text/rtf',
-            'text/html',
-            'text/enriched',
-            'text/plain',
+        $validDocumentExtensionList = array(
+            'docx',
+            'doc',
+            'pdf',
+            'txt',
+            'rtf',
+            'html',
         );
 
-        if ( !in_array($documentType, $validDocumentTypeList) ) {
+        if ( !in_array($documentExtension, $validDocumentExtensionList) ) {
             return false;
         }
 

@@ -22,7 +22,8 @@ if ( isset( $_FILES['file']['name'] ) && $_FILES['file']['name'] && is_numeric($
             $document->fileId = $submissionId;
 
             $document->file = array(
-                'id' => $submissionId, 'name' => $_FILES['file']['name'],
+                'id' => $submissionId,
+				'name' => $_FILES['file']['name'],
                 'file' => Cfg::get('submission_dir') . "/$submissionId.dat"
             );
 

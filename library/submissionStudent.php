@@ -126,14 +126,13 @@ class SubmissionStudent extends DeprecatedModel {
 		
         $this->db->insert($this->_table, $studentSub);
 		$fileId = $this->db->insertID();
-		
+
         //save file using file ID as name
         $newFileName = $fileId . ".dat";
 		
         move_uploaded_file($file['tmp_name'], Cfg::get('submission_dir') . "/" . $newFileName);
 
         return $fileId;
-
     }
 
     function delete($id, $clean = true) {
