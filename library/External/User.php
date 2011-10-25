@@ -10,6 +10,12 @@
 class External_User {
 	private $database;
 
+	/**
+	 * Constructor
+	 *
+	 * @throws Exception
+	 * @param String $databaseName
+	 */
 	public function __construct ($databaseName = '') {
 		if ( empty($databaseName) ) {
 			$databaseName = Config::get('external_type');
@@ -23,9 +29,10 @@ class External_User {
 			$this->setDatabase( $database );
 		}
 		else {
-			throw Exception;
+			error(22);
 		}
 	}
+
 
 	/**
 	 * Used in search

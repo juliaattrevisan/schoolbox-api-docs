@@ -29,7 +29,7 @@ class External_Timetable {
 			$this->setDatabase( $database );
 		}
 		else {
-			throw Exception("External database class '$databaseClass' not found.");
+			error(22);
 		}
 	}
 

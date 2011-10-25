@@ -10,6 +10,12 @@
 class External_Class {
 	private $database;
 
+	/**
+	 * Constructor
+	 *
+	 * @throws Exception
+	 * @param String $databaseName
+	 */
 	public function __construct ($databaseName = '') {
 		if ( empty($databaseName) ) {
 			$databaseName = Config::get('external_type');
@@ -23,7 +29,7 @@ class External_Class {
 			$this->setDatabase( $database );
 		}
 		else {
-			throw Exception;
+			error(22);
 		}
 	}
 

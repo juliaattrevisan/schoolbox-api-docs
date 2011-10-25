@@ -44,6 +44,7 @@ class External_Denbigh_User implements External_UserInterface {
 			LEFT JOIN People pe ON pe.denbighID = pa.peopleDenbighID
 			LEFT JOIN Addresses a ON a.familyDenbighID = pa.familyDenbighID
 			WHERE People.denbighID = $externalUserId
+			ORDER BY pe.denbighID = $externalUserId DESC
 		");
 
 		$parentList = $statement->fetchAll(PDO::FETCH_ASSOC);
