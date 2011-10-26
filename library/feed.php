@@ -213,7 +213,7 @@ class Feed {
 	}
 
 	function getWiki($cid, $limit) {
-		$query = "SELECT w.wikiID, heading, UNIX_TIMESTAMP(r.created) submitted, u.firstname, u.lastname, u.title, u.id as uid
+		$query = "SELECT w.wikiID, heading, w.categoryID, w.slug, UNIX_TIMESTAMP(r.created) submitted, u.firstname, u.lastname, u.title, u.id as uid
 					FROM wikiRevision r
 						JOIN wiki w ON w.wikiID = r.wikiID
 						JOIN user u ON u.id = r.userID
@@ -229,7 +229,7 @@ class Feed {
 				'date' => $row['submitted'],
 				'type' => 'wiki',
 				'message' => $userHandler->formatName($row) . ' updated the wiki '.Scrub::text($row['heading']),
-				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> updated the wiki <a href="/wiki/'.$row['wikiID'].'">' . Scrub::text($row['heading']) . '</a>',
+				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> updated the wiki <a href="/wiki/'.$row['categoryID'].'/'.$row['slug'] .'">' . Scrub::text($row['heading']) . '</a>',
 			);
 		}
 

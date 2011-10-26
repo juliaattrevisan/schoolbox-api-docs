@@ -98,7 +98,7 @@ else {
 
 		$wikiHandler->revert($wiki['wikiID'], $_GET['revert']);
 
-		SitePage::localRedir('/wiki/' . $wiki['wikiID']);
+		SitePage::localRedir('/wiki/' . $wiki['categoryID'] . '/' . $wiki['slug']);
 	}
 	else {
 		if (is_numeric($_GET['delete'])) {
