@@ -44,7 +44,13 @@ else {
 
 /* External system checks */
 if(Cfg::get('external_enable')) {
-    $dbf = @mssql_connect(Cfg::get('external_db_host'), Cfg::get('external_db_user'),  Cfg::get('external_db_passwd'));
+	if ( Cfg::get('external_type') == 'denbigh') {
+		$dbf = @mysql_connect(Cfg::get('external_db_host'), Cfg::get('external_db_user'),  Cfg::get('external_db_passwd'));
+	}
+	else {
+    	$dbf = @mssql_connect(Cfg::get('external_db_host'), Cfg::get('external_db_user'),  Cfg::get('external_db_passwd'));
+	}
+	
     if($dbf) {
         $db = array('EXTERNAL_DB'   => ucfirst(Cfg::get('external_type')),
                     'EXTERNAL_DB_LIGHT' => 'on',
