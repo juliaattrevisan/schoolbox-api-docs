@@ -111,6 +111,9 @@ class Url {
 		return '/redir.php?url=' . base64_encode($this->getUrl());
 	}
 
+	/* Getters/Setters
+	 */
+
 	/**
 	 * Set useCfg. This determines whether to use the Cfg object, or
 	 * alternatively whatever input params you want

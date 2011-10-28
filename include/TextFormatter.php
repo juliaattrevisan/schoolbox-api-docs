@@ -25,8 +25,6 @@ class TextFormatter {
 		return 'Good Evening';
 	}
 
-
-
 	/**
 	 * Cut a string to the character limit and append ellipsis (...)
 	 *
