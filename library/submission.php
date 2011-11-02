@@ -382,7 +382,16 @@ class Submission extends DeprecatedModel {
             return $this->db->getAll($query);
     }
 
-    function getAllForUser($userID) {
+	/**
+	 * Note the empty string for Availability for the first half of the Union
+	 * This is to keep the column count matching for the second half of the
+	 * Union (this is the only way to determine whether an Evaluation record is
+	 * an Assess or a Survey)
+	 *
+	 * @param  $userID
+	 * @return array|bool
+	 */
+    public function getAllForUser($userID) {
         $query = "(SELECT
                         submission_box.id,
                         submission_box.name,
@@ -394,7 +403,8 @@ class Submission extends DeprecatedModel {
                         DATE_FORMAT(submission_box.date, '%a, %D %b %l:%i%p') AS date,
                         DATE_FORMAT(submission_box.open_date, '%a, %D %b %l:%i%p') AS open_date,
                         submission_box.type AS type_id,
-                        file_type.name AS type
+                        file_type.name AS type,
+                        '' as availability
                     FROM (category, submission_box )
                     LEFT JOIN file_type ON submission_box.type = file_type.id
                     LEFT JOIN categoryCode co ON co.categoryID = category.id
@@ -414,12 +424,14 @@ class Submission extends DeprecatedModel {
                         DATE_FORMAT(assess.finish, '%a, %D %b %l:%i%p') AS date,
                         DATE_FORMAT(assess.start, '%a, %D %b %l:%i%p') AS open_date,
                         file_type.id AS type_id,
-                        file_type.name AS type
+                        file_type.name AS type,
+                        assess.availability
                     FROM assess
                     LEFT JOIN file_type ON file_type.id = assess.type
                     LEFT JOIN category ON assess.category_id = category.id
                     WHERE category.id = assess.category_id
 					AND assess.deleted_at IS NULL
+					AND assess.availability = 'assess'
                     AND assess.user_id = '$userID')
                     ORDER BY catid, date";
 

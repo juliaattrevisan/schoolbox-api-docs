@@ -56,7 +56,7 @@ if (is_array($subList)) {
 
 		$totals = $submissionHandler->getBoxCount($sub['id']);
 
-		if ($sub['type_id'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) {
+		if (($sub['type_id'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) && ($sub['availability'] == 'assess')) {
 			$this->setVar(array(
 				'ASSESS_ASSESS_ID' => $sub['id'],
 				'ASSESS_TITLE' => Scrub::text($sub['name']),
@@ -72,7 +72,7 @@ if (is_array($subList)) {
 			$this->setVar('normalSubmission_block', '');
 			$this->parse('onlineAssessment_block', 'onlineAssessment');
 		}
-		else {
+		else if ($sub['availability'] == '') {
 			$this->setVar(array(
 				'ID' => $sub['id'],
 				'ASSDESC' => Scrub::text($sub['name']),
@@ -88,7 +88,6 @@ if (is_array($subList)) {
 			$this->setVar('onlineAssessment_block', '');
 			$this->parse('normalSubmission_block', 'normalSubmission');
 		}
-
 		$this->parse('submission_block', 'submission_listing', true);
 
 		$prevCat = $sub;
