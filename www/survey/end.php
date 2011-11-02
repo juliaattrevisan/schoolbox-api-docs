@@ -61,6 +61,7 @@ if ($attempt['finish'] == '0000-00-00 00:00:00') {
 
     $this->setVar(array(
         'ASSESS_TITLE' => $assess['title'],
+		'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'ATTEMPT_END' => $attemptEndDate->getShort()
     ));
 
@@ -72,6 +73,7 @@ else {
 
     $this->setVar(array(
         'ASSESS_TITLE' => $assess['title'],
+		'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'ATTEMPT_END' => $attemptEndDate->getShort()
     ));
 
