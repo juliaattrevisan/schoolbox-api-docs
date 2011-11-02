@@ -15,42 +15,42 @@ $this->setBlock('category_selected', 'no_questions', 'no_questions_block');
 $this->setBlock('category_selected', 'question', 'question_block');
 $this->setBlock('question', 'answers', 'answers_block');
 
-
 $this->setVar(array(
     'ASSESS_ID' => $this->arg[1],
 	'SECTION_ID' => $this->arg[2],
-
 ));
 
 $questionBankHandler = new AssessQuestionBank();
 
-/* output question bank categories */
+/* Output question bank categories
+ */
 $questionBankCategoryHandler = new AssessQuestionCategory();
 
 $categoryList = $questionBankCategoryHandler->getList();
 
-if(is_array($categoryList) ) {
+if (is_array($categoryList) ) {
     foreach($categoryList as $category) {
-
         $this->setVar(array(
             'CATEGORY_NAME' => $category['name'],
             'CATEGORY_ID'   => $category['question_category_id'],
-            'CATEGORY_SELECTED' => $category['question_category_id']==$this->arg[0]?'selected':''));
+            'CATEGORY_SELECTED' => $category['question_category_id'] == $this->arg[0] ? 'selected' : ''
+		));
 
-        if($category['question_category_id']==$this->arg[0])
+        if ($category['question_category_id'] == $this->arg[0]) {
             $categoryName = $category['name'];
+		}
 
         $this->parse('question_category_block', 'question_category', true);
     }
 }
-else
+else {
     $this->setVar('question_category_block','');
+}
 
-
-if($this->arg[0] > 0) {
+if ($this->arg[0] > 0) {
+    $this->setVar('QUESTION_CATEGORY', $categoryName);
 
     $allQuestions = $questionBankHandler->getContents($this->arg[0]);
-    $this->setVar('QUESTION_CATEGORY', $categoryName);
 
     /* Iterate and show
      */
@@ -58,23 +58,29 @@ if($this->arg[0] > 0) {
         $previousCategory = false;
 
         foreach($allQuestions as $currentQuestion) {
-
             $this->setVar(array(
-                'QUESTION_BANK_ID' => $currentQuestion['question_bank_id'],
-                'QUESTION_TYPE' => $currentQuestion['description'],
-                'QUESTION' => $currentQuestion['question'],
-                'MARKS' => $currentQuestion['marks'],
-                'answers_block'  => '',
+				'QUESTION_BANK_ID' => $currentQuestion['question_bank_id'],
+				'QUESTION_TYPE' => $currentQuestion['description'],
+				'QUESTION' => $currentQuestion['question'],
+				'MARKS' => $currentQuestion['marks'],
+				'answers_block'  => '',
             ));
 
-            if($currentQuestion['answer']) {
+            if ($currentQuestion['answer']) {
                 $answerList = unserialize($currentQuestion['answer']);
-                 foreach($answerList as $answer) {
-                    $this->setVar('ANSWER_DESCRIPTION', $answer->description);
-                    $this->parse('answers_block','answers',true);
-                 }
+
+				if (is_array($answerList)) {
+					foreach($answerList as $answer) {
+						$this->setVar('ANSWER_DESCRIPTION', $answer->description);
+						$this->parse('answers_block', 'answers', true);
+					}
+				}
+				else {
+					$this->setVar('ANSWER_DESCRIPTION', $currentQuestion['answer']);
+					$this->parse('answers_block', 'answers', true);
+				}
             }
-            
+
             $this->parse('question_block', 'question', true);
 
             $previous = $currentQuestion['question_category_id'];
