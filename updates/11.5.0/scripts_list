@@ -19,3 +19,4 @@ php/add_web_root.php
 php/updateColours.php
 php/welcomePageUpdate.php
 php/update-wiki.php
+php/update-news.php
