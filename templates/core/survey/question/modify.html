@@ -58,15 +58,13 @@
 
 		<p class="clearfix">
 			<input type="submit" name="create" id="create" value="Modify" class="submit-btn-plain"/>
-		</label>	
-	</p>
-	
-	
+		</p>
+	</form>
+
 	<h2>Import into Question Bank</h2>
 
-	
 	<form action='/survey/questionbank/create' class='' method='post'>
-	
+
 	<p>
 		Puts this question into the Question Bank so you can import
 		them into other surveys.
@@ -75,7 +73,7 @@
 			<input name='type_id' type='hidden' value='{QUESTIONTYPE_TYPE_ID}' />
 			<input name='question_id' type='hidden' value='{QUESTION_ID}' />
 			<input name='answer_id' type='hidden' value='{ANSWER_ID}' />
-			<input name='marks' type='hidden' value='{MARKS}' /> 
+			<input name='marks' type='hidden' value='{MARKS}' />
 		</label>
 		<label>Question Category
 			<select name='question_category'>
