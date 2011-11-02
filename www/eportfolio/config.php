@@ -16,13 +16,13 @@ if (is_numeric($this->arg[0])) {
 	if($_SESSION['id'] != $uid) {
 		error(19);
     }
-	
+
 	$eportfolioHandler = new ePortfolio($uid);
-	
+
 	$this->setFile(TEMPLATE_content, 'eportfolio/customise.html');
 	$this->setTitle('ePortfolio Customisation');
 	$this->setTab('resources');
-	
+
 	/* Template control
      */
 	$template = $eportfolioHandler->getTemplate();
@@ -37,12 +37,12 @@ if (is_numeric($this->arg[0])) {
         'UID'		=> $uid,
         'TEMPLATE'	=> $template,
     ));
-	
+
 	/* Components
      */
 	$this->setBlock(TEMPLATE_content, 'componentRow', 'componentRowBlock');
 	$this->setBlock('componentRow', 'componentCol', 'componentColBlock');
-	
+
 	$listComp = $eportfolioHandler->getComponentList();
 
 	foreach($listComp as $key => $component){
@@ -56,7 +56,7 @@ if (is_numeric($this->arg[0])) {
 		else {
 			$this->setVar('componentChecked', '');
         }
-		
+
 		$this->parse('componentColBlock', 'componentCol', true);
 
         if ((++$key % 3) == 0 or $component == end($listComp)) {
@@ -64,7 +64,7 @@ if (is_numeric($this->arg[0])) {
 			$this->setVar('componentColBlock','');
 		}
 	}
-	
+
 	$this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 
 	/* Colors
@@ -74,7 +74,7 @@ if (is_numeric($this->arg[0])) {
 	$this->setVar('COLOUR_ARRAY', 'pickers');
 	$this->setVar($listColor);
 	$this->parse('colour_list_block', 'colour_list', true);
-	
+
 	/* Defaults
      */
 	$defaultColour = unserialize(HOMEPAGE_colors);
