@@ -81,6 +81,7 @@ if (is_array($sectionValues) && count($sectionValues)) {
 
 $this->setVar(array(
 	'SURVEY_NAME' => $assess['title'],
+    'SURVEY_ID'   => $assess['assess_id'],
 	'QUESTION_QUESTION' => $questionList
 ));
 
