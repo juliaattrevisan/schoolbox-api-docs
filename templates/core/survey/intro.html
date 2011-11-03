@@ -1,41 +1,52 @@
-		<h2>{ASSESS_TITLE}</h2>
-	<div class="pad-it">
-				<p><strong>Introduction</strong><br />
-					{ASSESS_DESCRIPTION}
-				</p>
-				<p><strong>Created by</strong><br />
-					{ASSESS_AUTHOR}
-				</p>
-				<p>
-					<strong>Time allowed: </strong><br />
-					{ASSESS_DURATION}
-				</p>
-				<p>
-					<strong>Open Date: </strong><br />
-					{ASSESS_START}
-				</p>
-				<p>
-					<strong>Close Date: </strong><br />
-					{ASSESS_FINISH}
-				</p>
+<h2>{ASSESS_TITLE}</h2>
+<div class="pad-it">
+	<p><strong>Introduction</strong><br/>
+		{ASSESS_DESCRIPTION}
+	</p>
 
-				<ul><li><strong>Sections:</strong></li>
-					<!-- BEGIN section -->
-					<li>Section {SECTION_SEQUENCE}: {SECTION_TITLE} ({SECTION_NUMQUESTIONS} questions)</li>
-					<!-- END section -->
-				</ul>
+	<p><strong>Created by</strong><br/>
+		{ASSESS_AUTHOR}
+	</p>
 
-            <!-- BEGIN startTest -->
-			<div class="float-left" style="margin:20px 0 0 0; width:127px;">
-				<a href="/survey/attempt/{ASSESS_ASSESS_ID}/{FIRST_SECTION}" class="btn go-to float-left"><span></span>Begin Survey</a>
-			</div>
-            <!-- END startTest -->
+	<p>
+		<strong>Time allowed: </strong><br/>
+		{ASSESS_DURATION}
+	</p>
 
-            <!-- BEGIN error -->
-            <div style="margin-top:20px;">
-                <p>
-                    {ERROR_STRING}
-                </p>
-            </div>
-            <!-- END error -->
-		</div>
+	<p>
+		<strong>Open Date: </strong><br/>
+		{ASSESS_START}
+	</p>
+
+	<p>
+		<strong>Close Date: </strong><br/>
+		{ASSESS_FINISH}
+	</p>
+
+	<ul>
+		<li><strong>Sections:</strong></li>
+		<!-- BEGIN section -->
+		<li>Section {SECTION_SEQUENCE}: {SECTION_TITLE} ({SECTION_NUMQUESTIONS}
+			questions)
+		</li>
+		<!-- END section -->
+	</ul>
+	<br>
+
+	<p class="clearfix">
+		<a href="/survey/attempt/{ASSESS_ASSESS_ID}/{FIRST_SECTION}"
+		   class="btn go-to float-left"><span></span >Begin Survey</a>
+	</p>
+
+	<!-- BEGIN startTest -->
+
+	<!-- END startTest -->
+
+	<!-- BEGIN error -->
+	<div style="margin-top:20px;">
+		<p>
+			{ERROR_STRING}
+		</p>
+	</div>
+	<!-- END error -->
+</div>
