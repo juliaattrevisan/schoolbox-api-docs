@@ -3,18 +3,18 @@
 class CategoryNews extends DeprecatedModel {
 
 	function CategoryNews () {
-	
+
 		$this->_table = "subject_news";
 		$this->_index = "id";
-		
+
 		parent::DeprecatedModel();
 	}
 
 	function getAllForCategory($categoryID, $config = false, $archive = false) {
-		$query = "SELECT n.id, heading, UNIX_TIMESTAMP(datetime_posted) posted, 
+		$query = "SELECT n.id, heading, UNIX_TIMESTAMP(datetime_posted) posted,
 					UNIX_TIMESTAMP(datetime_expires) expires, body, deleted, code, owner, u.firstname, u.lastname, u.title, u.id as uid
 				  FROM ".$this->_table." n
-				  LEFT JOIN user u ON u.id = n.owner 
+				  LEFT JOIN user u ON u.id = n.owner
 				  WHERE code = '$categoryID'  AND deleted = 0 ";
 		if ($archive)
 			$query .= " AND (datetime_published < NOW() OR owner = {$_SESSION['id']}) AND datetime_expires < NOW()";
@@ -22,22 +22,22 @@ class CategoryNews extends DeprecatedModel {
 			$query .= " AND (datetime_published < NOW() OR owner = {$_SESSION['id']}) AND datetime_expires > NOW()";
 
 		$query .= "ORDER BY datetime_posted DESC";
-		
-		if($config['size'] > 0) 
-			$query .= " LIMIT 0, " . $config['size']; 
-	
+
+		if($config['size'] > 0)
+			$query .= " LIMIT 0, " . $config['size'];
+
 		return $this->db->getAll($query);
 	}
-	
+
 	function homepageClean($cid) {
 		$this->db->delete('subject_news', 'code', $cid);
 	}
-	
+
 	function create($news) {
 		$news['datetime_posted'] = 'NOW()';
 		parent::create($news);
 	}
-	
+
 	function delete($id) {
 		$this->update(array('id'=>$id,'deleted'=>1));
 	}
@@ -74,6 +74,7 @@ class CategoryNews extends DeprecatedModel {
                             AND `userAccess`.uid = {$_SESSION['id']}
                         WHERE (`perms`.cid OR `userAccess`.sid)
                             AND MATCH(`heading`,`body`) AGAINST ('$keyword')
+                            AND (`subject_news`.datetime_published < NOW() OR `subject_news`.owner = {$_SESSION['id']})
                             AND `deleted` = FALSE
         ";
 
