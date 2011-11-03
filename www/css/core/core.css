@@ -94,6 +94,16 @@ img {
 	border: 0;
 }
 
+sub, sup {
+	font-size: 75%;
+	line-height: 0;
+	position: relative;
+}
+
+sup { top: -0.5em; }
+
+sub { bottom: -0.25em; }
+
 /*--------------------------------------------------------------
 CSS commands
 --------------------------------------------------------------*/
@@ -4347,7 +4357,7 @@ COLOUR ADJUSTMENT BOX
 	padding: 16px 0 0 0;
 }
 
-.leftColumn {
+.topColumn {
 	margin-left: 16px;
 }
 

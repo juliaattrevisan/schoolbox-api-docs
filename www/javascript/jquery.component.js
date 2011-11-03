@@ -308,8 +308,12 @@ setupCustomise = {
 					var str = $j(this).attr('id');
 					var newstr = str.replace(/^.*left_(.*).*$/m, '$1');
 
+					console.log(newstr);
+
 					rightBox = $j('#' + 'right_'+newstr);
-					rightBox.css('backgroundColor', $j(this).css('backgroundColor'));
+					rightBox.css({
+						'background-color' : $j(this).css('backgroundColor')
+					});
 					rightBox.next().val($j(this).next().val());
 				});
 
