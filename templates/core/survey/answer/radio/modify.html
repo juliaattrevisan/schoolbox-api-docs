@@ -4,8 +4,6 @@ $j(document).ready(function() {
 
 	//add in one clone to start with
 	$j('.answerCorrect').attr('checked', false);
-	var thing = $j('.hidden-clone li:first-child').clone();
-	$j('ul#answerCollection').append(thing);
 	refreshList();
 
 	var validator = $j("#createQuestionForm").submit(function() {

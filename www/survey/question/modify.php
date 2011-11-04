@@ -51,9 +51,9 @@ if (!empty($_POST)) {
     $questionHandler->update($_POST);
     $answerHandler->update($_POST);
 
-    /* Find the assess summary page
+    /* Create new question
      */
-    SitePage::localRedir('/survey/summary/' . $section['assess_id']);
+    SitePage::localRedir('/survey/question/create/' . $section['section_id']);
 }
 else {
     if (!is_numeric($this->arg[0])) {
