@@ -116,9 +116,16 @@ class EvaluationExporter {
 				$answerRecord = $answerHandler->getForQuestion($allQuestions[$i]['question_id']);
 				$allAnswers = unserialize($answerRecord['answer']);
 
-				foreach($allAnswers as $currentAnswer) {
-					$this->sectionValues[$sectionIndex]['questions'][$i]['summary'][$currentAnswer->value]['values'] = 0;
-					$this->sectionValues[$sectionIndex]['questions'][$i]['summary'][$currentAnswer->value]['text'] = $currentAnswer->description;
+				/* If this was a multi-choice or radio variant, answers
+				 * are stored in a serialized array format
+				 *
+				 * Short answers are not serialized
+				 */
+				if (is_array($allAnswers) && count($allAnswers)) {
+					foreach($allAnswers as $currentAnswer) {
+						$this->sectionValues[$sectionIndex]['questions'][$i]['summary'][$currentAnswer->value]['values'] = 0;
+						$this->sectionValues[$sectionIndex]['questions'][$i]['summary'][$currentAnswer->value]['text'] = $currentAnswer->description;
+					}
 				}
 			}
 		}
