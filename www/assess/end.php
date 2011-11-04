@@ -109,4 +109,22 @@ if ($allAttempts) {
 
 $responseHandler->updatedAutomatedMarks($markedResponseIDs);
 
+/* Show mark for the attempt you just did
+ */
+$marks = $attemptHandler->getMarksForAttempt($_SESSION['attempt_id']);
+$total = $attemptHandler->getTotalMarks($this->arg[0], $_SESSION['attempt_id']);
+$percentage = 100*number_format($marks/$total, 2);
+$numMarkedQuestions = count($allResponses);
+$numUnmarkedQuestions = $responseHandler->numNotAutomarked($_SESSION['attempt_id']);
+$numQuestions = $numMarkedQuestions + $numUnmarkedQuestions;
+$valueUnmarkedQuestions = $responseHandler->valueNotAutomarked($_SESSION['attempt_id']);
 
+$this->setVar(array(
+	'ATTEMPT_MARKS' => $marks,
+	'ATTEMPT_PERCENTAGE' => $percentage,
+	'ATTEMPT_TOTAL' => $total,
+	'ATTEMPT_NUM_MARKED_QUESTIONS' => $numMarkedQuestions,
+	'ATTEMPT_NUM_UNMARKED_QUESTIONS' => $numUnmarkedQuestions,
+	'ATTEMPT_NUM_QUESTIONS' => $numQuestions,
+	'ATTEMPT_VALUE_UNMARKED_QUESTIONS' => $valueUnmarkedQuestions,
+));

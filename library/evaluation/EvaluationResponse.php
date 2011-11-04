@@ -170,6 +170,30 @@ abstract class EvaluationResponse extends DeprecatedModel {
         return $this->db->getOne($query);
     }
 
+    /**
+     * The total number of marks that were not automarked AND not reviewed.
+     *
+	 * @param  $attempt_id
+	 * @return
+     */
+    public function valueNotAutomarked($attempt_id) {
+		$query = "SELECT SUM(assess_question.marks)
+				  FROM assess_question
+				  LEFT JOIN {$this->_table} ON assess_question.question_id = {$this->_table}.question_id
+				  LEFT JOIN assess_attempt ON assess_attempt.attempt_id = {$this->_table}.attempt_id
+				  WHERE {$this->_table}.attempt_id = '$attempt_id'
+                  AND assess_attempt.reviewed_at IS NULL
+                  AND automarked_already = 'false'";
+
+		$value = $this->db->getOne($query);
+
+		if ($value) {
+			return $value;
+		}
+
+		return 0;
+    }
+
 	/**
 	 * Mark as deleted all the responses for an attempt.
 	 *
