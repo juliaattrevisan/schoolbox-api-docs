@@ -39,81 +39,80 @@ if (is_array($allSurveys)) {
             'ON_OFF' => $i%2 ? 'dark' : '',
         ));
 
+		/* Check if you have completed an assessment already
+		 *
+		 * Set up Attempt vars
+		 */
+		$attempt = $attemptHandler->getLatestForUser($currentSurvey['assess_id'], $_SESSION['id']);
+		$attemptStartTime = strtotime($attempt['start']);
+		$attemptTimeRemaining = $attemptStartTime + $currentSurvey['duration'] - time();
+		$attemptEndTime = $attemptStartTime + $currentSurvey['duration'];
 
-			/* Check if you have completed an assessment already
-			 *
-			 * Set up Attempt vars
-			 */
-			$attempt = $attemptHandler->getLatestForUser($currentSurvey['assess_id'], $_SESSION['id']);
-			$attemptStartTime = strtotime($attempt['start']);
-			$attemptTimeRemaining = $attemptStartTime + $currentSurvey['duration'] - time();
-			$attemptEndTime = $attemptStartTime + $currentSurvey['duration'];
+		/* Tests can be undertaken if:
+		 *
+		 * 1. The assessment allows resit and the assessment hasn't expired
+		 * 2. The assessment is one-time-only, and you haven't completed an attempt, and have time to do it, and have not yet attempted
+		 * 3. The current time has passed the test's starting time
+		 * 4. You aren't the owner of the test
+		 */
+		if(is_array($attempt)) {
+			// If the last assess is not completed provide resume link
+			if ($attempt['finish'] == '0000-00-00 00:00:00' && ($attemptTimeRemaining < 0 || $currentSurvey['duration'] == Assess::UNLIMITED_DURATION)) {
+				$firstSection = $sectionHandler->getFirst($currentSurvey['assess_id']);
 
-			/* Tests can be undertaken if:
-			 *
-			 * 1. The assessment allows resit and the assessment hasn't expired
-			 * 2. The assessment is one-time-only, and you haven't completed an attempt, and have time to do it, and have not yet attempted
-			 * 3. The current time has passed the test's starting time
-			 * 4. You aren't the owner of the test
-			 */
-            if(is_array($attempt)) {
-                // If the last assess is not completed provide resume link
-                if ($attempt['finish'] == '0000-00-00 00:00:00' && ($attemptTimeRemaining < 0 || $currentSurvey['duration'] == Assess::UNLIMITED_DURATION)) {
-                    $firstSection = $sectionHandler->getFirst($currentSurvey['assess_id']);
+				$this->setVar(array(
+					'SURVEY_ASSESS_ID' => $currentSurvey['assess_id'],
+					'SURVEY_SECTION_ID' => $firstSection['section_id'],
+					'SURVEY_FINISH_DATE'  => 'In progress'
+				));
 
-                    $this->setVar(array(
-                        'SURVEY_ASSESS_ID' => $currentSurvey['assess_id'],
-                        'SURVEY_SECTION_ID' => $firstSection['section_id'],
-                        'SURVEY_FINISH_DATE'     => 'In progress'
-                    ));
+				$this->parse('resumeLink_block', 'resumeLink');
+				$this->setVar('surveyLink_block', '');
+				$this->setVar('surveyNoLink_block', '');
+			}
+			// allow to resit
+			else if ($currentSurvey['allow_resit'] == 1) {
+				$this->parse('surveyLink_block', 'surveyLink');
+				$this->setVar('surveyNoLink_block', '');
+				$this->setVar('resumeLink_block', '');
+			}
+			// else dont let them complete it again
+			else {
+				$this->setVar('surveyLink_block', '');
+				$this->parse('surveyNoLink_block', 'surveyNoLink');
+				$this->setVar('assessLink_block', '');
+				$this->setVar('resumeLink_block', '');
+				$this->setVar('SURVEY_FINISH_DATE', 'Completed');
+			}
+		}
+		else {
 
-                    $this->parse('resumeLink_block', 'resumeLink');
-                    $this->setVar('surveyLink_block', '');
-                    $this->setVar('surveyNoLink_block', '');
-                }
-                // allow to resit
-                else if ($currentSurvey['allow_resit'] == 1) {
-                    $this->parse('surveyLink_block', 'surveyLink');
-                    $this->setVar('surveyNoLink_block', '');
-                    $this->setVar('resumeLink_block', '');
-                }
-                // else dont let them complete it again
-                else {
-                    $this->parse('surveyNoLink_block', 'surveyNoLink');
-                    $this->setVar('assessLink_block', '');
-                    $this->setVar('resumeLink_block', '');
-                    $this->setVar('SURVEY_FINISH_DATE', 'Completed');
-                }
-
+			/* show to everyone unless expired */
+			if (strtotime($currentSurvey['finish']) < mktime() ) {
+				$this->parse('surveyNoLink_block', 'surveyNoLink');
+				$this->setVar('surveyLink_block', '');
+				$this->setVar('resumeLink_block', '');
 			}
 			else {
+				$this->parse('surveyLink_block', 'surveyLink');
+				$this->setVar('surveyNoLink_block', '');
+				$this->setVar('resumeLink_block', '');
+			}
+		}
 
-                /* show to everyone unless expired */
-                if (strtotime($currentSurvey['finish']) < mktime() ) {
-                    $this->parse('surveyNoLink_block', 'surveyNoLink');
-					$this->setVar('surveyLink_block', '');
-                    $this->setVar('resumeLink_block', '');
-				}
-                else {
-					$this->parse('surveyLink_block', 'surveyLink');
-                    $this->setVar('surveyNoLink_block', '');
-                    $this->setVar('resumeLink_block', '');
-				}
-			}
+		/* Modified this check so that only the owner or a superuser can get
+		 * these links which allow you to modify the assessment
+		 */
+		if ($currentSurvey['user_id'] == $_SESSION['id'] || $groupHandler->isSuperuser()) {
+			$this->parse('teacherLink_block', 'teacherLink');
+		}
+		else {
+			$this->setVar('teacherLink_block', '');
+		}
 
-			/* Modified this check so that only the owner or a superuser can get
-			 * these links which allow you to modify the assessment
-			 */
-			if ($currentSurvey['user_id'] == $_SESSION['id'] || $groupHandler->isSuperuser()) {
-				$this->parse('teacherLink_block', 'teacherLink');
-			}
-			else {
-				$this->setVar('teacherLink_block', '');
-			}
         $this->parse('survey_block', 'survey', true);
     }
 }
 else {
     $this->setVar('survey_block', '');
 }
-?>
