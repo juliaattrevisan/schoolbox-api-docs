@@ -66,7 +66,7 @@ class Session {
             $_SESSION['campus'] = $userHandler->getUserCampus($user['uid']);
 
             //if no webmail enabled or user has elected to use external client set mailhandle to mailto:
-            if(Cfg::get('mail_enable') == 0 || $user['mail_handler'] || ($groupHandler->isParent($user['group_id']) && !$user['local_email']))
+            if(Cfg::get('mail_enable') == 0 || $user['mail_handler'] || ($groupHandler->isParent() && !$user['local_email']))
                 $_SESSION['mailhandle'] = "mailto:";
             else
                 $_SESSION['mailhandle'] = "/mail/createMail.php?replyto=";
