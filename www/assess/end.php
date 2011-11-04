@@ -48,6 +48,8 @@ if ($assessHandler->isExpired($this->arg[0])) {
 $this->setFile(TEMPLATE_content, 'assess/end.html');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setBlock(TEMPLATE_content, 'alreadyEnded', 'alreadyEnded_block');
+$this->setBlock(TEMPLATE_content, 'unmarkedRemaining', 'unmarkedRemaining_block');
+
 $this->setTitle('Assessment: ' . $assess['title']);
 
 if ($attempt['finish'] == '0000-00-00 00:00:00') {
@@ -128,3 +130,12 @@ $this->setVar(array(
 	'ATTEMPT_NUM_QUESTIONS' => $numQuestions,
 	'ATTEMPT_VALUE_UNMARKED_QUESTIONS' => $valueUnmarkedQuestions,
 ));
+
+/* If there are unmarked questions remaining, show the block
+ */
+if ($numUnmarkedQuestions) {
+	$this->parse('unmarkedRemaining_block', 'unmarkedRemaining');
+}
+else {
+	$this->setVar('unmarkedRemaining_block', '');
+}
