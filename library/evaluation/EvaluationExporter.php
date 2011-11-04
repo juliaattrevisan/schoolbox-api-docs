@@ -158,51 +158,59 @@ class EvaluationExporter {
 			*/
 			$allQuestions = $this->getSectionHandler()->getContents($this->getAssessID(), $currentSection['section_id'], false, $this->getFilterByQuestion());
 
-			$this->sectionValues[$k]['questions'] = $this->getQuestionData($allQuestions);
-
-			/* Get attempts for the assessment
+			/* If there are questions for this survey
 			 */
-			$allAttempts = $this->getAttemptHandler()->getListByAssessAndSection($this->getAssessID(), $currentSection['section_id']);
+			if ($allQuestions) {
 
-			if ($allAttempts) {
-				for ($j = 0; $j < count($allAttempts); $j++) {
-					$currentAttempt = $allAttempts[$j];
+				/* Get the question text, id and type, store it
+				 * with its summary of results and attempt list
+				 */
+				$this->sectionValues[$k]['questions'] = $this->getQuestionData($allQuestions);
 
-					if ($allQuestions) {
+				/* Initialise all possible responses
+				 */
+				$this->accumulatePossibleQuestions($allQuestions, $k);
 
-						/* Initialise all possible responses
-						 */
-						$this->accumulatePossibleQuestions($allQuestions, $k);
+				/* Get attempts for the assessment
+				 */
+				$allAttempts = $this->getAttemptHandler()->getListByAssessAndSection($this->getAssessID(), $currentSection['section_id']);
 
-						/* Accumulate attempt data
-						 */
-						for ($i = 0; $i < count($allQuestions); $i++) {
-							$this->updateResponseSummary($allQuestions[$i], $allAttempts[$j], $k, $i);
+				if ($allAttempts) {
+					for ($j = 0; $j < count($allAttempts); $j++) {
+						$currentAttempt = $allAttempts[$j];
 
-							/* This if() clause allows for sections containing no questions.
-							 * because they come out with getContents()
+						if ($allQuestions) {
+
+							/* Accumulate attempt data
 							 */
-							if ($allQuestions[$i]['type_id']) {
-								$answerHandler = $this->getFactory()->createAnswerModel($allQuestions[$i]['type_id']);
+							for ($i = 0; $i < count($allQuestions); $i++) {
+								$this->updateResponseSummary($allQuestions[$i], $allAttempts[$j], $k, $i);
 
-								/* Specify whether to include html formatting in
-								 * this output
+								/* This if() clause allows for sections containing no questions.
+								 * because they come out with getContents()
 								 */
-								$answerHandler->setLegendHTML($this->getLegendHTML());
+								if ($allQuestions[$i]['type_id']) {
+									$answerHandler = $this->getFactory()->createAnswerModel($allQuestions[$i]['type_id']);
 
-								/* Load answer template into answerOption block
-								 */
-								$data = $answerHandler->exportResponseToCSV($currentAttempt['attempt_id'], $allQuestions[$i]['question_id']);
+									/* Specify whether to include html formatting in
+									 * this output
+									 */
+									$answerHandler->setLegendHTML($this->getLegendHTML());
 
-								$responseValues = str_replace("\t", '', $data['responseText']);
-								$commentValues = $data['comment'];
+									/* Load answer template into answerOption block
+									 */
+									$data = $answerHandler->exportResponseToCSV($currentAttempt['attempt_id'], $allQuestions[$i]['question_id']);
 
-								$this->sectionValues[$k]['questions'][$i]['attempts'][$j] = array(
-									'synergy_id' => $currentAttempt['synergy_id'],
-									'name' => $currentAttempt['firstname'] . ' ' . $currentAttempt['lastname'],
-									'responses' => $responseValues,
-									'comment' => html_entity_decode(str_replace("\n", '', strip_tags($commentValues)), ENT_QUOTES)
-								);
+									$responseValues = str_replace("\t", '', $data['responseText']);
+									$commentValues = $data['comment'];
+
+									$this->sectionValues[$k]['questions'][$i]['attempts'][$j] = array(
+										'synergy_id' => $currentAttempt['synergy_id'],
+										'name' => $currentAttempt['firstname'] . ' ' . $currentAttempt['lastname'],
+										'responses' => $responseValues,
+										'comment' => html_entity_decode(str_replace("\n", '', strip_tags($commentValues)), ENT_QUOTES)
+									);
+								}
 							}
 						}
 					}
