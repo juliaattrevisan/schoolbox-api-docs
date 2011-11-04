@@ -102,19 +102,6 @@ abstract class EvaluationFactory extends DeprecatedModel {
 
         return $this->db->getOne($query);
     }
-	/**
-	 * Questions templates for different question types
-	 *
-	 * @param  $type_id
-	 * @return
-	 */
-//    public function getQuestionTemplate($type_id) {
-//        $query = "SELECT template_dir
-//          FROM assess_luQuestionType
-//          WHERE type_id = '$type_id'";
-//
-//        return $this->db->getOne($query);
-//    }
 
 	/**
 	 * Find out the moodle name

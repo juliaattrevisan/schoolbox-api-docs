@@ -494,3 +494,8 @@ ALTER TABLE `wiki` DROP `stub`;
 /* Denbigh Integration */
 UPDATE `config` SET `options`='synergetic:tass:denbigh' WHERE `configID`='51';
 ALTER TABLE `luCampus` ADD COLUMN `timetable_period_count` INT NULL  AFTER `name` , ADD COLUMN `timetable_day_count` INT NULL  AFTER `timetable_period_count` ;
+
+/* This is a missing error message from when the error tables
+ * inadvertantly got truncated and not restored entirely
+ */
+INSERT INTO error (id, message) VALUES (137, 'There are no questions to attempt in this assessment.');
