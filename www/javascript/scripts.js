@@ -2,28 +2,47 @@ var $j = jQuery.noConflict();
 
 $j(function() {
 	
-	$j('#nav ul').droppy({speed: 0});
-	
+	/*
+	* Main Navigation dropdown
+	* */
+    $j("#nav li").hover(function(){
+        $j(this).addClass("hover");
+        $j('ul:first',this).toggle()
+    }, function(){
+        $j(this).removeClass("hover");
+        $j('ul:first',this).toggle();
+    });
+
+
+	/*
+	* Autoclear the main site search field
+	* */
 	$j('#search-field').autoclear();
-	
+
+ 	/*
+	* Remove the border from the bottom of the last row of any table.
+	* */
 	$j('.standardForm tr:last td').css("border", "0") 
-	
+
+	/*
+	* Submit the form with a href links with the classes below
+	* */
 	$j('.submit, .submit-this').click(function(event) {
 		event.preventDefault();
 		$j(this).closest('form').submit();
 	});
 
-	
-
 });
 
-function calendarPos(currentObject, leftNegative, heightNegative) {
-	$j('.cal-bubble').find('.bottom').removeAttr("style");
-	$j('.cal-bubble').find('.bottom strong').removeAttr("style");
-	$j('.cal-bubble').find('.bottom').show();
-	
-	var dynamicHTML = $j(currentObject).children('.hidden-fields').html();
+/*
+* Each skin has a slightly different header height or a different left navigation.
+* This function allows us to position the calendar popup at the right place.
+* */
 
+function calendarPos(currentObject, leftNegative, heightNegative) {
+	$j('.cal-bubble').find('.bottom, .bottom strong').removeAttr("style");
+	$j('.cal-bubble').find('.bottom').show();
+	var dynamicHTML = $j(currentObject).children('.hidden-fields').html();
 	$j('.cal-bubble .middle').children('.js-data').html(dynamicHTML);
 	var position = $j(currentObject).offset();
 	$j('.cal-bubble').show();
@@ -37,7 +56,5 @@ function calendarPos(currentObject, leftNegative, heightNegative) {
 	if (($j('.cal-bubble').css("top")) < '0px') {
 			$j('.cal-bubble').css("top", '0');	
 			$j('.cal-bubble').find('.bottom').hide();
-			
 	}
-
 }
