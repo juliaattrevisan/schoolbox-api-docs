@@ -10,7 +10,7 @@ if ((isset($_POST['username'])) && (isset($_POST['password']) && $_POST['passwor
 	//first check for brute force attempt
 	if ($sessionHandler->checkBruteForce()) {
 		$page = new SitePage(FALSE);
-		$page->goLoginPage('You have attempted more than ' . LOGINALLOWED . ' logins in ' . LOGINGRACE . ' seconds.<br>
+		$page->goLoginPage('You have attempted more than ' . Config::get('login_allowed') . ' logins in ' . Config::get('login_grace') . ' seconds.<br>
 			Please try again in a short while.');
 	}
 

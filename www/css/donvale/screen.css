@@ -332,7 +332,12 @@ td.cal-right .link-case .filter-drop .filter-list {
 }
 
 #footer ul li a {
-	color: #1d9ffc;
+	color: #fff;
+	text-decoration: underline
+}
+
+#footer ul li a:hover {
+	text-decoration: none;
 }
 
 .cal-bubble .middle {
