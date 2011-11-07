@@ -305,7 +305,7 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 }
 
 #search {
-	background: url(/images/kings/kings-search.jpg) no-repeat;
+	background: #fff;
 	width: 289px;
 	height: 35px;
 }
