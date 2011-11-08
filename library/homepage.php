@@ -61,13 +61,12 @@ class Homepage {
 	 * @return void
 	 */
 	public function updateColumnWidths($left, $right) {
-		$query = "UPDATE homepage_config
-				  SET
-				  	left_column_width = '{$left}',
-				  	right_column_width = '{$right}'
-				  WHERE cid = '{$this->cid}'";
 
-		$this->db->query($query);
+        $columnWidths = array('cid' => $this->cid,
+                              'left_column_width' => $left,
+                              'right_column_width' => $right,);
+
+        $this->db->update('homepage_config', 'cid', $columnWidths);
 	}
 
 
