@@ -1,5 +1,7 @@
 <?php
 
+
+
 class Category extends DeprecatedModel {
 
 	function Category () {
@@ -83,6 +85,9 @@ class Category extends DeprecatedModel {
 	}
 
 	function getByID($categoryID) {
+
+        require_once dirname(__FILE__) . '/group.php';
+
 		$query = "SELECT c.*, GROUP_CONCAT(co.code) code, u.id owner, u.title, u.firstname, u.lastname, g.type type, cf.template
 				  FROM (category c)
 				  LEFT JOIN categoryCode co ON co.categoryID = c.id
@@ -97,6 +102,9 @@ class Category extends DeprecatedModel {
 	}
 
 	function getByCode($code) {
+
+        require_once dirname(__FILE__) . '/group.php';
+
         $query = "SELECT c.*, GROUP_CONCAT(co.code) code, u.id owner, u.title, u.firstname, u.lastname, g.type type, cf.template
                   FROM (category c)
                   LEFT JOIN categoryCode co ON co.categoryID = c.id
