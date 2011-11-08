@@ -155,7 +155,13 @@ abstract class AnswerMulti extends EvaluationAnswer {
      * @param <type> $response
      */
     public function saveResponse($data) {
-        $processedResponse = serialize($data['answer']);
+
+		if ($data['answer'] == null) {
+			$processedResponse = 'NULL';
+		}
+		else {
+        	$processedResponse = serialize($data['answer']);
+		}
 
         return parent::saveResponse($data['section_id'], $data['question_id'], $processedResponse);
     }

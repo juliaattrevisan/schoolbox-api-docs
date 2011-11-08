@@ -160,7 +160,12 @@ abstract class AnswerRadio extends EvaluationAnswer {
 
 		/* Enforce array format for radio answers
 		 */
-        $processedResponse = serialize(array($data['answer']));
+		if ($data['answer'] == null) {
+			$processedResponse = 'NULL';
+		}
+		else {
+        	$processedResponse = serialize(array($data['answer']));
+		}
 
         return parent::saveResponse($data['section_id'], $data['question_id'], $processedResponse);
     }

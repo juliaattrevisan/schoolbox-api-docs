@@ -125,6 +125,7 @@ $this->setVar(array(
     'ATTEMPT_END' => $assess['duration'] == Survey::UNLIMITED_DURATION ? 'No particular time' : $attemptEnd->getShort(),
     'SECTION_TITLE' => $section['title'],
     'SECTION_DESCRIPTION' => $section['description'],
+	'CURRENT_SECTION_SEQUENCE' => $section['sequence'],
 ));
 
 /* Load all the questions for this section. This saves stubs for each response

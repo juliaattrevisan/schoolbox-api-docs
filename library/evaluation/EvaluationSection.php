@@ -124,6 +124,7 @@ abstract class EvaluationSection extends DeprecatedModel {
      */
     public function getQuestions($attempt_id, $section_id) {
         $query = "SELECT
+        			  assess_response.section_id,
                       assess_response.question_id,
                       assess_question.type_id,
                       assess_question.sequence,

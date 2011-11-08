@@ -114,7 +114,7 @@ abstract class EvaluationResponse extends DeprecatedModel {
 
         $allQuestions = $this->db->getAll($query);
 
-        /* Optionally andomise
+        /* Optionally randomise
          */
         if ($randomise === self::RANDOMISE_QUESTIONS) {
             shuffle($allQuestions);
