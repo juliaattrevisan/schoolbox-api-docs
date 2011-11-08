@@ -103,15 +103,6 @@ class Homepage {
 				$query = "INSERT INTO homepage_config (cid, template) VALUES ('$this->cid', '$template')";
 			}
 			$this->db->query($query);
-
-			if ($template == 3) {
-				// full column layout, move all components into left column
-				$query = "SELECT MAX(position) FROM homepage_comp_location WHERE cid = " . $this->cid . " AND `column` = 1";
-				if ($position = $this->db->getOne($query)) {
-					$query = "UPDATE homepage_comp_location SET position = (position + ".$position."), `column` = 1 WHERE cid = " . $this->cid . " AND `column` = 2";
-					$this->db->query($query);
-				}
-			}
 	}
 
 	function deleteHomepage()

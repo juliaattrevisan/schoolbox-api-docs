@@ -29,8 +29,10 @@ class HomepageTemplate extends  DeprecatedModel {
 			$template = $this->getByID($templateID);
 			
 			$homepage = new Homepage($cid);
-			$homepage->savePageTemplate($template['layout']);
-			
+            $homepage->savePageTemplate($templateID);
+            $homepage->updateColumnWidths($template['left_column_width'], $template['right_column_width']);
+
+
 			$homepage->deleteComponentPositions();
 			
 			$compPos = $this->getTemplatePositions($templateID);

@@ -54,14 +54,6 @@ if (is_numeric($_REQUEST['cid'])) {
 ;
 		$homepage->saveDisplayProperties($color);
 	}
-	/* AJAX Save homepage template
-	 */
-	else if ($_POST['cid'] && is_numeric($_POST['template'])) {
-
-		print $_POST['template'];
-
-		$homepage->savePageTemplate($_POST['template']);
-	}
 	/* Post config options from homepage
 	 */
 	else if ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {

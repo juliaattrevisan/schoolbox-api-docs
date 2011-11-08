@@ -490,3 +490,8 @@ UPDATE `link` SET `modified` = `submitted` WHERE `modified` IS NULL;
 ALTER TABLE `wiki` ADD COLUMN `slug` VARCHAR(255) NULL AFTER `latestRevision`;
 ALTER TABLE `wiki` ADD INDEX `category_slug` (`categoryID`, `slug`);
 ALTER TABLE `wiki` DROP `stub`;
+
+/* Alter table in target */
+ALTER TABLE `homepageTemplate`
+	ADD COLUMN `left_column_width` float   NULL DEFAULT '69.9' after `layout`,
+	ADD COLUMN `right_column_width` float   NULL DEFAULT '29.9' after `left_column_width`;
