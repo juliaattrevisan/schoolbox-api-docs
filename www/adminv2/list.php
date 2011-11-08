@@ -19,7 +19,9 @@ $this->setBlock('table_row', 'table_cell', 'table_cell_block');
 $this->setBlock('table_row', 'table_cell_select', 'table_cell_select_block');
 $this->setBlock('table_cell_select','table_cell_select_option','table_cell_select_option_block');
 $this->setBlock(TEMPLATE_content, 'table_schema', 'table_schema_block');
-$this->setBlock(TEMPLATE_content, 'newData', 'newData_block');
+$this->setBlock(TEMPLATE_content, 'newInput', 'newInput_block');
+$this->setBlock(TEMPLATE_content, 'newSelect', 'newSelect_block');
+$this->setBlock('newSelect', 'newSelect_option', 'newSelect_option_block');
 
 $this->setVar('table_cell_static_block','');
 $this->setVar('table_cell_select_block','');
@@ -114,13 +116,26 @@ foreach($table as $row) {
 			if ($keys == $selectedTable['index']) {
 				$this->setVar('TYPE', 'hidden');
 				$this->setVar('READONLY', 'readonly="readonly"');
+                $this->parse('newInput_block', 'newInput', true);
 			}
+            else if(stristr($col['Type'],'enum') ) {
+                $this->setVar('newSelect_option_block','');
+                
+                preg_match('/enum\((.*)\)/', $col['Type'], $match);
+                $list = explode(',',str_replace('\'','',$match[1]));
+                foreach($list as $option) {
+                    $this->setVar('OPTION_VALUE', $option);
+                    $this->parse('newSelect_option_block','newSelect_option',true);
+                }
+                $this->parse('newSelect_block', 'newSelect', true);
+            }
 			else {
 				$this->setVar('TYPE', 'text');
 				$this->setVar('READONLY', '');
+                $this->parse('newInput_block', 'newInput', true);
 			}
 
-			$this->parse('newData_block', 'newData', true);
+
         }
 
         if ($keys == $selectedTable['index']) {

@@ -116,9 +116,16 @@ $j(function() {
 <table id="newData" class="hide-it">
 	<tbody>
 		<tr>
-			<!-- BEGIN newData -->
+			<!-- BEGIN newInput -->
 			<td><input name="{TABLE_COLUMN}[]" type="{TYPE}" {READONLY} value="" /></td>
-			<!-- END newData -->
+			<!-- END newInput -->
+            <!-- BEGIN newSelect -->
+                <td><select name="{TABLE_COLUMN}[]">
+                    <!-- BEGIN newSelect_option -->
+                        <option value="{OPTION_VALUE}">{OPTION_VALUE}</option>
+                    <!-- END newSelect_option -->
+                </select></td>
+			<!-- END newSelect -->
 		</tr>
 	</tbody>
 </table>

@@ -60,6 +60,7 @@ if (is_array($sectionValues) && count($sectionValues)) {
 				 */
 				$this->setVar(array(
 					'ASSESS_ID' => $assess['assess_id'],
+                    'CID'       => $assess['category_id'],
 					'QUESTION_QUESTION' => $currentQuestion['question'],
 					'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
 					'QUESTION_INDEX' => $i++,

@@ -141,6 +141,7 @@ $this->setTab('submission');
 $this->setVar(array(
 	'ASSESS_ASSESS_ID' => $assess['assess_id'],
     'ASSESS_TITLE' => $assess['title'],
+    'CID'           => $assess['category_id'],
 ));
 
 /* Get a list of students who could have submitted data to this Assess, then
