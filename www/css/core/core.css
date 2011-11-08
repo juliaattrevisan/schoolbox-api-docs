@@ -2935,7 +2935,7 @@ ul.section-options a.drop-arrow {
 	border: 1px solid #638961;
 	height: 20px;
 	clear: both;
-	background: url(/images/core/assess/progress-bar.jpg);
+	background: url(/images/core/assess/progress-bar.png);
 }
 
 .evaluation-content.take-test ul li.right-answer:hover {
@@ -3221,12 +3221,13 @@ ul.section-options a.drop-arrow {
 }
 
 /*results for the evaluation */
-.evaluation-question-section h2 {
+.evaluation-question-section h2,
+.evaluation-content.take-test h2{
 	padding-left: 0;
 	margin-bottom: 16px;
 }
 
-.evaluation-question-section h2 span {
+.evaluation-content h2 span {
 	background: url(/images/core/transparencies/40-white.png) repeat;
 	color: #000;
 	display: block;
