@@ -89,10 +89,10 @@ $j(document).ready(function() {
 </script>
 <!-- END custom_head -->
 <div class="evaluation-content take-test">
-    <h2>Survey Section: {SECTION_TITLE}</h2>
-	<h3 class="test-details">Survey Details:</h3>
-	<p class="pad-it wysywig">{SECTION_DESCRIPTION}</p>
+    <h2>{SECTION_TITLE}</h2>
+	<h3 class="test-details">{SECTION_DESCRIPTION}</h3>
 
+<br />
 		<!-- BEGIN question -->
 		<form action="/survey/saveResponse/{QUESTION_QUESTION_ID}" method="post" class="questionForm">
 			<div class="wysiwyg no-pad clearfix">
