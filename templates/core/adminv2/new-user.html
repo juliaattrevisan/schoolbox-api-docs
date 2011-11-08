@@ -70,10 +70,10 @@ $j(function() {
 	$j.validator.addMethod("customValid", function(value, element) {
 		inputValue = (parseInt(value));
 		if (isNaN(inputValue)) {
-			
+
 			value = String(value);
-			
-			if ((value == 'k') || (value == 'elc') || (value == 'ELC') || (value == 'K')) {
+
+			if ((value == '') || (value == 'k') || (value == 'elc') || (value == 'ELC') || (value == 'K')) {
 				console.log(value);
 				return true
 			} else {
