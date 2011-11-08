@@ -499,3 +499,8 @@ ALTER TABLE `luCampus` ADD COLUMN `timetable_period_count` INT NULL  AFTER `name
  * inadvertantly got truncated and not restored entirely
  */
 INSERT INTO error (id, message) VALUES (137, 'There are no questions to attempt in this assessment.');
+
+/* This is to allow the database to set the Year level to K or ELC. Also put in 3 character limit as there is no reason for longer.
+*/
+ALTER TABLE `user`
+ MODIFY `year`   VARCHAR(3) DEFAULT NULL;
