@@ -152,6 +152,26 @@ abstract class EvaluationResponse extends DeprecatedModel {
         return $this->db->getOne($query);
     }
 
+	/**
+	 * Count the number of questions that were automarked AND not reviewed.
+	 * This indicates questions that remain to be reviewed manually.
+	 *
+	 * @param <type> $attempt_id
+	 * @return <type>
+	 */
+	public function numAutomarked($attempt_id) {
+		$query = "SELECT COUNT(*)
+				  FROM {$this->_table}
+				  LEFT JOIN assess_attempt ON assess_attempt.attempt_id = {$this->_table}.attempt_id
+				  LEFT JOIN assess_question ON assess_question.question_id = {$this->_table}.question_id
+				  WHERE {$this->_table}.attempt_id = '$attempt_id'
+				  AND assess_attempt.reviewed_at IS NULL
+				  AND assess_question.deleted_at IS NULL
+				  AND automarked_already = 'true'";
+
+		return $this->db->getOne($query);
+	}
+
     /**
      * Count the number of questions that were not automarked AND not reviewed.
      * This indicates questions that remain to be reviewed manually.
