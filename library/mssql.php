@@ -16,8 +16,11 @@ class MSSQL {
 		$this->passwd = Cfg::get('external_db_passwd');
 		$this->debug = 0;
         $this->db = $db?$db:Cfg::get('external_db_db');
-		$this->connect();
-	}
+
+        if(Cfg::get('external_enable') == 1) {
+            $this->connect();
+        }
+    }
 
 	function connect() {
 		if(!isset($this->dbf))
@@ -42,16 +45,20 @@ class MSSQL {
 	
 	function query($sql_q)
 	{
-		$this->result = mssql_query($sql_q, $this->dbf);
-		
-		if ($this->result == FALSE) {
-			if($this->debug)
-				print "<b>Query:</b> $sql_q<br />";
-			else
-				error(21, 'Error in Synegetic query<br /><br />'.$sql_q );
-		}
-		
-		return $this->result;
+        if($this->dbf) {
+            $this->result = mssql_query($sql_q, $this->dbf);
+
+            if ($this->result == FALSE) {
+                if($this->debug)
+                    print "<b>Query:</b> $sql_q<br />";
+                else
+                    error(21, 'Error in Synegetic query<br /><br />'.$sql_q );
+            }
+
+            return $this->result;
+        }
+        else
+            return false;
 	}
 
 	/* Gets the first result returned by the query */
