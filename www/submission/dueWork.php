@@ -321,7 +321,7 @@ $j=0;
 
 if ($allAssessments) {
     foreach($allAssessments as $currentAssessment) {
-		$allAttempts = $attemptHandler->getList($currentAssessment['assess_id']);
+		$allAttempts = $attemptHandler->getList($currentAssessment['assess_id'], $_SESSION['id']);
 
 		/* If multiple attempts were made, list them
 		 */
@@ -414,6 +414,9 @@ if ($allAssessments) {
                 $this->setVar('DARK',$j++ % 2 ?'' : 'dark');
 				$this->parse('attempt_block', 'attempt', true);
 			}
+		}
+		else {
+			$this->setVar('attempt_block', '');
 		}
     }
 
