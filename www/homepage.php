@@ -50,12 +50,28 @@ if (!isset($category['template'])) {
 $categoryCodes = $categoryHandler->getCodeForCategory($categoryID);
 $code = $categoryCodes['codes'];
 
+$enroled = false;
+$categoryList = $groupHandler->involvedInCategoryList($_SESSION['id']);
+
+/* See if you're in the Category first
+ */
+if (is_array($categoryList)) {
+    foreach ($categoryList as $key => $value) {
+        if ($value['id'] == $categoryID) {
+            $enroled = true;
+        }
+    }
+}
+
+/*
 if ($code != '') {
 	$enroled = $groupHandler->involvedInSubject($category['code']);
 }
 else {
 	$enroled = $groupHandler->involvedInGroup($_SESSION['id'], $categoryID);
 }
+*/
+
 
 $this->setFile(TEMPLATE_content, 'homepage/template.html');
 $this->setTitle($category['name']);

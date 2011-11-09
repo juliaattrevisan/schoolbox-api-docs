@@ -44,9 +44,9 @@ if ($type == DENY_ACCESS && $type !== NULL) {
 	$this->parse('subscribedModerated_block', 'subscribedModerated');
 }
 
-/* If you are subscribed with something greater than DENY_ACCESS
+/* If you are subscribed with something greater than DENY_ACCESS and you can subscribe, display the unsubscribe button
  */
-else if ($type == READ_ACCESS || $type == WRITE_ACCESS) {
+else if ($groupHandler->canSubscribe($categoryID) && ($type == READ_ACCESS || $type == WRITE_ACCESS)) {
 	$this->parse('subscribed_block', 'subscribed');
 }
 else if($type == FULL_ACCESS) {
