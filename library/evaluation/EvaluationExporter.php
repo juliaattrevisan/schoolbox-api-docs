@@ -13,6 +13,7 @@ class EvaluationExporter {
 	protected $sectionValues = array();
 	protected $filterByQuestion = false;
 	protected $legendHTML = false;
+	protected $columnHeadings = array("Synergy ID", "Respondent", "Response", "Teacher's Comment");
 
 	/**
 	 * Constructor
@@ -262,7 +263,7 @@ class EvaluationExporter {
 					foreach($currentSection['questions'] as $currentQuestion) {
 						$this->outputCSV2(array(
 							array("Q$i. " . strip_tags($currentQuestion['question']) . "\n"),
-							array("Synergy ID", "Respondent", "Response", "Teacher's Comment"),
+							$this->getColumnHeadings(),
 						));
 
 						/* Generate attempts for this question
@@ -320,6 +321,17 @@ class EvaluationExporter {
 		fputcsv($filehandler, $vals, ',', '"');
 	}
 
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Get column headings in export file
+	 *
+	 * @return
+	 */
+	public function getColumnHeadings() {
+		return $this->columnHeadings;
+	}
 
 	/**
 	 * Sets legendHTML
