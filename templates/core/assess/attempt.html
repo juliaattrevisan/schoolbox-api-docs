@@ -107,8 +107,9 @@ $j(document).ready(function() {
 });
 </script>
 <!-- END custom_head -->
+<h1>{ASSESS_TITLE}</h1>
 <div class="evaluation-content take-test">
-	<h2>Assessment Section: {SECTION_TITLE}</h2>
+	<h2><span>Section {CURRENT_SECTION_SEQUENCE} - </span> {SECTION_TITLE}</h2>
 
 	<h3 class="test-details">Test Details:</h3>
 	<p class="pad-it wysywig">{SECTION_DESCRIPTION}</p>
@@ -146,7 +147,7 @@ $j(document).ready(function() {
 </div>
 <div class="evaluation-menu">
 	
-	<h2>Assessment Name: {ASSESS_TITLE}</h2>
+	<h2>Assessment Progress</h2>
 	<div class="pad-it">
 		<div class="time-holder"> <strong>Time remaining</strong>
 			<div id="countdown"></div>
