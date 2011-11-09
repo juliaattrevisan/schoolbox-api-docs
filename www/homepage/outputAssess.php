@@ -64,8 +64,7 @@ if (is_array($allAssess)) {
 			 * 3. The current time has passed the test's starting time
 			 * 4. You aren't the owner of the test
 			 */
-
-            if(is_array($attempt)) {
+            if (is_array($attempt)) {
                 // If the last assess is not completed provide resume link
                 if ($attempt['finish'] == '0000-00-00 00:00:00' && ($attemptTimeRemaining < 0 || $currentAssess['duration'] == Assess::UNLIMITED_DURATION)) {
                     $firstSection = $sectionHandler->getFirst($currentAssess['assess_id']);
@@ -93,7 +92,6 @@ if (is_array($allAssess)) {
                     $this->setVar('resumeLink_block', '');
                     $this->setVar('ASSESS_FINISH_DATE', 'Completed');
                 }
-
 			}
 			else {
 
