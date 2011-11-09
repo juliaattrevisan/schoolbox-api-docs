@@ -267,15 +267,17 @@ class EvaluationExporter {
 
 						/* Generate attempts for this question
 						 */
-						foreach($currentQuestion['attempts'] as $currentAttempt) {
-							$attemptList = array();
+						if (is_array($currentQuestion['attempts'])) {
+							foreach($currentQuestion['attempts'] as $currentAttempt) {
+								$attemptList = array();
 
-							$attemptList[] = $currentAttempt['synergy_id'];
-							$attemptList[] = $currentAttempt['name'];
-							$attemptList[] = $currentAttempt['responses'];
-							$attemptList[] = $currentAttempt['comment'];
+								$attemptList[] = $currentAttempt['synergy_id'];
+								$attemptList[] = $currentAttempt['name'];
+								$attemptList[] = $currentAttempt['responses'];
+								$attemptList[] = $currentAttempt['comment'];
 
-							$this->outputCSV2(array($attemptList));
+								$this->outputCSV2(array($attemptList));
+							}
 						}
 
 						echo "\n";
