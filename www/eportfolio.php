@@ -5,7 +5,7 @@
  *														   *
  ************************************************************/
 
-define('MAX_COLUMN_COUNT', 2);
+define('MAX_COLUMN_COUNT', 3);
 
 require_once 'include/stdfuncs.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
@@ -317,7 +317,7 @@ if ($eportfolioHandler->canEdit($userID)) {
 	}
 
 	/* Set any columns with nothing in them to null
-		 */
+	 */
 	for ($i = 1; $i <= MAX_COLUMN_COUNT; $i++) {
 		if (!$columnFlag[$i]) {
 			$this->setVar('COLUMN' . $i, '');
