@@ -1,13 +1,8 @@
 <?php
 
-class ePortfolioTextBox extends DeprecatedModel {
-
-	function ePortfolioTextBox () {
-		$this->_table = 'eportfolio_textBox';
-		$this->_index = 'textBoxID';
-
-		parent::DeprecatedModel();
-	}
+class Eportfolio_Textbox extends DeprecatedModel {
+	public $_table = 'eportfolio_textBox';
+	public $_index = 'textBoxID';
 
 	/**
 	 * Get a textbox record using only a componentLocationID

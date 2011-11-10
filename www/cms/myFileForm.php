@@ -75,7 +75,7 @@ else {
 			error(2);
 		}
 
-		$eportfolioHandler = new ePortfolio($file['owner']);
+		$eportfolioHandler = new Eportfolio_Container($file['owner']);
 
 		if (!$eportfolioHandler->canEdit($file['owner'])) {
 			error(109);
@@ -96,7 +96,7 @@ else {
 				error(2);
 			}
 
-			$eportfolioHandler = new ePortfolio($file['owner']);
+			$eportfolioHandler = new Eportfolio_Container($file['owner']);
 
 			if (!$eportfolioHandler->canEdit($file['owner'])) {
 				error(109);

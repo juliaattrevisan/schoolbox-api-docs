@@ -2,7 +2,7 @@
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage();
-$eportfolioHandler = new ePortfolio($_SESSION['id']);
+$eportfolioHandler = new Eportfolio_Container($_SESSION['id']);
 $linkHandler = new Eportfolio_Link();
 $groupHandler = new Group();
 

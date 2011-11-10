@@ -3,7 +3,7 @@
 require_once '../library/eportfolio.php';
 require_once '../library/eportfolio-link.php';
 
-$eportfolioHandler = new ePortfolio($_SESSION['id']);
+$eportfolioHandler = new Eportfolio_Container($_SESSION['id']);
 $linkHandler = new Eportfolio_Link();
 
 if (is_numeric($this->arg[0])) {

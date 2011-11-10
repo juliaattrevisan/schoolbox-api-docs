@@ -15,7 +15,7 @@ if (is_numeric($_REQUEST['uid'])) {
         error(19);
     }
 
-    $eportfolioHandler = new ePortfolio($_REQUEST['uid']);
+    $eportfolioHandler = new Eportfolio_Container($_REQUEST['uid']);
 
     /* ajax request for drag and drop of components
      * this is found in jquery.eportfoliocomponent.js

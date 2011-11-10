@@ -39,7 +39,7 @@ else {
 	}
 	else {
 		if (is_numeric($_GET['share'])) {
-			$ePortfolioHandler = new ePortfolio($_SESSION['id']);
+			$ePortfolioHandler = new Eportfolio_Container($_SESSION['id']);
 
 			if ($ePortfolioHandler->isEnabled()) {
 				if (!$myLinksHandler->shareLink($_GET['share'])) {

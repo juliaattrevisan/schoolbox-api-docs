@@ -17,7 +17,7 @@ if (is_numeric($this->arg[0])) {
 		error(19);
     }
 
-	$eportfolioHandler = new ePortfolio($uid);
+	$eportfolioHandler = new Eportfolio_Container($uid);
 
 	$this->setFile(TEMPLATE_content, 'eportfolio/customise.html');
 	$this->setTitle('ePortfolio Customisation');

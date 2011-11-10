@@ -11,15 +11,15 @@
 //includes
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-	
+
 if(is_numeric($_GET['id']))
 {
 	$page = new SitePage;
 	$groupHandler = new Group;
-	
-	
+
+
 	if(isset($_GET['myFile'])) {
-		
+
 		if (Cfg::get('webdav_enable')) {
 			require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
 			$fileHandler = PortfolioWebDAV::factory();
@@ -27,7 +27,7 @@ if(is_numeric($_GET['id']))
 			$file['realname'] = substr($_SESSION['WebDAVIDCache'][$_GET['id']], strrpos($_SESSION['WebDAVIDCache'][$_GET['id']], '/') + 1);
 		} else {
 			require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
-			
+
 			$myFileHandler = new MyFile;
 			$file = $myFileHandler->getByID($_GET['id']);
 			if(!is_array($file))
@@ -36,7 +36,7 @@ if(is_numeric($_GET['id']))
             if ($_GET['published']) {
                 require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio.php');
 
-                $eportfolioHandler = new ePortfolio($file['owner']);
+                $eportfolioHandler = new Eportfolio_Container($file['owner']);
 
                 if (!$eportfolioHandler->canEdit($file['owner'])) {
                     error(5);
@@ -46,11 +46,11 @@ if(is_numeric($_GET['id']))
                 if($file['owner'] != $_SESSION['id'])
                     error(5);
             }
-			
+
 			$filename = Cfg::get('myfile_dir') ."/". $file['id'] . ".dat";
 		}
-		
-		
+
+
 	}
         else if(isset($_GET['folder'])){
 
@@ -75,39 +75,39 @@ if(is_numeric($_GET['id']))
         }
 	else {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
-		
+
 		$fileHandler = new File;
 		$file = $fileHandler->getByID($_GET['id']);
 		if(!is_array($file))
 			error(41);
-			
-		if($groupHandler->getPermission($file['category']) < READ_ACCESS) 
+
+		if($groupHandler->getPermission($file['category']) < READ_ACCESS)
 			error(5);
-		
+
 		$filename = Cfg::get('file_dir') ."/". $_GET['id'] . ".dat";
-	
+
 	}
-	
-	
+
+
 	if($_GET['save'])
 		$attach = "attachment;";
 	else
 		$attach = "";
-	
+
 	$filesize = @filesize($filename);
 	if($filesize == FALSE) //if we cannot find the file (something is wrong dont link to it)
 		error(41);
 
 	//send headers
-	if($file['mime_type'])		
-		header ("Content-Type: {$file['mime_type']}"); 
+	if($file['mime_type'])
+		header ("Content-Type: {$file['mime_type']}");
 	else
-		header ("Content-Type: application/octet-stream"); 
+		header ("Content-Type: application/octet-stream");
 
 	header ("Pragma: ");
-	header ("Cache-control: ");			
-	header ("Content-Disposition: $attach filename=\"".$file['realname']."\""); 
-	header ("Content-Length: $filesize");	
+	header ("Cache-control: ");
+	header ("Content-Disposition: $attach filename=\"".$file['realname']."\"");
+	header ("Content-Length: $filesize");
 	readfile($filename);
 }
 else

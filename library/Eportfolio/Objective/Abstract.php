@@ -97,7 +97,7 @@ class Eportfolio_Objective_Abstract extends DeprecatedModel {
 	 * @return void
 	 */
 	public function createUpdate($post) {
-		$eportfolioHandler = new ePortfolio($_SESSION['id']);
+		$eportfolioHandler = new Eportfolio_Container($_SESSION['id']);
 
 		if (!$eportfolioHandler->canEdit($this->getUserId())) {
 			error(19);

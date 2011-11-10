@@ -4,7 +4,7 @@ $blogHandler = new Eportfolio_Blog_Item();
 $this->setFile(TEMPLATE_content, 'eportfolio_blog/modify.html');
 
 if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
-    $eportfolioHandler = new ePortfolio($this->arg[1]);
+    $eportfolioHandler = new Eportfolio_Container($this->arg[1]);
 
     if (!$eportfolioHandler->canEdit($this->arg[1])) {
 		error(23);
@@ -25,7 +25,7 @@ if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 }
 else if (is_numeric($this->arg[0])) {
 	$blog = $blogHandler->getByID($this->arg[0]);
-    $eportfolioHandler = new ePortfolio($blog['owner']);
+    $eportfolioHandler = new Eportfolio_Container($blog['owner']);
 
 	$this->setTitle('Modify Blog Entry');
 

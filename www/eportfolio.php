@@ -9,13 +9,12 @@ define('MAX_COLUMN_COUNT', 3);
 
 require_once 'include/stdfuncs.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 
 $userHandler = new User();
 $groupHandler = new Group();
-$eportfolioHandler = new ePortfolio($this->arg[0]);
+$eportfolioHandler = new Eportfolio_Container($this->arg[0]);
 $allowedFiles = new AllowedFile();
 
 /* Check that the user exists

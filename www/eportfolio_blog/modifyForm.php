@@ -5,7 +5,7 @@ $page = new SitePage();
 $blogHandler = new Eportfolio_Blog_Item();
 
 if (isset($_POST['delete'])) {
-	$eportfolioHandler = new ePortfolio($_POST['uid']);
+	$eportfolioHandler = new Eportfolio_Container($_POST['uid']);
 
 	if (!$eportfolioHandler->canEdit($_POST['uid'])) {
 		error(107);
@@ -17,7 +17,7 @@ if (isset($_POST['delete'])) {
 }
 else {
 	if (!empty($_POST['heading'])) {
-		$eportfolioHandler = new ePortfolio($_POST['uid']);
+		$eportfolioHandler = new Eportfolio_Container($_POST['uid']);
 
 		if (!$eportfolioHandler->canEdit($_POST['uid'])) {
 			error(107);

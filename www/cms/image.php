@@ -38,7 +38,7 @@ if($_GET['id'] && $_GET['width'] && $_GET['height'])
         require_once($_SERVER['DOCUMENT_ROOT'].'/../library/eportfolio.php');
         require_once($_SERVER['DOCUMENT_ROOT'].'/../library/group.php');
 
-        $eportfolioHandler = new ePortfolio($imageInfo['owner']);
+        $eportfolioHandler = new Eportfolio_Container($imageInfo['owner']);
 
         if (!$eportfolioHandler->canEdit($imageInfo['owner'])) {
             error(5);

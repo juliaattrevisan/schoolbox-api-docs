@@ -13,7 +13,7 @@
 
 if (is_numeric($this->arg[0]) ) {
     $userHandler = new User();
-	$eportfolioHandler = new ePortfolio($this->arg[0]);
+	$eportfolioHandler = new Eportfolio_Container($this->arg[0]);
 
 	if (!$eportfolioHandler->canEdit($this->arg[0])) {
         error(1);
@@ -31,7 +31,7 @@ if (is_numeric($this->arg[0]) ) {
         'FOLDER_NAME' => $user['firstname'] . ' ' . $user['lastname'],
         'USER_ID'       => $user['uid'],
     ));
-    
+
 	$imageList = $imageList = $eportfolioHandler->getImages($this->arg[0]);
 
 	$count = 1;

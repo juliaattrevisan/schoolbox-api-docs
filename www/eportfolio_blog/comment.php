@@ -5,7 +5,7 @@ $commentHandle = new Eportfolio_Blog_Comment();
 if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	$blog = $blogHandle->getByID($this->arg[1]);
 
-    $eportfolioHandler = new ePortfolio($blog['owner']);
+    $eportfolioHandler = new Eportfolio_Container($blog['owner']);
 
     /* Check whether the current user can modify this person's eportfolio
      */
@@ -30,7 +30,7 @@ else if ($this->arg[0] == 'delete' && is_numeric($this->arg[1])) {
 
     $blog = $blogHandle->getByID($comment['bid']);
 
-    $eportfolioHandler = new ePortfolio($blog['owner']);
+    $eportfolioHandler = new Eportfolio_Container($blog['owner']);
 
     /* Check whether the current user can modify this person's eportfolio
      */

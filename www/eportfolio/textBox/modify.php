@@ -1,8 +1,6 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio-textBox.php';
-
 $page = new SitePage();
-$textBoxHandler = new ePortfolioTextBox();
+$textBoxHandler = new Eportfolio_Textbox();
 
 $textBox = $textBoxHandler->getByComponentLocationID($this->arg[1]);
 

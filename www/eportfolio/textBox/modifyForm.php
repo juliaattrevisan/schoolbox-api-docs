@@ -1,11 +1,10 @@
 <?php
 require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio-textBox.php';
 
 $page = new SitePage();
 $groupHandler = new Group();
-$eportfolioHandler = new ePortfolio($_SESSION['id']);
-$textBoxHandler = new ePortfolioTextBox();
+$eportfolioHandler = new Eportfolio_Container($_SESSION['id']);
+$textBoxHandler = new Eportfolio_Textbox();
 
 if (isset($_POST['heading']) && isset($_POST['body'])) {
 	if (!$eportfolioHandler->canEdit(Scrub::text($_POST['userID']))) {
