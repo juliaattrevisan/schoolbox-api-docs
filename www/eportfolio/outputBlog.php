@@ -25,7 +25,7 @@ $userHandler = new User();
 if (!empty($blogs)) {
 	foreach ($blogs as $blog) {
         if ($eportfolioHandler->canEdit($userID)) {
-            $this->setVar('MODIFY_BLOG', "<a href=\"/eportfolio_blog/modify/{$blog['id']}\">Modify</a>");
+            $this->setVar('MODIFY_BLOG', "<a href=\"/eportfolio/blog/modify/{$blog['id']}\">Modify</a>");
         }
         else {
             $this->setVar('MODIFY_BLOG', '');
@@ -78,7 +78,7 @@ if (!empty($blogs)) {
 				));
 
 				if ($comment['owner'] == $_SESSION['id'] || $permission >= WRITE_ACCESS) {
-					$this->setVar('DELETE_COMMENT', "<a href=\"/eportfolio_blog/comment/delete/{$comment['id']}\">Delete</a>");
+					$this->setVar('DELETE_COMMENT', "<a href=\"/eportfolio/blog/comment/delete/{$comment['id']}\">Delete</a>");
                 }
 				else {
 					$this->setVar('DELETE_COMMENT', '');
