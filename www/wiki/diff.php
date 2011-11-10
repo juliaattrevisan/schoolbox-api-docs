@@ -1,12 +1,5 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/wiki.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-
-// pear libs
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/PEAR/Text/Diff.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/PEAR/Text/Diff/Renderer/inline.php';
-
 $wiki  = new Wiki;
 $group = new Group(HOMEPAGE_SERVICE);
 $userHandler = new User();
@@ -34,8 +27,8 @@ if (is_numeric($this->arg[0])) {
 	$this->setTab('resources');
 
 	// perfom diff
-	$diff = new Text_Diff(str_split($from['body']), str_split($to['body']));
-	$renderer = new Text_Diff_Renderer_inline();
+	$diff = new Horde_Text_Diff('auto', array( explode("\n", $from['body']), explode("\n", $to['body']) ) );
+	$renderer = new Alaress_Text_Diff_Renderer_Inline();
 
 	$modifiedDate = new Alaress_Date_Format($from['modified'], 'U');
 
