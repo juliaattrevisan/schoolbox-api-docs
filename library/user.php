@@ -453,7 +453,7 @@ class User extends DeprecatedModel {
             }
         } else {
             /* Note that this can insert multiple campus if the update only specified a single value like in a bulk load */
-            $campusquery = "INSERT IGNORE INTO userCampus (uid, campus) VALUES ('$id', '$campusarray')";
+            $campusquery = "INSERT IGNORE INTO userCampus (uid, campus) VALUES ('{$user['id']}', '$campusArray')";
             $this->db->query($campusquery);
         }
 
@@ -501,8 +501,8 @@ class User extends DeprecatedModel {
                 $insertCampus = array('uid' => $id, 'campus' => $campus, 'defaultCampus' => $campus == $defaultCampus ? 1 : 0);
                 $this->db->insert('userCampus', $insertCampus);
             }
-        } else if ($id && $campusarray) {
-            $campusquery = "INSERT INTO userCampus (uid, campus) VALUES ('$id', '$campusarray')";
+        } else if ($id && $campusArray) {
+            $campusquery = "INSERT INTO userCampus (uid, campus) VALUES ('$id', '$campusArray')";
             $this->db->query($campusquery);
         }
 
