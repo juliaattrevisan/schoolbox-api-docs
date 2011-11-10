@@ -380,7 +380,7 @@ class Bulk {
 				 * If access is 3, then the sid corresponds to campus id's
 				 * If access is 2, then the sid corresponds to group id's
 				 */
-				$date = new Alaress_Date_Format(Scrub::html($thisRow[0]));
+				$date = new Alaress_Date_Format(Scrub::html($thisRow[0]), 'd/m/y');
 
 				if ((trim($thisRow[0]) != '') && (trim($thisRow[3]) != '')) {
 					$event = array(
