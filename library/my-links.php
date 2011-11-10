@@ -11,7 +11,7 @@ class MyLinks extends DeprecatedModel {
 
 	/**
 	 * Shares a link to the current user's ePortfolio.
-	 * 
+	 *
 	 * @param <type> $linkID
 	 */
 	public function shareLink($linkID) {
@@ -25,7 +25,7 @@ class MyLinks extends DeprecatedModel {
 		if ($link) {
 			require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio-link.php');
 
-			$ePortfolioLinkHandler = new ePortfolioLink();
+			$ePortfolioLinkHandler = new Eportfolio_Link();
 
 			$exists = $ePortfolioLinkHandler->getAllByFields(array(
 				'owner' => $_SESSION['id'],
@@ -48,7 +48,7 @@ class MyLinks extends DeprecatedModel {
 				return false;
 			}
 		}
-		
+
 		return false;
 	}
 

@@ -1,21 +1,16 @@
 <?php
 
-class ePortfolioLink extends DeprecatedModel {
+class Eportfolio_Link extends DeprecatedModel {
+	public $_table = 'eportfolio_link';
+	public $_index = 'id';
 
-    /**
-     *
-     */
-	function ePortfolioLink() {
-		$this->_table = "eportfolio_link";
-		$this->_index = "id";
-
-		parent::DeprecatedModel();
-	}
-
-    /**
-     * Gets an eportfolio link record
-     */
-	function getByID($linkID) {
+	/**
+	 * Get a link by its id
+	 *
+	 * @param  $linkID
+	 * @return array|bool
+	 */
+	public function getByID($linkID) {
 		$query = "SELECT l.*, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName,
 						UNIX_TIMESTAMP(l.submitted) submitted
 				  FROM eportfolio_link l
@@ -25,21 +20,18 @@ class ePortfolioLink extends DeprecatedModel {
 		return $this->db->getRow($query);
 	}
 
-    /**
-     * Gets all the links owned by $userID
-     *
-     * @param <type> $userID
-     * @param <type> $config
-     * @return <type>
-     */
-	function getAllInUser($userID, $config = false) {
+	/**
+	 * Gets all the links owned by $userID
+	 *
+	 * @param  $userID
+	 * @param bool $config
+	 * @return array|bool
+	 */
+	public function getAllInUser($userID, $config = false) {
 		$query = "SELECT l.*, u.firstname, u.lastname, u.title, UNIX_TIMESTAMP(submitted) submitted, 'html_alt1' iconFile
 				  FROM eportfolio_link l
 				  LEFT JOIN user u ON u.id = l.owner
 				  WHERE owner = '$userID'";
-
-//		if ($groupHandler->getPermission($categoryID) < WRITE_ACCESS)
-//			$query .= " AND l.hidden = 0";
 
 		$sortFields = array('Name' => 'l.description', 'Date' => 'l.submitted');
 		$config['sort'] = isset($sortFields[$config['sort']]) ? $config['sort'] : 'Name';
@@ -54,57 +46,101 @@ class ePortfolioLink extends DeprecatedModel {
 		return $this->db->getAll($query);
 	}
 
-	function appendHTTP($url) {
-		if( strncasecmp($url,"http://", 7) && strncasecmp($url, "https://", 8) )
-			$url = "http://".$url;
+	/**
+	 * Append protocol
+	 *
+	 * @param  $url
+	 * @return string
+	 */
+	public function appendHTTP($url) {
+		if (strncasecmp($url, "http://", 7) && strncasecmp($url, "https://", 8)) {
+			$url = "http://" . $url;
+		}
+
 		return $url;
 	}
 
-	function logAction ($linkID, $action) {
-		$logEntry = array(	'object'	=> 'link',
-							'objectId'	=> $linkID,
-							'action'	=> $action,
-							'user'		=> $_SESSION['id'],
-							);
+	/**
+	 * Log somethign that changed
+	 *
+	 * @param  $linkID
+	 * @param  $action
+	 * @return void
+	 */
+	public function logAction($linkID, $action) {
+		$logEntry = array(
+			'object' => 'link',
+			'objectId' => $linkID,
+			'action' => $action,
+			'user' => $_SESSION['id'],
+		);
 
 		$this->db->insert('cmsLog', $logEntry);
 	}
 
-	function update($data) {
-
-        if(isset($data['url']))
-            $data['url'] = $this->appendHTTP(trim($data['url']));
+	/**
+	 * Update link
+	 *
+	 * @param  $data
+	 * @return void
+	 */
+	public function update($data) {
+		if (isset($data['url'])) {
+			$data['url'] = $this->appendHTTP(trim($data['url']));
+		}
 
 		parent::update($data);
 
-		/* Update log entry */
+		/* Update log entry
+		 */
 		$this->logAction($data[$this->_index], 'modify');
-
 	}
 
-	function create($data) {
-
+	/**
+	 * Create link
+	 *
+	 * @param  $data
+	 * @return int
+	 */
+	public function create($data) {
 		$data['submitted'] = 'NOW()';
 		$data['url'] = $this->appendHTTP(trim($data['url']));
 
 		$linkID = parent::create($data);
 
-		/* Insert log entry */
+		/* Insert log entry
+		 */
 		$this->logAction($linkID, 'create');
 
 		return $linkID;
 	}
 
-	function delete($id) {
-
+	/**
+	 * Delete link
+	 *
+	 * @param  $id
+	 * @return void
+	 */
+	public function delete($id) {
 		parent::delete($id);
 
-		/* Delete log entry */
+		/* Delete log entry
+		 */
 		$this->logAction($id, 'delete');
-
 	}
 
-	function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
+	/**
+	 * Search
+	 *
+	 * @param  $keyword
+	 * @param int $offset
+	 * @param int $limit
+	 * @param null $count
+	 * @param string $sort_by
+	 * @param string $sort_dir
+	 * @return array|bool
+	 */
+	public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
 		$keyword = Scrub::text($keyword);
 
 		$query = "SELECT `link`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
@@ -143,4 +179,3 @@ class ePortfolioLink extends DeprecatedModel {
 		return $this->db->getAll($query);
 	}
 }
-?>

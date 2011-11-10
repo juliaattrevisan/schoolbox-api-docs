@@ -8,7 +8,7 @@ $this->setBlock('myLink', 'myLink_exists', 'myLink_exists_block');
 $this->setBlock('myLink', 'myLink_share', 'myLink_share_block');
 
 $myLinksHandler = new MyLinks();
-$ePortfolioLinkHandler = new ePortfolioLink();
+$ePortfolioLinkHandler = new Eportfolio_Link();
 
 $allLinks = $myLinksHandler->getAllByField('owner', $_SESSION['id']);
 
@@ -37,7 +37,7 @@ if (is_array($allLinks)) {
 		}
 
 		$this->parse('myLink_block', 'myLink', true);
-		
+
 		$this->setVar('myLink_exists_block', '');
 		$this->setVar('myLink_share_block', '');
 	}

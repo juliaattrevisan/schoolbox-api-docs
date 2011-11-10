@@ -5,7 +5,7 @@ $this->setBlock($componentHandle, 'link', 'link_block');
 $this->setBlock('link', 'modify_link', 'modify_link_block');
 
 $userHandler = new User();
-$linkHandler = new ePortfolioLink;
+$linkHandler = new Eportfolio_Link();
 $linkList = $linkHandler->getAllInUser($userID, $config);
 
 if (is_array($linkList)) {
@@ -57,4 +57,3 @@ else {
 	$this->setVar("submit_link_block", "");
 
 }
-?>

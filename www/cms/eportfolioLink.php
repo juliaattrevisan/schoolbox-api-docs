@@ -4,7 +4,7 @@ require_once '../library/eportfolio.php';
 require_once '../library/eportfolio-link.php';
 
 $eportfolioHandler = new ePortfolio($_SESSION['id']);
-$linkHandler = new ePortfolioLink;
+$linkHandler = new Eportfolio_Link();
 
 if (is_numeric($this->arg[0])) {
 
@@ -42,4 +42,3 @@ if (is_numeric($this->arg[0])) {
 else {
 	error(2);
 }
-?>
