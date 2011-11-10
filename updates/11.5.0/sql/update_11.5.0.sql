@@ -520,7 +520,10 @@ CREATE TABLE `timetable_cycle` (
   `length` int(11) unsigned NOT NULL,
   `regular` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
-);
+/* Alter table in target: Allows Default Homepage Column widths to be used */
+ALTER TABLE `homepageTemplate`
+	ADD COLUMN `left_column_width` float   NULL DEFAULT '69.9' after `layout`,
+	ADD COLUMN `right_column_width` float   NULL DEFAULT '29.9' after `left_column_width`;);
 
 CREATE TABLE `user_profile` (
   `user_id` int(11) NOT NULL,

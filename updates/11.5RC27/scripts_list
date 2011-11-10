@@ -13,10 +13,4 @@
 ######
 
 
-sql/update_11.5.0.sql
-php/add_dsn.php
-php/add_web_root.php
-php/updateColours.php
-php/welcomePageUpdate.php
-php/update-wiki.php
-php/update-news.php
+sql/fix_homepages.sql
