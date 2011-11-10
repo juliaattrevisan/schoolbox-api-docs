@@ -37,4 +37,3 @@ class ePortfolioTextBox extends DeprecatedModel {
 		parent::delete($record['textBoxID']);
 	}
 }
-?>

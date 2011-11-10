@@ -1,9 +1,5 @@
 <?php
-
-require_once '../library/eportfolio.php';
-require_once '../library/eportfolio-blog.php';
-
-$blogHandler = new ePortfolioBlog();
+$blogHandler = new Eportfolio_Blog_Item();
 
 $this->setFile(TEMPLATE_content, 'eportfolio_blog/modify.html');
 
@@ -19,12 +15,12 @@ if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 	$this->setBlock(TEMPLATE_content, 'delete', 'delete_block');
 
 	$this->setVar(array(
-		'ACTION'		=> 'Create',
+		'ACTION' => 'Create',
 		'ENTRY_HEADING' => '',
-		'ENTRY_BODY'    => '',
-		'UID'			=> $this->arg[1],
-		'ID'			=> '',
-		'delete_block'	=> ''
+		'ENTRY_BODY' => '',
+		'UID' => $this->arg[1],
+		'ID' => '',
+		'delete_block' => ''
 	));
 }
 else if (is_numeric($this->arg[0])) {
@@ -38,12 +34,11 @@ else if (is_numeric($this->arg[0])) {
     }
 
 	$this->setVar(array(
-		'ACTION'		=> 'Modify',
+		'ACTION' => 'Modify',
 		'ENTRY_HEADING' => Scrub::text($blog['heading']),
-		'ENTRY_BODY'    => Scrub::html($blog['body']),
-		'UID'			=> $blog['owner'],
-		'ID'			=> $this->arg[0],
+		'ENTRY_BODY' => Scrub::html($blog['body']),
+		'UID' => $blog['owner'],
+		'ID' => $this->arg[0],
 	));
 }
 
-?>

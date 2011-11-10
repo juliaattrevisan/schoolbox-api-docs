@@ -1,9 +1,8 @@
 <?php
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
-require_once '../../library/eportfolio-blog.php';
 
 $page = new SitePage();
-$blogHandler = new ePortfolioBlog();
+$blogHandler = new Eportfolio_Blog_Item();
 
 if (isset($_POST['delete'])) {
 	$eportfolioHandler = new ePortfolio($_POST['uid']);

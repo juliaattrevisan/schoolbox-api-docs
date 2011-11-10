@@ -1,6 +1,4 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio-link.php';
-
 $this->setBlock($componentHandle, 'link', 'link_block');
 $this->setBlock('link', 'modify_link', 'modify_link_block');
 

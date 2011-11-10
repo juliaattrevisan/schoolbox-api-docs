@@ -1,12 +1,8 @@
 <?php
-
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio-blog.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio-blog-comment.php';
-
-$blogHandle = new ePortfolioBlog();
+$blogHandle = new Eportfolio_Blog_Item();
 $blogHandle->config($config);
 
-$commentHandle = new ePortfolioBlogComment();
+$commentHandle = new Eportfolio_Blog_Comment();
 $commentHandle->config($config);
 
 $this->setBlock('config', 'comments_size', 'comments_size_block');
