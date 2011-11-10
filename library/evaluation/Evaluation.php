@@ -160,7 +160,7 @@ abstract class Evaluation extends DeprecatedModel {
                     'QUESTION_SEQUENCE' => $currentQuestion['questionSequence'],
                     'QUESTION_QUESTION' => $currentQuestion['question'],
                     'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
-                    'QUESTION_MARKS' => $currentQuestion['marks'],
+                    'QUESTION_MARKS' => floor($currentQuestion['marks']) < $currentQuestion['marks'] ? $currentQuestion['marks'] : floor($currentQuestion['marks']),
                 ));
 
                 $page->parse('question_block', 'question', true);

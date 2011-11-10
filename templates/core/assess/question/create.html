@@ -33,7 +33,7 @@ $j(document).ready(function() {
 	}
 
 
-if ($j('.question-type-select :selected').text() == 'Import Question') {
+	if ($j('.question-type-select :selected').text() == 'Import Question') {
 		$j('.xml-add').show();
 	}
 
@@ -66,6 +66,12 @@ if ($j('.question-type-select :selected').text() == 'Import Question') {
 		file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
         file_browser_category_id : 0
 	});
+
+	/* Enforce two decimal places
+	 */
+	$j('input[name=marks]').change(function() {
+		$j(this).val(parseFloat($j(this).val()).toFixed(2));
+	});
 });
 </script>
 
@@ -74,16 +80,16 @@ if ($j('.question-type-select :selected').text() == 'Import Question') {
 <div class="evaluation-content">
 	<h2>Question Details</h2>
 	<form id="createQuestionForm" action="/assess/question/create" class="clearfix" method="post">
-		
+
 		<p class="help">
 			Now that you've created a section for the test, use the drop down below to select a question type.
 		</p>
-		
+
 		<label class="hide">
 			<input name="section_id" type="hidden" value="{SECTION_ID}" />
 			<input name="sequence" type="hidden" value="{SEQUENCE}" />
 		</label>
-		
+
 		<label><strong>Type</strong>
 			<select name="type_id" id="type_id" class="question-type-select">
 				<option disabled {DISABLED_SELECTED} value='-1'>-- Select Type --</option>
@@ -96,7 +102,7 @@ if ($j('.question-type-select :selected').text() == 'Import Question') {
 
 		<label class="question-holder">Question
 			<div class="textarea-container" id="question_container">
-				<input name="question" class="mceSimple tinyValidate" id="question" type="text" size="35" value="{QUESTION}" />	
+				<input name="question" class="mceSimple tinyValidate" id="question" type="text" size="35" value="{QUESTION}" />
 			</div>
 		</label>
 
@@ -109,7 +115,7 @@ if ($j('.question-type-select :selected').text() == 'Import Question') {
 
 			<!-- END answerInputs -->
 		</div>
-		
+
 		<p class="clearfix">
 			<input type="submit" name="create" id="create" value="Add Question" class="submit-btn-plain"/>
 		</p>
@@ -121,7 +127,7 @@ if ($j('.question-type-select :selected').text() == 'Import Question') {
 		<label class="clearfix"><strong>File</strong>
 			<input name="importXML" type="file" class="prettify"/>
 		</label>
-		
+
 		<p class="clearfix">
 			<input type="submit" value="Import from XML file"  class="submit-btn-plain float-none no-marg"/>
 		</p>

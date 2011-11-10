@@ -26,6 +26,14 @@
 		file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
         file_browser_category_id : 0
 	});
+
+	$j(function() {
+		/* Enforce two decimal places
+		 */
+		$j('input[name=marks]').change(function() {
+			$j(this).val(parseFloat($j(this).val()).toFixed(2));
+		});
+	});
 </script>
 <!-- END custom_head -->
 	<h1>Modify Question</h1>
@@ -63,13 +71,13 @@
 			<input type="submit" name="create" id="create" value="Modify" class="submit-btn-plain"/>
 		</p>
 	</form>
-	
-	
+
+
 	<h2>Import into Question Bank</h2>
 
-	
+
 	<form action='/assess/questionbank/create' class='' method='post'>
-	
+
 	<p>
 		Puts this question into the Question Bank so you can import
 		them into other Online Assessments.
@@ -91,7 +99,7 @@
 		<p class="clearfix">
 			<input type='submit' class='submit-btn-plain' value='Add To Question Bank' />
 		</p>
-		
+
 	</form>
 	</div>
 	<div class="evaluation-menu">
