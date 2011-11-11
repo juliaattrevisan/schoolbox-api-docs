@@ -87,16 +87,18 @@ abstract class Evaluation extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
-    /**
-     * Loads the summary for the test
-     *
-     * @param <type> $assess_id
-     */
+	/**
+	 * Loads the summary for the test
+	 *
+	 * @param  $assess_id
+	 * @return array|bool
+	 */
     public function getIntroSummary($assess_id) {
         $query = "SELECT
                      assess_section.section_id,
                      assess_section.title,
                      assess_section.sequence,
+                     assess_section.pool,
                      COUNT(assess_section.section_id) AS numQuestions
                   FROM assess_section
                   LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
@@ -105,6 +107,7 @@ abstract class Evaluation extends DeprecatedModel {
 				  AND assess_question.deleted_at IS NULL
                   GROUP BY assess_section.section_id
                   ORDER BY assess_section.sequence";
+
 
         return $this->db->getAll($query);
     }

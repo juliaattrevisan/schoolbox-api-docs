@@ -104,8 +104,9 @@ $this->setVar(array(
 ));
 
 /* Load all the questions for this section.
+ * Note: only show the randomly-selected ones
  */
-$allQuestions = $sectionHandler->getContents($this->arg[0], $this->arg[1], AssessSection::SECTION_EXCLUDE);
+$allQuestions = $sectionHandler->getQuestions($_SESSION['attempt_id'], $section['section_id']);
 
 if ($allQuestions) {
     foreach($allQuestions as $currentQuestion) {

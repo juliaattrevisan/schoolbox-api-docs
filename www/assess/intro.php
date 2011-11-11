@@ -85,7 +85,7 @@ if (is_array($allSummary) && count($allSummary)) {
         $this->setVar(array(
             'SECTION_SEQUENCE' => $currentSummary['sequence'],
             'SECTION_TITLE' => $currentSummary['title'],
-            'SECTION_NUMQUESTIONS' => $currentSummary['numQuestions'],
+            'SECTION_NUMQUESTIONS' => $currentSummary['pool'] > 0 ? $currentSummary['pool'] : $currentSummary['numQuestions'],
         ));
 
         $this->parse('section_block', 'section', 'true');
