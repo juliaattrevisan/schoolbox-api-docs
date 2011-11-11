@@ -69,11 +69,23 @@ echo -e "Grabbing the v$new_ver core files update archive...\n";
 wget -q http://schoolbox.com.au/schoolboxinstaller/release_$new_ver.tgz -O $working_dir/release_$new_ver.tgz;
 errorCheck 1;
 }
-listVersions() {
-wget -q http://schoolbox.com.au/schoolboxinstaller/version_index
-errorCheck 1;
-cat $working_dir/version_index|cut -d ":" -f2
+
+checkOS() {
+if [[ `cat /etc/lsb-release|grep "DISTRIB_ID=Ubuntu"` ]]; then
+echo -e "Ubuntu Operating System Detected, Continuing...\n";
+codename=`cat /etc/lsb-release |grep DISTRIB_CODENAME|cut -d "=" -f2`;
+release=`cat /etc/lsb-release |grep DISTRIB_RELEASE|cut -d "=" -f2`;
+if [[ `cat /etc/lsb-release|egrep "oneiric|natty"` ]]; then
+echo -e "Found Ubuntu $release, codename '$codename'\n - Continuing...";
+else
+echo -e "Found Ubuntu $release, codename '$codename' ...\n This OS is Unfortunately not supported by this updater. \nPlease consider Upgrading.\n";
+fi;
+else
+echo -e "You are not running a supported Operating System to recieve Automatic Update\n";
+exit;
+fi;
 }
+
 loadConfig() {
 confloc=`echo -e "$schoolbox_dir/www/conf/conf.php"`;
 if [ -f $confloc ]; then
@@ -266,6 +278,8 @@ else
 echo -e "No errors found...\n";
 fi;
 }
+
+checkOS;
 dependancyChecks;
 loadConfig;
 isdir;
