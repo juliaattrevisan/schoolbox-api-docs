@@ -26,6 +26,7 @@ class Feed {
         $blog = $this->getBlog($cid, $limit);
         $blogComments = $this->getBlogComments($cid, $limit);
         $onlineAssessments = $this->getOnlineAssessments($cid, $limit);
+		$surveys = $this->getSurveys($cid, $limit);
 
 		is_array($files)?0:$files=array();
 		is_array($links)?0:$links=array();
@@ -36,9 +37,10 @@ class Feed {
         is_array($blog)?0:$blog=array();
         is_array($blogComments)?0:$blogComments=array();
         is_array($onlineAssessments)?0:$onlineAssessments=array();
+		is_array($surveys)?0:$surveys=array();
 
 		//get each of the areas
-		$feedList = array_merge($files, $links, $folders, $news, $wiki, $forum, $blog, $blogComments, $onlineAssessments);
+		$feedList = array_merge($files, $links, $folders, $news, $wiki, $forum, $blog, $blogComments, $onlineAssessments, $surveys);
 
 
 		//sort them
@@ -109,13 +111,14 @@ class Feed {
 		return $link;
 	}
 
-    /**
-     * Get a list of online assessments that were created.
-     *
-     * @param <type> $cid
-     * @param <type> $limit
-     */
-    function getOnlineAssessments($cid, $limit) {
+	/**
+	 * Get a list of online assessments that were created.
+	 *
+	 * @param  $cid
+	 * @param  $limit
+	 * @return
+	 */
+    public function getOnlineAssessments($cid, $limit) {
         $query = "SELECT
                       assess.assess_id, assess.title AS heading, assess.created_at,
                       user.title, user.firstname, user.lastname,
@@ -124,6 +127,7 @@ class Feed {
                   LEFT JOIN user ON assess.user_id = user.id
                   WHERE assess.category_id = '$cid'
                   AND assess.deleted_at IS NULL
+                  AND assess.availability = 'assess'
                   ORDER BY assess.created_at DESC LIMIT 0, $limit";
 
         $this->db->query($query);
@@ -141,6 +145,42 @@ class Feed {
 
         return $onlineAssessments;
     }
+
+	/**
+	 * Get a list of surveys that were created.
+	 *
+	 * @param  $cid
+	 * @param  $limit
+	 * @return
+	 */
+	public function getSurveys($cid, $limit) {
+		$query = "SELECT
+					  assess.assess_id, assess.title AS heading, assess.created_at,
+					  user.title, user.firstname, user.lastname,
+					  user.id AS uid
+				  FROM assess
+				  LEFT JOIN user ON assess.user_id = user.id
+				  WHERE assess.category_id = '$cid'
+				  AND assess.deleted_at IS NULL
+				  AND assess.availability = 'survey'
+				  ORDER BY assess.created_at DESC LIMIT 0, $limit";
+
+		$this->db->query($query);
+
+		$userHandler = new User();
+
+		while ($row = $this->db->getNextArray()) {
+			$surveys[] = array(
+				'date' => $row['created_at'],
+				'type' => 'survey',
+				'message' => $userHandler->formatName($row) . ' posted the survey ' . Scrub::text($row['heading']),
+				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">' . $userHandler->formatName($row) . '</a> posted the survey <a href="/survey/intro/' . $row['assess_id'] . '">' . Scrub::text($row['heading']) . '</a>',
+			);
+		}
+
+		return $surveys;
+	}
+
 
 	function getNews($cid, $limit) {
 		$query = "SELECT sn.id, heading, UNIX_TIMESTAMP(datetime_posted) submitted, u.firstname, u.lastname, u.title, u.id as uid
