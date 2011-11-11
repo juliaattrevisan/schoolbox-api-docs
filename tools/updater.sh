@@ -3,7 +3,7 @@ clear;
 ### Schoolbox Updater V1.0 by Damian Alexander
 ## Will only run 1 update from current version to next version (w/o any input, so can be looped until Version is current)
 # Basic Dependencies Check
-dependencies=( "php5" "mysql-server" "dos2unix" );
+dependencies=( "dos2unix" );
 ##### PHP MINIMUM REQUIREMENTS
 
 desired_major="5"; ### MAJOR Version, IE 5 in PHP V5.3
