@@ -2,7 +2,10 @@
 clear;
 ### Schoolbox Updater V1.0 by Damian Alexander
 ## Will only run 1 update from current version to next version (w/o any input, so can be looped until Version is current)
+# Basic Dependencies Check
+dependencies=( "php5" "mysql-server" "dos2unix" );
 ##### PHP MINIMUM REQUIREMENTS
+
 desired_major="5"; ### MAJOR Version, IE 5 in PHP V5.3
 desired_minor="3"; ### MINOR Version, IE 3 in PHP v5.3
 ## Designed for Schoolbox V11.0+
@@ -42,11 +45,26 @@ wget -q http://schoolbox.com.au/schoolboxinstaller/version_index -O $working_dir
 errorCheck 1;
 index="$working_dir/version_index";
 }
+depcheck () {
+packageName=$1;
+info=`dpkg -l $packageName`;
+if [[ `echo $info|grep "ii $packageName"` ]]; then
+echo -e "Server Package:$packageName is installed.";
+else
+echo -e "Server Package:$packageName is not installed.\n";
+echo -e "Attempting Installation of Package: $packageName.\n";
+apt-get install --force-yes -y $packageName >> /dev/null;
+errorCheck 1;
+fi;
+}
+dependancyChecks() {
+echo -e "Running Dependency Checks (Server Packages)...\n";
+for package in ${dependencies[*]}; do
+depcheck $package;
+done;
+}
 
 grabVersion() {
-#echo -e "Grabbing the v$new_ver database update file...\n";
-#wget -q http://schoolbox.com.au/schoolboxinstaller/update_$new_ver.sql -O $working_dir/update_$new_ver.sql
-#errorCheck 1;
 echo -e "Grabbing the v$new_ver core files update archive...\n";
 wget -q http://schoolbox.com.au/schoolboxinstaller/release_$new_ver.tgz -O $working_dir/release_$new_ver.tgz;
 errorCheck 1;
@@ -111,6 +129,12 @@ fi;
 echo -e "Determining if a new version is available...\n"
 new_ver_id=`expr $cur_ver_id + 1`;
 new_ver=`cat $index|grep "$new_ver_id:"|cut -d ":" -f2`;
+echo -e "Verifying Version Name...\n";
+echo $new_ver >> $working_dir/tmpversion;
+dos2unix $working_dir/tmpversion;
+errorCheck;
+new_ver=`cat -v $working_dir/tmpversion`;
+rm -Rf $working_dir/tmpversion;
 if [[ ${#new_ver} -gt 3 ]]; then
 if [[ ${#new_ver} -lt 12 ]]; then
 echo -e "... Update to v$new_ver Found! Continuing...\n";
@@ -242,6 +266,7 @@ else
 echo -e "No errors found...\n";
 fi;
 }
+dependancyChecks;
 loadConfig;
 isdir;
 compareVersions;
@@ -249,10 +274,6 @@ phpVersionCheck;
 grabVersion;
 backupInstall;
 updateFiles;
-##
-#Replaced updateDatabase with the Custom Scripts / SQL functions. (Include the file there)
-#updateDatabase;
-##
 restoreAfterBackup;
 runCustomScripts;
 confirmPermissions;
