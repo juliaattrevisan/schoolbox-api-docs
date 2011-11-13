@@ -5,42 +5,40 @@ clear;
 # Basic Dependencies Check
 dependencies=( "dos2unix" );
 ##### PHP MINIMUM REQUIREMENTS
-
 desired_major="5"; ### MAJOR Version, IE 5 in PHP V5.3
 desired_minor="3"; ### MINOR Version, IE 3 in PHP v5.3
 ## Designed for Schoolbox V11.0+
-echo -e "SCHOOLBOX UPDATER: V1.0\n\n\n\n\n";
+echo -e "Schoolbox Updater for Ubuntu 10.10 or Higher.\nRequires a minimum of Version 11.5.0 of Schoolbox\n\n\n";
 schoolbox_dir=`cd ../ && pwd`
 working_dir="/tmp/update_tmp";
-isdir() {
+workingDirectory() {
 if [ ! -d $working_dir ]; then
-echo -e "Creating Working Directory...\n";
+echo -e "Creating Working Directory:\n";
 sudo mkdir $working_dir;
 errorCheck 1;
 else
-if [[ $recursive == 1 ]]; then
-echo -e "Removing old Working Directory...\n";
+echo -e "Removing old Working Directory:\n";
 rm -Rf $working_dir;
 errorCheck 1;
-echo -e "Creating Working Directory...\n";
+echo -e "Creating Working Directory:\n";
 mkdir $working_dir;
 errorCheck 1;
-fi;
 fi;
 }
 errorCheck() {
 if [ $? -eq 0 ]; then
-		echo -e "... OK\n";
+		echo -e "... Success\n";
 	else
-		echo -e "... FAILED\n";
+		echo -e "... Failed\n";
 		
 		if [ ${#1} -eq 1 ]; then
+			echo -e "Critical Failure, Aborting update.\n";
 			exit;
 		fi;
 fi;
 }
 grabIndex() {
-echo -e "Grabbing Versions Index...\n";
+echo -e "Downloading Updated Version Index:\n";
 wget -q http://schoolbox.com.au/schoolboxinstaller/version_index -O $working_dir/version_index;
 errorCheck 1;
 index="$working_dir/version_index";
@@ -49,39 +47,39 @@ depcheck () {
 packageName=$1;
 info=`dpkg -l $packageName`;
 if [[ `echo $info|grep "ii $packageName"` ]]; then
-echo -e "Server Package:$packageName is installed.";
+echo -e "Server Package: $packageName is installed.\n";
 else
-echo -e "Server Package:$packageName is not installed.\n";
+echo -e "Server Package: $packageName is not installed.\n";
 echo -e "Attempting Installation of Package: $packageName.\n";
 apt-get install --force-yes -y $packageName >> /dev/null;
 errorCheck 1;
 fi;
 }
 dependancyChecks() {
-echo -e "Running Dependency Checks (Server Packages)...\n";
+echo -e "Running Dependency Checks for Server packages:\n";
 for package in ${dependencies[*]}; do
 depcheck $package;
 done;
 }
 
 grabVersion() {
-echo -e "Grabbing the v$new_ver core files update archive...\n";
+echo -e "Update Download: Downloading the Schoolbox v$new_ver update package, please wait.\n";
 wget -q http://schoolbox.com.au/schoolboxinstaller/release_$new_ver.tgz -O $working_dir/release_$new_ver.tgz;
 errorCheck 1;
 }
 
 checkOS() {
+echo -e "Operating System Detection:\n";
 if [[ `cat /etc/lsb-release|grep "DISTRIB_ID=Ubuntu"` ]]; then
-echo -e "Ubuntu Operating System Detected, Continuing...\n";
 codename=`cat /etc/lsb-release |grep DISTRIB_CODENAME|cut -d "=" -f2`;
 release=`cat /etc/lsb-release |grep DISTRIB_RELEASE|cut -d "=" -f2`;
-if [[ `cat /etc/lsb-release|egrep "oneiric|natty"` ]]; then
-echo -e "Found Ubuntu $release, codename '$codename'\n - Continuing...";
+if [[ `cat /etc/lsb-release|egrep "maverick|oneiric|natty"` ]]; then
+echo -e "Detected Ubuntu $release - $codename\n";
 else
-echo -e "Found Ubuntu $release, codename '$codename' ...\n This OS is Unfortunately not supported by this updater. \nPlease consider Upgrading.\n";
+echo -e "Found Ubuntu $release - $codename\nThis version is Unfortunately not supported by this updater.\nPlease contact support@schoolbox.com.au for assistance.\n";
 fi;
 else
-echo -e "You are not running a supported Operating System to recieve Automatic Update\n";
+echo -e "\nNo Supported Operating System Detected.\n";
 exit;
 fi;
 }
@@ -89,38 +87,40 @@ fi;
 loadConfig() {
 confloc=`echo -e "$schoolbox_dir/www/conf/conf.php"`;
 if [ -f $confloc ]; then
-	echo -e "Loading Schoolbox Configuration Specific to your Installation...\n";
+	echo -e "Loading Database configuration from the Schoolbox config File:\n";
         sqluser=`cat $confloc|grep \"SQL_user|grep -v //|cut -d "\"" -f4`;
         sqlpass=`cat $confloc|grep \"SQL_passwd|grep -v //|cut -d "\"" -f4`;
         sqldb=`cat $confloc|grep \"SQL_db|grep -v //|cut -d "\"" -f4`;
+	echo -e "... Success.\n";
 else
-echo -e "No Config File Found\n";
+echo -e "Unable to Locate Configuration file. \nThis is most likely due to the fact you are not running this Script from the /tools directory in Schoolbox.\n";
 exit;
 fi;
 }
 getCurrentVersion() {
-echo -e "Obtaining Current Version...\n";
+echo -e "Version Detection:\n";
+echo -e "Obtaining Current Version from Database:\n";
 cur_ver=`echo -e "SELECT value FROM config WHERE NAME = 'site_version'"|mysql -u $sqluser --password=$sqlpass $sqldb`;
 cur_ver=`echo $cur_ver|cut -d " " -f2`;
-echo -e "... $cur_ver\n";
+echo -e "Schoolbox v$cur_ver Detected.\n";
 }
 setNewVersion() {
-echo -e "Setting New Version to $new_ver...\n";
+echo -e "Setting New Version to v$new_ver.\n";
 `echo -e "UPDATE config SET value = '$new_ver' where name = 'site_version'"|mysql -u $sqluser --password=$sqlpass $sqldb`;
 errorCheck;
 }
 phpVersionCheck() {
-echo -e "Beginning PHP Version Check...\n";
+echo -e "Beginning PHP Version Check:\n";
 php_major=`php -v|grep built|cut -d "-" -f1|cut -d " " -f2|cut -d "." -f1` &> /dev/null;
 php_minor=`php -v|grep built|cut -d "-" -f1|cut -d " " -f2|cut -d "." -f2` &> /dev/null;
 desired_major=`expr $desired_major - 1`;
 desired_minor=`expr $desired_minor - 1`;
 if [[ $php_major -gt $desired_major && $php_minor -gt $desired_minor ]]; then
-echo -e "V$php_major.$php_minor is OK\n";
+echo -e "Success: PHP v$php_major.$php_minor Detected.\n";
 else
 desired_major=`expr $desired_major + 1`;
 desired_minor=`expr $desired_minor + 1`;
-echo -e "... Version Check Failed, v$php_major.$php_minor is NOT OK... Minimum is v$desired_major.$desired_minor\n";
+echo -e "Failed: PHP v$php_major.$php_minor Detected.\nMinimum is v$desired_major.$desired_minor.\n";
 cleanup;
 exit;
 fi;
@@ -129,19 +129,20 @@ fi;
 
 compareVersions() {
 cd $working_dir;
+echo -e "Processing Versions and Locating new Update:\n";
 grabIndex;
 getCurrentVersion;
 cur_ver_id=`cat $index|grep $cur_ver|cut -d ":" -f1`
 if [[ -z "$cur_ver_id" ]]; then
-echo -e "Your Version is $cur_ver and is not supported by this updater.\nPlease Contact support@schoolbox.com.au for further assistance\n";
+echo -e "Detected Version is $cur_ver and is not supported by this updater.\nPlease Contact support@schoolbox.com.au for further assistance.\n";
 exit;
 else
-echo -e "...$cur_ver is Supported! \nYour Identifier for this update is: $cur_ver_id\n";
+echo -e "Detected version, v$cur_ver is supported.\nYour identifier for this update is: $cur_ver_id.\n";
 fi;
-echo -e "Determining if a new version is available...\n"
+echo -e "Locating new Version (if available):\n"
 new_ver_id=`expr $cur_ver_id + 1`;
 new_ver=`cat $index|grep "$new_ver_id:"|cut -d ":" -f2`;
-echo -e "Verifying Version Name...\n";
+echo -e "Verifying new version name:\n";
 echo $new_ver >> $working_dir/tmpversion;
 dos2unix $working_dir/tmpversion;
 errorCheck;
@@ -149,91 +150,94 @@ new_ver=`cat -v $working_dir/tmpversion`;
 rm -Rf $working_dir/tmpversion;
 if [[ ${#new_ver} -gt 3 ]]; then
 if [[ ${#new_ver} -lt 12 ]]; then
-echo -e "... Update to v$new_ver Found! Continuing...\n";
+echo -e "New Update Found: Version v$new_ver.\n";
 else
-echo -e "Error with Target Version with id \"$new_ver_id\" - Version name is appearing as follows..\n";
-echo "$new_ver";
+echo -e "Error with target Version (ID:\"$new_ver_id\") (Version:\"$new_ver\").\n";
 exit;
 fi;
 else
-echo -e "Your Version is current($cur_ver) or you do not have any access to any new updates Exiting!\n";
+echo -e "Your Version is current or you do not have any access to any new updates.\n";
 exit;
 fi;
 }
 
 backupInstall() {
-echo -e "Moving Data Directory out of Installation Directory...\n";
+echo -e "Backup Prior to Update:\n";
+echo -e "Moving Data Directory out of Installation Directory:\n";
 mv $schoolbox_dir/data $schoolbox_dir/../data
 errorCheck;
-echo -e "Backing up Installation Directory...\n";
+echo -e "Backing up Installation Directory:\n";
 tar -cvzf /tmp/schoolbox.tgz $schoolbox_dir >> /dev/null;
 errorCheck;
-echo -e "Backing up Config File...\n";
+echo -e "Backing up Config File:\n";
 cp $schoolbox_dir/www/conf/conf.php /tmp/schoolbox_config.php >> /dev/null;
 errorCheck;
 
-echo -e "Backing up HTACCESS File...\n";
+echo -e "Backing up HTACCESS File:\n";
 cp $schoolbox_dir/www/.htaccess /tmp/htaccess.file >> /dev/null;
 errorCheck;
 
-echo -e "Backing up Database...\n";
+echo -e "Backing up Database:\n";
 mysqldump --user=$sqluser --password=$sqlpass $sqldb >> /tmp/$sqldb.sql
 errorCheck;
 }
 restoreAfterBackup() {
-echo -e "Restoring Data Directory...\n";
+echo -e "Restoring Data Directory:\n";
 mv $schoolbox_dir/../data $schoolbox_dir/;
 errorCheck;
-echo -e "Restoring Configuration File...\n";
+echo -e "Restoring Configuration File:\n";
 mv /tmp/schoolbox_config.php $schoolbox_dir/www/conf/conf.php;
 errorCheck;
-echo -e "Restoring HTACCESS File...\n";
+echo -e "Restoring HTACCESS File:\n";
 cp /tmp/htaccess.file $schoolbox_dir/www/.htaccess  >> /dev/null;
 errorCheck;
 
 }
 confirmPermissions() {
-echo -e "Ensuring Alaress is the Owner user on the Installation...\n";
+echo -e "Configuring Permissions:\n";
+echo -e "Installation Directory Owner set to Alaress:\n";
 chown -R alaress:alaress $schoolbox_dir;
 errorCheck;
-echo -e "Resetting all Permissions on install Directory...\n";
+echo -e "Permissions reset on install Directory:\n";
 chmod -R 775 $schoolbox_dir;
 errorCheck;
-echo -e "Granting Required Permissions to HTML Purifier...\n";
+echo -e "Granting Required Permissions to HTML Purifier:\n";
 chmod -R 777 $schoolbox_dir/include/HTMLPurifier;
 errorCheck;
-echo -e "Granting Required Permissions to Data Directory...\n";
+echo -e "Granting Required Permissions to Data Directory:\n";
 chmod -R 777 $schoolbox_dir/data;
 errorCheck;
-echo -e "Update to $new_ver Complete!\n";
+echo -e "Schoolbox v$new_ver Update Completed.\n";
 }
 updateDatabase() {
-echo -e "Updating Database...\n";
+echo -e "Updating Database:\n";
 mysql -f -u $sqluser --password=$sqlpass $sqldb < $working_dir/update_$new_ver.sql; >> /dev/null;
 errorCheck;
 }
 updateFiles(){
-echo -e "Removing Old Files...\n";
+echo -e "Updating Application Files:\n";
+echo -e "Removing Old Files:\n";
 rm -Rf $schoolbox_dir/*;
-errorCheck;
-echo -e "Extracting Files and Updating...\n";
+errorCheck 1;
+echo -e "Extracting and Updating Files:\n";
 tar --overwrite --overwrite-dir -xvzf $working_dir/release_$new_ver.tgz -C $schoolbox_dir >> /dev/null;
 errorCheck 1;
-echo -e "Removing Template Config File...\n";
+echo -e "Removing Template Config File:\n";
 rm -Rf $schoolbox_dir/www/conf/conf.php;
-errorCheck;
-echo -e "Removing Template HTACCESS File...\n";
+errorCheck 1;
+echo -e "Removing Template HTACCESS File:\n";
 rm -Rf $schoolbox_dir/www/.htacess;
-errorCheck;
-echo -e "Removing Template Data Directory...\n";
+errorCheck 1;
+echo -e "Removing Template Data Directory:\n";
 rm -Rf $schoolbox_dir/data;
-errorCheck;
+errorCheck 1;
 }
 runCustomScripts() {
+echo -e "Custom Script Processing:\n";
 if [ -d $schoolbox_dir/updates/$new_ver ]; then
 cd $schoolbox_dir/updates/$new_ver/;
 if [ -s ./scripts_list ]; then
-echo -e "Reading Script Processing List...\n";
+echo -e "Reading Script Processing List:\n";
 for script in `cat scripts_list`; do
 file=`echo $script`;
 if [[ `echo $file|grep -v "#"|grep .sh$` ]]; then
@@ -252,37 +256,39 @@ mysql -f -u $sqluser --password=$sqlpass $sqldb < ./$file  >> /dev/null &> /tmp/
 errorCheck;
 fi;
 done;
+echo -e "Custom Script Processing Complete.\n";
 else
-echo -e "No Scripts index found for $new_ver.. Ignoring any existing scripts...\n ";
+echo -e "No scripts processing list found for v$new_ver, Ignoring any scripts that exist.\n ";
 fi;
 else
-echo -e "No Custom Scripts Directory Found\n";
+echo -e "No custom script directory found.\n";
 fi;
-echo -e "Custom Scripts Queue Processing Complete...\n";
 }
 cleanup(){
+echo -e "Cleanup after update:\n";
 echo -e "Removing all temporary Files...\n";
 rm -Rf $working_dir;
 errorCheck;
-echo -e "Removing Minifier Cache...\n";
+echo -e "Removing Page Rendering Cache to avoid browser issues:\n";
 rm -Rf /tmp/minify*
 errorCheck;
 }
 isErrors() {
+echo -e "Error Detection Report:\n";
 if [ -s /tmp/update_$new_ver.errlog ]; then
-echo -e "There were errors found during the update,\nSee them in /tmp/update_$new_ver.errlog...\n";
-echo -e "Attempting to mail error Log to support@schoolbox.com.au for review...\n";
+echo -e "There were potential errors found during the update,\nLocated in: /tmp/update_$new_ver.errlog.\n";
+echo -e "Attempting to mail error Log to support@schoolbox.com.au for review:\n";
 mail -s "Schoolbox Update Error Log" support@schoolbox.com.au < /tmp/update_$new_ver.errlog;
 errorCheck;
 else
-echo -e "No errors found...\n";
+echo -e "No errors found.\n";
 fi;
 }
 
 checkOS;
 dependancyChecks;
 loadConfig;
-isdir;
+workingDirectory;
 compareVersions;
 phpVersionCheck;
 grabVersion;
