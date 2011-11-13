@@ -5,7 +5,7 @@
 //------------------------------------------------------
 
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/sitePage.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 
 class editDuties
 {
@@ -13,20 +13,22 @@ class editDuties
 	{
 		$this->category = $cat;
 		$this->service = 1;
-		$this->checkPerms();
+
 		$this->db = new DeprecatedDatabase();
 		$this->page = new SitePage();
+        $this->checkPerms();
 		if(!$currYear) { $this->currYear = date("Y"); } else { $this->currYear = $currYear; }
         if(!$currMonth) { $this->currMonth = date("n"); } else { $this->currMonth = $currMonth; }
         if(!$currDay) { $this->currDay = date("j"); } else { $this->currDay = $currDay; }
 	}
 
-        function checkPerms()
-        {
-                $this->perm = perm($this->category, $this->service);
-                if($this->perm < 2)
-                        error(14);
-        }
+    function checkPerms()
+    {
+        $groupHandler = new Group($this->service);
+        $this->perm = $groupHandler->getPermission($this->category);
+        if($this->perm < 2)
+                error(14);
+    }
 
 
 	function doOutput ($message)
@@ -42,9 +44,9 @@ class editDuties
 
 		$queryDate = date("Y-m-d", $currentDate);
 
-        		$this->page->setFile('/modules/duties/editDuties.html');
+        $this->page->setFile(TEMPLATE_content,'modules/duties/editDuties.html');
 		$this->page->setBlock(TEMPLATE_content, "duty_list", "d_block");
-
+        $this->page->setTitle('Edit Duties');
 
 		$this->page->setVar("WEEKBACK", "editDuties.php?category=".$this->category."&Year=".date("Y",$previousWeek).
                                 "&Month=".date("m",$previousWeek)."&Day=".date("d", $previousWeek));
@@ -68,7 +70,6 @@ class editDuties
 		$this->page->setVar("QDATE", $queryDate);
 		$this->page->setVar("GET", "?category=".$this->category."&Year=".date("Y",$currentDate).
                                 "&Month=".date("m",$currentDate)."&Day=".date("d", $currentDate) );
-		$this->page->setVar("TITLE", HEADING." - Duty Editor");
 		$this->page->setVar("CID", $this->category );
 		while($row = $this->db->dbGetNextArray())
 		{
@@ -87,7 +88,7 @@ class editDuties
 		{
 			$this->page->setVar("d_block", '');
 		}
-		$this->t_body->pparse("finaloutput", "tplBODY");
+		$this->page->outputPage();
 	}
 
 	function doUpdate()
