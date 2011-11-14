@@ -3,12 +3,12 @@
 class Calendar extends DeprecatedModel {
 
 	function Calendar () {
-	
+
 		$this->_table = "event";
 		$this->_index = "id";
-		
+
 		$this->groupHandler = new Group(CALENDAR_SERVICE);
-		
+
 		parent::DeprecatedModel();
 	}
 
@@ -22,33 +22,33 @@ class Calendar extends DeprecatedModel {
 			}
 		}
 		return $this->colourSet[$id];
-		
+
 	}
 
 
 	function getPerm($eventID) {
-		
+
 		if (is_array($eventID))
 			$event =& $eventID;
 		else
 			$event = $this->getByID($eventID);
-	
+
 		if ($_SESSION['su'])
 			return 3;
-	
+
 		switch ($event['access']) {
-		
+
 			case 1: // personal
 				return $event['owner'] == $_SESSION['id'] ? 2 : 0;
-				
+
 			case 2: // single group
 				$this->groupHandler->setService(HOMEPAGE_SERVICE);
 				$permission = $this->groupHandler->getPermission($event['sid']);
 				$this->groupHandler->setService(CALENDAR_SERVICE);
 				return $permission;
-				
+
 			case 3: // campus
-				
+
 				if (is_array($event['campusList']))
 					$campusList = $event['campusList'];
 				else
@@ -65,7 +65,7 @@ class Calendar extends DeprecatedModel {
 				}
 
 				return $output;
-				
+
 			default:
 				return 0;
 		}
@@ -80,7 +80,7 @@ class Calendar extends DeprecatedModel {
 		$query = "SELECT id, name FROM luCampus";
 		if (!$_SESSION['su']) {
 			$query .=", userAccess WHERE (luCampus.id = userAccess.sid OR userAccess.sid = 0) AND
-				userAccess.service = '2' AND uid = ".$_SESSION['id']." AND type > $type";   
+				userAccess.service = '2' AND uid = ".$_SESSION['id']." AND type > $type";
 		}
 		$campusList = $this->db->getAll($query);
 		if (is_array($campusList)) {
@@ -91,8 +91,8 @@ class Calendar extends DeprecatedModel {
 			}
 		}
 		return $output;
-	}  
- 
+	}
+
 
 	function getGroupList() {
 		$query = "SELECT * FROM groups";
@@ -104,7 +104,7 @@ class Calendar extends DeprecatedModel {
 				$output[] = $data;
 			}
 		}
-		return $output;		
+		return $output;
 	}
 
 	function getByID($eventID) {
@@ -115,7 +115,7 @@ class Calendar extends DeprecatedModel {
 				  WHERE " . $this->_index . " = $eventID";
 		return $this->db->getRow($query);
 	}
-	
+
 	function getAllInCategory($categoryID, $config = false) {
 
 		//event limit changed from posts to days
@@ -123,7 +123,7 @@ class Calendar extends DeprecatedModel {
 				$where = " AND date < ADDDATE(CURDATE(), INTERVAL {$config['size']} DAY) ";
 		else
 				$where = "";
-	
+
 		$query = "SELECT event.id, DATE_FORMAT(date, '%a %D %b') as outputDate,
 						DATE_FORMAT(date, '%Y') as year, DATE_FORMAT(date, '%c') as month, DATE_FORMAT(date, '%e') as day,
 						TIME_FORMAT(startTime, '".Cfg::get('calendar_time_format')."') as startTimeString,
@@ -135,20 +135,26 @@ class Calendar extends DeprecatedModel {
 				  LEFT JOIN user ON owner = user.id
 				  LEFT JOIN luEventType ON type = eventTypeID
 				  WHERE access = '2' AND sid = '".$categoryID."' AND( date >= CURRENT_DATE() $where) ORDER BY date, startTime";
-		
+
 		return $this->db->getAll($query);
 	}
 
-	function getSubmissionEvents($currentDay) {
-	
+	/**
+	 * Get all the submission events for the specified day
+	 *
+	 * @param  $currentDay
+	 * @return array|bool
+	 */
+	public function getSubmissionEvents($currentDay) {
+
 		//get a list of all the possible submission box categories
 		$this->groupHandler->setService(HOMEPAGE_SERVICE);
 		$catList = $this->groupHandler->involvedInCategoryList($_SESSION['id']);
 		$this->groupHandler->setService(CALENDAR_SERVICE);
-		
-		if(is_array($catList)) {
+
+		if (is_array($catList)) {
 			foreach($catList as $cat) {
-					$catQuery[] = $cat['id'];
+				$catQuery[] = $cat['id'];
 			}
 
 			$query = "SELECT DISTINCT category.name AS category, GROUP_CONCAT(co.code) AS synergyCode, submission_box.name, submission_box.description,
@@ -161,13 +167,24 @@ class Calendar extends DeprecatedModel {
                       LEFT JOIN student_submission ON submission_box.id = student_submission.box_id AND student_submission.owner = {$_SESSION['id']}
                       LEFT JOIN `file` f ON f.id = submission_box.fid
                       LEFT JOIN categoryCode co ON co.categoryID = category.id
-                      LEFT JOIN user ON user.id = submission_box.owner
-                      WHERE category.id = submission_box.category
-                        AND submission_box.category IN (".implode(',', $catQuery).")
-                        AND submission_box.deleted = 0
-                        AND	DATE(submission_box.date) = DATE(FROM_UNIXTIME('$currentDay'))
-                      GROUP BY submission_box.id, category.id
-                      ORDER BY submission_box.date";
+                      LEFT JOIN user ON user.id = submission_box.owner ";
+
+			/* If you aren't part of any categories, don't try to
+			 * do a whereIn
+			 */
+			if (count($catQuery)) {
+            	$query .= "WHERE category.id = submission_box.category
+							AND submission_box.category IN (".implode(',', $catQuery).")
+							AND submission_box.deleted = 0
+							AND	DATE(submission_box.date) = DATE(FROM_UNIXTIME('$currentDay'))
+							GROUP BY submission_box.id, category.id
+							ORDER BY submission_box.date";
+			}
+			else {
+				$query .= "WHERE DATE(submission_box.date) = DATE(FROM_UNIXTIME('$currentDay'))
+							GROUP BY submission_box.id
+							ORDER BY submission_box.date";
+			}
 
 			$submissions = $this->db->getAll($query);
 
@@ -229,7 +246,11 @@ class Calendar extends DeprecatedModel {
                 $groupList[] = $temp['id'];
             }
 
-            $groupQuery = "OR (access = '2' AND sid IN (".implode(',', $groupList)."))";
+			/* If there are no groups prevent sql error
+			 */
+			if (count($groupList)) {
+            	$groupQuery = "OR (access = '2' AND sid IN (".implode(',', $groupList)."))";
+			}
         }
 
         $this->groupHandler->setService(CALENDAR_SERVICE);
@@ -297,7 +318,7 @@ class Calendar extends DeprecatedModel {
                 }
 		else {
 			$campusList = array(1);
-                
+
                         $campusQuery = '1 = 1';
                 }
 
@@ -310,10 +331,15 @@ class Calendar extends DeprecatedModel {
 			foreach ($tempList as $temp) {
 				$groupList[] = $temp['id'];
 			}
-			$groupQuery = "OR (access = '2' AND sid IN (".implode(',', $groupList)."))";
+
+			/* If there are no groups prevent sql error
+			 */
+			if (count($groupList)) {
+				$groupQuery = "OR (access = '2' AND sid IN (".implode(',', $groupList)."))";
+			}
 		}
 		$this->groupHandler->setService(CALENDAR_SERVICE);
-		
+
 		//give people with userAccess to moderate Calendar Access to view all Camups Posts
 		if(is_array($_SESSION['campus'])) {
 			if($this->groupHandler->getPermission($_SESSION['campus'][0]) > WRITE_ACCESS)
@@ -322,7 +348,7 @@ class Calendar extends DeprecatedModel {
 				$groupChunk = "AND eventGroup.groupID = {$_SESSION['gid']}";
 			}
 		}
-			
+
 		//get single events for the day
 		$query = "SELECT DISTINCT event.id, owner,
                             GROUP_CONCAT(DISTINCT eventCampus.campusID) as campusList,
@@ -345,46 +371,46 @@ class Calendar extends DeprecatedModel {
 								)
 						GROUP BY id
 						ORDER BY event.startTime, event.endTime";
-		
-		return $this->db->getAll($query);	
 
-	}	
-	
+		return $this->db->getAll($query);
+
+	}
+
 	function getDayByGroup($currentDay, $groupList, $campusList) {
-		
+
 		$query = "SELECT DISTINCT id, owner,
 							TIME_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') as startTime,
 							TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTime,
 							type, note, location, detail, access, eventCampus.campusID as sid
-						FROM event 
+						FROM event
 						LEFT JOIN eventCampus ON event.id = eventCampus.eventID
 						LEFT JOIN eventGroup ON event.id = eventGroup.eventID
 						WHERE date = '" . date("Y-m-d", $currentDay) . "'
-							AND (    
+							AND (
 								  (access = '3' AND eventCampus.campusID IN(" . implode(',', $campusList) . ") AND eventGroup.groupID IN(" . implode(',', $groupList) . ") )
 								)
 						GROUP BY id
 						ORDER BY event.startTime, event.endTime";
-		
-		return $this->db->getAll($query);		
-	}	
+
+		return $this->db->getAll($query);
+	}
 
 	function getStudentBirthdays($currentDay) {
-	
-		require_once '../library/mssql.php';	
+
+		require_once '../library/mssql.php';
 		$db = new MSSQL;
-		
+
 		$query = "SELECT  vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname,
 						vStudents.StudentBirthDate, vStudents.StudentCampus, datediff(year,studentbirthdate,getdate()) as age,
 						vStudents.StudentFormDescription, convert(varchar,studentbirthdate,106)  as 'la'
 						FROM SynergyOne.dbo.vStudents vStudents
-						WHERE 
-						vStudents.FileSemester=".$_SESSION['FileSemester']." 
-						AND vStudents.FileYear=".$_SESSION[ 'FileYear']." 
+						WHERE
+						vStudents.FileSemester=".$_SESSION['FileSemester']."
+						AND vStudents.FileYear=".$_SESSION[ 'FileYear']."
 						AND day(studentbirthdate) = ". date("j", $currentDay) ."
 						AND month(studentbirthdate) =". date("n", $currentDay) ."
 						AND StudentCampus = 'G'";
-	
+
 		$birthdayList = $db->getAll($query);
 		if (is_array($birthdayList)) {
 			$i = 0;
@@ -393,10 +419,10 @@ class Calendar extends DeprecatedModel {
 				$output[$i]['form'] = $birthday['StudentFormDescription'];
 				$output[$i]['age'] 	= $birthday['age'];
 				$output[$i]['birthdate'] = $birthday['la'];
-				$i++;		
+				$i++;
 			}
 		}
-		
+
 		return $output;
 	}
 
@@ -445,9 +471,9 @@ class Calendar extends DeprecatedModel {
 									);
 				$this->db->insert('eventGroup', $eventGroup);
 			}
-		}	
+		}
 	}
-	
+
 	function createCampus($campusList, $eventID) {
 		if (is_array($campusList)) {
 			foreach ($campusList as $campusID) {
@@ -456,36 +482,36 @@ class Calendar extends DeprecatedModel {
 									);
 				$this->db->insert('eventCampus', $eventCampus);
 			}
-		}	
+		}
 	}
-	
+
 	function delPerms($eventID) {
 		$this->db->delete('eventGroup', 'eventID', $eventID);
 		$this->db->delete('eventCampus', 'eventID', $eventID);
 	}
-	
+
 
 	function create($event) {
-		
+
 		if($this->getPerm($event) < WRITE_ACCESS)
 			error(35);
 
 		$groupList = $event['groupList'];
 		$campusList = $event['campusList'];
-		
+
 		unset($event['groupList']);
 		unset($event['campusList']);
 
-		$eventID = parent::create($event);	
-		
+		$eventID = parent::create($event);
+
 		$this->createGroups($groupList, $eventID);
 		$this->createCampus($campusList, $eventID);
-				
+
 		return $eventID;
 	}
-	
+
 	function update($event) {
-		
+
 		if($this->getPerm($event['id']) < WRITE_ACCESS)
 			error(34);
 
@@ -494,17 +520,17 @@ class Calendar extends DeprecatedModel {
 
 		unset($event['groupList']);
 		unset($event['campusList']);
-		
-		parent::update($event);	
-		
+
+		parent::update($event);
+
 		$this->delPerms($event['id']);
-		
+
 		$this->createGroups($groupList, $event['id']);
-		$this->createCampus($campusList, $event['id']);		
-				
-		return $eventID;	
+		$this->createCampus($campusList, $event['id']);
+
+		return $eventID;
 	}
-	
+
 	function delete ($eventID) {
 		$event = $this->getByID($eventID);
 
