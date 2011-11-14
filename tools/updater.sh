@@ -74,9 +74,10 @@ if [[ `cat /etc/lsb-release|grep "DISTRIB_ID=Ubuntu"` ]]; then
 codename=`cat /etc/lsb-release |grep DISTRIB_CODENAME|cut -d "=" -f2`;
 release=`cat /etc/lsb-release |grep DISTRIB_RELEASE|cut -d "=" -f2`;
 if [[ `cat /etc/lsb-release|egrep "maverick|oneiric|natty"` ]]; then
-echo -e "Detected Ubuntu $release - $codename\n";
+echo -e "Detected Ubuntu $release - '$codename'\n";
 else
-echo -e "Found Ubuntu $release - $codename\nThis version is Unfortunately not supported by this updater.\nPlease contact support@schoolbox.com.au for assistance.\n";
+echo -e "Found Ubuntu $release - '$codename'\nThis version is Unfortunately not supported by this updater.\nPlease contact support@schoolbox.com.au for assistance.\n";
+exit;
 fi;
 else
 echo -e "\nNo Supported Operating System Detected.\n";
