@@ -20,3 +20,4 @@ php/updateColours.php
 php/welcomePageUpdate.php
 php/update-wiki.php
 php/update-news.php
+sql/component_visibility_set.sql
