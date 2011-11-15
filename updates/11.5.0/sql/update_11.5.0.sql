@@ -426,7 +426,7 @@ INSERT IGNORE INTO assess_question_category (question_category_id,NAME,availabil
  TRUNCATE `assess_luQuestionType`;
 ALTER TABLE `assess_luQuestionType` DROP `template_dir`;
 INSERT INTO `assess_luQuestionType`(`type_id`,`filename`,`description`,`moodle`,`automated_marking`,`availability`,`has_legend`) VALUES
-(1,'short','Short Answer','shortanswer','false','survey','false'),
+(1,'short','Short Answer','shortanswer','false','all','false'),
 (2,'multi','Multiple Choice','multichoice','true','all','true'),
 (3,'fillgap','Cloze Exercise','cloze','true','assess','true'),
 (4,'match','Matching Pairs','matching','true','assess','true'),
