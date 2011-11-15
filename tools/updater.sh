@@ -165,7 +165,7 @@ fi;
 backupInstall() {
 echo -e "Backup Prior to Update:\n";
 echo -e "Moving Data Directory out of Installation Directory:\n";
-mv $schoolbox_dir/data $schoolbox_dir/../data
+mv $schoolbox_dir/data $schoolbox_dir/../data_$dbname
 errorCheck 1;
 echo -e "Backing up Installation Directory:\n";
 tar -cvzf /tmp/schoolbox_$sqldb$cur_ver.tgz $schoolbox_dir >> /dev/null;
@@ -184,7 +184,7 @@ errorCheck;
 }
 restoreAfterBackup() {
 echo -e "Restoring Data Directory:\n";
-mv $schoolbox_dir/../data $schoolbox_dir/;
+mv $schoolbox_dir/../data_$dbname $schoolbox_dir/data;
 errorCheck;
 echo -e "Restoring Configuration File:\n";
 mv /tmp/schoolbox_config.php $schoolbox_dir/www/conf/conf.php;
@@ -242,18 +242,18 @@ echo -e "Reading Script Processing List:\n";
 for script in `cat scripts_list`; do
 file=`echo $script`;
 if [[ `echo $file|grep -v "#"|grep .sh$` ]]; then
-echo -e "Running Shell Script: $file\n" &> /tmp/update_$new_ver.errlog;
+echo -e "Running Shell Script: $file\n" &> /tmp/update_$dbname$new_ver.errlog;
 ./$file >> /dev/null;
 errorCheck;
 fi;
 if [[ `echo $file|grep -v "#"|grep .php$` ]]; then
 echo -e "Running PHP Script: $file\n";
-php -f ./$file >> /dev/null &> /tmp/update_$new_ver.errlog;
+php -f ./$file >> /dev/null &> /tmp/update_$dbname$new_ver.errlog;
 errorCheck;
 fi;
 if [[ `echo $file|grep -v "#"|grep .sql$` ]]; then
 echo -e "Running SQL Script: $file\n";
-mysql -f -u $sqluser --password=$sqlpass $sqldb < ./$file  >> /dev/null &> /tmp/update_$new_ver.errlog;
+mysql -f -u $sqluser --password=$sqlpass $sqldb < ./$file  >> /dev/null &> /tmp/update_$dbname$new_ver.errlog;
 errorCheck;
 fi;
 done;
@@ -276,10 +276,10 @@ errorCheck;
 }
 isErrors() {
 echo -e "Error Detection Report:\n";
-if [ -s /tmp/update_$new_ver.errlog ]; then
-echo -e "There were potential errors found during the update,\nLocated in: /tmp/update_$new_ver.errlog.\n";
+if [ -s /tmp/update_$dbname$new_ver.errlog ]; then
+echo -e "There were potential errors found during the update,\nLocated in: /tmp/update_$dbname$new_ver.errlog.\n";
 echo -e "Attempting to mail error Log to support@schoolbox.com.au for review:\n";
-mail -s "Schoolbox Update Error Log" support@schoolbox.com.au < /tmp/update_$new_ver.errlog;
+mail -s "Schoolbox Update Error Log" support@schoolbox.com.au < /tmp/update_$dbname$new_ver.errlog;
 errorCheck;
 else
 echo -e "No errors found.\n";
