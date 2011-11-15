@@ -438,7 +438,6 @@ INSERT INTO `assess_luQuestionType`(`type_id`,`filename`,`description`,`moodle`,
 (10,'yesno','Yes/No',NULL,'false','survey','true'),
 (11,'truefalse','True/False',NULL,'false','survey','true');
 
-
 /* Add multiple flag for component definitions */
 ALTER TABLE `component_definition` ADD COLUMN `multiple` ENUM('false','true') NULL AFTER `visible` ;
 
