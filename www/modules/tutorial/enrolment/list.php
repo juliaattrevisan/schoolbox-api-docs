@@ -80,7 +80,7 @@ if (is_numeric($_GET['eventID'])) {
 			if (is_array($attendanceList)) {
 				$page->setVar('attendance_list_block', '');
 
-				$attendanceDate = new Alaress_Date_Format($attendance['date']);
+				$attendanceDate = new Alaress_Date_Format($attendance['date'], 'U');
 
 				foreach ($attendanceList as $attendance) {
 					$output = array(

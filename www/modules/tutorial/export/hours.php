@@ -16,10 +16,10 @@ $groupHandler = new Group(TUTORIAL_SERVICE);
 if ($groupHandler->getPermission(0) < FULL_ACCESS)
 	error(19);
 
-$dateObj = new Alaress_Date_Format($_GET['from']);
+$dateObj = new Alaress_Date_Format($_GET['from'], 'd/m/y');
 $from = $dateObj->getUnixTimestamp();
 
-$toObj = new Alaress_Date_Format($_GET['to']);
+$toObj = new Alaress_Date_Format($_GET['to'], 'd/m/y');
 $to = $toObj->getUnixTimestamp();
 
 $line = "PortalID,SynergyID,Title,Firstname,Surname,Email,Marked,Tutorial,Code,Type,Tutorial Date,Start Time,Finish Time,Students Enrolled,Student Attended,Hours,Processed\n";
@@ -73,8 +73,8 @@ if (is_array($tutorList)) {
 	}
 }
 
-$fromDate = new Alaress_Date_Format($from);
-$toDate = new Alaress_Date_Format($to);
+$fromDate = new Alaress_Date_Format($from, 'U');
+$toDate = new Alaress_Date_Format($to, 'U');
 
 header('Content-type: text/csv');
 header('Content-Disposition: inline; filename="hours-performed-'. $fromDate->getLocalShort() .'-'. $toDate->getLocalShort() .'.csv"');

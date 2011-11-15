@@ -21,10 +21,10 @@ if ($groupHandler->getPermission(0) < FULL_ACCESS)
 if (!isset($_GET['to']))
 	$_GET['to'] = date("d/m/Y");
 
-$fromObj = new Alaress_Date_Format($_GET['from']);
+$fromObj = new Alaress_Date_Format($_GET['from'], 'd/m/y');
 $from = $fromObj->getUnixTimestamp();
 
-$toObj = new Alaress_Date_Format($_GET['to']);
+$toObj = new Alaress_Date_Format($_GET['to'], 'd/m/y');
 $to = $toObj->getUnixTimestamp();
 
 $eventHandler = new Event;

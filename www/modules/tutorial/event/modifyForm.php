@@ -73,7 +73,7 @@ if (isset($_POST['typeID'])) {
 		if (empty($_POST['date']))
 			error(2);
 
-		$dateObj = new Alaress_Date_Format($_POST['date']);
+		$dateObj = new Alaress_Date_Format($_POST['date'], 'd/m/y');
 		$date = $dateObj->getUnixTimestamp();
 
 		if(is_numeric($_POST['eventID'])) {
@@ -97,7 +97,7 @@ if (isset($_POST['typeID'])) {
 			/* add new event */
 			$dateArray = array();
 
-			$untilObj = new Alaress_Date_Format($_POST['repeat_until']);
+			$untilObj = new Alaress_Date_Format($_POST['repeat_until'], 'd/m/y');
 			$until = $untilObj->getUnixTimestamp();
 
 			$validRepeat = array('weekly' => '+1 week', 'fortnightly' => '+2 weeks', 'monthly' => '+1 month');

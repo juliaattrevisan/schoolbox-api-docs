@@ -60,9 +60,9 @@ if (is_numeric($_GET['eventID'])) {
 	list($tohour, $tominute) = explode(":", $event['finish']);
 	list($tominute, $toperiod) = explode(" ", $tominute);
 
-	$date = new Alaress_Date_Format($event['date']);
-	$startDate = new Alaress_Date_Format($sequence['start_date']);
-	$endDate = new Alaress_Date_Format($sequence['end_date']);
+	$date = new Alaress_Date_Format($event['date'], 'U');
+	$startDate = new Alaress_Date_Format($sequence['start_date'], 'U');
+	$endDate = new Alaress_Date_Format($sequence['end_date'], 'U');
 
 	$output = array('ACTION'		=> 'Modify',
 					'ACTION_TYPE'	=> isset($_GET['sequence']) ? 'sequence' : 'single',

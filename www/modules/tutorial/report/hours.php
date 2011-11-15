@@ -45,10 +45,10 @@ if (is_array($_POST['processed'])) {
 		$_GET['filter'] = 'unprocessed';
 
 
-	$fromObj = new Alaress_Date_Format($_GET['from']);
+	$fromObj = new Alaress_Date_Format($_GET['from'], 'd/m/y');
 	$from = $fromObj->getUnixTimestamp();
 
-	$toObj = new Alaress_Date_Format($_GET['to']);
+	$toObj = new Alaress_Date_Format($_GET['to'], 'd/m/y');
 	$to = $toObj->getUnixTimestamp();
 
 	$output = array('FROM'		=> $fromObj->getLocalShort(),

@@ -62,7 +62,7 @@ $page->setVar($output);
 
 if (is_array($eventList)) {
 	foreach ($eventList as $event) {
-		$date = new Alaress_Date_Format($event['date']);
+		$date = new Alaress_Date_Format($event['date'], 'U');
 
 		$output = array('EVENT_ID'	=> $event['eventID'],
 						'DATE'		=> $date->getDateOnly(),

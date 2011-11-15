@@ -22,7 +22,7 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface {
 	 *
 	 * @param  $dateTime
 	 */
-	public function __construct($dateTime = null, $dateFormat = null) {
+	public function __construct($dateTime = null, $dateFormat) {
 		$strategy = new Alaress_Date_Strategy_V52($dateTime, $dateFormat);
 		$strategy->setLocale(new Alaress_Date_Locale_Australian());
 
