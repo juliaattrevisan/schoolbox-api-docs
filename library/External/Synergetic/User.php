@@ -160,7 +160,10 @@ class External_Synergetic_User implements External_UserInterface {
                           FROM
                                 SynergyOne.dbo.vStudentContactAllAddress
                           WHERE
-                                StudentID = $synID";
+                                StudentID = $synID
+                                AND (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
+                                AND FileSemester = " . $_SESSION['FileSemester'] . "
+                                AND FileYear = " . $_SESSION[ 'FileYear'] ;
 
 		return $this->getDatabase()->getAll($query);
 	}
