@@ -1,6 +1,6 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-links.php';
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio-link.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/Eportfolio/Link.php');
 
 $this->setFile(TEMPLATE_content, 'cms/myLinks.html');
 $this->setBlock(TEMPLATE_content, 'myLink', 'myLink_block');
