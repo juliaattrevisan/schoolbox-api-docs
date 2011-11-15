@@ -129,14 +129,31 @@ class Wiki extends DeprecatedModel
 		return $this->db->insertID();
 	}
 
+    protected function makeUnique($slug) {
+        $query = "SELECT slug FROM `" . $this->_table. "` WHERE slug LIKE ".$this->db->smartQuote($slug . '%')." ORDER BY slug DESC LIMIT 1";
+
+        $row = $this->db->getOne($query);
+        if (!$row) {
+            return $slug;
+        }
+
+        if (preg_match('/(\d+)$/', $row, $matches)) {
+            return $slug .'-'. ($matches[1] + 1);
+        }
+
+        return $slug . '-1';
+    }
+
 	/**
 	 * Creates a wiki page and assigns latest revision
 	 *
 	 * @param  $data
 	 * @return int
 	 */
-	public function create($data) {
+	public function create(&$data) {
 		$data['created'] = 'NOW()';
+
+        $data['slug'] = $this->makeUnique($data['slug']);
 
 		$revision = array(
 			'heading' => $data['heading'],
