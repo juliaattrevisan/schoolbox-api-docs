@@ -14,6 +14,12 @@ $this->setTitle('Weather Forecast');
 
 $this->setBlock(TEMPLATE_content, "current", "current_block");
 $this->setBlock(TEMPLATE_content, "forecast", "forecast_block");
+$this->setBlock(TEMPLATE_content, "weather_unavailable", "weather_unavailable_block");
+
+$this->setVar("current_block", "");
+$this->setVar("forecast_block", "");
+$this->setVar("weather_unavailable_block", "");
+
 
 $imageLocation = '/weather/image.php?path=';
 
@@ -39,12 +45,11 @@ for($i = 0; $i < 4; $i++) {
 }
 
 //dont display blocks if they dont have any data
-if($weather->weather != null) {
+if($weather->weather->forecast_conditions) {
     $this->parse("current_block", "current");
     $this->parse("forecast_block", "forecast");
 } else {
-    $this->setVar("current_block", "");
-    $this->setVar("forecast_block", "");
+    $this->parse("weather_unavailable_block", "weather_unavailable");
 }
 
 //ouput drop down box of available locations

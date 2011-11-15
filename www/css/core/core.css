@@ -5611,7 +5611,7 @@ li.bars {
 .information-notification {
 	color: #fff;
 	padding: 2px 8px 2px 28px;
-	background: #e8f5ff url(/images/famicons/information.png) 8px 4px no-repeat;
+	background: #e8f5ff url(/images/famicons/information.png) 8px 2px no-repeat;
 	line-height: 16px;
 	margin-bottom: 8px;
 	-moz-border-radius: 4px;
