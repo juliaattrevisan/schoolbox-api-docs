@@ -38,6 +38,7 @@ if (is_numeric($this->arg[0])) {
 			'FROM_ID'          => $from['revisionID'],
 			'TO_ID'            => $to['revisionID'],
 			'HEADING'          => Scrub::text($from['heading']),
+            'SLUG'             => Scrub::text($from['slug']),
 			'DIFF'             => $renderer->render($diff),
 			'MODIFIED'         => $modifiedDate->getLong(),
 			'AUTHOR'           => $userHandler->formatName($from),
