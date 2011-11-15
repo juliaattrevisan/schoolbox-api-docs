@@ -64,12 +64,14 @@ class Component_Dashboard_WeatherController extends Component_Dashboard_Controll
             ));
         }
 
+		$forecastDate = new Alaress_Date_Format($this->weather->weather->forecast_information->forecast_date['data'], 'y-m-d');
+
         $this->setvar(array(
             'WEATHER_ICON' => $imageLocation . $this->weather->weather->current_conditions->icon['data'],
             'TEMP' => $this->weather->weather->current_conditions->temp_c['data'],
             'WIND' => substr($this->weather->weather->current_conditions->wind_condition['data'], 6),
             'HUMIDITY' => substr($this->weather->weather->current_conditions->humidity['data'], 10),
-            'ISSUED' => date("g:i a", strtotime($this->weather->weather->forecast_information->current_date_time['data']))
+            'ISSUED' => $forecastDate->getDateOnly(),
         ));
     }
 

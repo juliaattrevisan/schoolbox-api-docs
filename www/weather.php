@@ -20,16 +20,17 @@ $this->setVar("current_block", "");
 $this->setVar("forecast_block", "");
 $this->setVar("weather_unavailable_block", "");
 
-
 $imageLocation = '/weather/image.php?path=';
 
 //set current weather
+$forecastDate = new Alaress_Date_Format($weather->weather->forecast_information->forecast_date['data'], 'y-m-d');
+
 $this->setVar(array(
         'LOCATION'  => $weather->weather->forecast_information->city['data'],
         'TEMP'      => $weather->weather->current_conditions->temp_c['data'],
         'WIND'      => substr($weather->weather->current_conditions->wind_condition['data'], 6),
         'HUMIDITY'  => substr($weather->weather->current_conditions->humidity['data'], 10),
-        'PERIOD'    => date("F j, Y, g:i a", strtotime($weather->weather->forecast_information->current_date_time['data'])),
+        'PERIOD'    => $forecastDate->getDateOnly(),
 ));
 
 for($i = 0; $i < 4; $i++) {
@@ -63,6 +64,6 @@ $locations = array(
     array('LOCATION_VALUE' => 'Perth, Western Australia', 'LOCATION_NAME' => 'Perth'),
     array('LOCATION_VALUE' => 'Sydney, New South Wales', 'LOCATION_NAME' => 'Sydney')
 );
+
 $this->dropDown('regions', $locations, $location);
 
-?>
