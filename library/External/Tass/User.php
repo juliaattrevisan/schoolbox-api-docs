@@ -41,7 +41,7 @@ class External_Tass_User implements External_UserInterface {
 
 	function getStudentContactList ($tassID) {
 
-		$query = "SELECT parent.f_name StudentContactPreferred, parent.m_name as StudentContactSpousePreferred, addr1, addr2 StudentContactAddress1, addr3, town_sub StudentContactSuburb, state_code StudentContactState, post_code StudentContactPostCode,
+		$query = "SELECT student.par_code as StudentContactID, parent.f_name StudentContactPreferred, parent.m_name as StudentContactSpousePreferred, addr1, addr2 StudentContactAddress1, addr3, town_sub StudentContactSuburb, state_code StudentContactState, post_code StudentContactPostCode,
 						home_phone as StudentContactPhoneActual, bus_phone as StudentContactOccupPhone, mob_phone as StudentContactMobilePhone
 						FROM student
 						JOIN parent ON student.par_code = parent.par_code AND student.cmpy_code = parent.cmpy_code
@@ -90,7 +90,10 @@ class External_Tass_User implements External_UserInterface {
 			return false;
 	}
 	
-	function getEnrolledStudents($synergyID) {
+	function getEnrolledStudents($tassID) {
+        $query = "SELECT stud_code RelatedID FROM studenrol WHERE par_code = '$tassID' AND cmpy_code = 01";
+
+		return $this->getDatabase()->getAll($query);
 
 	}
 
