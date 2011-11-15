@@ -289,6 +289,7 @@ class Feed {
 			JOIN blog b
 			ON u.id = b.owner
 			WHERE cid = $cid
+			AND deleted IS NULL
 			ORDER BY submitted LIMIT 0, $limit";
 
 		$this->db->query($query);
@@ -320,6 +321,7 @@ class Feed {
 			JOIN blogComment bc ON u.id = bc.owner
 			JOIN blog b ON bc.bid = b.id
 			WHERE cid = $cid
+			AND b.deleted IS NULL
 			ORDER BY submitted LIMIT 0, $limit";
 
 		$this->db->query($query);

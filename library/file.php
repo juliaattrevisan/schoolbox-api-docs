@@ -12,11 +12,11 @@ class File extends DeprecatedModel {
 
     function getByID ($fileID) {
         $query = "SELECT f.*, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName,
-						UNIX_TIMESTAMP(f.submitted) submitted, UNIX_TIMESTAMP(f.modified) modified, 
+						UNIX_TIMESTAMP(f.submitted) submitted, UNIX_TIMESTAMP(f.modified) modified,
 						ft.name typeName, c.name categoryName, c.id cid, af.description as mimeDescription, iconFile, af.inline
-				  FROM file f 
+				  FROM file f
 				  LEFT JOIN user u ON u.id = f.owner
-				  LEFT JOIN category c ON c.id = f.category 
+				  LEFT JOIN category c ON c.id = f.category
 				  LEFT JOIN file_type ft ON ft.id = f.type
 				  LEFT JOIN allowedFileTypes af ON f.mime_type = af.mime
 				  WHERE f.id = '$fileID' AND deleted = 0";
@@ -31,9 +31,9 @@ class File extends DeprecatedModel {
         $query = "SELECT f.*, u.firstname, u.lastname, u.title,
 						UNIX_TIMESTAMP(f.submitted) submitted, UNIX_TIMESTAMP(f.modified) modified,
 						ft.name typeName, c.name categoryName, af.description as mimeDescription, iconFile, af.inline
-				  FROM file f 
+				  FROM file f
 				  LEFT JOIN user u ON u.id = f.owner
-				  LEFT JOIN category c ON c.id = f.category 
+				  LEFT JOIN category c ON c.id = f.category
 				  LEFT JOIN file_type ft ON ft.id = f.type
 				  LEFT JOIN allowedFileTypes af ON f.mime_type = af.mime
 				  LEFT JOIN submission_box sb on sb.fid = f.id
@@ -214,6 +214,20 @@ class File extends DeprecatedModel {
 
         return $this->db->getAll($query);
     }
+
+	/**
+	 * Soft-deletes content
+	 *
+	 * TODO: Refactor
+	 *
+	 * @param  $cid
+	 * @return void
+	 */
+	public function homepageClean($cid) {
+		$query = "UPDATE {$this->_table} SET deleted = 1 WHERE category = '{$cid}'";
+
+		$this->db->query($query);
+	}
 }
 
 ?>

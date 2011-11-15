@@ -116,32 +116,46 @@ class Homepage {
 		$this->emptyHomepage();
 	}
 
-	function emptyHomepage()
-	{
+	/**
+	 * Soft-deletes persistent data and files associated with a homepage
+	 * on a per-component basis.
+	 *
+	 * @return void
+	 */
+	public function emptyHomepage() {
 		/* Delete components, TODO move this into calling component delete functions */
-		require_once dirname(__FILE__) . '/forum.php';
-		$forumHandler = new Forum;
-		$forumHandler->homepageClean($this->cid);
 
-		require_once dirname(__FILE__) . '/categoryNews.php';
-		$newsHandler = new CategoryNews;
-		$newsHandler->homepageClean($this->cid);
+		/* Abstract the homepageClean() method into each Component
+		 * The Component should know how to remove itself
+		 *
+		 * $allComponents = getAllComponentInstances($category);
+		 *
+		 * foreach($allComponents as $currentComponent) {
+		 *     $currentComponent->removeFromHomepage();
+		 * }
+		 */
+		require_once(dirname(__FILE__) . '/assess/Assess.php');
+		require_once(dirname(__FILE__) . '/survey/Survey.php');
 
-		require_once dirname(__FILE__) . '/wiki.php';
-		$wikiHandler = new Wiki;
-		$wikiHandler->homepageClean($this->cid);
+		$allComponents = array(
+			'Assess', 'Blog', 'Calendar', 'CategoryNews', 'Chat', 'Dropbox', 'File', 'Forum',
+			'Poll', 'Submission', 'Survey', 'TextBox', 'Wiki'
+		);
 
-		require_once dirname(__FILE__) . '/poll.php';
-		$pollHandler = new Poll;
-		$pollHandler->homepageClean($this->cid);
+		if (is_array($allComponents) && count($allComponents)) {
+			foreach ($allComponents as $currentComponent) {
+				$handler = new $currentComponent();
+				$handler->homepageClean($this->cid);
+			}
+		}
 
-		require_once dirname(__FILE__) . '/dropbox.php';
-		$dboxHandler = new Dropbox;
-		$dboxHandler->homepageClean($this->cid);
+		/* Reset to template defaults
+		 */
+		$categoryHandler = new Category();
+		$category = $categoryHandler->getByID($this->cid);
 
-		require_once dirname(__FILE__) . '/submission.php';
-		$submissionBoxHandler = new Submission;
-		$submissionBoxHandler->homepageClean($this->cid);
+		$homepageTemplate = new HomepageTemplate();
+		$homepageTemplate->createTemplate($this->cid, $category['template']);
 	}
 
     function addComponent($component) {

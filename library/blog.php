@@ -5,25 +5,25 @@ class Blog extends DeprecatedModel {
 		$this->_table = "blog";
 		$this->_index = "id";
 		$this->_config = array();
-		
+
 		$this->group = new Group();
-		
+
 		parent::DeprecatedModel();
 	}
-	
+
 	function getByID($id) {
 		$query = "SELECT {$this->_table}.*, user.title, user.firstname, user.lastname
 			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner = user.id
 			WHERE {$this->_table}.id = $id AND deleted IS NULL
 			ORDER BY {$this->_table}.created DESC";
 		$query = $this->_config['size'] > 0 ? "$query LIMIT 0, {$this->_config['size']}" : $query;
-		
+
 		return $this->db->getRow($query);
 	}
 
     /**
      * Get all the blogs for a category.
-     * 
+     *
      * @param <type> $cid
      * @return <type>
      */
@@ -33,7 +33,7 @@ class Blog extends DeprecatedModel {
 			WHERE cid = $cid AND deleted IS NULL
 			ORDER BY {$this->_table}.created DESC";
 		$query = $this->_config['size'] > 0 ? "$query LIMIT 0, {$this->_config['size']}" : $query;
-			
+
 		return $this->db->getAll($query);
 	}
 
@@ -87,23 +87,23 @@ class Blog extends DeprecatedModel {
 			'owner'   => $_SESSION['id'],
 			'created' => 'NOW()'
 		), $blog);
-		
+
 		return parent::create($blog);
 	}
-	
+
 	function update($blog) {
 		return $this->permission($blog['id']) ? parent::update($blog) : false;
 	}
-	
+
 	function delete($id) {
 		$blog = array(
 			'id'      => $id,
 			'deleted' => 'NOW()'
 		);
-	
+
 		return $this->permission($blog['id']) ? parent::update($blog) : false;
 	}
-		
+
 	function permission($id) {
 		$blog = $this->getByID($id);
 		if(is_array($blog)) {
@@ -116,7 +116,7 @@ class Blog extends DeprecatedModel {
 		else
 			false;
 	}
-	
+
 	function config($config = null) {
 		if($config)
 			$this->_config = $config;
@@ -161,6 +161,19 @@ class Blog extends DeprecatedModel {
 
             return $this->db->getAll($query);
         }
+
+	/**
+	 * Soft-deletes content
+	 *
+	 * TODO: Refactor
+	 *
+	 * @param  $cid
+	 * @return void
+	 */
+	public function homepageClean($cid) {
+		$query = "UPDATE {$this->_table} SET deleted = NOW() WHERE cid = '{$cid}'";
+
+		$this->db->query($query);
+	}
 }
 
-?>

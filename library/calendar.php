@@ -541,6 +541,16 @@ class Calendar extends DeprecatedModel {
 		$this->delPerms($eventID);
 	}
 
+	/**
+	 * Removes content
+	 *
+	 * TODO: Refactor
+	 *
+	 * @param  $cid
+	 * @return void
+	 */
+	public function homepageClean($cid) {
+		$this->db->delete($this->_table, 'sid', $cid);
+	}
 }
 
-?>

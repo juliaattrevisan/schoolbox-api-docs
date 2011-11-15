@@ -102,6 +102,24 @@ class Chat extends DeprecatedModel {
 
         return $this->db->query($query);
     }
-}
 
-?>
+	/**
+	 * Removes content
+	 *
+	 * TODO: Refactor
+	 *
+	 * @param  $cid
+	 * @return void
+	 */
+	public function homepageClean($cid) {
+		$query = "DELETE FROM {$this->_table}  WHERE category_id = '{$cid}'";
+
+		$this->db->query($query);
+
+		$query = "DELETE FROM chat_poll  WHERE category_id = '{$cid}'";
+
+		$this->db->query($query);
+	}
+
+
+}

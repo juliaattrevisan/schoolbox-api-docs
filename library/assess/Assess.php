@@ -78,4 +78,72 @@ class Assess extends Evaluation {
 
         return $this->db->getAll($query);
     }
+
+	/**
+	 * Soft-deletes content
+	 *
+	 * @param  $category_id
+	 * @return void
+	 */
+	public function homepageClean($category_id) {
+		$query = "SELECT assess_id FROM assess WHERE category_id = '{$category_id}' AND availability = 'assess'";
+
+		$allAssess = $this->db->getAll($query);
+
+		if (is_array($allAssess) && count($allAssess)) {
+			require_once('AssessQuestion.php');
+			require_once('AssessAnswer.php');
+			require_once('AssessFactory.php');
+			require_once('AssessSection.php');
+
+			/* Get a list of questions and answers to softdelete
+			 */
+			$assessHandler = new Assess();
+			$questionHandler = new AssessQuestion();
+			$answerHandler = new AssessAnswer();
+			$sectionHandler = new AssessSection();
+
+			/* Shamelessly stolen from delete.php and squished
+			 * into position here
+			 */
+			foreach($allAssess as $currentAssess) {
+				$sectionList = $sectionHandler->getList($currentAssess['assess_id']);
+
+				if (is_array($sectionList) && count($sectionList)) {
+					foreach($sectionList as $currentSection) {
+						$section = $sectionHandler->getByID($currentSection['section_id']);
+						$questionList = $questionHandler->getList($currentSection['section_id']);
+
+						if (is_array($questionList) && count($questionList)) {
+							foreach($questionList as $currentQuestion) {
+								$answer = $answerHandler->getForQuestion($currentQuestion['question_id']);
+
+								/* Perform soft delete
+								 */
+								$questionHandler->update(array(
+									'question_id' => $currentQuestion['question_id'],
+									'deleted_at' => 'NOW()',
+								));
+
+								$answerHandler->update(array(
+									'answer_id' => $answer['answer_id'],
+									'deleted_at' => 'NOW()',
+								));
+							}
+						}
+
+						$section['deleted_at'] = 'NOW()';
+						$sectionHandler->update($section);
+					}
+				}
+
+				/* Remove assess
+				 */
+				$assessHandler->update(array(
+					'assess_id' => $currentAssess['assess_id'],
+					'deleted_at' => 'NOW()'
+				));
+			}
+		}
+	}
 }
