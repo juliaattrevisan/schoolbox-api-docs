@@ -32,7 +32,7 @@ if [ $? -eq 0 ]; then
 		echo -e "... Failed\n";
 		
 		if [ ${#1} -eq 1 ]; then
-			echo -e "Critical Failure, Aborting update.\n";
+			echo -e "Critical Failure, Aborting update.\nIf any issues persist on your installation contact support@schoolbox.com.au or call 1300 932 338, ext. 1.";
 			exit;
 		fi;
 fi;
@@ -166,9 +166,9 @@ backupInstall() {
 echo -e "Backup Prior to Update:\n";
 echo -e "Moving Data Directory out of Installation Directory:\n";
 mv $schoolbox_dir/data $schoolbox_dir/../data
-errorCheck;
+errorCheck 1;
 echo -e "Backing up Installation Directory:\n";
-tar -cvzf /tmp/schoolbox.tgz $schoolbox_dir >> /dev/null;
+tar -cvzf /tmp/schoolbox_$sqldb$cur_ver.tgz $schoolbox_dir >> /dev/null;
 errorCheck;
 echo -e "Backing up Config File:\n";
 cp $schoolbox_dir/www/conf/conf.php /tmp/schoolbox_config.php >> /dev/null;
@@ -179,7 +179,7 @@ cp $schoolbox_dir/www/.htaccess /tmp/htaccess.file >> /dev/null;
 errorCheck;
 
 echo -e "Backing up Database:\n";
-mysqldump --user=$sqluser --password=$sqlpass $sqldb >> /tmp/$sqldb.sql
+mysqldump --user=$sqluser --password=$sqlpass $sqldb >> /tmp/schoolbox_$sqldb$cur_ver.sql
 errorCheck;
 }
 restoreAfterBackup() {
