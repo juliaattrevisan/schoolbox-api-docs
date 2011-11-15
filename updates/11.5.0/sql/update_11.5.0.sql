@@ -1,6 +1,3 @@
-UPDATE `config`
-SET `value` = '11.5.0' where `name` = 'site_version';
-
 /* Added availability for questions and assessments/surveys
  */
 ALTER TABLE `assess_luQuestionType` ADD COLUMN `availability` ENUM('assess','survey','all') NULL AFTER `automated_marking`;
