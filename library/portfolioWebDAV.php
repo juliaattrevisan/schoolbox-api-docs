@@ -264,8 +264,8 @@ class PortfolioWebDAV {
 
                 if(Cfg::get('site_location') == 'wenona') {
                     if ($groupHandler->isStaff()) {
-                            $pathList = array( 'http://gold/StaffHome/',
-                                                               'http://gold/StaffData/',
+                            $pathList = array( 'http://oxygen/StaffHome/',
+                                                               'http://oxygen/StaffData/',
                                                               );
                     } else {
                             $pathList = array( 'http://mercury/StudentHome/' . (12 - $_SESSION['year'] + 11 ) . '/' . $_SESSION['username'] . '/',
