@@ -584,3 +584,8 @@ CREATE TABLE `class` (
  ALTER TABLE `assess_response`     CHANGE `mark` `mark` DECIMAL(15,2) DEFAULT '0.00' NULL ;
  /* Fixed bug where site detect was mandatory. */
 UPDATE config SET editable='false' WHERE name='site_detect';
+
+/* Error messages */
+INSERT INTO error (id, message) VALUES (138, 'This username already exists.');
+INSERT INTO error (id, message) VALUES (139, 'The link provided is not a correctly formatted URL.');
+INSERT INTO error (id, message) VALUES (140, 'You already have that link in your list.');
