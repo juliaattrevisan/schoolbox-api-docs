@@ -15,8 +15,7 @@ class Synchronise_Synergetic_Main {
 	/**
 	 * Choose your strategy wisely
 	 *
-	 * @param  $strategy
-	 * @param bool $performUpdate
+	 * @param null $strategy
 	 */
 	public function __construct($strategy = null) {
 		if ($strategy !== null) {
