@@ -51,7 +51,19 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
 	}
 
 	public function getDayNumber ($campusId, $date = 0) {
-		return 0;
+		if(!$date) {
+			$date = mktime();
+		}
+
+		if(date('w', $date) == 0 || date('w', $date) == 6)
+			return false;
+
+
+        $day = date("w", $date);
+        if($day <1 || $day > 5)
+            $day = 1;
+
+        return $day;
 	}
 
 	public function getPeriodNumber ($campusId) {
