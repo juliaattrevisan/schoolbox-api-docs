@@ -13,14 +13,14 @@ schoolbox_dir=`cd ../ && pwd`
 working_dir="/tmp/update_tmp";
 workingDirectory() {
 if [ ! -d $working_dir ]; then
-echo -e "Creating Working Directory:\n";
+echo -e "Creating Working Directory:\c";
 sudo mkdir $working_dir;
 errorCheck 1;
 else
-echo -e "Removing old Working Directory:\n";
+echo -e "Removing old Working Directory:\c";
 rm -Rf $working_dir;
 errorCheck 1;
-echo -e "Creating Working Directory:\n";
+echo -e "Creating Working Directory:\c";
 mkdir $working_dir;
 errorCheck 1;
 fi;
@@ -38,7 +38,7 @@ if [ $? -eq 0 ]; then
 fi;
 }
 grabIndex() {
-echo -e "Downloading Updated Version Index:\n";
+echo -e "Downloading Updated Version Index:\c";
 wget -q http://schoolbox.com.au/schoolboxinstaller/version_index -O $working_dir/version_index;
 errorCheck 1;
 index="$working_dir/version_index";
@@ -52,7 +52,7 @@ if [[ `echo $info|grep "ii $pckageName"` ]]; then
 echo -e "Server Package: $packageName is installed.\n";
 else
 echo -e "Server Package: $packageName is not installed.\n";
-echo -e "Attempting Installation of Package: $packageName.\n";
+echo -e "Attempting Installation of Package: $packageName.\c";
 if [[ `echo $OS|grep "ubuntu"` ]]; then
 apt-get install --force-yes -y $packageName >> /dev/null;
 errorCheck 1;
@@ -71,7 +71,7 @@ if [[ `echo $info|grep "$packageName"` ]]; then
 echo -e "Server Package: $packageName is installed.\n";
 else
 echo -e "Server Package: $packageName is not installed.\n";
-echo -e "Attempting Installation of Package: $packageName.\n";
+echo -e "Attempting Installation of Package: $packageName.\c";
 if [[ `echo $OS|grep "centos"` ]]; then
 yum install -y $packageName >> /dev/null;
 errorCheck 1;
@@ -90,7 +90,7 @@ done;
 }
 
 grabVersion() {
-echo -e "Update Download: Downloading the Schoolbox v$new_ver update package, please wait.\n";
+echo -e "Update Download: Downloading the Schoolbox v$new_ver update package, please wait\c";
 wget -q http://schoolbox.com.au/schoolboxinstaller/release_$new_ver.tgz -O $working_dir/release_$new_ver.tgz;
 errorCheck 1;
 }
@@ -148,7 +148,7 @@ cur_ver=`echo $cur_ver|cut -d " " -f2`;
 echo -e "Schoolbox v$cur_ver Detected.\n";
 }
 setNewVersion() {
-echo -e "Setting New Version to v$new_ver.\n";
+echo -e "Setting New Version to v$new_ver.\c";
 `echo -e "UPDATE config SET value = '$new_ver' where name = 'site_version'"|mysql -u $sqluser --password=$sqlpass $sqldb`;
 errorCheck;
 }
@@ -185,7 +185,7 @@ fi;
 echo -e "Locating new Version (if available):\n"
 new_ver_id=`expr $cur_ver_id + 1`;
 new_ver=`cat $index|grep "$new_ver_id:"|cut -d ":" -f2`;
-echo -e "Verifying new version name:\n";
+echo -e "Verifying new version name:\c";
 echo $new_ver >> $working_dir/tmpversion;
 dos2unix $working_dir/tmpversion;
 errorCheck;
@@ -206,72 +206,67 @@ fi;
 
 backupInstall() {
 echo -e "Backup Prior to Update:\n";
-echo -e "Moving Data Directory out of Installation Directory:\n";
+echo -e "Moving Data Directory out of Installation Directory:\c";
 mv $schoolbox_dir/data $schoolbox_dir/../data_$dbname
 errorCheck 1;
-echo -e "Backing up Installation Directory:\n";
+echo -e "Backing up Installation Directory:\c";
 tar -cvzf /tmp/schoolbox_$sqldb$cur_ver.tgz $schoolbox_dir >> /dev/null;
 errorCheck;
-echo -e "Backing up Config File:\n";
+echo -e "Backing up Config File:\c";
 cp $schoolbox_dir/www/conf/conf.php /tmp/schoolbox_config.php >> /dev/null;
 errorCheck;
 
-echo -e "Backing up HTACCESS File:\n";
+echo -e "Backing up HTACCESS File:\c";
 cp $schoolbox_dir/www/.htaccess /tmp/htaccess.file >> /dev/null;
 errorCheck;
 
-echo -e "Backing up Database:\n";
+echo -e "Backing up Database:\c";
 mysqldump --user=$sqluser --password=$sqlpass $sqldb >> /tmp/schoolbox_$sqldb$cur_ver.sql
 errorCheck;
 }
 restoreAfterBackup() {
-echo -e "Restoring Data Directory:\n";
+echo -e "Restoring Data Directory:\c";
 mv $schoolbox_dir/../data_$dbname $schoolbox_dir/data;
 errorCheck;
-echo -e "Restoring Configuration File:\n";
+echo -e "Restoring Configuration File:\c";
 mv /tmp/schoolbox_config.php $schoolbox_dir/www/conf/conf.php;
 errorCheck;
-echo -e "Restoring HTACCESS File:\n";
+echo -e "Restoring HTACCESS File:\c";
 cp /tmp/htaccess.file $schoolbox_dir/www/.htaccess  >> /dev/null;
 errorCheck;
 
 }
 confirmPermissions() {
-echo -e "Configuring Permissions:\n";
+echo -e "Configuring Permissions:\c";
 echo -e "Installation Directory Owner set to Alaress:\n";
 chown -R alaress:alaress $schoolbox_dir;
 errorCheck;
-echo -e "Permissions reset on install Directory:\n";
+echo -e "Permissions reset on install Directory:\c";
 chmod -R 775 $schoolbox_dir;
 errorCheck;
-echo -e "Granting Required Permissions to HTML Purifier:\n";
+echo -e "Granting Required Permissions to HTML Purifier:\c";
 chmod -R 777 $schoolbox_dir/include/HTMLPurifier;
 errorCheck;
-echo -e "Granting Required Permissions to Data Directory:\n";
+echo -e "Granting Required Permissions to Data Directory:\c";
 chmod -R 777 $schoolbox_dir/data;
 errorCheck;
 echo -e "Schoolbox v$new_ver Update Completed.\n";
 }
-updateDatabase() {
-echo -e "Updating Database:\n";
-mysql -f -u $sqluser --password=$sqlpass $sqldb < $working_dir/update_$new_ver.sql; >> /dev/null;
-errorCheck;
-}
 updateFiles(){
 echo -e "Updating Application Files:\n";
-echo -e "Removing Old Files:\n";
+echo -e "Removing Old Files:\c";
 rm -Rf $schoolbox_dir/*;
 errorCheck 1;
-echo -e "Extracting and Updating Files:\n";
+echo -e "Extracting and Updating Files:\c";
 tar --overwrite --overwrite-dir -xvzf $working_dir/release_$new_ver.tgz -C $schoolbox_dir >> /dev/null;
 errorCheck 1;
-echo -e "Removing Template Config File:\n";
+echo -e "Removing Template Config File:\c";
 rm -Rf $schoolbox_dir/www/conf/conf.php;
 errorCheck 1;
-echo -e "Removing Template HTACCESS File:\n";
+echo -e "Removing Template HTACCESS File:\c";
 rm -Rf $schoolbox_dir/www/.htacess;
 errorCheck 1;
-echo -e "Removing Template Data Directory:\n";
+echo -e "Removing Template Data Directory:\c";
 rm -Rf $schoolbox_dir/data;
 errorCheck 1;
 }
@@ -284,17 +279,17 @@ echo -e "Reading Script Processing List:\n";
 for script in `cat scripts_list`; do
 file=`echo $script`;
 if [[ `echo $file|grep -v "#"|grep .sh$` ]]; then
-echo -e "Running Shell Script: $file\n" &> /tmp/update_$dbname$new_ver.errlog;
+echo -e "Running Shell Script: $file\c" &> /tmp/update_$dbname$new_ver.errlog;
 ./$file >> /dev/null;
 errorCheck;
 fi;
 if [[ `echo $file|grep -v "#"|grep .php$` ]]; then
-echo -e "Running PHP Script: $file\n";
+echo -e "Running PHP Script: $file\c";
 php -f ./$file >> /dev/null &> /tmp/update_$dbname$new_ver.errlog;
 errorCheck;
 fi;
 if [[ `echo $file|grep -v "#"|grep .sql$` ]]; then
-echo -e "Running SQL Script: $file\n";
+echo -e "Running SQL Script: $file\c";
 mysql -f -u $sqluser --password=$sqlpass $sqldb < ./$file  >> /dev/null &> /tmp/update_$dbname$new_ver.errlog;
 errorCheck;
 fi;
@@ -309,10 +304,10 @@ fi;
 }
 cleanup(){
 echo -e "Cleanup after update:\n";
-echo -e "Removing all temporary Files...\n";
+echo -e "Removing all temporary Files...\c";
 rm -Rf $working_dir;
 errorCheck;
-echo -e "Removing Page Rendering Cache to avoid browser issues:\n";
+echo -e "Removing Page Rendering Cache to avoid browser issues:\c";
 rm -Rf /tmp/minify*
 errorCheck;
 }
@@ -320,7 +315,7 @@ isErrors() {
 echo -e "Error Detection Report:\n";
 if [ -s /tmp/update_$dbname$new_ver.errlog ]; then
 echo -e "There were potential errors found during the update,\nLocated in: /tmp/update_$dbname$new_ver.errlog.\n";
-echo -e "Attempting to mail error Log to support@schoolbox.com.au for review:\n";
+echo -e "Attempting to mail error Log to support@schoolbox.com.au for review:\c";
 mail -s "Schoolbox Update Error Log" support@schoolbox.com.au < /tmp/update_$dbname$new_ver.errlog;
 errorCheck;
 else
