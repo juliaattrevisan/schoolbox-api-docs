@@ -229,8 +229,6 @@ if (is_numeric($this->arg[0])) {
 					if ((int)$studentContact['StudentContactID'] == (int)$_SESSION['sid'] || $studentContact['StudentContactSpouseID'] == $_SESSION['sid'] || $groupHandler->isStaff() || $_SESSION['su']) {
 						$j++;
 
-                        print "blah";
-
 						if ($studentContact['StudentContactDefaultEmail']) {
 							$contactName = '<a href="'.$_SESSION['mailhandle'].$studentContact['StudentContactDefaultEmail'].'">'.Scrub::text($studentContact['StudentContactTitle'].' '.$studentContact['StudentContactPreferred'].' '.$studentContact['StudentContactSurname']).'</a>';
 						}
