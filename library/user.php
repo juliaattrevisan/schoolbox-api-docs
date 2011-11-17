@@ -180,7 +180,33 @@ class User extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
+    /**
+     * Wrapper for the SynergeticAPI
+     *
+     * @param $synergeticID
+     * @param $currentPassword
+     * @param $newPassword
+     *
+     * @return string
+     */
+    private function setSynergeticPassword($synergeticID, $currentPassword, $newPassword) {
+
+        $api = new External_Synergetic_Gateway(
+            Cfg::get('external_web_services_url'),
+            Cfg::get('external_vendor_token_guid'),
+            Cfg::get('external_vendor_password'));
+
+        return $api->changeCommunityLoginPassword($synergeticID, $currentPassword, $newPassword);
+    }
+
     function setPassword($userID, $oldPassword, $newPassword) {
+
+        // update password in synergetic
+        if (Cfg::get('external_enable') && Cfg::get('external_type') === 'synergetic') {
+            $user = $this->getByID($userID);
+            $this->setSynergeticPassword($user['synergy_id'], $oldPassword, $newPassword);
+        }
+
         $oldPassword = mysql_real_escape_string($oldPassword);
         $newPassword = mysql_real_escape_string($newPassword);
         $query = "UPDATE `" . $this->_table . "` SET password = PASSWORD('$newPassword'), email_pass = '$newPassword' WHERE `" . $this->_index . "` = $userID AND password = PASSWORD('$oldPassword')";
