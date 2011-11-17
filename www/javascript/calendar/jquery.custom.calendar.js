@@ -2,6 +2,8 @@ setupCalendar = {
 	calendarFormat: "{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}",
 	calendarImageURL: "/images/core/calendar/calendar-click.png",
 	init: function() {
+		var $self = this;
+
 		$j('.modify a').html('<span></span>Modify');
 		$j('.modify a').addClass('btn modify float-left');
 		$j('.print-it').click(function() {
@@ -17,9 +19,9 @@ setupCalendar = {
 		 $j('.datepicker').datepicker({
 			dateFormat: 'dd-mm-yy',
 			onSelect: function(dateText, inst) {window.open('/calendar/month/'+dateText, "_self")},
-			defaultDate: $j.datepicker.parseDate("dd-mm-yy", setupCalendar.calendarFormat),
+			defaultDate: $j.datepicker.parseDate("dd-mm-yy", this.calendarFormat),
 			showOn: 'button',
-			buttonImage: setupCalendar.calendarImageURL,
+			buttonImage: this.calendarImageURL,
 			buttonImageOnly: true,
 			showAnim: 'slideDown'
         });
@@ -49,6 +51,7 @@ setupCalendar = {
 		});
 	},
 	filters: {
+
 		interaction: function() {
 			$j('a.filters').click(function(){
 				$j('.filter-drop').toggle();
@@ -72,7 +75,6 @@ setupCalendar = {
 		organise: function(filterArray) {
 			//for each unchecked element
 			for (i=0; i < filterArray.length; i++ ) {
-				console.log(filterArray[i]);
 				$j('.filter-list .' + filterArray[i] + ' input:not(:checked)').each(function(){
 					var n = $j(this).attr('value');
 					if ($j('ul.js_happening .' + n).is(':visible')) {
