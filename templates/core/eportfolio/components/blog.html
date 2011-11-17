@@ -1,7 +1,11 @@
 <!-- BEGIN custom_head -->
 <script type='text/javascript'>
 $j(function(){
-	$j('div.blog_comments, div.blog form').hide();
+			$j('a.show_comments').click(function(){
+				$j(this).closest('li').find('.blog-comments').toggle();
+				$j(this).children('span').toggle();
+				return false;
+		});
 
 	$j('a.show_comments').click(function(){
 		$j(this).closest('li').find('div.blog_comments').toggle();
@@ -58,60 +62,39 @@ $j(function(){
 
 	<div class="listing blog">
 		<ul>
-			<!-- BEGIN blog -->
+<!-- BEGIN blog -->
 			<li class="{BLOG_SHADING} clearfix">
-				<h4>
-					<em>{BLOG_HEADING}</em>
-					<p>{BLOG_BODY}</p>
-				</h4>
-				<div class="small-right clearfix">
-					<p class="interact">
-						{MODIFY_BLOG}
-					</p>
-
-					<p class="interact">
-						Posted by {BLOG_OWNER} {BLOG_CREATED}
-					</p>
-
-					<!-- BEGIN show_comment -->
-					<p>
-						<a class="show_comments" href="javascript:void();">Show {BLOG_COMMENTS} Comments</a>
-					</p>
-					<!-- END show_comment -->
+				<h4><strong>{BLOG_HEADING}</strong></h4>
+				<div class="small-right">
+					<p class="interact">{MODIFY_BLOG}</p>
 				</div>
-				<div class="blog_comments">
+				<p>{BLOG_BODY}</p>
+				<div class="blog-comments hide-it">
 					<!-- BEGIN comment -->
-					<p class="blog_title">
-						{COMMENT_BODY}
-					</p>
-
-					<p class="small hide-on-small separate">
-						{COMMENT_OWNER} <br />
-						{COMMENT_CREATED}<br />
-						{DELETE_COMMENT}
-					</p>
+					<div class="box clearfix"> {COMMENT_BODY}
+						<p class="interact">{COMMENT_OWNER} | {COMMENT_CREATED} | {DELETE_COMMENT}</p>
+					</div>
 					<!-- END comment -->
 
 					<!-- BEGIN show_all -->
-					<p>
-						<a class="interact" href="/eportfolio/blog/{BLOG_ID}">Show All {BLOG_TOTAL_COMMENTS} Comments</a>
-					</p>
+					<p class="interact"><a href="/blog/{BLOG_ID}">Show All {BLOG_TOTAL_COMMENTS} Comments</a></p>
 					<!-- END show_all -->
 				</div>
-
-				<p>
-					<a class="interact post_comment" href="javascript:void();" >Post comment</a>
+				<p class="links-house">
+					<!-- BEGIN show_comment -->
+					<a class="show_comments" href="javascript:void();"><span>Show</span><span class="hide-it">Hide</span> {BLOG_COMMENTS} Comments</a> -
+					<!-- END show_comment -->
+					<a class="interact post_comment" href="javascript:void();">Post comment</a>
 				</p>
-
-				<form  method="post" action="/eportfolio/blog/comment/new/{BLOG_ID}">
+				<form class="hide" method="post" action="/blog/comment/new/{BLOG_ID}">
 					<p>
 						<textarea name="body" style="width: 100%;"></textarea>
 					</p>
-
 					<p>
-						<input type="submit" name="comment" value="Comment"/>
+						<input type="submit" class="submit-btn-plain" name="comment" value="Comment"/>
 					</p>
 				</form>
+				<p class="interact hide-on-small">Posted by {BLOG_OWNER} {BLOG_CREATED}</p>
 			</li>
 			<!-- END blog -->
 		</ul>

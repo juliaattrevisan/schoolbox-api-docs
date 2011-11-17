@@ -3421,8 +3421,9 @@ display:block; padding:7px 16px;
 }
 
 .blog-comments p.interact {
-	border-top: 1px dashed #efecde;
+	border-top: 1px dashed #ccc;
 	padding-top: 0.5em;
+	margin-top:7px;
 }
 
 .blog-comments h3 {
@@ -3430,12 +3431,13 @@ display:block; padding:7px 16px;
 }
 
 .blog-comments .box {
-	background: #faf9f5;
+	background: #fafafa;
 	padding: 7px 16px;
 	margin: 0;
-	border-bottom: 3px solid #F4F1EA;
+	border: 2px solid #f1f1f1;
 	width: auto;
 	float: none;
+	margin:3px 0;
 }
 
 .blog-detail ul {
@@ -5089,13 +5091,7 @@ p.bubble-name {
 	font-size: 12px;
 }
 
-.privateBlock .box p {
-	margin: 0;
-}
 
-.privateBlock .box {
-	margin-bottom: 10px;
-}
 
 .privateBlock .box img {
 	padding: 5px;
