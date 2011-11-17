@@ -5,26 +5,27 @@
 <script type="text/javascript">
 
 $j(function() {
-
 	$j.fn.qtip.defaults.position.corner = {
 		target: 'topLeft',
 		tooltip: 'bottomLeft'
 	}
-	
+
 	$j.fn.qtip.defaults.style = {
 		tip: 'bottomLeft',
 		name: 'green'
 	}
-	
+
 	$j('.one-third:first h3 span').qtip({
-		content: 'Controls if files of this type can be uploaded'});
-		
+		content: 'Controls if files of this type can be uploaded'
+	});
+
 	$j('.one-third:nth-child(2) h3 span').qtip({
-		content: 'A simple name for the type of file'});
-		
+		content: 'A simple name for the type of file'
+	});
+
 	$j('.one-third:nth-child(3) h3 span').qtip({
-		content: 'The mime type for a file can be found by searching google'});
-	
+		content: 'The mime type for a file can be found by searching google'
+	});
 })
 
 </script>
@@ -47,23 +48,23 @@ $j(function() {
 <div class="admin-contents">
 	<h2>Rollover</h2>
 	<div class="level">
-	
-		 <h4>Remove Deleted/Expired Content</h4>
-		<p class="clearfix"><a href="/admin/cleanup.php?news=1&amp;subnews=1&amp;file=1" class="btn delete float-left" onclick="return(confirm('This will clean the database of all content no longer visible to users'));"><span></span>Click Here</a></p>
-		
+
+		<h4>Remove Deleted/Expired Content</h4>
+		<p class="clearfix"><a href="/adminv2/cleanup.php?news=1&amp;subnews=1&amp;file=1" class="btn delete float-left" onclick="return(confirm('This will clean the database of all content no longer visible to users'));"><span></span>Click Here</a></p>
+
 		<h4>Clean filesystem of stale files</h4>
-		<p class="clearfix"><a href="/admin/cleanup.php?fileclean=1" class="btn update float-left" onclick="return(confirm('This will delete all files that are no longer in the database'));"><span></span>Click Here</a>	</p>	
-		
+		<p class="clearfix"><a href="/adminv2/cleanup.php?fileclean=1" class="btn update float-left" onclick="return(confirm('This will delete all files that are no longer in the database'));"><span></span>Click Here</a>	</p>
+
 		<h4>Clean Log Files</h4>
-		<p class="clearfix"><a href="/admin/cleanup.php?log=1" class="btn update float-left" onclick="return(confirm('This will delete all logs, it will impact only on the whats new feature'));"><span></span>Click Here</a></p>
+		<p class="clearfix"><a href="/adminv2/cleanup.php?log=1" class="btn update float-left" onclick="return(confirm('This will delete all logs, it will impact only on the whats new feature'));"><span></span>Click Here</a></p>
 
 		<h4> Rollover users</h4>
-		<p class="clearfix"><a href="/admin/cleanup.php?rolluser=1" class="btn groups float-left" onclick="return(confirm('This will increment all students year by one'));"><span></span>Click Here</a></p>
-		
+		<p class="clearfix"><a href="/adminv2/cleanup.php?rolluser=1" class="btn groups float-left" onclick="return(confirm('This will increment all students year by one'));"><span></span>Click Here</a></p>
+
 		<h4>Clean Submission System</h4>
-		<p class="clearfix"><a href="/admin/cleanup.php?submission=1&amp;return=1" class="btn update float-left" onclick="return(confirm('WARNING! This will delete all submission boxes, student work and returned work.\nThis should only be performed once a year'));"><span></span>Click Here</a></p>
+		<p class="clearfix"><a href="/adminv2/cleanup.php?submission=1&amp;return=1" class="btn update float-left" onclick="return(confirm('WARNING! This will delete all submission boxes, student work and returned work.\nThis should only be performed once a year'));"><span></span>Click Here</a></p>
 
 		<h4>Clean Thumbnails</h4>
-		<p class="clearfix"><a href="/admin/cleanup.php?thumbnail=1" class="btn update float-left" onclick="return(confirm('This will delete all thumbnails.'));"><span></span>Click Here</a></p>
-
+		<p class="clearfix"><a href="/adminv2/cleanup.php?thumbnail=1" class="btn update float-left" onclick="return(confirm('This will delete all thumbnails.'));"><span></span>Click Here</a></p>
+	</div>
 </div>
