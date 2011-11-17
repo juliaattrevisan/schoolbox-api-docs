@@ -28,20 +28,21 @@
 		});
 
         $j('input:checkbox[name=accept_submission]').change(function () {
-            if ($j(this).attr('checked')) {
-                $j('table.standardForm tr:nth-last-child(1), table.standardForm tr:nth-last-child(3)').show();
+            if ($j(this).is(':checked')) {
+                $j('.accept-hide').show();
             } else {
-                $j('table.standardForm tr:nth-last-child(1), table.standardForm tr:nth-last-child(3)').hide();
+                $j('.accept-hide').hide();
             }
         });
 
-        if (!$j('input:checkbox[name=accept_submission]').attr('checked')) {
-            $j('table.standardForm tr:nth-last-child(1), table.standardForm tr:nth-last-child(3)').hide();
-        }
-		
+		if (!$j('input:checkbox[name=accept_submission]').attr('checked')) {
+			$j('.accept-hide').hide();
+		}
+
 		$j('#createSubmissionForm').validate();
 		
 	});
+	
 </script>
 <!-- END custom_head -->
 
@@ -96,7 +97,7 @@
 				<em>Should the submission box accept electronic submissions.</em></td>
 			<td><input name="accept_submission" type="checkbox" value="true" {ACCEPT_SUBMISSION}></td>
 		</tr>
-		<tr>
+		<tr class="accept-hide">
 			<td class="formLabelWidth"><h4>Open Date</h4>
 				<em>The date from when the submission box will be available for submission.  To make the box never available but have the date published, set this date to after the due date.</em></td>
 			<td><input name="open_date" id="open_date" type="text" value="{OPEN_DATE}" size="20" />
@@ -120,7 +121,7 @@
 					<option value="pm" {DUE_PM}>PM</option>
 				</select></td>
 		</tr>
-		<tr>
+		<tr class="accept-hide">
 			<td><h4>Late Date</h4>
 				<em>Students will not be able to submit after this date</em></td>
 			<td><input name="late_date" id="late_date" type="text" value="{LATE_DATE}" size="20" />
