@@ -186,7 +186,7 @@ class clean {
 
 		$query = "UPDATE user SET year = year + 1 WHERE group_id IN(".implode(',', $groupHandler->getStudentGroupTypeIds()).") AND year IS NOT NULL";
 		$this->db->query($query);
-		print "Updated ".$this->db->countRowsAffected()." student year levels<br>";
+		print "Updated ".$this->db->affectedRows()." student year levels<br>";
 	}
 
 	function cleanThumbnails() {
