@@ -74,49 +74,6 @@ $j(function () {
 
 });
 
-/*
-window.addEvent('domready', function () {
-	for(i = 0; i < pickers.length; i++){
-	
-		
-		pickers[i][2] = new MooRainbow(pickers[i][0] + '_div', pickers[i][0] + '_input', {
-			'id': pickers[i][0] + 'Picker',
-			'imgPath': '/images/mooRainbow/',
-			'onComplete': function(color, object){
-				object.element.setStyle('background-color', color.hex);
-				object.input.value = color.hex;
-			},
-			'onChange': function(color, object){
-				object.element.setStyle('background-color', color.hex);
-				object.input.value = color.hex;
-			}
-		});
-		pickers[i][2].manualSet(pickers[i][1], 'hex');
-		$j(pickers[i][0] + '_div').setStyle('background-color', pickers[i][2].sets.hex);
-		$j(pickers[i][0] + '_input').value = pickers[i][2].sets.hex;
-	};
-
-	$j("loadDefaults").addEvent('click', function () {
-		for(i = 0; i < pickers.length; i++){
-			pickers[i][2].manualSet(defaults[i][1], 'hex');
-			$j(pickers[i][0] + '_div').setStyle('background-color', pickers[i][2].sets.hex);
-			$j(pickers[i][0] + '_input').value = pickers[i][2].sets.hex;		
-		}
-	});
-	
-	$j("leftRight").addEvent('click', function () {
-		var half = pickers.length/2;
-		for (i = 0; i < half; i++) {
-			pickers[(i+half)][2].manualSet(pickers[i][1], 'hex');
-			$j(pickers[(i+half)][0] + '_div').setStyle('background-color', pickers[i][2].sets.hex);
-			$j(pickers[(i+half)][0] + '_input').value = pickers[i][2].sets.hex;		
-		}
-	});
-	
-});
-	
-*/
-
 
 </script>
 <style type="text/css">
