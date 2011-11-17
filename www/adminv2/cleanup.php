@@ -3,8 +3,8 @@
 /* this includes removing deleted files, expired news, logs and submission boxes */
 
 require_once("../include/include.php");
-require_once("../include/session.php");
-require_once("../include/adminonly.php");
+//require_once("../include/session.php");
+//require_once("../include/adminonly.php");
 
 class clean {
 	function clean()
