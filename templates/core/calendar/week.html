@@ -3,23 +3,9 @@
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript">
 	$j(function () {
-	    /* date picker */
-		$j('.datepicker').datepicker({
-			dateFormat: 'dd-mm-yy',
-			onSelect: function(dateText, inst) {window.open('/calendar/week/'+dateText, "_self")},
-			defaultDate: $j.datepicker.parseDate("dd-mm-yy", "{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}"),
-			showOn: 'button',
-			buttonImage: '/images/core/calendar/calendar-click.png',
-			buttonImageOnly: true,
-			showAnim: 'slideDown'
-		});
-
-
-		$j('.print-it').click(function() {
-			  window.print();
-			  return false;
-		});
-
+		setupCalendar.calendarFormat = "{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}";
+		setupCalendar.calendarImageURL = "/images/core/calendar/calendar-click.png";
+ 		setupCalendar.init();
 	});
 </script>
 <!-- END custom_head -->

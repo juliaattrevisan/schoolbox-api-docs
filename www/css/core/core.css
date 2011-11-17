@@ -554,13 +554,13 @@ th {
 
 #tabs li a {
 	font-weight: bold;
-	font-size: 14px;
+	font-size: 12px;
 	color: #579dcf;
 	height: 32px;
 	line-height: 32px;
 	display: block;
 	float: left;
-	padding: 0 15px;
+	padding: 0 12px;
 }
 
 #header #tabs li.navthis a {
