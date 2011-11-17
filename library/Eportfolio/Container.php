@@ -14,6 +14,7 @@ class Eportfolio_Container {
 		$this->uid = $uid;
 	}
 
+
 	/**
 	 * Check if an eportfolio is enabled
 	 *
@@ -34,6 +35,44 @@ class Eportfolio_Container {
 
         return $this->db->getOne($query);
     }
+
+    /**
+     * Function to create inital record of homepage when settings are first altered
+     */
+    public function initialiseHomepage($userID) {
+
+        $eportfolio_config['uid'] =$userID;
+
+        $defaultColour = array('head_font'=>Cfg::get('homepage_colour_head_font'),
+                                'head_bg'=>Cfg::get('homepage_colour_head_bg'),
+                                'font'=>Cfg::get('homepage_colour_font'),
+                                'bg_primary'=>Cfg::get('homepage_colour_bg_primary'),
+                                'bg_secondary'=>Cfg::get('homepage_colour_bg_secondary'),
+                                'link'=>Cfg::get('homepage_colour_link'),
+                                'hover'=>Cfg::get('homepage_colour_hover')
+                               );
+        $columns = array('top','left','right');
+        foreach($columns as $col){
+            foreach($defaultColour as $field=>$colour) {
+                $eportfolio_config[$col.'_'.$field] = $colour;
+            }
+        }
+
+        $this->db->insert('eportfolio_config',$eportfolio_config);
+
+    }
+
+    /**
+     * Checks if config for eportfolio exists
+     */
+    private function eportfolioConfigExists($userID) {
+        $query = "SELECT uid FROM eportfolio_config WHERE uid='$userID'";
+        if($this->db->getOne($query))
+            return true;
+        else
+            return false;
+    }
+
 
 	/**
 	 * Gets all the images associated with an eportfolio
@@ -163,36 +202,6 @@ class Eportfolio_Container {
 		}
 
 		return $colourList;
-	}
-
-	/**
-	 * Remembers themes for a template.
-	 *
-	 * @param  $template
-	 * @return void
-	 */
-	public function savePageTemplate($template) {
-        $query = "SELECT uid FROM eportfolio_config WHERE uid = '".$this->uid."'";
-        $this->db->query($query);
-
-        if ($row = $this->db->getNextArray()) {
-            $query = "UPDATE eportfolio_config SET template = '$template' WHERE uid = '".$this->uid."'";
-        }
-        else {
-            $query = "INSERT INTO eportfolio_config (uid, template) VALUES ('$this->uid', '$template')";
-        }
-
-        $this->db->query($query);
-
-        if ($template == 3) {
-            // full column layout, move all components into left column
-            $query = "SELECT MAX(position) FROM eportfolio_comp_location WHERE uid = " . $this->uid . " AND `column` = 1";
-
-            if ($position = $this->db->getOne($query)) {
-                $query = "UPDATE eportfolio_comp_location SET position = (position + ".$position."), `column` = 1 WHERE uid = " . $this->uid . " AND `column` = 2";
-                $this->db->query($query);
-            }
-        }
 	}
 
 	/**
@@ -367,16 +376,14 @@ class Eportfolio_Container {
 	 * @return
 	 */
 	public function saveDisplayProperties($listColor) {
-		$query = "UPDATE eportfolio_config SET ";
 
-		foreach($listColor as $key => $color) {
-			$query .= "$key = '$color', ";
-		}
+        if(!$this->eportfolioConfigExists($this->uid)) {
+            $this->initialiseHomepage($this->uid);
+        }
 
-		$query = substr($query, 0, -2);
-		$query .= " WHERE uid = '".$this->uid."'";
+        $listColor['uid'] = $this->uid;
+        $this->db->update('eportfolio_config', 'uid', $listColor);
 
-		return $this->db->query($query);
 	}
 
 	/**
@@ -433,12 +440,15 @@ class Eportfolio_Container {
 	 * @return void
 	 */
 	public function updateColumnWidths($left, $right) {
-		$query = "UPDATE eportfolio_config
-				  SET
-				  	left_column_width = '{$left}',
-				  	right_column_width = '{$right}'
-				  WHERE uid = '{$this->uid}'";
 
-		$this->db->query($query);
+        if(!$this->eportfolioConfigExists($this->uid)) {
+            $this->initialiseHomepage($this->uid);
+        }
+
+        $columns = array('left_column_width'=> $left,
+                          'right_column_width' => $right,
+                          'uid' => $this->uid);
+        $this->db->update('eportfolio_config', 'uid', $columns);
+
 	}
 }

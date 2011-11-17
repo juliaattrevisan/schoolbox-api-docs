@@ -64,12 +64,6 @@ if (is_numeric($_REQUEST['uid'])) {
 
         $eportfolioHandler->saveDisplayProperties($color);
     }
-	/* AJAX Save homepage template
-	 */
-	else if ($_POST['uid'] && is_numeric($_POST['template'])) {
-        print $_POST['template'];
-        $eportfolioHandler->savePageTemplate($_POST['template']);
-    }
 	/* Post config options from homepage
 	 */
 	else if ($_GET['uid'] && $_GET['type'] == 'config' && $_GET['component']) {

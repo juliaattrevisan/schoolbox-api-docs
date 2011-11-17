@@ -66,7 +66,7 @@ class User extends DeprecatedModel {
 					LEFT JOIN groups ON user.group_id = groups.id
 					LEFT JOIN userCampus ON user.id = userCampus.uid
 					LEFT JOIN superusers ON user.id = superusers.id
-				WHERE user.id = '$id' ORDER BY userCampus.defaultCampus DESC";
+				WHERE user.id = '".mysql_real_escape_string($id)."' ORDER BY userCampus.defaultCampus DESC";
         return $this->db->getRow($query);
     }
 
