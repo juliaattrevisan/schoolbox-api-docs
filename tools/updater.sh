@@ -130,7 +130,7 @@ fi;
 loadConfig() {
 confloc=`echo -e "$schoolbox_dir/www/conf/conf.php"`;
 if [ -f $confloc ]; then
-        echo -e "Loading Database configuration from the Schoolbox config File:\n";
+        echo -e "Loading Database configuration from the Schoolbox config File:\c";
         sqluser=`cat $confloc|grep \"SQL_user|grep -v //|cut -d "\"" -f4`;
         sqlpass=`cat $confloc|grep \"SQL_passwd|grep -v //|cut -d "\"" -f4`;
         sqldb=`cat $confloc|grep \"SQL_db|grep -v //|cut -d "\"" -f4`;
