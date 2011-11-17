@@ -8,7 +8,7 @@ dependencies=( "dos2unix" );
 desired_major="5"; ### MAJOR Version, IE 5 in PHP V5.3
 desired_minor="3"; ### MINOR Version, IE 3 in PHP v5.3
 ## Designed for Schoolbox V11.0+
-echo -e "Schoolbox Updater for Ubuntu 10.10 or Higher.\nRequires a minimum of Version 11.5.0 of Schoolbox\n\n\n";
+echo -e "Schoolbox Updater for Ubuntu 10.10 or Higher, or CentOS 6.0.\nSchoolbox Version Requirement: v11.5.0 + \n\n\n";
 schoolbox_dir=`cd ../ && pwd`
 working_dir="/tmp/update_tmp";
 workingDirectory() {
@@ -27,14 +27,14 @@ fi;
 }
 errorCheck() {
 if [ $? -eq 0 ]; then
-		echo -e "... Success\n";
-	else
-		echo -e "... Failed\n";
-		
-		if [ ${#1} -eq 1 ]; then
-			echo -e "Critical Failure, Aborting update.\nIf any issues persist on your installation contact support@schoolbox.com.au or call 1300 932 338, ext. 1.";
-			exit;
-		fi;
+                echo -e "... Success\n";
+        else
+                echo -e "... Failed\n";
+
+                if [ ${#1} -eq 1 ]; then
+                        echo -e "Critical Failure, Aborting update.\nIf any issues persist on your installation contact support@schoolbox.com.au or call 1300 932 338, ext. 1.";
+                        exit;
+                fi;
 fi;
 }
 grabIndex() {
@@ -45,16 +45,43 @@ index="$working_dir/version_index";
 }
 depcheck () {
 packageName=$1;
+### UBUNTU PACKAGE CHECK
+if [[ `echo $OS|grep "ubuntu"` ]]; then
 info=`dpkg -l $packageName`;
-if [[ `echo $info|grep "ii $packageName"` ]]; then
+if [[ `echo $info|grep "ii $pckageName"` ]]; then
 echo -e "Server Package: $packageName is installed.\n";
 else
 echo -e "Server Package: $packageName is not installed.\n";
 echo -e "Attempting Installation of Package: $packageName.\n";
+if [[ `echo $OS|grep "ubuntu"` ]]; then
 apt-get install --force-yes -y $packageName >> /dev/null;
 errorCheck 1;
+else
+echo "This updater does not know how to perform a package installation for your operating system.\n";
+fi;
+fi;
+
+else
+### CENTOS PACKAGE CHECK
+if [[ `echo $OS|grep "centos"` ]]; then
+info=`yum list installed|grep $packageName|cut -d " " -f1`;
+
+fi;
+if [[ `echo $info|grep "$packageName"` ]]; then
+echo -e "Server Package: $packageName is installed.\n";
+else
+echo -e "Server Package: $packageName is not installed.\n";
+echo -e "Attempting Installation of Package: $packageName.\n";
+if [[ `echo $OS|grep "centos"` ]]; then
+yum install -y $packageName >> /dev/null;
+errorCheck 1;
+else
+echo "This updater does not know how to perform a package installation for your operating system.\n";
+fi;
+fi;
 fi;
 }
+
 dependancyChecks() {
 echo -e "Running Dependency Checks for Server packages:\n";
 for package in ${dependencies[*]}; do
@@ -75,24 +102,39 @@ codename=`cat /etc/lsb-release |grep DISTRIB_CODENAME|cut -d "=" -f2`;
 release=`cat /etc/lsb-release |grep DISTRIB_RELEASE|cut -d "=" -f2`;
 if [[ `cat /etc/lsb-release|egrep "maverick|oneiric|natty"` ]]; then
 echo -e "Detected Ubuntu $release - '$codename'\n";
+OS="ubuntu";
 else
 echo -e "Found Ubuntu $release - '$codename'\nThis version is Unfortunately not supported by this updater.\nPlease contact support@schoolbox.com.au for assistance.\n";
+exit;
+fi;
+fi;
+if [ -z $OS ]; then
+if [[ `cat /etc/redhat-release|grep "CentOS Linux"` ]]; then
+release=`cat /etc/redhat-release|cut -d " " -f4`;
+if [[ `echo $release|egrep "6\.0" ` ]]; then
+echo -e "Detected CentOS $release \n";
+OS="centos";
+else
+echo -e "Found CentOS $release \nThis version is Unfortunately not supported by this updater.\nPlease contact support@schoolbox.com.au for assistance.\n";
 exit;
 fi;
 else
 echo -e "\nNo Supported Operating System Detected.\n";
 exit;
 fi;
+fi;
+
 }
+
 
 loadConfig() {
 confloc=`echo -e "$schoolbox_dir/www/conf/conf.php"`;
 if [ -f $confloc ]; then
-	echo -e "Loading Database configuration from the Schoolbox config File:\n";
+        echo -e "Loading Database configuration from the Schoolbox config File:\n";
         sqluser=`cat $confloc|grep \"SQL_user|grep -v //|cut -d "\"" -f4`;
         sqlpass=`cat $confloc|grep \"SQL_passwd|grep -v //|cut -d "\"" -f4`;
         sqldb=`cat $confloc|grep \"SQL_db|grep -v //|cut -d "\"" -f4`;
-	echo -e "... Success.\n";
+        echo -e "... Success.\n";
 else
 echo -e "Unable to Locate Configuration file. \nThis is most likely due to the fact you are not running this Script from the /tools directory in Schoolbox.\n";
 exit;
