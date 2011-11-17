@@ -4,7 +4,8 @@ $j(document).ready(function() {
 	//add a clone!
 	var thing = $j('.hidden-clone li:first-child').clone();
 	$j('ul#answerCollection').append(thing);
-	
+
+
 	var validator = $j("#createQuestionForm").submit(function() {
 		 // update underlying textarea before submit validation
 		 tinyMCE.triggerSave();
@@ -150,19 +151,16 @@ $j(document).ready(function() {
 			$j('#leftError').css('top',  pos );
 			$j('#rightError').css('top',  pos);
 		}
-		
-		
-		
 });
 </script>
 
-<label>Answer
+<strong>Answer</strong>
     <div class="answer-collection">
         <ul id="answerCollection">			
 			<li class="answerTemplate inputs clearfix">
-				<label class="drag-me left-option"><input name="answerLeft[]" class="answerLeft text-box" type="text" value="" /></label>
+				<label class="drag-me left-option"><input name="answerLeft[]" class="answerLeft text-box" type="text"  value="" /></label>
 				<div class="arrow"><span>MATCHES</span></div>
-				<label class="drag-me right-option"><input name="answerRight[]" class="answerRight text-box" type="text" value="" /></label>
+				<label class="drag-me right-option"><input name="answerRight[]" class="answerRight text-box" type="text"  value="" /></label>
 				<div class="delete"></div>
 			</li>
 		</ul>
@@ -180,10 +178,8 @@ $j(document).ready(function() {
 			<li class="answerTemplate inputs clearfix">
 				<label class="drag-me left-option"><input name="answerLeft[]" class="answerLeft text-box" type="text" value="" /></label>
 				<div class="arrow"><span>MATCHES</span></div>
-				<label class="drag-me right-option"><input name="answerRight[]" class="answerRight text-box" type="text" value="" /></label>
+				<label class="drag-me right-option"><input name="answerRight[]" class="answerRight text-box" type="text"  value="" /></label>
 				<div class="delete"></div>
 			</li>
 		</ul>
 	</div>
-	
-</label>
