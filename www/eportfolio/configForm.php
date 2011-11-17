@@ -80,6 +80,7 @@ if (is_numeric($_REQUEST['uid'])) {
         /* All remaining options and serialised and sent to db
          */
         $config = serialize($config);
+
         $eportfolioHandler->updateComponentConfig($_GET['component'], $config);
 
 		SitePage::localRedir('/eportfolio/' . $_GET['uid']);

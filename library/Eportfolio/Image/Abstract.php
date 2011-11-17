@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Eportfolio_Image_Abstract extends DeprecatedModel {
+abstract class Eportfolio_Image_Abstract extends DeprecatedModel implements Eportfolio_Image_Interface {
 	protected $page = null;
 	protected $componentHandle = null;
 	protected $config = null;
@@ -20,12 +20,15 @@ class Eportfolio_Image_Abstract extends DeprecatedModel {
 	 * have a reference to a db instance
 	 *
 	 * @param  $page
-	 * @param  $componentLocationId
+	 * @param  $userId
+	 * @param  $config
+	 * @param  $componentHandle
 	 */
-	public function __construct($page, $userId, $config) {
+	public function __construct($page, $userId, $config, $componentHandle) {
 		$this->setPage($page);
 		$this->setUserId($userId);
 		$this->setConfig($config);
+		$this->setComponentHandle($componentHandle);
 
 		parent::DeprecatedModel();
 	}

@@ -19,7 +19,7 @@ class Eportfolio_Image_Scroller extends Eportfolio_Image_Abstract {
 	 *
 	 * @return void
 	 */
-	private function setup() {
+	public function setup() {
 		$this->getPage()->setBlock($this->getComponentHandle(), 'image', 'image_block');
 		$this->getPage()->setBlock('config', 'caption_state', 'caption_state_block');
 		$this->getPage()->setBlock($this->getComponentHandle(), 'show_caption', 'show_caption_block');
@@ -51,13 +51,12 @@ class Eportfolio_Image_Scroller extends Eportfolio_Image_Abstract {
 		$this->setConfig($config);
 	}
 
-    /**
-     * Gets all the images associated with an eportfolio
-     *
-     * @param <type> $userID
-     * @param <type> $limit
-     * @return <type>
-     */
+	/**
+	 * Gets all the images associated with an eportfolio
+	 *
+	 * @param int $limit
+	 * @return array|bool
+	 */
 	private function getImages($limit = 0) {
 		$query = "SELECT id, myFile.description
 				  FROM myFile

@@ -35,9 +35,6 @@ if($_GET['id'] && $_GET['width'] && $_GET['height'])
      * in two contexts - eportfolio or generic files
      */
     if (is_numeric($_GET['myFile'])) {
-        require_once($_SERVER['DOCUMENT_ROOT'].'/../library/eportfolio.php');
-        require_once($_SERVER['DOCUMENT_ROOT'].'/../library/group.php');
-
         $eportfolioHandler = new Eportfolio_Container($imageInfo['owner']);
 
         if (!$eportfolioHandler->canEdit($imageInfo['owner'])) {
