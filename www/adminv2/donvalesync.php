@@ -12,6 +12,15 @@
  */
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
-$sync = new Synchronise_External_Donvale_Facade();
-$sync->useWebFormatting();
-$sync->process();
+$groupHandler = new Group();
+
+/* Only superusers can run sync tasks
+ */
+if (!$groupHandler->isSuperuser()) {
+    error(19);
+}
+else {
+	$sync = new Synchronise_External_Donvale_Facade();
+	$sync->useWebFormatting();
+	$sync->process();
+}
