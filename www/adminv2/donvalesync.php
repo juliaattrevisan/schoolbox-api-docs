@@ -12,6 +12,7 @@
  */
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
+$page = new SitePage();
 $groupHandler = new Group();
 
 /* Only superusers can run sync tasks
