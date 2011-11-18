@@ -16,7 +16,7 @@ class Synchronise_External_Donvale_Timetable extends Synchronise_External_Donval
 	 * @return void
 	 */
 	public function process() {
-		if ($this->isMatching($this->getTimetableColumnList())) {
+		if ($this->isMatchingColumns($this->getTimetableColumnList())) {
 			$this->setup();
 
 			/* Create regular timetable

@@ -258,6 +258,6 @@ abstract class Synchronise_External_Donvale_Abstract {
 	 * @return
 	 */
 	protected function getUserHandler() {
-		return $this->userHandler();
+		return $this->userHandler;
 	}
 }
