@@ -15,6 +15,7 @@ abstract class Synchronise_External_Donvale_Abstract {
 	private $columnList = array();
 	private $lineCount = 1;
 	private $errorCount = 0;
+	private $lineEnding = "\n";
 
 	/**
 	 * Constructor
@@ -36,6 +37,24 @@ abstract class Synchronise_External_Donvale_Abstract {
 			$this->setInputResource($this->loadFile());
 			$this->setColumnList();
 		}
+	}
+
+	/**
+	 * Use break elements to format web interface results
+	 *
+	 * @return void
+	 */
+	public function useCliFormatting() {
+		$this->lineEnding = "\n";
+	}
+
+	/**
+	 * Use \n elements to format cli interface results
+	 *
+	 * @return void
+	 */
+	public function useWebFormatting() {
+		$this->lineEnding = '<br />';
 	}
 
 	/**
@@ -110,7 +129,7 @@ abstract class Synchronise_External_Donvale_Abstract {
 	 */
 	protected function isInvalidPropertyList($propertyList) {
 		if (count($propertyList) != count($this->getColumnList())) {
-			print("Incorrect number of fields at line #{$this->getLineCount()} in {$this->getFileName()}\n");
+			print("Incorrect number of fields at line #{$this->getLineCount()} in {$this->getFileName()}{$this->getLineEnding()}");
 
 			$this->incrementErrorCount();
 
@@ -259,5 +278,14 @@ abstract class Synchronise_External_Donvale_Abstract {
 	 */
 	protected function getUserHandler() {
 		return $this->userHandler;
+	}
+
+	/**
+	 * Get line ending
+	 *
+	 * @return string
+	 */
+	protected function getLineEnding() {
+		return $this->lineEnding;
 	}
 }

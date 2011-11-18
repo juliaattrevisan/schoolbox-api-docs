@@ -58,13 +58,15 @@ class Synchronise_External_Donvale_ClassInvolvement extends Synchronise_External
 				$this->updateInvolvement($involvement);
 			}
 
-			print("\n{$this->getErrorCount()} of {$this->getLineCount()} student to class associations failed.\n");
+			print("{$this->getLineEnding()}{$this->getErrorCount()} of {$this->getLineCount()} student to class associations failed.{$this->getLineEnding()}");
 		}
 
 		/* Unrecognized format */
 		else {
-			die("Class involvement file is not in a recognised format.\n");
+			die("Class involvement file is not in a recognised format.{$this->getLineEnding()}");
 		}
+
+		echo "{$this->getLineEnding()}{$this->getLineEnding()}";
 	}
 
 	/**
@@ -98,7 +100,7 @@ class Synchronise_External_Donvale_ClassInvolvement extends Synchronise_External
 	 */
 	private function isInvalidPropertyListId($involvement, $propertyList) {
 		if (!is_numeric($involvement['userId'])) {
-			print("User ({$propertyList['Student Code']}) not found at line #{$this->getLineCount()} in {$this->getFileName()}\n");
+			print("User ({$propertyList['Student Code']}) not found at line #{$this->getLineCount()} in {$this->getFileName()}{$this->getLineEnding()}");
 
 			$this->incrementErrorCount();
 
@@ -117,7 +119,7 @@ class Synchronise_External_Donvale_ClassInvolvement extends Synchronise_External
 	 */
 	private function isInvalidClassId($involvement, $propertyList) {
 		if (!is_numeric($involvement['classId']) ) {
-			print("Class ({$propertyList['Class Codes']}) not found at line #{$this->getLineCount()} in {$this->getFileName()}\n");
+			print("Class ({$propertyList['Class Codes']}) not found at line #{$this->getLineCount()} in {$this->getFileName()}{$this->getLineEnding()}");
 
 			$this->incrementErrorCount();
 

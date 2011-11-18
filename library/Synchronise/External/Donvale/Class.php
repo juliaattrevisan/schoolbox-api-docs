@@ -63,13 +63,15 @@ class Synchronise_External_Donvale_Class extends Synchronise_External_Donvale_Ab
 				$this->updateClassUser($classUser);
 			}
 
-			print("\n{$this->getErrorCount()} of {$this->getLineCount()} classes failed to load properly.\n");
+			print("{$this->getLineEnding()}{$this->getErrorCount()} of {$this->getLineCount()} classes failed to load properly.{$this->getLineEnding()}");
 		}
 
 		/* Unrecognized format */
 		else {
-			die("Class file is not in a recognised format.\n");
+			die("Class file is not in a recognised format.{$this->getLineEnding()}");
 		}
+
+		echo "{$this->getLineEnding()}{$this->getLineEnding()}";
 	}
 
 	/**
@@ -140,7 +142,7 @@ class Synchronise_External_Donvale_Class extends Synchronise_External_Donvale_Ab
 	 */
 	private function isInvalidPropertyListId($teacherId, $propertyList) {
 		if (!is_numeric($teacherId)) {
-			print("Teacher not found ({$propertyList['Teacher']}) at line #{$this->getLineCount()} in {$this->getFileName()}\n");
+			print("Teacher not found ({$propertyList['Teacher']}) at line #{$this->getLineCount()} in {$this->getFileName()}{$this->getLineEnding()}");
 
 			$this->incrementErrorCount();
 

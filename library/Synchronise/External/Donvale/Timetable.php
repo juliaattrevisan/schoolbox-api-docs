@@ -144,13 +144,15 @@ class Synchronise_External_Donvale_Timetable extends Synchronise_External_Donval
 				}
 			}
 
-			print("\n{$this->getErrorCount()} of {$this->getLineCount()} class to period associations failed.\n");
+			print("{$this->getLineEnding()}{$this->getErrorCount()} of {$this->getLineCount()} class to period associations failed.{$this->getLineEnding()}");
 		}
 
 		/* Unrecognized format */
 		else {
-			die("Timetable file is not in a recognised format.\n");
+			die("Timetable file is not in a recognised format.{$this->getLineEnding()}");
 		}
+
+		echo "{$this->getLineEnding()}{$this->getLineEnding()}";
 	}
 
 	/**
@@ -182,7 +184,7 @@ class Synchronise_External_Donvale_Timetable extends Synchronise_External_Donval
 	 */
 	private function isInvalidPropertyListId($classId, $propertyList) {
 		if (!is_numeric($classId)) {
-			print("Class ({$propertyList['ClassCode']}) not found at line #{$this->getLineCount()} in {$this->getFileName()}\n");
+			print("Class ({$propertyList['ClassCode']}) not found at line #{$this->getLineCount()} in {$this->getFileName()}{$this->getLineEnding()}");
 
 			$this->incrementErrorCount();
 

@@ -31,8 +31,10 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 		/* Unrecognized format
 		 */
 		else {
-			die("User file is not in a recognised format.\n");
+			die("User file is not in a recognised format.{$this->getLineEnding()}");
 		}
+
+		echo "{$this->getLineEnding()}{$this->getLineEnding()}";
 	}
 
 	/**
@@ -90,7 +92,9 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 			}
 		}
 
-		print("\n{$this->getErrorCount()} of {$this->getLineCount()} students failed to load.\n");
+		print("{$this->getLineEnding()}{$this->getErrorCount()} of {$this->getLineCount()} students failed to load.{$this->getLineEnding()}");
+
+		echo "{$this->getLineEnding()}{$this->getLineEnding()}";
 	}
 
 	/**
@@ -148,7 +152,7 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 			}
 		}
 
-		print("\n{$this->getErrorCount()} of {$this->getLineCount()} teachers failed to load.\n");
+		print("{$this->getLineEnding()}{$this->getErrorCount()} of {$this->getLineCount()} teachers failed to load.\n");
 	}
 
 	/**
@@ -222,7 +226,7 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 	 */
 	private function isInvalidPropertyListId($data, $key) {
 		if (!is_numeric($data[$key])) {
-			print("Nonnumerical ID provided at line #{$this->getLineCount()} in {$this->getFileName()}\n");
+			print("Nonnumerical ID provided at line #{$this->getLineCount()} in {$this->getFileName()}{$this->getLineEnding()}");
 
 			$this->incrementErrorCount();
 
