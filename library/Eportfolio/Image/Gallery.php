@@ -50,7 +50,7 @@ class Eportfolio_Image_Gallery extends Eportfolio_Image_Abstract {
 		if (is_array($imageList) ) {
 			foreach ($imageList as $thumbnail) {
 				$this->getPage()->setVar('THUMBNAIL', "
-					<a class=\"thumb\" href=\"/cms/image.php?myFile=1&id={$thumbnail['id']}&height=600&width=800\" rel=\"lightbox[portal]\" title=\"{$thumbnail['description']}\">
+					<a style='height:100px' class=\"float-left thumb\" href=\"/cms/image.php?myFile=1&id={$thumbnail['id']}&height=600&width=800\" rel=\"lightbox[portal]\" title=\"{$thumbnail['description']}\">
 					<img src=\"/cms/image.php?myFile=1&id={$thumbnail['id']}&height=".Cfg::get('thumbnail_size')."&width=".Cfg::get('thumbnail_size')."&resample=0\" alt=\"{$thumbnail['description']}\" border=\"0\">
 					</a>");
 
