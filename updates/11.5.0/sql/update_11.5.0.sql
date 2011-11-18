@@ -616,3 +616,12 @@ INSERT INTO config (`name`, `title`, `description`, `field`, `type`, `editable`)
 ('external_vendor_token_guid', 'Synergetic Vendor Token GUID', 'The Vendor Token GUID used to access your Synergetic SOAP API', 'input', 'External DB', 'true');
 INSERT INTO config (`name`, `title`, `description`, `field`, `type`, `editable`) VALUES
 ('external_vendor_password', 'Synergetic Vendor Password', 'The Vendor Password used to access your Synergetic SOAP API', 'input', 'External DB', 'true');
+
+
+/* Donvale Synchronise
+ */
+INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'donvale_students_csv','./testdata/StudDetails.csv','Donvale Students CSV Import','The full path to smb share','input',NULL,'External DB','true','false','false');
+INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'donvale_staff_csv','./testdata/StaffDetails.csv','Donvale Staff CSV Import','The full path to smb share','input',NULL,'External DB','true','false','false');
+INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'donvale_classes_csv','./testdata/ACCClasses.csv','Donvale Classes CSV Import','The full path to smb share','input',NULL,'External DB','true','false','false');
+INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'donvale_classinvolvement_csv','./testdata/ACCClassesStud.csv','Donvale Class Involvement CSV Import','The full path to smb share','input',NULL,'External DB','true','false','false');
+INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'donvale_timetable_csv','./testdata/ACCTimeTables.csv','Donvale Timetable CSV Import','The full path to smb share','input',NULL,'External DB','true','false','false');
