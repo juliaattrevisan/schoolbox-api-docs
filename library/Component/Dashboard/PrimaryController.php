@@ -31,6 +31,10 @@ class Component_Dashboard_PrimaryController extends Component_Dashboard_Controll
     }
 
     public function renderTemplate ($templateHandle) {
+		if ( !$this->loadTemplate($templateHandle, 'primary') ) {
+			return false;
+		}
+
         $this->setVar('MY_CLASS', $this->homeroom);
 
         return true;

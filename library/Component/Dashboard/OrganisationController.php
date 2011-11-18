@@ -25,6 +25,10 @@ class Component_Dashboard_OrganisationController extends Component_Dashboard_Con
     }
 
     public function renderTemplate ($templateHandle) {
+		if ( !$this->loadTemplate($templateHandle, 'organisation') ) {
+			return false;
+		}
+
         $this->setBlock($templateHandle, 'extras_staff', 'extras_staff_block');
 
         if ( $this->group->isStaff() ) {

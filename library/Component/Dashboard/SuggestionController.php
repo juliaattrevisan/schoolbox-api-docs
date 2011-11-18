@@ -11,7 +11,7 @@
 
 class Component_Dashboard_SuggestionController extends Component_Dashboard_ControllerAbstract {
 
-    const CATEGORY_ID = 1699;
+    const CATEGORY_ID = 73;
 
     protected $categoryNews;
 
@@ -24,15 +24,19 @@ class Component_Dashboard_SuggestionController extends Component_Dashboard_Contr
     }
 
     public function execute () {
-        $this->categoryNews = $this->categoryNews->getAllForCategory(self::CATEGORY_ID, array( 'size', 1 ));
+        $this->categoryNewsList = $this->categoryNews->getAllForCategory(self::CATEGORY_ID, array( 'size', 1 ));
 
         return true;
     }
 
     public function renderTemplate ($templateHandle) {
-        if ( is_array($this->categoryNews) ) {
-            $this->setVar('TIPS_TRICKS_HEADING', Scrub::text($this->categoryNews[0]['heading']));
-            $this->setVar('TIPS_TRICKS', Scrub::html($this->categoryNews[0]['body']));
+		if ( !$this->loadTemplate($templateHandle, 'suggestion') ) {
+			return false;
+		}
+
+        if ( is_array($this->categoryNewsList) ) {
+            $this->setVar('TIPS_TRICKS_HEADING', Scrub::text($this->categoryNewsList[0]['heading']));
+            $this->setVar('TIPS_TRICKS', Scrub::html($this->categoryNewsList[0]['body']));
 
             return true;
         }

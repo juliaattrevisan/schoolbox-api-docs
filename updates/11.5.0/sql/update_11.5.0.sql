@@ -103,7 +103,24 @@ CREATE TABLE `component_definition`(
 	PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET='utf8';
 
-insert  into `component_definition`(`id`,`name`,`class`,`description`,`module`,`visible`) values (1,'Timetable','Component_Dashboard_TimetableController',NULL,'dashboard','true'),(2,'Greeting','Component_Dashboard_GreetingController',NULL,'dashboard','true'),(3,'Calendar','Component_Dashboard_CalendarController',NULL,'dashboard','true'),(4,'News','Component_Dashboard_NewsController',NULL,'dashboard','true'),(5,'Weather','Component_Dashboard_WeatherController',NULL,'dashboard','true'),(6,'Activity','Component_Dashboard_ActivityController',NULL,'dashboard','true'),(7,'Child Subject','Component_Dashboard_ChildSubjectController',NULL,'dashboard','true'),(8,'Helpdesk','Component_Dashboard_HelpdeskController',NULL,'dashboard','false'),(9,'Link','Component_Dashboard_LinkController',NULL,'dashboard','true'),(11,'Parent Helpdesk','Component_Dashboard_ParentHelpdeskController',NULL,'dashboard','false'),(13,'RSS','Component_Dashboard_RssController',NULL,'dashboard','true'),(14,'Shortcut','Component_Dashboard_ShortcutController',NULL,'dashboard','false'),(15,'Suggestion','Component_Dashboard_SuggestionController',NULL,'dashboard','false'),(16,'Tutorial','Component_Dashboard_TutorialController',NULL,'dashboard','false'),(17,'Wenona Intranet','Component_Dashboard_WenonaIntranetController',NULL,'dashboard','false');
+INSERT INTO `component_definition`(`id`,`name`,`class`,`description`,`module`,`visible`)
+VALUES (1,'Timetable','Component_Dashboard_TimetableController',NULL,'dashboard','true'),
+  (2,'Greeting','Component_Dashboard_GreetingController',NULL,'dashboard','true'),
+  (3,'Calendar','Component_Dashboard_CalendarController',NULL,'dashboard','true'),
+  (4,'News','Component_Dashboard_NewsController',NULL,'dashboard','true'),
+  (5,'Weather','Component_Dashboard_WeatherController',NULL,'dashboard','true'),
+  (6,'Activity','Component_Dashboard_ActivityController',NULL,'dashboard','true'),
+  (7,'Child Subject','Component_Dashboard_ChildSubjectController',NULL,'dashboard','true'),
+  (8,'Helpdesk','Component_Dashboard_HelpdeskController',NULL,'dashboard','false'),
+  (9,'Link','Component_Dashboard_LinkController',NULL,'dashboard','true'),
+  (11,'Parent Helpdesk','Component_Dashboard_ParentHelpdeskController',NULL,'dashboard','false'),
+  (13,'RSS','Component_Dashboard_RssController',NULL,'dashboard','true'),
+  (14,'Shortcut','Component_Dashboard_ShortcutController',NULL,'dashboard','false'),
+  (15,'Suggestion','Component_Dashboard_SuggestionController',NULL,'dashboard','false'),
+  (16,'Tutorial','Component_Dashboard_TutorialController',NULL,'dashboard','false'),
+  (17,'Wenona Intranet','Component_Dashboard_WenonaIntranetController',NULL,'dashboard','false'),
+  (18,'Primary','Component_Dashboard_PrimaryController',NULL,'dashboard','false'),
+  (19,'Organisation','Component_Dashboard_OrganisationController',NULL,'dashboard','false');
 
 CREATE TABLE `component_instance`(
 	`id` int(10) unsigned NOT NULL  auto_increment ,
@@ -456,6 +473,8 @@ UPDATE `component_definition` SET `multiple`='false' WHERE `id`='14';
 UPDATE `component_definition` SET `multiple`='false' WHERE `id`='15';
 UPDATE `component_definition` SET `multiple`='false' WHERE `id`='16';
 UPDATE `component_definition` SET `multiple`='false' WHERE `id`='17';
+UPDATE `component_definition` SET `multiple`='false' WHERE `id`='18';
+UPDATE `component_definition` SET `multiple`='false' WHERE `id`='19';
 
 /* Set colours for new top position on hompages to colours of the left position */
 UPDATE `homepage_config` SET
