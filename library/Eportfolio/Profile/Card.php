@@ -44,7 +44,7 @@ class Eportfolio_Profile_Card extends Eportfolio_Profile_Abstract {
 
         }
         else {
-               $this->getPage()->setVar('sudent_block','');
+               $this->getPage()->setVar('student_block','');
             }
 	
 	}

@@ -16,15 +16,6 @@ class Eportfolio_Objective_Interest extends Eportfolio_Objective_Abstract implem
 	 */
 	protected $facadePrimaryKey = 'objectiveInterestID';
 
-	/**
-	 * Special formatting
-	 *
-	 * @param  $body
-	 * @return string
-	 */
-	public function getBody($body) {
-		return $this->listify($body);
-	}
 
 	/**
 	 * Render a component on the page with appropriate tokens

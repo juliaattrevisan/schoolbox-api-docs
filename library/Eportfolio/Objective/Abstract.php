@@ -40,7 +40,7 @@ class Eportfolio_Objective_Abstract extends DeprecatedModel {
 	 * @return string
 	 */
 	public function getBody($body) {
-		return $body;
+		return Scrub::html($body);
 	}
 
 	/**
@@ -49,9 +49,9 @@ class Eportfolio_Objective_Abstract extends DeprecatedModel {
 	 * @param  $body
 	 * @return string
 	 */
-	protected function listify($body) {
+	/*protected function listify($body) {
 		return '<ul><li>' . str_replace("\n", '</li><li>', Scrub::html(trim($body))) . '</li></ul>';
-	}
+	}*/
 
 	/**
 	 * Get the Objectives components for a user
