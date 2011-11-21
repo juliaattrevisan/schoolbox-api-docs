@@ -112,7 +112,7 @@ VALUES (1,'Timetable','Component_Dashboard_TimetableController',NULL,'dashboard'
   (6,'Activity','Component_Dashboard_ActivityController',NULL,'dashboard','true'),
   (7,'Child Subject','Component_Dashboard_ChildSubjectController',NULL,'dashboard','true'),
   (8,'Helpdesk','Component_Dashboard_HelpdeskController',NULL,'dashboard','false'),
-  (9,'Link','Component_Dashboard_LinkController',NULL,'dashboard','true'),
+  (9,'Link','Component_Dashboard_LinkController',NULL,'dashboard','false'),
   (11,'Parent Helpdesk','Component_Dashboard_ParentHelpdeskController',NULL,'dashboard','false'),
   (13,'RSS','Component_Dashboard_RssController',NULL,'dashboard','true'),
   (14,'Shortcut','Component_Dashboard_ShortcutController',NULL,'dashboard','false'),

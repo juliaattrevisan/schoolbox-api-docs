@@ -53,13 +53,16 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 
 		$days = ceil( ($date - $start) / (60 * 60 * 24) );
 
+		/* Calculate the business days from the even weeks */
 		$businessDays = 5 * floor($days / 7);
 
+		/* Handle the excess days */
 		$excessDays = $days % 7;
 
 		for ( $i = 0; $i < $excessDays; $i++ ) {
 			$currentExcessDay = $date - (60 * 60 * 24 * $i);
 
+			/* If its not Saturday or Sunday then increment the business days */
 			if ( date('N', $currentExcessDay) < 6 ) {
 				$businessDays++;
 			}

@@ -37,5 +37,9 @@ UPDATE component_definition,config SET visible = 'true' WHERE component_definiti
 UPDATE component_definition,config SET visible = 'false' WHERE component_definition.name = 'Primary';
 UPDATE component_definition,config SET visible = 'true' WHERE component_definition.name = 'Primary' AND config.value IN (Select value from config where name = 'site_location' and value = 'mgs');
 
+/* Ensures the  Component "Link" isnt visible to other schools. */
+UPDATE component_definition,config SET visible = 'false' WHERE component_definition.name = 'Link';
+UPDATE component_definition,config SET visible = 'true' WHERE component_definition.name = 'Link' AND config.value IN (Select value from config where name = 'site_location' and value = 'wenona');
+
 /* Deletes all Active Components that are supposed to be hidden */
 DELETE FROM component_instance WHERE component_definition_id IN (SELECT id FROM component_definition WHERE visible = 'false');
