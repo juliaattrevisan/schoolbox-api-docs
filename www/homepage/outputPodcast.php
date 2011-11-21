@@ -27,6 +27,11 @@ if(!empty($config['url'])) {
 
 				$this->parse('podcast_list_block', 'podcast_list', true);
 			}
+            else {
+                $this->setVar('PODCAST_COMPONENT_TITLE', 'Podcast - URL is not a valid audio podcast');
+                $this->setVar('podcast_list_block', '');
+                break;
+            }
 
             if ($j == $config['size'] || $config['url'] != 0) {
                 break;
@@ -34,7 +39,7 @@ if(!empty($config['url'])) {
         }
     }
     else {
-        $this->setVar('PODCAST_COMPONENT_TITLE', 'Podcast - URL is not a podcast');
+        $this->setVar('PODCAST_COMPONENT_TITLE', 'Podcast - URL is not a valid audio podcast');
         $this->setVar('podcast_list_block', '');
     }
 }
@@ -42,4 +47,3 @@ else {
     $this->setVar('PODCAST_COMPONENT_TITLE', 'Podcast - Please set URL');
     $this->setVar('podcast_list_block', '');
 }
-
