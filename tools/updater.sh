@@ -185,7 +185,7 @@ fi;
 echo -e "Locating new Version (if available):\n"
 new_ver_id=`expr $cur_ver_id + 1`;
 new_ver=`cat $index|grep "$new_ver_id:"|cut -d ":" -f2`;
-echo -e "Verifying new version name:\c";
+echo -e "Verifying new version name:\n";
 echo $new_ver >> $working_dir/tmpversion;
 dos2unix $working_dir/tmpversion;
 errorCheck;
