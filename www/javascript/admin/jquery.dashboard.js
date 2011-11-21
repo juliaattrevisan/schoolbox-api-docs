@@ -103,7 +103,6 @@
 
         $('.delete-this').live('click',function() {
             var $instanceId = $(this).parent().attr('id').match(/^instance\-id\-(\d+)$/)[1];
-            console.log($(this).parent());
 
             $(this).parent().slideUp(100,function(){
                 $(this).remove();
