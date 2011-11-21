@@ -353,7 +353,7 @@ class News extends DeprecatedModel {
 				    AND item_datetime_published < NOW()
 					AND item_deleted = 0
 				  GROUP BY `".$this->_index."`
-				  ORDER BY item_datetime_modified DESC";
+				  ORDER BY item_datetime_posted DESC";
 
 		return $this->db->getAll($query);
 
@@ -364,10 +364,10 @@ class News extends DeprecatedModel {
 	
 		if ($a['newsTopicID'] == $b['newsTopicID']) {
 			//just a quick function to enable sorting of news based on time
-			if ($a['item_datetime_modified'] == $b['item_datetime_modified']) {
+			if ($a['item_datetime_posted'] == $b['item_datetime_posted']) {
 				return 0;
 			}
-			return ($a['item_datetime_modified'] > $b['item_datetime_modified']) ? -1 : 1;
+			return ($a['item_datetime_posted'] > $b['item_datetime_posted']) ? -1 : 1;
 		} else {
 			return $a['newsTopicID'] > $b['newsTopicID']?1:-1;
 		}
