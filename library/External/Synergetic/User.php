@@ -91,18 +91,21 @@ class External_Synergetic_User implements External_UserInterface {
 					LEFT JOIN SynergyOne.dbo.luForm ON vStudents.StudentForm=luForm.Code
 					LEFT JOIN SynergyOne.dbo.luTutor ON vStudents.StudentTutor=luTutor.Code
 				WHERE
-					vStudents.StudentID = $synID
+					vStudents.StudentID = '$synID'
 					AND vStudents.FileSemester=".$_SESSION['FileSemester']."
 					AND vStudents.FileYear=".$_SESSION[ 'FileYear']."
 		";
-
 		$student = $this->getDatabase()->getRow($query);
 
-		preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches);
-		$student['StudentBirthDate'] = strtotime($matches[2].' '.$matches[1].' '.$matches[3]);
 
-		return $student;
+        if(is_array($student)) {
+            preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches);
+            $student['StudentBirthDate'] = strtotime($matches[2].' '.$matches[1].' '.$matches[3]);
 
+            return $student;
+        }
+
+        return false;
 	}
 
        function getStaff($synID)

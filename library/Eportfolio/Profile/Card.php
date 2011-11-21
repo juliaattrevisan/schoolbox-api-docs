@@ -20,22 +20,32 @@ class Eportfolio_Profile_Card extends Eportfolio_Profile_Abstract {
 	 * @return void
 	 */
 	public function render() {
-		$this->getPage()->setBlock(TEMPLATE_content, 'year_level', 'year_level_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'student', 'student_block');
 
 		$userHandler = new User();
-		$profile = $userHandler->getProfile($this->getUserId());
+        $groupHandler = new Group();
 
-		if ($profile['year'] > 0) {
-			$this->getPage()->setVar('YEAR', $profile['year']);
-			$this->getPage()->parse('year_level_block', 'year_level');
-		}
-		else {
-			$this->getPage()->setVar('year_level_block', '');
-		}
+        $user = $userHandler->getByID($this->getUserId());
 
-		$this->getPage()->setVar(array(
-			'HOUSE' => $profile['house'],
-			'CAMPUS' => $profile['campus'],
-		));
+        if($groupHandler->isStudent() ) {
+
+            $this->getPage()->setVar('CAMPUS', $user['campusName']);
+            $this->getPage()->setVar('YEAR', $user['year']);
+
+            if(Cfg::get('external_enable')) {
+                $extUserHandler = new External_User();
+
+                $student = $extUserHandler->getStudent($user['synergy_id']);
+                $this->getPage()->setVar(array(
+                                              'YEAR' => Scrub::text($student['StudentYearLevel']),
+                                              'HOUSE' => Scrub::text($student['StudentHouseDescription'])));
+                $this->getPage()->parse('student_block','student');
+            }
+
+        }
+        else {
+               $this->getPage()->setVar('sudent_block','');
+            }
+	
 	}
 }

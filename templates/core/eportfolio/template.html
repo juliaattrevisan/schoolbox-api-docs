@@ -332,12 +332,12 @@ a.{NAME} {
 			<h2>My Profile</h2>
 			<div class="pad-it">
 				<img src="/search/portrait.php?id={SYNERGY_ID}&width=150&height=150" alt="{PERSON_NAME}" title="{PERSON_NAME}" />
-				<p> <strong>{PERSON_NAME}</strong><br />
+				<p> <strong><a href="/search/user/{ID}">{PERSON_NAME}</a></strong><br />
+                    <!-- BEGIN student -->
 					House: {HOUSE}<br />
 					Campus: {CAMPUS}<br />
-					<!-- BEGIN year_level -->
                     Year: {YEAR}
-                    <!-- END year_level -->
+                    <!-- END student -->
                 </p>
 			</div>
 		</div>
