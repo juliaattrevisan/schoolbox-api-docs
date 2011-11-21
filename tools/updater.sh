@@ -237,8 +237,8 @@ errorCheck;
 
 }
 confirmPermissions() {
-echo -e "Configuring Permissions:\c";
-echo -e "Installation Directory Owner set to Alaress:\n";
+echo -e "Configuring Permissions:\n";
+echo -e "Installation Directory Owner set to Alaress:\c";
 chown -R alaress:alaress $schoolbox_dir;
 errorCheck;
 echo -e "Permissions reset on install Directory:\c";
@@ -312,9 +312,9 @@ rm -Rf /tmp/minify*
 errorCheck;
 }
 isErrors() {
-echo -e "Error Detection Report:\n";
+echo -e "Error Detection Report:\c";
 if [ -s /tmp/update_$dbname$new_ver.errlog ]; then
-echo -e "There were potential errors found during the update,\nLocated in: /tmp/update_$dbname$new_ver.errlog.\n";
+echo -e "\nThere were potential errors found during the update,\nLocated in: /tmp/update_$dbname$new_ver.errlog.\n";
 echo -e "Attempting to mail error Log to support@schoolbox.com.au for review:\c";
 mail -s "Schoolbox Update Error Log" support@schoolbox.com.au < /tmp/update_$dbname$new_ver.errlog;
 errorCheck;
