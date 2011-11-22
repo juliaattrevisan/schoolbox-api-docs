@@ -51,9 +51,11 @@ $this->setVar($output);
 
 /*Output delete button */
 $this->setVar('delete_button_block', '');
+$this->setVar('modify_heading_block', '');
 
 if ($perm >= WRITE_ACCESS) {
-	$this->parse('delete_button_block', 'delete_button', true);
+	$this->parse('delete_button_block', 'delete_button');
+    $this->parse('modify_heading_block', 'modify_heading');
 }
 
 /* output pagination */
@@ -141,10 +143,9 @@ if (is_array($threadList)) {
 
 		/* Delete checkbox */
 		$this->setVar('modify_thread_block', '');
-		$this->setVar('modify_heading_block', '');
+
 		if ($perm >= WRITE_ACCESS) {
 			$this->parse('modify_thread_block', 'modify_thread', true);
-			$this->parse('modify_heading_block',  'modify_heading', true);
 		}
 
 		/* last post block */
@@ -158,5 +159,5 @@ if (is_array($threadList)) {
 	}
 }
 else {
-	$this->setVar('thread_block', '<p>There are no threads to display. Create a new thread.</p>');
+	$this->setVar('thread_block', '<p>This forum is currently empty, to get started post a new thread.</p>');
 }
