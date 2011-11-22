@@ -1,7 +1,18 @@
 var $j = jQuery.noConflict();
 
 $j(function() {
-	
+	/*
+	* Remove the layerX and layerY console log reports from Webkit.
+	* */
+    var all = $j.event.props,
+        len = all.length,
+        res = [];
+    while (len--) {
+      var el = all[len];
+      if (el != 'layerX' && el != 'layerY') res.push(el);
+    }
+    $j.event.props = res;
+
 	/*
 	* Main Navigation dropdown
 	* */
@@ -48,8 +59,7 @@ function calendarPos(currentObject, leftNegative, heightNegative) {
 	$j('.cal-bubble').show();
 	var annoyingHeight = ($j('.cal-bubble .middle').height() + ($j('.cal-bubble .top').height()) + ($j('.cal-bubble .bottom').height())) 			
 	$j('.cal-bubble').css("left", (position.left - leftNegative));
-	$j('.cal-bubble').css("top", (position.top - annoyingHeight - heightNegative));	
-	
+	$j('.cal-bubble').css("top", (position.top - annoyingHeight - heightNegative));
 	if (($j('.cal-bubble').css("left")) < '0px') {
 			$j('.cal-bubble').css("left", '0');	
 	}
