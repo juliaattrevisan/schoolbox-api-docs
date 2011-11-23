@@ -26,6 +26,14 @@ $j(function() {
 
 
 	/*
+	* Close the calendar popup no matter what!
+	* */
+	$j('.cal-bubble .close').click(function(){
+		$j('.cal-bubble').hide();
+	})
+
+
+	/*
 	* Autoclear the main site search field
 	* */
 	$j('#search-field').autoclear();

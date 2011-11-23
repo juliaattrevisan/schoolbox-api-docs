@@ -1,4 +1,5 @@
 setupCustomise = {
+	
 	ajaxURL: '',
 	id: '',
 	key: 'cid',
