@@ -7,12 +7,11 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/survey/Survey.php');
 require_once('../library/group.php');
 require_once('include/time.php');
 
 $groupHandler = new Group();
-$assessHandler = new Survey();
+$assessHandler = new Survey_Main();
 
 if (!$groupHandler->isStaff()) {
     error(126);
@@ -41,7 +40,7 @@ if (!empty($_POST)) {
         'description' => Scrub::text($_POST['description']),
         'start'       => $start->getDatabase(),
         'finish'      => $finish->getDatabase(),
-        'duration'    => Survey::UNLIMITED_DURATION,
+        'duration'    => Survey_Main::UNLIMITED_DURATION,
         'allow_resit' => Scrub::text($_POST['allow_resit']),
     ));
 
@@ -146,7 +145,7 @@ else {
     $this->setBlock('assessContentsFragment', 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');
 
-    $assess = new Survey();
+    $assess = new Survey_Main();
     $assess->renderAssessContents($this->arg[0], $this);
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);

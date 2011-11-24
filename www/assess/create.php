@@ -7,7 +7,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/Assess.php');
 require_once('../library/group.php');
 require_once('include/time.php');
 
@@ -17,7 +16,7 @@ if (!$groupHandler->isStaff()) {
     error(126);
 }
 
-$assessHandler = new Assess();
+$assessHandler = new Assess_Main();
 
 if (!empty($_POST)) {
 
@@ -32,7 +31,7 @@ if (!empty($_POST)) {
     $duration = ($_POST['duration']['hour'] * 60 + $_POST['duration']['minute']) * 60;
 
     if ($duration == 0) {
-        $duration = Assess::UNLIMITED_DURATION;
+        $duration = Assess_Main::UNLIMITED_DURATION;
     }
 
     $assess_id = $assessHandler->create(array(

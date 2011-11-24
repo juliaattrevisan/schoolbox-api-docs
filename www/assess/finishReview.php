@@ -7,11 +7,9 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/Assess.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessAttempt.php';
 
-$assessHandler = new Assess();
-$attemptHandler = new AssessAttempt();
+$assessHandler = new Assess_Main();
+$attemptHandler = new Assess_Attempt();
 
 if (!is_numeric($this->arg[0])) {
     error(112);

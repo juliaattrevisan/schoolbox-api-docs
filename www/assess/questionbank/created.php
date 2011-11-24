@@ -5,4 +5,3 @@ $this->setVar(array(
 	'QUESTION_ID' => $this->arg[0],
 ));
 
-?>

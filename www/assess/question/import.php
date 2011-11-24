@@ -8,8 +8,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/AssessFactory.php');
-require_once('../library/assess/AssessSection.php');
 
 if (!is_numeric($this->arg[0])) {
     error(18);
@@ -22,9 +20,9 @@ else {
     error(134);
 }
 
-$factory = new AssessFactory();
-$questionHandler = new AssessQuestion();
-$sectionHandler = new AssessSection();
+$factory = new Assess_Factory();
+$questionHandler = new Assess_Question();
+$sectionHandler = new Assess_Section();
 
 $currentSection = $sectionHandler->getById($this->arg[0]);
 

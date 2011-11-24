@@ -7,16 +7,11 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/Assess.php');
-require_once('../library/assess/AssessAttempt.php');
-require_once('../library/assess/AssessQuestion.php');
-require_once('../library/assess/AssessFactory.php');
-require_once('../library/assess/AssessResponse.php');
 
-$assessHandler = new Assess();
-$attemptHandler = new AssessAttempt();
-$questionHandler = new AssessQuestion();
-$responseHandler = new AssessResponse();
+$assessHandler = new Assess_Main();
+$attemptHandler = new Assess_Attempt();
+$questionHandler = new Assess_Question();
+$responseHandler = new Assess_Response();
 
 if (!is_numeric($_SESSION['attempt_id'])) {
     SitePage::localRedir('/assess/intro/' . $this->arg[0]);
@@ -91,7 +86,7 @@ else {
  */
 $allAttempts = $attemptHandler->getListByAssessAndAttempt($this->arg[0], $_SESSION['attempt_id']);
 
-$factory = new AssessFactory();
+$factory = new Assess_Factory();
 
 if ($allAttempts) {
     foreach($allAttempts as $currentAttempt) {

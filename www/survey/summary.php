@@ -7,13 +7,10 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/survey/Survey.php');
-require_once('../library/survey/SurveySection.php');
-require_once('../library/survey/SurveyAttempt.php');
 
-$assessHandler = new Survey();
-$sectionHandler = new SurveySection();
-$attemptHandler = new SurveyAttempt();
+$assessHandler = new Survey_Main();
+$sectionHandler = new Survey_Section();
+$attemptHandler = new Survey_Attempt();
 
 $assess = $assessHandler->getIntro($this->arg[0]);
 $allSummary = $assessHandler->getIntroSummary($this->arg[0]);
@@ -48,7 +45,7 @@ $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
 $this->setVar(array(
-    'ASSESS_DURATION' => $assess['duration'] == Survey::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
+    'ASSESS_DURATION' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
 ));
 
 /* Section list and question count
@@ -68,4 +65,3 @@ if (is_array($allSummary) && count($allSummary)) {
 else {
     $this->setVar('section_block', '');
 }
-?>

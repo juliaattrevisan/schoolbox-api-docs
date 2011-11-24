@@ -9,15 +9,12 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/survey/Survey.php');
-require_once('../library/survey/SurveySection.php');
-require_once('../library/survey/SurveyAttempt.php');
 require_once('../library/group.php');
 require_once('../library/user.php');
 
-$assessHandler = new Survey();
-$sectionHandler = new SurveySection();
-$attemptHandler = new SurveyAttempt();
+$assessHandler = new Survey_Main();
+$sectionHandler = new Survey_Section();
+$attemptHandler = new Survey_Attempt();
 $groupHandler = new Group();
 $userHandler = new User();
 
@@ -75,7 +72,7 @@ $this->setBlock(TEMPLATE_content, 'error', 'error_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
 $this->setVar(array(
-    'ASSESS_DURATION' => $assess['duration'] == Survey::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
+    'ASSESS_DURATION' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
 ));
 
 /* Section list and question count
@@ -113,7 +110,7 @@ $attemptEndTime = $attemptStartTime + $assess['duration'];
  * 2. The assessment is one-time-only, and you haven't completed an attempt, and have time to do it, and have not yet attempted
  */
 if ($assessHandler->allowResit($this->arg[0])) {
-    if (!(($assess['duration'] == Survey::UNLIMITED_DURATION) || (strtotime($assess['finish']) > time()))) {
+    if (!(($assess['duration'] == Survey_Main::UNLIMITED_DURATION) || (strtotime($assess['finish']) > time()))) {
         $this->setVar(array(
             'ERROR_STRING' => 'This online assessment has expired.'
         ));
@@ -136,7 +133,7 @@ else {
         $this->setVar('startTest_block', '');
         $this->parse('error_block', 'error');
     }
-    else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Survey::UNLIMITED_DURATION)) {
+    else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Survey_Main::UNLIMITED_DURATION)) {
         $this->setVar(array(
             'ERROR_STRING' => 'You have run out of time to complete this survey and cannot re-sit it.'
         ));
@@ -168,4 +165,3 @@ else {
         $this->setVar('error_block', '');
     }
 }
-?>

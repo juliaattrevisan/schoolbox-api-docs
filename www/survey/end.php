@@ -7,15 +7,11 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/survey/Survey.php');
-require_once('../library/survey/SurveyAttempt.php');
-require_once('../library/survey/SurveyQuestion.php');
-require_once('../library/survey/SurveyResponse.php');
 
-$assessHandler = new Survey();
-$attemptHandler = new SurveyAttempt();
-$questionHandler = new SurveyQuestion();
-$responseHandler = new SurveyResponse();
+$assessHandler = new Survey_Main();
+$attemptHandler = new Survey_Attempt();
+$questionHandler = new Survey_Question();
+$responseHandler = new Survey_Response();
 
 if (!is_numeric($_SESSION['attempt_id'])) {
     SitePage::localRedir('/survey/intro/' . $this->arg[0]);

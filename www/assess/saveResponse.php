@@ -7,15 +7,9 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/Assess.php');
-require_once('../library/assess/AssessQuestion.php');
-require_once('../library/assess/AssessAnswer.php');
-require_once('../library/assess/AssessFactory.php');
-require_once('../library/assess/AssessSection.php');
-
-$assessHandler = new Assess();
-$questionHandler = new AssessQuestion();
-$sectionHandler = new AssessSection();
+$assessHandler = new Assess_Main();
+$questionHandler = new Assess_Question();
+$sectionHandler = new Assess_Section();
 
 $question = $questionHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($question['section_id']);
@@ -46,7 +40,7 @@ if (!$question) {
     error(119);
 }
 
-$factory = new AssessFactory();
+$factory = new Assess_Factory();
 $answerHandler = $factory->createAnswerModel($question['type_id']);
 
 $data = $_POST;
@@ -66,4 +60,3 @@ echo json_encode($result);
  */
 exit();
 
-?>

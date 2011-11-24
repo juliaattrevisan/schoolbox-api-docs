@@ -7,17 +7,11 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once '../library/survey/Survey.php';
-require_once '../library/survey/SurveySection.php';
-require_once '../library/survey/SurveyQuestion.php';
-require_once '../library/survey/SurveyAnswer.php';
-require_once '../library/survey/SurveyFactory.php';
-require_once('../library/survey/SurveyQuestionCategory.php');
 require_once('../library/group.php');
 
-$factory = new SurveyFactory();
-$assessHandler = new Survey();
-$sectionHandler = new SurveySection();
+$factory = new Survey_Factory();
+$assessHandler = new Survey_Main();
+$sectionHandler = new Survey_Section();
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {
@@ -68,7 +62,7 @@ else {
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
 
-    $questionHandler = new SurveyQuestion();
+    $questionHandler = new Survey_Question();
     $question = $questionHandler->getByID($this->arg[0]);
     $section = $sectionHandler->getByID($question['section_id']);
 
@@ -127,7 +121,7 @@ else {
     $this->setBlock('assessContentsFragment', 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');
 
-    $assess = new Survey();
+    $assess = new Survey_Main();
     $assess->renderAssessContents($section['assess_id'], $this);
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);
@@ -136,7 +130,7 @@ else {
 	 */
 	$this->setBlock(TEMPLATE_content, 'question_category', 'question_category_block');
 
-	$questionCategoryHandler = new SurveyQuestionCategory();
+	$questionCategoryHandler = new Survey_Question_Category();
 	$allQuestionCategories = $questionCategoryHandler->getList();
 
 	if (is_array($allQuestionCategories) && count($allQuestionCategories)) {

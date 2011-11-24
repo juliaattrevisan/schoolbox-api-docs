@@ -8,12 +8,9 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/AssessFactory.php');
-require_once('../library/assess/AssessQuestion.php');
-require_once('../library/assess/AssessResponse.php');
 
-$factory = new AssessFactory();
-$questionHandler = new AssessQuestion();
+$factory = new Assess_Factory();
+$questionHandler = new Assess_Question();
 
 $currentQuestion = $questionHandler->getById($this->arg[0]);
 
@@ -63,4 +60,3 @@ $this->template->pparse('finaloutput', 'xml');
 /* Prevent other template crap from rendering ;)
  */
 die();
-?>

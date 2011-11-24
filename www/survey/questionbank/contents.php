@@ -1,9 +1,4 @@
 <?php
-require_once('../library/survey/SurveyQuestion.php');
-require_once('../library/survey/SurveyAnswer.php');
-require_once('../library/survey/SurveyQuestionBank.php');
-require_once('../library/survey/SurveyQuestionCategory.php');
-
 $this->setFile(TEMPLATE_content, 'survey/questionbank/contents.html');
 $this->setBlock(TEMPLATE_content, 'welcome', 'welcome_block');
 $this->setBlock(TEMPLATE_content, 'category_selected', 'category_selected_block');
@@ -20,16 +15,15 @@ $this->setVar(array(
 	'SECTION_ID' => $this->arg[2],
 ));
 
-$questionBankHandler = new SurveyQuestionBank();
+$questionBankHandler = new Survey_Question_Bank();
 
 /* output question bank categories */
-$questionBankCategoryHandler = new SurveyQuestionCategory();
+$questionBankCategoryHandler = new Survey_Question_Category();
 
 $categoryList = $questionBankCategoryHandler->getList();
 
-if(is_array($categoryList) ) {
+if (is_array($categoryList) ) {
     foreach($categoryList as $category) {
-
         $this->setVar(array(
             'CATEGORY_NAME' => $category['name'],
             'CATEGORY_ID'   => $category['question_category_id'],
@@ -56,7 +50,6 @@ if($this->arg[0] > 0) {
         $previousCategory = false;
 
         foreach($allQuestions as $currentQuestion) {
-
             $this->setVar(array(
                 'QUESTION_BANK_ID' => $currentQuestion['question_bank_id'],
                 'QUESTION_TYPE' => $currentQuestion['description'],
@@ -67,10 +60,10 @@ if($this->arg[0] > 0) {
 
             if($currentQuestion['answer']) {
                 $answerList = unserialize($currentQuestion['answer']);
-                 foreach($answerList as $answer) {
+				foreach($answerList as $answer) {
                     $this->setVar('ANSWER_DESCRIPTION', $answer->description);
                     $this->parse('answers_block','answers',true);
-                 }
+                }
             }
 
             $this->parse('question_block', 'question', true);
@@ -79,7 +72,7 @@ if($this->arg[0] > 0) {
         }
 
         $this->parse('category_selected_block','category_selected');
-        
+
         /* Hide submit button if we aren't adding contents to a section
          */
         if (is_numeric($this->arg[2])) {

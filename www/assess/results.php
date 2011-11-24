@@ -11,11 +11,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/Assess.php');
-require_once('../library/assess/AssessFactory.php');
-require_once('../library/assess/AssessAttempt.php');
-require_once('../library/assess/AssessResponse.php');
-require_once('../library/assess/AssessSection.php');
 require_once('../library/group.php');
 require_once('../library/category.php');
 require_once('../library/user.php');
@@ -25,12 +20,14 @@ require_once('../library/user.php');
  * process students in the class, and then later used to deal with remainder
  * attempts in a separate iteration.
  *
- * @param <type> $assessHandler
- * @param <type> $attemptHandler
- * @param <type> $responseHandler
- * @param <type> $sectionHandler
- * @param <type> $currentAttempt
- * @param <type> $page
+ * @param  $assessHandler
+ * @param  $attemptHandler
+ * @param  $responseHandler
+ * @param  $sectionHandler
+ * @param  $currentAttempt
+ * @param  $page
+ * @param  $currentStudent
+ * @return void
  */
 function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $page, $currentStudent) {
 	$firstSection = $sectionHandler->getFirst($page->arg[0]);
@@ -108,11 +105,11 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 
 /* Handlers and stuff
  */
-$factory = new AssessFactory();
-$responseHandler = new AssessResponse();
-$assessHandler = new Assess();
-$attemptHandler = new AssessAttempt();
-$sectionHandler = new AssessSection();
+$factory = new Assess_Factory();
+$responseHandler = new Assess_Response();
+$assessHandler = new Assess_Main();
+$attemptHandler = new Assess_Attempt();
+$sectionHandler = new Assess_Section();
 $userHandler = new User();
 $groupHandler = new Group();
 $categoryHandler = new Category();

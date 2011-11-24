@@ -13,17 +13,12 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/Assess.php');
-require_once('../library/assess/AssessFactory.php');
-require_once('../library/assess/AssessSection.php');
-require_once('../library/assess/AssessAttempt.php');
-require_once('../library/assess/AssessResponse.php');
 
-$factory = new AssessFactory();
-$assessHandler = new Assess();
-$attemptHandler = new AssessAttempt();
-$responseHandler = new AssessResponse();
-$sectionHandler = new AssessSection();
+$factory = new Assess_Factory();
+$assessHandler = new Assess_Main();
+$attemptHandler = new Assess_Attempt();
+$responseHandler = new Assess_Response();
+$sectionHandler = new Assess_Section();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -94,7 +89,7 @@ $this->setVar(array(
 
 /* Load all the questions for this section.
  */
-$allQuestions = $sectionHandler->getContents($this->arg[0], $this->arg[1], AssessSection::SECTION_EXCLUDE);
+$allQuestions = $sectionHandler->getContents($this->arg[0], $this->arg[1], Assess_Section::SECTION_EXCLUDE);
 
 if ($allQuestions) {
     foreach($allQuestions as $currentQuestion) {
@@ -175,4 +170,3 @@ else {
         $this->setVar('prevSection_block', '');
     }
 }
-?>

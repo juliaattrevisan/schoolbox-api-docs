@@ -7,12 +7,11 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/Assess.php');
 require_once('../library/group.php');
 require_once('include/time.php');
 
 $groupHandler = new Group();
-$assessHandler = new Assess();
+$assessHandler = new Assess_Main();
 
 if (!$groupHandler->isStaff()) {
     error(126);
@@ -39,19 +38,19 @@ if (!empty($_POST)) {
     $duration = ($_POST['duration']['hour'] * 60 + $_POST['duration']['minute']) * 60;
 
     if ($duration == 0) {
-        $duration = Assess::UNLIMITED_DURATION;
+        $duration = Assess_Main::UNLIMITED_DURATION;
     }
 
     $assessHandler->update(array(
-        'assess_id'   => $this->arg[0],
-        'category_id' => Scrub::text($_POST['category_id']),
-        'user_id'     => $_SESSION['id'],
-        'title'       => Scrub::text($_POST['title']),
-        'description' => Scrub::text($_POST['description']),
-        'start'       => $start->getDatabase(),
-        'finish'      => $finish->getDatabase(),
-        'duration'    => Scrub::text($duration),
-        'allow_resit' => Scrub::text($_POST['allow_resit']),
+		'assess_id' => $this->arg[0],
+		'category_id' => Scrub::text($_POST['category_id']),
+		'user_id' => $_SESSION['id'],
+		'title' => Scrub::text($_POST['title']),
+		'description' => Scrub::text($_POST['description']),
+		'start' => $start->getDatabase(),
+		'finish' => $finish->getDatabase(),
+		'duration' => Scrub::text($duration),
+		'allow_resit' => Scrub::text($_POST['allow_resit']),
     ));
 
     SitePage::localRedir('/assess/summary/' . $this->arg[0]);
@@ -183,7 +182,7 @@ else {
     $this->setBlock('assessContentsFragment', 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');
 
-    $assess = new Assess();
+    $assess = new Assess_Main();
     $assess->renderAssessContents($this->arg[0], $this);
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);

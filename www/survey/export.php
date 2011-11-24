@@ -8,15 +8,10 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/survey/Survey.php');
-require_once('../library/survey/SurveyQuestion.php');
-require_once('../library/survey/SurveyAnswer.php');
-require_once('../library/survey/SurveyFactory.php');
-require_once('../library/survey/SurveySection.php');
 
-$factory = new SurveyFactory();
+$factory = new Survey_Factory();
 $assessHandler = new Survey();
-$sectionHandler = new SurveySection();
+$sectionHandler = new Survey_Section();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -119,4 +114,3 @@ $this->template->pparse('finaloutput', 'xml');
 /* Prevent other template crap from rendering ;)
  */
 die();
-?>

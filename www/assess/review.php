@@ -13,18 +13,12 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/Assess.php');
-require_once('../library/assess/AssessFactory.php');
-require_once('../library/assess/AssessSection.php');
-require_once('../library/assess/AssessAttempt.php');
-require_once('../library/assess/AssessAnswer.php');
-require_once('../library/assess/AssessResponse.php');
 
-$factory = new AssessFactory();
-$assessHandler = new Assess();
-$attemptHandler = new AssessAttempt();
-$responseHandler = new AssessResponse();
-$sectionHandler = new AssessSection();
+$factory = new Assess_Factory();
+$assessHandler = new Assess_Main();
+$attemptHandler = new Assess_Attempt();
+$responseHandler = new Assess_Response();
+$sectionHandler = new Assess_Section();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -190,4 +184,3 @@ else {
         $this->setVar('prevSection_block', '');
     }
 }
-?>

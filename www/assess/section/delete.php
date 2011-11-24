@@ -8,10 +8,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/Assess.php');
-require_once('../library/assess/AssessQuestion.php');
-require_once('../library/assess/AssessAnswer.php');
-require_once('../library/assess/AssessSection.php');
 require_once '../library/group.php';
 
 $groupHandler = new Group();
@@ -22,10 +18,10 @@ if (!$groupHandler->isStaff()) {
 
 /* Get a list of questions and answers to softdelete
  */
-$assessHandler = new Assess();
-$sectionHandler = new AssessSection();
-$questionHandler = new AssessQuestion();
-$answerHandler = new AssessAnswer();
+$assessHandler = new Assess_Main();
+$sectionHandler = new Assess_Section();
+$questionHandler = new Assess_Question();
+$answerHandler = new Assess_Answer();
 
 $questionList = $questionHandler->getList($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[0]);

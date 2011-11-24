@@ -12,17 +12,12 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/Assess.php');
-require_once('../library/assess/AssessSection.php');
-require_once('../library/assess/AssessQuestion.php');
-require_once('../library/assess/AssessFactory.php');
-require_once('../library/assess/AssessResponse.php');
 require_once('../library/group.php');
 
-$assessHandler = new Assess();
-$sectionHandler = new AssessSection();
-$questionHandler = new AssessQuestion();
-$factory = new AssessFactory();
+$assessHandler = new Assess_Main();
+$sectionHandler = new Assess_Section();
+$questionHandler = new Assess_Question();
+$factory = new Assess_Factory();
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {
@@ -175,7 +170,7 @@ else {
     $this->setBlock('assessContentsFragment', 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');
 
-    $assessHandler = new Assess();
+    $assessHandler = new Assess_Main();
     $assessHandler->renderAssessContents($section['assess_id'], $this);
 
 	$assess = $assessHandler->getByID($section['assess_id']);

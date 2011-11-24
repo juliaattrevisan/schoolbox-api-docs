@@ -8,15 +8,10 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/Assess.php');
-require_once('../library/assess/AssessQuestion.php');
-require_once('../library/assess/AssessAnswer.php');
-require_once('../library/assess/AssessFactory.php');
-require_once('../library/assess/AssessSection.php');
 
-$factory = new AssessFactory();
-$assessHandler = new Assess();
-$sectionHandler = new AssessSection();
+$assessHandler = new Assess_Main();
+$factory = new Assess_Factory();
+$sectionHandler = new Assess_Section();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -119,4 +114,3 @@ $this->template->pparse('finaloutput', 'xml');
 /* Prevent other template crap from rendering ;)
  */
 die();
-?>

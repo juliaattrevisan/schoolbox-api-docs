@@ -8,15 +8,8 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/survey/Survey.php');
-require_once('../library/survey/SurveySection.php');
-require_once('../library/survey/SurveyQuestion.php');
-require_once('../library/survey/SurveyAnswer.php');
-require_once('../library/survey/SurveyFactory.php');
-require_once('../library/survey/SurveyAttempt.php');
-require_once('../library/survey/SurveyExporter.php');
 
-$assessHandler = new Survey();
+$assessHandler = new Survey_Main();
 $assess = $assessHandler->getByID($this->arg[0]);
 
 if (!is_numeric($this->arg[0])) {
@@ -31,7 +24,7 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
-$surveyExporter = new SurveyExporter($assess,  new SurveyFactory(), new SurveySection(), new SurveyAttempt(), new SurveyQuestion());
+$surveyExporter = new Survey_Exporter($assess,  new Survey_Factory(), new Survey_Section(), new Survey_Attempt(), new Survey_Question());
 $sectionValues = $surveyExporter->getSectionValues();
 
 /* Data collected, now we can show it.
@@ -47,7 +40,7 @@ $this->setVar(array(
 	'SURVEY_NAME' => $assess['title']
 ));
 
-$factory = new SurveyFactory();
+$factory = new Survey_Factory();
 
 if (is_array($sectionValues) && count($sectionValues)) {
 	foreach($sectionValues as $currentSection) {
@@ -60,7 +53,7 @@ if (is_array($sectionValues) && count($sectionValues)) {
 				 */
 				$this->setVar(array(
 					'ASSESS_ID' => $assess['assess_id'],
-                    'CID'       => $assess['category_id'],
+                    'CID' => $assess['category_id'],
 					'QUESTION_QUESTION' => $currentQuestion['question'],
 					'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
 					'QUESTION_INDEX' => $i++,

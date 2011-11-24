@@ -8,19 +8,13 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/Assess.php');
-require_once('../library/assess/AssessSection.php');
-require_once('../library/assess/AssessQuestion.php');
-require_once('../library/assess/AssessFactory.php');
-require_once('../library/assess/AssessAttempt.php');
-require_once('../library/assess/AssessResponse.php');
 
-$assessHandler = new Assess();
-$sectionHandler = new AssessSection();
-$questionHandler = new AssessQuestion();
-$factory = new AssessFactory();
-$attemptHandler = new AssessAttempt();
-$responseHandler = new AssessResponse();
+$assessHandler = new Assess_Main();
+$sectionHandler = new Assess_Section();
+$questionHandler = new Assess_Question();
+$factory = new Assess_Factory();
+$attemptHandler = new Assess_Attempt();
+$responseHandler = new Assess_Response();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -88,7 +82,7 @@ $attemptEndTime = $attemptStartTime + $assess['duration'];
  * 2. The assessment is one-time-only, and you haven't completed an attempt, and have time to do it, and have not yet attempted
  */
 if ($assess['allow_resit'] == 1) {
-    if (!(($assess['duration'] == Assess::UNLIMITED_DURATION) || (strtotime($assess['finish']) > time()))) {
+    if (!(($assess['duration'] == Assess_Main::UNLIMITED_DURATION) || (strtotime($assess['finish']) > time()))) {
         error(120);
     }
 }
@@ -96,7 +90,7 @@ else {
     if ($attemptHandler->isComplete($assess['assess_id'])) {
         error(121);
     }
-    else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Assess::UNLIMITED_DURATION)) {
+    else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Assess_Main::UNLIMITED_DURATION)) {
         error(122);
     }
 }
@@ -122,7 +116,7 @@ $this->setVar(array(
     'ASSESS_TITLE' => $assess['title'],
     'ASSESS_TIME_REMAINING' => $attemptTimeRemaining,
     'ATTEMPT_START' => $attemptStartDate->getShort(),
-    'ATTEMPT_END' => $assess['duration'] == Assess::UNLIMITED_DURATION ? 'No particular time' : $attemptEndDate->getShort(),
+    'ATTEMPT_END' => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'No particular time' : $attemptEndDate->getShort(),
     'SECTION_TITLE' => $section['title'],
     'SECTION_DESCRIPTION' => $section['description'],
 	'CURRENT_SECTION_SEQUENCE' => $section['sequence'],
@@ -135,11 +129,11 @@ $this->setVar(array(
 if (!$responseHandler->numStubResponsesInSection($_SESSION['attempt_id'], $section['section_id'])) {
     if ($section['random'] == 1) {
         $pool = $section['pool'];
-        $randomise = AssessResponse::RANDOMISE_QUESTIONS;
+        $randomise = Assess_Response::RANDOMISE_QUESTIONS;
     }
     else {
         $pool = 0;
-        $randomise = AssessResponse::ORDERED_QUESTIONS;
+        $randomise = Assess_Response::ORDERED_QUESTIONS;
     }
 
     $responseHandler->assignQuestions($_SESSION['attempt_id'], $section['section_id'], $pool, $randomise);
@@ -254,4 +248,3 @@ else {
         $this->setVar('prevSection_block', '');
     }
 }
-?>

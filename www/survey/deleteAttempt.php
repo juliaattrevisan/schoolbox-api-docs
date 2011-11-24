@@ -8,16 +8,13 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/survey/Survey.php');
-require_once('../library/survey/SurveyAttempt.php');
-require_once('../library/survey/SurveyResponse.php');
 require_once('../library/group.php');
 
 /* Get a list of questions and answers to softdelete
  */
-$assessHandler = new Survey();
-$attemptHandler = new SurveyAttempt();
-$responseHandler = new SurveyResponse();
+$assessHandler = new Survey_Main();
+$attemptHandler = new Survey_Attempt();
+$responseHandler = new Survey_Response();
 $groupHandler = new Group();
 
 $attempt = $attemptHandler->getByID($this->arg[0]);
@@ -37,4 +34,3 @@ $attemptHandler->update(array(
 ));
 
 SitePage::backToTheFuture(1);
-?>

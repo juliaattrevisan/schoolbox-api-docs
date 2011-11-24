@@ -8,11 +8,9 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/survey/SurveyFactory.php');
-require_once('../library/survey/SurveyQuestion.php');
 
-$factory = new SurveyFactory();
-$questionHandler = new SurveyQuestion();
+$factory = new Survey_Factory();
+$questionHandler = new Survey_Question();
 
 $currentQuestion = $questionHandler->getById($this->arg[0]);
 
@@ -62,4 +60,3 @@ $this->template->pparse('finaloutput', 'xml');
 /* Prevent other template crap from rendering ;)
  */
 die();
-?>

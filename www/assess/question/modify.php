@@ -7,17 +7,11 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once '../library/assess/Assess.php';
-require_once '../library/assess/AssessSection.php';
-require_once '../library/assess/AssessQuestion.php';
-require_once '../library/assess/AssessAnswer.php';
-require_once '../library/assess/AssessFactory.php';
-require_once('../library/assess/AssessQuestionCategory.php');
 require_once('../library/group.php');
 
-$factory = new AssessFactory();
-$assessHandler = new Assess();
-$sectionHandler = new AssessSection();
+$factory = new Assess_Factory();
+$assessHandler = new Assess_Main();
+$sectionHandler = new Assess_Section();
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {
@@ -68,7 +62,7 @@ else {
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
 
-    $questionHandler = new AssessQuestion();
+    $questionHandler = new Assess_Question();
     $question = $questionHandler->getByID($this->arg[0]);
     $section = $sectionHandler->getByID($question['section_id']);
 
@@ -127,7 +121,7 @@ else {
     $this->setBlock('assessContentsFragment', 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');
 
-    $assessHandler = new Assess();
+    $assessHandler = new Assess_Main();
     $assessHandler->renderAssessContents($section['assess_id'], $this);
 
 	$assess = $assessHandler->getByID($section['assess_id']);
@@ -142,7 +136,7 @@ else {
 	 */
 	$this->setBlock(TEMPLATE_content, 'question_category', 'question_category_block');
 
-	$questionCategoryHandler = new AssessQuestionCategory();
+	$questionCategoryHandler = new Assess_Question_Category();
 	$allQuestionCategories = $questionCategoryHandler->getList();
 
 	if (is_array($allQuestionCategories) && count($allQuestionCategories)) {

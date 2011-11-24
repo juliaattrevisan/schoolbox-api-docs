@@ -12,17 +12,12 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/survey/Survey.php');
-require_once('../library/survey/SurveySection.php');
-require_once('../library/survey/SurveyQuestion.php');
-require_once('../library/survey/SurveyFactory.php');
-require_once('../library/survey/SurveyResponse.php');
 require_once('../library/group.php');
 
-$assessHandler = new Survey();
-$sectionHandler = new SurveySection();
-$questionHandler = new SurveyQuestion();
-$factory = new SurveyFactory();
+$assessHandler = new Survey_Main();
+$sectionHandler = new Survey_Section();
+$questionHandler = new Survey_Question();
+$factory = new Survey_Factory();
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {
@@ -175,7 +170,7 @@ else {
     $this->setBlock('surveyContentsFragment', 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');
 
-    $survey = new Survey();
+    $survey = new Survey_Main();
     $survey->renderAssessContents($section['assess_id'], $this);
 
     $this->parse('allQuestions_block', 'surveyContentsFragment', true);

@@ -8,19 +8,13 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/survey/Survey.php');
-require_once('../library/survey/SurveySection.php');
-require_once('../library/survey/SurveyQuestion.php');
-require_once('../library/survey/SurveyFactory.php');
-require_once('../library/survey/SurveyAttempt.php');
-require_once('../library/survey/SurveyResponse.php');
 
-$assessHandler = new Survey();
-$sectionHandler = new SurveySection();
-$questionHandler = new SurveyQuestion();
-$factory = new SurveyFactory();
-$attemptHandler = new SurveyAttempt();
-$responseHandler = new SurveyResponse();
+$assessHandler = new Survey_Main();
+$sectionHandler = new Survey_Section();
+$questionHandler = new Survey_Question();
+$factory = new Survey_Factory();
+$attemptHandler = new Survey_Attempt();
+$responseHandler = new Survey_Response();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -88,7 +82,7 @@ $attemptEndTime = $attemptStartTime + $assess['duration'];
  * 2. The assessment is one-time-only, and you haven't completed an attempt, and have time to do it, and have not yet attempted
  */
 if ($assess['allow_resit'] == 1) {
-    if (!(($assess['duration'] == Survey::UNLIMITED_DURATION) || (strtotime($assess['finish']) > time()))) {
+    if (!(($assess['duration'] == Survey_Main::UNLIMITED_DURATION) || (strtotime($assess['finish']) > time()))) {
         error(120);
     }
 }
@@ -96,7 +90,7 @@ else {
     if ($attemptHandler->isComplete($assess['assess_id'])) {
         error(121);
     }
-    else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Survey::UNLIMITED_DURATION)) {
+    else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Survey_Main::UNLIMITED_DURATION)) {
         error(122);
     }
 }
@@ -122,7 +116,7 @@ $this->setVar(array(
     'ASSESS_TITLE' => $assess['title'],
     'ASSESS_TIME_REMAINING' => $attemptTimeRemaining,
     'ATTEMPT_START' => $attemptStart->getShort(),
-    'ATTEMPT_END' => $assess['duration'] == Survey::UNLIMITED_DURATION ? 'No particular time' : $attemptEnd->getShort(),
+    'ATTEMPT_END' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'No particular time' : $attemptEnd->getShort(),
     'SECTION_TITLE' => $section['title'],
     'SECTION_DESCRIPTION' => $section['description'],
 	'CURRENT_SECTION_SEQUENCE' => $section['sequence'],
@@ -135,11 +129,11 @@ $this->setVar(array(
 if (!$responseHandler->numStubResponsesInSection($_SESSION['attempt_id'], $section['section_id'])) {
     if ($section['random'] == 1) {
         $pool = $section['pool'];
-        $randomise = SurveyResponse::RANDOMISE_QUESTIONS;
+        $randomise = Survey_Response::RANDOMISE_QUESTIONS;
     }
     else {
         $pool = 0;
-        $randomise = SurveyResponse::ORDERED_QUESTIONS;
+        $randomise = Survey_Response::ORDERED_QUESTIONS;
     }
 
     $responseHandler->assignQuestions($_SESSION['attempt_id'], $section['section_id'], $pool, $randomise);
@@ -255,4 +249,3 @@ else {
         $this->setVar('prevSection_block', '');
     }
 }
-?>

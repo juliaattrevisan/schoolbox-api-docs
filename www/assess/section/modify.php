@@ -7,12 +7,9 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once '../library/assess/Assess.php';
-require_once '../library/assess/AssessQuestion.php';
-require_once '../library/assess/AssessSection.php';
 require_once '../library/group.php';
 
-$assessHandler = new Assess();
+$assessHandler = new Assess_Main();
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {
@@ -28,7 +25,7 @@ if (!empty($_POST)) {
         error(130);
     }
 
-    $sectionHandler = new AssessSection();
+    $sectionHandler = new Assess_Section();
 
     $sectionHandler->update(array(
         'assess_id' => Scrub::text($_POST['assess_id']),
@@ -49,7 +46,7 @@ else {
         error(112);
     }
 
-    $sectionHandler = new AssessSection();
+    $sectionHandler = new Assess_Section();
     $section = $sectionHandler->getByID($this->arg[0]);
 
     if (!$assessHandler->isOwner($section['assess_id'])) {
@@ -65,8 +62,6 @@ else {
     $this->setFile(TEMPLATE_content, 'assess/section/modify.html');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setTitle('Create Section');
-
-
 
     $assess = $assessHandler->getByID($section['assess_id']);
 
@@ -87,7 +82,7 @@ else {
     $this->setBlock('assessContentsFragment', 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');
 
-    $assessHandler = new Assess();
+    $assessHandler = new Assess_Main();
     $assessHandler->renderAssessContents($assess['assess_id'], $this);
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);

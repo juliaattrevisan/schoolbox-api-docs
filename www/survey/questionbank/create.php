@@ -7,9 +7,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/survey/SurveyQuestionBank.php');
-require_once('../library/survey/SurveyQuestion.php');
-require_once('../library/survey/SurveyAnswer.php');
 
 $groupHandler = new Group();
 
@@ -17,7 +14,7 @@ if (!$groupHandler->isStaff()) {
     error(126);
 }
 
-$questionBankHandler = new SurveyQuestionBank();
+$questionBankHandler = new Survey_Question_Bank();
 
 if (!empty($_POST)) {
 	$questionBankHandler->addQuestion(

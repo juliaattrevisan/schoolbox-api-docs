@@ -7,18 +7,13 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/survey/Survey.php');
-require_once('../library/survey/SurveySection.php');
-require_once('../library/survey/SurveyQuestion.php');
-require_once('../library/survey/SurveyAnswer.php');
-require_once('../library/survey/SurveyQuestionBank.php');
 require_once('../library/group.php');
 
-$assessHandler = new Survey();
-$sectionHandler = new SurveySection();
-$questionHandler = new SurveyQuestion();
-$answerHandler = new SurveyAnswer();
-$questionBankHandler = new SurveyQuestionBank();
+$assessHandler = new Survey_Main();
+$sectionHandler = new Survey_Section();
+$questionHandler = new Survey_Question();
+$answerHandler = new Survey_Answer();
+$questionBankHandler = new Survey_Question_Bank();
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {

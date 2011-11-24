@@ -7,9 +7,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/AssessQuestion.php');
-require_once('../library/assess/AssessAnswer.php');
-require_once('../library/assess/AssessQuestionBank.php');
 
 $groupHandler = new Group();
 
@@ -17,7 +14,7 @@ if (!$groupHandler->isStaff()) {
     error(126);
 }
 
-$questionBankHandler = new AssessQuestionBank();
+$questionBankHandler = new Assess_Question_Bank();
 
 if (!empty($_POST)) {
 	$i = 0;
@@ -35,4 +32,3 @@ if (!empty($_POST)) {
 echo "$i questions removed.";
 
 exit();
-?>

@@ -7,15 +7,10 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/survey/Survey.php');
-require_once('../library/survey/SurveyQuestion.php');
-require_once('../library/survey/SurveyAnswer.php');
-require_once('../library/survey/SurveyFactory.php');
-require_once('../library/survey/SurveySection.php');
 
-$assessHandler = new Survey();
-$questionHandler = new SurveyQuestion();
-$sectionHandler = new SurveySection();
+$assessHandler = new Survey_Main();
+$questionHandler = new Survey_Question();
+$sectionHandler = new Survey_Section();
 
 $question = $questionHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($question['section_id']);
@@ -42,7 +37,7 @@ if (!$question) {
     error(119);
 }
 
-$factory = new SurveyFactory();
+$factory = new Survey_Factory();
 $answerHandler = $factory->createAnswerModel($question['type_id']);
 
 $data = $_POST;
@@ -61,5 +56,3 @@ echo json_encode($result);
 /* Prevent rendering of template
  */
 exit();
-
-?>

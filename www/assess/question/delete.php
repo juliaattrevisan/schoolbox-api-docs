@@ -8,16 +8,12 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once '../library/assess/Assess.php';
-require_once '../library/assess/AssessQuestion.php';
-require_once '../library/assess/AssessAnswer.php';
-require_once '../library/assess/AssessSection.php';
 require_once('../library/group.php');
 
-$assessHandler = new Assess();
-$questionHandler = new AssessQuestion();
-$answerHandler = new AssessAnswer();
-$sectionHandler = new AssessSection();
+$assessHandler = new Assess_Main();
+$questionHandler = new Assess_Question();
+$answerHandler = new Assess_Answer();
+$sectionHandler = new Assess_Section();
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {

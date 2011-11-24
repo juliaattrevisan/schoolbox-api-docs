@@ -8,11 +8,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/survey/Survey.php');
-require_once('../library/survey/SurveySection.php');
-require_once('../library/survey/SurveyQuestion.php');
-require_once('../library/survey/SurveyAnswer.php');
-require_once('../library/survey/SurveyFactory.php');
 
 if (!is_numeric($this->arg[0])) {
     error(18);
@@ -25,9 +20,9 @@ else {
     error(134);
 }
 
-$assessHandler = new Survey();
-$sectionHandler = new SurveySection();
-$factory = new SurveyFactory();
+$assessHandler = new Survey_Main();
+$sectionHandler = new Survey_Section();
+$factory = new Survey_Factory();
 
 $xml = simplexml_load_string($data);
 

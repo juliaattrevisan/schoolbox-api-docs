@@ -8,17 +8,10 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/survey/Survey.php');
-require_once('../library/survey/SurveySection.php');
-require_once('../library/survey/SurveyQuestion.php');
-require_once('../library/survey/SurveyAnswer.php');
-require_once('../library/survey/SurveyFactory.php');
-require_once('../library/survey/SurveyAttempt.php');
-require_once('../library/survey/SurveyExporter.php');
 
-$assessHandler = new Survey();
-$factory = new SurveyFactory();
-$questionHandler = new SurveyQuestion();
+$assessHandler = new Survey_Main();
+$factory = new Survey_Factory();
+$questionHandler = new Survey_Question();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -34,7 +27,7 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
-$surveyExporter = new SurveyExporter($assess, $factory, new SurveySection(), new SurveyAttempt(), $questionHandler);
+$surveyExporter = new Survey_Exporter($assess, $factory, new Survey_Section(), new Survey_Attempt(), $questionHandler);
 $surveyExporter->setLegendHTML(true);
 
 /* Optionally filter by question
@@ -128,4 +121,3 @@ function cmp($a, $b) {
     }
     return ($a < $b) ? -1 : 1;
 }
-?>

@@ -7,7 +7,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/survey/Survey.php');
 require_once('../library/group.php');
 require_once('include/time.php');
 
@@ -17,7 +16,7 @@ if (!$groupHandler->isStaff()) {
     error(126);
 }
 
-$assessHandler = new Survey();
+$assessHandler = new Survey_Main();
 
 if (!empty($_POST)) {
 
@@ -34,7 +33,7 @@ if (!empty($_POST)) {
         'description' => Scrub::text($_POST['description']),
         'start' => $start->getDatabase(),
         'finish' => $finish->getDatabase(),
-        'duration'  => $duration = Survey::UNLIMITED_DURATION,
+        'duration'  => $duration = Survey_Main::UNLIMITED_DURATION,
 		'availability' => 'survey',
         'created_at' => 'NOW()',
     ));

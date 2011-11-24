@@ -7,12 +7,9 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once '../library/survey/Survey.php';
-require_once '../library/survey/SurveyQuestion.php';
-require_once '../library/survey/SurveySection.php';
 require_once '../library/group.php';
 
-$assessHandler = new Survey();
+$assessHandler = new Survey_Main();
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {
@@ -28,7 +25,7 @@ if (!empty($_POST)) {
         error(130);
     }
 
-    $sectionHandler = new SurveySection();
+    $sectionHandler = new Survey_Section();
 
     $sectionHandler->update(array(
         'assess_id' => Scrub::text($_POST['assess_id']),
@@ -49,7 +46,7 @@ else {
         error(112);
     }
 
-    $sectionHandler = new SurveySection();
+    $sectionHandler = new Survey_Section();
     $section = $sectionHandler->getByID($this->arg[0]);
 
     if (!$assessHandler->isOwner($section['assess_id'])) {
@@ -85,7 +82,7 @@ else {
     $this->setBlock('assessContentsFragment', 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');
 
-    $assessHandler = new Survey();
+    $assessHandler = new Survey_Main();
     $assessHandler->renderAssessContents($assess['assess_id'], $this);
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);

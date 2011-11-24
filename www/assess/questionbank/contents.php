@@ -1,9 +1,4 @@
 <?php
-require_once('../library/assess/AssessQuestion.php');
-require_once('../library/assess/AssessAnswer.php');
-require_once('../library/assess/AssessQuestionBank.php');
-require_once('../library/assess/AssessQuestionCategory.php');
-
 $this->setFile(TEMPLATE_content, 'assess/questionbank/contents.html');
 $this->setBlock(TEMPLATE_content, 'welcome', 'welcome_block');
 $this->setBlock(TEMPLATE_content, 'category_selected', 'category_selected_block');
@@ -20,11 +15,11 @@ $this->setVar(array(
 	'SECTION_ID' => $this->arg[2],
 ));
 
-$questionBankHandler = new AssessQuestionBank();
+$questionBankHandler = new Assess_Question_Bank();
 
 /* Output question bank categories
  */
-$questionBankCategoryHandler = new AssessQuestionCategory();
+$questionBankCategoryHandler = new Assess_Question_Category();
 
 $categoryList = $questionBankCategoryHandler->getList();
 

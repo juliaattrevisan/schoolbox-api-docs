@@ -7,12 +7,9 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once '../library/survey/Survey.php';
-require_once '../library/survey/SurveySection.php';
-require_once '../library/survey/SurveyQuestion.php';
 require_once '../library/group.php';
 
-$assessHandler = new Survey();
+$assessHandler = new Survey_Main();
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {
@@ -30,7 +27,7 @@ if (!empty($_POST)) {
 
     /* Create new Section
      */
-    $sectionHandler = new SurveySection();
+    $sectionHandler = new Survey_Section();
     $section_id = $sectionHandler->create($_POST);
 
     /* Redirect to question creation for this section
@@ -65,7 +62,7 @@ else {
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setTitle('Create Section');
 
-    $sectionHandler = new SurveySection();
+    $sectionHandler = new Survey_Section();
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $this->arg[0],

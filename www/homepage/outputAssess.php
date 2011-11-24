@@ -1,8 +1,5 @@
 <?php
 require_once SITE_root . '/library/group.php';
-require_once SITE_root . '/library/assess/Assess.php';
-require_once SITE_root . '/library/assess/AssessAttempt.php';
-require_once SITE_root . '/library/assess/AssessSection.php';
 
 $this->setBlock($componentHandle, 'assess', 'assess_block');
 $this->setBlock($componentHandle, 'createAssessment', 'createAssessment_block');
@@ -16,9 +13,9 @@ $this->setBlock('assess', 'assessNoLink', 'assessNoLink_block');
 $this->setVar('resumeLink_block', '');
 
 $groupHandler = new Group();
-$assessHandler = new Assess();
-$attemptHandler = new AssessAttempt();
-$sectionHandler = new AssessSection();
+$assessHandler = new Assess_Main();
+$attemptHandler = new Assess_Attempt();
+$sectionHandler = new Assess_Section();
 $allAssess = $assessHandler->getList($categoryID);
 
 if ($groupHandler->isStaff()) {
@@ -131,4 +128,3 @@ if (is_array($allAssess)) {
 else {
     $this->setVar('assess_block', '');
 }
-?>

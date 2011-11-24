@@ -8,16 +8,13 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once('../library/assess/Assess.php');
-require_once('../library/assess/AssessAttempt.php');
-require_once('../library/assess/AssessResponse.php');
 require_once('../library/group.php');
 
 /* Get a list of questions and answers to softdelete
  */
-$assessHandler = new Assess();
-$attemptHandler = new AssessAttempt();
-$responseHandler = new AssessResponse();
+$assessHandler = new Assess_Main();
+$attemptHandler = new Assess_Attempt();
+$responseHandler = new Assess_Response();
 $groupHandler = new Group();
 
 $attempt = $attemptHandler->getByID($this->arg[0]);
@@ -37,4 +34,3 @@ $attemptHandler->update(array(
 ));
 
 SitePage::backToTheFuture(1);
-?>
