@@ -1,6 +1,6 @@
 <?php
 /**
- * AssessResponse
+ * Assess_Response
  *
  * Responses are managed here
  *
@@ -9,9 +9,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationResponse.php');
-
-class AssessResponse extends EvaluationResponse {
+class Assess_Response extends Evaluation_Response {
     public $_table = 'assess_response';
     public $_index = 'response_id';
 

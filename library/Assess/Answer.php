@@ -1,6 +1,6 @@
 <?php
 /**
- * AssessAnswer
+ * Assess_Answer
  *
  * All AnswerTypes inherit from this class.
  *
@@ -9,10 +9,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationAnswer.php');
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessResponse.php');
-
-class AssessAnswer extends EvaluationAnswer {
+class Assess_Answer extends Evaluation_Answer {
     public $_table = 'assess_answer';
     public $_index = 'answer_id';
 
@@ -24,6 +21,6 @@ class AssessAnswer extends EvaluationAnswer {
     public function __construct() {
         parent::__construct();
 
-        $this->responseHandler = new AssessResponse();
+        $this->responseHandler = new Assess_Response();
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Assess
+ * Assess_Main
  *
  * Class for Online Assessments
  *
@@ -38,20 +38,20 @@
  * question. This is used to reformat a question; e.g. matching pairs: changing
  * the inputs to readonly; fillgaps: changing <span></span> elements to <input>s.
  */
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/Evaluation.php');
-
-class Assess extends Evaluation {
+class Assess_Main extends Evaluation_Main {
     public $_table = 'assess';
     public $_index = 'assess_id';
 
     const ONLINE_ASSESSMENT_TYPE_ID = 11;
     const UNLIMITED_DURATION = -1;
 
-    /**
-     * A list of assessments available for a category
-     *
-     * @param <type> $category_id
-     */
+	/**
+	 * A list of assessments available for a category
+	 *
+	 * @param  $category_id
+	 * @param bool $limit
+	 * @return array|bool
+	 */
     public function getList($category_id, $limit = false) {
         if (is_array($category_id)) {
             $categoryIDList = implode(',', $category_id);
@@ -91,17 +91,13 @@ class Assess extends Evaluation {
 		$allAssess = $this->db->getAll($query);
 
 		if (is_array($allAssess) && count($allAssess)) {
-			require_once('AssessQuestion.php');
-			require_once('AssessAnswer.php');
-			require_once('AssessFactory.php');
-			require_once('AssessSection.php');
 
 			/* Get a list of questions and answers to softdelete
 			 */
-			$assessHandler = new Assess();
-			$questionHandler = new AssessQuestion();
-			$answerHandler = new AssessAnswer();
-			$sectionHandler = new AssessSection();
+			$assessHandler = new Assess_Main();
+			$questionHandler = new Assess_Question();
+			$answerHandler = new Assess_Answer();
+			$sectionHandler = new Assess_Section();
 
 			/* Shamelessly stolen from delete.php and squished
 			 * into position here

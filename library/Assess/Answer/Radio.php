@@ -1,6 +1,6 @@
 <?php
 /**
- * AssessAnswerMulti
+ * Assess_Answer_Radio
  *
  * Handler for Multiple Choice questions.
  *
@@ -9,7 +9,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-class AssessAnswerMulti extends AnswerMulti {
+class Assess_Answer_Radio extends Evaluation_Answer_Radio {
     const CORRECT_CLASS = 'multiCorrect';
     const INCORRECT_CLASS = 'multiIncorrect';
 
@@ -19,13 +19,16 @@ class AssessAnswerMulti extends AnswerMulti {
     public function __construct() {
         parent::__construct();
 
-        $this->responseHandler = new AssessResponse();
+        $this->responseHandler = new Assess_Response();
     }
 
-	/*
+	/**
      * Automatically marks a response. Customised to be applicable to the way in
      * which the response is actually stored.
-     */
+	 *
+	 * @param  $currentResponse
+	 * @return void
+	 */
     public function mark($currentResponse) {
         $response = unserialize($currentResponse['response']);
         $answer = unserialize($currentResponse['answer']);
@@ -77,13 +80,14 @@ class AssessAnswerMulti extends AnswerMulti {
         $this->responseHandler->update($marks);
     }
 
-    /**
-     * Show the response someone submitted and also show the correct answer.
-     * Provide an option for the teacher to review the mark and adjust.
-     *
-     * @param <type> $page
-     * @param <type> $question_id
-     */
+	/**
+	 * Show the response someone submitted and also show the correct answer.
+	 * Provide an option for the teacher to review the mark and adjust.
+	 *
+	 * @param  $page
+	 * @param  $question_id
+	 * @return void
+	 */
     public function reviewResponse($page, $question_id) {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 

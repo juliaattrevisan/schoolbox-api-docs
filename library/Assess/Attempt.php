@@ -1,6 +1,6 @@
 <?php
 /**
- * AssessAttempt
+ * Assess_Attempt
  *
  * Assessment Attempts are managed through this class.
  *
@@ -9,9 +9,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationAttempt.php');
-
-class AssessAttempt extends EvaluationAttempt {
+class Assess_Attempt extends Evaluation_Attempt {
     public $_table = 'assess_attempt';
     public $_index = 'attempt_id';
 }

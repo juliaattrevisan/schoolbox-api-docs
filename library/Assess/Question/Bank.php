@@ -1,6 +1,6 @@
 <?php
 /**
- * AssessQuestionBank
+ * Assess_Question_Bank
  *
  * Manages saved questions in the QuestionBank
  *
@@ -9,16 +9,14 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationQuestionBank.php');
-
-class AssessQuestionBank extends EvaluationQuestionBank {
+class Assess_Question_Bank extends Evaluation_Question_Bank {
     public $_table = 'assess_question_bank';
     public $_index = 'question_bank_id';
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->questionHandler = new AssessQuestion();
-		$this->answerHandler = new AssessAnswer();
+		$this->questionHandler = new Assess_Question();
+		$this->answerHandler = new Assess_Answer();
 	}
 }

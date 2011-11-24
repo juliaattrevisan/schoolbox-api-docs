@@ -1,6 +1,6 @@
 <?php
 /**
- * AssessAnswerMatch
+ * Assess_Answer_Match
  *
  * Handler for Matching Pairs questions.
  *
@@ -9,7 +9,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-class AssessAnswerMatch extends AnswerMatch {
+class Assess_Answer_Match extends Evaluation_Answer_Match {
 
 	/**
 	 * Get an instance of a responseHandler upon instantiation
@@ -17,12 +17,15 @@ class AssessAnswerMatch extends AnswerMatch {
     public function __construct() {
         parent::__construct();
 
-        $this->responseHandler = new AssessResponse();
+        $this->responseHandler = new Assess_Response();
     }
 
 	/**
 	 * Automatically marks a response. Customised to be applicable to the way in
 	 * which the response is actually stored.
+	 *
+	 * @param  $currentResponse
+	 * @return void
 	 */
 	public function mark($currentResponse) {
 		$response = unserialize($currentResponse['response']);
@@ -53,8 +56,9 @@ class AssessAnswerMatch extends AnswerMatch {
 	 * Show the response someone submitted and also show the correct answer.
 	 * Provide an option for the teacher to review the mark and adjust.
 	 *
-	 * @param <type> $page
-	 * @param <type> $question_id
+	 * @param  $page
+	 * @param  $question_id
+	 * @return void
 	 */
 	public function reviewResponse($page, $question_id) {
 		$right = array();

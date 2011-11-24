@@ -1,6 +1,6 @@
 <?php
 /**
- * AssessQuestionCategory
+ * Assess_Question_Category
  *
  * Manages categories within the QuestionBank
  *
@@ -9,9 +9,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationQuestionCategory.php');
-
-class AssessQuestionCategory extends EvaluationQuestionCategory {
+class Assess_Question_Category extends Evaluation_Question_Category {
     public $_table = 'assess_question_category';
     public $_index = 'assess_question_category_id';
 

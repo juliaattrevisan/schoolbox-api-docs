@@ -1,6 +1,6 @@
 <?php
 /**
- * AssessSection
+ * Assess_Section
  *
  * All Sections are managed here.
  *
@@ -9,9 +9,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationSection.php');
-
-class AssessSection extends EvaluationSection {
+class Assess_Section extends Evaluation_Section {
     public $_table = 'assess_section';
     public $_index = 'section_id';
 

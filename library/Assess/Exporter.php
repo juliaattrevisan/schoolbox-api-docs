@@ -1,6 +1,6 @@
 <?php
 /**
- * AssessExporter
+ * Assess_Exporter
  *
  * Handles export of results
  *
@@ -9,9 +9,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationExporter.php');
-
-class AssessExporter extends EvaluationExporter {
+class Assess_Exporter extends Evaluation_Exporter {
 
 }
 

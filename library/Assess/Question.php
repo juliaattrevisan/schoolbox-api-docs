@@ -1,6 +1,6 @@
 <?php
 /**
- * AssessQuestion
+ * Assess_Question
  *
  * All QuestionTypes inherit from this class. At time of
  * writing, there is nothing needed in the children QuestionType classes.
@@ -10,24 +10,21 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/evaluation/EvaluationQuestion.php');
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessSection.php');
-
-class AssessQuestion extends EvaluationQuestion {
+class Assess_Question extends Evaluation_Question {
     public $_table = 'assess_question';
     public $_index = 'question_id';
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->sectionHandler = new AssessSection();
+		$this->sectionHandler = new Assess_Section();
 	}
 
-    /**
-     * Get all available question types.
-     *
-     * @return <type>
-     */
+	/**
+	 * Get all available question types.
+	 *
+	 * @return array|bool
+	 */
     public function getAllQuestionTypes() {
         $query = "SELECT *
                   FROM assess_luQuestionType
