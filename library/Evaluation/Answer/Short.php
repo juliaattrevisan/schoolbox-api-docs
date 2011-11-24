@@ -1,0 +1,205 @@
+<?php
+/**
+ * Evaluation_Answer_Short
+ *
+ * Handler for Short Answer questions.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   2010 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ * @version     SVN: $Id$
+ */
+abstract class Evaluation_Answer_Short extends Evaluation_Answer {
+
+	/**
+     * Creates an Answer. This is used when creating Questions and Answers in
+     * the setup phase.
+	 *
+	 * @param  $object
+	 * @param  $question_id
+	 * @return bool|int
+	 */
+    public function create($object, $question_id) {
+        $answer = array_intersect_key($object, array_flip($this->allowedFields));
+        $answer['question_id'] = $question_id;
+
+        /* 'Short' always has only one answer per question so we can override
+         * the sequence here
+         */
+        $answer['sequence'] = 1;
+
+        $answer_id = parent::create($answer);
+
+        if (!$answer_id) {
+            return false;
+        }
+
+        return $answer_id;
+    }
+
+	/**
+	 * Updates an existing Answer.
+	 *
+	 * @param  $object
+	 * @return void
+	 */
+    public function update($object) {
+        $answer = array_intersect_key($object, array_flip($this->allowedFields));
+
+        parent::update($answer);
+    }
+
+	/**
+     * Renders answers when editing a Question. If a question_id was provided,
+     * load its existing answers and populate fields; otherwise empty them or
+     * set to other default values.
+	 *
+	 * @param  $page
+	 * @param string $question_id
+	 * @return void
+	 */
+    public function modify($page, $question_id = '') {
+        if (is_numeric($question_id)) {
+            $currentAnswer = parent::getForQuestion($question_id);
+
+            $page->setVar(array(
+                'ANSWER_ID' => $currentAnswer['answer_id'],
+                'ANSWER' => $currentAnswer['answer'],
+            ));
+        }
+        else {
+            $page->setVar(array(
+                'ANSWER_ID' => '',
+                'ANSWER' => '',
+            ));
+        }
+    }
+
+	/**
+     * Resets answer tokens so a user can fill them in while actually taking
+     * the test.
+	 *
+	 * @param  $page
+	 * @param  $question_id
+	 * @return void
+	 */
+    public function prepareResponse($page, $question_id) {
+        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+
+        $currentAnswer = $this->getByQuestionID($question_id);
+
+        if ($existing['response']) {
+            $page->setVar(array(
+                'ANSWER_ID' => $currentAnswer['answer_id'],
+                'ANSWER' => $existing['response'],
+            ));
+        }
+        else {
+            $page->setVar(array(
+                'ANSWER_ID' => $currentAnswer['answer_id'],
+                'ANSWER' => '',
+            ));
+        }
+
+        $page->parse('answerOption_block', 'answerOption', true);
+    }
+
+	/**
+	 * Clear child blocks after parsing out the parent. Keep this in its own
+	 * method for polymorphic algorithm
+	 *
+	 * @param  $page
+	 * @return void
+	 */
+	public function cleanupParse($page) {
+	}
+
+	/**
+     * Saves a response for this Answer type. This should be customised based on
+     * the format and structure of the answer (e.g. serialize multichoice)
+	 *
+	 * @param  $data
+	 * @return
+	 */
+    public function saveResponse($data) {
+        $processedResponse = $data['answer'];
+
+        return parent::saveResponse($data['section_id'], $data['question_id'], $processedResponse);
+    }
+
+	/**
+     * Exports the answer to Moodle XML format. This is a modified version of
+     * $this->reviewResponse()
+	 *
+	 * @param  $page
+	 * @param  $question_id
+	 * @return void
+	 */
+    public function exportMoodleAnswer($page, $question_id) {
+        $currentAnswer = $this->getByQuestionID($question_id);
+
+        /* Show correct answer
+         */
+        $page->setVar(array(
+            'CORRECT_ANSWER' => $currentAnswer['answer']
+        ));
+
+        $page->parse('answerOption_block', 'answerOption', true);
+    }
+
+	/**
+     * Imports form a Moodle XML object. This is largely an alias of create()
+     * but we create the array specially because of the naming conventions and
+     * structure of the original xml export.
+	 *
+	 * @param  $xmlObj
+	 * @param  $question_id
+	 * @return bool|int
+	 */
+    public function importMoodleAnswer($xmlObj, $question_id) {
+        $object = array(
+            'answer_id' => '',
+            'question_id' => $question_id,
+            'sequence' => 1,
+            'answer' => trim((string) $xmlObj->answer->text),
+        );
+
+        return $this->create($object, $question_id);
+    }
+
+	/**
+	 * Get the response for a particular question
+	 *
+	 * @param  $attempt_id
+	 * @param  $question_id
+	 * @return
+	 */
+	public function exportResponseToCSV($attempt_id, $question_id) {
+		$response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
+
+		/* Remove tab characters
+		 */
+		$data['responseText'] = str_replace("\t", '', $response['response']);
+
+		/* Append commentary
+ 		 */
+		$data['comment'] = $response['comment'];
+
+		return $data;
+	}
+
+	/**
+	 * Get the response for a particular question
+	 *
+	 * @param  $attempt_id
+	 * @param  $question_id
+	 * @return
+	 */
+	public function exportResponseToArray($attempt_id, $question_id) {
+		$response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
+
+		$data = $response['response'];
+
+		return $data;
+	}
+}
