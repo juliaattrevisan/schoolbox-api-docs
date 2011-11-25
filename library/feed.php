@@ -120,7 +120,7 @@ class Feed {
 	 */
     public function getOnlineAssessments($cid, $limit) {
         $query = "SELECT
-                      assess.assess_id, assess.title AS heading, assess.created_at,
+                      assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.created_at) as created_at,
                       user.title, user.firstname, user.lastname,
                       user.id AS uid
                   FROM assess
@@ -155,7 +155,7 @@ class Feed {
 	 */
 	public function getSurveys($cid, $limit) {
 		$query = "SELECT
-					  assess.assess_id, assess.title AS heading, assess.created_at,
+					  assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.created_at) as created_at,
 					  user.title, user.firstname, user.lastname,
 					  user.id AS uid
 				  FROM assess
