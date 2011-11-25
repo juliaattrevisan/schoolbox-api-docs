@@ -1,0 +1,119 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
+<script type="text/javascript">
+    $j(function() {
+        $j('#startDate, #finishDate').datepicker({
+            dateFormat: 'dd/mm/yy',
+            showOn: 'both',
+            buttonImage: '/images/core/calendar/calendar-click.png',
+            buttonImageOnly: true,
+            constrainInput: false,
+            onClose: function (string) {
+                var input = $j(this);
+
+                $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                    input.val(data.time);
+                })
+            }
+        });
+    });
+</script>
+<!-- END custom_head -->
+
+<h1><span>Create Leave Request</span></h1>
+
+<form  method="post" action="/modules/leave/processCreate" id="requestForm">
+	<table class="standardForm">
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Leave Date</h4>
+                <em></em>
+            </td>
+            <td>
+                <input name="request[start][date]" id="startDate" type="text" size="16" maxlength="30"/>
+            </td>
+            <td class="formLabelWidth">
+                <h4>Leave Time</h4>
+                <em></em>
+            </td>
+            <td>
+                <input name="request[start][hour]" type="text" maxlength="2" class="timeField" />
+                :
+                <input name="request[start][minute]" type="text" maxlength="2" class="timeField" />
+                <select name="request[start][meridian]">
+                    <option>AM</option>
+                    <option>PM</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Return Date</h4>
+                <em></em>
+            </td>
+            <td>
+                <input name="request[finish][date]" id="finishDate" type="text" size="16" maxlength="30"/>
+            </td>
+            <td class="formLabelWidth">
+                <h4>Return Time</h4>
+                <em></em>
+            </td>
+            <td>
+                <input name="request[finish][hour]" type="text" maxlength="2" class="timeField" />
+                :
+                <input name="request[finish][minute]" type="text" maxlength="2" class="timeField" />
+                <select name="request[finish][meridian]">
+                    <option>AM</option>
+                    <option>PM</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Host</h4>
+                <em></em>
+            </td>
+            <td>
+                <select name="request[hostType]">
+                    <option value="1">Parent</option>
+                    <option value="2">Peer Parent</option>
+                </select>
+            </td>
+            <td class="formLabelWidth">
+                <h4>Student Phone</h4>
+                <em></em>
+            </td>
+            <td>
+                <input type="text" name="request[userPhone]" size="16" />
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Host Name</h4>
+                <em></em>
+            </td>
+            <td>
+                <input type="text" name="request[hostName]" size="24" />
+            </td>
+            <td class="formLabelWidth">
+                <h4>Host Phone</h4>
+                <em></em>
+            </td>
+            <td>
+                <input type="text" name="request[hostPhone]" size="16" />
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Description</h4>
+                <em></em>
+            </td>
+            <td colspan="3">
+                <textarea rows="4" cols="60" name="request[description]"></textarea>
+            </td>
+        </tr>
+	</table>
+
+	<input type="submit" name="Submit" value="Apply for Leave" class="submit-btn-plain">
+</form>

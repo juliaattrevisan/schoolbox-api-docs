@@ -348,7 +348,7 @@ abstract class Mapper {
             }
 
             if ( !empty($callback) ) {
-                $model = $callback($model);
+                $model = $callback($model, $row);
             }
 
             $modelList[] = $model;

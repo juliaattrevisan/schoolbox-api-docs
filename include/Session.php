@@ -54,6 +54,7 @@ class Session {
             $_SESSION['id']         = $user['uid'];
             $_SESSION['sid']        = $user['synergy_id'];
             $_SESSION['gid']        = $user['group_id'];
+            $_SESSION['houseId']    = $user['house'];
             $_SESSION['year']       = $user['year'];
             $_SESSION['local_email']= $user['local_email'];
             $_SESSION['alt_email']  = $user['alt_email'];

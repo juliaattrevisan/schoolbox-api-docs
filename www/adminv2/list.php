@@ -27,11 +27,16 @@ $this->setVar('table_cell_static_block','');
 $this->setVar('table_cell_select_block','');
 
 $tableList = array(
-	array(
-		'name'      => 'groups',
-		'title'     => 'Groups',
-		'index'     => 'id'
-	),
+    array(
+        'name'      => 'groups',
+        'title'     => 'Groups',
+        'index'     => 'id'
+    ),
+    array(
+        'name'      => 'house',
+        'title'     => 'Houses',
+        'index'     => 'id'
+    ),
 	array(
 		'name'      => 'luCampus',
 		'title'     => 'Campus',

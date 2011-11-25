@@ -1,0 +1,163 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
+<script type="text/javascript">
+    $j(function() {
+        $j('#startDate, #finishDate').datepicker({
+            dateFormat: 'dd/mm/yy',
+            showOn: 'both',
+            buttonImage: '/images/core/calendar/calendar-click.png',
+            buttonImageOnly: true,
+            constrainInput: false,
+            onClose: function (string) {
+                var input = $j(this);
+
+                $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                    input.val(data.time);
+                })
+            }
+        });
+    });
+</script>
+<!-- END custom_head -->
+
+<h1><span>{USER_NAME} Leave Request</span></h1>
+
+<form  method="post" action="/modules/leave/processModify" id="requestForm">
+	<table class="standardForm">
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Status</h4>
+                <em></em>
+            </td>
+            <td colspan="3">
+                {REQUEST_STATUS}
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Requested By</h4>
+                <em></em>
+            </td>
+            <td>
+                {USER_NAME}
+            </td>
+            <td class="formLabelWidth">
+                <h4>Year Level</h4>
+                <em></em>
+            </td>
+            <td>
+                {USER_YEAR}
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Student ID</h4>
+                <em></em>
+            </td>
+            <td>
+                {USER_EXTERNAL_ID}
+            </td>
+            <td class="formLabelWidth">
+                <h4>House</h4>
+                <em></em>
+            </td>
+            <td>
+                {USER_HOUSE}
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Leave Date</h4>
+                <em></em>
+            </td>
+            <td>
+                <input name="request[start][date]" id="startDate" type="text" size="16" maxlength="30" value="{REQUEST_START_DATE}" />
+            </td>
+            <td class="formLabelWidth">
+                <h4>Leave Time</h4>
+                <em></em>
+            </td>
+            <td>
+                <input name="request[start][hour]" type="text" maxlength="2" class="timeField" value="{REQUEST_START_HOUR}" />
+                :
+                <input name="request[start][minute]" type="text" maxlength="2" class="timeField" value="{REQUEST_START_MINUTE}" />
+                <select name="request[start][meridian]">
+                    <option {REQUEST_START_MERIDIAN_AM}>AM</option>
+                    <option {REQUEST_START_MERIDIAN_PM}>PM</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Return Date</h4>
+                <em></em>
+            </td>
+            <td>
+                <input name="request[finish][date]" id="finishDate" type="text" size="16" maxlength="30" value="{REQUEST_FINISH_DATE}"/>
+            </td>
+            <td class="formLabelWidth">
+                <h4>Return Time</h4>
+                <em></em>
+            </td>
+            <td>
+                <input name="request[finish][hour]" type="text" maxlength="2" class="timeField" value="{REQUEST_FINISH_HOUR}" />
+                :
+                <input name="request[finish][minute]" type="text" maxlength="2" class="timeField" value="{REQUEST_FINISH_MINUTE}" />
+                <select name="request[finish][meridian]">
+                    <option {REQUEST_FINISH_MERIDIAN_AM}>AM</option>
+                    <option {REQUEST_FINISH_MERIDIAN_PM}>PM</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Host</h4>
+                <em></em>
+            </td>
+            <td>
+                <select name="request[hostType]">
+                    <option value="1">Parent</option>
+                    <option value="2">Peer Parent</option>
+                </select>
+            </td>
+            <td class="formLabelWidth">
+                <h4>Student Phone</h4>
+                <em></em>
+            </td>
+            <td>
+                <input type="text" name="request[userPhone]" size="16" value="{REQUEST_USER_PHONE}" />
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Host Name</h4>
+                <em></em>
+            </td>
+            <td>
+                <input type="text" name="request[hostName]" size="24" value="{REQUEST_HOST_NAME}" />
+            </td>
+            <td class="formLabelWidth">
+                <h4>Host Phone</h4>
+                <em></em>
+            </td>
+            <td>
+                <input type="text" name="request[hostPhone]" size="16" value="{REQUEST_HOST_PHONE}" />
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Description</h4>
+                <em></em>
+            </td>
+            <td colspan="3">
+                <textarea rows="4" cols="60" name="request[description]">{REQUEST_DESCRIPTION}</textarea>
+            </td>
+        </tr>
+	</table>
+
+    <input type="hidden" name="request[id]" value="{REQUEST_ID}">
+    <input type="submit" name="modify" value="Modify" class="submit-btn-plain">
+    <input type="submit" name="reject" value="Reject" class="submit-btn-plain">
+    <input type="submit" name="approve" value="Approve" class="submit-btn-plain">
+</form>
