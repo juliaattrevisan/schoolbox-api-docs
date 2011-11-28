@@ -2,7 +2,7 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/DeprecatedUser.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/event.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/enrolment.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/attendance.php';
@@ -11,7 +11,7 @@ $page = new SitePage;
 $eventHandler = new Event;
 $enrolmentHandler = new Enrolment;
 $attendanceHandler = new Attendance;
-$userHandler = new DeprecatedUser;
+$userHandler = new User;
 
 $page->setFile(TEMPLATE_content, 'tutorial/enrolment/list.html');
 $page->setBlock(TEMPLATE_content, 'date_list', 'date_list_block');

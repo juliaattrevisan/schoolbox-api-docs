@@ -1,6 +1,6 @@
 <?php
 
-require_once '../library/DeprecatedUser.php';
+require_once '../library/user.php';
 require_once '../library/group.php';
 //require_once 'include/permission.php';
 
@@ -8,7 +8,7 @@ require_once '../library/group.php';
 if (is_numeric($this->arg[0])) {
 	$this->setTitle('Address Book');
 
-	$userHandler = new DeprecatedUser();
+	$userHandler = new User();
 	$groupHandler = new Group();
 
 	$user = $userHandler->getByID($this->arg[0]);
@@ -94,7 +94,7 @@ if (is_numeric($this->arg[0])) {
 		}
 	}
 
-	$userHandler = new DeprecatedUser();
+	$userHandler = new User();
 
 	$outputUser = array(
 		'NAME' => $userHandler->formatName($user),

@@ -13,7 +13,7 @@ $page->setBlock('event_list', 'tutor', 'tutor_block');
 $page->setTitle('Tutorials');
 
 $groupHandler = new Group(TUTORIAL_SERVICE);
-$userHandler = new DeprecatedUser();
+$userHandler = new User();
 
 // check access
 if ($groupHandler->getPermission(0) < WRITE_ACCESS)

@@ -324,8 +324,8 @@ class Group extends DeprecatedModel {
             return $this->cache[$this->_service][$relationID][$userID];
         }
 
-        require_once dirname(__FILE__) . '/DeprecatedUser.php';
-        $userHandler = new DeprecatedUser;
+        require_once dirname(__FILE__) . '/user.php';
+        $userHandler = new User;
         $user = $userHandler->getByID($userID);
 
         // if superuser just return highest permission type
@@ -386,9 +386,9 @@ class Group extends DeprecatedModel {
 
     function getTutorialPermission($userID) {
 
-        require_once dirname(__FILE__) . '/DeprecatedUser.php';
+        require_once dirname(__FILE__) . '/user.php';
         require_once dirname(__FILE__) . '/mssql.php';
-        $userHandler = new DeprecatedUser;
+        $userHandler = new User;
         $mssql = new MSSQL;
 
         $user = $userHandler->getByID($userID);
@@ -410,8 +410,8 @@ class Group extends DeprecatedModel {
         // checks if user is a student
         // default to current user
         if ($userID > 0) {
-            require_once dirname(__FILE__) . '/DeprecatedUser.php';
-            $userHandler = new DeprecatedUser;
+            require_once dirname(__FILE__) . '/user.php';
+            $userHandler = new User;
             $user = $userHandler->getByID($userID);
             $groupID = $user['group_id'];
         } else if (is_numeric($_SESSION['gid'])) {
@@ -436,8 +436,8 @@ class Group extends DeprecatedModel {
 
         // default to current user
         if ($userID > 0) {
-            require_once dirname(__FILE__) . '/DeprecatedUser.php';
-            $userHandler = new DeprecatedUser;
+            require_once dirname(__FILE__) . '/user.php';
+            $userHandler = new User;
             $user = $userHandler->getByID($userID);
 
             if ($user['su']) {
@@ -454,8 +454,8 @@ class Group extends DeprecatedModel {
         // checks if user is staff
         // default to current user
         if ($userID > 0) {
-            require_once dirname(__FILE__) . '/DeprecatedUser.php';
-            $userHandler = new DeprecatedUser;
+            require_once dirname(__FILE__) . '/user.php';
+            $userHandler = new User;
             $user = $userHandler->getByID($userID);
             $groupID = $user['group_id'];
         } elseif (is_numeric($_SESSION['gid'])) {
@@ -475,8 +475,8 @@ class Group extends DeprecatedModel {
         // checks if user is a parent
         // default to current user
         if ($userID > 0) {
-            require_once dirname(__FILE__) . '/DeprecatedUser.php';
-            $userHandler = new DeprecatedUser;
+            require_once dirname(__FILE__) . '/user.php';
+            $userHandler = new User;
             $user = $userHandler->getByID($userID);
             $groupID = $user['group_id'];
         } elseif (is_numeric($_SESSION['gid'])) {
@@ -540,7 +540,7 @@ class Group extends DeprecatedModel {
                 $catList = $_SESSION['subjects'];
             }
             else {
-                $userHandler = new DeprecatedUser;
+                $userHandler = new User;
                 $user = $userHandler->getByID($userID);
 
                 $externalUser = new External_User;

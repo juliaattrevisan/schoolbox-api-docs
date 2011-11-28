@@ -144,7 +144,7 @@ class SitePage extends Page
 			$this->saveHistory();
 		}
 
-		$userHandler = new DeprecatedUser();
+		$userHandler = new User();
 
 		$templateVar = array(
 			'TEMPLATE_YEAR' => date('Y'),
@@ -669,7 +669,7 @@ class SitePage extends Page
 		$this->setBlock('mstudent', 'mstudent_block', 'my_students');
 
 		if (is_array($_SESSION['children'])) {
-			$userHandler = new DeprecatedUser();
+			$userHandler = new User();
 
 			foreach ($_SESSION['children'] as $child) {
 				$query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";

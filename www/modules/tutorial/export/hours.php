@@ -2,12 +2,12 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/DeprecatedUser.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/event.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/attendance.php';
 
 $page = new SitePage;
-$userHandler = new DeprecatedUser;
+$userHandler = new User;
 $eventHandler = new Event;
 $attendaceHandler = new Attendance;
 

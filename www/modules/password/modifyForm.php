@@ -1,6 +1,6 @@
 <?php
 require_once(dirname(__FILE__) . '/../../../include/Config.php');
-require_once(dirname(__FILE__) . '/../../../library/DeprecatedUser.php');
+require_once(dirname(__FILE__) . '/../../../library/user.php');
 require_once(dirname(__FILE__) . '/../../../include/SitePage.php');
 
 /* Check inputs

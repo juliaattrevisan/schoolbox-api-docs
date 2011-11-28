@@ -28,7 +28,7 @@ $this->setBlock('blog', 'show_comment', 'show_comment_block');
 
 
 if(!empty($blogs)) {
-	$userHandler = new DeprecatedUser();
+	$userHandler = new User();
 
 	foreach($blogs as $blog) {
 		if($blog['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS || (NEWS_teacher_edit_other && $permission >= WRITE_ACCESS))
@@ -67,7 +67,7 @@ if(!empty($blogs)) {
 			$this->setVar('BLOG_COMMENTS', $showingComments);
 			$this->parse('show_comment_block','show_comment' );
 
-			$userHandler = new DeprecatedUser();
+			$userHandler = new User();
 
 			foreach($comments as $comment) {
 				$createdTime = new Alaress_Date_Relative($comment['created']);

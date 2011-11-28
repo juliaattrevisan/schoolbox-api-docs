@@ -5,7 +5,7 @@ $componentMap = array(1=>4,2=>5,3=>3,4=>6,5=>7,6=>1,7=>8,8=>11,9=>17,10=>13,11=>
 $componentPosMap = array(0=>'top', 1=>'left',2=>'left',3=>'left',4=>'left', 5=>'right',6=>'right',7=>'right',8=>'right',9=>'right');
 
 /* Foreach group extract existing welcome layout */
-$userHandle = new DeprecatedUser;
+$userHandle = new User;
 $groupList = $userHandle->getGroupList();
 
 if ( is_array($groupList) ) {

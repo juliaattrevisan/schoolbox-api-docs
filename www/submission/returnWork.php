@@ -2,14 +2,14 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionReturn.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/DeprecatedUser.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 
 $this->setFile(TEMPLATE_content, 'submission/returnWork.html');
 $this->setTitle('Return Student Work');
 $this->setTab('submission');
 
 $subHandler = new Submission;
-$userHandler = new DeprecatedUser;
+$userHandler = new User;
 $subReturnHandler = new SubmissionReturn;
 
 if(is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {

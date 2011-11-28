@@ -26,10 +26,10 @@ abstract class Component_FactoryAbstract {
     protected $dependencyList;
 
     /**
-     * @param DeprecatedUser $user
+     * @param User $user
      * @param SitePage $sitepage
      */
-    public function __construct (DeprecatedUser $user, SitePage $sitepage) {
+    public function __construct (User $user, SitePage $sitepage) {
         $this->dependencyList = array($user, $sitepage);
     }
 

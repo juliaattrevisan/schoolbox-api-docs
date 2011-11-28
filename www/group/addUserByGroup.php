@@ -7,7 +7,7 @@
  */
 require_once('../../include/Bootstrap.php');
 $groupHandler = new Group();
-$userHandler = new DeprecatedUser();
+$userHandler = new User();
 
 /* Whether we should be using a system or category to add from
 */

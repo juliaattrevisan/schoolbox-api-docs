@@ -14,7 +14,7 @@ if ( @!$involvementFileResource = fopen($involvementFilePath, 'r') ) {
 	die("User file could not be loaded.\n");
 }
 
-$userHandler = new DeprecatedUser;
+$userHandler = new User;
 
 $columnList = fgetcsv($involvementFileResource);
 

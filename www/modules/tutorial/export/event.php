@@ -11,7 +11,7 @@ $line = "EventID,Date,Name,Start,Finish,Location,Code,Type,Tutor 1,Tutor 2,Cance
 // user
 $user = false;
 if ($groupHandler->getPermission(0) >= FULL_ACCESS && is_numeric($_GET['userID'])) {
-	$userHandler = new DeprecatedUser;
+	$userHandler = new User;
 	$user = $userHandler->getByID($_GET['userID']);
 }
 

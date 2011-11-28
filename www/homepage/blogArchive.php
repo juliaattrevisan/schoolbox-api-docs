@@ -96,7 +96,7 @@ if ( $blogList = $blogHandler->getByYearAndMonth($category['id'], $yearNumber, $
 		}
 
 		/* Post */
-		$userHandler = new DeprecatedUser();
+		$userHandler = new User();
 
 		$poster = $userHandler->formatName($blog);
 
@@ -132,7 +132,7 @@ if ( $blogList = $blogHandler->getByYearAndMonth($category['id'], $yearNumber, $
 			$this->setVar('BLOG_COMMENTS', $showingComments);
 			$this->parse('show_comment_block','show_comment' );
 
-			$userHandler = new DeprecatedUser();
+			$userHandler = new User();
 
 			foreach($comments as $comment) {
 				$createdTime = new Alaress_Date_Relative($comment['created']);

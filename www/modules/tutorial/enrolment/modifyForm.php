@@ -28,8 +28,8 @@ if ((is_numeric($_POST['userID']) || is_numeric($_POST['userIDSelect']) ) && is_
 	// only add codes for tutorial enrolments
     $code = $event['typeID'] == 1 ? $event['code'] : '';	
 		
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/DeprecatedUser.php';
-	$userHandler = new DeprecatedUser;
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+	$userHandler = new User;
 	$user = $userHandler->getByID($userID);
 	if (isset($user['uid'])) {
 		$enrolment = array('code'		=> $code,

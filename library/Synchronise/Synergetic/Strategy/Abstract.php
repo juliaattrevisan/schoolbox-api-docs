@@ -23,7 +23,7 @@ abstract class Synchronise_Synergetic_Strategy_Abstract implements Synchronise_S
 	 * Instantiate Handlers and things
 	 */
 	public function __construct() {
-		$this->setUserHandler(new DeprecatedUser());
+		$this->setUserHandler(new User());
 		$this->setGroupHandler(new Group());
 		$this->setExternalUserHandler(new External_User());
 

@@ -4,9 +4,9 @@
 header("Content-Type: text/xml");
 
 require_once '../../../include/Config.php';
-require_once '../../../library/DeprecatedUser.php';
+require_once '../../../library/user.php';
 
-$user_handler = new DeprecatedUser();
+$user_handler = new User();
 
 if (empty($_GET['key']) || Cfg::get('api_key') != $_GET['key']) {
     $response = "<?xml version='1.0' standalone='yes'?>

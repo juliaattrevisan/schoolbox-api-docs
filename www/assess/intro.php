@@ -10,13 +10,13 @@
  * @version     SVN: $Id$
  */
 require_once('../library/group.php');
-require_once('../library/DeprecatedUser.php');
+require_once('../library/user.php');
 
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
 $attemptHandler = new Assess_Attempt();
 $groupHandler = new Group();
-$userHandler = new DeprecatedUser();
+$userHandler = new User();
 
 if (!is_numeric($this->arg[0])) {
     error(112);

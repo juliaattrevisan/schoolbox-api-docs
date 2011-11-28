@@ -2,7 +2,7 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/DeprecatedUser.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/event.php';
 
 $page = new SitePage;
@@ -47,7 +47,7 @@ $page->setVar($output);
 // user
 $user = false;
 if ($groupHandler->getPermission(0) >= FULL_ACCESS && is_numeric($_GET['userID'])) {
-	$userHandler = new DeprecatedUser;
+	$userHandler = new User;
 	$user = $userHandler->getByID($_GET['userID']);
 }
 

@@ -112,7 +112,7 @@ $this->setVar($outputPagination);
 $threadList = $forumHandler->getThreadList($category['id'], $threadIndex, $threadPerPage);
 
 if (is_array($threadList)) {
-	$userHandler = new DeprecatedUser();
+	$userHandler = new User();
 
 	foreach ($threadList as $thread) {
 		$user = array(

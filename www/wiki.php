@@ -34,7 +34,7 @@ if ($this->arg[0] == 'revision') {
 	$this->setTitle('Wiki');
 	$this->setTab('resources');
 
-	$userHandler = new DeprecatedUser();
+	$userHandler = new User();
 	$modifiedDate = new Alaress_Date_Format($wiki['modified'], 'U');
 
 	/* Detect stub links in the wiki body and determine whether the links should
@@ -62,7 +62,7 @@ if ($this->arg[0] == 'revision') {
 	$revisionList = $wikiHandler->getRevisionList($wiki['wikiID']);
 
 	if (is_array($revisionList)) {
-		$userHandler = new DeprecatedUser();
+		$userHandler = new User();
 		$i = 0;
 
 		foreach ($revisionList as $revision) {
@@ -168,7 +168,7 @@ else if (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
 		$this->setTitle('Wiki');
 		$this->setTab('resources');
 
-		$userHandler = new DeprecatedUser();
+		$userHandler = new User();
 		$modifiedDate = new Alaress_Date_Format($wiki['modified'], 'U');
 
 		/* Detect stub links in the wiki body and determine whether the links should
@@ -196,7 +196,7 @@ else if (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
 		$revisionList = $wikiHandler->getRevisionList($wiki['wikiID']);
 
 		if (is_array($revisionList)) {
-			$userHandler = new DeprecatedUser();
+			$userHandler = new User();
 			$i = 0;
 
 			foreach ($revisionList as $revision) {

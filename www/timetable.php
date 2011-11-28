@@ -5,7 +5,7 @@
  *                                                           *
  ************************************************************/
 //timetable object that displays the users timetable
-require_once '../library/DeprecatedUser.php';
+require_once '../library/user.php';
 require_once '../library/group.php';
 require_once '../library/category.php';
 
@@ -14,7 +14,7 @@ if (!Cfg::get('external_enable'))
     error(19);
 
 $groupHandler = new Group;
-$userHandler = new DeprecatedUser;
+$userHandler = new User;
 $timetableHandler = new External_Timetable;
 $categoryHandler = new Category;
 

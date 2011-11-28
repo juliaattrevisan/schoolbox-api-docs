@@ -13,7 +13,7 @@ if ( @!$timetableFileResource = fopen($timetableFilePath, 'r') ) {
 	die("Timetable file could not be loaded.\n");
 }
 
-$userHandler = new DeprecatedUser;
+$userHandler = new User;
 
 $columnList = fgetcsv($timetableFileResource);
 

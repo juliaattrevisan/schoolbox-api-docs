@@ -2,7 +2,7 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/DeprecatedUser.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/event.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/attendance.php';
 
@@ -62,7 +62,7 @@ if (is_array($_POST['processed'])) {
 
 	$_SESSION['hoursReport'] = array();
 
-	$userHandler = new DeprecatedUser;
+	$userHandler = new User;
 	$tutorList = $eventHandler->getTutorList();
 	if (is_array($tutorList)) {
 		$i = 0;

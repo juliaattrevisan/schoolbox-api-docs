@@ -29,7 +29,7 @@ class Chat extends DeprecatedModel {
         $logs = $this->db->getAll($query);
 
         if (!empty($logs)) {
-			$userHandler = new DeprecatedUser();
+			$userHandler = new User();
 
             foreach ($logs as &$log) {
                 $log_time = new DateTime($log['time']);
@@ -82,7 +82,7 @@ class Chat extends DeprecatedModel {
         $users = $this->db->getAll($query);
 
         if (!empty($users)) {
-			$userHandler = new DeprecatedUser();
+			$userHandler = new User();
 
             foreach ($users as &$user) {
                 $user['name'] = $userHandler->formatName($user);

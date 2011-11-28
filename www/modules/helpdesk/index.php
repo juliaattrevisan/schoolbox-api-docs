@@ -1,12 +1,12 @@
 <?php
 
-require_once(SITE_root.'/library/DeprecatedUser.php');
+require_once(SITE_root.'/library/user.php');
 require_once(SITE_root.'/library/group.php');
 require_once(HELPDESK_location.'/include/sql.php');
 
 define( 'DB_NAME_PORTAL', SQL_db);
 
-$userHandler = new DeprecatedUser;
+$userHandler = new User;
 $groupHandler = new Group;
 
 $db = new DeprecatedDatabase(SQL_db, 1);

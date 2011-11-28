@@ -9,7 +9,7 @@
 $groupHandler = new Group;
 
 if($groupHandler->isStaff()) {
-	$userHandler = new DeprecatedUser;
+	$userHandler = new User;
 	$categoryHandler = new Category;
 	$synergeticClass = new External_Class;
 

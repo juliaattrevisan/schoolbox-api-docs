@@ -161,8 +161,8 @@ class Forum extends DeprecatedModel {
 
 
 		/* update thread */
-		require_once SITE_root . '/library/DeprecatedUser.php';
-		$userHandler = new DeprecatedUser();
+		require_once SITE_root . '/library/user.php';
+		$userHandler = new User();
 		$user = $userHandler->getByID($_SESSION['id']);
 
 		$thread = array(

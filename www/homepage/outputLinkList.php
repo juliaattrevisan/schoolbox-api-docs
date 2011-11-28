@@ -8,7 +8,7 @@ $linkHandler = new Link;
 $linkList = $linkHandler->getAllInCategory($categoryID, $config);
 
 if (is_array($linkList)) {
-	$userHandler = new DeprecatedUser();
+	$userHandler = new User();
 
 	foreach ($linkList as $link) {
 		$url = new Url($link['url']);

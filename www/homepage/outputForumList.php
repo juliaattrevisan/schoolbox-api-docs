@@ -20,7 +20,7 @@ else {
 	$threadList = $forumHandler->getRecentThreadList($categoryID, $config);
 
 	if (is_array($threadList)) {
-		$userHandler = new DeprecatedUser();
+		$userHandler = new User();
 
 		foreach ($threadList as $thread) {
 			$user = array(

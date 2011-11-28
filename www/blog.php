@@ -36,7 +36,7 @@ if(is_numeric($this->arg[0])) {
 	if(!empty($comments)) {
 		$this->setVar('BLOG_COMMENTS', count($comments) . ' Comments');
 
-		$userHandler = new DeprecatedUser();
+		$userHandler = new User();
 
 		foreach($comments as $comment) {
 			$actionDate = new Alaress_Date_Relative($comment['created']);

@@ -2,14 +2,14 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/DeprecatedUser.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/event.php';
 
 $page = new SitePage;
 
 $eventHandler = new Event;
 $groupHandler = new Group(TUTORIAL_SERVICE);
-$userHandler = new DeprecatedUser;
+$userHandler = new User;
 
 // check access
 if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS)

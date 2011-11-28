@@ -10,7 +10,7 @@ $this->setBlock('work', 'status_due', 'status_due_block');
 $this->setBlock('work', 'status_awaiting_review', 'status_awaiting_review_block');
 $this->setBlock('work', 'status_marked', 'status_marked_block');
 
-$userHandler = new DeprecatedUser;
+$userHandler = new User;
 $groupHandler = new Group;
 $submissionHandler = new Submission;
 $returnHandler = new SubmissionReturn;

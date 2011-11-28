@@ -10,11 +10,11 @@
 require_once("../../include/SitePage.php");
 require_once("../include/image.php");
 require_once("../../library/group.php");
-require_once("../../library/DeprecatedUser.php");
+require_once("../../library/user.php");
 $page = new SitePage;
 
 $groupHandler = new Group;
-$userHandler = new DeprecatedUser;
+$userHandler = new User;
 
 
 //no image

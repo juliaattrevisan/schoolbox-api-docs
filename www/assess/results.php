@@ -13,7 +13,7 @@
  */
 require_once('../library/group.php');
 require_once('../library/category.php');
-require_once('../library/DeprecatedUser.php');
+require_once('../library/user.php');
 
 /**
  * Process an Attempt row. Functionised because it is used in an iteration to
@@ -110,7 +110,7 @@ $responseHandler = new Assess_Response();
 $assessHandler = new Assess_Main();
 $attemptHandler = new Assess_Attempt();
 $sectionHandler = new Assess_Section();
-$userHandler = new DeprecatedUser();
+$userHandler = new User();
 $groupHandler = new Group();
 $categoryHandler = new Category();
 

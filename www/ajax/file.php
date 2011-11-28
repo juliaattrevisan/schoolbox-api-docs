@@ -42,7 +42,7 @@ if (is_numeric($_POST['categoryID'])) {
 	if (!is_array($fileList)) {
 		$output = array();
 	} else {
-		$userHandler = new DeprecatedUser();
+		$userHandler = new User();
 
 		foreach ($fileList as $file) {
             $fileTime = new Alaress_Date_Relative($file['modified']);

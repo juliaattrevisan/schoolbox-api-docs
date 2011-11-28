@@ -2,7 +2,7 @@
 $this->setBlock($componentHandle, 'link', 'link_block');
 $this->setBlock('link', 'modify_link', 'modify_link_block');
 
-$userHandler = new DeprecatedUser();
+$userHandler = new User();
 $linkHandler = new Eportfolio_Link();
 $linkList = $linkHandler->getAllInUser($userID, $config);
 

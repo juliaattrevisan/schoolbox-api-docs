@@ -5,7 +5,7 @@ $this->setBlock("student_block", "subject_block", "subject_item");
 
 if(is_array($_SESSION['children'])) {
 	$i = 0;
-	$userHandler = new DeprecatedUser();
+	$userHandler = new User();
 
 	foreach($_SESSION['children'] as $child)
 	{

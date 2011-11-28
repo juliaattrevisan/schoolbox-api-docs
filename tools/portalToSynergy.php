@@ -4,11 +4,11 @@ require_once dirname(__FILE__) . '/../conf/conf.php';
 $_SERVER['DOCUMENT_ROOT'] = '/usr/local/vhosts/portal/www';
 define(SITE_root, '/usr/local/vhosts/portal');
 
-require_once SITE_root.'/library/DeprecatedUser.php';
+require_once SITE_root.'/library/user.php';
 require_once SITE_root.'/library/group.php';
 require_once SITE_root.'/www/include/stdfuncs.php';
 
-$userHandler = new DeprecatedUser;
+$userHandler = new User;
 $groupHandler = new Group(TUTORIAL_SERVICE);
 
 ini_set("auto_detect_line_endings", 1);

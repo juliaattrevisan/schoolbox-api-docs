@@ -13,7 +13,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
     protected $calendar;
 
-    public function __construct (Component_Instance $instance, DeprecatedUser $user, SitePage $sitepage, Calendar $calendar) {
+    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage, Calendar $calendar) {
         parent::__construct($instance, $user, $sitepage);
 
         $this->calendar = $calendar;

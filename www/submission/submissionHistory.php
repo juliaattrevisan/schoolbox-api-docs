@@ -12,7 +12,7 @@ $this->setBlock('subject', 'work', 'work_block');
 $this->setBlock('work', 'action_view_submitted', 'action_view_submitted_block');
 $this->setBlock('work', 'action_view_returned', 'action_view_returned_block');
 
-$userHandler = new DeprecatedUser;
+$userHandler = new User;
 $groupHandler = new Group;
 $submissionHandler = new Submission;
 $returnHandler = new SubmissionReturn;

@@ -20,7 +20,7 @@ $this->setBlock('blog', 'show_all', 'show_all_block');
 $this->setBlock('blog', 'show_comment', 'show_comment_block');
 
 $blogs = $blogHandle->getByOwnerID($userID);
-$userHandler = new DeprecatedUser();
+$userHandler = new User();
 
 if (!empty($blogs)) {
 	foreach ($blogs as $blog) {

@@ -1,5 +1,5 @@
 <?php
-require_once SITE_root . '/library/DeprecatedUser.php';
+require_once SITE_root . '/library/user.php';
 require_once SITE_root . '/library/group.php';
 require_once SITE_root . '/library/homepage-template.php';
 
@@ -14,7 +14,7 @@ $this->setFile(TEMPLATE_content, 'adminv2/category.html');
 $this->setBlock(TEMPLATE_content, 'group', 'group_block');
 $this->setBlock(TEMPLATE_content, 'homepage_template', 'homepage_template_block');
 
-$userHandler = new DeprecatedUser();
+$userHandler = new User();
 
 /* Show all the groups for permission selection
  */

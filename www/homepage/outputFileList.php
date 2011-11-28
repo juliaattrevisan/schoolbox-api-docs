@@ -16,7 +16,7 @@ print serialize($c);
 
 require_once SITE_root.'/library/file.php';
 $fileHandler = new File;
-$userHandler = new DeprecatedUser();
+$userHandler = new User();
 
 $fileList = $fileHandler->getAllInCategory($categoryID, $config);
 

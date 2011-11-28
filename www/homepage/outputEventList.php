@@ -10,7 +10,7 @@ $this->setVar('CALENDAR_TITLE', 'Group Calendar');
 $this->setVar('group_events_block', '');
 
 if (is_array($eventList)) {
-	$userHandler = new DeprecatedUser();
+	$userHandler = new User();
 
 	foreach ($eventList as $event) {
 

@@ -13,7 +13,7 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
 
     protected $news;
 
-    public function __construct (Component_Instance $instance, DeprecatedUser $user, SitePage $sitepage, News $news) {
+    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage, News $news) {
         parent::__construct($instance, $user, $sitepage);
 
         $this->news = $news;

@@ -2,7 +2,7 @@
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage();
-$userHandler = new DeprecatedUser();
+$userHandler = new User();
 $groupHandler = new Group();
 
 if (!in_array($_SESSION['gid'], $groupHandler->canChangePassword()) && !$_SESSION['su']) {

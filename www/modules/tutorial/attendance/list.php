@@ -11,7 +11,7 @@ $eventHandler = new Event;
 $attendanceHandler = new Attendance;
 $enrolmentHandler = new Enrolment;
 $groupHandler = new Group(TUTORIAL_SERVICE);
-$userHandler = new DeprecatedUser();
+$userHandler = new User();
 
 $page->setFile(TEMPLATE_content, 'tutorial/attendance/list.html');
 $page->setBlock(TEMPLATE_content, 'event', 'event_block');

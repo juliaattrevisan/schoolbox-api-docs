@@ -158,7 +158,7 @@ if(is_array($recentLog) ) {
 
         }
 
-		$userHandler = new DeprecatedUser();
+		$userHandler = new User();
 
         $output = array('LOG_DATE'      => date(Cfg::get('date_short'), strtotime($log['occurred'])),
                         'LOG_ACTION'    => $action,

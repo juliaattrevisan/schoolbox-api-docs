@@ -22,7 +22,7 @@ class Eportfolio_Profile_Card extends Eportfolio_Profile_Abstract {
 	public function render() {
 		$this->getPage()->setBlock(TEMPLATE_content, 'student', 'student_block');
 
-		$userHandler = new DeprecatedUser();
+		$userHandler = new User();
         $groupHandler = new Group();
 
         $user = $userHandler->getByID($this->getUserId());
