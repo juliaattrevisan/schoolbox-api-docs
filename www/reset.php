@@ -1,10 +1,10 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/DeprecatedUser.php';
 
 $page = new SitePage(false);
-$userHandler = new User;
+$userHandler = new DeprecatedUser;
 
 $page->setFile(TEMPLATE_body, 'common/reset.html');
 $page->setBlock(TEMPLATE_body, 'check_email', 'check_email_block');

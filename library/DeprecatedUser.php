@@ -1,8 +1,8 @@
 <?php
 
-class User extends DeprecatedModel {
+class DeprecatedUser extends DeprecatedModel {
 
-    function User() {
+    function DeprecatedUser() {
 
         $this->_table = "user";
         $this->_index = "id";

@@ -9,7 +9,7 @@ $subHandler = new Submission();
 $retHandler = new SubmissionReturn();
 $catHandler = new Category();
 $groupHandler = new Group();
-$userHandler = new User();
+$userHandler = new DeprecatedUser();
 
 $factory = new AssessFactory();
 $assessHandler = new Assess();

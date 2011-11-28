@@ -2,7 +2,7 @@
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage();
-$userHandler = new User();
+$userHandler = new DeprecatedUser();
 $groupHandler = new Group();
 $categoryHandler = new Category();
 

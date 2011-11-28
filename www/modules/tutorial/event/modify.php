@@ -3,7 +3,7 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/event.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/DeprecatedUser.php';
 
 $page = new SitePage();
 $page->setFile(TEMPLATE_content, 'tutorial/event/modify.html');
@@ -11,7 +11,7 @@ $page->setTitle("Tutorial Management");
 
 $eventHandler = new Event;
 $groupHandler = new Group(TUTORIAL_SERVICE);
-$userHandler = new User;
+$userHandler = new DeprecatedUser;
 
 // check access
 if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS)

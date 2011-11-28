@@ -13,7 +13,7 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
 
     protected $rss;
 
-    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage) {
+    public function __construct (Component_Instance $instance, DeprecatedUser $user, SitePage $sitepage) {
         parent::__construct($instance, $user, $sitepage);
 
         $this->rss = new Xml(Cfg::get('welcome_rss_url'), RSS_cache_time);

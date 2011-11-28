@@ -4,10 +4,10 @@ $this->setBlock($componentHandle, "staff_teachers", "staff_teacher_block");
 $this->setVar('staff_teacher_block', '');
 
 if (($code != '') && Cfg::get('external_enable')) {
-	require_once SITE_root.'/library/user.php';
+	require_once SITE_root.'/library/DeprecatedUser.php';
 
 	$externalClassHandler = new External_Class();
-	$userHandler = new User();
+	$userHandler = new DeprecatedUser();
 
 	$listSyns = $externalClassHandler->getTeacherName($code);
 

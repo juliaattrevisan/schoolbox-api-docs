@@ -2,7 +2,7 @@
 
 $wiki  = new Wiki;
 $group = new Group(HOMEPAGE_SERVICE);
-$userHandler = new User();
+$userHandler = new DeprecatedUser();
 
 if (is_numeric($this->arg[0])) {
 	$this->setFile(TEMPLATE_content, 'wiki/diff.html');

@@ -63,7 +63,7 @@ elseif (is_numeric($_POST['files'])) {
 	$output = array();
 
 	if (is_array($fileList) && $permission >= READ_ACCESS) {
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 
 		foreach ($fileList as $file) {
 

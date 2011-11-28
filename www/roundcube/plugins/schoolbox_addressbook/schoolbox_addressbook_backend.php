@@ -1,7 +1,7 @@
 <?php
 
 require_once '../include/stdfuncs.php';
-require_once '../../library/user.php';
+require_once '../../library/DeprecatedUser.php';
 
 class schoolbox_addressbook_backend extends rcube_addressbook {
 
@@ -13,7 +13,7 @@ class schoolbox_addressbook_backend extends rcube_addressbook {
 
     public function __construct() {
         $this->ready = true;
-        $this->user = new User();
+        $this->user = new DeprecatedUser();
     }
 
     public function set_search_set($filter) {
@@ -38,7 +38,7 @@ class schoolbox_addressbook_backend extends rcube_addressbook {
     }
 
     public function list_records($cols=null, $subset=0) {
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 
         $users = $this->user->search('', ($this->list_page - 1) * $this->page_size, $this->list_page * $this->page_size, $count);
 
@@ -73,7 +73,7 @@ class schoolbox_addressbook_backend extends rcube_addressbook {
         $this->result = $this->count();
 
 		if(is_array($users) ) {
-			$userHandler = new User();
+			$userHandler = new DeprecatedUser();
 
         	foreach ($users as $user) {
 				$emailObj = new Email();
@@ -98,7 +98,7 @@ class schoolbox_addressbook_backend extends rcube_addressbook {
         $this->user_count = $count;
         $this->result = $this->count();
 
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 
         foreach ($users as $user) {
 			$emailObj = new Email();

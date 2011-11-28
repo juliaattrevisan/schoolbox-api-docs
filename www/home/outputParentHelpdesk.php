@@ -5,7 +5,7 @@ if(HELPDESK_enable) {
 	require_once('modules/helpdesk/helpdesk.php');
 	$helpdesk = new Helpdesk;
 
-	$userHandler = new User();
+	$userHandler = new DeprecatedUser();
 
 	$this->setBlock($component['name'], "student_helpdesk_block", "student_helpdesk");
 	$this->setBlock("student_helpdesk_block", "student_job_block", "student_job");

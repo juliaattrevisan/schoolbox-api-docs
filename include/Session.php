@@ -30,9 +30,9 @@ class Session {
 	}
 
     public function create($username) {
-        require_once(dirname(__FILE__)  .'/../library/user.php');
+        require_once(dirname(__FILE__)  .'/../library/DeprecatedUser.php');
         require_once(dirname(__FILE__)  .'/../library/group.php');
-        $userHandler = new User;
+        $userHandler = new DeprecatedUser;
         $groupHandler = new Group;
 
         //Clear all remenants of past sessions

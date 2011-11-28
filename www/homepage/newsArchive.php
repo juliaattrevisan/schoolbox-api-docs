@@ -6,7 +6,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 $categoryHandler = new Category;
 $groupHandler = new Group;
 $newsHandler = new CategoryNews;
-$userHandler = new User();
+$userHandler = new DeprecatedUser();
 
 $this->setFile(TEMPLATE_content, "homepage/newsArchive.html");
 $this->setBlock(TEMPLATE_content, "submit_news", "submit_news_block");
@@ -36,7 +36,7 @@ if(is_array($newsList)) {
 		else
 			$this->setVar("MOD_NEWS", "");
 
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 
 		$poster = $userHandler->formatName($news);
 

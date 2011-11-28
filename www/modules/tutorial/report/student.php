@@ -2,7 +2,7 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/event.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/DeprecatedUser.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 $page = new SitePage();
@@ -28,7 +28,7 @@ $toObj = new Alaress_Date_Format($_GET['to'], 'd/m/y');
 $to = $toObj->getUnixTimestamp();
 
 $eventHandler = new Event;
-$userHandler = new User;
+$userHandler = new DeprecatedUser;
 
 if (is_numeric($_GET['userID'])) {
 	$user = $userHandler->getByID($_GET['userID'], 3);

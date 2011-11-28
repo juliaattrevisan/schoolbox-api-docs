@@ -66,7 +66,7 @@ else if (isset($_REQUEST['accept'])) {
 /* Add user
  */
 else if (isset($_POST['userID'])) {
-	$userHandler = new User();
+	$userHandler = new DeprecatedUser();
 	$user = $userHandler->getByID($_POST['userID']);
 
 	if (isset($user['uid'])) {
@@ -113,7 +113,7 @@ else if (isset($_GET['disband'])) {
 	SitePage::localRedir('/');
 }
 else if (isset($_POST['bulkAdd'])) {
-	$userHandler = new User();
+	$userHandler = new DeprecatedUser();
 
 	//get rid of newlines
 	$string = preg_replace('/(\r\n|\n|\r)/', ',', $_POST['bulkAdd']);

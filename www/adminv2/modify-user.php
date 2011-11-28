@@ -1,8 +1,8 @@
 <?php
-require_once SITE_root . '/library/user.php';
+require_once SITE_root . '/library/DeprecatedUser.php';
 require_once SITE_root . '/library/group.php';
 
-$userHandler = new User();
+$userHandler = new DeprecatedUser();
 $groupHandler = new Group();
 
 /* Superusers only */

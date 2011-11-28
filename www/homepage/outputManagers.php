@@ -4,8 +4,8 @@
 		$this->setBlock($componentHandle, "staff_members", "staff_member_block");
         $this->setBlock($componentHandle, "member_email", "member_email_block");
 
-		require_once SITE_root.'/library/user.php';
-		$userHandler = new User;
+		require_once SITE_root.'/library/DeprecatedUser.php';
+		$userHandler = new DeprecatedUser;
 		$managerList = $userHandler->getManagers($categoryID);
 
 		if (is_array($managerList)) {

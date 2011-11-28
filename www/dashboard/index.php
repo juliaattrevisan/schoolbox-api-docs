@@ -14,7 +14,7 @@ $this->setFile(TEMPLATE_content, 'dashboard/index.html');
 /* Instance factory */
 $groupID = $_SESSION['gid'];
 
-$componentFactory = new Component_Dashboard_Factory(new User, $this);
+$componentFactory = new Component_Dashboard_Factory(new DeprecatedUser, $this);
 $componentCollection = $componentFactory->buildComponentList($groupID);
 
 $occupiedPositionList = array();

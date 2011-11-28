@@ -121,7 +121,7 @@ for ($i = 0; $i < $totalDays; $i++) {
                 $this->setVar('MODIFY', '');
             }
 
-			$userHandler = new User();
+			$userHandler = new DeprecatedUser();
 
             $output = array(
                 'TIME' => $submission['date']->format('g:i a'), // g:i a
@@ -168,7 +168,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 
 	$eventList = $calendarHandler->getDayEvents($currentDay);
 	if(is_array($eventList)) {
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 
 		foreach($eventList as $event) {
 

@@ -2,7 +2,7 @@
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 require_once SITE_root . '/www/include/stdfuncs.php';
 
-$userHandler = new User();
+$userHandler = new DeprecatedUser();
 $groupHandler = new Group();
 
 $result = $suggestions = $data = array();

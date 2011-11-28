@@ -34,7 +34,7 @@ $eventList = $this->db->getAll($query);
 $this->setVar('group_events_block', '');
 
 if (is_array($eventList)) {
-	$userHandler = new User();
+	$userHandler = new DeprecatedUser();
 
 	foreach ($eventList as $event) {
 

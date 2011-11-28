@@ -8,11 +8,11 @@
 define('MAX_COLUMN_COUNT', 3);
 
 require_once 'include/stdfuncs.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/DeprecatedUser.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 
-$userHandler = new User();
+$userHandler = new DeprecatedUser();
 $groupHandler = new Group();
 $eportfolioHandler = new Eportfolio_Container($this->arg[0]);
 $allowedFiles = new AllowedFile();

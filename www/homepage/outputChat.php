@@ -4,7 +4,7 @@ require_once SITE_root . '/library/chat.php';
 require_once SITE_root . '/library/group.php';
 $chat = new Chat($config);
 $group = new Group();
-$userHandler = new User();
+$userHandler = new DeprecatedUser();
 
 if (empty($config['state'])) {
     $config['state'] = $default['state'];

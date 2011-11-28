@@ -4,7 +4,7 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 $forumHandler = new Forum();
 $categoryHandler = new Category();
 $groupHandler = new Group();
-$userHandler = new User();
+$userHandler = new DeprecatedUser();
 
 $this->setFile(TEMPLATE_content, 'forum/modify.html');
 $this->setBlock(TEMPLATE_content, 'thread_link', 'thread_link_block');

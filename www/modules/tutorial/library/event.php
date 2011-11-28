@@ -291,7 +291,7 @@ class Event extends DeprecatedModel {
 			$tutorList = $this->db->getAll($query);
 		}
 
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 
 		$output = array();
 		if (is_array($tutorList)) {

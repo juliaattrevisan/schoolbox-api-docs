@@ -1,6 +1,6 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/DeprecatedUser.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 $page = new SitePage(false);
@@ -17,7 +17,7 @@ $page->setVar('parents_only_block', '');
 
 if (isset($_POST['email'])) {
 	
-	$userHandler = new User;
+	$userHandler = new DeprecatedUser;
 	
 	$result = $userHandler->sendPassword($_POST['email']);
 	

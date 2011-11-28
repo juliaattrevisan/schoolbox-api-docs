@@ -8,7 +8,7 @@ $this->setBlock('wiki_row', 'modify_wiki', 'modify_wiki_block');
 $sortOptions = array('Heading', 'Created', 'Modified');
 
 $wikiHandler = new Wiki();
-$userHandler = new User();
+$userHandler = new DeprecatedUser();
 
 /* Dodge around addComponent when config for this instance is empty
  */

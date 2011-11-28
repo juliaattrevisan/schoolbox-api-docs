@@ -22,7 +22,7 @@ else {
 	require_once SITE_root.'/library/dropbox.php';
 	$dropbox = new Dropbox;
 	$fileList = $dropbox->getFileList($categoryID);
-	$userHandler = new User();
+	$userHandler = new DeprecatedUser();
 
 	if(is_array($fileList)) {
 		foreach($fileList as $file) {

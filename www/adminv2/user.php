@@ -11,8 +11,8 @@ $this->setFile(TEMPLATE_content, 'adminv2/user.html');
 $this->setTitle('Admin - Users');
 $this->setBlock(TEMPLATE_content, 'superusers', 'superusers_block');
 
-require_once SITE_root . '/library/user.php';
-$userHandler = new User();
+require_once SITE_root . '/library/DeprecatedUser.php';
+$userHandler = new DeprecatedUser();
 
 $superuserList = $userHandler->getSuperusers();
 

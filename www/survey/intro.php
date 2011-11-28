@@ -10,13 +10,13 @@
  * @version     SVN: $Id$
  */
 require_once('../library/group.php');
-require_once('../library/user.php');
+require_once('../library/DeprecatedUser.php');
 
 $assessHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
 $attemptHandler = new Survey_Attempt();
 $groupHandler = new Group();
-$userHandler = new User();
+$userHandler = new DeprecatedUser();
 
 if (!is_numeric($this->arg[0])) {
     error(112);

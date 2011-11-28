@@ -150,7 +150,7 @@ $fileList = $fileHandler->mergeLinks($fileHandler->getAllInCategory($openCategor
 $permission = $groupHandler->getPermission($openCategory);
 
 if (is_array($fileList) && count($fileList) > 0) {
-	$userHandler = new User();
+	$userHandler = new DeprecatedUser();
 
 	foreach ($fileList as $file) {
 

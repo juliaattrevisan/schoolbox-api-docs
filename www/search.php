@@ -145,7 +145,7 @@ if (!empty($result['user'])) {
 		/* If a parent is performing the search, remove the email address
 		 */
 		$groupHandler = new Group();
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 
 		if ($groupHandler->isParent()) {
 			unset($email);
@@ -221,7 +221,7 @@ if (!empty($result['file'])) {
         'FILE_COUNT'      => $count['file'],
     ));
 
-	$userHandler = new User();
+	$userHandler = new DeprecatedUser();
 
     foreach ($result['file'] as $file) {
         foreach ($categoryStd->breadcrumb($file['category']) as $i => $breadcrumb) {
@@ -311,7 +311,7 @@ if (!empty($result['link'])) {
 			$linkUrl = $url->getBase64EncodedRedirect();
 		}
 
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 		$createdTime = new Alaress_Date_Relative($link['submitted']);
 
         $page->setVar(array(
@@ -352,7 +352,7 @@ if (!empty($result['news'])) {
             $news['link'] = "/homepage/{$news['code']}#news-{$news['id']}";
         }
 
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 		$createdTime = new Alaress_Date_Relative($news['datetime_posted']);
 
         $page->setVar(array(
@@ -383,7 +383,7 @@ if (!empty($result['blog'])) {
         'BLOG_COUNT'      => $count['blog'],
     ));
 
-	$userHandler = new User();
+	$userHandler = new DeprecatedUser();
 
     foreach ($result['blog'] as $blog) {
         foreach ($categoryStd->breadcrumb($blog['cid']) as $i => $breadcrumb) {
@@ -418,7 +418,7 @@ if (!empty($result['wiki'])) {
         'WIKI_COUNT'      => $count['wiki'],
     ));
 
-	$userHandler = new User();
+	$userHandler = new DeprecatedUser();
 
     foreach ($result['wiki'] as $wiki) {
         foreach ($categoryStd->breadcrumb($wiki['categoryID']) as $i => $breadcrumb) {
@@ -455,7 +455,7 @@ if (!empty($result['forum'])) {
         'FORUM_COUNT'      => $count['forum'],
     ));
 
-	$userHandler = new User();
+	$userHandler = new DeprecatedUser();
 
     foreach ($result['forum'] as $forum) {
         foreach ($categoryStd->breadcrumb($forum['categoryID']) as $i => $breadcrumb) {

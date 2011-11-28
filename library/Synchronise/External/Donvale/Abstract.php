@@ -25,7 +25,7 @@ abstract class Synchronise_External_Donvale_Abstract {
 	public function __construct($filePath) {
 		$this->setFilePath($filePath);
 		$this->setFileName();
-		$this->setUserHandler(new User());
+		$this->setUserHandler(new DeprecatedUser());
 
 		/* Check if the input file is valid
 		 * If not, die

@@ -3,10 +3,10 @@
 session_start();
 
 require_once dirname(__FILE__) . '/../include/SitePage.php';
-require_once SITE_root . '/library/user.php';
+require_once SITE_root . '/library/DeprecatedUser.php';
 
 $page = new SitePage( false );
-$userHandler = new User;
+$userHandler = new DeprecatedUser;
 
 $recaptcha = new ReCaptcha( Config::get('recaptcha_public_api_key'), Config::get('recaptcha_private_api_key') );
 

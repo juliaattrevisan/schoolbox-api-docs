@@ -1,6 +1,6 @@
 <?php
 require_once SITE_root . '/library/sideMenu.php';
-require_once SITE_root . '/library/user.php';
+require_once SITE_root . '/library/DeprecatedUser.php';
 require_once SITE_root . '/library/group.php';
 
 $groupHandler = new Group();
@@ -13,7 +13,7 @@ $this->setFile(TEMPLATE_content, 'adminv2/modify-side-menu.html');
 $this->setTitle('Admin - Modify Side Menu');
 
 $menuHandler = new SideMenu;
-$userHandler = new User;
+$userHandler = new DeprecatedUser;
 
 if(is_numeric($this->arg[0])) {
     /* Modify existing item */

@@ -131,7 +131,7 @@ $this->setVar($outputPagination);
 /* output posts */
 $postList = $forumHandler->getPostList($thread['threadID'], $postIndex, $postPerPage);
 if (is_array($postList)) {
-	$userHandler = new User();
+	$userHandler = new DeprecatedUser();
 
 	foreach ($postList as $post) {
 

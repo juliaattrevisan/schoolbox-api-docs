@@ -4,7 +4,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 $newsHandler = new News();
 $groupHandler = new Group(NEWS_SERVICE);
-$userHandler = new User();
+$userHandler = new DeprecatedUser();
 
 // check permission
 if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS) {

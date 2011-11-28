@@ -1,10 +1,10 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/DeprecatedUser.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/include/stdfuncs.php';
 
-$userHandler = new User;
+$userHandler = new DeprecatedUser;
 $groupHandler = new Group(TUTORIAL_SERVICE);
 
 $handle = fopen($argv[1], "r");

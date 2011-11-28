@@ -24,7 +24,7 @@ class Bulk {
 	 * @param <type> $file
 	 */
 	public function addUsers($file) {
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 
 		/* List of outcomes for each user in the csv
 		 */
@@ -158,7 +158,7 @@ class Bulk {
 	 * @param <type> $file
 	 */
 	public function removeUsers($file) {
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 
 		/* List of outcomes for each user in the csv
 		 */

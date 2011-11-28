@@ -1,9 +1,9 @@
 <?php
 
-require_once SITE_root . '/library/user.php';
+require_once SITE_root . '/library/DeprecatedUser.php';
 require_once dirname(__FILE__) . '/library/workshop.php';
 
-$userHandler = new User;
+$userHandler = new DeprecatedUser;
 $workshopHandler = new Workshop;
 
 $this->setFile(TEMPLATE_content, 'modules/workshop/index.html');

@@ -17,7 +17,7 @@ abstract class Component_ControllerAbstract {
     protected $instance;
 
     /**
-     * @var User
+     * @var DeprecatedUser
      */
     protected $user;
 
@@ -28,10 +28,10 @@ abstract class Component_ControllerAbstract {
 
     /**
      * @param Component_Instance $instance
-     * @param User $user
+     * @param DeprecatedUser $user
      * @param SitePage $sitepage
      */
-    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage) {
+    public function __construct (Component_Instance $instance, DeprecatedUser $user, SitePage $sitepage) {
         $this->instance = $instance;
         $this->user = $user;
         $this->sitepage = $sitepage;

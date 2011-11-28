@@ -21,7 +21,7 @@ $this->setTitle('Admin - Dashboard');
 /* Group Selector */
 $this->setBlock(TEMPLATE_content, 'group', 'group_block');
 
-$userHandle = new User;
+$userHandle = new DeprecatedUser;
 $groupList = $userHandle->getGroupList();
 
 if ( is_array($groupList) ) {
@@ -58,7 +58,7 @@ $this->setBlock('layout', 'position_top', 'position_top_block');
 $this->setBlock('layout', 'position_left', 'position_left_block');
 $this->setBlock('layout', 'position_right', 'position_right_block');
 
-$componentFactory = new Component_Dashboard_Factory(new User, $this);
+$componentFactory = new Component_Dashboard_Factory(new DeprecatedUser, $this);
 
 $componentCollection = $componentFactory->buildComponentList($groupList[0]['id']);
 

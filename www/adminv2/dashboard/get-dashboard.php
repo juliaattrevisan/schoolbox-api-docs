@@ -23,7 +23,7 @@ $this->setBlock(TEMPLATE_body, 'position_top', 'position_top_block');
 $this->setBlock(TEMPLATE_body, 'position_left', 'position_left_block');
 $this->setBlock(TEMPLATE_body, 'position_right', 'position_right_block');
 
-$componentFactory = new Component_Dashboard_Factory(new User, $this);
+$componentFactory = new Component_Dashboard_Factory(new DeprecatedUser, $this);
 
 $componentCollection = $componentFactory->buildComponentList($groupId);
 

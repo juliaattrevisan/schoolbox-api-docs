@@ -9,7 +9,7 @@ $this->setBlock('files', 'file_no_url', 'file_no_url_block');
 $this->setBlock('files', 'modify_file', 'modify_file_block');
 $this->setBlock('files', 'unpublish', 'unpublish_block');
 
-$userHandler = new User();
+$userHandler = new DeprecatedUser();
 $fileHandler = new MyFile($userID);
 $fileList = $fileHandler->getAllPublished($config);
 $sortOptions = array('Description');

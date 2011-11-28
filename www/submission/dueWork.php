@@ -3,7 +3,7 @@
 require_once SITE_root . '/library/submission.php';
 require_once SITE_root . '/library/submissionReturn.php';
 require_once SITE_root . '/library/group.php';
-require_once SITE_root . '/library/user.php';
+require_once SITE_root . '/library/DeprecatedUser.php';
 
 /**
  * Order by date descending.
@@ -42,7 +42,7 @@ $this->setVar('activity_block', '');
 $this->setVar('is_parent_block', '');
 
 $groupHandler = new Group;
-$userHandler = new User;
+$userHandler = new DeprecatedUser;
 $returnHandler = new SubmissionReturn;
 $submissionHandler = new Submission;
 

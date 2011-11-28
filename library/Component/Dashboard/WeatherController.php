@@ -13,7 +13,7 @@ class Component_Dashboard_WeatherController extends Component_Dashboard_Controll
 
     protected $weather;
 
-    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage) {
+    public function __construct (Component_Instance $instance, DeprecatedUser $user, SitePage $sitepage) {
         parent::__construct($instance, $user, $sitepage);
 
         $this->weather = new Xml('http://www.google.com/ig/api?weather=' . urlencode(Cfg::get('weather_location')));

@@ -17,7 +17,7 @@ $groupHandler = new Group(HOMEPAGE_SERVICE);
 $categoryHandler = new Category;
 
 if (is_numeric($this->arg[0])) {
-	$userHandler = new User();
+	$userHandler = new DeprecatedUser();
 
 	$category = $categoryHandler->getByID($this->arg[0]);
 

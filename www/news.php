@@ -54,7 +54,7 @@ $items = $myNews->getNews();
 if (is_array($items)) {
 	$i = 0;
 	$total = count($items);
-	$userHandler = new User();
+	$userHandler = new DeprecatedUser();
 
 	foreach ($items as $article)
 	{

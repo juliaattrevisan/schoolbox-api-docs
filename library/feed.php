@@ -63,7 +63,7 @@ class Feed {
 
 		$this->db->query($query);
 
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 
 		while($row = $this->db->getNextArray()){
 			if ($row['realname'] != '') {
@@ -98,7 +98,7 @@ class Feed {
 
 		$this->db->query($query);
 
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 
 		while($row = $this->db->getNextArray()){
 			$link[] = array(
@@ -132,7 +132,7 @@ class Feed {
 
         $this->db->query($query);
 
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 
         while ($row = $this->db->getNextArray()) {
             $onlineAssessments[] = array(
@@ -167,7 +167,7 @@ class Feed {
 
 		$this->db->query($query);
 
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 
 		while ($row = $this->db->getNextArray()) {
 			$surveys[] = array(
@@ -189,7 +189,7 @@ class Feed {
 
 		$this->db->query($query);
 
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 
 		while($row = $this->db->getNextArray()){
 
@@ -211,7 +211,7 @@ class Feed {
 
 		$this->db->query($query);
 
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 
 		while($row = $this->db->getNextArray()){
 			$folder[] = array(
@@ -234,7 +234,7 @@ class Feed {
 
 		$this->db->query($query);
 
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 
 		while($row = $this->db->getNextArray()){
 			$forum[] = array(
@@ -262,7 +262,7 @@ class Feed {
 
 		$this->db->query($query);
 
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 
 		while($row = $this->db->getNextArray()){
 			$wiki[] = array(
@@ -294,7 +294,7 @@ class Feed {
 
 		$this->db->query($query);
 
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 
 		while ($row = $this->db->getNextArray()) {
 			$blog[] = array(
@@ -326,7 +326,7 @@ class Feed {
 
 		$this->db->query($query);
 
-		$userHandler = new User();
+		$userHandler = new DeprecatedUser();
 
 		while ($row = $this->db->getNextArray()) {
 			$blogComments[] = array(

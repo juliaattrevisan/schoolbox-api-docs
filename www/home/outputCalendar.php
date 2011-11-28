@@ -12,7 +12,7 @@ $this->setVar("DATE", date("l jS F"));
 
 //first lets output submission events
 $submissionList = $calendarHandler->getSubmissionEvents($currDay);
-$userHandler = new User();
+$userHandler = new DeprecatedUser();
 
 if (is_array($submissionList)) {
 	foreach ($submissionList as $submission) {
@@ -45,7 +45,7 @@ if(!is_array($eventList))
 }
 else
 {
-	$userHandler = new User();
+	$userHandler = new DeprecatedUser();
 
 	foreach($eventList as $event)
 	{

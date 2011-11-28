@@ -40,7 +40,7 @@ if (is_numeric($this->arg[0])) {
         $studentList = $groupHandler->getMemberList($subBox['category']);
     }
 
-    $userHandler = new User();
+    $userHandler = new DeprecatedUser();
 
     if (is_array($studentList)) {
         foreach($studentList as $student) {

@@ -114,7 +114,7 @@ for($i=0; $i < 7; $i++) {
                 $this->setVar('MODIFY', '');
             }
 
-			$userHandler = new User();
+			$userHandler = new DeprecatedUser();
 
 			$output = array(
                 'TIME'          => $submission['date']->format('g:iA'), // g:i a
@@ -167,7 +167,7 @@ for($i=0; $i < 7; $i++) {
 
 	if(is_array($eventList)) {
 		foreach($eventList as $event) {
-			$userHandler = new User();
+			$userHandler = new DeprecatedUser();
 
 			$output = array('TIME'		=> rtrim(
 											($event['startTime'] != "12:00AM" ? $event['startTime'] : "") . " - " .

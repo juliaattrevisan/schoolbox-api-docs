@@ -12,7 +12,7 @@
  * its orginal size						*/
 
 if (is_numeric($this->arg[0]) ) {
-    $userHandler = new User();
+    $userHandler = new DeprecatedUser();
 	$eportfolioHandler = new Eportfolio_Container($this->arg[0]);
 
 	if (!$eportfolioHandler->canEdit($this->arg[0])) {

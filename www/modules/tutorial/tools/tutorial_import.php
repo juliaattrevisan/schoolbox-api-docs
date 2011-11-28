@@ -1,7 +1,7 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/user.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/DeprecatedUser.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/mssql.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/event.php';
 
@@ -9,7 +9,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/modules/tutorial/library/event.php';
 
 $page = new SitePage;
 $eventHandler = new Event;
-$userHandler = new User;
+$userHandler = new DeprecatedUser;
 $mssql = new MSSQL;
 
 $query = "SELECT * FROM ".TUTORIAL_db.".tutorialTemp ";
