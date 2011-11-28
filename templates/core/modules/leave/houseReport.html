@@ -1,0 +1,66 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.tablesorter.min.js"></script>
+<script type="text/javascript">
+//    $j(function() {
+//        $j("#pendingRequestList, #previousRequestList").tablesorter({
+//            cssHeader: 'sortable',
+//            cssAsc: 'ascending',
+//            cssDesc: 'descending',
+//            dateFormat: 'uk'
+//        });
+//    });
+</script>
+<!-- END custom_head -->
+
+<h1>Leave Report for {HOUSE_NAME}</h1>
+<div class="indent">
+    <!-- BEGIN no_requests -->
+    {HOUSE_NAME} has no pending or previous requests.
+    <!-- END no_requests -->
+    <!-- BEGIN request_list -->
+    <h2>Request History</h2>
+    <span class="header_option in-h2"><a href="/modules/leave/export/{HOUSE_ID}" class="btn modify"><span></span>Export History</a></span>
+    <table id="previousRequestList" class="ruler">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Year</th>
+                <th colspan="3" class="center">{REPORT_START_DATE}</th>
+                <th colspan="3" class="center">{REPORT_FINISH_DATE}</th>
+                <th>Host</th>
+                <th>Approval Date</th>
+                <th>Approved By</th>
+                <th class="center">View</th>
+            </tr>
+            <tr>
+                <th colspan="2"></th>
+                <th>Morning</th>
+                <th>Afternoon</th>
+                <th>Night</th>
+                <th>Morning</th>
+                <th>Afternoon</th>
+                <th>Night</th>
+                <th colspan="4"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- BEGIN request -->
+            <tr class="{ON_OFF}">
+                <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
+                <td>{USER_YEAR}</td>
+                <td>{REQUEST_START_MORNING}</td>
+                <td>{REQUEST_START_AFTERNOON}</td>
+                <td>{REQUEST_START_NIGHT}</td>
+                <td>{REQUEST_FINISH_MORNING}</td>
+                <td>{REQUEST_FINISH_AFTERNOON}</td>
+                <td>{REQUEST_FINISH_NIGHT}</td>
+                <td>{REQUEST_HOST_TYPE}</td>
+                <td>{REQUEST_AUTHORISATION_DATETIME}</td>
+                <td><a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a></td>
+                <td class="center"><a href="/modules/leave/modify/{REQUEST_ID}">View</a></td>
+            </tr>
+            <!-- END request -->
+        </tbody>
+    </table>
+    <!-- END request_list -->
+</div>

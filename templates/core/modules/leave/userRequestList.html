@@ -1,3 +1,16 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.tablesorter.min.js"></script>
+<script type="text/javascript">
+    $j(function() {
+        $j("#pendingRequestList, #previousRequestList").tablesorter({
+            cssHeader: 'sortable',
+            cssAsc: 'ascending',
+            cssDesc: 'descending'
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 <h1>Boarder Leave Requests for {USER_NAME}</h1>
 <span class="header_option"><a class="btn back" href="/modules/leave/house/{HOUSE_ID}"><span></span>Return to {HOUSE_NAME}</a></span>
 <div class="indent">
@@ -5,13 +18,11 @@
     {USER_NAME} has no pending or previous requests.
     <!-- END no_requests -->
     <!-- BEGIN request_list -->
-    <table class="ruler">
-        <!-- BEGIN pending_request_list -->
-        <form name="modifyListForm" action="/modules/leave/processModifyList" method="post">
+    <!-- BEGIN pending_request_list -->
+    <form name="modifyListForm" action="/modules/leave/processModifyList" method="post">
+        <h2>Pending Requests</h2>
+        <table id="pendingRequestList" class="ruler">
             <thead>
-                <tr>
-                    <td colspan="9"><h2>Pending Requests</h2></td>
-                <tr>
                 <tr>
                     <th></th>
                     <th>Name</th>
@@ -34,24 +45,21 @@
                     <td class="center"><a href="/modules/leave/modify/{REQUEST_ID}">View</a></td>
                 </tr>
                 <!-- END pending_request -->
-                <tr>
-                    <td colspan="9">
-                        <input type="hidden" name="user[id]" value="{USER_ID}">
-                        <input type="submit" name="approve" value="Approve Selected" class="submit-btn-plain">
-                        <input type="submit" name="reject" value="Reject Selected" class="submit-btn-plain">
-                    </td>
-                </tr>
             </tbody>
-        </form>
-        <!-- END pending_request_list -->
-        <!-- BEGIN previous_request_list -->
+        </table>
+        
+        <div class="clearfix">
+            <input type="hidden" name="user[id]" value="{USER_ID}">
+            <input type="submit" name="approve" value="Approve Selected" class="submit-btn-plain">
+            <input type="submit" name="reject" value="Reject Selected" class="submit-btn-plain">
+        </div>
+    </form>
+    <!-- END pending_request_list -->
+    <!-- BEGIN previous_request_list -->
+    <h2>Request History</h2>
+    <span class="header_option in-h2"><a href="/modules/leave/export/{USER_ID}" class="btn modify"><span></span>Export History</a></span>
+    <table id="previousRequestList" class="ruler">
         <thead>
-            <tr>
-                <td colspan="9">
-                    <h2>Request History</h2>
-                    <span class="header_option in-h2"><a href="/modules/leave/export/{USER_ID}" class="btn modify"><span></span>Export History</a></span>
-                </td>
-            <tr>
             <tr>
                 <th>Name</th>
                 <th>Year</th>
@@ -78,9 +86,8 @@
                 <td class="center"><a href="/modules/leave/modify/{REQUEST_ID}">View</a></td>
             </tr>
             <!-- END previous_request -->
-            <tr><td colspan="9">&nbsp;</td></tr>
         </tbody>
-        <!-- END previous_request_list -->
     </table>
+    <!-- END previous_request_list -->
     <!-- END request_list -->
 </div>

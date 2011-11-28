@@ -15,5 +15,5 @@ interface Alaress_Date_Format_Interface {
 	public function getLong();
 	public function getShort();
 	public function getDateOnly();
-	public function getAustralian();
+    public function getAustralian();
 }

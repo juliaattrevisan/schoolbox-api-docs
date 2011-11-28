@@ -87,7 +87,7 @@ abstract class Mapper {
 
         $rowset = $statement->fetchAll();
 
-        return $this->hydrate($rowset);
+        return $this->hydrateList($rowset);
     }
 
     /**
@@ -111,7 +111,7 @@ abstract class Mapper {
 
         $rowset = $statement->fetchAll();
 
-        $collection = $this->hydrate($rowset);
+        $collection = $this->hydrateList($rowset);
 
         return $collection[0];
     }
@@ -137,7 +137,7 @@ abstract class Mapper {
 
         $rowset = $statement->fetchAll();
 
-        return $this->hydrate($rowset);
+        return $this->hydrateList($rowset);
     }
 
     /**
@@ -174,7 +174,7 @@ abstract class Mapper {
 
         $rowset = $statement->fetchAll();
 
-        return $this->hydrate($rowset);
+        return $this->hydrateList($rowset);
     }
 
     /**
@@ -325,36 +325,46 @@ abstract class Mapper {
     }
 
     /**
-     * @param Array $rowset
+     * @param Array $rowList
      * @param String $alias
      * @param Callback $callback
      * @return Collection
      */
-    public function hydrate ($rowset, $alias = '', $callback = null) {
+    public function hydrateList ($rowList, $alias = '', $callback = null) {
         $modelList = array();
 
-        foreach ( $rowset as $row ) {
-            $model = new $this->model;
-
-            foreach ( $this->map as $map) {
-                $propertyName = $map['property'];
-                $columnName = $map['column'];
-
-                if ( !empty($alias) ) {
-                    $columnName = "$alias.$columnName";
-                }
-
-                $model->$propertyName = $row[$columnName];
-            }
-
-            if ( !empty($callback) ) {
-                $model = $callback($model, $row);
-            }
-
-            $modelList[] = $model;
+        foreach ( $rowList as $row ) {
+            $modelList[] = $this->hydrate($row, $alias, $callback);
         }
 
         return new Collection($modelList);
+    }
+
+    /**
+     * @param Array $row
+     * @param String $alias
+     * @param Function $callback
+     * @return Model
+     */
+    public function hydrate ($row, $alias = '', $callback = null) {
+        $model = new $this->model;
+
+        foreach ( $this->map as $map) {
+            $propertyName = $map['property'];
+            $columnName = $map['column'];
+
+            if ( !empty($alias) ) {
+                $columnName = "$alias.$columnName";
+            }
+
+            $model->$propertyName = $row[$columnName];
+        }
+
+        if ( !empty($callback) ) {
+            $model = $callback($this, $model, $row);
+        }
+
+        return $model;
     }
 
     /**
@@ -438,3 +448,160 @@ abstract class Mapper {
     }
 
 }
+/*
+class User {
+    public $id;
+
+    public $username;
+
+    public $password;
+
+    public $groupId;
+
+    public $title;
+
+    public $firstname;
+
+    public $lastname;
+
+    public $emailPass;
+
+    public $synergyId;
+
+    public $campus;
+
+    public $year;
+
+    public $house;
+
+    public $localEmail;
+
+    public $altEmail;
+
+    public $mailHandler;
+
+    public $hash;
+
+    public $key;
+
+    public $eportfolioEnabled;
+}
+
+class UserMapper extends Mapper {
+    protected function mapping () {
+
+        $this->hasTable('user');
+        $this->hasModel('User');
+
+        $this->hasMap(array(
+            'column'     => 'id',
+            'property'   => 'id',
+            'type'       => Mapper::TYPE_INTEGER,
+            'identifier' => true
+        ));
+        
+        $this->hasMap(array(
+            'column'     => 'username',
+            'property'   => 'username',
+            'type'       => Mapper::TYPE_STRING,
+        ));
+
+        $this->hasMap(array(
+            'column'     => 'password',
+            'property'   => 'password',
+            'type'       => Mapper::TYPE_STRING,
+        ));
+
+        $this->hasMap(array(
+            'column'     => 'group_id',
+            'property'   => 'groupId',
+            'type'       => Mapper::TYPE_INTEGER,
+        ));
+
+        $this->hasMap(array(
+            'column'     => 'title',
+            'property'   => 'title',
+            'type'       => Mapper::TYPE_STRING,
+        ));
+
+        $this->hasMap(array(
+            'column'     => 'firstname',
+            'property'   => 'firstname',
+            'type'       => Mapper::TYPE_STRING,
+        ));
+
+        $this->hasMap(array(
+            'column'     => 'lastname',
+            'property'   => 'lastname',
+            'type'       => Mapper::TYPE_STRING,
+        ));
+
+        $this->hasMap(array(
+            'column'     => 'email_pass',
+            'property'   => 'emailPass',
+            'type'       => Mapper::TYPE_STRING,
+        ));
+
+        $this->hasMap(array(
+            'column'     => 'synergy_id',
+            'property'   => 'synergyId',
+            'type'       => Mapper::TYPE_INTEGER,
+        ));
+
+        $this->hasMap(array(
+            'column'     => 'campus',
+            'property'   => 'campus',
+            'type'       => Mapper::TYPE_INTEGER,
+        ));
+
+        $this->hasMap(array(
+            'column'     => 'year',
+            'property'   => 'year',
+            'type'       => Mapper::TYPE_INTEGER,
+        ));
+
+        $this->hasMap(array(
+            'column'     => 'house',
+            'property'   => 'house',
+            'type'       => Mapper::TYPE_INTEGER,
+        ));
+
+        $this->hasMap(array(
+            'column'     => 'local_email',
+            'property'   => 'localEmail',
+            'type'       => Mapper::TYPE_BOOLEAN,
+        ));
+
+        $this->hasMap(array(
+            'column'     => 'alt_email',
+            'property'   => 'altEmail',
+            'type'       => Mapper::TYPE_STRING,
+        ));
+
+        $this->hasMap(array(
+            'column'     => 'mail_handler',
+            'property'   => 'mailHandler',
+            'type'       => Mapper::TYPE_INTEGER,
+        ));
+
+        $this->hasMap(array(
+            'column'     => 'hash',
+            'property'   => 'hash',
+            'type'       => Mapper::TYPE_STRING,
+        ));
+
+        $this->hasMap(array(
+            'column'     => 'key',
+            'property'   => 'key',
+            'type'       => Mapper::TYPE_STRING,
+        ));
+
+        $this->hasMap(array(
+            'column'     => 'eportfolio_enabled',
+            'property'   => 'eportfolioEnabled',
+            'type'       => Mapper::TYPE_STRING,
+        ));
+
+        parent::mapping();
+    }
+}*/

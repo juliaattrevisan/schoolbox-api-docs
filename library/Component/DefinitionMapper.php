@@ -67,6 +67,6 @@ class Component_DefinitionMapper extends Mapper {
 
         $rowset = $statement->fetchAll();
 
-        return $this->hydrate($rowset);
+        return $this->hydrateList($rowset);
     }
 }

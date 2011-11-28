@@ -304,6 +304,14 @@ th {
 	font-weight: bold;
 }
 
+th.sortable {
+    background: url('/images/core/tablesorter/sort.gif') no-repeat left 10.5px;
+    padding: 7px 16px 7px 26px;
+}
+
+th.sortable.descending { background: url('/images/core/tablesorter/sort-descending.gif') no-repeat left 10.5px; }
+th.sortable.ascending { background: url('/images/core/tablesorter/sort-ascending.gif') no-repeat left 10.5px; }
+
 /*--------------------------------------------------------------
  Structural Styles
 --------------------------------------------------------------*/

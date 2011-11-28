@@ -131,14 +131,23 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface {
 		return $this->getStrategy()->getDatabaseTime();
 	}
 
-	/**
-	 * Get a unix timestamp
-	 *
-	 * @return string
-	 */
-	public function getUnixTimestamp() {
-		return $this->getStrategy()->getUnixTimestamp();
-	}
+    /**
+     * Get a unix timestamp
+     *
+     * @return string
+     */
+    public function getUnixTimestamp() {
+        return $this->getStrategy()->getUnixTimestamp();
+    }
+
+    /**
+     * Get numerical representation of the day of the week
+     *
+     * @return string
+     */
+    public function getWeekDayNumber () {
+        return $this->getStrategy()->getWeekDayNumber();
+    }
 
 	/**
 	 * Delegation method to get the datetime in an arbitrary format

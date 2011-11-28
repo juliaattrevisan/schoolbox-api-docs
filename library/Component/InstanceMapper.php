@@ -75,8 +75,8 @@ class Component_InstanceMapper extends Mapper {
 
         $rowset = $statement->fetchAll();
 
-        $instanceCollection = $this->hydrate($rowset, 'ci');
-        $definitionCollection = $definitionMapper->hydrate($rowset, 'cd');
+        $instanceCollection = $this->hydrateList($rowset, 'ci');
+        $definitionCollection = $definitionMapper->hydrateList($rowset, 'cd');
 
         foreach ( $instanceCollection as $i => $instance ) {
             $instance->definition =$definitionCollection[$i];

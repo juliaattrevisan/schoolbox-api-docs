@@ -5,7 +5,7 @@ class LeaveController {
 
     protected $requestMapper;
 
-    protected $userHandler;
+    protected $userMapper;
 
     protected $houseMapper;
 
@@ -48,24 +48,24 @@ class LeaveController {
     }
 
     /**
-     * Setter for $userHandler
+     * Setter for $userMapper
      *
-     * @param User $userHandler
+     * @param UserMapper $userMapper
      * @return void
      */
-    public function setUserHandler($userHandler)
+    public function setUserMapper($userMapper)
     {
-        $this->userHandler = $userHandler;
+        $this->userMapper = $userMapper;
     }
 
     /**
-     * Getter for $userHandler
+     * Getter for $userMapper
      *
-     * @return User
+     * @return UserMapper
      */
-    public function getUserHandler()
+    public function getUserMapper()
     {
-        return $this->userHandler;
+        return $this->userMapper;
     }
 
     /**
@@ -89,18 +89,34 @@ class LeaveController {
         return $this->houseMapper;
     }
 
+    /**
+     * Constructor
+     *
+     * @param Page $page
+     */
     public function __construct ($page) {
         $this->setPage($page);
-        $this->setUserHandler( new User );
-
+        
+        $this->setUserMapper( UserMapper::getInstance() );
         $this->setRequestMapper( Leave_RequestMapper::getInstance() );
         $this->setHouseMapper( HouseMapper::getInstance() );
     }
 
+    /**
+     * 
+     *
+     * @return Array
+     */
     public function executeCreateRequest () {
         return array();
     }
 
+    /**
+     * Renders a create request page
+     *
+     * @param Array $data
+     * @return void
+     */
     public function renderCreateRequest ($data) {
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/createRequest.html');
         $this->getPage()->setVar($data);
@@ -140,35 +156,31 @@ class LeaveController {
         $this->getPage()->backToTheFuture(-1);
     }
 
+    /**
+     * Returns a collection of requests by house id
+     *
+     * @param Integer $houseId
+     * @return Array
+     */
     public function executeHouseRequestList ($houseId) {
         $house = $this->getHouseMapper()->findById($houseId);
-
-        $data = array(
-            'house' => $house,
-            'pendingRequestList' => new Collection,
-            'previousRequestList' => new Collection
-        );
-
         $requestList = $this->getRequestMapper()->findByHouseId( $house->getId() );
 
-        if ( !empty($requestList) ) {
-            foreach ( $requestList as $request ) {
-                if ( $request->getStatus() == Leave_Request::STATUS_PENDING ) {
-                    $data['pendingRequestList'][] = $request;
-                }
-                else {
-                    $data['previousRequestList'][] = $request;
-                }
-            }
-        }
-
-        return $data;
+        return array(
+            'house'       => $house,
+            'requestList' => $requestList,
+        );
     }
 
+    /**
+     * Renders a collection of requests by house
+     *
+     * @param Array $data
+     * @return void
+     */
     public function renderHouseRequestList ($data) {
         $house = $data['house'];
-        $pendingRequestList = $data['pendingRequestList'];
-        $previousRequestList = $data['previousRequestList'];
+        $requestList = $data['requestList'];
 
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/houseRequestList.html');
 
@@ -177,73 +189,38 @@ class LeaveController {
         $this->getPage()->setBlock(TEMPLATE_content, 'previous_request', 'previous_request_block');
 
         $this->getPage()->setVar( array(
+            'HOUSE_ID' => $house->getId(),
             'HOUSE_NAME' => $house->getHouse()
         ) );
 
-        if ( is_a($pendingRequestList, 'Collection') && count($pendingRequestList) ) {
-            foreach ( $pendingRequestList as $pendingRequest ) {
-                $user = $pendingRequest->getUser();
-
-                $start = new Alaress_Date_Format( $pendingRequest->getStart(), 'y-m-d' );
-                $finish = new Alaress_Date_Format( $pendingRequest->getFinish(), 'y-m-d' );
-
-                $duration = floor( ( $finish->getUnixTimestamp() - $start->getUnixTimestamp() ) / ( 60 * 60 * 24) );
-
-                $this->getPage()->setVar( array(
-                    'USER_ID' => $user['id'],
-                    'USER_NAME' => $this->getUserHandler()->formatName($user),
-                    'USER_YEAR' => $user['year'],
-                    'REQUEST_ID' => $pendingRequest->getId(),
-                    'REQUEST_START' => $start->getAustralian(),
-                    'REQUEST_DURATION' => $duration,
-                    'REQUEST_HOST_TYPE' => $pendingRequest->getHostType(true)
-                ) );
-
-                $this->getPage()->parse('pending_request_block', 'pending_request', true);
-            }
-        }
-        else {
-            $this->getPage()->setBlock(TEMPLATE_content, 'pending_request_list', 'pending_request_list_block');
-            $this->getPage()->setVar('pending_request_list_block', '');
-        }
-
-        if ( is_a($previousRequestList, 'Collection') && count($previousRequestList) ) {
-            foreach ( $previousRequestList as $previousRequest ) {
-                $user = $previousRequest->getUser();
-                $authorisationUser = $previousRequest->getAuthorisationUser();
-
-                $start = new Alaress_Date_Format( $previousRequest->getStart(), 'y-m-d' );
-                $finish = new Alaress_Date_Format( $previousRequest->getFinish(), 'y-m-d' );
-
-                $duration = floor( ( $finish->getUnixTimestamp() - $start->getUnixTimestamp() ) / ( 60 * 60 * 24) );
-
-                $authorisationDatetime = new Alaress_Date_Format( $previousRequest->getAuthorisationDatetime(), 'y-m-d' );
-
-                $this->getPage()->setVar( array(
-                    'USER_ID' => $user['id'],
-                    'USER_NAME' => $this->getUserHandler()->formatName($user),
-                    'USER_YEAR' => $user['year'],
-                    'REQUEST_ID' => $previousRequest->getId(),
-                    'REQUEST_START' => $start->getAustralian(),
-                    'REQUEST_DURATION' => $duration,
-                    'REQUEST_HOST_TYPE' => $previousRequest->getHostType(true),
-                    'REQUEST_STATUS' => $previousRequest->getStatus(true),
-                    'REQUEST_AUTHORISATION_DATETIME' => $authorisationDatetime->getAustralian(),
-                    'REQUEST_AUTHORISATION_USER_ID' => $authorisationUser['id'],
-                    'REQUEST_AUTHORISATION_USER_NAME' => $this->getUserHandler()->formatName($authorisationUser),
-                ) );
-
-                $this->getPage()->parse('previous_request_block', 'previous_request', true);
-            }
-        }
-        else {
-            $this->getPage()->setBlock(TEMPLATE_content, 'previous_request_list', 'previous_request_list_block');
-            $this->getPage()->setVar('previous_request_list_block', '');
-        }
-
-        if ( ( is_a($pendingRequestList, 'Collection') && count($pendingRequestList) ) || ( is_a($previousRequestList, 'Collection') && count($previousRequestList) ) ) {
-            $this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
+        if ( count($requestList) ) {
             $this->getPage()->setVar('no_requests_block', '');
+
+            foreach ( $requestList as $request ) {
+                $this->getPage()->setVar( array(
+                    'USER_ID' => $request->getUser()->getId(),
+                    'USER_NAME' => $request->getUser()->getName(),
+                    'USER_YEAR' => $request->getUser()->getYear(),
+                    'REQUEST_ID' => $request->getId(),
+                    'REQUEST_START' => $request->getStart(true)->getAustralian(),
+                    'REQUEST_DURATION' => $request->getDuration(),
+                    'REQUEST_HOST_TYPE' => $request->getHostType(true)
+                ) );
+
+                if ( $request->getStatus() == Leave_Request::STATUS_PENDING ) {
+                    $this->getPage()->parse('pending_request_block', 'pending_request', true);
+                }
+                else {
+                    $this->getPage()->setVar( array(
+                        'REQUEST_STATUS' => $request->getStatus(true),
+                        'REQUEST_AUTHORISATION_DATETIME' => $request->getAuthorisationDatetime(true)->getAustralian(),
+                        'REQUEST_AUTHORISATION_USER_ID' => $request->getAuthorisationUser()->getId(),
+                        'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->getName(),
+                    ) );
+
+                    $this->getPage()->parse('previous_request_block', 'previous_request', true);
+                }
+            }
         }
         else {
             $this->getPage()->parse('no_requests_block', 'no_requests');
@@ -257,30 +234,15 @@ class LeaveController {
      * @return Collection
      */
     public function executeUserRequestList ($userId) {
-        $user = $this->getUserHandler()->getByID($userId);
-        $house = $this->getHouseMapper()->findById($user['house']);
+        $user = $this->getUserMapper()->findById($userId);
+        $house = $this->getHouseMapper()->findById( $user->getHouse() );
+        $requestList = $this->getRequestMapper()->findByUserId( $user->getId() );
 
-        $data = array(
-            'user' => $this->getUserHandler()->getByID($userId),
-            'house' => $house,
-            'pendingRequestList' => new Collection,
-            'previousRequestList' => new Collection
+        return array(
+            'user'        => $user,
+            'house'       => $house,
+            'requestList' => $requestList,
         );
-
-        $requestList = $this->getRequestMapper()->findByUserId($userId);
-
-        if ( !empty($requestList) ) {
-            foreach ( $requestList as $request ) {
-                if ( $request->getStatus() == Leave_Request::STATUS_PENDING ) {
-                    $data['pendingRequestList'][] = $request;
-                }
-                else {
-                    $data['previousRequestList'][] = $request;
-                }
-            }
-        }
-
-        return $data;
     }
 
     /**
@@ -292,9 +254,7 @@ class LeaveController {
     public function renderUserRequestList ($data) {
         $user = $data['user'];
         $house = $data['house'];
-        
-        $pendingRequestList = $data['pendingRequestList'];
-        $previousRequestList = $data['previousRequestList'];
+        $requestList = $data['requestList'];
 
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/userRequestList.html');
         
@@ -303,79 +263,52 @@ class LeaveController {
         $this->getPage()->setBlock(TEMPLATE_content, 'previous_request', 'previous_request_block');
 
         $this->getPage()->setVar( array(
-            'USER_ID' => $user['uid'],
-            'USER_NAME' => $this->getUserHandler()->formatName($user),
+            'USER_ID' => $user->getId(),
+            'USER_NAME' => $user->getName(),
             'HOUSE_NAME' => $house->getHouse(),
             'HOUSE_ID' => $house->getId()
         ) );
 
-        if ( is_a($pendingRequestList, 'Collection') && count($pendingRequestList) ) {
-            foreach ( $pendingRequestList as $pendingRequest ) {
-                $start = new Alaress_Date_Format( $pendingRequest->getStart(), 'y-m-d' );
-                $finish = new Alaress_Date_Format( $pendingRequest->getFinish(), 'y-m-d' );
-
-                $duration = floor( ( $finish->getUnixTimestamp() - $start->getUnixTimestamp() ) / ( 60 * 60 * 24) );
-
-                $this->getPage()->setVar( array(
-                    'USER_ID' => $user['uid'],
-                    'USER_NAME' => $this->getUserHandler()->formatName($user),
-                    'USER_YEAR' => $user['year'],
-                    'REQUEST_ID' => $pendingRequest->getId(),
-                    'REQUEST_START' => $start->getAustralian(),
-                    'REQUEST_DURATION' => $duration,
-                    'REQUEST_HOST_TYPE' => $pendingRequest->getHostType(true)
-                ) );
-
-                $this->getPage()->parse('pending_request_block', 'pending_request', true);
-            }
-        }
-        else {
-            $this->getPage()->setBlock(TEMPLATE_content, 'pending_request_list', 'pending_request_list_block');
-            $this->getPage()->setVar('pending_request_list_block', '');
-        }
-
-        if ( is_a($previousRequestList, 'Collection') && count($previousRequestList) ) {
-            foreach ( $previousRequestList as $previousRequest ) {
-                $authorisationUser = $previousRequest->getAuthorisationUser();
-
-                $start = new Alaress_Date_Format( $previousRequest->getStart(), 'y-m-d' );
-                $finish = new Alaress_Date_Format( $previousRequest->getFinish(), 'y-m-d' );
-
-                $duration = floor( ( $finish->getUnixTimestamp() - $start->getUnixTimestamp() ) / ( 60 * 60 * 24) );
-
-                $authorisationDatetime = new Alaress_Date_Format( $previousRequest->getAuthorisationDatetime(), 'y-m-d' );
-
-                $this->getPage()->setVar( array(
-                    'USER_ID' => $user['uid'],
-                    'USER_NAME' => $this->getUserHandler()->formatName($user),
-                    'USER_YEAR' => $user['year'],
-                    'REQUEST_ID' => $previousRequest->getId(),
-                    'REQUEST_START' => $start->getAustralian(),
-                    'REQUEST_DURATION' => $duration,
-                    'REQUEST_HOST_TYPE' => $previousRequest->getHostType(true),
-                    'REQUEST_STATUS' => $previousRequest->getStatus(true),
-                    'REQUEST_AUTHORISATION_DATETIME' => $authorisationDatetime->getAustralian(),
-                    'REQUEST_AUTHORISATION_USER_ID' => $authorisationUser['id'],
-                    'REQUEST_AUTHORISATION_USER_NAME' => $this->getUserHandler()->formatName($authorisationUser),
-                ) );
-
-                $this->getPage()->parse('previous_request_block', 'previous_request', true);
-            }
-        }
-        else {
-            $this->getPage()->setBlock(TEMPLATE_content, 'previous_request_list', 'previous_request_list_block');
-            $this->getPage()->setVar('previous_request_list_block', '');
-        }
-
-        if ( ( is_a($pendingRequestList, 'Collection') && count($pendingRequestList) ) || ( is_a($previousRequestList, 'Collection') && count($previousRequestList) ) ) {
-            $this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
+        if ( count($requestList) ) {
             $this->getPage()->setVar('no_requests_block', '');
+
+            foreach ( $requestList as $request ) {
+                $this->getPage()->setVar( array(
+                    'USER_ID' => $request->getUser()->getId(),
+                    'USER_NAME' => $request->getUser()->getName(),
+                    'USER_YEAR' => $request->getUser()->getYear(),
+                    'REQUEST_ID' => $request->getId(),
+                    'REQUEST_START' => $request->getStart(true)->getAustralian(),
+                    'REQUEST_DURATION' => $request->getDuration(),
+                    'REQUEST_HOST_TYPE' => $request->getHostType(true)
+                ) );
+
+                if ( $request->getStatus() == Leave_Request::STATUS_PENDING ) {
+                    $this->getPage()->parse('pending_request_block', 'pending_request', true);
+                }
+                else {
+                    $this->getPage()->setVar( array(
+                        'REQUEST_STATUS' => $request->getStatus(true),
+                        'REQUEST_AUTHORISATION_DATETIME' => $request->getAuthorisationDatetime(true)->getAustralian(),
+                        'REQUEST_AUTHORISATION_USER_ID' => $request->getAuthorisationUser()->getId(),
+                        'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->getName(),
+                    ) );
+
+                    $this->getPage()->parse('previous_request_block', 'previous_request', true);
+                }
+            }
         }
         else {
             $this->getPage()->parse('no_requests_block', 'no_requests');
         }
     }
 
+    /**
+     * Processes modifications against a list of requests
+     *
+     * @param Array $data
+     * @return void
+     */
     public function processModifyRequestList ($data) {
         $user = $data['user'];
         $requestList = $data['requestList'];
@@ -408,53 +341,58 @@ class LeaveController {
         $this->getPage()->localRedir("/modules/leave/student/{$user['id']}");
     }
 
+    /**
+     * Returns a data array with the request to be modified
+     *
+     * @param Integer $requestId
+     * @return Array
+     */
     public function executeModifyRequest ($requestId) {
-        $data = array(
+        return array(
             'request' => $this->getRequestMapper()->findById($requestId)
         );
-
-        return $data;
     }
 
+    /**
+     * Renders a modify request form
+     *
+     * @param Array $data
+     * @return void
+     */
     public function renderModifyRequest ($data) {
         $request = $data['request'];
-
         $user = $request->getUser();
-
-        $house = $this->getHouseMapper()->findById($user['house']);
-
-        $start = new Alaress_Date_Format($request->getStart(), 'y-m-d');
-        $finish = new Alaress_Date_Format($request->getFinish(), 'y-m-d');
+        $house = $this->getHouseMapper()->findById( $user->getHouse() );
 
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/modifyRequest.html');
 
         $this->getPage()->setVar( array(
             'REQUEST_ID' => $request->getId(),
             'REQUEST_STATUS' => $request->getStatus(true),
-            'USER_NAME' => $this->getUserHandler()->formatName($user),
-            'USER_EXTERNAL_ID' => $user['synergy_id'],
-            'USER_YEAR' => $user['year'],
+            'USER_NAME' => $user->getName(),
+            'USER_EXTERNAL_ID' => $user->getSynergyId(),
+            'USER_YEAR' => $user->getYear(),
             'USER_HOUSE' => $house->getHouse(),
-            'REQUEST_START_DATE' => $start->getLocalShort(),
-            'REQUEST_START_HOUR' => $start->getUsingFormat('h'),
-            'REQUEST_START_MINUTE' => $start->getUsingFormat('i'),
-            'REQUEST_FINISH_DATE' => $finish->getLocalShort(),
-            'REQUEST_FINISH_HOUR' => $finish->getUsingFormat('h'),
-            'REQUEST_FINISH_MINUTE' => $finish->getUsingFormat('i'),
+            'REQUEST_START_DATE' => $request->getStart(true)->getLocalShort(),
+            'REQUEST_START_HOUR' => $request->getStart(true)->getUsingFormat('h'),
+            'REQUEST_START_MINUTE' => $request->getStart(true)->getUsingFormat('i'),
+            'REQUEST_FINISH_DATE' => $request->getFinish(true)->getLocalShort(),
+            'REQUEST_FINISH_HOUR' => $request->getFinish(true)->getUsingFormat('h'),
+            'REQUEST_FINISH_MINUTE' => $request->getFinish(true)->getUsingFormat('i'),
             'REQUEST_HOST_NAME' => $request->getHostName(),
             'REQUEST_HOST_PHONE' => $request->getHostPhone(),
             'REQUEST_USER_PHONE' => $request->getUserPhone(),
             'REQUEST_DESCRIPTION' => $request->getDescription(),
         ) );
 
-        if ( $start->getUsingFormat('a') == 'am' ) {
+        if ( $request->getStart(true)->getUsingFormat('a') == 'am' ) {
             $this->getPage()->setVar('REQUEST_START_MERIDIAN_AM', 'selected="selected"');
         }
         else {
             $this->getPage()->setVar('REQUEST_START_MERIDIAN_PM', 'selected="selected"');
         }
 
-        if ( $finish->getUsingFormat('a') == 'am' ) {
+        if ( $request->getFinish(true)->getUsingFormat('a') == 'am' ) {
             $this->getPage()->setVar('REQUEST_FINISH_MERIDIAN_AM', 'selected="selected"');
         }
         else {
@@ -462,6 +400,12 @@ class LeaveController {
         }
     }
 
+    /**
+     * Processes a modify form for a request
+     *
+     * @param Array $data
+     * @return void
+     */
     public function processModifyRequest ($data) {
         $request = $this->getRequestMapper()->findById( $data['request']['id'] );
 
@@ -495,8 +439,83 @@ class LeaveController {
 
         $this->getPage()->backToTheFuture(2);
     }
+
+    public function executeHouseReport ($houseId) {
+        $house = $this->getHouseMapper()->findById($houseId);
+
+        $start = new Alaress_Date_Format(time(), 'U');
+        $start->addDays( 6 - $start->getWeekDayNumber() );
+
+        $finish = new Alaress_Date_Format(time(), 'U');
+        $finish->addDays( 7 - $finish->getWeekDayNumber() );
+
+        $requestList = $this->getRequestMapper()->findByDateRange( $start->getDatabase(), $finish->getDatabase() );
+
+        return array(
+            'house'       => $house,
+            'startDate'   => $start->getDatabase(),
+            'finishDate'   => $finish->getDatabase(),
+            'requestList' => $requestList,
+        );
+    }
+
+    public function renderHouseReport ($data) {
+        $house = $data['house'];
+        $requestList = $data['requestList'];
+
+        $startDate = $data['startDate'];
+        $finishDate = $data['finishDate'];
+
+        $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/houseReport.html');
+
+        $this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'request', 'request_block');
+
+        $this->getPage()->setVar( array(
+            'HOUSE_NAME' => $house->getHouse(),
+            'HOUSE_ID' => $house->getId(),
+            'REPORT_START_DATE' => $house->getId(),
+            'REPORT_FINISH_DATE' => $house->getId(),
+        ) );
+
+        if ( count($requestList) ) {
+            $this->getPage()->setVar('no_requests_block', '');
+
+            foreach ( $requestList as $request ) {
+                $this->getPage()->setVar( array(
+                    'USER_ID' => $request->getUser()->getId(),
+                    'USER_NAME' => $request->getUser()->getName(),
+                    'USER_YEAR' => $request->getUser()->getYear(),
+                    'REQUEST_ID' => $request->getId(),
+                    'REQUEST_STATUS' => $request->getStatus(true),
+                    'REQUEST_START_MORNING' => '',
+                    'REQUEST_START_AFTERNOON' => '',
+                    'REQUEST_START_NIGHT' => '',
+                    'REQUEST_FINISH_MORNING' => '',
+                    'REQUEST_FINISH_AFTERNOON' => '',
+                    'REQUEST_FINISH_NIGHT' => '',
+                    'REQUEST_HOST_TYPE' => $request->getHostType(true),
+                ) );
+            }
+
+            if ( $request->getStatus() != Leave_Request::STATUS_PENDING ) {
+                $this->getPage()->setVar( array(
+                    'REQUEST_STATUS' => $request->getStatus(true),
+                    'REQUEST_AUTHORISATION_DATETIME' => $request->getAuthorisationDatetime(true)->getAustralian(),
+                    'REQUEST_AUTHORISATION_USER_ID' => $request->getAuthorisationUser()->getId(),
+                    'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->getName(),
+                ) );
+            }
+
+            $this->getPage()->parse('request_block', 'request');
+        }
+        else {
+            $this->getPage()->parse('no_requests_block', 'no_requests');
+        }
+    }
 }
 
+/* Routing */
 $leaveController = new LeaveController($this);
 
 $method = $this->arg[0];
@@ -523,6 +542,17 @@ elseif ( $method == 'house' ) {
 
     $data = $leaveController->executeHouseRequestList($houseId);
     $leaveController->renderHouseRequestList($data);
+}
+elseif ( $method == 'report' && $this->arg[1] == 'house' ) {
+    if ( is_numeric($this->arg[2]) ) {
+        $houseId = $this->arg[2];
+    }
+    else {
+        $houseId = $_SESSION['houseId'];
+    }
+
+    $data = $leaveController->executeHouseReport($houseId);
+    $leaveController->renderHouseReport($data);
 }
 elseif ( $method == 'processCreate' ) {
     $leaveController->processCreateRequest($_POST);

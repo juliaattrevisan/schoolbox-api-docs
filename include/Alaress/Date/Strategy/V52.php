@@ -127,6 +127,15 @@ class Alaress_Date_Strategy_V52 extends Alaress_Date_Strategy_Abstract implement
 		return $this->getUsingFormat($this->getLocale()->timestampFormat());
 	}
 
+    /**
+     * Extract the numeric representation of the day of the week
+     *
+     * @return Integer
+     */
+    public function getWeekDayNumber () {
+        return $this->getUsingFormat('N');
+    }
+
 	/**
 	 * Transform the datetime into an arbitrary format
 	 *

@@ -47,9 +47,14 @@ class Leave_Request extends Model {
         $this->created = $created;
     }
 
-    public function getCreated()
+    public function getCreated($datetime = false)
     {
-        return $this->created;
+        if ( $datetime ) {
+            return new Alaress_Date_Format($this->created, 'y-m-d');
+        }
+        else {
+            return $this->created;
+        }
     }
 
     public function setDescription($description)
@@ -67,9 +72,14 @@ class Leave_Request extends Model {
         $this->finish = $finish;
     }
 
-    public function getFinish()
+    public function getFinish($datetime = false)
     {
-        return $this->finish;
+        if ( $datetime ) {
+            return new Alaress_Date_Format($this->finish, 'y-m-d');
+        }
+        else {
+            return $this->finish;
+        }
     }
 
     public function setHostName($hostName)
@@ -127,9 +137,14 @@ class Leave_Request extends Model {
         $this->start = $start;
     }
 
-    public function getStart()
+    public function getStart($datetime = false)
     {
-        return $this->start;
+        if ( $datetime ) {
+            return new Alaress_Date_Format($this->start, 'y-m-d');
+        }
+        else {
+            return $this->start;
+        }
     }
 
     public function setStatus($status)
@@ -175,11 +190,18 @@ class Leave_Request extends Model {
         return $this->userPhone;
     }
 
+    /**
+     * @param User $user
+     * @return void
+     */
     public function setUser($user)
     {
         $this->user = $user;
     }
 
+    /**
+     * @return User
+     */
     public function getUser()
     {
         return $this->user;
@@ -190,9 +212,14 @@ class Leave_Request extends Model {
         $this->authorisationDatetime = $authorisationDatetime;
     }
 
-    public function getAuthorisationDatetime()
+    public function getAuthorisationDatetime($datetime = false)
     {
-        return $this->authorisationDatetime;
+        if ( $datetime ) {
+            return new Alaress_Date_Format($this->authorisationDatetime, 'y-m-d');
+        }
+        else {
+            return $this->authorisationDatetime;
+        }
     }
 
     public function setAuthorisationUser($authorisationUser)
@@ -213,5 +240,11 @@ class Leave_Request extends Model {
     public function getAuthorisationUserId()
     {
         return $this->authorisationUserId;
+    }
+
+    public function getDuration () {
+        $duration = floor( ( $this->getFinish(true)->getUnixTimestamp() - $this->getStart(true)->getUnixTimestamp() ) / ( 60 * 60 * 24) );
+
+        return $duration;
     }
 }
