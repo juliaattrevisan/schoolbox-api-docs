@@ -4,7 +4,7 @@ class Leave_RequestMapper extends Mapper {
     protected $userMapper;
 
     protected function __construct () {
-        $this->setUserMapper( UserMapper::getInstance() );
+        $this->setUserMapper( NewUserMapper::getInstance() );
 
         parent::__construct();
     }

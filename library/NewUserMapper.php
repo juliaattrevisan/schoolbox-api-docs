@@ -1,10 +1,10 @@
 <?php
 
-class UserMapper extends Mapper {
+class NewUserMapper extends Mapper {
     protected function mapping () {
 
         $this->hasTable('user');
-        $this->hasModel('User');
+        $this->hasModel('NewUser');
 
         $this->hasMap(array(
             'column'     => 'id',

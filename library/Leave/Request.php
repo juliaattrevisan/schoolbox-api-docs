@@ -247,4 +247,20 @@ class Leave_Request extends Model {
 
         return $duration;
     }
+
+    /**
+     * Checks to see whether a particular date range falls within the date range of the request
+     *
+     * @param Alaress_Date_Format $datetimeStart
+     * @param Alaress_Date_Format $datetimeFinish
+     * @return Boolean
+     */
+    public function getOccupancy ($datetimeStart, $datetimeFinish) {
+        if ( $this->getStart(true)->getUnixTimestamp() < $datetimeFinish->getUnixTimestamp() && $this->getFinish(true)->getUnixTimestamp() > $datetimeStart->getUnixTimestamp() ) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }

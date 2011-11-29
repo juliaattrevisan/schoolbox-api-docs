@@ -1,6 +1,6 @@
 <?php
  
-class User extends Model {
+class NewUser extends Model {
     public $id;
 
     public $username;
@@ -223,7 +223,7 @@ class User extends Model {
      * @param null $format
      * @return mixed|null|string
      */
-    public function formatName($format = NULL){
+    public function getName($format = NULL){
 
         // Check for custom format
         if (empty($format)){
@@ -233,7 +233,7 @@ class User extends Model {
         /* Replace tags */
         preg_match_all('|{\w+}|', $format, $tags);
 
-        if (empty($tags) || empty($userInfo)) {
+        if (empty($tags) || empty($this->id)) {
             return 'Unknown User';
         }
 

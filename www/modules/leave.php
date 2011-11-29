@@ -97,7 +97,7 @@ class LeaveController {
     public function __construct ($page) {
         $this->setPage($page);
         
-        $this->setUserMapper( UserMapper::getInstance() );
+        $this->setUserMapper( NewUserMapper::getInstance() );
         $this->setRequestMapper( Leave_RequestMapper::getInstance() );
         $this->setHouseMapper( HouseMapper::getInstance() );
     }
@@ -443,19 +443,19 @@ class LeaveController {
     public function executeHouseReport ($houseId) {
         $house = $this->getHouseMapper()->findById($houseId);
 
-        $start = new Alaress_Date_Format(time(), 'U');
-        $start->addDays( 6 - $start->getWeekDayNumber() );
+        $reportStart = new Alaress_Date_Format(time(), 'U');
+        $reportStart->addDays( 6 - $reportStart->getWeekDayNumber() );
 
-        $finish = new Alaress_Date_Format(time(), 'U');
-        $finish->addDays( 7 - $finish->getWeekDayNumber() );
+        $reportFinish = new Alaress_Date_Format(time(), 'U');
+        $reportFinish->addDays( 7 - $reportFinish->getWeekDayNumber() );
 
-        $requestList = $this->getRequestMapper()->findByDateRange( $start->getDatabase(), $finish->getDatabase() );
+        $requestList = $this->getRequestMapper()->findByHouseId( $houseId );
 
         return array(
-            'house'       => $house,
-            'startDate'   => $start->getDatabase(),
-            'finishDate'   => $finish->getDatabase(),
-            'requestList' => $requestList,
+            'house'        => $house,
+            'reportStart'  => $reportStart,
+            'reportFinish' => $reportFinish,
+            'requestList'  => $requestList,
         );
     }
 
@@ -463,9 +463,28 @@ class LeaveController {
         $house = $data['house'];
         $requestList = $data['requestList'];
 
-        $startDate = $data['startDate'];
-        $finishDate = $data['finishDate'];
+        $reportStart = new Alaress_Date_Format( $data['reportStart']->getDatabaseDate() , 'y-m-d' );
 
+        $reportStartMorning = new Alaress_Date_Format( $data['reportStart']->getDatabaseDate() , 'y-m-d' );
+        $reportStartMorning->addDays(1/3);
+
+        $reportStartDay = new Alaress_Date_Format( $data['reportStart']->getDatabaseDate() , 'y-m-d' );
+        $reportStartDay->addDays(2/3);
+
+        $reportStartNight = new Alaress_Date_Format( $data['reportStart']->getDatabaseDate() , 'y-m-d' );
+        $reportStartNight->addDays(3/3);
+
+        $reportFinish = new Alaress_Date_Format( $data['reportFinish']->getDatabaseDate() , 'y-m-d' );
+
+        $reportFinishMorning = new Alaress_Date_Format( $data['reportFinish']->getDatabaseDate() , 'y-m-d' );
+        $reportFinishMorning->addDays(1/3);
+
+        $reportFinishDay = new Alaress_Date_Format( $data['reportFinish']->getDatabaseDate() , 'y-m-d' );
+        $reportFinishDay->addDays(2/3);
+
+        $reportFinishNight = new Alaress_Date_Format( $data['reportFinish']->getDatabaseDate() , 'y-m-d' );
+        $reportFinishNight->addDays(3/3);        
+        
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/houseReport.html');
 
         $this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
@@ -474,8 +493,8 @@ class LeaveController {
         $this->getPage()->setVar( array(
             'HOUSE_NAME' => $house->getHouse(),
             'HOUSE_ID' => $house->getId(),
-            'REPORT_START_DATE' => $house->getId(),
-            'REPORT_FINISH_DATE' => $house->getId(),
+            'REPORT_START_DATE' => $reportStart->getLong(),
+            'REPORT_FINISH_DATE' => $reportFinish->getLong(),
         ) );
 
         if ( count($requestList) ) {
@@ -488,12 +507,12 @@ class LeaveController {
                     'USER_YEAR' => $request->getUser()->getYear(),
                     'REQUEST_ID' => $request->getId(),
                     'REQUEST_STATUS' => $request->getStatus(true),
-                    'REQUEST_START_MORNING' => '',
-                    'REQUEST_START_AFTERNOON' => '',
-                    'REQUEST_START_NIGHT' => '',
-                    'REQUEST_FINISH_MORNING' => '',
-                    'REQUEST_FINISH_AFTERNOON' => '',
-                    'REQUEST_FINISH_NIGHT' => '',
+                    'REQUEST_START_MORNING' => $request->getOccupancy($reportStart, $reportStartMorning) ? 'L' : '',
+                    'REQUEST_START_DAY' => $request->getOccupancy($reportStartMorning, $reportStartDay) ? 'L' : '',
+                    'REQUEST_START_NIGHT' => $request->getOccupancy($reportStartDay, $reportStartNight) ? 'L' : '',
+                    'REQUEST_FINISH_MORNING' => $request->getOccupancy($reportFinish, $reportFinishMorning) ? 'L' : '',
+                    'REQUEST_FINISH_DAY' => $request->getOccupancy($reportFinishMorning, $reportFinishDay) ? 'L' : '',
+                    'REQUEST_FINISH_NIGHT' => $request->getOccupancy($reportFinishDay, $reportFinishNight) ? 'L' : '',
                     'REQUEST_HOST_TYPE' => $request->getHostType(true),
                 ) );
             }
@@ -504,6 +523,14 @@ class LeaveController {
                     'REQUEST_AUTHORISATION_DATETIME' => $request->getAuthorisationDatetime(true)->getAustralian(),
                     'REQUEST_AUTHORISATION_USER_ID' => $request->getAuthorisationUser()->getId(),
                     'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->getName(),
+                ) );
+            }
+            else {
+                $this->getPage()->setVar( array(
+                    'REQUEST_STATUS' => $request->getStatus(true),
+                    'REQUEST_AUTHORISATION_DATETIME' => 'Pending Approval',
+                    'REQUEST_AUTHORISATION_USER_ID' => '',
+                    'REQUEST_AUTHORISATION_USER_NAME' => '',
                 ) );
             }
 

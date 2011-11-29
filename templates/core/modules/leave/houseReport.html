@@ -18,8 +18,7 @@
     {HOUSE_NAME} has no pending or previous requests.
     <!-- END no_requests -->
     <!-- BEGIN request_list -->
-    <h2>Request History</h2>
-    <span class="header_option in-h2"><a href="/modules/leave/export/{HOUSE_ID}" class="btn modify"><span></span>Export History</a></span>
+    <a href="/modules/leave/export/{HOUSE_ID}" class="btn modify"><span></span>Export History</a>
     <table id="previousRequestList" class="ruler">
         <thead>
             <tr>
@@ -35,10 +34,10 @@
             <tr>
                 <th colspan="2"></th>
                 <th>Morning</th>
-                <th>Afternoon</th>
+                <th>Day</th>
                 <th>Night</th>
                 <th>Morning</th>
-                <th>Afternoon</th>
+                <th>Day</th>
                 <th>Night</th>
                 <th colspan="4"></th>
             </tr>
@@ -49,10 +48,10 @@
                 <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
                 <td>{USER_YEAR}</td>
                 <td>{REQUEST_START_MORNING}</td>
-                <td>{REQUEST_START_AFTERNOON}</td>
+                <td>{REQUEST_START_DAY}</td>
                 <td>{REQUEST_START_NIGHT}</td>
                 <td>{REQUEST_FINISH_MORNING}</td>
-                <td>{REQUEST_FINISH_AFTERNOON}</td>
+                <td>{REQUEST_FINISH_DAY}</td>
                 <td>{REQUEST_FINISH_NIGHT}</td>
                 <td>{REQUEST_HOST_TYPE}</td>
                 <td>{REQUEST_AUTHORISATION_DATETIME}</td>
