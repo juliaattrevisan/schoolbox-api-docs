@@ -31,7 +31,7 @@ if (is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, 'image_gallery', 'image_gallery_block');
 	
 	$this->setVar('FOLDER_NAME', $category['name']);
-	$this->setVar('ID',	$category['id']);
+	$this->setVar('CATEGORY_ID',	$category['id']);
 
 	$imageList = $categoryHandler->getImages($category['id']);
 
