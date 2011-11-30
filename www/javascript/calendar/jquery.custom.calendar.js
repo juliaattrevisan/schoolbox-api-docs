@@ -88,7 +88,7 @@ setupCalendar = {
 				});
 				$j('.filter-list .' + filterArray[i] + ' input:checked').each(function(){
 					var n = $j(this).attr('value');
-					 $j('ul.js_happening li.' + n).show();
+					$j('ul.js_happening li.' + n).show();
 				});
 			}
 		}
