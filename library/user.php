@@ -18,14 +18,30 @@ class User extends DeprecatedModel {
 	 * @return <type>
 	 */
 	public function getCampusID($name) {
-		$query = "SELECT id FROM luCampus WHERE name like '$name'";
-        return $this->db->getOne($query);
+		$query = "SELECT * FROM luCampus";
+
+		$allCampus = $this->db->getAll($query);
+
+		foreach($allCampus as $currentCampus) {
+			if ($currentCampus['name'] == $name) {
+				return $currentCampus['id'];
+			}
+		}
+
+		return false;
 	}
 
     function getGroupID($name)
     {
-        $query = "SELECT id FROM groups WHERE name like '$name'";
-        return $this->db->getOne($query);
+        $query = "SELECT id, name FROM groups";
+
+        foreach($this->db->getAll($query) as $group) {
+            if (strtolower($group['name']) == strtolower($name)) {
+                return $group['id'];
+            }
+        }
+
+        return false;
     }
 
     function getAllInCategory($categoryID) {
@@ -45,20 +61,19 @@ class User extends DeprecatedModel {
     function getByID($id) {
 
         $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, year, eportfolio_enabled,
-						synergy_id, local_email, alt_email, email_pass, userCampus.campus, luCampus.name as campusName, IF(superusers.id, 1, 0) as su, house
+						synergy_id, local_email, alt_email, email_pass, userCampus.campus, IF(superusers.id, 1, 0) as su
 				FROM user
 					LEFT JOIN groups ON user.group_id = groups.id
 					LEFT JOIN userCampus ON user.id = userCampus.uid
-					LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
 					LEFT JOIN superusers ON user.id = superusers.id
-				WHERE user.id = '".mysql_real_escape_string($id)."' ORDER BY userCampus.defaultCampus DESC";
+				WHERE user.id = '$id' ORDER BY userCampus.defaultCampus DESC";
         return $this->db->getRow($query);
     }
 
     function getByUsername($username) {
 
         $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, year, eportfolio_enabled,
-						synergy_id, local_email, alt_email, email_pass, userCampus.campus, IF(superusers.id, 1, 0) as su, house
+						synergy_id, local_email, alt_email, email_pass, userCampus.campus, IF(superusers.id, 1, 0) as su
 				FROM user
 					LEFT JOIN groups ON user.group_id = groups.id
 					LEFT JOIN userCampus ON user.id = userCampus.uid
@@ -187,7 +202,8 @@ class User extends DeprecatedModel {
     function setPassword($userID, $oldPassword, $newPassword) {
 
         // update password in synergetic
-        if (Cfg::get('external_enable') && Cfg::get('external_type') === 'synergetic') {
+        $webServicesUrl = Cfg::get('external_web_services_url');
+        if (Cfg::get('external_enable') && Cfg::get('external_type') === 'synergetic' && !empty($webServicesUrl)) {
             $user = $this->getByID($userID);
             $this->setSynergeticPassword($user['synergy_id'], $oldPassword, $newPassword);
         }
@@ -242,6 +258,21 @@ class User extends DeprecatedModel {
             return false;
     }
 
+    /**
+     * Gets the profile information for the user.
+     *
+     * @param <type> $userID
+     * @return <type>
+     */
+    function getProfile($userID) {
+        $query = "SELECT `year`, luCampus.name AS campus, house.house
+                  FROM `user`
+                  LEFT JOIN house ON user.house = house.id
+                  LEFT JOIN luCampus ON user.campus = luCampus.id
+                  WHERE user.id = '$userID'";
+
+        return $this->db->getRow($query);
+    }
 
     function getCampusList() {
         $query = "SELECT * FROM luCampus";
