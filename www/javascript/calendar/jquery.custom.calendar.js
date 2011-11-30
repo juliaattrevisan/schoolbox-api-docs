@@ -53,6 +53,7 @@ setupCalendar = {
 	filters: {
 
 		interaction: function() {
+
 			$j('a.filters').click(function(){
 				$j('.filter-drop').toggle();
 				$j('.cal-bubble').hide();
@@ -68,12 +69,16 @@ setupCalendar = {
 
 			//run the filter checker to show and hide the items
 			$j('#applyFilters').click(function() {
-				setupCalendar.filters.organise(["groups", "events", "campus"]);
+				setupCalendar.filters.organise(["campus", "groups", "events"]);
 				$j('.filter-drop').hide();
 			});
 		},
 		organise: function(filterArray) {
-			//for each unchecked element
+			/*
+			* The issue with this is that it doesn't work.
+			* 1. Check the 
+			*
+			* */
 			for (i=0; i < filterArray.length; i++ ) {
 				$j('.filter-list .' + filterArray[i] + ' input:not(:checked)').each(function(){
 					var n = $j(this).attr('value');
