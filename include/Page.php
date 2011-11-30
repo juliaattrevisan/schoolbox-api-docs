@@ -50,7 +50,7 @@ class Page {
 		$this->template->setUnknowns($unknowns);
 	}
 
-	function setBlock($parent, $handle, $name) {
+	function setBlock($parent, $handle, $name = '') {
 		$this->template->setBlock($parent, $handle, $name);
 	}
 

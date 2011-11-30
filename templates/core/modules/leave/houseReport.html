@@ -1,14 +1,33 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.tablesorter.min.js"></script>
 <script type="text/javascript">
-//    $j(function() {
-//        $j("#pendingRequestList, #previousRequestList").tablesorter({
-//            cssHeader: 'sortable',
-//            cssAsc: 'ascending',
-//            cssDesc: 'descending',
-//            dateFormat: 'uk'
-//        });
-//    });
+    $j(function() {
+        $j("#requestList").tablesorter({
+            cssHeader: 'sortable',
+            cssAsc: 'ascending',
+            cssDesc: 'descending',
+            dateFormat: 'uk',
+            headers: {
+                2: { sorter: false},
+                3: {sorter: false},
+                8: {sorter: false},
+                9: {sorter: false},
+                10: {sorter: false},
+                11: {sorter: false},
+                12: {sorter: false},
+                13: {sorter: false},
+                14: {sorter: false},
+                15: {sorter: false}
+            }
+        });
+
+        $j("#requestList").bind('sortEnd', function () {
+            var requestList = $j(this);
+
+            requestList.find('tbody tr').removeClass('dark');
+            requestList.find('tbody tr:even').addClass('dark');
+        } );
+    });
 </script>
 <!-- END custom_head -->
 
@@ -18,8 +37,11 @@
     {HOUSE_NAME} has no pending or previous requests.
     <!-- END no_requests -->
     <!-- BEGIN request_list -->
-    <a href="/modules/leave/export/{HOUSE_ID}" class="btn modify"><span></span>Export History</a>
-    <table id="previousRequestList" class="ruler">
+    <h2>Leave Report</h2>
+    <span class="header_option in-h2">
+        <a href="/modules/leave/export/{HOUSE_ID}" class="btn modify"><span></span>Export History</a>
+    </span>
+    <table id="requestList" class="ruler">
         <thead>
             <tr>
                 <th>Name</th>
@@ -43,8 +65,9 @@
             </tr>
         </thead>
         <tbody>
+            <!-- BEGIN row -->
             <!-- BEGIN request -->
-            <tr class="{ON_OFF}">
+            <tr class="{CLASS}">
                 <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
                 <td>{USER_YEAR}</td>
                 <td>{REQUEST_START_MORNING}</td>
@@ -59,6 +82,23 @@
                 <td class="center"><a href="/modules/leave/modify/{REQUEST_ID}">View</a></td>
             </tr>
             <!-- END request -->
+            <!-- BEGIN empty_request -->
+            <tr class="{CLASS}">
+                <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
+                <td>{USER_YEAR}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <!-- END empty_request -->
+            <!-- END row -->
         </tbody>
     </table>
     <!-- END request_list -->

@@ -2,12 +2,31 @@
 <script type="text/javascript" src="/javascript/jquery.tablesorter.min.js"></script>
 <script type="text/javascript">
     $j(function() {
-        $j("#pendingRequestList, #previousRequestList").tablesorter({
+        $j("#pendingRequestList").tablesorter({
             cssHeader: 'sortable',
             cssAsc: 'ascending',
             cssDesc: 'descending',
-            dateFormat: 'uk'
+            headers: {
+                0: { sorter: false},
+                6: { sorter: false}
+            }
         });
+
+        $j("#previousRequestList").tablesorter({
+            cssHeader: 'sortable',
+            cssAsc: 'ascending',
+            cssDesc: 'descending',
+            headers: {
+                8: { sorter: false}
+            }
+        });
+
+        $j("#requestList").bind('sortEnd', function () {
+            var requestList = $j(this);
+
+            requestList.find('tbody tr').removeClass('dark');
+            requestList.find('tbody tr:even').addClass('dark');
+        } );
     });
 </script>
 <!-- END custom_head -->
@@ -35,7 +54,7 @@
             </thead>
             <tbody>
                 <!-- BEGIN pending_request -->
-                <tr class="{ON_OFF}">
+                <tr class="{CLASS}">
                     <td><input name="requestList[][id]" type="checkbox" value="{REQUEST_ID}" /></td>
                     <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
                     <td>{USER_YEAR}</td>
@@ -74,7 +93,7 @@
         </thead>
         <tbody>
             <!-- BEGIN previous_request -->
-            <tr class="{ON_OFF}">
+            <tr class="{CLASS}">
                 <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
                 <td>{USER_YEAR}</td>
                 <td>{REQUEST_START}</td>

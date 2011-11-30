@@ -499,7 +499,7 @@ class UserMapper extends Mapper {
             'type'       => Mapper::TYPE_INTEGER,
             'identifier' => true
         ));
-        
+
         $this->hasMap(array(
             'column'     => 'username',
             'property'   => 'username',

@@ -98,7 +98,7 @@ class Leave_RequestMapper extends Mapper {
      * @param $userId
      * @return Collection
      */
-    public function findByUserId ($userId) {
+    public function findAllByUserId ($userId) {
         $statement = $this->database->prepare("
             SELECT {$this->getColumnString('lr')},
               u.id AS 'u.id', u.username AS 'u.username', u.password AS 'u.password', u.group_id AS 'u.group_id',
@@ -136,7 +136,7 @@ class Leave_RequestMapper extends Mapper {
      * @param $houseId
      * @return Collection
      */
-    public function findByHouseId ($houseId) {
+    public function findAllByHouseId ($houseId) {
         $statement = $this->database->prepare("
             SELECT {$this->getColumnString('lr')},
                 {$this->getUserMapper()->getColumnString('u')},
@@ -145,6 +145,30 @@ class Leave_RequestMapper extends Mapper {
             LEFT JOIN `user` u ON u.id = lr.user_id
             LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
             WHERE u.house = :houseId
+        ");
+
+        $statement->execute( array(
+            'houseId' => $houseId
+        ) );
+
+        $requestList = $statement->fetchAll();
+
+        $requestCollection = $this->hydrateList($requestList);
+
+        return $requestCollection;
+    }
+
+    public function findUserListByHouseId ($houseId) {
+        $statement = $this->database->prepare("
+            SELECT {$this->getColumnString('lr')},
+                {$this->getUserMapper()->getColumnString('u')},
+                {$this->getUserMapper()->getColumnString('au')}
+            FROM `user` u
+            LEFT JOIN groups g ON g.id = u.group_id
+            LEFT JOIN `{$this->table}` lr ON lr.user_id = u.id
+            LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
+            WHERE u.house = :houseId
+              /*AND g.type = 'student'*/
         ");
 
         $statement->execute( array(
@@ -180,7 +204,7 @@ class Leave_RequestMapper extends Mapper {
         return $requestCollection[0];
     }
 
-    public function findByDateRange ($start, $finish) {
+    public function findAllByDateRange ($start, $finish) {
         $statement = $this->database->prepare("
             SELECT {$this->getColumnString('lr')},
                 {$this->getUserMapper()->getColumnString('u')},
