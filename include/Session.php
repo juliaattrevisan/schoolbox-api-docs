@@ -153,7 +153,7 @@ class Session {
                 $entries = ldap_get_entries($ds, $result);
                 $dn = $entries[0]['dn'];
                 if($dn)
-                        return @ldap_bind($ds, $dn, $this->ldap_escape($password));
+                        return @ldap_bind($ds, $dn, utf8_encode($password));
         }
         ldap_unbind($ds);
 
@@ -168,7 +168,7 @@ class Session {
                 $entries = ldap_get_entries($ds, $result);
                 $dn = $entries[0]['dn'];
                 if($dn)
-                    return @ldap_bind($ds, $dn, $this->ldap_escape($password));
+                    return @ldap_bind($ds, $dn,utf8_encode($password));
             }
         }
 
