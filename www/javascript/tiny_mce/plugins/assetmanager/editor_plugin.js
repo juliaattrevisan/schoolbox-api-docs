@@ -2,7 +2,7 @@
  * $Id: editor_plugin_src.js 201 2007-02-12 15:56:56Z spocke $
  *
  * @author Moxiecode
- * @copyright Copyright © 2004-2008, Moxiecode Systems AB, All rights reserved.
+ * @copyright Copyright ï¿½ 2004-2008, Moxiecode Systems AB, All rights reserved.
  */
 
 (function() {
@@ -31,7 +31,7 @@
 					some_custom_arg : 'custom arg' // Custom argument
 				});
 			});
-			
+
 			this.url = url;
 
 			// Register example button
@@ -46,20 +46,20 @@
 				cm.setActive('assetmanager', n.nodeName == 'IMG');
 			});
 		},
-		
+
 		/**
 		 * open a new browser window
 		 */
 		fileBrowser : function (field_name, url, type, win) {
 			var ed = tinyMCE.activeEditor, file;
-			
+
 			if (type.toLowerCase() == 'image')
 				file = '/file_browser.php?filter=image';
 			else if (type.toLowerCase() == 'video')
                 file = '/file_browser.php?filter=video';
          	else
 				file = '/file_browser.php?filter=none';
-			
+
 			ed.windowManager.open({
 				url : this.url + file + '&categoryID=' + ed.settings['file_browser_category_id'],
 				width: 640 + parseInt(ed.getLang('amadeo_draft.delta_width', 0)),
@@ -71,6 +71,31 @@
 				input : field_name
 			});
 		},
+
+        /**
+         * open a new browser window
+         */
+        eportfolioFileBrowser : function (field_name, url, type, win) {
+            var ed = tinyMCE.activeEditor, file;
+
+            if (type.toLowerCase() == 'image')
+                file = '/eportfolio_file_browser.php?filter=image';
+            else if (type.toLowerCase() == 'video')
+                  file = '/eportfolio_file_browser.php?filter=video';
+            else
+                file = '/eportfolio_file_browser.php?filter=none';
+
+            ed.windowManager.open({
+                url : this.url + file + '&userID=' + ed.settings['file_browser_user_id'],
+                width: 640 + parseInt(ed.getLang('amadeo_draft.delta_width', 0)),
+                height : 511 + parseInt(ed.getLang('amadeo_draft.delta_height', 0)),
+                movable : true,
+                inline : true
+            }, {
+                window	: win,
+                input : field_name
+            });
+        },
 
 		/**
 		 * Creates control instances based in the incomming name. This method is normally not

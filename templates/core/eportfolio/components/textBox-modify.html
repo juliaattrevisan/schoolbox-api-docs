@@ -19,8 +19,8 @@ tinyMCE.init({
 	pdw_toggle_toolbars : '2, 3, 4',
 	extended_valid_elements : "a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
 	theme_advanced_blockformats : "p,address,h4,h5",
-	file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
-	//file_browser_category_id : {ID},
+	file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.eportfolioFileBrowser',
+	file_browser_user_id : {USER_ID},
 	tabfocus_elements : ":prev,:next",
 	convert_urls : false
 });
@@ -29,21 +29,21 @@ tinyMCE.init({
 <!-- END custom_head -->
 
 <h2>Edit textbox</h2>
-	<form action="/eportfolio/textBox/modifyForm.php" method="post" id="textBoxForm" class="standardForm">
-		<input type="hidden" name="userID" value="{USER_ID}" />
-		<input type="hidden" name="textBoxID" value="{TEXTBOX_ID}" />
-		<input type="hidden" name="componentLocationID" value="{COMPONENT_LOCATION_ID}" />
-		<fieldset class="pad-it">
-			<label>
-				<input type="text" name="heading" value="{TEXTBOX_HEADING}" />
-			</label>
-			
-			<label class="privateBlock">
-				<textarea rows="20" name="body" id="body">{TEXTBOX_BODY}</textarea>
-			</label>
-		</fieldset>
+<form action="/eportfolio/textBox/modifyForm.php" method="post" id="textBoxForm" class="standardForm">
+    <input type="hidden" name="userID" value="{USER_ID}" />
+    <input type="hidden" name="textBoxID" value="{TEXTBOX_ID}" />
+    <input type="hidden" name="componentLocationID" value="{COMPONENT_LOCATION_ID}" />
+    <fieldset class="pad-it">
+        <label>
+            <input type="text" name="heading" value="{TEXTBOX_HEADING}" />
+        </label>
 
-		<input type="submit" class="submit-btn-plain" value="Save Textbox" />
-	</form>
+        <label class="privateBlock">
+            <textarea rows="20" name="body" id="body">{TEXTBOX_BODY}</textarea>
+        </label>
+    </fieldset>
+
+    <input type="submit" class="submit-btn-plain" value="Save Textbox" />
+</form>
 
 
