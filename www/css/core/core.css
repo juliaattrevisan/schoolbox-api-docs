@@ -5774,12 +5774,14 @@ dd {
 }
 
 .timetable td.dayCurrent.current, #timetable td.current {
-	background: #06c;
-	color: #fff;
+	background: #e8f5ff;
+	color: #000;
+	border: 1px solid #d9effe;
+
 }
+
 .timetable td.dayCurrent.current a, #timetable td.current a{
 	text-decoration:underline;
-	color:#fff;
 }
 .home {
 	position: relative;
