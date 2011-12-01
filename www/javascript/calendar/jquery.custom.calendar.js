@@ -69,16 +69,11 @@ setupCalendar = {
 
 			//run the filter checker to show and hide the items
 			$j('#applyFilters').click(function() {
-				setupCalendar.filters.organise(["campus", "groups", "events"]);
+				setupCalendar.filters.organise(["campus", "groups"]);
 				$j('.filter-drop').hide();
 			});
 		},
 		organise: function(filterArray) {
-			/*
-			* The issue with this is that it doesn't work.
-			* 1. Check the 
-			*
-			* */
 			for (i=0; i < filterArray.length; i++ ) {
 				$j('.filter-list .' + filterArray[i] + ' input:not(:checked)').each(function(){
 					var n = $j(this).attr('value');
@@ -91,6 +86,13 @@ setupCalendar = {
 					$j('ul.js_happening li.' + n).show();
 				});
 			}
+
+			$j('.filter-list .events input:not(:checked)').each(function(){
+				var n = $j(this).attr('value');
+				if ($j('ul.js_happening .' + n).is(':visible')) {
+				  $j('ul.js_happening .' + n).hide();
+				}
+			});
 		}
 	}
 }
