@@ -11,12 +11,12 @@ $this->setVar('group_events_block', '');
 
 if (is_array($eventList)) {
 	$userHandler = new User();
-
+	
 	foreach ($eventList as $event) {
 
 		$event['colour'] = $calendarHandler->displayColour($event['type']);
 
-		$calendarDate = new Alaress_Date_Format(strtotime($event['outputDate']), 'U');
+		$calendarDate = new Alaress_Date_Format(strtotime($event['date']), 'U');
 
         $output = array('CAL_TIME'		=> rtrim(
                                         ($event['startTime'] != "12:00AM" ? $event['startTime'] : "") . " - " .

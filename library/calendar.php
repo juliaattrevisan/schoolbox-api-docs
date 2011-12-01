@@ -125,6 +125,7 @@ class Calendar extends DeprecatedModel {
 				$where = "";
 
 		$query = "SELECT event.id, DATE_FORMAT(date, '%a %D %b') as outputDate,
+						date,
 						DATE_FORMAT(date, '%Y') as year, DATE_FORMAT(date, '%c') as month, DATE_FORMAT(date, '%e') as day,
 						TIME_FORMAT(startTime, '".Cfg::get('calendar_time_format')."') as startTimeString,
 						TIME_FORMAT(endTime, '".Cfg::get('calendar_time_format')."') as endTimeString,
