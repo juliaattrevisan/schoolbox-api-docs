@@ -106,14 +106,14 @@ class Homepage {
 
 	function deleteHomepage()
 	{
-		$this->db->delete('homepage_config', 'cid', $this->cid);
-		$this->deleteComponentPositions();
-
 		require_once dirname(__FILE__) . '/group.php';
 		$groupHandler = new Group;
 		$groupHandler->disbandGroup($this->cid);
 
 		$this->emptyHomepage();
+
+        $this->db->delete('homepage_config', 'cid', $this->cid);
+        $this->deleteComponentPositions();
 	}
 
 	/**

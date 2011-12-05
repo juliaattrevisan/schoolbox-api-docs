@@ -464,7 +464,6 @@ class Category extends DeprecatedModel {
 
 		$this->deletePerms($categoryID);
 		$this->db->delete('categoryCode', 'categoryID', $categoryID);
-		parent::delete($categoryID);
 
 		require_once dirname(__FILE__) . '/homepage.php';
 		$homepageHandler = new Homepage($categoryID);
@@ -476,6 +475,8 @@ class Category extends DeprecatedModel {
 		$groupHandler->disbandGroup($categoryID);
 
 		$this->logAction($categoryID, 'delete');
+
+        parent::delete($categoryID);
 	}
 
 	function recursiveDelete($categoryID, $deleteSelf = true) {
