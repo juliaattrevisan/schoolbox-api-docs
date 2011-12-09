@@ -9,7 +9,8 @@
  */
 class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abstract {
 	private $studentColumnList = array('StudId', 'Password', 'StudFirstName', 'StudLastName', 'Guardian1', 'Guardian2', 'StudAddress', 'Guardian1Tel_H', 'Guardian1Tel_W', 'Guardian1Tel_M', 'Guardian2Tel_H', 'Guardian2Tel_W', 'Guardian2Tel_M', 'Guardian1Add', 'Guardian2Add', 'Guardian1Sub', 'Guardian2Sub', 'Guardian1PostC', 'Guardian1Email', 'Guardian2Email', 'Guardian2PostC', 'Guardian1MailAdd', 'Guardian2MailAdd', 'DateofBirth', 'StudTel', 'StudMob', 'Sex', 'Suburb', 'PostCode', 'EnrolmentYear', 'HomeGroup', 'Coordinator', 'AuthGroup', 'PreferredFirstName', 'StudName', 'StudEmail', 'Level', 'House', 'Id', 'ThirdParty_Code', 'ValidSASCode');
-	private $teacherColumnList = array('StaffId', 'Password', 'Teacher', 'PreferredFirstName', 'Title', 'Email', 'Department', 'Phone', 'Location', 'StaffFirstName', 'StaffLastName', 'AuthGroup', 'House', 'Id', 'ThirdParty_Code', 'Salutation', 'StaffMobile');
+    private $teacherColumnList = array('StaffId', 'Password', 'Teacher', 'PreferredFirstName', 'Title', 'Email', 'Department', 'Phone', 'Location', 'StaffFirstName', 'StaffLastName', 'AuthGroup', 'House', 'Id', 'ThirdParty_Code', 'Salutation', 'StaffMobile');
+    private $parentColumnList = array('school_num', 'FirstName', 'Surname', 'SBUsername', 'SBPassword', 'email', 'Comment', 'CurrentParent');
 
 	/**
 	 * Process input
@@ -28,6 +29,12 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 		else if ($this->isMatchingColumns($this->getTeacherColumnList())) {
 			$this->processTeachers();
 		}
+        /**
+         * Parent account format
+         */
+        else if ($this->isMatchingColumns($this->getParentColumnList())) {
+            $this->processParents();
+        }
 		/* Unrecognized format
 		 */
 		else {
@@ -56,14 +63,8 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 			 */
 			$propertyList = $this->generatePropertyList($propertyList);
 
-			/* Check id
-			 */
-			if ($this->isInvalidPropertyListId($propertyList, 'Id')) {
-				continue;
-			}
-
 			$user = array(
-				'synergy_id' => $propertyList['Id'],
+				'synergy_id' => $propertyList['StudId'],
 				'username' => $propertyList['ThirdParty_Code'],
 				'password' => $propertyList['Password'],
 				'title' => '',
@@ -116,14 +117,8 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 			 */
 			$propertyList = $this->generatePropertyList($propertyList);
 
-			/* Check id
-			 */
-			if ($this->isInvalidPropertyListId($propertyList, 'Id')) {
-				continue;
-			}
-
 			$user = array(
-				'synergy_id' => $propertyList['Id'],
+				'synergy_id' => $propertyList['StaffId'],
 				'username' => $propertyList['ThirdParty_Code'],
 				'password' => $propertyList['Password'],
 				'title' => $propertyList['Title'],
@@ -155,6 +150,58 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 		print("{$this->getLineEnding()}{$this->getErrorCount()} of {$this->getLineCount()} teachers failed to load.\n");
 	}
 
+    /**
+   	 * Process parent accounts
+   	 *
+   	 * @return void
+   	 */
+   	private function processParents () {
+        while ($propertyList = fgetcsv($this->getInputResource())) {
+            $this->incrementLineCount();
+
+            /* Check number of columns
+                     */
+            if ($this->isInvalidPropertyList($propertyList)) {
+                continue;
+            }
+
+            /* Overwrite original var -_-
+                     */
+            $propertyList = $this->generatePropertyList($propertyList);
+
+            $user = array(
+                'synergy_id' => $propertyList['school_num'],
+                'username' => $propertyList['SBUsername'],
+                'password' => $propertyList['SBPassword'],
+                'title' => '',
+                'firstname' => $propertyList['FirstName'],
+                'lastname' => $propertyList['Surname'],
+                'year' => 0,
+                'house' => '',
+                'local_email' => 0,
+                'alt_email' => $propertyList['email'],
+                'email_pass' => $propertyList['SBPassword'],
+                'mail_handler' => 0,
+                'su' => 0,
+                'eportfolio_enabled' => 0,
+                'group_id' => $this->getParentGroupId($propertyList),
+                'campus' => $this->getCampus(),
+                'defaultCampus' => $this->getCampus(),
+            );
+
+            if ($userClean = $this->getUserHandler()->getBySynergy($user['synergy_id'])) {
+                $user['id'] = $userClean['uid'];
+
+                $this->getUserHandler()->update($user);
+            }
+            else {
+                $this->getUserHandler()->create($user);
+            }
+        }
+
+        print("{$this->getLineEnding()}{$this->getErrorCount()} of {$this->getLineCount()} parents failed to load.\n");
+    }
+
 	/**
 	 * Get student group id
 	 *
@@ -171,21 +218,36 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 			")->fetchColumn(0);
 	}
 
-	/**
-	 * Get teacher group id
-	 *
-	 * @param  $propertyList
-	 * @return string
-	 */
-	private function getTeacherGroupId($propertyList) {
-		return Database::getInstance()->query("
-				SELECT id
-				FROM groups
-				WHERE name LIKE '{$propertyList['AuthGroup']}'
-					AND group_type = '".Group::STAFF_GROUP_TYPE."'
-				LIMIT 1
-			")->fetchColumn(0);
-	}
+    /**
+   	 * Get teacher group id
+   	 *
+   	 * @param  $propertyList
+   	 * @return string
+   	 */
+   	private function getTeacherGroupId($propertyList) {
+   		return Database::getInstance()->query("
+   				SELECT id
+   				FROM groups
+   				WHERE name LIKE '{$propertyList['AuthGroup']}'
+   					AND group_type = '".Group::STAFF_GROUP_TYPE."'
+   				LIMIT 1
+   			")->fetchColumn(0);
+   	}
+
+    /**
+   	 * Get parent group id
+   	 *
+   	 * @param  $propertyList
+   	 * @return string
+   	 */
+   	private function getParentGroupId($propertyList) {
+   		return Database::getInstance()->query("
+   				SELECT id
+   				FROM groups
+   				WHERE group_type = '".Group::PARENT_GROUP_TYPE."'
+   				LIMIT 1
+   			")->fetchColumn(0);
+   	}
 
 	/**
 	 * Get campus
@@ -208,14 +270,23 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 		return $this->studentColumnList;
 	}
 
-	/**
-	 * Get teacher column list
-	 *
-	 * @return array
-	 */
-	private function getTeacherColumnList() {
-		return $this->teacherColumnList;
-	}
+    /**
+   	 * Get teacher column list
+   	 *
+   	 * @return array
+   	 */
+   	private function getTeacherColumnList() {
+   		return $this->teacherColumnList;
+   	}
+
+    /**
+   	 * Get parent column list
+   	 *
+   	 * @return array
+   	 */
+   	private function getParentColumnList() {
+   		return $this->parentColumnList;
+   	}
 
 	/**
 	 * Check if the updated propertyList id is valid

@@ -39,6 +39,14 @@ class Synchronise_External_Donvale_Facade {
 				'name' => 'Synchronise_External_Donvale_User',
 				'input' => Cfg::get('donvale_staff_csv'),
 			),
+            array(
+                'name' => 'Synchronise_External_Donvale_User',
+                'input' => Cfg::get('donvale_parents_csv'),
+            ),
+            array(
+                'name' => 'Synchronise_External_Donvale_UserRelation',
+                'input' => Cfg::get('donvale_parent_relation_csv'),
+            ),
 			array(
 				'name' => 'Synchronise_External_Donvale_Class',
 				'input' => Cfg::get('donvale_classes_csv'),

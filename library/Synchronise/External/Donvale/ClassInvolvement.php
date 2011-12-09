@@ -33,19 +33,12 @@ class Synchronise_External_Donvale_ClassInvolvement extends Synchronise_External
 				 */
 				$propertyList = $this->generatePropertyList($propertyList);
 
-				$involvement = array();
-
 				$user = $this->getUserHandler()->getBySynergy($propertyList['Student Code']);
 
-				$involvement['userId'] = $user['uid'];
-
-				/* Check id
-				 */
-				if ($this->isInvalidPropertyListId($involvement, $propertyList)) {
-					continue;
-				}
-
-				$involvement['classId'] = $this->getClassId($propertyList);
+                $involvement = array(
+                    'userId' => $user['uid'],
+                    'classId' => $this->getClassId($propertyList)
+                );
 
 				/* Check id
 				 */

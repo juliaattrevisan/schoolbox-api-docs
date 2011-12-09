@@ -1,143 +1,67 @@
 "StaffId","Password","Teacher","PreferredFirstName","Title","Email","Department","Phone","Location","StaffFirstName","StaffLastName","AuthGroup","House","Id","ThirdParty_Code","Salutation","StaffMobile"
-"1112","xxx","Hogan, Jane","Jayne"," ","HogaJay@mail.donvale.vic.edu.au"," Administration"," 257"," ","Jayne","Hogan","Staff","Cook",60,"HogaJay",,
-"1113","xxx","Fraser, Colleen","Colleen",,"frascol@mail.donvale.vic.edu.au",,"213","Main Office A Block","Colleen","Fraser","Staff","Cook",61,"frascol",,
-"1114","xxx","Nicolaou, Nick","Nick",,"niconic@mail.donvale.vic.edu.au",,"233","Administration","Nick","Nicolaou","Staff","Cook",63,"niconic",,
-"1115","xxx"," Henson, Ross","Ross","General Manager","rossh@mail.donvale.vic.edu.au","Administration","213","A building","Ross","Henson","Staff","Cook",62,"rossh",,
-"121213",,"Vassiliou, Krystal","Krystal","Miss","VassKry@mail.donvale.vic.edu.au","IT",,,"Krystal","Vassiliou","Staff","Flinders",85,"VassKry",,
-"AM",,"Morgan, Astrid",,,"MorgAst@mail.donvale.vic.edu.au",,"111",,"Astrid","Morgan","Staff","Cook",73,"MorgAst",,
-"AldeBro",,"Alder, Brooke","Brooke",,"AldeBro@mail.donvale.vic.edu.au",,,,"Brooke","Alder","Staff","Cook",132,"AldeBro","Mrs",
-"AlliDou",,"Allison, Doug","Doug",,"AlliDou@mail.donvale.vic.edu.au",,"111",,"Doug","Allison","Staff","Cook",72,"AlliDou",,
-"AlliEmm","xxx","Allison, Emma","Emma",,"AlliEmm@mail.donvale.vic.edu.au",,,,"Emma","Allison","Staff","Cook",1,"AlliEmm",,
-"AytoNat",,"Ayton, Nat",,,"AytoNat@mail.donvale.vic.edu.au",,,,"Nat","Ayton","Staff","Cook",88,"AytoNat",,
-"BMo",,"Morton, Belinda","Belinda",,"MortBel@mail.donvale.vic.edu.au",,"1111",,"Belinda","Morton","Staff","Hume",69,"MortBel",,
-"BackJos","xxx","Backhouse, Josie","Josie",,"BackJos@mail.donvale.vic.edu.au"," "," "," ","Josie","Backhouse","Staff","Cook",55,"BackJos",,
-"BackVer",,"Backhouse, Veronica","Veronica",,"BackVer@donvale.vic.edu.au","Temporary",,,"Veronica","Backhouse","Staff","Cook",155,"BackVer",,
-"BailTan",,"Baillie, Tania","Tania",,"BailTan@mail.donvale.vic.edu.au",,,,"Tania","Baillie","Staff","Cook",103,"BailTan",,
-"BailTim","xxx","Bailey, Tim","Tim",,"BailTim@mail.donvale.vic.edu.au",,,,"Tim","Bailey","Staff","Cook",3,"BailTim",,
-"BakeAle",,"Baker, Alexandra","Alexandra",,"BakeAle@mail.donvale.vic.edu.au",,"111",,"Alexandra","Baker","Staff","Flinders",70,"BakeAle",,
-"BakeSim","xxx","Baker, Simone","Simone",,"BakeSim@mail.donvale.vic.edu.au",,,,"Simone","Baker","Staff","Cook",5,"BakeSim",,
-"BaldPau",,"Baldwin, Paul","Paul",,"BaldPau@donvale.vic.edu.au",,,,"Paul","Baldwin","Staff","Cook",162,"BaldPau",,
-"BarbNar",,"Barbieri, Narelle","Narelle",,"BarbNar@mail.donvale.vic.edu.au",,,,"Narelle","Barbieri","Staff","Cook",136,"BarbNar",,
-"BeckJan",,"Becker, Janna","Janna","Mrs","BeckJan@donvale.vic.edu.au",,,,"Janna","Becker","Staff","Cook",149,"BeckJan",,
-"BekkBet",,"Bekker, Bethany",,,"BekkBet@donvale.vic.edu.au",,,,"Bethany","Bekker","Staff","Cook",170,"BekkBet",,
-"BellMat",,"Bell, Matthew",,,"BellMat@mail.donvale.vic.edu.au",,,,"Matthew","Bell","Staff","Cook",119,"BellMat",,
-"BircNga","xxx","Birchall, Ngaire","Ngaire",,"BircNga@mail.donvale.vic.edu.au",,,,"Ngaire","Birchall","Staff","Cook",7,"BircNga",,
-"BonfDav",,"Bonfa, David",,"Mr","BonfDav@mail.donvale.vic.edu.au",,,,"David","Bonfa","Staff","COOK",79,"BonfDav",,
-"BradAli",,"Bradbury, Alison",,,"BradAli@mail.donvale.vic.edu.au",,,,"Alison","Bradbury","Staff","Cook",90,"BradAli",,
-"BrewPhi","xxx","Brewis, Phil","Phil",,"BrewPhi@mail.donvale.vic.edu.au",,,,"Phil","Brewis","Staff","Cook",9,"BrewPhi",,
-"BrooCam",,"Brookes, Cameron","Cameron",,"BrooCam@mail.donvale.vic.edu.au",,"224",,"Cameron","Brookes","Staff","Cook",120,"BrooCam",,
-"BurgHar","xxx","Burggraaf, Harry","Harry",,"BurgHar@mail.donvale.vic.edu.au",,,,"Harry","Burggraaf","Staff","Cook",10,"BurgHar",,
-"BuskJan","xxx","Buskes, Janet","Janet",,"BuskJan@mail.donvale.vic.edu.au",,,,"Janet","Buskes","Staff","Cook",11,"BuskJan",,
-"ButcRos",,"Butcher, Ros",,,"ButcRos@mail.donvale.vic.edu.au",,,,"Ros","Butcher","Staff","Cook",129,"ButcRos",,
-"CKi","xxx","C.Kirby","Catherine",,"KirbCat@mail.donvale.vic.edu.au",,,,"Catherine","Kirby","Staff","Cook",28,"KirbCat",,
-"Cai_Lou",,"Cai, Louie","Louie","Mr","Cai_Lou@donvale.vic.edu.au",,,,"Louie","Cai","Staff","Cook",151,"Cai_Lou",,
-"CalwAnd","xxx","Calwell, Andrew","Andrew",,"CalwAnd@mail.donvale.vic.edu.au",,,,"Andrew","Calwell","Staff","Cook",12,"CalwAnd",,
-"ChatSte",,"Chatelier, Stephen","Stephen",,"ChatSte@mail.donvale.vic.edu.au",,,,"Stephen","Chatelier","Staff","Cook",122,"ChatSte",,
-"CheuGra","xxx","Cheung, Graham","Graham",,"CheuGra@mail.donvale.vic.edu.au",,,,"Graham","Cheung","Staff","Cook",13,"CheuGra",,
-"ClouPet","xxx","Clough, Peter","Peter",,"ClouPet@mail.donvale.vic.edu.au",,,,"Peter","Clough","Staff","Cook",14,"ClouPet",,
-"CutlJam",,"Cutler, James","James",,"CutlJam@mail.donvale.vic.edu.au",,,,"James","Cutler","Staff","Cook",123,"CutlJam",,
-"DC","xxx","Conn, David","David",,"ConnDav@mail.donvale.vic.edu.au",,,,"David","Conn","Staff","Cook",50,"ConnDav",,"1111"
-"DH",,"Halliday, David",,,"HallDav@mail.donvale.vic.edu.au",,,,"David","Halliday","Staff","Cook",101,"HallDav",,
-"DT",,"Thomson, Dianne",,,"ThomDia@mail.donvale.vic.edu.au",,,,"Dianne","Thomson","Staff","Cook",97,"ThomDia",,
-"DelaKat","xxx","Delaney, Kathryn","Kathryn",,"DelaKat@mail.donvale.vic.edu.au",,,,"Kathryn","Delaney","Staff","Cook",15,"DelaKat",,
-"DemiEli",,"Demitrious, Elisia",,,"DemiEli@mail.donvale.vic.edu.au",,,,"Elisia","Demitrious","Staff","Cook",138,"DemiEli",,
-"DonvTea",,"Donvale, Teacher1",,,"DonvTea@donvale.vic.edu.au",,,,"Teacher1","Donvale","Staff","Cook",157,"DonvTea",,
-"DownLea",,"Down, Lea","Lea",,"DownLea@mail.donvale.vic.edu.au","IT",,,"Lea","Down","Staff","Cook",134,"DownLea",,
-"DuncCat",,"Duncan, Catherine","Catherine",,"DuncCat@mail.donvale.vic.edu.au",,,,"Catherine","Duncan","Staff","Cook",124,"DuncCat",,
-"DunePet","xxx","Dunemann, Petra","Petra","Mrs","DunePet@mail.donvale.vic.edu.au","SOSE","45"," ","Petra","Dunemann","Staff","Cook",53,"DunePet",,
-"ElenKar2","xxx","Elenius, Karin","Karin",,"ElenKar2@mail.donvale.vic.edu.au",,,,"Karin","Elenius","Staff","Cook",18,"ElenKar2",,
-"EvanJoA",,"Evans, Jo-Anne","Jo-Anne",,"EvanJoA@mail.donvale.vic.edu.au",,,,"Jo-Anne","Evans","Staff","Cook",143,"EvanJoA",,
-"FielJan",,"Fielding, Janice","Janice","Mrs","FielJan@mail.donvale.vic.edu.au",,,,"Janice","Fielding","Staff","Cook",139,"FielJan",,
-"FingSta",,"Finger, Stacey","Stacey",,"FingSta@mail.donvale.vic.edu.au",,,,"Stacey","Finger","Staff","Cook",141,"FingSta",,
-"FinlSue",,"Finlay, Sue","Sue",,"FinlSue@mail.donvale.vic.edu.au",,,,"Sue","Finlay","Staff","Cook",135,"FinlSue",,
-"FishAli",,"Fisher, Alison",,,"FishAli@donvale.vic.edu.au",,,,"Alison","Fisher","Staff","Cook",171,"FishAli",,
-"FishTim2",,"Fisher, Tim",,,"FishTim2@donvale.vic.edu.au",,,,"Tim","Fisher","Staff","Cook",164,"FishTim2",,
-"GardJoh","xxx","Gardiner, John","John",,"GardJoh@mail.donvale.vic.edu.au",,,,"John","Gardiner","Staff","Cook",20,"GardJoh",,
-"GaskGav",,"Gaskill, Gavin","Gavin",,"GaskGav@mail.donvale.vic.edu.au","Science",,,"Gavin","Gaskill","Staff","Cook",121,"GaskGav",,
-"GilbNat",,"Gilbert, Nathan","Nathan",,"GilbNat@donvale.vic.edu.au",,,,"Nathan","Gilbert","Staff","Cook",156,"GilbNat",,
-"GracRos","xxx","Grace, Ross","Ross",,"GracRos@mail.donvale.vic.edu.au",,,,"Ross","Grace","Staff","Cook",21,"GracRos",,
-"HallRob",,"Hallworth, Robert",,,"HallRob@mail.donvale.vic.edu.au",,,,"Robert","Hallworth","Staff","Cook",173,"HallRob",,
-"HarrJoh","xxx","Harris, John","John",,"HarrJoh@mail.donvale.vic.edu.au",,,,"John","Harris","Staff","Cook",24,"HarrJoh",,
-"HornChr",,"Horn, Chris","Chris",,"HornChr@donvale.vic.edu.au",,,,"Chris","Horn","Staff","Cook",153,"HornChr",,
-"HottMar",,"Hotton, Maria","Maria",,"HottMar@donvale.vic.edu.au",,,,"Maria","Hotton","Staff","Cook",160,"HottMar","Mrs",
-"HowlHea","xxx","Howlett, Heather","Heather",,"HowlHea@mail.donvale.vic.edu.au",,,,"Heather","Howlett","Staff","Cook",25,"HowlHea",,
-"HuntReb",,"Hunter, Rebecca","Rebecca",,"HuntReb@mail.donvale.vic.edu.au",,,,"Rebecca","Hunter","Staff","Cook",142,"HuntReb","Mrs",
-"HuntTim","xxx","Hunter, Tim","Tim",,"HuntTim@mail.donvale.vic.edu.au",,,,"Tim","Hunter","Staff","Cook",26,"HuntTim",,
-"JoneMat",,"Jones, Matthew",,"Mr","JoneMat@donvale.vic.edu.au",,,,"Matthew","Jones","Staff","Cook",150,"JoneMat",,
-"JuerEri",,"Juers, Erin","Erin",,"JuerEri@mail.donvale.vic.edu.au",,,,"Erin","Juers","Staff","Cook",140,"JuerEri",,
-"Kay_Chr","xxx","Kay, Chris","Chris",,"Kay_Chr@mail.donvale.vic.edu.au",,,,"Chris","Kay","Staff","Cook",27,"Kay_Chr",,
-"Kay_Lor",,"Kay, Lorraine",,,"Kay_Lor@donvale.vic.edu.au",,,,"Lorraine","Kay","Staff","Cook",167,"Kay_Lor",,
-"KeilSim",,"Keily, Simon",,,"KeilSim@mail.donvale.vic.edu.au",,,,"Simon","Keily","Staff","Cook",92,"KeilSim",,
-"KereLis",,"Kerekes, Lisa","Lisa",,"KererLis@mail.donvale.vic.edu.au",,,,"Lisa","Kerekes","Staff","Cook",104,"KereLis",,
-"KillAli",,"Killick, Alison","Alison",,"KillAli@donvale.vic.edu.au",,,,"Alison","Killick","Staff","Cook",159,"KillAli","Mrs",
-"KilmJue",,"Kilmartin, Jueaneene",,,"KilmJue@mail.donvale.vic.edu.au",,,,"Jueaneene","Kilmartin","Staff","Cook",128,"KilmJue",,
-"Kim_Jun",,"Kim, Jung In","Jung In",,"Kim_Jun@mail.donvale.vic.edu.au",,,,"Jung In","Kim","Staff","Cook",131,"Kim_Jun",,
-"LD","xxx","Dawson, Elizabeth","Liz"," ","Liz@mail.donvale.vic.edu.au"," "," "," ","Liz","Dawson","Staff","Cook",54,"Liz",,
-"LG","xxx","Guiver, Elizabeth","Liz",,"GuivLiz@mail.donvale.vic.edu.au",,,,"Liz","Guiver","Staff","Cook",22,"GuivEli",,
-"LI06",,"Ikladious, Linda",,,"iklalin@mail.donvale.vic.edu.au",,,,"Linda","Ikladious","Staff","Cook",98,"iklalin",,
-"LavePam","xxx","Lavery, Pam","Pam",,"LavePam@mail.donvale.vic.edu.au",,,,"Pam","Lavery","Staff","Cook",29,"LavePam",,
-"LikoTon",,"Likousis, Tony","Tony",,"LikoTon@mail.donvale.vic.edu.au",,,,"Tony","Likousis","Staff","Cook",112,"LikoTon",,
-"MC",,"Clements, Michael","Michael",,"ClemMic@mail.donvale.vic.edu.au",,,,"Michael","Clements","Staff","Cook",100,"ClemMic",,
-"MD",,"Dempsey, Michelle",,,"DempMic@mail.donvale.vic.edu.au",,,,"Michelle","Dempsey","Staff","Cook",96,"DempMic",,
-"ManeChr",,"Manevski, Christopher","Christopher",,"ManeChr@donvale.vic.edu.au",,,,"Christopher","Manevski","Staff","Cook",147,"ManeChr",,
-"MarkSal",,"Marks, Sally","Sally",,"MarkSal@donvale.vic.edu.au",,,,"Sally","Marks","Staff","Cook",163,"MarkSal",,
-"MarsJam",,"Marsland, James","James",,"MarsJam@mail.donvale.vic.edu.au",,,,"James","Marsland","Staff","Cook",111,"MarsJam",,
-"MarsJas",,"Marsham, Jason",,"Mr","MarsJas@mail.donvale.vic.edu.au",,,,"Jason","Marsham","Staff","Cook",145,"MarsJas",,
-"MastRac",,"Masters, Rachel","Rachel",,"MastRac@donvale.vic.edu.au",,,,"Rachel","Masters","Staff","Cook",166,"MastRac",,
-"McCuBeu","xxx","McCulloch, Beulah","Beulah",,"McCuBeu@mail.donvale.vic.edu.au",,,,"Beulah","McCulloch","Staff","Cook",31,"McCuBeu",,
-"McKeDeb",,"McKenzie, Debbie","Debbie",,"McKeDeb@donvale.vic.edu.au","Temporary",,,"Debbie","McKenzie","Staff","Cook",154,"McKeDeb",,
-"MillLis",,"Miller, Lisa",,,"MillLis@mail.donvale.vic.edu.au",,,,"Lisa","Miller","Staff","Cook",137,"MillLis","Mrs",
-"MittDav",,"Mitton, David",,,"MittDav@mail.donvale.vic.edu.au",,,,"David","Mitton","Staff","Cook",99,"MittDav",,
-"MortLin",,"Morton, Lindsay","Lindsay",,"MortLin@mail.donvale.vic.edu.au",,,,"Lindsay","Morton","Staff","Cook",106,"MortLin",,
-"MoweReb",,"Mower, Rebecca","Rebecca",,"MoweReb@mail.donvale.vic.edu.au",,,,"Rebecca","Mower","Staff","Cook",125,"MoweReb",,
-"MoylGra",,"Moyle, Graham",,"Mr","MoylGra@mail.donvale.vic.edu.au",,,,"Graham","Moyle","Staff","Cook",84,"MoylGra",,
-"MoylJan",,"Moyle, Jane","Jane",,"MoylJan@mail.donvale.vic.edu.au",,,,"Jane","Moyle","Staff","Cook",102,"MoylJan",,
-"MurrKev","xxx","Murray, Kevin","Kevin",,"MurrKev@mail.donvale.vic.edu.au",,,,"Kevin","Murray","Staff","Cook",32,"MurrKev",,
-"NairVim",,"Nair, Vimala","Vimala",,"NairVim@mail.donvale.vic.edu.au",,,,"Vimala","Nair","Staff","Cook",107,"NairVim",,
-"NatsChr","xxx","Natsis, Christine","Christine","Secondary Admin Support","natschr@mail.donvale.vic.edu.au","Secondary","269",,"Christine","Natsis","Staff","Cook",58,"NatsChr",,
-"NewbMeg","xxx","Newbold, Megan","Megan",,"NewbMeg@mail.donvale.vic.edu.au",,,,"Megan","Newbold","Staff","Cook",33,"NewbMeg",,
-"NordHol",,"Nord, Holger","Holger","Mr","NordHol@donvale.vic.edu.au",,,,"Holger","Nord","Staff","Cook",148,"NordHol",,
-"OGorKar",,"O'Gorman, Karen","Karen",,"OGorKar@mail.donvale.vic.edu.au",,,,"Karen","O'Gorman","Staff","Cook",113,"OGorKar",,
-"Ooi_Reb",,"Ooi, Rebecca",,,"Ooi_Reb@mail.donvale.vic.edu.au",,,,"Rebecca","Ooi","Staff","Cook",91,"Ooi_Reb",,
-"OuthAli",,"Outhred, Alison","Alison",,"OuthAli@mail.donvale.vic.edu.au",,,,"Alison","Outhred","Staff","Cook",126,"OuthAli",,
-"ParkAde",,"Parkinson, Adele",,,"ParkAde@mail.donvale.vic.edu.au",,"111",,"Adele","Parkinson","Staff","Cook",71,"ParkAde",,
-"ParkJen","xxx","Park, Jenny","Jenny",,"ParkJen@mail.donvale.vic.edu.au",,,,"Jenny","Park","Staff","Cook",35,"ParkJen",,
-"PattMur","xxx","Patterson, Murray","Murray",,"PattMur@mail.donvale.vic.edu.au",,,,"Murray","Patterson","Staff","Cook",34,"PattMur",,
-"PitmDav",,"Pitman, David","David",,"PitmDav@mail.donvale.vic.edu.au",,,,"David","Pitman","Staff","Cook",118,"PitmDav",,
-"RR",,"Reed, Richard","Richard",,"ReedRic@mail.donvale.vic.edu.au",,"1111",,"Richard","Reed","Staff","Cook",68,"ReedRic",,
-"RainMer",,"Raines, Meredith","Meredith",,"RainMer@donvale.vic.edu.au",,,,"Meredith","Raines","Staff","Cook",161,"RainMer",,
-"ReicPhi",,"Reichmann, Phil","Phil",,"ReicPhi@mail.donvale.vic.edu.au",,"111",,"Phil","Reichmann","Staff","Cook",75,"ReicPhi",,
-"ReidPau","xxx","Reid, Paul","Paul",,"ReidPau@mail.donvale.vic.edu.au",,,,"Paul","Reid","Staff","Cook",36,"ReidPau",,
-"RossGre",,"Ross, Gregory","Gregory",,"RossGre@donvale.vic.edu.au",,,,"Gregory","Ross","Staff","Cook",165,"RossGre",,
-"SC",,"Coleman, Sandra","Sandra","Mrs","ColeSan@mail.donvale.vic.edu.au","Science",,,"Sandra","Coleman","Staff","Hume",87,"ColeSan",,
-"SF","xxx","Foley, Sharon","Sharon",,"FoleSha@mail.donvale.vic.edu.au",,,,"Sharon","Foley","Staff","Cook",19,"FoleSha",,
-"SW","xxx","Watkins, Scott","Scott",,"WatkSco@mail.donvale.vic.edu.au",,,,"Scott","Watkins","Staff","Hume",45,"WatkSco",,
-"SamuNah","xxx","Samuel, Nahed","Nahed",,"SamuNah@mail.donvale.vic.edu.au",,,,"Nahed","Samuel","Staff","Cook",37,"SamuNah",,
-"SandMel",,"Sandefur, Melinda","Melinda",,"SandMel@mail.donvale.vic.edu.au",,,,"Melinda","Sandefur","Staff","Cook",105,"SandMel",,
-"SandRut","xxx","Sandy, Ruth","Ruth",,"SandRut@mail.donvale.vic.edu.au",,,,"Ruth","Sandy","Staff","Cook",38,"SandRut",,
-"SketNar",,"Sketcher, Narelle","Narelle",,"SketNar@mail.donvale.vic.edu.au",,,,"Narelle","Sketcher","Staff","Cook",109,"SketNar",,
-"SmytLlo",,"Smyth, Lloyd",,,"SmytLlo@donvale.vic.edu.au",,,,"Lloyd","Smyth","Staff","Cook",168,"SmytLlo",,
-"SoutJoh","xxx","Southwell, John","John",,"SoutJoh@mail.donvale.vic.edu.au",,,,"John","Southwell","Staff","Cook",40,"SoutJoh",,
-"SpikCar",,"Spike, Carol",,,"SpikCar@mail.donvale.vic.edu.au",,"111",,"Carol","Spike","Staff","Cook",74,"SpikCar",,
-"StafJod",,"Staff, Jodi",,,"StafJod@mail.donvale.vic.edu.au",,,,"Jodi","Staff","Staff","Cook",93,"StafJod",,
-"StapViv","xxx","Stapleton, Viv","Viv",,"StapViv@mail.donvale.vic.edu.au",,,,"Viv","Stapleton","Staff","Cook",41,"StapViv",,
-"SzalKat",,"Szallasi, Kathy",,,"SzalKat@mail.donvale.vic.edu.au",,,,"Kathy","Szallasi","Staff","Cook",94,"SzalKat",,
-"TD","xxx","Douglass, Teressa","Teressa",,"DougTer@mail.donvale.vic.edu.au",,,,"Teressa","Douglass","Staff","Cook",16,"DougTer",,
-"TS1","xxx","Staff, Test","Test",,"StafTes@mail.donvale.vic.edu.au",,"11111",,"Test","Staff","Staff","Cook",51,"ewStaff2",,
-"TU1","xxx","xxxxx","Test",,"tu@12.com",,,,"Test","User","Staff","Cook",57,"BackJos2",,
-"ThomMic",,"Thomson, Michael","Michael",,"ThomMic@mail.donvale.vic.edu.au",,,,"Michael","Thomson","Staff","Cook",127,"ThomMic",,
-"ThorSar",,"Thorne, Sarah",,,"ThorSar@donvale.vic.edu.au",,,,"Sarah","Thorne","Staff","Cook",169,"ThorSar",,
-"TullEli","xxx","Tulloh, Elizabeth","Elizabeth",,"TullEli@mail.donvale.vic.edu.au",,,,"Elizabeth","Tulloh","Staff","Cook",42,"TullEli",,
-"TurlPhi","xxx","Turland, Phil","Phil",,"TurlPhi@mail.donvale.vic.edu.au",,,,"Phil","Turland","Staff","Cook",43,"TurlPhi",,
-"VenoSte","xxx","Venour, Steve","Steve",,"VenoSte@mail.donvale.vic.edu.au",,,,"Steve","Venour","Staff","Cook",44,"VenoSte",,
-"WellJul","xxx","Wells, Julie","Julie",,"WellJul@mail.donvale.vic.edu.au",,,,"Julie","Wells","Staff","Cook",47,"WellJul",,
-"WhitCar","xxx","Whiteley, Carla","Carla",,"WhitCar@mail.donvale.vic.edu.au",,,,"Carla","Whiteley","Staff","Cook",48,"WhitCar",,
-"WhitLes",,"White, Lesley",,,"WhitLes@mail.donvale.vic.edu.au",,,,"Lesley","White","Staff","Cook",95,"WhitLes",,
-"WilsBen",,"Wilson, Ben","Ben",,"WilsBen@mail.donvale.vic.edu.au",,,,"Ben","Wilson","Staff","Cook",114,"WilsBen",,
-"WilsBet",,"Wilson, Bethany","Bethany",,"WilsBet@mail.donvale.vic.edu.au",,,,"Bethany","Wilson","Staff","Cook",133,"WilsBet",,
-"Xiaokev",,"Xiao, Kevin",,"Mr","Xiaokev@donvale.vic.edu.au",,,,"Kevin","Xiao","Staff","Cook",146,"Xiaokev",,
-"YB","xxx","Bradley, Yvonne","Yvonne",,"BradYvo@mail.donvale.vic.edu.au",,,,"Yvonne","Bradley","Staff","Cook",8,"YvonneB",,
-"YounDav",,"Youngman, David","David",,"YounDav@mail.donvale.vic.edu.au",,,,"David","Youngman","Staff","Cook",130,"YounDav",,
-"ewadmin",,"ewadmin","xx",,,,,,"cc","cc","staff","na",117,"ewAdmin",,
-"gmzz","xxxx","M, Giacomo",,,"xx",,,,"Giacomo","M","Staff","Cook",67,"xxxxx",,
+"AlliDou","","Allison,Doug","Doug","","Doug.Allison@donvale.vic.edu.au","","","","Doug","Allison","Staff","Cook","2269","AlliDou","",""
+"AytoNat","","Ayton,Nathaniel","Nathaniel","","Nathaniel.Ayton@donvale.vic.edu.au","","","","Nathaniel","Ayton","Staff","Cook","2472","AytoNat","",""
+"BackJos","","Backhouse,Josie","Josie","","Josie.Backhouse@donvale.vic.edu.au","","","","Josie","Backhouse","Staff","Cook","2148","BackJos","",""
+"BailTan","","Baillie,Tania","Tania","","Tania.Baillie@donvale.vic.edu.au","","","","Tania","Baillie","Staff","Cook","2836","BailTan","",""
+"BakeSim","","Baker,Simone","Simone","","Simone.Baker@donvale.vic.edu.au","","","","Simone","Baker","Staff","Cook","762","BakeSim","",""
+"BaldPau","","Baldwin,Paul","Paul","","Paul.Baldwin@donvale.vic.edu.au","","","","Paul","Baldwin","Staff","Cook","5510","BaldPau","",""
+"BeckJan","","Becker,Janna","Janna","","Janna.Becker@donvale.vic.edu.au","","","","Janna","Becker","Staff","Cook","3829","BeckJan","",""
+"BradAli","","Bradbury,Alison","Alison","","Alison.Bradbury@donvale.vic.edu.au","","","","Alison","Bradbury","Staff","Cook","2551","BradAli","",""
+"BrewPhi","","Brewis,Phillip","Phillip","","Phillip.Brewis@donvale.vic.edu.au","","","","Phillip","Brewis","Staff","Cook","769","BrewPhi","",""
+"BrooCam","","Brookes,Cameron","Cameron","","Cameron.Brookes@donvale.vic.edu.au","","","","Cameron","Brookes","Staff","Cook","132","BrooCam","",""
+"BurgHar","","Burggraaf,Harry","Harry","","Harry.Burggraaf@donvale.vic.edu.au","","","","Harry","Burggraaf","Staff","Cook","765","BurgHar","",""
+"BuskJan","","Buskes,Janet","Janet","","Janet.Buskes@donvale.vic.edu.au","","","","Janet","Buskes","Staff","Cook","1324","BuskJan","",""
+"ButcRos","","Butcher,Ros","Ros","","Ros.Butcher@donvale.vic.edu.au","","","","Ros","Butcher","Staff","Cook","2928","ButcRos","",""
+"CalwAnd","","Calwell,Andrew","Andrew","","Andrew.Calwell@donvale.vic.edu.au","","","","Andrew","Calwell","Staff","Cook","985","CalwAnd","",""
+"ChatSte","","Chatelier,Stephen","Stephen","","Stephen.Chatelier@donvale.vic.edu.au","","","","Stephen","Chatelier","Staff","Cook","3203","ChatSte","",""
+"CheuGra","","Cheung,Graham","Graham","","Graham.Cheung@donvale.vic.edu.au","","","","Graham","Cheung","Staff","Cook","2012","CheuGra","",""
+"ClouPet","","Clough,Peter","Peter","","Peter.Clough@donvale.vic.edu.au","","","","Peter","Clough","Staff","Cook","941","ClouPet","",""
+"CutlJam","","Cutler,James","James","","James.Cutler@donvale.vic.edu.au","","","","James","Cutler","Staff","Cook","3204","CutlJam","",""
+"DelaKat","","Delaney,Kathryn","Kathryn","","Kathryn.Delaney@donvale.vic.edu.au","","","","Kathryn","Delaney","Staff","Cook","2013","DelaKat","",""
+"DuncCat","","Duncan,Catherine","Catherine","","Catherine.Duncan@donvale.vic.edu.au","","","","Catherine","Duncan","Staff","Cook","3205","DuncCat","",""
+"DunePet","","Dunemann,Petra","Petra","","Petra.Dunemann@donvale.vic.edu.au","","","","Petra","Dunemann","Staff","Cook","766","DunePet","",""
+"FielJan","","Fielding,Janice","Janice","","Janice.Fielding@donvale.vic.edu.au","","","","Janice","Fielding","Staff","Cook","3522","FielJan","",""
+"FinlSue","","Finlay,Sue","Sue","","Sue.Finlay@donvale.vic.edu.au","","","","Sue","Finlay","Staff","Cook","3378","FinlSue","",""
+"FishTim2","","Fisher,Timothy","Timothy","","Timothy.Fisher@donvale.vic.edu.au","","","","Timothy","Fisher","Staff","Cook","3075","FishTim2","",""
+"GardJoh","","Gardiner,John","John","","John.Gardiner@donvale.vic.edu.au","","","","John","Gardiner","Staff","Cook","750","GardJoh","",""
+"GaskGav","","Gaskill,Gavin","Gavin","","Gavin.Gaskill@donvale.vic.edu.au","","","","Gavin","Gaskill","Staff","Cook","3154","GaskGav","",""
+"GracRos","","Grace,Ross","Ross","","Ross.Grace@donvale.vic.edu.au","","","","Ross","Grace","Staff","Cook","826","GracRos","",""
+"HottMar","","Hotton,Maria","Maria","","Maria.Hotton@donvale.vic.edu.au","","","","Maria","Hotton","Staff","Cook","5509","HottMar","",""
+"HowlHea","","Howlett,Heather","Heather","","Heather.Howlett@donvale.vic.edu.au","","","","Heather","Howlett","Staff","Cook","1720","HowlHea","",""
+"HuntReb","","Hunter,Rebecca","Rebecca","","Rebecca.Hunter@donvale.vic.edu.au","","","","Rebecca","Hunter","Staff","Cook","3545","HuntReb","",""
+"HuntTim","","Hunter,Tim","Tim","","Tim.Hunter@donvale.vic.edu.au","","","","Tim","Hunter","Staff","Cook","1695","HuntTim","",""
+"JuerEri","","Juers,Erin","Erin","","Erin.Juers@donvale.vic.edu.au","","","","Erin","Juers","Staff","Cook","3523","JuerEri","",""
+"Kay_Chr","","Kay,Chris","Chris","","Chris.Kay@donvale.vic.edu.au","","","","Chris","Kay","Staff","Cook","807","Kay_Chr","",""
+"Kay_Lor","","Kay,Lorraine","Lorraine","","Lorraine.Kay@donvale.vic.edu.au","","","","Lorraine","Kay","Staff","Cook","1697","Kay_Lor","",""
+"KereLis","","Kerekes,Lisa","Lisa","","Lisa.Kerekes@donvale.vic.edu.au","","","","Lisa","Kerekes","Staff","Cook","2837","KereLis","",""
+"KillAli","","Killick,Alison","Alison","","Alison.Killick@donvale.vic.edu.au","","","","Alison","Killick","Staff","Cook","3567","KillAli","",""
+"LavePam","","Lavery,Pamela","Pamela","","Pamela.Lavery@donvale.vic.edu.au","","","","Pamela","Lavery","Staff","Cook","758","LavePam","",""
+"MarkSal","","Marks,Sally","Sally","","Sally.Marks@donvale.vic.edu.au","","","","Sally","Marks","Staff","Cook","2101","MarkSal","",""
+"McCuBeu","","McCulloch,Beulah","Beulah","","Beulah.McCulloch@donvale.vic.edu.au","","","","Beulah","McCulloch","Staff","Cook","827","McCuBeu","",""
+"McKeDeb","","McKenzie,Debbie","Debbie","","Debbie.McKenzie@donvale.vic.edu.au","","","","Debbie","McKenzie","Staff","Cook","4998","McKeDeb","",""
+"MillLis","","Miller,Lisa","Lisa","","Lisa.Miller@donvale.vic.edu.au","","","","Lisa","Miller","Staff","Cook","3155","MillLis","",""
+"MittDav","","Mitton,David","David","","David.Mitton@donvale.vic.edu.au","","","","David","Mitton","Staff","Cook","2146","MittDav","",""
+"MoweReb","","Mower,Rebecca","Rebecca","","Rebecca.Mower@donvale.vic.edu.au","","","","Rebecca","Mower","Staff","Cook","3207","MoweReb","",""
+"MoylGra","","Moyle,Graham","Graham","","Graham.Moyle@donvale.vic.edu.au","","","","Graham","Moyle","Staff","Cook","2466","MoylGra","",""
+"MurrKev","","Murray,Kevin","Kevin","","Kevin.Murray@donvale.vic.edu.au","","","","Kevin","Murray","Staff","Cook","1698","MurrKev","",""
+"NairVim","","Nair,Vimala","Vimala","","Vimala.Nair@donvale.vic.edu.au","","","","Vimala","Nair","Staff","Cook","2840","NairVim","",""
+"NewbMeg","","Newbold,Megan","Megan","","Megan.Newbold@donvale.vic.edu.au","","","","Megan","Newbold","Staff","Cook","1718","NewbMeg","",""
+"NordHol","","Nord,Holger","Holger","","Holger.Nord@donvale.vic.edu.au","","","","Holger","Nord","Staff","Cook","3853","NordHol","",""
+"OGorKar","","O'Gorman,Karen","Karen","","Karen.O'Gorman@donvale.vic.edu.au","","","","Karen","O'Gorman","Staff","Cook","2889","OGorKar","",""
+"Ooi_Reb","","Ooi,Rebecca","Rebecca","","Rebecca.Ooi@donvale.vic.edu.au","","","","Rebecca","Ooi","Staff","Cook","2549","Ooi_Reb","",""
+"PattMur","","Patterson,Murray","Murray","","Murray.Patterson@donvale.vic.edu.au","","","","Murray","Patterson","Staff","Cook","1779","PattMur","",""
+"PitmDav","","Pitman,David","David","","David.Pitman@donvale.vic.edu.au","","","","David","Pitman","Staff","Cook","2610","PitmDav","",""
+"RainMer","","Raines,Meredith","Meredith","","Meredith.Raines@donvale.vic.edu.au","","","","Meredith","Raines","Staff","Cook","7068","RainMer","",""
+"ReicPhi","","Reichman,Phillip","Phillip","","Phillip.Reichman@donvale.vic.edu.au","","","","Phillip","Reichman","Staff","Cook","2323","ReicPhi","",""
+"ReidPau","","Reid,Paul","Paul","","Paul.Reid@donvale.vic.edu.au","","","","Paul","Reid","Staff","Cook","988","ReidPau","",""
+"SamuNah","","Samuel,Nahed","Nahed","","Nahed.Samuel@donvale.vic.edu.au","","","","Nahed","Samuel","Staff","Cook","2009","SamuNah","",""
+"SchiRac","","Schijf,Rachel","Rachel","","Rachel.Schijf@donvale.vic.edu.au","","","","Rachel","Schijf","Staff","Cook","1377","SchiRac","",""
+"SketNar","","Sketcher,Narelle","Narelle","","Narelle.Sketcher@donvale.vic.edu.au","","","","Narelle","Sketcher","Staff","Cook","2841","SketNar","",""
+"SmytLlo","","Smyth,Lloyd","Lloyd","","Lloyd.Smyth@donvale.vic.edu.au","","","","Lloyd","Smyth","Staff","Cook","1676","SmytLlo","",""
+"StafJod","","Staff,Jodi","Jodi","","Jodi.Staff@donvale.vic.edu.au","","","","Jodi","Staff","Staff","Cook","2558","StafJod","",""
+"StapViv","","Stapleton,Vivienne","Vivienne","","Vivienne.Stapleton@donvale.vic.edu.au","","","","Vivienne","Stapleton","Staff","Cook","2036","StapViv","",""
+"SzalKat","","Szallasi,Kathy","Kathy","","Kathy.Szallasi@donvale.vic.edu.au","","","","Kathy","Szallasi","Staff","Cook","2398","SzalKat","",""
+"TurlPhi","","Turland,Phil","Phil","","Phil.Turland@donvale.vic.edu.au","","","","Phil","Turland","Staff","Cook","803","TurlPhi","",""
+"WellJul","","Wells,Julie","Julie","","Julie.Wells@donvale.vic.edu.au","","","","Julie","Wells","Staff","Cook","779","WellJul","",""
+"WhitLes","","White,Lesley","Lesley","","Lesley.White@donvale.vic.edu.au","","","","Lesley","White","Staff","Cook","2552","WhitLes","",""
 

@@ -20,25 +20,33 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 
 	public function getTimetableDefinition ($campusId) {
 		$statement = $this->getDatabase()->prepare("
-			SELECT tc.start, tc.reset, tc.finish,
-				ty.title, ty.length, ty.regular
+			SELECT tc.start, tc.reset, tc.finish, tc.offset,
+				ty.title, ty.cycle_length, ty.day_length, ty.regular
 			FROM timetable_campus tc
 			LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
 			WHERE tc.campus_id = :campusId
+			    AND tc.start < NOW()
+			    AND tc.finish > NOW()
 		");
 
 		$statement->execute( array(':campusId' => $campusId) );
 		
-		$definition = $statement->fetch(PDO::FETCH_ASSOC);
+        if ( $definition = $statement->fetch(PDO::FETCH_ASSOC) ) {
+            /* Adapt to spec */
+            $definition['dayCount'] = $definition['cycle_length'];
+            $definition['periodCount'] = $definition['day_length'];
 
-		/* Adapt to spec */
-		$definition['dayCount'] = $definition['length'];
-
-		return $definition;
+            return $definition;
+        }
+        else {
+            return false;
+        }
 	}
 
 	public function getDayNumber ($campusId, $date = 0) {
-		$definition = $this->getTimetableDefinition($campusId);
+        if ( !$definition = $this->getTimetableDefinition($campusId) ) {
+            return false;
+        }
 
 		if ( empty($date) ) {
 			$date = time();
@@ -51,7 +59,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 			$start = strtotime($definition['reset']);
 		}
 
-		$days = ceil( ($date - $start) / (60 * 60 * 24) );
+		$days = ceil( ($date - $start) / (60 * 60 * 24) ) + 1;
 
 		/* Calculate the business days from the even weeks */
 		$businessDays = 5 * floor($days / 7);
@@ -68,13 +76,19 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 			}
 		}
 
-		$currentDay = $businessDays % $definition['length'];
+        if ( is_numeric($definition['offset']) ) {
+            $businessDays += $definition['offset'];
+        }
+
+		$currentDay = $businessDays % $definition['cycle_length'];
 
 		return $currentDay;
 	}
 
 	public function getPeriodNumber ($campusId) {
-		$definition = $this->getTimetableDefinition($campusId);
+        if ( !$definition = $this->getTimetableDefinition($campusId) ) {
+            return false;
+        }
 
 		if ( empty($definition['regular']) ) {
 			return false;
@@ -89,6 +103,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 			LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
 			LEFT JOIN timetable_period tp ON tp.cycle_id = ty.id
 			WHERE tc.campus_id = :campusId
+                AND tc.start < NOW()
+			    AND tc.finish > NOW()
 			ORDER BY tp.day ASC, tp.sequence ASC
 		");
 
@@ -155,6 +171,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 			LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
 			LEFT JOIN timetable_period tp ON tp.cycle_id = ty.id
 			WHERE tc.campus_id = :campusId
+                AND tc.start < NOW()
+			    AND tc.finish > NOW()
 				AND tp.day = :day
 			ORDER BY tp.day ASC, tp.sequence ASC
 		");

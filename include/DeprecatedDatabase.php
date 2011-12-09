@@ -314,9 +314,9 @@ function smartQuote($value) {
 	 * or double values, or exponential representations.
 	 */
 	// Quote if not integer or special
-	if (!((!preg_match('/[^0-9]+/m', $value) && $value[0] != 0) || in_array($value, $mysqlFuncs))) {
-		$value = "'" . mysql_real_escape_string($value) . "'";
-	}
+    if ( !is_numeric($value) && !in_array($value, $mysqlFuncs) ) {
+        $value = "'" . mysql_real_escape_string($value) . "'";
+    }
 
 	return $value;
 }

@@ -8,6 +8,7 @@
 ************************************************************/
 
 class External_Schoolbox_User implements External_UserInterface {
+    const RELATION_TYPE_PARENT = 1;
 
 	private $database;
 
@@ -67,7 +68,23 @@ class External_Schoolbox_User implements External_UserInterface {
 	}
 
 	function getEnrolledStudents ($externalUserId) {
+        $statement = $this->getDatabase()->prepare("
+      			SELECT c.synergy_id as RelatedID
+      			FROM user_relation ur
+      			LEFT JOIN user p ON p.id = ur.user_id
+      			LEFT JOIN user c ON c.id = ur.relation_id
+      			WHERE p.synergy_id = :externalUserId
+      			  AND ur.relation_type = :relationType
+      		");
 
+        $statement->execute( array(
+            ':externalUserId' => $externalUserId,
+            ':relationType' => self::RELATION_TYPE_PARENT
+        ) );
+
+        $childList = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        return $childList;
 	}
 
     function getEmail ($externalUserId) {

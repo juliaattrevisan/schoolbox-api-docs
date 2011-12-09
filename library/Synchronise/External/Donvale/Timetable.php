@@ -55,8 +55,8 @@ class Synchronise_External_Donvale_Timetable extends Synchronise_External_Donval
 					$propertyList['Title'] = "After School";
 				}
 				else {
+                    $propertyList['Title'] = "Period {$propertyList['Period']}";
 					$propertyList['Period'] += 2;
-					$propertyList['Title'] = "Period {$propertyList['Period']}";
 				}
 
 				/* Increase dimensions of timetable
@@ -69,16 +69,6 @@ class Synchronise_External_Donvale_Timetable extends Synchronise_External_Donval
 					$sequenceMax = $propertyList['Period'];
 				}
 
-				/* Find class
-				 */
-				$classId = $this->getClassId($propertyList);
-
-				/* Check id
-				 */
-				if ($this->isInvalidPropertyListId($classId, $propertyList)) {
-					continue;
-				}
-
 				/* Find period
 				 */
 				$periodId = $this->getPeriodId($cycleId, $propertyList);
@@ -88,7 +78,7 @@ class Synchronise_External_Donvale_Timetable extends Synchronise_External_Donval
 				if (!is_numeric($periodId)) {
 					$period = array(
 						'cycleId' => $cycleId,
-						'title' => "Period {$propertyList['Period']}",
+						'title' => $propertyList['Title'],
 						'day' => $propertyList['Day'],
 						'sequence' => $propertyList['Period'],
 						'usable' => 1
@@ -99,13 +89,26 @@ class Synchronise_External_Donvale_Timetable extends Synchronise_External_Donval
 					$periodId = Database::getInstance()->lastInsertId();
 				}
 
+                /* Find class
+                 */
+                $classId = $this->getClassId($propertyList);
+
+                /* Check id
+                 */
+                if ($this->isInvalidPropertyListId($classId, $propertyList)) {
+                    continue;
+                }
+
 				/* Create relationship
 				 */
 				$classPeriod = array(
 					'classId' => $classId,
 					'periodId' => $periodId
 				);
-
+if ( $classId == 1){
+    echo '*******************************************************************';
+    var_dump($classPeriod);
+}
 				$this->createClassPeriod($classPeriod);
 			}
 
@@ -114,7 +117,7 @@ class Synchronise_External_Donvale_Timetable extends Synchronise_External_Donval
 			$cycle = array(
 				'id' => $cycleId,
 				'title' => "$cycleLength Day Cycle",
-				'length' => $cycleLength
+				'cycleLength' => $cycleLength
 			);
 
 			$this->updateTimetableCycle($cycle);
@@ -201,7 +204,7 @@ class Synchronise_External_Donvale_Timetable extends Synchronise_External_Donval
 	 */
 	private function createTimetableCycle() {
 		Database::getInstance()->query("
-			INSERT INTO timetable_cycle (title, length, regular)
+			INSERT INTO timetable_cycle (title, cycle_length, regular)
 			VALUES ('', 0, 1)
 		");
 	}
@@ -272,7 +275,7 @@ class Synchronise_External_Donvale_Timetable extends Synchronise_External_Donval
 	private function updateTimetableCycle($cycle) {
 		Database::getInstance()->prepare("
 			UPDATE timetable_cycle
-			SET title = :title, length = :length
+			SET title = :title, cycle_length = :cycleLength
 			WHERE id = :id
 		")->execute($cycle);
 	}
@@ -281,17 +284,17 @@ class Synchronise_External_Donvale_Timetable extends Synchronise_External_Donval
 	 * Get period id by day and sequence
 	 *
 	 * @param  $cycleId
-	 * @param  $i
-	 * @param  $j
+	 * @param  $day
+	 * @param  $sequence
 	 * @return string
 	 */
-	private function getPeriodIdByDayAndSequence($cycleId, $i, $j) {
+	private function getPeriodIdByDayAndSequence($cycleId, $day, $sequence) {
 		return Database::getInstance()->query("
 			SELECT id
 			FROM timetable_period
 			WHERE cycle_id = $cycleId
-				AND day = $i
-				AND sequence = $j
+				AND day = $day
+				AND sequence = $sequence
 		")->fetchColumn(0);
 	}
 }
