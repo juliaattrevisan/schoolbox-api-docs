@@ -34,36 +34,73 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
 	}
 
 	public function getTimetableDefinition ($campusId) {
-		$definition = array();
+        $statement = $this->getInternalDatabase()->prepare("
+			SELECT tc.start, tc.reset, tc.finish, tc.offset,
+				ty.title, ty.cycle_length, ty.day_length, ty.regular
+			FROM timetable_campus tc
+			LEFT JOIN timetable_cycle ty ON ty.id = tc.cycle_id
+			WHERE tc.campus_id = :campusId
+			    AND tc.start < NOW()
+			    AND tc.finish > NOW()
+      		");
 
-		$countStatement = $this->getInternalDatabase()->query("
-			SELECT timetable_period_count, timetable_day_count
-			FROM luCampus
-			WHERE id = $campusId
-		");
+        $statement->execute( array(':campusId' => $campusId) );
 
-		$countList = $countStatement->fetch(PDO::FETCH_ASSOC);
+        $definition = $statement->fetch(PDO::FETCH_ASSOC);
 
-		$definition['periodCount'] = $countList['timetable_period_count'];
-		$definition['dayCount'] = $countList['timetable_day_count'];
+        /* Denbigh depends on a set day length */
+        if ( !empty($definition['cycle_length']) && !empty($definition['day_length']) ) {
+            /* Adapt to spec */
+            $definition['dayCount'] = $definition['cycle_length'];
+            $definition['periodCount'] = $definition['day_length'];
 
-		return $definition;
+            return $definition;
+        }
+        else {
+            return false;
+        }
 	}
 
 	public function getDayNumber ($campusId, $date = 0) {
-		if(!$date) {
-			$date = mktime();
-		}
+        if ( !$definition = $this->getTimetableDefinition($campusId) ) {
+            return false;
+        }
 
-		if(date('w', $date) == 0 || date('w', $date) == 6)
-			return false;
+        if ( empty($date) ) {
+            $date = time();
+        }
 
+        if ( empty($definition['reset']) ) {
+            $start = strtotime($definition['start']);
+        }
+        else {
+            $start = strtotime($definition['reset']);
+        }
 
-        $day = date("w", $date);
-        if($day <1 || $day > 5)
-            $day = 1;
+        $days = ceil( ($date - $start) / (60 * 60 * 24) ) + 1;
 
-        return $day;
+        /* Calculate the business days from the even weeks */
+        $businessDays = 5 * floor($days / 7);
+
+        /* Handle the excess days */
+        $excessDays = $days % 7;
+
+        for ( $i = 0; $i < $excessDays; $i++ ) {
+            $currentExcessDay = $date - (60 * 60 * 24 * $i);
+
+            /* If its not Saturday or Sunday then increment the business days */
+            if ( date('N', $currentExcessDay) < 6 ) {
+                $businessDays++;
+            }
+        }
+
+        if ( is_numeric($definition['offset']) ) {
+            $businessDays += $definition['offset'];
+        }
+
+        $currentDay = $businessDays % $definition['cycle_length'];
+
+        return $currentDay;
 	}
 
 	public function getPeriodNumber ($campusId) {
@@ -72,7 +109,9 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
 
 	public function getFullTimetable ($externalUserId, $userId, $campusId) {
 		/* Setup skeleton timetable */
-		$definition = $this->getTimetableDefinition($campusId);
+        if ( !$definition = $this->getTimetableDefinition($campusId) ) {
+            return false;
+        }
 
 		$periodList = array();
 
@@ -142,7 +181,9 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
 
 	public function getDayTimetable ($externalUserId, $userId, $campusId, $dayNumber) {
 		/* Setup skeleton timetable */
-		$definition = $this->getTimetableDefinition($campusId);
+        if ( !$definition = $this->getTimetableDefinition($campusId) ) {
+            return false;
+        }
 
 		$periodList = array();
 
