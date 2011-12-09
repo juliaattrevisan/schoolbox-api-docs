@@ -146,7 +146,7 @@ class Session {
         $ds=ldap_connect(Cfg::get('ldap_host'));
         ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
         ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-        ldap_bind($ds, $this->ldap_escape(Cfg::get('ldap_user')), $this->ldap_escape(Cfg::get('ldap_pass')));
+        ldap_bind($ds, $this->ldap_escape(Cfg::get('ldap_user')), utf8_encode(Cfg::get('ldap_pass')));
         $searchString = "(".Cfg::get('ldap_username')."=".$this->ldap_escape($username).")";
         $result = ldap_search($ds,Cfg::get('ldap_base'), $searchString, array('dn'));
         if($result) {
@@ -257,39 +257,39 @@ class Session {
                     $mydb->update('user', 'id', array( 'id' => $_SESSION['id'], 'alt_email' => $email ));
                 }
 
-                if ( $synergy_id ) {
-                    $children = $synUser->getEnrolledStudents($synergy_id);
+                $children = $synUser->getEnrolledStudents($synergy_id);
 
-                    if ( is_array($children) ) {
-                        foreach ( $children as $child ) {
-                            $portal = $userHandler->getBySynergy($child['RelatedID']);
-                            $subjects = array();
+                /* Get subject list for each student */
+                if ( is_array($children) ) {
+                    foreach ( $children as $child ) {
+                        $portal = $userHandler->getBySynergy($child['RelatedID']);
+                        $subjects = array();
 
-                            if ( $portal['uid'] ) {
-                                $subjectList = $synUser->getSubjectList($child['RelatedID'], $portal['uid']);
+                        if ( $portal['uid'] ) {
+                            $subjectList = $synUser->getSubjectList($child['RelatedID'], $portal['uid']);
 
-                                if ( is_array($subjectList) ) {
-                                    foreach ( $subjectList as $subject ) {
-                                        //check subject exists.. we cant link to subjects that dont exist its ugly
-                                        $cat = $catHandler->getByCode($subject['code']);
+                            if ( is_array($subjectList) ) {
+                                foreach ( $subjectList as $subject ) {
+                                    //check subject exists.. we cant link to subjects that dont exist its ugly
+                                    $cat = $catHandler->getByCode($subject['code']);
 
-                                        if ( is_array($cat) && is_numeric($cat['id']) ) {
-                                            if ( $groupHandler->getPermission($cat['id']) >= READ_ACCESS ) {
-                                                $subject['id'] = $cat['categoryID'];
-                                                $subjects[] = $subject;
-                                            }
+                                    if ( is_array($cat) && is_numeric($cat['id']) ) {
+                                        if ( $groupHandler->getPermission($cat['id']) >= READ_ACCESS ) {
+                                            $subject['id'] = $cat['categoryID'];
+                                            $subjects[] = $subject;
                                         }
                                     }
                                 }
-
-                                $_SESSION['children'][] = array(
-                                    'id' => $portal['uid'], 'sid' => $child['RelatedID'], 'gid' => $portal['group_id'],
-                                    'name' => $userHandler->formatName($portal), 'subjects' => $subjects
-                                );
                             }
+
+                            $_SESSION['children'][] = array(
+                                'id' => $portal['uid'], 'sid' => $child['RelatedID'], 'gid' => $portal['group_id'],
+                                'name' => $userHandler->formatName($portal), 'subjects' => $subjects
+                            );
                         }
                     }
                 }
+
             }
             else { //user is not parent so get timetable information
                 $subjectList = $synUser->getSubjectList($synergy_id, $_SESSION['id']);

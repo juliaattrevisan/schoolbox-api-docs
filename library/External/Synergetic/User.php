@@ -174,15 +174,25 @@ class External_Synergetic_User implements External_UserInterface {
 	function getCurrentSemester()
 	{
 		#Get current FileSemester and FileYear
-		$query = "SELECT FileSemester, FileYear FROM FileSemesters WHERE SystemCurrentFlag=1";
-                $semester = $this->getDatabase()->getRow($query);
-                $_SESSION['FileSemester'] = $semester['FileSemester'];
-                $_SESSION['FileYear'] = $semester['FileYear'];
-		return true;
-	}
+		$query = "SELECT FileSemester, FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1";
+
+        if ( $semester = $this->getDatabase()->getRow($query) ) {
+            $_SESSION['FileSemester'] = $semester['FileSemester'];
+            $_SESSION['FileYear'] = $semester['FileYear'];
+
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 
 	function getSubjectList($synergyID, $userID)
 	{
+        if ( !isset($_SESSION['FileSemester']) || !isset($_SESSION['FileYear']) ) {
+            return false;
+        }
+
 		if( $this->groupHandler->isStudent($userID) )
 		{
 			$sql ="SELECT StudentClasses.ClassCode, SubjectClasses.Description as name
