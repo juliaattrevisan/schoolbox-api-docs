@@ -14,9 +14,12 @@ class External_Schoolbox_User implements External_UserInterface {
 
 	private $group;
 
+    private $user;
+
 	public function __construct () {
 		$this->setdatabase( Database::getInstance() );
 
+        $this->setUser( new User );
 		$this->setGroup( new Group );
 	}
 
@@ -103,6 +106,29 @@ class External_Schoolbox_User implements External_UserInterface {
 
     }
 
+    /**
+     * Returns a local path to the user's portrait
+     *
+     * @param Integer $externalUserId
+     * @return Bool|String
+     */
+    public function getPortrait ($externalUserId) {
+        $user = $this->getUser()->getBySynergy($externalUserId);
+
+        if ( empty($user) ) {
+            return false;
+        }
+
+        $portraitPath = realpath( Config::get('portrait_dir') ) . "/{$user['uid']}.jpg";
+
+        if ( is_readable($portraitPath) ) {
+            return $portraitPath;
+        }
+        else {
+            return false;
+        }
+    }
+
 	/**
 	 * @param Database $database
 	 * @return void
@@ -132,4 +158,20 @@ class External_Schoolbox_User implements External_UserInterface {
 	private function getGroup () {
 		return $this->group;
 	}
+
+    /**
+     * @param User $user
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
 }

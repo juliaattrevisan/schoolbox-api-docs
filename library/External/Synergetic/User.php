@@ -11,10 +11,53 @@ class External_Synergetic_User implements External_UserInterface {
 
 	private $database;
 
-    function __construct () {
-		$this->setDatabase( new MSSQL() );
+    private $groupHandler;
 
-		$this->groupHandler = new Group;
+    private $userHandler;
+
+    function __construct () {
+		$this->setDatabase( new MSSQL );
+
+        $this->setGroupHandler( new Group );
+
+        $this->setUserHandler( new User );
+    }
+
+    /**
+     * Retrieves the user's Synergetic image
+     *
+     * @param Integer $externalUserId
+     * @return Bool|String
+     */
+    public function getPortrait ($externalUserId) {
+        $user = $this->getUserHandler()->getBySynergy($externalUserId);
+
+        if ( $this->getGroupHandler()->isStaff() || //Allow all staff access to all photos
+             $this->getGroupHandler()->isParentOfChild($user['uid']) || //Allow parents access to their childrens photos
+       		 ( Cfg::get('protect_student_photo') == 0 && $this->getGroupHandler()->isStudent() && $this->getGroupHandler()->isStudent($_GET['id']) ) || //If policy allows let students see other students photos
+       		 ( Cfg::get('protect_teacher_photo') == 0 && $this->getGroupHandler()->isStaff($_GET['id']) ) //If policy disabled allow access to staff photos
+       	) {
+            $query = "
+                SELECT vPhotos.ID, vPhotos.Photo, vPhotos.PhotoType
+                FROM SynergyOne.dbo.vPhotos vPhotos
+                WHERE vPhotos.ID = '{$externalUserId}'
+            ";
+
+            if ( $photo = $this->getDatabase()->getRow($query) ) {
+                $photoPath = tempnam(Cfg::get('zip_dir'), 'synport');
+                $photoHandle = fopen($photoPath, "w");
+
+                fwrite($photoHandle, $photo['Photo']);
+                fclose($photoHandle);
+            }
+
+            if ( is_readable($photoPath) ) {
+                return $photoPath;
+            }
+            else {
+                return false;
+            }
+        }
     }
 
 	/**
@@ -324,4 +367,36 @@ class External_Synergetic_User implements External_UserInterface {
 	private function getDatabase () {
 		return $this->database;
 	}
+
+    /**
+     * @param Group $groupHandler
+     */
+    public function setGroupHandler($groupHandler)
+    {
+        $this->groupHandler = $groupHandler;
+    }
+
+    /**
+     * @return Group
+     */
+    public function getGroupHandler()
+    {
+        return $this->groupHandler;
+    }
+
+    /**
+     * @param Group $userHandler
+     */
+    public function setUserHandler($userHandler)
+    {
+        $this->userHandler = $userHandler;
+    }
+
+    /**
+     * @return Group
+     */
+    public function getUserHandler()
+    {
+        return $this->userHandler;
+    }
 }

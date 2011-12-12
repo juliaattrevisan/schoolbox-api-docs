@@ -33,6 +33,15 @@ class External_User {
 		}
 	}
 
+    /**
+     * Returns a valid readable path to the user's portrait
+     *
+     * @param Integer $externalUserId
+     * @return String
+     */
+    public function getPortrait ($externalUserId) {
+        return $this->getDatabase()->getPortrait($externalUserId);
+    }
 
 	/**
 	 * Used in search

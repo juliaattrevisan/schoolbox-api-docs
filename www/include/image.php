@@ -1,5 +1,10 @@
 <?php
 
+/*
+ * Please use Alaress_Image instead of this class
+ */
+
+
 define('IMG_max_size', 30000000);
 
 class Image {
