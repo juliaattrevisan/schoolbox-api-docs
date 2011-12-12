@@ -25,7 +25,7 @@ class Synchronise_External_Donvale_Timetable extends Synchronise_External_Donval
 
 			$cycleId = Database::getInstance()->lastInsertId();
 
-			$cycleLength = 0;
+            $cycleLength = 0;
 
 			$sequenceMax = 0;
 
@@ -105,10 +105,7 @@ class Synchronise_External_Donvale_Timetable extends Synchronise_External_Donval
 					'classId' => $classId,
 					'periodId' => $periodId
 				);
-if ( $classId == 1){
-    echo '*******************************************************************';
-    var_dump($classPeriod);
-}
+
 				$this->createClassPeriod($classPeriod);
 			}
 
@@ -117,7 +114,8 @@ if ( $classId == 1){
 			$cycle = array(
 				'id' => $cycleId,
 				'title' => "$cycleLength Day Cycle",
-				'cycleLength' => $cycleLength
+                'cycleLength' => $cycleLength,
+                'dayLength' => $sequenceMax
 			);
 
 			$this->updateTimetableCycle($cycle);
@@ -217,10 +215,10 @@ if ( $classId == 1){
 	 */
 	private function getClassId($propertyList) {
 		return Database::getInstance()->query("
-				SELECT id
-				FROM class
-				WHERE code = '{$propertyList['ClassCode']}'
-			")->fetchColumn(0);
+            SELECT id
+            FROM class
+            WHERE code = '{$propertyList['ClassCode']}'
+        ")->fetchColumn(0);
 	}
 
 	/**
@@ -232,12 +230,12 @@ if ( $classId == 1){
 	 */
 	private function getPeriodId($cycleId, $propertyList) {
  		return Database::getInstance()->query("
-					SELECT id
-					FROM timetable_period
-					WHERE cycle_id = $cycleId
-							AND day = '{$propertyList['Day']}'
-							AND sequence = '{$propertyList['Period']}'
-				")->fetchColumn(0);
+            SELECT id
+            FROM timetable_period
+            WHERE cycle_id = $cycleId
+                    AND day = '{$propertyList['Day']}'
+                    AND sequence = '{$propertyList['Period']}'
+        ")->fetchColumn(0);
 	}
 
 	/**
@@ -275,7 +273,7 @@ if ( $classId == 1){
 	private function updateTimetableCycle($cycle) {
 		Database::getInstance()->prepare("
 			UPDATE timetable_cycle
-			SET title = :title, cycle_length = :cycleLength
+			SET title = :title, cycle_length = :cycleLength, day_length = :dayLength
 			WHERE id = :id
 		")->execute($cycle);
 	}
