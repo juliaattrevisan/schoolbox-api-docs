@@ -392,8 +392,7 @@ class Bulk {
 						'note' => Scrub::html($thisRow[3]),
 						'detail' => Scrub::html($thisRow[4]),
 						'location' => Scrub::html($thisRow[5]),
-						'priority' => Scrub::html($thisRow[6]),
-						'type' => Scrub::html($thisRow[7]),
+						'type' => Scrub::html($thisRow[6]),
 						'campusList' => $campusList,
 						'groupList' => $groupList,
 					);
