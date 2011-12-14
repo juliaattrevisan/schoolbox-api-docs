@@ -26,14 +26,14 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 					WHERE TimetableDefinition.FileYear='{$_SESSION['FileYear']}' AND
 						TimetableDefinition.FileSemester='{$_SESSION['FileSemester']}' AND
 						TimetableDefinition.TimetableGroup='{$this->campusCode[$campus]}' AND
-						TimetableDefinition.DayNumber = 0
+						(TimetableDefinition.DayNumber = 0 OR TimetableDefinition.DayNumber = 1)
 					ORDER BY TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq
 					";
 		$this->getDatabase()->query($query);
 
 		$periodCount = 0;
 
-		while($period = $this->getDatabase()->getNextArray()) {
+		while($period = $this->getDatabase()->getNextArray() ) {
 			preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['TimeTo'], $TimeToMatches);
 			preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['TimeFrom'], $TimeFromMatches);
 
