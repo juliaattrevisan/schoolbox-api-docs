@@ -4,6 +4,7 @@ require_once(SITE_root . '/library/textBox.php');
 $this->setBlock($componentHandle, 'text_editable', 'text_editable_block');
 $this->setBlock($componentHandle, 'text_locked', 'text_locked_block');
 $this->setBlock('text_locked', 'modify_text', 'modify_text_block');
+$this->setBlock('text_locked', 'create_text', 'create_text_block');
 
 $textBoxHandler = new TextBox;
 $textBox = $textBoxHandler->getByID((int)$config['textBoxID']);
@@ -24,6 +25,7 @@ $this->setVar($output);
 
 $this->setVar('text_editable_block', '');
 $this->setVar('modify_text_block', '');
+$this->setVar('create_text_block', '');
 $this->setVar('text_locked_block', '');
 
 if (($permission >= WRITE_ACCESS) && ($this->arg[1] == 'textBoxModify') && ($this->arg[2] == $component['homepageComponentLocationID'])) {
@@ -43,8 +45,13 @@ else {
 
 	/* modify links */
 	if ($permission >= WRITE_ACCESS) {
-		$this->parse('modify_text_block', 'modify_text');
+        if($textBox['textBoxID']) {
+		    $this->parse('modify_text_block', 'modify_text');
+        }
+        else
+            $this->parse('create_text_block', 'create_text');
 	}
+
 
 	/* formatted text */
 	$this->parse('text_locked_block', 'text_locked');
