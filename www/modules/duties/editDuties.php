@@ -80,7 +80,7 @@ class editDuties
 			$this->page->setVar("UPDATE", $update);
 			$this->page->setVar("DUTY", $row['name']);
 			$this->page->setVar("ASSIGNEDUSER", $row['user']);
-			$this->t_body->parse("d_block", "duty_list", true);
+			$this->page->parse("d_block", "duty_list", true);
 			$i++;
 		}
 		$this->page->setVar("MAXI", $i-1);
