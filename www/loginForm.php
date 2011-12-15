@@ -29,7 +29,7 @@ if ((isset($_POST['username'])) && (isset($_POST['password']) && $_POST['passwor
 		//get rid of session started earlier to stop it conflicting with next login
 		$sessionHandler->destroy();
 		$page = new SitePage(FALSE);
-		$page->goLoginPage('The username or password you typed is incorrect please try again', $_POST['page']);
+		$page->goLoginPage('The username or password you typed is incorrect, please try again', $_POST['page']);
 	}
 }
 else {
