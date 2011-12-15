@@ -96,8 +96,8 @@ class Wiki extends DeprecatedModel
 		if (($orderBy == 'created') || !strlen($orderBy)) {
 			$orderBy = 'ORDER BY w.created';
 		}
-		else if($orderBy) {
-			$orderBy = 'ORDER BY r.' . $orderBy;
+		else if($orderBy  == 'modified') {
+			$orderBy = 'ORDER BY r.created' ;
 		}
 
 		$query = "SELECT r.*, UNIX_TIMESTAMP(r.created) modified, u.title, u.firstname, u.lastname,
