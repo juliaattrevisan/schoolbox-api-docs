@@ -14,6 +14,10 @@ if(!empty($config['url'])) {
         $j = 0;
 
 	    foreach ($xml->channel->item as $item) {
+            if ( !isset($item->enclosure) ) {
+                continue;
+            }
+
 			$fileType = new FileType($item->enclosure->attributes()->url, $item->enclosure->attributes()->type);
 
 			if ($fileType->isAudio()) {
@@ -37,9 +41,14 @@ if(!empty($config['url'])) {
                 break;
 			}
         }
+
+        if ( $j == 0 ) {
+            $this->setVar('PODCAST_COMPONENT_TITLE', 'Podcast - URL does not contain any valid audio podcasts');
+            $this->setVar('podcast_list_block', '');
+        }
     }
     else {
-        $this->setVar('PODCAST_COMPONENT_TITLE', 'Podcast - URL is not a valid audio podcast');
+        $this->setVar('PODCAST_COMPONENT_TITLE', 'Podcast - URL is not a valid podcast feed');
         $this->setVar('podcast_list_block', '');
     }
 }
