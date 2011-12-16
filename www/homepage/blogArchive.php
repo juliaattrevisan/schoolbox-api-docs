@@ -45,6 +45,7 @@ $this->setVar(array(
     'CATEGORY_NAME'	=> Scrub::text($category['name']),
     'TITLE'			=> 'Blog Archive',
     'ID'			=> $category['id'],
+    'blog_block'    => '',
 ));
 
 /* Hide 'Add' button if not authorised */
