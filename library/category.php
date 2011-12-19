@@ -282,14 +282,19 @@ class Category extends DeprecatedModel {
 	 * categoryCodes, or a single categoryCode string
 	 *
 	 * @param  $code
+     * @param $updateID ID of element to ignore in update situation
 	 * @return array|bool
 	 */
-	public function isCodeExists($codeList) {
+	public function isCodeExists($codeList, $updateID = FALSE) {
 		if (empty($codeList)) {
 			return false;
 		}
 
-		$query = "SELECT * FROM categoryCode WHERE ";
+		$query = "SELECT * FROM categoryCode WHERE  ";
+
+        /* When updating ignore the item your updating */
+        if($updateID)
+            $query .= " id != $updateID AND ";
 
 		/* Re-implode the filtered components into a query-friendly format
 		 */
@@ -389,7 +394,7 @@ class Category extends DeprecatedModel {
 			$codeList = array_values(array_filter($codeList, 'trim'));
 		}
 
-		$codeExists = $this->isCodeExists($codeList);
+		$codeExists = $this->isCodeExists($codeList,$data['id']);
 
 		if ($codeExists) {
 			error(136);
