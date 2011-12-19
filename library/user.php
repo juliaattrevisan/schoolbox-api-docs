@@ -209,7 +209,7 @@ class User extends DeprecatedModel {
         }
 
         $oldPassword = mysql_real_escape_string($oldPassword);
-        $newPassword = mysql_real_escape_string($newPassword);
+        $newPassword = mysql_real_escape_string($newpassword);
         $query = "UPDATE `" . $this->_table . "` SET password = PASSWORD('$newPassword'), email_pass = '$newPassword' WHERE `" . $this->_index . "` = $userID AND password = PASSWORD('$oldPassword')";
         $this->db->query($query);
 
@@ -230,7 +230,7 @@ class User extends DeprecatedModel {
             $this->update(array('id' => $user['id'], 'hash' => $hash));
 
             require_once SITE_root . '/include/Mailer.php';
-            $mailHandler = new Mailer('reset-password.html', HEADING . ' Password Reset', $user['alt_email']);
+            $mailHandler = new Mailer('reset-password.html', Cfg::get('title') . ' Password Reset', $user['alt_email']);
             $mailHandler->setVar('NAME', $user['firstname']);
             $mailHandler->setVar('RESET_LINK', "http://" . $_SERVER['HTTP_HOST'] . "/reset.php?id={$user['id']}&h=" . $hash);
             return $mailHandler->send();
@@ -246,7 +246,7 @@ class User extends DeprecatedModel {
         if (isset($user['id'])) {
             if ($groupHandler->isParent($user['id']) || Cfg::get('site_name') != 'shore'  ) {
                 require_once SITE_root . '/include/Mailer.php';
-                $mailHandler = new Mailer('new-password.html', HEADING . ' Password Reminder', $user['alt_email']);
+                $mailHandler = new Mailer('new-password.html', Cfg::get('title') . ' Password Reminder', $user['alt_email']);
                 $mailHandler->setVar('NAME', $user['firstname']);
                 $mailHandler->setVar('USERNAME', $user['username']);
                 $mailHandler->setVar('PASSWORD', $user['email_pass']);

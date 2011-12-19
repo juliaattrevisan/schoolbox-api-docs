@@ -13,9 +13,8 @@ session_start();
 //			name - name of sender
 //			confirmation - location to redirect user to after submission, ie a confirmation page
 
-require_once dirname(__FILE__) . '/conf/conf.php';
-require_once dirname(__FILE__) . '/../include/SitePage.php';
-require_once SITE_root . '/include/Mailer.php';
+
+require_once dirname(__FILE__) . '/../include/Bootstrap.php';
 
 $recaptcha = new ReCaptcha( Config::get('recaptcha_public_api_key'), Config::get('recaptcha_private_api_key') );
 
@@ -26,7 +25,7 @@ if ( !isset($_SESSION['id']) && !$recaptcha->check_answer($_SERVER['REMOTE_ADDR'
 
 if(validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $_POST['template'])) {
 
-	$mailHandler = new Mailer($_POST['template'], 'OurSchool Feedback - ' . $_POST['subject'], Cfg::get('mail_support_address'));
+	$mailHandler = new Mailer($_POST['template'], Cfg::get('title').' Feedback - ' . $_POST['subject'], Cfg::get('mail_support_address'));
 
 	foreach($_POST as $key => $var) {
 		if(!checkSpamHeaders($var))
@@ -45,22 +44,27 @@ if(validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.ht
 
 	$mailHandler->setVar($output);
 	$mailHandler->setFrom($_POST['email'], $_POST['name']);
+
 	$mailHandler->setVar('SITE_DOMAIN', $_SERVER['HTTP_HOST']);
+    $mailHandler->setVar('SITE_TITLE',  Cfg::get('title'));
 	$mailHandler->send();
 
 	if($_POST['receipt']) {
-		$receiptHandler = new Mailer($_POST['receipt'], $_POST['receipt_subject'], $_POST['email']);
+        $receiptHandler = new Mailer($_POST['receipt'], $_POST['receipt_subject'], $_POST['email']);
 		$receiptHandler->setVar($output);
 		$receiptHandler->setVar('SITE_DOMAIN', $_SERVER['HTTP_HOST']);
 		$receiptHandler->send();
 
+
 	}
 }
 
-if(preg_match("/^[a-zA-Z0-9\/\-\_]+/", $_POST['confirmation']) )
+if(preg_match("/^[a-zA-Z0-9\/\-\_]+/", $_POST['confirmation']) ) {
 	SitePage::localRedir($_POST['confirmation']);
-else
+}
+else {
 	SitePage::localRedir('/thank-you');
+}
 
 function checkSpamHeaders($text)
 {
