@@ -7,11 +7,11 @@ $groupHandler = new Group();
 
 if ($_POST['name']) {
 	$category = array(
-		'name' => Scrub::text($_POST['name']),
-		'parent' => Scrub::text($_POST['parent']),
-		'template' => Scrub::text($_POST['template']),
-		'code' => Scrub::text($_POST['code']),
-		'group' => array_map(array(Scrub, 'text'), $_POST['group']),
+		'name' => $_POST['name'],
+		'parent' => $_POST['parent'],
+		'template' => $_POST['template'],
+		'code' => $_POST['code'],
+		'group' => $_POST['group'],
 	);
 
 	if (is_numeric($_POST['categoryID'])) {
