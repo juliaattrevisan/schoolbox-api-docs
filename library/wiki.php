@@ -94,11 +94,13 @@ class Wiki extends DeprecatedModel
 		/* Adjust the table in which to sort -_-
 		 */
 		if (($orderBy == 'created') || !strlen($orderBy)) {
-			$orderBy = 'ORDER BY w.created';
+			$orderBySQL = 'ORDER BY w.created';
 		}
 		else if($orderBy  == 'modified') {
-			$orderBy = 'ORDER BY r.created' ;
-		}
+			$orderBySQL = 'ORDER BY r.created' ;
+		}else{
+            $orderBySQL = 'ORDER BY '.$orderBy;
+        }
 
 		$query = "SELECT r.*, UNIX_TIMESTAMP(r.created) modified, u.title, u.firstname, u.lastname,
 				  w.locked, w.categoryID, w.slug
@@ -106,7 +108,7 @@ class Wiki extends DeprecatedModel
 				  LEFT JOIN " . $this->_revisionTable . " r ON r.revisionID = (SELECT r.revisionID FROM " . $this->_revisionTable . " r WHERE r.wikiID = w.wikiID ORDER BY r.created DESC LIMIT 1)
 				  LEFT JOIN user u ON u.id = r.userID
 				  WHERE w.deleted = 'false' AND categoryID = '{$categoryID}'
-				  {$orderBy} {$sortDir}";
+				  {$orderBySQL} {$sortDir}";
 
 		if (is_numeric($limit) && ($limit > 0)) {
 			$query .= " LIMIT $limit";
