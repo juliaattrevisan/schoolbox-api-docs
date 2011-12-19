@@ -53,4 +53,7 @@ else {
 	}
 }
 
-SitePage::localRedir('/cms/myLinks');
+if($_GET['return'])
+    SitePage::backToTheFuture(1);
+else
+    SitePage::localRedir('/cms/myLinks');
