@@ -93,6 +93,31 @@
 
 		</td>
 	</tr>
+    <!-- BEGIN subject -->
+    	<tr>
+		<td colspan="6"><h2>Subjects</h2></td>
+	</tr>
+    <!-- BEGIN subject_row -->
+	<tr>
+        <!-- BEGIN subject_item -->
+		<td class="clearfix"><img src="/search/portrait.php?id={SUBJECT_TEACHER_ID}&width=60&height=60" /></td>
+        <td colspan="2" class="clearfix">{SUBJECT_NAME}<br />
+        {SUBJECT_TEACHER_NAME}</td>
+        <!-- END subject_item -->
+	</tr>
+    <!-- END subject_row -->
+    <tr><td colspan="6">
+            <!-- BEGIN subject_mail -->
+          <form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
+              <input type="hidden" name="replyto" value="{REPLYTO}" />
+              <input type="hidden" name="bcc" value="{EMAILALL}" />
+              <a href="#" class="btn submit-this float-right up-arrow "><span></span>Email all</a>
+            </form>
+    <!-- END subject_mail -->
+
+    </td> </tr>
+    <!-- END subject -->
+
 	<!-- BEGIN contact_synergy -->
 
 	<tr>

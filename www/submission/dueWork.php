@@ -431,13 +431,14 @@ else {
 $percentage = array();
 $categoryIDs = array();
 $j = 0;
+$synClass = new External_Class;
 
 // subject summary
 foreach ($categoryList as $category) {
 	$categoryID = $category['id'];
 	/* yes it actually requires THIS MUCH code to get a teachers name. */
 	if (Cfg::get('external_enable')) {
-		$synClass = new External_Class;
+
 
 		$teacherOutput = array();
 		$teacherList = array();
