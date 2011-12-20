@@ -238,7 +238,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 		if($this->groupHandler->isStudent($userID))
 		{
 			$query ="SELECT 
-				Timetable.Room, SubjectClasses.Description, Timetable.PeriodNumber, Timetable.ClassCode
+				Timetable.Room, SubjectClasses.Description, Timetable.PeriodNumber, Timetable.ClassCode, StaffID
 				FROM 
 				SynergyOne.dbo.StudentClasses StudentClasses,
 				SynergyOne.dbo.SubjectClasses SubjectClasses, 
@@ -304,6 +304,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 				$timetable[$x]['description'] = $desc['Description'];
 				$timetable[$x]['code'] = $desc['ClassCode'];
 				$timetable[$x]['room'] = $desc['Room'];
+                $timetable[$x]['staffID'] = $desc['StaffID'];
 				$desc = $this->getDatabase()->getNextArray();
 				
 				//bad data in synergetic.. why..?? 
@@ -327,7 +328,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 		if( $this->groupHandler->isStudent($userID))
 		{
 			$query ="SELECT
-						Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber, Timetable.ClassCode
+						Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber, Timetable.ClassCode, StaffID
 					FROM
 						SynergyOne.dbo.Timetable Timetable,
 						SynergyOne.dbo.StudentClasses StudentClasses,
@@ -397,6 +398,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 					$timetable[$x]['day'][$y]['description'] = $desc['Description'];
 					$timetable[$x]['day'][$y]['code'] = $desc['ClassCode'];
 					$timetable[$x]['day'][$y]['room'] = $desc['Room'];
+                    $timetable[$x]['day'][$y]['staffID'] = $desc['StaffID'];
 					$desc = $this->getDatabase()->getNextArray();
 
 					//bad data in synergetic.. why..?? 
@@ -412,7 +414,10 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 				
 			}
 		}
-		usort($timetable, array($this, 'sortTimetable'));
+        if(is_array($timetable)) {
+		    usort($timetable, array($this, 'sortTimetable'));
+        }
+        
 		return $timetable;
 
 	}
