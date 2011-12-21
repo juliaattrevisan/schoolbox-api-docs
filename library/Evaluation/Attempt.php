@@ -31,8 +31,8 @@ abstract class Evaluation_Attempt extends DeprecatedModel {
 	/**
 	 * The number of attempts that have been reviewed for an assess
 	 *
-	 * @param  $assess_id
-	 * @return
+	 * @param $assess_id
+	 * @return mixed
 	 */
     public function numReviewed($assess_id) {
         $query = "SELECT COUNT(*)
@@ -44,12 +44,12 @@ abstract class Evaluation_Attempt extends DeprecatedModel {
     }
 
 	/**
-     * The number of attempts made for an assess. Optionally group them by
-     * user id to cater for multiple attempts.
+	 * The number of attempts made for an assess. Optionally group them by
+  	 * user id to cater for multiple attempts.
 	 *
-	 * @param  $assess_id
+	 * @param $assess_id
 	 * @param bool $groupById
-	 * @return
+	 * @return mixed
 	 */
     public function numAttempted($assess_id, $groupById = false) {
         $query = "SELECT COUNT(*)
@@ -116,8 +116,8 @@ abstract class Evaluation_Attempt extends DeprecatedModel {
 	/**
 	 * Check if the current user has already completed this assessment.
 	 *
-	 * @param  $assess_id
-	 * @return
+	 * @param $assess_id
+	 * @return mixed
 	 */
     public function isComplete($assess_id) {
         $query = "SELECT COUNT(*) AS completed
@@ -243,14 +243,14 @@ abstract class Evaluation_Attempt extends DeprecatedModel {
     }
 
 	/**
-     * Find the total marks available for an attempt (noting that an attempt
-     * can have varying total available marks, depending on randomness of
-     * questions which themselves have different available marks from other
-     * candidates which could be selected)
+	 * Find the total marks available for an attempt (noting that an attempt
+	 * can have varying total available marks, depending on randomness of
+	 * questions which themselves have different available marks from other
+	 * candidates which could be selected)
 	 *
-	 * @param  $assess_id
-	 * @param  $attempt_id
-	 * @return
+	 * @param $assess_id
+	 * @param $attempt_id
+	 * @return mixed
 	 */
     public function getTotalMarks($assess_id, $attempt_id) {
         $query = "SELECT SUM(marks) AS totalMarks
@@ -286,7 +286,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel {
 	 * Get the marks given to an attempt
 	 *
 	 * @param  $attempt_id
-	 * @return
+	 * @return mixed
 	 */
     public function getMarksForAttempt($attempt_id) {
         $query = "SELECT
@@ -304,7 +304,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel {
 	 *
 	 * @param  $assess_id
 	 * @param  $user_id
-	 * @return
+	 * @return mixed
 	 */
     public function userHasAttempted($assess_id, $user_id) {
         $query = "SELECT COUNT(*)
@@ -320,7 +320,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel {
 	 *
 	 * @param  $attempt_id
 	 * @param string $user_id
-	 * @return
+	 * @return mixed
 	 */
     public function isOwner($attempt_id, $user_id = '') {
         if (!is_numeric($user_id)) {

@@ -292,21 +292,16 @@ else {
 
 /* Online Assessments
  */
-require_once(SITE_root . '/library/assess/Assess.php');
-require_once(SITE_root . '/library/assess/AssessAttempt.php');
-require_once(SITE_root . '/library/assess/AssessResponse.php');
-require_once(SITE_root . '/library/assess/AssessSection.php');
-
 $this->setBlock(TEMPLATE_content, 'allAssess', 'allAssess_block');
 $this->setBlock('allAssess', 'attempt', 'attempt_block');
 $this->setBlock('attempt', 'viewMarks', 'viewMarks_block');
 $this->setBlock('attempt', 'takeTest', 'takeTest_block');
 $this->setBlock('attempt', 'unmarked', 'unmarked_block');
 
-$assessHandler = new Assess();
-$attemptHandler = new AssessAttempt();
-$responseHandler = new AssessResponse();
-$sectionHandler = new AssessSection();
+$assessHandler = new Assess_Main();
+$attemptHandler = new Assess_Attempt();
+$responseHandler = new Assess_Response();
+$sectionHandler = new Assess_Section();
 
 /* Store a lookup so you don't need to make new queries all day
  */
@@ -320,12 +315,16 @@ $allAssessments = $assessHandler->getList($categoryIDList, 10);
 $j=0;
 
 if ($allAssessments) {
+	$attemptsExisted = false;
+
     foreach($allAssessments as $currentAssessment) {
 		$allAttempts = $attemptHandler->getList($currentAssessment['assess_id'], $_SESSION['id']);
 
 		/* If multiple attempts were made, list them
 		 */
 		if (is_array($allAttempts) && count($allAttempts)) {
+			$attemptsExisted = true;
+
 			foreach($allAttempts as $currentAttempt) {
 				$firstSection = $sectionHandler->getFirst($currentAssessment['assess_id']);
 
@@ -347,6 +346,7 @@ if ($allAssessments) {
 					$this->setVar('unmarked_block', '');
 				}
 				else {
+
 					/* Finish time
 					 */
 					if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
@@ -411,16 +411,23 @@ if ($allAssessments) {
 						$this->setVar('viewMarks_block', '');
 					}
 				}
+
                 $this->setVar('DARK',$j++ % 2 ?'' : 'dark');
 				$this->parse('attempt_block', 'attempt', true);
 			}
 		}
-		else {
-			$this->setVar('attempt_block', '');
-		}
     }
 
-    $this->parse('allAssess_block', 'allAssess');
+	/* Clear only if attempts never existed for any assess.
+	 * Previously this would get incorrectly cleared for an
+	 * assess that existed but had no attempts coming after
+	 * an assess that existed and had attempts.
+	 */
+	if (!$attemptsExisted) {
+		$this->setVar('attempt_block', '');
+	}
+
+	$this->parse('allAssess_block', 'allAssess', true);
 }
 else {
     $this->setVar('allAssess_block', '');

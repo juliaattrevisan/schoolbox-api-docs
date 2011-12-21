@@ -11,7 +11,7 @@ $this->setVar('group_events_block', '');
 
 if (is_array($eventList)) {
 	$userHandler = new User();
-	
+
 	foreach ($eventList as $event) {
 
 		$event['colour'] = $calendarHandler->displayColour($event['type']);
