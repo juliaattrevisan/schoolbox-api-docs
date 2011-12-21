@@ -38,14 +38,14 @@ class Session {
         //Clear all remenants of past sessions
         $this->destroy();
 
-        //Start a new session
-	    session_start();
-
         $user = $userHandler->getByUsername($username);
 
         $ip = Session::getIP();
 
-        if(is_array($user)) {
+        /* if user is found and session is started create our user record */
+        
+        if(is_array($user) && session_start() ) {
+
 
             //register users id
             $_SESSION['title']      = $user['title'];
@@ -87,7 +87,8 @@ class Session {
 
             return true;
         }
-
+        else
+            return false;
     }
 
     public function destroy() {

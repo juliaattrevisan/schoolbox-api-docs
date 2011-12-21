@@ -14,16 +14,14 @@ if ((isset($_POST['username'])) && (isset($_POST['password']) && $_POST['passwor
 			Please try again in a short while.');
 	}
 
-	if ($sessionHandler->authenticate($_POST['username'], $_POST['password'])) {
-		$sessionHandler->create($_POST['username']);
-
-		if (isset($_POST['page']) && $_POST['page'] && $_POST['page'] != '/') {
-			$page = rawurldecode($_POST['page']);
-			SitePage::localRedir($page);
-		}
-		else {
-			SitePage::localRedir('/');
-		}
+	if ($sessionHandler->authenticate($_POST['username'], $_POST['password']) && $sessionHandler->create($_POST['username'])) {
+        if (isset($_POST['page']) && $_POST['page'] && $_POST['page'] != '/') {
+            $page = rawurldecode($_POST['page']);
+            SitePage::localRedir($page);
+        }
+        else {
+            SitePage::localRedir('/');
+        }
 	}
 	else {
 		//get rid of session started earlier to stop it conflicting with next login
