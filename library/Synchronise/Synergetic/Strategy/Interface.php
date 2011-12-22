@@ -20,8 +20,7 @@ interface Synchronise_Synergetic_Strategy_Interface {
 	/**
 	 * Process them
 	 *
-	 * @param  $performUpdate
-	 * @return void
+	 * @abstract
 	 */
 	public function createIfExists();
 }

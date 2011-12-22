@@ -54,7 +54,8 @@ class Synchronise_Synergetic_Bialik_Strategy_Student extends Synchronise_Synerge
 
 		/* Staff Group ID
 		 */
-		$newUser['group_id'] = self::STUDENT_GROUP_ID;
+		//$newUser['group_id'] = self::STUDENT_GROUP_ID;
+		$newUser['group_id'] = $this->getGroupIDFromYearLevel($currentUser['StudentYearLevel']);
 
 		/* This person is not a superuser
 		 */
