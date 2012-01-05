@@ -186,9 +186,12 @@ class Bulk {
 					/* If synergy id delete as id
 					 */
 					if (is_numeric($thisRow[0])) {
-						if ($userHandler->deleteSynUser($thisRow[0], $trans)) {
+						$user = $userHandler->getBySynergy($thisRow[0]);
+
+                        if (is_array($user)) {
+                            $userHandler->delete($user['uid'], $trans);
 							$output[] = array(
-								'username' => $thisRow[0],
+								'username' => $user['username'].'('.$thisRow[0].')',
 								'status' => 'Removed',
 								'error' => 'OK',
 							);
@@ -197,7 +200,7 @@ class Bulk {
 							$output[] = array(
 								'username' => $thisRow[0],
 								'status' => 'Warning',
-								'error' => 'Did not delete via Synergy',
+								'error' => 'Could not locate user via external ID',
 							);
 						}
 					}
@@ -218,8 +221,8 @@ class Bulk {
 						else {
 							$output[] = array(
 								'username' => $thisRow[0],
-								'status' => 'Not Removed',
-								'error' => "Could not find user",
+								'status' => 'Warning',
+								'error' => "Could not locate user via username",
 							);
 						}
 					}
