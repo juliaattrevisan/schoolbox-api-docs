@@ -26,7 +26,14 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && is_n
                 }
             }
             else {
-				$person = "{$user['firstname']} {$user['lastname']} - Year {$user['year']}, {$user['gname']}";
+
+                $person = "{$user['firstname']} {$user['lastname']} - ";
+
+                if($user['year'])
+                     $person .= "Year {$user['year']},";
+
+                $person .= $user['gname'];
+
                 $suggestions[] = html_entity_decode(Scrub::text($person), ENT_QUOTES);
                 $data[] = $user['uid'];
             }
