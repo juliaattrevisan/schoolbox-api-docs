@@ -28,6 +28,8 @@ interface External_UserInterface {
 
 	public function getEmail ($externalUserId);
 
+    public function getPortrait ($externalUserId);
+
 	public function getStudentUserAccountInfo ();
 
 	public function getParentUserAccountInfo ();

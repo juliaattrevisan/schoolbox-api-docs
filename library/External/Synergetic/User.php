@@ -13,14 +13,11 @@ class External_Synergetic_User implements External_UserInterface {
 
     private $groupHandler;
 
-    private $userHandler;
-
     function __construct () {
 		$this->setDatabase( new MSSQL );
 
-        $this->setGroupHandler( new Group );
+        $this->setGroup( new Group );
 
-        $this->setUserHandler( new User );
     }
 
     /**
@@ -30,33 +27,26 @@ class External_Synergetic_User implements External_UserInterface {
      * @return Bool|String
      */
     public function getPortrait ($externalUserId) {
-        $user = $this->getUserHandler()->getBySynergy($externalUserId);
 
-        if ( $this->getGroupHandler()->isStaff() || //Allow all staff access to all photos
-             $this->getGroupHandler()->isParentOfChild($user['uid']) || //Allow parents access to their childrens photos
-       		 ( Cfg::get('protect_student_photo') == 0 && $this->getGroupHandler()->isStudent() && $this->getGroupHandler()->isStudent($_GET['id']) ) || //If policy allows let students see other students photos
-       		 ( Cfg::get('protect_teacher_photo') == 0 && $this->getGroupHandler()->isStaff($_GET['id']) ) //If policy disabled allow access to staff photos
-       	) {
-            $query = "
-                SELECT vPhotos.ID, vPhotos.Photo, vPhotos.PhotoType
-                FROM SynergyOne.dbo.vPhotos vPhotos
-                WHERE vPhotos.ID = '{$externalUserId}'
-            ";
+        $query = "
+            SELECT vPhotos.ID, vPhotos.Photo, vPhotos.PhotoType
+            FROM SynergyOne.dbo.vPhotos vPhotos
+            WHERE vPhotos.ID = '{$externalUserId}'
+        ";
 
-            if ( $photo = $this->getDatabase()->getRow($query) ) {
-                $photoPath = tempnam(Cfg::get('zip_dir'), 'synport');
-                $photoHandle = fopen($photoPath, "w");
+        if ( $photo = $this->getDatabase()->getRow($query) ) {
+            $photoPath = tempnam(Cfg::get('zip_dir'), 'synport');
+            $photoHandle = fopen($photoPath, "w");
 
-                fwrite($photoHandle, $photo['Photo']);
-                fclose($photoHandle);
-            }
+            fwrite($photoHandle, $photo['Photo']);
+            fclose($photoHandle);
+        }
 
-            if ( is_readable($photoPath) ) {
-                return $photoPath;
-            }
-            else {
-                return false;
-            }
+        if ( is_readable($photoPath) ) {
+            return $photoPath;
+        }
+        else {
+            return false;
         }
     }
 
@@ -236,7 +226,7 @@ class External_Synergetic_User implements External_UserInterface {
             return false;
         }
 
-		if( $this->groupHandler->isStudent($userID) )
+		if( $this->getGroup()->isStudent($userID) )
 		{
 			$sql ="SELECT StudentClasses.ClassCode, SubjectClasses.Description as name
 					FROM StudentClasses, SubjectClasses
@@ -371,7 +361,7 @@ class External_Synergetic_User implements External_UserInterface {
     /**
      * @param Group $groupHandler
      */
-    public function setGroupHandler($groupHandler)
+    public function setGroup($groupHandler)
     {
         $this->groupHandler = $groupHandler;
     }
@@ -379,24 +369,9 @@ class External_Synergetic_User implements External_UserInterface {
     /**
      * @return Group
      */
-    public function getGroupHandler()
+    public function getGroup()
     {
         return $this->groupHandler;
     }
 
-    /**
-     * @param Group $userHandler
-     */
-    public function setUserHandler($userHandler)
-    {
-        $this->userHandler = $userHandler;
-    }
-
-    /**
-     * @return Group
-     */
-    public function getUserHandler()
-    {
-        return $this->userHandler;
-    }
 }

@@ -297,7 +297,10 @@ class External_Denbigh_User implements External_UserInterface {
 		return $studentList;
 	}
 
-    function getEmail ($externalUserId) {
+    public function getPortrait ($externalUserId) {
+    }
+
+    public function getEmail ($externalUserId) {
 		return '';
     }
 
@@ -308,6 +311,8 @@ class External_Denbigh_User implements External_UserInterface {
 	public function getParentUserAccountInfo () {
 
 	}
+
+
 
     public function getStaffUserAccountInfo () {
 

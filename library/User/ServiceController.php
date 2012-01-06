@@ -5,6 +5,8 @@ class User_ServiceController {
 
     private $userHandler;
 
+    private $groupHandler;
+
     private $externalUserHandler;
 
     private $imageHandler;
@@ -13,6 +15,7 @@ class User_ServiceController {
         $this->setSitePage($sitePage);
 
         $this->setUserHandler( new User );
+        $this->setGroupHandler( new Group );
         $this->setExternalUserHandler( new External_User );
         $this->setImageHandler( new Alaress_Image );
     }
@@ -23,15 +26,28 @@ class User_ServiceController {
      * @param Integer $height
      * @return String
      */
-    public function getPortrait ($userId, $width = 200, $height = 300) {
-        header("Content-Type: image/jpg");
-        header("Content-Disposition: filename={$userId}.jpg");
+    public function getPortrait ($externalUserId, $width = 200, $height = 300) {
 
-        if ( !$portraitPath = $this->getExternalUserHandler()->getPortrait($userId) ) {
-            $portraitPath = WEB_root . '/images/no_portrait.jpg';
+        /* Check security permissions for images */
+        $user = $this->getUserHandler()->getBySynergy($externalUserId);
+
+        if ( $this->getGroupHandler()->isStaff() || //Allow all staff access to all photos
+             $this->getGroupHandler()->isParentOfChild($user['uid']) || //Allow parents access to their childrens photos
+       		 ( Cfg::get('protect_student_photo') == 0 && $this->getGroupHandler()->isStudent() && $this->getGroupHandler()->isStudent($user['uid']) ) || //If policy allows let students see other students photos
+       		 ( Cfg::get('protect_teacher_photo') == 0 && $this->getGroupHandler()->isStaff($user['uid']) ) //If policy disabled allow access to staff photos
+       	) {
+
+            if ( !$portraitPath = $this->getExternalUserHandler()->getPortrait($externalUserId) ) {
+                $portraitPath = WEB_root . '/images/no_portrait.jpg';
+            }
         }
+        else
+            $portraitPath = WEB_root . '/images/no_portrait.jpg';
 
         $image = $this->getImageHandler()->imageResize($portraitPath, $height, $width, false);
+
+        header("Content-Type: image/jpg");
+        header("Content-Disposition: filename={$externalUserId}.jpg");
 
         return imagejpeg($image);
     }
@@ -50,6 +66,23 @@ class User_ServiceController {
     public function getUserHandler()
     {
         return $this->userHandler;
+    }
+
+
+        /**
+     * @param Group $groupHandler
+     */
+    public function setGroupHandler($groupHandler)
+    {
+        $this->groupHandler = $groupHandler;
+    }
+
+    /**
+     * @return User
+     */
+    public function getGroupHandler()
+    {
+        return $this->groupHandler;
     }
 
     /**

@@ -96,9 +96,10 @@ class External_Tass_User implements External_UserInterface {
 		return $this->getDatabase()->getAll($query);
 
 	}
+    public function getPortrait ($externalUserId) {
+    }
 
-    function getEmail ($id) {
-
+    public function getEmail ($id) {
     }
 
 	public function getStaffUserAccountInfo () {
