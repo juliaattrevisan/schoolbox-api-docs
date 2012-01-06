@@ -179,6 +179,8 @@
     onKeyUp: function(e) {
       if(this.disabled){ return; }
       switch (e.keyCode) {
+        case 9: //KEY_TAB:
+        case 13: //KEY_RETURN:
         case 38: //KEY_UP:
         case 40: //KEY_DOWN:
           return;
