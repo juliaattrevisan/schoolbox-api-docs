@@ -75,6 +75,7 @@ if (is_numeric($this->arg[0])) {
 		'parent_synergy_form_block' => '',
 		'parent_spouse_block' => '',
 		'staff_synergy_block' => '',
+        'subject_block' => '',
 	);
 
 	$this->setVar($blank);
@@ -231,52 +232,54 @@ if (is_numeric($this->arg[0])) {
 
             /*Output subject list */
             $subjectList = $synUserHandler->getSubjectList($user['synergy_id'], $user['uid']);
-            foreach($subjectList as $subject) {
+            if(is_array($subjectList)) {
+                foreach($subjectList as $subject) {
 
-                /* Fetch teacher names */
-                $teacherList = $synClass->getTeacherName($subject['code']);
-                $teacherOutput = array();
-                if (is_array($teacherList)) {
-                    foreach ($teacherList as $teacherSynID) {
-                        $teacher = $userHandler->getBySynergy($teacherSynID);
-                        $teacherName = $userHandler->formatName($teacher);
+                    /* Fetch teacher names */
+                    $teacherList = $synClass->getTeacherName($subject['code']);
+                    $teacherOutput = array();
+                    if (is_array($teacherList)) {
+                        foreach ($teacherList as $teacherSynID) {
+                            $teacher = $userHandler->getBySynergy($teacherSynID);
+                            $teacherName = $userHandler->formatName($teacher);
 
-                        $emailObj = new Email();
-                        $emailAddress = $emailObj->formatEmailFromArray($teacher);
+                            $emailObj = new Email();
+                            $emailAddress = $emailObj->formatEmailFromArray($teacher);
 
-                        $teacherOutput[] = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$teacherName</a>";
-                        $emailAll .= $emailAddress.",";
+                            $teacherOutput[] = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$teacherName</a>";
+                            $emailAll .= $emailAddress.",";
+                        }
                     }
+
+                    $category = $catHandler->getByCode($subject['code']);
+
+                    $output = array('SUBJECT_NAME' => is_array($category)&&$groupHandler->getPermission($category['id'])>=READ_ACCESS?'<a href="/homepage/'.$subject['code'].'">'.Scrub::Text($category['name']).'</a>':Scrub::Text($subject['name']),
+                                    'SUBJECT_TEACHER_NAME'=> implode(', ', $teacherOutput),
+                                    'SUBJECT_TEACHER_ID' => $teacherList[0],
+                                    );
+
+
+                    $this->setVar($output);
+                    $this->parse('subject_item_block','subject_item',true);
+                    if($i!=0 && !$i%2)
+                        $this->parse('subject_row_block','subject_row',true);
+
                 }
 
-                $category = $catHandler->getByCode($subject['code']);
+                $this->parse('subject_row_block','subject_row',true);
 
-                $output = array('SUBJECT_NAME' => is_array($category)&&$groupHandler->getPermission($category['id'])>=READ_ACCESS?'<a href="/homepage/'.$subject['code'].'">'.Scrub::Text($category['name']).'</a>':Scrub::Text($subject['name']),
-                                'SUBJECT_TEACHER_NAME'=> implode(', ', $teacherOutput),
-                                'SUBJECT_TEACHER_ID' => $teacherList[0],
-                                );
+                /*Output email all subject teachers */
+                if($groupHandler->isStaff() ) {
+                    $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
+                    $this->setVar("EMAILALL", $emailAll);
+                    $this->parse("subject_mail_block", "subject_mail");
+                }
+                else {
+                    $this->setVar('subject_mail_block','');
+                }
 
-
-                $this->setVar($output);
-                $this->parse('subject_item_block','subject_item',true);
-                if($i!=0 && !$i%2)
-                    $this->parse('subject_row_block','subject_row',true);
-
+                $this->parse('subject_block','subject');
             }
-
-            $this->parse('subject_row_block','subject_row',true);
-
-            /*Output email all subject teachers */
-            if($groupHandler->isStaff() ) {
-                $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
-                $this->setVar("EMAILALL", $emailAll);
-                $this->parse("subject_mail_block", "subject_mail");
-            }
-            else {
-                $this->setVar('subject_mail_block','');
-            }
-
-            $this->parse('subject_block','subject');
 
 			$studentContactList = $synUserHandler->getStudentContactList($user['synergy_id']);
 
