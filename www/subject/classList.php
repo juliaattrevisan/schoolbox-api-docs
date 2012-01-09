@@ -43,7 +43,7 @@ if($groupHandler->isStaff()) {
 
 		$classList = $synergeticClass->getStudents($code);
 
-		if (is_array($classList)) {
+		if (is_array($classList) && !empty($classList)) {
 			foreach($classList as $student) {
 
 				$email = '';
@@ -129,8 +129,9 @@ if($groupHandler->isStaff()) {
 			$this->setVar('student_list_block', '');
 		}
 	}
-	else
-		$this->setVar('student_list_block', '');
+	else {
+        $this->error(18);
+    }
 
 	$emailObj = new Email();
 	$email = $emailObj->formatEmailFromArray($_SESSION);
