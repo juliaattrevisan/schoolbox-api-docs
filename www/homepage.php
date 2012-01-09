@@ -63,15 +63,6 @@ if (is_array($categoryList)) {
     }
 }
 
-/*
-if ($code != '') {
-	$enroled = $groupHandler->involvedInSubject($category['code']);
-}
-else {
-	$enroled = $groupHandler->involvedInGroup($_SESSION['id'], $categoryID);
-}
-*/
-
 
 $this->setFile(TEMPLATE_content, 'homepage/template.html');
 $this->setTitle($category['name']);
@@ -80,6 +71,7 @@ $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 $this->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
 $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
+$this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 
 $codeCount = count(explode(',', $code));
 
@@ -178,24 +170,14 @@ if ($permission >= WRITE_ACCESS) {
 		$this->parse('homepage_component_tab_block', 'homepage_component_tab', true);
 	}
 
-	$this->setBlock('custom_head', 'colour_list', 'colour_list_block');
+    /* Colors (original)
+     */
+    $listColor = $homepageHandler->getColorList();
 
-	/* Widths
-	 */
-	$allWidths = $homepageHandler->getColumnWidths();
+    $this->setVar('COLOUR_ARRAY', 'original');
+    $this->setVar($listColor);
+    $this->parse('colour_list_block', 'colour_list', true);
 
-	$this->setVar(array(
-		'TEMPLATE_LEFT_COLUMN_WIDTH' => $allWidths['left_column_width'],
-		'TEMPLATE_RIGHT_COLUMN_WIDTH' => $allWidths['right_column_width'],
-	));
-
-	/* Colors (original)
-	 */
-	$listColor = $homepageHandler->getColorList();
-
-	$this->setVar('COLOUR_ARRAY', 'original');
-	$this->setVar($listColor);
-	$this->parse('colour_list_block', 'colour_list', true);
 
 	/* Colors (picker)
 	 */
@@ -237,7 +219,18 @@ else {
 	$this->setVar('edit_page_block', '');
 	$this->setVar('modify_layout_block', '');
 	$this->setVar('customise_page_block', '');
+    $this->setVar('colour_list_block','');
 }
+
+
+/* Widths
+ */
+$allWidths = $homepageHandler->getColumnWidths();
+
+$this->setVar(array(
+    'TEMPLATE_LEFT_COLUMN_WIDTH' => $allWidths['left_column_width'],
+    'TEMPLATE_RIGHT_COLUMN_WIDTH' => $allWidths['right_column_width'],
+));
 
 $colours = $homepageHandler->getColorList();
 $this->setVar($colours);
