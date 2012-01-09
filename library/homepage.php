@@ -20,13 +20,17 @@ class Homepage {
 			return $this->db->getOne($query);
 	}
 
-	function getComponentList($type = null)
+	function getComponentList($type = null, $categoryId = null)
 	{
+        if ( !is_numeric($categoryId) ) {
+            $categoryId = $this->cid;
+        }
+
 		$query = "SELECT t.homepageComponentCategoryID AS categoryID, t.name as categoryName, id, c.name, component, description, allowMultiple,
-                    (SELECT COUNT(*) FROM homepage_comp_location hcl WHERE hcl.component = c.id AND hcl.cid = {$this->cid}) as componentCount
+                    (SELECT COUNT(*) FROM homepage_comp_location hcl WHERE hcl.component = c.id AND hcl.cid = {$categoryId}) as componentCount
                     FROM homepage_comp c
                     JOIN homepageComponentCategory t ON t.homepageComponentCategoryID = homepageCategoryID
-                    LEFT JOIN homepage_comp_location l ON l.component = c.id AND cid = {$this->cid}
+                    LEFT JOIN homepage_comp_location l ON l.component = c.id AND cid = {$categoryId}
 
                   WHERE ( invisible = 'false' OR l.component IS NOT NULL )";
 
@@ -39,6 +43,36 @@ class Homepage {
 
 		return $this->db->getAll($query);
 	}
+
+    public function getSimpleComponentList ($categoryId = null) {
+        if ( !is_numeric($categoryId) ) {
+            $categoryId = $this->cid;
+        }
+
+        $query = "
+            SELECT `homepageComponentLocationID`, `cid`, `position`, `column`, `component`, `config`
+            FROM homepage_comp_location
+            WHERE cid = $categoryId
+        ";
+
+        $componentList = $this->db->getAll($query);
+
+        return $componentList;
+    }
+
+    public function setComponentList ($componentList, $categoryId = null) {
+        if ( !is_numeric($categoryId) ) {
+            $categoryId = $this->cid;
+        }
+
+        $this->deleteComponentPositions($categoryId);
+
+        if ( is_array($componentList) ) {
+            foreach ( $componentList as $component ) {
+                $this->db->insert('homepage_comp_location', $component);
+            }
+        }
+    }
 
 	/**
 	 * Gets the column widths for a particular homepage
@@ -170,9 +204,13 @@ class Homepage {
 
     }
 
-	function deleteComponentPositions()
+	function deleteComponentPositions($categoryId = null)
 	{
-		$this->db->delete('homepage_comp_location', 'cid', $this->cid);
+        if ( !is_numeric($categoryId) ) {
+            $categoryId = $this->cid;
+        }
+
+		$this->db->delete('homepage_comp_location', 'cid', $categoryId);
 	}
 
     function deleteComponent($component)
@@ -203,11 +241,15 @@ class Homepage {
 	}
 
 	// For updating available components
-	function updateComponents($submitListComp){
+	function updateComponents($submitListComp, $categoryId = null){
+        if ( !is_numeric($categoryId) ) {
+            $categoryId = $this->cid;
+        }
+
 		// Get components
 		$query = "SELECT `cid`, `position`, `column`, `component`, `config`
 			FROM homepage_comp_location
-			WHERE cid = '{$this->cid}'
+			WHERE cid = '{$categoryId}'
 			ORDER BY `position`";
 		$currentListComp = $this->db->getAll($query);
 		$submitListComp = is_array($submitListComp) ? $submitListComp : array();
@@ -232,7 +274,7 @@ class Homepage {
 				$query = "SELECT size, config FROM homepage_comp WHERE id = $comp";
 				$result = $this->db->getRow($query);
 				$newComp = array(
-					"cid" => $this->cid,
+					"cid" => $categoryId,
 					"position" => "",
 					"column" => $result['size'],
 					"component" => $comp,
@@ -308,8 +350,67 @@ class Homepage {
 
 	}
 
+    public function getConfig ($categoryId = null) {
+        if ( !is_numeric($categoryId) ) {
+            $categoryId = $this->cid;
+        }
+
+        $query = "
+            SELECT `cid`, `template`, `left_column_width`, `right_column_width`, `left_head_font`, `left_head_bg`,
+                `left_font`, `left_bg_primary`, `left_bg_secondary`, `left_link`, `left_hover`, `right_head_font`,
+                `right_head_bg`, `right_font`, `right_bg_primary`, `right_bg_secondary`, `right_link`, `right_hover`,
+                `top_head_font`, `top_head_bg`, `top_font`, `top_bg_primary`, `top_bg_secondary`, `top_link`, `top_hover`
+            FROM homepage_config
+            WHERE `cid` = $categoryId
+        ";
+
+        $config = $this->db->getRow($query);
+
+        return $config;
+    }
+
+    public function setConfig ($config, $categoryId = null) {
+        if ( !is_numeric($categoryId) ) {
+            $categoryId = $this->cid;
+        }
+
+        if ( $cleanConfig = $this->getConfig($categoryId) ) {
+            $this->db->update('homepage_config', 'cid', $config);
+        }
+        else {
+            $this->db->insert('homepage_config', $config);
+        }
+    }
+
+    public function deleteConfig ($categoryId = null) {
+        if ( !is_numeric($categoryId) ) {
+            $categoryId = $this->cid;
+        }
+
+        $this->db->delete('homepage_config', 'cid', $categoryId);
+    }
+
+    public function migrateHomepageConfiguration ($sourceCategoryId, $destinationCategoryId) {
+        /* Copy config from source to destination */
+        if ( $config = $this->getConfig($sourceCategoryId) ) {
+            $config['cid'] = $destinationCategoryId;
+
+            $this->setConfig($config, $destinationCategoryId);
+        }
+
+        /* Copy components from source to destination */
+        $componentList = $this->getSimpleComponentList($sourceCategoryId);
+
+        if ( is_array($componentList) ) {
+            foreach ( $componentList as &$component ) {
+                unset($component['homepageComponentLocationID'], $component['config']);
+
+                $component['cid'] = $destinationCategoryId;
+            }
+        }
+
+        $this->deleteComponentPositions($destinationCategoryId);
+
+        $this->setComponentList($componentList, $destinationCategoryId);
+    }
 }
-
-
-
-?>

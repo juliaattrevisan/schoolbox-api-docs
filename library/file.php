@@ -24,8 +24,6 @@ class File extends DeprecatedModel {
     }
 
     function getAllInCategory ($categoryID, $config = false) {
-
-        require_once dirname(__FILE__) . '/group.php';
         $groupHandler = new Group;
 
         $query = "SELECT f.*, u.firstname, u.lastname, u.title,
@@ -80,6 +78,34 @@ class File extends DeprecatedModel {
 
         return $this->db->getAll($query);
 
+    }
+
+    public function migrateCategory ($sourceCategoryId, $destinationCategoryId) {
+        $fileList = $this->getAllByField('category', $sourceCategoryId);
+
+        if ( is_array($fileList) ) {
+            foreach ( $fileList as &$file ) {
+                $sourceFilename = Cfg::get('file_dir') . '/' . $file['id'] . '.dat';
+
+                if ( is_readable($sourceFilename) ) {
+                    unset($file['id']);
+
+                    $file['category'] = $destinationCategoryId;
+
+                    $file['id'] = parent::create($file);
+
+                    $destinationFilename = Cfg::get('file_dir') . '/' . $file['id'] . '.dat';
+
+                    if ( is_writable( dirname($destinationFilename)) ) {
+                        copy($sourceFilename, $destinationFilename);
+                    }
+                    else {
+                        $this->db->delete($this->_table, $this->_index, $file['id']);
+                    }
+
+                }
+            }
+        }
     }
 
     function mergeLinks ($fileList, $linkList) {

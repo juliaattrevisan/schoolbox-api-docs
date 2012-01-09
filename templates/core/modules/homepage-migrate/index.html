@@ -1,0 +1,125 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/tree.css"/>
+<script type="text/javascript"
+        src="/min/index.php?f=javascript/jquery.ui.js,javascript/jquery.simplemodal.js,javascript/jquery.contextmenu.js,javascript/jquery.tree.js,javascript/jquery.scrollTo.js"></script>
+<script type="text/javascript">
+    $j(function () {
+        /* left tree navigation */
+        $j('#tree').tree({
+            type:'table',
+            node:'tr',
+            onOff:'dark',
+            sequencing:false,
+            dragDrop:false
+        });
+
+        /* Folder click event */
+        $j('#tree tr:not(.server)').live('click', function () {
+
+            /* select folder */
+            $j('#tree .selected').removeClass('selected');
+            $j(this).addClass('selected');
+
+            var relationID = $j(this).attr('id').substring(5);
+
+            $j('#sourceCategoryId').val(relationID);
+        });
+
+        /* triggered after a new branch is loaded */
+        $j('#tree').bind('loaded', function () {
+            var table = $j(this), scroller = $j('#category-window div.scroller');
+
+            /* fix left panel width */
+            var scrollerWidth = parseInt(scroller.width()) - 1;
+            if (table.height() > scroller.height())
+                scrollerWidth -= 16; // scroller width
+
+            if (table.width() < scrollerWidth)
+                table.width(scrollerWidth);
+            else {
+                var maxWidth = 0, width;
+                table.find('tr').each(function () {
+                    width = 0;
+                    $j(this).find('span').each(function () {
+                        width += $j(this).width();
+                    });
+                    width += 39; // cell padding, highlight border
+                    if (width > maxWidth)
+                        maxWidth = width;
+                });
+                if (maxWidth > scrollerWidth)
+                    table.width(maxWidth);
+            }
+        });
+
+        $j('#tree').triggerHandler('loaded');
+
+        /* resize left column on window resize */
+        $j(window).resize(function () {
+            $j('#tree').triggerHandler('loaded');
+        });
+
+        $j("div.loading").hide();
+
+        /* auto scroll to open branch */
+        $j("#category-window div.scroller").scrollTo($j("#node-{OPEN}"), 200);
+    });
+</script>
+<!-- END custom_head -->
+
+<h1>Homepage Migration</h1>
+
+<!-- BEGIN no_categories -->
+<p>You do not have write access to any categories.</p>
+<!-- END no_categories -->
+
+<!-- BEGIN homepage_migrate -->
+<form method="post" action="/modules/homepage-migrate">
+    <table class="standardForm">
+        <tr>
+            <td class="formLabelWidth"><h4>Source</h4></td>
+            <td>
+                <div id="category-window" style="height: 280px;">
+                    <div class="loading"></div>
+                    <table id="category-head">
+                        <thead>
+                        <th>Folders</th>
+                        </thead>
+                    </table>
+                    <div class="scroller">
+                        <table id="tree">
+                            <tbody>
+                            <tr id="node-0" class="server expanded loaded {FULL} {WRITE}">
+                                <td><span class="server label">Resources</span></td>
+                            </tr>
+                            <!-- BEGIN category_list -->
+                            <tr id="node-{CATEGORY_ID}" class="{CLASS}">
+                                <td><span class="elbow"></span><span class="label">{CATEGORY_NAME}</span></td>
+                            </tr>
+                            <!-- END category_list -->
+                            </tbody>
+                            <tfoot>
+                            <tr id="node-template">
+                                <td><span class="elbow"></span><span class="label"></span></td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <input type="hidden" id="sourceCategoryId" name="sourceCategoryId">
+            </td>
+            <td class="formLabelWidth"><h4>Destination</h4></td>
+            <td>
+                <ul>
+                    <!-- BEGIN destination_category -->
+                    <li><input type="checkbox" name="destinationCategoryList[]" value="{DESTINATION_HOMEPAGE_ID}"> {DESTINATION_HOMEPAGE_NAME}</li>
+                    <!-- END destination_category -->
+                </ul>
+            </td>
+        </tr>
+    </table>
+
+    <input type="submit" name="submit" value="Migrate" class="submit-btn-plain"/>
+</form>
+<!-- END homepage_migrate -->

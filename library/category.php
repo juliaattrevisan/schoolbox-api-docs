@@ -70,6 +70,20 @@ class Category extends DeprecatedModel {
 		return $this->db->getAll($query);
 	}
 
+    public function getSimpleCategoryList ($categoryId) {
+        $query = "SELECT id, name, parent, cf.template, GROUP_CONCAT(co.code) code
+      				  FROM category ca
+      				  LEFT JOIN categoryCode co ON co.categoryID = ca.id
+      				  LEFT JOIN homepage_config cf ON cf.cid = ca.id
+      				  WHERE parent = $categoryId
+      				  GROUP BY ca.id
+      	";
+
+        $categoryList = $this->db->getAll($query);
+
+        return $categoryList;
+    }
+
 	function hasChildren($categoryID) {
 		$query = "SELECT c.id as children
 				  FROM category c
@@ -184,6 +198,63 @@ class Category extends DeprecatedModel {
 		return $this->db->getAll($query);
 	}
 
+    /**
+     * @param $sourceCategoryId
+     * @param $destinationCategoryId
+     */
+    public function migrateCategory ($sourceCategoryId, $destinationCategoryId) {
+        $homepageHandler = new Homepage($sourceCategoryId);
+        $fileHandler = new File;
+        $linkHandler = new Link;
+        $textBoxHandler = new TextBox;
+
+        $this->migratePermissionList($sourceCategoryId, $destinationCategoryId);
+        $homepageHandler->migrateHomepageConfiguration($sourceCategoryId, $destinationCategoryId);
+        $fileHandler->migrateCategory($sourceCategoryId, $destinationCategoryId);
+        $linkHandler->migrateCategory($sourceCategoryId, $destinationCategoryId);
+        $textBoxHandler->migrateCategory($sourceCategoryId, $destinationCategoryId);
+
+        if ( $sourceChildList = $this->getSimpleCategoryList($sourceCategoryId) ) {
+            foreach ( $sourceChildList as $sourceChild ) {
+
+                /* Create destination child if it doesn't exist */
+                if ( !$destinationChild = $this->getByNameAndParent($sourceChild['name'], $destinationCategoryId) ) {
+                    $destinationChild = $sourceChild;
+
+                    unset($destinationChild['id'], $destinationChild['code']);
+
+                    $destinationChild['parent'] = $destinationCategoryId;
+
+                    $destinationChild['id'] = $this->create($destinationChild);
+                }
+
+                $this->migrateCategory($sourceChild['id'], $destinationChild['id']);
+
+            }
+        }
+    }
+
+    /**
+     * @param $sourceCategoryId
+     * @param $destinationCategoryId
+     */
+    public function migratePermissionList ($sourceCategoryId, $destinationCategoryId) {
+        $query = "
+            SELECT cid, gid, type
+            FROM perms
+            WHERE cid = $sourceCategoryId
+        ";
+
+        if ( $permissionList = $this->db->getAll($query) ) {
+            $this->db->delete('perms', 'cid', $destinationCategoryId);
+
+            foreach ( $permissionList as $permission ) {
+                $permission['cid'] = $destinationCategoryId;
+
+                $this->db->insert('perms', $permission);
+            }
+        }
+    }
 
 	function getCategoryTree($parent = 0, $indent = '') {
 
@@ -584,11 +655,27 @@ class Category extends DeprecatedModel {
 		return $this->db->getAll($query);
 	}
 
-        function breadcrumb($id) {
-            for(; $id != 0; $category = $this->getByID($id), $id = $category['parent'], $breadcrumb[] = $category);
+    function breadcrumb($id) {
+        for(; $id != 0; $category = $this->getByID($id), $id = $category['parent'], $breadcrumb[] = $category);
 
-            return array_reverse($breadcrumb);
-        }
+        return array_reverse($breadcrumb);
+    }
+
+    public function getByNameAndParent ($name, $parentId) {
+        $query = "SELECT id, name, parent, cf.template, GROUP_CONCAT(co.code) code
+      				  FROM category ca
+      				  LEFT JOIN categoryCode co ON co.categoryID = ca.id
+      				  LEFT JOIN homepage_config cf ON cf.cid = ca.id
+      				  WHERE parent = $parentId
+      				    AND name = '$name'
+      				  GROUP BY ca.id
+      				  LIMIT 1
+      	";
+
+        $category = $this->db->getRow($query);
+
+        return is_numeric($category['id']) ? $category : false;
+    }
 }
 
 ?>
