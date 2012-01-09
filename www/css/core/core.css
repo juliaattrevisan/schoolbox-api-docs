@@ -312,8 +312,13 @@ th.sortable {
 th.sortable.descending { background: url('/images/core/tablesorter/sort-descending.gif') no-repeat left 10.5px; }
 th.sortable.ascending { background: url('/images/core/tablesorter/sort-ascending.gif') no-repeat left 10.5px; }
 
-td.on-leave span{background:#e8f5ff;color: #777;
-text-shadow: 0 1px 0 white; padding:2px 4px; 	border: 1px solid #d9effe;}
+tr.leave-pending span{
+    background: #e8f5ff;
+    color: #777;
+    text-shadow: 0 1px 0 white;
+    padding:2px 4px;
+    border: 1px solid #d9effe;
+}
 
 /*--------------------------------------------------------------
  Structural Styles

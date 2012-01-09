@@ -74,6 +74,9 @@ if(is_numeric($this->arg[0])) {
         /* Output group list */
         $this->dropDown('system_group', $userHandler->getGroupList(), $user['group_id'], TEMPLATE_content, array('id'=>'GROUP_ID','name'=>'SYSTEM_GROUP_NAME'));
 
+        /* Output group list */
+        $this->dropDown('house', HouseMapper::getInstance()->findAll(), $user['house'], TEMPLATE_content, array('id'=>'HOUSE_ID','house'=>'HOUSE_NAME'));
+
         /* Output campus list */
 		$this->setBlock(TEMPLATE_content, 'campus','campus_block');
 

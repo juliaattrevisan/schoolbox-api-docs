@@ -12,6 +12,22 @@ class Calendar extends DeprecatedModel {
 		parent::DeprecatedModel();
 	}
 
+    public function getAttendees ($eventId) {
+        $event = $this->getByID($eventId);
+
+        $query = "
+            SELECT u.id, u.username, u.firstname, u.lastname,
+                ea.intention
+            FROM event_attendance ea
+            LEFT JOIN user u ON u.id = ea.user_id
+            WHERE ea.event_id = {$eventId}
+        ";
+
+        return $this->db->getAll($query);
+    }
+
+    //public function addA
+
 	function displayColour($id) {
 		if(!is_array($this->colourSet) ) {
 			//build cache of colours on first call
@@ -24,7 +40,6 @@ class Calendar extends DeprecatedModel {
 		return $this->colourSet[$id];
 
 	}
-
 
 	function getPerm($eventID) {
 
@@ -108,7 +123,7 @@ class Calendar extends DeprecatedModel {
 	}
 
 	function getByID($eventID) {
-		$query = "SELECT id, owner, access, sid, type, note, date, location, detail,
+		$query = "SELECT id, owner, access, sid, type, note, date, location, attendance, detail,
 						DATE_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') startTime,
 						DATE_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') endTime
 				  FROM " . $this->_table . "
@@ -490,7 +505,6 @@ class Calendar extends DeprecatedModel {
 		$this->db->delete('eventGroup', 'eventID', $eventID);
 		$this->db->delete('eventCampus', 'eventID', $eventID);
 	}
-
 
 	function create($event) {
 

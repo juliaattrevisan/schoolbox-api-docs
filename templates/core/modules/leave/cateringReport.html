@@ -1,0 +1,97 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.tablesorter.min.js"></script>
+<script type="text/javascript">
+    $j(function() {
+        $j('#reportDate').datepicker({
+            dateFormat: 'dd/mm/yy',
+            showOn: 'both',
+            buttonImage: '/images/core/calendar/calendar-click.png',
+            buttonImageOnly: true,
+            constrainInput: false,
+            onClose: function (string) {
+                var input = $j(this);
+
+                $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                    input.val(data.time);
+                })
+            }
+        });
+
+        $j('#reportFilter').submit( function (event) {
+            event.preventDefault();
+
+            var form = $j(this);
+
+            var date = $j('#reportDate').val().replace(/\//g, '-');
+
+            window.location = location.protocol+'//'+ location.host + '/modules/leave/report/catering/' + date;
+        } );
+
+        $j('#reportFilterSubmit').click( function () {
+            $j('#reportFilter').submit();
+        } );
+    });
+</script>
+<!-- END custom_head -->
+
+<h1>Catering Report</h1>
+<span class="header_option">
+    <a class="btn go-back" href="/modules/leave/house/{HOUSE_ID}"><span></span>Return to {HOUSE_NAME}</a>
+</span>
+<div class="indent">
+    <!-- BEGIN no_houses -->
+    No houses found.
+    <!-- END no_houses -->
+    <!-- BEGIN house_list -->
+    <h2>Report</h2>
+    <span class="header_option in-h2">
+        <a href="/modules/leave/export/{HOUSE_ID}" class="btn modify"><span></span>Export History</a>
+        <form id="reportFilter">
+            <a id="reportFilterSubmit" href="javascript:void(0);" class="btn search"><span></span>Search</a>
+            <input id="reportDate" type="text" value="{REPORT_DATE}">
+        </form>
+    </span>
+    <table id="requestList" class="ruler">
+        <thead>
+            <tr>
+                <th></th>
+                <th colspan="3" class="center">Absent</th>
+                <th colspan="3" class="center">Present</th>
+            </tr>
+            <tr>
+                <th>House</th>
+                <th>Breakfast</th>
+                <th>Lunch</th>
+                <th>Dinner</th>
+                <th>Breakfast</th>
+                <th>Lunch</th>
+                <th>Dinner</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- BEGIN house -->
+            <tr class="{CLASS}">
+                <td><a href="/modules/leave/house/{HOUSE_ID}">{HOUSE_NAME}</a></td>
+                <td>{ABSENT_MORNING}</td>
+                <td>{ABSENT_DAY}</td>
+                <td>{ABSENT_NIGHT}</td>
+                <td>{PRESENT_MORNING}</td>
+                <td>{PRESENT_DAY}</td>
+                <td>{PRESENT_NIGHT}</td>
+            </tr>
+            <!-- END house -->
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>Total</td>
+                <td>{ABSENT_MORNING_TOTAL}</td>
+                <td>{ABSENT_DAY_TOTAL}</td>
+                <td>{ABSENT_NIGHT_TOTAL}</td>
+                <td>{PRESENT_MORNING_TOTAL}</td>
+                <td>{PRESENT_DAY_TOTAL}</td>
+                <td>{PRESENT_NIGHT_TOTAL}</td>
+            </tr>
+        </tfoot>
+    </table>
+    <!-- END house_list -->
+</div>

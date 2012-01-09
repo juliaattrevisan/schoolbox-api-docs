@@ -1,0 +1,38 @@
+<h1>Attendance for {EVENT_NAME}</h1>
+<span class="header_option">
+    <a class="btn go-back" href="/"><span></span>Back to Event</a>
+</span>
+<div class="indent">
+    <!-- BEGIN no_attendance -->
+    {EVENT_NAME} has no attendees.
+    <!-- END no_attendance -->
+
+    <!-- BEGIN attendance_list -->
+
+    <!-- BEGIN attendance_response_list -->
+    <h2>Attendee Responses</h2>
+    <span class="header_option in-h2"><a href="/attendance/export/{EVENT_ID}" class="btn download"><span></span>Export Attendees</a></span>
+    <table id="previousRequestList" class="ruler">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Year</th>
+                <th>Status</th>
+				<th class="center">Remove</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- BEGIN attendance_response -->
+            <tr class="{CLASS}">
+                <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
+                <td>{USER_YEAR}</td>
+                <td>{ATTENDANCE_STATUS}</td>
+                <td class="center"><a href="/">Remove</a></td>
+            </tr>
+            <!-- END attendance_response -->
+        </tbody>
+    </table>
+    <!-- END attendance_response_list -->
+
+    <!-- END attendance_list -->
+</div>

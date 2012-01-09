@@ -71,6 +71,10 @@
 
 <h1><span>{FUNCTION} Event</span></h1>
 
+<span class="header_option">
+    <a class="btn go-back" href="/calendar"><span></span>Back to Calendar</a>
+</span>
+
 <form  method="post" action="/calendar/modify.php" id="eventForm">
 	<table class="standardForm">
 		<tr>
@@ -174,10 +178,14 @@
 				
 				<!-- END group_list --></td>
 		</tr>
-		<tr>
-			<td><h4>Details</h4></td>
-			<td ><textarea name="detail" cols="50" rows="3">{DETAIL}</textarea></td>
-		</tr>
+        <tr>
+            <td><h4>Attendance</h4></td>
+            <td><input name="attendance" type="checkbox" value="1" {ATTENDANCE}></td>
+        </tr>
+        <tr>
+            <td><h4>Details</h4></td>
+            <td><textarea name="detail" cols="50" rows="3">{DETAIL}</textarea></td>
+        </tr>
 	</table>
 	<input type="hidden" name="id" value="{EVENT_ID}" />
 	<input type="hidden" name="return" value="{RETURN_TO}" />

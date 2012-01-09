@@ -862,7 +862,7 @@ class SitePage extends Page
 	{
 		$this->setBlock($template, $handle, $handle . '_block');
 		$selected = is_array($selected) ? $selected : array($selected);
-		if (is_array($data)) {
+		if (is_array($data) || $data instanceof Traversable) {
 			foreach ($data as $row) {
 				foreach ($row as $key => $value) {
 					$mapping[$key] ? $key = $mapping[$key] : '';

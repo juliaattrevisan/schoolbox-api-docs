@@ -29,6 +29,16 @@ $j(function() {
 		return false;
 	});
 
+    $j('#modify-user').submit( function (event) {
+        event.preventDefault();
+
+        if ( !$j('#modify-user-button').hasClass('disabled') ){
+      			window.open('/adminv2/modify-user/' + $j('#user-to-mod').val(), '_self');
+      		}
+
+      		return false;
+    } );
+
 	$j('h3 span').qtip({
 		content: 'If you are wanting to deal with large lists at once, use this section.',
 		show: 'mouseover',

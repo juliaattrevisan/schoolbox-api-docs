@@ -210,12 +210,12 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 	 */
 	private function getStudentGroupId($propertyList) {
 		return Database::getInstance()->query("
-				SELECT id
-				FROM groups
-				WHERE group_type = '".Group::STUDENT_GROUP_TYPE."'
-			    ORDER BY name LIKE '%{$propertyList['AuthGroup']}%' DESC
-				LIMIT 1
-			")->fetchColumn(0);
+            SELECT id
+            FROM groups
+            WHERE group_type = '".Group::STUDENT_GROUP_TYPE."'
+            ORDER BY name LIKE '%{$propertyList['AuthGroup']}%' DESC
+            LIMIT 1
+        ")->fetchColumn(0);
 	}
 
     /**
@@ -226,12 +226,12 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
    	 */
    	private function getTeacherGroupId($propertyList) {
    		return Database::getInstance()->query("
-   				SELECT id
-   				FROM groups
-   				WHERE group_type = '".Group::STAFF_GROUP_TYPE."'
-                ORDER BY name LIKE '%{$propertyList['AuthGroup']}%' DESC
-   				LIMIT 1
-   			")->fetchColumn(0);
+            SELECT id
+            FROM groups
+            WHERE group_type = '".Group::STAFF_GROUP_TYPE."'
+            ORDER BY name LIKE '%{$propertyList['AuthGroup']}%' DESC
+            LIMIT 1
+        ")->fetchColumn(0);
    	}
 
     /**
@@ -242,11 +242,11 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
    	 */
    	private function getParentGroupId($propertyList) {
    		return Database::getInstance()->query("
-   				SELECT id
-   				FROM groups
-   				WHERE group_type = '".Group::PARENT_GROUP_TYPE."'
-   				LIMIT 1
-   			")->fetchColumn(0);
+            SELECT id
+            FROM groups
+            WHERE group_type = '".Group::PARENT_GROUP_TYPE."'
+            LIMIT 1
+        ")->fetchColumn(0);
    	}
 
 	/**

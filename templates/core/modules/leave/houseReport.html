@@ -8,16 +8,15 @@
             cssDesc: 'descending',
             dateFormat: 'uk',
             headers: {
+                0: { sorter: false},
+                1: { sorter: false},
                 2: { sorter: false},
-                3: {sorter: false},
-                8: {sorter: false},
-                9: {sorter: false},
-                10: {sorter: false},
-                11: {sorter: false},
-                12: {sorter: false},
-                13: {sorter: false},
-                14: {sorter: false},
-                15: {sorter: false}
+                3: { sorter: false},
+                4: { sorter: false},
+                5: { sorter: false},
+                6: { sorter: false},
+                7: { sorter: false},
+                19: { sorter: false}
             }
         });
 
@@ -27,11 +26,44 @@
             requestList.find('tbody tr').removeClass('dark');
             requestList.find('tbody tr:even').addClass('dark');
         } );
+
+        $j('#reportDate').datepicker({
+            dateFormat: 'dd/mm/yy',
+            showOn: 'both',
+            buttonImage: '/images/core/calendar/calendar-click.png',
+            buttonImageOnly: true,
+            constrainInput: false,
+            onClose: function (string) {
+                var input = $j(this);
+
+                $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+                    input.val(data.time);
+                })
+            }
+        });
+
+        $j('#reportFilter').submit( function (event) {
+            event.preventDefault();
+
+            var form = $j(this);
+
+            var houseId = $j('#reportHouse').val();
+            var date = $j('#reportDate').val().replace(/\//g, '-');
+
+            window.location = location.protocol+'//'+ location.host + '/modules/leave/report/house/' + houseId + '/' + date;
+        } );
+
+        $j('#reportFilterSubmit').click( function () {
+            $j('#reportFilter').submit();
+        } );
     });
 </script>
 <!-- END custom_head -->
 
 <h1>Leave Report for {HOUSE_NAME}</h1>
+<span class="header_option">
+    <a class="btn go-back" href="/modules/leave/house/{HOUSE_ID}"><span></span>Return to {HOUSE_NAME}</a>
+</span>
 <div class="indent">
     <!-- BEGIN no_requests -->
     {HOUSE_NAME} has no pending or previous requests.
@@ -40,28 +72,41 @@
     <h2>Leave Report</h2>
     <span class="header_option in-h2">
         <a href="/modules/leave/export/{HOUSE_ID}" class="btn modify"><span></span>Export History</a>
+        <form id="reportFilter">
+            <a id="reportFilterSubmit" href="javascript:void(0);" class="btn search"><span></span>Search</a>
+            <select id="reportHouse">
+                <!-- BEGIN house -->
+                <option value="{HOUSE_ID}" {HOUSE_SELECTED}>{HOUSE_NAME}</option>
+                <!-- END house -->
+            </select>
+            <input id="reportDate" type="text" value="{REPORT_DATE}">
+        </form>
     </span>
     <table id="requestList" class="ruler">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Year</th>
+                <th></th>
+                <th></th>
                 <th colspan="3" class="center">{REPORT_START_DATE}</th>
                 <th colspan="3" class="center">{REPORT_FINISH_DATE}</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <th>Year</th>
+                <th>Morning</th>
+                <th>Day</th>
+                <th>Night</th>
+                <th>Morning</th>
+                <th>Day</th>
+                <th>Night</th>
                 <th>Host</th>
                 <th>Approval Date</th>
                 <th>Approved By</th>
                 <th class="center">View</th>
-            </tr>
-            <tr>
-                <th colspan="2"></th>
-                <th>Morning</th>
-                <th>Day</th>
-                <th>Night</th>
-                <th>Morning</th>
-                <th>Day</th>
-                <th>Night</th>
-                <th colspan="4"></th>
             </tr>
         </thead>
         <tbody>

@@ -109,11 +109,11 @@ abstract class Mapper {
 
         $statement->execute();
 
-        $rowset = $statement->fetchAll();
+        $row = $statement->fetch();
 
-        $collection = $this->hydrateList($rowset);
+        $model = $this->hydrate($row);
 
-        return $collection[0];
+        return $model;
     }
 
     /**

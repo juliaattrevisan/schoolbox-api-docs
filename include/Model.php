@@ -9,7 +9,7 @@
  * 
  */
  
-abstract class Model {
+abstract class Model implements ArrayAccess {
     /**
          * Defines the state of the model
          *
@@ -57,6 +57,29 @@ abstract class Model {
         }
 
         return $this->state;
+    }
+
+
+    /* ArrayAccess interface methods */
+    public function offsetSet ($offset, $value) {
+        $this->$offset = $value;
+    }
+
+    public function offsetGet ($offset) {
+        if ( isset($this->$offset) ) {
+            return $this->$offset;
+        }
+        else {
+            return null;
+        }
+    }
+
+    public function offsetExists ($offset) {
+        return isset($this->$offset);
+    }
+
+    public function offsetUnset ($offset) {
+        unset($this->$offset);
     }
 
     public function toArray () {

@@ -264,7 +264,7 @@ abstract class Synchronise_External_Donvale_Abstract {
 	/**
 	 * Set user handler instance
 	 *
-	 * @param  $val
+	 * @param User $val
 	 * @return void
 	 */
 	private function setUserHandler($val) {
@@ -274,7 +274,7 @@ abstract class Synchronise_External_Donvale_Abstract {
 	/**
 	 * Get user handler instance
 	 *
-	 * @return
+	 * @return User
 	 */
 	protected function getUserHandler() {
 		return $this->userHandler;

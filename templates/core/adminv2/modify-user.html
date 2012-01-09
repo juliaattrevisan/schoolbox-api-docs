@@ -355,6 +355,13 @@ $j(function() {
 						<!-- END system_group -->
 					</select>
 				</label>
+                <label for="house">House</label>
+                <select id="house" name="house">
+                    <option value="">Not Set</option>
+                    <!-- BEGIN house -->
+                    <option value="{HOUSE_ID}" {HOUSE_ID_SELECTED}>{HOUSE_NAME}</option>
+                    <!-- END house -->
+                </select>
 				<label for="e-portfolio">E-Portfolio
 					<input type="checkbox" name="eportfolio" value="1" {EPORTFOLIO_CHECKED} />
 				</label>

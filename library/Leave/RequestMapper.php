@@ -158,7 +158,16 @@ class Leave_RequestMapper extends Mapper {
         return $requestCollection;
     }
 
-    public function findUserListByHouseId ($houseId) {
+    /**
+     * Returns all users in a house and any requests that intersect a date range defined by $start and $finish.
+     * Returns users regardless of whether they have any requests.
+     *
+     * @param Integer $houseId
+     * @param String $start
+     * @param String $finish
+     * @return Collection
+     */
+    public function getHouseReport ($houseId, $start, $finish) {
         $statement = $this->database->prepare("
             SELECT {$this->getColumnString('lr')},
                 {$this->getUserMapper()->getColumnString('u')},
@@ -166,13 +175,17 @@ class Leave_RequestMapper extends Mapper {
             FROM `user` u
             LEFT JOIN groups g ON g.id = u.group_id
             LEFT JOIN `{$this->table}` lr ON lr.user_id = u.id
+                AND lr.start < :finish
+                AND lr.finish > :start
             LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
             WHERE u.house = :houseId
               /*AND g.type = 'student'*/
         ");
 
         $statement->execute( array(
-            'houseId' => $houseId
+            ':houseId' => $houseId,
+            ':start' => $start,
+            ':finish' => $finish,
         ) );
 
         $requestList = $statement->fetchAll();
@@ -180,6 +193,56 @@ class Leave_RequestMapper extends Mapper {
         $requestCollection = $this->hydrateList($requestList);
 
         return $requestCollection;
+    }
+
+    public function getCateringReport ($date) {
+
+        if ( !is_a($date, 'Alaress_Date_Format') ) {
+            $date = new Alaress_Date_Format($date, 'd/m/y');
+        }
+
+        $morningStart = new Alaress_Date_Format( $date->getDatabaseDate() , 'y-m-d' );
+
+        $morningFinish = new Alaress_Date_Format( $date->getDatabaseDate() , 'y-m-d' );
+        $morningFinish->addDays(1/3);
+
+        $dayFinish = new Alaress_Date_Format( $date->getDatabaseDate() , 'y-m-d' );
+        $dayFinish->addDays(2/3);
+
+        $nightFinish = new Alaress_Date_Format( $date->getDatabaseDate() , 'y-m-d' );
+        $nightFinish->addDays(3/3);
+
+        $statement = $this->database->prepare("
+            SELECT h.id, h.house,
+            	COUNT( lr.id AND lr.start < DATE(:morningFinish) AND lr.finish > DATE(:morningStart) ) AS 'absent_morning',
+            	COUNT( lr.id AND lr.start < DATE(:dayFinish) AND lr.finish > DATE(:dayStart) ) AS 'absent_day',
+            	COUNT( lr.id AND lr.start < DATE(:nightFinish) AND lr.finish > DATE(:nightStart) ) AS 'absent_night',
+            	( COUNT(*) - COUNT( lr.id AND lr.start < DATE(:morningFinish) AND lr.finish > DATE(:morningStart) ) ) AS 'present_morning',
+            	( COUNT(*) - COUNT( lr.id AND lr.start < DATE(:dayFinish) AND lr.finish > DATE(:dayStart) ) ) AS 'present_day',
+            	( COUNT(*) - COUNT( lr.id AND lr.start < DATE(:nightFinish) AND lr.finish > DATE(:nightStart) ) ) AS 'present_night'
+            FROM `house` h
+            LEFT JOIN `user` u ON u.house = h.id
+            LEFT JOIN groups g ON g.id = u.group_id
+            LEFT JOIN `leave_request` lr ON lr.user_id = u.id
+            	AND lr.start < :date
+            	AND lr.finish > :date
+              /*AND g.type = 'student'*/
+            GROUP BY h.id;
+        ");
+
+        $statement->execute( array(
+            ':date' => $date->getDatabaseDate(),
+            ':morningStart' => $morningStart->getDatabase(),
+            ':morningFinish' => $morningFinish->getDatabase(),
+            ':dayStart' => $morningFinish->getDatabase(),
+            ':dayFinish' => $dayFinish->getDatabase(),
+            ':nightStart' => $dayFinish->getDatabase(),
+            ':nightFinish' => $nightFinish->getDatabase(),
+        ) );
+
+        $houseList = $statement->fetchAll();
+
+        return $houseList;
     }
 
     public function findById ($id) {

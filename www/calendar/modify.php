@@ -23,6 +23,7 @@ if (isset($_POST['date'])) {
 				   'startTime'	=> (($_POST['period'] == 'pm' && $_POST['hour'] != 12 ? 12 : 0) + $_POST['hour']) . ":" . $_POST['minute'] . ":00",
 				   'endTime'	=> (($_POST['toperiod'] == 'pm' && $_POST['tohour'] != 12 ? 12 : 0) + $_POST['tohour']) . ":" . $_POST['tominute'] . ":00",
                    'location'   => $_POST['location'],
+                   'attendance' => $_POST['attendance'],
                    'detail'     => $_POST['detail']
 				  );
 
@@ -107,6 +108,7 @@ if (isset($_POST['date'])) {
 					'GROUP'			=> '',
 					'DESCRIPTION' 	=> $event['note'],
                     'LOCATION'      => $event['location'],
+                    'ATTENDANCE'    => $event['attendance'] ? 'checked="checked"' : '',
                     'DETAIL'        => $event['detail'],
 					'RETURN_TO'		=> Scrub::text($_GET['returnTo']),
 					);
@@ -169,6 +171,7 @@ if (isset($_POST['date'])) {
 					'GROUP'			=> '',
                     'DESCRIPTION'	=> '',
                     'LOCATION'    	=> '',
+                    'ATTENDANCE'    => '',
                     'DETAIL'	    => '',
 					'RETURN_TO'		=> Scrub::text($_GET['returnTo'])
 

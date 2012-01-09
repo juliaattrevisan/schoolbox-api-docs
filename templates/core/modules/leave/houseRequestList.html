@@ -32,6 +32,10 @@
 <!-- END custom_head -->
 
 <h1>Boarder Leave Requests for {HOUSE_NAME}</h1>
+<span class="header_option">
+    <a class="btn report" href="/modules/leave/report/catering"><span></span>Catering Report</a>
+    <a class="btn report" href="/modules/leave/report/house"><span></span>House Report</a>
+</span>
 <div class="indent">
     <!-- BEGIN no_requests -->
     {HOUSE_NAME} has no pending or previous requests.
@@ -76,7 +80,7 @@
     <!-- END pending_request_list -->
     <!-- BEGIN previous_request_list -->
     <h2>Request History</h2>
-    <span class="header_option in-h2"><a href="/modules/leave/export/{HOUSE_ID}" class="btn modify"><span></span>Export History</a></span>
+    <span class="header_option in-h2"><a href="/modules/leave/export/{HOUSE_ID}" class="btn download"><span></span>Export History</a></span>
     <table id="previousRequestList" class="ruler">
         <thead>
             <tr>
