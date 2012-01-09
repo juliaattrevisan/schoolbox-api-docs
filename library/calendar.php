@@ -286,7 +286,7 @@ class Calendar extends DeprecatedModel {
                             TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTime,
                             TIME_TO_SEC(startTime) as startTimestamp,
                             TIME_TO_SEC(endTime) as endTimestamp,
-                            type, note, access, sid, location, detail,
+                            date, type, note, access, sid, location, detail,
                             user.id as uid, title, firstname, lastname,
                             eventType, eventColour,
                             MATCH (`note`, `detail`, `location`) AGAINST ('$keyword') AS `score`
