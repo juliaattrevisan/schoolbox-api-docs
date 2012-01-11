@@ -172,6 +172,7 @@ else {
     }
     else {
         $this->setVar('homepage_migrate_block', '');
-    }
 
+        $this->parse('no_categories_block', 'no_categories');
+    }
 }
