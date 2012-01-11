@@ -676,7 +676,7 @@ class SitePage extends Page
 				$user = $this->db->getRow($query);
 				$this->setVar("MSTUDENT_ID", $child['id']);
 				$this->setVar("MSTUDENT_NAME", $userHandler->formatName($user, '{firstname}'));
-				$this->setVar("MSTUDENT_YEAR", $user['year'] == 0 ? 'K' : $user['year']);
+				$this->setVar("MSTUDENT_YEAR", $user['year']);
 
 				$this->parse("my_students", "mstudent_block", true);
 			}
