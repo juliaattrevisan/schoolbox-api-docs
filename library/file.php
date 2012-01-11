@@ -87,12 +87,13 @@ class File extends DeprecatedModel {
             foreach ( $fileList as &$file ) {
                 $sourceFilename = Cfg::get('file_dir') . '/' . $file['id'] . '.dat';
 
+                unset($file['id']);
+
+                $file['category'] = $destinationCategoryId;
+
+                $file['id'] = parent::create($file);
+                
                 if ( is_readable($sourceFilename) ) {
-                    unset($file['id']);
-
-                    $file['category'] = $destinationCategoryId;
-
-                    $file['id'] = parent::create($file);
 
                     $destinationFilename = Cfg::get('file_dir') . '/' . $file['id'] . '.dat';
 

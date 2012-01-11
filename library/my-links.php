@@ -23,7 +23,7 @@ class MyLinks extends DeprecatedModel {
 		$link = $this->db->getRow($query);
 
 		if ($link) {
-			require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio-link.php');
+			require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/Eportfolio/Link.php');
 
 			$ePortfolioLinkHandler = new Eportfolio_Link();
 
