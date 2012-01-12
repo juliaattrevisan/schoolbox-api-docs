@@ -365,7 +365,7 @@ class Category extends DeprecatedModel {
 
         /* When updating ignore the item your updating */
         if($updateID)
-            $query .= " id != $updateID AND ";
+            $query .= " categoryID != $updateID AND ";
 
 		/* Re-implode the filtered components into a query-friendly format
 		 */
