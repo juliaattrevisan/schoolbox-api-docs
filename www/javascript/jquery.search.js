@@ -69,12 +69,12 @@ search = {
 	 * Add pagination events to all the <a> links
 	 */
 	paginate: function(){
-		$j('div.pagination > a').live('click', function(event) {
+		$j('div.pagination > a').bind('click', function(event) {
 			event.preventDefault();
 
 			/* Set the page number
 			 */
-			search.setPageNumber($j(this).text());
+            search.setPageNumber( $j(this).attr('title') );
 
 			/* Update hash configuration
 			 */

@@ -30,7 +30,7 @@ $j(function() {
 	$j('#type a[class!=disabled]').click(function(event) {
 		event.preventDefault();
 
-		search.runOnce(keyword, $j(this).attr('title'), $j(this), pageNumber);
+		search.runOnce(keyword, $j(this).attr('title'), $j(this), 1);
 	});
 });
 </script>
