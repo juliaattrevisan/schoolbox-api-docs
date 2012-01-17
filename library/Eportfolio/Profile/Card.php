@@ -27,7 +27,7 @@ class Eportfolio_Profile_Card extends Eportfolio_Profile_Abstract {
 
         $user = $userHandler->getByID($this->getUserId());
 
-        if($groupHandler->isStudent() ) {
+        if($groupHandler->isStudent($this->getUserId()) ) {
 
             $this->getPage()->setVar('CAMPUS', $user['campusName']);
             $this->getPage()->setVar('YEAR', $user['year']);
