@@ -545,11 +545,14 @@ class Group extends DeprecatedModel {
 
                 $externalUser = new External_User;
 	            $externalSubjectList = $externalUser->getSubjectList($user['synergy_id'], $user['uid']);
-                foreach ($externalSubjectList as $subject) {
-                    //convert code to id and get name
-                    $query = "SELECT name, id, cc.code FROM category JOIN categoryCode cc ON id = categoryID WHERE cc.code = '" . $subject['code'] . "'";
-                    if (is_array($catTmp = $this->db->getRow($query)))
-                        $catList[] = $catTmp;
+
+                if ( is_array($externalSubjectList) ) {
+                    foreach ($externalSubjectList as $subject) {
+                        //convert code to id and get name
+                        $query = "SELECT name, id, cc.code FROM category JOIN categoryCode cc ON id = categoryID WHERE cc.code = '" . $subject['code'] . "'";
+                        if (is_array($catTmp = $this->db->getRow($query)))
+                            $catList[] = $catTmp;
+                    }
                 }
             }
         }
