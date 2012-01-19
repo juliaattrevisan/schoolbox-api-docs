@@ -8,9 +8,9 @@ if ( !filter_var($remoteUrl, FILTER_VALIDATE_URL) ) {
     $this->error(2);
 }
 
-$secret = 'VRMXWvcFLUNPW298';
-$time = 1323305767;
-$externalUserId = 24249;
+$secret = Config::get('remote_secret');
+$time = time();
+$externalUserId = $_SESSION['sid'];
 
 $key = sha1($secret . $time . $externalUserId);
 
