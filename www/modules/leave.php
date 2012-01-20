@@ -44,7 +44,15 @@ elseif ( $method == 'report' && $this->arg[1] == 'house' ) {
     }
 
     $data = $leaveController->executeHouseReport($houseId, $date);
-    $leaveController->renderHouseReport($data);
+
+    $argumentCount = count($this->arg);
+
+    if ( $this->arg[$argumentCount - 1] == 'export') {
+        $leaveController->exportHouseReport($data);
+    }
+    else {
+        $leaveController->renderHouseReport($data);
+    }
 }
 elseif ( $method == 'report' && $this->arg[1] == 'catering' ) {
     if ( is_string($this->arg[2]) ) {
@@ -55,7 +63,16 @@ elseif ( $method == 'report' && $this->arg[1] == 'catering' ) {
     }
 
     $data = $leaveController->executeCateringReport($date);
-    $leaveController->renderCateringReport($data);
+
+    $argumentCount = count($this->arg);
+
+    if ( $this->arg[$argumentCount - 1] == 'export') {
+        $leaveController->exportCateringReport($data);
+    }
+    else {
+        $leaveController->renderCateringReport($data);
+    }
+
 }
 elseif ( $method == 'processCreate' ) {
     $leaveController->processCreateRequest($_POST);

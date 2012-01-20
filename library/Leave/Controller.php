@@ -7,6 +7,8 @@ class Leave_Controller extends Controller {
 
     protected $houseMapper;
 
+    protected $externalUser;
+
     /**
      * Constructor
      *
@@ -18,6 +20,7 @@ class Leave_Controller extends Controller {
         $this->setUserMapper( NewUserMapper::getInstance() );
         $this->setRequestMapper( Leave_RequestMapper::getInstance() );
         $this->setHouseMapper( HouseMapper::getInstance() );
+        $this->setExternalUser( new External_User );
     }
 
     /**
@@ -342,6 +345,9 @@ class Leave_Controller extends Controller {
         }
         else {
             $this->getPage()->parse('no_requests_block', 'no_requests');
+
+            $this->getPage()->setVar('pending_request_list_block', '');
+            $this->getPage()->setVar('previous_request_list_block', '');
         }
     }
 
@@ -483,7 +489,9 @@ class Leave_Controller extends Controller {
 
         $request = $this->getRequestMapper()->findById( $request->getId() );
 
-        $this->sendUserNotice($request);
+        if ( isset($data['approve']) || isset($data['reject']) ) {
+            $this->sendUserNotice($request);
+        }
 
         $this->getPage()->backToTheFuture(2);
     }
@@ -634,6 +642,95 @@ class Leave_Controller extends Controller {
         ) );
     }
 
+    public function exportHouseReport ($data) {
+        $requestList = $data['requestList'];
+
+        $reportStart = new Alaress_Date_Format( $data['reportStart']->getDatabaseDate() , 'y-m-d' );
+
+        $reportStartMorning = new Alaress_Date_Format( $data['reportStart']->getDatabaseDate() , 'y-m-d' );
+        $reportStartMorning->addDays(1/3);
+
+        $reportStartDay = new Alaress_Date_Format( $data['reportStart']->getDatabaseDate() , 'y-m-d' );
+        $reportStartDay->addDays(2/3);
+
+        $reportStartNight = new Alaress_Date_Format( $data['reportStart']->getDatabaseDate() , 'y-m-d' );
+        $reportStartNight->addDays(3/3);
+
+        $reportFinish = new Alaress_Date_Format( $data['reportFinish']->getDatabaseDate() , 'y-m-d' );
+
+        $reportFinishMorning = new Alaress_Date_Format( $data['reportFinish']->getDatabaseDate() , 'y-m-d' );
+        $reportFinishMorning->addDays(1/3);
+
+        $reportFinishDay = new Alaress_Date_Format( $data['reportFinish']->getDatabaseDate() , 'y-m-d' );
+        $reportFinishDay->addDays(2/3);
+
+        $reportFinishNight = new Alaress_Date_Format( $data['reportFinish']->getDatabaseDate() , 'y-m-d' );
+        $reportFinishNight->addDays(3/3);
+
+        $this->getPage()->setAjax(true);
+
+        header("Content-type: text/csv");
+        header("Cache-Control: no-store, no-cache");
+        header('Content-Disposition: attachment; filename="House Report.csv"');
+
+        $stream = fopen("php://output",'w');
+
+        $headerList = array('Name', 'Year', 'Saturday Morning', 'Saturday Day', 'Saturday Night', 'Sunday Morning', 'Sunday Day', 'Sunday Night', 'Host', 'Approval Date', 'Approved By');
+
+        fputcsv($stream, $headerList);
+
+        if ( count($requestList) ) {
+            foreach ( $requestList as $request) {
+                $fieldList = array(
+                    $request->getUser()->getName(),
+                    $request->getUser()->getYear()
+                );
+
+                if ( $request->getId() ) {
+                    $fieldList += array(
+                        $request->getOccupancy($reportStart, $reportStartMorning) ? '<span>L</span>' : '',
+                        $request->getOccupancy($reportStartMorning, $reportStartDay) ? '<span>L</span>' : '',
+                        $request->getOccupancy($reportStartDay, $reportStartNight) ? '<span>L</span>' : '',
+                        $request->getOccupancy($reportFinish, $reportFinishMorning) ? '<span>L</span>' : '',
+                        $request->getOccupancy($reportFinishMorning, $reportFinishDay) ? '<span>L</span>' : '',
+                        $request->getOccupancy($reportFinishDay, $reportFinishNight) ? '<span>L</span>' : '',
+                        $request->getHostType(true)
+                    );
+
+                    if ( $request->getStatus() != Leave_Request::STATUS_PENDING ) {
+                        $fieldList += array(
+                            $request->getAuthorisationDatetime(true)->getAustralian(),
+                            $request->getAuthorisationUser()->getName()
+                        );
+                    }
+                    else {
+                        $fieldList += array(
+                            'Pending Approval',
+                            ''
+                        );
+                    }
+                }
+                else {
+                    $fieldList += array(
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        ''
+                    );
+                }
+
+                fputcsv($stream, $fieldList);
+            }
+        }
+
+        fclose($stream);
+    }
+
     public function executeCateringReport ($date) {
         $data = array();
 
@@ -703,7 +800,33 @@ class Leave_Controller extends Controller {
         ) );
     }
 
-    private function sendUserNotice ($request) {
+    public function exportCateringReport ($data) {
+        $houseList = $data['houseList'];
+
+        $this->getPage()->setAjax(true);
+
+        header("Content-type: text/csv");
+        header("Cache-Control: no-store, no-cache");
+        header('Content-Disposition: attachment; filename="Catering Report.csv"');
+
+        $stream = fopen("php://output",'w');
+
+        $headerList = array('House', 'Breakfast Absent', 'Lunch Absent', 'Dinner Absent', 'Breakfast Present', 'Lunch Present', 'Dinner Present');
+
+        fputcsv($stream, $headerList);
+
+        if ( count($houseList) ) {
+            foreach ( $houseList as $house ) {
+                $fieldList = array($house['house'], $house['absent_morning'], $house['absent_day'], $house['absent_night'], $house['present_morning'], $house['present_day'], $house['present_night']);
+
+                fputcsv($stream, $fieldList);
+            }
+        }
+
+        fclose($stream);
+    }
+
+    public function sendUserNotice ($request) {
         $userNoticeEmail = new Mailer('../modules/leave/userNoticeEmail.html', 'Leave Request Status Update', $request->getUser()->getAltEmail());
         $userNoticeEmail->setVar( array(
             'LEAVE_USER_NAME' => $request->getUser()->getName(),
@@ -716,21 +839,35 @@ class Leave_Controller extends Controller {
         $userNoticeEmail->send();
     }
 
-    private function sendParentNotice ($request) {
-        $parent = $this->getUserMapper()->findById(19); // @todo Figure out method of determining user's parent
+    public function sendParentNotice ($request) {
+        $parentList = $this->getExternalUser()->getStudentContactList( $request->getUserId() );
 
-        $parentNoticeEmail = new Mailer('../modules/leave/parentNoticeEmail.html', 'Leave Request Status Update', $parent->getAltEmail());
-        $parentNoticeEmail->setVar( array(
-            'PARENT_NAME' => $parent->getName(),
-            'LEAVE_START' => $request->getStart(true)->getLong(),
-            'LEAVE_FINISH' => $request->getFinish(true)->getLong(),
-            'LEAVE_HOST_NAME' => $request->getHostName(),
-            'LEAVE_HOST_PHONE' => $request->getHostPhone(),
-            'LEAVE_USER_NAME' => $request->getUser()->getName(),
-            'LEAVE_USER_PHONE' => $request->getUserPhone(),
-            'LEAVE_DESCRIPTION' => $request->getDescription()
-        ) );
+        if ( is_array($parentList) ) {
+            foreach ( $parentList as $parent ) {
+                $parentNoticeEmail = new Mailer('../modules/leave/parentNoticeEmail.html', 'Leave Request Status Update', $parent['StudentContactDefaultEmail']);
+                $parentNoticeEmail->setVar( array(
+                    'PARENT_NAME' => "{$parent['StudentContactPreferred']} {$parent['StudentContactSurname']}",
+                    'LEAVE_START' => $request->getStart(true)->getLong(),
+                    'LEAVE_FINISH' => $request->getFinish(true)->getLong(),
+                    'LEAVE_HOST_NAME' => $request->getHostName(),
+                    'LEAVE_HOST_PHONE' => $request->getHostPhone(),
+                    'LEAVE_USER_NAME' => $request->getUser()->getName(),
+                    'LEAVE_USER_PHONE' => $request->getUserPhone(),
+                    'LEAVE_DESCRIPTION' => $request->getDescription()
+                ) );
 
-        $parentNoticeEmail->send();
+                $parentNoticeEmail->send();
+            }
+        }
+    }
+
+    public function setExternalUser($externalUser)
+    {
+        $this->externalUser = $externalUser;
+    }
+
+    public function getExternalUser()
+    {
+        return $this->externalUser;
     }
 }

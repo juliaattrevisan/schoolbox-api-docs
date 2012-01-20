@@ -2,6 +2,18 @@
 
 class Calendar extends DeprecatedModel {
 
+    const ATTENDANCE_STATUS_PENDING = 1;
+
+    const ATTENDANCE_STATUS_APPROVED = 2;
+
+    const ATTENDANCE_STATUS_REJECTED = 3;
+
+    const ATTENDANCE_INTENTION_PENDING = 1;
+
+    const ATTENDANCE_INTENTION_PRESENT = 2;
+
+    const ATTENDANCE_INTENTION_ABSENT = 3;
+
 	function Calendar () {
 
 		$this->_table = "event";
@@ -12,12 +24,12 @@ class Calendar extends DeprecatedModel {
 		parent::DeprecatedModel();
 	}
 
-    public function getAttendees ($eventId) {
+    public function getAttendeeList ($eventId) {
         $event = $this->getByID($eventId);
 
         $query = "
-            SELECT u.id, u.username, u.firstname, u.lastname,
-                ea.intention
+            SELECT u.*,
+                ea.id, ea.status, ea.intention
             FROM event_attendance ea
             LEFT JOIN user u ON u.id = ea.user_id
             WHERE ea.event_id = {$eventId}
@@ -26,7 +38,44 @@ class Calendar extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
-    //public function addA
+    public function getAttendance ($attendanceId) {
+        $query = "
+            SELECT *
+            FROM event_attendance
+            WHERE id = {$attendanceId}
+            LIMIT 1
+        ";
+
+        return $this->db->getRow($query);
+    }
+
+    public function getAttendanceByEventAndUser ($eventId, $userId) {
+        $query = "
+            SELECT *
+            FROM event_attendance
+            WHERE event_id = {$eventId}
+              AND user_id = {$userId}
+            LIMIT 1
+        ";
+
+        return $this->db->getRow($query);
+    }
+
+    public function createAttendance ($attendance) {
+        return $this->db->insert('event_attendance', $attendance);
+    }
+
+    public function updateAttendance ($attendance) {
+        return $this->db->update('event_attendance', 'id', $attendance);
+    }
+
+    public function removeAttendance ($attendanceId) {
+        return $this->db->delete('event_attendance', 'id', $attendanceId);
+    }
+
+    public function removeAttendanceByEvent ($eventId) {
+        return $this->db->delete('event_attendance', 'event_id', $eventId);
+    }
 
 	function displayColour($id) {
 		if(!is_array($this->colourSet) ) {
@@ -123,11 +172,13 @@ class Calendar extends DeprecatedModel {
 	}
 
 	function getByID($eventID) {
-		$query = "SELECT id, owner, access, sid, type, note, date, location, attendance, detail,
-						DATE_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') startTime,
-						DATE_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') endTime
-				  FROM " . $this->_table . "
-				  WHERE " . $this->_index . " = $eventID";
+		$query = "SELECT e.id, e.owner, e.access, e.sid, e.type, e.note, e.date, e.location, e.attendance, e.detail,
+						DATE_FORMAT(e.startTime, '" . Cfg::get('calendar_time_format') . "') startTime,
+						DATE_FORMAT(e.endTime, '" . Cfg::get('calendar_time_format') . "') endTime,
+						u.title, u.firstname, u.lastname
+				  FROM {$this->_table} e
+				  LEFT JOIN user u ON u.id = e.owner
+				  WHERE e.{$this->_index} = $eventID";
 		return $this->db->getRow($query);
 	}
 
@@ -372,7 +423,7 @@ class Calendar extends DeprecatedModel {
 							TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTime,
                             TIME_TO_SEC(startTime) as startTimestamp,
                             TIME_TO_SEC(endTime) as endTimestamp,
-							type, note, access, sid, location, detail,
+							type, note, access, sid, location, detail, attendance,
                             user.id as uid, title, firstname, lastname,
                             eventType, eventColour
 						FROM event
@@ -527,6 +578,8 @@ class Calendar extends DeprecatedModel {
 
 	function update($event) {
 
+        $cleanEvent = $this->getByID($eventID);
+
 		if($this->getPerm($event['id']) < WRITE_ACCESS)
 			error(34);
 
@@ -535,6 +588,11 @@ class Calendar extends DeprecatedModel {
 
 		unset($event['groupList']);
 		unset($event['campusList']);
+
+        /* Clear attendance if it has changed from true to false */
+        if ( $event['attendance'] < $cleanEvent['attendance'] ) {
+            $this->removeAttendanceByEvent($event['id']);
+        }
 
 		parent::update($event);
 
@@ -551,6 +609,8 @@ class Calendar extends DeprecatedModel {
 
 		if($this->getPerm($eventID) < WRITE_ACCESS)
 			error(34);
+
+        $this->removeAttendanceByEvent($eventID);
 
 		parent::delete($eventID);
 		$this->delPerms($eventID);

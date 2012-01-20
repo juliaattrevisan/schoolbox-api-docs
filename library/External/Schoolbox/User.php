@@ -44,7 +44,48 @@ class External_Schoolbox_User implements External_UserInterface {
 
 
 	function getStudentContactList ($externalUserId) {
+        $statement = $this->getDatabase()->query("
+      			SELECT u.*
+      			FROM user_relation ur
+      			LEFT JOIN user u ON u.id = ur.user_id
+      			WHERE ur.relation_id = {$externalUserId}
+      			  AND ur.relation_type = " . External_Schoolbox_User::RELATION_TYPE_PARENT . "
+      		");
 
+        $contactList = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        $contactAdaptionList = array();
+
+        if ( !empty($contactList) ) {
+            foreach ( $contactList as $contact ) {
+                $contactAdaption = array(
+                    'StudentContactID' => $contact['id'],
+                    'StudentContactTitle' => $contact['title'],
+                    'StudentContactPreferred' => $contact['firstname'],
+                    'StudentContactSurname' => $contact['lastname'],
+                    'StudentContactDefaultEmail' => $contact['alt_email'],
+                    'StudentContactAddress1' => '',
+                    'StudentContactSuburb' => '',
+                    'StudentContactPostCode' => '',
+                    'StudentContactState' => '',
+                    'StudentContactPhoneActual' => '',
+                    'StudentContactMobilePhone' => '',
+                    'StudentContactOccupPhone' => '',
+                    'StudentContactSpouseID' => '',
+                    'StudentContactSpouseTitle' => '',
+                    'StudentContactSpousePreferred' => '',
+                    'StudentContactSpouseSurname' => '',
+                    'StudentContactSpouseMobilePhon' => '',
+                    'StudentContactSpouseOccupPhone' => '',
+                    'StudentContactSpouseDefaultEma' => '',
+                    'StudentContactType' => 'SC1',
+                );
+
+                $contactAdaptionList[] = $contactAdaption;
+            }
+        }
+
+        return $contactAdaptionList;
 	}
 
 	function getCurrentSemester () {

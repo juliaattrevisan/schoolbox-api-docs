@@ -6,7 +6,7 @@
             <!-- BEGIN note_block -->
             <li class="clearfix">
                 <p class="interact-left home-calendar">{TIME}&nbsp;</p>
-                <h4 class="eventListing" style="background-color:{COLOUR}">{NOTE}</h4>
+                <h4 class="eventListing" style="background-color:{COLOUR}">{NOTE}<!-- BEGIN attendance_icon --><span class="float-right">A</span><!-- END attendance_icon --></h4>
                 <div class="hidden-fields clearfix">
                     <h4><!-- BEGIN time -->
                         <span class="time"><strong>{TIME}</strong></span>
@@ -15,10 +15,49 @@
                     <p class="meta">Event Type: {TYPE}<br/>
                         Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a><br/>
                         {LOCATION} {DETAIL}</p>
-                    <div class="modify">{MODIFY}</div>
+                    <!-- BEGIN attendance_status -->
+                    <p class="meta">Attendance Status: {ATTENDANCE_STATUS}</p>
+                    <!-- END attendance_status -->
+                    <div class="modify">
+                        <!-- BEGIN attendance_request_button -->
+                        <form method="post">
+                            <input name="event[id]" type="hidden" value="{EVENT_ID}">
+                            <a class="btn modify float-left attendance-request" href="#"><span></span>{ATTENDANCE_REQUEST_ACTION}</a>
+                        </form>
+                        <!-- END attendance_request_button -->
+
+                        <!-- BEGIN attendance_list_button -->
+                        <a class="btn modify float-left" href="/calendar/attendance/list/{EVENT_ID}"><span></span>Attendance List</a>
+                        <!-- END attendance_list_button -->
+
+                        {MODIFY}
+                    </div>
                 </div>
             </li>
             <!-- END note_block -->
         </ul>
     </div>
 </div>
+
+<script type="text/javascript">
+	$j(function () {
+        $j('a.attendance-request').live('click', function (event) {
+            event.preventDefault();
+
+            var button = $j(this);
+
+            var data = button.parent('form').serialize();
+
+            $j.post('/service/attendance/processToggleAttendance', data, function (data) {
+                if ( data.error == undefined ) {
+                    if ( button.text() == 'Attend' ) {
+                        button.html('<span></span>Unattend');
+                    }
+                    else {
+                        button.html('<span></span>Attend');
+                    }
+                }
+            });
+        } );
+	});
+</script>

@@ -6,6 +6,8 @@ class Leave_Request extends Model {
 
     const HOST_TYPE_PEER_PARENT = 2;
 
+    const HOST_TYPE_OTHER = 3;
+
     const STATUS_PENDING = 1;
 
     const STATUS_APPROVED = 2;

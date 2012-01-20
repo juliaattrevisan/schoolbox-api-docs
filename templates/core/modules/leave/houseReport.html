@@ -56,6 +56,10 @@
         $j('#reportFilterSubmit').click( function () {
             $j('#reportFilter').submit();
         } );
+
+        $j('#reportExportButton').click( function () {
+            window.location = window.location + '/export';
+        } );
     });
 </script>
 <!-- END custom_head -->
@@ -71,7 +75,7 @@
     <!-- BEGIN request_list -->
     <h2>Leave Report</h2>
     <span class="header_option in-h2">
-        <a href="/modules/leave/export/{HOUSE_ID}" class="btn modify"><span></span>Export History</a>
+        <a id="reportExportButton" href="javascript:void(0);" class="btn modify"><span></span>Export History</a>
         <form id="reportFilter">
             <a id="reportFilterSubmit" href="javascript:void(0);" class="btn search"><span></span>Search</a>
             <select id="reportHouse">
