@@ -1383,6 +1383,14 @@ input.timeField {
 	background-position: 0 -630px;
 }
 
+.btn.print span {
+	background-position: 0 -644px;
+}
+
+.btn.print:hover span {
+	background-position: 0 -658px;
+}
+
 .btn.submit {
 	border-color: #0aa9c7 !important;
 	background-color: #e4f5f9;
@@ -4730,7 +4738,9 @@ COLOUR ADJUSTMENT BOX
 .add-component.disabled .btn {
 	display: none;
 }
-
+/**********************************
+Dropbox
+********************************************/
 .dropBox {
 	width: auto;
 	padding: 10px;
@@ -5037,7 +5047,38 @@ p.bubble-name {
 	transition-duration: .4s;
 }
 
-/* FORUM */
+/************************************
+STUDENT AND PARENT DIRECTORIES
+***********************************/
+
+.directory{
+
+}
+
+.directory .contact{
+	margin-bottom:16px;
+}
+.directory .contact.private h2{
+	background-image: url(/images/famicons/information.png);
+	background-repeat:no-repeat;
+	background-position: 8px 50%;
+	text-indent:16px;
+	filter: alpha(opacity = 40); /* internet explorer */
+	opacity: 0.4; /* fx, safari, opera, chrome */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(opacity=40)"; /*IE8*/
+}
+.directory table{width:98%;border:1px solid #f1f1f1; margin:4px 1%;}
+.directory table td{vertical-align:top;}
+
+.directory .primary,
+.directory .spouse{
+	float:left;
+	width:49%;
+	padding-bottom:16px;
+}
+/************************************
+FORUM
+***********************************/
 .forum {
 	margin-bottom: 16px;
 }

@@ -49,3 +49,37 @@ h1, h2, h3, h4, h5, h6 {
 }
 h3{font-size:16px;}
 h4{font-size:10px;}
+
+
+/*********** DIRECTORY (PARENT AND STUDENT)
+******************************/
+.directory h1{
+	font-size:16px;
+	font-weight:bold;
+}
+
+.directory h2{
+	font-size:14px;
+	padding:4px;
+	border-bottom:1px solid dashed;
+}
+
+.directory .private h2:after{
+	content: '    *Parent details are private';
+	font-size:10px;
+	color:#ddd;
+}
+.directory .contact {
+	page-break-inside: avoid;
+}
+
+.directory .contact table{border-collapse: collapse;}
+.directory .contact{ margin-bottom:16px; float:left; width:100%;}
+.directory .contact td{border:1px solid #ddd;}
+.directory .primary,
+.directory .spouse{
+	float:left;
+	width:45%;
+	margin:8px;
+	padding-bottom:16px;
+}
