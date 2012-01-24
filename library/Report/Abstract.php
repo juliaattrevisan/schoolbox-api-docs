@@ -14,29 +14,6 @@ abstract class Report_Abstract {
 	protected $externalUserHandler = null;
 
 	/**
-	 * Constructor
-	 *
-	 * @param $page
-	 * @param $yearLevel
-	 */
-	public function __construct($page, $yearLevel) {
-		$this->setGroupHandler(new Group());
-
-		if (!is_numeric($yearLevel) || !$this->checkPermissions()) {
-			error(19);
-		}
-		else {
-			$this->setPage($page);
-			$this->setYearLevel($yearLevel);
-
-			$this->setExternalUserHandler(new External_User());
-			$this->getExternalUserHandler()->getCurrentSemester();
-
-			$this->setup();
-		}
-	}
-
-	/**
 	 * Set up blocks and stuff
 	 *
 	 * @abstract
@@ -80,7 +57,7 @@ abstract class Report_Abstract {
 	 *
 	 * @param $groupHandler
 	 */
-	private function setGroupHandler($groupHandler) {
+	protected function setGroupHandler($groupHandler) {
 		$this->groupHandler = $groupHandler;
 	}
 
@@ -98,7 +75,7 @@ abstract class Report_Abstract {
 	 *
 	 * @param $externalUserHandler
 	 */
-	private function setExternalUserHandler($externalUserHandler) {
+	protected function setExternalUserHandler($externalUserHandler) {
 		$this->externalUserHandler = $externalUserHandler;
 	}
 
@@ -116,7 +93,7 @@ abstract class Report_Abstract {
 	 *
 	 * @param $page
 	 */
-	private function setPage($page) {
+	protected function setPage($page) {
 		$this->page = $page;
 	}
 

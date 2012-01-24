@@ -45,37 +45,36 @@
 	});
 </script>
 
-
 <div class="directory staff">
 	<h1>Staff Directory</h1>
 	<span class="header_option"><a class="btn print" href="#"><span></span>Print</a></span>
 
 	<table class="sort-it" width="100%">
 		<thead>
-		<tr>
-			<th>Title</th>
-			<th>First name</th>
-			<th>Surname</th>
-			<th>Role</th>
-			<th>Department</th>
-			<th>Campus</th>
-			<th>Email</th>
-			<th>Image</th>
-		</tr>
+			<tr>
+				<th>Title</th>
+				<th>First name</th>
+				<th>Surname</th>
+				<th>Role</th>
+				<th>Department</th>
+				<th>Campus</th>
+				<th>Email</th>
+				<th>Image</th>
+			</tr>
 		</thead>
 		<tbody>
-		<!-- BEGIN contact -->
-		<tr>
-			<td>{TITLE}</td>
-			<td>{FIRST_NAME}</td>
-			<td>{SURNAME}</td>
-			<td>{ROLE}</td>
-			<td>{DEPARTMENT}</td>
-			<td>{CAMPUS}</td>
-			<td><a href="mailto:{EMAIL}">{EMAIL}</a></td>
-			<td><img src="{IMAGE}"></td>
-		</tr>
-		<!-- END contact -->
+			<!-- BEGIN staff -->
+			<tr>
+				<td>{STAFF_TITLE}</td>
+				<td>{STAFF_FIRSTNAME}</td>
+				<td>{STAFF_SURNAME}</td>
+				<td>{STAFF_ROLE}</td>
+				<td>{STAFF_DEPARTMENT}</td>
+				<td>{STAFF_CAMPUS}</td>
+				<td><a href="mailto:{STAFF_EMAIL}">{STAFF_EMAIL}</a></td>
+				<td><img src="{STAFF_IMAGE}"></td>
+			</tr>
+			<!-- END staff -->
 		</tbody>
 	</table>
 </div>

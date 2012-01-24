@@ -10,6 +10,29 @@
 class Report_Parent extends Report_Abstract {
 
 	/**
+	 * Constructor
+	 *
+	 * @param $page
+	 * @param $yearLevel
+	 */
+	public function __construct($page, $yearLevel) {
+		$this->setGroupHandler(new Group());
+
+		if (!is_numeric($yearLevel) || !$this->checkPermissions()) {
+			error(19);
+		}
+		else {
+			$this->setPage($page);
+			$this->setYearLevel($yearLevel);
+
+			$this->setExternalUserHandler(new External_User());
+			$this->getExternalUserHandler()->getCurrentSemester();
+
+			$this->setup();
+		}
+	}
+
+	/**
 	 * Check permissions. Only parents and superusers can view this page
 	 *
 	 * @return bool
