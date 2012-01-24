@@ -1,0 +1,86 @@
+<script type="text/javascript"
+		src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<script type="text/javascript"
+		src="/javascript/jquery.tablesorter.js"></script>
+<script type="text/javascript">
+	$j(function () {
+		$j('.private h2').qtip({
+			content:'The parents\' of this student are private',
+			position:{
+				corner:{
+					tooltip:'bottomLeft',
+					target:'topleft'
+				}
+			},
+			style:{
+				background:'#fffde9',
+				color:'black',
+				border:{
+					width:3,
+					radius:4,
+					color:'#fff9bf'
+				},
+				name:'green'
+			}
+		});
+
+		$j('.print').click(function () {
+			window.print();
+			return false;
+		});
+
+		$j('.sort-it').tablesorter({
+			headers: {
+				0: { sorter: false},
+				3: {sorter: false},
+				6: {sorter: false},
+				7: {sorter: false}
+			},
+			widgets: ['zebra'],
+			widgetZebra: {
+				css: ["", "dark"]
+			}
+		});
+	});
+</script>
+
+
+<div class="directory staff">
+	<h1>Staff Directory</h1>
+	<span class="header_option"><a class="btn print" href="#"><span></span>Print</a></span>
+
+	<table class="sort-it" width="100%">
+		<thead>
+		<tr>
+			<th>Title</th>
+			<th>First name</th>
+			<th>Surname</th>
+			<th>Role</th>
+			<th>Department</th>
+			<th>Campus</th>
+			<th>Email</th>
+			<th>Image</th>
+		</tr>
+		</thead>
+		<tbody>
+		<!-- BEGIN contact -->
+		<tr>
+			<td>{TITLE}</td>
+			<td>{FIRST_NAME}</td>
+			<td>{SURNAME}</td>
+			<td>{ROLE}</td>
+			<td>{DEPARTMENT}</td>
+			<td>{CAMPUS}</td>
+			<td><a href="mailto:{EMAIL}">{EMAIL}</a></td>
+			<td><img src="{IMAGE"></td>
+		</tr>
+		<!-- END contact -->
+
+		</tbody>
+	</table>
+
+
+</div>
+<!-- END student -->
+</div>
+

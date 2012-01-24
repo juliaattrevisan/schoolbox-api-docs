@@ -5051,10 +5051,6 @@ p.bubble-name {
 STUDENT AND PARENT DIRECTORIES
 ***********************************/
 
-.directory{
-
-}
-
 .directory .contact{
 	margin-bottom:16px;
 }
@@ -5067,7 +5063,7 @@ STUDENT AND PARENT DIRECTORIES
 	opacity: 0.4; /* fx, safari, opera, chrome */
 	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(opacity=40)"; /*IE8*/
 }
-.directory table{width:98%;border:1px solid #f1f1f1; margin:4px 1%;}
+.directory .parents table{width:98%;border:1px solid #f1f1f1; margin:4px 1%;}
 .directory table td{vertical-align:top;}
 
 .directory .primary,
@@ -5076,6 +5072,10 @@ STUDENT AND PARENT DIRECTORIES
 	width:49%;
 	padding-bottom:16px;
 }
+
+.directory
+
+
 /************************************
 FORUM
 ***********************************/
