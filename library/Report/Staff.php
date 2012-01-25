@@ -30,6 +30,18 @@ class Report_Staff extends Report_Abstract {
 		}
 	}
 
+	/**
+	 * Check permissions. Only staff and superusers can view this page
+	 *
+	 * @return bool
+	 */
+	protected function checkPermissions() {
+		if ($this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff()) {
+			return true;
+		}
+
+		return false;
+	}
 
 	/**
 	 * Set up blocks and stuff
