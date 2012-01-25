@@ -21,7 +21,7 @@ abstract class Report_Abstract {
 	abstract protected function setup();
 
 	/**
-	 * Check permissions. By defaul,t only parents and superusers can view this page
+	 * Check permissions. By default only parents and superusers can view this page
 	 *
 	 * @return bool
 	 */

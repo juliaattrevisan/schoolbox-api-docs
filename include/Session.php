@@ -43,7 +43,7 @@ class Session {
         $ip = Session::getIP();
 
         /* if user is found and session is started create our user record */
-        
+
         if(is_array($user) && session_start() ) {
 
 
@@ -284,13 +284,16 @@ class Session {
                             }
 
                             $_SESSION['children'][] = array(
-                                'id' => $portal['uid'], 'sid' => $child['RelatedID'], 'gid' => $portal['group_id'],
-                                'name' => $userHandler->formatName($portal), 'subjects' => $subjects
+                                'id' => $portal['uid'],
+								'sid' => $child['RelatedID'],
+								'gid' => $portal['group_id'],
+								'year' => $portal['year'],
+                                'name' => $userHandler->formatName($portal),
+								'subjects' => $subjects
                             );
                         }
                     }
                 }
-
             }
             else { //user is not parent so get timetable information
                 $subjectList = $synUser->getSubjectList($synergy_id, $_SESSION['id']);
