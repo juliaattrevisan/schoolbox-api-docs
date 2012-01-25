@@ -5026,7 +5026,6 @@ p.bubble-name {
 	-ms-transition-duration: .4s;
 	transition-property: border-color, background-color;
 	transition-duration: .4s;
-
 	-moz-background-clip: padding;
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
@@ -5065,7 +5064,6 @@ STUDENT AND PARENT DIRECTORIES
 }
 .directory.parents table{width:98%;border:1px solid #f1f1f1; margin:4px 1%;}
 .directory table td{vertical-align:top;}
-
 .directory .primary,
 .directory .spouse{
 	float:left;
@@ -5073,6 +5071,18 @@ STUDENT AND PARENT DIRECTORIES
 	padding-bottom:16px;
 }
 
+.directory .directory-sorter{
+	background:#f1f1f1 url(/images/core/tablesorter/sort.gif) no-repeat 100% 50%;
+}
+.directory .directory-sorter.headerSortDown{
+	background-image:url(/images/core/tablesorter/sort-ascending.gif);
+}
+.directory .directory-sorter.headerSortUp{
+	background-image:url(/images/core/tablesorter/sort-descending.gif);
+}
+
+.directory.staff th{border:1px solid #ccc; text-align:left;}
+.directory.staff .larger-image{display:none;}
 
 /************************************
 FORUM

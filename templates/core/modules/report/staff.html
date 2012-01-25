@@ -1,27 +1,31 @@
 <script type="text/javascript"
 		src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
 <script type="text/javascript"
-		src="/javascript/jquery.tablesorter.js"></script>
+		src="/javascript/jquery.tablesorter.min.js"></script>
 <script type="text/javascript">
 	$j(function () {
-		$j('.private h2').qtip({
-			content:'The parents\' of this student are private',
-			position:{
-				corner:{
-					tooltip:'bottomLeft',
-					target:'topleft'
-				}
-			},
-			style:{
-				background:'#fffde9',
-				color:'black',
-				border:{
-					width:3,
-					radius:4,
-					color:'#fff9bf'
+
+		$j('.small-image').each(function() {
+			var largerImage = $j(this).siblings('.larger-image').html()
+			$j(this).qtip({
+				content: largerImage,
+				position:{
+					corner:{
+						tooltip: 'rightMiddle',
+						target: 'topLeft'
+					}
 				},
-				name:'green'
-			}
+				style:{
+					background:'#ccc',
+					color:'black',
+					border:{
+						width:3,
+						radius:4,
+						color:'#f1f1f1'
+					},
+					name:'green'
+				}
+			});
 		});
 
 		$j('.print').click(function () {
@@ -48,7 +52,7 @@
 
 <div class="directory staff">
 	<h1>Staff Directory</h1>
-	<span class="header_option"><a class="btn print" href="#"><span></span>Print</a></span>
+
 
 	<table class="sort-it" width="100%">
 		<thead>
@@ -61,7 +65,7 @@
 			<th>Campus</th>
 			<th>Phone</th>
 			<th>Email</th>
-			<th>Image</th>
+			<th>Image (hover over for larger)</th>
 		</tr>
 		</thead>
 		<tbody>
@@ -76,8 +80,8 @@
 				<td>{STAFF_PHONE}</td>
 				<td><a href="mailto:{STAFF_EMAIL}">{STAFF_EMAIL}</a></td>
 				<td>
-					<img src="/modules/report/staffimage.php?StaffID={STAFF_STAFFID}">
-					<img src="/modules/report/staffimage.php?StaffID={STAFF_STAFFID}&size=large">
+					<img class="small-image" src="/modules/report/staffimage.php?StaffID={STAFF_STAFFID}">
+					<div class="larger-image"><img width="200" height="150" src="/modules/report/staffimage.php?StaffID={STAFF_STAFFID}&size=large"></div>
 				</td>
 			</tr>
 			<!-- END staff -->
