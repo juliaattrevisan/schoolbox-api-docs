@@ -11,9 +11,18 @@ class Report_Staff_Image {
 	private $externalUserHandler = null;
 	private $imageHandler = null;
 	private $groupHandler = null;
+	private $staffID = null;
+	private $size = 'small';
+
+	/* Small image dimensions
+	 */
 	private $imageWidth = 100;
 	private $imageHeight = 100;
-	private $staffID = null;
+
+	/* Large image dimensions
+	 */
+	private $largeImageWidth = 200;
+	private $largeImageHeight = 200;
 
 	/**
 	 * Constructor
@@ -26,6 +35,7 @@ class Report_Staff_Image {
 		$this->setGroupHandler(new Group());
 
 		$this->setStaffId($staffID);
+		$this->setSize($_GET['size']);
 
 		$this->spawnImage();
 	}
@@ -65,25 +75,37 @@ class Report_Staff_Image {
 			$photoPath = WEB_root . '/images/no_portrait.jpg';
 		}
 
+		/* Get desired image sizes
+		 */
+		if ($this->getSize() == 'small') {
+			$width = $this->getImageWidth();
+			$height = $this->getImageHeight();
+		}
+		else {
+			$width = $this->getLargeImageWidth();
+			$height = $this->getLargeImageHeight();
+		}
+
+		/* Make image
+		 */
+		$image = $this->getImageHandler()->imageResize($photoPath, $width, $height, false);
+
 		switch($documentType) {
 			case 'JPG':
 				header('Content-type: image/jpeg');
 				header("Content-Disposition: filename={$this->getStaffId()}.jpg");
-				$image = $this->getImageHandler()->imageResize($photoPath, $this->getImageWidth(), $this->getImageHeight(), false);
 				imagejpeg($image);
 				break;
 
 			case 'GIF':
 				header('Content-type: image/gif');
 				header("Content-Disposition: filename={$this->getStaffId()}.gif");
-				$image = $this->getImageHandler()->imageResize($photoPath, $this->getImageWidth(), $this->getImageHeight(), false);
 				imagegif($image);
 				break;
 
 			case 'PNG':
 				header('Content-type: image/png');
 				header("Content-Disposition: filename={$this->getStaffId()}.png");
-				$image = $this->getImageHandler()->imageResize($photoPath, $this->getImageWidth(), $this->getImageHeight(), false);
 				imagepng($image);
 				break;
 
@@ -199,5 +221,59 @@ class Report_Staff_Image {
 		return $this->groupHandler;
 	}
 
+	/**
+	 * Set large image height
+	 *
+	 * @param $largeImageHeight
+	 */
+	public function setLargeImageHeight($largeImageHeight) {
+		$this->largeImageHeight = $largeImageHeight;
+	}
 
+	/**
+	 * Get large image height
+	 *
+	 * @return int
+	 */
+	public function getLargeImageHeight() {
+		return $this->largeImageHeight;
+	}
+
+	/**
+	 * Set large image width
+	 *
+	 * @param $largeImageWidth
+	 */
+	public function setLargeImageWidth($largeImageWidth) {
+		$this->largeImageWidth = $largeImageWidth;
+	}
+
+	/**
+	 * Get large image width
+	 *
+	 * @return int
+	 */
+	public function getLargeImageWidth() {
+		return $this->largeImageWidth;
+	}
+
+	/**
+	 * Set size
+	 *
+	 * @param $size
+	 */
+	public function setSize($size) {
+		if (($size == 'small') || ($size == 'large')) {
+			$this->size = $size;
+		}
+	}
+
+	/**
+	 * Get size
+	 *
+	 * @return null
+	 */
+	public function getSize() {
+		return $this->size;
+	}
 }
