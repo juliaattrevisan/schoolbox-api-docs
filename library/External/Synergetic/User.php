@@ -352,6 +352,43 @@ class External_Synergetic_User implements External_UserInterface {
         return $this->getDatabase()->getAll($query);
     }
 
+	/**
+	 * Contact list for staff directory
+	 *
+	 * @return mixed
+	 */
+	public function getStaffContactListExtended() {
+		$query = "
+			SELECT
+				StaffID, StaffTitle, StaffPreferredName, StaffSurname, StaffPhone,
+				StaffCampusDescription, StaffCategoryType, StaffDepartment
+			FROM SynergyOne.dbo.vStaff vStaff
+		";
+
+        return $this->getDatabase()->getAll($query);
+	}
+
+	/**
+	 * Get latest image for a particular staff member
+	 *
+	 * @param $staffID
+	 * @return mixed
+	 */
+	public function getLatestStaffImageFor($staffID) {
+		$query = "
+			SELECT TOP 1
+				Documents.Document, Documents.DocumentType, Documents.DocumentCreatedDate
+			FROM SynergyOne.dbo.vStaff vStaff
+			LEFT JOIN SynergyOneMedia.dbo.DocumentReferences DocumentReferences ON vStaff.StaffID = DocumentReferences.ID
+			INNER JOIN SynergyOneMedia.dbo.tDocuments Documents ON DocumentReferences.DocumentReferencesSeq = Documents.tDocumentsSeq
+			WHERE ClassificationCode = 'StudentPhoto'
+			AND vStaff.StaffID = '{$staffID}'
+			ORDER BY Documents.DocumentCreatedDate DESC
+		";
+
+        return $this->getDatabase()->getRow($query);
+	}
+
 	private function setDatabase ($database) {
 		$this->database = $database;
 	}

@@ -33,19 +33,6 @@ class Report_Parent extends Report_Abstract {
 	}
 
 	/**
-	 * Check permissions. Only parents and superusers can view this page
-	 *
-	 * @return bool
-	 */
-	protected function checkPermissions() {
-		if ($this->getGroupHandler()->isParent() || $this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff()) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Set up blocks and stuff
 	 */
 	protected function setup() {

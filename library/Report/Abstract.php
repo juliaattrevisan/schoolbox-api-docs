@@ -21,11 +21,17 @@ abstract class Report_Abstract {
 	abstract protected function setup();
 
 	/**
-	 * Permissions for who can view this report
+	 * Check permissions. By defaul,t only parents and superusers can view this page
 	 *
-	 * @abstract
+	 * @return bool
 	 */
-	abstract protected function checkPermissions();
+	protected function checkPermissions() {
+		if ($this->getGroupHandler()->isParent() || $this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff()) {
+			return true;
+		}
+
+		return false;
+	}
 
 	/**
 	 * Render dat
