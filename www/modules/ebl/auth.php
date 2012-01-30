@@ -15,7 +15,8 @@
  */
 
 
-require_once SITE_root.'/include/SitePage.php';
+require_once dirname(__FILE__) . '/../../../include/Bootstrap.php';
+
 $page = new SitePage();
 
 define('EBL_LIBRARY_ID', 'shore');

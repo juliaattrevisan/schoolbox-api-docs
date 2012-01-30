@@ -51,6 +51,19 @@ case "ebsco-history":
         $formArray['ref'] = "";
 break;
 
+case "ebsco-bib":
+        $form="Form1";
+        $action="http://search.ebscohost.com/login.aspx?profile=brc";
+        $method="POST";
+        $formArray['__VIEWSTATE'] ="/wEPDwUJMjEzNzg1OTE1ZGQ=";
+        $formArray['FormSubmit'] = 'true';
+        $formArray['user'] = 'shore';
+        $formArray['password'] = "shore";
+        $formArray['btnLogin'] = "Login";
+        $formArray['authtype'] = "uid";
+        $formArray['ref'] = "";
+break;
+
 case "ebsco-pov":
         $form="Form1";
         $action="http://search.ebscohost.com/login.aspx?site=pov";

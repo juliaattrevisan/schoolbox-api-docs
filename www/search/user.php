@@ -222,19 +222,18 @@ if (is_numeric($this->arg[0])) {
 				'EMERGENCY_ALT_PHONE' =>Scrub::text($synInfo['StudentEmergencyPhoneAlt']),
 				'MEDICAL_NOTE' => Scrub::text($synInfo['StudentMedicalAlert']),
 				'CONTACT_ALERT_MESSAGE' => Scrub::text($synInfo['AlertMessage']),
-				'STUDENT_TYPE' => Scrub::text($synInfo['StudentBoarder'])=='B'?'Boarder':'Day',
+				'STUDENT_TYPE' => $synInfo['StudentBoarder']=='B'|| $synInfo['StudentBoarder']=='W' ? 'Boarder':'Day',
 			);
 
 			$this->setVar($output);
             $synClass = new External_Class;
             $catHandler = new Category;
-            $i=0;
+            $i=1;
 
             /*Output subject list */
             $subjectList = $synUserHandler->getSubjectList($user['synergy_id'], $user['uid']);
             if(is_array($subjectList)) {
                 foreach($subjectList as $subject) {
-
                     /* Fetch teacher names */
                     $teacherList = $synClass->getTeacherName($subject['code']);
                     $teacherOutput = array();
@@ -261,12 +260,25 @@ if (is_numeric($this->arg[0])) {
 
                     $this->setVar($output);
                     $this->parse('subject_item_block','subject_item',true);
-                    if($i!=0 && !$i%2)
+
+                    if($i%3 == 0) {
                         $this->parse('subject_row_block','subject_row',true);
+                        $this->setVar('subject_item_block','');
+                    }
+
+                    $i++;
 
                 }
 
-                $this->parse('subject_row_block','subject_row',true);
+                if(($i-2)%3) {
+
+                    /*for(;$i%3 > 0;$i++){
+
+                        $this->setVar('subject_item_block','',true);
+                    }*/
+
+                    $this->parse('subject_row_block','subject_row',true);
+                }
 
                 /*Output email all subject teachers */
                 if($groupHandler->isStaff() ) {
