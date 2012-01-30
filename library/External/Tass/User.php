@@ -91,9 +91,10 @@ class External_Tass_User implements External_UserInterface {
 	}
 	
 	function getEnrolledStudents($tassID) {
-        $query = "SELECT stud_code RelatedID FROM studenrol WHERE par_code = '$tassID' AND cmpy_code = 01";
+        $query = "SELECT stud_code RelatedID FROM studenrol WHERE par_code = '$tassID' OR sud19_code = '$tassID' AND cmpy_code = 01";
 
 		return $this->getDatabase()->getAll($query);
+
 
 	}
     public function getPortrait ($externalUserId) {
