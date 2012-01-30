@@ -374,7 +374,7 @@ class External_Synergetic_User implements External_UserInterface {
 	 * @param $staffID
 	 * @return mixed
 	 */
-	/*public function getLatestStaffImageFor($staffID) {
+	public function getLatestStaffImageFor($staffID) {
 		$query = "
 			SELECT TOP 1
 				Documents.Document, Documents.DocumentType, Documents.DocumentCreatedDate
@@ -387,7 +387,7 @@ class External_Synergetic_User implements External_UserInterface {
 		";
 
         return $this->getDatabase()->getRow($query);
-	}*/
+	}
 
 	private function setDatabase ($database) {
 		$this->database = $database;

@@ -1,8 +1,8 @@
 <?php
 require_once($_SERVER['DOCUMENT_ROOT'].'/conf/conf.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/include/stdfuncs.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/include/Session.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/include/SitePage.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/../include/Session.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/../include/SitePage.php');
 
 session_start();
 

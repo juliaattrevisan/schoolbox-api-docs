@@ -76,6 +76,7 @@ if (is_numeric($this->arg[0])) {
 		'parent_spouse_block' => '',
 		'staff_synergy_block' => '',
         'subject_block' => '',
+        'subject_row_block' => '',
 	);
 
 	$this->setVar($blank);
@@ -216,7 +217,7 @@ if (is_numeric($this->arg[0])) {
 				'FORM_DESCRIPTION' => Scrub::text($synInfo['FormDescription']),
 				'FORM_STAFF' => $formTeacher,
 				'LOCKER' => Scrub::text($synInfo['StudentLockerBook']),
-				'BIRTHDATE' => date('jS \o\f F, Y', $synInfo['StudentBirthDate']),
+				'BIRTHDATE' => date('j F Y', $synInfo['StudentBirthDate']),
 				'EMERGENCY_NAME' => Scrub::text($synInfo['StudentEmergencyName']),
 				'EMERGENCY_PHONE' => Scrub::text($synInfo['StudentEmergencyPhone']),
 				'EMERGENCY_ALT_PHONE' =>Scrub::text($synInfo['StudentEmergencyPhoneAlt']),
@@ -232,6 +233,7 @@ if (is_numeric($this->arg[0])) {
 
             /*Output subject list */
             $subjectList = $synUserHandler->getSubjectList($user['synergy_id'], $user['uid']);
+
             if(is_array($subjectList)) {
                 foreach($subjectList as $subject) {
                     /* Fetch teacher names */
@@ -270,7 +272,7 @@ if (is_numeric($this->arg[0])) {
 
                 }
 
-                if(($i-2)%3) {
+                if(($i-1)%3 != 0) {
 
                     /*for(;$i%3 > 0;$i++){
 

@@ -383,7 +383,8 @@ class SitePage extends Page
 		$this->setBlock('tabTpl', 'webmail_tab', 'wm_tab');
 
 		if ((MAIL_enable && $_SESSION['local_email']) ||
-			($this->site == 'wenona' && $this->groupHandler->isStaff()) ||
+			(
+            $this->site == 'wenona' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent() ) ||
 			$this->site == 'ormond' ||
 			$this->site == 'shore' && !($_SESSION['gid'] == 6 || $_SESSION['gid'] == 7 || $_SESSION['gid'] == '8') ||
 			$this->site == 'joeys' ||
@@ -391,6 +392,7 @@ class SitePage extends Page
 			$this->site == 'cathedral' ||
 			$this->site == 'mggs' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) ||
 			$this->site == 'bialik' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent())
+            )
 		) {
 			if ($this->site == 'mgs' || $this->site == 'grimwade') {
 
