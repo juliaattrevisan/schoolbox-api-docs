@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+		"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
+<head>
+	<title>{TITLE}</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<meta http-equiv="Content-Language" content="en-au"/>
+	<meta name="author" content="James Leckie, Lektec Consulting"/>
+	<link rel="stylesheet" type="text/css" media="screen"
+		  href="/css/core/core.css"/>
+	<link rel="stylesheet" type="text/css" media="screen"
+		  href="/css/{SITE_LOCATION}/screen.css"/>
+	<script type="text/javascript">
+		window.onload = init;
+		function init() {
+			document.getElementById('username').focus();
+		}
+	</script>
+</head>
+<body >
+<div id="wrap">
+	<div id="wrap-inner">
+		<div id="header">
+			<a class="logo" href="/" title="Melbourne Girls Grammar">
+				<img src="/images/mggs/mggs-logo.gif" width="280" height="67"
+					 alt="MGGS"/>
+
+
+			</a>
+
+			<div class="login-words"></div>
+		</div>
+
+		<div id="container">
+			<div id="content">
+
+					<h1 class="capitalize">{SITE_LOCATION}
+						Schoolbox: Guidelines of Use and Privacy Policy</h1>
+					{POLICY}
+
+				<div class="float-fix"></div>
+			</div>
+			<div class="float-fix"></div>
+		</div>
+
+	</div>
+</div>
+<div id="footer">
+	<ul>
+		<li>&copy; {TEMPLATE_YEAR} <a href="{SITE_ADDRESS}">{SITE_NAME}</a></li>
+		<li><a href="/policy.php">Guidelines of Use and Privacy Policy</a></li>
+		<li><a href="http://www.alaress.com.au" title="Web Designers">Web Design
+			by Alaress</a></li>
+		<li class="last"><a href="/feedback.php" title="">Support and
+			Feedback</a></li>
+	</ul>
+	<div class="float-fix"></div>
+</div>
+</body>
+</html>
