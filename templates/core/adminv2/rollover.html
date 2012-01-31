@@ -50,21 +50,23 @@ $j(function() {
 	<div class="level">
 
 		<h4>Remove Deleted/Expired Content</h4>
+        <p>This function will delete any news that has expired and is no longer available.  If a user has deleted a file or link this will clean up the soft deleted remnants.  This should be completed once a year to clean the system unused content.</p>
 		<p class="clearfix"><a href="/adminv2/cleanup.php?news=1&amp;subnews=1&amp;file=1" class="btn delete float-left" onclick="return(confirm('This will clean the database of all content no longer visible to users'));"><span></span>Click Here</a></p>
 
 		<h4>Clean filesystem of stale files</h4>
+        <p>This function will scan the filesystem for files that are no longer connected to the database.  This can occur due to errors in processing or cleanup.  This should be completed once a year to minimise disk wastage.</p>
 		<p class="clearfix"><a href="/adminv2/cleanup.php?fileclean=1" class="btn update float-left" onclick="return(confirm('This will delete all files that are no longer in the database'));"><span></span>Click Here</a>	</p>
 
 		<h4>Clean Log Files</h4>
+        <p>This will delete all content from the log files and help speed up the system.  The log files include the login log, submission box, homepage access and CMS log.  This should be completed once a year.</p>
 		<p class="clearfix"><a href="/adminv2/cleanup.php?log=1" class="btn update float-left" onclick="return(confirm('This will delete all logs, it will impact only on the whats new feature'));"><span></span>Click Here</a></p>
-
-		<h4> Rollover users</h4>
-		<p class="clearfix"><a href="/adminv2/cleanup.php?rolluser=1" class="btn groups float-left" onclick="return(confirm('This will increment all students year by one'));"><span></span>Click Here</a></p>
-
-		<h4>Clean Submission System</h4>
-		<p class="clearfix"><a href="/adminv2/cleanup.php?submission=1&amp;return=1" class="btn update float-left" onclick="return(confirm('WARNING! This will delete all submission boxes, student work and returned work.\nThis should only be performed once a year'));"><span></span>Click Here</a></p>
+		
+        <h4>Clean Submission System</h4>
+		<p>This function will delete all submission boxes and student submissions and returns.  This should be completed once a year at the beginning of the year.</p>
+        <p class="clearfix"><a href="/adminv2/cleanup.php?submission=1&amp;return=1" class="btn update float-left" onclick="return(confirm('WARNING! This will delete all submission boxes, student work and returned work.\nThis should only be performed once a year'));"><span></span>Click Here</a></p>
 
 		<h4>Clean Thumbnails</h4>
+        <p>If you are having issues with image thumbnails or you would like to free up some diskspace this can be run when ever you like.</p>
 		<p class="clearfix"><a href="/adminv2/cleanup.php?thumbnail=1" class="btn update float-left" onclick="return(confirm('This will delete all thumbnails.'));"><span></span>Click Here</a></p>
 	</div>
 </div>

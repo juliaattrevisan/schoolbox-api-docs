@@ -163,7 +163,11 @@ else {
             $this->setVar( array(
                 'DESTINATION_HOMEPAGE_ID' => $involvedCategory['id'],
                 'DESTINATION_HOMEPAGE_NAME' => $involvedCategory['name'],
+                'DESTINATION_CLASS_CODE' => '',
             ) );
+
+            if($involvedCategory['code'])
+                $this->setVar('DESTINATION_CLASS_CODE', '('.$involvedCategory['code'].')');
 
             $this->parse('destination_category_block', 'destination_category', true);
         }
