@@ -308,9 +308,6 @@ setupCustomise = {
 				$j('div.leftColumn div.colorBox').each(function () {
 					var str = $j(this).attr('id');
 					var newstr = str.replace(/^.*left_(.*).*$/m, '$1');
-
-					console.log(newstr);
-
 					rightBox = $j('#' + 'right_'+newstr);
 					rightBox.css({
 						'background-color' : $j(this).css('backgroundColor')
