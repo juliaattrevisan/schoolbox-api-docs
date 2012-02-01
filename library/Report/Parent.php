@@ -226,6 +226,17 @@ class Report_Parent extends Report_Abstract {
 
 			/* Last parse for final element
 			 */
+			if ($showContact == false) {
+				$this->getPage()->setVar(array(
+					'PRIVATE' => 'private'
+				));
+			}
+			else {
+				$this->getPage()->setVar(array(
+					'PRIVATE' => ''
+				));
+			}
+
 			$this->getPage()->parse('student_block', 'student', true);
 		}
 	}
