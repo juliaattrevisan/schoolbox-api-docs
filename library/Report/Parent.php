@@ -138,18 +138,24 @@ class Report_Parent extends Report_Abstract {
 				}
 
 				if ($currentContact['PrimaryDirectoryIncludeFlag'] == 1) {
-					$address = $currentContact['StudentContactAddress1'] . '<br />';
+					$address = '';
 
 					/* Combine additional address details
 					 * strlen/trim check in case of whitespace characters coming out
 					 */
+					if (strlen(trim($currentContact['StudentContactAddress1']))) {
+						$address .= $currentContact['StudentContactAddress1'];
+					}
+
 					if (strlen(trim($currentContact['StudentContactAddress2']))) {
-						$address .= ',<br />' . $currentContact['StudentContactAddress2'];
+						$address .= '<br />' . $currentContact['StudentContactAddress2'];
 					}
 
 					if (strlen(trim($currentContact['StudentContactAddress3']))) {
-						$address .= ',<br />' . $currentContact['StudentContactAddress3'];
+						$address .= '<br />' . $currentContact['StudentContactAddress3'];
 					}
+
+					$address .= '<br />';
 
 					/* Check if Country was specified
 					 */
