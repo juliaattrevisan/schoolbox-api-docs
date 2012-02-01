@@ -66,7 +66,7 @@ h4{font-size:10px;}
 }
 
 .directory .private h2:after{
-	content: '    *Parent details are private';
+	content: '    *Details have not been made available';
 	font-size:10px;
 	color:#ddd;
 }
