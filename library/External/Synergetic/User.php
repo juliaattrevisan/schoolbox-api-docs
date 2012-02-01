@@ -165,7 +165,7 @@ class External_Synergetic_User implements External_UserInterface {
     public function getStudentContactListExtended($yearlevel) {
 		$query = "
 			SELECT
-				StudentID, StudentGiven1, StudentSurname, StudentYearLevel, StudentHouse,
+				StudentID, StudentGiven1, StudentSurname, StudentYearLevel, House.Description AS StudentHouse,
 				StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
 				StudentContactAddress1, StudentContactAddress2, StudentContactAddress3,
 				StudentContactSuburb, StudentContactPostCode, StudentContactState, StudentContactCountryDesc,
@@ -177,6 +177,7 @@ class External_Synergetic_User implements External_UserInterface {
 			FROM SynergyOne.dbo.vStudentContactAllAddress
 			LEFT JOIN SynergyOne.dbo.Community Contact ON StudentContactID = Contact.ID
 			LEFT JOIN SynergyOne.dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
+			LEFT JOIN SynergyOne.dbo.luHouse House ON StudentHouse = House.Code
 			WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
 			AND FileSemester = " . $_SESSION['FileSemester'] . "
 			AND FileYear = " . $_SESSION[ 'FileYear'] . "
