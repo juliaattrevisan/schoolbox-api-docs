@@ -84,6 +84,7 @@ class Report_Parent extends Report_Abstract {
 	 * Render data
 	 */
 	public function render() {
+
 		$allContacts = $this->getExternalUserHandler()->getStudentContactListExtended($this->getYearLevel());
 
 		$showContact = false;
