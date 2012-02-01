@@ -192,7 +192,7 @@ abstract class Synchronise_Synergetic_Bialik_Strategy_Abstract extends Synchroni
 	 * @return void
 	 */
 	protected function userExists($newUser) {
-		return $this->getUserHandler()->getByUsername($newUser['username']);
+		return $this->getUserHandler()->getBySynergy($newUser['synergy_id']);
 	}
 
 	/**

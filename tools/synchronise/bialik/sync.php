@@ -29,7 +29,7 @@ foreach($allStrategies as $currentStrategy) {
 
 	/* Do not alter the db
 	 */
-	$sync->setPerformUpdate(false);
+	$sync->setPerformUpdate(true);
 
 	/* Set Verbosity so you can see intentions
 	 */

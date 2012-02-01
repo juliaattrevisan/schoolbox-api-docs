@@ -458,11 +458,19 @@ class User extends DeprecatedModel {
 
         $campusArray = $user['campus'];
         $defaultCampus = $user['defaultCampus'];
-        $su = $user['su'];
 
         unset($user['campus']);
         unset($user['defaultCampus']);
-        unset($user['su']);
+
+
+        if(isset($user['su'])) {
+            $this->db->delete('superusers', 'id', $user['id']);
+
+             if ($user['su']) {
+                 $this->db->insert('superusers', array('id' => $user['id']));
+             }
+            unset($user['su']);
+        }
 
         if(isset($user['password'])) {
             $this->setPasswordInternal($user['id'], $user['password']);
@@ -484,11 +492,7 @@ class User extends DeprecatedModel {
             $this->db->query($campusquery);
         }
 
-        $this->db->delete('superusers', 'id', $user['id']);
 
-        if ($su) {
-            $this->db->insert('superusers', array('id' => $user['id']));
-        }
     }
 
 	/**

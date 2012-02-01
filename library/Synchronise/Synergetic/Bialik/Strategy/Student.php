@@ -34,14 +34,16 @@ class Synchronise_Synergetic_Bialik_Strategy_Student extends Synchronise_Synerge
 		 * We don't know how the password is given to us
 		 */
 		$newUser['username'] = $currentUser['NetworkLogin'];
-		$newUser['password'] = '1234';
+		//$newUser['password'] = '1234';
 
 		/* User details
 		 */
-		$newUser['title'] = $currentUser['StudentTitle'];
+		$newUser['title'] = '';
 		$newUser['firstname'] = $currentUser['StudentPreferred'];
 		$newUser['lastname'] = $currentUser['StudentSurname'];
-		$newUser['alt_email'] = $currentUser['StudentEmail'];
+		$newUser['alt_email'] = '';
+        $newUser['synergy_id'] = $currentUser['StudentID'];
+        $newUser['local_email'] = 1;
 
 		/* Year level
 		 */
@@ -59,7 +61,7 @@ class Synchronise_Synergetic_Bialik_Strategy_Student extends Synchronise_Synerge
 
 		/* This person is not a superuser
 		 */
-		$newUser['su'] = false;
+		//$newUser['su'] = false;
 
 		return $newUser;
 	}

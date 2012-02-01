@@ -84,13 +84,14 @@ class Synchronise_Synergetic_Bialik_Verbose {
 	private function verboseUserSummary($newUser) {
 		$data = array();
 		$data[] = "username: {$newUser['username']}";
-		$data[] = "password: {$newUser['password']}";
+		//$data[] = "password: {$newUser['password']}";
 		$data[] = "title: {$newUser['title']}";
 		$data[] = "firstname: {$newUser['firstname']}";
 		$data[] = "lastname: {$newUser['lastname']}";
 		$data[] = "alt_email: {$newUser['alt_email']}";
 		$data[] = "campus: " . '[' . implode(',', $newUser['campus']) . ']';
 		$data[] = "groupIDs: " . $newUser['group_id'];
+        $data[] = 'year: ' . $newUser['year'];
 
 		return '(' . implode(', ', $data) . ')';
 	}

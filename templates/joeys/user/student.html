@@ -1,5 +1,5 @@
 <h1>School Directory</h1>
-<table id="directory">
+<table>
   <tr>
     <td colspan="6"><h2>Personal Information</h2></td>
     <td>&nbsp;</td>
@@ -77,46 +77,44 @@
   </tr>
     <tr>
         <td colspan="6"><!-- BEGIN school_links --><!-- END school_links -->
-             <ul>
-              <!-- BEGIN timetable_link -->
-              <li><a href="/timetable/{ID}">Timetable</a></li>
-              <!-- END timetable_link -->
-              <!-- BEGIN due_work -->
-              <li><a href="/submission/dueWork/0/{ID}">Due Work</a></li>
-              <!-- END due_work -->
-              <!-- BEGIN helpdesk -->
-              <li><a href="/modules/helpdesk/{ID}">Helpdesk Jobs</a></li>
-              <!-- END helpdesk -->
-              <!-- BEGIN eportfolio -->
-              <li><a href="/eportfolio/{ID}">ePortfolio</a></li>
-              <!-- END eportfolio -->
-            </ul>
+            <!-- BEGIN timetable_link -->
+         			<a href="/timetable/{ID}" class="btn report float-left"><span></span>Timetable</a>
+         			<!-- END timetable_link -->
+         			<!-- BEGIN due_work -->
+         			<a href="/submission/dueWork/0/{ID}" class="btn due-work float-left"><span></span>Due Work</a>
+         			<!-- END due_work -->
+         			<!-- BEGIN helpdesk -->
+         			<a href="/modules/helpdesk/{ID}" class="btn help float-left"><span></span>Helpdesk Jobs</a>
+         			<!-- END helpdesk -->
+         			<!-- BEGIN eportfolio -->
+         			<a href="/eportfolio/{ID}" class="btn eportfolio float-left"><span></span>ePortfolio</a>
+         			<!-- END eportfolio -->
         </td>
     </tr>
 
-        <!-- BEGIN subject -->
-    	<tr>
+    <!-- BEGIN subject -->
+    <tr>
 		<td colspan="6"><h2>Subjects</h2></td>
 	</tr>
     <!-- BEGIN subject_row -->
 	<tr>
         <!-- BEGIN subject_item -->
 		<td class="clearfix"><img src="/search/portrait.php?id={SUBJECT_TEACHER_ID}&width=60&height=60" /></td>
-        <td colspan="2" class="clearfix">{SUBJECT_NAME}<br />
+        <td class="clearfix">{SUBJECT_NAME}<br />
         {SUBJECT_TEACHER_NAME}</td>
         <!-- END subject_item -->
 	</tr>
     <!-- END subject_row -->
     <tr><td colspan="6">
-            <!-- BEGIN subject_mail -->
+         <!-- BEGIN subject_mail -->
           <form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
               <input type="hidden" name="replyto" value="{REPLYTO}" />
               <input type="hidden" name="bcc" value="{EMAILALL}" />
               <a href="#" class="btn submit-this float-right up-arrow "><span></span>Email all</a>
-            </form>
-    <!-- END subject_mail -->
+          </form>
+        <!-- END subject_mail -->
 
-    </td> </tr>
+    </td></tr>
     <!-- END subject -->
 
   <!-- BEGIN contact_synergy -->

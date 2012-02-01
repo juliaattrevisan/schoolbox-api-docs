@@ -35,14 +35,16 @@ class Synchronise_Synergetic_Bialik_Strategy_Staff extends Synchronise_Synergeti
 		 * We don't know how the password is given to us
 		 */
 		$newUser['username'] = $currentUser['NetworkLogin'];
-		$newUser['password'] = '1234';
+		//$newUser['password'] = '1234';
 
 		/* User details
 		 */
-		$newUser['title'] = $currentUser['StaffTitle'];
+		$newUser['title'] = '';
 		$newUser['firstname'] = $currentUser['StaffPreferredName'];
 		$newUser['lastname'] = $currentUser['StaffSurname'];
-		$newUser['alt_email'] = $currentUser['preferredEmail'];
+        $newUser['synergy_id'] = $currentUser['StaffID'];
+		$newUser['alt_email'] = '';
+        $newUser['local_email'] = 1;
 
 		/* Campus config: needs to map to a campus id
 		 */
@@ -55,7 +57,7 @@ class Synchronise_Synergetic_Bialik_Strategy_Staff extends Synchronise_Synergeti
 
 		/* This person is not a superuser
 		 */
-		$newUser['su'] = false;
+		//$newUser['su'] = false;
 
 		return $newUser;
 	}
