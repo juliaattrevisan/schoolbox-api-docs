@@ -1,0 +1,53 @@
+<div><h1>Duties Listing For {DATE} </h1>
+<form class="standardForm" action="editDuties.php{GET}" method="POST">
+	<table>
+                    <tr>
+                    	<td><div style="text-align:left"><a href="{WEEKBACK}" title="Back one Week">&lt;&lt;</a></div></td>
+                    	<td><div style="text-align:left"><a href="{DAYBACK}" title="Back one Day">&lt;</a></div></td>
+                   	<td><div style="text-align:center"><a href="{TODAY}" title="Back to Today">Today</a></div></td>
+               	        <td><div style="text-align:right"><a href="{DAYFORWARD}" title="Foward one Day">&gt;</a></div></td>
+                    	<td><div style="text-align:right"><a href="{WEEKFORWARD}" title="Foward one Week">&gt;&gt;</a></div></td>
+               	   </tr>
+                </table>
+
+                  <table>
+                    <tr> 
+                      <td><h2>Duty</h2></td>
+                      <td><h2>Assigned User</h2></td>
+                    </tr>
+                    <!-- BEGIN duty_list -->
+                    <tr> 
+                      <td> {DUTY}
+                      </td>
+                      <td>
+				<input type="text" name="user{I}" value="{ASSIGNEDUSER}">
+				<input type="hidden" name="dutyTypeID{I}" value="{DUTYID}">
+				<input type="hidden" name="update{I}" value="{UPDATE}">
+                      </td>
+                    </tr><!-- END duty_list -->
+                    <tr> 
+                      <td>&nbsp;</td>
+                      <td>
+                      	      	  <input name="cid" type="hidden" id="cid" value="{CID}">
+               			  <input name="maxi" type="hidden" id="cid" value="{MAXI}">
+               			  <input name="qdate" type="hidden" id="cid" value="{QDATE}">
+               	      	<input name="Submit" type="submit" class="button_modify" id="Submit" value="Save">
+               	    	</td>
+                    </tr>
+				 </table>
+                 </form>
+                 <p>&nbsp;</p>
+                 <form action='/subject/editDuties.php{GET}' method='post' enctype="multipart/form-data" class="standardForm">
+                 <input name="cid" type="hidden" id="cid" value="{CID}">
+                 <input name="maxi" type="hidden" id="cid" value="{MAXI}">
+               	 <input name="qdate" type="hidden" id="cid" value="{QDATE}">
+				 <table>
+                    <tr>
+                    	<td>Upload CSV</td>
+                        <td><input type='file' name='file' />
+                       <input type='submit' value='Upload' /></td>
+                    </tr>                    
+                  </table>
+          		  </form>
+         	</div>
+	</div>
