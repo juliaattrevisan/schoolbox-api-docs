@@ -312,7 +312,11 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 						$desc = $this->getDatabase()->getNextArray();
 			}
 		}
-		usort($timetable, array($this, 'sortTimetable'));
+
+        if(is_array($timetable)) {
+		    usort($timetable, array($this, 'sortTimetable'));
+        }
+
 		return $timetable;
 	
 	}
