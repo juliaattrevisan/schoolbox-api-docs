@@ -11,7 +11,7 @@
 
 class Component_Dashboard_SuggestionController extends Component_Dashboard_ControllerAbstract {
 
-    const CATEGORY_ID = 73;
+    const CATEGORY_ID = 1699;
 
     protected $categoryNews;
 

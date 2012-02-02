@@ -66,21 +66,21 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 			$user = array(
 				'synergy_id' => $propertyList['StudId'],
 				'username' => $propertyList['ThirdParty_Code'],
-				'password' => $propertyList['Password'],
+				'password' => '',
 				'title' => '',
 				'firstname' => $propertyList['StudFirstName'],
 				'lastname' => $propertyList['StudLastName'],
 				'year' => $propertyList['Level'],
 				'house' => $propertyList['House'],
-				'local_email' => 0,
+				'local_email' => 1,
 				'alt_email' => $propertyList['StudEmail'],
-				'email_pass' => $propertyList['Password'],
-				'mail_handler' => 0,
+				'email_pass' => '',
+				'mail_handler' => 1,
 				'su' => 0,
 				'eportfolio_enabled' => 1,
 				'group_id' => $this->getStudentGroupId($propertyList),
-				'campus' => $this->getCampus(),
-				'defaultCampus' => $this->getCampus(),
+				'campus' => 1,
+				'defaultCampus' => 1,
 			);
 
 			if ($userClean = $this->getUserHandler()->getBySynergy($user['synergy_id']) ) {
@@ -120,21 +120,20 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 			$user = array(
 				'synergy_id' => $propertyList['StaffId'],
 				'username' => $propertyList['ThirdParty_Code'],
-				'password' => $propertyList['Password'],
+				'password' => '',
 				'title' => $propertyList['Title'],
 				'firstname' => $propertyList['StaffFirstName'],
 				'lastname' => $propertyList['StaffLastName'],
-				'year' => 0,
+				'year' => '',
 				'house' => $propertyList['House'],
-				'local_email' => 0,
+				'local_email' => 1,
 				'alt_email' => $propertyList['Email'],
-				'email_pass' => $propertyList['Password'],
-				'mail_handler' => 0,
-				'su' => 0,
+				'email_pass' => '',
+				'mail_handler' => 1,
 				'eportfolio_enabled' => 0,
 				'group_id' => $this->getTeacherGroupId($propertyList),
-				'campus' => $this->getCampus(),
-				'defaultCampus' => $this->getCampus(),
+				'campus' => 1,
+				'defaultCampus' => 1,
 			);
 
 			if ($userClean = $this->getUserHandler()->getBySynergy($user['synergy_id'])) {
@@ -181,12 +180,12 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
                 'local_email' => 0,
                 'alt_email' => $propertyList['email'],
                 'email_pass' => $propertyList['SBPassword'],
-                'mail_handler' => 0,
+                'mail_handler' => 1,
                 'su' => 0,
                 'eportfolio_enabled' => 0,
                 'group_id' => $this->getParentGroupId($propertyList),
-                'campus' => $this->getCampus(),
-                'defaultCampus' => $this->getCampus(),
+                'campus' => 1,
+                'defaultCampus' => 1,
             );
 
             if ($userClean = $this->getUserHandler()->getBySynergy($user['synergy_id'])) {
