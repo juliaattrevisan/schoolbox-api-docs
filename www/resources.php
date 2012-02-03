@@ -116,7 +116,7 @@ if (is_array($categoryList)) {
 
 			$output = array(
 				'CATEGORY_ID' => $category['id'],
-				'CATEGORY_NAME' => $name,
+				'CATEGORY_NAME' => htmlspecialchars_decode($name),
 				'CLASS' => implode(" ", $class),
 			);
 			$this->setVar($output);
