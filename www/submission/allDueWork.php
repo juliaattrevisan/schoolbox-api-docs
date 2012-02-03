@@ -2,7 +2,6 @@
 
 $this->setFile(TEMPLATE_content, 'submission/allDueWork.html');
 $this->setTab('submission');
-
 $this->setBlock(TEMPLATE_content, 'subject', 'subject_block');
 $this->setBlock('subject', 'work', 'work_block');
 $this->setBlock('work', 'download', 'download_block');
@@ -10,10 +9,10 @@ $this->setBlock('work', 'status_due', 'status_due_block');
 $this->setBlock('work', 'status_awaiting_review', 'status_awaiting_review_block');
 $this->setBlock('work', 'status_marked', 'status_marked_block');
 
-$userHandler = new User;
-$groupHandler = new Group;
-$submissionHandler = new Submission;
-$returnHandler = new SubmissionReturn;
+$userHandler = new User();
+$groupHandler = new Group();
+$submissionHandler = new Submission();
+$returnHandler = new SubmissionReturn();
 
 /* ideally session children would use the id as the array key as this is ridiculous */
 $childList = array();
@@ -175,18 +174,23 @@ $allAssessments = $assessHandler->getList($categoryIDList, 10);
 
 if ($allAssessments) {
     foreach($allAssessments as $currentAssessment) {
-        $currentAttempt = $attemptHandler->getLatestForUser($currentAssessment['assess_id'], $_SESSION['id']);
+		if ($currentAssessment['allow_resit']) {
+			$allAttempts = $attemptHandler->getListForUser($currentAssessment['assess_id'], $_SESSION['id']);
+		}
+		else {
+        	$allAttempts = $attemptHandler->getLatestForUser($currentAssessment['assess_id'], $_SESSION['id']);
+		}
 
         $firstSection = $sectionHandler->getFirst($currentAssessment['assess_id']);
 
-        if (!$currentAttempt) {
+        if (!$allAttempts) {
             $this->setVar(array(
                 'ASSESS_CATEGORY' => $categoryLookup[$currentAssessment['category_id']],
                 'ASSESS_ASSESS_ID' => $currentAssessment['assess_id'],
                 'ASSESS_TITLE' => Scrub::Text($currentAssessment['title']),
                 'ASSESS_FINISH' => '',
                 'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
-                'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
+                'ATTEMPT_ATTEMPT_ID' => '',
                 'ATTEMPT_TOTAL_MARKS' => number_format(0, 2),
                 'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
                 'ATTEMPT_PERCENTAGE' => 0,
@@ -195,72 +199,80 @@ if ($allAssessments) {
             $this->setVar('viewMarks_block', '');
             $this->parse('takeTest_block', 'takeTest');
             $this->setVar('unmarked_block', '');
+			$this->parse('attempt_block', 'attempt', true);
         }
         else {
-            /* Finish time
-             */
-            if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
-                $finish = date('jS F Y, g:i:sa', strtotime($currentAttempt['finish']));
-                $timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
-            }
-            else {
-                $finish = '';
-                $timeTaken = '';
-            }
+			if (is_array($allAttempts) && count($allAttempts)) {
+				foreach($allAttempts as $currentAttempt) {
+					/* Finish time
+					 */
+					if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
+						$finish = date('jS F Y, g:i:sa', strtotime($currentAttempt['finish']));
+						$timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
+					}
+					else {
+						$finish = '';
+						$timeTaken = '';
+					}
 
-            /* The total available marks for this attempt
-             */
-            $totalAvailableMarks = $attemptHandler->getTotalMarks($currentAssessment['assess_id'], $currentAttempt['attempt_id']);
+					/* The total available marks for this attempt
+					 */
+					$totalAvailableMarks = $attemptHandler->getTotalMarks($currentAssessment['assess_id'], $currentAttempt['attempt_id']);
 
-            if ($totalAvailableMarks > 0) {
-                $marks = $attemptHandler->getMarksForAttempt($currentAttempt['attempt_id']);
+					if ($totalAvailableMarks > 0) {
+						$marks = $attemptHandler->getMarksForAttempt($currentAttempt['attempt_id']);
 
-                $percentage = round(100 * $marks / $totalAvailableMarks);
-            }
-            else {
-                $percentage = 0;
-            }
+						$percentage = round(100 * $marks / $totalAvailableMarks);
+					}
+					else {
+						$percentage = 0;
+					}
 
-			/* Count how many responses haven't been automarked, if it hasn't been
-			 * reviewed yet.
-			 */
-			if ($currentAttempt['reviewed_at'] == '') {
-				$this->setVar(array(
-					'ATTEMPT_UNMARKED_RESPONSES' => $responseHandler->numNotAutomarked($currentAttempt['attempt_id'])
-				));
+					/* Count how many responses haven't been automarked, if it hasn't been
+					 * reviewed yet.
+					 */
+					if ($currentAttempt['reviewed_at'] == '') {
+						$this->setVar(array(
+							'ATTEMPT_UNMARKED_RESPONSES' => $responseHandler->numNotAutomarked($currentAttempt['attempt_id'])
+						));
 
-				$this->parse('unmarked_block', 'unmarked');
+						$this->parse('unmarked_block', 'unmarked');
+					}
+					else {
+						$this->setVar('unmarked_block', '');
+					}
+
+					$this->setVar(array(
+						'ASSESS_CATEGORY' => $categoryLookup[$currentAssessment['category_id']],
+						'ASSESS_ASSESS_ID' => $currentAssessment['assess_id'],
+						'ASSESS_TITLE' => Scrub::Text($currentAssessment['title']),
+						'ASSESS_FINISH' => date('jS F Y, g:i:sa', strtotime($currentAttempt['finish'])),
+						'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
+						'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
+						'ATTEMPT_TOTAL_MARKS' => number_format($marks, 2),
+						'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
+						'ATTEMPT_PERCENTAGE' => $percentage,
+					));
+
+					$this->setVar('takeTest_block', '');
+
+					/* Find out if this test has been marked; if it has, allow the
+					 * student to see the feedback, otherwise remove link altogether
+					 */
+					if ($currentAttempt['reviewed_at']) {
+						$this->parse('viewMarks_block', 'viewMarks');
+					}
+					else {
+						$this->setVar('viewMarks_block', '');
+					}
+
+					$this->parse('attempt_block', 'attempt', true);
+				}
 			}
 			else {
-				$this->setVar('unmarked_block', '');
+				$this->setVar('attempt_block', '');
 			}
-
-            $this->setVar(array(
-                'ASSESS_CATEGORY' => $categoryLookup[$currentAssessment['category_id']],
-                'ASSESS_ASSESS_ID' => $currentAssessment['assess_id'],
-                'ASSESS_TITLE' => Scrub::Text($currentAssessment['title']),
-                'ASSESS_FINISH' => date('jS F Y, g:i:sa', strtotime($currentAttempt['finish'])),
-                'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
-                'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
-                'ATTEMPT_TOTAL_MARKS' => number_format($marks, 2),
-                'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
-                'ATTEMPT_PERCENTAGE' => $percentage,
-            ));
-
-            $this->setVar('takeTest_block', '');
-
-            /* Find out if this test has been marked; if it has, allow the
-             * student to see the feedback, otherwise remove link altogether
-             */
-            if ($currentAttempt['reviewed_at']) {
-                $this->parse('viewMarks_block', 'viewMarks');
-            }
-            else {
-                $this->setVar('viewMarks_block', '');
-            }
         }
-
-        $this->parse('attempt_block', 'attempt', true);
     }
 
     $this->parse('allAssess_block', 'allAssess');
@@ -268,4 +280,4 @@ if ($allAssessments) {
 else {
     $this->setVar('allAssess_block', '');
 }
-?>
+
