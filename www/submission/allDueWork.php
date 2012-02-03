@@ -221,20 +221,19 @@ if ($allAssessments) {
                 $percentage = 0;
             }
 
-            /* Count how many responses haven't been automarked
-             */
-            $numNotAutomarked = $responseHandler->numNotAutomarked($currentAttempt['attempt_id']);
+			/* Count how many responses haven't been automarked, if it hasn't been
+			 * reviewed yet.
+			 */
+			if ($currentAttempt['reviewed_at'] == '') {
+				$this->setVar(array(
+					'ATTEMPT_UNMARKED_RESPONSES' => $responseHandler->numNotAutomarked($currentAttempt['attempt_id'])
+				));
 
-            if ($numNotAutomarked == 0) {
-                $this->setVar(array(
-                    'ATTEMPT_UNMARKED_RESPONSES' => $numNotAutomarked
-                ));
-
-                $this->parse('unmarked_block', 'unmarked');
-            }
-            else {
-                $this->setVar('unmarked_block', '');
-            }
+				$this->parse('unmarked_block', 'unmarked');
+			}
+			else {
+				$this->setVar('unmarked_block', '');
+			}
 
             $this->setVar(array(
                 'ASSESS_CATEGORY' => $categoryLookup[$currentAssessment['category_id']],
