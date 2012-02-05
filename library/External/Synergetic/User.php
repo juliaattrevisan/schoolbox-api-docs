@@ -114,7 +114,7 @@ class External_Synergetic_User implements External_UserInterface {
 	public function getStudent($synID) {
 		$query = "SELECT
 					vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname, vStudents.StudentBirthDate,
-					vStudents.StudentTutorName, vStudents.StudentHeadOfHouse, vStudents.StudentFormStaffName, vStudents.StudentTutorDescription,
+					vStudents.StudentTutorName, vStudents.StudentHeadOfHouse, House.HeadOfHouseID,  vStudents.StudentFormStaffName, vStudents.StudentTutorDescription,
 					luForm.ID as TeacherFormID, vStudents.StudentForm, luTutor.ID as TeacherTutorID, vStudents.StudentTutor, luForm.Description as FormDescription,
 					vStudents.StudentHouseDescription, vStudents.StudentHouse, vStudents.StudentYearLevel, vStudents.StudentLockerBook,
 					vStudents.StudentEmergencyName, vStudents.StudentEmergencyPhone, vStudents.StudentEmergencyPhoneAlt, vStudents.StudentMedicalAlert,vStudents.StudentSpecialNeedsFlag, AlertMessage,
@@ -123,13 +123,13 @@ class External_Synergetic_User implements External_UserInterface {
                     LEFT JOIN CommunityAlerts ON CommunityAlerts.ID = StudentID
 					LEFT JOIN SynergyOne.dbo.luForm ON vStudents.StudentForm=luForm.Code
 					LEFT JOIN SynergyOne.dbo.luTutor ON vStudents.StudentTutor=luTutor.Code
+					LEFT JOIN SynergyOne.dbo.luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
 				WHERE
 					vStudents.StudentID = '$synID'
 					AND vStudents.FileSemester=".$_SESSION['FileSemester']."
 					AND vStudents.FileYear=".$_SESSION[ 'FileYear']."
 		";
 		$student = $this->getDatabase()->getRow($query);
-
 
         if(is_array($student)) {
             preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches);
@@ -141,17 +141,21 @@ class External_Synergetic_User implements External_UserInterface {
         return false;
 	}
 
-       function getStaff($synID)
-	{
-            $query = " SELECT SchoolStaffCode, StaffBuilding, StaffRoom, StaffExtension, StaffMobilePhone, StaffCampusDescription, StaffCategoryDescription, StaffDepartment
-                FROM SynergyOne.dbo.vStaff vStaff
-                WHERE vStaff.StaffID = $synID ";
+    function getStaff($synID)
+    {
+         $query = " SELECT SchoolStaffCode, luBuilding.Description as StaffBuilding, StaffRoom, StaffExtension,
+                           StaffMobilePhone, StaffCampusDescription, StaffCategoryDescription, luDepartment.Description as StaffDepartment
+             FROM SynergyOne.dbo.vStaff vStaff
+             LEFT JOIN SynergyOne.dbo.luBuilding ON StaffBuilding = luBuilding.Code
+             LEFT JOIN SynergyOne.dbo.luDepartment ON StaffDepartment = luDepartment.Code
+             WHERE vStaff.StaffID = $synID ";
 
-            $staff = $this->getDatabase()->getRow($query);
+         $staff = $this->getDatabase()->getRow($query);
 
-            return $staff;
+         return $staff;
 
-	}
+    }
+
 
 	/**
 	 * Gets a list of Contacts for all Students in a particular year level. The
@@ -177,7 +181,7 @@ class External_Synergetic_User implements External_UserInterface {
 			FROM SynergyOne.dbo.vStudentContactAllAddress
 			LEFT JOIN SynergyOne.dbo.Community Contact ON StudentContactID = Contact.ID
 			LEFT JOIN SynergyOne.dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
-			LEFT JOIN SynergyOne.dbo.luHouse House ON StudentHouse = House.Code
+			LEFT JOIN SynergyOne.dbo.luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
 			WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
 			AND FileSemester = " . $_SESSION['FileSemester'] . "
 			AND FileYear = " . $_SESSION[ 'FileYear'] . "

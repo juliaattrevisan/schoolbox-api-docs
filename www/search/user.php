@@ -180,12 +180,12 @@ if (is_numeric($this->arg[0])) {
 			$synInfo = $synUserHandler->getStudent($user['synergy_id']);
 
 			if ($synInfo['StudentFormStaffName'] && $synInfo['TeacherFormID']) {
-				$form = $userHandler->getByField('synergy_id', $synInfo['TeacherFormID']);
+				$form = $userHandler->getBySynergy( $synInfo['TeacherFormID']);
 
 				$emailObj = new Email();
-				$emailAddress = $emailObj->formatEmailFromArray($form);
+                $formEmail = $emailObj->formatEmailFromArray($form);
 
-				if ($formEmail = $emailAddress) {
+				if ($formEmail) {
 					$formTeacher = '<a href="'.$_SESSION['mailhandle'].$formEmail.'">'.Scrub::text($synInfo['StudentFormStaffName']).'</a>';
 				}
 				else {
@@ -194,12 +194,11 @@ if (is_numeric($this->arg[0])) {
 			}
 
 			if ($synInfo['StudentTutorName'] && $synInfo['TeacherTutorID']) {
-				$tutor = $userHandler->getByField('synergy_id', $synInfo['TeacherTutorID']);
-
+				$tutor = $userHandler->getBySynergy( $synInfo['TeacherTutorID']);
 				$emailObj = new Email();
-				$emailAddress = $emailObj->formatEmailFromArray($form);
+                $tutorEmail = $emailObj->formatEmailFromArray($tutor);
 
-				if ($tutorEmail = $emailAddress) {
+				if ($tutorEmail) {
 					$tutorTeacher = '<a href="'.$_SESSION['mailhandle'].$tutorEmail.'">'.Scrub::text($synInfo['StudentTutorName']).'</a>';
 				}
 				else {
@@ -207,12 +206,26 @@ if (is_numeric($this->arg[0])) {
 				}
 			}
 
+            if ($synInfo['StudentHeadOfHouse'] && $synInfo['HeadOfHouseID']) {
+         				$hoh = $userHandler->getBySynergy( $synInfo['HeadOfHouseID']);
+
+         				$emailObj = new Email();
+                         $hohEmail = $emailObj->formatEmailFromArray($hoh);
+
+         				if ($hohEmail) {
+         					$hohTeacher = '<a href="'.$_SESSION['mailhandle'].$hohEmail.'">'.Scrub::text($synInfo['StudentHeadOfHouse']).'</a>';
+         				}
+         				else {
+         					$hohTeacher = Scrub::text($synInfo['StudentHeadOfHouse']);
+         				}
+         	}
+
 			$output = array(
 				'TUTOR_GROUP' => Scrub::text($synInfo['StudentTutorDescription']),
 				'TUTOR' => $tutorTeacher,
 				'YEAR_LEVEL' => Scrub::text($synInfo['StudentYearLevel']),
 				'HOUSE' => Scrub::text($synInfo['StudentHouseDescription']),
-				'HOH' => Scrub::text($synInfo['StudentHeadOfHouse']),
+				'HOH' => $hohTeacher,
 				'FORM' => Scrub::text($synInfo['StudentForm']),
 				'FORM_DESCRIPTION' => Scrub::text($synInfo['FormDescription']),
 				'FORM_STAFF' => $formTeacher,
@@ -247,7 +260,12 @@ if (is_numeric($this->arg[0])) {
                             $emailObj = new Email();
                             $emailAddress = $emailObj->formatEmailFromArray($teacher);
 
-                            $teacherOutput[] = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$teacherName</a>";
+                            if($emailAddress) {
+                                $teacherOutput[] = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$teacherName</a>";
+                            }
+                            else {
+                                $teacherOutput[] = $teacherName;
+                            }
                             $emailAll .= $emailAddress.",";
                         }
                     }
