@@ -51,6 +51,11 @@ $j(function() {
 		$j(this).closest('form').submit();
 	});
 
+	/*
+	* Open rel="external" links ion a new tab.
+	* */
+	$j('a[rel=external]').attr('target','_blank');
+
 });
 
 /*
