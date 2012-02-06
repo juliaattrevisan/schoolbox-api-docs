@@ -66,10 +66,19 @@ if ( $dateList = $blogHandler->getOccupiedDateList($category['id']) ) {
 
 		$month = new Alaress_Date_Format($date['created'], 'y-m-d');
 
+		/* Highlight only for the selected month and selected year
+		 */
+		if (($month->getUsingFormat('m') == $monthNumber) && ($month->getUsingFormat('y') == $yearNumber)) {
+			$monthClass = 'selected';
+		}
+		else {
+			$monthClass = '';
+		}
+
 		$this->setVar( array(
 		   'MONTH' => $month->getUsingFormat('F'),
 		   'MONTH_NUMBER' => $month->getUsingFormat('m'),
-		   'MONTH_ClASS' => $month->getUsingFormat('m') == $monthNumber ? 'selected' : ''
+		   'MONTH_ClASS' => $monthClass,
 		) );
 
 		$this->parse('month_block', 'month', true);
@@ -139,7 +148,7 @@ if ( $blogList = $blogHandler->getByYearAndMonth($category['id'], $yearNumber, $
 				$createdTime = new Alaress_Date_Relative($comment['created']);
 
 				$comment['name'] = $userHandler->formatName($comment);
-				
+
 				$this->setVar(array(
 					'COMMENT_BODY'    => Scrub::text($comment['body']),
 					'COMMENT_OWNER'   => "<a href=\"/search/user/{$comment['owner']}\">{$comment['name']}</a>",
