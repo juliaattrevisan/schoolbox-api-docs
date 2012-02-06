@@ -25,22 +25,23 @@ $categoryList = $questionBankCategoryHandler->getList();
 if (is_array($categoryList) ) {
     foreach($categoryList as $category) {
         $this->setVar(array(
-            'CATEGORY_NAME' => $category['name'],
-            'CATEGORY_ID'   => $category['question_category_id'],
-            'CATEGORY_SELECTED' => $category['question_category_id']==$this->arg[0]?'selected':''));
+			'CATEGORY_NAME' => $category['name'],
+			'CATEGORY_ID' => $category['question_category_id'],
+			'CATEGORY_SELECTED' => $category['question_category_id'] == $this->arg[0] ? 'selected' : ''
+		));
 
-        if($category['question_category_id']==$this->arg[0])
-            $categoryName = $category['name'];
+		if ($category['question_category_id'] == $this->arg[0]) {
+			$categoryName = $category['name'];
+		}
 
-        $this->parse('question_category_block', 'question_category', true);
+		$this->parse('question_category_block', 'question_category', true);
     }
 }
-else
+else {
     $this->setVar('question_category_block','');
+}
 
-
-if($this->arg[0] > 0) {
-
+if ($this->arg[0] > 0) {
     $allQuestions = $questionBankHandler->getContents($this->arg[0]);
     $this->setVar('QUESTION_CATEGORY', $categoryName);
 
@@ -60,8 +61,19 @@ if($this->arg[0] > 0) {
 
             if($currentQuestion['answer']) {
                 $answerList = unserialize($currentQuestion['answer']);
+
 				foreach($answerList as $answer) {
-                    $this->setVar('ANSWER_DESCRIPTION', $answer->description);
+
+					/* Matching pairs uses a different property than
+					 * multiple choice
+					 */
+					if ($currentQuestion['type_id'] == $questionBankHandler::MATCHING_PAIRS_TYPE_ID) {
+						$this->setVar('ANSWER_DESCRIPTION', $answer->answerLeft . ' - ' . $answer->answerRight);
+					}
+					else {
+						$this->setVar('ANSWER_DESCRIPTION', $answer->description);
+					}
+
                     $this->parse('answers_block','answers',true);
                 }
             }

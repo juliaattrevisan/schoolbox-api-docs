@@ -66,7 +66,17 @@ if ($this->arg[0] > 0) {
 
 				if (is_array($answerList)) {
 					foreach($answerList as $answer) {
-						$this->setVar('ANSWER_DESCRIPTION', $answer->description);
+
+						/* Matching pairs uses a different property than
+						 * multiple choice
+						 */
+						if ($currentQuestion['type_id'] == $questionBankHandler::MATCHING_PAIRS_TYPE_ID) {
+							$this->setVar('ANSWER_DESCRIPTION', $answer->answerLeft . ' - ' . $answer->answerRight);
+						}
+						else {
+							$this->setVar('ANSWER_DESCRIPTION', $answer->description);
+						}
+
 						$this->parse('answers_block', 'answers', true);
 					}
 				}
