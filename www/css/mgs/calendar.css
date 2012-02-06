@@ -4,7 +4,7 @@
 #calendar a:hover { color: #CC0000; }
 #calendar .ruler thead td { background: 0; padding: 0; }
 #calendar .ruler tr { padding-bottom: 1em; }
-#calendar table.calendarTable td.calTableSelected {  background: #fff; }
+
 #calendar table.calendarTable td.calTableCurrent {  background: #335473; color: #fff; }
 #calendar table {
 	width: 100%;

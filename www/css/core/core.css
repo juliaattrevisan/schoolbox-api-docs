@@ -3847,7 +3847,7 @@ td.cal-mid h3 {
 	color: #797979;
 }
 
-.calTableSelected, .calTableCurrent {
+.calTableCurrent {
 	font-weight: bold;
 	background: #ececec
 }

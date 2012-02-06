@@ -1,7 +1,7 @@
 /*--------------------------------------------------------------
  Calander styles 
 --------------------------------------------------------------*/
-.calTableSelected { font-weight: bold; background: #ccc; }
+
 .calTableCurrent { font-weight: bold; }
 #calendar table {
 	width: 100%;

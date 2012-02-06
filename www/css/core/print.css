@@ -33,7 +33,7 @@ table td.dark{padding:4px; text-align:center; background-color:#000 }
 .otherMonth .dayWrap{border-color:#ccc;}
 .day-block ul.js_happening li span{display:none}
 .day-block ul.js_happening li h4 span.time{display:block;font-size:10px !important;}
-.calTable, .calTableSelected, .calTableCurrent{}
+.calTable, .calTableCurrent{}
 .time{ font-weight:bold; }
 .hidden-fields{display:block;font-size:10px !important;border:1px solid #888;padding:4px; margin:0;}
 .otherMonth .hidden-fields{border:1px dashed #ccc}
