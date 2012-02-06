@@ -43,7 +43,7 @@ class Synchronise_Synergetic_Bialik_Strategy_Student extends Synchronise_Synerge
 		$newUser['lastname'] = $currentUser['StudentSurname'];
         $newUser['alt_email'] = $currentUser['StudentEmail'];
         $newUser['synergy_id'] = $currentUser['StudentID'];
-        $newUser['local_email'] = 1;
+        $newUser['local_email'] = 0;
 
 		/* Year level
 		 */
