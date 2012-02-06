@@ -3515,9 +3515,6 @@ margin-bottom: 8px;
 /************************
 CALENDAR
  ************************/
-#calendar {
-	overflow: hidden
-}
 
 #calendar table {
 	border-bottom: 1px dotted #C3CDD7;
