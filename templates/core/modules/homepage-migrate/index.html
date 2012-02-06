@@ -63,6 +63,17 @@
 
         /* auto scroll to open branch */
         $j("#category-window div.scroller").scrollTo($j("#node-{OPEN}"), 200);
+
+
+		/*
+		* Adjust the height of the source browser depending on the height of the screen.
+		* */
+		$j('#category-window').height($j(window).height()-$j('#header').height()-$j('#footer').height()-330);
+
+		$j(window).resize(function() {
+			$j('#category-window').height($j(window).height()-$j('#header').height()-$j('#footer').height()-330)
+		});
+
     });
 </script>
 <!-- END custom_head -->
