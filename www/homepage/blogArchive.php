@@ -68,7 +68,7 @@ if ( $dateList = $blogHandler->getOccupiedDateList($category['id']) ) {
 
 		/* Highlight only for the selected month and selected year
 		 */
-		if (($month->getUsingFormat('m') == $monthNumber) && ($month->getUsingFormat('y') == $yearNumber)) {
+		if (($month->getUsingFormat('m') == $monthNumber) && ($month->getUsingFormat('Y') == $yearNumber)) {
 			$monthClass = 'selected';
 		}
 		else {
