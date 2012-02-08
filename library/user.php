@@ -430,15 +430,22 @@ class User extends DeprecatedModel {
         unset($user['campus']);
         unset($user['defaultCampus']);
 
-
-        if(isset($user['su'])) {
+		/* Check if $user['su'] exists and not equal to null
+		 */
+        if (isset($user['su'])) {
             $this->db->delete('superusers', 'id', $user['id']);
 
-             if ($user['su']) {
-                 $this->db->insert('superusers', array('id' => $user['id']));
-             }
+			if ($user['su']) {
+				$this->db->insert('superusers', array('id' => $user['id']));
+			}
+
             unset($user['su']);
         }
+		/* Check if $user['su'] exists and is null
+		 */
+		else if (array_key_exists('su', $user)) {
+			unset($user['su']);
+		}
 
         if(isset($user['password'])) {
             $this->setPasswordInternal($user['id'], $user['password']);
