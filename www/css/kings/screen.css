@@ -381,3 +381,8 @@ color: #0066B0;
 
 .row-holder{background:#f3f3f3}
 .standardForm tr.advanced td{background:#f8f8f8;}
+
+.header_option.in-h2 {
+    text-align: right;
+    width: 100%;
+}
