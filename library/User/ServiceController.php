@@ -38,11 +38,11 @@ class User_ServiceController {
        	) {
 
             if ( !$portraitPath = $this->getExternalUserHandler()->getPortrait($externalUserId) ) {
-                $portraitPath = WEB_root . '/images/no_portrait.jpg';
+                $portraitPath = WEB_root . '/images/core/placeholder.png';
             }
         }
         else
-            $portraitPath = WEB_root . '/images/no_portrait.jpg';
+            $portraitPath = WEB_root . '/images/core/placeholder.png';
 
         $image = $this->getImageHandler()->imageResize($portraitPath, $height, $width, false);
 
