@@ -34,10 +34,10 @@ class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synerget
 		 * We don't know how the password is given to us
 		 */
 		$newUser['username'] = $currentUser['StudentContactID'];
-		$newUser['password'] = '1234';
 
 		/* User details
 		 */
+        $newUser['synergy_id'] = $currentUser['StudentContactID'];
 		$newUser['title'] = $currentUser['StudentContactTitle'];
 		$newUser['firstname'] = $currentUser['StudentContactPreferred'];
 		$newUser['lastname'] = $currentUser['StudentContactSurname'];
