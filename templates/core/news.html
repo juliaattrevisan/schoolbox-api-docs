@@ -5,29 +5,29 @@
 	$j(function() {	
 		
 		$j('#category a').click(function() {
-			$j('#category a').removeClass('selected');
-			$j(this).addClass('selected');	
+
 			var el = $j(this).attr('title');
+
+			$j('#category a').removeClass('selected');
+			$j(this).addClass('selected');
 			$j('div.topic > div').hide();
 			$j('div.topic > div#' + el).show();
+			return false;
 		});
-		
-		var params = window.location.href.split("#");
-		if (params[1] != '' && params[0] != window.location.href) {
-			var parent = $j('#a'+ params[1]).parent();
+		var afterHashSymbol = location.hash.substr(1);
+
+		if (afterHashSymbol !== '') {
+			var parent = $j('#a'+ afterHashSymbol).parent();
 			$j(parent).show();
 			$j('#category a[title='+parent.attr('id')+']').addClass('selected');
-			$j.scrollTo('#a'+ params[1]);
-		
+			$j.scrollTo('#a'+ afterHashSymbol);
 		} else {
-		
-		$j('#category li:first-child a').addClass('selected');
+			$j('#category li:first-child a').addClass('selected');
 			$j('div.topic > div:first-child').show();
 		}
 		
 		$j('.news-item:nth-child(2n)' ).addClass('dark');
 
-				
 		$j('h2 .header_option a').html('<span></span>Modify');
 		$j('h2 .header_option a').addClass('btn modify')
 	});
