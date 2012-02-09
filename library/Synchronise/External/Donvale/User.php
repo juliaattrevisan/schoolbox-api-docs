@@ -54,10 +54,8 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 	 * @return void
 	 */
 	private function processStudents() {
-		$i = 0;
-		while (($propertyList = $this->getRow()) && ($i < 20)) {
+		while ($propertyList = $this->getRow()) {
 			$this->incrementLineCount();
-			$i++;
 
 			/* Check number of columns
 			 */

@@ -30,8 +30,50 @@ class External_Schoolbox_User implements External_UserInterface {
 
     }
 
-	public function getStudent ($externalUserId) {
+	/**
+	 * Get a student by id
+	 *
+	 * @param $externalUserId
+	 * @return array
+	 */
+	public function getStudent($externalUserId) {
+		$statement = $this->getDatabase()->prepare("
+			SELECT
+				user.id AS StudentID,
+				user.firstname AS StudentGiven1,
+				user.lastname AS StudentSurname,
+				UNIX_TIMESTAMP(dob) AS StudentBirthDate,
+				'' AS StudentTutorName,
+				'' AS StudentHeadOfHouse,
+				'' AS HeadOfHouseID,
+				'' AS StudentFormStaffName,
+				'' AS StudentTutorDescription,
+				'' AS TeacherFormID,
+				'' AS StudentForm,
+				'' AS TeacherTutorID,
+				'' AS StudentTutor,
+				'' AS FormDescription,
+				'' AS StudentHouseDescription,
+				user_profile.house AS StudentHouse,
+				level AS StudentYearLevel,
+				'' AS StudentLockerBook,
+				'' AS StudentEmergencyName,
+				'' AS StudentEmergencyPhone,
+				'' AS StudentEmergencyPhoneAlt,
+				'' AS StudentMedicalAlert,
+				'' AS StudentSpecialNeedsFlag,
+				'' AS AlertMessage,
+				'' AS StudentBoarder
+			FROM `user`
+			LEFT JOIN user_profile ON user.id = user_profile.user_id
+			WHERE user.synergy_id = :externalUserId
+		");
 
+		$statement->execute(array(
+			':externalUserId' => $externalUserId
+		));
+
+		return $statement->fetch(PDO::FETCH_ASSOC);
 	}
 
 	function getStaff ($externalUserId) {
@@ -90,7 +132,7 @@ class External_Schoolbox_User implements External_UserInterface {
 	}
 
 	function getCurrentSemester () {
-		
+
 	}
 
 	function getSubjectList ($externalUserId, $userId) {
@@ -132,7 +174,7 @@ class External_Schoolbox_User implements External_UserInterface {
 	}
 
     function getEmail ($externalUserId) {
-		
+
     }
 
     public function getStudentUserAccountInfo () {
