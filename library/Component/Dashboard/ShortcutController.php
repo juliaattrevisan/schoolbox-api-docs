@@ -50,23 +50,21 @@ class Component_Dashboard_ShortcutController extends Component_Dashboard_Control
         $this->setVar('student_only_block', '');
 		$this->setVar('administrator_only_block', '');
 
-		/* Parse staff blocks
-		 */
-        if ($this->getGroup()->isStaff()) {
-            $this->parse('staff_only_block', 'staff_only');
-        }
-
-		/* Parse student blocks
-		 */
-		if ($this->getGroup()->isStudent()) {
-            $this->parse('student_only_block', 'student_only');
-        }
-
 		/* Parse administrator blocks
 		 */
 		if ($this->getGroup()->isSuperuser()) {
 			$this->parse('administrator_only_block', 'administrator_only');
 		}
+		/* Parse staff blocks
+		 */
+        else if ($this->getGroup()->isStaff()) {
+            $this->parse('staff_only_block', 'staff_only');
+        }
+		/* Parse student blocks
+		 */
+		else if ($this->getGroup()->isStudent()) {
+            $this->parse('student_only_block', 'student_only');
+        }
 
         return true;
     }
