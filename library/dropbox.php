@@ -103,7 +103,7 @@ class Dropbox
 
 	function getFileList($cid) {
 		$query = "SELECT d.id, d.description, u.id as uid, title, firstname, lastname,  
-						DATE_FORMAT(submitted, '".FILE_date_format."') as subdate, iconFile 
+						submitted as subdate, iconFile
 					FROM dropbox d 
 						LEFT JOIN user u ON owner = u.id 
 						LEFT JOIN allowedFileTypes af ON d.mime_type = af.mime 

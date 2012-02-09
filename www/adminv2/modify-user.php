@@ -241,6 +241,9 @@ else {
     /* Output group list */
      $this->dropDown('system_group', $userHandler->getGroupList(), '', TEMPLATE_content, array('id'=>'GROUP_ID','name'=>'SYSTEM_GROUP_NAME'));
 
+    /* Output house list */
+    $this->dropDown('house', HouseMapper::getInstance()->findAll(), $user['house'], TEMPLATE_content, array('id'=>'HOUSE_ID','house'=>'HOUSE_NAME'));
+
     /* Output campus list */
      $this->setBlock(TEMPLATE_content, 'campus','campus_block');
      $campusList = $userHandler->getCampusList();

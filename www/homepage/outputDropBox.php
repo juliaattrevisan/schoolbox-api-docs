@@ -26,11 +26,13 @@ else {
 
 	if(is_array($fileList)) {
 		foreach($fileList as $file) {
+            $date = new Alaress_Date_Format($file['subdate'], 'y-m-d h:i:s');
+
 			$output = array('DROPBOX_MIME_IMAGE'	=> $allowedFiles->getClass($file["iconFile"]),
 							'DROPBOX_DESCRIPTION' => Scrub::text($file['description']),
 							'DROPBOX_ID'		=> $file['id'],
 							'DROP_SUBMITTED_BY' => "<a href=\"/search/user/{$file['uid']}\">".$userHandler->formatName($file).'</a>',
-							'DROP_SUBMITTED_TIME'=>$file['subdate'],
+							'DROP_SUBMITTED_TIME'=> $date->getShort(),
 							'ON_OFF' => ++$j%2? '' : 'dark',
 							);
 			$this->setVar($output);
