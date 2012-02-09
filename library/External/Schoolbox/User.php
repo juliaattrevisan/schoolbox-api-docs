@@ -44,6 +44,7 @@ class External_Schoolbox_User implements External_UserInterface {
 
 
 	function getStudentContactList ($externalUserId) {
+
         $statement = $this->getDatabase()->query("
       			SELECT u.*
       			FROM user_relation ur

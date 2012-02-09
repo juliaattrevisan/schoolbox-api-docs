@@ -156,7 +156,6 @@ class External_Synergetic_User implements External_UserInterface {
 
     }
 
-
 	/**
 	 * Gets a list of Contacts for all Students in a particular year level. The
 	 * year level is stored in Synergetic.

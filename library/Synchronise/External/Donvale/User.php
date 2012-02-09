@@ -72,7 +72,6 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 			$user = array(
 				'synergy_id' => $propertyList['StudId'],
 				'username' => $propertyList['ThirdParty_Code'],
-				'password' => '',
 				'title' => '',
 				'firstname' => $propertyList['StudFirstName'],
 				'lastname' => $propertyList['StudLastName'],
@@ -156,7 +155,6 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 			$user = array(
 				'synergy_id' => $propertyList['StaffId'],
 				'username' => $propertyList['ThirdParty_Code'],
-				'password' => '',
 				'title' => $propertyList['Title'],
 				'firstname' => $propertyList['StaffFirstName'],
 				'lastname' => $propertyList['StaffLastName'],
@@ -226,7 +224,7 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 
             if ($userClean = $this->getUserHandler()->getBySynergy($user['synergy_id'])) {
                 $user['id'] = $userClean['uid'];
-
+                unset($user['password']); // dont update passwords
                 $this->getUserHandler()->update($user);
             }
             else {

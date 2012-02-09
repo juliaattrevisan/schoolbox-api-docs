@@ -65,6 +65,7 @@ abstract class Synchronise_External_Donvale_Abstract {
 	 * @return bool
 	 */
 	protected function isMatchingColumns($columns) {
+
 		if (!count(array_diff($columns, $this->getColumnList()))) {
 			return true;
 		}
