@@ -242,7 +242,7 @@ h3, #nav h3, .add-component .notification { color: #FFFFFF; }
 
 .login #container #content h1 {
     background: url('/images/moriah/ely_light.png') no-repeat top left;
-    width: 400px; height: 121px; text-indent: -999em;
+    width: 400px; height: 99px; text-indent: -999em;
 }
 
 .standardForm, .dark, .dark td, #tree .dark, #assess .standardForm, #assess .additional-details,
