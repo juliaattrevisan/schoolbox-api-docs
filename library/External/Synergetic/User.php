@@ -365,9 +365,10 @@ class External_Synergetic_User implements External_UserInterface {
 	public function getStaffContactListExtended() {
 		$query = "
 			SELECT
-				StaffID, StaffTitle, StaffPreferredName, StaffSurname, StaffPhone,
+				StaffID, StaffTitle, StaffPreferredName, StaffSurname, StaffPhone, StaffOccupEmail,
 				StaffCampusDescription, StaffCategoryType, StaffDepartment
 			FROM SynergyOne.dbo.vStaff vStaff
+			WHERE ActiveFlag = 1
 		";
 
         return $this->getDatabase()->getAll($query);

@@ -64,8 +64,6 @@ class Report_Staff extends Report_Abstract {
 
 		if (is_array($allStaff) && count($allStaff)) {
 			foreach($allStaff as $currentStaff) {
-
-
 				$this->getPage()->setVar(array(
 					'STAFF_STAFFID' => $currentStaff['StaffID'],
 					'STAFF_TITLE' => $currentStaff['StaffTitle'],
