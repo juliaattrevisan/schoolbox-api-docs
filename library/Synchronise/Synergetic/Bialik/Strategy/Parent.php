@@ -60,6 +60,45 @@ class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synerget
 	}
 
 	/**
+	 * Set up the new user's spouse's details
+	 *
+	 * @param $currentUser
+	 * @return array
+	 */
+	public function setupSpouseDetails($currentUser) {
+		$spouse = array();
+
+		/* Login details
+		 * We don't know how the password is given to us
+		 */
+		$spouse['username'] = $currentUser['StudentContactSpouseID'];
+
+		/* User details
+		 */
+		$spouse['synergy_id'] = $currentUser['StudentContactSpouseID'];
+		$spouse['title'] = $currentUser['StudentContactSpouseTitle'];
+		$spouse['firstname'] = $currentUser['StudentContactSpousePreferred'];
+		$spouse['lastname'] = $currentUser['StudentContactSpouseSurname'];
+		$spouse['alt_email'] = $currentUser['StudentContactSpouseDefaultEma'];
+
+		/* Campus config: needs to map to a campus id
+		 */
+		$spouse['defaultCampus'] = 1;
+		$spouse['campus'] = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
+
+		/* Staff Group ID
+		 */
+		$spouse['group_id'] = self::PARENT_GROUP_ID;
+
+		/* This person is not a superuser
+		 */
+		$spouse['su'] = false;
+
+		return $spouse;
+	}
+
+
+	/**
 	 * If the users exist in Synergy but not in Schoolbox, create an account for
 	 * them
 	 *
@@ -73,6 +112,7 @@ class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synerget
 
 		foreach($this->getList() as $currentUser) {
 			$newUser = $this->setupUserDetails($currentUser);
+			$newSpouse = $this->setupSpouseDetails($currentUser);
 
 			/* First iteration
 			 */
@@ -82,25 +122,30 @@ class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synerget
 				}
 
 				$previousUser = $newUser;
+				$previousSpouse = $newSpouse;
 			}
 			/* Previous was different person to Current
 			 */
 			else if ($previousUser['username'] != $newUser['username']) {
 				$previousUser['campus'] = $compiledCampus;
+				$previousSpouse['campus'] = $compiledCampus;
 
 				/* Uniquify campus list
 				 */
 				$previousUser['campus'] = array_unique($previousUser['campus']);
+				$previousSpouse['campus'] = array_unique($previousSpouse['campus']);
 
 				/* Update previous user
 				 */
 				$this->executeCreateUpdate($previousUser);
+				$this->executeCreateUpdate($previousSpouse);
 
 				/* Recompile
 				 */
 				$compiledCampus = $newUser['campus'];
 
 				$previousUser = $newUser;
+				$previousSpouse = $newSpouse;
 			}
 			/* They are the same person
 			 */

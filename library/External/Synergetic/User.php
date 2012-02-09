@@ -323,9 +323,8 @@ class External_Synergetic_User implements External_UserInterface {
 	public function getParentUserAccountInfo() {
 		$query = "
 			SELECT DISTINCT
-				StudentContactID,
-				StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
-				StudentContactSpouseID, StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseSurname,
+				StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
+				StudentContactSpouseID, StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseSurname, StudentContactSpouseDefaultEmail,
 				StudentYearLevel
 			FROM SynergyOne.dbo.vStudentContactAllAddress
 			WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')

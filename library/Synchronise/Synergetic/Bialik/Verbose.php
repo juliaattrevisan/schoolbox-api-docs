@@ -91,7 +91,10 @@ class Synchronise_Synergetic_Bialik_Verbose {
 		$data[] = "alt_email: {$newUser['alt_email']}";
 		$data[] = "campus: " . '[' . implode(',', $newUser['campus']) . ']';
 		$data[] = "groupIDs: " . $newUser['group_id'];
-        $data[] = 'year: ' . $newUser['year'];
+
+		if (array_key_exists('year', $newUser)) {
+        	$data[] = 'year: ' . $newUser['year'];
+		}
 
 		return '(' . implode(', ', $data) . ')';
 	}
