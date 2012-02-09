@@ -12,6 +12,10 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
     private $teacherColumnList = array('StaffId', 'Password', 'Teacher', 'PreferredFirstName', 'Title', 'Email', 'Department', 'Phone', 'Location', 'StaffFirstName', 'StaffLastName', 'AuthGroup', 'House', 'Id', 'ThirdParty_Code', 'Salutation', 'StaffMobile');
     private $parentColumnList = array('school_num', 'FirstName', 'Surname', 'SBUsername', 'SBPassword', 'email', 'Comment', 'CurrentParent');
 
+	/* User Profile reference
+	 */
+	private $profile;
+
 	/**
 	 * Process input
 	 *
@@ -50,8 +54,10 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 	 * @return void
 	 */
 	private function processStudents() {
-		while ($propertyList = $this->getRow()) {
+		$i = 0;
+		while (($propertyList = $this->getRow()) && ($i < 20)) {
 			$this->incrementLineCount();
+			$i++;
 
 			/* Check number of columns
 			 */
@@ -89,8 +95,38 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 				$this->getUserHandler()->update($user);
 			}
 			else {
-				$this->getUserHandler()->create($user);
+				$user['id'] = $this->getUserHandler()->create($user);
 			}
+
+			/* Update user profile
+			 */
+			$this->setProfile(new Synchronise_External_Donvale_User_Profile());
+
+			$this->getProfile()->setUserId($user['id']);
+			$this->getProfile()->setDob($propertyList['DateofBirth']);
+			$this->getProfile()->setLevel($propertyList['Level']);
+			$this->getProfile()->setHomegroup($propertyList['HomeGroup']);
+			$this->getProfile()->setHouse($propertyList['House']);
+
+			$this->getProfile()->getGuardian1()->setHomePhone($propertyList['Guardian1Tel_H']);
+			$this->getProfile()->getGuardian1()->setWorkPhone($propertyList['Guardian1Tel_W']);
+			$this->getProfile()->getGuardian1()->setMobilePhone($propertyList['Guardian1Tel_M']);
+			$this->getProfile()->getGuardian1()->setAddress($propertyList['Guardian1Add']);
+			$this->getProfile()->getGuardian1()->setSuburb($propertyList['Guardian1Sub']);
+			$this->getProfile()->getGuardian1()->setPostcode($propertyList['Guardian1PostC']);
+			$this->getProfile()->getGuardian1()->setEmail($propertyList['Guardian1Email']);
+			$this->getProfile()->getGuardian1()->setMailAddress($propertyList['Guardian1MailAdd']);
+
+			$this->getProfile()->getGuardian2()->setHomePhone($propertyList['Guardian2Tel_H']);
+			$this->getProfile()->getGuardian2()->setWorkPhone($propertyList['Guardian2Tel_W']);
+			$this->getProfile()->getGuardian2()->setMobilePhone($propertyList['Guardian2Tel_M']);
+			$this->getProfile()->getGuardian2()->setAddress($propertyList['Guardian2Add']);
+			$this->getProfile()->getGuardian2()->setSuburb($propertyList['Guardian2Sub']);
+			$this->getProfile()->getGuardian2()->setPostcode($propertyList['Guardian2PostC']);
+			$this->getProfile()->getGuardian2()->setEmail($propertyList['Guardian2Email']);
+			$this->getProfile()->getGuardian2()->setMailAddress($propertyList['Guardian2MailAdd']);
+
+			$this->getProfile()->createUpdate();
 		}
 
 		print("{$this->getLineEnding()}{$this->getErrorCount()} of {$this->getLineCount()} students failed to load.{$this->getLineEnding()}");
@@ -305,4 +341,24 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 
 		return false;
 	}
+
+	/**
+	 * Set profile
+	 *
+	 * @param $profile
+	 */
+	private function setProfile($profile) {
+		$this->profile = $profile;
+	}
+
+	/**
+	 * Get profile
+	 *
+	 * @return mixed
+	 */
+	private function getProfile() {
+		return $this->profile;
+	}
+
+
 }
