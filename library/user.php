@@ -193,7 +193,7 @@ class User extends DeprecatedModel {
         }
 
         $oldPassword = mysql_real_escape_string($oldPassword);
-        $newPassword = mysql_real_escape_string($newpassword);
+        $newPassword = mysql_real_escape_string($newPassword);
         $query = "UPDATE `" . $this->_table . "` SET password = PASSWORD('$newPassword'), email_pass = '$newPassword' WHERE `" . $this->_index . "` = $userID AND password = PASSWORD('$oldPassword')";
         $this->db->query($query);
 
