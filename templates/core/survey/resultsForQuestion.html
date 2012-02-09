@@ -7,7 +7,7 @@
 $j(function() {
 	$j.fn.qtip.defaults.position.corner = {target: 'topLeft',tooltip: 'bottomLeft'};
 	$j.fn.qtip.defaults.style = {tip: 'bottomLeft',name: 'green'};
-	
+
 	$j('.evaluation-response li').each(function() {
 		$j(this).addClass('list-answer-'+$j(this).text());
 		$j(this).html('<a class="response-item" href="#">'+$j(this).html()+'</a>');
@@ -25,7 +25,7 @@ $j(function() {
 	$j('.response-item').click(function() {
 		$j('.activate-results, .response-item').removeClass('active');
 		$j('.list-answer-'+$j(this).text()).each(function() {
-			$j(this).children('a').addClass('active'); 
+			$j(this).children('a').addClass('active');
 		});
 		$j('.letter-'+$j(this).text()).children('a').addClass('active');
 		return false;
@@ -33,22 +33,25 @@ $j(function() {
 	$j('.response-item').each(function() {
 		$j(this).qtip({content: "<strong>Answer:</strong> " + $j('.letter-'+$j(this).html()).find('span').text()});
 	});
-	
+
 	if ($j('.evaluation-legend').length > 0) {
 		$j('.information-notification.hide').removeClass('hide');
 	};
-}); 
+});
 </script>
 <!-- END custom_head -->
 
-	<h1>{SURVEY_NAME}</h1>
-	<span class="header_option clearfix"><a class="btn go-back" href="/survey/results/{SURVEY_ID}"><span></span>Return to Survey</a></span>
+<h1>{SURVEY_NAME}</h1>
+<span class="header_option clearfix"><a class="btn go-back" href="/survey/results/{SURVEY_ID}"><span></span>Return to Survey</a></span>
 
-	<h2>{QUESTION_QUESTION}</h2>
-	<div class="evaluation-question-result pad-it clearfix">
+<h2>Responses</h2>
+<div class="evaluation-question-result pad-it clearfix">
 
-		<div class="evaluation-results">
-					
+	<div class="evaluation-results">
+		<div class='evaluation-question'>
+			{QUESTION_QUESTION}
+		</div>
+
 		<h3>Results</h3>
 		<p class="information-notification clearfix hide">Click on a response letter to see the other students who selected that answer. Alternatively hover the response letter to see what it refers to.</p>
 		<table>
@@ -67,14 +70,13 @@ $j(function() {
 				<!-- END respondent -->
 			</tbody>
 		</table>
-		</div>
-
+	</div>
 
 	<!-- BEGIN has_legend -->
 	<div class="evaluation-legend">
-		
+
 		<h3>Legend</h3>
-		<p class="information-notification clearfix">Click on a legend item to see the students that responded to that answer.</p>	
+		<p class="information-notification clearfix">Click on a legend item to see the students that responded to that answer.</p>
 		<ul>
 			<!-- BEGIN legend_item -->
 			<li class="letter-{LEGEND_ITEM_LETTER}"><a href="#" class="activate-results"><strong>{LEGEND_ITEM_LETTER}</strong> <span>{LEGEND_ITEM_TEXT}</span></a></li>

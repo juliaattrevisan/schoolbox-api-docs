@@ -9,7 +9,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-class Survey_Answer_Short extends AnswerShort {
+class Survey_Answer_Short extends Evaluation_Answer_Short {
 	protected $graphTemplateFile ='survey/answer/short/graph.html';
 
 	/**
