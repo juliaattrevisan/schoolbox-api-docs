@@ -43,6 +43,7 @@
 <h1>Catering Report</h1>
 <span class="header_option">
     <a class="btn go-back" href="/modules/leave/house/{HOUSE_ID}"><span></span>Return to {HOUSE_NAME}</a>
+    <a class="btn print" href="javascript:window.print()"><span></span>Print</a>
 </span>
 <div class="indent">
     <!-- BEGIN no_houses -->
@@ -61,14 +62,10 @@
         <thead>
             <tr>
                 <th></th>
-                <th colspan="3" class="center">Absent</th>
                 <th colspan="3" class="center">Present</th>
             </tr>
             <tr>
                 <th>House</th>
-                <th>Breakfast</th>
-                <th>Lunch</th>
-                <th>Dinner</th>
                 <th>Breakfast</th>
                 <th>Lunch</th>
                 <th>Dinner</th>
@@ -78,9 +75,6 @@
             <!-- BEGIN house -->
             <tr class="{CLASS}">
                 <td><a href="/modules/leave/house/{HOUSE_ID}">{HOUSE_NAME}</a></td>
-                <td>{ABSENT_MORNING}</td>
-                <td>{ABSENT_DAY}</td>
-                <td>{ABSENT_NIGHT}</td>
                 <td>{PRESENT_MORNING}</td>
                 <td>{PRESENT_DAY}</td>
                 <td>{PRESENT_NIGHT}</td>
@@ -90,9 +84,6 @@
         <tfoot>
             <tr>
                 <td>Total</td>
-                <td>{ABSENT_MORNING_TOTAL}</td>
-                <td>{ABSENT_DAY_TOTAL}</td>
-                <td>{ABSENT_NIGHT_TOTAL}</td>
                 <td>{PRESENT_MORNING_TOTAL}</td>
                 <td>{PRESENT_DAY_TOTAL}</td>
                 <td>{PRESENT_NIGHT_TOTAL}</td>

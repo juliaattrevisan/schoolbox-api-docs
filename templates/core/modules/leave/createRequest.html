@@ -15,6 +15,19 @@
                 $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
                     input.val(data.time);
                 })
+
+            }
+        });
+
+        $j('#requestForm').validate();
+
+        $j('#requesthostType').change(function(){
+            if(($j(this).val() == '4') && $j('#hostDetails').is(':visible')){
+                $j('#hostDetails').slideUp();
+                $j('#hostDetails input').removeClass('required');
+            } else {
+                $j('#hostDetails').slideDown();
+                $j('#hostDetails input').addClass('required');
             }
         });
     });
@@ -31,16 +44,16 @@
                 <em></em>
             </td>
             <td>
-                <input name="request[start][date]" id="startDate" type="text" size="16" maxlength="30"/>
+                <input name="request[start][date]" id="startDate" type="text" size="16" maxlength="30" class="required" />
             </td>
             <td class="formLabelWidth">
                 <h4>Leave Time</h4>
                 <em></em>
             </td>
             <td>
-                <input name="request[start][hour]" type="text" maxlength="2" class="timeField" />
+                <input name="request[start][hour]" type="text" maxlength="2" class="timeField required" />
                 :
-                <input name="request[start][minute]" type="text" maxlength="2" class="timeField" />
+                <input name="request[start][minute]" type="text" maxlength="2" class="timeField required" />
                 <select name="request[start][meridian]">
                     <option>AM</option>
                     <option>PM</option>
@@ -53,16 +66,16 @@
                 <em></em>
             </td>
             <td>
-                <input name="request[finish][date]" id="finishDate" type="text" size="16" maxlength="30"/>
+                <input name="request[finish][date]" id="finishDate" type="text" size="16" maxlength="30" class="required" />
             </td>
             <td class="formLabelWidth">
                 <h4>Return Time</h4>
                 <em></em>
             </td>
             <td>
-                <input name="request[finish][hour]" type="text" maxlength="2" class="timeField" />
+                <input name="request[finish][hour]" type="text" maxlength="2" class="timeField required" />
                 :
-                <input name="request[finish][minute]" type="text" maxlength="2" class="timeField" />
+                <input name="request[finish][minute]" type="text" maxlength="2" class="timeField required" />
                 <select name="request[finish][meridian]">
                     <option>AM</option>
                     <option>PM</option>
@@ -75,9 +88,12 @@
                 <em></em>
             </td>
             <td>
-                <select name="request[hostType]">
-                    <option value="1">Parent</option>
-                    <option value="2">Peer Parent</option>
+                <select name="request[hostType]" id="requesthostType">
+                    <option value="1">Mother</option>
+                    <option value="2">Father</option>
+                    <option value="3">Guardian</option>
+                    <option value="4">Self</option>
+                    <option value="5">Other</option>
                 </select>
             </td>
             <td class="formLabelWidth">
@@ -85,23 +101,23 @@
                 <em></em>
             </td>
             <td>
-                <input type="text" name="request[userPhone]" size="16" />
+                <input type="text" name="request[userPhone]" size="16" class="required" />
             </td>
         </tr>
-        <tr>
+        <tr id="hostDetails">
             <td class="formLabelWidth">
                 <h4>Host Name</h4>
                 <em></em>
             </td>
             <td>
-                <input type="text" name="request[hostName]" size="24" />
+                <input type="text" name="request[hostName]" size="24" class="required" />
             </td>
             <td class="formLabelWidth">
                 <h4>Host Phone</h4>
                 <em></em>
             </td>
             <td>
-                <input type="text" name="request[hostPhone]" size="16" />
+                <input type="text" name="request[hostPhone]" size="16" class="required" />
             </td>
         </tr>
         <tr>
@@ -113,7 +129,19 @@
                 <textarea rows="4" cols="60" name="request[description]"></textarea>
             </td>
         </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Terms and Conditions</h4>
+                <em></em>
+            </td>
+            <td colspan="3">
+                <label for="requestTerms">
+                    <input type="checkbox" id="requestTerms" name="request[terms]" class="required" />
+                    I accept the terms and conditions
+                </label>
+            </td>
+        </tr>
 	</table>
 
-	<input type="submit" name="Submit" value="Apply for Leave" class="submit-btn-plain">
+	<input type="submit" name="Submit" value="Submit Leave Application" class="submit-btn-plain">
 </form>

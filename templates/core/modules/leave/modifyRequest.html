@@ -21,7 +21,7 @@
 </script>
 <!-- END custom_head -->
 
-<h1><span>{USER_NAME} Leave Request</span></h1>
+<h1><span>Leave Request: {USER_NAME}, Year {USER_YEAR}, {USER_HOUSE}</span></h1>
 
 <form  method="post" action="/modules/leave/processModify" id="requestForm">
 	<table class="standardForm">
@@ -43,27 +43,11 @@
                 {USER_NAME}
             </td>
             <td class="formLabelWidth">
-                <h4>Year Level</h4>
-                <em></em>
-            </td>
-            <td>
-                {USER_YEAR}
-            </td>
-        </tr>
-        <tr>
-            <td class="formLabelWidth">
                 <h4>Student ID</h4>
                 <em></em>
             </td>
             <td>
                 {USER_EXTERNAL_ID}
-            </td>
-            <td class="formLabelWidth">
-                <h4>House</h4>
-                <em></em>
-            </td>
-            <td>
-                {USER_HOUSE}
             </td>
         </tr>
         <tr>
@@ -152,6 +136,15 @@
             </td>
             <td colspan="3">
                 <textarea rows="4" cols="60" name="request[description]">{REQUEST_DESCRIPTION}</textarea>
+            </td>
+        </tr>
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Notes</h4>
+                <em></em>
+            </td>
+            <td colspan="3">
+                <textarea rows="4" cols="60" name="request[notes]">{REQUEST_NOTES}</textarea>
             </td>
         </tr>
 	</table>
