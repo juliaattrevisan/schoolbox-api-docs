@@ -8,6 +8,7 @@
  * @version	 SVN: $Id$
  */
 class Synchronise_External_Donvale_User_Guardian {
+	private $name;
 	private $homePhone;
 	private $workPhone;
 	private $mobilePhone;
@@ -159,5 +160,23 @@ class Synchronise_External_Donvale_User_Guardian {
 	 */
 	public function getWorkPhone() {
 		return $this->workPhone;
+	}
+
+	/**
+	 * Set name
+	 *
+	 * @param $name
+	 */
+	public function setName($name) {
+		$this->name = $name;
+	}
+
+	/**
+	 * Get name
+	 *
+	 * @return mixed
+	 */
+	public function getName() {
+		return $this->name;
 	}
 }

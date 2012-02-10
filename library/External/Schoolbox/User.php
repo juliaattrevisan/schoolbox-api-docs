@@ -76,6 +76,55 @@ class External_Schoolbox_User implements External_UserInterface {
 		return $statement->fetch(PDO::FETCH_ASSOC);
 	}
 
+	/**
+	 * Get details for a student's contacts
+	 *
+	 * @param $externalUserId
+	 * @return array
+	 */
+	public function getStudentContactList($externalUserId) {
+		$statement = $this->getDatabase()->prepare("
+			SELECT
+				1 AS StudentContactID,
+				'' AS StudentContactTitle,
+				'' AS StudentContactPreferred,
+				'' AS StudentContactSurname,
+				guardian1Name AS StudentContactPreferred,
+				'' AS StudentContactSurname,
+				guardian1Email AS StudentContactDefaultEmail,
+				guardian1Address AS StudentContactAddress1,
+				guardian1Suburb AS StudentContactSuburb,
+				guardian1Postcode AS StudentContactPostCode,
+				'' AS StudentContactState,
+				guardian1HomePhone AS StudentContactPhoneActual,
+				guardian1MobilePhone AS StudentContactMobilePhone,
+				guardian1WorkPhone AS StudentContactOccupPhone,
+				2 AS StudentContactSpouseID,
+				'' AS StudentContactSpouseTitle,
+				'' AS StudentContactSpousePreferred,
+				'' AS StudentContactSpouseSurname,
+				guardian2Name AS StudentContactSpousePreferred,
+				'' AS StudentContactSpouseSurname,
+				guardian2Email AS StudentContactSpouseDefaultEmail,
+				guardian2Address AS StudentContactSpouseAddress1,
+				guardian2Suburb AS StudentContactSpouseSuburb,
+				guardian2Postcode AS StudentContactSpousePostCode,
+				'' AS StudentContactSpouseState,
+				guardian2HomePhone AS StudentContactSpousePhoneActual,
+				guardian2MobilePhone AS StudentContactSpouseMobilePhone,
+				guardian2WorkPhone AS StudentContactSpouseOccupPhone
+			FROM `user`
+			LEFT JOIN user_profile ON user.id = user_profile.user_id
+			WHERE user.synergy_id = :externalUserId
+		");
+
+		$statement->execute(array(
+			':externalUserId' => $externalUserId
+		));
+
+		return $statement->fetchAll(PDO::FETCH_ASSOC);
+	}
+
 	function getStaff ($externalUserId) {
 
 	}
@@ -85,7 +134,13 @@ class External_Schoolbox_User implements External_UserInterface {
     }
 
 
-	function getStudentContactList ($externalUserId) {
+	/**
+	 * Alex's weird usage
+	 *
+	 * @param $externalUserId
+	 * @return array
+	 */
+	public function getLeaveStudentContactList ($externalUserId) {
 
         $statement = $this->getDatabase()->query("
       			SELECT u.*

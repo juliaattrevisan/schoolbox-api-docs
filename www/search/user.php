@@ -317,7 +317,7 @@ if (is_numeric($this->arg[0])) {
 
 			if (is_array($studentContactList)) {
 				foreach ($studentContactList as $studentContact) {
-                    
+
 					if ((int)$studentContact['StudentContactID'] == (int)$_SESSION['sid'] || $studentContact['StudentContactSpouseID'] == $_SESSION['sid'] || $groupHandler->isStaff() || $_SESSION['su']) {
 						$j++;
 
@@ -352,7 +352,7 @@ if (is_numeric($this->arg[0])) {
 
 						$this->setVar($output);
 
-						if (trim($studentContact['StudentContactSpouseTitle'])) {
+						if (trim($studentContact['StudentContactSpouseTitle']) || trim($studentContact['StudentContactSpousePreferred'])) {
 							$this->parse('spouse_details_block', 'spouse_details');
 						}
 

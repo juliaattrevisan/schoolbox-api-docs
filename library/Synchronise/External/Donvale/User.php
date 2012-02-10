@@ -105,6 +105,7 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 			$this->getProfile()->setHomegroup($propertyList['HomeGroup']);
 			$this->getProfile()->setHouse($propertyList['House']);
 
+			$this->getProfile()->getGuardian1()->setName($propertyList['Guardian1']);
 			$this->getProfile()->getGuardian1()->setHomePhone($propertyList['Guardian1Tel_H']);
 			$this->getProfile()->getGuardian1()->setWorkPhone($propertyList['Guardian1Tel_W']);
 			$this->getProfile()->getGuardian1()->setMobilePhone($propertyList['Guardian1Tel_M']);
@@ -114,6 +115,7 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 			$this->getProfile()->getGuardian1()->setEmail($propertyList['Guardian1Email']);
 			$this->getProfile()->getGuardian1()->setMailAddress($propertyList['Guardian1MailAdd']);
 
+			$this->getProfile()->getGuardian2()->setName($propertyList['Guardian2']);
 			$this->getProfile()->getGuardian2()->setHomePhone($propertyList['Guardian2Tel_H']);
 			$this->getProfile()->getGuardian2()->setWorkPhone($propertyList['Guardian2Tel_W']);
 			$this->getProfile()->getGuardian2()->setMobilePhone($propertyList['Guardian2Tel_M']);

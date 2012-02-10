@@ -45,6 +45,7 @@ class Synchronise_External_Donvale_User_Profile {
 			'level' => $this->getLevel(),
 			'homegroup' => $this->getHomegroup(),
 			'house' => $this->getHouse(),
+			'guardian1Name' => $this->getGuardian1()->getName(),
 			'guardian1HomePhone' => $this->getGuardian1()->getHomePhone(),
 			'guardian1WorkPhone' => $this->getGuardian1()->getWorkPhone(),
 			'guardian1MobilePhone' => $this->getGuardian1()->getMobilePhone(),
@@ -53,6 +54,7 @@ class Synchronise_External_Donvale_User_Profile {
 			'guardian1Postcode' => $this->getGuardian1()->getPostcode(),
 			'guardian1Email' => $this->getGuardian1()->getEmail(),
 			'guardian1MailAddress' => $this->getGuardian1()->getMailAddress(),
+			'guardian2Name' => $this->getGuardian2()->getName(),
 			'guardian2HomePhone' => $this->getGuardian2()->getHomePhone(),
 			'guardian2WorkPhone' => $this->getGuardian2()->getWorkPhone(),
 			'guardian2MobilePhone' => $this->getGuardian2()->getMobilePhone(),
@@ -76,13 +78,13 @@ class Synchronise_External_Donvale_User_Profile {
 				Database::getInstance()->prepare("
 					INSERT INTO user_profile (
 						user_id, dob, level, homegroup, house,
-						guardian1HomePhone, guardian1WorkPhone, guardian1MobilePhone, guardian1Address, guardian1Suburb, guardian1Postcode, guardian1Email, guardian1MailAddress,
-						guardian2HomePhone, guardian2WorkPhone, guardian2MobilePhone, guardian2Address, guardian2Suburb, guardian2Postcode, guardian2Email, guardian2MailAddress
+						guardian1Name, guardian1HomePhone, guardian1WorkPhone, guardian1MobilePhone, guardian1Address, guardian1Suburb, guardian1Postcode, guardian1Email, guardian1MailAddress,
+						guardian2Name, guardian2HomePhone, guardian2WorkPhone, guardian2MobilePhone, guardian2Address, guardian2Suburb, guardian2Postcode, guardian2Email, guardian2MailAddress
 					)
 					VALUES (
 						:userId, :dob, :level, :homegroup, :house,
-						:guardian1HomePhone, :guardian1WorkPhone, :guardian1MobilePhone, :guardian1Address, :guardian1Suburb, :guardian1Postcode, :guardian1Email, :guardian1MailAddress,
-						:guardian2HomePhone, :guardian2WorkPhone, :guardian2MobilePhone, :guardian2Address, :guardian2Suburb, :guardian2Postcode, :guardian2Email, :guardian2MailAddress
+						:guardian1Name, :guardian1HomePhone, :guardian1WorkPhone, :guardian1MobilePhone, :guardian1Address, :guardian1Suburb, :guardian1Postcode, :guardian1Email, :guardian1MailAddress,
+						:guardian2Name, :guardian2HomePhone, :guardian2WorkPhone, :guardian2MobilePhone, :guardian2Address, :guardian2Suburb, :guardian2Postcode, :guardian2Email, :guardian2MailAddress
 					)
 				")->execute($profileData);
 			}
@@ -94,6 +96,7 @@ class Synchronise_External_Donvale_User_Profile {
 						level = :level,
 						homegroup = :homegroup,
 						house = :house,
+						guardian1Name = :guardian1Name,
 						guardian1HomePhone = :guardian1HomePhone,
 						guardian1WorkPhone = :guardian1WorkPhone,
 						guardian1MobilePhone = :guardian1MobilePhone,
@@ -102,6 +105,7 @@ class Synchronise_External_Donvale_User_Profile {
 						guardian1Postcode = :guardian1Postcode,
 						guardian1Email = :guardian1Email,
 						guardian1MailAddress = :guardian1MailAddress,
+						guardian2Name = :guardian2Name,
 						guardian2HomePhone = :guardian2HomePhone,
 						guardian2WorkPhone = :guardian2WorkPhone,
 						guardian2MobilePhone = :guardian2MobilePhone,
