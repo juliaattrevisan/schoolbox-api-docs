@@ -192,6 +192,9 @@ if (is_numeric($this->arg[0])) {
 					$formTeacher = Scrub::text($synInfo['StudentFormStaffName']);
 				}
 			}
+            else {
+                $formTeacher = $synInfo['StudentFormStaffName'];
+            }
 
 			if ($synInfo['StudentTutorName'] && $synInfo['TeacherTutorID']) {
 				$tutor = $userHandler->getBySynergy( $synInfo['TeacherTutorID']);
@@ -205,6 +208,9 @@ if (is_numeric($this->arg[0])) {
 					$tutorTeacher = Scrub::text($synInfo['StudentTutorName']);
 				}
 			}
+            else {
+                $tutorTeacher = $synInfo['StudentTutorName'];
+            }
 
             if ($synInfo['StudentHeadOfHouse'] && $synInfo['HeadOfHouseID']) {
          				$hoh = $userHandler->getBySynergy( $synInfo['HeadOfHouseID']);
@@ -219,6 +225,8 @@ if (is_numeric($this->arg[0])) {
          					$hohTeacher = Scrub::text($synInfo['StudentHeadOfHouse']);
          				}
          	}
+            else
+                $hohTeacher = $synInfo['StudentHeadOfHouse'];
 
 			$output = array(
 				'TUTOR_GROUP' => Scrub::text($synInfo['StudentTutorDescription']),
