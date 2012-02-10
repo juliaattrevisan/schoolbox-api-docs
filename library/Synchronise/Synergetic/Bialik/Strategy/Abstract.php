@@ -135,7 +135,7 @@ abstract class Synchronise_Synergetic_Bialik_Strategy_Abstract extends Synchroni
 		/* Does this person have a username? If not, skip them
 		 */
 		if ($this->hasUsername($newUser)) {
-			$existing = $this->userExists($newUser);
+			$existing = $this->userExistsBySynergyAndGroup($newUser);
 
 			/* If the current user exists in Schoolbox, update them
 			 */
@@ -184,15 +184,39 @@ abstract class Synchronise_Synergetic_Bialik_Strategy_Abstract extends Synchroni
 	}
 
 	/**
-	 * Determine if user exists in Schoolbox, by seeing if we can
-	 * get someone by their username
+	 * Determine if user exists in Schoolbox
 	 *
 	 * @param $newUser
-	 * @internal param $currentUser
-	 * @return void
+	 * @return mixed
 	 */
 	protected function userExists($newUser) {
 		return $this->getUserHandler()->getBySynergy($newUser['synergy_id']);
+	}
+
+	/**
+	 * Determine if a user exists in Schoolbox in a particular group
+	 *
+	 * @param $newUser
+	 * @return mixed
+	 */
+	protected function userExistsBySynergyAndGroup($newUser) {
+		$query = "
+			SELECT
+				user.id as uid, synergy_id,
+				title, firstname, lastname, username,
+				local_email, alt_email,
+				userCampus.campus, year, house,
+				eportfolio_enabled,
+				groups.name AS gname, group_id
+			FROM user
+			LEFT JOIN groups ON user.group_id = groups.id
+			LEFT JOIN userCampus ON user.id = userCampus.uid
+			WHERE user.synergy_id = '{$newUser['synergy_id']}'
+			AND groups.id = '{$newUser['group_id']}'
+			ORDER BY userCampus.defaultCampus DESC
+		";
+
+		return $this->getUserHandler()->db->getRow($query);
 	}
 
 	/**
