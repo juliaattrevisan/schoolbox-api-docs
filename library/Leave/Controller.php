@@ -1,14 +1,14 @@
 <?php
 
 class Leave_Controller extends Controller {
+	const THRESHOLD_MORNING = '11:59:59';
+	const THRESHOLD_DAY = '16:59:59';
+	const THRESHOLD_NIGHT = '23:59:59';
+
     protected $requestMapper;
-
     protected $userMapper;
-
     protected $houseMapper;
-
     protected $externalUser;
-
 	protected $group;
 
     /**
@@ -480,7 +480,7 @@ class Leave_Controller extends Controller {
 		}
 
 		$reportStart = new Alaress_Date_Format($date, 'd/m/y');
-		$reportStart->addDays(6 - $reportStart->getWeekDayNumber());
+		$reportStart->addDays(5 - $reportStart->getWeekDayNumber());
 
 		$reportFinish = new Alaress_Date_Format($date, 'd/m/y');
 		$reportFinish->addDays(7 - $reportFinish->getWeekDayNumber());
@@ -509,33 +509,16 @@ class Leave_Controller extends Controller {
         $houseList = $data['houseList'];
         $requestList = $data['requestList'];
 
-        $reportStart = new Alaress_Date_Format( $data['reportStart']->getDatabaseDate() , 'y-m-d' );
-
-        $reportStartMorning = new Alaress_Date_Format( $data['reportStart']->getDatabaseDate() , 'y-m-d' );
-        $reportStartMorning->addDays(1/3);
-
-        $reportStartDay = new Alaress_Date_Format( $data['reportStart']->getDatabaseDate() , 'y-m-d' );
-        $reportStartDay->addDays(2/3);
-
-        $reportStartNight = new Alaress_Date_Format( $data['reportStart']->getDatabaseDate() , 'y-m-d' );
-        $reportStartNight->addDays(3/3);
-
-        $reportFinish = new Alaress_Date_Format( $data['reportFinish']->getDatabaseDate() , 'y-m-d' );
-
-        $reportFinishMorning = new Alaress_Date_Format( $data['reportFinish']->getDatabaseDate() , 'y-m-d' );
-        $reportFinishMorning->addDays(1/3);
-
-        $reportFinishDay = new Alaress_Date_Format( $data['reportFinish']->getDatabaseDate() , 'y-m-d' );
-        $reportFinishDay->addDays(2/3);
-
-        $reportFinishNight = new Alaress_Date_Format( $data['reportFinish']->getDatabaseDate() , 'y-m-d' );
-        $reportFinishNight->addDays(3/3);
-
+		/* Render output
+		 */
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/houseReport.html');
         $this->getPage()->setBlock(TEMPLATE_content, 'house', 'house_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'row', 'row_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'report_header', 'report_header_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'report_header_subtitle', 'report_header_subtitle_block');
         $this->getPage()->setBlock('row', 'request', 'request_block');
+		$this->getPage()->setBlock('request', 'request_period', 'request_period_block');
         $this->getPage()->setBlock('row', 'empty_request', 'empty_request_block');
 
 		if (count($houseList)) {
@@ -560,66 +543,162 @@ class Leave_Controller extends Controller {
 			$this->getPage()->setVar('no_requests_block', '');
 
 			foreach ($requestList as $i => $request) {
-				$this->getPage()->setVar( array(
-                    'USER_ID' => $request->getUser()->getId(),
-                    'USER_NAME' => $request->getUser()->getName(),
-                    'USER_YEAR' => $request->getUser()->getYear(),
-                    'CLASS' => $i % 2 ? '' : 'dark'
-                ) );
+				$this->getPage()->setVar(array(
+					'USER_ID' => $request->getUser()->getId(),
+					'USER_NAME' => $request->getUser()->getName(),
+					'USER_YEAR' => $request->getUser()->getYear(),
+					'CLASS' => $i % 2 ? '' : 'dark'
+				));
+
+				define('NUM_SEGMENTS_PER_DAY', 3);
+				define('RANGE', 3);
 
 				if ($request->getId()) {
-                    $this->getPage()->setVar( array(
-                        'REQUEST_ID' => $request->getId(),
-                        'REQUEST_STATUS' => $request->getStatus(true),
-                        'REQUEST_START_MORNING' => $request->getOccupancy($reportStart, $reportStartMorning) ? '<span>L</span>' : '',
-                        'REQUEST_START_DAY' => $request->getOccupancy($reportStartMorning, $reportStartDay) ? '<span>L</span>' : '',
-                        'REQUEST_START_NIGHT' => $request->getOccupancy($reportStartDay, $reportStartNight) ? '<span>L</span>' : '',
-                        'REQUEST_FINISH_MORNING' => $request->getOccupancy($reportFinish, $reportFinishMorning) ? '<span>L</span>' : '',
-                        'REQUEST_FINISH_DAY' => $request->getOccupancy($reportFinishMorning, $reportFinishDay) ? '<span>L</span>' : '',
-                        'REQUEST_FINISH_NIGHT' => $request->getOccupancy($reportFinishDay, $reportFinishNight) ? '<span>L</span>' : '',
-                        'REQUEST_HOST_TYPE' => $request->getHostType(true),
-                    ) );
+					$this->getPage()->setVar(array(
+						'REQUEST_ID' => $request->getId(),
+						'REQUEST_STATUS' => $request->getStatus(true),
+						'REQUEST_HOST_TYPE' => $request->getHostType(true),
+					));
+
+					/* The date the Leave Request started and the date it ends
+					 */
+					$requestDateStart = new Alaress_Date_Format($request['start'], 'y-m-d');
+					$requestDateFinish = new Alaress_Date_Format($request['finish'], 'y-m-d');
+
+					/* For each day that the person is on leave within the prescribed period of time, show an
+					 * icon. If they are starting or ending their leave on this day, show the time as well
+					 *
+					 * Render 3 columns each day for 3 days
+					 *
+					 * Morning: 00:00:00 to 11:59:59
+					 * Day: 12:00:00 to 17:59:59
+					 * Night: 18:00:00 to 23:59:59
+					 */
+					$morningStart = $data['reportStart'];
+					$dayStart = new Alaress_Date_Format($morningStart->getUnixTimestamp() + 12*60*60-1, 'U');
+					$nightStart = new Alaress_Date_Format($dayStart->getUnixTimestamp() + 5*60*60, 'U');
+					$nightEnd = new Alaress_Date_Format($nightStart->getUnixTimestamp() + 7*60*60, 'U');
+
+					$showStartTime = true;
+
+					for ($i = 0; $i < RANGE; $i++) {
+
+						/* Parse out the headings
+						 */
+						$this->getPage()->setVar(array(
+							'REPORT_HEADER_DATE' => $morningStart->getLong(),
+						));
+
+						$this->getPage()->parse('report_header_block', 'report_header', true);
+						$this->getPage()->parse('report_header_subtitle_block', 'report_header_subtitle', true);
+
+						/* If this person is on leave during the morning
+						 */
+						if ($request->getOccupancy($morningStart, $dayStart)) {
+
+							/* Check whether next segment is occupied; if not, also show the time
+							 */
+							if ($showStartTime || !$request->getOccupancy($dayStart, $nightStart)) {
+								$requestPeriodMorning = "<span>L haha</span>";
+								$showStartTime = false;
+							}
+							else {
+								$requestPeriodMorning = "<span>L</span>";
+							}
+						}
+
+						/* If this person is on leave during the day
+						 */
+						if ($request->getOccupancy($dayStart, $nightStart)) {
+							if ($showStartTime || !$request->getOccupancy($nightStart, $nightEnd)) {
+								$requestPeriodDay = "<span>L haha</span>";
+								$showStartTime = false;
+							}
+							else {
+								$requestPeriodDay = "<span>L</span>";
+							}
+						}
+
+						/* If this person is on leave during the night
+						 */
+						if ($request->getOccupancy($nightStart, $nightEnd)) {
+
+							/* Check whether the next morning is occupied
+							 */
+							$nextMorning = new Alaress_Date_Format($dayStart->getDatabase(), 'y-m-d h:i:s');
+							$nextMorning->addDays(1);
+
+							if ($showStartTime || !$request->getOccupancy($nightEnd, $nextMorning)) {
+								$requestPeriodNight = "<span>L haha</span>";
+								$showStartTime = false;
+							}
+							else {
+								$requestPeriodNight = "<span>L</span>";
+							}
+						}
+
+						$this->getPage()->setVar(array(
+							'REQUEST_PERIOD_MORNING' => $requestPeriodMorning,
+							'REQUEST_PERIOD_DAY' => $requestPeriodDay,
+							'REQUEST_PERIOD_NIGHT' => $requestPeriodNight
+						));
+
+						$this->getPage()->parse('request_period_block', 'request_period', true);
+
+						/* Iteration reset
+						 */
+						$morningStart->addDays(1);
+						$dayStart->addDays(1);
+						$nightStart->addDays(1);
+						$nightEnd->addDays(1);
+
+						unset($requestPeriodMorning, $requestPeriodDay, $requestPeriodNight);
+					}
 
 					if ($request->getStatus() != Leave_Request::STATUS_PENDING) {
-                        $this->getPage()->setVar( array(
-                            'REQUEST_STATUS' => $request->getStatus(true),
-                            'REQUEST_AUTHORISATION_DATETIME' => $request->getAuthorisationDatetime(true)->getAustralian(),
-                            'REQUEST_AUTHORISATION_USER_ID' => $request->getAuthorisationUser()->getId(),
-                            'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->getName(),
-                        ) );
-                    }
-                    else {
-                        $this->getPage()->setVar( array(
-                            'REQUEST_STATUS' => $request->getStatus(true),
-                            'REQUEST_AUTHORISATION_DATETIME' => 'Pending Approval',
-                            'REQUEST_AUTHORISATION_USER_ID' => '',
-                            'REQUEST_AUTHORISATION_USER_NAME' => '',
-                            'CLASS' => $this->getPage()->getVar('CLASS') . ' leave-pending'
-                        ) );
-                    }
+						$this->getPage()->setVar(array(
+							'REQUEST_STATUS' => $request->getStatus(true),
+							'REQUEST_AUTHORISATION_DATETIME' => $request->getAuthorisationDatetime(true)->getAustralian(),
+							'REQUEST_AUTHORISATION_USER_ID' => $request->getAuthorisationUser()->getId(),
+							'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->getName(),
+						));
+					}
+					else {
+						$this->getPage()->setVar(array(
+							'REQUEST_STATUS' => $request->getStatus(true),
+							'REQUEST_AUTHORISATION_DATETIME' => 'Pending Approval',
+							'REQUEST_AUTHORISATION_USER_ID' => '',
+							'REQUEST_AUTHORISATION_USER_NAME' => '',
+							'CLASS' => $this->getPage()->getVar('CLASS') . ' leave-pending'
+						));
+					}
 
-                    $this->getPage()->setVar('empty_request_block', '');
-                    $this->getPage()->parse('request_block', 'request');
-                }
-                else {
-                    $this->getPage()->setVar('request_block', '');
-                    $this->getPage()->parse('empty_request_block', 'empty_request');
-                }
+					$this->getPage()->setVar('empty_request_block', '');
+					$this->getPage()->parse('request_block', 'request');
 
-                $this->getPage()->parse('row_block', 'row', true);
-            }
-        }
-        else {
-            $this->getPage()->parse('no_requests_block', 'no_requests');
+					/* Clear children after parsing out the parent
+					 */
+					$this->getPage()->setVar('request_period_block', '');
+				}
+				else {
+					$this->getPage()->setVar('request_block', '');
+					$this->getPage()->parse('empty_request_block', 'empty_request');
+				}
+
+				$this->getPage()->parse('row_block', 'row', true);
+			}
+		}
+		else {
+			$this->getPage()->parse('no_requests_block', 'no_requests');
 			$this->getPage()->setVar('row_block', '');
-        }
+		}
 
 		$this->getPage()->setVar(array(
-            'HOUSE_NAME' => $currentHouse->getHouse(),
-            'HOUSE_ID' => $currentHouse->getId(),
+//            'HOUSE_NAME' => $currentHouse->getHouse(),
+//            'HOUSE_ID' => $currentHouse->getId(),
             'REPORT_DATE' => $data['date'],
-            'REPORT_START_DATE' => $reportStart->getLong(),
-            'REPORT_FINISH_DATE' => $reportFinish->getLong(),
+//            'REPORT_START_DATE' => $reportStart->getLong(),
+//            'REPORT_FINISH_DATE' => $reportFinish->getLong(),
 		));
     }
 

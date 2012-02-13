@@ -94,8 +94,9 @@
             <tr>
                 <th></th>
                 <th></th>
-                <th colspan="3" class="center">{REPORT_START_DATE}</th>
-                <th colspan="3" class="center">{REPORT_FINISH_DATE}</th>
+				<!-- BEGIN report_header -->
+				<th colspan="3" class="center">{REPORT_HEADER_DATE}</th>
+				<!-- END report_header -->
                 <th></th>
                 <th></th>
                 <th></th>
@@ -104,12 +105,11 @@
             <tr>
                 <th>Name</th>
                 <th>Year</th>
+				<!-- BEGIN report_header_subtitle -->
                 <th>Morning</th>
                 <th>Day</th>
                 <th>Night</th>
-                <th>Morning</th>
-                <th>Day</th>
-                <th>Night</th>
+				<!-- END report_header_subtitle -->
                 <th>Host</th>
                 <th>Approval Date</th>
                 <th>Approved By</th>
@@ -122,12 +122,11 @@
             <tr class="{CLASS}">
                 <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
                 <td>{USER_YEAR}</td>
-                <td>{REQUEST_START_MORNING}</td>
-                <td>{REQUEST_START_DAY}</td>
-                <td>{REQUEST_START_NIGHT}</td>
-                <td>{REQUEST_FINISH_MORNING}</td>
-                <td>{REQUEST_FINISH_DAY}</td>
-                <td>{REQUEST_FINISH_NIGHT}</td>
+				<!-- BEGIN request_period -->
+				<td>{REQUEST_PERIOD_MORNING}</td>
+				<td>{REQUEST_PERIOD_DAY}</td>
+				<td>{REQUEST_PERIOD_NIGHT}</td>
+				<!-- END request_period -->
                 <td>{REQUEST_HOST_TYPE}</td>
                 <td>{REQUEST_AUTHORISATION_DATETIME}</td>
                 <td><a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a></td>
