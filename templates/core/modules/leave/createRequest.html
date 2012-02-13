@@ -1,7 +1,24 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/jquery.autocomplete.css" />
+
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript">
+
+	<!-- BEGIN student_autocomplete_javascript -->
+	$j('#user').autocomplete({
+		serviceUrl: '/ajax/user.php?groupID={STUDENT_GROUP_IDS}',
+		minChars: 2,
+		maxHeight: 300,
+		width: 275,
+        noCache: true,
+		onSelect: function (value, data) {
+			$j('#userId').val(data);
+		}
+	});
+	<!-- END student_autocomplete_javascript -->
+
     $j(function() {
         $j('#startDate, #finishDate').datepicker({
             dateFormat: 'dd/mm/yy',
@@ -38,6 +55,22 @@
 
 <form  method="post" action="/modules/leave/processCreate" id="requestForm">
 	<table class="standardForm">
+
+		<!-- BEGIN student_autocomplete -->
+		<tr>
+			<td class="formLabelWidth">
+				<h4>Person</h4>
+				<em></em>
+			</td>
+			<td>
+				<input id='user' type='text' value='' />
+				<input id='userId' name='userId' type='hidden' value='' />
+			</td>
+			<td class="formLabelWidth">
+			</td>
+			<td>
+			</td>
+		</tr>
         <tr>
             <td class="formLabelWidth">
                 <h4>Leave Date</h4>

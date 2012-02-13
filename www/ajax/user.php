@@ -10,7 +10,14 @@ $result = $suggestions = $data = array();
 $keyword = $_GET['query'];
 $groupID = $_GET['groupID'];
 
-if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && is_numeric($groupID)) {
+if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && strlen($groupID)) {
+
+	/* Allow for multiple groups search via autocompletes
+	 */
+	if (strstr($groupID, ',')) {
+		$groupID = explode(',', $groupID);
+	}
+
 	$userList = $userHandler->ajaxSearch($keyword, $groupID, 30);
 
 	if (is_array($userList)) {

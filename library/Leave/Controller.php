@@ -9,6 +9,8 @@ class Leave_Controller extends Controller {
 
     protected $externalUser;
 
+	protected $group;
+
     /**
      * Constructor
      *
@@ -17,75 +19,15 @@ class Leave_Controller extends Controller {
     public function __construct ($page = null) {
         parent::__construct($page);
 
-        $this->setUserMapper( NewUserMapper::getInstance() );
-        $this->setRequestMapper( Leave_RequestMapper::getInstance() );
-        $this->setHouseMapper( HouseMapper::getInstance() );
-        $this->setExternalUser( new External_User );
+        $this->setUserMapper(NewUserMapper::getInstance());
+        $this->setRequestMapper(Leave_RequestMapper::getInstance());
+        $this->setHouseMapper(HouseMapper::getInstance());
+        $this->setExternalUser(new External_User());
+		$this->setGroup(new Group());
     }
 
     /**
-     * Setter for $requestMapper
      *
-     * @param Leave_RequestMapper $requestMapper
-     * @return void
-     */
-    protected function setRequestMapper ($requestMapper){
-        $this->requestMapper = $requestMapper;
-    }
-
-    /**
-     * Getter for $requestMapper
-     *
-     * @return Leave_RequestMapper
-     */
-    protected function getRequestMapper () {
-        return $this->requestMapper;
-    }
-
-    /**
-     * Setter for $userMapper
-     *
-     * @param NewUserMapper $userMapper
-     * @return void
-     */
-    public function setUserMapper($userMapper)
-    {
-        $this->userMapper = $userMapper;
-    }
-
-    /**
-     * Getter for $userMapper
-     *
-     * @return NewUserMapper
-     */
-    public function getUserMapper()
-    {
-        return $this->userMapper;
-    }
-
-    /**
-     * Setter for $houseMapper
-     *
-     * @param HouseMapper $houseMapper
-     * @return void
-     */
-    public function setHouseMapper($houseMapper)
-    {
-        $this->houseMapper = $houseMapper;
-    }
-
-    /**
-     * Getter for $houseMapper
-     *
-     * @return HouseMapper
-     */
-    public function getHouseMapper()
-    {
-        return $this->houseMapper;
-    }
-
-    /**
-     * 
      *
      * @return Array
      */
@@ -101,7 +43,33 @@ class Leave_Controller extends Controller {
      */
     public function renderCreateRequest ($data) {
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/createRequest.html');
+		$this->getPage()->setBlock('custom_head', 'student_autocomplete_javascript', 'student_autocomplete_javascript_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'student_autocomplete', 'student_autocomplete_block');
+
         $this->getPage()->setVar($data);
+
+		/* Add terms and conditions
+		 */
+		$this->getPage()->setVar(array(
+			'TERMS_AND_CONDITIONS' => Cfg::get('terms_and_conditions')
+		));
+
+		/* Apply autocomplete if appropriate - staff can submit on someone else's behalf
+		 */
+		if ($this->getGroup()->isStaff()) {
+			$this->getPage()->setVar(array(
+				'STUDENT_GROUP_IDS' => implode(',', $this->getGroup()->getStudentGroupTypeIds())
+			));
+
+			$this->getPage()->parse('student_autocomplete_block', 'student_autocomplete');
+			$this->getPage()->parse('student_autocomplete_javascript_block', 'student_autocomplete_javascript');
+		}
+		/* Everyone else submits as themselves
+		 */
+		else {
+			$this->getPage()->setVar('student_autocomplete_block', '');
+			$this->getPage()->setVar('student_autocomplete_javascript_block', '');
+		}
     }
 
     /**
@@ -117,21 +85,28 @@ class Leave_Controller extends Controller {
 
         $start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['hour']}:{$data['request']['start']['minute']} {$data['request']['start']['meridian']}", 'd/m/y');
         $finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['hour']}:{$data['request']['finish']['minute']} {$data['request']['finish']['meridian']}", 'd/m/y');
-
         $created = new Alaress_Date_Format( time(), 'U');
-
         $request = new Leave_Request();
 
-        $request->setUserId($_SESSION['id']);
-        $request->setStart( $start->getDatabase() );
-        $request->setFinish( $finish->getDatabase() );
-        $request->setHostType($data['request']['hostType']);
-        $request->setHostName($data['request']['hostName']);
-        $request->setHostPhone($data['request']['hostPhone']);
-        $request->setUserPhone($data['request']['userPhone']);
-        $request->setDescription($data['request']['description']);
-        $request->setStatus(Leave_Request::STATUS_PENDING);
-        $request->setCreated( $created->getDatabase() );
+		/* Use the userId field when submitting on someone else's behalf,
+		 * otherwise just your own id
+		 */
+		if ($this->getGroup()->isStaff()) {
+			$request->setUserId($data['userId']);
+		}
+		else {
+			$request->setUserId($_SESSION['id']);
+		}
+
+		$request->setStart($start->getDatabase());
+		$request->setFinish($finish->getDatabase());
+		$request->setHostType($data['request']['hostType']);
+		$request->setHostName($data['request']['hostName']);
+		$request->setHostPhone($data['request']['hostPhone']);
+		$request->setUserPhone($data['request']['userPhone']);
+		$request->setDescription($data['request']['description']);
+		$request->setStatus(Leave_Request::STATUS_PENDING);
+		$request->setCreated($created->getDatabase());
 
         $this->getRequestMapper()->save($request);
 
@@ -274,7 +249,7 @@ class Leave_Controller extends Controller {
         $requestList = $data['requestList'];
 
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/userRequestList.html');
-        
+
         $this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'pending_request_list', 'pending_request_list_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'previous_request_list', 'previous_request_list_block');
@@ -548,8 +523,8 @@ class Leave_Controller extends Controller {
         $reportFinishDay->addDays(2/3);
 
         $reportFinishNight = new Alaress_Date_Format( $data['reportFinish']->getDatabaseDate() , 'y-m-d' );
-        $reportFinishNight->addDays(3/3);        
-        
+        $reportFinishNight->addDays(3/3);
+
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/houseReport.html');
 
         $this->getPage()->setBlock(TEMPLATE_content, 'house', 'house_block');
@@ -861,13 +836,99 @@ class Leave_Controller extends Controller {
         }
     }
 
-    public function setExternalUser($externalUser)
-    {
+	/**
+	 * Set external user
+	 *
+	 * @param $externalUser
+	 */
+    public function setExternalUser($externalUser) {
         $this->externalUser = $externalUser;
     }
 
-    public function getExternalUser()
-    {
+	/**
+	 * Get external user
+	 *
+	 * @return mixed
+	 */
+    public function getExternalUser() {
         return $this->externalUser;
     }
+
+	/**
+	 * Set group handler
+	 *
+	 * @param $group
+	 */
+	private function setGroup($group) {
+		$this->group = $group;
+	}
+
+	/**
+	 * Get group handler
+	 *
+	 * @return mixed
+	 */
+	private function getGroup() {
+		return $this->group;
+	}
+
+	/**
+	 * Setter for $requestMapper
+	 *
+	 * @param Leave_RequestMapper $requestMapper
+	 *
+	 * @return void
+	 */
+	protected function setRequestMapper($requestMapper) {
+		$this->requestMapper = $requestMapper;
+	}
+
+	/**
+	 * Getter for $requestMapper
+	 *
+	 * @return Leave_RequestMapper
+	 */
+	protected function getRequestMapper() {
+		return $this->requestMapper;
+	}
+
+	/**
+	 * Setter for $userMapper
+	 *
+	 * @param NewUserMapper $userMapper
+	 *
+	 * @return void
+	 */
+	public function setUserMapper($userMapper) {
+		$this->userMapper = $userMapper;
+	}
+
+	/**
+	 * Getter for $userMapper
+	 *
+	 * @return NewUserMapper
+	 */
+	public function getUserMapper() {
+		return $this->userMapper;
+	}
+
+	/**
+	 * Setter for $houseMapper
+	 *
+	 * @param HouseMapper $houseMapper
+	 *
+	 * @return void
+	 */
+	public function setHouseMapper($houseMapper) {
+		$this->houseMapper = $houseMapper;
+	}
+
+	/**
+	 * Getter for $houseMapper
+	 *
+	 * @return HouseMapper
+	 */
+	public function getHouseMapper() {
+		return $this->houseMapper;
+	}
 }
