@@ -24,6 +24,7 @@ class External_Schoolbox_Class extends Mapper implements External_ClassInterface
 			LEFT JOIN groups g ON g.id = u.group_id
 			WHERE c.code = :code
 				AND g.group_type = :type
+			ORDER BY u.lastname, u.firstname
 		");
 
 		$statement->execute( array(
