@@ -1,6 +1,8 @@
 <?php
 
 class HouseMapper extends Mapper {
+	protected $table = 'luResidentialHouse';
+
     protected function mapping () {
         $this->hasMap(array(
             'column'     => 'id',
@@ -10,7 +12,7 @@ class HouseMapper extends Mapper {
         ));
 
         $this->hasMap(array(
-            'column'     => 'house',
+            'column'     => 'name',
             'property'   => 'house',
             'type'       => Mapper::TYPE_STRING,
         ));

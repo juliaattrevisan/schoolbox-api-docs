@@ -89,6 +89,12 @@ class Leave_RequestMapper extends Mapper {
             'type'       => Mapper::TYPE_INTEGER,
         ));
 
+		$this->hasMap(array(
+			'column' => 'notes',
+			'property' => 'notes',
+			'type' => Mapper::TYPE_STRING,
+		));
+
         parent::mapping();
     }
 
