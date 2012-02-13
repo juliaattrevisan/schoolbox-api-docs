@@ -5,6 +5,34 @@
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript">
+$j(function() {
+	$j('#startDate, #finishDate').datepicker({
+		dateFormat: 'dd/mm/yy',
+		showOn: 'both',
+		buttonImage: '/images/core/calendar/calendar-click.png',
+		buttonImageOnly: true,
+		constrainInput: false,
+		onClose: function (string) {
+			var input = $j(this);
+
+			$j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
+				input.val(data.time);
+			})
+
+		}
+	});
+
+	$j('#requestForm').validate();
+
+	$j('#requesthostType').change(function(){
+		if(($j(this).val() == '4') && $j('#hostDetails').is(':visible')){
+			$j('#hostDetails').slideUp();
+			$j('#hostDetails input').removeClass('required');
+		} else {
+			$j('#hostDetails').slideDown();
+			$j('#hostDetails input').addClass('required');
+		}
+	});
 
 	<!-- BEGIN student_autocomplete_javascript -->
 	$j('#user').autocomplete({
@@ -12,42 +40,13 @@
 		minChars: 2,
 		maxHeight: 300,
 		width: 275,
-        noCache: true,
+		noCache: true,
 		onSelect: function (value, data) {
 			$j('#userId').val(data);
 		}
 	});
 	<!-- END student_autocomplete_javascript -->
-
-    $j(function() {
-        $j('#startDate, #finishDate').datepicker({
-            dateFormat: 'dd/mm/yy',
-            showOn: 'both',
-            buttonImage: '/images/core/calendar/calendar-click.png',
-            buttonImageOnly: true,
-            constrainInput: false,
-            onClose: function (string) {
-                var input = $j(this);
-
-                $j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
-                    input.val(data.time);
-                })
-
-            }
-        });
-
-        $j('#requestForm').validate();
-
-        $j('#requesthostType').change(function(){
-            if(($j(this).val() == '4') && $j('#hostDetails').is(':visible')){
-                $j('#hostDetails').slideUp();
-                $j('#hostDetails input').removeClass('required');
-            } else {
-                $j('#hostDetails').slideDown();
-                $j('#hostDetails input').addClass('required');
-            }
-        });
-    });
+});
 </script>
 <!-- END custom_head -->
 
@@ -71,6 +70,7 @@
 			<td>
 			</td>
 		</tr>
+		<!-- END student_autocomplete -->
         <tr>
             <td class="formLabelWidth">
                 <h4>Leave Date</h4>
