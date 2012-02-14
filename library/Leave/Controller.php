@@ -5,6 +5,11 @@ class Leave_Controller extends Controller {
 	const THRESHOLD_DAY = '16:59:59';
 	const THRESHOLD_NIGHT = '23:59:59';
 
+	/* Consts for days
+	 */
+	const FRIDAY = 5;
+	const SUNDAY = 7;
+
 	/* Show leave requests over RANGE days
 	 * Change
 	 */
@@ -497,10 +502,10 @@ class Leave_Controller extends Controller {
 		 * TODO: Remove these magic numbers
 		 */
 		$reportStart = new Alaress_Date_Format($date, 'd/m/y');
-		$reportStart->addDays(5 - $reportStart->getWeekDayNumber());
+		$reportStart->addDays(self::FRIDAY - $reportStart->getWeekDayNumber());
 
 		$reportFinish = new Alaress_Date_Format($date, 'd/m/y');
-		$reportFinish->addDays(7 - $reportFinish->getWeekDayNumber());
+		$reportFinish->addDays(self::SUNDAY - $reportFinish->getWeekDayNumber());
 
 		$requestList = $this->getRequestMapper()->getHouseReport($houseId, $reportStart->getDatabaseDate(), $reportFinish->getDatabaseDate());
 
@@ -934,26 +939,46 @@ class Leave_Controller extends Controller {
         fclose($stream);
     }
 
+	/**
+	 * Get catering requirements for the Friday, Saturday and Sunday.
+	 * This is the period of time when people can go on leave.
+	 *
+	 * @param $date
+	 * @return array
+	 */
 	public function executeCateringReport($date) {
-		$data = array();
 
+		/* Collate results for each day
+		 */
+		$data = array();
 		$data['date'] = $date;
 
-		$data['houseList'] = $this->getRequestMapper($date)->getCateringReport($date);
+		for ($i = self::FRIDAY; $i <= self::SUNDAY; $i++) {
+			$currentDate = new Alaress_Date_Format($date, 'd/m/y');
+			$currentDate->addDays($i - $currentDate->getWeekDayNumber());
 
-		if (count($data['houseList'])) {
-			foreach ($data['houseList'] as $house) {
-				$data['absentMorningTotal'] += $house['absent_morning'];
-				$data['absentDayTotal'] += $house['absent_day'];
-				$data['absentNightTotal'] += $house['absent_night'];
-				$data['presentMorningTotal'] += $house['present_morning'];
-				$data['presentDayTotal'] += $house['present_day'];
-				$data['presentNightTotal'] += $house['present_night'];
+			$data['dateList'][] = $currentDate;
+
+			$allHouses = $this->getRequestMapper($date)->getCateringReport($currentDate);
+			$data['houseList'][] = $allHouses;
+
+			/* Summate totals for each house in this segment
+			 */
+			$totals = array();
+
+			foreach($allHouses as $currentHouse) {
+				$totals['present_morning'] += $currentHouse['present_morning'];
+				$totals['present_day'] += $currentHouse['present_day'];
+				$totals['present_night'] += $currentHouse['present_night'];
 			}
+
+			/* Remember totals for this segment
+			 */
+			$data['totals'][] = $totals;
 		}
-
-		$data['house'] = $this->getHouseMapper()->findById($_SESSION['houseId']);
-
+//
+//		$data['house'] = $this->getHouseMapper()->findById($_SESSION['houseId']);
+//
 		return $data;
     }
 
@@ -967,45 +992,73 @@ class Leave_Controller extends Controller {
 		$this->getPage()->setFile(TEMPLATE_content, 'modules/leave/cateringReport.html');
 		$this->getPage()->setBlock(TEMPLATE_content, 'no_houses', 'no_houses_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'house', 'house_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'request_date_header', 'request_date_header_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'request_period_total', 'request_period_total_block');
+		$this->getPage()->setBlock('house', 'request_period', 'request_period_block');
 
-		$currentHouse = $data['house'];
+		$this->getPage()->setVar(array(
+			'REPORT_DATE' => $data['date']
+		));
 
-		$houseList = $data['houseList'];
+		/* For each day, render a heading
+		 */
+		foreach($data['dateList'] as $currentDate) {
+			$this->getPage()->setVar(array(
+				'REQUEST_DATE_HEADER_DATE' => $currentDate->getLocalShort()
+			));
 
-		if (count($houseList)) {
-			$this->getPage()->setVar('no_houses_block', '');
+			$this->getPage()->parse('request_date_header_block', 'request_date_header', true);
+		}
 
-			foreach ($houseList as $i => $house) {
+		/* For each day, render totals
+		 */
+		foreach($data['totals'] as $currentSegment) {
+			$this->getPage()->setVar(array(
+				'REQUEST_PERIOD_TOTAL_MORNING' => $currentSegment['present_morning'],
+				'REQUEST_PERIOD_TOTAL_DAY' => $currentSegment['present_day'],
+				'REQUEST_PERIOD_TOTAL_NIGHT' => $currentSegment['present_night'],
+			));
+
+			$this->getPage()->parse('request_period_total_block', 'request_period_total', true);
+		}
+
+		/* For each house
+		 */
+		if (is_array($data['houseList'][0]) && count($data['houseList'][0])) {
+			for ($i = 0; $i < count($data['houseList'][0]); $i++) {
+
+				/* For each day
+				 */
+				for ($j = 0; $j < count($data['dateList']); $j++) {
+					$this->getPage()->setVar(array(
+						'REQUEST_PERIOD_MORNING' => (int)$data['houseList'][$j][$i]['present_morning'],
+						'REQUEST_PERIOD_DAY' => (int)$data['houseList'][$j][$i]['present_day'],
+						'REQUEST_PERIOD_NIGHT' => (int)$data['houseList'][$j][$i]['present_night'],
+					));
+
+					$this->getPage()->parse('request_period_block', 'request_period', true);
+				}
+
+				/* Render house row, with alternating background colours
+				 */
 				$this->getPage()->setVar(array(
-					'REPORT_DATE' => $data['date'],
-					'HOUSE_ID' => $house['houseId'],
-					'HOUSE_NAME' => $house['name'],
-					'ABSENT_MORNING' => (int)$house['absent_morning'],
-					'ABSENT_DAY' => (int)$house['absent_day'],
-					'ABSENT_NIGHT' => (int)$house['absent_night'],
-					'PRESENT_MORNING' => (int)$house['present_morning'],
-					'PRESENT_DAY' => (int)$house['present_day'],
-					'PRESENT_NIGHT' => (int)$house['present_night'],
-					'CLASS' => $i % 2 ? 'dark' : ''
+					'HOUSE_ID' => $data['houseList'][0][$i]['houseId'],
+					'HOUSE_NAME' => $data['houseList'][0][$i]['name'],
+					'CLASS' => $i % 2 ? 'dark' : '',
 				));
 
 				$this->getPage()->parse('house_block', 'house', true);
+
+				/* Clear children after parsing out the parent
+				 */
+				$this->getPage()->setVar('request_period_block', '');
 			}
+
+			$this->getPage()->setVar('no_houses_block', '');
 		}
 		else {
 			$this->getPage()->parse('no_houses_block', 'no_houses');
 		}
-
-		$this->getPage()->setVar(array(
-			'HOUSE_ID' => $currentHouse->getId(),
-			'HOUSE_NAME' => $currentHouse->getHouse(),
-			'ABSENT_MORNING_TOTAL' => $data['absentMorningTotal'],
-			'ABSENT_DAY_TOTAL' => $data['absentDayTotal'],
-			'ABSENT_NIGHT_TOTAL' => $data['absentNightTotal'],
-			'PRESENT_MORNING_TOTAL' => $data['presentMorningTotal'],
-			'PRESENT_DAY_TOTAL' => $data['presentDayTotal'],
-			'PRESENT_NIGHT_TOTAL' => $data['presentNightTotal'],
-		));
 	}
 
 	public function exportCateringReport ($data) {
