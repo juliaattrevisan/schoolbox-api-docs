@@ -5,6 +5,11 @@ class Leave_Controller extends Controller {
 	const THRESHOLD_DAY = '16:59:59';
 	const THRESHOLD_NIGHT = '23:59:59';
 
+	/* Show leave requests over RANGE days
+	 * Change
+	 */
+	const RANGE = 3;
+
     protected $requestMapper;
     protected $userMapper;
     protected $houseMapper;
@@ -550,9 +555,6 @@ class Leave_Controller extends Controller {
 					'CLASS' => $i % 2 ? '' : 'dark'
 				));
 
-				define('NUM_SEGMENTS_PER_DAY', 3);
-				define('RANGE', 3);
-
 				if ($request->getId()) {
 					$this->getPage()->setVar(array(
 						'REQUEST_ID' => $request->getId(),
@@ -581,12 +583,12 @@ class Leave_Controller extends Controller {
 
 					$showStartTime = true;
 
-					for ($i = 0; $i < RANGE; $i++) {
+					for ($i = 0; $i < self::RANGE; $i++) {
 
 						/* Parse out the headings
 						 */
 						$this->getPage()->setVar(array(
-							'REPORT_HEADER_DATE' => $morningStart->getLong(),
+							'REPORT_HEADER_DATE' => $morningStart->getShort(),
 						));
 
 						$this->getPage()->parse('report_header_block', 'report_header', true);
@@ -705,11 +707,9 @@ class Leave_Controller extends Controller {
 		}
 
 		$this->getPage()->setVar(array(
-//            'HOUSE_NAME' => $currentHouse->getHouse(),
-//            'HOUSE_ID' => $currentHouse->getId(),
+            'HOUSE_NAME' => $currentHouse->getHouse(),
+            'HOUSE_ID' => $currentHouse->getId(),
             'REPORT_DATE' => $data['date'],
-//            'REPORT_START_DATE' => $reportStart->getLong(),
-//            'REPORT_FINISH_DATE' => $reportFinish->getLong(),
 		));
     }
 
