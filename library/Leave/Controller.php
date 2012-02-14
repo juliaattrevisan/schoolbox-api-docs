@@ -560,7 +560,7 @@ class Leave_Controller extends Controller {
 						'REQUEST_HOST_TYPE' => $request->getHostType(true),
 					));
 
-					/* The date the Leave Request started and the date it ends
+					/* Start and end of leave
 					 */
 					$requestDateStart = new Alaress_Date_Format($request['start'], 'y-m-d');
 					$requestDateFinish = new Alaress_Date_Format($request['finish'], 'y-m-d');
@@ -598,9 +598,12 @@ class Leave_Controller extends Controller {
 
 							/* Check whether next segment is occupied; if not, also show the time
 							 */
-							if ($showStartTime || !$request->getOccupancy($dayStart, $nightStart)) {
-								$requestPeriodMorning = "<span>L haha</span>";
+							if ($showStartTime) {
+								$requestPeriodMorning = "<span>L {$requestDateStart->getTimeOnly()}</span>";
 								$showStartTime = false;
+							}
+							else if (!$showStartTime && !$request->getOccupancy($dayStart, $nightStart)) {
+								$requestPeriodMorning = "<span>L {$requestDateFinish->getTimeOnly()}</span>";
 							}
 							else {
 								$requestPeriodMorning = "<span>L</span>";
@@ -610,9 +613,12 @@ class Leave_Controller extends Controller {
 						/* If this person is on leave during the day
 						 */
 						if ($request->getOccupancy($dayStart, $nightStart)) {
-							if ($showStartTime || !$request->getOccupancy($nightStart, $nightEnd)) {
-								$requestPeriodDay = "<span>L haha</span>";
+							if ($showStartTime) {
+								$requestPeriodDay = "<span>L {$requestDateStart->getTimeOnly()}</span>";
 								$showStartTime = false;
+							}
+							else if (!$showStartTime && !$request->getOccupancy($nightStart, $nightEnd)) {
+								$requestPeriodDay = "<span>L {$requestDateFinish->getTimeOnly()}</span>";
 							}
 							else {
 								$requestPeriodDay = "<span>L</span>";
@@ -628,15 +634,20 @@ class Leave_Controller extends Controller {
 							$nextMorning = new Alaress_Date_Format($dayStart->getDatabase(), 'y-m-d h:i:s');
 							$nextMorning->addDays(1);
 
-							if ($showStartTime || !$request->getOccupancy($nightEnd, $nextMorning)) {
-								$requestPeriodNight = "<span>L haha</span>";
+							if ($showStartTime) {
+								$requestPeriodNight = "<span>L {$requestDateStart->getTimeOnly()}</span>";
 								$showStartTime = false;
+							}
+							else if (!$showStartTime &&  !$request->getOccupancy($nightEnd, $nextMorning)) {
+								$requestPeriodNight = "<span>L {$requestDateFinish->getTimeOnly()}</span>";
 							}
 							else {
 								$requestPeriodNight = "<span>L</span>";
 							}
 						}
 
+						/* Display icon and time where appropriate
+						 */
 						$this->getPage()->setVar(array(
 							'REQUEST_PERIOD_MORNING' => $requestPeriodMorning,
 							'REQUEST_PERIOD_DAY' => $requestPeriodDay,
