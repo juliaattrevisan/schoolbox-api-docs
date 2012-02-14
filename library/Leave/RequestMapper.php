@@ -201,52 +201,63 @@ class Leave_RequestMapper extends Mapper {
         return $requestCollection;
     }
 
+	/**
+	 * Get the numbers of people who are absent and present for a given day, taking
+	 * into account the days they have been scheduled to be away.
+	 *
+	 * To prevent shortages of fud, the following preconditions have been used.
+	 *
+	 * When Leaving:
+	 * If you are present for any portion of a particular segment, you are classified
+	 * as being present for that segment. e.g. If you leave between 00;00:00 and 11:59:59
+	 * you are still considered as being present for the morning.
+	 *
+	 * When Returning:
+	 * If you are away for any portion of a particular segment, you are classified as
+	 * being absent for that segment. e.g. If you return between 00:00:00 and 11:59:59,
+	 * you are still considered as being away for the morning.
+	 *
+	 * @param $date
+	 * @return array
+	 */
     public function getCateringReport ($date) {
+		if (!is_a($date, 'Alaress_Date_Format')) {
+			$date = new Alaress_Date_Format($date, 'd/m/y');
+		}
 
-        if ( !is_a($date, 'Alaress_Date_Format') ) {
-            $date = new Alaress_Date_Format($date, 'd/m/y');
-        }
+		$morningStart = $date;
 
-        $morningStart = new Alaress_Date_Format( $date->getDatabaseDate() , 'y-m-d' );
+		$dayStart = new Alaress_Date_Format($morningStart->getUnixTimestamp() + 12*60*60-1, 'U');
+		$nightStart = new Alaress_Date_Format($dayStart->getUnixTimestamp() + 5*60*60, 'U');
+		$nightEnd = new Alaress_Date_Format($nightStart->getUnixTimestamp() + 7*60*60, 'U');
 
-        $morningFinish = new Alaress_Date_Format( $date->getDatabaseDate() , 'y-m-d' );
-        $morningFinish->addDays(1/3);
+		/* Mega query
+		 */
+		$statement = $this->database->prepare("
+			SELECT
+				luResidentialHouse.id AS houseId,
+				luResidentialHouse.name AS name,
+				leave_request.id AS leaveRequestId,
+				SUM(leave_request.id AND ((`start` < :morningStart) AND (`finish` > :dayStart))) AS absent_morning,
+				((SELECT COUNT(*) FROM `user` WHERE user.house = houseId) - (SUM(leave_request.id AND ((`start` < :morningStart) AND (`finish` > :dayStart))))) AS present_morning,
+				SUM(leave_request.id AND ((`start` < :dayStart) AND (`finish` > :nightStart))) AS absent_day,
+				((SELECT COUNT(*) FROM `user` WHERE user.house = houseId) - (SUM(leave_request.id AND ((`start` < :dayStart) AND (`finish` > :nightStart))))) AS present_day,
+				SUM(leave_request.id AND ((`start` < :nightStart) AND (`finish` > :nightEnd))) AS absent_night,
+				((SELECT COUNT(*) FROM `user` WHERE user.house = houseId) - (SUM(leave_request.id AND ((`start` < :nightStart) AND (`finish` > :nightEnd))))) AS present_night
+			FROM luResidentialHouse
+			LEFT JOIN `user` ON user.house = luResidentialHouse.id
+			LEFT JOIN leave_request ON leave_request.user_id = `user`.id
+			GROUP BY houseId;
+		");
 
-        $dayFinish = new Alaress_Date_Format( $date->getDatabaseDate() , 'y-m-d' );
-        $dayFinish->addDays(2/3);
+		$statement->execute(array(
+			':morningStart' => $morningStart->getDatabase(),
+			':dayStart' => $dayStart->getDatabase(),
+			':nightStart' => $nightStart->getDatabase(),
+			':nightEnd' => $nightEnd->getDatabase(),
+		));
 
-        $nightFinish = new Alaress_Date_Format( $date->getDatabaseDate() , 'y-m-d' );
-        $nightFinish->addDays(3/3);
-
-        $statement = $this->database->prepare("
-            SELECT h.id, h.house,
-            	COUNT( lr.id AND lr.start < DATE(:morningFinish) AND lr.finish > DATE(:morningStart) ) AS 'absent_morning',
-            	COUNT( lr.id AND lr.start < DATE(:dayFinish) AND lr.finish > DATE(:dayStart) ) AS 'absent_day',
-            	COUNT( lr.id AND lr.start < DATE(:nightFinish) AND lr.finish > DATE(:nightStart) ) AS 'absent_night',
-            	( COUNT(*) - COUNT( lr.id AND lr.start < DATE(:morningFinish) AND lr.finish > DATE(:morningStart) ) ) AS 'present_morning',
-            	( COUNT(*) - COUNT( lr.id AND lr.start < DATE(:dayFinish) AND lr.finish > DATE(:dayStart) ) ) AS 'present_day',
-            	( COUNT(*) - COUNT( lr.id AND lr.start < DATE(:nightFinish) AND lr.finish > DATE(:nightStart) ) ) AS 'present_night'
-            FROM `house` h
-            LEFT JOIN `user` u ON u.house = h.id
-            LEFT JOIN groups g ON g.id = u.group_id
-            LEFT JOIN `leave_request` lr ON lr.user_id = u.id
-            	AND lr.start < :date
-            	AND lr.finish > :date
-              /*AND g.type = 'student'*/
-            GROUP BY h.id;
-        ");
-
-        $statement->execute( array(
-            ':date' => $date->getDatabaseDate(),
-            ':morningStart' => $morningStart->getDatabase(),
-            ':morningFinish' => $morningFinish->getDatabase(),
-            ':dayStart' => $morningFinish->getDatabase(),
-            ':dayFinish' => $dayFinish->getDatabase(),
-            ':nightStart' => $dayFinish->getDatabase(),
-            ':nightFinish' => $nightFinish->getDatabase(),
-        ) );
-
-        $houseList = $statement->fetchAll();
+		$houseList = $statement->fetchAll(PDO::FETCH_ASSOC);
 
         return $houseList;
     }

@@ -479,11 +479,23 @@ class Leave_Controller extends Controller {
 		$this->getPage()->backToTheFuture(2);
 	}
 
+	/**
+	 * Get a list of leave requests between specified dates
+	 *
+	 * @param $houseId
+	 * @param $date
+	 * @return array
+	 */
 	public function executeHouseReport($houseId, $date) {
 		if (!$house = $this->getHouseMapper()->findById($houseId)) {
 			$this->getPage()->error(2);
 		}
 
+		/* Mess with these two magic numbers to change the range, in conjunction
+		 * with the class constant RANGE
+		 *
+		 * TODO: Remove these magic numbers
+		 */
 		$reportStart = new Alaress_Date_Format($date, 'd/m/y');
 		$reportStart->addDays(5 - $reportStart->getWeekDayNumber());
 
@@ -547,6 +559,22 @@ class Leave_Controller extends Controller {
 		if (count($requestList)) {
 			$this->getPage()->setVar('no_requests_block', '');
 
+			/* Parse out the headings
+			 */
+			for ($i = 0; $i < self::RANGE; $i++) {
+				$headerDate = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp(), 'U');
+				$headerDate->addDays($i);
+
+				$this->getPage()->setVar(array(
+					'REPORT_HEADER_DATE' => $headerDate->getShort(),
+				));
+
+				$this->getPage()->parse('report_header_block', 'report_header', true);
+				$this->getPage()->parse('report_header_subtitle_block', 'report_header_subtitle', true);
+			}
+
+			/* Parse out the requests
+			 */
 			foreach ($requestList as $i => $request) {
 				$this->getPage()->setVar(array(
 					'USER_ID' => $request->getUser()->getId(),
@@ -564,8 +592,8 @@ class Leave_Controller extends Controller {
 
 					/* Start and end of leave
 					 */
-					$requestDateStart = new Alaress_Date_Format($request['start'], 'y-m-d');
-					$requestDateFinish = new Alaress_Date_Format($request['finish'], 'y-m-d');
+					$requestDateStart = new Alaress_Date_Format($request['start'], 'y-m-d h:i:s');
+					$requestDateFinish = new Alaress_Date_Format($request['finish'], 'y-m-d h:i:s');
 
 					/* For each day that the person is on leave within the prescribed period of time, show an
 					 * icon. If they are starting or ending their leave on this day, show the time as well
@@ -576,7 +604,7 @@ class Leave_Controller extends Controller {
 					 * Day: 12:00:00 to 17:59:59
 					 * Night: 18:00:00 to 23:59:59
 					 */
-					$morningStart = $data['reportStart'];
+					$morningStart = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp(), 'U');
 					$dayStart = new Alaress_Date_Format($morningStart->getUnixTimestamp() + 12*60*60-1, 'U');
 					$nightStart = new Alaress_Date_Format($dayStart->getUnixTimestamp() + 5*60*60, 'U');
 					$nightEnd = new Alaress_Date_Format($nightStart->getUnixTimestamp() + 7*60*60, 'U');
@@ -584,15 +612,6 @@ class Leave_Controller extends Controller {
 					$showStartTime = true;
 
 					for ($i = 0; $i < self::RANGE; $i++) {
-
-						/* Parse out the headings
-						 */
-						$this->getPage()->setVar(array(
-							'REPORT_HEADER_DATE' => $morningStart->getShort(),
-						));
-
-						$this->getPage()->parse('report_header_block', 'report_header', true);
-						$this->getPage()->parse('report_header_subtitle_block', 'report_header_subtitle', true);
 
 						/* If this person is on leave during the morning
 						 */
@@ -861,76 +880,81 @@ class Leave_Controller extends Controller {
         fclose($stream);
     }
 
-    public function executeCateringReport ($date) {
-        $data = array();
+	public function executeCateringReport($date) {
+		$data = array();
 
-        $data['date'] = $date;
+		$data['date'] = $date;
 
-        $data['houseList'] = $this->getRequestMapper($date)->getCateringReport($date);
+		$data['houseList'] = $this->getRequestMapper($date)->getCateringReport($date);
 
-        if ( count($data['houseList']) ) {
-            foreach ( $data['houseList'] as $house ) {
-                $data['absentMorningTotal'] += $house['absent_morning'];
-                $data['absentDayTotal'] += $house['absent_day'];
-                $data['absentNightTotal'] += $house['absent_night'];
-                $data['presentMorningTotal'] += $house['present_morning'];
-                $data['presentDayTotal'] += $house['present_day'];
-                $data['presentNightTotal'] += $house['present_night'];
-            }
-        }
+		if (count($data['houseList'])) {
+			foreach ($data['houseList'] as $house) {
+				$data['absentMorningTotal'] += $house['absent_morning'];
+				$data['absentDayTotal'] += $house['absent_day'];
+				$data['absentNightTotal'] += $house['absent_night'];
+				$data['presentMorningTotal'] += $house['present_morning'];
+				$data['presentDayTotal'] += $house['present_day'];
+				$data['presentNightTotal'] += $house['present_night'];
+			}
+		}
 
-        $data['house'] = $this->getHouseMapper()->findById($_SESSION['houseId']);
+		$data['house'] = $this->getHouseMapper()->findById($_SESSION['houseId']);
 
-        return $data;
+		return $data;
     }
 
-    public function renderCateringReport ($data) {
-        $currentHouse = $data['house'];
+	/**
+	 * Render catering data. Null values can exist for absent_morning etc. when a House
+	 * as no leave requests for it. Casting it as an integer forces it to zero.
+	 *
+	 * @param $data
+	 */
+	public function renderCateringReport($data) {
+		$this->getPage()->setFile(TEMPLATE_content, 'modules/leave/cateringReport.html');
+		$this->getPage()->setBlock(TEMPLATE_content, 'no_houses', 'no_houses_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'house', 'house_block');
 
-        $houseList = $data['houseList'];
+		$currentHouse = $data['house'];
 
-        $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/cateringReport.html');
+		$houseList = $data['houseList'];
 
-        $this->getPage()->setBlock(TEMPLATE_content, 'no_houses', 'no_houses_block');
-        $this->getPage()->setBlock(TEMPLATE_content, 'house', 'house_block');
+		if (count($houseList)) {
+			$this->getPage()->setVar('no_houses_block', '');
 
-        if ( count($houseList) ) {
-            $this->getPage()->setVar('no_houses_block', '');
+			foreach ($houseList as $i => $house) {
+				$this->getPage()->setVar(array(
+					'REPORT_DATE' => $data['date'],
+					'HOUSE_ID' => $house['houseId'],
+					'HOUSE_NAME' => $house['name'],
+					'ABSENT_MORNING' => (int)$house['absent_morning'],
+					'ABSENT_DAY' => (int)$house['absent_day'],
+					'ABSENT_NIGHT' => (int)$house['absent_night'],
+					'PRESENT_MORNING' => (int)$house['present_morning'],
+					'PRESENT_DAY' => (int)$house['present_day'],
+					'PRESENT_NIGHT' => (int)$house['present_night'],
+					'CLASS' => $i % 2 ? 'dark' : ''
+				));
 
-            foreach ( $houseList as $i => $house ) {
-                $this->getPage()->setVar( array(
-                    'REPORT_DATE' => $data['date'],
-                    'HOUSE_ID' => $house['id'],
-                    'HOUSE_NAME' => $house['house'],
-                    'ABSENT_MORNING' => $house['absent_morning'],
-                    'ABSENT_DAY' => $house['absent_day'],
-                    'ABSENT_NIGHT' => $house['absent_night'],
-                    'PRESENT_MORNING' => $house['present_morning'],
-                    'PRESENT_DAY' => $house['present_day'],
-                    'PRESENT_NIGHT' => $house['present_night'],
-                    'CLASS' => $i % 2 ? 'dark' : ''
-                ) );
+				$this->getPage()->parse('house_block', 'house', true);
+			}
+		}
+		else {
+			$this->getPage()->parse('no_houses_block', 'no_houses');
+		}
 
-                $this->getPage()->parse('house_block', 'house', true);
-            }
-        }
-        else {
-            $this->getPage()->parse('no_houses_block', 'no_houses');
-        }
+		$this->getPage()->setVar(array(
+			'HOUSE_ID' => $currentHouse->getId(),
+			'HOUSE_NAME' => $currentHouse->getHouse(),
+			'ABSENT_MORNING_TOTAL' => $data['absentMorningTotal'],
+			'ABSENT_DAY_TOTAL' => $data['absentDayTotal'],
+			'ABSENT_NIGHT_TOTAL' => $data['absentNightTotal'],
+			'PRESENT_MORNING_TOTAL' => $data['presentMorningTotal'],
+			'PRESENT_DAY_TOTAL' => $data['presentDayTotal'],
+			'PRESENT_NIGHT_TOTAL' => $data['presentNightTotal'],
+		));
+	}
 
-        $this->getPage()->setVar( array(
-            'HOUSE_ID' => $currentHouse->getId(),
-            'HOUSE_NAME' => $currentHouse->getHouse(),
-            'ABSENT_MORNING_TOTAL' => $data['absentMorningTotal'],
-            'ABSENT_DAY_TOTAL' => $data['absentDayTotal'],
-            'ABSENT_NIGHT_TOTAL' => $data['absentNightTotal'],
-            'PRESENT_MORNING_TOTAL' => $data['presentMorningTotal'],
-            'PRESENT_DAY_TOTAL' => $data['presentDayTotal'],
-            'PRESENT_NIGHT_TOTAL' => $data['presentNightTotal'],
-        ) );
-    }
-
-    public function exportCateringReport ($data) {
+	public function exportCateringReport ($data) {
         $houseList = $data['houseList'];
 
         $this->getPage()->setAjax(true);
