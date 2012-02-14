@@ -620,7 +620,16 @@ class Leave_Controller extends Controller {
 							/* Check whether next segment is occupied; if not, also show the time
 							 */
 							if ($showStartTime) {
-								$requestPeriodMorning = "<span>L {$requestDateStart->getTimeOnly()}</span>";
+
+								/* Specifically check for this day, to account for multi-week leave
+								 */
+								if ($requestDateStart->getDatabaseDate() == $morningStart->getDatabaseDate()) {
+									$requestPeriodMorning = "<span>L {$requestDateStart->getTimeOnly()}</span>";
+								}
+								else {
+									$requestPeriodMorning = "<span>L</span>";
+								}
+
 								$showStartTime = false;
 							}
 							else if (!$showStartTime && !$request->getOccupancy($dayStart, $nightStart)) {
@@ -635,7 +644,13 @@ class Leave_Controller extends Controller {
 						 */
 						if ($request->getOccupancy($dayStart, $nightStart)) {
 							if ($showStartTime) {
-								$requestPeriodDay = "<span>L {$requestDateStart->getTimeOnly()}</span>";
+								if ($requestDateStart->getDatabaseDate() == $dayStart->getDatabaseDate()) {
+									$requestPeriodDay = "<span>L {$requestDateStart->getTimeOnly()}</span>";
+								}
+								else {
+									$requestPeriodDay = "<span>L</span>";
+								}
+
 								$showStartTime = false;
 							}
 							else if (!$showStartTime && !$request->getOccupancy($nightStart, $nightEnd)) {
@@ -656,7 +671,13 @@ class Leave_Controller extends Controller {
 							$nextMorning->addDays(1);
 
 							if ($showStartTime) {
-								$requestPeriodNight = "<span>L {$requestDateStart->getTimeOnly()}</span>";
+								if ($requestDateStart->getDatabaseDate() == $nightStart->getDatabaseDate()) {
+									$requestPeriodNight = "<span>L {$requestDateStart->getTimeOnly()}</span>";
+								}
+								else {
+									$requestPeriodNight = "<span>L</span>";
+								}
+
 								$showStartTime = false;
 							}
 							else if (!$showStartTime &&  !$request->getOccupancy($nightEnd, $nextMorning)) {
@@ -797,7 +818,16 @@ class Leave_Controller extends Controller {
 							/* Check whether next segment is occupied; if not, also show the time
 							 */
 							if ($showStartTime) {
-								$requestPeriodMorning = "L {$requestDateStart->getTimeOnly()}";
+
+								/* Specifically check for this day, to account for multi-week leave
+								 */
+								if ($requestDateStart->getDatabaseDate() == $morningStart->getDatabaseDate()) {
+									$requestPeriodMorning = "L {$requestDateStart->getTimeOnly()}";
+								}
+								else {
+									$requestPeriodMorning = "L";
+								}
+
 								$showStartTime = false;
 							}
 							else if (!$showStartTime && !$request->getOccupancy($dayStart, $nightStart)) {
@@ -812,7 +842,16 @@ class Leave_Controller extends Controller {
 						 */
 						if ($request->getOccupancy($dayStart, $nightStart)) {
 							if ($showStartTime) {
-								$requestPeriodDay = "L {$requestDateStart->getTimeOnly()}";
+
+								/* Specifically check for this day, to account for multi-week leave
+								 */
+								if ($requestDateStart->getDatabaseDate() == $dayStart->getDatabaseDate()) {
+									$requestPeriodDay = "L {$requestDateStart->getTimeOnly()}";
+								}
+								else {
+									$requestPeriodDay = "L";
+								}
+
 								$showStartTime = false;
 							}
 							else if (!$showStartTime && !$request->getOccupancy($nightStart, $nightEnd)) {
@@ -833,7 +872,16 @@ class Leave_Controller extends Controller {
 							$nextMorning->addDays(1);
 
 							if ($showStartTime) {
-								$requestPeriodNight = "L {$requestDateStart->getTimeOnly()}";
+								
+								/* Specifically check for this day, to account for multi-week leave
+								 */
+								if ($requestDateStart->getDatabaseDate() == $nightStart->getDatabaseDate()) {
+									$requestPeriodNight = "L {$requestDateStart->getTimeOnly()}";
+								}
+								else {
+									$requestPeriodNight = "L";
+								}
+
 								$showStartTime = false;
 							}
 							else if (!$showStartTime &&  !$request->getOccupancy($nightEnd, $nextMorning)) {
