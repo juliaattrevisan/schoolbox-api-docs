@@ -872,7 +872,7 @@ class Leave_Controller extends Controller {
 							$nextMorning->addDays(1);
 
 							if ($showStartTime) {
-								
+
 								/* Specifically check for this day, to account for multi-week leave
 								 */
 								if ($requestDateStart->getDatabaseDate() == $nightStart->getDatabaseDate()) {
