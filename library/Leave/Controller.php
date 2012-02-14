@@ -713,30 +713,13 @@ class Leave_Controller extends Controller {
 		));
     }
 
+	/**
+	 * Export CSV of renderHouseReport()
+	 *
+	 * @param $data
+	 */
     public function exportHouseReport ($data) {
         $requestList = $data['requestList'];
-
-        $reportStart = new Alaress_Date_Format( $data['reportStart']->getDatabaseDate() , 'y-m-d' );
-
-        $reportStartMorning = new Alaress_Date_Format( $data['reportStart']->getDatabaseDate() , 'y-m-d' );
-        $reportStartMorning->addDays(1/3);
-
-        $reportStartDay = new Alaress_Date_Format( $data['reportStart']->getDatabaseDate() , 'y-m-d' );
-        $reportStartDay->addDays(2/3);
-
-        $reportStartNight = new Alaress_Date_Format( $data['reportStart']->getDatabaseDate() , 'y-m-d' );
-        $reportStartNight->addDays(3/3);
-
-        $reportFinish = new Alaress_Date_Format( $data['reportFinish']->getDatabaseDate() , 'y-m-d' );
-
-        $reportFinishMorning = new Alaress_Date_Format( $data['reportFinish']->getDatabaseDate() , 'y-m-d' );
-        $reportFinishMorning->addDays(1/3);
-
-        $reportFinishDay = new Alaress_Date_Format( $data['reportFinish']->getDatabaseDate() , 'y-m-d' );
-        $reportFinishDay->addDays(2/3);
-
-        $reportFinishNight = new Alaress_Date_Format( $data['reportFinish']->getDatabaseDate() , 'y-m-d' );
-        $reportFinishNight->addDays(3/3);
 
         $this->getPage()->setAjax(true);
 
@@ -746,55 +729,131 @@ class Leave_Controller extends Controller {
 
         $stream = fopen("php://output",'w');
 
-        $headerList = array('Name', 'Year', 'Saturday Morning', 'Saturday Day', 'Saturday Night', 'Sunday Morning', 'Sunday Day', 'Sunday Night', 'Host', 'Approval Date', 'Approved By');
+		if (count($requestList)) {
+			foreach ($requestList as $request) {
+				$fieldList = array(
+					$request->getUser()->getName(),
+					$request->getUser()->getYear()
+				);
 
-        fputcsv($stream, $headerList);
+				if ($request->getId()) {
 
-        if ( count($requestList) ) {
-            foreach ( $requestList as $request) {
-                $fieldList = array(
-                    $request->getUser()->getName(),
-                    $request->getUser()->getYear()
-                );
+					/* Start and end of leave
+					 */
+					$requestDateStart = new Alaress_Date_Format($request['start'], 'y-m-d');
+					$requestDateFinish = new Alaress_Date_Format($request['finish'], 'y-m-d');
 
-                if ( $request->getId() ) {
-                    $fieldList += array(
-                        $request->getOccupancy($reportStart, $reportStartMorning) ? '<span>L</span>' : '',
-                        $request->getOccupancy($reportStartMorning, $reportStartDay) ? '<span>L</span>' : '',
-                        $request->getOccupancy($reportStartDay, $reportStartNight) ? '<span>L</span>' : '',
-                        $request->getOccupancy($reportFinish, $reportFinishMorning) ? '<span>L</span>' : '',
-                        $request->getOccupancy($reportFinishMorning, $reportFinishDay) ? '<span>L</span>' : '',
-                        $request->getOccupancy($reportFinishDay, $reportFinishNight) ? '<span>L</span>' : '',
-                        $request->getHostType(true)
-                    );
+					/* For each day that the person is on leave within the prescribed period of time, show an
+					 * icon. If they are starting or ending their leave on this day, show the time as well
+					 *
+					 * Render 3 columns each day for 3 days
+					 *
+					 * Morning: 00:00:00 to 11:59:59
+					 * Day: 12:00:00 to 17:59:59
+					 * Night: 18:00:00 to 23:59:59
+					 */
+					$morningStart = $data['reportStart'];
+					$dayStart = new Alaress_Date_Format($morningStart->getUnixTimestamp() + 12*60*60-1, 'U');
+					$nightStart = new Alaress_Date_Format($dayStart->getUnixTimestamp() + 5*60*60, 'U');
+					$nightEnd = new Alaress_Date_Format($nightStart->getUnixTimestamp() + 7*60*60, 'U');
 
-                    if ( $request->getStatus() != Leave_Request::STATUS_PENDING ) {
-                        $fieldList += array(
-                            $request->getAuthorisationDatetime(true)->getAustralian(),
-                            $request->getAuthorisationUser()->getName()
-                        );
-                    }
+					$showStartTime = true;
+
+					/* First two columns in headings
+					 */
+					$headers = array('Name', 'Year');
+
+					for ($i = 0; $i < self::RANGE; $i++) {
+
+						/* Parse out the headings
+						 */
+						$headers[] = $morningStart->getDateOnly();
+						$headers[] = $dayStart->getDateOnly();
+						$headers[] = $nightStart->getDateOnly();
+
+						/* If this person is on leave during the morning
+						 */
+						if ($request->getOccupancy($morningStart, $dayStart)) {
+
+							/* Check whether next segment is occupied; if not, also show the time
+							 */
+							if ($showStartTime) {
+								$requestPeriodMorning = "L {$requestDateStart->getTimeOnly()}";
+								$showStartTime = false;
+							}
+							else if (!$showStartTime && !$request->getOccupancy($dayStart, $nightStart)) {
+								$requestPeriodMorning = "L {$requestDateFinish->getTimeOnly()}";
+							}
+							else {
+								$requestPeriodMorning = "L";
+							}
+						}
+
+						/* If this person is on leave during the day
+						 */
+						if ($request->getOccupancy($dayStart, $nightStart)) {
+							if ($showStartTime) {
+								$requestPeriodDay = "L {$requestDateStart->getTimeOnly()}";
+								$showStartTime = false;
+							}
+							else if (!$showStartTime && !$request->getOccupancy($nightStart, $nightEnd)) {
+								$requestPeriodDay = "L {$requestDateFinish->getTimeOnly()}";
+							}
+							else {
+								$requestPeriodDay = "L";
+							}
+						}
+
+						/* If this person is on leave during the night
+						 */
+						if ($request->getOccupancy($nightStart, $nightEnd)) {
+
+							/* Check whether the next morning is occupied
+							 */
+							$nextMorning = new Alaress_Date_Format($dayStart->getDatabase(), 'y-m-d h:i:s');
+							$nextMorning->addDays(1);
+
+							if ($showStartTime) {
+								$requestPeriodNight = "L {$requestDateStart->getTimeOnly()}";
+								$showStartTime = false;
+							}
+							else if (!$showStartTime &&  !$request->getOccupancy($nightEnd, $nextMorning)) {
+								$requestPeriodNight = "L {$requestDateFinish->getTimeOnly()}";
+							}
+							else {
+								$requestPeriodNight = "L";
+							}
+						}
+
+						/* Display icon and time where appropriate
+						 */
+						$fieldList[] = $requestPeriodMorning;
+						$fieldList[] = $requestPeriodDay;
+						$fieldList[] = $requestPeriodNight;
+
+						/* Iteration reset
+						 */
+						$morningStart->addDays(1);
+						$dayStart->addDays(1);
+						$nightStart->addDays(1);
+						$nightEnd->addDays(1);
+
+						unset($requestPeriodMorning, $requestPeriodDay, $requestPeriodNight);
+					}
+
+					/* Authorisation fields
+					 */
+					if ($request->getStatus() != Leave_Request::STATUS_PENDING) {
+						$fieldList[] = $request->getAuthorisationDatetime(true)->getAustralian();
+						$fieldList[] = $request->getAuthorisationUser()->getName();
+					}
                     else {
-                        $fieldList += array(
-                            'Pending Approval',
-                            ''
-                        );
+						$fieldList[] = 'Pending Approval';
+                        $fieldList[] = ' ';
                     }
                 }
-                else {
-                    $fieldList += array(
-                        '',
-                        '',
-                        '',
-                        '',
-                        '',
-                        '',
-                        '',
-                        '',
-                        ''
-                    );
-                }
 
+				fputcsv($stream, $headers);
                 fputcsv($stream, $fieldList);
             }
         }
