@@ -571,7 +571,7 @@ class Leave_Controller extends Controller {
 				$headerDate->addDays($i);
 
 				$this->getPage()->setVar(array(
-					'REPORT_HEADER_DATE' => $headerDate->getShort(),
+					'REPORT_HEADER_DATE' => $headerDate->getLocalShort(),
 				));
 
 				$this->getPage()->parse('report_header_block', 'report_header', true);
