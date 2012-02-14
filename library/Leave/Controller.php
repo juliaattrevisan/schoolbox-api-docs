@@ -802,6 +802,7 @@ class Leave_Controller extends Controller {
 					/* First two columns in headings
 					 */
 					$headers = array('Name', 'Year');
+					$subheaders = array('', '');
 
 					for ($i = 0; $i < self::RANGE; $i++) {
 
@@ -810,6 +811,10 @@ class Leave_Controller extends Controller {
 						$headers[] = $morningStart->getDateOnly();
 						$headers[] = $dayStart->getDateOnly();
 						$headers[] = $nightStart->getDateOnly();
+
+						$subheaders[] = 'Morning';
+						$subheaders[] = 'Day';
+						$subheaders[] = 'Night';
 
 						/* If this person is on leave during the morning
 						 */
@@ -921,6 +926,7 @@ class Leave_Controller extends Controller {
                 }
 
 				fputcsv($stream, $headers);
+				fputcsv($stream, $subheaders);
                 fputcsv($stream, $fieldList);
             }
         }
