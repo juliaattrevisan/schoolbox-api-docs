@@ -246,7 +246,7 @@ class Leave_RequestMapper extends Mapper {
 				((SELECT COUNT(*) FROM `user` WHERE user.house = houseId) - (SUM(leave_request.id AND ((`start` < :nightStart) AND (`finish` > :nightEnd))))) AS present_night
 			FROM luResidentialHouse
 			LEFT JOIN `user` ON user.house = luResidentialHouse.id
-			LEFT JOIN leave_request ON leave_request.user_id = `user`.id
+			LEFT JOIN leave_request ON leave_request.user_id = `user`.id AND leave_request.authorisation_datetime IS NOT NULL
 			GROUP BY houseId;
 		");
 
