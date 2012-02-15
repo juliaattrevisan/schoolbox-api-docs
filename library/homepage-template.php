@@ -43,25 +43,25 @@ class HomepageTemplate extends  DeprecatedModel {
 			foreach($compPos as $comp) {
 				$homepage->saveComponentPosition($comp['componentID'], $comp['column'], $comp['position'], $comp['config']);
 			}
+
+			/* Create the default colours and set them
+			 */
+			$defaultColour = array();
+
+			foreach(array('top','left','right') as $position) {
+				$defaultColour = array_merge($defaultColour, array(
+					$position . '_head_font' => Cfg::get('homepage_colour_head_font'),
+					$position . '_head_bg' => Cfg::get('homepage_colour_head_bg'),
+					$position . '_font' => Cfg::get('homepage_colour_font'),
+					$position . '_bg_primary' => Cfg::get('homepage_colour_bg_primary'),
+					$position . '_bg_secondary' => Cfg::get('homepage_colour_bg_secondary'),
+					$position . '_link' => Cfg::get('homepage_colour_link'),
+					$position . '_hover' => Cfg::get('homepage_colour_hover')
+				));
+			}
+
+			$homepage->saveDisplayProperties($defaultColour);
 		}
-
-		/* Create the default colours and set them
-		 */
-		$defaultColour = array();
-
-		foreach(array('top','left','right') as $position) {
-			$defaultColour = array_merge($defaultColour, array(
-				$position . '_head_font' => Cfg::get('homepage_colour_head_font'),
-				$position . '_head_bg' => Cfg::get('homepage_colour_head_bg'),
-				$position . '_font' => Cfg::get('homepage_colour_font'),
-				$position . '_bg_primary' => Cfg::get('homepage_colour_bg_primary'),
-				$position . '_bg_secondary' => Cfg::get('homepage_colour_bg_secondary'),
-				$position . '_link' => Cfg::get('homepage_colour_link'),
-				$position . '_hover' => Cfg::get('homepage_colour_hover')
-			));
-		}
-
-		$homepage->saveDisplayProperties($defaultColour);
 	}
 
 		function getTemplatePositions($template) {
