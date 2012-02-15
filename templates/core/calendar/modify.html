@@ -93,7 +93,7 @@
 <h1><span>{FUNCTION} Event</span></h1>
 
 <span class="header_option">
-    <a class="btn go-back" href="/calendar"><span></span>Back to Calendar</a>
+    <a class="btn go-back" href="/calendar/{RETURN_TO}"><span></span>Back to Calendar</a>
 </span>
 
 <form method="post" action="/calendar/modify.php" id="eventForm">
@@ -191,8 +191,7 @@
             <td><!-- BEGIN campus_list -->
 
                 <label class="float-left clear">
-                    <input type="checkbox" class="campusCheck" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}
-                    />
+                    <input type="checkbox" class="campusCheck" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} />
                     {CAMPUS_NAME} </label>
 
                 <!-- END campus_list --></td>
