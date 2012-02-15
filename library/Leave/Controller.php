@@ -1068,9 +1068,14 @@ class Leave_Controller extends Controller {
 		}
 	}
 
-	public function exportCateringReport ($data) {
-        $houseList = $data['houseList'];
-
+	/**
+	 * Export a csv version of the catering report. Algorithm is similar to
+	 * renderCateringReport, but due to non-templating things have to be
+	 * fputcsv'd in order
+	 * 
+	 * @param $data
+	 */
+	public function exportCateringReport($data) {
         $this->getPage()->setAjax(true);
 
         header("Content-type: text/csv");
@@ -1079,17 +1084,59 @@ class Leave_Controller extends Controller {
 
         $stream = fopen("php://output",'w');
 
-        $headerList = array('House', 'Breakfast Absent', 'Lunch Absent', 'Dinner Absent', 'Breakfast Present', 'Lunch Present', 'Dinner Present');
+		/* For each day, render a heading
+		 */
+		$headers = array();
+		$headers[] = 'House';
 
-        fputcsv($stream, $headerList);
+		$subheaders = array();
+		$subheaders[] = '';
 
-        if ( count($houseList) ) {
-            foreach ( $houseList as $house ) {
-                $fieldList = array($house['house'], $house['absent_morning'], $house['absent_day'], $house['absent_night'], $house['present_morning'], $house['present_day'], $house['present_night']);
+		foreach($data['dateList'] as $currentDate) {
+			$headers[] = $currentDate->getLocalShort();
+			$headers[] = $currentDate->getLocalShort();
+			$headers[] = $currentDate->getLocalShort();
 
-                fputcsv($stream, $fieldList);
-            }
-        }
+			$subheaders[] = 'Breakfast';
+			$subheaders[] = 'Lunch';
+			$subheaders[] = 'Dinner';
+		}
+
+		fputcsv($stream, $headers);
+		fputcsv($stream, $subheaders);
+
+		/* For each house
+		 */
+		if (is_array($data['houseList'][0]) && count($data['houseList'][0])) {
+			for ($i = 0; $i < count($data['houseList'][0]); $i++) {
+
+				$row = array();
+				$row[] = $data['houseList'][0][$i]['name'];
+
+				/* For each day
+				 */
+				for ($j = 0; $j < count($data['dateList']); $j++) {
+					$row[] = (int)$data['houseList'][$j][$i]['present_morning'];
+					$row[] = (int)$data['houseList'][$j][$i]['present_day'];
+					$row[] = (int)$data['houseList'][$j][$i]['present_night'];
+				}
+
+				fputcsv($stream, $row);
+			}
+		}
+
+		/* For each day, render totals
+		 */
+		$totals = array();
+		$totals[] = 'Total';
+
+		foreach($data['totals'] as $currentSegment) {
+			$totals[] = $currentSegment['present_morning'];
+			$totals[] = $currentSegment['present_day'];
+			$totals[] = $currentSegment['present_night'];
+		}
+
+		fputcsv($stream, $totals);
 
         fclose($stream);
     }
