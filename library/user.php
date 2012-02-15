@@ -192,9 +192,9 @@ class User extends DeprecatedModel {
             $this->setSynergeticPassword($user['synergy_id'], $oldPassword, $newPassword);
         }
 
-        $oldPassword = mysql_real_escape_string($oldPassword);
         $newPassword = mysql_real_escape_string($newPassword);
-        $query = "UPDATE `" . $this->_table . "` SET password = PASSWORD('$newPassword'), email_pass = '$newPassword' WHERE `" . $this->_index . "` = $userID AND password = PASSWORD('$oldPassword')";
+
+		$query = "UPDATE `" . $this->_table . "` SET password = PASSWORD('$newPassword'), email_pass = '$newPassword' WHERE `" . $this->_index . "` = $userID";
         $this->db->query($query);
 
         return $this->db->affectedRows();
