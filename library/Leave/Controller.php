@@ -933,6 +933,10 @@ class Leave_Controller extends Controller {
                     }
                 }
 
+				/* Additional headers for authorisation
+				 */
+				$headers[] = 'Authorisation Status';
+
 				fputcsv($stream, $headers);
 				fputcsv($stream, $subheaders);
                 fputcsv($stream, $fieldList);
