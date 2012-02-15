@@ -747,6 +747,9 @@ class Leave_Controller extends Controller {
 			}
 		}
 		else {
+			$this->getPage()->setVar('report_header_block', '');
+			$this->getPage()->setVar('report_header_subtitle_block', '');
+
 			$this->getPage()->parse('no_requests_block', 'no_requests');
 			$this->getPage()->setVar('row_block', '');
 		}
