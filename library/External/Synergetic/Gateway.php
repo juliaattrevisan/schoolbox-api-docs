@@ -39,15 +39,19 @@ class External_Synergetic_Gateway {
      */
     public function changeCommunityLoginPassword($communityId, $currentPassword, $newPassword) {
 
-        $input = "<XMLInput>" .
-                 "<VendorTokenGUID>%s</VendorTokenGUID>" .
-                 "<VendorPassword>%s</VendorPassword>" .
-                 "<VersionNumber>1.2</VersionNumber>" .
-                 "<ConfigFileName></ConfigFileName>" .
-                 "<ID>%d</ID>" .
-                 "<CurrentPassword>%s</CurrentPassword>" .
-                 "<NewPassword>%s</NewPassword>" .
-                 "</XMLInput>";
+        $input =
+                "<aInputParamObj>".
+                "<XMLInput>" .
+                        "<VendorTokenGUID>%s</VendorTokenGUID>" .
+                        "<VendorPassword>%s</VendorPassword>" .
+                        "<VersionNumber>1.2</VersionNumber>" .
+                        "<ConfigFileName></ConfigFileName>" .
+                        "<ID>%d</ID>" .
+                        "<CurrentPassword>%s</CurrentPassword>" .
+                        "<NewPassword>%s</NewPassword>" .
+                 "</XMLInput>".
+                "</aInputParamObj>";
+
 
         $input = sprintf($input,
             $this->vendorTokenGUID,
@@ -56,7 +60,13 @@ class External_Synergetic_Gateway {
             $currentPassword,
             $newPassword);
 
-        return $this->client->ChangeCommunityLoginPassword($input);
+
+        try{
+            return $this->client->ChangeCommunityLoginPassword(array('aInputParamObj'=>array('XMLInput'=>$input)));
+        } catch (Exception $e) {
+                echo $e->getMessage();
+        }
+
     }
 
     public function logInCommunityMemberToSynCommPortal($parameters) {

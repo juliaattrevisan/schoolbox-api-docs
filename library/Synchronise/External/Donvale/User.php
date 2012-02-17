@@ -86,13 +86,16 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 				'defaultCampus' => 1,
 			);
 
+
 			if ($userClean = $this->getUserHandler()->getBySynergy($user['synergy_id']) ) {
 				$user['id'] = $userClean['uid'];
-
-				$this->getUserHandler()->update($user);
+				if(!$this->getUserHandler()->update($user))
+                    print "Unable to update user ".$propertyList['ThirdParty_Code'].'('.$propertyList['StudId'].')'.$user['id']."\n";
 			}
 			else {
-				$user['id'] = $this->getUserHandler()->create($user);
+				if(!$user['id'] = $this->getUserHandler()->create($user)) {
+                    print "Unable to create user ".$propertyList['ThirdParty_Code'].'('.$propertyList['StudId'].')';
+                }
 			}
 
 			/* Update user profile
@@ -164,7 +167,7 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
 				'alt_email' => $propertyList['Email'],
 				'email_pass' => '',
 				'mail_handler' => 1,
-				'eportfolio_enabled' => 0,
+				'eportfolio_enabled' => 1,
 				'group_id' => $this->getTeacherGroupId($propertyList),
 				'campus' => 1,
 				'defaultCampus' => 1,
@@ -203,7 +206,7 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
             $propertyList = $this->generatePropertyList($propertyList);
 
             $user = array(
-                'synergy_id' => $propertyList['school_num'],
+                'synergy_id' => $propertyList['SBUsername'],
                 'username' => $propertyList['SBUsername'],
                 'password' => $propertyList['SBPassword'],
                 'title' => '',
@@ -222,7 +225,7 @@ class Synchronise_External_Donvale_User extends Synchronise_External_Donvale_Abs
                 'defaultCampus' => 1,
             );
 
-            if ($userClean = $this->getUserHandler()->getBySynergy($user['synergy_id'])) {
+            if ($userClean = $this->getUserHandler()->getByUsername($user['username'])) {
                 $user['id'] = $userClean['uid'];
                 unset($user['password']); // dont update passwords
                 $this->getUserHandler()->update($user);

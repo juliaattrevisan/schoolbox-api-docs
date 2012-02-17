@@ -467,7 +467,7 @@ class User extends DeprecatedModel {
             $this->db->query($campusquery);
         }
 
-
+        return true;
     }
 
 	/**
