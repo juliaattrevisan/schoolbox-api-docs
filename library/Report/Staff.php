@@ -69,10 +69,10 @@ class Report_Staff extends Report_Abstract {
 					'STAFF_TITLE' => $currentStaff['StaffTitle'],
 					'STAFF_FIRSTNAME' => $currentStaff['StaffPreferredName'],
 					'STAFF_SURNAME' => $currentStaff['StaffSurname'],
-					'STAFF_ROLE' => $currentStaff['StaffCategoryType'],
+					'STAFF_ROLE' => $currentStaff['JobPositionDescription'],
 					'STAFF_DEPARTMENT' => $currentStaff['StaffDepartment'],
 					'STAFF_CAMPUS' => $currentStaff['StaffCampusDescription'],
-					'STAFF_PHONE' => $currentStaff['StaffPhone'],
+					'STAFF_PHONE' => $currentStaff['StaffOccupPhone'],
 					'STAFF_EMAIL' => $currentStaff['StaffOccupEmail'],
 				));
 
