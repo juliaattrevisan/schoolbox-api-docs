@@ -357,6 +357,8 @@ class External_Synergetic_User implements External_UserInterface {
 
 	/**
 	 * Contact list for staff directory
+	 * Exclude people who aren't active.
+	 * Exclude people who are on leave (category description for this is 'Staff on leave')
 	 *
 	 * @return mixed
 	 */
@@ -370,6 +372,8 @@ class External_Synergetic_User implements External_UserInterface {
 			FROM SynergyOne.dbo.vStaff vStaff
 			LEFT JOIN vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
 			WHERE ActiveFlag = 1
+			AND StaffCategoryDescription != 'Staff on leave'
+			ORDER BY StaffSurname
 		";
 
         return $this->getDatabase()->getAll($query);

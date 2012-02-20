@@ -63,21 +63,52 @@ class Report_Staff extends Report_Abstract {
 		$allStaff = $this->getExternalUserHandler()->getStaffContactListExtended();
 
 		if (is_array($allStaff) && count($allStaff)) {
-			foreach($allStaff as $currentStaff) {
-				$this->getPage()->setVar(array(
-					'STAFF_STAFFID' => $currentStaff['StaffID'],
-					'STAFF_TITLE' => $currentStaff['StaffTitle'],
-					'STAFF_FIRSTNAME' => $currentStaff['StaffPreferredName'],
-					'STAFF_SURNAME' => $currentStaff['StaffSurname'],
-					'STAFF_ROLE' => $currentStaff['JobPositionDescription'],
-					'STAFF_DEPARTMENT' => $currentStaff['StaffDepartment'],
-					'STAFF_CAMPUS' => $currentStaff['StaffCampusDescription'],
-					'STAFF_PHONE' => $currentStaff['StaffOccupPhone'],
-					'STAFF_EMAIL' => $currentStaff['StaffOccupEmail'],
-				));
+			$jobPositionDescription = array();
+			$previousStaff = null;
 
-				$this->getPage()->parse('staff_block', 'staff', true);
+			/* Agglutinate multiple JobPositionDescription
+			 */
+			foreach($allStaff as $currentStaff) {
+				$jobPositionDescription[] = $previousStaff['JobPositionDescription'];
+
+				if ($previousStaff['StaffID'] != $currentStaff['StaffID']) {
+					if ($previousStaff != null) {
+						$this->getPage()->setVar(array(
+							'STAFF_STAFFID' => $previousStaff['StaffID'],
+							'STAFF_TITLE' => $previousStaff['StaffTitle'],
+							'STAFF_FIRSTNAME' => $previousStaff['StaffPreferredName'],
+							'STAFF_SURNAME' => $previousStaff['StaffSurname'],
+							'STAFF_ROLE' => implode(', ', $jobPositionDescription),
+							'STAFF_DEPARTMENT' => $previousStaff['StaffDepartment'],
+							'STAFF_CAMPUS' => $previousStaff['StaffCampusDescription'],
+							'STAFF_PHONE' => $previousStaff['StaffOccupPhone'],
+							'STAFF_EMAIL' => $previousStaff['StaffOccupEmail'],
+						));
+
+						$this->getPage()->parse('staff_block', 'staff', true);
+					}
+
+					$jobPositionDescription = array();
+				}
+
+				$previousStaff = $currentStaff;
 			}
+//
+			/* Last person
+			 */
+			$this->getPage()->setVar(array(
+				'STAFF_STAFFID' => $currentStaff['StaffID'],
+				'STAFF_TITLE' => $currentStaff['StaffTitle'],
+				'STAFF_FIRSTNAME' => $currentStaff['StaffPreferredName'],
+				'STAFF_SURNAME' => $currentStaff['StaffSurname'],
+				'STAFF_ROLE' => implode(',', $jobPositionDescription),
+				'STAFF_DEPARTMENT' => $currentStaff['StaffDepartment'],
+				'STAFF_CAMPUS' => $currentStaff['StaffCampusDescription'],
+				'STAFF_PHONE' => $currentStaff['StaffOccupPhone'],
+				'STAFF_EMAIL' => $currentStaff['StaffOccupEmail'],
+			));
+
+			$this->getPage()->parse('staff_block', 'staff', true);
 		}
 	}
 }
