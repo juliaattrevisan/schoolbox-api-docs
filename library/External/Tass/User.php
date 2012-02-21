@@ -3,11 +3,12 @@
 *                                                           *
 * 		Copyright (c) 2008 Lektec Consulting				*
 *                                                           *
-*	This file provides access to synergetic user info		*	    
+*	This file provides access to synergetic user info		*
 *                                                           *
 ************************************************************/
 
 class External_Tass_User implements External_UserInterface {
+	const SPLIT_PARENT_TASSID_LENGTH = 8;
 
 	private $database;
 
@@ -25,13 +26,13 @@ class External_Tass_User implements External_UserInterface {
 	{
 
             $query = "SELECT stud_code, dob as StudentBirthDate, year_grp, form_cls as StudentForm, house as StudentHouseDescription, pctut_grp as StudentTutorDescription FROM student WHERE stud_code = '$tassID'";
-				
+
 		$student = $this->getDatabase()->getRow($query);
 
 		preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches);
 		$student['StudentBirthDate'] = strtotime($matches[2].' '.$matches[1].' '.$matches[3]);
 		return $student;
-		
+
 	}
 
 	function getStaff($tassID)
@@ -60,20 +61,20 @@ class External_Tass_User implements External_UserInterface {
         $_SESSION['FileSemester'] = $current['curr_sem'];
         $_SESSION['FileYear'] = $current['curr_year'];
 	}
-	
+
 	function getSubjectList($tassCode, $userID)
-	{	
+	{
 		if( $this->groupHandler->isStudent($userID) )
 		{
 			$sql ="SELECT class, studsub.cmpy_code, sub_code, year_grp
                                 FROM studsub
                                 JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
                                 WHERE studsub.stud_code = '$tassCode' AND semester = '{$_SESSION['FileSemester']}' AND yr_study = '{$_SESSION['FileYear']}'";
-                                
+
                 }
 		else
-		{      
-		
+		{
+
 			$sql = "SELECT class, cmpy_code, semester, sub_code, year_num, year_grp
                                 FROM tchsub
                                 WHERE tch_code = '$tassCode' AND semester = '{$_SESSION['FileSemester']}' AND year_num = '{$_SESSION['FileYear']}'";
@@ -86,17 +87,54 @@ class External_Tass_User implements External_UserInterface {
 
 		if(is_array($subjectList))
 			return $subjectList;
-		else 
+		else
 			return false;
 	}
-	
-	function getEnrolledStudents($tassID) {
-        $query = "SELECT stud_code RelatedID FROM studenrol WHERE par_code = '$tassID' OR sud19_code = '$tassID' AND cmpy_code = 01";
+
+	/**
+	 * Get enrolled students
+	 *
+	 * @param $tassID
+	 * @return mixed
+	 */
+	public function getEnrolledStudents($tassID) {
+
+		/* If the TassID is 8 characters long then it is assumed to be
+		 * someone in the split-parent scenario.
+		 */
+		if (strlen($tassID) == self::SPLIT_PARENT_TASSID_LENGTH) {
+			$parentCode = substr($tassID, 0, 7);
+			$parentNum = $tassID[self::SPLIT_PARENT_TASSID_LENGTH-1];
+
+			$query = "
+				SELECT
+					stud_code AS RelatedID
+				FROM student
+				INNER JOIN paraddress
+					ON student.cmpy_code = paraddress.cmpy_code
+					AND student.par_code = paraddress.par_code
+					AND student.sud19_code = paraddress.add_num
+				WHERE student.cmpy_code = '01'
+				AND student.par_code = '$parentCode'
+				AND paraddress.add_num = '$parentNum'
+			";
+		}
+		/* Otherwise just show them all
+		 */
+		else {
+			$query = "
+				SELECT
+					stud_code AS RelatedID
+				FROM studenrol
+				WHERE par_code = '$tassID'
+				OR sud19_code = '$tassID'
+				AND cmpy_code = '01'
+			";
+		}
 
 		return $this->getDatabase()->getAll($query);
-
-
 	}
+
     public function getPortrait ($externalUserId) {
     }
 
