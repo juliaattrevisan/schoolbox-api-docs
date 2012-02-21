@@ -14,6 +14,16 @@ $externalUserId = $_SESSION['sid'];
 
 $key = sha1($secret . $time . $externalUserId);
 
-$remoteUrl = "$remoteUrl?key=$key&time=$time&id=$externalUserId";
+/* Check if the $remoteUrl already has a query string in it. If so,
+ * just appened the $key, $time and $id parameters
+ */
+if (strpos($remoteUrl, '?') === false) {
+	$glue = '?';
+}
+else {
+	$glue = '&';
+}
+
+$remoteUrl = $remoteUrl . $glue . "key=$key&time=$time&id=$externalUserId";
 
 $this->setVar('REMOTE_URL', $remoteUrl);
