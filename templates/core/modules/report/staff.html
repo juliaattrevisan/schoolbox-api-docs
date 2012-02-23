@@ -11,18 +11,21 @@
 				content: largerImage,
 				position:{
 					corner:{
-						tooltip: 'rightMiddle',
-						target: 'topLeft'
+						tooltip: 'leftMiddle',
+						target: 'topRight'
 					}
+
 				},
 				style:{
-					background:'#ccc',
+					background:'#fefefe',
 					color:'black',
 					border:{
 						width:3,
 						radius:4,
 						color:'#f1f1f1'
 					},
+					width: 250,
+					height: 150,
 					name:'green'
 				}
 			});
@@ -57,6 +60,7 @@
 	<table class="sort-it" width="100%">
 		<thead>
 		<tr>
+			<th>Image (hover over for larger)</th>
 			<th>Title</th>
 			<th>First name</th>
 			<th>Surname</th>
@@ -65,24 +69,24 @@
 			<th>Campus</th>
 			<th>Phone</th>
 			<th>Email</th>
-			<th>Image (hover over for larger)</th>
+
 		</tr>
 		</thead>
 		<tbody>
 			<!-- BEGIN staff -->
 			<tr>
+				<td>
+					<img class="small-image" src="/search/portrait.php?id={STAFF_STAFFID}&height=60&width=60">
+					<div class="larger-image"><img  src="/search/portrait.php?id={STAFF_STAFFID}&width=200&height=150"></div>
+				</td>
 				<td>{STAFF_TITLE}</td>
 				<td>{STAFF_FIRSTNAME}</td>
 				<td>{STAFF_SURNAME}</td>
 				<td>{STAFF_DEPARTMENT}</td>
 				<td>{STAFF_ROLE}</td>
 				<td>{STAFF_CAMPUS}</td>
-				<td>{STAFF_PHONE}</td>
+				<td class="number" width="30%">{STAFF_PHONE}</td>
 				<td><a href="mailto:{STAFF_EMAIL}">{STAFF_EMAIL}</a></td>
-				<td>
-					<img class="small-image" src="/search/portrait.php?id={STAFF_STAFFID}&height=60&width=60">
-					<div class="larger-image"><img width="200" height="150" src="/search/portrait.php?id={STAFF_STAFFID}&width=200&height=150"></div>
-				</td>
 			</tr>
 			<!-- END staff -->
 		</tbody>

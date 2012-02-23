@@ -5088,6 +5088,9 @@ STUDENT AND PARENT DIRECTORIES
 	background-image:url(/images/core/tablesorter/sort-descending.gif);
 }
 
+.directory .sort-it{table-layout: fixed}
+.directory .sort-it td.number{word-wrap: break-word}
+
 .directory.staff th{border:1px solid #ccc; text-align:left;}
 .directory.staff .larger-image{display:none;}
 
