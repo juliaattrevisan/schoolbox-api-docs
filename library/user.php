@@ -194,7 +194,7 @@ class User extends DeprecatedModel {
 
         $newPassword = mysql_real_escape_string($newPassword);
 
-		$query = "UPDATE `" . $this->_table . "` SET password = PASSWORD('$newPassword'), email_pass = '$newPassword' WHERE `" . $this->_index . "` = $userID";
+		$query = "UPDATE `" . $this->_table . "` SET password = PASSWORD('$newPassword'), email_pass = '$newPassword' WHERE `" . $this->_index . "` = $userID AND password = PASSWORD('$oldPassword')";
         $this->db->query($query);
 
         return $this->db->affectedRows();

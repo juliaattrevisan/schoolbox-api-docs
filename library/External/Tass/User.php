@@ -3,7 +3,7 @@
 *                                                           *
 * 		Copyright (c) 2008 Lektec Consulting				*
 *                                                           *
-*	This file provides access to synergetic user info		*
+*	This file provides access to synergetic user info		*	    
 *                                                           *
 ************************************************************/
 
@@ -26,13 +26,13 @@ class External_Tass_User implements External_UserInterface {
 	{
 
             $query = "SELECT stud_code, dob as StudentBirthDate, year_grp, form_cls as StudentForm, house as StudentHouseDescription, pctut_grp as StudentTutorDescription FROM student WHERE stud_code = '$tassID'";
-
+				
 		$student = $this->getDatabase()->getRow($query);
 
 		preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches);
 		$student['StudentBirthDate'] = strtotime($matches[2].' '.$matches[1].' '.$matches[3]);
 		return $student;
-
+		
 	}
 
 	function getStaff($tassID)
@@ -61,20 +61,20 @@ class External_Tass_User implements External_UserInterface {
         $_SESSION['FileSemester'] = $current['curr_sem'];
         $_SESSION['FileYear'] = $current['curr_year'];
 	}
-
+	
 	function getSubjectList($tassCode, $userID)
-	{
+	{	
 		if( $this->groupHandler->isStudent($userID) )
 		{
 			$sql ="SELECT class, studsub.cmpy_code, sub_code, year_grp
                                 FROM studsub
                                 JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
                                 WHERE studsub.stud_code = '$tassCode' AND semester = '{$_SESSION['FileSemester']}' AND yr_study = '{$_SESSION['FileYear']}'";
-
+                                
                 }
 		else
-		{
-
+		{      
+		
 			$sql = "SELECT class, cmpy_code, semester, sub_code, year_num, year_grp
                                 FROM tchsub
                                 WHERE tch_code = '$tassCode' AND semester = '{$_SESSION['FileSemester']}' AND year_num = '{$_SESSION['FileYear']}'";
@@ -87,10 +87,10 @@ class External_Tass_User implements External_UserInterface {
 
 		if(is_array($subjectList))
 			return $subjectList;
-		else
+		else 
 			return false;
 	}
-
+    
 	/**
 	 * Get enrolled students
 	 *

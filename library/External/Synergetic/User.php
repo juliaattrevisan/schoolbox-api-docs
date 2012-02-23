@@ -35,19 +35,26 @@ class External_Synergetic_User implements External_UserInterface {
         ";
 
         if ( $photo = $this->getDatabase()->getRow($query) ) {
-            $photoPath = tempnam(Cfg::get('zip_dir'), 'synport');
-            $photoHandle = fopen($photoPath, "w");
+            //$photoPath = tempnam(Cfg::get('zip_dir'), 'synport');
 
-            fwrite($photoHandle, $photo['Photo']);
-            fclose($photoHandle);
+            $photoPath = Config::get('portrait_dir').'/'.$externalUserId.'.jpg';
+
+            //return file from cache
+            //TODO: delete photos on rollover
+            if(file_exists($photoPath)) {
+                return $photoPath;
+            }
+            else {
+                $photoHandle = fopen($photoPath, "w");
+
+                fwrite($photoHandle, $photo['Photo']);
+                fclose($photoHandle);
+
+                return $photoPath;
+            }
         }
 
-        if ( is_readable($photoPath) ) {
-            return $photoPath;
-        }
-        else {
-            return false;
-        }
+        return false;
     }
 
 	/**
