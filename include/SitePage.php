@@ -107,6 +107,9 @@ class SitePage extends Page
 					if ($_SESSION['campus'][0] == 3) {
 						$this->site = 'grimwade';
 					}
+                    else if ($_SESSION['campus'][0] == 2) {
+                        $this->site = 'wadhurst';
+                    }
 					else
 					{
 						$this->site = 'mgs';
@@ -394,7 +397,7 @@ class SitePage extends Page
 			$this->site == 'bialik' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent())
             )
 		) {
-			if ($this->site == 'mgs' || $this->site == 'grimwade') {
+			if ($this->site == 'mgs' || $this->site == 'grimwade' || $this->site =='wadhurst') {
 
 				if ($this->groupHandler->isStaff()) {
 					$this->setVar("WEBMAIL_LOCATION", 'href="https://owa.mgs.vic.edu.au/owa" rel="external"');
