@@ -15,23 +15,16 @@ h2, h2 a, .header_option {
 h2 {
 	background-repeat:repeat-x;
 	background-color:#0089d5;
-    border: 1px solid #0074b4;
 	color:#fff;
 	-moz-background-clip: padding;
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
 	font-weight:bold;
 	font-size:14px;
-	-moz-box-shadow: 0px 1px 2px #b9b9b9;
-	-webkit-box-shadow: 0px 1px 2px #b9b9b9;
-	box-shadow: 0px 1px 2px #b9b9b9;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#0089d5), to(#0079bc));
-   	background-image: -webkit-linear-gradient(top, #0089d5, #0079bc);
-   	background-image:    -moz-linear-gradient(top, #0089d5, #0079bc);
-   	background-image:     -ms-linear-gradient(top, #0089d5, #0079bc);
-   	background-image:      -o-linear-gradient(top, #0089d5, #0079bc);
-   	background-image:         linear-gradient(top, #0089d5, #0079bc);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#0089d5', EndColorStr='#0079bc');
+	-moz-box-shadow: 0px 1px 2px #b9b9b9, inset 0 0 1px rgba(0,0,0,0.3);
+	box-shadow: 0px 1px 2px #b9b9b9, inset 0 0 1px rgba(0,0,0,0.2);
+    background-image: url('/images/wadhurst/h2-background.png');
+    background-position: left bottom;
 }
 .top h2, .left h2, .right h2 { color: #fff; }
 
@@ -278,8 +271,8 @@ h3, #nav h3, .add-component .notification { color: #FFFFFF; }
 .otherMonth .dayWrap p, .otherMonth .dayWrap a { color: #797979; }
 
 td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box, td.cal-left a.back,
-td.cal-left a.forward, td.cal-right a.filter-change, .day-block { background-color: #f2f6fa; }
-.otherMonth.day-block { background-color: #FAF9F5; }
+td.cal-left a.forward, td.cal-right a.filter-change, .day-block, .timetable td.dayCurrent { background-color: #f2f6fa; }
+.otherMonth.day-block, .timetable td.normal { background-color: #FAF9F5; }
 
 td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-change.current, td.cal-right a.filter-change:hover { background-color: #D3D3E4; }
 
@@ -287,13 +280,17 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 
 .dayWrap { background-color: #e4e4e4; }
 
+.timetable td.dayCurrent { font-size: 1em; color: #000; }
+.timetable td, .timetable th { border-right: none; }
 .dayWrap p { color:#000; }
 
 .calTableCurrent .dayWrap { background-color:#ffffff; }
 
 .otherMonth .dayWrap, .past .dayWrap { background-color: #f4f4f4; }
 
-#month-view td.dark, #week-view td.dark {
+#month-view td.dark, 
+#week-view td.dark,
+.timetable th {
     background-repeat:repeat-x;
    	background-color:#0089d5;
    	color:#fff;
