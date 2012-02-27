@@ -52,7 +52,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 			$date = time();
 		}
 
-		if ( empty($definition['reset']) ) {
+		if ( empty($definition['reset']) || $definition['reset'] == '0000-00-00') {
 			$start = strtotime($definition['start']);
 		}
 		else {
