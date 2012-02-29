@@ -197,6 +197,38 @@ class External_Synergetic_User implements External_UserInterface {
 		return $this->getDatabase()->getAll($query);
     }
 
+	/**
+	 * Gets a list of Contacts for all Student Boarders.
+	 *
+	 * Used in reporting.
+	 *
+	 * @param $yearlevel
+	 * @return mixed
+	 */
+    public function getStudentBoarderContactListExtended($yearlevel) {
+		$query = "
+			SELECT
+				StudentID, StudentGiven1, StudentSurname, StudentYearLevel, House.Description AS StudentHouse,
+				StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
+				StudentContactAddress1, StudentContactAddress2, StudentContactAddress3,
+				StudentContactSuburb, StudentContactPostCode, StudentContactState, StudentContactCountryDesc,
+				StudentContactPhoneActual, StudentContactMobilePhone, StudentContactOccupPhone,
+				StudentContactSpouseID, StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseSurname,
+				StudentContactSpouseMobilePhone, StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail, StudentContactType,
+				StudentContactSilentPhoneFlag, Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag, Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
+				StudentParentsSeparatedFlag
+			FROM SynergyOne.dbo.vStudentContactAllAddress
+			LEFT JOIN SynergyOne.dbo.Community Contact ON StudentContactID = Contact.ID
+			LEFT JOIN SynergyOne.dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
+			LEFT JOIN SynergyOne.dbo.luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
+			WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
+			AND FileSemester = " . $_SESSION['FileSemester'] . "
+			AND FileYear = " . $_SESSION[ 'FileYear'] . "
+			AND StudentBoarder = 'B'
+			ORDER BY StudentSurname, StudentID, StudentContactType";
+
+		return $this->getDatabase()->getAll($query);
+    }
 
 	function getStudentContactList ($synID) {
 		$query = "
