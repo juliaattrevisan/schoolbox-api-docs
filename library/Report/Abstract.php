@@ -12,6 +12,7 @@ abstract class Report_Abstract {
 	protected $yearLevel = null;
 	protected $groupHandler = null;
 	protected $externalUserHandler = null;
+	protected $allRecords = array();
 
 	/**
 	 * Set up blocks and stuff
@@ -110,5 +111,23 @@ abstract class Report_Abstract {
 	 */
 	protected function getPage() {
 		return $this->page;
+	}
+
+	/**
+	 * Set all records
+	 *
+	 * @param $allRecords
+	 */
+	protected function setAllRecords($allRecords) {
+		$this->allRecords = $allRecords;
+	}
+
+	/**
+	 * Get all records
+	 *
+	 * @return array
+	 */
+	protected function getAllRecords() {
+		return $this->allRecords;
 	}
 }

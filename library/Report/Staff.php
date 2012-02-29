@@ -27,6 +27,8 @@ class Report_Staff extends Report_Abstract {
 			$this->getExternalUserHandler()->getCurrentSemester();
 
 			$this->setup();
+
+			$this->setAllRecords($this->getExternalUserHandler()->getStaffContactListExtended());
 		}
 	}
 
@@ -60,7 +62,7 @@ class Report_Staff extends Report_Abstract {
 	 * Render data
 	 */
 	public function render() {
-		$allStaff = $this->getExternalUserHandler()->getStaffContactListExtended();
+		$allStaff = $this->getAllRecords();
 
 		if (is_array($allStaff) && count($allStaff)) {
 			$jobPositionDescription = array();
