@@ -296,10 +296,9 @@ $j(document).ready(function() {
 				
 				/* enable all options */
 				$j(this.menu).find('.context-menu-item').removeClass('context-menu-item-disabled');
-				
-				if ($j(this.target).hasClass('child-of-node-0')) {
-					// disable from modify / delete
 
+                /* Disable modify and delete for node-0 (Top) and immediate children */
+				if ($j(this.target).hasClass('child-of-node-0') || $j(this.target).hasClass('server')) {
 					for (var i = 0; i <= 1; i++) {
 						$j($j(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled", true); 
 				}
