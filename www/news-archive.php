@@ -91,7 +91,7 @@ if(is_array($items))
 		$i++;
 
 		if(($permission >= WRITE_ACCESS && $article['item_owner'] == $_SESSION['id']) || $permission >= FULL_ACCESS)
-			$this->setVar("MODIFY", "<a href=\"/news/modify/".$article['item_id']."\">modify</a>");
+			$this->setVar("MODIFY", " | <a href=\"/news/modify/".$article['item_id']."\">modify</a>");
 		else
 			$this->setVar("MODIFY", "");
 
