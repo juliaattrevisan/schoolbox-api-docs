@@ -67,12 +67,19 @@ class External_Synergetic_User implements External_UserInterface {
     public function getParent($synID) {
         $query = "
 			SELECT
-				Contact.Title, Contact.Preferred, Contact.Surname, Contact.Email, Contact.MobilePhone, Contact.DirectoryIncludeFlag,
-                Contact.SpouseID, Spouse.Title SpouseTitle, Spouse.Preferred SpousePreferred, Spouse.Surname SpouseSurname,
-                Spouse.Email SpouseEmail, Spouse.MobilePhone SpouseMobilePhone,Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag
-			FROM SynergyOne.dbo.Community Contact
-			LEFT JOIN SynergyOne.dbo.Community Spouse ON Contact.SpouseID = Spouse.ID
-			WHERE Contact.ID = '$synID'";
+				Contact.Title, Contact.Preferred, Contact.Surname, Contact.Email, Addresses.Phone as HomePhone,
+				Addresses.SilentPhoneFlag, Contact.MobilePhone, Contact.DirectoryIncludeFlag, Contact.SpouseID,
+				Spouse.Title SpouseTitle, Spouse.Preferred SpousePreferred, Spouse.Surname SpouseSurname,
+				Spouse.Email SpouseEmail, Spouse.MobilePhone SpouseMobilePhone,
+				Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag
+			FROM
+			    SynergyOne.dbo.Community Contact
+            LEFT JOIN
+                SynergyOne.dbo.Addresses Addresses ON Contact.AddressID = Addresses.AddressID
+			LEFT JOIN
+			    SynergyOne.dbo.Community Spouse ON Contact.SpouseID = Spouse.ID
+			WHERE
+			    Contact.ID = '$synID'";
 
         return $this->getDatabase()->getRow($query);
     }

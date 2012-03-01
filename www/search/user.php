@@ -123,10 +123,11 @@ if (is_numeric($this->arg[0])) {
 
 		if ($groupHandler->isParent($user['uid']) && !$groupHandler->isStudent()) {
 			$parent = $synUserHandler->getParent($user['synergy_id']);
-			if ($parent['DirectoryIncludeFlag']) {
+
+            if ($parent['DirectoryIncludeFlag']) {
 				$output = array(
                     'NAME' => Scrub::text($parent['Title'].' '.$parent['Preferred'].' '.$parent['Surname']),
-					'HOME_PHONE' => !$parent['SilentPhoneFlag']?$parent['HomePhone']:'',
+					'HOME_PHONE' => !$parent['SilentPhoneFlag'] ? $parent['HomePhone'] : '',
 					'MOBILE_PHONE' => $parent['MobilePhone'],
 				);
 
