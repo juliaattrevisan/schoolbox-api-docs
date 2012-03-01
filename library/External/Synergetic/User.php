@@ -416,13 +416,12 @@ class External_Synergetic_User implements External_UserInterface {
 				JobPositions.StaffDepartmentDescription AS StaffDepartment, JobPositions.JobPositionDescription
 			FROM SynergyOne.dbo.vStaff vStaff
 			LEFT JOIN vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
-			LEFT JOIN StaffJobPositions ON vStaff.StaffID = StaffJobPositions.ID
 			WHERE ActiveFlag = 1
 			AND StaffCategoryDescription != 'Staff on leave'
-			AND ( StaffJobPositions.StartDate < GETDATE()
-			OR    StaffJobPositions.StartDate IS NULL )
-			AND ( StaffJobPositions.EndDate > GETDATE()
-			OR    StaffJobPositions.EndDate IS NULL )
+			AND ( JobPositions.StaffJobPositionStartDate < GETDATE()
+			OR    JobPositions.StaffJobPositionStartDate IS NULL )
+			AND ( JobPositions.StaffJobPositionEndDate > GETDATE()
+			OR    JobPositions.StaffJobPositionEndDate IS NULL )
 			ORDER BY StaffSurname
 		";
 
