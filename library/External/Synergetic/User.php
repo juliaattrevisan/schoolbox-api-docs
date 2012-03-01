@@ -175,7 +175,7 @@ class External_Synergetic_User implements External_UserInterface {
     public function getStudentContactListExtended($yearlevel) {
 		$query = "
 			SELECT
-				StudentID, StudentGiven1, StudentSurname, StudentYearLevel, House.Description AS StudentHouse,
+				StudentID, StudentGiven1, StudentSurname, StudentYearLevel, House.Description AS StudentHouse, StudentBoarder,
 				StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
 				StudentContactAddress1, StudentContactAddress2, StudentContactAddress3,
 				StudentContactSuburb, StudentContactPostCode, StudentContactState, StudentContactCountryDesc,

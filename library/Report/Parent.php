@@ -122,6 +122,7 @@ class Report_Parent extends Report_Abstract {
 						'STUDENT_FIRSTNAME' => $currentContact['StudentGiven1'],
 						'STUDENT_SURNAME' => $currentContact['StudentSurname'],
 						'STUDENT_YEAR' => $currentContact['StudentYearLevel'],
+                        'STUDENT_BOARDER' => $currentContact['StudentBoarder'] == 'B' ? '(Boarder)' : '',
 					));
 
 					/* Include Student House (there's also a BoardingHouse element
