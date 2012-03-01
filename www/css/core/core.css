@@ -5092,7 +5092,7 @@ STUDENT AND PARENT DIRECTORIES
 .directory .sort-it td.number{word-wrap: break-word}
 
 .directory.staff th{border:1px solid #ccc; text-align:left;}
-.directory.staff .larger-image{display:none;}
+.directory.staff .larger-image{display:none; }
 
 /************************************
 FORUM
