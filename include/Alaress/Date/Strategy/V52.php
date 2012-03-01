@@ -52,6 +52,15 @@ class Alaress_Date_Strategy_V52 extends Alaress_Date_Strategy_Abstract implement
 	}
 
 	/**
+	 * Use long format
+	 *
+	 * @return string
+	 */
+	public function getLongDateOnly() {
+		return $this->getUsingFormat($this->getLocale()->longDateOnlyFormat());
+	}
+
+	/**
 	 * Use short format
 	 *
 	 * @return string
@@ -66,7 +75,7 @@ class Alaress_Date_Strategy_V52 extends Alaress_Date_Strategy_Abstract implement
 	 * @return string
 	 */
 	public function getDateOnly() {
-		return $this->getUsingFormat($this->getLocale()->noTimeFormat());
+		return $this->getUsingFormat($this->getLocale()->dateOnlyFormat());
 	}
 
 	/**
@@ -75,7 +84,7 @@ class Alaress_Date_Strategy_V52 extends Alaress_Date_Strategy_Abstract implement
 	 * @return string
 	 */
 	public function getTimeOnly() {
-		return $this->getUsingFormat($this->getLocale()->timeFormat());
+		return $this->getUsingFormat($this->getLocale()->timeOnlyFormat());
 	}
 
 	/**

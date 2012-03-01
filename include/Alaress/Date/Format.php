@@ -21,6 +21,7 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface {
 	 * table rather than have a concrete instantiation
 	 *
 	 * @param  $dateTime
+	 * @param $dateFormat
 	 */
 	public function __construct($dateTime = null, $dateFormat) {
 		$strategy = new Alaress_Date_Strategy_V52($dateTime, $dateFormat);
@@ -71,16 +72,25 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface {
 	/**
 	 * Delegation method to get a long format
 	 *
-	 * @return
+	 * @return mixed
 	 */
 	public function getLong() {
 		return $this->getStrategy()->getLong();
 	}
 
 	/**
+	 * Delegation method to get a long format
+	 *
+	 * @return mixed
+	 */
+	public function getLongDateOnly() {
+		return $this->getStrategy()->getLongDateOnly();
+	}
+
+	/**
 	 * Delegation method to get a short format
 	 *
-	 * @return
+	 * @return mixed
 	 */
 	public function getShort() {
 		return $this->getStrategy()->getShort();
@@ -107,7 +117,7 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface {
 	/**
 	 * Delegation method to get a database format
 	 *
-	 * @return
+	 * @return mixed
 	 */
 	public function getDatabase() {
 		return $this->getStrategy()->getDatabase();

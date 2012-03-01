@@ -531,6 +531,8 @@ class Leave_Controller extends Controller {
         $houseList = $data['houseList'];
         $requestList = $data['requestList'];
 
+		$currentTime = new Alaress_Date_Format(time(), 'U');
+
 		/* Render output
 		 */
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/houseReport.html');
@@ -538,10 +540,27 @@ class Leave_Controller extends Controller {
         $this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'row', 'row_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'report_header', 'report_header_block');
+
 		$this->getPage()->setBlock(TEMPLATE_content, 'report_header_subtitle', 'report_header_subtitle_block');
+		$this->getPage()->setBlock('report_header_subtitle', 'report_header_subtitle_show_am', 'report_header_subtitle_show_am_block');
+		$this->getPage()->setBlock('report_header_subtitle', 'report_header_subtitle_show_day', 'report_header_subtitle_show_day_block');
+		$this->getPage()->setBlock('report_header_subtitle', 'report_header_subtitle_show_pm', 'report_header_subtitle_show_pm_block');
+		$this->getPage()->setBlock('report_header_subtitle', 'report_header_subtitle_hide_am', 'report_header_subtitle_hide_am_block');
+		$this->getPage()->setBlock('report_header_subtitle', 'report_header_subtitle_hide_day', 'report_header_subtitle_hide_day_block');
+
         $this->getPage()->setBlock('row', 'request', 'request_block');
+		$this->getPage()->setBlock('row', 'empty_request', 'empty_request_block');
 		$this->getPage()->setBlock('request', 'request_period', 'request_period_block');
-        $this->getPage()->setBlock('row', 'empty_request', 'empty_request_block');
+
+		$this->getPage()->setBlock('request_period', 'request_period_show_am', 'request_period_show_am_block');
+		$this->getPage()->setBlock('request_period', 'request_period_show_day', 'request_period_show_day_block');
+		$this->getPage()->setBlock('request_period', 'request_period_show_pm', 'request_period_show_pm_block');
+		$this->getPage()->setBlock('request_period', 'request_period_hide_am', 'request_period_hide_am_block');
+		$this->getPage()->setBlock('request_period', 'request_period_hide_day', 'request_period_hide_day_block');
+
+		$this->getPage()->setVar(array(
+			'GENERATED_AT' => $currentTime->getShort()
+		));
 
 		if (count($houseList)) {
 			foreach ($houseList as $house) {
@@ -571,11 +590,37 @@ class Leave_Controller extends Controller {
 				$headerDate->addDays($i);
 
 				$this->getPage()->setVar(array(
-					'REPORT_HEADER_DATE' => $headerDate->getLocalShort(),
+					'REPORT_HEADER_DATE' => $headerDate->getLongDateOnly(),
 				));
+
+				/* Hide the first two columns of the first group
+				 */
+				if (!$i) {
+					$this->getPage()->setVar('report_header_subtitle_show_am_block', '');
+					$this->getPage()->setVar('report_header_subtitle_show_day_block', '');
+					$this->getPage()->parse('report_header_subtitle_hide_am_block', 'report_header_subtitle_hide_am');
+					$this->getPage()->parse('report_header_subtitle_hide_day_block', 'report_header_subtitle_hide_day');
+
+				}
+				else {
+					$this->getPage()->parse('report_header_subtitle_show_am_block', 'report_header_subtitle_show_am');
+					$this->getPage()->parse('report_header_subtitle_show_day_block', 'report_header_subtitle_show_day');
+					$this->getPage()->setVar('report_header_subtitle_hide_am_block', '');
+					$this->getPage()->setVar('report_header_subtitle_hide_day_block', '');
+				}
+
+				$this->getPage()->parse('report_header_subtitle_show_pm_block', 'report_header_subtitle_show_pm');
 
 				$this->getPage()->parse('report_header_block', 'report_header', true);
 				$this->getPage()->parse('report_header_subtitle_block', 'report_header_subtitle', true);
+
+				/* Clear children after parsing out the parent
+				 */
+				$this->getPage()->setVar('report_header_subtitle_show_am_block', '');
+				$this->getPage()->setVar('report_header_subtitle_show_day_block', '');
+				$this->getPage()->setVar('report_header_subtitle_show_pm_block', '');
+				$this->getPage()->setVar('report_header_subtitle_hide_am_block', '');
+				$this->getPage()->setVar('report_header_subtitle_hide_day_block', '');
 			}
 
 			/* Parse out the requests
@@ -585,10 +630,20 @@ class Leave_Controller extends Controller {
 					'USER_ID' => $request->getUser()->getId(),
 					'USER_NAME' => $request->getUser()->getName(),
 					'USER_YEAR' => $request->getUser()->getYear(),
-					'CLASS' => $i % 2 ? '' : 'dark'
+					'CLASS' => $i % 2 ? '' : 'dark',
 				));
 
 				if ($request->getId()) {
+
+					/* Text color if request is still pending
+					 */
+					if ($request->isPending()) {
+						$pendingTextClass = 'grey';
+					}
+					else {
+						$pendingTextClass = '';
+					}
+
 					$this->getPage()->setVar(array(
 						'REQUEST_ID' => $request->getId(),
 						'REQUEST_STATUS' => $request->getStatus(true),
@@ -629,19 +684,19 @@ class Leave_Controller extends Controller {
 								/* Specifically check for this day, to account for multi-week leave
 								 */
 								if ($requestDateStart->getDatabaseDate() == $morningStart->getDatabaseDate()) {
-									$requestPeriodMorning = "<span>L {$requestDateStart->getTimeOnly()}</span>";
+									$requestPeriodMorning = "<span class='$pendingTextClass'>{$requestDateStart->getTimeOnly()}</span>";
 								}
 								else {
-									$requestPeriodMorning = "<span>L</span>";
+									$requestPeriodMorning = "<span class='$pendingTextClass'>L</span>";
 								}
 
 								$showStartTime = false;
 							}
 							else if (!$showStartTime && !$request->getOccupancy($dayStart, $nightStart)) {
-								$requestPeriodMorning = "<span>L {$requestDateFinish->getTimeOnly()}</span>";
+								$requestPeriodMorning = "<span class='$pendingTextClass'>{$requestDateFinish->getTimeOnly()}</span>";
 							}
 							else {
-								$requestPeriodMorning = "<span>L</span>";
+								$requestPeriodMorning = "<span class='$pendingTextClass'>L</span>";
 							}
 						}
 
@@ -650,19 +705,19 @@ class Leave_Controller extends Controller {
 						if ($request->getOccupancy($dayStart, $nightStart)) {
 							if ($showStartTime) {
 								if ($requestDateStart->getDatabaseDate() == $dayStart->getDatabaseDate()) {
-									$requestPeriodDay = "<span>L {$requestDateStart->getTimeOnly()}</span>";
+									$requestPeriodDay = "<span class='$pendingTextClass'>{$requestDateStart->getTimeOnly()}</span>";
 								}
 								else {
-									$requestPeriodDay = "<span>L</span>";
+									$requestPeriodDay = "<span class='$pendingTextClass'>L</span>";
 								}
 
 								$showStartTime = false;
 							}
 							else if (!$showStartTime && !$request->getOccupancy($nightStart, $nightEnd)) {
-								$requestPeriodDay = "<span>L {$requestDateFinish->getTimeOnly()}</span>";
+								$requestPeriodDay = "<span class='$pendingTextClass'>{$requestDateFinish->getTimeOnly()}</span>";
 							}
 							else {
-								$requestPeriodDay = "<span>L</span>";
+								$requestPeriodDay = "<span class='$pendingTextClass'>L</span>";
 							}
 						}
 
@@ -677,19 +732,19 @@ class Leave_Controller extends Controller {
 
 							if ($showStartTime) {
 								if ($requestDateStart->getDatabaseDate() == $nightStart->getDatabaseDate()) {
-									$requestPeriodNight = "<span>L {$requestDateStart->getTimeOnly()}</span>";
+									$requestPeriodNight = "<span class='$pendingTextClass'>{$requestDateStart->getTimeOnly()}</span>";
 								}
 								else {
-									$requestPeriodNight = "<span>L</span>";
+									$requestPeriodNight = "<span class='$pendingTextClass'>L</span>";
 								}
 
 								$showStartTime = false;
 							}
-							else if (!$showStartTime &&  !$request->getOccupancy($nightEnd, $nextMorning)) {
-								$requestPeriodNight = "<span>L {$requestDateFinish->getTimeOnly()}</span>";
+							else if (!$showStartTime && !$request->getOccupancy($nightEnd, $nextMorning)) {
+								$requestPeriodNight = "<span class='$pendingTextClass'>{$requestDateFinish->getTimeOnly()}</span>";
 							}
 							else {
-								$requestPeriodNight = "<span>L</span>";
+								$requestPeriodNight = "<span class='$pendingTextClass'>L</span>";
 							}
 						}
 
@@ -701,7 +756,31 @@ class Leave_Controller extends Controller {
 							'REQUEST_PERIOD_NIGHT' => $requestPeriodNight
 						));
 
+						/* Hide the first two columns of the first group
+						 */
+						if (!$i) {
+							$this->getPage()->setVar('request_period_show_am_block', '');
+							$this->getPage()->setVar('request_period_show_day_block', '');
+							$this->getPage()->parse('request_period_hide_am_block', 'request_period_hide_am');
+							$this->getPage()->parse('request_period_hide_day_block', 'request_period_hide_day');
+						}
+						else {
+							$this->getPage()->parse('request_period_show_am_block', 'request_period_show_am');
+							$this->getPage()->parse('request_period_show_day_block', 'request_period_show_day');
+							$this->getPage()->setVar('request_period_hide_am_block', '');
+							$this->getPage()->setVar('request_period_hide_day_block', '');
+						}
+
+						$this->getPage()->parse('request_period_show_pm_block', 'request_period_show_pm');
 						$this->getPage()->parse('request_period_block', 'request_period', true);
+
+						/* Clear children after parsing out the parent
+						 */
+						$this->getPage()->setVar('request_period_show_am_block', '');
+						$this->getPage()->setVar('request_period_show_day_block', '');
+						$this->getPage()->setVar('request_period_show_pm_block', '');
+						$this->getPage()->setVar('request_period_hide_am_block', '');
+						$this->getPage()->setVar('request_period_hide_day_block', '');
 
 						/* Iteration reset
 						 */
@@ -713,10 +792,9 @@ class Leave_Controller extends Controller {
 						unset($requestPeriodMorning, $requestPeriodDay, $requestPeriodNight);
 					}
 
-					if ($request->getStatus() != Leave_Request::STATUS_PENDING) {
+					if (!$request->isPending()) {
 						$this->getPage()->setVar(array(
 							'REQUEST_STATUS' => $request->getStatus(true),
-							'REQUEST_AUTHORISATION_DATETIME' => $request->getAuthorisationDatetime(true)->getAustralian(),
 							'REQUEST_AUTHORISATION_USER_ID' => $request->getAuthorisationUser()->getId(),
 							'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->getName(),
 						));
@@ -724,7 +802,6 @@ class Leave_Controller extends Controller {
 					else {
 						$this->getPage()->setVar(array(
 							'REQUEST_STATUS' => $request->getStatus(true),
-							'REQUEST_AUTHORISATION_DATETIME' => 'Pending Approval',
 							'REQUEST_AUTHORISATION_USER_ID' => '',
 							'REQUEST_AUTHORISATION_USER_NAME' => '',
 							'CLASS' => $this->getPage()->getVar('CLASS') . ' leave-pending'
@@ -1072,7 +1149,7 @@ class Leave_Controller extends Controller {
 	 * Export a csv version of the catering report. Algorithm is similar to
 	 * renderCateringReport, but due to non-templating things have to be
 	 * fputcsv'd in order
-	 * 
+	 *
 	 * @param $data
 	 */
 	public function exportCateringReport($data) {

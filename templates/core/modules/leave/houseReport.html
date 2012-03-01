@@ -77,6 +77,8 @@
     <!-- END no_requests -->
     <!-- BEGIN request_list -->
     <h2>Leave Report</h2>
+	<p class='leaveReportGeneratedAt'>Generated on {GENERATED_AT}</p>
+
     <span class="header_option in-h2">
         <a id="reportExportButton" href="javascript:void(0);" class="btn modify"><span></span>Export History</a>
         <form id="reportFilter">
@@ -95,25 +97,36 @@
                 <th></th>
                 <th></th>
 				<!-- BEGIN report_header -->
-				<th colspan="3" class="center">{REPORT_HEADER_DATE}</th>
+				<th colspan="3" class="leaveReportHeaderDate leaveReportLeftBorder leaveReportRightBorder">{REPORT_HEADER_DATE}</th>
 				<!-- END report_header -->
-                <th></th>
-                <th></th>
                 <th></th>
                 <th></th>
             </tr>
             <tr>
                 <th>Name</th>
-                <th>Year</th>
+                <th class='leaveReportYear'>Year</th>
 				<!-- BEGIN report_header_subtitle -->
-                <th>Morning</th>
-                <th>Day</th>
-                <th>Night</th>
+				<!-- BEGIN report_header_subtitle_show_am -->
+                <th class='leaveReportMeridiem leaveReportLeftBorder'>AM</th>
+				<!-- END report_header_subtitle_show_am -->
+				<!-- BEGIN report_header_subtitle_hide_am -->
+				<th class='leaveReportMeridiem leaveReportLeftBorder no-arrow'></th>
+				<!-- END report_header_subtitle_hide_am -->
+
+				<!-- BEGIN report_header_subtitle_show_day -->
+                <th class='leaveReportMeridiem'>Day</th>
+				<!-- END report_header_subtitle_show_day -->
+				<!-- BEGIN report_header_subtitle_hide_day -->
+				<th class='leaveReportMeridiem no-arrow'></th>
+				<!-- END report_header_subtitle_hide_day -->
+
+				<!-- BEGIN report_header_subtitle_show_pm -->
+                <th class='leaveReportMeridiem leaveReportRightBorder'>PM</th>
+				<!-- END report_header_subtitle_show_pm -->
+
 				<!-- END report_header_subtitle -->
                 <th>Host</th>
-                <th>Approval Date</th>
                 <th>Approved By</th>
-                <th class="center">View</th>
             </tr>
         </thead>
         <tbody>
@@ -121,16 +134,30 @@
             <!-- BEGIN request -->
             <tr class="{CLASS}">
                 <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
-                <td>{USER_YEAR}</td>
+                <td class='leaveReportYear'>{USER_YEAR}</td>
 				<!-- BEGIN request_period -->
-				<td>{REQUEST_PERIOD_MORNING}</td>
-				<td>{REQUEST_PERIOD_DAY}</td>
-				<td>{REQUEST_PERIOD_NIGHT}</td>
+
+				<!-- BEGIN request_period_show_am -->
+				<td class='leaveReportMeridiem leaveReportLeftBorder'>{REQUEST_PERIOD_MORNING}</td>
+				<!-- END request_period_show_am -->
+				<!-- BEGIN request_period_hide_am -->
+				<td class="leaveReportMeridiem leaveReportLeftBorder leaveReportNoRightBorder"></td>
+				<!-- END request_period_hide_am -->
+
+				<!-- BEGIN request_period_show_day -->
+				<td class='leaveReportMeridiem'>{REQUEST_PERIOD_DAY}</td>
+				<!-- END request_period_show_day -->
+				<!-- BEGIN request_period_hide_day -->
+				<td class="leaveReportMeridiem leaveReportNoBorder"></td>
+				<!-- END request_period_hide_day -->
+
+				<!-- BEGIN request_period_show_pm -->
+				<td class='leaveReportMeridiem leaveReportRightBorder'>{REQUEST_PERIOD_NIGHT}</td>
+				<!-- END request_period_show_pm -->
+
 				<!-- END request_period -->
                 <td>{REQUEST_HOST_TYPE}</td>
-                <td>{REQUEST_AUTHORISATION_DATETIME}</td>
                 <td><a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a></td>
-                <td class="center"><a href="/modules/leave/modify/{REQUEST_ID}">View</a></td>
             </tr>
             <!-- END request -->
             <!-- BEGIN empty_request -->

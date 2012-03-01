@@ -211,6 +211,45 @@ class Leave_Request extends Model {
 	}
 
 	/**
+	 * Determine if a leave request is pending
+	 *
+	 * @return bool
+	 */
+	public function isPending() {
+		if ($this->status == Leave_Request::STATUS_PENDING) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Determine if a leave request is approved
+	 *
+	 * @return bool
+	 */
+	public function isApproved() {
+		if ($this->status == Leave_Request::STATUS_APPROVED) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Determine if a leave request is rejected
+	 *
+	 * @return bool
+	 */
+	public function isRejected() {
+		if ($this->status == Leave_Request::STATUS_REJECTED) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Get status
 	 *
 	 * @param bool $string
@@ -219,13 +258,13 @@ class Leave_Request extends Model {
 	 */
 	public function getStatus($string = false) {
 		if ($string) {
-			if ($this->status == self::STATUS_PENDING) {
+			if ($this->isPending()) {
 				return 'Pending';
 			}
-			elseif ($this->status == self::STATUS_APPROVED) {
+			elseif ($this->isApproved()) {
 				return 'Approved';
 			}
-			elseif ($this->status == self::STATUS_REJECTED) {
+			elseif ($this->isRejected()) {
 				return 'Rejected';
 			}
 		}

@@ -6075,3 +6075,28 @@ ul.tree .collapsable .hitarea {
 .red {
 	color: #f00;
 }
+
+
+/* Leave Report
+ */
+#requestList tr.leave-pending span.grey {
+	color: #808080;
+}
+
+#requestList .leaveReportMeridiem {
+	width: 50px;
+}
+
+#requestList .leaveReportHeaderDate {
+	text-align: center;
+}
+
+/* Date the report was generated
+ */
+.leaveReportGeneratedAt {
+	display: none;
+}
+
+#requestList .no-arrow {
+	background: none;
+}

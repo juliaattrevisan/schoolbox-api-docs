@@ -13,9 +13,10 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 	protected $local;
 	protected $localShort;
 	protected $long;
+	protected $longDateOnly;
 	protected $short;
-	protected $noTime;
-	protected $time;
+	protected $dateOnly;
+	protected $timeOnly;
 	protected $database;
 	protected $databaseTime;
 	protected $timestamp;
@@ -48,6 +49,15 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 	}
 
 	/**
+	 * Get a long date only format
+	 *
+	 * @return
+	 */
+	public function longDateOnlyFormat() {
+		return $this->longDateOnly;
+	}
+
+	/**
 	 * Get a shortened format
 	 *
 	 * @return
@@ -61,8 +71,8 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 	 *
 	 * @return
 	 */
-	public function noTimeFormat() {
-		return $this->noTime;
+	public function dateOnlyFormat() {
+		return $this->dateOnly;
 	}
 
 	/**
@@ -70,8 +80,8 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 	 *
 	 * @return
 	 */
-	public function timeFormat() {
-		return $this->time;
+	public function timeOnlyFormat() {
+		return $this->timeOnly;
 	}
 
 	/**
@@ -86,7 +96,7 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
 	/**
 	 * Get a database date format
 	 *
-	 * @return
+	 * @return mixed
 	 */
 	public function databaseDateFormat() {
 		return $this->databaseDate;

@@ -23,10 +23,11 @@ class Alaress_Date_Locale_Australian extends Alaress_Date_Locale_Abstract {
 	protected $localShort = 'd/m/Y';
 
 	protected $long = 'l F jS Y g:ia';
+	protected $longDateOnly = 'l F jS Y';
 	protected $short = 'jS M Y g:ia'; // Closest to 'r'
 
-	protected $noTime = 'jS M Y';
-	protected $time = 'g:ia';
+	protected $dateOnly = 'jS M Y';
+	protected $timeOnly = 'g:ia';
 
 	/* Database specific formatting
 	 */
