@@ -1231,27 +1231,34 @@ class Leave_Controller extends Controller {
         $userNoticeEmail->send();
     }
 
+	/**
+	 * Send a notice to a parent when someone creates a leave request
+	 *
+	 * @param $request
+	 */
     public function sendParentNotice ($request) {
-        $parentList = $this->getExternalUser()->getStudentContactList( $request->getUserId() );
+		if (Cfg::get('parent_notification')) {
+			$parentList = $this->getExternalUser()->getStudentContactList($request->getUserId());
 
-        if ( is_array($parentList) ) {
-            foreach ( $parentList as $parent ) {
-                $parentNoticeEmail = new Mailer('../modules/leave/parentNoticeEmail.html', 'Leave Request Status Update', $parent['StudentContactDefaultEmail']);
-                $parentNoticeEmail->setVar( array(
-                    'PARENT_NAME' => "{$parent['StudentContactPreferred']} {$parent['StudentContactSurname']}",
-                    'LEAVE_START' => $request->getStart(true)->getLong(),
-                    'LEAVE_FINISH' => $request->getFinish(true)->getLong(),
-                    'LEAVE_HOST_NAME' => $request->getHostName(),
-                    'LEAVE_HOST_PHONE' => $request->getHostPhone(),
-                    'LEAVE_USER_NAME' => $request->getUser()->getName(),
-                    'LEAVE_USER_PHONE' => $request->getUserPhone(),
-                    'LEAVE_DESCRIPTION' => $request->getDescription()
-                ) );
+			if (is_array($parentList)) {
+				foreach ($parentList as $parent) {
+					$parentNoticeEmail = new Mailer('../modules/leave/parentNoticeEmail.html', 'Leave Request Status Update', $parent['StudentContactDefaultEmail']);
+					$parentNoticeEmail->setVar(array(
+						'PARENT_NAME' => "{$parent['StudentContactPreferred']} {$parent['StudentContactSurname']}",
+						'LEAVE_START' => $request->getStart(true)->getLong(),
+						'LEAVE_FINISH' => $request->getFinish(true)->getLong(),
+						'LEAVE_HOST_NAME' => $request->getHostName(),
+						'LEAVE_HOST_PHONE' => $request->getHostPhone(),
+						'LEAVE_USER_NAME' => $request->getUser()->getName(),
+						'LEAVE_USER_PHONE' => $request->getUserPhone(),
+						'LEAVE_DESCRIPTION' => $request->getDescription()
+					));
 
-                $parentNoticeEmail->send();
-            }
-        }
-    }
+					$parentNoticeEmail->send();
+				}
+			}
+		}
+	}
 
 	/**
 	 * Set external user

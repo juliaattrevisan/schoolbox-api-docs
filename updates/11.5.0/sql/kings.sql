@@ -4,7 +4,7 @@ ALTER TABLE `config`     CHANGE `type` `type` ENUM('Site','Security','Paths','Re
 
 /* Add config variables for Boarder Leave
  */
-INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'parent_notification','false','Disable Parent Notification','Disable Parent Notification','input','true:false','Board Leave','true','false','false');
+INSERT INTO `portal-dev`.`config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'parent_notification','0','Disable Parent Notification','Disable parent notification email when a leave request is created','boolean','true:false','Board Leave','true','false','false');
 INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'debug_email_address','steve.chan@alaress.com.au','Debug Email Address','Parent Notifications go here','input',NULL,'Board Leave','true','false','false');
 INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'terms_and_conditions','blah','Terms and Conditions','Terms and Conditions','textarea',NULL,'Board Leave','true','false','false');
 
