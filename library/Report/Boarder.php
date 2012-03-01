@@ -28,7 +28,7 @@ class Report_Boarder extends Report_Parent {
 
 			$this->setup();
 
-			$this->setAllRecords($this->getExternalUserHandler()->getStudentBoarderContactListExtended(5));
+			$this->setAllRecords($this->getExternalUserHandler()->getStudentBoarderContactListExtended());
 		}
 	}
 

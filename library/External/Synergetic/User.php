@@ -202,10 +202,9 @@ class External_Synergetic_User implements External_UserInterface {
 	 *
 	 * Used in reporting.
 	 *
-	 * @param $yearlevel
 	 * @return mixed
 	 */
-    public function getStudentBoarderContactListExtended($yearlevel) {
+    public function getStudentBoarderContactListExtended() {
 		$query = "
 			SELECT
 				StudentID, StudentGiven1, StudentSurname, StudentYearLevel, House.Description AS StudentHouse,
