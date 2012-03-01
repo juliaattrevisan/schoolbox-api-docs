@@ -25,10 +25,8 @@ class External_Timetable {
 
 		if ( class_exists($databaseClass, true) ) {
 			$database = new $databaseClass;
-
 			$this->setDatabase( $database );
-		}
-		else {
+		} else {
 			error(22);
 		}
 	}

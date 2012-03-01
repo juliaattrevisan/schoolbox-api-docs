@@ -332,11 +332,15 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 		if( $this->groupHandler->isStudent($userID))
 		{
 			$query ="SELECT
-						Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber, Timetable.ClassCode, StaffID
+						Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber,
+						Timetable.ClassCode, Timetable.StaffID, vStaff.StaffTitle, vStaff.StaffPreferredFormal,
+						vStaff.StaffSurname
 					FROM
-						SynergyOne.dbo.Timetable Timetable,
 						SynergyOne.dbo.StudentClasses StudentClasses,
-						SynergyOne.dbo.SubjectClasses SubjectClasses
+						SynergyOne.dbo.SubjectClasses SubjectClasses,
+						SynergyOne.dbo.Timetable Timetable
+					LEFT JOIN
+						SynergyOne.dbo.vStaff vStaff ON Timetable.StaffID = vStaff.StaffID
 					WHERE
 						Timetable.ClassCampus = SubjectClasses.ClassCampus AND
 						Timetable.ClassCode = SubjectClasses.ClassCode AND
@@ -356,21 +360,30 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 		}
 		else
 		{
-			$query = "SELECT Timetable.Room, SubjectClasses.Description, Timetable.DayNumber,
-				Timetable.PeriodNumber, Timetable.ClassCode
-				FROM SynergyOne.dbo.SubjectClasses SubjectClasses,
-				SynergyOne.dbo.Timetable Timetable
-				WHERE
-				Timetable.ClassCampus = SubjectClasses.ClassCampus AND
-				Timetable.ClassCode = SubjectClasses.ClassCode AND
-				Timetable.FileSemester = SubjectClasses.FileSemester AND
-				Timetable.FileType = SubjectClasses.FileType AND
-				Timetable.FileYear = SubjectClasses.FileYear AND
-				SubjectClasses.FileSemester='".$_SESSION['FileSemester']."' AND
-				SubjectClasses.FileYear='".$_SESSION['FileYear']."' AND
-				Timetable.StaffID='$synergy_id'
-				AND DayNumber > 0 AND DayNumber <= ".$timetabledef['dayCount']." AND PeriodNumber <= ".$timetabledef['periodCount']."
-				ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
+
+            /* BUGFIX20110301: if user has no timetable, $timetabledef['dayCount'] is NULL, not 0, which breaks SQL query */
+            if($timetabledef['dayCount'] == NULL) {
+                $timetabledef['dayCount'] = 0;
+            }
+
+			$query = "SELECT
+						Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber,
+						Timetable.ClassCode
+					FROM
+						SynergyOne.dbo.SubjectClasses SubjectClasses,
+						SynergyOne.dbo.Timetable Timetable
+					WHERE
+						Timetable.ClassCampus = SubjectClasses.ClassCampus AND
+						Timetable.ClassCode = SubjectClasses.ClassCode AND
+						Timetable.FileSemester = SubjectClasses.FileSemester AND
+						Timetable.FileType = SubjectClasses.FileType AND
+						Timetable.FileYear = SubjectClasses.FileYear AND
+						SubjectClasses.FileSemester='".$_SESSION['FileSemester']."' AND
+						SubjectClasses.FileYear='".$_SESSION['FileYear']."' AND
+						Timetable.StaffID='$synergy_id' AND
+						DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . " AND
+						PeriodNumber <= ".$timetabledef['periodCount']."
+					ORDER BY Timetable.PeriodNumber, Timetable.DayNumber";
 		}
 
 		$periodCount = $timetabledef['periodCount'];
@@ -392,7 +405,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 			$timetable[$x]['periodEnd'] = $timetabledef['end'][$x];
 			$timetable[$x]['periodNumber'] = $timetabledef['number'][$x];
 			$timetable[$x]['periodSequence'] = $timetabledef['sequence'][$x];
-				
+
 			//for each day
 			for ($y = 1; $y <= $dayCount; $y++)
 			{	 
@@ -403,7 +416,10 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 					$timetable[$x]['day'][$y]['code'] = $desc['ClassCode'];
 					$timetable[$x]['day'][$y]['room'] = $desc['Room'];
                     $timetable[$x]['day'][$y]['staffID'] = $desc['StaffID'];
-					$desc = $this->getDatabase()->getNextArray();
+                    $timetable[$x]['day'][$y]['staffFirstname'] = $desc['StaffPreferredFormal'];
+                    $timetable[$x]['day'][$y]['staffSurname'] = $desc['StaffSurname'];
+                    $timetable[$x]['day'][$y]['staffTitle'] = $desc['StaffTitle'];
+                    $desc = $this->getDatabase()->getNextArray();
 
 					//bad data in synergetic.. why..?? 
 					while($desc['DayNumber'] == $y && $desc['PeriodNumber'] == $timetable[$x]['periodNumber']) {

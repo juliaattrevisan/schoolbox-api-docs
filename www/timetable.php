@@ -66,11 +66,15 @@ if (is_array($outputList)) {
             $days = $timetableDefinition['dayCount'];
             //timetable field width
 
+
+
+
+
             $this->setVar('TIMETABLE_FIELD_WIDTH', round((95 / ($days + 1)), 1));
             $periodCount = 1;
             //for each period
-            foreach ($timetable as $row)
-            {
+            foreach ($timetable as $row) {
+
                 $outputPeriodDefinition = array('PERIOD_NAME' => $row['periodName'],
                                                 'PERIOD_START' => $row['periodStart'],
                                                 'PERIOD_END' => $row['periodEnd'],
@@ -88,10 +92,11 @@ if (is_array($outputList)) {
                         $this->parse("day_header_listing", "day_header", true);
                     }
 
-                    $outputPeriod = array('PERIOD_DESC' => '',
-                                          'PERIOD_CODE' => '',
-                                          'PERIOD_ROOM' => '',
+                    $outputPeriod = array('PERIOD_DESC'    => '',
+                                          'PERIOD_CODE'    => '',
+                                          'PERIOD_ROOM'    => '',
                                           'PERIOD_ONCLICK' => '',
+                                          'PERIOD_STAFF'   => ''
                     );
 
                     if ($period['description']) {
@@ -102,9 +107,11 @@ if (is_array($outputList)) {
                         }
                         else
                         {
-                            $outputPeriod = array('PERIOD_DESC' => Scrub::Text($period['description']),
-                                                  'PERIOD_CODE' => '(' . Scrub::Text($period['code']) . ')',
-                                                  'PERIOD_ROOM' => Scrub::Text($period['room']),
+                            $outputPeriod = array('PERIOD_DESC'    => Scrub::Text($period['description']),
+                                                  'PERIOD_CODE'    => '(' . Scrub::Text($period['code']) . ')',
+                                                  'PERIOD_ROOM'    => Scrub::Text($period['room']),
+                                                  'PERIOD_STAFF'   => ' - ' . Scrub::Text($period['staffTitle']
+                                                                    . ". " . $period['staffSurname']),
                                                   'PERIOD_ONCLICK' => '',
                             );
 
