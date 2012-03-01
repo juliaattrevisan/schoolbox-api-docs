@@ -63,6 +63,8 @@ if (is_numeric($this->arg[0])) {
 			/* If already marked display mark, else provide link to return mark */
             $return = $returnHandler->getByUser($user['uid'], $this->arg[0]);
 
+            $subDate = new Alaress_Date_Format($studentSub['datestamp'], 'y-m-d j:i:s');
+
             if (is_array($studentSub)) {
                 $output = array(
 					'OWNER' => $userHandler->formatName($user, '{lastname}, {firstname}'),
@@ -70,7 +72,8 @@ if (is_numeric($this->arg[0])) {
 					'OWNER_ESCAPED' => addslashes($userHandler->formatName($student, '{lastname}, {firstname}')),
 					'SUB_ID' => $studentSub['id'],
 					'SUBMITTED' => $studentSub['date'],
-					'COLOUR' => $studentSub['late'] ? '#ff0000' : '#000000',
+                    // check if submission date if after due date; if so, mark as late (ignore $studentSub['late'])
+                    'COLOUR' => $dueDate->getUnixTimestamp() < $subDate->getUnixTimestamp() ? '#ff0000' : '#000000',
 					'MARK' => $return[0]['mark'],
                     'SCORE' => $studentSub['score'],
 					'ON_OFF' => ++$i % 2 ? '' : 'dark',
