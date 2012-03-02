@@ -128,15 +128,19 @@ class External_Synergetic_User implements External_UserInterface {
 	public function getStudent($synID) {
 		$query = "SELECT
 					vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname, vStudents.StudentBirthDate,
-					vStudents.StudentTutorName, vStudents.StudentHeadOfHouse, House.HeadOfHouseID,  vStudents.StudentFormStaffName, vStudents.StudentTutorDescription,
-					luForm.ID as TeacherFormID, vStudents.StudentForm, luTutor.ID as TeacherTutorID, vStudents.StudentTutor, luForm.Description as FormDescription,
-					vStudents.StudentHouseDescription, vStudents.StudentHouse, vStudents.StudentYearLevel, vStudents.StudentLockerBook,
-					vStudents.StudentEmergencyName, vStudents.StudentEmergencyPhone, vStudents.StudentEmergencyPhoneAlt, vStudents.StudentMedicalAlert,vStudents.StudentSpecialNeedsFlag, AlertMessage,
-					vStudents.StudentBoarder
-                    FROM SynergyOne.dbo.vStudents vStudents
+					vStudents.StudentTutorName, vStudents.StudentHeadOfHouse, House.HeadOfHouseID,
+					vStudents.StudentFormStaffName, vStudents.StudentTutorDescription, luForm.ID as TeacherFormID,
+					vStudents.StudentForm, luTutor.ID as TeacherTutorID, vStudents.StudentTutor,
+					luForm.Description as FormDescription, vStudents.StudentHouseDescription, vStudents.StudentHouse,
+					vStudents.StudentYearLevel, vStudents.StudentLockerBook,
+					vStudents.StudentEmergencyName,  vStudents.StudentEmergencyPhone,  vStudents.StudentEmergencyPhoneAlt,
+					vStudents.StudentEmergency2Name, vStudents.StudentEmergency2Phone, vStudents.StudentEmergency2PhoneAlt,
+					vStudents.StudentEmergency3Name, vStudents.StudentEmergency3Phone, vStudents.StudentEmergency3PhoneAlt,
+					vStudents.StudentMedicalAlert, vStudents.StudentSpecialNeedsFlag, AlertMessage, vStudents.StudentBoarder
+                FROM SynergyOne.dbo.vStudents vStudents
                     LEFT JOIN CommunityAlerts ON CommunityAlerts.ID = StudentID
-					LEFT JOIN SynergyOne.dbo.luForm ON vStudents.StudentForm=luForm.Code
-					LEFT JOIN SynergyOne.dbo.luTutor ON vStudents.StudentTutor=luTutor.Code
+					LEFT JOIN SynergyOne.dbo.luForm ON vStudents.StudentForm = luForm.Code
+					LEFT JOIN SynergyOne.dbo.luTutor ON vStudents.StudentTutor = luTutor.Code
 					LEFT JOIN SynergyOne.dbo.luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
 				WHERE
 					vStudents.StudentID = '$synID'
