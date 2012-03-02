@@ -41,14 +41,18 @@ class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap {
 		$actualAnswers = $matches[1];
 
 		/* Find out how much each phrase is worth
+		 * If the number of Fillgap answers is 0 (ie. no blank for students to fill), skip it.
+		 * TODO: It should be noted that a teacher should be prevented from creating a cloze question that doesn't have any blanks in it...
 		 */
-		$marksPerAnswer = $currentResponse['marks'] / count($actualAnswers);
+        if(count($actualAnswers) != 0) {
+            $marksPerAnswer = $currentResponse['marks'] / count($actualAnswers);
 
-		for ($i=0, $totalMarks=0; $i < count($actualAnswers); $i++) {
-			if (strtolower(trim($actualAnswers[$i])) == strtolower(trim($response[$i]))) {
-				$totalMarks += $marksPerAnswer;
-			}
-		}
+            for ($i=0, $totalMarks=0; $i < count($actualAnswers); $i++) {
+                if (strtolower(trim($actualAnswers[$i])) == strtolower(trim($response[$i]))) {
+                    $totalMarks += $marksPerAnswer;
+                }
+            }
+        }
 
 		/* Total marks for this question
 		 */
