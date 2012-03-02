@@ -16,7 +16,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 
 		$this->campusCode = unserialize(SYN_CAMPUS_Codes);
 		$this->days = unserialize(TIMETABLE_day_count);
-		$this->offset = TIMETABLE_day_offset;
 
 		$this->groupHandler = new Group;
 	}
@@ -69,24 +68,29 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
             if($day < 1 || $day > 5)
                 $day = 1;
 
-            // if timetable starts on Monday, just return that
-            if($this->offset == 0) {
+            // calc offset
+            $startDate = $this->getLastSynergeticDay($date, $campus);
+            if($startDate) {
+                $offset = ($this->synergeticDay[$startDate]-1) + (date('N', $startDate) + 4);
+
+                // timetable does not start on a Monday: calculate the offset for display
+                $today = $day - $offset;
+
+                // if offset pushes "today" back further than the diaplayed week, wraparound
+                while($today < 0) {
+                    $today += $this->days[$campus];
+                }
+
+                // if offset is negative, mod to bring back into this week
+                if($today > $this->days[$campus])
+                    $today %= $this->days[$campus];
+
+                return $today;
+            }
+            else {
                 return $day;
             }
 
-            // timetable does not start on a Monday: calculate the offset for display
-            $today = $day - $this->offset;
-
-            // if offset pushes "today" back further than the diaplayed week, wraparound
-            while($today < 0) {
-                $today += $this->days[$campus];
-            }
-
-            // if offset is negative, mod to bring back into this week
-            if($today > $this->days[$campus])
-                $today %= $this->days[$campus];
-
-            return $today;
         }
         // if operating on a 7-day timetable
 		else if($this->days[$campus] == 7) {
