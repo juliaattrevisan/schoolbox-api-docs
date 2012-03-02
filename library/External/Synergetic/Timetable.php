@@ -9,13 +9,15 @@
 
 class External_Synergetic_Timetable implements External_TimetableInterface {
 	private $database;
+    private $offset;
 
 	function __construct () {
 		$this->setDatabase( new MSSQL() );
 
 		$this->campusCode = unserialize(SYN_CAMPUS_Codes);
 		$this->days = unserialize(TIMETABLE_day_count);
-		
+		$this->offset = TIMETABLE_day_offset;
+
 		$this->groupHandler = new Group;
 	}
 
@@ -53,7 +55,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 
 	//gets current day number
 	function getDayNumber($campus, $date = 0) {
-		
+
 		if(!$date) {
 			$date = mktime();
 		}
@@ -61,16 +63,34 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 		if(date('w', $date) == 0 || date('w', $date) == 6)
 			return false;
 
-		//get day count
+		// if operating on a 5-day timetable
 		if($this->days[$campus] == 5) {
 			$day = date("w", $date);
-            if($day <1 || $day > 5)
+            if($day < 1 || $day > 5)
                 $day = 1;
 
-            return $day;
+            // if timetable starts on Monday, just return that
+            if($this->offset == 0) {
+                return $day;
+            }
+
+            // timetable does not start on a Monday: calculate the offset for display
+            $today = $day - $this->offset;
+
+            // if offset pushes "today" back further than the diaplayed week, wraparound
+            while($today < 0) {
+                $today += $this->days[$campus];
+            }
+
+            // if offset is negative, mod to bring back into this week
+            if($today > $this->days[$campus])
+                $today %= $this->days[$campus];
+
+            return $today;
         }
-		else if($this->days[$campus] == 7)
-		{
+        // if operating on a 7-day timetable
+		else if($this->days[$campus] == 7) {
+
 			$startDate = $this->getLastSynergeticDay($date, $campus);
 		
 			//find number of days between both dates
@@ -84,15 +104,16 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 			//make correction for sunday (otherwise we travel back in time)
 			if(date("w", $date) == 0)
 				$currentDay = $currentDay % 7 + 1;
-	
+
 			return $currentDay;
 		}
+        // if operating on a 10-day timetable
 		else if($this->days[$campus] == 10) {
 
             $startDate = $this->getLastSynergeticDay($date, $campus);
 
             if($this->synergeticDay[$startDate] > 5)
-                    $this->synergeticDay[$startDate] = $this->synergeticDay[$startDate] + 1;  //extra days for weekend
+                $this->synergeticDay[$startDate] = $this->synergeticDay[$startDate] + 1;  //extra days for weekend
 
             $startDate = $startDate - ($this->synergeticDay[$startDate]*86400);
 
