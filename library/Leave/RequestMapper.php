@@ -150,7 +150,7 @@ class Leave_RequestMapper extends Mapper {
             FROM `{$this->table}` lr
             LEFT JOIN `user` u ON u.id = lr.user_id
             LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
-            WHERE u.house = :houseId
+            WHERE u.residentialHouse = :houseId
         ");
 
         $statement->execute( array(
@@ -184,7 +184,7 @@ class Leave_RequestMapper extends Mapper {
                 AND lr.start < :finish
                 AND lr.finish > :start
             LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
-            WHERE u.house = :houseId
+            WHERE u.residentialHouse = :houseId
               /*AND g.type = 'student'*/
         ");
 
@@ -239,15 +239,15 @@ class Leave_RequestMapper extends Mapper {
 				luResidentialHouse.name AS name,
 				leave_request.id AS leaveRequestId,
 				SUM(leave_request.id AND ((`start` < :morningStart) AND (`finish` > :dayStart))) AS absent_morning,
-				((SELECT COUNT(*) FROM `user` WHERE user.house = houseId) - (SUM(leave_request.id AND ((`start` < :morningStart) AND (`finish` > :dayStart))))) AS present_morning,
+				((SELECT COUNT(*) FROM `user` WHERE user.residentialHouse = houseId) - COALESCE(SUM(leave_request.id AND ((`start` < :morningStart) AND (`finish` > :dayStart))),0)) AS present_morning,
 				SUM(leave_request.id AND ((`start` < :dayStart) AND (`finish` > :nightStart))) AS absent_day,
-				((SELECT COUNT(*) FROM `user` WHERE user.house = houseId) - (SUM(leave_request.id AND ((`start` < :dayStart) AND (`finish` > :nightStart))))) AS present_day,
+				((SELECT COUNT(*) FROM `user` WHERE user.residentialHouse = houseId) - COALESCE(SUM(leave_request.id AND ((`start` < :dayStart) AND (`finish` > :nightStart))),0)) AS present_day,
 				SUM(leave_request.id AND ((`start` < :nightStart) AND (`finish` > :nightEnd))) AS absent_night,
-				((SELECT COUNT(*) FROM `user` WHERE user.house = houseId) - (SUM(leave_request.id AND ((`start` < :nightStart) AND (`finish` > :nightEnd))))) AS present_night
+				((SELECT COUNT(*) FROM `user` WHERE user.residentialHouse = houseId) - COALESCE(SUM(leave_request.id AND ((`start` < :nightStart) AND (`finish` > :nightEnd))),0)) AS present_night
 			FROM luResidentialHouse
-			LEFT JOIN `user` ON user.house = luResidentialHouse.id
+			LEFT JOIN `user` ON user.residentialHouse = luResidentialHouse.id
 			LEFT JOIN leave_request ON leave_request.user_id = `user`.id AND leave_request.authorisation_datetime IS NOT NULL
-			GROUP BY houseId;
+			GROUP BY residentialHouse;
 		");
 
 		$statement->execute(array(

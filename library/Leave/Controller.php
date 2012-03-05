@@ -1088,7 +1088,7 @@ class Leave_Controller extends Controller {
 		 */
 		foreach($data['dateList'] as $currentDate) {
 			$this->getPage()->setVar(array(
-				'REQUEST_DATE_HEADER_DATE' => $currentDate->getLocalShort()
+				'REQUEST_DATE_HEADER_DATE' => $currentDate->getLongDateOnly()
 			));
 
 			$this->getPage()->parse('request_date_header_block', 'request_date_header', true);
