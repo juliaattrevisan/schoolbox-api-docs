@@ -107,11 +107,15 @@ if (is_array($outputList)) {
                         }
                         else
                         {
+
+                            $teacher = array('title'    => $period['staffTitle'],
+                                            'firstname' => $period['staffFirstname'],
+                                            'lastname'  => $period['staffSurname']);
+
                             $outputPeriod = array('PERIOD_DESC'    => Scrub::Text($period['description']),
                                                   'PERIOD_CODE'    => '(' . Scrub::Text($period['code']) . ')',
                                                   'PERIOD_ROOM'    => Scrub::Text($period['room']),
-                                                  'PERIOD_STAFF'   => ' - ' . Scrub::Text($period['staffTitle']
-                                                                    . ". " . $period['staffSurname']),
+                                                  'PERIOD_STAFF'   => ' - ' . $userHandler->formatName($teacher),
                                                   'PERIOD_ONCLICK' => '',
                             );
 
