@@ -8,12 +8,15 @@
 	<div class="library-header clearfix">
 		<div class="library-content">
 			<div class="clearfix">
-				<!-- <form id="library-search" action="/search.php" method="get">
-					<fieldset>
-						<input id="library-search-field" type="text" title="Catalogue Search" name="keyword" />
-						<input id="library-search-button" type="submit" value="Search" />
-					</fieldset>
-				</form> -->
+                <form id="library-search" action="http://library.mggs.vic.edu.au/oliver/opac/search.do" method="get">
+                    <fieldset>
+                        <input id="library-search-field" type="text" title="Catalogue Search" name="queryTerm" />
+                        <input id="library-search-button" type="submit" value="Search" />
+
+                        <input type="hidden" name="mode" value="BASIC" />
+                        <input type="hidden" name="activeMenuItem" value="false" />
+                    </fieldset>
+                </form>
 				<h1>Nina Crone <span>Library</span></h1>
 			</div>
 			

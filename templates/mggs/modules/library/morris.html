@@ -40,6 +40,15 @@ $j(window).load(function(){
 
 
 	<div class="library-header">
+        <form id="library-search" action="http://library.mggs.vic.edu.au/oliver/opac/search.do" method="get">
+            <fieldset>
+                <input id="library-search-field" type="text" title="Catalogue Search" name="queryTerm" />
+                <input id="library-search-button" type="submit" value="Search" />
+
+                <input type="hidden" name="mode" value="BASIC" />
+                <input type="hidden" name="activeMenuItem" value="false" />
+            </fieldset>
+        </form>
 		<h1>Morris Hall Library <span>Whose library? Our Library!</span></h1>
 		<ul>
 			<li><a href="/modules/library/morris">Home</a></li>
