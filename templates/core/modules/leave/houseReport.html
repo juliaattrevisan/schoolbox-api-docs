@@ -4,6 +4,9 @@
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript">
     $j(function() {
+
+        $j('#container').css('width', $j('.ruler').outerWidth());
+
         $j("#requestList").tablesorter({
             cssHeader: 'sortable',
             cssAsc: 'ascending',
@@ -62,6 +65,9 @@
         $j('#reportExportButton').click( function () {
             window.location = window.location + '/export';
         } );
+
+        $j('#container').css('width', $j('.ruler').outerWidth());
+
     });
 </script>
 <!-- END custom_head -->
