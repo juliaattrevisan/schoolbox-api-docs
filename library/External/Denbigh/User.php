@@ -3,7 +3,7 @@
 *                                                           *
 * 		Copyright (c) 2008 Lektec Consulting				*
 *                                                           *
-*	This file provides access to Denbigh user info		*
+*	This file provides access to Kings user info		*
 *                                                           *
 ************************************************************/
 
@@ -304,18 +304,42 @@ class External_Denbigh_User implements External_UserInterface {
 		return '';
     }
 
+    /**
+     * Gets all Students' account info from Denbigh
+     * @return array|bool
+     */
     public function getStudentUserAccountInfo () {
-
+        $query = $this->getExternalDatabase()->query("
+            SELECT loginIDforIT, academicYear, peo.preferred_name, peo.surname, peo.denbighID, house, email
+            FROM Students stu
+            LEFT JOIN People peo ON stu.peopleDenbighID = peo.denbighID");
+        return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
 	public function getParentUserAccountInfo () {
-
+        $query = $this->getExternalDatabase()->query("
+            SELECT peo.title, preferred_name, peo.surname, adr.telephoneHome, peo.denbighID, par.familyDenbighID,
+                   peo.email, par.loginID
+            FROM Addresses adr
+            LEFT JOIN Parents par ON par.familyDenbighID = adr.familyDenbighID
+            LEFT JOIN People peo ON peo.denbighID = par.peopleDenbighID
+            WHERE peo.id IS NOT NULL
+            GROUP BY peo.denbighID
+            ORDER BY familyDenbighID ASC, denbighID ASC");
+        return $query->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 
-
+    /**
+     * Gets all Staff account info from Denbigh
+     * @return array
+     */
     public function getStaffUserAccountInfo () {
-
+        $query = $this->getExternalDatabase()->query("
+            SELECT People.`denbighID`, surname, preferred_name, title, staffCode, email
+            FROM Staff
+            LEFT JOIN People ON Staff.`peopleDenbighID` = People.`denbighID`");
+        return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
 	/**
