@@ -22,7 +22,6 @@ if (!empty($_POST)) {
 
     /* Format date, time
      */
-    print $_POST['start']['date'];
     $start = new Alaress_Date_Format($_POST['start']['date'].' '.$_POST['start']['hour'].':'.$_POST['start']['minute'].' '.$_POST['start']['meridiem'], 'd/m/y');
     $finish = new Alaress_Date_Format($_POST['finish']['date'].' '.$_POST['finish']['hour'].':'.$_POST['finish']['minute'].' '.$_POST['finish']['meridiem'], 'd/m/y');
 
