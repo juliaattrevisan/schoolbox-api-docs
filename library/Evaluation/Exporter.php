@@ -278,7 +278,8 @@ class Evaluation_Exporter {
 
 								$attemptList[] = $currentAttempt['synergy_id'];
 								$attemptList[] = $currentAttempt['name'];
-								$attemptList[] = $currentAttempt['responses'];
+                                // if freetext responses have html entities, convert them to plaintext
+								$attemptList[] = html_entity_decode($currentAttempt['responses'], ENT_COMPAT, 'UTF-8');
 								$attemptList[] = $currentAttempt['comment'];
 
 								$this->outputCSV2(array($attemptList));
