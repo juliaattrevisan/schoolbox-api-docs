@@ -937,14 +937,24 @@ class SitePage extends Page
 			}
 
 			if (is_array($list[$i]['children'])) {
-				$text .= '<li class="parent"><a href="' . $list[$i]['url'] . '"' . $target . '><span>' . $list[$i]['txt'] . '</span></a>';
-				$text .= $this->__outputMenu($list[$i]['children'], ($level + 1));
-			}
-			else
-			{
-				$text .= '<li><a href="' . $list[$i]['url'] . '"' . $target . '><span>' . $list[$i]['txt'] . '</span></a>';
-			}
+                
+                $url = new Url($list[$i]['url']);
 
+                $text .= '<li class="parent"><a href="';
+                $text .= $url->isLocalURL() ? $url->getRelativeURL() : $url->getBase64EncodedRedirect();
+                $text .= '"' . $target . '><span>' . $list[$i]['txt'] . '</span></a>';
+
+                $text .= $this->__outputMenu($list[$i]['children'], ($level + 1));
+
+			} else {
+
+                $url = new Url($list[$i]['url']);
+
+				$text .= '<li><a href="';
+                $text .= $url->isLocalURL() ? $url->getRelativeURL() : $url->getBase64EncodedRedirect();
+                $text .= '"' . $target . '><span>' . $list[$i]['txt'] . '</span></a>';
+
+			}
 			$text .= "</li>\n";
 		}
 		$text .= "</ul>\n";
