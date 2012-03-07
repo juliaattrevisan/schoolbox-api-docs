@@ -11,6 +11,7 @@ if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS) {
 	error(23);
 }
 
+// if we are editing an existing news article
 if (is_numeric($this->arg[0])) {
 	$this->setFile(TEMPLATE_content, 'news/modify.html');
 	$this->setBlock(TEMPLATE_content, 'campus_row', 'campus_row_block');
@@ -54,6 +55,12 @@ if (is_numeric($this->arg[0])) {
 	$userList = $newsHandler->getUserList($news['item_id']);
 
 	if (is_array($userList)) {
+        // set the advanced options to be shown by default since there is information in there
+        $this->setVar(array('SHOW_ADVANCED' => ' style="display: table-row;"',
+                            'OPAC_ADVANCED' => ' style="opacity: 1;"',
+                            'ADV_OFF'       => ' style="display:none"',
+                            'ADV_ON'        => ''));
+
 		foreach ($userList as $user) {
 			$userOut = array(
 				'USER_ID' => $user['id'],
@@ -66,6 +73,11 @@ if (is_numeric($this->arg[0])) {
 	}
 	else
 	{
+        // no data in advanced options, hide them by default
+        $this->setVar(array('SHOW_ADVANCED' => '',
+                            'OPAC_ADVANCED' => '',
+                            'ADV_OFF'       => '',
+                            'ADV_ON'        => ' style="display:none"'));
 		$this->setVar('current_users_block', '');
 	}
 
@@ -84,6 +96,8 @@ if (is_numeric($this->arg[0])) {
 
 	$this->parse("delete_button_block", "delete_button");
 }
+
+// if we are creating a new news article
 else {
 	$this->setFile(TEMPLATE_content, 'news/modify.html');
 	$this->setBlock(TEMPLATE_content, 'campus_row', 'campus_row_block');
@@ -127,4 +141,10 @@ else {
 	}
 
 	$this->setVar('delete_button_block', '');
+
+    // set the advanced options to be hidden by default since there can't be any data in there
+    $this->setVar(array('SHOW_ADVANCED' => '',
+                        'OPAC_ADVANCED' => '',
+                        'ADV_OFF'       => '',
+                        'ADV_ON'        => ' style="display:none"'));
 }

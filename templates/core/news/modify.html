@@ -138,7 +138,7 @@
 </script>
 <!-- END custom_head -->
 
-<h1><span>{ACTION} News</span><a class="customise" href="#"><span>Show Advanced Options</span><span style="display:none">Close Advanced Options</span></a></h1>
+<h1><span>{ACTION} News</span><a class="customise" href="#"><span{ADV_OFF}>Show Advanced Options</span><span{ADV_ON}>Close Advanced Options</span></a></h1>
 <form id="newsForm"  method="post" enctype="multipart/form-data" action="/news/modifyForm.php">
 	<input type="hidden" name="newsID" value="{NEWS_ID}" />
 	<table class="standardForm">
@@ -189,10 +189,10 @@
 				<!-- END campus_selection --></div></td>
 		</tr>
 		<!-- END campus_row -->
-		<tr class="advanced">
-			<td valign="top"><h4>Add users</h4>
+		<tr class="advanced"{SHOW_ADVANCED}>
+			<td valign="top"{OPAC_ADVANCED}><h4>Add users</h4>
 				<em>You may add users individually by typing their name and selecting from the list. Use the delete button to remove users</em></td>
-			<td><input id="addUser" type="text" size="30" />
+			<td{OPAC_ADVANCED}><input id="addUser" type="text" size="30" />
 				<ul class="visible-users">
 					<!-- BEGIN current_users -->
 					<li>
@@ -203,10 +203,10 @@
 			</td>
 		</tr>
 
-        <tr class="advanced">
-            <td><h4>Publish Date</h4>
+        <tr class="advanced"{SHOW_ADVANCED}>
+            <td{OPAC_ADVANCED}><h4>Publish Date</h4>
                 <em>Select a date for when this news item will become available.</em>
-            <td>
+            <td{OPAC_ADVANCED}>
                 <input type="text" class="required" name="item_datetime_published" id="item_datetime_published" size="12" maxlength="50" value="{ITEM_DATETIME_PUBLISHED}" />
             </td>
         </tr>
