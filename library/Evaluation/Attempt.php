@@ -283,6 +283,28 @@ abstract class Evaluation_Attempt extends DeprecatedModel {
     }
 
 	/**
+	 * Get the most recent attempt that you can resume
+	 *
+	 * @param $assess_id
+	 * @param $user_id
+	 * @return array|bool
+	 */
+	public function getLatestResumableForUser($assess_id, $user_id) {
+		$query = "
+			SELECT {$this->_table}.*
+			FROM {$this->_table}
+			LEFT JOIN assess ON assess.assess_id = {$this->_table}.assess_id
+			WHERE {$this->_table}.assess_id = '$assess_id'
+			AND {$this->_table}.user_id = '$user_id'
+			AND {$this->_table}.deleted_at IS NULL
+			AND {$this->_table}.finish = '0000-00-00 00:00:00'
+			ORDER BY {$this->_table}.start DESC
+		";
+
+		return $this->db->getRow($query);
+	}
+
+	/**
 	 * Get the marks given to an attempt
 	 *
 	 * @param  $attempt_id

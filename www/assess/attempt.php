@@ -59,19 +59,29 @@ if (!$questionHandler->numQuestions($this->arg[0])) {
 	error(137);
 }
 
-/* Set the start time if not already done.
+/* Check if this user has attempted this assess in the past and restore whatever
+ * he was doing.
  *
- * TODO: Check if this user has attempted this assess in the past, the attempt
- * hasn't expired, and allowResit is false; if these conditions are met, then
- * load the existing attempt, otherwise create a new one.
+ * As of 7/3/12, all attempts MUST be completed ie. you cannot start a new attempt
+ * if you already have an incomplete one
  */
-if ($_SESSION['attempt_id'] == '') {
+$latestResumable = $attemptHandler->getLatestResumableForUser($this->arg[0], $_SESSION['id']);
+
+if ($latestResumable) {
+	$_SESSION['attempt_id'] = $latestResumable['attempt_id'];
+
+	$attempt = $latestResumable;
+}
+/* Otherwise make a new attempt and set the start time
+ */
+else if ($_SESSION['attempt_id'] == '') {
     $_SESSION['attempt_id'] = $attemptHandler->start($_SESSION['id'], $this->arg[0]);
+
+	$attempt = $attemptHandler->getByID($_SESSION['attempt_id']);
 }
 
 /* Set up Attempt vars
  */
-$attempt = $attemptHandler->getByID($_SESSION['attempt_id']);
 $attemptStartTime = strtotime($attempt['start']);
 $attemptTimeRemaining = $attemptStartTime + $assess['duration'] - time();
 $attemptEndTime = $attemptStartTime + $assess['duration'];
