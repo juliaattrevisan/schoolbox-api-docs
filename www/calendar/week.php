@@ -75,7 +75,7 @@ for ($i = 0; $i < 7; $i++) {
     $currentDay = strtotime("+$i day", $startOfWeek);
 
     $this->setVar('DATE', date("l jS", $currentDay));
-    $this->setVar('ADD', '/calendar/modify.php?date=' . date("d-m-Y", $currentDay));
+    $this->setVar('ADD', '/calendar/modify.php?date=' . date("d-m-Y", $currentDay) . '&returnTo=week');
     $this->parse('day_header_block', 'day_header', true);
 }
 

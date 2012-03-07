@@ -110,7 +110,7 @@ if (isset($_POST['date'])) {
                     'LOCATION'      => $event['location'],
                     'ATTENDANCE'    => $event['attendance'] ? 'checked="checked"' : '',
                     'DETAIL'        => $event['detail'],
-					'RETURN_TO'		=> Scrub::text($_GET['returnTo']),
+					'RETURN_TO'		=> parseReturnTo($_GET['returnTo'], $_GET['date']),
 					);
 
 	$page->setVar($output);
@@ -173,7 +173,7 @@ if (isset($_POST['date'])) {
                     'LOCATION'    	=> '',
                     'ATTENDANCE'    => '',
                     'DETAIL'	    => '',
-					'RETURN_TO'		=> Scrub::text($_GET['returnTo'])
+					'RETURN_TO'		=> parseReturnTo($_GET['returnTo'], $_GET['date'])
 
 					);
 	$page->setVar($output);
@@ -210,4 +210,24 @@ if (isset($_POST['date'])) {
 
 }
 
+/**
+ * Ensure that the user hasn't modified the URL in an untoward manner.
+ * If they have, or it's somehow absent, default to week view.
+ *
+ * @param $returnTo
+ */
+function parseReturnTo($returnView, $returnDate = "") {
+    //the returnTo must be week or month, default to week
+    if(!in_array($returnView, array("week", "month")))
+        $returnView = "week";
+
+    // Shamelessly pinched from above, to test whether the date we've been provided is valid.
+    // A blank date will return the user to the current date.
+    list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $_GET['date']);
+    $selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
+    if ($selectedDate <= 0)
+        $returnDate = "";
+
+    return "$returnView/$returnDate";
+}
 ?>
