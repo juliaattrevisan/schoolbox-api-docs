@@ -11,3 +11,7 @@ UPDATE `assess_luQuestionType` SET `classname`='Rating_Important' WHERE `type_id
 UPDATE `assess_luQuestionType` SET `classname`='Rating_Satisfied' WHERE `type_id`='9';
 UPDATE `assess_luQuestionType` SET `classname`='YesNo' WHERE `type_id`='10';
 UPDATE `assess_luQuestionType` SET `classname`='TrueFalse' WHERE `type_id`='11';
+
+/* Twitter feed homepage component
+ */
+INSERT INTO `portal-dev`.`homepage_comp`(`id`,`size`,`method`,`name`,`description`,`homepageCategoryID`,`filename`,`config`,`invisible`,`allowMultiple`) VALUES ( NULL,'0','outputTwitter','Twitter','Output twitter feeds','6','twitter.html','','false','false');
