@@ -571,6 +571,22 @@ class Submission extends DeprecatedModel {
        return $this->db->getAll($query);
     }
 
+	/**
+	 * Get the name of a file_type by id. Used in submissions reporting
+	 *
+	 * @param $typeId
+	 * @return array|bool
+	 */
+	public function getType($typeId) {
+		$query = "
+			SELECT name
+			FROM file_type
+			WHERE id = '$typeId'
+		";
+
+		return $this->db->getRow($query);
+	}
+
 }
 /*
 $userArray = UserCollection::getAllByGroup($group_id);

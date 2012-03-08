@@ -58,11 +58,42 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
         $csv = 'Synergetic ID,Surname,Firstname,';
 
 		foreach($subList as $sub) {
-            $csv .= Scrub::text(str_replace(',', ' ', $sub['name'])).',';
+            $csv .= Scrub::text(str_replace(',', ' ', $sub['name'])) . ',,';
 		}
-	}
 
-    $csv .= "\n";
+		$csv .= "\n";
+
+		/* Add subheadings
+		 * These are spacers for synergetic id, surname, firstname
+		 */
+		$csv .= ',,,';
+
+		/* Actual subheadings
+		 */
+		foreach($subList as $sub) {
+			$submissionType = $subHandler->getType($sub['type_id']);
+			$csv .= $submissionType['name'] . ',,';
+		}
+
+		$csv .= "\n";
+
+		/* Add third level subheadings
+		 */
+		$csv .= ',,,';
+
+		/* Actual subheadings
+		 */
+		foreach($subList as $sub) {
+			if ($sub['type_id'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) {
+				$csv .= 'Grade,Total,';
+			}
+			else {
+				$csv .= 'Grade,Comment,';
+			}
+		}
+
+		$csv .= "\n";
+	}
 
 	if (is_array($studentList)) {
 		foreach($studentList as $student) {
@@ -76,18 +107,23 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
                         $marks = $attemptHandler->getMarksForAttempt($mostRecentAttempt['attempt_id']);
                         $total = $attemptHandler->getTotalMarks($sub['id'], $mostRecentAttempt['attempt_id']);
 
+						/* return two columns, grade and total available marks
+						 */
                         if ($marks && $total) {
-                            $val = $marks . ' / ' . $total;
+                            $val = $marks . ',' . $total;
                         }
                         else {
-                            $val = '';
+                            $val = ',';
                         }
 
-                        $csv .= Scrub::text($val).',';
+                        $csv .= Scrub::text($val) . ',';
                     }
                     else {
+
+						/* Return two columns, grade and comment
+						 */
                         $return = $retHandler->getByUser($student['uid'],$sub['id']);
-                        $csv .= Scrub::text($return[0]['mark']).',';
+                        $csv .= Scrub::text($return[0]['mark']) . ',' . Scrub::text($return[0]['comment']) . ',';
                     }
 				}
 			}
