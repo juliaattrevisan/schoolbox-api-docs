@@ -102,7 +102,18 @@ class User extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
-    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'lastname', $sort_dir = 'asc') {
+    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'lastname', $sort_dir = 'ASC') {
+
+        // TODO: this function doesn't currently protect against all injection (eg. % gets through).
+
+        // test for exact search, and if so return those results instead
+        if(preg_match('#".+"#', $keyword)) {
+            // strip the prepended and appended quote characters
+            $keyword = substr($keyword, 1, strlen($keyword) - 2);
+
+            return $this->searchExact($keyword, $offset, $limit, $count, $sort_by, $sort_dir);
+        }
+
         $keyword = mysql_real_escape_string($keyword);
 
         // retreive results
@@ -111,8 +122,8 @@ class User extends DeprecatedModel {
                         LEFT JOIN `groups` ON `user`.group_id = `groups`.id
 			            LEFT JOIN `userCampus` ON `user`.id = `userCampus`.uid AND defaultCampus = 1
                         LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
-                        WHERE CONCAT_WS(' ',firstname,lastname) like '%$keyword%'
-                        OR username like '%$keyword%' OR alt_email like '%$keyword%'";
+                        WHERE CONCAT_WS(' ',firstname,lastname) LIKE '%$keyword%'
+                        OR username LIKE '%$keyword%' OR alt_email LIKE '%$keyword%'";
 
         $query .= " ORDER BY `$sort_by` $sort_dir
                         LIMIT $offset, $limit;";
@@ -120,11 +131,38 @@ class User extends DeprecatedModel {
         // retreive count
         $count_query = "SELECT COUNT(*)
                                 FROM `user`
-                                WHERE CONCAT_WS(' ',firstname,lastname) like '%$keyword%'
-                                OR username like '%$keyword%' OR alt_email like '%$keyword%'";
+                                WHERE CONCAT_WS(' ',firstname,lastname) LIKE '%$keyword%'
+                                OR username LIKE '%$keyword%' OR alt_email LIKE '%$keyword%'";
 
         $count = $this->db->getOne($count_query);
 
+        return $this->db->getAll($query);
+    }
+
+    function searchExact($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'lastname', $sort_dir = 'ASC') {
+        $keyword = mysql_real_escape_string($keyword);
+
+        // retrieve results
+        $query = "SELECT user.*, groups.name AS group_name, luCampus.name AS campus_name
+                    FROM `user`
+                    LEFT JOIN `groups` ON `user`.group_id = `groups`.id
+                    LEFT JOIN `userCampus` ON `user`.id = `userCampus`.uid AND defaultCampus = 1
+                    LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
+                    WHERE firstname = '$keyword'
+                    OR lastname = '$keyword'
+                    OR username = '$keyword'
+                    OR alt_email = '$keyword'
+                    ORDER BY `$sort_by` $sort_dir
+                    LIMIT $offset, $limit;";
+
+
+        // retreive count
+        $count_query = "SELECT COUNT(*)
+                                FROM `user`
+                                WHERE firstname = '$keyword' OR lastname = '$keyword'
+                                OR username = '$keyword' OR alt_email = '$keyword'";
+
+        $count = $this->db->getOne($count_query);
         return $this->db->getAll($query);
     }
 

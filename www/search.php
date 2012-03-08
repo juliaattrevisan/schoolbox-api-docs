@@ -18,12 +18,11 @@ $group       = new Group();
 $categoryStd = new Category();
 $allowedFile = new AllowedFile();
 
-if ($_GET['keyword'] &&  strlen($_GET['keyword']) > 2) {
+if ($_GET['keyword'] && strlen($_GET['keyword']) > 2) {
 	$keyword      = $_GET['keyword'];
 	$type         = $_GET['type'];
 	$current_page = empty($_GET['page']) ? 1 : $_GET['page'];
-}
-else {
+} else {
 	error(45);
 }
 
@@ -52,28 +51,33 @@ $type_list = array(
     'event'    => 'Calendar',
 );
 
+$count = array();
+
+// default case is to search for everthing
 if (empty($type) || $type == 'all') {
     // perform search for each handle
     $page->setFile(TEMPLATE_content, 'search.html');
     $page->setBlock(TEMPLATE_content, 'type', 'type_block');
     $page->setBlock(TEMPLATE_content, 'result', 'result_block');
-    $page->setVar('KEYWORD', $keyword);
+    // escape any quotes in the keyword string, or the javascript will explode.
+    $page->setVar('KEYWORD', str_replace('"','\"',$keyword));
 
+    // iterate through the handle types
     foreach ($handle as $type_name => &$type_handle) {
         // include & instantiate
         require_once("../library/$type_handle.php");
         $type_class = ucfirst($type_handle);
         $type_handle = new $type_class;
 
-        // search
         $result[$type_name] = $type_handle->search($keyword, 0, Cfg::get('search_all_limit'), $count[$type_name]);
     }
 
     $count['all'] = array_sum($count);
 
-    // are there any results?
-    if ($count['all'] == 0)
+    // are there any results? TODO : this error should probably say "no results" rather than "your search was rubbish".
+    if ($count['all'] == 0) {
         error(45);
+    }
 
     // type list
     foreach ($type_list as $type_name => $type_desc) {
@@ -92,13 +96,15 @@ if (empty($type) || $type == 'all') {
             'RESULT_CLASS' => $type_name == 'all' ? 'hide loaded' : 'hide',
         ));
 
-        if($type_name != 'all')
+        if($type_name != 'all') {
             $page->setVar('RESULT');
+        }
 
         $page->parse('type_block', 'type', true);
         $page->parse('result_block', 'result', true);
     }
 }
+//
 elseif (!empty($handle[$type])) {
     // include & instantiate
     require_once("../library/{$handle[$type]}.php");
@@ -108,6 +114,9 @@ elseif (!empty($handle[$type])) {
     // perform search for individual category (without formatting for ajax call)
     $result[$type] = $handle[$type]->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
 }
+
+
+/* <RESULTS RENDERING> */
 
 // render users
 if (!empty($result['user'])) {
@@ -124,9 +133,7 @@ if (!empty($result['user'])) {
     ));
 
     foreach ($result['user'] as $user) {
-
-		/* Format email address
-		 */
+		// Format email address
 		$emailObj = new Email();
         $address = $emailObj->formatEmailFromArray($user);
 
@@ -519,7 +526,12 @@ if (!empty($result['event'])) {
     $page->parse('RESULT', 'event_t', true);
 }
 
-// pagination and execution times
+/* </RESULTS RENDERING> */
+
+
+/* PAGINATION AND EXECUTION TIMES */
+
+// if search type isn't specified
 if (empty($type)) {
     // clear pagination
     $page->setBlock('RESULT', 'pagination', 'pagination_block');
@@ -530,6 +542,8 @@ if (empty($type)) {
 
     // render final output
     $page->outputPage();
+
+// if we have a search type
 } else {
     // clear count
     $page->setBlock('RESULT', 'count', 'count_block');
@@ -553,7 +567,7 @@ if (empty($type)) {
         }
 
         $page->setVar(array(
-            'PAGE_NAME' => '<',
+            'PAGE_NAME'   => '<',
             'PAGE_NUMBER' => '1',
             'PAGE_CLASS'  => '',
         ));
@@ -562,7 +576,7 @@ if (empty($type)) {
 
         for ($i = $start_window; $i <= $end_window; $i++) {
             $page->setVar(array(
-                'PAGE_NAME' => $i,
+                'PAGE_NAME'   => $i,
                 'PAGE_NUMBER' => $i,
                 'PAGE_CLASS'  => $i == $current_page ? 'bold' : '',
             ));
@@ -571,12 +585,14 @@ if (empty($type)) {
         }
 
         $page->setVar(array(
-            'PAGE_NAME' => '>',
+            'PAGE_NAME'   => '>',
             'PAGE_NUMBER' => $number_pages,
             'PAGE_CLASS'  => '',
         ));
 
         $page->parse('pagination_block', 'pagination', true);
+
+    // only 1 page to display
     } else {
         $page->setVar('pagination_block');
     }
