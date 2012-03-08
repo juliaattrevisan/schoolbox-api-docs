@@ -33,7 +33,7 @@ if (is_numeric($_POST['userID']) && $_POST['modusername']) {
 		'group_id' => $_POST['group'],
 		'campus' => $_POST['campus'],
 		'defaultCampus' => $_POST['defaultCampus'],
-		'su' => $_POST['superuser'],
+		'su' => isset($_POST['superuser']) ? '1' : '0',
 		'year' => $_POST['year'] == '' ? 'NULL' : $_POST['year'],
 		'eportfolio_enabled' => $_POST['eportfolio'] == 1 ? 1 : 0,
         'house' => $_POST['house']
