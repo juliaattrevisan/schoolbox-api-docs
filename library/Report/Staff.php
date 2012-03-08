@@ -38,7 +38,7 @@ class Report_Staff extends Report_Abstract {
 	 * @return bool
 	 */
 	protected function checkPermissions() {
-		if ($this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff()) {
+		if ($this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff() || $this->getGroupHandler()->isParent()) {
 			return true;
 		}
 
