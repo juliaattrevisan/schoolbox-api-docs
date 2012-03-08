@@ -8,12 +8,14 @@ if (($code != '') && Cfg::get('external_enable')) {
 
 	$externalClassHandler = new External_Class();
 	$userHandler = new User();
+    $groupHandler = new Group();
 
 	$listSyns = $externalClassHandler->getTeacherName($code);
+    $staffGroups = $groupHandler->getStaffGroupTypeIds();
 
 	if (is_array($listSyns)) {
 		foreach($listSyns as $synid) {
-			$teacher = $userHandler->getBySynergy($synid);
+			$teacher = $userHandler->getBySynergyAndGroup($synid, $staffGroups);
 
 			if (is_array($teacher)) {
 				$name = $userHandler->formatName($teacher);

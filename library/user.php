@@ -102,6 +102,32 @@ class User extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
+    /**
+     * Search for a user by synergy ID, restricted to a group or group array
+     * @param $sid
+     * @param $gid
+     * @return array|bool
+     */
+    function getBySynergyAndGroup($sid, $gid) {
+
+        $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id,
+						synergy_id, local_email, alt_email, userCampus.campus, year, eportfolio_enabled, house
+				FROM user
+					LEFT JOIN groups ON user.group_id = groups.id
+					LEFT JOIN userCampus ON user.id = userCampus.uid
+				WHERE user.synergy_id = '$sid'
+				AND ";
+
+        if(is_array($gid))
+            $query .= "group_id IN (" . implode(", ", $gid) . ")";
+        else
+            $query .= "group_id = '$gid'";
+
+        $query .= " ORDER BY userCampus.defaultCampus DESC";
+
+        return $this->db->getRow($query);
+    }
+
     function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'lastname', $sort_dir = 'ASC') {
 
         // TODO: this function doesn't currently protect against all injection (eg. % gets through).
