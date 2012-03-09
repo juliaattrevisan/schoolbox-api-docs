@@ -318,7 +318,10 @@ setupCustomise = {
 				$j('.right .text, .right .listing').css('background-color', $j('.left .text').css('background-color'));
 				$j('.right .dark').css('background-color', $j('.left .dark').css('background-color'));
 				$j('.right, .right p').css('color', $j('.left').css('color'));
-				$j('.right h2').css('background-color', $j('.left h2').css('background-color'));
+				$j('.right h2').css({
+                    'background-color': $j('.left h2').css('background-color'),
+                    'color':  $j('.left h2').css('color')
+                });
 				$j('.right, .right p').css('color', $j('.left, .left p').css('color'));
 				$j('.right a').css('color', $j('.left a').css('color'));
 
@@ -336,7 +339,6 @@ setupCustomise = {
 			$j('#restore').click(function() {
 				$j('.colorBox').each(function () {
 					$j(this).css('background-color', defaults[$j(this).attr('id')]);
-					//$j('.text, .dark, h2, a, p, .left, .right').removeAttr("style");
 				});
 
 				resetColours('top');

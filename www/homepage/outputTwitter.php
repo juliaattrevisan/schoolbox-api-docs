@@ -141,6 +141,7 @@ else {
 			$this->setVar(array(
 				'TWEET_TEXT' => $currentTweet['text'],
 				'TWEET_DATE' => $currentTweet['date'],
+                'ON_OFF' => $i++%2 ? 'dark' : '',
 			));
 
 			$this->parse('tweet_block', 'tweet', true);

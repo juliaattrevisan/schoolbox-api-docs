@@ -32,12 +32,14 @@
 		</form>
 	</div>
 	<!-- END config -->
-
-	<!-- BEGIN tweet -->
-	<p>
-		{TWEET_TEXT}
-		<br />
-		<em>{TWEET_DATE}</em>
-	</p>
-	<!-- END tweet -->
+    <div class="listing">
+        <ul>
+        <!-- BEGIN tweet -->
+        <li class="clearfix {ON_OFF}">
+            <h4>{TWEET_TEXT}</h4>
+            <div class="small-right"><p>{TWEET_DATE}</p></div>
+        </li>
+        <!-- END tweet -->
+        </ul>
+    </div>
 </div>
