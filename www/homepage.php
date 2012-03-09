@@ -352,6 +352,7 @@ if (is_array($componentList)) {
 					}
 				}
 			}
+
 			$this->parse("config_block", "config");
 		}
 		else {

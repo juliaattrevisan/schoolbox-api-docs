@@ -7,18 +7,19 @@
 			<input type="hidden" name="cid" value="{ID}" />
 			<input type="hidden" name="type" value="config" />
 			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
-			Keyword (e.g. #test):
-			<input type='text' name='twitterkeyword' value='{COMPONENT_CONFIG_TWITTERKEYWORD}' />
+
+			Author:
+			<input type='text' name='username' value='{COMPONENT_CONFIG_USERNAME}' />
+
+			Keywords (e.g. #test):
+			To find tweets mentioning user <strong>alaress</strong>, use <em>@alaress</em><br />
+			To find tweets with a hashtag <strong>kony</strong>, use <em>#kony</em><br />
+
+			<input type='text' name='keywords' value='{COMPONENT_CONFIG_KEYWORDS}' />
 
 			Limit:
-			<input type='text' name='twittermaxnum' value='{COMPONENT_CONFIG_TWITTERMAXNUM}' />
+			<input type='text' name='maxtweets' value='{COMPONENT_CONFIG_MAXTWEETS}' />
 
-			Filter:
-			<select name='twitterfilter'>
-				<!-- BEGIN twitterfilter -->
-				<option value='{TWITTERFILTER_METHOD}' {TWITTERFILTER_SELECTED}>{TWITTERFILTER_NAME}</option>
-				<!-- END twitterfilter -->
-			</select>
 			<input type="submit" value="Update" class="submit-btn update" />
 		</form>
 	</div>
@@ -37,6 +38,10 @@
         <!-- BEGIN tweet -->
         <li class="clearfix {ON_OFF}">
             <h4>{TWEET_TEXT}</h4>
+			<br />
+			<img src='{TWEET_AVATAR}' />
+			<br />
+			<span>{TWEET_AUTHOR}</span>
             <div class="small-right"><p>{TWEET_DATE}</p></div>
         </li>
         <!-- END tweet -->
