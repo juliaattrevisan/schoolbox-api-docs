@@ -920,6 +920,15 @@ h4.eventListing {
 	border-radius: 3px;
 }
 
+.tweets h4 span{
+    display:block;
+    min-height:50px;
+    background-repeat: no-repeat;
+    padding-left:60px;
+    font-weight:normal;
+}
+
+
 p.interact {
 	margin: 0 0 0 15px;
 	float: right;

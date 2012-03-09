@@ -33,16 +33,13 @@
 		</form>
 	</div>
 	<!-- END config -->
-    <div class="listing">
+    <div class="listing tweets">
         <ul>
         <!-- BEGIN tweet -->
         <li class="clearfix {ON_OFF}">
-            <h4>{TWEET_TEXT}</h4>
-			<br />
-			<img src='{TWEET_AVATAR}' />
-			<br />
-			<span>{TWEET_AUTHOR}</span>
-            <div class="small-right"><p>{TWEET_DATE}</p></div>
+            <h4><span style="background-image:url({TWEET_AVATAR});">{TWEET_TEXT}</span></h4>
+
+            <div class="small-right"><p><strong>{TWEET_AUTHOR}</strong><br>{TWEET_DATE}</p></div>
         </li>
         <!-- END tweet -->
         </ul>
