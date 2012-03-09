@@ -14,4 +14,4 @@ UPDATE `assess_luQuestionType` SET `classname`='TrueFalse' WHERE `type_id`='11';
 
 /* Twitter feed homepage component
  */
-INSERT INTO `portal-dev`.`homepage_comp`(`id`,`size`,`method`,`name`,`description`,`homepageCategoryID`,`filename`,`config`,`invisible`,`allowMultiple`) VALUES ( NULL,'0','outputTwitter','Twitter','Output twitter feeds','6','twitter.html','','false','false');
+INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`homepageCategoryID`,`filename`,`config`,`invisible`,`allowMultiple`) VALUES ( NULL,'0','outputTwitter','Twitter','Output twitter feeds','6','twitter.html','a:3:{s:14:"twitterkeyword";s:0:"";s:13:"twittermaxnum";s:2:"10";s:13:"twitterfilter";s:7:"default";}','false','false');

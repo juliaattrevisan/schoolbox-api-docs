@@ -7,8 +7,18 @@
 			<input type="hidden" name="cid" value="{ID}" />
 			<input type="hidden" name="type" value="config" />
 			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
-			<input type='text' name='twitterusername' value='{COMPONENT_CONFIG_TWITTERUSERNAME}' />
-			<input type='text' name='twitternum' value='{COMPONENT_CONFIG_TWITTERNUM}' />
+			Keyword (e.g. #test):
+			<input type='text' name='twitterkeyword' value='{COMPONENT_CONFIG_TWITTERKEYWORD}' />
+
+			Limit:
+			<input type='text' name='twittermaxnum' value='{COMPONENT_CONFIG_TWITTERMAXNUM}' />
+
+			Filter:
+			<select name='twitterfilter'>
+				<!-- BEGIN twitterfilter -->
+				<option value='{TWITTERFILTER_METHOD}' {TWITTERFILTER_SELECTED}>{TWITTERFILTER_NAME}</option>
+				<!-- END twitterfilter -->
+			</select>
 			<input type="submit" value="Update" class="submit-btn update" />
 		</form>
 	</div>
@@ -26,7 +36,8 @@
 	<!-- BEGIN tweet -->
 	<p>
 		{TWEET_TEXT}
-		<span>{TWEET_DATE}</span>
+		<br />
+		<em>{TWEET_DATE}</em>
 	</p>
 	<!-- END tweet -->
 </div>
