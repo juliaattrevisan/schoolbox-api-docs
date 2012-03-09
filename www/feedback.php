@@ -27,7 +27,7 @@ else {
 $email = new Email();
 
 $output = array(
-    'NAME' => isset( $user ) ? $email->formatEmailFromArray($user) : '',
+    'NAME' => isset( $user ) ? $userHandler->formatName($user) : '',
     'EMAIL' => isset( $user ) ? $email->formatEmailFromArray($user) : '',
 );
 
