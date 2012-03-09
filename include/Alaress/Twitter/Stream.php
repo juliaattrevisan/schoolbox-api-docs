@@ -70,6 +70,44 @@ class Alaress_Twitter_Stream {
 	}
 
 	/**
+	 * Load and preprocess tweets using the selected Loader class, store result
+	 *
+	 * Chainable method
+	 *
+	 * @return array
+	 */
+	public function load() {
+		$allTweets = $this->getLoader()->load();
+
+		$processed = array();
+
+		/* Process and keep output
+		 */
+		for ($i = 0; ($i < $this->getMaxTweets()) && ($i < count($allTweets)); $i++) {
+			$processed[] = array(
+				'text' => $this->getFilter()->filterText($allTweets[$i]['text']),
+				'date' => $this->getFilter()->filterDate($allTweets[$i]['date']),
+			);
+		}
+
+		$this->setTweets($processed);
+
+		return $this;
+	}
+
+	/**
+	 * Shit out ajax format (json) so you can use it to do realtime updates
+	 *
+	 * @return void
+	 */
+	public function ajax() {
+		echo json_encode($this->getTweets());
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
 	 * Sets the Strategy used to load tweets
 	 *
 	 * @param $loader
@@ -132,32 +170,6 @@ class Alaress_Twitter_Stream {
 	}
 
 	/**
-	 * Load and preprocess tweets using the selected Loader class, store result
-	 *
-	 * Chainable method
-	 *
-	 * @return array
-	 */
-	public function load() {
-		$allTweets = $this->getLoader()->load();
-
-		$processed = array();
-
-		/* Process and keep output
-		 */
-		for ($i = 0; ($i < $this->getMaxTweets()) && ($i < count($allTweets)); $i++) {
-			$processed[] = array(
-				'text' => $this->getFilter()->filterText($allTweets[$i]['text']),
-				'date' => $this->getFilter()->filterDate($allTweets[$i]['date']),
-			);
-		}
-
-		$this->setTweets($processed);
-
-		return $this;
-	}
-
-	/**
 	 * Set preprocessed tweets
 	 *
 	 * @param  $tweets
@@ -174,15 +186,6 @@ class Alaress_Twitter_Stream {
 	 */
 	public function getTweets() {
 		return $this->tweets;
-	}
-
-	/**
-	 * Shit out ajax format (json) so you can use it to do realtime updates
-	 *
-	 * @return void
-	 */
-	public function ajax() {
-		echo json_encode($this->getTweets());
 	}
 }
 

@@ -14,4 +14,4 @@ define('CONSUMER_SECRET', 'Kh9SU8793NsfYnv2hJGw3RY8lpK2xkHfI0mIHAJW0');
 define('OAUTH_TOKEN', '8345982-zZi2Fsz657xEzCbO5uzYGKp1Demoeb527zbC5MA8');
 define('OAUTH_TOKEN_SECRET', 'VgWSIrO0Qrx2mHFXBjRQqXmXOfdsIV6UEuvEOhKHO0');
 
-define('OAUTH_CALLBACK', 'http://core.portal-dev.alaress-dev.com.au/include/Alaress/Twitter/test/oauth/callback.php');
+define('OAUTH_CALLBACK', 'http://core.portal-dev.alaress-dev.com.au/test/oauth/callback.php');

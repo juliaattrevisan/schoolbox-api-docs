@@ -15,8 +15,15 @@
  * This class encapsulates the tweet loading methodology, returning a key/value
  * array for text (the contents of the tweet) and the date (the date the tweet
  * was published)
+ *
+ * To change the API resource, use $twitter->getLoader()->setResource('statuses/mentions');
  */
 class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface {
+
+	/* REST API method. Defaults to statuses/user_timeline
+	 * See https://dev.twitter.com/docs/api
+	 */
+	private $resource = 'statuses/user_timeline';
 
 	/**
 	 * Load required classes, instantiate a new connection using the four
@@ -36,7 +43,7 @@ class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface {
 	 * @return array
 	 */
 	public function load() {
-		$allTweets = $this->getConnection()->get('statuses/user_timeline');
+		$allTweets = $this->getConnection()->get($this->getResource());
 
 		$preprocessed = array();
 
@@ -51,6 +58,9 @@ class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface {
 
 		return $preprocessed;
 	}
+
+	/* Getters/Setters
+	 */
 
 	/**
 	 * Set an OAuth connection object
@@ -69,5 +79,28 @@ class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface {
 	 */
 	private function getConnection() {
 		return $this->connection;
+	}
+
+	/**
+	 * Set resource
+	 *
+	 * Support chained methods
+	 *
+	 * @param $resource
+	 * @return \Alaress_Twitter_Loader_OAuth
+	 */
+	public function setResource($resource) {
+		$this->resource = $resource;
+
+		return $this;
+	}
+
+	/**
+	 * Get resource
+	 *
+	 * @return string
+	 */
+	private function getResource() {
+		return $this->resource;
 	}
 }

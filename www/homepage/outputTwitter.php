@@ -13,6 +13,7 @@
 $this->setBlock($componentHandle, 'tweet', 'tweet_block');
 
 $allTweets = new Alaress_Twitter_Stream($config['twitterusername']);
+$allTweets->getLoader()->setResource('statuses/mentions');
 $allTweets->setMaxTweets($config['twitternum'])->load();
 
 foreach($allTweets->getTweets() as $currentTweet) {
