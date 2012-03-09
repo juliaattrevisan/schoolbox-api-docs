@@ -655,9 +655,26 @@ class Category extends DeprecatedModel {
 		return $this->db->getAll($query);
 	}
 
+    /**
+     * Creates a breadcrumb of a category's heirarchical navigation
+     *
+     * @param $id
+     * @return array
+     */
     function breadcrumb($id) {
-        for(; $id != 0; $category = $this->getByID($id), $id = $category['parent'], $breadcrumb[] = $category);
+        $breadcrumb = array();
 
+        // get the breadcrumb back up to the root directory
+        while($id != 0) {
+            $category = $this->getByID($id);
+            $id = $category['parent'];
+
+            // recursion! something in the DB is borked! TODO: some form of logging or aux checks
+            if(in_array($category, $breadcrumb))
+                break;
+            else
+                $breadcrumb[] = $category;
+        }
         return array_reverse($breadcrumb);
     }
 
