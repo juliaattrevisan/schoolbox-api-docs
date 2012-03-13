@@ -122,15 +122,16 @@ abstract class Evaluation_Main extends DeprecatedModel {
 	 */
     public function renderAssessContents($assess_id, $page) {
         $allQuestions = $this->getContents($assess_id);
+//print_r($allQuestions);
+        $currentSection = $allQuestions[0]['section_id'];
 
-        $sectionTitle = $allQuestions[0]['title'];
-
-        for ($i=0, $questionNumber=0; $i < count($allQuestions); $i++) {
+        for ($i=0, $questionNumber=1; $i < count($allQuestions); $i++) {
             $currentQuestion = $allQuestions[$i];
 
             /* Parse out the previous Section's info if we're entering a new Section
              */
-            if ($currentQuestion['title'] != $sectionTitle) {
+            if ($currentQuestion['section_id'] != $currentSection) {
+//print_r($currentQuestion);
 				$questionNumber = 1;
                 $page->setVar(array(
                     'SECTION_TITLE' => $allQuestions[$i-1]['title'],
@@ -141,7 +142,7 @@ abstract class Evaluation_Main extends DeprecatedModel {
                 $page->parse('section_block', 'section', true);
                 $page->setVar('question_block', '');
 
-                $sectionTitle = $currentQuestion['title'];
+				$currentSection = $currentQuestion['section_id'];
             }
 
 			/* If section contains a deleted question, $allQuestions query is
@@ -150,22 +151,21 @@ abstract class Evaluation_Main extends DeprecatedModel {
 			 */
 
             /* Put the current Question into a new Section and parse it out. If
-             * it's empty, just hide it
+             * it's empty, just do nothing
              */
-            if (empty($currentQuestion['questionDeletedAt']) && is_numeric($currentQuestion['question_id'])) {
-                $page->setVar(array(
-                    'QUESTION_SEQUENCE' => $questionNumber,
-                    'QUESTION_QUESTION' => $currentQuestion['question'],
-                    'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
-                    'QUESTION_MARKS' => floor($currentQuestion['marks']) < $currentQuestion['marks'] ? $currentQuestion['marks'] : floor($currentQuestion['marks']),
-                ));
+            if ($currentQuestion['questionDeletedAt'] == null) {
+				if (is_numeric($currentQuestion['question_id'])) {
+					$page->setVar(array(
+						'QUESTION_SEQUENCE' => $questionNumber,
+						'QUESTION_QUESTION' => $currentQuestion['question'],
+						'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
+						'QUESTION_MARKS' => floor($currentQuestion['marks']) < $currentQuestion['marks'] ? $currentQuestion['marks'] : floor($currentQuestion['marks']),
+					));
 
-                $page->parse('question_block', 'question', true);
+					$page->parse('question_block', 'question', true);
 
-				$questionNumber++;
-            }
-            else {
-                $page->setVar('question_block', '', true);
+					$questionNumber++;
+				}
             }
         }
 

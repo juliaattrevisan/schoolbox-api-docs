@@ -36,7 +36,7 @@ $j(function() {
 
 	});
 
-	
+
 });
 </script>
 
@@ -44,28 +44,29 @@ $j(function() {
 	<div class="pad-it ">
 		<div class="hide assessment-options pad-it clearfix"> <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="btn modify float-left no-marg" ><span></span>Modify</a> <a href="/assess/export/{ASSESS_ASSESS_ID}" class="btn go-to float-left no-marg" ><span></span>Export</a> <a href="/assess/delete/{ASSESS_ASSESS_ID}" class="btn delete float-left no-marg" ><span></span>Delete</a> </div>
 		<a class="drop-arrow show-assess-options" href="#">&#x25BC;</a>
-		
+
 		<p class="clearfix">
-			<a class="btn add" href="/assess/section/create/{ASSESS_ASSESS_ID}"><span></span>Add section</a> 
+			<a class="btn add" href="/assess/summary/{ASSESS_ASSESS_ID}"><span></span>View summary</a>
+			<a class="btn add" href="/assess/section/create/{ASSESS_ASSESS_ID}"><span></span>Add section</a>
 		</p>
-		
+
 		<!-- BEGIN section -->
 		<div class="evaluation-section">
 			<h3>Section {SECTION_SEQUENCE}: {SECTION_TITLE}<a class="drop-arrow show-section-options" href="#">&#x25BC;</a></h3>
 
 			<ul class="question-list">
-			
+
 				<li class="hide evaluation-section-options clearfix">
 					<a href="/assess/section/modify/{SECTION_SECTION_ID}" class="btn modify float-left"><span></span>Edit</a>
 					<a href="/assess/section/delete/{SECTION_SECTION_ID}" class="btn delete float-left"><span></span>Delete</a>
 				</li>
-			
+
 				<!-- BEGIN question -->
 				<li>
-					<strong>Q{QUESTION_SEQUENCE})</strong> 
+					<strong>Q{QUESTION_SEQUENCE})</strong>
 					{QUESTION_QUESTION} - ({QUESTION_MARKS} marks)
-					<a href="/assess/question/export/{QUESTION_QUESTION_ID}">Export</a> | 
-					<a href="/assess/question/modify/{QUESTION_QUESTION_ID}">Edit</a> | 
+					<a href="/assess/question/export/{QUESTION_QUESTION_ID}">Export</a> |
+					<a href="/assess/question/modify/{QUESTION_QUESTION_ID}">Edit</a> |
 					<a class="delete" href="/assess/question/delete/{QUESTION_QUESTION_ID}">Delete</a>
 				</li>
 				<!-- END question -->
@@ -80,4 +81,4 @@ $j(function() {
 		</div>
 		<!-- END section -->
 	</div>
-	
+
