@@ -114,6 +114,11 @@ class ZipFolder {
 if(is_numeric($_GET['id'])) {
    $box_id = $_GET['id'];
 
+   // check that we have read access to the submissions directory
+   if(!is_readable(Cfg::get('submission_dir') . '/')) {
+       error(9, "the requested submissions could not be read.<br />Please try again, and if the problem persists contact your system administrator.");
+   }
+
    $subBoxHandler = new Submission();
 
    $submissionBox = $subBoxHandler->getByID($box_id);
