@@ -60,7 +60,7 @@ class Alaress_Twitter_Search {
 		$params = $this->generateParameters();
 
 		if (strlen(trim($params))) {
-			$this->setSearchUrl(self::SEARCH_PREFIX . $this->generateParameters());
+			$this->setSearchUrl(self::SEARCH_PREFIX . $params);
 
 			$allTweets = json_decode(@file_get_contents($this->getSearchUrl()));
 
