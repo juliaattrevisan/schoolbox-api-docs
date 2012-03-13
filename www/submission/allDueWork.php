@@ -47,10 +47,12 @@ if (!isset($user['uid'])) {
 	error(2);
 }
 
-if (is_array($_SESSION['children'])) {
-	$this->dropDown('child', $_SESSION['children'], $user['uid'], 'is_parent', array('id' => 'CHILD_ID', 'name' => 'CHILD_NAME'));
-
-	$this->parse('is_parent_block', 'is_parent');
+/* Check if system config restrict_student_submissions is on
+ */
+if ($groupHandler->isParentOfChild($this->arg[0])) {
+	if (Cfg::get('restrict_student_submissions')) {
+		error(19);
+	}
 }
 
 $categoryList = $groupHandler->involvedInCategoryList($userID, true, READ_ACCESS);

@@ -14,4 +14,8 @@ UPDATE `assess_luQuestionType` SET `classname`='TrueFalse' WHERE `type_id`='11';
 
 /* Twitter feed homepage component
  */
-INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`homepageCategoryID`,`filename`,`config`,`invisible`,`allowMultiple`) VALUES ( NULL,'0','outputTwitter','Twitter','Output twitter feeds','6','twitter.html','a:3:{s:14:"twitterkeyword";s:0:"";s:13:"twittermaxnum";s:2:"10";s:13:"twitterfilter";s:7:"default";}','false','false');
+INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`homepageCategoryID`,`filename`,`config`,`invisible`,`allowMultiple`) VALUES ( NULL,'0','outputTwitter','Twitter','Output twitter feeds','6','twitter.html','a:3:{s:8:"username";s:7:"alaress";s:8:"keywords";s:4:"kony";s:9:"maxtweets";s:1:"3";}','false','false');
+
+/* Ability for parents to see students' marks
+ */
+INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'restrict_student_submissions','true','Restrict Student Submissions','If ticked, parents cannot see marks and details of their students\' submissions.','boolean','true:false','Security','true','false','false');

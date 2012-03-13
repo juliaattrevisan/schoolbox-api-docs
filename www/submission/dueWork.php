@@ -225,49 +225,75 @@ $this->setBlock(TEMPLATE_content, 'work', 'work_block');
 /* Alternating row color index */
 $j = 0;
 
+
+/* Check if system config restrict_student_submissions is on
+ *
+ * This is used to hide marks in the Recent Work Activity/Online Assessments
+ * parts of the page
+ */
+$restrictedSubmissions = false;
+
+if ($groupHandler->isParentOfChild($this->arg[1])) {
+	if (Cfg::get('restrict_student_submissions')) {
+		$restrictedSubmissions = true;
+	}
+}
+
 if(count($allWork) > 0) {
     foreach($allWork as $currentWork) {
 
-        if ($currentWork['status'] == UPCOMING_WORK_TYPE) {
+		if (!$restrictedSubmissions) {
+			if ($currentWork['status'] == UPCOMING_WORK_TYPE) {
+				if (!$currentWork['accept_submission']) {
+					$status = 'Work due';
+					$action = 'View Details';
+				}
+				else if ($current_time > $currentWork['open_date']) {
+					if ($current_time < $currentWork['date']) {
+						$status = 'Work due';
+						$action = 'Submit Work';
+					}
+					else if ($current_time < $currentWork['late_date']) {
+						$status = 'Work overdue';
+						$action = 'Submit Work';
+					}
+					else {
+						$status = 'Missed due date';
+						$action = 'View Details';
+					}
+				}
+				else {
+					$status = 'Open date approaching';
+					$action = 'View Details';
+				}
+			}
+			else if ($currentWork['status'] == AWAITING_WORK_TYPE) {
+				$action = 'View Details';
 
-            if (!$currentWork['accept_submission']) {
-                $status = 'Work due';
-                $action = 'View Details';
-            } elseif ($current_time > $currentWork['open_date']) {
+				if ($current_time < $currentWork['date']) {
+					$status = 'Work submitted';
+				}
+				else if ($currentWork['submitted'] < $currentWork['late_date']) {
+					$status = 'Work submitted late';
+				}
+			}
+			else if ($currentWork['status'] == RETURNED_WORK_TYPE) {
+				$action = 'View Details';
 
-                if ($current_time < $currentWork['date']) {
-                    $status = 'Work due';
-                    $action = 'Submit Work';
-                } elseif ($current_time < $currentWork['late_date']) {
-                    $status = 'Work overdue';
-                    $action = 'Submit Work';
-                } else {
-                    $status = 'Missed due date';
-                    $action = 'View Details';
-                }
-
-            } else {
-                $status = 'Open date approaching';
-                $action = 'View Details';
-            }
-
-        } elseif ($currentWork['status'] == AWAITING_WORK_TYPE) {
-            $action = 'View Details';
-
-            if ($current_time < $currentWork['date']) {
-                $status = 'Work submitted';
-            } elseif ($currentWork['submitted'] < $currentWork['late_date']) {
-                $status = 'Work submitted late';
-            }
-        } elseif ($currentWork['status'] == RETURNED_WORK_TYPE) {
-            $action = 'View Details';
-
-            if (!empty($currentWork['mark'])) {
-                $status = 'Work marked';
-            } else {
-                $status = 'Work returned';
-            }
-        }
+				if (!empty($currentWork['mark'])) {
+					$status = 'Work marked';
+				}
+				else {
+					$status = 'Work returned';
+				}
+			}
+		}
+		/* Status to display when Restrict Student Submissions is on
+ 		 */
+		else {
+			$status = '';
+			$action = '';
+		}
 
         $this->setVar(array(
             'WORK_SUBJECT' => $currentWork['categoryName'],
@@ -281,9 +307,7 @@ if(count($allWork) > 0) {
         ));
 
         $this->parse('work_block', 'work', true);
-
     }
-
 }
 else {
     $this->setVar('work_block','');
@@ -294,9 +318,13 @@ else {
  */
 $this->setBlock(TEMPLATE_content, 'allAssess', 'allAssess_block');
 $this->setBlock('allAssess', 'attempt', 'attempt_block');
-$this->setBlock('attempt', 'viewMarks', 'viewMarks_block');
-$this->setBlock('attempt', 'takeTest', 'takeTest_block');
-$this->setBlock('attempt', 'unmarked', 'unmarked_block');
+
+$this->setBlock('attempt', 'restricted_student_submissions_marks', 'restricted_student_submissions_marks_block');
+$this->setBlock('restricted_student_submissions_marks', 'unmarked', 'unmarked_block');
+
+$this->setBlock('attempt', 'restricted_student_submissions_actions', 'restricted_student_submissions_actions_block');
+$this->setBlock('restricted_student_submissions_actions', 'viewMarks', 'viewMarks_block');
+$this->setBlock('restricted_student_submissions_actions', 'takeTest', 'takeTest_block');
 
 $assessHandler = new Assess_Main();
 $attemptHandler = new Assess_Attempt();
@@ -318,7 +346,7 @@ if ($allAssessments) {
 	$attemptsExisted = false;
 
     foreach($allAssessments as $currentAssessment) {
-		$allAttempts = $attemptHandler->getList($currentAssessment['assess_id'], $_SESSION['id']);
+		$allAttempts = $attemptHandler->getList($currentAssessment['assess_id'], $this->arg[2]);
 
 		/* If multiple attempts were made, list them
 		 */
@@ -328,6 +356,8 @@ if ($allAssessments) {
 			foreach($allAttempts as $currentAttempt) {
 				$firstSection = $sectionHandler->getFirst($currentAssessment['assess_id']);
 
+				/* No attempts yet
+				 */
 				if (!$currentAttempt) {
 					$this->setVar(array(
 						'ASSESS_CATEGORY' => $categoryLookup[$currentAssessment['category_id']],
@@ -356,6 +386,17 @@ if ($allAssessments) {
 					else {
 						$finish = '';
 						$timeTaken = '';
+					}
+
+					/* Hide marks and actions
+					 */
+					if ($restrictedSubmissions) {
+						$this->setVar('restricted_student_submissions_marks_block', '');
+						$this->setVar('restricted_student_submissions_actions_block', '');
+					}
+					else {
+						$this->parse('restricted_student_submissions_marks_block', 'restricted_student_submissions_marks');
+						$this->parse('restricted_student_submissions_actions_block', 'restricted_student_submissions_actions');
 					}
 
 					/* The total available marks for this attempt
@@ -399,6 +440,8 @@ if ($allAssessments) {
 						'ATTEMPT_PERCENTAGE' => $percentage,
 					));
 
+					/* Hide link to take the unattempted assesment directly
+					 */
 					$this->setVar('takeTest_block', '');
 
 					/* Find out if this test has been marked; if it has, allow the

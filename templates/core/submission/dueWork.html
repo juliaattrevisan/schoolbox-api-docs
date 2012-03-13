@@ -35,7 +35,7 @@ $j(function () {
     var completion = [{PERCENTAGE_COMPLETED_ARRAY}];
 
     for (var i=0; i < categories.length; i++) {
-        $j('#progressbar-' + categories[i]).progressbar({value: completion[i]}); 
+        $j('#progressbar-' + categories[i]).progressbar({value: completion[i]});
     }
 
     /* Calendar Popup */
@@ -71,7 +71,7 @@ $j(function () {
         if (($j('.duework-popup.cal-bubble').css("left")) < '0px') {
             $j('.duework-popup.cal-bubble').css("left", '0');
         }
-        
+
         closeBubble();
     }
 
@@ -118,15 +118,15 @@ $j(function () {
 						<option value="{SUBJECT_ID}">{SUBJECT_NAME}</option>
 						<!-- END subject -->
 					</select>
-					
+
 					<!-- BEGIN is_parent -->
-					
+
 					<select name="child" id="childSelect">
 						<!-- BEGIN child -->
 						<option value="{CHILD_ID}" {CHILD_ID_SELECTED}>{CHILD_NAME}</option>
 						<!-- END child -->
 					</select>
-					
+
 					<!-- END is_parent --></td>
 			</thead>
 			<tbody>
@@ -140,7 +140,7 @@ $j(function () {
 					<th width="14%" class="dark">Sat</th>
 				</tr>
 				<!-- BEGIN week -->
-				<tr> 
+				<tr>
 					<!-- BEGIN day -->
 					<td class="{PAST} {TODAY} {ACTIVE} {RIGHTY}"><div class="dayWrap">
 							<p>{DATE}</p>
@@ -150,7 +150,7 @@ $j(function () {
 							<li id="event-{EVENT_ID}" class="event category-{EVENT_CAT_ID}"> <span class="wrapper"> <strong>{TIME}</strong> {EVENT}</span> </li>
 							<!-- END event -->
 						</ul></td>
-					<!-- END day --> 
+					<!-- END day -->
 				</tr>
 				<!-- END week -->
 			</tbody>
@@ -183,7 +183,7 @@ $j(function () {
 			</table>
 		</div>
 	</div>
-	
+
 	<!-- BEGIN allAssess -->
 	<div class="box component">
 		<h2>Online Assessments</h2>
@@ -204,26 +204,35 @@ $j(function () {
 						<td>{ASSESS_CATEGORY}</td>
 						<td>{ASSESS_TITLE}</td>
 						<td>{ASSESS_FINISH}</td>
-						<td> {ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS} ({ATTEMPT_PERCENTAGE}%) 
+						<td>
+							<!-- BEGIN restricted_student_submissions_marks -->
+							{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS} ({ATTEMPT_PERCENTAGE}%)
 							<!-- BEGIN unmarked -->
-							
-							<p class="unmarkedResponses"> <strong>Unconfirmed mark.</strong><br />
-								{ATTEMPT_UNMARKED_RESPONSES} questions not yet marked </p>
-							
-							<!-- END unmarked --></td>
-						<td><!-- BEGIN viewMarks --> 
-							<a href="/assess/studentReview/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">View Results</a> 
-							<!-- END viewMarks --> 
-							<!-- BEGIN takeTest --> 
-							<a href="/assess/intro/{ASSESS_ASSESS_ID}">Take Test</a> 
-							<!-- END takeTest --></td>
+
+							<p class="unmarkedResponses">
+								<strong>Unconfirmed mark.</strong><br />
+								{ATTEMPT_UNMARKED_RESPONSES} questions not yet marked
+							</p>
+							<!-- END unmarked -->
+							<!-- END restricted_student_submissions_marks -->
+						</td>
+						<td>
+							<!-- BEGIN restricted_student_submissions_actions -->
+							<!-- BEGIN viewMarks -->
+							<a href="/assess/studentReview/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">View Results</a>
+							<!-- END viewMarks -->
+							<!-- BEGIN takeTest -->
+							<a href="/assess/intro/{ASSESS_ASSESS_ID}">Take Test</a>
+							<!-- END takeTest -->
+							<!-- END restricted_student_submissions_actions -->
+						</td>
 					</tr>
 					<!-- END attempt -->
 				</tbody>
 			</table>
 		</div>
 	</div>
-	<!-- END allAssess --> 
+	<!-- END allAssess -->
 </div>
 <div class="right">
 	<div class="box component">
@@ -231,7 +240,7 @@ $j(function () {
 		<div class="listing">
 			<ul class="clearfix">
 				<!-- BEGIN summary -->
-				<li class="bars {DARK} clearfix"> <a href="/homepage/{SUMMARY_CAT_ID}">{SUMMARY_CAT_NAME}</a> 
+				<li class="bars {DARK} clearfix"> <a href="/homepage/{SUMMARY_CAT_ID}">{SUMMARY_CAT_NAME}</a>
 					<!-- BEGIN summary_due -->( {SUMMARY_DUE} Due )<!-- END summary_due -->
 					<p>{SUMMARY_TEACHER}</p>
 					<!-- <div class="barchart">
@@ -255,7 +264,7 @@ $j(function () {
 					<p class="interact">{ACTIVITY_DATE}</p>
 				</li>
 				<!-- END activity -->
-				
+
 			</ul>
 		</div>
 	</div>

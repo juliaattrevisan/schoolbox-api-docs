@@ -17,7 +17,6 @@ $groupHandler = new Group;
 $submissionHandler = new Submission;
 $returnHandler = new SubmissionReturn;
 
-
 if (is_numeric($this->arg[1]) && ($groupHandler->isParentOfChild($this->arg[1]) || $groupHandler->isStaff() || $_SESSION['id'] == $this->arg[1])) {
 	$userID = $this->arg[1];
 }
@@ -28,6 +27,13 @@ else {
     $userID = $_SESSION['id'];
 }
 
+/* Check if system config restrict_student_submissions is on
+ */
+if ($groupHandler->isParentOfChild($this->arg[1])) {
+	if (Cfg::get('restrict_student_submissions')) {
+		error(19);
+	}
+}
 
 $user = $userHandler->getByID($userID);
 
