@@ -12,6 +12,12 @@ class FileType {
 	private $path = null;
 	private $mime = null;
 
+	/**
+	 * Constructor
+	 *
+	 * @param $path
+	 * @param null $mime
+	 */
 	public function __construct($path, $mime = null) {
 		$this->setPath($path);
 		$this->setMime($mime);
@@ -21,7 +27,6 @@ class FileType {
 	 * Determine the file extension for a given filename/path
 	 * without dot
 	 *
-	 * @param  $filename
 	 * @return string
 	 */
 	public function getExtension() {

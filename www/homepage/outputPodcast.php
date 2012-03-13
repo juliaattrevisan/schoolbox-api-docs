@@ -1,4 +1,17 @@
 <?php
+/*
+ * outputPodcast
+ *
+ * Output a list of podcasts from xml feeds, or a url directly
+ *
+ * Useful test links:
+ * http://www.abc.net.au/triplej/live/rss/podcast.xml
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
 $this->setJavascript('/javascript/swfobject.js');
 $this->setBlock($componentHandle, 'podcast_list', 'podcast_list_block');
 $this->setVar('podcast_list_block', '');
@@ -6,50 +19,64 @@ $this->setVar('podcast_list_block', '');
 require_once SITE_root.'/library/Xml.php';
 require_once SITE_root.'/include/FileType.php';
 
-if(!empty($config['url'])) {
+if (!empty($config['url'])) {
     $xml = new Xml($config['url']);
 
+	/* Podcasts from xml feed
+	 */
     if ($xml->channel) {
         $this->setVar('PODCAST_COMPONENT_TITLE', Scrub::text($xml->channel->title));
-        $j = 0;
 
-	    foreach ($xml->channel->item as $item) {
-            if ( !isset($item->enclosure) ) {
-                continue;
-            }
+		/* Iterate through each item in the channel
+		 */
+		if (strlen(trim($config['url']))) {
+			for ($i = 0, $j = 0; $i < count($xml->channel->item); $i++) {
 
-			$fileType = new FileType($item->enclosure->attributes()->url, $item->enclosure->attributes()->type);
+				/* Exit loop once maximum displayable is reached
+				 * Otherwise continue iterating
+				 */
+				if ($j == $config['size']) {
+					break;
+				}
+				else {
+					$item = $xml->channel->item[$i];
 
-			if ($fileType->isAudio()) {
-				$this->setVar(array(
-					'PODCAST_URL' => Scrub::text($item->enclosure['url']),
-					'PODCAST_TITLE' => Scrub::text($item->title),
-					'PODCAST_DESCRIPTION' => Scrub::text($item->description),
-					'ON_OFF'  => ++$j%2 ? '' : 'dark',
-					'PODCAST_ID' => md5($item->title),
-				));
+					/* Weird Alex fix
+					 */
+					if (!isset($item->enclosure)) {
+						continue;
+					}
 
-				$this->parse('podcast_list_block', 'podcast_list', true);
+					/* Get file type information
+					 */
+					$fileType = new FileType($item->enclosure->attributes()->url, $item->enclosure->attributes()->type);
+
+					if ($fileType->isAudio() || $fileType->isVideo()) {
+						$this->setVar(array(
+							'PODCAST_URL' => Scrub::text($item->enclosure['url']),
+							'PODCAST_TITLE' => Scrub::text($item->title),
+							'PODCAST_DESCRIPTION' => Scrub::text($item->description),
+							'ON_OFF'  => $j%2 ? '' : 'dark',
+							'PODCAST_ID' => md5($item->title),
+						));
+
+						$this->parse('podcast_list_block', 'podcast_list', true);
+
+						/* Unravelled hidden pre-increment from a conditional setVar()
+						 * and turned it into a conventional post-increment
+						 */
+						$j++;
+					}
+				}
 			}
-            else {
-                $this->setVar('PODCAST_COMPONENT_TITLE', 'Podcast - URL is not a valid audio podcast');
-                $this->setVar('podcast_list_block', '');
-                break;
-            }
+		}
 
-            if ($j == $config['size'] || $config['url'] != 0) {
-                break;
-			}
-        }
-
-        if ( $j == 0 ) {
+		/* If there are no podcasts in the list
+		 */
+		if (!$j) {
             $this->setVar('PODCAST_COMPONENT_TITLE', 'Podcast - URL does not contain any valid audio podcasts');
             $this->setVar('podcast_list_block', '');
         }
-    }
-    else {
-        $this->setVar('PODCAST_COMPONENT_TITLE', 'Podcast - URL is not a valid podcast feed');
-        $this->setVar('podcast_list_block', '');
     }
 }
 else {

@@ -50,7 +50,7 @@ class AllowedFile extends DeprecatedModel {
         $query = "SELECT mime FROM allowedFileExtension afe
                         JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
                         WHERE extension = '$extension' AND enable = 'true'";
-        
+
         if ( !$this->db->getOne($query) ) {
             return array(
                 'code' => 11,
@@ -59,11 +59,23 @@ class AllowedFile extends DeprecatedModel {
         }
     }
 
-    function getMime($extension) {
+	/**
+	 * Get mime type for a particular file extension
+	 *
+	 * @param $extension
+	 * @return mixed
+	 */
+	public function getMime($extension) {
+		$query = "
+			SELECT mime
+			FROM allowedFileExtension afe
+			LEFT JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
+			WHERE extension = '$extension'
+		";
 
-                $query = "SELECT mime FROM allowedFileExtension afe JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID WHERE extension = '$extension'";
-                $mime = $this->db->getOne($query);
-                return $mime;
+		$mime = $this->db->getOne($query);
+
+		return $mime;
 	}
 
 
