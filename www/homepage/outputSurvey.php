@@ -35,7 +35,7 @@ if (is_array($allSurveys)) {
             'SURVEY_TITLE' => $currentSurvey['title'],
             'SURVEY_START_DATE' => date('jS M Y', strtotime($currentSurvey['start'])),
             'SURVEY_FINISH_DATE' => date('jS M Y', strtotime($currentSurvey['finish'])),
-            'SURVEY_DESCRIPTION' => $currentSurvey['description'],
+            'SURVEY_DESCRIPTION' => strip_tags(html_entity_decode($currentSurvey['description'])),
             'ON_OFF' => $i%2 ? 'dark' : '',
         ));
 

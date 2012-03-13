@@ -36,12 +36,16 @@ if (is_array($allAssess)) {
 			$this->setVar('assess_block', '');
 		}
 		else {
+
+			/* Note that Assess Descriptions can now contain html, so we decode them
+			 * and remove the html from the short description in homepage components
+			 */
 			$this->setVar(array(
 				'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
 				'ASSESS_TITLE' => $currentAssess['title'],
 				'ASSESS_START_DATE' => date('jS M Y', strtotime($currentAssess['start'])),
 				'ASSESS_FINISH_DATE' => date('jS M Y', strtotime($currentAssess['finish'])),
-				'ASSESS_DESCRIPTION' => $currentAssess['description'],
+				'ASSESS_DESCRIPTION' => strip_tags(html_entity_decode($currentAssess['description'])),
 				'ON_OFF' => $i++%2 ? 'dark' : '',
 			));
 
