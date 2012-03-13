@@ -2,10 +2,23 @@
 //link output
 $this->setBlock($componentHandle, 'link', 'link_block');
 $this->setBlock('link', 'modify_link', 'modify_link_block');
+$this->setBlock('link', 'show_posted_by', 'show_posted_by_block');
 
-require_once SITE_root.'/library/link.php';
-$linkHandler = new Link;
+$linkHandler = new Link();
 $linkList = $linkHandler->getAllInCategory($categoryID, $config);
+
+/* Tick for checkbox which controls whether to show the Posted By details
+ */
+if ($config['show_posted_by']) {
+	$this->setVar(array(
+		'COMPONENT_CONFIG_SHOW_POSTED_BY_SELECTED' => 'checked="checked"'
+	));
+}
+else {
+	$this->setVar(array(
+		'COMPONENT_CONFIG_SHOW_POSTED_BY_SELECTED' => ''
+	));
+}
 
 if (is_array($linkList)) {
 	$userHandler = new User();
@@ -39,17 +52,30 @@ if (is_array($linkList)) {
 
 		$this->setVar($output);
 
-		if ($permission < WRITE_ACCESS)
+		/* If the config option is set to show Posted By information
+		 */
+		if ($config['show_posted_by']) {
+			$this->parse('show_posted_by_block', 'show_posted_by');
+		}
+		else {
+			$this->setVar('show_posted_by_block', '');
+		}
+
+		/* Controls
+		 */
+		if ($permission < WRITE_ACCESS) {
 			$this->setVar('modify_link_block', '');
-		else
+		}
+		else {
 			$this->parse('modify_link_block', 'modify_link');
+		}
 
 		$this->parse("link_block", "link", true);
-
-
 	}
-} else
+}
+else {
 	$this->setVar("link_block", "");
+}
 
 /* Set up component name
  */
@@ -59,11 +85,11 @@ $this->setvar(array(
 
 //setup block for submission button
 $this->setBlock($componentHandle, "submit_link", "submit_link_block");
-if ($permission < WRITE_ACCESS)
+
+if ($permission < WRITE_ACCESS) {
 	$this->setVar("submit_link_block", "");
-else
+}
+else {
 	$this->parse("submit_link_block", "submit_link");
+}
 
-
-
-?>
