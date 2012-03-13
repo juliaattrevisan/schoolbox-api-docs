@@ -58,7 +58,7 @@ class Survey_Main extends Evaluation_Main {
                       WHERE category_id IN ($categoryIDList)
                       AND availability = 'survey'
                       AND deleted_at IS NULL
-                      ORDER BY finish";
+                      ORDER BY created_at DESC";
         }
         else {
             $query = "SELECT *
@@ -66,7 +66,7 @@ class Survey_Main extends Evaluation_Main {
                       WHERE category_id = '$category_id'
                       AND availability = 'survey'
                       AND deleted_at IS NULL
-                      ORDER BY finish";
+                      ORDER BY created_at DESC";
         }
 
 		if (is_numeric($limit)) {
