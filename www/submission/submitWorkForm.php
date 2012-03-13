@@ -8,6 +8,11 @@ if ( isset( $_FILES['file']['name'] ) && $_FILES['file']['name'] && is_numeric($
     $allowedFileHandler = new AllowedFile;
     $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 
+    $submitDir = Cfg::get('submission_dir') . "/";
+    if(!is_writable($submitDir)) {
+        error(9, "unable to upload file to submission box.<br />Please try again, and if the problem persists please contact your teacher or system administrator.");
+    }
+
     $studentSubmission = new SubmissionStudent;
     $submissionId = $studentSubmission->create($_POST['box_id'], $_FILES['file']);
 
@@ -24,7 +29,7 @@ if ( isset( $_FILES['file']['name'] ) && $_FILES['file']['name'] && is_numeric($
             $document->file = array(
                 'id' => $submissionId,
 				'name' => $_FILES['file']['name'],
-                'file' => Cfg::get('submission_dir') . "/$submissionId.dat"
+                'file' => $submitDir . "$submissionId.dat"
             );
 
             Plagscan_DocumentMapper::getInstance()->save($document);

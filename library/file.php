@@ -134,6 +134,12 @@ class File extends DeprecatedModel {
         require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 
         $allowedFileHandler = new AllowedFile();
+        $fileDir = Cfg::get('file_dir') . '/';
+
+        // if we can't write into the files directory, don't try to insert into database - throw error instead
+        if(!is_writable($fileDir)) {
+            error(9, "unable to upload the requested file.<br />Please try again, and if the problem persists please contact your system administrator.");
+        }
 
         $data['submitted'] = 'NOW()';
         $data['modified'] = 'NOW()';
@@ -143,10 +149,19 @@ class File extends DeprecatedModel {
             $data['realname'] = $file['name'];
             $data['mime_type'] = $allowedFileHandler->getMime($allowedFileHandler->getExtension($file['name']));
 
+            // if successfully registered file into database
             if ( $fileID = parent::create($data) ) {
-                $filename = Cfg::get('file_dir') . '/' . $fileID . '.dat';
+                // set the file to be copied
+                $filename = $fileDir . $fileID . '.dat';
+
+                // If the file destination already exists, delete it so we can upload the new file.
+                // Ignore any errors, file probably won't exist
                 @unlink($filename);
-                copy($file['tmp_name'], $filename);
+
+                // Since write permissions were already checked, problems should not occur here, but if they do, let someone know.
+                if(!copy($file['tmp_name'], $filename)) {
+                    error(9, "unable to upload the requested file.<br />Please contact your system administrator.");
+                }
             }
         }
         else {
@@ -162,6 +177,13 @@ class File extends DeprecatedModel {
     function update ($data, $file = '') {
         $allowedFileHandler = new AllowedFile();
 
+        $fileDir = Cfg::get('file_dir') . '/';
+
+        // if we can't write into the files directory, don't try to insert into database - throw error instead
+        if(!is_writable($fileDir)) {
+            error(9, "unable to upload the requested file.<br />Please try again, and if the problem persists please contact your system administrator.");
+        }
+
         $data['modified'] = 'NOW()';
 
         /* If new file is being sent update its meta details and copy it into place */
@@ -172,9 +194,12 @@ class File extends DeprecatedModel {
 
             parent::update($data);
 
-            $filename = Cfg::get('file_dir') . '/' . $data['id'] . '.dat';
+            $filename = $fileDir . $data['id'] . '.dat';
             @unlink($filename);
-            copy($file['tmp_name'], $filename);
+
+            if(!copy($file['tmp_name'], $filename)) {
+                error(9, "unable to upload the requested file.<br />Please contact your system administrator.");
+            }
         }
         else {
             parent::update($data);

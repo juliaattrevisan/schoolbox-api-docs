@@ -51,6 +51,12 @@ if(is_numeric($_GET['id']))
 		}
 
 		$file = Cfg::get('submission_dir') . '/' . $studentSub['id'] . '.dat';
+
+        // does this file exist, and is it readable?
+        if(!is_readable($file)) {
+            error(9, "the requested file could not be read.<br />Please try again, and if the problem persists contact your system administrator.");
+        }
+
 		$filename = $studentSub['lastname']."-".$studentSub['realname'];
 	}
 
