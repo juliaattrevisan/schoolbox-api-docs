@@ -96,20 +96,19 @@ abstract class Evaluation_Main extends DeprecatedModel {
 	 * @return array|bool
 	 */
     public function getIntroSummary($assess_id) {
-        $query = "SELECT
-                     assess_section.section_id,
-                     assess_section.title,
-                     assess_section.sequence,
-                     assess_section.pool,
-                     COUNT(assess_section.section_id) AS numQuestions
-                  FROM assess_section
-                  LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
-                  WHERE assess_section.assess_id = '$assess_id'
-                  AND assess_section.deleted_at IS NULL
-				  AND assess_question.deleted_at IS NULL
-                  GROUP BY assess_section.section_id
-                  ORDER BY assess_section.sequence";
-
+		$query = "
+			SELECT
+				assess_section.section_id,
+				assess_section.title,
+				assess_section.sequence,
+				assess_section.pool,
+				SUM(IF (assess_question.deleted_at IS NULL AND assess_question.question_id IS NOT NULL, 1, 0)) AS numQuestions
+			FROM assess_section
+			LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
+			WHERE assess_section.assess_id = '$assess_id'
+			AND assess_section.deleted_at IS NULL
+			GROUP BY assess_section.section_id
+		";
 
         return $this->db->getAll($query);
     }
@@ -126,27 +125,13 @@ abstract class Evaluation_Main extends DeprecatedModel {
 
         $sectionTitle = $allQuestions[0]['title'];
 
-        for ($i=0, $numQuestions=0; $i < count($allQuestions); $i++) {
+        for ($i=0, $questionNumber=0; $i < count($allQuestions); $i++) {
             $currentQuestion = $allQuestions[$i];
-
-			/* If section contains a deleted question, $allQuestions query is
-			 * empty. So we actually need to include the deleted questions to
-			 * get all the sections contained deleted questions.
-			 *
-			 * This if() checks whether the question is deleted, and if it has
-			 * just continue with everyone else
-			 */
-			if (!empty($currentQuestion['questionDeletedAt'])) {
-				continue;
-			}
-
-            if (is_numeric($currentQuestion['question_id'])) {
-                $numQuestions++;
-            }
 
             /* Parse out the previous Section's info if we're entering a new Section
              */
             if ($currentQuestion['title'] != $sectionTitle) {
+				$questionNumber = 1;
                 $page->setVar(array(
                     'SECTION_TITLE' => $allQuestions[$i-1]['title'],
                     'SECTION_SEQUENCE' => $allQuestions[$i-1]['sectionSequence'],
@@ -159,18 +144,25 @@ abstract class Evaluation_Main extends DeprecatedModel {
                 $sectionTitle = $currentQuestion['title'];
             }
 
+			/* If section contains a deleted question, $allQuestions query is
+			 * empty. So we actually need to include the deleted questions to
+			 * get all the sections contained deleted questions.
+			 */
+
             /* Put the current Question into a new Section and parse it out. If
              * it's empty, just hide it
              */
-            if (is_numeric($currentQuestion['question_id'])) {
+            if (empty($currentQuestion['questionDeletedAt']) && is_numeric($currentQuestion['question_id'])) {
                 $page->setVar(array(
-                    'QUESTION_SEQUENCE' => $currentQuestion['questionSequence'],
+                    'QUESTION_SEQUENCE' => $questionNumber,
                     'QUESTION_QUESTION' => $currentQuestion['question'],
                     'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
                     'QUESTION_MARKS' => floor($currentQuestion['marks']) < $currentQuestion['marks'] ? $currentQuestion['marks'] : floor($currentQuestion['marks']),
                 ));
 
                 $page->parse('question_block', 'question', true);
+
+				$questionNumber++;
             }
             else {
                 $page->setVar('question_block', '', true);
@@ -178,13 +170,7 @@ abstract class Evaluation_Main extends DeprecatedModel {
         }
 
         /* Finally, parse out this Section's info
-         *
-         * Don't render question template for empty sections
          */
-        if (!$numQuestions) {
-            $page->setVar('question_block', '');
-        }
-
         if (is_numeric($currentQuestion['section_id'])) {
             $page->setVar(array(
                 'SECTION_TITLE' => $currentQuestion['title'],
