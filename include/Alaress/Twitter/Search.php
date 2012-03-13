@@ -4,7 +4,13 @@
  *
  * Wraps up the Twitter Search API which is a get-only request, unlike
  * the rest of the Alaress_Twitter module which would be capable of full
- * REST operations
+ * REST operations.
+ *
+ * Notes from https://dev.twitter.com/docs/using-search:
+ * The Search API is not complete index of all Tweets, but instead an index
+ * of recent Tweets. At the moment that index includes between 6-9 days of Tweets.
+ *
+ * You cannot use the Search API to find Tweets older than about a week.
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
