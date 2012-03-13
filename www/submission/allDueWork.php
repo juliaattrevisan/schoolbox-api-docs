@@ -180,12 +180,14 @@ if ($allAssessments) {
 			$allAttempts = $attemptHandler->getListForUser($currentAssessment['assess_id'], $_SESSION['id']);
 		}
 		else {
-        	$allAttempts = $attemptHandler->getLatestForUser($currentAssessment['assess_id'], $_SESSION['id']);
+        	$allAttempts = array($attemptHandler->getLatestForUser($currentAssessment['assess_id'], $_SESSION['id']));
 		}
 
         $firstSection = $sectionHandler->getFirst($currentAssessment['assess_id']);
 
-        if (!$allAttempts) {
+		/* Iterate
+		 */
+        if (!is_array($allAttempts[0])) {
             $this->setVar(array(
                 'ASSESS_CATEGORY' => $categoryLookup[$currentAssessment['category_id']],
                 'ASSESS_ASSESS_ID' => $currentAssessment['assess_id'],
@@ -206,6 +208,7 @@ if ($allAssessments) {
         else {
 			if (is_array($allAttempts) && count($allAttempts)) {
 				foreach($allAttempts as $currentAttempt) {
+
 					/* Finish time
 					 */
 					if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
@@ -248,7 +251,7 @@ if ($allAssessments) {
 						'ASSESS_CATEGORY' => $categoryLookup[$currentAssessment['category_id']],
 						'ASSESS_ASSESS_ID' => $currentAssessment['assess_id'],
 						'ASSESS_TITLE' => Scrub::Text($currentAssessment['title']),
-						'ASSESS_FINISH' => date('jS F Y, g:i:sa', strtotime($currentAttempt['finish'])),
+						'ASSESS_FINISH' => $finish,
 						'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
 						'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
 						'ATTEMPT_TOTAL_MARKS' => number_format($marks, 2),
