@@ -86,6 +86,8 @@ else {
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
     $this->setTitle('Create Question');
 
+	$this->setVar('question_block', '');
+
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],
         'SECTION_ID' => $this->arg[0],

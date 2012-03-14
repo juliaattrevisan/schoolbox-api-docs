@@ -122,7 +122,7 @@ abstract class Evaluation_Main extends DeprecatedModel {
 	 */
     public function renderAssessContents($assess_id, $page) {
         $allQuestions = $this->getContents($assess_id);
-//print_r($allQuestions);
+
         $currentSection = $allQuestions[0]['section_id'];
 
         for ($i=0, $questionNumber=1; $i < count($allQuestions); $i++) {
@@ -131,7 +131,7 @@ abstract class Evaluation_Main extends DeprecatedModel {
             /* Parse out the previous Section's info if we're entering a new Section
              */
             if ($currentQuestion['section_id'] != $currentSection) {
-//print_r($currentQuestion);
+
 				$questionNumber = 1;
                 $page->setVar(array(
                     'SECTION_TITLE' => $allQuestions[$i-1]['title'],
@@ -189,8 +189,6 @@ abstract class Evaluation_Main extends DeprecatedModel {
      * Gets a list of Questions that exist in a particular Assess. This is used
      * on the create question screens as a table of contents.
      *
-     * TODO: Sections disappear when their questions are all deleted?
-	 *
 	 * @param  $assess_id
 	 * @return array|bool
 	 */

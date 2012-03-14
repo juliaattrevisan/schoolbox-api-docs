@@ -72,6 +72,8 @@ else {
     $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
     $this->setTitle('Manage Assessment');
 
+	$this->setVar('question_block', '');
+	
     $assess = $assessHandler->getByID($this->arg[0]);
 
     if (!$assess) {
