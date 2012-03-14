@@ -58,7 +58,7 @@ $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $this->arg[0],
     'ASSESS_TITLE' => $assess['title'],
-    'ASSESS_DESCRIPTION' => $assess['description'],
+    'ASSESS_DESCRIPTION' => html_entity_decode($assess['description']),
     'ASSESS_START' => $assessStartDate->getShort(),
     'ASSESS_FINISH' => $assessFinishDate->getShort(),
     'FIRST_SECTION' => $allSections[0]['section_id'],
