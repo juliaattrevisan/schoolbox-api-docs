@@ -1,16 +1,28 @@
 <script type="text/javascript">
 $j(function() {
-	$j('tbody tr:even').addClass('row-switcher');
+
+    /*
+    * Add the dark class only to even rows that are visible (skip over the hidden ones)
+    * */
+	$j('tbody tr:visible:even').addClass('dark');
+
+    /*
+    * Add another, darker class to th
+    *
+    * */
+    $j('tbody tr:hidden').addClass('row-switcher');
 
 	$j('tr.attempt').click(function() {
 
 		/* Get matching children classes
 		 */
-		var matchingClasses = $j(this).attr('class').toString().match(/user_(\d+)/);
+		var matchingClasses = $j(this)
+                .attr('class')
+                .toString()
+                .match(/user_(\d+)/),
+        expandables = '.' + matchingClasses[0] + '.expandable';
 
-		var expandables = '.' + matchingClasses[0] + '.expandable';
-
-		$j(this).parent().find(expandables).toggle();
+		$j(this).parent().find(expandables).fadeToggle();
 	});
 });
 </script>

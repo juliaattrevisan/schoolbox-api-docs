@@ -3324,7 +3324,7 @@ ul.section-options a.drop-arrow {
 	background: #EDEDED
 }
 
-.evluation-legend {
+.evaluation-legend {
 }
 
 .evaluation-legend ul li a {
@@ -3347,6 +3347,8 @@ ul.section-options a.drop-arrow {
 .evaluation-legend ul li span {
 	font-weight: normal;
 }
+
+
 
 /*Graphs*/
 .evaluation-graph-holder .graph {
