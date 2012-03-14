@@ -3347,8 +3347,25 @@ ul.section-options a.drop-arrow {
 .evaluation-legend ul li span {
 	font-weight: normal;
 }
+.drop-parent td:first-child{padding-left:32px;
+position:relative;}
+.submission-dropdown{
+    position:absolute;
+    left:5px;
+    top:5px;
+    height:17px; width:17px;
+    background:#909090;
+    color:#fff;
+    text-align:center;
+
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
 
 
+    -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
+
+}
 
 /*Graphs*/
 .evaluation-graph-holder .graph {
