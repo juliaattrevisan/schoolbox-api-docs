@@ -16,13 +16,10 @@ $j(function() {
 
 		/* Get matching children classes
 		 */
-		var matchingClasses = $j(this)
-                .attr('class')
-                .toString()
-                .match(/user_(\d+)/),
-        expandables = '.' + matchingClasses[0] + '.expandable';
+		var matchingClasses = $j(this).attr('class').toString().match(/user_(\d+)/);
+        var expandables = '.' + matchingClasses[0] + '.expandable';
 
-		$j(this).parent().find(expandables).fadeToggle();
+		$j(this).parent().find(expandables).stop().fadeToggle();
 	});
 });
 </script>

@@ -226,7 +226,8 @@ if (is_array($allStudents) && count($allStudents)) {
 				'ATTEMPT_UNMARKED_RESPONSES' => '',
 				'ATTEMPT_REVIEW_LINK' => '',
 				'ATTEMPT_DELETE_LINK' => '',
-				'ATTEMPT_HIDDEN' => ''
+				'ATTEMPT_EXPANDABLE' => '',
+				'ATTEMPT_HIDDEN' => '',
 			));
 
 			$this->parse('attempt_block', 'attempt', true);
