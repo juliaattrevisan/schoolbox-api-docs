@@ -3348,22 +3348,26 @@ ul.section-options a.drop-arrow {
 	font-weight: normal;
 }
 .drop-parent td:first-child{
-position:relative; text-align:center; padding:2px 0 0 12px}
+    position:relative;
+    text-align:center;
+    padding:2px 0 0 12px
+}
+
 .submission-dropdown{
     display:block;
     height:17px; width:17px;
     background:#909090;
     color:#fff;
     text-align:center;
-
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
-
-
-    -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
-
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
 }
+
+.sub-table-row td{ background:#ededed; }
 
 /*Graphs*/
 .evaluation-graph-holder .graph {
