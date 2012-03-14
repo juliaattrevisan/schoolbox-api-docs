@@ -27,9 +27,11 @@ require_once('../library/user.php');
  * @param  $currentAttempt
  * @param  $page
  * @param  $currentStudent
+ * @param $previousAttempt
+ *
  * @return void
  */
-function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $page, $currentStudent) {
+function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $page, $currentStudent, $previousAttempt) {
 	$firstSection = $sectionHandler->getFirst($page->arg[0]);
 
 	/* Finish time. Show the datetime when the person clicked Finish.
@@ -100,6 +102,21 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 		'ATTEMPT_DELETE_LINK' => "<a href=\"/assess/deleteAttempt/{$currentAttempt['attempt_id']}\">Delete</a>",
 	));
 
+	/* Expandable attempts
+	 */
+	if ($previousAttempt == null) {
+		$page->setVar(array(
+			'ATTEMPT_EXPANDABLE' => '',
+			'ATTEMPT_HIDDEN' => ''
+		));
+	}
+	else {
+		$page->setVar(array(
+			'ATTEMPT_EXPANDABLE' => 'expandable',
+			'ATTEMPT_HIDDEN' => 'hide'
+		));
+	}
+
 	$page->parse('attempt_block', 'attempt', true);
 }
 
@@ -163,9 +180,13 @@ else {
 $allAttempts = $attemptHandler->getList($this->arg[0]);
 
 if (is_array($allStudents) && count($allStudents)) {
-	foreach($allStudents as $currentStudent) {
 
-		/* Process attempts for this student
+	/* Process each student
+	 */
+	foreach($allStudents as $currentStudent) {
+		$previousAttempt = null;
+
+		/* Process all attempts for this student
 		 */
 		if ($allAttempts && count($allAttempts)) {
 			for ($numAttempts = 0, $i = 0; $i < count($allAttempts); $i++) {
@@ -175,11 +196,13 @@ if (is_array($allStudents) && count($allStudents)) {
 				 */
 				if ($currentAttempt['user_id'] == $currentStudent['uid'] || $currentAttempt['synergy_id'] == $currentStudent['synergy_id']) {
 					if ($allAttempts[$i]['processed'] != true) {
-						processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this, $currentStudent);
+						processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this, $currentStudent, $previousAttempt);
 
 						$allAttempts[$i]['processed'] = true;
 
 						$numAttempts++;
+
+						$previousAttempt = $currentAttempt;
 					}
 				}
 			}
@@ -203,6 +226,7 @@ if (is_array($allStudents) && count($allStudents)) {
 				'ATTEMPT_UNMARKED_RESPONSES' => '',
 				'ATTEMPT_REVIEW_LINK' => '',
 				'ATTEMPT_DELETE_LINK' => '',
+				'ATTEMPT_HIDDEN' => ''
 			));
 
 			$this->parse('attempt_block', 'attempt', true);
@@ -218,10 +242,13 @@ else {
 /* Deal with remainder attempts
  */
 if ($allAttempts && count($allAttempts)) {
+	$previousAttempt = null;
 
 	foreach($allAttempts as $currentAttempt) {
 		if ($currentAttempt['processed'] != true) {
-			processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this, $userHandler->getByID($currentAttempt['user_id']));
+			processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this, $userHandler->getByID($currentAttempt['user_id']), $previousAttempt);
+
+			$previousAttempt = $currentAttempt;
 		}
 	}
 }

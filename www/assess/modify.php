@@ -73,7 +73,7 @@ else {
     $this->setTitle('Manage Assessment');
 
 	$this->setVar('question_block', '');
-	
+
     $assess = $assessHandler->getByID($this->arg[0]);
 
     if (!$assess) {

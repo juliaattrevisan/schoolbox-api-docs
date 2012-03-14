@@ -1,17 +1,24 @@
 <script type="text/javascript">
 $j(function() {
-	
 	$j('tbody tr:even').addClass('row-switcher');
-		
-	
-});
 
+	$j('tr.attempt').click(function() {
+
+		/* Get matching children classes
+		 */
+		var matchingClasses = $j(this).attr('class').toString().match(/user_(\d+)/);
+
+		var expandables = '.' + matchingClasses[0] + '.expandable';
+
+		$j(this).parent().find(expandables).toggle();
+	});
+});
 </script>
 <div id="assess">
 	<h1>Submissions for {ASSESS_TITLE}</h1>
 	<span class="header_option">
     <a href="/assess/exportResponseToCSV/{ASSESS_ASSESS_ID}" class="btn download"><span></span>Download All</a>
-        <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="btn modify"><span></span>Modify</a>
+    <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="btn modify"><span></span>Modify</a>
 </span>
 	<table>
 		<thead>
@@ -29,7 +36,7 @@ $j(function() {
 		</thead>
 		<tbody>
 			<!-- BEGIN attempt -->
-			<tr>
+			<tr class='attempt user_{USER_ID} {ATTEMPT_EXPANDABLE} {ATTEMPT_HIDDEN}'>
 				<td><a href="/search/user/{USER_ID}">{ATTEMPT_NAME}</a></td>
 				<td>{ATTEMPT_FINISH}</td>
 				<td>{ATTEMPT_TIME_TAKEN}</td>
