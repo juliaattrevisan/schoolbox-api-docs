@@ -3347,12 +3347,10 @@ ul.section-options a.drop-arrow {
 .evaluation-legend ul li span {
 	font-weight: normal;
 }
-.drop-parent td:first-child{padding-left:32px;
-position:relative;}
+.drop-parent td:first-child{
+position:relative; text-align:center; padding:2px 0 0 12px}
 .submission-dropdown{
-    position:absolute;
-    left:5px;
-    top:5px;
+    display:block;
     height:17px; width:17px;
     background:#909090;
     color:#fff;
