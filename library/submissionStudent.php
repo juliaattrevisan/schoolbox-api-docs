@@ -20,7 +20,7 @@ class SubmissionStudent extends DeprecatedModel {
         $query = "SELECT
                       student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid, username,
                       local_email, alt_email, DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date,
-                      DATE_FORMAT(submitted, '%Y-%m-%d %H:%i') as datestamp, DATlate, marked, user.synergy_id as synergy_id,
+                      DATE_FORMAT(submitted, '%Y-%m-%d %H:%i') as datestamp, late, marked, user.synergy_id as synergy_id,
                       pd.score
                   FROM
                       (student_submission, user)
