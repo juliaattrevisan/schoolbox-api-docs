@@ -24,14 +24,17 @@ $j(function() {
 
         if (currentUnicode == '9660') {
             $j(this).html('&#9650;')
-        } else {
+        }
+		else {
             $j(this).html('&#9660;')
         }
 
         var matchingClasses = $j(this).parents('tr').attr('class').toString().match(/user_(\d+)/);
         var expandables = '.' + matchingClasses[0] + '.expandable';
 
-        $j(this).parents('tbody').find(expandables).stop().fadeToggle();
+		/* Clear queue and complete animation
+		 */
+        $j(this).parents('tbody').find(expandables).stop(true, true).fadeToggle();
 
         return false;
     });
