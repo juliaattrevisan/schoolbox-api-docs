@@ -6,12 +6,14 @@
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript">
 $j(function() {
+
 	$j('#startDate, #finishDate').datepicker({
 		dateFormat: 'dd/mm/yy',
 		showOn: 'both',
 		buttonImage: '/images/core/calendar/calendar-click.png',
 		buttonImageOnly: true,
 		constrainInput: false,
+		minDate: new Date(),
 		onClose: function (string) {
 			var input = $j(this);
 
