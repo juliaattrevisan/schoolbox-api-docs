@@ -435,44 +435,52 @@ class Leave_Controller extends Controller {
      * @return void
      */
 	public function renderModifyRequest($data) {
-		$request = $data['request'];
-		$user = $request->getUser();
-		$house = $this->getHouseMapper()->findById($user->getHouse());
 
-		$this->getPage()->setFile(TEMPLATE_content, 'modules/leave/modifyRequest.html');
+		/* Only allow Teachers/Staff to modify requests
+		 */
+		if ($this->getGroup()->isStaff() || $this->getGroup()->isSuperuser()) {
+			$request = $data['request'];
+			$user = $request->getUser();
+			$house = $this->getHouseMapper()->findById($user->getHouse());
 
-		$this->getPage()->setVar(array(
-			'REQUEST_ID' => $request->getId(),
-			'REQUEST_STATUS' => $request->getStatus(true),
-			'USER_NAME' => $user->getName(),
-			'USER_EXTERNAL_ID' => $user->getSynergyId(),
-			'USER_YEAR' => $user->getYear(),
-			'USER_HOUSE' => $house->getHouse(),
-			'REQUEST_START_DATE' => $request->getStart(true)->getLocalShort(),
-			'REQUEST_START_HOUR' => $request->getStart(true)->getUsingFormat('h'),
-			'REQUEST_START_MINUTE' => $request->getStart(true)->getUsingFormat('i'),
-			'REQUEST_FINISH_DATE' => $request->getFinish(true)->getLocalShort(),
-			'REQUEST_FINISH_HOUR' => $request->getFinish(true)->getUsingFormat('h'),
-			'REQUEST_FINISH_MINUTE' => $request->getFinish(true)->getUsingFormat('i'),
-			'REQUEST_HOST_NAME' => $request->getHostName(),
-			'REQUEST_HOST_PHONE' => $request->getHostPhone(),
-			'REQUEST_USER_PHONE' => $request->getUserPhone(),
-			'REQUEST_DESCRIPTION' => $request->getDescription(),
-			'REQUEST_NOTES' => $request->getNotes(),
-		));
+			$this->getPage()->setFile(TEMPLATE_content, 'modules/leave/modifyRequest.html');
 
-		if ($request->getStart(true)->getUsingFormat('a') == 'am') {
-			$this->getPage()->setVar('REQUEST_START_MERIDIAN_AM', 'selected="selected"');
+			$this->getPage()->setVar(array(
+				'REQUEST_ID' => $request->getId(),
+				'REQUEST_STATUS' => $request->getStatus(true),
+				'USER_NAME' => $user->getName(),
+				'USER_EXTERNAL_ID' => $user->getSynergyId(),
+				'USER_YEAR' => $user->getYear(),
+				'USER_HOUSE' => $house->getHouse(),
+				'REQUEST_START_DATE' => $request->getStart(true)->getLocalShort(),
+				'REQUEST_START_HOUR' => $request->getStart(true)->getUsingFormat('h'),
+				'REQUEST_START_MINUTE' => $request->getStart(true)->getUsingFormat('i'),
+				'REQUEST_FINISH_DATE' => $request->getFinish(true)->getLocalShort(),
+				'REQUEST_FINISH_HOUR' => $request->getFinish(true)->getUsingFormat('h'),
+				'REQUEST_FINISH_MINUTE' => $request->getFinish(true)->getUsingFormat('i'),
+				'REQUEST_HOST_NAME' => $request->getHostName(),
+				'REQUEST_HOST_PHONE' => $request->getHostPhone(),
+				'REQUEST_USER_PHONE' => $request->getUserPhone(),
+				'REQUEST_DESCRIPTION' => $request->getDescription(),
+				'REQUEST_NOTES' => $request->getNotes(),
+			));
+
+			if ($request->getStart(true)->getUsingFormat('a') == 'am') {
+				$this->getPage()->setVar('REQUEST_START_MERIDIAN_AM', 'selected="selected"');
+			}
+			else {
+				$this->getPage()->setVar('REQUEST_START_MERIDIAN_PM', 'selected="selected"');
+			}
+
+			if ($request->getFinish(true)->getUsingFormat('a') == 'am') {
+				$this->getPage()->setVar('REQUEST_FINISH_MERIDIAN_AM', 'selected="selected"');
+			}
+			else {
+				$this->getPage()->setVar('REQUEST_FINISH_MERIDIAN_PM', 'selected="selected"');
+			}
 		}
 		else {
-			$this->getPage()->setVar('REQUEST_START_MERIDIAN_PM', 'selected="selected"');
-		}
-
-		if ($request->getFinish(true)->getUsingFormat('a') == 'am') {
-			$this->getPage()->setVar('REQUEST_FINISH_MERIDIAN_AM', 'selected="selected"');
-		}
-		else {
-			$this->getPage()->setVar('REQUEST_FINISH_MERIDIAN_PM', 'selected="selected"');
+			error(19);
 		}
 	}
 
