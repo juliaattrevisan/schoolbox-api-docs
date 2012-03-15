@@ -125,7 +125,7 @@ class Leave_Controller extends Controller {
 
 		$this->sendParentNotice($request);
 
-		$this->getPage()->backToTheFuture(-1);
+		SitePage::localRedir("/modules/leave/student/{$request->getUserId()}");
 	}
 
 	/**
@@ -267,6 +267,12 @@ class Leave_Controller extends Controller {
 		$this->getPage()->setBlock('pending_request_list', 'pending_request', 'pending_request_block');
 		$this->getPage()->setBlock('previous_request_list', 'previous_request', 'previous_request_block');
 
+		/* Checkbox
+		 */
+		$this->getPage()->setBlock('pending_request_list', 'approval_header', 'approval_header_block');
+		$this->getPage()->setBlock('pending_request_list', 'approval_submit', 'approval_submit_block');
+		$this->getPage()->setBlock('pending_request', 'approval_control', 'approval_control_block');
+
 		$this->getPage()->setVar(array(
 			'USER_ID' => $user->getId(),
 			'USER_NAME' => $user->getName(),
@@ -274,6 +280,21 @@ class Leave_Controller extends Controller {
 			'HOUSE_ID' => $house->getId()
 		));
 
+		/* Ability to render various controls
+		 */
+		$canApproveRequests = ($this->getGroup()->isStaff() || $this->getGroup()->isSuperuser());
+
+		if ($canApproveRequests) {
+			$this->getPage()->parse('approval_header_block', 'approval_header');
+			$this->getPage()->parse('approval_submit_block', 'approval_submit');
+		}
+		else {
+			$this->getPage()->setVar('approval_header_block', '');
+			$this->getPage()->setVar('approval_submit_block', '');
+		}
+
+		/* Render each request
+		 */
 		if (count($requestList)) {
 			$this->getPage()->setVar('no_requests_block', '');
 
@@ -299,6 +320,15 @@ class Leave_Controller extends Controller {
 					$this->getPage()->parse('pending_request_block', 'pending_request', true);
 
 					$pendingRequestCount++;
+
+					/* Render control for pending requests
+					 */
+					if ($canApproveRequests) {
+						$this->getPage()->parse('approval_control_block', 'approval_control');
+					}
+					else {
+						$this->getPage()->setVar('approval_control_block', '');
+					}
 				}
 				else {
 					$this->getPage()->setVar(array(
@@ -344,38 +374,46 @@ class Leave_Controller extends Controller {
      * @return void
      */
 	public function processModifyRequestList($data) {
-		$user = $data['user'];
-		$requestList = $data['requestList'];
 
-		if (!empty($requestList)) {
-			foreach ($requestList as $request) {
-				$request = $this->getRequestMapper()->findById($request['id']);
+		/* Only allow Teachers/Staff to approve/reject requests
+		 */
+		if ($this->getGroup()->isStaff() || $this->getGroup()->isSuperuser()) {
+			$user = $data['user'];
+			$requestList = $data['requestList'];
 
-				if (isset($data['approve']) || isset($data['reject'])) {
-					$authorisationDatetime = new Alaress_Date_Format(time(), 'U');
+			if (!empty($requestList)) {
+				foreach ($requestList as $request) {
+					$request = $this->getRequestMapper()->findById($request['id']);
 
-					$request->setAuthorisationDatetime($authorisationDatetime->getDatabase());
-					$request->setAuthorisationUserId($_SESSION['id']);
+					if (isset($data['approve']) || isset($data['reject'])) {
+						$authorisationDatetime = new Alaress_Date_Format(time(), 'U');
 
-					if (isset($data['approve'])) {
-						$request->setStatus(Leave_Request::STATUS_APPROVED);
+						$request->setAuthorisationDatetime($authorisationDatetime->getDatabase());
+						$request->setAuthorisationUserId($_SESSION['id']);
+
+						if (isset($data['approve'])) {
+							$request->setStatus(Leave_Request::STATUS_APPROVED);
+						}
+						elseif (isset($data['reject'])) {
+							$request->setStatus(Leave_Request::STATUS_REJECTED);
+						}
 					}
-					elseif (isset($data['reject'])) {
-						$request->setStatus(Leave_Request::STATUS_REJECTED);
+
+					$this->getRequestMapper()->save($request);
+
+					if (isset($data['approve']) || isset($data['reject'])) {
+						$request = $this->getRequestMapper()->findById($request->getId());
+
+						$this->sendUserNotice($request);
 					}
-				}
-
-				$this->getRequestMapper()->save($request);
-
-				if (isset($data['approve']) || isset($data['reject'])) {
-					$request = $this->getRequestMapper()->findById($request->getId());
-
-					$this->sendUserNotice($request);
 				}
 			}
-		}
 
-		$this->getPage()->localRedir("/modules/leave/student/{$user['id']}");
+			$this->getPage()->localRedir("/modules/leave/student/{$user['id']}");
+		}
+		else {
+			error(19);
+		}
 	}
 
     /**
