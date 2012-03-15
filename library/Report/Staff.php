@@ -15,6 +15,7 @@ class Report_Staff extends Report_Abstract {
 	 * @param $page
 	 */
 	public function __construct($page) {
+        $this->setPermissions();
 		$this->setGroupHandler(new Group());
 
 		if (!$this->checkPermissions()) {
@@ -30,19 +31,6 @@ class Report_Staff extends Report_Abstract {
 
 			$this->setAllRecords($this->getExternalUserHandler()->getStaffContactListExtended());
 		}
-	}
-
-	/**
-	 * Check permissions. Only staff and superusers can view this page
-	 *
-	 * @return bool
-	 */
-	protected function checkPermissions() {
-		if ($this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff() || $this->getGroupHandler()->isParent()) {
-			return true;
-		}
-
-		return false;
 	}
 
 	/**

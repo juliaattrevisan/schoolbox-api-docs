@@ -12,7 +12,9 @@ abstract class Report_Abstract {
 	protected $yearLevel = null;
 	protected $groupHandler = null;
 	protected $externalUserHandler = null;
+    protected $userHandler = null;
 	protected $allRecords = array();
+    protected $permissionsHandler = null;
 
 	/**
 	 * Set up blocks and stuff
@@ -26,13 +28,13 @@ abstract class Report_Abstract {
 	 *
 	 * @return bool
 	 */
-	protected function checkPermissions() {
-		if ($this->getGroupHandler()->isParent() || $this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff()) {
-			return true;
-		}
-
-		return false;
-	}
+	protected final function checkPermissions() {
+        // if there was no permissions explicitly defined, fallback to default
+        if($this->permissionsHandler == null) {
+            $this->setPermissions();
+	    }
+        return $this->permissionsHandler->checkPermissions($this);
+    }
 
 	/**
 	 * Render dat
@@ -55,7 +57,7 @@ abstract class Report_Abstract {
 	 *
 	 * @return mixed
 	 */
-	protected function getYearLevel() {
+	public function getYearLevel() {
 		return $this->yearLevel;
 	}
 
@@ -71,9 +73,9 @@ abstract class Report_Abstract {
 	/**
 	 * Get group handler
 	 *
-	 * @return null
+	 * @return Group
 	 */
-	protected function getGroupHandler() {
+	public function getGroupHandler() {
 		return $this->groupHandler;
 	}
 
@@ -86,10 +88,24 @@ abstract class Report_Abstract {
 		$this->externalUserHandler = $externalUserHandler;
 	}
 
+    /**
+     * @param $userHandler
+     */
+    protected function setUserHandler($userHandler) {
+        $this->userHandler = $userHandler;
+    }
+
+    /**
+     * @return User
+     */
+    protected function getUserHandler() {
+        return $this->userHandler;
+    }
+
 	/**
 	 * Get external user handler
 	 *
-	 * @return null
+	 * @return External_User
 	 */
 	protected function getExternalUserHandler() {
 		return $this->externalUserHandler;
@@ -107,7 +123,7 @@ abstract class Report_Abstract {
 	/**
 	 * Get page
 	 *
-	 * @return null
+	 * @return SitePage
 	 */
 	protected function getPage() {
 		return $this->page;
@@ -130,4 +146,12 @@ abstract class Report_Abstract {
 	protected function getAllRecords() {
 		return $this->allRecords;
 	}
+
+    /**
+     * Sets the permission handler to the site we're currently on, unless overridden
+     * @param string $site_location
+     */
+    protected function setPermissions($site_location = '') {
+        $this->permissionsHandler = Report_Permissions_Factory::build($site_location);
+    }
 }

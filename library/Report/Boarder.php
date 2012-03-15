@@ -15,6 +15,7 @@ class Report_Boarder extends Report_Parent {
 	 * @param $page
 	 */
 	public function __construct($page) {
+        $this->setPermissions();
 		$this->setGroupHandler(new Group());
 
 		if (!$this->checkPermissions()) {
@@ -48,19 +49,6 @@ class Report_Boarder extends Report_Parent {
 			'contact_block' => '',
 		));
 	}
-
-    /**
-     * Check permissions. By default only parents and superusers can view this page
-     *
-     * @return bool
-     */
-    protected function checkPermissions() {
-        if ($this->getGroupHandler()->isParent() || $this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff()) {
-            return true;
-        }
-
-        return false;
-    }
 }
 
 
