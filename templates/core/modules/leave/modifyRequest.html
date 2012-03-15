@@ -18,6 +18,16 @@
                 })
             }
         });
+
+		$j('#requesthostType').change(function(){
+			if(($j(this).val() == '4') && $j('#hostDetails').is(':visible')){
+				$j('#hostDetails').slideUp();
+				$j('#hostDetails input').removeClass('required');
+			} else {
+				$j('#hostDetails').slideDown();
+				$j('#hostDetails input').addClass('required');
+			}
+		});
     });
 </script>
 <!-- END custom_head -->
@@ -101,10 +111,13 @@
                 <em></em>
             </td>
             <td>
-                <select name="request[hostType]">
-                    <option value="1">Parent</option>
-                    <option value="2">Peer Parent</option>
-                </select>
+				<select name="request[hostType]" id="requesthostType">
+					<option value="1">Mother</option>
+					<option value="2">Father</option>
+					<option value="3">Guardian</option>
+					<option value="4">Self</option>
+					<option value="5">Other</option>
+				</select>
             </td>
             <td class="formLabelWidth">
                 <h4>Student Phone</h4>
@@ -114,22 +127,22 @@
                 <input type="text" name="request[userPhone]" size="16" value="{REQUEST_USER_PHONE}" />
             </td>
         </tr>
-        <tr>
-            <td class="formLabelWidth">
-                <h4>Host Name</h4>
-                <em></em>
-            </td>
-            <td>
-                <input type="text" name="request[hostName]" size="24" value="{REQUEST_HOST_NAME}" />
-            </td>
-            <td class="formLabelWidth">
-                <h4>Host Phone</h4>
-                <em></em>
-            </td>
-            <td>
-                <input type="text" name="request[hostPhone]" size="16" value="{REQUEST_HOST_PHONE}" />
-            </td>
-        </tr>
+		<tr id="hostDetails">
+			<td class="formLabelWidth">
+				<h4>Host Name</h4>
+				<em></em>
+			</td>
+			<td>
+				<input type="text" name="request[hostName]" size="24" class="required"/>
+			</td>
+			<td class="formLabelWidth">
+				<h4>Host Phone</h4>
+				<em></em>
+			</td>
+			<td>
+				<input type="text" name="request[hostPhone]" size="16" class="required"/>
+			</td>
+		</tr>
         <tr>
             <td class="formLabelWidth">
                 <h4>Description</h4>
