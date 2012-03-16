@@ -86,13 +86,11 @@ $j(function() {
                 <em></em>
             </td>
             <td>
-                <input name="request[start][hour]" type="text" maxlength="2" class="timeField required" />
-                :
-                <input name="request[start][minute]" type="text" maxlength="2" class="timeField required" />
-                <select name="request[start][meridian]">
-                    <option>AM</option>
-                    <option>PM</option>
-                </select>
+				<select name='request[start][time]'>
+					<!-- BEGIN request_start_time -->
+					<option value='{REQUEST_START_TIME_VALUE}' {REQUEST_START_TIME_SELECTED}>{REQUEST_START_TIME_LABEL}</option>
+					<!-- END request_start_time -->
+				</select>
             </td>
         </tr>
         <tr>
@@ -108,13 +106,11 @@ $j(function() {
                 <em></em>
             </td>
             <td>
-                <input name="request[finish][hour]" type="text" maxlength="2" class="timeField required" />
-                :
-                <input name="request[finish][minute]" type="text" maxlength="2" class="timeField required" />
-                <select name="request[finish][meridian]">
-                    <option>AM</option>
-                    <option>PM</option>
-                </select>
+				<select name='request[finish][time]'>
+					<!-- BEGIN request_finish_time -->
+					<option value='{REQUEST_FINISH_TIME_VALUE}' {REQUEST_FINISH_TIME_SELECTED}>{REQUEST_FINISH_TIME_LABEL}</option>
+					<!-- END request_finish_time -->
+				</select>
             </td>
         </tr>
         <tr>

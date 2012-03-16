@@ -78,17 +78,10 @@ class Leave_Request extends Model {
 	/**
 	 * Get finish
 	 *
-	 * @param bool $datetime
-	 *
 	 * @return Alaress_Date_Format
 	 */
-	public function getFinish($datetime = false) {
-		if ($datetime) {
-			return new Alaress_Date_Format($this->finish, 'y-m-d');
-		}
-		else {
-			return $this->finish;
-		}
+	public function getFinish() {
+		return new Alaress_Date_Format($this->finish, 'y-m-d h:i:s');
 	}
 
 	/**
@@ -188,17 +181,10 @@ class Leave_Request extends Model {
 	/**
 	 * Get start
 	 *
-	 * @param bool $datetime
-	 *
 	 * @return Alaress_Date_Format
 	 */
-	public function getStart($datetime = false) {
-		if ($datetime) {
-			return new Alaress_Date_Format($this->start, 'y-m-d');
-		}
-		else {
-			return $this->start;
-		}
+	public function getStart() {
+		return new Alaress_Date_Format($this->start, 'y-m-d h:i:s');
 	}
 
 	/**
@@ -395,7 +381,7 @@ class Leave_Request extends Model {
 	 * @return float
 	 */
 	public function getDuration() {
-		$duration = floor(($this->getFinish(true)->getUnixTimestamp() - $this->getStart(true)->getUnixTimestamp()) / (60 * 60 * 24));
+		$duration = floor(($this->getFinish()->getUnixTimestamp() - $this->getStart()->getUnixTimestamp()) / (60 * 60 * 24));
 
 		return $duration;
 	}
@@ -409,7 +395,7 @@ class Leave_Request extends Model {
 	 * @return Boolean
 	 */
 	public function getOccupancy($datetimeStart, $datetimeFinish) {
-		if ($this->getStart(true)->getUnixTimestamp() < $datetimeFinish->getUnixTimestamp() && $this->getFinish(true)->getUnixTimestamp() > $datetimeStart->getUnixTimestamp()) {
+		if ($this->getStart()->getUnixTimestamp() < $datetimeFinish->getUnixTimestamp() && $this->getFinish()->getUnixTimestamp() > $datetimeStart->getUnixTimestamp()) {
 			return true;
 		}
 		else {

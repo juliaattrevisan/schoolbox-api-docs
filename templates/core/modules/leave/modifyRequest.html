@@ -74,13 +74,11 @@
                 <em></em>
             </td>
             <td>
-                <input name="request[start][hour]" type="text" maxlength="2" class="timeField" value="{REQUEST_START_HOUR}" />
-                :
-                <input name="request[start][minute]" type="text" maxlength="2" class="timeField" value="{REQUEST_START_MINUTE}" />
-                <select name="request[start][meridian]">
-                    <option {REQUEST_START_MERIDIAN_AM}>AM</option>
-                    <option {REQUEST_START_MERIDIAN_PM}>PM</option>
-                </select>
+				<select name='request[start][time]'>
+					<!-- BEGIN request_start_time -->
+					<option value='{REQUEST_START_TIME_VALUE}' {REQUEST_START_TIME_SELECTED}>{REQUEST_START_TIME_LABEL}</option>
+					<!-- END request_start_time -->
+				</select>
             </td>
         </tr>
         <tr>
@@ -96,13 +94,11 @@
                 <em></em>
             </td>
             <td>
-                <input name="request[finish][hour]" type="text" maxlength="2" class="timeField" value="{REQUEST_FINISH_HOUR}" />
-                :
-                <input name="request[finish][minute]" type="text" maxlength="2" class="timeField" value="{REQUEST_FINISH_MINUTE}" />
-                <select name="request[finish][meridian]">
-                    <option {REQUEST_FINISH_MERIDIAN_AM}>AM</option>
-                    <option {REQUEST_FINISH_MERIDIAN_PM}>PM</option>
-                </select>
+				<select name='request[finish][time]'>
+					<!-- BEGIN request_finish_time -->
+					<option value='{REQUEST_FINISH_TIME_VALUE}' {REQUEST_FINISH_TIME_SELECTED}>{REQUEST_FINISH_TIME_LABEL}</option>
+					<!-- END request_finish_time -->
+				</select>
             </td>
         </tr>
         <tr>

@@ -15,6 +15,60 @@ class Leave_Controller extends Controller {
 	 */
 	const RANGE = 3;
 
+	/* Time map array
+	 * A map of actual time values => presentation information
+	 * used in the Leave Time/Return Time dropdowns
+	 */
+	private $timeMap = array(
+		'12:30:00' => '12:30 AM',
+		'01:00:00' => '1:00 AM',
+		'01:30:00' => '1:30 AM',
+		'02:00:00' => '2:00 AM',
+		'02:30:00' => '2:30 AM',
+		'03:00:00' => '3:00 AM',
+		'03:30:00' => '3:30 AM',
+		'04:00:00' => '4:00 AM',
+		'04:30:00' => '4:30 AM',
+		'05:00:00' => '5:00 AM',
+		'05:30:00' => '5:30 AM',
+		'06:00:00' => '6:00 AM',
+		'06:30:00' => '6:30 AM',
+		'07:00:00' => '7:00 AM',
+		'07:30:00' => '7:30 AM',
+		'08:00:00' => '8:00 AM',
+		'08:30:00' => '8:30 AM',
+		'09:00:00' => '9:00 AM',
+		'09:30:00' => '9:30 AM',
+		'10:00:00' => '10:00 AM',
+		'10:30:00' => '10:30 AM',
+		'11:00:00' => '11:00 AM',
+		'11:30:00' => '11:30 AM',
+		'12:00:00' => '12:00 PM',
+		'12:30:00' => '12:30 PM',
+		'13:00:00' => '1:00 PM',
+		'13:30:00' => '1:30 PM',
+		'14:00:00' => '2:00 PM',
+		'14:30:00' => '2:30 PM',
+		'15:00:00' => '3:00 PM',
+		'15:30:00' => '3:30 PM',
+		'16:00:00' => '4:00 PM',
+		'16:30:00' => '4:30 PM',
+		'17:00:00' => '5:00 PM',
+		'17:30:00' => '5:30 PM',
+		'18:00:00' => '6:00 PM',
+		'18:30:00' => '6:30 PM',
+		'19:00:00' => '7:00 PM',
+		'19:30:00' => '7:30 PM',
+		'20:00:00' => '8:00 PM',
+		'20:30:00' => '8:30 PM',
+		'21:00:00' => '9:00 PM',
+		'21:30:00' => '9:30 PM',
+		'22:00:00' => '10:00 PM',
+		'22:30:00' => '10:30 PM',
+		'23:00:00' => '11:00 PM',
+		'23:30:00' => '11:30 PM',
+	);
+
     protected $requestMapper;
     protected $userMapper;
     protected $houseMapper;
@@ -45,6 +99,63 @@ class Leave_Controller extends Controller {
         return array();
     }
 
+	/**
+	 * Render the dropdown for the start of Leave
+	 *
+	 * @param null $startTime
+	 */
+	private function renderStartTimeDropdown($startTime = null) {
+		$this->getPage()->setBlock(TEMPLATE_content, 'request_start_time', 'request_start_time_block');
+
+		/* Iterate through each option and preselect
+		 */
+		foreach($this->getTimeMap() as $value => $label) {
+			if ($startTime == $value) {
+				$selected = 'selected=\'selected\'';
+			}
+			else {
+				$selected = '';
+			}
+
+			$this->getPage()->setVar(array(
+				'REQUEST_START_TIME_VALUE' => $value,
+				'REQUEST_START_TIME_LABEL' => $label,
+				'REQUEST_START_TIME_SELECTED' => $selected,
+			));
+
+			$this->getPage()->parse('request_start_time_block', 'request_start_time', true);
+		}
+	}
+
+	/**
+	 * Render the dropdown for the end of Leave
+	 *
+	 * @param null $finishTime
+	 */
+	private function renderFinishTimeDropdown($finishTime = null) {
+		$this->getPage()->setBlock(TEMPLATE_content, 'request_finish_time', 'request_finish_time_block');
+
+		/* Iterate through each option and preselect
+		 */
+		foreach($this->getTimeMap() as $value => $label) {
+			if ($finishTime == $value) {
+				$selected = 'selected=\'selected\'';
+			}
+			else {
+				$selected = '';
+			}
+
+			$this->getPage()->setVar(array(
+				'REQUEST_FINISH_TIME_VALUE' => $value,
+				'REQUEST_FINISH_TIME_LABEL' => $label,
+				'REQUEST_FINISH_TIME_SELECTED' => $selected,
+			));
+
+
+			$this->getPage()->parse('request_finish_time_block', 'request_finish_time', true);
+		}
+	}
+
     /**
      * Renders a create request page
      *
@@ -55,6 +166,11 @@ class Leave_Controller extends Controller {
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/createRequest.html');
 		$this->getPage()->setBlock('custom_head', 'student_autocomplete_javascript', 'student_autocomplete_javascript_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'student_autocomplete', 'student_autocomplete_block');
+
+		/* Render dropdowns
+		 */
+		$this->renderStartTimeDropdown();
+		$this->renderFinishTimeDropdown();
 
         $this->getPage()->setVar($data);
 
@@ -94,8 +210,8 @@ class Leave_Controller extends Controller {
 			$this->getPage()->error(2);
 		}
 
-		$start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['hour']}:{$data['request']['start']['minute']} {$data['request']['start']['meridian']}", 'd/m/y');
-		$finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['hour']}:{$data['request']['finish']['minute']} {$data['request']['finish']['meridian']}", 'd/m/y');
+		$start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y h:i:s');
+		$finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y h:i:s');
 		$created = new Alaress_Date_Format(time(), 'U');
 		$request = new Leave_Request();
 
@@ -179,7 +295,7 @@ class Leave_Controller extends Controller {
 					'USER_NAME' => $request->getUser()->getName(),
 					'USER_YEAR' => $request->getUser()->getYear(),
 					'REQUEST_ID' => $request->getId(),
-					'REQUEST_START' => $request->getStart(true)->getAustralian(),
+					'REQUEST_START' => $request->getStart()->getAustralian(),
 					'REQUEST_DURATION' => $request->getDuration(),
 					'REQUEST_HOST_TYPE' => $request->getHostType(true)
 				));
@@ -312,7 +428,7 @@ class Leave_Controller extends Controller {
 						'USER_NAME' => $request->getUser()->getName(),
 						'USER_YEAR' => $request->getUser()->getYear(),
 						'REQUEST_ID' => $request->getId(),
-						'REQUEST_START' => $request->getStart(true)->getAustralian(),
+						'REQUEST_START' => $request->getStart()->getAustralian(),
 						'REQUEST_DURATION' => $request->getDuration(),
 						'REQUEST_HOST_TYPE' => $request->getHostType(true)
 					));
@@ -454,6 +570,11 @@ class Leave_Controller extends Controller {
 
 			$this->getPage()->setFile(TEMPLATE_content, 'modules/leave/modifyRequest.html');
 
+			/* Render dropdowns
+			 */
+			$this->renderStartTimeDropdown($data['request']->getStart()->getDatabaseTime());
+			$this->renderFinishTimeDropdown($data['request']->getFinish()->getDatabaseTime());
+
 			$this->getPage()->setVar(array(
 				'REQUEST_ID' => $request->getId(),
 				'REQUEST_STATUS' => $request->getStatus(true),
@@ -461,32 +582,14 @@ class Leave_Controller extends Controller {
 				'USER_EXTERNAL_ID' => $user->getSynergyId(),
 				'USER_YEAR' => $user->getYear(),
 				'USER_HOUSE' => $house->getHouse(),
-				'REQUEST_START_DATE' => $request->getStart(true)->getLocalShort(),
-				'REQUEST_START_HOUR' => $request->getStart(true)->getUsingFormat('h'),
-				'REQUEST_START_MINUTE' => $request->getStart(true)->getUsingFormat('i'),
-				'REQUEST_FINISH_DATE' => $request->getFinish(true)->getLocalShort(),
-				'REQUEST_FINISH_HOUR' => $request->getFinish(true)->getUsingFormat('h'),
-				'REQUEST_FINISH_MINUTE' => $request->getFinish(true)->getUsingFormat('i'),
+				'REQUEST_START_DATE' => $request->getStart()->getLocalShort(),
+				'REQUEST_FINISH_DATE' => $request->getFinish()->getLocalShort(),
 				'REQUEST_HOST_NAME' => $request->getHostName(),
 				'REQUEST_HOST_PHONE' => $request->getHostPhone(),
 				'REQUEST_USER_PHONE' => $request->getUserPhone(),
 				'REQUEST_DESCRIPTION' => $request->getDescription(),
 				'REQUEST_NOTES' => $request->getNotes(),
 			));
-
-			if ($request->getStart(true)->getUsingFormat('a') == 'am') {
-				$this->getPage()->setVar('REQUEST_START_MERIDIAN_AM', 'selected="selected"');
-			}
-			else {
-				$this->getPage()->setVar('REQUEST_START_MERIDIAN_PM', 'selected="selected"');
-			}
-
-			if ($request->getFinish(true)->getUsingFormat('a') == 'am') {
-				$this->getPage()->setVar('REQUEST_FINISH_MERIDIAN_AM', 'selected="selected"');
-			}
-			else {
-				$this->getPage()->setVar('REQUEST_FINISH_MERIDIAN_PM', 'selected="selected"');
-			}
 		}
 		else {
 			error(19);
@@ -502,8 +605,8 @@ class Leave_Controller extends Controller {
 	public function processModifyRequest($data) {
 		$request = $this->getRequestMapper()->findById($data['request']['id']);
 
-		$start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['hour']}:{$data['request']['start']['minute']} {$data['request']['start']['meridian']}", 'd/m/y');
-		$finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['hour']}:{$data['request']['finish']['minute']} {$data['request']['finish']['meridian']}", 'd/m/y');
+		$start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y h:i:s');
+		$finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y h:i:s');
 
 		$request->setStart($start->getDatabase());
 		$request->setFinish($finish->getDatabase());
@@ -1277,7 +1380,7 @@ class Leave_Controller extends Controller {
         $userNoticeEmail = new Mailer('../modules/leave/userNoticeEmail.html', 'Leave Request Status Update', $request->getUser()->getAltEmail());
         $userNoticeEmail->setVar( array(
             'LEAVE_USER_NAME' => $request->getUser()->getName(),
-            'LEAVE_DATE' => $request->getStart(true)->getLong(),
+            'LEAVE_DATE' => $request->getStart()->getLong(),
             'LEAVE_DURATION' => $request->getDuration(),
             'LEAVE_STATUS' => $request->getStatus(true),
             'LEAVE_AUTHORISATION_NAME' => $request->getAuthorisationUser()->getName()
@@ -1300,8 +1403,8 @@ class Leave_Controller extends Controller {
 					$parentNoticeEmail = new Mailer('../modules/leave/parentNoticeEmail.html', 'Leave Request Status Update', $parent['StudentContactDefaultEmail']);
 					$parentNoticeEmail->setVar(array(
 						'PARENT_NAME' => "{$parent['StudentContactPreferred']} {$parent['StudentContactSurname']}",
-						'LEAVE_START' => $request->getStart(true)->getLong(),
-						'LEAVE_FINISH' => $request->getFinish(true)->getLong(),
+						'LEAVE_START' => $request->getStart()->getLong(),
+						'LEAVE_FINISH' => $request->getFinish()->getLong(),
 						'LEAVE_HOST_NAME' => $request->getHostName(),
 						'LEAVE_HOST_PHONE' => $request->getHostPhone(),
 						'LEAVE_USER_NAME' => $request->getUser()->getName(),
@@ -1409,5 +1512,23 @@ class Leave_Controller extends Controller {
 	 */
 	public function getHouseMapper() {
 		return $this->houseMapper;
+	}
+
+	/**
+	 * Set time map
+	 *
+	 * @param $timeMap
+	 */
+	private function setTimeMap($timeMap) {
+		$this->timeMap = $timeMap;
+	}
+
+	/**
+	 * Get time map
+	 *
+	 * @return array
+	 */
+	private function getTimeMap() {
+		return $this->timeMap;
 	}
 }
