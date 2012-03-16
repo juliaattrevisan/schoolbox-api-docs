@@ -559,6 +559,7 @@ class Leave_Controller extends Controller {
 						$request = $this->getRequestMapper()->findById($request->getId());
 
 						$this->sendUserNotice($request);
+						$this->sendParentNotice($request);
 					}
 				}
 			}
@@ -727,6 +728,7 @@ class Leave_Controller extends Controller {
 
 		if (isset($data['approve']) || isset($data['reject'])) {
 			$this->sendUserNotice($request);
+			$this->sendParentNotice($request);
 		}
 
 		$this->getPage()->backToTheFuture(2);
@@ -746,8 +748,6 @@ class Leave_Controller extends Controller {
 
 		/* Mess with these two magic numbers to change the range, in conjunction
 		 * with the class constant RANGE
-		 *
-		 * TODO: Remove these magic numbers
 		 */
 		$reportStart = new Alaress_Date_Format($date, 'd/m/y');
 		$reportStart->addDays(self::FRIDAY - $reportStart->getWeekDayNumber());
@@ -1466,15 +1466,28 @@ class Leave_Controller extends Controller {
         fclose($stream);
     }
 
+	/**
+	 * Send email notification
+	 *
+	 * @param $request
+	 */
     public function sendUserNotice ($request) {
-        $userNoticeEmail = new Mailer('../modules/leave/userNoticeEmail.html', 'Leave Request Status Update', $request->getUser()->getAltEmail());
-        $userNoticeEmail->setVar( array(
+		$subject = '(Student) Leave Request Status Update for ' . $request->getUser()->getName();
+
+        $userNoticeEmail = new Mailer('../modules/leave/userNoticeEmail.html', $subject , $request->getUser()->getAltEmail());
+
+        $userNoticeEmail->setVar(array(
             'LEAVE_USER_NAME' => $request->getUser()->getName(),
-            'LEAVE_DATE' => $request->getStart()->getLong(),
-            'LEAVE_DURATION' => $request->getDuration(),
-            'LEAVE_STATUS' => $request->getStatus(true),
-            'LEAVE_AUTHORISATION_NAME' => $request->getAuthorisationUser()->getName()
-        ) );
+			'LEAVE_STATUS' => $request->getStatus(true),
+            'LEAVE_START' => $request->getStart()->getLong(),
+			'LEAVE_FINISH' => $request->getFinish()->getLong(),
+			'LEAVE_DESCRIPTION' => $request->getDescription(),
+			'LEAVE_HOST_NAME' => $request->getHostName(),
+			'LEAVE_HOST_PHONE' => $request->getHostPhone(),
+			'LEAVE_STUDENT_PHONE' => $request->getUserPhone(),
+            'LEAVE_AUTHORISATION_NAME' => $request->getAuthorisationUser()->getName(),
+			'TERMS_AND_CONDITIONS' => Cfg::get('terms_and_conditions'),
+        ));
 
         $userNoticeEmail->send();
     }
@@ -1485,21 +1498,26 @@ class Leave_Controller extends Controller {
 	 * @param $request
 	 */
     public function sendParentNotice ($request) {
-		if (Cfg::get('parent_notification')) {
-			$parentList = $this->getExternalUser()->getStudentContactList($request->getUserId());
+		if (!Cfg::get('parent_notification')) {
+			$parentList = $this->getExternalUser()->getStudentContactList($request->getUser()->getSynergyId());
+
+			$subject = '(Parent) Leave Request Status Update for ' . $request->getUser()->getName();
 
 			if (is_array($parentList)) {
 				foreach ($parentList as $parent) {
-					$parentNoticeEmail = new Mailer('../modules/leave/parentNoticeEmail.html', 'Leave Request Status Update', $parent['StudentContactDefaultEmail']);
+					$parentNoticeEmail = new Mailer('../modules/leave/parentNoticeEmail.html', $subject, $parent['StudentContactDefaultEmail']);
+
 					$parentNoticeEmail->setVar(array(
-						'PARENT_NAME' => "{$parent['StudentContactPreferred']} {$parent['StudentContactSurname']}",
+						'LEAVE_USER_NAME' => $request->getUser()->getName(),
+						'LEAVE_STATUS' => $request->getStatus(true),
 						'LEAVE_START' => $request->getStart()->getLong(),
 						'LEAVE_FINISH' => $request->getFinish()->getLong(),
+						'LEAVE_DESCRIPTION' => $request->getDescription(),
 						'LEAVE_HOST_NAME' => $request->getHostName(),
 						'LEAVE_HOST_PHONE' => $request->getHostPhone(),
-						'LEAVE_USER_NAME' => $request->getUser()->getName(),
-						'LEAVE_USER_PHONE' => $request->getUserPhone(),
-						'LEAVE_DESCRIPTION' => $request->getDescription()
+						'LEAVE_STUDENT_PHONE' => $request->getUserPhone(),
+						'LEAVE_AUTHORISATION_NAME' => $request->getAuthorisationUser()->getName(),
+						'TERMS_AND_CONDITIONS' => Cfg::get('terms_and_conditions'),
 					));
 
 					$parentNoticeEmail->send();

@@ -1,13 +1,33 @@
-<p>Dear {PARENT_NAME}</p>
-        
-<p>Your child, {LEAVE_USER_NAME} has requested leave, please read and approve this request.</p>
-        
-<p>{LEAVE_START} to {LEAVE_FINISH}</p>
-        
-<p>Host: {LEAVE_HOST_NAME}<br/>
-Host Contact Ph: {LEAVE_HOST_PHONE}<br/>
-Student Contact Ph: {LEAVE_USER_PHONE}</p>
+<h1>Leave Request for {LEAVE_USER_NAME}: {LEAVE_STATUS}</h1>
+<p>
+	(<em>confirmed by {LEAVE_AUTHORISATION_NAME}</em>)
+</p>
 
-<p>{LEAVE_DESCRIPTION}</p>
+<h2>Leave Details</h2>
+<dl>
+	<dt>Start Leave</dt>
+	<dd>{LEAVE_START}</dd>
+	<dt>End Leave</dt>
+	<dd>{LEAVE_FINISH}</dd>
+	<dt>Description</dt>
+	<dd>{LEAVE_DESCRIPTION}</dd>
+</dl>
 
-<p>Confirmation and disclaimer notices.</p>
+<h2>Contact Information</h2>
+<dl>
+	<dt>Host</dt>
+	<dd>{LEAVE_HOST_NAME}</dd>
+	<dt>Host Contact:</dt>
+	<dd>{LEAVE_HOST_PHONE}</dd>
+	<dt>Student Contact:</dt>
+	<dd>{LEAVE_STUDENT_PHONE}</dd>
+</dl>
+
+<p>
+	Authorised by <em>{LEAVE_AUTHORISATION_NAME}</em>
+</p>
+
+<div>
+	<h2>Terms And Conditions</h2>
+	{TERMS_AND_CONDITIONS}
+</div>
