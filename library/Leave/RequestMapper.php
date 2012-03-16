@@ -2,9 +2,15 @@
 
 class Leave_RequestMapper extends Mapper {
     protected $userMapper;
+	protected $limit = null;
 
     protected function __construct () {
         $this->setUserMapper( NewUserMapper::getInstance() );
+
+		/* Set the threshold for displaying/using lists of requests.
+		 * Only show the last 14 days' worth of info
+		 */
+		$this->setLimit(date('Y-m-d H:i:s', strtotime('-14 days')));
 
         parent::__construct();
     }
@@ -144,6 +150,8 @@ class Leave_RequestMapper extends Mapper {
 
     /**
      * Returns a collection of requests by house id
+	 *
+	 * Only show the most recent fortnight's worth of requests
      *
      * @param $houseId
      * @return Collection
@@ -157,10 +165,12 @@ class Leave_RequestMapper extends Mapper {
             LEFT JOIN `user` u ON u.id = lr.user_id
             LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
             WHERE u.residential_house_id = :houseId
+            AND lr.created >= :limit
         ");
 
         $statement->execute( array(
-            'houseId' => $houseId
+            'houseId' => $houseId,
+			'limit' => $this->getLimt(),
         ) );
 
         $requestList = $statement->fetchAll();
@@ -187,13 +197,15 @@ class Leave_RequestMapper extends Mapper {
 			WHERE u.house = :houseId
 			AND lr.status = :status
 			AND lr.id < :requestId
+			AND lr.created >= :limit
 			ORDER BY lr.id ASC
 		");
 
 		$statement->execute(array(
 			'houseId' => $houseId,
 			'requestId' => $requestId,
-			'status' => 1
+			'status' => 1,
+			'limit' => $this->getLimt(),
 		));
 
 		$requestList = $statement->fetchAll();
@@ -220,13 +232,15 @@ class Leave_RequestMapper extends Mapper {
 			WHERE u.house = :houseId
 			AND lr.status = :status
 			AND lr.id > :requestId
+			AND lr.created >= :limit
 			ORDER BY lr.id ASC
 		");
 
 		$statement->execute(array(
 			'houseId' => $houseId,
 			'requestId' => $requestId,
-			'status' => 1
+			'status' => 1,
+			'limit' => $this->getLimt(),
 		));
 
 		$requestList = $statement->fetchAll();
@@ -414,4 +428,22 @@ class Leave_RequestMapper extends Mapper {
     {
         return $this->userMapper;
     }
+
+	/**
+	 * Set limit
+	 *
+	 * @param $limit
+	 */
+	private function setLimit($limit) {
+		$this->limit = $limit;
+	}
+
+	/**
+	 * Get limit
+	 *
+	 * @return null
+	 */
+	private function getLimit() {
+		return $this->limit;
+	}
 }
