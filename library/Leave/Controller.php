@@ -896,6 +896,7 @@ class Leave_Controller extends Controller {
 						'REQUEST_ID' => $request->getId(),
 						'REQUEST_STATUS' => $request->getStatus(true),
 						'REQUEST_HOST_TYPE' => $request->getHostType(true),
+						'REQUEST_DESCRIPTION' => $request->getDescription(),
 					));
 
 					/* Start and end of leave

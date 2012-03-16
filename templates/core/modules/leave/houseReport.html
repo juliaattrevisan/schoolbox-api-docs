@@ -21,7 +21,9 @@
                 5: { sorter: false},
                 6: { sorter: false},
                 7: { sorter: false},
-                19: { sorter: false}
+				18: {sorter: false},
+				19: { sorter: false},
+                20: { sorter: false}
             }
         });
 
@@ -132,6 +134,7 @@
 
 				<!-- END report_header_subtitle -->
                 <th>Host</th>
+				<th>Leave Activity</th>
                 <th>Approved By</th>
             </tr>
         </thead>
@@ -163,6 +166,7 @@
 
 				<!-- END request_period -->
                 <td>{REQUEST_HOST_TYPE}</td>
+				<td>{REQUEST_DESCRIPTION}</td>
                 <td><a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a></td>
             </tr>
             <!-- END request -->
