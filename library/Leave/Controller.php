@@ -626,6 +626,8 @@ class Leave_Controller extends Controller {
 			$house = $this->getHouseMapper()->findById($user->getHouse());
 
 			$this->getPage()->setFile(TEMPLATE_content, 'modules/leave/modifyRequest.html');
+			$this->getPage()->setBlock(TEMPLATE_content, 'next_pending', 'next_pending_block');
+			$this->getPage()->setBlock(TEMPLATE_content, 'prev_pending', 'prev_pending_block');
 
 			/* Render dropdowns
 			 */
@@ -649,6 +651,34 @@ class Leave_Controller extends Controller {
 				'REQUEST_DESCRIPTION' => $request->getDescription(),
 				'REQUEST_NOTES' => $request->getNotes(),
 			));
+
+			/* What is the next/previous pending request?
+			 */
+			$nextRequest = $this->getRequestMapper()->findNextPendingByHouseId($request['id'], $house->getId());
+
+			if ($nextRequest) {
+				$this->getPage()->setVar(array(
+					'NEXT_PENDING_ID' => $nextRequest['id']
+				));
+
+				$this->getPage()->parse('next_pending_block', 'next_pending');
+			}
+			else {
+				$this->getPage()->setVar('next_pending_block', '');
+			}
+
+			$previousRequest = $this->getRequestMapper()->findPreviousPendingByHouseId($request['id'], $house->getId());
+
+			if ($previousRequest) {
+				$this->getPage()->setVar(array(
+					'PREV_PENDING_ID' => $previousRequest['id']
+				));
+
+				$this->getPage()->parse('prev_pending_block', 'prev_pending');
+			}
+			else {
+				$this->getPage()->setVar('prev_pending_block', '');
+			}
 		}
 		else {
 			error(19);

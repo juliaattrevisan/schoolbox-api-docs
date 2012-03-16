@@ -79,7 +79,13 @@ class NewUserMapper extends Mapper {
             'type'       => Mapper::TYPE_INTEGER,
         ));
 
-        $this->hasMap(array(
+		$this->hasMap(array(
+			'column' => 'residential_house_id',
+			'property' => 'residentialHouseId',
+			'type' => Mapper::TYPE_INTEGER,
+		));
+
+		$this->hasMap(array(
             'column'     => 'local_email',
             'property'   => 'localEmail',
             'type'       => Mapper::TYPE_BOOLEAN,

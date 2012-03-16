@@ -156,7 +156,7 @@ class Leave_RequestMapper extends Mapper {
             FROM `{$this->table}` lr
             LEFT JOIN `user` u ON u.id = lr.user_id
             LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
-            WHERE u.residentialHouse = :houseId
+            WHERE u.residential_house_id = :houseId
         ");
 
         $statement->execute( array(
@@ -170,7 +170,73 @@ class Leave_RequestMapper extends Mapper {
         return $requestCollection;
     }
 
-    /**
+	/**
+	 * Returns the next pending request by house id
+	 *
+	 * @param $requestId
+	 * @param $houseId
+	 *
+	 * @return Collection
+	 */
+	public function findPreviousPendingByHouseId($requestId, $houseId) {
+		$statement = $this->database->prepare("
+			SELECT {$this->getColumnString('lr')},
+				{$this->getUserMapper()->getColumnString('u')}
+			FROM `{$this->table}` lr
+			LEFT JOIN `user` u ON u.id = lr.user_id
+			WHERE u.house = :houseId
+			AND lr.status = :status
+			AND lr.id < :requestId
+			ORDER BY lr.id ASC
+		");
+
+		$statement->execute(array(
+			'houseId' => $houseId,
+			'requestId' => $requestId,
+			'status' => 1
+		));
+
+		$requestList = $statement->fetchAll();
+
+		$requestCollection = $this->hydrateList($requestList);
+
+		return $requestCollection[count($requestCollection)-1];
+	}
+
+	/**
+	 * Returns the next pending request by house id
+	 *
+	 * @param $requestId
+	 * @param $houseId
+	 *
+	 * @return Collection
+	 */
+	public function findNextPendingByHouseId($requestId, $houseId) {
+		$statement = $this->database->prepare("
+			SELECT {$this->getColumnString('lr')},
+				{$this->getUserMapper()->getColumnString('u')}
+			FROM `{$this->table}` lr
+			LEFT JOIN `user` u ON u.id = lr.user_id
+			WHERE u.house = :houseId
+			AND lr.status = :status
+			AND lr.id > :requestId
+			ORDER BY lr.id ASC
+		");
+
+		$statement->execute(array(
+			'houseId' => $houseId,
+			'requestId' => $requestId,
+			'status' => 1
+		));
+
+		$requestList = $statement->fetchAll();
+
+		$requestCollection = $this->hydrateList($requestList);
+
+		return $requestCollection[0];
+	}
+
+	/**
      * Returns all users in a house and any requests that intersect a date range defined by $start and $finish.
      * Returns users regardless of whether they have any requests.
      *
@@ -190,7 +256,7 @@ class Leave_RequestMapper extends Mapper {
                 AND lr.start < :finish
                 AND lr.finish > :start
             LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
-            WHERE u.residentialHouse = :houseId
+            WHERE u.residential_house_id = :houseId
               /*AND g.type = 'student'*/
         ");
 
@@ -245,15 +311,15 @@ class Leave_RequestMapper extends Mapper {
 				luResidentialHouse.name AS name,
 				leave_request.id AS leaveRequestId,
 				SUM(leave_request.id AND ((`start` < :morningStart) AND (`finish` > :dayStart))) AS absent_morning,
-				((SELECT COUNT(*) FROM `user` WHERE user.residentialHouse = houseId) - COALESCE(SUM(leave_request.id AND ((`start` < :morningStart) AND (`finish` > :dayStart))),0)) AS present_morning,
+				((SELECT COUNT(*) FROM `user` WHERE user.residential_house_id = houseId) - COALESCE(SUM(leave_request.id AND ((`start` < :morningStart) AND (`finish` > :dayStart))),0)) AS present_morning,
 				SUM(leave_request.id AND ((`start` < :dayStart) AND (`finish` > :nightStart))) AS absent_day,
-				((SELECT COUNT(*) FROM `user` WHERE user.residentialHouse = houseId) - COALESCE(SUM(leave_request.id AND ((`start` < :dayStart) AND (`finish` > :nightStart))),0)) AS present_day,
+				((SELECT COUNT(*) FROM `user` WHERE user.residential_house_id = houseId) - COALESCE(SUM(leave_request.id AND ((`start` < :dayStart) AND (`finish` > :nightStart))),0)) AS present_day,
 				SUM(leave_request.id AND ((`start` < :nightStart) AND (`finish` > :nightEnd))) AS absent_night,
-				((SELECT COUNT(*) FROM `user` WHERE user.residentialHouse = houseId) - COALESCE(SUM(leave_request.id AND ((`start` < :nightStart) AND (`finish` > :nightEnd))),0)) AS present_night
+				((SELECT COUNT(*) FROM `user` WHERE user.residential_house_id = houseId) - COALESCE(SUM(leave_request.id AND ((`start` < :nightStart) AND (`finish` > :nightEnd))),0)) AS present_night
 			FROM luResidentialHouse
-			LEFT JOIN `user` ON user.residentialHouse = luResidentialHouse.id
+			LEFT JOIN `user` ON user.residential_house_id = luResidentialHouse.id
 			LEFT JOIN leave_request ON leave_request.user_id = `user`.id AND leave_request.authorisation_datetime IS NOT NULL
-			GROUP BY residentialHouse;
+			GROUP BY residential_house_id;
 		");
 
 		$statement->execute(array(
