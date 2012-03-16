@@ -100,6 +100,34 @@ class Leave_Controller extends Controller {
     }
 
 	/**
+	 * Render host type dropdown
+	 *
+	 * @param $request
+	 */
+	private function renderHostTypeDropdown($request) {
+		$this->getPage()->setBlock(TEMPLATE_content, 'host_type', 'host_type_block');
+
+		/* Iterate through each option and preselect
+		 */
+		foreach($request->getHostTypeMap() as $value => $label) {
+			if ($request->getHostType() == $value) {
+				$selected = 'selected=\'selected\'';
+			}
+			else {
+				$selected = '';
+			}
+
+			$this->getPage()->setVar(array(
+				'HOST_TYPE_VALUE' => $value,
+				'HOST_TYPE_LABEL' => $label,
+				'HOST_TYPE_SELECTED' => $selected,
+			));
+
+			$this->getPage()->parse('host_type_block', 'host_type', true);
+		}
+	}
+
+	/**
 	 * Render the dropdown for the start of Leave
 	 *
 	 * @param null $startTime
@@ -171,6 +199,7 @@ class Leave_Controller extends Controller {
 		 */
 		$this->renderStartTimeDropdown();
 		$this->renderFinishTimeDropdown();
+		$this->renderHostTypeDropdown(new Leave_Request());
 
         $this->getPage()->setVar($data);
 
@@ -574,6 +603,7 @@ class Leave_Controller extends Controller {
 			 */
 			$this->renderStartTimeDropdown($data['request']->getStart()->getDatabaseTime());
 			$this->renderFinishTimeDropdown($data['request']->getFinish()->getDatabaseTime());
+			$this->renderHostTypeDropdown($data['request']);
 
 			$this->getPage()->setVar(array(
 				'REQUEST_ID' => $request->getId(),

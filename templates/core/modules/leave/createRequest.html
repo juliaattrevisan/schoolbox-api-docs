@@ -119,13 +119,11 @@ $j(function() {
                 <em></em>
             </td>
             <td>
-                <select name="request[hostType]" id="requesthostType">
-                    <option value="1">Mother</option>
-                    <option value="2">Father</option>
-                    <option value="3">Guardian</option>
-                    <option value="4">Self</option>
-                    <option value="5">Other</option>
-                </select>
+				<select name="request[hostType]" id="requesthostType">
+					<!-- BEGIN host_type -->
+					<option value="{HOST_TYPE_VALUE}" {HOST_TYPE_SELECTED}>{HOST_TYPE_LABEL}</option>
+					<!-- END host_type -->
+				</select>
             </td>
             <td class="formLabelWidth">
                 <h4>Student Phone</h4>

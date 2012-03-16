@@ -1,9 +1,17 @@
 <?php
 
 class Leave_Request extends Model {
-	const HOST_TYPE_PARENT = 1;
-	const HOST_TYPE_PEER_PARENT = 2;
-	const HOST_TYPE_OTHER = 3;
+
+	/* Host types and their presentation labels.
+	 */
+	private $hostTypeMap = array(
+		'1' => 'Mother',
+		'2' => 'Father',
+		'3' => 'Guardian',
+		'4' => 'Self',
+		'5' => 'Other'
+	);
+
 	const STATUS_PENDING = 1;
 	const STATUS_APPROVED = 2;
 	const STATUS_REJECTED = 3;
@@ -139,12 +147,7 @@ class Leave_Request extends Model {
 	 */
 	public function getHostType($string = false) {
 		if ($string) {
-			if ($this->hostType == self::HOST_TYPE_PARENT) {
-				return 'Parent';
-			}
-			elseif ($this->hostType == self::HOST_TYPE_PEER_PARENT) {
-				return 'Peer Parent';
-			}
+			return $this->getHostTypeMapIndex($this->hostType);
 		}
 		else {
 			return $this->hostType;
@@ -419,5 +422,24 @@ class Leave_Request extends Model {
 	 */
 	public function getNotes() {
 		return $this->notes;
+	}
+
+	/**
+	 * Get host type map array
+	 *
+	 * @return array
+	 */
+	public function getHostTypeMap() {
+		return $this->hostTypeMap;
+	}
+
+	/**
+	 * Get host type label for a host type id
+	 *
+	 * @param $index
+	 * @return mixed
+	 */
+	private function getHostTypeMapIndex($index) {
+		return $this->hostTypeMap[$index];
 	}
 }
