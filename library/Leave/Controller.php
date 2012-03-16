@@ -582,6 +582,34 @@ class Leave_Controller extends Controller {
 		);
 	}
 
+	/**
+	 * Render confirmed by checkbox array
+	 *
+	 * @param $request
+	 */
+	private function renderConfirmedByCheckboxes($request) {
+		$this->getPage()->setBlock(TEMPLATE_content, 'confirmed_by', 'confirmed_by_block');
+
+		/* Iterate through options
+		 */
+		foreach($request->getConfirmedByMap() as $value => $label) {
+			if ($request->getConfirmedBy() == $value) {
+				$selected = 'checked=\'checked\'';
+			}
+			else {
+				$selected = '';
+			}
+
+			$this->getPage()->setVar(array(
+				'CONFIRMED_BY_VALUE' => $value,
+				'CONFIRMED_BY_LABEL' => $label,
+				'CONFIRMED_BY_SELECTED' => $selected,
+			));
+
+			$this->getPage()->parse('confirmed_by_block', 'confirmed_by', true);
+		}
+	}
+
     /**
      * Renders a modify request form
      *
@@ -601,9 +629,10 @@ class Leave_Controller extends Controller {
 
 			/* Render dropdowns
 			 */
-			$this->renderStartTimeDropdown($data['request']->getStart()->getDatabaseTime());
-			$this->renderFinishTimeDropdown($data['request']->getFinish()->getDatabaseTime());
-			$this->renderHostTypeDropdown($data['request']);
+			$this->renderStartTimeDropdown($request->getStart()->getDatabaseTime());
+			$this->renderFinishTimeDropdown($request->getFinish()->getDatabaseTime());
+			$this->renderHostTypeDropdown($request);
+			$this->renderConfirmedByCheckboxes($request);
 
 			$this->getPage()->setVar(array(
 				'REQUEST_ID' => $request->getId(),
@@ -646,6 +675,7 @@ class Leave_Controller extends Controller {
 		$request->setUserPhone($data['request']['userPhone']);
 		$request->setDescription($data['request']['description']);
 		$request->setNotes($data['request']['notes']);
+		$request->setConfirmedBy($data['request']['confirmedBy']);
 
 		if (isset($data['approve']) || isset($data['reject'])) {
 			$authorisationDatetime = new Alaress_Date_Format(time(), 'U');

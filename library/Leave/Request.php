@@ -12,6 +12,16 @@ class Leave_Request extends Model {
 		'5' => 'Other'
 	);
 
+	/* Leave Requests confirmation types and their presentation labels
+	 */
+	private $confirmedByMap = array(
+		'1' => 'Email',
+		'2' => 'Fax',
+		'3' => 'Phone',
+		'4' => 'Person',
+		'5' => 'Text',
+	);
+
 	const STATUS_PENDING = 1;
 	const STATUS_APPROVED = 2;
 	const STATUS_REJECTED = 3;
@@ -34,6 +44,7 @@ class Leave_Request extends Model {
 	public $authorisationUserId;
 	public $authorisationUser;
 	public $notes;
+	public $confirmedBy;
 
 	/**
 	 * @param $created
@@ -441,5 +452,42 @@ class Leave_Request extends Model {
 	 */
 	private function getHostTypeMapIndex($index) {
 		return $this->hostTypeMap[$index];
+	}
+
+	/**
+	 * Get confirmed by
+	 *
+	 * @return mixed
+	 */
+	public function getConfirmedBy() {
+		return $this->confirmedBy;
+	}
+
+	/**
+	 * Set confirmed by
+	 *
+	 * @param $confirmedBy
+	 */
+	public function setConfirmedBy($confirmedBy) {
+		$this->confirmedBy = $confirmedBy;
+	}
+
+	/**
+	 * Get confirmed by map
+	 *
+	 * @return mixed
+	 */
+	public function getConfirmedByMap() {
+		return $this->confirmedByMap;
+	}
+
+	/**
+	 * Get confirmed by label for a type id
+	 *
+	 * @param $index
+	 * @return array
+	 */
+	private function getConfirmedByMapIndex($index) {
+		return $this->confirmedByMap[$index];
 	}
 }

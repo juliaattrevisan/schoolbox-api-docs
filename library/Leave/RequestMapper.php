@@ -95,6 +95,12 @@ class Leave_RequestMapper extends Mapper {
 			'type' => Mapper::TYPE_STRING,
 		));
 
+		$this->hasMap(array(
+			'column' => 'confirmed_by',
+			'property' => 'confirmedBy',
+			'type' => Mapper::TYPE_INTEGER,
+		));
+
         parent::mapping();
     }
 
