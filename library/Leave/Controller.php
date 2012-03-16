@@ -255,115 +255,124 @@ class Leave_Controller extends Controller {
      * @return void
      */
 	public function renderUserRequestList($data) {
-		$user = $data['user'];
-		$house = $data['house'];
-		$requestList = $data['requestList'];
 
-		$this->getPage()->setFile(TEMPLATE_content, 'modules/leave/userRequestList.html');
-
-		$this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
-		$this->getPage()->setBlock(TEMPLATE_content, 'pending_request_list', 'pending_request_list_block');
-		$this->getPage()->setBlock(TEMPLATE_content, 'previous_request_list', 'previous_request_list_block');
-		$this->getPage()->setBlock('pending_request_list', 'pending_request', 'pending_request_block');
-		$this->getPage()->setBlock('previous_request_list', 'previous_request', 'previous_request_block');
-
-		/* Checkbox
+		/* Only allow students to see their own leave requests
+		 * Allow staff/superusers to see anyone's
 		 */
-		$this->getPage()->setBlock('pending_request_list', 'approval_header', 'approval_header_block');
-		$this->getPage()->setBlock('pending_request_list', 'approval_submit', 'approval_submit_block');
-		$this->getPage()->setBlock('pending_request', 'approval_control', 'approval_control_block');
+		if ($this->getGroup()->isStaff() || $this->getGroup()->isSuperuser() || $_SESSION['id'] == $data['user']['id']) {
+			$user = $data['user'];
+			$house = $data['house'];
+			$requestList = $data['requestList'];
 
-		$this->getPage()->setVar(array(
-			'USER_ID' => $user->getId(),
-			'USER_NAME' => $user->getName(),
-			'HOUSE_NAME' => $house->getHouse(),
-			'HOUSE_ID' => $house->getId()
-		));
+			$this->getPage()->setFile(TEMPLATE_content, 'modules/leave/userRequestList.html');
 
-		/* Ability to render various controls
-		 */
-		$canApproveRequests = ($this->getGroup()->isStaff() || $this->getGroup()->isSuperuser());
+			$this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
+			$this->getPage()->setBlock(TEMPLATE_content, 'pending_request_list', 'pending_request_list_block');
+			$this->getPage()->setBlock(TEMPLATE_content, 'previous_request_list', 'previous_request_list_block');
+			$this->getPage()->setBlock('pending_request_list', 'pending_request', 'pending_request_block');
+			$this->getPage()->setBlock('previous_request_list', 'previous_request', 'previous_request_block');
 
-		if ($canApproveRequests) {
-			$this->getPage()->parse('approval_header_block', 'approval_header');
-			$this->getPage()->parse('approval_submit_block', 'approval_submit');
-		}
-		else {
-			$this->getPage()->setVar('approval_header_block', '');
-			$this->getPage()->setVar('approval_submit_block', '');
-		}
+			/* Checkbox
+			 */
+			$this->getPage()->setBlock('pending_request_list', 'approval_header', 'approval_header_block');
+			$this->getPage()->setBlock('pending_request_list', 'approval_submit', 'approval_submit_block');
+			$this->getPage()->setBlock('pending_request', 'approval_control', 'approval_control_block');
 
-		/* Render each request
-		 */
-		if (count($requestList)) {
-			$this->getPage()->setVar('no_requests_block', '');
+			$this->getPage()->setVar(array(
+				'USER_ID' => $user->getId(),
+				'USER_NAME' => $user->getName(),
+				'HOUSE_NAME' => $house->getHouse(),
+				'HOUSE_ID' => $house->getId()
+			));
 
-			$pendingRequestCount = 0;
-			$previousRequestCount = 0;
+			/* Ability to render various controls
+			 */
+			$canApproveRequests = ($this->getGroup()->isStaff() || $this->getGroup()->isSuperuser());
 
-			foreach ($requestList as $request) {
-				$this->getPage()->setVar(array(
-					'USER_ID' => $request->getUser()->getId(),
-					'USER_NAME' => $request->getUser()->getName(),
-					'USER_YEAR' => $request->getUser()->getYear(),
-					'REQUEST_ID' => $request->getId(),
-					'REQUEST_START' => $request->getStart(true)->getAustralian(),
-					'REQUEST_DURATION' => $request->getDuration(),
-					'REQUEST_HOST_TYPE' => $request->getHostType(true)
-				));
+			if ($canApproveRequests) {
+				$this->getPage()->parse('approval_header_block', 'approval_header');
+				$this->getPage()->parse('approval_submit_block', 'approval_submit');
+			}
+			else {
+				$this->getPage()->setVar('approval_header_block', '');
+				$this->getPage()->setVar('approval_submit_block', '');
+			}
 
-				if ($request->getStatus() == Leave_Request::STATUS_PENDING) {
+			/* Render each request
+			 */
+			if (count($requestList)) {
+				$this->getPage()->setVar('no_requests_block', '');
+
+				$pendingRequestCount = 0;
+				$previousRequestCount = 0;
+
+				foreach ($requestList as $request) {
 					$this->getPage()->setVar(array(
-						'CLASS' => $pendingRequestCount % 2 ? '' : 'dark',
+						'USER_ID' => $request->getUser()->getId(),
+						'USER_NAME' => $request->getUser()->getName(),
+						'USER_YEAR' => $request->getUser()->getYear(),
+						'REQUEST_ID' => $request->getId(),
+						'REQUEST_START' => $request->getStart(true)->getAustralian(),
+						'REQUEST_DURATION' => $request->getDuration(),
+						'REQUEST_HOST_TYPE' => $request->getHostType(true)
 					));
 
-					$this->getPage()->parse('pending_request_block', 'pending_request', true);
+					if ($request->getStatus() == Leave_Request::STATUS_PENDING) {
+						$this->getPage()->setVar(array(
+							'CLASS' => $pendingRequestCount % 2 ? '' : 'dark',
+						));
 
-					$pendingRequestCount++;
+						$this->getPage()->parse('pending_request_block', 'pending_request', true);
 
-					/* Render control for pending requests
-					 */
-					if ($canApproveRequests) {
-						$this->getPage()->parse('approval_control_block', 'approval_control');
+						$pendingRequestCount++;
+
+						/* Render control for pending requests
+						 */
+						if ($canApproveRequests) {
+							$this->getPage()->parse('approval_control_block', 'approval_control');
+						}
+						else {
+							$this->getPage()->setVar('approval_control_block', '');
+						}
 					}
 					else {
-						$this->getPage()->setVar('approval_control_block', '');
+						$this->getPage()->setVar(array(
+							'REQUEST_STATUS' => $request->getStatus(true),
+							'REQUEST_AUTHORISATION_DATETIME' => $request->getAuthorisationDatetime(true)->getAustralian(),
+							'REQUEST_AUTHORISATION_USER_ID' => $request->getAuthorisationUser()->getId(),
+							'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->getName(),
+							'CLASS' => $previousRequestCount % 2 ? '' : 'dark',
+						));
+
+						$this->getPage()->parse('previous_request_block', 'previous_request', true);
+
+						$previousRequestCount++;
 					}
 				}
+
+				if ($pendingRequestCount) {
+					$this->getPage()->parse('pending_request_list_block', 'pending_request_list');
+				}
 				else {
-					$this->getPage()->setVar(array(
-						'REQUEST_STATUS' => $request->getStatus(true),
-						'REQUEST_AUTHORISATION_DATETIME' => $request->getAuthorisationDatetime(true)->getAustralian(),
-						'REQUEST_AUTHORISATION_USER_ID' => $request->getAuthorisationUser()->getId(),
-						'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->getName(),
-						'CLASS' => $previousRequestCount % 2 ? '' : 'dark',
-					));
+					$this->getPage()->setVar('pending_request_list_block', '');
+				}
 
-					$this->getPage()->parse('previous_request_block', 'previous_request', true);
-
-					$previousRequestCount++;
+				if ($previousRequestCount) {
+					$this->getPage()->parse('previous_request_list_block', 'previous_request_list');
+				}
+				else {
+					$this->getPage()->setVar('previous_request_list_block', '');
 				}
 			}
-
-			if ($pendingRequestCount) {
-				$this->getPage()->parse('pending_request_list_block', 'pending_request_list');
-			}
 			else {
+				$this->getPage()->parse('no_requests_block', 'no_requests');
+
 				$this->getPage()->setVar('pending_request_list_block', '');
-			}
-
-			if ($previousRequestCount) {
-				$this->getPage()->parse('previous_request_list_block', 'previous_request_list');
-			}
-			else {
 				$this->getPage()->setVar('previous_request_list_block', '');
 			}
 		}
 		else {
-			$this->getPage()->parse('no_requests_block', 'no_requests');
-
-			$this->getPage()->setVar('pending_request_list_block', '');
-			$this->getPage()->setVar('previous_request_list_block', '');
+			error(19);
 		}
 	}
 
