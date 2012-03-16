@@ -170,7 +170,7 @@ class Leave_RequestMapper extends Mapper {
 
         $statement->execute( array(
             'houseId' => $houseId,
-			'limit' => $this->getLimt(),
+			'limit' => $this->getLimit(),
         ) );
 
         $requestList = $statement->fetchAll();
@@ -205,7 +205,7 @@ class Leave_RequestMapper extends Mapper {
 			'houseId' => $houseId,
 			'requestId' => $requestId,
 			'status' => 1,
-			'limit' => $this->getLimt(),
+			'limit' => $this->getLimit(),
 		));
 
 		$requestList = $statement->fetchAll();
@@ -240,7 +240,7 @@ class Leave_RequestMapper extends Mapper {
 			'houseId' => $houseId,
 			'requestId' => $requestId,
 			'status' => 1,
-			'limit' => $this->getLimt(),
+			'limit' => $this->getLimit(),
 		));
 
 		$requestList = $statement->fetchAll();
