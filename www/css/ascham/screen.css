@@ -450,11 +450,11 @@ color: #0066B0;
         font-weight: normal;
         font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
         margin: 0;
-        line-height: 1.2;
+        line-height: 1.8;
         background: none;
         box-shadow: none;
         padding: 0;
     }
-    #hgroup h1 { font-size: 1.8em; }
+    #hgroup h1 { font-size: 2em; }
     #hgroup h2 { font-size: 1.2em }
     #hgroup a, #hgroup a:hover { text-decoration: none; color: #fff; }
