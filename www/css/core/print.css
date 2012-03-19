@@ -86,57 +86,57 @@ h4{font-size:10px;}
 	padding-bottom:4px;
 }
 
-/* Leave Report
- */
+/*********** SORTABLE TABLES (incl leave report)
+******************************/
+
 tr.leave-pending span.grey {
 	color: #ccc;
 }
 
-#requestList {
+.sortable-table {
 	border-collapse: collapse;
+    table-layout:fixed;
+    width:29.7cm !important;
 }
 
-#requestList a {
+.sortable-table .no-arrow {
+    background: none;
+}
+
+.sortable-table a {
 	text-decoration: none;
 	color: #000;
 }
 
-#requestList td, #requestList th {
-	padding: 4px;
+.sortable-table td,
+.sortable-table th {
+	padding: 2px;
+    width:2cm;
 }
 
-#requestList .leaveReportHeaderDate {
+.sortable-table td {
+    border: 1px solid #ccc;
+}
+
+.sortable-table .leaveReportHeaderDate {
 	text-align: center;
 }
-
-#requestList .leaveReportLeftBorder {
-	border-left: 2px solid #000;
+.sortable-table .leaveReportLeftBorder {
+	border-left: 1px solid #000;
 }
-
-#requestList .leaveReportRightBorder {
-	border-right: 2px solid #000;
+.sortable-table .leaveReportRightBorder {
+	border-right: 1px solid #000;
 }
-
-#requestList th, #requestList td {
+.sortable-table th,
+.sortable-table td {
 	text-align: left;
 }
-
-#requestList .leaveReportMeridiem {
-	width: 100px;
+.sortable-table .leaveReportMeridiem {
 	text-align: center;
 }
-
-#requestList .leaveReportYear {
-	width: 30px;
+.sortable-table th.leaveReportYear {
 	text-align: center;
-}
-
-#requestList td {
-	border: 1px solid #ccc;
-}
-
-#requestList .no-arrow {
-	background: none;
+    width:2cm;
 }
 
 /* Date the report was generated
@@ -145,11 +145,11 @@ tr.leave-pending span.grey {
 	margin-bottom: 20px;
 }
 
-#requestList td.leaveReportNoBorder {
+.sortable-table td.leaveReportNoBorder {
 	border-right: 0px;
 	border-left: 0px;
 }
 
-#requestList td.leaveReportNoRightBorder {
+.sortable-table td.leaveReportNoRightBorder {
 	border-right: 0px;
 }

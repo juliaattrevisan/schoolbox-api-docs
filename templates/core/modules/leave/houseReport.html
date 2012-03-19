@@ -7,7 +7,7 @@
 
         $j('#container').css('width', $j('.ruler').outerWidth());
 
-        $j("#requestList").tablesorter({
+        $j(".sortable-table").tablesorter({
             cssHeader: 'sortable',
             cssAsc: 'ascending',
             cssDesc: 'descending',
@@ -99,16 +99,17 @@
             <input id="reportDate" type="text" value="{REPORT_DATE}">
         </form>
     </span>
-    <table id="requestList" class="ruler">
+    <table id="requestList" class="ruler sortable-table">
         <thead>
             <tr>
-                <th></th>
-                <th></th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
 				<!-- BEGIN report_header -->
 				<th colspan="3" class="leaveReportHeaderDate leaveReportLeftBorder leaveReportRightBorder">{REPORT_HEADER_DATE}</th>
 				<!-- END report_header -->
-                <th></th>
-                <th></th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
+                <th>&nbsp;</th>
             </tr>
             <tr>
                 <th>Name</th>
@@ -139,31 +140,28 @@
             </tr>
         </thead>
         <tbody>
+
             <!-- BEGIN row -->
             <!-- BEGIN request -->
             <tr class="{CLASS}">
                 <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
                 <td class='leaveReportYear'>{USER_YEAR}</td>
 				<!-- BEGIN request_period -->
-
 				<!-- BEGIN request_period_show_am -->
 				<td class='leaveReportMeridiem leaveReportLeftBorder'>{REQUEST_PERIOD_MORNING}</td>
 				<!-- END request_period_show_am -->
 				<!-- BEGIN request_period_hide_am -->
 				<td class="leaveReportMeridiem leaveReportLeftBorder leaveReportNoRightBorder"></td>
 				<!-- END request_period_hide_am -->
-
 				<!-- BEGIN request_period_show_day -->
 				<td class='leaveReportMeridiem'>{REQUEST_PERIOD_DAY}</td>
 				<!-- END request_period_show_day -->
 				<!-- BEGIN request_period_hide_day -->
 				<td class="leaveReportMeridiem leaveReportNoBorder"></td>
 				<!-- END request_period_hide_day -->
-
 				<!-- BEGIN request_period_show_pm -->
 				<td class='leaveReportMeridiem leaveReportRightBorder'>{REQUEST_PERIOD_NIGHT}</td>
 				<!-- END request_period_show_pm -->
-
 				<!-- END request_period -->
                 <td>{REQUEST_HOST_TYPE}</td>
 				<td>{REQUEST_DESCRIPTION}</td>
@@ -174,17 +172,18 @@
             <tr class="{CLASS}">
                 <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
                 <td>{USER_YEAR}</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td>TEST</td>
+                <td>TEST</td>
+                <td>TEST</td>
+                <td>TEST</td>
+                <td>TEST</td>
+                <td>TEST</td>
+                <td>TEST</td>
+                <td>TEST</td>
+                <td>TEST</td>
+                <td>TEST</td>
+                <td>TEST</td>
+                <td>TEST</td>
 				<td></td>
             </tr>
             <!-- END empty_request -->

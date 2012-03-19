@@ -6106,18 +6106,17 @@ ul.tree .collapsable .hitarea {
 	color: #f00;
 }
 
-
 /* Leave Report
  */
-#requestList tr.leave-pending span.grey {
-	color: #808080;
+.sortable-table tr.leave-pending span.grey {
+    color: #808080;
 }
 
-#requestList .leaveReportMeridiem {
-	width: 50px;
+.sortable-table .leaveReportMeridiem {
+    width: 50px;
 }
 
-#requestList .leaveReportHeaderDate {
+.sortable-table .leaveReportHeaderDate {
 	text-align: center;
 }
 
