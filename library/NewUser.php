@@ -1,5 +1,5 @@
 <?php
- 
+
 class NewUser extends Model {
     public $id;
 
@@ -24,6 +24,8 @@ class NewUser extends Model {
     public $year;
 
     public $house;
+
+	public $residentialHouse;
 
     public $localEmail;
 
@@ -257,5 +259,24 @@ class NewUser extends Model {
             return 'Unknown User';
         }
     }
+
+	/**
+	 * Set residential house
+	 *
+	 * @param $residentialHouseId
+	 */
+	public function setResidentialHouseId($residentialHouseId) {
+		$this->residentialHouseId = $residentialHouseId;
+	}
+
+	/**
+	 * Get residential house
+	 *
+	 * @return mixed
+	 */
+	public function getResidentialHouseId() {
+		return $this->residentialHouseId;
+	}
+
 
 }

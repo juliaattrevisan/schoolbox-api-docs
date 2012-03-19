@@ -386,7 +386,7 @@ class Leave_Controller extends Controller {
      */
 	public function executeUserRequestList($userId) {
 		$user = $this->getUserMapper()->findById($userId);
-		$house = $this->getHouseMapper()->findById($user->getHouse());
+		$house = $this->getHouseMapper()->findById($user->getResidentialHouseId());
 		$requestList = $this->getRequestMapper()->findAllByUserId($user->getId());
 
 		return array(

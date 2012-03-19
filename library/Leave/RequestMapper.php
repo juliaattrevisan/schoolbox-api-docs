@@ -166,6 +166,7 @@ class Leave_RequestMapper extends Mapper {
             LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
             WHERE u.residential_house_id = :houseId
             AND lr.created >= :limit
+            ORDER BY u.year, u.lastname
         ");
 
         $statement->execute( array(
@@ -253,6 +254,10 @@ class Leave_RequestMapper extends Mapper {
 	/**
      * Returns all users in a house and any requests that intersect a date range defined by $start and $finish.
      * Returns users regardless of whether they have any requests.
+	 *
+	 * Uses a wacky pseudo-natural-sort method found here:
+	 * http://stackoverflow.com/questions/153633/natural-sort-in-mysql
+	 * ...in order to produce an ordered list of leave requests, ordered by surname within a year level descending
      *
      * @param Integer $houseId
      * @param String $start
@@ -271,6 +276,7 @@ class Leave_RequestMapper extends Mapper {
                 AND lr.finish > :start
             LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
             WHERE u.residential_house_id = :houseId
+            ORDER BY LENGTH(u.year), u.year, u.lastname
               /*AND g.type = 'student'*/
         ");
 
