@@ -408,6 +408,7 @@ if (is_numeric($this->arg[0])) {
 			}
 		}
 		else if($groupHandler->isStaff($user['uid']) && $groupHandler->isStaff()) {
+
 			$this->parse("timetable_link_block", "timetable_link");
 			$this->parse("portrait_block", "portrait");
 
@@ -420,6 +421,7 @@ if (is_numeric($this->arg[0])) {
             $this->setVar('BUILDING', $synInfo['StaffBuilding']);
 			$this->setVar('CAMPUS', $synInfo['StaffCampusDescription']);
             $this->setVar('CATEGORY', $synInfo['StaffCategoryDescription']);
+            $this->setVar('VOICEMAIL', $synInfo['StaffVoiceMail']);
 
 			$this->parse('staff_synergy_block','staff_synergy');
 		}

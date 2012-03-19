@@ -162,7 +162,8 @@ class External_Synergetic_User implements External_UserInterface {
     function getStaff($synID)
     {
          $query = " SELECT SchoolStaffCode, luBuilding.Description as StaffBuilding, StaffRoom, StaffExtension,
-                           StaffMobilePhone, StaffCampusDescription, StaffCategoryDescription, luDepartment.Description as StaffDepartment
+                           StaffMobilePhone, StaffCampusDescription, StaffCategoryDescription,
+                           luDepartment.Description as StaffDepartment, StaffVoiceMail
              FROM SynergyOne.dbo.vStaff vStaff
              LEFT JOIN SynergyOne.dbo.luBuilding ON StaffBuilding = luBuilding.Code
              LEFT JOIN SynergyOne.dbo.luDepartment ON StaffDepartment = luDepartment.Code
@@ -419,7 +420,7 @@ class External_Synergetic_User implements External_UserInterface {
 				vStaff.StaffCampusDescription, vStaff.StaffCategoryType,
 				JobPositions.StaffDepartmentDescription AS StaffDepartment, JobPositions.JobPositionDescription
 			FROM SynergyOne.dbo.vStaff vStaff
-			LEFT JOIN vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
+			LEFT JOIN SynergyOne.dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
 			WHERE ActiveFlag = 1
 			AND StaffCategoryDescription != 'Staff on leave'
 			AND ( JobPositions.StaffJobPositionStartDate < GETDATE()
