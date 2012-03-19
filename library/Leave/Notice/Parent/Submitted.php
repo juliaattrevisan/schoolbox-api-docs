@@ -1,0 +1,31 @@
+<?php
+/**
+ * Leave_Notice_Parent_Submitted
+ *
+ * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @link		http://www.alaress.com.au/
+ * @version	 SVN: $Id$
+ */
+class Leave_Notice_Parent_Submitted extends Leave_Notice_Parent_Abstract {
+
+	/**
+	 * Setup
+	 */
+	public function setup() {
+
+		/* Common replacements
+		 */
+		parent::setup();
+
+		/* Custom replacements
+		 */
+		$this->getEmail()->setVar(array(
+			'LEAVE_SUBMITTED_BY' => $this->getRequest()->getUser()->getName(),
+		));
+
+		$this->getEmail()->parse('submitted_by_block', 'submitted_by');
+		$this->getEmail()->setVar('authorised_by_block', '');
+		$this->getEmail()->setVar('rejected_by_block', '');
+	}
+}

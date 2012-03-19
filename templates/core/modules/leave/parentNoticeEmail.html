@@ -1,7 +1,4 @@
 <h1>Leave Request for {LEAVE_USER_NAME}: {LEAVE_STATUS}</h1>
-<p>
-	(<em>confirmed by {LEAVE_AUTHORISATION_NAME}</em>)
-</p>
 
 <h2>Leave Details</h2>
 <dl>
@@ -23,9 +20,24 @@
 	<dd>{LEAVE_STUDENT_PHONE}</dd>
 </dl>
 
+<!-- BEGIN submitted_by -->
 <p>
-	Authorised by <em>{LEAVE_AUTHORISATION_NAME}</em>
+	Submitted by <em>{LEAVE_SUBMITTED_BY}</em>
 </p>
+<!-- END submitted_by -->
+
+<!-- BEGIN authorised_by -->
+<p>
+	Authorised by <em>{LEAVE_AUTHORISED_BY}</em><br />
+	Confirmed by {LEAVE_CONFIRMED_BY}
+</p>
+<!-- END authorised_by -->
+
+<!-- BEGIN rejected_by -->
+<p>
+	Rejected by <em>{LEAVE_REJECTED_BY}</em>
+</p>
+<!-- END rejected_by -->
 
 <div>
 	<h2>Terms And Conditions</h2>

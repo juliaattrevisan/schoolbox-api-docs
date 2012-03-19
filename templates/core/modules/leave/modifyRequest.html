@@ -155,17 +155,18 @@
                 <textarea rows="4" cols="60" name="request[notes]">{REQUEST_NOTES}</textarea>
             </td>
         </tr>
+		<!-- BEGIN has_confirmed_by -->
 		<tr>
-      <td class="formLabelWidth">
-          <h4>Confirmed by</h4>
-          <em></em>
-      </td>
-      <td colspan="3">
-		  <!-- BEGIN confirmed_by -->
-		  <input type='radio' name='request[confirmedBy]' value='{CONFIRMED_BY_VALUE}' {CONFIRMED_BY_SELECTED} />{CONFIRMED_BY_LABEL}<br />
-		  <!-- END confirmed_by -->
-      </td>
-  </tr>
+			<td class="formLabelWidth">
+				<h4>Confirmed by</h4><em></em>
+			</td>
+			<td colspan="3">
+				<!-- BEGIN confirmed_by -->
+				<input type='radio' name='request[confirmedBy]' value='{CONFIRMED_BY_VALUE}' {CONFIRMED_BY_SELECTED} />{CONFIRMED_BY_LABEL}<br />
+				<!-- END confirmed_by -->
+			</td>
+		</tr>
+		<!-- END has_confirmed_by -->
 	</table>
 
     <input type="hidden" name="request[id]" value="{REQUEST_ID}">

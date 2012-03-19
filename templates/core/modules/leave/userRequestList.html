@@ -10,7 +10,7 @@
             cssDesc: 'descending',
             headers: {
                 0: { sorter: false},
-                6: { sorter: false}
+                5: { sorter: false}
             }
         });
 
@@ -48,9 +48,6 @@
         <table id="pendingRequestList" class="ruler">
             <thead>
                 <tr>
-					<!-- BEGIN approval_header -->
-                    <th></th>
-					<!-- END approval_header -->
                     <th>Name</th>
                     <th>Year</th>
                     <th>Leave Date</th>
@@ -62,9 +59,6 @@
             <tbody>
                 <!-- BEGIN pending_request -->
                 <tr class="{CLASS}">
-					<!-- BEGIN approval_control -->
-                    <td><input name="requestList[][id]" type="checkbox" value="{REQUEST_ID}" /></td>
-					<!-- END approval_control -->
                     <td><a href="/search/user/{USER_ID}">{USER_NAME}</a></td>
                     <td>{USER_YEAR}</td>
                     <td>{REQUEST_START}</td>
@@ -78,10 +72,6 @@
 
         <div class="clearfix">
             <input type="hidden" name="user[id]" value="{USER_ID}">
-			<!-- BEGIN approval_submit -->
-            <input type="submit" name="approve" value="Approve Selected" class="submit-btn-plain">
-			<input type="submit" name="reject" value="Reject Selected" class="submit-btn-plain">
-			<!-- END approval_submit -->
         </div>
     </form>
     <!-- END pending_request_list -->

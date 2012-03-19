@@ -197,9 +197,11 @@ class Leave_Controller extends Controller {
 
 		/* Render dropdowns
 		 */
+		$request = new Leave_Request();
+
 		$this->renderStartTimeDropdown();
 		$this->renderFinishTimeDropdown();
-		$this->renderHostTypeDropdown(new Leave_Request());
+		$this->renderHostTypeDropdown($request);
 
         $this->getPage()->setVar($data);
 
@@ -268,6 +270,7 @@ class Leave_Controller extends Controller {
 
 		$request = $this->getRequestMapper()->findById($request->getId());
 
+		$this->sendUserNotice($request);
 		$this->sendParentNotice($request);
 
 		SitePage::localRedir("/modules/leave/student/{$request->getUserId()}");
@@ -417,31 +420,12 @@ class Leave_Controller extends Controller {
 			$this->getPage()->setBlock('pending_request_list', 'pending_request', 'pending_request_block');
 			$this->getPage()->setBlock('previous_request_list', 'previous_request', 'previous_request_block');
 
-			/* Checkbox
-			 */
-			$this->getPage()->setBlock('pending_request_list', 'approval_header', 'approval_header_block');
-			$this->getPage()->setBlock('pending_request_list', 'approval_submit', 'approval_submit_block');
-			$this->getPage()->setBlock('pending_request', 'approval_control', 'approval_control_block');
-
 			$this->getPage()->setVar(array(
 				'USER_ID' => $user->getId(),
 				'USER_NAME' => $user->getName(),
 				'HOUSE_NAME' => $house->getHouse(),
 				'HOUSE_ID' => $house->getId()
 			));
-
-			/* Ability to render various controls
-			 */
-			$canApproveRequests = ($this->getGroup()->isStaff() || $this->getGroup()->isSuperuser());
-
-			if ($canApproveRequests) {
-				$this->getPage()->parse('approval_header_block', 'approval_header');
-				$this->getPage()->parse('approval_submit_block', 'approval_submit');
-			}
-			else {
-				$this->getPage()->setVar('approval_header_block', '');
-				$this->getPage()->setVar('approval_submit_block', '');
-			}
 
 			/* Render each request
 			 */
@@ -470,15 +454,6 @@ class Leave_Controller extends Controller {
 						$this->getPage()->parse('pending_request_block', 'pending_request', true);
 
 						$pendingRequestCount++;
-
-						/* Render control for pending requests
-						 */
-						if ($canApproveRequests) {
-							$this->getPage()->parse('approval_control_block', 'approval_control');
-						}
-						else {
-							$this->getPage()->setVar('approval_control_block', '');
-						}
 					}
 					else {
 						$this->getPage()->setVar(array(
@@ -585,6 +560,7 @@ class Leave_Controller extends Controller {
 
 	/**
 	 * Render confirmed by checkbox array
+	 * Knows whether to show them depending on user type
 	 *
 	 * @param $request
 	 */
@@ -593,21 +569,26 @@ class Leave_Controller extends Controller {
 
 		/* Iterate through options
 		 */
-		foreach($request->getConfirmedByMap() as $value => $label) {
-			if ($request->getConfirmedBy() == $value) {
-				$selected = 'checked=\'checked\'';
-			}
-			else {
-				$selected = '';
-			}
+		if ($this->getGroup()->isStaff() || $this->getGroup()->isSuperuser()) {
+			foreach($request->getConfirmedByMap() as $value => $label) {
+				if ($request->getConfirmedBy() == $value) {
+					$selected = 'checked=\'checked\'';
+				}
+				else {
+					$selected = '';
+				}
 
-			$this->getPage()->setVar(array(
-				'CONFIRMED_BY_VALUE' => $value,
-				'CONFIRMED_BY_LABEL' => $label,
-				'CONFIRMED_BY_SELECTED' => $selected,
-			));
+				$this->getPage()->setVar(array(
+					'CONFIRMED_BY_VALUE' => $value,
+					'CONFIRMED_BY_LABEL' => $label,
+					'CONFIRMED_BY_SELECTED' => $selected,
+				));
 
-			$this->getPage()->parse('confirmed_by_block', 'confirmed_by', true);
+				$this->getPage()->parse('confirmed_by_block', 'confirmed_by', true);
+			}
+		}
+		else {
+			$this->getPage()->setVar('has_confirmed_by_block', '');
 		}
 	}
 
@@ -1473,24 +1454,21 @@ class Leave_Controller extends Controller {
 	 * @param $request
 	 */
     public function sendUserNotice ($request) {
-		$subject = '(Student) Leave Request Status Update for ' . $request->getUser()->getName();
-
-        $userNoticeEmail = new Mailer('../modules/leave/userNoticeEmail.html', $subject , $request->getUser()->getAltEmail());
-
-        $userNoticeEmail->setVar(array(
-            'LEAVE_USER_NAME' => $request->getUser()->getName(),
-			'LEAVE_STATUS' => $request->getStatus(true),
-            'LEAVE_START' => $request->getStart()->getLong(),
-			'LEAVE_FINISH' => $request->getFinish()->getLong(),
-			'LEAVE_DESCRIPTION' => $request->getDescription(),
-			'LEAVE_HOST_NAME' => $request->getHostName(),
-			'LEAVE_HOST_PHONE' => $request->getHostPhone(),
-			'LEAVE_STUDENT_PHONE' => $request->getUserPhone(),
-            'LEAVE_AUTHORISATION_NAME' => $request->getAuthorisationUser()->getName(),
-			'TERMS_AND_CONDITIONS' => Cfg::get('terms_and_conditions'),
-        ));
-
-        $userNoticeEmail->send();
+		if ($request->isPending()) {
+			$notice = new Leave_Notice_User_Submitted($request);
+			$notice->setup();
+			$notice->send();
+		}
+		else if ($request->isApproved()) {
+			$notice = new Leave_Notice_User_Authorised($request);
+			$notice->setup();
+			$notice->send();
+		}
+		else if ($request->isRejected()) {
+			$notice = new Leave_Notice_User_Rejected($request);
+			$notice->setup();
+			$notice->send();
+		}
     }
 
 	/**
@@ -1500,29 +1478,20 @@ class Leave_Controller extends Controller {
 	 */
     public function sendParentNotice ($request) {
 		if (!Cfg::get('parent_notification')) {
-			$parentList = $this->getExternalUser()->getStudentContactList($request->getUser()->getSynergyId());
-
-			$subject = '(Parent) Leave Request Status Update for ' . $request->getUser()->getName();
-
-			if (is_array($parentList)) {
-				foreach ($parentList as $parent) {
-					$parentNoticeEmail = new Mailer('../modules/leave/parentNoticeEmail.html', $subject, $parent['StudentContactDefaultEmail']);
-
-					$parentNoticeEmail->setVar(array(
-						'LEAVE_USER_NAME' => $request->getUser()->getName(),
-						'LEAVE_STATUS' => $request->getStatus(true),
-						'LEAVE_START' => $request->getStart()->getLong(),
-						'LEAVE_FINISH' => $request->getFinish()->getLong(),
-						'LEAVE_DESCRIPTION' => $request->getDescription(),
-						'LEAVE_HOST_NAME' => $request->getHostName(),
-						'LEAVE_HOST_PHONE' => $request->getHostPhone(),
-						'LEAVE_STUDENT_PHONE' => $request->getUserPhone(),
-						'LEAVE_AUTHORISATION_NAME' => $request->getAuthorisationUser()->getName(),
-						'TERMS_AND_CONDITIONS' => Cfg::get('terms_and_conditions'),
-					));
-
-					$parentNoticeEmail->send();
-				}
+			if ($request->isPending()) {
+				$notice = new Leave_Notice_Parent_Submitted($request);
+				$notice->setup();
+				$notice->send();
+			}
+			else if ($request->isApproved()) {
+				$notice = new Leave_Notice_Parent_Authorised($request);
+				$notice->setup();
+				$notice->send();
+			}
+			else if ($request->isRejected()) {
+				$notice = new Leave_Notice_Parent_Rejected($request);
+				$notice->setup();
+				$notice->send();
 			}
 		}
 	}

@@ -487,7 +487,7 @@ class Leave_Request extends Model {
 	 * @param $index
 	 * @return array
 	 */
-	private function getConfirmedByMapIndex($index) {
+	public function getConfirmedByMapIndex($index) {
 		return $this->confirmedByMap[$index];
 	}
 }
