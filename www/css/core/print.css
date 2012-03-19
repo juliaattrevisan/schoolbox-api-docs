@@ -3,7 +3,7 @@
 
 @page {size:landscape}
 body{font-family:Arial, Helvetica, sans-serif;font-size:10px !important;}
-#container{margin:0;}
+#container{margin:0; width:100% !important; }
 #calendar h3{float:none; width:100%;text-align:center; font-weight:bold;}
 table {height:100%; vertical-align:top; font-size:10px; width:100%;}
 table td{vertical-align:top; text-align:left; font-size:10px; width:14.2%}
@@ -95,8 +95,9 @@ tr.leave-pending span.grey {
 
 .sortable-table {
 	border-collapse: collapse;
-    table-layout:fixed;
-    width:29.7cm !important;
+    width:100% !important;
+    table-layout: fixed;
+    page-break-inside:avoid
 }
 
 .sortable-table .no-arrow {
@@ -111,7 +112,7 @@ tr.leave-pending span.grey {
 .sortable-table td,
 .sortable-table th {
 	padding: 2px;
-    width:2cm;
+    width:4% !important
 }
 
 .sortable-table td {
@@ -153,3 +154,4 @@ tr.leave-pending span.grey {
 .sortable-table td.leaveReportNoRightBorder {
 	border-right: 0px;
 }
+

@@ -2,6 +2,13 @@
 <script type="text/javascript" src="/javascript/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
+<style type="text/css">
+    @page {
+  size: landscape;
+}
+</style>
+
+
 <script type="text/javascript">
     $j(function() {
 
@@ -99,7 +106,23 @@
             <input id="reportDate" type="text" value="{REPORT_DATE}">
         </form>
     </span>
-    <table id="requestList" class="ruler sortable-table">
+    <table id="requestList" class="ruler sortable-table" width="100%">
+        <colgroup>
+            <col width="4%">
+            <col width="2%">
+            <col width="2%">
+            <col width="2%">
+            <col width="2%">
+            <col width="2%">
+            <col width="2%">
+            <col width="2%">
+            <col width="2%">
+            <col width="2%">
+            <col width="2%">
+            <col width="4%">
+            <col width="4%">
+            <col width="4%">
+        </colgroup>
         <thead>
             <tr>
                 <th>&nbsp;</th>
@@ -172,19 +195,18 @@
             <tr class="{CLASS}">
                 <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
                 <td>{USER_YEAR}</td>
-                <td>TEST</td>
-                <td>TEST</td>
-                <td>TEST</td>
-                <td>TEST</td>
-                <td>TEST</td>
-                <td>TEST</td>
-                <td>TEST</td>
-                <td>TEST</td>
-                <td>TEST</td>
-                <td>TEST</td>
-                <td>TEST</td>
-                <td>TEST</td>
-				<td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
             </tr>
             <!-- END empty_request -->
             <!-- END row -->
