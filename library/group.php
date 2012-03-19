@@ -5,6 +5,7 @@ define('CALENDAR_SERVICE', 2);
 define('NEWS_SERVICE', 3);
 define('TUTORIAL_SERVICE', 4);
 define('CMS_SERVICE', 5);
+define('HOUSEMASTER_SERVICE', 6);
 
 define('DENY_ACCESS', 0);
 define('READ_ACCESS', 1);

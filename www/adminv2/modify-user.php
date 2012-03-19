@@ -22,11 +22,13 @@ if(is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, 'user_calendar', 'user_calendar_block');
 	$this->setBlock(TEMPLATE_content, 'user_news', 'user_news_block');
 	$this->setBlock(TEMPLATE_content, 'user_cms', 'user_cms_block');
+    $this->setBlock(TEMPLATE_content, 'user_housemaster', 'user_housemaster_block');
 
 	$this->setVar(array(
 		'user_calendar_block' => '',
 		'user_news_block' => '',
-		'user_cms_block'=> ''
+		'user_cms_block'=> '',
+        'user_housemaster_block'=> ''
 	));
 
     /* Modify existing user
@@ -183,6 +185,10 @@ if(is_numeric($this->arg[0])) {
 					/* CMS
 					 */
                     case 5: $this->parse('user_cms_block', 'user_cms', true); break;
+
+                    /* Housemaster
+					 */
+                    case 6: $this->parse('user_housemaster_block', 'user_housemaster', true); break;
 				}
 
 				/* Clear child blocks after parsing out parent
