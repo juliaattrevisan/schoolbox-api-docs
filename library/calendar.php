@@ -158,6 +158,7 @@ class Calendar extends DeprecatedModel {
 	}
 
 
+
 	function getGroupList() {
 		$query = "SELECT * FROM groups";
 		$groupList = $this->db->getAll($query);

@@ -74,10 +74,11 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
                 $offset = ($this->synergeticDay[$startDate]-1) + (date('N', $startDate) + 4);
 
                 // timetable does not start on a Monday: calculate the offset for display
-                $today = $day - $offset;
+                $today = ($day+$this->days[$campus]) - $offset;
+
 
                 // if offset pushes "today" back further than the diaplayed week, wraparound
-                while($today < 0) {
+                while($today <= 0) {
                     $today += $this->days[$campus];
                 }
 
