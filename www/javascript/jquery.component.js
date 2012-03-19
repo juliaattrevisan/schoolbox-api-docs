@@ -179,7 +179,6 @@ setupCustomise = {
 		colours: function() {
 			$j('div.colorBox').each(function () {
 				$j(this).css('backgroundColor', pickers[$j(this).attr('id')]);
-				//$j(this).next().val(pickers[$j(this).attr('id')]);
 			});
 
 			var f = $j.farbtastic('#picker');
@@ -341,24 +340,43 @@ setupCustomise = {
 					$j(this).css('background-color', defaults[$j(this).attr('id')]);
 				});
 
-				resetColours('top');
-				resetColours('left');
-				resetColours('right');
+                resetColours(['.top', '.left' ,'.right']);
 
-				pickers = defaults;
+                pickers = defaults;
+
 
 			});
 
 			function resetColours(area) {
-				$j('.'+area+' h2').css({
-					"color": defaults[area+'_head_font'],
-					"background-color":defaults[area+'_head_bg']
-				});
-				$j('.'+area+' p, .'+area+' h3, .'+area+' .listing p.small').css("color", defaults[area+'_font']);
-				$j('.'+area+' a, .'+area+' .listing p.small a').css('color', defaults[area+'_link']);
-				$j('.'+area+' .box a:hover, .'+area+' .listing p.small a:hover').css('color', defaults[area+'_hover']);
-				$j('.'+area+' .text, .'+area+' .listing').css('background',defaults[area+'_bg_primary']);
-				$j('.'+area+'.listing .dark ').css('background',defaults[area+'_bg_secondary']);
+
+                $j.each(area, function(index, value) {
+
+                    var areaClass = value,
+                    areaVariable = value.substr(1);
+
+                    $j(areaClass).find('h2').css({
+                        "color": defaults[areaVariable+'_head_font'],
+                        "background-color": defaults[areaVariable+'_head_bg']
+                    });
+
+                    $j(areaClass).find('p, h3, .listing p.small').css({
+                        "color": defaults[areaVariable+'_font']
+                    });
+
+                    $j(areaClass).find('a, .listing p.small a').css({
+                        'color': defaults[areaVariable+'_link']
+                    });
+
+                    $j(areaClass).find('.text, .listing').css({
+                        'background': defaults[areaVariable+'_bg_primary']
+                    });
+
+                    $j(areaClass).find('.dark').css({
+                        'background':  defaults[areaVariable+'_bg_secondary']
+                    });
+
+                });
+                return false;
 			}
 
 			$j('#cancel').click(function() {
@@ -366,7 +384,11 @@ setupCustomise = {
 					$j(this).css('background-color', original[$j(this).attr('id')]);
 				});
 
-				$j('.text, .dark, h2(:not(.hide)), a, p').removeAttr("style");
+				$j('.text, .dark, h2:not(.hide), a, p').each(function () {
+                      $j(this).removeAttr("style");
+                });
+
+                pickers = original;
 
 			});
 
