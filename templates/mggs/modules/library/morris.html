@@ -40,19 +40,18 @@ $j(window).load(function(){
 
 
 	<div class="library-header">
-        <form id="library-search" action="http://library.mggs.vic.edu.au/oliver/opac/search.do" method="get">
+        <form id="library-search" action="http://library.mggs.vic.edu.au/oliver/olly/search.do" method="get">
             <fieldset>
-                <input id="library-search-field" type="text" title="Catalogue Search" name="queryTerm" />
+                <input id="library-search-field" type="text" title="Catalogue Search" name="searchTerm" />
                 <input id="library-search-button" type="submit" value="Search" />
 
-                <input type="hidden" name="mode" value="BASIC" />
-                <input type="hidden" name="activeMenuItem" value="false" />
+                <input type="hidden" name="action" value="search" />
             </fieldset>
         </form>
 		<h1>Morris Hall Library <span>Whose library? Our Library!</span></h1>
 		<ul>
 			<li><a href="/modules/library/morris">Home</a></li>
-			<li><a href="http://library.mggs.vic.edu.au/oliver"  rel="external">Catalogue</a></li>
+			<li><a href="http://library.mggs.vic.edu.au/oliver/OpacLogin?corporation=default_corp&url=/olly/start.do&defaultBranch=Morris Hall"  rel="external">Catalogue</a></li>
 			<li><a href="/homepage/4778">Let's Read</a></li>
 			<li><a href="/homepage/4780">Finding Out</a></li>
 			<li><a href="/homepage/4779">Digital Citizenship</a></li>
