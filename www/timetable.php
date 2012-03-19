@@ -55,6 +55,8 @@ if (is_array($outputList)) {
         );
         $this->setVar($outputUser);
 
+        $staffFlag = $groupHandler->isStaff($user['uid']);
+
         $periodCurrent = $timetableHandler->getPeriodNumber($user['campus']);
         $dayCurrent = $timetableHandler->getDayNumber($user['campus']);
 
@@ -115,7 +117,7 @@ if (is_array($outputList)) {
                             $outputPeriod = array('PERIOD_DESC'    => Scrub::Text($period['description']),
                                                   'PERIOD_CODE'    => '(' . Scrub::Text($period['code']) . ')',
                                                   'PERIOD_ROOM'    => Scrub::Text($period['room']),
-                                                  'PERIOD_STAFF'   => ' - ' . $userHandler->formatName($teacher),
+                                                  'PERIOD_STAFF'   => $staffFlag?'':' - ' . $userHandler->formatName($teacher),
                                                   'PERIOD_ONCLICK' => '',
                             );
 
