@@ -87,7 +87,7 @@ class Leave_Controller extends Controller {
         $this->setRequestMapper(Leave_RequestMapper::getInstance());
         $this->setHouseMapper(HouseMapper::getInstance());
         $this->setExternalUser(new External_User());
-		$this->setGroup(new Group());
+		$this->setGroup(new Group(HOUSEMASTER_SERVICE));
     }
 
     /**
@@ -213,7 +213,7 @@ class Leave_Controller extends Controller {
 
 		/* Apply autocomplete if appropriate - staff can submit on someone else's behalf
 		 */
-		if ($this->getGroup()->isStaff()) {
+		if ($this->getGroup()->getPermission(null)) {
 			$this->getPage()->setVar(array(
 				'STUDENT_GROUP_IDS' => implode(',', $this->getGroup()->getStudentGroupTypeIds())
 			));
@@ -249,7 +249,7 @@ class Leave_Controller extends Controller {
 		/* Use the userId field when submitting on someone else's behalf,
 		 * otherwise just your own id
 		 */
-		if ($this->getGroup()->isStaff()) {
+		if ($this->getGroup()->getPermission()) {
 			$request->setUserId($data['userId']);
 		}
 		else {
@@ -407,7 +407,7 @@ class Leave_Controller extends Controller {
 		/* Only allow students to see their own leave requests
 		 * Allow staff/superusers to see anyone's
 		 */
-		if ($this->getGroup()->isStaff() || $this->getGroup()->isSuperuser() || $_SESSION['id'] == $data['user']['id']) {
+		if ($this->getGroup()->getPermission() || $_SESSION['id'] == $data['user']['id']) {
 			$user = $data['user'];
 			$house = $data['house'];
 			$requestList = $data['requestList'];
@@ -506,7 +506,7 @@ class Leave_Controller extends Controller {
 
 		/* Only allow Teachers/Staff to approve/reject requests
 		 */
-		if ($this->getGroup()->isStaff() || $this->getGroup()->isSuperuser()) {
+		if ($this->getGroup()->getPermission()) {
 			$user = $data['user'];
 			$requestList = $data['requestList'];
 
@@ -569,7 +569,7 @@ class Leave_Controller extends Controller {
 
 		/* Iterate through options
 		 */
-		if ($this->getGroup()->isStaff() || $this->getGroup()->isSuperuser()) {
+		if ($this->getGroup()->getPermission()) {
 			foreach($request->getConfirmedByMap() as $value => $label) {
 				if ($request->getConfirmedBy() == $value) {
 					$selected = 'checked=\'checked\'';
@@ -602,7 +602,7 @@ class Leave_Controller extends Controller {
 
 		/* Only allow Teachers/Staff to modify requests
 		 */
-		if ($this->getGroup()->isStaff() || $this->getGroup()->isSuperuser()) {
+		if ($this->getGroup()->getPermission()) {
 			$request = $data['request'];
 			$user = $request->getUser();
 			$house = $this->getHouseMapper()->findById($user->getHouse());
