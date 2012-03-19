@@ -242,6 +242,99 @@ class News extends DeprecatedModel {
 		return $headlines;
 	}
 
+    function getNewsArchive($topic = '', $year = 0, $month = 0, $index = 0, $limit = 0) {
+        $userHandler = new Group;
+        $shareResults = array();
+
+        /* Prevent copies of posts appearing if they are posted to another group.
+        */
+
+        if($topic == '' || $topic == 'all')
+            $topicFilter = '';
+        else
+            $topicFilter = " AND newsTopic.name = '$topic' ";
+
+        $yearFilter = $year != 0 ? " AND YEAR(news_items.item_datetime_published) = $year " : '';
+        $monthFilter = $month != 0 ? " AND MONTH(news_items.item_datetime_published) = $month " : '';
+
+        if (!$userHandler->isSuperuser()) {
+            $query = "
+         SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner, news_items.item_body,
+            DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime,
+            news_items.item_datetime_posted, news_items.item_datetime_modified,
+            DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
+            user.lastname, user.title, user.id as uid, user.firstname, newsTopic.name topicName, newsTopicID
+         FROM `".$this->_table."`
+         LEFT JOIN user ON news_items.item_owner = user.id
+         JOIN newsCampus ON newsCampus.id = news_items.item_id
+            AND newsCampus.campus IN(".implode(',',$_SESSION['campus']).")
+            OR news_items.item_campus='4'
+         JOIN newsGroup ON newsGroup.id = news_items.item_id
+            AND newsGroup.gid = '".$_SESSION['gid']."'
+         JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
+         WHERE news_items.item_owner != '".$_SESSION['id']."'
+            AND news_items.item_deleted = 0
+            AND item_datetime_published < NOW()
+            AND news_items.item_datetime_expires <= NOW()
+            $topicFilter $yearFilter $monthFilter
+         GROUP BY news_items.item_id ORDER BY newsTopic.newsTopicID, news_items.item_datetime_posted DESC";
+
+            $shareResults = $this->db->getAll($query);
+        }
+
+        $query = "
+		SELECT DISTINCT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_body,
+			DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
+			DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
+			user.lastname, user.title, user.firstname, user.id as uid, newsTopic.name topicName, newsTopicID
+		FROM `".$this->_table."`
+		LEFT JOIN user ON news_items.item_owner = user.id
+        LEFT JOIN newsUser ON newsUser.newsID = news_items.item_id
+		JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
+        WHERE news_items.item_deleted = 0";
+
+        /* If the current user is a superuser, do not filter their results.
+        * Otherwise, restrict news post selection by ownership.
+        */
+        if (!$userHandler->isSuperuser()) {
+            $query .= " AND (news_items.item_owner = '".$_SESSION['id']."'
+                        OR (newsUser.userID = '".$_SESSION['id']."'
+                        AND item_datetime_published < NOW() )) ";
+        }
+
+        $query .= " AND news_items.item_datetime_expires <= NOW()
+                    $topicFilter $yearFilter $monthFilter
+                    ORDER BY newsTopic.newsTopicID, news_items.item_datetime_posted DESC;";
+
+        $userResults = $this->db->getAll($query);
+
+        //merge and sort the headlines based on time
+        if(is_array($shareResults) && is_array($userResults))
+            $allNews = array_merge($shareResults, $userResults);
+        else if(is_array($shareResults))
+            $allNews = $shareResults;
+        else if(is_array($userResults))
+            $allNews = $userResults;
+        else
+            return false;
+
+        usort($allNews,array($this,"timecmp"));
+
+        if ($limit > 0)
+            $allNews = array_slice($allNews, $index, $limit);
+
+        return $allNews;
+    }
+
+
+
+    /**
+     * @param int $id
+     * @param bool $archive
+     * @param int $index
+     * @param int $limit
+     * @return array|bool
+     */
 	function getNews($id = 0, $archive = false, $index = 0, $limit = 0) {
       $userHandler = new Group;
       $shareResults = array();
@@ -382,6 +475,36 @@ class News extends DeprecatedModel {
 		$query = "SELECT * FROM `newsTopic` ORDER BY `name`";
 		return $this->db->getAll($query);
 	}
+
+    /**
+     * Returns a list of years and months which have news articles
+     *
+     * @param Integer $categoryId
+     * @return Array|Bool
+     */
+    public function getOccupiedDateList ($topicName = '') {
+        $query = "SELECT YEAR(`item_datetime_published`) as 'year', item_datetime_published,
+                         MONTH(`item_datetime_published`) as 'month'
+				  FROM `news_items`";
+
+        if($topicName != '' && $topicName != 'all')
+            $query .= " LEFT JOIN newsTopic
+                        ON news_items.item_topic_id = newsTopic.newsTopicID
+                        WHERE `name` = '$topicName'
+                        AND ";
+        else
+            $query .= " WHERE";
+
+
+
+        $query .= " item_datetime_expires < NOW()
+                    GROUP BY `year` DESC, `month` DESC";
+
+        return $this->db->getAll($query);
+    }
+
 }
+
+
 
 ?>

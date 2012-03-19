@@ -1,0 +1,59 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
+<script type="text/javascript">
+    $j(function() {
+        $j('.news-item:nth-child(2n)' ).addClass('dark');
+    });
+</script>
+<!-- END custom_head -->
+
+<!-- BEGIN add_news -->
+<a class="btn add" href="/news/modify"><span></span>Add News</a>
+        <h1>News Archive</h1>
+<!-- END add_news -->
+<div class="newsWrapper blog-archive clearfix">
+    <ul id="category" class="clearfix">
+        <!-- BEGIN topic_header -->
+        <li><a {TOPIC_CLASS} href="/news/archive/{TOPIC_CLEAN}" title="{TOPIC_CLEAN}">{NEWS_TOPIC}</a></li>
+        <!-- END topic_header -->
+    </ul>
+    <div class="blog-archive-menu">
+        <ul>
+            <!-- BEGIN year -->
+            <li class="{YEAR_CLASS}"><h3>{YEAR}</h3>
+                <ul>
+                    <!-- BEGIN month -->
+                    <li>
+                        <a class="{MONTH_CLASS} blogArchiveNav"
+                           href="/news/archive/{MENU_TOPIC_CLEAN}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a>
+                    </li>
+                    <!-- END month -->
+                </ul>
+            </li>
+            <!-- END year -->
+        </ul>
+    </div>
+    <div class="blog-posts">
+        <!-- BEGIN topic -->
+        <div id="{TOPIC_CLEAN}">
+            <!-- BEGIN news -->
+            <div id="a{NEWS_ID}" class="news-item clearfix">
+                <h2>{NEWS_TITLE}</h2>
+                <div class="wysiwyg"> {NEWS_BODY}
+                    <p class="submitted-by">Submitted by {POSTER} on {DATETIME}{MODIFY}</p>
+                </div>
+            </div>
+            <!-- END news -->
+        </div>
+        <!-- END topic -->
+    </div>
+</div>
+
+<div class="pagination">
+  <!-- BEGIN previous_button -->
+  <a class="prev" href="/news/archive/{PREVIOUS_PAGE}">&lt;&lt; Prev</a><!-- END previous_button -->
+  <!-- BEGIN page_number -->
+  <a class="number{CURRENT}" href="/news/archive/{PAGE_INDEX_REF}">{PAGE_INDEX}</a><!-- END page_number -->
+  <!-- BEGIN next_button -->
+  <a class="next" href="/news/archive/{NEXT_PAGE}">Next &gt;&gt;</a><!-- END next_button -->
+</div>
