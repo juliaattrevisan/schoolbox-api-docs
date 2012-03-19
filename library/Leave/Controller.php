@@ -1315,8 +1315,11 @@ class Leave_Controller extends Controller {
 		));
 
 		/* For each day, render a heading
+		 * Exclude initial Friday -_-
 		 */
-		foreach($data['dateList'] as $currentDate) {
+		for ($i = 1; $i < count($data['dateList']); $i++) {
+			$currentDate = $data['dateList'][$i];
+
 			$this->getPage()->setVar(array(
 				'REQUEST_DATE_HEADER_DATE' => $currentDate->getLongDateOnly()
 			));
@@ -1326,7 +1329,9 @@ class Leave_Controller extends Controller {
 
 		/* For each day, render totals
 		 */
-		foreach($data['totals'] as $currentSegment) {
+		for ($i = 1; $i < count($data['totals']); $i++) {
+			$currentSegment = $data['totals'][$i];
+
 			$this->getPage()->setVar(array(
 				'REQUEST_PERIOD_TOTAL_MORNING' => $currentSegment['present_morning'],
 				'REQUEST_PERIOD_TOTAL_DAY' => $currentSegment['present_day'],
@@ -1342,8 +1347,9 @@ class Leave_Controller extends Controller {
 			for ($i = 0; $i < count($data['houseList'][0]); $i++) {
 
 				/* For each day
+				 * (Exclude Friday -_-)
 				 */
-				for ($j = 0; $j < count($data['dateList']); $j++) {
+				for ($j = 1; $j < count($data['dateList']); $j++) {
 					$this->getPage()->setVar(array(
 						'REQUEST_PERIOD_MORNING' => (int)$data['houseList'][$j][$i]['present_morning'],
 						'REQUEST_PERIOD_DAY' => (int)$data['houseList'][$j][$i]['present_day'],
