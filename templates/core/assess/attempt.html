@@ -44,7 +44,7 @@ $j(document).ready(function() {
     /* Submit all the questions before switching between sections
      */
     $j('.btn').click(function() {
-		$j('form').each(function(elem, value) {
+		$j('.questionForm').each(function(elem, value) {
 			$j(this).submit();
 		});
 	});
