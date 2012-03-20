@@ -27,7 +27,7 @@ if (is_array($newsList)) {
 		$output = array('ITEM_TITLE'		=> $news['item_heading'],
 						'ITEM_DESCRIPTION'	=> "<![CDATA[" . $news['item_body'] ."]]>",
 						'ITEM_DATE'			=> $itemDate->getShort(),
-						'ITEM_LINK'			=> SITE_address . '/news/#' . $news['item_id'],
+						'ITEM_LINK'			=> SITE_address . '/news/item/' . $news['item_id'],
 						);
 		$page->setVar($output);
 		$page->parse('rss_item_block', 'rss_item', true);

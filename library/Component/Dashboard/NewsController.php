@@ -51,7 +51,7 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                 $newsTime->setPrefix('');
 
                 $output = array(
-                    'NEWS_TITLE' => $item['item_heading'], 'NEWS_URL' => '/news/#' . $item['item_id'],
+                    'NEWS_TITLE' => $item['item_heading'], 'NEWS_URL' => '/news/item/' . $item['item_id'],
                     'NEWS_TIME' => $newsTime->getRelativeTime(), 'ON_OFF' => ++$k % 2 ? '' : 'dark',
                     'NEWS_TOPIC' => Scrub::text($previous['topicName']), 'TOPIC_CLEAN' => $url->getSlug(),
                 );
@@ -113,7 +113,7 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
             }
         }
         else{
-            $this->setVar('topci_header_block','');
+            $this->setVar('topic_header_block','');
         }
 
 

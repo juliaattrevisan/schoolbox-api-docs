@@ -242,7 +242,7 @@ class News extends DeprecatedModel {
 		return $headlines;
 	}
 
-    function getNewsArchive($topic = '', $year = 0, $month = 0, $index = 0, $limit = 0) {
+    function getNewsListing($archive = true, $topic = '', $year = 0, $month = 0, $index = 0, $limit = 0) {
         $userHandler = new Group;
         $shareResults = array();
 
@@ -256,6 +256,7 @@ class News extends DeprecatedModel {
 
         $yearFilter = $year != 0 ? " AND YEAR(news_items.item_datetime_published) = $year " : '';
         $monthFilter = $month != 0 ? " AND MONTH(news_items.item_datetime_published) = $month " : '';
+        $beforeOrAfter = $archive ? '<=' : '>';
 
         if (!$userHandler->isSuperuser()) {
             $query = "
@@ -275,7 +276,7 @@ class News extends DeprecatedModel {
          WHERE news_items.item_owner != '".$_SESSION['id']."'
             AND news_items.item_deleted = 0
             AND item_datetime_published < NOW()
-            AND news_items.item_datetime_expires <= NOW()
+            AND news_items.item_datetime_expires $beforeOrAfter NOW()
             $topicFilter $yearFilter $monthFilter
          GROUP BY news_items.item_id ORDER BY newsTopic.newsTopicID, news_items.item_datetime_posted DESC";
 
@@ -302,7 +303,7 @@ class News extends DeprecatedModel {
                         AND item_datetime_published < NOW() )) ";
         }
 
-        $query .= " AND news_items.item_datetime_expires <= NOW()
+        $query .= " AND news_items.item_datetime_expires $beforeOrAfter NOW()
                     $topicFilter $yearFilter $monthFilter
                     ORDER BY newsTopic.newsTopicID, news_items.item_datetime_posted DESC;";
 
@@ -482,7 +483,9 @@ class News extends DeprecatedModel {
      * @param Integer $categoryId
      * @return Array|Bool
      */
-    public function getOccupiedDateList ($topicName = '') {
+    public function getOccupiedDateList ($archive = false, $topicName = '') {
+        $beforeOrAfter = $archive ? '<=' : '>';
+
         $query = "SELECT YEAR(`item_datetime_published`) as 'year', item_datetime_published,
                          MONTH(`item_datetime_published`) as 'month'
 				  FROM `news_items`";
@@ -495,9 +498,7 @@ class News extends DeprecatedModel {
         else
             $query .= " WHERE";
 
-
-
-        $query .= " item_datetime_expires < NOW()
+        $query .= " item_datetime_expires $beforeOrAfter NOW()
                     GROUP BY `year` DESC, `month` DESC";
 
         return $this->db->getAll($query);

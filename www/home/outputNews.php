@@ -27,9 +27,9 @@ if(is_array($headlineList) )
 		$newsTime->setPrefix('');
 
 		$output = array('NEWS_TITLE'	=> $item['item_heading'],
-						'NEWS_URL'		=> '/news/#'.$item['item_id'],
+						'NEWS_URL'		=> '/news/item/'.$item['item_id'],
 						'NEWS_TIME'		=> $newsTime->getRelativeTime(),
-						'ON_OFF'		=> ++$k%2? '' : 'dark',
+						'ON_OFF'		=> ++$k % 2 ? '' : 'dark',
 						'NEWS_TOPIC'	=> Scrub::text($previous['topicName']),
 						'TOPIC_CLEAN'	=> $url->getSlug(),
 						);
