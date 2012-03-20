@@ -239,8 +239,6 @@ if ($groupHandler->isParentOfChild($this->arg[1])) {
 	}
 }
 
-print_r($allWork);
-
 if(count($allWork) > 0) {
     foreach($allWork as $currentWork) {
 

@@ -127,7 +127,6 @@ class External_Tass_User implements External_UserInterface {
 					stud_code AS RelatedID
 				FROM studenrol
 				WHERE par_code = '$tassID'
-				OR sud19_code = '$tassID'
 				AND cmpy_code = '01'
 			";
 		}
