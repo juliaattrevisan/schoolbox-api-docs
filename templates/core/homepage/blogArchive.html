@@ -4,7 +4,7 @@
 	$j(function() {
 
 		$j('a.show_comments').click(function() {
-			$j(this).closest('li').find('.blog-comments').toggle();
+			$j(this).closest('li').find('.comments').toggle();
 			$j(this).children('span').toggle();
 			return false;
 		});
@@ -13,22 +13,18 @@
 			$j(this).closest('li').find('form').toggle();
 			return false;
 		});
-		$j('a.delete-comment').click(
-				function() {
-					location.href = $j(this).attr('href');
-				}).confirm({
-					buttons: {
-						wrapper:'<button></button>',
-						separator:'  '
-					}
-				});
+		$j('a.delete-comment').click(function() {
+            location.href = $j(this).attr('href');
+        }).confirm({
+            buttons: {
+                wrapper:'<button></button>',
+                separator:'  '
+            }
+        });
 	});
 </script>
 <!-- END custom_head -->
-<div class="blog-archive clearfix">
-
-
-
+<div class="archive blog clearfix">
 	<h1>Blog Archive for {CATEGORY_NAME}</h1>
 	<span class="header_option">
 	<!-- BEGIN submit_blog -->
@@ -36,13 +32,13 @@
 	<!-- END submit_blog -->
 	<a href="/homepage/{ID}" class="btn go-back"><span></span>Return to Homepage</a>
 	</span>
-	<div class="blog-archive-menu">
+	<div class="menu">
 		<ul>
 			<!-- BEGIN year -->
 			<li class="{YEAR_ClASS}"><h3>{YEAR}</h3>
 				<ul>
 				<!-- BEGIN month -->
-					<li><a class="{MONTH_ClASS} blogArchiveNav"
+					<li><a class="{MONTH_ClASS}"
 						href="/homepage/blogArchive/{ID}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a>
 					</li>
 				<!-- END month -->
@@ -52,7 +48,7 @@
 		</ul>
 	</div>
 
-	<ul class="blog-posts">
+	<ul class="posts">
 		<!-- BEGIN blog -->
 		<li>
 			<a name="{BLOG_ID}"></a>
@@ -62,7 +58,7 @@
 			<div class="pad-it">
 				{BLOG_BODY}
 
-				<div class="blog-comments hide-it">
+				<div class="comments hide-it">
 					<!-- BEGIN comment -->
 					<div class="box clearfix"> {COMMENT_BODY}
 						<p class="interact">{COMMENT_OWNER} | {COMMENT_CREATED}

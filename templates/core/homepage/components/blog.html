@@ -4,7 +4,7 @@
 	$j(function(){
 
 		$j('a.show_comments').click(function(){
-				$j(this).closest('li').find('.blog-comments').toggle();
+				$j(this).closest('li').find('.comments').toggle();
 				$j(this).children('span').toggle();
 				return false;
 		});
@@ -25,7 +25,7 @@
 </script>
 <!-- END custom_head -->
 
-<div class="box clearfix" id="component{COMPONENT_HOMEPAGE_ID}">
+<div class="box component blog clearfix" id="component{COMPONENT_HOMEPAGE_ID}">
 	<h2>Blog</h2>
 	<!-- BEGIN config -->
 	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
@@ -59,7 +59,7 @@
 		</form>
 	</div>
 	<!-- END config -->
-	<div class="listing blog">
+	<div class="listing">
 		<ul>
 			<!-- BEGIN blog -->
 			<li class="{BLOG_SHADING} clearfix">
@@ -68,7 +68,7 @@
 					<p class="interact">{MODIFY_BLOG}</p>
 				</div>
 				<p>{BLOG_BODY}</p>
-				<div class="blog-comments hide-it">
+				<div class="comments hide-it">
 					<!-- BEGIN comment -->
 					<div class="box clearfix"> {COMMENT_BODY}
 						<p class="interact">{COMMENT_OWNER} | {COMMENT_CREATED} | {DELETE_COMMENT}</p>
