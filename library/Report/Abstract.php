@@ -14,7 +14,6 @@ abstract class Report_Abstract {
 	protected $externalUserHandler = null;
     protected $userHandler = null;
 	protected $allRecords = array();
-    protected $permissionsHandler = null;
 
 	/**
 	 * Set up blocks and stuff
@@ -28,13 +27,13 @@ abstract class Report_Abstract {
 	 *
 	 * @return bool
 	 */
-	protected final function checkPermissions() {
-        // if there was no permissions explicitly defined, fallback to default
-        if($this->permissionsHandler == null) {
-            $this->setPermissions();
-	    }
-        return $this->permissionsHandler->checkPermissions($this);
-    }
+	protected function checkPermissions() {
+		if ($this->getGroupHandler()->isParent() || $this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff()) {
+			return true;
+		}
+
+		return false;
+	}
 
 	/**
 	 * Render dat
@@ -146,12 +145,4 @@ abstract class Report_Abstract {
 	protected function getAllRecords() {
 		return $this->allRecords;
 	}
-
-    /**
-     * Sets the permission handler to the site we're currently on, unless overridden
-     * @param string $site_location
-     */
-    protected function setPermissions($site_location = '') {
-        $this->permissionsHandler = Report_Permissions_Factory::build($site_location);
-    }
 }

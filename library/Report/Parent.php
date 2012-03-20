@@ -1,4 +1,3 @@
-
 <?php
 /**
  * Report_Parent
@@ -17,8 +16,7 @@ class Report_Parent extends Report_Abstract {
 	 * @param $yearLevel
 	 */
 	public function __construct($page, $yearLevel) {
-		$this->setPermissions();
-        $this->setGroupHandler(new Group());
+		$this->setGroupHandler(new Group());
 		$this->setYearLevel($yearLevel);
 
 		if (!is_numeric($yearLevel) || !$this->checkPermissions()) {
@@ -34,6 +32,41 @@ class Report_Parent extends Report_Abstract {
 
 			$this->setAllRecords($this->getExternalUserHandler()->getStudentContactListExtended($this->getYearLevel()));
 		}
+	}
+
+	/**
+	 * Check permissions. By default only parents and superusers can view this page, but
+	 * for Parent Directory, the parent must have a child in the specified year level.
+	 *
+	 * @return bool
+	 */
+	protected function checkPermissions() {
+		if ($this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff()) {
+			return true;
+		}
+		else if ($this->getGroupHandler()->isParent()) {
+
+            // enable/disable this check with a config variable
+            if(Cfg::get('restrict_parent_directory')) {
+                /* If you are a parent, ensure that you have a child in the selected year level.
+                 * If you don't have a child in this year level, you can't view it.
+                 */
+
+                // if check enabled
+                if (is_array($_SESSION['children']) && count($_SESSION['children'])) {
+                    foreach($_SESSION['children'] as $currentChild) {
+                        if ($currentChild['year'] == $this->getYearLevel()) {
+                            return true;
+                        }
+                    }
+                }
+            } else {
+                // if check disabled
+                return true;
+            }
+		}
+
+		return false;
 	}
 
 	/**
@@ -224,6 +257,11 @@ class Report_Parent extends Report_Abstract {
 			$this->getPage()->parse('student_block', 'student', true);
 		}
 	}
+
+    public function export(Report_Exporter $exporter, $format = 'csv') {
+        // function stub to appease interpreter
+        // can be implemented if export required.
+    }
 }
 
 
