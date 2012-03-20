@@ -1,0 +1,77 @@
+<!-- BEGIN custom_head -->
+<style type="text/css">
+ .news-sidebar {
+     float: right;
+     width: 29%;
+ }
+
+ .news-sidebar h2 {
+    background-color: #77f;
+ }
+
+ .news-sidebar .meta {
+    margin: 10px 0 30px 10px;
+ }
+ .news-sidebar .meta li {
+     margin: 5px 0;
+ }
+
+ .news-sidebar .index {
+     margin: 10px;
+ }
+
+ .news-sidebar .index li {
+     margin: 4px;
+ }
+    
+ .news-sidebar .topic  li:before {
+    content: "- ";
+ }
+
+ .news-wrapper {
+     width: 70%; float: left;
+ }
+</style>
+<!-- END custom_head -->
+
+<!-- BEGIN modify_news -->
+<a class="btn modify" href="/news/modify/{NEWS_ID}"><span></span>Modify Article</a>
+<!-- END modify_news -->
+<h1>News Article</h1>
+<div class="news-wrapper clearfix">
+    <!-- BEGIN news -->
+    <div class="news-item clearfix">
+        <h2>{NEWS_TITLE}</h2>
+        <div class="wysiwyg">{NEWS_BODY}</div>
+    </div>
+    {PREVIOUS_ARTICLE}
+    {NEXT_ARTICLE}
+</div>
+<div class="news-sidebar">
+    <h2>Article Information</h2>
+    <ul class="meta">
+        <li>Topic: <a href="/news/archive/{TOPIC_CLEAN}/">{TOPIC_NAME}</a></li>
+        <li>Publisher: {POSTER}</li>
+        <li>Publish Date: {DATETIME}</li>
+        <li>{EXPIRY}</li>
+    </ul>
+    <h2>News Index</h2>
+    <div class="index">
+        <ul>
+            <!-- BEGIN topic_list -->
+            <li><a href="/news/{LIST_TOPIC_CLEAN}">{LIST_TOPIC_NAME}</a>
+            <ul class="topic">
+                <!-- BEGIN article_list -->
+                <li>{LIST_TOPIC_ARTICLE}</li>
+                <!-- END article_list -->
+            </ul>
+            </li>
+            <!-- END topic_list -->
+        </ul>
+    </div>
+    <!-- BEGIN allnews_button -->
+    <p class="interact clearfix"><a href="/news/" class="btn"><span></span>View All News</a></p>
+    <!-- END allnews_button -->
+</div>
+<!-- END news -->
+

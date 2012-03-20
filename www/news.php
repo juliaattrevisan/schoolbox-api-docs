@@ -83,13 +83,6 @@ if (($permission = $groupHandler->getPermission(0)) >= WRITE_ACCESS) {
     $this->setVar('add_news_block', '');
 }
 
-// does the bottom button link to archived or current news?
-$this->setVar(array(
-    'ARCH_CURRENT' => $archive ? 'Current' : 'Archived',
-    'ARCH_CURRENT_CLEAN' => $archive ? '' : 'archive/',
-));
-$this->parse('archive_button_block', 'archive_button');
-
 /* Year and Month List */
 $dateList = $newsHandler->getOccupiedDateList($archive, $filter['topic']);
 
@@ -153,6 +146,15 @@ else
 // set pagination button destinations
 $pageSlug = "${filter['archive']}${filter['topic']}/${filter['year']}/${filter['month']}/";
 
+// does the bottom button link to archived or current news?
+$this->setVar(array(
+    'ARCH_CURRENT' => $archive ? 'Current' : 'Archived',
+    'ARCH_CURRENT_CLEAN' => $archive ? "${filter['topic']}/" : "archive/${filter['topic']}/",
+));
+$this->parse('archive_button_block', 'archive_button');
+
+
+
 if($totalPages > 1) {
     for($j = 1; $j <= $totalPages; $j++) {
         if($filter['page'] == $j)
@@ -212,7 +214,7 @@ if (is_array($items)) {
                 'NEWS_TITLE' => $article['item_heading'],
                 'POSTER' => $owner,
                 'DATETIME' => $_SESSION['su'] == 1 ? $article['post_datetime'] . $expiry . $article['expire_datetime'] : $article['post_datetime'],
-                'NEWS_BODY' => $formatter->cutSentence(Scrub::html($article['item_body']), 200),
+                'NEWS_BODY' => $archive ? $article['item_body'] : $formatter->cutSentence(Scrub::html($article['item_body']), 200),
                 'TOPIC_NAME' => Scrub::text($previous['topicName']),
                 'TOPIC_CLEAN' => $filter['archive'] . $url->getSlug(),
             );
