@@ -67,7 +67,7 @@
 		<input type="file" class="prettify" name="file"/>
 
 		<label class="clearfix">
-			<input type="hidden" name="box_id" value="{WORK_BOX_ID}"/>
+			<input type="hidden" name="box_id" value="{BOX_ID}"/>
 		</label>
 		<label>
 			<input type="submit" name="Submit2" value="Submit"
@@ -81,7 +81,7 @@
 <!-- BEGIN returned_work -->
 <div class="submission-history background clearfix">
 	<div class="clearfix">
-		<h4>Up-to-date Returned Work</h4>
+		<h4>Returned Mark</h4>
 
 		<div class="mark-box">
 			<div class="mark-content"> Mark <span class="actual-mark"> {RETURNED_WORK_MARK} </span>
@@ -89,10 +89,13 @@
 		</div>
 		<div class="mark-comment"> {RETURNED_WORK_COMMENT}</div>
 	</div>
-	<a href="/submission/send.php?id={RETURNED_WORK_FILE_ID}&return=1"
-	   class="btn float-left"><span></span>View Returned Work</a></div>
+    <!-- BEGIN return_file -->
+	<a href="/submission/send.php?id={RETURNED_WORK_FILE_ID}&return=1" class="btn float-left"><span></span>View Returned Work</a>
+    <!-- END return_file -->
+
+</div>
 <!-- END returned_work -->
-    </div>
+</div>
 <!-- BEGIN subject -->
 <h2>History</h2>
 <div class="box component">

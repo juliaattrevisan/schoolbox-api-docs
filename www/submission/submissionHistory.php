@@ -7,6 +7,7 @@ $this->setBlock(TEMPLATE_content, 'download', 'download_block');
 $this->setBlock(TEMPLATE_content, 'action_submit', 'action_submit_block');
 $this->setBlock(TEMPLATE_content, 'recent_submission', 'recent_submission_block');
 $this->setBlock(TEMPLATE_content, 'returned_work', 'returned_work_block');
+$this->setBlock('returned_work', 'return_file','return_file_block');
 $this->setBlock('recent_submission', 'overdue', 'overdue_block');
 $this->setBlock('subject', 'work', 'work_block');
 $this->setBlock('work', 'action_view_submitted', 'action_view_submitted_block');
@@ -79,6 +80,7 @@ $this->setVar(array(
     'BOX_DESCRIPTION' => Scrub::text($submissionBox['description']),
 	'BOX_OWNER' => '<a href="'.$_SESSION['mailhandle'].$emailAddress.'">'.$userHandler->formatName($owner).'</a>',
 	'BOX_DUEDATE' => $dueDate->getLong(),
+    'BOX_ID' => $submissionBox['id'],
 ));
 
 /* Check whether a file is associated with the work
@@ -111,43 +113,38 @@ if (is_array($allWork) && count($allWork)) {
 			'WORK_DATE' => $workDate->getShort(),
 			'WORK_MARK' => Scrub::Text($currentWork['mark']),
 			'WORK_COMMENT' => Scrub::Text($currentWork['comment']),
-			'WORK_BOX_ID' => $currentWork['bid'],
 			'WORK_FILE_ID' => $currentWork['fid'],
 			'WORK_SUBMIT_FILE_ID' => $currentWork['sid'],
 			'WORK_RETURN_FILE_ID' => $currentWork['rid'],
 		));
 
 		if ($currentWork['sid'] != null) {
-			$this->setVar('action_submit_block', '');
 
-			/* Remember most recent submission
+            $this->parse('action_view_submitted_block', 'action_view_submitted');
+            $this->setVar('action_view_returned_block', '');
+
+            /* Remember most recent submission
 			 */
-			$recentSubmission['sid'] = $currentWork['sid'];
-			$recentSubmission['date'] = $currentWork['date'];
+            if(!is_numeric($recentSubmission['sid'])){
+                $recentSubmission = $currentWork;
+            }
 
-			if ($currentWork['rid'] != null) {
-				$this->setVar('action_view_submitted_block', '');
-				$this->parse('action_view_returned_block', 'action_view_returned');
+        }
+		else if ($currentWork['rid'] != null) {
+            $this->setVar('action_view_submitted_block', '');
 
-				/* Remember the most recent returned work, because we need it
-				 * later on
-				 */
-				if (!is_numeric($rid)) {
-					$returnedWork['fileID'] = $currentWork['rid'];
-					$returnedWork['comment'] = $currentWork['comment'];
-					$returnedWork['mark'] = $currentWork['mark'];
-				}
-			}
-			else {
-				$this->parse('action_view_submitted_block', 'action_view_submitted');
-				$this->setVar('action_view_returned_block', '');
-			}
-		}
-		else {
-			$this->parse('action_submit_block', 'action_submit');
-			$this->setVar('action_view_submitted_block', '');
-			$this->setVar('action_view_returned_block', '');
-		}
+            if($currentWork['filename'])
+                $this->parse('action_view_returned_block', 'action_view_returned');
+            else
+                $this->setVar('action_view_returned_block','');
+
+            /* Remember the most recent returned work, because we need it
+             * later on
+             */
+            if (!is_numeric($returnedWork['rid'])) {
+                $returnedWork = $currentWork;
+            }
+        }
 
 		/* Alternating row color
 		 */
@@ -165,45 +162,41 @@ if (is_array($allWork) && count($allWork)) {
 	}
 
 	$this->parse('subject_block', 'subject');
-
-	/* Show most recent submisison
-	 * Hide Submit form
-	 * Find out whether the latest submission was overdue
-	 */
-
-	if ($recentSubmission['date'] > date('U', strtotime($submissionBox['date']))) {
-		$this->setVar(array(
-			'OVERDUE' => 'overdue',
-		));
-
-		$this->parse('overdue_block', 'overdue');
-	}
-	else {
-		$this->setVar(array(
-			'OVERDUE' => '',
-		));
-
-		$this->setVar('overdue_block', '');
-	}
-
-	$recentSubmissionDate = new Alaress_Date_Format($recentSubmission['date'], 'U');
-
-	$this->setVar(array(
-		'MOST_RECENT_SUBMISSION_DATE' => $recentSubmissionDate->getLong(),
-		'MOST_RECENT_SUBMISSION_FILE_ID' => $recentSubmission['sid'],
-	));
-
-	$this->parse('recent_submission_block', 'recent_submission');
 }
 else {
+    $this->setVar('subject_block','');
+}
 
+
+if($recentSubmission['sid']) {
+
+   /* Show most recent submisison
+    * Hide Submit form
+    * Find out whether the latest submission was overdue
+    */
+
+   if ($recentSubmission['date'] > date('U', strtotime($submissionBox['date']))) {
+       $this->setVar('OVERDUE', 'overdue');
+       $this->parse('overdue_block', 'overdue');
+   }
+   else {
+       $this->setVar('OVERDUE','');
+       $this->setVar('overdue_block', '');
+   }
+
+   $recentSubmissionDate = new Alaress_Date_Format($recentSubmission['date'], 'U');
+
+   $this->setVar(array(
+       'MOST_RECENT_SUBMISSION_DATE' => $recentSubmissionDate->getLong(),
+       'MOST_RECENT_SUBMISSION_FILE_ID' => $recentSubmission['sid'],
+   ));
+
+   $this->parse('recent_submission_block', 'recent_submission');
+}
+else {
 	/* Hide most recent submission
 	 * Show Submit form
 	 */
-	$this->setVar(array(
-		'WORK_BOX_ID'   => $submissionBox['id'],
-	));
-
     if($userID == $_SESSION['id'] && mktime() > strtotime($submissionBox['open_date']) && mktime() < strtotime($submissionBox['late_date']) && $submissionBox['accept_submission'])
 	    $this->parse('action_submit_block', 'action_submit');
     else
@@ -211,23 +204,26 @@ else {
 
 	$this->setVar('recent_submission_block', '');
 
-	$this->setVar('subject_block', '');
 }
 
 /* Detect returned work
  */
-if (is_numeric($returnedWork['fileID'])) {
+if (is_numeric($returnedWork['rid'])) {
 	$this->setVar(array(
 		'RETURNED_WORK_COMMENT' => Scrub::Text($returnedWork['comment']),
 		'RETURNED_WORK_MARK' => Scrub::Text($returnedWork['mark']),
-		'RETURNED_WORK_FILE_ID' => $returnedWork['fileID'],
+		'RETURNED_WORK_FILE_ID' => $returnedWork['rid'],
 	));
+
+    if($returnedWork['filename'])
+        $this->parse('return_file_block', 'return_file');
+    else
+        $this->setVar('return_file_block','');
 
 	$this->parse('returned_work_block', 'returned_work');
 }
 else {
 	$this->setVar('returned_work_block', '');
 }
-
 
 ?>

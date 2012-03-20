@@ -153,11 +153,10 @@ class Submission extends DeprecatedModel {
 			r.mark
 			FROM submission_box b
 			LEFT JOIN category c ON c.id = b.category
-			LEFT JOIN student_submission s ON s.box_id = b.id
-			LEFT JOIN submission_return r ON r.box_id = b.id AND s.owner = r.owner
+			LEFT JOIN student_submission s ON s.box_id = b.id AND (s.owner = '$userID' OR s.owner IS NULL)
+			LEFT JOIN submission_return r ON r.box_id = b.id AND (r.owner = '$userID' OR r.owner IS NULL)
 			LEFT JOIN file f ON b.fid = f.id
 			WHERE b.deleted = 0
-			AND (s.owner = '$userID' OR s.owner IS NULL)
 			AND b.category IN (" . implode(',', $categoryIDList) . ")
 			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC";
 
@@ -180,15 +179,15 @@ class Submission extends DeprecatedModel {
 
 		if ($type == UPCOMING_WORK_TYPE) {
 			$query .= ' UNIX_TIMESTAMP(b.date) AS date, ';
-			$orderBy = 'UNIX_TIMESTAMP(b.date)';
+			$orderBy = 'b.date';
 		}
 		else if ($type == AWAITING_WORK_TYPE) {
 			$query .= ' UNIX_TIMESTAMP(s.submitted) AS date, ';
-			$orderBy = 'UNIX_TIMESTAMP(s.submitted)';
+			$orderBy = 's.submitted';
 		}
 		else if ($type == RETURNED_WORK_TYPE) {
 			$query .= ' UNIX_TIMESTAMP(r.returned) AS date, ';
-			$orderBy = 'UNIX_TIMESTAMP(r.returned)';
+			$orderBy = 'r.returned';
 		}
 
 		$query .= "
@@ -199,11 +198,10 @@ class Submission extends DeprecatedModel {
 			r.mark
 			FROM submission_box b
 			LEFT JOIN category c ON c.id = b.category
-			LEFT JOIN student_submission s ON s.box_id = b.id
-			LEFT JOIN submission_return r ON r.box_id = b.id AND s.owner = r.owner
+			LEFT JOIN student_submission s ON s.box_id = b.id AND (s.owner = '$userID' OR s.owner IS NULL)
+			LEFT JOIN submission_return r ON r.box_id = b.id  AND (r.owner = '$userID' OR r.owner IS NULL)
 			LEFT JOIN file f ON b.fid = f.id
 			WHERE b.deleted = 0
-			AND (s.owner = '$userID' OR s.owner IS NULL)
 			AND b.category IN (" . implode(',', $categoryIDList) . ")
 			AND $orderBy IS NOT NULL";
 
@@ -220,8 +218,7 @@ class Submission extends DeprecatedModel {
 						ORDER BY $orderBy DESC";
 		}
 		else if ($type == RETURNED_WORK_TYPE) {
-			$query .= " AND s.submitted IS NOT NULL
-						AND r.returned IS NOT NULL
+			$query .= " AND r.returned IS NOT NULL
 						ORDER BY $orderBy DESC";
 		}
 
@@ -269,7 +266,8 @@ class Submission extends DeprecatedModel {
 			f.id AS fid,
 			UNIX_TIMESTAMP(s.submitted) AS date,
 			NULL AS comment,
-			NULL AS mark
+			NULL AS mark,
+			NULL AS filename
 			FROM submission_box b
 			LEFT JOIN student_submission s ON s.box_id = b.id
 			LEFT JOIN file f ON b.fid = f.id
@@ -279,18 +277,18 @@ class Submission extends DeprecatedModel {
 			AND s.submitted IS NOT NULL)
 		UNION (SELECT
 			b.id AS bid,
-			s.id AS sid,
+		    NULL AS sid,
 		    r.id AS rid,
 			f.id AS fid,
 			UNIX_TIMESTAMP(r.returned) AS date,
 			r.comment,
-			r.mark
+			r.mark,
+			r.filename
 			FROM submission_box b
-			LEFT JOIN student_submission s ON s.box_id = b.id
-			LEFT JOIN submission_return r ON r.box_id = b.id AND s.owner = r.owner
+			LEFT JOIN submission_return r ON r.box_id = b.id
 			LEFT JOIN file f ON b.fid = f.id
 			WHERE b.deleted = 0
-			AND s.owner = '$userID'
+			AND r.owner = '$userID'
 			AND b.id = '$boxID'
 			AND r.returned IS NOT NULL)
 		ORDER BY date DESC";
@@ -307,11 +305,12 @@ class Submission extends DeprecatedModel {
                               FROM submission_box sb
                               LEFT JOIN  file f ON sb.fid = f.id AND f.deleted = '0'
                               LEFT JOIN allowedFileTypes af ON f.mime_type = mime
-                              LEFT JOIN student_submission ss ON ss.box_id = sb.id AND ss.owner = '" . $_SESSION['id'] . "'
-                              LEFT JOIN submission_return sr ON sr.box_id = sb.id AND sr.owner = '" . $_SESSION['id'] . "'
+                              LEFT JOIN student_submission ss ON ss.box_id = sb.id AND (ss.owner = '$userID' OR ss.owner IS NULL)
+                              LEFT JOIN submission_return sr ON sr.box_id = sb.id AND (sr.owner = '$userID' OR sr.owner IS NULL)
                               LEFT JOIN file_type ft ON sb.type = ft.id
-
-                              WHERE sb.category = '".$categoryID."' AND sb.deleted = '0'
+                              WHERE
+                              sb.category = '".$categoryID."'
+                              AND sb.deleted = '0'
                               ORDER BY sb.date DESC";
 
             if($config['size'] > 0)
@@ -588,72 +587,3 @@ class Submission extends DeprecatedModel {
 	}
 
 }
-/*
-$userArray = UserCollection::getAllByGroup($group_id);
-
-array(
-    0 => stdClass (
-        'name' => 'ballsack',
-        'phone' => 12345468,
-    )
-);
-
-
-foreach ($userArray as $currentUser) {
-    $currentUser->setName('ass bandit');
-    $currentUser->save();
-}
-
-class dbAbstraction {
-    public function doQuery($query) {
-        run $query
-        hydrateArrayToObjVars();
-    }
-}
-
-class User {
-
-
-    public function hydrateArrayToObjVars($array) {
-        $this->name = $array['name'];
-        $this->phone = $array['phone'];
-    }
-}
-
-
-class GroupCollection {
-    public function getAllByUserID($userID) {
-        $query = "SELECT * FROM groups WHERE userid = $this->userID";
-
-        // hydrate shit
-
-        return $resultArray;
-    }
-}
-
-
-class UserCollection {
-
-    public function getAllByGroup($group_id) {
-        $resultArray = array();
-
-        $allUsers = "SELECT id, group_id FROM users WHERE group_id = $group_id";
-
-
-        foreach($allUsers as $currentUser) {
-            $user = new User($currentUser['id']);
-            $user->setGroups(GroupCollection::getAllByUserId($currentUser['id']));
-
-            //$user->setGroup($group);
-
-            $resultArray[] = $clone->arrayToObjVars($currentUser);
-        }
-
-        return $resultArray;
-    }
-}
-
-*/
-
-
-?>
