@@ -155,7 +155,7 @@ a.{NAME} {
 	<!--/tabs-1-->
 	<div id="tabs-2" class="customise-components">
 		<div class="clearfix">
-			<div class="colours leftColumn clearfix">
+			<div class="colours topColumn clearfix">
 				<h3>Top Column</h3>
 				<div class="colours-split top-split">
 					<h3>Heading</h3>
@@ -171,7 +171,7 @@ a.{NAME} {
 					</div>
 				</div>
 				<div class="colours-split">
-					<h3>Heading</h3>
+					<h3>Content</h3>
 					<div class="colour clearfix">
 						<div id="top_bg_primary" class="colorBox"></div>
 						<input name="colors[top_bg_primary]" type="hidden" />
@@ -199,7 +199,7 @@ a.{NAME} {
 					</div>
 				</div>
 			</div>
-			<div class="colours">
+			<div class="colours leftColumn">
 				<h3>Left Column</h3>
 				<div class="colours-split top-split">
 					<h3>Heading</h3>
@@ -259,7 +259,7 @@ a.{NAME} {
 					</div>
 				</div>
 				<div class="colours-split">
-					<h3>Heading</h3>
+					<h3>Content</h3>
 					<div class="colour clearfix">
 						<div id="right_bg_primary" class="colorBox"></div>
 						<input name="colors[right_bg_primary]" type="hidden" />
@@ -331,12 +331,12 @@ a.{NAME} {
 			<h2>My Profile</h2>
 			<div class="pad-it">
 				<img src="/search/portrait.php?id={SYNERGY_ID}&width=150&height=150" alt="{PERSON_NAME}" title="{PERSON_NAME}" />
-				<p> <strong>{PERSON_NAME}</strong><br />
+				<p> <strong><a href="/search/user/{ID}">{PERSON_NAME}</a></strong><br />
+                    <!-- BEGIN student -->
 					House: {HOUSE}<br />
 					Campus: {CAMPUS}<br />
-					<!-- BEGIN year_level -->
                     Year: {YEAR}
-                    <!-- END year_level -->
+                    <!-- END student -->
                 </p>
 			</div>
 		</div>
@@ -346,7 +346,7 @@ a.{NAME} {
 			<h2>Teacher Notes</h2>
 			<div class="pad-it clearfix"> {PRIVATE_NOTES}
 				<!-- BEGIN modify_link -->
-				<p class="interact"> <a href="/eportfolio_privateNotes/modify/{ID}" class="btn modify"><span></span>Modify</a> </p>
+				<p class="interact"> <a href="/eportfolio/private/notes/modify/{ID}" class="btn modify"><span></span>Modify</a> </p>
 				<!-- END modify_link -->
 			</div>
 		</div>
