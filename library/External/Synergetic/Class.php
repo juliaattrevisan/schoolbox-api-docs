@@ -64,7 +64,7 @@ class External_Synergetic_Class implements External_ClassInterface {
 			$classQuery = "ClassCode = '$subCode'";
 		}
 
-		$msQuery = "SELECT DISTINCT StaffID, StaffSeq FROM SubjectClassStaff
+		$msQuery = "SELECT DISTINCT StaffID, StaffSeq FROM vSubjectClassesStaff
                     WHERE $classQuery AND FileYear={$_SESSION['FileYear']} AND FileSemester={$_SESSION['FileSemester']}
                     ORDER BY StaffSeq";
 
