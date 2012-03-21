@@ -27,7 +27,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 					WHERE TimetableDefinition.FileYear='{$_SESSION['FileYear']}' AND
 						TimetableDefinition.FileSemester='{$_SESSION['FileSemester']}' AND
 						TimetableDefinition.TimetableGroup='{$this->campusCode[$campus]}' AND
-						(TimetableDefinition.DayNumber = 0 OR TimetableDefinition.DayNumber = 1)
+						(TimetableDefinition.DayNumber = 0 OR TimetableDefinition.DayNumber = 5)
 					ORDER BY TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq
 					";
 		$this->getDatabase()->query($query);
