@@ -585,6 +585,43 @@ class User extends DeprecatedModel {
         return $id;
     }
 
+
+    /**
+     * Gets all in the system who are in a particular groupID, restricted by index and limit
+     *
+     * @param $groupID
+     * @param bool $hasSynergy
+     * @param int $index
+     * @param int $limit
+     */
+    public function getSelectionByGroup($groupID, $hasSynergy = false, $index = 0, $limit = 0) {
+        $query = "SELECT *
+				  FROM {$this->_table}
+				  WHERE group_id";
+
+        if (is_array($groupID)) {
+            $query .= " IN " . '(' . implode(',', $groupID) . ')';
+        }
+        else {
+            $query .= " = '$groupID'";
+        }
+
+        /* Optionally exclude those without synergy ids
+           */
+        if ($hasSynergy) {
+            $query .= " AND synergy_id IS NOT NULL
+					    AND synergy_id > 0 ";
+        }
+
+        $query .= " ORDER BY lastname ASC, firstname ASC";
+
+        if($limit) {
+            $query .= " LIMIT $index, $limit";
+        }
+
+        return $this->db->getAll($query);
+    }
+
 	/**
 	 * Gets all in the system who are in a particular groupID
 	 *

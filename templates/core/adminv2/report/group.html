@@ -1,0 +1,52 @@
+<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.tablesorter.min.js"></script>
+<script type="text/javascript">
+    $j(function () {
+        $j('.sort-it').tablesorter({
+            headers: {
+                0: {sorter: false},
+                6: {sorter: false}
+            },
+            widgets: ['zebra'],
+            widgetZebra: {
+                css: ["", "dark"]
+            },
+            cssHeader: "directory-sorter"
+        });
+    });
+</script>
+
+<div class="directory staff">
+    <table class="sort-it" width="100%">
+        <thead>
+        <tr>
+            <th width="5%">Title</th>
+            <th>First name</th>
+            <th>Surname</th>
+            <th>Campus</th>
+            <th>Year</th>
+            <th>Email</th>
+            <th width="20%"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- BEGIN user -->
+        <tr>
+            <td>{USER_TITLE}</td>
+            <td><a href="/search/user/{USER_ID}">{USER_FIRSTNAME}</a></td>
+            <td><a href="/search/user/{USER_ID}">{USER_SURNAME}</a></td>
+            <td>{USER_CAMPUS}</td>
+            <td>{USER_YEAR}</td>
+            <td>{USER_EMAIL}</td>
+            <td>
+                <div class="ssearch-functions clearfix">
+                    <!-- BEGIN modify -->
+                    <a href="/adminv2/modify-user/{USER_ID}" class="btn modify"><span></span>Modify User</a>
+                    <!-- END modify -->
+                </div>
+            </td>
+        </tr>
+        <!-- END user -->
+        </tbody>
+    </table>
+</div>

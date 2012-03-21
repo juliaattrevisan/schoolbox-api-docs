@@ -1,0 +1,66 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
+<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
+<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.search.js"></script>
+<script type="text/javascript">
+
+</script>
+
+<style type="text/css">
+    .directory table td {
+        vertical-align: middle;
+    }
+</style>
+
+<!-- END custom_head-->
+
+<h1>Schoolbox Administration</h1>
+<ul class="admin-nav">
+    <li><a href="/adminv2/home" class="current" >Home</a></li>
+    <li><a href="/adminv2/user" >Users</a></li>
+    <li><a href="/adminv2/side-menu">Side Menu</a></li>
+    <li><a href="/adminv2/dashboard">Dashboard</a></li>
+    <li><a href="/adminv2/allowed-file">Allowed Files</a></li>
+    <li><a href="/adminv2/setting">Settings</a></li>
+    <li><a href="/adminv2/calendar">Calendar</a></li>
+    <li><a href="/adminv2/category">Category</a></li>
+    <li><a href="/adminv2/list">Lists</a></li>
+    <li><a href="/adminv2/rollover">Rollover</a></li>
+</ul>
+<div class="admin-contents">
+    <h2>Reports</h2>
+    <div class="clearfix">
+                 <!-- BEGIN filter -->
+        <div class="level green clearfix">
+            <h4>Filter</h4>
+                <!-- BEGIN search_options -->
+
+                <!-- END search_options -->
+        </div>
+                <!-- END filter -->
+                <!-- BEGIN result_table -->
+        <div class="level last clearfix">
+            <h3>{USER_GROUP}<!-- BEGIN count -->: {USER_DISP_COUNT} members<!-- END count --></h3>
+            <span class="header_option">
+                <a href="/adminv2/reports/{REPORT_FILTER}/exportToCSV" class="btn download"><span></span>Download Report</a>
+            </span>
+                <!-- BEGIN result -->
+            <div class="{RESULT_CLASS}">
+                {RESULT}
+            </div>
+                <!-- END result -->
+            <div class="archive">
+                <div class="pagination clearfix">
+                    <!-- BEGIN previous_button -->
+                    <a class="prev" href="/adminv2/reports/{PREVIOUS_PAGE}">&laquo; Prev</a><!-- END previous_button -->
+                    <!-- BEGIN page_number -->
+                    <a class="{CURRENT}" href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a><!-- END page_number -->
+                    <!-- BEGIN next_button -->
+                    <a class="next" href="/adminv2/reports/{NEXT_PAGE}">Next &raquo;</a><!-- END next_button -->
+                </div>
+            </div>
+        </div>
+                <!-- END result_table -->
+    </div>
+</div>
