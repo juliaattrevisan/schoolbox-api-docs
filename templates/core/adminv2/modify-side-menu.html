@@ -4,8 +4,10 @@
 <script type="text/javascript" src="/javascript/jstree/jquery.jstree.js"></script>
 
 <script type="text/javascript">
-    // setup tree structure
+
     $j(function () {
+
+        // setup tree structure
         $j("#side-menu").jstree({
             "animation": 50,
             "core" : { "initially_open" : [ "node_0" ] },
@@ -15,12 +17,26 @@
                 "dots" : true,
                 "icons" : false
             }
+        });
 
-        })
-    });
+        /*
+        * Ascertain the currently active element
+        *
+        * */
+        $j('.jstree').find('a#0').addClass('active');
 
-    $j(function() {
+        $j(".jstree a").click(function() {
+            $this = $j(this);
+            var idToInput = $this.attr('ID');
+            $j(".jstree").find('.active').removeClass();
+            $this.addClass('active');
+            $j('#prent').val(idToInput);
+            $j('.parent-selection').text($this.text());
+            return false;
+        });
+
         $j('#form').validate();
+
         $j('#url').autocomplete({
             serviceUrl: '/ajax/findCategory.php',
             minChars: 2,
@@ -32,11 +48,6 @@
                 $j('#form input[name=url]').val(data);
             }
         });
-
-    });
-
-    $j(function() {
-
     });
 
 </script>
@@ -100,10 +111,10 @@
                 <!-- BEGIN parent_select -->
                 <tr>
                     <td width="250">
-                        <h2>Parent</h2>
-                        <em>This is where in the menu the new item will be inserted</em>
+                        <h3>Parent</h3>
+                        <em>This is where in the menu the new item will be inserted. Simply click on a menu item to allow it to be the parent.</em>
                     </td>
-                    <td>
+                    <td class="parent-level">
                         <input id="prent" name="parent" type="hidden" value="0" />
                         <div id="side-menu">
                             {MENU_TREE}
