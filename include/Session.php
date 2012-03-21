@@ -92,7 +92,7 @@ class Session {
     }
 
     public function destroy() {
-        session_destroy();
+        @session_destroy();
     }
 
     public function authenticate($username, $password) {
