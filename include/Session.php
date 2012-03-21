@@ -263,7 +263,7 @@ class Session {
                 /* Get subject list for each student */
                 if ( is_array($children) ) {
                     foreach ( $children as $child ) {
-                        $portal = $userHandler->getBySynergy($child['RelatedID']);
+                        $portal = $userHandler->getBySynergyAndGroup($child['RelatedID'], $groupHandler->getStudentGroupTypeIds());
                         $subjects = array();
 
                         if ( $portal['uid'] ) {
