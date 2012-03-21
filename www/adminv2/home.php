@@ -12,6 +12,7 @@ $this->setFile(TEMPLATE_content, 'adminv2/home.html');
 $this->setBlock(TEMPLATE_content, 'group_summary', 'group_summary_block');
 $this->setBlock(TEMPLATE_content, 'recent_log', 'recent_log_block');
 $this->setBlock(TEMPLATE_content, 'memory', 'memory_block');
+$this->setBlock(TEMPLATE_content, 'no_js_warning', 'no_js_warning_block');
 
 $this->setTitle('Admin - Home');
 
@@ -21,9 +22,9 @@ $free = disk_free_space(Cfg::get('file_dir'));
 $used = $total - $free;
 $perc = round(($used/$total)*100);
 
-$disk = array('DISK_USED'   => Alaress_Byte_Format::bytesToString($used),
-                'DISK_TOTAL' => Alaress_Byte_Format::bytesToString($total),
-                'DISK_PERC' => $perc);
+$disk = array( 'DISK_USED'  => Alaress_Byte_Format::bytesToString($used),
+               'DISK_TOTAL' => Alaress_Byte_Format::bytesToString($total),
+               'DISK_PERC'  => $perc);
 $this->setVar($disk);
 
 /* Memory Usage */
@@ -108,27 +109,43 @@ else {
 $this->setVar($ldap);
 
 /* WWW access check */
-if(@file_get_contents('http://schoolbox.com.au/design/img/favicon.ico')) {
-   $www = array('WWW_LIGHT'    => 'on',
-                'WWW_STATUS'    => 'Available');
-}
-else {
-   $www = array('WWW_LIGHT'    => '',
-                'WWW_STATUS'    => 'Inaccessible');
+if(in_array('nojscript', $this->arg)) {
+    // Believe it or not, this is actually really slow!
+    if(@file_get_contents('http://schoolbox.com.au/design/img/favicon.ico')) {
+       $www = array('WWW_LIGHT'  => 'on',
+                    'WWW_STATUS' => 'Available');
+    }
+    else {
+       $www = array('WWW_LIGHT'  => '',
+                    'WWW_STATUS' => 'Inaccessible');
+    }
+} else {
+    $www = array('WWW_LIGHT'  => '',
+                 'WWW_STATUS' => 'Not Tested');
 }
 $this->setVar($www);
 
-
 /* Group summary */
-$summary = $groupHandler->userSummary();
+// only do this if js is disabled
+// TODO: there has to be a better way to do this...
+if(in_array('nojscript', $this->arg)) {
 
-foreach($summary as $group) {
-    $groupOut = array('GROUP_NAME' => $group['name'],
-                    'GROUP_USER'    => $group['total'],
-                    'GROUP_LOGGED_IN' => $group['logged_in']);
+    $summary = $groupHandler->userSummary();
+
+    foreach($summary as $group) {
+        $groupOut = array('GROUP_ID'        => $group['id'],
+                          'GROUP_NAME'      => $group['name'],
+                          'GROUP_USER'      => $group['total'],
+                          'GROUP_LOGGED_IN' => $group['logged_in']);
+
+        $this->setVar($groupOut);
+        $this->setVar('no_js_warning_block', '');
+        $this->parse('group_summary_block','group_summary',true);
+    }
+} else {
     $this->setVar($groupOut);
-
-    $this->parse('group_summary_block','group_summary',true);
+    $this->setVar('group_summary_block', '');
+    $this->parse('no_js_warning_block', 'no_js_warning');
 }
 
 /* Recent activity */

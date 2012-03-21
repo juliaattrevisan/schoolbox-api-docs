@@ -42,12 +42,43 @@ $j(function() {
 	
 	//control at what percent the number turns red.
 	$j('.bar').each(function() {
-		var percent = Math.round(Number($j(this).children('span:first').width()/$j(this).width() * 100));
+		var percent = Math.round(Number($j(this).children('span:first').width() / $j(this).width() * 100));
 		if (percent > 50) {
 			$j(this).parent().next('.number').addClass('bad');
 		}
 	});
-	
+
+    $j(window).load( function() {
+        // test that the non-js page has not been requested
+        if(window.location.pathname.indexOf("nojscript") == -1) {
+            // replace the default www status 'untested' with 'testing'
+            $j('#www-light > span').html('Testing...');
+
+            // load the user statistics via ajax
+            $j.post('/ajax/adminStats.php', { module : 'users' }, function(data) {
+                for (i in data) {
+                    var row = data[i];
+
+                    $j('<tr><td nowrap="nowrap"><a href="/adminv2/reports/group/' + row.GROUP_ID + '">' + row.GROUP_NAME +
+                       '</a></td><td>' + row.GROUP_USER +
+                       '</td><td>' + row.GROUP_LOGGED_IN + '</td></tr>').appendTo($j('#group-summary'));
+                }
+                /* re-apply on off */
+                $j('#group-summary tr').removeClass('dark');
+                $j('#group-summary tr:odd').addClass('dark');
+            });
+
+            // load service statuses via ajax
+            $j.post('/ajax/adminStats.php', { module : 'service_www' }, function(data) {
+                for(i in data) {
+                    var light = data[i].WWW_LIGHT;
+                    var status = data[i].WWW_STATUS;
+                }
+                $j('#www-light > span').html(status);
+                $j('#www-light').addClass(light);
+            });
+        }
+    });
 });
 
 </script>
@@ -109,42 +140,49 @@ $j(function() {
 			<!-- END memory -->
 			<h4 style="margin-top:8px">Status of services</h4>
 			<ul class="server-statuses" >
-				<li class="{EXTERNAL_DB_LIGHT} clearfix"><strong>{EXTERNAL_DB}</strong><em><span></span></em><span>{EXTERNAL_DB_STATUS}</span></li>
-				<li class="{EMAIL_LIGHT} clearfix"><strong>Email </strong><em><span></span></em><span>{EMAIL_STATUS}</span></li>
-				<li class="{LDAP_LIGHT} clearfix"><strong>LDAP </strong><em><span></span></em><span>{LDAP_STATUS}</span></li>
-				<li class="{WWW_LIGHT} clearfix"><strong>WWW </strong><em><span></span></em><span>{WWW_STATUS}</span></li>
+				<li id="db-light" class="{EXTERNAL_DB_LIGHT} clearfix"><strong>{EXTERNAL_DB}</strong><em><span></span></em><span>{EXTERNAL_DB_STATUS}</span></li>
+				<li id="email-light" class="{EMAIL_LIGHT} clearfix"><strong>Email </strong><em><span></span></em><span>{EMAIL_STATUS}</span></li>
+				<li id="ldap-light" class="{LDAP_LIGHT} clearfix"><strong>LDAP </strong><em><span></span></em><span>{LDAP_STATUS}</span></li>
+				<li id="www-light" class="{WWW_LIGHT} clearfix"><strong>WWW </strong><em><span></span></em><span>{WWW_STATUS}</span></li>
 			</ul>
-			
-			<table cellpadding="0" cellspacing="0" class="logged-in">
-				<colgroup>
-					<col width="50%" />
-					<col width="20%" />
-					<col width="30%" />
-				</colgroup>
-				<thead>
-					<tr>
-						<td>Group</td>
-						<td>Total</td>
-						<td>Logged In</td>
-					</tr>
-				</thead>
-				<tbody>
-                                    <!-- BEGIN group_summary -->
-					<tr>
-						<td nowrap="nowrap">{GROUP_NAME}</td>
-						<td>{GROUP_USER}</td>
-						<td>{GROUP_LOGGED_IN}</td>
-					</tr>
-                                        <!-- END group_summary -->
-				</tbody>
-			</table>
-
+            <div class="loading"></div>
+            <h4 style="margin-top:8px">Group statistics</h4>
+			    <table cellpadding="0" cellspacing="0" class="logged-in" id="group-summary">
+                    <colgroup>
+                        <col width="50%" />
+                        <col width="20%" />
+                        <col width="30%" />
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <td>Group</td>
+                        <td>Total</td>
+                        <td>Logged In</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <!-- BEGIN group_summary -->
+                        <tr>
+                            <td nowrap="nowrap"><a href="/adminv2/reports/group/{GROUP_ID}">{GROUP_NAME}</a></td>
+                            <td>{GROUP_USER}</td>
+                            <td>{GROUP_LOGGED_IN}</td>
+                        </tr>
+                        <!-- END group_summary -->
+                    </tbody>
+                </table>
+            <!-- BEGIN no_js_warning -->
+            <noscript>
+                <p>It seems your browser either has Javascript disabled, or doesn't support it.</br>
+                   You can <a href="/adminv2/home/nojscript">reload the page</a> to see these statistics, but please be patient while they load.</p>
+            </noscript>
+            <!-- END no_js_warning -->
 		</div>
 	</div>
 	<div class="two-thirds">
 		<div class="level">
-			<h3 class="iconify">Recent activity</h3>
-			<table cellpadding="0" cellspacing="0" class="logged-in">
+            <h3 class="iconify">Recent activity</h3>
+            <a href="/adminv2/reports/activity" class="btn"><span></span>See all</a>
+            <table cellpadding="0" cellspacing="0" class="logged-in">
 				<colgroup>
 					<col width="35%" />
 					<col width="35%" />
@@ -165,7 +203,7 @@ $j(function() {
 						<td>{LOG_NAME}</td>
 					</tr>
                                         <!-- END recent_log -->
-				</tbody>
+                </tbody>
 			</table>
 		</div>
 	</div>
