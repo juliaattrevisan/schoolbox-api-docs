@@ -37,7 +37,7 @@ $j(function() {
 	<li><a href="/adminv2/rollover">Rollover</a></li>
 </ul>
 <div class="admin-contents">
-	<h2>Modify Side Menu Item</h2>
+	<h2>{ACTION} Side Menu Item</h2>
 	<form action="/adminv2/side-menuForm.php" method="post" name="form" id="form" class="standardForm" >
 		<table>
 			<tbody>
@@ -66,18 +66,33 @@ $j(function() {
 						</label>
 					</td>
 				</tr>
-				<tr>
-					<td width="250">
-						<h2>Target</h2>
-						<em>Select whether you would like this link to open in a new window</em>
-					</td>
-					<td>
-						<select name="target">
-							<option value="">No Target</option>
-							<option value="_blank" {BLANK_SELECTED}>New Window</option>
-						</select>
-					</td>
-				</tr>
+                <tr>
+                    <td width="250">
+                        <h2>Target</h2>
+                        <em>Select whether you would like this link to open in a new window</em>
+                    </td>
+                    <td>
+                        <select name="target">
+                            <option value="">No Target</option>
+                            <option value="_blank" {BLANK_SELECTED}>New Window</option>
+                        </select>
+                    </td>
+                </tr>
+                <!-- BEGIN parent_select -->
+                <tr>
+                    <td width="250">
+                        <h2>Parent</h2>
+                        <em>This is where in the menu the new item will be inserted</em>
+                    </td>
+                    <td>
+                        <select name="parent">
+                            <!-- BEGIN menu_select -->
+                            <option value="{ITEM_VALUE}">{ITEM_TEXT}</option>
+                            <!-- END menu_select -->
+                        </select>
+                    </td>
+                </tr>
+                <!-- END parent_select -->
 				<tr>
 					<td width="250">
 						<h2>Campus Access</h2>

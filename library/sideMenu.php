@@ -81,14 +81,16 @@ class sideMenu extends DeprecatedModel {
         $group = $item['group'];
         unset($item['campus']);
         unset($item['group']);
-
-        $item['sequence'] = $this->getLastItemSequence(0);
+        $item['sequence'] = $this->getLastItemSequence($item['parent']);
         $id = parent::create($item);
         $this->addPermissions($id, $campus, $group);
     }
 
     function getLastItemSequence($parent) {
         $query = "SELECT sequence FROM sideMenu WHERE parent = $parent ORDER BY sequence DESC";
+
+        echo $query;
+
         return $this->db->getOne($query) + 1;
     }
 
@@ -184,6 +186,10 @@ class sideMenu extends DeprecatedModel {
     function deletePermissions($id) {
         $this->db->delete('sideMenuCampus', 'id', $id);
         $this->db->delete('sideMenuGroup', 'id', $id);
+    }
+
+    function outputChildren($id) {
+
     }
 }
 ?>

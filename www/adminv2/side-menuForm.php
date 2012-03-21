@@ -11,12 +11,13 @@ if (!$groupHandler->isSuperuser()) {
 $menuHandler = new sideMenu();
 
 $menuItem = array(
-	'id' => $_POST['id'],
-	'txt' => $_POST['txt'],
-	'url' => $_POST['url'],
+	'id'     => $_POST['id'],
+	'txt'    => $_POST['txt'],
+	'url'    => $_POST['url'],
 	'target' => $_POST['target'],
+    'parent' => $_POST['parent'],
 	'campus' => $_POST['campus'],
-	'group' => $_POST['group']
+	'group'  => $_POST['group']
 );
 
 if ($_POST['delete'] && $_POST['id']) {
