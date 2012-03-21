@@ -249,7 +249,7 @@ class Leave_Controller extends Controller {
 		/* Use the userId field when submitting on someone else's behalf,
 		 * otherwise just your own id
 		 */
-		if ($this->getGroup()->getPermission()) {
+		if ($this->getGroup()->getPermission(null)) {
 			$request->setUserId($data['userId']);
 		}
 		else {
@@ -407,7 +407,7 @@ class Leave_Controller extends Controller {
 		/* Only allow students to see their own leave requests
 		 * Allow staff/superusers to see anyone's
 		 */
-		if ($this->getGroup()->getPermission() || $_SESSION['id'] == $data['user']['id']) {
+		if ($this->getGroup()->getPermission(null) || $_SESSION['id'] == $data['user']['id']) {
 			$user = $data['user'];
 			$house = $data['house'];
 			$requestList = $data['requestList'];
@@ -506,7 +506,7 @@ class Leave_Controller extends Controller {
 
 		/* Only allow Teachers/Staff to approve/reject requests
 		 */
-		if ($this->getGroup()->getPermission()) {
+		if ($this->getGroup()->getPermission(null)) {
 			$user = $data['user'];
 			$requestList = $data['requestList'];
 
@@ -569,7 +569,7 @@ class Leave_Controller extends Controller {
 
 		/* Iterate through options
 		 */
-		if ($this->getGroup()->getPermission()) {
+		if ($this->getGroup()->getPermission(null)) {
 			foreach($request->getConfirmedByMap() as $value => $label) {
 				if ($request->getConfirmedBy() == $value) {
 					$selected = 'checked=\'checked\'';
@@ -602,7 +602,7 @@ class Leave_Controller extends Controller {
 
 		/* Only allow Teachers/Staff to modify requests
 		 */
-		if ($this->getGroup()->getPermission()) {
+		if ($this->getGroup()->getPermission(null)) {
 			$request = $data['request'];
 			$user = $request->getUser();
 			$house = $this->getHouseMapper()->findById($user->getHouse());
