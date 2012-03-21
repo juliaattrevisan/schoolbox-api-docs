@@ -25,12 +25,14 @@ class sideMenu extends DeprecatedModel {
         $this->db->query($query);
 
         //initialise root of tree
-        $tree[0] =array('id' => 0,
-                        'txt'=> 'Top Level');
+        $tree[0] = array(
+            'id'  => 0,
+            'txt' => 'Top Level'
+        );
 
         //fetch each record and insert into tree
         while($menuitem = $this->db->getNextArray() ) {
-                $tree = $this->buildTree($tree, $menuitem);
+            $tree = $this->buildTree($tree, $menuitem);
         }
 
         return $tree;
@@ -52,9 +54,8 @@ class sideMenu extends DeprecatedModel {
         return $list;
     }
 
-    function outputTree($list, $level=0)
+    function outputTree($list, $level=0, $selectable = false)
     {
-
             $text = "<ul>\n";
 
             for($i=0; $list[$i]; $i++)
@@ -63,10 +64,15 @@ class sideMenu extends DeprecatedModel {
                             $target = " target={$list[$i]['target']}";
                     else $target = '';
 
-                    $text .= '<li id="node_'.$list[$i]['id'].'"><a href="/adminv2/modify-side-menu/'.$list[$i]['id'].'">'.$list[$i]['txt'].'</a>';
+                    $text .= '<li id="node_'.$list[$i]['id'].'">';
+
+                    if($selectable)
+                        $text .= '<a id="' . $list[$i]['id'] . '" href="#">' . $list[$i]['txt'] . "</a>";
+                    else
+                        $text .= '<a href="/adminv2/modify-side-menu/'.$list[$i]['id'].'">'.$list[$i]['txt'].'</a>';
 
                     if(is_array($list[$i]['children'])) {
-                            $text .= $this->outputTree($list[$i]['children'], ($level + 1));
+                            $text .= $this->outputTree($list[$i]['children'], ($level + 1), $selectable);
                     }
 
                     $text .= "</li>\n";

@@ -1,24 +1,43 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
 <script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
+<script type="text/javascript" src="/javascript/jstree/jquery.jstree.js"></script>
+
 <script type="text/javascript">
+    // setup tree structure
+    $j(function () {
+        $j("#side-menu").jstree({
+            "animation": 50,
+            "core" : { "initially_open" : [ "node_0" ] },
+            "plugins" : [ "themes", "html_data"],
+            "themes" : {
+                "theme" : "core",
+                "dots" : true,
+                "icons" : false
+            }
 
-$j(function() {
-	$j('#form').validate();
+        })
+    });
 
-	$j('#url').autocomplete({
-		serviceUrl: '/ajax/findCategory.php',
-		minChars: 2,
-		maxHeight: 300,
-		width: 275,
-        noCache: true,
-		onSelect: function (value, data) {
-			console.log(data);
-			$j('#form input[name=url]').val(data);
-		}
-	});
+    $j(function() {
+        $j('#form').validate();
+        $j('#url').autocomplete({
+            serviceUrl: '/ajax/findCategory.php',
+            minChars: 2,
+            maxHeight: 300,
+            width: 275,
+            noCache: true,
+            onSelect: function (value, data) {
+                console.log(data);
+                $j('#form input[name=url]').val(data);
+            }
+        });
 
-});
+    });
+
+    $j(function() {
+
+    });
 
 </script>
 <!-- END custom_head -->
@@ -85,11 +104,10 @@ $j(function() {
                         <em>This is where in the menu the new item will be inserted</em>
                     </td>
                     <td>
-                        <select name="parent">
-                            <!-- BEGIN menu_select -->
-                            <option value="{ITEM_VALUE}">{ITEM_TEXT}</option>
-                            <!-- END menu_select -->
-                        </select>
+                        <input id="prent" name="parent" type="hidden" value="0" />
+                        <div id="side-menu">
+                            {MENU_TREE}
+                        </div>
                     </td>
                 </tr>
                 <!-- END parent_select -->

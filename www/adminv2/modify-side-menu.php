@@ -17,21 +17,6 @@ $this->setBlock('parent_select', 'menu_select', 'menu_select_block');
 $menuHandler = new SideMenu;
 $userHandler = new User;
 
-function recurseChildren($tree, $page, $prepend = '') {
-    foreach($tree as $branch) {
-        $page->setVar(array(
-            'ITEM_VALUE' => $branch['id'],
-            'ITEM_TEXT'  => "$prepend- " . $branch['txt']
-        ));
-        $page->parse('menu_select_block', 'menu_select', true);
-
-        if($branch['children']) {
-            $prepend .= '&nbsp;&nbsp;&nbsp;';
-            recurseChildren($branch['children'], $page, $prepend);
-        }
-    }
-}
-
 if(is_numeric($this->arg[0])) {
     /* Modify existing item */
 
@@ -85,9 +70,9 @@ if(is_numeric($this->arg[0])) {
          'name' => 'CAMPUS_NAME'
      ));
 
-    // parse and show the parent selector
-    recurseChildren($menuHandler->getTree(), $this);
+    // don't hide the parent select block
     $this->parse('parent_select_block', 'parent_select', false);
+    $this->setVar('MENU_TREE', $menuHandler->outputTree($menuHandler->getTree(), 0, true));
 
 }
 
