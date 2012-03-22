@@ -148,6 +148,8 @@ else if(is_numeric($this->arg[0])) {
 
 	$this->setBlock(TEMPLATE_content, 'sub_head', 'sub_head_block');
 	$this->setBlock(TEMPLATE_content, 'assess_head', 'assess_head_block');
+	$this->setBlock(TEMPLATE_content, 'sub_type_head', 'sub_type_head_block');
+	$this->setBlock(TEMPLATE_content, 'assess_type_head', 'assess_type_head_block');
     $this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
     $this->setBlock(TEMPLATE_content, 'student_mark_list', 'student_mark_list_block');
     $this->setBlock('student_mark_list', 'markItem', 'markItem_block');
@@ -236,11 +238,11 @@ else if(is_numeric($this->arg[0])) {
                 }
 
 				$this->parse('assess_head_block','assess_head', true);
-
+                $this->parse('assess_type_head_block','assess_type_head', true);
             }
 			else {
 				$this->parse('sub_head_block','sub_head', true);
-
+				$this->parse('sub_type_head_block','sub_type_head', true);
 			}
 		}
 	}

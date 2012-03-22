@@ -63,28 +63,30 @@
             <!-- BEGIN sub_head -->
             <th id="work-{BOX_ID}" class="column-{BOX_ID}">
                 <div class="height-control">
-                    <a href="/submission/viewSubmission/{BOX_ID}">
-                    <strong>{SUB_NAME}</strong></a><br />
+                    <a href="/submission/viewSubmission/{BOX_ID}"><strong>{SUB_NAME}</strong></a>
                 </div>
             </th>
             <!-- END sub_head -->
-
             <!-- BEGIN assess_head -->
             <th id="work-{BOX_ID}" class="column-{BOX_ID}">
                 <div class="height-control">
-                <a href="/assess/results/{BOX_ID}"><strong>{SUB_NAME}</strong></a><br />
+                    <a href="/assess/results/{BOX_ID}"><strong>{SUB_NAME}</strong></a>
                 </div>
             </th>
             <!-- END assess_head -->
         </tr>
 
         <tr>
-            <!-- SAME BLOCK AS ABOVE -->
+            <!-- BEGIN sub_type_head -->
             <th>
                 <em>{SUB_TYPE}</em>
             </th>
-            <!-- end that new block -->
-
+            <!-- END sub_type_head -->
+            <!-- BEGIN assess_type_head -->
+            <th>
+                <em>{SUB_TYPE}</em>
+            </th>
+            <!-- END assess_type_head -->
         </tr>
         <!-- BEGIN student_mark_list -->
         <tr class="{ON_OFF}">
