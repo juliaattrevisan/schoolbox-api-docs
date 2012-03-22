@@ -28,11 +28,24 @@
 <span class="header_option"><a href="/submission/markSheet/export/{CID}" class="btn download" ><span></span>Download Spreadsheet</a>
 <a class="btn add" href="/submission/createSubmission/new/{CID}/"><span></span>Add Due Work</a>
 <a class="btn add" href="/assess/create/{CID}/"><span></span>Add Online Assessment</a></span>
+
+<table>
+    <tr>
+        <th>Surname</th>
+        <th>Preferred Name</th>
+    </tr>
+    <!-- BEGIN student_list -->
+    <tr class="{ON_OFF}">
+        <td><a href="/search/user/{UID}">{SURNAME}</a></td>
+        <td><a href="/search/user/{UID}">{FIRSTNAME}</a></td>
+    </tr>
+    <!-- END student_list -->
+</table>
+
+
+
 <table class="markTable" cellspacing="0" cellpadding="0" width="100%">
 	<tr>
-		<th>Surname</th>
-		<th>Preferred Name</th>
-
 		<!-- BEGIN sub_head -->
 		<th id="work-{BOX_ID}" class="column-{BOX_ID}"><a href="/submission/viewSubmission/{BOX_ID}"><strong>{SUB_NAME}</strong></a><br />
 			<em>{SUB_TYPE}</em><br /><br />
@@ -46,10 +59,8 @@
 		</th>
 		<!-- END assess_head -->
 	</tr>
-	<!-- BEGIN student_list -->
+	<!-- BEGIN student_mark_list -->
 	<tr class="{ON_OFF}">
-		<td><a href="/search/user/{UID}">{SURNAME}</a></td>
-		<td><a href="/search/user/{UID}">{FIRSTNAME}</a></td>
 		<!-- BEGIN markItem -->
 		<!-- BEGIN mark -->
 		<td class="column-{BOX_ID}">
@@ -68,5 +79,7 @@
 		<!-- END onlineAssessmentMark -->
 		<!-- END markItem -->
 	</tr>
-	<!-- END student_list -->
+	<!-- END student_mark_list -->
 </table>
+
+
