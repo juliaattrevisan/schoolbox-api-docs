@@ -12,6 +12,7 @@ abstract class Evaluation_Question_Category_List {
 	private $allCategories = array();
 	private $selectedAssess = 0;
 	private $selectedCategory = 0;
+	private $categoryHandler = null;
 
 	/**
 	 * Constructor
@@ -26,8 +27,52 @@ abstract class Evaluation_Question_Category_List {
 		$this->setSelectedAssess($selectedAssess);
 		$this->setSelectedCategory($selectedCategory);
 		$this->setAllCategories($allCategories);
+		$this->setCategoryHandler(new Assess_Question_Category());
 
 		$this->setup();
+	}
+
+	/**
+	 * Get a list of nodes that should be open, for the javascript tree
+	 *
+	 * @param $category_id
+	 * @return string
+	 */
+	private function getJsNodePath($category_id) {
+		$pathArray = array();
+
+		$allPaths = $this->getPathSegment($category_id, $pathArray);
+
+		/* Accumulate all the little path pieces
+		 */
+		if (is_array($allPaths) && count($allPaths)) {
+			foreach($allPaths as $currentPath) {
+				$path[] = '\'node_' . $currentPath['question_category_id'] . '\'';
+			}
+		}
+
+		return implode(',', $path);
+	}
+
+	/**
+	 * Find the way back to parent
+	 *
+	 * @param $category_id
+	 * @param $pathArray
+	 *
+	 * @return array
+	 */
+	private function getPathSegment($category_id, $pathArray) {
+		if ($category_id == 0) {
+			return $pathArray;
+		}
+		else {
+			$category = $this->getCategoryHandler()->getByID($category_id);
+
+			$pathArray[] = $category;
+
+			return $this->getPathSegment($category['parent_id'], $pathArray);
+		}
 	}
 
 	/**
@@ -39,8 +84,9 @@ abstract class Evaluation_Question_Category_List {
 		$this->getPage()->setBlock(TEMPLATE_content, 'category_list_item', 'category_list_item_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'category_list_item_end', 'category_list_item_end_block');
 
+		$this->getPage()->parse('category_list_start_block', 'category_list_start', true);
+
 		$this->getPage()->setVar(array(
-			'category_list_start_block' => '',
 			'category_list_item_start_block' => '',
 			'category_list_item_end_block' => '',
 			'question_category_block' => '',
@@ -52,6 +98,12 @@ abstract class Evaluation_Question_Category_List {
 	 */
 	public function render() {
 		$this->build($this->getAllCategories());
+
+		/* Tell javascript tree which nodes to open.
+		 */
+		$this->getPage()->setVar(array(
+			'SELECTED_NODES' => $this->getJsNodePath($this->getSelectedCategory()),
+		));
 	}
 
 	/**
@@ -72,6 +124,7 @@ abstract class Evaluation_Question_Category_List {
 			}
 
 			$this->getPage()->setVar(array(
+				'CATEGORY_LIST_ITEM_NODE' => 'node_' . $currentCategory['question_category_id'],
 				'CATEGORY_LIST_ITEM_ASSESS_ID' => $this->getSelectedAssess(),
 				'CATEGORY_LIST_ITEM_CATEGORY_ID' => $currentCategory['question_category_id'],
 				'CATEGORY_LIST_ITEM_NAME' => $currentCategory['name'],
@@ -162,5 +215,23 @@ abstract class Evaluation_Question_Category_List {
 	 */
 	private function getSelectedAssess() {
 		return $this->selectedAssess;
+	}
+
+	/**
+	 * Set category handler
+	 *
+	 * @param $categoryHandler
+	 */
+	private function setCategoryHandler($categoryHandler) {
+		$this->categoryHandler = $categoryHandler;
+	}
+
+	/**
+	 * Get category handler
+	 *
+	 * @return Assess_Question_Category|null
+	 */
+	private function getCategoryHandler() {
+		return $this->categoryHandler;
 	}
 }

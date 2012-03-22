@@ -21,6 +21,25 @@
 		});
 	});
 </script>
+<script type="text/javascript" src="/javascript/jstree/jquery.jstree.js"></script>
+<script type="text/javascript">
+$j(function () {
+	var selectedNodes = [{SELECTED_NODES}];
+
+	$j("#categoryTree").jstree({
+		"animation": 50,
+        "core": {
+			"initially_open": selectedNodes
+		},
+		"plugins": ["themes", "html_data", "dnd","crrm"],
+        "themes": {
+			"theme": "core",
+			"dots": true,
+			"icons": false
+		}
+	});
+});
+</script>
 
 <h1>Question Bank</h1>
 <span class="header_option"><a href="/assess/modify/{ASSESS_ID}" class="btn go-back "><span></span>Return To Assess</a></span>
@@ -86,22 +105,24 @@
 <div class="evaluation-menu">
 	<h2>Categories</h2>
 
-	<!-- BEGIN category_list_start -->
-	<ul>
-	<!-- END category_list_start -->
-
-		<!-- BEGIN category_list_item_start -->
+	<div id='categoryTree'>
+		<!-- BEGIN category_list_start -->
 		<ul>
-		<!-- END category_list_item_start -->
+		<!-- END category_list_start -->
 
-			<!-- BEGIN category_list_item -->
-			<li class='{CATEGORY_LIST_ITEM_SELECTED}'><a href='/assess/questionbank/contents/{CATEGORY_LIST_ITEM_CATEGORY_ID}/{CATEGORY_LIST_ITEM_ASSESS_ID}/{SECTION_ID}'>{CATEGORY_LIST_ITEM_NAME} ({CATEGORY_LIST_ITEM_NUMQUESTIONS})</a>
-			<!-- END category_list_item -->
+			<!-- BEGIN category_list_item_start -->
+			<ul>
+			<!-- END category_list_item_start -->
 
-		<!-- BEGIN category_list_item_end -->
+				<!-- BEGIN category_list_item -->
+				<li id='{CATEGORY_LIST_ITEM_NODE}' class='{CATEGORY_LIST_ITEM_SELECTED}'><a href='/assess/questionbank/contents/{CATEGORY_LIST_ITEM_CATEGORY_ID}/{CATEGORY_LIST_ITEM_ASSESS_ID}/{SECTION_ID}'>{CATEGORY_LIST_ITEM_NAME} ({CATEGORY_LIST_ITEM_NUMQUESTIONS})</a>
+				<!-- END category_list_item -->
+
+			<!-- BEGIN category_list_item_end -->
+			</ul>
+			</li>
+			<!-- END category_list_item_end -->
 		</ul>
-		</li>
-		<!-- END category_list_item_end -->
-	</ul>
+	</div>
 </div>
 

@@ -21,6 +21,25 @@
 		});
 	});
 </script>
+<script type="text/javascript" src="/javascript/jstree/jquery.jstree.js"></script>
+<script type="text/javascript">
+$j(function () {
+	var selectedNodes = [{SELECTED_NODES}];
+
+	$j("#categoryTree").jstree({
+		"animation": 50,
+        "core": {
+			"initially_open": selectedNodes
+		},
+		"plugins": ["themes", "html_data", "dnd","crrm"],
+        "themes": {
+			"theme": "core",
+			"dots": true,
+			"icons": false
+		}
+	});
+});
+</script>
 
 <h1>Question Bank</h1>
 <span class="header_option"><a href="/survey/modify/{SURVEY_ID}" class="btn go-back "><span></span>Return To Survey</a></span>
