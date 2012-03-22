@@ -16,10 +16,18 @@
                 $j.post('/submission/returnWorkForm.php', $j(this).closest('form').serialize());
 		});
 
-		if ($j('.markTable').find('th').length > 2) {
-			$j('.markTable').width('100%');
-			$j('#container').css('width', $j('.markTable').outerWidth());
-		}
+        var columnCount = $j('.mark-sheet.assessments table').find('tr:first').children('th').size();
+
+        for (i=0; i < columnCount; i++) {
+            $j('.mark-sheet.assessments table').find('tr:first').children('th:nth-child('+i+')').css('width', 150)
+        }
+
+        $j('.mark-sheet.assessments table').css('width', 150 * columnCount)
+
+
+
+
+
 	});
 </script>
 <!-- END custom_head -->
@@ -29,57 +37,77 @@
 <a class="btn add" href="/submission/createSubmission/new/{CID}/"><span></span>Add Due Work</a>
 <a class="btn add" href="/assess/create/{CID}/"><span></span>Add Online Assessment</a></span>
 
-<table>
-    <tr>
-        <th>Surname</th>
-        <th>Preferred Name</th>
-    </tr>
-    <!-- BEGIN student_list -->
-    <tr class="{ON_OFF}">
-        <td><a href="/search/user/{UID}">{SURNAME}</a></td>
-        <td><a href="/search/user/{UID}">{FIRSTNAME}</a></td>
-    </tr>
-    <!-- END student_list -->
-</table>
+<div class="mark-sheet names">
+    <table>
+        <tr>
+            <th>Surname</th>
+            <th>Preferred Name</th>
+        </tr>
+        <!-- BEGIN student_list -->
+        <tr class="{ON_OFF}">
+            <td><a href="/search/user/{UID}">{SURNAME}</a></td>
+            <td><a href="/search/user/{UID}">{FIRSTNAME}</a></td>
+        </tr>
+        <!-- END student_list -->
+    </table>
+</div>
+
+<div class="mark-sheet assessments">
+    <colgroup>
 
 
+    </colgroup>
+    <table>
 
-<table class="markTable" cellspacing="0" cellpadding="0" width="100%">
-	<tr>
-		<!-- BEGIN sub_head -->
-		<th id="work-{BOX_ID}" class="column-{BOX_ID}"><a href="/submission/viewSubmission/{BOX_ID}"><strong>{SUB_NAME}</strong></a><br />
-			<em>{SUB_TYPE}</em><br /><br />
-			<a class="btn delete float-left" href="/submission/submissionForm.php?deleteBox={BOX_ID}"><span></span>Delete</a>
-		</th>
-		<!-- END sub_head -->
-		<!-- BEGIN assess_head -->
-		<th id="work-{BOX_ID}" class="column-{BOX_ID}"><a href="/assess/results/{BOX_ID}"><strong>{SUB_NAME}</strong></a><br />
-			<em>{SUB_TYPE}</em><br /><br />
-			<a class="btn delete float-left" href="/assess/delete/{BOX_ID}"><span></span>Delete</a>
-		</th>
-		<!-- END assess_head -->
-	</tr>
-	<!-- BEGIN student_mark_list -->
-	<tr class="{ON_OFF}">
-		<!-- BEGIN markItem -->
-		<!-- BEGIN mark -->
-		<td class="column-{BOX_ID}">
-			<form method="post" onSubmit="return false;" action="" class="markForm">
-				<input name="mark" value="{MARK}" class="inputMark" type="text" size="5" maxlength="10">
-				<input type="hidden" name="uid" value="{UID}">
-				<input type="hidden" name="box_id" value="{BOX_ID}">
-				<input type="hidden" name="markUpdate" value="true">
-			</form>
-		</td>
-		<!-- END mark -->
-		<!-- BEGIN onlineAssessmentMark -->
-		<td class="column-assess-{ASSESS_ASSESS_ID}">
-			<a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ID}">{MARK}</a>
-		</td>
-		<!-- END onlineAssessmentMark -->
-		<!-- END markItem -->
-	</tr>
-	<!-- END student_mark_list -->
-</table>
+        <tr>
+            <!-- BEGIN sub_head -->
+            <th id="work-{BOX_ID}" class="column-{BOX_ID}">
+                <div class="height-control">
+                    <a href="/submission/viewSubmission/{BOX_ID}">
+                    <strong>{SUB_NAME}</strong></a><br />
+                </div>
+            </th>
+            <!-- END sub_head -->
 
+            <!-- BEGIN assess_head -->
+            <th id="work-{BOX_ID}" class="column-{BOX_ID}">
+                <div class="height-control">
+                <a href="/assess/results/{BOX_ID}"><strong>{SUB_NAME}</strong></a><br />
+                </div>
+            </th>
+            <!-- END assess_head -->
+        </tr>
+
+        <tr>
+            <!-- SAME BLOCK AS ABOVE -->
+            <th>
+                <em>{SUB_TYPE}</em>
+            </th>
+            <!-- end that new block -->
+
+        </tr>
+        <!-- BEGIN student_mark_list -->
+        <tr class="{ON_OFF}">
+            <!-- BEGIN markItem -->
+            <!-- BEGIN mark -->
+            <td class="column-{BOX_ID}">
+                <form method="post" onSubmit="return false;" action="" class="markForm">
+                    <input name="mark" value="{MARK}" class="inputMark" type="text" size="5" maxlength="10">
+                    <input type="hidden" name="uid" value="{UID}">
+                    <input type="hidden" name="box_id" value="{BOX_ID}">
+                    <input type="hidden" name="markUpdate" value="true">
+                </form>
+            </td>
+            <!-- END mark -->
+            <!-- BEGIN onlineAssessmentMark -->
+            <td class="column-assess-{ASSESS_ASSESS_ID}">
+                <a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ID}">{MARK}</a>
+            </td>
+            <!-- END onlineAssessmentMark -->
+            <!-- END markItem -->
+        </tr>
+        <!-- END student_mark_list -->
+    </table>
+
+</div>
 

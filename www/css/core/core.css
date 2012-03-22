@@ -1483,7 +1483,6 @@ td.small {
 }
 
 p.forgot a {
-	font-size: 90%;
 }
 
 .play-button {
@@ -1538,10 +1537,6 @@ p.forgot a {
 	margin-top: 5px;
 }
 
-.markTable th {
-	vertical-align: bottom;
-	text-align: left;
-}
 
 /*------------------------------------------------------------
 CHOOSE FILE SELECTOR
@@ -5800,6 +5795,41 @@ li.bars {
 
 table.subjectList {
 	width: 100%;
+}
+
+
+/* SUBMISSION MARK TABLE */
+
+
+.mark-sheet table{
+    table-layout: fixed;
+}
+
+.mark-sheet.assessments th {
+    vertical-align: bottom;
+    text-align: left;
+    font-size:12px;
+}
+
+.mark-sheet.names{
+    position:absolute;
+    top:140px;
+    left:0;
+    width:200px;
+}
+
+.mark-sheet.assessments{
+    overflow-x:scroll;
+    margin-left:200px;
+}
+
+.mark-sheet.assessments table{
+    table-layout: fixed;
+}
+
+.mark-sheet.assessments .height-control{overflow-y:hidden; height:60px; background:#0f0;}
+.mark-sheet.assessments .dark td{
+    background:#f4f4f4;
 }
 
 dt {
