@@ -262,7 +262,7 @@ class News extends DeprecatedModel {
             $query = "
          SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner, news_items.item_body,
             DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime,
-            news_items.item_datetime_posted, news_items.item_datetime_modified,
+            news_items.item_datetime_posted, news_items.item_datetime_modified, news_items.item_datetime_published,
             DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
             user.lastname, user.title, user.id as uid, user.firstname, newsTopic.name topicName, newsTopicID
          FROM `".$this->_table."`
@@ -286,7 +286,7 @@ class News extends DeprecatedModel {
         $query = "
 		SELECT DISTINCT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_body,
 			DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
-			DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
+			DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime, news_items.item_datetime_published,
 			user.lastname, user.title, user.firstname, user.id as uid, newsTopic.name topicName, newsTopicID
 		FROM `".$this->_table."`
 		LEFT JOIN user ON news_items.item_owner = user.id
@@ -484,6 +484,33 @@ class News extends DeprecatedModel {
      * @return Array|Bool
      */
     public function getOccupiedDateList ($archive = false, $topicName = '') {
+
+        // provide news listing
+        $visibleNews = $this->getNewsListing($archive, $topicName);
+
+        // go through and extract the years and months
+        $occupiedDates = array();
+        if($visibleNews) {
+            foreach($visibleNews as $article) {
+                $df = new Alaress_Date_Format($article['item_datetime_published'], 'y-m-d h:i:s');
+                $occupation = array(
+                    'year'                    => $df->getUsingFormat('Y'),
+                    'month'                   => $df->getUsingFormat('m')
+                );
+                if(!in_array($occupation, $occupiedDates)) {
+                    $occupiedDates[] = $occupation;
+                }
+            }
+        } else {
+            return null;
+        }
+
+        // sort the generated list so the dates collate properly
+        sort($occupiedDates);
+
+        return $occupiedDates;
+
+/*
         $beforeOrAfter = $archive ? '<=' : '>';
 
         $query = "SELECT YEAR(`item_datetime_published`) as 'year', item_datetime_published,
@@ -502,8 +529,8 @@ class News extends DeprecatedModel {
                     GROUP BY `year` DESC, `month` DESC";
 
         return $this->db->getAll($query);
+*/
     }
-
 }
 
 

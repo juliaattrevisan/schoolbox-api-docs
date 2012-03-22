@@ -6,6 +6,37 @@
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
+ *
+ * * * * * * * *
+ * Pseudocode framework
+ * * * * * * * *
+    1. Am I in archive or am I in current?
+    $timePeriod =? archive : current;
+
+    2. Get the list of news articles that I'm allowed to see within this $timePeriod.
+    Do not filter by topic yet.
+    $visibleList = [];
+
+    3. Have I selected a topic?
+    3a. Topic selected
+    Get the $visibleListTopicSubset of $visibleList for this topic.
+    Get the $occupiedDateList from $visibleListTopicSubset
+
+    3b. 'All' selected
+    Get the $occupiedDateList from $visibleList
+
+    4. Have I selected a month?
+    4a. Month selected
+    Filter $visibleList[TopicSubset] into $visibleList[TopicSubset]MonthSubset
+
+    4b. No month selected
+
+    5. Output everthing
+    5.1. Display the [archive|current] button
+    5.2. Display the topics of $visibleList
+    5.3. Display the $occupiedDateList from $visibleList[TopicSubset]
+    5.4. Display the articles in $visibleList[TopicSubset][MonthSubset]
+ *
  */
 
 $this->setFile(TEMPLATE_content, 'news.html');
@@ -21,13 +52,17 @@ $this->setBlock(TEMPLATE_content, 'month_filter', 'month_filter_block');
 $this->setBlock(TEMPLATE_content, 'year', 'year_block');
 $this->setBlock('year', 'month', 'month_block');
 $this->setBlock('topic', 'news', 'news_block');
+$this->setVar('topic_header_block', '');
+
 $this->setTab('news');
 
 $groupHandler = new Group(NEWS_SERVICE);
 $newsHandler = new News();
 
-$archive = false;
 
+
+// determine whether to show archive or current context, and setup filters accordingly
+$archive = false;
 if($this->arg[0] == 'archive') {
     $archive = true;
     $filter = array(
@@ -45,20 +80,25 @@ if($this->arg[0] == 'archive') {
     );
 }
 
-// set an appropriate title
+// set an appropriate title based on news context
 $title = $archive ? 'News Archive' : 'News';
 $this->setTitle($title);
 $this->setVar('PAGE_TITLE', $title);
 
-// get list of possible topics
-$validTopics = array();
-foreach($newsHandler->getTopicList() as $elem => $topic) {
-    $validTopics[] = strtolower($topic['name']);
+// collate the full list of news the current user is allowed to see in the current context
+// this is used to populate the topic headers
+$visibleList = $newsHandler->getNewsListing($archive);
+
+// get list of visibly populated topics
+$allTopics = array('all' => 1);
+foreach($visibleList as $article) {
+    $allTopics[strtolower($article['topicName'])] = 1;
 }
 
+
 // sanitise filter inputs
-if(!in_array($filter['topic'], $validTopics))
-    $filter['topic'] = 'all';
+if(!in_array($filter['topic'], array_keys($allTopics)))
+$filter['topic'] = 'all';
 
 // if year/month/page are null or something stupid, set to default
 $defaults = array(
@@ -66,15 +106,21 @@ $defaults = array(
     'month' => 'all',
     'page'  => 1
 );
-
 foreach ($defaults as $field => $default)
-    if(!is_numeric($filter[$field]))
-        $filter[$field] = $default;
+if(!is_numeric($filter[$field]))
+$filter[$field] = $default;
 
 // add archive to the filter post-sanitise
 $filter['archive'] = $archive ? 'archive/' : '';
 
-$this->setVar('topic_header_block', '');
+
+// collate the full list of occupied dates for this category
+// this is used to populate the archive sidebar
+$occupiedDateList = $newsHandler->getOccupiedDateList($archive, $filter['topic']);
+
+// finally get the list of news that is visible, based on the filters applied
+$visibleListSubset = $newsHandler->getNewsListing($archive, $filter['topic'], $filter['year'], $filter['month']);
+
 
 // display add news button if user is allowed to
 if (($permission = $groupHandler->getPermission(0)) >= WRITE_ACCESS) {
@@ -83,53 +129,51 @@ if (($permission = $groupHandler->getPermission(0)) >= WRITE_ACCESS) {
     $this->setVar('add_news_block', '');
 }
 
-/* Year and Month List */
-$dateList = $newsHandler->getOccupiedDateList($archive, $filter['topic']);
 
-if ( $dateList ) {
-    foreach ($dateList as $i => $date) {
+/* Year and Month List */
+if ( $occupiedDateList ) {
+    foreach ($occupiedDateList as $i => $date) {
 
         $this->setVar( array(
             'YEAR' => $date['year'],
             'YEAR_ClASS' => $date['year'] == $filter['year'] ? 'selected' : ''
         ) );
 
-        $month = new Alaress_Date_Format($date['item_datetime_published'], 'y-m-d');
-
         /* Highlight only for the selected month and selected year
            */
-        if (($month->getUsingFormat('m') == $filter['month']) && ($month->getUsingFormat('Y') == $filter['year'])) {
+        if (($date['month'] == $filter['month']) && ($date['year'] == $filter['year'])) {
             $monthClass = 'selected';
         }
         else {
             $monthClass = '';
         }
 
+        $format = new Alaress_Date_Format('70-' . $date['month'] . '-01', 'y-m-d');
+
         $this->setVar( array(
-            'MONTH'            => $month->getUsingFormat('F'),
-            'MONTH_NUMBER'     => $month->getUsingFormat('m'),
+            'MONTH'            => $format->getUsingFormat('F'),
+            'MONTH_NUMBER'     => $date['month'],
             'MONTH_CLASS'      => $monthClass,
             'MENU_TOPIC_CLEAN' => $filter['archive'] . $filter['topic']
         ) );
 
         $this->parse('month_block', 'month', true);
 
-        $nextYear = $dateList[$i+1]['year'];
+        $nextYear = $occupiedDateList[$i+1]['year'];
 
         if ( $date['year'] != $nextYear || empty($nextYear) ) {
             $this->parse('year_block', 'year', true);
             $this->setVar('month_block', '');
         }
     }
+} else {
+    $this->setVar('year_block', '');
 }
 
-// setup the news articles to display
-// $newsList = $newsHandler->getNews(0, true);
-$newsList = $newsHandler->getNewsListing($archive, $filter['topic'], $filter['year'], $filter['month']);
 
-// setup pagination for archive
+// setup pagination for display
 $newsPerPage = Cfg::get('search_type_limit');
-$totalPages = ceil(count($newsList) / $newsPerPage);
+$totalPages = ceil(count($visibleListSubset) / $newsPerPage);
 $newsIndex = $newsPerPage * ($filter['page'] - 1);
 
 // figure out which pagination buttons should be displayed
@@ -145,15 +189,6 @@ else
 
 // set pagination button destinations
 $pageSlug = "${filter['archive']}${filter['topic']}/${filter['year']}/${filter['month']}/";
-
-// does the bottom button link to archived or current news?
-$this->setVar(array(
-    'ARCH_CURRENT' => $archive ? 'Current' : 'Archived',
-    'ARCH_CURRENT_CLEAN' => $archive ? "${filter['topic']}/" : "archive/${filter['topic']}/",
-));
-$this->parse('archive_button_block', 'archive_button');
-
-
 
 if($totalPages > 1) {
     for($j = 1; $j <= $totalPages; $j++) {
@@ -179,6 +214,20 @@ $outputPagination = array(
 
 $this->setVar($outputPagination);
 
+
+// does the bottom button link to archived or current news?
+$this->setVar(array(
+    'ARCH_CURRENT' => $archive ? 'Current' : 'Archived',
+    'ARCH_CURRENT_CLEAN' => $archive ? "${filter['topic']}/" : "archive/${filter['topic']}/",
+));
+$this->parse('archive_button_block', 'archive_button');
+
+
+
+
+
+
+
 $items = $newsHandler->getNewsListing($archive, $filter['topic'], $filter['year'], $filter['month'], $newsIndex, $newsPerPage);
 
 if (is_array($items)) {
@@ -189,15 +238,12 @@ if (is_array($items)) {
     $topicList['All'] = 1;
 
     if($items) {
-        foreach ($items as $article)
-        {
+        foreach ($items as $article) {
             $i++;
 
             if (($permission >= WRITE_ACCESS && $article['item_owner'] == $_SESSION['id']) || $permission >= FULL_ACCESS) {
                 $this->setVar("MODIFY", " | <a href=\"/news/modify/" . $article['item_id'] . "\">modify</a>");
-            }
-            else
-            {
+            } else {
                 $this->setVar("MODIFY", "");
             }
 
@@ -260,16 +306,14 @@ if (is_array($items)) {
             $previous = $article;
         }
     } else {
-        $this->setVar('topic_block', 'No news items found.');
-        $this->setVar('year_block', '');
+        $this->setVar('topic_block', '');
+        $this->setVar('year_block', 'No news items found.');
     }
 
-    // prepend all onto our topic list
-    $validTopics = array_merge(array("all"), $validTopics);
 
     // output tabs
-    if (is_array($validTopics)) {
-        foreach ($validTopics as $i => $topic) {
+    if (is_array($allTopics)) {
+        foreach ($allTopics as $topic => $i) {
             $url = new Url($topic);
 
             $output = array(
@@ -288,6 +332,7 @@ if (is_array($items)) {
 }
 else
 {
-    $this->setVar("topic_block", "No news items found");
+    $this->setVar('topic_block', '');
+    $this->setVar('year_block', 'No news items found.');
 }
 
