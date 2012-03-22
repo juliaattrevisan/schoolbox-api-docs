@@ -2,11 +2,9 @@
 $this->setFile(TEMPLATE_content, 'survey/questionbank/contents.html');
 $this->setBlock(TEMPLATE_content, 'welcome', 'welcome_block');
 $this->setBlock(TEMPLATE_content, 'category_selected', 'category_selected_block');
-$this->setBlock(TEMPLATE_content, 'question_category', 'question_category_block');
 $this->setBlock('category_selected', 'show_submit', 'show_submit_block');
 $this->setBlock('category_selected', 'show_delete', 'show_delete_block');
 $this->setBlock('category_selected', 'no_questions', 'no_questions_block');
-
 $this->setBlock('category_selected', 'question', 'question_block');
 $this->setBlock('question', 'answers', 'answers_block');
 
@@ -17,33 +15,23 @@ $this->setVar(array(
 
 $questionBankHandler = new Survey_Question_Bank();
 
-/* output question bank categories */
+/* Derive and render a category list
+ */
 $questionBankCategoryHandler = new Survey_Question_Category();
 
-$categoryList = $questionBankCategoryHandler->getList();
+$questionCategoryList = new Survey_Question_Category_List($this, $this->arg[1], $this->arg[0], $questionBankCategoryHandler->getPath());
+$questionCategoryList->render();
 
-if (is_array($categoryList) ) {
-    foreach($categoryList as $category) {
-        $this->setVar(array(
-			'CATEGORY_NAME' => $category['name'],
-			'CATEGORY_ID' => $category['question_category_id'],
-			'CATEGORY_SELECTED' => $category['question_category_id'] == $this->arg[0] ? 'selected' : ''
-		));
+/* If expanding a particular category
+ */
+if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
+	$category = $questionBankCategoryHandler->getByID($this->arg[0]);
 
-		if ($category['question_category_id'] == $this->arg[0]) {
-			$categoryName = $category['name'];
-		}
+    $this->setVar(array(
+		'QUESTION_CATEGORY' => $category['name'],
+	));
 
-		$this->parse('question_category_block', 'question_category', true);
-    }
-}
-else {
-    $this->setVar('question_category_block','');
-}
-
-if ($this->arg[0] > 0) {
-    $allQuestions = $questionBankHandler->getContents($this->arg[0]);
-    $this->setVar('QUESTION_CATEGORY', $categoryName);
+	$allQuestions = $questionBankHandler->getContents($this->arg[0]);
 
     /* Iterate and show
      */
@@ -59,23 +47,29 @@ if ($this->arg[0] > 0) {
                 'answers_block'  => '',
             ));
 
-            if($currentQuestion['answer']) {
+            if ($currentQuestion['answer']) {
                 $answerList = unserialize($currentQuestion['answer']);
 
-				foreach($answerList as $answer) {
+				if (is_array($answerList)) {
+					foreach($answerList as $answer) {
 
-					/* Matching pairs uses a different property than
-					 * multiple choice
-					 */
-					if ($currentQuestion['type_id'] == $questionBankHandler::MATCHING_PAIRS_TYPE_ID) {
-						$this->setVar('ANSWER_DESCRIPTION', $answer->answerLeft . ' - ' . $answer->answerRight);
-					}
-					else {
-						$this->setVar('ANSWER_DESCRIPTION', $answer->description);
-					}
+						/* Matching pairs uses a different property than
+						 * multiple choice
+						 */
+						if ($currentQuestion['type_id'] == $questionBankHandler::MATCHING_PAIRS_TYPE_ID) {
+							$this->setVar('ANSWER_DESCRIPTION', $answer->answerLeft . ' - ' . $answer->answerRight);
+						}
+						else {
+							$this->setVar('ANSWER_DESCRIPTION', $answer->description);
+						}
 
-                    $this->parse('answers_block','answers',true);
-                }
+						$this->parse('answers_block', 'answers',true);
+					}
+				}
+				else {
+					$this->setVar('ANSWER_DESCRIPTION', $currentQuestion['answer']);
+					$this->parse('answers_block', 'answers', true);
+				}
             }
 
             $this->parse('question_block', 'question', true);

@@ -19,38 +19,37 @@
 			$j(this).siblings('.question-answers').slideToggle();
 			return false;
 		});
-
 	});
-
 </script>
 
 <h1>Question Bank</h1>
-<span class="header_option"><a href="/survey/modify/{SURVEY_ID}"
-   class="btn go-back "><span></span>Return To
-	Survey</a></span>
-        <!-- BEGIN welcome --><div class="evaluation-content question-bank">
-        <h2>Welcome</h2>
-		<p class="pad-it">Welcome to the survey question bank. Here you will find questions
-			that can be used in your survey. You can also store your own
-			questions here for later use. To begin browse to the appropriate
-			category and select the questions you wish to add. These questions
-			will automatically be added to your survey in the current
-			section.</p></div>
-		<!-- END welcome -->
+<span class="header_option"><a href="/survey/modify/{SURVEY_ID}" class="btn go-back "><span></span>Return To Survey</a></span>
+
+<!-- BEGIN welcome -->
+<div class="evaluation-content question-bank">
+	<h2>Welcome</h2>
+
+	<p class="pad-it">
+		Welcome to the survey question bank. Here you will find questions
+		that can be used in your survey. You can also store your own
+		questions here for later use. To begin browse to the appropriate
+		category and select the questions you wish to add. These questions
+		will automatically be added to your survey in the current
+		section.
+	</p>
+</div>
+<!-- END welcome -->
 
 <!-- BEGIN category_selected -->
-
 <div class="evaluation-content question-bank"><h2>{QUESTION_CATEGORY}</h2>
-	<form id='questionBankForm' action='/survey/questionbank/addToSection'
-		  method='post'>
+	<form id='questionBankForm' action='/survey/questionbank/addToSection' method='post'>
 		<input name='section_id' type='hidden' value='{SECTION_ID}'/>
 
 		<!-- BEGIN question -->
 		<div class="add-to-evaluation">
 			<label class="question clearfix">
-				<div class="question-checkbox"><input name='question_bank_id[]'
-													  type='checkbox'
-													  value='{QUESTION_BANK_ID}'/>
+				<div class="question-checkbox">
+					<input name='question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}'/>
 				</div>
 				<span class="question-content">{QUESTION}</span>
 			</label>
@@ -58,24 +57,22 @@
 			<a href="#" class="show-answers">Show Answers</a>
 
 			<div class="question question-answers">
-            <ul>
-                <!-- BEGIN answers -->
-                <li>{ANSWER_DESCRIPTION}</li>
-                <!-- END answers -->
-            </ul>
+				<ul>
+					<!-- BEGIN answers -->
+					<li>{ANSWER_DESCRIPTION}</li>
+					<!-- END answers -->
+				</ul>
             </div>
 		</div>
 		<!-- END question -->
 
 		<p class="clearfix">
 			<!-- BEGIN show_submit -->
-			<input type='submit' value='Copy to Survey'
-				   class="submit-btn-plain"/>
+			<input type='submit' value='Copy to Survey' class="submit-btn-plain"/>
 			<!-- END show_submit -->
 
 			<!-- BEGIN show_delete -->
-			<input id='deleteButton' type='button'
-				   value='Remove from QuestionBank' class="submit-btn-plain"/>
+			<input id='deleteButton' type='button' value='Remove from QuestionBank' class="submit-btn-plain"/>
 			<!-- END show_delete -->
 		</p>
 		<!-- BEGIN no_questions -->
@@ -88,13 +85,22 @@
 
 <div class="evaluation-menu">
 	<h2>Categories</h2>
-	<ul class="evaluation-category-select">
-		<!-- BEGIN question_category -->
-		<li>
-			<a href="/survey/questionbank/contents/{CATEGORY_ID}/{SURVEY_ID}/{SECTION_ID}"
-			   class="{CATEGORY_SELECTED}">{CATEGORY_NAME}</a>
+
+	<!-- BEGIN category_list_start -->
+	<ul>
+	<!-- END category_list_start -->
+
+		<!-- BEGIN category_list_item_start -->
+		<ul>
+		<!-- END category_list_item_start -->
+
+			<!-- BEGIN category_list_item -->
+			<li class='{CATEGORY_LIST_ITEM_SELECTED}'><a href='/survey/questionbank/contents/{CATEGORY_LIST_ITEM_CATEGORY_ID}/{SURVEY_ID}/{SECTION_ID}'>{CATEGORY_LIST_ITEM_NAME} ({CATEGORY_LIST_ITEM_NUMQUESTIONS})</a>
+			<!-- END category_list_item -->
+
+		<!-- BEGIN category_list_item_end -->
+		</ul>
 		</li>
-		<!-- END question_category -->
+		<!-- END category_list_item_end -->
 	</ul>
 </div>
-

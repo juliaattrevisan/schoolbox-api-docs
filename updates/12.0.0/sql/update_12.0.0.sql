@@ -19,3 +19,8 @@ INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`homepageC
 /* Ability for parents to see students' marks
  */
 INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'restrict_student_submissions','true','Restrict Student Submissions','If ticked, parents cannot see marks and details of their students\' submissions.','boolean','true:false','Security','true','false','false');
+
+/* Category hierarchy for Assess Question Bank Categories
+ */
+ALTER TABLE `assess_question_category` ADD COLUMN `parent_id` BIGINT(20) NULL AFTER `question_category_id`;
+UPDATE assess_question_category SET parent_id = 0;

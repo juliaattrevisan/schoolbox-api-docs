@@ -2,11 +2,9 @@
 $this->setFile(TEMPLATE_content, 'assess/questionbank/contents.html');
 $this->setBlock(TEMPLATE_content, 'welcome', 'welcome_block');
 $this->setBlock(TEMPLATE_content, 'category_selected', 'category_selected_block');
-$this->setBlock(TEMPLATE_content, 'question_category', 'question_category_block');
 $this->setBlock('category_selected', 'show_submit', 'show_submit_block');
 $this->setBlock('category_selected', 'show_delete', 'show_delete_block');
 $this->setBlock('category_selected', 'no_questions', 'no_questions_block');
-
 $this->setBlock('category_selected', 'question', 'question_block');
 $this->setBlock('question', 'answers', 'answers_block');
 
@@ -17,33 +15,21 @@ $this->setVar(array(
 
 $questionBankHandler = new Assess_Question_Bank();
 
-/* Output question bank categories
+/* Derive and render a category list
  */
 $questionBankCategoryHandler = new Assess_Question_Category();
 
-$categoryList = $questionBankCategoryHandler->getList();
+$questionCategoryList = new Assess_Question_Category_List($this, $this->arg[1], $this->arg[0], $questionBankCategoryHandler->getPath());
+$questionCategoryList->render();
 
-if (is_array($categoryList) ) {
-    foreach($categoryList as $category) {
-        $this->setVar(array(
-            'CATEGORY_NAME' => $category['name'],
-            'CATEGORY_ID'   => $category['question_category_id'],
-            'CATEGORY_SELECTED' => $category['question_category_id'] == $this->arg[0] ? 'selected' : ''
-		));
+/* If expanding a particular category
+ */
+if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
+	$category = $questionBankCategoryHandler->getByID($this->arg[0]);
 
-        if ($category['question_category_id'] == $this->arg[0]) {
-            $categoryName = $category['name'];
-		}
-
-        $this->parse('question_category_block', 'question_category', true);
-    }
-}
-else {
-    $this->setVar('question_category_block','');
-}
-
-if ($this->arg[0] > 0) {
-    $this->setVar('QUESTION_CATEGORY', $categoryName);
+	$this->setVar(array(
+		'QUESTION_CATEGORY' => $category['name'],
+	));
 
     $allQuestions = $questionBankHandler->getContents($this->arg[0]);
 
