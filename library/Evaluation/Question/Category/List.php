@@ -40,6 +40,7 @@ abstract class Evaluation_Question_Category_List {
 	 */
 	private function getJsNodePath($category_id) {
 		$pathArray = array();
+		$path = array();
 
 		$allPaths = $this->getPathSegment($category_id, $pathArray);
 
