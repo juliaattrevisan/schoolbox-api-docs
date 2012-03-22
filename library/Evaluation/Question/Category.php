@@ -47,6 +47,7 @@ abstract class Evaluation_Question_Category extends DeprecatedModel {
 				  LEFT JOIN assess_question_bank ON {$this->_table}.question_category_id = assess_question_bank.question_category_id
 				  WHERE availability = '{$this->getAvailability()}'
 				  AND parent_id = '$parent_id'
+				  AND assess_question_bank.deleted_at IS NULL
 				  GROUP BY question_category_id
 				  ORDER BY name";
 

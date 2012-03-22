@@ -131,8 +131,8 @@ abstract class Evaluation_Main extends DeprecatedModel {
             /* Parse out the previous Section's info if we're entering a new Section
              */
             if ($currentQuestion['section_id'] != $currentSection) {
-
 				$questionNumber = 1;
+
                 $page->setVar(array(
                     'SECTION_TITLE' => $allQuestions[$i-1]['title'],
                     'SECTION_SEQUENCE' => $allQuestions[$i-1]['sectionSequence'],
@@ -167,6 +167,12 @@ abstract class Evaluation_Main extends DeprecatedModel {
 					$questionNumber++;
 				}
             }
+
+			/* A section with no questions in
+			 */
+			if (!is_numeric($currentQuestion['question_id'])) {
+				$page->setVar('question_block', '');
+			}
         }
 
         /* Finally, parse out this Section's info
