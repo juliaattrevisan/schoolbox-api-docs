@@ -194,8 +194,10 @@ else if(is_numeric($this->arg[0])) {
 
 	$subList = $subHandler->getAllForUserCategory($this->arg[0], $_SESSION['id']);
 
-	$this->setVar('sub_head_block', '');
-	$this->setVar('assess_head_block', '');
+    $this->setVar('sub_head_block', '');
+    $this->setVar('assess_head_block', '');
+    $this->setVar('sub_type_head_block', '');
+    $this->setVar('assess_type_head_block', '');
 
 	$this->setVar('no_submissions_block', '');
 	$this->setVar('no_assessments_block', '');
@@ -247,8 +249,9 @@ else if(is_numeric($this->arg[0])) {
 		}
 	}
 	else {
-		$this->setVar('sub_head_block', '');
-	}
+        $this->setVar('sub_head_block', '');
+        $this->setVar('sub_type_head_block', '');
+    }
 
 	if (is_array($studentList)) {
 		foreach($studentList as $student) {
