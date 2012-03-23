@@ -82,12 +82,13 @@ abstract class Evaluation_Response extends DeprecatedModel {
     }
 
 	/**
-     * Find the number of STUB RESPONSES that have been set up in $attempt_id
-     * and $section_id
+	 * Find the number of STUB RESPONSES that have been set up in $attempt_id
+	 * and $section_id
 	 *
 	 * @param  $attempt_id
 	 * @param  $section_id
-	 * @return
+	 *
+	 * @return mixed
 	 */
     public function numStubResponsesInSection($attempt_id, $section_id) {
         $query = "SELECT COUNT(*) AS num
@@ -139,11 +140,12 @@ abstract class Evaluation_Response extends DeprecatedModel {
     }
 
 	/**
-     * Find out when an attempt's responses were last updated, so we can see
-     * when the student last saved data.
+	 * Find out when an attempt's responses were last updated, so we can see
+	 * when the student last saved data.
 	 *
 	 * @param  $attempt_id
-	 * @return
+	 *
+	 * @return mixed
 	 */
     public function getLastSave($attempt_id) {
         $query = "SELECT updated_at
@@ -159,7 +161,8 @@ abstract class Evaluation_Response extends DeprecatedModel {
 	 * This indicates questions that remain to be reviewed manually.
 	 *
 	 * @param  $attempt_id
-	 * @return
+	 *
+	 * @return mixed
 	 */
 	public function numAutomarked($attempt_id) {
 		$query = "SELECT COUNT(*)
@@ -175,11 +178,12 @@ abstract class Evaluation_Response extends DeprecatedModel {
 	}
 
 	/**
-     * Count the number of questions that were not automarked AND not reviewed.
-     * This indicates questions that remain to be reviewed manually.
+	 * Count the number of questions that were not automarked AND not reviewed.
+	 * This indicates questions that remain to be reviewed manually.
 	 *
 	 * @param  $attempt_id
-	 * @return
+	 *
+	 * @return mixed
 	 */
     public function numNotAutomarked($attempt_id) {
         $query = "SELECT COUNT(*)
@@ -223,7 +227,8 @@ abstract class Evaluation_Response extends DeprecatedModel {
 	 * Mark as deleted all the responses for an attempt.
 	 *
 	 * @param  $attempt_id
-	 * @return
+	 *
+	 * @return mixed
 	 */
 	public function deleteResponsesForAttempt($attempt_id) {
 		$query = "UPDATE {$this->_table}
@@ -241,9 +246,12 @@ abstract class Evaluation_Response extends DeprecatedModel {
 	 * @return array|bool
 	 */
 	public function getByAttemptAndQuestion($attempt_id, $question_id) {
-		$query = "SELECT * FROM assess_response
-				  WHERE attempt_id = '$attempt_id'
-				  AND question_id = '$question_id'";
+		$query = "
+			SELECT *
+			FROM assess_response
+			WHERE attempt_id = '$attempt_id'
+			AND question_id = '$question_id'
+		";
 
 		return $this->db->getRow($query);
 	}

@@ -156,11 +156,12 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
 	}
 
 	/**
-     * Saves a response for this Answer type. This should be customised based on
-     * the format and structure of the answer (e.g. serialize multichoice)
+	 * Saves a response for this Answer type. This should be customised based on
+	 * the format and structure of the answer (e.g. serialize multichoice)
 	 *
 	 * @param  $data
-	 * @return
+	 *
+	 * @return array
 	 */
     public function saveResponse($data) {
 
@@ -265,11 +266,23 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
 		$data = unserialize($response['response']);
 
 		if (is_array($data)) {
-			if ($this->getLegendHTML() !== false) {
-				$data['responseText'] = '<ul><li>' . implode('</li><li>', $data) . '</li></ul>';
+
+			/* Answer text to appear in export
+			 */
+			if ($this->getUseLongAnswers()) {
+				foreach($data as $currentAnswer) {
+					$postprocessed[] = $this->getAnswerText($question_id, $currentAnswer);
+				}
 			}
 			else {
-				$data['responseText'] = strip_tags(implode(', ', $data));
+				$postprocessed = $data;
+			}
+
+			if ($this->getLegendHTML() !== false) {
+				$data['responseText'] = '<ul><li>' . implode('</li><li>', $postprocessed) . '</li></ul>';
+			}
+			else {
+				$data['responseText'] = strip_tags(implode(', ', $postprocessed));
 			}
 		}
 

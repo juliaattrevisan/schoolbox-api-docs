@@ -12,6 +12,10 @@
 class Survey_Answer_YesNo extends Evaluation_Answer_YesNo {
 	protected $graphTemplateFile = 'survey/answer/yesno/graph.html';
 
+	/* Use this to toggle between letters and actual answers
+	 */
+	protected $useLongAnswers = true;
+
 	/**
 	 * Get an instance of a responseHandler upon instantiation
 	 */

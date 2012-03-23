@@ -14,6 +14,7 @@ abstract class Evaluation_Answer extends DeprecatedModel {
     public $_index = 'answer_id';
 
     public $responseHandler = null;
+
     protected $allowedFields = array('answer_id', 'question_id', 'sequence', 'answer', 'deleted_at');
 
 	/* Whether or not to include HTML formatting when exporting CSV results
@@ -23,6 +24,10 @@ abstract class Evaluation_Answer extends DeprecatedModel {
 	/* Template file used for graphing
 	 */
 	protected $graphTemplateFile = null;
+
+	/* Show letters 'A' or the full text corresponding to it
+	*/
+	protected $useLongAnswers = false;
 
 	/**
 	 * Constructor.
@@ -36,7 +41,9 @@ abstract class Evaluation_Answer extends DeprecatedModel {
 	/**
 	 * Sets legendHTML
 	 *
-	 * @return
+	 * @param $val
+	 *
+	 * @return void
 	 */
 	public function setLegendHTML($val) {
 		$this->legendHTML = $val;
@@ -45,7 +52,7 @@ abstract class Evaluation_Answer extends DeprecatedModel {
 	/**
 	 * Gets legendHTML
 	 *
-	 * @return
+	 * @return bool
 	 */
 	public function getLegendHTML() {
 		return $this->legendHTML;
@@ -81,14 +88,15 @@ abstract class Evaluation_Answer extends DeprecatedModel {
     }
 
 	/**
-     * Saves a response. The processedResponse is formatted by each Answertype's
-     * handler so you can serialize it, store it in native format, or in
-     * whatever format is required.
+	 * Saves a response. The processedResponse is formatted by each Answertype's
+	 * handler so you can serialize it, store it in native format, or in
+	 * whatever format is required.
 	 *
 	 * @param  $section_id
 	 * @param  $question_id
 	 * @param  $processedResponse
-	 * @return
+	 *
+	 * @return array
 	 */
     public function saveResponse($section_id, $question_id, $processedResponse) {
         $response = array(
@@ -152,5 +160,15 @@ abstract class Evaluation_Answer extends DeprecatedModel {
 	 */
 	protected function getGraphTemplateFile() {
 		return $this->graphTemplateFile;
+	}
+
+	/**
+	 * Find out whether to use long answers or just the letter code
+	 * Used in exports
+	 *
+	 * @return bool
+	 */
+	protected function getUseLongAnswers() {
+		return $this->useLongAnswers;
 	}
 }

@@ -12,6 +12,10 @@
 class Survey_Answer_Radio extends Evaluation_Answer_Radio {
 	protected $graphTemplateFile = 'survey/answer/radio/graph.html';
 
+	/* Use this to toggle between letters and actual answers
+	 */
+	protected $useLongAnswers = true;
+
 	/**
 	 * Get an instance of a responseHandler upon instantiation
 	 */

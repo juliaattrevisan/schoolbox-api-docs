@@ -12,6 +12,10 @@
 class Survey_Answer_Multi extends Evaluation_Answer_Multi {
 	protected $graphTemplateFile = 'survey/answer/multi/graph.html';
 
+	/* Use this to toggle between letters and actual answers
+	 */
+	protected $useLongAnswers = true;
+
 	/**
 	 * Get an instance of a responseHandler upon instantiation
 	 */

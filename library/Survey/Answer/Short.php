@@ -12,6 +12,10 @@
 class Survey_Answer_Short extends Evaluation_Answer_Short {
 	protected $graphTemplateFile ='survey/answer/short/graph.html';
 
+	/* Use this to toggle between letters and actual answers
+	 */
+	protected $useLongAnswers = true;
+
 	/**
 	 * Get an instance of a responseHandler upon instantiation
 	 */
