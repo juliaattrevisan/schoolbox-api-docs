@@ -5813,24 +5813,56 @@ table.subjectList {
 
 .mark-sheet.names{
     position:absolute;
-    top:140px;
+    top:92px;
     left:0;
-    width:200px;
+    width:250px;
 }
+
+.mark-sheet.names table{
+    width:100%;
+}
+
+.mark-sheet td{
+    line-height:24px;
+}
+
 
 .mark-sheet.assessments{
     overflow-x:scroll;
-    margin-left:200px;
+    margin-left:250px;
+}
+
+.mark-sheet.assessments input{
+    height:14px;
+    font-size:12px;
+    margin:0;
+    border:1px #ccc solid;
+    padding:0;
 }
 
 .mark-sheet.assessments table{
     table-layout: fixed;
 }
 
-.mark-sheet.assessments .height-control{overflow-y:hidden; height:60px; background:#0f0;}
+.mark-sheet.assessments .height-control{
+    height:40px;
+}
+
 .mark-sheet.assessments .dark td{
     background:#f4f4f4;
 }
+
+.mark-sheet .highlight-student td{background:#edf7e7 !important}
+
+.mark-sheet .save-notification{
+    float:right;
+    height:16px;
+    width:16px;
+    margin: 5px 20px 0 0;
+
+    background: url(/images/famicons/tick.png) no-repeat;
+}
+
 
 dt {
 	width: 100px;

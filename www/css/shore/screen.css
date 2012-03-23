@@ -316,3 +316,7 @@ p.interact a {
 .cal-bubble .middle{border-color:#003E7E}
 .cal-bubble .bottom{border-right-color:#003E7E}
 .cal-bubble .middle .close{background:#003E7E; color:#fff;}
+
+.mark-sheet.names{
+    top: 95px
+}

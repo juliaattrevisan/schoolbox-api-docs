@@ -1,4 +1,7 @@
 <!-- BEGIN custom_head -->
+
+<script src="/javascript/jquery.autoellipsis-1.0.3.min.js" type="text/javascript"></script>
+
 <script type="text/javascript">
 	$j(function(){
 		$j('a.delete-btn').click(function(){
@@ -12,20 +15,62 @@
 		  });
 
 		$j('.inputMark').blur(function(){
-            if($j(this).val() != '')
-                $j.post('/submission/returnWorkForm.php', $j(this).closest('form').serialize());
+            $this = $j(this);
+            if($this.val() != '')
+                $j.post('/submission/returnWorkForm.php', $this.closest('form').serialize(), function() {
+                $this.parent().remove('.save-notification');
+                $this.closest('td').prepend('<div class="save-notification"></div>')
+                    $j('.save-notification').delay(1000).fadeOut(500, function() {
+                        $this.closest('.save-notification').remove();
+                    });
+                });
 		});
 
         var columnCount = $j('.mark-sheet.assessments table').find('tr:first').children('th').size();
 
-        for (i=0; i < columnCount; i++) {
-            $j('.mark-sheet.assessments table').find('tr:first').children('th:nth-child('+i+')').css('width', 150)
+        for (i=0; i <= columnCount; i++) {
+            $j('.mark-sheet.assessments table').find('tr:first').children('th:nth-child('+i+')').css({
+                'width': '150px',
+                'padding-bottom': 0
+            });
+        };
+
+        $j('.mark-sheet.assessments table').css('width', 150 * columnCount);
+
+        $j('.height-control').ellipsis();
+
+        /*
+        * Hovering a td should make the entire row change colour
+        *
+        * */
+        $j('td').hover(function(evt) {
+            var rowNumber = $j(evt.target).closest("tr").prevAll("tr").length + 1;
+
+            if (!$j('.inputMark').is(':focus')) {
+                $j('table').find('tr').removeClass('highlight-student');
+
+                if (!$j('table').find('tr:nth-child('+rowNumber+')').hasClass('highlight-student')) {
+                    $j('table').find('tr:nth-child('+rowNumber+')').addClass('highlight-student');
+                }
+            }
+        }, function() {
+            if (!$j('.inputMark').is(':focus')) {
+                $j('table').find('tr').removeClass('highlight-student');
+            }
+        })
+
+        $j(".inputMark").focus(function(evt) {
+            var rowNumber = $j(evt.target).closest("tr").prevAll("tr").length + 1;
+            $j('table').find('tr').removeClass('highlight-student');
+
+            if (!$j('table').find('tr:nth-child('+rowNumber+')').hasClass('highlight-student')) {
+                $j('table').find('tr:nth-child('+rowNumber+')').addClass('highlight-student');
+            }
+        });
+
+        function changeHighlight(object) {
+
         }
-
-        $j('.mark-sheet.assessments table').css('width', 150 * columnCount)
-
-
-
 
 
 	});
@@ -39,62 +84,66 @@
 
 <div class="mark-sheet names">
     <table>
-        <tr>
+        <thead><tr>
             <th>Surname</th>
             <th>Preferred Name</th>
         </tr>
+        </thead>
+        <tbody>
         <!-- BEGIN student_list -->
         <tr class="{ON_OFF}">
             <td><a href="/search/user/{UID}">{SURNAME}</a></td>
             <td><a href="/search/user/{UID}">{FIRSTNAME}</a></td>
         </tr>
         <!-- END student_list -->
+        </tbody>
     </table>
 </div>
 
 <div class="mark-sheet assessments">
-    <colgroup>
-
-
-    </colgroup>
     <table>
+        <thead>
+            <tr>
+                <!-- BEGIN sub_head -->
+                <th id="work-{BOX_ID}" class="column-{BOX_ID}">
+                   <div class="height-control">
+                        <a href="/submission/viewSubmission/{BOX_ID}"><strong>{SUB_NAME}</strong></a>
+                    </div>
+                </th>
+                <!-- END sub_head -->
+                <!-- BEGIN assess_head -->
+                <th id="work-{BOX_ID}" class="column-{BOX_ID}">
+                    <div class="height-control">
+                        <a href="/assess/results/{BOX_ID}"><strong>{SUB_NAME}</strong></a>
+                    </div>
+                </th>
+                <!-- END assess_head -->
+            </tr>
 
-        <tr>
-            <!-- BEGIN sub_head -->
-            <th id="work-{BOX_ID}" class="column-{BOX_ID}">
-                <div class="height-control">
-                    <a href="/submission/viewSubmission/{BOX_ID}"><strong>{SUB_NAME}</strong></a>
-                </div>
-            </th>
-            <!-- END sub_head -->
-            <!-- BEGIN assess_head -->
-            <th id="work-{BOX_ID}" class="column-{BOX_ID}">
-                <div class="height-control">
-                    <a href="/assess/results/{BOX_ID}"><strong>{SUB_NAME}</strong></a>
-                </div>
-            </th>
-            <!-- END assess_head -->
-        </tr>
+            <tr>
+                <!-- BEGIN sub_type_head -->
+                <th>
+                    <em>{SUB_TYPE}</em>
+                </th>
+                <!-- END sub_type_head -->
 
-        <tr>
-            <!-- BEGIN sub_type_head -->
-            <th>
-                <em>{SUB_TYPE}</em>
-            </th>
-            <!-- END sub_type_head -->
-            <!-- BEGIN assess_type_head -->
-            <th>
-                <em>{SUB_TYPE}</em>
-            </th>
-            <!-- END assess_type_head -->
-        </tr>
+                <!-- BEGIN assess_type_head -->
+                <th>
+                    <em>{SUB_TYPE}</em>
+                </th>
+                <!-- END assess_type_head -->
+            </tr>
+        </thead>
+        <tbody>
         <!-- BEGIN student_mark_list -->
         <tr class="{ON_OFF}">
+
             <!-- BEGIN markItem -->
             <!-- BEGIN mark -->
             <td class="column-{BOX_ID}">
+
                 <form method="post" onSubmit="return false;" action="" class="markForm">
-                    <input name="mark" value="{MARK}" class="inputMark" type="text" size="5" maxlength="10">
+                    <input name="mark" value="{MARK}" class="inputMark" type="text" size="5" maxlength="10">&nbsp;
                     <input type="hidden" name="uid" value="{UID}">
                     <input type="hidden" name="box_id" value="{BOX_ID}">
                     <input type="hidden" name="markUpdate" value="true">
@@ -103,12 +152,14 @@
             <!-- END mark -->
             <!-- BEGIN onlineAssessmentMark -->
             <td class="column-assess-{ASSESS_ASSESS_ID}">
+                &nbsp;
                 <a href="/assess/review/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ID}">{MARK}</a>
             </td>
             <!-- END onlineAssessmentMark -->
             <!-- END markItem -->
         </tr>
         <!-- END student_mark_list -->
+        </tbody>
     </table>
 
 </div>
