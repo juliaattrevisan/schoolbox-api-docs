@@ -37,6 +37,14 @@ $j(function () {
 			"dots": true,
 			"icons": false
 		}
+	}).bind('move_node.jstree', function(e, data) {
+		var params = {
+			position: data.rslt.p,
+			destination: data.rslt.r[0].id.split('_').pop(),
+			target: data.rslt.o[0].id.split('_').pop()
+		}
+
+		$j.ajax({ url: '/assess/questionbank/move.php', data: params});
 	});
 });
 </script>

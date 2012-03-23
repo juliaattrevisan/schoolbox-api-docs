@@ -89,6 +89,40 @@ abstract class Evaluation_Question_Category extends DeprecatedModel {
 		return $all;
 	}
 
+	/**
+	 * Used in conjunction with javascript tree
+	 *
+	 * @param $targetId
+	 * @param $destinationId
+	 * @param $position
+	 *
+	 * @internal param $target
+	 * @internal param $destination
+	 */
+	public function move($targetId, $destinationId, $position) {
+		if (is_numeric($targetId) && is_numeric($destinationId)) {
+			$destinationNode = $this->getByID($destinationId);
+			$targetNode = $this->getByID($targetId);
+
+			/* Move target to parent of destination
+			 */
+			if (($position == 'before') || ($position == 'after')) {
+				$parentNode = $this->getByID($destinationNode['parent_id']);
+
+				$targetNode['parent_id'] = $parentNode['question_category_id'];
+
+				$this->update($targetNode);
+			}
+			/* Move target so that destination is the parent of target
+			*/
+			else if ($position == 'last') {
+				$targetNode['parent_id'] = $destinationNode['question_category_id'];
+
+				$this->update($targetNode);
+			}
+		}
+	}
+
 	/* Getters/Setters
 	 */
 
