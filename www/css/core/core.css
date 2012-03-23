@@ -5832,13 +5832,7 @@ table.subjectList {
     margin-left:250px;
 }
 
-.mark-sheet.assessments input{
-    height:14px;
-    font-size:12px;
-    margin:0;
-    border:1px #ccc solid;
-    padding:0;
-}
+
 
 .mark-sheet.assessments table{
     table-layout: fixed;
@@ -5855,15 +5849,26 @@ table.subjectList {
 .mark-sheet .highlight-student td{background:#edf7e7 !important}
 
 .mark-sheet .save-notification{
+    display:none;
     float:right;
     height:16px;
     width:16px;
-    margin: 5px 20px 0 0;
-
     background: url(/images/famicons/tick.png) no-repeat;
 }
 
+.mark-sheet.assessments input{
+    height:14px;
+    font-size:12px;
+    margin:0;
+    border:1px #ccc solid;
+    padding:0;
+    float:left;
+}
 
+
+.mark-sheet.assessments input.comment{display:none;float:left; margin-left:14px;}
+
+.mark-sheet.assessments .active-assessment{width:500px;}
 dt {
 	width: 100px;
 	font-weight: bold;
