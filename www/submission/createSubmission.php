@@ -24,7 +24,16 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         $catOutput = "<b>".$subbox['categoryName']."</b>";
 
     /* Output submission type drop down */
-    $this->dropdown('type_drop', $subBoxHandler->getTypes(), $subbox['type'], TEMPLATE_content, array('name'=>'TYPE_TEXT','id'=>'TYPE_VALUE'));
+    $this->dropdown('type_drop', $subBoxHandler->getTypes(), $subbox['type'], TEMPLATE_content, array(
+        'name' => 'TYPE_TEXT',
+        'id'   => 'TYPE_VALUE'
+    ));
+
+    /* Output marktype drop down */
+    $this->dropdown('marktype_drop', $subBoxHandler->getMarkTypes(), $subbox['marktype'], TEMPLATE_content, array(
+        'name' => 'MARKTYPE_TEXT',
+        'id'   => 'MARKTYPE_VALUE'
+    ));
 
     /* Convert times */
     $open_date = strtotime($subbox['open_date']);
@@ -115,7 +124,16 @@ else if($this->arg[0] == 'new') {
 
 	$types = $subBoxHandler->getTypesExcept(array(Assess::ONLINE_ASSESSMENT_TYPE_ID));
 
-	$this->dropDown('type_drop', $types, $this->arg[3],TEMPLATE_content, array('name'=>'TYPE_TEXT','id'=>'TYPE_VALUE'));
+	$this->dropDown('type_drop', $types, $this->arg[3],TEMPLATE_content, array(
+        'name' => 'TYPE_TEXT',
+        'id'   => 'TYPE_VALUE'
+    ));
+
+    /* Output marktype drop down */
+    $this->dropdown('marktype_drop', $subBoxHandler->getMarkTypes(), $subbox['marktype'], TEMPLATE_content, array(
+        'name' => 'MARKTYPE_TEXT',
+        'id'   => 'MARKTYPE_VALUE'
+    ));
 
     /* Convert times */
     $open_date = strtotime('now');;

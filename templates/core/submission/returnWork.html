@@ -26,6 +26,17 @@
 		return true;
     }
 </script>
+
+<style type="text/css">
+    #mark, #comment {
+        border: solid 1px #ccc;
+        padding-right: 2px;
+    }
+
+    #mark {
+        text-align: right;
+    }
+</style>
 <!-- END custom_head -->
 
 <h1>Return Work </h1>
@@ -35,8 +46,8 @@
     <table class="standardForm">
         <tr>
             <td class="formLabelWidth"><h4>Returning Work To</h4>
-                <em>You may return the work with any one or more of the following options; file, comment mark.</em></td>
-			<td>{NAME}<br />{CATEGORY} - {ASSNAME} </td>
+                <em>You may return the work with any one or more of the following options; file, comment, mark.</em></td>
+			<td><strong>{NAME}</strong><br />{CATEGORY} - {ASSNAME} </td>
         </tr>
         <tr>
             <td><h4>File</h4>
@@ -45,13 +56,27 @@
         </tr>
         <tr>
             <td><h4>Comment</h4>
-                <em>You may write a short comment here (20 words) regarding the work.</em></td>
+                <em>You may write a short comment here (20 words) regarding the work. This field is optional.</em></td>
 			<td><textarea name="comment" cols="50" rows="3" id="comment">{COMMENT}</textarea></td>
         </tr>
         <tr>
             <td><h4>Mark</h4>
-                <em>Can be letter (A), score (15/20) or percentage (88%). This field is optional</em></td>
-			<td><input name="mark" type="text" id="mark" size="10" maxlength="15" value="{MARK}"/></td>
+                <em>{MARK_TYPE_COMMENT} This field is optional.</em></td>
+            <td>
+                <!-- BEGIN mark_type_percent -->
+                <input name="mark" type="text" id="mark" size="10" maxlength="3" value="{MARK}"/><span>%</span>
+                <!-- END mark_type_percent -->
+                <!-- BEGIN mark_type_letter -->
+                <select id="mark" name="mark">
+                    <!-- BEGIN grade_drop -->
+                    <option value="{GRADE_VALUE}" {GRADE_VALUE_SELECTED}>{GRADE_TEXT}</option>
+                    <!-- END grade_drop -->
+                </select>
+                <!-- END mark_type_letter -->
+                <!-- BEGIN mark_type_raw -->
+                <input name="mark" type="text" id="mark" size="10" maxlength="15" value="{MARK}"/><span> out of {MAX_MARK}</span>
+                <!-- END mark_type_raw -->
+			</td>
         </tr>
         <tr>
             <td>

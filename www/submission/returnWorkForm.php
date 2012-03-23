@@ -3,6 +3,7 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage;
 $returnHandler = new SubmissionReturn;
+$subHandler = new Submission();
 
 if( is_numeric($_POST['uid']) && is_numeric($_POST['box_id']) && $_POST['markUpdate'] == 'true') {
 
@@ -19,12 +20,17 @@ if( is_numeric($_POST['uid']) && is_numeric($_POST['box_id']) && $_POST['markUpd
 		 */
         $result = $returnHandler->getByUser($_POST['uid'], $_POST['box_id'], 1);
 
+        $subbox = $subHandler->getByID($_POST['box_id']);
+        $marksheet = Marksheet_Factory::build($subbox['mark_type_slug']);
+        $mark = $marksheet->normaliseMark($_POST['mark'], $subbox);
+
 		/* Set up common values for the return
 		 */
         $return = array(
 			'box_id'    => $_POST['box_id'],
 			'owner'     => $_POST['uid'],
-			'mark'      => $_POST['mark'],
+			'mark'      => $mark['mark'],
+            'norm_mark' => $mark['norm_mark']
 		);
 
         if (is_array($result)) {
@@ -50,23 +56,29 @@ else if ( (
   )
 {
 
-        $returnHandler->securityCheck($_POST['box_id'], $_POST['uid']);
+    $returnHandler->securityCheck($_POST['box_id'], $_POST['uid']);
 
 
-        if($_FILES['file']['name']) {
-            $allowedFileHandler = new AllowedFile;
-            $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
-        }
+    if($_FILES['file']['name']) {
+        $allowedFileHandler = new AllowedFile;
+        $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
+    }
 
-        $return = array('box_id'    => $_POST['box_id'],
-                        'owner'     => $_POST['uid'],
-                        'comment'   => $_POST['comment'],
-                        'mark'      => $_POST['mark'],
-                        );
+    $subbox = $subHandler->getByID($_POST['box_id']);
+    $marksheet = Marksheet_Factory::build($subbox['mark_type_slug']);
+    $mark = $marksheet->normaliseMark($_POST['mark'], $subbox);
 
-        $returnHandler->create($return, $_FILES['file']);
+    $return = array(
+        'box_id'    => $_POST['box_id'],
+        'owner'     => $_POST['uid'],
+        'comment'   => $_POST['comment'],
+        'mark'      => $mark['mark'],
+        'norm_mark' => $mark['norm_mark']
+    );
 
-        $page->backToTheFuture(2);
+    $returnHandler->create($return, $_FILES['file']);
+
+    $page->backToTheFuture(2);
 }
 /* Exceeded PHP max file size */
 elseif ( $_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0 && empty($_POST) && empty($_FILES) ) {

@@ -69,6 +69,29 @@ class SubmissionReturn extends DeprecatedModel {
 		return $this->db->getAll($query);
 	}
 
+    function getLetterGradeByUser($user_id, $box_id = 0) {
+        $query = "SELECT * FROM submission_grade
+                  WHERE lower_bound <=
+                  (
+                       SELECT norm_mark
+                       FROM submission_return sr
+                       WHERE sr.owner = $user_id";
+
+        if($box_id)
+            $query .= " AND sr.box_id = $box_id";
+
+        $query .= " ORDER BY returned DESC
+                       LIMIT 0, 1
+                  )
+                  ORDER BY lower_bound DESC
+                  LIMIT 0, 1";
+
+        return $this->db->getRow($query);
+    }
+
+
+
+
     function securityCheck($box_id, $sid)
     {
         //check if person returning work is actual owner of the submission box

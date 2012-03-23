@@ -149,6 +149,7 @@ if (!$assessHandler->isOwner($this->arg[0])) {
  */
 $this->setFile(TEMPLATE_content, 'assess/results.html');
 $this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
+$this->setBlock(TEMPLATE_content, 'download_btn', 'download_btn_block');
 $this->setTitle('Results for: ' . $assess['title']);
 $this->setTab('submission');
 
@@ -212,7 +213,6 @@ if (is_array($allStudents) && count($allStudents)) {
 		 */
 		if (!$numAttempts) {
 			$this->setVar(array(
-				'ASSESS_ASSESS_ID' => '',
 				'ASSESS_FIRST_SECTION_ID' => '',
 				'ATTEMPT_ATTEMPT_ID' => '',
 				'USER_ID' => $currentStudent['uid'],
@@ -231,7 +231,11 @@ if (is_array($allStudents) && count($allStudents)) {
 			));
 
 			$this->parse('attempt_block', 'attempt', true);
-		}
+            $this->setVar('download_btn_block', '');
+		} else {
+            // display bulk download
+            $this->parse('download_btn_block', 'download_btn', false);
+        }
 
 		$numAttempts = 0;
 	}

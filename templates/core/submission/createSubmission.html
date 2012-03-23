@@ -84,22 +84,33 @@
 				<!-- END category_select --></td>
 		</tr>
 		<tr>
-			<td><h4>Type</h4>
-				<em>What is the purpose of this submission box?</em></td>
-			<td><select name="type" class="formfield">
-					<!-- BEGIN type_drop -->
-					<option value="{TYPE_VALUE}" {TYPE_VALUE_SELECTED}>{TYPE_TEXT}</option>
-					<!-- END type_drop -->
-				</select></td>
-		</tr>
+            <td><h4>Submission Type</h4>
+                <em>What is the purpose of this submission box?</em></td>
+            <td><select name="type" class="formfield">
+                <!-- BEGIN type_drop -->
+                <option value="{TYPE_VALUE}" {TYPE_VALUE_SELECTED}>{TYPE_TEXT}</option>
+                <!-- END type_drop -->
+            </select>
+            </td>
+        </tr>
+        <tr>
+            <td><h4>Mark Type</h4>
+                <em>How this assessment will be graded</em></td>
+            <td><select name="marktype" class="formfield">
+                <!-- BEGIN marktype_drop -->
+                <option value="{MARKTYPE_VALUE}" {MARKTYPE_VALUE_SELECTED}>{MARKTYPE_TEXT}</option>
+                <!-- END marktype_drop -->
+            </select>
+            </td>
+        </tr>
 		<tr>
 			<td><h4>Accept Submissions</h4>
-				<em>Should the submission box accept electronic submissions.</em></td>
+				<em>Should the submission box accept electronic submissions?</em></td>
 			<td><input name="accept_submission" type="checkbox" value="true" {ACCEPT_SUBMISSION}></td>
 		</tr>
 		<tr class="accept-hide">
 			<td class="formLabelWidth"><h4>Open Date</h4>
-				<em>The date from when the submission box will be available for submission.  To make the box never available but have the date published, set this date to after the due date.</em></td>
+				<em>The date from when the submission box will be available for submission. To make the box never available but have the date published, set this date to after the due date.</em></td>
 			<td><input name="open_date" id="open_date" type="text" value="{OPEN_DATE}" size="20" />
 				<input name="open_hour" type="text" maxlength="2" value="{OPEN_HOUR}" class="timeField" />
 				:

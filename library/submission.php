@@ -50,16 +50,22 @@ class Submission extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
+    /**
+     * @param $boxID
+     * @return array|bool
+     */
     function getByID($boxID) {
         $query = "SELECT s.*, GROUP_CONCAT(cc.code) code, category.name as categoryName, category.id as cid,
-					file.comment, ft.name as typeName
+					file.comment, ft.name as typeName, smt.slug AS mark_type_slug
                   FROM submission_box  s
 				  JOIN category ON s.category = category.id
 				  LEFT JOIN categoryCode cc ON cc.categoryID = category.id
 				  LEFT JOIN file ON s.fid = file.id
 			 	  LEFT JOIN file_type ft ON s.type = ft.id
+			 	  LEFT JOIN submission_mark_type smt ON s.mark_type = smt.mark_type_id
                   WHERE s.id = '$boxID'
 				  GROUP BY s.id, category.id";
+
         return $this->db->getRow($query);
     }
 
@@ -445,6 +451,51 @@ class Submission extends DeprecatedModel {
     function getTypes(){
         $query = "SELECT * FROM file_type";
         return $this->db->getAll($query);
+    }
+
+    /**
+     * Get the custom letter grades from the database
+     * @return array
+     */
+    function getLetterGrades() {
+        // in addition to the db, give 'none' option.
+        $default = array(
+            array(
+                'grade_id'    => '-1',
+                'lower_bound' => '-1',
+                'caption'     => '(none)'
+            )
+        );
+        $query = "SELECT * FROM submission_grade";
+
+        return array_merge($default, $this->db->getAll($query));
+    }
+
+    function getLetterGradeByID($id) {
+        $query = "SELECT * FROM submission_grade WHERE grade_id = '$id'";
+        return $this->db->getRow($query);
+    }
+
+
+    function getMarkTypes() {
+        $query = "SELECT * FROM submission_mark_type";
+        return $this->db->getAll($query);
+    }
+
+    function getMarkTypeByID($id) {
+        $query = "SELECT *
+                  FROM submission_mark_type
+                  WHERE mark_type_id = '$id'";
+
+        return $this->db->getRow($query);
+    }
+
+    function getMarkTypeBySlug($slug) {
+        $query = "SELECT *
+                  FROM submission_mark_type
+                  WHERE slug = '$slug'";
+
+        return $this->db->getRow($query);
     }
 
 	/**

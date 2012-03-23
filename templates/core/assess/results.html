@@ -42,29 +42,31 @@ $j(function() {
 });
 </script>
 <div id="assess">
-	<h1>Submissions for {ASSESS_TITLE}</h1>
+    <h1>Submissions for {ASSESS_TITLE}</h1>
 	<span class="header_option">
-    <a href="/assess/exportResponseToCSV/{ASSESS_ASSESS_ID}" class="btn download"><span></span>Download All</a>
-    <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="btn modify"><span></span>Modify</a>
-</span>
-	<table width="100%">
-		<thead>
-			<tr>
+        <!-- BEGIN download_btn -->
+        <a href="/assess/exportResponseToCSV/{ASSESS_ASSESS_ID}" class="btn download"><span></span>Download All</a>
+        <!-- END download_btn -->
+        <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="btn modify"><span></span>Modify</a>
+    </span>
+    <table width="100%">
+        <thead>
+            <tr>
                 <th>&nbsp;</th>
-				<th>Name</th>
-				<th>Last submitted on</th>
-				<th>Time taken</th>
-				<th>Mark</th>
-				<th>Percentage</th>
+                <th>Name</th>
+                <th>Last submitted on</th>
+                <th>Time taken</th>
+                <th>Mark</th>
+                <th>Percentage</th>
                 <th>Unmarked Questions</th>
-				<th>Review Test</th>
+                <th>Review Test</th>
                 <th>Review Status</th>
-				<th>Delete Attempt</th>
-			</tr>
-		</thead>
-		<tbody>
-			<!-- BEGIN attempt -->
-			<tr class='attempt user_{USER_ID} {ATTEMPT_EXPANDABLE} {ATTEMPT_HIDDEN}'>
+                <th>Delete Attempt</th>
+            </tr>
+        </thead>
+        <tbody>
+        <!-- BEGIN attempt -->
+        <tr class='attempt user_{USER_ID} {ATTEMPT_EXPANDABLE} {ATTEMPT_HIDDEN}'>
                 <td width="2"></td>
 				<td><a href="/search/user/{USER_ID}">{ATTEMPT_NAME}</a></td>
 				<td>{ATTEMPT_FINISH}</td>

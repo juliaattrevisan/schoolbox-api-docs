@@ -30,14 +30,15 @@ if (is_numeric($_POST['id']) && $_POST['due_date'] && $_POST['due_hour'] && $_PO
 	}
 
 	$submission_box = array(
-		'id' => $_POST['id'],
+		'id'                => $_POST['id'],
 		'accept_submission' => !empty($_POST['accept_submission']) ? true : false,
-		'open_date' => $open_date,
-		'date' => $due_date,
-		'late_date' => $late_date,
-		'name' => $_POST['name'],
-		'description' => $_POST['description'],
-		'type' => $_POST['type'],
+		'open_date'         => $open_date,
+		'date'              => $due_date,
+		'late_date'         => $late_date,
+		'name'              => $_POST['name'],
+		'description'       => $_POST['description'],
+		'type'              => $_POST['type'],
+        'mark_type'         => $_POST['marktype'],
 	);
 
 	$submission_box_handler->update($submission_box);
@@ -88,17 +89,18 @@ else if ($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_PO
 	/* Create Submission Box
 	 */
 	$submission_box = array(
-		'category' => $_POST['category'],
+		'category'          => $_POST['category'],
 		'accept_submission' => !empty($_POST['accept_submission']) ? true : false,
-		'open_date' => $open_date,
-		'date' => $due_date,
-		'late_date' => $late_date,
-		'name' => $_POST['name'],
-		'description' => $_POST['description'],
-		'type' => $_POST['type'],
-		'fid' => $fileId,
-		'created' => 'NOW()',
-		'owner' => $_SESSION['id'],
+		'open_date'         => $open_date,
+		'date'              => $due_date,
+		'late_date'         => $late_date,
+		'name'              => $_POST['name'],
+		'description'       => $_POST['description'],
+		'type'              => $_POST['type'],
+        'mark_type'         => $_POST['marktype'],
+		'fid'               => $fileId,
+		'created'           => 'NOW()',
+		'owner'             => $_SESSION['id'],
 	);
 
 	$submission_box_handler->create($submission_box);
