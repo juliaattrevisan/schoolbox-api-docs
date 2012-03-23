@@ -251,8 +251,8 @@ class Evaluation_Exporter {
 			$filename_id .= "_{$question_id}";
 		}
 
-//		header('Content-type: text/ascii');
-//		header('Content-disposition: attachment; filename="exported_response_' . $filename_id . '.csv"');
+		header('Content-type: text/ascii');
+		header('Content-disposition: attachment; filename="exported_response_' . $filename_id . '.csv"');
 
 		if (is_array($sectionValues) && count($sectionValues)) {
 			foreach($sectionValues as $currentSection) {

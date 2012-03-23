@@ -12,6 +12,10 @@
 class Survey_Answer_Rating_Like extends Evaluation_Answer_Rating_Like {
 	protected $graphTemplateFile = 'survey/answer/ratingLike/graph.html';
 
+	/* Use this to toggle between letters and actual answers
+	 */
+	protected $useLongAnswers = true;
+
 	/**
 	 * Get an instance of a responseHandler upon instantiation
 	 */

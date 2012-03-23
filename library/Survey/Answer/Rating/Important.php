@@ -12,6 +12,10 @@
 class Survey_Answer_Rating_Important extends Evaluation_Answer_Rating_Important {
 	protected $graphTemplateFile = 'survey/answer/ratingImportant/graph.html';
 
+	/* Use this to toggle between letters and actual answers
+	 */
+	protected $useLongAnswers = true;
+
 	/**
 	 * Get an instance of a responseHandler upon instantiation
 	 */

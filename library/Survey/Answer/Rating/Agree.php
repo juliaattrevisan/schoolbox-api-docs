@@ -12,6 +12,10 @@
 class Survey_Answer_Rating_Agree extends Evaluation_Answer_Rating_Agree {
 	protected $graphTemplateFile = 'survey/answer/ratingAgree/graph.html';
 
+	/* Use this to toggle between letters and actual answers
+	 */
+	protected $useLongAnswers = true;
+
 	/**
 	 * Get an instance of a responseHandler upon instantiation
 	 */
