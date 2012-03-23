@@ -113,32 +113,34 @@ abstract class Evaluation_Question_Category_List {
 	 * @param $allCategories
 	 */
 	private function build($allCategories) {
-		foreach($allCategories as $currentCategory) {
+		if (is_array($allCategories) && count($allCategories)) {
+			foreach($allCategories as $currentCategory) {
 
-			/* Find out if this the category that has been selected
-			 */
-			if ($currentCategory['question_category_id'] == $this->getSelectedCategory()) {
-				$selected = 'selected';
-			}
-			else {
-				$selected = '';
-			}
+				/* Find out if this the category that has been selected
+				 */
+				if ($currentCategory['question_category_id'] == $this->getSelectedCategory()) {
+					$selected = 'selected';
+				}
+				else {
+					$selected = '';
+				}
 
-			$this->getPage()->setVar(array(
-				'CATEGORY_LIST_ITEM_NODE' => 'node_' . $currentCategory['question_category_id'],
-				'CATEGORY_LIST_ITEM_ASSESS_ID' => $this->getSelectedAssess(),
-				'CATEGORY_LIST_ITEM_CATEGORY_ID' => $currentCategory['question_category_id'],
-				'CATEGORY_LIST_ITEM_NAME' => $currentCategory['name'],
-				'CATEGORY_LIST_ITEM_NUMQUESTIONS' => $currentCategory['numQuestions'],
-				'CATEGORY_LIST_ITEM_SELECTED' => $selected,
-			));
+				$this->getPage()->setVar(array(
+					'CATEGORY_LIST_ITEM_NODE' => 'node_' . $currentCategory['question_category_id'],
+					'CATEGORY_LIST_ITEM_ASSESS_ID' => $this->getSelectedAssess(),
+					'CATEGORY_LIST_ITEM_CATEGORY_ID' => $currentCategory['question_category_id'],
+					'CATEGORY_LIST_ITEM_NAME' => $currentCategory['name'],
+					'CATEGORY_LIST_ITEM_NUMQUESTIONS' => $currentCategory['numQuestions'],
+					'CATEGORY_LIST_ITEM_SELECTED' => $selected,
+				));
 
-			$this->getPage()->parse('category_list_item_block', 'category_list_item', true);
+				$this->getPage()->parse('category_list_item_block', 'category_list_item', true);
 
-			if (count($currentCategory['children'])) {
-				$this->getPage()->parse('category_list_item_block', 'category_list_item_start', true);
-				$this->build($currentCategory['children']);
-				$this->getPage()->parse('category_list_item_block', 'category_list_item_end', true);
+				if (count($currentCategory['children'])) {
+					$this->getPage()->parse('category_list_item_block', 'category_list_item_start', true);
+					$this->build($currentCategory['children']);
+					$this->getPage()->parse('category_list_item_block', 'category_list_item_end', true);
+				}
 			}
 		}
 	}

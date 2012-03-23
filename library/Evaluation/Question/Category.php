@@ -48,6 +48,7 @@ abstract class Evaluation_Question_Category extends DeprecatedModel {
 				  WHERE availability = '{$this->getAvailability()}'
 				  AND parent_id = '$parent_id'
 				  AND assess_question_bank.deleted_at IS NULL
+				  AND {$this->_table}.deleted_at IS NULL
 				  GROUP BY question_category_id
 				  ORDER BY name";
 
@@ -109,14 +110,23 @@ abstract class Evaluation_Question_Category extends DeprecatedModel {
 			if (($position == 'before') || ($position == 'after')) {
 				$parentNode = $this->getByID($destinationNode['parent_id']);
 
+				/* If you don't unset deleted_at, it gets rendered as 0000-00-00 00:00:00
+				 * in the db
+				 */
 				$targetNode['parent_id'] = $parentNode['question_category_id'];
+				unset($targetNode['deleted_at']);
 
 				$this->update($targetNode);
 			}
 			/* Move target so that destination is the parent of target
 			*/
 			else if ($position == 'last') {
+
+				/* If you don't unset deleted_at, it gets rendered as 0000-00-00 00:00:00
+				 * in the db
+				 */
 				$targetNode['parent_id'] = $destinationNode['question_category_id'];
+				unset($targetNode['deleted_at']);
 
 				$this->update($targetNode);
 			}

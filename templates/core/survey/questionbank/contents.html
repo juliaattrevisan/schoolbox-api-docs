@@ -52,8 +52,9 @@ $j(function () {
 <h1>Question Bank</h1>
 <span class="header_option"><a href="/survey/modify/{SURVEY_ID}" class="btn go-back "><span></span>Return To Survey</a></span>
 
-<!-- BEGIN welcome -->
+
 <div class="evaluation-content question-bank">
+	<!-- BEGIN welcome -->
 	<h2>Welcome</h2>
 
 	<p class="pad-it">
@@ -64,11 +65,10 @@ $j(function () {
 		will automatically be added to your survey in the current
 		section.
 	</p>
-</div>
-<!-- END welcome -->
+	<!-- END welcome -->
 
-<!-- BEGIN category_selected -->
-<div class="evaluation-content question-bank"><h2>{QUESTION_CATEGORY}</h2>
+	<!-- BEGIN category_selected -->
+	<h2>{QUESTION_CATEGORY}</h2>
 	<form id='questionBankForm' action='/survey/questionbank/addToSection' method='post'>
 		<input name='section_id' type='hidden' value='{SECTION_ID}'/>
 
@@ -107,18 +107,27 @@ $j(function () {
 		<!-- END no_questions -->
 	</form>
 
+	<a href='/survey/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}' class="submit-btn-plain" >Remove this category</a>
+
+	<form action='/survey/questionbank/modify.php' method='post'>
+		<input name='questionCategoryId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}' />
+		<input name='name' type='text' value='{QUESTION_CATEGORY}' />
+
+		<p class="clearfix">
+			<input type='submit' value='Rename Category' class="submit-btn-plain" />
+		</p>
+	</form>
+	<!-- END category_selected -->
+
 	<form action='/survey/questionbank/create' method='post'>
 		<input name='parentId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}' />
 		<input name='name' type='text' value='' />
 
 		<p class="clearfix">
-			<input type='submit' value='Add New Category' class="submit-btn-plain" />
+			<input type='submit' value='Add New Subcategory' class="submit-btn-plain" />
 		</p>
 	</form>
-
-	<a href='/survey/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}' class="submit-btn-plain" >Remove this category</a>
 </div>
-<!-- END category_selected -->
 
 <div class="evaluation-menu">
 	<h2>Categories</h2>

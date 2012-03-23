@@ -12,12 +12,13 @@
  */
 require_once('../../../include/Bootstrap.php');
 
+$page = new SitePage();
 $groupHandler = new Group();
 
-if (!$groupHandler->isStaff()) {
-    error(126);
+if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
+	$categoryHandler = new Assess_Question_Category();
+	$categoryHandler->move($_GET['target'], $_GET['destination'], $_GET['position']);
 }
-
-$categoryHandler = new Assess_Question_Category();
-$categoryHandler->move($_GET['target'], $_GET['destination'], $_GET['position']);
-
+else {
+	error(126);
+}
