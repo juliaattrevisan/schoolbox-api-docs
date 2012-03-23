@@ -9,6 +9,7 @@ $this->setBlock('category_selected', 'question', 'question_block');
 $this->setBlock('question', 'answers', 'answers_block');
 
 $this->setVar(array(
+	'QUESTIONBANK_CATEGORY_ID' => $this->arg[0],
     'ASSESS_ID' => $this->arg[1],
 	'SECTION_ID' => $this->arg[2],
 ));

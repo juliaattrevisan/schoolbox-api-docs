@@ -24,7 +24,7 @@ if (!empty($_POST)) {
 		Scrub::text($_POST['marks'])
 	);
 
-	SitePage::localRedir('/assess/questionbank/created/' . Scrub::text($_POST['question_id']));
+	SitePage::localRedir('/assess/questionbank/added/' . Scrub::text($_POST['question_id']));
 }
 else {
 	error(2);

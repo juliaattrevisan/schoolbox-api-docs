@@ -9,6 +9,7 @@ $this->setBlock('category_selected', 'question', 'question_block');
 $this->setBlock('question', 'answers', 'answers_block');
 
 $this->setVar(array(
+	'QUESTIONBANK_CATEGORY_ID' => $this->arg[0],
     'SURVEY_ID' => $this->arg[1],
 	'SECTION_ID' => $this->arg[2],
 ));
@@ -63,7 +64,7 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
 							$this->setVar('ANSWER_DESCRIPTION', $answer->description);
 						}
 
-						$this->parse('answers_block', 'answers',true);
+						$this->parse('answers_block', 'answers', true);
 					}
 				}
 				else {

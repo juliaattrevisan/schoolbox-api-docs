@@ -4,7 +4,7 @@
 			var allQuestions = $j('#questionBankForm').find('input[name="question_bank_id[]"]:checked');
 
 			if (allQuestions.length && confirm('Do you want to remove the selected questions from the Question Bank?')) {
-				$j.post('/assess/questionbank/delete', $j('#questionBankForm').serialize(), function(response) {
+				$j.post('/assess/questionbank/removeQuestion', $j('#questionBankForm').serialize(), function(response) {
 					alert(response);
 					location.reload();
 				});
@@ -105,8 +105,10 @@ $j(function () {
 		<!-- BEGIN no_questions -->
 		<p>There are no questions in this category's Question Bank.</p>
 		<!-- END no_questions -->
-
 	</form>
+
+	<a href='/assess/questionbank/create/{QUESTIONBANK_CATEGORY_ID}' class="submit-btn-plain">Add new category</a>
+	<a href='/assess/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}' class="submit-btn-plain" >Remove this category</a>
 </div>
 <!-- END category_selected -->
 
@@ -133,4 +135,3 @@ $j(function () {
 		</ul>
 	</div>
 </div>
-
