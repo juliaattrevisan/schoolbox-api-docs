@@ -107,7 +107,15 @@ $j(function () {
 		<!-- END no_questions -->
 	</form>
 
-	<a href='/survey/questionbank/create/{QUESTIONBANK_CATEGORY_ID}' class="submit-btn-plain">Add new category</a>
+	<form action='/survey/questionbank/create' method='post'>
+		<input name='parentId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}' />
+		<input name='name' type='text' value='' />
+
+		<p class="clearfix">
+			<input type='submit' value='Add New Category' class="submit-btn-plain" />
+		</p>
+	</form>
+
 	<a href='/survey/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}' class="submit-btn-plain" >Remove this category</a>
 </div>
 <!-- END category_selected -->

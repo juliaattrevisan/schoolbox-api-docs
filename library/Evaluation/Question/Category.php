@@ -123,6 +123,30 @@ abstract class Evaluation_Question_Category extends DeprecatedModel {
 		}
 	}
 
+	/**
+	 * Create a new Questionbank Category, injecting $availability
+	 *
+	 * @param $data
+	 */
+	public function create($data) {
+		$data['availability'] = $this->getAvailability();
+		$data['created_at'] = 'NOW()';
+		$data['updated_at'] = 'NOW()';
+
+		parent::create($data);
+	}
+
+	/**
+	 * Softdeletes a Questionbank Category
+	 *
+	 * @param $data
+	 */
+	public function delete($data) {
+		$data['deleted_at'] = 'NOW()';
+
+		parent::update($data);
+	}
+
 	/* Getters/Setters
 	 */
 

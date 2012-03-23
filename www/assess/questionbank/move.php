@@ -1,6 +1,9 @@
 <?php
 /**
- * Modify
+ * Move
+ *
+ * Moves a question around in the Questionbank Category tree, reassigning
+ * parent_ids where appropriate based on $_GET['position']
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
