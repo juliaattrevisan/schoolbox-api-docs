@@ -25,19 +25,21 @@ $j(function() {
         },
 
         inputs: function() {
+
             $j('.inputMark, .comment').blur(function(){
-                var $this = $j(this);
-                if($this.val() != '')
-                    $j.post('/submission/returnWorkForm.php', $this.closest('form').serialize(), function() {
-                        console.log($this);
-                        $this.closest('.save-notification').show();
-                        //$j('.save-notification').delay(1000).fadeOut(500);
+                var $this = $j(this),
+                    notification = $j(this).parent().siblings('.save-notification');
+
+                if ($this.val() != '') {
+                    $j.post('/submission/returnWorkForm.php', $this.closest('form').serialize(), function(data) {
+                        notification.clearQueue();
+                        notification.stop().fadeIn(500).delay(1000).fadeOut(500);
                     });
+                }
             });
 
             $j(".inputMark").focusin(function(evt) {
                 $this = $j(this);
-
                 /*
                 * Row highlighting
                 *
