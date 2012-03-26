@@ -52,7 +52,7 @@ class Component_Dashboard_ShortcutController extends Component_Dashboard_Control
 
 		/* Parse administrator blocks
 		 */
-		if ($this->getGroup()->isSuperuser()) {
+		if ($_SESSION['gid'] == 1) {
 			$this->parse('administrator_only_block', 'administrator_only');
 		}
 		/* Parse staff blocks
