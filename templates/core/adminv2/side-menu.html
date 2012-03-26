@@ -1,11 +1,23 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jstree/jquery.jstree.js"></script>
-
+<script type="text/javascript" src="/javascript/jquery.cookie.js"></script>
 <script type="text/javascript">
 $j(function () {
+
+    var nodeArray = new Array();
+
+    if ($j.cookie("open-tree-nodes") == null) {
+        nodeArray = [ "node_0" ]
+    } else {
+        var originalArray = $j.cookie("open-tree-nodes").split(',');
+        for (i=0; i < originalArray.length; i++) {
+            nodeArray.push("node_" + originalArray[i])
+        }
+    }
+
 	$j("#side-menu").jstree({
 		"animation": 50,
-        "core" : { "initially_open" : [ "node_0" ] },
+        "core" : { "initially_open" : nodeArray },
 		"plugins" : [ "themes", "html_data", "dnd","crrm"],
         "themes" : {
 			"theme" : "core",
@@ -20,6 +32,15 @@ $j(function () {
           $j.ajax({ url: '/adminv2/side-menuForm.php',
                     data: {pos:pos, tid:tid, oid:oid}});
 
+    });
+
+    $j('.jstree a').click(function() {
+        $j.cookie("open-tree-nodes", null);
+        var openNodes = "";
+        $j('.jstree-open').each(function() {
+            openNodes += ($j(this).attr('id').substr(5)+',')
+        });
+        $j.cookie('open-tree-nodes', openNodes, { expires: 1 });
     });
 });
 
