@@ -32,16 +32,21 @@ $j(function () {
           $j.ajax({ url: '/adminv2/side-menuForm.php',
                     data: {pos:pos, tid:tid, oid:oid}});
 
+    }).bind('open_node.jstree', function() {
+        setCookie();
+    }).bind('close_node.jstree', function() {
+        setCookie();
     });
 
-    $j('.jstree a').click(function() {
+    function setCookie() {
         $j.cookie("open-tree-nodes", null);
         var openNodes = "";
         $j('.jstree-open').each(function() {
             openNodes += ($j(this).attr('id').substr(5)+',')
         });
         $j.cookie('open-tree-nodes', openNodes, { expires: 1 });
-    });
+    }
+
 });
 
 </script>
