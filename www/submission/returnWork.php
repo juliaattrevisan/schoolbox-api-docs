@@ -13,7 +13,6 @@ $this->setTab('submission');
 
 $subHandler = new Submission;
 $userHandler = new User;
-$subReturnHandler = new SubmissionReturn;
 
 if(is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
 

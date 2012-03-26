@@ -563,13 +563,49 @@ $activityLog = $submissionHandler->getActivityLog($user['uid'], 15, $categoryIDL
 if (is_array($activityLog)) {
 	foreach ($activityLog as $activity) {
 
-		$taskName = $activity['name'];
-		if ($activity['fid'])
-				$taskName = '<a href="/send.php?id=' . $activity['fid'] . '&save=1">' . $activity['name'] . '</a>';
+        $taskName = $activity['name'];
 
-		$categoryName = '<a href="/homepage/' . $activity['category'] . '">' . Scrub::text($activity['categoryName']) . '</a>';
+        if ($activity['fid'])
+            $taskName = '<a href="/send.php?id=' . $activity['fid'] . '&save=1">' . $activity['name'] . '</a>';
 
-		if ($activity['new'] == 'new') {
+        $categoryName = '<a href="/homepage/' . $activity['category'] . '">' . Scrub::text($activity['categoryName']) . '</a>';
+
+        switch($activity['new']) {
+
+            case 'new':
+                $stringDesc = "New {$activity['typeName']} $taskName added for $categoryName";
+                break;
+
+            case 'overdue':
+                $stringDesc = "<strong>$taskName for $categoryName is overdue</strong> ";
+                break;
+
+            case 'submitted':
+                $stringDesc = 'Work submitted to '.$activity['name'] .' for <a href="/homepage/' . $activity['category'] . '">' . Scrub::text($activity['categoryName']) . '</a>';
+                break;
+
+            case 'returned':
+                if($activity['typeName']) {
+                    // format for output
+                    $rtn = $returnHandler->getByUserAndTime($user['uid'], $activity['activity_date']);
+                    $marksheet = Marksheet_Factory::build($rtn['slug']);
+                    $mark = $marksheet->convertRawMark($rtn['norm_mark'], $rtn['max_mark'], true);
+                    $stringDesc = 'You received ' . $mark;
+                }
+                else if($activity['fid'])
+                    $stringDesc = '<a href="/submission/send.php?id='.$activity['fid'].'&return=1">Work returned</a>';
+                else
+                    $stringDesc = 'Work returned';
+                $stringDesc .= ' for '.$activity['name']. ' in <a href="/homepage/' . $activity['category'] . '">' . Scrub::text($activity['categoryName']) . '</a>';
+                break;
+
+            default:
+                $stringDesc = $categoryName . ' submissions for ' . Scrub::text($activity['name']) . ' are now closed ';
+                break;
+        }
+
+/*
+        if ($activity['new'] == 'new') {
 			$stringDesc = 'New ' . $activity['typeName'] . ' ' . $taskName . ' added for ' . $categoryName;
 		}
 		elseif ($activity['new'] == 'overdue') {
@@ -591,6 +627,8 @@ if (is_array($activityLog)) {
 		else {
 			$stringDesc = $categoryName . ' submissions for ' . Scrub::text($activity['name']) . ' are now closed ';
 		}
+*/
+
 
 		$activityTime = new Alaress_Date_Relative($activity['activity_date']);
 		$activityTime->setPrefix('');

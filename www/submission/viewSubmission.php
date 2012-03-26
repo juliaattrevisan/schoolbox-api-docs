@@ -74,7 +74,7 @@ if (is_numeric($this->arg[0])) {
 					'SUBMITTED' => $studentSub['date'],
                     // check if submission date if after due date; if so, mark as late (ignore $studentSub['late'])
                     'COLOUR' => $dueDate->getUnixTimestamp() < $subDate->getUnixTimestamp() ? '#ff0000' : '#000000',
-					'MARK' => $return[0]['mark'],
+					'MARK' => $return[0]['visible_mark'],
                     'SCORE' => $studentSub['score'],
 					'ON_OFF' => ++$i % 2 ? '' : 'dark',
 					'REMARK' => $remark,
@@ -92,7 +92,7 @@ if (is_numeric($this->arg[0])) {
 					'OWNER_ESCAPED' => addslashes($userHandler->formatName($student, '{lastname}, {firstname}')),
 					'SUBMITTED' => '',
 					'COLOUR' => '',
-					'MARK' => $return[0]['mark'],
+					'MARK' => $return[0]['visible_mark'],
                     'SCORE' => '',
 					'ON_OFF' => ++$i % 2 ? '' : 'dark',
                 );

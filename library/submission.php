@@ -70,6 +70,28 @@ class Submission extends DeprecatedModel {
     }
 
     /**
+     * @param $boxID
+     * @return array|bool
+     */
+    function getByName($boxName) {
+        $boxName = mysql_real_escape_string($boxName);
+        $query = "SELECT s.*, GROUP_CONCAT(cc.code) code, category.name as categoryName, category.id as cid,
+					file.comment, ft.name as typeName, smt.slug AS mark_type_slug
+                  FROM submission_box  s
+				  JOIN category ON s.category = category.id
+				  LEFT JOIN categoryCode cc ON cc.categoryID = category.id
+				  LEFT JOIN file ON s.fid = file.id
+			 	  LEFT JOIN file_type ft ON s.type = ft.id
+			 	  LEFT JOIN submission_mark_type smt ON s.mark_type = smt.mark_type_id
+                  WHERE s.name = '$boxName'
+				  GROUP BY s.id, category.id";
+
+        return $this->db->getRow($query);
+    }
+
+
+
+    /**
      * Collate a list of events to appear on the My Work screen. Amended to
      * include online assessments as well.
      *
@@ -80,7 +102,8 @@ class Submission extends DeprecatedModel {
      */
 	function getByDate($date, $userID, $categoryList) {
         $query = "(SELECT
-                    s.*,
+                    s.id, s.category, s.type, s.owner, s.open_date, s.date, s.late_date, s.fid, s.accept_submission,
+                    s.deleted, s.description, s.name, s.created, s.mark_type, s.max_mark,
                     t.realname,
                     c.name categoryName,
                     GROUP_CONCAT(cc.code) categoryCode
@@ -109,6 +132,8 @@ class Submission extends DeprecatedModel {
                         assess.title as name,
                         assess.description as description,
                         assess.created_at as created,
+                        '' AS mark_type,
+                        '' AS max_mark,
                         '' as realname,
                         category.name as categoryName,
                         categoryCode.code as categoryCode
@@ -498,7 +523,24 @@ class Submission extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
-	/**
+    function getSubmissionBoxMarkType($box_id) {
+        $query = "SELECT slug
+                  FROM submission_box s
+                  LEFT JOIN submission_mark_type mt ON s.mark_type = mt.mark_type_id
+                  WHERE s.id = $box_id";
+        return $this->db->getRow($query);
+    }
+
+    function getSubmissionBoxMarkTypeByName($box_name) {
+        $query = "SELECT slug
+                  FROM submission_box s
+                  LEFT JOIN submission_mark_type mt ON s.mark_type = mt.mark_type_id
+                  WHERE s.name = $box_name";
+        return $this->db->getRow($query);
+    }
+
+
+    /**
 	 * Get all the types except the id's mentioned in $vals. Used to exclude
 	 * Online Assessments from selection on createSubmission/
 	 *

@@ -153,8 +153,11 @@ else if(is_numeric($this->arg[0])) {
     $this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
     $this->setBlock(TEMPLATE_content, 'student_mark_list', 'student_mark_list_block');
     $this->setBlock('student_mark_list', 'markItem', 'markItem_block');
-	$this->setBlock('markItem', 'mark', 'mark_block');
+    $this->setBlock('markItem', 'mark', 'mark_block');
     $this->setBlock('markItem', 'onlineAssessmentMark', 'onlineAssessmentMark_block');
+    $this->setBlock('mark', 'mark_type_percent', 'mark_type_percent_block');
+    $this->setBlock('mark', 'mark_type_letter', 'mark_type_letter_block');
+    $this->setBlock('mark', 'mark_type_raw', 'mark_type_raw_block');
 
 	$this->setBlock(TEMPLATE_content, 'no_submissions', 'no_submissions_block');
 	$this->setBlock(TEMPLATE_content, 'no_assessments', 'no_assessments_block');
@@ -297,12 +300,55 @@ else if(is_numeric($this->arg[0])) {
 							 * exists in Synergetic but not in schoolbox)
 							 */
 							if (is_numeric($student['uid'])) {
-								$return = $retHandler->getByUser($student['uid'],$sub['id']);
+								$return = $retHandler->getByUser($student['uid'], $sub['id']);
 
-								$this->setVar(array(
-									'MARK' => Scrub::text($return[0]['mark']),
-									'BOX_ID' => $sub['id'],
-								));
+                                $subbox = $subHandler->getByID($sub['id']);
+
+
+                                $marksheet = Marksheet_Factory::build($subbox['mark_type_slug']);
+                                $mark = $marksheet->retrieveMark($student['uid'], $sub['id']);
+
+                                switch($marksheet->getSlug()) {
+                                    case 'raw':
+                                        $output = array(
+                                            'MAX_MARK' => $mark['max_mark'],
+                                            'MARK'     => $mark['mark'],
+                                        );
+                                        $this->setVar($output);
+                                        break;
+
+                                    case 'letter':
+                                        $this->setVar('grade_drop_block', '');
+                                        $this->dropdown('grade_drop', $subHandler->getLetterGrades(), $mark['grade_selected'], 'mark_type_letter', array(
+                                            'grade_id' => 'GRADE_VALUE',
+                                            'caption'  => 'GRADE_TEXT',
+                                        ));
+                                        break;
+
+                                    case 'percent':
+                                        $output = array(
+                                            'MARK'     => $mark['mark'],
+                                        );
+                                        $this->setVar($output);
+                                        break;
+                                    default:
+                                        error(-1);
+                                        break;
+                                }
+
+                                $marktypes = $subHandler->getMarkTypes();
+
+                                // parse the appropraite block, and hide the rest
+                                foreach($marktypes as $type) {
+                                    if($type['mark_type_id'] == $marksheet->getID()) {
+                                        $this->parse("mark_type_{$type['slug']}_block", "mark_type_{$type['slug']}", false);
+
+                                    } else
+                                        $this->setVar("mark_type_{$type['slug']}_block",'');
+                                }
+
+								$this->setVar('BOX_ID', $sub['id']);
+
 							}
 
 							$this->parse('mark_block','mark');
@@ -327,6 +373,7 @@ else if(is_numeric($this->arg[0])) {
 	}
 	else {
 		$this->setVar('student_list_block', '');
+		$this->setVar('student_mark_list_block', '');
     }
 }
 else {

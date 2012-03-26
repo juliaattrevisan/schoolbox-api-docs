@@ -22,8 +22,13 @@ class SubmissionReturn extends DeprecatedModel {
 	}
 
 	function getByUser($user_id, $box_id = 0, $limit = false) {
-		$query = "SELECT r.*, c.name categoryName, s.name, s.description, s.fid FROM ( `".$this->_table."` r, submission_box s, category c )
-				  WHERE r.deleted = 0 AND r.box_id = s.id AND s.category = c.id AND r.owner = $user_id";
+		$query = "SELECT r.*, c.name categoryName, s.name, s.description, s.fid, s.max_mark, m.slug
+		          FROM ( `".$this->_table."` r, submission_box s, category c )
+		          LEFT JOIN submission_mark_type m ON s.mark_type = m.mark_type_id
+				  WHERE r.deleted = 0
+				  AND r.box_id = s.id
+				  AND s.category = c.id
+				  AND r.owner = $user_id";
 	
 		if ($box_id) {
 			$query .= " AND r.box_id = $box_id";
@@ -34,8 +39,19 @@ class SubmissionReturn extends DeprecatedModel {
 		if (is_numeric($limit)) {
 			$query .= " LIMIT $limit";
 		}
-		return $this->db->getAll($query);
-	}
+
+		$result = $this->db->getAll($query);
+
+        // don't try to do marking normalisation if nothing is submitted
+        if($result)
+            // append normalised mark information onto each of the results
+            foreach($result as &$r) {
+                $mark = Marksheet_Factory::build($r['slug']);
+                $r['visible_mark'] = $mark->convertRawMark($r['norm_mark'], $r['max_mark'], true);
+            }
+
+        return $result;
+    }
 
 	/**
 	 * Gets all returned work
@@ -69,6 +85,16 @@ class SubmissionReturn extends DeprecatedModel {
 		return $this->db->getAll($query);
 	}
 
+    function getByUserAndTime($user_id, $timestamp) {
+        $query = "SELECT sr.*, sb.max_mark, smt.slug
+                  FROM submission_return sr
+                  LEFT JOIN submission_box sb ON sr.box_id = sb.id
+                  LEFT JOIN submission_mark_type smt ON sb.mark_type = smt.mark_type_id
+                  WHERE sr.owner = '$user_id'
+                  AND returned = '$timestamp'";
+        return $this->db->getRow($query);
+    }
+
     function getLetterGradeByUser($user_id, $box_id = 0) {
         $query = "SELECT * FROM submission_grade
                   WHERE lower_bound <=
@@ -89,7 +115,14 @@ class SubmissionReturn extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
+    function getLetterGradeByValue($mark) {
+        $query = "SELECT * FROM submission_grade
+                  WHERE lower_bound <= $mark
+                  ORDER BY lower_bound DESC
+                  LIMIT 0, 1";
 
+        return $this->db->getRow($query);
+    }
 
 
     function securityCheck($box_id, $sid)

@@ -78,6 +78,13 @@ abstract class Marksheet_Abstract {
     }
 
     function clean_num($value, $decimals){
+        if($value == null)
+            return "";
+
+        if($decimals < 1) {
+            $num = number_format($value, 1, '.', '');
+            return substr($num, 0, strpos($num, '.'));
+        }
         return trim(trim(number_format($value, $decimals, '.', ''),'0'),'.');
     }
 
@@ -93,5 +100,19 @@ abstract class Marksheet_Abstract {
      * @abstract
      * Extract a normalised mark from the database, and format it for the UI
      */
-    public abstract function retrieveMark($user_id, $box_id);
+    public abstract function retrieveMark($user_id, $box_id, $asText = false);
+
+    /**
+     * @abstract
+     * @param $submissionID
+     * Extract a normalised mark from the databse, and format it for the UI
+     */
+    public abstract function retrieveMarkBySubmissionID($submissionID, $asText = false);
+
+    /**
+     * @abstract
+     * @param $rawMark
+     * Convert an already-retrieved mark for UI
+     */
+    public abstract function convertRawMark($rawMark, $maxMark = 0, $asText = false);
 }

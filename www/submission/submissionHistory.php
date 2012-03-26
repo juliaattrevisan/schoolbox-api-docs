@@ -110,10 +110,10 @@ if (is_array($allWork) && count($allWork)) {
 		$workDate = new Alaress_Date_Format($currentWork['date'], 'U');
 
 		$this->setVar(array(
-			'WORK_DATE' => $workDate->getShort(),
-			'WORK_MARK' => Scrub::Text($currentWork['mark']),
-			'WORK_COMMENT' => Scrub::Text($currentWork['comment']),
-			'WORK_FILE_ID' => $currentWork['fid'],
+			'WORK_DATE'           => $workDate->getShort(),
+			'WORK_MARK'           => Scrub::Text($currentWork['mark']),
+			'WORK_COMMENT'        => Scrub::Text($currentWork['comment']),
+			'WORK_FILE_ID'        => $currentWork['fid'],
 			'WORK_SUBMIT_FILE_ID' => $currentWork['sid'],
 			'WORK_RETURN_FILE_ID' => $currentWork['rid'],
 		));

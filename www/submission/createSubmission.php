@@ -30,9 +30,9 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     ));
 
     /* Output marktype drop down */
-    $this->dropdown('marktype_drop', $subBoxHandler->getMarkTypes(), $subbox['marktype'], TEMPLATE_content, array(
-        'name' => 'MARKTYPE_TEXT',
-        'id'   => 'MARKTYPE_VALUE'
+    $this->dropdown('marktype_drop', $subBoxHandler->getMarkTypes(), $subbox['mark_type'], TEMPLATE_content, array(
+        'hr_name' => 'MARKTYPE_TEXT',
+        'mark_type_id'   => 'MARKTYPE_VALUE'
     ));
 
     /* Convert times */
@@ -82,6 +82,8 @@ else if($this->arg[0] == 'new') {
     //Create submission box
     $this->setTitle('Create Submission Box');
 
+    $subbox = $subBoxHandler->getByID($this->arg[1]);
+
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
@@ -130,10 +132,11 @@ else if($this->arg[0] == 'new') {
     ));
 
     /* Output marktype drop down */
-    $this->dropdown('marktype_drop', $subBoxHandler->getMarkTypes(), $subbox['marktype'], TEMPLATE_content, array(
-        'name' => 'MARKTYPE_TEXT',
-        'id'   => 'MARKTYPE_VALUE'
+    $this->dropdown('marktype_drop', $subBoxHandler->getMarkTypes(), $subbox['mark_type'], TEMPLATE_content, array(
+        'hr_name'      => 'MARKTYPE_TEXT',
+        'mark_type_id' => 'MARKTYPE_VALUE'
     ));
+
 
     /* Convert times */
     $open_date = strtotime('now');;
