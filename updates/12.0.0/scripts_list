@@ -12,5 +12,6 @@
 #
 ######
 
-# Add config variable for hiding parent directories
-sql/update_12.0.0.sql
+sql/config_options.sql
+sql/online_assess_survey.sql
+sql/questionbank.sql
