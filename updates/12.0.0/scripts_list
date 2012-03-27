@@ -11,7 +11,13 @@
 #Dependencies are handled by placing the script with a dependency on another, AFTER the one it depends on in the list.
 #
 ######
+## Ability for parents to see students' marks 
+admin/config_options.sql
 
-sql/config_options.sql
-sql/online_assess_survey.sql
-sql/questionbank.sql
+## Does stuff to survey? Not sure what.
+assess_survey/online_assess_survey.sql
+## Adds Twitter Component to Homepage
+homepages/add_twitter_comp.sql
+## Adds functionality To allow soft-delete of Questionbank Categories (otherwise you might lose questions)
+## Adds functionality to allow heirachical questionbank categories
+question_bank/questionbank.sql
