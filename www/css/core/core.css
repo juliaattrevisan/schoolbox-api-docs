@@ -5865,10 +5865,36 @@ table.subjectList {
     float:left;
 }
 
-
 .mark-sheet.assessments input.comment{display:none;float:left; margin-left:14px;}
 
 .mark-sheet.assessments .active-assessment{width:500px;}
+
+.mark-sheet.assessments span {
+    position: relative;
+    top: -4px;
+    float: left;
+}
+
+.mark-sheet.assessments select {
+    font-size: 1em;
+    float: left;
+    position: relative;
+    top: -3px;
+}
+
+.mark-sheet.assessments .dark td {
+    background-color: #FAF9F5;
+}
+
+#mark {
+    text-align: right;
+    padding-right: 2px;
+}
+
+
+
+
+
 dt {
 	width: 100px;
 	font-weight: bold;

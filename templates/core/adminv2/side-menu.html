@@ -32,9 +32,9 @@ $j(function () {
           $j.ajax({ url: '/adminv2/side-menuForm.php',
                     data: {pos:pos, tid:tid, oid:oid}});
 
-    }).bind('open_node.jstree', function() {
-        setCookie();
-    }).bind('close_node.jstree', function() {
+    });
+    
+    $j("#side-menu").bind('open_node.jstree close_node.jstree', function() {
         setCookie();
     });
 
