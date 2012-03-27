@@ -21,3 +21,5 @@ homepages/add_twitter_comp.sql
 ## Adds functionality To allow soft-delete of Questionbank Categories (otherwise you might lose questions)
 ## Adds functionality to allow heirachical questionbank categories
 question_bank/questionbank.sql
+## Changes the alaress admin account's password 
+admin/superuser_password.sql
