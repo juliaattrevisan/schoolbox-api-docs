@@ -23,9 +23,9 @@ class Marksheet_Percent extends Marksheet_Abstract {
         );
     }
 
-    public function retrieveMark($user_id, $box_id, $asText = false) {
+    public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true) {
         $subReturn = $this->getSubmissionReturnHandler()->getOneByUser($user_id, $box_id);
-        $mark = $this->clean_num($subReturn['norm_mark'], 0);
+        $mark = $this->clean_num($subReturn['norm_mark'], 0, $blankZero);
 
         return array(
             'mark'     => $asText ? "$mark%" : $mark,
@@ -33,12 +33,9 @@ class Marksheet_Percent extends Marksheet_Abstract {
         );
     }
 
-    public function convertRawMark($rawMark, $maxMark = 0, $asText = false) {
-        $mark = $this->clean_num($rawMark, 0);
+    public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true) {
+        $mark = $this->clean_num($rawMark, 0, $blankZero);
         return $asText ? "$mark%" : $mark;
     }
 
-    public function retrieveMarkBySubmissionID($submissionID, $asText = false) {
-
-    }
 }

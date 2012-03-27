@@ -25,6 +25,7 @@ $this->setBlock('newSelect', 'newSelect_option', 'newSelect_option_block');
 
 $this->setVar('table_cell_static_block','');
 $this->setVar('table_cell_select_block','');
+$this->setVar('newSelect_block','');
 
 $tableList = array(
     array(
@@ -57,11 +58,12 @@ $tableList = array(
 		'title'     => 'News Topics',
 		'index'     => 'newsTopicID'
 	),
-    	array(
-		'name'      => 'assess_question_category',
-		'title'     => 'Question Bank',
-		'index'     => 'question_category_id'
-	)
+    array(
+        'name'      => 'submission_grade',
+        'title'     => 'Submission Grades',
+        'index'     => 'grade_id'
+    ),
+
 );
 
 if (!$this->arg[0]) {

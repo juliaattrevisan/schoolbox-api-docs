@@ -16,17 +16,19 @@ class Marksheet_Factory {
     public static function build($slug) {
         $className = "Marksheet_" . ucwords(strtolower($slug));
 
+        $subHandler = new Submission();
+        $markType = $subHandler->getMarkTypeBySlug($slug);
+
         if(class_exists($className)) {
-            $subHandler = new Submission();
-            $markType = $subHandler->getMarkTypeBySlug($slug);
             return new $className($markType);
         } else {
-            return null;
+            // if something went wrong, assume free for legacy
+            return new Marksheet_Free($markType);
         }
     }
 
     public static function buildByID($id) {
-        // if there's a problem, default to percentage
+        // if there's a problem, default to free for legacy
         if(!is_numeric($id))
             return Marksheet_Factory::build('percent');
         $subHandler = new Submission();

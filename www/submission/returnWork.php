@@ -8,6 +8,7 @@ $this->setFile(TEMPLATE_content, 'submission/returnWork.html');
 $this->setBlock(TEMPLATE_content, 'mark_type_percent', 'mark_type_percent_block');
 $this->setBlock(TEMPLATE_content, 'mark_type_letter', 'mark_type_letter_block');
 $this->setBlock(TEMPLATE_content, 'mark_type_raw', 'mark_type_raw_block');
+$this->setBlock(TEMPLATE_content, 'mark_type_free', 'mark_type_free_block');
 $this->setTitle('Return Student Work');
 $this->setTab('submission');
 
@@ -34,7 +35,7 @@ if(is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
     $this->setVar($output);
 
     $marksheet = Marksheet_Factory::build($subbox['mark_type_slug']);
-    $mark = $marksheet->retrieveMark($this->arg[1], $this->arg[0]);
+    $mark = $marksheet->retrieveMark($this->arg[1], $this->arg[0], false, false);
 
     $this->setVar('MARK_TYPE_COMMENT', $marksheet->getComment());
 
@@ -58,18 +59,24 @@ if(is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
             break;
 
         case 'percent':
+        case 'free':
             $output = array(
-                'MARK'     => $mark['mark'],
-                'COMMENT'  => $mark['comment']
+            'MARK'     => $mark['mark'],
+            'COMMENT'  => $mark['comment']
             );
             $this->setVar($output);
             break;
+
         default:
-            error(-1);
+            $output = array(
+                'MARK'     => '',
+                'COMMENT'  => ''
+            );
+            $this->setVar($output);
             break;
     }
 
-    $marktypes = $subHandler->getMarkTypes();
+    $marktypes = $subHandler->getMarkTypes(true);
 
     // parse the appropraite block, and hide the rest
     foreach($marktypes as $type) {

@@ -18,6 +18,7 @@ $this->setBlock(TEMPLATE_content, 'setting_type_boolean', 'setting_type_boolean_
 $this->setBlock(TEMPLATE_content, 'setting_type_select', 'setting_type_select_block');
 $this->setBlock('setting_type_select', 'setting_select', 'setting_select_block');
 $this->setBlock(TEMPLATE_content, 'setting_type_check', 'setting_type_check_block');
+$this->setBlock(TEMPLATE_content, 'setting_type_list', 'setting_type_list_block');
 $this->setBlock(TEMPLATE_content, 'setting_save', 'setting_save_block');
 
 $output = array(
@@ -131,6 +132,10 @@ if(is_array($optionList)) {
                 case 'bytes':
                     $this->setVar('SETTING_VALUE', Alaress_Byte_Format::bytesToString($option['value']));
                     $this->parse('setting_type_input_block', 'setting_type_input', true);
+                    break;
+
+                case 'list':
+
                     break;
             }
         }

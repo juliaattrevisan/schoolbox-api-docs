@@ -6,6 +6,7 @@ $this->setFile(TEMPLATE_content, 'submission/createSubmission.html');
 $this->setTab('submission');
 $this->setBlock(TEMPLATE_content, 'browse_row', 'browse_block');
 $this->setBlock(TEMPLATE_content, 'category_select', 'category_select_block');
+$this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
 
 $this->setVar('category_select_block', '');
 
@@ -29,11 +30,17 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         'id'   => 'TYPE_VALUE'
     ));
 
-    /* Output marktype drop down */
-    $this->dropdown('marktype_drop', $subBoxHandler->getMarkTypes(), $subbox['mark_type'], TEMPLATE_content, array(
-        'hr_name' => 'MARKTYPE_TEXT',
-        'mark_type_id'   => 'MARKTYPE_VALUE'
-    ));
+    // legacy support
+    if($subbox['mark_type_slug'] == 'free') {
+        $this->setVar('marktype_block', '');
+    } else {
+        /* Output marktype drop down */
+        $this->dropdown('marktype_drop', $subBoxHandler->getMarkTypes(), $subbox['mark_type'], 'marktype', array(
+            'hr_name' => 'MARKTYPE_TEXT',
+            'mark_type_id'   => 'MARKTYPE_VALUE'
+        ));
+        $this->parse('marktype_block', 'marktype');
+    }
 
     /* Convert times */
     $open_date = strtotime($subbox['open_date']);
@@ -68,6 +75,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         'LATE_HOUR'     => $late_hour,
         'LATE_MIN'      => $late_min,
         'LATE_PM'       => date('a', $late_date) == 'pm' ? 'selected' : '',
+        'TOTAL_MARK'    => $subbox['max_mark']
     );
 
 
@@ -131,12 +139,14 @@ else if($this->arg[0] == 'new') {
         'id'   => 'TYPE_VALUE'
     ));
 
+
     /* Output marktype drop down */
-    $this->dropdown('marktype_drop', $subBoxHandler->getMarkTypes(), $subbox['mark_type'], TEMPLATE_content, array(
+    $this->dropdown('marktype_drop', $subBoxHandler->getMarkTypes(), $subbox['mark_type'], 'marktype', array(
         'hr_name'      => 'MARKTYPE_TEXT',
         'mark_type_id' => 'MARKTYPE_VALUE'
     ));
 
+    $this->parse('marktype_block','marktype');
 
     /* Convert times */
     $open_date = strtotime('now');;
@@ -167,6 +177,7 @@ else if($this->arg[0] == 'new') {
                     'LATE_HOUR' => $late_hour,
                     'LATE_MIN'  => '00',
                     'LATE_PM'   => date('a', $late_date) == 'pm'?'selected':'',
+                    'TOTAL_MARK' => ''
                     );
 
 

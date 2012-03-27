@@ -47,9 +47,15 @@ class SubmissionReturn extends DeprecatedModel {
             // append normalised mark information onto each of the results
             foreach($result as &$r) {
                 $mark = Marksheet_Factory::build($r['slug']);
-                $r['visible_mark'] = $mark->convertRawMark($r['norm_mark'], $r['max_mark'], true);
-            }
 
+                // legacy support
+                if($r['slug'] == 'free') {
+                    $r['visible_mark'] = $r['mark'];
+                } else {
+                    // for anything other than legacy
+                    $r['visible_mark'] = $mark->convertRawMark($r['norm_mark'], $r['max_mark'], true, false);
+                }
+            }
         return $result;
     }
 

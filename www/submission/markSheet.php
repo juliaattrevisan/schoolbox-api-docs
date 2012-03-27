@@ -158,6 +158,7 @@ else if(is_numeric($this->arg[0])) {
     $this->setBlock('mark', 'mark_type_percent', 'mark_type_percent_block');
     $this->setBlock('mark', 'mark_type_letter', 'mark_type_letter_block');
     $this->setBlock('mark', 'mark_type_raw', 'mark_type_raw_block');
+    $this->setBlock('mark', 'mark_type_free', 'mark_type_free_block');
 
 	$this->setBlock(TEMPLATE_content, 'no_submissions', 'no_submissions_block');
 	$this->setBlock(TEMPLATE_content, 'no_assessments', 'no_assessments_block');
@@ -313,6 +314,7 @@ else if(is_numeric($this->arg[0])) {
                                         $output = array(
                                             'MAX_MARK' => $mark['max_mark'],
                                             'MARK'     => $mark['mark'],
+                                            'COMMENT'  => $mark['comment']
                                         );
                                         $this->setVar($output);
                                         break;
@@ -323,28 +325,35 @@ else if(is_numeric($this->arg[0])) {
                                             'grade_id' => 'GRADE_VALUE',
                                             'caption'  => 'GRADE_TEXT',
                                         ));
+                                        $this->setVar('COMMENT', $mark['comment']);
                                         break;
 
                                     case 'percent':
+                                    case 'free': // legacy support
                                         $output = array(
-                                            'MARK'     => $mark['mark'],
+                                            'MARK' => $mark['mark'],
+                                            'COMMENT'  => $mark['comment']
                                         );
                                         $this->setVar($output);
                                         break;
+
                                     default:
-                                        error(-1);
+                                        $output = array(
+                                            'MARK' => '!ERROR',
+                                            'COMMENT'  => '!ERROR'
+                                        );
+                                        $this->setVar($output);
                                         break;
                                 }
 
-                                $marktypes = $subHandler->getMarkTypes();
+                                $marktypes = $subHandler->getMarkTypes(true);
 
                                 // parse the appropraite block, and hide the rest
                                 foreach($marktypes as $type) {
                                     if($type['mark_type_id'] == $marksheet->getID()) {
                                         $this->parse("mark_type_{$type['slug']}_block", "mark_type_{$type['slug']}", false);
-
                                     } else
-                                        $this->setVar("mark_type_{$type['slug']}_block",'');
+                                        $this->setVar("mark_type_{$type['slug']}_block", '');
                                 }
 
 								$this->setVar('BOX_ID', $sub['id']);

@@ -24,14 +24,14 @@ class Marksheet_Raw extends Marksheet_Abstract {
 
         return array(
             'norm_mark' => $normalised,
-            'mark'      => $this->clean_num($mark, 4) . " / " . $max
+            'mark'      => $this->clean_num($mark, 4, false) . " / " . $max
         );
     }
 
-    public function retrieveMark($user_id, $box_id, $asText = false) {
+    public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true) {
         $subReturn = $this->getSubmissionReturnHandler()->getOneByUser($user_id, $box_id);
         $subbox = $this->getSubmissionHandler()->getByID($box_id);
-        $mark = $this->clean_num(($subReturn['norm_mark'] / 100) * $subbox['max_mark'], 4);
+        $mark = $this->clean_num(($subReturn['norm_mark'] / 100) * $subbox['max_mark'], 4, $blankZero);
 
         return array(
             'mark'     => $asText ? "$mark / {$subbox['max_mark']}" : $mark,
@@ -40,13 +40,10 @@ class Marksheet_Raw extends Marksheet_Abstract {
         );
     }
 
-    public function convertRawMark($rawMark, $maxMark = 0, $asText = false) {
+    public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true) {
         // do we trust what's stored in the database?
-        $mark = $this->clean_num(($rawMark / 100) * $maxMark, 4);
+        $mark = $this->clean_num(($rawMark / 100) * $maxMark, 4, $blankZero);
         return $asText ? "$mark / $maxMark" : $mark;
     }
 
-    public function retrieveMarkBySubmissionID($submissionID, $asText = false) {
-
-    }
 }

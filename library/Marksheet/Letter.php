@@ -16,19 +16,15 @@ class Marksheet_Letter extends Marksheet_Abstract {
         );
     }
 
-    public function retrieveMark($user_id, $box_id, $asText = false) {
+    public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true) {
         $subReturn = $this->getSubmissionReturnHandler()->getLetterGradeByUser($user_id, $box_id);
         return array(
             'grade_selected' => $subReturn['grade_id']
         );
     }
 
-    public function convertRawMark($rawMark, $maxMark = 0, $asText = false) {
+    public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true) {
         $grade = $this->getSubmissionReturnHandler()->getLetterGradeByValue($rawMark);
         return $grade['caption'];
-    }
-
-    public function retrieveMarkBySubmissionID($submissionID, $asText = false) {
-
     }
 }

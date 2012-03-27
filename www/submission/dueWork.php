@@ -589,7 +589,14 @@ if (is_array($activityLog)) {
                     // format for output
                     $rtn = $returnHandler->getByUserAndTime($user['uid'], $activity['activity_date']);
                     $marksheet = Marksheet_Factory::build($rtn['slug']);
-                    $mark = $marksheet->convertRawMark($rtn['norm_mark'], $rtn['max_mark'], true);
+
+                    // legacy support
+                    if($rtn['slug'] == 'free') {
+                        $mark = $rtn['mark'];
+                    } else {
+                        $mark = $marksheet->convertRawMark($rtn['norm_mark'], $rtn['max_mark'], true, false);
+                    }
+
                     $stringDesc = 'You received ' . $mark;
                 }
                 else if($activity['fid'])
@@ -603,32 +610,6 @@ if (is_array($activityLog)) {
                 $stringDesc = $categoryName . ' submissions for ' . Scrub::text($activity['name']) . ' are now closed ';
                 break;
         }
-
-/*
-        if ($activity['new'] == 'new') {
-			$stringDesc = 'New ' . $activity['typeName'] . ' ' . $taskName . ' added for ' . $categoryName;
-		}
-		elseif ($activity['new'] == 'overdue') {
-			$stringDesc = '<strong>' . $taskName . ' for ' . $categoryName . ' is overdue</strong> ';
-		}
-		else if($activity['new'] == 'submitted') {
-			$stringDesc = 'Work submitted to '.$activity['name'] .' for <a href="/homepage/' . $activity['category'] . '">' . Scrub::text($activity['categoryName']) . '</a>';
-		}
-		else if($activity['new'] == 'returned') {
-			if($activity['typeName'])
-				$stringDesc = 'You received '.$activity['typeName'];
-			else if($activity['fid'])
-				$stringDesc = '<a href="/submission/send.php?id='.$activity['fid'].'&return=1">Work returned</a>';
-			else
-				$stringDesc = 'Work returned';
-
-			$stringDesc .= ' for '.$activity['name']. ' in <a href="/homepage/' . $activity['category'] . '">' . Scrub::text($activity['categoryName']) . '</a>';
-		}
-		else {
-			$stringDesc = $categoryName . ' submissions for ' . Scrub::text($activity['name']) . ' are now closed ';
-		}
-*/
-
 
 		$activityTime = new Alaress_Date_Relative($activity['activity_date']);
 		$activityTime->setPrefix('');

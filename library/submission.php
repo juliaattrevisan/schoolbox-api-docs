@@ -502,8 +502,14 @@ class Submission extends DeprecatedModel {
     }
 
 
-    function getMarkTypes() {
-        $query = "SELECT * FROM submission_mark_type";
+    function getMarkTypes($includeDisabled = false) {
+        $query = "SELECT *
+                  FROM submission_mark_type";
+
+        if(!$includeDisabled)
+            $query .= " WHERE enabled = '1'";
+
+
         return $this->db->getAll($query);
     }
 

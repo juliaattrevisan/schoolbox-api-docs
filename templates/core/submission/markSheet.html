@@ -81,8 +81,10 @@
                     <!-- BEGIN mark_type_raw -->
                     <input name="mark" class="inputMark" type="text" id="mark" size="4" maxlength="15" value="{MARK}"/><span>&nbsp;/ {MAX_MARK}</span>
                     <!-- END mark_type_raw -->
-
-                    <input name="comment" id="comment" size="40" placeholder="Comment" class="comment">
+                    <!-- BEGIN mark_type_free -->
+                    <input name="mark" class="inputMark" type="text" id="mark" size="4" maxlength="15" value="{MARK}"/>
+                    <!-- END mark_type_free -->
+                    <input name="comment" id="comment" size="40" placeholder="Comment" value="{COMMENT}" class="comment">
 
                     <input type="hidden" name="uid" value="{UID}">
                     <input type="hidden" name="box_id" value="{BOX_ID}">

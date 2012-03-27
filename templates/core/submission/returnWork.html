@@ -33,7 +33,7 @@
         padding-right: 2px;
     }
 
-    #mark {
+    .ralign {
         text-align: right;
     }
 </style>
@@ -64,7 +64,7 @@
                 <em>{MARK_TYPE_COMMENT} This field is optional.</em></td>
             <td>
                 <!-- BEGIN mark_type_percent -->
-                <input name="mark" type="text" id="mark" size="10" maxlength="3" value="{MARK}"/><span>%</span>
+                <input name="mark" class="ralign" type="text" id="mark" size="10" maxlength="3" value="{MARK}"/><span>%</span>
                 <!-- END mark_type_percent -->
                 <!-- BEGIN mark_type_letter -->
                 <select id="mark" name="mark">
@@ -74,9 +74,13 @@
                 </select>
                 <!-- END mark_type_letter -->
                 <!-- BEGIN mark_type_raw -->
-                <input name="mark" type="text" id="mark" size="10" maxlength="15" value="{MARK}"/><span> out of {MAX_MARK}</span>
+                <input name="mark" class="ralign" type="text" id="mark" size="10" maxlength="15" value="{MARK}"/><span> out of {MAX_MARK}</span>
                 <!-- END mark_type_raw -->
-			</td>
+                <!-- BEGIN mark_type_free -->
+                <input name="mark" type="text" id="mark" size="10" maxlength="15" value="{MARK}"/>
+                <!-- END mark_type_free -->
+
+            </td>
         </tr>
         <tr>
             <td>

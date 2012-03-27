@@ -29,6 +29,11 @@ if (is_numeric($_POST['id']) && $_POST['due_date'] && $_POST['due_hour'] && $_PO
 		error(15);
 	}
 
+    // if Total Mark selected, mark value must be specified
+    if ($_POST['marktype'] == 2 && empty($_POST['markvalue'])) {
+        error(15);
+    }
+
 	$submission_box = array(
 		'id'                => $_POST['id'],
 		'accept_submission' => !empty($_POST['accept_submission']) ? true : false,
@@ -38,7 +43,8 @@ if (is_numeric($_POST['id']) && $_POST['due_date'] && $_POST['due_hour'] && $_PO
 		'name'              => $_POST['name'],
 		'description'       => $_POST['description'],
 		'type'              => $_POST['type'],
-        'mark_type'         => $_POST['marktype'],
+        'mark_type'         => empty($_POST['marktype']) ? '4' : $_POST['marktype'], // legacy support
+        'max_mark'          => !$_POST['markvalue'] ? '1' : $_POST['markvalue'],
 	);
 
 	$submission_box_handler->update($submission_box);
@@ -101,6 +107,7 @@ else if ($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_PO
 		'fid'               => $fileId,
 		'created'           => 'NOW()',
 		'owner'             => $_SESSION['id'],
+        'max_mark'          => !$_POST['markvalue'] ? '100' : $_POST['markvalue'] // if not set, default to 100
 	);
 
 	$submission_box_handler->create($submission_box);
