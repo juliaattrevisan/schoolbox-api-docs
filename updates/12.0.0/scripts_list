@@ -21,8 +21,7 @@ assess_survey/online_assess_survey.sql
 ## Adds Twitter Component to Homepage
 homepages/add_twitter_comp.sql
 
-## Adds functionality To allow soft-delete of Questionbank Categories (otherwise you might lose questions)
-## Adds functionality to allow heirachical questionbank categories
+## Adds functionality To allow soft-delete of Questionbank Categories (otherwise you might lose questions) and Adds functionality to allow heirachical questionbank categories
 question_bank/questionbank.sql
 
 ## Changes the alaress admin account's password
@@ -30,3 +29,7 @@ admin/superuser_password.sql
 
 ## Upgrades submission box to take different normalised grading types
 submission_grades/submission_grades.sql
+
+## Removes References in the Administration system to Donvale for SCHOOLBOX as the EXTERNAL DB. configuration names need to change too,
+# but I cannot do that - this just hides them from the users - Damian
+admin/remove_donvale_references.sql
