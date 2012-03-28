@@ -8,6 +8,21 @@ $this->setBlock('assess', 'resumeLink', 'resumeLink_block');
 $this->setBlock('assess', 'assessLink', 'assessLink_block');
 $this->setBlock('assess', 'assessNoLink', 'assessNoLink_block');
 
+/* Tick for checkbox which controls whether to show the Posted By details
+ */
+if ($config['compactMode']) {
+	$this->setVar(array(
+		'COMPONENT_COMPACTMODE' => 'compact-mode',
+		'COMPONENT_CONFIG_COMPACTMODE_SELECTED' => 'checked="checked"'
+	));
+}
+else {
+	$this->setVar(array(
+		'COMPONENT_COMPACTMODE' => '',
+		'COMPONENT_CONFIG_COMPACTMODE_SELECTED' => ''
+	));
+}
+
 /* Remove resumeLink by default
  */
 $this->setVar('resumeLink_block', '');

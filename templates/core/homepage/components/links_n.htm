@@ -10,14 +10,14 @@
 			<label for="componentname">Name: </label>
 			<input id='componentname' name="componentname" type="text" value="{COMPONENT_NAME}" />
 
-			Show Posted By:
+			Compact Mode:
 			<label for="links{COMPONENT_HOMEPAGE_ID}">
-				<input type="hidden" name="show_posted_by" value="0" />
-				<input id="links{COMPONENT_HOMEPAGE_ID}" type="checkbox" name="show_posted_by" value="1" {COMPONENT_CONFIG_SHOW_POSTED_BY_SELECTED} />
+				<input type="hidden" name="compactMode" value="0" />
+				<input id="links{COMPONENT_HOMEPAGE_ID}" type="checkbox" name="compactMode" value="1" {COMPONENT_CONFIG_COMPACTMODE_SELECTED} />
 			</label>
 
 			<label for="sort">Sort: </label>
-			<select id='sort' name="sort">
+			<select name="sort">
 				<!-- BEGIN sort -->
 				<option value="{COMPONENT_CONFIG_SORT_VALUE}"{COMPONENT_CONFIG_SORT_SELECTED}>{COMPONENT_CONFIG_SORT_NAME}</option>
 				<!-- END sort -->
@@ -28,7 +28,7 @@
 				<!-- END sortdir -->
 			</select>
 			<label for="size">Item Limit: </label>
-			<select id='size' name="size">
+			<select name="size">
 				<!-- BEGIN size -->
 				<option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
 				<!-- END size -->
@@ -42,7 +42,8 @@
 			<input type="hidden" name="cid" value="{ID}" />
 			<input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
 			<input type="hidden" name="component" value="{COMPONENT_ID}" />
-			<a href="#" class="delete-accept btn delete"><span></span>Yes</a> <a href="#" class="delete-reject btn go-to"><span></span>No</a>
+			<a href="#" class="delete-accept btn delete"><span></span>Yes</a>
+			<a href="#" class="delete-reject btn go-to"><span></span>No</a>
 		</form>
 	</div>
 	<!-- END config -->
@@ -56,16 +57,15 @@
 					<p class="interact"><a href="/cms/link/{LINK_ID}">Modify</a></p>
 					<!-- END modify_link -->
 				</div>
-				<p class="hide-on-small">{LINK_COMMENT}</p>
-				<!-- BEGIN show_posted_by -->
-				<p class="interact hide-on-small">Posted by <a href="/search/user/{LINK_POSTED_BY_ID}">{LINK_POSTED_BY}</a> on {LINK_POSTED_DATE}</p>
-				<!-- END show_posted_by -->
+				<p class="{COMPONENT_COMPACTMODE} hide-on-small">{LINK_COMMENT}</p>
+				<p class="{COMPONENT_COMPACTMODE} interact hide-on-small">
+					Posted by <a href="/search/user/{LINK_POSTED_BY_ID}">{LINK_POSTED_BY}</a> on {LINK_POSTED_DATE}
+				</p>
 			</li>
 			<!-- END link -->
 		</ul>
 	</div>
 	<!-- BEGIN submit_link -->
 	<p class="interact"><a href="/cms/link/new/{ID}" class="btn up-arrow"><span></span>Post Link</a></p>
-
 	<!-- END submit_link -->
 </div>

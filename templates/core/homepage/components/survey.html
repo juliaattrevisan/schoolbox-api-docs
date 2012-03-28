@@ -1,13 +1,35 @@
 <div class="box clearfix" id="component{COMPONENT_HOMEPAGE_ID}">
 	<h2>Surveys</h2>
 	<!-- BEGIN config -->
-	<a class="close-delete" href="#"><span>X</span></a>
+	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
+	<div class="editPanel settings hide">
+		<form action="/homepage/configForm.php" method="get">
+			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="type" value="config" />
+			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
+
+			Compact Mode:
+			<label for="links{COMPONENT_HOMEPAGE_ID}">
+				<input type="hidden" name="compactMode" value="0" />
+				<input id="links{COMPONENT_HOMEPAGE_ID}" type="checkbox" name="compactMode" value="1" {COMPONENT_CONFIG_COMPACTMODE_SELECTED} />
+			</label>
+
+			<input type="submit" value="Update" class="submit-btn update" />
+		</form>
+	</div>
 	<div class="editPanel delete-it hide clearfix">
 		<p>Are you sure you want to remove component?</p>
 		<form action="#" method="post">
 			<input type="hidden" name="cid" value="{ID}" />
 			<input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
 			<input type="hidden" name="component" value="{COMPONENT_ID}" />
+
+			Compact Mode:
+			<label for="links{COMPONENT_HOMEPAGE_ID}">
+				<input type="hidden" name="compactMode" value="0" />
+				<input id="links{COMPONENT_HOMEPAGE_ID}" type="checkbox" name="compactMode" value="1" {COMPONENT_CONFIG_COMPACTMODE_SELECTED} />
+			</label>
+
 			<a href="#" class="delete-accept btn delete"><span></span>Yes</a> <a href="#" class="delete-reject btn go-to"><span></span>No</a>
 		</form>
 	</div>
@@ -37,7 +59,7 @@
                     </p>
 
 				</div>
-                <p class="summ hide-on-small">{SURVEY_DESCRIPTION}</p>
+                <p class="{COMPONENT_COMPACTMODE} summ hide-on-small">{SURVEY_DESCRIPTION}</p>
 			</li>
 			<!-- END survey -->
 		</ul>

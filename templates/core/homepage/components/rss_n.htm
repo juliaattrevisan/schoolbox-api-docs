@@ -1,18 +1,26 @@
 <div class="box clearfix" id="component{COMPONENT_HOMEPAGE_ID}">
 	<h2>RSS Feed - {RSS_NAME}</h2>
-	<!-- BEGIN config --> 
+	<!-- BEGIN config -->
 	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
 	<div class="editPanel settings hide">
 		<form action="/homepage/configForm.php" method="get">
 			<input type="hidden" name="cid" value="{ID}" />
 			<input type="hidden" name="type" value="config" />
 			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
+
+			Compact Mode:
+			<label for="rss{COMPONENT_HOMEPAGE_ID}">
+				<input type="hidden" name="compactMode" value="0" />
+				<input id="rss{COMPONENT_HOMEPAGE_ID}" type="checkbox" name="compactMode" value="1" {COMPONENT_CONFIG_COMPACTMODE_SELECTED} />
+			</label>
+
 			<label for="size">Item Limit: </label>
 			<select name="size">
 				<!-- BEGIN size -->
 				<option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
 				<!-- END size -->
 			</select>
+
 			<label for="url">URL: </label>
 			<input type="text" name="url" value="{COMPONENT_CONFIG_URL}" />
 			<input type="submit" value="Update" class="submit-btn update" />
@@ -34,13 +42,15 @@
 			<li class="clearfix {ON_OFF}">
 				<div class="clearfix">
 					<h4><a href="/redir.php?url={RSS_URL}">{RSS_TITLE}</a></h4>
-					<div class="small-right"> 
+					<div class="{COMPONENT_COMPACTMODE} small-right">
 						<!-- BEGIN rss_date -->
 						<p class="small summ">Posted {RSS_POSTED_DATE}</p>
-						<!-- END rss_date --> 
+						<!-- END rss_date -->
 					</div>
 				</div>
-				<p class="summ hide-on-small">{RSS_BRIEF}</p>
+				<div class='{COMPONENT_COMPACTMODE}'>
+					<p class="summ hide-on-small">{RSS_BRIEF}</p>
+				</div>
 			</li>
 			<!-- END rss_stories -->
 		</ul>

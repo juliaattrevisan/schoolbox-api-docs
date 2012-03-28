@@ -7,16 +7,24 @@ $this->setBlock('link', 'show_posted_by', 'show_posted_by_block');
 $linkHandler = new Link();
 $linkList = $linkHandler->getAllInCategory($categoryID, $config);
 
+/* Set up component name
+ */
+$this->setvar(array(
+	'COMPONENT_NAME' => strlen(trim($config['componentname'])) ? $config['componentname'] : 'Links'
+));
+
 /* Tick for checkbox which controls whether to show the Posted By details
  */
-if ($config['show_posted_by']) {
+if ($config['compactMode']) {
 	$this->setVar(array(
-		'COMPONENT_CONFIG_SHOW_POSTED_BY_SELECTED' => 'checked="checked"'
+		'COMPONENT_COMPACTMODE' => 'compact-mode',
+		'COMPONENT_CONFIG_COMPACTMODE_SELECTED' => 'checked="checked"'
 	));
 }
 else {
 	$this->setVar(array(
-		'COMPONENT_CONFIG_SHOW_POSTED_BY_SELECTED' => ''
+		'COMPONENT_COMPACTMODE' => '',
+		'COMPONENT_CONFIG_COMPACTMODE_SELECTED' => ''
 	));
 }
 
@@ -76,12 +84,6 @@ if (is_array($linkList)) {
 else {
 	$this->setVar("link_block", "");
 }
-
-/* Set up component name
- */
-$this->setvar(array(
-	'COMPONENT_NAME' => strlen(trim($config['componentname'])) ? $config['componentname'] : 'Links'
-));
 
 //setup block for submission button
 $this->setBlock($componentHandle, "submit_link", "submit_link_block");

@@ -1,12 +1,19 @@
 <div class="box clearfix" id="component{COMPONENT_HOMEPAGE_ID}">
 	<h2>Due Work</h2>
-	<!-- BEGIN config --> 
+	<!-- BEGIN config -->
 	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
 	<div class="editPanel settings hide">
 		<form action="/homepage/configForm.php" method="get">
 			<input type="hidden" name="cid" value="{ID}" />
 			<input type="hidden" name="type" value="config" />
 			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
+
+			Compact Mode:
+			<label for="links{COMPONENT_HOMEPAGE_ID}">
+				<input type="hidden" name="compactMode" value="0" />
+				<input id="links{COMPONENT_HOMEPAGE_ID}" type="checkbox" name="compactMode" value="1" {COMPONENT_CONFIG_COMPACTMODE_SELECTED} />
+			</label>
+
 			<label for="size">Item Limit: </label>
 			<select name="size">
 				<!-- BEGIN size -->
@@ -30,9 +37,13 @@
 		<ul>
 			<!-- BEGIN duework -->
 			<li class="{ON_OFF} clearfix">
-				<h4><span class="hide-on-small">{DUE_TYPE} - </span>{DUE_NAME}</h4>
+				<h4><span class="{COMPONENT_COMPACTMODE} hide-on-small">{DUE_TYPE} - </span>{DUE_NAME}</h4>
 				<div class="small-right">
-					<p class="interact">{DUE_DATE}<!-- BEGIN duework_actions --> <a href="{DUE_ACTION}">{DUE_ACTION_NAME}</a><!-- END duework_actions --></p>
+					<p class="interact">{DUE_DATE}
+						<!-- BEGIN duework_actions -->
+						<a href="{DUE_ACTION}">{DUE_ACTION_NAME}</a>
+						<!-- END duework_actions -->
+					</p>
 				</div>
                 <p class="summ hide-on-small">{DUE_COMMENT}</p>
 			</li>
@@ -41,5 +52,5 @@
 	</div>
 	<!-- BEGIN submit_dw -->
 	<p class="interact"><a href="/submission/createSubmission/new/{ID}/" class="btn up-arrow"><span></span>Post Due Work Item</a></p>
-	<!-- END submit_dw --> 
+	<!-- END submit_dw -->
 </div>

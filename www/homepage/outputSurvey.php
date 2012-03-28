@@ -10,6 +10,21 @@ $this->setBlock('survey', 'surveyNoLink', 'surveyNoLink_block');
 $this->setBlock('survey', 'surveyLink', 'surveyLink_block');
 $this->setBlock('survey', 'resumeLink', 'resumeLink_block');
 
+/* Tick for checkbox which controls whether to show the Posted By details
+ */
+if ($config['compactMode']) {
+	$this->setVar(array(
+		'COMPONENT_COMPACTMODE' => 'compact-mode',
+		'COMPONENT_CONFIG_COMPACTMODE_SELECTED' => 'checked="checked"'
+	));
+}
+else {
+	$this->setVar(array(
+		'COMPONENT_COMPACTMODE' => '',
+		'COMPONENT_CONFIG_COMPACTMODE_SELECTED' => ''
+	));
+}
+
 /* Remove resumeLink by default
  */
 $this->setVar('resumeLink_block', '');

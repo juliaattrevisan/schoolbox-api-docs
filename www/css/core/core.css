@@ -6238,3 +6238,9 @@ ul.tree .collapsable .hitarea {
 #requestList .no-arrow {
 	background: none;
 }
+
+/* Compact Mode for homepage components
+ */
+.compact-mode {
+	display: none;
+}

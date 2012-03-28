@@ -16,6 +16,21 @@ $this->setJavascript('/javascript/swfobject.js');
 $this->setBlock($componentHandle, 'podcast_list', 'podcast_list_block');
 $this->setVar('podcast_list_block', '');
 
+/* Tick for checkbox which controls whether to show the Posted By details
+ */
+if ($config['compactMode']) {
+	$this->setVar(array(
+		'COMPONENT_COMPACTMODE' => 'compact-mode',
+		'COMPONENT_CONFIG_COMPACTMODE_SELECTED' => 'checked="checked"'
+	));
+}
+else {
+	$this->setVar(array(
+		'COMPONENT_COMPACTMODE' => '',
+		'COMPONENT_CONFIG_COMPACTMODE_SELECTED' => ''
+	));
+}
+
 require_once SITE_root.'/library/Xml.php';
 require_once SITE_root.'/include/FileType.php';
 
@@ -35,7 +50,7 @@ if (!empty($config['url'])) {
 				/* Exit loop once maximum displayable is reached
 				 * Otherwise continue iterating
 				 */
-				if ($j == $config['size']) {
+				if (($j == $config['size']) && ($config['size'] > 0)) {
 					break;
 				}
 				else {
@@ -67,6 +82,7 @@ if (!empty($config['url'])) {
 						 */
 						$j++;
 					}
+
 				}
 			}
 		}

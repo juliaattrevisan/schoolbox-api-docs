@@ -1,12 +1,19 @@
 <div class="box clearfix" id="component{COMPONENT_HOMEPAGE_ID}">
 	<h2>Forum</h2>
-	<!-- BEGIN config --> 
+	<!-- BEGIN config -->
 	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
 	<div class="editPanel settings hide">
 		<form action="/homepage/configForm.php" method="get">
 			<input type="hidden" name="cid" value="{ID}" />
 			<input type="hidden" name="type" value="config" />
 			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
+
+			Compact Mode:
+			<label for="forum{COMPONENT_HOMEPAGE_ID}">
+				<input type="hidden" name="compactMode" value="0" />
+				<input id="forum{COMPONENT_HOMEPAGE_ID}" type="checkbox" name="compactMode" value="1" {COMPONENT_CONFIG_COMPACTMODE_SELECTED} />
+			</label>
+
 			<label for="sort">Sort: </label>
 			<select name="sort">
 				<!-- BEGIN sort -->
@@ -40,9 +47,11 @@
 					<h4><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE}</a></h4>
 					<!-- BEGIN forum_reply -->
 					<p class="interact"><a href="/forum/modify/{ID}/{THREAD_ID}">Reply</a></p>
-					<!-- END forum_reply --> 
+					<!-- END forum_reply -->
 				</div>
-				<p class="small hide-on-small">Posted by <a href="/search/user/{THREAD_USER_ID}">{THREAD_USER}</a> {THREAD_DATE}</p>
+				<div class='{COMPONENT_COMPACTMODE}'>
+					<p class="small hide-on-small">Posted by <a href="/search/user/{THREAD_USER_ID}">{THREAD_USER}</a> {THREAD_DATE}</p>
+				</div>
 			</li>
 			<!-- END forum -->
 		</ul>

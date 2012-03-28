@@ -4,6 +4,22 @@ $this->setBlock($componentHandle, 'files', 'files_block');
 $this->setBlock('files', 'file_url', 'file_url_block');
 $this->setBlock('files', 'file_no_url', 'file_no_url_block');
 $this->setBlock('files', 'modify_file', 'modify_file_block');
+
+/* Tick for checkbox which controls whether to show the Posted By details
+ */
+if ($config['compactMode']) {
+	$this->setVar(array(
+		'COMPONENT_COMPACTMODE' => 'compact-mode',
+		'COMPONENT_CONFIG_COMPACTMODE_SELECTED' => 'checked="checked"'
+	));
+}
+else {
+	$this->setVar(array(
+		'COMPONENT_COMPACTMODE' => '',
+		'COMPONENT_CONFIG_COMPACTMODE_SELECTED' => ''
+	));
+}
+
 /*
 $c = array('filter'	=> array('document','audio','video','image','other'),
 		   'filterOptions' => array('document','audio','video','image','other'),

@@ -2,6 +2,21 @@
 $this->setBlock($componentHandle, 'rss_stories', 'rss_block');
 $this->setBlock('rss_stories', 'rss_date', 'rss_date_block');
 
+/* Tick for checkbox which controls whether to show the Posted By details
+ */
+if ($config['compactMode']) {
+	$this->setVar(array(
+		'COMPONENT_COMPACTMODE' => 'compact-mode',
+		'COMPONENT_CONFIG_COMPACTMODE_SELECTED' => 'checked="checked"'
+	));
+}
+else {
+	$this->setVar(array(
+		'COMPONENT_COMPACTMODE' => '',
+		'COMPONENT_CONFIG_COMPACTMODE_SELECTED' => ''
+	));
+}
+
 /* Initialise feed
  */
 $rss = new Alaress_Rss_Stream($config['url']);

@@ -1,5 +1,20 @@
 <?php
 
+/* Tick for checkbox which controls whether to show the Posted By details
+ */
+if ($config['compactMode']) {
+	$this->setVar(array(
+		'COMPONENT_COMPACTMODE' => 'compact-mode',
+		'COMPONENT_CONFIG_COMPACTMODE_SELECTED' => 'checked="checked"'
+	));
+}
+else {
+	$this->setVar(array(
+		'COMPONENT_COMPACTMODE' => '',
+		'COMPONENT_CONFIG_COMPACTMODE_SELECTED' => ''
+	));
+}
+
 //dont show forums to parents if they not a direct member of group
 if ($groupHandler->isParent() && !$groupHandler->involvedInGroup($_SESSION['id'], $categoryID)) {
 	$componentHandle = '';
