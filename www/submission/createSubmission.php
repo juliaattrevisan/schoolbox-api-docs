@@ -5,7 +5,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 $this->setFile(TEMPLATE_content, 'submission/createSubmission.html');
 $this->setTab('submission');
 $this->setBlock(TEMPLATE_content, 'browse_row', 'browse_block');
-$this->setBlock(TEMPLATE_content, 'category_select', 'category_select_block');
 $this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
 
 $this->setVar('category_select_block', '');
@@ -63,6 +62,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         'DESCRIPTION'   => $subbox['description'],
         'FILEID'        => '',
         'ACCEPT_SUBMISSION' => $subbox['accept_submission'] ? 'checked="checked"' : '',
+        'MULTI_SUBMISSION' => $subbox['multi_submission'] ? 'checked="checked"' : '',
         'OPEN_DATE'     => date('d/m/Y', $open_date),
         'OPEN_HOUR'     => $open_hour,
         'OPEN_MIN'      => $open_min,
@@ -123,9 +123,6 @@ else if($this->arg[0] == 'new') {
 		$categoryList[$i]['name'] .= ' ('.$categoryList[$i]['code'].')';
 	}
 
-	$this->dropDown('category', $categoryList, $this->arg[1], 'category_select', array('id' => 'CATEGORY_ID', 'name' => 'CATEGORY_NAME'));
-	$this->parse('category_select_block', 'category_select');
-
     /* Output submission type drop down */
 
 	/* Exclude online assessment type
@@ -164,7 +161,8 @@ else if($this->arg[0] == 'new') {
                     'DESCRIPTION' => $file['description'],
                     'FILEID'    => $file['id'],
                     'CATLIST'   => $catOutput,
-                    'ACCEPT_SUBMISSION' => 'checked="checked"',
+                    'ACCEPT_SUBMISSION' => '', // checked no longer default
+                    'MULTI_SUBMISSION' => '',
                     'OPEN_DATE' => date('d/m/Y', $open_date),
                     'OPEN_HOUR' => $open_hour,
                     'OPEN_MIN'  => '00',

@@ -60,30 +60,54 @@ if (is_numeric($this->arg[0])) {
 				continue;
 			}
 
-			/* If already marked display mark, else provide link to return mark */
             $return = $returnHandler->getByUser($user['uid'], $this->arg[0]);
 
-            $subDate = new Alaress_Date_Format($studentSub['datestamp'], 'y-m-d j:i:s');
-
+            $i = 0;
             if (is_array($studentSub)) {
-                $output = array(
-					'OWNER' => $userHandler->formatName($user, '{lastname}, {firstname}'),
-					'OWNER_ID' => $user['uid'],
-					'OWNER_ESCAPED' => addslashes($userHandler->formatName($student, '{lastname}, {firstname}')),
-					'SUB_ID' => $studentSub['id'],
-					'SUBMITTED' => $studentSub['date'],
-                    // check if submission date if after due date; if so, mark as late (ignore $studentSub['late'])
-                    'COLOUR' => $dueDate->getUnixTimestamp() < $subDate->getUnixTimestamp() ? '#ff0000' : '#000000',
-					'MARK' => $return[0]['visible_mark'],
-                    'SCORE' => $studentSub['score'],
-					'ON_OFF' => ++$i % 2 ? '' : 'dark',
-					'REMARK' => $remark,
-                );
+                // if multi-submit has been disabled, only display the most recent submission
+                if(!$subBox['multi_submission']) {
+                   $studentSub = array($studentSub[0]);
+                }
 
-                $this->setVar($output);
+                foreach($studentSub as $submission) {
+                    $subDate = new Alaress_Date_Format($submission['datestamp'], 'y-m-d j:i:s');
 
-                $this->parse('download_action_block', 'download_action', false);
-                $this->parse('delete_action_block', 'delete_action', false);
+                    $output = array(
+                        'OWNER' => $userHandler->formatName($user, '{lastname}, {firstname}'),
+                        'OWNER_ID' => $user['uid'],
+                        'OWNER_ESCAPED' => addslashes($userHandler->formatName($student, '{lastname}, {firstname}')),
+                        'SUB_ID' => $submission['id'],
+                        'SUBMITTED' => $submission['date'],
+
+                        // check if submission date if after due date; if so, mark as late (ignore $studentSub['late'])
+                        'COLOUR' => $dueDate->getUnixTimestamp() < $subDate->getUnixTimestamp() ? '#ff0000' : '#000000',
+
+                        // only display the mark on the top row per student
+                        'SCORE' => $submission['score'],
+                    );
+
+                    if($i == 0) {
+                        $output['MARK'] = $return[0]['visible_mark'];
+                        $output['SUBMISSION_EXPANDABLE'] = '';
+                        $output['SUBMISSION_HIDDEN'] = '';
+                        $this->setVar($output);
+                        $this->parse('mark_action_block', 'mark_action', false);
+                    }
+                    else {
+                        $output['MARK'] = '';
+                        $output['SUBMISSION_EXPANDABLE'] = 'expandable';
+                        $output['SUBMISSION_HIDDEN'] = 'hide';
+                        $output['mark_action_block'] = '';
+                        $this->setVar($output);
+                    }
+
+                    $i++;
+
+                    $this->parse('download_action_block', 'download_action', false);
+                    $this->parse('delete_action_block', 'delete_action', false);
+
+                    $this->parse('submission_listing', 'submission_block', true);
+                }
             }
             else {
                 $output = array(
@@ -94,17 +118,18 @@ if (is_numeric($this->arg[0])) {
 					'COLOUR' => '',
 					'MARK' => $return[0]['visible_mark'],
                     'SCORE' => '',
-					'ON_OFF' => ++$i % 2 ? '' : 'dark',
+                    'SUBMISSION_EXPANDABLE' => '',
+                    'SUBMISSION_HIDDEN' => '',
                 );
 
                 $this->setVar($output);
 
                 $this->setVar('download_action_block', '');
                 $this->setVar('delete_action_block', '');
+                $this->parse('mark_action_block', 'mark_action', false);
+                $this->parse('submission_listing', 'submission_block', true);
             }
 
-            $this->parse('mark_action_block', 'mark_action', false);
-            $this->parse('submission_listing', 'submission_block', true);
         }
     }
     else {
@@ -115,13 +140,6 @@ if (is_numeric($this->arg[0])) {
 
 				/* If already marked display mark, else provide link to return mark */
                 $return = $returnHandler->getByUser($line['uid'], $this->arg[0]);
-
-				if (is_array($return)) {
-					$mark = $return[0]['mark'];
-				}
-				else {
-					$mark = "<a href=\"/submission/returnWork/".$this->arg[0]."/".$line['uid']."\">Mark</a>";
-				}
 
                 if ( empty($line['score']) ) {
                     $score = '-';
@@ -139,13 +157,12 @@ if (is_numeric($this->arg[0])) {
 					'COLOUR' => $line['late'] ? '#ff0000' : '#000000',
 					'MARK' => $return[0]['mark'],
                     'SCORE' => $score,
-					'ON_OFF' => ++$i % 2 ? '' : 'dark',
             	);
 
 				$this->setVar($output);
 				$this->parse('download_action_block', 'download_action');
 				$this->parse('mark_action_block', 'mark_action', false);
-				$this->parse("submission_listing","submission_block", true);
+				$this->parse('submission_listing', 'submission_block', true);
 				$this->parse('delete_action_block', 'delete_action');
             }
         }

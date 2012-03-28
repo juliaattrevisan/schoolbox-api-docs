@@ -9,6 +9,7 @@ $this->setBlock(TEMPLATE_content, 'recent_submission', 'recent_submission_block'
 $this->setBlock(TEMPLATE_content, 'returned_work', 'returned_work_block');
 $this->setBlock('returned_work', 'return_file','return_file_block');
 $this->setBlock('recent_submission', 'overdue', 'overdue_block');
+$this->setBlock('recent_submission', 'action_resubmit', 'action_resubmit_block');
 $this->setBlock('subject', 'work', 'work_block');
 $this->setBlock('work', 'action_view_submitted', 'action_view_submitted_block');
 $this->setBlock('work', 'action_view_returned', 'action_view_returned_block');
@@ -170,8 +171,9 @@ else {
 
 if($recentSubmission['sid']) {
 
-   /* Show most recent submisison
+   /* Show most recent submission
     * Hide Submit form
+    * If multi-submit is enabled, show the Resubmit form
     * Find out whether the latest submission was overdue
     */
 
@@ -191,11 +193,18 @@ if($recentSubmission['sid']) {
        'MOST_RECENT_SUBMISSION_FILE_ID' => $recentSubmission['sid'],
    ));
 
+   if($submissionBox['multi_submission']) {
+       $this->parse('action_resubmit_block', 'action_resubmit');
+   } else {
+       $this->setVar('action_resubmit_block', '');
+   }
+
    $this->parse('recent_submission_block', 'recent_submission');
 }
 else {
 	/* Hide most recent submission
 	 * Show Submit form
+	 * Hide the Resubmit form
 	 */
     if($userID == $_SESSION['id'] && mktime() > strtotime($submissionBox['open_date']) && mktime() < strtotime($submissionBox['late_date']) && $submissionBox['accept_submission'])
 	    $this->parse('action_submit_block', 'action_submit');
@@ -203,6 +212,7 @@ else {
         $this->setVar('action_submit_block','');
 
 	$this->setVar('recent_submission_block', '');
+    $this->setVar('action_resubmit_block', '');
 
 }
 

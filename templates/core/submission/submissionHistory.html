@@ -39,7 +39,6 @@
 <!-- BEGIN recent_submission -->
 <div class="submission-history background" id="submitted">
 	<h4>Your most recent submission</h4>
-
 	<p class="clearfix"><a
 			href="/submission/send.php?id={MOST_RECENT_SUBMISSION_FILE_ID}"
 			class="btn float-left"><span></span>View Submitted Work</a></p>
@@ -49,33 +48,47 @@
 	(Overdue)
 	<!-- END overdue -->
 
+    <!-- BEGIN action_resubmit -->
+    <h4 style="margin-top:24px;">Resubmit Work</h4>
+    <form method="post" action="/submission/submitWorkForm.php" class="clearfix"
+          enctype="multipart/form-data">
+        <p> You may resubmit your work by locating the file on your drive.
+            Make sure the file is saved and closed before submitting the
+            form.
+        </p>
+        <input type="file" class="prettify" name="file"/>
+        <label class="clearfix">
+            <input type="hidden" name="box_id" value="{BOX_ID}"/>
+        </label>
+        <label>
+            <input type="submit" name="Submit2" value="Submit"
+                   class="submit-btn-plain"/>
+        </label>
+    </form>
+    <!-- END action_resubmit -->
 </div>
 <!-- END recent_submission -->
 
-
-	<!-- BEGIN action_submit -->
-	<div class="submission-history background">
-
-	<h4 style="margin-top:8px;">Submit Work</h4>
-
-	<form method="post" action="/submission/submitWorkForm.php" class="clearfix"
-		  enctype="multipart/form-data">
-		<p> You must attach your work by locating the file on your drive.
-			Make sure the file is saved and closed before submitting the
-			form. </p>
-
-		<input type="file" class="prettify" name="file"/>
-
-		<label class="clearfix">
-			<input type="hidden" name="box_id" value="{BOX_ID}"/>
-		</label>
-		<label>
-			<input type="submit" name="Submit2" value="Submit"
-				   class="submit-btn-plain"/>
-		</label>
-	</form>
-		</div>
-	<!-- END action_submit -->
+<!-- BEGIN action_submit -->
+<div class="submission-history background">
+    <h4 style="margin-top:8px;">Submit Work</h4>
+    <form method="post" action="/submission/submitWorkForm.php" class="clearfix"
+          enctype="multipart/form-data">
+        <p> You must attach your work by locating the file on your drive.
+            Make sure the file is saved and closed before submitting the
+            form.
+        </p>
+        <input type="file" class="prettify" name="file"/>
+        <label class="clearfix">
+            <input type="hidden" name="box_id" value="{BOX_ID}"/>
+        </label>
+        <label>
+            <input type="submit" name="Submit2" value="Submit"
+                   class="submit-btn-plain"/>
+        </label>
+    </form>
+</div>
+<!-- END action_submit -->
 
 
 <!-- BEGIN returned_work -->

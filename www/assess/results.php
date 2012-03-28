@@ -89,7 +89,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 		'ASSESS_ASSESS_ID' => $page->arg[0],
 		'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
 		'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
-		'USER_ID' => $currentStudent['uid'],
+		'USER_ID' => $currentAttempt['user_id'],
 		'ATTEMPT_NAME' => $currentAttempt['lastname'] . ', ' . $currentAttempt['firstname'],
 		'ATTEMPT_FINISH' => $finish,
 		'ATTEMPT_TIME_TAKEN' => $timeTaken,
@@ -186,6 +186,12 @@ if (is_array($allStudents) && count($allStudents)) {
 	 */
 	foreach($allStudents as $currentStudent) {
 		$previousAttempt = null;
+
+        // need to append uid if synergetic
+        if($currentStudent['synergy_id'] && !$currentStudent['uid']) {
+            $user = $userHandler->getBySynergy($currentStudent['synergy_id']);
+            $currentStudent['uid'] = $user['uid'];
+        }
 
 		/* Process all attempts for this student
 		 */

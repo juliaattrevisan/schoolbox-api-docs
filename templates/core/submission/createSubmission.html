@@ -29,9 +29,9 @@
 
         $j('#marktype').change(function() {
             if( $j('#marktype option:selected').first().val() == 3) {
-                $j('.marks-hide').show();
+                $j('.marks-hide').show(500);
             } else {
-                $j('.marks-hide').hide();
+                $j('.marks-hide').hide(500);
             }
         });
 
@@ -41,9 +41,9 @@
 
         $j('input:checkbox[name=accept_submission]').change(function () {
             if ($j(this).is(':checked')) {
-                $j('.accept-hide').show();
+                $j('.accept-hide').show(500);
             } else {
-                $j('.accept-hide').hide();
+                $j('.accept-hide').hide(500);
             }
         });
 
@@ -56,9 +56,23 @@
 	});
 	
 </script>
+
+<style>
+    .accept-hide, .marks-hide {
+        background-color: #E9E3D6;
+    }
+
+    .accept-hide td, .marks-hide td {
+        border-bottom: solid 1px #FAF9F5;
+    }
+
+    input[type="text"] {
+        border: solid 1px #ccc;
+    }
+</style>
 <!-- END custom_head -->
 
-<h1>{HEADING} Submission Box</h1>
+<h1>{HEADING} Due Work</h1>
 <form action="/submission/submissionForm.php" method="post" name="form" class="clearfix" id="createSubmissionForm"  enctype="multipart/form-data">
 	<input type="hidden" name="category" value="{CATEGORY}" />
 	<table class="standardForm">
@@ -76,33 +90,27 @@
         </tr>
 		<!-- BEGIN browse_row -->
 		<tr>
-			<td class="formLabelWidth"><h4>File</h4>
-				<em>This is an optional file that will be related with the submission box and made available for download</em></td>
-			<td><input type="file" name="file" class="prettify"/>
-				<input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" /></td>
+			<td class="formLabelWidth">
+                <h4>File</h4>
+				<em>This is an optional file that will be related with the due work and made available for download.</em>
+            </td>
+			<td>
+                <input type="file" name="file" class="prettify" />
+				<input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" />
+            </td>
 		</tr>
 		<!-- END browse_row -->
 		<tr>
-			<td class="formLabelWidth" valign="top"><h4>Location</h4>
-				<em>This submission box will be located in the following folder:</em>{CURRENT_CAT} </td>
-			<td>
-                <!-- BEGIN category_select -->
-				<select name="category">
-					<!-- BEGIN category -->
-					<option value="{CATEGORY_ID}" {CATEGORY_ID_SELECTED}>{CATEGORY_NAME}</option>
-					<!-- END category -->
-				</select>
-				<!-- END category_select -->
+            <td>
+                <h4>Due Work Type</h4>
+                <em>What kind of assessment is this?</em>
             </td>
-		</tr>
-		<tr>
-            <td><h4>Submission Type</h4>
-                <em>What is the purpose of this submission box?</em></td>
-            <td><select name="type" class="formfield">
-                <!-- BEGIN type_drop -->
-                <option value="{TYPE_VALUE}" {TYPE_VALUE_SELECTED}>{TYPE_TEXT}</option>
-                <!-- END type_drop -->
-            </select>
+            <td>
+                <select name="type" class="formfield">
+                    <!-- BEGIN type_drop -->
+                    <option value="{TYPE_VALUE}" {TYPE_VALUE_SELECTED}>{TYPE_TEXT}</option>
+                    <!-- END type_drop -->
+                </select>
             </td>
         </tr>
         <!-- BEGIN marktype -->
@@ -130,12 +138,18 @@
         <!-- END marktype -->
         <tr>
 			<td><h4>Accept Submissions</h4>
-				<em>Should the submission box accept electronic submissions?</em></td>
+				<em>Will this work be submitted electronically?</em></td>
 			<td><input name="accept_submission" type="checkbox" value="true" {ACCEPT_SUBMISSION}></td>
 		</tr>
+        <tr class="accept-hide">
+            <td><h4>Multiple Submissions</h4>
+                <em>Should multiple submissions be accepted?</em></td>
+            <td><input name="multi_submission" type="checkbox" value="true" {MULTI_SUBMISSION}></td>
+        </tr>
+
 		<tr class="accept-hide">
 			<td class="formLabelWidth"><h4>Open Date</h4>
-				<em>The date from when the submission box will be available for submission. To make the box never available but have the date published, set this date to after the due date.</em></td>
+				<em>The date from when the due work will be available for submission. To make the box never available but have the date published, set this date to after the due date.</em></td>
 			<td><input name="open_date" id="open_date" type="text" value="{OPEN_DATE}" size="20" />
 				<input name="open_hour" type="text" maxlength="2" value="{OPEN_HOUR}" class="timeField" />
 				<span>:</span>

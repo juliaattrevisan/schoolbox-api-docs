@@ -661,10 +661,26 @@ class Submission extends DeprecatedModel {
     }
 
     function getAllForBox($box_id) {
-       $query = "SELECT ss.id, realname, u.firstname, u.lastname
-               FROM student_submission ss
-               JOIN `user` u ON ss.owner = u.id
-               WHERE box_id = $box_id";
+        $query = "SELECT multi_submission FROM submission_box WHERE id = $box_id";
+        $multi = $this->db->getOne($query);
+
+        // if multiselect has been disabled, return THE MOST RECENT submission from each student in the box
+        if($multi)
+            $query = "SELECT ss.id, realname, u.firstname, u.lastname
+                      FROM student_submission ss
+                      JOIN `user` u ON ss.owner = u.id
+                      WHERE box_id = $box_id ";
+        else
+            $query = "SELECT * FROM
+                      (
+                          SELECT ss.id, realname, u.firstname, u.lastname, u.id AS uid
+                          FROM student_submission ss
+                          JOIN `user` u ON ss.owner = u.id
+                          WHERE box_id = $box_id
+                          ORDER BY id DESC
+                      ) foo
+                      GROUP BY uid
+                      ORDER BY lastname, firstname ";
 
        return $this->db->getAll($query);
     }

@@ -37,6 +37,7 @@ if (is_numeric($_POST['id']) && $_POST['due_date'] && $_POST['due_hour'] && $_PO
 	$submission_box = array(
 		'id'                => $_POST['id'],
 		'accept_submission' => !empty($_POST['accept_submission']) ? true : false,
+        'multi_submission'  => !empty($_POST['multi_submission'])  ? true : false,
 		'open_date'         => $open_date,
 		'date'              => $due_date,
 		'late_date'         => $late_date,
@@ -97,6 +98,7 @@ else if ($_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_PO
 	$submission_box = array(
 		'category'          => $_POST['category'],
 		'accept_submission' => !empty($_POST['accept_submission']) ? true : false,
+        'multi_submission'  => !empty($_POST['multi_submission'])  ? true : false,
 		'open_date'         => $open_date,
 		'date'              => $due_date,
 		'late_date'         => $late_date,

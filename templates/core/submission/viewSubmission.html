@@ -1,3 +1,39 @@
+<script type="text/javascript">
+    $j(function() {
+        // Add the dark class only to even rows that are visible (skip over the hidden ones)
+        $j('tbody tr:visible:even').addClass('dark');
+
+        // Add another, darker class to th
+        $j('tbody tr:hidden').addClass('sub-table-row');
+
+        $j('tr.submission').each(function() {
+            if ($j(this).next().hasClass('expandable') && !$j(this).hasClass('expandable')) {
+                $j(this).addClass('drop-parent').children('td:first-child').prepend('<a href="#" class="submission-dropdown">&#9660;</a>');
+            }
+        });
+
+        $j('.submission-dropdown').live('click', function() {
+            var currentUnicode = $j(this).html().charCodeAt(0);
+
+            if (currentUnicode == '9660') {
+                $j(this).html('&#9650;')
+            }
+            else {
+                $j(this).html('&#9660;')
+            }
+
+            var matchingClasses = $j(this).parents('tr').attr('class').toString().match(/user_(\d+)/);
+            var expandables = '.' + matchingClasses[0] + '.expandable';
+
+            // Clear queue and complete animation
+            $j(this).parents('tbody').find(expandables).stop(true, true).fadeToggle();
+
+            return false;
+        });
+
+    });
+</script>
+
 <h1>{ASSDESC}</h1>
 <span class="header_option">
     <a href="/submission/downloadAll.php?id={BOX_ID}" class="btn download"><span></span>Download All</a>
@@ -7,11 +43,10 @@
 </span>
 <p>Due on {DUE_DATE}</p>
 <div class="indent">
-    <p>These are the assignments that have been submitted. Deleting an assignment from here will allow the student to resubmit. Assignments in red are late.</p>
-
+    <p>These are the assignments that have been submitted. Deleting an assignment from here will allow the student to resubmit if multiple submissions are not allowed. Assignments in red are late.</p>
     <table class="ruler">
-	
 		<colgroup>
+			<col />
 			<col width="20%" />
 			<col width="20%" />
 			<col width="20%" />
@@ -19,9 +54,9 @@
 			<col width="15%" />
 			<col width="15%" />
 		</colgroup>
-		
         <thead>
             <tr>
+                <th>&nbsp;</th>
                 <th>Submitted By</th>
                 <th>Submitted Date</th>
                 <th>Mark</th>
@@ -33,25 +68,21 @@
         </thead>
         <tbody>
             <!-- BEGIN submission_block -->
-            <tr class="{ON_OFF}">
+            <tr class="submission user_{OWNER_ID} {SUBMISSION_EXPANDABLE} {SUBMISSION_HIDDEN}">
+                <td width="2"></td>
                 <td style="color:{COLOUR}; white-space: nowrap;">
-				
-				<a  href="/search/user/{OWNER_ID}">{OWNER}</a>
-				
+    				<a  href="/search/user/{OWNER_ID}">{OWNER}</a>
 				</td>
                 <td style="color:{COLOUR};">{SUBMITTED}</td>
                 <td>{MARK}</td>
                 <td>{SCORE}</td>
                 <td><!-- BEGIN download_action --><a href="/submission/send.php?id={SUB_ID}">Download</a><!-- END download_action --></td>
-                <td><!-- BEGIN delete_action -->
-				<a href="/submission/viewSubmissionForm.php?delete={SUB_ID}" onclick="return(confirm('Remove {OWNER_ESCAPED}\'s submission? '));">Delete</a>
-				<!-- END delete_action --></td>
                 <td>
-				<!-- BEGIN mark_action -->
-				
-				<a href="/submission/returnWork/{BOX_ID}/{OWNER_ID}">Mark</a>
-				
-				<!-- END mark_action --></td>
+                    <!-- BEGIN delete_action -->
+				    <a href="/submission/viewSubmissionForm.php?delete={SUB_ID}" onclick="return(confirm('Remove {OWNER_ESCAPED}\'s submission? '));">Delete</a>
+				    <!-- END delete_action -->
+                </td>
+                <td><!-- BEGIN mark_action --><a href="/submission/returnWork/{BOX_ID}/{OWNER_ID}">Mark</a><!-- END mark_action --></td>
             </tr>
             <!-- END submission_block -->
         </tbody>
