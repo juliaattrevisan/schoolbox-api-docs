@@ -1,0 +1,26 @@
+<h1>{SURVEY_NAME}</h1>
+
+<div class="header_option clearfix">
+	<a href="/homepage/{CID}" class="btn go-back"><span></span>Back to Homepage</a>
+</div>
+
+<div class="evaluation-question-section">
+	<table>
+		<tr>
+			<th>Student</th>
+			<th>Start</th>
+			<th>Finish</th>
+			<th>Reviewed</th>
+			<th>Action</th>
+		</tr>
+		<!-- BEGIN attempt -->
+		<tr>
+			<td>{ATTEMPT_LASTNAME}, {ATTEMPT_FIRSTNAME}</td>
+			<td>{ATTEMPT_START}</td>
+			<td>{ATTEMPT_FINISH}</td>
+			<td>{ATTEMPT_REVIEWED_AT}</td>
+			<td><a href='/survey/deleteAttempt/{ATTEMPT_ATTEMPT_ID}'>Delete</a></td></td>
+		</tr>
+		<!-- END attempt -->
+	</table>
+</div>

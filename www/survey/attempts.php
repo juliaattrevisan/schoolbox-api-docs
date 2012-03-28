@@ -1,0 +1,58 @@
+<?php
+/**
+ * Attempts
+ *
+ * Show a list of attempts for a particular Survey.
+ * You can delete attempts from this screen.
+ *
+ * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @link		http://www.alaress.com.au/
+ * @version	 SVN: $Id$
+ */
+$groupHandler = new Group();
+$assessHandler = new Survey_Main();
+$attemptHandler = new Survey_Attempt();
+
+if (!$groupHandler->isStaff()) {
+    error(126);
+}
+
+if ($assessHandler->isDeleted($this->arg[0])) {
+	error(112);
+}
+
+if (!$assessHandler->isOwner($this->arg[0]) && !$groupHandler->isSuperuser()) {
+    error(125);
+}
+
+$this->setFile(TEMPLATE_content, 'survey/attempts.html');
+$this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
+
+$assess = $assessHandler->getByID($this->arg[0]);
+$allAttempts = $attemptHandler->getList($this->arg[0]);
+
+if (is_array($allAttempts) && count($allAttempts)) {
+	foreach($allAttempts as $currentAttempt) {
+		$startDate = new Alaress_Date_Format($currentAttempt['start'], 'y-m-d h:i:s');
+		$finishDate = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
+
+		$this->setVar(array(
+			'ATTEMPT_FIRSTNAME' => $currentAttempt['firstname'],
+			'ATTEMPT_LASTNAME' => $currentAttempt['lastname'],
+			'ATTEMPT_START' => $startDate->getLocalShort(),
+			'ATTEMPT_FINISH' => $finishDate->getLocalShort(),
+			'ATTEMPT_REVIEWED_AT' => $currentAttempt['reviewed_at'],
+			'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id']
+		));
+
+		$this->parse('attempt_block', 'attempt', true);
+	}
+}
+else {
+	$this->setVar('attempt_block', '');
+}
+
+$this->setVar(array(
+	'SURVEY_NAME' => $assess['title']
+));
