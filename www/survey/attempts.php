@@ -39,17 +39,23 @@ $this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
 $allAttempts = $attemptHandler->getList($this->arg[0]);
 
 if (is_array($allAttempts) && count($allAttempts)) {
+	$i = 0;
+
 	foreach($allAttempts as $currentAttempt) {
+		$i++;
+
 		$startDate = new Alaress_Date_Format($currentAttempt['start'], 'y-m-d h:i:s');
 		$finishDate = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
 
 		$this->setVar(array(
+			'ATTEMPT_USER_ID' => $currentAttempt['user_id'],
 			'ATTEMPT_FIRSTNAME' => $currentAttempt['firstname'],
 			'ATTEMPT_LASTNAME' => $currentAttempt['lastname'],
 			'ATTEMPT_START' => $startDate->getLocalShort(),
 			'ATTEMPT_FINISH' => $finishDate->getLocalShort(),
 			'ATTEMPT_REVIEWED_AT' => $currentAttempt['reviewed_at'],
-			'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id']
+			'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
+			'ON_OFF' => $i % 2 ? 'dark' : ''
 		));
 
 		$this->parse('attempt_block', 'attempt', true);

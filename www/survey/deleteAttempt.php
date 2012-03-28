@@ -17,7 +17,6 @@ $attemptHandler = new Survey_Attempt();
 $responseHandler = new Survey_Response();
 $groupHandler = new Group();
 
-$attempt = $attemptHandler->getByID($this->arg[0]);
 $user_id = $this->arg[1];
 
 if (!$groupHandler->isSuperuser()) {
@@ -26,11 +25,18 @@ if (!$groupHandler->isSuperuser()) {
 	}
 }
 
-$responseHandler->deleteResponsesForAttempt($attempt['attempt_id']);
+/* Multiple soft-delete
+ */
+foreach ($_POST['attemptIds'] as $currentAttempt) {
+	if (is_numeric($currentAttempt)) {
+		$attempt = $attemptHandler->getByID($currentAttempt);
+		$responseHandler->deleteResponsesForAttempt($attempt['attempt_id']);
 
-$attemptHandler->update(array(
-	'attempt_id' => $attempt['attempt_id'],
-	'deleted_at' => 'NOW()'
-));
+		$attemptHandler->update(array(
+			'attempt_id' => $attempt['attempt_id'],
+			'deleted_at' => 'NOW()'
+		));
+	}
+}
 
 SitePage::backToTheFuture(1);

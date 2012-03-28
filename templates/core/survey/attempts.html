@@ -5,22 +5,26 @@
 </div>
 
 <div class="evaluation-question-section">
-	<table>
-		<tr>
-			<th>Student</th>
-			<th>Start</th>
-			<th>Finish</th>
-			<th>Reviewed</th>
-			<th>Action</th>
-		</tr>
-		<!-- BEGIN attempt -->
-		<tr>
-			<td>{ATTEMPT_LASTNAME}, {ATTEMPT_FIRSTNAME}</td>
-			<td>{ATTEMPT_START}</td>
-			<td>{ATTEMPT_FINISH}</td>
-			<td>{ATTEMPT_REVIEWED_AT}</td>
-			<td><a href='/survey/deleteAttempt/{ATTEMPT_ATTEMPT_ID}'>Delete</a></td></td>
-		</tr>
-		<!-- END attempt -->
-	</table>
+	<form action='/survey/deleteAttempt' method='post'>
+		<table>
+			<tr>
+				<th>Student</th>
+				<th>Start</th>
+				<th>Finish</th>
+				<th>Reviewed</th>
+				<th>Action</th>
+			</tr>
+			<!-- BEGIN attempt -->
+			<tr class='{ON_OFF}'>
+				<td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_LASTNAME}, {ATTEMPT_FIRSTNAME}</a></td>
+				<td>{ATTEMPT_START}</td>
+				<td>{ATTEMPT_FINISH}</td>
+				<td>{ATTEMPT_REVIEWED_AT}</td>
+				<td><input type='checkbox' name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'></td>
+			</tr>
+			<!-- END attempt -->
+		</table>
+
+		<input class='submit-btn-plain' type='submit' value='Delete selected' />
+	</form>
 </div>
