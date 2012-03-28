@@ -14,6 +14,12 @@ $groupHandler = new Group();
 $assessHandler = new Survey_Main();
 $attemptHandler = new Survey_Attempt();
 
+$assess = $assessHandler->getByID($this->arg[0]);
+
+if (!$assess) {
+	error(112);
+}
+
 if (!$groupHandler->isStaff()) {
     error(126);
 }
@@ -29,7 +35,7 @@ if (!$assessHandler->isOwner($this->arg[0]) && !$groupHandler->isSuperuser()) {
 $this->setFile(TEMPLATE_content, 'survey/attempts.html');
 $this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
 
-$assess = $assessHandler->getByID($this->arg[0]);
+
 $allAttempts = $attemptHandler->getList($this->arg[0]);
 
 if (is_array($allAttempts) && count($allAttempts)) {
