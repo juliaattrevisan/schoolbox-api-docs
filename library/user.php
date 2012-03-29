@@ -155,7 +155,7 @@ class User extends DeprecatedModel {
 
         // retreive results
 
-		/* Allow search on user_id
+		/* Allow search on synergy id
 		 */
         $query = "
 			SELECT user.*, groups.name AS group_name, luCampus.name AS campus_name
@@ -165,7 +165,7 @@ class User extends DeprecatedModel {
 			LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
 			WHERE CONCAT_WS(' ',firstname,lastname) LIKE '%$keyword%'
 			OR username LIKE '%$keyword%' OR alt_email LIKE '%$keyword%'
-			OR user.id = '$keyword'
+			OR synergy_id = '$keyword'
 		";
 
         $query .= " ORDER BY `$sort_by` $sort_dir
