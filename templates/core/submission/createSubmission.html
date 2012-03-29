@@ -51,9 +51,13 @@
 			$j('.accept-hide').hide();
 		}
 
+        // TODO: frontend implementation show/hide on change
         $j('.allday input').change(function() {
             alert('CHANGED!! Hide or show the time selector.');
         });
+
+        // TODO: frontend implementation show/hide on pageload
+
 
 		$j('#createSubmissionForm').validate();
 		
@@ -168,7 +172,7 @@
                     <input name="open_minute" type="text" maxlength="2" value="{OPEN_MIN}" class="timeField" />
                     <select name="open_period" class="short">
                         <option value="am">AM</option>
-                        <option value="pm" {DUE_PM}>PM</option>
+                        <option value="pm" {OPEN_PM}>PM</option>
                     </select>
                 </span>
                 <!-- END all_day_open -->

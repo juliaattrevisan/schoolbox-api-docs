@@ -48,42 +48,47 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
 
     $open_hour = date('g',$open_date);
     $open_min = date('i',$open_date);
+
     $due_hour = date('g',$due_date);
     $due_min = date('i',$due_date);
+
     $late_hour = date('g',$late_date);
     $late_min = date('i',$late_date);
 
     $output = array(
-        'HEADING'       => 'Modify',
-        'ID'            => $subbox['id'],
-        'CATEGORY'      => $subbox['category'],
-        'CURRENT_CAT'   => $catOutput,
-        'NAME'          => $subbox['name'],
-        'DESCRIPTION'   => $subbox['description'],
-        'FILEID'        => '',
-        'ACCEPT_SUBMISSION' => $subbox['accept_submission'] ? 'checked="checked"' : '',
-        'MULTI_SUBMISSION' => $subbox['multi_submission'] ? 'checked="checked"' : '',
-        'OPEN_DATE'     => date('d/m/Y', $open_date),
-        'OPEN_HOUR'     => $open_hour,
-        'OPEN_MIN'      => $open_min,
-        'OPEN_PM'       => date('a', $open_date) == 'pm' ? 'selected' : '',
-        'DUE_DATE'      => date('d/m/Y', $due_date),
-        'DUE_HOUR'      => $due_hour,
-        'DUE_MIN'       => $due_min,
-        'DUE_PM'        => date('a', $due_date) == 'pm' ? 'selected' : '',
-        'LATE_DATE'     => date('d/m/Y', $late_date),
-        'LATE_HOUR'     => $late_hour,
-        'LATE_MIN'      => $late_min,
-        'LATE_PM'       => date('a', $late_date) == 'pm' ? 'selected' : '',
-        'TOTAL_MARK'    => $subbox['max_mark']
+        'HEADING'           => 'Modify',
+        'ID'                => $subbox['id'],
+        'CATEGORY'          => $subbox['category'],
+        'CURRENT_CAT'       => $catOutput,
+        'NAME'              => $subbox['name'],
+        'DESCRIPTION'       => $subbox['description'],
+        'FILEID'            => '',
+        'ACCEPT_SUBMISSION' => $subbox['accept_submission'] ? ' checked="checked"' : '',
+        'MULTI_SUBMISSION'  => $subbox['multi_submission'] ? ' checked="checked"' : '',
+        'TOTAL_MARK'        => $subbox['max_mark'],
+
+        'OPEN_DATE'         => date('d/m/Y', $open_date),
+        'OPEN_HOUR'         => $open_hour,
+        'OPEN_MIN'          => $open_min,
+        'OPEN_PM'           => date('a', $open_date) == 'pm' ? 'selected' : '',
+        'OPEN_ALL_DAY'      => date('H:i:s', $open_date) == '00:00:00' ? ' checked="checked"' : '',
+
+        'DUE_DATE'          => date('d/m/Y', $due_date),
+        'DUE_HOUR'          => $due_hour,
+        'DUE_MIN'           => $due_min,
+        'DUE_PM'            => date('a', $due_date) == 'pm' ? 'selected' : '',
+        'DUE_ALL_DAY'       => date('H:i:s', $due_date) == '23:59:59' ? ' checked="checked"' : '',
+
+        'LATE_DATE'         => date('d/m/Y', $late_date),
+        'LATE_HOUR'         => $late_hour,
+        'LATE_MIN'          => $late_min,
+        'LATE_PM'           => date('a', $late_date) == 'pm' ? 'selected' : '',
+        'LATE_ALL_DAY'      => date('H:i:s', $late_date) == '23:59:59' ? ' checked="checked"' : '',
+
     );
 
-
     $this->setVar($output);
-
-
     $this->setVar('browse_block', '');
-
 
 }
 else if($this->arg[0] == 'new') {
@@ -154,29 +159,36 @@ else if($this->arg[0] == 'new') {
     $due_hour = date('g',$due_date);
     $late_hour = date('g',$late_date);
 
-    $output = array('HEADING'   => 'Create',
-                    'CATEGORY'  => $this->arg[1],
-					'ID'		=> '',
-                    'NAME'     => $file['name'],
-                    'DESCRIPTION' => $file['description'],
-                    'FILEID'    => $file['id'],
-                    'CATLIST'   => $catOutput,
-                    'ACCEPT_SUBMISSION' => '', // checked no longer default
-                    'MULTI_SUBMISSION' => '',
-                    'OPEN_DATE' => date('d/m/Y', $open_date),
-                    'OPEN_HOUR' => $open_hour,
-                    'OPEN_MIN'  => '00',
-                    'OPEN_PM'   => date('a', $open_date) == 'pm'?'selected':'',
-                    'DUE_DATE' => date('d/m/Y', $due_date),
-                    'DUE_HOUR' => $due_hour,
-                    'DUE_MIN'  => '00',
-                    'DUE_PM'   => date('a', $due_date) == 'pm'?'selected':'',
-                    'LATE_DATE' => date('d/m/Y', $late_date),
-                    'LATE_HOUR' => $late_hour,
-                    'LATE_MIN'  => '00',
-                    'LATE_PM'   => date('a', $late_date) == 'pm'?'selected':'',
-                    'TOTAL_MARK' => ''
-                    );
+    $output = array(
+        'HEADING'           => 'Create',
+        'CATEGORY'          => $this->arg[1],
+		'ID'		        => '',
+        'NAME'              => $file['name'],
+        'DESCRIPTION'       => $file['description'],
+        'FILEID'            => $file['id'],
+        'CATLIST'           => $catOutput,
+        'ACCEPT_SUBMISSION' => '', // checked no longer default
+        'MULTI_SUBMISSION'  => '',
+        'TOTAL_MARK'        => '',
+
+        'OPEN_DATE'         => date('d/m/Y', $open_date),
+        'OPEN_HOUR'         => $open_hour,
+        'OPEN_MIN'          => '00',
+        'OPEN_PM'           => date('a', $open_date) == 'pm'?'selected':'',
+        'OPEN_ALL_DAY'      => '',
+
+        'DUE_DATE'          => date('d/m/Y', $due_date),
+        'DUE_HOUR'          => $due_hour,
+        'DUE_MIN'           => '00',
+        'DUE_PM'            => date('a', $due_date) == 'pm'?'selected':'',
+        'DUE_ALL_DAY'      => '',
+
+        'LATE_DATE'         => date('d/m/Y', $late_date),
+        'LATE_HOUR'         => $late_hour,
+        'LATE_MIN'          => '00',
+        'LATE_PM'           => date('a', $late_date) == 'pm'?'selected':'',
+        'LATE_ALL_DAY'      => '',
+    );
 
 
     $this->setVar($output);
