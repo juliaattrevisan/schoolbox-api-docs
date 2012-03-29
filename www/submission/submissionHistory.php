@@ -10,6 +10,7 @@ $this->setBlock(TEMPLATE_content, 'returned_work', 'returned_work_block');
 $this->setBlock('returned_work', 'return_file','return_file_block');
 $this->setBlock('recent_submission', 'overdue', 'overdue_block');
 $this->setBlock('recent_submission', 'action_resubmit', 'action_resubmit_block');
+$this->setBlock('recent_submission', 'recent_submission_download', 'recent_submission_download_block');
 $this->setBlock('subject', 'work', 'work_block');
 $this->setBlock('work', 'action_view_submitted', 'action_view_submitted_block');
 $this->setBlock('work', 'action_view_returned', 'action_view_returned_block');
@@ -36,6 +37,9 @@ if ($groupHandler->isParentOfChild($this->arg[1])) {
 		error(19);
 	}
 }
+
+// setup boolean for whether the current user is a parent and ONLY a parent (and therefore can't see downlaod links)
+$parentOnly = ($groupHandler->isParent() && !$groupHandler->isStaff() && !$groupHandler->isSuperuser());
 
 $user = $userHandler->getByID($userID);
 
@@ -86,12 +90,13 @@ $this->setVar(array(
 
 /* Check whether a file is associated with the work
  */
-if ($submissionBox['fid'] && is_numeric($submissionBox['fid'])) {
-	$this->setVar(array(
-		'WORK_FILE_ID' => $submissionBox['fid']
-	));
+if ( ( $submissionBox['fid'] && is_numeric($submissionBox['fid']) ) ) {
 
-	$this->parse('download_block', 'download');
+  $this->setVar(array(
+        'WORK_FILE_ID' => $submissionBox['fid']
+    ));
+
+    $this->parse('download_block', 'download');
 }
 else {
 	$this->setVar('download_block', '');
@@ -121,7 +126,12 @@ if (is_array($allWork) && count($allWork)) {
 
 		if ($currentWork['sid'] != null) {
 
-            $this->parse('action_view_submitted_block', 'action_view_submitted');
+            // if you are a parent (and only a parent), you can only see plaintext, not a link
+            if($parentOnly)
+                $this->setVar('action_view_submitted_block', 'Work Submitted');
+            else
+                $this->parse('action_view_submitted_block', 'action_view_submitted');
+
             $this->setVar('action_view_returned_block', '');
 
             /* Remember most recent submission
@@ -134,8 +144,12 @@ if (is_array($allWork) && count($allWork)) {
 		else if ($currentWork['rid'] != null) {
             $this->setVar('action_view_submitted_block', '');
 
-            if($currentWork['filename'])
-                $this->parse('action_view_returned_block', 'action_view_returned');
+            if($currentWork['filename']) {
+                if($parentOnly)
+                    $this->setVar('action_view_returned_block', 'Work Returned');
+                else
+                    $this->parse('action_view_returned_block', 'action_view_returned');
+            }
             else
                 $this->setVar('action_view_returned_block','');
 
@@ -193,11 +207,20 @@ if($recentSubmission['sid']) {
        'MOST_RECENT_SUBMISSION_FILE_ID' => $recentSubmission['sid'],
    ));
 
-   if($submissionBox['multi_submission']) {
+
+
+   if($submissionBox['multi_submission'] && !$parentOnly) {
        $this->parse('action_resubmit_block', 'action_resubmit');
    } else {
        $this->setVar('action_resubmit_block', '');
    }
+
+    // if parent, hide the "view submitted work" button
+    if($parentOnly) {
+        $this->setVar('recent_submission_download_block', '');
+    } else {
+        $this->parse('recent_submission_download_block', 'recent_submission_download');
+    }
 
    $this->parse('recent_submission_block', 'recent_submission');
 }
@@ -225,7 +248,7 @@ if (is_numeric($returnedWork['rid'])) {
 		'RETURNED_WORK_FILE_ID' => $returnedWork['rid'],
 	));
 
-    if($returnedWork['filename'])
+    if($returnedWork['filename'] && !$parentOnly)
         $this->parse('return_file_block', 'return_file');
     else
         $this->setVar('return_file_block','');
