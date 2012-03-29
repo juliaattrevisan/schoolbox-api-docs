@@ -46,14 +46,30 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $due_date  = strtotime($subbox['date']);
     $late_date = strtotime($subbox['late_date']);
 
-    $open_hour = date('g',$open_date);
-    $open_min = date('i',$open_date);
+    if(date('H:i:s', $open_date) == '00:00:00') {
+        $open_hour = '';
+        $open_min = '';
+    } else {
+        $open_hour = date('g',$open_date);
+        $open_min = date('i',$open_date);
+    }
 
-    $due_hour = date('g',$due_date);
-    $due_min = date('i',$due_date);
+    if(date('H:i:s', $due_date) == '23:59:59') {
+        $due_hour = '';
+        $due_min = '';
+    } else {
+        $due_hour = date('g',$due_date);
+        $due_min = date('i',$due_date);
+    }
 
-    $late_hour = date('g',$late_date);
-    $late_min = date('i',$late_date);
+    if(date('H:i:s', $late_date) == '23:59:59') {
+        $late_hour = '';
+        $late_min = '';
+    } else {
+        $late_hour = date('g',$late_date);
+        $late_min = date('i',$late_date);
+    }
+
 
     $output = array(
         'HEADING'           => 'Modify',
@@ -71,19 +87,16 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         'OPEN_HOUR'         => $open_hour,
         'OPEN_MIN'          => $open_min,
         'OPEN_PM'           => date('a', $open_date) == 'pm' ? 'selected' : '',
-        'OPEN_ALL_DAY'      => date('H:i:s', $open_date) == '00:00:00' ? ' checked="checked"' : '',
 
         'DUE_DATE'          => date('d/m/Y', $due_date),
         'DUE_HOUR'          => $due_hour,
         'DUE_MIN'           => $due_min,
         'DUE_PM'            => date('a', $due_date) == 'pm' ? 'selected' : '',
-        'DUE_ALL_DAY'       => date('H:i:s', $due_date) == '23:59:59' ? ' checked="checked"' : '',
 
         'LATE_DATE'         => date('d/m/Y', $late_date),
         'LATE_HOUR'         => $late_hour,
         'LATE_MIN'          => $late_min,
         'LATE_PM'           => date('a', $late_date) == 'pm' ? 'selected' : '',
-        'LATE_ALL_DAY'      => date('H:i:s', $late_date) == '23:59:59' ? ' checked="checked"' : '',
 
     );
 
@@ -151,13 +164,9 @@ else if($this->arg[0] == 'new') {
     $this->parse('marktype_block','marktype');
 
     /* Convert times */
-    $open_date = strtotime('now');;
+    $open_date = strtotime('now');
     $due_date  = strtotime('+1 hours');
     $late_date = strtotime('+1 day');
-
-    $open_hour = date('g',$open_date);
-    $due_hour = date('g',$due_date);
-    $late_hour = date('g',$late_date);
 
     $output = array(
         'HEADING'           => 'Create',
@@ -172,24 +181,20 @@ else if($this->arg[0] == 'new') {
         'TOTAL_MARK'        => '',
 
         'OPEN_DATE'         => date('d/m/Y', $open_date),
-        'OPEN_HOUR'         => $open_hour,
-        'OPEN_MIN'          => '00',
-        'OPEN_PM'           => date('a', $open_date) == 'pm'?'selected':'',
-        'OPEN_ALL_DAY'      => '',
+        'OPEN_HOUR'         => '',
+        'OPEN_MIN'          => '',
+        'OPEN_PM'           => '',
 
         'DUE_DATE'          => date('d/m/Y', $due_date),
-        'DUE_HOUR'          => $due_hour,
-        'DUE_MIN'           => '00',
-        'DUE_PM'            => date('a', $due_date) == 'pm'?'selected':'',
-        'DUE_ALL_DAY'      => '',
+        'DUE_HOUR'          => '',
+        'DUE_MIN'           => '',
+        'DUE_PM'            => 'selected',
 
         'LATE_DATE'         => date('d/m/Y', $late_date),
-        'LATE_HOUR'         => $late_hour,
-        'LATE_MIN'          => '00',
-        'LATE_PM'           => date('a', $late_date) == 'pm'?'selected':'',
-        'LATE_ALL_DAY'      => '',
+        'LATE_HOUR'         => '',
+        'LATE_MIN'          => '',
+        'LATE_PM'           => 'selected',
     );
-
 
     $this->setVar($output);
 

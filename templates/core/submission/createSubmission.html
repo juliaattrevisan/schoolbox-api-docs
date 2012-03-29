@@ -51,14 +51,6 @@
 			$j('.accept-hide').hide();
 		}
 
-        // TODO: frontend implementation show/hide on change
-        $j('.allday input').change(function() {
-            alert('CHANGED!! Hide or show the time selector.');
-        });
-
-        // TODO: frontend implementation show/hide on pageload
-
-
 		$j('#createSubmissionForm').validate();
 		
 	});
@@ -76,10 +68,6 @@
 
     input[type="text"] {
         border: solid 1px #ccc;
-    }
-
-    .allday {
-        width: 100px;
     }
 </style>
 <!-- END custom_head -->
@@ -161,66 +149,48 @@
 
 		<tr class="accept-hide">
 			<td class="formLabelWidth"><h4>Open Date</h4>
-				<em>The date from when the due work will be available for submission. To make the box never available but have the date published, set this date to after the due date.</em>
+				<em>The date from when the due work will be available for submission.
+                    To allow submissions from the start of the day, leave the time fields blank.</em>
             </td>
 			<td>
                 <input name="open_date" id="open_date" type="text" value="{OPEN_DATE}" size="20" />
-                <!-- BEGIN all_day_open -->
-                <span class="time_select" id="time_select_open">
-                    <input name="open_hour" type="text" maxlength="2" value="{OPEN_HOUR}" class="timeField" />
-                    <span>:</span>
-                    <input name="open_minute" type="text" maxlength="2" value="{OPEN_MIN}" class="timeField" />
-                    <select name="open_period" class="short">
-                        <option value="am">AM</option>
-                        <option value="pm" {OPEN_PM}>PM</option>
-                    </select>
-                </span>
-                <!-- END all_day_open -->
-                <label class="allday" for="open_all_day">All day?
-                    <input name="open_all_day" id="open_all_day" type="checkbox" value="true" {OPEN_ALL_DAY} />
-                </label>
+                <input name="open_hour" type="text" maxlength="2" value="{OPEN_HOUR}" class="timeField" />
+                <span>:</span>
+                <input name="open_minute" type="text" maxlength="2" value="{OPEN_MIN}" class="timeField" />
+                <select name="open_period" class="short">
+                    <option value="am">AM</option>
+                    <option value="pm" {OPEN_PM}>PM</option>
+                </select>
             </td>
 		</tr>
 		<tr>
 			<td><h4>Due Date</h4>
-				<em>Actual date the work is due. This is the date that will be published.</em></td>
+				<em>Actual date the work is due. This is the date that will be published.
+                    To allow submissions until the end of the day, leave the time fields blank.</em></td>
 			<td>
                 <input name="due_date" id="due_date"  type="text" value="{DUE_DATE}" size="20" />
-                <!-- BEGIN all_day_due -->
-                <span class="time_select" id="time_select_due">
-                    <input name="due_hour" type="text" maxlength="2" value="{DUE_HOUR}" class="timeField">
-                    <span>:</span>
-                    <input name="due_minute" type="text" maxlength="2" value="{DUE_MIN}" class="timeField">
-                    <select name="due_period" class="short">
-                        <option value="am">AM</option>
-                        <option value="pm" {DUE_PM}>PM</option>
-                    </select>
-                </span>
-                <!-- END all_day_due -->
-                <label class="allday" for="due_all_day">All day?
-                    <input name="due_all_day" id="due_all_day" type="checkbox" value="true" {DUE_ALL_DAY} />
-                </label>
+                <input name="due_hour" type="text" maxlength="2" value="{DUE_HOUR}" class="timeField">
+                <span>:</span>
+                <input name="due_minute" type="text" maxlength="2" value="{DUE_MIN}" class="timeField">
+                <select name="due_period" class="short">
+                    <option value="am">AM</option>
+                    <option value="pm" {DUE_PM}>PM</option>
+                </select>
             </td>
 		</tr>
 		<tr class="accept-hide">
 			<td><h4>Late Date</h4>
-				<em>Students will not be able to submit after this date.</em></td>
+				<em>Students will not be able to submit after this date.
+                    To allow submissions until the end of the day, leave the time fields blank.</em></td>
 			<td>
                 <input name="late_date" id="late_date" type="text" value="{LATE_DATE}" size="20" />
-                <!-- BEGIN all_day_late -->
-                <span class="time_select" id="time_select_late">
-                    <input name="late_hour" type="text" maxlength="2" value="{LATE_HOUR}" class="timeField">
-                    <span>:</span>
-                    <input name="late_minute" type="text" maxlength="2" value="{LATE_MIN}" class="timeField">
-                    <select name="late_period" class="short">
-                        <option value="am">AM</option>
-                        <option value="pm" {LATE_PM}>PM</option>
-                    </select>
-                </span>
-                <!-- END all_day_late -->
-                <label class="allday" for="late_all_day">All day?
-                    <input name="late_all_day" id="late_all_day" type="checkbox" value="true" {LATE_ALL_DAY} />
-                </label>
+                <input name="late_hour" type="text" maxlength="2" value="{LATE_HOUR}" class="timeField">
+                <span>:</span>
+                <input name="late_minute" type="text" maxlength="2" value="{LATE_MIN}" class="timeField">
+                <select name="late_period" class="short">
+                    <option value="am">AM</option>
+                    <option value="pm" {LATE_PM}>PM</option>
+                </select>
                 <input type="hidden" name='fileId' value="{FILEID}" />
 				<input type="hidden" name="id" value="{ID}" /></td>
 		</tr>

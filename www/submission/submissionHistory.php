@@ -78,13 +78,17 @@ $emailAddress = $emailObj->formatEmailFromArray($owner);
 
 $dueDate = new Alaress_Date_Format($submissionBox['date'],'y-m-d');
 
+if($dueDate->getUsingFormat('H:i:s') == '23:59:59')
+    $this->setVar('BOX_DUEDATE', $dueDate->getLongDateOnly());
+else
+    $this->setVar('BOX_DUEDATE', $dueDate->getLong());
+
 $this->setVar(array(
-	'BOX_CATEGORYNAME' => Scrub::text($submissionBox['categoryName']),
+    'BOX_CATEGORYNAME' => Scrub::text($submissionBox['categoryName']),
     'BOX_CATEGORYID'    => $submissionBox['cid'],
-	'BOX_NAME' => Scrub::text($submissionBox['name']),
+    'BOX_NAME' => Scrub::text($submissionBox['name']),
     'BOX_DESCRIPTION' => Scrub::text($submissionBox['description']),
-	'BOX_OWNER' => '<a href="'.$_SESSION['mailhandle'].$emailAddress.'">'.$userHandler->formatName($owner).'</a>',
-	'BOX_DUEDATE' => $dueDate->getLong(),
+    'BOX_OWNER' => '<a href="'.$_SESSION['mailhandle'].$emailAddress.'">'.$userHandler->formatName($owner).'</a>',
     'BOX_ID' => $submissionBox['id'],
 ));
 

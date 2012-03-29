@@ -295,12 +295,23 @@ if(count($allWork) > 0) {
 			$action = '';
 		}
 
+        // if the relevant_date is set to the start of end of a day, only show the day itselfand truncate the time
+        $shortFormat = Cfg::get('date_short');
+        $timePos = strpos($shortFormat, 'g:i') ? strpos($shortFormat, 'g:i') - 1 : strlen($shortFormat);
+        if( $currentWork['relevant_date']->format('H:i:s') == '00:00:00' ||
+            $currentWork['relevant_date']->format('H:i:s') == '23:59:59' )
+        {
+            $this->setVar('WORK_DATE', $currentWork['relevant_date']->format(substr($shortFormat, 0, $timePos)));
+        } else {
+            $this->setVar('WORK_DATE', $currentWork['relevant_date']->format(Cfg::get('date_short')));
+        }
+
+
         $this->setVar(array(
             'WORK_SUBJECT' => $currentWork['categoryName'],
             'WORK_DESCRIPTION' => $currentWork['name'],
             'WORK_ACTION' => $action,
             'WORK_STATUS' => $status,
-            'WORK_DATE'   => $currentWork['relevant_date']->format(Cfg::get('date_short')),
             'WORK_BOX_ID' => $currentWork['bid'],
             'WORK_FILE_ID' => $currentWork['fid'],
             'ROW_COLOR' => !($j++ % 2) ? 'dark' : ''

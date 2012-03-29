@@ -5,7 +5,7 @@ $page = new SitePage;
 
 $submission_box_handler = new Submission();
 
-if (is_numeric($_POST['id']) && $_POST['due_date'] && $_POST['due_hour'] && $_POST['late_date'] && $_POST['late_hour']) {
+if (is_numeric($_POST['id']) && $_POST['due_date'] && $_POST['late_date']) {
 
 	/* Prevent 12pm to 12am-next-day bug by checking that the hour submitted is
 	 * not equal to 12. This stops the date incrementing to the next day.
@@ -13,14 +13,14 @@ if (is_numeric($_POST['id']) && $_POST['due_date'] && $_POST['due_hour'] && $_PO
 	 * Also set the time to the start or end of the day if all_day is set
 	 */
 
-    if(!empty($_POST['due_all_day'])) {
+    if(empty($_POST['due_hour'])) {
         $dueDate = new Alaress_Date_Format($_POST['due_date'] . ' 23:59:59', 'd/m/y');
     } else {
         $dueDate = new Alaress_Date_Format($_POST['due_date'] . ' ' . $_POST['due_hour'] . ':' . $_POST['due_minute'] . ' ' . $_POST['due_period'], 'd/m/y');
     }
 
 
-    if(!empty($_POST['late_all_day'])) {
+    if(empty($_POST['late_hour'])) {
         $lateDate = new Alaress_Date_Format($_POST['late_date'] . ' 23:59:59', 'd/m/y');
     } else {
         $lateDate = new Alaress_Date_Format($_POST['late_date'] . ' ' . $_POST['late_hour'] . ':' . $_POST['late_minute'] . ' ' . $_POST['late_period'], 'd/m/y');
@@ -30,7 +30,7 @@ if (is_numeric($_POST['id']) && $_POST['due_date'] && $_POST['due_hour'] && $_PO
     if(empty($_POST['accept_submission'])) {
         $openDate = new Alaress_Date_Format(time(), 'U');
     } else {
-        if(!empty($_POST['open_all_day'])) {
+        if(empty($_POST['open_hour'])) {
             $openDate = new Alaress_Date_Format($_POST['open_date'] . ' 00:00:00', 'd/m/y');
         } else {
             $openDate = new Alaress_Date_Format($_POST['open_date'] . ' ' . $_POST['open_hour'] . ':' . $_POST['open_minute'] . ' ' . $_POST['open_period'], 'd/m/y');
@@ -170,4 +170,7 @@ else if (isset($_GET['deleteBox']) && is_numeric($_GET['deleteBox'])) {
 	$submission_box_handler->delete($_GET['deleteBox']);
 
 	$page->localRedir("/submission/listSubmission/");
+} else {
+    // not enough data submitted to the form
+    $page->backToTheFuture(1);
 }
