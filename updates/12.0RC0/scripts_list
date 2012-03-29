@@ -1,0 +1,73 @@
+<<<<<<< .mine
+#####################START INSTRUCTIONS############ 
+#This File ignores Any line that contains a # character
+# Files will be executed in the order provided
+# When adding scripts place them in the corrosponding folder
+#	Admin
+#	Calendar
+#	CMS
+#	Core
+#	Dashboard
+#	Database
+#	ePortfolio
+#	General
+#	Homepage
+#	Interface
+#	New Feature
+#	Online Testing
+#	Submissions
+#Dependencies are handled by placing the script with a #dependency on another, AFTER the one it depends on in the #list.
+#######################END INSTRUCTIONS#######################
+
+## Ability for parents to see students' marks 
+admin/config_options.sql
+
+## Does stuff to survey? Not sure what.
+assess_survey/online_assess_survey.sql
+
+## Adds Twitter Component to Homepage
+homepages/add_twitter_comp.sql
+
+## Adds functionality To allow soft-delete of Questionbank ##Categories (otherwise you might lose questions)
+
+## Adds functionality to allow heirachical questionbank categories
+question_bank/questionbank.sql
+
+##Changes the alaress admin account's password 
+admin/superuser_password.sql
+=======
+######
+# This File ignores Any line that contains a # character
+# Files will be executed in the order provided
+# This is how I add a PHP script to the index.
+#php/myphpscript.php
+# This is how I add a Shell Script to the index.
+#sh/myshellscript.sh
+# This is how I add a SQL Script to the Index
+#sql/mysqlscript.sql
+#
+#Dependencies are handled by placing the script with a dependency on another, AFTER the one it depends on in the list.
+#
+######
+
+## Ability for parents to see students' marks
+admin/config_options.sql
+
+## Does stuff to survey? Not sure what.
+assess_survey/online_assess_survey.sql
+
+## Adds Twitter Component to Homepage
+homepages/add_twitter_comp.sql
+
+## Adds functionality To allow soft-delete of Questionbank Categories (otherwise you might lose questions) and Adds functionality to allow heirachical questionbank categories
+question_bank/questionbank.sql
+
+## Changes the alaress admin account's password
+admin/superuser_password.sql
+
+## Upgrades submission box to take different normalised grading types
+submission_grades/submission_grades.sql
+
+## Removes References in the Administration system to Donvale for SCHOOLBOX as the EXTERNAL DB. configuration names need to change too,
+# but I cannot do that - this just hides them from the users - Damian
+admin/remove_donvale_references.sql>>>>>>> .r3644
