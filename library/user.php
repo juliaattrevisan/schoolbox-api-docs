@@ -128,7 +128,18 @@ class User extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
-    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'lastname', $sort_dir = 'ASC') {
+	/**
+	 * Search the user table for particular user(s)
+	 *
+	 * @param $keyword
+	 * @param int $offset
+	 * @param int $limit
+	 * @param null $count
+	 * @param string $sort_by
+	 * @param string $sort_dir
+	 * @return array|bool
+	 */
+    public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'lastname', $sort_dir = 'ASC') {
 
         // TODO: this function doesn't currently protect against all injection (eg. % gets through).
 
@@ -143,13 +154,19 @@ class User extends DeprecatedModel {
         $keyword = mysql_real_escape_string($keyword);
 
         // retreive results
-        $query = "SELECT user.*, groups.name AS group_name, luCampus.name AS campus_name
-                        FROM `user`
-                        LEFT JOIN `groups` ON `user`.group_id = `groups`.id
-			            LEFT JOIN `userCampus` ON `user`.id = `userCampus`.uid AND defaultCampus = 1
-                        LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
-                        WHERE CONCAT_WS(' ',firstname,lastname) LIKE '%$keyword%'
-                        OR username LIKE '%$keyword%' OR alt_email LIKE '%$keyword%'";
+
+		/* Allow search on user_id
+		 */
+        $query = "
+			SELECT user.*, groups.name AS group_name, luCampus.name AS campus_name
+			FROM `user`
+			LEFT JOIN `groups` ON `user`.group_id = `groups`.id
+			LEFT JOIN `userCampus` ON `user`.id = `userCampus`.uid AND defaultCampus = 1
+			LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
+			WHERE CONCAT_WS(' ',firstname,lastname) LIKE '%$keyword%'
+			OR username LIKE '%$keyword%' OR alt_email LIKE '%$keyword%'
+			OR user.id = '$keyword'
+		";
 
         $query .= " ORDER BY `$sort_by` $sort_dir
                         LIMIT $offset, $limit;";
