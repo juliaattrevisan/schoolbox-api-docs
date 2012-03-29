@@ -36,8 +36,8 @@ class External_Timetable {
 	 * @param Integer $campusId
 	 * @return Array
 	 */
-	function getTimetableDefinition ($campusId) {
-		return $this->getDatabase()->getTimetableDefinition($campusId);
+	function getTimetableDefinition ($campusId, $day) {
+		return $this->getDatabase()->getTimetableDefinition($campusId, $day);
 	}
 
 	/**

@@ -8,7 +8,7 @@
  */
 
 interface External_TimetableInterface {
-	public function getTimetableDefinition ($campusId);
+	public function getTimetableDefinition ($campusId, $day=0);
 
 	public function getDayNumber ($campusId, $date = 0);
 

@@ -20,14 +20,14 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 		$this->groupHandler = new Group;
 	}
 
-	function getTimetableDefinition($campus) {
+	function getTimetableDefinition($campus, $day = 0) {
 		$query = "SELECT TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq, TimetableDefinition.TimeFrom,
 					TimetableDefinition.TimeTo, TimetableDefinition.Description, TimetableDefinition.DayNumber
 					FROM SynergyOne.dbo.TimetableDefinition TimetableDefinition
 					WHERE TimetableDefinition.FileYear='{$_SESSION['FileYear']}' AND
 						TimetableDefinition.FileSemester='{$_SESSION['FileSemester']}' AND
 						TimetableDefinition.TimetableGroup='{$this->campusCode[$campus]}' AND
-						(TimetableDefinition.DayNumber = 0 OR TimetableDefinition.DayNumber = 5)
+						(TimetableDefinition.DayNumber = '$day' )
 					ORDER BY TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq
 					";
 		$this->getDatabase()->query($query);
@@ -255,7 +255,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 
 	function getDayTimetable($synergy_id, $userID, $campus, $daynumber)
 	{
-		$timetabledef = $this->getTimetableDefinition($campus);
+		$timetabledef = $this->getTimetableDefinition($campus,$daynumber);
 
         if(!is_array($timetabledef)) {
            return false;
@@ -349,10 +349,15 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 	
 	function getFullTimetable($synergy_id, $userID, $campus)
 	{	
-		$timetabledef = $this->getTimetableDefinition($campus);
+		$timetabledef = $this->getTimetableDefinition($campus, 0);
 
-        if(!is_array($timetabledef)) {
-           return false;
+        if(!is_array($timetabledef['desc'])) {
+            //try getting from full definition
+            $timetabledef = $this->getTimetableDefinition($campus, 5);
+
+            if(!is_array($timetabledef['desc'])){
+                return false;
+            }
         }
 
 		if( $this->groupHandler->isStudent($userID))

@@ -32,14 +32,17 @@ class External_Tass_Timetable implements External_TimetableInterface {
 		return $days;
 	}
 
-	function getTimetableDefinition($campus) {
+	function getTimetableDefinition($campus, $day = 0) {
 
-		/* Fetch the longest day to use as our day template... could be fixed to handle optionally taking a day number and only returning that */
-		$query = "SELECT tt_id, day_code, prd_num FROM ttdays WHERE tt_id = " . TASS_tt_id . " AND cmpy_code = {$this->campusCode[$campus]} ORDER BY prd_num DESC";
-		$longestDay = $this->getDatabase()->getRow($query);
+		/* Fetch the longest day to use as our day template...  */
+		if($day == 0) {
+            $query = "SELECT tt_id, day_code, prd_num FROM ttdays WHERE tt_id = " . TASS_tt_id . " AND cmpy_code = {$this->campusCode[$campus]} ORDER BY prd_num DESC";
+		    $longestDay = $this->getDatabase()->getRow($query);
+            $day = $longestDay['day_code'];
+        }
 
 		$query = "SELECT prd_desc, prd_start, prd_end, prd_code, day_code FROM ttperiod
-                WHERE tt_id = " . TASS_tt_id . " AND cmpy_code = {$this->campusCode[$campus]} AND day_code={$longestDay['day_code']}
+                WHERE tt_id = " . TASS_tt_id . " AND cmpy_code = '{$this->campusCode[$campus]}' AND day_code='$day''
                 ORDER BY prd_code";
 
 		$this->getDatabase()->query($query);
@@ -105,7 +108,7 @@ class External_Tass_Timetable implements External_TimetableInterface {
 	}
 
 	function getDayTimetable($synergy_id, $userID, $campus, $daynumber) {
-		$timetabledef = $this->getTimetableDefinition($campus);
+		$timetabledef = $this->getTimetableDefinition($campus, $daynumber);
 
 		if ($this->groupHandler->isStudent($userID)) {
 			$query = "SELECT room_code, tch_code, ttmast.sub_code, ttmast.year_grp, ttmast.class, prd_code, sub_desc

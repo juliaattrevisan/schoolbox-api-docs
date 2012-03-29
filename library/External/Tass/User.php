@@ -125,7 +125,7 @@ class External_Tass_User implements External_UserInterface {
 			$query = "
 				SELECT
 					stud_code AS RelatedID
-				FROM studenrol
+				FROM student
 				WHERE par_code = '$tassID'
 				AND cmpy_code = '01'
 			";

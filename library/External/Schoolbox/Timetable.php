@@ -18,7 +18,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface {
 		$this->setGroup( new Group );
 	}
 
-	public function getTimetableDefinition ($campusId) {
+	public function getTimetableDefinition ($campusId, $day = 0) {
 		$statement = $this->getDatabase()->prepare("
 			SELECT tc.start, tc.reset, tc.finish, tc.offset,
 				ty.title, ty.cycle_length, ty.day_length, ty.regular
