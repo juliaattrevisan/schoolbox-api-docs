@@ -70,11 +70,11 @@
             <!-- BEGIN submission_block -->
             <tr class="submission user_{OWNER_ID} {SUBMISSION_EXPANDABLE} {SUBMISSION_HIDDEN}">
                 <td width="2"></td>
-                <td style="color:{COLOUR}; white-space: nowrap;">
-    				<a  href="/search/user/{OWNER_ID}">{OWNER}</a>
+                <td style="white-space: nowrap;">
+    				<a href="/search/user/{OWNER_ID}">{OWNER}</a>
 				</td>
-                <td style="color:{COLOUR};">{SUBMITTED}</td>
-                <td>{MARK}</td>
+                <td><a style="color:{COLOUR};" href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}">{SUBMITTED}</td>
+                <td><a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}">{MARK}</a></td>
                 <td>{SCORE}</td>
                 <td><!-- BEGIN download_action --><a href="/submission/send.php?id={SUB_ID}">Download</a><!-- END download_action --></td>
                 <td>
