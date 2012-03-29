@@ -177,10 +177,20 @@ class Report_Parent extends Report_Abstract {
 						$country = $currentContact['StudentContactCountryDesc'];
 					}
 
+					/* Figure out whether to use the Preferred or the Given (LegalFullName) field
+					 * for this contact
+					 */
+					if (strlen($currentContact['StudentContactPreferred'])) {
+						$firstname = $currentContact['StudentContactPreferred'];
+					}
+					else {
+						$firstname = $currentContact['StudentContactLegalFullName'];
+					}
+
 					$this->getPage()->setVar(array(
 						'CONTACT_CONTACT_TYPE' => $currentContact['StudentContactType'],
 						'CONTACT_TITLE' => $currentContact['StudentContactTitle'],
-						'CONTACT_FIRSTNAME' => $currentContact['StudentContactPreferred'],
+						'CONTACT_FIRSTNAME' => $firstname,
 						'CONTACT_SURNAME' => $currentContact['StudentContactSurname'],
 						'CONTACT_PHONE' => $currentContact['StudentContactSilentPhoneFlag']?'':$currentContact['StudentContactPhoneActual'],
 						'CONTACT_MOBILE' => $currentContact['StudentContactMobilePhone'],
@@ -213,11 +223,22 @@ class Report_Parent extends Report_Abstract {
 					$this->getPage()->setVar('primary_block', '');
 				}
 
-				if ($currentContact['StudentContactSpousePreferred'] != '' && $currentContact['SpouseDirectoryIncludeFlag'] == 1) {
+				if ((($currentContact['StudentContactSpousePreferred'] != '') || ($currentContact['StudentContactSpouseLegalFullName'] != '')) && ($currentContact['SpouseDirectoryIncludeFlag'] == 1)) {
+
+					/* Figure out whether to use the Preferred or the Given (LegalFullName) field
+					 * for this contact
+					 */
+					if (strlen($currentContact['StudentContactSpousePreferred'])) {
+						$firstname = $currentContact['StudentContactSpousePreferred'];
+					}
+					else {
+						$firstname = $currentContact['StudentContactSpouseLegalFullName'];
+					}
+
 					$this->getPage()->setVar(array(
 						'SPOUSE_CONTACT_TYPE' => $currentContact['StudentContactSpouseType'],
 						'SPOUSE_TITLE' => $currentContact['StudentContactSpouseTitle'],
-						'SPOUSE_FIRSTNAME' => $currentContact['StudentContactSpousePreferred'],
+						'SPOUSE_FIRSTNAME' => $firstname,
 						'SPOUSE_SURNAME' => $currentContact['StudentContactSpouseSurname'],
 						'SPOUSE_CONTACT_MOBILE' => $currentContact['StudentContactSpouseMobilePhone'],
 						'SPOUSE_CONTACT_EMAIL' => $currentContact['StudentContactSpouseDefaultEmail'],

@@ -188,11 +188,14 @@ class External_Synergetic_User implements External_UserInterface {
 		$query = "
 			SELECT
 				StudentID, StudentGiven1, StudentSurname, StudentYearLevel, House.Description AS StudentHouse, StudentBoarder,
-				StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
+				StudentContactID,
+				StudentContactTitle, StudentContactPreferred, StudentContactLegalFullName, StudentContactSurname,
+				StudentContactDefaultEmail,
 				StudentContactAddress1, StudentContactAddress2, StudentContactAddress3,
 				StudentContactSuburb, StudentContactPostCode, StudentContactState, StudentContactCountryDesc,
 				StudentContactPhoneActual, StudentContactMobilePhone, StudentContactOccupPhone,
-				StudentContactSpouseID, StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseSurname,
+				StudentContactSpouseID,
+				StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseLegalFullName,StudentContactSpouseSurname,
 				StudentContactSpouseMobilePhone, StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail, StudentContactType,
 				StudentContactSilentPhoneFlag, Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag, Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
 				StudentParentsSeparatedFlag

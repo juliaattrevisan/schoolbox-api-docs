@@ -91,10 +91,12 @@ $visibleList = $newsHandler->getNewsListing($archive);
 
 // get list of visibly populated topics
 $allTopics = array('all' => 1);
-foreach($visibleList as $article) {
-    $allTopics[strtolower($article['topicName'])] = 1;
-}
 
+if (is_array($visibleList) && count($visibleList)) {
+	foreach($visibleList as $article) {
+		$allTopics[strtolower($article['topicName'])] = 1;
+	}
+}
 
 // sanitise filter inputs
 if(!in_array($filter['topic'], array_keys($allTopics)))
