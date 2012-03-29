@@ -39,6 +39,8 @@ if [ $? -eq 0 ]; then
 fi;
 }
 depcheck () {
+#Makes the installation noninteractive, meaning no user authentication or input is required.
+export DEBIAN_FRONTEND=noninteractive
 packageName=$1;
 ### UBUNTU PACKAGE CHECK
 if [[ `echo $OS|grep "ubuntu"` ]]; then
