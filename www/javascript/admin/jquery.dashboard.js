@@ -56,7 +56,12 @@ dashboardControl = {
 			helper: 'clone',
 			connectWith: '#dashboard-layout .component-holder',
 			update: function (event, ui) {
-				var $instanceId = $j(ui.item).attr('id').match(/instance\-id\-(\d+)/);
+
+                var $instanceId;
+                if($j(ui.item).attr('id'))
+    				$instanceId = $j(ui.item).attr('id').match(/instance\-id\-(\d+)/);
+                else
+                    $instanceId = null;
 
 				if ( $instanceId != null ) {
 					$instanceId = $instanceId[1];
