@@ -364,7 +364,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 		{
 			$query ="SELECT
 						Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber,
-						Timetable.ClassCode, Timetable.StaffID, vStaff.StaffTitle, vStaff.StaffPreferredFormal,
+						Timetable.ClassCode, Timetable.StaffID, vStaff.StaffTitle, vStaff.StaffPreferredName,
 						vStaff.StaffSurname
 					FROM
 						SynergyOne.dbo.StudentClasses StudentClasses,
@@ -392,7 +392,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 		else
 		{
 
-            /* BUGFIX20110301: if user has no timetable, $timetabledef['dayCount'] is NULL, not 0, which breaks SQL query */
+            // if user has no timetable, $timetabledef['dayCount'] is NULL, not 0, which breaks SQL query
             if($timetabledef['dayCount'] == NULL) {
                 $timetabledef['dayCount'] = 0;
             }
@@ -447,7 +447,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 					$timetable[$x]['day'][$y]['code'] = $desc['ClassCode'];
 					$timetable[$x]['day'][$y]['room'] = $desc['Room'];
                     $timetable[$x]['day'][$y]['staffID'] = $desc['StaffID'];
-                    $timetable[$x]['day'][$y]['staffFirstname'] = $desc['StaffPreferredFormal'];
+                    $timetable[$x]['day'][$y]['staffFirstname'] = $desc['StaffPreferredName'];
                     $timetable[$x]['day'][$y]['staffSurname'] = $desc['StaffSurname'];
                     $timetable[$x]['day'][$y]['staffTitle'] = $desc['StaffTitle'];
                     $desc = $this->getDatabase()->getNextArray();
