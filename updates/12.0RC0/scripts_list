@@ -70,4 +70,4 @@ submission_grades/submission_grades.sql
 
 ## Removes References in the Administration system to Donvale for SCHOOLBOX as the EXTERNAL DB. configuration names need to change too,
 # but I cannot do that - this just hides them from the users - Damian
-admin/remove_donvale_references.sql>>>>>>> .r3644
+admin/remove_donvale_references.sql
