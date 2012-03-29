@@ -208,8 +208,8 @@ if($recentSubmission['sid']) {
    ));
 
 
-
-   if($submissionBox['multi_submission'] && !$parentOnly) {
+    // only allow a resubmission if the current user is the owner, if the submission box is accepting submissions, and if the current time is between open and late
+   if($userID == $_SESSION['id'] && mktime() > strtotime($submissionBox['open_date']) && mktime() < strtotime($submissionBox['late_date']) && $submissionBox['accept_submission']) {
        $this->parse('action_resubmit_block', 'action_resubmit');
    } else {
        $this->setVar('action_resubmit_block', '');
