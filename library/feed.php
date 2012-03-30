@@ -53,12 +53,19 @@ class Feed {
 	}
 
 	function getFiles($cid, $limit) {
+
+        if(is_array($cid))
+            $where = ' IN (' . implode(',',$cid) . ') ';
+        else
+            $where = " = $cid ";
+
 		$query = "SELECT f.id, u.firstname, u.lastname, u.title, u.id as uid, UNIX_TIMESTAMP(f.submitted) submitted, f.description as name, realname,
-						af.description as type, inline
+						af.description as type, inline, c.name as cat_name, c.id as cat_id
 				  FROM file f
 				  LEFT JOIN user u ON u.id = f.owner
 				  LEFT JOIN allowedFileTypes af ON f.mime_type = af.mime
-				  WHERE f.category = $cid AND f.hidden = 0 AND f.deleted = 0
+				  LEFT JOIN category c ON c.id = f.category
+				  WHERE f.category $where AND f.hidden = 0 AND f.deleted = 0
 				  ORDER BY f.submitted DESC LIMIT 0, $limit";
 
 		$this->db->query($query);
@@ -83,6 +90,8 @@ class Feed {
 				'type' => 'file',
 				'message' => $userHandler->formatName($row) . ' uploaded the file '.Scrub::text($row['name']),
 				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">' . $userHandler->formatName($row) . '</a> uploaded the file '.$url,
+                'cat_name' => $row['cat_name'],
+                'cat_id' => $row['cat_id'],
 			);
 		}
 
@@ -90,10 +99,17 @@ class Feed {
 	}
 
 	function getLinks($cid, $limit) {
-		$query = "SELECT l.id, u.firstname, u.lastname, u.title, u.id as uid, UNIX_TIMESTAMP(l.submitted) submitted, description as name, url
+
+        if(is_array($cid))
+            $where = ' IN (' . implode(',',$cid) . ') ';
+        else
+            $where = " = $cid ";
+
+        $query = "SELECT l.id, u.firstname, u.lastname, u.title, u.id as uid, UNIX_TIMESTAMP(l.submitted) submitted, description as name, url, c.name as cat_name, c.id as cat_id
 				  FROM link l
 				  LEFT JOIN user u ON u.id = l.owner
-				  WHERE category = $cid AND l.hidden = 0
+				  LEFT JOIN category c ON c.id = l.category
+				  WHERE category $where AND l.hidden = 0
 				  ORDER BY l.submitted DESC LIMIT 0, $limit";
 
 		$this->db->query($query);
@@ -106,6 +122,8 @@ class Feed {
 				'type' => 'link',
 				'message' => $userHandler->formatName($row).' submitted the link '.Scrub::text($row['name']),
 				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row).'</a> submitted the link <a href="'.$row['url'].'">'.Scrub::text($row['name']).'</a>',
+                'cat_name' => $row['cat_name'],
+                'cat_id' => $row['cat_id'],
 			);
 		}
 		return $link;
@@ -119,13 +137,20 @@ class Feed {
 	 * @return
 	 */
     public function getOnlineAssessments($cid, $limit) {
+
+        if(is_array($cid))
+            $where = ' IN (' . implode(',',$cid) . ') ';
+        else
+            $where = " = $cid ";
+
         $query = "SELECT
                       assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.created_at) as created_at,
                       user.title, user.firstname, user.lastname,
-                      user.id AS uid
+                      user.id AS uid, c.name as cat_name, c.id as cat_id
                   FROM assess
                   LEFT JOIN user ON assess.user_id = user.id
-                  WHERE assess.category_id = '$cid'
+                  LEFT JOIN category c ON c.id = assess.category_id
+                  WHERE assess.category_id $where
                   AND assess.deleted_at IS NULL
                   AND assess.availability = 'assess'
                   ORDER BY assess.created_at DESC LIMIT 0, $limit";
@@ -140,6 +165,8 @@ class Feed {
                 'type' => 'onlineassessment',
                 'message' => $userHandler->formatName($row) . ' posted the online assessment ' . Scrub::text($row['heading']),
                 'messageHTML' => '<a href="/search/user/'.$row['uid'].'">' . $userHandler->formatName($row) . '</a> posted the online assessment <a href="/assess/intro/' . $row['assess_id'] . '">' . Scrub::text($row['heading']) . '</a>',
+                'cat_name' => $row['cat_name'],
+                'cat_id' => $row['cat_id'],
             );
         }
 
@@ -154,13 +181,20 @@ class Feed {
 	 * @return
 	 */
 	public function getSurveys($cid, $limit) {
-		$query = "SELECT
+
+        if(is_array($cid))
+            $where = ' IN (' . implode(',',$cid) . ') ';
+        else
+            $where = " = $cid ";
+
+        $query = "SELECT
 					  assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.created_at) as created_at,
 					  user.title, user.firstname, user.lastname,
-					  user.id AS uid
+					  user.id AS uid, c.name as cat_name, c.id as cat_id
 				  FROM assess
 				  LEFT JOIN user ON assess.user_id = user.id
-				  WHERE assess.category_id = '$cid'
+				  LEFT JOIN category c ON c.id = assess.category_id
+				  WHERE assess.category_id $where
 				  AND assess.deleted_at IS NULL
 				  AND assess.availability = 'survey'
 				  ORDER BY assess.created_at DESC LIMIT 0, $limit";
@@ -175,7 +209,9 @@ class Feed {
 				'type' => 'survey',
 				'message' => $userHandler->formatName($row) . ' posted the survey ' . Scrub::text($row['heading']),
 				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">' . $userHandler->formatName($row) . '</a> posted the survey <a href="/survey/intro/' . $row['assess_id'] . '">' . Scrub::text($row['heading']) . '</a>',
-			);
+                'cat_name' => $row['cat_name'],
+                'cat_id' => $row['cat_id'],
+            );
 		}
 
 		return $surveys;
@@ -183,8 +219,17 @@ class Feed {
 
 
 	function getNews($cid, $limit) {
-		$query = "SELECT sn.id, heading, UNIX_TIMESTAMP(datetime_posted) submitted, u.firstname, u.lastname, u.title, u.id as uid
-					FROM subject_news sn JOIN user u ON owner = u.id WHERE code = $cid AND deleted = 0
+
+        if(is_array($cid))
+            $where = ' IN (' . implode(',',$cid) . ') ';
+        else
+            $where = " = $cid ";
+
+        $query = "SELECT sn.id, heading, UNIX_TIMESTAMP(datetime_posted) submitted, u.firstname, u.lastname, u.title, u.id as uid, c.name as cat_name, c.id as cat_id
+					FROM subject_news sn
+					JOIN user u ON owner = u.id
+					LEFT JOIN category c ON c.id = sn.code
+					WHERE sn.code $where AND deleted = 0
 					ORDER BY datetime_posted DESC LIMIT 0, $limit";
 
 		$this->db->query($query);
@@ -198,15 +243,26 @@ class Feed {
 				'type' => 'news',
 				'message' => $userHandler->formatName($row) . ' posted the news '.Scrub::text($row['heading']),
 				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> posted the news <a href="/resources/'.$row['id'].'">' . Scrub::text($row['heading']) . '</a>',
-			);
+                'cat_name' => $row['cat_name'],
+                'cat_id' => $row['cat_id'],
+            );
 		}
 
 		return $news;
 	}
 
 	function getFolders($cid, $limit) {
-		$query = "SELECT c.id, name, UNIX_TIMESTAMP(time) submitted, action, u.firstname, u.lastname, u.title, u.id as uid
-					FROM cmsLog JOIN category c ON objectId = c.id JOIN user u ON user = u.id WHERE parent = $cid AND object = 'folder' AND action = 'create'
+
+        if(is_array($cid))
+            $where = ' IN (' . implode(',',$cid) . ') ';
+        else
+            $where = " = $cid ";
+
+        $query = "SELECT c.id, name, UNIX_TIMESTAMP(time) submitted, action, u.firstname, u.lastname, u.title, u.id as uid, c.name as cat_name, c.id as cat_id
+					FROM cmsLog
+					JOIN category c ON objectId = c.id
+					JOIN user u ON user = u.id
+					WHERE parent $where AND object = 'folder' AND action = 'create'
 					ORDER BY time DESC LIMIT 0, $limit";
 
 		$this->db->query($query);
@@ -219,17 +275,26 @@ class Feed {
 				'type' => 'folder',
 				'message' => $userHandler->formatName($row) . ' created the folder '.Scrub::text($row['name']),
 				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> created the folder <a href="/resources/'.$row['id'].'">' . Scrub::text($row['name']) . '</a>',
-			);
+                'cat_name' => $row['cat_name'],
+                'cat_id' => $row['cat_id'],
+            );
 		}
 
 		return $folder;
 	}
 
 	function getForum($cid, $limit) {
-		$query = "SELECT f.id, heading, UNIX_TIMESTAMP(`date`) submitted, u.firstname, u.lastname, u.title, u.id as uid
+
+        if(is_array($cid))
+            $where = ' IN (' . implode(',',$cid) . ') ';
+        else
+            $where = " = $cid ";
+
+        $query = "SELECT f.id, heading, UNIX_TIMESTAMP(`date`) submitted, u.firstname, u.lastname, u.title, u.id as uid, c.name as cat_name, c.id as cat_id
 					FROM forum f
-						JOIN user u ON u.id = f.owner
-					WHERE f.deleted = 0 AND f.cid = $cid
+                    JOIN user u ON u.id = f.owner
+                    LEFT JOIN category c ON c.id = f.cid
+					WHERE f.deleted = 0 AND f.cid $where
 					ORDER BY `date` DESC LIMIT 0, $limit";
 
 		$this->db->query($query);
@@ -242,7 +307,9 @@ class Feed {
 				'type' => 'forum',
 				'message' => $userHandler->formatName($row) . ' made the comment '.Scrub::text($row['heading']),
 				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> made the comment <a href="/forum/viewForum.php?mgsid='.$row['id'].'&cid='.$cid.'">' . Scrub::text($row['heading']) . '</a>',
-			);
+                'cat_name' => $row['cat_name'],
+                'cat_id' => $row['cat_id'],
+            );
 		}
 
 		return $forum;
@@ -253,11 +320,18 @@ class Feed {
 	}
 
 	function getWiki($cid, $limit) {
-		$query = "SELECT w.wikiID, heading, w.categoryID, w.slug, UNIX_TIMESTAMP(r.created) submitted, u.firstname, u.lastname, u.title, u.id as uid
+
+        if(is_array($cid))
+            $where = ' IN (' . implode(',',$cid) . ') ';
+        else
+            $where = " = $cid ";
+
+        $query = "SELECT w.wikiID, heading, w.categoryID, w.slug, UNIX_TIMESTAMP(r.created) submitted, u.firstname, u.lastname, u.title, u.id as uid, c.name as cat_name, c.id as cat_id
 					FROM wikiRevision r
 						JOIN wiki w ON w.wikiID = r.wikiID
 						JOIN user u ON u.id = r.userID
-				  	WHERE w.deleted = 'false' AND w.categoryID = $cid
+						LEFT JOIN category c ON c.id = w.categoryID
+				  	WHERE w.deleted = 'false' AND w.categoryID $where
 					ORDER BY r.created DESC LIMIT 0, $limit";
 
 		$this->db->query($query);
@@ -270,7 +344,9 @@ class Feed {
 				'type' => 'wiki',
 				'message' => $userHandler->formatName($row) . ' updated the wiki '.Scrub::text($row['heading']),
 				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> updated the wiki <a href="/wiki/'.$row['categoryID'].'/'.$row['slug'] .'">' . Scrub::text($row['heading']) . '</a>',
-			);
+                'cat_name' => $row['cat_name'],
+                'cat_id' => $row['cat_id'],
+            );
 		}
 
 		return $wiki;
@@ -284,11 +360,18 @@ class Feed {
 	 * @return
 	 */
 	public function getBlog($cid, $limit) {
-		$query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, b.id AS blogID, heading, UNIX_TIMESTAMP(b.created) AS submitted
+
+        if(is_array($cid))
+            $where = ' IN (' . implode(',',$cid) . ') ';
+        else
+            $where = " = $cid ";
+
+        $query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, b.id AS blogID, heading, UNIX_TIMESTAMP(b.created) AS submitted, c.name as cat_name, c.id as cat_id
 			FROM user u
 			JOIN blog b
 			ON u.id = b.owner
-			WHERE cid = $cid
+			LEFT JOIN category c ON c.id = cid
+			WHERE cid $where
 			AND deleted IS NULL
 			ORDER BY submitted LIMIT 0, $limit";
 
@@ -302,7 +385,9 @@ class Feed {
 				'type' => 'blog',
 				'message' => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
 				'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> updated the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text($row['heading']) . '</a>',
-			);
+                'cat_name' => $row['cat_name'],
+                'cat_id' => $row['cat_id'],
+            );
 		}
 
 		return $blog;
@@ -316,11 +401,18 @@ class Feed {
 	 * @return
 	 */
 	public function getBlogComments($cid, $limit) {
-		$query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, UNIX_TIMESTAMP(bc.created) AS submitted, b.id AS blogID, heading, cid
+
+        if(is_array($cid))
+            $where = ' IN (' . implode(',',$cid) . ') ';
+        else
+            $where = " = $cid ";
+
+        $query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, UNIX_TIMESTAMP(bc.created) AS submitted, b.id AS blogID, heading, cid, c.name as cat_name, c.id as cat_id
 			FROM `user` u
 			JOIN blogComment bc ON u.id = bc.owner
 			JOIN blog b ON bc.bid = b.id
-			WHERE cid = $cid
+			LEFT JOIN category c ON c.id = cid
+			WHERE cid $where
 			AND b.deleted IS NULL
 			ORDER BY submitted LIMIT 0, $limit";
 
@@ -334,7 +426,9 @@ class Feed {
 				'type' => 'blog',
 				'message' => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
 				'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> commented on the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text($row['heading']) . '</a>',
-			);
+                'cat_name' => $row['cat_name'],
+                'cat_id' => $row['cat_id'],
+            );
 		}
 
 		return $blogComments;
