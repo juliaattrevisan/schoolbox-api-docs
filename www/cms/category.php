@@ -157,19 +157,37 @@ else {
 		array_unshift($templateList, array('TEMPLATE_ID' => 0, 'TEMPLATE_NAME' => 'No Homepage'));
 		$this->dropDown('template_list', $templateList);
 
-		$groupPermList = $categoryHandler->getGroupPerms(0);
+		/* Suggest Group Permissions based on parent folder's Group Permissions
+		 */
+		$allParentPermissions = $categoryHandler->getGroupPerms($categoryParent['id']);
 
-		if (is_array($groupPermList)) {
-			foreach ($groupPermList as $group) {
-				$output = array(
-					'GROUP_NAME' => Scrub::text($group['name']),
-					'GROUP_ID' => $group['id'],
-					'PERM_0_SELECTED' => 'checked="checked"',
+		if (is_array($allParentPermissions) && count($allParentPermissions)) {
+			foreach($allParentPermissions as $parentPermission) {
+				$this->setVar(array(
+					'GROUP_ID' => $parentPermission['id'],
+					'GROUP_NAME' => Scrub::text($parentPermission['name']),
+					'PERM_0_SELECTED' => '',
 					'PERM_1_SELECTED' => '',
 					'PERM_2_SELECTED' => '',
-				);
+				));
 
-				$this->setVar($output);
+				/* Preselect permission radio
+				 */
+				if (is_numeric($parentPermission['type']) && in_array($parentPermission['type'], array(0,1,2))) {
+					$key = "PERM_{$parentPermission['type']}_SELECTED";
+
+					$this->setVar(array(
+						$key => 'checked="checked"',
+					));
+				}
+				/* Set "None" by default if unspecified
+				 */
+				else {
+					$this->setVar(array(
+						'PERM_0_SELECTED' => 'checked="checked"',
+					));
+				}
+
 				$this->parse('perm_table_block', 'perm_table', true);
 			}
 		}
