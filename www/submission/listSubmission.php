@@ -14,7 +14,7 @@ $this->setBlock('submission_listing', 'normalSubmission', 'normalSubmission_bloc
 $submissionHandler = new Submission();
 $subList = $submissionHandler->getAllForUser($_SESSION['id']);
 
-$attemptHandler = new AssessAttempt();
+$attemptHandler = new Assess_Attempt();
 $groupHandler = new Group();
 
 if (Cfg::get('external_enable')) {
