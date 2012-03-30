@@ -2526,6 +2526,11 @@ EVALUATION
 	margin-bottom: 5px;
 	position: relative;
 }
+.evaluation-content fieldset.checkboxes label{
+    width:auto;
+}
+
+
 
 .evaluation-content .textarea-container {
 	background: #fff;
