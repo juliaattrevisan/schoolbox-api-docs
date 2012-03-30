@@ -11,13 +11,28 @@ $j(function() {
   		}
 	});
 
-	$j('.show-survey-options').click(function() {
-		$j('.survey-options').slideToggle("fast");
-		$j(this).toggleClass('active')
-		return false;
-	});
+    $j('p.tiny-btns a').each(function() {
+        $j(this).css({
+            'width': '2px !important',
+            'padding': '0 14px',
+            'text-indent': '-9999em'
+        })
+    });
 
-	$j('.show-section-options').click(function() {
+
+    $j('p.tiny-btns a').hover(function() {
+        $j(this).removeAttr('style');
+    }, function() {
+        $j(this).css({
+            'width': '2px !important',
+            'padding': '0 14px',
+            'text-indent': '-9999em'
+        });
+    });
+
+
+
+    $j('.show-section-options').click(function() {
 		$j(this).parent().siblings('.question-list').children(":first-child").slideToggle();
 		$j(this).toggleClass('active')
 		return false;
@@ -42,11 +57,12 @@ $j(function() {
 
 <h2>Manage Survey</h2>
 	<div class="pad-it ">
-		<div class="hide survey-options pad-it clearfix"> <a href="/survey/modify/{ASSESS_ASSESS_ID}" class="btn modify float-left no-marg" ><span></span>Modify</a> <a href="/survey/export/{ASSESS_ASSESS_ID}" class="btn go-to float-left no-marg" ><span></span>Export</a> <a href="/survey/delete/{ASSESS_ASSESS_ID}" class="btn delete float-left no-marg" ><span></span>Delete</a> </div>
-		<a class="drop-arrow show-survey-options" href="#">&#x25BC;</a>
-		
-		<p class="clearfix">
-			<a class="btn add" href="/survey/section/create/{ASSESS_ASSESS_ID}"><span></span>Add section</a> 
+
+		<p class="clearfix tiny-btns">
+            <a href="/survey/modify/{ASSESS_ASSESS_ID}" class="btn modify float-left marg" ><span></span>Modify</a>
+            <a href="/survey/export/{ASSESS_ASSESS_ID}" class="btn go-to float-left marg" ><span></span>Export</a>
+            <a href="/survey/delete/{ASSESS_ASSESS_ID}" class="btn delete float-left marg" ><span></span>Delete</a>
+            <a class="btn add marg" href="/survey/section/create/{ASSESS_ASSESS_ID}"><span></span>Add section</a>
 		</p>
 		
 		<!-- BEGIN section -->

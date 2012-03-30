@@ -13,8 +13,8 @@ $j(function() {
 
     $j('p.tiny-btns a').each(function() {
         $j(this).css({
-            'width': '28px !important',
-            'padding': 0,
+            'width': '2px !important',
+            'padding': '0 14px',
             'text-indent': '-9999em'
         })
     });
@@ -24,8 +24,8 @@ $j(function() {
         $j(this).removeAttr('style');
     }, function() {
         $j(this).css({
-            'width': '28px !important',
-            'padding': 0,
+            'width': '2px !important',
+            'padding': '0 14px',
             'text-indent': '-9999em'
         });
     });
@@ -56,7 +56,6 @@ $j(function() {
 
 <h2>Manage Assessment</h2>
 	<div class="pad-it">
-
 
 		<p class="clearfix tiny-btns">
             <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="btn modify float-left marg tiny" ><span></span>Modify</a>
