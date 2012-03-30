@@ -1,0 +1,31 @@
+<h2>Most Recent Submissions</h2>
+
+<div class="listing">
+    <table class="due-dates">
+        <thead>
+        <tr>
+            <th width="20%">Last</th>
+            <th width="18%">Subject</th>
+            <th width="30%">Assessment Title</th>
+            <th width="15%">Submissions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- BEGIN work -->
+        <tr class="{ROW_COLOR}">
+            <td>{WORK_DATE}</td>
+            <td>{WORK_SUBJECT}</td>
+            <td>
+                <!-- BEGIN submission -->
+                <a href="/submission/viewSubmission/{WORK_BOX_ID}">{WORK_DESCRIPTION}</a>
+                <!-- END submission -->
+                <!-- BEGIN assess -->
+                <a href="/assess/results/{WORK_BOX_ID}">{WORK_DESCRIPTION}</a>
+                <!-- END assess -->
+            </td>
+            <td nowrap="nowrap">{WORK_COUNT}</td>
+        </tr>
+        <!-- END work -->
+        </tbody>
+    </table>
+</div>

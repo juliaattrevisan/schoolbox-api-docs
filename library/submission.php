@@ -468,6 +468,55 @@ class Submission extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
+    /**
+     * This function is similar to getAllForUsers, but returns aggregated results.
+     * Written for welcome component Most Recent Submissions
+     * @param $userID
+     */
+    public function getTotalSubmissionsByOwner($userID) {
+        $query = "(SELECT *, COUNT(id) AS `count` FROM (
+                        SELECT  sb.id,
+                            sb.name,
+                            c.name AS category_name,
+                            DATE_FORMAT(sb.date, '%a, %D %b %l:%i%p') AS `date`,
+                            DATE_FORMAT(submitted, '%Y-%m-%d %H:%i') AS datestamp,
+                            '' AS availability
+                        FROM student_submission ss
+                        LEFT JOIN submission_box sb ON ss.box_id = sb.id
+                        LEFT JOIN category c ON c.id = sb.category
+                        LEFT JOIN categoryCode co ON co.categoryID = c.id
+                        WHERE sb.owner = '$userID'
+                        AND sb.deleted = '0'
+                        ORDER BY datestamp DESC
+                        ) submissions
+                        GROUP BY id
+                        ORDER BY submitted DESC
+                    )
+                    UNION
+                    (
+                        SELECT *, COUNT(id) AS `count` FROM (
+                        SELECT	a.assess_id AS id,
+                            title AS `name`,
+                            c.name AS category_name,
+                            DATE_FORMAT(a.finish, '%a, %D %b %l:%i%p') AS `date`,
+                            DATE_FORMAT(aa.finish, '%Y-%m-%d %H:%i') AS datestamp,
+                            a.availability
+                        FROM assess_attempt aa
+                        LEFT JOIN assess a ON a.assess_id = aa.assess_id
+                        LEFT JOIN category c ON c.id = a.category_id
+                        LEFT JOIN categoryCode co ON co.categoryID = c.id
+                        WHERE a.availability = 'assess'
+                        AND aa.finish != '0000-00-00 00:00'
+                        AND a.user_id = '$userID'
+                        ) attempts
+                        GROUP BY id
+                        ORDER BY aa.finish DESC
+                    )
+                    ORDER BY datestamp DESC";
+
+        return $this->db->getAll($query);
+    }
+
     function getBoxCount($box_id) {
          $query = "SELECT COUNT(*) AS total, SUM(marked) AS marked FROM student_submission WHERE box_id = '".$box_id."'";
          return $this->db->getRow($query);
