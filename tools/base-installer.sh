@@ -23,24 +23,22 @@ supported_ubuntu="maverick|natty|onoeiric";
 ### CENTOS CONFIGURATION SETTINGS (DEPENDENCIES)
 
 dependencies_centos=( "dos2unix" );
-supported_centos="6.0|5.9|5.8";
+supported_centos="6.0|6.1|5.9|5.8";
 
 
 errorCheck() {
 if [ $? -eq 0 ]; then
-                echo -e "... Success\n";
-        else
-                echo -e "... Failed\n";
+               echo -e "... Success\n";
+       else
+               echo -e "... Failed\n";
 
-                if [ ${#1} -eq 1 ]; then
-                        echo -e "Critical Failure, Aborting installation.\nIf any issues persist on your installation contact support@schoolbox.com.au or call 1300 932 338, ext. 1.";
-                        exit;
-                fi;
+               if [ ${#1} -eq 1 ]; then
+                       echo -e "Critical Failure, Aborting installation.\nIf any issues persist on your installation contact support@schoolbox.com.au or call 1300 932 338, ext. 1.";
+                       exit;
+               fi;
 fi;
 }
 depcheck () {
-#Makes the installation noninteractive, meaning no user authentication or input is required.
-export DEBIAN_FRONTEND=noninteractive
 packageName=$1;
 ### UBUNTU PACKAGE CHECK
 if [[ `echo $OS|grep "ubuntu"` ]]; then
@@ -234,9 +232,8 @@ errorCheck 1;
 }
 installUpdater() {
 echo -e "\n##########################################################\n";
-echo -e "Installing Updater:\n";
-echo "01 01 * * *	root	cd $schoolbox_dir/tools && ./updater.sh >> /var/log/schoolbox_update_log" >> /etc/crontab;
-errorCheck;
+echo -e "Updater:\n";
+echo "Updater Crontab entry, please manually add to /etc/crontab if required (For test installs only, this is Not automatic for a reason!): \n01 01 * * *       root    cd $schoolbox_dir/tools && ./updater.sh >> /var/log/schoolbox_update_log";
 }
 createUser() {
 echo -e "\n##########################################################\n";
