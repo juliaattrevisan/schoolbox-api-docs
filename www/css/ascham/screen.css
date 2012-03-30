@@ -435,6 +435,10 @@ color: #0066B0;
 
 #ui-datepicker-div { z-index: 51; }
 
+#calendar h3{color:#000;}
+
+
+
 #hgroup {
     font-size: 1.3em;
     position: relative;
