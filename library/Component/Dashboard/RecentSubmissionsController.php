@@ -46,6 +46,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         $count = 0;
         $limit = min(array($this->max, count($this->submissions)));
 
+        $j = 0;
         foreach($this->submissions as $submit) {
             // don't exceed the limit
             if($count >= $limit)
@@ -58,8 +59,8 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
                 'WORK_SUBJECT'     => $submit['category_name'],
                 'WORK_DESCRIPTION' => $submit['name'],
                 'WORK_COUNT'       => $submit['count'],
-                'WORK_BOX_ID'      => $submit['id']
-
+                'WORK_BOX_ID'      => $submit['id'],
+                'ROW_COLOR'        => ++$j%2 ? 'dark' : ''
             );
 
             $this->setVar($output);
