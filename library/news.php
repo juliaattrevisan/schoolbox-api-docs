@@ -309,14 +309,28 @@ class News extends DeprecatedModel {
 
         $userResults = $this->db->getAll($query);
 
-        //merge and sort the headlines based on time
-        if(is_array($shareResults) && is_array($userResults))
-            $allNews = array_merge($shareResults, $userResults);
-        else if(is_array($shareResults))
-            $allNews = $shareResults;
-        else if(is_array($userResults))
-            $allNews = $userResults;
-        else
+
+        // iterate over news articles and include them if their key is not already found in the index
+        $existingIDs = array();
+        $allNews = array();
+
+        if(is_array($shareResults))
+        foreach($shareResults as $share) {
+            if(!in_array($share['item_id'], $existingIDs)) {
+                $existingIDs[] = $share['item_id'];
+                $allNews[] = $share;
+            }
+        }
+
+        if(is_array($userResults))
+        foreach($userResults as $user) {
+            if(!in_array($user['item_id'], $existingIDs)) {
+                $existingIDs[] = $user['item_id'];
+                $allNews[] = $user;
+            }
+        }
+
+        if(empty($allNews))
             return false;
 
         usort($allNews,array($this,"timecmp"));

@@ -64,12 +64,13 @@ $expired = $articleExpiry->getUnixTimestamp() < $now->getUnixTimestamp();
 $topicList = $newsHandler->getTopicList();
 $allNews = $newsHandler->getNewsListing($expired, $topic['name']);
 
+
 // output the list of topics for the sidebar
 foreach($topicList as $sidebarTopic) {
     $url = new Url($sidebarTopic['name']);
     $output = array(
         'LIST_TOPIC_NAME' => $sidebarTopic['name'],
-        'LIST_TOPIC_CLEAN' => $url->getSlug(),
+        'LIST_TOPIC_CLEAN' => ($expired ? 'archive/' : '') . $url->getSlug(),
     );
     $this->setVar($output);
 
@@ -120,7 +121,7 @@ if($prev) {
 
 // output next
 if($next) {
-    $this->setVar('NEXT_ARTICLE', '<a style="float:right;" href="/news/item/' . $next[0] . '">' . $next[1] . ' &raquo;</a>');
+    $this->setVar('NEXT_ARTICLE', '<a class="next" href="/news/item/' . $next[0] . '">' . $next[1] . ' &raquo;</a>');
 } else {
     $this->setVar('NEXT_ARTICLE', '');
 }
