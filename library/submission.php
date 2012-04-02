@@ -431,6 +431,7 @@ class Submission extends DeprecatedModel {
                         GROUP_CONCAT(co.code) code,
                         category.name AS category_name,
                         DATE_FORMAT(submission_box.date, '%a, %D %b %l:%i%p') AS date,
+                        submission_box.date AS due_date,
                         DATE_FORMAT(submission_box.open_date, '%a, %D %b %l:%i%p') AS open_date,
                         submission_box.type AS type_id,
                         file_type.name AS type,
@@ -452,6 +453,7 @@ class Submission extends DeprecatedModel {
                         '' AS code,
                         category.name AS name,
                         DATE_FORMAT(assess.finish, '%a, %D %b %l:%i%p') AS date,
+                        assess.finish as due_date,
                         DATE_FORMAT(assess.start, '%a, %D %b %l:%i%p') AS open_date,
                         file_type.id AS type_id,
                         file_type.name AS type,
@@ -463,7 +465,7 @@ class Submission extends DeprecatedModel {
 					AND assess.deleted_at IS NULL
 					AND assess.availability = 'assess'
                     AND assess.user_id = '$userID')
-                    ORDER BY catid, date";
+                    ORDER BY catid, due_date DESC";
 
         return $this->db->getAll($query);
     }
