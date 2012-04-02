@@ -2550,6 +2550,10 @@ EVALUATION
 	display: block;
 }
 
+.evaluation-content .wysiwyg strong{
+    display:inline;
+}
+
 .evaluation-content span {
 	font-weight: normal;
 }
