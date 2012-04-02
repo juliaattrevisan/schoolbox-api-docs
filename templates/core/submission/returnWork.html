@@ -4,43 +4,50 @@
 
 <script language="JavaScript" type="text/javascript">
 	$j(function() {
-	$j('.prettify').prettyFileInput({	
-		additionalButtonClasses: 'no-marg float-left',
-		buttonActiveClass: 'tick',
-		defaultText: '<span></span>Choose file',
-		defaultFileSelectedText: '<span></span>File selected'
+        $j('.prettify').prettyFileInput({
+            additionalButtonClasses: 'no-marg float-left',
+            buttonActiveClass: 'tick',
+            defaultText: '<span></span>Choose file',
+            defaultFileSelectedText: '<span></span>File selected'
+        });
+
+        jQuery.validator.addMethod("percentage", function(value, element) {
+            return this.optional(element) || (parseFloat(value) <= 100);
+        }, "Please enter a value out of 100");
+
+        jQuery.validator.addMethod("lessThanTotal", function(value, element) {
+
+            console.log(parseInt(value))
+
+            if (parseInt(value) <= parseInt($j('.validation-limit').text())) {
+                return true;
+                alert('e')
+            } else {
+                return false;
+            }
+        }, "Amount must be less or equal to mark limit");
+
+        jQuery.validator.addClassRules({
+            percentage: {
+                required: true,
+                percentage: true
+            },
+            outof: {
+                lessThanTotal: true,
+                required: true
+            }
+        });
+
+        $j('#returnWorkForm').validate();
+
 	});
-	});
-    function verify(){
-	var msg = ""
-	var myform = document.getElementById('returnWorkForm');
-	//user must enter at least one field
-	if(myform.file.value == "" && myform.comment.value == "" && myform.mark.value == ""){
-		msg += "You need to enter at least one field to return to student\n";
-	}
-	if(msg != ""){
-		alert(msg);
-		return false;
-	}
-	else
-		return true;
-    }
+
 </script>
 
-<style type="text/css">
-    #mark, #comment {
-        border: solid 1px #ccc;
-        padding-right: 2px;
-    }
-
-    .ralign {
-        text-align: right;
-    }
-</style>
 <!-- END custom_head -->
 
 <h1>Return Work </h1>
-<form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" class="clearfix" name="returnWorkForm" id="returnWorkForm"  onsubmit="return(verify());">
+<form action="/submission/returnWorkForm.php" method="post" enctype="multipart/form-data" class="clearfix" name="returnWorkForm" id="returnWorkForm" >
 <input name="box_id" type="hidden" id="box_id" value="{BOX_ID}" />
 <input name="uid" type="hidden" id="uid" value="{UID}" />
     <table class="standardForm">
@@ -57,14 +64,14 @@
         <tr>
             <td><h4>Comment</h4>
                 <em>You may write a short comment here (20 words) regarding the work. This field is optional.</em></td>
-			<td><textarea name="comment" cols="50" rows="3" id="comment">{COMMENT}</textarea></td>
+			<td><textarea name="comment" cols="50" rows="3"  id="comment">{COMMENT}</textarea></td>
         </tr>
         <tr>
             <td><h4>Mark</h4>
                 <em>{MARK_TYPE_COMMENT} This field is optional.</em></td>
             <td>
                 <!-- BEGIN mark_type_percent -->
-                <input name="mark" class="ralign" type="text" id="mark" size="10" maxlength="3" value="{MARK}"/><span>%</span>
+                <input name="mark" class="ralign percentage" type="text" id="mark" size="10"  maxlength="3" value="{MARK}"/><span>%</span>
                 <!-- END mark_type_percent -->
                 <!-- BEGIN mark_type_letter -->
                 <select id="mark" name="mark">
@@ -74,10 +81,10 @@
                 </select>
                 <!-- END mark_type_letter -->
                 <!-- BEGIN mark_type_raw -->
-                <input name="mark" class="ralign" type="text" id="mark" size="10" maxlength="15" value="{MARK}"/><span> out of {MAX_MARK}</span>
+                <input name="mark" class="ralign outof" type="text" id="mark" size="10" maxlength="15" value="{MARK}"/><span> out of <span class="validation-limit">{MAX_MARK}</span></span>
                 <!-- END mark_type_raw -->
                 <!-- BEGIN mark_type_free -->
-                <input name="mark" type="text" id="mark" size="10" maxlength="15" value="{MARK}"/>
+                <input name="mark" type="text" id="mark" class="required" size="10" maxlength="15" value="{MARK}"/>
                 <!-- END mark_type_free -->
 
             </td>
