@@ -22,6 +22,7 @@ $this->setBlock(TEMPLATE_content, 'table_schema', 'table_schema_block');
 $this->setBlock(TEMPLATE_content, 'newInput', 'newInput_block');
 $this->setBlock(TEMPLATE_content, 'newSelect', 'newSelect_block');
 $this->setBlock('newSelect', 'newSelect_option', 'newSelect_option_block');
+$this->setBlock(TEMPLATE_content, 'create_new', 'create_new_block');
 
 $this->setVar('table_cell_static_block','');
 $this->setVar('table_cell_select_block','');
@@ -29,41 +30,63 @@ $this->setVar('newSelect_block','');
 
 $tableList = array(
     array(
-        'name'      => 'groups',
-        'title'     => 'Groups',
-        'index'     => 'id'
+        'name'   => 'groups',
+        'title'  => 'Groups',
+        'index'  => 'id'
     ),
     array(
-        'name'      => 'house',
-        'title'     => 'Houses',
-        'index'     => 'id'
+        'name'   => 'house',
+        'title'  => 'Houses',
+        'index'  => 'id'
     ),
 	array(
-		'name'      => 'luCampus',
-		'title'     => 'Campus',
-		'index'     => 'id'
+		'name'   => 'luCampus',
+		'title'  => 'Campus',
+		'index'  => 'id'
 	),
 	array(
-		'name'      => 'luEventType',
-		'title'     => 'Event Types',
-		'index'     => 'eventTypeID'
+		'name'   => 'luEventType',
+		'title'  => 'Event Types',
+		'index'  => 'eventTypeID'
 	),
 	array(
-		'name'      => 'file_type',
-		'title'     => 'Assessment Types',
-		'index'     => 'id'
+		'name'   => 'file_type',
+		'title'  => 'Assessment Types',
+		'index'  => 'id'
 	),
 	array(
-		'name'      => 'newsTopic',
-		'title'     => 'News Topics',
-		'index'     => 'newsTopicID'
+		'name'   => 'newsTopic',
+		'title'  => 'News Topics',
+		'index'  => 'newsTopicID'
 	),
     array(
-        'name'      => 'submission_grade',
-        'title'     => 'Submission Grades',
-        'index'     => 'grade_id'
+        'name'   => 'submission_grade',
+        'title'  => 'Submission Grades',
+        'index'  => 'grade_id'
     ),
-
+    array(
+        'name'   => 'homepage_comp',
+        'title'  => 'Homepage Components',
+        'index'  => 'id',
+        'create' => false,
+        'fields' => array(
+            'id'           => array(
+                'readonly'     => '1'
+            ),
+            'name'         => array(
+                'caption'      => 'Component Name',
+                'readonly'     => '1'
+            ),
+            'description'  => array(
+                'caption'      => 'Description',
+                'readonly'     => '1'
+            ),
+            'invisible'    => array(
+                'caption'      => 'Hidden?',
+                'readonly'     => '0'
+            ),
+        ),
+    )
 );
 
 if (!$this->arg[0]) {
@@ -99,8 +122,15 @@ foreach($tableList as $table) {
 
 $genericHandler = new GenericTable($selectedTable['name'], $selectedTable['index']);
 
-$tableDefinition = $genericHandler->getDefinition();
-$table = $genericHandler->getAll();
+// restrict the visibility of the table if specified
+if(isset($selectedTable['fields'])) {
+    $fieldNames = array_keys($selectedTable['fields']);
+    $tableDefinition = $genericHandler->getLimitedDefinition($fieldNames);
+    $table = $genericHandler->getAllInFields($fieldNames);
+} else {
+    $tableDefinition = $genericHandler->getDefinition();
+    $table = $genericHandler->getAll();
+}
 
 foreach($table as $row) {
     foreach($row as $keys => $data) {
@@ -115,7 +145,15 @@ foreach($table as $row) {
 
 
         if (!$rowOne) {
-            $this->setVar('TABLE_HEAD', ucwords(str_replace('_',' ',$keys)));
+
+            if((isset($selectedTable['fields'][$keys]['caption']))) {
+                $this->setVar('TABLE_HEAD', $selectedTable['fields'][$keys]['caption']);
+            } else {
+                $this->setVar('TABLE_HEAD', ucwords(str_replace('_',' ',$keys)));
+            }
+
+
+
             $this->parse('table_heading_block','table_heading',true);
 
 			/* New row template. Indexes are readonly.
@@ -125,6 +163,15 @@ foreach($table as $row) {
 				$this->setVar('READONLY', 'readonly="readonly"');
                 $this->parse('newInput_block', 'newInput', true);
 			}
+
+            // fields specified as readonly are also...readonly.
+            else if(isset($selectedTable['fields'][$keys]) && $selectedTable['fields'][$keys]['readonly'] == '1') {
+                $this->setVar('TYPE', 'hidden');
+                $this->setVar('READONLY', 'readonly="readonly"');
+                $this->parse('newInput_block', 'newInput', true);
+            }
+
+            // if the field is an enum, explode it, and iteratively create select options for the list
             else if(stristr($col['Type'],'enum') ) {
                 $this->setVar('newSelect_option_block','');
                 
@@ -136,16 +183,17 @@ foreach($table as $row) {
                 }
                 $this->parse('newSelect_block', 'newSelect', true);
             }
-			else {
+
+            // generically, just go with a text input
+            else {
 				$this->setVar('TYPE', 'text');
 				$this->setVar('READONLY', '');
                 $this->parse('newInput_block', 'newInput', true);
 			}
 
-
         }
 
-        if ($keys == $selectedTable['index']) {
+        if ($keys == $selectedTable['index'] || (isset($selectedTable['fields'][$keys]) && $selectedTable['fields'][$keys]['readonly'] == '1')) {
             $this->parse('table_cell_block','table_cell_static',true);
 		}
         else if(stristr($col['Type'],'enum') ){
@@ -171,8 +219,17 @@ foreach($table as $row) {
 
     $rowOne = 'true';
 
+    $this->setVar('ROW_COLOR', ++$j%2 == 1? 'dark' : '');
+
     $this->parse('table_row_block','table_row',true);
     $this->setVar('table_cell_block','');
+}
+
+// prevent the creation of new entries if admins should not be able to
+if(isset($selectedTable['create']) && $selectedTable['create'] == false) {
+    $this->setVar('create_new_block', '');
+} else {
+    $this->parse('create_new_block', 'create_new', false);
 }
 
 ?>
