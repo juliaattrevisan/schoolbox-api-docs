@@ -28,6 +28,11 @@ if (is_array($allFolders) && count($allFolders)) {
 		$class = array();
 		$class[] = 'child-of-node-' . $currentFolder['parent'];
 
+        /* add plus sign to parent nodes */
+        if ($currentFolder['isParent']) {
+            $class[] = 'expanded loaded';
+        }
+
 		$output = array(
 			'CATEGORY_ID' => $currentFolder['id'],
 			'TITLE' => $currentFolder['name'],

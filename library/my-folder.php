@@ -61,16 +61,21 @@ class MyFolder extends DeprecatedModel {
 			$total = count($folderList);
 			for ($i = 0; $i < $total; $i++) {
 				if ($folderList[$i]['id'] != $ignore) {
+
+                    $childrenList = $this->getFolderTree($folderList[$i]['id'], $depth + 1, $ignore);
+
 					$output[] = array('id'	=> $folderList[$i]['id'],
 									  'name'	=> $folderList[$i]['name'],
 									  'parent' => $folderList[$i]['parent'],
 									  'depth'	=> $depth,
+                                      'isParent' => $hasChildren = is_array($childrenList),
 									 );
 
-					$childrenList = $this->getFolderTree($folderList[$i]['id'], $depth + 1, $ignore);
-					if (is_array($childrenList))
+
+					if ($hasChildren) {
 						$output = array_merge($output, $childrenList); //array_splice($folderList, $i+1, 0, $childrenList);
-				}
+                    }
+                }
 			}
 
 			return $output;
