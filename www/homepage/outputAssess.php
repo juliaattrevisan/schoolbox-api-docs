@@ -60,7 +60,7 @@ if (is_array($allAssess)) {
 				'ASSESS_TITLE' => $currentAssess['title'],
 				'ASSESS_START_DATE' => date('jS M Y', strtotime($currentAssess['start'])),
 				'ASSESS_FINISH_DATE' => date('jS M Y', strtotime($currentAssess['finish'])),
-				'ASSESS_DESCRIPTION' => strip_tags(html_entity_decode($currentAssess['description'])),
+				'ASSESS_DESCRIPTION' => Scrub::html(html_entity_decode($currentAssess['description'])),
 				'ON_OFF' => $i++%2 ? 'dark' : '',
 			));
 
