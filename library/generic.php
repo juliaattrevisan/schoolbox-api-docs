@@ -12,5 +12,25 @@ class GenericTable extends DeprecatedModel {
         $query = "SHOW COLUMNS FROM `$this->_table`";
         return $this->db->getAll($query);
     }
+
+    function getLimitedDefinition($visibleFields) {
+        if(!is_array($visibleFields))
+            return $this->getDefinition();
+
+        $fieldString = implode("', '", $visibleFields);
+
+        $query = "SHOW COLUMNS FROM `$this->_table` WHERE `Field` IN ('$fieldString')";
+        return $this->db->getAll($query);
+    }
+
+    function getAllInFields($fields) {
+        if(!is_array($fields))
+            return $this->getAll();
+
+        $fieldString = implode('`, `', $fields);
+        $query = "SELECT `$fieldString` FROM `$this->_table`";
+
+        return $this->db->getAll($query);
+    }
 }
 ?>
