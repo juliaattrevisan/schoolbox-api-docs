@@ -229,10 +229,10 @@ break;
 
 case "weblinks":
         $form="form";
-        $action="http://www.weblinksresearch.com/login/index.cfm";
-        $method="GET";
-	$formArray['QED'] = 'shore';
-        $formArray['PED'] = '607';
+        $action="http://www.weblinksresearch.com.au/login/online/online.cfm";
+        $method="POST";
+	$formArray['entereduser'] = 'shore';
+        $formArray['EnteredPassword'] = '607';
 break;
 
 case "elibrary":
