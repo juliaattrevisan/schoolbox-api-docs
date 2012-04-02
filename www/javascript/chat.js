@@ -200,7 +200,8 @@ $.widget("ui.chat",  {
 
         $message_el.html('<span class="chat-user"><span class="triangulate"></span><span class="chat-username">'+$message.name+'</span><span class="chat-time">'+$message.time+'</span></span><span class="chat-message">'+$message.body+'</span>');
 
-        this.options.log_el.append($message_el).attr({ scrollTop: this.options.log_el.attr("scrollHeight") });
+        this.options.log_el.append($message_el).prop({ scrollTop: this.options.log_el.prop("scrollHeight") });
+
     },
 
     _poll: function () {
