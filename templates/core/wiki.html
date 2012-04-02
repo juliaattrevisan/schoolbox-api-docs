@@ -1,5 +1,38 @@
 <!-- BEGIN custom_head -->
+
+<script type="text/javascript">
+
+$j(function() {
+    $j('.left').css('width','100%');
+    $j('.right').hide();
+
+    $j('.update').click(function(evt) {
+
+        if (!$j(this).hasClass('open')) {
+            $j(this).addClass('open');
+            $j('.left').stop().animate({'width':"69.5%"},function() {
+                $j('.right').stop().fadeIn();
+                $j('.update').html('<span></span>Hide Revisions');
+            });
+
+        } else {
+            $j(this).removeClass('open');
+            $j('.right').stop().fadeOut(function() {
+                $j('.left').stop().animate({'width':"100%"});
+                $j('.update').html('<span></span>View Revisions');
+            });
+
+        }
+
+        evt.preventDefault();
+    });
+
+});
+
+</script>
+
 <!-- END custom_head -->
+
 <h1>{HEADING} {LOCKED}</h1>
 
 <span class="header_option">
@@ -19,11 +52,15 @@
   </span>
 
 <div class="left">
-	<div class="wysiwig revision-box">
+	<div class="wysiwyg revision-box">
 		{BODY}
+
+        <p><a href="#" class="btn float-left update"><span></span>View Revisions</a></p>
+
 	</div>
 	<p>Modified by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a> on {MODIFIED}</p>
 </div>
+
 <div class="right">
 	<h2>Revisions</h2>
 	<table width="100%">
