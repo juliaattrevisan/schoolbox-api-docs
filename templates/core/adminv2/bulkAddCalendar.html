@@ -9,12 +9,12 @@ $j(function() {
 		target: 'topLeft',
 		tooltip: 'bottomLeft'
 	}
-	
+
 	$j.fn.qtip.defaults.style = {
 		tip: 'bottomLeft',
 		name: 'green'
 	}
-		
+
 	$j('thead td').each(function() {
 		activeContent = $j(this).find('em').html();
 		$j(this).qtip({
@@ -68,8 +68,8 @@ $j(function() {
 			</tbody>
 		</table>
 	</div>
-	
-	<a href="/adminv2/user" class="btn go-back float-left"><span></span>Back to calendar</a>
+
+	<a href="/adminv2/calendar" class="btn go-back float-left"><span></span>Back to calendar</a>
 
 	<div class="float-fix"></div>
 </div>

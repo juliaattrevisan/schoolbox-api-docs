@@ -897,237 +897,303 @@ class vcalendar {
  *                               FALSE - one occurance of component only in output array</tr>
  * @return array or FALSE
  */
-  function selectComponents( $startY=FALSE, $startM=FALSE, $startD=FALSE, $endY=FALSE, $endM=FALSE, $endD=FALSE, $cType=FALSE, $flat=FALSE, $any=TRUE, $split=TRUE ) {
-            /* check  if empty calendar */
-    if( 0 >= count( $this->components ))
-      return FALSE;
-            /* check default dates */
-    if( !$startY ) $startY = date( 'Y' );
-    if( !$startM ) $startM = date( 'm' );
-    if( !$startD ) $startD = date( 'd' );
-    $startDate = mktime( 0, 0, 0, $startM, $startD, $startY );
-    if( !$endY )   $endY   = $startY;
-    if( !$endM )   $endM   = $startM;
-    if( !$endD )   $endD   = $startD;
-    $endDate   = mktime( 23, 59, 59, $endM, $endD, $endY );
-            /* check component types */
-    $validTypes = array('vevent', 'vtodo', 'vjournal', 'vfreebusy' );
-    if( is_array( $cType )) {
-      foreach( $cType as $cix => $theType ) {
-        $cType[$cix] = $theType = strtolower( $theType );
-        if( !in_array( $theType, $validTypes ))
-          $cType[$cix] = 'vevent';
-      }
-      $cType = array_unique( $cType );
-    }
-    elseif( !empty( $cType )) {
-      $cType = strtolower( $cType );
-      if( !in_array( $cType, $validTypes ))
-        $cType = array( 'vevent' );
-      else
-        $cType = array( $cType );
-    }
-    else
-      $cType = $validTypes;
-    if( 0 >= count( $cType ))
-      $cType = $validTypes;
-            /* iterate components */
-    $result = array();
-    foreach ( $this->components as $cix => $component ) {
-      unset( $component->propix, $start );
-            /* deselect unvalid type components */
-      if( !in_array( $component->objName, $cType ))
-        continue;
-            /* deselect components without dtstart set */
-      if( FALSE === ( $start = $component->getProperty( 'dtstart' )))
-        continue;
-      $dtendExist = $dueExist = FALSE;
-      unset( $end, $startWdate, $endWdate, $rdurWsecs, $rdur, $exdatelist, $workstart, $workend ); // clean up
-      $startWdate = $component->_date2timestamp( $start );
-            /* get end date from dtend/due/duration properties */
-      $end = $component->getProperty( 'dtend' );
-      if( !empty( $end ))
-        $dtendExist = TRUE;
-      //if( !empty($end))  echo 'selectComponents 1 start='.implode('-',$start).' end='.implode('-',$end)."<br />\n"; // test ###
-      if( empty($end) && ( $component->objName == 'vtodo' )) {
-        $end = $component->getProperty( 'due' );
-        if( !empty( $end ))
-          $dueExist = TRUE;
-        //if( !empty($end))  echo 'selectComponents 2 start='.implode('-',$start).' end='.implode('-',$end)."<br />\n"; // test ###
-      }
-      elseif( !empty($end) && !isset( $end['hour'] )) {
-          /* a DTEND without time part regards an event that ends the day before,
-             for an all-day event DTSTART=20071201 DTEND=20071202 (taking place 20071201!!! */
-        $end = array( 'year' => $end['year'], 'month' => $end['month'], 'day' => ($end['day'] - 1), 'hour' => 23, 'min' => 59, 'sec' => 59 );
-        //if( !empty($end))  echo 'selectComponents 3 start='.implode('-',$start).' end='.implode('-',$end)."<br />\n"; // test ###
-      }
-      if( empty( $end )) {
-        $end = $component->getProperty( 'duration', FALSE, FALSE, TRUE );// in dtend (array) format
-        //if( !empty($end))  echo 'selectComponents 4 start='.implode('-',$start).' end='.implode('-',$end)."<br />\n"; // test ###
-      }
-      if( empty( $end )) { // assume one day duration if missing end date
-        $end = array( 'year' => $start['year'], 'month' => $start['month'], 'day' => $start['day'], 'hour' => 23, 'min' => 59, 'sec' => 59 );
-        //if( isset($end))  echo 'selectComponents 5 start='.implode('-',$start).' end='.implode('-',$end)."<br />\n"; // test ###
-      }
-      $endWdate = $component->_date2timestamp( $end );
-      if( $endWdate < $startWdate ) { // MUST be after start date!!
-        $end = array( 'year' => $start['year'], 'month' => $start['month'], 'day' => $start['day'], 'hour' => 23, 'min' => 59, 'sec' => 59 );
-        $endWdate = $component->_date2timestamp( $end );
-      }
-      $rdurWsecs  = $endWdate - $startWdate; // compute component duration in seconds
-      $rdur       = $component->_date2duration( $start, $end ); // compute component duration, array
-            /* make a list of optional exclude dates for component occurence, exrule, exdate */
-      $exdatelist = array();
-      $workstart  = $component->_date_time_string( date('Y-m-d H:i:s', ( $startDate - $rdurWsecs )), 6);
-      $workend    = $component->_date_time_string( date('Y-m-d H:i:s', ( $endDate + $rdurWsecs )), 6);
-      while( FALSE !== ( $exrule = $component->getProperty( 'exrule' )))
-        $component->_recur2date( $exdatelist, $exrule, $start, $workstart, $workend );
-      while( FALSE !== ( $exdate = $component->getProperty( 'exdate' ))) {
-        foreach( $exdate as $theExdate ) {
-          $exWdate = $component->_date2timestamp( $theExdate );
-          if((( $startDate - $rdurWsecs ) <= $exWdate ) && ( $endDate >= $exWdate ))
-            $exdatelist[$exWdate] = TRUE;
-        }
-      }
-            /* if 'any' components, check repeating components, removing all excluding dates */
-      if( TRUE === $any ) {
-            /* make a list of optional repeating dates for component occurence, rrule, rdate */
-        $recurlist = array();
-        while( FALSE !== ( $rrule = $component->getProperty( 'rrule' )))    // check rrule
-          $component->_recur2date( $recurlist, $rrule, $start, $workstart, $workend );
-        foreach( $recurlist as $recurkey => $recurvalue ) // key=match date as timestamp
-          $recurlist[$recurkey] = $rdurWsecs; // add duration in seconds
-        while( FALSE !== ( $rdate = $component->getProperty( 'rdate' ))) {  // check rdate
-          foreach( $rdate as $theRdate ) {
-            if( is_array( $theRdate ) && ( 2 == count( $theRdate )) &&  // PERIOD
-                   array_key_exists( '0', $theRdate ) &&  array_key_exists( '1', $theRdate )) {
-              $rstart = $component->_date2timestamp( $theRdate[0] );
-              if(( $rstart < ( $startDate - $rdurWsecs )) || ( $rstart > $endDate ))
-                continue;
-              if( isset( $theRdate[1]['year'] )) // date-date period
-                $rend = $component->_date2timestamp( $theRdate[1] );
-              else {                             // date-duration period
-                $rend = $component->duration2date( $theRdate[0], $theRdate[1] );
-                $rend = $component->_date2timestamp( $rend );
-              }
-              if((( $startDate - $rdurWsecs ) <= $rstart ) && ( $endDate >= $rstart ))
-                $recurlist[$rstart] = ( $rstart - $rend ); // set start date + rdate duration in seconds
-            }
-            else { // single date
-              $theRdate = $component->_date2timestamp( $theRdate );
-              if((( $startDate - $rdurWsecs ) <= $theRdate ) && ( $endDate >= $theRdate ))
-                $recurlist[$theRdate] = $rdurWsecs; // set start date + event duration in seconds
-            }
-          }
-        }
-        if( 0 < count( $recurlist )) {
-          ksort( $recurlist );
-          foreach( $recurlist as $recurkey => $durvalue ) {
-            if((( $startDate - $rdurWsecs ) > $recurkey ) || ( $endDate < $recurkey )) // not within period
-              continue;
-            if( isset( $exdatelist[$recurkey] )) // check excluded dates
-              continue;
-            if( $startWdate >= $recurkey ) // exclude component start date
-              continue;
-            $component2 = $component->copy();
-            $rstart     = $component2->_date_time_string( date('Y-m-d H:i:s', $recurkey ), 6);
-            $datevalue  = $rstart['month'].'/'.$rstart['day'].'/'.$rstart['year'];
-            $dateformat = 'Y-m-d';
-            if( isset( $start['hour'] ) || isset( $start['min'] ) || isset( $start['sec'] )) {
-              $datevalue  .= ( isset( $rstart['hour'] )) ? ' '.$rstart['hour'] : ' 00';
-              $datevalue  .= ( isset( $rstart['min'] ))  ? ':'.$rstart['min']  : ':00';
-              $datevalue  .= ( isset( $rstart['sec'] ))  ? ':'.$rstart['sec']  : ':00';
-              $dateformat .= ' H:i:s';
-            }
-            $datestring = date( $dateformat, strtotime( $datevalue ));
-            if( isset( $start['tz'] ))
-              $datestring .= ' '.$start['tz'];
-            $component2->setProperty( 'x-current-dtstart', $datestring );
-            $rend   = $component2->_date_time_string( date('Y-m-d H:i:s', ( $recurkey + $durvalue )), 6);
-            if( isset( $datevalue ) && ( $dtendExist || $dueExist )) {
-              $datevalue  = $rend['month'].'/'.$rend['day'].'/'.$rend['year'];
-              $dateformat = 'Y-m-d';
-              if( isset( $end['hour'] ) || isset( $end['min'] ) || isset( $end['sec'] )) {
-                $datevalue  .= ( isset( $rend['hour'] )) ? ' '.$rend['hour'] : ' 00';
-                $datevalue  .= ( isset( $rend['min'] ))  ? ':'.$rend['min']  : ':00';
-                $datevalue  .= ( isset( $rend['sec'] ))  ? ':'.$rend['sec']  : ':00';
-                $dateformat .= ' H:i:s';
-              }
-              $datestring = date( $dateformat, strtotime( $datevalue ));
-              if( isset( $end['tz'] ))
-                $datestring .= ' '.$end['tz'];
-              if( $dtendExist )
-                $component2->setProperty( 'x-current-dtend', $datestring );
-              else
-                $component2->setProperty( 'x-current-due', $datestring );
-            }
-            $rend   = $component2->_date2timestamp( $rend );
-            $rstart = $recurkey;
-            /* add repeating components within valid dates to output array, only start date */
-            if( $flat )
-              $result[] = $component2; // copy to output
-            elseif( $split ) {
-              if( $rend > $endDate )
-                $rend = $endDate;
-              while( $rstart <= $rend ) { // iterate
-                $wd = getdate( $rstart );
-//                if(( $rstart >= $startDate ) &&     // date within period
-                if(( $rstart > $startDate ) &&     // date after dtstart
-                    !isset( $exdatelist[$rstart] )) // check exclude date
-                  $result[$wd['year']][$wd['mon']][$wd['mday']][] = $component2->copy(); // copy to output
-                $rstart += ( 24*60*60 ); // step one day
-              }
-            }
-            elseif(( $rstart >= $startDate ) &&     // date within period
-                  !isset( $exdatelist[$rstart] )) { // check exclude date
-              $wd = getdate( $rstart );
-              $result[$wd['year']][$wd['mon']][$wd['mday']][] = $component2->copy(); // copy to output
-            }
-          }
-        }
-            /* deselect components with startdate/enddate not within period */
-        if(( $endWdate < $startDate ) || ( $startWdate > $endDate ))
-          continue;
-      }
-            /* deselect components with startdate not within period */
-      elseif(( $startWdate < $startDate ) || ( $startWdate > $endDate ))
-        continue;
-            /* add selected components within valid dates to output array */
-      if( $flat ) {
-        $result[] = $component->copy(); // copy to output;
-      }
-      elseif( $split ) {
-        if( $endWdate > $endDate )
-          $endWdate = $endDate;     // use period end date
-        if( !isset( $exdatelist[$startWdate] ))  { // check excluded dates
-          if( $startWdate < $startDate )
-            $startWdate = $startDate; // use period start date
-          while( $startWdate <= $endWdate ) { // iterate
-            $wd = getdate( $startWdate );
-            $result[$wd['year']][$wd['mon']][$wd['mday']][] = $component->copy(); // copy to output
-            $startWdate += ( 24*60*60 ); // step one day
-          }
-        }
-      } // use component date
-      elseif( !isset( $exdatelist[$startWdate] ) &&   // check excluded dates
-            ( $startWdate >= $startDate )) {         // within period
-        $wd = getdate( $startWdate );
-        $result[$wd['year']][$wd['mon']][$wd['mday']][] = $component->copy(); // copy to output
-      }
-    }
-    if( 0 >= count( $result ))
-      return FALSE;
-   elseif( !$flat ) {
-      foreach( $result as $y => $yeararr ) {
-        foreach( $yeararr as $m => $montharr ) {
-          ksort( $result[$y][$m] );
-        }
-        ksort( $result[$y] );
-      }
-      ksort( $result );
-    }
-    return $result;
-  }
+	function selectComponents($startY = FALSE, $startM = FALSE, $startD = FALSE, $endY = FALSE, $endM = FALSE, $endD = FALSE, $cType = FALSE, $flat = FALSE, $any = TRUE, $split = TRUE) {
+		/* check  if empty calendar */
+		if (0 >= count($this->components)) {
+			return FALSE;
+		}
+		/* check default dates */
+		if (!$startY) {
+			$startY = date('Y');
+		}
+		if (!$startM) {
+			$startM = date('m');
+		}
+		if (!$startD) {
+			$startD = date('d');
+		}
+		$startDate = mktime(0, 0, 0, $startM, $startD, $startY);
+		if (!$endY) {
+			$endY = $startY;
+		}
+		if (!$endM) {
+			$endM = $startM;
+		}
+		if (!$endD) {
+			$endD = $startD;
+		}
+		$endDate = mktime(23, 59, 59, $endM, $endD, $endY);
+		/* check component types */
+		$validTypes = array('vevent', 'vtodo', 'vjournal', 'vfreebusy');
+		if (is_array($cType)) {
+			foreach ($cType as $cix => $theType) {
+				$cType[$cix] = $theType = strtolower($theType);
+				if (!in_array($theType, $validTypes)) {
+					$cType[$cix] = 'vevent';
+				}
+			}
+			$cType = array_unique($cType);
+		}
+		elseif (!empty($cType)) {
+			$cType = strtolower($cType);
+			if (!in_array($cType, $validTypes)) {
+				$cType = array('vevent');
+			}
+			else
+			{
+				$cType = array($cType);
+			}
+		}
+		else
+		{
+			$cType = $validTypes;
+		}
+		if (0 >= count($cType)) {
+			$cType = $validTypes;
+		}
+		/* iterate components */
+		$result = array();
+		foreach ($this->components as $cix => $component) {
+			unset($component->propix, $start);
+
+			/* deselect unvalid type components */
+			if (!in_array($component->objName, $cType)) {
+				continue;
+			}
+			/* deselect components without dtstart set */
+			if (FALSE === ($start = $component->getProperty('dtstart'))) {
+
+				continue;
+			}
+			$dtendExist = $dueExist = FALSE;
+			unset($end, $startWdate, $endWdate, $rdurWsecs, $rdur, $exdatelist, $workstart, $workend); // clean up
+			$startWdate = $component->_date2timestamp($start);
+			/* get end date from dtend/due/duration properties */
+			$end = $component->getProperty('dtend');
+			if (!empty($end)) {
+				$dtendExist = TRUE;
+			}
+			//if( !empty($end))  echo 'selectComponents 1 start='.implode('-',$start).' end='.implode('-',$end)."<br />\n"; // test ###
+			if (empty($end) && ($component->objName == 'vtodo')) {
+				$end = $component->getProperty('due');
+				if (!empty($end)) {
+					$dueExist = TRUE;
+				}
+				//if( !empty($end))  echo 'selectComponents 2 start='.implode('-',$start).' end='.implode('-',$end)."<br />\n"; // test ###
+			}
+			elseif (!empty($end) && !isset($end['hour'])) {
+				/* a DTEND without time part regards an event that ends the day before,
+							 for an all-day event DTSTART=20071201 DTEND=20071202 (taking place 20071201!!! */
+				$end = array('year' => $end['year'], 'month' => $end['month'], 'day' => ($end['day'] - 1), 'hour' => 23, 'min' => 59, 'sec' => 59);
+				//if( !empty($end))  echo 'selectComponents 3 start='.implode('-',$start).' end='.implode('-',$end)."<br />\n"; // test ###
+			}
+			if (empty($end)) {
+				$end = $component->getProperty('duration', FALSE, FALSE, TRUE); // in dtend (array) format
+				//if( !empty($end))  echo 'selectComponents 4 start='.implode('-',$start).' end='.implode('-',$end)."<br />\n"; // test ###
+			}
+			if (empty($end)) { // assume one day duration if missing end date
+				$end = array('year' => $start['year'], 'month' => $start['month'], 'day' => $start['day'], 'hour' => 23, 'min' => 59, 'sec' => 59);
+				//if( isset($end))  echo 'selectComponents 5 start='.implode('-',$start).' end='.implode('-',$end)."<br />\n"; // test ###
+			}
+			$endWdate = $component->_date2timestamp($end);
+			if ($endWdate < $startWdate) { // MUST be after start date!!
+				$end = array('year' => $start['year'], 'month' => $start['month'], 'day' => $start['day'], 'hour' => 23, 'min' => 59, 'sec' => 59);
+				$endWdate = $component->_date2timestamp($end);
+			}
+			$rdurWsecs = $endWdate - $startWdate; // compute component duration in seconds
+			$rdur = $component->_date2duration($start, $end); // compute component duration, array
+			/* make a list of optional exclude dates for component occurence, exrule, exdate */
+			$exdatelist = array();
+			$workstart = $component->_date_time_string(date('Y-m-d H:i:s', ($startDate - $rdurWsecs)), 6);
+			$workend = $component->_date_time_string(date('Y-m-d H:i:s', ($endDate + $rdurWsecs)), 6);
+
+			while (FALSE !== ($exrule = $component->getProperty('exrule')))
+			{
+				$component->_recur2date($exdatelist, $exrule, $start, $workstart, $workend);
+			}
+
+			while (FALSE !== ($exdate = $component->getProperty('exdate'))) {
+				foreach ($exdate as $theExdate) {
+					$exWdate = $component->_date2timestamp($theExdate);
+					if ((($startDate - $rdurWsecs) <= $exWdate) && ($endDate >= $exWdate)) {
+						$exdatelist[$exWdate] = TRUE;
+					}
+				}
+			}
+			/* if 'any' components, check repeating components, removing all excluding dates */
+
+			if (TRUE === $any) {
+				/* make a list of optional repeating dates for component occurence, rrule, rdate */
+				$recurlist = array();
+				while (FALSE !== ($rrule = $component->getProperty('rrule'))) // check rrule
+				{
+					$component->_recur2date($recurlist, $rrule, $start, $workstart, $workend);
+				}
+				foreach ($recurlist as $recurkey => $recurvalue) // key=match date as timestamp
+				{
+					$recurlist[$recurkey] = $rdurWsecs;
+				} // add duration in seconds
+				while (FALSE !== ($rdate = $component->getProperty('rdate'))) { // check rdate
+					foreach ($rdate as $theRdate) {
+						if (is_array($theRdate) && (2 == count($theRdate)) && // PERIOD
+						array_key_exists('0', $theRdate) && array_key_exists('1', $theRdate)
+						) {
+							$rstart = $component->_date2timestamp($theRdate[0]);
+							if (($rstart < ($startDate - $rdurWsecs)) || ($rstart > $endDate)) {
+								continue;
+							}
+							if (isset($theRdate[1]['year'])) // date-date period
+							{
+								$rend = $component->_date2timestamp($theRdate[1]);
+							}
+							else { // date-duration period
+								$rend = $component->duration2date($theRdate[0], $theRdate[1]);
+								$rend = $component->_date2timestamp($rend);
+							}
+							if ((($startDate - $rdurWsecs) <= $rstart) && ($endDate >= $rstart)) {
+								$recurlist[$rstart] = ($rstart - $rend);
+							} // set start date + rdate duration in seconds
+						}
+						else { // single date
+							$theRdate = $component->_date2timestamp($theRdate);
+							if ((($startDate - $rdurWsecs) <= $theRdate) && ($endDate >= $theRdate)) {
+								$recurlist[$theRdate] = $rdurWsecs;
+							} // set start date + event duration in seconds
+						}
+					}
+				}
+				if (0 < count($recurlist)) {
+					ksort($recurlist);
+					foreach ($recurlist as $recurkey => $durvalue) {
+						if ((($startDate - $rdurWsecs) > $recurkey) || ($endDate < $recurkey)) // not within period
+						{
+							continue;
+						}
+						if (isset($exdatelist[$recurkey])) // check excluded dates
+						{
+							continue;
+						}
+						if ($startWdate >= $recurkey) // exclude component start date
+						{
+							continue;
+						}
+						$component2 = $component->copy();
+						$rstart = $component2->_date_time_string(date('Y-m-d H:i:s', $recurkey), 6);
+						$datevalue = $rstart['month'] . '/' . $rstart['day'] . '/' . $rstart['year'];
+						$dateformat = 'Y-m-d';
+						if (isset($start['hour']) || isset($start['min']) || isset($start['sec'])) {
+							$datevalue .= (isset($rstart['hour'])) ? ' ' . $rstart['hour'] : ' 00';
+							$datevalue .= (isset($rstart['min'])) ? ':' . $rstart['min'] : ':00';
+							$datevalue .= (isset($rstart['sec'])) ? ':' . $rstart['sec'] : ':00';
+							$dateformat .= ' H:i:s';
+						}
+						$datestring = date($dateformat, strtotime($datevalue));
+						if (isset($start['tz'])) {
+							$datestring .= ' ' . $start['tz'];
+						}
+						$component2->setProperty('x-current-dtstart', $datestring);
+						$rend = $component2->_date_time_string(date('Y-m-d H:i:s', ($recurkey + $durvalue)), 6);
+						if (isset($datevalue) && ($dtendExist || $dueExist)) {
+							$datevalue = $rend['month'] . '/' . $rend['day'] . '/' . $rend['year'];
+							$dateformat = 'Y-m-d';
+							if (isset($end['hour']) || isset($end['min']) || isset($end['sec'])) {
+								$datevalue .= (isset($rend['hour'])) ? ' ' . $rend['hour'] : ' 00';
+								$datevalue .= (isset($rend['min'])) ? ':' . $rend['min'] : ':00';
+								$datevalue .= (isset($rend['sec'])) ? ':' . $rend['sec'] : ':00';
+								$dateformat .= ' H:i:s';
+							}
+							$datestring = date($dateformat, strtotime($datevalue));
+							if (isset($end['tz'])) {
+								$datestring .= ' ' . $end['tz'];
+							}
+							if ($dtendExist) {
+								$component2->setProperty('x-current-dtend', $datestring);
+							}
+							else
+							{
+								$component2->setProperty('x-current-due', $datestring);
+							}
+						}
+						$rend = $component2->_date2timestamp($rend);
+						$rstart = $recurkey;
+						/* add repeating components within valid dates to output array, only start date */
+						if ($flat) {
+							$result[] = $component2;
+						} // copy to output
+						elseif ($split) {
+							if ($rend > $endDate) {
+								$rend = $endDate;
+							}
+							while ($rstart <= $rend) { // iterate
+								$wd = getdate($rstart);
+								//                if(( $rstart >= $startDate ) &&     // date within period
+								if (($rstart > $startDate) && // date after dtstart
+								!isset($exdatelist[$rstart])
+								) // check exclude date
+								{
+									$result[$wd['year']][$wd['mon']][$wd['mday']][] = $component2->copy();
+								} // copy to output
+								$rstart += (24 * 60 * 60); // step one day
+							}
+						}
+						elseif (($rstart >= $startDate) && // date within period
+						!isset($exdatelist[$rstart])
+						) { // check exclude date
+							$wd = getdate($rstart);
+							$result[$wd['year']][$wd['mon']][$wd['mday']][] = $component2->copy(); // copy to output
+						}
+					}
+				}
+				/* deselect components with startdate/enddate not within period */
+				if (($endWdate < $startDate) || ($startWdate > $endDate)) {
+					continue;
+				}
+			}
+			/* deselect components with startdate not within period */
+			elseif (($startWdate < $startDate) || ($startWdate > $endDate))
+			{
+				continue;
+			}
+
+			/* add selected components within valid dates to output array */
+			if ($flat) {
+				$result[] = $component->copy(); // copy to output;
+			}
+			elseif ($split) {
+				if ($endWdate > $endDate) {
+					$endWdate = $endDate;
+				} // use period end date
+				if (!isset($exdatelist[$startWdate])) { // check excluded dates
+					if ($startWdate < $startDate) {
+						$startWdate = $startDate;
+					} // use period start date
+					while ($startWdate <= $endWdate) { // iterate
+						$wd = getdate($startWdate);
+						$result[$wd['year']][$wd['mon']][$wd['mday']][] = $component->copy(); // copy to output
+						$startWdate += (24 * 60 * 60); // step one day
+					}
+				}
+			} // use component date
+			elseif (!isset($exdatelist[$startWdate]) && ($startWdate >= $startDate)) { // within period
+				$wd = getdate($startWdate);
+				$result[$wd['year']][$wd['mon']][$wd['mday']][] = $component->copy(); // copy to output
+			}
+		}
+
+		if (0 >= count($result)) {
+			return FALSE;
+		}
+		elseif (!$flat) {
+			foreach ($result as $y => $yeararr) {
+				foreach ($yeararr as $m => $montharr) {
+					ksort($result[$y][$m]);
+				}
+				ksort($result[$y]);
+			}
+			ksort($result);
+		}
+		return $result;
+	}
 /**
  * add calendar component to container
  *

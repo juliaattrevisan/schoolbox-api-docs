@@ -12,12 +12,11 @@ $this->setTitle('Admin - Bulk Add Calendar Events');
 $this->setFile(TEMPLATE_content, 'adminv2/bulkAddCalendar.html');
 $this->setBlock(TEMPLATE_content, 'event', 'event_block');
 
-$bulkHandler = new Bulk();
-
 /* Two types of upload.. either single user.. or via csv file..
  */
 if (isset($_FILES['bulkadd']['tmp_name']) && $_FILES['bulkadd']['tmp_name']) {
-	$allEvents = $bulkHandler->addCalendar($_FILES['bulkadd']['tmp_name']);
+	$bulkHandler = new Bulk_Calendar($_FILES['bulkadd']['tmp_name']);
+	$allEvents = $bulkHandler->addCalendar();
 
 	if ($allEvents && count($allEvents)) {
 		foreach ($allEvents as $currentEvent) {
@@ -37,4 +36,3 @@ if (isset($_FILES['bulkadd']['tmp_name']) && $_FILES['bulkadd']['tmp_name']) {
 else {
 	error(2);
 }
-?>

@@ -47,18 +47,26 @@ class Chat extends DeprecatedModel {
         return $logs;
     }
 
-    /* Create logs */
-    function create_log ($category_id, $user_id, $body, $type = 'user') {
-        $time = new DateTime();
+	/**
+	 * Create a log entry which remembers what people typed.
+	 *
+	 * @param $category_id
+	 * @param $user_id
+	 * @param $body
+	 * @param string $type
+	 * @return int
+	 */
+	public function create_log($category_id, $user_id, $body, $type = 'user') {
+		$now = new Alaress_Date_Format(time(), 'U');
 
-        return $this->create(array(
-            'category_id' => $category_id,
-            'user_id'     => $user_id,
-            'type'        => $type,
-            'time'        => $time->format('Y-m-d H:i:s'),
-            'body'        => $body
-        ));
-    }
+		return $this->create(array(
+			'category_id' => $category_id,
+			'user_id' => $user_id,
+			'type' => $type,
+			'time' => $now->getDatabase(),
+			'body' => $body,
+		));
+	}
 
     function clear_log ($category_id) {
         $query = "DELETE FROM {$this->_table} WHERE category_id = $category_id";
