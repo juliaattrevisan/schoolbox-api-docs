@@ -5886,7 +5886,7 @@ table.subjectList {
 }
 
 
-.mark-sheet.assessments .active-assessment{width:480px !important;}
+.mark-sheet.assessments .active-assessment{width:400px !important;}
 
 .mark-sheet.assessments span {
     position: relative;

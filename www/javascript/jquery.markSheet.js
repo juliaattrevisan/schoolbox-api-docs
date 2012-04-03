@@ -2,7 +2,7 @@ $j(function() {
     var markSheet =  {
 
         columnCount : $j('.mark-sheet.assessments table').find('tr:first').children('th').size(),
-        assessmentCellWidth : '180',
+        assessmentCellWidth : '195',
 
         init: function() {
             markSheet.columns();
@@ -23,7 +23,6 @@ $j(function() {
             $j('.mark-sheet.assessments table').css('width', markSheet.assessmentCellWidth * markSheet.columnCount);
 
             $j('.height-control').ellipsis();
-
         },
 
         inputs: function() {
