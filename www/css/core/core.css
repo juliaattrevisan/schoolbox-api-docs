@@ -5810,7 +5810,7 @@ table.subjectList {
 /* SUBMISSION MARK TABLE */
 
 
-.mark-sheet table{
+.mark-sheet.names table{
     table-layout: fixed;
 }
 
@@ -5839,13 +5839,9 @@ table.subjectList {
 .mark-sheet.assessments{
     overflow-x:scroll;
     margin-left:250px;
+    position:relative;
 }
 
-
-
-.mark-sheet.assessments table{
-    table-layout: fixed;
-}
 
 .mark-sheet.assessments .height-control{
     height:40px;
@@ -5876,7 +5872,7 @@ table.subjectList {
 
 .mark-sheet.assessments input.comment{display:none;float:left; margin-left:14px;}
 
-.mark-sheet.assessments .active-assessment{width:500px;}
+.mark-sheet.assessments .active-assessment{width:600px !important;}
 
 .mark-sheet.assessments span {
     position: relative;
@@ -5895,14 +5891,12 @@ table.subjectList {
     background-color: #FAF9F5;
 }
 
-#mark {
+.mark-sheet.assessments .mark-input {
     text-align: right;
     padding-right: 2px;
 }
 
-
-
-
+.mark-sheet.assessments .error{border-color:#db0101;}
 
 dt {
 	width: 100px;

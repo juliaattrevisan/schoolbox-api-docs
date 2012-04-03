@@ -67,24 +67,24 @@
             <!-- BEGIN mark -->
             <td class="column-{BOX_ID}">
                 <div class="save-notification"></div>
-                <form method="post" onSubmit="return false;" action="" class="markForm">
+                <form method="post" action="" class="markForm">
                     <!-- BEGIN mark_type_percent -->
-                    <input name="mark" class="inputMark" type="text" id="mark" size="3" maxlength="3" value="{MARK}"/><span>&nbsp;%</span>
+                    <input name="mark" class="mark-input percent" type="text" size="3" maxlength="3" value="{MARK}"/><span>&nbsp;%</span>
                     <!-- END mark_type_percent -->
                     <!-- BEGIN mark_type_letter -->
-                    <select id="mark" class="inputMark" name="mark">
+                    <select id="mark" class="mark-input" name="mark">
                         <!-- BEGIN grade_drop -->
                         <option value="{GRADE_VALUE}" {GRADE_VALUE_SELECTED}>{GRADE_TEXT}</option>
                         <!-- END grade_drop -->
                     </select>
                     <!-- END mark_type_letter -->
                     <!-- BEGIN mark_type_raw -->
-                    <input name="mark" class="inputMark" type="text" id="mark" size="4" maxlength="15" value="{MARK}"/><span>&nbsp;/ {MAX_MARK}</span>
+                    <input name="mark" class="mark-input out-of" type="text"  size="4" maxlength="15" value="{MARK}"/><span>&nbsp;/ <strong class="validation-limit">{MAX_MARK}</strong></span>
                     <!-- END mark_type_raw -->
                     <!-- BEGIN mark_type_free -->
-                    <input name="mark" class="inputMark" type="text" id="mark" size="4" maxlength="15" value="{MARK}"/>
+                    <input name="mark" class="mark-input free" type="text" size="4" maxlength="15" value="{MARK}"/>
                     <!-- END mark_type_free -->
-                    <input name="comment" id="comment" size="40" placeholder="Comment" value="{COMMENT}" class="comment">
+                    <input name="comment" id="comment" size="40" title="Comment" value="{COMMENT}" class="comment">
 
                     <input type="hidden" name="uid" value="{UID}">
                     <input type="hidden" name="box_id" value="{BOX_ID}">

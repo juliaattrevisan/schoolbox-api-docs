@@ -2,12 +2,13 @@ $j(function() {
     var markSheet =  {
 
         columnCount : $j('.mark-sheet.assessments table').find('tr:first').children('th').size(),
-        assessmentCellWidth : '150',
+        assessmentCellWidth : '180',
 
         init: function() {
             markSheet.columns();
             markSheet.inputs();
             markSheet.cells();
+            markSheet.cellValidation();
         },
 
 
@@ -23,25 +24,13 @@ $j(function() {
 
             $j('.height-control').ellipsis();
 
-
         },
 
         inputs: function() {
 
-            $j('.inputMark, .comment').blur(function(){
-                var $this = $j(this),
-                    notification = $j(this).parent().siblings('.save-notification');
-
-                if ($this.val() != '') {
-                    $j.post('/submission/returnWorkForm.php', $this.closest('form').serialize(), function(data) {
-                        notification.clearQueue();
-                        notification.stop().fadeIn(500).delay(1000).fadeOut(500);
-                    });
-                }
-            });
-
-            $j(".inputMark").focusin(function(evt) {
+            $j(".mark-input").focusin(function(evt) {
                 $this = $j(this);
+                //markSheet.columns();
                 /*
                 * Row highlighting
                 *
@@ -59,22 +48,20 @@ $j(function() {
                 * */
 
                 if (!$this.closest('td').hasClass('active-assessment')) {
-                    var assignmentClass = $this.closest('td').attr('class');
+                    var assignmentClass = $this.closest('td');
 
                     $j('.mark-sheet.assessments table').css('width', markSheet.assessmentCellWidth * markSheet.columnCount);
 
-                    $j('td:not(".'+assignmentClass+'")').removeClass('active-assessment');
+                    $j('td').not(assignmentClass).removeClass('active-assessment');
 
                     $j('.comment').each(function() {
                         $j(this).hide();
                     });
 
-                    $j('.'+assignmentClass).each(function() {
+                    $j(assignmentClass).each(function() {
                         $j(this).find('.comment').show();
                         $j(this).addClass('active-assessment');
-                    })
-
-                    $j('.mark-sheet.assessments table').css('width',$j('.mark-sheet.assessments table').width() + 350);
+                    });
 
                 }
             });
@@ -89,7 +76,7 @@ $j(function() {
             $j('td').hover(function(evt) {
                 var rowNumber = $j(evt.target).closest("tr").prevAll("tr").length + 1;
 
-                if (!$j('.inputMark').is(':focus')) {
+                if (!$j('.mark-input').is(':focus')) {
                     $j('table').find('tr').removeClass('highlight-student');
 
                     if (!$j('table').find('tr:nth-child('+rowNumber+')').hasClass('highlight-student')) {
@@ -102,10 +89,76 @@ $j(function() {
                 }
             })
 
+        },
+
+        cellValidation: function() {
+
+            $j('.mark-input, .comment').blur(function(){
+
+
+
+                if ($j(this).val() !== '') {
+                    $j(this).closest('form').submit();
+                }
+
+            });
+
+            /*
+            * Depends on the presence of the jquery.validate library.
+            *
+            * */
+
+            jQuery.validator.addMethod("percentage", function(value, element) {
+                return this.optional(element) || (parseFloat(value) <= 100);
+            }, "Please enter a value out of 100");
+
+            jQuery.validator.addMethod("markLimit", function(value, element) {
+
+                var markLimit = parseInt($j(element).siblings('span').children('.validation-limit').text());
+
+                if (value !== "") {
+                    if (parseInt(value) <= markLimit) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return true;
+                }
+
+            }, "Amount must be less or equal to mark limit");
+
+
+            jQuery.validator.addClassRules({
+
+                percent: {
+                    percentage: true
+                },
+
+                'out-of': {
+                    markLimit: true
+                }
+
+            });
+
+            $j('.markForm').each(function() {
+                $j(this).validate({
+                    submitHandler: function(form) {
+                        var notification = $j(form).siblings('.save-notification');
+                        $j.post('/submission/returnWorkForm.php', $j(form).serialize(), function(data) {
+                            notification.clearQueue();
+                            notification.stop().fadeIn(500).delay(1000).fadeOut(500);
+                        });
+                        return false;
+                    },
+                    errorPlacement: function(error,element) {
+                        return true;
+                    }
+                });
+            });
+
         }
-
     }
-
     markSheet.init();
 
 });

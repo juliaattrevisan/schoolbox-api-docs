@@ -17,14 +17,12 @@
 
         jQuery.validator.addMethod("lessThanTotal", function(value, element) {
 
-            console.log(parseInt(value))
-
             if (parseInt(value) <= parseInt($j('.validation-limit').text())) {
                 return true;
-                alert('e')
             } else {
                 return false;
             }
+
         }, "Amount must be less or equal to mark limit");
 
         jQuery.validator.addClassRules({
