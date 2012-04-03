@@ -5842,6 +5842,14 @@ table.subjectList {
     position:relative;
 }
 
+.mark-sheet.assessments table{
+    position:relative;
+}
+
+.mark-sheet.assessments table td{
+    position:relative;
+}
+
 
 .mark-sheet.assessments .height-control{
     height:40px;
@@ -5855,7 +5863,7 @@ table.subjectList {
 
 .mark-sheet .save-notification{
     display:none;
-    float:right;
+    position:absolute; top:7px; right:16px;
     height:16px;
     width:16px;
     background: url(/images/famicons/tick.png) no-repeat;
@@ -5870,9 +5878,15 @@ table.subjectList {
     float:left;
 }
 
-.mark-sheet.assessments input.comment{display:none;float:left; margin-left:14px;}
+.mark-sheet.assessments .comment{
+    display:none;
+    float:left;
+    margin-left:14px;
+    width:0px;
+}
 
-.mark-sheet.assessments .active-assessment{width:600px !important;}
+
+.mark-sheet.assessments .active-assessment{width:480px !important;}
 
 .mark-sheet.assessments span {
     position: relative;
@@ -5885,6 +5899,8 @@ table.subjectList {
     float: left;
     position: relative;
     top: -3px;
+    width:100px;
+
 }
 
 .mark-sheet.assessments .dark td {
@@ -5894,7 +5910,10 @@ table.subjectList {
 .mark-sheet.assessments .mark-input {
     text-align: right;
     padding-right: 2px;
+    width:60px;
 }
+
+
 
 .mark-sheet.assessments .error{border-color:#db0101;}
 

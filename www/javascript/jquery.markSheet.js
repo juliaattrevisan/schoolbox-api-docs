@@ -48,18 +48,23 @@ $j(function() {
                 * */
 
                 if (!$this.closest('td').hasClass('active-assessment')) {
+
                     var assignmentClass = $this.closest('td');
+
+                    $j('.active-assessment').find('.comment').animate({width:0}, function() {
+
+                        $j('td').not(assignmentClass).removeClass('active-assessment');
+
+                        $j(this).hide();
+
+
+
+                     });
 
                     $j('.mark-sheet.assessments table').css('width', markSheet.assessmentCellWidth * markSheet.columnCount);
 
-                    $j('td').not(assignmentClass).removeClass('active-assessment');
-
-                    $j('.comment').each(function() {
-                        $j(this).hide();
-                    });
-
                     $j(assignmentClass).each(function() {
-                        $j(this).find('.comment').show();
+                        $j(this).find('.comment').show().animate({width:200});
                         $j(this).addClass('active-assessment');
                     });
 
@@ -69,11 +74,13 @@ $j(function() {
         },
 
         cells: function() {
+
             /*
              * Hovering a td should make the entire row change colour
              *
              * */
-            $j('td').hover(function(evt) {
+
+             $j('td').hover(function(evt) {
                 var rowNumber = $j(evt.target).closest("tr").prevAll("tr").length + 1;
 
                 if (!$j('.mark-input').is(':focus')) {
@@ -87,21 +94,20 @@ $j(function() {
                 if (!$j('.inputMark').is(':focus')) {
                     $j('table').find('tr').removeClass('highlight-student');
                 }
-            })
+            });
+
+
 
         },
 
         cellValidation: function() {
 
             $j('.mark-input, .comment').blur(function(){
-
-
-
                 if ($j(this).val() !== '') {
                     $j(this).closest('form').submit();
                 }
-
             });
+
 
             /*
             * Depends on the presence of the jquery.validate library.
