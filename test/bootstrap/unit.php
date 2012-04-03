@@ -8,12 +8,12 @@
  */
 
 /* Load Configuration Files */
-require_once dirname(__FILE__) . '/../www/conf/conf.php';
+require_once dirname(__FILE__) . '/../../www/conf/conf.php';
 
 /* Load the Autoloader */
-require_once dirname(__FILE__) . '/../include/Autoloader.php';
+require_once dirname(__FILE__) . '/../../include/Autoloader.php';
 $autoloader = Autoloader::initialise();
 
-require_once dirname(__FILE__) . '/../www/include/stdfuncs.php';
+require_once dirname(__FILE__) . '/../../www/include/stdfuncs.php';
 
 require_once 'PHPUnit/Framework/TestCase.php';
