@@ -35,6 +35,7 @@ class Chat extends DeprecatedModel {
                 $log_time = new DateTime($log['time']);
 
                 $log['time_js'] = $log_time->format('D M j Y H:i:s \G\M\TO (T)'); // Thu Apr 14 2011 15:54:52 GMT+1000 (EST)
+                $log['stamp'] = $log_time->format('Y-m-d H:i:s');
                 $log['time'] = $log_time->format('h:i:s a');
                 $log['name'] = $userHandler->formatName($log);
                 $log['user_perm'] = $this->group->getPermission($category_id, $log['user_id']);
@@ -68,12 +69,13 @@ class Chat extends DeprecatedModel {
 		));
 	}
 
+/*  *** DEPRECATED ***
     function clear_log ($category_id) {
         $query = "DELETE FROM {$this->_table} WHERE category_id = $category_id";
 
         return $this->db->query($query);
     }
-
+*/
     function update_poll ($category_id, $user_id) {
         $query = "INSERT INTO chat_poll (user_id, category_id, time)
                   VALUES ($user_id, $category_id, NOW())
@@ -132,5 +134,61 @@ class Chat extends DeprecatedModel {
 		$this->db->query($query);
 	}
 
+    public function getOccupiedDateList($categoryID) {
+        // check membership
+        $groupHandler = new Group();
 
+        $memberships = $groupHandler->getAllUserAccess($_SESSION['id']);
+
+        if(!$groupHandler->isSuperuser()) {
+            $permit = false;
+            foreach ($memberships as $group) {
+                if($categoryID == $group['sid']) {
+                    $permit = true;
+                    break;
+                }
+            }
+            if(!$permit)
+                return null;
+        }
+
+        $chats = $this->get_logs($categoryID);
+
+        // go through and extract the years and months
+        $occupiedDates = array();
+        if($chats) {
+            foreach($chats as $chat) {
+                $df = new Alaress_Date_Format($chat['stamp'], 'y-m-d h:i:s');
+                $occupation = array(
+                    'year'  => $df->getUsingFormat('Y'),
+                    'month' => $df->getUsingFormat('m')
+                );
+                if(!in_array($occupation, $occupiedDates)) {
+                    $occupiedDates[] = $occupation;
+                }
+            }
+        } else {
+            return null;
+        }
+
+        // sort the generated list so the dates collate properly
+        sort($occupiedDates);
+
+        return $occupiedDates;
+    }
+
+    public function getChatListing($categoryID, $year = 0, $month = 0, $index = 0, $limit = 0) {
+        $yearFilter = $year != 0 ? " AND YEAR(time) = $year " : '';
+        $monthFilter = $month != 0 ? " AND MONTH(time) = $month " : '';
+
+        $query = "SELECT *, DATE(`time`) AS `date`
+                  FROM `{$this->_table}`
+                  WHERE category_id = $categoryID $yearFilter $monthFilter";
+
+        if($limit) {
+            $query .= " LIMIT $index, $limit";
+        }
+
+        return $this->db->getAll($query);
+    }
 }

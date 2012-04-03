@@ -13,7 +13,7 @@ $j(function () {
 		user_name: '{CHAT_USER_NAME}',
 		user_perm: '{CHAT_USER_PERM}',
 		log_el: 'ul.chat-messages',
-		send_el: 'a.btn'
+		send_el: 'a.btn.chat'
 	});
 
 	$j('.show-users').click(function(event) {
@@ -84,6 +84,7 @@ $j(function () {
             <p class="bold">The chat is inactive. <a href="/homepage/configForm.php?cid={ID}&type=config&component={CHAT_COMPONENT_ID}&state=Active&teacher_timestamp=">Please click here to activate the chat.</a></p>
             <!-- END chat_state_inactive -->
 		</form>
+        <a href="/homepage/chatArchive/{ID}/" class="btn"><span></span>Chat Archive</a>
 	</div>
 	<div class="chat-error hide"></div>
 </div>

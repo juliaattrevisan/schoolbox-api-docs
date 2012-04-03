@@ -1,0 +1,73 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
+<script type="text/javascript">
+    $j(function() {
+        $j('.item:nth-child(2n)' ).addClass('dark');
+    });
+</script>
+<!-- END custom_head -->
+
+<h1>Chat Archive for {CATEGORY_TITLE}</a></h1>
+<span class="header_option">
+    <a href="/homepage/{CATEGORY_ID}" class="btn go-back"><span></span>Return to Homepage</a>
+</span>
+
+<div class="archive chat clearfix">
+
+    <ul id="category" class="clearfix">
+        <!-- BEGIN category_header -->
+        <li><a {CATEGORY_CLASS} href="/homepage/chatArchive/{CATEGORY_CLEAN}" title="{CATEGORY_CLEAN}">{CATEGORY_NAME}</a></li>
+        <!-- END category_header -->
+    </ul>
+    <div class="menu">
+        <ul>
+            <!-- BEGIN year -->
+            <li class="{YEAR_CLASS}"><h3>{YEAR}</h3>
+                <ul>
+                    <!-- BEGIN month -->
+                    <li>
+                        <a class="{MONTH_CLASS}"
+                           href="/homepage/chatArchive/{MENU_CATEGORY_CLEAN}/{YEAR}/{MONTH_NUMBER}">{MONTH}</a>
+                    </li>
+                    <!-- END month -->
+                </ul>
+            </li>
+            <!-- END year -->
+        </ul>
+    </div>
+
+    <div class="posts">
+        <div id="{CATEGORY_CLEAN}">
+            <!-- BEGIN chat_date -->
+            <div>
+                <h2>{CHAT_DATE}</h2>
+                <ul class="chat-archive box">
+                <!-- BEGIN chat -->
+                    <li class="chat-message-user chat-message-user-admin chat-message-user-me">
+                        <span class="chat-user">
+                            <span class="triangulate"></span>
+                            <span class="chat-username">{POSTER}</span>
+                            <span class="chat-time">{DATETIME}</span>
+                        </span>
+                        <span id="a{CHAT_ID}" class="chat-message">
+                            {CHAT_BODY}
+                        </span>
+                    </li>
+                <!-- END chat -->
+                </ul>
+            </div>
+            <!-- END chat_date -->
+        </div>
+    </div>
+    <div class="clearfix"></div>
+
+    <div class="pagination clearfix">
+        <!-- BEGIN previous_button -->
+        <a class="prev" href="/homepage/chatArchive/{PREVIOUS_PAGE}">&laquo; Prev</a><!-- END previous_button -->
+        <!-- BEGIN page_number -->
+        <a class="number {CURRENT}" href="/homepage/chatArchive/{PAGE_INDEX_REF}">{PAGE_INDEX}</a><!-- END page_number -->
+        <!-- BEGIN next_button -->
+        <a class="next" href="/homepage/chatArchive/{NEXT_PAGE}">Next &raquo;</a><!-- END next_button -->
+    </div>
+
+</div>
