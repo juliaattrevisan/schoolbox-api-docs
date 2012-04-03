@@ -11,6 +11,14 @@
     .directory table td {
         vertical-align: middle;
     }
+
+    .orderby {
+        background: #dfdfdf;
+    }
+
+    .orderby:after {
+        content: ' {DIR}';
+    }
 </style>
 
 <!-- END custom_head-->
@@ -43,7 +51,7 @@
         <div class="level last clearfix">
             <h3>{USER_GROUP}<!-- BEGIN count -->: {USER_DISP_COUNT} members<!-- END count --></h3>
             <span class="header_option">
-                <a href="/adminv2/reports/{REPORT_FILTER}/exportToCSV" class="btn download"><span></span>Download Report</a>
+                <a href="/adminv2/reports/{REPORT_FILTER}exportToCSV" class="btn download"><span></span>Download Report</a>
             </span>
                 <!-- BEGIN result -->
             <div class="{RESULT_CLASS}">

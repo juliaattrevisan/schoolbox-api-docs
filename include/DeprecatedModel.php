@@ -58,9 +58,11 @@ class DeprecatedModel {
         }
     }
 
-    function getAllByField ($field, $id) {
+    function getAllByField ($field, $id, $orderBy = "", $orderDir = "") {
         $query = "	SELECT *
 					FROM `" . $this->_table . "` WHERE `" . $field . "` = " . $this->db->smartQuote($id);
+        if($orderBy != "")
+            $query .= " ORDER BY $orderBy $orderDir";
 
         return $this->db->getAll($query);
     }

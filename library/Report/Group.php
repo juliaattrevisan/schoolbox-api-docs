@@ -6,18 +6,27 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Report_Group extends Report_Abstract {
+class Report_Group extends Report_Abstract implements Report_IReport {
 
     private $groupID = null;
+    private $dataSet;
+    private $dataCount;
+    private $pageNum;
+    private $perPage;
 
-    // csv column mapping: index => humanreadable
-    private $columns = array(
+    // csv field mapping: index => humanreadable
+    private $fields = array(
         'title'     => 'title',
         'firstname' => 'firstname',
         'lastname'  => 'lastname',
         'campus'    => 'campus',
+        'year'      => 'year',
         'alt_email' => 'email'
     );
+
+    // fields that we will permit sorting on
+    private $sortable = array('firstname', 'lastname', 'campus', 'year', 'alt_email');
+    private $defaultOrderBy = 'lastname';
 
     public function __construct($page) {
         $this->setGroupHandler(new Group());
@@ -27,17 +36,12 @@ class Report_Group extends Report_Abstract {
 
         } else {
             $this->setPage($page);
-
             $this->setUserHandler(new User());
-
             $this->setup();
         }
     }
 
     protected function setup() {
-        // which html file to use as template
-        //$this->getPage()->setFile(TEMPLATE_content, 'modules/report/group.html');
-
         // set blocks
         $this->getPage()->setFile('user_t', 'adminv2/report/group.html');
         $this->getPage()->setBlock(TEMPLATE_content, 'group', 'group_block');
@@ -51,99 +55,79 @@ class Report_Group extends Report_Abstract {
 
     }
 
-    public function setGroupID($groupID) {
+    public function setIndexID($groupID) {
         $this->groupID = $groupID;
     }
 
-    public function getGroupID() {
+    public function getIndexID() {
         return $this->groupID;
     }
 
-    public function getGroupName() {
-        return $this->getGroupHandler()->getGroupName($this->getGroupID());
+    public function getReportTitle() {
+        return $this->getGroupHandler()->getGroupName($this->getIndexID());
     }
 
-    public function setColumns($cols) {
-        $this->columns = $cols;
+    public function setFields($fields) {
+        $this->fields = $fields;
     }
 
-    public function addColumns($cols) {
-        array_merge($this->columns, $cols);
+    public function getSortableFields() {
+        return $this->sortable;
     }
 
-    public function getColumns() {
-        return $this->columns;
+    public function addFields($fields) {
+        array_merge($this->fields, $fields);
+    }
+
+    public function getFields() {
+        return $this->fields;
+    }
+
+    public function getDefaultOrderBy() {
+        return $this->defaultOrderBy;
+    }
+
+    public function populateDataset($offset, $limit, $orderBy = '', $orderDir = 'ASC') {
+
+        $this->pageNum = ($offset / $limit) + 1;
+        $this->perPage = $limit;
+
+        // need fields from which to retrieve data
+        if(empty($this->fields))
+            return false;
+
+        // fallback to default if unset
+        if($orderBy == '' || !in_array($orderBy, $this->sortable))
+            $orderBy = $this->getDefaultOrderBy();
+
+        $allResults = $this->getUserHandler()->getAllByField('group_id', $this->getIndexID(), $orderBy, $orderDir);
+
+        $this->dataCount = count($allResults);
+        $this->dataSet = array_slice($allResults, $offset, $limit);
+
+        return $this->dataCount;
     }
 
     public function render() {
-        // the group must not be null
-        if($this->getGroupID() == null)
+        // the group and the dataset must both not be null
+        if($this->getIndexID() == null || empty($this->dataSet))
             error(19);
 
         $page = $this->getPage();
 
-        if(!is_numeric($page->arg[2]) || empty($page->arg[2]) || $page->arg[2] < 1)
-            $pageNum = 1;
-        else
-            $pageNum = $page->arg[2];
-
-        $perPage = Cfg::get('search_type_limit') * 2;
-
-        // bring back a list of users in the requested group
-        $fullResult = $this->getUserHandler()->getByGroup($this->getGroupID(), false);
-        $visibleResult = $this->getUserHandler()->getSelectionByGroup($this->getGroupID(), false, ($pageNum - 1) * $perPage, $perPage);
-
-        $pageCount = ceil(count($fullResult) / $perPage);
-
-        // figure out which pagination buttons should be displayed
-        if($pageNum < 2)
-            $page->setVar('previous_button_block', '');
-        else
-            $page->parse('previous_button_block', 'previous_button');
-
-        if($pageNum >= $pageCount)
-            $page->setVar('next_button_block', '');
-        else
-            $page->parse('next_button_block', 'next_button');
-
-        $pageSlug = "group/{$page->arg[1]}/";
-
-        if($pageCount > 1) {
-            for($j = 1; $j <= $pageCount; $j++) {
-                if($pageNum == $j)
-                    $page->setVar('CURRENT', ' current');
-                else
-                    $page->setVar('CURRENT', '');
-
-                $page->setVar('PAGE_INDEX', $j);
-                $page->setVar('PAGE_INDEX_REF', $pageSlug . $j);
-
-                $page->parse('page_number_block','page_number', true);
-            }
-        }
-        else
-            $page->setVar('page_number_block', '');
-
-        $outputPagination = array(
-            'PREVIOUS_PAGE' => $pageSlug . ($pageNum - 1),
-            'NEXT_PAGE'		=> $pageSlug . ($pageNum + 1),
-            'LAST_PAGE'		=> $pageSlug . $pageCount,
-        );
-
-        $page->setVar($outputPagination);
-
         $groupHandler = new Group();
-        $groupName = $groupHandler->getGroupName($this->getGroupID());
+        $groupName = $groupHandler->getGroupName($this->getIndexID());
 
         // render users
-        if (!empty($visibleResult)) {
+        if (!empty($this->dataSet)) {
 
             $page->setVar(array(
-                'USER_DISP_COUNT' => count($fullResult),
-                'USER_GROUP'      => $groupName
+                'USER_DISP_COUNT' => $this->dataCount,
+                'USER_GROUP'      => $groupName,
+                'SORT_BASE'       => "group/{$this->getIndexID()}",
             ));
 
-            foreach ($visibleResult as $user) {
+            foreach ($this->dataSet as $user) {
                 // Format email address
                 $emailObj = new Email();
                 $address = $emailObj->formatEmailFromArray($user);
@@ -164,6 +148,8 @@ class Report_Group extends Report_Abstract {
                 else
                     $page->parse('modify_block', 'modify');
 
+                $page->setVar('DARK', ++$j%2?'dark':'');
+
                 $page->parse('user_block', 'user', true);
             }
 
@@ -172,7 +158,7 @@ class Report_Group extends Report_Abstract {
         } else {
             $page->setVar(array(
                 'RESULT'                => 'No results.',
-                'USER_DISP_COUNT'       => count($fullResult),
+                'USER_DISP_COUNT'       => $this->dataCount,
                 'USER_GROUP'            => $groupName,
                 'previous_button_block' => '',
                 'next_button_block'     => '',
@@ -183,9 +169,9 @@ class Report_Group extends Report_Abstract {
     }
 
     public function export() {
-        $exporter = new Report_Exporter($this->getGroupName());
-        $exporter->setHeadings($this->getColumns());
-        $exporter->setData($this->getUserHandler()->getByGroup($this->getGroupID(), false));
+        $exporter = new Report_Exporter($this->getReportTitle());
+        $exporter->setHeadings($this->getFields());
+        $exporter->setData($this->getUserHandler()->getByGroup($this->getIndexID(), false));
         $exporter->export('CSV');
     }
 }

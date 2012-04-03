@@ -17,7 +17,7 @@ class Report_Factory {
     /**
      * @static
      * @param $reportType
-     * @return Report_Abstract|null
+     * @return Report_IReport
      */
     public static function build($reportType, $page) {
         if(Report_Factory::$typesafe) {
