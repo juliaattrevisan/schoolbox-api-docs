@@ -167,11 +167,12 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 	}
 
 	/**
-     * Saves a response for this Answer type. This should be customised based on
-     * the format and structure of the answer (e.g. serialize multichoice)
+	 * Saves a response for this Answer type. This should be customised based on
+	 * the format and structure of the answer (e.g. serialize multichoice)
 	 *
 	 * @param  $data
-	 * @return
+	 *
+	 * @return array
 	 */
     public function saveResponse($data) {
 		$isNotEmpty = false;
@@ -261,6 +262,10 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 		/* Append commentary
  		 */
 		$data['comment'] = $response['comment'];
+
+		/* Append awarded mark
+		 */
+		$data['mark'] = $response['mark'];
 
 		return $data;
 	}

@@ -117,6 +117,33 @@ abstract class Evaluation_Question extends DeprecatedModel {
 	}
 
 	/**
+	 * Get all the questions in an assess
+	 *
+	 * @param $assess_id
+	 * @return array|bool
+	 */
+	public function getAll($assess_id) {
+		$query = "
+			SELECT
+				assess_section.section_id,
+				assess_section.sequence AS section_sequence,
+				assess_section.title AS section_title,
+				assess_question.question_id AS question_id,
+				assess_question.type_id AS question_type_id,
+				assess_question.sequence AS question_sequence,
+				assess_question.marks AS question_marks,
+				assess_question.question AS question
+			FROM assess
+			LEFT JOIN assess_section ON assess.assess_id = assess_section.assess_id
+			LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
+			WHERE assess.assess_id = '$assess_id'
+			ORDER BY assess_section.sequence, assess_question.sequence
+		";
+
+		return $this->db->getAll($query);
+	}
+
+	/**
 	 * Get a list of questions in a section
 	 *
 	 * @param  $section_id

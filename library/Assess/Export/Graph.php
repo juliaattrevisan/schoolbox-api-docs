@@ -1,6 +1,6 @@
 <?php
 /**
- * Assess_Exporter
+ * Assess_Export_Graph
  *
  * Handles export of results
  *
@@ -9,7 +9,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Assess_Exporter extends Evaluation_Exporter {
+class Assess_Export_Graph extends Evaluation_Export_Graph {
 
 }
 

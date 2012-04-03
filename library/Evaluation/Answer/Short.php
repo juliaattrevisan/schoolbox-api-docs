@@ -187,6 +187,10 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
  		 */
 		$data['comment'] = $response['comment'];
 
+		/* Append awarded mark
+		 */
+		$data['mark'] = $response['mark'];
+
 		return $data;
 	}
 
@@ -195,7 +199,8 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
 	 *
 	 * @param  $attempt_id
 	 * @param  $question_id
-	 * @return
+	 *
+	 * @return mixed
 	 */
 	public function exportResponseToArray($attempt_id, $question_id) {
 		$response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);

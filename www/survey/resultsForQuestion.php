@@ -27,7 +27,7 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
-$surveyExporter = new Survey_Exporter($assess, $factory, new Survey_Section(), new Survey_Attempt(), $questionHandler);
+$surveyExporter = new Survey_Export_Graph($assess, $factory, new Survey_Section(), new Survey_Attempt(), $questionHandler);
 $surveyExporter->setLegendHTML(true);
 
 /* Optionally filter by question
@@ -79,7 +79,7 @@ if (is_array($sectionValues) && count($sectionValues)) {
 
 $this->setVar(array(
 	'SURVEY_NAME' => $assess['title'],
-    'SURVEY_ID'   => $assess['assess_id'],
+	'SURVEY_ID' => $assess['assess_id'],
 	'QUESTION_QUESTION' => $questionList
 ));
 

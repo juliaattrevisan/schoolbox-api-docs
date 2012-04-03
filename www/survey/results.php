@@ -24,7 +24,7 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
-$surveyExporter = new Survey_Exporter($assess,  new Survey_Factory(), new Survey_Section(), new Survey_Attempt(), new Survey_Question());
+$surveyExporter = new Survey_Export_Graph($assess,  new Survey_Factory(), new Survey_Section(), new Survey_Attempt(), new Survey_Question());
 $sectionValues = $surveyExporter->getSectionValues();
 
 /* Data collected, now we can show it.

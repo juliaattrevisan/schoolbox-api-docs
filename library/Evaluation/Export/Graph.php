@@ -1,6 +1,6 @@
 <?php
 /**
- * Evaluation_Exporter
+ * Evaluation_Export_Graph
  *
  * Manages results export to various formats
  *
@@ -9,7 +9,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Evaluation_Exporter {
+class Evaluation_Export_Graph {
 	protected $sectionValues = array();
 	protected $filterByQuestion = false;
 	protected $legendHTML = false;

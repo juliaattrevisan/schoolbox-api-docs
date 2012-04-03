@@ -1,6 +1,6 @@
 <?php
 /**
- * Survey_Exporter
+ * Survey_Export_Graph
  *
  * Handles export of results
  *
@@ -9,7 +9,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Survey_Exporter extends Evaluation_Exporter {
+class Survey_Export_Graph extends Evaluation_Export_Graph {
 	protected $columnHeadings = array("Synergy ID", "Respondent", "Response");
 }
 

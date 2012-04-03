@@ -176,7 +176,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
 	 * the format and structure of the answer (e.g. serialize multichoice)
 	 *
 	 * @param  $data
-	 * @return
+	 *
+	 * @return array
 	 */
     public function saveResponse($data) {
         $processedResponse = serialize($data['answerRight']);
@@ -267,6 +268,10 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
 		/* Append commentary
  		 */
 		$data['comment'] = $response['comment'];
+
+		/* Append awarded mark
+		 */
+		$data['mark'] = $response['mark'];
 
 		return $data;
 	}
