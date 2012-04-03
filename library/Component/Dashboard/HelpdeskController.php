@@ -40,13 +40,15 @@ class Component_Dashboard_HelpdeskController extends Component_Dashboard_Control
             return false;
         }
 
+        $this->setBlock($templateHandle, 'helpdesk_block', 'helpdesk_jobs');
+
         if ( is_array($this->jobList) ) {
             foreach ( $this->jobList as $job ) {
-                $this->setVar("PROBLEM", ucfirst($job['problem']));
-                $this->setVar("CREATED", $job['createdDate']);
-                $this->setVar("STATUS", $job['status']);
+                $this->setVar('PROBLEM', ucfirst($job['problem']));
+                $this->setVar('CREATED', $job['createdDate']);
+                $this->setVar('STATUS', $job['status']);
                 $this->setVar('ON_OFF', ++$j % 2 ? '' : 'dark');
-                $this->parse("helpdesk_jobs", "helpdesk_block", true);
+                $this->parse('helpdesk_jobs', 'helpdesk_block', true);
             }
 
             return true;
