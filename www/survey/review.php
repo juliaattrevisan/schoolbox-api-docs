@@ -85,6 +85,10 @@ $this->setBlock(TEMPLATE_content, 'prevSection', 'prevSection_block');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
+$start = new Alaress_Date_Format($attempt['start'], 'y-m-d h:i:s');
+$finish = new Alaress_Date_Format($attempt['finish'], 'y-m-d h:i:s');
+$user = $attemptHandler->getUser($attempt['attempt_id']);
+
 /* Show current Section's data, and other mandatory tokens needed to complete
  * the Assessment.
  */
@@ -95,6 +99,9 @@ $this->setVar(array(
     'SECTION_TITLE' => $section['title'],
     'SECTION_DESCRIPTION' => $section['description'],
 	'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
+	'ATTEMPT_USERNAME' => $user['firstname'] . ' ' . $user['lastname'],
+	'ATTEMPT_START_DATETIME' => $start->getShort(),
+	'ATTEMPT_FINISH_DATETIME' => $finish->getShort(),
 ));
 
 /* Load all the questions for this section.

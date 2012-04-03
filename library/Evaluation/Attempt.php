@@ -359,4 +359,21 @@ abstract class Evaluation_Attempt extends DeprecatedModel {
 
         return $this->db->getOne($query);
     }
+
+	/**
+	 * Get the user who did the attempt
+	 *
+	 * @param $attempt_id
+	 * @return mixed
+	 */
+	public function getUser($attempt_id) {
+		$query = "
+			SELECT `user`.firstname, `user`.lastname
+			FROM assess_attempt
+			LEFT JOIN `user` ON assess_attempt.user_id = `user`.id
+			WHERE assess_attempt.attempt_id = '$attempt_id'
+		";
+
+		return $this->db->getRow($query);
+	}
 }
