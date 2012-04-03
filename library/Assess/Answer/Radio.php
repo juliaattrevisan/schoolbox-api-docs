@@ -10,8 +10,6 @@
  * @version     SVN: $Id$
  */
 class Assess_Answer_Radio extends Evaluation_Answer_Radio {
-    const CORRECT_CLASS = 'multiCorrect';
-    const INCORRECT_CLASS = 'multiIncorrect';
 
 	/**
 	 * Get an instance of a responseHandler upon instantiation
@@ -78,99 +76,5 @@ class Assess_Answer_Radio extends Evaluation_Answer_Radio {
         );
 
         $this->responseHandler->update($marks);
-    }
-
-	/**
-	 * Show the response someone submitted and also show the correct answer.
-	 * Provide an option for the teacher to review the mark and adjust.
-	 *
-	 * @param  $page
-	 * @param  $question_id
-	 * @return void
-	 */
-    public function reviewResponse($page, $question_id) {
-        $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
-
-        if ($existing) {
-            $existingAnswer = unserialize($existing['response']);
-        }
-
-        $answerGroup = $this->getByQuestionID($question_id);
-
-        if ($answerGroup) {
-            $allAnswers = unserialize($answerGroup['answer']);
-
-            $page->setVar(array(
-                'ANSWER_ID' => $answerGroup['answer_id'],
-                'RESPONSE_ID' => $existing['response_id'],
-                'REVIEWED_COMMENT' => $existing['comment'],
-                'REVIEWED_MARKS' => $existing['mark'],
-            ));
-
-            foreach($allAnswers as $currentAnswer) {
-                if ($currentAnswer->correct) {
-                    $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => 'correct-answer'
-                    ));
-                }
-                else {
-                    $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => ''
-                    ));
-                }
-
-                $page->setVar(array(
-                    'ANSWER_VALUE' => $currentAnswer->value,
-                    'ANSWER_DESCRIPTION' => $currentAnswer->description,
-                ));
-
-                if ($existing['response']) {
-                    if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
-                        $page->setVar(array(
-                            'ANSWER_CHECKED' => 'checked=\'checked\'',
-                        ));
-
-                        /* Was this a correctly-selected response? If so apply a
-                         * special class to it. The three cases are:
-                         *
-                         * Correct response, selected
-                         * Incorrect response, selected
-                         * Unselected
-                         */
-                        if ($currentAnswer->correct && in_array($currentAnswer->value, $existingAnswer)) {
-                            $page->setVar(array(
-                                'CORRECT' => self::CORRECT_CLASS,
-                            ));
-                        }
-                        else if (in_array($currentAnswer->value, $existingAnswer)) {
-                            $page->setVar(array(
-                                'CORRECT' => self::INCORRECT_CLASS,
-                            ));
-                        }
-                        else {
-                            $page->setVar(array(
-                                'CORRECT' => ''
-                            ));
-                        }
-                    }
-                    else {
-                        $page->setVar(array(
-                            'ANSWER_CHECKED' => '',
-                            'CORRECT' => ''
-                        ));
-                    }
-                }
-                else {
-                    $page->setVar(array(
-                        'CORRECT' => ''
-                    ));
-                }
-
-                $page->parse('answerOption_block', 'answerOption', true);
-            }
-        }
-        else {
-            $page->setVar('answerOption_block', '');
-        }
     }
 }

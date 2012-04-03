@@ -61,9 +61,14 @@ if (is_array($sectionValues) && count($sectionValues)) {
 		 */
 		if (count($currentQuestion['attempts'])) {
 			foreach($currentQuestion['attempts'] as $currentAttempt) {
+				$start = new Alaress_Date_Format($currentAttempt['start'], 'y-m-d h:i:s');
+				$finish = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
+
 				$this->setVar(array(
 					'RESPONDENT_NAME' => $currentAttempt['name'],
-					'RESPONDENT_RESPONSE' => $currentAttempt['responses']
+					'RESPONDENT_RESPONSE' => $currentAttempt['responses'],
+					'RESPONDENT_START_DATETIME' => $start->getShort(),
+					'RESPONDENT_FINISH_DATETIME' => $finish->getShort(),
 				));
 
 				$this->parse('respondent_block', 'respondent', true);

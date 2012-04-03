@@ -12,6 +12,7 @@
  */
 $groupHandler = new Group();
 $assessHandler = new Survey_Main();
+$sectionHandler = new Survey_Section();
 $attemptHandler = new Survey_Attempt();
 
 $assess = $assessHandler->getByID($this->arg[0]);
@@ -35,7 +36,6 @@ if (!$assessHandler->isOwner($this->arg[0]) && !$groupHandler->isSuperuser()) {
 $this->setFile(TEMPLATE_content, 'survey/attempts.html');
 $this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
 
-
 $allAttempts = $attemptHandler->getList($this->arg[0]);
 
 if (is_array($allAttempts) && count($allAttempts)) {
@@ -47,13 +47,16 @@ if (is_array($allAttempts) && count($allAttempts)) {
 		$startDate = new Alaress_Date_Format($currentAttempt['start'], 'y-m-d h:i:s');
 		$finishDate = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
 
+		$firstSection = $sectionHandler->getFirst($this->arg[0]);
+
 		$this->setVar(array(
 			'ATTEMPT_USER_ID' => $currentAttempt['user_id'],
 			'ATTEMPT_FIRSTNAME' => $currentAttempt['firstname'],
 			'ATTEMPT_LASTNAME' => $currentAttempt['lastname'],
-			'ATTEMPT_START' => $startDate->getLocalShort(),
-			'ATTEMPT_FINISH' => $finishDate->getLocalShort(),
-			'ATTEMPT_REVIEWED_AT' => $currentAttempt['reviewed_at'],
+			'ATTEMPT_START' => $startDate->getShort(),
+			'ATTEMPT_FINISH' => $finishDate->getShort(),
+			'ATTEMPT_ASSESS_ID' => $this->arg[0],
+			'ATTEMPT_SECTION_ID' => $firstSection['section_id'],
 			'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
 			'ON_OFF' => $i % 2 ? 'dark' : ''
 		));

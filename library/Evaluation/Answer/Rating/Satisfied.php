@@ -9,8 +9,5 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-
 abstract class Evaluation_Answer_Rating_Satisfied extends Evaluation_Answer_Radio {
-    const CORRECT_CLASS = 'multiCorrect';
-    const INCORRECT_CLASS = 'multiIncorrect';
 }

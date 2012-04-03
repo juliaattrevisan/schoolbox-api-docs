@@ -10,6 +10,11 @@
  * @version     SVN: $Id$
  */
 class Survey_Answer_TrueFalse extends Evaluation_Answer_TrueFalse {
+
+	/* Always use Correct css class
+	 */
+	protected $incorrectClass = 'multiCorrect';
+
 	protected $graphTemplateFile = 'survey/answer/truefalse/graph.html';
 
 	/* Use this to toggle between letters and actual answers

@@ -36,4 +36,14 @@ class Survey_Answer_Multi extends Evaluation_Answer_Multi {
 		$graph = new Survey_Graph_Render($page, $currentQuestion, $this->getGraphTemplateFile());
 		$graph->graph();
 	}
+
+	/**
+	 * Get the css class to use for incorrect responses
+	 * Always use the correctClass for Surveys
+	 *
+	 * @return string
+	 */
+	protected function getIncorrectClass() {
+		return $this->correctClass;
+	}
 }

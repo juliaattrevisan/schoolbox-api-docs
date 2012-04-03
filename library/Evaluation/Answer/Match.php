@@ -10,8 +10,8 @@
  * @version     SVN: $Id$
  */
 abstract class Evaluation_Answer_Match extends Evaluation_Answer {
-    const CORRECT_CLASS = 'matchCorrect';
-    const INCORRECT_CLASS = 'matchIncorrect';
+    protected $correctClass = 'matchCorrect';
+	protected $incorrectClass = 'matchIncorrect';
 
 	/**
      * Creates an Answer. This is used when creating Questions and Answers in
@@ -306,5 +306,26 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
 		$data = unserialize($response['response']);
 
 		return $data;
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Get correct class
+	 *
+	 * @return string
+	 */
+	protected function getCorrectClass() {
+		return $this->correctClass;
+	}
+
+	/**
+	 * Get incorrect class
+	 *
+	 * @return string
+	 */
+	protected function getIncorrectClass() {
+		return $this->incorrectClass;
 	}
 }

@@ -11,7 +11,7 @@
 				<th>Student</th>
 				<th>Start</th>
 				<th>Finish</th>
-				<th>Reviewed</th>
+				<th>Review</th>
 				<th>Action</th>
 			</tr>
 			<!-- BEGIN attempt -->
@@ -19,7 +19,7 @@
 				<td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_LASTNAME}, {ATTEMPT_FIRSTNAME}</a></td>
 				<td>{ATTEMPT_START}</td>
 				<td>{ATTEMPT_FINISH}</td>
-				<td>{ATTEMPT_REVIEWED_AT}</td>
+				<td><a href='/survey/review/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}'>Review</a></td>
 				<td><input type='checkbox' name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'></td>
 			</tr>
 			<!-- END attempt -->

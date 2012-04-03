@@ -10,6 +10,11 @@
  * @version     SVN: $Id$
  */
 class Survey_Answer_YesNo extends Evaluation_Answer_YesNo {
+
+	/* Always use Correct css class
+	 */
+	protected $incorrectClass = 'multiCorrect';
+
 	protected $graphTemplateFile = 'survey/answer/yesno/graph.html';
 
 	/* Use this to toggle between letters and actual answers

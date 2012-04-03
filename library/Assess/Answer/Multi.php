@@ -10,8 +10,6 @@
  * @version     SVN: $Id$
  */
 class Assess_Answer_Multi extends Evaluation_Answer_Multi {
-    const CORRECT_CLASS = 'multiCorrect';
-    const INCORRECT_CLASS = 'multiIncorrect';
 
 	/**
 	 * Get an instance of a responseHandler upon instantiation
@@ -139,12 +137,12 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi {
                          */
                         if ($currentAnswer->correct && in_array($currentAnswer->value, $existingAnswer)) {
                             $page->setVar(array(
-                                'CORRECT' => self::CORRECT_CLASS,
+                                'CORRECT' => $this->getCorrectClass(),
                             ));
                         }
                         else if (in_array($currentAnswer->value, $existingAnswer)) {
                             $page->setVar(array(
-                                'CORRECT' => self::INCORRECT_CLASS,
+                                'CORRECT' => $this->getIncorrectClass(),
                             ));
                         }
                         else {

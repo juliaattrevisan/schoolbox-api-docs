@@ -219,7 +219,9 @@ class Evaluation_Exporter {
 										'synergy_id' => $currentAttempt['synergy_id'],
 										'name' => $currentAttempt['firstname'] . ' ' . $currentAttempt['lastname'],
 										'responses' => $responseValues,
-										'comment' => html_entity_decode(str_replace("\n", '', strip_tags($commentValues)), ENT_QUOTES)
+										'comment' => html_entity_decode(str_replace("\n", '', strip_tags($commentValues)), ENT_QUOTES),
+										'start' => $currentAttempt['start'],
+										'finish' => $currentAttempt['finish'],
 									);
 								}
 							}

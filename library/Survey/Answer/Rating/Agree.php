@@ -10,6 +10,11 @@
  * @version     SVN: $Id$
  */
 class Survey_Answer_Rating_Agree extends Evaluation_Answer_Rating_Agree {
+
+	/* Always use Correct css class
+	 */
+	protected $incorrectClass = 'multiCorrect';
+
 	protected $graphTemplateFile = 'survey/answer/ratingAgree/graph.html';
 
 	/* Use this to toggle between letters and actual answers

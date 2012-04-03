@@ -115,11 +115,12 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
 	}
 
 	/**
-     * Saves a response for this Answer type. This should be customised based on
-     * the format and structure of the answer (e.g. serialize multichoice)
+	 * Saves a response for this Answer type. This should be customised based on
+	 * the format and structure of the answer (e.g. serialize multichoice)
 	 *
-	 * @param  $data
-	 * @return
+	 * @param $data
+	 *
+	 * @return array
 	 */
     public function saveResponse($data) {
         $processedResponse = $data['answer'];
@@ -172,7 +173,8 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
 	 *
 	 * @param  $attempt_id
 	 * @param  $question_id
-	 * @return
+	 *
+	 * @return array
 	 */
 	public function exportResponseToCSV($attempt_id, $question_id) {
 		$response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
@@ -201,5 +203,41 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
 		$data = $response['response'];
 
 		return $data;
+	}
+
+	/**
+	 * Show the response someone submitted and also show the correct answer.
+	 * Provide an option for the teacher to review the mark and adjust.
+	 *
+	 * @param  $page
+	 * @param  $question_id
+	 * @return void
+	 */
+	public function reviewResponse($page, $question_id) {
+		$existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
+
+		$currentAnswer = $this->getByQuestionID($question_id);
+
+		/* Removed this check because it was wrongly matching a blank saved
+		 * response with no response at all, preventing reviewed marks from
+		 * displaying properly.
+		 *
+		 * if ($existing['response'] != null) { ... } else { ... }
+		 */
+		$page->setVar(array(
+			'ANSWER_ID' => $currentAnswer['answer_id'],
+			'ANSWER' => $existing['response'],
+			'RESPONSE_ID' => $existing['response_id'],
+			'REVIEWED_COMMENT' => $existing['comment'],
+			'REVIEWED_MARKS' => $existing['mark'],
+		));
+
+		/* Show correct answer
+		 */
+		$page->setVar(array(
+			'CORRECT_ANSWER' => $currentAnswer['answer']
+		));
+
+		$page->parse('answerOption_block', 'answerOption', true);
 	}
 }

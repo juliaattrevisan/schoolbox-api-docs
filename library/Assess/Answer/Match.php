@@ -92,10 +92,10 @@ class Assess_Answer_Match extends Evaluation_Answer_Match {
 				$currentAnswer = $allAnswers[$i];
 
 				if ($right[$i] == $currentAnswer->answerRight) {
-					$correct = self::CORRECT_CLASS;
+					$correct = $this->getCorrectClass();
 				}
 				else {
-					$correct = self::INCORRECT_CLASS;
+					$correct = $this->getIncorrectClass();
 				}
 
 				$page->setVar(array(

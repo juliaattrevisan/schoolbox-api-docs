@@ -10,6 +10,4 @@
  * @version     SVN: $Id$
  */
 abstract class Evaluation_Answer_TrueFalse extends Evaluation_Answer_Radio {
-    const CORRECT_CLASS = 'multiCorrect';
-    const INCORRECT_CLASS = 'multiIncorrect';
 }

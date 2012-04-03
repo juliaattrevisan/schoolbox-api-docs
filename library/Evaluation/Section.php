@@ -184,7 +184,8 @@ abstract class Evaluation_Section extends DeprecatedModel {
 	 * Find out how much of a section was completed.
 	 *
 	 * @param  $section_id
-	 * @return
+	 *
+	 * @return array
 	 */
     public function sectionPercentageComplete($section_id) {
         $section = $this->getByID($section_id);
