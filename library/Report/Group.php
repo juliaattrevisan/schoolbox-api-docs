@@ -171,7 +171,7 @@ class Report_Group extends Report_Abstract implements Report_IReport {
     public function export() {
         $exporter = new Report_Exporter($this->getReportTitle());
         $exporter->setHeadings($this->getFields());
-        $exporter->setData($this->getUserHandler()->getByGroup($this->getIndexID(), false));
+        $exporter->setData($this->dataSet);
         $exporter->export('CSV');
     }
 }
