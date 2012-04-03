@@ -83,8 +83,11 @@ class Chat extends DeprecatedModel {
     }
 
     function get_users ($category_id) {
-        $query = "SELECT title, firstname, lastname, chat_poll.*
-                  FROM chat_poll LEFT JOIN user ON chat_poll.user_id = user.id
+        // retrieve users as well as their membership. If no staff present, deactivate the chat.
+        $query = "SELECT title, firstname, lastname, group_type, chat_poll.*
+                  FROM chat_poll
+                  LEFT JOIN `user` ON chat_poll.user_id = user.id
+                  LEFT JOIN `groups` ON user.`group_id` = groups.`id`
                   WHERE `category_id` = $category_id";
 
         $users = $this->db->getAll($query);
@@ -102,7 +105,7 @@ class Chat extends DeprecatedModel {
     }
 
     function prune_users ($category_id) {
-        $time = new DateTime('-12 seconds');
+        $time = new DateTime('-9 seconds');
 
         $query = "DELETE FROM chat_poll
                   WHERE time < '".$time->format('Y-m-d H:i:s')."'

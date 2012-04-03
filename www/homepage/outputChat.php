@@ -13,6 +13,7 @@ if (empty($config['state'])) {
 $this->setBlock('config', 'chat_state', 'chat_state_block');
 $this->setBlock($componentHandle, 'chat_state_active', 'chat_state_active_block');
 $this->setBlock($componentHandle, 'chat_state_inactive', 'chat_state_inactive_block');
+$this->setBlock($componentHandle, 'chat_staff_js', 'chat_staff_js_block');
 
 foreach (array('Active', 'Inactive') as $state) {
     $this->setVar(array(
@@ -43,5 +44,12 @@ $this->setVar(array(
     'CHAT_USER_PERM' => $group->getPermission($categoryID),
     'CHAT_STATE'        => $config['state'],
 ));
+
+if($group->isStaff()) {
+    $this->parse('chat_staff_js_block', 'chat_staff_js');
+} else {
+    $this->setVar('chat_staff_js_block', '');
+}
+
 
 ?>

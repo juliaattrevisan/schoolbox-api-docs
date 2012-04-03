@@ -12,9 +12,9 @@ $.widget("ui.chat",  {
         users_el: 'ul.chat-users',
         body_el: 'textarea',
         send_el: 'input[type="submit"]',
-        base_freq: 4,
-        poll_freq: 8, // seconds,
-        recv_freq: 4
+        base_freq: 3,
+        poll_freq: 6, // seconds,
+        recv_freq: 3
     },
 
     _create: function () {
@@ -310,6 +310,12 @@ $.widget("ui.chat",  {
             },
             dataType: 'json'
         });
+    },
+
+    get_state: function() {
+        if(this.options.users_el.children().length <= 1)
+            return 'Inactive';
+        return this.options.state;
     }
 });
 

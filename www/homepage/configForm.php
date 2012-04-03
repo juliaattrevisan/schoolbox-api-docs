@@ -57,7 +57,7 @@ if (is_numeric($_REQUEST['cid'])) {
 	/* Post config options from homepage
 	 */
 	else if ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {
-		$config = $_GET;
+        $config = $_GET;
 
 		unset($config['cid'], $config['type'], $config['component']);
 

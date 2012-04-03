@@ -82,13 +82,42 @@ else if ($method == 'poll') {
 
     if (empty($users)) {
         $users = array();
+
+    } else {
+        $conf = $homepage_handler->getComponentConfig($_POST['component_id']);
+        $staffPresent = false;
+
+        // am I personally a staff member?
+        if(!$group_handler->isStaff()) {
+
+            // no? ok, iterate and find out if any of the users are
+            foreach($users as &$user) {
+                if($user['group_type'] == Group::STAFF_GROUP_TYPE) {
+
+                    $msg[] = $user['group_type'];
+
+                    $staffPresent = true;
+                }
+                unset($user['group_type']);
+            }
+
+            // deactivate the chat if no staff members
+            if(!$staffPresent) {
+                $conf['state'] = 'Inactive';
+            }
+        } else {
+            // yes? set the flag
+            $conf['state'] = 'Active';
+        }
+
+        $homepage_handler->setComponentConfig($_POST['component_id'], $conf);
     }
 
     $time = new DateTime();
 
     $data = array(
-        'time' => $time->format('D M j Y H:i:s \G\M\TO (T)'),
-        'users' => $users,
+        'time'   => $time->format('D M j Y H:i:s \G\M\TO (T)'),
+        'users'  => $users,
         'config' => $homepage_handler->getComponentConfig($_POST['component_id']),
     );
 

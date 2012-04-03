@@ -22,10 +22,21 @@ $j(function () {
 		$j(this).toggleClass('active')
 	});
 });
-
 </script>
 <!-- END custom_head -->
-
+<!-- BEGIN chat_staff_js -->
+<script type="text/javascript">
+    window.check = true;
+    window.onbeforeunload = function (e) {
+        if(window.check) if($j('#component{COMPONENT_HOMEPAGE_ID}').chat("get_state") == 'Active') {
+            var confirm = "If you leave this page, the chat will be disabled for any students still in it.";
+            var e = e || window.event;
+            if (e) { e.returnValue = confirm; }
+            return confirm;
+        }
+    };
+</script>
+<!-- END chat_staff_js -->
 <div class="box chat clearfix" id="component{COMPONENT_HOMEPAGE_ID}">
 	<h2>Chat<span class="light"></span></h2>
 	<!-- BEGIN config -->
