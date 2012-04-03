@@ -87,30 +87,33 @@ else if ($method == 'poll') {
         $conf = $homepage_handler->getComponentConfig($_POST['component_id']);
         $staffPresent = false;
 
-        // am I personally a staff member?
-        if(!$group_handler->isStaff()) {
+        // ignore all of these checks if the chat is disabled.
+        if($conf['state'] == 'Active') {
 
-            // no? ok, iterate and find out if any of the users are
-            foreach($users as &$user) {
-                if($user['group_type'] == Group::STAFF_GROUP_TYPE) {
+            // am I personally a staff member?
+            if(!$group_handler->isStaff()) {
 
-                    $msg[] = $user['group_type'];
+                // no? ok, iterate and find out if any of the users are
+                foreach($users as &$user) {
+                    if($user['group_type'] == Group::STAFF_GROUP_TYPE) {
 
-                    $staffPresent = true;
+                        $msg[] = $user['group_type'];
+
+                        $staffPresent = true;
+                    }
+                    unset($user['group_type']);
                 }
-                unset($user['group_type']);
-            }
 
-            // deactivate the chat if no staff members
-            if(!$staffPresent) {
-                $conf['state'] = 'Inactive';
+                // deactivate the chat if no staff members
+                if(!$staffPresent) {
+                    $conf['state'] = 'Inactive';
+                }
+            } else {
+                // yes? set the flag
+                $conf['state'] = 'Active';
             }
-        } else {
-            // yes? set the flag
-            $conf['state'] = 'Active';
+            $homepage_handler->setComponentConfig($_POST['component_id'], $conf);
         }
-
-        $homepage_handler->setComponentConfig($_POST['component_id'], $conf);
     }
 
     $time = new DateTime();
