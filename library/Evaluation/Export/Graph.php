@@ -50,7 +50,7 @@ class Evaluation_Export_Graph {
 			* appropriate answerHandler, which contains the graphing method
 			*/
 			$allData[] = array(
-				'question' => strip_tags($currentQuestion['question']),
+				'question' => $currentQuestion['question'],
 				'question_id' => $currentQuestion['question_id'],
 				'type_id' => $currentQuestion['type_id'],
 			);

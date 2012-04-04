@@ -105,8 +105,14 @@ else {
         error(51);
     }
 
+	$assessHandler = new Assess_Main();
+	$assessHandler->renderAssessContents($section['assess_id'], $this);
+
+	$assess = $assessHandler->getByID($section['assess_id']);
+
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],
+		'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'SECTION_ID' => $question['section_id'],
         'SEQUENCE' => $question['sequence'],
         'QUESTION_ID' => $question['question_id'],
@@ -121,10 +127,6 @@ else {
     $this->setBlock('assessContentsFragment', 'section', 'section_block');
     $this->setBlock('section', 'question', 'question_block');
 
-    $assessHandler = new Assess_Main();
-    $assessHandler->renderAssessContents($section['assess_id'], $this);
-
-	$assess = $assessHandler->getByID($section['assess_id']);
 
 	$this->setVar(array(
 		'ASSESS_CATEGORY_ID' => $assess['category_id'],

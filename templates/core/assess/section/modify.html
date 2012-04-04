@@ -2,35 +2,34 @@
 <script type="text/javascript">
 
 $j(function() {
-		
 	if ($j('.checkbox').attr("checked")) {
 		$j('.hide-questions').show();
-		$j('.hide-questions :input').removeAttr('disabled');	
+		$j('.hide-questions :input').removeAttr('disabled');
 	}
-	
-	$j('.checkbox').click(function() {	
+
+	$j('.checkbox').click(function() {
 		if ($j('.hide-questions').css("display") == "block") {
 			$j('.hide-questions').hide();
 			$j('.hide-questions :input').attr('disabled', 'true');
 		} else {
 			$j('.hide-questions').show();
-			$j('.hide-questions :input').removeAttr('disabled');	
+			$j('.hide-questions :input').removeAttr('disabled');
 		}
-		
+
 	});
-	
+
 	jQuery.validator.addMethod(
-	  "combo",
-	  function(value, element) {
-		if (($j('.checkbox').is(':checked')) && ($j('.pool').val() == ""))
-		{
-		  return false;
-		}
-		else return true;
-	  },
-	  "You've selected random selection of questions. Please enter the amount of questions to put in the pool."
-	);	
-	
+		"combo",
+		function(value, element) {
+			if (($j('.checkbox').is(':checked')) && ($j('.pool').val() == "")) {
+				return false;
+			}
+
+			return true;
+		},
+		"You've selected random selection of questions. Please enter the amount of questions to put in the pool."
+	);
+
 	$j('#modifySection').validate({
 		rules: {
 			title: {
@@ -41,7 +40,7 @@ $j(function() {
 				combo: true
 			}
 		},
-		
+
 		messages: {
 			title: "Please enter a title",
 			description: "Please enter a description"
@@ -54,7 +53,7 @@ $j(function() {
 <h1>Modify Section {TITLE} in {ASSESS_TITLE}</h1>
 <div class="evaluation-content">
 	<h2>Section Details</h2>
-	
+
 	<form name="create" action="/assess/section/modify" class="" id="modifySection" method="post">
 		<label class="hide">
 			<input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
@@ -65,21 +64,21 @@ $j(function() {
 		<label>Section Title
 			<input name="title" type="text" size="35" value="{TITLE}" />
 		</label>
-		
+
 
 		<label><strong>Shuffle Questions</strong>
 			<input name="random" type="checkbox" class="checkbox" value="1" {RANDOM_SELECTED} /><span>Questions should be selected randomly</span>
 		</label>
-	
+
 		<label class="hide hide-questions">
 			Total Questions Displayed
-			<input name="pool" type="text" disabled="disabled" class="pool number" value="{POOL}"/> 
+			<input name="pool" type="text" disabled="disabled" class="pool number" value="{POOL}"/>
 		</label>
-	
+
 		<label>Description
 			<div class="textarea-container"><textarea name="description">{DESCRIPTION}</textarea></div>
 		</label>
-	
+
 		<label class="clearfix ">
 			<input type="submit" id="create" value="Modify" class="submit-btn-plain no-marg">
 		</label>
