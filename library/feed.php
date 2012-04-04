@@ -112,11 +112,22 @@ class Feed {
 		$userHandler = new User();
 
 		while($row = $this->db->getNextArray()){
+
+            $url = new Url($row['url']);
+            if ($url->isLocalUrl()) {
+                $linkUrl = $url->getRelativeURL();
+                $linkTarget = '';
+            }
+            else {
+                $linkUrl = $url->getBase64EncodedRedirect();
+                $linkTarget = 'external';
+            }
+
 			$link[] = array(
 				'date' => $row['submitted'],
 				'type' => 'link',
 				'message' => $userHandler->formatName($row).' submitted the link '.Scrub::text($row['name']),
-				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row).'</a> submitted the link <a href="'.$row['url'].'" rel="external">'.Scrub::text($row['name']).'</a>',
+				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row).'</a> submitted the link <a href="'.$linkUrl.'" rel="'.$linkTarget.'">'.Scrub::text($row['name']).'</a>',
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
 			);

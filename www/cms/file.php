@@ -116,7 +116,7 @@ if(is_numeric($this->arg[0])) {
 	if ($groupHandler->getPermission($category['id']) < WRITE_ACCESS)
 		error(6);
 
-	$output = array('ACTION'		=> 'Add',
+	$output = array('ACTION'		=> 'Post',
                         'FILE_ID'		=> '',
                         'DESCRIPTION'		=> '',
                         'COMMENT'		=> '',
