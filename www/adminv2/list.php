@@ -89,13 +89,19 @@ $tableList = array(
     )
 );
 
+// if no page supplied, default to groups
 if (!$this->arg[0]) {
 	$this->arg[0] = 'groups';
 }
 
 $selectedTable = $tableList[0];
+$allTableNames = array();
 
+// construct the sidebar
 foreach($tableList as $table) {
+
+    $allTableNames[] = $table['name'];
+
     $output = array(
 		'TABLE_NAME'    => $table['name'],
 		'TABLE_TITLE'   => $table['title'],
@@ -120,6 +126,10 @@ foreach($tableList as $table) {
     $this->parse('table_tab_block', 'table_tab',true);
 }
 
+// test page supplied is valid, if not, error
+if(!in_array($this->arg[0], $allTableNames))
+    error(101);
+
 $genericHandler = new GenericTable($selectedTable['name'], $selectedTable['index']);
 
 // restrict the visibility of the table if specified
@@ -132,97 +142,108 @@ if(isset($selectedTable['fields'])) {
     $table = $genericHandler->getAll();
 }
 
-foreach($table as $row) {
-    foreach($row as $keys => $data) {
-        $this->setVar('TABLE_DATA', $data);
-		$this->setVar('TABLE_COLUMN', $keys);
+if($table) {
+    foreach($table as $row) {
+        foreach($row as $keys => $data) {
+            $this->setVar('TABLE_DATA', $data);
+            $this->setVar('TABLE_COLUMN', $keys);
 
-        /* Search definition for row */
-        foreach($tableDefinition as $col) {
-            if($col['Field']==$keys)
-                break;
-        }
-
-
-        if (!$rowOne) {
-
-            if((isset($selectedTable['fields'][$keys]['caption']))) {
-                $this->setVar('TABLE_HEAD', $selectedTable['fields'][$keys]['caption']);
-            } else {
-                $this->setVar('TABLE_HEAD', ucwords(str_replace('_',' ',$keys)));
+            /* Search definition for row */
+            foreach($tableDefinition as $col) {
+                if($col['Field']==$keys)
+                    break;
             }
 
 
+            if (!$rowOne) {
 
-            $this->parse('table_heading_block','table_heading',true);
+                if((isset($selectedTable['fields'][$keys]['caption']))) {
+                    $this->setVar('TABLE_HEAD', $selectedTable['fields'][$keys]['caption']);
+                } else {
+                    $this->setVar('TABLE_HEAD', ucwords(str_replace('_',' ',$keys)));
+                }
 
-			/* New row template. Indexes are readonly.
-			 */
-			if ($keys == $selectedTable['index']) {
-				$this->setVar('TYPE', 'hidden');
-				$this->setVar('READONLY', 'readonly="readonly"');
-                $this->parse('newInput_block', 'newInput', true);
-			}
 
-            // fields specified as readonly are also...readonly.
-            else if(isset($selectedTable['fields'][$keys]) && $selectedTable['fields'][$keys]['readonly'] == '1') {
-                $this->setVar('TYPE', 'hidden');
-                $this->setVar('READONLY', 'readonly="readonly"');
-                $this->parse('newInput_block', 'newInput', true);
+
+                $this->parse('table_heading_block','table_heading',true);
+
+                /* New row template. Indexes are readonly.
+                 */
+                if ($keys == $selectedTable['index']) {
+                    $this->setVar('TYPE', 'hidden');
+                    $this->setVar('READONLY', 'readonly="readonly"');
+                    $this->parse('newInput_block', 'newInput', true);
+                }
+
+                // fields specified as readonly are also...readonly.
+                else if(isset($selectedTable['fields'][$keys]) && $selectedTable['fields'][$keys]['readonly'] == '1') {
+                    $this->setVar('TYPE', 'hidden');
+                    $this->setVar('READONLY', 'readonly="readonly"');
+                    $this->parse('newInput_block', 'newInput', true);
+                }
+
+                // if the field is an enum, explode it, and iteratively create select options for the list
+                else if(stristr($col['Type'],'enum') ) {
+                    $this->setVar('newSelect_option_block','');
+
+                    preg_match('/enum\((.*)\)/', $col['Type'], $match);
+                    $list = explode(',',str_replace('\'','',$match[1]));
+                    foreach($list as $option) {
+                        $this->setVar('OPTION_VALUE', $option);
+                        $this->parse('newSelect_option_block','newSelect_option',true);
+                    }
+                    $this->parse('newSelect_block', 'newSelect', true);
+                }
+
+                // generically, just go with a text input
+                else {
+                    $this->setVar('TYPE', 'text');
+                    $this->setVar('READONLY', '');
+                    $this->parse('newInput_block', 'newInput', true);
+                }
+
             }
 
-            // if the field is an enum, explode it, and iteratively create select options for the list
-            else if(stristr($col['Type'],'enum') ) {
-                $this->setVar('newSelect_option_block','');
-                
+            if ($keys == $selectedTable['index'] || (isset($selectedTable['fields'][$keys]) && $selectedTable['fields'][$keys]['readonly'] == '1')) {
+                $this->parse('table_cell_block','table_cell_static',true);
+            }
+            else if(stristr($col['Type'],'enum') ){
+                $this->setVar('table_cell_select_option_block','');
+
                 preg_match('/enum\((.*)\)/', $col['Type'], $match);
                 $list = explode(',',str_replace('\'','',$match[1]));
                 foreach($list as $option) {
                     $this->setVar('OPTION_VALUE', $option);
-                    $this->parse('newSelect_option_block','newSelect_option',true);
+                    if($option==$data) {
+                        $this->setVar('OPTION_VALUE_SELECTED', 'selected="selected"');
+                    }else {
+                        $this->setVar('OPTION_VALUE_SELECTED', '');
+                    }
+                    $this->parse('table_cell_select_option_block','table_cell_select_option',true);
                 }
-                $this->parse('newSelect_block', 'newSelect', true);
+                $this->parse('table_cell_block','table_cell_select',true);
             }
-
-            // generically, just go with a text input
             else {
-				$this->setVar('TYPE', 'text');
-				$this->setVar('READONLY', '');
-                $this->parse('newInput_block', 'newInput', true);
-			}
-
-        }
-
-        if ($keys == $selectedTable['index'] || (isset($selectedTable['fields'][$keys]) && $selectedTable['fields'][$keys]['readonly'] == '1')) {
-            $this->parse('table_cell_block','table_cell_static',true);
-		}
-        else if(stristr($col['Type'],'enum') ){
-            $this->setVar('table_cell_select_option_block','');
-            
-            preg_match('/enum\((.*)\)/', $col['Type'], $match);
-            $list = explode(',',str_replace('\'','',$match[1]));
-            foreach($list as $option) {
-                $this->setVar('OPTION_VALUE', $option);
-                if($option==$data) {
-                    $this->setVar('OPTION_VALUE_SELECTED', 'selected="selected"');
-                }else {
-                    $this->setVar('OPTION_VALUE_SELECTED', '');
-                }
-                $this->parse('table_cell_select_option_block','table_cell_select_option',true);
+                $this->parse('table_cell_block','table_cell',true);
             }
-            $this->parse('table_cell_block','table_cell_select',true);
         }
-        else {
-            $this->parse('table_cell_block','table_cell',true);
-		}
+
+        $rowOne = 'true';
+
+        $this->setVar('ROW_COLOR', ++$j%2 == 1? 'dark' : '');
+
+        $this->parse('table_row_block','table_row',true);
+        $this->setVar('table_cell_block','');
     }
-
-    $rowOne = 'true';
-
-    $this->setVar('ROW_COLOR', ++$j%2 == 1? 'dark' : '');
-
-    $this->parse('table_row_block','table_row',true);
-    $this->setVar('table_cell_block','');
+}
+// else table is blank, empty, etc.
+else {
+    $output = array(
+        'table_heading_block' => '',
+        'table_row_block' => '',
+        'newInput_block' => ''
+    );
+    $this->setVar($output);
 }
 
 // prevent the creation of new entries if admins should not be able to
