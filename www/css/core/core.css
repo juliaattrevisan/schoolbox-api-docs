@@ -1143,7 +1143,6 @@ input.timeField {
 	position: relative;
 	font-size: 12px;
 	font-weight: normal;
-	width: auto !important;
 	overflow: visible;
 	margin-top: 4px;
 	font-family: Arial, Helvetica, sans-serif;
