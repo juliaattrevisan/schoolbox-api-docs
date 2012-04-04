@@ -2,7 +2,7 @@ $j(function() {
     var markSheet =  {
 
         columnCount : $j('.mark-sheet.assessments table').find('tr:first').children('th').size(),
-        assessmentCellWidth : '195',
+        assessmentCellWidth : '160',
 
         init: function() {
             markSheet.columns();
@@ -27,18 +27,21 @@ $j(function() {
 
         inputs: function() {
 
-            $j(".mark-input").focusin(function(evt) {
-                $this = $j(this);
-                //markSheet.columns();
+            $j(".mark-input").live('focusin', function(evt) {
+                var $this = $j(this),
+                assignmentClass = $this.closest('td'),
+                rowIndex = $this.closest("tr").prevAll("tr").length + 1,
+                colIndex = assignmentClass.index() + 1;
+
                 /*
                 * Row highlighting
                 *
                 * */
-                var rowNumber = $this.closest("tr").prevAll("tr").length + 1;
+
                 $j('table').find('tr').removeClass('highlight-student');
 
-                if (!$j('table').find('tr:nth-child('+rowNumber+')').hasClass('highlight-student')) {
-                    $j('table').find('tr:nth-child('+rowNumber+')').addClass('highlight-student');
+                if (!$j('table').find('tr:nth-child('+rowIndex+')').hasClass('highlight-student')) {
+                    $j('table').find('tr:nth-child('+rowIndex+')').addClass('highlight-student');
                 }
 
                 /*
@@ -46,30 +49,14 @@ $j(function() {
                 *
                 * */
 
-                if (!$this.closest('td').hasClass('active-assessment')) {
+                $j('.active-assessment').each(function() {
+                    $j(this).removeClass('active-assessment');
+                });
 
-                    var assignmentClass = $this.closest('td');
+                $j('.assessments tbody tr td:not(:nth-child('+colIndex+'))').find('.comment').stop().animate({width:0}, 200).delay(200).hide();
+                $j('.assessments tbody tr td:nth-child('+colIndex+')').addClass('active-assessment').find('.comment').stop().show().animate({width:200});
 
-                    $j('.active-assessment').find('.comment').animate({width:0}, function() {
-
-                        $j('td').not(assignmentClass).removeClass('active-assessment');
-
-                        $j(this).hide();
-
-
-
-                     });
-
-                    $j('.mark-sheet.assessments table').css('width', markSheet.assessmentCellWidth * markSheet.columnCount);
-
-                    $j(assignmentClass).each(function() {
-                        $j(this).find('.comment').show().animate({width:200});
-                        $j(this).addClass('active-assessment');
-                    });
-
-                }
             });
-
         },
 
         cells: function() {
@@ -90,7 +77,7 @@ $j(function() {
                     }
                 }
             }, function() {
-                if (!$j('.inputMark').is(':focus')) {
+                if (!$j('.mark-input').is(':focus')) {
                     $j('table').find('tr').removeClass('highlight-student');
                 }
             });
@@ -135,7 +122,6 @@ $j(function() {
 
 
             jQuery.validator.addClassRules({
-
                 percent: {
                     percentage: true
                 },
@@ -143,21 +129,29 @@ $j(function() {
                 'out-of': {
                     markLimit: true
                 }
-
             });
 
             $j('.markForm').each(function() {
                 $j(this).validate({
                     submitHandler: function(form) {
-                        var notification = $j(form).siblings('.save-notification');
+                        var notification = $j(form).find('input, select');
                         $j.post('/submission/returnWorkForm.php', $j(form).serialize(), function(data) {
-                            notification.clearQueue();
-                            notification.stop().fadeIn(500).delay(1000).fadeOut(500);
+                           notification.css({
+                               'border': '2px solid green'
+                           });
+
+                            setTimeout(function() {
+                                notification.css({
+                                    'border': '1px solid #ccc'
+                                });
+                            }, 1000)
+
+
+
+
+
                         });
                         return false;
-                    },
-                    errorPlacement: function(error,element) {
-                        return true;
                     }
                 });
             });

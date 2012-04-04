@@ -5848,6 +5848,7 @@ table.subjectList {
 
 .mark-sheet.assessments table td{
     position:relative;
+    padding-right:0;
 }
 
 
@@ -5886,7 +5887,7 @@ table.subjectList {
 }
 
 
-.mark-sheet.assessments .active-assessment{width:400px !important;}
+.mark-sheet.assessments .active-assessment{width:470px !important;}
 
 .mark-sheet.assessments span {
     position: relative;
@@ -5916,6 +5917,17 @@ table.subjectList {
 
 
 .mark-sheet.assessments .error{border-color:#db0101;}
+.mark-sheet.assessments label.error{
+position: absolute;
+top: -54px;
+left: 0px;
+height: 47px;
+width: 95px;
+text-indent: 0;
+background-image: none;
+padding: 4px;
+line-height: 16px;
+    }
 
 dt {
 	width: 100px;
