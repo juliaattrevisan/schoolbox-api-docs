@@ -1,15 +1,34 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jstree/jquery.jstree.js"></script>
+<script type="text/javascript" src="/javascript/jquery.confirm.1.3.js"></script>
 <script type='text/javascript'>
 	$j(function() {
-		$j('#deleteButton').click(function() {
-			var allQuestions = $j('#questionBankForm').find('input[name="question_bank_id[]"]:checked');
+        $j('#deleteButton').click(function() {
+            var allQuestions = $j('#questionBankForm').find('input[name="question_bank_id[]"]:checked');
 
-			if (allQuestions.length && confirm('Do you want to remove the selected questions from the Question Bank?')) {
-				$j.post('/survey/questionbank/removeQuestion', $j('#questionBankForm').serialize(), function(response) {
-					alert(response);
-					location.reload();
-				});
-			}
-		});
+            if (allQuestions.length && confirm('Do you want to remove the selected questions from the Question Bank?')) {
+                $j.post('/survey/questionbank/removeQuestion', $j('#questionBankForm').serialize(), function(response) {
+                    alert(response);
+                    location.reload();
+                });
+            }
+        }).confirm({
+            buttons: {
+                wrapper:'<button></button>',
+                separator:'  '
+            }
+        });
+
+
+        $j('a.delete').click(function() {
+            location.href = $j(this).attr('href');
+        }).confirm({
+            buttons: {
+                wrapper:'<button></button>',
+                separator:'  '
+            }
+        });
+
 
 		$j('input[type=checkbox]').click(function() {
 			$j(this).closest('.question').toggleClass('checked')
@@ -19,36 +38,35 @@
 			$j(this).siblings('.question-answers').slideToggle();
 			return false;
 		});
-	});
-</script>
-<script type="text/javascript" src="/javascript/jstree/jquery.jstree.js"></script>
-<script type="text/javascript">
-$j(function () {
-	var selectedNodes = [{SELECTED_NODES}];
 
-	$j("#categoryTree").jstree({
-		"animation": 50,
-        "core": {
-			"initially_open": selectedNodes
-		},
-		"plugins": ["themes", "html_data", "dnd","crrm"],
-        "themes": {
-			"theme": "core",
-			"dots": true,
-			"icons": false
-		}
-	}).bind('move_node.jstree', function(e, data) {
-		var params = {
-			position: data.rslt.p,
-			destination: data.rslt.r[0].id.split('_').pop(),
-			target: data.rslt.o[0].id.split('_').pop()
-		}
+        var selectedNodes = [{SELECTED_NODES}];
 
-		$j.ajax({ url: '/survey/questionbank/move.php', data: params});
+        $j("#categoryTree").jstree({
+            "animation": 50,
+            "core": {
+                "initially_open": selectedNodes
+            },
+            "plugins": ["themes", "html_data", "dnd","crrm"],
+            "themes": {
+                "theme": "core",
+                "dots": true,
+                "icons": false
+            }
+        }).bind('move_node.jstree', function(e, data) {
+            var params = {
+                position: data.rslt.p,
+                destination: data.rslt.r[0].id.split('_').pop(),
+                target: data.rslt.o[0].id.split('_').pop()
+            }
+
+            $j.ajax({ url: '/survey/questionbank/move.php', data: params});
+
 	});
+
+        $j('#subcategoryForm').validate();
 });
 </script>
-
+<!-- END custom_head -->
 <h1>Question Bank</h1>
 <span class="header_option"><a href="/survey/modify/{SURVEY_ID}" class="btn go-back "><span></span>Return To Survey</a></span>
 
@@ -68,7 +86,7 @@ $j(function () {
 	<!-- END welcome -->
 
 	<!-- BEGIN category_selected -->
-	<h2>{QUESTION_CATEGORY}</h2>
+	<h2>Questions in category: {QUESTION_CATEGORY}</h2>
 	<form id='questionBankForm' action='/survey/questionbank/addToSection' method='post'>
 		<input name='section_id' type='hidden' value='{SECTION_ID}'/>
 
@@ -93,13 +111,13 @@ $j(function () {
 		</div>
 		<!-- END question -->
 
-		<p class="clearfix">
+		<p class="clearfix no-marg">
 			<!-- BEGIN show_submit -->
-			<input type='submit' value='Copy to Survey' class="submit-btn-plain"/>
+			<input type='submit' value='Copy to Survey' class="submit-btn-plain no-marg"/>
 			<!-- END show_submit -->
 
 			<!-- BEGIN show_delete -->
-			<input id='deleteButton' type='button' value='Remove from QuestionBank' class="submit-btn-plain"/>
+			<input id='deleteButton' type='button' value='Remove from Question Bank' class="submit-btn-plain no-marg"/>
 			<!-- END show_delete -->
 		</p>
 		<!-- BEGIN no_questions -->
@@ -107,26 +125,37 @@ $j(function () {
 		<!-- END no_questions -->
 	</form>
 
-	<a href='/survey/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}' class="submit-btn-plain" >Remove this category</a>
+
+    <h2>Edit Category</h2>
+
+    <h4>Rename</h4>
 
 	<form action='/survey/questionbank/modify.php' method='post'>
 		<input name='questionCategoryId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}' />
-		<input name='name' type='text' value='{QUESTION_CATEGORY}' />
-
-		<p class="clearfix">
-			<input type='submit' value='Rename Category' class="submit-btn-plain" />
-		</p>
+		<p class="clearfix no-marg">
+            <input name='name' type='text' value='{QUESTION_CATEGORY}' />
+            <input type='submit' value='Rename Category' class="submit-btn-plain no-marg" />
+        </p>
 	</form>
+    <h4>Add Subcategory</h4>
+    <form action='/survey/questionbank/create' method='post' id="subcategoryForm">
+        <input name='parentId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}' />
+        <input name='name' type='text' value='' />
+
+        <p class="clearfix no-marg">
+            <input type='submit' value='Add New Subcategory' class="submit-btn-plain no-marg required" />
+        </p>
+    </form>
+
+    <h4>Remove</h4>
+
+    <form>
+        <p class="clearfix no-marg"><a href='/survey/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}'
+                                       class="submit-btn-plain no-marg delete">Remove this category</a></p>
+    </form>
+
 	<!-- END category_selected -->
 
-	<form action='/survey/questionbank/create' method='post'>
-		<input name='parentId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}' />
-		<input name='name' type='text' value='' />
-
-		<p class="clearfix">
-			<input type='submit' value='Add New Subcategory' class="submit-btn-plain" />
-		</p>
-	</form>
 </div>
 
 <div class="evaluation-menu">

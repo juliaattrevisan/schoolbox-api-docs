@@ -1,153 +1,192 @@
-<script type='text/javascript'>
-	$j(function() {
-		$j('#deleteButton').click(function() {
-			var allQuestions = $j('#questionBankForm').find('input[name="question_bank_id[]"]:checked');
-
-			if (allQuestions.length && confirm('Do you want to remove the selected questions from the Question Bank?')) {
-				$j.post('/assess/questionbank/removeQuestion', $j('#questionBankForm').serialize(), function(response) {
-					alert(response);
-					location.reload();
-				});
-			}
-		});
-
-		$j('input[type=checkbox]').click(function() {
-			$j(this).closest('.question').toggleClass('checked')
-		})
-
-		$j('.show-answers').click(function() {
-			$j(this).siblings('.question-answers').slideToggle();
-			return false;
-		});
-	});
-</script>
+<!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jstree/jquery.jstree.js"></script>
-<script type="text/javascript">
-$j(function () {
-	var selectedNodes = [{SELECTED_NODES}];
+<script type="text/javascript" src="/javascript/jquery.confirm.1.3.js"></script>
+<script type='text/javascript'>
+    $j(function () {
 
-	$j("#categoryTree").jstree({
-		"animation": 50,
-        "core": {
-			"initially_open": selectedNodes
-		},
-		"plugins": ["themes", "html_data", "dnd","crrm"],
-        "themes": {
-			"theme": "core",
-			"dots": true,
-			"icons": false
-		}
-	}).bind('move_node.jstree', function(e, data) {
-		var params = {
-			position: data.rslt.p,
-			destination: data.rslt.r[0].id.split('_').pop(),
-			target: data.rslt.o[0].id.split('_').pop()
-		}
+        $j('#deleteButton').click(
+                function () {
+                    var allQuestions = $j('#questionBankForm').find('input[name="question_bank_id[]"]:checked');
 
-		$j.ajax({ url: '/assess/questionbank/move.php', data: params});
-	});
-});
+                    if (allQuestions.length && confirm('Do you want to remove the selected questions from the Question Bank?')) {
+                        $j.post('/assess/questionbank/removeQuestion', $j('#questionBankForm').serialize(), function (response) {
+                            alert(response);
+                            location.reload();
+                        });
+                    }
+                }).confirm({
+                    buttons:{
+                        wrapper:'<button></button>',
+                        separator:'  '
+                    }
+                });
+
+
+        $j('a.delete').click(
+                function () {
+                    location.href = $j(this).attr('href');
+                }).confirm({
+                    buttons:{
+                        wrapper:'<button></button>',
+                        separator:'  '
+                    }
+                });
+
+        $j('input[type=checkbox]').click(function () {
+            $j(this).closest('.question').toggleClass('checked')
+        })
+
+        $j('.show-answers').click(function () {
+            $j(this).siblings('.question-answers').slideToggle();
+            return false;
+        });
+
+        var selectedNodes = [
+            {SELECTED_NODES}
+        ];
+
+        $j("#categoryTree").jstree({
+            "animation":50,
+            "core":{
+                "initially_open":selectedNodes
+            },
+            "plugins":["themes", "html_data", "dnd", "crrm"],
+            "themes":{
+                "theme":"core",
+                "dots":true,
+                "icons":false
+            }
+        }).bind('move_node.jstree', function (e, data) {
+                    var params = {
+                        position:data.rslt.p,
+                        destination:data.rslt.r[0].id.split('_').pop(),
+                        target:data.rslt.o[0].id.split('_').pop()
+                    }
+
+                    $j.ajax({ url:'/assess/questionbank/move.php', data:params});
+                });
+
+        $j('#subcategoryForm').validate();
+    });
 </script>
-
+<!-- END custom_head -->
 <h1>Question Bank</h1>
 <span class="header_option"><a href="/assess/modify/{ASSESS_ID}" class="btn go-back "><span></span>Return To Assess</a></span>
 
 <div class="evaluation-content question-bank">
-	<!-- BEGIN welcome -->
-	<h2>Welcome</h2>
+    <!-- BEGIN welcome -->
+    <h2>Welcome</h2>
 
-	<p class="pad-it">
-		Welcome to the assessment question bank. Here you will find questions
-		that can be used in your assessment. You can also store your own
-		questions here for later use. To begin browse to the appropriate
-		category and select the questions you wish to add. These questions
-		will automatically be added to your assessment in the current
-		section.
-	</p>
-	<!-- END welcome -->
+    <p class="pad-it">
+        Welcome to the assessment question bank. Here you will find questions
+        that can be used in your assessment. You can also store your own
+        questions here for later use. To begin browse to the appropriate
+        category and select the questions you wish to add. These questions
+        will automatically be added to your assessment in the current
+        section.
+    </p>
+    <!-- END welcome -->
 
-	<!-- BEGIN category_selected -->
-	<h2>{QUESTION_CATEGORY}</h2>
-	<form id='questionBankForm' action='/assess/questionbank/addToSection' method='post'>
-		<input name='section_id' type='hidden' value='{SECTION_ID}'/>
+    <!-- BEGIN category_selected -->
+    <h2>Questions in category: {QUESTION_CATEGORY}</h2>
 
-		<!-- BEGIN question -->
-		<div class="add-to-evaluation">
-			<label class="question clearfix">
-				<div class="question-checkbox">
-					<input name='question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}'/>
-				</div>
-				<span class="question-content">{QUESTION}</span>
-			</label>
+    <form id='questionBankForm' action='/assess/questionbank/addToSection' method='post'>
+        <input name='section_id' type='hidden' value='{SECTION_ID}'/>
 
-			<a href="#" class="show-answers">Show Answers</a>
+        <!-- BEGIN question -->
+        <div class="add-to-evaluation">
+            <label class="question clearfix">
+                <div class="question-checkbox">
+                    <input name='question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}'/>
+                </div>
+                <span class="question-content">{QUESTION}</span>
+            </label>
 
-			<div class="question question-answers">
-				<ul>
-					<!-- BEGIN answers -->
-					<li>{ANSWER_DESCRIPTION}</li>
-					<!-- END answers -->
-				</ul>
+            <a href="#" class="show-answers">Show Answers</a>
+
+            <div class="question question-answers">
+                <ul>
+                    <!-- BEGIN answers -->
+                    <li>{ANSWER_DESCRIPTION}</li>
+                    <!-- END answers -->
+                </ul>
             </div>
-		</div>
-		<!-- END question -->
+        </div>
+        <!-- END question -->
 
-		<p class="clearfix">
-			<!-- BEGIN show_submit -->
-			<input type='submit' value='Copy to assess' class="submit-btn-plain"/>
-			<!-- END show_submit -->
+        <p class="clearfix no-marg ">
+            <!-- BEGIN show_submit -->
+            <input type='submit' value='Copy to Assess' class="submit-btn-plain no-marg"/>
+            <!-- END show_submit -->
 
-			<!-- BEGIN show_delete -->
-			<input id='deleteButton' type='button' value='Remove from QuestionBank' class="submit-btn-plain"/>
-			<!-- END show_delete -->
-		</p>
-		<!-- BEGIN no_questions -->
-		<p>There are no questions in this category's Question Bank.</p>
-		<!-- END no_questions -->
-	</form>
+            <!-- BEGIN show_delete -->
+            <input id='deleteButton' type='button' value='Remove from Question Bank' class="submit-btn-plain no-marg"/>
+            <!-- END show_delete -->
+        </p>
 
-	<a href='/assess/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}' class="submit-btn-plain" >Remove this category</a>
+        <!-- BEGIN no_questions -->
+        <p>There are no questions in this category's Question Bank.</p>
+        <!-- END no_questions -->
+    </form>
 
-	<form action='/assess/questionbank/modify.php' method='post'>
-		<input name='questionCategoryId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}' />
-		<input name='name' type='text' value='{QUESTION_CATEGORY}' />
+    <h2>Edit Category</h2>
 
-		<p class="clearfix">
-			<input type='submit' value='Rename Category' class="submit-btn-plain" />
-		</p>
-	</form>
-	<!-- END category_selected -->
+    <h4>Rename</h4>
 
-	<form action='/assess/questionbank/create' method='post'>
-		<input name='parentId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}' />
-		<input name='name' type='text' value='' />
+    <form action='/assess/questionbank/modify.php' method='post'>
+        <input name='questionCategoryId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
 
-		<p class="clearfix">
-			<input type='submit' value='Add New Subcategory' class="submit-btn-plain" />
-		</p>
-	</form>
+        <p class="clearfix no-marg">
+            <input name='name' type='text' value='{QUESTION_CATEGORY}'/>
+            <input type='submit' value='Rename Category' class="submit-btn-plain no-marg"/>
+        </p>
+
+    </form>
+
+    <h4>Add Subcategory</h4>
+
+    <form action='/assess/questionbank/create' method='post' id="subcategoryForm">
+        <input name='parentId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}'/>
+
+        <p class="clearfix no-marg">
+            <input name='name' type='text' value='' class="required"/>
+            <input type='submit' value='Add New Subcategory' class="submit-btn-plain no-marg "/>
+        </p>
+    </form>
+
+    <h4>Remove</h4>
+
+    <form>
+        <p class="clearfix no-marg"><a href='/assess/questionbank/delete/{QUESTIONBANK_CATEGORY_ID}'
+                                       class="submit-btn-plain no-marg delete">Remove this category</a></p>
+    </form>
+    <!-- END category_selected -->
+
+
 </div>
 
 <div class="evaluation-menu">
-	<h2>Categories</h2>
+    <h2>Categories</h2>
 
-	<div id='categoryTree'>
-		<!-- BEGIN category_list_start -->
-		<ul>
-		<!-- END category_list_start -->
+    <div id='categoryTree'>
+        <!-- BEGIN category_list_start -->
+        <ul>
+            <!-- END category_list_start -->
 
-			<!-- BEGIN category_list_item_start -->
-			<ul>
-			<!-- END category_list_item_start -->
+            <!-- BEGIN category_list_item_start -->
+            <ul>
+                <!-- END category_list_item_start -->
 
-				<!-- BEGIN category_list_item -->
-				<li id='{CATEGORY_LIST_ITEM_NODE}' class='{CATEGORY_LIST_ITEM_SELECTED}'><a href='/assess/questionbank/contents/{CATEGORY_LIST_ITEM_CATEGORY_ID}/{CATEGORY_LIST_ITEM_ASSESS_ID}/{SECTION_ID}'>{CATEGORY_LIST_ITEM_NAME} ({CATEGORY_LIST_ITEM_NUMQUESTIONS})</a>
-				<!-- END category_list_item -->
+                <!-- BEGIN category_list_item -->
+                <li id='{CATEGORY_LIST_ITEM_NODE}' class='{CATEGORY_LIST_ITEM_SELECTED}'><a
+                        href='/assess/questionbank/contents/{CATEGORY_LIST_ITEM_CATEGORY_ID}/{CATEGORY_LIST_ITEM_ASSESS_ID}/{SECTION_ID}'>{CATEGORY_LIST_ITEM_NAME}
+                    ({CATEGORY_LIST_ITEM_NUMQUESTIONS})</a>
+                    <!-- END category_list_item -->
 
-			<!-- BEGIN category_list_item_end -->
-			</ul>
-			</li>
-			<!-- END category_list_item_end -->
-		</ul>
-	</div>
+                    <!-- BEGIN category_list_item_end -->
+            </ul>
+            </li>
+            <!-- END category_list_item_end -->
+        </ul>
+    </div>
 </div>

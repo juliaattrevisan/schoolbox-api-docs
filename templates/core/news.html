@@ -1,8 +1,8 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
 <script type="text/javascript">
-    $j(function() {
-        $j('.item:nth-child(2n)' ).addClass('dark');
+    $j(function () {
+        $j('.item:nth-child(2n)').addClass('dark');
     });
 </script>
 <!-- END custom_head -->
@@ -48,6 +48,7 @@
             <!-- BEGIN news -->
             <div id="a{NEWS_ID}" class="item">
                 <h2><a href="/news/item/{NEWS_ID}">{NEWS_TITLE}</a></h2>
+
                 <div class="wysiwyg"> {NEWS_BODY}
                     <p class="submitted-by">Submitted by {POSTER} on {DATETIME}{MODIFY}</p>
                 </div>
@@ -56,9 +57,9 @@
         </div>
         <!-- END topic -->
     </div>
-    <div class="clearfix"></div>
+
     <!-- BEGIN archive_button -->
-    <p class="full-width clearfix"><a href="/news/{ARCH_CURRENT_CLEAN}" class="btn"><span></span>View {ARCH_CURRENT} News</a></p>
+    <p class="clearfix"><a href="/news/{ARCH_CURRENT_CLEAN}" class="btn"><span></span>View {ARCH_CURRENT} News</a></p>
     <!-- END archive_button -->
 
     <div class="pagination clearfix">

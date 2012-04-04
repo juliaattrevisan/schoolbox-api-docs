@@ -3452,6 +3452,8 @@ ul.section-options a.drop-arrow {
 .evaluation-content.question-bank .question-answers{display:none; padding:7px 16px; background:#fff;}
 
 .evaluation-content.question-bank  .add-to-evaluation{margin-bottom:16px;}
+.evaluation-content.question-bank  .add-to-evaluation .question-content{background:#fff;}
+question-content
 
 .question-bank .question .question-checkbox {
 	float:left;
@@ -3495,6 +3497,11 @@ display:block; padding:7px 16px;
  border:1px solid #ccc; margin-bottom:8px;}
 
 .evaluation-content.question-bank .question.checked, .evaluation-category-select li a.selected {background:#CAE9B9; filter:none;}
+.question-bank input[type="text"] {float:left; margin-right:7px;}
+
+.question-bank h4{border:0; background:none; font-size:12px; font-weight:bold;
+margin:8px 0;}
+
 
 /************************
  END EVALUATION
