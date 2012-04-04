@@ -105,6 +105,22 @@ else {
         error(51);
     }
 
+	/* Show this Assess' contents
+     */
+	$this->setFile('assessContentsFragment', 'assess/contents.html');
+	$this->setBlock('assessContentsFragment', 'section', 'section_block');
+	$this->setBlock('section', 'question', 'question_block');
+
+	$this->setVar(array(
+		'ASSESS_CATEGORY_ID' => $assess['category_id'],
+	));
+
+	$this->parse('allQuestions_block', 'assessContentsFragment', true);
+
+	/* Options for importing into the Question Bank
+	 */
+	$this->setBlock(TEMPLATE_content, 'question_category', 'question_category_block');
+
 	$assessHandler = new Assess_Main();
 	$assessHandler->renderAssessContents($section['assess_id'], $this);
 
@@ -121,22 +137,6 @@ else {
         'DISABLED_SELECTED' => '',
     ));
 
-    /* Show this Assess' contents
-     */
-    $this->setFile('assessContentsFragment', 'assess/contents.html');
-    $this->setBlock('assessContentsFragment', 'section', 'section_block');
-    $this->setBlock('section', 'question', 'question_block');
-
-
-	$this->setVar(array(
-		'ASSESS_CATEGORY_ID' => $assess['category_id'],
-	));
-
-    $this->parse('allQuestions_block', 'assessContentsFragment', true);
-
-	/* Options for importing into the Question Bank
-	 */
-	$this->setBlock(TEMPLATE_content, 'question_category', 'question_category_block');
 
 	$questionCategoryHandler = new Assess_Question_Category();
 	$allQuestionCategories = $questionCategoryHandler->getList();
