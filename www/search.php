@@ -314,9 +314,11 @@ if (!empty($result['link'])) {
 
 		if ($url->isLocalUrl()) {
 			$linkUrl = $url->getRelativeURL();
+            $linkTarget = '';
 		}
 		else {
 			$linkUrl = $url->getBase64EncodedRedirect();
+            $linkTarget = 'external';
 		}
 
 		$userHandler = new User();
@@ -325,6 +327,7 @@ if (!empty($result['link'])) {
         $page->setVar(array(
             'LINK_URL'         => $linkUrl,
             'LINK_ICON'        => $link['iconFile'],
+            'LINK_TARGET'      => $linkTarget,
             'LINK_DESCRIPTION' => Scrub::text($link['description']),
             'LINK_COMMENT'     => TextFormatter::cutSentence(Scrub::text($link['comment']), 150),
             'LINK_OWNER'       => $link['uid'],

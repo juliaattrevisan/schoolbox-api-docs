@@ -26,14 +26,14 @@ if (is_array($submissionList)) {
 
 	foreach($submissionList as $submission) {
 
-		$nameURL = $submission['realname'] != '' ? "/send" . ($submission['inline'] == 'true'&& FILE_use_frame ? 'frame' : '') . ".php?id=" . $submission['fileID'] : false;
+		$nameURL = $submission['realname'] != '' ? "/send.php?id=" . $submission['fileID'] : false;
 
 		$date = new Alaress_Date_Format($submission['date'], 'U');
 
 		$dateHTML = $date->getDateOnly();
 		$dateURL = false;
 
-		$nameHTML = ($nameURL ? '<a href="'.$nameURL.'">' : "") . Scrub::text($submission['name']) . ($nameURL ? '</a>' : "");
+		$nameHTML = ($nameURL ? '<a href="'.$nameURL.'" rel="external">' : "") . Scrub::text($submission['name']) . ($nameURL ? '</a>' : "");
 
         /* Actions Block */
         $this->setBlock('duework', 'duework_actions', 'duework_actions_block');

@@ -104,19 +104,17 @@ abstract class Synchronise_Synergetic_Bialik_Strategy_Abstract extends Synchroni
 	 */
 	protected function getCampusFromCode($code) {
 		switch($code) {
-			case 'S':
-			case 'M':
-			case 'P':
-				// return 'main';
-				return 1;
-				break;
-			case 'ELC':
-				// return 'elc';
-				return 2;
-				break;
+            case 'ELC':
+            	return 2;
+			case 'PRI':
+                return 3;
+            case 'MID':
+                return 5;
+			case 'SEN':
+                return 4;
 			default:
-				return false;
-				break;
+                // return 'main';
+				return 1;
 		}
 	}
 

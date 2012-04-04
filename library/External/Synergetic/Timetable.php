@@ -509,7 +509,14 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 		return $this->getDatabase()->getOne($query);
 
 	}
-	
+
+    function getCampusFromTimetable($staffID) {
+        $query = "SELECT DISTINCT( ClassCampus ) as campus FROM timetable WHERE StaffID = '$staffID'";
+
+        return $this->getDatabase()->getAll($query);
+
+    }
+
 	function getSubjectName($code) {
 	
 			$query = "SELECT SubjectClasses.Description 

@@ -121,11 +121,7 @@ if ( is_string($_POST['description']) && ( is_numeric($_POST['category']) || is_
             }
 
         }
-        else {
-            if ( !isset( $_POST['submission'] ) ) {
-                error(2);
-            }
-        }
+
 
         /* For some reason this is necessary for upload indication to reach
                   * Completed status.
@@ -134,17 +130,12 @@ if ( is_string($_POST['description']) && ( is_numeric($_POST['category']) || is_
             exit( true );
         }
 
-        /* Redirect to submission page */
-        if ( $_POST['submission'] ) {
-            SitePage::localRedir("/submission/createSubmission/new/{$_POST['category']}/$fileID");
+
+        if ( isset( $_POST['return'] ) ) {
+            SitePage::localRedir($_POST['return'] . '&fileID=' . $fileID);
         }
         else {
-            if ( isset( $_POST['return'] ) ) {
-                SitePage::localRedir($_POST['return'] . '&fileID=' . $fileID);
-            }
-            else {
-                $page->backToTheFuture(2);
-            }
+            $page->backToTheFuture(2);
         }
     }
 }

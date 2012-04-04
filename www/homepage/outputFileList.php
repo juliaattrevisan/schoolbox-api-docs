@@ -55,14 +55,9 @@ if (is_array($fileList)) {
 		//set name
 		if($file['realname'] != "") {
 
-			if($file['inline'] == 'true' && FILE_use_frame) {
-				$this->setVar('FILE_URL', '/sendframe.php?id='.$file['id']);
-				$this->setVar('FILE_TARGET', '_blank');
-			}
-			else {
-				$this->setVar('FILE_URL', '/send.php?id='.$file['id']);
-				$this->setVar('FILE_TARGET', '_blank');
-			}
+			$this->setVar('FILE_URL', '/send.php?id='.$file['id']);
+			$this->setVar('FILE_TARGET', '_blank');
+
 			$this->setVar('file_no_url_block', '');
 			$this->parse('file_url_block', 'file_url');
 		}

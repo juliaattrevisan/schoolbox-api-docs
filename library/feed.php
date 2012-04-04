@@ -74,12 +74,7 @@ class Feed {
 
 		while($row = $this->db->getNextArray()){
 			if ($row['realname'] != '') {
-				if ($row['inline'] == 'true' && FILE_use_frame) {
-					$url = "<a href=\"/sendframe.php?id=".$row['id']."\" target=\"_blank\">".Scrub::text($row['name'])."</a>";
-				}
-				else {
-					$url = '<a href="/send.php?id='.$row['id'].'">'.Scrub::text($row['name']).'</a>';
-				}
+				$url = '<a href="/send.php?id='.$row['id'].'" rel="external">'.Scrub::text($row['name']).'</a>';
 			}
 			else {
 				$url = Scrub::text($row['name']);
@@ -121,7 +116,7 @@ class Feed {
 				'date' => $row['submitted'],
 				'type' => 'link',
 				'message' => $userHandler->formatName($row).' submitted the link '.Scrub::text($row['name']),
-				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row).'</a> submitted the link <a href="'.$row['url'].'">'.Scrub::text($row['name']).'</a>',
+				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row).'</a> submitted the link <a href="'.$row['url'].'" rel="external">'.Scrub::text($row['name']).'</a>',
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
 			);

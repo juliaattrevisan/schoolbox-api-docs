@@ -46,10 +46,22 @@ class Synchronise_Synergetic_Bialik_Strategy_Staff extends Synchronise_Synergeti
 		$newUser['alt_email'] = '';
         $newUser['local_email'] = 1;
 
-		/* Campus config: needs to map to a campus id
+		/* Retrieve campuses from timetable definition (dirty hack)
 		 */
-		$newUser['defaultCampus'] = 1;
-		$newUser['campus'] = array($this->getCampusFromCode($currentUser['StaffCampus']));
+        $campusList = $this->getCampus($currentUser['StaffID']);
+
+        if(is_array($campusList)) {
+            $newUser['defaultCampus'] = $campusList[0]['campus'];
+            foreach( $campusList as $campus) {
+                $newUser['campus'][] = $this->getCampusFromCode($campus['campus']);
+            }
+        }
+        else {
+            //Just put staff in main if no campus retrieved from timetable
+            $newUser['defaultCampus'] = 1;
+            $newUser['campus'] = array(1);
+        }
+
 
 		/* Staff Group ID
 		 */
@@ -101,4 +113,11 @@ class Synchronise_Synergetic_Bialik_Strategy_Staff extends Synchronise_Synergeti
 
 		$this->getVerboseFilter()->summary();
 	}
+
+    /*
+     * Fetches staff campus from timetable table
+     */
+    function getCampus($staffID) {
+        $campus = $this->getExternalUserHandler()->getCampusFromTimetable($staffID);
+    }
 }

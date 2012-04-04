@@ -19,7 +19,8 @@ $j(function() {
 
 		},
         'onComplete'     : function () {
-            $j('#upload-status').slideDown();
+            //$j('#upload-status').slideDown();
+            history.back(-1);
         },
         'onSelectOnce': function() {
            if (!$j('.uploadifyQueueItem').find('.heading-table').length > 0) {
@@ -102,14 +103,16 @@ $j(function() {
 					$j('input[name=uploaded_' + v + ']').val(1) ;
 				}
 			});
+
+
 		}
 
 //		$j('#custom_file_upload').uploadifyClearQueue();
 	});
 
-    $j('input.submit-btn-plain').click(function () {
-        history.back(-1);
-    });
+  /*  $j('input.submit-btn-plain').click(function () {
+
+    });*/
 });
 </script>
 
@@ -119,7 +122,7 @@ $j(function() {
 <div id="upload-status" class="saved-colours hide">Successfully uploaded files!</div>
 <table class="standardForm">
 	<tr>
-		<td class="formLabelWidth"><h4>Location</h4> <em>These files will be located in this folder</em></td>
+		<td class="formLabelWidth"><h4>Location</h4> <em>File will be uploaded to this location</em></td>
 		<td>{CATEGORY_NAME}</td>
 	</tr>
 	<tr>
@@ -132,14 +135,14 @@ $j(function() {
 	<tr>
 		<td>
 			<h4>Files</h4>
-			<em>Each line must have a title and file selected, a new row will appear when these requirements are met</em>
+			<em>When browsing your computer you can select multiple files by holding control and clicking.  You can add files from multiple folders by clicking the select files multiple times.  If you do not provide a title the filename will be used.</em>
 		</td>
 		<td>
 			<input id="custom_file_upload" name="custom_file_upload" type="file" />
 			<div id="fileQueue"></div>
-			<p class="clearfix"><a href="#" id="startUpload" class="btn create float-left"><span></span>Upload files</a></p>
+			<p class="clearfix"></p>
 		</td>
 	</tr>
 </table>
-<p class="clearfix"><input class="submit-btn-plain" type="submit" name="finish" value="Finish Uploading" /></p>
+<p class="clearfix"><input id="startUpload" class="submit-btn-plain" type="button" name="finish" value="Upload Files" /></p>
 
