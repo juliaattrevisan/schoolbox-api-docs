@@ -2,10 +2,9 @@
 <head>
 <title>{#assetmanager.title}</title>
 <link rel="stylesheet" type="text/css" href="css/screen.css" media="screen" />
-<link rel="stylesheet" type="text/css" href="css/tree.css" media="screen" />
 <script type="text/javascript" src="../../tiny_mce_popup.js"></script>
-<script type="text/javascript" src="/javascript/jquery.js"></script>
-<script type="text/javascript" src="/javascript/jquery.tree.js"></script>
+<script type="text/javascript" src="/javascript/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="/javascript/jstree/jquery.jstree.js"></script>
 <style type="text/css">
 span.file {
 	white-space: nowrap;
@@ -13,18 +12,43 @@ span.file {
 </style>
 <script type="text/javascript">
 $(function () {
+/*    $('#tree').tree({
+        dragDrop 	: false,
+        stripeRows 	: false,
+        sequencing	: false,
+        label		: 'span.file',
+        template	: 'li.dir-template:first'
+    });*/
 
-	/* Resize left column on window resize
-	 */
-	$(window).resize(function () {
-		$('#tree').triggerHandler('loaded');
-	});
+    $("#tree").jstree({
+        "animation":50,
+        "core":{
+            "initially_open": ["node_0",{PARENTLIST}]
+        },
+        "plugins":["themes", "html_data", "dnd", "crrm"],
+        "themes":{
+            "theme":"core",
+            "dots":true,
+            "icons":false
+        }
+    });
+
+ /* triggered after a new branch is loaded */
+
+
+
+
+    $('#tree li .file').live('click', function() {
+
+        $('#tree .jstree-clicked').removeClass('jstree-clicked');
+        $(this).addClass('jstree-clicked');
+    });
+
+
 
 	/* When someone opens dir
 	 */
 	$('#tree li').live('click', function() {
-		$('#tree li.selected').removeClass('selected');
-		$(this).addClass('selected');
 
 		var categoryID = $(this).attr('id').substring(5);
 
@@ -143,11 +167,11 @@ $(function () {
 
 	/* Open ones that are on the way to the current categoryID
 	 */
-	var openFolders = [{PARENTLIST}];
 
+/*
 	$.each(openFolders, function(index, value) {
 		$('#' + value).removeClass('hide');
-	});
+	});*/
 });
 
 $(window).load(function () {

@@ -3,7 +3,7 @@
 .jstree-core ins { background-image:url("d.png"); background-repeat:no-repeat; background-color:transparent; }
 
 .jstree-core li { background-position:-90px 0; background-repeat:repeat-y;}
-.jstree-core li.jstree-last { background:transparent; }
+/*.jstree-core li.jstree-last { background:transparent; }*/
 .jstree-core .jstree-open > ins { background-position:-72px 0; }
 .jstree-core .jstree-closed > ins { background-position:-54px 0; }
 .jstree-core .jstree-leaf > ins { background-position:-36px 0; }
@@ -12,10 +12,12 @@
 .jstree-core a { background:#a9e8e1; border-radius:4px; -moz-border-radius:4px; -webkit-border-radius:4px;  padding:0 16px; }
 .jstree-core a span{ background:#fff; padding:4px;  border-radius:4px; -moz-border-radius:4px; -webkit-border-radius:4px; }
 
-.jstree-core .jstree-leaf a{background:#cae9b9}
+.jstree-core .jstree-leaf a,
+.jstree-core  span.file{background:#cae9b9}
 
 .jstree-core .jstree-hovered { background:#e7f4f9; border:1px solid #d8f0fa; padding:0 3px 0 1px; text-shadow:1px 1px 1px silver; }
-.jstree-core .jstree-clicked { background:#beebff; border:1px solid #99defd; padding:0 3px 0 1px; }
+.jstree-core .jstree-clicked,
+.jstree-core  span.jstree-clicked{ background:#beebff; border:1px solid #99defd; padding:0 3px 0 1px; }
 .jstree-core a .jstree-icon { background-position:-56px -20px; }
 .jstree-core a.jstree-loading .jstree-icon { background:url("throbber.gif") center center no-repeat !important; }
 
