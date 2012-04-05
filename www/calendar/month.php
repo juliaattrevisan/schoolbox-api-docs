@@ -27,6 +27,7 @@ $this->setBlock("note_block", "attendance_icon", "attendance_icon_block");
 $this->setBlock("note_block", "attendance_status", "attendance_status_block");
 $this->setBlock("note_block", "attendance_request_button", "attendance_request_button_block");
 $this->setBlock("note_block", "attendance_list_button", "attendance_list_button_block");
+$this->setBlock('note_block', 'has_category', 'has_category_block');
 
 list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->arg[0]);
 
@@ -253,6 +254,20 @@ for ($i = 0; $i < $totalDays; $i++) {
                     $this->parse('attendance_list_button_block', 'attendance_list_button');
                 }
             }
+
+			/* Show a homepage if appropriate
+			 */
+			if (is_numeric($event['categoryId'])) {
+				$this->setVar(array(
+					'HAS_CATEGORY_ID' => $event['categoryId'],
+					'HAS_CATEGORY_NAME' => $event['categoryName'],
+				));
+
+				$this->parse('has_category_block', 'has_category');
+			}
+			else {
+				$this->setVar('has_category_block', '');
+			}
 
             $this->parse("note_listing", "note_block", true);
         }

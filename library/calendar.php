@@ -426,12 +426,14 @@ class Calendar extends DeprecatedModel {
                             TIME_TO_SEC(endTime) as endTimestamp,
 							type, note, access, sid, location, detail, attendance,
                             user.id as uid, title, firstname, lastname,
-                            eventType, eventColour
+                            eventType, eventColour,
+                            category.id AS categoryId, category.name AS categoryName
 						FROM event
                         LEFT JOIN user ON owner = user.id
                         LEFT JOIN luEventType ON type = eventTypeID
 						LEFT JOIN eventCampus ON event.id = eventCampus.eventID
 						LEFT JOIN eventGroup ON event.id = eventGroup.eventID
+						LEFT JOIN category ON event.sid = category.id AND event.sid IS NOT NULL
 						WHERE date = '" . date("Y-m-d", $currentDay) . "'
 							AND (    (access = '1' AND owner = '".$_SESSION['id']."')
 								  $groupQuery

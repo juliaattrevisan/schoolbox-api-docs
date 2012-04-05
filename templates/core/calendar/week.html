@@ -124,9 +124,16 @@
 								<!-- END time -->{NOTE}
 							</h4>
 							<p class="meta">Event Type: {TYPE}<br />
-								<span class="created">Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a></span>
+								<span class="created">Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a></span><br />
 								{LOCATION} {DETAIL}
 							</p>
+
+							<!-- BEGIN has_category -->
+							<p class='meta'>
+								Homepage: <a href='/homepage/{HAS_CATEGORY_ID}'>{HAS_CATEGORY_NAME}</a>
+							</p>
+							<!-- END has_category -->
+
                             <!-- BEGIN attendance_status -->
                             <p class="meta">Attendance Status: {ATTENDANCE_STATUS}</p>
                             <!-- END attendance_status -->
