@@ -51,7 +51,24 @@
 			$j('.accept-hide').hide();
 		}
 
-		$j('#createSubmissionForm').validate();
+
+        jQuery.validator.addMethod("markTypeCheck", function(value, element) {
+            if (($j('.marks-hide').is(':visible')) && (value == '')) {
+                return false;
+            } else {
+                return true;
+            }
+        }, "Please enter a mark amount");
+
+
+		$j('#createSubmissionForm').validate({
+            rules: {
+                markvalue: {
+                    markTypeCheck: true,
+                    number: true
+                }
+            }
+        });
 		
 	});
 	
