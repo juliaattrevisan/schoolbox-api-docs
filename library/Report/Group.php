@@ -45,9 +45,7 @@ class Report_Group extends Report_Abstract implements Report_IReport {
         // set blocks
         $this->getPage()->setFile('user_t', 'adminv2/report/group.html');
         $this->getPage()->setBlock(TEMPLATE_content, 'group', 'group_block');
-        $this->getPage()->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
-        $this->getPage()->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
-        $this->getPage()->setBlock(TEMPLATE_content, 'next_button', 'next_button_block');
+
         $this->getPage()->setBlock('user_t', 'user', 'user_block');
         $this->getPage()->setBlock('user', 'modify', 'modify_block');
         $this->getPage()->setVar(array('group_block' => ''));
@@ -122,9 +120,10 @@ class Report_Group extends Report_Abstract implements Report_IReport {
         if (!empty($this->dataSet)) {
 
             $page->setVar(array(
-                'USER_DISP_COUNT' => $this->dataCount,
-                'USER_GROUP'      => $groupName,
+                'COUNTABLE_COUNT' => $this->dataCount,
+                'REPORT_TITLE'    => $groupName,
                 'SORT_BASE'       => "group/{$this->getIndexID()}",
+                'COUNTABLE'       => 'members',
             ));
 
             foreach ($this->dataSet as $user) {
@@ -173,5 +172,10 @@ class Report_Group extends Report_Abstract implements Report_IReport {
         $exporter->setHeadings($this->getFields());
         $exporter->setData($this->dataSet);
         $exporter->export('CSV');
+    }
+
+    public function displayUserBlock() {
+        // not implemented
+        return;
     }
 }

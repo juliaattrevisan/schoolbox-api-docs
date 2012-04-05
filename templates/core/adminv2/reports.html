@@ -19,6 +19,26 @@
     .orderby:after {
         content: ' {DIR}';
     }
+
+    .archive .pagination {
+        padding-top: 10px;
+    }
+
+    .archive .pagination span {
+        float: left;
+        padding: 7px 2px;
+        margin: 2px;
+    }
+
+    .filter label {
+        font-weight: bold;
+        padding-bottom: 5px;
+    }
+
+    .filter input[type="text"] {
+        border: solid 1px #ccc;
+        margin-top: 5px;
+    }
 </style>
 
 <!-- END custom_head-->
@@ -39,36 +59,57 @@
 <div class="admin-contents">
     <h2>Reports</h2>
     <div class="clearfix">
-                 <!-- BEGIN filter -->
+        <!-- BEGIN filter -->
         <div class="level green clearfix">
             <h4>Filter</h4>
+            <form class="filter" action="/adminv2/reportsForm.php" method="POST">
+                <ul>
                 <!-- BEGIN search_options -->
-
+                    <li><label for="{FILTER_ID}">{FILTER_NAME}<input id="{FILTER_ID}" name="{FILTER_ID}" type="text" value="{FILTER_VALUE}" /></label></li>
                 <!-- END search_options -->
+                <input type="hidden" readonly="readonly" name="bounce" value="{RETURN}" />
+                <input class="submit-btn-plain" id="filtersubmit" type="submit" value="Filter" />
+                </ul>
+            </form>
         </div>
-                <!-- END filter -->
-                <!-- BEGIN result_table -->
+        <!-- END filter -->
+        <!-- BEGIN result_table -->
         <div class="level last clearfix">
-            <h3>{USER_GROUP}<!-- BEGIN count -->: {USER_DISP_COUNT} members<!-- END count --></h3>
+            <h3>{REPORT_TITLE}<!-- BEGIN count -->: {COUNTABLE_COUNT} {COUNTABLE}<!-- END count --></h3>
+            <!-- BEGIN download_report -->
             <span class="header_option">
                 <a href="/adminv2/reports/{REPORT_FILTER}exportToCSV" class="btn download"><span></span>Download Report</a>
             </span>
-                <!-- BEGIN result -->
+            <!-- END download_report -->
+            <!-- BEGIN result -->
             <div class="{RESULT_CLASS}">
                 {RESULT}
             </div>
-                <!-- END result -->
+            <!-- END result -->
             <div class="archive">
                 <div class="pagination clearfix">
-                    <!-- BEGIN previous_button -->
-                    <a class="prev" href="/adminv2/reports/{PREVIOUS_PAGE}">&laquo; Prev</a><!-- END previous_button -->
-                    <!-- BEGIN page_number -->
-                    <a class="{CURRENT}" href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a><!-- END page_number -->
-                    <!-- BEGIN next_button -->
-                    <a class="next" href="/adminv2/reports/{NEXT_PAGE}">Next &raquo;</a><!-- END next_button -->
+            <!-- BEGIN previous_button -->
+                    <a class="prev" href="/adminv2/reports/{PREVIOUS_PAGE}">&laquo; Prev</a>
+            <!-- END previous_button -->
+
+            <!-- BEGIN first_page -->
+            <a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a><span>...</span>
+            <!-- END first_page -->
+
+            <!-- BEGIN page_number -->
+                    <a class="{CURRENT}" href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
+            <!-- END page_number -->
+
+            <!-- BEGIN last_page -->
+            <span>...</span><a href="/adminv2/reports/{PAGE_INDEX_REF}">{PAGE_INDEX}</a>
+            <!-- END last_page -->
+
+            <!-- BEGIN next_button -->
+                    <a class="next" href="/adminv2/reports/{NEXT_PAGE}">Next &raquo;</a>
+            <!-- END next_button -->
                 </div>
             </div>
         </div>
-                <!-- END result_table -->
+        <!-- END result_table -->
     </div>
 </div>

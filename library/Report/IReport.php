@@ -16,6 +16,7 @@ interface Report_IReport {
     function getDefaultOrderBy();
     function getSortableFields();
     function populateDataset($offset, $limit, $orderBy = "", $orderDir = "ASC");
+    function displayFilterBlock();
     function export();
 
 // TODO: refactor Report_Abstract to implement IReport so these can be included in interface

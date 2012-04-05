@@ -12,7 +12,7 @@ class Report_Factory {
 
     // provide optional type safety
     private static $typesafe = false;
-    private static $allowed = array('group', 'activity');
+    private static $allowed = array('group', 'activity', 'login');
 
     /**
      * @static
