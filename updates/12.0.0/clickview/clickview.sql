@@ -1,0 +1,1 @@
+INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`homepageCategoryID`,`filename`,`config`,`invisible`,`allowMultiple`) VALUES ( NULL,'0','outputClickview','ClickView','A place to create links to Clickview videos','5','clickview.html','a:1:{s:3:\"url\";s:0:\"\";}','false','true');
