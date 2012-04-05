@@ -1194,6 +1194,14 @@ input.timeField {
 	margin-right: 12px;
 }
 
+.btn.in-heading-absolute{
+    position:absolute;
+    float:none;
+    top:0;
+    right:0;
+    margin:0;
+}
+
 .submit-btn-plain.float-remove {
 	float: none;
 }
@@ -1684,11 +1692,12 @@ ADMIN
 }
 
 .admin-contents h4 {
-	border-bottom: 1px solid #E9E3D6;
-	font-size: 14px;
-	font-weight: bold;
-	margin-bottom: 8px;
-	padding-bottom: 4px;
+    border-bottom: 1px solid #E9E3D6;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    padding-bottom: 5px;
+    line-height: 28px;
 }
 
 
