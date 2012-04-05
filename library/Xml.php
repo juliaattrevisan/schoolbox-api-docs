@@ -25,11 +25,9 @@ class Xml {
 			return false;
 		}
 
-		$cache_file = Cfg::get('xml_dir') . '/' . md5($url);
-
 		/* Set up cached file
 		 */
-		$this->setCache(new Alaress_Rss_Cache($cache_file, $cache_time, $url));
+		$this->setCache(new Alaress_Rss_Cache($cache_time, $url));
 
 		/* Load from cached file
 		 * Delete the cached file if it can't be loaded correctly

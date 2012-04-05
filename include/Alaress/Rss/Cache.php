@@ -11,20 +11,34 @@ class Alaress_Rss_Cache extends Alaress_Cache_Abstract {
 	protected $cacheFile = null;
 	protected $cacheTime = null;
 
+	private $url = '';
+
 	/**
 	 * Constructor
 	 *
-	 * @param  $cache_file
 	 * @param  $cache_time
 	 * @param  $url
 	 */
-	public function __construct($cache_file, $cache_time, $url) {
-		$this->setCacheFile($cache_file);
+	public function __construct($cache_time, $url) {
+		$this->setUrl($url);
+
+		$this->setCacheFile($this->generateCacheFilename());
 		$this->setCacheTime($cache_time);
 
 		/* Set up a cached version of the url
 		 */
 		$this->setup($url);
+	}
+
+	/**
+	 * The cache filename to use for this rss feed
+	 *
+	 * @return string
+	 */
+	protected function generateCacheFilename() {
+		$filename = Cfg::get('xml_dir') . '/' . 'rss_' . md5($this->getUrl()) . '.xml';
+
+		return $filename;
 	}
 
 	/**
@@ -38,9 +52,24 @@ class Alaress_Rss_Cache extends Alaress_Cache_Abstract {
 		return new SimpleXMLElement($this->getCacheFile(), null, true);
 	}
 
-	/**
-	 * The cache filename to use for this rss feed
+	/* Getters/Setters
 	 */
-	protected function generateCacheFilename() {
+
+	/**
+	 * Set url
+	 *
+	 * @param $url
+	 */
+	private function setUrl($url) {
+		$this->url = $url;
+	}
+
+	/**
+	 * Get url
+	 *
+	 * @return string
+	 */
+	private function getUrl() {
+		return $this->url;
 	}
 }

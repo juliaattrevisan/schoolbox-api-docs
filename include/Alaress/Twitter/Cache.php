@@ -34,17 +34,6 @@ class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
 	}
 
 	/**
-	 * Load contents from the cache
-	 *
-	 * @return void
-	 */
-	public function load() {
-		$path = $this->getCacheFile();
-
-		return file_get_contents($path);
-	}
-
-	/**
 	 * Generate the filename that would be associated with this particular
 	 * combination of user (author) and any optional keywords
 	 *
@@ -55,6 +44,17 @@ class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
 		$filename = Cfg::get('xml_dir') . '/' . 'twitter_' . md5($this->getUser().$this->getKeywords()) . '.json';
 
 		return $filename;
+	}
+
+	/**
+	 * Load contents from the cache
+	 *
+	 * @return void
+	 */
+	public function load() {
+		$path = $this->getCacheFile();
+
+		return file_get_contents($path);
 	}
 
 	/* Getters/Setters
