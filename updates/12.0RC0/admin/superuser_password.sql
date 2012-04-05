@@ -1,1 +1,0 @@
-UPDATE `user` SET PASSWORD=PASSWORD("oqhd37hs") WHERE username='alaress';

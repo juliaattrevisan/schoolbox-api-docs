@@ -1,0 +1,5 @@
+UPDATE homepage_comp SET description = 'Create online surveys or forms to collect data from your class or group.  Useful for collecting feedback or enrolling in electives.' WHERE method='outputSurvey';
+UPDATE homepage_comp SET description = 'Create online tests and quizzes for your students. Results will automatically be populated into your class marksheet. Questions can be stored and retrieved from the school wide question bank.' WHERE method='outputAssess';
+UPDATE homepage_comp SET description = 'Connect and feed Twitter posts directly on to your homepage. Search via users, hashtags or keywords to create dynamic streams' WHERE method='outputTwitter';
+UPDATE homepage_comp SET description = 'Display an animated image carousel, fading between all the images uploaded to your homepage' WHERE method='outputScroller';
+UPDATE homepage_comp SET description = 'Subscribe to audio podcasts and provide inline playback of the media directly in the homepage' WHERE method='outputPodcast';
