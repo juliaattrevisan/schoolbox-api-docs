@@ -1,6 +1,6 @@
 ######
 # This File ignores Any line that contains a # character
-#####################START INSTRUCTIONS############ 
+#####################START INSTRUCTIONS############
 #This File ignores Any line that contains a # character
 # Files will be executed in the order provided
 # This is how I add a PHP script to the index.
@@ -58,3 +58,9 @@ homepages/deprecated_components.php
 
 ## Purges category data on category-dependent tables where category has been deleted
 homepages/deleted_homepage_cleanup.sql
+
+## Creates stream cache dir
+cache/cache.php
+
+## Inserts new config variable stream_dir
+cache/cache.sql
