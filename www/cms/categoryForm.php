@@ -12,6 +12,7 @@ if ($_POST['name']) {
 		'template' => $_POST['template'],
 		'code' => $_POST['code'],
 		'group' => $_POST['group'],
+        'recursive' => $_POST['recursive'] ? '1' : '0',
 	);
 
 	if (is_numeric($_POST['categoryID'])) {

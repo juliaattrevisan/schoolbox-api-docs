@@ -32,6 +32,11 @@ $j(function() {
 
 });
 </script>
+<style type="text/css">
+    #recursive {
+        margin-top: 15px;
+    }
+</style>
 <!-- END custom_head -->
 
 <h1>{ACTION} Folder</h1>
@@ -77,7 +82,9 @@ $j(function() {
 						<td><input type="radio" name="group[{GROUP_ID}]" value="2" {PERM_2_SELECTED} /></td>
 					</tr>
 					<!-- END perm_table -->
-				</table></td>
+				</table>
+                <em><label for="recursive">Apply these permissions to all subfolders: <input type="checkbox" id="recursive" name="recursive" value="1" /></label></em>
+                </td>
 		</tr>
 		<!-- BEGIN indiv_perms -->
 		<tr>

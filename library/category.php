@@ -386,6 +386,40 @@ class Category extends DeprecatedModel {
 		return $this->db->getAll($query);
 	}
 
+
+    public function applyPermissions($id, $group, $recursive) {
+
+        // do you have permission to alter my permissions??
+
+        $groupHandler = new Group();
+
+        if ($groupHandler->getPermission($id) < WRITE_ACCESS) {
+            return false;
+        }
+
+        // delete previous permission set
+        $this->deletePerms($id);
+
+        // insert new permissions
+        foreach($group as $groupID => $perm) {
+            $this->insertPerm($id, $groupID, $perm);
+        }
+
+        // if doing this recursively, apply perms to all child nodes
+        if($recursive) {
+            $childList = $this->getCategoryList($id);
+            if(is_array($childList)) {
+                /* Recurse into child folders */
+                foreach($childList as $child) {
+                    $this->applyPermissions($child['id'], $group, $recursive);
+                }
+            }
+        }
+        return true;
+    }
+
+
+
 	/**
 	 * Create a new category
 	 *
@@ -473,14 +507,12 @@ class Category extends DeprecatedModel {
 
 		/* Redo group permissions */
 		if (is_array($data['group'])) {
-			$this->deletePerms($data['id']);
-
-			foreach($data['group'] as $groupID => $perm) {
-				$this->insertPerm($data['id'], $groupID, $perm);
-			}
+            // apply permissions, recursively or not depending on 3rd variable
+            $this->applyPermissions($data['id'], $data['group'], $data['recursive']);
 		}
 
 		unset($data['group']);
+        unset($data['recursive']);
 
 		/* Setup homepage template */
 
