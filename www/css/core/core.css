@@ -1918,12 +1918,10 @@ ADMIN
     -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
 }
 
-.parent-level .jstree-core a,
-.parent-level .jstree-core .jstree-leaf a{ background:#ccc;}
-.parent-level .jstree-core a.active,
-.parent-level .jstree-core .jstree-leaf a.active{background:#CAE9B9}
-
-
+.parent-level .jstree-schoolbox a,
+.parent-level .jstree-schoolbox .jstree-leaf a{ background:#ccc;}
+.parent-level .jstree-schoolbox a.active,
+.parent-level .jstree-schoolbox .jstree-leaf a.active{background:#CAE9B9}
 
 .server-statuses {
 	margin-bottom: 8px;

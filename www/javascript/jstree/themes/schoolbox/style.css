@@ -1,0 +1,66 @@
+.jstree-schoolbox li{min-height:34px;line-height:34px; margin-left:34px;}
+
+.jstree-schoolbox a,
+.jstree-schoolbox span.file{ background:#fff; border-radius:4px; -moz-border-radius:4px; -webkit-border-radius:4px;  padding:0 28px;line-height:28px;margin-top:3px; height:28px; }
+
+.jstree-schoolbox span.file{background:#ccc; display:inline-block;}
+
+.jstree-schoolbox li,
+.jstree-schoolbox ins { background-image:url("tree-icons.png"); background-repeat:no-repeat; background-color:transparent; }
+
+.jstree ins{height:34px; width:34px;}
+
+.jstree-schoolbox li { background-position:-204px 0; background-repeat:repeat-y;}
+/*.jstree-schoolbox li.jstree-last { background:transparent; }*/
+.jstree-schoolbox .jstree-open > ins { background-position:0 0; }
+.jstree-schoolbox .jstree-closed > ins { background-position:-34px 0; }
+.jstree-schoolbox .jstree-leaf > ins { background-position:-170px 0; }
+
+
+.jstree-schoolbox a span{ background:#fff; padding:4px;  border-radius:4px; -moz-border-radius:4px; -webkit-border-radius:4px; }
+
+.jstree-schoolbox .jstree-hovered { background:#e7f4f9;  text-shadow:1px 1px 1px silver; }
+.jstree-schoolbox .jstree-clicked,
+.jstree-schoolbox  span.jstree-clicked{ background:#beebff; ;  }
+.jstree-schoolbox a .jstree-icon { background-position:-56px -20px; }
+.jstree-schoolbox a.jstree-loading .jstree-icon { }
+
+.jstree-schoolbox.jstree-focused {  }
+
+.jstree-schoolbox .jstree-no-dots li,
+.jstree-schoolbox .jstree-no-dots .jstree-leaf > ins { background:transparent; }
+.jstree-schoolbox .jstree-no-dots .jstree-open > ins { background-position:-18px 0; }
+.jstree-schoolbox .jstree-no-dots .jstree-closed > ins { background-position:0 0; }
+
+.jstree-schoolbox .jstree-no-icons a .jstree-icon { display:none; }
+
+.jstree-schoolbox .jstree-search { font-style:italic; }
+
+.jstree-schoolbox .jstree-no-icons .jstree-checkbox { display:inline-block; }
+.jstree-schoolbox .jstree-no-checkboxes .jstree-checkbox { display:none !important; }
+.jstree-schoolbox .jstree-checked > a > .jstree-checkbox { background-position:-38px -19px; }
+.jstree-schoolbox .jstree-unchecked > a > .jstree-checkbox { background-position:-2px -19px; }
+.jstree-schoolbox .jstree-undetermined > a > .jstree-checkbox { background-position:-20px -19px; }
+.jstree-schoolbox .jstree-checked > a > .checkbox:hover { background-position:-38px -37px; }
+.jstree-schoolbox .jstree-unchecked > a > .jstree-checkbox:hover { background-position:-2px -37px; }
+.jstree-schoolbox .jstree-undetermined > a > .jstree-checkbox:hover { background-position:-20px -37px; }
+
+#vakata-dragged.jstree-schoolbox ins { background:url("tree-icons.png"); background-position:  -83px -12px; }
+#vakata-dragged.jstree-schoolbox .jstree-ok { background-position:-146px -12px;  left:9px; top:5px}
+#vakata-dragged.jstree-schoolbox .jstree-invalid {background-position:-114px -12px; left:9px; top:5px}
+#jstree-marker.jstree-schoolbox {background:url("tree-icons.png"); background-position:  -83px -12px;}
+
+.jstree-schoolbox a.jstree-search { color:aqua; }
+
+#vakata-contextmenu.jstree-schoolbox-context,
+#vakata-contextmenu.jstree-schoolbox-context li ul { background:#f0f0f0; border:1px solid #979797; -moz-box-shadow: 1px 1px 2px #999; -webkit-box-shadow: 1px 1px 2px #999; box-shadow: 1px 1px 2px #999; }
+#vakata-contextmenu.jstree-schoolbox-context li { }
+#vakata-contextmenu.jstree-schoolbox-context a { color:black; }
+#vakata-contextmenu.jstree-schoolbox-context a:hover,
+#vakata-contextmenu.jstree-schoolbox-context .vakata-hover > a { padding:0 5px; background:#e8eff7; border:1px solid #aecff7; color:black; -moz-border-radius:2px; -webkit-border-radius:2px; border-radius:2px; }
+#vakata-contextmenu.jstree-schoolbox-context li.jstree-contextmenu-disabled a,
+#vakata-contextmenu.jstree-schoolbox-context li.jstree-contextmenu-disabled a:hover { color:silver; background:transparent; border:0; padding:1px 4px; }
+#vakata-contextmenu.jstree-schoolbox-context li.vakata-separator { background:white; border-top:1px solid #e0e0e0; margin:0; }
+#vakata-contextmenu.jstree-schoolbox-context li ul { margin-left:-4px; }
+
+/* TODO: IE6 support - the `>` selectors */
