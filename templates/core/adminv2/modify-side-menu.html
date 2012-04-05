@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
 <script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
 <script type="text/javascript" src="/javascript/jstree/jquery.jstree.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 
 <script type="text/javascript">
 
@@ -48,6 +49,29 @@
                 $j('#form input[name=url]').val(data);
             }
         });
+
+        /*
+        * Modal for URL homepage selection
+        * */
+
+        $j('#resource-browser').dialog({
+            width: 650,
+            autoOpen: false,
+            title: "Select a homepage"
+        });
+
+        $j('.open-modal').click(function() {
+            $j('#resource-browser').dialog('open');
+
+            return false;
+        });
+
+
+
+
+
+
+
     });
 
 </script>
@@ -91,9 +115,14 @@
 						from the list that drops down. </em>
 					</td>
 					<td>
+                       <p class="clearfix"> <a href="#" class="btn float-left open-modal"><span></span>Find a URL</a></p>
 						<label>
+
 							<input type="text" name="url" id="url" size="40" class="required" maxlength="250" value="{URL}" />
 						</label>
+
+                        <div id="resource-browser" class="hide"></div>
+
 					</td>
 				</tr>
                 <tr>

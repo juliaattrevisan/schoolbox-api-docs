@@ -48,20 +48,6 @@ $j(document).ready(function() {
 	});
 	/* date picker */
 
-	$j('.show-duration').click(function() {
-		if ($j('.edit-duration').is(':visible')) {
-			$j('.edit-duration').toggle();
-			$j('#minHours').val('0');
-			$j('#minDuration').val('00');
-		} else {
-			$j('.edit-duration').toggle();
-			$j('#minDuration').val('15');
-		}
-	});
-
-	if ($j('.show-duration').is(':checked')) {
-        $j('.hide-it').show();
-	}
 
 	var actionPlace = '{ACTION}';
 
@@ -144,6 +130,7 @@ $j(document).ready(function() {
 					<input name="finish[date]" id="finish_date" type="text" size="15" maxlength="30" value="{ASSESS_FINISH_DATE}" />
 				</td>
 			</tr>
+
 			<tr>
 				<td>
 					<h4>Description</h4>
