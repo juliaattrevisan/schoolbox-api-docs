@@ -47,4 +47,4 @@ RewriteCond %{REQUEST_URI} !/admin/.*
 RewriteCond %{REQUEST_URI} !/dav/.*
 RewriteCond %{REQUEST_URI} !/roundcube/.*
 RewriteCond %{REQUEST_URI} !\.[A-Za-z]{2,4}$
-RewriteRule ^([^.]+) /index.php?page=$1 [L]
+RewriteRule ^(.*)$ /index.php?page=$1 [L]
