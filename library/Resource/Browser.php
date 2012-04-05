@@ -11,7 +11,7 @@ class Resource_Browser {
 
     private $page;
 
-    public function __construct(SitePage $page) {
+    public function __construct(Page $page) {
         $this->page = $page;
     }
 
