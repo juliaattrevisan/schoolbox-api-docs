@@ -1,0 +1,47 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/jquery.contextmenu.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/tree.css" />
+
+<script type="text/javascript" src="/min/index.php?f=javascript/jquery.ui.js,javascript/jquery.simplemodal.js,javascript/jquery.contextmenu.js,javascript/jquery.tree.js,javascript/jquery.scrollTo.js"></script>
+<script type="text/javascript" src="/javascript/jquery.resourcebrowser.js"></script>
+<script type="text/javascript">
+    /* auto scroll to open branch */
+    $j("#category-window div.scroller").scrollTo($j("#node-{OPEN}"), 200);
+</script>
+<style type="text/css">
+    .submit-btn-plain {
+        float: right;
+    }
+</style>
+<!-- END custom_head -->
+<div class="left">
+    <div id="category-window">
+        <div class="loading"></div>
+        <table id="category-head">
+            <thead>
+            <th>Folders</th>
+            </thead>
+        </table>
+        <div class="scroller">
+            <table id="tree">
+                <tbody>
+                <tr id="node-0" class="server expanded loaded {FULL} {WRITE}">
+                    <td><span class="server label">Resources</span></td>
+                </tr>
+                <!-- BEGIN category_list -->
+                <tr id="node-{CATEGORY_ID}" class="{CLASS}">
+                    <td><span class="elbow"></span><span class="label">{CATEGORY_NAME}</span></td>
+                </tr>
+                <!-- END category_list -->
+                </tbody>
+                <tfoot>
+                <tr id="node-template">
+                    <td><span class="elbow"></span><span class="label"></span></td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <input id="destination" type="text" readonly="readonly" />
+    <a href="#" class="submit-btn-plain"><span></span>Select</a>
+</div>
