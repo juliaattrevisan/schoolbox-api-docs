@@ -39,6 +39,20 @@
         border: solid 1px #ccc;
         margin-top: 5px;
     }
+    
+    #report-result table td {
+        padding: 2px 0;
+    }
+    
+    .filter ul li {
+        width: 200px;
+        float: left;
+        margin-right: 8px;
+    }
+
+    .filter .submit-btn-plain {
+        clear: both;
+    }
 </style>
 
 <!-- END custom_head-->
@@ -82,7 +96,7 @@
             </span>
             <!-- END download_report -->
             <!-- BEGIN result -->
-            <div class="{RESULT_CLASS}">
+            <div class="{RESULT_CLASS}" id="report-result">
                 {RESULT}
             </div>
             <!-- END result -->

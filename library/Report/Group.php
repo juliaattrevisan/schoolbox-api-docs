@@ -11,6 +11,7 @@ class Report_Group extends Report_Abstract implements Report_IReport {
     private $groupID = null;
     private $dataSet;
     private $dataCount;
+    private $fullDataSet;
     private $pageNum;
     private $perPage;
 
@@ -62,7 +63,8 @@ class Report_Group extends Report_Abstract implements Report_IReport {
     }
 
     public function getReportTitle() {
-        return $this->getGroupHandler()->getGroupName($this->getIndexID());
+        $rtn = $this->getGroupHandler()->getGroupName($this->getIndexID());
+        return $rtn ? $rtn : 'Group';
     }
 
     public function setFields($fields) {
@@ -100,8 +102,13 @@ class Report_Group extends Report_Abstract implements Report_IReport {
 
         $allResults = $this->getUserHandler()->getAllByField('group_id', $this->getIndexID(), $orderBy, $orderDir);
 
+        if(!$allResults)
+            return 0;
+
         $this->dataCount = count($allResults);
+        $this->fullDataSet = $allResults;
         $this->dataSet = array_slice($allResults, $offset, $limit);
+
 
         return $this->dataCount;
     }
@@ -170,12 +177,12 @@ class Report_Group extends Report_Abstract implements Report_IReport {
     public function export() {
         $exporter = new Report_Exporter($this->getReportTitle());
         $exporter->setHeadings($this->getFields());
-        $exporter->setData($this->dataSet);
+        $exporter->setData($this->fullDataSet);
         $exporter->export('CSV');
     }
 
-    public function displayUserBlock() {
-        // not implemented
+    public function displayFilterBlock() {
+        // this report does not utilise filtering
         return;
     }
 }

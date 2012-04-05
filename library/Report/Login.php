@@ -11,16 +11,27 @@ class Report_Login extends Report_Abstract implements Report_IReport {
     private $groupID = null;
     private $dataSet;
     private $dataCount;
+    private $fullDataSet;
     private $pageNum;
     private $perPage;
     private $filter;
 
-    // csv field mapping: index => humanreadable
+    // visible field mapping: index => humanreadable
     private $fields = array(
         'date'  => 'date',
         'login' => 'action',
         'user'  => 'user',
         'ip'    => 'ip'
+    );
+
+    // csv mappings
+    private $csvFields = array(
+        'date'      => 'date',
+        'login'     => 'login success',
+        'user'      => 'user id',
+        'firstname' => 'firstname',
+        'lastname'  => 'lastname',
+        'ip'        => 'originating ip address'
     );
 
     // fields that we will permit sorting on
@@ -97,7 +108,6 @@ class Report_Login extends Report_Abstract implements Report_IReport {
         // filter data passed in by report
         $filterString = $this->getIndexID();
 
-
         // explode across comma to get keypairs
         $filterSplit = explode(',',$filterString);
         $resultFilter = array();
@@ -144,6 +154,7 @@ class Report_Login extends Report_Abstract implements Report_IReport {
             return 0;
 
         $this->dataCount = count($allResults);
+        $this->fullDataSet = $allResults;
         $this->dataSet = array_slice($allResults, $offset, $limit);
 
         return $this->dataCount;
@@ -213,8 +224,8 @@ class Report_Login extends Report_Abstract implements Report_IReport {
 
     public function export() {
         $exporter = new Report_Exporter($this->getReportTitle());
-        $exporter->setHeadings($this->getFields());
-        $exporter->setData($this->dataSet);
+        $exporter->setHeadings($this->csvFields);
+        $exporter->setData($this->fullDataSet);
         $exporter->export('CSV');
     }
 
@@ -232,7 +243,6 @@ class Report_Login extends Report_Abstract implements Report_IReport {
             $page->setVar($output);
             $page->parse('search_options_block', 'search_options', true);
         }
-
 
         $page->parse('filter_block', 'filter', false);
     }

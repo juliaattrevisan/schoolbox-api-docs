@@ -8,20 +8,30 @@
  */
 class Report_Activity extends Report_Abstract implements Report_IReport {
 
-    const REPORT_ACTIVITY = 'activity';
-
     private $groupID = null;
     private $dataSet;
     private $dataCount;
+    private $fullDataSet;
     private $pageNum;
     private $perPage;
     private $filter;
 
-    // csv field mapping: index => humanreadable
+    // visible field mapping: index => humanreadable
     private $fields = array(
         'time'   => 'date',
         'action' => 'action',
         'user'   => 'user',
+    );
+
+    // csv mappings
+    private $csvFields = array(
+        'time'      => 'date',
+        'user_id'   => 'user id',
+        'firstname' => 'firstname',
+        'lastname'  => 'lastname',
+        'action'    => 'action',
+        'object'    => 'resource type',
+        'objectId'  => 'resource'
     );
 
     // fields that we will permit sorting on
@@ -171,6 +181,7 @@ ORDER BY $orderBy $orderDir
             return 0;
 
         $this->dataCount = count($allResults);
+        $this->fullDataSet = $allResults;
         $this->dataSet = array_slice($allResults, $offset, $limit);
 
         return $this->dataCount;
@@ -266,15 +277,38 @@ ORDER BY $orderBy $orderDir
                 'page_number_block'     => ''
             ));
         }
-
-
-
     }
 
     public function export() {
         $exporter = new Report_Exporter($this->getReportTitle());
-        $exporter->setHeadings($this->getFields());
-        $exporter->setData($this->dataSet);
+        $exporter->setHeadings($this->csvFields);
+
+        // we need to modify the dataset to substitute resourceIDs with their actual names / descriptions
+        $data = $this->fullDataSet;
+
+        foreach($data as &$datum) {
+            switch($datum['object']) {
+                case 'folder':
+                    $datum['objectId'] = $datum['c_name'];
+                    break;
+                case 'file':
+                    $datum['objectId'] = $datum['f_description'];
+                    break;
+                case 'link':
+                    $datum['objectId'] = $datum['l_description'];
+                    break;
+                case 'myfile':
+                    $datum['objectId'] = $datum['mf_description'];
+                    break;
+                case 'myfolder':
+                    $datum['objectId'] = $datum['ml_name'];
+                    break;
+                default:
+                    $datum['objectId'] = 'unknown resource';
+            }
+        }
+
+        $exporter->setData($data);
         $exporter->export('CSV');
     }
 
@@ -292,7 +326,6 @@ ORDER BY $orderBy $orderDir
             $page->setVar($output);
             $page->parse('search_options_block', 'search_options', true);
         }
-
 
         $page->parse('filter_block', 'filter', false);
     }
