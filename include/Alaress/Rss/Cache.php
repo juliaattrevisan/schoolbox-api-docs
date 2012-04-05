@@ -36,7 +36,7 @@ class Alaress_Rss_Cache extends Alaress_Cache_Abstract {
 	 * @return string
 	 */
 	protected function generateCacheFilename() {
-		$filename = Cfg::get('xml_dir') . '/' . 'rss_' . md5($this->getUrl()) . '.xml';
+		$filename = Cfg::get('stream_dir') . '/' . 'rss_' . md5($this->getUrl()) . '.xml';
 
 		return $filename;
 	}

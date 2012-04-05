@@ -41,7 +41,7 @@ class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
 	 * @return string
 	 */
 	protected function generateCacheFilename() {
-		$filename = Cfg::get('xml_dir') . '/' . 'twitter_' . md5($this->getUser().$this->getKeywords()) . '.json';
+		$filename = Cfg::get('stream_dir') . '/' . 'twitter_' . md5($this->getUser().$this->getKeywords()) . '.json';
 
 		return $filename;
 	}
