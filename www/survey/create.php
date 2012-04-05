@@ -25,15 +25,6 @@ if (!empty($_POST)) {
     $start = new Alaress_Date_Format($_POST['start']['date'].' '.$_POST['start']['hour'].':'.$_POST['start']['minute'].' '.$_POST['start']['meridiem'], 'd/m/y');
     $finish = new Alaress_Date_Format($_POST['finish']['date'].' '.$_POST['finish']['hour'].':'.$_POST['finish']['minute'].' '.$_POST['finish']['meridiem'], 'd/m/y');
 
-	/* Cater for unlimited duration tests. Can't use zero because of countdown
-	 * timer, so we use -1
-	 */
-	$duration = ($_POST['duration']['hour'] * 60 + $_POST['duration']['minute']) * 60;
-
-	if ($duration == 0) {
-     $duration = Survey_Main::UNLIMITED_DURATION;
-	}
-
     $assess_id = $assessHandler->create(array(
         'category_id' => Scrub::text($_POST['category_id']),
         'user_id' => $_SESSION['id'],
@@ -41,7 +32,7 @@ if (!empty($_POST)) {
         'description' => Scrub::text($_POST['description']),
         'start' => $start->getDatabase(),
         'finish' => $finish->getDatabase(),
-        'duration'  => Scrub::text($duration),
+        'duration'  => Survey_Main::UNLIMITED_DURATION,
 		'availability' => 'survey',
         'created_at' => 'NOW()',
     ));
@@ -177,28 +168,8 @@ else {
         $this->parse('finishMeridiem_block', 'finishMeridiem', true);
     }
 
-	/* Render duration
-	 */
-	for ($i = 0; $i <= 3; $i++) {
-		$this->setVar(array(
-			'DURATION_HOUR_VALUE' => $i,
-			'DURATION_HOUR_SELECTED' => ''
-		));
-
-		$this->parse('durationHour_block', 'durationHour', true);
-	}
-
-	for ($i = 0; $i <= 45; $i += 15) {
-		$this->setVar(array(
-			'DURATION_MINUTE_VALUE' => $i == 0 ? $i = '00' : $i,
-			'DURATION_MINUTE_SELECTED' => ''
-		));
-
-		$this->parse('durationMinute_block', 'durationMinute', true);
-	}
-
 	/* Don't display questions contents, which appears in Modify
-		 */
+	 */
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setVar('allQuestions_block', '');
     $this->parse('importXML_block', 'importXML');
