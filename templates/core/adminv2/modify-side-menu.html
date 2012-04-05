@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
 <script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
 <script type="text/javascript" src="/javascript/jstree/jquery.jstree.js"></script>
+
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 
 <script type="text/javascript">
@@ -54,14 +55,18 @@
         * Modal for URL homepage selection
         * */
 
-        $j('#resource-browser').dialog({
+         $j('#resource-browser').dialog({
             width: 650,
             autoOpen: false,
-            title: "Select a homepage"
+            title: "Select a homepage",
+            modal: true,
+            resizable: false
         });
 
         $j('.open-modal').click(function() {
-            $j('#resource-browser').dialog('open');
+            $j('#resource-browser').load('/ajax/resourceBrowser', function() {
+                $j('#resource-browser').dialog('open');
+            });
 
             return false;
         });

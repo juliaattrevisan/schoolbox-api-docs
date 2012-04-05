@@ -69,19 +69,23 @@ $j(function() {
 	});
 	
 	$j('a.show-pass').click(function() {
-		$j(this).siblings('em').show().css('display', 'block');
+
+        $j(this).siblings('em').show().css('display', 'block');
 		$j(this).siblings('a.hide-pass').show().css('display', 'block');
 		$j(this).hide();
 
 		return false;
+
 	});
 	
 	$j('a.hide-pass').click(function() {
-		$j(this).siblings('em').hide();
+
+        $j(this).siblings('em').hide();
 		$j(this).siblings('a.show-pass').show();
 		$j(this).hide();
 		
 		return false;
+
 	});
 
 	/* Reset availability options for campuses and services
