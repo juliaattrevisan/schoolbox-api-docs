@@ -80,7 +80,6 @@ class Alaress_Rss_Stream {
 	/**
 	 * Decide if the feed is an ATOM feed
 	 *
-	 * @param  $rss
 	 * @return bool
 	 */
 	private function isInputAtom() {
@@ -96,7 +95,6 @@ class Alaress_Rss_Stream {
 	/**
 	 * Decide if the feed is an RSS 2.0 feed
 	 *
-	 * @param  $rss
 	 * @return bool
 	 */
 	private function isInputRss20() {
@@ -110,7 +108,6 @@ class Alaress_Rss_Stream {
 	/**
 	 * Decide if the feed is an RSS 2.0 feed
 	 *
-	 * @param  $rss
 	 * @return bool
 	 */
 	private function isInputFeedburner() {
@@ -124,7 +121,7 @@ class Alaress_Rss_Stream {
 	/**
 	 * Get an RSS stream if a source was provided
 	 *
-	 * @return
+	 * @return void
 	 */
 	public function stream() {
 		if ($this->getSource() != null) {
@@ -141,7 +138,7 @@ class Alaress_Rss_Stream {
 	/**
 	 * Get an RSS stream title
 	 *
-	 * @return
+	 * @return string
 	 */
 	public function getTitle() {
 		if (($this->getSource() != null) && ($this->getRssStrategy() != null)) {
@@ -154,7 +151,7 @@ class Alaress_Rss_Stream {
 	/**
 	 * Get an RSS stream link
 	 *
-	 * @return
+	 * @return string
 	 */
 	public function getLink() {
 		if (($this->getSource() != null) && ($this->getRssStrategy() != null)) {
@@ -163,6 +160,9 @@ class Alaress_Rss_Stream {
 
 		return '';
 	}
+
+	/* Getters/Setters
+	 */
 
 	/**
 	 * Set output contents
@@ -177,7 +177,7 @@ class Alaress_Rss_Stream {
 	/**
 	 * Get output contents
 	 *
-	 * @return
+	 * @return array
 	 */
 	public function getOutput() {
 		return $this->output;

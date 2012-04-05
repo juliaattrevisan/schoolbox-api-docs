@@ -68,8 +68,14 @@ class Alaress_Twitter_Search {
 		if (strlen(trim($params))) {
 			$this->setSearchUrl(self::SEARCH_PREFIX . $params);
 
-			$allTweets = json_decode(@file_get_contents($this->getSearchUrl()));
+			/* Instantiate a cache and load from it
+			 */
+			$cache = new Alaress_Twitter_Cache($this->getUser(), $this->getKeywords(), $this->getSearchUrl());
 
+			$allTweets = json_decode($cache->load());
+
+			/* Iterate and process
+			 */
 			for ($i = 0; ($i < $this->getMaxTweets()) && ($i < count($allTweets->results)); $i++) {
 				$processed[] = array(
 					'text' => $allTweets->results[$i]->text,

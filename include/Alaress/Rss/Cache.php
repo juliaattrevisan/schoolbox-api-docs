@@ -7,7 +7,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Alaress_Rss_Cache {
+class Alaress_Rss_Cache extends Alaress_Cache_Abstract {
+	protected $cacheFile = null;
+	protected $cacheTime = null;
 
 	/**
 	 * Constructor
@@ -26,49 +28,8 @@ class Alaress_Rss_Cache {
 	}
 
 	/**
-	 * Set up cached contents of the url
-	 * Overwrite an expired cached file if necessary
-	 *
-	 * @param  $cache_file
-	 * @param  $cache_time
-	 * @param  $url
-	 * @return bool
-	 */
-	private function setup($url) {
-        if (!file_exists($this->getCacheFile()) || $this->isCacheExpired()) {
-            $xml_handle = @fopen($url, 'r');
-            $cache_handle = @fopen($this->getCacheFile(), 'w');
-
-			if (!$xml_handle || !$cache_handle) {
-				return false;
-			}
-
-            while (!feof($xml_handle)) {
-                fwrite($cache_handle, fread($xml_handle, 8192), 8192);
-            }
-
-            fclose($xml_handle);
-            fclose($cache_handle);
-        }
-	}
-
-	/**
-	 * Determine if the cached file has expired
-	 *
-	 * @return bool
-	 */
-	private function isCacheExpired() {
-		if (filectime($this->getCacheFile()) < (time() - $this->getCacheTime())) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Load contents from the cache
 	 *
-	 * @param  $cache_file
 	 * @return void
 	 */
 	public function load() {
@@ -78,49 +39,8 @@ class Alaress_Rss_Cache {
 	}
 
 	/**
-	 * Remove the cached file
-	 *
-	 * @return void
+	 * The cache filename to use for this rss feed
 	 */
-	public function remove() {
-		unlink($this->getCacheFile());
-	}
-
-	/**
-	 * Set cache file
-	 *
-	 * @param  $val
-	 * @return void
-	 */
-	private function setCacheFile($val) {
-		$this->cacheFile = $val;
-	}
-
-	/**
-	 * Get cache file
-	 *
-	 * @return
-	 */
-	private function getCacheFile() {
-		return $this->cacheFile;
-	}
-
-	/**
-	 * Set cache time
-	 *
-	 * @param  $val
-	 * @return void
-	 */
-	private function setCacheTime($val) {
-		$this->cacheTime = $val;
-	}
-
-	/**
-	 * Get cache time
-	 *
-	 * @return
-	 */
-	private function getCacheTime() {
-		return $this->cacheTime;
+	protected function generateCacheFilename() {
 	}
 }
