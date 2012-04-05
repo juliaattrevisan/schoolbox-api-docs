@@ -7,7 +7,16 @@ CREATE TABLE `submission_grade`(
 ) ENGINE=MyISAM DEFAULT CHARSET='utf8';
 
 INSERT INTO `submission_grade`(`grade_id`,`lower_bound`,`caption`)
-    VALUES (1,0,'Fail'),(2,50,'Pass'),(3,60,'Credit'),(4,70,'Distinction'),(5,80,'High Distinction');
+    VALUES (1, 0, 'E' ),
+           (2, 10,'E+'),
+           (3, 20,'D' ),
+           (4, 30,'D+'),
+           (5, 40,'C' ),
+           (6, 50,'C+'),
+           (7, 60,'B' ),
+           (8, 70,'B+'),
+           (9, 80,'A' ),
+           (10,90,'A+');
 
 CREATE TABLE `submission_mark_type`(
 	`mark_type_id` int(11) NOT NULL  auto_increment ,
