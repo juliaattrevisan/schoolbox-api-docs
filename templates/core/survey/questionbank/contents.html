@@ -137,15 +137,7 @@
             <input type='submit' value='Rename Category' class="submit-btn-plain no-marg" />
         </p>
 	</form>
-    <h4>Add Subcategory</h4>
-    <form action='/survey/questionbank/create' method='post' id="subcategoryForm">
-        <input name='parentId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}' />
-        <input name='name' type='text' value='' />
 
-        <p class="clearfix no-marg">
-            <input type='submit' value='Add New Subcategory' class="submit-btn-plain no-marg required" />
-        </p>
-    </form>
 
     <h4>Remove</h4>
 
@@ -155,7 +147,15 @@
     </form>
 
 	<!-- END category_selected -->
+    <h4>Add Subcategory</h4>
+    <form action='/survey/questionbank/create' method='post' id="subcategoryForm">
+        <input name='parentId' type='hidden' value='{QUESTIONBANK_CATEGORY_ID}' />
+        <input name='name' type='text' value='' />
 
+        <p class="clearfix no-marg">
+            <input type='submit' value='Add New Subcategory' class="submit-btn-plain no-marg required" />
+        </p>
+    </form>
 </div>
 
 <div class="evaluation-menu">
