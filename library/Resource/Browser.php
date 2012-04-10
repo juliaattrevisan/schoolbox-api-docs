@@ -15,11 +15,11 @@ class Resource_Browser {
         $this->page = $page;
     }
 
-    public function render($templateHandle) {
+    public function render($templateHandle, $destinationInputIdentifier) {
         $page = $this->getPage();
         $page->setFile($templateHandle, 'resource_browser.html');
         $page->setBlock($templateHandle, 'category_list', 'category_list_block');
-
+        $page->setVar('DESTINATION', $destinationInputIdentifier);
 
         $groupHandler = new Group;
         $categoryHandler = new Category;

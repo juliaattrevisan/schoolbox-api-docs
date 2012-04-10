@@ -1,3 +1,27 @@
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
+<script type="text/javascript">
+    $j(function () {
+        /*
+         * Modal for URL homepage selection
+         * */
+
+        $j('#resource-browser').dialog({
+            width: 650,
+            autoOpen: false,
+            title: "Select a homepage",
+            modal: true,
+            resizable: false
+        });
+
+        $j('#import-files').click(function() {
+            $j('#resource-browser').load('/ajax/resourceBrowser', {destination : '#import-files'}, function() {
+                $j('#resource-browser').dialog('open');
+            });
+
+            return false;
+        });
+    });
+</script>
 <div class="box clearfix" id="component{COMPONENT_HOMEPAGE_ID}">
 	<h2>{COMPONENT_NAME}</h2>
 	<!-- BEGIN config -->
@@ -38,6 +62,8 @@
 				<option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
 				<!-- END size -->
 			</select>
+            <label for="import-files"><br/>Import files from: </label>
+            <input type="text" value="{COMPONENT_CONFIG_IMPORT_FILES}" id="import-files" name="import-files" />
 			<input type="submit" value="Update" class="submit-btn update" />
 		</form>
 	</div>

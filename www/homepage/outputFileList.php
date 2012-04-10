@@ -34,7 +34,13 @@ require_once SITE_root.'/library/file.php';
 $fileHandler = new File;
 $userHandler = new User();
 
-$fileList = $fileHandler->getAllInCategory($categoryID, $config);
+// if config is set to import files, make it so
+if(($i = strpos($config['import-files'], 'homepage/')) === 0) {
+    // get homepage id
+    $auxCategory = substr($config['import-files'], 9);
+    $fileList = $fileHandler->getAllInCategory(array($categoryID, $auxCategory), $config);
+} else
+    $fileList = $fileHandler->getAllInCategory($categoryID, $config);
 
 if (is_array($fileList)) {
 	foreach ($fileList as $file) {
@@ -83,7 +89,8 @@ if (is_array($fileList)) {
 /* Set up component name
  */
 $this->setvar(array(
-	'COMPONENT_NAME' => strlen(trim($config['componentname'])) ? $config['componentname'] : 'Files'
+	'COMPONENT_NAME' => strlen(trim($config['componentname'])) ? $config['componentname'] : 'Files',
+    'COMPONENT_CONFIG_IMPORT_FILES' => $config['import-files'],
 ));
 
 /* filter config */

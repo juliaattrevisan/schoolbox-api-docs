@@ -1,16 +1,14 @@
 <link rel="stylesheet" type="text/css" media="screen" href="/css/tree.css" />
-<script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
-<script type="text/javascript" src="/javascript/jquery.resourcebrowser.js"></script>
-<script type="text/javascript">
-    /* auto scroll to open branch */
-    $j("#category-window div.scroller").scrollTo($j("#node-{OPEN}"), 200);
-</script>
 <style type="text/css">
     .submit-btn-plain {
         float: right;
     }
-</style>
 
+    .left {
+        float: none;
+        width: 100%;
+    }
+</style>
 <div class="left">
     <div id="category-window">
         <div class="loading"></div>
@@ -39,6 +37,16 @@
             </table>
         </div>
     </div>
-    <input id="destination" type="text" readonly="readonly" />
-    <a href="#" class="submit-btn-plain"><span></span>Select</a>
+    <input id="destination" type="hidden" readonly="readonly" />
+    <a href="#" id="select-resource" class="submit-btn-plain"><span></span>Select</a>
 </div>
+<script type="text/javascript">
+    // listener for submit
+    $j('#select-resource').click(function() {
+        // set the contents of the nominated field to the destination value, then bug out
+        var dest = "homepage/" + $j('#destination').val();
+        $j('{DESTINATION}').val(dest);
+        // kbye
+        $j('#resource-browser').dialog('close');
+    });
+</script>

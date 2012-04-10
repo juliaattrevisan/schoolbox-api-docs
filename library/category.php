@@ -47,6 +47,12 @@ class Category extends DeprecatedModel {
 	}
 
 	function getCategoryList ($categoryID, $config = false) {
+
+        if(is_array($categoryID)) {
+            $cats = " IN ('" . implode("', '", $categoryID) . "') ";
+        } else
+            $cats = " = '$categoryID' ";
+
 		$query = "SELECT id, name, GROUP_CONCAT(co.code) code, cf.template, parent,
 					(SELECT 1 FROM `".$this->_table."` k
 					 LEFT JOIN perms p ON p.cid = k.id AND p.gid = '".$_SESSION['gid']."' AND p.type > 0
@@ -55,7 +61,7 @@ class Category extends DeprecatedModel {
 				  FROM category ca
 				  LEFT JOIN categoryCode co ON co.categoryID = ca.id
 				  LEFT JOIN homepage_config cf ON cf.cid = ca.id
-				  WHERE parent = $categoryID
+				  WHERE parent $cats
 				  GROUP BY ca.id";
 
 		$sortFields = array('name' => 'name', 'date' => 'id');

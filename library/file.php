@@ -26,6 +26,11 @@ class File extends DeprecatedModel {
     function getAllInCategory ($categoryID, $config = false) {
         $groupHandler = new Group;
 
+        if(is_array($categoryID)) {
+            $cats = " IN ('" . implode("', '", $categoryID) . "') ";
+        } else
+            $cats = " = '$categoryID' ";
+
         $query = "SELECT f.*, u.firstname, u.lastname, u.title,
 						UNIX_TIMESTAMP(f.submitted) submitted, UNIX_TIMESTAMP(f.modified) modified,
 						ft.name typeName, c.name categoryName, af.description as mimeDescription, iconFile, af.inline
@@ -35,7 +40,7 @@ class File extends DeprecatedModel {
 				  LEFT JOIN file_type ft ON ft.id = f.type
 				  LEFT JOIN allowedFileTypes af ON f.mime_type = af.mime
 				  LEFT JOIN submission_box sb on sb.fid = f.id
-				  WHERE f.category = " . $categoryID . " AND f.deleted = '0' ";
+				  WHERE f.category $cats AND f.deleted = '0' ";
 
         if ( $groupHandler->getPermission($categoryID) < WRITE_ACCESS ) {
             $query .= " AND f.hidden = 0";

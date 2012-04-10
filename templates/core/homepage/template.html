@@ -9,6 +9,10 @@
 <link rel="stylesheet" type="text/css" href="/javascript/farbtastic/farbtastic.css" />
 <script type="text/javascript" src="/javascript/farbtastic/farbtastic.js"></script>
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<script type="text/javascript" src="/javascript/jquery.tree.js"></script>
+<script type="text/javascript" src="/javascript/jquery.resourcebrowser.js"></script>
+<script type="text/javascript" src="/javascript/jquery.contextmenu.js"></script>
+<script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
 <script type="text/javascript">
 	$j(function() {
 		/* Set up variables and urls
@@ -337,6 +341,7 @@ var {COLOUR_ARRAY} = {
 	<div class="right clearfix" style="width: {TEMPLATE_RIGHT_COLUMN_WIDTH}%">{COLUMN2}</div>
 </div>
 <input type="hidden" id="categoryID" value="{ID}" />
+<div id="resource-browser" class="hide"></div>
 <script type="text/javascript">
     // all forms should submit without prevention
     $j(".homepage form").submit(function() {

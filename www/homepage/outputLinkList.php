@@ -5,12 +5,21 @@ $this->setBlock('link', 'modify_link', 'modify_link_block');
 $this->setBlock('link', 'show_posted_by', 'show_posted_by_block');
 
 $linkHandler = new Link();
-$linkList = $linkHandler->getAllInCategory($categoryID, $config);
+
+// if config is set to import links, make it so
+if(($i = strpos($config['import-links'], 'homepage/')) === 0) {
+    // get homepage id
+    $auxCategory = substr($config['import-links'], 9);
+    $linkList = $linkHandler->getAllInCategory(array($categoryID, $auxCategory), $config);
+} else
+    $linkList = $linkHandler->getAllInCategory($categoryID, $config);
+
 
 /* Set up component name
  */
 $this->setvar(array(
-	'COMPONENT_NAME' => strlen(trim($config['componentname'])) ? $config['componentname'] : 'Links'
+	'COMPONENT_NAME' => strlen(trim($config['componentname'])) ? $config['componentname'] : 'Links',
+    'COMPONENT_CONFIG_IMPORT_LINKS' => $config['import-links'],
 ));
 
 /* Tick for checkbox which controls whether to show the Posted By details

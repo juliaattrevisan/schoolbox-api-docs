@@ -26,10 +26,15 @@ class Link extends DeprecatedModel {
 		require_once dirname(__FILE__) . '/group.php';
 		$groupHandler = new Group;
 
+        if(is_array($categoryID)) {
+            $cats = " IN ('" . implode("', '", $categoryID) . "') ";
+        } else
+            $cats = " = '$categoryID' ";
+
 		$query = "SELECT l.*, u.firstname, u.lastname, u.title, UNIX_TIMESTAMP(submitted) submitted, 'html_alt1' iconFile
 				  FROM link l
 				  LEFT JOIN user u ON u.id = l.owner
-				  WHERE category = '".$categoryID."'";
+				  WHERE category $cats";
 
 		if ($groupHandler->getPermission($categoryID) < WRITE_ACCESS)
 			$query .= " AND l.hidden = 0";
@@ -42,7 +47,6 @@ class Link extends DeprecatedModel {
 
 		if($config['size'] > 0)
 			$query .= " LIMIT 0, " . $config['size'];
-
 
 		return $this->db->getAll($query);
 	}

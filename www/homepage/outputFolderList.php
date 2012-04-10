@@ -4,8 +4,16 @@ $this->setBlock($componentHandle, 'folders', 'folders_block');
 $this->setBlock('folders', 'homepage_folder', 'homepage_folder_block');
 $this->setBlock('folders', 'modify_folder', 'modify_folder_block');
 
+$i = strpos($config['import-folders'], 'homepage/');
 
-$folderList = $categoryHandler->getCategoryList($categoryID, $config);
+// if config is set to import files, make it so
+if(($i = strpos($config['import-folders'], 'homepage/')) === 0) {
+    // get homepage id
+    $auxCategory = substr($config['import-folders'], 9);
+    $folderList = $categoryHandler->getCategoryList(array($categoryID, $auxCategory), $config);
+} else
+    $folderList = $categoryHandler->getCategoryList($categoryID, $config);
+
 if (is_array($folderList)) {
 	$flag = 0;
 	foreach ($folderList as $folder) {
@@ -36,7 +44,8 @@ if (is_array($folderList)) {
 /* Set up component name
  */
 $this->setvar(array(
-	'COMPONENT_NAME' => strlen(trim($config['componentname'])) ? $config['componentname'] : 'Folders'
+	'COMPONENT_NAME' => strlen(trim($config['componentname'])) ? $config['componentname'] : 'Folders',
+    'COMPONENT_CONFIG_IMPORT_FOLDERS' => $config['import-folders'],
 ));
 
 //setup block for submission button

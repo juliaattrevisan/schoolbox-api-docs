@@ -64,24 +64,21 @@
         });
 
         $j('.open-modal').click(function() {
-            $j('#resource-browser').load('/ajax/resourceBrowser', function() {
+            $j('#resource-browser').load('/ajax/resourceBrowser', {destination : '#url'}, function() {
                 $j('#resource-browser').dialog('open');
             });
 
             return false;
         });
 
-
-
-
-
-
-
     });
 
 </script>
+<script type="text/javascript" src="/javascript/jquery.tree.js"></script>
+<script type="text/javascript" src="/javascript/jquery.resourcebrowser.js"></script>
+<script type="text/javascript" src="/javascript/jquery.contextmenu.js"></script>
+<script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
 <!-- END custom_head -->
-
 <h1>Schoolbox Administration</h1>
 <ul class="admin-nav">
 	<li><a href="/adminv2/home">Home</a></li>

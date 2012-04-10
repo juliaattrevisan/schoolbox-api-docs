@@ -7,20 +7,10 @@
  * @version     SVN: $Id$
  */
 
-// expecting POST to contain the identifier for the handle
-//if($_REQUEST['templatehandle']) {
-    $this->setFile(TEMPLATE_content, 'resource_browser.html');
-    $rb = new Resource_Browser($this);
-    $rb->render($_REQUEST['templatehandle']);
-    $this->setAjax();
-    $this->template->pparse('finaloutput', TEMPLATE_content);
-/*
-}
+$this->setFile(TEMPLATE_content, 'resource_browser.html');
+$rb = new Resource_Browser($this);
+$rb->render(TEMPLATE_content, $_REQUEST['destination']);
+$this->setAjax();
+$this->template->pparse('finaloutput', TEMPLATE_content);
 
-// templatehandle not set
-
-else {
-    // die quietly
-    echo "no handle";
-}*/
 ?>
