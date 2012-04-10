@@ -32,6 +32,8 @@ $this->setVar('resumeLink_block', '');
 $surveyHandler = new Survey();
 $attemptHandler = new SurveyAttempt();
 $sectionHandler = new SurveySection();
+$userHandler = new User();
+
 $allSurveys = $surveyHandler->getList($categoryID);
 
 if ($groupHandler->isStaff()) {
@@ -45,13 +47,21 @@ if (is_array($allSurveys)) {
     $i=0;
 
     foreach($allSurveys as $currentSurvey) {
+		$createdTime = new Alaress_Date_Relative($currentSurvey['created_at']);
+
+		$author = $userHandler->getByID($currentSurvey['user_id']);
+
         $this->setVar(array(
             'SURVEY_ASSESS_ID' => $currentSurvey['assess_id'],
             'SURVEY_TITLE' => $currentSurvey['title'],
             'SURVEY_START_DATE' => date('jS M Y', strtotime($currentSurvey['start'])),
             'SURVEY_FINISH_DATE' => date('jS M Y', strtotime($currentSurvey['finish'])),
             'SURVEY_DESCRIPTION' => Scrub::html(html_entity_decode($currentSurvey['description'])),
-            'ON_OFF' => $i%2 ? 'dark' : '',
+			'SURVEY_CREATED' => $createdTime->getRelativeTime(),
+			'USER_ID' => $author['uid'],
+			'USER_FIRSTNAME' => $author['firstname'],
+			'USER_LASTNAME' => $author['lastname'],
+			'ON_OFF' => $i%2 ? 'dark' : '',
         ));
 
 		/* Check if you have completed an assessment already
@@ -70,7 +80,7 @@ if (is_array($allSurveys)) {
 		 * 3. The current time has passed the test's starting time
 		 * 4. You aren't the owner of the test
 		 */
-		if(is_array($attempt)) {
+		if (is_array($attempt)) {
 			// If the last assess is not completed provide resume link
 			if ($attempt['finish'] == '0000-00-00 00:00:00' && ($attemptTimeRemaining < 0 || $currentSurvey['duration'] == Assess::UNLIMITED_DURATION)) {
 				$firstSection = $sectionHandler->getFirst($currentSurvey['assess_id']);

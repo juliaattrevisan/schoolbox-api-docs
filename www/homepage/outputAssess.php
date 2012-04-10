@@ -31,6 +31,8 @@ $groupHandler = new Group();
 $assessHandler = new Assess_Main();
 $attemptHandler = new Assess_Attempt();
 $sectionHandler = new Assess_Section();
+$userHandler = new User();
+
 $allAssess = $assessHandler->getList($categoryID);
 
 if ($groupHandler->isStaff()) {
@@ -51,6 +53,9 @@ if (is_array($allAssess)) {
 			$this->setVar('assess_block', '');
 		}
 		else {
+			$createdTime = new Alaress_Date_Relative($currentAssess['created_at']);
+
+			$author = $userHandler->getByID($currentAssess['user_id']);
 
 			/* Note that Assess Descriptions can now contain html, so we decode them
 			 * and remove the html from the short description in homepage components
@@ -61,6 +66,10 @@ if (is_array($allAssess)) {
 				'ASSESS_START_DATE' => date('jS M Y', strtotime($currentAssess['start'])),
 				'ASSESS_FINISH_DATE' => date('jS M Y', strtotime($currentAssess['finish'])),
 				'ASSESS_DESCRIPTION' => Scrub::html(html_entity_decode($currentAssess['description'])),
+				'ASSESS_CREATED' => $createdTime->getRelativeTime(),
+				'USER_ID' => $author['uid'],
+				'USER_FIRSTNAME' => $author['firstname'],
+				'USER_LASTNAME' => $author['lastname'],
 				'ON_OFF' => $i++%2 ? 'dark' : '',
 			));
 
