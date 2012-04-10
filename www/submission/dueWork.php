@@ -8,9 +8,10 @@ require_once SITE_root . '/library/user.php';
 /**
  * Order by date descending.
  *
- * @param <type> $a
- * @param <type> $b
- * @return <type>
+ * @param $a
+ * @param $b
+ *
+ * @return int
  */
 function cmp($a, $b) {
 	if ($a['relevant_date'] == $b['relevant_date']) {
@@ -41,25 +42,36 @@ $this->setVar('summary_block', '');
 $this->setVar('activity_block', '');
 $this->setVar('is_parent_block', '');
 
-$groupHandler = new Group;
-$userHandler = new User;
-$returnHandler = new SubmissionReturn;
-$submissionHandler = new Submission;
+$groupHandler = new Group();
+$userHandler = new User();
+$returnHandler = new SubmissionReturn();
+$submissionHandler = new Submission();
 
-/* Instantiate for current date time */
+/* Instantiate for current date time
+ */
 $current_time = new DateTime();
 
-/* ideally session children would use the id as the array key as this is ridiculous */
+/* ideally session children would use the id as the array key as this is ridiculous
+ */
 $childList = array();
+
 if (is_array($_SESSION['children'])) {
 	foreach ($_SESSION['children'] as $child) {
 		$childList[] = $child['id'];
 	}
 }
 
-// get selected user
-if(is_array($_SESSION['children']))
+/* From calendar format url e.g. /submission/dueWork/10/04/2012/17
+ */
+if (count($this->arg) > 3) {
+	$userID = $this->arg[3];
+}
+
+/* get selected user from session (?)
+ */
+else if (is_array($_SESSION['children'])) {
     $userID = $_SESSION['children'][0]['id'];
+}
 else {
     //displaying users on due work, so log this as the last time they viewed due work
     $submissionHandler->logPageView(1);
@@ -67,15 +79,18 @@ else {
     $userID = $_SESSION['id'];
 }
 
-if (is_numeric($this->arg[1]) && in_array($this->arg[1], $childList))
+if ((count($this->arg) < 3) && is_numeric($this->arg[1]) && in_array($this->arg[1], $childList)) {
 	$userID = $this->arg[1];
-elseif (is_numeric($this->arg[1]) && $groupHandler->isStaff())
+}
+else if ((count($this->arg) < 3) && is_numeric($this->arg[1]) && $groupHandler->isStaff()) {
 	$userID = $this->arg[1];
+}
 
 $user = $userHandler->getByID($userID);
 
-if (!isset($user['uid']))
+if (!isset($user['uid'])) {
 	error(2);
+}
 
 if (is_array($_SESSION['children'])) {
 	$this->dropDown('child', $_SESSION['children'], $user['uid'], 'is_parent', array('id' => 'CHILD_ID', 'name' => 'CHILD_NAME'));
@@ -90,29 +105,35 @@ if (is_array($categoryList)) {
 	}
 }
 
-//Catch if not involved in any categories
-if (count($categoryList) == 0)
+/* Catch if not involved in any categories
+ */
+if (count($categoryList) == 0) {
 	error(135);
+}
 
-// get selected date
-if (isset($this->arg[0]))
+/* get selected date
+ */
+if (isset($this->arg[0])) {
 	$selectedDate = strtotime($this->arg[0]);
+}
 
-if ($selectedDate <= 0)
+if ($selectedDate <= 0) {
 	$selectedDate = time();
+}
 
 $selectedDateObj = new Alaress_Date_Format($selectedDate, 'U');
 
-// output general data
+/* output general data
+ */
 $output = array(
-	'CURRENT_DATE'	=> date('F Y', $selectedDateObj->getUnixTimestamp()),
-	'NOT_TODAY'		=> date('dmY', $selectedDate) != date('dmY') ? 'not-today' : '',
-	'TODAY_DATE'	=> date('Y-m-d'),
-	'NEXT_MONTH'	=> date('Y-m-d', strtotime('+1 month', $selectedDate)),
-	'PREV_MONTH'	=> date('Y-m-d', strtotime('-1 month', $selectedDate)),
-	'SELECTED_DATE'	=> $selectedDateObj->getLocalShort(),
-	'WORK_USER_ID'  => $userID,
-    'WORK_USER_NAME' => $userID==$_SESSION['id']?'My':$userHandler->formatName($user)."'s",
+	'CURRENT_DATE' => date('F Y', $selectedDateObj->getUnixTimestamp()),
+	'NOT_TODAY' => date('dmY', $selectedDate) != date('dmY') ? 'not-today' : '',
+	'TODAY_DATE' => date('Y-m-d'),
+	'NEXT_MONTH' => date('Y-m-d', strtotime('+1 month', $selectedDate)),
+	'PREV_MONTH' => date('Y-m-d', strtotime('-1 month', $selectedDate)),
+	'SELECTED_DATE' => $selectedDateObj->getLocalShort(),
+	'WORK_USER_ID' => $userID,
+	'WORK_USER_NAME' => $userID == $_SESSION['id'] ? 'My' : $userHandler->formatName($user) . "'s",
 );
 
 $this->setVar($output);
@@ -120,31 +141,34 @@ $this->setVar($output);
 $selectedMonth 	= date("n", $selectedDate);
 $selectedYear 	= date("Y", $selectedDate);
 
-// calculate month layout
-$firstDay 		= date("w", mktime(0,0,0,$selectedMonth, 1, $selectedYear));
+/* calculate month layout
+ */
+$firstDay = date("w", mktime(0, 0, 0, $selectedMonth, 1, $selectedYear));
 $numDaysinMonth = date("d", mktime(0, 0, 0, $selectedMonth + 1, 0, $selectedYear));
-$numWeeksMonth 	= ceil(($firstDay + $numDaysinMonth)/7);
-$totalDays 		= $numWeeksMonth * 7 + (6 - $firstDay);
+$numWeeksMonth = ceil(($firstDay + $numDaysinMonth) / 7);
+$totalDays = $numWeeksMonth * 7 + (6 - $firstDay);
 
 $startDay = mktime(12, 0, 0, $selectedMonth, 1, $selectedYear) - strtotime("+$firstDay day", 0);
 
 // output calendar
 $summary = array();
-for ($i = 0; $i < $totalDays; $i++) {
 
+for ($i = 0; $i < $totalDays; $i++) {
 	$currentDay = strtotime("+$i day", $startDay);
 
 	$day = $i % 7;
 
-	if($i >= $firstDay && $i < $numDaysinMonth+$firstDay)
+	if ($i >= $firstDay && $i < $numDaysinMonth + $firstDay) {
 		$this->setVar('OTHER_MONTH', '');
+	}
 
-	$output = array('DATE'		=> date("j", $currentDay),
-					'PAST'		=> $i >= $firstDay && $i < $numDaysinMonth+$firstDay ? '' : 'past',
-					'ACTIVE'	=> date('dmY', $currentDay) == date('dmY', $selectedDate) ? 'active' : '',
-					'TODAY'		=> date('dmY') == date('dmY', $currentDay) ? 'today' : '',
-					'RIGHTY'	=> $day > 3 ? 'righty' : '',
-					);
+	$output = array(
+		'DATE' => date("j", $currentDay),
+		'PAST' => $i >= $firstDay && $i < $numDaysinMonth + $firstDay ? '' : 'past',
+		'ACTIVE' => date('dmY', $currentDay) == date('dmY', $selectedDate) ? 'active' : '',
+		'TODAY' => date('dmY') == date('dmY', $currentDay) ? 'today' : '',
+		'RIGHTY' => $day > 3 ? 'righty' : '',
+	);
 
 	$this->setVar($output);
 
@@ -152,27 +176,28 @@ for ($i = 0; $i < $totalDays; $i++) {
 
 	if (is_array($eventList)) {
 		foreach ($eventList as $event) {
-
-			$due = ( $event['realname'] && $event['open_date'] < time() && $event['late_date'] > time() && $event['accept_submission'] );
+			$due = ($event['realname'] && $event['open_date'] < time() && $event['late_date'] > time() && $event['accept_submission']);
 
 			$date = new Alaress_Date_Format(strtotime($event['date']), 'U');
 
-			$output = array('EVENT_ID'		=> $event['id'],
-							'TIME'			=> $date->getTimeOnly(),
-							'EVENT'			=> Scrub::text($event['name']),
-							'EVENT_PAST' 	=> !$due ? 'fade' : '',
-							'EVENT_CAT_ID'	=> $event['category'],
-							);
+			$output = array(
+				'EVENT_ID' => $event['id'],
+				'TIME' => $date->getTimeOnly(),
+				'EVENT' => Scrub::text($event['name']),
+				'EVENT_PAST' => !$due ? 'fade' : '',
+				'EVENT_CAT_ID' => $event['category'],
+			);
 
 			$this->setVar($output);
 			$this->parse('event_block', 'event', true);
 
 			/* record overview for summary box */
-			$summary[$event['category']] = array('name' 	=> $event['categoryName'],
-												 'total' 	=> ++$summary[$event['category']]['total'],
-												 'due'		=> $due ? ++$summary[$event['category']]['due'] : $summary[$event['category']]['due'],
-												 'code'		=> explode(',', $event['categoryCode']),
-												 );
+			$summary[$event['category']] = array(
+				'name' => $event['categoryName'],
+				'total' => ++$summary[$event['category']]['total'],
+				'due' => $due ? ++$summary[$event['category']]['due'] : $summary[$event['category']]['due'],
+				'code' => explode(',', $event['categoryCode']),
+			);
 		}
 	}
 
@@ -239,7 +264,7 @@ if ($groupHandler->isParentOfChild($this->arg[1])) {
 	}
 }
 
-if(count($allWork) > 0) {
+if (count($allWork) > 0) {
     foreach($allWork as $currentWork) {
 
 		if (!$restrictedSubmissions) {
@@ -323,7 +348,6 @@ if(count($allWork) > 0) {
 else {
     $this->setVar('work_block','');
 }
-
 
 /* Online Assessments
  */
@@ -497,17 +521,18 @@ $synClass = new External_Class;
 // subject summary
 foreach ($categoryList as $category) {
 	$categoryID = $category['id'];
+
 	/* yes it actually requires THIS MUCH code to get a teachers name. */
 	if (Cfg::get('external_enable')) {
-
-
 		$teacherOutput = array();
 		$teacherList = array();
-                $codeList = explode(',',$category['code']);
+        $codeList = explode(',',$category['code']);
+
 		if (is_array($codeList)) {
 			foreach ($codeList as $code) {
-				if(is_array($temp = $synClass->getTeacherName($code)))
+				if(is_array($temp = $synClass->getTeacherName($code))) {
                     $teacherList = array_merge($teacherList, $temp);
+				}
 			}
 		}
 
@@ -542,20 +567,23 @@ foreach ($categoryList as $category) {
     $percentage[] = $thisPercentage;
     $categoryIDs[] = $categoryID;
 
-	$output = array('SUMMARY_CAT_ID'	=> $categoryID,
-					'SUMMARY_CAT_NAME'	=> Scrub::text($category['name']),
-					'SUMMARY_TOTAL'		=> $summary[$category['id']]['total'],
-					'SUMMARY_DUE'		=> $summary[$category['id']]['due'],
-					'SUMMARY_TEACHER'	=> Cfg::get('external_enable') ? implode(', ', $teacherOutput) : '',
-					'DARK'				=> $j++ % 2 ? 'dark' : '',
-                    'PERCENTAGE_COMPLETED' => $thisPercentage,
-					);
+	$output = array(
+		'SUMMARY_CAT_ID' => $categoryID,
+		'SUMMARY_CAT_NAME' => Scrub::text($category['name']),
+		'SUMMARY_TOTAL' => $summary[$category['id']]['total'],
+		'SUMMARY_DUE' => $summary[$category['id']]['due'],
+		'SUMMARY_TEACHER' => Cfg::get('external_enable') ? implode(', ', $teacherOutput) : '',
+		'DARK' => $j++ % 2 ? 'dark' : '',
+		'PERCENTAGE_COMPLETED' => $thisPercentage,
+	);
 
 	$this->setVar($output);
 
 	$this->setVar('summary_due_block', '');
-	if ($category['due'] > 0)
+
+	if ($category['due'] > 0) {
 		$this->parse('summary_due_block', 'summary_due');
+	}
 
 	$this->parse('summary_block', 'summary', true);
 }
@@ -569,17 +597,19 @@ $this->setVar(array(
 
 $j = 0;
 
-// activities feed
+/* activities feed
+ */
 $activityLog = $submissionHandler->getActivityLog($user['uid'], 15, $categoryIDList);
+
 if (is_array($activityLog)) {
 	foreach ($activityLog as $activity) {
-
         $taskName = $activity['name'];
 
-        if ($activity['fid'])
-            $taskName = '<a href="/send.php?id=' . $activity['fid'] . '&save=1">' . $activity['name'] . '</a>';
+		if ($activity['fid']) {
+			$taskName = '<a href="/send.php?id=' . $activity['fid'] . '&save=1">' . $activity['name'] . '</a>';
+		}
 
-        $categoryName = '<a href="/homepage/' . $activity['category'] . '">' . Scrub::text($activity['categoryName']) . '</a>';
+		$categoryName = '<a href="/homepage/' . $activity['category'] . '">' . Scrub::text($activity['categoryName']) . '</a>';
 
         switch($activity['new']) {
 
@@ -604,18 +634,22 @@ if (is_array($activityLog)) {
                     // legacy support
                     if($rtn['slug'] == 'free') {
                         $mark = $rtn['mark'];
-                    } else {
+                    }
+					else {
                         $mark = $marksheet->convertRawMark($rtn['norm_mark'], $rtn['max_mark'], true, false);
                     }
 
                     $stringDesc = 'You received ' . $mark;
                 }
-                else if($activity['fid'])
+                else if($activity['fid']) {
                     $stringDesc = '<a href="/submission/send.php?id='.$activity['fid'].'&return=1">Work returned</a>';
-                else
+				}
+                else {
                     $stringDesc = 'Work returned';
+				}
+
                 $stringDesc .= ' for '.$activity['name']. ' in <a href="/homepage/' . $activity['category'] . '">' . Scrub::text($activity['categoryName']) . '</a>';
-                break;
+				break;
 
             default:
                 $stringDesc = $categoryName . ' submissions for ' . Scrub::text($activity['name']) . ' are now closed ';
@@ -625,18 +659,17 @@ if (is_array($activityLog)) {
 		$activityTime = new Alaress_Date_Relative($activity['activity_date']);
 		$activityTime->setPrefix('');
 
-		$output = array('ACTIVITY_DESCRIPTION'	=> $stringDesc,
-						'ACTIVITY_DATE'			=> $activityTime->getRelativeTime(),
-						'DARK'					=> $j++ % 2 ? 'dark' : '',
-						);
+		$output = array(
+			'ACTIVITY_DESCRIPTION' => $stringDesc,
+			'ACTIVITY_DATE' => $activityTime->getRelativeTime(),
+			'DARK' => $j++ % 2 ? 'dark' : '',
+		);
+
 		$this->setVar($output);
 		$this->parse('activity_block', 'activity', true);
 	}
 }
 
-// subject drop down
+/* subject drop down
+ */
 $this->dropDown('subject', $categoryList, '', TEMPLATE_content, array('id' => 'SUBJECT_ID', 'name' => 'SUBJECT_NAME'));
-
-
-
-?>
