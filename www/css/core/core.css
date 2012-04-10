@@ -4029,8 +4029,19 @@ ul.js_happening li span {
 	border-radius: 5px;
 	cursor: pointer;
 	overflow: hidden;
-
 }
+
+/* Calendar translucency
+ */
+ul.js_happening li.translucent span{
+opacity:0.4;
+    background-image: url(/images/famicons/time.png); background-repeat:no-repeat; background-position: 95% 50%;
+}
+ul.js_happening li.translucent span:hover{
+    opacity:0.5;
+}
+
+
 
 ul.js_happening li span:hover {
 	opacity: 0.8;
@@ -6270,8 +6281,6 @@ ul.tree .collapsable .hitarea {
     color: #808080;
 }
 
-
-
 .sortable-table .leaveReportHeaderDate {
 	text-align: center;
 }
@@ -6292,8 +6301,3 @@ ul.tree .collapsable .hitarea {
 	display: none;
 }
 
-/* Calendar translucency
- */
-.translucent {
-
-}

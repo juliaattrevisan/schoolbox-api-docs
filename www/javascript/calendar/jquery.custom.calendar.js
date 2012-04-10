@@ -4,6 +4,20 @@ setupCalendar = {
 	init: function() {
 		var $self = this;
 
+        $j.fn.qtip.defaults.position.corner = {
+            target: 'topLeft',
+            tooltip: 'bottomLeft'
+        }
+
+        $j.fn.qtip.defaults.style = {
+            tip: 'bottomLeft',
+            name: 'green'
+        }
+
+        $j('ul.js_happening li.translucent span').qtip({
+            content: "This event has yet to reach its publish date and will not be seen by some users."
+        });
+
 		$j('.modify a').html('<span></span>Modify');
 		$j('.modify a').addClass('btn modify float-left');
 		$j('.print-it').click(function() {
