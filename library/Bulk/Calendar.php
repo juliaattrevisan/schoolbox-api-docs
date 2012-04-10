@@ -85,6 +85,16 @@ class Bulk_Calendar {
 				 */
 				$date = new Alaress_Date_Format(Scrub::html($thisRow[0]), 'd/m/y');
 
+				/* If a publish date is specified, use it; otherwise assume the
+				 * Publish Date is the same as the Event Date
+				 */
+				if (strlen(trim($thisRow[8]))) {
+					$publishDate = new Alaress_Date_Format(Scrub::html($thisRow[8]), 'd/m/y');
+				}
+				else {
+					$publishDate = clone $date;
+				}
+
 				if ((trim($thisRow[0]) != '') && (trim($thisRow[3]) != '')) {
 					$event = array(
 						'owner' => $uid,
@@ -96,6 +106,7 @@ class Bulk_Calendar {
 						'detail' => Scrub::html($thisRow[4]),
 						'location' => Scrub::html($thisRow[5]),
 						'type' => Scrub::html($thisRow[6]),
+						'publish_date' => $publishDate->getDatabase(),
 						'campusList' => $campusList,
 						'groupList' => $groupList,
 					);
