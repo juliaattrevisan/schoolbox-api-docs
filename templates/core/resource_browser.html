@@ -1,10 +1,10 @@
 <link rel="stylesheet" type="text/css" media="screen" href="/css/tree.css" />
 <style type="text/css">
-    .submit-btn-plain {
+    #resource-browser .submit-btn-plain {
         float: right;
     }
 
-    .left {
+    #resource-browser .left {
         float: none;
         width: 100%;
     }
@@ -37,16 +37,20 @@
             </table>
         </div>
     </div>
-    <input id="destination" type="hidden" readonly="readonly" />
+    <input id="destination" type="hidden" readonly="readonly" value="" />
     <a href="#" id="select-resource" class="submit-btn-plain"><span></span>Select</a>
 </div>
 <script type="text/javascript">
     // listener for submit
+    $j('#destination').val($j('{DESTINATION}').val());
     $j('#select-resource').click(function() {
         // set the contents of the nominated field to the destination value, then bug out
-        var dest = "homepage/" + $j('#destination').val();
-        $j('{DESTINATION}').val(dest);
+        if($j('#destination').val().indexOf('homepage/') == -1) {
+            var dest = "homepage/" + $j('#destination').val();
+            $j('{DESTINATION}').val(dest);
+        }
         // kbye
         $j('#resource-browser').dialog('close');
     });
 </script>
+<script type="text/javascript" src="/javascript/jquery.resourcebrowser.js"></script>
