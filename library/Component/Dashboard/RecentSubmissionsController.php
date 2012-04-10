@@ -27,7 +27,6 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         // returns appropriately sorted and formatted data for this module
         $this->submissions = $this->getSubmissionHandler()->getTotalSubmissionsByOwner($_SESSION['id']);
 
-        $this->dump .= print_r($this->submissions, true);
         return true;
     }
 
@@ -36,49 +35,51 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
             return false;
         }
 
-        $this->setVar('DUMP', $this->dump);
 
         $this->setBlock($templateHandle, 'work', 'work_block');
         $this->setBlock('work', 'submission', 'submission_block');
         $this->setBlock('work', 'assess', 'assess_block');
+
+        $this->setVar('work_block','');
 
         // determine how many results to output
         $count = 0;
         $limit = min(array($this->max, count($this->submissions)));
 
         $j = 0;
-        foreach($this->submissions as $submit) {
-            // don't exceed the limit
-            if($count >= $limit)
-                break;
+        if(is_array($this->submissions)) {
+            foreach($this->submissions as $submit) {
+                // don't exceed the limit
+                if($count >= $limit)
+                    break;
 
-            $date = new Alaress_Date_Relative($submit['datestamp']);
+                $date = new Alaress_Date_Relative($submit['datestamp']);
 
-            $output = array(
-                'WORK_DATE'        => $date->getRelativeTime(),
-                'WORK_SUBJECT'     => $submit['category_name'],
-                'WORK_DESCRIPTION' => $submit['name'],
-                'WORK_COUNT'       => $submit['count'],
-                'WORK_BOX_ID'      => $submit['id'],
-                'ROW_COLOR'        => ++$j%2 ? 'dark' : ''
-            );
+                $output = array(
+                    'WORK_DATE'        => $date->getRelativeTime(),
+                    'WORK_SUBJECT'     => $submit['category_name'],
+                    'WORK_DESCRIPTION' => $submit['name'],
+                    'WORK_COUNT'       => $submit['count'],
+                    'WORK_BOX_ID'      => $submit['id'],
+                    'ROW_COLOR'        => ++$j%2 ? 'dark' : ''
+                );
 
-            $this->setVar($output);
+                $this->setVar($output);
 
-            if($submit['availability'] == 'assess') {
-                $this->parse('assess_block', 'assess', false);
-                $this->setVar('submission_block', '');
-            } else {
-                $this->parse('submission_block', 'submission', false);
-                $this->setVar('assess_block', '');
+                if($submit['availability'] == 'assess') {
+                    $this->parse('assess_block', 'assess', false);
+                    $this->setVar('submission_block', '');
+                } else {
+                    $this->parse('submission_block', 'submission', false);
+                    $this->setVar('assess_block', '');
 
+                }
+
+                $this->parse('work_block', 'work', true);
+
+                $count++;
             }
-
-            $this->parse('work_block', 'work', true);
-
-            $count++;
         }
-
 
 
         return true;

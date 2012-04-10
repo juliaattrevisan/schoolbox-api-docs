@@ -16,14 +16,16 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
         $groupHandler = new Group();
         $userAccess = $groupHandler->getAllUserAccess($_SESSION['id']);
 
-        $categoryIDs = array();
+        if(is_array($userAccess) ){
+            $categoryIDs = array();
 
-        foreach($userAccess as $ua)
-            $categoryIDs[] = $ua['sid'];
+            foreach($userAccess as $ua)
+                $categoryIDs[] = $ua['sid'];
 
-        $this->feedList = $feedHandler->getFeed($categoryIDs, $this->limit);
+            $this->feedList = $feedHandler->getFeed($categoryIDs, $this->limit);
 
-        return true;
+            return true;
+        }
     }
 
     public function renderTemplate ($templateHandle) {
