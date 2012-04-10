@@ -1,5 +1,4 @@
 <?php
-require_once SITE_root . '/library/bulk.php';
 require_once SITE_root . '/library/group.php';
 
 $groupHandler = new Group();
@@ -12,12 +11,11 @@ $this->setTitle('Admin - Bulk Remove Users');
 $this->setFile(TEMPLATE_content, 'adminv2/bulkRemove.html');
 $this->setBlock(TEMPLATE_content, 'user', 'user_block');
 
-$bulkHandler = new Bulk();
-
 /* Two types of upload.. either single user.. or via csv file..
  */
 if (isset($_FILES['bulkremove']['tmp_name']) && $_FILES['bulkremove']['tmp_name']) {
-	$allUsers = $bulkHandler->removeUsers($_FILES['bulkremove']['tmp_name']);
+	$bulkHandler = new Bulk_User($_FILES['bulkremove']['tmp_name']);
+	$allUsers = $bulkHandler->removeUsers();
 
 	if ($allUsers && count($allUsers)) {
 		foreach ($allUsers as $currentUser) {
@@ -37,4 +35,3 @@ if (isset($_FILES['bulkremove']['tmp_name']) && $_FILES['bulkremove']['tmp_name'
 else {
 	error(2);
 }
-?>

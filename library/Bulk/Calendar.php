@@ -7,17 +7,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Bulk_Calendar {
-	private $file = null;
-
-	/**
-	 * Constructor
-	 *
-	 * @param $file
-	 */
-	public function __construct($file) {
-		$this->setFile($file);
-	}
+class Bulk_Calendar extends Bulk_Abstract {
 
 	/**
 	 * Wrapper for uploading a calendar file which could be in either format
@@ -176,26 +166,5 @@ class Bulk_Calendar {
 		}
 
 		return array();
-	}
-
-	/* Getters/Setters
-	 */
-
-	/**
-	 * Set file
-	 *
-	 * @param $file
-	 */
-	private function setFile($file) {
-		$this->file = $file;
-	}
-
-	/**
-	 * Get file
-	 *
-	 * @return null
-	 */
-	private function getFile() {
-		return $this->file;
 	}
 }

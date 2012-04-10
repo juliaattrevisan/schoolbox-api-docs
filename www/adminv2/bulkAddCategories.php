@@ -1,5 +1,4 @@
 <?php
-require_once SITE_root . '/library/bulk.php';
 require_once SITE_root . '/library/group.php';
 
 $groupHandler = new Group();
@@ -12,12 +11,11 @@ $this->setTitle('Admin - Bulk Add Categories');
 $this->setFile(TEMPLATE_content, 'adminv2/bulkAddCategories.html');
 $this->setBlock(TEMPLATE_content, 'category', 'category_block');
 
-$bulkHandler = new Bulk();
-
 /* Two types of upload.. either single user.. or via csv file..
  */
 if (isset($_FILES['bulkadd']['tmp_name']) && $_FILES['bulkadd']['tmp_name']) {
-	$allCategories = $bulkHandler->addCategories($_FILES['bulkadd']['tmp_name'], Scrub::text($_POST['template']));
+	$bulkHandler = new Bulk_Category($_FILES['bulkadd']['tmp_name'], Scrub::text($_POST['template']));
+	$allCategories = $bulkHandler->addCategories();
 
 	if ($allCategories && count($allCategories)) {
 		foreach ($allCategories as $currentCategory) {
@@ -37,4 +35,3 @@ if (isset($_FILES['bulkadd']['tmp_name']) && $_FILES['bulkadd']['tmp_name']) {
 else {
 	error(2);
 }
-?>
