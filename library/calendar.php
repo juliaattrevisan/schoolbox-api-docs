@@ -157,6 +157,42 @@ class Calendar extends DeprecatedModel {
 		return $output;
 	}
 
+	/**
+	 * Used on the Calendar screens to filter events
+	 *
+	 * @param $userId
+	 *
+	 * @return array
+	 */
+	public function getFilterCampusList($userId) {
+		$query = "
+			SELECT id, name
+			FROM luCampus
+		";
+
+		if (!$_SESSION['su']) {
+			$query .= "
+				LEFT JOIN userCampus ON userCampus.campus = luCampus.id
+				WHERE userCampus.uid = '$userId'
+			";
+		}
+
+		$allCampuses = $this->db->getAll($query);
+
+		if (is_array($allCampuses) && count($allCampuses)) {
+			foreach($allCampuses as $currentCampus) {
+				$output[] = array(
+					'CAMPUS_ID' => $currentCampus['id'],
+					'CAMPUS_NAME' => $currentCampus['name'],
+				);
+			}
+		}
+		else {
+			$output = array();
+		}
+
+		return $output;
+	}
 
 
 	function getGroupList() {
