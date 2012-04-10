@@ -22,6 +22,10 @@ if (is_numeric($_GET['keyword']) || ($_GET['keyword'] && strlen($_GET['keyword']
 	$keyword = $_GET['keyword'];
 	$type = $_GET['type'];
 	$current_page = empty($_GET['page']) ? 1 : $_GET['page'];
+
+	$page->setVar(array(
+		'UNESCAPED_KEYWORD' => $_GET['keyword']
+	));
 }
 else {
 	error(45);
