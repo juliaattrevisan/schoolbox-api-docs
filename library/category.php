@@ -647,7 +647,7 @@ class Category extends DeprecatedModel {
 	 * @param string $sort_dir
 	 * @return array|bool
 	 */
-	public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
+	public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'id', $sort_dir = 'desc') {
 		$keyword = mysql_real_escape_string($keyword);
 
 		$query = "SELECT `category`.*,

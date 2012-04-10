@@ -74,14 +74,7 @@ if (empty($type) || $type == 'all') {
         $type_class = ucfirst($type_handle);
         $type_handle = new $type_class;
 
-		/* Particular ordering and sorting for Categories
-		 */
-		if (in_array($type_class, array('Category'))) {
-			$result[$type_name] = $type_handle->search($keyword, 0, Cfg::get('search_all_limit'), $count[$type_name], 'id', 'desc');
-		}
-		else {
-        	$result[$type_name] = $type_handle->search($keyword, 0, Cfg::get('search_all_limit'), $count[$type_name]);
-		}
+        $result[$type_name] = $type_handle->search($keyword, 0, Cfg::get('search_all_limit'), $count[$type_name]);
     }
 
     $count['all'] = array_sum($count);
