@@ -113,15 +113,15 @@
 					<td width="250">
 						<h2>URL</h2>
 
-						<em>Start typing in a homepage name and then select
-						from the list that drops down. </em>
+						<em>Either enter in a URL or use the browse button to link to folders created in the resource system</em>
 					</td>
 					<td>
-                       <p class="clearfix"> <a href="#" class="btn float-left open-modal"><span></span>Find a URL</a></p>
+
 						<label>
 
 							<input type="text" name="url" id="url" size="40" class="required" maxlength="250" value="{URL}" />
 						</label>
+                        <p class="clearfix"> <a href="#" class="btn float-left open-modal"><span></span>Browse Resources</a></p>
 
                         <div id="resource-browser" class="hide"></div>
 
@@ -129,12 +129,12 @@
 				</tr>
                 <tr>
                     <td width="250">
-                        <h2>Target</h2>
-                        <em>Select whether you would like this link to open in a new window</em>
+                        <h2>Windows</h2>
+                        <em>Generally links to offsite resources would be set to a new window, while local resources would stay in the existing window.</em>
                     </td>
                     <td>
                         <select name="target">
-                            <option value="">No Target</option>
+                            <option value="">Same Window</option>
                             <option value="_blank" {BLANK_SELECTED}>New Window</option>
                         </select>
                     </td>
