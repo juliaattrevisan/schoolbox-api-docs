@@ -70,7 +70,14 @@ if (empty($type) || $type == 'all') {
         $type_class = ucfirst($type_handle);
         $type_handle = new $type_class;
 
-        $result[$type_name] = $type_handle->search($keyword, 0, Cfg::get('search_all_limit'), $count[$type_name]);
+		/* Particular ordering and sorting for Categories
+		 */
+		if (in_array($type_class, array('Category'))) {
+			$result[$type_name] = $type_handle->search($keyword, 0, Cfg::get('search_all_limit'), $count[$type_name], 'id', 'desc');
+		}
+		else {
+        	$result[$type_name] = $type_handle->search($keyword, 0, Cfg::get('search_all_limit'), $count[$type_name]);
+		}
     }
 
     $count['all'] = array_sum($count);
@@ -112,8 +119,15 @@ elseif (!empty($handle[$type])) {
     $type_class = ucfirst($handle[$type]);
     $handle[$type] = new $type_class;
 
-    // perform search for individual category (without formatting for ajax call)
-    $result[$type] = $handle[$type]->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
+	/* Particular ordering and sorting for Categories
+	 */
+	if (in_array($type_class, array('Category'))) {
+		$result[$type] = $handle[$type]->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type], 'id', 'desc');
+	}
+	else {
+		// perform search for individual category (without formatting for ajax call)
+		$result[$type] = $handle[$type]->search($keyword, ($current_page - 1) * Cfg::get('search_type_limit'), Cfg::get('search_type_limit'), $count[$type]);
+	}
 }
 
 
