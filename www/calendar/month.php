@@ -63,7 +63,6 @@ $dayOfWeek = date("w", mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYe
 $startOfWeek = mktime(0, 0, 0, $selectedMonth, ($selectedDay - $dayOfWeek), $selectedYear);
 $endOfWeek = strtotime("+6 days", $startOfWeek);
 
-
 $this->setVar('MONTH', date("F", mktime(0, 0, 0, $selectedMonth, 1, $selectedYear)));
 
 $output = array('YEAR' => date("Y", $startOfWeek),
@@ -80,27 +79,33 @@ for ($i = 0; $i < $totalDays; $i++) {
 
     $day = $i % 7;
 
-    if ($i >= $firstDay && $i < $numDaysinMonth + $firstDay)
-        $this->setVar('OTHER_MONTH', '');
-    else
-        $this->setVar('OTHER_MONTH', ' otherMonth');
+	if ($i >= $firstDay && $i < $numDaysinMonth + $firstDay) {
+		$this->setVar('OTHER_MONTH', '');
+	}
+	else {
+		$this->setVar('OTHER_MONTH', ' otherMonth');
+	}
 
-    $output = array('DATE' => date("jS", $currentDay),
-        'ADD' => '/calendar/modify.php?date=' . date("d-m-Y", $currentDay) . '&returnTo=month',
-        'ON_OFF' => !($day % 2) ? 'dark' : '',
-    );
+	$output = array(
+		'DATE' => date("jS", $currentDay),
+		'ADD' => '/calendar/modify.php?date=' . date("d-m-Y", $currentDay) . '&returnTo=month',
+		'ON_OFF' => !($day % 2) ? 'dark' : '',
+	);
 
-    if (date("d-m-Y", $selectedDate) == date("d-m-Y", $currentDay))
+    if (date("d-m-Y", $selectedDate) == date("d-m-Y", $currentDay)) {
         $this->setVar("MONTABLE_CSS", "calTableSelected");
-    else if (date("d-m-Y", $currentDay) == date("d-m-Y"))
+	}
+    else if (date("d-m-Y", $currentDay) == date("d-m-Y")) {
         $this->setVar("MONTABLE_CSS", "calTableCurrent");
-    else
+	}
+    else {
         $this->setVar("MONTABLE_CSS", "calTable");
+	}
 
     $this->setVar($output);
 
-
     $submissionList = $calendarHandler->getSubmissionEvents($currentDay);
+
     if (is_array($submissionList)) {
         foreach ($submissionList as $submission) {
 
@@ -113,17 +118,21 @@ for ($i = 0; $i < $totalDays; $i++) {
 
                 if (!$submission['accept_submission']) {
                     $action = 'View Details';
-                } elseif ($student_submission['status'] == 1 && $current_time > $student_submission['open_date'] && $current_time < $student_submission['late_date']) {
+                }
+				else if ($student_submission['status'] == 1 && $current_time > $student_submission['open_date'] && $current_time < $student_submission['late_date']) {
                     $action = 'Submit Work';
-                } else {
+                }
+				else {
                     $action = 'View Details';
                 }
 
                 $this->setVar('MODIFY', '<a class="btn go-to float-left" href="/submission/submissionHistory/' . $submission['id'] . '"><span></span>' . $action . '</a>');
 
-            } elseif ($groupHandler->isStaff($_SESSION['id'])) {
+            }
+			else if ($groupHandler->isStaff($_SESSION['id'])) {
                 $this->setVar('MODIFY', '<a class="btn go-to float-left" href="/submission/viewSubmission/' . $submission['id'] . '"><span></span>View Submissions</a>');
-            } else {
+            }
+			else {
                 $this->setVar('MODIFY', '');
             }
 
@@ -145,15 +154,16 @@ for ($i = 0; $i < $totalDays; $i++) {
             $this->setVar($output);
             $this->parse('time_block', 'time');
             $this->parse("note_listing", "note_block", true);
+
             $subout = 1;
         }
     }
 
     if (Cfg::get('site_location') == 'mgs' && Cfg::get('external_enable') && $groupHandler->isStaff($_SESSION['id'])) {
         $birthdayList = $calendarHandler->getStudentBirthdays($currentDay);
+
         if (is_array($birthdayList) && in_array(3, $_SESSION['campus'])) {
             foreach ($birthdayList as $birthday) {
-
                 $output = array('TIME' => '',
                     'NOTE' => 'Student Birthday - ' . $birthday['name'] . ' in ' . $birthday['form'] . ' turns ' . $birthday['age'],
                     'LOCATION' => '',
@@ -163,6 +173,7 @@ for ($i = 0; $i < $totalDays; $i++) {
                     'TYPE' => 'Birthday',
                     'AUTHOR' => '',
                 );
+
                 $this->setVar($output);
                 $this->setVar('time_block', '');
                 $this->parse("note_listing", "note_block", true);
@@ -173,10 +184,37 @@ for ($i = 0; $i < $totalDays; $i++) {
     }
 
     $eventList = $calendarHandler->getDayEvents($currentDay);
+
     if (is_array($eventList)) {
         $userHandler = new User();
 
         foreach ($eventList as $event) {
+			$this->setVar(array(
+				'attendance_icon_block' => '',
+				'attendance_status_block' => '',
+				'attendance_request_button_block' => '',
+				'attendance_list_button_block' => '',
+			));
+
+			/* If the Publish Date hasn't been reached yet, only show the events to Superusers
+			 * in a different way so they can still edit/click them. Otherwie, they don't appear
+			 * at all for everyone else
+			 */
+			$publishDate = new Alaress_Date_Format($event['publish_date'], 'y-m-d h:i:s');
+
+			/* Publish date in the future
+			 */
+			if ($publishDate->getUnixTimestamp() >= time()) {
+				if ($groupHandler->isSuperuser()) {
+					$cssClass = 'translucent';
+				}
+				else {
+					continue;
+				}
+			}
+			else {
+				$cssClass = '';
+			}
 
             $output = array(
                 'EVENT_ID' => $event['id'],
@@ -193,6 +231,7 @@ for ($i = 0; $i < $totalDays; $i++) {
                 'TYPE' => $event['eventType'],
                 'AUTHOR' => $userHandler->formatName($event),
                 'AUTHOR_ID' => $event['owner'],
+				'EVENT_VISIBLE' => $cssClass,
             );
 
             if ($event['access'] == 3) {
@@ -201,28 +240,27 @@ for ($i = 0; $i < $totalDays; $i++) {
                         $output['EVENT_LEVEL'] .= ' campus' . $campus;
                     }
                 }
-                else
+                else {
                     $output['EVENT_LEVEL'] .= ' campus' . $event['campusList'];
+				}
             }
-            else if ($event['access'] == 2)
+            else if ($event['access'] == 2) {
                 $output['EVENT_LEVEL'] = 'group' . $event['sid'];
-            else
+			}
+            else {
                 $output['EVENT_LEVEL'] = 'personal';
-
+			}
 
             $this->setVar($output);
-            if ($output['TIME'])
-                $this->parse('time_block', 'time');
-            else
-                $this->setVar('time_block', '');
 
-            /* Attendance */
-            $this->setVar(array(
-                'attendance_icon_block' => '',
-                'attendance_status_block' => '',
-                'attendance_request_button_block' => '',
-                'attendance_list_button_block' => '',
-            ));
+			if ($output['TIME']) {
+				$this->parse('time_block', 'time');
+			}
+			else {
+				$this->setVar('time_block', '');
+			}
+
+			/* Attendance */
 
             if ($event['attendance']) {
                 $this->parse('attendance_icon_block', 'attendance_icon');
@@ -233,10 +271,10 @@ for ($i = 0; $i < $totalDays; $i++) {
                         if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
                             $this->setVar('ATTENDANCE_STATUS', 'Pending');
                         }
-                        elseif ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
+                        else if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
                             $this->setVar('ATTENDANCE_STATUS', 'Approved');
                         }
-                        elseif ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
+                        else if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
                             $this->setVar('ATTENDANCE_STATUS', 'Rejected');
                         }
 
@@ -250,7 +288,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 
                     $this->parse('attendance_request_button_block', 'attendance_request_button');
                 }
-                elseif ($groupHandler->isStaff($_SESSION['id'])) {
+                else if ($groupHandler->isStaff($_SESSION['id'])) {
                     $this->parse('attendance_list_button_block', 'attendance_list_button');
                 }
             }
@@ -271,9 +309,10 @@ for ($i = 0; $i < $totalDays; $i++) {
 
             $this->parse("note_listing", "note_block", true);
         }
-
-    } else
-        if (!$subout) $this->setVar("note_listing", "");
+    }
+	else if (!$subout) {
+		$this->setVar("note_listing", "");
+	}
 
     $this->parse('day_listing', 'day_block', true);
     $this->setVar('note_listing', '');
@@ -283,7 +322,3 @@ for ($i = 0; $i < $totalDays; $i++) {
         $this->setVar('day_listing', '');
     }
 }
-
-
-
-?>

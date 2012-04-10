@@ -43,7 +43,9 @@
             $j('#campusList, #groupList, #attendance').show()
         }
 
-        $j('#cal_date, #repeat_until').datepicker({
+		/* Datepickers for event date, repeat until and publish date
+		 */
+        $j('#cal_date, #repeat_until, #publishDate').datepicker({
             dateFormat:'dd/mm/yy',
             showOn:'both',
             buttonImage:'/images/core/calendar/calendar-click.png',
@@ -108,6 +110,12 @@
             </td>
             <td><input name="date" id="cal_date" type="text" size="15" maxlength="30" value="{DATE}"/></td>
         </tr>
+		<tr>
+      <td class="formLabelWidth" valign="top"><h4>Publish Date</h4>
+          <em>Events won't be visible before this date.</em>
+      </td>
+      <td><input name="publishDate" id="publishDate" type="text" size="15" maxlength="30" value="{PUBLISH_DATE}"/></td>
+  </tr>
         <!-- BEGIN recurring_dates -->
         <tr>
             <td class="formLabelWidth" valign="top"><h4>Repeat</h4>

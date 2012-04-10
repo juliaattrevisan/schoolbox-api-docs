@@ -172,14 +172,24 @@ class Calendar extends DeprecatedModel {
 		return $output;
 	}
 
-	function getByID($eventID) {
-		$query = "SELECT e.id, e.owner, e.access, e.sid, e.type, e.note, e.date, e.location, e.attendance, e.detail,
-						DATE_FORMAT(e.startTime, '" . Cfg::get('calendar_time_format') . "') startTime,
-						DATE_FORMAT(e.endTime, '" . Cfg::get('calendar_time_format') . "') endTime,
-						u.title, u.firstname, u.lastname
-				  FROM {$this->_table} e
-				  LEFT JOIN user u ON u.id = e.owner
-				  WHERE e.{$this->_index} = $eventID";
+	/**
+	 * Get an event by its id
+	 *
+	 * @param $eventID
+	 * @return array|bool
+	 */
+	public function getByID($eventID) {
+		$query = "
+			SELECT
+				e.id, e.owner, e.access, e.sid, e.type, e.note, e.date, e.location, e.attendance, e.detail, e.publish_date,
+				DATE_FORMAT(e.startTime, '" . Cfg::get('calendar_time_format') . "') startTime,
+				DATE_FORMAT(e.endTime, '" . Cfg::get('calendar_time_format') . "') endTime,
+				u.title, u.firstname, u.lastname
+			FROM {$this->_table} e
+			LEFT JOIN user u ON u.id = e.owner
+			WHERE e.{$this->_index} = $eventID
+		";
+
 		return $this->db->getRow($query);
 	}
 
@@ -376,25 +386,30 @@ class Calendar extends DeprecatedModel {
         return $events;
     }
 
-	function getDayEvents($currentDay) {
-		// return all events occuring on the date specified
-
-		if(is_array($_SESSION['campus'])) {
+	/**
+	 * Get all events occurring on the specified date
+	 *
+	 * @param $currentDay
+	 * @return array|bool
+	 */
+	public function getDayEvents($currentDay) {
+		if (is_array($_SESSION['campus'])) {
 			$campusList = $_SESSION['campus'];
-
-                        $campusQuery = "eventCampus.campusID IN(" . implode(',', $campusList) . ")";
-                }
+			$campusQuery = "eventCampus.campusID IN(" . implode(',', $campusList) . ")";
+		}
 		else {
 			$campusList = array(1);
+			$campusQuery = '1 = 1';
+		}
 
-                        $campusQuery = '1 = 1';
-                }
-
-		// get accessible groups
+		/* get accessible groups
+		 */
 		$groupList = array();
 		$groupQuery = '';
+
 		$this->groupHandler->setService(HOMEPAGE_SERVICE);
 		$tempList = $this->groupHandler->involvedInCategoryList($_SESSION['id']);
+
 		if (is_array($tempList)) {
 			foreach ($tempList as $temp) {
 				$groupList[] = $temp['id'];
@@ -406,44 +421,49 @@ class Calendar extends DeprecatedModel {
 				$groupQuery = "OR (access = '2' AND sid IN (".implode(',', $groupList)."))";
 			}
 		}
+
 		$this->groupHandler->setService(CALENDAR_SERVICE);
 
-		//give people with userAccess to moderate Calendar Access to view all Camups Posts
-		if(is_array($_SESSION['campus'])) {
-			if($this->groupHandler->getPermission($_SESSION['campus'][0]) > WRITE_ACCESS)
+		/* Give people with userAccess to moderate Calendar Access to view all Camups Posts
+		 */
+		if (is_array($_SESSION['campus'])) {
+			if ($this->groupHandler->getPermission($_SESSION['campus'][0]) > WRITE_ACCESS) {
 				$groupChunk = "";
+			}
 			else {
 				$groupChunk = "AND eventGroup.groupID = {$_SESSION['gid']}";
 			}
 		}
 
 		//get single events for the day
-		$query = "SELECT DISTINCT event.id, owner,
-                            GROUP_CONCAT(DISTINCT eventCampus.campusID) as campusList,
-							TIME_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') as startTime,
-							TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTime,
-                            TIME_TO_SEC(startTime) as startTimestamp,
-                            TIME_TO_SEC(endTime) as endTimestamp,
-							type, note, access, sid, location, detail, attendance,
-                            user.id as uid, title, firstname, lastname,
-                            eventType, eventColour,
-                            category.id AS categoryId, category.name AS categoryName
-						FROM event
-                        LEFT JOIN user ON owner = user.id
-                        LEFT JOIN luEventType ON type = eventTypeID
-						LEFT JOIN eventCampus ON event.id = eventCampus.eventID
-						LEFT JOIN eventGroup ON event.id = eventGroup.eventID
-						LEFT JOIN category ON event.sid = category.id AND event.sid IS NOT NULL
-						WHERE date = '" . date("Y-m-d", $currentDay) . "'
-							AND (    (access = '1' AND owner = '".$_SESSION['id']."')
-								  $groupQuery
-								  OR (access = '3' AND $campusQuery $groupChunk OR owner = '".$_SESSION['id']."')
-								)
-						GROUP BY id
-						ORDER BY event.startTime, event.endTime";
+		$query = "
+			SELECT DISTINCT event.id, owner,
+				GROUP_CONCAT(DISTINCT eventCampus.campusID) as campusList,
+				TIME_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') as startTime,
+				TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTime,
+				TIME_TO_SEC(startTime) as startTimestamp,
+				TIME_TO_SEC(endTime) as endTimestamp,
+				type, note, access, sid, location, detail, attendance,
+				user.id as uid, title, firstname, lastname,
+				eventType, eventColour,
+				event.publish_date,
+				category.id AS categoryId, category.name AS categoryName
+			FROM event
+			LEFT JOIN user ON owner = user.id
+			LEFT JOIN luEventType ON type = eventTypeID
+			LEFT JOIN eventCampus ON event.id = eventCampus.eventID
+			LEFT JOIN eventGroup ON event.id = eventGroup.eventID
+			LEFT JOIN category ON event.sid = category.id AND event.sid IS NOT NULL
+			WHERE date = '" . date("Y-m-d", $currentDay) . "'
+				AND (    (access = '1' AND owner = '".$_SESSION['id']."')
+					  $groupQuery
+					  OR (access = '3' AND $campusQuery $groupChunk OR owner = '".$_SESSION['id']."')
+					)
+			GROUP BY id
+			ORDER BY event.startTime, event.endTime
+		";
 
 		return $this->db->getAll($query);
-
 	}
 
 	function getDayByGroup($currentDay, $groupList, $campusList) {

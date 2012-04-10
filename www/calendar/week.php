@@ -180,10 +180,38 @@ for ($i = 0; $i < 7; $i++) {
     $eventList = $calendarHandler->getDayEvents($currentDay);
 
     if (is_array($eventList)) {
+		$userHandler = new User();
+
         foreach ($eventList as $event) {
+			$this->setVar(array(
+				'attendance_icon_block' => '',
+				'attendance_status_block' => '',
+				'attendance_request_button_block' => '',
+				'attendance_list_button_block' => '',
+			));
 
-            $userHandler = new User();
+			/* If the Publish Date hasn't been reached yet, only show the events to Superusers
+			 * in a different way so they can still edit/click them. Otherwie, they don't appear
+			 * at all for everyone else
+			 */
+			$publishDate = new Alaress_Date_Format($event['publish_date'], 'y-m-d h:i:s');
 
+			/* Publish date in the future
+			 */
+			if ($publishDate->getUnixTimestamp() >= time()) {
+				if ($groupHandler->isSuperuser()) {
+					$cssClass = 'translucent';
+				}
+				else {
+					continue;
+				}
+			}
+			else {
+				$cssClass = '';
+			}
+
+			/* Render event
+			 */
             $output = array(
                 'EVENT_ID' => $event['id'],
                 'TIME' => rtrim(
@@ -199,6 +227,7 @@ for ($i = 0; $i < 7; $i++) {
                 'TYPE' => $event['eventType'],
                 'AUTHOR' => $userHandler->formatName($event),
                 'AUTHOR_ID' => $event['owner'],
+				'EVENT_VISIBLE' => $cssClass,
             );
 
             if ($event['access'] == 3) {
@@ -207,28 +236,28 @@ for ($i = 0; $i < 7; $i++) {
                         $output['EVENT_LEVEL'] .= ' campus' . $campus;
                     }
                 }
-                else
-                    $output['EVENT_LEVEL'] .= ' campus' . $event['campusList'];
+				else {
+					$output['EVENT_LEVEL'] .= ' campus' . $event['campusList'];
+				}
 
-            }
-            else if ($event['access'] == 2)
-                $output['EVENT_LEVEL'] = 'group' . $event['sid'];
-            else
-                $output['EVENT_LEVEL'] = 'personal';
+			}
+			else if ($event['access'] == 2) {
+				$output['EVENT_LEVEL'] = 'group' . $event['sid'];
+			}
+			else {
+				$output['EVENT_LEVEL'] = 'personal';
+			}
 
-            $this->setVar($output);
-            if ($output['TIME'])
-                $this->parse('time_block', 'time');
-            else
-                $this->setVar('time_block', '');
+			$this->setVar($output);
 
-            /* Attendance */
-            $this->setVar(array(
-                'attendance_icon_block' => '',
-                'attendance_status_block' => '',
-                'attendance_request_button_block' => '',
-                'attendance_list_button_block' => '',
-            ));
+			if ($output['TIME']) {
+				$this->parse('time_block', 'time');
+			}
+			else {
+				$this->setVar('time_block', '');
+			}
+
+			/* Attendance */
 
             if ($event['attendance']) {
                 $this->parse('attendance_icon_block', 'attendance_icon');
@@ -239,10 +268,10 @@ for ($i = 0; $i < 7; $i++) {
                         if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
                             $this->setVar('ATTENDANCE_STATUS', 'Pending');
                         }
-                        elseif ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
+                        else if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
                             $this->setVar('ATTENDANCE_STATUS', 'Approved');
                         }
-                        elseif ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
+                        else if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
                             $this->setVar('ATTENDANCE_STATUS', 'Rejected');
                         }
 
@@ -256,7 +285,7 @@ for ($i = 0; $i < 7; $i++) {
 
                     $this->parse('attendance_request_button_block', 'attendance_request_button');
                 }
-                elseif ($groupHandler->isStaff($_SESSION['id'])) {
+                else if ($groupHandler->isStaff($_SESSION['id'])) {
                     $this->parse('attendance_list_button_block', 'attendance_list_button');
                 }
             }
@@ -277,12 +306,11 @@ for ($i = 0; $i < 7; $i++) {
 
             $this->parse("note_listing", "note_block", true);
         }
-
-    } else
-        if (!$subout) $this->setVar("note_listing", "");
+    }
+	else if (!$subout) {
+		$this->setVar("note_listing", "");
+	}
 
     $this->parse("day_listing", "day_block", true);
     $this->setVar("note_listing", "");
 }
-
-?>

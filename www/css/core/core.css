@@ -6291,3 +6291,9 @@ ul.tree .collapsable .hitarea {
 .compact-mode {
 	display: none;
 }
+
+/* Calendar translucency
+ */
+.translucent {
+
+}
