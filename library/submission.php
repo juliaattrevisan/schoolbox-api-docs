@@ -223,6 +223,7 @@ class Submission extends DeprecatedModel {
 
 		$query .= "
 			c.name AS categoryName,
+			c.id as cid,
 			b.name, b.description, b.accept_submission,
 			b.open_date, b.date, b.late_date, b.created, s.submitted, r.returned,
 			r.comment,
@@ -481,6 +482,7 @@ class Submission extends DeprecatedModel {
                         SELECT  sb.id,
                             sb.name,
                             c.name AS category_name,
+                            c.id as cid,
                             DATE_FORMAT(sb.date, '%a, %D %b %l:%i%p') AS `date`,
                             DATE_FORMAT(submitted, '%Y-%m-%d %H:%i') AS datestamp,
                             '' AS availability
@@ -501,6 +503,7 @@ class Submission extends DeprecatedModel {
                         SELECT	a.assess_id AS id,
                             title AS `name`,
                             c.name AS category_name,
+                            c.id as cid,
                             DATE_FORMAT(a.finish, '%a, %D %b %l:%i%p') AS `date`,
                             DATE_FORMAT(aa.finish, '%Y-%m-%d %H:%i') AS datestamp,
                             a.availability

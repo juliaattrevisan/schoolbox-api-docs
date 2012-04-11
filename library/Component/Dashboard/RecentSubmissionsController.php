@@ -57,8 +57,9 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
 
                 $output = array(
                     'WORK_DATE'        => $date->getRelativeTime(),
-                    'WORK_SUBJECT'     => $submit['category_name'],
-                    'WORK_DESCRIPTION' => $submit['name'],
+                    'WORK_SUBJECT'     => scrub::Text($submit['category_name']),
+                    'WORK_SUBJECT_ID'  => $submit['cid'],
+                    'WORK_DESCRIPTION' => scrub::Text($submit['name']),
                     'WORK_COUNT'       => $submit['count'],
                     'WORK_BOX_ID'      => $submit['id'],
                     'ROW_COLOR'        => ++$j%2 ? 'dark' : ''
