@@ -250,6 +250,7 @@ class Submission extends DeprecatedModel {
 		}
 		else if ($type == RETURNED_WORK_TYPE) {
 			$query .= " AND r.returned IS NOT NULL
+			            GROUP BY rid
 						ORDER BY $orderBy DESC";
 		}
 
