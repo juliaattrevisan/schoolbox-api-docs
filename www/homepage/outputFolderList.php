@@ -14,6 +14,8 @@ if(strpos($config['import-folders'], '/homepage/') === 0) {
 
 $folderList = $categoryHandler->getCategoryList($catID, $config);
 
+$this->setVar('folders_block', '');
+
 if (is_array($folderList)) {
 	$flag = 0;
 	foreach ($folderList as $folder) {

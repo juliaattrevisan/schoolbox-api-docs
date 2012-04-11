@@ -42,6 +42,8 @@ if(strpos($config['import-files'], '/homepage/') === 0) {
 
 $fileList = $fileHandler->getAllInCategory($catID, $config);
 
+$this->setVar('files_block', '');
+
 if (is_array($fileList)) {
 	foreach ($fileList as $file) {
 		$date = new Alaress_Date_Format($file['submitted'], 'U');
@@ -84,6 +86,8 @@ if (is_array($fileList)) {
 	}
 } else
 	$this->setVar('files_block', '');
+
+
 
 if($catID == $categoryID) {
     $src = array('name' => 'Local');

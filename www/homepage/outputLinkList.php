@@ -47,6 +47,8 @@ else {
 	));
 }
 
+$this->setVar('link_block', '');
+
 if (is_array($linkList)) {
 	$userHandler = new User();
 
