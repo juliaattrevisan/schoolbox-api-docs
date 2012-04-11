@@ -32,6 +32,13 @@ if (is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, 'indiv_modify', 'indiv_modify_block');
 	$this->setBlock(TEMPLATE_content, 'reset_content', 'reset_content_block');
 	$this->setBlock(TEMPLATE_content, 'synergy_input', 'synergy_input_block');
+	$this->setBlock(TEMPLATE_content, 'recursive', 'recursive_block');
+
+    if($groupHandler->isSuperuser()) {
+        $this->parse('recursive_block', 'recursive');
+    } else {
+        $this->setVar('recursive_block', '');
+    }
 
 	$this->setTitle('Modify Category');
 	$this->setTab('resources');
@@ -135,6 +142,10 @@ else {
 		$this->setBlock(TEMPLATE_content, 'indiv_modify', 'indiv_modify_block');
 		$this->setBlock(TEMPLATE_content, 'reset_content', 'reset_content_block');
 		$this->setBlock(TEMPLATE_content, 'synergy_input', 'synergy_input_block');
+        $this->setBlock(TEMPLATE_content, 'recursive', 'recursive_block');
+
+        // don't add recursion option for a new folder, it's empty, makes no sense
+        $this->setVar('recursive_block', '');
 
 		$this->setTitle('Add Category');
 		$this->setTab('resources');
