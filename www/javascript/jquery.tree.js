@@ -209,7 +209,7 @@
 				
 				/* ajax move */
 				$.post(options.categoryAjax, {move: node.attr('id').substring(5), categoryID : destination.attr('id').substring(5)}, function (data) {
-					if (data.error) {
+					if (data && data.error) {
 						alert('An error occurred during processing. Please reload your browser and try again.\nError: ' + data.error);
 					} else {
 						
@@ -220,7 +220,7 @@
 								sequence += $(this).attr('id').substring(5) + ',';
 							});
 							$.post('/admin/navigation/modifyForm.php', {reorder : sequence}, function (data) {
-								if (data.error)
+								if (data && data.error)
 									alert('An error occurred while re-ordering. Please reload your browser and try again.\nError: ' + data.error);
 							}, 'json');
 						}
@@ -289,7 +289,7 @@
 				var destParentID = destination[0].className.match(/node-[\d]+/);
 				if (parentID != destinationParent.attr('id')) {
 					$.post('/admin/navigation/modifyForm.php', {move: node.attr('id').substring(5), parentID : destParentID.toString().substring(5)}, function (data) {
-						if (data.error) {
+						if (data && data.error) {
 							alert('An error occurred during processing. Please reload your browser and try again.\nError: ' + data.error);
 						} else {
 							
@@ -299,7 +299,7 @@
 								sequence += $(this).attr('id').substring(5) + ',';
 							});
 							$.post('/admin/navigation/modifyForm.php', {reorder : sequence}, function (data) {
-								if (data.error)
+								if (data && data.error)
 									alert('An error occurred while re-ordering. Please reload your browser and try again.\nError: ' + data.error);
 							}, 'json');
 							
@@ -313,7 +313,7 @@
 						sequence += $(this).attr('id').substring(5) + ',';
 					});
 					$.post('/admin/navigation/modifyForm.php', {reorder : sequence}, function (data) {
-						if (data.error)
+						if (data && data.error)
 							alert('An error occurred while re-ordering. Please reload your browser and try again.\nError: ' + data.error);
 					}, 'json');
 					
@@ -503,7 +503,7 @@
 							url = '/cms/linkForm.php';
 							
 						$.post(url, {move: id, categoryID: destination.attr('id').substring(5)}, function (data) {
-							if (data.result != 'success')
+							if (data && data.result != 'success')
 								alert(data.result);
 						}, 'json');
 						
