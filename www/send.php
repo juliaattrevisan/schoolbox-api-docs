@@ -24,7 +24,7 @@ if(is_numeric($_GET['id']))
 			require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
 			$fileHandler = PortfolioWebDAV::factory();
 			$filename = $fileHandler->getFile($_GET['id']);
-			$file['realname'] = substr($_SESSION['WebDAVIDCache'][$_GET['id']], strrpos($_SESSION['WebDAVIDCache'][$_GET['id']], '/') + 1);
+			$file['realname'] = substr($_SESSION['portfolioIdPathMap'][$_GET['id']], strrpos($_SESSION['portfolioIdPathMap'][$_GET['id']], '/') + 1);
 		} else {
 			require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
 
@@ -113,4 +113,3 @@ if(is_numeric($_GET['id']))
 else
 	error(2);
 
-?>
