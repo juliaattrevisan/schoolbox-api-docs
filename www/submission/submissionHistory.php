@@ -38,7 +38,7 @@ if ($groupHandler->isParentOfChild($this->arg[1])) {
 	}
 }
 
-// setup boolean for whether the current user is a parent and ONLY a parent (and therefore can't see downlaod links)
+// setup boolean for whether the current user is a parent and ONLY a parent (and therefore can't see download links)
 $parentOnly = ($groupHandler->isParent() && !$groupHandler->isStaff() && !$groupHandler->isSuperuser());
 
 $user = $userHandler->getByID($userID);
@@ -211,9 +211,14 @@ if($recentSubmission['sid']) {
        'MOST_RECENT_SUBMISSION_FILE_ID' => $recentSubmission['sid'],
    ));
 
-
     // only allow a resubmission if the current user is the owner, if the submission box is accepting submissions, and if the current time is between open and late
-   if($userID == $_SESSION['id'] && mktime() > strtotime($submissionBox['open_date']) && mktime() < strtotime($submissionBox['late_date']) && $submissionBox['accept_submission']) {
+   if(
+       $userID == $_SESSION['id'] &&
+       mktime() > strtotime($submissionBox['open_date']) &&
+       mktime() < strtotime($submissionBox['late_date']) &&
+       $submissionBox['accept_submission'] &&
+       $submissionBox['multi_submission']
+   ) {
        $this->parse('action_resubmit_block', 'action_resubmit');
    } else {
        $this->setVar('action_resubmit_block', '');
