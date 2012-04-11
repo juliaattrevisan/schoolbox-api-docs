@@ -4,15 +4,15 @@ $this->setBlock($componentHandle, 'folders', 'folders_block');
 $this->setBlock('folders', 'homepage_folder', 'homepage_folder_block');
 $this->setBlock('folders', 'modify_folder', 'modify_folder_block');
 
-$i = strpos($config['import-folders'], 'homepage/');
-
 // if config is set to import files, make it so
-if(($i = strpos($config['import-folders'], 'homepage/')) === 0) {
+if(strpos($config['import-folders'], '/homepage/') === 0) {
     // get homepage id
-    $auxCategory = substr($config['import-folders'], 9);
-    $folderList = $categoryHandler->getCategoryList(array($categoryID, $auxCategory), $config);
-} else
-    $folderList = $categoryHandler->getCategoryList($categoryID, $config);
+    $catID = substr($config['import-folders'], 10);
+} else {
+    $catID = $categoryID;
+}
+
+$folderList = $categoryHandler->getCategoryList($catID, $config);
 
 if (is_array($folderList)) {
 	$flag = 0;
@@ -43,9 +43,18 @@ if (is_array($folderList)) {
 
 /* Set up component name
  */
+if($catID == $categoryID) {
+    $src = array('name' => 'Local');
+} else {
+    $catHandler = new Category();
+    $src = $catHandler->getByID($catID);
+}
+
 $this->setvar(array(
-	'COMPONENT_NAME' => strlen(trim($config['componentname'])) ? $config['componentname'] : 'Folders',
-    'COMPONENT_CONFIG_IMPORT_FOLDERS' => $config['import-folders'],
+	'COMPONENT_NAME'            => strlen(trim($config['componentname'])) ? $config['componentname'] : 'Folders',
+    'COMPONENT_CONFIG_SRC_ID'   => $config['import-folders'],
+    'COMPONENT_CONFIG_SRC_NAME' => $src['name'],
+    'COMPONENT_HANDLE'          => strtolower($componentHandle)
 ));
 
 //setup block for submission button

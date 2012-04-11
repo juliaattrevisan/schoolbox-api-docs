@@ -13,8 +13,8 @@
             resizable: false
         });
 
-        $j('#import-files').click(function() {
-            $j('#resource-browser').load('/ajax/resourceBrowser', {destination : '#import-files'}, function() {
+        $j('#launch-browser-{COMPONENT_HANDLE}').click(function() {
+            $j('#resource-browser').load('/ajax/resourceBrowser', {destination : '#import-files-{COMPONENT_HANDLE}'}, function() {
                 $j('#resource-browser').dialog('open');
             });
 
@@ -34,15 +34,14 @@
 			<label for="componentname">Name: </label>
 			<input id="componentname" type="text" name="componentname" value="{COMPONENT_NAME}" />
 
-			Compact Mode:
-			<label for="files{COMPONENT_HOMEPAGE_ID}">
+			<label for="files{COMPONENT_HOMEPAGE_ID}">Compact Mode:
 				<input type="hidden" name="compactMode" value="0" />
 				<input id="files{COMPONENT_HOMEPAGE_ID}" type="checkbox" name="compactMode" value="1" {COMPONENT_CONFIG_COMPACTMODE_SELECTED} />
 			</label>
 
 			<!-- BEGIN filter -->
-			<label for="{COMPONENT_CONFIG_FILTER_VALUE}">
-				<input type="checkbox" name="filter[]" value="{COMPONENT_CONFIG_FILTER_VALUE}" {COMPONENT_CONFIG_FILTER_SELECTED} />
+			<label for="file_{COMPONENT_CONFIG_FILTER_VALUE}">
+				<input id="file_{COMPONENT_CONFIG_FILTER_VALUE}" type="checkbox" name="filter[]" value="{COMPONENT_CONFIG_FILTER_VALUE}" {COMPONENT_CONFIG_FILTER_SELECTED} />
 				{COMPONENT_CONFIG_FILTER_NAME} </label>
 			<!-- END filter -->
 			<label for="sort">Sort: </label>
@@ -56,14 +55,17 @@
 				<option value="{COMPONENT_CONFIG_SORTDIR_VALUE}"{COMPONENT_CONFIG_SORTDIR_SELECTED}>{COMPONENT_CONFIG_SORTDIR_NAME}</option>
 				<!-- END sortdir -->
 			</select>
+
+            <span>Displaying: <a href="{COMPONENT_CONFIG_SRC_ID}">{COMPONENT_CONFIG_SRC_NAME}</a> </span>
+            <input type="button" value="Select Alternate Source" id="launch-browser-{COMPONENT_HANDLE}" />
+            <input type="hidden" value="{COMPONENT_CONFIG_SRC_ID}" name="import-files" id="import-files-{COMPONENT_HANDLE}"/>
+
 			<label for="size">Item Limit: </label>
 			<select name="size">
 				<!-- BEGIN size -->
 				<option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
 				<!-- END size -->
 			</select>
-            <label for="import-files"><br/>Import files from: </label>
-            <input type="text" value="{COMPONENT_CONFIG_IMPORT_FILES}" id="import-files" name="import-files" />
 			<input type="submit" value="Update" class="submit-btn update" />
 		</form>
 	</div>

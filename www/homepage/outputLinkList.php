@@ -7,19 +7,29 @@ $this->setBlock('link', 'show_posted_by', 'show_posted_by_block');
 $linkHandler = new Link();
 
 // if config is set to import links, make it so
-if(($i = strpos($config['import-links'], 'homepage/')) === 0) {
+if(strpos($config['import-links'], '/homepage/') === 0) {
     // get homepage id
-    $auxCategory = substr($config['import-links'], 9);
-    $linkList = $linkHandler->getAllInCategory(array($categoryID, $auxCategory), $config);
+    $catID = substr($config['import-links'], 10);
 } else
-    $linkList = $linkHandler->getAllInCategory($categoryID, $config);
+    $catID = $categoryID;
 
+$linkList = $linkHandler->getAllInCategory($catID, $config);
+
+if($catID == $categoryID) {
+    $src = array('name' => 'Local');
+
+} else {
+    $catHandler = new Category();
+    $src = $catHandler->getByID($catID);
+}
 
 /* Set up component name
  */
 $this->setvar(array(
-	'COMPONENT_NAME' => strlen(trim($config['componentname'])) ? $config['componentname'] : 'Links',
-    'COMPONENT_CONFIG_IMPORT_LINKS' => $config['import-links'],
+	'COMPONENT_NAME'            => strlen(trim($config['componentname'])) ? $config['componentname'] : 'Links',
+    'COMPONENT_CONFIG_SRC_ID'   => $config['import-links'],
+    'COMPONENT_CONFIG_SRC_NAME' => $src['name'],
+    'COMPONENT_HANDLE'          => strtolower($componentHandle)
 ));
 
 /* Tick for checkbox which controls whether to show the Posted By details

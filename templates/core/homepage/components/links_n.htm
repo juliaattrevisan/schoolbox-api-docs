@@ -14,8 +14,8 @@
             resizable: false
         });
 
-        $j('#import-links').click(function() {
-            $j('#resource-browser').load('/ajax/resourceBrowser', {destination : '#import-links'}, function() {
+        $j('#launch-browser-{COMPONENT_HANDLE}').click(function() {
+            $j('#resource-browser').load('/ajax/resourceBrowser', {destination : '#import-links-{COMPONENT_HANDLE}'}, function() {
                 $j('#resource-browser').dialog('open');
             });
 
@@ -35,8 +35,7 @@
 			<label for="componentname">Name: </label>
 			<input id='componentname' name="componentname" type="text" value="{COMPONENT_NAME}" />
 
-			Compact Mode:
-			<label for="links{COMPONENT_HOMEPAGE_ID}">
+			<label for="links{COMPONENT_HOMEPAGE_ID}">Compact Mode:
 				<input type="hidden" name="compactMode" value="0" />
 				<input id="links{COMPONENT_HOMEPAGE_ID}" type="checkbox" name="compactMode" value="1" {COMPONENT_CONFIG_COMPACTMODE_SELECTED} />
 			</label>
@@ -51,15 +50,17 @@
 				<option value="{COMPONENT_CONFIG_SORTDIR_VALUE}"{COMPONENT_CONFIG_SORTDIR_SELECTED}>{COMPONENT_CONFIG_SORTDIR_NAME}</option>
 				<!-- END sortdir -->
 			</select>
-			<label for="size">Item Limit: </label>
+
+            <span>Displaying: <a href="{COMPONENT_CONFIG_SRC_ID}">{COMPONENT_CONFIG_SRC_NAME}</a> </span>
+            <input type="button" value="Select Alternate Source" id="launch-browser-{COMPONENT_HANDLE}" />
+            <input type="hidden" value="{COMPONENT_CONFIG_SRC_ID}" name="import-links" id="import-links-{COMPONENT_HANDLE}"/>
+
+            <label for="size">Item Limit: </label>
 			<select name="size">
 				<!-- BEGIN size -->
 				<option value="{COMPONENT_CONFIG_SIZE_VALUE}"{COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
 				<!-- END size -->
 			</select>
-            <label for="import-links"><br/>Import links from: </label>
-            <input type="text" value="{COMPONENT_CONFIG_IMPORT_LINKS}" id="import-links" name="import-links" />
-
 			<input type="submit" value="Update" class="submit-btn update" />
 		</form>
 	</div>

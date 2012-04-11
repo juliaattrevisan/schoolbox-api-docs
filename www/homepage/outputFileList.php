@@ -35,12 +35,12 @@ $fileHandler = new File;
 $userHandler = new User();
 
 // if config is set to import files, make it so
-if(($i = strpos($config['import-files'], 'homepage/')) === 0) {
-    // get homepage id
-    $auxCategory = substr($config['import-files'], 9);
-    $fileList = $fileHandler->getAllInCategory(array($categoryID, $auxCategory), $config);
+if(strpos($config['import-files'], '/homepage/') === 0) {
+    $catID = substr($config['import-files'], 10);
 } else
-    $fileList = $fileHandler->getAllInCategory($categoryID, $config);
+    $catID = $categoryID;
+
+$fileList = $fileHandler->getAllInCategory($catID, $config);
 
 if (is_array($fileList)) {
 	foreach ($fileList as $file) {
@@ -85,12 +85,20 @@ if (is_array($fileList)) {
 } else
 	$this->setVar('files_block', '');
 
+if($catID == $categoryID) {
+    $src = array('name' => 'Local');
+} else {
+    $catHandler = new Category();
+    $src = $catHandler->getByID($catID);
+}
 
 /* Set up component name
  */
 $this->setvar(array(
-	'COMPONENT_NAME' => strlen(trim($config['componentname'])) ? $config['componentname'] : 'Files',
-    'COMPONENT_CONFIG_IMPORT_FILES' => $config['import-files'],
+	'COMPONENT_NAME'            => strlen(trim($config['componentname'])) ? $config['componentname'] : 'Files',
+    'COMPONENT_CONFIG_SRC_ID'   => $config['import-files'],
+    'COMPONENT_CONFIG_SRC_NAME' => $src['name'],
+    'COMPONENT_HANDLE'          => strtolower($componentHandle)
 ));
 
 /* filter config */

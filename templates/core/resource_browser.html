@@ -46,7 +46,7 @@
     $j('#select-resource').click(function() {
         // set the contents of the nominated field to the destination value, then bug out
         if($j('#destination').val().indexOf('homepage/') == -1) {
-            var dest = "homepage/" + $j('#destination').val();
+            var dest = "/homepage/" + $j('#destination').val();
             $j('{DESTINATION}').val(dest);
         }
         // kbye

@@ -13,8 +13,8 @@
             resizable: false
         });
 
-        $j('#import-folders').click(function() {
-            $j('#resource-browser').load('/ajax/resourceBrowser', {destination : '#import-folders'}, function() {
+        $j('#launch-browser-{COMPONENT_HANDLE}').click(function() {
+            $j('#resource-browser').load('/ajax/resourceBrowser', {destination : '#import-folders-{COMPONENT_HANDLE}'}, function() {
                 $j('#resource-browser').dialog('open');
             });
 
@@ -34,8 +34,9 @@
 			<label for="componentname">Name: </label>
 			<input type="text" name="componentname" value="{COMPONENT_NAME}" />
 
-            <label for="import-folders">Import folders from: </label>
-            <input type="text" value="{COMPONENT_CONFIG_IMPORT_FOLDERS}" id="import-folders" name="import-folders" />
+            <span>Displaying: <a href="{COMPONENT_CONFIG_SRC_ID}">{COMPONENT_CONFIG_SRC_NAME}</a> </span>
+            <input type="button" value="Select Alternate Source" id="launch-browser-{COMPONENT_HANDLE}" />
+            <input type="hidden" value="{COMPONENT_CONFIG_SRC_ID}" name="import-folders" id="import-folders-{COMPONENT_HANDLE}"/>
             <label for="size">Item Limit: </label>
             <select name="size">
 				<!-- BEGIN size -->
