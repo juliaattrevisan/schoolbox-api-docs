@@ -435,6 +435,7 @@ class Category extends DeprecatedModel {
 	public function create($data) {
 		$group = $data['group'];
 		unset($data['group']);
+        unset($data['recursive']);
 
 		/* Check if the category code exists. If it already does, spawn error;
 		 * otherwise continue creating. array_filter() removes empty, false
