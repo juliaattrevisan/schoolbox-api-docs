@@ -1,5 +1,5 @@
 setupCustomise = {
-	
+
 	ajaxURL: '',
 	id: '',
 	key: 'cid',
@@ -457,13 +457,27 @@ setupCustomise = {
 				var right = '';
 				var top = '';
 				$j('.homepage div.left').children('div.box').each(function () {
-					left += $j(this).attr('id').substring(9) + ',';
+
+					/* Two components in ePorfolio have no id's (My Profile, Teacher Notes)
+					 * and always appear in the same positions. So we do a check to see if
+					 * an id is set. If it isn't, and we don't do the check, the script breaks
+					 * and components cannot be relocated successfully
+					 */
+					if ($j(this).attr('id') != undefined) {
+						left += $j(this).attr('id').substring(9) + ',';
+					}
 				});
+
 				$j('.homepage div.right').children('div.box').each(function () {
-					right += $j(this).attr('id').substring(9) + ',';
+					if ($j(this).attr('id') != undefined) {
+						right += $j(this).attr('id').substring(9) + ',';
+					}
 				});
+
 				$j('.homepage div.top').children('div.box').each(function () {
-					top += $j(this).attr('id').substring(9) + ',';
+					if ($j(this).attr('id') != undefined) {
+						top += $j(this).attr('id').substring(9) + ',';
+					}
 				});
 
 				var data = {
