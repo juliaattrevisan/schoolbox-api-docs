@@ -39,7 +39,7 @@ class Sabre_DAV_Client_Extended extends Sabre_DAV_Client {
      */
     public function move($path, $destination) {
         return $this->request('MOVE', $path, null, array(
-                                        'Destination' => $this->getAbsoluteUrl($destination))
+            'Destination' => $this->getAbsoluteUrl($destination))
         );
     }
 }
@@ -267,6 +267,9 @@ class PortfolioWebDAV {
             return $this->cache[$md5Path][$filter];
         }
 
+        $this->cache[$md5Path]['dir'] = array();
+        $this->cache[$md5Path]['file'] = array();
+
         $response = $this->client->propFind($path, array(
             '{DAV:}getcontentlength',
             '{DAV:}resourcetype',
@@ -445,10 +448,10 @@ class PortfolioWebDAV {
         }
 
         if ($file) {
-            $path = $_SESSION['portfolioIdPathMap'][$data['parent']] . $file['name'];
+            $path = $_SESSION['portfolioIdPathMap'][$data['parent']] . urlencode($file['name']);
             $this->client->put($path, $file['tmp_name']);
         } else {
-            $path = $_SESSION['portfolioIdPathMap'][$data['parent']] . $data['name'] . '/';
+            $path = $_SESSION['portfolioIdPathMap'][$data['parent']] . urlencode($data['name']) . '/';
             $this->client->request('MKCOL', $path);
         }
 
@@ -463,7 +466,7 @@ class PortfolioWebDAV {
         }
 
         if (isset($data['description'])) {
-            $destination = dirname($_SESSION['portfolioIdPathMap'][$data['id']]) . $data['description'];
+            $destination = dirname($_SESSION['portfolioIdPathMap'][$data['id']]) . urlencode($data['description']);
             $this->client->move($_SESSION['portfolioIdPathMap'][$data['id']], $destination);
 
             $_SESSION['portfolioIdPathMap'][$data['id']] = $destination;

@@ -119,7 +119,12 @@ $j(document).ready(function() {
 				}
 				else if (data.length == 0) {
 					/* display empty message */
-					$j('<tr class="category-' + relationID + ' empty"><td>No files to display</td></tr>').appendTo($j('#file-list'));
+                    var empty = $j('#file-list tr.category-'+relationID+'.empty');
+                    if (empty.length) {
+                        empty.show();
+                    } else {
+					    $j('<tr class="category-' + relationID + ' empty"><td>No files to display</td></tr>').appendTo($j('#file-list'));
+                    }
 				}
 				else {
 					var template = $j('#file-template');
@@ -379,7 +384,7 @@ $j(document).ready(function() {
 							<td>
 								<span class="elbow"></span><span class="label"></span>
 							</td>
-          </tr>         
+          </tr>
         </tfoot>
       </table>
       </div>
@@ -422,7 +427,7 @@ $j(document).ready(function() {
 								<span class="file"></span>
 							</td>
             <td></td>
-          </tr>         
+          </tr>
          </tfoot>
       </table>
       </div>

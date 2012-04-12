@@ -36,7 +36,7 @@ if (isset($this->arg[0])) {
 if (Cfg::get('webdav_enable')) {
 
     $folderHandler = PortfolioWebDAV::factory();
-    $fileHandler = $folderHandler;
+    $fileHandler =& $folderHandler;
 
 } else {
     $folderHandler = new MyFolder;
@@ -127,7 +127,7 @@ if (is_array($fileList) && count($fileList) > 0) {
 
     }
 } else {
-    $this->setVar('file_list_block', '');
+    $this->setVar('file_list_block', '<tr class="category-'.$openFolder.' empty"><td>No files to display</td></tr>');
 }
 
 // output mime classes
