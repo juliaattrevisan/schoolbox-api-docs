@@ -62,10 +62,8 @@ function cleanName($name) {
 function uniqueFileName($fileName, $depth=1) {
 	if(is_file($fileName)) {
 		$pathParts = pathinfo($fileName);
-		//because only php 5.2 has filename we need to do our own cutting and pasting to get the filename on its own 
-		$pathParts['filename'] = substr($pathParts['basename'],0 ,strlen($pathParts['basename'])-strlen($pathParts['extension'])-1);
 		$newName = $pathParts['dirname'].'/'.$pathParts['filename'].'_'.$depth.'.'.$pathParts['extension'];
-		return $this->uniqueFileName($newName, ++$depth);	
+		return $this->uniqueFileName($newName, ++$depth);
 	}
 	else
 		return $fileName;
@@ -101,7 +99,7 @@ function createDirectory($currentDir, $folderID, $depth=0) {
 				$this->size = $this->size + $file['file_size'];
 				$fileName = $currentDir.'/'.$file['realname'];
 				$fileName = $this->uniqueFileName($fileName); //ensure filename is unique else puts numbers in filename
-				copy(Cfg::get('file_dir') .'/'.$file['id'].'.dat', $currentDir.'/'.$file['realname']);
+				copy(Cfg::get('file_dir') .'/'.$file['id'].'.dat', $fileName);
 			}
 		}
 	}

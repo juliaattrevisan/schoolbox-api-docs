@@ -50,8 +50,6 @@ class ZipFolder {
    function uniqueFileName($fileName, $depth=1) {
       if(is_file($fileName)) {
          $pathParts = pathinfo($fileName);
-         //because only php 5.2 has filename we need to do our own cutting and pasting to get the filename on its own
-         $pathParts['filename'] = substr($pathParts['basename'],0 ,strlen($pathParts['basename'])-strlen($pathParts['extension'])-1);
          $newName = $pathParts['dirname'].'/'.$pathParts['filename'].'_'.$depth.'.'.$pathParts['extension'];
          return $this->uniqueFileName($newName, ++$depth);
       }
