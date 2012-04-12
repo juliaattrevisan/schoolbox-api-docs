@@ -117,10 +117,6 @@ else {
 
 	$this->parse('allQuestions_block', 'assessContentsFragment', true);
 
-	/* Options for importing into the Question Bank
-	 */
-	$this->setBlock(TEMPLATE_content, 'question_category', 'question_category_block');
-
 	$assessHandler = new Assess_Main();
 	$assessHandler->renderAssessContents($section['assess_id'], $this);
 
@@ -137,22 +133,11 @@ else {
         'DISABLED_SELECTED' => '',
     ));
 
+	/* Derive and render a category list
+	 */
+	$questionBankCategoryHandler = new Assess_Question_Category();
 
-	$questionCategoryHandler = new Assess_Question_Category();
-	$allQuestionCategories = $questionCategoryHandler->getList();
-
-	if (is_array($allQuestionCategories) && count($allQuestionCategories)) {
-		foreach($allQuestionCategories as $currentQuestionCategory) {
-			$this->setVar(array(
-				'QUESTION_CATEGORY_ID' => $currentQuestionCategory['question_category_id'],
-				'QUESTION_CATEGORY_NAME' => $currentQuestionCategory['name'],
-			));
-
-			$this->parse('question_category_block', 'question_category', true);
-		}
-	}
-	else {
-		$this->setVar('question_category_block', '');
-	}
+	$questionCategoryList = new Assess_Question_Category_List($this, $assess['assess_id'], 0, $questionBankCategoryHandler->getPath());
+	$questionCategoryList->render();
 }
 

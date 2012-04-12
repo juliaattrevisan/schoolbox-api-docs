@@ -1,37 +1,58 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jstree/jquery.jstree.js"></script>
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="/javascript/jquery.json2.js"></script>
 <script type="text/javascript">
     tinyMCE.init({
-            mode : "exact",
-		    elements: "question",
-            theme : "advanced",
-            skin : "cirkuit",
-            plugins : "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
-            content_css : "/css/core/tiny.css",
-            theme_advanced_toolbar_location : "top",
-            theme_advanced_toolbar_align : "left",
-            theme_advanced_statusbar_location : "bottom",
-            theme_advanced_buttons1 : "bold,italic,underline,separator,bullist,numlist,separator,link,unlink,image,media,separator,undo,redo,separator,pdw_toggle",
-            theme_advanced_buttons2 : "forecolor,formatselect,fontsizeselect,separator,justifyleft,justifycenter,justifyright,spellchecker",
-            theme_advanced_buttons3 : "outdent,indent,sub,sup,separator,hr,charmap,separator,seperator,ltr,rtl,selectall,pastetext,pasteword,separator,removeformat,cleanup,code",
-            theme_advanced_buttons4 : "tablecontrols",
-            pdw_toggle_on : 1,
-            pdw_toggle_toolbars : '2, 3, 4',
-            extended_valid_elements : "a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
-            file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
-            file_browser_category_id : '{ASSESS_CATEGORY_ID}',
-            tabfocus_elements : ":prev,:next",
-            convert_urls : false,
-    		force_br_newlines : false,
-            force_p_newlines : true
-    	});
+		mode : "exact",
+		elements: "question",
+		theme : "advanced",
+		skin : "cirkuit",
+		plugins : "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
+		content_css : "/css/core/tiny.css",
+		theme_advanced_toolbar_location : "top",
+		theme_advanced_toolbar_align : "left",
+		theme_advanced_statusbar_location : "bottom",
+		theme_advanced_buttons1 : "bold,italic,underline,separator,bullist,numlist,separator,link,unlink,image,media,separator,undo,redo,separator,pdw_toggle",
+		theme_advanced_buttons2 : "forecolor,formatselect,fontsizeselect,separator,justifyleft,justifycenter,justifyright,spellchecker",
+		theme_advanced_buttons3 : "outdent,indent,sub,sup,separator,hr,charmap,separator,seperator,ltr,rtl,selectall,pastetext,pasteword,separator,removeformat,cleanup,code",
+		theme_advanced_buttons4 : "tablecontrols",
+		pdw_toggle_on : 1,
+		pdw_toggle_toolbars : '2, 3, 4',
+		extended_valid_elements : "a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
+		file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
+		file_browser_category_id : '{ASSESS_CATEGORY_ID}',
+		tabfocus_elements : ":prev,:next",
+		convert_urls : false,
+		force_br_newlines : false,
+		force_p_newlines : true
+	});
+
+	$j(function() {
+		/* Enforce two decimal places
+		 */
+		$j('input[name=marks]').change(function() {
+			$j(this).val(parseFloat($j(this).val()).toFixed(2));
+		});
+
+		/* Category tree
+		 */
+		$j("#categoryTree").jstree({
+			"animation": 50,
+			"plugins":["themes", "html_data", "dnd", "crrm"],
+			"themes":{
+				"theme":"schoolbox",
+				"dots":true,
+				"icons":false
+			}
+		});
+	});
 </script>
 <!-- END custom_head -->
-	<h1>Modify Question</h1>
-	<div class="evaluation-content">
-		<h2>Question Details</h2>
-		<form id="createQuestionForm" action="/survey/question/modify" class="" method="post">
+<h1>Modify Question</h1>
+<div class="evaluation-content">
+	<h2>Question Details</h2>
+	<form id="createQuestionForm" action="/survey/question/modify" class="" method="post">
 
 		<label class="hide">
 			<input type="hidden" name="marks" />
@@ -64,32 +85,50 @@
 	<h2>Import into Question Bank</h2>
 
 	<form action='/survey/questionbank/addQuestion' class='' method='post'>
-
-	<p>
-		Puts this question into the Question Bank so you can import
-		them into other surveys.
-	</p>
+		<p>
+			Puts this question into the Question Bank so you can import
+			them into other surveys.
+		</p>
 		<label class="hide">
 			<input name='type_id' type='hidden' value='{QUESTIONTYPE_TYPE_ID}' />
 			<input name='question_id' type='hidden' value='{QUESTION_ID}' />
 			<input name='answer_id' type='hidden' value='{ANSWER_ID}' />
 			<input name='marks' type='hidden' value='{MARKS}' />
 		</label>
-		<label>Question Category
-			<select name='question_category'>
-				<!-- BEGIN question_category -->
-				<option value='{QUESTION_CATEGORY_ID}'>{QUESTION_CATEGORY_NAME}</option>
-				<!-- END question_category -->
-			</select>
+		<label>
+			Question Category
+			<div id='categoryTree'>
+				<!-- BEGIN category_list_start -->
+				<ul>
+				<!-- END category_list_start -->
+
+					<!-- BEGIN category_list_item_start -->
+					<ul>
+					<!-- END category_list_item_start -->
+
+						<!-- BEGIN category_list_item -->
+						<li id='{CATEGORY_LIST_ITEM_NODE}' class='{CATEGORY_LIST_ITEM_SELECTED}'>
+							<a href='#'>
+								{CATEGORY_LIST_ITEM_NAME} ({CATEGORY_LIST_ITEM_NUMQUESTIONS})
+							</a>
+						<!-- END category_list_item -->
+
+					<!-- BEGIN category_list_item_end -->
+					</ul>
+					</li>
+					<!-- END category_list_item_end -->
+				</ul>
+			</div>
+			<input type='hidden' name='question_category' type='hidden' />
 		</label>
 
 		<p class="clearfix">
 			<input type='submit' class='submit-btn-plain' value='Add To Question Bank' />
 		</p>
 	</form>
-	</div>
-	<div class="evaluation-menu">
-	<!-- BEGIN allQuestions -->
+</div>
+<div class="evaluation-menu">
+<!-- BEGIN allQuestions -->
 
-	<!-- END allQuestions -->
-	</div>
+<!-- END allQuestions -->
+</div>

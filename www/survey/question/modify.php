@@ -119,6 +119,7 @@ else {
 
 	$assessHandler = new Survey_Main();
 	$assessHandler->renderAssessContents($section['assess_id'], $this);
+
 	$assess = $assessHandler->getByID($section['assess_id']);
 
     $this->setVar(array(
@@ -132,23 +133,11 @@ else {
         'DISABLED_SELECTED' => '',
     ));
 
+	/* Derive and render a category list
+	 */
+	$questionBankCategoryHandler = new Survey_Question_Category();
 
-
-	$questionCategoryHandler = new Survey_Question_Category();
-	$allQuestionCategories = $questionCategoryHandler->getList();
-
-	if (is_array($allQuestionCategories) && count($allQuestionCategories)) {
-		foreach($allQuestionCategories as $currentQuestionCategory) {
-			$this->setVar(array(
-				'QUESTION_CATEGORY_ID' => $currentQuestionCategory['question_category_id'],
-				'QUESTION_CATEGORY_NAME' => $currentQuestionCategory['name'],
-			));
-
-			$this->parse('question_category_block', 'question_category', true);
-		}
-	}
-	else {
-		$this->setVar('question_category_block', '');
-	}
+	$questionCategoryList = new Survey_Question_Category_List($this, $assess['assess_id'], 0, $questionBankCategoryHandler->getPath());
+	$questionCategoryList->render();
 }
 
