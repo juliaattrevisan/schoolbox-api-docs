@@ -88,7 +88,7 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 				$csv .= 'Grade,Total,';
 			}
 			else {
-				$csv .= 'Grade,Comment,';
+				$csv .= 'Normalised Grade,Comment,';
 			}
 		}
 
@@ -120,10 +120,12 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
                     }
                     else {
 
-						/* Return two columns, grade and comment
-						 */
+                        /* Return two columns, grade and comment
+                               */
                         $return = $retHandler->getByUser($student['uid'],$sub['id']);
-                        $csv .= Scrub::text($return[0]['mark']) . ',' . Scrub::text($return[0]['comment']) . ',';
+                        // if this is legacy, return Excel-escaped (ie. '-prepended) mark, otherwise norm_mark
+                        $mark = $return[0]['slug'] == 'free' ? "'{$return[0]['mark']}" : $return[0]['norm_mark'];
+                        $csv .= html_entity_decode(Scrub::text($mark), ENT_QUOTES) . ',' . html_entity_decode(Scrub::text($return[0]['comment']), ENT_QUOTES) . ',';
                     }
 				}
 			}
