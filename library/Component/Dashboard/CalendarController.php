@@ -47,6 +47,16 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
         $this->setBlock("note_block", "attendance_request_button", "attendance_request_button_block");
         $this->setBlock("note_block", "attendance_list_button", "attendance_list_button_block");
 
+		/* Initialise
+		 */
+		$this->setVar(array(
+			'attendance_icon_block' => '',
+			'attendance_status_block' => '',
+			'attendance_request_button_block' => '',
+			'attendance_list_button_block' => '',
+		));
+
+
         if ( is_array($this->submissionList) ) {
             foreach ( $this->submissionList as $submission ) {
 
@@ -103,13 +113,6 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
                 $this->setVar($output);
 
                 /* Attendance */
-                $this->setVar(array(
-                    'attendance_icon_block' => '',
-                    'attendance_status_block' => '',
-                    'attendance_request_button_block' => '',
-                    'attendance_list_button_block' => '',
-                ));
-
                 if ($event['attendance']) {
                     $this->parse('attendance_icon_block', 'attendance_icon');
 
