@@ -285,7 +285,7 @@ h2 {
 .box .chinese { background: url(/images/grimwade/icon-chinese.gif) no-repeat; }
 .box .item:hover { background-position: 0 -170px; }
 
-.customise-components{background:#e4e4e4;}
+#tabs-homepage .customise-components{background:#e4e4e4;}
 .colours-buttons{background:#ccc;}
 #tabs-homepage li.ui-tabs-selected a {background:#e4e4e4;}
 #tabs-sub li.ui-tabs-selected a {background:#fff;}

@@ -4683,8 +4683,24 @@ COLOUR ADJUSTMENT BOX
 
 #tabs-homepage {
 	display: none;
+    padding:0;
+    background:none; border:0;
 }
 
+#tabs-homepage .ui-tabs-panel{
+    padding:0;
+}
+
+#tabs-homepage .ui-widget-header{
+    background:none;
+    border:none;
+}
+
+
+#tabs-homepage .ui-widget-content{
+    border:0;
+    background:none;
+}
 #tabs-homepage .ui-tabs-hide {
 	display: none;
 }
@@ -4692,10 +4708,16 @@ COLOUR ADJUSTMENT BOX
 #tabs-homepage .ui-tabs-nav {
 	width: 100%;
 	margin: 0;
+    padding:0;
 }
 
 #tabs-homepage .ui-tabs-nav li {
 	float: left;
+    padding:0;
+    background:none;
+    margin:0;
+    border:0;
+    margin-right:7px;
 }
 
 #tabs-homepage .ui-tabs-nav li a {
@@ -4704,7 +4726,7 @@ COLOUR ADJUSTMENT BOX
 	-moz-border-radius: 7px 7px 0 0;
 	-webkit-border-radius: 7px 7px 0 0;
 	border-radius: 7px 7px 0 0;
-	margin-right: 7px;
+
 	font-weight: bold;
 	font-size: 16px;
 }
@@ -4765,7 +4787,7 @@ COLOUR ADJUSTMENT BOX
 }
 
 /*CUSTOMISE COMPONENT*/
-.customise-components {
+#tabs-homepage .customise-components {
 	padding: 16px;
 	margin-bottom: 16px;
 	background: #faf9f5;
@@ -4786,7 +4808,7 @@ COLOUR ADJUSTMENT BOX
 	display: none;
 }
 
-.customise-components .centre-it {
+#tabs-homepage customise-components .centre-it {
 	margin: 0 auto;
 }
 
@@ -6014,7 +6036,6 @@ dd {
 	padding: 3px;
 	background: #666;
 	color: #fff;
-	font-family: Verdana, arial, sans-serif, serif;
 	font-size: 100%;
 	font-weight: bold;
 	line-height: 1.5;
@@ -6024,7 +6045,7 @@ dd {
 .timetable td {
 	background: #efefef;
 	color: #000;
-	font: normal 80% /1em Verdana, arial, sans-serif, serif;
+	font: normal 80% /1em arial, sans-serif, serif;
 	cursor: hand;
 	padding: 4px;
 	text-align: center;

@@ -34,7 +34,8 @@ a{color:#0076fa;}
 }
 
 
-.dark, .dark td, #tree .dark, .standardForm, #assess .standardForm, #assess .additional-details, #assess .assess-body, .blog-comments .box, .post-left, #category, .search-item:nth-child(2n),.customise-components {
+.dark, .dark td, #tree .dark, .standardForm, #assess .standardForm, #assess .additional-details, #assess .assess-body,
+.blog-comments .box, .post-left, #category, .search-item:nth-child(2n), #tabs-homepage .customise-components {
     background: none repeat scroll 0 0 #fcfbf2;
 }
 

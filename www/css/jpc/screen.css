@@ -30,7 +30,7 @@ a:hover {
 h3, #infoPanel li, #nav h3, .add-component .notification {
 
 }
-.customise-components h3 {
+#tabs-homepage .customise-components h3 {
     color: #000000;
 }
 #infoPanel a {
@@ -47,7 +47,8 @@ h3, #infoPanel li, #nav h3, .add-component .notification {
 #nav h3.my-links, .colours-buttons {
     background-color: #BCBDD6;
 }
-#nav ul.my-links, .customise-components {
+#nav ul.my-links,
+#tabs-homepage .customise-components {
     background-color: #F8F8FC;
     color: #000000;
 }

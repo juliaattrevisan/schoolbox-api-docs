@@ -67,7 +67,7 @@ h3, .add-component .notification {
 	color: #FFFFFF;
 }
 
-.customise-components h3 {
+#tabs-homepage .customise-components h3 {
 	color: #000000;
 }
 
@@ -95,7 +95,7 @@ h3, .add-component .notification {
 	background-color: #3375b3;
 }
 
-.customise-components {
+#tabs-homepage .customise-components {
 	background-color: #fff;
 	color: #000000;
 	-moz-box-shadow: 0px 1px 1px #bdbdbd;

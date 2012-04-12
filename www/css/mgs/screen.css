@@ -1,7 +1,6 @@
 
 body {
 	background: #182484 url(/images/mgs/background.gif);
-	font-family: Verdana, Arial, Helvetica, sans-serif;
 	color: #000;
 }
 
@@ -328,7 +327,7 @@ min-height:1px;
 	margin-right:16px;
 }
 
-.customise-components { background:#eee; }
+#tabs-homepage .customise-components { background:#eee; }
 .colours-buttons{background:#e0e0e0;}
 
 /*---------------------------------------

@@ -54,7 +54,7 @@ h2 {
 
 h3, #nav h3, .add-component .notification { color: #FFFFFF; }
 
-.customise-components h3 { color: #000000; }
+#tabs-homepage .customise-components h3 { color: #000000; }
 
 #infoPanel li { color:#fff; }
 
@@ -86,7 +86,7 @@ h3, #nav h3, .add-component .notification { color: #FFFFFF; }
 
 .colours-buttons { background-color: #3375b3; }
 
-.customise-components {
+#tabs-homepage .customise-components {
 	background-color: #F8F8FC;
 	color: #000000;
 	-moz-box-shadow: 0px 1px 1px #bdbdbd;

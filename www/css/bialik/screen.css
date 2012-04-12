@@ -36,7 +36,7 @@ h3, #nav h3, .add-component .notification {
     color: #FFFFFF;
 }
 
-.customise-components h3 {
+#tabs-homepage .customise-components h3 {
     color: #000000;
 }
 
@@ -60,7 +60,7 @@ h3, #nav h3, .add-component .notification {
     background-color: #3375b3;
 }
 
-.customise-components {
+#tabs-homepage .customise-components {
     background-color: #F8F8FC;
     color: #000000;
 }

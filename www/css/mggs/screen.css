@@ -14,7 +14,7 @@ h2, h2 span a, h2 a {
 }
 .box .listing{margin:0;}
 
-.customise-components {background:#ededed;padding:16px}
+#tabs-homepage .customise-components {background:#ededed;padding:16px}
 
 #tabs-homepage li.ui-tabs-selected a{background:#ededed;}
 #tabs-sub li.ui-tabs-selected a{background:#ffffff;}

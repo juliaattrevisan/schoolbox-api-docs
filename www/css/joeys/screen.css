@@ -355,7 +355,7 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 
 /*****************/
 
-.customise-components { background:#ededed; }
+#tabs-homepage .customise-components { background:#ededed; }
 
 .colours-buttons { background:#bebebe; }
 
