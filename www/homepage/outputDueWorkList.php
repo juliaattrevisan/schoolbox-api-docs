@@ -20,7 +20,7 @@ $this->setBlock($componentHandle, "duework", "duework_block");
 
 require_once SITE_root.'/library/submission.php';
 $submissionHandler = new Submission;
-$submissionList = $submissionHandler->getAllForCategory($categoryID, $config);
+$submissionList = $submissionHandler->getAllForCategory($categoryID, $config, true);
 
 if (is_array($submissionList)) {
 
@@ -38,30 +38,54 @@ if (is_array($submissionList)) {
         /* Actions Block */
         $this->setBlock('duework', 'duework_actions', 'duework_actions_block');
 
+        // what to display if student
         if($groupHandler->isStudent()) {
             $this->setVar('DUE_ACTION', '/submission/submissionHistory/' . $submission['id']);
 
-            if (!empty($submission['submitted'])) {
-                if (!empty($submission['returned'])) {
-                    $this->setVar('DUE_ACTION_NAME', 'View Mark');
-                } else {
-                    $this->setVar('DUE_ACTION_NAME', 'Awaiting Mark');
+
+            // if a mark has been given, regardless of all other detail, display "View Mark"
+            if (!empty($submission['returned'])) {
+                $this->setVar('DUE_ACTION_NAME', 'View Mark');
+            }
+            // no mark has been given
+            else {
+                // if dueWork is accepting submissions
+                if($submission['accept_submission']) {
+                    // if something has been submitted
+                    if (!empty($submission['submitted'])) {
+                        $this->setVar('DUE_ACTION_NAME', 'Awaiting Mark');
+                    }
+                    // nothing has been submitted
+                    else {
+                        // if the submission box is open
+                        if (time() > $submission['open'] && time() < $submission['late']) {
+                            $this->setVar('DUE_ACTION_NAME', 'Submit Work');
+                        }
+                        // if submission box is closed
+                        else {
+                            $this->setVar('DUE_ACTION_NAME', 'View Details');
+                        }
+                    }
                 }
-            } else {
-                if (time() > $submission['open'] && time() < $submission['late']) {
-                    $this->setVar('DUE_ACTION_NAME', 'Submit Work');
-                } else {
+                // dueWork not accepting submissions
+                else {
                     $this->setVar('DUE_ACTION_NAME', 'View Details');
                 }
             }
 
             $this->parse('duework_actions_block', 'duework_actions');
-        } elseif ($groupHandler->isStaff() && $submission['owner'] == $_SESSION['id']) {
+        }
+
+        // what to display if staff
+        elseif ($groupHandler->isStaff() && $submission['owner'] == $_SESSION['id']) {
             $this->setVar('DUE_ACTION', '/submission/viewSubmission/' . $submission['id']);
             $this->setVar('DUE_ACTION_NAME', 'View Work');
 
             $this->parse('duework_actions_block', 'duework_actions');
-        } else {
+        }
+
+        // if anybody else, don't display anything
+        else {
             $this->setVar('duework_actions_block', '');
         }
 

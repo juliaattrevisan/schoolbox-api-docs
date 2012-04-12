@@ -329,12 +329,14 @@ class Submission extends DeprecatedModel {
 		return $this->db->getAll($query);
 	}
 
-    function getAllForCategory($categoryID, $config = false) {
+    function getAllForCategory($categoryID, $config = false, $distinct = false, $userID = -1) {
+        if($userID == -1) $userID = $_SESSION['id'];
             $query = "SELECT sb.id, sb.category, ft.name as typeName, sb.owner,
                               UNIX_TIMESTAMP(sb.open_date) AS open,
                               UNIX_TIMESTAMP(sb.date) AS date,
                               UNIX_TIMESTAMP(sb.late_date) AS late,
-                              f.id fileID, f.realname, sb.name, sb.description, sb.created, ss.id studentWork, af.inline, ss.submitted, sr.returned
+                              f.id fileID, f.realname, sb.name, sb.description, sb.created, ss.id studentWork,
+                              af.inline, ss.submitted, sr.returned, sb.accept_submission, sb.multi_submission
                               FROM submission_box sb
                               LEFT JOIN  file f ON sb.fid = f.id AND f.deleted = '0'
                               LEFT JOIN allowedFileTypes af ON f.mime_type = mime
@@ -343,8 +345,10 @@ class Submission extends DeprecatedModel {
                               LEFT JOIN file_type ft ON sb.type = ft.id
                               WHERE
                               sb.category = '".$categoryID."'
-                              AND sb.deleted = '0'
-                              ORDER BY sb.date DESC";
+                              AND sb.deleted = '0'";
+            if($distinct)
+                $query .= " GROUP BY id";
+            $query .= " ORDER BY sb.date DESC";
 
             if($config['size'] > 0)
                     $query .= " LIMIT 0, " . $config['size'];
