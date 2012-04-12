@@ -181,7 +181,7 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
 
 		/* Remove tab characters
 		 */
-		$data['responseText'] = str_replace("\t", '', $response['response']);
+		$data['response'] = str_replace("\t", '', $response['response']);
 
 		/* Append commentary
  		 */

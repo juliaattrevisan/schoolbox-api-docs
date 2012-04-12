@@ -2,6 +2,9 @@
 /**
  * Evaluation_Export_CSV
  *
+ * Protected class variables are intended to be set after
+ * instantiation and/or overridden in subclasses
+ *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
@@ -12,6 +15,20 @@ class Evaluation_Export_CSV {
 	/* Include html in export output
 	 */
 	protected $legendHTML = false;
+
+	/* These are additional subheadings that appear in the export.
+
+	 * Due to shared functionality contained in Assess and Survey,
+	 * sometimes these need to be turned on/off by specifying this
+	 * array in subclasses
+	 *
+	 * These are mapped as Textual Display => data array key
+	 * (this is used in collateResponses)
+	 */
+	protected $additionalColumns = array(
+		'Mark' => 'mark',
+		'Comment' => 'comment'
+	);
 
 	private $evaluation_id = null;
 	private $factory = null;
@@ -148,10 +165,16 @@ class Evaluation_Export_CSV {
 				$prefix = "S{$currentQuestion['section_sequence']}. Q{$currentQuestion['question_sequence']}. ";
 				$questionText = preg_replace('/\n+/', ' ', strip_tags(html_entity_decode($currentQuestion['question'])));
 
+				/* Append Response heading
+				 */
 				$additionalColumns = array();
 				$additionalColumns[] =  $prefix . $questionText . ' Response';
-				$additionalColumns[] =  $prefix . $questionText . ' Mark';
-				$additionalColumns[] =  $prefix . $questionText . ' Comment';
+
+				/* Append additional columns
+				 */
+				foreach($this->getAdditionalColumns() as $heading => $value) {
+					$additionalColumns[] =  $prefix . $questionText . ' ' . $heading;
+				}
 
 				$allColumns = array_merge($allColumns, $additionalColumns);
 			}
@@ -179,6 +202,8 @@ class Evaluation_Export_CSV {
 			$start = new Alaress_Date_Format($currentAttempt['start'], 'y-m-d h:i:s');
 			$finish = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
 
+			/* Collect mandatory columns
+			 */
 			$thisResponse = array(
 				$currentAttempt['user_id'],
 				$start->getShort(),
@@ -200,17 +225,32 @@ class Evaluation_Export_CSV {
 					$answerHandler->setLegendHTML($this->getLegendHTML());
 
 					/* Load answer template into answerOption block
+
+					 * Note that each answerHandler returns a $responseData containing
+					 * key => data values for Response, Mark and Comment. This is used
+					 * when collecting additional columns.
+					 *
+					 * If you want extra info beyond these three, then you need to modify
+					 * each AnswerHandler accordingly.
 					 */
 					$responseData = $answerHandler->exportResponseToCSV($currentAttempt['attempt_id'], $currentQuestion['question_id']);
 
 					/* Append horizontally
 					 */
-					$additionalColumns[] = str_replace("\t", '', $responseData['responseText']);
-					$additionalColumns[] = $responseData['mark'];
-					$additionalColumns[] = $responseData['comment'];
+					$additionalColumns[] = str_replace("\t", '', $responseData['response']);
+
+					/* Additional columns.
+					 *
+					 * Look for the exportResponseToCSV method which returns this data array
+					 */
+					foreach ($this->getAdditionalColumns() as $heading => $value) {
+						$additionalColumns[] = $responseData[$value];
+					}
 				}
 			}
 
+			/* Concatenate mandatory columns with additional columns
+			 */
 			$allResponses[] = array_merge($thisResponse, $additionalColumns);
 		}
 
@@ -464,5 +504,14 @@ class Evaluation_Export_CSV {
 	 */
 	private function getQuestionFilter() {
 		return $this->questionFilter;
+	}
+
+	/**
+	 * Get additional columns
+	 *
+	 * @return array
+	 */
+	private function getAdditionalColumns() {
+		return $this->additionalColumns;
 	}
 }

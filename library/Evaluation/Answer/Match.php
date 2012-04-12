@@ -258,10 +258,10 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
 
 		if (is_array($data)) {
 			if ($this->getLegendHTML() !== false) {
-				$data['responseText'] = '<ul><li>' . implode('</li><li>', $data) . '</li></ul>';
+				$data['response'] = '<ul><li>' . implode('</li><li>', $data) . '</li></ul>';
 			}
 			else {
-				$data['responseText'] = strip_tags(implode(', ', $data));
+				$data['response'] = strip_tags(implode(', ', $data));
 			}
 		}
 

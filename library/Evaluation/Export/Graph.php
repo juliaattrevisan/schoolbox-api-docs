@@ -212,7 +212,7 @@ class Evaluation_Export_Graph {
 									 */
 									$data = $answerHandler->exportResponseToCSV($currentAttempt['attempt_id'], $allQuestions[$i]['question_id']);
 
-									$responseValues = str_replace("\t", '', $data['responseText']);
+									$responseValues = str_replace("\t", '', $data['response']);
 									$commentValues = $data['comment'];
 
 									$this->sectionValues[$k]['questions'][$i]['attempts'][$j] = array(

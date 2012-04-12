@@ -281,10 +281,10 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
 			}
 
 			if ($this->getLegendHTML() !== false) {
-				$data['responseText'] = '<ul><li>' . implode('</li><li>', $postprocessed) . '</li></ul>';
+				$data['response'] = '<ul><li>' . implode('</li><li>', $postprocessed) . '</li></ul>';
 			}
 			else {
-				$data['responseText'] = strip_tags(implode(', ', $postprocessed));
+				$data['response'] = strip_tags(implode(', ', $postprocessed));
 			}
 		}
 

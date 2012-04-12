@@ -8,5 +8,5 @@
  * @version	 SVN: $Id$
  */
 class Survey_Export_CSV extends Evaluation_Export_CSV {
-
+	protected $additionalColumns = array();
 }
