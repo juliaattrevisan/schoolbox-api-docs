@@ -102,21 +102,12 @@ class SubmissionReturn extends DeprecatedModel {
     }
 
     function getLetterGradeByUser($user_id, $box_id = 0) {
-        $query = "SELECT * FROM submission_grade
-                  WHERE lower_bound <=
-                  (
-                       SELECT norm_mark
-                       FROM submission_return sr
-                       WHERE sr.owner = $user_id";
-
-        if($box_id)
-            $query .= " AND sr.box_id = $box_id";
-
-        $query .= " ORDER BY returned DESC
-                       LIMIT 0, 1
-                  )
-                  ORDER BY lower_bound DESC
-                  LIMIT 0, 1";
+        $query = "SELECT g.grade_id, r.comment FROM submission_return r, submission_grade g
+                  WHERE r.owner = " . $this->db->smartQuote($user_id) . "
+                  AND r.box_id = " . $this->db->smartQuote($box_id) . "
+                  AND  g.lower_bound <= r.norm_mark
+                  ORDER BY returned DESC, lower_bound DESC
+                  LIMIT 1";
 
         return $this->db->getRow($query);
     }
