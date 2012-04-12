@@ -3510,6 +3510,8 @@ display:block; padding:7px 16px;
 margin:8px 0;}
 
 #categoryTree{background:#f1f1f1; padding:16px;}
+#categoryTree li{border:0; padding:0; background:none; margin-bottom:0;}
+
 /************************
  END EVALUATION
  ************************/

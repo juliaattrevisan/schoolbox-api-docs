@@ -2,7 +2,8 @@
 
 .jstree-schoolbox a,
 .jstree-schoolbox span.file{ background:#fff; border-radius:4px; -moz-border-radius:4px; -webkit-border-radius:4px;  padding:0 28px;line-height:28px;margin-top:3px; height:28px; }
-
+ .jstree-schoolbox a.active,
+.jstree-schoolbox .jstree-leaf a.active{background:#CAE9B9}
 .jstree-schoolbox span.file{background:#ccc; display:inline-block;}
 
 .jstree-schoolbox li,

@@ -46,7 +46,18 @@
 				"icons":false
 			}
 		});
-	});
+
+        $j(".jstree a").click(function() {
+            $this = $j(this),
+            categoryFullID = $this.closest('li').attr('ID'),
+            categoryStrippedID = parseInt(categoryFullID.substr(5));
+            $j('#question_category').val(categoryStrippedID);
+            $j(".jstree a").removeClass('active');
+            $this.addClass('active');
+            return false;
+        });
+
+    });
 </script>
 <!-- END custom_head -->
 <h1>Modify Question</h1>
@@ -122,7 +133,7 @@
 					<!-- END category_list_item_end -->
 				</ul>
 			</div>
-			<input type='hidden' name='question_category' type='hidden' />
+			<input type='hidden' name='question_category' type='hidden' id="question_category"/>
 		</label>
 
 		<p class="clearfix">
