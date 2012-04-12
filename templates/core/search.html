@@ -34,9 +34,28 @@ $j(function() {
 	});
 });
 </script>
+<style type="text/css">
+    .no_results li {
+        list-style: disc;
+        margin-left: 20px;
+    }
+    #inline_search {
+        margin-top: 20px;
+    }
+    #inline_search .submit-btn-plain {
+        float: none;
+        display: inline;
+    }
+    #inline_search label {
+        display: inline;
+    }
+    #inline_search .default {
+        border: solid 1px #ccc;
+    }
+</style>
 <!-- END custom_head -->
 
-<h1>Search Results</h1>
+<h1>Search Results{FOR}<em>{UNESCAPED_KEYWORD}</em></h1>
 
 <ul id="type">
     <!-- BEGIN type -->
@@ -53,3 +72,20 @@ $j(function() {
 	</div>
     <!-- END result -->
 </div>
+<!-- BEGIN no_result -->
+<div class="no_results">
+    <p>Sorry, but your search{FOR}<em>{UNESCAPED_KEYWORD}</em> didn't return any results{NO_RESULTS_BECAUSE}.</p>
+    <p>Here are some tips for improving your search:</p>
+    <ul>
+        <li>Ensure your search is 3 or more letters long. If you need to search for something less than 3 letters long, "quote" it.</li>
+        <li>You can also use "quotes" to search for an exact string, for example "dog and cat".</li>
+    </ul>
+    <form method="get" action="/search.php" _lpchecked="1" id="inline_search">
+        <label for="inline_search_field">
+            Search again:
+        </label>
+        <input id="inline_search_field" type="text" value="{ENCODED_KEYWORD}" name="keyword" title="search" placeholder="search" class="default" />
+        <input type="submit" class="submit-btn-plain" value="Search" />
+    </form>
+</div>
+<!-- END no_result -->

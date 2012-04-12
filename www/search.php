@@ -28,7 +28,38 @@ if (is_numeric($_GET['keyword']) || ($_GET['keyword'] && strlen($_GET['keyword']
 	));
 }
 else {
-	error(45);
+    $page->setFile(TEMPLATE_content, 'search.html');
+    $page->setBlock(TEMPLATE_content, 'type', 'type_block');
+    $page->setBlock(TEMPLATE_content, 'result', 'result_block');
+    $page->setBlock(TEMPLATE_content, 'no_result', 'no_result_block');
+    // escape any quotes in the keyword string, or the javascript will explode.
+
+    // setup default values
+    $output = array(
+        'KEYWORD'            => str_replace('"','\"', $_GET['keyword']),
+        'ENCODED_KEYWORD'    => htmlentities($_GET['keyword']),
+        'UNESCAPED_KEYWORD'  => $_GET['keyword'],
+        'FOR'                => ' for ',
+        'NO_RESULTS_BECAUSE' => '',
+        'type_block'         => '',
+        'result_block'       => '',
+        'no_result_block'    => ''
+    );
+    $page->setVar($output);
+
+
+    // test the search as to why it failed, and return meaningful response to the user
+    if(strlen($_GET['keyword']) == 0) {
+        $page->setVar('FOR', '');
+        $page->setVar('NO_RESULTS_BECAUSE', ' because it\'s empty');
+    }
+    elseif(strlen($_GET['keyword']) < 3)
+        $page->setVar('NO_RESULTS_BECAUSE', ' because it needs to be longer, or wrapped in "quotes"');
+
+    $page->parse('no_result_block', 'no_result');
+    $page->outputPage();
+    // finished rendering. return control to SitePage
+    return true;
 }
 
 $handle = array(
@@ -64,8 +95,21 @@ if (empty($type) || $type == 'all') {
     $page->setFile(TEMPLATE_content, 'search.html');
     $page->setBlock(TEMPLATE_content, 'type', 'type_block');
     $page->setBlock(TEMPLATE_content, 'result', 'result_block');
+    $page->setBlock(TEMPLATE_content, 'no_result', 'no_result_block');
     // escape any quotes in the keyword string, or the javascript will explode.
-    $page->setVar('KEYWORD', str_replace('"','\"',$keyword));
+
+    // setup default values
+    $output = array(
+        'KEYWORD'            => str_replace('"','\"', $keyword),
+        'ENCODED_KEYWORD'    => htmlentities($keyword),
+        'UNESCAPED_KEYWORD'  => $keyword,
+        'FOR'                => ' for ',
+        'NO_RESULTS_BECAUSE' => '',
+        'type_block'         => '',
+        'result_block'       => '',
+        'no_result_block'    => ''
+    );
+    $page->setVar($output);
 
     // iterate through the handle types
     foreach ($handle as $type_name => &$type_handle) {
@@ -79,9 +123,12 @@ if (empty($type) || $type == 'all') {
 
     $count['all'] = array_sum($count);
 
-    // are there any results? TODO : this error should probably say "no results" rather than "your search was rubbish".
+    // are there any results?
     if ($count['all'] == 0) {
-        error(45);
+        $page->parse('no_result_block', 'no_result', false);
+        // done. exit.
+        $page->outputPage();
+        return true;
     }
 
     // type list
@@ -593,7 +640,7 @@ if (empty($type)) {
             $page->setVar(array(
                 'PAGE_NAME'   => $i,
                 'PAGE_NUMBER' => $i,
-                'PAGE_CLASS'  => $i == $current_page ? 'bold' : '',
+                'PAGE_CLASS'  => $i == $current_page ? 'current' : '',
             ));
 
             $page->parse('pagination_block', 'pagination', true);
