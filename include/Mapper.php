@@ -207,8 +207,9 @@ abstract class Mapper {
 
             if ( $statement->execute() ) {
                 $identifier = $this->identifier['property'];
-
-                $model->$identifier = $this->database->lastInsertId();
+                if (!$model->$identifier) {
+                    $model->$identifier = $model->$identifier || $this->database->lastInsertId();
+                }
             }
             else {
                 return false;
