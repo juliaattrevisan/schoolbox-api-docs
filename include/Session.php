@@ -142,39 +142,101 @@ class Session {
         return $result;
     }
 
-    private function authenticateLDAP($username, $password) {
-
-        $ds=ldap_connect(Cfg::get('ldap_host'));
-        ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
-        ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-        ldap_bind($ds, $this->ldap_escape(Cfg::get('ldap_user')), utf8_encode(Cfg::get('ldap_pass')));
+    private function _authLDAP($username, $password, $ds, $ldap_user, $ldap_base, $version = 3, $referrals = 0) {
+        // perform search for user in ldap server specified
+        ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, $version);
+        ldap_set_option($ds, LDAP_OPT_REFERRALS, $referrals);
+        ldap_bind($ds, $this->ldap_escape($ldap_user), utf8_encode(Cfg::get('ldap_pass')));
         $searchString = "(".Cfg::get('ldap_username')."=".$this->ldap_escape($username).")";
-        $result = ldap_search($ds,Cfg::get('ldap_base'), $searchString, array('dn'));
+        $result = ldap_search($ds, $ldap_base, $searchString, array('dn'));
+        // user exists
         if($result) {
-                $entries = ldap_get_entries($ds, $result);
-                $dn = $entries[0]['dn'];
-                if($dn)
-                        return @ldap_bind($ds, $dn, utf8_encode($password));
-        }
-        ldap_unbind($ds);
+            $entries = ldap_get_entries($ds, $result);
+            $dn = $entries[0]['dn'];
+            // if the user exists
+            if($dn) {
+                $bind = @ldap_bind($ds, $dn, utf8_encode($password));
 
-        if(Cfg::get('ldap_host_alt'))  {
-            //Try student server
-            $ds=ldap_connect(Cfg::get('ldap_host_alt'));
-            ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
-            ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-            ldap_bind($ds, $this->ldap_escape(Cfg::get('ldap_user_alt')), $this->ldap_escape(Cfg::get('ldap_pass')));
-            $result = ldap_search($ds,Cfg::get('ldap_base_alt'), $searchString, array('dn'));
-            if($result) {
-                $entries = ldap_get_entries($ds, $result);
-                $dn = $entries[0]['dn'];
-                if($dn)
-                    return @ldap_bind($ds, $dn,utf8_encode($password));
+                // failed to bind. find out why.
+                if(!$bind) {
+                    // get LDAP response: 0x0032 correlates to LDAP_OPT_DIAGNOSTIC_MESSAGE (but PHP doesn't map it by default)
+                    if (ldap_get_option($ds, 0x0032, $ldap_error)) {
+                        // extract error code
+                        preg_match('/(data [0-9a-z]*)/', $ldap_error, $matches);
+                        // if the preg_match finds an error formatted as expected
+                        if($matches[0]) {
+                            $err_code = substr($matches[0], 5);
+                            // error codes referenced from per http://wiki.service-now.com/index.php?title=LDAP_Error_Codes
+                            switch($err_code) {
+
+                                case '701': // ACCOUNT_EXPIRED
+                                case '533': // ACCOUNT_DISABLED
+                                    // do not fall back. Throw error indicating expired account.
+                                    $page = new SitePage(FALSE);
+                                    $errMsg = 'Your account has expired or been disabled.<br />
+                                               Please contact a system administrator to regain access to your account.';
+                                    $page->goLoginPage($errMsg);
+                                    break;
+
+                                case '773': // USER_MUST_RESET_PASSWORD
+                                case '532': // PASSWORD_EXPIRED
+                                    // do not fall back. Soft-redirect to password reset function.
+                                    $page = new SitePage(FALSE);
+                                    $errMsg = 'Your password has expired and needs to be reset before you can log in.<br />';
+
+                                    // site-specific handling for how to go about resetting a password
+                                    switch(Cfg::get('site_location')) {
+
+                                        case 'mgs':
+                                            $errMsg .= 'Please visit <a href="https://owa.mgs.vic.edu.au/owa">owa.mgs.vic.edu.au/owa</a> to reset your password.';
+                                            break;
+
+                                        default:
+                                            $errMsg .= 'Please contact a system administrator to regain access to your account.';
+                                            break;
+                                    }
+                                    $page->goLoginPage($errMsg);
+                                    break;
+
+                                case '52e': // INVALID_CREDENTIALS
+                                case '49':  // INVALID_CREDENTIALS
+                                default:    // SOME OTHER REASON...
+                                    // default behaviour is to fall back onto SQL authentication.
+                                    break;
+                            }
+                        }
+                    }
+                    @ldap_unbind($ds);
+                    return false;
+                }
+                // successful connection.
+                else {
+                    @ldap_unbind($ds);
+                    return true;
+                }
             }
         }
-
+        // user does not exist in LDAP
+        @ldap_unbind($ds);
         return false;
+    }
 
+    private function authenticateLDAP($username, $password) {
+        $ds = ldap_connect(Cfg::get('ldap_host'));
+
+        // test authentication in primary server
+        if($this->_authLDAP($username, $password, $ds, Cfg::get('ldap_user'), Cfg::get('ldap_base')))
+            return true;
+
+        // test authentication in secondary server
+        if(Cfg::get('ldap_host_alt')) {
+            $ds = ldap_connect(Cfg::get('ldap_host'));
+            if($this->_authLDAP($username, $password, $ds, Cfg::get('ldap_user_alt'), Cfg::get('ldap_base_alt')))
+                return true;
+        }
+
+        // failed authentication
+        return false;
     }
 
     private function authenticateSQL($username, $password) {
