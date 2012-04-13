@@ -37,9 +37,10 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
         foreach ( $this->children as $child ) {
             if ( !( Cfg::get('site_location') == 'wenona' && $child['gid'] == 3 ) ) {
                 $i++;
-                $query = "SELECT title, firstname, lastname, year FROM user WHERE id = {$child['id']}";
+                $query = "SELECT title, firstname, lastname, year, synergy_id FROM user WHERE id = {$child['id']}";
                 $user = DeprecatedDatabase::getInstance()->getRow($query);
                 $this->setVar("STUDENT_ID", $child['id']);
+                $this->setVar("STUDENT_EXTERNAL_ID", $user['synergy_id']);
                 $this->setVar("STUDENT_NAME", $this->user->formatName($user, '{firstname} {lastname}'));
                 $this->setVar("STUDENT_YEAR", $user['year']);
 
