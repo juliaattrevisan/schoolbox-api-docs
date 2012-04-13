@@ -262,7 +262,7 @@ if (is_array($items)) {
                 'NEWS_TITLE' => $article['item_heading'],
                 'POSTER' => $owner,
                 'DATETIME' => $_SESSION['su'] == 1 ? $article['post_datetime'] . $expiry . $article['expire_datetime'] : $article['post_datetime'],
-                'NEWS_BODY' => $archive ? $article['item_body'] : $formatter->cutSentence(Scrub::html($article['item_body']), 200),
+                'NEWS_BODY' => $archive ? $article['item_body'] : Scrub::html($article['item_body']),
                 'TOPIC_NAME' => Scrub::text($previous['topicName']),
                 'TOPIC_CLEAN' => $filter['archive'] . $url->getSlug(),
             );

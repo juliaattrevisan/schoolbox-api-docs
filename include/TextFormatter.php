@@ -51,6 +51,9 @@ class TextFormatter {
 	 * @return string
 	 */
 	public function cutSentence($content, $chars) {
+
+        $content = strip_tags($content);
+
 		if (strlen($content) < $chars) {
 			return $content;
 		}
