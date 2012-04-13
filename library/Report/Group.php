@@ -17,16 +17,17 @@ class Report_Group extends Report_Abstract implements Report_IReport {
 
     // csv field mapping: index => humanreadable
     private $fields = array(
-        'title'     => 'title',
-        'firstname' => 'firstname',
-        'lastname'  => 'lastname',
-        'campus'    => 'campus',
-        'year'      => 'year',
-        'alt_email' => 'email'
+        'title'      => 'title',
+        'firstname'  => 'firstname',
+        'lastname'   => 'lastname',
+        'synergy_id' => 'external id',
+        'campus'     => 'campus',
+        'year'       => 'year',
+        'alt_email'  => 'email'
     );
 
     // fields that we will permit sorting on
-    private $sortable = array('firstname', 'lastname', 'campus', 'year', 'alt_email');
+    private $sortable = array('firstname', 'lastname', 'synergy_id', 'campus', 'year', 'alt_email');
     private $defaultOrderBy = 'lastname';
 
     public function __construct($page) {
@@ -144,6 +145,7 @@ class Report_Group extends Report_Abstract implements Report_IReport {
                     'USER_TITLE'      => $user['title'],
                     'USER_FIRSTNAME'  => $user['firstname'],
                     'USER_SURNAME'    => $user['lastname'],
+                    'USER_SYNERGY_ID' => $user['synergy_id'],
                     'USER_EMAIL'      => $email,
                     'USER_YEAR'       => empty($user['year']) ? '' : "Year {$user['year']}",
                     'USER_CAMPUS'     => stristr($user['group_name'], $user['campus_name'])?'':$user['campus_name'],
