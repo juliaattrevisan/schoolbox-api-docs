@@ -54,9 +54,6 @@ class Library_Splash {
     }
 
 
-
-
-
     /* GETTERS AND SETTERS */
     private function setTemplateFile($file) {
         $this->templateFile = $file;

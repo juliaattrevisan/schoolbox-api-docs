@@ -5,12 +5,12 @@ $library = new Library_Splash('morris', 4582);
 $library->setVars(array(
     'LETS_READ'         => 930,
     'CURIOUS_QUOTES'    => 934,
-    'FINDING_OUT'       => 933,
-    'OUR_COMMUNITY'     => 935,
+    'FINDING_OUT'       => 931,
+    'OUR_COMMUNITY'     => 936,
     'GALLERY'           => 932,
     'DID_YOU_KNOW'      => 935,
-    'DIGITAL_CITIZEN'   => 936,
-    'THINKS'            => 937,
+    'DIGITAL_CITIZEN'   => 932,
+    'THINKS'            => 933,
     'WONDERFUL_WORDS'   => 924,
     'REMINDER'          => 937
 ));
