@@ -67,3 +67,6 @@ $locations = array(
 
 $this->dropDown('regions', $locations, $location);
 
+$url = new Url("http://www.google.com.au");
+$this->setVar('SUPPLIED_BY_NAME', 'Google');
+$this->setVar('SUPPLIED_BY_URL' , $url->getBase64EncodedRedirect());
