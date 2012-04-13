@@ -68,6 +68,7 @@ $handle = array(
     'category' => 'category',
     'link'     => 'link',
     'news'     => 'categoryNews',
+    'sitenews' => 'news',
     'blog'     => 'blog',
     'wiki'     => 'wiki',
     'forum'    => 'forum',
@@ -80,7 +81,8 @@ $type_list = array(
     'file'     => 'Files',
     'category' => 'Folders',
     'link'     => 'Links',
-    'news'     => 'News',
+    'sitenews' => 'School News',
+    'news'     => 'Homepage News',
     'blog'     => 'Blogs',
     'wiki'     => 'Wikis',
     'forum'    => 'Forums',
@@ -401,7 +403,7 @@ if (!empty($result['link'])) {
     $page->parse('RESULT', 'link_t', true);
 }
 
-// render news
+// render homepage news
 if (!empty($result['news'])) {
     $page->setFile('news_t', 'search/news.html');
     $page->setBlock('news_t', 'news', 'news_block');
@@ -442,6 +444,46 @@ if (!empty($result['news'])) {
 
     $page->parse('RESULT', 'news_t', true);
 }
+
+
+// render school news
+if (!empty($result['sitenews'])) {
+    $page->setFile('sitenews_t', 'search/schoolnews.html');
+    $page->setBlock('sitenews_t', 'sitenews', 'sitenews_block');
+    $page->setVar(array(
+        'NEWS_DISP_COUNT' => count($result['news']),
+        'NEWS_COUNT'      => $count['news'],
+    ));
+
+    foreach ($result['sitenews'] as $news) {
+        $tName = strtolower($news['topicName']);
+        $archived = (new DateTime() > new DateTime($news['item_datetime_expires']));
+        $news['breadcrumb'] = ($archived ? ' Archived' : 'Posted') . " in <a href=\"/news/" . ($archived ? 'archive/': '') . "$tName\">{$news['topicName']}</a>";
+
+        $news['link'] = "/news/item/{$news['item_id']}";
+
+        $userHandler = new User();
+        $createdTime = new Alaress_Date_Relative($news['item_datetime_posted']);
+
+        $page->setVar(array(
+            'NEWS_ID'         => $news['item_id'],
+            'NEWS_CODE'       => $news['code'],
+            'NEWS_LINK'       => $news['link'],
+            'NEWS_HEADING'    => Scrub::text($news['item_heading']),
+            'NEWS_BODY'       => html_entity_decode(TextFormatter::cutSentence(Scrub::text(strip_tags($news['item_body'])), 150)),
+            'NEWS_OWNER'      => $news['item_owner'],
+            'NEWS_OWNER_NAME' => $userHandler->formatName($news),
+            'NEWS_CREATED'    => $createdTime->getRelativeTime(),
+            'NEWS_BREADCRUMB' => $news['breadcrumb'],
+            'NEWS_COUNT'      => $count['news'],
+        ));
+
+        $page->parse('sitenews_block', 'sitenews', true);
+    }
+
+    $page->parse('RESULT', 'sitenews_t', true);
+}
+
 
 // render blog
 if (!empty($result['blog'])) {

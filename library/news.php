@@ -545,6 +545,117 @@ class News extends DeprecatedModel {
         return $this->db->getAll($query);
 */
     }
+
+    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
+        $keyword = mysql_real_escape_string($keyword);
+/*
+        $query = "SELECT `subject_news`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
+                        MATCH(`heading`,`body`) AGAINST ('$keyword') AS `score`
+                    FROM `subject_news`
+                    LEFT JOIN `user` ON `subject_news`.owner = `user`.id
+                    LEFT JOIN `perms` ON `subject_news`.code = `perms`.cid
+                        AND `perms`.gid = {$_SESSION['gid']}
+                        AND `perms`.type > 0
+                    LEFT JOIN `userAccess` ON `subject_news`.code = `userAccess`.sid
+                        AND `userAccess`.service = 1
+                        AND `userAccess`.uid = {$_SESSION['id']}
+                    WHERE (`perms`.cid OR `userAccess`.sid)
+                        AND MATCH(`heading`,`body`) AGAINST ('$keyword')
+                        AND (`subject_news`.datetime_published < NOW() OR `subject_news`.owner = {$_SESSION['id']})
+                        AND `deleted` = FALSE
+                    ORDER BY `$sort_by` $sort_dir
+                    LIMIT $offset, $limit;
+        ";
+
+        $count_query = "SELECT COUNT(*)
+                        FROM `subject_news`
+                        LEFT JOIN `user` ON `subject_news`.owner = `user`.id
+                        LEFT JOIN `perms` ON `subject_news`.code = `perms`.cid
+                            AND `perms`.gid = {$_SESSION['gid']}
+                            AND `perms`.type > 0
+                        LEFT JOIN `userAccess` ON `subject_news`.code = `userAccess`.sid
+                            AND `userAccess`.service = 1
+                            AND `userAccess`.uid = {$_SESSION['id']}
+                        WHERE (`perms`.cid OR `userAccess`.sid)
+                            AND MATCH(`heading`,`body`) AGAINST ('$keyword')
+                            AND (`subject_news`.datetime_published < NOW() OR `subject_news`.owner = {$_SESSION['id']})
+                            AND `deleted` = FALSE
+        ";
+*/
+
+        $userHandler = new Group;
+        $shareResults = array();
+
+        /* Prevent copies of posts appearing if they are posted to another group.
+        */
+        if (!$userHandler->isSuperuser()) {
+            $query = "
+        SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner, news_items.item_body,
+            DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
+            DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
+            user.lastname, user.title, user.id as uid, user.firstname, newsTopic.name topicName, newsTopicID,
+            MATCH(`item_heading`,`item_body`) AGAINST ('$keyword') AS `score`
+        FROM `".$this->_table."`
+        LEFT JOIN user ON news_items.item_owner = user.id
+        JOIN newsCampus ON newsCampus.id = news_items.item_id
+            AND newsCampus.campus IN(".implode(',',$_SESSION['campus']).")
+            OR news_items.item_campus='4'
+        JOIN newsGroup ON newsGroup.id = news_items.item_id
+            AND newsGroup.gid = '".$_SESSION['gid']."'
+        JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
+        WHERE news_items.item_owner != '".$_SESSION['id']."' AND news_items.item_deleted = 0
+            AND item_datetime_published < NOW()
+            AND MATCH(`item_heading`,`item_body`) AGAINST ('$keyword')
+        GROUP BY news_items.item_id
+        ORDER BY newsTopic.newsTopicID, news_items.item_datetime_posted DESC";
+
+            $shareResults = $this->db->getAll($query);
+        }
+
+        $query = "
+		SELECT DISTINCT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_body,
+			DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
+			DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime, news_items.item_datetime_expires,
+			user.lastname, user.title, user.firstname, user.id as uid, newsTopic.name topicName, newsTopicID,
+		    MATCH(`item_heading`,`item_body`) AGAINST ('$keyword') AS `score`
+		FROM `".$this->_table."`
+		LEFT JOIN user ON news_items.item_owner = user.id
+        LEFT JOIN newsUser ON newsUser.newsID = news_items.item_id
+		JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
+        WHERE news_items.item_deleted = 0
+        ";
+
+        /* If the current user is a superuser, do not filter their results.
+        * Otherwise, restrict news post selection by ownership.
+        */
+        if (!$userHandler->isSuperuser()) {
+            $query .= " AND (news_items.item_owner = '".$_SESSION['id']."' OR (newsUser.userID = '".$_SESSION['id']."' AND item_datetime_published < NOW() )) ";
+        }
+
+        $query .= " AND MATCH(`item_heading`,`item_body`) AGAINST ('$keyword')
+                    ORDER BY newsTopic.newsTopicID, news_items.item_datetime_posted DESC;";
+
+        $userResults = $this->db->getAll($query);
+
+        //merge and sort the headlines based on time
+        if(is_array($shareResults) && is_array($userResults))
+            $allNews = array_merge($shareResults, $userResults);
+        else if(is_array($shareResults))
+            $allNews = $shareResults;
+        else if(is_array($userResults))
+            $allNews = $userResults;
+        else
+            return false;
+
+        usort($allNews,array($this,"timecmp"));
+
+        $count = count($allNews);
+
+        if ($limit > 0)
+        $allNews = array_slice($allNews, $offset, $limit);
+
+        return $allNews;
+    }
 }
 
 
