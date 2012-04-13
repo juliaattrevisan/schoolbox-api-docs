@@ -1,4 +1,21 @@
 <?php
+
+$library = new Library_Splash('nina', 4276);
+
+$library->setVars(array(
+    'ONLINE_RESOURCES'   => 530,
+    'REMARKABLE_READING' => 531,
+    'NEW_BOOKS'          => 940,
+    'QUICK_FACTS'        => 532,
+    'IN_THE_NEWS'        => 534,
+    'RESEARCH_TOOLS'     => 941,
+    'CLICK_VIEW'         => 942,
+));
+
+$library->render($this);
+
+/*
+
 $this->setFile(TEMPLATE_content, 'modules/library/nina.html');
 
 require_once SITE_root.'/library/textBox.php';
@@ -39,6 +56,6 @@ else {
     $this->setVar('image_block','');
 }
 
-
+*/
 
 ?>

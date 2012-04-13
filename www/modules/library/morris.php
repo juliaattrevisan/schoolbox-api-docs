@@ -1,4 +1,24 @@
 <?php
+
+$library = new Library_Splash('morris', 4582);
+
+$library->setVars(array(
+    'LETS_READ'         => 930,
+    'CURIOUS_QUOTES'    => 934,
+    'FINDING_OUT'       => 933,
+    'OUR_COMMUNITY'     => 935,
+    'GALLERY'           => 932,
+    'DID_YOU_KNOW'      => 935,
+    'DIGITAL_CITIZEN'   => 936,
+    'THINKS'            => 937,
+    'WONDERFUL_WORDS'   => 924,
+    'REMINDER'          => 937
+));
+
+$library->render($this);
+
+
+/*
 $this->setFile(TEMPLATE_content, 'modules/library/morris.html');
 
 require_once SITE_root.'/library/textBox.php';
@@ -43,4 +63,5 @@ if(is_array($allFiles)) {
 else {
     $this->setVar('image_block','');
 }
+*/
 ?>
