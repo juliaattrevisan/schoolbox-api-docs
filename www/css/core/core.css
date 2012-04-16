@@ -870,6 +870,33 @@ h4 .hide-on-small {
 	width: 100%;
 }
 
+.box.student-subjects li{
+     position:relative;
+}
+
+.box.student-subjects li.image-height{
+    min-height:53px;
+}
+
+.box.student-subjects li .student-name{
+display:block;
+    font-weight:bold;
+    margin-left:16px;
+}
+
+.box.student-subjects .student-details {
+    margin-left:65px;
+}
+
+
+.box.student-subjects .link-image{
+    position:absolute;
+    top:7px;
+    left:16px;
+
+}
+
+
 .dark {
 	background: #faf9f5;
 }
