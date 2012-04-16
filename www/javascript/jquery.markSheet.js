@@ -2,7 +2,7 @@ $j(function() {
     var markSheet =  {
 
         columnCount : $j('.mark-sheet.assessments table').find('tr:first').children('th').size(),
-        assessmentCellWidth : '160',
+        assessmentCellWidth : '180',
 
         init: function() {
             markSheet.columns();
@@ -139,17 +139,11 @@ $j(function() {
                            notification.css({
                                'border': '2px solid green'
                            });
-
                             setTimeout(function() {
                                 notification.css({
                                     'border': '1px solid #ccc'
                                 });
                             }, 1000)
-
-
-
-
-
                         });
                         return false;
                     }
