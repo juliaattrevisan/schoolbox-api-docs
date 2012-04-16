@@ -88,8 +88,6 @@ if (is_array($sectionValues) && count($sectionValues)) {
         }
     }
 
-    print_r($legendItems);
-
 	foreach($sectionValues as $currentSection) {
 		$questionList = array();
 

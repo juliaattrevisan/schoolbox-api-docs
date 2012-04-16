@@ -3403,8 +3403,8 @@ ul.section-options a.drop-arrow {
 
 /*Graphs*/
 .evaluation-graph-holder .graph {
-	width: 600px;
-	height: 300px;
+	width: 400px;
+	height: 200px;
 	float: left;
 
 	margin-bottom: 16px
