@@ -7,20 +7,13 @@
 $j(function() {
 	$j.fn.qtip.defaults.position.corner = {target: 'topLeft',tooltip: 'bottomLeft'};
 	$j.fn.qtip.defaults.style = {tip: 'bottomLeft',name: 'green'};
-
+/*
 	$j('.evaluation-response li').each(function() {
 		$j(this).addClass('list-answer-'+$j(this).text());
 		$j(this).html('<a class="response-item" href="#">'+$j(this).html()+'</a>');
 	});
-	//click on an item in the legend
-	$j('.activate-results').click(function() {
-		$j('.activate-results, .response-item').removeClass('active');
-		$j('.evaluation-response li.list-answer-'+$j(this).children('strong').text()).each(function() {
-			$j(this).children('a').addClass('active');
-		});
-		$j(this).addClass('active');
-		return false;
-	});
+
+
 	//click on a response item
 	$j('.response-item').click(function() {
 		$j('.activate-results, .response-item').removeClass('active');
@@ -30,15 +23,32 @@ $j(function() {
 		$j('.letter-'+$j(this).text()).children('a').addClass('active');
 		return false;
 	});
-	$j('.response-item').each(function() {
-		$j(this).qtip({content: "<strong>Answer:</strong> " + $j('.letter-'+$j(this).html()).find('span').text()});
-	});
-
+*/
 	if ($j('.evaluation-legend').length > 0) {
 		$j('.information-notification.hide').removeClass('hide');
-	};
+	}
 });
 </script>
+<style type="text/css">
+    .graph-block {
+        float: left;
+        margin-top: 30px;
+    }
+
+    .evaluation-question-result .evaluation-results {
+        width: 46%;
+    }
+
+    .graph-block .legend {
+        float: left;
+        clear: both;
+        margin-left: 10%;
+    }
+    
+    .evaluation-results th {
+        text-align: left;
+    }
+</style>
 <!-- END custom_head -->
 
 <h1>{SURVEY_NAME}</h1>
@@ -53,39 +63,27 @@ $j(function() {
 		</div>
 
 		<h3>Results</h3>
-		<p class="information-notification clearfix hide">Click on a response letter to see the other students who selected that answer. Alternatively hover the response letter to see what it refers to.</p>
+		<p class="information-notification clearfix hide">Click on a response letter to see the other students who selected that answer.</p>
 		<table>
 			<thead>
 				<tr>
 					<th><strong>Respondent</strong></th>
 					<th><strong>Response</strong></th>
-					<th><strong>Start</strong></th>
-					<th><strong>Finish</strong></th>
 				</tr>
 			</thead>
 			<tbody>
 				<!-- BEGIN respondent -->
 				<tr>
 					<td>{RESPONDENT_NAME}</td>
-					<td class="evaluation-response">{RESPONDENT_RESPONSE}</td>
-					<td class="evaluation-response">{RESPONDENT_START_DATETIME}</td>
-					<td class="evaluation-response">{RESPONDENT_FINISH_DATETIME}</td>
+					<td class="evaluation-response"><ul><li><a class="response-item">{RESPONDENT_RESPONSE}</a></li></ul></td>
 				</tr>
 				<!-- END respondent -->
 			</tbody>
 		</table>
 	</div>
+    <div class="graph-block">
+    <!-- BEGIN graph -->
+    <!-- END graph -->
+    </div>
 
-	<!-- BEGIN has_legend -->
-	<div class="evaluation-legend">
-
-		<h3>Legend</h3>
-		<p class="information-notification clearfix">Click on a legend item to see the students that responded to that answer.</p>
-		<ul>
-			<!-- BEGIN legend_item -->
-			<li class="letter-{LEGEND_ITEM_LETTER}"><a href="#" class="activate-results"><strong>{LEGEND_ITEM_LETTER}</strong> <span>{LEGEND_ITEM_TEXT}</span></a></li>
-			<!-- END legend_item -->
-		</ul>
-	</div>
-	<!-- END has_legend -->
 </div>

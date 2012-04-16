@@ -69,5 +69,7 @@ else {
 }
 
 $this->setVar(array(
-	'SURVEY_NAME' => $assess['title']
+	'SURVEY_NAME' => $assess['title'],
+    'CID'         => $assess['category_id'],
+    'SURVEY_ID'   => $assess['assess_id']
 ));

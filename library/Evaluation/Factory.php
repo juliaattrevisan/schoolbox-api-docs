@@ -49,7 +49,6 @@ abstract class Evaluation_Factory extends DeprecatedModel {
 
             if ($classname) {
 				$object = $this->factoryName . '_' . $prefix . '_' . $classname;
-
 				return new $object;
             }
             else {

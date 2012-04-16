@@ -28,7 +28,7 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 }
 
 $surveyExporter = new Survey_Export_Graph($assess, $factory, new Survey_Section(), new Survey_Attempt(), $questionHandler);
-$surveyExporter->setLegendHTML(true);
+$surveyExporter->setLegendHTML(false);
 
 /* Optionally filter by question
  */
@@ -42,10 +42,54 @@ $sectionValues = $surveyExporter->getSectionValues();
  */
 $this->setFile(TEMPLATE_content, 'survey/resultsForQuestion.html');
 $this->setBlock(TEMPLATE_content, 'respondent', 'respondent_block');
-$this->setBlock(TEMPLATE_content, 'has_legend', 'has_legend_block');
-$this->setBlock('has_legend', 'legend_item', 'legend_item_block');
+$this->setBlock(TEMPLATE_content, 'graph', 'graph_block');
+
+
+
+/* Render legend. There should only be one section and one question when using
+ * this script, but for polymorphism it appears in an array structure
+ */
+/*
+if (is_array($sectionValues) && count($sectionValues)) {
+    if (is_array($sectionValues[0]['questions']) && count($sectionValues[0]['questions'])) {
+        if ($questionHandler->hasLegend($sectionValues[0]['questions'][0]['type_id'])) {
+            $allLegendItems = $sectionValues[0]['questions'][0]['summary'];
+
+            // Sort legend items explicitly, otherwise they will appear in the
+                 order they were submitted
+
+            uksort($allLegendItems, 'cmp');
+
+            foreach($allLegendItems as $key => $value) {
+                $this->setVar(array(
+                    'LEGEND_ITEM_LETTER' => $key,
+                    'LEGEND_ITEM_TEXT' => $value['text'],
+                ));
+
+                $this->parse('legend_item_block', 'legend_item', true);
+            }
+
+            $this->parse('has_legend_block', 'has_legend');
+        }
+        else {
+            $this->setVar('has_legend_block', '');
+        }
+    }
+}
+*/
+
 
 if (is_array($sectionValues) && count($sectionValues)) {
+
+    // manual array flip
+    if(isset($allLegendItems)) {
+        foreach($allLegendItems as $key => $item) {
+            $legendItems[$item['text']] = $key;
+        }
+    }
+
+    print_r($legendItems);
+
 	foreach($sectionValues as $currentSection) {
 		$questionList = array();
 
@@ -57,6 +101,10 @@ if (is_array($sectionValues) && count($sectionValues)) {
 			}
 		}
 
+        $answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
+
+        $answerHandler->graphResults($this, $currentQuestion);
+
 		/* A list of attempts
 		 */
 		if (count($currentQuestion['attempts'])) {
@@ -66,7 +114,7 @@ if (is_array($sectionValues) && count($sectionValues)) {
 
 				$this->setVar(array(
 					'RESPONDENT_NAME' => $currentAttempt['name'],
-					'RESPONDENT_RESPONSE' => $currentAttempt['responses'],
+					'RESPONDENT_RESPONSE' =>  $currentAttempt['responses'],
 					'RESPONDENT_START_DATETIME' => $start->getShort(),
 					'RESPONDENT_FINISH_DATETIME' => $finish->getShort(),
 				));
@@ -83,35 +131,6 @@ $this->setVar(array(
 	'QUESTION_QUESTION' => $questionList
 ));
 
-/* Render legend. There should only be one section and one question when using
- * this script, but for polymorphism it appears in an array structure
- */
-if (is_array($sectionValues) && count($sectionValues)) {
-	if (is_array($sectionValues[0]['questions']) && count($sectionValues[0]['questions'])) {
-		if ($questionHandler->hasLegend($sectionValues[0]['questions'][0]['type_id'])) {
-			$allLegendItems = $sectionValues[0]['questions'][0]['summary'];
-
-			/* Sort legend items explicitly, otherwise they will appear in the
-			 * order they were submitted
-			 */
-			uksort($allLegendItems, 'cmp');
-
-			foreach($allLegendItems as $key => $value) {
-				$this->setVar(array(
-					'LEGEND_ITEM_LETTER' => $key,
-					'LEGEND_ITEM_TEXT' => $value['text'],
-				));
-
-				$this->parse('legend_item_block', 'legend_item', true);
-			}
-
-			$this->parse('has_legend_block', 'has_legend');
-		}
-		else {
-			$this->setVar('has_legend_block', '');
-		}
-	}
-}
 
 /**
  * Custom comparison function as used on php.net
