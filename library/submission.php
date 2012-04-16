@@ -103,7 +103,7 @@ class Submission extends DeprecatedModel {
 	function getByDate($date, $userID, $categoryList) {
         $query = "(SELECT
                     s.id, s.category, s.type, s.owner, s.open_date, s.date, s.late_date, s.fid, s.accept_submission,
-                    s.deleted, s.description, s.name, s.created, s.mark_type, s.max_mark,
+                    s.deleted, s.name, s.description, s.created, s.mark_type, s.max_mark,
                     t.realname,
                     c.name categoryName,
                     GROUP_CONCAT(cc.code) categoryCode
@@ -147,7 +147,12 @@ class Submission extends DeprecatedModel {
                     )
                     ORDER BY date";
 
-        return $this->db->getAll($query);
+        $result = $this->db->getAll($query);
+
+        echo "$query \n";
+        print_r($result);
+
+        return $result;
 	}
 
 	function getUpcoming($userID, $categoryList) {
