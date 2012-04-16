@@ -64,3 +64,6 @@ cache/cache.php
 
 ## Inserts new config variable stream_dir
 cache/cache.sql
+
+## Clears all the synport[rnd] files from data/zip directory
+cache/remove_synport_cache.php
