@@ -228,6 +228,7 @@ class External_Tass_Timetable implements External_TimetableInterface {
 					$timetable[$x]['day'][$y]['description'] = $desc['sub_desc'];
 					$timetable[$x]['day'][$y]['code'] = trim($desc['year_grp'] . '-' . $desc['sub_code'] . '-' . $desc['class']);
 					$timetable[$x]['day'][$y]['room'] = $desc['room_code'];
+                    $timetable[$x]['day'][$y]['staffCode'] = $desc['tch_code'];
 					$desc = $this->getDatabase()->getNextArray();
 
 					//bad data in synergetic.. why..??

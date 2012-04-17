@@ -102,6 +102,32 @@ if (is_array($outputList)) {
                         }
                         else
                         {
+                            // format teacher output
+
+                            // if not staff and external db is enabled
+                            if(!$staffFlag && Cfg::get('external_enable')) {
+                                switch(Cfg::get('external_type')) {
+                                    case 'synergetic':
+                                        $period_staff = $userHandler->formatName(array(
+                                            'title'     => $period['staffTitle'],
+                                            'firstname' => $period['staffFirstname'],
+                                            'lastname'  => $period['staffSurname']
+                                        ));
+                                        break;
+                                    case 'tass':
+                                        $period_staff = $period['staffCode'];
+                                        break;
+                                    case 'denbigh':
+                                    case 'schoolbox':
+                                    default:
+                                        $period_staff = '';
+                                        break;
+                                }
+                            }
+                            // staff, or external_db is disabled
+                            else {
+                                $period_staff = '';
+                            }
 
                             $teacher = array('title'    => $period['staffTitle'],
                                             'firstname' => $period['staffFirstname'],
@@ -110,7 +136,7 @@ if (is_array($outputList)) {
                             $outputPeriod = array('PERIOD_DESC'    => Scrub::Text($period['description']),
                                                   'PERIOD_CODE'    => '(' . Scrub::Text($period['code']) . ')',
                                                   'PERIOD_ROOM'    => Scrub::Text($period['room']),
-                                                  'PERIOD_STAFF'   => $staffFlag?'':' - ' . $userHandler->formatName($teacher),
+                                                  'PERIOD_STAFF'   => Scrub::Text($period_staff),
                                                   'PERIOD_ONCLICK' => '',
                             );
 
