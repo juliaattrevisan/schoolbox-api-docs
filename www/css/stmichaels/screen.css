@@ -1,0 +1,112 @@
+body{background:#002c77 url(/images/cathedral/background-strip.jpg) repeat-x;}
+
+h2{color:#004b93; background:#ece1a6;}
+a{color:#0076fa;}
+#header{height:138px;}
+#header .logo{padding:0; width:756px; height:112px; left:0;}
+
+#header #tabs li.navthis a{color:#054b93; }
+#header #tabs li a{color:#fff;}
+
+#nav{top:112px;}
+#nav h3{background:#d4e1ed; color:#004b93;}
+#nav .nav-wrapper, #nav ul ul,.colours-buttons{background:#f2f6f9;}
+#nav ul ul{border-color:#d4e1ed;}
+
+#tabs-homepage li.ui-state-default a {
+    background: none repeat scroll 0 0 #F2F6F9;
+    color: #004b93;
+}
+
+#tabs-homepage li.ui-tabs-selected a {
+    background: none repeat scroll 0 0 #fcfbf2;
+    color: #004b93;
+}
+
+#tabs-sub .ui-tabs-nav li a {
+    background:#fcfbf2;
+}
+
+#nav li a:hover, #nav li li a:hover, #category li a:hover, #tabs-sub .ui-tabs-nav li a:hover{
+    background-color: #c9a900;
+    color: #ffffff;
+}
+
+
+.dark, .dark td, #tree .dark, .standardForm, #assess .standardForm, #assess .additional-details, #assess .assess-body,
+.blog-comments .box, .post-left, #category, .search-item:nth-child(2n), #tabs-homepage .customise-components {
+    background: none repeat scroll 0 0 #fcfbf2;
+}
+
+#category li a.selected, #tabs-sub li.ui-tabs-selected a {background:#004b93; color:#ffffff;}
+.submit-btn-plain {
+
+    background-color: #eff4f8;
+    background-image: -moz-linear-gradient(top, #eff4f8, #dce7f0);
+    background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #eff4f8),color-stop(1, #dce7f0));
+    background-image: -webkit-linear-gradient(#eff4f8, #dce7f0);
+    background-image: linear-gradient(top, #eff4f8, #dce7f0);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#eff4f8', EndColorStr='#dce7f0');
+
+    border-color: #a6c0d9;
+    color: #000000 !important;
+    text-shadow: 0 1px 0 #ffffff;
+    font-weight:bold;
+}
+.submit-btn-plain:hover {
+    background-color: #fbfaef;
+    background-image: -moz-linear-gradient(top, #fbfaef, #f7f3dc);
+    background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #fbfaef),color-stop(1, #f7f3dc));
+    background-image: -webkit-linear-gradient(#fbfaef, #f7f3dc);
+    background-image: linear-gradient(top, #fbfaef, #f7f3dc);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfaef', EndColorStr='#f7f3dc');
+    border-color: #ece1a6;
+    color: #000000 !important;
+    cursor: pointer;
+    font-weight:bold;
+    text-shadow: 0 1px 0 #fff0b0;
+}
+
+/****** Calendar ******/
+.dayWrap p {
+    color: #000000;
+}
+.otherMonth .dayWrap p, .otherMonth .dayWrap a {
+    color: #797979;
+}
+td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box, td.cal-left a.back, td.cal-left a.forward, td.cal-right a.filter-change, .day-block {
+    background-color: #f2f6fa;
+}
+td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-change.current, td.cal-right a.filter-change:hover {
+    background-color: #D4E1ED;
+}
+
+.dayWrap {
+    background-color: #D4E1ED;
+}
+.calTableCurrent .dayWrap{
+    background-color:#ffffff;
+
+}
+.otherMonth .dayWrap, .past .dayWrap {
+    background-color: #b6d6f4;
+}
+#month-view td.dark, #week-view td.dark {
+    background:#004B93;
+    color:#fff;
+}
+#month-view h3, #week-view h3{color:#000;}
+
+.cal-bubble .middle{border-color:#D4E1ED}
+.cal-bubble .bottom{border-right-color:#D4E1ED}
+.cal-bubble .middle .close{background:#D4E1ED; color:#004B93;}
+
+
+
+#search, #search-field{background:#d4e1ed;}
+#infoPanel {margin-top:23px;}
+#infoPanel li{color:#d4e1ed;}
+#infoPanel li a{color:#f6f0d4;}
+
+#footer ul li {color:#4c81b3}
+#footer ul li a{color:#a6c0d9;}
