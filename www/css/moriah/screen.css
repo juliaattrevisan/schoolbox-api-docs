@@ -159,7 +159,7 @@ h3, #nav h3, .add-component .notification { color: #FFFFFF; }
     filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#4c7299', EndColorStr='#3c5b7b');
 }
 
-#tabs li.navthis a { background:#fff; }
+#tabs li.navthis a { background:#fff; filter: none; }
 
 #header #tabs li.navthis a { color:#000; }
 
