@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-include('../../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 $dir = Cfg::get('zip_dir');
 $rtn = shell_exec("rm -f $dir/synport*");
 
