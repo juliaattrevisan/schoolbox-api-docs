@@ -69,6 +69,6 @@ cache/remove_synport_cache.php
 
 calendar/calendar.sql
 
-clickview/clickview.sql
+homepages/clickview.sql
 
 core/user_digest.sql
