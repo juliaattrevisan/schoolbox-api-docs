@@ -59,6 +59,8 @@ homepages/deprecated_components.php
 ## Purges category data on category-dependent tables where category has been deleted
 homepages/deleted_homepage_cleanup.sql
 
+hompages/fix_component_desc.sql
+
 ## Creates stream cache dir
 cache/cache.php
 
@@ -67,3 +69,7 @@ cache/cache.sql
 
 ## Clears all the synport[rnd] files from data/zip directory
 cache/remove_synport_cache.php
+
+calendar/calendar.sql
+
+clickview/clickview.sql
