@@ -49,16 +49,13 @@ admin/superuser_password.sql
 ## Upgrades submission box to take different normalised grading types
 submission_grades/submission_grades.sql
 
-## Removes References in the Administration system to Donvale for SCHOOLBOX as the EXTERNAL DB. configuration names need to change too,
-# but I cannot do that - this just hides them from the users - Damian
-admin/remove_donvale_references.sql
-
 ## Maps deprecated components to their new counterparts, then deletes the deprecated components
 homepages/deprecated_components.php
 
 ## Purges category data on category-dependent tables where category has been deleted
 homepages/deleted_homepage_cleanup.sql
 
+## Improves homepage component description to be clearer
 hompages/fix_component_desc.sql
 
 ## Creates stream cache dir
