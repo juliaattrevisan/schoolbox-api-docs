@@ -276,19 +276,19 @@ if [ -d $schoolbox_dir/updates/$new_ver ]; then
 cd $schoolbox_dir/updates/$new_ver/;
 if [ -s ./scripts_list ]; then
 echo -e "Reading Script Processing List:\n";
-for script in `cat scripts_list`; do
+for script in `grep -v "#" scripts_list`; do
 file=`echo $script`;
-if [[ `echo $file|grep -v "#"|grep .sh$` ]]; then
+if [[ `echo $file|grep .sh` ]]; then
 echo -e "Running Shell Script: $file\c" &> /tmp/update_$dbname$new_ver.errlog;
 ./$file >> /dev/null;
 errorCheck;
 fi;
-if [[ `echo $file|grep -v "#"|grep .php$` ]]; then
+if [[ `echo $file|grep .php` ]]; then
 echo -e "Running PHP Script: $file\c";
 php -f ./$file >> /dev/null &> /tmp/update_$dbname$new_ver.errlog;
 errorCheck;
 fi;
-if [[ `echo $file|grep -v "#"|grep .sql$` ]]; then
+if [[ `echo $file|grep .sql` ]]; then
 echo -e "Running SQL Script: $file\c";
 mysql -f -u $sqluser --password=$sqlpass $sqldb < ./$file  >> /dev/null &> /tmp/update_$dbname$new_ver.errlog;
 errorCheck;
