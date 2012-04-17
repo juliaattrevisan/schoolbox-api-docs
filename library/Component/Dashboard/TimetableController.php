@@ -57,7 +57,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
         $periodCount = 0;
 
-        if ( is_array($this->timetable) ) {
+        if ( is_array($this->timetable) && !empty($this->timetable)) {
 
             //for each period set result
             foreach ( $this->timetable as $period ) {

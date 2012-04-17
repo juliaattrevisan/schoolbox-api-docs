@@ -62,7 +62,7 @@ if (is_array($outputList)) {
 
         $timetable = $timetableHandler->getFullTimetable($user['synergy_id'], $user['uid'], $user['campus']);
 
-        if (is_array($timetable)) {
+        if (is_array($timetable) && !empty($timetable)) {
             $days = count($timetable[1]['day']);
 
             $this->setVar('TIMETABLE_FIELD_WIDTH', round((95 / ($days + 1)), 1));
@@ -128,10 +128,6 @@ if (is_array($outputList)) {
                             else {
                                 $period_staff = '';
                             }
-
-                            $teacher = array('title'    => $period['staffTitle'],
-                                            'firstname' => $period['staffFirstname'],
-                                            'lastname'  => $period['staffSurname']);
 
                             $outputPeriod = array('PERIOD_DESC'    => Scrub::Text($period['description']),
                                                   'PERIOD_CODE'    => '(' . Scrub::Text($period['code']) . ')',
