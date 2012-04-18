@@ -56,7 +56,7 @@ homepages/deprecated_components.php
 homepages/deleted_homepage_cleanup.sql
 
 ## Improves homepage component description to be clearer
-hompages/fix_component_desc.sql
+homepages/fix_component_desc.sql
 
 ## Creates stream cache dir
 cache/cache.php
