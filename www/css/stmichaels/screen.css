@@ -178,3 +178,7 @@ ADMIN!
 
 #footer ul li {color:#b2c5d6}
 #footer ul li a{color:#003f77;}
+
+.standardForm td {
+    border-bottom: 1px solid #eee;
+}
