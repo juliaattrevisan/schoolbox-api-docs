@@ -61,7 +61,7 @@ if (is_array($allSurveys)) {
 			'USER_ID' => $author['uid'],
 			'USER_FIRSTNAME' => $author['firstname'],
 			'USER_LASTNAME' => $author['lastname'],
-			'ON_OFF' => $i%2 ? 'dark' : '',
+			'ON_OFF' => $i++%2 ? 'dark' : '',
         ));
 
 		/* Check if you have completed an assessment already

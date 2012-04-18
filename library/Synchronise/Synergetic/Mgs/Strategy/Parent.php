@@ -69,14 +69,14 @@ class Synchronise_Synergetic_Mgs_Strategy_Parent extends Synchronise_Synergetic_
         $spouse['title'] = $currentUser['StudentContactSpouseTitle'];
         $spouse['firstname'] = $currentUser['StudentContactSpousePreferred'];
         $spouse['lastname'] = $currentUser['StudentContactSpouseSurname']; // for some reason this index gets truncated
-        $spouse['alt_email'] = $currentUser['StudentContactSpouseDefaultEma'];
+        $spouse['alt_email'] = $currentUser['StudentContactSpouseDefaultEmail'];
         $spouse['defaultCampus'] = self::PARENT_DEFAULT_CAMPUS;
         // get campuses of kids
         $spouse['campus'] = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
         $spouse['group_id'] = self::PARENT_GROUP_ID;
 
         // parents are not superusers
-        $spouse['su'] = false;
+        //$spouse['su'] = false;
 
         return $spouse;
     }

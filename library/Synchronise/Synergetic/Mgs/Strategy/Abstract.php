@@ -17,8 +17,9 @@ abstract class Synchronise_Synergetic_Mgs_Strategy_Abstract extends Synchronise_
     // TODO: edit fields to match MGS-specific install
     // group IDs
     const STUDENT_GROUP_ID = 3;
-    const STAFF_GROUP_ID = 2;
-    const PARENT_GROUP_ID = 4;
+    const STAFF_GROUP_ID = 1;
+    const ADMIN_GROUP_ID = 2;
+    const PARENT_GROUP_ID = 13;
 
     // default campuses
     const STAFF_DEFAULT_CAMPUS = 1;
@@ -31,7 +32,7 @@ abstract class Synchronise_Synergetic_Mgs_Strategy_Abstract extends Synchronise_
     const PARENT_LOCAL_EMAIL = 0;
 
     // school-based email domains (parents don't have them)
-    const STUDENT_EMAIL_SUFFIX = "mgs.vic.edu.au";
+    const STUDENT_EMAIL_SUFFIX = "student.mgs.vic.edu.au";
     const STAFF_EMAIL_SUFFIX = "mgs.vic.edu.au";
 
     // ePortfolio enabled by default (parents miss out on these too)
@@ -58,15 +59,11 @@ abstract class Synchronise_Synergetic_Mgs_Strategy_Abstract extends Synchronise_
     protected function getCampusFromCode($code) {
         switch($code) {
             case 'S':
-            case 'M':
-            case 'P':
-                // return 'main';
-                return 1;
-                break;
-            case 'ELC':
-                // return 'elc';
-                return 2;
-                break;
+		return 1;
+            case 'W':
+		return 2;
+            case 'G':
+		return 3;
             default:
                 return false;
                 break;
@@ -82,30 +79,68 @@ abstract class Synchronise_Synergetic_Mgs_Strategy_Abstract extends Synchronise_
      */
     protected function getCampusFromYearLevel($year) {
         switch ($year) {
-            case '02':
-            case '03':
-            case '04':
-            case '05':
-            case '06':
-            case '07':
-            case '08':
-            case '09':
+	    case '0';
+	    case '1';
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+		return 3;
+            case '7':
+            case '8':
+		return 2;
+            case '9':
             case '10':
             case '11':
             case '12':
-                //return 'main';
-                return 1;
-                break;
-            case '00':
-            case '01':
-            case '30':
-            case '40':
-                //return 'elc';
-                return 2;
-                break;
-            default:
+		return 1;
+	    default:
                 return false;
                 break;
+        }
+    }
+
+    protected function getHouseFromCode($house) {
+        switch($house){
+            case 'A':
+                return 16;
+            case 'Gs':
+                return 17;
+            case 'M':
+                return 18;
+            case 'S':
+                return 19;
+            case 'Be':
+                return 2;
+            case 'By':
+                return 1;
+            case 'Ce':
+                return 15;
+            case 'Cf':
+                return 12;
+            case 'Cm':
+                return 14;
+            case 'Cn':
+                return 13;
+            case 'Dn':
+                return 3;
+            case 'He':
+                return 4;
+            case 'Mr':
+                return 5;
+            case 'Ms':
+                return 6;
+            case 'Py':
+                return 7;
+            case 'Rn':
+                return 9;
+            case 'Rs':
+                return 8;
+            case 'Sl':
+                return 10;
+            case 'Wy':
+                return 11;
         }
     }
 
@@ -118,28 +153,24 @@ abstract class Synchronise_Synergetic_Mgs_Strategy_Abstract extends Synchronise_
      */
     protected function getGroupIDFromYearLevel($year) {
         switch ($year) {
+            case '0' :
             case '01':
             case '02':
             case '03':
             case '04':
             case '05':
-                return 8;
-                break;
             case '06':
+                return 5;
+                break;
             case '07':
             case '08':
-            case '09':
-                return 7;
+                return 4;
                 break;
+            case '09':
             case '10':
             case '11':
             case '12':
-                return 6;
-                break;
-            case '00':
-            case '30':
-            case '40':
-                return 9;
+                return 3;
                 break;
             default:
                 return false;
@@ -147,6 +178,12 @@ abstract class Synchronise_Synergetic_Mgs_Strategy_Abstract extends Synchronise_
         }
     }
 
+   protected function getGroupIDFromCategory($category) {
+       if($category == 'TEACHER')
+		return 1;
+	else
+		return 2;
+   }
 
     /**
      * Identical algorithm used to create/update a user
@@ -239,8 +276,8 @@ abstract class Synchronise_Synergetic_Mgs_Strategy_Abstract extends Synchronise_
 			FROM user
 			LEFT JOIN groups ON user.group_id = groups.id
 			LEFT JOIN userCampus ON user.id = userCampus.uid
-			WHERE user.synergy_id = '{$newUser['synergy_id']}'
-			AND groups.id = '{$newUser['group_id']}'
+			WHERE (user.synergy_id = '{$newUser['synergy_id']}'
+			AND groups.id = '{$newUser['group_id']}' ) OR user.username = '{$newUser['username']}'
 			ORDER BY userCampus.defaultCampus DESC
 		";
 

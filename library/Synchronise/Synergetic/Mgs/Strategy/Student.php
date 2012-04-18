@@ -38,10 +38,11 @@ class Synchronise_Synergetic_Mgs_Strategy_Student extends Synchronise_Synergetic
         $newUser['title']         = '';
         $newUser['firstname']     = $currentUser['StudentPreferred'];
         $newUser['lastname']      = $currentUser['StudentSurname'];
-        $newUser['alt_email']     = $newUser['username'] . '@' . self::STUDENT_EMAIL_SUFFIX;
+        $newUser['alt_email']     = $currentUser['StudentEmail'];
         $newUser['synergy_id']    = $currentUser['StudentID'];
         $newUser['local_email']   = self::STUDENT_LOCAL_EMAIL;
         $newUser['year']          = $currentUser['StudentYearLevel'];
+        $newUser['house']         = $this->getHouseFromCode($currentUser['StudentHouse']);
         $newUser['defaultCampus'] = self::STUDENT_DEFAULT_CAMPUS;
         $newUser['campus']        = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
         $newUser['group_id']      = $this->getGroupIDFromYearLevel($currentUser['StudentYearLevel']);
@@ -49,7 +50,7 @@ class Synchronise_Synergetic_Mgs_Strategy_Student extends Synchronise_Synergetic
         $newUser['eportfolio_enabled'] = self::STUDENT_EPORTFOLIO;
 
         // students aren't superusers
-        $newUser['su'] = false;
+        //$newUser['su'] = false;
 
         return $newUser;
     }
