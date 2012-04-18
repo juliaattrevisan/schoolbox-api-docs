@@ -504,6 +504,8 @@ tr.leave-pending span{
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
 	border-radius: 3px;
+
+
 }
 
 #nav li a span strong {
@@ -586,7 +588,7 @@ tr.leave-pending span{
 	padding: 0 12px;
 }
 
-#header #tabs li.navthis a {
+#tabs li.navthis a {
 	-moz-border-radius: 7px 7px 0 0;
 	-webkit-border-radius: 7px 7px 0 0;
 	border-radius: 7px 7px 0 0;
@@ -595,7 +597,7 @@ tr.leave-pending span{
 	color: #0066b0;
 }
 
-#header #tabs li.navthis {
+#tabs li.navthis {
 	z-index: 2;
 }
 
