@@ -1,9 +1,4 @@
 <?php
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/Assess.php');
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessAttempt.php');
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessSection.php');
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessResponse.php');
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessFactory.php');
 
 $subHandler = new Submission();
 $retHandler = new SubmissionReturn();
@@ -11,11 +6,11 @@ $catHandler = new Category();
 $groupHandler = new Group();
 $userHandler = new User();
 
-$factory = new AssessFactory();
-$assessHandler = new Assess();
-$attemptHandler = new AssessAttempt();
-$sectionHandler = new AssessSection();
-$responseHandler = new AssessResponse();
+$factory = new Assess_Factory();
+$assessHandler = new Assess_Main();
+$attemptHandler = new Assess_Attempt();
+$sectionHandler = new Assess_Section();
+$responseHandler = new Assess_Response();
 
 if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 	if (!$groupHandler->isStaff()) {

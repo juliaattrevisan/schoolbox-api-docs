@@ -1,7 +1,5 @@
 <?php
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/Assess.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/AssessAttempt.php';
 
 $this->setFile(TEMPLATE_content, 'submission/listSubmission.html');
 $this->setTitle('Submissions');
@@ -56,7 +54,7 @@ if (is_array($subList)) {
 
 		$totals = $submissionHandler->getBoxCount($sub['id']);
 
-		if (($sub['type_id'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) && ($sub['availability'] == 'assess')) {
+		if (($sub['type_id'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) && ($sub['availability'] == 'assess')) {
 			$this->setVar(array(
 				'ASSESS_ASSESS_ID' => $sub['id'],
 				'ASSESS_TITLE' => Scrub::text($sub['name']),

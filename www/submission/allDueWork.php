@@ -159,7 +159,7 @@ $this->setBlock('attempt', 'viewMarks', 'viewMarks_block');
 $this->setBlock('attempt', 'takeTest', 'takeTest_block');
 $this->setBlock('attempt', 'unmarked', 'unmarked_block');
 
-$assessHandler = new Assess();
+$assessHandler = new Assess_Main();
 $attemptHandler = new AssessAttempt();
 $responseHandler = new AssessResponse();
 $sectionHandler = new AssessSection();
