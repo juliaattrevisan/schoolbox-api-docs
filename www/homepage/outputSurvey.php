@@ -1,8 +1,4 @@
 <?php
-require_once SITE_root . '/library/survey/Survey.php';
-require_once SITE_root . '/library/survey/SurveyAttempt.php';
-require_once SITE_root . '/library/survey/SurveySection.php';
-
 $this->setBlock($componentHandle, 'survey', 'survey_block');
 $this->setBlock($componentHandle, 'createSurvey', 'createSurvey_block');
 $this->setBlock('survey', 'teacherLink', 'teacherLink_block');
@@ -29,9 +25,9 @@ else {
  */
 $this->setVar('resumeLink_block', '');
 
-$surveyHandler = new Survey();
-$attemptHandler = new SurveyAttempt();
-$sectionHandler = new SurveySection();
+$surveyHandler = new Survey_Main();
+$attemptHandler = new Survey_Attempt();
+$sectionHandler = new Survey_Section();
 $userHandler = new User();
 
 $allSurveys = $surveyHandler->getList($categoryID);

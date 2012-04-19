@@ -148,11 +148,6 @@ else {
 
 /* Online Assessments
  */
-require_once(SITE_root . '/library/assess/Assess.php');
-require_once(SITE_root . '/library/assess/AssessAttempt.php');
-require_once(SITE_root . '/library/assess/AssessResponse.php');
-require_once(SITE_root . '/library/assess/AssessSection.php');
-
 $this->setBlock(TEMPLATE_content, 'allAssess', 'allAssess_block');
 $this->setBlock('allAssess', 'attempt', 'attempt_block');
 $this->setBlock('attempt', 'viewMarks', 'viewMarks_block');
@@ -160,9 +155,9 @@ $this->setBlock('attempt', 'takeTest', 'takeTest_block');
 $this->setBlock('attempt', 'unmarked', 'unmarked_block');
 
 $assessHandler = new Assess_Main();
-$attemptHandler = new AssessAttempt();
-$responseHandler = new AssessResponse();
-$sectionHandler = new AssessSection();
+$attemptHandler = new Assess_Attempt();
+$responseHandler = new Assess_Response();
+$sectionHandler = new Assess_Section();
 
 /* Store a lookup so you don't need to make new queries all day
  */

@@ -10,7 +10,7 @@
  */
 
 $factory = new Survey_Factory();
-$assessHandler = new Survey();
+$assessHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
 
 if (!is_numeric($this->arg[0])) {
