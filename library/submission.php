@@ -149,9 +149,6 @@ class Submission extends DeprecatedModel {
 
         $result = $this->db->getAll($query);
 
-        echo "$query \n";
-        print_r($result);
-
         return $result;
 	}
 

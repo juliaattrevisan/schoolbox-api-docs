@@ -80,7 +80,7 @@ class sideMenu extends DeprecatedModel {
             $text .= "</ul>\n";
             return $text;
     }
-    
+
     function create($item) {
 
         $campus = $item['campus'];
@@ -95,8 +95,6 @@ class sideMenu extends DeprecatedModel {
     function getLastItemSequence($parent) {
         $query = "SELECT sequence FROM sideMenu WHERE parent = $parent ORDER BY sequence DESC";
 
-        echo $query;
-
         return $this->db->getOne($query) + 1;
     }
 
@@ -105,7 +103,7 @@ class sideMenu extends DeprecatedModel {
         $this->addPermissions($item['id'], $item['campus'], $item['group']);
         unset($item['campus'], $item['group']);
         parent::update($item);
-        
+
         $itemCur = $this->getByID($item['id']);
         $this->resequenceMenu($itemCur['parent']);
     }
