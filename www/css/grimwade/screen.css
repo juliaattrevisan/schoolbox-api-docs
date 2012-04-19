@@ -72,29 +72,23 @@ h2 {
 #nav li a:hover { background-color: #1965b4; }
 
 #tabs {
-	right: 15px;
 	left:auto;
-	width:800px;
+    width:100%;
+}
+#tabs li {
+    float:right;
 }
 
 #tabs li a {
-	height: 31px;
-	font-size:12px;
-	padding: 0 20px;
-	font-weight:normal;
-}
-
-
-#tabs { right: 15px; }
-
-#tabs li { float:left; }
-
-#tabs li a {
+    height: 31px;
+    font-size:12px;
+    padding: 0 10px;
+    font-weight:normal;
 	border: 1px solid #cacaca;
 	border-bottom:0;
 	background: #e0eeef;
 	color: #3a7e8e;
-	padding:0 20px;
+
 }
 
 #nav	{top:0; left:0; margin:0; width:180px;}
