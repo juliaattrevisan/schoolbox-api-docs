@@ -1,5 +1,4 @@
 <!-- BEGIN custom_head -->
-
 <script type="text/javascript" src="/javascript/jquery.treeview.min.js"></script>
 <script type="text/javascript">
     $j(function() {
@@ -11,25 +10,24 @@
 
     });
 </script>
-
 <!-- END custom_head -->
-
-
 
 <!-- BEGIN modify_news -->
 <a class="btn modify" href="/news/modify/{NEWS_ID}"><span></span>Modify Article</a>
 <!-- END modify_news -->
 <h1>News Article</h1>
-<div class="news-wrapper clearfix">
+<div class="news-wrapper left clearfix">
     <!-- BEGIN news -->
     <div class="news-item clearfix">
         <h2>{NEWS_TITLE}</h2>
 
         <div class="wysiwyg">{NEWS_BODY}</div>
     </div>
-    {PREVIOUS_ARTICLE}
-    {NEXT_ARTICLE}
+
+    <a class="btn no-icon float-left" href="/news/item/{PREVIOUS_ARTICLE_ID}">&laquo; {PREVIOUS_ARTICLE_TITLE}</a>
+    <a class="btn no-icon"  href="/news/item/{NEXT_ARTICLE_ID}">{NEXT_ARTICLE_TITLE} &raquo;</a>
 </div>
+
 <div class="right">
     <h2>Article Information</h2>
 
