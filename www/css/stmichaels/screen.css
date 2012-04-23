@@ -32,8 +32,6 @@ a{color:#0054d3;}
     background: -ms-linear-gradient(top,  #dcebfd 0%,#cfe4fd 100%); /* IE10+ */
     background: linear-gradient(top,  #dcebfd 0%,#cfe4fd 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#dcebfd', endColorstr='#cfe4fd',GradientType=0 ); /* IE6-9 */
-
-
 }
 
 #tabs li.navthis a{
@@ -45,7 +43,6 @@ a{color:#0054d3;}
     background:#fff;
     filter:none;
 }
-
 
 #nav{top:152px;}
 #nav h3{background: #77b5f9; /* Old browsers */

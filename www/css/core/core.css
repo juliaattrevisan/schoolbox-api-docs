@@ -231,7 +231,6 @@ h2 {
 	color: #013a63;
 	font-size: 18px;
 	font-weight: bold;
-
 }
 
 h2 a {
@@ -1177,6 +1176,10 @@ input.timeField {
 	font-family: Arial, Helvetica, sans-serif;
 }
 
+.btn.no-symbol{
+    padding:0 16px;
+}
+
 .submit-btn-plain {
 	border-color: #09bda9;
 	text-shadow: 0 1px 0px #ffffff;
@@ -1204,7 +1207,6 @@ input.timeField {
 	color: #ff5a00 !important;
 	border-color: #ffc5a6;
 	text-shadow: 0;
-
 	background-color: #fff4ee;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#fff4ee), to(#ffe9dd));
 	background-image: -webkit-linear-gradient(top, #fff4ee, #ffe9dd);
@@ -3612,13 +3614,6 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
     filter:none;
 }
 
-
-/************************
- NEWS
- ************************/
-
-
-
 .archive.news img {
     padding: 10px;
 }
@@ -3649,6 +3644,40 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
 .news-headlines li a {
     padding: 7px 16px;
 }
+
+.news-sidebar {
+    float: right;
+    width: 29%;
+}
+
+.news-sidebar .meta {
+    margin: 10px 0 30px 10px;
+}
+.news-sidebar .meta li {
+    margin: 5px 0;
+}
+
+.news-sidebar .index {
+    margin: 10px;
+}
+
+.news-sidebar .index li {
+    margin: 4px;
+}
+
+.news-sidebar .topic  li:before {
+    content: "- ";
+}
+
+.news-wrapper {
+    width: 70%; float: left;
+}
+
+.next {
+    float: right;
+}
+
+
 
 /************************
  BLOG COMPONENT
