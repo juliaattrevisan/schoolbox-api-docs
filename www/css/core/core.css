@@ -3637,47 +3637,12 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
 }
 
 
-.news-headlines li {
-    padding: 0;
-}
-
-.news-headlines li a {
-    padding: 7px 16px;
-}
-
-.news-sidebar {
-    float: right;
-    width: 29%;
-}
-
-.news-sidebar .meta {
-    margin: 10px 0 30px 10px;
-}
-.news-sidebar .meta li {
-    margin: 5px 0;
-}
-
-.news-sidebar .index {
-    margin: 10px;
-}
-
-.news-sidebar .index li {
-    margin: 4px;
-}
-
 .news-sidebar .topic  li:before {
     content: "- ";
 }
-
-.news-wrapper {
-    width: 70%; float: left;
-}
-
 .next {
     float: right;
 }
-
-
 
 /************************
  BLOG COMPONENT
@@ -4094,14 +4059,16 @@ ul.js_happening li span {
 /* Calendar translucency
  */
 ul.js_happening li.translucent span{
-opacity:0.4;
+    opacity:0.4;
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
+    filter: alpha(opacity=40);
     background-image: url(/images/famicons/time.png); background-repeat:no-repeat; background-position: 95% 50%;
 }
 ul.js_happening li.translucent span:hover{
     opacity:0.5;
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
+    filter: alpha(opacity=40);
 }
-
-
 
 ul.js_happening li span:hover {
 	opacity: 0.8;
