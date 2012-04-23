@@ -23,11 +23,12 @@ $this->setBlock(TEMPLATE_content, 'setting_save', 'setting_save_block');
 
 $output = array(
 	'setting_type_noneditable_block' => '',
-	'setting_type_input_block' => '',
-	'setting_type_textarea_block' => '',
-	'setting_type_boolean_block' => '',
-	'setting_type_select_block' => '',
-	'setting_type_check_block' => '',
+	'setting_type_input_block'       => '',
+	'setting_type_textarea_block'    => '',
+	'setting_type_boolean_block'     => '',
+	'setting_type_select_block'      => '',
+	'setting_type_check_block'       => '',
+    'setting_type_list_block'        => '',
 );
 
 $this->setVar($output);
