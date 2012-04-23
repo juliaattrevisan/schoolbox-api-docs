@@ -48,7 +48,7 @@ $output = array(
     'NEWS_TITLE'  => $article['item_heading'],
     'POSTER'      => $owner,
     'DATETIME'    => $d->getLong(),
-    'EXPIRY'      => $_SESSION['su'] == 1 ? 'Expires: ' . $e->getLong() : '',
+    'EXPIRY'      => $_SESSION['su'] == 1 ? ' - ' . $e->getLong() : '',
     'NEWS_BODY'   => Scrub::html($article['item_body']),
     'TOPIC_NAME'  => Scrub::text($topic['name']),
     'TOPIC_CLEAN' => $url->getSlug()

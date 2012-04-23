@@ -3635,7 +3635,10 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
 .news-item ul li {
     list-style-type: circle;
 }
-
+p.meta{
+margin-top: -16px;
+border-bottom: 1px solid #CCC;
+}
 
 .news-sidebar .topic  li:before {
     content: "- ";
@@ -6201,6 +6204,8 @@ ul.tree, ul.tree ul {
 	margin: 0;
 }
 
+ul.tree li.current a{background:none; font-weight:bold;}
+
 #content ul.tree li {
 	background: 0;
 	padding-left: 5px;
@@ -6211,7 +6216,7 @@ ul.tree, ul.tree ul {
 	padding-left: 48px;
 }
 
-ul.tree li.icon a {
+ul.tree .icon a {
 	background: url(/images/file-icon.gif) no-repeat;
 	padding: 3px 0 3px 28px;
 	line-height: 21px;

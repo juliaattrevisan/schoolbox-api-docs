@@ -15,13 +15,19 @@
 <!-- BEGIN modify_news -->
 <a class="btn modify" href="/news/modify/{NEWS_ID}"><span></span>Modify Article</a>
 <!-- END modify_news -->
-<h1>News Article</h1>
-<div class="news-wrapper left clearfix">
-    <!-- BEGIN news -->
-    <div class="news-item clearfix">
-        <h2>{NEWS_TITLE}</h2>
+<!-- BEGIN news -->
+<h1>{NEWS_TITLE}</h1>
 
-        <div class="wysiwyg">{NEWS_BODY}</div>
+
+
+
+<div class="news-wrapper left clearfix">
+    <p class="meta">
+        by {POSTER}<br> Active: {DATETIME} {EXPIRY}
+    </p>
+    <!-- BEGIN news -->
+    <div class="wysiwyg clearfix">
+        {NEWS_BODY}
     </div>
 
     <!-- BEGIN previous_article -->
@@ -33,17 +39,7 @@
 </div>
 
 <div class="right">
-    <h2>Article Information</h2>
 
-    <div class="pad-it">
-
-        <ul class="meta">
-            <li>Topic: <a href="/news/archive/{TOPIC_CLEAN}/">{TOPIC_NAME}</a></li>
-            <li>Publisher: {POSTER}</li>
-            <li>Publish Date: {DATETIME}</li>
-            <li>{EXPIRY}</li>
-        </ul>
-    </div>
     <h2>News Index</h2>
 
     <div class="pad-it">
@@ -53,7 +49,7 @@
                 <!-- BEGIN article_list -->
                 <ul class="topic">
                     <!-- BEGIN article_list_item -->
-                    <li class="icon">{LIST_TOPIC_ARTICLE_NAME}</li>
+                    <li class="{LIST_TOPIC_ARTICLE_CURRENT}"><a href="/news/item/{LIST_TOPIC_ARTICLE_ID}">{LIST_TOPIC_ARTICLE_NAME}</a></li>
                     <!-- END article_list_item -->
                 </ul>
                 <!-- END article_list -->
