@@ -147,7 +147,7 @@ else if($this->arg[0] == 'new') {
 	 */
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/assess/Assess.php';
 
-	$types = $subBoxHandler->getTypesExcept(array(Assess::ONLINE_ASSESSMENT_TYPE_ID));
+	$types = $subBoxHandler->getTypesExcept(array(Assess_Main::ONLINE_ASSESSMENT_TYPE_ID));
 
 	$this->dropDown('type_drop', $types, $this->arg[3],TEMPLATE_content, array(
         'name' => 'TYPE_TEXT',

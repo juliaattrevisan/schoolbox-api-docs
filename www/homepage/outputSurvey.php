@@ -78,7 +78,7 @@ if (is_array($allSurveys)) {
 		 */
 		if (is_array($attempt)) {
 			// If the last assess is not completed provide resume link
-			if ($attempt['finish'] == '0000-00-00 00:00:00' && ($attemptTimeRemaining < 0 || $currentSurvey['duration'] == Assess::UNLIMITED_DURATION)) {
+			if ($attempt['finish'] == '0000-00-00 00:00:00' && ($attemptTimeRemaining < 0 || $currentSurvey['duration'] == Assess_Main::UNLIMITED_DURATION)) {
 				$firstSection = $sectionHandler->getFirst($currentSurvey['assess_id']);
 
 				$this->setVar(array(

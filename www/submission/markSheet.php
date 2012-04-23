@@ -79,7 +79,7 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 		/* Actual subheadings
 		 */
 		foreach($subList as $sub) {
-			if ($sub['type_id'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) {
+			if ($sub['type_id'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) {
 				$csv .= 'Grade,Total,';
 			}
 			else {
@@ -96,7 +96,7 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 
 			if (is_array($subList)) {
 				foreach($subList as $sub) {
-                    if ($sub['type_id'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) {
+                    if ($sub['type_id'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) {
                         $firstSection = $sectionHandler->getFirst($sub['id']);
                         $mostRecentAttempt = $attemptHandler->getLatestForUser($sub['id'], $student['uid']);
                         $marks = $attemptHandler->getMarksForAttempt($mostRecentAttempt['attempt_id']);
@@ -211,7 +211,7 @@ else if(is_numeric($this->arg[0])) {
 				'SUB_TYPE' => Scrub::text($sub['typeName'])
             ));
 
-            if ($sub['type_id'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) {
+            if ($sub['type_id'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) {
 
                 /* Perform automated marking on responses which support this feature. Only
                  * mark responses which haven't been automarked previously, which allows
@@ -275,7 +275,7 @@ else if(is_numeric($this->arg[0])) {
 
 				if (is_array($subList)) {
 					foreach($subList as $sub) {
-						if ($sub['type_id'] == Assess::ONLINE_ASSESSMENT_TYPE_ID) {
+						if ($sub['type_id'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) {
 							$firstSection = $sectionHandler->getFirst($sub['id']);
 							$mostRecentAttempt = $attemptHandler->getLatestForUser($sub['id'], $student['uid']);
 							$marks = $attemptHandler->getMarksForAttempt($mostRecentAttempt['attempt_id']);
