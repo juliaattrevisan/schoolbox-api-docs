@@ -17,6 +17,9 @@ $this->setFile(TEMPLATE_content, 'news/item.html');
 $this->setBlock(TEMPLATE_content, 'modify_news', 'modify_news_block');
 $this->setBlock(TEMPLATE_content, 'topic_list', 'topic_list_block');
 $this->setBlock('topic_list', 'article_list', 'article_list_block');
+$this->setBlock('article_list', 'article_list_item', 'article_list_item_block');
+$this->setBlock(TEMPLATE_content, 'previous_article', 'previous_article_block');
+$this->setBlock(TEMPLATE_content, 'next_article', 'next_article_block');
 
 $this->setTab('news');
 
@@ -77,17 +80,27 @@ foreach($topicList as $sidebarTopic) {
 
     // if the current sidebar topic matches the article, load the news results into that section
     if($sidebarTopic['newsTopicID'] == $article['item_topic_id']) {
-        foreach($allNews as $listItem) {
+        if(count($allNews)) {
 
-            if($listItem['item_id'] == $article['item_id'])
-                $this->setVar('LIST_TOPIC_ARTICLE', $listItem['item_heading']);
-            else
-                $this->setVar('LIST_TOPIC_ARTICLE', '<a href="/news/item/' . $listItem['item_id'] . '">' . $listItem['item_heading'] . '</a>');
+            foreach($allNews as $listItem) {
 
+
+                $output = array(
+                    'LIST_TOPIC_ARTICLE_CURRENT' => ($listItem['item_id'] == $article['item_id']) ? 'current' : '',
+                    'LIST_TOPIC_ARTICLE_NAME'    =>  $listItem['item_heading'],
+                    'LIST_TOPIC_ARTICLE_ID'      =>  $listItem['item_id']
+                );
+                $this->setVar($output);
+                $this->parse('article_list_item_block', 'article_list_item', true);
+            }
             $this->parse('article_list_block', 'article_list', true);
         }
+        // if no items in allNews
+        else {
+            $this->setVar('article_list_block', '');
+        }
     } else {
-        $this->setVar('article_list_block', '');
+        $this->setVar('article_list_item_block', '');
     }
 
     $this->parse('topic_list_block', 'topic_list', true);
@@ -116,15 +129,17 @@ $next = $current < count($prevNext) - 1 ? $prevNext[$current + 1] : null;
 if($prev) {
     $this->setVar('PREVIOUS_ARTICLE_ID', $prev[0]);
     $this->setVar('PREVIOUS_ARTICLE_TITLE', $prev[1]);
+    $this->parse('previous_article_block', 'previous_article', false);
 } else {
-    $this->setVar('PREVIOUS_ARTICLE', '');
+    $this->setVar('previous_article_block', '');
 }
 
 // output next
 if($next) {
     $this->setVar('NEXT_ARTICLE_ID', $next[0]);
     $this->setVar('NEXT_ARTICLE_TITLE', $next[1]);
+    $this->parse('next_article_block', 'next_article', false);
 } else {
-    $this->setVar('NEXT_ARTICLE', '');
+    $this->setVar('next_article_block', '');
 }
 

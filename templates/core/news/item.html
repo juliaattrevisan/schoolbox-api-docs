@@ -24,8 +24,12 @@
         <div class="wysiwyg">{NEWS_BODY}</div>
     </div>
 
+    <!-- BEGIN previous_article -->
     <a class="btn no-icon float-left" href="/news/item/{PREVIOUS_ARTICLE_ID}">&laquo; {PREVIOUS_ARTICLE_TITLE}</a>
+    <!-- END previous_article -->
+    <!-- BEGIN next_article -->
     <a class="btn no-icon"  href="/news/item/{NEXT_ARTICLE_ID}">{NEXT_ARTICLE_TITLE} &raquo;</a>
+    <!-- END next_article -->
 </div>
 
 <div class="right">
@@ -46,11 +50,13 @@
         <ul class="tree">
             <!-- BEGIN topic_list -->
             <li><a href="/news/{LIST_TOPIC_CLEAN}">{LIST_TOPIC_NAME}</a>
+                <!-- BEGIN article_list -->
                 <ul class="topic">
-                    <!-- BEGIN article_list -->
-                    <li class="icon">{LIST_TOPIC_ARTICLE}</li>
-                    <!-- END article_list -->
+                    <!-- BEGIN article_list_item -->
+                    <li class="icon">{LIST_TOPIC_ARTICLE_NAME}</li>
+                    <!-- END article_list_item -->
                 </ul>
+                <!-- END article_list -->
             </li>
             <!-- END topic_list -->
         </ul>
