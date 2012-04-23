@@ -114,14 +114,16 @@ $next = $current < count($prevNext) - 1 ? $prevNext[$current + 1] : null;
 
 // output previous
 if($prev) {
-    $this->setVar('PREVIOUS_ARTICLE', '<a href="/news/item/' . $prev[0] . '">&laquo; ' . $prev[1] . '</a>');
+    $this->setVar('PREVIOUS_ARTICLE_ID', $prev[0]);
+    $this->setVar('PREVIOUS_ARTICLE_TITLE', $prev[1]);
 } else {
     $this->setVar('PREVIOUS_ARTICLE', '');
 }
 
 // output next
 if($next) {
-    $this->setVar('NEXT_ARTICLE', '<a class="next" href="/news/item/' . $next[0] . '">' . $next[1] . ' &raquo;</a>');
+    $this->setVar('NEXT_ARTICLE_ID', $next[0]);
+    $this->setVar('NEXT_ARTICLE_TITLE', $next[1]);
 } else {
     $this->setVar('NEXT_ARTICLE', '');
 }
