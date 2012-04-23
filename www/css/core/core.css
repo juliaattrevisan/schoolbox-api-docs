@@ -5487,6 +5487,7 @@ p.forgotten {
 	display: block;
 	margin: 4px;
 	float: left;
+    padding:0;
 }
 
 #category li a {
