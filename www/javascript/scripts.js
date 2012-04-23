@@ -11,11 +11,13 @@ $j(function() {
       var el = all[len];
       if (el != 'layerX' && el != 'layerY') res.push(el);
     }
-    $j.event.props = res;
+    $j.event.props = res
 
-	/*
-	* Main Navigation dropdown
-	* */
+
+
+    /*
+     * Main Navigation dropdown
+     * */
     $j("#nav li").hover(function(){
         $j(this).addClass("hover");
         $j('ul:first',this).toggle()
@@ -23,6 +25,8 @@ $j(function() {
         $j(this).removeClass("hover");
         $j('ul:first',this).toggle();
     });
+
+    $j('#nav li:last-child').addClass('lastChild');
 
 
 	/*
