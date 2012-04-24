@@ -152,13 +152,13 @@ class SitePage extends Page
 		$templateVar = array(
 			'TEMPLATE_YEAR' => date('Y'),
 			'SITE_NAME' => Cfg::get('school_name'),
-			'SITE_ADDRESS' => Cfg::get('site_address'),
 			'SITE_GREETING' => TextFormatter::greeting(), // TODO: This should be an object
 			'SITE_LOGINNAME' => $userHandler->formatName($_SESSION),
 			'SITE_USERNAME' => $_SESSION['username'],
 			'SITE_LOCATION' => $this->site,
 			'USER_ID' => $_SESSION['id'],
 			'SITE_VERSION' => Cfg::get('site_version'),
+			'SCHOOL_ADDRESS' => Cfg::get('school_address'),
 		);
 
 		$this->setVar($templateVar);
@@ -929,7 +929,7 @@ class SitePage extends Page
 			}
 
 			if (is_array($list[$i]['children'])) {
-                
+
                 $url = new Url($list[$i]['url']);
 
                 $text .= '<li class="parent"><a href="';
