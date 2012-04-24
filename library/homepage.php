@@ -168,12 +168,9 @@ class Homepage {
 		 *     $currentComponent->removeFromHomepage();
 		 * }
 		 */
-		require_once(dirname(__FILE__) . '/assess/Assess.php');
-		require_once(dirname(__FILE__) . '/survey/Survey.php');
-
 		$allComponents = array(
-			'Assess', 'Blog', 'Calendar', 'CategoryNews', 'Chat', 'Dropbox', 'File', 'Forum',
-			'Poll', 'Submission', 'Survey', 'TextBox', 'Wiki'
+			'Assess_Main', 'Blog', 'Calendar', 'CategoryNews', 'Chat', 'Dropbox', 'File', 'Forum',
+			'Poll', 'Submission', 'Survey_Main', 'TextBox', 'Wiki'
 		);
 
 		if (is_array($allComponents) && count($allComponents)) {
