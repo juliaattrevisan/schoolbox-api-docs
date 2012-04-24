@@ -1,20 +1,37 @@
 /*
 Variablahs
 */
+
 @black: #000000;
 @white: #ffffff;
 @light-grey: #ededed;
+
 @body-background: #d9effe;
 
-@btn-icon-size: 14px;
+@h1-color: @black;
+@module-heading: #013a63;
+@module-background: #cae9b9;
+@alternate-background: #faf9f5;
+@body-text: @black;
+@secondary-text: #797979;
+@link: #1d9ffc;
+@link-hover: #ff5a00;
+@btn-background-color: #0aa9c7;
+@subnav-background: #faf9f5;
+@subnav-header-background: #f4f1ea;
+@subnav-stroke: #efecde;
+@subnav-text-up: #0066b0;
+@subnav-header-text: #797979;
+@chat-list-background: #f3fbef;
+@chat-list-alternative-background: #ecf7e7;
+@search-background: #fffde9;
 
 /*
 Mixarns
 */
 
-
 .btn-icon(@number) {
-    background-position:0 -(@number*@btn-icon-size);
+    background-position:0 -(@number*14px);
 }
 
 body {
@@ -28,7 +45,7 @@ html > body {
 body {
     background: @body-background;
     font-size: 12px;
-    color: #000000;
+    color: @black;
     font-family: Arial, Helvetica, sans-serif;
     text-align: left;
     margin: 0;
@@ -54,7 +71,7 @@ body#tinymce {
 a {
     outline: none;
     text-decoration: none;
-    color: #1d9ffc;
+    color: @link;
     &:hover {
         text-decoration: underline;
     }
@@ -84,9 +101,6 @@ ul {
 
 ol {
     list-style-type: decimal;
-}
-
-ol {
     margin-left: 2.5em;
 }
 
@@ -121,7 +135,7 @@ CSS commands
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
-    background: #CAE9B9;
+    background: @module-background;
     padding: 0 2px;
 }
 
@@ -225,7 +239,7 @@ h1 {
 }
 
 h2 {
-    background: #cae9b9;
+    background: @module-background;
     margin: 0;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -455,7 +469,7 @@ tr.leave-pending span{
     position: absolute;
     z-index:100;
     .nav-wrapper {
-        background: #faf9f5;
+        background: @subnav-background;
         -moz-border-radius: 0 0 3px 3px;
         -webkit-border-radius: 0 0 3px 3px;
         border-radius: 0 0 3px 3px;
@@ -518,7 +532,7 @@ tr.leave-pending span{
             -moz-border-radius: 3px;
             -webkit-border-radius: 3px;
             border-radius: 3px;
-            background: #faf9f5;
+            background: @subnav-background;
             a{
                 zoom: 1;
             }
@@ -640,7 +654,7 @@ tr.leave-pending span{
     height: 150px;
     margin: 16px;
     display: block;
-    background: #cae9b9;
+    background: @module-background;
     z-index: 2;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
@@ -860,11 +874,11 @@ tr.leave-pending span{
 }
 
 .dark {
-    background: #faf9f5;
+    background: @subnav-background;
 }
 
 .dark td {
-    background: #faf9f5;
+    background: @subnav-background;
     zoom: 1;
     min-height: 1px;
 }
@@ -872,36 +886,35 @@ tr.leave-pending span{
 /*--------------------------------------------------------------
  LISTING (FOR HOMEPAGE COMPONENTS THAT ALTERNATE) eg. files, blog
 --------------------------------------------------------------*/
-.listing h3 {
-    float: left;
-    line-height: 1.3;
-    width: 70%;
+.listing {
+    h3 {
+        float: left;
+        line-height: 1.3;
+        width: 70%;
+    }
+    h4 {
+        float: left;
+        width: 70%;
+        overflow: hidden;
+        a {
+            font-weight: normal;
+        }
+    }
+    .small-right {
+        width: 30%;
+        float: right;
+        text-align: right;
+        p {
+            margin: 0;
+            clear: both;
+            text-align: right;
+            color: #989898;
+            float: right;
+            display: block
+        }
+    }
 }
 
-.listing h4 {
-    float: left;
-    width: 70%;
-    overflow: hidden;
-}
-
-.listing h4 a {
-    font-weight: normal;
-}
-
-.listing .small-right {
-    width: 30%;
-    float: right;
-    text-align: right;
-}
-
-.listing .small-right p {
-    margin: 0;
-    clear: both;
-    text-align: right;
-    color: #989898;
-    float: right;
-    display: block
-}
 
 h4.eventListing {
     width: 70%;
@@ -975,8 +988,6 @@ label {
     width: 250px;
 }
 
-label
-
 label input[type=text] {
     width: 100%;
     margin: 0;
@@ -999,7 +1010,7 @@ fieldset {
 }
 
 .standardForm {
-    background: #faf9f5;
+    background: @subnav-background;
     margin: 0 0 16px 0;
     width: 100%;
 }
@@ -1420,7 +1431,7 @@ input.timeField {
     padding: 0 9px 0 38px;
     display: inline-block;
     margin: 0;
-    background: #FAF9F5;
+    background: @subnav-background;
     border: 0;
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
@@ -1521,7 +1532,7 @@ p.forgot a {
 
 .customise:hover {
     background-position: right bottom;
-    color: #ff5a00;
+    color: @link-hover;
 }
 
 .subscribe p {
@@ -1734,11 +1745,11 @@ ADMIN
 
 .admin-contents .level.green {
     background: #edf7e7;
-    border-color: #cae9b9;
+    border-color: @module-background;
 }
 
 .admin-contents .level.green .split {
-    border-color: #cae9b9;
+    border-color: @module-background;
 }
 
 .admin-contents .one-third {
@@ -1891,7 +1902,7 @@ ADMIN
 }
 
 .admin-contents .number.bad {
-    color: #ff5a00;
+    color: @link-hover;
 }
 
 .parent-selection{
@@ -1991,7 +2002,7 @@ ADMIN
 }
 
 .sortable li li div {
-    background: #cae9b9;
+    background: @module-background;
     font-weight: normal;
 }
 
@@ -2109,7 +2120,7 @@ ADMIN
 }
 
 .allowed-files tr.add-new td {
-    background: #cae9b9;
+    background: @module-background;
 }
 
 .settings-nav-holder, .admin-contents .settings {
@@ -2331,7 +2342,7 @@ DASHBOARD
     padding: 7px 8px 7px 28px;
     margin: 0 16px 4px 0px;
     cursor: move;
-    border: 1px solid #1D9FFC;
+    border: 1px solid @link;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
@@ -3489,7 +3500,7 @@ ul.evaluation-category-select {list-style:none; padding:8px;}
 
     border:1px solid #ccc; margin-bottom:8px;}
 
-.evaluation-content.question-bank .question.checked, .evaluation-category-select li a.selected {background:#CAE9B9; filter:none;}
+.evaluation-content.question-bank .question.checked, .evaluation-category-select li a.selected {background:@module-background; filter:none;}
 .question-bank input[type="text"] {float:left; margin-right:7px;}
 
 .question-bank h4{border:0; background:none; font-size:12px; font-weight:bold;
@@ -3548,7 +3559,7 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
 }
 
 .archive .menu ul li a.selected{
-    background:#CAE9B9;
+    background:@module-background;
     filter:none;
 }
 
@@ -3565,7 +3576,7 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
 }
 
 .archive .pagination a.current {
-    background:#CAE9B9;
+    background:@module-background;
     filter:none;
 }
 
@@ -3660,7 +3671,7 @@ CALENDAR
 }
 
 #month-view thead td {
-    color: #000000;
+    color: @black;
 }
 
 #month-view td.dark {
@@ -3735,7 +3746,7 @@ CALENDAR
     height: 24px;
     line-height: 24px;
     padding: 0 8px;
-    color: #000000;
+    color: @black;
     font-weight: normal;
 }
 
@@ -3754,7 +3765,7 @@ td.cal-left a {
     text-indent: -9999em;
     font-size: 1px;
     padding: 0;
-    background-color: #faf9f5;
+    background-color: @subnav-background;
     margin-right: 4px;
 }
 
@@ -3812,7 +3823,7 @@ td.cal-mid h3 {
     color: #797979;
     display: inline-block;
     text-decoration: none;
-    background: #faf9f5;
+    background: @subnav-background;
     position: relative;
     margin-right: 4px;
 }
@@ -3960,7 +3971,7 @@ td.cal-mid h3 {
     color: @white;
     text-align: left;
     height: 20px;
-    background-color: #cae9b9;
+    background-color: @module-background;
     padding: 3px 5px;
     position: relative;
 }
@@ -3988,7 +3999,7 @@ td.cal-mid h3 {
 .day-block {
     width: 14%;
     padding: 0;
-    background: #faf9f5;
+    background: @subnav-background;
     border-bottom: 3px solid @white;
     border-right: 3px solid @white;
     vertical-align: top;
@@ -4040,7 +4051,7 @@ ul.js_happening li span:hover {
 .cal-bubble {
     z-index: 200000;
     bottom: 90%;
-    color: #000000;
+    color: @black;
     font-size: 12px;
     left: -100px;
     position: absolute;
@@ -4351,7 +4362,7 @@ CHAT
     display: block;
     padding: 6px 16px;
     color: #000;
-    background: #faf9f5;
+    background: @subnav-background;
     border: 1px solid #e9e3d6;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
@@ -4375,7 +4386,7 @@ CHAT
 
 .chat-message-user-admin .chat-user {
     font-weight: bold;
-    color: #1d9ffc;
+    color: @link;
 }
 
 .chat-message-user-admin .chat-user .time {
@@ -4425,7 +4436,7 @@ CHAT
 
 .chat-users .chat-user-admin {
     font-weight: bold;
-    color: #1d9ffc;
+    color: @link;
 }
 
 .chat-box .activate-chat {
@@ -4727,7 +4738,7 @@ COLOUR ADJUSTMENT BOX
 }
 
 #tabs-homepage li.ui-tabs-selected a {
-    background: #faf9f5;
+    background: @subnav-background;
     color: #0066b0;
 }
 
@@ -4780,7 +4791,7 @@ COLOUR ADJUSTMENT BOX
 #tabs-homepage .customise-components {
     padding: 16px;
     margin-bottom: 16px;
-    background: #faf9f5;
+    background: @subnav-background;
 }
 
 .saved-colours, .saved-layout {
@@ -4809,7 +4820,7 @@ COLOUR ADJUSTMENT BOX
     width: 158px;
     padding: 16px;
     margin: 0 16px 16px 0;
-    border: 1px solid #1d9ffc;
+    border: 1px solid @link;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
@@ -4850,7 +4861,7 @@ COLOUR ADJUSTMENT BOX
     position: absolute;
     top: 50px;
     left: 50px;
-    background: #cae9b9;
+    background: @module-background;
     color: @white;
     width: 62px;
     height: 34px;
@@ -5075,7 +5086,7 @@ span.wrapper a {
 
 .bubble {
     top: -100px;
-    color: #000000;
+    color: @black;
     font-size: 11px;
     left: 2;
     position: absolute;
@@ -5109,7 +5120,7 @@ span.wrapper a {
 
 .duework-popup.cal-bubble {
     top: -140px;
-    color: #000000;
+    color: @black;
     font-size: 11px;
     left: -300px;
     position: absolute;
@@ -5286,7 +5297,7 @@ FORUM
 }
 
 .post-left {
-    background-color: #FAF9F5;
+    background-color: @subnav-background;
     padding: 0;
     vertical-align: top
 }
@@ -5427,7 +5438,7 @@ p.forgotten {
 }
 
 #category {
-    background: #faf9f5;
+    background: @subnav-background;
     list-style: none;
     margin: 0;
     -moz-border-radius: 6px;
@@ -5795,7 +5806,7 @@ li.bars {
 }
 
 .background {
-    background-color: #FAF9F5;
+    background-color: @subnav-background;
     -moz-border-radius: 0 0 4px 4px;
     -webkit-border-radius: 0 0 4px 4px;
     border-radius: 0 0 4px 4px;
@@ -5942,7 +5953,7 @@ table.subjectList {
 }
 
 .mark-sheet.assessments .dark td {
-    background-color: #FAF9F5;
+    background-color: @subnav-background;
 }
 
 .mark-sheet.assessments .mark-input {
