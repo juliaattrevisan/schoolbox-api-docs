@@ -8,23 +8,14 @@ Variablahs
 
 @btn-icon-size: 14px;
 
-
-
-
 /*
 Mixarns
 */
 
-.square(@x) {
-    width: @x;
-    height: @x;
-}
 
 .btn-icon(@number) {
     background-position:0 -(@number*@btn-icon-size);
 }
-
-
 
 body {
     font-size: 75%;
@@ -472,6 +463,31 @@ tr.leave-pending span{
             background-color: #f3faff;
         }
     }
+    li{
+        display: block; list-style: none; margin: 0; padding: 0;position:relative; z-index:200;
+        a {
+            position: relative;
+            width: 160px;
+            margin-left: 16px;
+            color: #0066b0;
+            padding: 4px 16px;
+            word-wrap: break-word;
+            display:block;
+            &:hover{
+                color: @white;
+                text-decoration: none;
+                background: #0aa9c7;
+                -moz-border-radius: 3px;
+                -webkit-border-radius: 3px;
+                border-radius: 3px;
+            }
+            span strong {
+                position: absolute;
+                right: 16px;
+                top: 3px;
+            }
+        }
+    }
 
     ul {
         display: block; margin: 0; padding: 0; position: relative; z-index:200;
@@ -482,31 +498,7 @@ tr.leave-pending span{
         -webkit-border-radius: 0 0 3px 3px;
         border-radius: 0 0 3px 3px;
 
-        li{
-            display: block; list-style: none; margin: 0; padding: 0;position:relative; z-index:200;
-            a {
-                position: relative;
-                width: 160px;
-                margin-left: 16px;
-                color: #0066b0;
-                padding: 4px 16px;
-                word-wrap: break-word;
-                display:block;
-                &:hover{
-                    color: @white;
-                    text-decoration: none;
-                    background: #0aa9c7;
-                    -moz-border-radius: 3px;
-                    -webkit-border-radius: 3px;
-                    border-radius: 3px;
-                }
-                span strong {
-                    position: absolute;
-                    right: 16px;
-                    top: 3px;
-                }
-            }
-        }
+
 
          ul {
             display: none;
@@ -954,32 +946,33 @@ p.interact-left.home-calendar {
 label {
     margin-bottom: 4px;
     display: block;
+    &.error {
+
+        background: #fffddb url(/images/core/icons/label-error.png) no-repeat 6px 2px;
+        width: 100%;
+        padding: 4px;
+        text-indent: 36px;
+        padding: 3px 0;
+        border: 1px solid #ffcc00;
+        color: #ff5f45 !important;
+        display: block;
+
+        -moz-border-radius: 0 0 3px 3px;
+        -webkit-border-radius: 0 0 3px 3px;
+        border-radius: 0 0 3px 3px;
+
+        -moz-background-clip: padding;
+        -webkit-background-clip: padding-box;
+        background-clip: padding-box;
+
+    }
 }
 
 .formLabelWidth {
     width: 250px;
 }
 
-label.error {
-
-    background: #fffddb url(/images/core/icons/label-error.png) no-repeat 6px 2px;
-    width: 100%;
-    padding: 4px;
-    text-indent: 36px;
-    padding: 3px 0;
-    border: 1px solid #ffcc00;
-    color: #ff5f45 !important;
-    display: block;
-
-    -moz-border-radius: 0 0 3px 3px;
-    -webkit-border-radius: 0 0 3px 3px;
-    border-radius: 0 0 3px 3px;
-
-    -moz-background-clip: padding;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-
-}
+label
 
 label input[type=text] {
     width: 100%;
@@ -1210,7 +1203,8 @@ input.timeField {
     position: absolute;
     top: 4px;
     left: 8px;
-    .square(@btn-icon-size);
+    height:14px;
+    width:14px;
     background: url(/images/core/icons/btn-icons.png) no-repeat;
 }
 
