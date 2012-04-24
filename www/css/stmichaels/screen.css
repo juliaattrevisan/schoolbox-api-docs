@@ -76,7 +76,7 @@ a:hover{color:#ff5a00}
     background:#fcfbf2;
 }
 
-#nav li a:hover, #nav li li a:hover, #category li a:hover, #tabs-sub .ui-tabs-nav li a:hover{
+#nav ul li a:hover, #nav li li a:hover, #category ul li a:hover, #tabs-sub .ui-tabs-nav li a:hover{
     background-color: #6faff9;
     color: #ffffff;
 }
