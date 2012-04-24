@@ -628,7 +628,8 @@ tr.leave-pending span{
     float: right;
 }
 
-
+.template2 .left{width:49.5%;}
+.template2 .right{width:49.5%;}
 /*--------------------------------------------------------------
  BOXES/COMPONENT LAYOUT ^_^
 --------------------------------------------------------------*/
@@ -1199,209 +1200,207 @@ input.timeField {
     float: right
 }
 
-.btn span {
-    position: absolute;
-    top: 4px;
-    left: 8px;
-    height:14px;
-    width:14px;
-    background: url(/images/core/icons/btn-icons.png) no-repeat;
+.btn {
+    span {
+        position: absolute;
+        top: 4px;
+        left: 8px;
+        height:14px;
+        width:14px;
+        background: url(/images/core/icons/btn-icons.png) no-repeat;
+    }
+    &:hover {
+        background-position: bottom left;
+        cursor: pointer;
+        color: #ff5a00 !important;
+        text-decoration: none;
+        span {
+            .btn-icon(1);
+        }
+    }
+
+    &.weather span {
+        .btn-icon(2);
+    }
+    &.weather:hover span {
+        .btn-icon(3);
+    }
+
+    &.up-arrow span {
+        .btn-icon(4);
+    }
+    &.up-arrow:hover span {
+        .btn-icon(5);
+    }
+
+    &.update span {
+        .btn-icon(6);
+    }
+    &.update:hover span {
+        .btn-icon(7);
+    }
+
+    &.email span {
+        .btn-icon(8);
+    }
+    &.email:hover span {
+        .btn-icon(9);
+    }
+
+    &.translate span {
+        .btn-icon(10);
+    }
+    &.translate:hover span {
+        .btn-icon(11);
+    }
+
+    &.add span {
+        .btn-icon(12);
+    }
+
+    &.add:hover span {
+        .btn-icon(13);
+    }
+
+    &.tick span {
+        .btn-icon(14);
+    }
+
+    &.tick:hover span {
+        .btn-icon(15);
+    }
+
+    &.report span {
+        .btn-icon(16);
+    }
+
+    &.report:hover span {
+        .btn-icon(17);
+    }
+
+    &.create span {
+        .btn-icon(18);
+    }
+
+    &.create:hover span {
+        .btn-icon(19);
+    }
+
+    &.groups span {
+        .btn-icon(20);
+    }
+
+    &.groups:hover span {
+        .btn-icon(21);
+    }
+
+    &.modify span {
+        .btn-icon(22);
+    }
+
+    &.modify:hover span {
+        .btn-icon(23);
+    }
+
+    &.delete span {
+        .btn-icon(24);
+    }
+
+    &.delete:hover span {
+        .btn-icon(25);
+    }
+
+    &.statistics span {
+        .btn-icon(26);
+    }
+
+    &.statistics:hover span {
+        .btn-icon(27);
+    }
+
+    &.go-to span {
+        .btn-icon(28);
+    }
+
+    &.go-to:hover span {
+        .btn-icon(29);
+    }
+
+    &.reply span {
+        .btn-icon(30);
+    }
+
+    &.reply:hover span {
+        .btn-icon(31);
+    }
+
+    &.eportfolio span {
+        .btn-icon(32);
+    }
+
+    &.eportfolio:hover span {
+        .btn-icon(33);
+    }
+
+    &.help span {
+        .btn-icon(34);
+    }
+
+    &.help:hover span {
+        .btn-icon(35);
+    }
+
+    &.due-work span {
+        .btn-icon(36);
+    }
+
+    &.due-work:hover span {
+        .btn-icon(37);
+    }
+
+    &.go-back span {
+        .btn-icon(38);
+    }
+
+    &.go-back:hover span {
+        .btn-icon(39);
+    }
+
+    &.download span {
+        .btn-icon(40);
+    }
+
+    &.download:hover span {
+        .btn-icon(41);
+    }
+
+    &.chat span {
+        .btn-icon(42);
+    }
+
+    &.chat:hover span {
+        .btn-icon(43);
+    }
+
+    &.user span {
+        .btn-icon(44);
+    }
+
+    &.user:hover span {
+        .btn-icon(45);
+    }
+
+    &.print span {
+        .btn-icon(46);
+    }
+
+    &.print:hover span {
+        .btn-icon(47);
+    }
 }
 
-.btn:hover {
-    background-position: bottom left;
-    cursor: pointer;
-    color: #ff5a00 !important;
-    text-decoration: none;
-}
 
-.btn:hover span {
-    .btn-icon(1);
-}
 
-.btn.weather span {
-    .btn-icon(2);
-}
-
-.btn.weather:hover span {
-    .btn-icon(3);
-}
-
-.btn.up-arrow span {
-    .btn-icon(4);
-}
-
-.btn.up-arrow:hover span {
-    .btn-icon(5);
-}
-
-.btn.update span {
-    .btn-icon(6);
-}
-
-.btn.update:hover span {
-    .btn-icon(7);
-}
-
-.btn.email span {
-    .btn-icon(8);
-}
-
-.btn.email:hover span {
-    .btn-icon(9);
-}
-
-.btn.translate span {
-    .btn-icon(10);
-}
-
-.btn.translate:hover span {
-    .btn-icon(11);
-}
-
-.btn.add span {
-    .btn-icon(12);
-}
-
-.btn.add:hover span {
-    .btn-icon(13);
-}
-
-.btn.tick span {
-    .btn-icon(14);
-}
-
-.btn.tick:hover span {
-    .btn-icon(15);
-}
-
-.btn.report span {
-    .btn-icon(16);
-}
-
-.btn.report:hover span {
-    .btn-icon(17);
-}
-
-.btn.create span {
-    .btn-icon(18);
-}
-
-.btn.create:hover span {
-    .btn-icon(19);
-}
-
-.btn.groups span {
-    .btn-icon(20);
-}
-
-.btn.groups:hover span {
-    .btn-icon(21);
-}
-
-.btn.modify span {
-    .btn-icon(22);
-}
-
-.btn.modify:hover span {
-    .btn-icon(23);
-}
-
-.btn.delete span {
-    .btn-icon(24);
-}
-
-.btn.delete:hover span {
-    .btn-icon(25);
-}
-
-.btn.statistics span {
-    .btn-icon(26);
-}
-
-.btn.statistics:hover span {
-    .btn-icon(27);
-}
-
-.btn.go-to span {
-    .btn-icon(28);
-}
-
-.btn.go-to:hover span {
-    .btn-icon(29);
-}
-
-.btn.reply span {
-    .btn-icon(30);
-}
-
-.btn.reply:hover span {
-    .btn-icon(31);
-}
-
-.btn.eportfolio span {
-    .btn-icon(32);
-}
-
-.btn.eportfolio:hover span {
-    .btn-icon(33);
-}
-
-.btn.help span {
-    .btn-icon(34);
-}
-
-.btn.help:hover span {
-    .btn-icon(35);
-}
-
-.btn.due-work span {
-    .btn-icon(36);
-}
-
-.btn.due-work:hover span {
-    .btn-icon(37);
-}
-
-.btn.go-back span {
-    .btn-icon(38);
-}
-
-.btn.go-back:hover span {
-    .btn-icon(39);
-}
-
-.btn.download span {
-    .btn-icon(40);
-}
-
-.btn.download:hover span {
-    .btn-icon(41);
-}
-
-.btn.chat span {
-    .btn-icon(42);
-}
-
-.btn.chat:hover span {
-    .btn-icon(43);
-}
-
-.btn.user span {
-    .btn-icon(44);
-}
-
-.btn.user:hover span {
-    .btn-icon(45);
-}
-
-.btn.print span {
-    .btn-icon(46);
-}
-
-.btn.print:hover span {
-    .btn-icon(47);
-}
 
 .btn.submit {
     border-color: #0aa9c7 !important;
@@ -2424,7 +2423,8 @@ DASHBOARD
 }
 
 .dashboard #dashboard-layout #position-right {
-    margin: 0 0 0 .5%
+    margin: 0;
+    margin-left:0.5%;
 }
 
 /*--------------------------------------------------------------
