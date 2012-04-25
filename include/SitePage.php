@@ -393,7 +393,7 @@ class SitePage extends Page
 			$this->site == 'joeys' ||
 			$this->site == 'jpc' ||
 			$this->site == 'cathedral' ||
-			$this->site == 'mggs' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) ||
+			($this->site == 'mggs' || $this->site=='grimwade' || $this->site=='wadhurst') && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) ||
 			$this->site == 'bialik' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) ||
             $this->site == 'moriah' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent())
             )
