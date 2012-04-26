@@ -163,7 +163,7 @@ class Synchronise_External_Donvale_Timetable extends Synchronise_External_Donval
 	 */
 	private function setup() {
 		Database::getInstance()->query("TRUNCATE class_period");
-		Database::getInstance()->query("TRUNCATE timetable_period");
+		//Database::getInstance()->query("TRUNCATE timetable_period");
 		Database::getInstance()->query("TRUNCATE timetable_cycle");
 	}
 
@@ -245,10 +245,12 @@ class Synchronise_External_Donvale_Timetable extends Synchronise_External_Donval
 	 * @return bool
 	 */
 	private function createTimetablePeriod($period) {
-		Database::getInstance()->prepare("
+		/*
+        Database::getInstance()->prepare("
 			INSERT INTO timetable_period (cycle_id, title, day, sequence, usable)
 			VALUES (:cycleId, :title, :day, :sequence, :usable)
 		")->execute($period);
+        */
 	}
 
 	/**
