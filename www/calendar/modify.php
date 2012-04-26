@@ -14,7 +14,13 @@ if (isset($_POST['date'])) {
 
 	/* Events aren't visible until this date
 	 */
-	$publishDate = new Alaress_Date_Format($_POST['publishDate'], 'd/m/y');
+    if($_POST['publishDate']) {
+        $pubDateObject = new Alaress_Date_Format($_POST['publishDate'], 'd/m/y');
+        $publishDate = $pubDateObject->getDatabaseDate();
+    }
+    else {
+        $publishDate = 'NULL';
+    }
 
 	$event = array(
 		'owner' => $_SESSION['id'],
@@ -29,7 +35,7 @@ if (isset($_POST['date'])) {
 		'location' => $_POST['location'],
 		'attendance' => $_POST['attendance'],
 		'detail' => $_POST['detail'],
-		'publish_date' => $publishDate->getDatabaseDate(),
+		'publish_date' => $publishDate,
 	);
 
 	$validRepeat = array(

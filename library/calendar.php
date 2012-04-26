@@ -637,7 +637,7 @@ class Calendar extends DeprecatedModel {
 
 	function update($event) {
 
-        $cleanEvent = $this->getByID($eventID);
+        $cleanEvent = $this->getByID($event['id']);
 
 		if($this->getPerm($event['id']) < WRITE_ACCESS)
 			error(34);
@@ -660,7 +660,7 @@ class Calendar extends DeprecatedModel {
 		$this->createGroups($groupList, $event['id']);
 		$this->createCampus($campusList, $event['id']);
 
-		return $eventID;
+		return $event['id'];
 	}
 
 	function delete ($eventID) {
