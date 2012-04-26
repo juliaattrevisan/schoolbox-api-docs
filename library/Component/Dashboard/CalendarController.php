@@ -83,6 +83,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
         }
         else {
             $userHandler = $this->user;
+            $groupHandler = $this->group;
 
             foreach ( $this->eventList as $event ) {
                 if ( $event['startTime'] == "0:00" || strtolower($event['startTime']) == "12:00am" || strtolower($event['startTime']) == "12:00 am" || $event['startTime'] == '' ) {
