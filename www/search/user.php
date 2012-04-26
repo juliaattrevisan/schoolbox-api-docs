@@ -270,7 +270,7 @@ if (is_numeric($this->arg[0])) {
                     $teacherOutput = array();
                     if (is_array($teacherList)) {
                         foreach ($teacherList as $teacherSynID) {
-                            $teacher = $userHandler->getBySynergy($teacherSynID);
+                            $teacher = $userHandler->getBySynergyAndGroup($teacherSynID, $groupHandler->getStaffGroupTypeIds());
                             $teacherName = $userHandler->formatName($teacher);
 
                             $emailObj = new Email();
