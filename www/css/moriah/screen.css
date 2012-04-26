@@ -501,8 +501,8 @@ color: #0066B0;
     margin: 0 2% 54px 0;
 }
 #library-links li:hover { background: #fff; }
-#library-links li a { display: block; height: 100%; width: 100%; position: relative; }
-#library-links li span { position: relative; top: 104%; font-weight: bold; }
+#library-links li a { display: block; height: 100%; width: 100%; position: relative; overflow: visible; }
+#library-links li span { position: relative; top: 104%; font-weight: bold; zoom: 1; writing-mode: lr-bt; }
 
 #library-links li.turnitin a { background: url('/images/moriah/library/turnitin.png') no-repeat center center; }
 #library-links li.database a { background: url('/images/moriah/library/database.png') no-repeat center center; }
