@@ -115,13 +115,14 @@ else if (is_numeric($_GET['eventID'])) {
 
 	/* By default, if a publish date isn't specified, make it a week in advance
 	 */
-	if ($event['publish_date'] == null) {
-		$publishDate = new Alaress_Date_Format(time(), 'U');
-		$publishDate->addDays(7);
-	}
-	else {
-		$publishDate = new Alaress_Date_Format($event['publish_date'], 'y-m-d h:i:s');
-	}
+
+	if ($event['publish_date'] != null) {
+        $pubDateObject = new Alaress_Date_Format($event['publish_date'], 'y-m-d h:i:s');
+        $publishDate = $pubDateObject->getLocalShort();
+    }
+    else {
+        $publishDate = "";
+    }
 
 	$output = array(
 		'FUNCTION' => 'Update',
@@ -142,7 +143,7 @@ else if (is_numeric($_GET['eventID'])) {
 		'ATTENDANCE' => $event['attendance'] ? 'checked="checked"' : '',
 		'DETAIL' => $event['detail'],
 		'RETURN_TO' => parseReturnTo($_GET['returnTo'], $_GET['date']),
-		'PUBLISH_DATE' => $publishDate->getLocalShort(),
+		'PUBLISH_DATE' => $publishDate,
 	);
 
 	$page->setVar($output);
