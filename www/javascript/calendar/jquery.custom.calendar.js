@@ -82,7 +82,7 @@ setupCalendar = {
 			});
 
 			//make all of the checkboxes checked... darn you firefoxxxxxx
-			$j('.filter-list .checkbox').attr('checked', true);
+			//$j('.filter-list .checkbox').attr('checked', true);
 
 			//run the filter checker to show and hide the items
             $j('.applyFilters').click(function() {
@@ -101,28 +101,53 @@ setupCalendar = {
             $j('.filter-drop').click(function(e) {
                 e.stopPropagation();
             });
+
+            setupCalendar.filters.organise(["campus", "groups"]);
 		},
 
 		organise: function(filterArray) {
-			for (i=0; i < filterArray.length; i++ ) {
+
+            var flist = new Array();
+
+			for (i = 0; i < filterArray.length; i++) {
+
+                k = 0;
+                flist[i] = new Array(filterArray[i], new Array());
+
 				$j('.filter-list .' + filterArray[i] + ' input:not(:checked)').each(function(){
 					var n = $j(this).attr('value');
-					if ($j('ul.js_happening .' + n).is(':visible')) {
+                    //flist[i][1][k++] = new Array($j(this), n);
+                    if ($j('ul.js_happening .' + n).is(':visible')) {
 					  $j('ul.js_happening .' + n).hide();
 					}
 				});
+
 				$j('.filter-list .' + filterArray[i] + ' input:checked').each(function(){
 					var n = $j(this).attr('value');
+                    flist[i][1][k++] = n;
 					$j('ul.js_happening li.' + n).show();
 				});
+
 			}
 
-			$j('.filter-list .events input:not(:checked)').each(function(){
+            $j('.filter-list .events input:not(:checked)').each(function(){
 				var n = $j(this).attr('value');
 				if ($j('ul.js_happening .' + n).is(':visible')) {
 				  $j('ul.js_happening .' + n).hide();
 				}
 			});
+
+
+            k = 0;
+            flist[filterArray.length] = new Array('events', new Array());
+            $j('.filter-list .events input:checked').each(function(){
+                var n = $j(this).attr('value');
+                flist[filterArray.length][1][k++] = n;
+            });
+
+            $j.post('/ajax/calendarFilter.php', {fList : flist}, function(data) {
+                console.log(data);
+            });
 		}
 	}
 };

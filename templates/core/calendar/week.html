@@ -55,7 +55,7 @@
 								<span>Groups</span>
 								<!-- BEGIN group -->
 								<label title="{GROUP_NAME}">
-									<input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}" checked="checked" class="checkbox applyFilters"/>
+									<input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}" {GROUP_ID_SELECTED} class="checkbox applyFilters"/>
 									{GROUP_NAME}
 								</label>
 								<!-- END group -->
@@ -73,7 +73,7 @@
 								<span>Event</span>
 								<!-- BEGIN event_type -->
 								<label title="{EVENT_TYPE_NAME}">
-									<input type="checkbox" name="events" id="{EVENT_TYPE_ID}" checked="checked" value="type{EVENT_TYPE_ID}" class="checkbox applyFilters"/>
+									<input type="checkbox" name="events" id="{EVENT_TYPE_ID}" {EVENT_TYPE_ID_SELECTED} value="type{EVENT_TYPE_ID}" class="checkbox applyFilters"/>
 									<span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span>
 								</label>
 								<!-- END event_type -->
