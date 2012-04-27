@@ -82,10 +82,19 @@ setupCalendar = {
 			$j('.filter-list .checkbox').attr('checked', true);
 
 			//run the filter checker to show and hide the items
-			$j('#applyFilters').click(function() {
-				setupCalendar.filters.organise(["campus", "groups"]);
-				$j('.filter-drop').hide();
-			});
+            $j('.applyFilters').click(function() {
+                setupCalendar.filters.organise(["campus", "groups"]);
+            });
+
+            $j('#applyFilters').click(function() {
+                setupCalendar.filters.organise(["campus", "groups"]);
+                $j('.filter-drop').hide();
+            });
+
+            $j('.filter-drop input').blur(function() {
+                alert('lol');
+                $j('.filter-drop').hide();
+            });
 		},
 		organise: function(filterArray) {
 			for (i=0; i < filterArray.length; i++ ) {
@@ -109,4 +118,5 @@ setupCalendar = {
 			});
 		}
 	}
-}
+};
+

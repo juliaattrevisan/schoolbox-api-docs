@@ -55,7 +55,7 @@
 								<span>Groups</span>
 								<!-- BEGIN group -->
 								<label title="{GROUP_NAME}">
-									<input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}" checked="checked" class="checkbox"/>
+									<input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}" checked="checked" class="checkbox applyFilters"/>
 									{GROUP_NAME}
 								</label>
 								<!-- END group -->
@@ -64,7 +64,7 @@
 								<span>Campus</span>
 								<!-- BEGIN campus -->
 								<label title="{CAMPUS_NAME}">
-									<input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="checkbox"/>
+									<input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="checkbox applyFilters"/>
 									{CAMPUS_NAME}
 								</label>
 								<!-- END campus -->
@@ -73,7 +73,7 @@
 								<span>Event</span>
 								<!-- BEGIN event_type -->
 								<label title="{EVENT_TYPE_NAME}">
-									<input type="checkbox" name="events" id="{EVENT_TYPE_ID}" checked="checked" value="type{EVENT_TYPE_ID}" class="checkbox"/>
+									<input type="checkbox" name="events" id="{EVENT_TYPE_ID}" checked="checked" value="type{EVENT_TYPE_ID}" class="checkbox applyFilters"/>
 									<span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span>
 								</label>
 								<!-- END event_type -->
