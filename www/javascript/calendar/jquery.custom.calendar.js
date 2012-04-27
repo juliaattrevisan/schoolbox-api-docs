@@ -19,11 +19,14 @@ setupCalendar = {
         });
 
 		$j('.modify a').html('<span></span>Modify');
+
 		$j('.modify a').addClass('btn modify float-left');
+
 		$j('.print-it').click(function() {
 			  window.print();
 			  return false;
 		});
+
 		this.datePicker();
 		this.resizeTableCells();
 		this.windowResize();
@@ -92,7 +95,6 @@ setupCalendar = {
             });
 
             $j("body").click(function() {
-                // Hide all hidden content
                 $j('.filter-drop').hide();
             });
 
@@ -100,6 +102,7 @@ setupCalendar = {
                 e.stopPropagation();
             });
 		},
+
 		organise: function(filterArray) {
 			for (i=0; i < filterArray.length; i++ ) {
 				$j('.filter-list .' + filterArray[i] + ' input:not(:checked)').each(function(){
