@@ -91,9 +91,13 @@ setupCalendar = {
                 $j('.filter-drop').hide();
             });
 
-            $j('.filter-drop input').blur(function() {
-                alert('lol');
+            $j("body").click(function() {
+                // Hide all hidden content
                 $j('.filter-drop').hide();
+            });
+
+            $j('.filter-drop').click(function(e) {
+                e.stopPropagation();
             });
 		},
 		organise: function(filterArray) {
