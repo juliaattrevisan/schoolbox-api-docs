@@ -66,8 +66,8 @@
 				
 				$j('.visible-users')
 				.append('<li><input type="hidden" name="userList[]" value="'+data+'"><span>'+value+'</span><a href="#" class="delete-from-list">delete</a></li>');
-				
 				$j('#addUser').val("").focus();
+                $j('.groups input').valid();
 			}
 		});
 		
@@ -107,19 +107,32 @@
 				 $j('.advanced').queue('fx', []);	
 			}
 		});
-		
-		$j('#newsForm').validate({
+
+
+
+    jQuery.validator.addMethod("groupCheck", function(value, element) {
+        console.log($j(element).prop("checked"));
+
+        if (($j('.visible-users').children('li').length < 1) && ($j('.groups input:checked').length < 1 )) {
+            return false;
+        } else {
+            return true;
+        }
+
+
+
+    }, "Please tick at least one group");
+
+	$j('#newsForm').validate({
 			
 		rules: {  
 			'group[]': { 
-				required: true, 
-				minlength: 1
+				groupCheck: true
 			},
 			'campus[]': { 
 				required: true, 
 				minlength: 1
 			}
-			
 		},
 		messages: {
 			'group[]': "Please tick at least one group",
@@ -168,7 +181,7 @@
         		<tr>
 			<td class="formLabelWidth"><h4>Groups</h4>
 				<em>This news item will only be visible to the groups you select.</em></td>
-			<td><div class="clearfix checkboxes"><!-- BEGIN group_selection -->
+			<td><div class="clearfix checkboxes groups"><!-- BEGIN group_selection -->
 
 				<label class="float-left clear">
 					<input type="checkbox" value="{GROUP_ID}" name="group[]" {GROUP_ID_SELECTED}/>{GROUP_NAME}
