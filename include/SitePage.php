@@ -30,16 +30,10 @@ class SitePage extends Page
 	 */
 	public function conType()
 	{
-		$port = getenv("SERVER_PORT");
-
-		if ($port == 80) {
-			$contype = "http://";
-		}
-		else {
-			if ($port == 443) {
-				$contype = "https://";
-			}
-		}
+        $contype = "http://";
+		if (getenv("SERVER_PORT") == 443) {
+			$contype = "https://";
+        }
 
 		return $contype;
 	}
@@ -124,7 +118,6 @@ class SitePage extends Page
 		}
 
 		$this->site = Cfg::get('site_location');
-
 	}
 
 	function setAjax($state = true)
@@ -393,9 +386,7 @@ class SitePage extends Page
 			$this->site == 'joeys' ||
 			$this->site == 'jpc' ||
 			$this->site == 'cathedral' ||
-			($this->site == 'mggs' || $this->site=='grimwade' || $this->site=='wadhurst') && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) ||
-			$this->site == 'bialik' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) ||
-            $this->site == 'moriah' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent())
+			($this->site == 'mggs' || $this->site=='grimwade' || $this->site=='wadhurst' || $this->site =='stmichaels' || $this->site == 'bialik' || $this->site == 'moriah') && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent())
             )
 		) {
 			if ($this->site == 'mgs' || $this->site == 'grimwade' || $this->site =='wadhurst') {
@@ -464,6 +455,9 @@ class SitePage extends Page
                else if( $this->groupHandler->isStudent() ){
                    $this->setVar('WEBMAIL_LOCATION', 'href="http://www.google.com/a/student.moriah.nsw.edu.au/" rel="external"');
                }
+            }
+            else if ($this->site == 'stmichaels') {
+                $this->setVar('WEBMAIL_LOCATION', 'href="https://mail.stmichaels.vic.edu.au/owa" rel="external"');
             }
 
 			$this->parse('wm_tab', 'webmail_tab');
