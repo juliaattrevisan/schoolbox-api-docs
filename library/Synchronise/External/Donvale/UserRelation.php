@@ -91,7 +91,7 @@ class Synchronise_External_Donvale_UserRelation extends Synchronise_External_Don
         }
         else {
             Database::getInstance()-> prepare("
-                TRUNCATE user_relation
+                DELETE FROM user_relation
                 WHERE `relation_type` = :relationType
             ")->execute( array( 'relationType' => $relationType ) );
         }
