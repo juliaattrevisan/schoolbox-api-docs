@@ -205,6 +205,11 @@ abstract class Synchronise_Synergetic_Mgs_Strategy_Abstract extends Synchronise_
             /* If the current user exists in Schoolbox, update them
                 */
             if ($existing) {
+                /* dont update staff campuses */
+                if($newUser['group_id'] == self::STAFF_GROUP_ID || $newUser['group_id'] == self::ADMIN_GROUP_ID){
+                    unset($newUser['campus']);
+                    unset($newUser['defaultCampus']);
+                }
 
                 /* Perform action; report what happened
                      */

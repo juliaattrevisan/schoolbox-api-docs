@@ -42,6 +42,16 @@ abstract class Synchronise_Denbigh_Kings_Abstract extends Synchronise_Denbigh_Ab
         return $this::DEFAULT_CAMPUS_ID;
     }
 
+    protected function getHouse($house) {
+        $house = HouseMapper::getInstance()->findByColumn('name',$house);
+        return $house->id;
+    }
+
+    protected function getResidentialHouse($house) {
+        $house = HouseResidentialMapper::getInstance()->findByColumn('name',$house);
+        return $house->id;
+    }
+
     /**
      * Create or update a user in Schoolbox db, depending on whether user already exists
      * @param $newUser - an array of user attributes

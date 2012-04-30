@@ -1,7 +1,7 @@
 <?php
 
 class HouseMapper extends Mapper {
-	protected $table = 'luResidentialHouse';
+	protected $table = 'luHouse';
 
     protected function mapping () {
         $this->hasMap(array(

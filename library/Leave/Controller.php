@@ -85,7 +85,7 @@ class Leave_Controller extends Controller {
 
         $this->setUserMapper(NewUserMapper::getInstance());
         $this->setRequestMapper(Leave_RequestMapper::getInstance());
-        $this->setHouseMapper(HouseMapper::getInstance());
+        $this->setHouseMapper(HouseResidentialMapper::getInstance());
         $this->setExternalUser(new External_User());
 		$this->setGroup(new Group(HOUSEMASTER_SERVICE));
     }
