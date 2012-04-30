@@ -9,6 +9,7 @@ $this->setBlock("poll_vote", "poll_options", "poll_options_block");
 $this->setBlock($componentHandle, "poll_responses", "poll_responses_block");
 $this->setBlock($componentHandle, "response_count", "response_count_block");
 $this->setBlock('poll_responses', 'series_separator', 'series_separator_block');
+$this->setBlock($componentHandle, 'new_poll', 'new_poll_block');
 
 $this->setBlock($componentHandle, "poll_chart", "poll_chart_block");
 $this->setVar('poll_responses_block', '');
@@ -93,9 +94,11 @@ if ( !empty($config['pollID']) && is_numeric($config['pollID']) ) {
 
         if ($permission < WRITE_ACCESS ) {
 	        $this->setVar("modify_poll_block", "");
+            $this->setVar('new_poll_block', '');
         }
         else {
 	        $this->parse("modify_poll_block", "modify_poll");
+            $this->parse('new_poll_block', 'new_poll');
         }
 
     }
@@ -110,6 +113,14 @@ if ( !empty($config['pollID']) && is_numeric($config['pollID']) ) {
         $this->setVar('poll_chart_block', '');
         $this->setVar('poll_vote_block', '');
         $this->setVar('modify_poll_block', '');
+
+        if ($permission < WRITE_ACCESS ) {
+            $this->setVar('new_poll_block', '');
+        }
+        else {
+            $this->parse('new_poll_block', 'new_poll');
+        }
+
     }
 
     $current = $poll;
@@ -125,6 +136,14 @@ else {
     $this->setVar("poll_vote_block", "");
 	$this->setVar('show_results_block', '');
     $this->setVar('modify_poll_block', '');
+
+    if ($permission < WRITE_ACCESS ) {
+        $this->setVar('new_poll_block', '');
+    }
+    else {
+        $this->parse('new_poll_block', 'new_poll');
+    }
+
 }
 
 
