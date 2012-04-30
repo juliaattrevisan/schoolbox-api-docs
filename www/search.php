@@ -338,7 +338,7 @@ if (!empty($result['category'])) {
 
         $page->setVar(array(
             'CATEGORY_ID' => $category['id'],
-            'CATEGORY_NAME' => Scrub::text($category['name']),
+            'CATEGORY_NAME' => $category['code'] ? Scrub::text($category['name']) . '('.$category['code'].')' : Scrub::text($category['name']),
             'CATEGORY_CODE' => $category['code'],
             'CATEGORY_BREADCRUMB' => $category['breadcrumb'],
             'CATEGORY_COUNT'      => $count['category'],
