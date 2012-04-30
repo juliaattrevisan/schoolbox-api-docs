@@ -32,7 +32,7 @@ $userHandler = new User();
 
 $allSurveys = $surveyHandler->getList($categoryID);
 
-if ($groupHandler->isStaff()) {
+if ($permission >= WRITE_ACCESS) {
     $this->parse('createSurvey_block', 'createSurvey');
 }
 else {
