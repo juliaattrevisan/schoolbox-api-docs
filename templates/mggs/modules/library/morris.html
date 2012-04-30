@@ -1,37 +1,34 @@
 <script type="text/javascript" src="/javascript/jquery.cycle.js"></script>
 <script type="text/javascript">
-	
-$j(function() {
-    //in order for the boxes to complete their height adjustments effectively.
-    $j('tr td:first-child').each(function() {
-        var oneHeight = $j(this).height();
-        $j(this).children('.library-box').css("min-height", oneHeight - 41);
-        $j(this).next().children('.library-box').css("min-height",oneHeight - 41);
+
+    $j(function () {
+        //in order for the boxes to complete their height adjustments effectively.
+        $j('tr td:first').each(function () {
+            var oneHeight = $j(this).outerHeight()-34;
+            $j(this).children('.library-box').css("min-height", oneHeight);
+            $j(this).next().children('.library-box').css("min-height", oneHeight);
+        });
+
+        //autoclear the catalogue search
+        $j('#library-search-field').autoclear();
+        $j('.community').height($j('.taller').innerHeight());
+
+        $j('#galleryCycle').children('div:not(:first-child)').each(function () {
+            $j(this).hide();
+        });
     });
 
-    //autoclear the catalogue search
-    $j('#library-search-field').autoclear();
-
-    $j('.community').height($j('.taller').innerHeight() -41);
-
-    $j('#galleryCycle').children('div:not(:first-child)').each(function() {
-		$j(this).hide();
-	});
-});
-
-$j(window).load(function(){
-	$j('#galleryCycle').cycle({
-        cleartype: true,
-        before: function() {
-            $j('#galleryCycle span').slideUp();
-        },
-        after: function() {
-            $j('span', this).slideDown();
-        }
+    $j(window).load(function () {
+        $j('#galleryCycle').cycle({
+            cleartype:true,
+            before:function () {
+                $j('#galleryCycle span').slideUp();
+            },
+            after:function () {
+                $j('span', this).slideDown();
+            }
+        });
     });
-});
-
-
 
 
 </script>
@@ -39,80 +36,89 @@ $j(window).load(function(){
 <div id="morris">
 
 
-	<div class="library-header">
+    <div class="library-header">
         <form id="library-search" action="http://library.mggs.vic.edu.au/oliver/olly/search.do" method="get">
             <fieldset>
-                <input id="library-search-field" type="text" title="Catalogue Search" name="searchTerm" />
-                <input id="library-search-button" type="submit" value="Search" />
+                <input id="library-search-field" type="text" title="Catalogue Search" name="searchTerm"/>
+                <input id="library-search-button" type="submit" value="Search"/>
 
-                <input type="hidden" name="action" value="search" />
+                <input type="hidden" name="action" value="search"/>
             </fieldset>
         </form>
-		<h1>Morris Hall Library <span>Whose library? Our Library!</span></h1>
-		<ul>
-			<li><a href="/modules/library/morris">Home</a></li>
-			<li><a href="http://library.mggs.vic.edu.au/oliver/OpacLogin?corporation=default_corp&url=/olly/start.do&defaultBranch=Morris Hall"  rel="external">Catalogue</a></li>
-			<li><a href="/homepage/4778">Let's Read</a></li>
-			<li><a href="/homepage/4780">Finding Out</a></li>
-			<li><a href="/homepage/4779">Digital Citizenship</a></li>
-			<li><a href="/homepage/4583">"Thinks" to do</a></li>
-		</ul> 
-		<div class="float-fix"></div>
-	</div>
-	
-	
-	
-	<table class="library-boxes" >
-		<tr class="resize">
-			<td width="33%">
-			<a class="library-box lets-read" href="/homepage/4778">
-					<strong>Let's read</strong>
-				</a></td>
-			<td width="33%"><a href="/homepage/4780" class=" library-box finding-out">
-					<strong>Finding Out</strong>
-				</a></td>
-			<td rowspan="3" width="33%" class="taller">
-			<div class="library-box community">
-					<h3>Our Community</h3>
-						<div id="galleryCycle">
-                            <!-- BEGIN image -->
-							<div>
-								<img src="/cms/image.php?id={IMAGE_ID}&amp;height=222&amp;width=222">
-								<!-- <span>{IMAGE_NAME}</span> -->
-							</div>
-                            <!-- END image -->
-						</div>
-					
-					<h5>Did you know</h5>
+        <h1>Morris Hall Library <span>Whose library? Our Library!</span></h1>
+        <ul>
+            <li><a href="/modules/library/morris">Home</a></li>
+            <li>
+                <a href="http://library.mggs.vic.edu.au/oliver/OpacLogin?corporation=default_corp&url=/olly/start.do&defaultBranch=Morris Hall"
+                   rel="external">Catalogue</a></li>
+            <li><a href="/homepage/4778">Let's Read</a></li>
+            <li><a href="/homepage/4780">Finding Out</a></li>
+            <li><a href="/homepage/4779">Digital Citizenship</a></li>
+            <li><a href="/homepage/4583">"Thinks" to do</a></li>
+        </ul>
+        <div class="float-fix"></div>
+    </div>
+
+
+    <table class="library-boxes">
+        <tr class="resize">
+            <td width="33%">
+                <a class="library-box lets-read" href="/homepage/4778">
+                    <strong>Let's read</strong>
+                </a></td>
+            <td width="33%"><a href="/homepage/4780" class=" library-box finding-out">
+                <strong>Finding Out</strong>
+            </a></td>
+            <td rowspan="3" width="33%" class="taller">
+                <div class="library-box community">
+                    <h3>Our Community</h3>
+
+                    <div id="galleryCycle">
+                        <!-- BEGIN image -->
+                        <div>
+                            <img src="/cms/image.php?id={IMAGE_ID}&amp;height=222&amp;width=222">
+                            <!-- <span>{IMAGE_NAME}</span> -->
+                        </div>
+                        <!-- END image -->
+                    </div>
+
+                    <h5>Did you know</h5>
 
                     {DID_YOU_KNOW}
-					
-				</div></td>
-		</tr>
-		<tr class="resize">
-			<td><a href="/homepage/4779" class="library-box digital-citizenship">
-					<strong>Digital Citizenship</strong>
-				</a></td>
-			<td><a href="/homepage/4583" class="library-box thinks-to-do">
-					<strong>"Thinks" to do</strong>
-				</a></td>
-		</tr>
-		<tr>
-			<td colspan="2"><div class="library-box quotes">
-					<h5>Curious Quotes</h5>
-					{CURIOUS_QUOTES}
 
-				</div></td>
-		</tr>
-		
-		<tr>
-			<td colspan="3"><div class="library-box cybersmart">
-				<h6>Reminder</h6>
-			    {REMINDER}
                 </div>
             </td>
-		</tr>
-		
-		
-	</table>
+        </tr>
+        <tr class="resize">
+            <td>
+                <a href="/homepage/4779" class="library-box digital-citizenship">
+                    <strong>Digital Citizenship</strong>
+                </a>
+            </td>
+            <td>
+                <a href="/homepage/4583" class="library-box thinks-to-do">
+                    <strong>"Thinks" to do</strong>
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <div class="library-box quotes">
+                    <h5>Curious Quotes</h5>
+                    {CURIOUS_QUOTES}
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="3">
+                <div class="library-box cybersmart">
+                    <h6>Reminder</h6>
+                    {REMINDER}
+                </div>
+            </td>
+        </tr>
+
+
+    </table>
 </div>
