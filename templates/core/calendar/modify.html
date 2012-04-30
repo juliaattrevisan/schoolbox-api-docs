@@ -85,7 +85,30 @@
             } else {
                 $j('#repeatUntil').hide();
             }
-        })
+        });
+
+        $j('#eventForm').submit(function() {
+            $j("#dialog-confirm").dialog({
+                resizable: false,
+                height:150,
+                width: 400,
+                modal: true,
+                draggable: false,
+                buttons: {
+                    "Only this event": function() {
+                        $(this).dialog("close");
+                    },
+                    "All events in the series": function() {
+                        $(this).dialog("close");
+                    }
+                },
+                close: function() {
+                    return false;
+                }
+            });
+        });
+
+
 
     });
 
@@ -119,7 +142,7 @@
         <!-- BEGIN recurring_dates -->
         <tr>
             <td class="formLabelWidth" valign="top"><h4>Repeat</h4>
-                <em>The frequency that this event recurs if at all.</em></td>
+                <em>The frequency with which this event recurs, if at all.</em></td>
             <td><select name="repeat" id="repeatUntilSelect">
                 <option value="">Single Event</option>
                 <option value="daily">Daily</option>
@@ -134,6 +157,12 @@
             <td><input name="repeat_until" id="repeat_until" type="text" size="15" maxlength="30" value=""/></td>
         </tr>
         <!-- END recurring_dates -->
+        <!-- BEGIN recurring_reminder -->
+        <tr>
+            <td class="formLabelWidth" valign="top"><h4>Repeat</h4>
+                <em>This event is part of a recurring series.</em></td>
+            <td>{REC_FREQ}, beginning <strong>{REC_START}</strong> and ending <strong>{REC_END}</strong>.</td>
+        <!-- END recurring_reminder -->
         <tr>
             <td><h4>Time</h4>
                 <em>Both time slots are optional.</em></td>
@@ -231,5 +260,7 @@
     <input type="button" name="delete" value="Delete Event" class="submit-btn-plain"
            onclick="confirmDelete({EVENT_ID});"/>
     <!-- END delete_button -->
-
+    <div id="dialog-confirm" title="Update Event">
+        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>This event is part of a series. Would you like to update only this event, or all the events?</p>
+    </div>
 </form>

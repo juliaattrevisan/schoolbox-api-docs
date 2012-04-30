@@ -217,7 +217,7 @@ class Calendar extends DeprecatedModel {
 	public function getByID($eventID) {
 		$query = "
 			SELECT
-				e.id, e.owner, e.access, e.sid, e.type, e.note, e.date, e.location, e.attendance, e.detail, e.publish_date,
+				e.id, e.series_id, e.owner, e.access, e.sid, e.type, e.note, e.date, e.location, e.attendance, e.detail, e.publish_date,
 				DATE_FORMAT(e.startTime, '" . Cfg::get('calendar_time_format') . "') startTime,
 				DATE_FORMAT(e.endTime, '" . Cfg::get('calendar_time_format') . "') endTime,
 				u.title, u.firstname, u.lastname
@@ -252,6 +252,52 @@ class Calendar extends DeprecatedModel {
 
 		return $this->db->getAll($query);
 	}
+
+    function getAllInSeries($seriesID) {
+        $query = "SELECT *
+                  FROM event
+                  WHERE series_id = $seriesID";
+        return $this->db->getAll($query);
+    }
+
+    function getUpperSeriesIndex() {
+        $query = "SELECT series_id
+                  FROM series
+                  ORDER BY series_id DESC";
+        return $this->db->getOne($query);
+    }
+
+    function getSeriesRecurrence($seriesID) {
+        $series = $this->getAllInSeries($seriesID);
+        $first = 0;
+        $next = 1;
+        $last = count($series) - 1;
+
+        $dateFirst = new Alaress_Date_Format($series[$first]['date'], 'y-m-d');
+        $dateNext = new Alaress_Date_Format($series[$next]['date'], 'y-m-d');
+        $dateLast = new Alaress_Date_Format($series[$last]['date'], 'y-m-d');
+
+        $diff = (int)(($dateNext->getUnixTimestamp() - $dateFirst->getUnixTimestamp()) / 86400);
+
+        $recurMap = array(
+            1  => 'daily',
+            7  => 'weekly',
+            14 => 'fortnightly',
+            28 => 'monthly',
+            29 => 'monthly',
+            30 => 'monthly',
+            31 => 'monthly',
+        );
+
+        if(isset($recurMap[$diff])) {
+            return array(
+                'freq' => $recurMap[$diff],
+                'start' => $dateFirst,
+                'end' => $dateLast
+            );
+        }
+        return null;
+    }
 
 	/**
 	 * Get all the submission events for the specified day

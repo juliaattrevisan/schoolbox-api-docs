@@ -14,3 +14,6 @@ CREATE TABLE `event_attendance`(
 	`intention` int(11) NOT NULL  ,
 	PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET='latin1';
+
+/* Alter events table to include series_id for manipulating events by bulk */
+ALTER TABLE `event` ADD COLUMN `series_id` INT(6) NULL AFTER `id`;

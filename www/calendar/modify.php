@@ -47,6 +47,7 @@ if (isset($_POST['date'])) {
 
 	if (isset($validRepeat[$_POST['repeat']]) && $until) {
 		$i = 0;
+        $event['series_id'] = $calendarHandler->getUpperSeriesIndex() + 1;
 
 		for ($date; $date <= $until; $date = strtotime($validRepeat[$_POST['repeat']], $date)) {
 			if ($i++ > 100) {
@@ -92,7 +93,8 @@ else if (is_numeric($_GET['eventID'])) {
     $page->setTitle('Update Calender Event');
 
 	$page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
-	$page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
+    $page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
+    $page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
 	$event = $calendarHandler->getByID($_GET['eventID']);
 
@@ -185,6 +187,17 @@ else if (is_numeric($_GET['eventID'])) {
 	$page->parse('delete_button_block', 'delete_button', true);
 	$page->setVar('recurring_dates_block', '');
 
+    if($event['series_id'] == null) {
+        $page->setVar('recurring_reminder_block', '');
+    }
+    else {
+        $recurrence = $calendarHandler->getSeriesRecurrence($event['series_id']);
+        $page->setVar('REC_FREQ', ucfirst($recurrence['freq']));
+        $page->setVar('REC_START', $recurrence['start']->getLongDateOnly());
+        $page->setVar('REC_END', $recurrence['end']->getLongDateOnly());
+        $page->parse('recurring_reminder_block', 'recurring_reminder');
+    }
+
 	$page->outputPage();
 }
 else {
@@ -192,6 +205,7 @@ else {
 	$page->setTab("calendar");
 	$page->setBlock(TEMPLATE_content, 'recurring_dates', 'recurring_dates_block');
 	$page->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
+    $page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
     $page->setTitle('Add Calendar Event');
 
 	list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $_GET['date']);
@@ -264,6 +278,7 @@ else {
 	$page->dropDown('level_drop', $levelList, $_GET['level']);
 
 	$page->setVar('delete_button_block', '');
+    $page->setVar('recurring_reminder_block', '');
 	$page->parse('recurring_dates_block', 'recurring_dates');
 
 	$page->outputPage();
