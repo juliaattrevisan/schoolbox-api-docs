@@ -76,8 +76,6 @@
             }
         });
 
-        $j('#eventForm').validate();
-
         $j('#repeatUntilSelect').change(function () {
 
             if ($j(this).val() !== '') {
@@ -87,28 +85,29 @@
             }
         });
 
-        $j('#eventForm').submit(function() {
-            $j("#dialog-confirm").dialog({
-                resizable: false,
-                height:150,
-                width: 400,
-                modal: true,
-                draggable: false,
-                buttons: {
-                    "Only this event": function() {
-                        $(this).dialog("close");
+
+        $j('#eventForm').validate({
+            submitHandler: function() {
+                $j("#dialog-confirm").dialog({
+                    resizable: false,
+                    height:150,
+                    width: 400,
+                    modal: true,
+                    draggable: false,
+                    buttons: {
+                        "Only this event": function() {
+                            $j(this).dialog( "close" );
+                        },
+                        "All events in the series": function() {
+                            $j(this).dialog( "close" );
+                        }
                     },
-                    "All events in the series": function() {
-                        $(this).dialog("close");
+                    close: function() {
+                        return false;
                     }
-                },
-                close: function() {
-                    return false;
-                }
-            });
+                });
+            }
         });
-
-
 
     });
 
