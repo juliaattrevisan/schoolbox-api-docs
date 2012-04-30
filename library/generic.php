@@ -8,6 +8,13 @@ class GenericTable extends DeprecatedModel {
         parent::DeprecatedModel();
     }
 
+    function tableExists() {
+        $query = "SHOW FULL TABLES FROM `" . SQL_db . "` WHERE `Tables_in_" . SQL_db . "` = '{$this->_table}'";
+        if($this->db->getRow($query))
+            return true;
+        return false;
+    }
+
     function getDefinition() {
         $query = "SHOW COLUMNS FROM `$this->_table`";
         return $this->db->getAll($query);

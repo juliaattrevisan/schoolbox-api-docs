@@ -39,6 +39,11 @@ $tableList = array(
         'title'  => 'Houses',
         'index'  => 'id'
     ),
+    array(
+        'name'   => 'luResidentialHouse',
+        'title'  => 'Residential Houses',
+        'index'  => 'id'
+    ),
 	array(
 		'name'   => 'luCampus',
 		'title'  => 'Campus',
@@ -99,6 +104,11 @@ $allTableNames = array();
 
 // construct the sidebar
 foreach($tableList as $table) {
+
+    // if the table in question does not exist in the target database, don't try to display it (empty table is a different story)
+    $gHandle = new GenericTable($table['name'], $table['index']);
+    if(!$gHandle->tableExists())
+        continue;
 
     $allTableNames[] = $table['name'];
 
