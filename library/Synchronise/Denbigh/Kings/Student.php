@@ -41,11 +41,11 @@ class Synchronise_Denbigh_Kings_Student extends Synchronise_Denbigh_Kings_Abstra
         $newUser = array();
 
         // set attributes
-        $newUser['username']            = $currentUser['username'];
+        $newUser['username']            = $currentUser['loginIDforIT'];
      // $newUser['password']            = 'abc123';
         $newUser['group_id']            = $this->getGroupIDFromYearLevel($currentUser['academicYear']);
         $newUser['title']               = '';
-        $newUser['firstname']           = $currentUser['firstname'];
+        $newUser['firstname']           = $currentUser['preferred_name'];
         $newUser['lastname']            = $currentUser['surname'];
      // $newuser['email_pass']          = 'abc123';
         $newUser['synergy_id']          = $currentUser['denbighID'];
@@ -53,12 +53,12 @@ class Synchronise_Denbigh_Kings_Student extends Synchronise_Denbigh_Kings_Abstra
         $newUser['year']                = $currentUser['academicYear'];
         $newUser['house']               = $this->getHouse($currentUser['house']);
         $newUser['residentialHouse']    = $this->getResidentialHouse($currentUser['cateringHouse']);
-        $newUser['alt_email']           = strtolower($newUser['username']) . '@student.kings.edu.au';
+        $newUser['alt_email']           = strtolower($newUser['loginIDforIT']) . '@student.kings.edu.au';
         $newUser['local_email']         = 0;
         $newUser['su']                  = false;
         $newUser['defaultCampus']       = $this->getCampusFromYearLevel($currentUser['academicYear']);
         $newUser['eportfolio_enabled']  = self::EPORTFOLIO_STUDENT_ENABLED ? 1 : 0;
-        print_r($newUser);
+
         return $newUser;
     }
 }

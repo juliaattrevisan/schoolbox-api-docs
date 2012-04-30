@@ -43,13 +43,15 @@ abstract class Synchronise_Denbigh_Kings_Abstract extends Synchronise_Denbigh_Ab
     }
 
     protected function getHouse($house) {
-        $house = HouseMapper::getInstance()->findByColumn('name',$house);
-        return $house->id;
+        $house = HouseMapper::getInstance()->findByColumn('house',$house);
+        if($house->count() > 0)
+            return $house[0]->getId();
     }
 
     protected function getResidentialHouse($house) {
         $house = HouseResidentialMapper::getInstance()->findByColumn('name',$house);
-        return $house->id;
+        if($house->count() > 0)
+            return $house[0]->getId();
     }
 
     /**
