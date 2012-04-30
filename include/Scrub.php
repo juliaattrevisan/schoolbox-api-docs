@@ -47,15 +47,15 @@ class Scrub {
 		require_once dirname(__FILE__) . '/HTMLPurifier/HTMLPurifier.auto.php';
 
 		$config = HTMLPurifier_Config::createDefault();
-		$config->set('Filter', 'YouTube', true);
+		//$config->set('Filter', 'YouTube', true);
 		$config->set('Filter', 'Custom', array(
 			new HTMLPurifier_Filter_Quicktime(),
 			new HTMLPurifier_Filter_Shockwave(),
 			new HTMLPurifier_Filter_Flash(),
 			new HTMLPurifier_Filter_WindowsMedia(),
 			new HTMLPurifier_Filter_Real(),
+            new HTMLPurifier_Filter_IFrame()
 		));
-
 		$config->set('Attr', 'AllowedFrameTargets', array(
 			'_blank',
 			'_self',
