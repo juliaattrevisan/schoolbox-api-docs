@@ -552,6 +552,7 @@ foreach ($categoryList as $category) {
     /* Count the number of submission boxes for this Subject, and the percentage
      * of items submitted. If there are no submission boxes, just have 100%
      */
+    /*
     $submissions = $submissionHandler->getSubmissionsForSubject($categoryID);
     $numBoxes = $submissionHandler->countSubmissionBoxes($categoryID);
 
@@ -561,15 +562,18 @@ foreach ($categoryList as $category) {
     else {
         $thisPercentage = 100;
     }
+    */
 
     /* Accumulate into array for Javascript
      */
-    $percentage[] = $thisPercentage;
+    //$percentage[] = $thisPercentage;
     $categoryIDs[] = $categoryID;
 
 	$output = array(
 		'SUMMARY_CAT_ID' => $categoryID,
-		'SUMMARY_CAT_NAME' => Scrub::text($category['name']),
+        'SUMMARY_CAT_NAME' => $groupHandler->getPermission($categoryID) >= READ_ACCESS ?
+            '<a href="/homepage/' . $category['code'] . '">' .Scrub::Text($category['name']) . '</a>'
+            : Scrub::Text($category['name']),
 		'SUMMARY_TOTAL' => $summary[$category['id']]['total'],
 		'SUMMARY_DUE' => $summary[$category['id']]['due'],
 		'SUMMARY_TEACHER' => Cfg::get('external_enable') ? implode(', ', $teacherOutput) : '',
