@@ -11,25 +11,6 @@ $j(function() {
   		}
 	});
 
-    $j('p.tiny-btns a').each(function() {
-        $j(this).css({
-            'width': '2px',
-            'padding': '0 14px',
-            'text-indent': '-9999em'
-        })
-    });
-
-
-    $j('p.tiny-btns a').hover(function() {
-        $j(this).removeAttr('style');
-    }, function() {
-        $j(this).css({
-            'width': '2px',
-            'padding': '0 14px',
-            'text-indent': '-9999em'
-        });
-    });
-
 
 
     $j('.show-section-options').click(function() {
@@ -58,11 +39,13 @@ $j(function() {
 <h2>Manage Survey</h2>
 	<div class="pad-it ">
 
-		<p class="clearfix tiny-btns">
-            <a href="/survey/modify/{ASSESS_ASSESS_ID}" class="btn modify float-left marg" ><span></span>Modify Overview and dates</a>
-            <a href="/survey/export/{ASSESS_ASSESS_ID}" class="btn go-to float-left marg" ><span></span>Export</a>
-            <a href="/survey/delete/{ASSESS_ASSESS_ID}" class="btn delete float-left marg" ><span></span>Delete</a>
+		<p class="clearfix tiny-btns no-marg">
             <a class="btn add float-left marg" href="/survey/section/create/{ASSESS_ASSESS_ID}"><span></span>Add section</a>
+            <a href="/survey/delete/{ASSESS_ASSESS_ID}" class="btn delete float-left marg" ><span></span>Delete</a>
+        </p>
+        <p class="clearfix tiny-btns">
+            <a href="/survey/export/{ASSESS_ASSESS_ID}" class="btn go-to float-left marg" ><span></span>Export</a>
+            <a href="/survey/modify/{ASSESS_ASSESS_ID}" class="btn modify float-left marg" ><span></span>Overview and dates</a>
 		</p>
 		
 		<!-- BEGIN section -->
