@@ -1,6 +1,6 @@
 <?php
 
-class HouseMapper extends Mapper {
+class HouseResidentialMapper extends Mapper {
 	protected $table = 'luResidentialHouse';
 
     protected function mapping () {
