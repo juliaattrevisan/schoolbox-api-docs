@@ -36,7 +36,8 @@ if (is_numeric($_POST['userID']) && $_POST['modusername']) {
 		'su' => isset($_POST['superuser']) ? '1' : '0',
 		'year' => $_POST['year'] == '' ? 'NULL' : $_POST['year'],
 		'eportfolio_enabled' => $_POST['eportfolio'] == 1 ? 1 : 0,
-        'house' => $_POST['house']
+        'house' => $_POST['house'],
+        'residential_house_id' => $_POST['residential_house']
 	);
 
 	//Do not change password if its the default output value
@@ -71,7 +72,9 @@ else if ($_POST['modusername']) {
 		'su' => $_POST['superuser'],
 		'year' => $_POST['year'] == '' ? 'NULL' : $_POST['year'],
 		'eportfolio_enabled' => $_POST['eportfolio'] == 1 ? 1 : 0,
-        'house' => $_POST['house']
+        'house' => $_POST['house'],
+        'residential_house_id' => $_POST['residential_house']
+
 	);
 
 	$id = $userHandler->create($user);
