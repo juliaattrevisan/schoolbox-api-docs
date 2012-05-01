@@ -9,7 +9,7 @@ class GenericTable extends DeprecatedModel {
     }
 
     function tableExists() {
-        $query = "SHOW FULL TABLES FROM `" . SQL_db . "` WHERE `Tables_in_" . SQL_db . "` = '{$this->_table}'";
+        $query = "SHOW TABLES FROM `" . SQL_db . "` LIKE '{$this->_table}'";
         if($this->db->getRow($query))
             return true;
         return false;
