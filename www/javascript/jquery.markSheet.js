@@ -23,6 +23,13 @@ $j(function() {
             $j('.mark-sheet.assessments table').css('width', markSheet.assessmentCellWidth * markSheet.columnCount);
 
             $j('.height-control').ellipsis();
+
+
+            if (!$j('.assessments').find('td').length > 0) {
+
+                $j('.assessments').height($j('.names').height()+92)
+            }
+
         },
 
         inputs: function() {
