@@ -100,6 +100,9 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
 
         $currentDay = $businessDays % $definition['cycle_length'];
 
+        if($currentDay == 0)
+            $currentDay = $definition['cycle_length'];
+
         return $currentDay;
 	}
 
