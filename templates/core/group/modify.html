@@ -2,15 +2,17 @@
 <link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
 <script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
 <script type="text/javascript">
+
+
+
 $j(document).ready(function() {
-    $j('.greenCheck').click(function() {
-        if ($j(this).attr('checked')) {
+    $j('.greenCheck').change(function() {
+        if ($j(this).prop('checked')) {
             var data = {
                 categoryID: '{CATEGORY_ID}',
                 userID: $j(this).attr('rel'),
                 write: 2
             }
-            $j(this).attr('checked', true);
         }
         else {
             var data = {
@@ -18,12 +20,11 @@ $j(document).ready(function() {
                 userID: $j(this).attr('rel'),
                 write: 1
             }
-
-            $j(this).attr('checked', false);
         }
 
         $j.get('/group/modifyForm.php', data);
-    });
+
+    }).change();
 
 
 	$j('#addUser').autocomplete({
