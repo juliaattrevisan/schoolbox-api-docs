@@ -105,7 +105,7 @@
                         $j('.bulk-delete').css('display', 'none');
                         $j("#dialog-bulk").dialog({
                             resizable: false,
-                            height:150,
+                            height:180,
                             width: 400,
                             modal: true,
                             draggable: false,
@@ -129,7 +129,7 @@
                         $j('.bulk-delete').css('display', 'inline');
                         $j("#dialog-bulk").dialog({
                             resizable: false,
-                            height:150,
+                            height:140,
                             width: 400,
                             modal: true,
                             draggable: false,
@@ -157,7 +157,7 @@
                     else if(act == 'Delete') {
                         $j("#dialog-delete").dialog({
                             resizable: false,
-                            height:150,
+                            height:100,
                             width: 400,
                             modal: true,
                             draggable: false,
@@ -208,7 +208,7 @@
     <a class="btn go-back" href="/calendar/{RETURN_TO}"><span></span>Back to Calendar</a>
 </span>
 
-<form method="post" action="/calendar/modify.php" id="eventForm">
+<form method="post" action="/calendar/modifyForm.php" id="eventForm">
     <table class="standardForm">
         <tr>
             <td class="formLabelWidth"><h4>Title</h4></td>
@@ -352,7 +352,7 @@
 
     <div id="dialog-bulk" title="This event is part of a series">
         <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
-           <span class="bulk-update">Would you like to update only this event, or all in the series?</span>
+           <span class="bulk-update">Would you like to update only this event, or all in the series? If any events in the series have been modified, the changes will be overridden.</span>
            <span class="bulk-delete">Would you like to delete only this event, or all in the series?</span>
         </p>
     </div>

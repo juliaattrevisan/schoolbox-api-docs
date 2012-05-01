@@ -5,89 +5,8 @@ $page = new SitePage();
 $calendarHandler = new Calendar();
 $groupHandler = new Group();
 
-if (isset($_POST['date'])) {
-	$dateObj = new Alaress_Date_Format($_POST['date'], 'd/m/y');
-	$date = $dateObj->getUnixTimestamp();
-
-	$untilObj = new Alaress_Date_Format($_POST['repeat_until'], 'd/m/y');
-	$until = $untilObj->getUnixTimestamp();
-
-	/* Events aren't visible until this date
-	 */
-    if($_POST['publishDate']) {
-        $pubDateObject = new Alaress_Date_Format($_POST['publishDate'], 'd/m/y');
-        $publishDate = $pubDateObject->getDatabaseDate();
-    }
-    else {
-        $publishDate = 'NULL';
-    }
-
-	$event = array(
-		'owner' => $_SESSION['id'],
-		'access' => $_POST['level'],
-		'sid' => $_POST['group'],
-		'campusList' => !empty($_POST['campus']) ? $_POST['campus'] : array($_SESSION['campus'][0]),
-		'groupList' => $_POST['groupCheck'],
-		'type' => $_POST['type'],
-		'note' => $_POST['note'],
-		'startTime' => (($_POST['period'] == 'pm' && $_POST['hour'] != 12 ? 12 : 0) + $_POST['hour']) . ":" . $_POST['minute'] . ":00",
-		'endTime' => (($_POST['toperiod'] == 'pm' && $_POST['tohour'] != 12 ? 12 : 0) + $_POST['tohour']) . ":" . $_POST['tominute'] . ":00",
-		'location' => $_POST['location'],
-		'attendance' => $_POST['attendance'],
-		'detail' => $_POST['detail'],
-		'publish_date' => $publishDate,
-	);
-
-	$validRepeat = array(
-		'daily' => '+1 day',
-		'weekly' => '+1 week',
-		'fortnightly' => '+2 weeks',
-		'monthly' => '+1 month'
-	);
-
-	if (isset($validRepeat[$_POST['repeat']]) && $until) {
-		$i = 0;
-        $event['series_id'] = $calendarHandler->getUpperSeriesIndex() + 1;
-
-		for ($date; $date <= $until; $date = strtotime($validRepeat[$_POST['repeat']], $date)) {
-			if ($i++ > 100) {
-				break;
-			}
-
-			$dateArray[] = date("Y-m-d", $date);
-		}
-	}
-	else {
-		$dateArray[] = date("Y-m-d", $date);
-	}
-
-	if(is_numeric($_POST['id'])) {
-		$event['id'] = $_POST['id'];
-		$event['date'] = $dateArray[0];
-
-		$calendarHandler->update($event);
-	}
-	else {
-		for ($i = 0; $i < count($dateArray); $i++) {
-			$event['date'] = $dateArray[$i];
-
-			$calendarHandler->create($event);
-		}
-	}
-
-	$page->backToTheFuture(2);
-}
-else if (isset($_GET['delete'])) {
-	$calendar = $calendarHandler->getByID($_GET['delete']);
-	$calendarHandler->delete($_GET['delete']);
-
-	$date = explode("-", $calendar['date']);
-	$date = array_reverse($date);
-
-	$page->backToTheFuture(2);
-
-}
-else if (is_numeric($_GET['eventID'])) {
+// if modifying an event
+if (is_numeric($_GET['eventID'])) {
 	$page->setFile(TEMPLATE_content, 'calendar/modify.html');
 	$page->setTab("calendar");
     $page->setTitle('Update Calender Event');
@@ -200,6 +119,8 @@ else if (is_numeric($_GET['eventID'])) {
 
 	$page->outputPage();
 }
+
+// if creating a new event
 else {
 	$page->setFile(TEMPLATE_content, 'calendar/modify.html');
 	$page->setTab("calendar");
@@ -283,6 +204,8 @@ else {
 
 	$page->outputPage();
 }
+
+
 
 /**
  * Ensure that the user hasn't modified the URL in an untoward manner.

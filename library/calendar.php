@@ -253,16 +253,33 @@ class Calendar extends DeprecatedModel {
 		return $this->db->getAll($query);
 	}
 
+    function getAllInSeriesByEventID($eventID) {
+        $query = "SELECT * FROM event WHERE series_id = (
+                    SELECT series_id FROM event WHERE id = '$eventID'
+                  )";
+        return $this->db->getAll($query);
+    }
+
+    function getSeriesID($eventID) {
+        $query = "SELECT `series_id` FROM `event` WHERE `id` = '$eventID'";
+        return $this->db->getOne($query);
+    }
+
+    function isInSeries($eventID) {
+        return $this->getSeriesID($eventID) != null;
+    }
+
     function getAllInSeries($seriesID) {
         $query = "SELECT *
-                  FROM event
-                  WHERE series_id = $seriesID";
+                  FROM `event`
+                  WHERE `series_id` = '$seriesID'
+                  ORDER BY `date` ASC";
         return $this->db->getAll($query);
     }
 
     function getUpperSeriesIndex() {
-        $query = "SELECT series_id
-                  FROM series
+        $query = "SELECT `series_id`
+                  FROM `event`
                   ORDER BY series_id DESC";
         return $this->db->getOne($query);
     }
@@ -296,7 +313,12 @@ class Calendar extends DeprecatedModel {
                 'end' => $dateLast
             );
         }
-        return null;
+
+        return array(
+            'freq' => 'periodically',
+            'start' => $dateFirst,
+            'end' => $dateLast
+        );
     }
 
 	/**
