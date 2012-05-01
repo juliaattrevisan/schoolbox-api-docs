@@ -49,7 +49,7 @@ ALTER TABLE `submission_return`
 
 ALTER TABLE `submission_box`
 	ADD COLUMN `mark_type` int(11)   NULL after `created`,
-	ADD COLUMN `max_mark` int(11)   NULL after `mark_type`
+	ADD COLUMN `max_mark` int(11)   NULL after `mark_type`,
 	ADD COLUMN `multi_submission` tinyint(1) NOT NULL DEFAULT '0' after `accept_submission`;
 
 
