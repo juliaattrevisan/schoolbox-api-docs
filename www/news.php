@@ -216,19 +216,17 @@ $outputPagination = array(
 
 $this->setVar($outputPagination);
 
-
-// does the bottom button link to archived or current news?
-$this->setVar(array(
-    'ARCH_CURRENT' => $archive ? 'Current' : 'Archived',
-    'ARCH_CURRENT_CLEAN' => $archive ? "${filter['topic']}/" : "archive/${filter['topic']}/",
-));
-$this->parse('archive_button_block', 'archive_button');
-
-
-
-
-
-
+// does the bottom button link to archived news?
+if($archive) {
+    $this->setVar('archive_button_block');
+}
+else {
+    $this->setVar(array(
+        'ARCH_CURRENT' => 'Archived',
+        'ARCH_CURRENT_CLEAN' => "archive/${filter['topic']}/",
+    ));
+    $this->parse('archive_button_block', 'archive_button');
+}
 
 $items = $newsHandler->getNewsListing($archive, $filter['topic'], $filter['year'], $filter['month'], $newsIndex, $newsPerPage);
 

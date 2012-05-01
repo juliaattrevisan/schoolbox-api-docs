@@ -10,7 +10,11 @@
 
 // specified an article ID?
 if(!is_numeric($this->arg[0])) {
-    error(19);
+    // get the most recent one, and redirect
+    $newsHandler = new News();
+    $allNews = $newsHandler->getNewsListing(false);
+    $itemID = $allNews[0]['item_id'];
+    self::localRedir("/news/item/$itemID");
 }
 
 $this->setFile(TEMPLATE_content, 'news/item.html');
@@ -29,7 +33,7 @@ $newsHandler = new News();
 $article = null;
 
 if(!($article = $newsHandler->getByID($this->arg[0]))) {
-    error(0);
+    error(19);
 }
 
 $topic = $newsHandler->getTopicByID($article['item_topic_id']);
@@ -74,39 +78,34 @@ $allNews = $newsHandler->getNewsListing($expired, $topic['name']);
 // output the list of topics for the sidebar
 foreach($topicList as $sidebarTopic) {
     $url = new Url($sidebarTopic['name']);
+    $items = $newsHandler->getNewsListing($expired, $sidebarTopic['name']);
     $output = array(
         'LIST_TOPIC_NAME' => $sidebarTopic['name'],
         'LIST_TOPIC_CLEAN' => ($expired ? 'archive/' : '') . $url->getSlug(),
+        'LIST_TOPIC_RECENT_ARTICLE_ID' => $items[0]['item_id'],
     );
     $this->setVar($output);
 
+    $items = $newsHandler->getNewsListing($expired, $sidebarTopic['name']);
 
-    // if the current sidebar topic matches the article, load the news results into that section
-    if($sidebarTopic['newsTopicID'] == $article['item_topic_id']) {
-        if(count($allNews)) {
+    if(is_array($items)) {
+        foreach($items as $listItem) {
 
-            foreach($allNews as $listItem) {
-
-
-                $output = array(
-                    'LIST_TOPIC_ARTICLE_CURRENT' => ($listItem['item_id'] == $article['item_id']) ? 'current' : '',
-                    'LIST_TOPIC_ARTICLE_NAME'    =>  $listItem['item_heading'],
-                    'LIST_TOPIC_ARTICLE_ID'      =>  $listItem['item_id']
-                );
-                $this->setVar($output);
-                $this->parse('article_list_item_block', 'article_list_item', true);
-            }
-            $this->parse('article_list_block', 'article_list', true);
+            $output = array(
+                'LIST_TOPIC_ARTICLE_CURRENT' => ($listItem['item_id'] == $article['item_id']) ? 'current' : '',
+                'LIST_TOPIC_ARTICLE_NAME'    =>  $listItem['item_heading'],
+                'LIST_TOPIC_ARTICLE_ID'      =>  $listItem['item_id']
+            );
+            $this->setVar($output);
+            $this->parse('article_list_item_block', 'article_list_item', true);
         }
-        // if no items in allNews
-        else {
-            $this->setVar('article_list_block', '');
-        }
-    } else {
-        $this->setVar('article_list_item_block', '');
+        $this->parse('article_list_block', 'article_list', true);
+        $this->parse('topic_list_block', 'topic_list', true);
     }
-
-    $this->parse('topic_list_block', 'topic_list', true);
+    else {
+        $this->setVar('article_list_block', '');
+    }
+    $this->setVar('article_list_item_block', '');
     $this->setVar('article_list_block','');
 }
 

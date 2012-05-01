@@ -45,7 +45,7 @@
     <div class="pad-it">
         <ul class="tree">
             <!-- BEGIN topic_list -->
-            <li><a href="/news/{LIST_TOPIC_CLEAN}">{LIST_TOPIC_NAME}</a>
+            <li><a href="/news/item/{LIST_TOPIC_RECENT_ARTICLE_ID}">{LIST_TOPIC_NAME}</a>
                 <!-- BEGIN article_list -->
                 <ul class="topic">
                     <!-- BEGIN article_list_item -->
@@ -58,7 +58,7 @@
         </ul>
     </div>
     <!-- BEGIN allnews_button -->
-    <p class="interact clearfix"><a href="/news/" class="btn"><span></span>View All News</a></p>
+    <p class="interact clearfix"><a href="/news/archive/{TOPIC_CLEAN}" class="btn"><span></span>View Archived News</a></p>
     <!-- END allnews_button -->
 </div>
 <!-- END news -->

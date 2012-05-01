@@ -278,7 +278,8 @@ class News extends DeprecatedModel {
             AND item_datetime_published < NOW()
             AND news_items.item_datetime_expires $beforeOrAfter NOW()
             $topicFilter $yearFilter $monthFilter
-         GROUP BY news_items.item_id ORDER BY newsTopic.newsTopicID, news_items.item_datetime_posted DESC";
+         GROUP BY news_items.item_id
+         ORDER BY newsTopic.newsTopicID, news_items.item_datetime_posted DESC";
 
             $shareResults = $this->db->getAll($query);
         }
@@ -470,15 +471,15 @@ class News extends DeprecatedModel {
 	function timecmp($a, $b)
 	{
 
-		if ($a['newsTopicID'] == $b['newsTopicID']) {
+		//if ($a['newsTopicID'] == $b['newsTopicID']) {
 			//just a quick function to enable sorting of news based on time
 			if ($a['item_datetime_posted'] == $b['item_datetime_posted']) {
 				return 0;
 			}
 			return ($a['item_datetime_posted'] > $b['item_datetime_posted']) ? -1 : 1;
-		} else {
-			return $a['newsTopicID'] > $b['newsTopicID']?1:-1;
-		}
+		//} else {
+		//	return $a['newsTopicID'] > $b['newsTopicID']?1:-1;
+		//}
 	}
 
 	function getTopicByID($newsTopicID) {
