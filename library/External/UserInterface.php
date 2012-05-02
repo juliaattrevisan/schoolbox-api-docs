@@ -8,31 +8,18 @@
  */
 
 interface External_UserInterface {
-	public function getParent ($externalUserId);
-
-	public function getParentSync ($externalUserId);
-
-	public function getStudent ($externalUserId);
-
-	public function getStaff ($externalUserId);
-
-	public function getStudentContactListExtended ($yearLevel);
-
-	public function getStudentContactList ($externalUserId);
-
-	public function getCurrentSemester ();
-
-	public function getSubjectList ($externalUserId, $userId);
-
-	public function getEnrolledStudents ($externalUserId);
-
-	public function getEmail ($externalUserId);
-
-    public function getPortrait ($externalUserId);
-
-	public function getStudentUserAccountInfo ();
-
-	public function getParentUserAccountInfo ();
-
-	public function getStaffUserAccountInfo ();
+	public function getParent($externalUserId);
+	public function getParentSync($externalUserId);
+	public function getStudent($externalUserId);
+	public function getStaff($externalUserId);
+	public function getStudentContactListExtended($yearLevel);
+	public function getStudentContactList($externalUserId);
+	public function getCurrentSemester();
+	public function getSubjectList($externalUserId, $userId);
+	public function getEnrolledStudents($externalUserId);
+	public function getEmail($externalUserId);
+	public function getPortrait($externalUserId);
+	public function getStudentUserAccountInfo();
+	public function getParentUserAccountInfo();
+	public function getStaffUserAccountInfo();
 }

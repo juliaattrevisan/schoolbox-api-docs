@@ -31,7 +31,7 @@ class External_Denbigh_User implements External_UserInterface {
 
 		$this->setExternalDatabase($database);
 
-		$this->setGroup( new Group );
+		$this->setGroup(new Group());
 	}
 
     public function getParent ($externalUserId) {
@@ -197,10 +197,16 @@ class External_Denbigh_User implements External_UserInterface {
 
     }
 
-
-	function getStudentContactList ($externalUserId) {
+	/**
+	 * Get a list of student contacts (parents) and their contact information
+	 *
+	 * @param $externalUserId
+	 * @return mixed
+	 */
+	public function getStudentContactList($externalUserId) {
 		$statement = $this->getExternalDatabase()->query("
-			SELECT pe_p.denbighID, pe_p.surname, pe_p.given_names, pe_p.preferred_name, pe_p.title,
+			SELECT
+				pe_p.denbighID, pe_p.surname, pe_p.given_names, pe_p.preferred_name, pe_p.title, pe_p.email,
 				pa_p.familyDenbighID,
 				a.street, a.suburb, a.state, a.postcode, a.telephoneHome
 			FROM People pe_s
@@ -220,14 +226,14 @@ class External_Denbigh_User implements External_UserInterface {
 
 		$contactAdaptionList = array();
 
-		if ( !empty($contactList) ) {
-			foreach ( $contactList as $contact ) {
+		if (!empty($contactList)) {
+			foreach ($contactList as $contact) {
 				$contactAdaption = array(
 					'StudentContactID' => $contact['denbighID'],
 					'StudentContactTitle' => $contact['title'],
 					'StudentContactPreferred' => $contact['preferred_name'],
 					'StudentContactSurname' => $contact['surname'],
-					'StudentContactDefaultEmail' => '',
+					'StudentContactDefaultEmail' => $contact['email'],
 					'StudentContactAddress1' => $contact['street'],
 					'StudentContactSuburb' => $contact['suburb'],
 					'StudentContactPostCode' => $contact['postcode'],

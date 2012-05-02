@@ -219,9 +219,9 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
 
 
                 $this->setVar(array(
-                    'WORK_SUBJECT' => scrub::Text($currentWork['categoryName']),
+                    'WORK_SUBJECT' => Scrub::text($currentWork['categoryName']),
                     'WORK_SUBJECT_ID' => $currentWork['cid'],
-                    'WORK_DESCRIPTION' => scrub::Text($currentWork['name']),
+                    'WORK_DESCRIPTION' => Scrub::text($currentWork['name']),
                     'WORK_ACTION' => $action,
                     'WORK_STATUS' => $status,
                     'WORK_BOX_ID' => $currentWork['bid'],

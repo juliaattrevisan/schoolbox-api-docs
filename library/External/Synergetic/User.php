@@ -244,7 +244,13 @@ class External_Synergetic_User implements External_UserInterface {
 		return $this->getDatabase()->getAll($query);
     }
 
-	function getStudentContactList ($synID) {
+	/**
+	 * Get a list of student contacts (parents) and their contact information
+	 *
+	 * @param $externalUserId
+	 * @return mixed
+	 */
+	public function getStudentContactList($externalUserId) {
 		$query = "
 			SELECT
 				StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
@@ -255,7 +261,7 @@ class External_Synergetic_User implements External_UserInterface {
 			FROM
 				SynergyOne.dbo.vStudentContactAllAddress
 			WHERE
-				StudentID = $synID
+				StudentID = '$externalUserId'
 				AND (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
 				AND FileSemester = " . $_SESSION['FileSemester'] . "
 				AND FileYear = " . $_SESSION[ 'FileYear'] ;
@@ -457,28 +463,38 @@ class External_Synergetic_User implements External_UserInterface {
         return $this->getDatabase()->getRow($query);
 	}
 
-	private function setDatabase ($database) {
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set database
+	 *
+	 * @param $database
+	 */
+	private function setDatabase($database) {
 		$this->database = $database;
 	}
 
-	private function getDatabase () {
+	/**
+	 * Get database
+	 *
+	 * @return mixed
+	 */
+	private function getDatabase() {
 		return $this->database;
 	}
 
     /**
      * @param Group $groupHandler
      */
-    public function setGroup($groupHandler)
-    {
+    public function setGroup($groupHandler) {
         $this->groupHandler = $groupHandler;
     }
 
     /**
      * @return Group
      */
-    public function getGroup()
-    {
+    public function getGroup() {
         return $this->groupHandler;
     }
-
 }
