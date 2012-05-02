@@ -72,3 +72,5 @@ calendar/calendar.sql
 homepages/clickview.sql
 
 core/user_digest.sql
+
+dashboard/dashboard.sql
