@@ -4,8 +4,9 @@
     $j(function() {
         $j(".tree").treeview({
             persist: "location",
-            unique: false,
-            animated: "fast"
+            unique: true,
+            animated: "fast",
+            collapsed: true
         });
 
     });
@@ -43,7 +44,7 @@
     <h2>News Index</h2>
 
     <div class="pad-it">
-        <ul class="tree">
+        <ul class="tree news-index-tree">
             <!-- BEGIN topic_list -->
             <li><a href="/news/item/{LIST_TOPIC_RECENT_ARTICLE_ID}">{LIST_TOPIC_NAME}</a>
                 <!-- BEGIN article_list -->
