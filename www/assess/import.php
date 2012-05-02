@@ -20,67 +20,7 @@ else {
     error(134);
 }
 
-$assessHandler = new Assess_Main();
-$sectionHandler = new Assess_Section();
-$factory = new Assess_Factory();
+$import = new Assess_Import_Xml($this->arg[0], new Assess_Main(), new Assess_Section(), new Assess_Factory(), $data, $this);
+$import->import();
 
-$xml = simplexml_load_string($data);
-
-/* Set up assess
- */
-$assess_id = $assessHandler->create(array(
-    'category_id' => Scrub::text($this->arg[0]),
-    'user_id' => $_SESSION['id'],
-    'title' => Scrub::text($xml->title),
-    'description' => Scrub::text($xml->description),
-    'start' => Scrub::text($xml->start),
-    'finish' => Scrub::text($xml->finish),
-    'duration' => Scrub::text($xml->duration),
-    'allow_resit' => Scrub::text($xml->allow_resit),
-	'availability' => Scrub::text($xml->availability),
-    'created_at' => 'NOW()',
-));
-
-if (!$assess_id) {
-    error(112);
-}
-
-/* Process each section in the assess
- */
-for ($i=0; $i < count($xml->section); $i++) {
-    $currentSection = $xml->section[$i];
-
-    $section_id = $sectionHandler->create(array(
-        'section_id' => '',
-        'assess_id' => $assess_id,
-        'sequence' => $i+1,
-        'title' => $currentSection->title,
-        'description' => $currentSection->description,
-        'random' => $currentSection->random,
-        'pool' => $currentSection->pool,
-    ));
-
-    /* Process each question in the section
-     */
-    for ($j=0; $j < count($currentSection->question); $j++) {
-        $currentQuestion = $currentSection->question[$j];
-
-        $questionHandler = $factory->createQuestionModel(Scrub::text($currentQuestion->typeid));
-        $answerHandler = $factory->createAnswerModel(Scrub::text($currentQuestion->typeid));
-
-        $question_id = $questionHandler->create(array(
-            'question_id' => '',
-            'section_id' => $section_id,
-            'sequence' => $j+1,
-            'type_id' => $currentQuestion->typeid,
-            'marks' => $currentQuestion->marks,
-            'question' => trim((string) $currentQuestion->questiontext->text),
-        ));
-
-        if (method_exists($answerHandler, 'importMoodleAnswer')) {
-            $answer_id = $answerHandler->importMoodleAnswer($currentQuestion->answers, $question_id);
-        }
-    }
-}
-
-SitePage::localRedir('/assess/modify/' . $assess_id);
+SitePage::localRedir('/assess/modify/' . $import->getAssessId());

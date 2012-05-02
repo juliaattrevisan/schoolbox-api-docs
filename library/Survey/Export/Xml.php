@@ -1,0 +1,15 @@
+<?php
+/**
+ * Survey_Export_Xml
+ *
+ * Export an entire assessment, sections and questions into xml format
+ *
+ * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @link		http://www.alaress.com.au/
+ * @version	 SVN: $Id$
+ */
+class Survey_Export_Xml extends Evaluation_Export_Xml {
+	protected $evaluationType = 'survey';
+	protected $templateFile = 'survey/exportToMoodle.html';
+}
