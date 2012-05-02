@@ -18,7 +18,7 @@ dashboardControl = {
             name: 'green' 
         }
 
-        $j('h2 span').each(function() {
+        $j('h3 span').each(function() {
             activeContent = $j(this).siblings('em').html();
             $j(this).qtip({
                 content: activeContent,
@@ -30,6 +30,19 @@ dashboardControl = {
 					 }
 				 }
             });
+        });
+
+        // We'll encapsulate our .qtip() call in your .live() handler method
+        $j('.disabled').live('mouseover', function(event) {
+            // Bind the qTip within the event handler
+            $j(this).qtip({
+                overwrite: false,
+                content: 'This component is already active for the group selected.',
+                show: {
+                    event: event.type,
+                    ready: true
+                }
+            }, event); // Pass through our original event to qTip
         });
 	},
 
@@ -106,6 +119,8 @@ dashboardControl = {
 			helper: 'clone',
 			connectToSortable: '#dashboard-layout .component-holder'
 		});
+
+        $j('#dashboard-layout .component-holder').sortable('refresh');
 
 		this.refreshPalette();
 	},

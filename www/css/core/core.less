@@ -2311,7 +2311,6 @@ DASHBOARD
 
 .dashboard .component {
     position: relative;
-
     padding: 7px 8px 7px 28px;
     margin: 0 16px 4px 0px;
     cursor: move;
@@ -2323,15 +2322,28 @@ DASHBOARD
     font-weight: bold;
     background: #B0DDFE url(/images/famicons/arrow_out.png) no-repeat 4px 50%;
 }
+.dashboard .component.disabled {
+    background: #EDEDED;
+    border-color: #CCC;
+    color: #A1A1A1;
+}
 
 .dashboard .component:hover {
     cursor: move
+}
+
+.dashboard .component.disabled:hover{
+    cursor:help;
 }
 
 .dashboard #group-select {
     margin: 0 2% 8px 2%;
     width: 91%;
 }
+
+
+.dashboard #dashboard-layout:after{clear:both; content:'.'; display:block; height:0; line-height:0; font-size:0; visibility:hidden; padding:0; margin:0;}
+
 
 .dashboard #dashboard-layout .component,
 .dashboard .ui-draggable-dragging {
