@@ -58,8 +58,8 @@ abstract class Evaluation_Export_Xml {
 		$assess = $this->getAssess();
 
 		$this->getPage()->setVar(array(
-			'ASSESS_TITLE' => htmlentities($assess['title']),
-			'ASSESS_DESCRIPTION' => htmlentities($assess['description']),
+			'ASSESS_TITLE' => Scrub::Text($assess['title']),
+			'ASSESS_DESCRIPTION' => Scrub::HTML($assess['description']),
 			'ASSESS_START' => $assess['start'],
 			'ASSESS_FINISH' => $assess['finish'],
 			'ASSESS_DURATION' => $assess['duration'],
@@ -71,8 +71,8 @@ abstract class Evaluation_Export_Xml {
 			foreach($this->getAllSections() as $currentSection) {
 				$this->getPage()->setVar(array(
 					'SECTION_SECTION_ID' => $currentSection['section_id'],
-					'SECTION_TITLE' => $currentSection['title'],
-					'SECTION_DESCRIPTION' => $currentSection['description'],
+					'SECTION_TITLE' => Scrub::Text($currentSection['title']),
+					'SECTION_DESCRIPTION' => Scrub::Text($currentSection['description']),
 					'SECTION_RANDOM' => $currentSection['random'],
 					'SECTION_POOL' => $currentSection['pool'],
 				));
@@ -98,7 +98,7 @@ abstract class Evaluation_Export_Xml {
 							$this->getPage()->setVar('answerOption_block', '');
 
 							$this->getPage()->setVar(array(
-								'QUESTION_QUESTION' => $currentQuestion['question'],
+								'QUESTION_QUESTION' => Scrub::Html($currentQuestion['question']),
 								'QUESTION_MARKS' => $currentQuestion['marks'],
 								'QUESTION_TYPE_ID' => $currentQuestion['type_id'],
 								'QUESTION_TYPE_MOODLE' => $this->getFactory()->getMoodleQuestionType($currentQuestion['type_id']),
