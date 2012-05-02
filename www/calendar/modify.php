@@ -137,9 +137,6 @@ else {
 		$selectedDate = time();
 	}
 
-	$publishDate = new Alaress_Date_Format(time(), 'U');
-	$publishDate->addDays(7);
-
 	$output = array(
 		'FUNCTION' => 'Add',
 		'EVENT_ID' => '',
@@ -159,7 +156,7 @@ else {
 		'ATTENDANCE' => '',
 		'DETAIL' => '',
 		'RETURN_TO' => parseReturnTo($_GET['returnTo'], $_GET['date']),
-		'PUBLISH_DATE' => $publishDate->getLocalShort(),
+		'PUBLISH_DATE' => '',
 	);
 
 	$page->setVar($output);
