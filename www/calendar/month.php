@@ -52,15 +52,21 @@ if(isset($_SESSION['calendarFilter'])) {
     $selected['event_type'] = $_SESSION['calendarFilter']['events'];
 }
 else {
-    foreach($catList as $cat) {
-        $selected['group'][] = $cat['id'];
+    if(count($catList)) {
+        foreach($catList as $cat) {
+            $selected['group'][] = $cat['id'];
+        }
     }
 
     $selected['campus'] = $_SESSION['campus'];
 
-    foreach($calendarHandler->getTypeList() as $type) {
-        $selected['event_type'][] = $type['eventTypeID'];
+    $typeList = $calendarHandler->getTypeList();
+    if(count($typeList)) {
+        foreach($typeList as $type) {
+            $selected['event_type'][] = $type['eventTypeID'];
+        }
     }
+
 }
 
 $this->checkList('group', $catList, $selected['group'], TEMPLATE_content, array('name' => 'GROUP_NAME', 'id' => 'GROUP_ID'));
