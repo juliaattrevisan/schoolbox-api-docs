@@ -248,6 +248,7 @@ if (is_array($allStudents) && count($allStudents)) {
 }
 else {
 	$this->setVar('attempt_block', '');
+    $this->setVar('download_btn_block', '');
 }
 
 /* Deal with remainder attempts
