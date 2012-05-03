@@ -18,13 +18,15 @@ $group       = new Group();
 $categoryStd = new Category();
 $allowedFile = new AllowedFile();
 
-if (is_numeric($_GET['keyword']) || ($_GET['keyword'] && strlen($_GET['keyword']) > 2)) {
-	$keyword = $_GET['keyword'];
-	$type = $_GET['type'];
+$keyword = preg_replace( '/[^\ A-Za-z0-9\"\'\+\-_=\?!\.]/', '', $_GET['keyword'] );
+
+if (is_numeric($keyword) || ($keyword && strlen($keyword) > 2)) {
+    // strip out any injection attempts
+    $type = $_GET['type'];
 	$current_page = empty($_GET['page']) ? 1 : $_GET['page'];
 
 	$page->setVar(array(
-		'UNESCAPED_KEYWORD' => $_GET['keyword']
+		'UNESCAPED_KEYWORD' => $keyword
 	));
 }
 else {
@@ -36,9 +38,9 @@ else {
 
     // setup default values
     $output = array(
-        'KEYWORD'            => str_replace('"','\"', $_GET['keyword']),
-        'ENCODED_KEYWORD'    => htmlentities($_GET['keyword']),
-        'UNESCAPED_KEYWORD'  => $_GET['keyword'],
+        'KEYWORD'            => str_replace('"','\"', $keyword),
+        'ENCODED_KEYWORD'    => htmlentities($keyword),
+        'UNESCAPED_KEYWORD'  => $keyword,
         'FOR'                => ' for ',
         'NO_RESULTS_BECAUSE' => '',
         'type_block'         => '',
@@ -49,11 +51,11 @@ else {
 
 
     // test the search as to why it failed, and return meaningful response to the user
-    if(strlen($_GET['keyword']) == 0) {
+    if(strlen($keyword) == 0) {
         $page->setVar('FOR', '');
         $page->setVar('NO_RESULTS_BECAUSE', ' because it\'s empty');
     }
-    elseif(strlen($_GET['keyword']) < 3)
+    elseif(strlen($keyword) < 3)
         $page->setVar('NO_RESULTS_BECAUSE', ' because it needs to be longer, or wrapped in "quotes"');
 
     $page->parse('no_result_block', 'no_result');
