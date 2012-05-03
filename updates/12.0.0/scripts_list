@@ -74,3 +74,6 @@ homepages/clickview.sql
 core/user_digest.sql
 
 dashboard/dashboard.sql
+
+## Add residential house to user table
+user/residential_house.sql
