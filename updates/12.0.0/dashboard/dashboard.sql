@@ -1,3 +1,3 @@
-insert into `component_definition` (`id`, `name`, `class`, `description`, `module`, `visible`, `multiple`) values('18','Upcoming Due Work','Component_Dashboard_UpcomingWorkController',NULL,'dashboard','true','false');
-insert into `component_definition` (`id`, `name`, `class`, `description`, `module`, `visible`, `multiple`) values('19','Recent Submissions','Component_Dashboard_RecentSubmissionsController',NULL,'dashboard','true','false');
-insert into `component_definition` (`id`, `name`, `class`, `description`, `module`, `visible`, `multiple`) values('20','Homepage Activity','Component_Dashboard_HomepageNewsController',NULL,'dashboard','true','false');
+insert into `component_definition` ( `name`, `class`, `description`, `module`, `visible`, `multiple`) values('Upcoming Due Work','Component_Dashboard_UpcomingWorkController',NULL,'dashboard','true','false');
+insert into `component_definition` ( `name`, `class`, `description`, `module`, `visible`, `multiple`) values('Recent Submissions','Component_Dashboard_RecentSubmissionsController',NULL,'dashboard','true','false');
+insert into `component_definition` ( `name`, `class`, `description`, `module`, `visible`, `multiple`) values('Homepage Activity','Component_Dashboard_HomepageNewsController',NULL,'dashboard','true','false');
