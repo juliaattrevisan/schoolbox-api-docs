@@ -53,7 +53,12 @@ abstract class Leave_Notice_Parent_Abstract extends Leave_Notice_Abstract {
 
 		if (is_array($parentList)) {
 			foreach ($parentList as $parent) {
-				$this->getEmail()->send($parent['StudentContactDefaultEmail']);
+				if (Cfg::get('debug_email_address') != '') {
+					$this->getEmail()->send(Cfg::get('debug_email_address'));
+				}
+				else {
+					$this->getEmail()->send($parent['StudentContactDefaultEmail']);
+				}
 			}
 		}
 	}

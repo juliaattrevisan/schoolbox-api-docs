@@ -1483,7 +1483,7 @@ class Leave_Controller extends Controller {
 	 * @param $request
 	 */
     public function sendParentNotice ($request) {
-		if (Cfg::get('parent_notification') != 'false') {
+		if (Cfg::get('parent_notification') == 'false') {
 			if ($request->isPending()) {
 				$notice = new Leave_Notice_Parent_Submitted($request);
 				$notice->setup();
