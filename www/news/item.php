@@ -24,6 +24,7 @@ if(!is_numeric($this->arg[0])) {
 
 $this->setFile(TEMPLATE_content, 'news/item.html');
 $this->setBlock(TEMPLATE_content, 'modify_news', 'modify_news_block');
+$this->setBlock(TEMPLATE_content, 'add_news', 'add_news_block');
 $this->setBlock(TEMPLATE_content, 'topic_list', 'topic_list_block');
 $this->setBlock('topic_list', 'article_list', 'article_list_block');
 $this->setBlock('article_list', 'article_list_item', 'article_list_item_block');
@@ -66,10 +67,14 @@ $output = array(
 $this->setVar($output);
 
 // does the current user have permission to modify this news article?
-if (($permission = $groupHandler->getPermission(0)) >= WRITE_ACCESS)
+if (($permission = $groupHandler->getPermission(0)) >= WRITE_ACCESS) {
     $this->parse('modify_news_block', 'modify_news');
-else
+    $this->parse('add_news_block', 'add_news');
+} else {
+    $this->setVar('add_news_block', '');
     $this->setVar('modify_news_block', '');
+}
+
 
 $now = new Alaress_Date_Format(time(), 'U');
 $articleExpiry = new Alaress_Date_Format($article['item_datetime_expires'], 'y-m-d');

@@ -13,18 +13,24 @@
 </script>
 <!-- END custom_head -->
 
-<!-- BEGIN modify_news -->
-<a class="btn modify" href="/news/modify/{NEWS_ID}"><span></span>Modify Article</a>
-<!-- END modify_news -->
+
+    <!-- BEGIN add_news -->
+    <a class="btn add" href="/news/modify"><span></span>Add News</a>
+    <!-- END add_news -->
+    <!-- BEGIN modify_news -->
+    <a class="btn modify" href="/news/modify/{NEWS_ID}"><span></span>Modify Article</a>
+    <!-- END modify_news -->
 <!-- BEGIN news -->
 <h1>{NEWS_TITLE}</h1>
 
 
 
 
+
+
 <div class="news-wrapper left clearfix">
     <p class="meta">
-        by {POSTER}<br> Active: {DATETIME} {EXPIRY}
+        Posted by {POSTER} on {DATETIME} {EXPIRY}
     </p>
     <!-- BEGIN news -->
     <div class="wysiwyg clearfix">

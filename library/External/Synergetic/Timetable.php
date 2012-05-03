@@ -45,6 +45,11 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 			$timetableDef['sequence'][] = $period['PeriodNumberSeq'];
 			$periodCount++;
 		}
+        
+        //Fall back to day 0 if nothing found
+        if($periodCount == 0 && $day != 0) {
+            return $this->getTimetableDefinition(($campus));
+        }
 
 		$timetableDef['periodCount'] = $periodCount;
 		$timetableDef['dayCount'] = $this->days[$campus];

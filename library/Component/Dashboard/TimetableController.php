@@ -36,7 +36,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             $this->currentPeriod = $timetableHandler->getPeriodNumber($_SESSION['campus'][0]);
 
             $this->timetable = $timetableHandler->getDayTimetable($_SESSION['sid'], $_SESSION['id'], $_SESSION['campus'][0], $this->dayNumber);
-
+   
 			return true;
         }
 		else {
