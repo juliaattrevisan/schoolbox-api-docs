@@ -14,7 +14,12 @@ if(!is_numeric($this->arg[0])) {
     $newsHandler = new News();
     $allNews = $newsHandler->getNewsListing(false);
     $itemID = $allNews[0]['item_id'];
-    self::localRedir("/news/item/$itemID");
+    if($itemID) {
+        self::localRedir("/news/item/$itemID");
+    }
+    else {
+        self::localRedir("/news");
+    }
 }
 
 $this->setFile(TEMPLATE_content, 'news/item.html');
