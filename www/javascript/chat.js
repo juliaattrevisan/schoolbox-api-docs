@@ -32,7 +32,7 @@ $.widget("ui.chat",  {
         this._receive();
 
         if (this.options.state == 'Active') {
-            
+
         } else {
             return false;
         }
@@ -77,7 +77,7 @@ $.widget("ui.chat",  {
                 var $body_el = $self.options.body_el;
 
 				event.preventDefault();
-                
+
 				if ($body_el.val().length > 0) {
                     $self._send($self);
 				} else {
@@ -105,7 +105,7 @@ $.widget("ui.chat",  {
             $self._poll();
         }
 
-        $self.interval_cnt++;        
+        $self.interval_cnt++;
     },
 
     _send: function ($self) {
@@ -118,8 +118,16 @@ $.widget("ui.chat",  {
 
         var $meridian = 'am';
 
-        if ($hours > 13 ) {
-            $hours -= 12;
+		/* Allow for noon times to be in PM
+		 */
+        if ($hours >= 12 ) {
+
+			/* Convert to 12-hour format
+			 */
+			if ($hours > 13) {
+            	$hours -= 12;
+			}
+
             $meridian = 'pm'
         }
 
@@ -169,7 +177,7 @@ $.widget("ui.chat",  {
                 last_poll: this.last_poll
             },
             success: function ($data) {
-                
+
                 /* Output received messages */
                 var $log = $data.log;
 
@@ -217,7 +225,7 @@ $.widget("ui.chat",  {
                 user_id: this.options.user_id
             },
             success: function ($data) {
-                
+
                 /* Output received users */
                 var $user_list_el = $self.options.users_el;
 
@@ -240,7 +248,7 @@ $.widget("ui.chat",  {
 
                     /* If admin */
                     if ($user.perm > 1) {
-                        $user_el.addClass('chat-user-admin');                        
+                        $user_el.addClass('chat-user-admin');
                     }
 
                     /* If self */
@@ -266,7 +274,7 @@ $.widget("ui.chat",  {
 
                         $mute_el.appendTo($user_el);
                     }
-                    
+
                     $user_el.appendTo($user_list_el);
                 }
 
