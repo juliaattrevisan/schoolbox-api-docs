@@ -33,7 +33,7 @@ $this->setBlock(TEMPLATE_content, 'next_article', 'next_article_block');
 
 $this->setTab('news');
 
-$groupHandler = new Group();
+$groupHandler = new Group(NEWS_SERVICE);
 $userHandler = new User();
 $newsHandler = new News();
 $article = null;
