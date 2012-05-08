@@ -343,10 +343,10 @@ class Calendar extends DeprecatedModel {
                         submission_box.owner, submission_box.id, user.firstname, user.lastname, user.title,
                         DATE_FORMAT(submission_box.date, '%w') as dayIndex,
 					    DATE_FORMAT(submission_box.date, '" . Cfg::get('calendar_time_format') . "') as dueTime,
-                        submission_box.accept_submission, submission_box.open_date, submission_box.date, submission_box.late_date, submission_box.created, student_submission.submitted, submission_return.returned
+                        submission_box.accept_submission, submission_box.open_date, submission_box.date, submission_box.late_date, submission_box.created,
+                        submission_return.returned
                       FROM (category, submission_box )
                       LEFT JOIN submission_return ON submission_box.id = submission_return.box_id AND submission_return.owner = {$_SESSION['id']}
-                      LEFT JOIN student_submission ON submission_box.id = student_submission.box_id AND student_submission.owner = {$_SESSION['id']}
                       LEFT JOIN `file` f ON f.id = submission_box.fid
                       LEFT JOIN categoryCode co ON co.categoryID = category.id
                       LEFT JOIN user ON user.id = submission_box.owner ";
