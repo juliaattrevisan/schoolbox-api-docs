@@ -246,14 +246,56 @@ if($table) {
         $this->setVar('table_cell_block','');
     }
 }
-// else table is blank, empty, etc.
+// else table contains no data. still display headers
 else {
-    $output = array(
-        'table_heading_block' => '',
-        'table_row_block' => '',
-        'newInput_block' => ''
-    );
-    $this->setVar($output);
+
+    foreach($tableDefinition as $col) {
+        $key = $col['Field'];
+        if((isset($selectedTable['fields'][$key]['caption']))) {
+            $this->setVar('TABLE_HEAD', $selectedTable['fields'][$key]['caption']);
+        } else {
+            $this->setVar('TABLE_HEAD', ucwords(str_replace('_',' ',$key)));
+        }
+        $this->parse('table_heading_block','table_heading',true);
+
+        $this->setVar('TABLE_COLUMN', $key);
+
+        if ($key == $selectedTable['index']) {
+            $this->setVar('TYPE', 'hidden');
+            $this->setVar('READONLY', 'readonly="readonly"');
+            $this->parse('newInput_block', 'newInput', true);
+        }
+
+        // fields specified as readonly are also...readonly.
+        else if(isset($selectedTable['fields'][$key]) && $selectedTable['fields'][$key]['readonly'] == '1') {
+            $this->setVar('TYPE', 'hidden');
+            $this->setVar('READONLY', 'readonly="readonly"');
+            $this->parse('newInput_block', 'newInput', true);
+        }
+
+        // if the field is an enum, explode it, and iteratively create select options for the list
+        else if(stristr($col['Type'],'enum') ) {
+            $this->setVar('newSelect_option_block','');
+
+            preg_match('/enum\((.*)\)/', $col['Type'], $match);
+            $list = explode(',',str_replace('\'','',$match[1]));
+            foreach($list as $option) {
+                $this->setVar('OPTION_VALUE', $option);
+                $this->parse('newSelect_option_block','newSelect_option',true);
+            }
+            $this->parse('newSelect_block', 'newSelect', true);
+        }
+
+        // generically, just go with a text input
+        else {
+            $this->setVar('TYPE', 'text');
+            $this->setVar('READONLY', '');
+            $this->parse('newInput_block', 'newInput', true);
+        }
+
+    }
+
+    $this->setVar('table_row_block', '');
 }
 
 // prevent the creation of new entries if admins should not be able to
