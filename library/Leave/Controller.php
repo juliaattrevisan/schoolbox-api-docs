@@ -1480,10 +1480,13 @@ class Leave_Controller extends Controller {
 	/**
 	 * Send a notice to a parent when someone creates a leave request
 	 *
+	 * At Kings Live, parent_notification started saving as integer 1/0, instead
+	 * of the usual true/false string?
+	 *
 	 * @param $request
 	 */
     public function sendParentNotice ($request) {
-		if (Cfg::get('parent_notification') == 'false') {
+		if ((Cfg::get('parent_notification') == 0) || (Cfg::get('parent_notification') == 'false')) {
 			if ($request->isPending()) {
 				$notice = new Leave_Notice_Parent_Submitted($request);
 				$notice->setup();
