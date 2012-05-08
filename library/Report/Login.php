@@ -11,7 +11,6 @@ class Report_Login extends Report_Abstract implements Report_IReport {
     private $groupID = null;
     private $dataSet;
     private $dataCount;
-    private $fullDataSet;
     private $pageNum;
     private $perPage;
     private $filter;
@@ -36,8 +35,13 @@ class Report_Login extends Report_Abstract implements Report_IReport {
 
     // fields that we will permit sorting on
     private $sortable = array('date', 'user', 'ip');
-    private $filterable = array('user', 'ip');
+
+    // default sorting if none provided
     private $defaultOrderBy = 'date';
+
+    // fields we permit filtering by
+    private $filterable = array('user', 'ip');
+
 
     public function __construct($page) {
         $this->setGroupHandler(new Group());
@@ -104,6 +108,8 @@ class Report_Login extends Report_Abstract implements Report_IReport {
         if($orderBy == '' || !in_array($orderBy, $this->sortable))
             $orderBy = $this->getDefaultOrderBy();
 
+        // set subset restriction
+        $restrict = ($offset < 0) ? '' : "LIMIT $offset, $limit";
 
         // filter data passed in by report
         $filterString = $this->getIndexID();
@@ -142,20 +148,35 @@ class Report_Login extends Report_Abstract implements Report_IReport {
 
         $handler = new DeprecatedModel();
 
-        $query = "SELECT `date`, login, ip, user.id AS user, title, firstname, lastname
-                  FROM login_log
-                  LEFT JOIN `user` ON `user`.`username`=login_log.username
-                  $sqlFilter
-                  ORDER BY $orderBy $orderDir";
+        $dataQuery = "SELECT `date`, login, ip, user.id AS user, title, firstname, lastname
+                      FROM login_log
+                      LEFT JOIN `user` ON `user`.`username` = login_log.username
+                      $sqlFilter
+                      ORDER BY $orderBy $orderDir
+                      $restrict";
 
-        $allResults = $handler->db->getAll($query);
+        // I was trying to avoid doing this, but when the query returns 100,000s of results...yeah, this is better.
+        $countQuery = "SELECT COUNT(`date`)
+                       FROM login_log
+                       LEFT JOIN `user` ON `user`.`username` = login_log.username
+                       $sqlFilter";
+
+
+        // if this query throws an error, it will be fatal, so we don't want the default error display to appear
+        $was = ini_get('display_errors');
+        ini_set('display_errors', false);
+
+        $allResults = $handler->db->getAll($dataQuery);
+
+        // reset error display to whatever it was
+        ini_set('display_errors', $was);
 
         if(!$allResults)
             return 0;
 
-        $this->dataCount = count($allResults);
-        $this->fullDataSet = $allResults;
-        $this->dataSet = array_slice($allResults, $offset, $limit);
+        $this->dataCount = $handler->db->getOne($countQuery);
+        //$this->fullDataSet = $allResults;
+        $this->dataSet = $allResults;
 
         return $this->dataCount;
     }
@@ -225,7 +246,7 @@ class Report_Login extends Report_Abstract implements Report_IReport {
     public function export() {
         $exporter = new Report_Exporter($this->getReportTitle());
         $exporter->setHeadings($this->csvFields);
-        $exporter->setData($this->fullDataSet);
+        $exporter->setData($this->dataSet);
         $exporter->export('CSV');
     }
 

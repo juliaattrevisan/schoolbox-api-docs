@@ -17,6 +17,9 @@ require_once dirname(__FILE__) . '/HTMLPurifier/HTMLPurifier.auto.php';
 /* Stdfuncs */
 require_once(WEB_root.'/include/stdfuncs.php');
 
+// register the shutdown_safely() function in stdfuncs as the termination script
+register_shutdown_function('shutdown_safely');
+
 /* Set include path */
 set_include_path('.' . PATH_SEPARATOR . SITE_root . PATH_SEPARATOR . SITE_root . '/include/PEAR' . PATH_SEPARATOR . get_include_path());
 
