@@ -33,9 +33,11 @@ if (count($allResults)) {
 			$color = 'dark';
 		}
 
+		$date = new Alaress_Date_Format(strtotime($currentTweet['date']), 'U');
+
 		$this->setVar(array(
 			'TWEET_TEXT' => $currentTweet['text'],
-			'TWEET_DATE' => $currentTweet['date'],
+			'TWEET_DATE' => $date->getShort(),
 			'TWEET_AUTHOR' => $currentTweet['author'],
 			'TWEET_AVATAR' => $currentTweet['avatar'],
 			'ON_OFF' => $color,
