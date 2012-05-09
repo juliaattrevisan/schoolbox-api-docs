@@ -51,52 +51,61 @@ while ($parentID > 0) {
     $parentList[] = $parentID = $folderHandler->getParent($parentID);
 }
 
-// output folders, column 1
-$folderList = $folderHandler->getFolderNode($openFolder);
-if (!is_array($folderList)) {
-    $parentList = array(0);
-    $openFolder = 0;
-    $folderList = $folderHandler->getFolderNode($openFolder);
+try {
+	// output folders, column 1
+	$folderList = $folderHandler->getFolderNode($openFolder);
+	if (!is_array($folderList)) {
+		$parentList = array(0);
+		$openFolder = 0;
+		$folderList = $folderHandler->getFolderNode($openFolder);
+	}
+
+	if (is_array($folderList)) {
+		foreach ($folderList as $folder) {
+
+			$folder['children'] = $folderHandler->hasChildren($folder['id']);
+
+			$class = array();
+
+			// set parent folder
+			$class[] = "child-of-node-{$folder['parent']}";
+
+			// has children
+			if ($folder['children'] > 0) {
+
+				// is currently expanded
+				if (in_array($folder['id'], $parentList) ) {
+					$class[] = "populated expanded";
+				} else {
+					$class[] = "collapsed";
+				}
+
+			}
+
+			// has files showing
+			$folder["id"] == $openFolder ? $class[] = "opened selected" : null;
+
+			// write access
+			$class[] = "write";
+
+			$output = array('CATEGORY_ID' => $folder['id'],
+							'CATEGORY_NAME' => Scrub::text($folder['name']),
+							'CLASS' => implode(" ", $class),
+			);
+			$this->setVar($output);
+			$this->parse('category_list_block', 'category_list', true);
+		}
+	} else {
+		$this->setVar('category_list_block', '');
+	}
 }
+catch (Exception $e) {
 
-if (is_array($folderList)) {
-    foreach ($folderList as $folder) {
-
-
-        $folder['children'] = $folderHandler->hasChildren($folder['id']);
-
-        $class = array();
-
-        // set parent folder
-        $class[] = "child-of-node-{$folder['parent']}";
-
-        // has children
-        if ($folder['children'] > 0) {
-
-            // is currently expanded
-            if (in_array($folder['id'], $parentList) ) {
-                $class[] = "populated expanded";
-            } else {
-                $class[] = "collapsed";
-            }
-
-        }
-
-        // has files showing
-        $folder["id"] == $openFolder ? $class[] = "opened selected" : null;
-
-        // write access
-        $class[] = "write";
-
-        $output = array('CATEGORY_ID' => $folder['id'],
-                        'CATEGORY_NAME' => Scrub::text($folder['name']),
-                        'CLASS' => implode(" ", $class),
-        );
-        $this->setVar($output);
-        $this->parse('category_list_block', 'category_list', true);
-    }
-} else {
-    $this->setVar('category_list_block', '');
+	/* Handle Sabre_DAV_Exception specifically
+	 */
+	if (get_class($e) == 'Sabre_DAV_Exception') {
+		error(138, DAV_Error::getMeaning($e->getMessage()));
+	}
 }
 
 // output files, column 2
