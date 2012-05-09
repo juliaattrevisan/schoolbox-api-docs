@@ -237,7 +237,7 @@ class News extends DeprecatedModel {
 		else
 			return false;
 
-		usort($headlines,array($this,"timecmp"));
+		usort($headlines,array($this,"cattimecmp"));
 
 		return $headlines;
 	}
@@ -468,19 +468,45 @@ class News extends DeprecatedModel {
 
 	}
 
-	function timecmp($a, $b)
-	{
+    /**
+     * Comparison logic for posted-time only
+     * @param $a
+     * @param $b
+     * @return int
+     */
+    function timecmp($a, $b)
+    {
 
-		//if ($a['newsTopicID'] == $b['newsTopicID']) {
-			//just a quick function to enable sorting of news based on time
-			if ($a['item_datetime_posted'] == $b['item_datetime_posted']) {
-				return 0;
-			}
-			return ($a['item_datetime_posted'] > $b['item_datetime_posted']) ? -1 : 1;
-		//} else {
-		//	return $a['newsTopicID'] > $b['newsTopicID']?1:-1;
-		//}
-	}
+        //if ($a['newsTopicID'] == $b['newsTopicID']) {
+        //just a quick function to enable sorting of news based on time
+        if ($a['item_datetime_posted'] == $b['item_datetime_posted']) {
+            return 0;
+        }
+        return ($a['item_datetime_posted'] > $b['item_datetime_posted']) ? -1 : 1;
+        //} else {
+        //	return $a['newsTopicID'] > $b['newsTopicID']?1:-1;
+        //}
+    }
+
+    /**
+     * Comparison logic for posted-time SUBORDINATE TO topic
+     * @param $a
+     * @param $b
+     * @return int
+     */
+    function cattimecmp($a, $b)
+    {
+
+        if ($a['newsTopicID'] == $b['newsTopicID']) {
+        //just a quick function to enable sorting of news based on time
+        if ($a['item_datetime_posted'] == $b['item_datetime_posted']) {
+            return 0;
+        }
+        return ($a['item_datetime_posted'] > $b['item_datetime_posted']) ? -1 : 1;
+        } else {
+        	return $a['newsTopicID'] > $b['newsTopicID']?1:-1;
+        }
+    }
 
 	function getTopicByID($newsTopicID) {
 		$query = "SELECT * FROM `newsTopic` WHERE `newsTopicID` = $newsTopicID";
