@@ -230,7 +230,7 @@ class Session {
 
         // test authentication in secondary server
         if(Cfg::get('ldap_host_alt')) {
-            $ds = ldap_connect(Cfg::get('ldap_host'));
+            $ds = ldap_connect(Cfg::get('ldap_host_alt'));
             if($this->_authLDAP($username, $password, $ds, Cfg::get('ldap_user_alt'), Cfg::get('ldap_base_alt')))
                 return true;
         }
