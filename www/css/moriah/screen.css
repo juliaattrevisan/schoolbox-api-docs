@@ -32,7 +32,7 @@ h2 {
     filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#5692ce', EndColorStr='#477fc6');
 }
 .top h2, .left h2, .right h2 { color: #fff; }
-
+#calendar h3{color:#000;}
 .cal-bubble .time { background: none repeat scroll 0 0 transparent; }
 
 .header_option { background: none repeat scroll 0 0 transparent; }
