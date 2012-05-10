@@ -41,7 +41,7 @@ class Component_Dashboard_ParentHelpdeskController extends Component_Dashboard_C
         $this->setBlock("student_helpdesk_block", "student_job_block", "student_job");
 
             foreach ( $this->children as $child ) {
-                $query = "SELECT title, firstname, lastname, year FROM " . SQL_db . ".user WHERE id = {$child['id']}";
+                $query = "SELECT title, firstname, lastname, year FROM `" . SQL_db . "`.user WHERE id = {$child['id']}";
                 $user = DeprecatedDatabase::getInstance()->getRow($query);
                 $this->setVar("STUDENT_ID", $child['id']);
                 $this->setVar("STUDENT_NAME", $this->user->formatName($user, '{firstname} {lastname}'));
