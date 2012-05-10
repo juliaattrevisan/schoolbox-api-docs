@@ -26,7 +26,6 @@ if(is_numeric($this->arg[0])) {
 	//$this->setBlock(TEMPLATE_content, 'browse', 'browse_block');
 	$this->setBlock(TEMPLATE_content, 'optgroup', 'optgroup_block');
 	$this->setBlock('optgroup', 'my_files', 'my_files_block');
-	$this->setBlock(TEMPLATE_content, 'submission_box', 'submission_box_block');
 
 	$this->setTitle('Modify File');
 	$this->setTab('resources');
@@ -71,28 +70,6 @@ if(is_numeric($this->arg[0])) {
 		}
 	}
 
-	/* Output different controls for submission boxes */
-	$this->setVar('submission_box_block', '');
-	if ($groupHandler->isStaff()) {
-
-		$subBoxHandler = new Submission;
-		$subBox = $subBoxHandler->getByField('fid', $file['id']);
-
-		if(is_array($subBox)) {
-			if($subBox['deleted'])
-			//	$this->setVar('SUBBOX', "<a href=\"/submission/listSubmission.php?undelete=".$subBox['id']."\">Undelete Box</a>");
-                $this->setVar('SUBBOX', '');
-            else
-				$this->setVar("SUBBOX", "<p><a href=\"/submission/submissionForm.php?deleteBox=".$subBox['id']."\">Delete</a></p>
-					<a href=\"/submission/createSubmission/modify/".$subBox['id']."\">Modify</a>");
-		}
-		else {
-			$this->setVar("SUBBOX", "<a href=\"/submission/createSubmission/new/".$file['category']."/".$file['id']."\">Create</a>");
-		}
-		$this->parse('submission_box_block', 'submission_box');
-	}
-
-
 } else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
 	/* Add new file to system */
@@ -101,7 +78,6 @@ if(is_numeric($this->arg[0])) {
 	$this->setFile(TEMPLATE_content, 'cms/modify-file.html');
 	$this->setBlock(TEMPLATE_content, 'optgroup', 'optgroup_block');
 	$this->setBlock('optgroup', 'my_files', 'my_files_block');
-	$this->setBlock(TEMPLATE_content, 'submission_box', 'submission_box_block');
     $this->setBlock(TEMPLATE_content, 'delete_button','delete_button_block');
     $this->setVar('delete_button_block','');
 
@@ -116,19 +92,19 @@ if(is_numeric($this->arg[0])) {
 	if ($groupHandler->getPermission($category['id']) < WRITE_ACCESS)
 		error(6);
 
-	$output = array('ACTION'		=> 'Post',
-                        'FILE_ID'		=> '',
-                        'DESCRIPTION'		=> '',
-                        'COMMENT'		=> '',
-                        'HIDDEN_SELECTED'	=> '',
-                        'MAX_FILE_SIZE'		=> Cfg::get('max_file_size'),
-                        'SUBBOX'			=> '<input type="checkbox" name="submission" id="submission" value="1" >',
-                        'CATEGORY_NAME'		=> Scrub::text($category['name']),
-                        'CATEGORY_ID'		=> $category['id'],
-                        'DUE_DAY'		=> is_numeric($this->arg[2])?$this->arg[2]:'',
-                        'DUE_MONTH'		=> is_numeric($this->arg[3])?$this->arg[3]:'',
-                        'DUE_YEAR'		=> is_numeric($this->arg[4])?$this->arg[4]:'',
-				);
+	$output = array(
+        'ACTION'		    => 'Post',
+        'FILE_ID'		    => '',
+        'DESCRIPTION'		=> '',
+        'COMMENT'		    => '',
+        'HIDDEN_SELECTED'	=> '',
+        'MAX_FILE_SIZE'		=> Cfg::get('max_file_size'),
+        'CATEGORY_NAME'		=> Scrub::text($category['name']),
+        'CATEGORY_ID'		=> $category['id'],
+        'DUE_DAY'		    => is_numeric($this->arg[2])?$this->arg[2]:'',
+        'DUE_MONTH'		    => is_numeric($this->arg[3])?$this->arg[3]:'',
+        'DUE_YEAR'		    => is_numeric($this->arg[4])?$this->arg[4]:'',
+    );
 
 	$this->setVar($output);
 
@@ -139,16 +115,18 @@ if(is_numeric($this->arg[0])) {
 	$folderTree = $myFolderHandler->getFolderTree();
 	if (is_array($folderTree)) {
 		foreach ($folderTree as $folder) {
-			$output = array('MYFOLDER_NAME'	=> trim($folder['name']),
-							'MYFOLDER_LEFT'	=> number_format($folder['depth'] * 14, 0),
-							);
+			$output = array(
+                'MYFOLDER_NAME'	=> trim($folder['name']),
+                'MYFOLDER_LEFT'	=> number_format($folder['depth'] * 14, 0),
+            );
 			$this->setVar($output);
 			$fileList = $myFileHandler->getAllInFolder($folder['id']);
 			if (is_array($fileList)) {
 				foreach ($fileList as $file) {
-					$output = array('MYFILE_ID'		=> $file['id'],
-									'MYFILE_NAME'	=> $file['description'],
-									);
+					$output = array(
+                        'MYFILE_ID'		=> $file['id'],
+                        'MYFILE_NAME'	=> $file['description'],
+                    );
 					$this->setVar($output);
 					$this->parse('my_files_block', 'my_files', true);
 				}
@@ -157,10 +135,6 @@ if(is_numeric($this->arg[0])) {
 			$this->setVar('my_files_block', '');
 		}
 	}
-
-	$this->setVar('submission_box_block', '');
-	if ($groupHandler->isStaff())
-		$this->parse('submission_box_block', 'submission_box');
 
 }
 else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
@@ -180,12 +154,13 @@ else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
 	if ($groupHandler->getPermission($category['id']) < WRITE_ACCESS)
 		error(6);
 
-	$output = array('CATEGORY_NAME'		=> Scrub::text($category['name']),
-					'CATEGORY_ID'		=> $category['id'],
-					'FILE_max_upload'	=> Cfg::get('file_upload_count'),
-					'SESSION_NAME'		=> session_name(),
-					'SESSION_ID'		=> session_id(),
-					);
+	$output = array(
+        'CATEGORY_NAME'		=> Scrub::text($category['name']),
+        'CATEGORY_ID'		=> $category['id'],
+        'FILE_max_upload'	=> Cfg::get('file_upload_count'),
+        'SESSION_NAME'		=> session_name(),
+        'SESSION_ID'		=> session_id(),
+    );
 	$this->setVar($output);
 }
 else if($this->arg[0] == 'multicat') {
