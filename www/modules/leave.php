@@ -82,6 +82,9 @@ else if ($method == 'processModify') {
 else if ($method == 'processModifyList') {
 	$leaveController->processModifyRequestList($_POST);
 }
+else if ($method == 'test') {
+	$leaveController->executeEmailTest();
+}
 else {
 	$data = $leaveController->executeHouseRequestList($_SESSION['houseId']);
 	$leaveController->renderHouseRequestList($data);
