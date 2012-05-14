@@ -5,8 +5,8 @@
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript">
 	tinyMCE.init({
-        mode : "exact",
-		elements: 'policy',
+        mode : "specific_textareas",
+        editor_selector : "mceEditor",
         theme : "advanced",
         skin : "cirkuit",
         plugins : "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
@@ -112,7 +112,7 @@ $j(function() {
 
                 <!-- BEGIN setting_type_textarea -->
 				<label for="{SETTING_NAME}">{SETTING_TITLE}<span class="help">?</span> <em>{SETTING_DESC}</em>
-					<textarea id="{SETTING_NAME}" class="{OPTION_REQUIRED}" name="{SETTING_NAME}">{SETTING_VALUE}</textarea>
+					<textarea id="{SETTING_NAME}" class="mceEditor {OPTION_REQUIRED}" name="{SETTING_NAME}">{SETTING_VALUE}</textarea>
 				</label>
                 <!-- END setting_type_textarea -->
 
