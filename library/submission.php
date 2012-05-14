@@ -177,12 +177,13 @@ class Submission extends DeprecatedModel {
 			b.id AS bid,
 			s.id AS sid,
 			r.id AS rid,
+			UNIX_TIMESTAMP(b.late_date) AS lateDate,
 			UNIX_TIMESTAMP(b.date) AS dueDate,
 			c.name AS categoryName,
 			b.name,
 			b.description,
 			b.created, s.submitted, r.returned,
-			r.mark
+			(SELECT mark FROM submission_return WHERE box_id = bid ORDER BY returned DESC LIMIT 1) AS mark
 			FROM submission_box b
 			LEFT JOIN category c ON c.id = b.category
 			LEFT JOIN student_submission s ON s.box_id = b.id AND (s.owner = '$userID' OR s.owner IS NULL)

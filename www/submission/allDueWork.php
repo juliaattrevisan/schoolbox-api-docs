@@ -5,6 +5,8 @@ $this->setTab('submission');
 $this->setBlock(TEMPLATE_content, 'subject', 'subject_block');
 $this->setBlock('subject', 'work', 'work_block');
 $this->setBlock('work', 'download', 'download_block');
+$this->setBlock('work', 'status_late', 'status_late_block');
+$this->setBlock('work', 'status_closed', 'status_closed_block');
 $this->setBlock('work', 'status_due', 'status_due_block');
 $this->setBlock('work', 'status_awaiting_review', 'status_awaiting_review_block');
 $this->setBlock('work', 'status_marked', 'status_marked_block');
@@ -91,6 +93,7 @@ if (is_array($allWork)) {
 		}
 
 		$dueDate = new Alaress_Date_Format($currentWork['dueDate'], 'U');
+		$lateDate = new Alaress_Date_Format($currentWork['lateDate'], 'U');
 
 		$this->setVar(array(
 			'WORK_CATEGORYNAME' => Scrub::Text($currentWork['categoryName']),
@@ -100,26 +103,43 @@ if (is_array($allWork)) {
 			'WORK_BOX_ID' => $currentWork['bid'],
 		));
 
-        if($dueDate->getUnixTimestamp() > time() ) {
-            /* Add block to handle submission box closed...*/
-        }
+		$this->setVar('status_due_block', '');
+		$this->setVar('status_late_block', '');
+		$this->setVar('status_closed_block', '');
+		$this->setVar('status_awaiting_review_block', '');
+		$this->setVar('status_marked_block', '');
 
 		if ($currentWork['submitted'] != null || $currentWork['returned'] != null) {
 			if ($currentWork['returned'] != null) {
-				$this->setVar('status_due_block', '');
-				$this->setVar('status_awaiting_review_block', '');
 				$this->parse('status_marked_block', 'status_marked');
 			}
 			else {
-				$this->setVar('status_due_block', '');
 				$this->parse('status_awaiting_review_block', 'status_awaiting_review');
-				$this->setVar('status_marked_block', '');
 			}
 		}
+
+		/* If it hasn't been submitted check whether it's overdue,
+		 * then check if it's closed and display accordingly
+		 */
 		else {
-			$this->parse('status_due_block', 'status_due');
-			$this->setVar('status_awaiting_review_block', '');
-			$this->setVar('status_marked_block', '');
+
+			/* Open
+			 */
+			if ($dueDate->getUnixTimestamp() > time() ) {
+				$this->parse('status_due_block', 'status_due');
+			}
+
+			/* Late
+			 */
+			else if (($dueDate->getUnixTimestamp() < time()) && $lateDate->getUnixTimestamp() > time()) {
+				$this->parse('status_late_block', 'status_late');
+			}
+
+			/* Closed
+			 */
+			else if ($lateDate->getUnixTimestamp() < time()) {
+				$this->parse('status_closed_block', 'status_closed');
+		    }
 		}
 
 		/* Alternating row color
@@ -129,10 +149,6 @@ if (is_array($allWork)) {
 		));
 
 		$this->parse('work_block', 'work', true);
-
-		$this->setVar('status_due_block', '');
-		$this->setVar('status_awaiting_review_block', '');
-		$this->setVar('status_marked_block', '');
 
 		$first = false;
 		$j++;
