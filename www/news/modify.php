@@ -11,12 +11,6 @@ if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS) {
 	error(23);
 }
 
-/* If staff are prevented from making news posts
- */
-if ($groupHandler->isStaff() && !Cfg::get('news_staff_post_enabled')) {
-	error(19);
-}
-
 // if we are editing an existing news article
 if (is_numeric($this->arg[0])) {
 	$this->setFile(TEMPLATE_content, 'news/modify.html');

@@ -60,7 +60,7 @@ class Group extends DeprecatedModel {
 		$query = "SELECT type
 				   FROM userGroups
 				  WHERE cid = '{$categoryId}' AND type >= '" . GROUP_TYPE_MODERATED. "'";
-        
+
 		$result = $this->db->getAll($query);
 
 		/* If there are results, they are already subscribed
@@ -368,9 +368,10 @@ class Group extends DeprecatedModel {
             }
         }
 
-        // allow staff write access to NEWS_SERVICE by default except at shore...
-        if (($this->isStaff($userID) && Cfg::get('site_location') != 'shore') && $this->_service == NEWS_SERVICE && $permission < WRITE_ACCESS)
-            $permission = WRITE_ACCESS;
+		// allow staff write access to NEWS_SERVICE by default except at shore...
+		if ($this->isStaff($userID) && (Cfg::get('news_staff_post_enabled') == '1') && ($this->_service == NEWS_SERVICE) && ($permission < WRITE_ACCESS)) {
+			$permission = WRITE_ACCESS;
+		}
 
         // check synergy tutor list
         if ($permission < WRITE_ACCESS && $this->_service == TUTORIAL_SERVICE && Cfg::get('external_enable')) {
