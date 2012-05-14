@@ -1,6 +1,31 @@
 <?php
 class Sabre_DAV_Client_Extended extends Sabre_DAV_Client {
 
+	/**
+	 * Overridden to implement Content-Length header in $this->request call
+	 *
+	 * @param $url
+	 * @param $settings
+	 *
+	 * @return array
+	 */
+	protected function curlRequest($url, $settings) {
+		if ($settings[CURLOPT_CUSTOMREQUEST] == 'PROPFIND') {
+			$settings[CURLOPT_HTTPHEADER][] = 'Content-Length: 0';
+		}
+
+		$curl = curl_init($url);
+
+		curl_setopt_array($curl, $settings);
+
+		return array(
+			curl_exec($curl),
+			curl_getinfo($curl),
+			curl_errno($curl),
+			curl_error($curl)
+		);
+	}
+
     /**
      * Uploads a file via a PUT request
      *
@@ -112,6 +137,7 @@ class PortfolioWebDAV {
         }
 
         $this->cache[$rootPath]['file'][] = true;
+
     }
 
     public function factory() {
@@ -224,8 +250,8 @@ class PortfolioWebDAV {
             } else {
                 return false;
             }
-
-        } elseif ($site_location == 'core') {
+        }
+		else if ($site_location == 'core') {
             $settings = array(
                 'baseUri' => 'http://webdave.alaress-dev.com.au/',
                 'userName' => 'webdave',
@@ -270,12 +296,19 @@ class PortfolioWebDAV {
         $this->cache[$md5Path]['dir'] = array();
         $this->cache[$md5Path]['file'] = array();
 
-        $response = $this->client->propFind($path, array(
-            '{DAV:}getcontentlength',
-            '{DAV:}resourcetype',
-            '{DAV:}getlastmodified',
-            '{DAV:}creationdate',
-        ), 1);
+		try{
+			$response = $this->client->propFind($path, array(
+				'{DAV:}getcontentlength',
+				'{DAV:}resourcetype',
+				'{DAV:}getlastmodified',
+				'{DAV:}creationdate',),
+				1);
+		}
+		/* Handle Sabre_DAV_Exception specifically
+		 */
+		catch (Sabre_DAV_Exception $e) {
+			error(141, DAV_Error::getMeaning($e->getMessage()));
+		}
 
         // remove parent
         array_shift($response);
