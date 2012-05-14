@@ -9,6 +9,12 @@ if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS) {
 	error(19);
 }
 
+/* If staff are prevented from making news posts
+ */
+if ($groupHandler->isStaff() && !Cfg::get('news_staff_post_enabled')) {
+	error(19);
+}
+
 if ($_POST['heading']) {
 	$publishedDate = new Alaress_Date_Format($_POST['item_datetime_published'], 'd/m/y');
 	$expiryDate = new Alaress_Date_Format($_POST['item_datetime_expires'], 'd/m/y');

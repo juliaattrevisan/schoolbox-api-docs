@@ -75,6 +75,12 @@ if (($permission = $groupHandler->getPermission(0)) >= WRITE_ACCESS) {
     $this->setVar('modify_news_block', '');
 }
 
+/* If config var prevents staff from making news posts, clear template variables
+ */
+if ($groupHandler->isStaff() && !Cfg::get('news_staff_post_enabled')) {
+	$this->setVar('add_news_block', '');
+	$this->setVar('modify_news_block', '');
+}
 
 $now = new Alaress_Date_Format(time(), 'U');
 $articleExpiry = new Alaress_Date_Format($article['item_datetime_expires'], 'y-m-d');
