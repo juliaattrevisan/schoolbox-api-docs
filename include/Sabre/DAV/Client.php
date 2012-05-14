@@ -286,15 +286,7 @@ class Sabre_DAV_Client {
         }
 
         if ($this->userName) {
-
-			/* Alaress
-			 * This is a bug in the SabreDAV client. It was using CURLAUTH_BASIC and
-			 * CURLAUTH_DIGEST as some kind of bitmask, eventually assigning
-			 * CURLOPT_HTTPAUTH to integer 3, a nonexistent authentication method.
-			 *
-			 * Fixed on 14/5/2012, hardcoded to CURLAUTH_BASIC
-			 */
-            $curlSettings[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
+            $curlSettings[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC | CURLAUTH_DIGEST;
             $curlSettings[CURLOPT_USERPWD] = $this->userName . ':' . $this->password;
         }
 
