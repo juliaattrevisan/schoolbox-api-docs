@@ -177,7 +177,6 @@ class Submission extends DeprecatedModel {
 			b.id AS bid,
 			s.id AS sid,
 			r.id AS rid,
-			f.id AS fid,
 			UNIX_TIMESTAMP(b.date) AS dueDate,
 			c.name AS categoryName,
 			b.name,
@@ -188,9 +187,9 @@ class Submission extends DeprecatedModel {
 			LEFT JOIN category c ON c.id = b.category
 			LEFT JOIN student_submission s ON s.box_id = b.id AND (s.owner = '$userID' OR s.owner IS NULL)
 			LEFT JOIN submission_return r ON r.box_id = b.id AND (r.owner = '$userID' OR r.owner IS NULL)
-			LEFT JOIN file f ON b.fid = f.id
 			WHERE b.deleted = 0
 			AND b.category IN (" . implode(',', $categoryIDList) . ")
+            GROUP BY b.id
 			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC";
 
 		return $this->db->getAll($query);

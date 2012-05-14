@@ -97,14 +97,14 @@ if (is_array($allWork)) {
 			'WORK_DESCRIPTION' => Scrub::Text($currentWork['name']),
 			'WORK_DUEDATE' => $dueDate->getDateOnly(),
 			'WORK_MARK' => $currentWork['mark'],
-			'WORK_ACTION' => '',
 			'WORK_BOX_ID' => $currentWork['bid'],
-			'WORK_FILE_ID' => $currentWork['fid'],
-			'WORK_SUBMIT_FILE_ID' => $currentWork['sid'],
-			'WORK_RETURN_FILE_ID' => $currentWork['rid'],
 		));
 
-		if ($currentWork['submitted'] != null) {
+        if($dueDate->getUnixTimestamp() > time() ) {
+            /* Add block to handle submission box closed...*/
+        }
+
+		if ($currentWork['submitted'] != null || $currentWork['returned'] != null) {
 			if ($currentWork['returned'] != null) {
 				$this->setVar('status_due_block', '');
 				$this->setVar('status_awaiting_review_block', '');
