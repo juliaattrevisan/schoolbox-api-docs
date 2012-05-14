@@ -71,7 +71,7 @@ abstract class Alaress_Cache_Abstract {
 	 * @return void
 	 */
 	public function remove() {
-		unlink($this->getCacheFile());
+		@unlink($this->getCacheFile());
 	}
 
 	/**
