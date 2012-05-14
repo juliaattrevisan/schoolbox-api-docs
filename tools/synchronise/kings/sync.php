@@ -13,15 +13,15 @@ require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 // manually define list of strategies to implement
 $strategyList = array(
     'Synchronise_Denbigh_Kings_Student',
-    'Synchronise_Denbigh_Kings_Staff',
-    'Synchronise_Denbigh_Kings_Parent'
+    //'Synchronise_Denbigh_Kings_Staff',
+    //'Synchronise_Denbigh_Kings_Parent'
 );
 
 foreach($strategyList as $currentStrategy) {
     $sync = new Synchronise_Denbigh_Main($currentStrategy);
 
     // set params
-    $sync->setPerformUpdate(false); // false - don't actually *touch* anything... (default)
+    $sync->setPerformUpdate(true); // false - don't actually *touch* anything... (default)
     $sync->setVerbose(true);       // true  - show me what you're doing! (default)
     $sync->generateTitle();
 

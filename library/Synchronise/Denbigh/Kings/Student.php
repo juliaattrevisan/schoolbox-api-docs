@@ -52,8 +52,8 @@ class Synchronise_Denbigh_Kings_Student extends Synchronise_Denbigh_Kings_Abstra
         $newUser['campus']              = array($this->getCampusFromYearLevel($currentUser['academicYear']));
         $newUser['year']                = $currentUser['academicYear'];
         $newUser['house']               = $this->getHouse($currentUser['house']);
-        $newUser['residentialHouse']    = $this->getResidentialHouse($currentUser['cateringHouse']);
-        $newUser['alt_email']           = strtolower($newUser['loginIDforIT']) . '@student.kings.edu.au';
+        $newUser['residential_house_id']    = $this->getResidentialHouse($currentUser['cateringHouse']);
+        $newUser['alt_email']           = strtolower($currentUser['loginIDforIT']) . '@student.kings.edu.au';
         $newUser['local_email']         = 0;
         $newUser['su']                  = false;
         $newUser['defaultCampus']       = $this->getCampusFromYearLevel($currentUser['academicYear']);

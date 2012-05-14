@@ -351,7 +351,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 		return $timetable;
 	
 	}
-	
+
 	function getFullTimetable($synergy_id, $userID, $campus)
 	{	
 		$timetabledef = $this->getTimetableDefinition($campus, 1);
