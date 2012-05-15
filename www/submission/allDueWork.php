@@ -150,6 +150,7 @@ if (is_array($allWork)) {
 
 		$this->parse('work_block', 'work', true);
 
+		$previousSubject = $currentWork['categoryName'];
 		$first = false;
 		$j++;
 	}
