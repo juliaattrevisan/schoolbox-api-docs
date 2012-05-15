@@ -9,7 +9,6 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-
 abstract class Evaluation_Section extends DeprecatedModel {
     public $_table = 'assess_section';
     public $_index = 'section_id';
@@ -44,7 +43,7 @@ abstract class Evaluation_Section extends DeprecatedModel {
         $sequence = $this->db->getOne($query);
 
         if ($sequence) {
-            return $sequence['num'];
+            return $sequence;
         }
 
         return 1;

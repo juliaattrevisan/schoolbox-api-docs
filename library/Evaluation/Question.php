@@ -16,6 +16,9 @@ abstract class Evaluation_Question extends DeprecatedModel {
 
     private $allowedFields = array('section_id', 'question_id', 'sequence', 'type_id', 'marks', 'question', 'deleted_at');
 
+	/**
+	 * Constructor
+	 */
 	public function __construct() {
 		parent::DeprecatedModel();
 	}
@@ -66,7 +69,7 @@ abstract class Evaluation_Question extends DeprecatedModel {
         $sequence = $this->db->getOne($query);
 
         if ($sequence) {
-            return $sequence['num'];
+            return $sequence;
         }
 
         return 1;
@@ -193,7 +196,8 @@ abstract class Evaluation_Question extends DeprecatedModel {
 	 * Find the number of questions in this assess
 	 *
 	 * @param  $assess_id
-	 * @return
+	 *
+	 * @return mixed
 	 */
     public function numQuestions($assess_id) {
         $query = "SELECT COUNT(assess_question.question_id) AS numQuestions
