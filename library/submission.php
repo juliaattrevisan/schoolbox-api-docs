@@ -168,11 +168,12 @@ class Submission extends DeprecatedModel {
 	/**
 	 * Gets all the due/submitted/returned work via Submission Boxes.
 	 *
-	 * @param <type> $categoryIDList
-	 * @param <type> $limit
-	 * @return <type>
+	 * @param $userID
+	 * @param $categoryIDList
+	 *
+	 * @return array|bool
 	 */
-	function getAllDueWork($userID, $categoryIDList) {
+	public function getAllDueWork($userID, $categoryIDList) {
 		$query = "SELECT
 			b.id AS bid,
 			s.id AS sid,
@@ -183,7 +184,14 @@ class Submission extends DeprecatedModel {
 			b.name,
 			b.description,
 			b.created, s.submitted, r.returned,
-			(SELECT mark FROM submission_return WHERE box_id = bid ORDER BY returned DESC LIMIT 1) AS mark
+			(
+				SELECT mark
+				FROM submission_return
+				WHERE box_id = bid
+				AND submission_return.owner = '$userID'
+				ORDER BY returned DESC
+				LIMIT 1
+			) AS mark
 			FROM submission_box b
 			LEFT JOIN category c ON c.id = b.category
 			LEFT JOIN student_submission s ON s.box_id = b.id AND (s.owner = '$userID' OR s.owner IS NULL)
