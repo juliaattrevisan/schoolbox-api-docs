@@ -1,4 +1,4 @@
-<script type="text/javascript" src="/javascript/jquery.form.2.43.js"></script>
+
 <script type="text/javascript">
 $j(document).ready(function() {
 
@@ -51,8 +51,11 @@ $j(document).ready(function() {
 
 			/* Submit via POST and redirect to question creation screen upon done
 			 */
-			$j.post(theForm.attr('action'), data, function(responseText) {
-				window.location = '/survey/question/create/' + data.section_id;
+//			$j.post(theForm.attr('action'), data, function(responseText) {
+//				window.location = '/survey/question/create/' + data.section_id;
+//			});
+			$j.post('/survey/question/sandbox.php', data, function(responseText) {
+				console.log(responseText);
 			});
 
 			tinyMCE.triggerSave();
