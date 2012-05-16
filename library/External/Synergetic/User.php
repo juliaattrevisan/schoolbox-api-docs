@@ -463,6 +463,13 @@ class External_Synergetic_User implements External_UserInterface {
         return $this->getDatabase()->getRow($query);
 	}
 
+    function getCampusFromTimetable($staffID) {
+        $query = "SELECT DISTINCT( ClassCampus ) as campus FROM timetable WHERE StaffID = '$staffID'";
+
+        return $this->getDatabase()->getAll($query);
+
+    }
+
 	/* Getters/Setters
 	 */
 
