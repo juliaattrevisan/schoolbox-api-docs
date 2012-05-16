@@ -18,18 +18,18 @@ class Synchronise_Denbigh_Kings_Student extends Synchronise_Denbigh_Kings_Abstra
         $this->collateList($this->getExternalUserHandler()->getStudentUserAccountInfo());
     }
 
-
     /**
      * Creates the users and inserts them into the database (unless they already exist)
      */
     public function create() {
         $this->getVerboseFilter()->intro();
+
         foreach($this->getList() as $currentUser) {
             $this->executeCreateUpdate($this->generateUserAttributes($currentUser));
         }
+
         $this->getVerboseFilter()->summary();
     }
-
 
     /**
      * Map the attributes of the current user to Schoolbox fields
@@ -37,7 +37,6 @@ class Synchronise_Denbigh_Kings_Student extends Synchronise_Denbigh_Kings_Abstra
      * @return array
      */
     public function generateUserAttributes($currentUser) {
-
         $newUser = array();
 
         // set attributes
@@ -58,6 +57,7 @@ class Synchronise_Denbigh_Kings_Student extends Synchronise_Denbigh_Kings_Abstra
         $newUser['su']                  = false;
         $newUser['defaultCampus']       = $this->getCampusFromYearLevel($currentUser['academicYear']);
         $newUser['eportfolio_enabled']  = self::EPORTFOLIO_STUDENT_ENABLED ? 1 : 0;
+		$newUser['boarding_status'] = $currentUser['boardingStatus'];
 
         return $newUser;
     }

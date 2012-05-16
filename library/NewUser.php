@@ -39,6 +39,8 @@ class NewUser extends Model {
 
     public $eportfolioEnabled;
 
+	public $boardingStatus;
+
     public function setAltEmail($altEmail)
     {
         $this->altEmail = $altEmail;
@@ -278,5 +280,30 @@ class NewUser extends Model {
 		return $this->residentialHouseId;
 	}
 
+	/**
+	 * Set boarding status
+	 *
+	 * @param $boardingStatus
+	 */
+	public function setBoardingStatus($boardingStatus) {
+		$this->boardingStatus = $boardingStatus;
+	}
 
+	/**
+	 * Get boarding status
+	 *
+	 * @return mixed
+	 */
+	public function getBoardingStatus() {
+		return $this->boardingStatus;
+	}
+
+	/**
+	 * Get abbreviated form of boarding status (first letter)
+	 *
+	 * @return string
+	 */
+	public function getAbbreviatedBoardingStatus() {
+		return substr($this->getBoardingStatus(), 0, 1);
+	}
 }

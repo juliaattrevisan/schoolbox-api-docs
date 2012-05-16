@@ -158,7 +158,8 @@ class Leave_RequestMapper extends Mapper {
      */
     public function findAllByHouseId ($houseId) {
         $statement = $this->database->prepare("
-            SELECT {$this->getColumnString('lr')},
+            SELECT
+            	{$this->getColumnString('lr')},
                 {$this->getUserMapper()->getColumnString('u')},
                 {$this->getUserMapper()->getColumnString('au')}
             FROM `{$this->table}` lr
@@ -166,7 +167,7 @@ class Leave_RequestMapper extends Mapper {
             LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
             WHERE u.residential_house_id = :houseId
             AND lr.created >= :limit
-            ORDER BY u.year, u.lastname
+            ORDER BY u.year, u.lastname, created DESC
         ");
 
         $statement->execute( array(

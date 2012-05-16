@@ -316,7 +316,7 @@ class External_Denbigh_User implements External_UserInterface {
      */
     public function getStudentUserAccountInfo () {
         $query = $this->getExternalDatabase()->query("
-            SELECT username, academicYear, firstname, surname, denbighID, email, house, cateringHouse
+            SELECT username, academicYear, firstname, surname, denbighID, email, house, cateringHouse, boardingStatus
             FROM Schoolbox_Students");
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }

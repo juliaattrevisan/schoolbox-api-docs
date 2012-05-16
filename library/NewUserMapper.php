@@ -86,6 +86,12 @@ class NewUserMapper extends Mapper {
 		));
 
 		$this->hasMap(array(
+			'column' => 'boarding_status',
+			'property' => 'boardingStatus',
+			'type' => Mapper::TYPE_STRING,
+		));
+
+		$this->hasMap(array(
             'column'     => 'local_email',
             'property'   => 'localEmail',
             'type'       => Mapper::TYPE_BOOLEAN,

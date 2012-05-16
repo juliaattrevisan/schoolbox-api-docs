@@ -1,13 +1,29 @@
 <?php
-
+/**
+ * Leave Controller
+ *
+ * @author      Alex Tworowsky <aetworowsky@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
 class Leave_Controller extends Controller {
-	const THRESHOLD_MORNING = '11:59:59';
-	const THRESHOLD_DAY = '16:59:59';
-	const THRESHOLD_NIGHT = '23:59:59';
+
+	/* Unused constants which document when morning, day and night occur
+	 * for Leave Reports and Catering Reports respectively
+	 */
+	const LEAVE_THRESHOLD_MORNING = '9:59:59';
+	const LEAVE_THRESHOLD_DAY = '18:59:59';
+	const LEAVE_THRESHOLD_NIGHT = '21:59:59';
+
+	const CATERING_THRESHOLD_MORNING = '11:59:59';
+	const CATERING_THRESHOLD_DAY = '16:59:59';
+	const CATERING_THRESHOLD_NIGHT = '23:59:59';
 
 	/* Consts for days
 	 */
 	const FRIDAY = 5;
+	const SATURDAY = 6;
 	const SUNDAY = 7;
 
 	/* Show leave requests over RANGE days
@@ -20,7 +36,7 @@ class Leave_Controller extends Controller {
 	 * used in the Leave Time/Return Time dropdowns
 	 */
 	private $timeMap = array(
-		'12:30:00' => '12:30 AM',
+		'00:30:00' => '12:30 AM',
 		'01:00:00' => '1:00 AM',
 		'01:30:00' => '1:30 AM',
 		'02:00:00' => '2:00 AM',
@@ -336,6 +352,7 @@ class Leave_Controller extends Controller {
 					'USER_ID' => $request->getUser()->getId(),
 					'USER_NAME' => $request->getUser()->getName(),
 					'USER_YEAR' => $request->getUser()->getYear(),
+					'USER_BOARDING_STATUS' => $request->getUser()->getAbbreviatedBoardingStatus(),
 					'REQUEST_ID' => $request->getId(),
 					'REQUEST_START' => $request->getStart()->getAustralian(),
 					'REQUEST_DURATION' => $request->getDuration(),
@@ -869,6 +886,7 @@ class Leave_Controller extends Controller {
 					'USER_ID' => $request->getUser()->getId(),
 					'USER_NAME' => $request->getUser()->getName(),
 					'USER_YEAR' => $request->getUser()->getYear(),
+					'USER_BOARDING_STATUS' => $request->getUser()->getAbbreviatedBoardingStatus(),
 					'CLASS' => $i % 2 ? '' : 'dark',
 				));
 
@@ -900,14 +918,14 @@ class Leave_Controller extends Controller {
 					 *
 					 * Render 3 columns each day for 3 days
 					 *
-					 * Morning: 00:00:00 to 11:59:59
-					 * Day: 12:00:00 to 17:59:59
-					 * Night: 18:00:00 to 23:59:59
+					 * Morning: 00:00:00 to 09:59:59
+					 * Day: 10:00:00 to 18:59:59
+					 * Night: 19:00:00 to 21:59:59
 					 */
 					$morningStart = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp(), 'U');
-					$dayStart = new Alaress_Date_Format($morningStart->getUnixTimestamp() + 12*60*60-1, 'U');
-					$nightStart = new Alaress_Date_Format($dayStart->getUnixTimestamp() + 5*60*60, 'U');
-					$nightEnd = new Alaress_Date_Format($nightStart->getUnixTimestamp() + 7*60*60, 'U');
+					$dayStart = new Alaress_Date_Format($morningStart->getUnixTimestamp() + 10*60*60-1, 'U');
+					$nightStart = new Alaress_Date_Format($dayStart->getUnixTimestamp() + 9*60*60, 'U');
+					$nightEnd = new Alaress_Date_Format($nightStart->getUnixTimestamp() + 3*60*60, 'U');
 
 					$showStartTime = true;
 
@@ -1277,7 +1295,9 @@ class Leave_Controller extends Controller {
 		$data = array();
 		$data['date'] = $date;
 
-		for ($i = self::FRIDAY; $i <= self::SUNDAY; $i++) {
+		/* Skip Friday
+		 */
+		for ($i = self::SATURDAY; $i <= self::SUNDAY; $i++) {
 			$currentDate = new Alaress_Date_Format($date, 'd/m/y');
 			$currentDate->addDays($i - $currentDate->getWeekDayNumber());
 
@@ -1300,9 +1320,7 @@ class Leave_Controller extends Controller {
 			 */
 			$data['totals'][] = $totals;
 		}
-//
-//		$data['house'] = $this->getHouseMapper()->findById($_SESSION['houseId']);
-//
+
 		return $data;
     }
 
@@ -1327,7 +1345,7 @@ class Leave_Controller extends Controller {
 		/* For each day, render a heading
 		 * Exclude initial Friday -_-
 		 */
-		for ($i = 1; $i < count($data['dateList']); $i++) {
+		for ($i = 0; $i < count($data['dateList']); $i++) {
 			$currentDate = $data['dateList'][$i];
 
 			$this->getPage()->setVar(array(
@@ -1339,7 +1357,7 @@ class Leave_Controller extends Controller {
 
 		/* For each day, render totals
 		 */
-		for ($i = 1; $i < count($data['totals']); $i++) {
+		for ($i = 0; $i < count($data['totals']); $i++) {
 			$currentSegment = $data['totals'][$i];
 
 			$this->getPage()->setVar(array(
@@ -1359,7 +1377,7 @@ class Leave_Controller extends Controller {
 				/* For each day
 				 * (Exclude Friday -_-)
 				 */
-				for ($j = 1; $j < count($data['dateList']); $j++) {
+				for ($j = 0; $j < count($data['dateList']); $j++) {
 					$this->getPage()->setVar(array(
 						'REQUEST_PERIOD_MORNING' => (int)$data['houseList'][$j][$i]['present_morning'],
 						'REQUEST_PERIOD_DAY' => (int)$data['houseList'][$j][$i]['present_day'],
