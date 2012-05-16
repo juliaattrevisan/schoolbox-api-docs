@@ -76,7 +76,10 @@ class Alaress_Twitter_Search {
 
 			/* Iterate and process
 			 */
-			for ($i = 0; ($i < $this->getMaxTweets()) && ($i < count($allTweets->results)); $i++) {
+            if($this->getMaxTweets())
+                $allTweets = array_slice($allTweets, 0, $this->getMaxTweets());
+
+			for ($i = 0; $i < count($allTweets->results); $i++) {
 				$processed[] = array(
 					'text' => $allTweets->results[$i]->text,
 					'date' => $allTweets->results[$i]->created_at,
