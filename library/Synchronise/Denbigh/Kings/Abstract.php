@@ -73,10 +73,11 @@ abstract class Synchronise_Denbigh_Kings_Abstract extends Synchronise_Denbigh_Ab
         // does the user exist in schoolbox?
         if($this->userExists($newUser)) {
             // if yes, update details
-
+            $existingUser = $this->getUserHandler()->getByUsername($newUser['username']);
+            $newUser['id'] = $existingUser['uid'];
             if($this->getPerformUpdate()) {
                 // actually do it
-             // $this->getUserHandler()->update($newUser);
+                $this->getUserHandler()->update($newUser);
                 $this->getVerboseFilter()->performUpdate();
                 $this->getVerboseFilter()->incrementUpdated();
 

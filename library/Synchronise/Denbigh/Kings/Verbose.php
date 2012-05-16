@@ -88,7 +88,7 @@ class Synchronise_Denbigh_Kings_Verbose {
         $data[] = "email: {$newUser['local_email']}";
         //$data[] = "campus: " . '[' . implode(',', $newUser['campus']) . ']';
         //$data[] = "groupIDs: " . $newUser['group_id'];
-
+        $data[] = "residential house: {$newUser['residential_house_id']}";
         if (array_key_exists('year', $newUser)) {
             $data[] = 'year: ' . $newUser['year'];
         }
