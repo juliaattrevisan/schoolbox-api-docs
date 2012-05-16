@@ -145,7 +145,19 @@ class Mailer {
         $hdrs = $this->email->headers($this->headers);
 
         //send email
-        $mail =& Mail::factory('mail');
+
+        if(Cfg::get('mail_smtp_host') && Cfg::get('mail_smtp_port') ){
+            $smtpSettings = array(
+                    'host' => Cfg::get('mail_smtp_host'),
+                    'port' => Cfg::get('mail_smtp_port'),
+                    'localhost' => Cfg::get('site_hostname').'.'.Cfg::get('site_domain')
+            );
+
+            $mail =& Mail::factory('smtp', $smtpSettings);
+        }
+        else {
+            $mail =& Mail::factory('mail');
+        }
         $return = $mail->send($this->to, $hdrs, $body);
 
         return $return;
