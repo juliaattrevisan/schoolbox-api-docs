@@ -34,6 +34,25 @@ class External_Denbigh_User implements External_UserInterface {
 		$this->setGroup(new Group());
 	}
 
+	/**
+	 * Gets a housemaster by a house id
+	 *
+	 * @param $houseId
+	 *
+	 * @return mixed
+	 */
+	public function getHousemasterByHouseId($houseId) {
+		$statement = $this->getExternalDatabase()->query("
+			SELECT Houses.housemaster_id
+			FROM Houses
+			WHERE Houses.id = $houseId
+		");
+
+		$requestList = $statement->fetch(PDO::FETCH_ASSOC);
+
+		return $requestList['housemaster_id'];
+	}
+
     public function getParent ($externalUserId) {
 		$statement = $this->getExternalDatabase()->query("
 			SELECT pe.denbighID, pe.surname, pe.given_names, pe.preferred_name, pe.title, pe.gender, pe.dateOfBirth,

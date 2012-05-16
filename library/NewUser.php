@@ -25,7 +25,7 @@ class NewUser extends Model {
 
     public $house;
 
-	public $residentialHouse;
+	public $residentialHouseId;
 
     public $localEmail;
 
