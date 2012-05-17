@@ -113,33 +113,31 @@
 
     <table id="requestList" class="ruler sortable-table" width="100%">
         <colgroup>
+            <col width="12%">
+			<col width="6%">
             <col width="4%">
-			<col width="2%">
-            <col width="2%">
-            <col width="2%">
-            <col width="2%">
-            <col width="2%">
-            <col width="2%">
-            <col width="2%">
-            <col width="2%">
-            <col width="2%">
-            <col width="2%">
-            <col width="2%">
-            <col width="4%">
-            <col width="4%">
-            <col width="4%">
+            <col width="0%">
+            <col width="0%">
+            <col width="6%">
+            <col width="6%">
+            <col width="6%">
+            <col width="6%">
+            <col width="6%">
+            <col width="6%">
+            <col width="6%">
+            <col width="12%">
+            <col width="12%">
+            <col width="12%">
         </colgroup>
         <thead>
             <tr>
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
-				<th>&nbsp;</th>
+                <th colspan="3"></th>
 				<!-- BEGIN report_header -->
 				<th colspan="3" class="leaveReportHeaderDate leaveReportLeftBorder leaveReportRightBorder">{REPORT_HEADER_DATE}</th>
 				<!-- END report_header -->
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
+                <th></th>
+                <th class="leaveReportNoPrint"></th>
+                <th></th>
             </tr>
             <tr>
                 <th>Name</th>
@@ -150,14 +148,14 @@
                 <th class='leaveReportMeridiem leaveReportLeftBorder'>AM</th>
 				<!-- END report_header_subtitle_show_am -->
 				<!-- BEGIN report_header_subtitle_hide_am -->
-				<th class='leaveReportMeridiem leaveReportLeftBorder no-arrow'></th>
+				<th class='leaveReportMeridiem leaveReportLeftBorder no-arrow leaveReportHide'></th>
 				<!-- END report_header_subtitle_hide_am -->
 
 				<!-- BEGIN report_header_subtitle_show_day -->
                 <th class='leaveReportMeridiem'>PM</th>
 				<!-- END report_header_subtitle_show_day -->
 				<!-- BEGIN report_header_subtitle_hide_day -->
-				<th class='leaveReportMeridiem no-arrow'></th>
+				<th class='leaveReportMeridiem no-arrow leaveReportHide'></th>
 				<!-- END report_header_subtitle_hide_day -->
 
 				<!-- BEGIN report_header_subtitle_show_pm -->
@@ -166,7 +164,7 @@
 
 				<!-- END report_header_subtitle -->
                 <th>Host</th>
-				<th>Leave Activity</th>
+				<th class="leaveReportNoPrint">Leave Activity</th>
                 <th>Approved By</th>
             </tr>
         </thead>
@@ -183,20 +181,20 @@
 				<td class='leaveReportMeridiem leaveReportLeftBorder'>{REQUEST_PERIOD_MORNING}</td>
 				<!-- END request_period_show_am -->
 				<!-- BEGIN request_period_hide_am -->
-				<td class="leaveReportMeridiem leaveReportLeftBorder leaveReportNoRightBorder"></td>
+				<td class="leaveReportMeridiem leaveReportLeftBorder leaveReportNoRightBorder leaveReportHide"></td>
 				<!-- END request_period_hide_am -->
 				<!-- BEGIN request_period_show_day -->
 				<td class='leaveReportMeridiem'>{REQUEST_PERIOD_DAY}</td>
 				<!-- END request_period_show_day -->
 				<!-- BEGIN request_period_hide_day -->
-				<td class="leaveReportMeridiem leaveReportNoBorder"></td>
+				<td class="leaveReportMeridiem leaveReportNoBorder leaveReportHide"></td>
 				<!-- END request_period_hide_day -->
 				<!-- BEGIN request_period_show_pm -->
 				<td class='leaveReportMeridiem leaveReportRightBorder'>{REQUEST_PERIOD_NIGHT}</td>
 				<!-- END request_period_show_pm -->
 				<!-- END request_period -->
                 <td>{REQUEST_HOST_TYPE}</td>
-				<td>{REQUEST_DESCRIPTION}</td>
+				<td class="leaveReportNoPrint">{REQUEST_DESCRIPTION}</td>
                 <td><a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a></td>
             </tr>
             <!-- END request -->
@@ -205,58 +203,44 @@
                 <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
                 <td>{USER_YEAR}</td>
                 <td></td>
-				<td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+				<td colspan="2" class="leaveReportHide"></td>
+                <td colspan="8"></td>
+                <td class="leaveReportNoPrint"></td>
                 <td></td>
             </tr>
             <!-- END empty_request -->
             <!-- END row -->
 
 			<!-- Empty row -->
-			<tr>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
+			<tr class="signatures">
+				<td colspan="3" class="no-right-border"></td>
+				<td colspan="2" class="leaveReportHide"></td>
+				<td class="no-right-border" colspan="8"></td>
+				<td class="leaveReportNoPrint"></td>
+				<td class="no-left-border"></td>
 			</tr>
 
 			<!-- Signatures and initials -->
-			<tr>
-				<td style='border:1px solid #000;' colspan='4'><strong>Duty Master Initial</strong></td>
-				<td style='border:1px solid #000;'></td>
-				<td style='border:1px solid #000;'></td>
-				<td style='border:1px solid #000;'></td>
-				<td style='border:1px solid #000;'></td>
-				<td style='border:1px solid #000;'></td>
-				<td style='border:1px solid #000;'></td>
-				<td style='border:1px solid #000;'></td>
-				<td style='border:1px solid #000;'></td>
-				<td style='border:1px solid #000;'></td>
-				<td style='border:1px solid #000;' colspan='3'></td>
+			<tr class="signatures">
+				<td colspan='3'><strong>Duty Master Initial</strong></td>
+				<td colspan="2" class="leaveReportHide"></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td class="no-right-border"></td>
+				<td class="leaveReportNoPrint"></td>
+				<td class="no-left-border"></td>
 			</tr>
-			<tr>
-				<td style='border:1px solid #000;' colspan='4'><strong>Housemaster Signature</strong></td>
-				<td style='border:1px solid #000;' colspan='11'></td>
+			<tr class="signatures">
+				<td colspan='3'><strong>Housemaster Signature</strong></td>
+                <td colspan="2" class="leaveReportHide"></td>
+				<td class="no-right-border" colspan='8'></td>
+				<td class='leaveReportNoPrint'></td>
+				<td class="no-left-border"></td>
 			</tr>
         </tbody>
     </table>

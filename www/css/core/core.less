@@ -6122,18 +6122,34 @@ ul.tree .collapsable .hitarea {
 /* Leave Report
  */
 .sortable-table{
+    td { border: 1px solid #000; border-collapse: collapse; }
     tr.leave-pending span.grey {
         color: #808080;
     }
     .leaveReportHeaderDate {
         text-align: center;
     }
+    .signatures td {
+
+    }
+    .leaveReportHide {
+        width: 0; padding: 0; overflow:hidden;
+        border-top: 1px solid #000;
+        border-bottom: 1px solid #000;
+        border-left: 1px solid transparent;
+        border-right: 1px solid transparent;
+    }
+    .signatures .leaveReportNoPrint { border-width: 1px 0 }
+    th.leaveReportHide { border: 0; }
+    .no-left-border { border-left-width: 0; }
+    .no-right-border { border-right-width: 0; }
 }
 /* Date the report was generated
  */
 .leaveReportGeneratedAt {
     display: none;
 }
+
 
 #requestList .no-arrow {
     background: none;
@@ -6145,3 +6161,6 @@ ul.tree .collapsable .hitarea {
     display: none;
 }
 
+@media print {
+    .leaveReportNoPrint { display:none; width: 0; padding: 0; overflow:hidden; border: 0; }
+}

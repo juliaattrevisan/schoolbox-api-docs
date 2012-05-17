@@ -33,6 +33,14 @@
 <!-- END custom_head -->
 
 <h1><span>Leave Request: {USER_NAME}, Year {USER_YEAR}, {USER_HOUSE}</span></h1>
+<span class="header_option">
+    <!-- BEGIN next_pending -->
+    <a class="btn go-to" href='/modules/leave/modify/{NEXT_PENDING_ID}'><span></span>Next Pending</a>
+    <!-- END next_pending -->
+    <!-- BEGIN prev_pending -->
+    <a class="btn go-back" href='/modules/leave/modify/{PREV_PENDING_ID}'><span></span>Previous Pending</a>
+    <!-- END prev_pending -->
+</span>
 
 <form  method="post" action="/modules/leave/processModify" id="requestForm">
 	<table class="standardForm">
@@ -41,24 +49,15 @@
                 <h4>Status</h4>
                 <em></em>
             </td>
-            <td colspan="3">
+            <td>
                 {REQUEST_STATUS}
             </td>
-        </tr>
-        <tr>
             <td class="formLabelWidth">
                 <h4>Requested By</h4>
                 <em></em>
             </td>
             <td>
                 {USER_NAME}
-            </td>
-            <td class="formLabelWidth">
-                <h4>Student ID</h4>
-                <em></em>
-            </td>
-            <td>
-                {USER_EXTERNAL_ID}
             </td>
         </tr>
         <tr>
@@ -142,17 +141,15 @@
                 <h4>Description</h4>
                 <em></em>
             </td>
-            <td colspan="3">
-                <textarea rows="4" cols="60" name="request[description]">{REQUEST_DESCRIPTION}</textarea>
+            <td>
+                <textarea rows="4" cols="40" name="request[description]">{REQUEST_DESCRIPTION}</textarea>
             </td>
-        </tr>
-        <tr>
             <td class="formLabelWidth">
                 <h4>Notes</h4>
                 <em></em>
             </td>
-            <td colspan="3">
-                <textarea rows="4" cols="60" name="request[notes]">{REQUEST_NOTES}</textarea>
+            <td>
+                <textarea rows="4" cols="40" name="request[notes]">{REQUEST_NOTES}</textarea>
             </td>
         </tr>
 		<!-- BEGIN has_confirmed_by -->
@@ -175,14 +172,3 @@
     <input type="submit" name="approve" value="Approve" class="submit-btn-plain">
 </form>
 
-<!-- BEGIN prev_pending -->
-<p>
-	<a href='/modules/leave/modify/{PREV_PENDING_ID}'>Previous Pending</a>
-</p>
-<!-- END prev_pending -->
-
-<!-- BEGIN next_pending -->
-<p>
-	<a href='/modules/leave/modify/{NEXT_PENDING_ID}'>Next Pending</a>
-</p>
-<!-- END next_pending -->
