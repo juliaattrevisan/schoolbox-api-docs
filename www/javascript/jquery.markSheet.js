@@ -2,7 +2,7 @@ $j(function() {
     var markSheet =  {
 
         columnCount : $j('.mark-sheet.assessments table').find('tr:first').children('th').size(),
-        assessmentCellWidth : '180',
+        assessmentCellWidth : '200',
 
         init: function() {
             markSheet.columns();
@@ -144,7 +144,7 @@ $j(function() {
                         var notification = $j(form).find('input, select');
                         $j.post('/submission/returnWorkForm.php', $j(form).serialize(), function(data) {
                            notification.css({
-                               'border': '2px solid green'
+                               'border': '1px solid green'
                            });
                             setTimeout(function() {
                                 notification.css({

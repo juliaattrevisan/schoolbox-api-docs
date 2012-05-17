@@ -5673,7 +5673,11 @@ table.subjectList {
 
 
 /* SUBMISSION MARK TABLE */
+.markForm{
+    display:block;
+}
 
+.row-fix{height:14px; overflow:hidden; padding:12px 0;min-height:14px;}
 
 .mark-sheet.names table{
     table-layout: fixed;
@@ -5700,7 +5704,6 @@ table.subjectList {
     line-height:24px;
 }
 
-
 .mark-sheet.assessments{
     overflow-x:scroll;
     margin-left:250px;
@@ -5712,10 +5715,8 @@ table.subjectList {
 }
 
 .mark-sheet.assessments table td{
-    position:relative;
-    padding-right:0;
+    padding: 0
 }
-
 
 .mark-sheet.assessments .height-control{
     height:40px;
@@ -5752,12 +5753,15 @@ table.subjectList {
 }
 
 
-.mark-sheet.assessments .active-assessment{width:470px !important;}
+/*.mark-sheet.assessments .active-assessment{width:471px !important;}*/
+
+.mark-sheet.assessments .active-assessment .row-fix{width:360px !important;}
+
 
 .mark-sheet.assessments span {
     position: relative;
     display: block;
-    line-height: 20px;
+    line-height: 14px;
     float: left;
 }
 
@@ -5776,7 +5780,6 @@ table.subjectList {
 
 .mark-sheet.assessments .mark-input {
     text-align: right;
-    padding-right: 2px;
     width:60px;
 }
 
