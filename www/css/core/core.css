@@ -388,13 +388,6 @@ table th.sortable.descending {
 table th.sortable.ascending {
   background: url('/images/core/tablesorter/sort-ascending.gif') no-repeat left 10.5px;
 }
-tr.leave-pending span {
-  background: #e8f5ff;
-  color: #777;
-  text-shadow: 0 1px 0 white;
-  padding: 2px 4px;
-  border: 1px solid #d9effe;
-}
 /*--------------------------------------------------------------
  Structural Styles
 --------------------------------------------------------------*/
@@ -5160,6 +5153,15 @@ table.subjectList {
   width: 100%;
 }
 /* SUBMISSION MARK TABLE */
+.markForm {
+  display: block;
+}
+.row-fix {
+  height: 14px;
+  overflow: hidden;
+  padding: 12px 0;
+  min-height: 14px;
+}
 .mark-sheet.names table {
   table-layout: fixed;
 }
@@ -5189,8 +5191,7 @@ table.subjectList {
   position: relative;
 }
 .mark-sheet.assessments table td {
-  position: relative;
-  padding-right: 0;
+  padding: 0;
 }
 .mark-sheet.assessments .height-control {
   height: 40px;
@@ -5224,13 +5225,14 @@ table.subjectList {
   margin-left: 14px;
   width: 0px;
 }
-.mark-sheet.assessments .active-assessment {
-  width: 470px !important;
+/*.mark-sheet.assessments .active-assessment{width:471px !important;}*/
+.mark-sheet.assessments .active-assessment .row-fix {
+  width: 360px !important;
 }
 .mark-sheet.assessments span {
   position: relative;
   display: block;
-  line-height: 20px;
+  line-height: 14px;
   float: left;
 }
 .mark-sheet.assessments select {
@@ -5245,7 +5247,6 @@ table.subjectList {
 }
 .mark-sheet.assessments .mark-input {
   text-align: right;
-  padding-right: 2px;
   width: 60px;
 }
 .mark-sheet.assessments .error {
@@ -5559,8 +5560,8 @@ ul.tree .collapsable .hitarea {
   overflow: hidden;
   border-top: 1px solid #000;
   border-bottom: 1px solid #000;
-  border-left: 1px solid transparent;
-  border-right: 1px solid transparent;
+  border-left-width: 0;
+  border-right-width: 0;
 }
 .sortable-table .signatures .leaveReportNoPrint {
   border-width: 1px 0;
@@ -5573,6 +5574,13 @@ ul.tree .collapsable .hitarea {
 }
 .sortable-table .no-right-border {
   border-right-width: 0;
+}
+tr.leave-pending span {
+  background: #e8f5ff;
+  color: #777;
+  text-shadow: 0 1px 0 white;
+  padding: 2px 4px;
+  border: 1px solid #d9effe;
 }
 /* Date the report was generated
  */
