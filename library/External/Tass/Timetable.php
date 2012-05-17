@@ -42,7 +42,7 @@ class External_Tass_Timetable implements External_TimetableInterface {
         }
 
 		$query = "SELECT prd_desc, prd_start, prd_end, prd_code, day_code FROM ttperiod
-                WHERE tt_id = " . TASS_tt_id . " AND cmpy_code = '{$this->campusCode[$campus]}' AND day_code='$day''
+                WHERE tt_id = " . TASS_tt_id . " AND cmpy_code = '{$this->campusCode[$campus]}' AND day_code='$day'
                 ORDER BY prd_code";
 
 		$this->getDatabase()->query($query);
