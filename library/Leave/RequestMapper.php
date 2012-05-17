@@ -183,29 +183,36 @@ class Leave_RequestMapper extends Mapper {
     }
 
 	/**
-	 * Returns the next pending request by house id
+	 * Common function used for generating next/previous links
 	 *
-	 * @param $requestId
+	 * Due to the multiple sorting requirement (year, surname, created) the resultant
+	 * collection is in an indeterminate order. There seems to be no way to tell from
+	 * the current request what the next and previous requests should be; e.g. an order
+	 * could be as follows:
+	 *
+	 * id 60 (sam) created 2012-05-17 16:42:41
+	 * id 58 (anita) created 2012-05-17 16:26:46
+	 * id 59 (andrew) created 2012-05-17 16:27:26
+	 * id 56 (bobby) 2012-05-17 13:16:11
+	 *
 	 * @param $houseId
-	 *
 	 * @return Collection
 	 */
-	public function findPreviousPendingByHouseId($requestId, $houseId) {
+	private function getAllLeaveRequests($houseId) {
 		$statement = $this->database->prepare("
-			SELECT {$this->getColumnString('lr')},
+			SELECT
+				{$this->getColumnString('lr')},
 				{$this->getUserMapper()->getColumnString('u')}
 			FROM `{$this->table}` lr
 			LEFT JOIN `user` u ON u.id = lr.user_id
-			WHERE u.house = :houseId
+			WHERE u.residential_house_id = :houseId
 			AND lr.status = :status
-			AND lr.id < :requestId
 			AND lr.created >= :limit
-			ORDER BY lr.id ASC
+			ORDER BY u.year, u.lastname, lr.created DESC
 		");
 
 		$statement->execute(array(
 			'houseId' => $houseId,
-			'requestId' => $requestId,
 			'status' => 1,
 			'limit' => $this->getLimit(),
 		));
@@ -214,7 +221,33 @@ class Leave_RequestMapper extends Mapper {
 
 		$requestCollection = $this->hydrateList($requestList);
 
-		return $requestCollection[count($requestCollection)-1];
+		return $requestCollection;
+	}
+
+	/**
+	 * Returns the next pending request by house id
+	 *
+	 * @param $requestId
+	 * @param $houseId
+	 *
+	 * @return Collection
+	 */
+	public function findPreviousPendingByHouseId($requestId, $houseId) {
+		$requestCollection = $this->getAllLeaveRequests($houseId);
+
+		/* Manually iterate and get the next one.
+		 */
+		for ($i = 0; $i < count($requestCollection); $i++) {
+			$currentRequest = $requestCollection[$i];
+
+			/* Return the previous one
+			 */
+			if ($currentRequest->getId() == $requestId) {
+				return $requestCollection[$i-1];
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -226,30 +259,21 @@ class Leave_RequestMapper extends Mapper {
 	 * @return Collection
 	 */
 	public function findNextPendingByHouseId($requestId, $houseId) {
-		$statement = $this->database->prepare("
-			SELECT {$this->getColumnString('lr')},
-				{$this->getUserMapper()->getColumnString('u')}
-			FROM `{$this->table}` lr
-			LEFT JOIN `user` u ON u.id = lr.user_id
-			WHERE u.house = :houseId
-			AND lr.status = :status
-			AND lr.id > :requestId
-			AND lr.created >= :limit
-			ORDER BY lr.id ASC
-		");
+		$requestCollection = $this->getAllLeaveRequests($houseId);
 
-		$statement->execute(array(
-			'houseId' => $houseId,
-			'requestId' => $requestId,
-			'status' => 1,
-			'limit' => $this->getLimit(),
-		));
+		/* Manually iterate and get the next one.
+		 */
+		for ($i = 0; $i < count($requestCollection); $i++) {
+			$currentRequest = $requestCollection[$i];
 
-		$requestList = $statement->fetchAll();
+			/* Return the previous one
+			 */
+			if ($currentRequest->getId() == $requestId) {
+				return $requestCollection[$i+1];
+			}
+		}
 
-		$requestCollection = $this->hydrateList($requestList);
-
-		return $requestCollection[0];
+		return null;
 	}
 
 	/**
