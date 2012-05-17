@@ -1487,22 +1487,13 @@ class Leave_Controller extends Controller {
 	 *
 	 * @param $request
 	 */
-    public function sendUserNotice ($request) {
-		if ($request->isPending()) {
-			$notice = new Leave_Notice_User_Submitted($request);
-			$notice->setup();
-			$notice->send();
-		}
-		else if ($request->isApproved()) {
-			$notice = new Leave_Notice_User_Authorised($request);
-			$notice->setup();
-			$notice->send();
-		}
-		else if ($request->isRejected()) {
-			$notice = new Leave_Notice_User_Rejected($request);
-			$notice->setup();
-			$notice->send();
-		}
+    public function sendUserNotice($request) {
+
+		/* Choose the Factory, have it produce() the notice object and send
+		 */
+		$factory = new Leave_Notice_Kings_User_Factory($request);
+		$notice = $factory->produce();
+		$notice->send();
     }
 
 	/**
@@ -1513,23 +1504,14 @@ class Leave_Controller extends Controller {
 	 *
 	 * @param $request
 	 */
-    public function sendParentNotice ($request) {
+    public function sendParentNotice($request) {
 		if ((Cfg::get('parent_notification') == 0) || (Cfg::get('parent_notification') == 'false')) {
-			if ($request->isPending()) {
-				$notice = new Leave_Notice_Parent_Submitted($request);
-				$notice->setup();
-				$notice->send();
-			}
-			else if ($request->isApproved()) {
-				$notice = new Leave_Notice_Parent_Authorised($request);
-				$notice->setup();
-				$notice->send();
-			}
-			else if ($request->isRejected()) {
-				$notice = new Leave_Notice_Parent_Rejected($request);
-				$notice->setup();
-				$notice->send();
-			}
+
+			/* Choose the Factory, have it produce() the notice object and send
+			 */
+			$factory = new Leave_Notice_Kings_Parent_Factory($request);
+			$notice = $factory->produce();
+			$notice->send();
 		}
 	}
 

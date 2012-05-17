@@ -35,6 +35,33 @@ class External_Denbigh_User implements External_UserInterface {
 	}
 
 	/**
+	 * Get a comma-separated list of parent emails that notifications should be sent to.
+	 * This is a Kings specific method.
+	 *
+	 * @param $externalUserId
+	 *
+	 * @return array
+	 */
+	public function getParentEmails($externalUserId) {
+		$statement = $this->getExternalDatabase()->query("
+			SELECT *
+			FROM Schoolbox_Students
+			LEFT JOIN Family ON Schoolbox_Students.familyDenbighID = Family.familyDenbighID
+			WHERE Schoolbox_Students.denbighID = $externalUserId
+		");
+
+		$parentList = $statement->fetch(PDO::FETCH_ASSOC);
+
+		if (is_array($parentList)) {
+			$parentEmails = $parentList['email'];
+		}
+
+		$allEmails = explode(',', $parentEmails);
+
+		return $allEmails;
+	}
+
+	/**
 	 * Gets a housemaster by a house id
 	 *
 	 * @param $houseId
