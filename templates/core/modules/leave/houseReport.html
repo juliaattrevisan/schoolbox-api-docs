@@ -28,12 +28,15 @@
             }
         });
 
+        $j("#requestList").find('tbody tr').removeClass('dark');
+        $j("#requestList").find('tbody tr:even').addClass('dark');
+
+
         $j("#requestList").bind('sortEnd', function () {
             var requestList = $j(this);
-
             requestList.find('tbody tr').removeClass('dark');
             requestList.find('tbody tr:even').addClass('dark');
-        } );
+        });
 
         $j('#reportDate').datepicker({
             dateFormat: 'dd/mm/yy',
@@ -70,6 +73,11 @@
         } );
 
         $j('#container').css('width', $j('.ruler').outerWidth());
+        /*
+        * HAck for column width.
+        * */
+
+        $j('.leaveReportHeaderDate:first').attr('colspan',1)
 
     });
 </script>
@@ -102,13 +110,13 @@
     </span>
     <p class='leaveReportGeneratedAt'>Generated on {GENERATED_AT}</p>
 
-    <table id="requestList" class="ruler sortable-table" width="100%">
+    <table id="requestList" class="ruler sortable-table" width="100%" style="table-layout:fixed;">
         <colgroup>
             <col width="13%">
 			<col width="7%">
             <col width="4%">
-            <col width="0%">
-            <col width="0%">
+        <!--<col width="0%">
+            <col width="0%">-->
             <col width="7%">
             <col width="7%">
             <col width="7%">
@@ -123,9 +131,9 @@
         <thead>
             <tr>
                 <th colspan="3"></th>
-				<!-- BEGIN report_header -->
-				<th colspan="3" class="leaveReportHeaderDate leaveReportLeftBorder leaveReportRightBorder">{REPORT_HEADER_DATE}</th>
-				<!-- END report_header -->
+                <!-- BEGIN report_header -->
+                <th colspan="3" class="leaveReportHeaderDate leaveReportLeftBorder leaveReportRightBorder">{REPORT_HEADER_DATE}</th>
+                <!-- END report_header -->
                 <th></th>
                 <th class="leaveReportNoPrint"></th>
                 <th></th>
@@ -204,13 +212,13 @@
         </tbody>
     </table>
 
-    <table class="ruler signatures" width="100%">
+    <table class="ruler signatures" width="100%" style="table-layout:fixed;">
         <colgroup>
             <col width="13%">
             <col width="7%">
             <col width="4%">
-            <col width="0%">
-            <col width="0%">
+<!--        <col width="0%">
+            <col width="0%">-->
             <col width="7%">
             <col width="7%">
             <col width="7%">
@@ -225,8 +233,9 @@
         <tbody>
 			<!-- Signatures and initials -->
 			<tr class="signatures">
-				<td colspan='3'><strong>Duty Master Initial</strong></td>
-				<td colspan="2" class="leaveReportHide"></td>
+				<td colspan='3'><strong>Duty Master Initial</strong><br><br></td>
+				<td class="leaveReportHide"></td>
+                <td class="leaveReportHide"></td>
 				<td></td>
 				<td></td>
 				<td></td>
@@ -239,7 +248,7 @@
 				<td class="no-left-border"></td>
 			</tr>
 			<tr class="signatures">
-				<td colspan='3'><strong>Housemaster Signature</strong></td>
+				<td colspan='3'><strong>Housemaster Signature</strong><br><br></td>
                 <td colspan="2" class="leaveReportHide"></td>
 				<td class="no-right-border" colspan='8'></td>
 				<td class='leaveReportNoPrint'></td>
