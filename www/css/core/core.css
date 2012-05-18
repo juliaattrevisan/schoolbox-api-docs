@@ -3354,6 +3354,7 @@ CALENDAR
   font-weight: bold;
   line-height: 24px;
   font-size: 20px;
+  color: #000;
 }
 .day-block span.time {
   display: block;
