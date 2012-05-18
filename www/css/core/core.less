@@ -6115,8 +6115,9 @@ ul.tree .collapsable .hitarea {
 
 /* Leave Report
  */
-.sortable-table{
+.sortable-table, .signatures {
     td { border: 1px solid #000; border-collapse: collapse; }
+    td,th { padding: 7px; }
     tr.leave-pending span.grey {
         color: #808080;
     }
@@ -6133,11 +6134,12 @@ ul.tree .collapsable .hitarea {
         border-left-width: 0;
         border-right-width: 0;
     }
-    .signatures .leaveReportNoPrint { border-width: 1px 0 }
+    .leaveReportNoPrint { border-width: 1px 0 }
     th.leaveReportHide { border: 0; }
     .no-left-border { border-left-width: 0; }
     .no-right-border { border-right-width: 0; }
 }
+
 
 tr.leave-pending span{
     background: #e8f5ff;

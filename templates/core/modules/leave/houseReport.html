@@ -13,28 +13,18 @@
             cssDesc: 'descending',
             dateFormat: 'uk',
             headers: { // These seem to be fucking it. Object no have toLowerCase
-                0:  { sorter: false},
-                1:  { sorter: false},
-                2:  { sorter: false},
-                3:  { sorter: false},
-                4:  { sorter: false},
-                5:  { sorter: false},
-                6:  { sorter: false},
-                7:  { sorter: false},//true from here
-				8:  { sorter: false},
-				9:  { sorter: false},
-				10: { sorter: false},
-				11: { sorter: false},
-				12: { sorter: false},
-				13: { sorter: false},
-				14: { sorter: false},
-				15: { sorter: false},
-				16: { sorter: false},
-				17: { sorter: false},
-				18: { sorter: false},
-				19: { sorter: false},
-				20: { sorter: false},
-				21: { sorter: false}
+                 0: { sorter: false},
+                 1: { sorter: false},
+                 2: { sorter: false},
+                 3: { sorter: false},
+                 4: { sorter: false},
+                 5: { sorter: false},
+                 6: { sorter: false},
+                10: { sorter: false},
+                11: { sorter: false},
+                19: { sorter: false},
+                20: { sorter: false},
+                21: { sorter: false}
             }
         });
 
@@ -114,21 +104,21 @@
 
     <table id="requestList" class="ruler sortable-table" width="100%">
         <colgroup>
-            <col width="12%">
-			<col width="6%">
+            <col width="13%">
+			<col width="7%">
             <col width="4%">
             <col width="0%">
             <col width="0%">
-            <col width="6%">
-            <col width="6%">
-            <col width="6%">
-            <col width="6%">
-            <col width="6%">
-            <col width="6%">
-            <col width="6%">
-            <col width="12%">
-            <col width="12%" class="leaveReportNoPrint">
-            <col width="12%">
+            <col width="7%">
+            <col width="7%">
+            <col width="7%">
+            <col width="7%">
+            <col width="7%">
+            <col width="7%">
+            <col width="7%">
+            <col>
+            <col class="leaveReportNoPrint">
+            <col>
         </colgroup>
         <thead>
             <tr>
@@ -211,16 +201,28 @@
             </tr>
             <!-- END empty_request -->
             <!-- END row -->
+        </tbody>
+    </table>
 
-			<!-- Empty row -->
-			<tr class="signatures">
-				<td colspan="3" class="no-right-border"></td>
-				<td colspan="2" class="leaveReportHide"></td>
-				<td class="no-right-border" colspan="8"></td>
-				<td class="leaveReportNoPrint"></td>
-				<td class="no-left-border"></td>
-			</tr>
-
+    <table class="ruler signatures" width="100%">
+        <colgroup>
+            <col width="13%">
+            <col width="7%">
+            <col width="4%">
+            <col width="0%">
+            <col width="0%">
+            <col width="7%">
+            <col width="7%">
+            <col width="7%">
+            <col width="7%">
+            <col width="7%">
+            <col width="7%">
+            <col width="7%">
+            <col>
+            <col class="leaveReportNoPrint">
+            <col>
+        </colgroup>
+        <tbody>
 			<!-- Signatures and initials -->
 			<tr class="signatures">
 				<td colspan='3'><strong>Duty Master Initial</strong></td>
