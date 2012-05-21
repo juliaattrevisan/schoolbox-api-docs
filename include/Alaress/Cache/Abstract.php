@@ -63,7 +63,7 @@ abstract class Alaress_Cache_Abstract {
 			/* Verbose debugging
 			 */
 			if ($this->getVerbose()) {
-				echo "Writing new cache file.";
+				echo 'Writing new ' . get_class($this) . ' file. ';
 			}
 
 			while (!feof($streamHandle)) {
@@ -78,7 +78,7 @@ abstract class Alaress_Cache_Abstract {
 			/* Verbose debugging
 			 */
 			if ($this->getVerbose()) {
-				echo "Loading from cache.";
+				echo 'Loading from cache. ';
 			}
 		}
 	}
@@ -98,6 +98,10 @@ abstract class Alaress_Cache_Abstract {
 	 * @return bool
 	 */
 	protected function isCacheExpired() {
+		if ($this->getVerbose()) {
+			echo get_class($this) . ' file expires in ' . ((60*60*1) - (time() - filectime($this->getCacheFile()))) . ' seconds. ';
+		}
+
 		if (filectime($this->getCacheFile()) < (time() - $this->getCacheTime())) {
 			return true;
 		}
