@@ -76,7 +76,7 @@ if (is_numeric($this->arg[0])) {
                     $subDate = new Alaress_Date_Format($submission['datestamp'], 'y-m-d j:i:s');
 
                     if($subDate->getUnixTimestamp() > $rtnDate->getUnixTimestamp() && $rtnDate->getUnixTimestamp() > 0) {
-                        $exc = '<span>!</span>';
+                        $exc = '<span></span>';
                     }
                     else {
                         $exc = '';

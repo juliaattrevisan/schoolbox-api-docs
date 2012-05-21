@@ -1,18 +1,5 @@
 <!-- BEGIN custom_head -->
-<style type="text/css">
-    .submission td span {
-        font-weight: bold;
-        margin-left: 5px;
-        font-style: italic;
-        background: #fc0;
-        color: #000;
-        padding: 2px 5px;
-        -moz-border-radius: 4px;
-        -webkit-border-radius: 4px;
-        border-radius: 4px;
-    }
-</style>
-<!-- END custom_head -->
+<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
 <script type="text/javascript">
     $j(function() {
         // Add the dark class only to even rows that are visible (skip over the hidden ones)
@@ -46,11 +33,25 @@
             return false;
         });
 
-        $j('.submission td span').attr('title','Submission received after mark given');
+
+        $j.fn.qtip.defaults.position.corner = {
+            target: 'topLeft',
+            tooltip: 'bottomLeft'
+        }
+        $j.fn.qtip.defaults.style = {
+            tip: 'bottomLeft',
+            name: 'green'
+        }
+
+
+        $j('.submission td span').qtip({
+            content: "Submission received after mark given"
+        });
+
 
     });
 </script>
-
+<!-- END custom_head -->
 <h1>{ASSDESC}</h1>
 <span class="header_option">
     <a href="/submission/downloadAll.php?id={BOX_ID}" class="btn download"><span></span>Download All</a>
