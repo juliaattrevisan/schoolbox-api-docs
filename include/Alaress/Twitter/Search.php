@@ -76,7 +76,7 @@ class Alaress_Twitter_Search {
 			/* Slice the required number of elements out
 			 * Otherwise return all tweets when a limit is not specified (ie blank)
 			 */
-            if (is_numeric($this->getMaxTweets())) {
+            if ($this->getMaxTweets() && is_numeric($this->getMaxTweets()) && is_array($allTweets->results)) {
                 $allResults = array_slice($allTweets->results, 0, $this->getMaxTweets());
 			}
 			else {

@@ -15,8 +15,12 @@
 
 			<input type='text' name='keywords' value='{COMPONENT_CONFIG_KEYWORDS}' />
 
-			Limit:
-			<input type='text' name='maxtweets' value='{COMPONENT_CONFIG_MAXTWEETS}' />
+			Size:
+			<select name="size">
+				<!-- BEGIN size -->
+				<option value="{COMPONENT_CONFIG_SIZE_VALUE}" {COMPONENT_CONFIG_SIZE_SELECTED}>{COMPONENT_CONFIG_SIZE_NAME}</option>
+				<!-- END size -->
+			</select>
 
 			<input type="submit" value="Update" class="submit-btn update" />
 		</form>
