@@ -17,6 +17,10 @@ abstract class Alaress_Cache_Abstract {
 	protected $cacheFile = null;
 	protected $cacheTime = null;
 
+	/* Show plain debugging messages
+	 */
+	private $verbose = false;
+
 	/**
 	 * Load contents from the cache
 	 *
@@ -56,12 +60,26 @@ abstract class Alaress_Cache_Abstract {
 				return false;
 			}
 
+			/* Verbose debugging
+			 */
+			if ($this->getVerbose()) {
+				echo "Writing new cache file.";
+			}
+
 			while (!feof($streamHandle)) {
 				fwrite($cacheHandle, fread($streamHandle, 8192), 8192);
 			}
 
 			fclose($streamHandle);
 			fclose($cacheHandle);
+		}
+		else {
+
+			/* Verbose debugging
+			 */
+			if ($this->getVerbose()) {
+				echo "Loading from cache.";
+			}
 		}
 	}
 
@@ -138,5 +156,14 @@ abstract class Alaress_Cache_Abstract {
 	 */
 	protected function getCacheTime() {
 		return $this->cacheTime;
+	}
+
+	/**
+	 * Get verbose
+	 *
+	 * @return bool
+	 */
+	private function getVerbose() {
+		return $this->verbose;
 	}
 }

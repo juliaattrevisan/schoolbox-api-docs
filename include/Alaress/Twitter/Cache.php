@@ -8,6 +8,18 @@
  * @version	 SVN: $Id$
  */
 class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
+
+	/* Chooze the number of hours to cache the tweets.
+	 * This is converted into seconds via $cacheTime
+	 */
+	protected $cacheHours = 1;
+
+	/* 9 seconds for testing
+	 */
+//	protected $cacheHours = 0.0025;
+
+	/* Derived cache settings, don't need to change these
+	 */
 	protected $cacheFile = '';
 	protected $cacheTime = 0;
 
@@ -25,8 +37,10 @@ class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
 		$this->setUser($user);
 		$this->setKeywords($keywords);
 
+		/* Interpret cache details
+		 */
 		$this->setCacheFile($this->generateCacheFilename());
-		$this->setCacheTime(60*60*24*7);
+		$this->setCacheTime(60*60*$this->getCacheHours());
 
 		/* Set up a cached version of the url
 		 */
@@ -94,5 +108,14 @@ class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
 	 */
 	private function getUser() {
 		return $this->user;
+	}
+
+	/**
+	 * Get cache hours
+	 *
+	 * @return int
+	 */
+	private function getCacheHours() {
+		return $this->cacheHours;
 	}
 }

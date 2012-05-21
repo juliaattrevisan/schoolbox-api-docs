@@ -18,8 +18,7 @@
  * @version	 SVN: $Id$
  */
 class Alaress_Twitter_Search {
-	const SEARCH_PREFIX = 'http://search.twitter.com/search.json?&q=';
-
+	private $searchPrefix = 'http://search.twitter.com/search.json?&q=';
 	private $user = '';
 	private $searchUrl = '';
 	private $keywords = '';
@@ -66,7 +65,7 @@ class Alaress_Twitter_Search {
 		$params = $this->generateParameters();
 
 		if (strlen(trim($params))) {
-			$this->setSearchUrl(self::SEARCH_PREFIX . $params);
+			$this->setSearchUrl($this->getSearchPrefix() . $params);
 
 			/* Instantiate a cache and load from it
 			 */
@@ -74,17 +73,24 @@ class Alaress_Twitter_Search {
 
 			$allTweets = json_decode($cache->load());
 
+			/* Slice the required number of elements out
+			 * Otherwise return all tweets when a limit is not specified (ie blank)
+			 */
+            if (is_numeric($this->getMaxTweets())) {
+                $allResults = array_slice($allTweets->results, 0, $this->getMaxTweets());
+			}
+			else {
+				$allResults = $allTweets->results;
+			}
+
 			/* Iterate and process
 			 */
-            if($this->getMaxTweets())
-                $allTweets = array_slice($allTweets, 0, $this->getMaxTweets());
-
-			for ($i = 0; $i < count($allTweets->results); $i++) {
+			for ($i = 0; $i < count($allResults); $i++) {
 				$processed[] = array(
-					'text' => $allTweets->results[$i]->text,
-					'date' => $allTweets->results[$i]->created_at,
-					'author' => $allTweets->results[$i]->from_user,
-					'avatar' => $allTweets->results[$i]->profile_image_url,
+					'text' => $allResults[$i]->text,
+					'date' => $allResults[$i]->created_at,
+					'author' => $allResults[$i]->from_user,
+					'avatar' => $allResults[$i]->profile_image_url,
 				);
 			}
 		}
@@ -188,5 +194,14 @@ class Alaress_Twitter_Search {
 	 */
 	private function getMaxTweets() {
 		return $this->maxTweets;
+	}
+
+	/**
+	 * Get search prefix
+	 *
+	 * @return string
+	 */
+	private function getSearchPrefix() {
+		return $this->searchPrefix;
 	}
 }
