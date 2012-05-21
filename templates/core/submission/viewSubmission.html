@@ -1,3 +1,18 @@
+<!-- BEGIN custom_head -->
+<style type="text/css">
+    .submission td span {
+        font-weight: bold;
+        margin-left: 5px;
+        font-style: italic;
+        background: #fc0;
+        color: #000;
+        padding: 2px 5px;
+        -moz-border-radius: 4px;
+        -webkit-border-radius: 4px;
+        border-radius: 4px;
+    }
+</style>
+<!-- END custom_head -->
 <script type="text/javascript">
     $j(function() {
         // Add the dark class only to even rows that are visible (skip over the hidden ones)
@@ -8,7 +23,7 @@
 
         $j('tr.submission').each(function() {
             if ($j(this).next().hasClass('expandable') && !$j(this).hasClass('expandable')) {
-                $j(this).addClass('drop-parent').children('td:first-child').prepend('<a href="#" class="submission-dropdown">&#9660;</a>');
+                $j(this).addClass('drop-parent').children('td:first-child').prepend('<a href="#" class="submission-dropdown" title="Show submissions">&#9660;</a>');
             }
         });
 
@@ -30,6 +45,8 @@
 
             return false;
         });
+
+        $j('.submission td span').attr('title','Submission received after mark given');
 
     });
 </script>
@@ -73,7 +90,7 @@
                 <td style="white-space: nowrap;">
     				<a href="/search/user/{OWNER_ID}">{OWNER}</a>
 				</td>
-                <td><a style="color:{COLOUR};" href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}">{SUBMITTED}</td>
+                <td><a style="color:{COLOUR};" href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}">{SUBMITTED}</a>{SUBMITTED_AFTER_MARK}</td>
                 <td><a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}">{MARK}</a></td>
                 <td>{SCORE}</td>
                 <td><!-- BEGIN download_action --><a href="/submission/send.php?id={SUB_ID}">Download</a><!-- END download_action --></td>

@@ -69,8 +69,18 @@ if (is_numeric($this->arg[0])) {
                    $studentSub = array($studentSub[0]);
                 }
 
+                $rtnDate = new Alaress_Date_Format($return[0]['returned'], 'y-m-d j:i:s');
+
                 foreach($studentSub as $submission) {
+
                     $subDate = new Alaress_Date_Format($submission['datestamp'], 'y-m-d j:i:s');
+
+                    if($subDate->getUnixTimestamp() > $rtnDate->getUnixTimestamp() && $rtnDate->getUnixTimestamp() > 0) {
+                        $exc = '<span>!</span>';
+                    }
+                    else {
+                        $exc = '';
+                    }
 
                     $output = array(
                         'OWNER' => $userHandler->formatName($user, '{lastname}, {firstname}'),
@@ -78,6 +88,7 @@ if (is_numeric($this->arg[0])) {
                         'OWNER_ESCAPED' => addslashes($userHandler->formatName($student, '{lastname}, {firstname}')),
                         'SUB_ID' => $submission['id'],
                         'SUBMITTED' => $submission['date'],
+                        'SUBMITTED_AFTER_MARK' => $exc,
 
                         // check if submission date if after due date; if so, mark as late (ignore $studentSub['late'])
                         'COLOUR' => $dueDate->getUnixTimestamp() < $subDate->getUnixTimestamp() ? '#ff0000' : '#000000',
