@@ -68,7 +68,11 @@ class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
 	public function load() {
 		$path = $this->getCacheFile();
 
-		return file_get_contents($path);
+		if (file_exists($path)) {
+			return file_get_contents($path);
+		}
+
+		return false;
 	}
 
 	/* Getters/Setters
