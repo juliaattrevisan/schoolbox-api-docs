@@ -46,6 +46,10 @@ RewriteRule ^assess/export/(\d+)\.xml$ /assess/export/$1
 RewriteCond %{SCRIPT_FILENAME}/ -d
 RewriteRule [^/]$ %{REQUEST_URI}/ [R=301,L]
 
+# required to bypass central authentication for RSS feeds
+RewriteCond %{REQUEST_URI} /homepage/rss/[0-9]*
+RewriteRule ^(.*)$ /homepage/rss.php?page=$1 [L]
+
 RewriteCond %{REQUEST_URI} !/admin/.*
 RewriteCond %{REQUEST_URI} !/dav/.*
 RewriteCond %{REQUEST_URI} !/roundcube/.*
