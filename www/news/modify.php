@@ -107,8 +107,11 @@ else {
 	$this->setTitle('Add News');
 	$this->setTab('news');
 
-	$publishedDate = new Alaress_Date_Format(time(), 'U');
-	$expiryDate = new Alaress_Date_Format(strtotime('+7 days'), 'U');
+    $pubTime = time();
+    $expTime = strtotime(Cfg::get('news_default_expiry'));
+
+    $publishedDate = new Alaress_Date_Format($pubTime, 'U');
+	$expiryDate = new Alaress_Date_Format($expTime >= $pubTime ? $expTime : $pubTime, 'U');
 
 	$output = array(
 		'ACTION' => 'Add',
