@@ -396,8 +396,24 @@ class Eportfolio_Container {
     public function canEdit($userID) {
         $groupHandler = new Group();
 
-	    if ($groupHandler->isSuperuser() || $groupHandler->isStaff() || $groupHandler->isParentOfChild($userID) || ($_SESSION['id'] == $userID)) {
+        // can always edit your own
+        if($_SESSION['id'] == $userID) {
             return true;
+        }
+
+        // different cases based on the owner of the folio
+        if($groupHandler->isStaff($userID)) {
+            // staff: can be edited by you or supers
+            if ($groupHandler->isSuperuser()) {
+                return true;
+            }
+        } elseif($groupHandler->isStudent($userID)) {
+            // student: can be edited by you, your parents, teachers or supers
+            if ($groupHandler->isSuperUser() ||
+                $groupHandler->isStaff() ||
+                $groupHandler->isParentOfChild($userID)) {
+                return true;
+            }
         }
 
         return false;
@@ -412,7 +428,31 @@ class Eportfolio_Container {
     public function canEditPrivateNotes($userID) {
         $groupHandler = new Group();
 
-        if ($groupHandler->isSuperUser() || $groupHandler->isStaff() || $groupHandler->isParentOfChild($userID)) {
+        // different cases based on the owner of the folio
+        if($groupHandler->isStaff($userID)) {
+            // staff: can be edited by you or supers
+            if ($groupHandler->isSuperuser() || ($_SESSION['id'] == $userID)) {
+                return true;
+            }
+        }
+        elseif($groupHandler->isStudent($userID)) {
+            // student: can be edited by your parents, teachers or supers...but not you
+            if ($groupHandler->isSuperUser() ||
+                $groupHandler->isStaff() ||
+                $groupHandler->isParentOfChild($userID)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function canView($userID) {
+        $groupHandler = new Group();
+
+        // supers, staff, your parents and you can view your folio
+        if ($groupHandler->isSuperUser() ||
+            $groupHandler->isStaff() ||
+            $groupHandler->isParentOfChild($userID)) {
             return true;
         }
 

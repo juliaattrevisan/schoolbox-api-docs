@@ -32,6 +32,7 @@ class Eportfolio_Private_Notes extends Eportfolio_Private_Abstract {
 
 		/* Show private notes edit functionality if allowed
 		 */
+
 		if ($this->getCanEditPrivateNotes()) {
 			$this->getPage()->parse('privateNotes_block', 'privateNotes');
 		}
