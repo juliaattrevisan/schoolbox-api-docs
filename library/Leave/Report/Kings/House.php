@@ -89,7 +89,7 @@ class Leave_Report_Kings_House {
 				$data = $this->getData();
 
 				$morningStart = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp(), 'U');
-				$dayStart = new Alaress_Date_Format($morningStart->getUnixTimestamp() + 10*60*60-1, 'U');
+				$dayStart = new Alaress_Date_Format($morningStart->getUnixTimestamp() + 10*60*60, 'U');
 				$nightStart = new Alaress_Date_Format($dayStart->getUnixTimestamp() + 9*60*60, 'U');
 				$nightEnd = new Alaress_Date_Format($nightStart->getUnixTimestamp() + 5*60*60, 'U');
 
