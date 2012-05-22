@@ -181,7 +181,11 @@
 				<td class='leaveReportMeridiem leaveReportRightBorder'>{REQUEST_PERIOD_NIGHT}</td>
 				<!-- END request_period_show_pm -->
 				<!-- END request_period -->
-                <td><a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a></td>
+                <td>
+					<!-- BEGIN request_authorisation -->
+					<a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a><br />
+					<!-- END request_authorisation -->
+				</td>
             </tr>
             <!-- END request -->
             <!-- BEGIN empty_request -->

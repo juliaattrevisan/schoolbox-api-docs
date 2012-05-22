@@ -157,6 +157,9 @@ class Leave_RequestMapper extends Mapper {
      * @return Collection
      */
     public function findAllByHouseId ($houseId) {
+
+		/* This is the original query I used, which is sorted by year, surname and created date
+
         $statement = $this->database->prepare("
             SELECT
             	{$this->getColumnString('lr')},
@@ -169,13 +172,27 @@ class Leave_RequestMapper extends Mapper {
             AND lr.created >= :limit
             ORDER BY u.year, u.lastname, created DESC
         ");
+		*/
 
-        $statement->execute( array(
-            'houseId' => $houseId,
+		$statement = $this->database->prepare("
+			SELECT
+				{$this->getColumnString('lr')},
+				{$this->getUserMapper()->getColumnString('u')},
+				{$this->getUserMapper()->getColumnString('au')}
+			FROM `{$this->table}` lr
+			LEFT JOIN `user` u ON u.id = lr.user_id
+			LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
+			WHERE u.residential_house_id = :houseId
+			AND lr.created >= :limit
+			ORDER BY substr(lr.start, 1, 10), LENGTH(u.year), u.year, u.lastname
+		");
+
+		$statement->execute(array(
+			'houseId' => $houseId,
 			'limit' => $this->getLimit(),
-        ) );
+		));
 
-        $requestList = $statement->fetchAll();
+		$requestList = $statement->fetchAll();
 
         $requestCollection = $this->hydrateList($requestList);
 
@@ -208,7 +225,7 @@ class Leave_RequestMapper extends Mapper {
 			WHERE u.residential_house_id = :houseId
 			AND lr.status = :status
 			AND lr.created >= :limit
-			ORDER BY u.year, u.lastname, lr.created DESC
+			ORDER BY substr(lr.start, 1, 10), LENGTH(u.year), u.year, u.lastname
 		");
 
 		$statement->execute(array(
@@ -290,6 +307,9 @@ class Leave_RequestMapper extends Mapper {
      * @return Collection
      */
     public function getHouseReport ($houseId, $start, $finish) {
+
+		/* The original query I used. LENGTH(u.year) simulates a natural sort
+
         $statement = $this->database->prepare("
             SELECT {$this->getColumnString('lr')},
                 {$this->getUserMapper()->getColumnString('u')},
@@ -302,8 +322,23 @@ class Leave_RequestMapper extends Mapper {
             LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
             WHERE u.residential_house_id = :houseId
             ORDER BY LENGTH(u.year), u.year, u.lastname
-              /*AND g.type = 'student'*/
         ");
+        */
+
+		$statement = $this->database->prepare("
+			SELECT
+				{$this->getColumnString('lr')},
+				{$this->getUserMapper()->getColumnString('u')},
+				{$this->getUserMapper()->getColumnString('au')}
+			FROM `user` u
+			LEFT JOIN groups g ON g.id = u.group_id
+			LEFT JOIN `{$this->table}` lr ON lr.user_id = u.id
+			AND lr.start < :finish
+			AND lr.finish > :start
+			LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
+			WHERE u.residential_house_id = :houseId
+			ORDER BY substr(lr.start, 1, 10), LENGTH(u.year), u.year, u.lastname
+		");
 
         $statement->execute( array(
             ':houseId' => $houseId,

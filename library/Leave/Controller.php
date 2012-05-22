@@ -808,6 +808,7 @@ class Leave_Controller extends Controller {
         $this->getPage()->setBlock('row', 'request', 'request_block');
 		$this->getPage()->setBlock('row', 'empty_request', 'empty_request_block');
 		$this->getPage()->setBlock('request', 'request_period', 'request_period_block');
+		$this->getPage()->setBlock('request', 'request_authorisation', 'request_authorisation_block');
 
 		$this->getPage()->setBlock('request_period', 'request_period_show_am', 'request_period_show_am_block');
 		$this->getPage()->setBlock('request_period', 'request_period_show_day', 'request_period_show_day_block');

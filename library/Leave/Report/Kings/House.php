@@ -65,13 +65,10 @@ class Leave_Report_Kings_House {
 				$combined[$key]['request_description'][$request->getId()] = $request->getDescription();
 
 				if ($request->isPending()) {
-					$combined[$key]['request_authorisation_user_id'][$request->getId()] = '';
-					$combined[$key]['request_authorisation_user_name'][$request->getId()] = '';
 					$combined[$key]['row_css_class'][] = 'leave-pending';
 				}
 				else {
-					$combined[$key]['request_authorisation_user_id'][$request->getId()] = $request->getAuthorisationUser()->getId();
-					$combined[$key]['request_authorisation_user_name'][$request->getId()] = $request->getAuthorisationUser()->getName();
+					$combined[$key]['request_authorisation_user_id'][$request->getAuthorisationUser()->getId()] = trim($request->getAuthorisationUser()->getName());
 					$combined[$key]['row_css_class'][] = '';
 				}
 
@@ -214,11 +211,24 @@ class Leave_Report_Kings_House {
 					'REQUEST_HOST_TYPE' => implode('<hr />', $currentPerson['request_host_type']),
 					'REQUEST_DESCRIPTION' => implode('<hr />', $currentPerson['request_description']),
 
-					'REQUEST_AUTHORISATION_USER_ID' => implode('<hr />', $currentPerson['request_authorisation_user_id']),
-					'REQUEST_AUTHORISATION_USER_NAME' => implode('<hr />', $currentPerson['request_authorisation_user_name']),
-
 					'CLASS' => implode(' ', $currentPerson['row_css_class']),
 				));
+
+				/* Render out each authorisation user -_-
+				 */
+				if (is_array($currentPerson['request_authorisation_user_id']) && count($currentPerson['request_authorisation_user_id'])) {
+					foreach($currentPerson['request_authorisation_user_id'] as $id => $name) {
+						$this->getPage()->setVar(array(
+							'REQUEST_AUTHORISATION_USER_ID' => $id,
+							'REQUEST_AUTHORISATION_USER_NAME' => $name,
+						));
+
+						$this->getPage()->parse('request_authorisation_block', 'request_authorisation', true);
+					}
+				}
+				else {
+					$this->getPage()->setVar('request_authorisation_block', '');
+				}
 
 				/* Used to hide the first two blocks
 				 */
@@ -266,6 +276,7 @@ class Leave_Report_Kings_House {
 				/* Clear children after parsing out the parent
 				 */
 				$this->getPage()->setVar('request_period_block', '');
+				$this->getPage()->setVar('request_authorisation_block', '');
 			}
 		}
 	}
