@@ -53,7 +53,7 @@ class Synchronise_Denbigh_Kings_Student extends Synchronise_Denbigh_Kings_Abstra
         $newUser['house']               = $this->getHouse($currentUser['house']);
         $newUser['residential_house_id']    = $this->getResidentialHouse($currentUser['cateringHouse']);
         $newUser['alt_email']           = strtolower($currentUser['username']) . '@student.kings.edu.au';
-        $newUser['local_email']         = 1;
+        $newUser['local_email']         = 0;
         $newUser['su']                  = false;
         $newUser['defaultCampus']       = $this->getCampusFromYearLevel($currentUser['academicYear']);
         $newUser['eportfolio_enabled']  = self::EPORTFOLIO_STUDENT_ENABLED ? 1 : 0;

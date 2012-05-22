@@ -265,45 +265,49 @@ if (is_numeric($this->arg[0])) {
 
             if(is_array($subjectList)) {
                 foreach($subjectList as $subject) {
-                    /* Fetch teacher names */
-                    $teacherList = $synClass->getTeacherName($subject['code']);
-                    $teacherOutput = array();
-                    if (is_array($teacherList)) {
-                        foreach ($teacherList as $teacherSynID) {
-                            $teacher = $userHandler->getBySynergyAndGroup($teacherSynID, $groupHandler->getStaffGroupTypeIds());
-                            $teacherName = $userHandler->formatName($teacher);
 
-                            $emailObj = new Email();
-                            $emailAddress = $emailObj->formatEmailFromArray($teacher);
+                    if($groupHandler->getPermission($category['id']) >= READ_ACCESS || Cfg::get('site_name') != 'stmichaels') {
 
-                            if($emailAddress) {
-                                $teacherOutput[] = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$teacherName</a>";
+                        /* Fetch teacher names */
+                        $teacherList = $synClass->getTeacherName($subject['code']);
+                        $teacherOutput = array();
+                        if (is_array($teacherList)) {
+                            foreach ($teacherList as $teacherSynID) {
+                                $teacher = $userHandler->getBySynergyAndGroup($teacherSynID, $groupHandler->getStaffGroupTypeIds());
+                                $teacherName = $userHandler->formatName($teacher);
+
+                                $emailObj = new Email();
+                                $emailAddress = $emailObj->formatEmailFromArray($teacher);
+
+                                if($emailAddress) {
+                                    $teacherOutput[] = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$teacherName</a>";
+                                }
+                                else {
+                                    $teacherOutput[] = $teacherName;
+                                }
+                                $emailAll .= $emailAddress.",";
                             }
-                            else {
-                                $teacherOutput[] = $teacherName;
-                            }
-                            $emailAll .= $emailAddress.",";
                         }
+
+                        $category = $catHandler->getByCode($subject['code']);
+
+                        $output = array('SUBJECT_NAME' => is_array($category) && $groupHandler->getPermission($category['id']) >= READ_ACCESS ?
+                                                          '<a href="/homepage/' . $subject['code'] . '">' .
+                                                          Scrub::Text($category['name']) .
+                                                          '</a>':Scrub::Text($subject['name']),
+                                        'SUBJECT_TEACHER_NAME'=> implode(', ', $teacherOutput),
+                                        'SUBJECT_TEACHER_ID' => $teacherList[0],
+                                        );
+
+                        $this->setVar($output);
+                        $this->parse('subject_item_block','subject_item',true);
+
+                        if($i%3 == 0) {
+                            $this->parse('subject_row_block','subject_row',true);
+                            $this->setVar('subject_item_block','');
+                        }
+                        $i++;
                     }
-
-                    $category = $catHandler->getByCode($subject['code']);
-
-                    $output = array('SUBJECT_NAME' => is_array($category) && $groupHandler->getPermission($category['id']) >= READ_ACCESS ?
-                                                      '<a href="/homepage/' . $subject['code'] . '">' .
-                                                      Scrub::Text($category['name']) .
-                                                      '</a>':Scrub::Text($subject['name']),
-                                    'SUBJECT_TEACHER_NAME'=> implode(', ', $teacherOutput),
-                                    'SUBJECT_TEACHER_ID' => $teacherList[0],
-                                    );
-
-                    $this->setVar($output);
-                    $this->parse('subject_item_block','subject_item',true);
-
-                    if($i%3 == 0) {
-                        $this->parse('subject_row_block','subject_row',true);
-                        $this->setVar('subject_item_block','');
-                    }
-                    $i++;
                 }
 
                 if(($i-1) % 3 != 0) {
@@ -326,6 +330,7 @@ if (is_numeric($this->arg[0])) {
                 }
 
                 $this->parse('subject_block','subject');
+
             }
 
 			$studentContactList = $synUserHandler->getStudentContactList($user['synergy_id']);

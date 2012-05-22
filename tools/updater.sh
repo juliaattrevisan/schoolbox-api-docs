@@ -323,6 +323,7 @@ echo -e "No errors found.\n";
 fi;
 }
 
+
 checkOS;
 dependancyChecks;
 loadConfig;
