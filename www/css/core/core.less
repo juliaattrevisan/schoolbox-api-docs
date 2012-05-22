@@ -5764,11 +5764,54 @@ table.subjectList {
     width:0px;
 }
 
+/* -----------------------------------------
+   Tiny Tables
+----------------------------------------- */
+
+table.tiny-tables{
+    td, th {
+        position: relative; white-space: nowrap; overflow: hidden;
+    }
+    th:first-child,
+    td:first-child{width:30%}
+}
+
+.tiny-tables-wrap  {
+    position: relative; margin-bottom: 20px; overflow: hidden;
+    div.tiny-tables-scroll{
+        overflow: scroll; overflow-y: hidden;  margin-left: 30%;
+        -webkit-overflow-scrolling:touch;
+    }
+}
+
+.tiny-tables-pinned {
+    -webkit-overflow-scrolling:touch;
+    position: absolute; left: 0; top: 0; background: #fff; width: 30%; overflow: hidden; overflow-x: scroll; border-right: 1px solid #ccc;
+    table{
+        border-right: none; border-left: none; width: 100%;
+        th, td{
+            white-space: nowrap;
+        }
+        th{
+            text-align: left;
+        }
+        td{
+            &:last-child{
+                border-bottom: 0;
+            }
+        }
+    }
+}
+
+.tiny-tables-scroll{
+    th:first-child,
+    td:first-child{
+        display:none;
+    }
+}
 
 /*.mark-sheet.assessments .active-assessment{width:471px !important;}*/
-
 .mark-sheet.assessments .active-assessment .row-fix{width:360px !important;}
-
 
 .mark-sheet.assessments span {
     position: relative;
