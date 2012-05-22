@@ -44,7 +44,7 @@ class Leave_Report_Kings_House {
 				/* Text color if request is still pending
 				 */
 				if ($request->isPending()) {
-					$pendingTextClass = 'grey';
+					$pendingTextClass = 'leave-pending';
 				}
 				else {
 					$pendingTextClass = '';
@@ -59,7 +59,7 @@ class Leave_Report_Kings_House {
 				$combined[$key]['user_year'] = $request->getUser()->getYear();
 				$combined[$key]['user_boarding_status'] = $request->getUser()->getAbbreviatedBoardingStatus();
 
-				$combined[$key]['request_id'][$request->getId()] = $request->getID();
+				$combined[$key]['request_id'][$request->getId()] = $request->getId();
 				$combined[$key]['request_status'][$request->getId()] = $request->getStatus(true);
 				$combined[$key]['request_host_type'][$request->getId()] = $request->getHostType(true);
 				$combined[$key]['request_description'][$request->getId()] = $request->getDescription();
@@ -91,7 +91,7 @@ class Leave_Report_Kings_House {
 				$morningStart = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp(), 'U');
 				$dayStart = new Alaress_Date_Format($morningStart->getUnixTimestamp() + 10*60*60-1, 'U');
 				$nightStart = new Alaress_Date_Format($dayStart->getUnixTimestamp() + 9*60*60, 'U');
-				$nightEnd = new Alaress_Date_Format($nightStart->getUnixTimestamp() + 3*60*60, 'U');
+				$nightEnd = new Alaress_Date_Format($nightStart->getUnixTimestamp() + 5*60*60, 'U');
 
 				$showStartTime = true;
 
@@ -105,22 +105,32 @@ class Leave_Report_Kings_House {
 						 */
 						if ($showStartTime) {
 
-							/* Specifically check for this day, to account for multi-week leave
+							/* If $showStartTime == true and he's not on leave in the next period
+							 * then he left and returned in the same period
 							 */
-							if ($requestDateStart->getDatabaseDate() == $morningStart->getDatabaseDate()) {
-								$requestPeriodMorning = "<span class='$pendingTextClass'>{$requestDateStart->getTimeOnly()}</span>";
+							if (!$request->getOccupancy($dayStart, $nightStart)) {
+								$requestPeriodMorning = "<span class='$pendingTextClass'>{$requestDateStart->getTimeOnly()}</span><br />";
+								$requestPeriodMorning .= "<span class='$pendingTextClass'>{$requestDateFinish->getTimeOnly()}</span><br />";
 							}
 							else {
-								$requestPeriodMorning = "<span class='$pendingTextClass'>L</span>";
+
+								/* Specifically check for this day, to account for multi-week leave
+								 */
+								if ($requestDateStart->getDatabaseDate() == $morningStart->getDatabaseDate()) {
+									$requestPeriodMorning = "<span class='$pendingTextClass'>{$requestDateStart->getTimeOnly()}</span><br />";
+								}
+								else {
+									$requestPeriodMorning = "<span class='$pendingTextClass'>L</span><br />";
+								}
 							}
 
 							$showStartTime = false;
 						}
 						else if (!$showStartTime && !$request->getOccupancy($dayStart, $nightStart)) {
-							$requestPeriodMorning = "<span class='$pendingTextClass'>{$requestDateFinish->getTimeOnly()}</span>";
+							$requestPeriodMorning = "<span class='$pendingTextClass'>{$requestDateFinish->getTimeOnly()}</span><br />";
 						}
 						else {
-							$requestPeriodMorning = "<span class='$pendingTextClass'>L</span>";
+							$requestPeriodMorning = "<span class='$pendingTextClass'>L</span><br />";
 						}
 					}
 
@@ -128,20 +138,26 @@ class Leave_Report_Kings_House {
 					 */
 					if ($request->getOccupancy($dayStart, $nightStart)) {
 						if ($showStartTime) {
-							if ($requestDateStart->getDatabaseDate() == $dayStart->getDatabaseDate()) {
-								$requestPeriodDay = "<span class='$pendingTextClass'>{$requestDateStart->getTimeOnly()}</span>";
+							if (!$request->getOccupancy($nightStart, $nightEnd)) {
+								$requestPeriodDay = "<span class='$pendingTextClass'>{$requestDateStart->getTimeOnly()}</span><br />";
+								$requestPeriodDay .= "<span class='$pendingTextClass'>{$requestDateFinish->getTimeOnly()}</span><br />";
 							}
 							else {
-								$requestPeriodDay = "<span class='$pendingTextClass'>L</span>";
+								if ($requestDateStart->getDatabaseDate() == $dayStart->getDatabaseDate()) {
+									$requestPeriodDay = "<span class='$pendingTextClass'>{$requestDateStart->getTimeOnly()}</span><br />";
+								}
+								else {
+									$requestPeriodDay = "<span class='$pendingTextClass'>L</span><br />";
+								}
 							}
 
 							$showStartTime = false;
 						}
 						else if (!$showStartTime && !$request->getOccupancy($nightStart, $nightEnd)) {
-							$requestPeriodDay = "<span class='$pendingTextClass'>{$requestDateFinish->getTimeOnly()}</span>";
+							$requestPeriodDay = "<span class='$pendingTextClass'>{$requestDateFinish->getTimeOnly()}</span><br />";
 						}
 						else {
-							$requestPeriodDay = "<span class='$pendingTextClass'>L</span>";
+							$requestPeriodDay = "<span class='$pendingTextClass'>L</span><br />";
 						}
 					}
 
@@ -155,20 +171,26 @@ class Leave_Report_Kings_House {
 						$nextMorning->addDays(1);
 
 						if ($showStartTime) {
-							if ($requestDateStart->getDatabaseDate() == $nightStart->getDatabaseDate()) {
-								$requestPeriodNight = "<span class='$pendingTextClass'>{$requestDateStart->getTimeOnly()}</span>";
+							if (!$request->getOccupancy($nightEnd, $nextMorning)) {
+								$requestPeriodNight = "<span class='$pendingTextClass'>{$requestDateStart->getTimeOnly()}</span><br />";
+								$requestPeriodNight .= "<span class='$pendingTextClass'>{$requestDateFinish->getTimeOnly()}</span><br />";
 							}
 							else {
-								$requestPeriodNight = "<span class='$pendingTextClass'>L</span>";
+								if ($requestDateStart->getDatabaseDate() == $nightStart->getDatabaseDate()) {
+									$requestPeriodNight = "<span class='$pendingTextClass'>{$requestDateStart->getTimeOnly()}</span><br />";
+								}
+								else {
+									$requestPeriodNight = "<span class='$pendingTextClass'>L</span><br />";
+								}
 							}
 
 							$showStartTime = false;
 						}
 						else if (!$showStartTime && !$request->getOccupancy($nightEnd, $nextMorning)) {
-							$requestPeriodNight = "<span class='$pendingTextClass'>{$requestDateFinish->getTimeOnly()}</span>";
+							$requestPeriodNight = "<span class='$pendingTextClass'>{$requestDateFinish->getTimeOnly()}</span><br />";
 						}
 						else {
-							$requestPeriodNight = "<span class='$pendingTextClass'>L</span>";
+							$requestPeriodNight = "<span class='$pendingTextClass'>L</span><br />";
 						}
 					}
 

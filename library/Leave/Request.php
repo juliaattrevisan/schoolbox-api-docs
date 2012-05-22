@@ -412,9 +412,8 @@ class Leave_Request extends Model {
 		if ($this->getStart()->getUnixTimestamp() < $datetimeFinish->getUnixTimestamp() && $this->getFinish()->getUnixTimestamp() > $datetimeStart->getUnixTimestamp()) {
 			return true;
 		}
-		else {
-			return false;
-		}
+
+		return false;
 	}
 
 	/**
