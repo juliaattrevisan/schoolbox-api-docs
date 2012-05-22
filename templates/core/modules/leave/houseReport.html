@@ -21,10 +21,7 @@
                  5: { sorter: false},
                  6: { sorter: false},
                 10: { sorter: false},
-                11: { sorter: false},
-                19: { sorter: false},
-                20: { sorter: false},
-                21: { sorter: false}
+                11: { sorter: false}
             }
         });
 
@@ -112,11 +109,9 @@
 
     <table id="requestList" class="ruler sortable-table" width="100%" style="table-layout:fixed;">
         <colgroup>
-            <col width="13%">
-			<col width="7%">
-            <col width="4%">
-        <!--<col width="0%">
-            <col width="0%">-->
+            <col width="20%">
+			<col width="4%">
+            <col width="8%">
             <col width="7%">
             <col width="7%">
             <col width="7%">
@@ -124,9 +119,7 @@
             <col width="7%">
             <col width="7%">
             <col width="7%">
-            <col>
-            <col class="leaveReportNoPrint">
-            <col>
+            <col width="20%">
         </colgroup>
         <thead>
             <tr>
@@ -134,8 +127,6 @@
                 <!-- BEGIN report_header -->
                 <th colspan="3" class="leaveReportHeaderDate leaveReportLeftBorder leaveReportRightBorder">{REPORT_HEADER_DATE}</th>
                 <!-- END report_header -->
-                <th></th>
-                <th class="leaveReportNoPrint"></th>
                 <th></th>
             </tr>
             <tr>
@@ -162,8 +153,6 @@
 				<!-- END report_header_subtitle_show_pm -->
 
 				<!-- END report_header_subtitle -->
-                <th>Host</th>
-				<th class="leaveReportNoPrint">Leave Activity</th>
                 <th>Approved By</th>
             </tr>
         </thead>
@@ -192,8 +181,6 @@
 				<td class='leaveReportMeridiem leaveReportRightBorder'>{REQUEST_PERIOD_NIGHT}</td>
 				<!-- END request_period_show_pm -->
 				<!-- END request_period -->
-                <td>{REQUEST_HOST_TYPE}</td>
-				<td class="leaveReportNoPrint">{REQUEST_DESCRIPTION}</td>
                 <td><a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a></td>
             </tr>
             <!-- END request -->
@@ -203,8 +190,7 @@
                 <td>{USER_YEAR}</td>
                 <td></td>
 				<td colspan="2" class="leaveReportHide"></td>
-                <td colspan="8"></td>
-                <td class="leaveReportNoPrint"></td>
+                <td colspan="7"></td>
                 <td></td>
             </tr>
             <!-- END empty_request -->
@@ -214,11 +200,9 @@
 
     <table class="ruler signatures" width="100%" style="table-layout:fixed;">
         <colgroup>
-            <col width="13%">
-            <col width="7%">
+            <col width="20%">
             <col width="4%">
-<!--        <col width="0%">
-            <col width="0%">-->
+            <col width="8%">
             <col width="7%">
             <col width="7%">
             <col width="7%">
@@ -226,8 +210,7 @@
             <col width="7%">
             <col width="7%">
             <col width="7%">
-            <col>
-            <col class="leaveReportNoPrint">
+            <col width="20%">
             <col>
         </colgroup>
         <tbody>
@@ -242,16 +225,13 @@
 				<td></td>
 				<td></td>
 				<td></td>
-				<td></td>
 				<td class="no-right-border"></td>
-				<td class="leaveReportNoPrint"></td>
 				<td class="no-left-border"></td>
 			</tr>
 			<tr class="signatures">
 				<td colspan='3'><strong>Housemaster Signature</strong><br><br></td>
                 <td colspan="2" class="leaveReportHide"></td>
-				<td class="no-right-border" colspan='8'></td>
-				<td class='leaveReportNoPrint'></td>
+				<td class="no-right-border" colspan='7'></td>
 				<td class="no-left-border"></td>
 			</tr>
         </tbody>
