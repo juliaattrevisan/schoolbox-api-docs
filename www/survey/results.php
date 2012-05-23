@@ -24,6 +24,10 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
+if (!$assessHandler->isOwner($this->arg[0])) {
+    error(125);
+}
+
 $surveyExporter = new Survey_Export_Graph($assess,  new Survey_Factory(), new Survey_Section(), new Survey_Attempt(), new Survey_Question());
 $sectionValues = $surveyExporter->getSectionValues();
 
