@@ -340,13 +340,13 @@ class Leave_RequestMapper extends Mapper {
 			ORDER BY substr(lr.start, 1, 10), LENGTH(u.year), u.year, u.lastname
 		");
 
-        $statement->execute( array(
-            ':houseId' => $houseId,
-            ':start' => $start,
-            ':finish' => $finish,
-        ) );
+		$statement->execute(array(
+			':houseId' => $houseId,
+			':start' => $start,
+			':finish' => $finish,
+		));
 
-        $requestList = $statement->fetchAll();
+		$requestList = $statement->fetchAll();
 
         $requestCollection = $this->hydrateList($requestList);
 
