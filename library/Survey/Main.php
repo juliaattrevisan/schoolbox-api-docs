@@ -43,6 +43,24 @@ class Survey_Main extends Evaluation_Main {
     const UNLIMITED_DURATION = -1;
 
 	/**
+     * Determines whether the current user can take a test by checking which
+     * categories the current user belongs to.
+	 *
+	 * @param  $assess_id
+	 * @return bool
+	 */
+    public function canDoAssessment($assess_id) {
+        $groupHandler = new Group();
+        $assess = $this->getByID($assess_id);
+
+		if ($groupHandler->getPermission($assess['category_id']) >= READ_ACCESS) {
+			return true;
+		}
+
+        return false;
+    }
+
+	/**
 	 * A list of assessments available for a category
 	 *
 	 * @param  $category_id
