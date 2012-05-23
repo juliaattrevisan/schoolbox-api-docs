@@ -154,6 +154,7 @@
                         <th>Longitude</th>
 						<th>Mel. Ref</th>
 						<th>Delete</th>
+                        <th>Map</th>
 					</tr>
 					<!-- BEGIN modvenues_list -->
 					<tr>
@@ -167,6 +168,7 @@
 						<td><input size="20" type="text" name="melref[]" value="{MELREF}" />
 						</td>
 						<td><a href="venue.php?id={VID}&amp;flag=3" onclick="return(confirm('Delete this venue?'))">Delete</a> </td>
+                        <td><a href="http://maps.google.com.au/maps?q={LAT},{LONG}" target="_blank">View Map</a> </td>
 					</tr>
 					<!-- END modvenues_list -->
 					<tr>

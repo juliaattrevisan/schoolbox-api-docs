@@ -23,7 +23,7 @@ class venue
 
 	function getVenues()
 	{
-		$query = "SELECT vid, venue, melref, lat, long
+		$query = "SELECT vid, venue, melref, `lat`, `long`
 			  FROM venue
 			  ORDER BY venue
 		";		
@@ -47,7 +47,7 @@ class venue
 			$this->mySQLdb->dbDoQuery($query);
 			if ($this->mySQLdb->dbCountRows() == 0)
 			{
-				$query = "INSERT INTO venue (venue, melref,campus,lat, long)
+				$query = "INSERT INTO venue (venue, melref,campus,`lat`, `long`)
 					  VALUES ('".$venue."','".$melref."','".$this->campus."', '$lat', '$long')
 				";
 				if($this->mySQLdb->dbDoQuery($query))
@@ -69,9 +69,9 @@ class venue
 		if($this->exists)
 		{
 			$query = "UPDATE venue SET venue = '".$venue."', 
-				  		   melref = '".$melref."'
-				  		   lat = '".$lat."'
-				  		   long = '".$long."'
+				  		   melref = '".$melref."',
+				  		   `lat` = '".$lat."',
+				  		   `long` = '".$long."'
 				  WHERE vid = '".$venid."'
 			";
 			$this->mySQLdb->dbDoQuery($query);

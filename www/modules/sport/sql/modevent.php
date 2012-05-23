@@ -37,7 +37,7 @@ class event
 		}
 		$query = "SELECT e.eid, e.tid, e.vid, e.oid, e.win, e.result,
 				 t.section, t.sid , t.teamorder,
-				 v.venue, v.melref, v.lat, v.long
+				 v.venue, v.melref, v.lat, v.long,
 				 o.opp,
 				 st1.pos as pos1, st1.staffid as staffid1, 
 			  	 s1.lastname as lname1, s1.firstname as fname1, s1.phone as phone1, s1.email as email1, 

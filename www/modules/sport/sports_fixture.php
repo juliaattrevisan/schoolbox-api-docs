@@ -87,10 +87,14 @@ class sports_fixture
 							if ($isevents)
                        						$this->t_body->parse("sport_listing", "sport_list", true);
 						}
+
        						$this->t_body->set_var("SPORTNAME", $sport['name']." ".$date);
                                			$this->t_body->set_var("TEAM", $event['section']); 
-                               			$this->t_body->set_var("OPP", $event['opp']); 
-                               			$this->t_body->set_var("VENUE", $event['venue']);
+                               			$this->t_body->set_var("OPP", $event['opp']);
+                                        if($event['lat'] && $event['long'])
+                                            $this->t_body->set_var("VENUE", '<a href="http://maps.google.com.au/maps?q='.$event['lat'].','.$event['long'].'" target="_blank">'.$event['venue'].'</a>');
+                               			else
+                                            $this->t_body->set_var("VENUE", $event['venue']);
                                			$this->t_body->set_var("MELREF", $event['melref']);
                                         $this->t_body->set_var("LAT", $event['lat']);
                                         $this->t_body->set_var("LONG", $event['long']);
