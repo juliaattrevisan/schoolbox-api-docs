@@ -3,7 +3,7 @@
 //showSeason object..gets all info required to populate template fields in season.htm.
 
 require_once("../../include/session.php");
-//require_once("../../include/permission.php");
+require_once("../../include/permission.php");
 require_once("../../include/include.php");
 require_once("../../include/html-time.php");
 require_once("sql/modseason.php");

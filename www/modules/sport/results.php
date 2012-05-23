@@ -4,7 +4,7 @@
 
 require_once("../../include/include.php");
 require_once("../../include/session.php");
-//require_once("../../include/permission.php");
+require_once("../../include/permission.php");
 require_once("../../include/html-time.php");
 require_once("sql/modsport.php");
 require_once("sql/modopp.php");

@@ -2,7 +2,7 @@
 
 include_once("../../include/include.php");
 include_once("../../include/session.php");
-//include_once("../../include/permission.php");
+include_once("../../include/permission.php");
 include_once("sql/modevent.php");
 include_once("sql/modsport.php");
 
