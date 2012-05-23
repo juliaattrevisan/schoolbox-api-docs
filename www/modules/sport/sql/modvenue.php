@@ -23,7 +23,7 @@ class venue
 
 	function getVenues()
 	{
-		$query = "SELECT vid, venue, melref
+		$query = "SELECT vid, venue, melref, lat, long
 			  FROM venue
 			  ORDER BY venue
 		";		
@@ -37,7 +37,7 @@ class venue
 		return $listOfVenues;
 	}
 	
-	function addVenue($venue, $melref)
+	function addVenue($venue, $melref, $lat, $long)
 	{
 		$venue = addslashes($venue);
 		$melref = addslashes($melref);
@@ -47,8 +47,8 @@ class venue
 			$this->mySQLdb->dbDoQuery($query);
 			if ($this->mySQLdb->dbCountRows() == 0)
 			{
-				$query = "INSERT INTO venue (venue, melref,campus) 
-					  VALUES ('".$venue."','".$melref."','".$this->campus."')
+				$query = "INSERT INTO venue (venue, melref,campus,lat, long)
+					  VALUES ('".$venue."','".$melref."','".$this->campus."', '$lat', '$long')
 				";
 				if($this->mySQLdb->dbDoQuery($query))
 					return 1;
@@ -62,7 +62,7 @@ class venue
 			error(38);
 	}
 	
-	function modifyVenues($venid, $venue, $melref )
+	function modifyVenues($venid, $venue, $melref, $lat, $long )
   	{
 		$venue = addslashes($venue);
 		$melref = addslashes($melref);
@@ -70,6 +70,8 @@ class venue
 		{
 			$query = "UPDATE venue SET venue = '".$venue."', 
 				  		   melref = '".$melref."'
+				  		   lat = '".$lat."'
+				  		   long = '".$long."'
 				  WHERE vid = '".$venid."'
 			";
 			$this->mySQLdb->dbDoQuery($query);

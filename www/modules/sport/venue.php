@@ -23,7 +23,7 @@ class initVenue
                                 if (isset($_POST['venue']) && $_POST['venue'])
                                 {
                                         $myVenue = new venue();
-                                        if ($myVenue->addVenue($_POST['venue'], $_POST['melref']))
+                                        if ($myVenue->addVenue($_POST['venue'], $_POST['melref'], $_POST['lat'], $_POST['long']))
                                                 $this->displayAddVenue();
                                         else
                                                 print "could not add venue";
@@ -39,11 +39,13 @@ class initVenue
                                         $vid = $_POST['vid'];
                                         $venue = $_POST['venue'];
                                         $melref = $_POST['melref'];
+                                        $lat = $_POST['lat'];
+                                        $long = $_POST['long'];
                                         $num = 0;
                                         foreach ($vid as $venid)
                                         {
                                                 $myVenue = new venue($venid);
-                                                $myVenue->modifyVenues($venid, $venue[$num], $melref[$num]);
+                                                $myVenue->modifyVenues($venid, $venue[$num], $melref[$num], $lat[$num], $long[$num]);
                                                 $num++;
                                         }
                                         $this->displayVenues();
@@ -109,6 +111,9 @@ class initVenue
 				$this->t_body->set_var("VID", $venue['vid']);
 				$this->t_body->set_var("VENUE", $venue['venue']);
 				$this->t_body->set_var("MELREF", $venue['melref']);
+                $this->t_body->set_var("LAT", $venue['lat']);
+                $this->t_body->set_var("LONG", $venue['long']);
+
 				$this->t_body->parse("modvenues_listing", "modvenues_list", true);
 			}
 		}

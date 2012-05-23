@@ -92,6 +92,8 @@ class sports_fixture
                                			$this->t_body->set_var("OPP", $event['opp']); 
                                			$this->t_body->set_var("VENUE", $event['venue']);
                                			$this->t_body->set_var("MELREF", $event['melref']);
+                                        $this->t_body->set_var("LAT", $event['lat']);
+                                        $this->t_body->set_var("LONG", $event['long']);
 						$field1 = $event['fname1']." ".$event['lname1'];
 						$this->t_body->set_var("NAME0", $field1); 
 						$this->t_body->set_var("PHONE0", $event['phone1']); 
