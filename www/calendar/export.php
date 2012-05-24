@@ -54,21 +54,21 @@ $v->setComponent( $t );
 $year = date('Y');
 
 for($x=1; $x < 364; $x++) {
-	
-	$date = mktime(5,0,0,0,$x,$year);
+
+	$date = mktime(5,0,0,1,$x,$year);
  	$month = date('n', $date);
 	$day = date('j', $date);
- 
+
 	$events = $cal->getDayEvents($date);
-	
+
 	if(is_array($events)) {
 		foreach($events as $event) {
-			
-			
-			$e = new vevent();                             
-			$e->setProperty('categories', 'SCHOOL' );  
-			
-			                 
+
+
+			$e = new vevent();
+			$e->setProperty('categories', 'SCHOOL' );
+
+
 			if($event['startTimestamp']) {
 				$startHour = floor($event['startTimestamp'] / 60 / 60);
 				$startMinute = ($event['startTimestamp'] /60) % 60;
@@ -83,14 +83,14 @@ for($x=1; $x < 364; $x++) {
                     $durMinute = 0;
                 }
 
-                $e->setProperty('dtstart', $year, $month, $day, $startHour, $startMinute,array('VALUE'=>'DATE-TIME') );
+                $e->setProperty('dtstart', $event['year'], $month, $day, $startHour, $startMinute,array('VALUE'=>'DATE-TIME') );
 				$e->setProperty('duration', 0, 0, $durHour, $durMinute );
-			}   
+			}
 			else
-				$e->setProperty('dtstart', $year, $month, $day,FALSE,FALSE,array('VALUE'=>'DATE'));
-			
-			$e->setProperty('summary', $event['note'] ); 
-			$v->addComponent( $e );                        
+				$e->setProperty('dtstart', $event['year'], $month, $day,FALSE,FALSE,array('VALUE'=>'DATE'));
+
+			$e->setProperty('summary', $event['note'] );
+			$v->addComponent( $e );
 		}
 	}
 }

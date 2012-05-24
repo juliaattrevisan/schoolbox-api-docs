@@ -544,6 +544,7 @@ class Calendar extends DeprecatedModel {
 				TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTime,
 				TIME_TO_SEC(startTime) as startTimestamp,
 				TIME_TO_SEC(endTime) as endTimestamp,
+				SUBSTR(event.date, 1, 4) AS year,
 				type, note, access, sid, location, detail, attendance,
 				user.id as uid, title, firstname, lastname,
 				eventType, eventColour,
