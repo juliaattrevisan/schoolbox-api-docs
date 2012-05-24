@@ -67,9 +67,9 @@ if (is_array($allAssess)) {
 				'ASSESS_FINISH_DATE' => date('jS M Y', strtotime($currentAssess['finish'])),
 				'ASSESS_DESCRIPTION' => Scrub::html(html_entity_decode($currentAssess['description'])),
 				'ASSESS_CREATED' => $createdTime->getRelativeTime(),
-				'USER_ID' => $author['uid'],
-				'USER_FIRSTNAME' => $author['firstname'],
-				'USER_LASTNAME' => $author['lastname'],
+				'ASSESS_USER_ID' => $author['uid'],
+				'ASSESS_USER_FIRSTNAME' => $author['firstname'],
+				'ASSESS_USER_LASTNAME' => $author['lastname'],
 				'ON_OFF' => $i++%2 ? 'dark' : '',
 			));
 

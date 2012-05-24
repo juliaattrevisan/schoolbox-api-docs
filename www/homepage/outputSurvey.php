@@ -54,9 +54,9 @@ if (is_array($allSurveys)) {
             'SURVEY_FINISH_DATE' => date('jS M Y', strtotime($currentSurvey['finish'])),
             'SURVEY_DESCRIPTION' => Scrub::html(html_entity_decode($currentSurvey['description'])),
 			'SURVEY_CREATED' => $createdTime->getRelativeTime(),
-			'USER_ID' => $author['uid'],
-			'USER_FIRSTNAME' => $author['firstname'],
-			'USER_LASTNAME' => $author['lastname'],
+			'SURVEY_USER_ID' => $author['uid'],
+			'SURVEY_USER_FIRSTNAME' => $author['firstname'],
+			'SURVEY_USER_LASTNAME' => $author['lastname'],
 			'ON_OFF' => $i++%2 ? 'dark' : '',
         ));
 
