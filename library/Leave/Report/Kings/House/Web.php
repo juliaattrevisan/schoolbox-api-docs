@@ -62,177 +62,183 @@ class Leave_Report_Kings_House_Web {
 		$combined = array();
 
 		foreach($this->getRequestList() as $i => $request) {
-			if ($request->getId()) {
-				$key = $request->getUser()->getId();
+			$key = $request->getUser()->getId();
 
-				/* Collect general data
+			/* Collect general data
+			 */
+			$combined[$key]['user_id'] = $key;
+			$combined[$key]['user_name'] = $request->getUser()->getName();
+			$combined[$key]['user_year'] = $request->getUser()->getYear();
+			$combined[$key]['user_boarding_status'] = $request->getUser()->getAbbreviatedBoardingStatus();
+
+			$combined[$key]['request_id'][$request->getId()] = $request->getId();
+			$combined[$key]['request_status'][$request->getId()] = $request->getStatus(true);
+			$combined[$key]['request_host_type'][$request->getId()] = $request->getHostType(true);
+			$combined[$key]['request_description'][$request->getId()] = $request->getDescription();
+
+			/* Pending leave requests get a css class for the row
+			 * (used to decorate the spans)
+			 */
+			if ($request->isPending()) {
+				$combined[$key]['row_css_class'][] = 'leave-pending';
+			}
+			/* Non-pending requests (authorised requests)
+			 */
+			else if ($request->getId()) {
+				$combined[$key]['request_authorisation_user_id'][$request->getAuthorisationUser()->getId()] = trim($request->getAuthorisationUser()->getName());
+				$combined[$key]['row_css_class'][] = 'leave-pending';
+			}
+			else {
+				$combined[$key]['row_css_class'][] = '';
+			}
+
+			/* Text color if request is still pending
+			 */
+			if ($request->isPending()) {
+				$decorationStart = $this->getDecorationPendingStart();
+				$decorationEnd = $this->getDecorationPendingEnd();
+			}
+			else {
+				$decorationStart = $this->getDecorationApprovedStart();
+				$decorationEnd = $this->getDecorationApprovedEnd();
+			}
+
+			/* Start and end of leave
+			 */
+			$requestDateStart = new Alaress_Date_Format($request['start'], 'y-m-d h:i:s');
+			$requestDateFinish = new Alaress_Date_Format($request['finish'], 'y-m-d h:i:s');
+
+			/* For each day that the person is on leave within the prescribed period of time, show an
+			 * icon. If they are starting or ending their leave on this day, show the time as well
+			 *
+			 * Render 3 columns each day for 3 days
+			 *
+			 * Morning: 00:00:00 to 09:59:59
+			 * Day: 10:00:00 to 18:59:59
+			 * Night: 19:00:00 to 21:59:59
+			 */
+			$data = $this->getData();
+
+			$morningStart = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp(), 'U');
+			$dayStart = new Alaress_Date_Format($morningStart->getUnixTimestamp() + 10*60*60, 'U');
+			$nightStart = new Alaress_Date_Format($dayStart->getUnixTimestamp() + 9*60*60, 'U');
+			$nightEnd = new Alaress_Date_Format($nightStart->getUnixTimestamp() + 5*60*60, 'U');
+
+			$showStartTime = true;
+
+			for ($j = 0; $j < $this->getRange(); $j++) {
+
+				/* If this person is on leave during the morning
 				 */
-				$combined[$key]['user_id'] = $key;
-				$combined[$key]['user_name'] = $request->getUser()->getName();
-				$combined[$key]['user_year'] = $request->getUser()->getYear();
-				$combined[$key]['user_boarding_status'] = $request->getUser()->getAbbreviatedBoardingStatus();
+				if ($request->getOccupancy($morningStart, $dayStart)) {
 
-				$combined[$key]['request_id'][$request->getId()] = $request->getId();
-				$combined[$key]['request_status'][$request->getId()] = $request->getStatus(true);
-				$combined[$key]['request_host_type'][$request->getId()] = $request->getHostType(true);
-				$combined[$key]['request_description'][$request->getId()] = $request->getDescription();
-
-				if ($request->isPending()) {
-					$combined[$key]['row_css_class'][] = 'leave-pending';
-				}
-				else {
-					$combined[$key]['request_authorisation_user_id'][$request->getAuthorisationUser()->getId()] = trim($request->getAuthorisationUser()->getName());
-					$combined[$key]['row_css_class'][] = '';
-				}
-
-				/* Text color if request is still pending
-				 */
-				if ($request->isPending()) {
-					$decorationStart = $this->getDecorationPendingStart();
-					$decorationEnd = $this->getDecorationPendingEnd();
-				}
-				else {
-					$decorationStart = $this->getDecorationApprovedStart();
-					$decorationEnd = $this->getDecorationApprovedEnd();
-				}
-
-				/* Start and end of leave
-				 */
-				$requestDateStart = new Alaress_Date_Format($request['start'], 'y-m-d h:i:s');
-				$requestDateFinish = new Alaress_Date_Format($request['finish'], 'y-m-d h:i:s');
-
-				/* For each day that the person is on leave within the prescribed period of time, show an
-				 * icon. If they are starting or ending their leave on this day, show the time as well
-				 *
-				 * Render 3 columns each day for 3 days
-				 *
-				 * Morning: 00:00:00 to 09:59:59
-				 * Day: 10:00:00 to 18:59:59
-				 * Night: 19:00:00 to 21:59:59
-				 */
-				$data = $this->getData();
-
-				$morningStart = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp(), 'U');
-				$dayStart = new Alaress_Date_Format($morningStart->getUnixTimestamp() + 10*60*60, 'U');
-				$nightStart = new Alaress_Date_Format($dayStart->getUnixTimestamp() + 9*60*60, 'U');
-				$nightEnd = new Alaress_Date_Format($nightStart->getUnixTimestamp() + 5*60*60, 'U');
-
-				$showStartTime = true;
-
-				for ($j = 0; $j < $this->getRange(); $j++) {
-
-					/* If this person is on leave during the morning
+					/* Check whether next segment is occupied; if not, also show the time
 					 */
-					if ($request->getOccupancy($morningStart, $dayStart)) {
+					if ($showStartTime) {
 
-						/* Check whether next segment is occupied; if not, also show the time
+						/* If $showStartTime == true and he's not on leave in the next period
+						 * then he left and returned in the same period
 						 */
-						if ($showStartTime) {
+						if (!$request->getOccupancy($dayStart, $nightStart)) {
+							$requestPeriodMorning = $decorationStart . $requestDateStart->getTimeOnly() . $decorationEnd;
+							$requestPeriodMorning .= $decorationStart . $requestDateFinish->getTimeOnly() . $decorationEnd;
+						}
+						else {
 
-							/* If $showStartTime == true and he's not on leave in the next period
-							 * then he left and returned in the same period
+							/* Specifically check for this day, to account for multi-week leave
 							 */
-							if (!$request->getOccupancy($dayStart, $nightStart)) {
+							if ($requestDateStart->getDatabaseDate() == $morningStart->getDatabaseDate()) {
 								$requestPeriodMorning = $decorationStart . $requestDateStart->getTimeOnly() . $decorationEnd;
-								$requestPeriodMorning .= $decorationStart . $requestDateFinish->getTimeOnly() . $decorationEnd;
 							}
 							else {
-
-								/* Specifically check for this day, to account for multi-week leave
-								 */
-								if ($requestDateStart->getDatabaseDate() == $morningStart->getDatabaseDate()) {
-									$requestPeriodMorning = $decorationStart . $requestDateStart->getTimeOnly() . $decorationEnd;
-								}
-								else {
-									$requestPeriodMorning = $decorationStart . 'L' . $decorationEnd;
-								}
+								$requestPeriodMorning = $decorationStart . 'L' . $decorationEnd;
 							}
+						}
 
-							$showStartTime = false;
-						}
-						else if (!$showStartTime && !$request->getOccupancy($dayStart, $nightStart)) {
-							$requestPeriodMorning = $decorationStart . $requestDateFinish->getTimeOnly() . $decorationEnd;
-						}
-						else {
-							$requestPeriodMorning = $decorationStart . 'L' . $decorationEnd;
-						}
+						$showStartTime = false;
 					}
-
-					/* If this person is on leave during the day
-					 */
-					if ($request->getOccupancy($dayStart, $nightStart)) {
-						if ($showStartTime) {
-							if (!$request->getOccupancy($nightStart, $nightEnd)) {
-								$requestPeriodDay = $decorationStart . $requestDateStart->getTimeOnly() . $decorationEnd;
-								$requestPeriodDay .= $decorationStart . $requestDateFinish->getTimeOnly() . $decorationEnd;
-							}
-							else {
-								if ($requestDateStart->getDatabaseDate() == $dayStart->getDatabaseDate()) {
-									$requestPeriodDay = $decorationStart . $requestDateStart->getTimeOnly() . $decorationEnd;
-								}
-								else {
-									$requestPeriodDay = $decorationStart . 'L' . $decorationEnd;
-								}
-							}
-
-							$showStartTime = false;
-						}
-						else if (!$showStartTime && !$request->getOccupancy($nightStart, $nightEnd)) {
-							$requestPeriodDay = $decorationStart . $requestDateFinish->getTimeOnly() . $decorationEnd;
-						}
-						else {
-							$requestPeriodDay = $decorationStart . 'L' . $decorationEnd;
-						}
+					else if (!$showStartTime && !$request->getOccupancy($dayStart, $nightStart)) {
+						$requestPeriodMorning = $decorationStart . $requestDateFinish->getTimeOnly() . $decorationEnd;
 					}
-
-					/* If this person is on leave during the night
-					 */
-					if ($request->getOccupancy($nightStart, $nightEnd)) {
-
-						/* Check whether the next morning is occupied
-						 */
-						$nextMorning = new Alaress_Date_Format($dayStart->getDatabase(), 'y-m-d h:i:s');
-						$nextMorning->addDays(1);
-
-						if ($showStartTime) {
-							if (!$request->getOccupancy($nightEnd, $nextMorning)) {
-								$requestPeriodNight = $decorationStart . $requestDateStart->getTimeOnly() . $decorationEnd;
-								$requestPeriodNight .= $decorationStart . $requestDateFinish->getTimeOnly() . $decorationEnd;
-							}
-							else {
-								if ($requestDateStart->getDatabaseDate() == $nightStart->getDatabaseDate()) {
-									$requestPeriodNight = $decorationStart . $requestDateStart->getTimeOnly() . $decorationEnd;
-								}
-								else {
-									$requestPeriodNight = $decorationStart . 'L' . $decorationEnd;
-								}
-							}
-
-							$showStartTime = false;
-						}
-						else if (!$showStartTime && !$request->getOccupancy($nightEnd, $nextMorning)) {
-							$requestPeriodNight = $decorationStart . $requestDateFinish->getTimeOnly() . $decorationEnd;
-						}
-						else {
-							$requestPeriodNight = $decorationStart . 'L' . $decorationEnd;
-						}
+					else {
+						$requestPeriodMorning = $decorationStart . 'L' . $decorationEnd;
 					}
-
-					/* Display icon and time where appropriate
-					 */
-					$combined[$key]['periods'][$j]['request_period_morning'] .= $requestPeriodMorning;
-					$combined[$key]['periods'][$j]['request_period_day'] .= $requestPeriodDay;
-					$combined[$key]['periods'][$j]['request_period_night'] .= $requestPeriodNight;
-
-					/* Iteration reset
-					 */
-					$morningStart->addDays(1);
-					$dayStart->addDays(1);
-					$nightStart->addDays(1);
-					$nightEnd->addDays(1);
-
-					unset($requestPeriodMorning, $requestPeriodDay, $requestPeriodNight);
 				}
+
+				/* If this person is on leave during the day
+				 */
+				if ($request->getOccupancy($dayStart, $nightStart)) {
+					if ($showStartTime) {
+						if (!$request->getOccupancy($nightStart, $nightEnd)) {
+							$requestPeriodDay = $decorationStart . $requestDateStart->getTimeOnly() . $decorationEnd;
+							$requestPeriodDay .= $decorationStart . $requestDateFinish->getTimeOnly() . $decorationEnd;
+						}
+						else {
+							if ($requestDateStart->getDatabaseDate() == $dayStart->getDatabaseDate()) {
+								$requestPeriodDay = $decorationStart . $requestDateStart->getTimeOnly() . $decorationEnd;
+							}
+							else {
+								$requestPeriodDay = $decorationStart . 'L' . $decorationEnd;
+							}
+						}
+
+						$showStartTime = false;
+					}
+					else if (!$showStartTime && !$request->getOccupancy($nightStart, $nightEnd)) {
+						$requestPeriodDay = $decorationStart . $requestDateFinish->getTimeOnly() . $decorationEnd;
+					}
+					else {
+						$requestPeriodDay = $decorationStart . 'L' . $decorationEnd;
+					}
+				}
+
+				/* If this person is on leave during the night
+				 */
+				if ($request->getOccupancy($nightStart, $nightEnd)) {
+
+					/* Check whether the next morning is occupied
+					 */
+					$nextMorning = new Alaress_Date_Format($dayStart->getDatabase(), 'y-m-d h:i:s');
+					$nextMorning->addDays(1);
+
+					if ($showStartTime) {
+						if (!$request->getOccupancy($nightEnd, $nextMorning)) {
+							$requestPeriodNight = $decorationStart . $requestDateStart->getTimeOnly() . $decorationEnd;
+							$requestPeriodNight .= $decorationStart . $requestDateFinish->getTimeOnly() . $decorationEnd;
+						}
+						else {
+							if ($requestDateStart->getDatabaseDate() == $nightStart->getDatabaseDate()) {
+								$requestPeriodNight = $decorationStart . $requestDateStart->getTimeOnly() . $decorationEnd;
+							}
+							else {
+								$requestPeriodNight = $decorationStart . 'L' . $decorationEnd;
+							}
+						}
+
+						$showStartTime = false;
+					}
+					else if (!$showStartTime && !$request->getOccupancy($nightEnd, $nextMorning)) {
+						$requestPeriodNight = $decorationStart . $requestDateFinish->getTimeOnly() . $decorationEnd;
+					}
+					else {
+						$requestPeriodNight = $decorationStart . 'L' . $decorationEnd;
+					}
+				}
+
+				/* Display icon and time where appropriate
+				 */
+				$combined[$key]['periods'][$j]['request_period_morning'] .= $requestPeriodMorning;
+				$combined[$key]['periods'][$j]['request_period_day'] .= $requestPeriodDay;
+				$combined[$key]['periods'][$j]['request_period_night'] .= $requestPeriodNight;
+
+				/* Iteration reset
+				 */
+				$morningStart->addDays(1);
+				$dayStart->addDays(1);
+				$nightStart->addDays(1);
+				$nightEnd->addDays(1);
+
+				unset($requestPeriodMorning, $requestPeriodDay, $requestPeriodNight);
 			}
 		}
 

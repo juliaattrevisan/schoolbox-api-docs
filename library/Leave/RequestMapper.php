@@ -337,6 +337,7 @@ class Leave_RequestMapper extends Mapper {
 			AND lr.finish > :start
 			LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
 			WHERE u.residential_house_id = :houseId
+			AND (lr.status = :statusApproved OR lr.status = :statusPending OR lr.status IS NULL)
 			ORDER BY substr(lr.start, 1, 10), LENGTH(u.year), u.year, u.lastname
 		");
 
@@ -344,6 +345,8 @@ class Leave_RequestMapper extends Mapper {
 			':houseId' => $houseId,
 			':start' => $start,
 			':finish' => $finish,
+			':statusApproved' => Leave_Request::STATUS_APPROVED,
+			':statusPending' => Leave_Request::STATUS_PENDING,
 		));
 
 		$requestList = $statement->fetchAll();
