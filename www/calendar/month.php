@@ -134,38 +134,30 @@ for ($i = 0; $i < $totalDays; $i++) {
     if (is_array($submissionList)) {
         foreach ($submissionList as $submission) {
 
+            /* Clear attendance blocks */
+            $this->setVar(array(
+                'attendance_icon_block' => '',
+                'attendance_status_block' => '',
+                'attendance_request_button_block' => '',
+                'attendance_list_button_block' => '',
+            ));
+
             /* Get status to set action */
             if ($groupHandler->isStudent($_SESSION['id'])) {
-
-                $current_time = new DateTime();
-
-                $student_submission = $subStuHandler->getStatus($_SESSION['id'], $submission['id']);
-
-                if (!$submission['accept_submission']) {
-                    $action = 'View Details';
-                }
-				else if ($student_submission['status'] == 1 && $current_time > $student_submission['open_date'] && $current_time < $student_submission['late_date']) {
-                    $action = 'Submit Work';
-                }
-				else {
-                    $action = 'View Details';
-                }
-
+                $action = 'View Details';
                 $this->setVar('MODIFY', '<a class="btn go-to float-left" href="/submission/submissionHistory/' . $submission['id'] . '"><span></span>' . $action . '</a>');
 
-            }
-			else if ($groupHandler->isStaff($_SESSION['id'])) {
+            } elseif ($groupHandler->isStaff($_SESSION['id'])) {
                 $this->setVar('MODIFY', '<a class="btn go-to float-left" href="/submission/viewSubmission/' . $submission['id'] . '"><span></span>View Submissions</a>');
-            }
-			else {
+            } else {
                 $this->setVar('MODIFY', '');
             }
 
             $userHandler = new User();
 
             $output = array(
-                'TIME' => $submission['date']->format('g:i a'), // g:i a
-                'NOTE' => 'WORK DUE ' . $submission['category'] . (!empty($submission['synergyCode']) ? ' (' . $submission['synergyCode'] . ')' : '') . ' - ' . $submission['name'],
+                'TIME' => $submission['date']->format('g:iA') != '11:59PM'? $submission['date']->format('g:iA') : '', // g:i a
+                'NOTE' => $submission['category'] . (!empty($submission['synergyCode']) ? ' (' . $submission['synergyCode'] . ')' : '') . '<br />' . $submission['name'],
                 'COLOUR' => $calendarHandler->displayColour(4),
                 'LOCATION' => '',
                 'DETAIL' => '',
@@ -174,10 +166,14 @@ for ($i = 0; $i < $totalDays; $i++) {
                 'AUTHOR' => $userHandler->formatName($submission),
                 'AUTHOR_ID' => $submission['owner'],
                 'EVENT_LEVEL' => '',
+                'has_category_block' => '',
             );
 
             $this->setVar($output);
-            $this->parse('time_block', 'time');
+            if($submission['date']->format('g:iA') != '11:59PM')
+                $this->parse('time_block', 'time');
+            else
+                $this->setVar('time_block','');
             $this->parse("note_listing", "note_block", true);
 
             $subout = 1;
