@@ -264,6 +264,9 @@ if (is_numeric($this->arg[0])) {
             $subjectList = $synUserHandler->getSubjectList($user['synergy_id'], $user['uid']);
 
             if(is_array($subjectList)) {
+
+                $emailAll = '';
+
                 foreach($subjectList as $subject) {
 
                     if($groupHandler->getPermission($category['id']) >= READ_ACCESS || Cfg::get('site_name') != 'stmichaels') {
@@ -271,6 +274,7 @@ if (is_numeric($this->arg[0])) {
                         /* Fetch teacher names */
                         $teacherList = $synClass->getTeacherName($subject['code']);
                         $teacherOutput = array();
+
                         if (is_array($teacherList)) {
                             foreach ($teacherList as $teacherSynID) {
                                 $teacher = $userHandler->getBySynergyAndGroup($teacherSynID, $groupHandler->getStaffGroupTypeIds());
@@ -281,11 +285,11 @@ if (is_numeric($this->arg[0])) {
 
                                 if($emailAddress) {
                                     $teacherOutput[] = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$teacherName</a>";
+                                    $emailAll .= $emailAddress.",";
                                 }
                                 else {
                                     $teacherOutput[] = $teacherName;
                                 }
-                                $emailAll .= $emailAddress.",";
                             }
                         }
 
