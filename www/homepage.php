@@ -79,6 +79,7 @@ $output = array(
 	'HEADING' => Scrub::text($category['name']) . (isset($code) && $codeCount < 2 ? ' (' . $code . ')' : ''),
 	'CODE' => urlencode(urlencode($code)),
 	'ID' => $categoryID,
+    'USER_TOKEN' => $_SESSION['key'],
 );
 
 $this->setVar($output);

@@ -5,10 +5,6 @@ $this->setBlock($componentHandle, 'feed', 'feed_block');
 require_once SITE_root.'/library/feed.php';
 $feedHandler = new Feed;
 
-$db = DeprecatedDatabase::getInstance();
-$token = $db->getOne("SELECT `key` FROM `user` WHERE `id` = '{$_SESSION['id']}'");
-$this->setVar('USER_TOKEN', $token);
-
 $feedList = $feedHandler->getFeed($categoryID, $config['size']);
 
 if (count($feedList) > 0) {

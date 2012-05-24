@@ -43,7 +43,7 @@ class User extends DeprecatedModel {
 
     function getByID($id) {
 
-        $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, year, eportfolio_enabled,
+        $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, year, `key`, eportfolio_enabled,
 						synergy_id, local_email, alt_email, email_pass, userCampus.campus, luCampus.name as campusName, IF(superusers.id, 1, 0) as su, house, residential_house_id as residential_house, mail_handler
 				FROM user
 					LEFT JOIN groups ON user.group_id = groups.id
@@ -56,7 +56,7 @@ class User extends DeprecatedModel {
 
     function getByUsername($username) {
 
-        $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, year, eportfolio_enabled,
+        $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, year, eportfolio_enabled,`key`,
 						synergy_id, local_email, alt_email, email_pass, userCampus.campus, IF(superusers.id, 1, 0) as su, house, mail_handler
 				FROM user
 					LEFT JOIN groups ON user.group_id = groups.id

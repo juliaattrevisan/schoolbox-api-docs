@@ -59,6 +59,7 @@ class Session {
             $_SESSION['local_email']= $user['local_email'];
             $_SESSION['alt_email']  = $user['alt_email'];
             $_SESSION['email_pass'] = $user['email_pass'];
+            $_SESSION['key']        = $user['key'];
             $_SESSION['lasttime']   = mktime();
             $_SESSION['username']   = $user['username'];
             $_SESSION['password']   = $_POST['password']?$_POST['password']:$user['email_pass']; /* ALERT only works in some cases */
