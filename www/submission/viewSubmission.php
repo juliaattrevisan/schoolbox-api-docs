@@ -131,6 +131,7 @@ if (is_numeric($this->arg[0])) {
                     'SCORE' => '',
                     'SUBMISSION_EXPANDABLE' => '',
                     'SUBMISSION_HIDDEN' => '',
+                    'SUBMITTED_AFTER_MARK' => ''
                 );
 
                 $this->setVar($output);
@@ -168,6 +169,7 @@ if (is_numeric($this->arg[0])) {
 					'COLOUR' => $line['late'] ? '#ff0000' : '#000000',
 					'MARK' => $return[0]['mark'],
                     'SCORE' => $score,
+                    'SUBMITTED_AFTER_MARK' => ''
             	);
 
 				$this->setVar($output);
