@@ -335,20 +335,23 @@ class Leave_RequestMapper extends Mapper {
 			LEFT JOIN `{$this->table}` lr ON lr.user_id = u.id
 			AND lr.start < :finish
 			AND lr.finish > :start
+			AND (lr.status = :statusApproved OR lr.status = :statusPending OR lr.status IS NULL)
 			LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
 			WHERE u.residential_house_id = :houseId
-			AND (lr.status = :statusApproved OR lr.status = :statusPending OR lr.status IS NULL)
-			ORDER BY substr(lr.start, 1, 10), LENGTH(u.year), u.year, u.lastname
+			ORDER BY LENGTH(lr.start) DESC, SUBSTR(lr.start, 1, 10),
+			LENGTH(u.year), u.year, u.lastname
 		");
 
-		$statement->execute(array(
+		$args = array(
 			':houseId' => $houseId,
 			':start' => $start,
 			':finish' => $finish,
 			':statusApproved' => Leave_Request::STATUS_APPROVED,
 			':statusPending' => Leave_Request::STATUS_PENDING,
-		));
+		);
 
+		$statement->execute($args);
+print_r($args);
 		$requestList = $statement->fetchAll();
 
         $requestCollection = $this->hydrateList($requestList);
