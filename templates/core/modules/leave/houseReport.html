@@ -65,8 +65,11 @@
             $j('#reportFilter').submit();
         } );
 
-        $j('#reportExportButton').click( function () {
-            window.location = window.location + '/export';
+        $j('#reportExportButton').click( function (e) {
+            var date =  $j('#reportDate').val(),
+            dateToURL = date.replace(/\//g,"-");
+            window.location = $j(this).attr('href') + "/" + dateToURL + '/export';
+            e.preventDefault();
         } );
 
         $j('#container').css('width', $j('.ruler').outerWidth());
@@ -94,7 +97,7 @@
     <h2>Leave Report</h2>
 
     <span class="header_option in-h2">
-        <a id="reportExportButton" href="javascript:void(0);" class="btn modify"><span></span>Export History</a>
+        <a id="reportExportButton" href="/modules/leave/report/house/{HOUSE_ID}" class="btn modify"><span></span>Export History</a>
         <form id="reportFilter">
             <a id="reportFilterSubmit" href="javascript:void(0);" class="btn search"><span></span>Search</a>
             <select id="reportHouse">

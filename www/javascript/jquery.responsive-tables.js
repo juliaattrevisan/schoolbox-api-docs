@@ -4,54 +4,52 @@
 
     $.fn.extend({
 
-        //pass the options variable to the function
         tinyTables: function(options) {
             var defaults = {
-                shrinkAt: 1400,
+                shrinkAt: 900,
                 tableClass: 'tiny-tables',
                 tableWrapperClass: 'tiny-tables-wrap' ,
-                scrollingTableClass: 'tiny-tables-scroll',
-                pinnedTableClass: 'tiny-tables-pinned'
+                scrollingClass: 'tiny-tables-scroll',
+                pinnedClass: 'tiny-tables-pinned'
             };
 
             options =  $.extend(defaults, options);
 
             return this.each(function() {
-                var obj = $(this);
+                var originalTable = $(this);
 
-                obj.addClass(options.tableClass);
+                originalTable.addClass(options.tableClass);
 
-                updateTables(obj);
+                updateTables(originalTable);
 
                 $(window).bind("resize", function(){
-                    updateTables(obj);
+                    updateTables(originalTable);
                 });
             });
 
-            function updateTables(original) {
+            function updateTables(originalTable) {
                 if (($(window).width() < options.shrinkAt)) {
-                    splitTable(original);
+                    splitTable(originalTable);
                 } else if (($(window).width() > options.shrinkAt)) {
-                    unsplitTable(original);
+                    undoSplit(originalTable);
                 }
             }
 
-            function splitTable(sourceTable) {
-                if (!sourceTable.parent().hasClass(options.scrollingTableClass)) {
-                    sourceTable.wrap('<div class="' + options.tableWrapperClass + '" />');
-                    var pinnedTable = sourceTable.clone();
-                    pinnedTable.find("td:not(:first-child), th:not(:first-child)").hide();
-                    sourceTable.closest('.' + options.tableWrapperClass).append(pinnedTable);
-                    pinnedTable.wrap('<div class="' + options.pinnedTableClass + '" />');
-                    sourceTable.wrap('<div class="' + options.scrollingTableClass + '" />');
+            function splitTable(originalTable) {
+                if (!originalTable.parent().hasClass(options.scrollingClass)) {
+                    originalTable.wrap('<div class="' + options.tableWrapperClass + '" />');
+                    var pinnedTable = originalTable.clone();
+                    originalTable.closest('.' + options.tableWrapperClass).append(pinnedTable);
+                    originalTable.wrap('<div class="' + options.scrollingClass + '" />');
+                    pinnedTable.wrap('<div class="' + options.pinnedClass + '" />');
                 }
             }
 
-            function unsplitTable(sourceTable) {
-                if (sourceTable.parent().hasClass(options.scrollingTableClass)) {
-                    $('.' + options.pinnedTableClass).remove();
-                    sourceTable.unwrap();
-                    sourceTable.unwrap();
+            function undoSplit(originalTable) {
+                if (originalTable.parent().hasClass(options.scrollingClass)) {
+                    $('.' + options.pinnedClass).remove();
+                    originalTable.unwrap();
+                    originalTable.unwrap();
                 }
             }
         }
