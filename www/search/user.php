@@ -269,6 +269,8 @@ if (is_numeric($this->arg[0])) {
 
                 foreach($subjectList as $subject) {
 
+                    $category = $catHandler->getByCode($subject['code']);
+
                     if($groupHandler->getPermission($category['id']) >= READ_ACCESS || Cfg::get('site_name') != 'stmichaels') {
 
                         /* Fetch teacher names */
@@ -292,8 +294,6 @@ if (is_numeric($this->arg[0])) {
                                 }
                             }
                         }
-
-                        $category = $catHandler->getByCode($subject['code']);
 
                         $output = array('SUBJECT_NAME' => is_array($category) && $groupHandler->getPermission($category['id']) >= READ_ACCESS ?
                                                           '<a href="/homepage/' . $subject['code'] . '">' .
