@@ -351,7 +351,7 @@ class Leave_RequestMapper extends Mapper {
 		);
 
 		$statement->execute($args);
-print_r($args);
+
 		$requestList = $statement->fetchAll();
 
         $requestCollection = $this->hydrateList($requestList);
