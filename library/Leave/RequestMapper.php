@@ -338,8 +338,7 @@ class Leave_RequestMapper extends Mapper {
 			AND (lr.status = :statusApproved OR lr.status = :statusPending OR lr.status IS NULL)
 			LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
 			WHERE u.residential_house_id = :houseId
-			ORDER BY LENGTH(lr.start) DESC, SUBSTR(lr.start, 1, 10),
-			LENGTH(u.year), u.year, u.lastname
+			ORDER BY LENGTH(u.year), u.year, u.lastname
 		");
 
 		$args = array(
