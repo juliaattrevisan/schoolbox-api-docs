@@ -24,7 +24,7 @@ table td.dark{padding:4px; text-align:center; background-color:#000 }
 	display:block;
 	padding:3px;
 	margin:0;
-	}
+}
 
 .clearfix:after {
 	display:none;
@@ -116,7 +116,7 @@ tr.leave-pending span.grey {
 
 .sortable-table td,
 .sortable-table th {
-	padding: 2px;
+	padding: 7px 2px;
 }
 .sortable-table .leaveReportHeaderDate {
 	text-align: center;

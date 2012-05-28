@@ -918,6 +918,7 @@ ul.tree .collapsable .hitarea{background:url(/images/core/home-minus.gif) no-rep
 .sortable-table th.leaveReportHide,.signatures th.leaveReportHide{border:0;}
 .sortable-table .no-left-border,.signatures .no-left-border{border-left-width:0;}
 .sortable-table .no-right-border,.signatures .no-right-border{border-right-width:0;}
+.sortable-table .right-border,.signatures .right-border{border-right-width:1px;}
 tr span.leave-pending{background:#e8f5ff;color:#777;text-shadow:0 1px 0 white;padding:2px 4px;border:1px solid #d9effe;}
 .leaveReportGeneratedAt{display:none;}
 #requestList .no-arrow{background:none;}
