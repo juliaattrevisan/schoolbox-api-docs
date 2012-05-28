@@ -271,7 +271,7 @@ if (is_numeric($this->arg[0])) {
 
                     $category = $catHandler->getByCode($subject['code']);
 
-                    if($groupHandler->getPermission($category['id']) >= READ_ACCESS || Cfg::get('site_name') != 'stmichaels') {
+                    if(Cfg::get('site_name') != 'stmichaels' || ($category['id'] && $groupHandler->getPermission($category['id']) >= READ_ACCESS )) {
 
                         /* Fetch teacher names */
                         $teacherList = $synClass->getTeacherName($subject['code']);
