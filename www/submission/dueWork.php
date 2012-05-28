@@ -381,7 +381,7 @@ if ($allAssessments) {
 	$attemptsExisted = false;
 
     foreach($allAssessments as $currentAssessment) {
-		$allAttempts = $attemptHandler->getList($currentAssessment['assess_id'], $this->arg[2]);
+		$allAttempts = $attemptHandler->getListForUser($currentAssessment['assess_id'], $userID);
 
 		/* If multiple attempts were made, list them
 		 */

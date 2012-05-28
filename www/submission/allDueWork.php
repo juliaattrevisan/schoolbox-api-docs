@@ -184,15 +184,15 @@ foreach($categoryList as $key => $value) {
 
 /* Make a list of assessments
  */
-$allAssessments = $assessHandler->getList($categoryIDList, 10);
+$allAssessments = $assessHandler->getList($categoryIDList);
 
 if ($allAssessments) {
     foreach($allAssessments as $currentAssessment) {
 		if ($currentAssessment['allow_resit']) {
-			$allAttempts = $attemptHandler->getListForUser($currentAssessment['assess_id'], $_SESSION['id']);
+			$allAttempts = $attemptHandler->getListForUser($currentAssessment['assess_id'], $userID);
 		}
 		else {
-        	$allAttempts = array($attemptHandler->getLatestForUser($currentAssessment['assess_id'], $_SESSION['id']));
+        	$allAttempts = array($attemptHandler->getLatestForUser($currentAssessment['assess_id'], $userID));
 		}
 
         $firstSection = $sectionHandler->getFirst($currentAssessment['assess_id']);

@@ -123,7 +123,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel {
         $query = "SELECT COUNT(*) AS completed
                   FROM {$this->_table}
                   WHERE assess_id = '$assess_id'
-                  AND user_id = '$_SESSION[id]'
+                  AND user_id = '{$_SESSION['id']}'
                   AND finish != '0000-00-00 00:00:00'
 				  AND deleted_at IS NULL";
 
@@ -137,7 +137,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel {
 	 * @param bool $user_id
 	 * @return array|bool
 	 */
-    public function getList($assess_id, $user_id = false) {
+    public function getList($assess_id) {
         $query = "SELECT
                       assess_attempt.attempt_id,
                       assess_attempt.user_id, synergy_id, firstname, lastname,
@@ -150,13 +150,8 @@ abstract class Evaluation_Attempt extends DeprecatedModel {
                   LEFT JOIN assess ON assess_attempt.assess_id = assess.assess_id
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
                   WHERE assess.assess_id = '$assess_id'
-				  AND assess_attempt.deleted_at IS NULL ";
-
-	    if (is_numeric($user_id)) {
-            $query .= "AND assess_attempt.user_id = '$user_id' ";
-        }
-
-        $query .= "GROUP BY assess_attempt.attempt_id";
+				  AND assess_attempt.deleted_at IS NULL
+				  GROUP BY assess_attempt.attempt_id";
 
         return $this->db->getAll($query);
     }
@@ -182,7 +177,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel {
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
                   WHERE assess.assess_id = '$assess_id'
 				  AND assess_attempt.deleted_at IS NULL
-				  AND user.id = '$user_id'
+				  AND assess_attempt.user_id = '$user_id'
                   GROUP BY assess_attempt.attempt_id";
 
         return $this->db->getAll($query);
