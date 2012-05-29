@@ -115,7 +115,7 @@ abstract class Synchronise_Synergetic_Strategy_Abstract implements Synchronise_S
 	/**
 	 * Get the User handler
 	 *
-	 * @return
+	 * @return User
 	 */
 	protected function getUserHandler() {
 		return $this->userHandler;
@@ -200,7 +200,7 @@ abstract class Synchronise_Synergetic_Strategy_Abstract implements Synchronise_S
 	/**
 	 * Get verbose filter
 	 *
-	 * @return
+	 * @return Synchronise_Synergetic_Wenona_Verbose
 	 */
 	public function getVerboseFilter() {
 		return $this->verboseFilter;
