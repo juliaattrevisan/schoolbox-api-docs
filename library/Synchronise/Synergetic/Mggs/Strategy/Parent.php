@@ -13,6 +13,13 @@ class Synchronise_Synergetic_Mggs_Strategy_Parent extends Synchronise_Synergetic
 	protected $strategyTitle = "Update Schoolbox Parent Details Synchronisation";
 
 	/**
+	 * Setup
+	 */
+	protected function setup() {
+		$this->setVerboseFilter(new Synchronise_Synergetic_Mggs_Verbose_Parent());
+	}
+
+	/**
 	 * Get a list of users' Synergy IDs to sync
 	 *
 	 * @return void
@@ -28,68 +35,104 @@ class Synchronise_Synergetic_Mggs_Strategy_Parent extends Synchronise_Synergetic
 	 * @return void
 	 */
 	public function createIfExists() {
+		$this->getVerboseFilter()->intro();
+
 		foreach($this->getList() as $currentUser) {
-			$currentSynergyId = $currentUser['synergy_id'];
 
-			$currentParent = $this->getExternalUserHandler()->getParentSync($currentSynergyId);
-
-			/* If the parent could be found, try updating him in Synergetic
+			/* Generate details about the new user
 			 */
-			if ($currentParent) {
+			$this->executeCreateUpdate($this->setupUserDetails($currentUser));
+		}
 
-				/* The drop down in synergetic's Phone and Occupation tabs indicates
-				 * which email the person prefers to use.
+		$this->getVerboseFilter()->summary();
+	}
+
+	/**
+	 * Set up the new user's details
+	 *
+	 * @param  $currentUser
+	 * @return array
+	 */
+	public function setupUserDetails($currentUser) {
+		return $currentUser;
+	}
+
+	/**
+	 * Identical algorithm used to create/update a user
+	 *
+	 * @param $currentUser
+	 */
+	public function executeCreateUpdate($currentUser) {
+		$currentSynergyId = $currentUser['synergy_id'];
+
+		$currentParent = $this->getExternalUserHandler()->getParentSync($currentSynergyId);
+
+		/* If the parent could be found, try updating him in Synergetic
+		 */
+		if ($currentParent) {
+
+			/* The drop down in synergetic's Phone and Occupation tabs indicates
+			 * which email the person prefers to use.
+			 */
+			if ($currentParent['DefaultEmailCode'] == 'O') {
+				$preferredEmail = $currentParent['OccupEmail'];
+			}
+			else {
+				$preferredEmail = $currentParent['Email'];
+			}
+
+			/* Update Portal with Synergetic data if there is something
+			 * different contained in Synergetic db
+			 */
+			$user = $this->getUserHandler()->getBySynergy($currentSynergyId);
+
+			if (($user['title'] != $currentParent['Title']) || ($user['firstname'] != $currentParent['Preferred']) || ($user['lastname'] != $currentParent['Surname']) || ($user['alt_email'] != $preferredEmail)) {
+				$updatedUser = $this->getUserHandler()->getById($user['uid']);
+
+				$updatedUser['id'] = $user['uid'];
+				$updatedUser['title'] = trim($currentParent['Title']);
+				$updatedUser['firstname'] = trim($currentParent['Preferred']);
+				$updatedUser['lastname'] = trim($currentParent['Surname']);
+
+				$updatedUser['campus'] = $this->getUserHandler()->getUserCampus($user['uid']);
+				$updatedUser['defaultCampus'] = array();
+
+				/* Clear email address in Portal if the user is not meant to be
+				 * publicly listed
 				 */
-				if ($currentParent['DefaultEmailCode'] == 'O') {
-					$preferredEmail = $currentParent['OccupEmail'];
+				if ($this->isPubliclyListed($currentParent)) {
+					$updatedUser['alt_email'] = trim($preferredEmail);
 				}
 				else {
-					$preferredEmail = $currentParent['Email'];
+					$updatedUser['alt_email'] = '';
 				}
 
-				/* Update Portal with Synergetic data if there is something
-				 * different contained in Synergetic db
+				unset($updatedUser['gname']);
+				unset($updatedUser['uid']);
+
+				/* Revision 3221 introduces this alias
 				 */
-				$user = $this->getUserHandler()->getBySynergy($currentSynergyId);
+				unset($updatedUser['campusName']);
 
-				if (($user['title'] != $currentParent['Title']) || ($user['firstname'] != $currentParent['Preferred']) || ($user['lastname'] != $currentParent['Surname']) || ($user['alt_email'] != $preferredEmail)) {
-					$updatedUser = $this->getUserHandler()->getById($user['uid']);
+				/* Revision 3913 introduces this alias
+				 */
+				unset($updatedUser['residential_house']);
 
-					$updatedUser['id'] = $user['uid'];
-					$updatedUser['title'] = trim($currentParent['Title']);
-					$updatedUser['firstname'] = trim($currentParent['Preferred']);
-					$updatedUser['lastname'] = trim($currentParent['Surname']);
-
-					$updatedUser['campus'] = $this->getUserHandler()->getUserCampus($user['uid']);
-					$updatedUser['defaultCampus'] = array();
-
-					/* Clear email address in Portal if the user is not meant to be
-					 * publicly listed
-					 */
-					if ($this->isPubliclyListed($currentParent)) {
-						$updatedUser['alt_email'] = trim($preferredEmail);
-					}
-					else {
-						$updatedUser['alt_email'] = '';
-					}
-
-					unset($updatedUser['gname']);
-					unset($updatedUser['uid']);
-
-					/* Actually perform db update
-					 */
-					if ($this->getPerformUpdate() === true) {
-						$this->getUserHandler()->update($updatedUser);
-
-						$this->getVerboseFilter()->performUpdate($user, $currentSynergyId, $updatedUser, $currentParent);
-					}
-					else {
-						$this->getVerboseFilter()->planUpdate($user, $currentSynergyId, $updatedUser, $currentParent);
-					}
+				/* Actually perform db update
+				 */
+				if ($this->getPerformUpdate() === true) {
+					$this->getUserHandler()->update($updatedUser);
+					$this->getVerboseFilter()->performUpdate($user, $currentSynergyId, $updatedUser, $currentParent);
+					$this->getVerboseFilter()->incrementUpdated();
 				}
 				else {
-					$this->getVerboseFilter()->skip($user, $currentSynergyId);
+					$this->getVerboseFilter()->planUpdate($user, $currentSynergyId, $updatedUser, $currentParent);
+					$this->getVerboseFilter()->incrementUpdated();
 				}
+			}
+			else {
+				$this->getVerboseFilter()->skip($user, $currentSynergyId);
+				$this->getVerboseFilter()->incrementSkipped();
 			}
 		}
 	}

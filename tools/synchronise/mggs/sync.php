@@ -17,7 +17,9 @@ require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
  * Otherwise it will echo out a plan
  */
 $allStrategies = array(
+	'Synchronise_Synergetic_Mggs_Strategy_Staff',
 	'Synchronise_Synergetic_Mggs_Strategy_Parent',
+	'Synchronise_Synergetic_Mggs_Strategy_Student',
 );
 
 /* Do each strat
@@ -27,7 +29,7 @@ foreach($allStrategies as $currentStrategy) {
 
 	/* Do not alter the db
 	 */
-	$sync->setPerformUpdate(false);
+	$sync->setPerformUpdate(true);
 
 	/* Set Verbosity so you can see intentions
 	 */

@@ -1,6 +1,6 @@
 <?php
 /**
- * Synchronise_Synergetic_Mggs_Verbose
+ * Synchronise_Synergetic_Mggs_Verbose_Parent
  *
  * Contains methods to output verbose messages
  *
@@ -9,8 +9,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Synchronise_Synergetic_Mggs_Verbose {
-	private $verbose = false;
+class Synchronise_Synergetic_Mggs_Verbose_Parent extends Synchronise_Synergetic_Verbose_Abstract {
+	protected $verbose = false;
 
 	/**
 	 * Echo message about performing update
@@ -36,11 +36,11 @@ class Synchronise_Synergetic_Mggs_Verbose {
 		$str = array();
 		$str[] = "#$user[uid] (Synergetic #$currentSynergyId) $user[title] $user[firstname] $user[lastname] ($user[alt_email])";
 		$str[] = "to $updatedUser[title] $updatedUser[firstname] $updatedUser[lastname] ($updatedUser[alt_email])";
-		$str[] = "$emailString\n";
+		$str[] = "$emailString";
 
 		$summary = (implode(' ', $str));
 
-		echo "+  Performing update of $summary\n";
+		echo "^  Performing update of $summary\n";
 	}
 
 	/**
@@ -66,9 +66,9 @@ class Synchronise_Synergetic_Mggs_Verbose {
 			}
 
 			$str = array();
-			$str[] = "#$user[uid] (Synergetic #$currentSynergyId) $user[title] $user[firstname] $user[lastname] ($user[alt_email])";
-			$str[] = "to $updatedUser[title] $updatedUser[firstname] $updatedUser[lastname] ($updatedUser[alt_email])";
-			$str[] = "$emailString\n";
+			$str[] = "#{$user['uid']} (Synergetic #{$currentSynergyId}) {$user['title']} {$user['firstname']} {$user['lastname']} ({$user['alt_email']})";
+			$str[] = "to {$updatedUser['title']} {$updatedUser['firstname']} {$updatedUser['lastname']} ({$updatedUser['alt_email']})";
+			$str[] = "{$emailString}\n";
 
 			$summary = (implode(' ', $str));
 
@@ -86,8 +86,7 @@ class Synchronise_Synergetic_Mggs_Verbose {
 	public function skip($user, $currentSynergyId) {
 		if ($this->getVerbose() === true) {
 			$str = array();
-			$str[] = 'Ignoring';
-			$str[] = "#$user[uid] (Synergetic #$currentSynergyId) $user[title] $user[firstname] $user[lastname] ($user[alt_email])\n";
+			$str[] = "#$user[uid] (Synergetic #$currentSynergyId) $user[title] $user[firstname] $user[lastname] ($user[alt_email])";
 
 			$summary = implode(' ', $str);
 
@@ -96,21 +95,16 @@ class Synchronise_Synergetic_Mggs_Verbose {
 	}
 
 	/**
-	 * Set Verbose estting
+	 * Determine whether the $currentParent is supposed to be listed publicly
 	 *
-	 * @param  $val
-	 * @return void
-	 */
-	public function setVerbose($val) {
-		$this->verbose = $val;
-	}
-
-	/**
-	 * Get Verbose setting
-	 *
+	 * @param  $currentParent
 	 * @return bool
 	 */
-	private function getVerbose() {
-		return $this->verbose;
+	private function isPubliclyListed($currentParent) {
+		if ($currentParent['DirectoryIncludeFlag'] == 0) {
+			return false;
+		}
+
+		return true;
 	}
 }

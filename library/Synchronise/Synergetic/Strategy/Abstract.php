@@ -30,6 +30,17 @@ abstract class Synchronise_Synergetic_Strategy_Abstract implements Synchronise_S
 		/* Set up ninja variable
 		 */
 		$this->getExternalUserHandler()->getCurrentSemester();
+
+		/* Optional setup hook
+		 * Does nothing by default so established sync scripts shouldn't be affected
+		 */
+		$this->setup();
+	}
+
+	/**
+	 * Override this optionally
+	 */
+	protected function setup() {
 	}
 
 	/**
@@ -61,26 +72,7 @@ abstract class Synchronise_Synergetic_Strategy_Abstract implements Synchronise_S
 		echo "\n------------------------------------------------------------\n";
 	}
 
-	/**
-	 * Prints out the actual or intended modification
-	 *
-	 * @param  $data
-	 * @return void
-	 */
-	protected function generateVerboseResult($data) {
-		if ($this->getPerformUpdate() === true) {
-			$action = "Created account for: ";
-		}
-		else {
-			$action = "Planned creation of: ";
-		}
-
-		$str = "$action [" . implode(', ', $data) . "]\n";
-
-		print_r($str);
-	}
-
-	/* Generic getters and setters
+	/* Getters/Setters
 	 */
 
 	/**
@@ -200,7 +192,7 @@ abstract class Synchronise_Synergetic_Strategy_Abstract implements Synchronise_S
 	/**
 	 * Get verbose filter
 	 *
-	 * @return Synchronise_Synergetic_Wenona_Verbose
+	 * @return Synchronise_Synergetic_Verbose_Abstract
 	 */
 	public function getVerboseFilter() {
 		return $this->verboseFilter;
