@@ -11,6 +11,5 @@
  * @shamelessly_pilfered_from <steve.chan@alaress.com.au>
  *
  */
-
 class Synchronise_Synergetic_Mgs_Verbose extends Synchronise_Synergetic_Verbose_Abstract {
 }

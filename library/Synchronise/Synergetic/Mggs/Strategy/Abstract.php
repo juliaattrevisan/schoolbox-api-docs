@@ -115,6 +115,8 @@ abstract class Synchronise_Synergetic_Mggs_Strategy_Abstract extends Synchronise
 			case '2':
 			case '3':
 			case '4':
+			case '30':
+			case '40':
 				return 6;
 			case '5':
 			case '6':

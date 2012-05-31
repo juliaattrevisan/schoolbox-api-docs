@@ -62,13 +62,13 @@ class Synchronise_Synergetic_Mggs_Verbose_Parent extends Synchronise_Synergetic_
 				 $emailString = 'and updating email address';
 			}
 			else {
-				$emailString  = 'and clearing email address';
+				$emailString  = 'and clearing email address because it is not publicly listed';
 			}
 
 			$str = array();
 			$str[] = "#{$user['uid']} (Synergetic #{$currentSynergyId}) {$user['title']} {$user['firstname']} {$user['lastname']} ({$user['alt_email']})";
 			$str[] = "to {$updatedUser['title']} {$updatedUser['firstname']} {$updatedUser['lastname']} ({$updatedUser['alt_email']})";
-			$str[] = "{$emailString}\n";
+			$str[] = "{$emailString}";
 
 			$summary = (implode(' ', $str));
 
