@@ -542,7 +542,7 @@ class User extends DeprecatedModel {
                 $insertCampus = array('uid' => $user['id'], 'campus' => $campus, 'defaultCampus' => $campus == $defaultCampus ? 1 : 0);
                 $this->db->insert('userCampus', $insertCampus);
             }
-        } else {
+        } else if(is_numeric($campusArray) && $campusArray > 0) {
             /* Note that this can insert multiple campus if the update only specified a single value like in a bulk load */
             $campusquery = "INSERT IGNORE INTO userCampus (uid, campus) VALUES ('{$user['id']}', '$campusArray')";
             $this->db->query($campusquery);
