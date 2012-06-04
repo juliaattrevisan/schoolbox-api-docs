@@ -48,8 +48,9 @@ class HTMLPurifier_Filter_IFrame extends HTMLPurifier_Filter
         // Domain Whitelist
         $youTubeMatch = preg_match('#src="https?://www.youtube(-nocookie)?.com/#i', $matches[1]);
         $vimeoMatch = preg_match('#src="http://player.vimeo.com/#i', $matches[1]);
-        $gMapsMatch = preg_match('#src="http://maps.google.#i', $matches[1]);
-        if ($youTubeMatch || $vimeoMatch || $gMapsMatch) {
+        $gMapsMatch = preg_match('#src="https?://maps.google.#i', $matches[1]);
+        $gMaps2Match = preg_match('#src="https?://www.google.com(.[a-z]{2})?/maps#i', $matches[1]);
+        if ($youTubeMatch || $vimeoMatch || $gMapsMatch || $gMaps2Match) {
             $extra = ' frameborder="0"';
             if ($youTubeMatch) {
                 $extra .= ' allowfullscreen';
