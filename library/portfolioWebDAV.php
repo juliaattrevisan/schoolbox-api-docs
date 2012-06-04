@@ -174,7 +174,7 @@ class PortfolioWebDAV {
                 $settings['baseUri'] = 'http://mercury/';
 
                 $paths = array(
-                    '/StudentHome/' . (12 - $_SESSION['year'] + 11) . '/' . $_SESSION['username'] . '/',
+                    '/StudentHome/' . (12 - $_SESSION['year'] + date('y')) . '/' . $_SESSION['username'] . '/',
                     '/StudentData/',
                 );
             }
