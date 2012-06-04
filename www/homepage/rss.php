@@ -1,6 +1,5 @@
 <?php
 
-require_once '../conf/conf.php';
 require_once SITE_root.'/include/Bootstrap.php';
 
 $categoryHandler = new Category();
