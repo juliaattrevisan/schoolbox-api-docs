@@ -9,9 +9,7 @@
  */
 require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 
-/* lol
- *
- * If you want to actually perform the DB update, use:
+/* If you want to actually perform the DB update, use:
  * $sync->setPerformUpdate(true);
  *
  * Otherwise it will echo out a plan
