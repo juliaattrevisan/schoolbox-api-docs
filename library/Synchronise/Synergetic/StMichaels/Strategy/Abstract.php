@@ -10,15 +10,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-abstract class Synchronise_Synergetic_Mggs_Strategy_Abstract extends Synchronise_Synergetic_Strategy_Abstract {
+abstract class Synchronise_Synergetic_StMichaels_Strategy_Abstract extends Synchronise_Synergetic_Strategy_Abstract {
 	protected $verboseFilter = null;
-
-	/**
-	 * Setup
-	 */
-	protected function setup() {
-		$this->setVerboseFilter(new Synchronise_Synergetic_StMichaels_Verbose());
-	}
 
 	/**
 	 * Identical algorithm used to create/update a user

@@ -16,6 +16,13 @@ class Synchronise_Synergetic_StMichaels_Strategy_Student extends Synchronise_Syn
 	protected $strategyTitle = "Update Schoolbox Student Details Synchronisation";
 
 	/**
+	 * Setup
+	 */
+	protected function setup() {
+		$this->setVerboseFilter(new Synchronise_Synergetic_StMichaels_Verbose_Student());
+	}
+
+	/**
 	 * Get a list of users' Synergy IDs to sync
 	 *
 	 * @return void
