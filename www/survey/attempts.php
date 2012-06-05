@@ -45,7 +45,16 @@ if (is_array($allAttempts) && count($allAttempts)) {
 		$i++;
 
 		$startDate = new Alaress_Date_Format($currentAttempt['start'], 'y-m-d h:i:s');
-		$finishDate = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
+
+		/* For attempts that are still in progress
+		 */
+		if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
+			$finishDate = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
+			$finishDateValue = $finishDate->getShort();
+		}
+		else {
+			$finishDateValue = 'Unfinished';
+		}
 
 		$firstSection = $sectionHandler->getFirst($this->arg[0]);
 
@@ -54,7 +63,7 @@ if (is_array($allAttempts) && count($allAttempts)) {
 			'ATTEMPT_FIRSTNAME' => $currentAttempt['firstname'],
 			'ATTEMPT_LASTNAME' => $currentAttempt['lastname'],
 			'ATTEMPT_START' => $startDate->getShort(),
-			'ATTEMPT_FINISH' => $finishDate->getShort(),
+			'ATTEMPT_FINISH' => $finishDateValue,
 			'ATTEMPT_ASSESS_ID' => $this->arg[0],
 			'ATTEMPT_SECTION_ID' => $firstSection['section_id'],
 			'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
