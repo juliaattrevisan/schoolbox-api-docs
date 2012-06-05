@@ -178,7 +178,6 @@ elseif (!empty($handle[$type])) {
 	}
 }
 
-
 /* <RESULTS RENDERING> */
 
 // render users
@@ -650,7 +649,11 @@ if (empty($type)) {
     $page->outputPage();
 
 // if we have a search type
-} else {
+}
+/* If we have a search type and have results to display
+ */
+else if ($result[$type]) {
+
     // clear count
     $page->setBlock('RESULT', 'count', 'count_block');
     $page->setVar('count_block');
