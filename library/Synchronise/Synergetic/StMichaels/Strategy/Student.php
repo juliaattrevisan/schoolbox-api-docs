@@ -63,7 +63,7 @@ class Synchronise_Synergetic_StMichaels_Strategy_Student extends Synchronise_Syn
 		$newUser['defaultCampus'] = 1;
 		$newUser['campus'] = array($this->getCampusFromCode($currentUser['StudentCampus']));
 
-		/* Staff Group ID
+		/* Student Group ID
 		 */
 		$newUser['group_id'] = $this->getGroupIDFromYearLevel($currentUser['StudentYearLevel']);
 

@@ -83,16 +83,20 @@ abstract class Synchronise_Synergetic_StMichaels_Strategy_Abstract extends Synch
 	 * @return bool|string
 	 */
 	protected function getCampusFromCode($code) {
+
+		/* Not sure what MTH is, or how it comes out via Synergetic.
+		 * I assume it comes out as an M. I've only seen J and S so far.
+		 */
 		switch($code) {
-			case 'E':
-				return 1;
+			case 'M':
+				return 3;
 			case 'J':
 				return 2;
 			case 'S':
-				return 3;
-			default:
-				// return 'E';
 				return 1;
+			default:
+				// return 'M';
+				return 3;
 		}
 	}
 
@@ -104,23 +108,36 @@ abstract class Synchronise_Synergetic_StMichaels_Strategy_Abstract extends Synch
 	 */
 	protected function getGroupIDFromYearLevel($year) {
 		switch ($year) {
+			case '0':
+				return 4;
 			case '1':
-			case '2':
-			case '3':
-			case '4':
-			case '30':
-			case '40':
 				return 6;
+			case '2':
+				return 7;
+			case '3':
+				return 8;
+			case '4':
+				return 9;
 			case '5':
+				return 10;
 			case '6':
+				return 11;
 			case '7':
+				return 12;
 			case '8':
-				return 5;
+				return 13;
 			case '9':
+				return 14;
 			case '10':
+				return 15;
 			case '11':
+				return 16;
 			case '12':
-				return 3;
+				return 17;
+			case '30':
+				return 18;
+			case '40':
+				return 19;
 			default:
 				return false;
 		}
