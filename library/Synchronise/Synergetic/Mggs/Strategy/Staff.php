@@ -2,6 +2,9 @@
 /**
  * Synchronise_Synergetic_Mggs_Strategy_Staff
  *
+ * Update Schoolbox with Synergetic data if there is something different
+ * contained in Synergetic database.
+ *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/

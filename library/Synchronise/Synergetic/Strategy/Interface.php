@@ -1,7 +1,9 @@
 <?php
 /**
- * Standardised interface for all SynergeticSync Strategies. These are methods
- * which must exist in all SynergeticSync Strategies.
+ * Synchronise_Synergetic_Strategy_Interface
+ *
+ * Standardised interface for all Synchronise_Synergetic_Strategy_Abstract Strategies.
+ * These are methods which must exist in all Synchronise_Synergetic_Strategy_Abstract Strategies.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd

@@ -1,5 +1,7 @@
 <?php
 /**
+ * Synchronise_Synergetic_Bialik_Strategy_Student
+ *
  * Adds Students in Synergetic to the Schoolbox User table. Applies Campus based
  * on the Students' Year Level.
  *

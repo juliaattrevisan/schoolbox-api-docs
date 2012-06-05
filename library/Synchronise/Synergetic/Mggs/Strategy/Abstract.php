@@ -1,9 +1,11 @@
 <?php
 /**
+ * Synchronise_Synergetic_Mggs_Strategy_Abstract
+ *
  * Mggs-specific methods that are provided for each synchronisation Strategy.
  *
- * You can create custom subclasses of SynergeticSyncStrategy to provide unique
- * methods to your synchronisation strategies.
+ * You can create custom subclasses of Synchronise_Synergetic_Strategy_Abstract
+ * to provide unique methods to your synchronisation strategies.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd

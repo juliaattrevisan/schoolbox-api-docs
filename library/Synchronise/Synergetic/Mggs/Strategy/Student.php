@@ -1,5 +1,10 @@
 <?php
 /**
+ * Synchronise_Synergetic_Mggs_Strategy_Student
+ *
+ * Update Schoolbox with Synergetic data if there is something different
+ * contained in Synergetic database.
+ *
  * Adds Students in Synergetic to the Schoolbox User table.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>

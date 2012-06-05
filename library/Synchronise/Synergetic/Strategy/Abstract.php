@@ -1,5 +1,7 @@
 <?php
 /**
+ * Synchronise_Synergetic_Strategy_Abstract
+ *
  * Class definition for Synergetic Synchronisation Strategies. Strategies are
  * individual classes that handle particular steps of an algorithm. This class
  * defines shared Strategy methods and shouldn't be instantiated, only extended

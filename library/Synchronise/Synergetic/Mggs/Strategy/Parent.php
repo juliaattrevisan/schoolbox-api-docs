@@ -1,5 +1,7 @@
 <?php
 /**
+ * Synchronise_Synergetic_Mggs_Strategy_Parent
+ *
  * Update Schoolbox with Synergetic data if there is something different
  * contained in Synergetic database. This was formerly known as parentSync.php
  * and was amalgamated with the Bialik sync classes.

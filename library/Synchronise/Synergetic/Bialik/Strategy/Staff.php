@@ -1,5 +1,7 @@
 <?php
 /**
+ * Synchronise_Synergetic_Bialik_Strategy_Staff
+ *
  * Adds Staff in Synergetic to the Schoolbox User table. Applies Campus based
  * on the Staff's campus field.
  *
