@@ -111,6 +111,9 @@ if (is_array($fileList) && count($fileList) > 0) {
         // icon
         $class[] = $allowedFiles->getClass(!empty($file['iconFile']) ? $file["iconFile"] : "txt.png");
 
+		/* Note that WebDAV returns the $file['submitted'] value in a different format
+		 * than Schoolbox.
+		 */
         $modifiedTime = new Alaress_Date_Format(strtotime($file['submitted']), 'U');
 
         $output = array('FILE_ID' => $file['id'],
