@@ -27,31 +27,53 @@ class External_Synergetic_User implements External_UserInterface {
      * @return Bool|String
      */
     public function getPortrait ($externalUserId) {
-
         $query = "
-            SELECT vPhotos.ID, vPhotos.Photo, vPhotos.PhotoType
+            SELECT vPhotos.ID, vPhotos.Photo, vPhotos.PhotoType, vPhotos.ModifiedDate
             FROM SynergyOne.dbo.vPhotos vPhotos
             WHERE vPhotos.ID = '{$externalUserId}'
         ";
 
-        if ( $photo = $this->getDatabase()->getRow($query) ) {
-            //$photoPath = tempnam(Cfg::get('zip_dir'), 'synport');
-
+		if ($photo = $this->getDatabase()->getRow($query)) {
             $photoPath = Config::get('portrait_dir').'/'.$externalUserId.'.jpg';
 
-            //return file from cache
             //TODO: delete photos on rollover
-            if(file_exists($photoPath)) {
-                return $photoPath;
-            }
-            else {
-                $photoHandle = fopen($photoPath, "w");
 
-                fwrite($photoHandle, $photo['Photo']);
-                fclose($photoHandle);
+			/* If the file exists, check that it hasn't expired.
+			 * If it has, update the image and return that instead
+			 */
+			$userHandler = new User();
+			$user = $userHandler->getBySynergy($externalUserId);
 
-                return $photoPath;
+			/* If our cached version timestamp is the same as the synergetic
+			 * modified timestamp, the image is still the same
+			 */
+			$portraitModifiedDate = new Alaress_Date_Format(strtotime($photo['ModifiedDate']), 'U');
+			$lastModifiedDate = new Alaress_Date_Format($user['portrait_updated_at'], 'y-m-d h:i:s');
+
+			/* If the cached file doesn't exist, or the synergetic image is more recent than our
+			 * last known cached version, regenerate cached version
+			 */
+            if (!file_exists($photoPath) || ($portraitModifiedDate->getUnixTimestamp() > $lastModifiedDate->getUnixTimestamp())) {
+
+				/* Save the image
+				 */
+				$photoHandle = fopen($photoPath, "w");
+				fwrite($photoHandle, $photo['Photo']);
+				fclose($photoHandle);
+
+				/* To avoid the dupe username check which uses the 'id' key
+				 */
+				$updatedUser = array(
+					'id' => $user['uid'],
+					'portrait_updated_at' => $portraitModifiedDate->getDatabase(),
+				);
+
+				/* Update user table to remember when the portrait was last generated
+				 */
+				$userHandler->update($updatedUser);
             }
+
+			return $photoPath;
         }
 
         return false;
