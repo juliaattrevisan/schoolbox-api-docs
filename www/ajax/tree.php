@@ -26,7 +26,7 @@ if (is_numeric($_POST['relationID'])) {
 					$category['permission'] = "full";
 
 				/* append code to name */
-				$name = Scrub::text($category['name']);
+				$name = htmlspecialchars_decode(Scrub::text($category['name']), ENT_QUOTES);
 				if($category['code'] != '' && $category['code'] != $category['name'])
 					$name .= ' ('.Scrub::text($category['code']).')';
 
@@ -46,7 +46,6 @@ if (is_numeric($_POST['relationID'])) {
 }
 elseif (is_numeric($_POST['resourcesID']))
 	$_SESSION['resourcesID'] = $_POST['resourcesID'];
-
 
 
 header("Content-type: application/json");
