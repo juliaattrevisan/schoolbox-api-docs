@@ -76,15 +76,20 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
             if ($answerGroup) {
                 $allAnswers = unserialize($answerGroup['answer']);
 
-                foreach($allAnswers as $currentAnswer) {
-                    $page->setVar(array(
-                        'ANSWER_VALUE' => $currentAnswer->value,
-                        'ANSWER_DESCRIPTION' => $currentAnswer->description,
-                        'ANSWER_CHECKED' => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
-                    ));
+                if (is_array($allAnswers) && count($allAnswers)) {
+                    foreach($allAnswers as $currentAnswer) {
+                        $page->setVar(array(
+                            'ANSWER_VALUE' => $currentAnswer->value,
+                            'ANSWER_DESCRIPTION' => $currentAnswer->description,
+                            'ANSWER_CHECKED' => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
+                        ));
 
-                    $page->parse('answerOption_block', 'answerOption', true);
+                        $page->parse('answerOption_block', 'answerOption', true);
+                    }
                 }
+                else {
+					$page->setVar('answerOption_block', '');
+				}
 
                 $page->setVar(array(
                     'ANSWER_ID' => $answerGroup['answer_id']
