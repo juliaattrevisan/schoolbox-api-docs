@@ -106,39 +106,36 @@ $j(function () {
 <h1>{WORK_USER_NAME} Work</h1>
 <div class="left">
 	<div id="calendar">
+        <div class="calendar-controls clearfix">
+            <div>
+
+                <a class="back" href="/submission/dueWork/{PREV_MONTH}/{WORK_USER_ID}" title="Back one month"><strong>&lt;&lt;</strong></a>
+                <div class="current-date">{CURRENT_DATE}</div>
+                <a class="forward" href="/submission/dueWork/{NEXT_MONTH}/{WORK_USER_ID}" title="Forward one month"><strong>&gt;&gt;</strong></a>
+
+            </div>
+            <div class="float-right">
+                <select name="subject" id="subjectFilter">
+                    <option value="">Show All</option>
+                    <!-- BEGIN subject -->
+                    <option value="{SUBJECT_ID}">{SUBJECT_NAME}</option>
+                    <!-- END subject -->
+                </select>
+            </div>
+        </div>
 		<table class="month-view duedates-calendar calendarTable">
-			<thead>
-			<td class="cal-left" colspan="3"><a class="back" href="/submission/dueWork/{PREV_MONTH}/{WORK_USER_ID}" title="Back one month"><strong>&lt;&lt;</strong></a>
-					<div class="current-date">{CURRENT_DATE}</div>
-					<a class="forward" href="/submission/dueWork/{NEXT_MONTH}/{WORK_USER_ID}" title="Forward one month"><strong>&gt;&gt;</strong></a></td>
-				<td></td>
-				<td colspan="3"><select name="subject" id="subjectFilter">
-						<option value="">Show All</option>
-						<!-- BEGIN subject -->
-						<option value="{SUBJECT_ID}">{SUBJECT_NAME}</option>
-						<!-- END subject -->
-					</select>
-
-					<!-- BEGIN is_parent -->
-
-					<select name="child" id="childSelect">
-						<!-- BEGIN child -->
-						<option value="{CHILD_ID}" {CHILD_ID_SELECTED}>{CHILD_NAME}</option>
-						<!-- END child -->
-					</select>
-
-					<!-- END is_parent --></td>
-			</thead>
-			<tbody>
-				<tr>
-					<th width="14%" class="dark">Sun</th>
-					<th width="14%" class="dark">Mon</th>
-					<th width="14%" class="dark">Tue</th>
-					<th width="14%" class="dark">Wed</th>
-					<th width="14%" class="dark">Thu</th>
-					<th width="14%" class="dark">Fri</th>
-					<th width="14%" class="dark">Sat</th>
-				</tr>
+            <thead>
+            <tr>
+                <th width="14%" class="dark">Sun</th>
+                <th width="14%" class="dark">Mon</th>
+                <th width="14%" class="dark">Tue</th>
+                <th width="14%" class="dark">Wed</th>
+                <th width="14%" class="dark">Thu</th>
+                <th width="14%" class="dark">Fri</th>
+                <th width="14%" class="dark">Sat</th>
+            </tr>
+            </thead>
+            <tbody>
 				<!-- BEGIN week -->
 				<tr>
 					<!-- BEGIN day -->

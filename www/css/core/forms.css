@@ -21,7 +21,7 @@ input[type="select"],
 input[type="search"]			{ border: solid 1px #ccc; height: 16px; padding: 1px 2px; display: block; }
 input[type="file"]				{ border: none; }
 textarea						{ border: solid 1px #ccc; height: 16px; padding: 0 2px; display: block; line-height: 18px; }
-select							{ display: block; margin-top: 2px; }
+select							{ display: block; margin-top: 2px; max-width: 100%; }
 input[type="submit"],
 input[type="reset"],
 input[type="button"]			{ margin-left: 12px; }
