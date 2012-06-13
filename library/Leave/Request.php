@@ -449,7 +449,7 @@ class Leave_Request extends Model {
 	 * @param $index
 	 * @return mixed
 	 */
-	private function getHostTypeMapIndex($index) {
+	public function getHostTypeMapIndex($index) {
 		return $this->hostTypeMap[$index];
 	}
 

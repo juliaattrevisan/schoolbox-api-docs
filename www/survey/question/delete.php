@@ -16,21 +16,18 @@ $answerHandler = new Survey_Answer();
 $sectionHandler = new Survey_Section();
 $groupHandler = new Group();
 
-if (!$groupHandler->isStaff()) {
-    error(130);
-}
-
 /* Soft delete the question
  */
 $question = $questionHandler->getByID($this->arg[0]);
 $answer = $answerHandler->getForQuestion($question['question_id']);
 $section = $sectionHandler->getByID($question['section_id']);
+$assess = $assessHandler->getByID($section['assess_id']);
 
 if ($assessHandler->isDeleted($section['assess_id'])) {
 	error(112);
 }
 
-if (!$assessHandler->isOwner($section['assess_id'])) {
+if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
     error(130);
 }
 
@@ -52,8 +49,6 @@ $answerHandler->update(array(
 
 /* Reorder questions because sequence corresponds to question number
  */
-$section = $sectionHandler->getByID($question['section_id']);
-
 $questionHandler->resequenceQuestionsAfterDelete($section['assess_id'], $section['section_id']);
 
 SitePage::localRedir('/survey/modify/' . $section['assess_id']);

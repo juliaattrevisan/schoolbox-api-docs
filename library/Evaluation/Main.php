@@ -125,6 +125,10 @@ abstract class Evaluation_Main extends DeprecatedModel {
 
         $currentSection = $allQuestions[0]['section_id'];
 
+		/* If there are no questions, remove template variable
+		 */
+		$page->setVar('question_block', '');
+
         for ($i=0, $questionNumber=1; $i < count($allQuestions); $i++) {
             $currentQuestion = $allQuestions[$i];
 

@@ -13,15 +13,17 @@ require_once('include/time.php');
 $groupHandler = new Group();
 $assessHandler = new Survey_Main();
 
-if (!$groupHandler->isStaff()) {
-    error(126);
+$assess = $assessHandler->getByID($this->arg[0]);
+
+if (!$assess) {
+    error(112);
 }
 
 if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
-if (!$assessHandler->isOwner($this->arg[0]) && !$groupHandler->isSuperuser()) {
+if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
     error(125);
 }
 
@@ -32,10 +34,13 @@ if (!empty($_POST)) {
     $start = new Alaress_Date_Format($_POST['start']['date'].' '.$_POST['start']['hour'].':'.$_POST['start']['minute'].' '.$_POST['start']['meridiem'], 'd/m/y');
     $finish = new Alaress_Date_Format($_POST['finish']['date'].' '.$_POST['finish']['hour'].':'.$_POST['finish']['minute'].' '.$_POST['finish']['meridiem'], 'd/m/y');
 
+	/* Do not update user_id, in case a superuser makes changes to some other teacher's survey.
+	 * Doing so would change ownership; thus, changes made by a superuser would prevent the
+	 * original author from being able to modify it.
+	 */
     $assessHandler->update(array(
 		'assess_id' => $this->arg[0],
 		'category_id' => Scrub::text($_POST['category_id']),
-		'user_id' => $_SESSION['id'],
 		'title' => Scrub::text($_POST['title']),
 		'description' => Scrub::text($_POST['description']),
 		'start' => $start->getDatabase(),
@@ -62,12 +67,6 @@ else {
 	$this->setBlock(TEMPLATE_content, 'durationMinute', 'durationMinute_block');
     $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
     $this->setTitle('Manage Survey');
-
-    $assess = $assessHandler->getByID($this->arg[0]);
-
-    if (!$assess) {
-        error(112);
-    }
 
     $assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
     $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');

@@ -311,8 +311,8 @@ class Leave_Report_Kings_House_Web {
 						'USER_BOARDING_STATUS' => $currentPerson['user_boarding_status'],
 
 						'REQUEST_STATUS' => implode('<hr />', $currentPerson['request_status']),
-						'REQUEST_HOST_TYPE' => implode('<hr />', $currentPerson['request_host_type']),
-						'REQUEST_DESCRIPTION' => implode('<hr />', $currentPerson['request_description']),
+						'REQUEST_HOST' => implode('<hr />', $currentPerson['request_host_type']),
+						'REQUEST_ACTIVITY' => implode('<hr />', $currentPerson['request_description']),
 
 						'CLASS' => implode(' ', $currentPerson['row_css_class']),
 					));
@@ -346,9 +346,9 @@ class Leave_Report_Kings_House_Web {
 
 						if (!$i) {
 							$this->getPage()->setVar('request_period_show_am_block', '');
-							$this->getPage()->setVar('request_period_show_day_block', '');
+							$this->getPage()->parse('request_period_show_day_block', 'request_period_show_day');
 							$this->getPage()->parse('request_period_hide_am_block', 'request_period_hide_am');
-							$this->getPage()->parse('request_period_hide_day_block', 'request_period_hide_day');
+							$this->getPage()->setVar('request_period_hide_day_block', '');
 						}
 						else {
 							$this->getPage()->parse('request_period_show_am_block', 'request_period_show_am');
@@ -413,10 +413,9 @@ class Leave_Report_Kings_House_Web {
 				 */
 				if (!$i) {
 					$this->getPage()->setVar('report_header_subtitle_show_am_block', '');
-					$this->getPage()->setVar('report_header_subtitle_show_day_block', '');
+					$this->getPage()->parse('report_header_subtitle_show_day_block', 'report_header_subtitle_show_day');
 					$this->getPage()->parse('report_header_subtitle_hide_am_block', 'report_header_subtitle_hide_am');
-					$this->getPage()->parse('report_header_subtitle_hide_day_block', 'report_header_subtitle_hide_day');
-
+					$this->getPage()->setVar('report_header_subtitle_hide_day_block', '');
 				}
 				else {
 					$this->getPage()->parse('report_header_subtitle_show_am_block', 'report_header_subtitle_show_am');

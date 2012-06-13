@@ -181,7 +181,7 @@ class Event_Attendance_Controller extends Controller
         $request->setUserId($attendance['user_id']);
         $request->setStart( $start->getDatabase() );
         $request->setFinish( $finish->getDatabase() );
-        $request->setHostType(Leave_Request::HOST_TYPE_OTHER);
+        $request->setHostType($request->getHostTypeMapIndex(5));
         $request->setHostName( $this->getUserHandler()->formatName($event) );
         $request->setHostPhone('');
         $request->setUserPhone('');

@@ -12,18 +12,16 @@ require_once '../library/group.php';
 $assessHandler = new Survey_Main();
 $groupHandler = new Group();
 
-if (!$groupHandler->isStaff()) {
-    error(130);
-}
-
 if (!empty($_POST)) {
-	if ($assessHandler->isDeleted($_POST['assess_id'])) {
-		error(112);
+	$assess = $assessHandler->getByID(Scrub::text($_POST['assess_id']));
+
+	if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+	    error(130);
 	}
 
-    if (!$assessHandler->isOwner(Scrub::text($_POST['assess_id']))) {
-        error(130);
-    }
+	if ($assessHandler->isDeleted(Scrub::text($_POST['assess_id']))) {
+		error(112);
+	}
 
     /* Create new Section
      */
@@ -43,10 +41,6 @@ else {
 		error(112);
 	}
 
-    if (!$assessHandler->isOwner($this->arg[0])) {
-        error(130);
-    }
-
     /* Find out whether the test exists to which you are attempting to add a
      * new Section
      */
@@ -55,6 +49,10 @@ else {
     if (empty($assess)) {
         error(112);
     }
+
+	if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+	    error(130);
+	}
 
     /* Render create page
      */

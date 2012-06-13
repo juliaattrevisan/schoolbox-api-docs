@@ -59,10 +59,12 @@ class Leave_Report_Kings_House_CSV extends Leave_Report_Kings_House_Web {
 			$headerDate = new Alaress_Date_Format($this->getReportStart()->getUnixTimestamp(), 'U');
 			$headerDate->addDays($j);
 
+			/* Skip AM for Friday
+			 */
 			$fieldList[] = $headerDate->getLongDateOnly();
+			$fieldList[] = '';
 
 			if ($j) {
-				$fieldList[] = '';
 				$fieldList[] = '';
 			}
 		}
@@ -80,15 +82,15 @@ class Leave_Report_Kings_House_CSV extends Leave_Report_Kings_House_Web {
 	protected function renderSubheadings() {
 		$fieldList = array('', '', '');
 
+		/* Skip AM for Friday
+		 */
 		for ($j = 0; $j < $this->getRange(); $j++) {
-			if (!$j) {
-				$fieldList[] = 'Bed';
-			}
-			else {
+			if ($j) {
 				$fieldList[] = 'AM';
-				$fieldList[] = 'PM';
-				$fieldList[] = 'Bed';
 			}
+
+			$fieldList[] = 'PM';
+			$fieldList[] = 'Bed';
 		}
 
 		/* Stream it!
@@ -120,9 +122,9 @@ class Leave_Report_Kings_House_CSV extends Leave_Report_Kings_House_Web {
 
 						if ($j) {
 							$fieldList[] = $currentPeriod['request_period_morning'];
-							$fieldList[] = $currentPeriod['request_period_day'];
 						}
 
+						$fieldList[] = $currentPeriod['request_period_day'];
 						$fieldList[] = $currentPeriod['request_period_night'];
 					}
 

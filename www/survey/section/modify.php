@@ -17,13 +17,19 @@ if (!$groupHandler->isStaff()) {
 }
 
 if (!empty($_POST)) {
+	$assess = $assessHandler->getByID(Scrub::text($_POST['assess_id']));
+
 	if ($assessHandler->isDeleted($_POST['assess_id'])) {
 		error(112);
 	}
 
-    if (!$assessHandler->isOwner(Scrub::text($_POST['assess_id']))) {
-        error(130);
-    }
+	if (!$assessHandler->isOwner($this->arg[0]) && !($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+		error(130);
+	}
+
+	if (!$assessHandler->isOwner(Scrub::text($_POST['assess_id'])) && !$groupHandler->isSuperuser()) {
+		error(130);
+	}
 
     $sectionHandler = new Survey_Section();
 
@@ -48,10 +54,11 @@ else {
 
     $sectionHandler = new Survey_Section();
     $section = $sectionHandler->getByID($this->arg[0]);
+	$assess = $assessHandler->getByID($section['assess_id']);
 
-    if (!$assessHandler->isOwner($section['assess_id'])) {
-        error(130);
-    }
+	if (!$assessHandler->isOwner($section['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+		error(130);
+	}
 
 	if ($assessHandler->isDeleted($section['assess_id'])) {
 		error(112);
@@ -62,8 +69,6 @@ else {
     $this->setFile(TEMPLATE_content, 'survey/section/modify.html');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setTitle('Create Section');
-
-    $assess = $assessHandler->getByID($section['assess_id']);
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],
