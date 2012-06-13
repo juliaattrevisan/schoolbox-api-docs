@@ -427,9 +427,19 @@ Library
 #library-search-field { font-weight:bold; color:#959595; font-size:16px;max-width: 288px; padding: 0 12px;height:31px; line-height:31px; border:0; background:#ffffff;-webkit-border-radius:3px; -moz-border-radius:3px; border-radius:3px; font-family:Arial, Helvetica, sans-serif }
 #library-search-button { -webkit-border-radius:4px; text-indent:-999999em; border:0;-moz-border-radius:4px; border-radius:4px; float:right; margin:0;text-align:center; line-height:32px; height:33px;width:33px; position:absolute; top:0; right:0; background:url("/images/core/icons/search.png") no-repeat 50% 50%; padding:0;}
 #library-search-button:hover {  cursor:pointer;}
-
-
 .library-content{margin-left:144px;}
+
+
+
+/*
+MORRIS LIBRARY
+*/
+#morris .library-left{float: left; width:66%;}
+#morris .library-right{float:right; width:33%;}
+#morris .left-column{float:left; width:49.5%;}
+#morris .left-column a.library-box{margin: 0 0 10px 0;}
+#morris .left-column.two{float:right}
+#morris .left-column.two a.library-box{margin-right:0;}
 
 #morris a.library-box strong{font-size:22px; font-weight:bold; background:none; margin-bottom:10px;}
 #morris a.library-box{display:block; color:#255196; min-height:204px;}
@@ -458,8 +468,10 @@ Library
 #morris .quotes blockquote em{font-weight:normal; font-style:italic; color:#000;}
 #morris .quotes, #morris .words{min-height:inherit;}
 
+#morris .community {margin-bottom:16px; min-height:525px;}
 #morris h5{ margin-bottom:8px;}
 #morris .community h5{margin-top:36px; margin-bottom:8px;}
+#morris .quotes{margin-bottom:16px;}
 #morris .words p{color:#3c00ff; font-size:18px; margin-top:18px;}
 #morris .cybersmart{min-height:inherit;}
 #morris .cybersmart p{line-height:18px; margin-bottom:0;}
