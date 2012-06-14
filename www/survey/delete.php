@@ -18,12 +18,6 @@ $answerHandler = new Survey_Answer();
 $sectionHandler = new Survey_Section();
 $groupHandler = new Group();
 
-if (!$groupHandler->isSuperuser()) {
-	if (!$assessHandler->isOwner($this->arg[0])) {
-		error(126);
-	}
-}
-
 /* Proceed regardless of whether the section has been previously erased or not
  *
 
@@ -35,6 +29,11 @@ if ($assessHandler->isDeleted($this->arg[0])) {
  */
 
 $assess = $assessHandler->getByID($this->arg[0]);
+
+if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+	error(126);
+}
+
 $sectionList = $sectionHandler->getList($this->arg[0]);
 
 if (is_array($sectionList) && count($sectionList)) {

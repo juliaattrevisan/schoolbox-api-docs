@@ -12,6 +12,7 @@
 $assessHandler = new Survey_Main();
 $factory = new Survey_Factory();
 $questionHandler = new Survey_Question();
+$groupHandler = new Group();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -25,6 +26,10 @@ if (!$assess) {
 
 if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
+}
+
+if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+    error(125);
 }
 
 $surveyExporter = new Survey_Export_Graph($assess, $factory, new Survey_Section(), new Survey_Attempt(), $questionHandler);

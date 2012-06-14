@@ -19,6 +19,7 @@ $assessHandler = new Survey_Main();
 $attemptHandler = new Survey_Attempt();
 $responseHandler = new Survey_Response();
 $sectionHandler = new Survey_Section();
+$groupHandler = new Group();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -52,7 +53,7 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
-if (!$assessHandler->isOwner($this->arg[0])) {
+if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
     error(127);
 }
 

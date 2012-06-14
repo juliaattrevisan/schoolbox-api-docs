@@ -19,24 +19,33 @@ $groupHandler = new Group();
 
 $user_id = $this->arg[1];
 
-if (!$groupHandler->isSuperuser()) {
-	if (!$assessHandler->isOwner($attempt['assess_id'])) {
-		error(126);
+/* Check that you can delete these attempts first
+ */
+$allAttempts = array();
+
+foreach ($_POST['attemptIds'] as $currentAttempt) {
+	if (is_numeric($currentAttempt)) {
+		$attempt = $attemptHandler->getByID($currentAttempt);
+
+		$attempt['assess'] = $assessHandler->getByID($attempt['assess_id']);
+
+		$allAttempts[] = $attempt;
+
+		if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($attempt['assess']['category_id']) < WRITE_ACCESS)) {
+			error(142);
+		}
 	}
 }
 
 /* Multiple soft-delete
  */
-foreach ($_POST['attemptIds'] as $currentAttempt) {
-	if (is_numeric($currentAttempt)) {
-		$attempt = $attemptHandler->getByID($currentAttempt);
-		$responseHandler->deleteResponsesForAttempt($attempt['attempt_id']);
+foreach ($allAttempts as $currentAttempt) {
+	$responseHandler->deleteResponsesForAttempt($currentAttempt['attempt_id']);
 
-		$attemptHandler->update(array(
-			'attempt_id' => $attempt['attempt_id'],
-			'deleted_at' => 'NOW()'
-		));
-	}
+	$attemptHandler->update(array(
+		'attempt_id' => $currentAttempt['attempt_id'],
+		'deleted_at' => 'NOW()'
+	));
 }
 
 SitePage::backToTheFuture(1);

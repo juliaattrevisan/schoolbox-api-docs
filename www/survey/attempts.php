@@ -21,16 +21,12 @@ if (!$assess) {
 	error(112);
 }
 
-if (!$groupHandler->isStaff()) {
+if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
     error(126);
 }
 
 if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
-}
-
-if (!$assessHandler->isOwner($this->arg[0]) && !$groupHandler->isSuperuser()) {
-    error(125);
 }
 
 $this->setFile(TEMPLATE_content, 'survey/attempts.html');
