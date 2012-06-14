@@ -7,20 +7,25 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-$assessHandler = new Survey_Main();
+$surveyHandler = new Survey_Main();
+$groupHandler = new Group();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
 }
 
-$assess = $assessHandler->getByID($this->arg[0]);
+$survey = $surveyHandler->getByID($this->arg[0]);
 
-if (!$assess) {
+if (!$survey) {
     error(112);
 }
 
-if ($assessHandler->isDeleted($assess['assess_id'])) {
+if ($surveyHandler->isDeleted($survey['assess_id'])) {
 	error(112);
+}
+
+if (!$surveyHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
+	error(125);
 }
 
 $exporter = new Survey_Export_CSV($this->arg[0], new Survey_Factory(), new Survey_Attempt(), new Survey_Question());

@@ -10,21 +10,28 @@
  */
 require_once '../library/group.php';
 
-$groupHandler = new Group();
-
-if (!$groupHandler->isStaff()) {
-    error(130);
-}
-
 /* Get a list of questions and answers to softdelete
  */
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
 $questionHandler = new Assess_Question();
 $answerHandler = new Assess_Answer();
+$groupHandler = new Group();
 
 $questionList = $questionHandler->getList($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[0]);
+
+if ($section) {
+	$assess = $assessHandler->getByID($section['assess_id']);
+}
+
+if (!$assess) {
+	error(112);
+}
+
+if (!$assessHandler->isOwner($section['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+    error(130);
+}
 
 if ($assessHandler->isDeleted($section['assess_id'])) {
 	error(112);

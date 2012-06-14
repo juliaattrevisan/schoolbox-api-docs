@@ -51,12 +51,12 @@ $j(document).ready(function() {
 
 			/* Submit via POST and redirect to question creation screen upon done
 			 */
-//			$j.post(theForm.attr('action'), data, function(responseText) {
-//				window.location = '/survey/question/create/' + data.section_id;
-//			});
-			$j.post('/survey/question/sandbox.php', data, function(responseText) {
-				console.log(responseText);
+			$j.post(theForm.attr('action'), data, function(responseText) {
+				window.location = '/survey/question/create/' + data.section_id;
 			});
+//			$j.post('/survey/question/sandbox.php', data, function(responseText) {
+//				console.log(responseText);
+//			});
 
 			tinyMCE.triggerSave();
 

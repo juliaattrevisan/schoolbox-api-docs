@@ -10,21 +10,26 @@
  */
 
 $factory = new Survey_Factory();
-$assessHandler = new Survey_Main();
+$surveyHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
+$groupHandler = new Group();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
 }
 
-$survey = $assessHandler->getByID($this->arg[0]);
+$survey = $surveyHandler->getByID($this->arg[0]);
 
 if (!$survey) {
     error(112);
 }
 
-if ($assessHandler->isDeleted($this->arg[0])) {
+if ($surveyHandler->isDeleted($this->arg[0])) {
 	error(112);
+}
+
+if (!$surveyHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
+	error(125);
 }
 
 /* Export xml

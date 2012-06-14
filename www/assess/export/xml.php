@@ -12,6 +12,7 @@
 $factory = new Assess_Factory();
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
+$groupHandler = new Group();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -25,6 +26,10 @@ if (!$assess) {
 
 if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
+}
+
+if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+	error(125);
 }
 
 /* Export xml

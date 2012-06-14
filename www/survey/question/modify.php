@@ -61,8 +61,14 @@ else {
 
     $questionHandler = new Survey_Question();
     $question = $questionHandler->getByID($this->arg[0]);
-    $section = $sectionHandler->getByID($question['section_id']);
-	$assess = $assessHandler->getByID($section['assess_id']);
+
+	if ($question) {
+    	$section = $sectionHandler->getByID($question['section_id']);
+	}
+
+	if ($section) {
+		$assess = $assessHandler->getByID($section['assess_id']);
+	}
 
 	if ($assessHandler->isDeleted($section['assess_id'])) {
 		error(112);

@@ -23,8 +23,11 @@ else {
 $factory = new Survey_Factory();
 $questionHandler = new Survey_Question();
 $sectionHandler = new Survey_Section();
+$surveyHandler = new Survey_Main();
+$groupHandler = new Group();
 
 $currentSection = $sectionHandler->getById($this->arg[0]);
+$survey = $surveyHandler->getByID($currentSection['assess_id']);
 
 if (!$currentSection) {
 	error(115);
@@ -32,6 +35,10 @@ if (!$currentSection) {
 
 if ($sectionHandler->isDeleted($this->arg[0])) {
 	error(115);
+}
+
+if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
+    error(125);
 }
 
 $xml = simplexml_load_string($data);

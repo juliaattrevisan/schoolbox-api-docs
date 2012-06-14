@@ -11,11 +11,20 @@
 
 $factory = new Assess_Factory();
 $questionHandler = new Assess_Question();
+$sectionHandler = new Assess_Section();
+$assessHandler = new Assess_Main();
+$groupHandler = new Group();
 
 $currentQuestion = $questionHandler->getById($this->arg[0]);
+$section = $sectionHandler->getByID($currentQuestion['section_id']);
+$assess = $assessHandler->getBYID($section['assess_id']);
 
 if (!$currentQuestion) {
 	error(119);
+}
+
+if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+    error(125);
 }
 
 /* Set up template

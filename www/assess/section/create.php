@@ -12,11 +12,13 @@ require_once '../library/group.php';
 $assessHandler = new Assess_Main();
 $groupHandler = new Group();
 
-if (!$groupHandler->isStaff()) {
-    error(130);
-}
-
 if (!empty($_POST)) {
+	$assess = $assessHandler->getByID(Scrub::text($_POST['assess_id']));
+
+	if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+	    error(130);
+	}
+
 	if ($assessHandler->isDeleted($_POST['assess_id'])) {
 		error(112);
 	}

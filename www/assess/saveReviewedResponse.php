@@ -12,15 +12,17 @@
 $assessHandler = new Assess_Main();
 $questionHandler = new Assess_Question();
 $sectionHandler = new Assess_Section();
+$groupHandler = new Group();
 
 $question = $questionHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($question['section_id']);
+$assess = $assessHandler->getByID($section['assess_id']);
 
 if ($assessHandler->isDeleted($section['assess_id'])) {
 	error(112);
 }
 
-if (!$assessHandler->isOwner($section['assess_id'])) {
+if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
     error(127);
 }
 

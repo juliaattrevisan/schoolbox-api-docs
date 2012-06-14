@@ -12,7 +12,7 @@ require_once '../library/group.php';
 
 /* Get a list of questions and answers to softdelete
  */
-$assessHandler = new Survey_Main();
+$surveyHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
 $questionHandler = new Survey_Question();
 $answerHandler = new Survey_Answer();
@@ -20,13 +20,20 @@ $groupHandler = new Group();
 
 $questionList = $questionHandler->getList($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[0]);
-$assess = $assessHandler->getByID($section['assess_id']);
 
-if (!$assessHandler->isOwner($section['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+if ($section) {
+	$survey = $surveyHandler->getByID($section['assess_id']);
+}
+
+if (!$survey) {
+	error(112);
+}
+
+if (!$surveyHandler->isOwner($section['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
     error(130);
 }
 
-if ($assessHandler->isDeleted($section['assess_id'])) {
+if ($surveyHandler->isDeleted($section['assess_id'])) {
 	error(112);
 }
 

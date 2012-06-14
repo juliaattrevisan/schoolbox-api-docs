@@ -34,7 +34,7 @@ class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap {
 		/* Pattern match spans to find answers
 		 */
 		$matches = array();
-		$pattern = '#<span>([^<]+)</span>#ms';
+		$pattern = '#<span class="selected-word">([^<]+)</span>#ms';
 
 		preg_match_all($pattern, $answer, $matches);
 
@@ -80,7 +80,7 @@ class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap {
 		/* Pattern match spans to find answers
 		 */
 		$matches = array();
-		$pattern = '#<span>([^<]+)</span>#ms';
+		$pattern = '#<span class="selected-word">([^<]+)</span>#ms';
 
 		preg_match_all($pattern, $currentAnswer['answer'], $matches);
 
@@ -103,7 +103,7 @@ class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap {
 			$i = 0;
 
 			foreach($existingAnswer as $val) {
-				$pattern = '#<span>([^<]+)</span>#ms';
+				$pattern = '#<span class="selected-word">([^<]+)</span>#ms';
 
 				/* Indicate matching/non-matching responses to answers
 				 */
@@ -131,7 +131,7 @@ class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap {
 			/* Prepare a special way to show Fillgap answers. This replaces
 			 * %%token%% tokens with inputs.
 			 */
-			$pattern = '#<span>([^<]+)</span>#ms';
+			$pattern = '#<span class="selected-word">([^<]+)</span>#ms';
 			$replace = " <span class='fillgapIncorrect'>&nbsp;</span> ";
 
 			$page->setVar(array(

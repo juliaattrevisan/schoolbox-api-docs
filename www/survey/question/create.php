@@ -20,7 +20,6 @@ $questionHandler = new Survey_Question();
 $factory = new Survey_Factory();
 $groupHandler = new Group();
 
-
 /* If a question was submitted
  */
 if (!empty($_POST)) {

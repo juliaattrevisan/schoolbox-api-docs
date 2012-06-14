@@ -12,18 +12,16 @@ require_once '../library/group.php';
 $assessHandler = new Assess_Main();
 $groupHandler = new Group();
 
-if (!$groupHandler->isStaff()) {
-    error(130);
-}
-
 if (!empty($_POST)) {
+	$assess = $assessHandler->getByID(Scrub::text($_POST['assess_id']));
+
 	if ($assessHandler->isDeleted($_POST['assess_id'])) {
 		error(112);
 	}
 
-    if (!$assessHandler->isOwner(Scrub::text($_POST['assess_id']))) {
-        error(130);
-    }
+	if (!$assessHandler->isOwner($assess['assess_id']) && !($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+		error(130);
+	}
 
     $sectionHandler = new Assess_Section();
 
@@ -49,12 +47,16 @@ else {
     $sectionHandler = new Assess_Section();
     $section = $sectionHandler->getByID($this->arg[0]);
 
-    if (!$assessHandler->isOwner($section['assess_id'])) {
-        error(130);
-    }
+	if ($section) {
+		$assess = $assessHandler->getByID($section['assess_id']);
+	}
 
 	if ($assessHandler->isDeleted($section['assess_id'])) {
 		error(112);
+	}
+
+	if (!$assessHandler->isOwner($section['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+		error(130);
 	}
 
     /* Render modify page
@@ -62,8 +64,6 @@ else {
     $this->setFile(TEMPLATE_content, 'assess/section/modify.html');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setTitle('Create Section');
-
-    $assess = $assessHandler->getByID($section['assess_id']);
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],

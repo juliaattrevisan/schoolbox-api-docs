@@ -23,8 +23,11 @@ else {
 $factory = new Assess_Factory();
 $questionHandler = new Assess_Question();
 $sectionHandler = new Assess_Section();
+$assessHandler = new Assess_Main();
+$groupHandler = new Group();
 
 $currentSection = $sectionHandler->getById($this->arg[0]);
+$assess = $assessHandler->getByID($currentSection['assess_id']);
 
 if (!$currentSection) {
 	error(115);
@@ -32,6 +35,10 @@ if (!$currentSection) {
 
 if ($sectionHandler->isDeleted($this->arg[0])) {
 	error(115);
+}
+
+if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+    error(125);
 }
 
 $xml = simplexml_load_string($data);

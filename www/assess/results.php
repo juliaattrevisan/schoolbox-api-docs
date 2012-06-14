@@ -141,7 +141,7 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
-if (!$assessHandler->isOwner($this->arg[0])) {
+if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
     error(125);
 }
 

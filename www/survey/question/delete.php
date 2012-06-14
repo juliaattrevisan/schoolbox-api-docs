@@ -19,9 +19,15 @@ $groupHandler = new Group();
 /* Soft delete the question
  */
 $question = $questionHandler->getByID($this->arg[0]);
-$answer = $answerHandler->getForQuestion($question['question_id']);
-$section = $sectionHandler->getByID($question['section_id']);
-$assess = $assessHandler->getByID($section['assess_id']);
+
+if ($question) {
+	$answer = $answerHandler->getForQuestion($question['question_id']);
+	$section = $sectionHandler->getByID($question['section_id']);
+}
+
+if ($section) {
+	$assess = $assessHandler->getByID($section['assess_id']);
+}
 
 if ($assessHandler->isDeleted($section['assess_id'])) {
 	error(112);

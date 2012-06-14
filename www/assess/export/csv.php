@@ -8,6 +8,7 @@
  * @version	 SVN: $Id$
  */
 $assessHandler = new Assess_Main();
+$groupHandler = new Group();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -21,6 +22,10 @@ if (!$assess) {
 
 if ($assessHandler->isDeleted($assess['assess_id'])) {
 	error(112);
+}
+
+if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+	error(125);
 }
 
 $exporter = new Assess_Export_CSV($this->arg[0], new Assess_Factory(), new Assess_Attempt(), new Assess_Question());

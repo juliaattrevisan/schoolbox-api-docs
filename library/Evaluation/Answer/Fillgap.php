@@ -81,7 +81,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 
             $allMatches = array();
 
-            preg_match_all('#<span>([^<]+)</span>#ms', $currentAnswer['answer'], $allMatches);
+            preg_match_all('#<span class="selected-word">([^<]+)</span>#ms', $currentAnswer['answer'], $allMatches);
 
             if (count($allMatches[1])) {
                 foreach($allMatches[1] as $currentMatch) {
@@ -129,7 +129,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
             $ans = $currentAnswer['answer'];
 
             foreach($existingAnswer as $val) {
-                $pattern = '#<span>([^<]+)</span>#ms';
+                $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
                 $replace = " <input name='fillgap_{$question_id}[]' type='text' value=\"$val\" /> ";
 
                 $ans = preg_replace($pattern, $replace, $ans, 1, $x);
@@ -144,7 +144,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
             /* Prepare a special way to show Fillgap answers. This replaces
              * %%token%% tokens with inputs.
              */
-            $pattern = '#<span>([^<]+)</span>#ms';
+            $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
             $replace = " <input name='fillgap_{$question_id}[]' type='text' value='' /> ";
 
             $page->setVar(array(

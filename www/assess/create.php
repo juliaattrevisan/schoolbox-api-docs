@@ -11,14 +11,12 @@ require_once('../library/group.php');
 require_once('include/time.php');
 
 $groupHandler = new Group();
-
-if (!$groupHandler->isStaff()) {
-    error(126);
-}
-
 $assessHandler = new Assess_Main();
 
 if (!empty($_POST)) {
+	if ($groupHandler->getPermission(Scrub::text($_POST['category_id'])) < WRITE_ACCESS) {
+	    error(126);
+	}
 
     /* Format date, time
      */
@@ -57,6 +55,11 @@ else {
     if (!is_numeric($this->arg[0])) {
         error(117);
     }
+
+	if ($groupHandler->getPermission($this->arg[0]) < WRITE_ACCESS) {
+		error(126);
+	}
+
     /* Render create page
      */
     $this->setFile(TEMPLATE_content, 'assess/modify.html');

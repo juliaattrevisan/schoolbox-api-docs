@@ -9,25 +9,21 @@
  */
 require_once '../library/group.php';
 
-$assessHandler = new Survey_Main();
+$surveyHandler = new Survey_Main();
 $groupHandler = new Group();
 
-if (!$groupHandler->isStaff()) {
-    error(130);
-}
-
 if (!empty($_POST)) {
-	$assess = $assessHandler->getByID(Scrub::text($_POST['assess_id']));
+	$survey = $surveyHandler->getByID(Scrub::text($_POST['assess_id']));
 
-	if ($assessHandler->isDeleted($_POST['assess_id'])) {
+	if (!$survey) {
 		error(112);
 	}
 
-	if (!$assessHandler->isOwner($this->arg[0]) && !($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
-		error(130);
+	if ($surveyHandler->isDeleted($_POST['assess_id'])) {
+		error(112);
 	}
 
-	if (!$assessHandler->isOwner(Scrub::text($_POST['assess_id'])) && !$groupHandler->isSuperuser()) {
+	if (!$surveyHandler->isOwner($survey['assess_id']) && !($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
 		error(130);
 	}
 
@@ -54,13 +50,20 @@ else {
 
     $sectionHandler = new Survey_Section();
     $section = $sectionHandler->getByID($this->arg[0]);
-	$assess = $assessHandler->getByID($section['assess_id']);
 
-	if (!$assessHandler->isOwner($section['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+	if ($section) {
+		$survey = $surveyHandler->getByID($section['assess_id']);
+	}
+
+	if (!$survey) {
+		error(112);
+	}
+
+	if (!$surveyHandler->isOwner($section['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
 		error(130);
 	}
 
-	if ($assessHandler->isDeleted($section['assess_id'])) {
+	if ($surveyHandler->isDeleted($section['assess_id'])) {
 		error(112);
 	}
 
@@ -88,7 +91,7 @@ else {
     $this->setBlock('section', 'question', 'question_block');
 
     $assessHandler = new Survey_Main();
-    $assessHandler->renderAssessContents($assess['assess_id'], $this);
+    $assessHandler->renderAssessContents($survey['assess_id'], $this);
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);
 }

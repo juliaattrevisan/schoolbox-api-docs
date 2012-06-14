@@ -11,6 +11,7 @@
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
 $attemptHandler = new Assess_Attempt();
+$groupHandler = new Group();
 
 $assess = $assessHandler->getIntro($this->arg[0]);
 $allSummary = $assessHandler->getIntroSummary($this->arg[0]);
@@ -24,7 +25,7 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
-if (!$assessHandler->isOwner($this->arg[0])) {
+if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
     error(125);
 }
 

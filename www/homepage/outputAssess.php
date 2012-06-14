@@ -33,14 +33,14 @@ $attemptHandler = new Assess_Attempt();
 $sectionHandler = new Assess_Section();
 $userHandler = new User();
 
-$allAssess = $assessHandler->getList($categoryID);
-
-if ($groupHandler->isStaff()) {
+if ($permission >= WRITE_ACCESS) {
     $this->parse('createAssessment_block', 'createAssessment');
 }
 else {
     $this->setVar('createAssessment_block', '');
 }
+
+$allAssess = $assessHandler->getList($categoryID);
 
 if (is_array($allAssess)) {
     $i=0;
@@ -142,7 +142,7 @@ if (is_array($allAssess)) {
 			/* Modified this check so that only the owner or a superuser can get
 			 * these links which allow you to modify the assessment
 			 */
-			if ($currentAssess['user_id'] == $_SESSION['id'] || $groupHandler->isSuperuser()) {
+			if ($assessHandler->isOwner($currentAssess['assess_id']) || $groupHandler->getPermission($currentAssess['category_id']) >= WRITE_ACCESS) {
 				$this->parse('teacherLink_block', 'teacherLink');
 			}
 			else {

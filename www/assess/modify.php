@@ -13,15 +13,13 @@ require_once('include/time.php');
 $groupHandler = new Group();
 $assessHandler = new Assess_Main();
 
-if (!$groupHandler->isStaff()) {
-    error(126);
-}
+$assess = $assessHandler->getByID($this->arg[0]);
 
 if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
-if (!$assessHandler->isOwner($this->arg[0]) && !$groupHandler->isSuperuser()) {
+if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
     error(125);
 }
 

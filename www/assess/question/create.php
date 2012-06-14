@@ -20,22 +20,19 @@ $questionHandler = new Assess_Question();
 $factory = new Assess_Factory();
 $groupHandler = new Group();
 
-if (!$groupHandler->isStaff()) {
-    error(130);
-}
-
 /* If a question was submitted
  */
 if (!empty($_POST)) {
     $section = $sectionHandler->getByID($_POST['section_id']);
+	$assess = $assessHandler->getByID($section['assess_id']);
+
+	if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+	    error(130);
+	}
 
 	if ($assessHandler->isDeleted($section['assess_id'])) {
 		error(112);
 	}
-
-    if (!$assessHandler->isOwner(Scrub::text($section['assess_id']))) {
-        error(130);
-    }
 
 	if ($sectionHandler->isDeleted($section['section_id'])) {
 		error(115);
@@ -65,14 +62,16 @@ else {
     }
 
     $section = $sectionHandler->getByID($this->arg[0]);
+	$assess = $assessHandler->getByID($section['assess_id']);
 
 	if ($assessHandler->isDeleted($section['assess_id'])) {
 		error(112);
 	}
 
-    if (!$assessHandler->isOwner($section['assess_id'])) {
-        error(130);
-    }
+	if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+	    error(130);
+	}
+
 
 	if ($sectionHandler->isDeleted($section['section_id'])) {
 		error(115);

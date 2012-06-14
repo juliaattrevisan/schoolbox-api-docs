@@ -10,6 +10,7 @@
 
 $assessHandler = new Assess_Main();
 $attemptHandler = new Assess_Attempt();
+$groupHandler = new Group();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -34,7 +35,7 @@ if (!$attempt) {
     error(118);
 }
 
-if (!$assessHandler->isOwner($this->arg[0])) {
+if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
     error(127);
 }
 
