@@ -10,6 +10,7 @@
 $assessHandler = new Assess_Main();
 $questionHandler = new Assess_Question();
 $sectionHandler = new Assess_Section();
+$groupHandler = new Group();
 
 $question = $questionHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($question['section_id']);
@@ -35,6 +36,14 @@ if ($assessHandler->isDeleted($section['assess_id'])) {
 	error(112);
 }
 
+/* Participants should be blocked from attempting if it hasn't started,
+ * but authors should be able to test out their content
+ */
+$assess = $assessHandler->getByID($section['assess_id']);
+
+if (!$assessHandler->isOpen($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+	error(143);
+}
 
 if (!$question) {
     error(119);
@@ -51,7 +60,6 @@ $result = $answerHandler->saveResponse($data);
 
 /* Find out how many questions were completed in this section already
  */
-
 $result['percentageComplete'] = $sectionHandler->sectionPercentageComplete($question['section_id']);
 
 echo json_encode($result);

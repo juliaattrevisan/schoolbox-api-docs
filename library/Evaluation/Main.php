@@ -388,4 +388,27 @@ abstract class Evaluation_Main extends DeprecatedModel {
 
         return false;
     }
+
+	/**
+	 * Find out if this assess can be started
+	 *
+	 * @param $assess_id
+	 * @return bool
+	 */
+	public function isOpen($assess_id) {
+		$query = "
+			SELECT COUNT(assess_id)
+			FROM assess
+			WHERE assess_id = '$assess_id'
+			AND start <= NOW()
+		";
+
+		return $this->db->getOne($query);
+
+		if (!$result) {
+			return true;
+		}
+
+		return false;
+	}
 }

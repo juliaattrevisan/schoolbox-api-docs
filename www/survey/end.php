@@ -12,6 +12,7 @@ $assessHandler = new Survey_Main();
 $attemptHandler = new Survey_Attempt();
 $questionHandler = new Survey_Question();
 $responseHandler = new Survey_Response();
+$groupHandler = new Group();
 
 if (!is_numeric($_SESSION['attempt_id'])) {
     SitePage::localRedir('/survey/intro/' . $this->arg[0]);
@@ -38,6 +39,13 @@ if ($assessHandler->isOwner($this->arg[0])) {
 
 if ($assessHandler->isExpired($this->arg[0])) {
     error(120);
+}
+
+/* Participants should be blocked from attempting if it hasn't started,
+ * but authors should be able to test out their content
+ */
+if (!$assessHandler->isOpen($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+	error(144);
 }
 
 $this->setFile(TEMPLATE_content, 'survey/end.html');

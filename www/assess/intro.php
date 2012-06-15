@@ -47,6 +47,13 @@ if ($assessHandler->isExpired($this->arg[0])) {
     error(120);
 }
 
+/* Participants should be blocked from attempting if it hasn't started,
+ * but authors should be able to test out their content
+ */
+if (!$assessHandler->isOpen($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+	error(143);
+}
+
 $author = $userHandler->getByID($assess['user_id']);
 
 $allSummary = $assessHandler->getIntroSummary($this->arg[0]);

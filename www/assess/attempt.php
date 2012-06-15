@@ -15,6 +15,7 @@ $questionHandler = new Assess_Question();
 $factory = new Assess_Factory();
 $attemptHandler = new Assess_Attempt();
 $responseHandler = new Assess_Response();
+$groupHandler = new Group();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -57,6 +58,13 @@ if (!$assessHandler->canDoAssessment($this->arg[0])) {
 
 if (!$questionHandler->numQuestions($this->arg[0])) {
 	error(137);
+}
+
+/* Participants should be blocked from attempting if it hasn't started,
+ * but authors should be able to test out their content
+ */
+if (!$assessHandler->isOpen($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+	error(143);
 }
 
 /* Check if this user has attempted this assess in the past and restore whatever

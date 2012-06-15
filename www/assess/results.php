@@ -104,7 +104,7 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 
 	/* Expandable attempts
 	 */
-	if ($previousAttempt == null) {
+	if (($previousAttempt == null) || ($previousAttempt['user_id'] != $currentAttempt['user_id'])) {
 		$page->setVar(array(
 			'ATTEMPT_EXPANDABLE' => '',
 			'ATTEMPT_HIDDEN' => ''
