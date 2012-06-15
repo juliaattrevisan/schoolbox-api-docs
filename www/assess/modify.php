@@ -30,6 +30,12 @@ if (!empty($_POST)) {
     $start = new Alaress_Date_Format($_POST['start']['date'].' '.$_POST['start']['hour'].':'.$_POST['start']['minute'].' '.$_POST['start']['meridiem'], 'd/m/y');
     $finish = new Alaress_Date_Format($_POST['finish']['date'].' '.$_POST['finish']['hour'].':'.$_POST['finish']['minute'].' '.$_POST['finish']['meridiem'], 'd/m/y');
 
+	/* Check that finish time cannot be before start time
+	 */
+	if ($start->getUnixTimestamp() >= $finish->getUnixTimestamp()) {
+		error(145);
+	}
+
     /* Cater for unlimited duration tests. Can't use zero because of countdown
      * timer, so we use -1
      */
