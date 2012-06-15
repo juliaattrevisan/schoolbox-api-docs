@@ -28,7 +28,7 @@ class External_Synergetic_User implements External_UserInterface {
      */
     public function getPortrait ($externalUserId) {
         $query = "
-            SELECT vPhotos.ID, vPhotos.Photo, vPhotos.PhotoType, vPhotos.ModifiedDate
+            SELECT vPhotos.ModifiedDate
             FROM SynergyOne.dbo.vPhotos vPhotos
             WHERE vPhotos.ID = '{$externalUserId}'
         ";
@@ -51,9 +51,19 @@ class External_Synergetic_User implements External_UserInterface {
 			$lastModifiedDate = new Alaress_Date_Format($user['portrait_updated_at'], 'y-m-d h:i:s');
 
 			/* If the cached file doesn't exist, or the synergetic image is more recent than our
-			 * last known cached version, regenerate cached version
+			 * last known cached version, regenerate cached version.
+			 *
+			 * Separate the queries out, fetching the photo data only if it's newer than the cached
+			 * version, or if the cache version doesn't already exist.
 			 */
             if (!file_exists($photoPath) || ($portraitModifiedDate->getUnixTimestamp() > $lastModifiedDate->getUnixTimestamp())) {
+				$query = "
+					SELECT vPhotos.Photo, vPhotos.PhotoType
+					FROM SynergyOne.dbo.vPhotos vPhotos
+					WHERE vPhotos.ID = '{$externalUserId}'
+				";
+
+				$photo = $this->getDatabase()->getRow($query);
 
 				/* Save the image
 				 */
