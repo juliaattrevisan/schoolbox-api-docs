@@ -2,6 +2,8 @@
 /**
  * Leave_Notice_Core_Parent_Abstract
  *
+ * The base class for parent notifications.
+ *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/

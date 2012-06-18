@@ -2,6 +2,8 @@
 /**
  * Leave_Notice_Kings_User_Abstract
  *
+ * The base class for user notifications.
+ *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
