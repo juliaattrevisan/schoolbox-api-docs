@@ -22,13 +22,19 @@ abstract class Leave_Notice_Kings_Parent_Abstract extends Leave_Notice_Abstract 
 
 		$housemasterInitials = $this->getExternalUser()->getHousemasterByHouseId($this->getRequest()->getUser()->getResidentialHouseId());
 
+		$userHandler = new User();
+		$housemaster = $userHandler->getByUsername($housemasterInitials);
+
+		$housemasterName = $housemaster['firstname'] . ' ' . $housemaster['lastname'];
+		$housemasterEmail = $housemaster['alt_email'];
+
 		$subject = '(Parent) Leave Request Status Update for ' . $this->getRequest()->getUser()->getName();
 
 		/* Set destination email address in loop in send()
 		 */
         $email = new Mailer('../modules/leave/parentNoticeEmail.html', $subject, '');
 
-		$email->setFrom(Cfg::get('mail_from_address'), $housemasterInitials);
+		$email->setFrom($housemasterEmail, $housemasterName);
 
 		$email->setBlock($email->t_label, 'submitted_by', 'submitted_by_block');
 		$email->setBlock($email->t_label, 'authorised_by', 'authorised_by_block');
