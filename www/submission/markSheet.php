@@ -92,7 +92,7 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 
 	if (is_array($studentList)) {
 		foreach($studentList as $student) {
-            $csv .= $student['uid'].','.Scrub::text($student['lastname']).','.Scrub::text($student['firstname']).',';
+            $csv .= htmlspecialchars_decode($student['uid'].','.Scrub::text($student['lastname']).','.Scrub::text($student['firstname']).',', ENT_QUOTES);
 
 			if (is_array($subList)) {
 				foreach($subList as $sub) {
