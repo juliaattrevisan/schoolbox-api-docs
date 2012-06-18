@@ -1,13 +1,13 @@
 <?php
 /**
- * Leave_Notice_Parent_Submitted
+ * Leave_Notice_Core_Parent_Submitted
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Leave_Notice_Parent_Submitted extends Leave_Notice_Parent_Abstract {
+class Leave_Notice_Core_Parent_Submitted extends Leave_Notice_Core_Parent_Abstract {
 
 	/**
 	 * Setup

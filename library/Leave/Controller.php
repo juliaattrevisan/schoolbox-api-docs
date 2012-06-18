@@ -1022,7 +1022,9 @@ class Leave_Controller extends Controller {
 
 		/* Choose the Factory, have it produce() the notice object and send
 		 */
-		$factory = new Leave_Notice_Kings_User_Factory($request);
+		$leaveFactory = new Leave_Notice_Factory($request);
+		$factory = $leaveFactory->produceUserFactory();
+
 		$notice = $factory->produce();
 		$notice->send();
     }
@@ -1040,7 +1042,9 @@ class Leave_Controller extends Controller {
 
 			/* Choose the Factory, have it produce() the notice object and send
 			 */
-			$factory = new Leave_Notice_Kings_Parent_Factory($request);
+			$leaveFactory = new Leave_Notice_Factory($request);
+			$factory = $leaveFactory->produceParentFactory();
+
 			$notice = $factory->produce();
 			$notice->send();
 		}

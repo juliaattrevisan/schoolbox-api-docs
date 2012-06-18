@@ -1,14 +1,15 @@
 <?php
 /**
- * Leave_Notice_Abstract
+ * Leave_Notice_Abstract_Notice
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-abstract class Leave_Notice_Abstract {
+abstract class Leave_Notice_Abstract_Notice {
 	protected $request = null;
+	protected $emailTemplateFile = '';
 
 	/**
 	 * Constructor
@@ -43,5 +44,14 @@ abstract class Leave_Notice_Abstract {
 	 */
 	protected function getRequest() {
 		return $this->request;
+	}
+
+	/**
+	 * Get email template file
+	 *
+	 * @return string
+	 */
+	protected function getEmailTemplateFile() {
+		return $this->emailTemplateFile;
 	}
 }

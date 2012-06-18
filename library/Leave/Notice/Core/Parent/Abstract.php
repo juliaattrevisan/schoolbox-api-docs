@@ -1,14 +1,16 @@
 <?php
 /**
- * Leave_Notice_Parent_Abstract
+ * Leave_Notice_Core_Parent_Abstract
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-abstract class Leave_Notice_Parent_Abstract extends Leave_Notice_Abstract {
+abstract class Leave_Notice_Core_Parent_Abstract extends Leave_Notice_Abstract_Notice {
 	protected $email = null;
+	protected $emailTemplateFile = '../../core/modules/leave/parentNoticeEmail.html';
+
 	private $externalUser = null;
 
 	/**
@@ -22,13 +24,19 @@ abstract class Leave_Notice_Parent_Abstract extends Leave_Notice_Abstract {
 
 		$housemasterInitials = $this->getExternalUser()->getHousemasterByHouseId($this->getRequest()->getUser()->getResidentialHouseId());
 
+		$userHandler = new User();
+		$housemaster = $userHandler->getByUsername($housemasterInitials);
+
+		$housemasterName = $housemaster['firstname'] . ' ' . $housemaster['lastname'];
+		$housemasterEmail = $housemaster['alt_email'];
+
 		$subject = '(Parent) Leave Request Status Update for ' . $this->getRequest()->getUser()->getName();
 
 		/* Set destination email address in loop in send()
 		 */
-        $email = new Mailer('../modules/leave/parentNoticeEmail.html', $subject, '');
+        $email = new Mailer($this->getEmailTemplateFile(), $subject, '');
 
-		$email->setFrom(Cfg::get('mail_from_address'), $housemasterInitials);
+		$email->setFrom($housemasterEmail, $housemasterName);
 
 		$email->setBlock($email->t_label, 'submitted_by', 'submitted_by_block');
 		$email->setBlock($email->t_label, 'authorised_by', 'authorised_by_block');
@@ -53,19 +61,34 @@ abstract class Leave_Notice_Parent_Abstract extends Leave_Notice_Abstract {
 	 * Send a notification to all parents of the child
 	 */
 	public function send() {
-		$parentList = $this->getExternalUser()->getStudentContactList($this->getRequest()->getUser()->getSynergyId());
+		$allEmails = $this->getExternalUser()->getParentEmails($this->getRequest()->getUser()->getSynergyId());
 
-		if (is_array($parentList)) {
-			foreach ($parentList as $parent) {
+		if (is_array($allEmails) && count($allEmails)) {
+			foreach($allEmails as $currentEmail) {
 				if (Cfg::get('debug_email_address') != '') {
 					$this->getEmail()->send(Cfg::get('debug_email_address'));
 				}
 				else {
-					$this->getEmail()->send($parent['StudentContactDefaultEmail']);
+					$this->getEmail()->send($currentEmail);
 				}
 			}
 		}
 	}
+
+//	public function send() {
+//		$parentList = $this->getExternalUser()->getStudentContactList($this->getRequest()->getUser()->getSynergyId());
+//
+//		if (is_array($parentList)) {
+//			foreach ($parentList as $parent) {
+//				if (Cfg::get('debug_email_address') != '') {
+//					$this->getEmail()->send(Cfg::get('debug_email_address'));
+//				}
+//				else {
+//					$this->getEmail()->send($parent['StudentContactDefaultEmail']);
+//				}
+//			}
+//		}
+//	}
 
 	/* Getters/Setters
 	 */

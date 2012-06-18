@@ -7,7 +7,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Leave_Notice_Kings_Parent_Factory extends Leave_Notice_Factory_Abstract {
+class Leave_Notice_Kings_Parent_Factory extends Leave_Notice_Abstract_Factory {
 
 	/**
 	 * Produce a family of Kings Parent Notifications based on status

@@ -7,8 +7,10 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-abstract class Leave_Notice_Kings_Parent_Abstract extends Leave_Notice_Abstract {
+abstract class Leave_Notice_Kings_Parent_Abstract extends Leave_Notice_Abstract_Notice {
 	protected $email = null;
+	protected $emailTemplateFile = '../../kings/modules/leave/parentNoticeEmail.html';
+
 	private $externalUser = null;
 
 	/**
@@ -32,7 +34,7 @@ abstract class Leave_Notice_Kings_Parent_Abstract extends Leave_Notice_Abstract 
 
 		/* Set destination email address in loop in send()
 		 */
-        $email = new Mailer('../modules/leave/parentNoticeEmail.html', $subject, '');
+        $email = new Mailer($this->getEmailTemplateFile(), $subject, '');
 
 		$email->setFrom($housemasterEmail, $housemasterName);
 

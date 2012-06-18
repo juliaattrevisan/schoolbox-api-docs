@@ -7,8 +7,9 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-abstract class Leave_Notice_Kings_User_Abstract extends Leave_Notice_Abstract {
+abstract class Leave_Notice_Kings_User_Abstract extends Leave_Notice_Abstract_Notice {
 	protected $email = null;
+	protected $emailTemplateFile = '../../kings/modules/leave/userNoticeEmail.html';
 
 	/**
 	 * Setup
@@ -16,7 +17,7 @@ abstract class Leave_Notice_Kings_User_Abstract extends Leave_Notice_Abstract {
 	public function setup() {
 		$subject = '(Student) Leave Request Status Update for ' . $this->getRequest()->getUser()->getName();
 
-        $email = new Mailer('../modules/leave/userNoticeEmail.html', $subject , $this->getRequest()->getUser()->getAltEmail());
+        $email = new Mailer($this->getEmailTemplateFile(), $subject , $this->getRequest()->getUser()->getAltEmail());
 
 		$email->setBlock($email->t_label, 'submitted_by', 'submitted_by_block');
 		$email->setBlock($email->t_label, 'authorised_by', 'authorised_by_block');

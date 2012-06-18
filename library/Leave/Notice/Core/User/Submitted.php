@@ -1,13 +1,13 @@
 <?php
 /**
- * Leave_Notice_Parent_Rejected
+ * Leave_Notice_Core_User_Submitted
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Leave_Notice_Parent_Rejected extends Leave_Notice_Parent_Abstract {
+class Leave_Notice_Core_User_Submitted extends Leave_Notice_Core_User_Abstract {
 
 	/**
 	 * Setup
@@ -21,11 +21,18 @@ class Leave_Notice_Parent_Rejected extends Leave_Notice_Parent_Abstract {
 		/* Custom replacements
 		 */
 		$this->getEmail()->setVar(array(
-			'LEAVE_REJECTED_BY' => $this->getRequest()->getAuthorisationUser()->getName(),
+			'LEAVE_SUBMITTED_BY' => $this->getRequest()->getUser()->getName(),
 		));
 
-		$this->getEmail()->setVar('submitted_by_block', '');
+		$this->getEmail()->parse('submitted_by_block', 'submitted_by');
 		$this->getEmail()->setVar('authorised_by_block', '');
-		$this->getEmail()->parse('rejected_by_block', 'rejected_by');
+		$this->getEmail()->setVar('rejected_by_block', '');
+	}
+
+	/**
+	 * Send it
+	 */
+	public function send() {
+		$this->getEmail()->send();
 	}
 }

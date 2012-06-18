@@ -1,15 +1,15 @@
 <?php
 /**
- * Leave_Notice_Factory_Abstract
+ * Leave_Notice_Abstract_Factory
  *
- * Abstract Factory Method
+ * Abstract Factory Method. This used by the _User and _Parent factories for notifications
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-abstract class Leave_Notice_Factory_Abstract {
+abstract class Leave_Notice_Abstract_Factory {
 	protected $request = null;
 
 	/**
