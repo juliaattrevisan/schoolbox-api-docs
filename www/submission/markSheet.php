@@ -53,7 +53,7 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
         $csv = 'Synergetic ID,Surname,Firstname,';
 
 		foreach($subList as $sub) {
-            $csv .= Scrub::text(str_replace(',', ' ', $sub['name'])) . ',,';
+            $csv .= htmlspecialchars_decode(Scrub::text(str_replace(',', ' ', $sub['name'])), ENT_QUOTES) . ',,';
 		}
 
 		$csv .= "\n";
