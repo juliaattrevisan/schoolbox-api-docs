@@ -406,7 +406,8 @@ class Leave_Report_Kings_House_Web {
 				$headerDate->addDays($i);
 
 				$this->getPage()->setVar(array(
-					'REPORT_HEADER_DATE' => $headerDate->getLongDateOnly(),
+					'REPORT_HEADER_WEEKDAY' => $headerDate->getUsingFormat('l'),
+					'REPORT_HEADER_DATE' => $headerDate->getLocalShort(),
 				));
 
 				/* Hide the first two columns of the first group
