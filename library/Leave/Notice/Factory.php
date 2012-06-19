@@ -34,7 +34,7 @@ class Leave_Notice_Factory {
 	 * @return mixed
 	 */
 	public function produceParentFactory() {
-		$fullClassname = "Leave_Notice_{$this->getClassname()}_Parent_Factory";
+		$fullClassname = "Leave_{$this->getClassname()}_Notice_Parent_Factory";
 
 		return new $fullClassname($this->getRequestData());
 	}
@@ -45,7 +45,7 @@ class Leave_Notice_Factory {
 	 * @return mixed
 	 */
 	public function produceUserFactory() {
-		$fullClassname = "Leave_Notice_{$this->getClassname()}_User_Factory";
+		$fullClassname = "Leave_{$this->getClassname()}_Notice_User_Factory";
 
 		return new $fullClassname($this->getRequestData());
 	}

@@ -33,7 +33,7 @@ class Leave_Report_Factory {
 	 * @return mixed
 	 */
 	public function produceCSV() {
-		return $this->produce("Leave_Report_{$this->getClassname()}_House_CSV");
+		return $this->produce("Leave_{$this->getClassname()}_Report_House_CSV");
 	}
 
 	/**
@@ -42,7 +42,7 @@ class Leave_Report_Factory {
 	 * @return mixed
 	 */
 	public function producePrint() {
-		return $this->produce("Leave_Report_{$this->getClassname()}_House_Print");
+		return $this->produce("Leave_{$this->getClassname()}_Report_House_Print");
 	}
 
 	/**
@@ -51,7 +51,7 @@ class Leave_Report_Factory {
 	 * @return mixed
 	 */
 	public function produceWeb() {
-		return $this->produce("Leave_Report_{$this->getClassname()}_House_Web");
+		return $this->produce("Leave_{$this->getClassname()}_Report_House_Web");
 	}
 
 	/**
