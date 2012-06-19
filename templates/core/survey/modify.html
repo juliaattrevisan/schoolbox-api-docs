@@ -40,7 +40,6 @@ $j(document).ready(function() {
 		constrainInput: false,
 		onClose: function (string) {
 			var input = $j(this);
-
 			$j.getJSON('/ajax/strtotime.php', {string: string}, function (data) {
 				input.val(data.time);
 			})

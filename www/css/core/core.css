@@ -382,7 +382,7 @@ table th {
   font-weight: bold;
 }
 table th.sortable {
-  background: url('/images/core/tablesorter/sort.gif') no-repeat 8px 19.5px;
+  background: url('/images/core/tablesorter/sort.gif') no-repeat 8px center;
   padding: 7px 16px 7px 26px;
 }
 table th.sortable.descending {

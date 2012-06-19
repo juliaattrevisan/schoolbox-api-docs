@@ -1,0 +1,27 @@
+/*
+ * Because EVERYTHING's over-ridden in core -.-
+ */
+
+#letterhead {
+    text-align:  center;
+    position: relative;
+    margin-bottom: 3em;
+}
+#letterhead img {
+    position: absolute;
+    top: 0; left: 0;
+    height: 10em;
+}
+#letterhead h1 {
+    font-size: 3em; font-weight: normal;
+}
+
+h1 {
+    font-size: 2em; font-weight: bold; text-align: center;
+}
+table td, table th,
+.sortable-table td,
+.sortable-table th {
+    text-align: center;
+}
+table .text { text-align: left; }
