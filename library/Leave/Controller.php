@@ -31,6 +31,12 @@ class Leave_Controller extends Controller {
 	 */
 	const RANGE = 3;
 
+	protected $requestMapper;
+	protected $userMapper;
+	protected $houseMapper;
+	protected $externalUser;
+	protected $group;
+
 	/* Time map array
 	 * A map of actual time values => presentation information
 	 * used in the Leave Time/Return Time dropdowns
@@ -85,18 +91,12 @@ class Leave_Controller extends Controller {
 		'23:30:00' => '11:30 PM',
 	);
 
-    protected $requestMapper;
-    protected $userMapper;
-    protected $houseMapper;
-    protected $externalUser;
-	protected $group;
-
     /**
      * Constructor
      *
      * @param Page $page
      */
-    public function __construct ($page = null) {
+    public function __construct($page = null) {
         parent::__construct($page);
 
         $this->setUserMapper(NewUserMapper::getInstance());
@@ -206,7 +206,7 @@ class Leave_Controller extends Controller {
 	 *
 	 * @return Array
 	 */
-	public function executeCreateRequest () {
+	public function executeCreateRequest() {
 		return array();
 	}
 
@@ -216,7 +216,7 @@ class Leave_Controller extends Controller {
      * @param Array $data
      * @return void
      */
-    public function renderCreateRequest ($data) {
+    public function renderCreateRequest($data) {
         $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/createRequest.html');
 		$this->getPage()->setBlock('custom_head', 'student_autocomplete_javascript', 'student_autocomplete_javascript_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'student_autocomplete', 'student_autocomplete_block');
@@ -797,7 +797,7 @@ class Leave_Controller extends Controller {
 	 *
 	 * @param $data
 	 */
-    public function exportHouseReport ($data) {
+    public function exportHouseReport($data) {
 
 		/* Can wrap this in a factory to provide school-level customisation
 		 */
