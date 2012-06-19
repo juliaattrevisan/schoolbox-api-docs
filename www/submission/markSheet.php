@@ -13,11 +13,22 @@ $sectionHandler = new Assess_Section();
 $responseHandler = new Assess_Response();
 
 if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
+	$category = $catHandler->getByID($this->arg[1]);
+
+	/* Open an output stream so we can use fputcsv
+	 */
+	$filename = preg_replace('/[^0-9a-zA-Z()_-]/','_', $category['name']);
+
+	header ("Pragma: ");
+	header ("Cache-control: ");
+	header ("Content-Type: text/csv");
+	header ("Content-Disposition: attachment; filename=\"".$filename.".csv\"");
+
+	$fp = fopen('php://output', 'w');
+
 	if (!$groupHandler->isStaff()) {
 		error(19);
 	}
-
-	$category = $catHandler->getByID($this->arg[1]);
 
 	/* Get full student list of class  */
     if ($category['code'] && Cfg::get('external_enable')) {
@@ -50,49 +61,58 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 	$subList = $subHandler->getAllForUserCategory($this->arg[1], $_SESSION['id']);
 
 	if (is_array($subList)) {
-        $csv = 'Synergetic ID,Surname,Firstname,';
+        $csv = array('Synergetic ID','Surname','Firstname');
 
+		/* Scrub::text() too aggressive, creates untranslatable &#039; for apostrophes?
+		 */
 		foreach($subList as $sub) {
-            $csv .= htmlspecialchars_decode(Scrub::text(str_replace(',', ' ', $sub['name'])), ENT_QUOTES) . ',,';
+            $csv[] = html_entity_decode($sub['name'], ENT_QUOTES);
+			$csv[] = '';
 		}
 
-		$csv .= "\n";
+		fputcsv($fp, $csv);
 
 		/* Add subheadings
 		 * These are spacers for synergetic id, surname, firstname
 		 */
-		$csv .= ',,,';
+		$csv = array('', '', '');
 
 		/* Actual subheadings
 		 */
 		foreach($subList as $sub) {
 			$submissionType = $subHandler->getType($sub['type_id']);
-			$csv .= $submissionType['name'] . ',,';
+			$csv[] = html_entity_decode($submissionType['name'], ENT_QUOTES);
+			$csv[] = '';
 		}
 
-		$csv .= "\n";
+		fputcsv($fp, $csv);
 
 		/* Add third level subheadings
 		 */
-		$csv .= ',,,';
+		$csv = array('', '', '');
 
 		/* Actual subheadings
 		 */
 		foreach($subList as $sub) {
 			if ($sub['type_id'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) {
-				$csv .= 'Grade,Total,';
+				$csv[] = 'Grade';
+				$csv[] = 'Total';
 			}
 			else {
-				$csv .= 'Normalised Grade,Comment,';
+				$csv[] = 'Normalised Grade';
+				$csv[] = 'Comment';
 			}
 		}
 
-		$csv .= "\n";
+		fputcsv($fp, $csv);
 	}
 
 	if (is_array($studentList)) {
 		foreach($studentList as $student) {
-            $csv .= htmlspecialchars_decode($student['uid'].','.Scrub::text($student['lastname']).','.Scrub::text($student['firstname']).',', ENT_QUOTES);
+			$csv = array();
+			$csv[] = $student['uid'];
+			$csv[] = htmlspecialchars_decode(Scrub::text($student['lastname']), ENT_QUOTES);
+			$csv[] = htmlspecialchars_decode(Scrub::text($student['firstname']), ENT_QUOTES);
 
 			if (is_array($subList)) {
 				foreach($subList as $sub) {
@@ -105,36 +125,33 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 						/* return two columns, grade and total available marks
 						 */
                         if ($marks && $total) {
-                            $val = $marks . ',' . $total;
+                            $csv[] = Scrub::text($marks);
+							$csv[] = Scrub::text($total);
                         }
                         else {
-                            $val = ',';
+							$csv[] = '';
+							$csv[] = '';
                         }
-
-                        $csv .= Scrub::text($val) . ',';
                     }
                     else {
 
                         /* Return two columns, grade and comment
-                               */
+                         */
                         $return = $retHandler->getByUser($student['uid'],$sub['id']);
                         // if this is legacy, return Excel-escaped (ie. '-prepended) mark, otherwise norm_mark
                         $mark = $return[0]['slug'] == 'free' ? "'{$return[0]['mark']}" : $return[0]['norm_mark'];
-                        $csv .= html_entity_decode(Scrub::text($mark), ENT_QUOTES) . ',' . html_entity_decode(Scrub::text($return[0]['comment']), ENT_QUOTES) . ',';
+
+                        $csv[] = html_entity_decode(Scrub::text($mark), ENT_QUOTES);
+						$csv[] = html_entity_decode(Scrub::text($return[0]['comment']), ENT_QUOTES);
                     }
 				}
 			}
-            $csv .="\n";
+
+			fputcsv($fp, $csv);
 		}
 	}
 
-    $filename = preg_replace('/[^0-9a-zA-Z()_-]/','_', $category['name']);
-
-    header ("Pragma: ");
-    header ("Cache-control: ");
-    header ("Content-Type: text/csv");
-    header ("Content-Disposition: attachment; filename=\"".$filename.".csv\"");
-    echo $csv;
+	fclose($fp);
 
     exit;
 }
