@@ -116,15 +116,6 @@ class Leave_Controller extends Controller {
 		$email->send();
 	}
 
-    /**
-     *
-     *
-     * @return Array
-     */
-    public function executeCreateRequest () {
-        return array();
-    }
-
 	/**
 	 * Render host type dropdown
 	 *
@@ -208,6 +199,15 @@ class Leave_Controller extends Controller {
 
 			$this->getPage()->parse('request_finish_time_block', 'request_finish_time', true);
 		}
+	}
+
+	/**
+	 * Execute create request
+	 *
+	 * @return Array
+	 */
+	public function executeCreateRequest () {
+		return array();
 	}
 
     /**
@@ -300,6 +300,142 @@ class Leave_Controller extends Controller {
 		$this->sendParentNotice($request);
 
 		SitePage::localRedir("/modules/leave/student/{$request->getUserId()}");
+	}
+
+	/**
+	 * Returns a data array with the request to be modified
+	 *
+	 * @param Integer $requestId
+	 * @return Array
+	 */
+	public function executeModifyRequest($requestId) {
+		return array(
+			'request' => $this->getRequestMapper()->findById($requestId)
+		);
+	}
+
+	/**
+	 * Renders a modify request form
+	 *
+	 * @param Array $data
+	 *
+	 * @return void
+	 */
+	public function renderModifyRequest($data) {
+
+		/* Only allow Teachers/Staff to modify requests
+  		 */
+		if ($this->getGroup()->getPermission(null)) {
+			$request = $data['request'];
+			$user = $request->getUser();
+			$house = $this->getHouseMapper()->findById($user->getHouse());
+
+			$this->getPage()->setFile(TEMPLATE_content, 'modules/leave/modifyRequest.html');
+			$this->getPage()->setBlock(TEMPLATE_content, 'next_pending', 'next_pending_block');
+			$this->getPage()->setBlock(TEMPLATE_content, 'prev_pending', 'prev_pending_block');
+
+			/* Render dropdowns
+			 */
+			$this->renderStartTimeDropdown($request->getStart()->getDatabaseTime());
+			$this->renderFinishTimeDropdown($request->getFinish()->getDatabaseTime());
+			$this->renderHostTypeDropdown($request);
+			$this->renderConfirmedByCheckboxes($request);
+
+			$this->getPage()->setVar(array(
+				'REQUEST_ID' => $request->getId(),
+				'REQUEST_STATUS' => $request->getStatus(true),
+				'USER_NAME' => $user->getName(),
+				'USER_EXTERNAL_ID' => $user->getSynergyId(),
+				'USER_YEAR' => $user->getYear(),
+				'USER_HOUSE' => $house->getHouse(),
+				'REQUEST_START_DATE' => $request->getStart()->getLocalShort(),
+				'REQUEST_FINISH_DATE' => $request->getFinish()->getLocalShort(),
+				'REQUEST_HOST_NAME' => $request->getHostName(),
+				'REQUEST_HOST_PHONE' => $request->getHostPhone(),
+				'REQUEST_USER_PHONE' => $request->getUserPhone(),
+				'REQUEST_DESCRIPTION' => $request->getDescription(),
+				'REQUEST_NOTES' => $request->getNotes(),
+			));
+
+			/* What is the next/previous pending request?
+			 */
+			$nextRequest = $this->getRequestMapper()->findNextPendingByHouseId($request['id'], $user->getResidentialHouseId());
+
+			if ($nextRequest) {
+				$this->getPage()->setVar(array(
+					'NEXT_PENDING_ID' => $nextRequest['id']
+				));
+
+				$this->getPage()->parse('next_pending_block', 'next_pending');
+			}
+			else {
+				$this->getPage()->setVar('next_pending_block', '');
+			}
+
+			$previousRequest = $this->getRequestMapper()->findPreviousPendingByHouseId($request['id'], $user->getResidentialHouseId());
+
+			if ($previousRequest) {
+				$this->getPage()->setVar(array(
+					'PREV_PENDING_ID' => $previousRequest['id']
+				));
+
+				$this->getPage()->parse('prev_pending_block', 'prev_pending');
+			}
+			else {
+				$this->getPage()->setVar('prev_pending_block', '');
+			}
+		}
+		else {
+			error(19);
+		}
+	}
+
+	/**
+	 * Processes a modify form for a request
+	 *
+	 * @param Array $data
+	 * @return void
+	*/
+	public function processModifyRequest($data) {
+		$request = $this->getRequestMapper()->findById($data['request']['id']);
+
+		$start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y h:i:s');
+		$finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y h:i:s');
+
+		$request->setStart($start->getDatabase());
+		$request->setFinish($finish->getDatabase());
+		$request->setHostType($data['request']['hostType']);
+		$request->setHostName($data['request']['hostName']);
+		$request->setHostPhone($data['request']['hostPhone']);
+		$request->setUserPhone($data['request']['userPhone']);
+		$request->setDescription($data['request']['description']);
+		$request->setNotes($data['request']['notes']);
+		$request->setConfirmedBy($data['request']['confirmedBy']);
+
+		if (isset($data['approve']) || isset($data['reject'])) {
+			$authorisationDatetime = new Alaress_Date_Format(time(), 'U');
+
+			$request->setAuthorisationDatetime($authorisationDatetime->getDatabase());
+			$request->setAuthorisationUserId($_SESSION['id']);
+
+			if (isset($data['approve'])) {
+				$request->setStatus(Leave_Request::STATUS_APPROVED);
+			}
+			elseif (isset($data['reject'])) {
+				$request->setStatus(Leave_Request::STATUS_REJECTED);
+			}
+		}
+
+		$this->getRequestMapper()->save($request);
+
+		$request = $this->getRequestMapper()->findById($request->getId());
+
+		if (isset($data['approve']) || isset($data['reject'])) {
+			$this->sendUserNotice($request);
+			$this->sendParentNotice($request);
+		}
+
+		$this->getPage()->backToTheFuture(2);
 	}
 
 	/**
@@ -573,18 +709,6 @@ class Leave_Controller extends Controller {
 		}
 	}
 
-    /**
-     * Returns a data array with the request to be modified
-     *
-     * @param Integer $requestId
-     * @return Array
-     */
-	public function executeModifyRequest($requestId) {
-		return array(
-			'request' => $this->getRequestMapper()->findById($requestId)
-		);
-	}
-
 	/**
 	 * Render confirmed by checkbox array
 	 * Knows whether to show them depending on user type
@@ -617,129 +741,6 @@ class Leave_Controller extends Controller {
 		else {
 			$this->getPage()->setVar('has_confirmed_by_block', '');
 		}
-	}
-
-    /**
-     * Renders a modify request form
-     *
-     * @param Array $data
-     * @return void
-     */
-	public function renderModifyRequest($data) {
-
-		/* Only allow Teachers/Staff to modify requests
-		 */
-		if ($this->getGroup()->getPermission(null)) {
-			$request = $data['request'];
-			$user = $request->getUser();
-			$house = $this->getHouseMapper()->findById($user->getHouse());
-
-			$this->getPage()->setFile(TEMPLATE_content, 'modules/leave/modifyRequest.html');
-			$this->getPage()->setBlock(TEMPLATE_content, 'next_pending', 'next_pending_block');
-			$this->getPage()->setBlock(TEMPLATE_content, 'prev_pending', 'prev_pending_block');
-
-			/* Render dropdowns
-			 */
-			$this->renderStartTimeDropdown($request->getStart()->getDatabaseTime());
-			$this->renderFinishTimeDropdown($request->getFinish()->getDatabaseTime());
-			$this->renderHostTypeDropdown($request);
-			$this->renderConfirmedByCheckboxes($request);
-
-			$this->getPage()->setVar(array(
-				'REQUEST_ID' => $request->getId(),
-				'REQUEST_STATUS' => $request->getStatus(true),
-				'USER_NAME' => $user->getName(),
-				'USER_EXTERNAL_ID' => $user->getSynergyId(),
-				'USER_YEAR' => $user->getYear(),
-				'USER_HOUSE' => $house->getHouse(),
-				'REQUEST_START_DATE' => $request->getStart()->getLocalShort(),
-				'REQUEST_FINISH_DATE' => $request->getFinish()->getLocalShort(),
-				'REQUEST_HOST_NAME' => $request->getHostName(),
-				'REQUEST_HOST_PHONE' => $request->getHostPhone(),
-				'REQUEST_USER_PHONE' => $request->getUserPhone(),
-				'REQUEST_DESCRIPTION' => $request->getDescription(),
-				'REQUEST_NOTES' => $request->getNotes(),
-			));
-
-			/* What is the next/previous pending request?
-			 */
-			$nextRequest = $this->getRequestMapper()->findNextPendingByHouseId($request['id'], $user->getResidentialHouseId());
-
-			if ($nextRequest) {
-				$this->getPage()->setVar(array(
-					'NEXT_PENDING_ID' => $nextRequest['id']
-				));
-
-				$this->getPage()->parse('next_pending_block', 'next_pending');
-			}
-			else {
-				$this->getPage()->setVar('next_pending_block', '');
-			}
-
-			$previousRequest = $this->getRequestMapper()->findPreviousPendingByHouseId($request['id'], $user->getResidentialHouseId());
-
-			if ($previousRequest) {
-				$this->getPage()->setVar(array(
-					'PREV_PENDING_ID' => $previousRequest['id']
-				));
-
-				$this->getPage()->parse('prev_pending_block', 'prev_pending');
-			}
-			else {
-				$this->getPage()->setVar('prev_pending_block', '');
-			}
-		}
-		else {
-			error(19);
-		}
-	}
-
-    /**
-     * Processes a modify form for a request
-     *
-     * @param Array $data
-     * @return void
-	 */
-	public function processModifyRequest($data) {
-		$request = $this->getRequestMapper()->findById($data['request']['id']);
-
-		$start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y h:i:s');
-		$finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y h:i:s');
-
-		$request->setStart($start->getDatabase());
-		$request->setFinish($finish->getDatabase());
-		$request->setHostType($data['request']['hostType']);
-		$request->setHostName($data['request']['hostName']);
-		$request->setHostPhone($data['request']['hostPhone']);
-		$request->setUserPhone($data['request']['userPhone']);
-		$request->setDescription($data['request']['description']);
-		$request->setNotes($data['request']['notes']);
-		$request->setConfirmedBy($data['request']['confirmedBy']);
-
-		if (isset($data['approve']) || isset($data['reject'])) {
-			$authorisationDatetime = new Alaress_Date_Format(time(), 'U');
-
-			$request->setAuthorisationDatetime($authorisationDatetime->getDatabase());
-			$request->setAuthorisationUserId($_SESSION['id']);
-
-			if (isset($data['approve'])) {
-				$request->setStatus(Leave_Request::STATUS_APPROVED);
-			}
-			elseif (isset($data['reject'])) {
-				$request->setStatus(Leave_Request::STATUS_REJECTED);
-			}
-		}
-
-		$this->getRequestMapper()->save($request);
-
-		$request = $this->getRequestMapper()->findById($request->getId());
-
-		if (isset($data['approve']) || isset($data['reject'])) {
-			$this->sendUserNotice($request);
-			$this->sendParentNotice($request);
-		}
-
-		$this->getPage()->backToTheFuture(2);
 	}
 
 	/**
@@ -915,6 +916,9 @@ class Leave_Controller extends Controller {
 			$leaveFactory->produceParentFactory()->produce()->send();
 		}
 	}
+
+	/* Getters/Setters
+	 */
 
 	/**
 	 * Set external user
