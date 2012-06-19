@@ -10,13 +10,14 @@
  * @version	 SVN: $Id$
  */
 class Leave_Report_Kings_House_Web {
-	private $page = null;
-	private $data = array();
-	private $requestList = array();
-	private $houseList = array();
-	private $range = -1;
-	private $combined = array();
-	private $currentHouse = null;
+	protected $templateFile = '../kings/modules/leave/report/house/web.html';
+	protected $page = null;
+	protected $data = array();
+	protected $requestList = array();
+	protected $houseList = array();
+	protected $range = -1;
+	protected $combined = array();
+	protected $currentHouse = null;
 
 	/* Decorations to use on the little L's etc.
 	 * Shared functionality with csv export -_-
@@ -260,8 +261,8 @@ class Leave_Report_Kings_House_Web {
 	/**
 	 * Set up blocks and stuff
 	 */
-	private function setup() {
-        $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/houseReport.html');
+	protected function setup() {
+        $this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
         $this->getPage()->setBlock(TEMPLATE_content, 'house', 'house_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'row', 'row_block');
@@ -448,7 +449,7 @@ class Leave_Report_Kings_House_Web {
 	/**
 	 * Render the house list dropdown selector
 	 */
-	private function renderHouseList() {
+	protected function renderHouseList() {
 		if (count($this->getHouseList())) {
 			foreach ($this->getHouseList() as $house) {
 				$this->getPage()->setVar(array(
@@ -471,7 +472,7 @@ class Leave_Report_Kings_House_Web {
 	/**
 	 * Render extra information about the report
 	 */
-	private function renderMetaDetails() {
+	protected function renderMetaDetails() {
 		$currentTime = new Alaress_Date_Format(time(), 'U');
 
 		$this->getPage()->setVar(array(
@@ -490,7 +491,7 @@ class Leave_Report_Kings_House_Web {
 	 *
 	 * @return mixed
 	 */
-	private function getReportDate() {
+	protected function getReportDate() {
 		return $this->data['date'];
 	}
 
@@ -508,7 +509,7 @@ class Leave_Report_Kings_House_Web {
 	 *
 	 * @param $page
 	 */
-	private function setPage($page) {
+	protected function setPage($page) {
 		$this->page = $page;
 	}
 
@@ -526,7 +527,7 @@ class Leave_Report_Kings_House_Web {
 	 *
 	 * @param $data
 	 */
-	private function setData($data) {
+	protected function setData($data) {
 		$this->data = $data;
 	}
 
@@ -544,7 +545,7 @@ class Leave_Report_Kings_House_Web {
 	 *
 	 * @param $range
 	 */
-	private function setRange($range) {
+	protected function setRange($range) {
 		$this->range = $range;
 	}
 
@@ -562,7 +563,7 @@ class Leave_Report_Kings_House_Web {
 	 *
 	 * @param $requestList
 	 */
-	private function setRequestList($requestList) {
+	protected function setRequestList($requestList) {
 		$this->requestList = $requestList;
 	}
 
@@ -580,7 +581,7 @@ class Leave_Report_Kings_House_Web {
 	 *
 	 * @param $combined
 	 */
-	private function setCombined($combined) {
+	protected function setCombined($combined) {
 		$this->combined = $combined;
 	}
 
@@ -598,7 +599,7 @@ class Leave_Report_Kings_House_Web {
 	 *
 	 * @param $houseList
 	 */
-	private function setHouseList($houseList) {
+	protected function setHouseList($houseList) {
 		$this->houseList = $houseList;
 	}
 
@@ -607,7 +608,7 @@ class Leave_Report_Kings_House_Web {
 	 *
 	 * @return array
 	 */
-	private function getHouseList() {
+	protected function getHouseList() {
 		return $this->houseList;
 	}
 
@@ -616,7 +617,7 @@ class Leave_Report_Kings_House_Web {
 	 *
 	 * @param $currentHouse
 	 */
-	private function setCurrentHouse($currentHouse) {
+	protected function setCurrentHouse($currentHouse) {
 		$this->currentHouse = $currentHouse;
 	}
 
@@ -625,7 +626,7 @@ class Leave_Report_Kings_House_Web {
 	 *
 	 * @return null
 	 */
-	private function getCurrentHouse() {
+	protected function getCurrentHouse() {
 		return $this->currentHouse;
 	}
 
@@ -663,5 +664,14 @@ class Leave_Report_Kings_House_Web {
 	 */
 	protected function getDecorationApprovedEnd() {
 		return $this->decoration['approvedEnd'];
+	}
+
+	/**
+	 * Get template file
+	 *
+	 * @return string
+	 */
+	protected function getTemplateFile() {
+		return $this->templateFile;
 	}
 }

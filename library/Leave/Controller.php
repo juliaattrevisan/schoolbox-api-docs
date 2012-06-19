@@ -787,8 +787,8 @@ class Leave_Controller extends Controller {
 
 		/* Can wrap this in a factory to provide school-level customisation
 		 */
-		$houseReport = new Leave_Report_Kings_House_Web($this->getPage(), $data, self::RANGE);
-		$houseReport->render();
+		$factory = new Leave_Report_Factory($this->getPage(), $data, self::RANGE);
+		$factory->produceWeb()->render();
     }
 
 	/**
@@ -800,10 +800,23 @@ class Leave_Controller extends Controller {
 
 		/* Can wrap this in a factory to provide school-level customisation
 		 */
-		$houseReport = new Leave_Report_Kings_House_CSV($this->getPage(), $data, self::RANGE);
-		$houseReport->render();
+		$factory = new Leave_Report_Factory($this->getPage(), $data, self::RANGE);
+		$factory->produceCSV()->render();
 
 		die();
+    }
+
+	/**
+	 * Export CSV of renderHouseReport()
+	 *
+	 * @param $data
+	 */
+    public function printHouseReport($data) {
+
+		/* Can wrap this in a factory to provide school-level customisation
+		 */
+		$factory = new Leave_Report_Factory($this->getPage(), $data, self::RANGE);
+		$factory->producePrint()->render();
     }
 
 	/**

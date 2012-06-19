@@ -72,11 +72,11 @@
             e.preventDefault();
         });
 
-
-        $j('.print').click( function (e) {
-            e.preventDefault();
-            window.print();
-        })
+		$j('.print').click( function (e) {
+			window.location = $j(this).attr('href') + '/print';
+			console.log($j(this).attr('href').toString().replace(/\#/, '') + '/print');
+			e.preventDefault();
+		});
 
         /*
         * Hack for the hidden column next to the BS.
@@ -87,7 +87,7 @@
 </script>
 <!-- END custom_head -->
 
-<h1>Leave Report for {HOUSE_NAME}</h1>
+<h1>Leave Report for {HOUSE_NAME} (Core)</h1>
 <span class="header_option">
     <a class="btn go-back" href="/modules/leave/house/{HOUSE_ID}"><span></span>Return to {HOUSE_NAME}</a>
     <a class="btn print" href="#"><span></span>Print</a>

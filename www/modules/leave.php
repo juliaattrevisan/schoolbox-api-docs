@@ -47,9 +47,18 @@ else if ($method == 'report' && $this->arg[1] == 'house') {
 
     $argumentCount = count($this->arg);
 
+	/* Export to csv
+	 */
 	if ($this->arg[$argumentCount - 1] == 'export') {
 		$leaveController->exportHouseReport($data);
 	}
+	/* Print view
+	 */
+	else if ($this->arg[$argumentCount-1] == 'print') {
+		$leaveController->printHouseReport($data);
+	}
+	/* Web view
+	 */
 	else {
 		$leaveController->renderHouseReport($data);
 	}
