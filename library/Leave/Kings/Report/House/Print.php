@@ -9,4 +9,20 @@
  */
 class Leave_Kings_Report_House_Print extends Leave_Kings_Report_House_Web {
 	protected $templateFile = '../kings/modules/leave/report/house/print.html';
+
+	/**
+	 * Render extra information about the report
+	 *
+	 * Augment functionality (even though call super is bad)
+	 */
+	protected function renderMetaDetails() {
+		parent::renderMetaDetails();
+
+		$weekEnding = new Alaress_Date_Format($this->getReportDate(), 'd/m/y');
+		$weekEnding->addDays(Leave_Controller::SUNDAY - $weekEnding->getWeekDayNumber());
+
+		$this->getPage()->setVar(array(
+			'WEEK_ENDING' => $weekEnding->getUsingFormat('l F j, Y'),
+		));
+	}
 }
