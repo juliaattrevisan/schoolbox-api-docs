@@ -787,7 +787,7 @@ class Leave_Controller extends Controller {
 
 		/* Can wrap this in a factory to provide school-level customisation
 		 */
-		$factory = new Leave_Report_Factory($this->getPage(), $data, self::RANGE);
+		$factory = new Leave_Report_House_Factory($this->getPage(), $data, self::RANGE);
 		$factory->produceWeb()->render();
     }
 
@@ -800,7 +800,7 @@ class Leave_Controller extends Controller {
 
 		/* Can wrap this in a factory to provide school-level customisation
 		 */
-		$factory = new Leave_Report_Factory($this->getPage(), $data, self::RANGE);
+		$factory = new Leave_Report_House_Factory($this->getPage(), $data, self::RANGE);
 		$factory->produceCSV()->render();
 
 		die();
@@ -811,13 +811,13 @@ class Leave_Controller extends Controller {
 	 *
 	 * @param $data
 	 */
-    public function printHouseReport($data) {
+	public function printHouseReport($data) {
 
 		/* Can wrap this in a factory to provide school-level customisation
 		 */
-		$factory = new Leave_Report_Factory($this->getPage(), $data, self::RANGE);
+		$factory = new Leave_Report_House_Factory($this->getPage(), $data, self::RANGE);
 		$factory->producePrint()->render();
-    }
+	}
 
 	/**
 	 * Get catering requirements for the Friday, Saturday and Sunday.
@@ -869,88 +869,8 @@ class Leave_Controller extends Controller {
 	 * @param $data
 	 */
 	public function renderCateringReport($data) {
-		$this->getPage()->setFile(TEMPLATE_content, 'modules/leave/cateringReport.html');
-		$this->getPage()->setBlock(TEMPLATE_content, 'no_houses', 'no_houses_block');
-		$this->getPage()->setBlock(TEMPLATE_content, 'house', 'house_block');
-		$this->getPage()->setBlock(TEMPLATE_content, 'request_date_header', 'request_date_header_block');
-		$this->getPage()->setBlock(TEMPLATE_content, 'request_period_total', 'request_period_total_block');
-		$this->getPage()->setBlock('house', 'request_period', 'request_period_block');
-
-		/* Current House for navigation elements
-		 */
-		$currentHouse = $this->getHouseMapper()->findById($this->getPage()->arg[2]);
-
-		$this->getPage()->setVar(array(
-			'CURRENT_HOUSE_NAME' => $currentHouse->getHouse(),
-			'CURRENT_HOUSE_ID' => $currentHouse->getId(),
-			'REPORT_DATE' => $data['date']
-		));
-
-		/* For each day, render a heading
-		 * Exclude initial Friday -_-
-		 */
-		for ($i = 0; $i < count($data['dateList']); $i++) {
-			$currentDate = $data['dateList'][$i];
-
-			$this->getPage()->setVar(array(
-				'REQUEST_DATE_HEADER_DATE' => $currentDate->getLongDateOnly()
-			));
-
-			$this->getPage()->parse('request_date_header_block', 'request_date_header', true);
-		}
-
-		/* For each day, render totals
-		 */
-		for ($i = 0; $i < count($data['totals']); $i++) {
-			$currentSegment = $data['totals'][$i];
-
-			$this->getPage()->setVar(array(
-				'REQUEST_PERIOD_TOTAL_MORNING' => $currentSegment['present_morning'],
-				'REQUEST_PERIOD_TOTAL_DAY' => $currentSegment['present_day'],
-				'REQUEST_PERIOD_TOTAL_NIGHT' => $currentSegment['present_night'],
-			));
-
-			$this->getPage()->parse('request_period_total_block', 'request_period_total', true);
-		}
-
-		/* For each house
-		 */
-		if (is_array($data['houseList'][0]) && count($data['houseList'][0])) {
-			for ($i = 0; $i < count($data['houseList'][0]); $i++) {
-
-				/* For each day
-				 * (Exclude Friday -_-)
-				 */
-				for ($j = 0; $j < count($data['dateList']); $j++) {
-					$this->getPage()->setVar(array(
-						'REQUEST_PERIOD_MORNING' => (int)$data['houseList'][$j][$i]['present_morning'],
-						'REQUEST_PERIOD_DAY' => (int)$data['houseList'][$j][$i]['present_day'],
-						'REQUEST_PERIOD_NIGHT' => (int)$data['houseList'][$j][$i]['present_night'],
-					));
-
-					$this->getPage()->parse('request_period_block', 'request_period', true);
-				}
-
-				/* Render house row, with alternating background colours
-				 */
-				$this->getPage()->setVar(array(
-					'HOUSE_ID' => $data['houseList'][0][$i]['houseId'],
-					'HOUSE_NAME' => $data['houseList'][0][$i]['name'],
-					'CLASS' => $i % 2 ? 'dark' : '',
-				));
-
-				$this->getPage()->parse('house_block', 'house', true);
-
-				/* Clear children after parsing out the parent
-				 */
-				$this->getPage()->setVar('request_period_block', '');
-			}
-
-			$this->getPage()->setVar('no_houses_block', '');
-		}
-		else {
-			$this->getPage()->parse('no_houses_block', 'no_houses');
-		}
+		$report = new Leave_Report_Catering_Web($this->getPage(), $data);
+		$report->render();
 	}
 
 	/**
@@ -961,69 +881,8 @@ class Leave_Controller extends Controller {
 	 * @param $data
 	 */
 	public function exportCateringReport($data) {
-        $this->getPage()->setAjax(true);
-
-        header("Content-type: text/csv");
-        header("Cache-Control: no-store, no-cache");
-        header('Content-Disposition: attachment; filename="Catering Report.csv"');
-
-        $stream = fopen("php://output",'w');
-
-		/* For each day, render a heading
-		 */
-		$headers = array();
-		$headers[] = 'House';
-
-		$subheaders = array();
-		$subheaders[] = '';
-
-		foreach($data['dateList'] as $currentDate) {
-			$headers[] = $currentDate->getLocalShort();
-			$headers[] = $currentDate->getLocalShort();
-			$headers[] = $currentDate->getLocalShort();
-
-			$subheaders[] = 'Breakfast';
-			$subheaders[] = 'Lunch';
-			$subheaders[] = 'Dinner';
-		}
-
-		fputcsv($stream, $headers);
-		fputcsv($stream, $subheaders);
-
-		/* For each house
-		 */
-		if (is_array($data['houseList'][0]) && count($data['houseList'][0])) {
-			for ($i = 0; $i < count($data['houseList'][0]); $i++) {
-
-				$row = array();
-				$row[] = $data['houseList'][0][$i]['name'];
-
-				/* For each day
-				 */
-				for ($j = 0; $j < count($data['dateList']); $j++) {
-					$row[] = (int)$data['houseList'][$j][$i]['present_morning'];
-					$row[] = (int)$data['houseList'][$j][$i]['present_day'];
-					$row[] = (int)$data['houseList'][$j][$i]['present_night'];
-				}
-
-				fputcsv($stream, $row);
-			}
-		}
-
-		/* For each day, render totals
-		 */
-		$totals = array();
-		$totals[] = 'Total';
-
-		foreach($data['totals'] as $currentSegment) {
-			$totals[] = $currentSegment['present_morning'];
-			$totals[] = $currentSegment['present_day'];
-			$totals[] = $currentSegment['present_night'];
-		}
-
-		fputcsv($stream, $totals);
-
-        fclose($stream);
+		$report = new Leave_Report_Catering_CSV($this->getPage(), $data);
+		$report->render();
     }
 
 	/**
@@ -1036,10 +895,7 @@ class Leave_Controller extends Controller {
 		/* Choose the Factory, have it produce() the notice object and send
 		 */
 		$leaveFactory = new Leave_Notice_Factory($request);
-		$factory = $leaveFactory->produceUserFactory();
-
-		$notice = $factory->produce();
-		$notice->send();
+		$leaveFactory->produceUserFactory()->produce()->send();
     }
 
 	/**
@@ -1056,10 +912,7 @@ class Leave_Controller extends Controller {
 			/* Choose the Factory, have it produce() the notice object and send
 			 */
 			$leaveFactory = new Leave_Notice_Factory($request);
-			$factory = $leaveFactory->produceParentFactory();
-
-			$notice = $factory->produce();
-			$notice->send();
+			$leaveFactory->produceParentFactory()->produce()->send();
 		}
 	}
 

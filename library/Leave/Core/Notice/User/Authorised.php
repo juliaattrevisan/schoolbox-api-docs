@@ -7,7 +7,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Leave_Core_Notice_User_Authorised extends Leave_Notice_Core_User_Abstract {
+class Leave_Core_Notice_User_Authorised extends Leave_Core_Notice_User_Abstract {
 
 	/**
 	 * Setup

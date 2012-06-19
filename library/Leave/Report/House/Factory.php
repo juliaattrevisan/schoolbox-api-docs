@@ -1,13 +1,13 @@
 <?php
 /**
- * Leave_Report_Factory
+ * Leave_Report_House_Factory
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Leave_Report_Factory {
+class Leave_Report_House_Factory {
 	private $page = null;
 	private $data = array();
 	private $range = -1;

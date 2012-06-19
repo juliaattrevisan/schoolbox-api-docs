@@ -7,7 +7,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Leave_Kings_Notice_User_Rejected extends Leave_Notice_Kings_User_Abstract {
+class Leave_Kings_Notice_User_Rejected extends Leave_Kings_Notice_User_Abstract {
 
 	/**
 	 * Setup
