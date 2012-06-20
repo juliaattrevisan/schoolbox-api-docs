@@ -458,8 +458,7 @@ class Calendar extends DeprecatedModel {
                         LEFT JOIN luEventType ON type = eventTypeID
                         LEFT JOIN eventCampus ON event.id = eventCampus.eventID
                         LEFT JOIN eventGroup ON event.id = eventGroup.eventID
-                        WHERE date >= NOW()
-                            AND (    (access = '1' AND owner = '".$_SESSION['id']."')
+                        WHERE (    (access = '1' AND owner = '".$_SESSION['id']."')
                                   $groupQuery
                                   OR (access = '3' AND $campusQuery $groupChunk OR owner = '".$_SESSION['id']."')
                                 )
@@ -468,23 +467,23 @@ class Calendar extends DeprecatedModel {
                         ORDER BY $sort_by $sort_dir
                         LIMIT $offset, $limit";
 
+
         $count_query = "SELECT COUNT(*)
 						FROM event
 						LEFT JOIN user ON owner = user.id
 						LEFT JOIN luEventType ON type = eventTypeID
 						LEFT JOIN eventCampus ON event.id = eventCampus.eventID
 						LEFT JOIN eventGroup ON event.id = eventGroup.eventID
-						WHERE date >= NOW()
-						AND (
+						WHERE (
 							(access = '1' AND owner = '" . $_SESSION['id'] . "')
 							$groupQuery
 							OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
 						)
 						AND MATCH (`note`, `detail`, `location`) AGAINST ('$keyword')
-						GROUP BY event.id";
+						";
 
         $events = $this->db->getAll($event_query);
-        $count = count($this->db->getAll($count_query));
+        $count = $this->db->getOne($count_query);
 
         return $events;
     }

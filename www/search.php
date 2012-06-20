@@ -128,6 +128,7 @@ if (empty($type) || $type == 'all') {
     $count['all'] = array_sum($count);
 
     // are there any results?
+
     if ($count['all'] == 0) {
         $page->parse('no_result_block', 'no_result', false);
         // done. exit.
@@ -139,7 +140,6 @@ if (empty($type) || $type == 'all') {
     foreach ($type_list as $type_name => $type_desc) {
         if (!$count[$type_name])
             continue;
-
         $page->setVar(array(
             'TYPE_COUNT' => $count[$type_name],
             'TYPE_TITLE' => $type_name,
@@ -594,6 +594,7 @@ if (!empty($result['forum'])) {
 }
 
 // render event
+
 if (!empty($result['event'])) {
     $page->setFile('event_t', 'search/event.html');
     $page->setBlock('event_t', 'event', 'event_block');
@@ -652,7 +653,7 @@ if (empty($type)) {
 }
 /* If we have a search type and have results to display
  */
-else if ($result[$type]) {
+else if ($result[$type] || $type=='all') {
 
     // clear count
     $page->setBlock('RESULT', 'count', 'count_block');
