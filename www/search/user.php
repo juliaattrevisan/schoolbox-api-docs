@@ -91,6 +91,10 @@ if (is_numeric($this->arg[0])) {
 		if ($groupHandler->isStudent($user['uid']) && $groupHandler->isParent() && !$groupHandler->isParentOfChild($user['uid']) ) {
 			$email = '';
 		}
+        else if(Cfg::get('site_location') == 'bialik' && $groupHandler->isParent($user['uid']) && !$groupHandler->isStaff() ) {
+            //dont display parent emails to anyone but staff
+            $email = '';
+        }
 		else {
 			if (Cfg::get('site_location') == 'wenona') {
 				$email = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">Send Email</a>";
