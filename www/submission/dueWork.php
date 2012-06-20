@@ -630,29 +630,31 @@ if (is_array($activityLog)) {
                 break;
 
             case 'returned':
-                if($activity['typeName']) {
-                    // format for output
-                    $rtn = $returnHandler->getByUserAndTime($user['uid'], $activity['activity_date']);
-                    $marksheet = Marksheet_Factory::build($rtn['slug']);
+				if(!(Cfg::get('restrict_student_submissions') && $groupHandler->isParent())) {
+					if( $activity['typeName']) {
+						// format for output
+						$rtn = $returnHandler->getByUserAndTime($user['uid'], $activity['activity_date']);
+						$marksheet = Marksheet_Factory::build($rtn['slug']);
 
-                    // legacy support
-                    if($rtn['slug'] == 'free') {
-                        $mark = $rtn['mark'];
-                    }
+						// legacy support
+						if($rtn['slug'] == 'free') {
+							$mark = $rtn['mark'];
+						}
+						else {
+							$mark = $marksheet->convertRawMark($rtn['norm_mark'], $rtn['max_mark'], true, false);
+						}
+
+						$stringDesc = 'You received ' . $mark;
+					}
+					else if($activity['fid']) {
+						$stringDesc = '<a href="/submission/send.php?id='.$activity['fid'].'&return=1">Work returned</a>';
+					}
 					else {
-                        $mark = $marksheet->convertRawMark($rtn['norm_mark'], $rtn['max_mark'], true, false);
-                    }
+						$stringDesc = 'Work returned';
+					}
 
-                    $stringDesc = 'You received ' . $mark;
-                }
-                else if($activity['fid']) {
-                    $stringDesc = '<a href="/submission/send.php?id='.$activity['fid'].'&return=1">Work returned</a>';
+					$stringDesc .= ' for '.$activity['name']. ' in <a href="/homepage/' . $activity['category'] . '">' . Scrub::text($activity['categoryName']) . '</a>';
 				}
-                else {
-                    $stringDesc = 'Work returned';
-				}
-
-                $stringDesc .= ' for '.$activity['name']. ' in <a href="/homepage/' . $activity['category'] . '">' . Scrub::text($activity['categoryName']) . '</a>';
 				break;
 
             default:

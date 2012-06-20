@@ -121,6 +121,15 @@ $j(function () {
                     <option value="{SUBJECT_ID}">{SUBJECT_NAME}</option>
                     <!-- END subject -->
                 </select>
+				<!-- BEGIN is_parent -->
+
+				<select name="child" id="childSelect">
+					<!-- BEGIN child -->
+					<option value="{CHILD_ID}" {CHILD_ID_SELECTED}>{CHILD_NAME}</option>
+					<!-- END child -->
+				</select>
+
+				<!-- END is_parent -->
             </div>
         </div>
 		<table class="month-view duedates-calendar calendarTable">
