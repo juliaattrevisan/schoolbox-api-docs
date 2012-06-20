@@ -403,7 +403,7 @@ abstract class Evaluation_Main extends DeprecatedModel {
 			AND start <= NOW()
 		";
 
-		return $this->db->getOne($query);
+		$result = $this->db->getOne($query);
 
 		if (!$result) {
 			return true;
