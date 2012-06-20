@@ -143,7 +143,8 @@ class External_Denbigh_User implements External_UserInterface {
 				stu.tutorGroup, stu.house, stu.academicYear,
 				pe_sta.denbighID AS tutor_denbighID, pe_sta.surname AS tutor_surname, pe_sta.preferred_name AS tutor_preferred_name, pe_sta.title AS tutor_title,
 				pe_pa.denbighID AS parent_denbighID, pe_pa.surname AS parent_surname, pe_pa.preferred_name AS parent_preferred_name, pe_pa.title AS parent_title,
-				a.telephoneHome AS parent_telephoneHome
+				a.telephoneHome AS parent_telephoneHome,
+				stu.boardingStatus
 			FROM People pe
 			LEFT JOIN Students stu ON stu.peopleDenbighID = pe.denbighID
 			/* Student's tutor */
@@ -185,7 +186,7 @@ class External_Denbigh_User implements External_UserInterface {
 			'StudentMedicalAlert' => '',
 			'StudentSpecialNeedsFlag' => 0,
 			'AlertMessage' => '',
-			'StudentBoarder' => 'D'
+			'StudentBoarder' => ''
 		);
 
 		if ( !empty($student) ) {
@@ -205,6 +206,8 @@ class External_Denbigh_User implements External_UserInterface {
 
 			$adaption['StudentEmergencyName'] = "{$student['parent_title']} {$student['parent_preferred_name']} {$student['parent_surname']}";
 			$adaption['StudentEmergencyPhone'] = $student['parent_telephoneHome'];
+
+			$adaption['StudentBoarder'] = $student['boardingStatus'];
 		}
 
 		return $adaption;
@@ -392,6 +395,26 @@ class External_Denbigh_User implements External_UserInterface {
             LEFT JOIN People ON Staff.`peopleDenbighID` = People.`denbighID`");
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
+
+	/**
+	 * Determine the boarder type based on a value
+	 * Returns a human-readable string
+	 *
+	 * @param $boarderValue
+	 * @return string
+	 */
+	public function determineBoarderType($boarderValue) {
+		$boarders = array('Boarder', 'Weekly Boarder');
+
+		if (in_array($boarderValue, $boarders)) {
+			return 'Boarder';
+		}
+
+		return 'Day';
+	}
+
+	/* Getters/Setters
+	 */
 
 	/**
 	 * @param Database $internalDatabase

@@ -218,45 +218,45 @@ if (is_numeric($this->arg[0])) {
             }
 
             if ($synInfo['StudentHeadOfHouse'] && $synInfo['HeadOfHouseID']) {
-         				$hoh = $userHandler->getBySynergy( $synInfo['HeadOfHouseID']);
+				$hoh = $userHandler->getBySynergy( $synInfo['HeadOfHouseID']);
 
-         				$emailObj = new Email();
-                         $hohEmail = $emailObj->formatEmailFromArray($hoh);
+				$emailObj = new Email();
+				 $hohEmail = $emailObj->formatEmailFromArray($hoh);
 
-         				if ($hohEmail) {
-         					$hohTeacher = '<a href="'.$_SESSION['mailhandle'].$hohEmail.'">'.Scrub::text($synInfo['StudentHeadOfHouse']).'</a>';
-         				}
-         				else {
-         					$hohTeacher = Scrub::text($synInfo['StudentHeadOfHouse']);
-         				}
+				if ($hohEmail) {
+					$hohTeacher = '<a href="'.$_SESSION['mailhandle'].$hohEmail.'">'.Scrub::text($synInfo['StudentHeadOfHouse']).'</a>';
+				}
+				else {
+					$hohTeacher = Scrub::text($synInfo['StudentHeadOfHouse']);
+				}
          	}
-            else
-                $hohTeacher = $synInfo['StudentHeadOfHouse'];
+			else {
+				$hohTeacher = $synInfo['StudentHeadOfHouse'];
+			}
 
-            $output = array(
-                'TUTOR_GROUP'           => Scrub::text($synInfo['StudentTutorDescription']),
-                'TUTOR'                 => $tutorTeacher,
-                'YEAR_LEVEL'            => Scrub::text($synInfo['StudentYearLevel']),
-                'HOUSE'                 => Scrub::text($synInfo['StudentHouseDescription']),
-                'HOH'                   => $hohTeacher,
-                'FORM'                  => Scrub::text($synInfo['StudentForm']),
-                'FORM_DESCRIPTION'      => Scrub::text($synInfo['FormDescription']),
-                'FORM_STAFF'            => $formTeacher,
-                'LOCKER'                => Scrub::text($synInfo['StudentLockerBook']),
-                'BIRTHDATE'             => date('j F Y', $synInfo['StudentBirthDate']),
-                'EMERGENCY_NAME'        => Scrub::text($synInfo['StudentEmergencyName']),
-                'EMERGENCY_PHONE'       => Scrub::text($synInfo['StudentEmergencyPhone']),
-                'EMERGENCY_ALT_PHONE'   => Scrub::text($synInfo['StudentEmergencyPhoneAlt']),
-                'EMERGENCY_NAME_2'      => Scrub::text($synInfo['StudentEmergency2Name']),
-                'EMERGENCY_PHONE_2'     => Scrub::text($synInfo['StudentEmergency2Phone']),
-                'EMERGENCY_ALT_PHONE_2' => Scrub::text($synInfo['StudentEmergency2PhoneAlt']),
-                'EMERGENCY_NAME_3'      => Scrub::text($synInfo['StudentEmergency3Name']),
-                'EMERGENCY_PHONE_3'     => Scrub::text($synInfo['StudentEmergency3Phone']),
-                'EMERGENCY_ALT_PHONE_3' => Scrub::text($synInfo['StudentEmergency3PhoneAlt']),
-                'MEDICAL_NOTE'          => Scrub::text($synInfo['StudentMedicalAlert']),
-                'CONTACT_ALERT_MESSAGE' => Scrub::text($synInfo['AlertMessage']),
-                'STUDENT_TYPE'          => $synInfo['StudentBoarder'] == 'B'||
-                                           $synInfo['StudentBoarder'] == 'W' ? 'Boarder':'Day',
+			$output = array(
+				'TUTOR_GROUP' => Scrub::text($synInfo['StudentTutorDescription']),
+				'TUTOR' => $tutorTeacher,
+				'YEAR_LEVEL' => Scrub::text($synInfo['StudentYearLevel']),
+				'HOUSE' => Scrub::text($synInfo['StudentHouseDescription']),
+				'HOH' => $hohTeacher,
+				'FORM' => Scrub::text($synInfo['StudentForm']),
+				'FORM_DESCRIPTION' => Scrub::text($synInfo['FormDescription']),
+				'FORM_STAFF' => $formTeacher,
+				'LOCKER' => Scrub::text($synInfo['StudentLockerBook']),
+				'BIRTHDATE' => date('j F Y', $synInfo['StudentBirthDate']),
+				'EMERGENCY_NAME' => Scrub::text($synInfo['StudentEmergencyName']),
+				'EMERGENCY_PHONE' => Scrub::text($synInfo['StudentEmergencyPhone']),
+				'EMERGENCY_ALT_PHONE' => Scrub::text($synInfo['StudentEmergencyPhoneAlt']),
+				'EMERGENCY_NAME_2' => Scrub::text($synInfo['StudentEmergency2Name']),
+				'EMERGENCY_PHONE_2' => Scrub::text($synInfo['StudentEmergency2Phone']),
+				'EMERGENCY_ALT_PHONE_2' => Scrub::text($synInfo['StudentEmergency2PhoneAlt']),
+				'EMERGENCY_NAME_3' => Scrub::text($synInfo['StudentEmergency3Name']),
+				'EMERGENCY_PHONE_3' => Scrub::text($synInfo['StudentEmergency3Phone']),
+				'EMERGENCY_ALT_PHONE_3' => Scrub::text($synInfo['StudentEmergency3PhoneAlt']),
+				'MEDICAL_NOTE' => Scrub::text($synInfo['StudentMedicalAlert']),
+				'CONTACT_ALERT_MESSAGE' => Scrub::text($synInfo['AlertMessage']),
+				'STUDENT_TYPE' => $synUserHandler->determineBoarderType($synInfo['StudentBoarder']),
             );
 
             $this->setVar($output);

@@ -8,16 +8,15 @@
 ************************************************************/
 
 class External_Synergetic_User implements External_UserInterface {
-
 	private $database;
-
     private $groupHandler;
 
-    function __construct () {
-		$this->setDatabase( new MSSQL );
-
-        $this->setGroup( new Group );
-
+	/**
+	 * Constructor
+	 */
+    public function __construct () {
+		$this->setDatabase(new MSSQL());
+		$this->setGroup(new Group());
     }
 
     /**
@@ -93,8 +92,9 @@ class External_Synergetic_User implements External_UserInterface {
 	 * Gets the contact info of the person who is a Student's Contact. The ID
 	 * passed is the Synergetic of the Contact, not the Student.
 	 *
-	 * @param <type> $synID
-	 * @return <type>
+	 * @param $synID
+	 *
+	 * @return mixed
 	 */
     public function getParent($synID) {
         $query = "
@@ -121,11 +121,11 @@ class External_Synergetic_User implements External_UserInterface {
 	 * passed is the Synergetic of the Contact, not the Student. Anyone who is
 	 * not supposed to be having their details publicised (via the
 	 * DirectoryIncludeFlag) are not included in the result set.
-	 *
 	 * Accept array of Synergy IDs, or just an int
 	 *
-	 * @param <type> $synID
-	 * @return <type>
+	 * @param $synID
+	 *
+	 * @return mixed
 	 */
     public function getParentSync($synID) {
 		if (is_array($synID)) {
@@ -501,6 +501,23 @@ class External_Synergetic_User implements External_UserInterface {
         return $this->getDatabase()->getAll($query);
 
     }
+
+	/**
+	 * Determine the boarder type based on a value
+	 * Returns a human-readable string
+	 *
+	 * @param $boarderValue
+	 * @return string
+	 */
+	public function determineBoarderType($boarderValue) {
+		$boarders = array('B', 'W');
+
+		if (in_array($boarderValue, $boarders)) {
+			return 'Boarder';
+		}
+
+		return 'Day';
+	}
 
 	/* Getters/Setters
 	 */
