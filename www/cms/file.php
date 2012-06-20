@@ -16,33 +16,38 @@ if(is_numeric($this->arg[0])) {
 
 	$file = $fileHandler->getByID($this->arg[0]);
 
-	if(!is_array($file))
+	if (!is_array($file)) {
 		error(41);
+	}
 
-	if ($groupHandler->getPermission($file['cid']) < WRITE_ACCESS)
+	if ($groupHandler->getPermission($file['cid']) < WRITE_ACCESS) {
 		error(6);
+	}
 
 	$this->setFile(TEMPLATE_content, 'cms/modify-file.html');
 	//$this->setBlock(TEMPLATE_content, 'browse', 'browse_block');
-	$this->setBlock(TEMPLATE_content, 'optgroup', 'optgroup_block');
+	$this->setBlock(TEMPLATE_content, 'show_my_files', 'show_my_files_block');
+	$this->setBlock('show_my_files', 'optgroup', 'optgroup_block');
 	$this->setBlock('optgroup', 'my_files', 'my_files_block');
 
 	$this->setTitle('Modify File');
 	$this->setTab('resources');
 
 	//$this->setVar('browse_block', '');
-	$output = array('ACTION'		=> 'Modify',
-                        'FILE_ID'		=> $file['id'],
-                        'DESCRIPTION'		=> Scrub::text($file['description']),
-                        'COMMENT'		=> Scrub::text($file['comment']),
-                        'HIDDEN_SELECTED'	=> $file['hidden'] > 0 ? 'checked="checked"' : '',
-                        'MAX_FILE_SIZE'		=> Cfg::get('max_file_size'),
-                        'CATEGORY_ID'		=> $file['cid'],
-                        'CATEGORY_NAME'		=> Scrub::text($file['categoryName']),
-                        'DUE_DAY'		=> '',
-                        'DUE_MONTH'		=> '',
-                        'DUE_YEAR'		=> '',
-                        );
+	$output = array(
+		'ACTION' => 'Modify',
+		'FILE_ID' => $file['id'],
+		'DESCRIPTION' => Scrub::text($file['description']),
+		'COMMENT' => Scrub::text($file['comment']),
+		'HIDDEN_SELECTED' => $file['hidden'] > 0 ? 'checked="checked"' : '',
+		'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
+		'CATEGORY_ID' => $file['cid'],
+		'CATEGORY_NAME' => Scrub::text($file['categoryName']),
+		'DUE_DAY' => '',
+		'DUE_MONTH' => '',
+		'DUE_YEAR' => '',
+	);
+
 	$this->setVar($output);
 
 	$myFolderHandler = new MyFolder;
@@ -70,13 +75,23 @@ if(is_numeric($this->arg[0])) {
 		}
 	}
 
-} else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+	/* Parse show_my_files only if WebDAV is disabled
+	 */
+	if (!Cfg::get('webdav_enable')) {
+		$this->parse('show_my_files_block', 'show_my_files');
+	}
+	else {
+		$this->setVar('show_my_files_block', '');
+	}
+}
+else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
 	/* Add new file to system */
 	require_once '../library/category.php';
 
 	$this->setFile(TEMPLATE_content, 'cms/modify-file.html');
-	$this->setBlock(TEMPLATE_content, 'optgroup', 'optgroup_block');
+	$this->setBlock(TEMPLATE_content, 'show_my_files', 'show_my_files_block');
+	$this->setBlock('show_my_files', 'optgroup', 'optgroup_block');
 	$this->setBlock('optgroup', 'my_files', 'my_files_block');
     $this->setBlock(TEMPLATE_content, 'delete_button','delete_button_block');
     $this->setVar('delete_button_block','');
@@ -86,24 +101,27 @@ if(is_numeric($this->arg[0])) {
 
 	$categoryHandler = new Category;
 	$category = $categoryHandler->getByID($this->arg[1]);
-	if(!is_array($category))
-		error(13);
 
-	if ($groupHandler->getPermission($category['id']) < WRITE_ACCESS)
+	if (!is_array($category)) {
+		error(13);
+	}
+
+	if ($groupHandler->getPermission($category['id']) < WRITE_ACCESS) {
 		error(6);
+	}
 
 	$output = array(
-        'ACTION'		    => 'Post',
-        'FILE_ID'		    => '',
-        'DESCRIPTION'		=> '',
-        'COMMENT'		    => '',
-        'HIDDEN_SELECTED'	=> '',
-        'MAX_FILE_SIZE'		=> Cfg::get('max_file_size'),
-        'CATEGORY_NAME'		=> Scrub::text($category['name']),
-        'CATEGORY_ID'		=> $category['id'],
-        'DUE_DAY'		    => is_numeric($this->arg[2])?$this->arg[2]:'',
-        'DUE_MONTH'		    => is_numeric($this->arg[3])?$this->arg[3]:'',
-        'DUE_YEAR'		    => is_numeric($this->arg[4])?$this->arg[4]:'',
+		'ACTION' => 'Post',
+		'FILE_ID' => '',
+		'DESCRIPTION' => '',
+		'COMMENT' => '',
+		'HIDDEN_SELECTED' => '',
+		'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
+		'CATEGORY_NAME' => Scrub::text($category['name']),
+		'CATEGORY_ID' => $category['id'],
+		'DUE_DAY' => is_numeric($this->arg[2]) ? $this->arg[2] : '',
+		'DUE_MONTH' => is_numeric($this->arg[3]) ? $this->arg[3] : '',
+		'DUE_YEAR' => is_numeric($this->arg[4]) ? $this->arg[4] : '',
     );
 
 	$this->setVar($output);
@@ -136,6 +154,14 @@ if(is_numeric($this->arg[0])) {
 		}
 	}
 
+	/* Parse show_my_files only if WebDAV is disabled
+	 */
+	if (!Cfg::get('webdav_enable')) {
+		$this->parse('show_my_files_block', 'show_my_files');
+	}
+	else {
+		$this->setVar('show_my_files_block', '');
+	}
 }
 else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
 	/* Upload multiple files at once */
@@ -148,11 +174,14 @@ else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
 
 	$categoryHandler = new Category;
 	$category = $categoryHandler->getByID($this->arg[1]);
-	if(!is_array($category))
-		error(13);
 
-	if ($groupHandler->getPermission($category['id']) < WRITE_ACCESS)
+	if (!is_array($category)) {
+		error(13);
+	}
+
+	if ($groupHandler->getPermission($category['id']) < WRITE_ACCESS) {
 		error(6);
+	}
 
 	$output = array(
         'CATEGORY_NAME'		=> Scrub::text($category['name']),

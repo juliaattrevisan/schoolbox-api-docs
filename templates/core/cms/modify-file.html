@@ -7,7 +7,7 @@
 	//check that description and category have been entered
 
 $j(document).ready(function() {
-    
+
 	$j('#deleteFile').click(function() {
         if (confirm('Are you sure you want to delete this file?')) {
             window.location = '/cms/fileForm.php?delete={FILE_ID}&redirect=/homepage/{CATEGORY_ID}';
@@ -20,9 +20,9 @@ $j(document).ready(function() {
 		defaultText: '<span></span>Choose file',
 		defaultFileSelectedText: '<span></span>File selected'
 	});
-	
+
 	if ($j('h1.type').text() == "Add File") {
-			
+
 		$j('#fileForm').validate({
 			rules: {
 				file : {
@@ -44,7 +44,7 @@ $j(document).ready(function() {
 	} else {
 		$j('#fileForm').validate();
 	}
-	
+
 
 
 });
@@ -69,12 +69,13 @@ $j(document).ready(function() {
       <td><h4>File</h4>
         <em>Browse your local disk for a file or upload from your 'my files'. You can <a href="/cms/file/multi/{CATEGORY_ID}">upload multiple files</a> here.</em></td>
 		<td><strong>Upload from your computer</strong>
-		
+
 		<label class="clearfix">
 			<input type="file" name="file" id="browse" class="prettify"/>
 			<input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" />
 		</label>
-		
+
+		<!-- BEGIN show_my_files -->
 		<br />
 		<strong>Select from your existing files</strong><br />
 		<select name='myfile' id="myfile">
@@ -87,12 +88,13 @@ $j(document).ready(function() {
 			</optgroup>
 			<!-- END optgroup -->
         </select>
-		
-		
-		
+		<!-- END show_my_files -->
+
+
+
 		</td>
     </tr>
-    
+
     <!-- END browse -->
 
     <tr>
@@ -123,7 +125,7 @@ $j(document).ready(function() {
           <!-- BEGIN delete_button -->
           <input id='deleteFile' type="button" class="submit-btn-plain"  value="Delete File" />
           <!-- END delete_button -->
-  
+
 </form>
 
 
