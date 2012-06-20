@@ -151,7 +151,7 @@ $j(document).ready(function() {
 
 	/* Remove an answer option
 	 */
-	$j('.delete').live('click', function(){
+	$j('div.delete').live('click', function(){
 		if (($j('.inputs').length) !== 3) {
 			$j(this).parent().remove();
 		}

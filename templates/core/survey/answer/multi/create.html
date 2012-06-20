@@ -141,7 +141,7 @@ $j(document).ready(function() {
 
     /* Add a new answer option
      */
-    $j('#makeNewAnswer').live('click', function() {
+    $j('.makeNewAnswer').live('click', function() {
 		var thing = $j('.hidden-clone li:first-child').clone();
 		$j('ul#answerCollection').append(thing);
 		refreshList();
@@ -201,11 +201,11 @@ $j(document).ready(function() {
 			</li>
         </ul>
 
-		<label for="answerDescription[]" generated="true" id="listItems" class="error">Please fill out all answers</label>
+		<label generated="true" id="listItems" class="error">Please fill out all answers</label>
 
 
 		<p class="clearfix">
-        <a class="add-answer btn add float-left" id="makeNewAnswer" href="#"><span></span>Add answer option</a>
+        <a class="add-answer btn add float-left makeNewAnswer" href="#"><span></span>Add answer option</a>
 		</p>
     </div>
 
@@ -218,6 +218,6 @@ $j(document).ready(function() {
 				<div class="delete"></div>
 			</li>
         </ul>
-        <a class="add-answer" id="makeNewAnswer">Add answer option</a>
+        <a class="add-answer makeNewAnswer">Add answer option</a>
     </div>
 </label>

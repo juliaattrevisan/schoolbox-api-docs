@@ -145,7 +145,7 @@ $j(document).ready(function() {
 
     /* Add a new answer option
      */
-    $j('#makeNewAnswer').live('click', function() {
+    $j('.makeNewAnswer').live('click', function() {
 		var thing = $j('.hidden-clone ul:first-child').clone();
 		$j('ul#answerCollection').append(thing);
 		refreshList();
@@ -159,13 +159,13 @@ $j(document).ready(function() {
 	});
 
 	$j('.answerCorrect').live('click', function() {
-		$j(this).parent().parent().toggleClass("highlight");
+		$j(this).closest('li').toggleClass("highlight");
 	});
 
 	/* Remove an answer option
 	 */
 	$j('.delete').live('click', function(){
-		if (($j('.inputs').length) !== 1) {
+		if (($j('.inputs').length) !== 3) {
 			$j(this).parent().remove();
 			refreshList()
 		}
@@ -198,7 +198,7 @@ $j(document).ready(function() {
 });
 </script>
 
-    <label>Answer
+    <label>Answer</label>
 	<div class="answer-collection">
 		<ul id="answerCollection" >
 		 <!-- BEGIN answerOption -->
@@ -215,11 +215,11 @@ $j(document).ready(function() {
 			 <!-- END answerOption -->
 		</ul>
 
-		<label for="answerDescription[]" generated="true" class="error" id="listItems">Please fill out all answers</label>
-		<label for="answer[]" generated="true" class="error" id="wrongCheckbox">Tick at least one checkbox</label>
+		<label generated="true" class="error" id="listItems">Please fill out all answers</label>
+		<label generated="true" class="error" id="wrongCheckbox">Tick at least one checkbox</label>
 
 		<p class="clearfix">
-			<a href="#" class="add-answer btn add float-left" id="makeNewAnswer"><span></span>Add answer option</a>
+			<a href="#" class="add-answer btn add float-left makeNewAnswer"><span></span>Add answer option</a>
 		</p>
 	</div>
 
@@ -236,7 +236,6 @@ $j(document).ready(function() {
 			</li>
 		</ul>
 		<p class="clearfix">
-			<a href="#" class="add-answer btn add float-left" id="makeNewAnswer"><span></span>Add answer option</a>
+			<a href="#" class="add-answer btn add float-left makeNewAnswer"><span></span>Add answer option</a>
 		</p>
 	</div>
-</label>
