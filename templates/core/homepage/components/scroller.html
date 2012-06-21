@@ -2,16 +2,20 @@
 	<script type="text/javascript" src="/javascript/jquery.cycle.js"></script>
 	<script type="text/javascript">
 	$j(function () {
-		$j('.cycle-content').delay(2000).cycle({
-			timeout: {COMPONENT_CONFIG_TIMING_VALUE_MS},
-			cleartype: true,
-
-	        after: function()
-			 {
-				var append = $j(this).attr('alt');
-				$j('.caption-holder').text(append);
-	        }
-	    });
+        if ($j('.cycle-content img').length > 1) {
+            $j('.cycle-content').delay(2000).cycle({
+                timeout: {COMPONENT_CONFIG_TIMING_VALUE_MS},
+                cleartype: true,
+                after: function(curr)
+                 {
+                    var append = $j(this).attr('alt');
+                    $j('.caption-holder').text(append);
+                }
+            });
+        } else{
+            var append = $j('.cycle-content img').attr('alt');
+            $j('.caption-holder').text(append);
+        }
 	});
 	</script>
     <h2>Image Carousel</h2>

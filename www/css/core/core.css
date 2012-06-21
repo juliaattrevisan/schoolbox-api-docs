@@ -121,7 +121,6 @@ p.interact{margin:0 0 0 15px;float:right;text-align:right;}
 p.interact-left{float:left;clear:none;width:120px;}
 p.interact-left.home-calendar{width:23%;margin:0;margin-top:2px;}
 #galleryCycle{width:100%;}#galleryCycle .caption-holder{background:#576369;color:#fff;padding:10px;text-decoration:none;opacity:0.9;z-index:2;text-align:center;margin:0 auto;}
-#galleryCycle img{display:none;}
 .cycle-content{position:relative;z-index:1;margin:10px auto;border:4px solid #fff;-moz-box-shadow:0 0 8px #000;-webkit-box-shadow:0 0 8px #000;box-shadow:0 0 8px #000;}
 label{margin-bottom:4px;display:block;}label input[type=text]{width:100%;margin:0;}
 label.error{background:#fffddb url(/images/core/icons/label-error.png) no-repeat 6px 2px;width:100%;padding:4px;text-indent:36px;padding:3px 0;border:1px solid #ffcc00;color:#ff5f45 !important;display:block;-moz-border-radius:0 0 3px 3px;-webkit-border-radius:0 0 3px 3px;border-radius:0 0 3px 3px;-moz-background-clip:padding;-webkit-background-clip:padding-box;background-clip:padding-box;}
