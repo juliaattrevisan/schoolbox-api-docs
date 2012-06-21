@@ -9,8 +9,8 @@ desired_major="5"; ### MAJOR Version, IE 5 in PHP V5.3
 desired_minor="3"; ### MINOR Version, IE 3 in PHP v5.3
 ## Designed for Schoolbox V11.0+
 echo -e "Schoolbox Updater for Ubuntu 10.10 or Higher, or CentOS 6.0.\nSchoolbox Version Requirement: v11.5.0 + \n\n\n";
-schoolbox_dir=`cd ../ && pwd`
-working_dir="/tmp/update_tmp";
+export schoolbox_dir=`cd ../ && pwd`
+export working_dir="/tmp/update_tmp";
 workingDirectory() {
 if [ ! -d $working_dir ]; then
 echo -e "Creating Working Directory:\c";
