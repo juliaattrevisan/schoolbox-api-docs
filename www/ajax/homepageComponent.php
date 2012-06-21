@@ -33,7 +33,7 @@ $this->setBlock($componentHandle, "config", "config_block");
 $this->setVar('COMPONENT_HOMEPAGE_ID', $component['homepageComponentLocationID']);
 $this->setVar('COMPONENT_ID', $component['component']);
 $this->setVar('ID', $categoryID);
-$this->setVar('SITE_LOCATION', Cfg::get('site_location'));
+$this->setVar('SITE_LOCATION', $this->site);
 
 $default = unserialize($component['dfconfig']);
 $config = array();
