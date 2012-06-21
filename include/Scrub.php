@@ -38,10 +38,25 @@ class Scrub {
 	}
 
 	/**
+	 * Convert smart quotes to apostrophes/double quotes
+	 *
+	 * @static
+	 * @param $text
+	 * @return mixed
+	 */
+	static public function smartQuotes($text) {
+		$search = array(chr(145), chr(146), chr(147), chr(148), chr(151));
+		$replace = array("'", "'", '"', '"', '-');
+
+		return str_replace($search, $replace, $text);
+	}
+
+	/**
 	 * Cleans crap out of input using HTMLPurifier
 	 *
 	 * @param  $html
-	 * @return
+	 *
+	 * @return mixed
 	 */
 	static public function html($html) {
 		require_once dirname(__FILE__) . '/HTMLPurifier/HTMLPurifier.auto.php';

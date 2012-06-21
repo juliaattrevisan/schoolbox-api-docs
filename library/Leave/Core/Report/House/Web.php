@@ -68,7 +68,7 @@ class Leave_Core_Report_House_Web {
 			/* Collect general data
 			 */
 			$combined[$key]['user_id'] = $key;
-			$combined[$key]['user_name'] = $request->getUser()->getName();
+			$combined[$key]['user_name'] = Scrub::smartQuotes($request->getUser()->getName());
 			$combined[$key]['user_year'] = $request->getUser()->getYear();
 			$combined[$key]['user_boarding_status'] = $request->getUser()->getAbbreviatedBoardingStatus();
 
@@ -86,7 +86,7 @@ class Leave_Core_Report_House_Web {
 			/* Non-pending requests (authorised requests)
 			 */
 			else if ($request->getId()) {
-				$combined[$key]['request_authorisation_user_id'][$request->getAuthorisationUser()->getId()] = trim($request->getAuthorisationUser()->getName());
+				$combined[$key]['request_authorisation_user_id'][$request->getAuthorisationUser()->getId()] = Scrub::smartQuotes(trim($request->getAuthorisationUser()->getName()));
 				$combined[$key]['row_css_class'][] = 'leave-pending';
 			}
 			else {
