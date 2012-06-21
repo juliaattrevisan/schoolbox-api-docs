@@ -5,10 +5,7 @@
 		$j('.cycle-content').delay(2000).cycle({
 			timeout: {COMPONENT_CONFIG_TIMING_VALUE_MS},
 			cleartype: true,
-			before: function(curr, next, opts) {
-				$j(next).css('margin-left', -$j(next).width()/2);
-				$j(next).css('margin-top', -$j(next).height()/2);
-			},
+
 	        after: function()
 			 {
 				var append = $j(this).attr('alt');
@@ -17,35 +14,6 @@
 	    });
 	});
 	</script>
-
-	<style type="text/css">
-	#galleryCycle img {
-		display:none;
-		left:50% !important;
-		top:50% !important;
-	}
-
-	#galleryCycle {
-		width:100%;
-
-	}
-	.cycle-content{position:relative; z-index:1;margin:10px auto; border:4px solid #fff;
-
-	     -moz-box-shadow: 0 0 8px #000;
-	  -webkit-box-shadow: 0 0 8px #000;
-	          box-shadow: 0 0 8px #000; }
-
-	#galleryCycle .caption-holder {
-		background: #576369;
-		color: #fff;
-		padding: 10px;
-		text-decoration: none;
-		opacity: 0.9;
-		z-index:2;
-		text-align:center;
-		margin:0 auto;
-	}
-	</style>
     <h2>Image Carousel</h2>
     <!-- BEGIN config -->
     <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
