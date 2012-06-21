@@ -164,7 +164,7 @@ class External_Synergetic_User implements External_UserInterface {
 					vStudents.StudentFormStaffName, vStudents.StudentTutorDescription, luForm.ID as TeacherFormID,
 					vStudents.StudentForm, luTutor.ID as TeacherTutorID, vStudents.StudentTutor,
 					luForm.Description as FormDescription, vStudents.StudentHouseDescription, vStudents.StudentHouse,
-					vStudents.StudentYearLevel, vStudents.StudentLockerBook,
+					vStudents.StudentYearLevel, vStudents.StudentYearLevelCoordinator, vStudents.StudentLockerBook,
 					vStudents.StudentEmergencyName,  vStudents.StudentEmergencyPhone,  vStudents.StudentEmergencyPhoneAlt,
 					vStudents.StudentEmergency2Name, vStudents.StudentEmergency2Phone, vStudents.StudentEmergency2PhoneAlt,
 					vStudents.StudentEmergency3Name, vStudents.StudentEmergency3Phone, vStudents.StudentEmergency3PhoneAlt,

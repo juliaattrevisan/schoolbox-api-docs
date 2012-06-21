@@ -38,7 +38,7 @@ if ($assessHandler->isDeleted($section['assess_id'])) {
  */
 $assess = $assessHandler->getByID($section['assess_id']);
 
-if (!$assessHandler->isOpen($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
 	error(144);
 }
 

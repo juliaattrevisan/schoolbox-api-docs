@@ -46,7 +46,7 @@ if (is_array($allSurveys)) {
 
 		/* Do not show the survey if you are a participant and the survey is not yet open
 		*/
-		if (($permission < WRITE_ACCESS) && !$surveyHandler->isOpen($currentSurvey['assess_id'])) {
+		if (($permission < WRITE_ACCESS) && !$surveyHandler->isOpen($currentSurvey)) {
 			$this->setVar('survey_block', '');
 		}
 		else {

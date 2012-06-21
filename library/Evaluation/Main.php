@@ -395,20 +395,11 @@ abstract class Evaluation_Main extends DeprecatedModel {
 	 * @param $assess_id
 	 * @return bool
 	 */
-	public function isOpen($assess_id) {
-		$query = "
-			SELECT COUNT(assess_id)
-			FROM assess
-			WHERE assess_id = '$assess_id'
-			AND start <= NOW()
-		";
-
-		$result = $this->db->getOne($query);
-
-		if (!$result) {
+	public function isOpen($assess) {
+        if(strtotime($assess['start']) <= mktime()) {
 			return true;
-		}
-
-		return false;
-	}
+		}else {
+		    return false;
+        }
+    }
 }

@@ -49,7 +49,8 @@ if (is_array($allAssess)) {
 
 		/* Hide it from students if the start date hasn't passed yet
 		 */
-		if (($permission < WRITE_ACCESS) && !$assessHandler->isOpen($currentAssess['assess_id'])) {
+
+		if ($permission < WRITE_ACCESS && !$assessHandler->isOpen($currentAssess)) {
 			$this->setVar('assess_block', '');
 		}
 		else {
