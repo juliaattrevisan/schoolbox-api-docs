@@ -59,9 +59,16 @@ if ($alternateCategoryId) {
 		$this->parse("submit_news_block", "submit_news");
 	}
 }
-/* Default: Load news for the current homepage
+/* Tried to load from alternate source but failed
  */
-else if (!strlen($config['homepage-news'])){
+else if (!strlen($config['homepage-news']) && !$alternateCategoryId){
+	$newsList = array();
+
+	$this->setVar("submit_news_block", "");
+}
+/* Load news for the current homepage
+ */
+else if (!strlen($config['homepage-news'])) {
 	$newsList = $newsHandler->getAllForCategory($categoryID, $config);
 
 	/* Controls such as Post News
@@ -73,7 +80,7 @@ else if (!strlen($config['homepage-news'])){
 		$this->parse("submit_news_block", "submit_news");
 	}
 }
-/* Tried to load from alternate source but failed
+/* Default
  */
 else {
 	$newsList = array();

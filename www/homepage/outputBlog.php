@@ -1,16 +1,36 @@
 <?php
+require_once(SITE_root.'/library/blog.php');
+require_once(SITE_root.'/library/blog-comment.php');
 
-require_once SITE_root.'/library/blog.php';
-require_once SITE_root.'/library/blog-comment.php';
+$this->setBlock($componentHandle, 'blog', 'blog_block');
+$this->setBlock($componentHandle, 'submit', 'submit_block');
+$this->setBlock('blog', 'comment', 'comment_block');
+$this->setBlock('blog', 'show_all', 'show_all_block');
+$this->setBlock('blog', 'show_comment', 'show_comment_block');
+$this->setBlock('config', 'comments_size', 'comments_size_block');
+
+/* Set up component name
+ */
+$this->setVar(array(
+	'COMPONENT_NAME' => strlen(trim($config['componentname'])) ? $config['componentname'] : 'Blog',
+
+	/* These are for the Select Alternate Source resourcebrowser
+	 */
+	'COMPONENT_CONFIG_SRC_ID' => $config['homepage-news'],
+	'COMPONENT_CONFIG_SRC_NAME' => $src['name'],
+	'COMPONENT_HANDLE' => strtolower($componentHandle)
+));
+
+/* Prevent multiple blog entries from other categories stacking up in the wrong place
+ * and initialise empty blog roll by default
+ */
+$this->setVar('blog_block', '');
 
 $blogHandle = new Blog();
 $blogHandle->config($config);
 
 $commentHandle = new Comment();
 $commentHandle->config($config);
-
-$this->setBlock('config', 'comments_size', 'comments_size_block');
-
 
 for($i=0; $i<=10; $i++) {
 	$this->setVar('COMPONENT_CONFIG_COMMENTS_SIZE_NAME', $i == 0 ? 'All' : $i);
@@ -19,14 +39,75 @@ for($i=0; $i<=10; $i++) {
 	$this->parse("comments_size_block", "comments_size", true);
 }
 
-$blogs = $blogHandle->getByCID($categoryID);
+/* Select news feed from alternate source, if specified
+ */
+$alternateCategoryId = false;
+$alternatePermissions = 0;
 
-$this->setBlock($componentHandle, 'blog', 'blog_block');
-$this->setBlock('blog', 'comment', 'comment_block');
-$this->setBlock('blog', 'show_all', 'show_all_block');
-$this->setBlock('blog', 'show_comment', 'show_comment_block');
+/* If you chose an alternate source, check the permissions on it
+ */
+if (strlen($config['homepage-blog'])) {
+	$matches = array();
+	preg_match('#/homepage/(\d+)#', $config['homepage-blog'], $matches);
 
+	if (count($matches)) {
+		$alternatePermissions = $groupHandler->getPermission($matches[1]);
 
+		if ($alternatePermissions >= READ_ACCESS) {
+			$alternateCategoryId = $matches[1];
+		}
+	}
+}
+
+/* Load news from some other homepage
+ */
+if ($alternateCategoryId) {
+	$blogs = $blogHandle->getByCID($alternateCategoryId);
+
+	/* Controls such as Post News
+	 */
+	if ($alternatePermissions < WRITE_ACCESS) {
+		$this->setVar("submit_block", "");
+	}
+	else {
+		$this->setVar(array(
+			'ID' => $alternateCategoryId
+		));
+
+		$this->parse("submit_block", "submit");
+	}
+}
+/* Tried to load from alternate source but failed
+ */
+else if (!strlen($config['homepage-blog']) && !$alternateCategoryId) {
+	$newsList = array();
+
+	$this->setVar("submit_block", "");
+}
+/* Load blogs for the current homepage
+ */
+else if (!strlen($config['homepage-blog'])){
+	$blogs = $blogHandle->getByCID($categoryID);
+
+	/* Controls such as Post News
+	 */
+	if ($permission < WRITE_ACCESS) {
+		$this->setVar("submit_block", "");
+	}
+	else {
+		$this->parse("submit_block", "submit");
+	}
+}
+/* Default
+ */
+else {
+	$newsList = array();
+
+	$this->setVar("submit_block", "");
+}
+
+/* Iterate
+ */
 if(!empty($blogs)) {
 	$userHandler = new User();
 
@@ -92,15 +173,4 @@ if(!empty($blogs)) {
 		}
 		$this->parse('blog_block', 'blog', true);
 	}
-} else
-	$this->setVar('blog_block', '');
-
-$this->setBlock($componentHandle, 'submit', 'submit_block');
-if ($permission < WRITE_ACCESS)
-	$this->setVar('submit_block', '');
-else
-	$this->parse('submit_block', 'submit');
-
-
-
-?>
+}
