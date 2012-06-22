@@ -36,6 +36,12 @@ else {
 	$this->setVar("news_block", "");
 }
 
+/* Set up component name
+ */
+$this->setVar(array(
+	'COMPONENT_NAME' => strlen(trim($config['componentname'])) ? $config['componentname'] : 'Files',
+));
+
 //setup block for submission button
 $this->setBlock($componentHandle, "submit_news", "submit_news_block");
 

@@ -1,12 +1,15 @@
 <div class="box clearfix" id="component{COMPONENT_HOMEPAGE_ID}">
-	<h2>News</h2>
-	<!-- BEGIN config --> 
+	<h2>{COMPONENT_NAME}</h2>
+	<!-- BEGIN config -->
 	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
 	<div class="editPanel settings hide">
 		<form action="/homepage/configForm.php" method="get">
 			<input type="hidden" name="cid" value="{ID}" />
 			<input type="hidden" name="type" value="config" />
 			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
+			<label for="componentname">Name: </label>
+			<input id="componentname" type="text" name="componentname" value="{COMPONENT_NAME}" />
+
 			<label for="size">Item Limit: </label>
 			<select name="size">
 				<!-- BEGIN size -->
@@ -40,7 +43,7 @@
 			<!-- END news -->
 		</ul>
 	</div>
-	<p class="interact"> <a href="/homepage/newsArchive/{ID}" class="btn"><span></span>News Archive</a> 
-		<!-- BEGIN submit_news --> <a href="/news/homepage/new/{ID}" class="btn up-arrow"><span></span>Post News</a><!-- END submit_news --> 
+	<p class="interact"> <a href="/homepage/newsArchive/{ID}" class="btn"><span></span>News Archive</a>
+		<!-- BEGIN submit_news --> <a href="/news/homepage/new/{ID}" class="btn up-arrow"><span></span>Post News</a><!-- END submit_news -->
 	</p>
 </div>
