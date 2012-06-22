@@ -1,11 +1,88 @@
 <?php
-//news output
 $this->setBlock($componentHandle, 'news', 'news_block');
+$this->setBlock($componentHandle, "submit_news", "submit_news_block");
 
-$newsHandler = new CategoryNews;
+/* Set up component name
+ */
+$this->setVar(array(
+	'COMPONENT_NAME' => strlen(trim($config['componentname'])) ? $config['componentname'] : 'News',
 
-$newsList = $newsHandler->getAllForCategory($categoryID, $config);
+	/* These are for the Select Alternate Source resourcebrowser
+	 */
+	'COMPONENT_CONFIG_SRC_ID' => $config['homepage-news'],
+	'COMPONENT_CONFIG_SRC_NAME' => $src['name'],
+	'COMPONENT_HANDLE' => strtolower($componentHandle)
+));
 
+/* Prevent multiple news from other categories stacking up in the wrong place
+ * and initialise empty news roll by default
+ */
+$this->setVar('news_block', '');
+
+$newsHandler = new CategoryNews();
+
+/* Select news feed from alternate source, if specified
+ */
+$alternateCategoryId = false;
+$alternatePermissions = 0;
+
+/* If you chose an alternate source, check the permissions on it
+ */
+if (strlen($config['homepage-news'])) {
+	$matches = array();
+	preg_match('#/homepage/(\d+)#', $config['homepage-news'], $matches);
+
+	if (count($matches)) {
+		$alternatePermissions = $groupHandler->getPermission($matches[1]);
+
+		if ($alternatePermissions >= READ_ACCESS) {
+			$alternateCategoryId = $matches[1];
+		}
+	}
+}
+
+/* Load news from some other homepage
+ */
+if ($alternateCategoryId) {
+	$newsList = $newsHandler->getAllForCategory($alternateCategoryId, $config);
+
+	/* Controls such as Post News
+	 */
+	if ($alternatePermissions < WRITE_ACCESS) {
+		$this->setVar("submit_news_block", "");
+	}
+	else {
+		$this->setVar(array(
+			'ID' => $alternateCategoryId
+		));
+
+		$this->parse("submit_news_block", "submit_news");
+	}
+}
+/* Default: Load news for the current homepage
+ */
+else if (!strlen($config['homepage-news'])){
+	$newsList = $newsHandler->getAllForCategory($categoryID, $config);
+
+	/* Controls such as Post News
+	 */
+	if ($permission < WRITE_ACCESS) {
+		$this->setVar("submit_news_block", "");
+	}
+	else {
+		$this->parse("submit_news_block", "submit_news");
+	}
+}
+/* Tried to load from alternate source but failed
+ */
+else {
+	$newsList = array();
+
+	$this->setVar("submit_news_block", "");
+}
+
+/* Iterate
+ */
 if (is_array($newsList)) {
 	$userHandler = new User();
 
@@ -31,23 +108,4 @@ if (is_array($newsList)) {
 
 		$this->parse("news_block", "news", true);
 	}
-}
-else {
-	$this->setVar("news_block", "");
-}
-
-/* Set up component name
- */
-$this->setVar(array(
-	'COMPONENT_NAME' => strlen(trim($config['componentname'])) ? $config['componentname'] : 'News',
-));
-
-//setup block for submission button
-$this->setBlock($componentHandle, "submit_news", "submit_news_block");
-
-if ($permission < WRITE_ACCESS) {
-	$this->setVar("submit_news_block", "");
-}
-else {
-	$this->parse("submit_news_block", "submit_news");
 }
