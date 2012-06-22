@@ -297,4 +297,9 @@ abstract class Synchronise_Synergetic_Wenona_Strategy_Abstract extends Synchroni
 
         return false;
     }
+
+    protected function generatePassword($currentUser) {
+        // if parent, and if password is blank
+
+    }
 }

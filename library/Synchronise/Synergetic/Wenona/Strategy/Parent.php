@@ -17,7 +17,13 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
      * @return void
      */
     public function generateList() {
-        $this->collateList($this->getExternalUserHandler()->getParentUserAccountInfo());
+        // custom query provided by Wenona
+        $mssqlDB = new MSSQL();
+        $sql = 'SELECT * FROM SynergyOne.dbo.uvCurrentAndNearFutureParents';
+        $result = $mssqlDB->getAll($sql);
+
+        $this->collateList($result);
+
     }
 
     /**
@@ -30,19 +36,50 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
         $newUser = array();
 
         // Login details
-        $newUser['username'] = $currentUser['StudentContactID'];
+        $newUser['username'] = $currentUser['Login'];
      // $newUser['password'] = "abc123";
 
         // User details
-        $newUser['synergy_id'] = $currentUser['StudentContactID'];
-        $newUser['title'] = $currentUser['StudentContactTitle'];
-        $newUser['firstname'] = $currentUser['StudentContactPreferred'];
-        $newUser['lastname'] = $currentUser['StudentContactSurname'];
-        $newUser['alt_email'] = $currentUser['StudentContactDefaultEmail'];
-        $newUser['defaultCampus'] = self::PARENT_DEFAULT_CAMPUS;
+        $newUser['synergy_id'] = $currentUser['DatabaseID'];
+        $newUser['title']      = substr($currentUser['Description'], 0, strpos($currentUser['Description'], ' '));
+        $newUser['firstname']  = $currentUser['Given'];
+        $newUser['lastname']   = $currentUser['Surname'];
+        $newUser['alt_email']  = ''; // not mapped
+
+        // the view inverts the boolean campus flags for some reason
+        $campus = array();
+        if(!$currentUser['FutureStudent']) {
+            if(!$currentUser['SeniorSchoolStudent']) {
+                $campus[] = 1;
+            }
+            if(!$currentUser['JuniorSchoolStudent']) {
+                $campus[] = 2;
+            }
+            if(!$currentUser['MiddleSchoolStudent']) {
+                $campus[] = 3;
+            }
+            $newUser['defaultCampus'] = $campus[0];
+        }
+        else {
+            $newUser['defaultCampus'] = 0;
+        }
+
+        // get WPA associations
+        $newUser['WPA'] = array();
+
+        for($i = 0; $i < 13; $i++) {
+            if($currentUser["Year{$i}Student"]) {
+                if($i == 0) {
+                    $newUser['WPA'][] = "Year Kindergarten Wenona Parents Association";
+                }
+                else {
+                    $newUser['WPA'][] = sprintf("Year %02d Wenona Parents Association", $i);
+                }
+            }
+        }
 
         // get campuses of attached children
-        $newUser['campus'] = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
+        $newUser['campus'] = $campus;
         $newUser['group_id'] = self::PARENT_GROUP_ID;
 
         // parents are not superusers
@@ -50,37 +87,6 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
 
         return $newUser;
     }
-
-    /**
-     * Set up the new user's spouse's details
-     *
-     * @param $currentUser
-     * @return array
-     */
-    public function setupSpouseDetails($currentUser) {
-        $spouse = array();
-
-        // Login details
-        $spouse['username'] = $currentUser['StudentContactSpouseID'];
-     // $spouse['password'] = "abc123";
-
-        // User details
-        $spouse['synergy_id'] = $currentUser['StudentContactSpouseID'];
-        $spouse['title'] = $currentUser['StudentContactSpouseTitle'];
-        $spouse['firstname'] = $currentUser['StudentContactSpousePreferred'];
-        $spouse['lastname'] = $currentUser['StudentContactSpouseSurname'];
-        $spouse['alt_email'] = $currentUser['StudentContactSpouseDefaultEmail']; // for some reason this index gets truncated...sometimes
-        $spouse['defaultCampus'] = self::PARENT_DEFAULT_CAMPUS;
-        // get campuses of kids
-        $spouse['campus'] = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
-        $spouse['group_id'] = self::PARENT_GROUP_ID;
-
-        // parents are not superusers
-        //$spouse['su'] = false;
-
-        return $spouse;
-    }
-
 
     /**
      * If the users exist in Synergy but not in Schoolbox, create an account for
@@ -92,11 +98,22 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
         $previousUser = null;
         $compiledCampus = array();
 
+        $db = DeprecatedDatabase::getInstance();
+
+        $groupHandler = new Group(HOMEPAGE_SERVICE);
+        $userHandler = new User();
+
+        $result = $db->getAll("SELECT `id`, `name` FROM `category` WHERE `name` LIKE '%Wenona Parents%'");
+        $wpaCats = array();
+        // index by name, not id
+        foreach($result as $r) {
+            $wpaCats[$r['name']] = $r['id'];
+        }
+
         $this->getVerboseFilter()->intro();
 
         foreach($this->getList() as $currentUser) {
             $newUser = $this->setupUserDetails($currentUser);
-            $newSpouse = $this->setupSpouseDetails($currentUser);
 
             /* First iteration
                 */
@@ -106,36 +123,82 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
                 }
 
                 $previousUser = $newUser;
-                $previousSpouse = $newSpouse;
             }
             /* Previous was different person to Current
                 */
             else if ($previousUser['username'] != $newUser['username']) {
                 $previousUser['campus'] = $compiledCampus;
-                $previousSpouse['campus'] = $compiledCampus;
 
                 /* Uniquify campus list
                      */
                 $previousUser['campus'] = array_unique($previousUser['campus']);
-                $previousSpouse['campus'] = array_unique($previousSpouse['campus']);
 
                 /* Update previous user
                      */
                 $this->executeCreateUpdate($previousUser);
-                $this->executeCreateUpdate($previousSpouse);
+
+                // map parents into their WPA categories
+                foreach($previousUser['WPA'] as $wpa) {
+                    if ($this->getPerformUpdate() === true) {
+                        echo "^  Adding parent to $wpa\n";
+                        $groupHandler->addUser($wpaCats[$wpa], $previousUser['id']);
+                    }
+                    else {
+                        echo "^  Planning to add parent to $wpa\n";
+                    }
+                }
 
                 /* Recompile
                      */
                 $compiledCampus = $newUser['campus'];
 
                 $previousUser = $newUser;
-                $previousSpouse = $newSpouse;
             }
             /* They are the same person
                 */
             else {
                 $compiledCampus = array_merge($compiledCampus, $newUser['campus']);
             }
+        }
+
+
+        // retrieve all parent records from the user table where passwords are blank, and apply passwords
+        $db = DeprecatedDatabase::getInstance();
+        $users = $db->getAll(
+            "SELECT `id`, `username`
+             FROM `user`
+             WHERE (`password` = '' OR `password` IS NULL)
+             AND `group_id` = ".self::PARENT_GROUP_ID
+        );
+
+        if(is_array($users) && count($users)) {
+            $output = '/tmp/ppw.csv';
+            $fp = fopen($output, 'w');
+            fputcsv($fp, array('login', 'password'));
+
+            foreach ($users as $user) {
+                // plaintext generation needs to be stored: randomly 3 letters, 4 numbers
+                $pw = '';
+                for($i = 0; $i < 7; $i++) {
+                    $rnd = rand(97, 122);
+                    if($i < 3) {
+                        $pw .= chr($rnd);
+                    }
+                    else {
+                        $pw .= $rnd % 10;
+                    }
+                }
+
+                // store password
+                fputcsv($fp,array($user['username'], $pw));
+
+                if ($this->getPerformUpdate() === true) {
+                    // store password in synergetic and schoolbox
+                    $_oldPW = '';
+                    $userHandler->setPassword($user['id'], $_oldPW, $pw);
+                }
+            }
+            fclose($fp);
         }
 
         $this->getVerboseFilter()->summary();

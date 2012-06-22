@@ -38,7 +38,7 @@ class Synchronise_Synergetic_Wenona_Strategy_Staff extends Synchronise_Synergeti
         $newUser['alt_email']          = $currentUser['OccupEmail'];
         $newUser['local_email']        = self::STAFF_LOCAL_EMAIL;
         $newUser['defaultCampus']      = self::STAFF_DEFAULT_CAMPUS;
-        $newUser['campus']             = $this->getCampusFromCode($currentUser['StaffCampus']);
+        // $newUser['campus']             = $this->getCampusFromCode($currentUser['StaffCampus']);
         $newUser['group_id']           = $this->getGroupIDFromCategory($currentUser['StaffCategoryType']);
         if(self::STAFF_EPORTFOLIO != -1) {
             $newUser['eportfolio_enabled'] = self::STAFF_EPORTFOLIO;
