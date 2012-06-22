@@ -39,7 +39,7 @@ else {
 /* Set up component name
  */
 $this->setVar(array(
-	'COMPONENT_NAME' => strlen(trim($config['componentname'])) ? $config['componentname'] : 'Files',
+	'COMPONENT_NAME' => strlen(trim($config['componentname'])) ? $config['componentname'] : 'News',
 ));
 
 //setup block for submission button
