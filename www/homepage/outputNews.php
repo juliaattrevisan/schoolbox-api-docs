@@ -61,7 +61,7 @@ if ($alternateCategoryId) {
 }
 /* Tried to load from alternate source but failed
  */
-else if (!strlen($config['homepage-news']) && !$alternateCategoryId){
+else if (strlen($config['homepage-news']) && !$alternateCategoryId){
 	$newsList = array();
 
 	$this->setVar("submit_news_block", "");

@@ -1,5 +1,29 @@
 <div class="box clearfix" id="component{COMPONENT_HOMEPAGE_ID}">
-	<h2>Forum</h2>
+	<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
+	<script type="text/javascript">
+	    $j(function () {
+	        /*
+	         * Modal for URL homepage selection
+	         * */
+
+	        $j('#resource-browser').dialog({
+	            width: 650,
+	            autoOpen: false,
+	            title: "Select a homepage",
+	            modal: true,
+	            resizable: false
+	        });
+
+	        $j('#launch-browser-{COMPONENT_HANDLE}').click(function() {
+	            $j('#resource-browser').load('/ajax/resourceBrowser', {destination : '#homepage-forum-{COMPONENT_HANDLE}'}, function() {
+	                $j('#resource-browser').dialog('open');
+	            });
+
+	            return false;
+	        });
+	    });
+	</script>
+	<h2>{COMPONENT_NAME}</h2>
 	<!-- BEGIN config -->
 	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
 	<div class="editPanel settings hide">
@@ -7,6 +31,13 @@
 			<input type="hidden" name="cid" value="{ID}" />
 			<input type="hidden" name="type" value="config" />
 			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
+
+			<label for="componentname">Name: </label>
+			<input id="componentname" type="text" name="componentname" value="{COMPONENT_NAME}" />
+
+			<span>Displaying: <a href="{COMPONENT_CONFIG_SRC_ID}">{COMPONENT_CONFIG_SRC_NAME}</a> </span>
+			<input type="button" value="Select Alternate Source" id="launch-browser-{COMPONENT_HANDLE}" />
+			<input type="hidden" value="{COMPONENT_CONFIG_SRC_ID}" name="homepage-forum" id="homepage-forum-{COMPONENT_HANDLE}"/>
 
 			Compact Mode:
 			<label for="forum{COMPONENT_HOMEPAGE_ID}">

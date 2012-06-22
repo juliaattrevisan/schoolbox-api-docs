@@ -59,7 +59,7 @@ if (strlen($config['homepage-blog'])) {
 	}
 }
 
-/* Load news from some other homepage
+/* Load blog from some other homepage
  */
 if ($alternateCategoryId) {
 	$blogs = $blogHandle->getByCID($alternateCategoryId);
@@ -79,8 +79,8 @@ if ($alternateCategoryId) {
 }
 /* Tried to load from alternate source but failed
  */
-else if (!strlen($config['homepage-blog']) && !$alternateCategoryId) {
-	$newsList = array();
+else if (strlen($config['homepage-blog']) && !$alternateCategoryId) {
+	$blogs = array();
 
 	$this->setVar("submit_block", "");
 }
@@ -101,7 +101,7 @@ else if (!strlen($config['homepage-blog'])){
 /* Default
  */
 else {
-	$newsList = array();
+	$blogs = array();
 
 	$this->setVar("submit_block", "");
 }
