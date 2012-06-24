@@ -1,6 +1,6 @@
 <?php
 
-require_once SITE_root.'/include/Bootstrap.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/../include/Bootstrap.php';
 
 $categoryHandler = new Category();
 $feedHandler = new Feed();
