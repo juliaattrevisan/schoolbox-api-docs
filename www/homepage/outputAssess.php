@@ -49,11 +49,7 @@ if (is_array($allAssess)) {
 
 		/* Hide it from students if the start date hasn't passed yet
 		 */
-
-		if ($permission < WRITE_ACCESS && !$assessHandler->isOpen($currentAssess)) {
-			$this->setVar('assess_block', '');
-		}
-		else {
+		if (($permission >= WRITE_ACCESS) || $assessHandler->isOpen($currentAssess)) {
 			$createdTime = new Alaress_Date_Relative($currentAssess['created_at']);
 
 			$author = $userHandler->getByID($currentAssess['user_id']);
