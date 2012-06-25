@@ -34,8 +34,6 @@ if(is_numeric($_GET['id']))
 				error(41);
 
             if ($_GET['published']) {
-                require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/eportfolio.php');
-
                 $eportfolioHandler = new Eportfolio_Container($file['owner']);
 
                 if (!$eportfolioHandler->canEdit($file['owner'])) {
