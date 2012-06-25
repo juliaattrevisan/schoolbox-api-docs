@@ -16,7 +16,7 @@ $this->setVar(array(
 
 	/* These are for the Select Alternate Source resourcebrowser
 	 */
-	'COMPONENT_CONFIG_SRC_ID' => $config['homepage-news'],
+	'COMPONENT_CONFIG_SRC_ID' => $config['homepage-blog'],
 	'COMPONENT_CONFIG_SRC_NAME' => $src['name'],
 	'COMPONENT_HANDLE' => strtolower($componentHandle)
 ));
