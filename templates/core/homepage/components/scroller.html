@@ -1,24 +1,44 @@
 <div class="box clearfix" id="component{COMPONENT_HOMEPAGE_ID}">
+	<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 	<script type="text/javascript" src="/javascript/jquery.cycle.js"></script>
 	<script type="text/javascript">
 	$j(function () {
-        if ($j('.cycle-content img').length > 1) {
-            $j('.cycle-content').delay(2000).cycle({
+        if ($j('#image-scroller-{COMPONENT_HOMEPAGE_ID} img').length > 1) {
+            $j('#image-scroller-{COMPONENT_HOMEPAGE_ID}').delay(2000).cycle({
                 timeout: {COMPONENT_CONFIG_TIMING_VALUE_MS},
                 cleartype: true,
                 after: function(curr)
                  {
                     var append = $j(this).attr('alt');
-                    $j('.caption-holder').text(append);
+                    $j('#caption-holder-{COMPONENT_HOMEPAGE_ID}').text(append);
                 }
             });
-        } else{
-            var append = $j('.cycle-content img').attr('alt');
-            $j('.caption-holder').text(append);
         }
+		else {
+            var append = $j('#image-scroller-{COMPONENT_HOMEPAGE_ID} img').attr('alt');
+            $j('#caption-holder-{COMPONENT_HOMEPAGE_ID}').text(append);
+        }
+
+		/* Modal for URL homepage selection
+		 */
+		$j('#resource-browser').dialog({
+			width:650,
+			autoOpen:false,
+			title:"Select a homepage",
+			modal:true,
+			resizable:false
+		});
+
+		$j('#launch-browser-{COMPONENT_HANDLE}').click(function () {
+			$j('#resource-browser').load('/ajax/resourceBrowser', {destination:'#homepage-imagescroller-{COMPONENT_HANDLE}'}, function () {
+				$j('#resource-browser').dialog('open');
+			});
+
+			return false;
+		});
 	});
 	</script>
-    <h2>Image Carousel</h2>
+    <h2>{COMPONENT_NAME}</h2>
     <!-- BEGIN config -->
     <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
 	<a class="close-delete" href="#"><span>X</span></a>
@@ -28,9 +48,12 @@
 			<input type="hidden" name="type" value="config" />
 			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
 
+			<label for="componentname">Name: </label>
+			<input id="componentname" type="text" name="componentname" value="{COMPONENT_NAME}" />
 
-				Pixels:
-				<input id='url' type="text" name="pixel" value="{COMPONENT_PIXEL}" size="4"/>
+			<label>Pixels:</label>
+
+			<input id='url' type="text" name="pixel" value="{COMPONENT_PIXEL}" size="4"/>
 
 			<label for="caption">
 				Captions:
@@ -49,6 +72,10 @@
 				</select>
 			</label>
 
+			<span>Displaying: <a href="{COMPONENT_CONFIG_SRC_ID}">{COMPONENT_CONFIG_SRC_NAME}</a> </span>
+			<input type="button" value="Select Alternate Source" id="launch-browser-{COMPONENT_HANDLE}" />
+			<input type="hidden" value="{COMPONENT_CONFIG_SRC_ID}" name="homepage-imagescroller" id="homepage-imagescroller-{COMPONENT_HANDLE}"/>
+
 			<input type="submit" value="Update" class="submit-btn update" />
     	</form>
   	</div>
@@ -62,21 +89,20 @@
 			<a href="#" class="delete-reject btn go-to"><span></span>No</a>
 		</form>
 	</div>
-    </a>
     <!-- END config -->
 
     <div id="galleryCycle" class="box clearfix">
-		<div class="cycle-content">
+		<div id='image-scroller-{COMPONENT_HOMEPAGE_ID}' class="cycle-content">
 			<!-- BEGIN image -->
 			<img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" alt="{IMAGE_NAME}"/>
 			<!-- END image -->
 		</div>
 		<!-- BEGIN show_caption -->
-		<div class="caption-holder"></div>
+		<div id='caption-holder-{COMPONENT_HOMEPAGE_ID}' class="caption-holder"></div>
 		<!-- END show_caption -->
     </div>
 
 	<!-- BEGIN submit_image -->
-	<p class="interact clearfix"><a href="/cms/file/multi/{ID}" class="btn up-arrow"><span></span>Post Images</a></p>
+	<p class="interact clearfix"><a href="/cms/file/multi/{IMAGESCROLLER_CATEGORY_ID}" class="btn up-arrow"><span></span>Post Images</a></p>
 	<!-- END submit_image -->
 </div>
