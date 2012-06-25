@@ -53,7 +53,7 @@ if ($alternateCategoryId) {
 	}
 	else {
 		$this->setVar(array(
-			'ID' => $alternateCategoryId
+			'NEWS_CATEGORY_ID' => $alternateCategoryId
 		));
 
 		$this->parse("submit_news_block", "submit_news");
@@ -64,12 +64,24 @@ if ($alternateCategoryId) {
 else if (strlen($config['homepage-news']) && !$alternateCategoryId){
 	$newsList = array();
 
+	/* Have update form to back to this homepage, not the wiki's homepage
+	 */
+	$this->setVar(array(
+		'NEWS_CATEGORY_ID' => $categoryID
+	));
+
 	$this->setVar("submit_news_block", "");
 }
 /* Load news for the current homepage
  */
 else if (!strlen($config['homepage-news'])) {
 	$newsList = $newsHandler->getAllForCategory($categoryID, $config);
+
+	/* Have update form to back to this homepage, not the wiki's homepage
+	 */
+	$this->setVar(array(
+		'NEWS_CATEGORY_ID' => $categoryID
+	));
 
 	/* Controls such as Post News
 	 */
