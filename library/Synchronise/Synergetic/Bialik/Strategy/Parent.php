@@ -156,6 +156,22 @@ class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synerget
 			}
 		}
 
+        /* Cleanup last previous user */
+        if ($previousUser['username']) {
+            $previousUser['campus'] = $compiledCampus;
+            $previousSpouse['campus'] = $compiledCampus;
+
+            /* Uniquify campus list
+             */
+            $previousUser['campus'] = array_unique($previousUser['campus']);
+            $previousSpouse['campus'] = array_unique($previousSpouse['campus']);
+
+            /* Update previous user
+             */
+            $this->executeCreateUpdate($previousUser);
+            $this->executeCreateUpdate($previousSpouse);
+        }
+
 		$this->getVerboseFilter()->summary();
 	}
 }
