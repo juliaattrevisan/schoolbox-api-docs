@@ -71,7 +71,7 @@ if ($alternateCategoryId) {
 	}
 	else {
 		$this->setVar(array(
-			'ID' => $alternateCategoryId
+			'BLOG_CATEGORY_ID' => $alternateCategoryId
 		));
 
 		$this->parse("submit_block", "submit");
@@ -82,12 +82,24 @@ if ($alternateCategoryId) {
 else if (strlen($config['homepage-blog']) && !$alternateCategoryId) {
 	$blogs = array();
 
+	/* Have update form to back to this homepage, not the wiki's homepage
+	 */
+	$this->setVar(array(
+		'BLOG_CATEGORY_ID' => $categoryID
+	));
+
 	$this->setVar("submit_block", "");
 }
 /* Load blogs for the current homepage
  */
 else if (!strlen($config['homepage-blog'])){
 	$blogs = $blogHandle->getByCID($categoryID);
+
+	/* Have update form to back to this homepage, not the wiki's homepage
+	 */
+	$this->setVar(array(
+		'BLOG_CATEGORY_ID' => $categoryID
+	));
 
 	/* Controls such as Post News
 	 */
