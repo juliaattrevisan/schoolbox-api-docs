@@ -12,7 +12,8 @@
  */
 class Synchronise_Synergetic_Mggs_Strategy_Staff extends Synchronise_Synergetic_Mggs_Strategy_Abstract {
 	protected $strategyTitle = "Update Schoolbox Staff Details Synchronisation";
-	const STAFF_GROUP_ID = 2;
+	const ADMIN_GROUP_ID = 1;
+    const TEACH_GROUP_ID = 2;
 	const STAFF_DEFAULT_CAMPUS = 1;
 
 	/**
@@ -48,21 +49,21 @@ class Synchronise_Synergetic_Mggs_Strategy_Staff extends Synchronise_Synergetic_
 
 		/* User details
 		 */
-		$newUser['title'] = '';
+		$newUser['title'] = $currentUser['StaffTitle'];
 		$newUser['firstname'] = $currentUser['StaffPreferredName'];
 		$newUser['lastname'] = $currentUser['StaffSurname'];
         $newUser['synergy_id'] = $currentUser['StaffID'];
-		$newUser['alt_email'] = '';
-        $newUser['local_email'] = 1;
+		$newUser['alt_email'] = $currentUser['OccupEmail'];
+        $newUser['local_email'] = 0;
 
 		/* Campus config: needs to map to a campus id
 		 */
-		$newUser['defaultCampus'] = 1;
+		$newUser['defaultCampus'] = $this->getCampusFromCode($currentUser['StaffCampus']);
 		$newUser['campus'] = array($this->getCampusFromCode($currentUser['StaffCampus']));
 
 		/* Staff Group ID
 		 */
-		$newUser['group_id'] = self::STAFF_GROUP_ID;
+		$newUser['group_id'] = $this->getGroupIDFromCategory($currentUser['StaffCategoryType']);
 
 		/* This person is not a superuser
 		 */
@@ -82,16 +83,6 @@ class Synchronise_Synergetic_Mggs_Strategy_Staff extends Synchronise_Synergetic_
 
 		foreach($this->getList() as $currentUser) {
 
-			/* The drop down in Synergetic's Phone and Occupation tabs indicates
-			 * which email the person prefers to use. Create a field in the
-			 * $currentUser structure to remember this email address
-			 */
-			if ($currentUser['DefaultEmailCode'] == 'O') {
-				$currentUser['preferredEmail'] = $currentUser['OccupEmail'];
-			}
-			else {
-				$currentUser['preferredEmail'] = $currentUser['Email'];
-			}
 
 			/* Generate details about the new user
 			 */
@@ -110,4 +101,13 @@ class Synchronise_Synergetic_Mggs_Strategy_Staff extends Synchronise_Synergetic_
 
 		$this->getVerboseFilter()->summary();
 	}
+
+    //Converts Synergetic StaffCategoryType to admin or teacher group
+    protected function getGroupIDFromCategory($category) {
+
+        if($category == 'TEACHER')
+           return self::TEACH_GROUP_ID;
+        else
+           return self::ADMIN_GROUP_ID;
+   }
 }

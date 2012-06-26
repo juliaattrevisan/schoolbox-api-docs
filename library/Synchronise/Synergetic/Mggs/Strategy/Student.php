@@ -50,17 +50,17 @@ class Synchronise_Synergetic_Mggs_Strategy_Student extends Synchronise_Synergeti
 		$newUser['title'] = '';
 		$newUser['firstname'] = $currentUser['StudentPreferred'];
 		$newUser['lastname'] = $currentUser['StudentSurname'];
-        $newUser['alt_email'] = $currentUser['StudentEmail'];
+        $newUser['alt_email'] = $currentUser['StudentOccupEmail'];
         $newUser['synergy_id'] = $currentUser['StudentID'];
         $newUser['local_email'] = 0;
 
 		/* Year level
 		 */
-		$newUser['year'] = $currentUser['StudentYearLevel'];
+		$newUser['year'] = $this->getYear($currentUser['StudentYearLevel']);
 
 		/* Campus config: needs to map to a campus id
 		 */
-		$newUser['defaultCampus'] = 1;
+		$newUser['defaultCampus'] = $this->getCampusFromCode($currentUser['StudentCampus']);
 		$newUser['campus'] = array($this->getCampusFromCode($currentUser['StudentCampus']));
 
 		/* Staff Group ID
@@ -73,6 +73,15 @@ class Synchronise_Synergetic_Mggs_Strategy_Student extends Synchronise_Synergeti
 
 		return $newUser;
 	}
+
+    protected function getYear($year) {
+        if($year == '40')
+            return '4yo Kinder';
+        else if($year == '30')
+            return '3yo Kinder';
+        else
+            return $year;
+    }
 
 	/**
 	 * If the users exist in Synergy but not in Schoolbox, create an account for

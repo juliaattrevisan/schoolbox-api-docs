@@ -89,15 +89,16 @@ class Synchronise_Synergetic_Mggs_Strategy_Parent extends Synchronise_Synergetic
 			$user = $this->getUserHandler()->getBySynergy($currentSynergyId);
 
 			if (($user['title'] != $currentParent['Title']) || ($user['firstname'] != $currentParent['Preferred']) || ($user['lastname'] != $currentParent['Surname']) || ($user['alt_email'] != $preferredEmail)) {
-				$updatedUser = $this->getUserHandler()->getById($user['uid']);
 
 				$updatedUser['id'] = $user['uid'];
+                $updatedUser['username'] = $user['username'];
 				$updatedUser['title'] = trim($currentParent['Title']);
 				$updatedUser['firstname'] = trim($currentParent['Preferred']);
 				$updatedUser['lastname'] = trim($currentParent['Surname']);
 
+                //TODO: Fix this so it works out the parent campus based on student year level
 				$updatedUser['campus'] = $this->getUserHandler()->getUserCampus($user['uid']);
-				$updatedUser['defaultCampus'] = array();
+				$updatedUser['defaultCampus'] = $updatedUser['campus'][0];
 
 				/* Clear email address in Portal if the user is not meant to be
 				 * publicly listed
@@ -108,17 +109,6 @@ class Synchronise_Synergetic_Mggs_Strategy_Parent extends Synchronise_Synergetic
 				else {
 					$updatedUser['alt_email'] = '';
 				}
-
-				unset($updatedUser['gname']);
-				unset($updatedUser['uid']);
-
-				/* Revision 3221 introduces this alias
-				 */
-				unset($updatedUser['campusName']);
-
-				/* Revision 3913 introduces this alias
-				 */
-				unset($updatedUser['residential_house']);
 
 				/* Actually perform db update
 				 */
