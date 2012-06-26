@@ -39,6 +39,7 @@ if (!empty($_POST)) {
         'duration'  => Survey_Main::UNLIMITED_DURATION,
 		'availability' => 'survey',
 		'anonymous_result' => Scrub::text($_POST['anonymous_result']),
+		'notify_author' => Scrub::text($_POST['notify_author']),
         'created_at' => 'NOW()',
     ));
 
@@ -83,6 +84,7 @@ else {
         'ASSESS_START_DATE'  => $assessDate->getLocalShort(),
         'ASSESS_FINISH_DATE' => $assessEndDate->getLocalShort(),
 		'ASSESS_ANONYMOUS_RESULT_CHECKED' => '',
+		'ASSESS_NOTIFY_AUTHOR_CHECKED' => '',
     ));
 
     /* Select default settings

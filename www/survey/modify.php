@@ -54,6 +54,7 @@ if (!empty($_POST)) {
 		'duration' => Survey_Main::UNLIMITED_DURATION,
 		'allow_resit' => Scrub::text($_POST['allow_resit']),
 		'anonymous_result' => Scrub::text($_POST['anonymous_result']),
+		'notify_author' => Scrub::text($_POST['notify_author']),
     ));
 
     SitePage::localRedir('/survey/summary/' . $this->arg[0]);
@@ -86,7 +87,8 @@ else {
         'ASSESS_DESCRIPTION' => $assess['description'],
         'ASSESS_START_DATE'  => $assessStartDate->getLocalShort(),
         'ASSESS_FINISH_DATE' => $assessFinishDate->getLocalShort(),
-		'ASSESS_ANONYMOUS_RESULT_CHECKED' => $assess['anonymous_result'] ? 'checked="checked"' : ''
+		'ASSESS_ANONYMOUS_RESULT_CHECKED' => $assess['anonymous_result'] ? 'checked="checked"' : '',
+		'ASSESS_NOTIFY_AUTHOR_CHECKED' => $assess['notify_author'] ? 'checked="checked"' : '',
     ));
 
     /* Render starting times

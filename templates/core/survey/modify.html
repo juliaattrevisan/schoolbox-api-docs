@@ -140,8 +140,18 @@ $j(document).ready(function() {
 			<tr>
 				<td>
 					<h4>Anonymous Results</h4>
+					<p>Hide usernames from results listings and exported survey results files.</p>
 					<div class="textarea-container">
 						<input name="anonymous_result" type="checkbox" value="1" {ASSESS_ANONYMOUS_RESULT_CHECKED}/> Results will be anonymous
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<h4>Notification</h4>
+					<p>Send an email notification to the survey's author whenever someone completes an attempt.</p>
+					<div class="textarea-container">
+						<input name="notify_author" type="checkbox" value="1" {ASSESS_NOTIFY_AUTHOR_CHECKED}/> Turn on notifications
 					</div>
 				</td>
 			</tr>

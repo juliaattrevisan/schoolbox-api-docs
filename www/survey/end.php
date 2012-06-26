@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-$assessHandler = new Survey_Main();
+$surveyHandler = new Survey_Main();
 $attemptHandler = new Survey_Attempt();
 $questionHandler = new Survey_Question();
 $responseHandler = new Survey_Response();
@@ -18,40 +18,40 @@ if (!is_numeric($_SESSION['attempt_id'])) {
     SitePage::localRedir('/survey/intro/' . $this->arg[0]);
 }
 
-$assess = $assessHandler->getByID($this->arg[0]);
+$survey = $surveyHandler->getByID($this->arg[0]);
 $attempt = $attemptHandler->getByID($_SESSION['attempt_id']);
 
-if (!$assess) {
+if (!$survey) {
     error(112);
 }
 
-if ($assessHandler->isDeleted($this->arg[0])) {
+if ($surveyHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
 /* Disabled: doing so will allow teachers to give their test a "dry run" and
  * they can delete their attempts afterwards
 
-if ($assessHandler->isOwner($this->arg[0])) {
+if ($surveyHandler->isOwner($this->arg[0])) {
     error(124);
 }
 */
 
-if ($assessHandler->isExpired($this->arg[0])) {
+if ($surveyHandler->isExpired($this->arg[0])) {
     error(120);
 }
 
 /* Participants should be blocked from attempting if it hasn't started,
  * but authors should be able to test out their content
  */
-if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
 	error(144);
 }
 
 $this->setFile(TEMPLATE_content, 'survey/end.html');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setBlock(TEMPLATE_content, 'alreadyEnded', 'alreadyEnded_block');
-$this->setTitle('Assessment: ' . $assess['title']);
+$this->setTitle('Assessment: ' . $survey['title']);
 
 if ($attempt['finish'] == '0000-00-00 00:00:00') {
 	$finishDate = new Alaress_Date_Format(time(), 'U');
@@ -64,8 +64,8 @@ if ($attempt['finish'] == '0000-00-00 00:00:00') {
 	$attemptEndDate = new Alaress_Date_Format(time(), 'U');
 
     $this->setVar(array(
-        'ASSESS_TITLE' => $assess['title'],
-		'ASSESS_CATEGORY_ID' => $assess['category_id'],
+        'ASSESS_TITLE' => $survey['title'],
+		'ASSESS_CATEGORY_ID' => $survey['category_id'],
         'ATTEMPT_END' => $attemptEndDate->getShort()
     ));
 
@@ -76,11 +76,18 @@ else {
 	$attemptEndDate = new Alaress_Date_Format(strtotime($attempt['finish']), 'U');
 
     $this->setVar(array(
-        'ASSESS_TITLE' => $assess['title'],
-		'ASSESS_CATEGORY_ID' => $assess['category_id'],
+        'ASSESS_TITLE' => $survey['title'],
+		'ASSESS_CATEGORY_ID' => $survey['category_id'],
         'ATTEMPT_END' => $attemptEndDate->getShort()
     ));
 
     $this->parse('alreadyEnded_block', 'alreadyEnded');
     $this->setVar('endAssess_block', '');
+}
+
+/* Notify the survey author when someone completes this
+ */
+if ($survey['notify_author']) {
+	$notification = new Survey_Notification($survey);
+	$notification->send();
 }
