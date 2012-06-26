@@ -60,6 +60,8 @@ else {
 	$this->parse('respondent_heading_block', 'respondent_heading');
 }
 
+$this->setVar('respondent_block', '');
+
 if (is_array($sectionValues) && count($sectionValues)) {
 
     // manual array flip
