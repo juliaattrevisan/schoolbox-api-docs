@@ -9,7 +9,9 @@
 	<form action='/survey/deleteAttempt' method='post'>
 		<table>
 			<tr>
+				<!-- BEGIN respondent_heading -->
 				<th>Student</th>
+				<!-- END respondent_heading -->
 				<th>Start</th>
 				<th>Finish</th>
 				<th>Review</th>
@@ -17,7 +19,9 @@
 			</tr>
 			<!-- BEGIN attempt -->
 			<tr class='{ON_OFF}'>
+				<!-- BEGIN respondent_name -->
 				<td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_LASTNAME}, {ATTEMPT_FIRSTNAME}</a></td>
+				<!-- END respondent_name -->
 				<td>{ATTEMPT_START}</td>
 				<td>{ATTEMPT_FINISH}</td>
 				<td><a href='/survey/review/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}'>Review</a></td>

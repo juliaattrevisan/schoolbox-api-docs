@@ -35,5 +35,6 @@ if (is_numeric($this->arg[1])) {
 }
 
 $exporter->generate();
+$exporter->activateTheGrid();
 
 exit(1);

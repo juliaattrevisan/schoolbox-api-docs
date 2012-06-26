@@ -31,7 +31,32 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 
 $this->setFile(TEMPLATE_content, 'survey/attempts.html');
 $this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
+$this->setBlock(TEMPLATE_content, 'respondent_heading', 'respondent_heading_block');
+$this->setBlock('attempt', 'respondent_name', 'respondent_name_block');
 
+/* If not using Anonymous Result, set respondent details
+ */
+if ($assess['anonymous_result']) {
+	$this->setVar('respondent_heading_block', '');
+}
+else {
+	$this->parse('respondent_heading_block', 'respondent_heading');
+}
+
+/* Generic details
+ */
+$this->setVar(array(
+	'SURVEY_NAME' => $assess['title'],
+	'CID' => $assess['category_id'],
+	'SURVEY_ID' => $assess['assess_id']
+));
+
+/* Default
+ */
+$this->setVar('attempt_block', '');
+
+/* Iterate
+ */
 $allAttempts = $attemptHandler->getList($this->arg[0]);
 
 if (is_array($allAttempts) && count($allAttempts)) {
@@ -66,15 +91,19 @@ if (is_array($allAttempts) && count($allAttempts)) {
 			'ON_OFF' => $i % 2 ? 'dark' : ''
 		));
 
+		/* If not using Anonymous Result, set respondent details
+		 */
+		if ($assess['anonymous_result']) {
+			$this->setVar('respondent_name_block', '');
+		}
+		else {
+			$this->parse('respondent_name_block', 'respondent_name', true);
+		}
+
 		$this->parse('attempt_block', 'attempt', true);
+
+		/* Clear children after parsing out the parent
+		 */
+		$this->setVar('respondent_name_block', '');
 	}
 }
-else {
-	$this->setVar('attempt_block', '');
-}
-
-$this->setVar(array(
-	'SURVEY_NAME' => $assess['title'],
-    'CID'         => $assess['category_id'],
-    'SURVEY_ID'   => $assess['assess_id']
-));

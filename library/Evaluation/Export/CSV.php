@@ -40,9 +40,9 @@ class Evaluation_Export_CSV {
 	 */
 	private $mandatoryColumns = array(
 		'User ID',
+		'Name',
 		'Start',
 		'Finish',
-		'Name',
 	);
 
 	/* Source data
@@ -93,10 +93,6 @@ class Evaluation_Export_CSV {
 		/* Collate responses
 		 */
 		$this->setResponses($this->collateResponses());
-
-		/* Collate grid
-		 */
-		$this->activateTheGrid();
 
 		return $this;
 	}
@@ -213,9 +209,9 @@ class Evaluation_Export_CSV {
 			 */
 			$thisResponse = array(
 				$currentAttempt['user_id'],
+				$user['firstname'] . ' ' . $user['lastname'],
 				$start->getShort(),
 				$finishTime,
-				$user['firstname'] . ' ' . $user['lastname']
 			);
 
 			/* Construct horizontally for this attempt
@@ -258,7 +254,9 @@ class Evaluation_Export_CSV {
 
 			/* Concatenate mandatory columns with additional columns
 			 */
-			$allResponses[] = array_merge($thisResponse, $additionalColumns);
+			$row = array_merge($thisResponse, $additionalColumns);
+
+			$allResponses[] = $row;
 		}
 
 		return $allResponses;
@@ -390,7 +388,7 @@ class Evaluation_Export_CSV {
 	 *
 	 * @param $headings
 	 */
-	private function setHeadings($headings) {
+	protected function setHeadings($headings) {
 		$this->headings = $headings;
 	}
 
@@ -399,7 +397,7 @@ class Evaluation_Export_CSV {
 	 *
 	 * @return array
 	 */
-	private function getHeadings() {
+	protected function getHeadings() {
 		return $this->headings;
 	}
 
@@ -482,7 +480,7 @@ class Evaluation_Export_CSV {
 	 *
 	 * @param $responses
 	 */
-	private function setResponses($responses) {
+	protected function setResponses($responses) {
 		$this->responses = $responses;
 	}
 
@@ -491,7 +489,7 @@ class Evaluation_Export_CSV {
 	 *
 	 * @return array
 	 */
-	private function getResponses() {
+	protected function getResponses() {
 		return $this->responses;
 	}
 

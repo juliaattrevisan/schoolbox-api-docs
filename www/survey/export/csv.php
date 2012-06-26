@@ -34,6 +34,16 @@ if (is_numeric($this->arg[1])) {
 	$exporter->setQuestionFilter($this->arg[1]);
 }
 
+/* Generate output
+ */
 $exporter->generate();
+
+/* Check if Anonymous Result is set
+ */
+$exporter->adjustAnonymousResult($survey);
+
+/* Stream output
+ */
+$exporter->activateTheGrid();
 
 exit(1);

@@ -48,41 +48,17 @@ $sectionValues = $surveyExporter->getSectionValues();
 $this->setFile(TEMPLATE_content, 'survey/resultsForQuestion.html');
 $this->setBlock(TEMPLATE_content, 'respondent', 'respondent_block');
 $this->setBlock(TEMPLATE_content, 'graph', 'graph_block');
+$this->setBlock(TEMPLATE_content, 'respondent_heading', 'respondent_heading_block');
+$this->setBlock('respondent', 'respondent_name', 'respondent_name_block');
 
-
-
-/* Render legend. There should only be one section and one question when using
- * this script, but for polymorphism it appears in an array structure
+/* If not using Anonymous Result, set respondent details
  */
-/*
-if (is_array($sectionValues) && count($sectionValues)) {
-    if (is_array($sectionValues[0]['questions']) && count($sectionValues[0]['questions'])) {
-        if ($questionHandler->hasLegend($sectionValues[0]['questions'][0]['type_id'])) {
-            $allLegendItems = $sectionValues[0]['questions'][0]['summary'];
-
-            // Sort legend items explicitly, otherwise they will appear in the
-                 order they were submitted
-
-            uksort($allLegendItems, 'cmp');
-
-            foreach($allLegendItems as $key => $value) {
-                $this->setVar(array(
-                    'LEGEND_ITEM_LETTER' => $key,
-                    'LEGEND_ITEM_TEXT' => $value['text'],
-                ));
-
-                $this->parse('legend_item_block', 'legend_item', true);
-            }
-
-            $this->parse('has_legend_block', 'has_legend');
-        }
-        else {
-            $this->setVar('has_legend_block', '');
-        }
-    }
+if ($assess['anonymous_result']) {
+	$this->setVar('respondent_heading_block', '');
 }
-*/
-
+else {
+	$this->parse('respondent_heading_block', 'respondent_heading');
+}
 
 if (is_array($sectionValues) && count($sectionValues)) {
 
@@ -122,7 +98,20 @@ if (is_array($sectionValues) && count($sectionValues)) {
 					'RESPONDENT_FINISH_DATETIME' => $finish->getShort(),
 				));
 
+				/* If not using Anonymous Result, set respondent details
+				 */
+				if ($assess['anonymous_result']) {
+					$this->setVar('respondent_name_block', '');
+				}
+				else {
+					$this->parse('respondent_name_block', 'respondent_name', true);
+				}
+
 				$this->parse('respondent_block', 'respondent', true);
+
+				/* Clear children after parsing out the parent
+				 */
+				$this->setVar('respondent_name_block', '');
 			}
 		}
 	}
