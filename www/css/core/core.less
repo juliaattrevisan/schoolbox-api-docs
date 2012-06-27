@@ -393,6 +393,27 @@ table {
     }
 }
 
+/*--------------------------------------------------------------
+Notifications
+--------------------------------------------------------------*/
+.information-notification {
+    padding: 2px 8px 2px 28px;
+    background: #e8f5ff url(/images/famicons/information.png) 8px 2px no-repeat;
+    line-height: 16px;
+    margin-bottom: 16px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    color: #000;
+    z-index: 120;
+    border: 1px solid @body-background;
+}
+
+.error-notification{
+    .information-notification;
+    background-image: url(/images/famicons/exclamation.png);
+    background-color:#FBBCA8;
+}
 
 
 /*--------------------------------------------------------------
@@ -5624,19 +5645,6 @@ li.bars {
 }
 
 /* SUBMISSION */
-.information-notification {
-    color: @white;
-    padding: 2px 8px 2px 28px;
-    background: #e8f5ff url(/images/famicons/information.png) 8px 2px no-repeat;
-    line-height: 16px;
-    margin-bottom: 8px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-    color: #000;
-    z-index: 120;
-    border: 1px solid @body-background;
-}
 
 .submission td span{
     background:#e8f5ff url(/images/famicons/information.png) no-repeat 50% 50%;
