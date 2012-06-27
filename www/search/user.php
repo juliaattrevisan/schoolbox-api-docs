@@ -243,6 +243,7 @@ if (is_numeric($this->arg[0])) {
 				'FORM' => Scrub::text($synInfo['StudentForm']),
 				'FORM_DESCRIPTION' => Scrub::text($synInfo['FormDescription']),
 				'FORM_STAFF' => $formTeacher,
+                'YCOORD'    => Scrub::text($synInfo['StudentYearLevelCoordinator']),
 				'LOCKER' => Scrub::text($synInfo['StudentLockerBook']),
 				'BIRTHDATE' => date('j F Y', $synInfo['StudentBirthDate']),
 				'EMERGENCY_NAME' => Scrub::text($synInfo['StudentEmergencyName']),
