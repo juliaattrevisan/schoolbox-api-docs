@@ -59,7 +59,7 @@
 .ui-widget { font-size: 1.1em; }
 .ui-widget .ui-widget { font-size: 1em; }
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {  font-size: 1em; }
-.ui-widget-content { border: 1px solid #aaaaaa; background: #0065ce url(/images/mgs/jqueryui/ui-bg_flat_75_0065ce_40x100.png) 50% 50% repeat-x; color: #fff; }
+.ui-widget-content { border: 1px solid #aaaaaa; background: #0065ce url(/images/mgs/jqueryui/ui-bg_flat_75_0065ce_40x100.png) 50% 50% repeat-x; color: #333; }
 .ui-widget-content a { color: #fff; }
 .ui-widget-header { border: 1px solid #aaaaaa; background: #00458a url(/images/mgs/jqueryui/ui-bg_highlight-soft_75_00458a_1x100.png) 50% 50% repeat-x; color: #fff; font-weight: bold; }
 .ui-widget-header a { color: #fff; }
