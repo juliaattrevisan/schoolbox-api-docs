@@ -113,7 +113,7 @@ else if (!strlen($config['homepage-imagescroller'])) {
 	$this->setVar(array(
 		'IMAGESCROLLER_CATEGORY_ID' => $categoryID
 	));
-echo $categoryID;
+
 	/* Controls such as Post News
 	 */
 	if ($permission < WRITE_ACCESS) {
