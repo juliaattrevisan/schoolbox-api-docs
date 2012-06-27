@@ -25,7 +25,7 @@ if (!$assess) {
     error(112);
 }
 
-if ($assessHandler->isDeleted($this->arg[0])) {
+if ($assessHandler->isDeleted($assess['assess_id'])) {
 	error(112);
 }
 
@@ -37,7 +37,7 @@ if ($assessHandler->isOwner($this->arg[0])) {
 }
 */
 
-if ($assessHandler->isExpired($this->arg[0])) {
+if ($assessHandler->isExpired($assess['assess_id'])) {
     error(120);
 }
 
@@ -141,3 +141,7 @@ if ($numUnmarkedQuestions) {
 else {
 	$this->setVar('unmarkedRemaining_block', '');
 }
+
+/* Clear attempt
+ */
+$_SESSION['attempt_id'] = '';

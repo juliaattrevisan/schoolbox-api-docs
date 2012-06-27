@@ -37,13 +37,13 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 /* Check if you are in this category, so you can't submit other category's
  * online assessments unless you are a part of that category.
  */
-if (!$assessHandler->canDoAssessment($this->arg[0])) {
+if (!$assessHandler->canDoAssessment($assess['assess_id'])) {
     error(19);
 }
 
 /* Check if this assessment can be started
  */
-if ($assessHandler->isExpired($this->arg[0])) {
+if ($assessHandler->isExpired($assess['assess_id'])) {
     error(120);
 }
 
@@ -54,32 +54,65 @@ if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['c
 	error(144);
 }
 
+/* Check if you have completed an assessment already
+ *
+ * Set up Attempt vars
+ */
+$numAttempts = $attemptHandler->userHasAttempted($assess['assess_id'], $_SESSION['id']);
+
+$attempt = $attemptHandler->getLatestResumableForUser($assess['assess_id'], $_SESSION['id']);
+$attemptStartTime = strtotime($attempt['start']);
+$attemptTimeRemaining = $attemptStartTime + $assess['duration'] - time();
+$attemptEndTime = $attemptStartTime + $assess['duration'];
+
+/* If there is a resumable attempt, resume it.
+ */
+if ($attempt) {
+	$_SESSION['attempt_id'] = $attempt['attempt_id'];
+}
+/* Otherwise start a new attempt if there is a limit
+ */
+else {
+
+	/* Clear and exit when you attempt to make more than is allowed
+	 */
+	$_SESSION['attempt_id'] = '';
+
+	if (($assess['max_attempts'] > 0) && ($numAttempts+1 > $assess['max_attempts'])) {
+		error(146);
+	}
+}
+
+/* Check if Attempt ran out of time
+ */
+if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Assess_Main::UNLIMITED_DURATION)) {
+	error(122);
+}
+
+/* Continue once you get past checks
+ */
 $author = $userHandler->getByID($assess['user_id']);
 
-$allSummary = $assessHandler->getIntroSummary($this->arg[0]);
+$allSummary = $assessHandler->getIntroSummary($assess['assess_id']);
 $allSections = $sectionHandler->getList($assess['assess_id']);
 
 $assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
 $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
 
+$this->setFile(TEMPLATE_content, 'survey/intro.html');
+$this->setBlock(TEMPLATE_content, 'section', 'section_block');
+$this->setBlock(TEMPLATE_content, 'startTest', 'startTest_block');
+$this->setTitle('Assessment: ' . $assess['title']);
+
 $this->setVar(array(
-    'ASSESS_ASSESS_ID' => $this->arg[0],
+    'ASSESS_ASSESS_ID' => $assess['assess_id'],
     'ASSESS_TITLE' => $assess['title'],
     'ASSESS_DESCRIPTION' => html_entity_decode($assess['description']),
     'ASSESS_START' => $assessStartDate->getShort(),
     'ASSESS_FINISH' => $assessFinishDate->getShort(),
     'FIRST_SECTION' => $allSections[0]['section_id'],
     'ASSESS_AUTHOR' => $author['firstname'] . ' ' . $author['lastname'],
-));
-
-$this->setFile(TEMPLATE_content, 'survey/intro.html');
-$this->setBlock(TEMPLATE_content, 'section', 'section_block');
-$this->setBlock(TEMPLATE_content, 'startTest', 'startTest_block');
-$this->setBlock(TEMPLATE_content, 'error', 'error_block');
-$this->setTitle('Assessment: ' . $assess['title']);
-
-$this->setVar(array(
-    'ASSESS_DURATION' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
+	'ASSESS_DURATION' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
 ));
 
 /* Section list and question count
@@ -100,75 +133,4 @@ if (is_array($allSummary) && count($allSummary)) {
 else {
     $this->setVar('section_block', '');
     $this->setVar('startTest_block', '');
-}
-
-/* Check if you have completed an assessment already
- *
- * Set up Attempt vars
- */
-$attempt = $attemptHandler->getLatestForUser($assess['assess_id'], $_SESSION['id']);
-$attemptStartTime = strtotime($attempt['start']);
-$attemptTimeRemaining = $attemptStartTime + $assess['duration'] - time();
-$attemptEndTime = $attemptStartTime + $assess['duration'];
-
-/* Tests can be undertaken if:
- *
- * 1. The assessment allows resit and the assessment hasn't expired
- * 2. The assessment is one-time-only, and you haven't completed an attempt, and have time to do it, and have not yet attempted
- */
-if ($assessHandler->allowResit($this->arg[0])) {
-    if (!(($assess['duration'] == Survey_Main::UNLIMITED_DURATION) || (strtotime($assess['finish']) > time()))) {
-        $this->setVar(array(
-            'ERROR_STRING' => 'This online assessment has expired.'
-        ));
-
-        $this->setVar('startTest_block', '');
-        $this->parse('error_block', 'error');
-    }
-    else {
-        $_SESSION['attempt_id'] = '';
-
-        $this->setVar('error_block', '');
-    }
-}
-else {
-    if ($attemptHandler->isComplete($assess['assess_id'])) {
-        $this->setVar(array(
-            'ERROR_STRING' => 'You have already attempted this survey and cannot re-sit it.'
-        ));
-
-        $this->setVar('startTest_block', '');
-        $this->parse('error_block', 'error');
-    }
-    else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Survey_Main::UNLIMITED_DURATION)) {
-        $this->setVar(array(
-            'ERROR_STRING' => 'You have run out of time to complete this survey and cannot re-sit it.'
-        ));
-
-        $this->setVar('startTest_block', '');
-        $this->parse('error_block', 'error');
-    }
-    else if ($assessHandler->isExpired($this->arg[0])) {
-        $this->setVar(array(
-            'ERROR_STRING' => 'This survey has expired.'
-        ));
-
-        $this->setVar('startTest_block', '');
-        $this->parse('error_block', 'error');
-    }
-    else if ($attemptHandler->userHasAttempted($this->arg[0], $_SESSION['id'])) {
-
-        /* Load attempt id so the user can resume
-         */
-        $latest = $attemptHandler->getLatestForUser($this->arg[0], $_SESSION['id']);
-
-        $_SESSION['attempt_id'] = $latest['attempt_id'];
-
-        $this->setVar('error_block', '');
-    }
-    else {
-        $_SESSION['attempt_id'] = '';
-
-        $this->setVar('error_block', '');
-    }
 }

@@ -272,7 +272,8 @@ abstract class Evaluation_Main extends DeprecatedModel {
 	 * duration of assessments, converting from duration entirely in seconds.
 	 *
 	 * @param  $val
-	 * @return
+	 *
+	 * @return array
 	 */
     public function parse_sec2hms($val) {
         preg_match('/(\d+)hrs\ (\d+)min (\d+)sec/', $val, $matches);
@@ -285,25 +286,12 @@ abstract class Evaluation_Main extends DeprecatedModel {
     }
 
 	/**
-	 * Find out if an assessment can be re-sat.
-	 *
-	 * @param  $assess_id
-	 * @return
-	 */
-    public function allowResit($assess_id) {
-        $query = "SELECT allow_resit
-                  FROM {$this->_table}
-                  WHERE assess_id = '$assess_id'";
-
-        return $this->db->getOne($query);
-    }
-
-	/**
 	 * Finds out if the specified user owns the assessment.
 	 *
-	 * @param  $assess_id
+	 * @param $assess_id
 	 * @param string $user_id
-	 * @return
+	 *
+	 * @return mixed
 	 */
     public function isOwner($assess_id, $user_id = '') {
         if (!is_numeric($user_id)) {

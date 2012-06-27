@@ -94,7 +94,7 @@ if (is_array($allAssess)) {
                     $this->setVar(array(
                         'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
                         'ASSESS_SECTION_ID' => $firstSection['section_id'],
-                        'ASSESS_FINISH_DATE'     => 'In progress'
+                        'ASSESS_FINISH_DATE' => 'In progress'
                     ));
 
                     $this->parse('resumeLink_block', 'resumeLink');
@@ -118,16 +118,25 @@ if (is_array($allAssess)) {
 			else {
 
                 /* Do not show link if past finish date */
-                if (strtotime($currentAssess['finish']) < mktime()) {
+                if ($assessHandler->isExpired($currentAssess['assess_id'])) {
                     $this->parse('assessNoLink_block', 'assessNoLink');
 					$this->setVar('assessLink_block', '');
                     $this->setVar('resumeLink_block', '');
 				}
                 /* only show test link to owner and enrolled students */
                 else if($enroled || $currentAssess['user_id'] == $_SESSION['id'] ) {
-					$this->parse('assessLink_block', 'assessLink');
-                    $this->setVar('assessNoLink_block', '');
-                    $this->setVar('resumeLink_block', '');
+					$numAttempts = $attemptHandler->userHasAttempted($currentAssess['assess_id'], $_SESSION['id']);
+
+					if (($currentAssess['max_attempts'] > 0) && ($numAttempts+1 > $currentAssess['max_attempts'])) {
+						$this->setVar('assessLink_block', '');
+						$this->parse('assessNoLink_block', 'assessNoLink');
+						$this->setVar('resumeLink_block', '');
+					}
+					else {
+						$this->parse('assessLink_block', 'assessLink');
+						$this->setVar('assessNoLink_block', '');
+						$this->setVar('resumeLink_block', '');
+					}
 				}
                 else {
                     $this->parse('assessNoLink_block', 'assessNoLink');

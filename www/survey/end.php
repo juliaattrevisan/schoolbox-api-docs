@@ -25,7 +25,7 @@ if (!$survey) {
     error(112);
 }
 
-if ($surveyHandler->isDeleted($this->arg[0])) {
+if ($surveyHandler->isDeleted($survey['assess_id'])) {
 	error(112);
 }
 
@@ -37,7 +37,7 @@ if ($surveyHandler->isOwner($this->arg[0])) {
 }
 */
 
-if ($surveyHandler->isExpired($this->arg[0])) {
+if ($surveyHandler->isExpired($survey['assess_id'])) {
     error(120);
 }
 
@@ -91,3 +91,7 @@ if ($survey['notify_author']) {
 	$notification = new Survey_Notification($survey);
 	$notification->send();
 }
+
+/* Clear attempt
+ */
+$_SESSION['attempt_id'] = '';

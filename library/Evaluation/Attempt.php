@@ -133,8 +133,8 @@ abstract class Evaluation_Attempt extends DeprecatedModel {
 	/**
 	 * Get a list of attempts that have been made, along with their authors
 	 *
-	 * @param  $assess_id
-	 * @param bool $user_id
+	 * @param $assess_id
+	 *
 	 * @return array|bool
 	 */
     public function getList($assess_id) {

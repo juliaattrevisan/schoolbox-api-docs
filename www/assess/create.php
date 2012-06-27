@@ -46,7 +46,7 @@ if (!empty($_POST)) {
         'start' => $start->getDatabase(),
         'finish' => $finish->getDatabase(),
         'duration' => Scrub::text($duration),
-        'allow_resit' => Scrub::text($_POST['allow_resit']),
+        'max_attempts' => Scrub::text($_POST['max_attempts']),
 		'availability' => 'assess',
         'created_at' => 'NOW()',
     ));
@@ -78,6 +78,7 @@ else {
     $this->setBlock(TEMPLATE_content, 'durationHour', 'durationHour_block');
     $this->setBlock(TEMPLATE_content, 'durationMinute', 'durationMinute_block');
     $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
+	$this->setBlock(TEMPLATE_content, 'max_attempts', 'max_attempts_block');
     $this->setTitle('Manage Assessment');
 
 	$assessDate = new Alaress_Date_Format(time(), 'U');
@@ -206,6 +207,17 @@ else {
 
         $this->parse('durationMinute_block', 'durationMinute', true);
     }
+
+	/* Resit amounts
+	 */
+	for ($i=1; $i<11; $i++) {
+		$this->setVar(array(
+			'MAX_ATTEMPTS_VALUE' => $i,
+			'MAX_ATTEMPTS_CHECKED' => '',
+		));
+
+		$this->parse('max_attempts_block', 'max_attempts', true);
+	}
 
     /* Don't display questions contents, which appears in Modify
      */

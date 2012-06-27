@@ -177,9 +177,16 @@ $j(document).ready(function() {
 			</tr>
 			<tr>
 				<td>
-					<h4>Allow Re-sit</h4>
-					<em>Allow students to take this test multiple times</em>
-					<input name="allow_resit" type="checkbox" value="1" {ALLOW_RESIT_CHECKED}/>
+					<h4>Maximum Attempts</h4>
+					<p>
+						The maximum number of times someone can attempt this Online Assessment.
+					</p>
+					<select name='max_attempts'>
+						<option value='0'>Unlimited</option>
+						<!-- BEGIN max_attempts -->
+						<option value='{MAX_ATTEMPTS_VALUE}' {MAX_ATTEMPTS_CHECKED}>{MAX_ATTEMPTS_VALUE}</option>
+						<!-- END max_attempts -->
+					</select>
 				</td>
 			</tr>
 		</table>

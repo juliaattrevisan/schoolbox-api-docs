@@ -52,7 +52,6 @@ if (!empty($_POST)) {
 		'start' => $start->getDatabase(),
 		'finish' => $finish->getDatabase(),
 		'duration' => Survey_Main::UNLIMITED_DURATION,
-		'allow_resit' => Scrub::text($_POST['allow_resit']),
 		'anonymous_result' => Scrub::text($_POST['anonymous_result']),
 		'notify_author' => Scrub::text($_POST['notify_author']),
     ));

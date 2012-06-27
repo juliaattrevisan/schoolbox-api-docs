@@ -32,12 +32,36 @@ if (!$assess) {
     error(112);
 }
 
-if ($assessHandler->isDeleted($this->arg[0])) {
+if ($assessHandler->isDeleted($assess['assess_id'])) {
 	error(112);
 }
 
 if (!$section) {
     error(115);
+}
+
+/* Check if you are in this category, so you can't submit other category's
+ * online assessments unless you are a part of that category.
+ */
+if (!$assessHandler->canDoAssessment($assess['assess_id'])) {
+    error(19);
+}
+
+/* Check if this assessment can be started
+ */
+if ($assessHandler->isExpired($assess['assess_id'])) {
+    error(120);
+}
+
+/* Participants should be blocked from attempting if it hasn't started,
+ * but authors should be able to test out their content
+ */
+if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+	error(144);
+}
+
+if (!$questionHandler->numQuestions($assess['assess_id'])) {
+	error(137);
 }
 
 /* Disabled: doing so will allow teachers to give their test a "dry run" and
@@ -48,69 +72,44 @@ if ($assessHandler->isOwner($this->arg[0])) {
 }
 */
 
-if ($assessHandler->isExpired($this->arg[0])) {
-    error(120);
-}
-
-if (!$assessHandler->canDoAssessment($this->arg[0])) {
-    error(19);
-}
-
-if (!$questionHandler->numQuestions($this->arg[0])) {
-	error(137);
-}
-
-/* Participants should be blocked from attempting if it hasn't started,
- * but authors should be able to test out their content
- */
-if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
-	error(144);
-}
-
-/* Check if this user has attempted this assess in the past and restore whatever
- * he was doing.
+/* Check if you have completed an assessment already
  *
- * As of 7/3/12, all attempts MUST be completed ie. you cannot start a new attempt
- * if you already have an incomplete one
+ * Set up Attempt vars
  */
-$latestResumable = $attemptHandler->getLatestResumableForUser($this->arg[0], $_SESSION['id']);
+$numAttempts = $attemptHandler->userHasAttempted($assess['assess_id'], $_SESSION['id']);
 
-if ($latestResumable) {
-	$_SESSION['attempt_id'] = $latestResumable['attempt_id'];
-
-	$attempt = $latestResumable;
-}
-/* Otherwise make a new attempt and set the start time
- */
-else if ($_SESSION['attempt_id'] == '') {
-    $_SESSION['attempt_id'] = $attemptHandler->start($_SESSION['id'], $this->arg[0]);
-
-	$attempt = $attemptHandler->getByID($_SESSION['attempt_id']);
-}
-
-/* Set up Attempt vars
- */
+$attempt = $attemptHandler->getLatestResumableForUser($assess['assess_id'], $_SESSION['id']);
 $attemptStartTime = strtotime($attempt['start']);
 $attemptTimeRemaining = $attemptStartTime + $assess['duration'] - time();
 $attemptEndTime = $attemptStartTime + $assess['duration'];
 
-/* Tests can be undertaken if:
- *
- * 1. The assessment allows resit and the assessment hasn't expired
- * 2. The assessment is one-time-only, and you haven't completed an attempt, and have time to do it, and have not yet attempted
+/* If there is a resumable attempt, resume it.
  */
-if ($assess['allow_resit'] == 1) {
-    if (!(($assess['duration'] == Survey_Main::UNLIMITED_DURATION) || (strtotime($assess['finish']) > time()))) {
-        error(120);
-    }
+if ($attempt) {
+	$_SESSION['attempt_id'] = $attempt['attempt_id'];
 }
+/* Otherwise start a new attempt if there is a limit
+ */
 else {
-    if ($attemptHandler->isComplete($assess['assess_id'])) {
-        error(121);
-    }
-    else if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Survey_Main::UNLIMITED_DURATION)) {
-        error(122);
-    }
+	if (($assess['max_attempts'] > 0) && ($numAttempts+1 > $assess['max_attempts'])) {
+
+		/* Clear and exit when you attempt to make more than is allowed
+		 */
+		$_SESSION['attempt_id'] = '';
+
+		error(146);
+	}
+	else {
+		$_SESSION['attempt_id'] = $attemptHandler->start($_SESSION['id'], $this->arg[0]);
+
+		$attempt = $attemptHandler->getByID($_SESSION['attempt_id']);
+	}
+}
+
+/* Check if Attempt ran out of time
+ */
+if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Assess_Main::UNLIMITED_DURATION)) {
+	error(122);
 }
 
 /* Set up template
@@ -174,6 +173,7 @@ if ($allQuestions) {
         /* Load answer template into answerOption block
          */
 		$path = 'survey/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/answer.html';
+
         $this->setFile('answerFormFragment', $path);
         $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 

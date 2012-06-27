@@ -54,7 +54,7 @@ if (!empty($_POST)) {
 		'start' => $start->getDatabase(),
 		'finish' => $finish->getDatabase(),
 		'duration' => Scrub::text($duration),
-		'allow_resit' => Scrub::text($_POST['allow_resit']),
+		'max_attempts' => Scrub::text($_POST['max_attempts']),
     ));
 
     SitePage::localRedir('/assess/summary/' . $this->arg[0]);
@@ -74,6 +74,7 @@ else {
     $this->setBlock(TEMPLATE_content, 'durationMinute', 'durationMinute_block');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
+	$this->setBlock(TEMPLATE_content, 'max_attempts', 'max_attempts_block');
     $this->setTitle('Manage Assessment');
 
 	$this->setVar('question_block', '');
@@ -181,6 +182,17 @@ else {
 
         $this->parse('durationMinute_block', 'durationMinute', true);
     }
+
+	/* Resit amounts
+	 */
+	for ($i=1; $i<11; $i++) {
+		$this->setVar(array(
+			'MAX_ATTEMPTS_VALUE' => $i,
+			'MAX_ATTEMPTS_CHECKED' => $i == $assess['max_attempts'] ? 'selected="selected"' : '',
+		));
+
+		$this->parse('max_attempts_block', 'max_attempts', true);
+	}
 
     /* Show this Assess' contents
      */
