@@ -185,14 +185,28 @@ for ($i = 0; $i < $totalDays; $i++) {
 
         if (is_array($birthdayList) && in_array(3, $_SESSION['campus'])) {
             foreach ($birthdayList as $birthday) {
+
+                /* Clear attendance blocks */
+                $this->setVar(array(
+                    'attendance_icon_block' => '',
+                    'attendance_status_block' => '',
+                    'attendance_request_button_block' => '',
+                    'attendance_list_button_block' => '',
+                ));
+
+
                 $output = array('TIME' => '',
                     'NOTE' => 'Student Birthday - ' . $birthday['name'] . ' in ' . $birthday['form'] . ' turns ' . $birthday['age'],
+                    'COLOUR' => $calendarHandler->displayColour(7),
+                    'MODIFY' => "",
                     'LOCATION' => '',
                     'DETAIL' => '',
-                    'COLOUR' => $calendarHandler->displayColour(3),
-                    'MODIFY' => '',
+                    'EVENT_TYPE' => 'type7', //filter in mgs lookup table...
                     'TYPE' => 'Birthday',
                     'AUTHOR' => '',
+                    'AUTHOR_ID' => '',
+                    'EVENT_LEVEL' => '',
+                    'has_category_block' => '',
                 );
 
                 $this->setVar($output);
