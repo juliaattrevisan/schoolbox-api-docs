@@ -88,9 +88,9 @@ class Synchronise_Synergetic_StMichaels_Strategy_Parent extends Synchronise_Syne
 			$user = $this->getUserHandler()->getBySynergy($currentSynergyId);
 
 			if (($user['title'] != $currentParent['Title']) || ($user['firstname'] != $currentParent['Preferred']) || ($user['lastname'] != $currentParent['Surname']) || ($user['alt_email'] != $preferredEmail)) {
-				$updatedUser = $this->getUserHandler()->getById($user['uid']);
 
 				$updatedUser['id'] = $user['uid'];
+                $updatedUser['username'] = $user['username'];
 				$updatedUser['title'] = trim($currentParent['Title']);
 				$updatedUser['firstname'] = trim($currentParent['Preferred']);
 				$updatedUser['lastname'] = trim($currentParent['Surname']);
@@ -107,17 +107,6 @@ class Synchronise_Synergetic_StMichaels_Strategy_Parent extends Synchronise_Syne
 				else {
 					$updatedUser['alt_email'] = '';
 				}
-
-				unset($updatedUser['gname']);
-				unset($updatedUser['uid']);
-
-				/* Revision 3221 introduces this alias
-				 */
-				unset($updatedUser['campusName']);
-
-				/* Revision 3913 introduces this alias
-				 */
-				unset($updatedUser['residential_house']);
 
 				/* Actually perform db update
 				 */

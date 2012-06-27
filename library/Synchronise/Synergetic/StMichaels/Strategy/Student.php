@@ -52,7 +52,9 @@ class Synchronise_Synergetic_StMichaels_Strategy_Student extends Synchronise_Syn
 		$newUser['lastname'] = $currentUser['StudentSurname'];
         $newUser['alt_email'] = $currentUser['StudentEmail'];
         $newUser['synergy_id'] = $currentUser['StudentID'];
-        $newUser['local_email'] = 0;
+        $newUser['local_email'] = 1;
+        $newUser['eportfolio_enabled'] = 1;
+
 
 		/* Year level
 		 */
@@ -60,7 +62,7 @@ class Synchronise_Synergetic_StMichaels_Strategy_Student extends Synchronise_Syn
 
 		/* Campus config: needs to map to a campus id
 		 */
-		$newUser['defaultCampus'] = 1;
+		$newUser['defaultCampus'] = $this->getCampusFromCode($currentUser['StudentCampus']);
 		$newUser['campus'] = array($this->getCampusFromCode($currentUser['StudentCampus']));
 
 		/* Student Group ID
