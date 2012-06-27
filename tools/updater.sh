@@ -3,7 +3,6 @@ clear;
 ### Schoolbox Updater V1.0 by Damian Alexander
 ## Will only run 1 update from current version to next version (w/o any input, so can be looped until Version is current)
 # Basic Dependencies Check
-dependencies=( "dos2unix" );
 ##### PHP MINIMUM REQUIREMENTS
 desired_major="5"; ### MAJOR Version, IE 5 in PHP V5.3
 desired_minor="3"; ### MINOR Version, IE 3 in PHP v5.3
@@ -100,7 +99,7 @@ echo -e "Operating System Detection:\n";
 if [[ `cat /etc/lsb-release|grep "DISTRIB_ID=Ubuntu"` ]]; then
 codename=`cat /etc/lsb-release |grep DISTRIB_CODENAME|cut -d "=" -f2`;
 release=`cat /etc/lsb-release |grep DISTRIB_RELEASE|cut -d "=" -f2`;
-if [[ `cat /etc/lsb-release|egrep "maverick|oneiric|natty"` ]]; then
+if [[ `cat /etc/lsb-release|egrep "maverick|oneiric|natty|precise"` ]]; then
 echo -e "Detected Ubuntu $release - '$codename'\n";
 OS="ubuntu";
 else
@@ -111,7 +110,7 @@ fi;
 if [ -z $OS ]; then
 if [[ `cat /etc/redhat-release|grep "CentOS Linux"` ]]; then
 release=`cat /etc/redhat-release|cut -d " " -f4`;
-if [[ `echo $release|egrep "6\.0" ` ]]; then
+if [[ `echo $release|egrep "6\.0|6\.1|6\.2" ` ]]; then
 echo -e "Detected CentOS $release \n";
 OS="centos";
 else
@@ -175,7 +174,7 @@ cd $working_dir;
 echo -e "Processing Versions and Locating new Update:\n";
 grabIndex;
 getCurrentVersion;
-cur_ver_id=`cat $index|grep $cur_ver|cut -d ":" -f1`
+cur_ver_id=`grep $cur_ver $index|cut -d ":" -f1`
 if [[ -z "$cur_ver_id" ]]; then
 echo -e "Detected Version is $cur_ver and is not supported by this updater.\nPlease Contact support@schoolbox.com.au for further assistance.\n";
 exit;
@@ -184,10 +183,9 @@ echo -e "Detected version, v$cur_ver is supported.\nYour identifier for this upd
 fi;
 echo -e "Locating new Version (if available):\n"
 new_ver_id=`expr $cur_ver_id + 1`;
-new_ver=`cat $index|grep "$new_ver_id:"|cut -d ":" -f2`;
+new_ver=`grep "^$new_ver_id:" $index|cut -d ":" -f2`;
 echo -e "Verifying new version name:\n";
 echo $new_ver >> $working_dir/tmpversion;
-dos2unix $working_dir/tmpversion;
 errorCheck;
 new_ver=`cat -v $working_dir/tmpversion`;
 rm -Rf $working_dir/tmpversion;
@@ -207,7 +205,6 @@ fi;
 backupInstall() {
 echo -e "Backup Prior to Update:\n";
 echo -e "Moving Data Directory out of Installation Directory:\c";
-mv $schoolbox_dir/data $schoolbox_dir/../data_$dbname
 errorCheck 1;
 echo -e "Backing up Installation Directory:\c";
 tar -cvzf /tmp/schoolbox_$sqldb$cur_ver.tgz $schoolbox_dir >> /dev/null;
@@ -225,14 +222,11 @@ mysqldump --user=$sqluser --password=$sqlpass $sqldb >> /tmp/schoolbox_$sqldb$cu
 errorCheck;
 }
 restoreAfterBackup() {
-echo -e "Restoring Data Directory:\c";
-mv $schoolbox_dir/../data_$dbname $schoolbox_dir/data;
-errorCheck;
 echo -e "Restoring Configuration File:\c";
-mv /tmp/schoolbox_config.php $schoolbox_dir/www/conf/conf.php;
+cp /tmp/schoolbox_config.php $schoolbox_dir/www/conf/conf.php;
 errorCheck;
 echo -e "Restoring HTACCESS File:\c";
-cp /tmp/htaccess.file $schoolbox_dir/www/.htaccess  >> /dev/null;
+cp /tmp/htaccess.file $schoolbox_dir/www/.htaccess;
 errorCheck;
 
 }
@@ -255,7 +249,6 @@ echo -e "Schoolbox v$new_ver Update Completed.\n";
 updateFiles(){
 echo -e "Updating Application Files:\n";
 echo -e "Removing Old Files: \c";
-rm -Rf $schoolbox_dir/*;
 errorCheck 1;
 echo -e "Extracting and Updating Files:\c";
 tar --overwrite --overwrite-dir -xvzf $working_dir/release_$new_ver.tgz -C $schoolbox_dir >> /dev/null;
@@ -265,9 +258,6 @@ rm -Rf $schoolbox_dir/www/conf/conf.php;
 errorCheck 1;
 echo -e "Removing Template HTACCESS File:\c";
 rm -Rf $schoolbox_dir/www/.htacess;
-errorCheck 1;
-echo -e "Removing Template Data Directory:\c";
-rm -Rf $schoolbox_dir/data;
 errorCheck 1;
 }
 runCustomScripts() {
