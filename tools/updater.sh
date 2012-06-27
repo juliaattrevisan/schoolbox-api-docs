@@ -207,7 +207,7 @@ echo -e "Backup Prior to Update:\n";
 echo -e "Moving Data Directory out of Installation Directory:\c";
 errorCheck 1;
 echo -e "Backing up Installation Directory:\c";
-tar -cvzf /tmp/schoolbox_$sqldb$cur_ver.tgz $schoolbox_dir >> /dev/null;
+tar  -cvzf /tmp/schoolbox_$sqldb$cur_ver.tgz $schoolbox_dir --exclude='$schoolbox_dir/data' >> /dev/null;
 errorCheck;
 echo -e "Backing up Config File:\c";
 cp $schoolbox_dir/www/conf/conf.php /tmp/schoolbox_config.php >> /dev/null;
