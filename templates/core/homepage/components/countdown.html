@@ -1,0 +1,174 @@
+<div class="box clearfix" id="component{COMPONENT_HOMEPAGE_ID}">
+	<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
+	<script type='text/javascript' src='/javascript/jquery.timepicker.js'></script>
+	<script type='text/javascript' src='/javascript/jquery.lwtCountdown-1.0-modified.js'></script>
+
+	<style type='text/css'>
+		.ui-timepicker-list {
+			overflow-y: auto;
+			height: 150px;
+			width: 6.5em;
+			background: #fff;
+			border: 1px solid #ddd;
+			margin: 0;
+			padding: 0;
+			list-style: none;
+			-webkit-box-shadow:0 5px 10px rgba(0,0,0,0.2);
+			-moz-box-shadow:0 5px 10px rgba(0,0,0,0.2);
+			box-shadow:0 5px 10px rgba(0,0,0,0.2);
+			outline: none;
+		}
+
+		.ui-timepicker-list.ui-timepicker-with-duration {
+			width: 11em;
+		}
+
+		.ui-timepicker-duration {
+			margin-left: 5px; color: #888;
+		}
+
+		.ui-timepicker-list:hover .ui-timepicker-duration {
+			color: #888;
+		}
+
+		.ui-timepicker-list li {
+			padding: 3px 0 3px 5px;
+			cursor: pointer;
+			white-space: nowrap;
+			color: #000;
+			list-style: none;
+			margin: 0;
+		}
+
+		.ui-timepicker-list:hover .ui-timepicker-selected {
+			background: #fff; color: #000;
+		}
+
+		li.ui-timepicker-selected,
+		.ui-timepicker-list li:hover,
+		.ui-timepicker-list:hover .ui-timepicker-selected:hover {
+			background: #1980EC; color: #fff;
+		}
+
+		li.ui-timepicker-selected .ui-timepicker-duration,
+		.ui-timepicker-list li:hover .ui-timepicker-duration {
+			color: #ccc;
+		}
+	</style>
+	<style type='text/css'>
+		.dash {
+			width: 110px;
+			height: 114px;
+			float: left;
+			margin-left: 20px;
+			position: relative;
+		}
+
+		.dash .digit {
+			font-size: 35pt;
+			font-weight: bold;
+			float: left;
+			text-align: center;
+			font-family: Times;
+			color: #555;
+			position: relative;
+		}
+
+		.dash_title {
+			position: absolute;
+			display: block;
+			bottom: 40px;
+			right: 62px;
+			font-size: 7pt;
+			color: #555;
+			text-transform: uppercase;
+			letter-spacing: 2px;
+		}
+	</style>
+	<script type='text/javascript'>
+		$j(function() {
+			$j('#countdownTime{COMPONENT_HOMEPAGE_ID}').timepicker({
+				'timeFormat': 'H:i',
+				'step': 15
+			});
+
+			$j('#countdownDate{COMPONENT_HOMEPAGE_ID}').datepicker({
+				dateFormat: 'dd M yy'
+			});
+
+			$j('#countdown{COMPONENT_HOMEPAGE_ID}').countDown({
+				targetDate: {
+					'day': {DEADLINE_DAY},
+					'month': {DEADLINE_MONTH},
+					'year': {DEADLINE_YEAR},
+					'hour': {DEADLINE_HOUR},
+					'min': {DEADLINE_MIN},
+					'sec': {DEADLINE_SEC}
+				}
+			});
+
+		});
+	</script>
+	<h2>{COMPONENT_NAME}</h2>
+	<!-- BEGIN config -->
+	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
+	<div class="editPanel settings hide">
+		<form action="/homepage/configForm.php" method="get">
+			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="type" value="config" />
+			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
+
+			<label for="componentname">Name: </label>
+			<input id="componentname" type="text" name="componentname" value="{COMPONENT_NAME}" />
+
+			<label>Countdown to</label>
+
+			<input id='countdownTime{COMPONENT_HOMEPAGE_ID}' name='time' type='text' value='{COMPONENT_CONFIG_TIME}' />
+			<input id='countdownDate{COMPONENT_HOMEPAGE_ID}' name='date' type='text' value='{COMPONENT_CONFIG_DATE}' />
+
+			<input type="submit" value="Update" class="submit-btn update" />
+		</form>
+	</div>
+	<div class="editPanel delete-it hide clearfix">
+		<p>Are you sure you want to remove component?</p>
+		<form action="#" method="post">
+			<input type="hidden" name="cid" value="{ID}" />
+			<input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
+			<input type="hidden" name="component" value="{COMPONENT_ID}" />
+			<a href="#" class="delete-accept btn delete"><span></span>Yes</a> <a href="#" class="delete-reject btn go-to"><span></span>No</a>
+		</form>
+	</div>
+	<!-- END config -->
+
+	<div id='countdown{COMPONENT_HOMEPAGE_ID}'>
+		<div class="dash weeks_dash">
+			<span class="dash_title">weeks</span>
+			<div class="digit">0</div>
+			<div class="digit">0</div>
+		</div>
+
+		<div class="dash days_dash">
+			<span class="dash_title">days</span>
+			<div class="digit">0</div>
+			<div class="digit">0</div>
+		</div>
+
+		<div class="dash hours_dash">
+			<span class="dash_title">hours</span>
+			<div class="digit">0</div>
+			<div class="digit">0</div>
+		</div>
+
+		<div class="dash minutes_dash">
+			<span class="dash_title">minutes</span>
+			<div class="digit">0</div>
+			<div class="digit">0</div>
+		</div>
+
+		<div class="dash seconds_dash">
+			<span class="dash_title">seconds</span>
+			<div class="digit">0</div>
+			<div class="digit">0</div>
+		</div>
+	</div>
+</div>
