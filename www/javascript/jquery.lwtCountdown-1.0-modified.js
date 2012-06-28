@@ -41,7 +41,7 @@
 			$.data($(this)[0], 'omitWeeks', config.omitWeeks);
 		}
 
-		$('#' + $(this).attr('id') + ' .digit').html('<div class="top"></div><div class="bottom"></div>');
+		$('#' + $(this).attr('id') + ' .digit').html('<div class="digit-top"></div><div class="digit-bottom"></div>');
 		$(this).doCountDown($(this).attr('id'), diffSecs, 500);
 
 		return this;
@@ -165,10 +165,10 @@
 	 * Removes animation which breaks when dragging/dropping components
 	 */
 	$.fn.digitChangeTo = function (digit, n, duration) {
-		if ($(digit + ' div.top').html() != n + '') {
-			$(digit + ' div.top').css({'display': 'none'});
-			$(digit + ' div.top').html((n ? n : '0'))
-			$(digit + ' div.bottom').html($(digit + ' div.top').html());
+		if ($(digit + ' div.digit-top').html() != n + '') {
+			$(digit + ' div.digit-top').css({'display': 'none'});
+			$(digit + ' div.digit-top').html((n ? n : '0'))
+			$(digit + ' div.digit-bottom').html($(digit + ' div.digit-top').html());
 		}
 	};
 })(jQuery);

@@ -6176,6 +6176,89 @@ ul.tree .collapsable .hitarea {
     width: auto;
 }
 
+/* Countdown */
+.ui-timepicker-list {
+    overflow-y: auto;
+    height: 140px;
+    width: 6.5em;
+    background: #fff;
+    border: 1px solid #ddd;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    -webkit-box-shadow:0 5px 10px rgba(0,0,0,0.2);
+    -moz-box-shadow:0 5px 10px rgba(0,0,0,0.2);
+    box-shadow:0 5px 10px rgba(0,0,0,0.2);
+    outline: none;
+    text-align: left;
+}
+
+.ui-timepicker-list.ui-timepicker-with-duration {
+    width: 11em;
+}
+
+.ui-timepicker-duration {
+    margin-left: 5px; color: #888;
+}
+
+.ui-timepicker-list:hover .ui-timepicker-duration {
+    color: #888;
+}
+
+.ui-timepicker-container .ui-timepicker-list li {
+    padding: 3px 0 3px 5px;
+    cursor: pointer;
+    white-space: nowrap;
+    color: #000;
+    list-style: none;
+    margin: 0;
+}
+
+.ui-timepicker-list:hover .ui-timepicker-selected {
+    background: #fff; color: #000;
+}
+
+li.ui-timepicker-selected,
+.ui-timepicker-list li:hover,
+.ui-timepicker-list:hover .ui-timepicker-selected:hover {
+    background: #1980EC; color: #fff;
+}
+
+li.ui-timepicker-selected .ui-timepicker-duration,
+.ui-timepicker-list li:hover .ui-timepicker-duration {
+    color: #ccc;
+}
+
+.dash {
+    width: 20%;
+    height: 114px;
+    float: left;
+    position: relative;
+    text-align: center;
+}
+
+.dash .digit {
+    font-size: 35pt;
+    font-weight: bold;
+    float: left;
+    text-align: center;
+    position: relative;
+    width: 30%;
+    left: 20%;
+}
+
+.dash_title {
+    position: absolute;
+    display: block;
+    bottom: 40px;
+    left: 0;
+    width: 100%;
+    font-size: 7pt;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
 /*--------------------------------------------------------------
  Footer specific styles
 --------------------------------------------------------------*/
