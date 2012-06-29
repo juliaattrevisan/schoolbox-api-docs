@@ -18,7 +18,7 @@ $group       = new Group();
 $categoryStd = new Category();
 $allowedFile = new AllowedFile();
 
-$keyword = preg_replace( '/[^\ A-Za-z0-9\"\'\+\-_=\?!\.]/', '', $_GET['keyword'] );
+$keyword = preg_replace( '/[^\ A-Za-z0-9\"\'\+\-_=\@\?!\.]/', '', $_GET['keyword'] );
 
 if (is_numeric($keyword) || ($keyword && strlen($keyword) > 2)) {
     // strip out any injection attempts
@@ -26,7 +26,7 @@ if (is_numeric($keyword) || ($keyword && strlen($keyword) > 2)) {
 	$current_page = empty($_GET['page']) ? 1 : $_GET['page'];
 
 	$page->setVar(array(
-		'UNESCAPED_KEYWORD' => $keyword
+		'UNESCAPED_KEYWORD' => $keyword,
 	));
 }
 else {
