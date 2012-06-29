@@ -285,17 +285,19 @@ if (is_numeric($this->arg[0])) {
                         if (is_array($teacherList)) {
                             foreach ($teacherList as $teacherSynID) {
                                 $teacher = $userHandler->getBySynergyAndGroup($teacherSynID, $groupHandler->getStaffGroupTypeIds());
-                                $teacherName = $userHandler->formatName($teacher);
+                                if(is_array($teacher)) {
+                                    $teacherName = $userHandler->formatName($teacher);
 
-                                $emailObj = new Email();
-                                $emailAddress = $emailObj->formatEmailFromArray($teacher);
+                                    $emailObj = new Email();
+                                    $emailAddress = $emailObj->formatEmailFromArray($teacher);
 
-                                if($emailAddress) {
-                                    $teacherOutput[] = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$teacherName</a>";
-                                    $emailAll .= $emailAddress.",";
-                                }
-                                else {
-                                    $teacherOutput[] = $teacherName;
+                                    if($emailAddress) {
+                                        $teacherOutput[] = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$teacherName</a>";
+                                        $emailAll .= $emailAddress.",";
+                                    }
+                                    else {
+                                        $teacherOutput[] = $teacherName;
+                                    }
                                 }
                             }
                         }

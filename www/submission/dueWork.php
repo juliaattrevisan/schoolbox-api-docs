@@ -539,12 +539,14 @@ foreach ($categoryList as $category) {
 		if (is_array($teacherList)) {
 			foreach ($teacherList as $teacherSynID) {
 				$teacher = $userHandler->getBySynergy($teacherSynID);
-				$teacherName = $userHandler->formatName($teacher);
+                if(is_array($teacher)) {
+                    $teacherName = $userHandler->formatName($teacher);
 
-				$emailObj = new Email();
-				$emailAddress = $emailObj->formatEmailFromArray($teacher);
+                    $emailObj = new Email();
+                    $emailAddress = $emailObj->formatEmailFromArray($teacher);
 
-				$teacherOutput[] = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$teacherName</a>";
+                    $teacherOutput[] = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$teacherName</a>";
+                }
 			}
 		}
 	}
@@ -568,11 +570,12 @@ foreach ($categoryList as $category) {
      */
     //$percentage[] = $thisPercentage;
     $categoryIDs[] = $categoryID;
+    $categoryCode = $category['code']?$category['code']:$categoryID;
 
 	$output = array(
 		'SUMMARY_CAT_ID' => $categoryID,
         'SUMMARY_CAT_NAME' => $groupHandler->getPermission($categoryID) >= READ_ACCESS ?
-            '<a href="/homepage/' . $category['code'] . '">' .Scrub::Text($category['name']) . '</a>'
+            '<a href="/homepage/' . $categoryCode . '">' .Scrub::Text($category['name']) . '</a>'
             : Scrub::Text($category['name']),
 		'SUMMARY_TOTAL' => $summary[$category['id']]['total'],
 		'SUMMARY_DUE' => $summary[$category['id']]['due'],
