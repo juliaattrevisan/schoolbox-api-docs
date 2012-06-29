@@ -68,6 +68,7 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 		foreach($subList as $sub) {
             $csv[] = html_entity_decode($sub['name'], ENT_QUOTES);
 			$csv[] = '';
+			$csv[] = '';
 		}
 
 		fputcsv($fp, $csv);
@@ -82,6 +83,7 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 		foreach($subList as $sub) {
 			$submissionType = $subHandler->getType($sub['type_id']);
 			$csv[] = html_entity_decode($submissionType['name'], ENT_QUOTES);
+			$csv[] = '';
 			$csv[] = '';
 		}
 
@@ -100,6 +102,7 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 			}
 			else {
 				$csv[] = 'Normalised Grade';
+				$csv[] = 'Grade';
 				$csv[] = 'Comment';
 			}
 		}
@@ -142,6 +145,7 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
                         $mark = $return[0]['slug'] == 'free' ? "'{$return[0]['mark']}" : $return[0]['norm_mark'];
 
                         $csv[] = html_entity_decode(Scrub::text($mark), ENT_QUOTES);
+						$csv[] = $return[0]['mark'];
 						$csv[] = html_entity_decode(Scrub::text($return[0]['comment']), ENT_QUOTES);
                     }
 				}
