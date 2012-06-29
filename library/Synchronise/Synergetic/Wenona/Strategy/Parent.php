@@ -190,15 +190,24 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
                 }
 
                 // store password
-                fputcsv($fp,array($user['username'], $pw));
+                fputcsv($fp, array($user['username'], $pw));
 
                 if ($this->getPerformUpdate() === true) {
-                    // store password in synergetic and schoolbox
-                    $_oldPW = '';
-                    $userHandler->setPassword($user['id'], $_oldPW, $pw);
+                    // store password in schoolbox
+                    $userHandler->setPasswordInternal($user['id'], $pw);
                 }
             }
             fclose($fp);
+
+            // don't send the email if we didn't update any passwords
+            if ($this->getPerformUpdate() === true) {
+                $m = new Mailer('');
+                $m->setTo('support@alaress.com.au');
+                $m->setSubject('Wenona Parent Sync');
+                $m->addFile($output, 'text/csv');
+                $m->send();
+            }
+            unlink($output);
         }
 
         $this->getVerboseFilter()->summary();

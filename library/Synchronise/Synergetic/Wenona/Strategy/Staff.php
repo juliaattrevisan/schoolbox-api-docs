@@ -83,10 +83,13 @@ class Synchronise_Synergetic_Wenona_Strategy_Staff extends Synchronise_Synergeti
             /* Default campus to 1, as per James' email
                 * but only if no campuses were determined
                 * (use array filter to remove empty elements)
-                */
+
+            NOT SYNCING CAMPUS FOR STAFF
+
             if(!is_array($newUser['campus']) || !count(array_filter($newUser['campus']))) {
                 $newUser['campus'] = array(self::STAFF_DEFAULT_CAMPUS);
             }
+                */
 
             $this->executeCreateUpdate($newUser);
         }
