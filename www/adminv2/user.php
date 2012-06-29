@@ -18,9 +18,12 @@ $superuserList = $userHandler->getSuperusers();
 
 if(is_array($superuserList)) {
     foreach($superuserList as $superuser) {
+
+        $loginLog = $userHandler->getUserLogins($superuser['username'],1);
+
         $output = array(
 			'SUPERUSER_NAME' => $userHandler->formatName($superuser),
-			'SUPERUSER_LOGIN' => '',
+			'SUPERUSER_LOGIN' => date(Cfg::get('date_short'),strtotime( $loginLog[0]['date'])),
 			'SUPERUSER_ID' => $superuser['uid']
 		);
 
