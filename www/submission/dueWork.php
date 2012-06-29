@@ -246,6 +246,7 @@ foreach(array($allUpcomingWork, $allAwaitingWork, $allReturnedWork) as $current)
 usort($allWork, 'cmp');
 
 $this->setBlock(TEMPLATE_content, 'work', 'work_block');
+$this->setBlock(TEMPLATE_content, 'view_all_due_work','view_all_due_work_block');
 
 /* Alternating row color index */
 $j = 0;
@@ -258,11 +259,17 @@ $j = 0;
  */
 $restrictedSubmissions = false;
 
-if ($groupHandler->isParentOfChild($this->arg[1])) {
-	if (Cfg::get('restrict_student_submissions')) {
+if ($groupHandler->isParentOfChild($this->arg[1]) && Cfg::get('restrict_student_submissions')) {
 		$restrictedSubmissions = true;
-	}
+        $this->setVar('view_all_due_work_block','');
 }
+else {
+    $this->parse('view_all_due_work_block','view_all_due_work');
+}
+
+
+
+
 
 if (count($allWork) > 0) {
     foreach($allWork as $currentWork) {
