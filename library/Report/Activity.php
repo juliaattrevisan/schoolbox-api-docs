@@ -181,14 +181,9 @@ ORDER BY $orderBy $orderDir";
             return 0;
         }
 
-        mysql_data_seek($this->dataResource, $offset);
+        // get limited records from the resource, rather than in bulk
+        $this->dataSet = $this->getRecordsFromResource($this->dataResource, $offset, $limit);
 
-        $set = array();
-        for($i = 0; $i < $limit; $i++) {
-            $set[] = mysql_fetch_assoc($this->dataResource);
-        }
-
-        $this->dataSet = $set;
         return $this->dataCount;
     }
 

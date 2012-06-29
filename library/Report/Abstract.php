@@ -145,4 +145,34 @@ abstract class Report_Abstract {
 	protected function getAllRecords() {
 		return $this->allRecords;
 	}
+
+    /**
+     * @param $resource
+     * @param $offset
+     * @param $limit
+     * @return array|bool
+     */
+    protected function getRecordsFromResource(&$resource, $offset, $limit) {
+
+        if(!is_resource($resource)) {
+            return false;
+        }
+
+        // fforward to the desired offset
+        mysql_data_seek($resource, max($offset, 0));
+
+        // collect a page of data
+        $set = array();
+        for($i = 0; $i < $limit; $i++) {
+            if(!($datum = mysql_fetch_assoc($resource))) {
+                break;
+            }
+            $set[] = $datum;
+        }
+
+        // rewind the data cursor so if export is being called it won't miss the first opage of results
+        mysql_data_seek($resource, 0);
+
+        return $set;
+    }
 }

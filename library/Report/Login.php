@@ -14,6 +14,7 @@ class Report_Login extends Report_Abstract implements Report_IReport {
     private $pageNum;
     private $perPage;
     private $filter;
+    private $dataResource;
 
     // visible field mapping: index => humanreadable
     private $fields = array(
@@ -108,9 +109,6 @@ class Report_Login extends Report_Abstract implements Report_IReport {
         if($orderBy == '' || !in_array($orderBy, $this->sortable))
             $orderBy = $this->getDefaultOrderBy();
 
-        // set subset restriction
-        $restrict = ($offset < 0) ? '' : "LIMIT $offset, $limit";
-
         // filter data passed in by report
         $filterString = $this->getIndexID();
 
@@ -146,37 +144,23 @@ class Report_Login extends Report_Abstract implements Report_IReport {
             }
         }
 
-        $handler = new DeprecatedModel();
+        $handler = DeprecatedDatabase::getInstance();
 
         $dataQuery = "SELECT `date`, login, ip, user.id AS user, title, firstname, lastname
                       FROM login_log
                       LEFT JOIN `user` ON `user`.`username` = login_log.username
                       $sqlFilter
-                      ORDER BY $orderBy $orderDir
-                      $restrict";
+                      ORDER BY $orderBy $orderDir";
 
-        // I was trying to avoid doing this, but when the query returns 100,000s of results...yeah, this is better.
-        $countQuery = "SELECT COUNT(`date`)
-                       FROM login_log
-                       LEFT JOIN `user` ON `user`.`username` = login_log.username
-                       $sqlFilter";
+        $this->dataResource = $handler->query($dataQuery);
+        $this->dataCount = mysql_num_rows($this->dataResource);
 
-
-        // if this query throws an error, it will be fatal, so we don't want the default error display to appear
-        $was = ini_get('display_errors');
-        ini_set('display_errors', false);
-
-        $allResults = $handler->db->getAll($dataQuery);
-
-        // reset error display to whatever it was
-        ini_set('display_errors', $was);
-
-        if(!$allResults)
+        if(!$this->dataCount) {
             return 0;
+        }
 
-        $this->dataCount = $handler->db->getOne($countQuery);
-        //$this->fullDataSet = $allResults;
-        $this->dataSet = $allResults;
+        // get limited records from the resource, rather than in bulk
+        $this->dataSet = $this->getRecordsFromResource($this->dataResource, $offset, $limit);
 
         return $this->dataCount;
     }
@@ -246,7 +230,7 @@ class Report_Login extends Report_Abstract implements Report_IReport {
     public function export() {
         $exporter = new Report_Exporter($this->getReportTitle());
         $exporter->setHeadings($this->csvFields);
-        $exporter->setData($this->dataSet);
+        $exporter->setData($this->dataResource);
         $exporter->export('CSV');
     }
 

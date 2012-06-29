@@ -14,6 +14,7 @@ class Report_Group extends Report_Abstract implements Report_IReport {
     private $fullDataSet;
     private $pageNum;
     private $perPage;
+    private $dataResource;
 
     // csv field mapping: index => humanreadable
     private $fields = array(
@@ -101,15 +102,23 @@ class Report_Group extends Report_Abstract implements Report_IReport {
         if($orderBy == '' || !in_array($orderBy, $this->sortable))
             $orderBy = $this->getDefaultOrderBy();
 
-        $allResults = $this->getUserHandler()->getAllByField('group_id', $this->getIndexID(), $orderBy, $orderDir);
+        // filter data passed in by report
+        $filterString = $this->getIndexID();
 
-        if(!$allResults)
+        // bypass handlers because I need access to the mysql pointer resource
+        $query = "SELECT * FROM `user` WHERE `group_id` = '$filterString' ORDER BY $orderBy $orderDir";
+
+        $handler = DeprecatedDatabase::getInstance();
+
+        $this->dataResource = $handler->query($query);
+        $this->dataCount = mysql_num_rows($this->dataResource);
+
+        if(!$this->dataCount) {
             return 0;
+        }
 
-        $this->dataCount = count($allResults);
-        $this->fullDataSet = $allResults;
-        $this->dataSet = array_slice($allResults, $offset, $limit);
-
+        // get limited records from the resource, rather than in bulk
+        $this->dataSet = $this->getRecordsFromResource($this->dataResource, $offset, $limit);
 
         return $this->dataCount;
     }
