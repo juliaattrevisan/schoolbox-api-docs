@@ -250,6 +250,8 @@ else {
 
     /* Output house list */
     $this->dropDown('house', HouseMapper::getInstance()->findAll(), $user['house'], TEMPLATE_content, array('id'=>'HOUSE_ID','house'=>'HOUSE_NAME'));
+    $this->dropDown('residential_house', HouseResidentialMapper::getInstance()->findAll(), $user['residential_house'], TEMPLATE_content, array('id' => 'RESIDENT_HOUSE_ID', 'house' => 'RESIDENT_HOUSE_NAME'));
+
 
     /* Output campus list */
      $this->setBlock(TEMPLATE_content, 'campus','campus_block');
