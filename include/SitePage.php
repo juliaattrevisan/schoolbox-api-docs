@@ -187,17 +187,22 @@ class SitePage extends Page
 
 		$this->parse('MAIN_HEADER_REGION', 'headerTpl');
 		$this->parse('MAIN_FOOTER_REGION', 'footerTpl');
-		$this->parse('MAIN_BANNER_REGION', 'bannerTpl');
+
+        $this->setBlock('bannerTpl', 'banner_logged_in', 'banner_logged_in_block');
 
 		if ($_SESSION['id']) {
-			$this->parse('MAIN_NAV_REGION', 'navTpl');
+
+            $this->parse('MAIN_NAV_REGION', 'navTpl');
 			$this->parse('MAIN_TAB_REGION', 'tabTpl');
+            $this->parse('banner_logged_in_block','banner_logged_in');
 		}
 		else {
 			$this->setVar('MAIN_NAV_REGION', '');
 			$this->setVar('MAIN_TAB_REGION', '');
+            $this->setVar('banner_logged_in_block','');
 		}
 
+        $this->parse('MAIN_BANNER_REGION', 'bannerTpl');
 		$this->parse('MAIN_CONTENT_REGION', TEMPLATE_content);
 
 		if ($this->getVar('custom_head') && $customHead) {
