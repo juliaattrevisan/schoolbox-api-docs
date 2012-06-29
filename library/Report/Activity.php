@@ -11,10 +11,10 @@ class Report_Activity extends Report_Abstract implements Report_IReport {
     private $groupID = null;
     private $dataSet;
     private $dataCount;
-    private $fullDataSet;
     private $pageNum;
     private $perPage;
     private $filter;
+    private $dataResource;
 
     // visible field mapping: index => humanreadable
     private $fields = array(
@@ -155,8 +155,8 @@ OR ml.name        LIKE '%$value%'
 
         $handler = new DeprecatedModel();
 
-                $query = "
-SELECT
+                $query =
+"SELECT
 cl.id AS cl_id, cl.object, cl.objectId, cl.action, cl.user AS user_id, cl.time,
 u.username, u.title, u.firstname, u.lastname,
 c.id AS c_id, c.name AS c_name,
@@ -172,18 +172,23 @@ LEFT JOIN `link` l    ON cl.objectID = l.id  AND cl.object = 'link'
 LEFT JOIN myFile mf   ON cl.objectID = mf.id AND cl.object = 'myFile'
 LEFT JOIN myFolder ml ON cl.objectID = ml.id AND cl.object = 'myFolder'
 $sqlFilter
-ORDER BY $orderBy $orderDir
-                ";
+ORDER BY $orderBy $orderDir";
 
-        $allResults = $handler->db->getAll($query);
+        $this->dataResource = $handler->db->query($query);
+        $this->dataCount = mysql_num_rows($this->dataResource);
 
-        if(!$allResults)
+        if(!$this->dataCount) {
             return 0;
+        }
 
-        $this->dataCount = count($allResults);
-        $this->fullDataSet = $allResults;
-        $this->dataSet = array_slice($allResults, $offset, $limit);
+        mysql_data_seek($this->dataResource, $offset);
 
+        $set = array();
+        for($i = 0; $i < $limit; $i++) {
+            $set[] = mysql_fetch_assoc($this->dataResource);
+        }
+
+        $this->dataSet = $set;
         return $this->dataCount;
     }
 
@@ -256,7 +261,6 @@ ORDER BY $orderBy $orderDir
                     'IP'        => $log['ip']
                 ));
 
-
                 $page->setVar('DARK', ++$j%2?'dark':'');
 
                 $page->parse('activity_block', 'activity', true);
@@ -284,32 +288,32 @@ ORDER BY $orderBy $orderDir
         $exporter->setHeadings($this->csvFields);
 
         // we need to modify the dataset to substitute resourceIDs with their actual names / descriptions
-        $data = $this->fullDataSet;
+        $exporter->setData($this->dataResource, array($this, 'dataManipulator'));
+        $exporter->export('CSV');
+    }
 
-        foreach($data as &$datum) {
-            switch($datum['object']) {
-                case 'folder':
-                    $datum['objectId'] = $datum['c_name'];
-                    break;
-                case 'file':
-                    $datum['objectId'] = $datum['f_description'];
-                    break;
-                case 'link':
-                    $datum['objectId'] = $datum['l_description'];
-                    break;
-                case 'myfile':
-                    $datum['objectId'] = $datum['mf_description'];
-                    break;
-                case 'myfolder':
-                    $datum['objectId'] = $datum['ml_name'];
-                    break;
-                default:
-                    $datum['objectId'] = 'unknown resource';
-            }
+    public function dataManipulator($datum) {
+        switch($datum['object']) {
+            case 'folder':
+                $datum['objectId'] = $datum['c_name'];
+                break;
+            case 'file':
+                $datum['objectId'] = $datum['f_description'];
+                break;
+            case 'link':
+                $datum['objectId'] = $datum['l_description'];
+                break;
+            case 'myfile':
+                $datum['objectId'] = $datum['mf_description'];
+                break;
+            case 'myfolder':
+                $datum['objectId'] = $datum['ml_name'];
+                break;
+            default:
+                $datum['objectId'] = 'unknown resource';
         }
 
-        $exporter->setData($data);
-        $exporter->export('CSV');
+        return $datum;
     }
 
     public function displayFilterBlock() {

@@ -12,6 +12,7 @@ class Report_Exporter {
     private $reportHeadings = array();
     private $reportData = array();
     private $filename = null;
+    private $dataManipulatorCallback;
 
     /**
      * @param Report_Abstract $report
@@ -25,8 +26,9 @@ class Report_Exporter {
         $this->reportHeadings = $headings;
     }
 
-    public function setData($data) {
+    public function setData($data, $callback = null) {
         $this->reportData = $data;
+        $this->dataManipulatorCallback = $callback;
     }
 
     protected function getHeadings() {
@@ -66,22 +68,28 @@ class Report_Exporter {
         $this->filename = str_replace(' ', '_', strtolower($this->filename));
 
         // set the output headers
-        header('Content-type: text/ascii');
+        header('Content-type: text/csv');
         header('Content-disposition: attachment; filename="report-' . $this->filename . '.csv"');
 
         // output the column headings
         $this->__outputCSV(array($this->getHeadings()));
 
-
         // format data for output - filter and order by column headers specified
         $data = array();
 
-        foreach($this->getData() as $row) {
-            $datum = array();
-            foreach($this->getHeadings() as $dbCol => $display) {
-                $datum[] = $row[$dbCol];
+        // use resource iteratively
+        if(is_resource($this->getData())) {
+            $db = DeprecatedDatabase::getInstance();
+            while($row = $db->getNextArray($this->getData())) {
+                $data[] = $this->parseRow($row);
             }
-            $data[] = $datum;
+        }
+
+        // use array iteratively
+        elseif(is_array($this->getData())) {
+            foreach($this->getData() as $row) {
+                $data[] = $this->parseRow($row);
+            }
         }
 
         // output data
@@ -89,6 +97,22 @@ class Report_Exporter {
 
         // don't keep going. stop now.
         exit(1);
+    }
+
+    /**
+     * Check for and perform any data manipulation that needs doing
+     * @param $row
+     * @return array
+     */
+    protected function parseRow($row) {
+        if(is_callable($this->dataManipulatorCallback)) {
+            $row = call_user_func_array($this->dataManipulatorCallback, array($row));
+        }
+        $datum = array();
+        foreach($this->getHeadings() as $dbCol => $display) {
+            $datum[] = $row[$dbCol];
+        }
+        return $datum;
     }
 
     /**
