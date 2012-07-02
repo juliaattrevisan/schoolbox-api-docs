@@ -651,7 +651,7 @@ class Category extends DeprecatedModel {
 	public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'id', $sort_dir = 'desc') {
 		$keyword = mysql_real_escape_string($keyword);
 
-		$query = "SELECT `category`.*,
+		$query = "SELECT `category`.*, GROUP_CONCAT(categoryCode.code) as code,
 						MATCH(`name`) AGAINST (\"*$keyword*\" IN BOOLEAN MODE) AS `score`,
 						MATCH(`categoryCode`.code) AGAINST (\"*$keyword*\" IN BOOLEAN MODE) AS `cscore`,
 						`perms`.type AS perms_type,
@@ -669,6 +669,7 @@ class Category extends DeprecatedModel {
 							MATCH(`name`) AGAINST (\"*$keyword*\" IN BOOLEAN MODE)
 							OR MATCH(`categoryCode`.code) AGAINST (\"*$keyword*\" IN BOOLEAN MODE)
 						)
+					GROUP BY category.id
 					ORDER BY `$sort_by` $sort_dir
 					LIMIT $offset, $limit;
 		";
@@ -687,6 +688,7 @@ class Category extends DeprecatedModel {
 							MATCH(`name`) AGAINST (\"*$keyword*\" IN BOOLEAN MODE)
 							OR MATCH(`categoryCode`.code) AGAINST (\"*$keyword*\" IN BOOLEAN MODE)
 						)
+						GROUP BY category.id
 		";
 
 		$count = $this->db->getOne($count_query);
