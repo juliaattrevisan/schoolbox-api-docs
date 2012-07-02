@@ -379,6 +379,7 @@ table td {
   display: table-cell;
 }
 table th {
+  text-align: left;
   font-weight: bold;
 }
 table th.sortable {
