@@ -1679,14 +1679,16 @@
                     }
                     else {
                         pos.top = Math.round(plotOffset.top + axis.p2c(tick.v) - axis.labelHeight/2);
-                        if (axis.position == "left") {
+/*                        if (axis.position == "left") {
                             pos.right = canvasWidth - (box.left + box.width - box.padding)
                             align = "right";
                         }
                         else {
                             pos.left = box.left + box.padding;
                             align = "left";
-                        }
+                        }*/
+                        pos.left = 0
+                        align = "right";
                     }
 
                     pos.width = axis.labelWidth;
@@ -2194,7 +2196,7 @@
                     label = lf(label, s);
                 
                 fragments.push(
-                    '<td class="legendColorBox"><div style="border:1px solid ' + options.legend.labelBoxBorderColor + ';padding:1px"><div style="width:4px;height:0;border:5px solid ' + s.color + ';overflow:hidden"></div></div></td>' +
+                    '<td class="legendColorBox" width="16"><div style="border:1px solid ' + options.legend.labelBoxBorderColor + ';padding:1px"><div style="width:4px;height:0;border:5px solid ' + s.color + ';overflow:hidden"></div></div></td>' +
                     '<td class="legendLabel">' + label + '</td>');
             }
             if (rowStarted)

@@ -134,7 +134,7 @@ tr.leave-pending span.grey {
 }
 
 /* Date the report was generated
- */
+ */`
 .leaveReportGeneratedAt {
 	margin-bottom: 20px;
 }
@@ -163,3 +163,5 @@ tr.leave-pending span.grey {
     display: none;
 }
 .leaveReportNoPrint { display:none; width: 0; padding: 0; overflow:hidden; border: 0; }
+
+.legendColorBox { width: 0.01%; }
