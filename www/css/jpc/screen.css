@@ -179,3 +179,29 @@ td.cal-right .link-case .filter-drop .filter-list {
 .cal-bubble .middle{border-color:#BCBDD6}
 .cal-bubble .bottom{border-right-color:#BCBDD6}
 .cal-bubble .middle .close{background:#BCBDD6; color:#fff;}
+
+/* Dashboard */
+.icon-listing {
+
+}
+.icon-listing li { display: inline; }
+.icon-listing a {
+    display: block; width: 100px; padding-top: 100px; margin: 2em 2em 0 0;
+    background: no-repeat center top;
+    float: left;
+    font-size: 0.8em; font-weight: bold; text-align: center;
+
+
+}
+.icon-listing .careers-centre { background-image: url('/images/jpc/dashboard/careers-centre.png') }
+.icon-listing .daily-extra { background-image: url('/images/jpc/dashboard/daily-extra.png') }
+.icon-listing .daily-notes { background-image: url('/images/jpc/dashboard/daily-notes.png') }
+.icon-listing .ict-helpdesk { background-image: url('/images/jpc/dashboard/ict-helpdesk.png') }
+.icon-listing .newsletter { background-image: url('/images/jpc/dashboard/newsletter.png') }
+.icon-listing .resource-centre { background-image: url('/images/jpc/dashboard/resource-centre.png') }
+.icon-listing .stewart-centre { background-image: url('/images/jpc/dashboard/stewart-centre.png') }
+
+.box.news { width: 49%; float: left; }
+.box.calendar { width: 49%; float: right; }
+
+.box ul li { padding: 5px 16px; }
