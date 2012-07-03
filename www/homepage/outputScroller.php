@@ -106,7 +106,7 @@ else if (strlen($config['homepage-imagescroller']) && !$alternateCategoryId){
 /* Load news for the current homepage
  */
 else if (!strlen($config['homepage-imagescroller'])) {
-	$allFiles = $fileHandler->getAllInCategory($categoryId, array('filter' => array('image')));
+	$allFiles = $fileHandler->getAllInCategory($categoryID, array('filter' => array('image')));
 
 	/* Have update form to back to this homepage, not the gallery's homepage
 	 */
