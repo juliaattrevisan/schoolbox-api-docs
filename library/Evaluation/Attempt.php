@@ -324,10 +324,13 @@ abstract class Evaluation_Attempt extends DeprecatedModel {
 	 * @return mixed
 	 */
     public function userHasAttempted($assess_id, $user_id) {
-        $query = "SELECT COUNT(*)
-                  FROM {$this->_table}
-                  WHERE assess_id = '$assess_id'
-                  AND user_id = '$user_id'";
+        $query = "
+			SELECT COUNT(*)
+			FROM {$this->_table}
+			WHERE assess_id = '$assess_id'
+			AND user_id = '$user_id'
+			AND deleted_at IS NULL
+		";
 
         return $this->db->getOne($query);
     }
