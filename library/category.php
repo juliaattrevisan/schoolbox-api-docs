@@ -651,7 +651,7 @@ class Category extends DeprecatedModel {
 	public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'id', $sort_dir = 'desc') {
 		$keyword = mysql_real_escape_string($keyword);
 
-		$query = "SELECT `category`.*, GROUP_CONCAT(categoryCode.code) as code,
+		$query = "SELECT SQL_CALC_FOUND_ROWS `category`.*, GROUP_CONCAT(categoryCode.code) as code,
 						MATCH(`name`) AGAINST (\"*$keyword*\" IN BOOLEAN MODE) AS `score`,
 						MATCH(`categoryCode`.code) AGAINST (\"*$keyword*\" IN BOOLEAN MODE) AS `cscore`,
 						`perms`.type AS perms_type,
@@ -674,26 +674,12 @@ class Category extends DeprecatedModel {
 					LIMIT $offset, $limit;
 		";
         
-		$count_query = "SELECT COUNT(*)
-						FROM `category`
-						LEFT JOIN `perms` ON `category`.id = `perms`.cid
-							AND `perms`.gid = {$_SESSION['gid']}
-							AND `perms`.type > 0
-						LEFT JOIN `userAccess` ON `category`.id = `userAccess`.sid
-							AND `userAccess`.service = 1
-							AND `userAccess`.uid = {$_SESSION['id']}
-						LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
-						WHERE (`perms`.cid OR `userAccess`.sid)
-						AND (
-							MATCH(`name`) AGAINST (\"*$keyword*\" IN BOOLEAN MODE)
-							OR MATCH(`categoryCode`.code) AGAINST (\"*$keyword*\" IN BOOLEAN MODE)
-						)
-						GROUP BY category.id
-		";
+		$count_query = "SELECT FOUND_ROWS()";
 
+        $result = $this->db->getAll($query);
 		$count = $this->db->getOne($count_query);
 
-		return $this->db->getAll($query);
+		return $result;
 	}
 
     /**
