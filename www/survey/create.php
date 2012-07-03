@@ -40,6 +40,7 @@ if (!empty($_POST)) {
 		'availability' => 'survey',
 		'anonymous_result' => Scrub::text($_POST['anonymous_result']),
 		'notify_author' => Scrub::text($_POST['notify_author']),
+		'max_attempts' => 1,
         'created_at' => 'NOW()',
     ));
 

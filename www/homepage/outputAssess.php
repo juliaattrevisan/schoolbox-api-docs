@@ -87,6 +87,8 @@ if (is_array($allAssess)) {
 			 * 4. You aren't the owner of the test
 			 */
             if (is_array($attempt)) {
+				$numAttempts = $attemptHandler->userHasAttempted($currentAssess['assess_id'], $_SESSION['id']);
+
                 // If the last assess is not completed provide resume link
                 if ($attempt['finish'] == '0000-00-00 00:00:00' && ($attemptTimeRemaining < 0 || $currentAssess['duration'] == Assess_Main::UNLIMITED_DURATION)) {
                     $firstSection = $sectionHandler->getFirst($currentAssess['assess_id']);
@@ -102,7 +104,7 @@ if (is_array($allAssess)) {
                     $this->setVar('assessNoLink_block', '');
                 }
                 // allow to resit
-                else if ($currentAssess['allow_resit'] == 1) {
+                else if (!(($currentAssess['max_attempts'] > 0) && ($numAttempts+1 > $currentAssess['max_attempts']))) {
                     $this->parse('assessLink_block', 'assessLink');
                     $this->setVar('assessNoLink_block', '');
                     $this->setVar('resumeLink_block', '');

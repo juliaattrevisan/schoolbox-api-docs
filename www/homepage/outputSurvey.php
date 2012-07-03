@@ -81,6 +81,8 @@ if (is_array($allSurveys)) {
 			 * 4. You aren't the owner of the test
 			 */
 			if (is_array($attempt)) {
+				$numAttempts = $attemptHandler->userHasAttempted($currentSurvey['assess_id'], $_SESSION['id']);
+
 				// If the last assess is not completed provide resume link
 				if ($attempt['finish'] == '0000-00-00 00:00:00' && ($attemptTimeRemaining < 0 || $currentSurvey['duration'] == Assess_Main::UNLIMITED_DURATION)) {
 					$firstSection = $sectionHandler->getFirst($currentSurvey['assess_id']);
@@ -96,7 +98,7 @@ if (is_array($allSurveys)) {
 					$this->setVar('surveyNoLink_block', '');
 				}
 				// allow to resit
-				else if ($currentSurvey['allow_resit'] == 1) {
+				else if (!(($currentSurvey['max_attempts'] > 0) && ($numAttempts+1 > $currentSurvey['max_attempts']))) {
 					$this->parse('surveyLink_block', 'surveyLink');
 					$this->setVar('surveyNoLink_block', '');
 					$this->setVar('resumeLink_block', '');

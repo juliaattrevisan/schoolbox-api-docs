@@ -54,6 +54,7 @@ if (!empty($_POST)) {
 		'duration' => Survey_Main::UNLIMITED_DURATION,
 		'anonymous_result' => Scrub::text($_POST['anonymous_result']),
 		'notify_author' => Scrub::text($_POST['notify_author']),
+		'max_attempts' => 1,
     ));
 
     SitePage::localRedir('/survey/summary/' . $this->arg[0]);
