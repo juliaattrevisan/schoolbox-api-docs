@@ -89,41 +89,44 @@ abstract class Calendar_Month_Abstract {
 	 * @param $currentDay
 	 */
 	protected function renderStudentBirthdays($currentDay) {
-		if (Cfg::get('site_location') == "mgs" && Cfg::get('external_enable') && $this->getGroupHandler()->isStaff($_SESSION['id'])) {
-			$birthdayList = $this->getCalendarHandler()->getStudentBirthdays($currentDay);
+		$birthdayList = $this->getCalendarHandler()->getStudentBirthdays($currentDay);
 
-			if (is_array($birthdayList) && in_array(3, $_SESSION['campus'])) {
-				foreach ($birthdayList as $birthday) {
+		$iterator = $birthdayList->createIterator();
 
-					/* Clear attendance blocks
-					 */
-					$this->setVar(array(
-						'attendance_icon_block' => '',
-						'attendance_status_block' => '',
-						'attendance_request_button_block' => '',
-						'attendance_list_button_block' => '',
-						'has_category_block', '',
-					));
+		for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
+			$currentEvent = $iterator->current();
 
-					$output = array(
-						'TIME' => '',
-						'NOTE' => 'Student Birthday - ' . $birthday['name'] . ' in ' . $birthday['form'] . ' turns ' . $birthday['age'],
-						'COLOUR' => $this->getCalendarHandler()->displayColour(7),
-						'MODIFY' => "",
-						'LOCATION' => '',
-						'DETAIL' => '',
-						'EVENT_TYPE' => 'type7', //filter in mgs lookup table
-						'TYPE' => 'Birthday',
-						'AUTHOR' => '',
-						'AUTHOR_ID' => '',
-						'EVENT_LEVEL' => '',
-					);
+			/* Clear attendance blocks
+			 */
+			$this->getPage()->setVar(array(
+				'attendance_icon_block' => '',
+				'attendance_status_block' => '',
+				'attendance_request_button_block' => '',
+				'attendance_list_button_block' => '',
+				'has_category_block' => '',
+				'time_block' => '',
+			));
 
-					$this->getPage()->setVar($output);
-					$this->getPage()->setVar('time_block', '');
-					$this->getPage()->parse("note_block", "note", true);
-				}
-			}
+			$this->getPage()->setVar(array(
+				'EVENT_ID' => '',
+				'TIME' => '',
+				'NOTE' => $currentEvent->getNote(),
+				'COLOUR' => $currentEvent->getColour(),
+				'LOCATION' => '',
+				'DETAIL' => '',
+
+				/* Wtf - EVENT_TYPE => 'type' . $event['type']; and TYPE => $event['eventType']
+				 */
+				'EVENT_TYPE' => 'type' . $currentEvent->getType(),
+				'TYPE' => $currentEvent->getEventType(),
+
+				'AUTHOR' => '',
+				'AUTHOR_ID' => '',
+				'EVENT_VISIBLE' => '',
+				'EVENT_LEVEL' => '',
+			));
+
+			$this->getPage()->parse("note_block", "note", true);
 		}
 	}
 

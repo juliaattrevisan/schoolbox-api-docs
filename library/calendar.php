@@ -568,11 +568,14 @@ class Calendar extends DeprecatedModel {
 
 		$allEvents = $this->db->getAll($query);
 
+		/* Standardised output
+		 */
 		$stack = new Calendar_Event_Collection();
 
 		if (is_array($allEvents) && count($allEvents)) {
 			foreach($allEvents as $currentEvent) {
 				$event = new Calendar_Event_Day();
+
 				$event->setAuthor($currentEvent['firstname'] . ' ' . $currentEvent['lastname']);
 				$event->setAuthorId($currentEvent['uid']);
 				$event->setEventId($currentEvent['id']);
@@ -620,6 +623,17 @@ class Calendar extends DeprecatedModel {
 		require_once '../library/mssql.php';
 		$db = new MSSQL;
 
+//		$query = "SELECT  vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname,
+//						vStudents.StudentBirthDate, vStudents.StudentCampus, datediff(year,studentbirthdate,getdate()) as age,
+//						vStudents.StudentFormDescription, convert(varchar,studentbirthdate,106)  as 'la'
+//						FROM SynergyOne.dbo.vStudents vStudents
+//						WHERE
+//						vStudents.FileSemester=".$_SESSION['FileSemester']."
+//						AND vStudents.FileYear=".$_SESSION[ 'FileYear']."
+//						AND day(studentbirthdate) = ". date("j", $currentDay) ."
+//						AND month(studentbirthdate) =". date("n", $currentDay) ."
+//						AND StudentCampus = 'G'";
+
 		$query = "SELECT  vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname,
 						vStudents.StudentBirthDate, vStudents.StudentCampus, datediff(year,studentbirthdate,getdate()) as age,
 						vStudents.StudentFormDescription, convert(varchar,studentbirthdate,106)  as 'la'
@@ -628,22 +642,28 @@ class Calendar extends DeprecatedModel {
 						vStudents.FileSemester=".$_SESSION['FileSemester']."
 						AND vStudents.FileYear=".$_SESSION[ 'FileYear']."
 						AND day(studentbirthdate) = ". date("j", $currentDay) ."
-						AND month(studentbirthdate) =". date("n", $currentDay) ."
-						AND StudentCampus = 'G'";
+						AND month(studentbirthdate) =". date("n", $currentDay);
 
 		$birthdayList = $db->getAll($query);
-		if (is_array($birthdayList)) {
-			$i = 0;
-			foreach ($birthdayList as $birthday) {
-				$output[$i]['name'] = $birthday['StudentGiven1']." ".$birthday['StudentSurname'];
-				$output[$i]['form'] = $birthday['StudentFormDescription'];
-				$output[$i]['age'] 	= $birthday['age'];
-				$output[$i]['birthdate'] = $birthday['la'];
-				$i++;
+
+		/* Standardised output
+		 */
+		$stack = new Calendar_Event_Collection();
+
+		if (is_array($birthdayList) && count($birthdayList)) {
+			foreach($birthdayList as $birthday) {
+				$event = new Calendar_Event_StudentBirthday();
+				$event->setName($birthday['StudentGiven1'] . ' ' . $birthday['StudentSurname']);
+				$event->setForm($birthday['StudentFormDescription']);
+				$event->setAge($birthday['age']);
+				$event->setDate($birthday['la']);
+				$event->setBirthdayNote();
+
+				$stack->add($event);
 			}
 		}
 
-		return $output;
+		return $stack;
 	}
 
 	function getEventGroup($eventID) {
@@ -781,4 +801,3 @@ class Calendar extends DeprecatedModel {
 		$this->db->delete($this->_table, 'sid', $cid);
 	}
 }
-
