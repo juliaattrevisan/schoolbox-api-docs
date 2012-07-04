@@ -372,13 +372,6 @@ class Calendar extends DeprecatedModel {
                 $date_fields = array('open_date', 'date', 'created', 'late_date', 'submitted', 'returned');
 
                 foreach ($submissions as &$submission) {
-
-                    foreach ($date_fields as $field_name) {
-                        if (!empty($submission[$field_name])) {
-                            $submission[$field_name] = new DateTime($submission[$field_name]);
-                        }
-                    }
-
                     if (!empty($submission['returned'])) {
                         $submission['status'] = 3;
                         $submission['relevant_date'] = $submission['returned'];
@@ -389,14 +382,33 @@ class Calendar extends DeprecatedModel {
                         $submission['status'] = 1;
                         $submission['relevant_date'] = $submission['date'];
                     }
-
                 }
             }
+		}
 
-            return $submissions;
-		} else {
-            return false;
-        }
+		/* Standardised output
+		 */
+		$stack = new Calendar_Event_Collection();
+
+		if (is_array($submissions) && count($submissions)) {
+			foreach($submissions as $submission) {
+				$event = new Calendar_Event_Submission();
+
+				$event->setDate(new Alaress_Date_Format($submission['date'], 'y-m-d h:i:s'));
+				$event->setCategoryName($submission['category']);
+				$event->setCategoryCodes($submission['synergyCode']);
+				$event->setAuthorId($submission['owner']);
+				$event->setAuthorName($submission['firstname'] . ' ' . $submission['lastname']);
+				$event->setSubmissionBoxId($submission['id']);
+				$event->setSubmissionBoxName($submission['name']);
+				$event->setSubmissionNote();
+				$event->setColour($this->displayColour(4));
+
+				$stack->add($event);
+			}
+		}
+
+		return $stack;
 	}
 
     function search ($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
@@ -576,7 +588,7 @@ class Calendar extends DeprecatedModel {
 			foreach($allEvents as $currentEvent) {
 				$event = new Calendar_Event_Day();
 
-				$event->setAuthor($currentEvent['firstname'] . ' ' . $currentEvent['lastname']);
+				$event->setAuthorName($currentEvent['firstname'] . ' ' . $currentEvent['lastname']);
 				$event->setAuthorId($currentEvent['uid']);
 				$event->setEventId($currentEvent['id']);
 				$event->setStartTime($currentEvent['startTime']);
