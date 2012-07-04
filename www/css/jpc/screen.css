@@ -186,13 +186,12 @@ td.cal-right .link-case .filter-drop .filter-list {
 }
 .icon-listing li { display: inline; }
 .icon-listing a {
-    display: block; width: 100px; padding-top: 100px; margin: 2em 2em 0 0;
+    display: block; width: 48px; padding-top: 48px; margin: 2em 2em 0 0;
     background: no-repeat center top;
     float: left;
-    font-size: 0.8em; font-weight: bold; text-align: center;
-
-
+    text-align: center;
 }
+
 .icon-listing .careers-centre { background-image: url('/images/jpc/dashboard/careers-centre.png') }
 .icon-listing .daily-extra { background-image: url('/images/jpc/dashboard/daily-extra.png') }
 .icon-listing .daily-notes { background-image: url('/images/jpc/dashboard/daily-notes.png') }
