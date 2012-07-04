@@ -131,56 +131,62 @@ abstract class Calendar_Week_Abstract {
 	protected function renderSubmissionEvents($currentDay) {
 		$submissionList = $this->getCalendarHandler()->getSubmissionEvents($currentDay);
 
-	    if (is_array($submissionList)) {
-	        foreach ($submissionList as $submission) {
+		$iterator = $submissionList->createIterator();
 
-	            /* Clear attendance blocks */
-	            $this->getPage()->setVar(array(
-	                'attendance_icon_block' => '',
-	                'attendance_status_block' => '',
-	                'attendance_request_button_block' => '',
-	                'attendance_list_button_block' => '',
-	            ));
+		for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
+			$currentEvent = $iterator->current();
 
-	            /* Get status to set action */
-	            if ($this->getGroupHandler()->isStudent($_SESSION['id'])) {
-	                $action = 'View Details';
-	                $this->getPage()->setVar('MODIFY', '<a class="btn go-to float-left" href="/submission/submissionHistory/' . $submission['id'] . '"><span></span>' . $action . '</a>');
+			/* Clear attendance blocks
+			 */
+			$this->getPage()->setVar(array(
+				'attendance_icon_block' => '',
+				'attendance_status_block' => '',
+				'attendance_request_button_block' => '',
+				'attendance_list_button_block' => '',
+				'has_category_block' => '',
+				'time_block' => ''
+			));
 
-	            } elseif ($this->getGroupHandler()->isStaff($_SESSION['id'])) {
-	                $this->getPage()->setVar('MODIFY', '<a class="btn go-to float-left" href="/submission/viewSubmission/' . $submission['id'] . '"><span></span>View Submissions</a>');
-	            } else {
-	                $this->getPage()->setVar('MODIFY', '');
-	            }
+			/* Get status to set action
+			 */
+			if ($this->getGroupHandler()->isStudent($_SESSION['id'])) {
+				$action = 'View Details';
+				$this->getPage()->setVar('MODIFY', '<a class="btn go-to float-left" href="/submission/submissionHistory/' . $currentEvent->getSubmissionBoxId() . '"><span></span>' . $action . '</a>');
+			}
+			else if ($this->getGroupHandler()->isStaff($_SESSION['id'])) {
+				$this->getPage()->setVar('MODIFY', '<a class="btn go-to float-left" href="/submission/viewSubmission/' . $currentEvent->getSubmissionBoxId() . '"><span></span>View Submissions</a>');
+			}
+			else {
+				$this->getPage()->setVar('MODIFY', '');
+			}
 
-	            $userHandler = new User();
+			$this->getPage()->setVar(array(
+				'EVENT_ID' => '',
+				'TIME' => $currentEvent->getDerivedTime(),
+				'NOTE' => $currentEvent->getNote(),
+				'COLOUR' => $currentEvent->getColour(),
+				'LOCATION' => '',
+				'DETAIL' => '',
 
-	            $output = array(
-	                'TIME' => $submission['date']->format('g:iA') != '11:59PM'? $submission['date']->format('g:iA') : '', // g:i a
-	                'NOTE' => $submission['category'] . (!empty($submission['synergyCode']) ? ' (' . $submission['synergyCode'] . ')' : '') . '<br />' . $submission['name'],
-	                'COLOUR' => $this->getCalendarHandler()->displayColour(4),
-	                'LOCATION' => '',
-	                'DETAIL' => '',
-	                'EVENT_TYPE' => 'submission',
-	                'TYPE' => 'Due Work',
-	                'AUTHOR' => $userHandler->formatName($submission),
-	                'AUTHOR_ID' => $submission['owner'],
-	                'EVENT_LEVEL' => '',
-	                'has_category_block' => '',
-	            );
+				/* Wtf - EVENT_TYPE => 'type' . $event['type']; and TYPE => $event['eventType']
+				 */
+				'EVENT_TYPE' => 'submission',
+				'TYPE' => $currentEvent->getEventType(),
 
-	            $this->getPage()->setVar($output);
+				'AUTHOR' => $currentEvent->getAuthorName(),
+				'AUTHOR_ID' => $currentEvent->getAuthorId(),
+				'EVENT_VISIBLE' => '',
+				'EVENT_LEVEL' => '',
+			));
 
-				if ($submission['date']->format('g:iA') != '11:59PM') {
-					$this->getPage()->parse('time_block', 'time');
-				}
-				else {
-					$this->getPage()->setVar('time_block', '');
-				}
+			/* If a time was specified, show it; otherwise hide it
+			 */
+			if (strlen($currentEvent->getDerivedTime())) {
+				$this->getPage()->parse('time_block', 'time');
+			}
 
-				$this->getPage()->parse("note_block", "note", true);
-	        }
-	    }
+			$this->getPage()->parse("note_block", "note", true);
+		}
 	}
 
 	/**
@@ -290,7 +296,7 @@ abstract class Calendar_Week_Abstract {
 				'EVENT_TYPE' => 'type' . $currentEvent->getType(),
 				'TYPE' => $currentEvent->getEventType(),
 
-				'AUTHOR' => $currentEvent->getAuthor(),
+				'AUTHOR' => $currentEvent->getAuthorName(),
 				'AUTHOR_ID' => $currentEvent->getAuthorId(),
 				'EVENT_VISIBLE' => $cssClass,
 				'EVENT_LEVEL' => $currentEvent->getDerivedEventLevel(),

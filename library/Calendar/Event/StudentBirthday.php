@@ -9,23 +9,22 @@
  */
 class Calendar_Event_StudentBirthday extends Calendar_Event_Abstract {
 
-	/* The Birthday person's name and age
-	 */
-	protected $name = '';
-	protected $age = -1;
-
-	/* The inherited $date var is used to store the actual birthdate
-	 * in this context.
+	/* Contextual: The actual birthdate
 	 */
 	protected $date = '';
-
-	/* Form? What is this
-	 */
-	protected $form = '';
 
 	/* Hardcoded?
 	 */
 	protected $eventType = 'Birthday';
+
+	/* The Birthday person's name and age
+	 */
+	private $name = '';
+	private $age = -1;
+
+	/* Form? What is this
+	 */
+	private $form = '';
 
 	/**
 	 * Sets the event note in a standardised way

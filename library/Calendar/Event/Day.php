@@ -9,6 +9,28 @@
  */
 class Calendar_Event_Day extends Calendar_Event_Abstract {
 
+	/* Attendance flag
+	 */
+	private $attendance = 0;
+
+	/* The date when the event was published (made visible to users)
+	 * Stored always as an Alaress_Date_Format() instance
+	 */
+	private $publishDate = null;
+
+	/**
+	 * Can someone attend this event
+	 *
+	 * @return bool
+	 */
+	public function canAttend() {
+		if (is_numeric($this->getAttendance()) && ($this->getAttendance() > 0)) {
+			return true;
+		}
+
+		return false;
+	}
+
 	/**
 	 * Event visibility; generates a CSS string
 	 *
@@ -50,5 +72,44 @@ class Calendar_Event_Day extends Calendar_Event_Abstract {
 			($this->getEndTime() != "12:00AM" ? $this->getEndTime() : ""), "- ");
 
 		return $formattedTime;
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set publish date object
+	 *
+	 * @param $publishDate
+	 */
+	public function setPublishDate($publishDate) {
+		$this->publishDate = new Alaress_Date_Format($publishDate, 'y-m-d h:i:s');
+	}
+
+	/**
+	 * Get publish date
+	 *
+	 * @return null
+	 */
+	public function getPublishDate() {
+		return $this->publishDate;
+	}
+
+	/**
+	 * Set attendance
+	 *
+	 * @param $attendance
+	 */
+	public function setAttendance($attendance) {
+		$this->attendance = $attendance;
+	}
+
+	/**
+	 * Get attendance
+	 *
+	 * @return string
+	 */
+	public function getAttendance() {
+		return $this->attendance;
 	}
 }

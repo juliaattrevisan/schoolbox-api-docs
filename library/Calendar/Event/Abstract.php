@@ -21,21 +21,6 @@ abstract class Calendar_Event_Abstract {
 	protected $endTime = '';
 	protected $date = '';
 
-	/* The date when the event was published (made visible to users)
-	 * Stored always as an Alaress_Date_Format() instance
-	 */
-	protected $publishDate = null;
-
-	/* A hex string representing the colour of this event
-	 */
-	protected $colour = '';
-
-	/* Location, short description and long description of the event
-	 */
-	protected $location = '';
-	protected $note = '';
-	protected $detail = '';
-
 	/* Unholy selection of field names: eventType and type
 	 *
 	 * eventType is a human-friendly description of an event's type;
@@ -43,18 +28,33 @@ abstract class Calendar_Event_Abstract {
 	 */
 	protected $eventType = '';
 
+	/* Location, short description and long description of the event
+	 */
+	protected $location = '';
+	protected $note = '';
+	protected $detail = '';
+
 	/* An int from the event table corresponding to $eventType
 	 */
 	protected $type = -1;
 
 	/* Event author's name and id
 	 */
-	protected $author = '';
+	protected $authorName = '';
 	protected $authorId = -1;
+
+	/* A hex string representing the colour of this event
+	 */
+	protected $colour = '';
 
 	/* Access level
 	 */
 	protected $access = -1;
+
+	/* Category id and name
+	 */
+	protected $categoryId = -1;
+	protected $categoryName = '';
 
 	/* CSV separated list of campus ids relevant to this event.
 	 */
@@ -63,15 +63,6 @@ abstract class Calendar_Event_Abstract {
 	/* sid ><
 	 */
 	protected $sid = -1;
-
-	/* Attendance flag
-	 */
-	protected $attendance = 0;
-
-	/* Category id and name
-	 */
-	protected $categoryId = -1;
-	protected $categoryName = '';
 
 	/**
 	 * Constructor
@@ -86,22 +77,8 @@ abstract class Calendar_Event_Abstract {
 	 * Hook method for your own customisations
 	 *
 	 * Empty by default
-	 *
 	 */
 	protected function setup() {
-	}
-
-	/**
-	 * Can someone attend this event
-	 *
-	 * @return bool
-	 */
-	public function canAttend() {
-		if (is_numeric($this->getAttendance()) && ($this->getAttendance() > 0)) {
-			return true;
-		}
-
-		return false;
 	}
 
 	/**
@@ -136,10 +113,10 @@ abstract class Calendar_Event_Abstract {
 	/**
 	 * Set author
 	 *
-	 * @param $author
+	 * @param $authorName
 	 */
-	public function setAuthor($author) {
-		$this->author = $author;
+	public function setAuthorName($authorName) {
+		$this->authorName = $authorName;
 	}
 
 	/**
@@ -147,8 +124,8 @@ abstract class Calendar_Event_Abstract {
 	 *
 	 * @return null
 	 */
-	public function getAuthor() {
-		return $this->author;
+	public function getAuthorName() {
+		return $this->authorName;
 	}
 
 	/**
@@ -301,24 +278,6 @@ abstract class Calendar_Event_Abstract {
 	}
 
 	/**
-	 * Set publish date object
-	 *
-	 * @param $publishDate
-	 */
-	public function setPublishDate($publishDate) {
-		$this->publishDate = new Alaress_Date_Format($publishDate, 'y-m-d h:i:s');
-	}
-
-	/**
-	 * Get publish date
-	 *
-	 * @return null
-	 */
-	public function getPublishDate() {
-		return $this->publishDate;
-	}
-
-	/**
 	 * Set event id
 	 *
 	 * @param $eventId
@@ -424,24 +383,6 @@ abstract class Calendar_Event_Abstract {
 	 */
 	public function getSid() {
 		return $this->sid;
-	}
-
-	/**
-	 * Set attendance
-	 *
-	 * @param $attendance
-	 */
-	public function setAttendance($attendance) {
-		$this->attendance = $attendance;
-	}
-
-	/**
-	 * Get attendance
-	 *
-	 * @return string
-	 */
-	public function getAttendance() {
-		return $this->attendance;
 	}
 
 	/**
