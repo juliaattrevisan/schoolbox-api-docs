@@ -29,7 +29,7 @@
 	});
 </script>
 <!-- END custom_head -->
-     <div id="calendar">
+     <div class="calendar">
      <div class="calendar-controls clearfix">
 		<div class="float-left clearfix">
 
@@ -101,7 +101,7 @@
         <tbody>
         <!-- BEGIN month_week -->
         <tr class="month-week ">
-        	<!-- BEGIN day_block -->
+        	<!-- BEGIN day -->
         	<td class="day-block {OTHER_MONTH} {MONTABLE_CSS}">
 				<div class="dayWrap clearfix">
 					<a class="btn add calendar-add" href="{ADD}"><span></span></a>
@@ -109,7 +109,7 @@
 				</div>
 				<div class="noteWrap">
 					<ul class="js_happening">
-						<!-- BEGIN note_block -->
+						<!-- BEGIN note -->
                         <li class="{EVENT_TYPE} {EVENT_LEVEL} {EVENT_VISIBLE}">
                             <span style="background-color:{COLOUR}; border:1px solid {COLOUR};">{NOTE}
                                 <!-- BEGIN attendance_icon --><strong class="float-right">A</strong><!-- END attendance_icon -->
@@ -151,11 +151,11 @@
                                 </div>
                             </div>
                         </li>
-						<!-- END note_block -->
+						<!-- END note -->
 					</ul>
 				</div>
           </td>
-        	<!-- END day_block -->
+        	<!-- END day -->
         </tr>
         <!-- END month_week -->
         </tbody>
