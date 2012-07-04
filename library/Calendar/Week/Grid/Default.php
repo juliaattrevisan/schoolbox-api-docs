@@ -76,7 +76,7 @@ class Calendar_Week_Grid_Default extends Calendar_Week_Abstract {
 			$this->renderDayEvents($currentDay);
 
 		    $this->getPage()->parse("day_block", "day", true);
-		    $this->getPage()->setVar("note_listing", "");
+		    $this->getPage()->setVar("note_block", "");
 		}
 	}
 }
