@@ -45,7 +45,8 @@ class Calendar_Week_List_Default extends Calendar_Week_Abstract {
 	 */
 	public function render() {
 		$this->getPage()->setVar(array(
-			'day_block' => ''
+			'day_block' => '',
+			'note_block' => '',
 		));
 
 		for ($i = 0; $i < 7; $i++) {

@@ -233,8 +233,6 @@ abstract class Calendar_Week_Abstract {
 	 * @param $currentDay
 	 */
 	protected function renderDayEvents($currentDay) {
-		$this->getPage()->setVar("note_block", "");
-
 		$eventList = $this->getCalendarHandler()->getDayEvents($currentDay);
 
 		$iterator = $eventList->createIterator();
@@ -273,9 +271,7 @@ abstract class Calendar_Week_Abstract {
 			 */
 			$this->getPage()->setVar(array(
 				'EVENT_ID' => $currentEvent->getEventId(),
-				'TIME' => rtrim(
-					($currentEvent->getStartTime() != "12:00AM" ? $currentEvent->getStartTime() : "") . " - " .
-					($currentEvent->getEndTime() != "12:00AM" ? $currentEvent->getEndTime() : ""), "- "),
+				'TIME' => $currentEvent->getDerivedTime(),
 				'NOTE' => $currentEvent->getNote(),
 				'COLOUR' => $currentEvent->getColour(),
 				'LOCATION' => $currentEvent->getLocation(),
