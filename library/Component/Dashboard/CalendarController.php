@@ -36,6 +36,11 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
     }
 
     public function renderTemplate ($templateHandle) {
+		$this->setVar("note_listing", "");
+
+		$userHandler = $this->user;
+		$groupHandler = $this->group;
+
         if ( !$this->loadTemplate($templateHandle, 'calendar') ) {
             return false;
         }
@@ -76,78 +81,75 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
             }
         }
 
-        if ( !is_array($this->eventList) ) {
-            if ( !$subout ) {
-                $this->setVar("note_listing", "");
-            }
-        }
-        else {
-            $userHandler = $this->user;
-            $groupHandler = $this->group;
+		$iterator = $this->eventList->createIterator();
 
-            foreach ( $this->eventList as $event ) {
-                if ( $event['startTime'] == "0:00" || strtolower($event['startTime']) == "12:00am" || strtolower($event['startTime']) == "12:00 am" || $event['startTime'] == '' ) {
-                    $this->setVar("TIME", "");
-                }
-                else {
-                    if ( $event['endTime'] == "0:00" || strtolower($event['endTime']) == "12:00am" || strtolower($event['endTime']) == "12:00 am" || $event['endTime'] == '' ) {
-                        $this->setVar("TIME", $event['startTime']);
-                    }
-                    else {
-                        $this->setVar("TIME", $event['startTime'] . " - " . $event['endTime']);
-                    }
-                }
+		for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
+			$currentEvent = $iterator->current();
 
-                $output = array(
-                    'EVENT_ID' => $event['id'],
-                    'TIME' => rtrim(( $event['startTime'] != "12:00AM" ? $event['startTime']
-                                                                    : "" ) . " - " . ( $event['endTime'] != "12:00AM"
-                                  ? $event['endTime'] : "" ), "- "), 'NOTE' => Scrub::text($event['note']),
-                    'LOCATION' => Scrub::text($event['location']), 'DETAIL' => Scrub::text($event['detail']),
-                    'COLOUR' => '#' . $event['eventColour'],
-                    'MODIFY' => $this->getCalendar()->getPerm($event['id']) > 1
-                            ? "<a href=\"/calendar/modify.php?eventID=" . $event['id'] . "&returnTo=month\" title=\"Modify\">Modify</a>"
-                            : '', 'EVENT_TYPE' => 'type' . $event['type'], 'TYPE' => $event['eventType'],
-                    'AUTHOR' => $userHandler->formatName($event), 'AUTHOR_ID' => $event['owner'],
-                );
+			if ($currentEvent->getStartTime() == "0:00" || strtolower($currentEvent->getStartTime()) == "12:00am" || strtolower($currentEvent->getStartTime()) == "12:00 am" || $currentEvent->getStartTime() == '') {
+				$this->setVar("TIME", "");
+			}
+			else if ($currentEvent->getEndTime() == "0:00" || strtolower($currentEvent->getEndTime()) == "12:00am" || strtolower($currentEvent->getEndTime()) == "12:00 am" || $currentEvent->getEndTime() == '') {
+				$this->setVar("TIME", $currentEvent->getStartTime());
+			}
+			else {
+				$this->setVar("TIME", $currentEvent->getStartTime()." - ".$currentEvent->getEndTime());
+			}
 
-                $this->setVar($output);
+			$this->setVar(array(
+				'EVENT_ID' => $currentEvent->getEventId(),
+				'TIME' => $currentEvent->getDerivedTime(),
+				'NOTE' => $currentEvent->getNote(),
+				'LOCATION' => $currentEvent->getLocation(),
+				'DETAIL' => $currentEvent->getDetail(),
+				'COLOUR' => $currentEvent->getColour(),
+				'EVENT_TYPE' => 'type' . $currentEvent->getType(),
+				'TYPE' => $currentEvent->getEventType(),
+				'AUTHOR' => $currentEvent->getAuthor(),
+				'AUTHOR_ID' => $currentEvent->getAuthorId(),
+			));
 
-                /* Attendance */
-                if ($event['attendance']) {
-                    $this->parse('attendance_icon_block', 'attendance_icon');
+			$this->setVar(array(
+				'MODIFY' => $this->getCalendar()->getPerm($currentEvent->getEventId()) > 1 ? "<a href=\"/calendar/modify.php?eventID=" . $currentEvent->getEventId() . "&returnTo=month\" title=\"Modify\">Modify</a>" : '',
+			));
 
-                    if ($this->getGroup()->isStudent($_SESSION['id'])) {
-                        if ($attendance = $this->getCalendar()->getAttendanceByEventAndUser($event['id'], $_SESSION['id'])) {
-                            /* Attendance Status */
-                            if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
-                                $this->setVar('ATTENDANCE_STATUS', 'Pending');
-                            }
-                            elseif ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
-                                $this->setVar('ATTENDANCE_STATUS', 'Approved');
-                            }
-                            elseif ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
-                                $this->setVar('ATTENDANCE_STATUS', 'Rejected');
-                            }
+			/* Event attendance
+			 */
+			if ($currentEvent->canAttend()) {
+				$this->parse('attendance_icon_block', 'attendance_icon');
 
-                            $this->parse('attendance_status_block', 'attendance_status');
+				if ($this->getGroup()->isStudent($_SESSION['id'])) {
+					if ($attendance = $this->getCalendarHandler()->getAttendanceByEventAndUser($currentEvent->getEventId(), $_SESSION['id'])) {
 
-                            $this->setVar('ATTENDANCE_REQUEST_ACTION', 'Unattend');
-                        }
-                        else {
-                            $this->setVar('ATTENDANCE_REQUEST_ACTION', 'Attend');
-                        }
+						/* Attendance Status
+						 */
+						if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
+							$this->setVar('ATTENDANCE_STATUS', 'Pending');
+						}
+						else if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
+							$this->setVar('ATTENDANCE_STATUS', 'Approved');
+						}
+						else if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
+							$this->setVar('ATTENDANCE_STATUS', 'Rejected');
+						}
 
-                        $this->parse('attendance_request_button_block', 'attendance_request_button');
-                    }
-                    elseif ($groupHandler->isStaff($_SESSION['id'])) {
-                        $this->parse('attendance_list_button_block', 'attendance_list_button');
-                    }
-                }
+						$this->parse('attendance_status_block', 'attendance_status');
 
-                $this->parse("note_listing", "note_block", true);
-            }
-        }
+						$this->setVar('ATTENDANCE_REQUEST_ACTION', 'Unattend');
+					}
+					else {
+						$this->setVar('ATTENDANCE_REQUEST_ACTION', 'Attend');
+					}
+
+					$this->parse('attendance_request_button_block', 'attendance_request_button');
+				}
+				else if ($this->getGroup()->isStaff($_SESSION['id'])) {
+					$this->parse('attendance_list_button_block', 'attendance_list_button');
+				}
+			}
+
+			$this->parse("note_listing", "note_block", true);
+		}
 
         return true;
     }

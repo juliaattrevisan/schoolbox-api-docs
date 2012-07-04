@@ -4,7 +4,11 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/calendar.php';
 
 $this->setBlock($component['name'], "note_block", "note_listing");
 
-$calendarHandler = new Calendar;
+$this->setVar(array(
+	'note_listing' => ''
+));
+
+$calendarHandler = new Calendar();
 
 $currDay = time();
 
@@ -38,44 +42,38 @@ if (is_array($submissionList)) {
 
 
 $eventList = $calendarHandler->getDayEvents($currDay);
+$iterator = $eventList->createIterator();
 
-if(!is_array($eventList))
-{
-	if(!$subout) $this->setVar("note_listing", "");
-}
-else
-{
-	$userHandler = new User();
+for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
+	$currentEvent = $iterator->current();
 
-	foreach($eventList as $event)
-	{
-		if($event['startTime'] == "0:00" || strtolower($event['startTime']) == "12:00am" || strtolower($event['startTime']) == "12:00 am" || $event['startTime'] == '')
-				$this->setVar("TIME", "");
-		else if($event['endTime'] == "0:00" || strtolower($event['endTime']) == "12:00am" || strtolower($event['endTime']) == "12:00 am" || $event['endTime'] == '')
-				$this->setVar("TIME", $event['startTime']);
-		else
-				$this->setVar("TIME", $event['startTime']." - ".$event['endTime']);
-
-        $output = array('TIME'		=> rtrim(
-                                        ($event['startTime'] != "12:00AM" ? $event['startTime'] : "") . " - " .
-                                           ($event['endTime'] != "12:00AM" ? $event['endTime'] : ""),
-                                       "- "),
-                        'NOTE'		=> Scrub::text($event['note']),
-                        'LOCATION'	=> Scrub::text($event['location']),
-                        'DETAIL'	=> Scrub::text($event['detail']),
-                        'COLOUR'	=> '#'.$event['eventColour'],
-                        'MODIFY'	=> $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify.php?eventID=" . $event['id'] . "&returnTo=month\" title=\"Modify\">Modify</a>" : '',
-                        'EVENT_TYPE'    => 'type'.$event['type'],
-                        'TYPE'          => $event['eventType'],
-                        'AUTHOR'        => $userHandler->formatName($event),
-                        'AUTHOR_ID'        => $event['owner'],
-                      );
-
-		$this->setVar($output);
-		$this->parse("note_listing","note_block", true);
-
+	if ($currentEvent->getStartTime() == "0:00" || strtolower($currentEvent->getStartTime()) == "12:00am" || strtolower($currentEvent->getStartTime()) == "12:00 am" || $currentEvent->getStartTime() == '') {
+		$this->setVar("TIME", "");
 	}
+	else if ($currentEvent->getEndTime() == "0:00" || strtolower($currentEvent->getEndTime()) == "12:00am" || strtolower($currentEvent->getEndTime()) == "12:00 am" || $currentEvent->getEndTime() == '') {
+		$this->setVar("TIME", $currentEvent->getStartTime());
+	}
+	else {
+		$this->setVar("TIME", $currentEvent->getStartTime()." - ".$currentEvent->getEndTime());
+	}
+
+	$this->setVar(array(
+		'TIME' => $currentEvent->getDerivedTime(),
+		'NOTE' => $currentEvent->getNote(),
+		'LOCATION' => $currentEvent->getLocation(),
+		'DETAIL' => $currentEvent->getDetail(),
+		'COLOUR' => $currentEvent->getColour(),
+		'EVENT_TYPE' => 'type' . $currentEvent->getType(),
+		'TYPE' => $currentEvent->getEventType(),
+		'AUTHOR' => $currentEvent->getAuthor(),
+		'AUTHOR_ID' => $currentEvent->getAuthorId(),
+	));
+
+	$this->setVar(array(
+		'MODIFY' => $calendarHandler->getPerm($event['id']) > 1 ? "<a href=\"/calendar/modify.php?eventID=" . $event['id'] . "&returnTo=month\" title=\"Modify\">Modify</a>" : '',
+	));
+
+	$this->parse("note_listing", "note_block", true);
 }
 
 $this->parse('POS'.$component['position'], $component['name']);
-?>

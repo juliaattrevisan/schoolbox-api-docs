@@ -566,7 +566,34 @@ class Calendar extends DeprecatedModel {
 			ORDER BY event.startTime, event.endTime
 		";
 
-		return $this->db->getAll($query);
+		$allEvents = $this->db->getAll($query);
+
+		$stack = new Calendar_Event_Collection();
+
+		if (is_array($allEvents) && count($allEvents)) {
+			foreach($allEvents as $currentEvent) {
+				$event = new Calendar_Event_Day();
+				$event->setAuthor($currentEvent['firstname'] . ' ' . $currentEvent['lastname']);
+				$event->setAuthorId($currentEvent['uid']);
+				$event->setEventId($currentEvent['id']);
+				$event->setStartTime($currentEvent['startTime']);
+				$event->setEndTime($currentEvent['endTime']);
+				$event->setType($currentEvent['type']);
+				$event->setNote($currentEvent['note']);
+				$event->setAccess($currentEvent['access']);
+				$event->setEventType($currentEvent['eventType']);
+				$event->setColour($currentEvent['eventColour']);
+				$event->setPublishDate($currentEvent['publish_date']);
+				$event->setSid($currentEvent['sid']);
+				$event->setCategoryId($currentEvent['categoryId']);
+				$event->setCategoryname($currentEvent['categoryName']);
+				$event->setAttendance($currentEvent['attendance']);
+
+				$stack->add($event);
+			}
+		}
+
+		return $stack;
 	}
 
 	function getDayByGroup($currentDay, $groupList, $campusList) {
