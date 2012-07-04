@@ -479,6 +479,4 @@ abstract class Calendar_Event_Abstract {
 	public function getCategoryName() {
 		return $this->categoryName;
 	}
-
-
 }

@@ -10,7 +10,7 @@
 class Calendar_Event_Day extends Calendar_Event_Abstract {
 
 	/**
-	 * Event visibility
+	 * Event visibility; generates a CSS string
 	 *
 	 * @return string
 	 */
