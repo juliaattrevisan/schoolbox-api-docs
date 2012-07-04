@@ -9,6 +9,4 @@
  */
 class Calendar_Event_StudentBirthday extends Calendar_Event_Abstract {
 
-	protected function setup() {
-	}
 }

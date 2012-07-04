@@ -2,14 +2,25 @@
 /**
  * Calendar_Event_Collection
  *
+ * A container for subclasses of Calendar_Event_Abstract.
+ *
+ * Uses the Iterator to traverse in a standardised interface. This allows you to make a more
+ * complex/different data structure instead of the generic array() for the $stack, and still
+ * render its contents using the same methodology.
+ *
+ * I am debating whether the instance of Iterator should be within or without the class. I've
+ * seen usages of both. Having it within makes it a bit more self-contained but less reusable.
+ *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
 class Calendar_Event_Collection {
+
+	/* A bunch of Calendar_Event_Abstract subclasses
+	 */
 	private $stack = array();
-	private $userHandler = null;
 
 	/* Cached set of colours
 	 */
@@ -23,8 +34,6 @@ class Calendar_Event_Collection {
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->setUserHandler(new User());
-
 		$this->cacheColourSet();
 
 		$this->setup();
@@ -38,6 +47,8 @@ class Calendar_Event_Collection {
 
 	/**
 	 * Cache colour set
+	 *
+	 * Temporarily disabled for now
 	 */
 	private function cacheColourSet() {
 //		$colours = array();
@@ -67,15 +78,6 @@ class Calendar_Event_Collection {
 	 */
 
 	/**
-	 * Set user handler
-	 *
-	 * @param $userHandler
-	 */
-	private function setUserHandler($userHandler) {
-		$this->userHandler = $userHandler;
-	}
-
-	/**
 	 * Set colour set
 	 *
 	 * @param $colourSet
@@ -91,15 +93,6 @@ class Calendar_Event_Collection {
 	 */
 	private function getColourSet() {
 		return $this->colourSet;
-	}
-
-	/**
-	 * Get user handler
-	 *
-	 * @return null
-	 */
-	private function getUserHandler() {
-		return $this->userHandler;
 	}
 
 	/**
