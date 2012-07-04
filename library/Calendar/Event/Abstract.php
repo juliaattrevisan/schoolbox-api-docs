@@ -8,6 +8,14 @@
  * @version	 SVN: $Id$
  */
 abstract class Calendar_Event_Abstract {
+
+	/* These probably exist elsewhere.
+	 */
+	const CAMPUS_ACCESS = 3;
+	const GROUP_ACCESS = 2;
+
+	/* Inheritable class vars
+	 */
 	protected $eventId = -1;
 	protected $startTime = '';
 	protected $endTime = '';
@@ -90,6 +98,32 @@ abstract class Calendar_Event_Abstract {
 	 */
 	public function canAttend() {
 		if (is_numeric($this->getAttendance()) && ($this->getAttendance() > 0)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Is campus access or not
+	 *
+	 * @return bool
+	 */
+	protected function isCampusAccess() {
+		if ($this->getAccess() == self::CAMPUS_ACCESS) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * is group access or not
+	 *
+	 * @return bool
+	 */
+	protected function isGroupAccess() {
+		if ($this->getAccess() == self::GROUP_ACCESS) {
 			return true;
 		}
 
@@ -445,4 +479,6 @@ abstract class Calendar_Event_Abstract {
 	public function getCategoryName() {
 		return $this->categoryName;
 	}
+
+
 }

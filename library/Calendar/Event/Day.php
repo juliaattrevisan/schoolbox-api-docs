@@ -17,7 +17,7 @@ class Calendar_Event_Day extends Calendar_Event_Abstract {
 	public function getDerivedEventLevel() {
 		$eventLevel = '';
 
-		if ($this->getAccess() == 3) {
+		if ($this->isCampusAccess()) {
 			if (stristr($this->getCampusList(), ',')) {
 				foreach (explode(',', $this->getCampusList()) as $campus) {
 					$eventLevel .= ' campus' . $campus;
@@ -27,13 +27,11 @@ class Calendar_Event_Day extends Calendar_Event_Abstract {
 				$eventLevel .= ' campus' . $this->getCampusList();
 			}
 		}
+		else if ($this->isGroupAccess()) {
+			$eventLevel = 'group' . $this->getSid();
+		}
 		else {
-			if ($this->getAccess() == 2) {
-				$eventLevel = 'group' . $this->getSid();
-			}
-			else {
-				$eventLevel = 'personal';
-			}
+			$eventLevel = 'personal';
 		}
 
 		return $eventLevel;
