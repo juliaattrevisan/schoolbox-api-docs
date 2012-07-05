@@ -129,7 +129,7 @@ class Calendar_Month_List_Default extends Calendar_Month_Abstract {
 
 		    $this->getPage()->setVar($output);
 
-			/* Render all rgistered event types
+			/* Render all registered event types
 			 */
 			$facade = new Calendar_Event_Collection_Renderer_Facade($this->getCalendarHandler(), $currentDay, $this->getPage());
 			$facade->renderAll();
