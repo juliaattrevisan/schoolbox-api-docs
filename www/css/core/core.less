@@ -480,8 +480,8 @@ Notifications
     border: 0;
     height: 32px;
     position: relative;
-
 }
+
 #search-field {
     font-weight: bold;
     color: #797979;
@@ -3679,8 +3679,7 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
 /************************
 CALENDAR
  ************************/
-
-#calendar {
+.calendar {
     table {
         width: 100%;
         background: @white;
@@ -3688,7 +3687,6 @@ CALENDAR
         thead td {
             text-align: center;
             color: @black;
-
         }
         .dark {
             background: @subnav-header-background;
@@ -3707,7 +3705,32 @@ CALENDAR
         font-size: 20px;
         color:#000;
     }
+    .agenda-view{
+        h3{
+            text-align: left;
+            font-size:16px;
+        }
+        td{
+            border-top:1px solid #f0f0f0;
+        }
+        thead{
+            td{
+                border-top:2px solid #000;
+            }
+        }
+        &.week-list{
+            h3{
+                text-indent:8px;
+            }
+            .calendar-add{
+                right:auto; left:0; top:9px;
+            }
+        }
+
+    }
 }
+
+
 
 .day-block span.time {
     display: block;

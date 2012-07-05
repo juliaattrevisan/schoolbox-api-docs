@@ -67,6 +67,7 @@ setupCalendar = {
 			setupCalendar.resizeTableCells();
 		});
 	},
+
 	filters: {
 
 		interaction: function() {
@@ -77,13 +78,6 @@ setupCalendar = {
 				return false;
 			});
 
-			$j('.close').click(function(){
-				$j('.cal-bubble').hide();
-			});
-
-			//make all of the checkboxes checked... darn you firefoxxxxxx
-			//$j('.filter-list .checkbox').attr('checked', true);
-
 			//run the filter checker to show and hide the items
             $j('.applyFilters').click(function() {
                 setupCalendar.filters.organise(["campus", "groups"]);
@@ -92,6 +86,7 @@ setupCalendar = {
             $j('#applyFilters').click(function() {
                 setupCalendar.filters.organise(["campus", "groups"]);
                 $j('.filter-drop').hide();
+                return false;
             });
 
             $j("body").click(function() {
@@ -106,7 +101,6 @@ setupCalendar = {
 		},
 
 		organise: function(filterArray) {
-
             var flist = new Array();
 
 			for (i = 0; i < filterArray.length; i++) {
@@ -137,17 +131,16 @@ setupCalendar = {
 				}
 			});
 
-
             k = 0;
+
             flist[filterArray.length] = new Array('events', new Array());
+
             $j('.filter-list .events input:checked').each(function(){
                 var n = $j(this).attr('value');
                 flist[filterArray.length][1][k++] = n;
             });
 
-            $j.post('/ajax/calendarFilter.php', {fList : flist}, function(data) {
-                console.log(data);
-            });
+            $j.post('/ajax/calendarFilter.php', {fList : flist});
 		}
 	}
 };

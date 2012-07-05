@@ -3389,30 +3389,48 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
 /************************
 CALENDAR
  ************************/
-#calendar table {
+.calendar table {
   width: 100%;
   background: #ffffff;
   position: relative;
 }
-#calendar table thead td {
+.calendar table thead td {
   text-align: center;
   color: #000000;
 }
-#calendar table .dark {
+.calendar table .dark {
   background: #f4f1ea;
   text-align: center;
 }
-#calendar table p {
+.calendar table p {
   margin-bottom: 0.5em;
 }
-#calendar table img {
+.calendar table img {
   margin-top: 5px;
 }
-#calendar h3 {
+.calendar h3 {
   font-weight: bold;
   line-height: 24px;
   font-size: 20px;
   color: #000;
+}
+.calendar .agenda-view h3 {
+  text-align: left;
+  font-size: 16px;
+}
+.calendar .agenda-view td {
+  border-top: 1px solid #f0f0f0;
+}
+.calendar .agenda-view thead td {
+  border-top: 2px solid #000;
+}
+.calendar .agenda-view.week-list h3 {
+  text-indent: 8px;
+}
+.calendar .agenda-view.week-list .calendar-add {
+  right: auto;
+  left: 0;
+  top: 9px;
 }
 .day-block span.time {
   display: block;

@@ -86,63 +86,71 @@
 	</div>
 
 	<!-- BEGIN day -->
-	<div>
-		<h3>{DATE}</h3>
+    <table class="agenda-view">
+    <thead>
+    <tr>
+        <td colspan="3">
+            <h3>{DATE}</h3>
+        </td>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- BEGIN note -->
 
-		<table>
-			<!-- BEGIN note -->
-			<tr>
-				<td width='200'>
-					{TIME}
-				</td>
-				<td>
-					<span style="background-color:{COLOUR}; border:1px solid {COLOUR};">
-						 {NOTE}
-					</span>
+    <tr>
+        <td width='200'>
+            {TIME}
+        </td>
+        <td>
+                <span style="background-color:{COLOUR}; border:1px solid {COLOUR};">
+                     {NOTE}
+                </span>
 
-					<div class="hidden-fields clearfix">
-						<h4><!-- BEGIN time -->
-							<div class="time"><strong>{TIME}</strong></div>
-							<!-- END time -->{NOTE}
-						</h4>
-						<p class="meta">Event Type: {TYPE}<br/>
-							Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a><br/>
-							{LOCATION} {DETAIL}
-						</p>
+            <div class="hidden-fields clearfix">
+                <h4><!-- BEGIN time -->
+                    <div class="time"><strong>{TIME}</strong></div>
+                    <!-- END time -->{NOTE}
+                </h4>
+                <p class="meta">Event Type: {TYPE}<br/>
+                    Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a><br/>
+                    {LOCATION} {DETAIL}
+                </p>
 
-						<!-- BEGIN has_category -->
-						<p class='meta'>
-							Homepage: <a href='/homepage/{HAS_CATEGORY_ID}'>{HAS_CATEGORY_NAME}</a>
-						</p>
-						<!-- END has_category -->
+                <!-- BEGIN has_category -->
+                <p class='meta'>
+                    Homepage: <a href='/homepage/{HAS_CATEGORY_ID}'>{HAS_CATEGORY_NAME}</a>
+                </p>
+                <!-- END has_category -->
 
-						<!-- BEGIN attendance_status -->
-						<p class="meta">Attendance Status: {ATTENDANCE_STATUS}</p>
-						<!-- END attendance_status -->
+                <!-- BEGIN attendance_status -->
+                <p class="meta">Attendance Status: {ATTENDANCE_STATUS}</p>
+                <!-- END attendance_status -->
 
-						<div class="modify-event">
-							<!-- BEGIN attendance_request_button -->
-							<form method="post">
-								<input name="event[id]" type="hidden" value="{EVENT_ID}">
-								<a class="btn modify float-left attendance-request" href="#"><span></span>{ATTENDANCE_REQUEST_ACTION}</a>
-							</form>
-							<!-- END attendance_request_button -->
+                <div class="modify-event">
+                    <!-- BEGIN attendance_request_button -->
+                    <form method="post">
+                        <input name="event[id]" type="hidden" value="{EVENT_ID}">
+                        <a class="btn modify float-left attendance-request" href="#"><span></span>{ATTENDANCE_REQUEST_ACTION}</a>
+                    </form>
+                    <!-- END attendance_request_button -->
 
-							<!-- BEGIN attendance_list_button -->
-							<a class="btn modify float-left" href="/calendar/attendance/list/{EVENT_ID}"><span></span>Attendance List</a>
-							<!-- END attendance_list_button -->
+                    <!-- BEGIN attendance_list_button -->
+                    <a class="btn modify float-left" href="/calendar/attendance/list/{EVENT_ID}"><span></span>Attendance List</a>
+                    <!-- END attendance_list_button -->
 
-							{MODIFY}
-						</div>
-					</div>
-				</td>
-				<td>
-					<!-- BEGIN attendance_icon --><strong class="float-right">A</strong><!-- END attendance_icon -->
-				</td>
-			</tr>
-			<!-- END note -->
-		</table>
-	</div>
+                    {MODIFY}
+                </div>
+            </div>
+        </td>
+
+        <td>
+            <!-- BEGIN attendance_icon --><strong class="float-right">A</strong><!-- END attendance_icon -->
+        </td>
+
+    </tr>
+    <!-- END note -->
+    </tbody>
+</table>
 	<!-- END day -->
 
 </div>

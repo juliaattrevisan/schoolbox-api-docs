@@ -90,11 +90,18 @@
 	</div>
 
 	<!-- BEGIN day -->
-	<div>
-		<h3>{DATE}</h3>
-		<a class="btn add calendar-add" href="{ADD}"><span></span></a>
 
-		<table>
+
+		<table class="agenda-view week-list">
+            <thead>
+                <tr>
+                    <td colspan="3">
+                        <h3>{DATE}</h3>
+                        <a class="btn add calendar-add float-left" href="{ADD}"><span></span></a>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
 			<!-- BEGIN note -->
 			<tr>
 				<td width='200'>
@@ -144,12 +151,9 @@
 				</td>
 			</tr>
 			<!-- END note -->
-		</table>
-		<ul>
+        </tbody>
+	</table>
 
-		</ul>
-		<BR><BR><BR>
-	</div>
 	<!-- END day -->
 
 </div>
