@@ -105,6 +105,17 @@ class Calendar_Event_Collection {
 	}
 
 	/**
+	 * Merge another stack into this one
+	 *
+	 * @param \Calendar_Event_Collection $collection
+	 */
+	public function merge(Calendar_Event_Collection $collection) {
+		$merged = array_merge($this->getStack(), $collection->getStack());
+
+		$this->setStack($merged);
+	}
+
+	/**
 	 * Set iterator
 	 *
 	 * @param $iterator
@@ -125,11 +136,22 @@ class Calendar_Event_Collection {
 	}
 
 	/**
+	 * Set stack
+	 *
+	 * @param $stack
+	 *
+	 * @return array
+	 */
+	public function setStack($stack) {
+		$this->stack = $stack;
+	}
+
+	/**
 	 * Get stack
 	 *
 	 * @return array
 	 */
-	private function getStack() {
+	public function getStack() {
 		return $this->stack;
 	}
 }
