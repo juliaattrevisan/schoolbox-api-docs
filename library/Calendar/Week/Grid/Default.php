@@ -71,7 +71,7 @@ class Calendar_Week_Grid_Default extends Calendar_Week_Abstract {
 
 			/* Render all registered event types
 			 */
-			$facade = new Calendar_Event_Collection_Renderer_Facade($this->getCalendarHandler(), $currentDay, $this->getPage());
+			$facade = new Calendar_Event_Collection_Renderer_Facade($this->getApi(), $currentDay, $this->getPage());
 			$facade->renderAll();
 
 		    $this->getPage()->parse("day_block", "day", true);

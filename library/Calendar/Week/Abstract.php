@@ -19,6 +19,10 @@ abstract class Calendar_Week_Abstract {
 	protected $selectedDate = null;
 	protected $startOfWeek = null;
 
+	/* Actual connector instance
+	 */
+	protected $api = null;
+
 	/**
 	 * Constructor
 	 *
@@ -29,7 +33,11 @@ abstract class Calendar_Week_Abstract {
 		$factory = new Calendar_Bridge_Factory();
 		$api = $factory->produce();
 
-		$this->setCalendarHandler($api);
+		$this->setApi($api);
+
+		/* Still used for perms and stuff
+		 */
+		$this->setCalendarHandler(new Calendar());
 
 		$this->setGroupHandler(new Group());
 		$this->setSubStuHandler(new SubmissionStudent());
@@ -124,6 +132,7 @@ abstract class Calendar_Week_Abstract {
 
 	/* Getters/Setters
 	 */
+
 
 	/**
 	 * Set calendar handler
@@ -303,5 +312,23 @@ abstract class Calendar_Week_Abstract {
 	 */
 	protected function getStartOfWeek() {
 		return $this->startOfWeek;
+	}
+
+	/**
+	 * Set api
+	 *
+	 * @param $api
+	 */
+	protected function setApi($api) {
+		$this->api = $api;
+	}
+
+	/**
+	 * Get api
+	 *
+	 * @return null
+	 */
+	protected function getApi() {
+		return $this->api;
 	}
 }

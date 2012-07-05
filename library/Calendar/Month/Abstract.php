@@ -17,11 +17,14 @@ abstract class Calendar_Month_Abstract {
 	protected $templateFile = '';
 	protected $selected = array();
 	protected $selectedDate = null;
-
 	protected $firstDay = null;
 	protected $numDaysInMonth = null;
 	protected $totalDays = null;
 	protected $startDay = null;
+
+	/* Actual connector instance
+	 */
+	protected $api = null;
 
 	/**
 	 * Constructor
@@ -33,7 +36,11 @@ abstract class Calendar_Month_Abstract {
 		$factory = new Calendar_Bridge_Factory();
 		$api = $factory->produce();
 
-		$this->setCalendarHandler($api);
+		$this->setApi($api);
+
+		/* Still used for perms and stuff
+		 */
+		$this->setCalendarHandler(new Calendar());
 
 		$this->setGroupHandler(new Group());
 		$this->setSubStuHandler(new SubmissionStudent());
@@ -338,5 +345,23 @@ abstract class Calendar_Month_Abstract {
 	 */
 	protected function getStartDay() {
 		return $this->startDay;
+	}
+
+	/**
+	 * Set api
+	 *
+	 * @param $api
+	 */
+	protected function setApi($api) {
+		$this->api = $api;
+	}
+
+	/**
+	 * Get api
+	 *
+	 * @return null
+	 */
+	protected function getApi() {
+		return $this->api;
 	}
 }
