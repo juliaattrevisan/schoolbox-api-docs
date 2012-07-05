@@ -18,7 +18,7 @@ class Calendar_Event_Collection_Renderer_StudentBirthday extends Calendar_Event_
 	 * Render collection into calendar view
 	 */
 	public function render() {
-		$birthdayList = $this->getCalendarHandler()->getStudentBirthdays($this->getCurrentDay());
+		$birthdayList = $this->getApi()->getStudentBirthdays($this->getCurrentDay());
 
 		$iterator = $birthdayList->createIterator();
 

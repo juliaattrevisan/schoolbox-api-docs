@@ -13,7 +13,7 @@ class Calendar_Event_Collection_Renderer_Day extends Calendar_Event_Collection_R
 	 * Render collection into calendar view
 	 */
 	public function render() {
-		$eventList = $this->getCalendarHandler()->getDayEvents($this->getCurrentDay());
+		$eventList = $this->getApi()->getDayEvents($this->getCurrentDay());
 
 		$iterator = $eventList->createIterator();
 

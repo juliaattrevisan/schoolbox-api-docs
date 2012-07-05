@@ -13,7 +13,7 @@ class Calendar_Event_Collection_Renderer_Submission extends Calendar_Event_Colle
 	 * Render collection into calendar view
 	 */
 	public function render() {
-		$submissionList = $this->getCalendarHandler()->getSubmissionEvents($this->getCurrentDay());
+		$submissionList = $this->getApi()->getSubmissionEvents($this->getCurrentDay());
 
 		$iterator = $submissionList->createIterator();
 
