@@ -392,7 +392,7 @@ class Calendar extends DeprecatedModel {
 
 		if (is_array($submissions) && count($submissions)) {
 			foreach($submissions as $submission) {
-				$event = new Calendar_Event_Submission();
+				$event = new Calendar_Event_Type_Submission();
 
 				$event->setDate(new Alaress_Date_Format($submission['date'], 'y-m-d h:i:s'));
 				$event->setCategoryName($submission['category']);
@@ -586,7 +586,7 @@ class Calendar extends DeprecatedModel {
 
 		if (is_array($allEvents) && count($allEvents)) {
 			foreach($allEvents as $currentEvent) {
-				$event = new Calendar_Event_Day();
+				$event = new Calendar_Event_Type_Day();
 
 				$event->setAuthorName($currentEvent['firstname'] . ' ' . $currentEvent['lastname']);
 				$event->setAuthorId($currentEvent['uid']);
@@ -664,7 +664,7 @@ class Calendar extends DeprecatedModel {
 
 		if (is_array($birthdayList) && count($birthdayList)) {
 			foreach($birthdayList as $birthday) {
-				$event = new Calendar_Event_StudentBirthday();
+				$event = new Calendar_Event_Type_StudentBirthday();
 				$event->setName($birthday['StudentGiven1'] . ' ' . $birthday['StudentSurname']);
 				$event->setForm($birthday['StudentFormDescription']);
 				$event->setAge($birthday['age']);

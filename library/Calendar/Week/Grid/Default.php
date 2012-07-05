@@ -69,11 +69,10 @@ class Calendar_Week_Grid_Default extends Calendar_Week_Abstract {
 				$this->getPage()->setVar("MONTABLE_CSS", "calTable");
 			}
 
-			/* Render submission events
+			/* Render all rgistered event types
 			 */
-			$this->renderSubmissionEvents($currentDay);
-			$this->renderStudentBirthdays($currentDay);
-			$this->renderDayEvents($currentDay);
+			$facade = new Calendar_Event_Collection_Renderer_Facade($this->getCalendarHandler(), $currentDay, $this->getPage());
+			$facade->renderAll();
 
 		    $this->getPage()->parse("day_block", "day", true);
 		    $this->getPage()->setVar("note_block", "");

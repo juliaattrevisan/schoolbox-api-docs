@@ -18,7 +18,7 @@
  */
 class Calendar_Event_Collection {
 
-	/* A bunch of Calendar_Event_Abstract subclasses
+	/* A bunch of Calendar_Event_Type_Abstract subclasses
 	 */
 	private $stack = array();
 
@@ -100,7 +100,7 @@ class Calendar_Event_Collection {
 	 *
 	 * @param $element
 	 */
-	public function add(Calendar_Event_Abstract $element) {
+	public function add(Calendar_Event_Type_Abstract $element) {
 		$this->stack[] = $element;
 	}
 
