@@ -64,6 +64,11 @@ abstract class Calendar_Event_Type_Abstract {
 	 */
 	protected $sid = -1;
 
+	/* The class used to render this event object. This should be
+	 * just the class' name, not an actual instance of it
+	 */
+	protected $rendererClass = '';
+
 	/**
 	 * Constructor
 	 *
@@ -72,6 +77,14 @@ abstract class Calendar_Event_Type_Abstract {
 	public function __construct() {
 		$this->setup();
 	}
+
+	/**
+	 * Use Visitor design pattern to render via an external class
+	 *
+	 * @abstract
+	 * @param $visitor
+	 */
+	abstract public function accept($visitor);
 
 	/**
 	 * Hook method for your own customisations
@@ -419,5 +432,14 @@ abstract class Calendar_Event_Type_Abstract {
 	 */
 	public function getCategoryName() {
 		return $this->categoryName;
+	}
+
+	/**
+	 * Get renderer class
+	 *
+	 * @return string
+	 */
+	public function getRendererClass() {
+		return $this->rendererClass;
 	}
 }

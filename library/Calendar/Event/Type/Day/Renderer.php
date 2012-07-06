@@ -1,0 +1,136 @@
+<?php
+/**
+ * Calendar_Event_Type_Day_Renderer
+ *
+ * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @link		http://www.alaress.com.au/
+ * @version	 SVN: $Id$
+ */
+class Calendar_Event_Type_Day_Renderer extends Calendar_Event_Type_Renderer_Abstract {
+
+	/**
+	 * Render this event
+	 *
+	 * @param $currentEvent
+	 */
+	public function visit($currentEvent) {
+		if ($this->isVisible($currentEvent)) {
+
+			/* Clear attendance blocks
+			 */
+			$this->getPage()->setVar(array(
+				'attendance_icon_block' => '',
+				'attendance_status_block' => '',
+				'attendance_request_button_block' => '',
+				'attendance_list_button_block' => '',
+				'has_category_block' => '',
+				'time_block' => ''
+			));
+
+			if (($currentEvent->getPublishDate()->getUnixTimestamp() >= time()) && $this->getGroupHandler()->isSuperuser()) {
+				$cssClass = 'translucent';
+			}
+			else {
+				$cssClass = '';
+			}
+
+			/* Render normally if we haven't already skipped it due to being unpublished
+			 */
+			$this->getPage()->setVar(array(
+				'EVENT_ID' => $currentEvent->getEventId(),
+				'TIME' => $currentEvent->getDerivedTime(),
+				'NOTE' => $currentEvent->getNote(),
+				'COLOUR' => $currentEvent->getColour(),
+				'LOCATION' => $currentEvent->getLocation(),
+				'DETAIL' => $currentEvent->getDetail(),
+
+				/* Wtf - EVENT_TYPE => 'type' . $event['type']; and TYPE => $event['eventType']
+				 */
+				'EVENT_TYPE' => 'type' . $currentEvent->getType(),
+				'TYPE' => $currentEvent->getEventType(),
+
+				'AUTHOR' => $currentEvent->getAuthorName(),
+				'AUTHOR_ID' => $currentEvent->getAuthorId(),
+				'EVENT_VISIBLE' => $cssClass,
+				'EVENT_LEVEL' => $currentEvent->getDerivedEventLevel(),
+			));
+
+			/* Modify link. Should be templated...
+			 */
+			$this->getPage()->setVar(array(
+				'MODIFY' => $this->getCalendarHandler()->getPerm($currentEvent->getEventId()) > 1 ? '<a class="btn modify float-left" href="/calendar/modify.php?eventID=' . $currentEvent->getEventId() . '&returnTo=month"><span></span>Modify</a>' : '',
+			));
+
+			/* If a time was specified, show it; otherwise hide it
+			 */
+			if (strlen($currentEvent->getDerivedTime())) {
+				$this->getPage()->parse('time_block', 'time');
+			}
+
+			/* Event attendance
+			 */
+			if ($currentEvent->canAttend()) {
+				$this->getPage()->parse('attendance_icon_block', 'attendance_icon');
+
+				if ($this->getGroupHandler()->isStudent($_SESSION['id'])) {
+					if ($attendance = $this->getCalendarHandler()->getAttendanceByEventAndUser($currentEvent->getEventId(), $_SESSION['id'])) {
+
+						/* Attendance Status
+						 */
+						if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
+							$this->getPage()->setVar('ATTENDANCE_STATUS', 'Pending');
+						}
+						else if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
+							$this->getPage()->setVar('ATTENDANCE_STATUS', 'Approved');
+						}
+						else if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
+							$this->getPage()->setVar('ATTENDANCE_STATUS', 'Rejected');
+						}
+
+						$this->getPage()->parse('attendance_status_block', 'attendance_status');
+
+						$this->getPage()->setVar('ATTENDANCE_REQUEST_ACTION', 'Unattend');
+					}
+					else {
+						$this->getPage()->setVar('ATTENDANCE_REQUEST_ACTION', 'Attend');
+					}
+
+					$this->getPage()->parse('attendance_request_button_block', 'attendance_request_button');
+				}
+				else if ($this->getGroupHandler()->isStaff($_SESSION['id'])) {
+					$this->getPage()->parse('attendance_list_button_block', 'attendance_list_button');
+				}
+			}
+
+			/* Show a homepage if appropriate
+			 */
+			if (is_numeric($currentEvent->getCategoryId())) {
+				$this->getPage()->setVar(array(
+					'HAS_CATEGORY_ID' => $currentEvent->getCategoryId,
+					'HAS_CATEGORY_NAME' => $currentEvent->getCategoryName(),
+				));
+
+				$this->getPage()->parse('has_category_block', 'has_category');
+			}
+
+			$this->getPage()->parse("note_block", "note", true);
+		}
+	}
+
+	/**
+	 * If the Publish Date hasn't been reached yet, only show the events to Superusers
+	 * in a different way so they can still edit/click them. Otherwise, they don't appear
+	 * at all for everyone else
+	 *
+	 * @param $currentEvent
+	 * @return bool
+	 */
+	private function isVisible($currentEvent) {
+		if (($currentEvent->getPublishDate()->getUnixTimestamp() >= time()) && !$this->getGroupHandler()->isSuperuser()) {
+			return false;
+		}
+
+		return true;
+	}
+}

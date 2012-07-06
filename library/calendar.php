@@ -669,8 +669,8 @@ class Calendar extends DeprecatedModel {
 				$event->setForm($birthday['StudentFormDescription']);
 				$event->setAge($birthday['age']);
 				$event->setDate($birthday['la']);
+				$event->setStartTime(new Alaress_Date_Format(strtotime($birthday['StudentBirthdate']), 'U'));
 				$event->setBirthdayNote();
-
 				$stack->add($event);
 			}
 		}

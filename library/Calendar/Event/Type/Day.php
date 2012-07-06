@@ -2,12 +2,20 @@
 /**
  * Calendar_Event_Type_Day
  *
+ * Uses the Visitor pattern to render via an external class, finally decoupling
+ * the data structure from rendering methodology in a highly granular environment
+ * without needing to use singletons.
+ *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
 class Calendar_Event_Type_Day extends Calendar_Event_Type_Abstract {
+
+	/* Renderer
+	 */
+	protected $rendererClass = 'Calendar_Event_Type_Day_Renderer';
 
 	/* Attendance flag
 	 */
@@ -17,6 +25,15 @@ class Calendar_Event_Type_Day extends Calendar_Event_Type_Abstract {
 	 * Stored always as an Alaress_Date_Format() instance
 	 */
 	private $publishDate = null;
+
+	/**
+	 * Render via external class
+	 *
+	 * @param Calendar_Event_Day_Renderer $visitor
+	 */
+	public function accept($visitor) {
+		$visitor->visit($this);
+	}
 
 	/**
 	 * Can someone attend this event

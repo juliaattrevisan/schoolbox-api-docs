@@ -2,12 +2,20 @@
 /**
  * Calendar_Event_Type_StudentBirthday
  *
+ * Uses the Visitor pattern to render via an external class, finally decoupling
+ * the data structure from rendering methodology in a highly granular environment
+ * without needing to use singletons.
+ *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
 class Calendar_Event_Type_StudentBirthday extends Calendar_Event_Type_Abstract {
+
+	/* Renderer
+	 */
+	protected $rendererClass = 'Calendar_Event_Type_StudentBirthday_Renderer';
 
 	/* Contextual: The actual birthdate
 	 */
@@ -25,6 +33,15 @@ class Calendar_Event_Type_StudentBirthday extends Calendar_Event_Type_Abstract {
 	/* Form? What is this
 	 */
 	private $form = '';
+
+	/**
+	 * Render via external class
+	 *
+	 * @param \Calendar_Event_StudentBirthday_Renderer $visitor
+	 */
+	public function accept($visitor) {
+		$visitor->visit($this);
+	}
 
 	/**
 	 * Sets the event note in a standardised way
