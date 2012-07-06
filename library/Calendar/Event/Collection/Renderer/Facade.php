@@ -25,11 +25,12 @@ class Calendar_Event_Collection_Renderer_Facade {
 	 */
 	public function __construct($api, $currentDay, $page) {
 		$this->setApi($api);
+		$this->setCurrentDay($currentDay);
 		$this->setPage($page);
 
 		$this->setAllEvents(new Calendar_Event_Collection());
 
-		$this->collectAllEvents($currentDay);
+		$this->collectAllEvents();
 	}
 
 	/**
@@ -37,44 +38,14 @@ class Calendar_Event_Collection_Renderer_Facade {
 	 *
 	 * Do this by using ReflectionClass on the API Interface to
 	 * get all the mandatory methods
-	 *
-	 * @param $currentDay
 	 */
-	private function collectAllEvents($currentDay) {
+	private function collectAllEvents() {
 		$reflection = new ReflectionClass('Calendar_Api_Interface');
 
 		foreach ($reflection->getMethods() as $currentMethod) {
 			$methodName = $currentMethod->getName();
 
-			$eventList = $this->getApi()->$methodName($currentDay);
-
-//			if ($methodName == 'getDayEvents') {
-//				$x = date('d', $currentDay);
-//
-//				$duff = new Calendar_Event_Type_Day();
-//				$duff->setNote("MALENA Test for sorting");
-//				$duff->setPublishDate(date('Y-m-d H:i:s'));
-//				$duff->setStartTime(new Alaress_Date_Format("2012-07-$x 09:15:15", 'y-m-d h:i:s'));
-//				$duff->setEndTime(new Alaress_Date_Format("2012-07-$x 14:17:17", 'y-m-d h:i:s'));
-//
-//				$eventList->add($duff);
-//
-//				$duff = new Calendar_Event_Type_Day();
-//				$duff->setNote("SARAH Test for sorting");
-//				$duff->setPublishDate(date('Y-m-d H:i:s'));
-//				$duff->setStartTime(new Alaress_Date_Format("2012-07-$x 05:15:15", 'y-m-d h:i:s'));
-//				$duff->setEndTime(new Alaress_Date_Format("2012-07-$x 07:17:17", 'y-m-d h:i:s'));
-//
-//				$eventList->add($duff);
-//
-//				$duff = new Calendar_Event_Type_Day();
-//				$duff->setNote("JUSTINE Test for sorting");
-//				$duff->setPublishDate(date('Y-m-d H:i:s'));
-//				$duff->setStartTime(new Alaress_Date_Format("2012-07-$x 15:15:15", 'y-m-d h:i:s'));
-//				$duff->setEndTime(new Alaress_Date_Format("2012-07-$x 15:17:17", 'y-m-d h:i:s'));
-//
-//				$eventList->add($duff);
-//			}
+			$eventList = $this->getApi()->$methodName($this->getCurrentDay());
 
 			$this->getAllEvents()->merge($eventList);
 		}
