@@ -17,8 +17,8 @@ abstract class Calendar_Event_Type_Abstract {
 	/* Inheritable class vars
 	 */
 	protected $eventId = -1;
-	protected $startTime = '';
-	protected $endTime = '';
+	protected $startTime = null;
+	protected $endTime = null;
 	protected $date = '';
 
 	/* Unholy selection of field names: eventType and type

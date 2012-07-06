@@ -403,6 +403,7 @@ class Calendar extends DeprecatedModel {
 				$event->setSubmissionBoxName($submission['name']);
 				$event->setSubmissionNote();
 				$event->setColour($this->displayColour(4));
+				$event->setStartTime(new Alaress_Date_Format($submission['date'], 'y-m-d h:i:s'));
 
 				$stack->add($event);
 			}
@@ -553,8 +554,7 @@ class Calendar extends DeprecatedModel {
 		$query = "
 			SELECT DISTINCT event.id, owner,
 				GROUP_CONCAT(DISTINCT eventCampus.campusID) as campusList,
-				TIME_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') as startTime,
-				TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTime,
+				startTime, endTime, date AS eventDate,
 				TIME_TO_SEC(startTime) as startTimestamp,
 				TIME_TO_SEC(endTime) as endTimestamp,
 				SUBSTR(event.date, 1, 4) AS year,
@@ -591,8 +591,8 @@ class Calendar extends DeprecatedModel {
 				$event->setAuthorName($currentEvent['firstname'] . ' ' . $currentEvent['lastname']);
 				$event->setAuthorId($currentEvent['uid']);
 				$event->setEventId($currentEvent['id']);
-				$event->setStartTime($currentEvent['startTime']);
-				$event->setEndTime($currentEvent['endTime']);
+				$event->setStartTime(new Alaress_Date_Format($currentEvent['eventDate'] . ' ' . $currentEvent['startTime'], 'y-m-d h:i:s'));
+				$event->setEndTime(new Alaress_Date_Format($currentEvent['eventDate'] . ' ' . $currentEvent['endTime'],  'y-m-d h:i:s'));
 				$event->setType($currentEvent['type']);
 				$event->setNote($currentEvent['note']);
 				$event->setAccess($currentEvent['access']);

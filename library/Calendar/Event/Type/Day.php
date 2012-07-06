@@ -67,9 +67,12 @@ class Calendar_Event_Type_Day extends Calendar_Event_Type_Abstract {
 	 * @return string
 	 */
 	public function getDerivedTime() {
+		$startFormat = $this->getStartTime()->getUsingFormat('g:iA');
+		$endFormat = $this->getEndTime()->getUsingFormat('g:iA');
+
 		$formattedTime = rtrim(
-			($this->getStartTime() != "12:00AM" ? $this->getStartTime() : "") . " - " .
-			($this->getEndTime() != "12:00AM" ? $this->getEndTime() : ""), "- ");
+			($startFormat != "12:00AM" ? $startFormat : "") . " - " .
+			($endFormat != "12:00AM" ? $endFormat : ""), "- ");
 
 		return $formattedTime;
 	}

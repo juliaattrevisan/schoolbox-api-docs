@@ -116,6 +116,40 @@ class Calendar_Event_Collection {
 	}
 
 	/**
+	 * Comparison
+	 *
+	 * @param $a
+	 * @param $b
+	 * @return int
+	 */
+	private function cmp($a, $b) {
+		if ($a->getStartTime()->getUnixTimestamp() < $b->getStartTime()->getUnixTimestamp()) {
+			return -1;
+		}
+		else if ($a->getStartTime()->getUnixTimestamp() > $b->getStartTime()->getUnixTimestamp()) {
+			return 1;
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Sort the stack
+	 *
+	 * Used after merging multiple stacks so all events are ordered by time
+	 */
+	public function sort() {
+		$sorted = $this->getStack();
+
+		usort($sorted, array($this, 'cmp'));
+
+		$this->setStack($sorted);
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
 	 * Set iterator
 	 *
 	 * @param $iterator
