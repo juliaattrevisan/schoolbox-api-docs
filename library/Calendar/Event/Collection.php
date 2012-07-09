@@ -74,6 +74,15 @@ class Calendar_Event_Collection {
 		return $this->getIterator();
 	}
 
+	/**
+	 * The number of items in this collection
+	 *
+	 * @return int
+	 */
+	public function getCount() {
+		return count($this->getStack());
+	}
+
 	/* Getters/Setters
 	 */
 

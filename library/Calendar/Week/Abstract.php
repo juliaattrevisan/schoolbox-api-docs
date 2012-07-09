@@ -30,7 +30,7 @@ abstract class Calendar_Week_Abstract {
 	 * @param $date
 	 */
 	public function __construct($page, $date) {
-		$factory = new Calendar_Bridge_Factory();
+		$factory = new Calendar_Api_Factory();
 		$api = $factory->produce();
 
 		$this->setApi($api);
