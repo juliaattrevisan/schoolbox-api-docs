@@ -404,7 +404,8 @@ class Leave_RequestMapper extends Mapper {
 			FROM luResidentialHouse
 			LEFT JOIN `user` ON user.residential_house_id = luResidentialHouse.id
 			LEFT JOIN leave_request ON leave_request.user_id = `user`.id AND leave_request.authorisation_datetime IS NOT NULL
-			GROUP BY residential_house_id;
+			GROUP BY residential_house_id
+			ORDER BY luResidentialHouse.name
 		");
 
 		$statement->execute(array(
