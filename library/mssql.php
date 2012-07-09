@@ -5,34 +5,51 @@
 *                                                           *
 *	This file provides abstraction of the  MSSQL database.	*
 *	This used for Synergetic connections. 	 				*
-*	It also includes error handling and a debug mode.		*		    
+*	It also includes error handling and a debug mode.		*
 *                                                           *
 ************************************************************/
 class MSSQL {
 
-	function MSSQL($db = false) {
-		$this->host = Cfg::get('external_db_host');
-		$this->user = Cfg::get('external_db_user');
-		$this->passwd = Cfg::get('external_db_passwd');
-		$this->debug = 0;
-        $this->db = $db?$db:Cfg::get('external_db_db');
+	function MSSQL($db = false, $optionalConfig = false) {
 
-        if(Cfg::get('external_enable') == 1) {
-            $this->connect();
-        }
+		/* Blasphemy (heresy unavoidable)
+		 * Hijack these settings for alternative config
+		 */
+		if (is_array($optionalConfig)) {
+			$this->host = $optionalConfig['host'];
+			$this->user = $optionalConfig['user'];
+			$this->passwd = $optionalConfig['passwd'];
+
+			/* Database name
+			 */
+			$this->db = $optionalConfig['db'];
+
+			$this->connect();
+		}
+		else {
+			$this->host = Cfg::get('external_db_host');
+			$this->user = Cfg::get('external_db_user');
+			$this->passwd = Cfg::get('external_db_passwd');
+			$this->debug = 0;
+			$this->db = $db?$db:Cfg::get('external_db_db');
+
+			if(Cfg::get('external_enable') == 1) {
+				$this->connect();
+			}
+		}
     }
 
 	function connect() {
 		if(!isset($this->dbf))
 			$this->dbf = mssql_connect($this->host, $this->user, $this->passwd);
-		
+
 		if(!isset($this->dbf))
 			error(22);
 
 		if(!$this->changeDb($this->db))
 			error(22);
 	}
-	
+
 	function changeDB($db) {
 		if(mssql_select_db($db, $this->dbf))
 		{
@@ -42,7 +59,7 @@ class MSSQL {
 		else
 			return false;
 	}
-	
+
 	function query($sql_q)
 	{
         if($this->dbf) {
@@ -78,7 +95,7 @@ class MSSQL {
 		$row = mssql_fetch_assoc($result);
 		return $row[0];
 	}
-	
+
 	/* Gets an 3 dimensional associative array of all rows returned by query, */
 	/*	returns false if no rows */
 	function getAll($sql_q)
@@ -97,7 +114,7 @@ class MSSQL {
 		else
 			return false;
 	}
-	
+
 	/* Returns the next result from a query result resource */
 	/* Can be optionally passed a result resource otherwise it uses current result resource */
 	function getNextArray($result = 0)
@@ -108,10 +125,10 @@ class MSSQL {
 			$return_array = mssql_fetch_assoc($this->result);
 		else
 			return false;
-	
+
 		return $return_array;
 	}
-	
+
 	/* Returns the number of rows returned by the query */
 	function countRows($result = 0)
 	{
@@ -123,6 +140,6 @@ class MSSQL {
 			return false;
 		return $return_count;
 	}
-	
+
 }
 ?>

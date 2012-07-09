@@ -38,6 +38,9 @@ class Calendar_Api_Schoolbox_Default implements Calendar_Api_Interface {
 	 * @return Calendar_Event_Collection
 	 */
 	public function getStudentBirthdays($currentDay) {
+
+		/* Note that this uses an MSSQL connection
+		 */
 		$collection = $this->getCalendarHandler()->getStudentBirthdays($currentDay);
 
 		return $collection;
@@ -48,7 +51,7 @@ class Calendar_Api_Schoolbox_Default implements Calendar_Api_Interface {
 	 *
 	 * @param $currentDay
 	 *
-	 * @return \Calendar_Event_Collection
+	 * @return Calendar_Event_Collection
 	 */
 	public function getSubmissionEvents($currentDay) {
 		$collection = $this->getCalendarHandler()->getSubmissionEvents($currentDay);

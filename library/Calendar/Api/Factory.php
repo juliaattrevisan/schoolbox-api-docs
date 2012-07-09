@@ -14,7 +14,9 @@
  * @version	 SVN: $Id$
  */
 class Calendar_Api_Factory {
-	private $allSources = array('Schoolbox', 'Sharepoint', 'Vcal');
+	private $allSources = array('Schoolbox');
+//	private $allSources = array('Sharepoint');
+//	private $allSources = array();
 
 	/**
 	 * Produce an API Composite
@@ -24,19 +26,34 @@ class Calendar_Api_Factory {
 	public function produce() {
 		$compositeApi = new Calendar_Api_Composite();
 
-		/* Alternate data sources
+		/* Alternative data sources
 		 */
 		foreach ($this->getAllSources() as $currentSource) {
 			$defaultImplementation = 'Calendar_Api_' . $currentSource . '_Default';
 			$uniqueImplementation = 'Calendar_Api_' . $currentSource . '_' . Cfg::get('site_domain');
 
+			/* Temporary forced usage of Sharepoint/Iport for Stk
+			 */
+//			if ($currentSource == 'Sharepoint') {
+//				$uniqueImplementation = 'Calendar_Api_' . $currentSource . '_Stk';
+//			}
+
+			/* Decide which to use (unique or default)
+			 * Or create no class, if neither exists
+			 */
 			if (class_exists($uniqueImplementation)) {
 				$compositeApi->add(new $uniqueImplementation);
 			}
-			else {
+			else if (class_exists($defaultImplementation)) {
 				$compositeApi->add(new $defaultImplementation);
 			}
 		}
+
+		/* Throw error if no APIs were determined and found
+		if (!$compositeApi->getCount()) {
+			throw new Exception('No Calendar APIs found for your implementation.');
+		}
+		 */
 
 		return $compositeApi;
 	}

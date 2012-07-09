@@ -72,6 +72,15 @@ class Calendar_Api_Composite implements Calendar_Api_Interface {
 		$this->api[] = $api;
 	}
 
+	/**
+	 * Get the number of apis currently being used
+	 *
+	 * @return int
+	 */
+	public function getCount() {
+		return count($this->getApi());
+	}
+
 	/* Getters/Setters
 	 */
 

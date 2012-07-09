@@ -8,6 +8,8 @@
  * @version	 SVN: $Id$
  */
 class Calendar_Event_Collection_Renderer {
+	private $interfaceClass = 'Calendar_Api_Interface';
+
 	private $api = null;
 	private $currentDay = -1;
 	private $page = null;
@@ -40,7 +42,7 @@ class Calendar_Event_Collection_Renderer {
 	 * get all the mandatory methods
 	 */
 	private function collectAllEvents() {
-		$reflection = new ReflectionClass('Calendar_Api_Interface');
+		$reflection = new ReflectionClass($this->getInterfaceClass());
 
 		foreach ($reflection->getMethods() as $currentMethod) {
 			$methodName = $currentMethod->getName();
@@ -149,5 +151,14 @@ class Calendar_Event_Collection_Renderer {
 	 */
 	private function getAllEvents() {
 		return $this->allEvents;
+	}
+
+	/**
+	 * The interface which defines accessible methods
+	 *
+	 * @return string
+	 */
+	public function getInterfaceClass() {
+		return $this->interfaceClass;
 	}
 }
