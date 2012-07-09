@@ -26,7 +26,7 @@ class Leave_Kings_Report_House_Web {
 		'pendingStart' => "<span class='leave-pending'>",
 		'pendingEnd' => "</span><br />",
 
-		'approvedStart' => "<span>",
+		'approvedStart' => "<span class='leave-approved'>",
 		'approvedEnd' => "</span><br />",
 	);
 
@@ -87,7 +87,7 @@ class Leave_Kings_Report_House_Web {
 			 */
 			else if ($request->getId()) {
 				$combined[$key]['request_authorisation_user_id'][$request->getAuthorisationUser()->getId()] = Scrub::smartQuotes(trim($request->getAuthorisationUser()->getName()));
-				$combined[$key]['row_css_class'][] = 'leave-pending';
+				$combined[$key]['row_css_class'][] = 'leave-approved';
 			}
 			else {
 				$combined[$key]['row_css_class'][] = '';
