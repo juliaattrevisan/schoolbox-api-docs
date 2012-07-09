@@ -1,6 +1,17 @@
 /*
  * Because EVERYTHING's over-ridden in core -.-
  */
+@page {size:portrait}
+
+body{background:#fff;}
+
+#nav, #header, #footer{display:none;}
+
+#container{
+    margin:0;
+    padding:0;
+    min-width:0
+}
 
 #letterhead {
     text-align:  center;
@@ -13,9 +24,11 @@
     height: 10em;
 }
 #letterhead h1 {
-    font-size: 3em; font-weight: normal;
+    font-size: 3em; font-weight: normal; line-height:normal;
 }
-
+#letterhead p{
+    text-align:center;
+}
 h1 {
     font-size: 2em; font-weight: bold; text-align: center;
 }

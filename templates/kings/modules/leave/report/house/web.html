@@ -74,8 +74,8 @@
 
 
         $j('.print').click( function (e) {
-            e.preventDefault();
-            window.print();
+            window.location = window.location + '/print';
+            return false;
         })
 
         /*
@@ -107,7 +107,7 @@
     <h2>Leave Report</h2>
 
     <span class="header_option in-h2">
-        <a id="reportExportButton" href="/modules/leave/report/house/{HOUSE_ID}" class="btn modify"><span></span>Export History</a>
+        <a id="reportExportButton" href="print" class="btn modify"><span></span>Export History</a>
         <form id="reportFilter">
             <a id="reportFilterSubmit" href="javascript:void(0);" class="btn search"><span></span>Search</a>
             <select id="reportHouse">

@@ -3710,13 +3710,24 @@ CALENDAR
             text-align: left;
             font-size:16px;
         }
-        td{
-            border-top:1px solid #f0f0f0;
-        }
+
         thead{
             td{
                 border-top:2px solid #000;
             }
+        }
+        .js_happening{
+            li{
+                border-top:1px solid #f0f0f0;
+                margin:0;
+                padding:4px;
+            }
+            .event-time, .event-brief{
+                display:block;
+                float:left;
+            }
+            .event-time{width:200px; min-height:20px}
+            .event-brief{display:inline-block;}
         }
         &.week-list{
             h3{

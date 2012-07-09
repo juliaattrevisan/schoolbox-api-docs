@@ -3418,11 +3418,25 @@ CALENDAR
   text-align: left;
   font-size: 16px;
 }
-.calendar .agenda-view td {
-  border-top: 1px solid #f0f0f0;
-}
 .calendar .agenda-view thead td {
   border-top: 2px solid #000;
+}
+.calendar .agenda-view .js_happening li {
+  border-top: 1px solid #f0f0f0;
+  margin: 0;
+  padding: 4px;
+}
+.calendar .agenda-view .js_happening .event-time,
+.calendar .agenda-view .js_happening .event-brief {
+  display: block;
+  float: left;
+}
+.calendar .agenda-view .js_happening .event-time {
+  width: 200px;
+  min-height: 20px;
+}
+.calendar .agenda-view .js_happening .event-brief {
+  display: inline-block;
 }
 .calendar .agenda-view.week-list h3 {
   text-indent: 8px;
