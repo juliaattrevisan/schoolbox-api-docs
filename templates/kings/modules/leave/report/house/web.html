@@ -53,18 +53,16 @@
 
         $j('#reportFilter').submit( function (event) {
             event.preventDefault();
-
             var form = $j(this);
-
             var houseId = $j('#reportHouse').val();
             var date = $j('#reportDate').val().replace(/\//g, '-');
 
             window.location = location.protocol+'//'+ location.host + '/modules/leave/report/house/' + houseId + '/' + date;
-        } );
+        });
 
         $j('#reportFilterSubmit').click( function () {
             $j('#reportFilter').submit();
-        } );
+        });
 
         $j('#reportExportButton').click( function (e) {
             var date =  $j('#reportDate').val().toString().replace(/\//g,"-");
@@ -72,9 +70,9 @@
             e.preventDefault();
         });
 
-
         $j('.print').click( function (e) {
-            window.location = window.location + '/print';
+            var date = $j('#reportDate').val().replace(/\//g, '-');
+            window.location = location.protocol+'//'+ location.host + '/modules/leave/report/house/{HOUSE_ID}/' + date + '/print';
             return false;
         })
 
