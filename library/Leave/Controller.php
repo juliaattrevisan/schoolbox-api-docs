@@ -328,7 +328,7 @@ class Leave_Controller extends Controller {
 		if ($this->getGroup()->getPermission(null)) {
 			$request = $data['request'];
 			$user = $request->getUser();
-			$house = $this->getHouseMapper()->findById($user->getHouse());
+			$house = $this->getHouseMapper()->findById($user->getResidentialHouseId());
 
 			$this->getPage()->setFile(TEMPLATE_content, 'modules/leave/modifyRequest.html');
 			$this->getPage()->setBlock(TEMPLATE_content, 'next_pending', 'next_pending_block');
@@ -348,6 +348,7 @@ class Leave_Controller extends Controller {
 				'USER_EXTERNAL_ID' => $user->getSynergyId(),
 				'USER_YEAR' => $user->getYear(),
 				'USER_HOUSE' => $house->getHouse(),
+				'USER_HOUSE_ID' => $house->getId(),
 				'REQUEST_START_DATE' => $request->getStart()->getLocalShort(),
 				'REQUEST_FINISH_DATE' => $request->getFinish()->getLocalShort(),
 				'REQUEST_HOST_NAME' => $request->getHostName(),
