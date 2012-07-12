@@ -48,7 +48,12 @@ class Scrub {
 		$search = array(chr(145), chr(146), chr(147), chr(148), chr(151));
 		$replace = array("'", "'", '"', '"', '-');
 
-		return str_replace($search, $replace, $text);
+		$data = str_replace($search, $replace, $text);
+
+		$search = array("&#8220;", "&#8221;", "&#8216;", "&#8217;", "&#8243;");
+		$replace = array("&quot;", "&quot;", "&#39;", "&#39;", "&quot;");
+
+		return str_replace($search, $replace, $data);
 	}
 
 	/**
