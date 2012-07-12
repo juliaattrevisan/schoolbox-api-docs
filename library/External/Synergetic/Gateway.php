@@ -40,7 +40,7 @@ class External_Synergetic_Gateway {
     public function changeCommunityLoginPassword($communityId, $currentPassword, $newPassword) {
         $input =
                 "<aInputParamObj>".
-                "<XMLInput>" .
+                "<InputXML>" .
                         "<VendorTokenGUID>%s</VendorTokenGUID>" .
                         "<VendorPassword>%s</VendorPassword>" .
                         "<VersionNumber>1.2</VersionNumber>" .
@@ -48,7 +48,7 @@ class External_Synergetic_Gateway {
                         "<ID>%d</ID>" .
                         "<CurrentPassword>%s</CurrentPassword>" .
                         "<NewPassword>%s</NewPassword>" .
-                 "</XMLInput>".
+                 "</InputXML>".
                 "</aInputParamObj>";
 
 
