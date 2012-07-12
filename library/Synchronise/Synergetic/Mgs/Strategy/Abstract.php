@@ -179,7 +179,7 @@ abstract class Synchronise_Synergetic_Mgs_Strategy_Abstract extends Synchronise_
     }
 
    protected function getGroupIDFromCategory($category) {
-       if($category == 'TEACHER')
+       if($category == 'Teach')
 		return 1;
 	else
 		return 2;

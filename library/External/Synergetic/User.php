@@ -437,7 +437,7 @@ class External_Synergetic_User implements External_UserInterface {
 				StaffID, NetworkLogin, ActiveFlag,
 				StaffTitle, StaffPreferredName, StaffSurname,
 				DefaultEmailCode, OccupEmail, Email,
-				StaffCampus, StaffCategoryType
+				StaffCampus, StaffCategoryType, StaffCategoryCode
 			FROM SynergyOne.dbo.vStaff vStaff
 			LEFT JOIN Community ON Community.ID = StaffID
 			AND ActiveFlag = 1
