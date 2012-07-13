@@ -24,7 +24,7 @@ class Component_Dashboard_SuggestionController extends Component_Dashboard_Contr
     }
 
     public function execute () {
-        $this->categoryNewsList = $this->categoryNews->getAllForCategory(self::CATEGORY_ID, array( 'size', 1 ));
+        $this->categoryNewsList = $this->categoryNews->getAllForCategory(self::CATEGORY_ID);
 
         return true;
     }
@@ -35,8 +35,9 @@ class Component_Dashboard_SuggestionController extends Component_Dashboard_Contr
 		}
 
         if ( is_array($this->categoryNewsList) ) {
-            $this->setVar('TIPS_TRICKS_HEADING', Scrub::text($this->categoryNewsList[0]['heading']));
-            $this->setVar('TIPS_TRICKS', Scrub::html($this->categoryNewsList[0]['body']));
+            $newsItem = array_rand($this->categoryNewsList);
+            $this->setVar('TIPS_TRICKS_HEADING', Scrub::text($this->categoryNewsList[$newsItem]['heading']));
+            $this->setVar('TIPS_TRICKS', Scrub::html($this->categoryNewsList[$newsItem]['body']));
 
             return true;
         }
