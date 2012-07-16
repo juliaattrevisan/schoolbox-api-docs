@@ -27,13 +27,21 @@ if (is_array($allLinks)) {
 			'url' => $currentLink['url'],
 		));
 
-		if ($exists) {
-			$this->parse('myLink_exists_block', 'myLink_exists');
-			$this->setVar('myLink_share_block', '');
+		if ($_SESSION['eportfolio_enabled']) {
+			if ($exists) {
+				$this->parse('myLink_exists_block', 'myLink_exists');
+				$this->setVar('myLink_share_block', '');
+			}
+			else {
+				$this->setVar('myLink_exists_block', '');
+				$this->parse('myLink_share_block', 'myLink_share');
+			}
 		}
 		else {
-			$this->setVar('myLink_exists_block', '');
-			$this->parse('myLink_share_block', 'myLink_share');
+			$this->setVar(array(
+				'myLink_exists_block' => '',
+				'myLink_share_block' => '',
+			));
 		}
 
 		$this->parse('myLink_block', 'myLink', true);
