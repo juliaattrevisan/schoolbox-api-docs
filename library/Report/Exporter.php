@@ -71,40 +71,38 @@ class Report_Exporter {
         header('Content-type: text/csv');
         header('Content-disposition: attachment; filename="report-' . $this->filename . '.csv"');
 
-        // output the column headings
-        $this->__outputCSV(array($this->getHeadings()));
+        $outstream = fopen("php://output", 'r');
 
-        // format data for output - filter and order by column headers specified
-        $data = array();
+        // output the column headings
+        fputcsv($outstream, $this->getHeadings());
 
         // use resource iteratively
         if(is_resource($this->getData())) {
             $db = DeprecatedDatabase::getInstance();
             while($row = $db->getNextArray($this->getData())) {
-                $data[] = $this->parseRow($row);
+                $this->parseRow($outstream, $row);
             }
         }
 
         // use array iteratively
         elseif(is_array($this->getData())) {
             foreach($this->getData() as $row) {
-                $data[] = $this->parseRow($row);
+                $this->parseRow($outstream, $row);
             }
         }
 
-        // output data
-        $this->__outputCSV($data);
+        fclose($outstream);
 
         // don't keep going. stop now.
         exit(1);
     }
 
     /**
-     * Check for and perform any data manipulation that needs doing
+     * Check for and perform any data manipulation that needs doing, then write the row to file
      * @param $row
      * @return array
      */
-    protected function parseRow($row) {
+    protected function parseRow($outstream, $row) {
         if(is_callable($this->dataManipulatorCallback)) {
             $row = call_user_func_array($this->dataManipulatorCallback, array($row));
         }
@@ -112,31 +110,8 @@ class Report_Exporter {
         foreach($this->getHeadings() as $dbCol => $display) {
             $datum[] = $row[$dbCol];
         }
-        return $datum;
-    }
 
-    /**
-     * Output a csv row, using the __outputCSV method
-     *
-     * @param  $data
-     * @return void
-     */
-    protected function __outputCSV($data) {
-        $outstream = fopen("php://output", 'r');
-        array_walk($data, array($this, '__outputCSVRow'), $outstream);
-        fclose($outstream);
-    }
-
-    /**
-     * Output a csv row.
-     *
-     * @param  $vals
-     * @param  $key
-     * @param  $filehandler
-     * @return void
-     */
-    protected function __outputCSVRow(&$vals, $key, $filehandler) {
-        fputcsv($filehandler, $vals, ',', '"');
+        fputcsv($outstream, $datum);
     }
 
 }
