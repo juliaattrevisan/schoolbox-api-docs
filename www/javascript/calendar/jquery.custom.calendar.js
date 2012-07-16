@@ -1,6 +1,8 @@
 setupCalendar = {
 	calendarFormat: "{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}",
 	calendarImageURL: "/images/core/calendar/calendar-click.png",
+	calendarView: 'week',
+
 	init: function() {
 		var $self = this;
 
@@ -33,9 +35,14 @@ setupCalendar = {
 		this.filters.interaction();
 	},
 	datePicker: function() {
+
 		 $j('.datepicker').datepicker({
 			dateFormat: 'dd-mm-yy',
-			onSelect: function(dateText, inst) {window.open('/calendar/month/'+dateText, "_self")},
+			onSelect: function(dateText, inst) {
+				var url = '/calendar/' + setupCalendar.calendarView + '/' + dateText;
+
+				window.open(url, "_self");
+			},
 			defaultDate: $j.datepicker.parseDate("dd-mm-yy", this.calendarFormat),
 			showOn: 'button',
 			buttonImage: this.calendarImageURL,
