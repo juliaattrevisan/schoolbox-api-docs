@@ -408,7 +408,7 @@ class Eportfolio_Container {
                 return true;
             }
         } elseif($groupHandler->isStudent($userID)) {
-            // student: can be edited by you, your parents, teachers or supers
+            // student: can be edited by you,teachers or supers
             if ($groupHandler->isSuperUser() ||
                 $groupHandler->isStaff() ) {
                 return true;
