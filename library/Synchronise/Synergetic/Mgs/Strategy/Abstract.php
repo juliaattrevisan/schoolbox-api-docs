@@ -27,8 +27,8 @@ abstract class Synchronise_Synergetic_Mgs_Strategy_Abstract extends Synchronise_
     const PARENT_DEFAULT_CAMPUS = 1;
 
     // schoolbox email enabled
-    const STUDENT_LOCAL_EMAIL = 0;
-    const STAFF_LOCAL_EMAIL = 0;
+    const STUDENT_LOCAL_EMAIL = 1;
+    const STAFF_LOCAL_EMAIL = 1;
     const PARENT_LOCAL_EMAIL = 0;
 
     // school-based email domains (parents don't have them)
