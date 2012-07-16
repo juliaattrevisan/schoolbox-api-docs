@@ -61,6 +61,13 @@ abstract class Calendar_Week_Abstract {
 
 		$selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
 
+		/* Default url access doesn't have a date portion
+		 * i.e. /calendar/week/. In that case, just use now
+		 */
+		if ($selectedDate <= 0) {
+		    $selectedDate = time();
+		}
+
 		$this->setSelectedDate($selectedDate);
 
 		if ($selectedDate <= 0) {
