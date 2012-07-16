@@ -410,8 +410,7 @@ class Eportfolio_Container {
         } elseif($groupHandler->isStudent($userID)) {
             // student: can be edited by you, your parents, teachers or supers
             if ($groupHandler->isSuperUser() ||
-                $groupHandler->isStaff() ||
-                $groupHandler->isParentOfChild($userID)) {
+                $groupHandler->isStaff() ) {
                 return true;
             }
         }
