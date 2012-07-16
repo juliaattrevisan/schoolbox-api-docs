@@ -147,9 +147,17 @@ else if (is_numeric($_GET['deleteService']) && is_numeric($_GET['sid']) && is_nu
 /* Switch logins to the current user being viewed
  */
 else if ($_POST['login']) {
+	$oldSession = $_SESSION;
+
 	$sessionHandler = new Session();
 
 	if ($sessionHandler->create($_POST['login'])) {
+
+		/* Logging
+		 */
+		$logger = new User_Logger_AssumeUser($oldSession, $userHandler->getByUsername($_POST['login']));
+		$logger->notify();
+
 		SitePage::localRedir('/');
 	}
 	else {
