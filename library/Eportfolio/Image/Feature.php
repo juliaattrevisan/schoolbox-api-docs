@@ -87,6 +87,7 @@ class Eportfolio_Image_Feature extends Eportfolio_Image_Abstract {
 
 		$this->getPage()->setVar('PREVIEW_IMAGE_URL', $config['url']);
 		$this->getPage()->setVar('PREVIEW_IMAGE_DESC', Scrub::text($config['url']));
+		$this->getPage()->setVar('PREVIEW_IMAGE_PIXELS', Scrub::text($config['pixel']));
 
 		if ($url->isUrl()) {
 			$this->getPage()->setVar('CONTENT_URL_START', "<a href=\"" . $url->getBase64EncodedRedirect() . "\" target=\"_blank\">");
