@@ -22,6 +22,7 @@ class User_Portrait {
 	/* Placeholder image file
 	 */
 	private $placeholder = '';
+	private $isPlaceholder = true;
 
 	/**
 	 * Constructor
@@ -58,10 +59,19 @@ class User_Portrait {
 	 * @return bool
 	 */
 	public function stream() {
-		header("Content-Type: image/jpg");
-		header("Content-Disposition: filename={$this->getExternalUserId()}.jpg");
+		$image = $this->generatePortrait();
 
-		imagejpeg($this->generatePortrait());
+		if ($this->isPlaceholder()) {
+			header("Content-Type: image/png");
+			header("Content-Disposition: filename={$this->getExternalUserId()}.png");
+			imagejpeg($image);
+
+		}
+		else {
+			header("Content-Type: image/jpg");
+			header("Content-Disposition: filename={$this->getExternalUserId()}.jpg");
+			imagejpeg($image);
+		}
 	}
 
 	/**
@@ -84,6 +94,8 @@ class User_Portrait {
 			/* If the portrait path exists, use it
 			 */
 			if ($portraitPathExists) {
+				$this->setIsPlaceholder(false);
+
 				$portraitPath = $portraitPathExists;
 			}
 		}
@@ -117,13 +129,13 @@ class User_Portrait {
 
 		/* Parents can always see their children's portraits
 		 */
-		if ($this->getGroupHandler->isParentOfChild($this->getUserId())) {
+		if ($this->getGroupHandler()->isParentOfChild($this->getUserId())) {
 			return true;
 		}
 
 		/* Students can see other students' portraits if Hide Student Photo policy is disabled
 		 */
-		if ((Cfg::get('protect_student_photo') == 0) && ($this->getGroupHandler()->isStudent()) && ($this->getGroupHandler->isStudent($this->getUserId()))) {
+		if ((Cfg::get('protect_student_photo') == 0) && ($this->getGroupHandler()->isStudent()) && ($this->getGroupHandler()->isStudent($this->getUserId()))) {
 			return true;
 		}
 
@@ -299,5 +311,23 @@ class User_Portrait {
 	 */
 	private function getPlaceholder() {
 		return $this->placeholder;
+	}
+
+	/**
+	 * Set placeholder boolean
+	 *
+	 * @param $isPlaceholder
+	 */
+	private function setIsPlaceholder($isPlaceholder) {
+		$this->isPlaceholder = $isPlaceholder;
+	}
+
+	/**
+	 * Find out if this is a placeholder image or not
+	 *
+	 * @return bool
+	 */
+	private function isPlaceholder() {
+		return $this->isPlaceholder;
 	}
 }
