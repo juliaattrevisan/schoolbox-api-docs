@@ -73,6 +73,12 @@ class Calendar_Event_Type_Day_Renderer extends Calendar_Event_Type_Renderer_Abst
 			if ($currentEvent->canAttend()) {
 				$this->getPage()->parse('attendance_icon_block', 'attendance_icon');
 
+				/* Anyone with write access can approve attendance
+				 */
+				if ($this->getGroupHandler()->getPermission($currentEvent->getCategoryId()) > READ_ACCESS) {
+					$this->parse('attendance_list_button_block', 'attendance_list_button');
+				}
+
 				if ($this->getGroupHandler()->isStudent($_SESSION['id'])) {
 					if ($attendance = $this->getCalendarHandler()->getAttendanceByEventAndUser($currentEvent->getEventId(), $_SESSION['id'])) {
 
