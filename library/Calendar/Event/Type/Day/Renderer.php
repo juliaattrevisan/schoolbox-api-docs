@@ -107,7 +107,7 @@ class Calendar_Event_Type_Day_Renderer extends Calendar_Event_Type_Renderer_Abst
 			 */
 			if (is_numeric($currentEvent->getCategoryId())) {
 				$this->getPage()->setVar(array(
-					'HAS_CATEGORY_ID' => $currentEvent->getCategoryId,
+					'HAS_CATEGORY_ID' => $currentEvent->getCategoryId(),
 					'HAS_CATEGORY_NAME' => $currentEvent->getCategoryName(),
 				));
 
