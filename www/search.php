@@ -389,7 +389,7 @@ if (!empty($result['link'])) {
             'LINK_URL'         => $linkUrl,
             'LINK_ICON'        => $link['iconFile'],
             'LINK_TARGET'      => $linkTarget,
-            'LINK_DESCRIPTION' => Scrub::text($link['description']),
+            'LINK_DESCRIPTION' => html_entity_decode(Scrub::text($link['description'])),
             'LINK_COMMENT'     => html_entity_decode(TextFormatter::cutSentence(Scrub::text($link['comment']), 150)),
             'LINK_OWNER'       => $link['uid'],
             'LINK_OWNER_NAME'  => $userHandler->formatName($link),
