@@ -72,9 +72,12 @@
 
         $j('.print').click( function (e) {
             var date = $j('#reportDate').val().replace(/\//g, '-');
-            window.location = location.protocol+'//'+ location.host + '/modules/leave/report/house/{HOUSE_ID}/' + date + '/print';
+            window.open(
+                location.protocol+'//'+ location.host + '/modules/leave/report/house/{HOUSE_ID}/' + date + '/print',
+                '_blank' // <- This is what makes it open in a new window.
+            );
             return false;
-        })
+        });
 
         /*
         * Hack for the hidden column next to the BS.
