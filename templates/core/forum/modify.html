@@ -1,73 +1,73 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript">
-tinyMCE.init({
-	mode : "textareas",
-	theme : "advanced",
-    skin : "cirkuit",
-	plugins : "pdw,tabfocus,advimage,inlinepopups,assetmanager,paste,spellchecker",
-	content_css : "/css/core/tiny.css",
-	theme_advanced_toolbar_location : "top",
-	theme_advanced_toolbar_align : "left",
-    theme_advanced_buttons1 : "bold,italic,underline,separator,bullist,numlist,separator,link,unlink,image,media,separator,undo,redo,separator,pdw_toggle",
-    theme_advanced_buttons2 : "forecolor,formatselect,fontsizeselect,separator,justifyleft,justifycenter,justifyright,z,spellchecker",
-    theme_advanced_buttons3 : "outdent,indent,sub,sup,separator,hr,charmap,separator,seperator,ltr,rtl,selectall,pastetext,pasteword,separator,removeformat,cleanup,code",
-    theme_advanced_buttons4 : "tablecontrols",
-    pdw_toggle_on : 1,
-    pdw_toggle_toolbars : '2, 3, 4',
-    extended_valid_elements : "img[src|border|alt=|title|hspace|vspace|width|height|align|style]",
-    tabfocus_elements : ":prev,:next",
-	file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
-	file_browser_category_id : '{CATEGORY_ID}',
-	convert_urls : false
-});
-</script>
-<script type="text/javascript">
-$j(function(){
+    tinyMCE.init({
+        mode : "textareas",
+        theme : "advanced",
+        skin : "cirkuit",
+        plugins : "pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
+        content_css : "/css/core/tiny.css",
+        theme_advanced_toolbar_location : "top",
+        theme_advanced_toolbar_align : "left",
+        theme_advanced_statusbar_location : "bottom",
+        theme_advanced_buttons1 : "bold,italic,underline,separator,bullist,numlist,separator,link,unlink,image,media,separator,undo,redo,separator,pdw_toggle",
+        theme_advanced_buttons2 : "forecolor,formatselect,fontsizeselect,separator,justifyleft,justifycenter,justifyright,z,spellchecker",
+        theme_advanced_buttons3 : "outdent,indent,sub,sup,separator,hr,charmap,separator,seperator,ltr,rtl,selectall,pastetext,pasteword,separator,removeformat,cleanup,code",
+        theme_advanced_buttons4 : "tablecontrols",
+        pdw_toggle_on : 1,
+        pdw_toggle_toolbars : '2, 3, 4',
+        extended_valid_elements : "img[src|border|alt=|title|hspace|vspace|width|height|align|style]",
+        tabfocus_elements : ":prev,:next",
+        file_browser_callback : 'tinyMCE.activeEditor.plugins.assetmanager.fileBrowser',
+        file_browser_category_id : '{CATEGORY_ID}',
+        convert_urls : false
+    });
 
-	$j('#forumForm').submit(function () {
-		
-		tinyMCE.triggerSave();
+    $j(function(){
 
-		if ($j('#forumTitle') && $j('#forumTitle').val() == '') {
-			alert('You need to enter a title');
-			return false;
-		}
-		else if ($j('#forumBody').val() == '') {
-			alert('You need to enter a message');
-			return false;
-		}
-		
-		return true;
-	});
+        $j('#forumForm').submit(function () {
 
-	$j('#quote').click(function(){
-		if(getSelectedText()) {
-			$j('#body').html(getSelectedText());
-			var quote = '', byline = '';
-			if ($j('#byline').attr('checked') == true)
-				byline = '{QUOTE_USER}';
-				
-			quote = '<cite>'+byline+'</cite><blockquote><p>'+getSelectedText()+'</p></blockquote>';
-			tinyMCE.execCommand('mceInsertContent',false,quote); 
-			return false;
-		} else
-			alert('Please highlight the passage you wish to quote and try again.');
-	});
-	
-	function getSelectedText(){
-		if(window.getSelection){
-			return window.getSelection().toString();
-		}
-		else if(document.getSelection){
-			return document.getSelection();
-		}
-		else if(document.selection){
-			return document.selection.createRange().text;
-		}
-	} 
-	
-});
+            tinyMCE.triggerSave();
+
+            if ($j('#forumTitle') && $j('#forumTitle').val() == '') {
+                alert('You need to enter a title');
+                return false;
+            }
+            else if ($j('#forumBody').val() == '') {
+                alert('You need to enter a message');
+                return false;
+            }
+
+            return true;
+        });
+
+        $j('#quote').click(function(){
+            if(getSelectedText()) {
+                $j('#body').html(getSelectedText());
+                var quote = '', byline = '';
+                if ($j('#byline').attr('checked') == true)
+                    byline = '{QUOTE_USER}';
+
+                quote = '<cite>'+byline+'</cite><blockquote><p>'+getSelectedText()+'</p></blockquote>';
+                tinyMCE.execCommand('mceInsertContent',false,quote);
+                return false;
+            } else
+                alert('Please highlight the passage you wish to quote and try again.');
+        });
+
+        function getSelectedText(){
+            if(window.getSelection){
+                return window.getSelection().toString();
+            }
+            else if(document.getSelection){
+                return document.getSelection();
+            }
+            else if(document.selection){
+                return document.selection.createRange().text;
+            }
+        }
+
+    });
 </script>
 <!-- END custom_head -->
 
