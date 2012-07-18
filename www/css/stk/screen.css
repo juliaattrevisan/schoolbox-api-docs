@@ -102,7 +102,6 @@ h3, #nav h3, .add-component .notification {
 
 #tabs-homepage .customise-components {
     background-color: #E5F4FB;
-    border:1px solid #eee;
 }
 
 #tabs-homepage .customise-components h3 {
@@ -138,8 +137,6 @@ h3, #nav h3, .add-component .notification {
     background-color: #E5F4FB;
     color: #000;
     font-weight:bold;
-    border:1px solid #eee;
-    border-bottom:0;
 }
 
 #tabs-homepage #tabs-sub .ui-tabs-nav li a {
@@ -267,7 +264,7 @@ h3, #nav h3, .add-component .notification {
 }
 
 .otherMonth .dayWrap p, .otherMonth .dayWrap a {
-    color: #797979;
+    color: #000;
 }
 
 td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box, td.cal-left a.back, td.cal-left a.forward, td.cal-right a.filter-change, .day-block {
@@ -295,7 +292,8 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 }
 
 .otherMonth .dayWrap, .past .dayWrap {
-    background-color: #91b5cf;
+    background-color: #E5F4FB;
+    color:#000;
 }
 
 #month-view td.dark, #week-view td.dark {
@@ -349,6 +347,10 @@ td.cal-right .link-case .filter-drop .filter-list {
     background: none repeat scroll 0 0 #FAEDC3;
 }
 
+#tree tbody tr.selected td, #file-list tbody tr.selected td{
+    background-color: #E5F4FB !important;
+}
+
 .submit-btn-plain {
     background-color: #f0f2f7;
     background-image: -webkit-gradient(linear, left top, left bottom, from(#f0f2f7), to(#e0e5ef));
@@ -380,7 +382,7 @@ td.cal-right .link-case .filter-drop .filter-list {
 }
 
 .standardForm td {
-    border-color: #dddddd;
+    border-color: #eee;
 }
 
 #footer ul {
