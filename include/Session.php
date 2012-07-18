@@ -191,7 +191,9 @@ class Session {
                                         case 'mgs':
                                             $errMsg .= 'Please visit <a href="https://owa.mgs.vic.edu.au/owa">owa.mgs.vic.edu.au/owa</a> to reset your password.';
                                             break;
-
+                                        case 'bialik':
+                                            $errMsg .= 'Please visit the school email system with this link:- <a href="https://webmail.bialik.vic.edu.au/owa">webmail.bialik.vic.edu.au</a> to reset your password.';
+                                            break;
                                         default:
                                             $errMsg .= 'Please contact a system administrator to regain access to your account.';
                                             break;
