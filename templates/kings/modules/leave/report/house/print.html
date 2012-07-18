@@ -1,6 +1,6 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
-<link rel="stylesheet" type="text/css" href="/css/{SITE_LOCATION}/print.css" />
+<link rel="stylesheet" type="text/css"  href="/css/{SITE_LOCATION}/print.css" />
 <script type="text/javascript">
     $j(function() {
         /*
@@ -11,17 +11,6 @@
     });
 </script>
 <!-- END custom_head -->
-<div id="letterhead">
-
-    <img src="/images/kings/school-crest.png" alt="The Kings School Crest" />
-    <h1>The King&#39;s School</h1>
-    <p>PO Box 1 Parramatta NSW 2124 Australia<br />
-       Phone (02) 9683 8555 Fax (02) 9683 8488<br />
-       Web Site: www.kings.edu.au<br />
-       e-mail: tks@kings.edu.au</p>
-</div>
-<h1>Leave Report for {HOUSE_NAME}&#8202;&mdash;&#8202;Week Ending {WEEK_ENDING}</h1>
-
 <!--
 - print view has no host and no activity.
 - there is a hidden "AM" column
@@ -43,8 +32,23 @@
             <col span="8" class="multi-cell" width="6%">
             <col width="15%">
         </colgroup>
-        <thead>
 
+        <tbody>
+            <tr>
+                <th colspan="12">
+
+                    <div id="letterhead">
+
+                        <img src="/images/kings/school-crest.png" alt="The Kings School Crest" width="95" height="120"/>
+                        <h1>The King&#39;s School</h1>
+                        <p>PO Box 1 Parramatta NSW 2124 Australia<br />
+                            Phone (02) 9683 8555 Fax (02) 9683 8488<br />
+                            Web Site: www.kings.edu.au<br />
+                            e-mail: tks@kings.edu.au</p>
+                    </div>
+                    <h1>Leave Report for {HOUSE_NAME}&#8202;&mdash;&#8202;Week Ending {WEEK_ENDING}</h1>
+                </th>
+            </tr>
             <tr>
                 <th colspan="3"></th>
                 <!-- BEGIN report_header -->
@@ -83,8 +87,6 @@
 				<!-- END report_header_subtitle -->
                 <th class="text">Approved By</th>
             </tr>
-        </thead>
-        <tbody>
 
             <!-- BEGIN row -->
             <!-- BEGIN request -->

@@ -2,13 +2,14 @@
 ******************************/
 
 @page {size:landscape}
+
 body{font-family:Arial, Helvetica, sans-serif;font-size:10px !important;}
 #container{margin:0; width:100% !important; }
 #calendar h3{float:none; width:100%;text-align:center; font-weight:bold;}
 #calendar { height:100%; }
-table { vertical-align:top; font-size:10px; width:100%;}
-table td{vertical-align:top; text-align:left; font-size:10px; width:14.2%}
-table td.dark{padding:4px; text-align:center; background-color:#000 }
+#calendar table { vertical-align:top; font-size:10px; width:100%;}
+#calendar table td{vertical-align:top; text-align:left; font-size:10px; width:14.2%}
+#calendar table td.dark{padding:4px; text-align:center; background-color:#000 }
 
 #nav, #tabs, #header, #footer, .link-case, .datepicker-box, .header_option, .back, .forward, .dates, .note, .btn, .created,
 .calendar-controls .float-left, .calendar-controls .float-right
@@ -89,79 +90,10 @@ h4{font-size:10px;}
 
 /*********** SORTABLE TABLES (incl leave report)
 ******************************/
-
-tr.leave-pending span.grey {
-	color: #ccc;
+#letterhead img {
+    position:absolute;
+    top: 0;
+    left: 0;
+    height: 120px;
+    width:95px;
 }
-
-.sortable-table,
-.signatures {
-	border-collapse: collapse;
-    width:100% !important;
-    table-layout: fixed;
-    page-break-inside:avoid
-}
-.signatures{
-    margin-top:8px;
-}
-
-.sortable-table .no-arrow {
-    background: none;
-}
-
-.sortable-table a {
-	text-decoration: none;
-	color: #000;
-}
-
-.sortable-table td,
-.sortable-table th {
-	padding: 7px 2px;
-}
-.sortable-table .leaveReportHeaderDate {
-	text-align: center;
-}
-.sortable-table th,
-.sortable-table td {
-	text-align: left;
-}
-.sortable-table .leaveReportMeridiem {
-	text-align: center;
-}
-.sortable-table th.leaveReportYear {
-	text-align: center;
-    width:2cm;
-}
-
-/* Date the report was generated
- */`
-.leaveReportGeneratedAt {
-	margin-bottom: 20px;
-}
-
-.sortable-table td.leaveReportNoBorder {
-	border-right: 0px;
-	border-left: 0px;
-}
-
-.sortable-table td.leaveReportNoRightBorder {
-	border-right: 0px;
-}
-.sortable-table td, .signatures td { border: 1px solid #000; border-collapse: collapse; }
-.signatures .leaveReportNoPrint { border-width: 1px 0 }
-.sortable-table th.leaveReportHide,
-.signatures th.leaveReportHide{ border: 0; }
-.no-left-border { border-left-width: 0; }
-.no-right-border { border-right-width: 0; }
-.sortable-table .leaveReportHide,
-.signatures .leaveReportHide{
-    width: 0; padding: 0; overflow:hidden;
-    border-top: 1px solid #000;
-    border-bottom: 1px solid #000;
-    border-left-width: 0;
-    border-right-width: 0;
-    display: none;
-}
-.leaveReportNoPrint { display:none; width: 0; padding: 0; overflow:hidden; border: 0; }
-
-.legendColorBox { width: 0.01%; }
