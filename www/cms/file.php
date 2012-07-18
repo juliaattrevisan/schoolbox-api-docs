@@ -150,10 +150,12 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 					$this->parse('my_files_block', 'my_files', true);
 				}
 			}
-			$this->parse('optgroup_block', 'optgroup', true);
+
 			$this->setVar('my_files_block', '');
 		}
 	}
+
+	$this->parse('optgroup_block', 'optgroup', true);
 
 	/* Check for files in the root
 	 */
@@ -173,9 +175,9 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 			$this->setVar($output);
 			$this->parse('my_files_block', 'my_files', true);
 		}
-
-		$this->parse('optgroup_block', 'optgroup', true);
 	}
+
+	$this->parse('optgroup_block', 'optgroup', true);
 
 	/* Parse show_my_files only if WebDAV is disabled
 	 */
