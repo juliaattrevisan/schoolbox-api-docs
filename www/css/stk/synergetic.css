@@ -1,0 +1,7 @@
+
+/* Hide header */
+#ctl00_HeaderDiv { display: none; }
+
+.bodyDiv {
+    background: none;
+}
