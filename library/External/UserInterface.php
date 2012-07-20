@@ -22,4 +22,5 @@ interface External_UserInterface {
 	public function getStudentUserAccountInfo();
 	public function getParentUserAccountInfo();
 	public function getStaffUserAccountInfo();
+	public function determineBoarderType($boarderValue);
 }

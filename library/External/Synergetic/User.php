@@ -513,7 +513,10 @@ class External_Synergetic_User implements External_UserInterface {
 	public function determineBoarderType($boarderValue) {
 		$boarders = array('B', 'W');
 
-		if (in_array($boarderValue, $boarders)) {
+		if (!strlen($boarderValue)) {
+			return '';
+		}
+		else if (in_array($boarderValue, $boarders)) {
 			return 'Boarder';
 		}
 

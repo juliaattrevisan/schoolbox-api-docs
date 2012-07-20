@@ -244,6 +244,26 @@ class External_Schoolbox_User implements External_UserInterface {
 
     }
 
+	/**
+	 * Determine the boarder type based on a value
+	 * Returns a human-readable string
+	 *
+	 * @param $boarderValue
+	 * @return string
+	 */
+	public function determineBoarderType($boarderValue) {
+		$boarders = array('B', 'W');
+
+		if (!strlen($boarderValue)) {
+			return '';
+		}
+		else if (in_array($boarderValue, $boarders)) {
+			return 'Boarder';
+		}
+
+		return 'Day';
+	}
+
     /**
      * Returns a local path to the user's portrait
      *
