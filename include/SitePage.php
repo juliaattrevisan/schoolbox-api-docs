@@ -778,10 +778,25 @@ class SitePage extends Page
 	 * @param  $file
 	 * @return void
 	 */
-	static public function localRedir($file)
+	static public function localRedir($file, $keepProcessing = false)
 	{
 		header('Location: ' . SitePage::conType() . $_SERVER['HTTP_HOST'] . $file);
-		exit;
+        // don't quit
+        if($keepProcessing) {
+            ob_end_clean();
+            header("Connection: close\r\n");
+            ignore_user_abort();
+            ob_start();
+            // header("Content-Encoding: none\r\n"); // might be required to prevent gzip encoding header
+            header("Content-Length: 0");
+            ob_end_flush();
+            flush();
+            session_write_close();
+        }
+        // quit
+        else {
+            exit;
+        }
 	}
 
 	function goLoginPage($error = '', $page = '')

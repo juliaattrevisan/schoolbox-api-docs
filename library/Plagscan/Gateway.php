@@ -180,8 +180,13 @@ class Plagscan_Gateway {
     }
 
     private function parseXmlResponse ($response) {
-        list($header, $content) = explode("\r\n\r\n", $response, 2);  
+        list($header, $content) = explode("\r\n\r\n", $response, 2);
 
-        return new SimpleXMLElement($content);
+        try {
+            return new SimpleXMLElement($content);
+        }
+        catch(Exception $e) {
+            return false;
+        }
     }
 }
