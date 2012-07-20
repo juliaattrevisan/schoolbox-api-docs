@@ -1,6 +1,6 @@
 <div class="box clearfix" id="component{COMPONENT_HOMEPAGE_ID}">
 	<h2>{CALENDAR_TITLE}</h2>
-	<!-- BEGIN config --> 
+	<!-- BEGIN config -->
 	<a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a> <a class="close-delete" href="#"><span>X</span></a>
 	<div class="editPanel settings hide">
 		<form action="/homepage/configForm.php" method="get">
@@ -35,18 +35,43 @@
                 <h4 class="eventListing"><span style="background-color:{CAL_COLOUR}">{CAL_NOTE}</span></h4>
 
 				<div class="hidden-fields clearfix">
-					<h4><!-- BEGIN time --> 
-						<span class="time"><strong>{CAL_TIME}</strong></span> 
-						<!-- END time -->{CAL_NOTE} </h4>
-					<p class="meta">Event Type: {CAL_TYPE}<br/>
+					<h4><!-- BEGIN time -->
+						<span class="time"><strong>{CAL_TIME}</strong></span>
+						<!-- END time -->
+						<!-- BEGIN attendance_icon --><span class="float-right">A</span><!-- END attendance_icon -->
+
+						{CAL_NOTE}
+					</h4>
+					<p class="meta">
+						Event Type: {CAL_TYPE}<br/>
 						Created by: <a href="/search/user/{CAL_AUTHOR_ID}">{CAL_AUTHOR}</a><br/>
-						{CAL_LOCATION} {CAL_DETAIL}</p>
-					<span class="modify">{CAL_MODIFY}</span> </div>
+						{CAL_LOCATION} {CAL_DETAIL}
+					</p>
+
+					<span class="modify">{CAL_MODIFY}</span>
+
+					<!-- BEGIN attendance_status -->
+					<p class="meta">Attendance Status: {ATTENDANCE_STATUS}</p>
+					<!-- END attendance_status -->
+
+					<div class="modify-event">
+						<!-- BEGIN attendance_request_button -->
+						<form method="post">
+							<input name="event[id]" type="hidden" value="{CAL_ID}">
+							<a class="btn modify float-left attendance-request" href="#"><span></span>{ATTENDANCE_REQUEST_ACTION}</a>
+						</form>
+						<!-- END attendance_request_button -->
+
+						<!-- BEGIN attendance_list_button -->
+						<a class="btn modify float-left" href="/calendar/attendance/list/{CAL_ID}"><span></span>Attendance List</a>
+						<!-- END attendance_list_button -->
+					</div>
+				</div>
 			</li>
 			<!-- END group_events -->
 		</ul>
 	</div>
 	<!-- BEGIN submit_event -->
 	<p class="interact"><a href="/calendar/modify.php?level=2&sid={ID}" class="btn add"><span></span>Add Event</a></p>
-	<!-- END submit_event --> 
+	<!-- END submit_event -->
 </div>

@@ -244,7 +244,8 @@ class Calendar extends DeprecatedModel {
 						TIME_FORMAT(endTime, '".Cfg::get('calendar_time_format')."') as endTimeString,
 						type, note, location, detail,
 						user.id as uid, title, firstname, lastname,
-						eventType, eventColour
+						eventType, eventColour,
+						attendance
 				  FROM event
 				  LEFT JOIN user ON owner = user.id
 				  LEFT JOIN luEventType ON type = eventTypeID

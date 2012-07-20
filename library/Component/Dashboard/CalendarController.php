@@ -86,14 +86,14 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 		for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
 			$currentEvent = $iterator->current();
 
-			if ($currentEvent->getStartTime() == "0:00" || strtolower($currentEvent->getStartTime()) == "12:00am" || strtolower($currentEvent->getStartTime()) == "12:00 am" || $currentEvent->getStartTime() == '') {
+			if ($currentEvent->getStartTime()->getTimeOnly() == "0:00" || strtolower($currentEvent->getStartTime()->getTimeOnly()) == "12:00am" || strtolower($currentEvent->getStartTime()->getTimeOnly()) == "12:00 am" || $currentEvent->getStartTime()->getTimeOnly() == '') {
 				$this->setVar("TIME", "");
 			}
-			else if ($currentEvent->getEndTime() == "0:00" || strtolower($currentEvent->getEndTime()) == "12:00am" || strtolower($currentEvent->getEndTime()) == "12:00 am" || $currentEvent->getEndTime() == '') {
-				$this->setVar("TIME", $currentEvent->getStartTime());
+			else if ($currentEvent->getEndTime()->getTimeOnly() == "0:00" || strtolower($currentEvent->getEndTime()->getTimeOnly()) == "12:00am" || strtolower($currentEvent->getEndTime()->getTimeOnly()) == "12:00 am" || $currentEvent->getEndTime()->getTimeOnly() == '') {
+				$this->setVar("TIME", $currentEvent->getStartTime()->getTimeOnly());
 			}
 			else {
-				$this->setVar("TIME", $currentEvent->getStartTime()." - ".$currentEvent->getEndTime());
+				$this->setVar("TIME", $currentEvent->getStartTime()->getTimeOnly()." - ".$currentEvent->getEndTime()->getTimeOnly());
 			}
 
 			$this->setVar(array(
@@ -105,7 +105,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 				'COLOUR' => $currentEvent->getColour(),
 				'EVENT_TYPE' => 'type' . $currentEvent->getType(),
 				'TYPE' => $currentEvent->getEventType(),
-				'AUTHOR' => $currentEvent->getAuthor(),
+				'AUTHOR' => $currentEvent->getAuthorName(),
 				'AUTHOR_ID' => $currentEvent->getAuthorId(),
 			));
 
@@ -119,7 +119,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 				$this->parse('attendance_icon_block', 'attendance_icon');
 
 				if ($this->getGroup()->isStudent($_SESSION['id'])) {
-					if ($attendance = $this->getCalendarHandler()->getAttendanceByEventAndUser($currentEvent->getEventId(), $_SESSION['id'])) {
+					if ($attendance = $this->getCalendar()->getAttendanceByEventAndUser($currentEvent->getEventId(), $_SESSION['id'])) {
 
 						/* Attendance Status
 						 */
