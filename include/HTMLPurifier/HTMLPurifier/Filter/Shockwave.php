@@ -5,7 +5,7 @@ class HTMLPurifier_Filter_Shockwave extends HTMLPurifier_Filter
     public $name = 'Shockwave';
 
     public function preFilter($html, $config, $context) {
-		$pre_regex = '#<object[^>]*?classid="clsid:166b1bca-3f9c-11cf-8075-444553540000"[^>]*?width="([^"]+)"[^>]*?height="([^"]+)"[^>]*?>'.
+		$pre_regex = '#<object[^>]*?width="([\d]+)"[^>]*?height="([\d]+)"[^>]*?(classid="clsid:166b1bca-3f9c-11cf-8075-444553540000"|type="application/x-director")[^>]*?>'.
 					 '.*?<param name="src" value="([A-Za-z0-9\-_\.\?/=&:%]+)"[^>]*?>.*?</object>#s';
         $pre_replace = '<span class="shockwave-embed width-\1 height-\2">\3</span>';
        
@@ -26,8 +26,9 @@ class HTMLPurifier_Filter_Shockwave extends HTMLPurifier_Filter
         $url = $this->armorUrl($matches[3]);
 		$width = $matches[1];
 		$height = $matches[2];
-        return  '<object classid="clsid:166b1bca-3f9c-11cf-8075-444553540000" '.
-				'width="'.$width.'" height="'.$height.'">'.
+        return  '<object '.
+				'width="'.$width.'" height="'.$height.'" '.
+                'classid="clsid:166b1bca-3f9c-11cf-8075-444553540000">'.
 				'<param name="src" value="'.$url.'"/>'.
 				'<param name="sound" value="true" />'.
 				'<param name="progress" value="true" />'.

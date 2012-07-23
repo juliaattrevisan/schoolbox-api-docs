@@ -8,10 +8,11 @@ class HTMLPurifier_Filter_WindowsMedia extends HTMLPurifier_Filter
 
 		/* First find out if the autostart param exists
 		 */
-		$pattern = '#<object[^>]*?classid="clsid:6bf52a52-394a-11d3-b153-00c04f79faa6".*?width="([^"]+)".*?height="([^"]+)"[^>]*?>'.
+
+		$pattern = '#<object[^>]*?width="([\d]+)"[^>]*?height="([\d]+)"[^>]*?(classid="clsid:6bf52a52-394a-11d3-b153-00c04f79faa6"|type="application/x-mplayer2")[^>]*?>'.
 					'.*?<param name="autostart" value="([\w]+)"[^>]*?>' .
 					'.*?<param name="url" value="([A-Za-z0-9\-_\.\?/=&:%]+)"[^>]*?>' .
-					'.*?</object>#s';
+					'.*?</object>#is';
 
 		/* Extract an autostart value.
 		 *
@@ -19,16 +20,19 @@ class HTMLPurifier_Filter_WindowsMedia extends HTMLPurifier_Filter
 		 * (by default, autostart is true and the tag is nonexistent) and thus
 		 * the autostart value is false
 		 */
+
 		if (preg_match($pattern, $html)) {
 			$pre_regex = $pattern;
-			$pre_replace = '<span class="windowsmedia-embed width-\1 height-\2 autostart-false">\4</span>';
+			$pre_replace = '<span class="windowsmedia-embed width-\1 height-\2 autostart-false">\5</span>';
 		}
 		else {
-			$pre_regex = '#<object[^>]*?classid="clsid:6bf52a52-394a-11d3-b153-00c04f79faa6".*?width="([^"]+)".*?height="([^"]+)"[^>]*?>'.
-						 '.*?<param name="url" value="([A-Za-z0-9\-_\.\?/=&:%]+)"[^>]*?>' .
-						 '.*?</object>#s';
 
-			$pre_replace = '<span class="windowsmedia-embed width-\1 height-\2 autostart-true">\3</span>';
+			$pre_regex = '#<object[^>]*?width="([\d]+)"[^>]*?height="([\d]+)"[^>]*?(classid="clsid:6bf52a52-394a-11d3-b153-00c04f79faa6"|type="application/x-mplayer2")[^>]*?>'.
+						 '.*?<param name="url" value="([A-Za-z0-9\-_\.\?/=&:%]+)"[^>]*?>' .
+						 '.*?</object>#is';
+
+			$pre_replace = '<span class="windowsmedia-embed width-\1 height-\2 autostart-true">\4</span>';
+
 		}
 
 		$result = preg_replace($pre_regex, $pre_replace, $html);
@@ -49,15 +53,18 @@ class HTMLPurifier_Filter_WindowsMedia extends HTMLPurifier_Filter
     }
 
     protected function postFilterCallback($matches) {
+
         $url = $this->armorUrl($matches[4]);
 
 		$width = $matches[1];
 		$height = $matches[2];
 		$autostart = $matches[3];
 
-        return  '<object classid="clsid:6bf52a52-394a-11d3-b153-00c04f79faa6" '.
-				'width="'.$width.'" height="'.$height.'">'.
-				'<param name="url" value="'.$url.'" />'.
+
+        $outpt ='<object '.
+				'width="'.$width.'" height="'.$height.'" '.
+                'classid="clsid:6bf52a52-394a-11d3-b153-00c04f79faa6"'.
+				'><param name="url" value="'.$url.'" />'.
 				'<param name="autostart" value="' . $autostart . '" />'.
 				'<param name="wmode" value="transparent" />'.
 				'<param name="WindowlessVideo" value="-1" />'.
@@ -72,6 +79,8 @@ class HTMLPurifier_Filter_WindowsMedia extends HTMLPurifier_Filter
 				'</object>'.
 				'<!--<![endif]-->'.
 				'</object>';
+
+        return $outpt;
     }
 }
 

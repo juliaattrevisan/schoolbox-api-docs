@@ -5,9 +5,9 @@ class HTMLPurifier_Filter_Quicktime extends HTMLPurifier_Filter
     public $name = 'Quicktime';
 
     public function preFilter($html, $config, $context) {
-		$pre_regex = '#<object[^>]*?classid="clsid:02bf25d5-8c17-4b23-bc80-d3488abddc6b"[^>]*?width="([^"]+)"[^>]*?height="([^"]+)"[^>]*?>'.
+		$pre_regex = '#<object[^>]*?width="([\d]+)"[^>]*?height="([\d]+)"[^>]*?(classid="clsid:02bf25d5-8c17-4b23-bc80-d3488abddc6b"|type="video/quicktime")[^>]*?>'.
 					 '.*?<param name="src" value="([A-Za-z0-9\-_\.\?/=&:%]+)"[^>]*?>.*?</object>#s';
-        $pre_replace = '<span class="quicktime-embed width-\1 height-\2">\3</span>';
+        $pre_replace = '<span class="quicktime-embed width-\1 height-\2">\4</span>';
        	
 		//return '<span>'.htmlentities($html).'</span>';
 		return preg_replace($pre_regex, $pre_replace, $html);
@@ -26,8 +26,9 @@ class HTMLPurifier_Filter_Quicktime extends HTMLPurifier_Filter
         $url = $this->armorUrl($matches[3]);
 		$width = $matches[1];
 		$height = $matches[2];
-        return  '<object classid="clsid:02bf25d5-8c17-4b23-bc80-d3488abddc6b" '.
-				'width="'.$width.'" height="'.$height.'">'.
+        return  '<object '.
+				'width="'.$width.'" height="'.$height.'" '.
+                'classid="clsid:02bf25d5-8c17-4b23-bc80-d3488abddc6b">'.
 				'<param name="src" value="'.$url.'"/>'.
 				'<param value="true" name="autostart" />'.
 				'<param value="true" name="saveembedtags" />'.

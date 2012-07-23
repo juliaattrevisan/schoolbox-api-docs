@@ -5,7 +5,7 @@ class HTMLPurifier_Filter_Real extends HTMLPurifier_Filter
     public $name = 'Real';
 
     public function preFilter($html, $config, $context) {
-		$pre_regex = '#<object[^>]*?classid="clsid:cfcdaa03-8be4-11cf-b84b-0020afbbccfa".*?width="([^"]+)".*?height="([^"]+)"[^>]*?>'.
+		$pre_regex = '#<object[^>]*?width="([\d]+)"[^>]*?height="([\d]+)"[^>]*?(classid="clsid:cfcdaa03-8be4-11cf-b84b-0020afbbccfa"|type="audio/x-pn-realaudio-plugin")[^>]*?>'.
 					 '.*?<param name="src" value="([A-Za-z0-9\-_\.\?/=&:%]+)"[^>]*?>.*?</object>#s';
         $pre_replace = '<span class="real-embed width-\1 height-\2">\3</span>';
        	
@@ -25,8 +25,9 @@ class HTMLPurifier_Filter_Real extends HTMLPurifier_Filter
         $url = $this->armorUrl($matches[3]);
 		$width = $matches[1];
 		$height = $matches[2];
-        return  '<object classid="clsid:cfcdaa03-8be4-11cf-b84b-0020afbbccfa" '.
-				'width="'.$width.'" height="'.$height.'">'.
+        return  '<object '.
+				'width="'.$width.'" height="'.$height.'" '.
+                'classid="clsid:cfcdaa03-8be4-11cf-b84b-0020afbbccfa">'.
 				'<param name="src" value="'.$url.'" />'.
 				'<param name="autostart" value="true" />'.				
 				'<!--[if !IE]-->'.

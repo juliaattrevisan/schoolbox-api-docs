@@ -15,10 +15,11 @@ if ($textBox['deleted'] == 'true') {
 	unset($textBox);
 }
 
+
 $output = array(
 	'TEXTBOX_HEADING' => !empty($textBox['heading']) ? Scrub::text($textBox['heading']) : 'Text Box',
 	'TEXTBOX_BODY' => Scrub::html($textBox['body']),
-	'TEXTBOX_ID' => $textBox['textBoxID'],
+    'TEXTBOX_ID' => $textBox['textBoxID'],
 );
 
 $this->setVar($output);
@@ -29,6 +30,7 @@ $this->setVar('create_text_block', '');
 $this->setVar('text_locked_block', '');
 
 if (($permission >= WRITE_ACCESS) && ($this->arg[1] == 'textBoxModify') && ($this->arg[2] == $component['homepageComponentLocationID'])) {
+    $this->setVar('TEXTBOX_BODY', $textBox['body']);
 	$this->parse('text_editable_block', 'text_editable');
 }
 else if ($permission >= WRITE_ACCESS && $this->arg[1] == 'textBoxCreate' && $this->arg[2] == $component['homepageComponentLocationID']) {
