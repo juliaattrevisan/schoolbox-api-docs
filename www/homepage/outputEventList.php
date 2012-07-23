@@ -11,8 +11,9 @@ $this->setBlock("group_events", "attendance_status", "attendance_status_block");
 $this->setBlock("group_events", "attendance_request_button", "attendance_request_button_block");
 $this->setBlock("group_events", "attendance_list_button", "attendance_list_button_block");
 
-
-
+$this->setVar(array(
+	'CALENDAR_PREFIX' => 'group'
+));
 
 require_once SITE_root.'/library/calendar.php';
 $calendarHandler = new Calendar;

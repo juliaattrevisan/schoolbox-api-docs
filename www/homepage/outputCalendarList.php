@@ -2,6 +2,19 @@
 /* Output a campus calendar */
 $this->setBlock($componentHandle, "group_events", "group_events_block");
 
+/* From updated calendar
+ */
+$groupHandler = new Group();
+
+$this->setBlock("group_events", "attendance_icon", "attendance_icon_block");
+$this->setBlock("group_events", "attendance_status", "attendance_status_block");
+$this->setBlock("group_events", "attendance_request_button", "attendance_request_button_block");
+$this->setBlock("group_events", "attendance_list_button", "attendance_list_button_block");
+
+$this->setVar(array(
+	'CALENDAR_PREFIX' => 'campus'
+));
+
 require_once SITE_root.'/library/calendar.php';
 $calendarHandler = new Calendar;
 
@@ -17,7 +30,7 @@ $query = "SELECT event.id, UNIX_TIMESTAMP(date) as outputDate, owner,
 			TIME_FORMAT(startTime, '".Cfg::get('calendar_time_format')."') as startTimeString, TIME_FORMAT(endTime,
 			'".Cfg::get('calendar_time_format')."') as endTimeString,priority, note, location, detail,
 			user.id as uid, title, firstname, lastname,
-			eventType, eventColour
+			eventType, eventColour, attendance
 		FROM event
 		    LEFT JOIN user ON owner = user.id
 		    LEFT JOIN luEventType ON type = eventTypeID
@@ -68,6 +81,60 @@ if (is_array($eventList)) {
                       );
 
 		$this->setVar($output);
+
+		/* From updated calendar
+		 */
+
+		/* Clear attendance blocks
+		 */
+		$this->setVar(array(
+			'attendance_icon_block' => '',
+			'attendance_status_block' => '',
+			'attendance_request_button_block' => '',
+			'attendance_list_button_block' => '',
+		));
+
+		/* Event attendance
+		 */
+		if ($event['attendance']) {
+
+			$this->parse('attendance_icon_block', 'attendance_icon');
+
+			/* Anyone with write access can approve attendance
+			 */
+			if ($groupHandler->getPermission($categoryID) >= WRITE_ACCESS) {
+				$this->parse('attendance_list_button_block', 'attendance_list_button');
+			}
+
+			if ($groupHandler->isStudent($_SESSION['id'])) {
+				if ($attendance = $calendarHandler->getAttendanceByEventAndUser($event['id'], $_SESSION['id'])) {
+
+					/* Attendance Status
+					 */
+					if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
+						$this->setVar('ATTENDANCE_STATUS', 'Pending');
+					}
+					else if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
+						$this->setVar('ATTENDANCE_STATUS', 'Approved');
+					}
+					else if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
+						$this->setVar('ATTENDANCE_STATUS', 'Rejected');
+					}
+
+					$this->parse('attendance_status_block', 'attendance_status');
+
+					$this->setVar('ATTENDANCE_REQUEST_ACTION', 'Unattend');
+				}
+				else {
+					$this->setVar('ATTENDANCE_REQUEST_ACTION', 'Attend');
+				}
+
+				$this->parse('attendance_request_button_block', 'attendance_request_button');
+			}
+			else if ($groupHandler->isStaff($_SESSION['id'])) {
+				$this->parse('attendance_list_button_block', 'attendance_list_button');
+			}
+		}
 
 		if($event['startTimeString'] == "12:00AM" || $event['startTimeString'] == "")
 				$this->setVar("CAL_TIME", "");
