@@ -47,7 +47,11 @@ $tableList = array(
 	array(
 		'name'   => 'luCampus',
 		'title'  => 'Campus',
-		'index'  => 'id'
+		'index'  => 'id',
+        'fields' => array(
+            'id'    => array('readonly' => '1'),
+            'name'  => array('caption' => 'Name'),
+        )
 	),
 	array(
 		'name'   => 'luEventType',
