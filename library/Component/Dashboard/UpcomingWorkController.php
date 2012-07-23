@@ -141,6 +141,8 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
 
         // for all the work, render output
         if(count($this->allWork) > 0) {
+            $workRendered = false;
+
             foreach($this->allWork as $currentWork) {
 
                 // in the case of parents if somehow we got a student who's not our child, skip over it
@@ -230,6 +232,21 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
                 ));
 
                 $this->parse('work_block', 'work', true);
+                $workRendered = true;
+            }
+            if(!$workRendered) {
+                $this->setVar(array(
+                    'WORK_DATE'         => 'No due work.',
+                    'WORK_SUBJECT'      => '',
+                    'WORK_SUBJECT_ID'   => '',
+                    'WORK_DESCRIPTION'  => '',
+                    'WORK_ACTION'       => '',
+                    'WORK_STATUS'       => '',
+                    'WORK_BOX_ID'       => '',
+                    'WORK_FILE_ID'      => '',
+                    'ROW_COLOR'         => 'dark',
+                ));
+                $this->parse('work_block', 'work', false);
             }
         }
         else {
