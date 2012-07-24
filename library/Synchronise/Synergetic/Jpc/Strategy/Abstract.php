@@ -36,9 +36,11 @@ abstract class Synchronise_Synergetic_Jpc_Strategy_Abstract extends Synchronise_
 
 				/* Perform action; report what happened
 				 */
+                //Leave groups alone once user is defined
+                unset($newUser['group_id']);
+
 				if ($this->getPerformUpdate() === true) {
 					$newUser['id'] = $existing['uid'];
-
 					$this->getUserHandler()->update($newUser);
 					$this->getVerboseFilter()->performUpdate();
 					$this->getVerboseFilter()->incrementUpdated();
@@ -55,6 +57,9 @@ abstract class Synchronise_Synergetic_Jpc_Strategy_Abstract extends Synchronise_
 			else {
 				/* Perform action; report what happened
 				 */
+
+
+
 				if ($this->getPerformUpdate() === true) {
 					$this->getUserHandler()->create($newUser);
 					$this->getVerboseFilter()->performCreation();

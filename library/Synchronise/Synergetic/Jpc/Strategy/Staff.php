@@ -12,7 +12,7 @@
  */
 class Synchronise_Synergetic_Jpc_Strategy_Staff extends Synchronise_Synergetic_Jpc_Strategy_Abstract {
 	protected $strategyTitle = "Update Schoolbox Staff Details Synchronisation";
-    const ADMIN_GROUP_ID = 1;
+    const SUPPORT_GROUP_ID = 11;
     const TEACH_GROUP_ID = 2;
 	const STAFF_DEFAULT_CAMPUS = 1;
 
@@ -62,7 +62,7 @@ class Synchronise_Synergetic_Jpc_Strategy_Staff extends Synchronise_Synergetic_J
 
 		/* Staff Group ID
 		 */
-		$newUser['group_id'] =  $this->getGroupIDFromCategory($currentUser['StaffCategoryType']);
+		$newUser['group_id'] =  $this->getGroupIDFromCategory($currentUser['StaffCategory']);
 
 
 		return $newUser;
@@ -100,10 +100,11 @@ class Synchronise_Synergetic_Jpc_Strategy_Staff extends Synchronise_Synergetic_J
 
     //Converts Synergetic StaffCategoryType to admin or teacher group
     protected function getGroupIDFromCategory($category) {
+        $teacherGroupList = array('TCHR','REP-TCHR','SCH_OFF','BUS MGR','Maint MGR','Princ_Sec');
 
-        if($category == 'TEACHER')
+        if(in_array($category,$teacherGroupList))
             return self::TEACH_GROUP_ID;
         else
-            return self::ADMIN_GROUP_ID;
+            return self::SUPPORT_GROUP_ID;
     }
 }
