@@ -391,7 +391,7 @@ class SitePage extends Page
 			$this->site == 'joeys' ||
 			$this->site == 'jpc' ||
 			$this->site == 'cathedral' ||
-			($this->site == 'mggs' || $this->site=='grimwade' || $this->site=='wadhurst' || $this->site =='stmichaels' || $this->site == 'bialik' || $this->site == 'moriah') && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent())
+			($this->site == 'mggs' || $this->site=='grimwade' || $this->site=='wadhurst' || $this->site =='stmichaels' || $this->site == 'bialik' || $this->site == 'moriah' || $this->site == 'stk') && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent())
             )
 		) {
 			if ($this->site == 'mgs' || $this->site == 'grimwade' || $this->site =='wadhurst') {
@@ -463,6 +463,9 @@ class SitePage extends Page
             }
             else if ($this->site == 'stmichaels') {
                 $this->setVar('WEBMAIL_LOCATION', 'href="https://mail.stmichaels.vic.edu.au/owa" rel="external"');
+            }
+            else if ($this->site == 'stk') {
+                $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.saintkentigern.com/owa" rel="external"');
             }
 
 			$this->parse('wm_tab', 'webmail_tab');
