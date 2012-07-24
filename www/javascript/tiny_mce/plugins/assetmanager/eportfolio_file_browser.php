@@ -78,8 +78,27 @@ $allFiles = $fileHandler->getAllByFields(array(
 	'parent' => $_GET['categoryID'],
 ));
 
+/* For some reason, not being found by the autoloader?
+ */
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../include/FileType.php');
+
+$fileType = new FileType(null, null);
+$registry = array();
+
 if (is_array($allFiles)) {
 	foreach ($allFiles as $currentFile) {
+
+		/* Flyweight these icons
+		 */
+		if (!isset($registry[$currentFile['mime_type']])) {
+			$iconFile = $fileType->getIconFile($currentFile['mime_type']);
+
+			$registry[$currentFile['mime_type']] = $iconFile;
+		}
+		else {
+			$iconFile = $registry[$currentFile['mime_type']];
+		}
+
         $page->setVar(array (
             'FILE_ID' => $currentFile['id'],
             'DESCRIPTION' => $currentFile['description'],
@@ -91,12 +110,30 @@ if (is_array($allFiles)) {
 		$page->setVar('thumbnail_image_block', '');
 		$page->setVar('thumbnail_flash_block', '');
 
-		if ($filter == 'image') {
-            $page->parse('thumbnail_image_block', 'thumbnail_image');
-        }
-        else {
-            $page->parse('thumbnail_flash_block', 'thumbnail_flash');
-        }
+		/* Assign filetype to do image check
+		 */
+		$fileType->setMime($currentFile['mime_type']);
+
+		/* In Image Embed utility (hide non-images)
+		 */
+		if ($filter['filter'] == 'image') {
+			if ($fileType->isImage()) {
+				$page->parse('thumbnail_image_block', 'thumbnail_image');
+			}
+			else {
+				continue;
+			}
+		}
+		/* Otherwise in Media Embed utility (hide images)
+		 */
+		else {
+			if (!$fileType->isImage()) {
+				$page->parse('thumbnail_flash_block', 'thumbnail_flash');
+			}
+			else {
+				continue;
+			}
+		}
 
         $page->parse('file_block', 'file', true);
 	}

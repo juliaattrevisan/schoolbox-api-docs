@@ -198,7 +198,8 @@ $(window).load(function () {
       <!-- BEGIN file -->
       <li id="file-{FILE_ID}">
         <div class="taskbar">{TITLE_SHORT}</div>
-        <div class="image"> <!-- BEGIN thumbnail_image --><img alt="{DESCRIPTION}" src="/cms/image.php?id={FILE_ID}&height=80&width=75&resample=1" /> <!-- END thumbnail_image -->
+        <div class="image">
+		<!-- BEGIN thumbnail_image --><img alt="{DESCRIPTION}" src="/cms/image.php?id={FILE_ID}&height=100&width=75&resample=1&myFile=1" /> <!-- END thumbnail_image -->
         <!-- BEGIN thumbnail_flash --><img alt="{DESCRIPTION}" src="/images/mime/22x22/{FILE_ICON}?id={FILE_ID}" /> <!-- END thumbnail_flash -->
         	<input type="hidden" class="hide file-url" value="{URL}" /> </div>
       </li>

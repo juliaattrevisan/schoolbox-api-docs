@@ -7,10 +7,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-
-class FileType {
-	private $path = null;
-	private $mime = null;
+class FileType extends DeprecatedModel {
+	public $_table = 'allowedFileTypes';
+	public $_index = 'fileTypeId';
 
 	/**
 	 * Constructor
@@ -21,6 +20,8 @@ class FileType {
 	public function __construct($path, $mime = null) {
 		$this->setPath($path);
 		$this->setMime($mime);
+
+		parent::__construct();
 	}
 
 	/**
@@ -60,6 +61,41 @@ class FileType {
 	}
 
 	/**
+	 * Determine if a file is an image
+	 *
+	 * @return bool
+	 */
+	public function isImage() {
+		if (strstr($this->getMime(), 'image')) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Find out what the iconFile for a particular mime type is
+	 *
+	 * @param $mimeType
+	 * @return mixed
+	 */
+	public function getIconFile($mimeType) {
+		$query = "
+			SELECT iconFile
+			FROM {$this->_table}
+			WHERE mime = '{$mimeType}'
+			LIMIT 1
+		";
+
+		$mimeType = $this->db->getRow($query);
+
+		return $mimeType['iconFile'];
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
 	 * Set path
 	 *
 	 * @param  $val
@@ -85,7 +121,7 @@ class FileType {
 	 * @param  $val
 	 * @return void
 	 */
-	private function setMime($val) {
+	public function setMime($val) {
 		$this->mime = $val;
 	}
 
