@@ -7,6 +7,14 @@ $this->setTab('submission');
 $this->setBlock(TEMPLATE_content, 'browse_row', 'browse_block');
 $this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
 
+$this->setBlock(TEMPLATE_content, 'notification_enable', 'notification_enable_block');
+if(Cfg::get('due_work_notifications_enabled')) {
+    $this->parse('notification_enable_block', 'notification_enable');
+}
+else {
+    $this->setVar('notification_enable_block', '');
+}
+
 $this->setVar('category_select_block', '');
 
 $subBoxHandler = new Submission();
@@ -97,6 +105,8 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         'LATE_HOUR'         => $late_hour,
         'LATE_MIN'          => $late_min,
         'LATE_PM'           => date('a', $late_date) == 'pm' ? 'selected' : '',
+
+        'NOTIF_ENABLED'     => $subbox['notif_enabled'] ? ' checked="checked"' : '',
 
     );
 
@@ -193,6 +203,8 @@ else if($this->arg[0] == 'new') {
         'LATE_HOUR'         => '',
         'LATE_MIN'          => '',
         'LATE_PM'           => 'selected',
+
+        'NOTIF_ENABLED' => ' checked="checked"', // on by default
     );
 
     $this->setVar($output);

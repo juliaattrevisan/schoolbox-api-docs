@@ -72,6 +72,7 @@ if (is_numeric($_POST['id']) && $_POST['due_date']) {
 		'type'              => $_POST['type'],
         'mark_type'         => empty($_POST['marktype']) ? '4' : $_POST['marktype'], // legacy support
         'max_mark'          => !$_POST['markvalue'] ? '1' : $_POST['markvalue'],
+        'notif_enabled'     => !empty($_POST['notif_enabled']) ? true : false,
 	);
 
 	$submission_box_handler->update($submission_box);

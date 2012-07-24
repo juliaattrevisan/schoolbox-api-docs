@@ -215,6 +215,13 @@
                 <input type="hidden" name='fileId' value="{FILEID}" />
 				<input type="hidden" name="id" value="{ID}" /></td>
 		</tr>
+        <!-- BEGIN notification_enable -->
+        <tr>
+            <td><h4>Send Notifications</h4>
+                <em>Should students be sent email reminders about this due work?</em></td>
+            <td><input name="notif_enabled" type="checkbox" value="true"{NOTIF_ENABLED}/></td>
+        </tr>
+        <!-- END notification_enable -->
 	</table>
 	<input type="submit" name="Submit" value="{HEADING}" class="submit-btn-plain" />
 </form>

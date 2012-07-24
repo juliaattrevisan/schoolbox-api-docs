@@ -6,6 +6,7 @@
 define('UPCOMING_WORK_TYPE', 1);
 define('AWAITING_WORK_TYPE', 2);
 define('RETURNED_WORK_TYPE', 3);
+define('OVERDUE_WORK_TYPE',  4);
 define('RECENT_WORK_LIMIT', 12);
 
 class Submission extends DeprecatedModel {
@@ -770,4 +771,89 @@ class Submission extends DeprecatedModel {
 		return $this->db->getRow($query);
 	}
 
+    public function getSubmissionReminderList($status) {
+
+        if($status == UPCOMING_WORK_TYPE) {
+            $sql =
+"SELECT
+  u.id u_id, u.firstname u_firstname, u.lastname u_lastname, u.alt_email u_alt_email,
+  sb.category c_id, c.name c_name,
+  sb.id sb_id, sb.name sb_name, sb.date sb_date
+FROM submission_box sb
+LEFT JOIN category c ON sb.category = c.id
+LEFT JOIN userAccess ua ON ua.service = 1 AND ua.sid = sb.category
+LEFT JOIN `user` u ON ua.uid = u.id
+WHERE u.group_id IN (SELECT id FROM groups WHERE group_type = 'student')
+AND sb.deleted = 0
+AND u.id IS NOT NULL
+AND sb.notif_enabled = 0
+AND sb.notif_sent = 0
+AND sb.`date` BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 1 DAY)
+AND u.id NOT IN (SELECT `owner` FROM student_submission ss WHERE ss.box_id = sb.id)
+ORDER BY u.id ASC, c.id ASC, sb.date ASC";
+
+            $pdo = Database::getInstance()->query($sql);
+            $output = array();
+            $prevUID = -1;
+            $prevCID = -1;
+            while($row = $pdo->fetch(PDO::FETCH_ASSOC)) {
+
+                // different user, create user details
+                if($row['u_id'] != $prevUID) {
+                    $output[$row['u_id']] = array(
+                        'id'         => $row['u_id'],
+                        'firstname'  => $row['u_firstname'],
+                        'lastname'   => $row['u_lastname'],
+                        'alt_email'  => $row['u_alt_email'],
+                        'categories' => array()
+                    );
+                    $prevUID = $row['u_id'];
+                    $prevCID = -1;
+                }
+
+                // different category, create category details
+                if($row['c_id'] != $prevCID) {
+                    $output[$row['u_id']]['categories'][$row['c_id']] = array(
+                        'id'   => $row['c_id'],
+                        'name' => $row['c_name'],
+                        'work' => array()
+                    );
+                    $prevCID = $row['c_id'];
+                }
+
+                $output[$row['u_id']]['categories'][$row['c_id']]['work'][$row['sb_id']] = array(
+                    'id'   => $row['sb_id'],
+                    'name' => $row['sb_name'],
+                    'date' => $row['sb_date'],
+                );
+            }
+
+            return $output;
+        }
+
+        elseif($status == OVERDUE_WORK_TYPE) {
+            $sql =
+"SELECT
+  u.id u_id, u.firstname u_firstname, u.lastname u_lastname, u.alt_email u_alt_email,
+  sb.category c_id, c.name c_name,
+  sb.id sb_id, sb.name sb_name, sb.date sb_date
+FROM submission_box sb
+LEFT JOIN category c ON sb.category = c.id
+LEFT JOIN userAccess ua ON ua.service = 1 AND ua.sid = sb.category
+LEFT JOIN `user` u ON ua.uid = u.id
+WHERE u.group_id IN (SELECT id FROM groups WHERE group_type = 'student')
+AND sb.accept_submission = 1
+AND sb.deleted = 0
+AND u.id IS NOT NULL
+AND sb.notif_enabled = 1
+AND sb.`date` BETWEEN DATE_SUB(NOW(), INTERVAL 1 HOUR) AND NOW()
+AND u.id NOT IN (SELECT `owner` FROM student_submission ss WHERE ss.box_id = sb.id)
+ORDER BY u.id ASC, c.id ASC, sb.date ASC";
+
+            $pdo = Database::getInstance()->query($sql);
+            return $pdo->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        return array();
+    }
 }
