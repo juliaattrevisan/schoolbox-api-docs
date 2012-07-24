@@ -2,10 +2,10 @@
 	$j(function() {
 		$j('#category li:first-child a').addClass('selected');
 		$j('ul.topic li:first-child').show();
-		
-		$j('#category a').click(function() {a
+
+		$j('#category a').click(function() {
 			$j('#category a').removeClass('selected');
-			$j(this).addClass('selected');	
+			$j(this).addClass('selected');
 			var el = $j(this).attr('title');
 			$j('ul.topic > li').hide();
 			$j('ul.topic > li.' + el).show();
@@ -22,7 +22,7 @@
       <!-- END topic_header -->
     </ul>
   <div class="listing">
-  	
+
     <ul class="topic">
     <!-- BEGIN topic -->
     	<li class="hide {TOPIC_CLEAN}">
@@ -37,6 +37,6 @@
     </ul>
     </li>
     <!-- END topic -->
-    </ul> 
-  </div>      
+    </ul>
+  </div>
 </div>
