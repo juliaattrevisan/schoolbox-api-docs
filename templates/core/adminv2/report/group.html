@@ -27,13 +27,14 @@
         <thead>
         <tr>
             <th width="5%">Title</th>
-            <th class="{SORT_FIRSTNAME}"><a href="/adminv2/reports/{SORT_BASE}/firstname/{SORT_FIRSTNAME_DIR}">First name</a></th>
-            <th class="{SORT_LASTNAME}"><a href="/adminv2/reports/{SORT_BASE}/lastname/{SORT_LASTNAME_DIR}">Surname</a></th>
-            <th class="{SORT_SYNERGY_ID}"><a href="/adminv2/reports/{SORT_BASE}/synergy_id/{SORT_SYNERGY_ID_DIR}">External ID</a></th>
-            <th class="{SORT_CAMPUS}"><a href="/adminv2/reports/{SORT_BASE}/campus/{SORT_CAMPUS_DIR}">Campus</a></th>
-            <th class="{SORT_YEAR}"><a href="/adminv2/reports/{SORT_BASE}/year/{SORT_YEAR_DIR}">Year</a></th>
-            <th class="{SORT_ALT_EMAIL}"><a href="/adminv2/reports/{SORT_BASE}/alt_email/{SORT_ALT_EMAIL_DIR}">Email</a></th>
-            <th width="20%"></th>
+            <th width="10%" class="{SORT_FIRSTNAME}"><a href="/adminv2/reports/{SORT_BASE}/firstname/{SORT_FIRSTNAME_DIR}">First name</a></th>
+            <th width="10%" class="{SORT_LASTNAME}"><a href="/adminv2/reports/{SORT_BASE}/lastname/{SORT_LASTNAME_DIR}">Surname</a></th>
+            <th width="10%" class="{SORT_USERNAME}"><a href="/adminv2/reports/{SORT_BASE}/username/{SORT_USERNAME_DIR}">Username</a></th>
+            <th width="10%" class="{SORT_SYNERGY_ID}"><a href="/adminv2/reports/{SORT_BASE}/synergy_id/{SORT_SYNERGY_ID_DIR}">External ID</a></th>
+            <th width="10%" class="{SORT_CAMPUS}"><a href="/adminv2/reports/{SORT_BASE}/campus/{SORT_CAMPUS_DIR}">Campus</a></th>
+            <th width="10%" class="{SORT_YEAR}"><a href="/adminv2/reports/{SORT_BASE}/year/{SORT_YEAR_DIR}">Year</a></th>
+            <th width="17%" class="{SORT_ALT_EMAIL}"><a href="/adminv2/reports/{SORT_BASE}/alt_email/{SORT_ALT_EMAIL_DIR}">Email</a></th>
+            <th width="120px"></th>
         </tr>
         </thead>
         <tbody>
@@ -42,6 +43,7 @@
             <td>{USER_TITLE}</td>
             <td><a href="/search/user/{USER_ID}">{USER_FIRSTNAME}</a></td>
             <td><a href="/search/user/{USER_ID}">{USER_SURNAME}</a></td>
+            <td>{USER_USERNAME}</td>
             <td>{USER_SYNERGY_ID}</td>
             <td>{USER_CAMPUS}</td>
             <td>{USER_YEAR}</td>

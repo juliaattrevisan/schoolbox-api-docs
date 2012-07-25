@@ -11,7 +11,6 @@ class Report_Group extends Report_Abstract implements Report_IReport {
     private $groupID = null;
     private $dataSet;
     private $dataCount;
-    private $fullDataSet;
     private $pageNum;
     private $perPage;
     private $dataResource;
