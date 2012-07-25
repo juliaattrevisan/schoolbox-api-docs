@@ -343,22 +343,14 @@ class News extends DeprecatedModel {
     }
 
 
+    public function getFilteredNews($userID = 0, $campus = array(), $groupID = 0, $id = 0, $archive = false, $index = 0, $limit = 0) {
+        $userHandler = new Group;
+        $shareResults = array();
 
-    /**
-     * @param int $id
-     * @param bool $archive
-     * @param int $index
-     * @param int $limit
-     * @return array|bool
-     */
-	function getNews($id = 0, $archive = false, $index = 0, $limit = 0) {
-      $userHandler = new Group;
-      $shareResults = array();
-
-      /* Prevent copies of posts appearing if they are posted to another group.
-       */
-      if (!$userHandler->isSuperuser()) {
-         $query = "
+        /* Prevent copies of posts appearing if they are posted to another group.
+        */
+        if (!$userHandler->isSuperuser($userID)) {
+            $query = "
          SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner, news_items.item_body,
             DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
             DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
@@ -366,27 +358,27 @@ class News extends DeprecatedModel {
          FROM `".$this->_table."`
          LEFT JOIN user ON news_items.item_owner = user.id
          JOIN newsCampus ON newsCampus.id = news_items.item_id
-            AND newsCampus.campus IN(".implode(',',$_SESSION['campus']).")
+            AND newsCampus.campus IN(".implode(',',$campus).")
             OR news_items.item_campus='4'
          JOIN newsGroup ON newsGroup.id = news_items.item_id
-            AND newsGroup.gid = '".$_SESSION['gid']."'
+            AND newsGroup.gid = '".$groupID."'
          JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
-         WHERE news_items.item_owner != '".$_SESSION['id']."' AND news_items.item_deleted = 0";
+         WHERE news_items.item_owner != '".$userID."' AND news_items.item_deleted = 0";
 
-         if($id)
-            $query .=" AND news_items.item_id = '$id'";
-         else if($archive)
-            $query .=" AND item_datetime_published < NOW() AND news_items.item_datetime_expires <= NOW() ";
-         else
-            $query .=" AND item_datetime_published < NOW() AND news_items.item_datetime_expires > NOW() ";
+            if($id)
+                $query .=" AND news_items.item_id = '$id'";
+            else if($archive)
+                $query .=" AND item_datetime_published < NOW() AND news_items.item_datetime_expires <= NOW() ";
+            else
+                $query .=" AND item_datetime_published < NOW() AND news_items.item_datetime_expires > NOW() ";
 
 
-         $query .= " GROUP BY news_items.item_id ORDER BY newsTopic.newsTopicID, news_items.item_datetime_posted DESC";
+            $query .= " GROUP BY news_items.item_id ORDER BY newsTopic.newsTopicID, news_items.item_datetime_posted DESC";
 
-         $shareResults = $this->db->getAll($query);
-      }
+            $shareResults = $this->db->getAll($query);
+        }
 
-		$query = "
+        $query = "
 		SELECT DISTINCT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_body,
 			DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
 			DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
@@ -397,39 +389,50 @@ class News extends DeprecatedModel {
 		JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
       WHERE news_items.item_deleted = 0";
 
-      /* If the current user is a superuser, do not filter their results.
-       * Otherwise, restrict news post selection by ownership.
-       */
-      if (!$userHandler->isSuperuser()) {
-         $query .= " AND (news_items.item_owner = '".$_SESSION['id']."' OR (newsUser.userID = '".$_SESSION['id']."' AND item_datetime_published < NOW() )) ";
-      }
+        /* If the current user is a superuser, do not filter their results.
+        * Otherwise, restrict news post selection by ownership.
+        */
+        if (!$userHandler->isSuperuser($userID)) {
+            $query .= " AND (news_items.item_owner = '".$userID."' OR (newsUser.userID = '".$userID."' AND item_datetime_published < NOW() )) ";
+        }
 
-		if($id)
-			$query .= " AND news_items.item_id = '$id'";
-		else if($archive)
-			$query .= " AND news_items.item_datetime_expires <= NOW() ";
-		else
-			$query .= " AND news_items.item_datetime_expires > NOW() ";
+        if($id)
+            $query .= " AND news_items.item_id = '$id'";
+        else if($archive)
+            $query .= " AND news_items.item_datetime_expires <= NOW() ";
+        else
+            $query .= " AND news_items.item_datetime_expires > NOW() ";
 
-		$query .= " ORDER BY newsTopic.newsTopicID, news_items.item_datetime_posted DESC;";
-		$userResults = $this->db->getAll($query);
+        $query .= " ORDER BY newsTopic.newsTopicID, news_items.item_datetime_posted DESC;";
+        $userResults = $this->db->getAll($query);
 
-		//merge and sort the headlines based on time
-		if(is_array($shareResults) && is_array($userResults))
-			$allNews = array_merge($shareResults, $userResults);
-		else if(is_array($shareResults))
-			$allNews = $shareResults;
-		else if(is_array($userResults))
-			$allNews = $userResults;
-		else
-			return false;
+        //merge and sort the headlines based on time
+        if(is_array($shareResults) && is_array($userResults))
+            $allNews = array_merge($shareResults, $userResults);
+        else if(is_array($shareResults))
+            $allNews = $shareResults;
+        else if(is_array($userResults))
+            $allNews = $userResults;
+        else
+            return false;
 
-		usort($allNews,array($this,"timecmp"));
+        usort($allNews,array($this,"timecmp"));
 
-		if ($limit > 0)
-			$allNews = array_slice($allNews, $index, $limit);
+        if ($limit > 0)
+            $allNews = array_slice($allNews, $index, $limit);
 
-		return $allNews;
+        return $allNews;
+    }
+
+    /**
+     * @param int $id
+     * @param bool $archive
+     * @param int $index
+     * @param int $limit
+     * @return array|bool
+     */
+	function getNews($id = 0, $archive = false, $index = 0, $limit = 0) {
+        return $this->getFilteredNews($_SESSION['id'], $_SESSION['campus'], $_SESSION['gid'], $id, $archive, $index, $limit);
 	}
 
 	function getDailyNotice($limit = 1, $campus = '') {
@@ -440,8 +443,6 @@ class News extends DeprecatedModel {
 			$query .= "JOIN newsCampus c ON c.id = n.item_id AND c.campus IN (".implode(',', $campus).") ";
 
 		$query .= "WHERE item_heading LIKE '%Daily Notices%' ORDER BY item_datetime_posted DESC ";
-
-
 
 		if ($limit)
 			$query .= "LIMIT $limit";

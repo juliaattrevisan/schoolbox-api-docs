@@ -14,7 +14,7 @@ require_once( dirname(__FILE__) . '/Config.php' );
 
 class Mailer {
 
-    function Mailer ($template, $subject = "", $to = "") {
+    function Mailer ($template, $subject = "", $to = "", $host = '') {
 
         //setup header
         $this->headers = '';
@@ -30,7 +30,12 @@ class Mailer {
         $this->loadTemplate($template);
 
         //setup defaults
-        $this->template->set_var('SITE_DOMAIN', $_SERVER['HTTP_HOST']);
+        if($host) {
+            $this->template->set_var('SITE_DOMAIN', $host);
+        }
+        else {
+            $this->template->set_var('SITE_DOMAIN', $_SERVER['HTTP_HOST']);
+        }
 
         //setup MIME email
         $this->email = new Mail_mime( "\n" );
@@ -90,12 +95,15 @@ class Mailer {
     }
 
     function getTemplate ($template) {
-        if ( is_file(MAIL_templates . '/' . Cfg::get('site_location') . '/email/' . $template) ) {
+        $root = defined('MAIL_templates') ? MAIL_templates : SITE_root . '/templates';
+
+        if ( is_file($root . '/' . Cfg::get('site_location') . '/email/' . $template) ) {
             return Cfg::get('site_location') . '/email/' . $template;
         }
         else {
             return 'core/email/' . $template;
         }
+
     }
 
     function setVar ($name, $value = '') {

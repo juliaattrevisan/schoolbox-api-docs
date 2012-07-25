@@ -10,16 +10,17 @@ class CategoryNews extends DeprecatedModel {
 		parent::DeprecatedModel();
 	}
 
-	function getAllForCategory($categoryID, $config = false, $archive = false) {
+	function getAllForCategory($categoryID, $config = false, $archive = false, $userID = 0) {
+        $userID = $userID ? $userID : $_SESSION['id'];
 		$query = "SELECT n.id, heading, UNIX_TIMESTAMP(datetime_posted) posted,
 					UNIX_TIMESTAMP(datetime_expires) expires, body, deleted, code, owner, u.firstname, u.lastname, u.title, u.id as uid
 				  FROM ".$this->_table." n
 				  LEFT JOIN user u ON u.id = n.owner
 				  WHERE code = '$categoryID'  AND deleted = 0 ";
 		if ($archive)
-			$query .= " AND (datetime_published < NOW() OR owner = {$_SESSION['id']}) AND datetime_expires < NOW()";
+			$query .= " AND (datetime_published < NOW() OR owner = $userID) AND datetime_expires < NOW()";
     	else
-			$query .= " AND (datetime_published < NOW() OR owner = {$_SESSION['id']}) AND datetime_expires > NOW()";
+			$query .= " AND (datetime_published < NOW() OR owner = $userID) AND datetime_expires > NOW()";
 
 		$query .= "ORDER BY datetime_posted DESC";
 
