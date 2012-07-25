@@ -168,6 +168,9 @@ class Mailer {
         }
         $return = $mail->send($this->to, $hdrs, $body);
 
+        // prevent memory leak
+        unset($mail);
+
         return $return;
     }
 

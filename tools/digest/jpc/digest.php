@@ -7,6 +7,13 @@
  * @version     SVN: $Id$
  */
 
+if(isset($argv[1]) && $argv[1] == 'nomail') {
+    $sendMail = false;
+}
+else {
+    $sendMail = true;
+}
+
 require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 
 // every user will receive an email that contains the previous week's news
@@ -14,7 +21,7 @@ require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 
 $digestStart = strtotime('-1 week');
 $digestEnd = time();
-$host = 'jpc.alaress-dev.com.au';
+$host = 'jpc.portal-dev.alaress-dev.com.au';
 
 $catHandler = new Category();
 $newsHandler = new News();
@@ -33,11 +40,11 @@ $userList = compileList($sql);
 $keys = array_keys($userList);
 
 
-printf("Memory limit: %s\n", ini_get('memory_limit'));
+cli(sprintf("Memory limit: %s\n", ini_get('memory_limit')));
 
 for($i = 0; $i < count($keys); $i++) {
 
-    printf("Memory usage: %s\n", convert(memory_get_usage(true)));
+    cli(sprintf("Memory usage at %03d: %s (%s)\n", $i, convert(memory_get_usage(true)), memory_get_usage(true)));
 
     compileNews($userList[$keys[$i]]);
     sendEmail($userList[$keys[$i]]);
@@ -45,9 +52,14 @@ for($i = 0; $i < count($keys); $i++) {
     unset($userList[$keys[$i]]);
 }
 
-printf("Final Size of user list: %s\n", count($userList));
-printf("End Memory usage: %s\n", convert(memory_get_usage(true)));
-printf("Peak Memory usage: %s\n", convert(memory_get_peak_usage(true)));
+unset($catHandler);
+unset($catnewsHandler);
+unset($groupHandler);
+unset($newsHandler);
+
+cli(sprintf("Final Size of user list: %s\n", count($userList)));
+cli(sprintf("End Memory usage: %s (%s)\n", convert(memory_get_usage(true)), memory_get_usage(true)));
+cli(sprintf("Peak Memory usage: %s (%s)\n", convert(memory_get_peak_usage(true)), memory_get_usage(true)));
 
 die();
 
@@ -138,9 +150,10 @@ function compileNews(&$u) {
 function sendEmail(&$u) {
 
     global $host;
+    global $sendMail;
 
     // do nothing if there's no email address
-    if(!$u['email']) {
+    if(!trim($u['email'])) {
         return;
     }
 
@@ -149,29 +162,36 @@ function sendEmail(&$u) {
     $mailer->setBlock('newslist', 'article', 'article_block');
     $mailer->setVar('NAME', $u['firstname']);
 
-    printf("Email to %s %s (%s)\n", $u['firstname'], $u['lastname'], $u['email']);
+    cli(sprintf("Email to %s %s (%s)\n", $u['firstname'], $u['lastname'], $u['email']));
 
     foreach($u['articles'] as $newsType => $newsList) {
 
         switch($newsType) {
             case 'c':
                 $mailer->setVar('NEWS_TYPE', 'School News');
+                $slugBase = "news/item/";
                 break;
             case 'h':
                 $mailer->setVar('NEWS_TYPE', 'From your homepages');
+                $slugBase = "homepage/";
+                break;
+            default:
+                $mailer->setVar('NEWS_TYPE', '');
+                $slugBase = "";
                 break;
         }
 
-        foreach($newsList as $news) {
+        foreach($newsList as $catID => $news) {
+            $i = 0;
             foreach($news as $article) {
                 if(withinWindow($article['date'])) {
-                    print_r($article);
                     $mailer->setVar(array(
-                        'ARTICLE_ID'       => $article['id'],
-                        'ARTICLE_TITLE'    => $article['title'],
-                        'ARTICLE_ABSTRACT' => $article['abstract'],
-                        'ARTICLE_TOPIC'    => $article['topic'],
-                        'ARTICLE_DATE'     => date('l, jS \o\f F', $article['date']),
+                        'ARTICLE_SLUG'       => $slugBase . ($newsType == 'h' ? $catID : $article['id']),
+                        'ARTICLE_TITLE'      => $article['title'],
+                        'ARTICLE_ABSTRACT'   => $article['abstract'],
+                        'ARTICLE_TOPIC'      => $article['topic'],
+                        'ARTICLE_DATE'       => date('l, jS \o\f F', $article['date']),
+                        'ARTICLE_BACKGROUND' => ++$i % 2 == 1 ? "none" : "#F4F4F8"
                     ));
 
                     $mailer->parse('article_block', 'article', true);
@@ -183,9 +203,16 @@ function sendEmail(&$u) {
     }
 
     // TODO remove in production: testing only, to prevent mass spammage
-    if($u['email'] == 'matt.day@alaress.com.au') {
-        $mailer->send();
+    if(in_array($u['email'], array(
+        'matt.day@alaress.com.au',
+        'chris.cohen@alaress.com.au',
+        'ivan.pseudonym@gmail.com'
+    ))) {
+        if($sendMail) {
+            $mailer->send();
+        }
     }
+    unset($mailer);
 }
 
 
@@ -209,4 +236,11 @@ function withinWindow($stamp) {
 function convert($size) {
     $unit=array('','K','M','G','T','P');
     return @round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . $unit[(int)$i];
+}
+
+function cli($output) {
+    global $sendMail;
+    if(!$sendMail) {
+        echo '[ ] ' . $output;
+    }
 }
