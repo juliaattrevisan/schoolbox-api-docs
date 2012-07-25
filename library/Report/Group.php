@@ -21,6 +21,7 @@ class Report_Group extends Report_Abstract implements Report_IReport {
         'title'      => 'title',
         'firstname'  => 'firstname',
         'lastname'   => 'lastname',
+        'username'   => 'username',
         'synergy_id' => 'external id',
         'campus'     => 'campus',
         'year'       => 'year',
@@ -28,7 +29,7 @@ class Report_Group extends Report_Abstract implements Report_IReport {
     );
 
     // fields that we will permit sorting on
-    private $sortable = array('firstname', 'lastname', 'synergy_id', 'campus', 'year', 'alt_email');
+    private $sortable = array('firstname', 'lastname', 'username', 'synergy_id', 'campus', 'year', 'alt_email');
     private $defaultOrderBy = 'lastname';
 
     public function __construct($page) {
@@ -154,6 +155,7 @@ class Report_Group extends Report_Abstract implements Report_IReport {
                     'USER_TITLE'      => $user['title'],
                     'USER_FIRSTNAME'  => $user['firstname'],
                     'USER_SURNAME'    => $user['lastname'],
+                    'USER_USERNAME'   => $user['username'],
                     'USER_SYNERGY_ID' => $user['synergy_id'],
                     'USER_EMAIL'      => $email,
                     'USER_YEAR'       => empty($user['year']) ? '' : "Year {$user['year']}",
@@ -188,7 +190,7 @@ class Report_Group extends Report_Abstract implements Report_IReport {
     public function export() {
         $exporter = new Report_Exporter($this->getReportTitle());
         $exporter->setHeadings($this->getFields());
-        $exporter->setData($this->fullDataSet);
+        $exporter->setData($this->dataResource);
         $exporter->export('CSV');
     }
 
