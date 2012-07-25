@@ -113,7 +113,7 @@ function compileNews(&$u) {
         $u['articles']['c'][0][$article['item_id']] = array(
             'id'       => $article['item_id'],
             'title'    => $article['item_heading'],
-            'abstract' => 'Lorem upsum,',
+            'abstract' => scrub($article['item_body']),
             'topic'    => $article['topicName'],
             'date'     => strtotime($article['item_datetime_posted']),
         );
@@ -133,7 +133,7 @@ function compileNews(&$u) {
                     $u['articles']['h'][$a['sid']][$art['id']] = array(
                         'id'       => $art['id'],
                         'title'    => $art['heading'],
-                        'abstract' => 'Dolor sit amet.',
+                        'abstract' => scrub($art['body']),
                         'topic'    => $cat['name'],
                         'date'     => $art['posted'],
                     );
@@ -205,8 +205,9 @@ function sendEmail(&$u) {
     // TODO remove in production: testing only, to prevent mass spammage
     if(in_array($u['email'], array(
         'matt.day@alaress.com.au',
-        'chris.cohen@alaress.com.au',
-        'ivan.pseudonym@gmail.com'
+        //'chris.cohen@alaress.com.au',
+        //'ivan.pseudonym@gmail.com',
+        //'james.leckie@alaress.com.au'
     ))) {
         if($sendMail) {
             $mailer->send();
@@ -225,6 +226,18 @@ function withinWindow($stamp) {
     global $digestEnd;
     return (($stamp > $digestStart) && ($stamp < $digestEnd));
 }
+
+
+/**
+ * Trim and sanitise the abstract
+ * @param $text
+ * @return string
+ */
+function scrub($text) {
+    $tf = new TextFormatter();
+    return $tf->cutSentence(html_entity_decode(Scrub::text(strip_tags($text))), 300);
+}
+
 
 
 /**
