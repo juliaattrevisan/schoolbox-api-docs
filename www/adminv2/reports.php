@@ -58,18 +58,28 @@ elseif(is_numeric($this->arg[2])) {
 else {
     $page = 1;
     $orderBy = $this->arg[2];
-    if(strtolower($this->arg[3]) == "desc") {
-        $orderDir = "DESC";
-    } else
-        $orderDir = "ASC";
-        if($this->arg[4] == "exportToCSV") {
-            $page = 0; //export, so no pagination
-            $exportToCSV = true;
-        }
-        // page number
-        elseif(is_numeric($this->arg[4])) {
-            $page = $this->arg[4];
-        }
+
+    // if direction is unspecified, leave it to the report itself to decide its preference
+    switch(strtolower($this->arg[3])) {
+        case 'desc':
+            $orderDir = "DESC";
+            break;
+        case 'asc':
+            $orderDir = "ASC";
+            break;
+        default:
+            $orderDir = '';
+            break;
+    }
+
+    if($this->arg[4] == "exportToCSV") {
+        $page = 0; //export, so no pagination
+        $exportToCSV = true;
+    }
+    // page number
+    elseif(is_numeric($this->arg[4])) {
+        $page = $this->arg[4];
+    }
 }
 
 /* Don't worry about bounds checking here - the implementation takes care of it */
@@ -85,7 +95,9 @@ if(!$report)
 
 $report->setIndexID($reportVar);
 
-$pageSlug = strtolower("$reportType/$reportVar/" . ( $orderBy ? "$orderBy/$orderDir/" : '' ) );
+$slugDir = $orderDir ? $orderDir : 'ASC';
+
+$pageSlug = strtolower("$reportType/$reportVar/" . ( $orderBy ? "$orderBy/$slugDir/" : '' ) );
 $this->setVar('REPORT_FILTER', $pageSlug);
 $this->setVar('RETURN', $reportType);
 
@@ -111,12 +123,12 @@ if(($totalRows = $report->populateDataset($offset, $limit, $orderBy, $orderDir))
             if($header == $orderBy) {
                 $this->setVar("SORT_{$ref}", 'orderby');
 
-                if($orderDir == "ASC") {
-                    $this->setVar("SORT_{$ref}_DIR", "desc");
-                    $this->setVar('DIR', '\0025B4');
-                } else {
+                if($orderDir == "DESC") {
                     $this->setVar("SORT_{$ref}_DIR", "asc");
                     $this->setVar('DIR', '\0025BE');
+                } else {
+                    $this->setVar("SORT_{$ref}_DIR", "desc");
+                    $this->setVar('DIR', '\0025B4');
                 }
 
             } else {

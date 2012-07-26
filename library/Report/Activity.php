@@ -91,7 +91,11 @@ class Report_Activity extends Report_Abstract implements Report_IReport {
         return $this->defaultOrderBy;
     }
 
-    public function populateDataset($offset, $limit, $orderBy = '', $orderDir = 'ASC') {
+    public function populateDataset($offset, $limit, $orderBy = '', $orderDir = '') {
+
+        if($orderDir == '') {
+            $orderDir = 'DESC';
+        }
 
         $this->pageNum = ($offset / $limit) + 1;
         $this->perPage = $limit;
