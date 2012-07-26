@@ -21,10 +21,9 @@ if($groupHandler->isStaff()) {
     $this->setBlock('student_list', 'special', 'special_block');
     $this->setBlock('student_list', 'eportfolio', 'eportfolio_block');
 
-	$this->setBlock('student_list', 'surname_with_link', 'surname_with_link_block');
-	$this->setBlock('student_list', 'surname_without_link', 'surname_without_link_block');
-	$this->setBlock('student_list', 'firstname_with_link', 'firstname_with_link_block');
-	$this->setBlock('student_list', 'firstname_without_link', 'firstname_without_link_block');
+	$this->setBlock('student_list', 'name_with_link', 'name_with_link_block');
+	$this->setBlock('student_list', 'name_without_link', 'name_without_link_block');
+    $this->setBlock('student_list', 'actions', 'actions_block');
 
 	$this->setTitle('Class List');
 
@@ -63,20 +62,23 @@ if($groupHandler->isStaff()) {
 
 				$lastVisit = $categoryHandler->lastVisit($category['id'], $user['uid']);
 
-				$studentOutput = array(	'SURNAME' 	=> $student['lastname'],
-										'FIRSTNAME' => $student['firstname'],
-										'YEARLEVEL' => $student['yearlevel'],
-										'HOUSE' 	=> $student['house'],
-										'LASTVISIT' => $lastVisit?$lastVisit:'Never',
-										'ID'		=> $user['uid'],
-										'SYNERGYID'	=> $student['synergy_id'],
-										'EMAIL'		=> $emailaddr?$emaillink:'',
-										'EMAIL_ADDRESS'=> $emailaddr,
-                                        'MEDICAL_ALERT' => $student['StudentMedicalAlert'],
-										'ON_OFF' => ++$j%2? '' : 'dark',
-										);
+				$studentOutput = array(
+                    'SURNAME' 	    => $student['lastname'],
+                    'FIRSTNAME'     => $student['firstname'],
+                    'YEARLEVEL'     => $student['yearlevel'],
+                    'HOUSE' 	    => $student['house'],
+                    'LASTVISIT'     => $lastVisit ? $lastVisit : 'Never',
+                    'ID'		    => $user['uid'],
+                    'SYNERGYID'	    => $student['synergy_id'],
+                    'EMAIL'		    => $emailaddr ? $emaillink : '',
+                    'EMAIL_ADDRESS' => $emailaddr,
+                    'EMAIL_BTN'     => $emailaddr ? sprintf('<a href="%s%s" title="Send email" class="btn email float-left"><span></span>Email</a>', $_SESSION['mailhandle'], $emailaddr) : '',
+                    'MEDICAL_ALERT' => $student['StudentMedicalAlert'],
+                    'ON_OFF'        => ++$j % 2 ? '' : 'dark',
+                    'SELECT'        => $emailaddr ? sprintf('<label class="checklabel" for="c%s"></label><input id="c%s" type="checkbox" value="%s"/>', $j, $j, $emailaddr) : '',
+                );
 
-				$this->setVar($studentOutput);
+                $this->setVar($studentOutput);
 
 				$student['StudentMedicalAlert'] = trim($student['StudentMedicalAlert']);
 				$student['StudentSpecialNeedsFlag'] = trim($student['StudentSpecialNeedsFlag']);
@@ -108,18 +110,14 @@ if($groupHandler->isStaff()) {
 				 * give the names links - otherwise leave them unlinked
 				 */
 				if (is_array($user)) {
-					$this->parse('surname_with_link_block', 'surname_with_link');
-					$this->setVar('surname_without_link_block', '');
-
-					$this->parse('firstname_with_link_block', 'firstname_with_link');
-					$this->setVar('firstname_without_link_block', '');
+					$this->parse('name_with_link_block', 'name_with_link');
+					$this->setVar('name_without_link_block', '');
+                    $this->parse('actions_block', 'actions');
 				}
 				else {
-					$this->parse('surname_without_link_block', 'surname_without_link');
-					$this->setVar('surname_with_link_block', '');
-
-					$this->parse('firstname_without_link_block', 'firstname_without_link');
-					$this->setVar('firstname_with_link_block', '');
+					$this->parse('name_without_link_block', 'name_without_link');
+					$this->setVar('name_with_link_block', '');
+                    $this->setVar('actions_block', '');
 				}
 
 				$this->parse("student_list_block", "student_list", true);
