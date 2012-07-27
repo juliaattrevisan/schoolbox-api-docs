@@ -37,6 +37,36 @@ class Scrub {
 		return $text;
 	}
 
+    /**
+     * Turns html into plaintext.
+     * Note: output will be quite unpredictable if used on input that contains tables or copious formatting.
+     * @static
+     * @param $html
+     * @return string
+     */
+    static public function html2text($html) {
+
+        $text = html_entity_decode(                         // 4: unconvert entities (3 -> 4 is just for normalising any rogue characters)
+                    htmlentities(                           // 3: convert all entites, including quotes, into UTF-8
+                        preg_replace(                       // 2: all recurring whitespaces (including &nbsp;) to be trimmed
+                            '/(\s|&nbsp;)+/i',
+                            ' ',
+                            strip_tags(                     // 1: remove all remaining tags from input
+                                preg_replace(               // 0: replace all text-style block-level elements with newlines
+                                    '#</(p|h[1-5]|br)>#i',
+                                    "\n",
+                                    $html
+                                )
+                            )
+                        ),
+                        ENT_QUOTES,
+                        "UTF-8"
+                    )
+                );
+
+        return $text;
+    }
+
 	/**
 	 * Convert smart quotes to apostrophes/double quotes
 	 *
