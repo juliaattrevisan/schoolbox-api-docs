@@ -20,7 +20,7 @@ $debug = (isset($argv[1]) && $argv[1] == 'nomail');
 $digestStart = strtotime('-1 week');
 $digestEnd = time();
 
-$newsDigest = new Digest_News_Jpc($digestStart, $digestEnd, $debug);
+$newsDigest = new Digest_News($digestStart, $digestEnd, $debug);
 $newsDigest->compileUserList();
 $newsDigest->send();
 

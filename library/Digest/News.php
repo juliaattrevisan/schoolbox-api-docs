@@ -6,9 +6,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Digest_News_Abstract {
+class Digest_News {
 
-    protected $host = 'core.portal-dev.alaress-dev.com.au';
+    protected $host;
 
     protected $catHandler;
     protected $newsHandler;
@@ -26,6 +26,13 @@ class Digest_News_Abstract {
     protected $textFormatter;
 
     public function __construct($windowStart, $windowEnd, $debug = false) {
+
+        $this->debug = $debug;
+
+        $this->host = Cfg::get('site_hostname') . '.' . Cfg::get('site_domain');
+
+        $this->cli('Link URI base is ' . $this->host);
+
         $this->catHandler = new Category();
         $this->newsHandler = new News();
         $this->groupHandler = new Group();
@@ -35,7 +42,6 @@ class Digest_News_Abstract {
         $this->digestStart = $windowStart;
         $this->digestEnd = $windowEnd;
 
-        $this->debug = $debug;
 
         $this->textFormatter = new TextFormatter();
     }
