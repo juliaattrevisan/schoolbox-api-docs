@@ -53,6 +53,7 @@ switch($_POST['action']) {
             'monthly'     => '+1 month'
         );
 
+        // repeat specified, and and enddate also, populate the dates to be set
         if (isset($validRepeat[$_POST['repeat']]) && $until) {
             $i = 0;
             $event['series_id'] = $calendarHandler->getUpperSeriesIndex() + 1;
@@ -65,6 +66,13 @@ switch($_POST['action']) {
                 $dateArray[] = date("Y-m-d", $date);
             }
         }
+
+        // if repeat is set, but no enddate was specified, bail out
+        elseif(isset($validRepeat[$_POST['repeat']]) && (!$until)) {
+            error(2); // "not enough data submitted to the form"
+        }
+
+        // no repeat
         else {
             $dateArray[] = date("Y-m-d", $date);
         }
