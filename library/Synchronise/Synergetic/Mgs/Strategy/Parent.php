@@ -30,8 +30,6 @@ class Synchronise_Synergetic_Mgs_Strategy_Parent extends Synchronise_Synergetic_
         $newUser = array();
 
         // Login details
-        $newUser['username'] = $currentUser['StudentContactID'];
-     // $newUser['password'] = "abc123";
 
         // User details
         $newUser['synergy_id'] = $currentUser['StudentContactID'];
@@ -61,14 +59,12 @@ class Synchronise_Synergetic_Mgs_Strategy_Parent extends Synchronise_Synergetic_
         $spouse = array();
 
         // Login details
-        $spouse['username'] = $currentUser['StudentContactSpouseID'];
-     // $spouse['password'] = "abc123";
 
         // User details
         $spouse['synergy_id'] = $currentUser['StudentContactSpouseID'];
         $spouse['title'] = $currentUser['StudentContactSpouseTitle'];
         $spouse['firstname'] = $currentUser['StudentContactSpousePreferred'];
-        $spouse['lastname'] = $currentUser['StudentContactSpouseSurname']; // for some reason this index gets truncated
+        $spouse['lastname'] = $currentUser['StudentContactSpouseSurname'];
         $spouse['alt_email'] = $currentUser['StudentContactSpouseDefaultEmail'];
         $spouse['defaultCampus'] = self::PARENT_DEFAULT_CAMPUS;
         // get campuses of kids
@@ -110,7 +106,7 @@ class Synchronise_Synergetic_Mgs_Strategy_Parent extends Synchronise_Synergetic_
             }
             /* Previous was different person to Current
                 */
-            else if ($previousUser['username'] != $newUser['username']) {
+            else if ($previousUser['synergy_id'] != $newUser['synergy_id']) {
                 $previousUser['campus'] = $compiledCampus;
                 $previousSpouse['campus'] = $compiledCampus;
 

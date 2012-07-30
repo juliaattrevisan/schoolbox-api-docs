@@ -440,7 +440,7 @@ class External_Synergetic_User implements External_UserInterface {
 				StaffCampus, StaffCategoryType, StaffCategory
 			FROM SynergyOne.dbo.vStaff vStaff
 			LEFT JOIN Community ON Community.ID = StaffID
-			WHERE StaffRegistrationType != 'STDNT' AND ActiveFlag = 1
+			WHERE ActiveFlag = 1 AND StaffRegistrationType != 'STDNT'
 		";
 
         return $this->getDatabase()->getAll($query);
