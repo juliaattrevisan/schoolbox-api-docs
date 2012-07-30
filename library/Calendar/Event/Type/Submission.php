@@ -59,8 +59,8 @@ class Calendar_Event_Type_Submission extends Calendar_Event_Type_Abstract {
 
 		/* Optional categoryCodes suffix
 		 */
-		if (strlen($this->getCategoryCodes())) {
-			$extended = ' (' . $this->getCategoryCodes() . ')';
+		if (count($this->getCategoryCodes())) {
+			$extended = ' (' . implode(', ',$this->getCategoryCodes()) . ')';
 		}
 		else {
 			$extended = '';
@@ -95,7 +95,7 @@ class Calendar_Event_Type_Submission extends Calendar_Event_Type_Abstract {
 	 * @param $categoryCodes
 	 */
 	public function setCategoryCodes($categoryCodes) {
-		$this->categoryCodes = $categoryCodes;
+		$this->categoryCodes = explode(',',$categoryCodes);
 	}
 
 	/**
