@@ -34,17 +34,17 @@ class HTMLPurifier_Filter_Quicktime extends HTMLPurifier_Filter
 				'<param value="true" name="saveembedtags" />'.
 				'<param value="true" name="postdomevents" />'.
 				'<param name="wmode" value="transparent" />'.
-				'<!--[if !IE]-->'.
+                '<![if !IE]>'.
 				'<object type="video/quicktime" data="'.$url.'" width="'.$width.'" height="'.$height.'">'.
 				'<param value="true" name="autostart" />'.
 				'<param value="true" name="saveembedtags" />'.
 				'<param value="true" name="postdomevents" />'.
 				'<param name="wmode" value="transparent" />'.
-				'<!--<![endif]-->'.
+				'<![endif]>'.
 				'<a href="http://www.apple.com/quicktime/download/">QuickTime required. Free download</a>'.
-				'<!--[if !IE]-->'.
+				'<![if !IE]>'.
 				'</object>'.
-				'<!--<![endif]-->'.
+				'<![endif]>'.
 				'</object>';
     }
 }
