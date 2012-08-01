@@ -248,7 +248,7 @@ class Feed {
 				'date' => $row['submitted'],
 				'type' => 'news',
 				'message' => $userHandler->formatName($row) . ' posted the news '.Scrub::text($row['heading']),
-				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> posted the news <a href="/resources/'.$row['id'].'">' . Scrub::text($row['heading']) . '</a>',
+				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> posted the news <a href="/homepage/'.$row['id'].'">' . Scrub::text($row['heading']) . '</a>',
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -280,7 +280,7 @@ class Feed {
 				'date' => $row['submitted'],
 				'type' => 'folder',
 				'message' => $userHandler->formatName($row) . ' created the folder '.Scrub::text($row['name']),
-				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> created the folder <a href="/resources/'.$row['id'].'">' . Scrub::text($row['name']) . '</a>',
+				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> created the folder <a href="/homepage/'.$row['id'].'">' . Scrub::text($row['name']) . '</a>',
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
