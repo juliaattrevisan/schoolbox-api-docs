@@ -17,7 +17,7 @@ $debug = (isset($argv[1]) && $argv[1] == 'nomail');
 // this should be at a school, campus and then category level
 
 // Specify the digest window. This should match the frequency of the cronjob, and end should be the current datetime.
-$digestStart = strtotime('-1 week');
+$digestStart = strtotime('-2 days');
 $digestEnd = time();
 
 $newsDigest = new Digest_News($digestStart, $digestEnd, $debug);

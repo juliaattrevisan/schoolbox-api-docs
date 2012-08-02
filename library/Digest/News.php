@@ -159,6 +159,7 @@ class Digest_News {
         $mailer->setVar('NAME', $u['firstname']);
 
         $this->cli(sprintf("Email to %s %s (%s)", $u['firstname'], $u['lastname'], $u['email']));
+        $newsFlag = false;
 
         foreach($u['articles'] as $newsType => $newsList) {
 
@@ -191,6 +192,7 @@ class Digest_News {
                         ));
 
                         $mailer->parse('article_block', 'article', true);
+                        $newsFlag = true;
                     }
                 }
             }
@@ -198,7 +200,7 @@ class Digest_News {
             $mailer->setVar('article_block', '');
         }
 
-        if(!$this->debugging()) {
+        if(!$this->debugging() && $newsFlag) {
             $success = $mailer->send();
             if(!$success) {
                 $this->cli("Failed to send email to {$u['email']}", true);
