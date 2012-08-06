@@ -95,6 +95,20 @@ abstract class Calendar_Event_Type_Abstract {
 	}
 
 	/**
+	 * Find out if the currently logged in user is the owner (creator)
+	 * of this event
+	 *
+	 * @return bool
+	 */
+	public function isOwner() {
+		if ($this->getAuthorId() == $_SESSION['id']) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Is campus access or not
 	 *
 	 * @return bool

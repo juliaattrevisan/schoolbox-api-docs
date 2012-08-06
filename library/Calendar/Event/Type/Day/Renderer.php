@@ -28,7 +28,12 @@ class Calendar_Event_Type_Day_Renderer extends Calendar_Event_Type_Renderer_Abst
 				'time_block' => ''
 			));
 
-			if (($currentEvent->getPublishDate()->getUnixTimestamp() >= time()) && $this->getGroupHandler()->isSuperuser()) {
+			/* Future events are visible to superusers, event owners, group members with write access
+			 */
+			$isFutureEvent = ($currentEvent->getPublishDate()->getUnixTimestamp() >= time());
+			$isVisibleToUser = ($this->getGroupHandler()->isSuperuser() || $currentEvent->isOwner() || ($this->getGroupHandler()->getPermission($currentEvent->getCategoryId()) > READ_ACCESS));
+
+			if ($isFutureEvent && $isVisibleToUser) {
 				$cssClass = 'translucent';
 			}
 			else {

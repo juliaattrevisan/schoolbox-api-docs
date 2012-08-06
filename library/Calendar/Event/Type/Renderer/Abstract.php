@@ -26,7 +26,7 @@ abstract class Calendar_Event_Type_Renderer_Abstract {
 	public function __construct($page) {
 		$this->setPage($page);
 
-		$this->setGroupHandler(new Group());
+		$this->setGroupHandler(new Group(CALENDAR_SERVICE));
 		$this->setCalendarHandler(new Calendar());
 	}
 
