@@ -12,7 +12,7 @@
 abstract class Component_ControllerAbstract {
 
     /**
-     * @var \Component_Instance
+     * @var Component_Instance
      */
     protected $instance;
 
@@ -27,6 +27,16 @@ abstract class Component_ControllerAbstract {
     protected $sitepage;
 
     /**
+     * @var array
+     */
+    protected $context;
+
+    /**
+     * @var array
+     */
+    protected $config;
+
+    /**
      * @param Component_Instance $instance
      * @param User $user
      * @param SitePage $sitepage
@@ -35,7 +45,19 @@ abstract class Component_ControllerAbstract {
         $this->instance = $instance;
         $this->user = $user;
         $this->sitepage = $sitepage;
+        $this->config = $instance->getConfigArray();
     }
+
+
+    /**
+     * Method to provide global config details to the component
+     * @param array $config
+     */
+    public function setup(array $context, array $config) {
+        $this->context = $context;
+        $this->config = $config;
+    }
+
 
     /**
      * Prepares data for the render function. Business logic.
@@ -43,7 +65,7 @@ abstract class Component_ControllerAbstract {
      * @abstract
      * @return void
      */
-    abstract function execute ();
+    abstract function execute();
 
     /**
      * @param $templateHandle
@@ -52,12 +74,17 @@ abstract class Component_ControllerAbstract {
      * @return bool
      */
     protected function loadTemplate ($templateHandle, $templateName = '', $templatePath = '') {
-
         $templateFile = $this->getTemplate($templateName, $templatePath);
-
-        if ( !$this->sitepage->setFile($templateHandle, $templateFile) ) {
+        if (!$this->sitepage->setFile($templateHandle, $templateFile)) {
             return false;
         }
+
+        $output = array(
+            'COMPONENT_INSTANCE_ID' => $this->instance->id,
+            'COMPONENT_HANDLE'      => $templateHandle . '_' . $this->instance->id
+        );
+
+        $this->setVar($output);
 
         return true;
     }
@@ -81,14 +108,14 @@ abstract class Component_ControllerAbstract {
      * Renders view using Component_AbstractController::$templateObject.
      *
      * @param String $templateHandle
-     * @return void
+     * @return boolean
      */
     protected function renderTemplate ($templateHandle) {
 
         if ( !$this->loadTemplate($templateHandle) ) {
             return false;
         }
-        
+        return true;
     }
 
     /**
@@ -127,4 +154,74 @@ abstract class Component_ControllerAbstract {
             return $this->$property;
         }
     }
+
+
+    /**
+     * @return bool
+     */
+    protected function parseConfig() {
+
+        $page = $this->sitepage;
+
+        $page->setVar('CONFIGURATION', '');
+
+        $config = $this->instance->getConfigArray();
+
+        // if there is no configuration, or you're not allowed to see it, hide and run
+        if(!is_array($config) || $this->permission < WRITE_ACCESS) {
+            return false;
+        }
+
+        $page->setFile('configTpl', 'component/config/_wrapper.html');
+        $page->setBlock('configTpl', 'config_element', 'config_element_block');
+        $this->setVar('config_element_block','');
+
+        // every config key has a corresponding controller and template to be called
+        foreach($config as $key => $params) {
+
+            $page->setVar('CONFIG_ELEMENT_LABEL', $params['label']);
+
+            // attempt to build a configuration instance from the key provided
+            if($conf = Component_Config_Factory::build($key)) {
+                $templateFile = "component/config/$key.html";
+                $page->setFile($key, $templateFile);
+                $conf->parse($page, $key, $key, $params['value']);
+                $page->parse('CONFIG_ELEMENT_CONTENT', $key);
+                $page->parse('config_element_block', 'config_element', true);
+            }
+
+            $page->setVar('CONFIG_ELEMENT_CONTENT', '');
+        }
+
+        $page->parse('CONFIGURATION', 'configTpl', false);
+
+        return true;
+    }
+
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    protected function getContext($key = '') {
+        if($key) {
+            return isset($this->context[$key]) ? $this->context[$key] : false;
+        }
+        return $this->context;
+    }
+
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    protected function getConfig($key = '', $attr = 'value') {
+        if($key) {
+            return isset($this->config[$key][$attr]) ? $this->config[$key][$attr] : false;
+        }
+        return $this->config;
+    }
+
+    public function getPageTemplate() {
+        return $this->sitepage->template;
+    }
+
 }

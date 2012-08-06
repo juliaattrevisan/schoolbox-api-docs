@@ -58,14 +58,21 @@ class Component_InstanceMapper extends Mapper {
      */
     public function findByContext ($module, $identifier) {
         $definitionMapper = Component_DefinitionMapper::getInstance();
+        $configDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
+        $configInstanceMapper = Component_ConfigMapper::getInstance();
 
         $statement = $this->database->prepare("
-            SELECT {$this->getColumnString('ci')}, {$definitionMapper->getColumnString('cd')}
-            FROM `{$this->table}` ci
-            LEFT JOIN `component_definition` cd ON ci.component_definition_id = cd.id
-            WHERE ci.`module` = :module
-                AND `identifier` = :identifier
-            ORDER BY ci.sequence ASC
+            SELECT {$this->getColumnString('ci')}
+                 , {$definitionMapper->getColumnString('cd')}
+                 , {$configDefinitionMapper->getColumnString('ccd')}
+                 , {$configInstanceMapper->getColumnString('cci')}
+            FROM component_instance ci
+            INNER JOIN component_definition cd ON ci.component_definition_id = cd.id
+              LEFT JOIN component_config_definition ccd ON cd.id = ccd.component_definition_id
+              LEFT JOIN component_config_instance cci ON ccd.id = cci.component_config_definition_id AND cci.component_instance_id = ci.id
+            WHERE ci.module = :module
+            AND identifier = :identifier
+            ORDER BY identifier ASC, `position` ASC, ci.sequence ASC
         ");
 
         $statement->bindParam(":module", $module);
@@ -77,17 +84,42 @@ class Component_InstanceMapper extends Mapper {
 
         $instanceCollection = $this->hydrateList($rowset, 'ci');
         $definitionCollection = $definitionMapper->hydrateList($rowset, 'cd');
+        $configInstanceCollection = $configInstanceMapper->hydrateList($rowset, 'cci');
+        $configDefinitionCollection = $configDefinitionMapper->hydrateList($rowset, 'ccd');
 
-        foreach ( $instanceCollection as $i => $instance ) {
-            $instance->definition =$definitionCollection[$i];
+        $finalCollection = array();
+
+        // map the definitions into their instances
+        foreach($instanceCollection as $i => $instance) {
+
+            // if this component has already been processed, just add the config and move on
+            if(isset($finalCollection[$instance->id])) {
+                $finalCollection[$instance->id]->config[$configDefinitionCollection[$i]->id] = $configDefinitionCollection[$i];
+                continue;
+            }
+
+            // 1:1 :: instance:definition
+            $instance->definition = $definitionCollection[$i];
+
+            // n:1 :: configDefinitions:instance
+            $instance->config[$configDefinitionCollection[$i]->id] = $configDefinitionCollection[$i];
+
+            $finalCollection[$instance->id] = $instance;
         }
 
-        return $instanceCollection;
+        // overwrite default configurations
+        foreach($configInstanceCollection as $i => $confInstance) {
+            if($confInstance->id != null) {
+                $finalCollection[$confInstance->instanceId]->config[$confInstance->configDefinitionId]['value'] = $confInstance->value;
+            }
+        }
+
+        return $finalCollection;
     }
 
     public function save ($object) {
-        if ( is_a($object, 'Component_Instance') ) {
-            $dirtyInstanceCollection = new Collection;
+        if ($object instanceof Component_Instance) {
+            $dirtyInstanceCollection = new Collection();
             $dirtyInstanceCollection[] = $object;
         }
         else {
@@ -164,7 +196,7 @@ class Component_InstanceMapper extends Mapper {
             }
         }
 
-        return parent::save($dirtyInstanceCollection);
+        return parent::save($dirtyInstanceCollection, false);
     }
 
     public function delete ($object) {

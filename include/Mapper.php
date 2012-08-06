@@ -191,10 +191,15 @@ abstract class Mapper {
             $collection = $object;
         }
 
+        $tbl = $this->table;
+        $colString = $this->getColumnString();
+        $plcString = $this->getPlaceholderString();
+        $updString = $this->getUpdateString();
+
         $statement = $this->database->prepare("
-            INSERT INTO `{$this->table}` ({$this->getColumnString()})
-            VALUES ({$this->getPlaceholderString()})
-            ON DUPLICATE KEY UPDATE {$this->getUpdateString()};
+            INSERT INTO `$tbl` ($colString)
+            VALUES ($plcString)
+            ON DUPLICATE KEY UPDATE $updString;
         ");
 
         foreach ( $collection as $model ) {

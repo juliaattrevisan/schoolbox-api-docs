@@ -9,10 +9,10 @@
  * 
  */
  
-class Component_Option extends Model {
+class Component_Config extends Model {
     public $id;
 
-    public $componentOptionDefinitionId;
+    public $configDefinitionId;
 
     public $instanceId;
 

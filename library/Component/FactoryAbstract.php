@@ -33,7 +33,10 @@ abstract class Component_FactoryAbstract {
         $this->dependencyList = array($user, $sitepage);
     }
 
-    
+    /**
+     * @param $identifier
+     * @return Collection
+     */
     public function buildComponentList ($identifier) {
         /* Get Component Instances */
         $instanceCollection = $this->getInstanceList($identifier);
@@ -83,17 +86,32 @@ abstract class Component_FactoryAbstract {
         }
     }
 
+    /**
+     * @param $identifier
+     * @return Collection
+     */
     public function getInstanceList ($identifier) {
-        $componentList = Component_InstanceMapper::getInstance()->findByContext($this->module, $identifier);
-
-        return $componentList;
+        return Component_InstanceMapper::getInstance()->findByContext($this->module, $identifier);
     }
 
+    /**
+     * @param $instanceId
+     * @return Component_Instance
+     */
     public function getInstance ($instanceId) {
-        $component = Component_InstanceMapper::getInstance()->findById($instanceId);
+        $instance = Component_InstanceMapper::getInstance()->findById($instanceId);
+        $instance->definition = Component_DefinitionMapper::getInstance()->findById($instance->definitionId);
 
-        return $component;
+        return $instance;
     }
+
+    /**
+     * @return Collection
+     */
+    public function getDefinitionList() {
+        return Component_DefinitionMapper::getInstance()->findAllForModule($this->module);
+    }
+
 
     /**
      * Builds dependencies from a component controller's constructor.

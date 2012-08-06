@@ -23,4 +23,38 @@ class Component_Instance extends Model {
     public $position;
 
     public $sequence;
+
+    public $config;
+
+    public function getConfigArray($compat = true) {
+        if(isset($this->config)) {
+            $output = array();
+            foreach($this->config as $opt) {
+                $key = $compat ? $this->compatMap($opt['key']) : $opt['key'];
+                $val = isset($opt['value']) ? $opt['value'] : $opt['defaultValue'];
+                $output[$key] = array(
+                    'label' => $opt['label'],
+                    'value' => $val,
+                );
+            }
+            return $output;
+        }
+        return array();
+    }
+
+    /**
+     * Converts new keys to old keys to preserve integrity with old components
+     * @param $key
+     * @return mixed
+     */
+    protected function compatMap($key) {
+        $map = array(
+            'limit'  => 'size',
+            'title'  => 'componentname',
+        );
+        if(isset($map[$key])) {
+            return $map[$key];
+        }
+        return $key;
+    }
 }

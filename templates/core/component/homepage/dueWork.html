@@ -1,0 +1,24 @@
+<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <h2>Due Work</h2>
+    {CONFIGURATION}
+    <div class="listing clearfix">
+        <ul>
+            <!-- BEGIN duework -->
+            <li class="{ON_OFF} clearfix">
+                <h4><span class="{COMPONENT_COMPACTMODE} hide-on-small">{DUE_TYPE} - </span>{DUE_NAME}</h4>
+                <div class="small-right">
+                    <p class="interact">{DUE_DATE}
+                        <!-- BEGIN duework_actions -->
+                        <a href="{DUE_ACTION}">{DUE_ACTION_NAME}</a>
+                        <!-- END duework_actions -->
+                    </p>
+                </div>
+                <p class="summ hide-on-small">{DUE_COMMENT}</p>
+            </li>
+            <!-- END duework -->
+        </ul>
+    </div>
+    <!-- BEGIN submit_dw -->
+    <p class="interact"><a href="/submission/createSubmission/new/{ID}/" class="btn up-arrow"><span></span>Post Due Work Item</a></p>
+    <!-- END submit_dw -->
+</div>

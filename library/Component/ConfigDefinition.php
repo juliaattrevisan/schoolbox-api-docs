@@ -9,6 +9,16 @@
  * 
  */
  
-class Component_OptionDefinition extends Model {
+class Component_ConfigDefinition extends Model {
+
+    public $id;
+
+    public $definitionId;
+
+    public $key;
+
+    public $defaultValue;
+
+    public $label;
 
 }
