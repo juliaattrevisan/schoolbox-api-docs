@@ -15,11 +15,10 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 	 */
 	private $soap = null;
 
-	/* The place where we found the wsdl file, which was then
-	 * saved locally at $localWsdl
+	/* The place where we found the wsdl file
+	 * Note: Sharepoint queries are sent here too, otherwise it won't work!
 	 */
 	private $wsdl = 'http://iportexternal/_vti_bin/Lists.asmx?wsdl';
-	private $localWsdl = '../library/Calendar/Api/Sharepoint/Stk/Lists.wsdl';
 
 	/* STK credentials
 	 * User account to authenticate with. (Must have read/write/edit permissions to given Lists)
@@ -31,52 +30,24 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 		'trace' => true,
 	);
 
+	/* A campus name-id relation from the luCampus table.
+ 	*/
+	private $campusList = array(
+		'SKC' => 1,
+		'SKG' => 2,
+		'SKB' => 3,
+		'SKP' => 4,
+	);
+
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
+
+		/* Create soap client
+		 */
 		try {
-
-			/* Create authentication instances
-			 */
-
-//			/* Security name space definition
-//			 */
-//			$strWSSENS = "http://schemas.xmlsoap.org/ws/2002/07/secext";
-//
-//			/* Create Soap Variables for Username and Password
-//			 */
-//			$soapUser = new SoapVar('NTDOMAIN\alaress', XSD_STRING, null, $strWSSENS, null, $strWSSENS);
-//			$soapPass = new SoapVar('Tjs782', XSD_STRING, null, $strWSSENS, null, $strWSSENS);
-//
-//			/* Object for Auth Class
-//			 */
-//			$wsseAuth = new Alaress_Soap_WSSEAuth($soapUser, $soapPass);
-//
-//			/* Create soapVar out of auth class object
-//			 */
-//			$soapVarWSSEAuth = new SoapVar($wsseAuth, SOAP_ENC_OBJECT, null, $strWSSENS, 'UsernameToken', $strWSSENS);
-//
-//			/* Create object for token class
-//			 */
-//			$wsseToken = new Alaress_Soap_WSSEToken($soapVarWSSEAuth);
-//
-//			/* Create soapVar out of token class object
-//			 */
-//			$soapVarWSSEToken = new SoapVar($wsseToken, SOAP_ENC_OBJECT, null, $strWSSENS, 'UsernameToken', $strWSSENS);
-//
-//			/* Create soapVar for Security node
-//			 */
-//			$soapVarHeaderVal = new SoapVar($soapVarWSSEToken, SOAP_ENC_OBJECT, null, $strWSSENS, 'Security', $strWSSENS);
-//
-//			/* Create header object out of security soapVar
-//			 */
-//			$soapVarWSSEHeader = new SoapHeader($strWSSENS, 'Security', $soapVarHeaderVal, true);
-
-			/* Create soap client
-			*/
 			$soapClient = new SoapClient($this->getWsdl(), $this->getCredentials());
-//			$soapClient->__setSoapHeaders(array($soapVarWSSEHeader));
 		}
 		catch (SoapFault $fault) {
 			var_dump($fault);
@@ -84,87 +55,6 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 		}
 
 		$this->setSoap($soapClient);
-
-//		$this->test();
-	}
-
-	/**
-	 * Test method
-	 */
-//	private function test() {
-//		$start = new Alaress_Date_Format(date('Y-m-d') . ' 00:00:01', 'y-m-d h:i:s');
-//		$end = new Alaress_Date_Format(date('Y-m-d') . ' 23:59:59', 'y-m-d h:i:s');
-//
-////		$startDate = $start->getUsingFormat(DATE_ISO8601);
-////		$endDate = $end->getUsingFormat(DATE_ISO8601);
-//
-//		$startDate = $start->getDatabase();
-//		$endDate = $end->getDatabase();
-////		$startDate = '2012-07-19 00:00:01';
-////		$endDate = '2012-07-19 23:59:59';
-//
-//		$xmlPayload = new Calendar_Api_Sharepoint_Stk_Payload($startDate, $endDate);
-//
-//		$response = $this->getSoap()->GetListItems(array(
-//			'listName' => 'Master Calendar',
-//			'query' => $xmlPayload->getPayload(),
-//			'rowLimit' => 5,
-//		));
-//
-//		$allEvents = $xmlPayload->parseXml($response->GetListItemsResult->any);
-////print_r($xmlPayload->getPayload());
-////		print_r($allEvents);
-//		$stack = new Calendar_Event_Collection();
-//
-//		foreach($allEvents->rsdata->zrow as $currentEvent) {
-//			$attribs = $currentEvent->attributes();
-//
-//			$event = new Calendar_Event_Type_Day();
-//			$event->setAuthorName('');
-//			$event->setAuthorId('');
-//			$event->setEventId(1);
-//			$event->setStartTime(new Alaress_Date_Format((string)$attribs->ows_EventDate, 'y-m-d h:i:s'));
-//			$event->setEndTime(new Alaress_Date_Format((string)$attribs->ows_EndDate, 'y-m-d h:i:s'));
-//			$event->setType('');
-//			$event->setNote((string)$attribs->ows_Title);
-//			$event->setAccess(-1);
-//			$event->setEventType('');
-//			$event->setColour('');
-//			$event->setPublishDate('2012-07-01 01:01:01');
-//			$event->setSid('');
-//			$event->setCategoryId('');
-//			$event->setCategoryName('');
-//			$event->setAttendance('');
-//
-//			$stack->add($event);
-//		}
-//
-//		return $stack;
-//	}
-
-	/**
-	 * Load wsdl file via curl
-	 *
-	 * @return bool|string
-	 */
-	private function loadWsdl() {
-		$curl = new Alaress_Curl_Url($this->getWsdl());
-
-		$curl->addOptions(array(
-			CURLOPT_USERPWD => "alaress:Tjs782",
-			CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-		));
-
-		$result = $curl->exec()->getResult();
-
-		if ($result) {
-			return $result;
-		}
-
-		/* TODO: Throw exception here
-		 */
-
-		return false;
 	}
 
 	/**
@@ -189,7 +79,9 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 
 		$allEvents = $xmlPayload->parseXml($response->GetListItemsResult->any);
 
-		$stack = new Calendar_Event_Collection();
+		/* Fill in your query result set here and populate $collection
+		 */
+		$collection = new Calendar_Event_Collection();
 
 		foreach($allEvents->rsdata->zrow as $currentEvent) {
 			$attribs = $currentEvent->attributes();
@@ -202,24 +94,18 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 			$event->setEndTime(new Alaress_Date_Format((string)$attribs->ows_EndDate, 'y-m-d h:i:s'));
 			$event->setType('');
 			$event->setNote((string)$attribs->ows_Title);
-			$event->setAccess(-1);
+			$event->setAccess(Calendar_Event_Type_Abstract::CAMPUS_ACCESS);
+			$event->setCampusList($this->getCampusIdFromName((string)$attribs->ows_School));
 			$event->setEventType('');
 			$event->setColour('');
-			$event->setPublishDate('2012-07-01 01:01:01');
+			$event->setPublishDate((string)$attribs->ows_Created);
 			$event->setSid('');
 			$event->setCategoryId('');
 			$event->setCategoryName('');
 			$event->setAttendance('');
 
-			$stack->add($event);
+			$collection->add($event);
 		}
-
-		return $stack;
-
-		$collection = new Calendar_Event_Collection();
-
-		/* Fill in your query result set here and populate $collection
-		 */
 
 		return $collection;
 	}
@@ -254,6 +140,30 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 		 */
 
 		return $collection;
+	}
+
+	/**
+	 * Get the campus id from its initials as provided by Sharepoint.
+	 * Save some db calls by copying the luCampus table into this class.
+	 *
+	 * If "All" is provided, it gets all the campuses in the class var
+	 * except "All" (which obviously doesn't exist as a campus)
+	 *
+	 * @param $name
+	 * @return mixed
+	 */
+	private function getCampusIdFromName($name) {
+		if ($name == 'ALL') {
+			$allCampuses = $this->campusList;
+
+			/* Remove 'All'
+			 */
+			array_pop($allCampuses);
+
+			return implode(',', $allCampuses);
+		}
+
+		return $this->campusList[$name];
 	}
 
 	/* Getters/Setters
@@ -293,14 +203,5 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 	 */
 	private function getCredentials() {
 		return $this->credentials;
-	}
-
-	/**
-	 * Get local wsdl location
-	 *
-	 * @return string
-	 */
-	private function getLocalWsdl() {
-		return $this->localWsdl;
 	}
 }

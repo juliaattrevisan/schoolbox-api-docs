@@ -14,8 +14,9 @@
  * @version	 SVN: $Id$
  */
 class Calendar_Api_Factory {
-	private $allSources = array('Schoolbox');
 //	private $allSources = array('Sharepoint');
+	private $allSources = array('Schoolbox');
+//	private $allSources = array('Sharepoint', 'Vcal', 'Schoolbox', 'Iport');
 //	private $allSources = array();
 
 	/**
@@ -34,9 +35,9 @@ class Calendar_Api_Factory {
 
 			/* Temporary forced usage of Sharepoint/Iport for Stk
 			 */
-//			if ($currentSource == 'Sharepoint') {
-//				$uniqueImplementation = 'Calendar_Api_' . $currentSource . '_Stk';
-//			}
+			if ($currentSource == 'Sharepoint') {
+				$uniqueImplementation = 'Calendar_Api_' . $currentSource . '_Stk';
+			}
 
 			/* Decide which to use (unique or default)
 			 * Or create no class, if neither exists
