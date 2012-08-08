@@ -1,0 +1,33 @@
+<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+	<h2>{COMPONENT_NAME}</h2>
+	{CONFIGURATION}
+	<div class="listing clearfix">
+		<ul>
+			<!-- BEGIN files -->
+			<li class="{ON_OFF} clearfix">
+
+				<!-- BEGIN file_url -->
+				<h4><a class="icons {HIDDEN} {FILE_MIME_IMAGE}" href="{FILE_URL}" rel="external">{FILE_DESCRIPTION}</a></h4>
+				<!-- END file_url -->
+				<!-- BEGIN file_no_url -->
+				<h4 class="hide-on-small">{FILE_DESCRIPTION}</h4>
+				<!-- END file_no_url -->
+
+				<div class="small-right">
+					<!-- BEGIN modify_file -->
+					<p class="interact"> <a href="/cms/file/{FILE_ID}">Modify</a> </p>
+					<!-- END modify_file -->
+				</div>
+				<p class="{COMPONENT_COMPACTMODE} hide-on-small">{FILE_COMMENT}</p>
+				<p class="{COMPONENT_COMPACTMODE} interact hide-on-small">Posted by <a href="/search/user/{FILE_POSTED_BY_ID}">{FILE_POSTED_BY}</a> on {FILE_POSTED_DATE}</p>
+			</li>
+			<!-- END files -->
+		</ul>
+	</div>
+    <p class="interact"><a href="/resources/{ID}" class="btn"><span></span>View All Files</a>
+	<!-- BEGIN submit_file -->
+	<a href="/cms/file/new/{ID}" class="btn up-arrow"><span></span>Post File</a>
+    <a href="/cms/file/multi/{ID}" class="btn up-arrow"><span></span>Post Multiple Files</a>
+	<!-- END submit_file -->
+    </p>
+</div>

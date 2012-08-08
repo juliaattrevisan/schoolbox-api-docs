@@ -1,0 +1,29 @@
+<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <h2>{COMPONENT_NAME}</h2>
+    {CONFIGURATION}
+    <div class="listing clearfix">
+        <ul>
+            <!-- BEGIN link -->
+            <li class="{ON_OFF} clearfix">
+                <h4><a class="icons link" rel="{LINK_TARGET}" href="{LINK_URL}">{LINK_NAME}</a></h4>
+                <div class="small-right">
+                    <!-- BEGIN modify_link -->
+                    <p class="interact"><a href="/cms/link/{LINK_ID}">Modify</a></p>
+                    <!-- END modify_link -->
+                </div>
+                <!-- BEGIN show_posted_by -->
+                <p class="hide-on-small">{LINK_COMMENT}</p>
+                <p class="interact hide-on-small">
+                    Posted by <a href="/search/user/{LINK_POSTED_BY_ID}">{LINK_POSTED_BY}</a> on {LINK_POSTED_DATE}
+                </p>
+                <!-- END show_posted_by -->
+            </li>
+            <!-- END link -->
+        </ul>
+    </div>
+    <p class="interact"><a href="/resources/{ID}" class="btn"><span></span>View All Links</a>
+        <!-- BEGIN submit_link -->
+        <a href="/cms/link/new/{ID}" class="btn up-arrow"><span></span>Post Link</a>
+        <!-- END submit_link -->
+    </p>
+</div>

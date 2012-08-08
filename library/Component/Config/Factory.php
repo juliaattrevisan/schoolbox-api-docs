@@ -21,11 +21,16 @@ abstract class Component_Config_Factory {
             return false;
         }
 
-        $classname = 'Component_Config_' . ucfirst($key);
+        $classname = 'Component_Config_' . ucfirst(preg_replace_callback("#_[a-z]#s", function($matches) {
+            return ucfirst($matches[0][1]); // because strings are accessible via array notation ^_^
+        }, $key));
+
         if(class_exists($classname)) {
+            // echo "Found $classname - will need template $key.html<br/>\n";
             return new $classname();
         }
         else {
+            // echo "Problem: couldn't find $classname ($key.html won't be rendered)<br/>\n";
             return false;
         }
     }

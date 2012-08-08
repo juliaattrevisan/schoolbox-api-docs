@@ -37,6 +37,11 @@ abstract class Component_ControllerAbstract {
     protected $config;
 
     /**
+     * @var int
+     */
+    protected $permission = 0;
+
+    /**
      * @param Component_Instance $instance
      * @param User $user
      * @param SitePage $sitepage
@@ -75,6 +80,7 @@ abstract class Component_ControllerAbstract {
      */
     protected function loadTemplate ($templateHandle, $templateName = '', $templatePath = '') {
         $templateFile = $this->getTemplate($templateName, $templatePath);
+
         if (!$this->sitepage->setFile($templateHandle, $templateFile)) {
             return false;
         }
@@ -159,7 +165,7 @@ abstract class Component_ControllerAbstract {
     /**
      * @return bool
      */
-    protected function parseConfig() {
+    public function parseConfig() {
 
         $page = $this->sitepage;
 
@@ -172,7 +178,24 @@ abstract class Component_ControllerAbstract {
             return false;
         }
 
-        $page->setFile('configTpl', 'component/config/_wrapper.html');
+        $templateFiles = array(
+            'homepage'            => 'component/config/_wrapper.html',
+            'eportfolio'          => 'component/config/_wrapper.html',
+            'dashboard'           => 'component/config/_templatewrapper.html',
+            'homepage_template'   => 'component/config/_templatewrapper.html',
+            'eportfolio_template' => 'component/config/_templatewrapper.html',
+        );
+
+        if(isset($templateFiles[$this->instance->module])) {
+            $template = $templateFiles[$this->instance->module];
+        }
+        // fallback
+        else {
+            $template = 'component/config/_wrapper.html';
+        }
+
+        $page->setFile('configTpl', $template);
+
         $page->setBlock('configTpl', 'config_element', 'config_element_block');
         $this->setVar('config_element_block','');
 

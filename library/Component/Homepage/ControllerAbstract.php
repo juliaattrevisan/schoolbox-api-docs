@@ -8,8 +8,6 @@
  */
 abstract class Component_Homepage_ControllerAbstract extends Component_ControllerAbstract {
 
-    protected $permission;
-
     public function setup(array $context, array $config) {
         parent::setup($context, $config);
         $g = new Group();

@@ -61,7 +61,7 @@ if ($permission >= WRITE_ACCESS) {
     $this->parse('modify_layout_block', 'modify_layout');
     $this->parse('customise_page_block', 'customise_page');
 
-    $definitionCollection = $componentFactory->getDefinitionList();
+    $definitionCollection = $componentFactory->getDefinitionList('component_category');
 
     foreach($definitionCollection as $definition) {
         $definition->instanceCount = 0;
@@ -81,9 +81,14 @@ if ($permission >= WRITE_ACCESS) {
             if($component->multiple == 'false') {
                 $class = 'one-only ';
                 if($component->multiple == 'false' && $component->instanceCount > 0) {
-                    $class .= 'disabled';
+                    $class .= 'disabled ';
                 }
             }
+            if(!class_exists($component->class)) {
+                $class .= 'undeveloped ';
+            }
+
+            $class = trim($class);
 
             $output = array(
                 'HOMEPAGE_COMPONENT_ID'          => Scrub::text($component->id),

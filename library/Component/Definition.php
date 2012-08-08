@@ -23,4 +23,6 @@ class Component_Definition extends Model {
     public $visible;
 
     public $multiple;
+
+    public $componentCategory;
 }

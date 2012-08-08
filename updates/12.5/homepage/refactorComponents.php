@@ -33,6 +33,12 @@ class DashboardComponentReFactory {
         'comments_size' => 'Number of comments'
     );
 
+    private $customConfigs = array(
+        'Assess' => array('compactMode' => 'false'),
+    );
+
+    private $newConfigDefinitions = array();
+
     /**
      * @var Database
      */
@@ -77,22 +83,41 @@ class DashboardComponentReFactory {
         }
 
         // test the existence of new controller names in database
-        $source = $this->db->query("SELECT `class` FROM `component_definition` WHERE `module` = 'homepage'");
+        $source = $this->db->query("SELECT `id`, `class` FROM `component_definition` WHERE `module` = 'homepage'");
         $registeredControllers = array();
-        while($r = $source->fetchColumn(0)) {
-            $registeredControllers[] = $r;
+        while($r = $source->fetch(PDO::FETCH_ASSOC)) {
+            $registeredControllers[$r['class']] = $r['id'];
+        }
+
+        $source = $this->db->query("SELECT * FROM `component_config_definition`");
+        $registeredConfigs = array();
+        while($r = $source->fetch(PDO::FETCH_ASSOC)) {
+            $registeredConfigs[$r['component_definition_id']][] = $r;
         }
 
         foreach($comp['new'] as &$nc) {
-            if(in_array($nc['class'], $registeredControllers)) {
+            if(in_array($nc['class'], array_keys($registeredControllers))) {
                 $nc['registered'] = true;
+
+                // it's registered, so we'll assume its configs are registered as well
+
+                if(isset($registeredConfigs[$registeredControllers[$nc['class']]])) {
+                    foreach($registeredConfigs[$registeredControllers[$nc['class']]] as $conf) {
+                        print_r($conf);
+                    }
+                }
+                else {
+                    echo "Missing configs for {$nc['class']}\n";
+                }
+
+
             }
             else {
                 $nc['registered'] = false;
             }
 
-            // test the existence of new controller files
-            if(file_exists((dirname(__FILE__).'/../../../library/'.str_replace('_','/',$nc['class'])).'.php')) {
+            // test the existence of new controller classes
+            if(class_exists($nc['class'])) {
                 $nc['exists'] = true;
             }
             else {
@@ -100,14 +125,20 @@ class DashboardComponentReFactory {
             }
         }
 
+        printf("\n%23s    %-45s%-8s%s\n",'method','controller','reg','file');
+        for($i = 0; $i < 100; $i++) echo "-"; echo "\n";
         for($i = 0; $i < count($comp['old']); ++$i) {
-            printf(" [%s] %18s => %-42s : %s, %s\n",
+            printf(" [%s] %18s => %-42s :  %-8s%s\n",
                 ($comp['new'][$i]['registered'] && $comp['new'][$i]['exists']) ? ' ' : '!',
                 $comp['old'][$i]['method'],
                 $comp['new'][$i]['class'],
-                $comp['new'][$i]['registered'] ? 'registered' : 'not registered',
-                $comp['new'][$i]['exists'] ? 'class exists' : 'class does not exist'
+                $comp['new'][$i]['registered'] ? 'Y' : 'N',
+                $comp['new'][$i]['exists'] ? 'Y' : 'N'
             );
+            // if the component is registered, display the status of its config template files
+            if($comp['new'][$i]['registered']) {
+
+            }
         }
         echo "\n";
 
@@ -151,36 +182,7 @@ class DashboardComponentReFactory {
             $newComp->multiple = $oldComp['allowMultiple'];
 
             /* config definitions and instances */
-
-            $oldCompConfig = unserialize($oldComp['config']);
-
-            if(is_array($oldCompConfig) && count($oldCompConfig)) {
-                foreach($oldCompConfig as $key => $value) {
-
-                    if(preg_match('#homepage-.*#i', $key)) {
-                        $key = 'src';
-                    }
-
-                    // keys can be duplicated, but the combination of key and definitionId must be unique
-                    // database schema will perform update if the combination is not unique
-                    $confDefinition = new Component_ConfigDefinition();
-                    $confDefinition->id = null;
-                    $confDefinition->definitionId = $newComp->id;
-                    $confDefinition->key = $key;
-
-                    if(($confDefinition->defaultValue = $this->refactorDefaultValue($key, $value)) === false) {
-                        continue;
-                    }
-
-                    $confDefinition->label = $this->refactorLabel($key);
-
-                    // for debug, it won't attempt to insert this value
-                    $confDefinition['componentClassname'] = $newComp->class;
-
-                    $newConfigDefinitions[] = $confDefinition;
-
-                }
-            }
+            $this->parseSerializedConfig($oldComp['config'], $newComp);
 
             // custom cases for links, files and folders because their sources aren't defined in the default config
             if(in_array($oldComp['method'], array('outputLinkList', 'outputFileList','outputFolderList', 'outputNews'))) {
@@ -190,7 +192,7 @@ class DashboardComponentReFactory {
                 $confDefinition->key          = 'src';
                 $confDefinition->label        = 'Source';
                 $confDefinition->defaultValue = '';
-                $newConfigDefinitions[] = $confDefinition;
+                $this->newConfigDefinitions[] = $confDefinition;
             }
 
             $newDefinitions[] = $newComp;
@@ -199,13 +201,13 @@ class DashboardComponentReFactory {
 
         if($performSQL) {
             Component_DefinitionMapper::getInstance()->save($newDefinitions);
-            Component_ConfigDefinitionMapper::getInstance()->save($newConfigDefinitions);
+            Component_ConfigDefinitionMapper::getInstance()->save($this->newConfigDefinitions);
         }
 
         if($this->beVerbose) {
             foreach($newDefinitions as $def) {
                 printf("%s [ %s%s ]\n",$def->name, $def->class, class_exists($def->class, true) ? '' : ' (does not exist)');
-                foreach($newConfigDefinitions as $conf) {
+                foreach($this->newConfigDefinitions as $conf) {
                     if($conf->definitionId == $def->id) {
                         printf(" > %s :%s\n", $conf->key, $conf->defaultValue);
                     }
@@ -214,6 +216,76 @@ class DashboardComponentReFactory {
             }
         }
     }
+
+    /**
+     * @param string $configString
+     * @param Component_Definition $newComp
+     */
+    public function parseSerializedConfig($configString, $newComp = null, $return = false) {
+        $oldCompConfig = unserialize($configString);
+
+        $rtn = array();
+
+        if($newComp) {
+            $oldCompConfig = $this->mergeCustomConfig($newComp, $oldCompConfig);
+        }
+
+        if(is_array($oldCompConfig) && count($oldCompConfig)) {
+            foreach($oldCompConfig as $key => $value) {
+
+                if(preg_match('#homepage-.*#i', $key)) {
+                    $key = 'src';
+                }
+
+                // keys can be duplicated, but the combination of key and definitionId must be unique
+                // database schema will perform update if the combination is not unique
+                $confDefinition = new Component_ConfigDefinition();
+                $confDefinition->id = null;
+                $confDefinition->key = $key;
+
+                if($newComp) {
+                    $confDefinition->definitionId = $newComp->id;
+                }
+
+                if(($confDefinition->defaultValue = $this->refactorDefaultValue($key, $value)) === false) {
+                    continue;
+                }
+
+                $confDefinition->label = $this->refactorLabel($key);
+
+                if($return) {
+                    $rtn[] = $confDefinition;
+                }
+                else {
+                    $this->newConfigDefinitions[] = $confDefinition;
+                }
+
+            }
+        }
+
+        if($return) {
+            return $rtn;
+        }
+    }
+
+    /**
+     * @param $newComp
+     * @param $oldCompConfig
+     * @return array
+     */
+    public function mergeCustomConfig($newComp, $oldCompConfig) {
+        // merge any configurations that we come across that weren't specified in the db into the old config array
+
+        $k = preg_replace("#Homepage_([A-Za-z]*)Controller#i", "$1", $newComp->class);
+        if(isset($this->customConfigs[$k])) {
+            if(!is_array($oldCompConfig)) {
+                $oldCompConfig = array();
+            }
+            return array_merge($oldCompConfig, $this->customConfigs[$k]);
+        }
+        return $oldCompConfig;
+    }
+
 
     /**
      * @param string $method
@@ -287,8 +359,6 @@ class DashboardComponentReFactory {
 }
 
 new DashboardComponentReFactory($options);
-
-die();
 
 
 /* Original `homepage_comp` schema

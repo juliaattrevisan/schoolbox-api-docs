@@ -108,8 +108,8 @@ abstract class Component_FactoryAbstract {
     /**
      * @return Collection
      */
-    public function getDefinitionList() {
-        return Component_DefinitionMapper::getInstance()->findAllForModule($this->module);
+    public function getDefinitionList($sortBy = '') {
+        return Component_DefinitionMapper::getInstance()->findAllForModule($this->module, $sortBy);
     }
 
 

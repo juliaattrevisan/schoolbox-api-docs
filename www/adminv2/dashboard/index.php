@@ -38,7 +38,7 @@ if ( is_array($groupList) ) {
 /* Component Palette */
 $this->setBlock(TEMPLATE_content, 'definition', 'definition_block');
 
-$definitionCollection = Component_DefinitionMapper::getInstance()->findAll();
+$definitionCollection = Component_DefinitionMapper::getInstance()->findByColumn('module', 'dashboard');
 
 foreach ( $definitionCollection as $definition ) {
     $this->setVar(array(

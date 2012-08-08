@@ -1,0 +1,184 @@
+homepageControl = {
+	
+	init: function(event){
+		this.help();
+		this.checkForPreselection();
+		this.roleSelect();
+		this.dragAndDrop();
+		this.refreshPalette();
+		this.deleteComponent();
+	},
+	help: function(target) {
+		 $j.fn.qtip.defaults.position.corner = {
+            target: 'topLeft',
+            tooltip: 'bottomLeft'
+        }
+        $j.fn.qtip.defaults.style = {
+            tip: 'bottomLeft',
+            name: 'green' 
+        }
+
+        $j('h3 span').each(function() {
+            activeContent = $j(this).siblings('em').html();
+            $j(this).qtip({
+                content: activeContent,
+                api: {
+					// Retrieve the content when tooltip is first rendered
+					 onRender: function()
+					 {
+						var self = this;
+					 }
+				 }
+            });
+        });
+
+        // We'll encapsulate our .qtip() call in your .live() handler method
+        $j('.disabled').live('mouseover', function(event) {
+            // Bind the qTip within the event handler
+            $j(this).qtip({
+                overwrite: false,
+                content: 'This component is already active for the template selected.',
+                show: {
+                    event: event.type,
+                    ready: true
+                }
+            }, event); // Pass through our original event to qTip
+        });
+	},
+
+	checkForPreselection: function() {
+		$this = this;
+		hashStripped = location.href.split("#")[1];
+		if (hashStripped) {
+			$j('#template-select').val(hashStripped);
+			$j.get('/adminv2/homepage/get-homepage/'+hashStripped, function ($layout) {
+				$j('#homepage-layout').fadeOut(function() {
+					$j(this).empty().append($layout);
+					$j(this).fadeIn();
+					$this.dragAndDrop();
+				});
+			});
+		}
+
+	},
+
+	dragAndDrop: function(target) {
+		$this = this;
+
+		$j('#homepage-layout .component-holder').sortable({
+			helper: 'clone',
+			connectWith: '#homepage-layout .component-holder',
+			update: function (event, ui) {
+
+                var $instanceId;
+                if($j(ui.item).attr('id'))
+    				$instanceId = $j(ui.item).attr('id').match(/instance\-id\-(\d+)/);
+                else
+                    $instanceId = null;
+
+				if ( $instanceId != null ) {
+					$instanceId = $instanceId[1];
+				}
+
+				var $definitionId = $j(ui.item).attr('class').match(/definition\-id\-(\d+)/)[1];
+
+				var $templateId = $j('#template-select').val();
+
+				var $position = $j(ui.item).parent().parent().attr('id').match(/position\-(\w+)/)[1];
+
+				var $sequence = $j(ui.item).index() + 1;
+
+				var $component = {
+					definitionId: $definitionId,
+					templateId: $templateId,
+					position: $position,
+					sequence: $sequence
+				};
+
+				if ( $instanceId != null ) {
+					$component.instanceId = $instanceId;
+				}
+
+				$j.post('/adminv2/homepage/save-instance', $component, function ($instance) {
+					$j(ui.item).attr('id', 'instance-id-'+$instance.id);
+					$this.refreshPalette();
+				});
+			},
+			placeholder: 'marker',
+			items: '.component',
+			cursor: 'move',
+			stop: function(event, ui) {
+				if (!(ui.item.find('.delete-this').length > 0)) {
+					ui.item.append('<a href="#" class="config-this">&#9660;</a><a href="#" class="delete-this">X</a>')
+				}
+			}
+
+		});
+
+		$j('#definition-palette .component').draggable({
+			helper: 'clone',
+			connectToSortable: '#homepage-layout .component-holder'
+		});
+
+        $j('#homepage-layout .component-holder').sortable('refresh');
+
+		this.refreshPalette();
+	},
+
+	refreshPalette: function() {
+		$j('#definition-palette .component').each( function () {
+			var $definitionElement = $j(this);
+			var $definitionIdClass = $definitionElement.attr('class').match(/(definition\-id\-\d+)/)[1];
+
+			if ( !$j('#homepage-layout .component').hasClass($definitionIdClass) ) {
+				$definitionElement
+					.draggable('enable')
+					.removeClass('disabled');
+			}
+			else {
+				$definitionElement
+					.draggable('disable')
+					.addClass('disabled');
+			}
+		} );
+	},
+
+	roleSelect: function() {
+		$this = this;
+		 $j('#template-select').change(function () {
+            var $templateId = $j(this).val();
+			location.hash = $templateId;
+
+            $j.get('/adminv2/homepage/get-homepage/'+$templateId, function ($layout) {
+                $j('#homepage-layout').fadeOut(function() {
+                    $j(this).empty().append($layout);
+                    $j(this).fadeIn();
+                    $this.dragAndDrop();
+                });
+            });
+        });
+	},
+
+	deleteComponent: function() {
+
+		$this = this;
+		console.log($this);
+		/*
+		  $j('.delete-this').live('click',function() {
+            var $instanceId = $j(this).parent().attr('id').match(/^instance\-id\-(\d+)$/)[1];
+
+            $j(this).parent().slideUp(100,function(){
+                $j(this).remove();
+                $this.refreshPalette();
+            })
+
+            $j.post('/adminv2/homepage/remove-instance', {instanceId: $instanceId}, function () {
+
+            });
+
+            return false;
+        })
+        */
+	}
+
+}

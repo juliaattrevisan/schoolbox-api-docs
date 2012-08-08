@@ -83,6 +83,10 @@ if (is_numeric($_REQUEST['cid'])) {
         $factory = new Component_Homepage_Factory(new User(), new SitePage(false));
         $component = $factory->buildComponent($instanceID);
 
+        if(!$component) {
+            die("<h2>Error adding component</h2><p>Could not find component to instantiate.</p>");
+        }
+
         $templateTarget = "component_position_{$component->instance->position}";
         $templateHandle = "component_{$component->instance->id}";
         $templateHandle = TEMPLATE_content;

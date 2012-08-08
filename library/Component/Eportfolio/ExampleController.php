@@ -27,9 +27,13 @@ class Component_Eportfolio_ExampleController extends Component_Eportfolio_Contro
         if(!parent::loadTemplate($templateHandle, 'example')) {
             return false;
         }
+        $this->parseConfig();
+
         // TODO: Implement renderTemplate() method.
 
-    }
 
+        // return true; everything went according to plan
+        // return false; will suppress the output of this component instance
+    }
 
 }

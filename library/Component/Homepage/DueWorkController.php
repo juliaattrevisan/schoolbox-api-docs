@@ -45,7 +45,7 @@ class Component_Homepage_DueWorkController extends Component_Homepage_Controller
         }
 
 
-        $this->parseConfig($templateHandle);
+        $this->parseConfig();
 
         /* Tick for checkbox which controls whether to show the Posted By details
         */

@@ -76,13 +76,24 @@ class Component_DefinitionMapper extends Mapper {
         return $this->hydrateList($rowset);
     }
 
-    public function findAllForModule($module) {
-        $statement = $this->database->prepare("
+    public function findAllForModule($module, $sortBy = '') {
+        $sort = '';
+        if($sortBy) {
+            foreach($this->map as $m)
+            if($m['column'] == $sortBy) {
+                $sort = "ORDER BY $sortBy ASC";
+                break;
+            }
+        }
+        $sql = "
             SELECT {$this->getColumnString()}
             FROM `{$this->table}`
             WHERE visible = 'true'
             AND module = :module
-        ");
+            $sort
+        ";
+
+        $statement = $this->database->prepare($sql);
 
         $statement->bindParam('module', $module);
         $statement->execute();

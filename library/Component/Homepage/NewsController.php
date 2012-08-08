@@ -56,7 +56,7 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
             return false;
         }
 
-        $this->parseConfig($templateHandle);
+        $this->parseConfig();
 
         $this->setBlock($templateHandle, 'news', 'news_block');
         $this->setBlock($templateHandle, "submit_news", "submit_news_block");
