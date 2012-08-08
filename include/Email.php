@@ -59,7 +59,7 @@ class Email {
 	 * @return bool|string
 	 */
 	public function formatEmailFromArray($user) {
-		if ($user['local_email'] && $user['username']) {
+		if ($user['local_email'] && isset($user['username']) && $user['username']) {
 			return $user['username'] . '@' . Cfg::get('mail_address');
 		}
 		else if ($user['alt_email']) {
