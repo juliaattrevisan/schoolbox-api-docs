@@ -100,7 +100,7 @@ class Synchronise_Synergetic_Jpc_Strategy_Staff extends Synchronise_Synergetic_J
 
     //Converts Synergetic StaffCategoryType to admin or teacher group
     protected function getGroupIDFromCategory($category) {
-        $teacherGroupList = array('TCHR','REP-TCHR','SCH_OFF','BUS MGR','Maint MGR','Princ_Sec');
+        $teacherGroupList = array('TCHR','REP-TCHR','SCH_OFF','BUS MGR','Maint MGR','Princ_Sec','');
 
         if(in_array($category,$teacherGroupList))
             return self::TEACH_GROUP_ID;
