@@ -103,40 +103,43 @@ class Digest_News {
      * @return array
      */
     protected function compileNews($u) {
-        $newslist = $this->newsHandler->getFilteredNews($u['id'], $u['campus'], $u['gid']);
+        $newsList = $this->newsHandler->getFilteredNews($u['id'], $u['campus'], $u['gid']);
 
-        foreach($newslist as $article) {
-            $u['articles']['c'][0][$article['item_id']] = array(
-                'id'       => $article['item_id'],
-                'title'    => $article['item_heading'],
-                'abstract' => $this->scrub($article['item_body']),
-                'topic'    => $article['topicName'],
-                'date'     => strtotime($article['item_datetime_posted']),
-            );
-        }
+        if(is_array($newsList)) {
+            foreach($newsList as $article) {
+                $u['articles']['c'][0][$article['item_id']] = array(
+                    'id'       => $article['item_id'],
+                    'title'    => $article['item_heading'],
+                    'abstract' => $this->scrub($article['item_body']),
+                    'topic'    => $article['topicName'],
+                    'date'     => strtotime($article['item_datetime_posted']),
+                );
+            }
 
-        $access = $this->groupHandler->getAllUserAccess($u['id']);
+            $access = $this->groupHandler->getAllUserAccess($u['id']);
 
-        if($access) {
-            foreach($access as $a) {
-                if($a['name'] != 'Homepage') {
-                    continue;
-                }
-                $cat = $this->catHandler->getByID($a['sid']);
-                $hNews = $this->catnewsHandler->getAllForCategory($a['sid'], false, false, $u['id']);
-                if($hNews) {
-                    foreach($hNews as $art) {
-                        $u['articles']['h'][$a['sid']][$art['id']] = array(
-                            'id'       => $art['id'],
-                            'title'    => $art['heading'],
-                            'abstract' => $this->scrub($art['body']),
-                            'topic'    => $cat['name'],
-                            'date'     => $art['posted'],
-                        );
+            if($access) {
+                foreach($access as $a) {
+                    if($a['name'] != 'Homepage') {
+                        continue;
+                    }
+                    $cat = $this->catHandler->getByID($a['sid']);
+                    $hNews = $this->catnewsHandler->getAllForCategory($a['sid'], false, false, $u['id']);
+                    if($hNews) {
+                        foreach($hNews as $art) {
+                            $u['articles']['h'][$a['sid']][$art['id']] = array(
+                                'id'       => $art['id'],
+                                'title'    => $art['heading'],
+                                'abstract' => $this->scrub($art['body']),
+                                'topic'    => $cat['name'],
+                                'date'     => $art['posted'],
+                            );
+                        }
                     }
                 }
             }
         }
+
         return $u;
     }
 
@@ -161,51 +164,53 @@ class Digest_News {
         $this->cli(sprintf("Email to %s %s (%s)", $u['firstname'], $u['lastname'], $u['email']));
         $newsFlag = false;
 
-        foreach($u['articles'] as $newsType => $newsList) {
+        if(is_array($u['articles'])) {
+            foreach($u['articles'] as $newsType => $newsList) {
 
-            switch($newsType) {
-                case 'c':
-                    $mailer->setVar('NEWS_TYPE', 'School News');
-                    $slugBase = "news/item/";
-                    break;
-                case 'h':
-                    $mailer->setVar('NEWS_TYPE', 'From your homepages');
-                    $slugBase = "homepage/";
-                    break;
-                default:
-                    $mailer->setVar('NEWS_TYPE', '');
-                    $slugBase = "";
-                    break;
-            }
+                switch($newsType) {
+                    case 'c':
+                        $mailer->setVar('NEWS_TYPE', 'School News');
+                        $slugBase = "news/item/";
+                        break;
+                    case 'h':
+                        $mailer->setVar('NEWS_TYPE', 'From your homepages');
+                        $slugBase = "homepage/";
+                        break;
+                    default:
+                        $mailer->setVar('NEWS_TYPE', '');
+                        $slugBase = "";
+                        break;
+                }
 
-            foreach($newsList as $catID => $news) {
-                $i = 0;
-                foreach($news as $article) {
-                    if($this->withinWindow($article['date'])) {
-                        $mailer->setVar(array(
-                            'ARTICLE_SLUG'       => $slugBase . ($newsType == 'h' ? $catID : $article['id']),
-                            'ARTICLE_TITLE'      => $article['title'],
-                            'ARTICLE_ABSTRACT'   => $article['abstract'],
-                            'ARTICLE_TOPIC'      => $article['topic'],
-                            'ARTICLE_DATE'       => date('l, jS \o\f F', $article['date']),
-                            'ARTICLE_BACKGROUND' => ++$i % 2 == 1 ? "none" : "#F4F4F8"
-                        ));
+                foreach($newsList as $catID => $news) {
+                    $i = 0;
+                    foreach($news as $article) {
+                        if($this->withinWindow($article['date'])) {
+                            $mailer->setVar(array(
+                                'ARTICLE_SLUG'       => $slugBase . ($newsType == 'h' ? $catID : $article['id']),
+                                'ARTICLE_TITLE'      => $article['title'],
+                                'ARTICLE_ABSTRACT'   => $article['abstract'],
+                                'ARTICLE_TOPIC'      => $article['topic'],
+                                'ARTICLE_DATE'       => date('l, jS \o\f F', $article['date']),
+                                'ARTICLE_BACKGROUND' => ++$i % 2 == 1 ? "none" : "#F4F4F8"
+                            ));
 
-                        $mailer->parse('article_block', 'article', true);
-                        $newsFlag = true;
+                            $mailer->parse('article_block', 'article', true);
+                            $newsFlag = true;
+                        }
                     }
                 }
+                $mailer->parse('newslist_block', 'newslist', true);
+                $mailer->setVar('article_block', '');
             }
-            $mailer->parse('newslist_block', 'newslist', true);
-            $mailer->setVar('article_block', '');
-        }
 
-        if(!$this->debugging() && $newsFlag) {
-            $success = $mailer->send();
-            if(!$success) {
-                $this->cli("Failed to send email to {$u['email']}", true);
+            if(!$this->debugging() && $newsFlag) {
+                $success = $mailer->send();
+                if(!$success) {
+                    $this->cli("Failed to send email to {$u['email']}", true);
+                }
+                return $success;
             }
-            return $success;
         }
 
         return true;
