@@ -69,6 +69,10 @@ abstract class Calendar_Event_Type_Abstract {
 	 */
 	protected $rendererClass = '';
 
+	/* Whether or not to display the modify link
+	 */
+	protected $isEditable = true;
+
 	/**
 	 * Constructor
 	 *
@@ -455,5 +459,23 @@ abstract class Calendar_Event_Type_Abstract {
 	 */
 	public function getRendererClass() {
 		return $this->rendererClass;
+	}
+
+	/**
+	 * Set isEditable
+	 *
+	 * @param $isEditable
+	 */
+	public function setIsEditable($isEditable) {
+		$this->isEditable = $isEditable;
+	}
+
+	/**
+	 * Get isEditable
+	 *
+	 * @return bool
+	 */
+	public function getIsEditable() {
+		return $this->isEditable;
 	}
 }

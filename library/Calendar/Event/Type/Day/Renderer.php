@@ -63,9 +63,16 @@ class Calendar_Event_Type_Day_Renderer extends Calendar_Event_Type_Renderer_Abst
 
 			/* Modify link. Should be templated...
 			 */
-			$this->getPage()->setVar(array(
-				'MODIFY' => $this->getCalendarHandler()->getPerm($currentEvent->getEventId()) > 1 ? '<a class="btn modify float-left" href="/calendar/modify.php?eventID=' . $currentEvent->getEventId() . '&returnTo=month"><span></span>Modify</a>' : '',
-			));
+			if ($currentEvent->getIsEditable()) {
+				$this->getPage()->setVar(array(
+					'MODIFY' => $this->getCalendarHandler()->getPerm($currentEvent->getEventId()) > 1 ? '<a class="btn modify float-left" href="/calendar/modify.php?eventID=' . $currentEvent->getEventId() . '&returnTo=month"><span></span>Modify</a>' : '',
+				));
+			}
+			else {
+				$this->getPage()->setVar(array(
+					'MODIFY' => ''
+				));
+			}
 
 			/* If a time was specified, show it; otherwise hide it
 			 */

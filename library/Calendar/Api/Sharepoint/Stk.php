@@ -104,6 +104,10 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 			$event->setCategoryName('');
 			$event->setAttendance('');
 
+			/* Prevent modify link
+			 */
+			$event->setIsEditable(false);
+
 			$collection->add($event);
 		}
 
