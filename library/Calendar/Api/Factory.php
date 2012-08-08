@@ -14,10 +14,7 @@
  * @version	 SVN: $Id$
  */
 class Calendar_Api_Factory {
-//	private $allSources = array('Sharepoint');
-	private $allSources = array('Schoolbox');
-//	private $allSources = array('Sharepoint', 'Vcal', 'Schoolbox', 'Iport');
-//	private $allSources = array();
+	private $allSources = array('Sharepoint', 'Schoolbox');
 
 	/**
 	 * Produce an API Composite
@@ -31,13 +28,7 @@ class Calendar_Api_Factory {
 		 */
 		foreach ($this->getAllSources() as $currentSource) {
 			$defaultImplementation = 'Calendar_Api_' . $currentSource . '_Default';
-			$uniqueImplementation = 'Calendar_Api_' . $currentSource . '_' . Cfg::get('site_domain');
-
-			/* Temporary forced usage of Sharepoint/Iport for Stk
-			 */
-			if ($currentSource == 'Sharepoint') {
-				$uniqueImplementation = 'Calendar_Api_' . $currentSource . '_Stk';
-			}
+			$uniqueImplementation = 'Calendar_Api_' . $currentSource . '_' . ucwords(Cfg::get('site_location'));
 
 			/* Decide which to use (unique or default)
 			 * Or create no class, if neither exists
