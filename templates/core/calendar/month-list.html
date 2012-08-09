@@ -116,11 +116,17 @@
                         <div class="hidden-fields clearfix">
                             <h4><!-- BEGIN time -->
                                 <div class="time"><strong>{TIME}</strong></div>
-                                <!-- END time -->{NOTE}
+                                <!-- END time -->
+
+								<p>
+									<em>{LOCATION}</em>
+								</p>
+
+								{NOTE}
                             </h4>
                             <p class="meta">Event Type: {TYPE}<br/>
                                 Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a><br/>
-                                {LOCATION} {DETAIL}
+								{DETAIL}
                             </p>
 
                             <!-- BEGIN has_category -->
