@@ -120,7 +120,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 			$event->setEventId(1);
 			$event->setStartTime(new Alaress_Date_Format((string)$attribs->ows_EventDate, 'y-m-d h:i:s'));
 			$event->setEndTime(new Alaress_Date_Format((string)$attribs->ows_EndDate, 'y-m-d h:i:s'));
-			$event->setType('');
+			$event->setType($eventTypeID);
 			$event->setNote((string)$attribs->ows_Title);
 			$event->setLocation((string)$attribs->ows_School);
 			$event->setAccess(Calendar_Event_Type_Abstract::CAMPUS_ACCESS);
