@@ -28,14 +28,14 @@ class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synerget
         // use defaults to connect to Synergetic for passwords
         $link = new MSSQL();
         $result = $link->query("
-            SELECT [vCommunityAddresses].id AS SynergyID,
-                   [CommunityAttributes].AttributeCode AS CommunityAttribute,
-                   [CommunityAttributes].AttributeValue AS CommunityPortalPassword,
-                   [CommunityAttributes].AttributeModifiedDate AS CommunityPortalPasswordDate
-            FROM [SynergyOne].[dbo].[vCommunityAddresses]
-            LEFT JOIN [SynergyOne].[dbo].[CommunityAttributes] ON [SynergyOne].[dbo].[CommunityAttributes].ID = [vCommunityAddresses].id
+            SELECT vCommunityAddresses.id AS SynergyID,
+                   CommunityAttributes.AttributeCode AS CommunityAttribute,
+                   CommunityAttributes.AttributeValue AS CommunityPortalPassword,
+                   CommunityAttributes.AttributeModifiedDate AS CommunityPortalPasswordDate
+            FROM vCommunityAddresses
+            LEFT JOIN CommunityAttributes ON CommunityAttributes.ID = vCommunityAddresses.id
             WHERE ConstitCodes LIKE '%@pc%'
-            AND [CommunityAttributes].AttributeCode = '5'"
+            AND CommunityAttributes.AttributeCode = '5'"
         );
 
         // collate the results, indexed by synID
