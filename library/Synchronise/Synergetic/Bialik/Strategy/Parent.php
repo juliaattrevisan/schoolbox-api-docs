@@ -14,13 +14,34 @@ class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synerget
 	protected $strategyTitle = "Parent Synchronisation";
 	const PARENT_GROUP_ID = 4;
 
+    protected $parentPSync = array();
+
 	/**
 	 * Get a list of users' Synergy IDs to sync
+     * Custom addon for Bialik: also collate the parents' passwords
 	 *
 	 * @return void
 	 */
 	public function generateList() {
 		$this->collateList($this->getExternalUserHandler()->getParentUserAccountInfo());
+
+        // use defaults to connect to Synergetic for passwords
+        $link = new MSSQL();
+        $result = $link->query("
+            SELECT [vCommunityAddresses].id AS SynergyID,
+                   [CommunityAttributes].AttributeCode AS CommunityAttribute,
+                   [CommunityAttributes].AttributeValue AS CommunityPortalPassword,
+                   [CommunityAttributes].AttributeModifiedDate AS CommunityPortalPasswordDate
+            FROM [SynergyOne].[dbo].[vCommunityAddresses]
+            LEFT JOIN [SynergyOne].[dbo].[CommunityAttributes] ON [SynergyOne].[dbo].[CommunityAttributes].ID = [vCommunityAddresses].id
+            WHERE ConstitCodes LIKE '%@pc%'
+            AND [CommunityAttributes].AttributeCode = '5'"
+        );
+
+        // collate the results, indexed by synID
+        while($user = $link->getNextArray()) {
+            $this->parentPSync[$user['SynergyID']] = $user;
+        }
 	}
 
 	/**
@@ -33,9 +54,14 @@ class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synerget
 		$newUser = array();
 
 		/* Login details
-		 * We don't know how the password is given to us
 		 */
 		$newUser['username'] = $currentUser['StudentContactID'];
+
+        // only set pw variable if there's something to put in it
+        $synID = $currentUser['StudentContactID'];
+        if(isset($this->parentPSync[$synID])) {
+            $newUser['password'] = $this->parentPSync[$synID]['CommunityPortalPassword'];
+        }
 
 		/* User details
 		 */
@@ -71,9 +97,14 @@ class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synerget
 		$spouse = array();
 
 		/* Login details
-		 * We don't know how the password is given to us
 		 */
 		$spouse['username'] = $currentUser['StudentContactSpouseID'];
+
+        // only set pw variable if there's something to put in it
+        $synID = $currentUser['StudentContactSpouseID'];
+        if(isset($this->parentPSync[$synID])) {
+            $spouse['password'] = $this->parentPSync[$synID]['CommunityPortalPassword'];
+        }
 
 		/* User details
 		 */
