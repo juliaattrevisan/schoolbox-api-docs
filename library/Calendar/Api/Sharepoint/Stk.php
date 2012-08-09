@@ -39,7 +39,30 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 		'SKP' => 4,
 	);
 
-	/**
+    /* Event type mapping from the luEventType table.
+      */
+    private $typeMap = array(
+        'Arts'             => 1,
+        'Assembly'         => 2,
+        'Chapel'           => 2,
+        'ETT'              => 2,
+        'Assessment'       => 3,
+        'Meeting P'        => 4,
+        'Meeting S'        => 5,
+        'Administration'   => 7,
+        'Deadline'         => 7,
+        'Photos'           => 7,
+        'Other'            => 7,
+        'Sport'            => 8,
+        'EOTC'             => 11,
+        'Event'            => 9,
+    );
+
+    /* Contains all event types for reference during mapping */
+    private $typeList = array();
+
+
+    /**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -55,6 +78,9 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 		}
 
 		$this->setSoap($soapClient);
+
+        $this->setCalendarHandler(new Calendar());
+        $this->setEventTypes($this->getCalendarHandler()->getTypeList());
 	}
 
 	/**
@@ -86,6 +112,8 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 		foreach($allEvents->rsdata->zrow as $currentEvent) {
 			$attribs = $currentEvent->attributes();
 
+            $eventTypeID = $this->getTypeIdFromName((string)$attribs->ows_ContentType);
+
 			$event = new Calendar_Event_Type_Day();
 			$event->setAuthorName('');
 			$event->setAuthorId('');
@@ -97,8 +125,8 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 			$event->setLocation((string)$attribs->ows_School);
 			$event->setAccess(Calendar_Event_Type_Abstract::CAMPUS_ACCESS);
 			$event->setCampusList($this->getCampusIdFromName((string)$attribs->ows_School));
-			$event->setEventType('');
-			$event->setColour('');
+			$event->setEventType($this->getTypeNameByID($eventTypeID));
+			$event->setColour($this->getCalendarHandler()->displayColour($eventTypeID));
 			$event->setPublishDate((string)$attribs->ows_Created);
 			$event->setSid('');
 			$event->setCategoryId('');
@@ -171,6 +199,16 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 		return $this->campusList[$name];
 	}
 
+    /**
+     * Used to map event types from STK to Schoolbox
+     *
+     * @param $name
+     * @return mixed
+     */
+    private function getTypeIdFromName($name) {
+        return $this->typeMap[$name];
+    }
+
 	/* Getters/Setters
 	 */
 
@@ -209,4 +247,46 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 	private function getCredentials() {
 		return $this->credentials;
 	}
+
+    /**
+     * Set calendar handler
+     *
+     * @param $calendarHandler
+     */
+    public function setCalendarHandler($calendarHandler) {
+        $this->calendarHandler = $calendarHandler;
+    }
+
+    /**
+     * Get calendar handler
+     *
+     * @return null
+     */
+    public function getCalendarHandler() {
+        return $this->calendarHandler;
+    }
+
+    /**
+     * Set event type list
+     *
+     * @array $eventTypes
+     */
+    public function setEventTypes($eventTypes) {
+        $this->typeList = $eventTypes;
+    }
+
+    /**
+     * Get event type list based on ID
+     *
+     * @param $eventTypeID
+     * @return string
+     */
+    public function getTypeNameByID($eventTypeID) {
+        foreach($this->typeList as $type) {
+            if($type['eventTypeID'] == $eventTypeID) {
+                return $type['eventType'];
+            }
+        }
+    }
+
 }
