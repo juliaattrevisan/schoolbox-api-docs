@@ -1,0 +1,59 @@
+<?php
+/**
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+class Component_Homepage_TwitterController extends Component_Homepage_ControllerAbstract {
+
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return void
+     */
+    public function execute() {
+
+    }
+
+    /**
+     * Renders the data into the SitePage. Presentation logic.
+     * @param String $templateHandle
+     * @return boolean
+     */
+    public function renderTemplate($templateHandle) {
+        if(!parent::loadTemplate($templateHandle, 'twitter')) {
+            return false;
+        }
+        $this->parseConfig();
+
+        $this->setBlock($templateHandle, 'tweet', 'tweet_block');
+
+        $allTweets = new Alaress_Twitter_Search($this->getConfig('username'), $this->getConfig('keywords'));
+        $allTweets->setMaxTweets($this->getConfig('size'))->load();
+
+        $allResults = $allTweets->getTweets();
+
+        // Render out tweets
+        $this->setVar('tweet_block', '');
+
+        if (count($allResults)) {
+            $i = 0;
+            foreach($allResults as $currentTweet) {
+                $color = ++$i % 2 ? '' : 'dark';
+                $date = new Alaress_Date_Format(strtotime($currentTweet['date']), 'U');
+                $this->setVar(array(
+                    'TWEET_TEXT' => $currentTweet['text'],
+                    'TWEET_DATE' => $date->getShort(),
+                    'TWEET_AUTHOR' => $currentTweet['author'],
+                    'TWEET_AVATAR' => $currentTweet['avatar'],
+                    'ON_OFF' => $color,
+                ));
+                $this->parse('tweet_block', 'tweet', true);
+            }
+        }
+        return true;
+    }
+
+}

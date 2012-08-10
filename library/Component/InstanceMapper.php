@@ -134,7 +134,7 @@ class Component_InstanceMapper extends Mapper {
 
             $dirtyInstance->definition = $definitionMapper->findById($dirtyInstance->definitionId);
 
-            /* Check for multiple instances with the same definition if disallowed */
+            // Check for multiple instances with the same definition if disallowed
             if ( $dirtyInstance->definition->multiple == 'false' ) {
                 $similarInstanceCollection = $instanceMapper->findByColumnList(array(
                     'module'     => 'dashboard',
@@ -149,7 +149,7 @@ class Component_InstanceMapper extends Mapper {
                 }
             }
 
-            /* Find original instance otherwise use blank instance for following conditional statements */
+            // Find original instance otherwise use blank instance for following conditional statements
             $cleanInstance = $instanceMapper->findById($dirtyInstance->id);
 
             if ( !$cleanInstance ) {
@@ -158,7 +158,7 @@ class Component_InstanceMapper extends Mapper {
 
             if ( $dirtyInstance->position != $cleanInstance->position || $dirtyInstance->sequence != $cleanInstance->sequence ) {
 
-                /* Resequence source components */
+                // Resequence source components
                 if ( !empty($cleanInstance->id) ) {
                     $sourceInstanceCollection = $instanceMapper->findByColumnList(array(
                         'module'     => 'dashboard',
@@ -178,7 +178,7 @@ class Component_InstanceMapper extends Mapper {
                     parent::save($sourceInstanceCollection);
                 }
 
-                /* Resequence destination components */
+                // Resequence destination components
                 $destinationInstanceCollection = $instanceMapper->findByColumnList(array(
                     'module'     => 'dashboard',
                     'identifier' => $dirtyInstance->identifier,

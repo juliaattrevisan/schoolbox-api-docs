@@ -179,7 +179,7 @@ class Alaress_Twitter_Search {
 	 * Chainable method
 	 *
 	 * @param  $maxTweets
-	 * @return void
+	 * @return self
 	 */
 	public function setMaxTweets($maxTweets) {
 		$this->maxTweets = $maxTweets;

@@ -42,6 +42,16 @@ abstract class Component_ControllerAbstract {
     protected $permission = 0;
 
     /**
+     * @var array
+     */
+    protected $sortFields = null;
+
+    /**
+     * @var array
+     */
+    protected $filterFields = null;
+
+    /**
      * @param Component_Instance $instance
      * @param User $user
      * @param SitePage $sitepage
@@ -173,8 +183,37 @@ abstract class Component_ControllerAbstract {
 
         $config = $this->instance->getConfigArray();
 
-        // if there is no configuration, or you're not allowed to see it, hide and run
-        if(!is_array($config) || $this->permission < WRITE_ACCESS) {
+        // DETERMINE WHAT TO DISPLAY
+
+        // there is configuration
+        if(is_array($config)) {
+            // have write access
+            if($this->permission > READ_ACCESS) {
+                // display full configuration block
+                list($hasWriteAccess, $processConfig, $displayConfig) = array(true, true, true);
+            }
+            // do not have write access
+            else {
+                // parse configuration display variables for readonly
+                list($hasWriteAccess, $processConfig, $displayConfig) = array(false, true, false);
+            }
+        }
+        // there is no configuration
+        else {
+            // have write access
+            if($this->permission > READ_ACCESS) {
+                // display delete option
+                list($hasWriteAccess, $processConfig, $displayConfig) = array(true, false, false);
+            }
+            // do not have write access
+            else {
+                // no config, no write access: do nothing
+                list($hasWriteAccess, $processConfig, $displayConfig) = array(false, false, false);
+            }
+        }
+
+        // if all 3 above vars are false, bug out
+        if(!($hasWriteAccess || $processConfig || $displayConfig)) {
             return false;
         }
 
@@ -197,23 +236,48 @@ abstract class Component_ControllerAbstract {
         $page->setFile('configTpl', $template);
 
         $page->setBlock('configTpl', 'config_element', 'config_element_block');
-        $this->setVar('config_element_block','');
+        $page->setVar('config_element_block','');
 
-        // every config key has a corresponding controller and template to be called
-        foreach($config as $key => $params) {
+        if($processConfig) {
+            // every config key has a corresponding controller and template to be called
+            foreach($config as $key => $params) {
 
-            $page->setVar('CONFIG_ELEMENT_LABEL', $params['label']);
+                $page->setVar('CONFIG_ELEMENT_LABEL', $params['label']);
 
-            // attempt to build a configuration instance from the key provided
-            if($conf = Component_Config_Factory::build($key)) {
-                $templateFile = "component/config/$key.html";
-                $page->setFile($key, $templateFile);
-                $conf->parse($page, $key, $key, $params['value']);
-                $page->parse('CONFIG_ELEMENT_CONTENT', $key);
-                $page->parse('config_element_block', 'config_element', true);
+                // attempt to build a configuration instance from the key provided
+
+                $fields = array();
+                if($this->sortFields) {
+                    $fields['sort'] = $this->sortFields;
+                }
+                if($this->filterFields) {
+                    $fields['filter'] = $this->filterFields;
+                }
+
+                if($conf = Component_Config_Factory::build($key, $this->context, $fields)) {
+                    $templateFile = "component/config/$key.html";
+                    $page->setFile($key, $templateFile);
+                    $conf->parse($page, $key, $key, $params['value']);
+                    $page->parse('CONFIG_ELEMENT_CONTENT', $key);
+                    $page->parse('config_element_block', 'config_element', true);
+                }
+
+                $page->setVar('CONFIG_ELEMENT_CONTENT', '');
             }
 
-            $page->setVar('CONFIG_ELEMENT_CONTENT', '');
+        }
+        else {
+
+        }
+
+        // now clear things we don't want seen
+        if(!$displayConfig) {
+            $page->setVar('settings_link', '');
+            $page->setVar('settings_panel', '');
+        }
+
+        if(!$hasWriteAccess) {
+            $page->setVar('config_element_block', '');
         }
 
         $page->parse('CONFIGURATION', 'configTpl', false);
@@ -240,7 +304,14 @@ abstract class Component_ControllerAbstract {
         if($key) {
             return isset($this->config[$key][$attr]) ? $this->config[$key][$attr] : false;
         }
-        return $this->config;
+
+        $return = array();
+
+        foreach($this->config as $item) {
+            $return[$item['label']] = $item['value'];
+        }
+
+        return $return;
     }
 
     public function getPageTemplate() {

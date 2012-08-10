@@ -8,14 +8,15 @@
  */
 abstract class Component_Config_Factory {
 
-    private static $invalid = array( 'factory', 'interface' );
+    private static $invalid = array('factory', 'abstract', 'interface');
 
     /**
      * @static
-     * @param $key
-     * @return Component_Config_Interface|bool
+     * @param string $key
+     * @param int $category
+     * @return Component_Config_Abstract|bool
      */
-    public static function build($key) {
+    public static function build($key, $category, $fields) {
 
         if(in_array(strtolower($key), self::$invalid)) {
             return false;
@@ -27,7 +28,7 @@ abstract class Component_Config_Factory {
 
         if(class_exists($classname)) {
             // echo "Found $classname - will need template $key.html<br/>\n";
-            return new $classname();
+            return new $classname($category, $fields);
         }
         else {
             // echo "Problem: couldn't find $classname ($key.html won't be rendered)<br/>\n";

@@ -12,6 +12,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         parent::setup($context, $config);
         $g = new Group();
         $this->permission = $g->getPermission($context['id']);
+        $this->sitepage->setVar('ID', $context['id']);
     }
 
     /**

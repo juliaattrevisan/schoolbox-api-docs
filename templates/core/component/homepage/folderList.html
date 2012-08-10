@@ -1,0 +1,19 @@
+<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <h2>{COMPONENT_NAME}</h2>
+    {CONFIGURATION}
+    <div class="listing folders">
+        <ul>
+            <!-- BEGIN folders -->
+            <li class="{ON_OFF} clearfix">
+                <h4><a class="icons {FOLDER_ICON}" href="/homepage/{FOLDER_ID}/" >{FOLDER_NAME}</a></h4>
+                <!-- BEGIN modify_folder -->
+                <p class="interact"><a href="/cms/category/{FOLDER_ID}">Modify</a></p>
+                <!-- END modify_folder -->
+            </li>
+            <!-- END folders -->
+        </ul>
+    </div>
+    <!-- BEGIN submit_folder -->
+    <p class="interact"><a href="/cms/category/new/{ID}" class="btn add"><span></span>Add Folder</a></p>
+    <!-- END submit_folder -->
+</div>

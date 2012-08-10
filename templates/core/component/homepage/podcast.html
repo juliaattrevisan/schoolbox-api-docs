@@ -1,0 +1,37 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript">
+    function loadPodcastSWF(audioID, url){
+        var flashvars = {
+            filename: url
+        };
+        var params = {
+            movie: "/flash/player_mp3.swf",
+            wmode: "transparent"
+        };
+
+        swfobject.embedSWF("/flash/mp3small.swf", "podcast-player-"+audioID, "22", "22", "9.0.0", "/flash/expressInstall.swf", flashvars, params);
+    }
+</script>
+<!-- END custom_head -->
+<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <h2>{PODCAST_COMPONENT_TITLE}</h2>
+    {CONFIGURATION}
+    <div class="listing clearfix" >
+        <ul>
+            <!-- BEGIN podcast_list -->
+            <li class="{ON_OFF} clearfix">
+                <h4><a class="icons soundmp3" href="{PODCAST_URL}">{PODCAST_TITLE}</a></h4>
+                <div class="small-right">
+                    <p class="interact">
+                    <div class="play-button">
+                        <div id="podcast-player-{PODCAST_ID}"><a onclick="loadPodcastSWF('{PODCAST_ID}', '{PODCAST_URL}'); return false;"></a></div>
+                    </div>
+                    </p>
+                </div>
+
+                <p class="{COMPONENT_COMPACTMODE} hide-on-small">{PODCAST_DESCRIPTION}</p>
+            </li>
+            <!-- END podcast_list -->
+        </ul>
+    </div>
+</div>

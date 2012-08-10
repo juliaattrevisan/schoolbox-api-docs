@@ -31,7 +31,7 @@ if (is_numeric($_REQUEST['cid'])) {
 			foreach ($components[$position] as $sequence => $componentID) {
                 if($componentID) {
                     $inst = Component_InstanceMapper::getInstance()->findById($componentID);
-                    $inst->sequence = $sequence;
+                    $inst->sequence = $sequence + 1; // because we prefer to not have 0s in the database///
                     $inst->position = $position;
 
                     $instanceList[] = $inst;
@@ -65,7 +65,7 @@ if (is_numeric($_REQUEST['cid'])) {
         $newComp->definitionId = $_POST['add'];
         $newComp->identifier = $_POST['cid'];
         $newComp->module = 'homepage';
-        $newComp->sequence = 1;
+        $newComp->sequence = 0;
         $newComp->position = 'left';
 
         $componentInstanceMapper->save($newComp);
@@ -81,6 +81,8 @@ if (is_numeric($_REQUEST['cid'])) {
 
         // get the Instance's Definition's Controller
         $factory = new Component_Homepage_Factory(new User(), new SitePage(false));
+
+        // $component instanceof Component_ControllerAbstract
         $component = $factory->buildComponent($instanceID);
 
         if(!$component) {
@@ -92,6 +94,7 @@ if (is_numeric($_REQUEST['cid'])) {
         $templateHandle = TEMPLATE_content;
 
         $component->setup(array('id' => $_POST['cid']), $component->instance->getConfigArray());
+        $component->parseConfig();
 
         if ($component->execute() !== false) {
             if ($component->renderTemplate($templateHandle) !== false) {

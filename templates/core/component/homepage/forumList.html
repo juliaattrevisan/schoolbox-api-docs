@@ -1,0 +1,22 @@
+<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <h2>{COMPONENT_NAME}</h2>
+    {CONFIGURATION}
+    <div class="listing">
+        <ul>
+            <!-- BEGIN forum -->
+            <li class="{ON_OFF} clearfix">
+                <div class="clearfix">
+                    <h4><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE}</a></h4>
+                    <!-- BEGIN forum_reply -->
+                    <p class="interact"><a href="/forum/modify/{ID}/{THREAD_ID}">Reply</a></p>
+                    <!-- END forum_reply -->
+                </div>
+                <div class='{COMPONENT_COMPACTMODE}'>
+                    <p class="small hide-on-small">Posted by <a href="/search/user/{THREAD_USER_ID}">{THREAD_USER}</a> {THREAD_DATE}</p>
+                </div>
+            </li>
+            <!-- END forum -->
+        </ul>
+    </div>
+    <p class="interact"><a href="/forum/{ID}" class="btn go-to"><span></span>Go to Forum</a></p>
+</div>

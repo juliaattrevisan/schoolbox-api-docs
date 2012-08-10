@@ -6,18 +6,15 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Config_Filter implements Component_Config_Interface {
+class Component_Config_Filter extends Component_Config_Abstract {
 
     public function parse(SitePage $page, $key, $keyblock, $configValue) {
 
-        // DO NOT EDIT THIS ARRAY. MANIPULATE THE RESULTANT $filter VARIABLE IF YOU WANT TO PLAY WITH
-        // THINGS LIKE ELEMENT DISPLAY ORDER
-        $filterKeys = array('document', 'audio', 'video', 'image', 'other');
         $filter = array();
 
-        for($i = 0; $i < count($filterKeys); $i++) {
+        for($i = 0; $i < count($this->filterFields); $i++) {
             $j = $configValue % 2;
-            $filter[$filterKeys[$i]] = $j;
+            $filter[$this->filterFields[$i]] = $j;
             $configValue = (int) $configValue / 2;
         }
 

@@ -6,7 +6,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_DueWorkController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_DueWorkListController extends Component_Homepage_ControllerAbstract {
 
     /**
      * @var Group
@@ -40,7 +40,7 @@ class Component_Homepage_DueWorkController extends Component_Homepage_Controller
      * @return boolean
      */
     public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'dueWork')) {
+        if(!parent::loadTemplate($templateHandle, 'dueWorkList')) {
             return false;
         }
 

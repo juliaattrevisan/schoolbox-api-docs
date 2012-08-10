@@ -1,10 +1,13 @@
+<!-- BEGIN settings_link -->
 <a class="edit" href="#">
   <em>Settings</em>
   <span>&#9660;</span>
 </a>
+<!-- END settings_link -->
 <a class="close-delete" href="#">
   <span>X</span>
 </a>
+<!-- BEGIN settings_panel -->
 <div class="editPanel settings hide">
   <form action="/hpage/configForm.php" method="GET">
     <input type="hidden" name="cid" value="{ID}" />
@@ -16,6 +19,7 @@
     <input type="submit" value="Update" class="submit-btn update" />
   </form>
 </div>
+<!-- END settings_panel -->
 <div class="editPanel delete-it hide clearfix">
   <p>Are you sure you want to remove this component?</p>
   <form action="#" method="post">

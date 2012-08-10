@@ -45,9 +45,6 @@ $this->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
 $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
 $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 
-
-
-
 /* BUILD COMPONENTRY */
 $componentFactory = new Component_Homepage_Factory(new User, $this);
 $componentCollection = $componentFactory->buildComponentList($categoryID);
@@ -153,7 +150,6 @@ if ($permission >= WRITE_ACCESS) {
     $this->setVar('COLOUR_ARRAY', 'original');
     $this->setVar($listColor);
     $this->parse('colour_list_block', 'colour_list', true);
-
 
     // Colors (picker)
     $this->setVar('COLOUR_ARRAY', 'pickers');

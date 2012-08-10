@@ -44,70 +44,65 @@
 
 <style type="text/css">
 
-    .top h2 { color: #{top_head_font}; background-color: #{top_head_bg};	}
-    .top p, .top h3, .top .listing p.small { color: #{top_font}; }
-    .top a, .top .listing p.small a { color: #{top_link}; }
-    .top .box a:hover, .top .listing p.small a:hover { color: #{top_hover};  }
-    .top .text { background: #{top_bg_primary}; }
-    .top .listing{ background: #{top_bg_primary}; }
-    .top .listing .dark { background: #{top_bg_secondary}; }
+    .top h2                                              { color: #{top_head_font}; background-color: #{top_head_bg}; }
+    .top p, .top h3, .top .listing p.small               { color: #{top_font}; }
+    .top a, .top .listing p.small a                      { color: #{top_link}; }
+    .top .box a:hover, .top .listing p.small a:hover     { color: #{top_hover};  }
+    .top .text                                           { background: #{top_bg_primary}; }
+    .top .listing                                        { background: #{top_bg_primary}; }
+    .top .listing .dark                                  { background: #{top_bg_secondary}; }
 
-    .left h2 { color: #{left_head_font}; background-color: #{left_head_bg};	}
-    .left p, .left h3, .left .listing p.small,.left { color: #{left_font}; }
-    .left a, .left .listing p.small a { color: #{left_link}; }
-    .left .box a:hover, .left .listing p.small a:hover { color: #{left_hover};  }
-    .left .text { background: #{left_bg_primary}; }
-    .left .listing { background: #{left_bg_primary}; }
-    .left .listing .dark { background: #{left_bg_secondary}; }
+    .left h2                                             { color: #{left_head_font}; background-color: #{left_head_bg};	}
+    .left p, .left h3, .left .listing p.small,.left      { color: #{left_font}; }
+    .left a, .left .listing p.small a                    { color: #{left_link}; }
+    .left .box a:hover, .left .listing p.small a:hover   { color: #{left_hover};  }
+    .left .text                                          { background: #{left_bg_primary}; }
+    .left .listing                                       { background: #{left_bg_primary}; }
+    .left .listing .dark                                 { background: #{left_bg_secondary}; }
 
-    .right h2 { color: #{right_head_font}; background-color: #{right_head_bg};	}
-    .right p, .right h3, .right .listing p.small { color: #{right_font}; }
-    .right a, .right .listing p.small a { color: #{right_link}; }
+    .right h2                                            { color: #{right_head_font}; background-color: #{right_head_bg};	}
+    .right p, .right h3, .right .listing p.small         { color: #{right_font}; }
+    .right a, .right .listing p.small a                  { color: #{right_link}; }
     .right .box a:hover, .right .listing p.small a:hover { color: #{right_hover};  }
-    .right .text { background: #{right_bg_primary}; }
-    .right .listing{ background: #{right_bg_primary}; }
-    .right .listing .dark { background: #{right_bg_secondary}; }
+    .right .text                                         { background: #{right_bg_primary}; }
+    .right .listing                                      { background: #{right_bg_primary}; }
+    .right .listing .dark                                { background: #{right_bg_secondary}; }
 
         /* wrap mimetypes in classes */
 
     <!-- BEGIN allowed_files -->
-
-    a.{NAME}{background-image: url(/images/mime/22x22/{ICON});}
-
+    a.{NAME} { background-image: url(/images/mime/22x22/{ICON}); }
     <!-- END allowed_files -->
 
 </style>
 <script type="text/javascript">
     <!-- BEGIN colour_list -->
     var {COLOUR_ARRAY} = {
-        'top_head_font'	: '#{top_head_font}',
-        'top_head_bg'		: '#{top_head_bg}',
-        'top_font'			: '#{top_font}',
-        'top_bg_primary'	: '#{top_bg_primary}',
-        'top_bg_secondary'	: '#{top_bg_secondary}',
-        'top_link'			: '#{top_link}',
-        'top_hover'		: '#{top_hover}',
+        'top_head_font'      : '#{top_head_font}',
+        'top_head_bg'        : '#{top_head_bg}',
+        'top_font'           : '#{top_font}',
+        'top_bg_primary'     : '#{top_bg_primary}',
+        'top_bg_secondary'   : '#{top_bg_secondary}',
+        'top_link'           : '#{top_link}',
+        'top_hover'          : '#{top_hover}',
 
+        'left_head_font'     : '#{left_head_font}',
+        'left_head_bg'       : '#{left_head_bg}',
+        'left_font'          : '#{left_font}',
+        'left_bg_primary'    : '#{left_bg_primary}',
+        'left_bg_secondary'  : '#{left_bg_secondary}',
+        'left_link'          : '#{left_link}',
+        'left_hover'         : '#{left_hover}',
 
-        'left_head_font'	: '#{left_head_font}',
-        'left_head_bg'		: '#{left_head_bg}',
-        'left_font'			: '#{left_font}',
-        'left_bg_primary'	: '#{left_bg_primary}',
-        'left_bg_secondary'	: '#{left_bg_secondary}',
-        'left_link'			: '#{left_link}',
-        'left_hover'		: '#{left_hover}',
-
-        'right_head_font'	: '#{right_head_font}',
-        'right_head_bg'	: '#{right_head_bg}',
-        'right_font'	: '#{right_font}',
-        'right_bg_primary'	: '#{right_bg_primary}',
-        'right_bg_secondary'	: '#{right_bg_secondary}',
-        'right_link'	: '#{right_link}',
-        'right_hover'	: '#{right_hover}'
+        'right_head_font'    : '#{right_head_font}',
+        'right_head_bg'      : '#{right_head_bg}',
+        'right_font'         : '#{right_font}',
+        'right_bg_primary'   : '#{right_bg_primary}',
+        'right_bg_secondary' : '#{right_bg_secondary}',
+        'right_link'         : '#{right_link}',
+        'right_hover'        : '#{right_hover}'
     };
     <!-- END colour_list -->
-
-
 
 </script>
 <style type="text/css">
@@ -133,6 +128,7 @@
     .homepage .editPanel input[type=submit] {
         margin-top: 10px;
     }
+/*
     .homepage .editPanel {
         position: absolute;
         right: 5px;
@@ -144,6 +140,7 @@
     .homepage .box {
         overflow: visible;
     }
+*/
     .add-component.undeveloped {
         background-color: rgba(255,0,0,0.1);
         border-color: #faa;

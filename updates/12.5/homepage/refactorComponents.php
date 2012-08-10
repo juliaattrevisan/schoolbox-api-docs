@@ -15,14 +15,22 @@
  * --skip-sql  don't perform the SQL insertion/update
  * -v          verbose output
  */
-$options = getopt("v", array('status', 'skip-sql'));
+$options = getopt("v", array('status', 'skip-sql', 'create-components', 'clean-db'));
 
 require_once('../../../include/Bootstrap.php');
 
 class DashboardComponentReFactory {
 
+    /**
+     * Standard format for component names
+     * @var string
+     */
     private $classBase = "Component_Homepage_%sController";
 
+    /**
+     * Custom remappings of config labels to human-readable form
+     * @var array
+     */
     private $labelMappings = array(
         'size'          => 'Limit',
         'componentname' => 'Heading',
@@ -30,13 +38,57 @@ class DashboardComponentReFactory {
         'pixel'         => 'Max width',
         'sort'          => 'Sort by',
         'sortdir'       => 'Direction',
-        'comments_size' => 'Number of comments'
+        'comments_size' => 'Number of comments',
+        'username'      => 'Author',
+        'keywords'      => 'Hashtags'
     );
 
+    /**
+     * These configurations will be appended to those in the database, located via the format $classBase
+     * @var array
+     */
     private $customConfigs = array(
-        'Assess' => array('compactMode' => 'false'),
+        'Assess'     => array('compactMode' => 'false'),
+        'ForumList'  => array('componentname' => 'Forum', 'compactMode' => 'false'),
+        'RSS'        => array('compactMode' => 'false'),
+        'Survey'     => array('compactMode' => 'false'),
     );
 
+    /**
+     * Controller classnames in this list will have their visibility forcibly set to false
+     * @var array
+     */
+    private $disableByDefault = array(
+        'Component_Homepage_DutiesController',
+        'Component_Homepage_MGGSHeaderController'
+    );
+
+    /**
+     * This is regex: ensure the keys are mutually exclusive!
+     * @var array
+     */
+    private $configKeyRemappings = array(
+        '#homepage-.*#is' => 'src',
+        '#pollID#s'       => 'poll',
+        '#textBoxID#s'    => 'textbox',
+        '#maxtweets#s'    => 'size',
+    );
+
+    /**
+     * Mapping for handlers with nonstandard names
+     * @var array
+     */
+    private $customControllers = array(
+        'initSubject'  => 'ManageClass',
+        'folderManage' => 'ManageFolder',
+    );
+
+
+    /**
+     * New configuration definitions will be loaded into here for the sake of scope
+     * This isn't a configuration variable (ie. don't put anything in it)
+     * @var array
+     */
     private $newConfigDefinitions = array();
 
     /**
@@ -62,8 +114,13 @@ class DashboardComponentReFactory {
             $this->printStatus();
         }
         else {
-            $this->execute(!isset($options['skip-sql']));
+            $this->execute(!isset($options['skip-sql']), isset($options['clean-db']));
         }
+
+        if(isset($options['create-components'])) {
+            $this->generateMissingComponents();
+        }
+
     }
 
 
@@ -100,7 +157,6 @@ class DashboardComponentReFactory {
                 $nc['registered'] = true;
 
                 // it's registered, so we'll assume its configs are registered as well
-
                 if(isset($registeredConfigs[$registeredControllers[$nc['class']]])) {
                     foreach($registeredConfigs[$registeredControllers[$nc['class']]] as $conf) {
                         print_r($conf);
@@ -109,8 +165,6 @@ class DashboardComponentReFactory {
                 else {
                     echo "Missing configs for {$nc['class']}\n";
                 }
-
-
             }
             else {
                 $nc['registered'] = false;
@@ -146,9 +200,37 @@ class DashboardComponentReFactory {
 
 
     /**
+     * Method that does all the hard work
+     *
      * @param bool $performSQL
+     * @param bool $cleanDB
      */
-    public function execute($performSQL) {
+    public function execute($performSQL, $cleanDB) {
+
+        if(!$performSQL && $cleanDB) {
+            echo " [!] Won't clean database without inserting new definitions: --skip-sql and --clear-db are mutually exclusive.\n";
+            return;
+        }
+
+        if($cleanDB) {
+            // gather a list of all the things that need clearing
+            $defIDs = $this->flatten($this->db->query("SELECT `id` FROM `component_definition` WHERE `module` = 'homepage'")->fetchAll(PDO::FETCH_ASSOC));
+            $defList = implode(",", $defIDs);
+
+            $conIDs = $this->flatten($this->db->query("SELECT `id` FROM `component_config_definition` WHERE `component_definition_id` IN ($defList)")->fetchAll(PDO::FETCH_ASSOC));
+            $conList = implode(",", $conIDs);
+
+            $this->db->query("DELETE FROM `component_config_instance` WHERE `component_config_definition_id` IN ($conList)");
+            $this->db->query("DELETE FROM `component_config_definition` WHERE `component_definition_id` IN ($defList)");
+            $this->db->query("DELETE FROM `component_instance` WHERE `component_definition_id` IN ($defList)");
+            $this->db->query("DELETE FROM `component_definition` WHERE `id` IN ($defList)");
+
+            // reset index counters on account of the mass deletion
+            $this->db->query("ALTER TABLE `component_definition` AUTO_INCREMENT = 1");
+            $this->db->query("ALTER TABLE `component_instance` AUTO_INCREMENT = 1");
+            $this->db->query("ALTER TABLE `component_config_definition` AUTO_INCREMENT = 1");
+            $this->db->query("ALTER TABLE `component_config_instance` AUTO_INCREMENT = 1");
+        }
 
         $dataset = $this->db->query("SELECT * FROM `component_config_definition`")->fetchAll(PDO::FETCH_ASSOC);
         $existingConfigDefinitions = array();
@@ -161,7 +243,6 @@ class DashboardComponentReFactory {
         $i = $this->db->query("SELECT `id` FROM `component_definition` ORDER BY `id` DESC")->fetchColumn();
 
         $newDefinitions = array();
-        $newConfigDefinitions = array();
 
         $origin = $this->db->query("SELECT * FROM `homepage_comp`");
 
@@ -178,12 +259,13 @@ class DashboardComponentReFactory {
             $newComp->description = $oldComp['description'];
             $newComp->module = 'homepage';
             $newComp->componentCategory = $oldComp['homepageCategoryID'];
-            $newComp->visible = $oldComp['invisible'] == 'true' ? 'false' : 'true';
+            $newComp->visible = ($oldComp['invisible'] == 'true' || in_array($newComp->class, $this->disableByDefault)) ? 'false' : 'true';
             $newComp->multiple = $oldComp['allowMultiple'];
 
             /* config definitions and instances */
             $this->parseSerializedConfig($oldComp['config'], $newComp);
 
+/*
             // custom cases for links, files and folders because their sources aren't defined in the default config
             if(in_array($oldComp['method'], array('outputLinkList', 'outputFileList','outputFolderList', 'outputNews'))) {
                 $confDefinition = new Component_ConfigDefinition();
@@ -194,9 +276,9 @@ class DashboardComponentReFactory {
                 $confDefinition->defaultValue = '';
                 $this->newConfigDefinitions[] = $confDefinition;
             }
+*/
 
             $newDefinitions[] = $newComp;
-
         }
 
         if($performSQL) {
@@ -233,8 +315,12 @@ class DashboardComponentReFactory {
         if(is_array($oldCompConfig) && count($oldCompConfig)) {
             foreach($oldCompConfig as $key => $value) {
 
-                if(preg_match('#homepage-.*#i', $key)) {
-                    $key = 'src';
+
+                foreach($this->configKeyRemappings as $pattern => $replacement) {
+                    if(preg_match($pattern, $key)) {
+                        $key = $replacement;
+                        break;
+                    }
                 }
 
                 // keys can be duplicated, but the combination of key and definitionId must be unique
@@ -276,7 +362,7 @@ class DashboardComponentReFactory {
     public function mergeCustomConfig($newComp, $oldCompConfig) {
         // merge any configurations that we come across that weren't specified in the db into the old config array
 
-        $k = preg_replace("#Homepage_([A-Za-z]*)Controller#i", "$1", $newComp->class);
+        $k = preg_replace("#Component_Homepage_([A-Za-z]*)Controller#i", "$1", $newComp->class);
         if(isset($this->customConfigs[$k])) {
             if(!is_array($oldCompConfig)) {
                 $oldCompConfig = array();
@@ -299,14 +385,13 @@ class DashboardComponentReFactory {
         }
 
         // mandatory non-customisable components
-        elseif($method == 'initSubject') {
-            return false;
+        elseif(isset($this->customControllers[$method])) {
+            $method = $this->customControllers[$method];
         }
-        elseif($method == 'folderManage') {
-            return false;
-        }
+
+        // fail
         else {
-            echo "[!] Couldn't map method $method.\n";
+            echo " [!] Couldn't map method $method.\n";
             return false;
         }
 
@@ -315,6 +400,7 @@ class DashboardComponentReFactory {
 
 
     /**
+     * @param $key
      * @param $value
      * @return mixed
      */
@@ -343,8 +429,8 @@ class DashboardComponentReFactory {
      */
     public function refactorLabel($key) {
         // cases for handling the labels
-        if(isset($labelMappings[$key])) {
-            return $labelMappings[$key];
+        if(isset($this->labelMappings[$key])) {
+            return $this->labelMappings[$key];
         }
         elseif(strpos($key,'_') !== false) {
             return ucwords(str_replace('_', ' ', $key));
@@ -356,6 +442,65 @@ class DashboardComponentReFactory {
     }
 
 
+    /**
+     * Generates PHP and HTML template files for those that have yet to be ported across.
+     */
+    public function generateMissingComponents() {
+        $_DIR = realpath(dirname(__FILE__) . '/../../..');
+
+        $phpTemplate  = 'library/Component/_ControllerTemplate.php';
+        $htmlTemplate = 'templates/core/component/_templateTemplate.html';
+
+        $result = $this->db->query("SELECT class FROM `component_definition` WHERE `module` = 'homepage'");
+
+        while($class = $result->fetchColumn(0)) {
+            if(!class_exists($class)) {
+                // remap classname to filename
+                $newPHPFile  = 'library/' . str_replace('_', '/', $class) . '.php';
+                $component = preg_replace("#Component_Homepage_([A-Za-z]*)Controller#s", "$1", $class);
+                $templateName = lcfirst($component);
+                $newHTMLFile = "templates/core/component/homepage/$templateName.html";
+
+                // create php file
+                echo " [ ] Creating $_DIR/$newPHPFile from $_DIR/$phpTemplate\n";
+                $phpContents = file_get_contents("$_DIR/$phpTemplate");
+                $phpContents = str_replace('{MODULE}','Homepage',$phpContents);
+                $phpContents = str_replace('{COMPONENT}', $component, $phpContents);
+                $phpContents = str_replace('{COMPONENT_TEMPLATE}', $templateName, $phpContents);
+
+                $fp = fopen("$_DIR/$newPHPFile", 'w');
+                fwrite($fp,$phpContents);
+                fclose($fp);
+
+                // create html file
+                echo " [ ] Creating $_DIR/$newHTMLFile from $_DIR/$htmlTemplate\n";
+                copy("$_DIR/$htmlTemplate", "$_DIR/$newHTMLFile");
+            }
+        }
+    }
+
+    /**
+     * Takes sequential array of array and flattens into a single array
+     * @param $array
+     * @return array
+     */
+    public function flatten($array) {
+        if(count($array)) {
+            $replacement = array();
+            foreach($array as $i) {
+                if(count($i)) {
+                    foreach ($i as $k => $v) {
+                        $replacement[] = $v;
+                    }
+                }
+                else {
+                    $replacement[] = $i;
+                }
+            }
+            return $replacement;
+        }
+        return $array;
+    }
 }
 
 new DashboardComponentReFactory($options);

@@ -1,0 +1,76 @@
+<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <script type='text/javascript'>
+        $j(function() {
+            $j('a.{CALENDAR_PREFIX}-attendance-request').live('click', function (event) {
+                event.preventDefault();
+
+                var button = $j(this);
+
+                var data = button.parent('form').serialize();
+
+                $j.post('/service/attendance/processToggleAttendance', data, function (data) {
+
+                    if (data.error == undefined) {
+                        if (button.text() == 'Attend') {
+                            button.html('<span></span>Unattend');
+                        }
+                        else {
+                            button.html('<span></span>Attend');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+    <h2>{CALENDAR_TITLE}</h2>
+    {CONFIGURATION}
+    <div class="listing clearfix">
+        <ul class="js_happening calendar-event">
+            <!-- BEGIN group_events -->
+            <li class="{ON_OFF} clearfix">
+                <p class="interact-left"><strong>{CAL_DATE}</strong><br>{CAL_TIME}</p>
+
+                <h4 class="eventListing">
+                    <span style="background-color:{CAL_COLOUR}">{CAL_NOTE}</span>
+                    <!-- BEGIN attendance_icon --><span class="float-right">A</span><!-- END attendance_icon -->
+                </h4>
+
+                <div class="hidden-fields clearfix">
+                    <h4><!-- BEGIN time -->
+                        <span class="time"><strong>{CAL_TIME}</strong></span>
+                        <!-- END time -->
+                        {CAL_NOTE}
+                    </h4>
+                    <p class="meta">
+                        Event Type: {CAL_TYPE}<br/>
+                        Created by: <a href="/search/user/{CAL_AUTHOR_ID}">{CAL_AUTHOR}</a><br/>
+                        {CAL_LOCATION} {CAL_DETAIL}
+                    </p>
+
+                    <!-- BEGIN attendance_status -->
+                    <p class="meta">Attendance Status: {ATTENDANCE_STATUS}</p>
+                    <!-- END attendance_status -->
+
+                    <div class="modify-event">
+                        <!-- BEGIN attendance_request_button -->
+                        <form method="post">
+                            <input name="event[id]" type="hidden" value="{CAL_ID}">
+                            <a class="btn modify float-left {CALENDAR_PREFIX}-attendance-request" href="#"><span></span>{ATTENDANCE_REQUEST_ACTION}</a>
+                        </form>
+                        <!-- END attendance_request_button -->
+
+                        <!-- BEGIN attendance_list_button -->
+                        <a class="btn modify float-left" href="/calendar/attendance/list/{CAL_ID}"><span></span>Attendance List</a>
+                        <!-- END attendance_list_button -->
+
+                        <span class="modify">{CAL_MODIFY}</span>
+                    </div>
+                </div>
+            </li>
+            <!-- END group_events -->
+        </ul>
+    </div>
+    <!-- BEGIN submit_event -->
+    <p class="interact"><a href="/calendar/modify.php?level=2&sid={ID}" class="btn add"><span></span>Add Event</a></p>
+    <!-- END submit_event -->
+</div>

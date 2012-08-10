@@ -35,8 +35,8 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
      */
     public function execute() {
         $this->groupHandler = new Group();
-        $this->catHandler = new Category();
         $this->newsHandler = new CategoryNews();
+        $this->catHandler = new Category();
 
         $this->source = $this->catHandler->getByID(
             $this->getConfig('src') ?

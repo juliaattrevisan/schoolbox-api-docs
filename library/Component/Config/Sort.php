@@ -6,7 +6,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Config_Sort implements Component_Config_Interface {
+class Component_Config_Sort extends Component_Config_Abstract {
 
     public function parse(SitePage $page, $key, $keyblock, $configValue) {
 
@@ -14,9 +14,7 @@ class Component_Config_Sort implements Component_Config_Interface {
         $page->setBlock($keyblock, 'sorting', 'sorting_block');
         $page->setVar('sorting_block', '');
 
-        $sortable = array('name', 'date');
-
-        foreach($sortable as $opt) {
+        foreach($this->sortFields as $opt) {
             $page->setVar('COMPONENT_CONFIG_SORT_NAME', ucfirst($opt));
             $page->setVar('COMPONENT_CONFIG_SORT_VALUE', $opt);
             $page->setVar('COMPONENT_CONFIG_SORT_SELECTED', strtolower($opt) == strtolower($configValue) ? ' selected="selected"' : '');
