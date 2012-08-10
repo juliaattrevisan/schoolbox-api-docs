@@ -34,7 +34,7 @@ class Calendar_Api_Sharepoint_Stk_Payload {
 			<listName>%s</listName>
 			<rowLimit>%s</rowLimit>
 			<query>
-				<Query>
+				<Query xmlns="">
 					<Where>
 						<And>
 							<And>
@@ -55,6 +55,23 @@ class Calendar_Api_Sharepoint_Stk_Payload {
 					</Where>
 				</Query>
 			</query>
+			<viewFields>
+				<ViewFields xmlns="">
+					<FieldRef Name="Title"/>
+					<FieldRef Name="School"/>
+					<FieldRef Name="ContentType"/>
+					<FieldRef Name="_ModerationStatus"/>
+					<FieldRef Name="EventDate"/>
+					<FieldRef Name="EndDate"/>
+					<FieldRef Name="Created"/>
+				</ViewFields>
+			</viewFields>
+			<queryOptions>
+				<QueryOptions xmlns="">
+				   <IncludeMandatoryColumns>FALSE</IncludeMandatoryColumns>
+				   <ViewAttributes Scope="Recursive" />
+				</QueryOptions>
+			</queryOptions>
 		</GetListItems>
 	';
 

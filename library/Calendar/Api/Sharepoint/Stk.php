@@ -128,7 +128,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 			$event->setEventType($this->getTypeNameByID($eventTypeID));
 			$event->setColour($this->getCalendarHandler()->displayColour($eventTypeID));
 			$event->setPublishDate((string)$attribs->ows_Created);
-			$event->setSid('');
+			$event->setSid($this->getSidFromName((string)$attribs->ows_School));
 			$event->setCategoryId('');
 			$event->setCategoryName('');
 			$event->setAttendance('');
@@ -187,13 +187,29 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 	 */
 	private function getCampusIdFromName($name) {
 		if ($name == 'ALL') {
-			$allCampuses = $this->campusList;
+			$allCampuses = $this->getCampusList();
 
 			/* Remove 'All'
 			 */
 			array_pop($allCampuses);
 
 			return implode(',', $allCampuses);
+		}
+
+		return $this->campusList[$name];
+	}
+
+	/**
+	 * Get content to use in the query for sid
+	 *
+	 * @param $name
+	 * @return mixed
+	 */
+	private function getSidFromName($name) {
+		if ($name == 'ALL') {
+			$allCampuses = $this->getCampusList();
+
+			return $allCampuses[0] . implode(' OR sid = ', $allCampuses);
 		}
 
 		return $this->campusList[$name];
@@ -289,4 +305,21 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
         }
     }
 
+	/**
+	 * Set campus list
+	 *
+	 * @param $campusList
+	 */
+	private function setCampusList($campusList) {
+		$this->campusList = $campusList;
+	}
+
+	/**
+	 * Get campus list
+	 *
+	 * @return array
+	 */
+	private function getCampusList() {
+		return $this->campusList;
+	}
 }

@@ -31,7 +31,7 @@ class Calendar_Event_Type_Day_Renderer extends Calendar_Event_Type_Renderer_Abst
 			/* Future events are visible to superusers, event owners, group members with write access
 			 */
 			$isFutureEvent = ($currentEvent->getPublishDate()->getUnixTimestamp() >= time());
-			$isVisibleToUser = ($this->getGroupHandler()->isSuperuser() || $currentEvent->isOwner() || ($this->getGroupHandler()->getPermission($currentEvent->getCategoryId()) > READ_ACCESS));
+			$isVisibleToUser = ($this->getGroupHandler()->isSuperuser() || $currentEvent->isOwner() || (is_numeric($currentEvent->getCategoryId()) && ($this->getGroupHandler()->getPermission($currentEvent->getCategoryId())) > READ_ACCESS));
 
 			if ($isFutureEvent && $isVisibleToUser) {
 				$cssClass = 'translucent';
@@ -87,8 +87,10 @@ class Calendar_Event_Type_Day_Renderer extends Calendar_Event_Type_Renderer_Abst
 
 				/* Anyone with write access can approve attendance
 				 */
-				if ($this->getGroupHandler()->getPermission($currentEvent->getCategoryId()) > READ_ACCESS) {
-					$this->getPage()->parse('attendance_list_button_block', 'attendance_list_button');
+				if (is_numeric($currentEvent->getCategoryId())) {
+					if ($this->getGroupHandler()->getPermission($currentEvent->getCategoryId()) > READ_ACCESS) {
+						$this->getPage()->parse('attendance_list_button_block', 'attendance_list_button');
+					}
 				}
 
 				if ($this->getGroupHandler()->isStudent($_SESSION['id'])) {
