@@ -58,8 +58,10 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
         'Event'            => 9,
     );
 
+    /* List of event types parents can see */
     private $parentAllowedTypes = array(1,3,4,8,11);
 
+    /* List of event types students can see */
     private $studentAllowedTypes = array(1,3,8);
 
 
