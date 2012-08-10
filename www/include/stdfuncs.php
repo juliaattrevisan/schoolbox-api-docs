@@ -50,14 +50,18 @@ function shutdown_safely() {
 
                 // if it's not somewhere we expect to find an error, just be generic about it
                 default:
-                    $info = "If the problem persists, please contact your System Administrator.";
+                    $info = "If the problem persists, please contact your System Administrator including the following information:";
                     break;
             }
 
             // explain that something went cataclysmically wrong.
-            echo "<h2>Sorry, Schoolbox has encountered a fatal error</h2><p><b>$info</b></p>" .
-                '<p style="color:#999;font-size:0.7em;">For the technologically inclined: ' .
-                "{$error['message']} in {$error['file']} on line {$error['line']}.</p>";
+            echo '<div style="margin:40px auto 0 auto;max-width:700px">'.
+                 "<h2>Sorry, Schoolbox has encountered a fatal error</h2><p><b>$info</b></p>" .
+                 '<ul style="list-style:none;padding:0;margin:0;color:#444;font-size:0.7em;">' .
+                 '<li>Datetime: '.date('Y-m-d H:i:s').'</li>' .
+                 '<li>URL: http'.(getenv("SERVER_PORT") == 443 ? 's://' : '://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'</li>' .
+                 "<li>{$error['message']} in {$error['file']} on line {$error['line']}.</li>" .
+                 '</ul></div>';
         }
     }
 }
