@@ -58,6 +58,11 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
         'Event'            => 9,
     );
 
+    private $parentAllowedTypes = array(1,3,4,8,11);
+
+    private $studentAllowedTypes = array(1,3,8);
+
+
     /* Contains all event types for reference during mapping */
     private $typeList = array();
 
@@ -91,6 +96,9 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 	 * @return Calendar_Event_Collection
 	 */
 	public function getDayEvents($currentDay) {
+
+        $groupHandler = new Group;
+
 		$now = new Alaress_Date_Format($currentDay, 'U');
 
 		$start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:01', 'y-m-d h:i:s');
@@ -105,7 +113,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 
 		$allEvents = $xmlPayload->parseXml($response->GetListItemsResult->any);
 
-		/* Fill in your query result set here and populate $collection
+        /* Fill in your query result set here and populate $collection
 		 */
 		$collection = new Calendar_Event_Collection();
 
@@ -113,6 +121,15 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 			$attribs = $currentEvent->attributes();
 
             $eventTypeID = $this->getTypeIdFromName((string)$attribs->ows_ContentType);
+
+            /* Hide events based on role and type of event */
+            if($groupHandler->isParent() && !in_array($eventTypeID, $this->parentAllowedTypes) ) {
+                continue;
+            }
+
+            if($groupHandler->isStudent() && !in_array($eventTypeID, $this->studentAllowedTypes)) {
+                continue;
+            }
 
 			$event = new Calendar_Event_Type_Day();
 			$event->setAuthorName('');
