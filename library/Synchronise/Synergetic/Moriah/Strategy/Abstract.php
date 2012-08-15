@@ -125,11 +125,11 @@ abstract class Synchronise_Synergetic_Moriah_Strategy_Abstract extends Synchroni
 	protected function getCampusFromCode($code) {
 		switch($code) {
             case 'FC':
-            	return 2;
+            	return 10;
 			case 'PS':
-                return 3;
-            case 'MS':
                 return 5;
+            case 'MS':
+                return 9;
 			case 'HS':
                 return 4;
 			default:

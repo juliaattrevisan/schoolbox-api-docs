@@ -36,17 +36,17 @@ class Synchronise_Synergetic_Moriah_Strategy_Staff extends Synchronise_Synergeti
 		/* Login details
 		 * We don't know how the password is given to us
 		 */
-		$newUser['username'] = $currentUser['NetworkLogin'];
+		$newUser['username'] = substr($currentUser['OccupEmail'], 0, strpos($currentUser['OccupEmail'], '@moriah'));
 		//$newUser['password'] = '1234';
 
 		/* User details
 		 */
-		$newUser['title'] = '';
+		$newUser['title'] = $currentUser['StaffTitle'];
 		$newUser['firstname'] = $currentUser['StaffPreferredName'];
 		$newUser['lastname'] = $currentUser['StaffSurname'];
         $newUser['synergy_id'] = $currentUser['StaffID'];
-		$newUser['alt_email'] = '';
-        $newUser['local_email'] = 1;
+		$newUser['alt_email'] = $currentUser['OccupEmail'];
+        $newUser['local_email'] = 0;
 
 		/* Retrieve campuses from timetable definition (dirty hack)
 		 */

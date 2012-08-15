@@ -12,7 +12,7 @@
  */
 class Synchronise_Synergetic_Moriah_Strategy_Student extends Synchronise_Synergetic_Moriah_Strategy_Abstract {
 	protected $strategyTitle = "Student Synchronisation";
-	const STUDENT_GROUP_ID = 3;
+	const STUDENT_GROUP_ID = 0; // unused
 
 	/**
 	 * Get a list of users' Synergy IDs to sync
@@ -35,7 +35,7 @@ class Synchronise_Synergetic_Moriah_Strategy_Student extends Synchronise_Synerge
 		/* Login details
 		 * We don't know how the password is given to us
 		 */
-		$newUser['username'] = $currentUser['NetworkLogin'];
+		$newUser['username'] = $currentUser['StudentPreferred'] . ' ' . $currentUser['StudentSurname']; // according to existing data, this is the full name...
 		//$newUser['password'] = '1234';
 
 		/* User details
@@ -43,7 +43,7 @@ class Synchronise_Synergetic_Moriah_Strategy_Student extends Synchronise_Synerge
 		$newUser['title'] = '';
 		$newUser['firstname'] = $currentUser['StudentPreferred'];
 		$newUser['lastname'] = $currentUser['StudentSurname'];
-        $newUser['alt_email'] = $newUser['username'].'@students.moriah.vic.edu.au';
+        $newUser['alt_email'] = $currentUser['StudentOccupEmail'];
         $newUser['synergy_id'] = $currentUser['StudentID'];
         $newUser['local_email'] = 0;
 

@@ -12,7 +12,7 @@
  */
 class Synchronise_Synergetic_Moriah_Strategy_Parent extends Synchronise_Synergetic_Moriah_Strategy_Abstract {
 	protected $strategyTitle = "Parent Synchronisation";
-	const PARENT_GROUP_ID = 4;
+	const PARENT_GROUP_ID = 19;
 
 
 	/**
