@@ -57,21 +57,25 @@ switch($action) {
 
 // if we're here, all above is valid
 
-
 if($action == 'delete') {
-    $sql = "DELETE FROM `homepageTemplate` WHERE `id` = :templateID";
-    $vars = array('templateID' => $templateID);
+    $sql[0] = "DELETE FROM `component_instance` WHERE `module` = 'homepage_template' AND `indentifier` = :templateID";
+    $vars[0] = array('templateID' => $templateID);
+
+    $sql[1] = "DELETE FROM `homepageTemplate` WHERE `id` = :templateID";
+    $vars[1] = array('templateID' => $templateID);
 }
 elseif($action == 'rename') {
-    $sql = "UPDATE `homepageTemplate` SET `name` = :name WHERE `id` = :templateID";
-    $vars = array('templateID' => $templateID, 'name' => $name);
+    $sql[0] = "UPDATE `homepageTemplate` SET `name` = :name WHERE `id` = :templateID";
+    $vars[0] = array('templateID' => $templateID, 'name' => $name);
 }
 else {
-    $sql = "INSERT INTO `homepageTemplate` (`name`,`layout`,`left_column_width`,`right_column_width`) VALUES (:name,'1','69.9','29.9')";
-    $vars = array('name' => $name);
+    $sql[0] = "INSERT INTO `homepageTemplate` (`name`,`layout`,`left_column_width`,`right_column_width`) VALUES (:name,'1','69.9','29.9')";
+    $vars[0] = array('name' => $name);
 }
 
-$stmt = Database::getInstance()->prepare($sql);
-$stmt->execute($vars);
+for($i = 0; $i < count($sql); $i++) {
+    $stmt = Database::getInstance()->prepare($sql[$i]);
+    $stmt->execute($vars[$i]);
+}
 
 $sitePage->backToTheFuture(1);
