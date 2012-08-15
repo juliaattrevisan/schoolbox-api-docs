@@ -94,8 +94,61 @@ class SynchroniseAbstract {
         }
     }
 
-    private function lookupSynergeticCampusYearLevel() {
+    private function lookupSynergeticStudentExample() {
+        echo "Synergetic Student Entity Examples\n";
+        $esu = new External_Synergetic_User();
+        $esu->getCurrentSemester();
+        $students = $esu->getStudentUserAccountInfo();
 
+        foreach(array_keys($students[0]) as $key) {
+            printf("%-24s", $key);
+        }
+        echo "\n";
+
+        for($i = 0; $i < 5; $i++) {
+            foreach($students[$i] as $field) {
+                printf("%-24s", $field);
+            }
+            echo "\n";
+        }
+    }
+
+    private function lookupSynergeticStaffExample() {
+        echo "Synergetic Staff Entity Examples\n";
+        $esu = new External_Synergetic_User();
+        $esu->getCurrentSemester();
+        $students = $esu->getStaffUserAccountInfo();
+
+        foreach(array_keys($students[0]) as $key) {
+            printf("%-24s", $key);
+        }
+        echo "\n";
+
+        for($i = 0; $i < 5; $i++) {
+            foreach($students[$i] as $field) {
+                printf("%-24s", $field);
+            }
+            echo "\n";
+        }
+    }
+
+    private function lookupSynergeticParentExample() {
+        echo "Synergetic Parent Entity Examples\n";
+        $esu = new External_Synergetic_User();
+        $esu->getCurrentSemester();
+        $students = $esu->getParentUserAccountInfo();
+
+        foreach(array_keys($students[0]) as $key) {
+            printf("%-24s", substr($key, 7));
+        }
+        echo "\n";
+
+        for($i = 0; $i < 5; $i++) {
+            foreach($students[$i] as $field) {
+                printf("%-24s", $field);
+            }
+            echo "\n";
+        }
     }
 
     private final function lookupSchoolboxGroupsFromYearLevel() {
