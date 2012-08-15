@@ -1,0 +1,118 @@
+<?php
+/**
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+class SynchroniseAbstract {
+
+    private $verbose;
+    private $perform;
+    private $school;
+    private $strats;
+    private $db;
+    private $stratBase = 'Synchronise_%s_%s_Strategy_%s';
+
+
+    public function __construct($school, $verbose = true, $perform = false, $db = '') {
+        $this->school = $school;
+        $this->verbose = $verbose;
+        $this->perform = $perform;
+        $this->db = ($db) ? $db : ucfirst(strtolower(Config::get('external_type')));
+    }
+
+
+    /**
+     * @param string[...]
+     */
+    public function setStrategies() {
+        foreach(func_get_args() as $arg) {
+            if(is_string($arg)) {
+                $this->strats[] = $arg;
+            }
+        }
+    }
+
+
+    public function execute() {
+        // Do each strat
+        foreach($this->strats as $currentStrategy) {
+            $sync = new Synchronise_Synergetic_Main(sprintf($this->stratBase, $this->db, $this->school, $currentStrategy));
+
+            // Do not alter the db
+            $sync->setPerformUpdate($this->perform);
+
+            // Set Verbosity so you can see intentions
+            $sync->setVerbose($this->verbose);
+
+            $sync->generateTitle();
+            $sync->synchronise();
+
+            echo "\n\n";
+        }
+    }
+
+
+    /**
+     * This method is designed to provide the developer with information about the setup of the Synergetic database
+     * to be able to set the details of the sync-script to align with the Synergetic setup.
+     */
+    public function diagnose() {
+        // for the sake of modularity, this is split out into subordinate methods
+        $refl = new ReflectionObject($this);
+        foreach($refl->getMethods(ReflectionMethod::IS_PRIVATE) as $m) {
+            $meth = $m->name;
+            if(strpos($meth, $this->db) !== false || strpos($meth, 'Schoolbox') !== false) {
+                $this->$meth();
+            }
+        }
+    }
+
+
+
+    /* all private methods with 'Schoolbox' or the current db name will be picked up by the reflection in diagnose() */
+
+    private function lookupSynergeticCampusCodes() {
+        $db = new MSSQL();
+        $campuses = $db->getAll("SELECT DISTINCT( ClassCampus ) AS campus FROM timetable");
+        echo "Campus Codes in Synergetic\n";
+        foreach($campuses as $c) {
+            echo "  '" . $c['campus'] . "'\n";
+        }
+
+        $db = Database::getInstance();
+
+        $result = $db->query("SELECT * FROM `luCampus`");
+        if($result) {
+            echo "Campuses listed in Schoolbox\n";
+            printf("%4s %-32s\n",'id','campus name');
+            while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                printf("%4s %-32s\n", $row['id'], $row['name']);
+            }
+        }
+    }
+
+    private function lookupSynergeticCampusYearLevel() {
+
+    }
+
+    private final function lookupSchoolboxGroupsFromYearLevel() {
+        $db = Database::getInstance();
+
+        $result = $db->query("SELECT * FROM `groups` WHERE `group_type` = 'student'");
+
+        if($result) {
+            echo "Student Groups in Schoolbox\n";
+            printf("%4s %-32s\n",'id','group name');
+            while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                printf("%4s %-32s\n", $row['id'], $row['name']);
+            }
+        }
+        else {
+            echo "Failed to obtain Schoolbox student groups\n";
+        }
+    }
+
+}
