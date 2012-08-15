@@ -86,6 +86,11 @@ if (is_array($subList)) {
 			$this->setVar('onlineAssessment_block', '');
 			$this->parse('normalSubmission_block', 'normalSubmission');
 		}
+        else {
+            // something went wrong (ie. this scenario should not exist) but at any rate, hide the tokens from view
+            $this->setVar('onlineAssessment_block', '');
+            $this->setVar('normalSubmission_block', '');
+        }
 		$this->parse('submission_block', 'submission_listing', true);
 
 		$prevCat = $sub;

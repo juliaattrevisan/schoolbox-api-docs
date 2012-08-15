@@ -1,0 +1,114 @@
+<?php
+/**
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+class Component_Homepage_ScrollerController extends Component_Homepage_ControllerAbstract {
+
+    /**
+     * @var Group
+     */
+    private $groupHandler;
+
+    /**
+     * @var File
+     */
+    private $fileHandler;
+
+    /**
+     * @var array
+     */
+    private $source;
+
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return void
+     */
+    public function execute() {
+        $this->groupHandler = new Group();
+        $this->fileHandler = new File();
+
+        $catHandler = new Category();
+
+        $this->source = $catHandler->getByID(
+            $this->getConfig('src') ?
+                $this->getConfig('src') :
+                $this->getContext('id')
+        );
+    }
+
+    /**
+     * Renders the data into the SitePage. Presentation logic.
+     * @param String $templateHandle
+     * @return boolean
+     */
+    public function renderTemplate($templateHandle) {
+        if(!parent::loadTemplate($templateHandle, 'scroller')) {
+            return false;
+        }
+        $this->parseConfig();
+
+        $this->setBlock($templateHandle, 'image', 'image_block');
+        $this->setBlock($templateHandle, 'show_caption', 'show_caption_block');
+        $this->setBlock($templateHandle, 'submit_image', 'submit_image_block');
+
+        // Make sure there a config option
+        $pixel = $this->getConfig('pixel') ? $this->getConfig('pixel') : 222;
+
+        $this->setVar(array(
+            'COMPONENT_PIXEL' => $pixel,
+            'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig('timing') * 1000 : '2000',
+        ));
+
+        // Set up component name
+        $this->setVar('COMPONENT_NAME', strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Image Scroller');
+
+        /* Prevent multiple galleries from other categories stacking up in the wrong place
+         * and initialise empty gallery by default
+         */
+        $this->setVar('image_block', '');
+
+        // Load news for the current homepage
+        $allFiles = $this->fileHandler->getAllInCategory($this->source['id'], array('filter' => array('image')));
+
+        // Have update form to back to this homepage, not the gallery's homepage
+        $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->source['id']);
+
+        // Controls such as Post News
+        if ($this->permission < WRITE_ACCESS) {
+            $this->setVar("submit_image_block", "");
+        }
+        else {
+            $this->parse("submit_image_block", "submit_image");
+        }
+
+        // Iterate
+        if (is_array($allFiles)) {
+            foreach($allFiles as $currentFile) {
+                $this->setVar(array(
+                    'IMAGE_ID' => $currentFile['id'],
+                    'IMAGE_NAME' => $currentFile['description'],
+                    'IMAGE_DIMENSION' => $pixel
+                ));
+
+                $this->parse('image_block', 'image', true);
+            }
+        }
+
+        // Display captions
+        if ($this->getConfig('captionState') == 'Active') {
+            $this->parse('show_caption_block', 'show_caption');
+        }
+        else {
+            $this->setVar('show_caption_block', '');
+        }
+
+        return true; // everything went according to plan
+
+    }
+
+}

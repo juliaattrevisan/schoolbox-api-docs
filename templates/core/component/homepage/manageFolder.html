@@ -1,0 +1,28 @@
+<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <h2>Manage Folder</h2>
+    {CONFIGURATION}
+    <div class="listing">
+        <p class="interact">
+            <a href="/resources/{ID}" class="btn"><span></span>Browse Resources</a>
+            <!-- BEGIN addmylinks -->
+            <a href="/cms/myLinksForm.php?url={HOMEPAGE_URL}&description={HEADING}&return=1" class="btn add"><span></span>Add to My Links</a>
+            <!-- END addmylinks -->
+            <!-- BEGIN manage_page -->
+            <a href="/group/modify/{ID}" class="btn groups"><span></span>Manage Group</a>
+            <!-- END manage_page -->
+            <!-- BEGIN stats_data -->
+            <a href="/cms/category/{ID}" class="btn modify"><span></span>Modify Folder</a>
+            <!-- END stats_data -->
+            <!-- BEGIN subscribedModerated -->
+            <a href="/group/joinForm.php?leave={ID}&return=true" class="btn delete"><span></span>Awaiting approval</a>
+            <!-- END subscribedModerated -->
+            <!-- BEGIN subscribed -->
+            <a href="/group/joinForm.php?leave={ID}" class="btn delete"><span></span>Leave Group</a>
+            <!-- END subscribed -->
+            <!-- BEGIN unsubscribed -->
+            <a href="/group/joinForm.php?join={ID}&return=true" class="btn add"><span></span>Join Group</a>
+            <!-- END unsubscribed -->
+        <div class="float-fix"></div>
+        </p>
+    </div>
+</div>

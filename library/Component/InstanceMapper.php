@@ -51,21 +51,13 @@ class Component_InstanceMapper extends Mapper {
         parent::mapping();
     }
 
-    /**
-     * @param String $module
-     * @param Integer $identifier
-     * @return Collection
-     */
-    public function findByContext ($module, $identifier) {
-        $definitionMapper = Component_DefinitionMapper::getInstance();
-        $configDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
-        $configInstanceMapper = Component_ConfigMapper::getInstance();
 
-        $statement = $this->database->prepare("
-            SELECT {$this->getColumnString('ci')}
-                 , {$definitionMapper->getColumnString('cd')}
-                 , {$configDefinitionMapper->getColumnString('ccd')}
-                 , {$configInstanceMapper->getColumnString('cci')}
+    public function findByContext($module, $identifier) {
+        $sql = '
+            SELECT '.$this->getColumnString('ci').'
+                 , '.Component_DefinitionMapper::getInstance()->getColumnString('cd').'
+                 , '.Component_ConfigDefinitionMapper::getInstance()->getColumnString('ccd').'
+                 , '.Component_ConfigMapper::getInstance()->getColumnString('cci')."
             FROM component_instance ci
             INNER JOIN component_definition cd ON ci.component_definition_id = cd.id
               LEFT JOIN component_config_definition ccd ON cd.id = ccd.component_definition_id
@@ -73,19 +65,46 @@ class Component_InstanceMapper extends Mapper {
             WHERE ci.module = :module
             AND identifier = :identifier
             ORDER BY identifier ASC, `position` ASC, ci.sequence ASC
-        ");
+        ";
+        return $this->findByFields($sql, array(':module' => $module, ':identifier' => $identifier));
+    }
+
+    public function findByInstanceId($id) {
+        $sql = '
+            SELECT ' . $this->getColumnString('ci') . '
+                 , ' . Component_DefinitionMapper::getInstance()->getColumnString('cd') .'
+                 , ' . Component_ConfigDefinitionMapper::getInstance()->getColumnString('ccd') . '
+                 , ' . Component_ConfigMapper::getInstance()->getColumnString('cci') . "
+            FROM component_instance ci
+            INNER JOIN component_definition cd ON ci.component_definition_id = cd.id
+              LEFT JOIN component_config_definition ccd ON cd.id = ccd.component_definition_id
+              LEFT JOIN component_config_instance cci ON ccd.id = cci.component_config_definition_id AND cci.component_instance_id = ci.id
+            WHERE ci.id = :id
+            ORDER BY identifier ASC, `position` ASC, ci.sequence ASC
+        ";
+        return $this->findByFields($sql, array(':id' => $id));
+    }
+
+    /**
+     * @param String $module
+     * @param Integer $identifier
+     * @return Collection
+     */
+    protected function findByFields($sql, $fields) {
+
+        $statement = $this->database->prepare($sql);
 
         $statement->bindParam(":module", $module);
         $statement->bindParam(":identifier", $identifier);
 
-        $statement->execute();
+        $statement->execute($fields);
 
         $rowset = $statement->fetchAll();
 
         $instanceCollection = $this->hydrateList($rowset, 'ci');
-        $definitionCollection = $definitionMapper->hydrateList($rowset, 'cd');
-        $configInstanceCollection = $configInstanceMapper->hydrateList($rowset, 'cci');
-        $configDefinitionCollection = $configDefinitionMapper->hydrateList($rowset, 'ccd');
+        $definitionCollection = Component_DefinitionMapper::getInstance()->hydrateList($rowset, 'cd');
+        $configInstanceCollection = Component_ConfigMapper::getInstance()->hydrateList($rowset, 'cci');
+        $configDefinitionCollection = Component_ConfigDefinitionMapper::getInstance()->hydrateList($rowset, 'ccd');
 
         $finalCollection = array();
 
@@ -116,6 +135,7 @@ class Component_InstanceMapper extends Mapper {
 
         return $finalCollection;
     }
+
 
     public function save ($object) {
         if ($object instanceof Component_Instance) {

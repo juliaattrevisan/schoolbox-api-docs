@@ -188,12 +188,23 @@
         border: solid 1px #ccc;
         padding: 2px;
     }
-</style>
-
-<style type="text/css">
-    .homepage #template-select {
-        margin: 0 2% 8px 2%;
+    .homepage form {
+        padding-bottom: 16px;
+    }
+    .homepage form select {
+        margin: 0 2% 4px 2%;
         width: 91%;
+    }
+    .homepage form .btn {
+        padding: 0 16px;
+        float: left;
+        margin-top: 0;
+    }
+    .homepage form input[type=text] {
+        border: solid 1px #ccc;
+        width: 91%;
+        margin: 8px 2% 4px 2%;
+
     }
 </style>
 <!-- END custom_head-->
@@ -221,11 +232,19 @@
     </h3>
 
     <div id="definition-palette">
-        <select id="template-select">
+        <form id="template-action" action="/adminv2/homepage/homepageForm.php" method="POST">
+        <select id="template-select" name="template">
             <!-- BEGIN template -->
             <option value="{template.id}">{template.name}</option>
             <!-- END template -->
         </select>
+        <input type="submit" class="btn" name="action" value="Delete" />
+        <input type="text" name="name" />
+        <input type="submit" class="btn" name="action" value="New" />
+        <input type="submit" class="btn" name="action" value="Rename" />
+
+        <div class="clearfix"></div>
+        </form>
 
         <!-- BEGIN definition -->
         <div class="component definition-id-{definition.id}">{definition.name}</div>

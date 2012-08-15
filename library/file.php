@@ -23,6 +23,11 @@ class File extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
+    /**
+     * @param $categoryID
+     * @param array|bool $config
+     * @return array|bool
+     */
     function getAllInCategory ($categoryID, $config = false) {
         $groupHandler = new Group;
 

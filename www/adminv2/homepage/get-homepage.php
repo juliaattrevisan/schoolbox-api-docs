@@ -29,11 +29,15 @@ $componentCollection = $componentFactory->buildComponentList($templateId);
 
 $occupiedPositionList = array();
 foreach($componentCollection as $component) {
+
     $position = "position_{$component->position}";
 
     if ( !$this->template->exists("{$position}_block") ) {
         $this->setFile($position, 'adminv2/homepage/placeholder.html');
     }
+
+    $component->execute();
+//    $component->renderTemplate($position);
 
     $component->parseConfig();
 

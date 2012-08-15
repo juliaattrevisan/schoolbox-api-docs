@@ -178,8 +178,7 @@ if ($permission >= WRITE_ACCESS) {
 
     $this->parse('colour_list_block', 'colour_list', true);
 
-    /* Template control
-      */
+    // Template control
     $template = $homepageHandler->getTemplate();
     for($x = 1; $x <= 4; $x++) {
         $this->setVar("CURRENT_TEMPLATE_$x", $template == $x ? 'current' : '');
@@ -253,6 +252,8 @@ $this->setVar(array(
     'TEMPLATE_RIGHT_COLUMN_WIDTH' => $allWidths['right_column_width'],
 ));
 
+$colours = $homepageHandler->getColorList();
+$this->setVar($colours);
 
 // output MIMEs
 $allowedFiles = new AllowedFile;

@@ -13,7 +13,7 @@ abstract class Component_Config_Abstract {
     protected $filterFields = null;
     protected $sortFields = null;
 
-    public function __construct(array $category, $fields = null) {
+    public function __construct($category = array(), $fields = null) {
         $this->cat = $category;
 
         if(isset($fields['sort'])) {
@@ -24,12 +24,16 @@ abstract class Component_Config_Abstract {
         }
     }
 
+    /**
+     * @param string $attr
+     * @return mixed|bool
+     */
     protected function getCategory($attr = '') {
         if($attr) {
             if(isset($this->cat[$attr])) {
                 return $this->cat[$attr];
             }
-            return null;
+            return false;
         }
         return $this->cat;
     }

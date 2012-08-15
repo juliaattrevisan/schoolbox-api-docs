@@ -143,24 +143,70 @@ abstract class Component_ControllerAbstract {
      * @param Array $argumentList
      * @return mixed
      */
-    public function __call($method, $argumentList) {
+//    public function __call($method, $argumentList) {
+//        echo "USING BACKPORTING: " . get_called_class() . "->$method()</br>";
+//        if(method_exists($this, $method)) {
+//            $object = $this;
+//        }
+//        elseif(method_exists($this->sitepage, $method)) {
+//            $object = $this->sitepage;
+//        }
+//        if(!empty($object)) {
+//            $rm = new ReflectionMethod($object, $method);
+//            return $rm->invokeArgs($object, $argumentList);
+//        }
+//        throw new Exception("Method `$method` not found.");
+//    }
 
-        if ( method_exists($this, $method) ) {
-            $object = $this;
-        }
-        elseif ( method_exists($this->sitepage, $method) ) {
-            $object = $this->sitepage;
-        }
 
-        if ( !empty($object) ) {
-            $rm = new ReflectionMethod($object, $method);
+    // ENCAPSULATION FOR SITEPAGE METHODS: __CALL() IS SLOW AND CAUSES PARSING ERRORS
 
-            return $rm->invokeArgs($object, $argumentList);
-        } else {
-            return $this->$method();
-        }
-
+    /**
+     * @param $varname
+     * @return mixed
+     */
+    public function getVar($varname) {
+        return $this->sitepage->getVar($varname);
     }
+
+    /**
+     * @param $var
+     * @param string $value
+     */
+    public function setVar($var, $value = '') {
+        $this->sitepage->setVar($var, $value);
+    }
+
+    /**
+     * @param $handle
+     * @param $file
+     */
+    public function setFile($handle, $file) {
+        $this->sitepage->setFile($handle, $file);
+    }
+
+    /**
+     * @param $parent
+     * @param $handle
+     * @param string $name
+     */
+    public function setBlock($parent,$handle,$name = '') {
+        $this->sitepage->setBlock($parent,$handle,$name);
+    }
+
+    /**
+     * @param $target
+     * @param $handle
+     * @param bool $append
+     */
+    public function parse($target, $handle, $append = false) {
+        $this->sitepage->parse($target, $handle, $append);
+    }
+
+    public function setJavascript($file) {
+        $this->sitepage->setJavascript($file);
+    }
+
 
     public function __get ($property) {
         if ( isset($this->instance->$property) ) {
@@ -217,18 +263,11 @@ abstract class Component_ControllerAbstract {
             return false;
         }
 
-        $templateFiles = array(
-            'homepage'            => 'component/config/_wrapper.html',
-            'eportfolio'          => 'component/config/_wrapper.html',
-            'dashboard'           => 'component/config/_templatewrapper.html',
-            'homepage_template'   => 'component/config/_templatewrapper.html',
-            'eportfolio_template' => 'component/config/_templatewrapper.html',
-        );
-
-        if(isset($templateFiles[$this->instance->module])) {
-            $template = $templateFiles[$this->instance->module];
+        // if we're building in the context of the admin system, use a different template (_templatewrapper.html),
+        // otherwise use the regular one (_wrapper.html)
+        if(in_array($this->instance->module, array('dashboard','homepage_template','eportfolio_template'))) {
+            $template = 'component/config/_templatewrapper.html';
         }
-        // fallback
         else {
             $template = 'component/config/_wrapper.html';
         }
@@ -244,8 +283,6 @@ abstract class Component_ControllerAbstract {
 
                 $page->setVar('CONFIG_ELEMENT_LABEL', $params['label']);
 
-                // attempt to build a configuration instance from the key provided
-
                 $fields = array();
                 if($this->sortFields) {
                     $fields['sort'] = $this->sortFields;
@@ -254,11 +291,15 @@ abstract class Component_ControllerAbstract {
                     $fields['filter'] = $this->filterFields;
                 }
 
+                // attempt to build a configuration instance from the key provided
                 if($conf = Component_Config_Factory::build($key, $this->context, $fields)) {
                     $templateFile = "component/config/$key.html";
                     $page->setFile($key, $templateFile);
                     $conf->parse($page, $key, $key, $params['value']);
                     $page->parse('CONFIG_ELEMENT_CONTENT', $key);
+
+                    $page->setVar('CONFIG_DISPLAY', $params['label'] ? '' : ' style="display:none;"');
+
                     $page->parse('config_element_block', 'config_element', true);
                 }
 
