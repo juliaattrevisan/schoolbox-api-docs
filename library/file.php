@@ -65,7 +65,7 @@ class File extends DeprecatedModel {
             );
 
             foreach ( $config['filter'] as $filter ) {
-                if ( key_exists($filter, $filter_sql) ) {
+                if ( array_key_exists($filter, $filter_sql) ) {
                     $query .= $filter_sql[$filter];
                 }
                 else {

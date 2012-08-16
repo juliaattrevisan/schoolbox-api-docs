@@ -38,7 +38,14 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
         $this->setVar('IMAGE_TITLE', 'Random Image');
 
         //get image id
-        $query = "SELECT id, comment FROM file WHERE category = {$this->getContext('id')} AND deleted = '0' AND hidden = '0' AND INSTR(mime_type, 'image/') ORDER BY RAND() LIMIT 1";
+        $query = "SELECT id, comment
+                  FROM file
+                  WHERE category = {$this->getContext('id')}
+                  AND deleted = '0'
+                  AND hidden = '0'
+                  AND INSTR(mime_type, 'image/')
+                  AND `type` = '0'
+                  ORDER BY RAND() LIMIT 1";
 
         $this->db->query($query);
 

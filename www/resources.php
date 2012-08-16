@@ -154,6 +154,11 @@ if (is_array($fileList) && count($fileList) > 0) {
 
 	foreach ($fileList as $file) {
 
+        // if the file is associated with due work, it shouldn't be visible here
+        if($file['type'] || $file['typeName']) {
+            continue;
+        }
+
 		if (empty($file['modified'])) {
 			$file['modified'] = $file['submitted'];
 		}

@@ -66,7 +66,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         $this->setVar('image_gallery_block', '');
 
         // Load images for the requested homepage
-        $imageList = $this->categoryHandler->getImages($this->source['id'], $limit);
+        $imageList = $this->categoryHandler->getImages($this->source['id'], $limit, true);
 
         // Have update form to back to this homepage, not the gallery's homepage
         $this->setVar('IMAGEGALLERY_CATEGORY_ID', $this->getContext('id'));

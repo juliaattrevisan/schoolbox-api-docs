@@ -19,6 +19,11 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
     private $fileHandler;
 
     /**
+     * @var Category
+     */
+    private $catHandler;
+
+    /**
      * @var array
      */
     private $source;
@@ -32,9 +37,9 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         $this->groupHandler = new Group();
         $this->fileHandler = new File();
 
-        $catHandler = new Category();
+        $this->catHandler = new Category();
 
-        $this->source = $catHandler->getByID(
+        $this->source = $this->catHandler->getByID(
             $this->getConfig('src') ?
                 $this->getConfig('src') :
                 $this->getContext('id')
@@ -72,13 +77,13 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
          */
         $this->setVar('image_block', '');
 
-        // Load news for the current homepage
-        $allFiles = $this->fileHandler->getAllInCategory($this->source['id'], array('filter' => array('image')));
+        // Load images for the current homepage
+        $allFiles = $this->catHandler->getImages($this->source['id'], 0, true);
 
         // Have update form to back to this homepage, not the gallery's homepage
         $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->source['id']);
 
-        // Controls such as Post News
+        // Controls such as Post Images
         if ($this->permission < WRITE_ACCESS) {
             $this->setVar("submit_image_block", "");
         }
