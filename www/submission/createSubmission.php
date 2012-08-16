@@ -5,6 +5,8 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 $this->setFile(TEMPLATE_content, 'submission/createSubmission.html');
 $this->setTab('submission');
 $this->setBlock(TEMPLATE_content, 'browse_row', 'browse_block');
+$this->setBlock('browse_row', 'file_overwrite', 'file_overwrite_block');
+$this->setBlock('browse_row', 'existing_file', 'existing_file_block');
 $this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
 
 $this->setBlock(TEMPLATE_content, 'notification_enable', 'notification_enable_block');
@@ -86,7 +88,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         'CURRENT_CAT'       => $catOutput,
         'NAME'              => $subbox['name'],
         'DESCRIPTION'       => $subbox['description'],
-        'FILEID'            => '',
+        'FILEID'            => $subbox['fid'],
         'ACCEPT_SUBMISSION' => $subbox['accept_submission'] ? ' checked="checked"' : '',
         'MULTI_SUBMISSION'  => $subbox['multi_submission'] ? ' checked="checked"' : '',
         'TOTAL_MARK'        => $subbox['max_mark'],
@@ -111,7 +113,29 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     );
 
     $this->setVar($output);
-    $this->setVar('browse_block', '');
+
+    // check for an associated file
+    if($subbox['fid']) {
+
+        $fileHandler = new File;
+        $file = $fileHandler->getByID($subbox['fid']);
+
+        $this->setVar('CURRENT_FILE_NAME', $file['realname']);
+        $this->setVar('CURRENT_FILE_ICON', $file['iconFile']);
+        $this->setVar('CURRENT_FILE_DATE', date('jS M Y, g:ia', $file['submitted']));
+
+        $this->parse('existing_file_block','existing_file');
+        $this->parse('file_overwrite_block','file_overwrite');
+    }
+    // no file found, clear the blocks
+    else {
+        $this->setVar(array(
+            'file_overwrite_block' => '',
+            'existing_file_block' => ''
+        ));
+    }
+
+    $this->parse('browse_block', 'browse_row');
 
 }
 else if($this->arg[0] == 'new') {
@@ -124,6 +148,11 @@ else if($this->arg[0] == 'new') {
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
 	$groupHandler = new Group;
+
+    $this->setVar(array(
+        'file_overwrite_block' => '',
+        'existing_file_block' => ''
+    ));
 
     if(is_numeric($this->arg[2]) && $this->arg[2] > 0) {
         /* File ID submitted, associate box with file */

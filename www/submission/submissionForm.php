@@ -7,6 +7,25 @@ $submission_box_handler = new Submission();
 
 if (is_numeric($_POST['id']) && $_POST['due_date']) {
 
+    // retrieve the file if there is one
+    if (isset($_FILES['file']['name']) && $_FILES['file']['name']) {
+        $allowedFileHandler = new AllowedFile();
+        $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
+        $fileHandler = new File();
+        $data = array(
+            'owner'       => $_SESSION['id'],
+            'description' => $_POST['name'],
+            'type'        => $_POST['type'],
+            'comment'     => $_POST['comment'],
+            'category'    => $_POST['category'],
+            'hidden'      => '1',
+        );
+        $fileId = $fileHandler->create($data, $_FILES['file']);
+    }
+    else {
+        $fileId = 0;
+    }
+
 	/* Prevent 12pm to 12am-next-day bug by checking that the hour submitted is
 	 * not equal to 12. This stops the date incrementing to the next day.
 	 *
@@ -75,6 +94,11 @@ if (is_numeric($_POST['id']) && $_POST['due_date']) {
         'notif_enabled'     => !empty($_POST['notif_enabled']) ? true : false,
 	);
 
+    // only set this field if there's actually something to put in it
+    if($fileId) {
+        $submission_box['fid'] = $fileId;
+    }
+
 	$submission_box_handler->update($submission_box);
 
     $page->backToTheFuture(2);
@@ -88,10 +112,12 @@ else if ($_POST['due_date']) {
 		$fileHandler = new File();
 
 		$data = array(
-			'description' => $_POST['name'],
-			'comment' => $_POST['comment'],
-			'category' => $_POST['category'],
-			'owner' => $_SESSION['id'],
+            'owner'       => $_SESSION['id'],
+            'description' => $_POST['name'],
+            'type'        => $_POST['type'],
+            'comment'     => $_POST['comment'],
+            'category'    => $_POST['category'],
+            'hidden'      => '1',
 		);
 		$fileId = $fileHandler->create($data, $_FILES['file']);
 	}
