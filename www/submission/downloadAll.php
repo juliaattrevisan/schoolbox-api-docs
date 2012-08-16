@@ -29,35 +29,41 @@ class ZipFolder {
       return true;
    }
 
-   function createDirectory($currentDir, $folderID, $fileList, $depth=0) {
-      if(is_array($fileList)) {
-         foreach($fileList as $file) {
-            $dataFile = "{$file[id]}.dat";
+    function createDirectory($currentDir, $folderID, $fileList, $depth = 0) {
+        if(is_array($fileList)) {
+            foreach($fileList as $file) {
+                $dataFile = $file['id'].'.dat';
 
-            $fileLocation = Cfg::get('submission_dir') . '/' . $dataFile;
+                $fileLocation = Cfg::get('submission_dir') . '/' . $dataFile;
 
-            if(is_file($fileLocation)) {
-               $this->size = $this->size + filesize($fileLocation);
-               $fileName = $currentDir . '/' . $file['lastname'] . '-' . $file['realname'];
-               $fileName = $this->uniqueFileName($fileName); //ensure filename is unique else puts numbers in filename
+                if(is_file($fileLocation)) {
+                    $this->size = $this->size + filesize($fileLocation);
 
-               copy(Cfg::get('submission_dir') .'/'.$dataFile, $fileName);
+                    $fileName = $currentDir . '/' . sprintf("%s-%s_%s_%s",
+                        $file['lastname'], $file['firstname'],          // student name
+                        date("md-Hi", strtotime($file['submitted'])),   // datetime
+                        $file['realname']                               // filename
+                    );
+
+                    $fileName = $this->uniqueFileName($fileName); //ensure filename is unique else puts numbers in filename
+
+                    copy(Cfg::get('submission_dir') .'/'.$dataFile, $fileName);
+                }
             }
-         }
-      }
-   }
+        }
+    }
 
-   function uniqueFileName($fileName, $depth=1) {
-      if(is_file($fileName)) {
-         $pathParts = pathinfo($fileName);
-         $newName = $pathParts['dirname'].'/'.$pathParts['filename'].'_'.$depth.'.'.$pathParts['extension'];
-         return $this->uniqueFileName($newName, ++$depth);
-      }
-      else
-         return $fileName;
-   }
+    function uniqueFileName($fileName, $depth=1) {
+        if(is_file($fileName)) {
+            $pathParts = pathinfo($fileName);
+            $newName = sprintf("%s/%s_%s.%s", $pathParts['dirname'], $pathParts['filename'], $depth, $pathParts['extension']);
+            return $this->uniqueFileName($newName, ++$depth);
+        }
+        else
+            return $fileName;
+    }
 
-   function cleanUp() {
+    function cleanUp() {
       unlink($this->tmpName);
       unlink($this->tmpZip);
       $this->removeDir($this->tmpFolder);
@@ -102,8 +108,8 @@ class ZipFolder {
       }
    }
 
-   function cleanName($name) {
-      $filename = preg_replace("/{$this->allowedChars}/","_",$name);
+   function cleanName($name, $delim = "_") {
+      $filename = preg_replace("/{$this->allowedChars}/", $delim, $name);
       return $filename;
    }
 }

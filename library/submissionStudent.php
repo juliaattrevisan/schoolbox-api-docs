@@ -11,7 +11,7 @@ class SubmissionStudent extends DeprecatedModel {
     }
 
 	function getByID($id) {
-		$query = "SELECT s.*, u.lastname FROM `".$this->_table."` s, user u 
+		$query = "SELECT s.*, u.lastname, u.firstname FROM `".$this->_table."` s, user u
 				  WHERE s.owner = u.id AND s.".$this->_index." = $id";	
 		return $this->db->getRow($query);
 	}

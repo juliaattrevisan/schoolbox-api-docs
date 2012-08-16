@@ -736,14 +736,14 @@ class Submission extends DeprecatedModel {
 
         // if multiselect has been disabled, return THE MOST RECENT submission from each student in the box
         if($multi)
-            $query = "SELECT ss.id, realname, u.firstname, u.lastname
+            $query = "SELECT ss.id, submitted, realname, u.firstname, u.lastname
                       FROM student_submission ss
                       JOIN `user` u ON ss.owner = u.id
                       WHERE box_id = $box_id ";
         else
             $query = "SELECT * FROM
                       (
-                          SELECT ss.id, realname, u.firstname, u.lastname, u.id AS uid
+                          SELECT ss.id, submitted, realname, u.firstname, u.lastname, u.id AS uid
                           FROM student_submission ss
                           JOIN `user` u ON ss.owner = u.id
                           WHERE box_id = $box_id

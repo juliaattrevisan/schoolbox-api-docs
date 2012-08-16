@@ -63,19 +63,33 @@ if(is_numeric($_GET['id']))
             error(9, "the requested file could not be read.<br />Please try again, and if the problem persists contact your system administrator.");
         }
 
-		$filename = $studentSub['lastname']."-".$studentSub['realname'];
+        // filename format to be {lastname-firstname_month-day_hour-minute_{sanitised(filename)}}
+        // eg. Day-Matt_0816-1432_MyAssignment.docx (from 'My Assign!ment.docx')
+
+        $filename = sprintf("%s-%s_%s_%s",
+            $studentSub['lastname'], $studentSub['firstname'],  // student name
+            date("md-Hi", strtotime($studentSub['submitted'])), // datetime
+            $studentSub['realname']                             // filename
+        );
+
 	}
 
-	if($_GET['view'])
-		$attach = "";
-	else
-		$attach = "attachment;";
+    // sanitise
+    $filename = preg_replace("#[^a-z0-9_\-\(\)\.]#i", "", $filename);
+
+    // get the mime-type
+    $allowedHandler = new AllowedFile();
+    $mime = $allowedHandler->getMime(substr($filename, stripos($filename, '.') + 1));
+
+    $attach = $_GET['view'] ? '' : 'attachment;';
 
 	//send headers
-	header ("Content-Type: application/octet-stream");
+	header ("Content-Type: $mime");
 	header ("Content-Disposition: $attach filename=\"".$filename."\"");
 	header ("Content-Length: ".filesize($file));
 	readfile($file);
+
+    die(); // just in case
 }
 else
 	error(2);
