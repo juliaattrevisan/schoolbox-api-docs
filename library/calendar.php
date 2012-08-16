@@ -24,6 +24,38 @@ class Calendar extends DeprecatedModel {
 		parent::DeprecatedModel();
 	}
 
+	/**
+	 * Get a list of upcoming events with a summary tally of attendances
+	 * for both Pending and Approved statuses
+	 *
+	 * @return array|bool
+	 */
+	public function getUpcomingEventAttendance() {
+		$query = "
+			SELECT
+				event.id,
+				event.note,
+				event.date,
+				event.startTime,
+				event.endTime,
+				event.location,
+				event.owner,
+				user.firstname,
+				user.lastname,
+				SUM(IF(event_attendance.status = 1, 1, 0)) AS numPending,
+				SUM(IF(event_attendance.status = 2, 1, 0)) AS numApproved
+			FROM event
+			LEFT JOIN event_attendance ON event.id = event_attendance.event_id
+			LEFT JOIN `user` ON event.owner = user.id
+			WHERE attendance = 1
+			AND publish_date < NOW()
+			GROUP BY event.id
+			ORDER BY CONCAT(event.date, ' ', event.startTime) DESC
+		";
+
+		return $this->db->getAll($query);
+	}
+
     public function getAttendeeList ($eventId) {
         $event = $this->getByID($eventId);
 

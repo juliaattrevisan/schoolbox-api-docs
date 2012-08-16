@@ -22,6 +22,55 @@ class Event_Attendance_Controller extends Controller
         $this->setLeaveController( new Leave_Controller );
     }
 
+	/**
+	 * Get a list of all upcoming events with a summary of attendance statuses
+	 *
+	 * @return
+	 */
+	public function executeUpcomingEventAttendance() {
+		$data = $this->getCalendarHandler()->getUpcomingEventAttendance();
+
+		return $data;
+	}
+
+	/**
+	 * Render a list of all upcoming events with a summary of attendance statuses
+	 *
+	 * @param $data
+	 */
+	public function renderUpcomingEventAttendance($data) {
+		$this->getPage()->setFile(TEMPLATE_content, 'calendar/upcomingeventattendance.html');
+		$this->getPage()->setBlock(TEMPLATE_content, 'event', 'event_block');
+
+		if (is_array($data) && count($data)) {
+			foreach($data as $currentEvent) {
+				$eventDate = new Alaress_Date_Format($currentEvent['date'] . ' ' . $currentEvent['startTime'], 'y-m-d h:i:s');
+
+				// check security perms
+				if ($this->getCalendarHandler()->getPerm($currentEvent['id']) < 2) {
+					error(34);
+				}
+				else {
+					$this->getPage()->setVar(array(
+						'EVENT_ID' => $currentEvent['id'],
+						'EVENT_NOTE' => $currentEvent['note'],
+						'EVENT_DATE' => $eventDate->getShort(),
+						'EVENT_LOCATION' => $currentEvent['location'],
+						'EVENT_USER_FIRSTNAME' => $currentEvent['firstname'],
+						'EVENT_USER_SURNAME' => $currentEvent['lastname'],
+						'EVENT_PENDING' => $currentEvent['numPending'],
+						'EVENT_APPROVED' => $currentEvent['numApproved'],
+					));
+				}
+
+				$this->getPage()->parse('event_block', 'event', true);
+			}
+		}
+		else {
+			$this->getPage()->setVar('event_block', 'event');
+		}
+	}
+
     public function executeAttendeeList ($eventId) {
         $data = array();
 

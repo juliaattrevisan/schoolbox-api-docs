@@ -4,7 +4,7 @@ $attendanceController = new Event_Attendance_Controller($this);
 
 $method = $this->arg[0];
 
-if ( $method == 'list' && is_numeric($this->arg[1]) ) {
+if ($method == 'list' && is_numeric($this->arg[1])) {
     $eventId = $this->arg[1];
 
     $data = $attendanceController->executeAttendeeList($eventId);
@@ -21,4 +21,11 @@ elseif ( $method == 'processRemoveAttendance' && is_numeric($this->arg[1]) ) {
     $attendanceId = $this->arg[1];
 
     $attendanceController->processRemoveAttendance($attendanceId);
+}
+/* Show all upcoming events with the number of attendees
+ */
+else if ($method == 'upcomingEvents') {
+	$data = $attendanceController->executeUpcomingEventAttendance();
+
+	$attendanceController->renderUpcomingEventAttendance($data);
 }

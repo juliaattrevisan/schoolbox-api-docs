@@ -216,20 +216,27 @@ else {
  */
 function parseReturnTo($returnView, $returnDate = "") {
 
-    //the returnTo must be week or month, default to week
-	if (!in_array($returnView, array("week", "month"))) {
-		$returnView = "week";
+	/* Allow someone to return to the Upcoming Event Attendance screen -_-
+	 */
+	if ($returnView == 'upcomingEventAttendance') {
+		return '/calendar/upcomingEventAttendance';
 	}
+	else {
+		//the returnTo must be week or month, default to week
+		if (!in_array($returnView, array("week", "month"))) {
+			$returnView = "week";
+		}
 
-	// Shamelessly pinched from above, to test whether the date we've been provided is valid.
-    // A blank date will return the user to the current date.
-    list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $_GET['date']);
+		// Shamelessly pinched from above, to test whether the date we've been provided is valid.
+		// A blank date will return the user to the current date.
+		list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $_GET['date']);
 
-    $selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
+		$selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
 
-	if ($selectedDate <= 0) {
-		$returnDate = "";
+		if ($selectedDate <= 0) {
+			$returnDate = "";
+		}
+
+		return "$returnView/$returnDate";
 	}
-
-	return "$returnView/$returnDate";
 }
