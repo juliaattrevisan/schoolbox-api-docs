@@ -2,7 +2,7 @@
 /* This class has functions for cleaning up the database at the end of the year */
 /* this includes removing deleted files, expired news, logs and submission boxes */
 
-require_once("../include/include.php");
+//require_once("../include/include.php");
 //require_once("../include/session.php");
 //require_once("../include/adminonly.php");
 
@@ -39,42 +39,52 @@ class clean {
         $this->db->query($query);
     }
 
-	function cleanSubmissionBoxes()
+    /**
+     * @deprecated 2012-08-17
+     */
+    function cleanSubmissionBoxes()
 	{
-		//unlink all student submissions
-		$query = "SELECT id FROM student_submission";
-		$this->db->query($query);
+        error(0,'This function has been deprecated. Submission boxes are now archived, not deleted.');
 
-		while( $sub = $this->db->getNextArray() )
-		{
-			if(!@unlink(Cfg::get('submission_dir')."/".$sub['id'].".dat"))
-				print "Failed to delete ".Cfg::get('submission_dir')."/".$sub['id'].".dat<br>";
-		}
-
-		$query = "DELETE FROM student_submission";
-		$this->db->query($query);
-		print "Deleted all student submissions<br>";
-
-		$query = "DELETE FROM submission_box";
-		$this->db->query($query);
-		print "Deleted all submission boxes<br>";
+//		//unlink all student submissions
+//		$query = "SELECT id FROM student_submission";
+//		$this->db->query($query);
+//
+//		while( $sub = $this->db->getNextArray() )
+//		{
+//			if(!@unlink(Cfg::get('submission_dir')."/".$sub['id'].".dat"))
+//				print "Failed to delete ".Cfg::get('submission_dir')."/".$sub['id'].".dat<br>";
+//		}
+//
+//		$query = "DELETE FROM student_submission";
+//		$this->db->query($query);
+//		print "Deleted all student submissions<br>";
+//
+//		$query = "DELETE FROM submission_box";
+//		$this->db->query($query);
+//		print "Deleted all submission boxes<br>";
 
 	}
 
-	function cleanReturnedWork()
+    /**
+     * @deprecated
+     */
+    function cleanReturnedWork()
 	{
-		$query = "SELECT id FROM submission_return";
-		$this->db->query($query);
+        error(0,'This function has been deprecated. Submission boxes are now archived, not deleted.');
 
-		while( $ret = $this->db->getNextArray() )
-		{
-			if(!@unlink(Cfg::get('returns_dir')."/".$ret['id'].".dat"))
-				print "Failed to delete ".Cfg::get('returns_dir')."/".$ret['id'].".dat<br>";
-		}
-
-		$query = "DELETE FROM submission_return";
-		$this->db->query($query);
-		print "Deleted all returned items<br>";
+//		$query = "SELECT id FROM submission_return";
+//		$this->db->query($query);
+//
+//		while( $ret = $this->db->getNextArray() )
+//		{
+//			if(!@unlink(Cfg::get('returns_dir')."/".$ret['id'].".dat"))
+//				print "Failed to delete ".Cfg::get('returns_dir')."/".$ret['id'].".dat<br>";
+//		}
+//
+//		$query = "DELETE FROM submission_return";
+//		$this->db->query($query);
+//		print "Deleted all returned items<br>";
 
 	}
 
@@ -202,27 +212,33 @@ class clean {
 
 $clean = new clean;
 
-if($_GET['news'] == 1)
-	$clean->cleanNews();
-if($_GET['calendar'] == 1)
-	$clean->cleanCalendar();
-if($_GET['subnews'] == 1)
-	$clean->cleanSubNews();
-if($_GET['file'] == 1)
-	$clean->cleanDeletedFiles();
-if($_GET['loginlog'] == 1)
-	$clean->cleanLoginLog();
-if($_GET['log'] == 1)
-	$clean->cleanLogs();
-if($_GET['submission'] == 1)
-	$clean->cleanSubmissionBoxes();
-if($_GET['return'] == 1)
-	$clean->cleanReturnedWork();
-if($_GET['rolluser'] == 1)
-	$clean->rollStudents();
-if($_GET['fileclean'] == 1)
-	$clean->cleanFileSystem();
-if($_GET['thumbnail'] == 1)
-	$clean->cleanThumbnails();
+if(!isset($this)) {
+    if($_GET['news'] == 1)
+        $clean->cleanNews();
+    if($_GET['calendar'] == 1)
+        $clean->cleanCalendar();
+    if($_GET['subnews'] == 1)
+        $clean->cleanSubNews();
+    if($_GET['file'] == 1)
+        $clean->cleanDeletedFiles();
+    if($_GET['loginlog'] == 1)
+        $clean->cleanLoginLog();
+    if($_GET['log'] == 1)
+        $clean->cleanLogs();
+    if($_GET['submission'] == 1)
+        $clean->cleanSubmissionBoxes();
+    if($_GET['return'] == 1)
+        $clean->cleanReturnedWork();
+    if($_GET['rolluser'] == 1)
+        $clean->rollStudents();
+    if($_GET['fileclean'] == 1)
+        $clean->cleanFileSystem();
+    if($_GET['thumbnail'] == 1)
+        $clean->cleanThumbnails();
+}
+else {
+    $this->setTitle('Admin - Cleanup');
+    $this->setFile(TEMPLATE_content, 'adminv2/cleanup.html');
+}
 
 ?>
