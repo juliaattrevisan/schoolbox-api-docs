@@ -199,7 +199,7 @@ abstract class Synchronise_Synergetic_Mgs_Strategy_Abstract extends Synchronise_
 
         /* Does this person have a username? If not, skip them
            */
-        if ($this->hasUsername($newUser)) {
+        if ($this->hasUsername($newUser) || $newUser['synergy_id']) {
             $existing = $this->userExistsBySynergyAndGroup($newUser);
 
             /* If the current user exists in Schoolbox, update them

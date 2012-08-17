@@ -28,7 +28,7 @@ foreach($allStrategies as $currentStrategy) {
     $sync = new Synchronise_Synergetic_Main('Synchronise_Synergetic_Wenona_Strategy_' . $currentStrategy);
 
     // Do not alter the db
-    $sync->setPerformUpdate(false);
+    $sync->setPerformUpdate(true);
 
     // Set Verbosity so you can see intentions
     $sync->setVerbose(true);

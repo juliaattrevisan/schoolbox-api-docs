@@ -16,7 +16,7 @@ require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
  */
 $allStrategies = array(
 	'Synchronise_Synergetic_Jpc_Strategy_Staff',
-	'Synchronise_Synergetic_Jpc_Strategy_Parent',
+	//'Synchronise_Synergetic_Jpc_Strategy_Parent',
 	'Synchronise_Synergetic_Jpc_Strategy_Student',
 );
 
@@ -27,7 +27,7 @@ foreach($allStrategies as $currentStrategy) {
 
 	/* Do not alter the db
 	 */
-	$sync->setPerformUpdate(false);
+	$sync->setPerformUpdate(true);
 
 	/* Set Verbosity so you can see intentions
 	 */
