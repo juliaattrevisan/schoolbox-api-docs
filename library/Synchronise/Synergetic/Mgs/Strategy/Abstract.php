@@ -199,7 +199,7 @@ abstract class Synchronise_Synergetic_Mgs_Strategy_Abstract extends Synchronise_
 
         /* Does this person have a username? If not, skip them
            */
-        if ($this->hasUsername($newUser) || $newUser['synergy_id']) {
+        if ($this->hasUsername($newUser) || ( $newUser['synergy_id'] && $newUser['group_id'] == self::PARENT_GROUP_ID) ) {
             $existing = $this->userExistsBySynergyAndGroup($newUser);
 
             /* If the current user exists in Schoolbox, update them
@@ -282,9 +282,13 @@ abstract class Synchronise_Synergetic_Mgs_Strategy_Abstract extends Synchronise_
 			LEFT JOIN groups ON user.group_id = groups.id
 			LEFT JOIN userCampus ON user.id = userCampus.uid
 			WHERE (user.synergy_id = '{$newUser['synergy_id']}'
-			AND groups.id = '{$newUser['group_id']}' ) OR user.username = '{$newUser['username']}'
-			ORDER BY userCampus.defaultCampus DESC
-		";
+			AND groups.id = '{$newUser['group_id']}' ) ";
+
+        if(isset($newUser['username']) ) {
+            $query .= "OR user.username = '{$newUser['username']}'";
+        }
+
+		$query .= "ORDER BY userCampus.defaultCampus DESC";
 
         return $this->getUserHandler()->db->getRow($query);
     }
@@ -296,8 +300,10 @@ abstract class Synchronise_Synergetic_Mgs_Strategy_Abstract extends Synchronise_
      * @return bool
      */
     protected function hasUsername($currentUser) {
-        if (strlen(trim($currentUser['username']))) {
-            return true;
+        if(isset($currentUser['username'])) {
+            if (strlen(trim($currentUser['username']))) {
+                return true;
+            }
         }
 
         return false;
