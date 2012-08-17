@@ -174,7 +174,17 @@ class Submission extends DeprecatedModel {
 	 *
 	 * @return array|bool
 	 */
-	public function getAllDueWork($userID, $categoryIDList) {
+	public function getAllDueWork($userID, $categoryIDList, $year = 0, $semester = 0) {
+
+        if(!$categoryIDList) {
+            return array();
+        }
+
+        if(!$year) {
+            $year = date('Y');
+        }
+        $semesterTest = DueWork_All::getSemesterLogic($semester);
+
 		$query = "SELECT
 			b.id AS bid,
 			s.id AS sid,
@@ -199,6 +209,8 @@ class Submission extends DeprecatedModel {
 			LEFT JOIN submission_return r ON r.box_id = b.id AND (r.owner = '$userID' OR r.owner IS NULL)
 			WHERE b.deleted = 0
 			AND b.category IN (" . implode(',', $categoryIDList) . ")
+			AND DATE_FORMAT(b.date, '%Y') = $year
+			AND DATE_FORMAT(b.date, '%m') $semesterTest
             GROUP BY b.id
 			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC";
 
@@ -438,51 +450,70 @@ class Submission extends DeprecatedModel {
 	 * @param  $userID
 	 * @return array|bool
 	 */
-    public function getAllForUser($userID) {
-        $query = "(SELECT
-                        submission_box.id,
-                        submission_box.name,
-                        submission_box.description,
-                        submission_box.accept_submission,
-                        category.id AS catid,
-                        GROUP_CONCAT(co.code) code,
-                        category.name AS category_name,
-                        DATE_FORMAT(submission_box.date, '%a, %D %b %l:%i%p') AS date,
-                        submission_box.date AS due_date,
-                        DATE_FORMAT(submission_box.open_date, '%a, %D %b %l:%i%p') AS open_date,
-                        submission_box.type AS type_id,
-                        file_type.name AS type,
-                        '' as availability
-                    FROM (category, submission_box )
-                    LEFT JOIN file_type ON submission_box.type = file_type.id
-                    LEFT JOIN categoryCode co ON co.categoryID = category.id
-                    WHERE category.id = submission_box.category
-                    AND submission_box.owner = '$userID'
-                    AND submission_box.deleted = '0'
-                    GROUP BY submission_box.id, category.id)
-                UNION
-                    (SELECT
-                        assess.assess_id,
-                        assess.title,
-                        assess.description,
-                        true AS accept_submission,
-                        assess.category_id AS catid,
-                        '' AS code,
-                        category.name AS name,
-                        DATE_FORMAT(assess.finish, '%a, %D %b %l:%i%p') AS date,
-                        assess.finish as due_date,
-                        DATE_FORMAT(assess.start, '%a, %D %b %l:%i%p') AS open_date,
-                        file_type.id AS type_id,
-                        file_type.name AS type,
-                        assess.availability
-                    FROM assess
-                    LEFT JOIN file_type ON file_type.id = assess.type
-                    LEFT JOIN category ON assess.category_id = category.id
-                    WHERE category.id = assess.category_id
-					AND assess.deleted_at IS NULL
-					AND assess.availability = 'assess'
-                    AND assess.user_id = '$userID')
-                    ORDER BY catid, due_date DESC";
+    public function getAllForUser($userID, $year = 0, $semester = 0) {
+        $dateConditionA = '';
+        $dateConditionB = '';
+
+        if($year) {
+            $dateConditionA .= " AND DATE_FORMAT(submission_box.open_date, '%Y') = $year";
+            $dateConditionB .= " AND DATE_FORMAT(assess.start, '%Y') = $year";
+        }
+        if($semester) {
+            $dateConditionA .= " AND DATE_FORMAT(submission_box.open_date, '%m') " . DueWork_All::getSemesterLogic($semester);
+            $dateConditionB .= " AND DATE_FORMAT(assess.start, '%m') " . DueWork_All::getSemesterLogic($semester);
+        }
+
+        $query = "
+            (
+                SELECT
+                    submission_box.id,
+                    submission_box.name,
+                    submission_box.description,
+                    submission_box.accept_submission,
+                    category.id AS catid,
+                    GROUP_CONCAT(co.code) code,
+                    category.name AS category_name,
+                    DATE_FORMAT(submission_box.date, '%a, %D %b %l:%i%p') AS date,
+                    submission_box.date AS due_date,
+                    DATE_FORMAT(submission_box.open_date, '%a, %D %b %l:%i%p') AS open_date,
+                    submission_box.type AS type_id,
+                    file_type.name AS type,
+                    '' as availability
+                FROM (category, submission_box )
+                LEFT JOIN file_type ON submission_box.type = file_type.id
+                LEFT JOIN categoryCode co ON co.categoryID = category.id
+                WHERE category.id = submission_box.category
+                AND submission_box.owner = '$userID'
+                AND submission_box.deleted = '0'
+                $dateConditionA
+                GROUP BY submission_box.id, category.id
+            )
+            UNION
+            (
+                SELECT
+                    assess.assess_id,
+                    assess.title,
+                    assess.description,
+                    true AS accept_submission,
+                    assess.category_id AS catid,
+                    '' AS code,
+                    category.name AS name,
+                    DATE_FORMAT(assess.finish, '%a, %D %b %l:%i%p') AS date,
+                    assess.finish as due_date,
+                    DATE_FORMAT(assess.start, '%a, %D %b %l:%i%p') AS open_date,
+                    file_type.id AS type_id,
+                    file_type.name AS type,
+                    assess.availability
+                FROM assess
+                LEFT JOIN file_type ON file_type.id = assess.type
+                LEFT JOIN category ON assess.category_id = category.id
+                WHERE category.id = assess.category_id
+                AND assess.deleted_at IS NULL
+                AND assess.availability = 'assess'
+                AND assess.user_id = '$userID'
+                $dateConditionB
+            )
+            ORDER BY catid, due_date DESC";
 
         return $this->db->getAll($query);
     }
@@ -856,4 +887,60 @@ ORDER BY u.id ASC, c.id ASC, sb.date ASC";
 
         return array();
     }
+
+    public function getAllYearsByUser($userID = 0) {
+        if(!$userID) {
+            $userID = $_SESSION['id'];
+        }
+
+        $sql = "SELECT DISTINCT DATE_FORMAT(`submitted`, '%Y') `year`
+                FROM `student_submission`
+                WHERE `owner` = $userID
+                ORDER BY `submitted` DESC";
+
+        $years = array();
+        $result = $this->db->query($sql);
+
+        // rather than user getAll(), we want this as an ordinal array, not associative, so iterate manually
+        while($y = mysql_fetch_assoc($result)) {
+            $years[] = $y['year'];
+        }
+
+        return $years;
+    }
+
+    /**
+     * This function is supposed to determine a list of categories the user WAS involved in based on due work submission
+     *
+     * @param $userID
+     * @param $year
+     * @param $semester
+     * @param $includeSubjectList
+     * @param int $accessType
+     */
+    function submittedToCategoryList($userID, $year, $semester) {
+        $semesterTest = DueWork_All::getSemesterLogic($semester);
+
+        $sql = "SELECT category.name, category.id, GROUP_CONCAT(cc.code) AS `code`
+                FROM category
+                LEFT JOIN categoryCode cc ON category.id = categoryID
+                WHERE category.id IN (
+                    SELECT DISTINCT sb.category
+                    FROM submission_box sb
+                    LEFT JOIN student_submission ss ON ss.`box_id` = sb.`id`
+                    LEFT JOIN submission_return sr ON sb.id = sr.`box_id`
+                    WHERE (ss.`owner` = $userID OR sr.`owner` = $userID)
+                    AND ((
+                        DATE_FORMAT(ss.submitted, '%Y') = $year AND DATE_FORMAT(ss.submitted, '%m') $semesterTest
+                    ) OR (
+                        DATE_FORMAT(sr.returned, '%Y') = $year AND DATE_FORMAT(sr.returned, '%m') $semesterTest
+                    ))
+                )
+                GROUP BY category.id
+                ORDER BY category.name";
+
+        return $this->db->getAll($sql);
+
+    }
+
 }

@@ -52,25 +52,32 @@ class Assess_Main extends Evaluation_Main {
 	 * @param bool $limit
 	 * @return array|bool
 	 */
-    public function getList($category_id, $limit = false) {
+    public function getList($category_id, $limit = false, $year = 0, $semester = 0) {
+
         if (is_array($category_id)) {
             $categoryIDList = implode(',', $category_id);
 
             $query = "SELECT *
                       FROM {$this->_table}
-                      WHERE category_id IN ($categoryIDList)
-                      AND availability = 'assess'
-                      AND deleted_at IS NULL
-                      ORDER BY created_at DESC";
+                      WHERE category_id IN ($categoryIDList)";
         }
         else {
             $query = "SELECT *
                       FROM {$this->_table}
-                      WHERE category_id = '$category_id'
-                      AND availability = 'assess'
-                      AND deleted_at IS NULL
-                      ORDER BY created_at DESC";
+                      WHERE category_id = '$category_id'";
         }
+
+        if($year) {
+            $query .= " AND DATE_FORMAT(start, '%Y') = $year";
+        }
+
+        if($semester) {
+            $query .= " AND DATE_FORMAT(start, '%m') " . DueWork_All::getSemesterLogic($semester);
+        }
+
+        $query .= " AND availability = 'assess'
+                    AND deleted_at IS NULL
+                    ORDER BY created_at DESC";
 
 		if (is_numeric($limit)) {
 			$query .= " LIMIT $limit";
