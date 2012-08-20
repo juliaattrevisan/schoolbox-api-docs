@@ -20,11 +20,13 @@ if (is_numeric($this->arg[0])) {
 
     $submissionHandler->logPageView(3, $this->arg[0]);
 
-    $this->setVar('ASSDESC', Scrub::text($subBox['categoryName'])." - ".Scrub::text($subBox['name']));
-	$this->setVar('CATEGORY_ID', $subBox['cid']);
-    $this->setVar('BOX_ID', $subBox['id']);
     $dueDate = new Alaress_Date_Format($subBox['date'], 'y-m-d');
-    $this->setVar('DUE_DATE', $dueDate->getLong());
+    $this->setVar(array(
+        'ASSDESC'     => Scrub::text($subBox['categoryName'])." - ".Scrub::text($subBox['name']),
+        'CATEGORY_ID' => $subBox['cid'],
+        'BOX_ID'      => $subBox['id'],
+        'DUE_DATE'    => $dueDate->getLong()
+    ));
 
     /* Get full student list of class to show those who have not submitted
      * If synergy code get synergy students
@@ -83,18 +85,16 @@ if (is_numeric($this->arg[0])) {
                     }
 
                     $output = array(
-                        'OWNER' => $userHandler->formatName($user, '{lastname}, {firstname}'),
-                        'OWNER_ID' => $user['uid'],
-                        'OWNER_ESCAPED' => addslashes($userHandler->formatName($student, '{lastname}, {firstname}')),
-                        'SUB_ID' => $submission['id'],
-                        'SUBMITTED' => $submission['date'],
-                        'SUBMITTED_AFTER_MARK' => $exc,
-
+                        'OWNER'                 => $userHandler->formatName($user, '{lastname}, {firstname}'),
+                        'OWNER_ID'              => $user['uid'],
+                        'OWNER_ESCAPED'         => addslashes($userHandler->formatName($student, '{lastname}, {firstname}')),
+                        'SUB_ID'                => $submission['id'],
+                        'SUBMITTED'             => $submission['date'],
+                        'SUBMITTED_AFTER_MARK'  => $exc,
                         // check if submission date if after due date; if so, mark as late (ignore $studentSub['late'])
-                        'COLOUR' => $dueDate->getUnixTimestamp() < $subDate->getUnixTimestamp() ? '#ff0000' : '#000000',
-
+                        'COLOUR'                => $dueDate->getUnixTimestamp() < $subDate->getUnixTimestamp() ? '#ff0000' : '#000000',
                         // only display the mark on the top row per student
-                        'SCORE' => $submission['score'],
+                        'SCORE'                 => $submission['score'],
                     );
 
                     if($i == 0) {
@@ -115,23 +115,31 @@ if (is_numeric($this->arg[0])) {
                     $i++;
 
                     $this->parse('download_action_block', 'download_action', false);
-                    $this->parse('delete_action_block', 'delete_action', false);
+
+                    // check how old the due work is: if it's old enough (?), disallow deletion or mark changes
+                    if(date('Y') <= $dueDate->getUsingFormat('Y')) {
+                        $this->parse('delete_action_block', 'delete_action', false);
+                    }
+                    else {
+                        $this->setVar('delete_action_block', '-');
+                        $this->setVar('mark_action_block', '-');
+                    }
 
                     $this->parse('submission_listing', 'submission_block', true);
                 }
             }
             else {
                 $output = array(
-					'OWNER' => $userHandler->formatName($user, '{lastname}, {firstname}'),
-					'OWNER_ID' => $user['uid'],
-					'OWNER_ESCAPED' => addslashes($userHandler->formatName($student, '{lastname}, {firstname}')),
-					'SUBMITTED' => '',
-					'COLOUR' => '',
-					'MARK' => $return[0]['visible_mark'],
-                    'SCORE' => '',
+					'OWNER'                 => $userHandler->formatName($user, '{lastname}, {firstname}'),
+					'OWNER_ID'              => $user['uid'],
+					'OWNER_ESCAPED'         => addslashes($userHandler->formatName($student, '{lastname}, {firstname}')),
+					'SUBMITTED'             => '',
+					'COLOUR'                => '',
+					'MARK'                  => $return[0]['visible_mark'],
+                    'SCORE'                 => '',
                     'SUBMISSION_EXPANDABLE' => '',
-                    'SUBMISSION_HIDDEN' => '',
-                    'SUBMITTED_AFTER_MARK' => ''
+                    'SUBMISSION_HIDDEN'     => '',
+                    'SUBMITTED_AFTER_MARK'  => ''
                 );
 
                 $this->setVar($output);
@@ -161,22 +169,31 @@ if (is_numeric($this->arg[0])) {
                 }
 
                 $output = array(
-					'OWNER' => $userHandler->formatName($line, '{lastname}, {firstname}'),
-					'OWNER_ID' => $line['uid'],
-					'SUB_ID' => $line['id'],
-					'OWNER_ESCAPED' => addslashes($userHandler->formatName($line, '{lastname}, {firstname}')),
-					'SUBMITTED' => $line['date'],
-					'COLOUR' => $line['late'] ? '#ff0000' : '#000000',
-					'MARK' => $return[0]['mark'],
-                    'SCORE' => $score,
-                    'SUBMITTED_AFTER_MARK' => ''
+					'OWNER'                 => $userHandler->formatName($line, '{lastname}, {firstname}'),
+					'OWNER_ID'              => $line['uid'],
+					'SUB_ID'                => $line['id'],
+					'OWNER_ESCAPED'         => addslashes($userHandler->formatName($line, '{lastname}, {firstname}')),
+					'SUBMITTED'             => $line['date'],
+					'COLOUR'                => $line['late'] ? '#ff0000' : '#000000',
+					'MARK'                  => $return[0]['mark'],
+                    'SCORE'                 => $score,
+                    'SUBMITTED_AFTER_MARK'  => ''
             	);
 
 				$this->setVar($output);
 				$this->parse('download_action_block', 'download_action');
-				$this->parse('mark_action_block', 'mark_action', false);
 				$this->parse('submission_listing', 'submission_block', true);
-				$this->parse('delete_action_block', 'delete_action');
+
+                // check how old the due work is: if it's old enough (?), disallow deletion or mark changes
+                if(date('Y') <= $dueDate->getUsingFormat('Y')) {
+                    $this->parse('delete_action_block', 'delete_action', false);
+                    $this->parse('mark_action_block', 'mark_action', false);
+                }
+                else {
+                    $this->setVar('delete_action_block', '-');
+                    $this->setVar('mark_action_block', '-');
+                }
+
             }
         }
 		else {
