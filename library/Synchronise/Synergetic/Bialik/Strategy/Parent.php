@@ -27,7 +27,7 @@ class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synerget
 
         // use defaults to connect to Synergetic for passwords
         $link = new MSSQL();
-        $result = $link->query("
+        $link->query("
             SELECT vCommunityAddresses.id AS SynergyID,
                    CommunityAttributes.AttributeCode AS CommunityAttribute,
                    CommunityAttributes.AttributeValue AS CommunityPortalPassword,
@@ -112,7 +112,7 @@ class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synerget
 		$spouse['title'] = $currentUser['StudentContactSpouseTitle'];
 		$spouse['firstname'] = $currentUser['StudentContactSpousePreferred'];
 		$spouse['lastname'] = $currentUser['StudentContactSpouseSurname'];
-		$spouse['alt_email'] = $currentUser['StudentContactSpouseDefaultEmail'];
+		$spouse['alt_email'] = $currentUser['StudentContactSpouseDefaultEma'];
 
 		/* Campus config: needs to map to a campus id
 		 */
