@@ -1,103 +1,103 @@
 <?php
-
 /**
- * 
- * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
- * @copyright   2011 Alaress Pty Ltd
- * @link        http://www.alaress.com.au
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
- * 
  */
- 
-class Collection implements ArrayAccess, Iterator, Countable {
+class Collection implements Iterator {
 
-    protected $container;
+    private $collection = array();
+    private $position;
 
-    public function __construct ($objectList = array()) {
-        $this->container = $objectList;
+    public function __construct($collection = null) {
+        // create empty
+        if($collection != null) {
+            $this->add($collection);
+        }
+        $this->position = 0;
+    }
+
+    public function add($collection) {
+        if($collection instanceof Collection) {
+            $this->collection = array_merge($this->collection, $collection->getAll());
+        }
+
+        elseif(is_array($collection) && count($collection)) {
+            foreach($collection as $item) {
+                if(is_a($item, 'Generic_Object')) {
+                    $this->collection[] = $item;
+                }
+            }
+        }
+
+        elseif(is_a($collection, 'Generic_Object')) {
+            $this->collection[] = $collection;
+        }
+
+        else {
+            throw new Exception_Schoolbox('Collection can only hold ORM Objects');
+        }
     }
 
     /**
-     * Sets the container
+     * Get method allows passthru when there is only 1 item in the Collection, otherwise returns the requested index
      *
-     * @param Array $modelList
-     * @return Bool
+     * @param int $index
+     * @return Generic_Object|Collection
+     * @throws Exception_Schoolbox
      */
-    public function set ($modelList) {
-        if ( !is_array($modelList) ) {
-            return false;
+    public function get($index = 0) {
+        if(count($this->collection == 1)) {
+            if($this->collection[0]->__isset($index)) {
+                return $this->collection[0]->get($index);
+            }
+            return $this->collection[0];
         }
-
-        $this->rewind();
-
-        $this->container = $modelList;
-
-        return true;
+        elseif(count($this->collection)) {
+            return $this->collection[$index];
+        }
+        throw new Exception_Schoolbox("Could not get '$index'.");
     }
+
+    // exploiting the weird way PHP implements 'protected': method can be called across objects of the same class :S
+    protected function getAll() {
+        return $this->collection;
+    }
+
+    public function asArray() {
+        return $this->collection;
+    }
+
+    public function count() {
+        return count($this->collection);
+    }
+
+
+    /* Iteration Implementation. Collection can be used in foreach */
 
     /**
-     * Gets the container
-     *
-     * @return Array
+     * @return Generic_Object
      */
-    public function get () {
-        return $this->container;
+    public function current() {
+        return $this->collection[$this->position];
     }
 
-    public function toArray () {
-        return $this->container;
+    public function next() {
+        ++$this->position;
     }
 
-    /* ArrayAccess interface methods */
-    public function offsetSet ($offset, $value) {
-        if ( empty($offset) ) {
-            $this->container[] = $value;
-        }
-        else {
-            $this->container[$offset] = $value;
-        }
+    public function key() {
+        return $this->position;
     }
 
-    public function offsetGet ($offset) {
-        if ( isset($this->container[$offset]) ) {
-            return $this->container[$offset];
-        }
-        else {
-            return null;
-        }
+    public function valid() {
+        return isset($this->collection[$this->position]);
     }
 
-    public function offsetExists ($offset) {
-        return isset($this->container[$offset]);
+    public function rewind() {
+        $this->position = 0;
     }
 
-    public function offsetUnset ($offset) {
-        unset($this->container[$offset]);
-    }
-
-    /* Iterator interface methods */
-    public function rewind () {
-        reset($this->container);
-    }
-
-    public function current () {
-        return current($this->container);
-    }
-
-    public function key () {
-        return key($this->container);
-    }
-
-    public function next () {
-        next($this->container);
-    }
-
-    public function valid () {
-        return current($this->container) !== false;
-    }
-
-    /* Countable interface methods */
-    public function count () {
-        return count($this->container);
-    }
 }

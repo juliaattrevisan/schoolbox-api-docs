@@ -1,0 +1,116 @@
+<script>
+
+    // Nav events
+    var nav  = $('#nav');
+    var menu = $('#menu');
+    var ni   = -1;
+    var mi   = -1;
+
+    nav.on(clickEvent,'a',function(e){
+        if($(this).attr('href') != '#') {
+            renderPage($(this).attr('href'));
+            return false;
+        }
+        // If its a new page
+        if(ni != $(this).parent().index()){
+
+            // Clear classes
+            nav.find('.active').removeClass('active');
+
+            // Kill scrollMenu to free up memory
+            killScroll(scrollMenu);
+
+            // Get index of clicked nav
+            ni = $(this).parent().index();
+
+            // Build menu HTML
+            $('#menu').html('<a href="#" class="back"></a>' +
+                            '<div id="menu_wrapper"></div>')
+                      .addClass('active');
+            $('#menu_wrapper').append($(this).siblings('ul[role="navigation"]').clone());
+
+            scrollMenu = new iScroll('menu_wrapper', { bounce: true, vScroll: true });
+
+            // Display menu
+            $(this).parent().addClass('active');
+
+        } else {
+            nav.find('li[role="tab"]:nth-of-type('+ (ni + 1) +')').toggleClass('active');
+            menu.toggleClass('active');
+        }
+        return false;
+    });
+
+    // Menu events
+    menu.on(clickEvent,'a',function(e){
+
+        // Get index of clicked link
+        mi = $(this).parent().index()
+
+        // Check nothing funky's going on before proceeding
+        if($(e.target).is('.parent')){
+            // Active sub
+            $('.parent[data-icon="minus"]').data('icon','plus')
+            if($(e.target).parent().is('.active')){
+                $('.parent.active').removeClass('active')
+            } else {
+                $('.parent.active').removeClass('active')
+                $(this).parent().addClass('active')
+                $(this).data('icon','minus')
+                scrollMenu.refresh()
+            }
+        } else if($(e.target).is('.back')){
+            // If its a back button, de-active-ate
+            $(this).parent().removeClass('active')
+        } else {
+            // Clear classes
+            menu.find('.current').removeClass('current')
+            nav.find('.current').removeClass('current')
+
+            // Mark currents
+            menu.find('li:nth-of-type('+ (mi + 1) + ')').addClass('current')
+            nav.find('ul li[role="tab"]:nth-of-type('+ (ni + 1) +') ul li:nth-of-type('+ (mi + 1) + ')').addClass('current')
+            nav.find('li[role="tab"]:nth-of-type('+ (ni + 1) +')').addClass('current')
+
+            // Link to page
+            var href = $(this).attr('href')
+            if(href != '#' && href != 'undefined'){
+                $('#menu, #menu li, #nav li').removeClass('active')
+                renderPage('/m/'+href)
+            }
+        }
+        return false
+    });
+
+/*
+    nav.on(clickEvent, '.back', function(e){
+        $('#tablist ul li').removeClass('current')
+        return false
+    });
+
+    menu.on(clickEvent, '.back', function(e){
+        $('#menu').removeClass('active')
+        nav.find('li.active').removeClass('active')
+        return false
+    });
+
+    menu.on($.Event(clickEvent), 'ul .back', function(e){
+        $('#menu .active').removeClass('active')
+        return false
+    });
+
+    /*        if($(this).parent('li').hasClass('current')){
+                $(this).parent('li').removeClass('current');
+            } else {
+                $(this).parent('li').siblings('li').removeClass('current');
+                $(this).parent('li').addClass('current');
+            }
+            var href = $(this).attr('href');
+            if(href != '#' && href != 'undefined'){
+                renderPage('/'+href);
+            }
+    */
+
+
+
+</script>

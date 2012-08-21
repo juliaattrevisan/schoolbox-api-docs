@@ -1,0 +1,24 @@
+<style>
+ul li h3 {
+    margin: -12px -12px 12px -12px;
+}
+</style>
+<ul class="calendar-day">
+{% if content %}
+    {% for i in content | keys %}
+    <li class="calendar-event {{ content[i].eventType }}">
+        {% if content[i].header %}
+        <h3>{{ content[i].header }}</h3>
+        {% endif %}
+        <a href="/m/calendar/event/{{ content[i].id }}">
+            {% if content[i].startTime %}
+            <time>{{ content[i].startTime }}</time>
+            {% endif %}
+            <p class="event-title">{{ content[i].note }}</p>
+        </a>
+    </li>
+    {% endfor %}
+{% else %}
+    <p>No events</p>
+{% endif %}
+</ul>

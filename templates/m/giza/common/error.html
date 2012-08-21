@@ -1,0 +1,4 @@
+<h1>{{ error.code }}</h1>
+{% for e in error %}
+    <p>{{ e | raw }}</p>
+{% endfor %}

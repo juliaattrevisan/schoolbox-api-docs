@@ -1,0 +1,32 @@
+<script>
+    function loadFile(filename, filetype){
+        var fileref;
+        switch (filetype){
+            case "js":
+                fileref=document.createElement('script');
+                fileref.setAttribute("type","text/javascript");
+                fileref.setAttribute("src", filename);
+                break;
+            case "css":
+                fileref=document.createElement("link");
+                fileref.setAttribute("rel", "stylesheet");
+                fileref.setAttribute("type", "text/css");
+                fileref.setAttribute("href", filename);
+                break;
+            case "less":
+                fileref=document.createElement("link");
+                fileref.setAttribute("rel", "stylesheet");
+                fileref.setAttribute("type", "text/less");
+                fileref.setAttribute("href", filename);
+                break;
+            default:
+                debug("Unsure what to do with '"+filename+"', '"+filetype+"'");
+        }
+        document.getElementsByTagName("head")[0].appendChild(fileref);
+    }
+
+    loadFile("/m/inc/js/libs/iscroll.js",'js');
+    loadFile("/m/inc/css/chrome.css",'css');
+    loadFile("/m/inc/css/chrome-ext.css", 'css');
+
+</script>

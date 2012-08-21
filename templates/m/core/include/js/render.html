@@ -1,0 +1,147 @@
+<script>
+
+    function renderMenu(data){
+        data = JSON.parse(localCache.get(data));
+
+        if(!data.menu) {
+            if(data.redirect) {
+                sessionStorage.clear();
+                return;
+            }
+        }
+
+        var menu = '<ul role="tablist" id="tablist">'+'\n';
+            menu += '<li id="nav_back" data-icon="back"></li>'
+
+        // Each tab
+        $.each(data.menu,function(k,v){
+            var ref = (v.href === undefined) ? '#' : v.href;
+            menu += '<li role="tab" data-icon="'+k+'">' +
+                    '<a title="'+v.value+'" href="#">'+v.value+'</a>';
+
+            // Each menu
+            if (v.items){
+                menu += '<ul role="navigation">'+'\n';
+                $.each(v.items,function(k,v){
+                    menu += '<li';
+
+                    // If children
+                    if (v.items){ menu += ' class="parent"' }
+                    menu += '>'
+                    if (v.href) { menu += '<a href="'+ v.href +'">' } else { menu += '<h3>' }
+                    menu += v.value
+                    if (v.href) { menu += '</a>' } else { menu += '</h3>' }
+                    // Subnav
+                    if (v.items){
+                        menu += '<a class="parent" data-icon="plus"></a>'+'\n';
+                        menu += '<ul>'+'\n';
+                        // Each subnav
+                        $.each(v.items,function(k,v){
+                            menu += '<li><a href="'+v.href+'">'+v.value+'</a></li>'+'\n';
+                        });
+                        menu += '</ul>';
+                    }
+                    menu += '</li>'+'\n';
+                });
+                menu += '</ul>';
+            }
+            menu += '</li>'+'\n';
+        });
+
+        $('#nav').append(menu);
+    }
+
+    // data should be coming through with no extension
+    function renderPage(data, push){
+        if(push === undefined) push = true;
+
+        console.log('render.html:54 > renderPage() url should have no extension: ' + data);
+
+        env.status(1); // Loading
+
+        if(env.lastPage){
+            $('#logo').data('icon','back')
+        }
+
+        $('#page').animate({opacity:'0'},200,'linear',function(){
+
+            // Cleanup
+            $(this).html('');
+            killScroll(scrollTable)
+
+            if(data != '/m/') {
+                // remove trailing slash if present
+                if(data.substr(data.length - 1, 1) == '/') {
+                    data = data.substr(0, data.length - 2);
+                }
+                data += '.html';
+            }
+
+            // Get the page content
+            console.log( 'render.html:75 renderPage() requesting content for ' + data );
+            data = localCache.get(data)
+            //console.log(data)
+            page = $(data).find('article')
+
+            if(!title) var title = ''
+            if(!titleAside) var titleAside = ''
+
+            $('#currentPage').html(title)
+            $('#header aside').html(titleAside)
+
+            $('#page').html(page).animate({opacity:'1'},200);
+            scrollTop()
+
+            // Create scroll wrappers
+            setTimeout(function () {
+                // TODO probably should not be hardcoded quite like this.
+                if($('#table-wrapper').length > 0){
+                    scrollTable = new iScroll('table-wrapper', {
+                        snap: 'th'
+                    });
+                    scrollTable.scrollToElement('td.current',200);
+                }
+                if($('#school-news-wrapper').length > 0){
+                    scrollTable = new iScroll('school-news-wrapper', {
+                        snap: 'ul',
+                        onScrollEnd: function(){
+                            $('#school-news-wrapper .pagination li').removeClass('active');
+                            $('#school-news-wrapper .pagination li:nth-child(' + (this.currPageX+1) + ')').addClass('active');
+                            $('#school-news-wrapper').siblings('h1').html('School News: <span>'+$('#school-news-wrapper ul:nth-child('+(this.currPageX+1)+')').attr('data-topic')+'</span>');
+                        }
+                    });
+                }
+                if($('#your-news-wrapper').length > 0){
+                    scrollTable = new iScroll('your-news-wrapper', {
+                        snap: 'ul',
+                        momentum: false,
+                        onScrollEnd: function(){
+                            var el = $('#your-news-wrapper');
+                            $('#your-news-wrapper .pagination li').removeClass('active');
+                            $('#your-news-wrapper .pagination li:nth-child(' + (this.currPageX+1) + ')').addClass('active');
+                            $('#your-news-wrapper').siblings('h1').html('My News: <span>'+$('#your-news-wrapper ul:nth-child('+(this.currPageX+1)+')').attr('data-topic')+'</span>');
+                        }
+                    });
+                }
+                if($('#dashboard-timetable-wrapper').length > 0){
+                    scrollTable = new iScroll('dashboard-timetable-wrapper', {
+                        snap: 'li',
+                        momentum: false
+                    });
+                    scrollTable.scrollToElement('li.current',200);
+                }
+            }, 100);
+        });
+
+        if(push && location.pathname != data && data != '/') {
+            history.pushState(null, null, data);
+            console.log('pushed '+data);
+            localStorage.setItem('lastPage', data)
+        }
+        else {
+            console.log('suppressed push of '+data);
+        }
+
+    }
+
+</script>

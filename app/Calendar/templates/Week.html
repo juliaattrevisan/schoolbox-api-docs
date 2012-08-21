@@ -1,0 +1,16 @@
+<ul class="calendar-day">
+{% if content %}
+    {% for i in content | keys %}
+    <li class="calendar-event {{ content[i].eventType }}">
+        <a href="/m/calendar/event/{{ content[i].id }}">
+            {% if content[i].startTime %}
+            <time>{{ content[i].startTime }}</time>
+            {% endif %}
+            <p class="event-title">{{ content[i].note }}</p>
+        </a>
+    </li>
+    {% endfor %}
+{% else %}
+    <li><p>No events</p></li>
+{% endif %}
+</ul>

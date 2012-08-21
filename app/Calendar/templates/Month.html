@@ -1,0 +1,44 @@
+<table class="calendar">
+    <thead>
+    <tr>
+        <th width="14%">Sun</th>
+        <th width="14%">Mon</th>
+        <th width="14%">Tue</th>
+        <th width="14%">Wed</th>
+        <th width="14%">Thu</th>
+        <th width="14%">Fri</th>
+        <th width="14%">Sat</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    {% for i in content|keys %}
+        {% if i % 7 == 0 %}
+    </tr><tr>
+        {% endif %}
+        <td class="{% if content[i].events %}has-events {% endif %}{% if content[i].isToday %}today{% endif %}">
+        {% if content[i].niceDay %}
+            <h3 data-date="{{ content[i].dayOfMonth }}">{{content[i].niceDay}}</h3>
+        {% else %}
+            <h3 class="blank">&nbsp;</h3>
+        {% endif %}
+        {% if content[i].events %}
+            <ul>
+            {% for j in content[i].events|keys %}
+                <li class="{{ content[i].events[j].eventType }}{% if j > 2 %} excess{% endif %}">
+                    <a href="/m/calendar/event/{{ content[i].events[j].eventId }}">
+                    {% if content[i].events[j].startTime.timeOnly %}
+                    <time>{{ content[i].events[j].startTime.timeOnly }}</time>
+                    {% endif %}
+                    {{ content[i].events[j].note }}</a>
+                </li>
+            {% endfor %}
+            </ul>
+        {% elseif content[i] != '_blank' %}
+            <p class="empty">No events</p>
+        {% endif %}
+        </td>
+    {% endfor %}
+    </tr>
+    </tbody>
+</table>

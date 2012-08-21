@@ -16,6 +16,7 @@ require_once dirname(__FILE__) . '/HTMLPurifier/HTMLPurifier.auto.php';
 
 /* Stdfuncs */
 require_once(WEB_root.'/include/stdfuncs.php');
+require_once('constants.php');
 
 // register the shutdown_safely() function in stdfuncs as the termination script
 register_shutdown_function('shutdown_safely');

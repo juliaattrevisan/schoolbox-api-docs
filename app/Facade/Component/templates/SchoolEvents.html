@@ -1,0 +1,19 @@
+<ul>
+{% if content.events %}
+    {% for event in content.events %}
+    <li class="{{ event.eventType }}">
+        <a href="/m/calendar/event/{{ event.id }}" class="aside">
+            {% if event.date %}
+            <time>{{ event.date }}</time>
+            {% endif %}
+            {{ event.note }}
+            {% if event.topic %}
+            <aside>{{ event.topic }}</aside>
+            {% endif %}
+        </a>
+    </li>
+    {% endfor %}
+{% else %}
+    <li><p>Nothing special on today</p></li>
+{% endif %}
+</ul>

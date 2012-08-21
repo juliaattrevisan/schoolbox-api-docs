@@ -1,0 +1,70 @@
+{% if content %}
+<div id="school-news-wrapper">
+    <div class="news-container scroller" style="width: {{ content | length }}00%;">
+    {% for topic in content | keys %}
+        <ul data-topic="{{ topic }}" style="width: {{ 100 / content | length }}%;">
+                {% for news in content[topic] %}
+            <li title="{{ news.item_heading }}">
+                <a href="/m/news/article/school/{{ news.item_id }}">{{ news.item_heading }}
+                    <p>Posted {{ news.item_datetime_posted|date("F jS") }}</p></a>
+            </li>
+                {% endfor %}
+        </ul>
+    {% endfor %}
+    </div>
+    <ul class="pagination">
+        {% for topic in content %}
+            {% if loop.first %}
+                <li class="active">{{ loop.index }}</li>
+            {% else %}
+                <li>{{ loop.index }}</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>
+{% else %}
+<ul>
+    <li><p>No news</p></li>
+</ul>
+{% endif %}
+
+</article>
+<article data-icon="settings">
+<h1>Test</h1>
+<ul id="test">
+    <li><a href="#">Test</a><a href="#">bubble</a></li>
+    <li><h3>QuickLinks (can't get to any other way yet)</h3></li>
+    <li><a href="/m/calendar/week" data-icon="settings">Calendar: Week</a></li>
+    <li><a href="/m/calendar/agenda" data-icon="settings">Calendar: Agenda</a></li>
+
+</ul>
+
+<ul>
+    <li><h3>Seperator</h3></li>
+    <li>Dashbuttons</li>
+    <li><a href="#">List item with link</a></li>
+    <li><a href="#">List item with link</a>
+        <a href="#">And second</a></li>
+    <li><a href="#">List item with link</a>
+        <a href="#" data-icon="news"></a></li>
+    <li><a href="#"><time>Today</time>List item with time</a></li>
+    <li><h3>Multi-line items</h3></li>
+    <li><a href="#">List item with link
+        <p>And paragraph</p></a></li>
+    <li><a href="#">List item with link
+        <p>And a waay longer paragraph that just goes on and on like its deliberately trying to take up more than one line.</p></a></li>
+    <li><a href="#"><img src="" class="avatar">English
+        <p>Mrs. Celia Glenn</p><span class="grade">B<sup>+</sup></span></a></li>
+    <li><a href="#"><img src="" class="avatar">Welsh
+        <p>Mr. David Jones</p><span class="grade">B<sup>+</sup></span></a></li>
+    <li><a href="#"><img src="" class="avatar">Latin
+        <p>Caesar. Julius Tiberious Augustus</p><span class="grade">B<sup>+</sup></span></a></li>
+    <li><a href="#"><time class="cal">&#xe00c; 31<span>June</span></time>Bacon Party
+        <p>Steve&#39;s Special Place</p></a></li>
+    <li><a href="#"><img src="" class="avatar">Latin
+        <p>Caesar. Julius Tiberious Augustus</p><span class="grade">B<sup>+</sup></span></a></li>
+    <li><a href="#">Long Term Pythagoras
+        <p>Next Tuesday - Math (Essay)</p></a></li>
+    <li><a href="#">Shakespeare 4
+        <p>12th July - English (Essay)</p></a></li>
+</ul>

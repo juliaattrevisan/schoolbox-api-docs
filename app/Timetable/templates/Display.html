@@ -1,0 +1,241 @@
+<style type="text/css">
+    .timetable-container {
+        top: 0;
+        font-size: 0.9em;
+    }
+    .timetable-container thead tr {
+        height: 24px;
+    }
+    .timetable-container td,
+    .timetable-container th {
+        padding: 0;
+        bdorder: 0;
+        vertical-align: top;
+    }
+    .timetable-container * {
+        text-transform: none;
+    }
+    .timetable-container span {
+        font-size: 1em;
+        display: block;
+        width: 100%;
+        height: 1.5em;
+        float: none;
+        line-height: 1em;
+    }
+    .timetable-container ul, .timetable-container li {
+        height: 100%;
+    }
+    .timetable-container .class-title {
+        font-weight: bold;
+    }
+    .timetable-periods h3 {
+        color: #555;
+        font-size: 1em;
+    }
+    .timetable-container thead th {
+        text-transform: uppercase;
+    }
+</style>
+
+
+<!-- tablet styles
+-->
+<style>
+.timetable-container .class-code {
+    display: none;
+}
+.timetable-periods h3 {
+    margin-top: 12px;
+}
+.timetable-periods td {
+    padding-left: 12px;
+}
+.timetable-container tbody td {
+    height: 80px;
+}
+</style>
+
+
+<!-- phone styles
+
+<style>
+.timetable-container tbody td,
+.timetable-container tr {
+    height: 40px;
+}
+.timetable-container td,
+.timetable-container th {
+    min-width: 80px;
+}
+
+.timetable-container .class-title,
+.timetable-container .class-teacher {
+    display: none;
+}
+.timetable-periods h3 {
+    margin-top: 4px;
+    line-height: 1.1em;
+}
+.timetable-periods td {
+    padding-left: 4px;
+}
+ul li a {
+    padding: 4px;
+    margin: -4px;
+}
+ul li {
+    padding: 4px;
+}
+</style>
+-->
+
+<!--
+<style>
+/* override */
+.timetable-container {
+top: 0;
+}
+.timetable-container thead tr {
+height: 24px;
+}
+.timetable-container tbody tr {
+height: 96px;
+}
+#table-wrapper tbody td {
+min-width: 200px;
+}
+.timetable-container h3 {
+background-color:#eee;
+background-image:-webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.25, rgba(255, 255, 255, 0.5)), color-stop(0.25, transparent), color-stop(0.5, transparent), color-stop(0.5, rgba(255, 255, 255, 0.5)), color-stop(0.75, rgba(255, 255, 255, 0.5)), color-stop(0.75, transparent), to(transparent));
+background-image:-webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.5) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.5) 50%, rgba(255, 255, 255, 0.5) 75%, transparent 75%, transparent);
+background-image:-o-linear-gradient(-45deg, rgba(255, 255, 255, 0.5) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.5) 50%, rgba(255, 255, 255, 0.5) 75%, transparent 75%, transparent);
+background-image:linear-gradient(-45deg, rgba(255, 255, 255, 0.5) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.5) 50%, rgba(255, 255, 255, 0.5) 75%, transparent 75%, transparent);
+background-size:6px 6px;
+font-size:1em;
+color:rgba(0, 0, 0, 0.4);
+text-shadow:0 1px rgba(255, 255, 255, 0.8);
+padding:0 12px;
+}
+.timetable-container td,
+.timetable-container th {
+padding: 0;
+border: 0;
+vertical-align: top;
+}
+.timetable-container td {
+border-top: none;
+border-left: solid 1px #eee;
+border-bottom: solid 1px #eee;
+}
+.timetable-container time,
+.timetable-container span {
+padding: 0 6px;
+}
+.timetable-container #table-wrapper tbody .class-name {
+font-weight: bold;
+text-transform: none;
+width: 200px;
+}
+.timetable-container #table-wrapper tbody .class-details {
+padding-right: 6px;
+text-transform: none;
+float: none;
+width: 100%;
+}
+.timetable-container .class-details span {
+font-size: 1em;
+display: inline;
+padding: 0 12px 0 0;
+text-transform: none;
+float: none;
+
+}
+.timetable-container #table-wrapper tbody .class-code {
+font-size: 1em !important;
+color: rgba(0,0,0,0.3) !important;
+display: inline !important;
+text-transform: none;
+float: none;
+}
+.timetable-periods td {
+background: #e7e7e7;
+border-right: solid 1px #ddd;
+}
+.timetable-periods table {
+border-right: solid 1px #fff;
+}
+.timetable-container .current {
+border-color: #eee;
+}
+.timetable-container
+</style>
+-->
+<div class="timetable-container">
+    <div class="timetable-periods">
+        <table>
+            <thead>
+            <tr>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for period in content %}
+            <tr>
+                <td{% if period.highlight %} class="current"{% endif %}>
+                    <h3>{{ period.periodName }}</h3>
+                    <time>{{ period.periodStart }}-{{ period.periodEnd }}</time>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div id="table-wrapper">
+        <table>
+            <thead>
+            <tr>
+            {% for col in content[0].day | keys %}
+                {% if col == content[0].day|length %}
+                <th{% if response.Display.content[0].day[col].today %} class="current"{% endif %}>
+                {% else %}
+                <th{% if content[0].day[col].today %} class="current"{% endif %}>
+                {% endif %}
+                    Day {{ col }}
+                </th>
+            {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for period in content %}
+            <tr>
+                {% for day in period.day %}
+                <td{% if day.today and period.highlight %} class="current"{% endif %}>
+                    {% if day.periodOn == 1 %}
+                    <ul>
+                        <li>
+                        {% if day.catID %}
+                        <a href="/m/facade/homepage/display/{{ day.catID }}">
+                        {% else %}
+                        <a href="#">
+                        {% endif %}
+                            <span class="class-title">{{ day.description }}</span>
+                            <span class="class-code">{{ day.code }}</span>
+                            <span class="class-details">
+                                {% if day.teacherName %}
+                                <span class="class-teacher">{{ day.teacherName }}</span>
+                                {% endif %}
+                                <span class="class-room">{{ day.room }}</span>
+                            </span>
+                        </a>
+                        </li>
+                    </ul>
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

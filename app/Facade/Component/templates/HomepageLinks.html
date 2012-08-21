@@ -1,0 +1,11 @@
+<ul>
+    {% if content %}
+    {% for link in content %}
+    <li title="{{ link.description }}" class="dashbutton">
+        <a href="{{ link.url }}">{{ link.description }}</a>
+    </li>
+    {% endfor %}
+    {% else %}
+    <li><p>No links</p></li>
+    {% endif %}
+</ul>

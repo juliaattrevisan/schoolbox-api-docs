@@ -1,0 +1,43 @@
+<style>
+    #dashboard-timetable-wrapper h5.class-room, h5.class-staff {
+        color: rgba(0, 0, 0, 0.6);
+    }
+    #dashboard-timetable-wrapper time.class-time {
+        font-weight: normal;
+        position: absolute;
+        bottom: 4px;
+        color: rgba(0, 0, 0, 0.4);
+    }
+    /* this is an override of an existing style */
+    article h1 span {
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: 0.9em;
+        display: block;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        text-align: center;
+    }
+</style>
+<div id="dashboard-timetable-wrapper">
+<ul style="width: {{ content | length * 50 }}%;" class="scroller">
+{% for period in content %}
+    <li style="width: {{ 100 / content | length }}%;" {% if period.current %}class="current"{% endif %}>
+        {% if period.catID %}
+        <a href="/m/facade/homepage/display/{{ period.catID }}">
+        {% else %}
+        <a href="#">
+        {% endif %}
+            <h3 class="period-name">{{ period.periodName }}</h3>
+            {% if period.description %}
+            <h4 class="class-descr">{{ period.description }} [{{ period.code }}]</h4>
+            <h5 class="class-room">{{ period.room }}</h5>
+            <h5 class="class-staff">{{ period.staffName }}</h5>
+            {% endif %}
+            <time class="class-time">{{ period.periodStart }} - {{ period.periodEnd }}</time>
+        </a>
+    </li>
+{% endfor %}
+</ul>
+</div>

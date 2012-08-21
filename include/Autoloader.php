@@ -18,7 +18,7 @@ class Autoloader {
     /**
      * @var array Possible class locations
      */
-    static $includePathArray = array('include', 'library');
+    static $includePathArray = array('include', 'library', 'app');
 
     /**
      * Initializes variables, registers autoloading functions with PHP and sets include paths
@@ -61,6 +61,7 @@ class Autoloader {
      */
     private static function getClassFile ($className) {
         $classSegments = explode('_', $className);
+        $unqualClassName = $classSegments[count($classSegments) - 1];
         $pathSegments = $classSegments;
 
         /* Determine path */
@@ -71,7 +72,6 @@ class Autoloader {
 
             if ( self::fileExists($currentPath) ) {
                 $path = $currentPath;
-
                 break;
             }
         }
@@ -79,13 +79,18 @@ class Autoloader {
         /* Determine file name */
         $filename = array_pop($classSegments);
 
-        $classFile = ltrim("$path/$filename.php", '/');
+        /* Array of expected classfile definitions, in descending order of likelihood */
+        $possibleFiles = array();
+        $possibleFiles[] = ltrim("$path/$filename.php", '/');
+        $possibleFiles[] = ltrim("$path/$unqualClassName/$unqualClassName.php", '/');
+        $possibleFiles[] = ltrim("$className.php", '/');
 
-        if ( !self::fileExists($classFile) ) {
-            return false;
+        foreach($possibleFiles as $classFile) {
+            if ( self::fileExists($classFile) ) {
+                return $classFile;
+            }
         }
-
-        return $classFile;
+        return false;
     }
 
     /**

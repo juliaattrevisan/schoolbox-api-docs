@@ -1,0 +1,55 @@
+// =============================================================================
+// Variables
+// =============================================================================
+// Colours
+@link-color: 		#237CFF;
+@highlight-color: 	#CAE9B9;
+@brand-blue:        #0066b0;
+@light-blue:        #D9EFFE;
+
+@skin:              'core';
+@brand-color:        #0066b0;
+@brand-secondary:    #D9EFFE;
+
+
+@marked-color:      rgba(255,255,0,0.4);
+@body-color: 		#222;
+@negative: 			~`'@{body-color}'.replace(/./gi,function(s){return 'fedcba9876543210#'.charAt('0123456789abcdef#'.indexOf(s));})`;
+@light-grey:    	#ddd;
+@grey:              #999;
+@dark-grey:         #333;
+
+// Font stacks
+@font-family: 		~'"Roboto Light", "Roboto", "Helvetica Neue", sans-serif';
+@font-family: 		~'sans-serif';
+@monospace: 		~'"Courier new", monospace';		// make sure monospace is defined
+
+
+// DP
+// Density-independent pixel
+@dp:                48px;
+@dp2-3:             @dp * ( 2 / 3); // 32
+@dp2:               @dp / 2;        // 24
+@dp3:               @dp / 3;        // 16
+@dp4:               @dp / 4;        // 12
+@dp6:               @dp / 6;        //  8
+@dp12:              @dp / 12;       //  4
+
+// Type variables
+@baseline:			@dp / 2;							// baseline height
+@basefont:			@dp / 3.5;
+@bodyfont:			(@basefont/16) * 100%;
+
+@font:              ~`'@{basefont}'+'/'+'@{baseline}'+' '+'@{font-family}'`;
+
+@fontpx:			13;
+@linepx:			18;
+
+@line:				1.4;
+@bodyfont: 			100% * (@fontpx/16); 			// body font size in percentages
+@bodyoffset:		0px;
+
+@opacity: 			0.5;
+@ie-opacity-value: 	@opacity * 100;
+@ie-opacity: 		"alpha(opacity=@{ie-opacity-value})";
+

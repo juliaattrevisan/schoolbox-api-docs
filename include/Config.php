@@ -6,6 +6,7 @@ class Config extends DeprecatedModel {
 
         static private $instance = false;
         static private $data = false;
+        static private $consts;
 
         public function __construct () {
 
@@ -20,7 +21,13 @@ class Config extends DeprecatedModel {
 
         static public function getInstance() {
                 if (!self::$instance) {
-                        self::$instance = new self();
+                    $w = realpath( dirname(__FILE__) . "/..");
+                    self::$consts = array(
+                        'siteRoot' => $w,
+                        'webRoot'  => "$w/www",
+                        'webBase'  => ''
+                    );
+                    self::$instance = new self();
                 }
                 return self::$instance;
         }
@@ -60,6 +67,8 @@ class Config extends DeprecatedModel {
 
                 if (isset(self::$data[$configName]))
                         return self::$data[$configName];
+                elseif (isset(self::$consts[$configName]))
+                    return self::$consts[$configName];
                 elseif (defined($configName))
                         return constant($configName);
                 else {

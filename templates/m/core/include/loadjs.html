@@ -1,0 +1,287 @@
+<script>
+    document.write('<script src=/m/inc/js/libs/' +
+            ('__proto__' in {} ? 'zepto' : 'jquery') +
+            '.min.js><\/script>')
+</script>
+{# include all the embedded js scripts that can't be linked #}
+
+{% include 'js/loadfile.html' %}
+{% include 'js/variables.html' %}
+
+<script>
+if(env.tablet) {
+    loadFile("/inc/js/libs/masonry.min.js", 'js');
+}
+
+function goToByScroll(id){
+    window.scrollTo(0,$("#"+id).offset().top)
+}
+
+function size_format(bytes) {
+    var sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    if (bytes == 0) return 'n/a';
+    var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+    return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+};
+function debug(msg){
+    if(settings.debug){
+        console.log(msg);
+    }
+};
+
+function getCookie(c) {
+    var i,x,y,cookies=document.cookie.split(";");
+    for (i=0;i<cookies.length;i++) {
+        x=cookies[i].substr(0,cookies[i].indexOf("="));
+        y=cookies[i].substr(cookies[i].indexOf("=")+1);
+        x=x.replace(/^\s+|\s+$/g,"");
+        if (x==c) {
+            return unescape(y);
+        }
+    }
+}
+function killCookie(c) { document.cookie = c + '=; expires=Thu, 01-Jan-70 00:00:01 GMT;'; }
+function killScroll(o) { if(o != null){ o.destroy(); o = null; } }
+
+function toast(el){
+    alert(el)
+}
+
+$('body').on('longTap','[title]',function(){
+    toast($(this).attr('title'))
+})
+
+/*
+$('#app').on(clickEvent,'a',function(e){
+    if(scrollPage != null){
+        if (scrollPage.moved) {
+            return false
+        }
+    }
+})
+*/
+
+
+</script>
+
+{% include 'js/init.html' %}
+
+<script>
+
+// Resource getter
+// Get response to HTTP request and save it to localStorage
+localCache.get = function(url) {
+
+    console.log('loadjs.html:73 > localCache() url should have no extension: ' + url);
+
+    var r = localStorage[url];
+
+    // If online, refresh resource
+    if(env.online()){
+        env.status(1); // Loading
+        var xhr = new XMLHttpRequest();
+
+        // append the default view for history api trickery
+        if(url != '/' && !url.match(".*[json|html]")) {
+            url += '.html';
+        }
+        xhr.open("GET", url, false);
+
+        xhr.send(null);
+        if (xhr.status != 200) {
+            env.status(4); // Error
+            return null;
+        }
+        // check headers: use content-disposition as trigger for file download
+        if(xhr.getResponseHeader('Content-Disposition')) {
+            console.log('HOKAY, IMMA DOWNLOAD YO FILE!');
+            console.log('Create iframe!');
+            var f = document.createElement('iframe');
+            f.style.display = 'none';
+
+            console.log('Point iframe to ' + url);
+            f.src = url;
+            // download is sent here
+            document.body.appendChild(f);
+
+            console.log('Go back to ' + localStorage.getItem('lastPage'));
+            history.go(-1);
+
+            return '';
+        }
+
+        localStorage.setItem(url, xhr.responseText);
+        env.status(2); // Loaded
+        return xhr.responseText;
+    }
+
+    // If not online, return cached
+    if (r != null) {
+        env.status(3); // Loaded from cache
+        return r;
+    }
+
+    else {
+        env.status = 4; // Error
+        return "Resource not cached, please try again when you are connected";
+    }
+};
+
+
+
+</script>
+
+{% include 'js/render.html' %}
+{% include 'js/cache.html' %}
+{% include 'js/menu.html' %}
+
+<script>
+
+// Calendar
+$('#page').on(clickEvent,'.calendar td',function(){
+    if($('#events').length == 0) {
+        $('#page').append('<article><ul id="events"></ul></article>')
+    }
+    $('#events').html($(this).find('li').clone())
+    goToByScroll('events')
+})
+
+
+
+
+document.addEventListener('deviceready', onDeviceReady);
+function onDeviceReady() {
+    alert('Device ready!')
+    navigator.notification.vibrate(1000)
+}
+
+// history navigation listener
+window.addEventListener("popstate", function(e) {
+    if(location.pathname != '/') {
+        console.log('popping ' + location.pathname)
+        renderPage(location.pathname, false)
+    }
+    else {
+        console.log('popping / : using dashboard instead')
+        renderPage('/m/facade/dashboard/display', false)
+    }
+})
+
+// back button listener
+$('#nav_back').on(clickEvent, function(e) {
+    history.go(-1)
+});
+
+    // Browser chrome removal
+function scrollTop(){
+    i = (env.android) ? 1 : 0;
+    setTimeout(scrollTo(0,i),100)
+}
+$("#header").on(clickEvent, '#currentPage', scrollTop)
+
+// Stop craaazzzzyyy bounce on iPhail
+// TODO: Currently breaks the page scrolling. Moved to fantasy utopia wishlist
+//document.html.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+
+$("#bubble").on(clickEvent, '.close', function(e){
+    $('#bubble').remove();
+    localStorage.setItem('pinned',true)
+    return false;
+});
+
+$("#bubble").on(clickEvent, '.wp', function(e){
+    localStorage.setItem('pinned','true');
+    $('body').load('/m/ie.html');
+    return false;
+});
+
+var nyan = 0;
+$("#page").on(clickEvent, '#nyan', function(e){
+    debug('nyan clicked');
+    if (nyan < 3) { nyan++ }
+    else { $('body').load('/m/nyan.html'); }
+
+    return false;
+});
+
+
+$("#page, #header aside").on(clickEvent, 'a', function(){
+    var href = $(this).attr('href')
+
+    if(href != '#' && href != 'undefined' && !href.match('^https?://') && !href.match('^mailto:')){
+        renderPage(href)
+        return false
+    } else if(href == '#' || href == 'undefined'){
+        return false
+    } else {
+        $(this).attr('target','_blank')
+        debug('User navigated to: ' + href)
+    }
+})
+
+// Debug shiz
+$("#app").on(clickEvent, '#status', function(){
+    $("body").append('<div id="grid"></div>');
+});
+$("body").on(clickEvent, '#grid', function(){
+    $("#grid").remove();
+});
+
+
+$("#page").on(clickEvent, '#wipeCache', function(){
+    $('html').attr('manifest','manifest_obsolete.php');
+    document.cookie = 'PHPSESSID' + '=; expires=Thu, 01-Jan-70 00:00:01 GMT;';
+    appCache.OBSOLETE;
+    window.location.reload();
+});
+
+$("#page").on(clickEvent, '#logout', function(){
+    localStorage.clear();
+    sessionStorage.clear();
+    killCookie('PHPSESSID');
+    window.location.reload();
+});
+
+
+/*
+$('#page').on(clickEvent, '[data-href]',function(e){
+    debug($(e.target).parent().is('[data-href]'));
+    return false
+});
+
+
+$('#page').on('click', "#test", function(e){
+    debug($(e.target).is('li'));
+    return false;
+});
+*/
+
+
+/*
+$('#app').on(clickEvent, 'a',function(e){
+    e.stopPropagation();
+    return((scrollPage != null) && !scrollPage.moved)
+});
+
+$('#app').on(clickEvent, '.scroller li',function(e){
+    e.stopPropagation();
+    return((scrollPage != null) && !scrollPage.moved)
+});
+
+*/
+
+
+function debug_storage(){
+    // Request storage usage and capacity left
+    if(navigator.userAgent.indexOf('Chrome') > -1){
+        window.webkitStorageInfo.queryUsageAndQuota(webkitStorageInfo.PERSISTANT,function(used, remaining) {
+            debug('Local storage   : '+size_format(JSON.stringify(localStorage).length) +
+                  ' ('+localStorage.length+' entries)');
+            debug('AppCache size   : ' + size_format(used));
+            debug('Total storage   : ' + size_format(used + JSON.stringify(localStorage).length));
+            debug('Remaining quota : ' + size_format(5242880 - (used + JSON.stringify(localStorage).length)) + ' (actual: ' + size_format(remaining)+')');
+        });
+    }
+}
+
+</script>
