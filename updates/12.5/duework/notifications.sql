@@ -9,8 +9,9 @@ ALTER TABLE `submission_box`
 INSERT INTO `config` (
   `name`, `value`, `title`, `description`, `field`, `options`, `type`, `editable`, `hidden`, `required`
 )
-VALUES ( 'due_work_notifications_enabled', '1', 'Due Work Notifications Enabled',
+VALUES (
+  'due_work_notifications_enabled', '1', 'Due Work Notifications Enabled',
   'If ticked, students can automatically be sent reminder emails regarding upcoming due work.',
   'boolean', 'true:false', 'Email', 'true', 'false', 'false'
-) ON DUPLICATE KEY UPDATE;
+);
 
