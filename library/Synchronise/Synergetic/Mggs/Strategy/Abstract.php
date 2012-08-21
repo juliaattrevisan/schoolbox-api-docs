@@ -14,7 +14,7 @@
  */
 abstract class Synchronise_Synergetic_Mggs_Strategy_Abstract extends Synchronise_Synergetic_Strategy_Abstract {
 	protected $verboseFilter = null;
-
+    const PARENT_GROUP_ID = 4;
 	/**
 	 * Setup
 	 */
@@ -65,10 +65,14 @@ abstract class Synchronise_Synergetic_Mggs_Strategy_Abstract extends Synchronise
 				/* Perform action; report what happened
 				 */
 				if ($this->getPerformUpdate() === true) {
-					$this->getUserHandler()->create($newUser);
-					$this->getVerboseFilter()->performCreation();
-					$this->getVerboseFilter()->incrementCreated();
-				}
+                    // Do not create parents
+                    if($newUser['group_id'] != self::PARENT_GROUP_ID) {
+					    $this->getUserHandler()->create($newUser);
+
+				    	$this->getVerboseFilter()->performCreation();
+				    	$this->getVerboseFilter()->incrementCreated();
+                    }
+                }
 				/* Report intentions
 				 */
 				else {
@@ -104,6 +108,39 @@ abstract class Synchronise_Synergetic_Mggs_Strategy_Abstract extends Synchronise
 				return 1;
 		}
 	}
+
+    /**
+     * Figure out which Campus belongs to this Student
+     *
+     * @param  $year
+     * @return bool|string
+     */
+    protected function getCampusFromYearLevel($year) {
+        switch ($year) {
+            case '0';
+            case '1';
+            case '2':
+            case '3':
+            case '4':
+                return 2;
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case '10':
+            case '11':
+            case '12':
+                return 3;
+            case '40':
+            case '30':
+            case '50':
+                return 1;
+            default:
+                return false;
+                break;
+        }
+    }
 
 	/**
 	 * Figure out the Group ID based on a Student's year level
