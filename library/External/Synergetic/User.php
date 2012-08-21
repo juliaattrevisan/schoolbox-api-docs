@@ -164,16 +164,17 @@ class External_Synergetic_User implements External_UserInterface {
 					vStudents.StudentFormStaffName, vStudents.StudentTutorDescription, luForm.ID as TeacherFormID,
 					vStudents.StudentForm, luTutor.ID as TeacherTutorID, vStudents.StudentTutor,
 					luForm.Description as FormDescription, vStudents.StudentHouseDescription, vStudents.StudentHouse,
-					vStudents.StudentYearLevel, vStudents.StudentYearLevelCoordinator, vStudents.StudentLockerBook,
+					vStudents.StudentYearLevel, vStudents.StudentYearLevelCoordinator, luYearLevel.YearLevelCoordID, vStudents.StudentLockerBook,
 					vStudents.StudentEmergencyName,  vStudents.StudentEmergencyPhone,  vStudents.StudentEmergencyPhoneAlt,
 					vStudents.StudentEmergency2Name, vStudents.StudentEmergency2Phone, vStudents.StudentEmergency2PhoneAlt,
 					vStudents.StudentEmergency3Name, vStudents.StudentEmergency3Phone, vStudents.StudentEmergency3PhoneAlt,
 					vStudents.StudentMedicalAlert, vStudents.StudentSpecialNeedsFlag, AlertMessage, vStudents.StudentBoarder
                 FROM SynergyOne.dbo.vStudents vStudents
                     LEFT JOIN CommunityAlerts ON CommunityAlerts.ID = StudentID
-					LEFT JOIN SynergyOne.dbo.luForm ON vStudents.StudentForm = luForm.Code
-					LEFT JOIN SynergyOne.dbo.luTutor ON vStudents.StudentTutor = luTutor.Code
-					LEFT JOIN SynergyOne.dbo.luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
+					LEFT JOIN luForm ON vStudents.StudentForm = luForm.Code
+					LEFT JOIN luTutor ON vStudents.StudentTutor = luTutor.Code
+					LEFT JOIN luYearLevel ON vStudents.StudentCampus = luYearLevel.Campus AND vStudents.StudentYearLevel = luYearLevel.Code
+					LEFT JOIN luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
 				WHERE
 					vStudents.StudentID = '$synID'
 					AND vStudents.FileSemester=".$_SESSION['FileSemester']."

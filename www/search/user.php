@@ -234,6 +234,24 @@ if (is_numeric($this->arg[0])) {
 				$hohTeacher = $synInfo['StudentHeadOfHouse'];
 			}
 
+            if ($synInfo['StudentYearLevelCoordinator'] && $synInfo['YearLevelCoordID']) {
+                $coord = $userHandler->getBySynergy( $synInfo['YearLevelCoordID']);
+
+                $emailObj = new Email();
+                $coordEmail = $emailObj->formatEmailFromArray($coord);
+
+                if ($coordEmail) {
+                    $coordTeacher = '<a href="'.$_SESSION['mailhandle'].$coordEmail.'">'.Scrub::text($synInfo['StudentYearLevelCoordinator']).'</a>';
+                }
+                else {
+                    $coordTeacher = Scrub::text($synInfo['StudentYearLevelCoordinator']);
+                }
+            }
+            else {
+                $coordTeacher = $synInfo['StudentYearLevelCoordinator'];
+            }
+
+
 			$output = array(
 				'TUTOR_GROUP' => Scrub::text($synInfo['StudentTutorDescription']),
 				'TUTOR' => $tutorTeacher,
@@ -243,7 +261,7 @@ if (is_numeric($this->arg[0])) {
 				'FORM' => Scrub::text($synInfo['StudentForm']),
 				'FORM_DESCRIPTION' => Scrub::text($synInfo['FormDescription']),
 				'FORM_STAFF' => $formTeacher,
-                'YCOORD'    => Scrub::text($synInfo['StudentYearLevelCoordinator']),
+                'YCOORD'    => $coordTeacher,
 				'LOCKER' => Scrub::text($synInfo['StudentLockerBook']),
 				'BIRTHDATE' => date('j F Y', $synInfo['StudentBirthDate']),
 				'EMERGENCY_NAME' => Scrub::text($synInfo['StudentEmergencyName']),
