@@ -117,7 +117,7 @@ abstract class Synchronise_Synergetic_Verbose_Abstract {
 	protected function verboseUserSummary($newUser) {
 		$data = array();
 		$data[] = "username: {$newUser['username']}";
-        $data[] = "password: " . sha1($newUser['title']);
+        $data[] = "synergy_id: " .$newUser['synergy_id'];
 		$data[] = "title: {$newUser['title']}";
 		$data[] = "firstname: {$newUser['firstname']}";
 		$data[] = "lastname: {$newUser['lastname']}";

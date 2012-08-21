@@ -14,6 +14,7 @@
  */
 abstract class Synchronise_Synergetic_Bialik_Strategy_Abstract extends Synchronise_Synergetic_Strategy_Abstract implements Synchronise_Synergetic_Bialik_Strategy_Interface {
 	protected $verboseFilter = null;
+    const PARENT_GROUP_ID = 4;
 
 	/**
 	 * Construct
@@ -211,10 +212,14 @@ abstract class Synchronise_Synergetic_Bialik_Strategy_Abstract extends Synchroni
 			FROM user
 			LEFT JOIN groups ON user.group_id = groups.id
 			LEFT JOIN userCampus ON user.id = userCampus.uid
-			WHERE user.synergy_id = '{$newUser['synergy_id']}'
-			AND groups.id = '{$newUser['group_id']}'
-			ORDER BY userCampus.defaultCampus DESC
-		";
+			WHERE user.synergy_id = '{$newUser['synergy_id']}'";
+
+        //Only lock user to group if parent account
+	    if($newUser['group_id'] == self::PARENT_GROUP_ID)
+		    $query .= " AND groups.id = '{$newUser['group_id']}'";
+
+
+		$query .= " ORDER BY userCampus.defaultCampus DESC";
 
 		return $this->getUserHandler()->db->getRow($query);
 	}

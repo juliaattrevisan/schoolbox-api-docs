@@ -12,7 +12,7 @@
  */
 class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synergetic_Bialik_Strategy_Abstract {
 	protected $strategyTitle = "Parent Synchronisation";
-	const PARENT_GROUP_ID = 4;
+
 
     protected $parentPSync = array();
 
@@ -112,7 +112,7 @@ class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synerget
 		$spouse['title'] = $currentUser['StudentContactSpouseTitle'];
 		$spouse['firstname'] = $currentUser['StudentContactSpousePreferred'];
 		$spouse['lastname'] = $currentUser['StudentContactSpouseSurname'];
-		$spouse['alt_email'] = $currentUser['StudentContactSpouseDefaultEma'];
+		$spouse['alt_email'] = $currentUser['StudentContactSpouseDefaultEmail'];
 
 		/* Campus config: needs to map to a campus id
 		 */
