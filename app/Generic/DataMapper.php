@@ -42,7 +42,7 @@ abstract class Generic_DataMapper {
     /**
      * @param $value
      * @param int $limit
-     * @return Collection
+     * @return GizaCollection
      * @throws Exception_Schoolbox
      */
     public function read($conditions = '', $limit = 0, $clearWhere = true) {
@@ -91,14 +91,14 @@ abstract class Generic_DataMapper {
         if(is_array($result)) {
             if(count($result) == 1) {
                 $result = array_merge($result[0], $this->hydrates);
-                return new Collection(new $this->objClassname($result));
+                return new GizaCollection(new $this->objClassname($result));
             }
             else {
                 $batch = array();
                 foreach($result as $row) {
                     $batch[] = new $this->objClassname(array_merge($row, $this->hydrates));
                 }
-                return new Collection($batch);
+                return new GizaCollection($batch);
             }
 
         }
@@ -138,7 +138,7 @@ abstract class Generic_DataMapper {
     }
 
     protected function setHydrateField($field) {
-        $this->hydrates[$field] = new Collection();
+        $this->hydrates[$field] = new GizaCollection();
     }
 
     protected function getColumnList() {

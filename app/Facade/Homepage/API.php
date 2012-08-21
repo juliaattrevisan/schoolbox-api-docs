@@ -85,7 +85,7 @@ class Facade_Homepage_API extends Generic_API {
         try {
             $articles = array();
 
-            if(is_array($components) || $components instanceof Collection) {
+            if(is_array($components) || $components instanceof GizaCollection) {
                 // plz render mine components
                 foreach($components as $component) {
                     foreach($this->componentRefactoryMap($component->get('method')) as $m) {
@@ -130,7 +130,7 @@ class Facade_Homepage_API extends Generic_API {
             }
 
             // if the category is still wrapped in a collection, extract it
-            if($cat instanceof Collection) {
+            if($cat instanceof GizaCollection) {
                 $cat = $cat->get();
             }
             $catTitle = $cat->get('name') . ($cat->__isset('code') ? " ({$cat->get('code')})" : '');

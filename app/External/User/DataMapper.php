@@ -48,7 +48,7 @@ class External_User_DataMapper extends Generic_DataMapper implements External_Us
             }
         }
 
-        return new Collection();
+        return new GizaCollection();
     }
 
     public function getParent($externalUserId) {

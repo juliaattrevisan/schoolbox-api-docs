@@ -83,7 +83,7 @@ class GizaCategory_DataMapper extends Generic_DataMapper {
         $uMap = new GizaUser_DataMapper();
 
         if(is_array($tchr) && count($tchr)) {
-            $coll = new Collection();
+            $coll = new GizaCollection();
             foreach($tchr as $t) {
                 try {
                     $u = $uMap->read(array('synergy_id' => $t));

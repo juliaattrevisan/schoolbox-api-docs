@@ -19,7 +19,7 @@ class GizaUser extends Generic_Object {
     /**
      * @param int $service
      * @param int $access
-     * @return Collection
+     * @return GizaCollection
      */
     public function getSubjects($service = HOMEPAGE_SERVICE, $access = READ_ACCESS) {
         $args = array(

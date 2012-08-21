@@ -39,7 +39,7 @@ class Generic_Object {
 
     /**
      * @param $field
-     * @return Collection
+     * @return GizaCollection
      */
     public function get($field) {
         return $this->getField($field, '');
@@ -51,7 +51,7 @@ class Generic_Object {
      *
      * @param $field
      * @param $args
-     * @return Collection
+     * @return GizaCollection
      * @throws Exception_Schoolbox
      */
     protected function getField($field, $args) {
@@ -59,7 +59,7 @@ class Generic_Object {
         if($this->__isset($field)) {
 
             // if the data is absent, try to hydrate it
-            if($this->fields[$field] instanceof Collection) {
+            if($this->fields[$field] instanceof GizaCollection) {
                 if($this->fields[$field]->count() == 0) {
                     try {
                         $dm = $this->getDataMapper();
