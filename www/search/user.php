@@ -294,7 +294,7 @@ if (is_numeric($this->arg[0])) {
 
                     $category = $catHandler->getByCode($subject['code']);
 
-                    if(Cfg::get('site_location') != 'stmichaels' || ($category['id'] && $groupHandler->getPermission($category['id']) >= READ_ACCESS )) {
+                    if( !(Cfg::get('site_location') == 'stmichaels' || Cfg::get('site_location') == 'jpc' ) || ($category['id'] && $groupHandler->getPermission($category['id']) >= READ_ACCESS )) {
 
                         /* Fetch teacher names */
                         $teacherList = $synClass->getTeacherName($subject['code']);
