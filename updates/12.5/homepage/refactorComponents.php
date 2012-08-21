@@ -1,6 +1,6 @@
 <?php
 /**
- * !IMPORTANT! DEPENDENCY: SQL SCRIPT TO MODIFY SCHEMA OF TABLES USED IN THIS SCRIPT
+ * !IMPORTANT! DEPENDENCY: SQL SCRIPT TO MODIFY SCHEMA OF TABLES USED IN THIS SCRIPT (refactorComments.sql)
  * This script takes existing component definitions in `homepage_comp` and refactors into `component_definition`
  *
  * @author      Matt Day <matt.day@alaress.com.au>
