@@ -206,6 +206,9 @@ h3, #nav h3, .add-component .notification {
 #nav li a:hover, #nav li li a:hover {
     background: #0194d3;
     color: #fff;
+    border-radius: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
 }
 
 #nav .nav-wrapper {
@@ -240,6 +243,11 @@ h3, #nav h3, .add-component .notification {
     color: #fff;
 }
 
+#category li a {
+    border-radius: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+}
 #category li a.selected {
     background: #0194d3;
     color: #fff;
@@ -465,4 +473,14 @@ td.cal-right .link-case .filter-drop .filter-list {
 }
 .jstree-schoolbox a, .jstree-schoolbox span.file{
     background:#eee;
+}
+#nav ul ul,
+h4.eventListing,
+.archive .menu ul li a, .archive .pagination a {
+    border-radius: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+}
+.archive .menu ul li a.selected {
+    background: #E5F4FB;
 }

@@ -187,6 +187,9 @@ td.dxmMenuItemSelected_PortalMenu, td.dxmMenuItemSelectedWithImage_PortalMenu {
 .res_ttl_cell, .tableBlackTopBorder {
     border: none;
 }
+.res_ttl_cell {
+    border-bottom: 1px solid #b2bfce;
+}
 
 .clear {
     min-height: 10px;
