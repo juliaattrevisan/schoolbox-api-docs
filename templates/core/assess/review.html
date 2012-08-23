@@ -5,7 +5,7 @@
 <script type="text/javascript" src="/javascript/jquery.validate.min.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
-  
+
    var currentForm = '';
 	$j('form').each(function(index, formElement) {
    		 $j(formElement).validate({
@@ -18,9 +18,9 @@ $j(document).ready(function() {
 				return false;
 			},
 			rules: {
-				reviewedMarks: { 
+				reviewedMarks: {
 					number:true
-				}	
+				}
 			},
 			messages: {
 				reviewedMarks: "Please enter a decimal number"
@@ -30,40 +30,40 @@ $j(document).ready(function() {
                             error.insertBefore(element)
 			}
    		});
-	});  	   
-		
+	});
+
 	$j('.textarea-container textarea').blur(function() {
 		if ($j(this).val() !== '') {
-			$j.post($j(this).closest('form').attr('action'), 
-			$j(this).closest('form').serialize(), 
+			$j.post($j(this).closest('form').attr('action'),
+			$j(this).closest('form').serialize(),
 			function(responseText) {
 				var dataFunction = new Function('return ' + responseText);
 				var result = dataFunction();
 			});
-			return false;			
+			return false;
 		}
 	});
-	
+
 	$j('.marks-amount input').blur(function() {
 		showAlert($j(this));
-		$j.post($j(this).closest('form').attr('action'), 
-		$j(this).closest('form').serialize(), 
+		$j.post($j(this).closest('form').attr('action'),
+		$j(this).closest('form').serialize(),
 		function(responseText) {
 			var dataFunction = new Function('return ' + responseText);
 			var result = dataFunction();
 		});
-		return false;	
+		return false;
 	});
 
 	var assessAttempted = '{ASSESS_PREVIOUSLY_REVIEWED}';
-	
-	
-	
+
+
+
 	if (assessAttempted == 'true') {
 		$j('.tick').html('<span></span>Resubmit Review')
 		$j('.review-submitted').show();
 	}
-	
+
 	function showAlert(target) {
 		var relevantLabel = $j(target).closest('form').find('.assess-alert');
 		if (assessAttempted == "false") {
@@ -87,13 +87,13 @@ $j(document).ready(function() {
 });
 </script>
 <!-- END custom_head -->
-<h1>Mark the test results</h1>
+<h1>Mark the test results for {RESPONDENT_NAME}</h1>
 
 <p class="information-notification review-submitted hide">Please note: You are currently editing an already submitted review.</p>
 
 	<div class="evaluation-content mark-test">
 	<h2>Section: {SECTION_TITLE}</h2>
-	
+
 		<p class="pad-it">{SECTION_DESCRIPTION}</p>
 	<!-- BEGIN question -->
 
@@ -104,7 +104,7 @@ $j(document).ready(function() {
 		<div class="evaluation-answer clearfix">
 			<!-- BEGIN answerInputs -->
 			<!-- END answerInputs -->
-				
+
 		</div>
 		<label class="alert-holder clearfix">
 			<div class="assess-alert">
@@ -120,11 +120,11 @@ $j(document).ready(function() {
 		<!-- BEGIN prevSection -->
 		<a class="btn go-back float-left" href="/assess/review/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}"><span></span>Previous Section</a>
 		<!-- END prevSection -->
-	
+
 		<!-- BEGIN nextSection -->
 		<a class="btn go-to" href="/assess/review/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}"><span></span>Next Section</a>
 		<!-- END nextSection -->
-	
+
 		<!-- BEGIN endAssess -->
 		<a class="btn tick finish-review" href="/assess/finishReview/{ASSESS_ASSESS_ID}/{ATTEMPT_ATTEMPT_ID}"><span></span>Finalise Review</a>
 		<!-- END endAssess -->

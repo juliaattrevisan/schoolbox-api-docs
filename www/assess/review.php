@@ -20,6 +20,7 @@ $attemptHandler = new Assess_Attempt();
 $responseHandler = new Assess_Response();
 $sectionHandler = new Assess_Section();
 $groupHandler = new Group();
+$userHandler = new User();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -75,6 +76,7 @@ else {
 	$reviewedAt = 'false';
 }
 
+$user = $userHandler->getByID($attempt['user_id']);
 
 /* Set up template
  */
@@ -86,6 +88,8 @@ $this->setBlock(TEMPLATE_content, 'prevSection', 'prevSection_block');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
+
+
 /* Show current Section's data, and other mandatory tokens needed to complete
  * the Assessment.
  */
@@ -96,6 +100,7 @@ $this->setVar(array(
     'SECTION_TITLE' => $section['title'],
     'SECTION_DESCRIPTION' => $section['description'],
 	'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
+	'RESPONDENT_NAME' => $userHandler->formatName($user),
 ));
 
 /* Load all the questions for this section.
