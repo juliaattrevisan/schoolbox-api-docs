@@ -1,0 +1,1 @@
+INSERT INTO `portal-dev`.`homepage_comp`(`id`,`size`,`method`,`name`,`description`,`homepageCategoryID`,`filename`,`config`,`invisible`,`allowMultiple`) VALUES ( NULL,'0','outputClassList','Class Students','Output class list','3','students.html','','false','false');

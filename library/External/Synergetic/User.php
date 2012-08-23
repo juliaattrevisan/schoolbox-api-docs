@@ -152,6 +152,32 @@ class External_Synergetic_User implements External_UserInterface {
     }
 
 	/**
+	 * Get all the parents of the $synergyIds
+	 *
+	 * @param $synergyIds
+	 *
+	 * @return array|bool
+	 */
+	public function getParentsOf($synergyIds) {
+		$query = "
+			SELECT
+				StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
+				StudentContactAddress1, StudentContactSuburb, StudentContactPostCode, StudentContactState,
+				StudentContactPhoneActual, StudentContactMobilePhone, StudentContactOccupPhone,
+				StudentContactSpouseID, StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseSurname,
+				StudentContactSpouseMobilePhone, StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail, StudentContactType
+			FROM
+				SynergyOne.dbo.vStudentContactAllAddress
+			WHERE
+				StudentID IN ($synergyIds)
+				AND (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
+				AND FileSemester = " . $_SESSION['FileSemester'] . "
+				AND FileYear = " . $_SESSION[ 'FileYear'];
+
+		return $this->getDatabase()->getAll($query);
+	}
+
+	/**
 	 * Get a guy's info from Synergetic
 	 *
 	 * @param  $synID
