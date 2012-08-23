@@ -9,15 +9,11 @@
  */
 class Alaress_Twitter_Filter_Search implements Alaress_Twitter_Filter_Interface {
 	private $dateFormat = 'F jS Y, H:i';
-	private $keyword = '';
 
 	/**
 	 * Constructor
-	 *
-	 * @param $keyword
 	 */
-	public function __construct($keyword) {
-		$this->setKeyword($keyword);
+	public function __construct() {
 	}
 
 	/**
@@ -27,36 +23,23 @@ class Alaress_Twitter_Filter_Search implements Alaress_Twitter_Filter_Interface 
 	 * @return mixed|string
 	 */
 	public function filterText($text) {
-		$keys = array();
+		$finalText = $text;
 
-		/* Ensure each keyword starts with a hash
+		$pattern = "#\b(([\w-]+://?|www[.])[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|/)))#iS";
+
+		preg_match_all($pattern, $text, $matches);
+
+		/* Uniqify result set to prevent nested replacement if multiple dupe urls were found
 		 */
-		$exploded = explode(' ', trim($this->getKeyword()));
+		if (is_array($matches) && count($matches)) {
+			$allMatches = array_values(array_unique($matches[0]));
 
-		foreach($exploded as $current) {
-			if ($current[0] != '#') {
-				$keys[] = '#' . $current;
-			}
-			else {
-				$keys[] = $current;
+			foreach($allMatches as $current) {
+				$finalText = str_replace($current, "<a href=\"$current\">$current</a>", $finalText);
 			}
 		}
 
-		/* Replace spaces with regex OR symbol
-		 */
-		$refined = implode('|', $keys);
-
-		/* Search for multiple hashtags
-		 */
-		$pattern = "/($refined)/";
-
-		if (preg_match($pattern, $text)) {
-			return $text;
-		}
-
-		/* Allow rendering algorithm to skip null text fields
-		 */
-		return null;
+		return $finalText;
 	}
 
 	/**

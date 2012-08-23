@@ -24,16 +24,28 @@ class Alaress_Twitter_Search {
 	private $keywords = '';
 	private $tweets = array();
 	private $maxTweets = 20;
+	private $filter = null;
 
 	/**
 	 * Constructor
 	 *
 	 * @param $user
 	 * @param $keywords
+	 * @param null $filter
 	 */
-	public function __construct($user, $keywords) {
+	public function __construct($user, $keywords, $filter = null) {
 		$this->setUser(trim($user));
 		$this->setKeywords(trim($keywords));
+
+		/* Filter object for tweet content. Activates urls, etc. or you can pass
+		 * or own custom instance.
+		 */
+		if ($filter === null) {
+			$this->setFilter(new Alaress_Twitter_Filter_Search());
+		}
+		else {
+			$this->setFilter($filter);
+		}
 	}
 
 	/**
@@ -87,7 +99,7 @@ class Alaress_Twitter_Search {
 			 */
 			for ($i = 0; $i < count($allResults); $i++) {
 				$processed[] = array(
-					'text' => $allResults[$i]->text,
+					'text' => $this->getFilter()->filterText($allResults[$i]->text),
 					'date' => $allResults[$i]->created_at,
 					'author' => $allResults[$i]->from_user,
 					'avatar' => $allResults[$i]->profile_image_url,
@@ -203,5 +215,23 @@ class Alaress_Twitter_Search {
 	 */
 	private function getSearchPrefix() {
 		return $this->searchPrefix;
+	}
+
+	/**
+	 * Set filter
+	 *
+	 * @param $filter
+	 */
+	private function setFilter($filter) {
+		$this->filter = $filter;
+	}
+
+	/**
+	 * Get filter
+	 *
+	 * @return null
+	 */
+	private function getFilter() {
+		return $this->filter;
 	}
 }
