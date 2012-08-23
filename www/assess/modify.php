@@ -70,8 +70,6 @@ else {
     $this->setBlock(TEMPLATE_content, 'finishHour', 'finishHour_block');
     $this->setBlock(TEMPLATE_content, 'finishMinute', 'finishMinute_block');
     $this->setBlock(TEMPLATE_content, 'finishMeridiem', 'finishMeridiem_block');
-    $this->setBlock(TEMPLATE_content, 'durationHour', 'durationHour_block');
-    $this->setBlock(TEMPLATE_content, 'durationMinute', 'durationMinute_block');
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
 	$this->setBlock(TEMPLATE_content, 'max_attempts', 'max_attempts_block');
@@ -165,23 +163,10 @@ else {
      */
     $duration = $assessHandler->parse_sec2hms($assessHandler->sec2hms($assess['duration']));
 
-    for ($i=0; $i<=3; $i++) {
-        $this->setVar(array(
-            'DURATION_HOUR_VALUE' => $i,
-            'DURATION_HOUR_SELECTED' => $i == $duration['hours'] ? 'selected=\'selected\'' : '',
-        ));
-
-        $this->parse('durationHour_block', 'durationHour', true);
-    }
-
-    for ($i=0; $i<=45; $i += 15) {
-        $this->setVar(array(
-            'DURATION_MINUTE_VALUE' => $i == 0 ? $i = '00' : $i,
-            'DURATION_MINUTE_SELECTED' => $i == $duration['minutes'] ? 'selected=\'selected\'' : '',
-        ));
-
-        $this->parse('durationMinute_block', 'durationMinute', true);
-    }
+	$this->setVar(array(
+		'DURATION_HOUR_VALUE' => $duration['hours'],
+		'DURATION_MINUTE_VALUE' => $duration['minutes'],
+	));
 
 	/* Resit amounts
 	 */

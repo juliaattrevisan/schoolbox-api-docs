@@ -152,18 +152,8 @@ $j(document).ready(function() {
 						<input type="checkbox" class="float-left show-duration" {ASSESS_DURATION_CHECKED}/>
 					</label>
 					<fieldset class="hide float-left edit-duration">
-						<select name="duration[hour]" id="minHours" class="groupedSelect min-hours">
-							<!-- BEGIN durationHour -->
-							<option value="{DURATION_HOUR_VALUE}" {DURATION_HOUR_SELECTED}>{DURATION_HOUR_VALUE}</option>
-							<!-- END durationHour -->
-						</select>
-						hr
-						<select name="duration[minute]" id="minDuration" class="groupedSelect min-minutes">
-							<!-- BEGIN durationMinute -->
-							<option value="{DURATION_MINUTE_VALUE}" {DURATION_MINUTE_SELECTED}>{DURATION_MINUTE_VALUE}</option>
-							<!-- END durationMinute -->
-						</select>
-						min
+						<input name='duration[hour]' type='text' value='{DURATION_HOUR_VALUE}' maxlength='1'>hr
+						<input name='duration[minute]' type='text' value='{DURATION_MINUTE_VALUE}' maxlength='2'>min
 					</fieldset>
 				</td>
 			</tr>
