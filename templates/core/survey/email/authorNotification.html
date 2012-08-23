@@ -1,8 +1,27 @@
-<body>
-	<h1>{SURVEY_TITLE}</h1>
+<table width="100%" bgcolor="#cccccc" cellpadding="0" cellspacing="0">
+    <tr>
+        <td valign="top" align="center">
+            <center>
+                <table bgcolor="#FFFFFF" width="506" cellpadding="0" cellspacing="0" border="0" align="center">
+                    <tr>
+                        <td width="20"><IMG SRC="http://{SITE_DOMAIN}/images/emails/spacer.gif" WIDTH="20" HEIGHT="1" BORDER="0"></td>
+                        <td width="456">
+                            <div><IMG SRC="http://{SITE_DOMAIN}/images/emails/spacer.gif" WIDTH="1" HEIGHT="16" BORDER="0"></div>
 
-	<p>
-		A response was submitted to {SURVEY_TITLE}. To view the list of attempts, examine
-		<a href='http://{SITE_DOMAIN}/survey/results/{SURVEY_SURVEY_ID}'>{SURVEY_TITLE} attempts</a>.
-	</p>
-</body>
+							<p style="line-height:18px;text-align:left;">
+								<span style="font-size:13px;color:#000000;font-family:Arial, Helvetica, sans-serif;text-align:left;">
+									A response was submitted to {SURVEY_TITLE}. You may access this response
+									<a href='http://{SITE_DOMAIN}/survey/results/{SURVEY_SURVEY_ID}'>here</a>.
+								</span>
+							</p>
+
+                            <div><IMG SRC="http://{SITE_DOMAIN}/images/emails/spacer.gif" WIDTH="1" HEIGHT="20" BORDER="0"/></div>
+                        </td>
+                        <td width="20"><IMG SRC="http://{SITE_DOMAIN}/images/emails/spacer.gif" WIDTH="20" HEIGHT="1" BORDER="0"/></td>
+                    </tr>
+                </table>
+                <br>
+            </center>
+        </td>
+    </tr>
+</table>
