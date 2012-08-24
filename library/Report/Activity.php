@@ -321,9 +321,10 @@ ORDER BY $orderBy $orderDir";
         foreach($this->filterable as $field) {
 
             $output = array(
-                'FILTER_ID'    => $field,
-                'FILTER_NAME'  => $field,
-                'FILTER_VALUE' => $this->filter[$field],
+                'FILTER_ID'          => $field,
+                'FILTER_NAME'        => $field,
+                'FILTER_PLACEHOLDER' => '', // not used
+                'FILTER_VALUE'       => $this->filter[$field],
             );
 
             $page->setVar($output);

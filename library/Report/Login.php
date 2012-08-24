@@ -41,7 +41,12 @@ class Report_Login extends Report_Abstract implements Report_IReport {
     private $defaultOrderBy = 'date';
 
     // fields we permit filtering by
-    private $filterable = array('user', 'ip');
+    private $filterable = array(
+        'user'   => 'username, realname or partial',
+        'ip'     => 'x.x.x.x',
+        'after'  => 'eg. 2012-01-06, yesterday',
+        'before' => 'eg. July 1, 3 days ago'
+    );
 
 
     public function __construct($page) {
@@ -92,6 +97,10 @@ class Report_Login extends Report_Abstract implements Report_IReport {
         return $this->fields;
     }
 
+    public function getFilterFields() {
+        return array_keys($this->filterable);
+    }
+
     public function getDefaultOrderBy() {
         return $this->defaultOrderBy;
     }
@@ -123,37 +132,49 @@ class Report_Login extends Report_Abstract implements Report_IReport {
         foreach($filterSplit as $split) {
             $thisFilter = explode('=', $split);
             if(count($thisFilter) == 2)
-                $resultFilter[$thisFilter[0]] = $thisFilter[1];
+                $resultFilter[$thisFilter[0]] = urldecode(urldecode($thisFilter[1]));
         }
 
         $this->filter = $resultFilter;
 
-        $sqlFilter = "";
+        $sqlFilter = array();
 
         foreach($resultFilter as $key => $value) {
-            if(in_array($key, array_keys($this->getFields()))) {
+            if(in_array($key, $this->getFilterFields())) {
                 $key = mysql_real_escape_string($key);
                 $value = mysql_real_escape_string($value);
-                $sqlFilter .= $sqlFilter == "" ? " WHERE" : " AND";
-
 
                 // custom filter by user
                 if($key == 'user') {
-                    $sqlFilter .= " ( user.username LIKE '%$value%' OR user.firstname LIKE '%$value%' OR user.lastname LIKE '%$value%' ) ";
+                    $sqlFilter[] = "user.username LIKE '%$value%' OR user.firstname LIKE '%$value%' OR user.lastname LIKE '%$value%'";
+                }
+                elseif($key == 'after') {
+                    if($date = strtotime($value)) {
+                        $date = date('Y-m-d H:i:s', $date);
+                        $sqlFilter[] = "`date` >= '$date'";
+                    }
+                }
+                elseif($key == 'before') {
+                    if($date = strtotime($value)) {
+                        $date = date('Y-m-d H:i:s', $date);
+                        $sqlFilter[] = "`date` <= '$date'";
+                    }
                 }
                 // default filter
                 else {
-                    $sqlFilter .= " $key LIKE '%$value%'";
+                    $sqlFilter[] = "$key LIKE '%$value%'";
                 }
             }
         }
+
+        $sqlFilterString = count($sqlFilter) ? sprintf(" WHERE (%s)", implode(') AND (',$sqlFilter)) : '';
 
         $handler = DeprecatedDatabase::getInstance();
 
         $dataQuery = "SELECT `date`, login, ip, user.id AS user, title, firstname, lastname
                       FROM login_log
                       LEFT JOIN `user` ON `user`.`username` = login_log.username
-                      $sqlFilter
+                      $sqlFilterString
                       ORDER BY $orderBy $orderDir";
 
         $this->dataResource = $handler->query($dataQuery);
@@ -186,6 +207,8 @@ class Report_Login extends Report_Abstract implements Report_IReport {
                 'COUNTABLE'       => 'events'
             ));
 
+            $j = 0;
+
             foreach ($this->dataSet as $log) {
 
                 $action = $log['login'] == 0 ? "Failed login" : "Logged in";
@@ -207,7 +230,7 @@ class Report_Login extends Report_Abstract implements Report_IReport {
                     'IP'        => $log['ip']
                 ));
 
-                $page->setVar('DARK', ++$j%2?'dark':'');
+                $page->setVar('DARK', ++$j % 2 ? 'dark' : '');
 
                 $page->parse('activity_block', 'activity', true);
             }
@@ -241,12 +264,13 @@ class Report_Login extends Report_Abstract implements Report_IReport {
     public function displayFilterBlock() {
         $page = $this->getPage();
 
-        foreach($this->filterable as $field) {
+        foreach($this->filterable as $field => $pholder) {
 
             $output = array(
-                'FILTER_ID'    => $field,
-                'FILTER_NAME'  => $field,
-                'FILTER_VALUE' => $this->filter[$field],
+                'FILTER_ID'          => $field,
+                'FILTER_NAME'        => $field,
+                'FILTER_PLACEHOLDER' => $pholder,
+                'FILTER_VALUE'       => $this->filter[$field],
             );
 
             $page->setVar($output);

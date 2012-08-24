@@ -20,7 +20,7 @@ $vars = "";
 foreach($_POST as $post => $val) {
     if($post == 'bounce')
         continue;
-    if($val)
+    if($val = str_replace('/','-',$val))
         $vars .= "$post=$val,";
 }
 
