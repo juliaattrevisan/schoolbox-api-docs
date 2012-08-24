@@ -37,7 +37,7 @@ abstract class Synchronise_Synergetic_Mggs_Strategy_Abstract extends Synchronise
 		/* Does this person have a username? If not, skip them
 		 */
 		if ($this->hasUsername($newUser)) {
-			$existing = $this->userExists($newUser);
+                        $existing = $this->userExistsBySynergyAndGroup($newUser);
 
 			/* If the current user exists in Schoolbox, update them
 			 */
@@ -76,8 +76,11 @@ abstract class Synchronise_Synergetic_Mggs_Strategy_Abstract extends Synchronise
 				/* Report intentions
 				 */
 				else {
+                    // Do not create parents
+                    if($newUser['group_id'] != self::PARENT_GROUP_ID) {
 					$this->getVerboseFilter()->planCreation();
 					$this->getVerboseFilter()->incrementCreated();
+                    }
 				}
 			}
 		}
@@ -195,4 +198,34 @@ abstract class Synchronise_Synergetic_Mggs_Strategy_Abstract extends Synchronise
 	protected function userExists($newUser) {
 		return $this->getUserHandler()->getBySynergy($newUser['synergy_id']);
 	}
+	
+        /**
+         * Determine if a user exists in Schoolbox in a particular group
+         *
+         * @param $newUser
+         * @return mixed
+         */
+        protected function userExistsBySynergyAndGroup($newUser) {
+                $query = "
+                        SELECT
+                                user.id as uid, synergy_id,
+                                title, firstname, lastname, username,
+                                local_email, alt_email,
+                                userCampus.campus, year, house,
+                                eportfolio_enabled,
+                                groups.name AS gname, group_id
+                        FROM user
+                        LEFT JOIN groups ON user.group_id = groups.id
+                        LEFT JOIN userCampus ON user.id = userCampus.uid
+                        WHERE user.synergy_id = '{$newUser['synergy_id']}'";
+
+        //Only lock user to group if parent account
+            if($newUser['group_id'] == self::PARENT_GROUP_ID)
+                    $query .= " AND groups.id = '{$newUser['group_id']}'";
+
+
+                $query .= " ORDER BY userCampus.defaultCampus DESC";
+
+                return $this->getUserHandler()->db->getRow($query);
+        }
 }
