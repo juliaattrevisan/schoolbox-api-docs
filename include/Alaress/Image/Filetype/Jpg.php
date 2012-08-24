@@ -1,0 +1,63 @@
+<?php
+/**
+ * Alaress_Image_Filetype_Jpg
+ *
+ * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @link		http://www.alaress.com.au/
+ * @version	 SVN: $Id$
+ */
+class Alaress_Image_Filetype_Jpg implements Alaress_Image_Filetype_Interface {
+	private $quality = 90;
+
+	/**
+	 * Create an image
+	 *
+	 * @param $filename
+	 * @return resource
+	 */
+	public function create($filename) {
+		return imagecreatefromjpeg($filename);
+	}
+
+	/**
+	 * Save image to file system
+	 *
+	 * @param $image
+	 * @param $filename
+	 */
+	public function save($image, $filename) {
+		imagejpeg($image, $filename, $this->getQuality());
+	}
+
+	/**
+	 * Stream image to browser directly
+	 *
+	 * @param $image
+	 */
+	public function stream($image) {
+		header('Content-type: image/jpg');
+		imagejpeg($image, null, $this->getQuality());
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set quality
+	 *
+	 * @param $quality
+	 */
+	private function setQuality($quality) {
+		$this->quality = $quality;
+	}
+
+	/**
+	 * Get quality
+	 *
+	 * @return int
+	 */
+	private function getQuality() {
+		return $this->quality;
+	}
+}
