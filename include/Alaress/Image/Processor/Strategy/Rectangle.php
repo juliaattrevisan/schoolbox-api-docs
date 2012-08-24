@@ -1,6 +1,6 @@
 <?php
 /**
- * Alaress_Image_Processor_Strategy_Rect
+ * Alaress_Image_Processor_Strategy_Rectangle
  *
  * Constrain an image to fit within a specified width and height which is measured
  * from the center of the source image
@@ -10,7 +10,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Alaress_Image_Processor_Strategy_Rect extends Alaress_Image_Processor_Strategy_Abstract implements Alaress_Image_Processor_Strategy_Interface {
+class Alaress_Image_Processor_Strategy_Rectangle extends Alaress_Image_Processor_Strategy_Abstract implements Alaress_Image_Processor_Strategy_Interface {
 
 	/**
 	 * Constructor
@@ -44,20 +44,38 @@ class Alaress_Image_Processor_Strategy_Rect extends Alaress_Image_Processor_Stra
 		$centerX = floor($currentWidth/2);
 		$centerY = floor($currentHeight/2);
 
-        $ratioX = $currentWidth / $this->getCanvasWidth();
-        $ratioY = $currentHeight / $this->getCanvasHeight();
+		/* Landscape
+		 */
+		if (($this->getCanvasWidth()/$this->getCanvasHeight()) >= 1) {
+			$finalRatio = $this->getCanvasWidth() / $this->getCanvasHeight();
 
-        $resizedWidth = $currentWidth / $ratioX;
-        $resizedHeight = $currentHeight / $ratioY;
+			$height = $currentWidth / $finalRatio;
 
-        $startX = $centerX - ($currentWidth / 2);
-        $startY = $centerY - ($currentHeight / 2);
+			$startX = 0;
+			$startY = $centerY - ($height/2);
 
+			$endX = imagesx($image);
+			$endY = $currentHeight - 2*$startY;
+		}
+
+		/* Portrait
+		 */
+		else {
+			$finalRatio = $this->getCanvasHeight() / $this->getCanvasWidth();
+
+			$width = $currentHeight / $finalRatio;
+
+			$startY = 0;
+			$startX = $centerX - ($width/2);
+
+			$endX = $currentWidth - 2*$startX;
+			$endY = imagesy($image);
+		}
 
 		/* Resize the canvas to fit the new resized dimensions, so
 		 * you don't get excess canvas space
 		 */
-		imagecopyresampled($this->getCanvas(), $image, 0, 0, $startX, $startY, $resizedWidth, $resizedHeight, imagesx($image), imagesy($image));
+		imagecopyresampled($this->getCanvas(), $image, 0, 0, $startX, $startY, $this->getCanvasWidth(), $this->getCanvasHeight(), $endX, $endY);
 
 		return $this->getCanvas();
 	}

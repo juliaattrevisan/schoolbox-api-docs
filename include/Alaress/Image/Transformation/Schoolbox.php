@@ -23,6 +23,7 @@ class Alaress_Image_Transformation_Schoolbox extends Alaress_Image_Transformatio
 				'method' => 'Sharpen'
 			),
 		),
+
 		'square64' => array(
 			array(
 				'method' => 'Square',
@@ -34,11 +35,26 @@ class Alaress_Image_Transformation_Schoolbox extends Alaress_Image_Transformatio
 				'method' => 'Sharpen'
 			),
 		),
-		'square200' => array(
+
+		'constrain200' => array(
 			array(
-				'method' => 'Square',
+				'method' => 'Constrain',
 				'args' => array(
 					'width' => 200,
+					'height' => 300
+				)
+			),
+			array(
+				'method' => 'Sharpen'
+			),
+		),
+
+		'rectangle' => array(
+			array(
+				'method' => 'Rectangle',
+				'args' => array(
+					'width' => 140,
+					'height' => 50
 				)
 			),
 			array(
