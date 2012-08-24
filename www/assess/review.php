@@ -83,9 +83,11 @@ $user = $userHandler->getByID($attempt['user_id']);
 $this->setFile(TEMPLATE_content, 'assess/review.html');
 $this->setBlock(TEMPLATE_content, 'answerInputs', 'answerInputs_block');
 $this->setBlock(TEMPLATE_content, 'question', 'question_block');
+$this->setBlock('question', 'writable_update', 'writable_update_block');
 $this->setBlock(TEMPLATE_content, 'nextSection', 'nextSection_block');
 $this->setBlock(TEMPLATE_content, 'prevSection', 'prevSection_block');
 $this->setBlock(TEMPLATE_content, 'endAssess', 'endAssess_block');
+$this->setBlock('endAssess', 'writable_finalise', 'writable_finalise_block');
 $this->setTitle('Assessment: ' . $assess['title']);
 
 
@@ -103,6 +105,8 @@ $this->setVar(array(
 	'RESPONDENT_NAME' => $userHandler->formatName($user),
 ));
 
+$readonly = (!(($groupHandler->getPermission($assess['category_id']) >= FULL_ACCESS) || (!(date('Y', strtotime($assess['finish'])) < date('Y')))));
+
 /* Load all the questions for this section.
  * Note: only show the randomly-selected ones
  */
@@ -116,6 +120,12 @@ if ($allQuestions) {
          */
         $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/review.html');
         $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
+
+        $this->setBlock('answerFormFragment', 'writable_comment', 'writable_comment_block');
+        $this->setBlock('answerFormFragment', 'readonly_comment', 'readonly_comment_block');
+
+        $this->setBlock('answerFormFragment', 'writable_mark', 'writable_mark_block');
+        $this->setBlock('answerFormFragment', 'readonly_mark', 'readonly_mark_block');
 
         /* Reset answer options from previous iteration
          */
@@ -141,6 +151,26 @@ if ($allQuestions) {
 
         $this->setVar('answerFormFragment', '');
         $this->setVar('answerInputs_block', '');
+
+        if($readonly) {
+            $this->setVar('writable_update_block','');
+
+            $this->setVar('writable_comment_block','');
+            $this->parse ('readonly_comment_block','readonly_comment');
+
+            $this->setVar('writable_mark_block','');
+            $this->parse ('readonly_mark_block','readonly_mark');
+
+        }
+        else {
+            $this->parse('writable_update_block','writable_update');
+
+            $this->parse ('writable_comment_block','writable_comment');
+            $this->setVar('readonly_comment_block','');
+
+            $this->parse ('writable_mark_block','writable_mark');
+            $this->setVar('readonly_mark_block','');
+        }
     }
 }
 else {
@@ -189,4 +219,11 @@ else {
     else {
         $this->setVar('prevSection_block', '');
     }
+}
+
+if($readonly) {
+    $this->setVar('writable_finalise_block', '');
+}
+else {
+    $this->parse('writable_finalise_block', 'writable_finalise');
 }

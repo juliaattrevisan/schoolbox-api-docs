@@ -1,3 +1,4 @@
+<!-- BEGIN custom_head -->
 <script type="text/javascript">
 $j(function() {
 
@@ -41,13 +42,31 @@ $j(function() {
 
 });
 </script>
+<style>
+    .warning {
+        float: left;
+        padding: 4px 8px;
+        margin: 4px 4px;
+        color: #c44;
+        background: #fbf9f9;
+        border-radius: 3px;
+    }
+    .warning:hover {
+        background: #c44;
+        color: #fff;
+    }
+</style>
+<!-- END custom_head -->
 <div id="assess">
     <h1>Submissions for {ASSESS_TITLE}</h1>
 	<span class="header_option">
+        {ASSESS_ARCHIVED}
         <!-- BEGIN download_btn -->
         <a href="/assess/export/csv/{ASSESS_ASSESS_ID}" class="btn download"><span></span>Download All</a>
         <!-- END download_btn -->
+        <!-- BEGIN modify_btn -->
         <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="btn modify"><span></span>Modify</a>
+        <!-- END modify_btn -->
     </span>
 	<form action='/assess/deleteAttempt' method='post'>
 		<table width="100%">
@@ -75,12 +94,17 @@ $j(function() {
 					<td>{ATTEMPT_UNMARKED_RESPONSES}</td>
 					<td>{ATTEMPT_REVIEW_LINK}</td>
 					<td>{ATTEMPT_REVIEW_STATUS}</td>
-					<td><input type='checkbox' name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'></td>
+                    <td>
+                    <!-- BEGIN attempt_delete -->
+					<input type='checkbox' name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'>
+                    <!-- END attempt_delete -->
+                    </td>
 				</tr>
 				<!-- END attempt -->
 			</tbody>
 		</table>
-
+        <!-- BEGIN delete -->
 		<input class='submit-btn-plain' type='submit' value='Delete selected' />
+        <!-- END delete -->
 	</form>
 </div>

@@ -31,7 +31,7 @@ require_once('../library/user.php');
  *
  * @return void
  */
-function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $page, $currentStudent, $previousAttempt) {
+function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $page, $currentStudent, $previousAttempt, $readonly) {
 	$firstSection = $sectionHandler->getFirst($page->arg[0]);
 
 	/* Finish time. Show the datetime when the person clicked Finish.
@@ -116,8 +116,15 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
 			'ATTEMPT_HIDDEN' => 'hide'
 		));
 	}
-
-	$page->parse('attempt_block', 'attempt', true);
+    if($readonly) {
+        $page->setVar('assess_delete_block', '');
+        $page->setVar('attempt_delete_block', '');
+    }
+    else {
+        $page->parse('assess_delete_block', 'delete', false);
+        $page->parse('attempt_delete_block', 'attempt_delete', false);
+    }
+    $page->parse('attempt_block', 'attempt', true);
 }
 
 /* Handlers and stuff
@@ -149,7 +156,10 @@ if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($as
  */
 $this->setFile(TEMPLATE_content, 'assess/results.html');
 $this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
+$this->setBlock('attempt', 'attempt_delete', 'attempt_delete_block');
 $this->setBlock(TEMPLATE_content, 'download_btn', 'download_btn_block');
+$this->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
+$this->setBlock(TEMPLATE_content, 'delete', 'delete_block');
 $this->setTitle('Results for: ' . $assess['title']);
 $this->setTab('submission');
 
@@ -158,6 +168,12 @@ $this->setVar(array(
     'ASSESS_TITLE' => $assess['title'],
     'CID'           => $assess['category_id'],
 ));
+
+/**
+ * If this assessment finishes in the past, don't allow editing except to superadmins
+ */
+$readonly = (!(($groupHandler->getPermission($assess['category_id']) >= FULL_ACCESS) || (!(date('Y', strtotime($assess['finish'])) < date('Y')))));
+$this->setVar('ASSESS_ARCHIVED', (date('Y', strtotime($assess['finish'])) < date('Y')) ? '<b class="warning">Archived</b>' : '');
 
 /* Get a list of students who could have submitted data to this Assess, then
  * join up all the attempts via php, so we can see who has submitted to this
@@ -203,7 +219,7 @@ if (is_array($allStudents) && count($allStudents)) {
 				 */
 				if ($currentAttempt['user_id'] == $currentStudent['uid'] || $currentAttempt['synergy_id'] == $currentStudent['synergy_id']) {
 					if ($allAttempts[$i]['processed'] != true) {
-						processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this, $currentStudent, $previousAttempt);
+						processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this, $currentStudent, $previousAttempt, $readonly);
 
 						$allAttempts[$i]['processed'] = true;
 
@@ -249,6 +265,7 @@ if (is_array($allStudents) && count($allStudents)) {
 else {
 	$this->setVar('attempt_block', '');
     $this->setVar('download_btn_block', '');
+    $this->setVar('assess_delete_block', '');
 }
 
 /* Deal with remainder attempts
@@ -258,9 +275,18 @@ if ($allAttempts && count($allAttempts)) {
 
 	foreach($allAttempts as $currentAttempt) {
 		if ($currentAttempt['processed'] != true) {
-			processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this, $userHandler->getByID($currentAttempt['user_id']), $previousAttempt);
+			processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this, $userHandler->getByID($currentAttempt['user_id']), $previousAttempt, $readonly);
 
 			$previousAttempt = $currentAttempt;
 		}
 	}
+}
+
+if($readonly) {
+    $this->setVar('delete_block', '');
+    $this->setVar('modify_btn_block', '');
+}
+else {
+    $this->parse('delete_block', 'delete');
+    $this->parse('modify_btn_block', 'modify_btn');
 }
