@@ -15,7 +15,7 @@ define('TEMPLATE_content', 		'contentTpl');
 //MySQL config options
 
 define("SQL_host", "localhost");
-define("SQL_user", "root");
+define("SQL_user", "portal");
 define("SQL_passwd", "tnp879");
 define("SQL_db", "portal-dev");
 define("SQL_dsn", "mysql:host=".SQL_host.";dbname=".SQL_db);
