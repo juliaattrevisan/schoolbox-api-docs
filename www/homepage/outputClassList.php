@@ -2,6 +2,9 @@
 $this->setBlock($componentHandle, 'student', 'student_block');
 $this->setBlock($componentHandle, 'student_email', 'student_email_block');
 
+$this->setBlock($componentHandle, 'parent', 'parent_block');
+$this->setBlock($componentHandle, 'parent_email', 'parent_email_block');
+
 $categoryHandler = new Category();
 $category = $categoryHandler->getByID($categoryID);
 
@@ -13,7 +16,7 @@ $allStudents = $externalClassHandler->getStudents($category['code']);
 $userHandler = new User();
 $emailHandler = new Email();
 
-$emailAllStudents = '';
+$allStudentEmails = array();
 
 if (is_array($allStudents)) {
 	foreach ($allStudents as $currentStudent) {
@@ -32,7 +35,7 @@ if (is_array($allStudents)) {
 			/* Agglutinate a giant bcc
 			 */
 			if ($email) {
-				$emailAllStudents .= "$email, ";
+				$allStudentEmails[]= $email;
 			}
 
 			$this->setVar(array(
@@ -44,6 +47,8 @@ if (is_array($allStudents)) {
 			$this->parse('student_block', 'student', true);
 		}
 	}
+
+	$emailAllStudents = implode(',', $allStudentEmails);
 
 	/* Student bulk email
 	 */
@@ -57,25 +62,24 @@ if (is_array($allStudents)) {
 	/* Parent bulk email
 	 */
 	if (count($synergyIds)) {
+		$allParentEmails = array();
 		$allSynergyIds = implode(',', $synergyIds);
 
 		$externalHandler = new External_User();
 		$allParents = $externalHandler->getParentsOf($allSynergyIds);
 
 		if (is_array($allParents) && count($allParents)) {
-			$emailAllParents = '';
-
 			foreach($allParents as $currentParent) {
 				$email = trim($currentParent['StudentContactDefaultEmail']);
 
 				if (strlen($email)) {
-					$allEmails[] = $email;
+					$allParentEmails[] = $email;
 				}
 			}
 
 			/* Uniquify emails
 			 */
-			$emailAllParents = implode(', ', array_filter(array_unique($allEmails)));
+			$emailAllParents = implode(', ', array_filter(array_unique($allParentEmails)));
 		}
 
 		$this->setVar(array(
@@ -83,7 +87,7 @@ if (is_array($allStudents)) {
 			'EMAIL_ALL_PARENTS' => $emailAllParents,
 		));
 
-		$this->parse('student_email_block', 'student_email');
+		$this->parse('parent_email_block', 'parent_email');
 	}
 }
 else {

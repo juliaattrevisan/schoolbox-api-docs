@@ -25,6 +25,9 @@ if($groupHandler->isStaff()) {
 	$this->setBlock('student_list', 'name_without_link', 'name_without_link_block');
     $this->setBlock('student_list', 'actions', 'actions_block');
 
+	$this->setBlock(TEMPLATE_content, 'parent', 'parent_block');
+	$this->setBlock(TEMPLATE_content, 'parent_email', 'parent_email_block');
+
 	$this->setTitle('Class List');
 
 	$code = urldecode(implode('/', $this->arg));
@@ -42,8 +45,14 @@ if($groupHandler->isStaff()) {
 
 		$classList = $synergeticClass->getStudents($code);
 
+		$synergyIds = array();
+
 		if (is_array($classList) && !empty($classList)) {
 			foreach($classList as $student) {
+
+				/* Accumulate this for a giant parent-based bcc
+				 */
+				$synergyIds[] = $student['synergy_id'];
 
 				$email = '';
 				$emailaddr = '';
@@ -142,6 +151,37 @@ if($groupHandler->isStaff()) {
     else {
         $this->setVar('email_class_block','');
     }
+
+	/* Parent bulk email
+	 */
+	if (count($synergyIds)) {
+		$allParentEmails = array();
+		$allSynergyIds = implode(',', $synergyIds);
+
+		$externalHandler = new External_User();
+		$allParents = $externalHandler->getParentsOf($allSynergyIds);
+
+		if (is_array($allParents) && count($allParents)) {
+			foreach($allParents as $currentParent) {
+				$email = trim($currentParent['StudentContactDefaultEmail']);
+
+				if (strlen($email)) {
+					$allParentEmails[] = $email;
+				}
+			}
+
+			/* Uniquify emails
+			 */
+			$emailAllParents = implode(', ', array_filter(array_unique($allParentEmails)));
+		}
+
+		$this->setVar(array(
+			'REPLY_TO' => $emailObj->formatEmailFromArray($_SESSION),
+			'EMAIL_ALL_PARENTS' => $emailAllParents,
+		));
+
+		$this->parse('parent_email_block', 'parent_email');
+	}
 }
 else {
 	error(19);
