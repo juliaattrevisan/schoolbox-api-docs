@@ -105,7 +105,7 @@ $this->setVar(array(
 	'RESPONDENT_NAME' => $userHandler->formatName($user),
 ));
 
-$readonly = (!(($groupHandler->getPermission($assess['category_id']) >= FULL_ACCESS) || (!(date('Y', strtotime($assess['finish'])) < date('Y')))));
+$readonly = (!($groupHandler->isSuperuser() || (!(date('Y', strtotime($assess['finish'])) < date('Y')))));
 
 /* Load all the questions for this section.
  * Note: only show the randomly-selected ones

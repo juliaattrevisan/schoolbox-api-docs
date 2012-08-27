@@ -172,7 +172,7 @@ $this->setVar(array(
 /**
  * If this assessment finishes in the past, don't allow editing except to superadmins
  */
-$readonly = (!(($groupHandler->getPermission($assess['category_id']) >= FULL_ACCESS) || (!(date('Y', strtotime($assess['finish'])) < date('Y')))));
+$readonly = (!($groupHandler->isSuperuser() || (!(date('Y', strtotime($assess['finish'])) < date('Y')))));
 $this->setVar('ASSESS_ARCHIVED', (date('Y', strtotime($assess['finish'])) < date('Y')) ? '<b class="warning">Archived</b>' : '');
 
 /* Get a list of students who could have submitted data to this Assess, then

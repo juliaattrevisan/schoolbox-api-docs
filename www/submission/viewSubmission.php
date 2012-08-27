@@ -7,10 +7,14 @@ if (is_numeric($this->arg[0])) {
     $this->setBlock('submission_block', 'download_action', 'download_action_block');
     $this->setBlock('submission_block', 'delete_action', 'delete_action_block');
     $this->setBlock('submission_block', 'mark_action', 'mark_action_block');
+    $this->setBlock(TEMPLATE_content, 'download_btn', 'download_btn_block');
+    $this->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
 
     $submissionHandler = new Submission();
     $studentSubHandler = new SubmissionStudent();
 	$returnHandler = new SubmissionReturn();
+    $groupHandler = new Group();
+    $userHandler = new User();
 
     $subBox = $submissionHandler->getByID($this->arg[0]);
 
@@ -38,11 +42,13 @@ if (is_numeric($this->arg[0])) {
 	/* Retrieve student list from group membership
 	 */
     else {
-        $groupHandler = new Group();
         $studentList = $groupHandler->getMemberList($subBox['category']);
     }
 
-    $userHandler = new User();
+    // an markable work is read-only if the user IS NOT a super-user, AND the end date IS in the past
+    $readonly = !$groupHandler->isSuperuser() && $dueDate->getUsingFormat('Y') < date('Y');
+
+    $downloadCount = 0;
 
     if (is_array($studentList)) {
         foreach($studentList as $student) {
@@ -182,16 +188,17 @@ if (is_numeric($this->arg[0])) {
 
 				$this->setVar($output);
 				$this->parse('download_action_block', 'download_action');
+                ++$downloadCount;
 				$this->parse('submission_listing', 'submission_block', true);
 
-                // check how old the due work is: if it's old enough (?), disallow deletion or mark changes
-                if(date('Y') <= $dueDate->getUsingFormat('Y')) {
-                    $this->parse('delete_action_block', 'delete_action', false);
-                    $this->parse('mark_action_block', 'mark_action', false);
+                // check how old the due work is: if it's old enough (last year and earlier?), disallow deletion or mark changes
+                if($readonly) {
+                    $this->setVar('mark_action_block', '-');
+                    $this->setVar('delete_action_block', '-');
                 }
                 else {
-                    $this->setVar('delete_action_block', '-');
-                    $this->setVar('mark_action_block', '-');
+                    $this->parse('delete_action_block', 'delete_action', false);
+                    $this->parse('mark_action_block', 'mark_action', false);
                 }
 
             }
@@ -200,6 +207,28 @@ if (is_numeric($this->arg[0])) {
 			$this->setVar('submission_listing', '');
 		}
     }
+
+    // final housekeeping
+
+    // show or hide download button
+    if($downloadCount) {
+        $this->parse('download_btn_block','download_btn');
+    }
+    else {
+        $this->setVar('download_btn_block', '');
+    }
+
+    // show or hide edit button, based on readonly status
+    if($readonly) {
+        $this->setVar('modify_btn_block', '');
+    }
+    else {
+        $this->parse('modify_btn_block', 'modify_btn');
+    }
+
+    // show or hide the archived warning, based on end date
+    $this->setVar('DUEWORK_ARCHIVED', $dueDate->getUsingFormat('Y') < date('Y') ? '<b class="warning">Archived</b>' : '');
+
 }
 else {
     error(2);

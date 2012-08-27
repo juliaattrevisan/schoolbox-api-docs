@@ -34,8 +34,21 @@ $this->setTitle('Submissions');
 $this->setTab('submission');
 $this->setBlock(TEMPLATE_content, 'submission_listing', 'submission_block');
 $this->setBlock(TEMPLATE_content, 'category_listing', 'category_block');
+
 $this->setBlock('submission_listing', 'onlineAssessment', 'onlineAssessment_block');
+$this->setBlock('onlineAssessment', 'readonly_assess', 'readonly_assess_block');
+$this->setBlock('onlineAssessment', 'writable_assess', 'writable_assess_block');
+
 $this->setBlock('submission_listing', 'normalSubmission', 'normalSubmission_block');
+$this->setBlock('normalSubmission', 'readonly_duework', 'readonly_duework_block');
+$this->setBlock('normalSubmission', 'writable_duework', 'writable_duework_block');
+
+$this->setBlock('normalSubmission', 'readonly_open', 'readonly_open_block');
+$this->setBlock('normalSubmission', 'readonly_close', 'readonly_close_block');
+
+$this->setBlock('normalSubmission', 'writable_open', 'writable_open_block');
+$this->setBlock('normalSubmission', 'writable_close', 'writable_close_block');
+
 $this->setBlock(TEMPLATE_content, 'semester_option', 'semester_option_block');
 $this->setBlock(TEMPLATE_content, 'year_option', 'year_option_block');
 
@@ -71,6 +84,8 @@ if (Cfg::get('external_enable')) {
 }
 
 if (is_array($subList)) {
+    $i = 0;
+
 	foreach ($subList as $sub) {
 		if ($prevCat['catid'] != $sub['catid'] && $prevCat['catid'] != '') {
 
@@ -105,6 +120,8 @@ if (is_array($subList)) {
 
 		$totals = $submissionHandler->getBoxCount($sub['id']);
 
+        $readonly = !($groupHandler->isSuperuser() || date('Y', strtotime($sub['due_date'])) >= date('Y'));
+
 		if (($sub['type_id'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) && ($sub['availability'] == 'assess')) {
 			$this->setVar(array(
 				'ASSESS_ASSESS_ID' => $sub['id'],
@@ -119,6 +136,26 @@ if (is_array($subList)) {
 			));
 
 			$this->setVar('normalSubmission_block', '');
+
+            if($readonly) {
+                $this->parse('readonly_assess_block','readonly_assess');
+                $this->setVar('writable_assess_block', '');
+
+                $this->parse('readonly_open_block','readonly_open');
+                $this->parse('readonly_close_block','readonly_close');
+                $this->setVar('writable_open_block', '');
+                $this->setVar('writable_close_block', '');
+            }
+            else {
+                $this->parse('writable_assess_block','writable_assess');
+                $this->setVar('readonly_assess_block', '');
+
+                $this->parse('writable_open_block','writable_open');
+                $this->parse('writable_close_block','writable_close');
+                $this->setVar('readonly_open_block', '');
+                $this->setVar('readonly_close_block', '');
+            }
+
 			$this->parse('onlineAssessment_block', 'onlineAssessment');
 		}
 		else if ($sub['availability'] == '') {
@@ -135,7 +172,27 @@ if (is_array($subList)) {
 			));
 
 			$this->setVar('onlineAssessment_block', '');
-			$this->parse('normalSubmission_block', 'normalSubmission');
+
+            if($readonly) {
+                $this->parse('readonly_duework_block','readonly_duework');
+                $this->setVar('writable_duework_block', '');
+
+                $this->parse('readonly_open_block','readonly_open');
+                $this->parse('readonly_close_block','readonly_close');
+                $this->setVar('writable_open_block', '');
+                $this->setVar('writable_close_block', '');
+            }
+            else {
+                $this->parse('writable_duework_block','writable_duework');
+                $this->setVar('readonly_duework_block', '');
+
+                $this->parse('writable_open_block','writable_open');
+                $this->parse('writable_close_block','writable_close');
+                $this->setVar('readonly_open_block', '');
+                $this->setVar('readonly_close_block', '');
+            }
+
+            $this->parse('normalSubmission_block', 'normalSubmission');
 		}
         else {
             // something went wrong (ie. this scenario should not exist) but at any rate, hide the tokens from view
@@ -175,4 +232,13 @@ if (is_array($subList)) {
 }
 else {
 	$this->setVar('category_block', 'No submissions found.');
+
+    // pre-emptively clear the blocks that might not get rendered
+    $this->setVar(array(
+        'writable_assess_block'  => '',
+        'writable_duework_block' => '',
+    ));
+
+    //$this->parse('readonly_assess_block', 'readonly_assess');
+    //$this->parse('readonly_duework_block', 'readonly_duework');
 }
