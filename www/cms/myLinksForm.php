@@ -13,17 +13,25 @@ if (isset($_REQUEST['url']) && $_REQUEST['url'] && isset($_REQUEST['description'
 		error(139);
 	}
 
-	if ($myLinksHandler->linkExists($_SESSION['id'], $_REQUEST['url'])) {
-		error(140);
-	}
-
 	$url = Scrub::text(trim($_REQUEST['url']));
 
-	$myLinksHandler->create(array(
-		'owner' => $_SESSION['id'],
-		'url' => $url,
-		'description' => $_REQUEST['description']
-	));
+	/* Create/update
+	 */
+	$existing = $myLinksHandler->getByID($_POST['linkID']);
+
+	if ($existing) {
+		$existing['url'] = $_REQUEST['url'];
+		$existing['description'] = $_REQUEST['description'];
+
+		$myLinksHandler->update($existing);
+	}
+	else {
+		$myLinksHandler->create(array(
+			'owner' => $_SESSION['id'],
+			'url' => $url,
+			'description' => $_REQUEST['description']
+		));
+	}
 }
 else {
 	if (is_numeric($_GET['delete'])) {

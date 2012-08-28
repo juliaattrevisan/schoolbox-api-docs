@@ -13,6 +13,35 @@ $j(function() {
 			}
 		}
 	});
+
+	/* Dropdown inline editor for rows
+	 */
+	$j('.modify').live('click',function() {
+		var trigger = 0;
+
+		level = $j(this).parent().parent();
+		console.log(level);
+
+		$j('.form-holder').each(function() {
+			if ($j(this).is(':visible')) {
+				level.slideUp(function() {
+					level.siblings('.form-holder').slideDown();
+				});
+
+				$j(this).siblings().slideDown();
+				$j(this).slideUp();
+				trigger = 1;
+			}
+		});
+
+		if (trigger == 0) {
+				level.slideUp(function() {
+				level.siblings('.form-holder').slideDown();
+			});
+		}
+
+		return false;
+	});
 });
 
 </script>
@@ -30,23 +59,6 @@ $j(function() {
 			</tr>
 		</thead>
 		<tbody>
-			<!-- BEGIN myLink -->
-			<tr>
-				<td><a href="{MYLINK_URL}">{MYLINK_URL}</a></td>
-				<td>{MYLINK_DESCRIPTION}</td>
-				<td>
-					<a href="/cms/myLinksForm.php?delete={MYLINK_ID}" class="btn delete float-left"><span></span>Delete</a>
-					
-					<!-- BEGIN myLink_exists -->
-					<div class="shared-success">Shared in ePortfolio</div>
-					<!-- END myLink_exists -->
-
-					<!-- BEGIN myLink_share -->
-					<a href="/cms/myLinksForm.php?share={MYLINK_ID}" class="btn eportfolio float-left shared-btn"><span></span>Share in ePortfolio</a>
-					<!-- END myLink_share -->
-				</td>
-			</tr>
-			<!-- END myLink -->
 			<tr>
 				<td><label><input name="url" type="text" class="required" placeholder="Hyperlink (http://schoolbox.com/)" /></label></td>
 				<td><label><input name="description" class="required " type="text" placeholder="Name (Schoolbox LMS)" /></label></td>
@@ -55,3 +67,58 @@ $j(function() {
 		</tbody>
 	</table>
 </form>
+
+<div class="allowed-files">
+
+	<!-- BEGIN myLink -->
+	<div class="row-holder">
+		<div class="row clearfix">
+			<div class='enabled'>
+				<a href="{MYLINK_URL}">{MYLINK_URL}</a>
+			</div>
+			<div class='enabled'>
+				{MYLINK_DESCRIPTION}
+			</div>
+			<div class='enabled'>
+				<a href="#" class="btn modify no-marg"><span></span>Modify</a>
+			</div>
+			<div class='enabled'>
+				<!-- BEGIN myLink_exists -->
+				<div class="shared-success">Shared in ePortfolio</div>
+				<!-- END myLink_exists -->
+
+				<!-- BEGIN myLink_share -->
+				<a href="/cms/myLinksForm.php?share={MYLINK_ID}" class="btn eportfolio float-left shared-btn"><span></span>Share in ePortfolio</a>
+				<!-- END myLink_share -->
+			</div>
+		</div>
+		<div class="row form-holder">
+			<form id='link{MYLINK_ID}' class="clearfix" action='/cms/myLinksForm.php' method='post'>
+				<input type="hidden" readonly="readonly" name="linkID" value="{MYLINK_ID}" />
+
+				<fieldset class='description'>
+					<fieldset>
+						<!--<em>The internet address for the website, eg. http://www.google.com</em>-->
+						<input class="text-input" type="text" name="url" size="40" maxlength="250" value="{MYLINK_URL}" />
+					</fieldset>
+				</fieldset>
+
+				<fieldset class='description'>
+					<fieldset>
+						<!--<em>One line description of the URL for the title </em>-->
+						<input class="text-input" type="text" name="description" size="40" maxlength="250" value="{MYLINK_DESCRIPTION}" />
+					</fieldset>
+				</fieldset>
+
+				<fieldset class='description'>
+					<fieldset>
+						<a href="#" class="btn tick submit no-marg"><span></span>Save</a>
+						<a href="/cms/myLinksForm.php?delete={MYLINK_ID}" class="btn delete no-marg"><span></span>Delete</a>
+					</fieldset>
+				</fieldset>
+			</form>
+
+		</div>
+	</div>
+	<!-- END myLink -->
+</div>
