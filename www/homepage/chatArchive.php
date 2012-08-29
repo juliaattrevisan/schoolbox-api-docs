@@ -41,8 +41,6 @@ if(!($category = $categoryHandler->getByID($filter['category']))) {
     error(19);
 }
 
-
-
 $this->setTitle("Chat Archive: {$category['name']}");
 $this->setVar('CATEGORY_TITLE', $category['name']);
 $this->setVar('CATEGORY_ID', $category['id']);
@@ -167,7 +165,12 @@ if (is_array($items)) {
             $i++;
 
             // get the datestamp for the post
-            $df = new Alaress_Date_Format($previous['time'], 'y-m-d');
+            if(isset($previous)) {
+                $df = new Alaress_Date_Format($previous['time'], 'y-m-d');
+            }
+            else {
+                $df = new Alaress_Date_Format($chat['time'], 'y-m-d');
+            }
 
             $postDay = $df->getLongDateOnly();
 
