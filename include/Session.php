@@ -123,9 +123,6 @@ class Session
         if (Cfg::get('ldap_enable')) {
             $result = $this->authenticateLDAP($username, $password);
 
-            //create hash for
-            //$query = "UPDATE user SET email_pass = '$password' WHERE username = '".trim($username)."'";
-            //$db->query($query);
         }
 
         if (!$result) {
@@ -140,6 +137,9 @@ class Session
             $loginlogquery = "INSERT INTO login_log (username, date, ip, login)
                         VALUES ('" . mysql_real_escape_string($username) . "', NOW(), '$ip', '0')";
             $this->db->query($loginlogquery);
+        } else {
+            // Store password as hash for DAV authentication later
+            $this->db->update('user', 'username', array('username' => $username, 'hash' => md5($username . ':' . Cfg::get('site_location') . ':' . $password)));
         }
 
         return $result;
