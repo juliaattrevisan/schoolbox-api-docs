@@ -303,11 +303,11 @@ $j(document).ready(function() {
 				$j(this.menu).find('.context-menu-item').removeClass('context-menu-item-disabled');
 
                 /* Disable modify and delete for node-0 (Top) and immediate children */
-				if ($j(this.target).hasClass('child-of-node-0') || $j(this.target).hasClass('server')) {
+				if ($j(this.target).hasClass('server')) {
 					for (var i = 0; i <= 1; i++) {
 						$j($j(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled", true);
-				}
-			}
+                    }
+                }
 			}
 		});
 	});
