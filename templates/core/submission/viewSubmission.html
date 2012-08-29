@@ -1,5 +1,6 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<script src="/javascript/jquery.viewSubmission.js" type="text/javascript"></script>
 <script type="text/javascript">
     $j(function() {
         // Add the dark class only to even rows that are visible (skip over the hidden ones)
@@ -44,7 +45,7 @@
         }
 
 
-        $j('.submission td span').qtip({
+        $j('.submission td span.alert').qtip({
             content: "Submission received after mark given"
         });
 
@@ -64,63 +65,143 @@
         background: #c44;
         color: #fff;
     }
+    input[type=text] {
+        font-size: 1em;
+        border: solid 1px #ccc;
+    }
+    select, select option {
+        font-size: 1em;
+    }
+    td .btn {
+        opacity: 1;
+    }
+    tr:hover .btn {
+        opacity: 1;
+    }
+    table thead th {
+         /* border-right: solid 2px #555; */
+    }
+    .nowrap {
+        white-space: nowrap;
+    }
+    .student-status {
+        font-size: 0.8em;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    .submit-none {
+        color: #333;
+    }
+    .submit-ontime {
+        color: #292;
+    }
+    .submit-late {
+        color: #922;
+    }
+    .submission {
+        height: 36px;
+    }
+    .submission.user {
+        height: 48px;
+    }
+    .submission .btn {
+        margin-top: 0;
+    }
+    .markForm {
+        position: relative;
+        top: -4px;
+    }
+    span.mark-input {
+        float: left;
+        min-width: 120px;
+        margin-right: 20px;
+    }
+    span.mark-comment {
+        width: auto;
+    }
+    div.markForm {
+        top: -9px;
+    }
 </style>
 <!-- END custom_head -->
-<h1>{ASSDESC}</h1>
+
+<h1>{DUEWORK_DESCRIPTION}</h1>
 <span class="header_option">
     <!-- BEGIN download_btn -->
     <a href="/submission/downloadAll.php?id={BOX_ID}" class="btn download"><span></span>Download All</a>
     <!-- END download_btn -->
     <!-- BEGIN modify_btn -->
-    <a href="/submission/createSubmission/modify/{BOX_ID}" class="btn edit"><span></span>Modify</a>
+    <a href="/submission/createSubmission/modify/{BOX_ID}" class="btn modify"><span></span>Modify</a>
     <!-- END modify_btn -->
 	<a href="/submission/listSubmission" class="btn go-back"><span></span>Return to List</a>
     {DUEWORK_ARCHIVED}
 </span>
-<p>Due on {DUE_DATE}</p>
+<p>Due on {DUEWORK_DUEDATE}</p>
 <div class="indent">
     <p>These are the assignments that have been submitted. Deleting an assignment from here will allow the student to resubmit if multiple submissions are not allowed. Assignments in red are late.</p>
     <table class="ruler">
 		<colgroup>
-			<col />
-			<col width="20%" />
-			<col width="20%" />
-			<col width="20%" />
-			<col width="15%" />
-			<col width="15%" />
-			<col width="15%" />
+			<col width="1%"  />
+			<col width="13%" />
+			<col width="13%" />
+			<col width="30%" />
+            <col width="1%"  />
+            <col width="14%"  />
 		</colgroup>
+        <!--
         <thead>
             <tr>
                 <th>&nbsp;</th>
-                <th>Submitted By</th>
-                <th>Submitted Date</th>
+                <th>Submitted&nbsp;By</th>
+                <th>Submitted&nbsp;Date</th>
                 <th>Mark</th>
                 <th>Plagiarism</th>
                 <th>Download</th>
                 <th>Delete</th>
-                <th>Mark</th>
+                <th>History</th>
             </tr>
         </thead>
+        -->
+        <thead>
+        <tr>
+            <th>&nbsp;</th>
+            <th>Student</th>
+            <th>Status</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
         <tbody>
-            <!-- BEGIN submission_block -->
-            <tr class="submission user_{OWNER_ID} {SUBMISSION_EXPANDABLE} {SUBMISSION_HIDDEN}">
-                <td width="2"></td>
-                <td style="white-space: nowrap;">
-    				<a href="/search/user/{OWNER_ID}">{OWNER}</a>
-				</td>
-                <td><a style="color:{COLOUR};" href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}">{SUBMITTED}</a>{SUBMITTED_AFTER_MARK}</td>
-                <td><a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}">{MARK}</a></td>
-                <td>{SCORE}</td>
-                <td><!-- BEGIN download_action --><a href="/submission/send.php?id={SUB_ID}">Download</a><!-- END download_action --></td>
-                <td>
-                    <!-- BEGIN delete_action -->
-				    <a href="/submission/viewSubmissionForm.php?delete={SUB_ID}" onclick="return(confirm('Remove {OWNER_ESCAPED}\'s submission? '));">Delete</a>
-				    <!-- END delete_action -->
-                </td>
-                <td><!-- BEGIN mark_action --><a href="/submission/returnWork/{BOX_ID}/{OWNER_ID}">Mark</a><!-- END mark_action --></td>
-            </tr>
-            <!-- END submission_block -->
+        <!-- BEGIN student_row -->
+        <tr class="user user_{OWNER_ID} submission">
+            <td></td>
+            <td class="nowrap"><a href="/search/user/{OWNER_ID}">{OWNER_NAME}</a></td>
+            <td class="student-status {OWNER_CLASS}">{OWNER_STATUS}</td>
+            <td class="column-{BOX_ID}">
+                <div class="row-fix">{OWNER_MARKING}</div>
+            </td>
+            <td></td>
+            <td><a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="btn"><span></span>View&nbsp;History</a></td>
+        </tr>
+
+        <!-- BEGIN submission_row -->
+        <tr class="submission user_{OWNER_ID} {SUBMISSION_EXPANDABLE} sub-table-row">
+            <td></td>
+            <td></td>
+            <td class="nowrap {SUBMISSION_CLASS}">{SUBMISSION_TIME}{SUBMISSION_AFTER_MARK}</td>
+            <td class="nowrap">{SUBMISSION_MIME}{SUBMISSION_FILENAME}</td>
+            <td title="{SUBMISSION_SCORE} plagiarism">{SUBMISSION_SCORE}</td>
+            <td>
+                <a href="/submission/send.php?id={SUBMISSION_ID}" class="btn download"><span></span>Download</a>
+            <!-- BEGIN delete_action -->
+                <a href="/submission/viewSubmissionForm.php?delete={SUBMISSION_ID}" onclick="return(confirm('Remove {OWNER_ESCAPED}\'s submission? '));" class="btn delete"><span></span>Delete</a>
+            <!-- END delete_action -->
+            </td>
+        </tr>
+        <!-- END submission_row -->
+        <!-- END student_row -->
         </tbody>
     </table>
 </div>
+

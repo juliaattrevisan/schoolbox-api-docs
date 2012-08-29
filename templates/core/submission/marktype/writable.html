@@ -1,0 +1,22 @@
+<form method="post" action="" class="markForm clearfix">
+    <!-- BEGIN mark_type_percent -->
+    <input name="mark" class="mark-input percent" type="text" size="3" maxlength="3" value="{MARK}"/><span>&nbsp;%</span>
+    <!-- END mark_type_percent -->
+    <!-- BEGIN mark_type_letter -->
+    <select id="mark" class="mark-input" name="mark">
+        <!-- BEGIN grade_drop -->
+        <option value="{GRADE_VALUE}" {GRADE_VALUE_SELECTED}>{GRADE_TEXT}</option>
+        <!-- END grade_drop -->
+    </select>
+    <!-- END mark_type_letter -->
+    <!-- BEGIN mark_type_raw -->
+    <input name="mark" class="mark-input out-of" type="text"  size="4" maxlength="15" value="{MARK}"/><span>&nbsp;/&nbsp;<strong class="validation-limit">{MAX_MARK}</strong></span>
+    <!-- END mark_type_raw -->
+    <!-- BEGIN mark_type_free -->
+    <input name="mark" class="mark-input free" type="text" size="4" maxlength="15" value="{MARK}"/>
+    <!-- END mark_type_free -->
+    <input name="comment" id="comment" size="40" title="Comment" value="{COMMENT}" class="comment" type="text">
+    <input type="hidden" name="uid" value="{OWNER_ID}">
+    <input type="hidden" name="box_id" value="{BOX_ID}">
+    <input type="hidden" name="markUpdate" value="true">
+</form>

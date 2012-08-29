@@ -27,4 +27,12 @@ class Marksheet_Free extends Marksheet_Abstract {
     public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true) {
         return $rawMark;
     }
+
+    public function outputUI(SitePage $page, $mark) {
+        $output = array(
+            'MARK' => $mark['mark'],
+            'COMMENT'  => $mark['comment']
+        );
+        $page->setVar($output);
+    }
 }

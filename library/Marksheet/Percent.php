@@ -38,4 +38,12 @@ class Marksheet_Percent extends Marksheet_Abstract {
         return $asText ? "$mark%" : $mark;
     }
 
+    public function outputUI(SitePage $page, $mark) {
+        $output = array(
+            'MARK' => $mark['mark'],
+            'COMMENT'  => $mark['comment']
+        );
+        $page->setVar($output);
+    }
+
 }

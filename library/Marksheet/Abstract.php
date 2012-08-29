@@ -77,6 +77,14 @@ abstract class Marksheet_Abstract {
         return $this->subReturnHandler;
     }
 
+    /**
+     * Handle the differences between 0, 0.0, '', null, and false
+     *
+     * @param $value
+     * @param $decimals
+     * @param bool $blankZero
+     * @return int|string
+     */
     function clean_num($value, $decimals, $blankZero = true) {
 
         // handle null, blank and zero
@@ -94,23 +102,45 @@ abstract class Marksheet_Abstract {
     /* Abstract functions for extending classes to implement */
 
     /**
-     * @abstract
      * Take a UI-formatted mark, normalise it, and insert it into the database
+     *
+     * @abstract
+     * @param $mark
+     * @param $subbox
+     * @return mixed
      */
     public abstract function normaliseMark($mark, $subbox);
 
     /**
-     * @abstract
      * Extract a normalised mark from the database, and format it for the UI
+     *
+     * @abstract
+     * @param $user_id
+     * @param $box_id
+     * @param bool $asText
+     * @param bool $blankZero
+     * @return mixed
      */
     public abstract function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true);
 
     /**
+     * Format a pre-extracted value for the UI
+     *
      * @abstract
      * @param $rawMark
      * @param int $maxMark
      * @param bool $asText
-     * Format a pre-extracted value for the UI
+     * @param bool $blankZero
      */
     public abstract function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true);
+
+    /**
+     * Use the sitepage instance passed to output the user interface elements for this marktype.
+     * I think I decided against doing this in the first place (and using a switch instead) to aid Separation of Concerns.
+     *
+     * @abstract
+     * @param SitePage $page
+     * @param array $mark
+     */
+    public abstract function outputUI(SitePage $page, $mark);
 }

@@ -8,6 +8,8 @@
  */
 class Marksheet_Factory {
 
+    private static $marktypes = array('free','letter','none','percent','raw','rubric');
+
     /**
      * @static
      * @param $slug
@@ -19,9 +21,10 @@ class Marksheet_Factory {
         $subHandler = new Submission();
         $markType = $subHandler->getMarkTypeBySlug($slug);
 
-        if(class_exists($className)) {
+        if(class_exists($className) && in_array(strtolower($slug), self::$marktypes)) {
             return new $className($markType);
-        } else {
+        }
+        else {
             // if something went wrong, assume free for legacy
             return new Marksheet_Free($markType);
         }
@@ -29,11 +32,13 @@ class Marksheet_Factory {
 
     public static function buildByID($id) {
         // if there's a problem, default to free for legacy
-        if(!is_numeric($id))
+        if(!is_numeric($id)) {
             return Marksheet_Factory::build('percent');
+        }
         $subHandler = new Submission();
         $marktype = $subHandler->getMarkTypeByID($id);
 
         return Marksheet_Factory::build($marktype['slug']);
     }
+
 }

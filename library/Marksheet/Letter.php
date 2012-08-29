@@ -28,4 +28,16 @@ class Marksheet_Letter extends Marksheet_Abstract {
         $grade = $this->getSubmissionReturnHandler()->getLetterGradeByValue($rawMark);
         return $grade['caption'];
     }
+
+    public function outputUI(SitePage $page, $mark) {
+        $subHandler = new Submission();
+
+        $page->setVar('grade_drop_block', '');
+        $page->dropdown('grade_drop', $subHandler->getLetterGrades(), $mark['grade_selected'], 'mark_type_letter', array(
+            'grade_id' => 'GRADE_VALUE',
+            'caption'  => 'GRADE_TEXT',
+        ));
+        $page->setVar('COMMENT', $mark['comment']);
+    }
+
 }

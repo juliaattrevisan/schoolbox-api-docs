@@ -46,4 +46,13 @@ class Marksheet_Raw extends Marksheet_Abstract {
         return $asText ? "$mark / $maxMark" : $mark;
     }
 
+    public function outputUI(SitePage $page, $mark) {
+        $output = array(
+            'MAX_MARK' => $mark['max_mark'],
+            'MARK'     => $mark['mark'],
+            'COMMENT'  => $mark['comment']
+        );
+        $page->setVar($output);
+    }
+
 }
