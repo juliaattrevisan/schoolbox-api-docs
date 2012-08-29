@@ -53,16 +53,18 @@ class DueWork_Detail {
         }
 
         foreach($students as $user) {
-            $insertion = array('user' => $user);
+            $insertion = array();
 
             // accepts submissions
             if($this->getSubmissionType() != self::ACCEPT_NONE) {
                 // search by internal id
                 if($user['uid']) {
+                    $insertion['user'] = $this->userHandler->getByID($user['uid']);
                     $submissions = $this->submissionStudentHandler->getByUserID($this->dueWork['id'], $user['uid']);
                 }
                 // try the synergetic id
                 elseif($user['synergy_id']) {
+                    $insertion['user'] = $this->userHandler->getBySynergy($user['synergy_id']);
                     $submissions = $this->submissionStudentHandler->getBySynergyID($this->dueWork['id'], $user['synergy_id']);
                 }
                 // ignore this user
@@ -113,8 +115,20 @@ class DueWork_Detail {
             }
             // does not accept submissions
             else {
-                $user['status'] = '';
-                $user['class'] = '';
+                $insertion['user']['status'] = '';
+                $insertion['user']['class'] = '';
+
+                if($user['uid']) {
+                    $insertion['user'] = $this->userHandler->getByID($user['uid']);
+                }
+                // try the synergetic id
+                elseif($user['synergy_id']) {
+                    $insertion['user'] = $this->userHandler->getBySynergy($user['synergy_id']);
+                }
+                // ignore this user
+                else {
+                    continue;
+                }
             }
 
             // get student's mark, if there is one
