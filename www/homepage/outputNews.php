@@ -1,6 +1,7 @@
 <?php
 $this->setBlock($componentHandle, 'news', 'news_block');
 $this->setBlock($componentHandle, "submit_news", "submit_news_block");
+$this->setBlock('news', "has_publish_date", "has_publish_date_block");
 
 /* Set up component name
  */
@@ -125,6 +126,27 @@ if (is_array($newsList)) {
 			'ON_OFF' => ++$j%2? '' : 'dark'
 		));
 
-		$this->parse("news_block", "news", true);
+		/* Anyone with write access can now see the publish date for news items
+		 */
+		if ($permission >= WRITE_ACCESS) {
+			$publishDate = new Alaress_Date_Format($news['published'], 'U');
+
+			if (strlen($news['published']) && $news['published'] > time()) {
+				$this->setVar(array(
+					'NEWS_PUBLISH_DATE' => $publishDate->getDateOnly()
+				));
+
+				$this->parse('has_publish_date_block', 'has_publish_date');
+			}
+			else {
+				$this->setVar('has_publish_date_block', '');
+			}
+
+			$this->parse("news_block", "news", true);
+
+			/* Clear children after parsing out the parent
+			 */
+			$this->setVar('has_publish_date_block', '');
+		}
 	}
 }
