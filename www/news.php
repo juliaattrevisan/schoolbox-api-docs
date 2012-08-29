@@ -52,6 +52,10 @@ $this->setBlock(TEMPLATE_content, 'month_filter', 'month_filter_block');
 $this->setBlock(TEMPLATE_content, 'year', 'year_block');
 $this->setBlock('year', 'month', 'month_block');
 $this->setBlock('topic', 'news', 'news_block');
+$this->setBlock('news', 'has_modify_button', 'has_modify_button_block');
+$this->setBlock('news', 'has_publish_date', 'has_publish_date_block');
+$this->setBlock('news', 'has_expiry', 'has_expiry_block');
+
 $this->setVar('topic_header_block', '');
 
 $this->setTab('news');
@@ -241,17 +245,71 @@ if (is_array($items)) {
         foreach ($items as $article) {
             $i++;
 
-            if (($permission >= WRITE_ACCESS && $article['item_owner'] == $_SESSION['id']) || $permission >= FULL_ACCESS) {
-                $this->setVar("MODIFY", " | <a href=\"/news/modify/" . $article['item_id'] . "\">modify</a>");
-            } else {
-                $this->setVar("MODIFY", "");
-            }
+			/* Find out if admin-specific kind of information should be displayed with the
+			 * news article
+			 */
+			$hasAdminAccess = ($permission >= WRITE_ACCESS && $article['item_owner'] == $_SESSION['id']) || $permission >= FULL_ACCESS;
 
+			/* Offer a Modify button if you are allowed to alter this new item's contents
+			 */
+            if ($hasAdminAccess) {
+				$this->setVar(array(
+					'HAS_MODIFY_BUTTON_ITEM_ID' => $article['item_id'],
+				));
+
+				$this->parse('has_modify_button_block', 'has_modify_button');
+			}
+			else {
+				$this->setVar('has_modify_button_block', '');
+			}
+
+			/* Show publish date to administrators if it's in the future
+			 */
+			if ($hasAdminAccess) {
+				$publishDate = new Alaress_Date_Format($article['item_datetime_published'], 'y-m-d h:i:s');
+
+				if ($publishDate->getUnixTimestamp() > time()) {
+					$this->setVar(array(
+						'PUBLISH_DATE' => $publishDate->getDateOnly(),
+					));
+
+					$this->parse('has_publish_date_block', 'has_publish_date');
+				}
+				else {
+					$this->setVar('has_publish_date_block', '');
+				}
+			}
+			else {
+				$this->setVar('has_publish_date_block', '');
+			}
+
+			/* Expiry settings
+			 */
+			if ($hasAdminAccess) {
+				if ($archive) {
+					$expiryVerb = 'Expired';
+				}
+				else {
+					$expiryVerb = 'Expires';
+				}
+
+				$this->setVar(array(
+					'EXPIRY_VERB' => $expiryVerb,
+					'EXPIRY_DATE' => $article['expire_datetime'],
+				));
+
+				$this->parse('has_expiry_block', 'has_expiry');
+			}
+			else {
+				$this->setVar('has_expiry_block', '');
+			}
+
+			/* The usual stuff
+			 */
             $fullname = $userHandler->formatName($article);
             $owner = "<a href=\"/search/user/{$article['uid']}\">$fullname</a>";
 
             $url = new Url($previous['topicName']);
-            $expiry = $archive ? ', expired on ' : ', expires on ';
 
             $formatter = new TextFormatter();
 
@@ -259,7 +317,7 @@ if (is_array($items)) {
                 'NEWS_ID' => $article['item_id'],
                 'NEWS_TITLE' => $article['item_heading'],
                 'POSTER' => $owner,
-                'DATETIME' => $_SESSION['su'] == 1 ? $article['post_datetime'] . $expiry . $article['expire_datetime'] : $article['post_datetime'],
+                'DATETIME' => $_SESSION['su'] == 1 ? $article['post_datetime'] : $article['post_datetime'],
                 'NEWS_BODY' => $archive ? $article['item_body'] : Scrub::html($article['item_body']),
                 'TOPIC_NAME' => Scrub::text($previous['topicName']),
                 'TOPIC_CLEAN' => $filter['archive'] . $url->getSlug(),
