@@ -28,18 +28,20 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
         $this->setVar("DATE", date("l jS F"));
 
-        $this->submissionList = $this->getCalendar()->getSubmissionEvents($currDay);
+		$factory = new Calendar_Api_Factory();
+		$api = $factory->produce();
 
-        $this->eventList = $this->getCalendar()->getDayEvents($currDay);
+        $this->submissionList = $api->getSubmissionEvents($currDay);
+		$this->submissionList->sort();
+
+        $this->eventList = $api->getDayEvents($currDay);
+		$this->eventList->sort();
 
         return true;
     }
 
     public function renderTemplate ($templateHandle) {
 		$this->setVar("note_listing", "");
-
-		$userHandler = $this->user;
-		$groupHandler = $this->group;
 
         if ( !$this->loadTemplate($templateHandle, 'calendar') ) {
             return false;
@@ -61,7 +63,6 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 			'attendance_list_button_block' => '',
 		));
 
-
         if ( is_array($this->submissionList) ) {
             foreach ( $this->submissionList as $submission ) {
 
@@ -77,7 +78,6 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
                 $this->setVar($output);
                 $this->parse("note_listing", "note_block", true);
-                $subout = 1;
             }
         }
 
