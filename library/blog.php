@@ -28,7 +28,7 @@ class Blog extends DeprecatedModel {
      * @return <type>
      */
 	function getByCID($cid) {
-		$query = "SELECT {$this->_table}.*, user.title, user.firstname, user.lastname, created, UNIX_TIMESTAMP(created) AS createdTimestamp
+		$query = "SELECT {$this->_table}.*, user.synergy_id, user.title, user.firstname, user.lastname, created, UNIX_TIMESTAMP(created) AS createdTimestamp
 			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner = user.id
 			WHERE cid = $cid AND deleted IS NULL
 			ORDER BY {$this->_table}.created DESC";

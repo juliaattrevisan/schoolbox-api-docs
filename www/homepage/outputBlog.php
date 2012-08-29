@@ -139,7 +139,9 @@ if(!empty($blogs)) {
 			'BLOG_OWNER'    => "<a href=\"/search/user/{$blog['owner']}\">{$blog['name']}</a>",
 			'BLOG_CREATED'  => $createdTime->getRelativeTime(),
 			'BLOG_SHADING'  => ++$j%2 ? '' : 'dark',
-			'BLOG_COMMENTS' => ''
+			'BLOG_COMMENTS' => '',
+			'BLOG_AUTHOR_EXTERNAL_ID' => $blog['synergy_id'],
+			'BLOG_AUTHOR_NAME' => $blog['firstname'] . ' ' . $blog['lastname']
 		));
 
 		// comments
@@ -169,7 +171,9 @@ if(!empty($blogs)) {
 				$this->setVar(array(
 					'COMMENT_BODY'    => Scrub::text($comment['body']),
 					'COMMENT_OWNER'   => "<a href=\"/search/user/{$comment['owner']}\">{$comment['name']}</a>",
-					'COMMENT_CREATED' => $createdTime->getRelativeTime()
+					'COMMENT_CREATED' => $createdTime->getRelativeTime(),
+					'COMMENT_AUTHOR_EXTERNAL_ID' => $comment['synergy_id'],
+					'COMMENT_AUTHOR_NAME' => $comment['firstname'] . ' ' . $comment['lastname']
 				));
 
 				if($comment['owner'] == $_SESSION['id'] || $permission >= WRITE_ACCESS)
