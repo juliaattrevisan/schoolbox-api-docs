@@ -50,7 +50,7 @@ if (is_array($fileList)) {
 
 		$output = array('FILE_DESCRIPTION'	=> Scrub::text($file['description']),
 						'FILE_ID'			=> $file['id'],
-						'FILE_MIME_IMAGE'	=> $allowedFiles->getClass($file["iconFile"]),
+						'FILE_MIME_IMAGE'	=> $allowedFiles->getClass($file['iconFile']),
 						'FILE_POSTED_BY'	=> $userHandler->formatName($file),
 						'FILE_POSTED_BY_ID'	=> $file['owner'],
 						'FILE_POSTED_DATE'	=> $date->getShort(),
@@ -96,6 +96,8 @@ if($catID == $categoryID) {
     $src = $catHandler->getByID($catID);
 }
 
+
+
 /* Set up component name
  */
 $this->setvar(array(
@@ -118,6 +120,7 @@ foreach ($default['filterOptions'] as $option) {
 }
 
 //setup block for submission button
+$this->setVar('FILE_CAT_ID',$catID);
 $this->setBlock($componentHandle, "submit_file", "submit_file_block");
 if ($permission < WRITE_ACCESS)
 	$this->setVar("submit_file_block", "");
