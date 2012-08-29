@@ -28,6 +28,7 @@ if (is_array($fileList)) {
 			'FILE_EXTENSION'		=> $file['extension'],
 			'FILE_ICON'				=> $file['iconFile'],
 			'FILE_INLINE'			=> $file['inline'] == 'true' ? 'Inline' : 'External',
+            'FILE_EXTERN_CHECKED'   => $file['inline'] == 'true' ? '' : 'selected="selected"',
 		);
 
         $this->setVar($output);
