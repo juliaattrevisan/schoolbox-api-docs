@@ -7,66 +7,68 @@ $page = new SitePage();
 $groupHandler = new Group();
 
 if ($groupHandler->isSuperuser()) {
-	$tableIndex = 'fileTypeID';
+    $tableIndex = 'fileTypeID';
 
-	/* Set up generic table handler thing.
-	 */
-	$allowedFileTypesHandler = new GenericTable('allowedFileTypes', $tableIndex);
-	$allowedFileExtensionHandler = new GenericTable('allowedFileExtension', $tableIndex);
+    /* Set up generic table handler thing.
+      */
+    $allowedFileTypesHandler = new GenericTable('allowedFileTypes', $tableIndex);
+    $allowedFileExtensionHandler = new GenericTable('allowedFileExtension', $tableIndex);
 
-	/* Delete or create/update
-	 */
-	if (is_numeric($_GET['delete'])) {
-		$allowedFileTypesHandler->delete(Scrub::text($_GET['delete']));
-		$allowedFileExtensionHandler->delete(Scrub::text($_GET['delete']));
-	}
-	else {
-		$data = array();
-		$allExtensions = array();
+    /* Delete or create/update
+      */
+    if (is_numeric($_GET['delete'])) {
+        $allowedFileTypesHandler->delete(Scrub::text($_GET['delete']));
+        $allowedFileExtensionHandler->delete(Scrub::text($_GET['delete']));
+    } else {
+        $data = array();
+        $allExtensions = array();
 
-		$allColumns = array_keys($_POST);
+        $allColumns = array_keys($_POST);
 
-		foreach($allColumns as $currentColumn) {
+        foreach ($allColumns as $currentColumn) {
 
-			/* Don't add extension column to allowedFileTypes, but remember it for
-			 * addition into allowedFileExtension
-			 */
-			if ($currentColumn == 'extension') {
-				$allExtensions = explode(',', $_POST[$currentColumn]);
-			}
-			else {
-				$data[$currentColumn] = Scrub::text($_POST[$currentColumn]);
-			}
-		}
+            /* Don't add extension column to allowedFileTypes, but remember it for
+                * addition into allowedFileExtension
+                */
+            if ($currentColumn == 'extension') {
+                $allExtensions = explode(',', $_POST[$currentColumn]);
+            } else {
+                $data[$currentColumn] = Scrub::text($_POST[$currentColumn]);
+            }
+        }
 
-		/* Create New or Update existing
-		 */
-		if (is_numeric($_POST[$tableIndex])) {
-			$allowedFileTypesHandler->update($data);
+        /* Create New or Update existing
+           */
+        if ($data['enable'] != 'true')
+            $data['enable'] = 'false';
 
-			$allowedFileExtensionHandler->delete($data['fileTypeID']);
+        if (is_numeric($_POST[$tableIndex])) {
 
-			$fileTypeID = $data['fileTypeID'];
-		}
-		else {
-			$fileTypeID = $allowedFileTypesHandler->create($data);
-		}
 
-		/* Create/update valid file extensions table too
-		 */
-		foreach($allExtensions as $currentExtension) {
-			$data = array(
-				'fileTypeID' => $fileTypeID,
-				'extension' => Scrub::text(trim($currentExtension))
-			);
+            $allowedFileTypesHandler->update($data);
 
-			$allowedFileExtensionHandler->create($data);
-		}
-	}
+            $allowedFileExtensionHandler->delete($data['fileTypeID']);
 
-	$page->backToTheFuture(1);
-}
-else {
-	error(19);
+            $fileTypeID = $data['fileTypeID'];
+        } else {
+
+            $fileTypeID = $allowedFileTypesHandler->create($data);
+        }
+
+        /* Create/update valid file extensions table too
+           */
+        foreach ($allExtensions as $currentExtension) {
+            $data = array(
+                'fileTypeID' => $fileTypeID,
+                'extension' => Scrub::text(trim($currentExtension))
+            );
+
+            $allowedFileExtensionHandler->create($data);
+        }
+    }
+
+    $page->backToTheFuture(1);
+} else {
+    error(19);
 }
 ?>
