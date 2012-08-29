@@ -50,6 +50,9 @@ if(is_numeric($catID) && !empty($token)) {
             $page->parse('feed_block', 'feed', true);
 		}
 	}
+    else {
+        $page->setVar('feed_block', '');
+    }
     $page->outputPage(true);
 	
 	exit;
