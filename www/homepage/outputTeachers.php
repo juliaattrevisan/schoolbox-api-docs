@@ -20,7 +20,12 @@ if (($code != '') && Cfg::get('external_enable')) {
 			if (is_array($teacher)) {
 				$name = $userHandler->formatName($teacher);
 
-				$this->setVar('MEMBER_NAME', "<a href=\"/search/user/{$teacher['uid']}\">{$name}</a>");
+				$this->setVar(array(
+					'MEMBER_NAME' => "<a href=\"/search/user/{$teacher['uid']}\">{$name}</a>",
+					'STAFF_NAME' => $teacher['firstname'] . ' ' . $teacher['lastname'],
+					'STAFF_EXTERNAL_ID' => $synid,
+				));
+
 				$this->parse("staff_teacher_block", "staff_teachers", true);
 			}
 

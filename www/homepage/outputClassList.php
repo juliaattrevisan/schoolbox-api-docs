@@ -40,6 +40,7 @@ if (is_array($allStudents)) {
 
 			$this->setVar(array(
 				'STUDENT_ID' => $user['uid'],
+				'STUDENT_EXTERNAL_ID' => $user['synergy_id'],
 				'STUDENT_NAME' => $name,
 				'ON_OFF' => ++$j%2? '' : 'dark',
 			));

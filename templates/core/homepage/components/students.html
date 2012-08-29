@@ -15,7 +15,10 @@
 	<div class="listing">
 		<ul>
 			<!-- BEGIN student -->
-			<li class='{ON_OFF}'><a href="/search/user/{STUDENT_ID}">{STUDENT_NAME}</a></li>
+			<li class='{ON_OFF}'>
+				<img src='/portrait?userId={STUDENT_EXTERNAL_ID}&size=square64' alt="{STUDENT_NAME}" title="{STUDENT_NAME}" />
+				<a href="/search/user/{STUDENT_ID}">{STUDENT_NAME}</a>
+			</li>
 			<!-- END student -->
 		</ul>
 
