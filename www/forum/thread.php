@@ -155,6 +155,8 @@ if (is_array($postList)) {
 						'POST_BODY' => Scrub::html($post['body']),
 						'POST_MODIFIED' => $modifiedTime->getRelativeTime(),
 						'POST_CENSORED' => $post['censored'] == 'true' ? '(Administrator)' : '',
+						'POST_AUTHOR_EXTERNAL_ID' => $post['synergy_id'],
+						'POST_AUTHOR_NAME' => $post['firstname'] . ' ' . $post['lastname']
 		);
 		$this->setVar($output);
 

@@ -64,7 +64,7 @@ class Forum extends DeprecatedModel {
 	}
 
 	function getPostList ($threadID, $index = 0, $limit = 0) {
-		$query = "SELECT p.*, u.title userTitle, u.firstname userFirstname, u.lastname userLastname, g.name userGroup FROM forumPost p
+		$query = "SELECT p.*, u.synergy_id, u.title userTitle, u.firstname userFirstname, u.lastname userLastname, g.name userGroup FROM forumPost p
 				  LEFT JOIN user u ON u.id = p.userID
 				  LEFT JOIN groups g ON g.id = u.group_id
 				  WHERE p.threadID = $threadID AND p.deleted = 'false' ";
