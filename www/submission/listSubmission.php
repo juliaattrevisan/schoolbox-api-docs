@@ -125,9 +125,9 @@ if (is_array($subList)) {
 		if (($sub['type_id'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) && ($sub['availability'] == 'assess')) {
 			$this->setVar(array(
 				'ASSESS_ASSESS_ID' => $sub['id'],
-				'ASSESS_TITLE' => Scrub::text($sub['name']),
+				'ASSESS_TITLE' => Scrub::text(html_entity_decode($sub['name'])),
 				'ASSESS_TYPE' => $sub['type'],
-				'JAVAASSDESC' => addslashes(Scrub::text($sub['name'])),
+				'JAVAASSDESC' => addslashes(Scrub::text(html_entity_decode($sub['name']))),
 				'ASSESS_START' => $sub['open_date'],
 				'ASSESS_FINISH' => $sub['date'],
 				'ASSESS_ATTEMPTS' => $attemptHandler->numAttempted($sub['id']),
@@ -161,9 +161,9 @@ if (is_array($subList)) {
 		else if ($sub['availability'] == '') {
 			$this->setVar(array(
 				'ID' => $sub['id'],
-				'ASSDESC' => Scrub::text($sub['name']),
+				'ASSDESC' => Scrub::text(html_entity_decode($sub['name'])),
 				'TYPE' => $sub['type'],
-				'JAVAASSDESC' => addslashes(Scrub::text($sub['name'])),
+				'JAVAASSDESC' => addslashes(Scrub::text(html_entity_decode($sub['name']))),
 				'OPENDATE' => $sub['accept_submission'] ? $sub['open_date'] : '',
 				'DUEDATE' => $sub['date'],
 				'MARKED' => (int)$totals['marked'],
