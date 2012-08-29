@@ -202,6 +202,7 @@ if (is_array($allStudents) && count($allStudents)) {
 	 */
 	foreach($allStudents as $currentStudent) {
 		$previousAttempt = null;
+        $this->setVar('attempt_delete_block', '');
 
         // need to append uid if synergetic
         if($currentStudent['synergy_id'] && !$currentStudent['uid']) {
