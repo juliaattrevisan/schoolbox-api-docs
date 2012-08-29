@@ -1,9 +1,9 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
+<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css"/>
 <script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
 <script type="text/javascript" src="/javascript/jstree/jquery.jstree.js"></script>
 
-<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css"/>
 
 <script type="text/javascript">
 
@@ -11,23 +11,23 @@
 
         // setup tree structure
         $j("#side-menu").jstree({
-            "animation": 50,
-            "core" : { "initially_open" : [ "node_0" ] },
-            "plugins" : [ "themes", "html_data"],
-            "themes" : {
-                "theme" : "schoolbox",
-                "dots" : true,
-                "icons" : false
+            "animation":50,
+            "core":{ "initially_open":[ "node_0" ] },
+            "plugins":[ "themes", "html_data"],
+            "themes":{
+                "theme":"schoolbox",
+                "dots":true,
+                "icons":false
             }
         });
 
         /*
-        * Ascertain the currently active element
-        *
-        * */
+         * Ascertain the currently active element
+         *
+         * */
         $j('.jstree').find('a#0').addClass('active');
 
-        $j(".jstree a").click(function() {
+        $j(".jstree a").click(function () {
             $this = $j(this);
             var idToInput = $this.attr('ID');
             $j(".jstree").removeClass('active');
@@ -40,31 +40,31 @@
         $j('#form').validate();
 
         $j('#url').autocomplete({
-            serviceUrl: '/ajax/findCategory.php',
-            minChars: 2,
-            maxHeight: 300,
-            width: 275,
-            noCache: true,
-            onSelect: function (value, data) {
+            serviceUrl:'/ajax/findCategory.php',
+            minChars:2,
+            maxHeight:300,
+            width:275,
+            noCache:true,
+            onSelect:function (value, data) {
                 console.log(data);
                 $j('#form input[name=url]').val(data);
             }
         });
 
         /*
-        * Modal for URL homepage selection
-        * */
+         * Modal for URL homepage selection
+         * */
 
-         $j('#resource-browser').dialog({
-            width: 650,
-            autoOpen: false,
-            title: "Select a homepage",
-            modal: true,
-            resizable: false
+        $j('#resource-browser').dialog({
+            width:650,
+            autoOpen:false,
+            title:"Select a homepage",
+            modal:true,
+            resizable:false
         });
 
-        $j('.open-modal').click(function() {
-            $j('#resource-browser').load('/ajax/resourceBrowser', {destination : '#url'}, function() {
+        $j('.open-modal').click(function () {
+            $j('#resource-browser').load('/ajax/resourceBrowser', {destination:'#url'}, function () {
                 $j('#resource-browser').dialog('open');
             });
 
@@ -81,115 +81,125 @@
 <!-- END custom_head -->
 <h1>Schoolbox Administration</h1>
 <ul class="admin-nav">
-	<li><a href="/adminv2/home">Home</a></li>
-	<li><a href="/adminv2/user">Users</a></li>
-	<li><a href="/adminv2/side-menu" class="current">Side Menu</a></li>
+    <li><a href="/adminv2/home">Home</a></li>
+    <li><a href="/adminv2/user">Users</a></li>
+    <li><a href="/adminv2/side-menu" class="current">Side Menu</a></li>
     <li><a href="/adminv2/dashboard">Dashboard</a></li>
-<li><a href="/adminv2/homepage">Homepages</a></li>
-<li><a href="/adminv2/allowed-file">Allowed Files</a></li>
-	<li><a href="/adminv2/setting">Settings</a></li>
-	<li><a href="/adminv2/calendar">Calendar</a></li>
-	<li><a href="/adminv2/category">Category</a></li>
-	<li><a href="/adminv2/list">Lists</a></li>
-	<li><a href="/adminv2/cleanup">Cleanup</a></li>
+    <li><a href="/adminv2/homepage">Homepages</a></li>
+    <li><a href="/adminv2/allowed-file">Allowed Files</a></li>
+    <li><a href="/adminv2/setting">Settings</a></li>
+    <li><a href="/adminv2/calendar">Calendar</a></li>
+    <li><a href="/adminv2/category">Category</a></li>
+    <li><a href="/adminv2/list">Lists</a></li>
+    <li><a href="/adminv2/cleanup">Cleanup</a></li>
 </ul>
 <div class="admin-contents">
-	<h2>{ACTION} Side Menu Item</h2>
-	<form action="/adminv2/side-menuForm.php" method="post" name="form" id="form" class="standardForm" >
-		<table>
-			<tbody>
-				<tr>
-					<td class="formLabelWidth" width="250">
+    <h2>{ACTION} Side Menu Item</h2>
 
-						<h2>Name</h2>
-						<em>This is the text that will be displayed on the menu</em>
-					</td>
-					<td>
-						<label>
-							<input type="text" name="txt" class="required" maxlength="250" size="40" value="{TEXT}" />
-						</label>
-					</td>
-				</tr>
-				<tr>
-					<td width="250">
-						<h2>URL</h2>
+    <form action="/adminv2/side-menuForm.php" method="post" name="form" id="form" class="standardForm">
+        <table>
+            <tbody>
+            <tr>
+                <td class="formLabelWidth" width="250">
 
-						<em>Either enter in a URL or use the browse button to link to folders created in the resource system</em>
-					</td>
-					<td>
+                    <h2>Name</h2>
+                    <em>This is the text that will be displayed on the menu</em>
+                </td>
+                <td>
+                    <label>
+                        <input type="text" name="txt" class="required" maxlength="250" size="40" value="{TEXT}"/>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td width="250">
+                    <h2>URL</h2>
 
-						<label>
+                    <em>Either enter in a URL or use the browse button to link to folders created in the resource
+                        system</em>
+                </td>
+                <td>
 
-							<input type="text" name="url" id="url" size="40" class="required" maxlength="250" value="{URL}" />
-						</label>
-                        <p class="clearfix"> <a href="#" class="btn float-left open-modal"><span></span>Browse Resources</a></p>
+                    <label>
 
-                        <div id="resource-browser" class="hide"></div>
+                        <input type="text" name="url" id="url" size="40" class="required" maxlength="250"
+                               value="{URL}"/>
+                    </label>
 
-					</td>
-				</tr>
-                <tr>
-                    <td width="250">
-                        <h2>Windows</h2>
-                        <em>Generally links to offsite resources would be set to a new window, while local resources would stay in the existing window.</em>
-                    </td>
-                    <td>
-                        <select name="target">
-                            <option value="">Same Window</option>
-                            <option value="_blank" {BLANK_SELECTED}>New Window</option>
-                        </select>
-                    </td>
-                </tr>
-                <!-- BEGIN parent_select -->
-                <tr>
-                    <td width="250">
-                        <h3>Parent</h3>
-                        <em>This is where in the menu the new item will be inserted. Simply click on a menu item to allow it to be the parent.</em>
-                    </td>
-                    <td class="parent-level">
-                        <input id="prent" name="parent" type="hidden" value="0" />
-                        <div id="side-menu">
-                            {MENU_TREE}
-                        </div>
-                    </td>
-                </tr>
-                <!-- END parent_select -->
-				<tr>
-					<td width="250">
-						<h2>Campus Access</h2>
-						<em>Select the campuses that should be able to view
-						this link. Note that this link will only be viewable
-						by people in both the campuses and groups selected</em>
-					</td>
-					<td>
-						<!-- BEGIN campus -->
-						<label><input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} />{CAMPUS_NAME}</label>
-						<!-- END campus -->
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<h2>Group Access</h2>
-					</td>
-					<td>
-						<!-- BEGIN group -->
-					<label><input type="checkbox" name="group[]" value="{GROUP_ID}" {GROUP_ID_SELECTED} />{GROUP_NAME}</label>
-						<!-- END group -->
-					</td>
-				</tr>
-		  		<tr>
-					<td>&nbsp;
+                    <p class="clearfix"><a href="#" class="btn float-left open-modal"><span></span>Browse Resources</a>
+                    </p>
 
-					</td>
-					<td>
-						<input type="hidden" name="id" value="{ID}" />
-					  	<input type="submit" name="Submit" value="{ACTION}" class="submit-btn-plain" />
-						<!-- BEGIN delete -->
-						<input type="submit" name="delete" value="Delete" class="submit-btn-plain"  />
-						<!-- END delete -->
-					</td>
-				</tr>
-			</tbody>
-		</table>
-	</form>
+                    <div id="resource-browser" class="hide"></div>
+
+                </td>
+            </tr>
+            <tr>
+                <td width="250">
+                    <h2>Windows</h2>
+                    <em>Generally links to offsite resources would be set to a new window, while local resources would
+                        stay in the existing window.</em>
+                </td>
+                <td>
+                    <select name="target">
+                        <option value="">Same Window</option>
+                        <option value="_blank"
+                        {BLANK_SELECTED}>New Window</option>
+                    </select>
+                </td>
+            </tr>
+            <!-- BEGIN parent_select -->
+            <tr>
+                <td width="250">
+                    <h3>Parent</h3>
+                    <em>This is where in the menu the new item will be inserted. Simply click on a menu item to allow it
+                        to be the parent.</em>
+                </td>
+                <td class="parent-level">
+                    <div id="side-menu">
+                        {MENU_TREE}
+                    </div>
+                </td>
+            </tr>
+            <!-- END parent_select -->
+            <tr>
+                <td width="250">
+                    <h2>Campus Access</h2>
+                    <em>Select the campuses that should be able to view
+                        this link. Note that this link will only be viewable
+                        by people in both the campuses and groups selected</em>
+                </td>
+                <td>
+                    <!-- BEGIN campus -->
+                    <label><input type="checkbox" name="campus[]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}
+                        />{CAMPUS_NAME}</label>
+                    <!-- END campus -->
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h2>Group Access</h2>
+                </td>
+                <td>
+                    <!-- BEGIN group -->
+                    <label><input type="checkbox" name="group[]" value="{GROUP_ID}" {GROUP_ID_SELECTED}
+                        />{GROUP_NAME}</label>
+                    <!-- END group -->
+                </td>
+            </tr>
+            <tr>
+                <td>&nbsp;
+
+                </td>
+                <td>
+                    <input type="hidden" name="id" value="{ID}"/>
+                    <input id="prent" name="parent" type="hidden" value="{PARENT_ID}"/>
+                    <input type="submit" name="Submit" value="{ACTION}" class="submit-btn-plain"/>
+                    <!-- BEGIN delete -->
+                    <input type="submit" name="delete" value="Delete" class="submit-btn-plain"/>
+                    <!-- END delete -->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </form>
 </div>

@@ -17,30 +17,31 @@ $this->setBlock('parent_select', 'menu_select', 'menu_select_block');
 $menuHandler = new SideMenu;
 $userHandler = new User;
 
-if(is_numeric($this->arg[0])) {
+if (is_numeric($this->arg[0])) {
     /* Modify existing item */
 
     $menuItem = $menuHandler->getByID($this->arg[0]);
 
     $output = array(
-        'MENUITEMLIST'   => '',
-        'TEXT'           => $menuItem['txt'],
-        'URL'            => $menuItem['url'],
+        'MENUITEMLIST' => '',
+        'TEXT' => $menuItem['txt'],
+        'URL' => $menuItem['url'],
         'BLANK_SELECTED' => $menuItem['target'] == '_blank' ? 'selected="selected"' : '',
-        'ID'             => $menuItem['id'],
-        'ACTION'         => 'Update'
+        'ID' => $menuItem['id'],
+        'PARENT_ID' => $menuItem['parent'],
+        'ACTION' => 'Update'
     );
     $this->setVar($output);
 
-     /* Output group list */
-     $this->checkList('group', $userHandler->getGroupList(), $menuHandler->getMenuItemGroupList($this->arg[0]), TEMPLATE_content, array(
-         'id'   => 'GROUP_ID',
-         'name' => 'GROUP_NAME'
-     ));
-     $this->checkList('campus', $userHandler->getCampusList(),$menuHandler->getMenuItemCampusList($this->arg[0]), TEMPLATE_content, array(
-         'id'   => 'CAMPUS_ID',
-         'name' => 'CAMPUS_NAME'
-     ));
+    /* Output group list */
+    $this->checkList('group', $userHandler->getGroupList(), $menuHandler->getMenuItemGroupList($this->arg[0]), TEMPLATE_content, array(
+        'id' => 'GROUP_ID',
+        'name' => 'GROUP_NAME'
+    ));
+    $this->checkList('campus', $userHandler->getCampusList(), $menuHandler->getMenuItemCampusList($this->arg[0]), TEMPLATE_content, array(
+        'id' => 'CAMPUS_ID',
+        'name' => 'CAMPUS_NAME'
+    ));
 
     // blank the parent selector
     $this->setVar('parent_select_block', '');
@@ -48,32 +49,32 @@ if(is_numeric($this->arg[0])) {
 } else {
     /* Create new item */
     $output = array(
-        'MENUITEMLIST'   => '',
-        'TEXT'           => '',
-        'URL'            => '',
+        'MENUITEMLIST' => '',
+        'TEXT' => '',
+        'URL' => '',
         'BLANK_SELECTED' => '',
-        'ID'             => '',
-        'ACTION'         => 'Create'
+        'ID' => '',
+        'ACTION' => 'Create'
     );
     $this->setVar($output);
 
     $this->setBlock(TEMPLATE_content, 'delete', 'delete_block');
-    $this->setVar('delete_block','');
+    $this->setVar('delete_block', '');
 
-     /* Output group list */
-     $this->checkList('group', $userHandler->getGroupList(), '', TEMPLATE_content, array(
-         'id'   => 'GROUP_ID',
-         'name' => 'GROUP_NAME'
-     ));
-     $this->checkList('campus', $userHandler->getCampusList(),'', TEMPLATE_content, array(
-         'id'   => 'CAMPUS_ID',
-         'name' => 'CAMPUS_NAME'
-     ));
+    /* Output group list */
+    $this->checkList('group', $userHandler->getGroupList(), '', TEMPLATE_content, array(
+        'id' => 'GROUP_ID',
+        'name' => 'GROUP_NAME'
+    ));
+    $this->checkList('campus', $userHandler->getCampusList(), '', TEMPLATE_content, array(
+        'id' => 'CAMPUS_ID',
+        'name' => 'CAMPUS_NAME'
+    ));
 
     // don't hide the parent select block
-    $this->parse('parent_select_block', 'parent_select', false);
-    $this->setVar('MENU_TREE', $menuHandler->outputTree($menuHandler->getTree(), 0, true));
 
+    $this->setVar('MENU_TREE', $menuHandler->outputTree($menuHandler->getTree(), 0, true));
+    $this->parse('parent_select_block', 'parent_select', false);
 }
 
 ?>
