@@ -486,7 +486,7 @@ class User extends DeprecatedModel {
         $query = "DELETE FROM eportfolio_textBox WHERE userID = '$id'";
         $this->db->query($query);
 
-        $this->db->delete('userCampus', 'uid', $user['id']);
+        $this->db->delete('userCampus', 'uid', $id);
 
     }
 
@@ -674,7 +674,7 @@ class User extends DeprecatedModel {
 	 * @param null $format
 	 * @return mixed|null|string
 	 */
-	public function formatName($userInfo, $format = NULL){
+	public function formatName($userInfo, $format = NULL, $useNonBreakingSpace = false){
 
 		// Check for custom format
 		if (empty($format)){
@@ -701,12 +701,18 @@ class User extends DeprecatedModel {
 			$format = str_replace($tag, $value, $format);
 		}
 
-		if (trim($format)) {
+		if ($format = trim($format)) {
+            if($useNonBreakingSpace) {
+                $format = preg_replace("#[\s]#",'&nbsp;',$format);
+            }
 			return $format;
 		}
-		else {
-			return 'Unknown User';
+		elseif($useNonBreakingSpace) {
+            return 'Unknown&nbsp;User';
 		}
+        else {
+            return 'Unknown User';
+        }
 	}
 }
 ?>
