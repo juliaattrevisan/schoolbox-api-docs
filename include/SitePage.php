@@ -426,6 +426,9 @@ class SitePage extends Page
             } else if ($this->site == 'stk') {
                 $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.saintkentigern.com/owa" rel="external"');
             }
+            else {
+                $this->setVar('WEBMAIL_LOCATION', 'href="'.Cfg::get('mail_webmail').'" rel="external"');
+            }
 
             $this->parse('wm_tab', 'webmail_tab');
         } else {
