@@ -54,24 +54,39 @@
   	<!-- BEGIN post -->
 	<tr class="post">
     	<td class="post-left" valign="top">
-			<div class="post-content">
+			<div class="post-content" style='min-width:200px'>
 				<a name="{POST_ID}"></a>
-				<p>
+
+				<div style='width:64px;height:64px;'>
 					<img src='/portrait?userId={POST_AUTHOR_EXTERNAL_ID}&size=square64' alt="{POST_AUTHOR_NAME}" title="{POST_AUTHOR_NAME}" />
-					<a href="/search/user/{POST_USER_ID}">{POST_AUTHOR}</a><br />
+				</div>
+				<div style='position:relative;top:-64px;left:80px'>
+					<p>
+						<a href="/search/user/{POST_USER_ID}">{POST_AUTHOR}</a><br />
+						{POST_GROUP}
 
-					{POST_GROUP}
-				</p>
+						<br /><br />
+						Posted {POST_TIME}
 
+					</p>
+				</div>
 
-				 <p><!-- BEGIN reply_post -->
-				<a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}">Reply to this post</a><br />
-				<!-- END reply_post -->
 				<!-- BEGIN modify -->
-				<a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}">Edit post</a> |
-				<a href="/forum/modifyForm.php?deletePost={POST_ID}" class="delete">Delete post</a><br /> <!-- END modify -->
-				Posted {POST_TIME}
-				<!-- BEGIN modified --><br /> edited {POST_MODIFIED} {POST_CENSORED}<!-- END modified --></p>
+				<p>
+					<a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}">Edit post</a> |
+					<a href="/forum/modifyForm.php?deletePost={POST_ID}" class="delete">Delete post</a><br />
+				</p>
+				<!-- END modify -->
+
+				<p>
+					<!-- BEGIN reply_post -->
+					<a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}">Reply to this post</a><br/>
+					<!-- END reply_post -->
+
+					<!-- BEGIN modified -->
+					<br/> edited {POST_MODIFIED} {POST_CENSORED}
+					<!-- END modified -->
+				</p>
 			</div>
 		</td>
 		<td class="post-right" valign="top">
