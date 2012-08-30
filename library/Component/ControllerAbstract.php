@@ -310,7 +310,6 @@ abstract class Component_ControllerAbstract {
         else {
 
         }
-
         // now clear things we don't want seen
         if(!$displayConfig) {
             $page->setVar('settings_link', '');

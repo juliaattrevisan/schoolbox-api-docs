@@ -204,18 +204,25 @@ class Category extends DeprecatedModel {
 
 	}
 
-	function getImages($categoryID, $limit = 0) {
-		$query = "SELECT id, file.description
+	function getImages($categoryID, $limit = 0, $excludeWork = false) {
+		$query = "SELECT id, file.description, file.type
 				  FROM file
 				  LEFT JOIN allowedFileTypes ON mime_type = mime
-				  WHERE category = '{$categoryID}'
-				  AND deleted = '0' AND INSTR(mime_type, 'image/') AND inline = 'true'
-				  ORDER BY submitted";
+				  WHERE category = '$categoryID'
+				  AND deleted = '0'
+				  AND INSTR(mime_type, 'image/')
+				  AND inline = 'true'";
 
-		if ($limit == 0)
-			$query .= "";
-		else
-			$query .= " LIMIT 1, $limit";
+        if($excludeWork) {
+            $query .= " AND file.type = '0'";
+        }
+
+        $query .= "ORDER BY submitted";
+
+
+		if ($limit > 0) {
+            $query .= " LIMIT 1, $limit";
+        }
 
 		return $this->db->getAll($query);
 	}
@@ -480,14 +487,13 @@ class Category extends DeprecatedModel {
 			}
 		}
 
-		/* Setup homepage template */
-		if($data['template']) {
-			require_once dirname(__FILE__) . '/homepage-template.php';
-			$templateHandler = new HomepageTemplate;
-			$templateHandler->createTemplate($categoryID, $data['template']);
-		}
-		else
-			unset($data['template']);
+        if($data['template']) {
+            $this->createHomepageFromTemplate($categoryID, $data['template']);
+        }
+        else {
+            // we don't want an invalid template ID going into the database
+            unset($data['template']);
+        }
 
 		/* Insert synergetic subject code */
 		$codeList = explode(",", $data['code']);
@@ -542,27 +548,20 @@ class Category extends DeprecatedModel {
 		/* If -1 is set as template, remove homepage config, remove homepage
 		 * components, then set the category's templateID to zero
 		 */
-		require_once dirname(__FILE__) . '/../library/homepage.php';
+        if ($data['template'] == Homepage::REMOVE_HOMEPAGE_TEMPLATE_ID) {
+            $categoryID = mysql_real_escape_string($data['id'], $this->db->dbf);
+            $this->db->query("DELETE FROM `component_instance` WHERE `module` = 'homepage' AND `indetifier` = '$categoryID'");
+            $data['template'] = 0;
+        }
 
-		if ($data['template'] == Homepage::REMOVE_HOMEPAGE_TEMPLATE_ID) {
-			$homepage = new Homepage($data['id']);
-			$homepage->db->delete('homepage_config', 'cid', $data['id']);
-			$homepage->deleteComponentPositions();
-
-			$data['template'] = 0;
-		}
-
-		/* Continue normally
-		 */
-		if ($data['template']) {
-			require_once dirname(__FILE__) . '/homepage-template.php';
-
-			$templateHandler = new HomepageTemplate;
-			$templateHandler->createTemplate($data['id'], $data['template']);
-		}
-		else {
-			unset($data['template']);
-		}
+        // now continue as normal
+        if($data['template']) {
+            $this->createHomepageFromTemplate($data['id'], $data['template']);
+        }
+        else {
+            // we don't want an invalid template ID going into the database
+            unset($data['template']);
+        }
 
 		/* Insert synergetic subject code */
         if (isset($data['code'])) {
@@ -736,6 +735,33 @@ class Category extends DeprecatedModel {
 
         return is_numeric($category['id']) ? $category : false;
     }
+
+
+    /**
+     * This simply copies a bunch of rows, changing 'homepage_template' to 'homepage'...quite simple, really.
+     *
+     * @param $categoryID
+     * @param $templateID
+     */
+    private function createHomepageFromTemplate($categoryID, $templateID) {
+
+        $categoryID = mysql_real_escape_string($categoryID, $this->db->dbf);
+        $templateID = mysql_real_escape_string($templateID, $this->db->dbf);
+
+        $result = $this->db->query("SELECT * FROM `component_instance` WHERE `module` = 'homepage_template' AND `identifier` = $templateID");
+
+        // oldschool mysql functions
+        while($r = mysql_fetch_assoc($result)) {
+            // hack at the data, then flick it back in
+            unset($r['id']);
+            $r['module'] = 'homepage';
+            $r['identifier'] = $categoryID;
+            $keys = implode('`, `', array_keys($r));
+            $values = implode("', '", array_values($r));
+            $this->db->query("INSERT INTO `component_instance` (`$keys`) VALUES ('$values')");
+        }
+    }
+
 }
 
 ?>

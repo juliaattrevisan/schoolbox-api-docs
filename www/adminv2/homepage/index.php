@@ -58,9 +58,11 @@ $this->setBlock('layout', 'position_top', 'position_top_block');
 $this->setBlock('layout', 'position_left', 'position_left_block');
 $this->setBlock('layout', 'position_right', 'position_right_block');
 
-$componentFactory = new Component_Dashboard_Factory(new User, $this);
+$componentFactory = new Component_Homepage_Factory(new User, $this, true);
 
-$componentCollection = $componentFactory->buildComponentList($groupList[0]['id']);
+$cid = $templateList[0]['id'];
+$componentCollection = $componentFactory->buildComponentList($cid);
+
 
 $occupiedPositionList = array();
 
@@ -71,7 +73,14 @@ foreach($componentCollection as $component) {
         $this->setFile($position, 'adminv2/homepage/placeholder.html');
     }
 
+    $component->setup(array(), array());
+    $component->execute();
+    $component->parseConfig();
+
     $this->setVar(array(
+//        'CID'                       => $cid,
+        'COMPONENT_INSTANCE_ID'     => $component->instance->id,
+        'COMPONENT_HANDLE'          => $component->instance->id,
         'component.instance.id'     => $component->instance->id,
         'component.definition.id'   => $component->definition->id,
         'component.definition.name' => $component->definition->name,
