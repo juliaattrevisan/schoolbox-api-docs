@@ -51,7 +51,7 @@ if (is_numeric($_REQUEST['cid'])) {
 		foreach ($_POST['colors'] as $key => $value) {
 			$color[$key] = substr($value, 1);
 		}
-;
+
 		$homepage->saveDisplayProperties($color);
 	}
 	/* Post config options from homepage

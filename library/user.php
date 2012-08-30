@@ -28,7 +28,7 @@ class User extends DeprecatedModel {
     }
 
     function getAllInCategory($categoryID) {
-        $query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email
+        $query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email, synergy_id
 				  FROM user, userAccess
 				  WHERE id = uid AND service = '" . HOMEPAGE_SERVICE . "' AND sid = '" . $categoryID . "' AND type > 0
 				  ORDER BY lastname, firstname";
@@ -36,7 +36,7 @@ class User extends DeprecatedModel {
     }
 
     function getManagers($categoryID) {
-        $query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email FROM user, userAccess
+        $query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email, synergy_id FROM user, userAccess
 		WHERE id = uid AND service = '" . HOMEPAGE_SERVICE . "' AND sid = '" . $categoryID . "' and type in(3,2) ORDER BY lastname, firstname";
         return $this->db->getAll($query);
     }

@@ -1,9 +1,46 @@
 <?php
-$this->setBlock($componentHandle, 'student', 'student_block');
+$this->setBlock($componentHandle, 'person', 'person_block');
 $this->setBlock($componentHandle, 'student_email', 'student_email_block');
-
 $this->setBlock($componentHandle, 'parent', 'parent_block');
 $this->setBlock($componentHandle, 'parent_email', 'parent_email_block');
+
+$this->setBlock('config', 'displayportraits', 'displayportraits_block');
+$this->setBlock('person', 'has_portrait', 'has_portrait_block');
+$this->setBlock('person', 'has_group', 'has_group_block');
+
+$this->setVar('displayportraits_block', '');
+$this->setVar('has_portrait_block', '');
+$this->setVar('has_group_block', '');
+$this->setVar('person_block', '');
+
+/* Display options
+ */
+$allOptions = array(
+	array(
+		'name' => 'Grid',
+		'value' => 'grid',
+		'css' => 'thumb',
+	),
+	array(
+		'name' => 'List',
+		'value' => 'list',
+		'css' => 'bar',
+	),
+);
+
+foreach($allOptions as $currentOption) {
+	$this->setVar(array(
+		'COMPONENT_CONFIG_DISPLAYPORTRAITS_VALUE' => $currentOption['value'],
+		'COMPONENT_CONFIG_DISPLAYPORTRAITS_NAME' => $currentOption['name'],
+		'COMPONENT_CONFIG_DISPLAYPORTRAITS_SELECTED' => $currentOption['value'] == $config['displayPortraits'] ? ' selected="selected"' : '',
+	));
+
+	if ($currentOption['value'] == $config['displayPortraits']) {
+		$chosenStyle = $currentOption;
+	}
+
+	$this->parse('displayportraits_block', 'displayportraits', true);
+}
 
 $categoryHandler = new Category();
 $category = $categoryHandler->getByID($categoryID);
@@ -39,13 +76,30 @@ if (is_array($allStudents)) {
 			}
 
 			$this->setVar(array(
-				'STUDENT_ID' => $user['uid'],
-				'STUDENT_EXTERNAL_ID' => $user['synergy_id'],
-				'STUDENT_NAME' => $name,
-				'ON_OFF' => ++$j%2? '' : 'dark',
+				'PERSON_UID' => $user['uid'],
+				'PERSON_EXTERNAL_ID' => $user['synergy_id'],
+				'PERSON_NAME' => $name,
+				'PERSON_GROUP' => $user['gname'],
+				'LIST_STYLE' => $chosenStyle['css'],
 			));
 
-			$this->parse('student_block', 'student', true);
+			/* Don't display images in list view
+			 */
+			if ($chosenStyle['value'] == 'grid') {
+				$this->parse('has_portrait_block', 'has_portrait');
+				$this->parse('has_group_block', 'has_group');
+			}
+			else {
+				$this->setVar('has_portrait_block', '');
+				$this->setVar('has_group_block', '');
+			}
+
+			$this->parse('person_block', 'person', true);
+
+			/* Clear children after parsing out the parent
+			 */
+			$this->setVar('has_portrait_block', '');
+			$this->setVar('has_group_block', '');
 		}
 	}
 
