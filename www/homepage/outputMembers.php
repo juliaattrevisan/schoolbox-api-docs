@@ -12,12 +12,14 @@ $this->setVar('person_block', '');
 
 /* Display options
  */
+$chosenStyle = array(
+	'name' => 'Grid',
+	'value' => 'grid',
+	'css' => 'thumb',
+);
+
 $allOptions = array(
-	array(
-		'name' => 'Grid',
-		'value' => 'grid',
-		'css' => 'thumb',
-	),
+	$chosenStyle,
 	array(
 		'name' => 'List',
 		'value' => 'list',

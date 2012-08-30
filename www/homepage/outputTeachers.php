@@ -12,12 +12,14 @@ $this->setVar('person_block', '');
 
 /* Display options
  */
+$chosenStyle = array(
+	'name' => 'Grid',
+	'value' => 'grid',
+	'css' => 'thumb',
+);
+
 $allOptions = array(
-	array(
-		'name' => 'Grid',
-		'value' => 'grid',
-		'css' => 'thumb',
-	),
+	$chosenStyle,
 	array(
 		'name' => 'List',
 		'value' => 'list',
@@ -39,9 +41,20 @@ foreach($allOptions as $currentOption) {
 	$this->parse('displayportraits_block', 'displayportraits', true);
 }
 
-if (($code != '') && Cfg::get('external_enable')) {
-	require_once SITE_root.'/library/user.php';
+/* $code can be empty when added for the first time
+ *
+ * Find out what the class code is first from the posted cid
+ */
+if ($code == '') {
+	$categoryHandler = new Category();
 
+	$category = $categoryHandler->getByID($_POST['cid']);
+	$code = $category['code'];
+}
+
+/* Continue normally
+ */
+if (($code != '') && Cfg::get('external_enable')) {
 	$externalClassHandler = new External_Class();
 	$userHandler = new User();
     $groupHandler = new Group();
