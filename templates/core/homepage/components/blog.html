@@ -96,11 +96,15 @@
 				<p>{BLOG_BODY}</p>
 				<div class="comments hide-it">
 					<!-- BEGIN comment -->
-					<div class="box clearfix"> {COMMENT_BODY}
-						<p class="interact">
-							<img src='/portrait?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32' alt="{COMMENT_AUTHOR_NAME}" title="{COMMENT_AUTHOR_NAME}" />
-							{COMMENT_OWNER} | {COMMENT_CREATED} | {DELETE_COMMENT}
-						</p>
+					<div class="box clearfix">
+						<img src='/portrait?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32' alt="{COMMENT_AUTHOR_NAME}" title="{COMMENT_AUTHOR_NAME}" style='margin-right: 16px;'/>
+						<div style='position:relative;top:-32px;left:48px;'>
+							<p>
+								{COMMENT_OWNER}<br />
+								Posted {COMMENT_CREATED} | {DELETE_COMMENT}
+							</p>
+							{COMMENT_BODY}
+						</div>
 					</div>
 					<!-- END comment -->
 
