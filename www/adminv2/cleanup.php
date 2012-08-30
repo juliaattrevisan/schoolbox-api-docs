@@ -25,11 +25,15 @@ class clean {
 		//remove all log entries
 		$this->cleanLoginLog();
 
-		$query = "DELETE FROM homepage_log";
-		$this->db->query($query);
-		print "Homepage last visit records cleaned<br>";
+        $query = "DELETE FROM homepage_log";
+        $this->db->query($query);
+        print "Homepage last visit records cleaned<br>";
 
-		$query = "DELETE FROM submission_log";
+        $query = "DELETE FROM homepage_visits";
+        $this->db->query($query);
+        print "Homepage visit records cleaned<br>";
+
+        $query = "DELETE FROM submission_log";
 		$this->db->query($query);
 		print "Submission system last visit records cleaned<br>";
 	}
