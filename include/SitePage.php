@@ -859,23 +859,22 @@ class SitePage extends Page
                 $target = '';
             }
 
+            $url = new Url($list[$i]['url']);
+
+            if ($url->isLocalUrl()) {
+                $linkUrl = $url->getRelativeURL();
+            } else if ($url->isFTPURL()) {
+                $linkUrl = $url->getUrl();
+            } else {
+                $linkUrl = $url->getBase64EncodedRedirect();
+            }
+
             if (is_array($list[$i]['children'])) {
-
-                $url = new Url($list[$i]['url']);
-
-                $text .= '<li class="parent"><a href="';
-                $text .= $url->isLocalURL() ? $url->getRelativeURL() : $url->getBase64EncodedRedirect();
-                $text .= '"' . $target . '><span>' . $list[$i]['txt'] . '</span></a>';
-
+                $text .= '<li class="parent"><a href="' . $linkUrl . '"' . $target . '><span>' . $list[$i]['txt'] . '</span></a>';
                 $text .= $this->__outputMenu($list[$i]['children'], ($level + 1));
 
             } else {
-
-                $url = new Url($list[$i]['url']);
-
-                $text .= '<li><a href="';
-                $text .= $url->isLocalURL() ? $url->getRelativeURL() : $url->getBase64EncodedRedirect();
-                $text .= '"' . $target . '><span>' . $list[$i]['txt'] . '</span></a>';
+                $text .= '<li><a href="' . $linkUrl . '"' . $target . '><span>' . $list[$i]['txt'] . '</span></a>';
 
             }
             $text .= "</li>\n";

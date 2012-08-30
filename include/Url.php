@@ -9,210 +9,239 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Url {
-	private $url = '';
-	private $useCfg = false;
+class Url
+{
+    private $url = '';
+    private $useCfg = false;
 
     /**
      * @param $url
      * @param bool $useCfg Decouples the class for unit testing
      */
-	public function __construct($url, $useCfg = true) {
-		$this->setUrl(trim($url));
+    public function __construct($url, $useCfg = true)
+    {
+        $this->setUrl(trim($url));
 
-		$this->setUseCfg($useCfg);
+        $this->setUseCfg($useCfg);
 
-		if ($this->getUseCfg()) {
-			$this->setSiteHostname(Cfg::get('site_hostname'));
-			$this->setSiteDomain(Cfg::get('site_domain'));
-			$this->setServerHost($_SERVER['HTTP_HOST']);
-		}
-	}
+        if ($this->getUseCfg()) {
+            $this->setSiteHostname(Cfg::get('site_hostname'));
+            $this->setSiteDomain(Cfg::get('site_domain'));
+            $this->setServerHost($_SERVER['HTTP_HOST']);
+        }
+    }
 
-	/**
-	 * Creates slugs from a string.
-	 * Not sure what the third replacement is supposed to do
-	 *
-	 * @param  $string
-	 * @return string
-	 */
-	public function getSlug() {
-		$pattern[] = '/[^a-zA-Z\d\s\-\+\/]*/';
-		$replace[] = '';
+    /**
+     * Creates slugs from a string.
+     * Not sure what the third replacement is supposed to do
+     *
+     * @param  $string
+     * @return string
+     */
+    public function getSlug()
+    {
+        $pattern[] = '/[^a-zA-Z\d\s\-\+\/]*/';
+        $replace[] = '';
 
-		$pattern[] = '/(\s|-|\/)+/';
-		$replace[] = '-';
+        $pattern[] = '/(\s|-|\/)+/';
+        $replace[] = '-';
 
-		$pattern[] = '/\+/';
-		$replace[] = 'p';
+        $pattern[] = '/\+/';
+        $replace[] = 'p';
 
-		return strtolower(preg_replace($pattern, $replace, $this->getUrl()));
-	}
+        return strtolower(preg_replace($pattern, $replace, $this->getUrl()));
+    }
 
-	/**
-	 * Is this a valid url?
-	 *
-	 * @param  $url
-	 * @return bool
-	 */
-	public function isUrl() {
-		$cmp = @parse_url($this->getUrl());
+    /**
+     * Is this a valid url?
+     *
+     * @param  $url
+     * @return bool
+     */
+    public function isUrl()
+    {
+        $cmp = @parse_url($this->getUrl());
 
-		if (is_array($cmp) && isset($cmp['host'])){
-			return true;
-		}
+        if (is_array($cmp) && isset($cmp['host'])) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Returns true if the url is for a local page
-	 * TODO: can the in_array() be absorbed into the regex to increase efficiency?
-	 * @return int
-	 */
-	public function isLocalURL() {
-		list($hostname, $domain) = explode('.', $this->getServerHost(), 2);
+    /**
+     * Returns true if the url is for a local page
+     * TODO: can the in_array() be absorbed into the regex to increase efficiency?
+     * @return int
+     */
+    public function isLocalURL()
+    {
+        list($hostname, $domain) = explode('.', $this->getServerHost(), 2);
 
         // regex to detemine if absolute path is inside current (sub)domain
-		$pattern = '#^(http(s)?://)(' . preg_quote($hostname) . ')|(' . preg_quote($this->getServerHost()) . ')|('
-                 . preg_quote($this->getSiteHostname()) . '(.' . preg_quote($this->getSiteDomain()) . '))/(.*)?#i';
+        $pattern = '#^(http(s)?://)(' . preg_quote($hostname) . ')|(' . preg_quote($this->getServerHost()) . ')|('
+            . preg_quote($this->getSiteHostname()) . '(.' . preg_quote($this->getSiteDomain()) . '))/(.*)?#i';
 
         // get the first character of the url if it's already a local link
         $lead = substr($this->getUrl(), 0, 1);
 
         // if it's an absolute internal link, or a relative link, anchor or query, return true.
-		return preg_match($pattern, $this->getUrl()) || in_array($lead, array("/", "#", "?"));
-	}
+        return preg_match($pattern, $this->getUrl()) || in_array($lead, array("/", "#", "?"));
+    }
 
-	/**
-	 * Get a relative url variant of $url
-	 *
-	 * @param  $url
-	 * @return mixed
-	 */
-	public function getRelativeURL() {
+    /*
+     * Returns true if url is an ftp link
+     */
+    public function isFTPURL()
+    {
+        if (parse_url($this->getUrl(), PHP_URL_SCHEME) == 'ftp') {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-        list($hostname, $domain) = explode('.',$this->getServerHost(),2);
+    /**
+     * Get a relative url variant of $url
+     *
+     * @param  $url
+     * @return mixed
+     */
+    public function getRelativeURL()
+    {
 
-		/* Takes into account subdomain name e.g. ilearn/ and ilearn.joeys
-		 * (that originally caused the issue with links not being correct)
-		 */
-		$hosts = array(
-			'http://' . $this->getSiteHostname() . '.' . $this->getSiteDomain(),
-			'https://' . $this->getSiteHostname() . '.' . $this->getSiteDomain(),
-			'http://' . $this->getServerHost(),
-			'https://' . $this->getServerHost(),
-			'http://' . $this->getSiteHostname(),
-			'https://' . $this->getSiteHostname(),
-		);
+        list($hostname, $domain) = explode('.', $this->getServerHost(), 2);
 
-		return str_replace($hosts, '', $this->getUrl());
-	}
+        /* Takes into account subdomain name e.g. ilearn/ and ilearn.joeys
+           * (that originally caused the issue with links not being correct)
+           */
+        $hosts = array(
+            'http://' . $this->getSiteHostname() . '.' . $this->getSiteDomain(),
+            'https://' . $this->getSiteHostname() . '.' . $this->getSiteDomain(),
+            'http://' . $this->getServerHost(),
+            'https://' . $this->getServerHost(),
+            'http://' . $this->getSiteHostname(),
+            'https://' . $this->getSiteHostname(),
+        );
 
-	/**
-	 * Get a redirect link with base64 encoded url
-	 *
-	 * @return string
-	 */
-	public function getBase64EncodedRedirect() {
-		return '/redir.php?url=' . base64_encode($this->getUrl());
-	}
+        return str_replace($hosts, '', $this->getUrl());
+    }
 
-	/* Getters/Setters
-	 */
+    /**
+     * Get a redirect link with base64 encoded url
+     *
+     * @return string
+     */
+    public function getBase64EncodedRedirect()
+    {
+        return '/redir.php?url=' . base64_encode($this->getUrl());
+    }
 
-	/**
-	 * Set useCfg. This determines whether to use the Cfg object, or
-	 * alternatively whatever input params you want
-	 *
-	 * @param  $val
-	 * @return void
-	 */
-	public function setUseCfg($val) {
-		$this->useCfg = $val;
-	}
+    /* Getters/Setters
+      */
 
-	/**
-	 * Get useCfg
-	 *
-	 * @return bool
-	 */
-	private function getUseCfg() {
-		return $this->useCfg;
-	}
+    /**
+     * Set useCfg. This determines whether to use the Cfg object, or
+     * alternatively whatever input params you want
+     *
+     * @param  $val
+     * @return void
+     */
+    public function setUseCfg($val)
+    {
+        $this->useCfg = $val;
+    }
 
-	/**
-	 * Set url to work on
-	 *
-	 * @param  $val
-	 * @return void
-	 */
-	private function setUrl($val) {
-		$this->url = $val;
-	}
+    /**
+     * Get useCfg
+     *
+     * @return bool
+     */
+    private function getUseCfg()
+    {
+        return $this->useCfg;
+    }
 
-	/**
-	 * Get url
-	 *
-	 * @return string
-	 */
-	private function getUrl() {
-		return $this->url;
-	}
+    /**
+     * Set url to work on
+     *
+     * @param  $val
+     * @return void
+     */
+    private function setUrl($val)
+    {
+        $this->url = $val;
+    }
 
-	/**
-	 * Set site hostname
-	 *
-	 * @param  $val
-	 * @return void
-	 */
-	public function setSiteHostname($val) {
-		$this->siteHostname = $val;
-	}
+    /**
+     * Get url
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
 
-	/**
-	 * Get site hostname
-	 *
-	 * @return
-	 */
-	private function getSiteHostname() {
-		return $this->siteHostname;
-	}
+    /**
+     * Set site hostname
+     *
+     * @param  $val
+     * @return void
+     */
+    public function setSiteHostname($val)
+    {
+        $this->siteHostname = $val;
+    }
 
-	/**
-	 * Set site domain
-	 *
-	 * @param  $val
-	 * @return void
-	 */
-	public function setSiteDomain($val) {
-		$this->siteDomain = $val;
-	}
+    /**
+     * Get site hostname
+     *
+     * @return
+     */
+    private function getSiteHostname()
+    {
+        return $this->siteHostname;
+    }
 
-	/**
-	 * Get site domain
-	 *
-	 * @return
-	 */
-	private function getSiteDomain() {
-		return $this->siteDomain;
-	}
+    /**
+     * Set site domain
+     *
+     * @param  $val
+     * @return void
+     */
+    public function setSiteDomain($val)
+    {
+        $this->siteDomain = $val;
+    }
 
-	/**
-	 * Set server host ($_SERVER['HTTP_HOST'])
-	 * @param  $val
-	 * @return void
-	 */
-	public function setServerHost($val) {
-		$this->serverHost = $val;
-	}
+    /**
+     * Get site domain
+     *
+     * @return
+     */
+    private function getSiteDomain()
+    {
+        return $this->siteDomain;
+    }
 
-	/**
-	 * Get server host
-	 *
-	 * @return
-	 */
-	private function getServerHost() {
-		return $this->serverHost;
-	}
+    /**
+     * Set server host ($_SERVER['HTTP_HOST'])
+     * @param  $val
+     * @return void
+     */
+    public function setServerHost($val)
+    {
+        $this->serverHost = $val;
+    }
+
+    /**
+     * Get server host
+     *
+     * @return
+     */
+    private function getServerHost()
+    {
+        return $this->serverHost;
+    }
 }

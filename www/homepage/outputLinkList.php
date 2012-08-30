@@ -57,6 +57,9 @@ if (is_array($linkList)) {
         if ($url->isLocalUrl()) {
             $linkUrl = $url->getRelativeURL();
             $linkTarget = '';
+        } else if ($url->isFTPURL()) {
+            $linkUrl = $url->getUrl();
+            $linkTarget = 'external';
         } else {
             $linkUrl = $url->getBase64EncodedRedirect();
             $linkTarget = 'external';

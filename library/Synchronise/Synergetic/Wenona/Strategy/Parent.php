@@ -9,14 +9,16 @@
  * @shamelessly_pilfered_from <steve.chan@alaress.com.au>
  */
 
-class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synergetic_Wenona_Strategy_Abstract {
+class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synergetic_Wenona_Strategy_Abstract
+{
 
     /**
      * Get a list of users' Synergy IDs to sync
      *
      * @return void
      */
-    public function generateList() {
+    public function generateList()
+    {
         // custom query provided by Wenona
         $mssqlDB = new MSSQL();
         $sql = 'SELECT * FROM SynergyOne.dbo.uvCurrentAndNearFutureParents';
@@ -32,47 +34,50 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
      * @param  $currentUser
      * @return array
      */
-    public function setupUserDetails($currentUser) {
+    public function setupUserDetails($currentUser)
+    {
         $newUser = array();
+
+
+        $parent = $this->getExternalUserHandler()->getParent($currentUser['DatabaseID']);
+
 
         // Login details
         $newUser['username'] = $currentUser['Login'];
-     // $newUser['password'] = "abc123";
+        // $newUser['password'] = "abc123";
 
         // User details
         $newUser['synergy_id'] = $currentUser['DatabaseID'];
-        $newUser['title']      = substr($currentUser['Description'], 0, strpos($currentUser['Description'], ' '));
-        $newUser['firstname']  = $currentUser['Given'];
-        $newUser['lastname']   = $currentUser['Surname'];
-        $newUser['alt_email']  = ''; // not mapped
+        $newUser['title'] = substr($currentUser['Description'], 0, strpos($currentUser['Description'], ' '));
+        $newUser['firstname'] = $currentUser['Given'];
+        $newUser['lastname'] = $currentUser['Surname'];
+        $newUser['alt_email'] = $parent['Email']; // not mapped
 
         // the view inverts the boolean campus flags for some reason
         $campus = array();
-        if(!$currentUser['FutureStudent']) {
-            if(!$currentUser['SeniorSchoolStudent']) {
+        if (!$currentUser['FutureStudent']) {
+            if (!$currentUser['SeniorSchoolStudent']) {
                 $campus[] = 1;
             }
-            if(!$currentUser['JuniorSchoolStudent']) {
+            if (!$currentUser['JuniorSchoolStudent']) {
                 $campus[] = 2;
             }
-            if(!$currentUser['MiddleSchoolStudent']) {
+            if (!$currentUser['MiddleSchoolStudent']) {
                 $campus[] = 3;
             }
             $newUser['defaultCampus'] = $campus[0];
-        }
-        else {
+        } else {
             $newUser['defaultCampus'] = 0;
         }
 
         // get WPA associations
         $newUser['WPA'] = array();
 
-        for($i = 0; $i < 13; $i++) {
-            if($currentUser["Year{$i}Student"]) {
-                if($i == 0) {
+        for ($i = 0; $i < 13; $i++) {
+            if ($currentUser["Year{$i}Student"]) {
+                if ($i == 0) {
                     $newUser['WPA'][] = "Year Kindergarten Wenona Parents Association";
-                }
-                else {
+                } else {
                     $newUser['WPA'][] = sprintf("Year %02d Wenona Parents Association", $i);
                 }
             }
@@ -94,7 +99,8 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
      *
      * @return void
      */
-    public function createIfExists() {
+    public function createIfExists()
+    {
         $previousUser = null;
         $compiledCampus = array();
 
@@ -106,13 +112,13 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
         $result = $db->getAll("SELECT `id`, `name` FROM `category` WHERE `name` LIKE '%Wenona Parents%'");
         $wpaCats = array();
         // index by name, not id
-        foreach($result as $r) {
+        foreach ($result as $r) {
             $wpaCats[$r['name']] = $r['id'];
         }
 
         $this->getVerboseFilter()->intro();
 
-        foreach($this->getList() as $currentUser) {
+        foreach ($this->getList() as $currentUser) {
             $newUser = $this->setupUserDetails($currentUser);
 
             /* First iteration
@@ -123,8 +129,7 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
                 }
 
                 $previousUser = $newUser;
-            }
-            /* Previous was different person to Current
+            } /* Previous was different person to Current
                 */
             else if ($previousUser['username'] != $newUser['username']) {
                 $previousUser['campus'] = $compiledCampus;
@@ -138,12 +143,11 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
                 $this->executeCreateUpdate($previousUser);
 
                 // map parents into their WPA categories
-                foreach($previousUser['WPA'] as $wpa) {
+                foreach ($previousUser['WPA'] as $wpa) {
                     if ($this->getPerformUpdate() === true) {
                         echo "^  Adding parent to $wpa\n";
                         $groupHandler->addUser($wpaCats[$wpa], $previousUser['id']);
-                    }
-                    else {
+                    } else {
                         echo "^  Planning to add parent to $wpa\n";
                     }
                 }
@@ -153,8 +157,7 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
                 $compiledCampus = $newUser['campus'];
 
                 $previousUser = $newUser;
-            }
-            /* They are the same person
+            } /* They are the same person
                 */
             else {
                 $compiledCampus = array_merge($compiledCampus, $newUser['campus']);
@@ -168,10 +171,10 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
             "SELECT `id`, `username`
              FROM `user`
              WHERE (`password` = '' OR `password` IS NULL)
-             AND `group_id` = ".self::PARENT_GROUP_ID
+             AND `group_id` = " . self::PARENT_GROUP_ID
         );
 
-        if(is_array($users) && count($users)) {
+        if (is_array($users) && count($users)) {
             $output = '/tmp/ppw.csv';
             $fp = fopen($output, 'w');
             fputcsv($fp, array('login', 'password'));
@@ -179,12 +182,11 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
             foreach ($users as $user) {
                 // plaintext generation needs to be stored: randomly 3 letters, 4 numbers
                 $pw = '';
-                for($i = 0; $i < 7; $i++) {
+                for ($i = 0; $i < 7; $i++) {
                     $rnd = rand(97, 122);
-                    if($i < 3) {
+                    if ($i < 3) {
                         $pw .= chr($rnd);
-                    }
-                    else {
+                    } else {
                         $pw .= $rnd % 10;
                     }
                 }
