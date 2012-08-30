@@ -11,6 +11,9 @@
 		$linkHandler = new Link;
 		$link = $linkHandler->getByID($_GET['id']);
 		$url = $link['url'];
+        if($link) {
+            $linkHandler->logAction($_GET['id'], 'access');
+        }
 	}
 	
 	if (!empty($url)) {

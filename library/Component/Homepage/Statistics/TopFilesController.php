@@ -1,0 +1,71 @@
+<?php
+/**
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+class Component_Homepage_Statistics_TopFilesController extends Component_Homepage_Statistics_ControllerAbstract {
+
+    private $files;
+
+    public function execute() {
+
+        $dateFilter = '';
+        if(count($this->dateRange)) {
+            $dateFilter = sprintf("AND time BETWEEN '%s' AND '%s'",date('Y-m-d', $this->dateRange[0]), date('Y-m-d', $this->dateRange[1]));
+        }
+
+        $stmt = Database::getInstance()->prepare("
+            SELECT f.id, f.`realname`, f.submitted, f.file_size, COUNT(f.id) AS `count` FROM cmsLog cl
+            LEFT JOIN `file` f ON cl.`objectId` = f.id AND cl.`object` = 'file'
+            WHERE f.id IS NOT NULL
+            AND f.`category` = :cid
+            -- AND `action` = 'modify'
+            $dateFilter
+            GROUP BY f.id
+            ORDER BY `count` DESC"
+        );
+
+        $stmt->execute(array('cid' => $this->getContext('id')));
+
+        $i = 0;
+        while($link = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $this->files[$i] = $link;
+            $this->files[$i]['progress'] = (int)$this->files[$i]['count'] / $this->files[0]['count'] * 100;
+            ++$i;
+        }
+
+        return true;
+    }
+
+    public function renderTemplate($templateHandle) {
+        if(!parent::loadTemplate($templateHandle, 'topFiles')) {
+            return false;
+        }
+
+        $this->setBlock($templateHandle, 'top_file','top_file_block');
+
+        if(count($this->files)) {
+            for($i = 0; $i < 5 && $i < count($this->files); ++$i) {
+                $rel = new Alaress_Date_Relative($this->files[$i]['submitted']);
+                $this->setVar(array(
+                    'FILE_ID'       => $this->files[$i]['id'],
+                    'FILE_THUMB'    => '/images/mime/60x60/msexcel_xls.png',
+                    'FILE_NAME'     => $this->files[$i]['realname'],
+                    'FILE_SIZE'     => Alaress_Byte_Format::bytesToString($this->files[$i]['file_size']),
+                    'FILE_DATE'     => $rel->getLong(),
+                    'FILE_PROGRESS' => $this->files[$i]['progress']
+                ));
+                $this->parse('top_file_block','top_file',true);
+            }
+        }
+        else {
+            $this->setVar('top_file_block', '<p>No files viewed.</p>');
+        }
+
+        return true;
+    }
+
+}

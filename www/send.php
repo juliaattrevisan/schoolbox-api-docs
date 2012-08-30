@@ -19,13 +19,13 @@ if(is_numeric($_GET['id']))
 
 
 	if(isset($_GET['myFile'])) {
-
 		if (Cfg::get('webdav_enable')) {
 			require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
 			$fileHandler = PortfolioWebDAV::factory();
 			$filename = $fileHandler->getFile($_GET['id']);
 			$file['realname'] = substr($_SESSION['portfolioIdPathMap'][$_GET['id']], strrpos($_SESSION['portfolioIdPathMap'][$_GET['id']], '/') + 1);
-		} else {
+		}
+        else {
 			require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
 
 			$myFileHandler = new MyFile;
@@ -47,30 +47,29 @@ if(is_numeric($_GET['id']))
 
 			$filename = Cfg::get('myfile_dir') ."/". $file['id'] . ".dat";
 		}
-
-
 	}
-        else if(isset($_GET['folder'])){
+    elseif(isset($_GET['folder'])) {
 
-            if($groupHandler->getPermission($_GET['id']) < READ_ACCESS)
-                error(5);
+        if($groupHandler->getPermission($_GET['id']) < READ_ACCESS)
+            error(5);
 
-            require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
 
-            $config = array('sort'  => 'Date',
-                            'sortdir' => 'DESC',
-                            'size'  => 1,
-                            );
+        $config = array(
+            'sort'    => 'Date',
+            'sortdir' => 'DESC',
+            'size'    => 1,
+        );
 
-            $fileHandler = new File;
-            $file = $fileHandler->getAllInCategory($_GET['id']);
-            $file = $file[0];
+        $fileHandler = new File;
+        $file = $fileHandler->getAllInCategory($_GET['id']);
+        $file = $file[0];
 
-            if(!is_array($file))
-                error(41);
+        if(!is_array($file))
+            error(41);
 
-            $filename = Cfg::get('file_dir') ."/". $file['id'] . ".dat";
-        }
+        $filename = Cfg::get('file_dir') ."/". $file['id'] . ".dat";
+    }
 	else {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
 
@@ -83,6 +82,8 @@ if(is_numeric($_GET['id']))
 			error(5);
 
 		$filename = Cfg::get('file_dir') ."/". $_GET['id'] . ".dat";
+
+        $fileHandler->logAction($_GET['id'], 'access');
 
 	}
 

@@ -1,0 +1,91 @@
+<!-- BEGIN custom_head -->
+<style type="text/css">
+.navigator {
+    border: solid 1px #eee;
+    border-radius: 4px;
+    background: #FAF9F5;
+    height: 40px;
+}
+.navigator .star-rating {
+    margin: 10px 0 0 10px;
+    float: left;
+    position: relative;
+}
+.star-rating .star {
+    display: block;
+    width: 21px;
+    height: 20px;
+    float:left;
+    background: url("/images/core/icons/star.png");
+}
+.star-rating .star.mask {
+    background-position: top left;
+}
+.star-rating .star.on {
+    background-position: bottom left;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-repeat: repeat-x;
+}
+.star-rating .star.off {
+    background-position: top left;
+}
+.navigator .totheright {
+    float: right;
+    margin-top: 6px;
+    margin-right: 75px;
+}
+.navigator .totheright label {
+    margin: 0 8px 0 4px;
+    display: inline;
+}
+.navigator .totheright select {
+    border: solid 1px #DEDEDE;
+    background: #FDFDFD;
+    padding: 2px;
+}
+.totheright .btn {
+    position: absolute;
+    top: 9px;
+    right: 9px;
+    padding: 0 8px;
+    line-height: 24px;
+    height: 24px;
+    margin: 0;
+}
+</style>
+<!-- END custom_head -->
+<div class="navigator">
+  <div class="star-rating" title="{RATING}">
+      <!-- BEGIN star -->
+      <span class="star mask"></span>
+      <!-- END star -->
+      <span class="star on" style="width:{STAR_WIDTH}%"></span>
+  </div>
+  <form class="totheright" method="GET" action="/statistics/homepage/{ID}">
+      <label for="date_start">
+          <select id="date_start" name="date_start">
+              <!-- BEGIN date_start_option -->
+              <option value="{DATE_START_VALUE}"{DATE_START_SELECTED}>{DATE_START_NAME}</option>
+              <!-- END date_start_option -->
+          </select>
+      </label>
+      <label for="date_end">to
+          <select id="date_end" name="date_end">
+              <!-- BEGIN date_end_option -->
+              <option value="{DATE_END_VALUE}"{DATE_END_SELECTED}>{DATE_END_NAME}</option>
+              <!-- END date_end_option -->
+          </select>
+      </label>
+      <label for="drop">
+      <select id="drop" name="drop">
+        <!-- BEGIN drop_option -->
+        <option value="{DROP_VALUE}"{DROP_SELECTED}>{DROP_NAME}</option>
+        <!-- END drop_option -->
+      </select>
+    </label>
+      <input class="btn" type="submit" value="Update"/>
+  </form>
+  <div class="clearfix"></div>
+</div>
