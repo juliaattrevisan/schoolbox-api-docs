@@ -139,6 +139,22 @@ class Category extends DeprecatedModel {
 	}
 
 	function logPageView($categoryID) {
+        // new mechanism for storing pageviews
+        // the use of NOW() generates a truncation warning (non-fatal and non-critical) since a datetime is being
+        // shoved into a date field, but it can be safely ignored: the data inserts correctly
+        $stmt = Database::getInstance()->prepare("
+            INSERT INTO homepage_visits (`date`, `user_group_id`, `category_id`)
+            VALUES (NOW(), :gid, :cid)
+            ON DUPLICATE KEY
+            UPDATE `hitcount` = `hitcount` + 1"
+        );
+
+        $stmt->execute(array(
+            'cid' => $categoryID,
+            'gid' => $_SESSION['gid']
+        ));
+
+        // old mechanism for storing pageviews - will use both in tandem for the time being
 		$query = "SELECT datetime FROM homepage_log WHERE cid = '". $categoryID. "' AND user = '".$_SESSION['id']."'";
 		$this->db->query($query);
 
