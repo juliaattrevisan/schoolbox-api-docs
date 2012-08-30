@@ -109,16 +109,21 @@ if (is_array($allStudents)) {
 
 	/* Student bulk email
 	 */
-	$this->setVar(array(
-		'REPLY_TO' => $emailHandler->formatEmailFromArray($_SESSION),
-		'EMAIL_ALL_STUDENTS' => $emailAllStudents,
-	));
+	if ($groupHandler->isStaff()) {
+		$this->setVar(array(
+			'REPLY_TO' => $emailHandler->formatEmailFromArray($_SESSION),
+			'EMAIL_ALL_STUDENTS' => $emailAllStudents,
+		));
 
-	$this->parse('student_email_block', 'student_email');
+		$this->parse('student_email_block', 'student_email');
+	}
+	else {
+		$this->setVar('student_email_block', '');
+	}
 
 	/* Parent bulk email
 	 */
-	if (count($synergyIds)) {
+	if (count($synergyIds) && $groupHandler->isStaff()) {
 		$allParentEmails = array();
 		$allSynergyIds = implode(',', $synergyIds);
 
@@ -145,6 +150,9 @@ if (is_array($allStudents)) {
 		));
 
 		$this->parse('parent_email_block', 'parent_email');
+	}
+	else {
+		$this->setVar('parent_email_block', '');
 	}
 }
 else {

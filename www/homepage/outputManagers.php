@@ -86,9 +86,16 @@ if (is_array($managerList)) {
 		$this->setVar('has_group_block', '');
 	}
 
-	$this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
-	$this->setVar("EMAILALL", $emailall);
-	$this->parse("member_email_block", "member_email");
+	/* Student bulk email
+	 */
+	if ($groupHandler->isStaff()) {
+		$this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
+		$this->setVar("EMAILALL", $emailall);
+		$this->parse("member_email_block", "member_email");
+	}
+	else {
+		$this->setVar('member_email_block', '');
+	}
 }
 else {
 	$this->setVar("person_block", "");
