@@ -46,7 +46,7 @@ if ($this->arg[0] == 'revision') {
 		'WIKI_ID' => $wiki['wikiID'],
 		'CATEGORY_ID' => $wiki['categoryID'],
 		'HEADING' => Scrub::text($wiki['heading']),
-		'BODY' => $wikiHandler->activateStubLinks($wiki['body']),
+		'BODY' => Scrub::html($wikiHandler->activateStubLinks($wiki['body'])),
 		'MODIFIED' => $modifiedDate->getLong(),
 		'AUTHOR' => $userHandler->formatName($wiki),
 		'AUTHOR_ID' => $wiki['authorID'],
