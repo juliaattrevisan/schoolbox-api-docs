@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  *
  */
-$this->setFile(TEMPLATE_content, 'hpage/index.html');
+$this->setFile(TEMPLATE_content, 'homepage/index.html');
 
 $groupID = $_SESSION['gid'];
 $catHandler = new Category();
