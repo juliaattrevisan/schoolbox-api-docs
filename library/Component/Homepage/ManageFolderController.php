@@ -69,6 +69,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
         $this->setBlock($templateHandle, 'subscribed', 'subscribed_block');
         $this->setBlock($templateHandle, 'subscribedModerated', 'subscribedModerated_block');
         $this->setBlock($templateHandle, 'unsubscribed', 'unsubscribed_block');
+        $this->setBlock($templateHandle, 'view_stats', 'view_stats_block');
 
         $this->setVar('subscribed_block', '');
         $this->setVar('subscribedModerated_block', '');
@@ -96,6 +97,14 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
         else if ($this->groupHandler->canSubscribe($this->getContext('id'))) {
             $this->parse('unsubscribed_block', 'unsubscribed');
         }
+
+        if($this->groupHandler->isSuperuser() || $this->groupHandler->isStaff()) {
+            $this->parse('view_stats_block','view_stats');
+        }
+        else {
+            $this->setVar('view_stats_block', '');
+        }
+
 
         return true; // everything went according to plan
 
