@@ -129,6 +129,10 @@ abstract class Evaluation_Section extends DeprecatedModel {
 	/**
 	 * Get a list of questions for a particular attempt and section
 	 *
+	 * If random was selected for this section, get the order in which
+	 * the randomised questions were chosen; otherwise use the question
+	 * sequence for ordering
+	 *
 	 * @param  $attempt_id
 	 * @param  $section_id
 	 * @return array|bool
@@ -143,10 +147,11 @@ abstract class Evaluation_Section extends DeprecatedModel {
                       assess_question.question
                   FROM assess_response
                   LEFT JOIN assess_question ON assess_response.question_id = assess_question.question_id
+                  LEFT JOIN assess_section ON assess_question.section_id = assess_section.section_id
                   WHERE assess_response.attempt_id = '$attempt_id'
                   AND assess_response.section_id = '$section_id'
                   AND assess_question.deleted_at IS NULL
-                  ORDER BY assess_question.sequence";
+                  ORDER BY IF(assess_section.random = '1', assess_response.response_id, assess_question.sequence)";
 
         return $this->db->getAll($query);
     }

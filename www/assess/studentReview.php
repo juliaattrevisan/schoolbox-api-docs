@@ -93,6 +93,8 @@ $this->setVar(array(
 $allQuestions = $sectionHandler->getQuestions($_SESSION['attempt_id'], $section['section_id']);
 
 if ($allQuestions) {
+	$randomQuestionNumber = 1;
+
     foreach($allQuestions as $currentQuestion) {
         $answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
 
@@ -111,6 +113,14 @@ if ($allQuestions) {
             'QUESTION_QUESTION' => $currentQuestion['question'],
             'QUESTION_MARKS' => $currentQuestion['marks'],
         ));
+
+		/* If this is a randomised section, number each question incrementally
+		 */
+		if ($section['random'] == 1) {
+			$this->setVar(array(
+				'QUESTION_SEQUENCE' => $randomQuestionNumber
+			));
+		}
 
         /* Load individual answers
          */

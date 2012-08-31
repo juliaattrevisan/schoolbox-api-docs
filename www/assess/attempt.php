@@ -163,6 +163,8 @@ $allQuestions = $sectionHandler->getQuestions($_SESSION['attempt_id'], $section[
 /* Process questions now that we've got a list of 'em
  */
 if ($allQuestions) {
+	$randomQuestionNumber = 1;
+
     foreach($allQuestions as $currentQuestion) {
         if (!is_numeric($currentQuestion['type_id'])) {
             error(133);
@@ -187,6 +189,16 @@ if ($allQuestions) {
             'QUESTION_QUESTION' => $currentQuestion['question'],
             'QUESTION_MARKS' => $currentQuestion['marks'],
         ));
+
+		/* If this is a randomised section, number each question incrementally
+		 */
+		if ($section['random'] == 1) {
+			$this->setVar(array(
+				'QUESTION_SEQUENCE' => $randomQuestionNumber
+			));
+		}
+
+		$randomQuestionNumber++;
 
         /* Load individual answers
          */
