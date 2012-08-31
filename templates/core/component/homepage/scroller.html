@@ -1,37 +1,32 @@
-<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript" src="/javascript/jquery.cycle.js"></script>
+<script type="text/javascript" src="/javascript/jquery.imagesloaded.js"></script>
 <script type="text/javascript">
-$j(function () {
-    if ($j('#image-scroller-{COMPONENT_INSTANCE_ID} img').length > 1) {
-        $j('#image-scroller-{COMPONENT_INSTANCE_ID}').delay(2000).cycle({
-            timeout: {COMPONENT_CONFIG_TIMING_VALUE_MS},
-            cleartype: true,
-            after: function(curr) {
-                var append = $j(this).attr('alt');
-                $j('#caption-holder-{COMPONENT_INSTANCE_ID}').text(append);
-            }
+    $j(function () {
+        $j('.slideshow-cycle img').imagesLoaded(function (images) {
+            $j('#galleryCycle').cycle({
+                timeout:{COMPONENT_CONFIG_TIMING_VALUE_MS},
+                cleartype:true
+            });
         });
-    }
-    else {
-        var append = $j('#image-scroller-{COMPONENT_INSTANCE_ID} img').attr('alt');
-        $j('#caption-holder-{COMPONENT_INSTANCE_ID}').text(append);
-    }
-});
+    });
+
 </script>
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
     <div id="galleryCycle" class="box clearfix">
-        <div id='image-scroller-{COMPONENT_INSTANCE_ID}' class="cycle-content">
-            <!-- BEGIN image -->
-            <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" alt="{IMAGE_NAME}"/>
-            <!-- END image -->
+        <!-- BEGIN image -->
+        <div class="slideshow-cycle">
+            <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}"
+                 alt="{IMAGE_NAME}"/>
+            <!-- BEGIN show_caption -->
+            <div class="caption-holder">{IMAGE_NAME}</div>
+            <!-- END show_caption -->
         </div>
-        <!-- BEGIN show_caption -->
-        <div id='caption-holder-{COMPONENT_INSTANCE_ID}' class="caption-holder"></div>
-        <!-- END show_caption -->
+        <!-- END image -->
     </div>
     <!-- BEGIN submit_image -->
-    <p class="interact clearfix"><a href="/cms/file/multi/{IMAGESCROLLER_CATEGORY_ID}" class="btn up-arrow"><span></span>Post Images</a></p>
+    <p class="interact clearfix"><a href="/cms/file/multi/{IMAGESCROLLER_CATEGORY_ID}"
+                                    class="btn up-arrow"><span></span>Post Images</a></p>
     <!-- END submit_image -->
 </div>

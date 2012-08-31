@@ -6,7 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_ScrollerController extends Component_Homepage_ControllerAbstract {
+class Component_Homepage_ScrollerController extends Component_Homepage_ControllerAbstract
+{
 
     /**
      * @var Group
@@ -33,7 +34,8 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
      *
      * @return void
      */
-    public function execute() {
+    public function execute()
+    {
         $this->groupHandler = new Group();
         $this->fileHandler = new File();
 
@@ -51,18 +53,19 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'scroller')) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, 'scroller')) {
             return false;
         }
         $this->parseConfig();
 
         $this->setBlock($templateHandle, 'image', 'image_block');
-        $this->setBlock($templateHandle, 'show_caption', 'show_caption_block');
+        $this->setBlock('image', 'show_caption', 'show_caption_block');
         $this->setBlock($templateHandle, 'submit_image', 'submit_image_block');
 
         // Make sure there a config option
-        $pixel = $this->getConfig('pixel') ? $this->getConfig('pixel') : 222;
+        $pixel = $this->getConfig('pixel') ? $this->getConfig('pixel') : 200;
 
         $this->setVar(array(
             'COMPONENT_PIXEL' => $pixel,
@@ -86,30 +89,28 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         // Controls such as Post Images
         if ($this->permission < WRITE_ACCESS) {
             $this->setVar("submit_image_block", "");
-        }
-        else {
+        } else {
             $this->parse("submit_image_block", "submit_image");
         }
 
         // Iterate
         if (is_array($allFiles)) {
-            foreach($allFiles as $currentFile) {
+            foreach ($allFiles as $currentFile) {
                 $this->setVar(array(
                     'IMAGE_ID' => $currentFile['id'],
                     'IMAGE_NAME' => $currentFile['description'],
                     'IMAGE_DIMENSION' => $pixel
                 ));
 
+                // Display captions
+                if ($this->getConfig('captionState') == 'Active') {
+                    $this->parse('show_caption_block', 'show_caption');
+                } else {
+                    $this->setVar('show_caption_block', '');
+                }
+
                 $this->parse('image_block', 'image', true);
             }
-        }
-
-        // Display captions
-        if ($this->getConfig('captionState') == 'Active') {
-            $this->parse('show_caption_block', 'show_caption');
-        }
-        else {
-            $this->setVar('show_caption_block', '');
         }
 
         return true; // everything went according to plan
