@@ -35,6 +35,9 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
             }
 
             $answer['answer'] = serialize($answer['answer']);
+
+            // only important on an update but we want to make sure we dont delete anything if there is no answers
+            $this->db->delete($this->_table, 'question_id', $question_id);
         }
         $answer_id = parent::create($answer);
 
@@ -54,7 +57,6 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
      */
     public function update($object)
     {
-        $this->db->delete($this->_table, 'question_id', $question_id);
         $this->create($object, $question_id);
     }
 
