@@ -9,29 +9,33 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-abstract class Evaluation_Answer_Match extends Evaluation_Answer {
+abstract class Evaluation_Answer_Match extends Evaluation_Answer
+{
     protected $correctClass = 'matchCorrect';
-	protected $incorrectClass = 'matchIncorrect';
+    protected $incorrectClass = 'matchIncorrect';
 
-	/**
+    /**
      * Creates an Answer. This is used when creating Questions and Answers in
      * the setup phase.
-	 *
-	 * @param  $object
-	 * @param  $question_id
-	 * @return bool|int
-	 */
-    public function create($object, $question_id) {
+     *
+     * @param  $object
+     * @param  $question_id
+     * @return bool|int
+     */
+    public function create($object, $question_id)
+    {
         $answer = array_intersect_key($object, array_flip($this->allowedFields));
         $answer['question_id'] = $question_id;
         $answer['sequence'] = 1;
 
-        foreach(json_decode($object['allAnswers']) as $currentAnswer) {
-            $answer['answer'][] = $currentAnswer;
-            $answer['sequence']++;
-        }
+        if (isset($object['allAnswers']) && $object['allAnswers'] != '') {
+            foreach (json_decode($object['allAnswers']) as $currentAnswer) {
+                $answer['answer'][] = $currentAnswer;
+                $answer['sequence']++;
+            }
 
-        $answer['answer'] = serialize($answer['answer']);
+            $answer['answer'] = serialize($answer['answer']);
+        }
 
         $answer_id = parent::create($answer);
 
@@ -42,31 +46,30 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
         return $answer_id;
     }
 
-	/**
-	 * Updates an existing Answer.
-	 *
-	 * @param  $object
-	 * @return void
-	 */
-    public function update($object) {
-        $query = "DELETE FROM {$this->_table}
-                  WHERE question_id = '$object[question_id]'";
-
-        $this->db->query($query);
+    /**
+     * Updates an existing Answer.
+     *
+     * @param  $object
+     * @return void
+     */
+    public function update($object)
+    {
+        $this->db->delete($this->_table, 'question_id', $question_id);
 
         $this->create($object, $object['question_id']);
     }
 
-	/**
+    /**
      * Renders answers when editing a Question. If a question_id was provided,
      * load its existing answers and populate fields; otherwise empty them or
      * set to other default values.
-	 *
-	 * @param  $page
-	 * @param string $question_id
-	 * @return void
-	 */
-    public function modify($page, $question_id = '') {
+     *
+     * @param  $page
+     * @param string $question_id
+     * @return void
+     */
+    public function modify($page, $question_id = '')
+    {
         if (is_numeric($question_id)) {
             $answerGroup = parent::getForQuestion($question_id);
 
@@ -77,7 +80,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
             if ($answerGroup) {
                 $allAnswers = unserialize($answerGroup['answer']);
 
-                foreach($allAnswers as $currentAnswer) {
+                foreach ($allAnswers as $currentAnswer) {
                     $page->setVar(array(
                         'ANSWER_LEFT_VALUE' => $currentAnswer->answerLeft,
                         'ANSWER_RIGHT_VALUE' => $currentAnswer->answerRight,
@@ -85,25 +88,25 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
 
                     $page->parse('answerOption_block', 'answerOption', true);
                 }
-            }
-            else {
+            } else {
                 $page->setVar('answerOption_block', '');
             }
         }
     }
 
-	/**
+    /**
      * Resets answer tokens so a user can fill them in while actually taking
      * the test.
      *
      * TODO: If a response for the current user and attempt already exists,
      * prefill it.
-	 *
-	 * @param  $page
-	 * @param  $question_id
-	 * @return void
-	 */
-    public function prepareResponse($page, $question_id) {
+     *
+     * @param  $page
+     * @param  $question_id
+     * @return void
+     */
+    public function prepareResponse($page, $question_id)
+    {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         /* Define special blocks to handle this special answerOptions scenario,
@@ -130,8 +133,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
 
             if ($existing['response']) {
                 $right = unserialize($existing['response']);
-            }
-            else {
+            } else {
 
                 /* Randomize right-side. Do this multiple times because it's not
                  * very random after one shuffle for some reason
@@ -141,7 +143,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
                 shuffle($right);
             }
 
-            for ($i=0; $i<$answerCount; $i++) {
+            for ($i = 0; $i < $answerCount; $i++) {
                 $page->setVar(array(
                     'ANSWER_LEFT_VALUE' => $left[$i],
                     'ANSWER_RIGHT_VALUE' => $right[$i],
@@ -159,41 +161,44 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
         ));
     }
 
-	/**
-	 * Clear child blocks after parsing out the parent. Keep this in its own
-	 * method for polymorphic algorithm
-	 *
-	 * @param  $page
-	 * @return void
-	 */
-	public function cleanupParse($page) {
-		$page->setVar('answerOptionLeft_block', '');
-		$page->setVar('answerOptionRight_block', '');
-	}
+    /**
+     * Clear child blocks after parsing out the parent. Keep this in its own
+     * method for polymorphic algorithm
+     *
+     * @param  $page
+     * @return void
+     */
+    public function cleanupParse($page)
+    {
+        $page->setVar('answerOptionLeft_block', '');
+        $page->setVar('answerOptionRight_block', '');
+    }
 
-	/**
-	 * Saves a response for this Answer type. This should be customised based on
-	 * the format and structure of the answer (e.g. serialize multichoice)
-	 *
-	 * @param  $data
-	 *
-	 * @return array
-	 */
-    public function saveResponse($data) {
+    /**
+     * Saves a response for this Answer type. This should be customised based on
+     * the format and structure of the answer (e.g. serialize multichoice)
+     *
+     * @param  $data
+     *
+     * @return array
+     */
+    public function saveResponse($data)
+    {
         $processedResponse = serialize($data['answerRight']);
 
         return parent::saveResponse($data['section_id'], $data['question_id'], $processedResponse);
     }
 
-	/**
+    /**
      * Exports the answer to Moodle XML format. This is a modified version of
      * $this->reviewResponse()
-	 *
-	 * @param  $page
-	 * @param  $question_id
-	 * @return void
-	 */
-    public function exportMoodleAnswer($page, $question_id) {
+     *
+     * @param  $page
+     * @param  $question_id
+     * @return void
+     */
+    public function exportMoodleAnswer($page, $question_id)
+    {
         $page->setBlock('answerFormFragment', 'answerCorrect', 'answerCorrect_block');
 
         $answerGroup = $this->getByQuestionID($question_id);
@@ -201,7 +206,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
 
-            for($i=0; $i<count($allAnswers); $i++) {
+            for ($i = 0; $i < count($allAnswers); $i++) {
                 $currentAnswer = $allAnswers[$i];
 
                 $page->setVar(array(
@@ -214,22 +219,23 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
         }
     }
 
-	/**
+    /**
      * Imports form a Moodle XML object. This is largely an alias of create()
      * but we create the array specially because of the naming conventions and
      * structure of the original xml export.
-	 *
-	 * @param  $xmlObj
-	 * @param  $question_id
-	 * @return bool|int
-	 */
-    public function importMoodleAnswer($xmlObj, $question_id) {
-        foreach($xmlObj->subquestion as $currentAnswer) {
+     *
+     * @param  $xmlObj
+     * @param  $question_id
+     * @return bool|int
+     */
+    public function importMoodleAnswer($xmlObj, $question_id)
+    {
+        foreach ($xmlObj->subquestion as $currentAnswer) {
 
             /* Set up data object in accordance with $this->create();
              */
-            $answer['answerLeft'] = trim((string) $currentAnswer->text);
-            $answer['answerRight'] = trim((string) $currentAnswer->answer);
+            $answer['answerLeft'] = trim((string)$currentAnswer->text);
+            $answer['answerRight'] = trim((string)$currentAnswer->answer);
 
             $allAnswers[] = $answer;
         }
@@ -244,93 +250,97 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
         return $this->create($object, $question_id);
     }
 
-	/**
-	 * Get the response for a particular question
-	 *
-	 * @param  $attempt_id
-	 * @param  $question_id
-	 * @return mixed
-	 */
-	public function exportResponseToCSV($attempt_id, $question_id) {
-		$response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
+    /**
+     * Get the response for a particular question
+     *
+     * @param  $attempt_id
+     * @param  $question_id
+     * @return mixed
+     */
+    public function exportResponseToCSV($attempt_id, $question_id)
+    {
+        $response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
 
-		$data = unserialize($response['response']);
+        $data = unserialize($response['response']);
 
-		if (is_array($data)) {
-			if ($this->getLegendHTML() !== false) {
-				$data['response'] = '<ul><li>' . implode('</li><li>', $data) . '</li></ul>';
-			}
-			else {
-				$data['response'] = strip_tags(implode(', ', $data));
-			}
-		}
+        if (is_array($data)) {
+            if ($this->getLegendHTML() !== false) {
+                $data['response'] = '<ul><li>' . implode('</li><li>', $data) . '</li></ul>';
+            } else {
+                $data['response'] = strip_tags(implode(', ', $data));
+            }
+        }
 
-		/* Append commentary
- 		 */
-		$data['comment'] = $response['comment'];
+        /* Append commentary
+            */
+        $data['comment'] = $response['comment'];
 
-		/* Append awarded mark
-		 */
-		$data['mark'] = $response['mark'];
+        /* Append awarded mark
+           */
+        $data['mark'] = $response['mark'];
 
-		return $data;
-	}
+        return $data;
+    }
 
-	/**
-	 * Gets the text associated with an array-based multiple choice answer
-	 *
-	 * @param  $question_id
-	 * @param  $value
-	 * @return string
-	 */
-	public function getAnswerText($question_id, $value) {
-		$answer = $this->getByQuestionID($question_id);
+    /**
+     * Gets the text associated with an array-based multiple choice answer
+     *
+     * @param  $question_id
+     * @param  $value
+     * @return string
+     */
+    public function getAnswerText($question_id, $value)
+    {
+        $answer = $this->getByQuestionID($question_id);
 
-		$allOptions = unserialize($answer['answer']);
+        $allOptions = unserialize($answer['answer']);
 
-		foreach($allOptions as $currentOption) {
-			if ($currentOption->value == $value) {
-				return $currentOption->description;
-			}
-		}
+        foreach ($allOptions as $currentOption) {
+            if ($currentOption->value == $value) {
+                return $currentOption->description;
+            }
+        }
 
-		return '';
-	}
+        return '';
+    }
 
-	/**
-	 * Get the response for a particular question
-	 *
-	 *
-	 * @param  $attempt_id
-	 * @param  $question_id
-	 * @return mixed
-	 */
-	public function exportResponseToArray($attempt_id, $question_id) {
-		$response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
+    /**
+     * Get the response for a particular question
+     *
+     *
+     * @param  $attempt_id
+     * @param  $question_id
+     * @return mixed
+     */
+    public function exportResponseToArray($attempt_id, $question_id)
+    {
+        $response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
 
-		$data = unserialize($response['response']);
+        $data = unserialize($response['response']);
 
-		return $data;
-	}
+        return $data;
+    }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+      */
 
-	/**
-	 * Get correct class
-	 *
-	 * @return string
-	 */
-	protected function getCorrectClass() {
-		return $this->correctClass;
-	}
+    /**
+     * Get correct class
+     *
+     * @return string
+     */
+    protected function getCorrectClass()
+    {
+        return $this->correctClass;
+    }
 
-	/**
-	 * Get incorrect class
-	 *
-	 * @return string
-	 */
-	protected function getIncorrectClass() {
-		return $this->incorrectClass;
-	}
+    /**
+     * Get incorrect class
+     *
+     * @return string
+     */
+    protected function getIncorrectClass()
+    {
+        return $this->incorrectClass;
+    }
 }
