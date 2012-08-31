@@ -79,7 +79,7 @@ if(is_numeric($_GET['id']))
 
     // get the mime-type
     $allowedHandler = new AllowedFile();
-    $mime = $allowedHandler->getMime(substr($filename, stripos($filename, '.') + 1));
+    $mime = $allowedHandler->getMime(substr($filename, strripos($filename, '.') + 1));
 
     $attach = $_GET['view'] ? '' : 'attachment;';
 

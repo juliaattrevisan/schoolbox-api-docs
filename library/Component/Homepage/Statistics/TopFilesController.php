@@ -54,7 +54,7 @@ class Component_Homepage_Statistics_TopFilesController extends Component_Homepag
 
                 // check the mime icon can be determined, and that it exists, and if not, use a default
                 $icon = sprintf('/images/mime/60x60/%s.png', $mime ? str_replace('/','_', $mime) : 'source');
-                if(!file_exists(SITE_root . $icon)) {
+                if(!file_exists(WEB_root . $icon)) {
                     $icon = '/images/mime/60x60/source.png';
                 }
 
