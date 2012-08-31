@@ -50,12 +50,18 @@ class Component_Homepage_Statistics_TopFilesController extends Component_Homepag
         if(count($this->files)) {
             $allowedHandler = new AllowedFile();
             for($i = 0; $i < 5 && $i < count($this->files); ++$i) {
+                $mime = $allowedHandler->getMime(substr($this->files[$i]['realname'], strripos($this->files[$i]['realname'], '.') + 1));
 
-                $mime = $allowedHandler->getMime(substr($this->files[$i]['realname'], stripos($this->files[$i]['realname'], '.') + 1));
+                // check the mime icon can be determined, and that it exists, and if not, use a default
+                $icon = sprintf('/images/mime/60x60/%s.png', $mime ? str_replace('/','_', $mime) : 'source');
+                if(!file_exists(SITE_root . $icon)) {
+                    $icon = '/images/mime/60x60/source.png';
+                }
+
                 $rel = new Alaress_Date_Relative($this->files[$i]['submitted']);
                 $this->setVar(array(
                     'FILE_ID'       => $this->files[$i]['id'],
-                    'FILE_THUMB'    => sprintf('/images/mime/60x60/%s.png', str_replace('/','_',$mime)),
+                    'FILE_THUMB'    => $icon,
                     'FILE_NAME'     => $this->files[$i]['realname'],
                     'FILE_SIZE'     => Alaress_Byte_Format::bytesToString($this->files[$i]['file_size']),
                     'FILE_DATE'     => $rel->getLong(),
