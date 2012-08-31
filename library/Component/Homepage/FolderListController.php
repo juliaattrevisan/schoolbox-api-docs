@@ -98,6 +98,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         ));
 
         //setup block for submission button
+        $this->setVar('FOLDER_CAT_ID', $this->source['id']);
         $this->setBlock($templateHandle, "submit_folder", "submit_folder_block");
         if ($this->permission < WRITE_ACCESS)
             $this->setVar("submit_folder_block", "");

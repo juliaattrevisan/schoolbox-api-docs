@@ -59,6 +59,8 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
             $this->setVar('createSurvey_block', '');
         }
 
+        $this->setVar('survey_block', '');
+
         if (is_array($allSurveys)) {
             $i=0;
 
@@ -159,9 +161,6 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                     $this->parse('survey_block', 'survey', true);
                 }
             }
-        }
-        else {
-            $this->setVar('survey_block', '');
         }
 
         return true; // everything went according to plan

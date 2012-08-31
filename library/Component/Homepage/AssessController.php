@@ -15,8 +15,6 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
      */
     public function execute() {
 
-        // TODO: Implement execute() method.
-
     }
 
     /**
@@ -30,7 +28,6 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
         }
         $this->parseConfig();
 
-        // TODO: Implement renderTemplate() method.
         $this->setBlock($templateHandle, 'assess', 'assess_block');
         $this->setBlock($templateHandle, 'createAssessment', 'createAssessment_block');
         $this->setBlock('assess', 'teacherLink', 'teacherLink_block');
@@ -54,6 +51,8 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
         else {
             $this->setVar('createAssessment_block', '');
         }
+
+        $this->setVar('assess_block', '');
 
         $allAssess = $assessHandler->getList($this->getContext('id'));
 
@@ -176,12 +175,6 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                 }
             }
         }
-        else {
-            $this->setVar('assess_block', '');
-        }
-
-
-
 
         return true; // everything went according to plan
     }

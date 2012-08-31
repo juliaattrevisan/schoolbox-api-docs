@@ -10,7 +10,13 @@
                 <div class="wysiwyg">
                     {NEWS_BODY}
                 </div>
-                <p class="interact hide-on-small">Posted by {EMAIL_CONTACT} {POSTED_DATE}</p>
+                <p class="interact hide-on-small">
+                    Posted by {EMAIL_CONTACT} {POSTED_DATE}
+                    <!-- BEGIN has_publish_date -->
+                    <br />
+                    Published on {NEWS_PUBLISH_DATE}
+                    <!-- END has_publish_date -->
+                </p>
             </li>
             <!-- END news -->
         </ul>

@@ -9,12 +9,17 @@
 class Component_Homepage_ManagersController extends Component_Homepage_ControllerAbstract {
 
     /**
+     * @var Group
+     */
+    protected $groupHandler;
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
     public function execute() {
-
+        $this->groupHandler = new Group();
     }
 
     /**
@@ -29,8 +34,30 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
         $this->parseConfig();
 
         //output managers
-        $this->setBlock($templateHandle, "staff_members", "staff_member_block");
         $this->setBlock($templateHandle, "member_email", "member_email_block");
+        $this->setBlock($templateHandle, "person", "person_block");
+        $this->setBlock('person', 'has_portrait', 'has_portrait_block');
+        $this->setBlock('person', 'has_group', 'has_group_block');
+
+        $this->setVar('displayportraits_block', '');
+        $this->setVar('has_portrait_block', '');
+        $this->setVar('has_group_block', '');
+        $this->setVar('person_block', '');
+
+        /* Display options
+         */
+        $displayOptions = array(
+            'grid' => array(
+                'name'  => 'Grid',
+                'value' => 'grid',
+                'css'   => 'thumb',
+            ),
+            'list' => array(
+                'name'  => 'List',
+                'value' => 'list',
+                'css'   => 'bar',
+            ),
+        );
 
         $userHandler = new User;
         $managerList = $userHandler->getManagers($this->getContext('id'));
@@ -38,41 +65,61 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
         $emailObj = new Email();
 
         if (is_array($managerList)) {
-            $j = 0;
-            $emailall = array();
             foreach ($managerList as $manager) {
 
                 $name = $userHandler->formatName($manager);
-
                 $email = $emailObj->formatEmailFromArray($manager);
+                $meta = $userHandler->getByID($manager['uid']);
 
-                $this->setVar("MEMBER_NAME", "<a href=\"/search/user/{$manager['uid']}\">$name</a>");
-
-                if($manager['type'] == 3)
+                if ($manager['type'] == 3) {
                     $name .= " (Group Admin.)";
+                }
 
-                if($email) {
+                if ($email) {
                     $emailall[] = $email;
                 }
 
-                $this->setVar('ON_OFF', ++$j % 2 ? '' : 'dark');
-                $this->parse("staff_member_block", "staff_members", true);
+                $this->setVar(array(
+                    'PERSON_UID' => $manager['uid'],
+                    'PERSON_NAME' => $name,
+                    'PERSON_EXTERNAL_ID' => $manager['synergy_id'],
+                    'PERSON_GROUP' => $meta['gname'],
+                    'LIST_STYLE' => $displayOptions[$this->getConfig('displayPortraits')]['css'],
+                ));
 
+                /* Don't display images in list view
+             */
+                if ($this->getConfig('displayPortraits') == 'grid') {
+                    $this->parse('has_portrait_block', 'has_portrait');
+                    $this->parse('has_group_block', 'has_group');
+                }
+                else {
+                    $this->setVar('has_portrait_block', '');
+                    $this->setVar('has_group_block', '');
+                }
+
+                $this->parse('person_block', 'person', true);
+
+                /* Clear children after parsing out the parent
+             */
+                $this->setVar('has_portrait_block', '');
+                $this->setVar('has_group_block', '');
             }
 
-            $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
-
-            if(count($emailall)) {
-                $this->setVar("EMAILALL", implode(', ', $emailall));
+            /* Student bulk email
+        */
+            if ($this->groupHandler->isStaff() && isset($emailall)) {
+                $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
+                $this->setVar("EMAILALL", implode(',',$emailall));
+                $this->parse("member_email_block", "member_email");
             }
             else {
-                $this->setVar("EMAILALL", '');
+                $this->setVar('member_email_block', '');
             }
-
-            $this->parse("member_email_block", "member_email");
-        } else {
-            $this->setVar("staff_member_block", "");
-            $this->setVar('member_email_block','');
+        }
+        else {
+            $this->setVar("person_block", "");
+            $this->setVar('member_email_block', '');
         }
 
         return true; // everything went according to plan

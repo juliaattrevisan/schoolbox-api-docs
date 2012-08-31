@@ -135,6 +135,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         }
 
         //setup block for submission button
+        $this->setVar('LINK_CAT_ID', $this->source['id']);
         $this->setBlock($templateHandle, "submit_link", "submit_link_block");
 
         if ($this->permission < WRITE_ACCESS) {

@@ -43,7 +43,8 @@ class DashboardComponentReFactory {
         'keywords'          => 'Hashtags',
         'teacher_timestamp' => '',
         'muted_users'       => '',
-        'captionState'      => 'Captions'
+        'captionState'      => 'Captions',
+        'displayPortraits'  => 'Display Portraits',
     );
 
     /**
@@ -94,6 +95,18 @@ class DashboardComponentReFactory {
         'Chat'        => array(
             'muted_users'   => 'a:0:{}',
         ),
+        'ClassList'   => array(
+            'displayPortraits' => ''
+        ),
+        'Managers'    => array(
+            'displayPortraits' => ''
+        ),
+        'Members'     => array(
+            'displayPortraits' => ''
+        ),
+        'Teachers'    => array(
+            'displayPortraits' => ''
+        )
     );
 
     /**

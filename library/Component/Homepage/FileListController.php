@@ -104,7 +104,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
                 $output = array('FILE_DESCRIPTION'	=> Scrub::text($file['description']),
                     'FILE_ID'			=> $file['id'],
-                    'FILE_MIME_IMAGE'	=> $this->allowedFileHandler->getClass($file["iconFile"]),
+                    'FILE_MIME_IMAGE'	=> $this->allowedFileHandler->getClass($file['iconFile']),
                     'FILE_POSTED_BY'	=> $this->user->formatName($file),
                     'FILE_POSTED_BY_ID'	=> $file['owner'],
                     'FILE_POSTED_DATE'	=> $date->getShort(),
@@ -142,6 +142,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         }
 
         //setup block for submission button
+        $this->setVar('FILE_CAT_ID', $this->source['id']);
         $this->setBlock($templateHandle, "submit_file", "submit_file_block");
         if ($this->permission < WRITE_ACCESS)
             $this->setVar("submit_file_block", "");
