@@ -15,7 +15,7 @@
  * --skip-sql  don't perform the SQL insertion/update
  * -v          verbose output
  */
-$options = getopt("v", array('status', 'skip-sql', 'create-components', 'clean-db', 'skip-instantiation'));
+$options = getopt("v", array('status', 'skip-sql', 'create-components', 'skip-clean-db', 'skip-instantiation'));
 require_once('../../../include/Bootstrap.php');
 
 class DashboardComponentReFactory {
@@ -138,6 +138,14 @@ class DashboardComponentReFactory {
         'folderManage' => 'ManageFolder',
     );
 
+    private $customNames = array(
+        'Component_Homepage_ScrollerController' => 'Image Slideshow',
+    );
+
+    private $customDescriptions = array(
+        'Component_Homepage_ManagersController' => 'Displays a list of group members with write access to the homepage. Useful in larger groups to show who manages the group.',
+    );
+
 
 
 
@@ -181,7 +189,7 @@ class DashboardComponentReFactory {
             $this->printStatus();
         }
         else {
-            $this->refactorHomepages(!isset($options['skip-sql']), isset($options['clean-db']));
+            $this->refactorHomepages(!isset($options['skip-sql']), !isset($options['skip-clean-db']));
             $this->refactorHomepageTemplates(!isset($options['skip-sql']));
 
             if(!(isset($options['skip-instantiation']) || isset($options['skip-sql']))) {
@@ -277,9 +285,9 @@ class DashboardComponentReFactory {
      */
     public function refactorHomepages($performSQL, $cleanDB) {
 
-        if(!$performSQL && $cleanDB) {
-            echo " [!] Won't clean database without inserting new definitions: --skip-sql and --clear-db are mutually exclusive.\n";
-            return;
+        // if not doing SQL, forcibly prevent cleaning of the DB
+        if(!$performSQL) {
+            $cleanDB = false;
         }
 
         if($cleanDB) {
@@ -328,16 +336,29 @@ class DashboardComponentReFactory {
         while($oldComp = $origin->fetch(PDO::FETCH_ASSOC)) {
             $newComp = new Component_Definition();
 
-            $newComp->id = ++$i;
-            $newComp->name = $oldComp['name'];
-
             if(($newComp->class = $this->method2controller($oldComp['method'])) === false) {
                 continue;
             }
 
             $this->cli("Converting {$oldComp['method']} to $newComp->class");
 
-            $newComp->description = $oldComp['description'];
+            if(isset($this->customNames[$newComp->class])) {
+                $name = $this->customNames[$newComp->class];
+            }
+            else {
+                $name = $oldComp['name'];
+            }
+
+            if(isset($this->customDescriptions[$newComp->class])) {
+                $description = $this->customDescriptions[$newComp->class];
+            }
+            else {
+                $description = $oldComp['description'];
+            }
+
+            $newComp->id = ++$i;
+            $newComp->name = $name;
+            $newComp->description = $description;
             $newComp->module = 'homepage';
             $newComp->componentCategory = $oldComp['homepageCategoryID'];
             $newComp->visible = ($oldComp['invisible'] == 'true' || in_array($newComp->class, $this->disableByDefault)) ? 'false' : 'true';
@@ -425,25 +446,7 @@ class DashboardComponentReFactory {
                 'col'        => $columns[$row['column'] - 1],
                 'seq'        => $row['position'],
             ));
-/*
-            if(!isset($templates[$row['tid']])) {
-                $templates[$row['tid']] = array(
-                    'id'                 => $row['tid'],
-                    'name'               => $row['name'],
-                    'left_column_width'  => $row['left_column_width'],
-                    'right_column_width' => $row['right_column_width'],
-                    'components'         => array(),
-                );
-            }
-            $templates[$row['tid']]['components'][$columns[$row['column']-1]][$row['position']] = array(
-                'id'     => $row['componentId'],
-                'method' => $row['method'],
-            );
-            */
         }
-/*
-        print_r($templates);
-*/
     }
 
 

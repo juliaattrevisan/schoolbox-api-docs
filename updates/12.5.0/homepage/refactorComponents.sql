@@ -37,3 +37,6 @@ ALTER TABLE `component_instance`
 	CHANGE `module` `module` enum('dashboard','homepage','homepage_template','eportfolio')  COLLATE utf8_general_ci NULL after `component_definition_id`,
 	CHANGE `position` `position` enum('top','left','right')  COLLATE utf8_general_ci NOT NULL DEFAULT 'left' after `identifier`,
 	CHANGE `sequence` `sequence` int(10)   NOT NULL after `position`;
+
+/* 'Move' surveys from learning to collaboration */
+UPDATE homepage_comp SET homepageCategoryID = 2 WHERE method = 'outputSurvey';
