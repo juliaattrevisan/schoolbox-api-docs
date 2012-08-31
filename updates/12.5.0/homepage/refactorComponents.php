@@ -115,7 +115,8 @@ class DashboardComponentReFactory {
      */
     private $disableByDefault = array(
         'Component_Homepage_DutiesController',
-        'Component_Homepage_MGGSHeaderController'
+        'Component_Homepage_MGGSHeaderController',
+        'Component_Homepage_TranslateController'
     );
 
     /**
