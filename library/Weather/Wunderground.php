@@ -80,11 +80,36 @@ class Weather_Wunderground implements Weather_Interface {
 
         // print_r($data);
 
-        $weather = array();
+        $ob = $data->current_observation;
 
+        $current = array(
+            'datetime'      => $ob->observation_epoch,
+            'temp'          => array(
+                'actual'            => $ob->temp_c,
+                'feels_like'        => $ob->feelslike_c
+            ),
+            'conditions'    => $ob->weather,
+            'styles'        => array(
+                'wxug_icon'         => $ob->icon_url,
+                'foreground'        => $ob->icon
+            ),
+            'rain'          => array(
+                'next_hour'         => $ob->precip_1hr_metric,
+                'today'             => $ob->precip_today_metric
+            ),
+            'wind'          => array(
+                'speed'             => $ob->wind_kph,
+                'gust'              => $ob->wind_gust_kph,
+                'dir'               => $ob->wind_dir
+            ),
+            'humidity'      => $ob->relative_humidity,
+            'link'          => $ob->ob_url
+        );
+
+        $forecast = array();
         for($i = 0; $i < count($data->forecast->simpleforecast->forecastday); ++$i) {
             $day = $data->forecast->simpleforecast->forecastday[$i];
-            $weather[$i] = array(
+            $forecast[$i] = array(
                 'datetime'   => $day->date->epoch,
                 'temp'       => array(
                     'high'          => $day->high->celsius,
@@ -120,11 +145,17 @@ class Weather_Wunderground implements Weather_Interface {
         }
 
         return array(
-            'location' => array(
-                'country' => $data->location->country_name,
-                'city'    => $data->location->city
+            'location'    => array(
+                'country'       => $data->location->country_name,
+                'city'          => $data->location->city
             ),
-            'weather'  => $weather
+            'current'     => $current,
+            'forecast'    => $forecast,
+            'attribution' => array(
+                'name'          => $data->current_observation->image->title,
+                'url'           => $data->current_observation->image->link,
+                'logo'          => $data->current_observation->image->url
+            ),
         );
     }
 
@@ -170,7 +201,7 @@ class Weather_Wunderground implements Weather_Interface {
         // update every half hour: suppress error
         if(!(file_exists($file) && time() - @filemtime($file) < 1800)) {
 
-            if(($json = $this->getWundergroundData(array('geolookup', 'forecast'))) === false) {
+            if(($json = $this->getWundergroundData(array('geolookup', 'forecast10day', 'conditions'))) === false) {
                 return array();
             }
 

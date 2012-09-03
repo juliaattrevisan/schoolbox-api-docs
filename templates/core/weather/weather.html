@@ -1,15 +1,51 @@
+<!-- BEGIN custom_head -->
+<style>
+    .temp-h {
+        color:#f33;
+    }
+    .temp-l {
+        color:#09f;
+    }
+    .supplied-by {
+        line-height: 22px;
+        height: 22px;
+        display: block;
+    }
+    .supplied-by img {
+        max-width: 150px;
+        margin-left: 1em;
+        margin-top: 2px;
+    }
+    #forecast td {
+        vertical-align: top;
+    }
+    .current li {
+        height: 25px;
+        line-height: 25px;
+        list-style: none;
+    }
+    .current img {
+        float: left;
+        padding: 25px 25px 25px 9px;
+    }
+    .fade {
+        color: #555;
+    }
+</style>
+<!-- END custom_head -->
 <!-- BEGIN current -->
-<h1>Weather Forecast for {LOCATION}</h1>
+<h1>Weather for {LOCATION}</h1>
 <h2>Currently</h2>
 
-<ul class="pad-it">
-    <li><strong>Temperature :</strong> {TEMP}&deg;</li>
-    <li><strong>Wind : </strong>{WIND}</li>
-    <li><strong>Humidity : </strong>{HUMIDITY}</li>
-    <li>Weather issued {PERIOD}</li>
+<div class="current pad-it">
+<img src="{C_IMAGE}" alt="{C_PRECIS}" title="{C_PRECIS}" width="50" height="50"/>
+<ul>
+    <li><strong>Temperature:</strong> {TEMP}&deg; (feels like {TEMP_FL}&deg;)</li>
+    <li><strong>Wind: </strong>{WIND}</li>
+    <li><strong>Humidity: </strong>{HUMIDITY}</li>
+    <li class="fade">Last updated {PERIOD}</li>
 </ul>
-
-
+</div>
 <br/>
 <!-- END current -->
 <!-- BEGIN forecast -->
@@ -17,35 +53,26 @@
     <h2>Forecast</h2>
     <table id="forecast">
         <tr>
-            <th width="25%">{DAY0}</th>
-            <th width="25%">{DAY1}</th>
-            <th width="25%">{DAY2}</th>
-            <th width="25%">{DAY3}</th>
+            <!-- BEGIN forecast_header -->
+            <th width="{FC_WIDTH}%">{FC_DAY}</th>
+            <!-- END forecast_header -->
         </tr>
         <tr>
-            <td><img src="{IMAGE0}" alt="{PRECIS0}" width="50" height="50"/><br/>
-                {PRECIS0}
+            <!-- BEGIN forecast_image -->
+            <td><img src="{FC_IMAGE}" alt="{FC_PRECIS}" width="50" height="50"/><br/>
+                {FC_PRECIS}
             </td>
-            <td><img src="{IMAGE1}" alt="{PRECIS1}" width="50" height="50"/><br/>
-                {PRECIS1}
-            </td>
-            <td><img src="{IMAGE2}" alt="{PRECIS2}" width="50" height="50"/><br/>
-                {PRECIS2}
-            </td>
-            <td><img src="{IMAGE3}" alt="{PRECIS3}" width="50" height="50"/><br/>
-                {PRECIS3}
-            </td>
+            <!-- END forecast_image -->
         </tr>
         <tr>
-            <td><span style="color:#f33">{HIGH0}&deg;</span> | <span style="color:#09f">{LOW0}&deg;</span></td>
-            <td><span style="color:#f33">{HIGH1}&deg;</span> | <span style="color:#09f">{LOW1}&deg;</span></td>
-            <td><span style="color:#f33">{HIGH2}&deg;</span> | <span style="color:#09f">{LOW2}&deg;</span></td>
-            <td><span style="color:#f33">{HIGH3}&deg;</span> | <span style="color:#09f">{LOW3}&deg;</span></td>
+            <!-- BEGIN forecast_data -->
+            <td class="temp"><span class="temp-h">{FC_HIGH}&deg;</span> | <span class="temp-l">{FC_LOW}&deg;</span></td>
+            <!-- END forecast_data -->
         </tr>
     </table>
 
     <p>&nbsp;</p>
-    <span class="sub_footer"> Weather Supplied By <a href="{SUPPLIED_BY_URL}" target="_blank">{SUPPLIED_BY_NAME}</a></span>
+    <span class="sub_footer supplied-by"> Weather supplied by <a href="{SUPPLIED_BY_URL}" target="_blank">{SUPPLIED_BY_NAME}</a><img alt="{SUPPLIED_BY_NAME}" src="{SUPPLIED_BY_LOGO}" /></span>
 </div>
 <!-- END forecast -->
 

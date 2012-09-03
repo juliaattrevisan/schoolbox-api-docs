@@ -6,15 +6,32 @@
 ************************************************************/
 
 //create weather
-$location = empty($this->arg[0]) ? Cfg::get('weather_location') : $this->arg[0];
-$weather = new Xml('http://www.google.com/ig/api?weather=' . urlencode($location), 60*60 );
+if(isset($this->arg[1])) {
+    $location = array('country' => $this->arg[0], 'city' => $this->arg[1]);
+}
+else {
+    $loc = explode('/', Cfg::get('weather_location'));
+    $location = array('country' => $loc[0], 'city' => $loc[1]);
+}
+
+
+$weatherController = new Weather_Wunderground();
+$weatherController->setLocation($location);
+$weather = $weatherController->getForecast();
+
+$iconPattern = 'http://icons-ak.wxug.com/i/c/k/%s.gif';
+
+// $weather = new Xml('http://www.google.com/ig/api?weather=' . urlencode($location), 60*60 );
 
 $this->setFile(TEMPLATE_content, 'weather/weather.html');
 $this->setTitle('Weather Forecast');
 
-$this->setBlock(TEMPLATE_content, "current", "current_block");
-$this->setBlock(TEMPLATE_content, "forecast", "forecast_block");
+$this->setBlock(TEMPLATE_content, 'current', 'current_block');
+$this->setBlock(TEMPLATE_content, 'forecast', 'forecast_block');
 $this->setBlock(TEMPLATE_content, "weather_unavailable", "weather_unavailable_block");
+$this->setBlock('forecast', 'forecast_header', 'forecast_header_block');
+$this->setBlock('forecast', 'forecast_image', 'forecast_image_block');
+$this->setBlock('forecast', 'forecast_data', 'forecast_data_block');
 
 $this->setVar("current_block", "");
 $this->setVar("forecast_block", "");
@@ -23,30 +40,51 @@ $this->setVar("weather_unavailable_block", "");
 $imageLocation = '/weather/image.php?path=';
 
 //set current weather
-$forecastDate = new Alaress_Date_Format($weather->weather->forecast_information->forecast_date['data'], 'y-m-d');
+// $forecastDate = new Alaress_Date_Format($weather->weather->forecast_information->forecast_date['data'], 'y-m-d');
+
+$forecastDate = new Alaress_Date_Format($weather['forecast'][0]['datetime'], 'U');
+
+$wind = $weather['current']['wind']['speed']
+    ? sprintf("%0.1fkm/h %s", $weather['current']['wind']['speed'], $weather['current']['wind']['dir'])
+    : 'Still';
 
 $this->setVar(array(
-        'LOCATION'  => $weather->weather->forecast_information->city['data'],
-        'TEMP'      => $weather->weather->current_conditions->temp_c['data'],
-        'WIND'      => substr($weather->weather->current_conditions->wind_condition['data'], 6),
-        'HUMIDITY'  => substr($weather->weather->current_conditions->humidity['data'], 10),
-        'PERIOD'    => $forecastDate->getDateOnly(),
+    'LOCATION'  => $weather['location']['city'] . ', ' . $weather['location']['country'],
+    'TEMP'      => $weather['current']['temp']['actual'],
+    'TEMP_FL'   => sprintf("%d",$weather['current']['temp']['feels_like']),
+    'WIND'      => $wind,
+    'HUMIDITY'  => ($weather['current']['humidity'] < 0) ? '0%' : $weather['current']['humidity'],
+    'PERIOD'    => $forecastDate->getLong(),
+    'C_IMAGE'   => $weather['current']['styles']['wxug_icon'],
+    'C_PRECIS'  => $weather['current']['conditions']
 ));
 
-for($i = 0; $i < 4; $i++) {
-    $forecast_conditions = $weather->weather->forecast_conditions[$i];
-    $url = parse_url((string)$forecast_conditions->icon['data']);
-    $this->setVar(array(
-        "DAY$i"     => $forecast_conditions->day_of_week['data'],
-        "IMAGE$i"   => $imageLocation.urlencode($url['path']),
-        "PRECIS$i"  => $forecast_conditions->condition['data'],
-        "HIGH$i"    => round(($forecast_conditions->high['data'] - 32) / 1.8),
-        "LOW$i"     => round(($forecast_conditions->low['data'] - 32) / 1.8)
-    ));
+$count = min(count($weather['forecast']), 6);
+
+if($count) {
+    $width = (int)(100 / $count);
+
+    for($i = 0; $i < $count; $i++) {
+
+        $forecastConditions = $weather['forecast'][$i];
+        $forecastDate = new Alaress_Date_Format($forecastConditions['datetime'], 'U');
+        $this->setVar(array(
+            "FC_DAY"    => $forecastDate->getUsingFormat('D'),
+            "FC_IMAGE"  => $forecastConditions['styles']['wxug_icon'],
+            "FC_PRECIS" => $forecastConditions['conditions'],
+            "FC_HIGH"   => $forecastConditions['temp']['high'],
+            "FC_LOW"    => $forecastConditions['temp']['low'],
+            'FC_WIDTH'  => $width
+        ));
+
+        $this->parse('forecast_header_block','forecast_header', true);
+        $this->parse('forecast_image_block','forecast_image', true);
+        $this->parse('forecast_data_block','forecast_data', true);
+    }
 }
 
 //dont display blocks if they dont have any data
-if($weather->weather->forecast_conditions) {
+if($weather['location']['city']) {
     $this->parse("current_block", "current");
     $this->parse("forecast_block", "forecast");
 } else {
@@ -55,18 +93,21 @@ if($weather->weather->forecast_conditions) {
 
 //ouput drop down box of available locations
 $locations = array(
-    array('LOCATION_VALUE' => 'Adelaide, South Australia', 'LOCATION_NAME' => 'Adelaide'),
-    array('LOCATION_VALUE' => 'Brisbane, Queensland', 'LOCATION_NAME' => 'Brisbane'),
-    array('LOCATION_VALUE' => 'Canberra, ACT', 'LOCATION_NAME' => 'Canberra'),
-    array('LOCATION_VALUE' => 'Darwin, Northern Territory', 'LOCATION_NAME' => 'Darwin'),
-    array('LOCATION_VALUE' => 'Hobart, Tasmania', 'LOCATION_NAME' => 'Hobart'),
-    array('LOCATION_VALUE' => 'Melbourne, Victoria', 'LOCATION_NAME' => 'Melbourne'),
-    array('LOCATION_VALUE' => 'Perth, Western Australia', 'LOCATION_NAME' => 'Perth'),
-    array('LOCATION_VALUE' => 'Sydney, New South Wales', 'LOCATION_NAME' => 'Sydney')
+    array('LOCATION_VALUE' => 'Australia/Adelaide', 'LOCATION_NAME' => 'Adelaide'),
+    array('LOCATION_VALUE' => 'Australia/Brisbane', 'LOCATION_NAME' => 'Brisbane'),
+    array('LOCATION_VALUE' => 'Australia/Canberra', 'LOCATION_NAME' => 'Canberra'),
+    array('LOCATION_VALUE' => 'Australia/Darwin', 'LOCATION_NAME' => 'Darwin'),
+    array('LOCATION_VALUE' => 'Australia/Hobart', 'LOCATION_NAME' => 'Hobart'),
+    array('LOCATION_VALUE' => 'Australia/Melbourne', 'LOCATION_NAME' => 'Melbourne'),
+    array('LOCATION_VALUE' => 'Australia/Perth', 'LOCATION_NAME' => 'Perth'),
+    array('LOCATION_VALUE' => 'Australia/Sydney', 'LOCATION_NAME' => 'Sydney')
 );
 
 $this->dropDown('regions', $locations, $location);
 
-$url = new Url("http://www.google.com.au");
-$this->setVar('SUPPLIED_BY_NAME', 'Google');
-$this->setVar('SUPPLIED_BY_URL' , $url->getBase64EncodedRedirect());
+$url = new Url($weather['attribution']['url']);
+$this->setVar(array(
+    'SUPPLIED_BY_NAME' => $weather['attribution']['name'],
+    'SUPPLIED_BY_URL'  => $url->getBase64EncodedRedirect(),
+    'SUPPLIED_BY_LOGO' => 'http://icons.wxug.com/logos/PNG/wundergroundLogo_4c_horz.png',
+));
