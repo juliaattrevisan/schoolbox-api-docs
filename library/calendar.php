@@ -56,6 +56,61 @@ class Calendar extends DeprecatedModel {
 		return $this->db->getAll($query);
 	}
 
+	/**
+	 * Get a list of people who are attending/pending for a particular
+	 * event attendance
+	 *
+	 * @param $eventId
+	 * @param $status
+	 * @return mixed
+	 */
+	private function getByStatus($eventId, $status) {
+		$query = "
+			SELECT
+				user.*,
+				IF(user.local_email = 0, user.alt_email, user.local_email) AS email,
+				groups.name as groupName,
+				ea.id, ea.status, ea.intention
+			FROM event_attendance ea
+			LEFT JOIN `user` ON `user`.id = ea.user_id
+			LEFT JOIN `groups` ON `user`.group_id = `groups`.id
+			WHERE ea.event_id = {$eventId}
+			AND ea.status = {$status}
+		";
+
+		return $this->db->getAll($query);
+	}
+
+	/**
+	 * Get all the people pending for an event
+	 *
+	 * @param $eventId
+	 * @return mixed
+	 */
+	public function getPending($eventId) {
+		return $this->getByStatus($eventId, self::ATTENDANCE_STATUS_PENDING);
+	}
+
+	/**
+	 * Get all the people approved for an event
+	 *
+	 * @param $eventId
+	 * @return mixed
+	 */
+	public function getAttending($eventId) {
+		return $this->getByStatus($eventId, self::ATTENDANCE_STATUS_APPROVED);
+	}
+
+	/**
+	 * Get all the people approved for an event
+	 *
+	 * @param $eventId
+	 * @return mixed
+	 */
+	public function getRejected($eventId) {
+		return $this->getByStatus($eventId, self::ATTENDANCE_STATUS_REJECTED);
+	}
+
     public function getAttendeeList ($eventId) {
         $event = $this->getByID($eventId);
 

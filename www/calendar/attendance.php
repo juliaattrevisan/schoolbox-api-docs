@@ -29,3 +29,24 @@ else if ($method == 'upcomingEvents') {
 
 	$attendanceController->renderUpcomingEventAttendance($data);
 }
+/* A csv export of all people pending for a particular event
+ */
+else if ($method == 'exportPending') {
+	$data = $attendanceController->executePending($this->arg[1]);
+
+	$attendanceController->renderExportCSV($data);
+}
+/* A csv export of all people attending a particular event
+ */
+else if ($method == 'exportAttending') {
+	$data = $attendanceController->executeAttending($this->arg[1]);
+
+	$attendanceController->renderExportCSV($data);
+}
+/* A csv export of all people rejected from a particular event
+ */
+else if ($method == 'exportRejected') {
+	$data = $attendanceController->executeRejected($this->arg[1]);
+
+	$attendanceController->renderExportCSV($data);
+}

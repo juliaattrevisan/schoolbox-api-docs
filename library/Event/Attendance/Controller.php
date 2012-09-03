@@ -85,6 +85,111 @@ class Event_Attendance_Controller extends Controller
         return $data;
     }
 
+	/**
+	 * Get a list of attending people
+	 *
+	 * @param $eventId
+	 * @return array
+	 */
+	public function executeAttending($eventId) {
+		$data = array();
+
+		if ($event = $this->getCalendarHandler()->getByID($eventId)) {
+			$data['event'] = $event;
+		}
+
+		if ($attendeeList = $this->getCalendarHandler()->getAttending($eventId)) {
+			$data['attendeeList'] = $attendeeList;
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Get a list of pending people
+	 *
+	 * @param $eventId
+	 * @return array
+	 */
+	public function executePending($eventId) {
+		$data = array();
+
+		if ($event = $this->getCalendarHandler()->getByID($eventId)) {
+			$data['event'] = $event;
+		}
+
+		if ($attendeeList = $this->getCalendarHandler()->getPending($eventId)) {
+			$data['attendeeList'] = $attendeeList;
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Get a list of pending people
+	 *
+	 * @param $eventId
+	 * @return array
+	 */
+	public function executeRejected($eventId) {
+		$data = array();
+
+		if ($event = $this->getCalendarHandler()->getByID($eventId)) {
+			$data['event'] = $event;
+		}
+
+		if ($attendeeList = $this->getCalendarHandler()->getRejected($eventId)) {
+			$data['attendeeList'] = $attendeeList;
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Exports an event/list of people into a csv format
+	 *
+	 * @param $data
+	 */
+	public function renderExportCSV($data) {
+		$name = new Url($data['event']['note']);
+
+		$headings = array(
+			'External ID',
+			'Firstname',
+			'Lastname',
+			'Email',
+			'Group',
+			'Year Level',
+		);
+
+		$allRows = array();
+		$allRows[] = TextFormatter::outputCSV($headings);
+
+		if (is_array($data['attendeeList']) && count($data['attendeeList'])) {
+			foreach ($data['attendeeList'] as $currentPerson) {
+
+				$row = array(
+					$currentPerson['synergy_id'],
+					$currentPerson['firstname'],
+					$currentPerson['lastname'],
+					$currentPerson['email'],
+					$currentPerson['groupName'],
+					$currentPerson['year'],
+				);
+
+				$allRows[] = TextFormatter::outputCSV($row);
+			}
+		}
+
+		header('Content-type: application/csv');
+		header("Content-Disposition: attachment; filename={$name->getSlug()}.csv");
+		header("Pragma: no-cache");
+		header("Expires: 0");
+
+		echo implode("\n", $allRows);
+		exit(1);
+	}
+
     public function renderAttendeeList ($data) {
         $event = $data['event'];
         $attendeeList = $data['attendeeList'];
