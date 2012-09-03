@@ -35,7 +35,7 @@ $this->setVar("weather_unavailable_block", "");
 
 $imageLocation = '/weather/image.php?path=';
 
-$forecastDate = new Alaress_Date_Format($weather['forecast'][0]['datetime'], 'U');
+$forecastDate = new Alaress_Date_Format($weather['current']['datetime'], 'U');
 
 $wind = $weather['current']['wind']['speed']
     ? sprintf("%0.1fkm/h %s", $weather['current']['wind']['speed'], $weather['current']['wind']['dir'])

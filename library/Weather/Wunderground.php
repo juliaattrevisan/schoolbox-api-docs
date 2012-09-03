@@ -15,10 +15,12 @@ class Weather_Wunderground implements Weather_Interface {
     private $location = 'Australia/Melbourne';
 
     /**
-     * hardcoded API key
+     * hardcoded default API key
      * @var string
      */
     private $APIKey = '784036067287ef7a';
+
+    private $querystring = '';
 
     /**
      * where we will find weather data
@@ -59,7 +61,12 @@ class Weather_Wunderground implements Weather_Interface {
 
         $featureString = strtolower(implode('/', $features));
 
-        $call = sprintf("http://api.wunderground.com/api/%s/%s/q/%s.json", $this->APIKey, $featureString, $this->location);
+        $key = Cfg::get('weather_api_key');
+        if(!$key) {
+            $key = $this->APIKey;
+        }
+
+        $call = sprintf("http://api.wunderground.com/api/%s/%s/q/%s.json%s", $key, $featureString, $this->location, $this->querystring);
 
         $data = file_get_contents($call);
 
@@ -77,8 +84,6 @@ class Weather_Wunderground implements Weather_Interface {
      */
     protected function parseJSON($json) {
         $data = json_decode($json);
-
-        // print_r($data);
 
         $ob = $data->current_observation;
 
@@ -107,9 +112,9 @@ class Weather_Wunderground implements Weather_Interface {
         );
 
         $forecast = array();
-        for($i = 0; $i < count($data->forecast->simpleforecast->forecastday); ++$i) {
-            $day = $data->forecast->simpleforecast->forecastday[$i];
-            $forecast[$i] = array(
+
+        foreach($data->forecast->simpleforecast->forecastday as $day) {
+            $forecast[] = array(
                 'datetime'   => $day->date->epoch,
                 'temp'       => array(
                     'high'          => $day->high->celsius,
@@ -182,7 +187,8 @@ class Weather_Wunderground implements Weather_Interface {
             $this->location = strtoupper($location['airport']);
         }
         elseif(isset($location['ip'])) {
-            $this->location = $location['ip'];
+            $this->location = 'autoip';
+            $this->querystring = '?geo_ip=' . $location['ip'];
         }
         else {
             return false;
@@ -199,7 +205,7 @@ class Weather_Wunderground implements Weather_Interface {
         $file = sprintf($this->cachePattern, $this->getDefangedLocation());
 
         // update every half hour: suppress error
-        if(!(file_exists($file) && time() - @filemtime($file) < 1800)) {
+        if(!(file_exists($file) && time() - @filemtime($file) < Cfg::get('weather_api_caching'))) {
 
             if(($json = $this->getWundergroundData(array('geolookup', 'forecast10day', 'conditions'))) === false) {
                 return array();
@@ -212,7 +218,6 @@ class Weather_Wunderground implements Weather_Interface {
             return $this->parseJSON($json);
         }
 
-        // echo "retrieved from cache! ";
         return $this->parseJSON(file_get_contents($file));
     }
 
