@@ -20,6 +20,14 @@
             $j('.chat-users').slideToggle();
             $j(this).toggleClass('active')
         });
+
+        /* IE : defer focus to the chat message box */
+        $j('#component{COMPONENT_INSTANCE_ID}').live('focus', function() {
+            var msgbox = document.getElementById('component{COMPONENT_INSTANCE_ID}-chatmessage');
+            if(msgbox.setActive) {
+                msgbox.setActive();
+            }
+        });
     });
 </script>
 <!-- BEGIN chat_staff_js -->
@@ -48,7 +56,7 @@
         <form action="#" method="post" class="chat-send" id="chatSend">
             <!-- BEGIN chat_state_active -->
             <div class="chat-message-container">
-                <textarea name="message" class="chat-message-box"></textarea>
+                <textarea id="component{COMPONENT_INSTANCE_ID}-chatmessage" name="message" class="chat-message-box"></textarea>
             </div>
             <a href="#" class="btn chat float-right"><span></span>Send</a>
             <!-- END chat_state_active -->
