@@ -1,27 +1,23 @@
 <div class="box">
 	<h2>Weather</h2>
+    <div class="text weather clearfix">
     <!-- BEGIN weather_forecast -->
-	<div class="text weather clearfix">
-		
-		<div class="weatherDay"> <img src="{IMAGE0}" alt="{PRECIS0}" />
-			<h4>{DAY0}</h4>
-			<p><span style="color:#f36f0e;">{HIGH0}&deg;C</span> | <span style="color:#0098d0;">{LOW0}&deg;C</span></p>
+		<div class="weatherDay {FC_CLASS}">
+            <div style="width:50%;float:left;text-align:right;height:50px;">
+                <img style="position:relative;right:8px;" src="{FC_IMAGE}" title="{FC_PRECIS}" alt="{FC_PRECIS}" />
+            </div>
+            <div style="width:50%;float:left;text-align:left;height:50px;color:#aaa;">
+                <h4 style="height:25px;line-height:25px;">{FC_DAY}</h4>
+                <!-- BEGIN temp_now -->
+                <span style="color:#000;">{FC_ACTUAL}&deg;</span>
+                <!-- END temp_now -->
+                <!-- BEGIN temp_range -->
+                <span style="color:#f33;">{FC_HIGH}&deg;</span> | <span style="color:#09f;">{FC_LOW}&deg;</span>
+                <!-- END temp_range -->
+            </div>
 		</div>
-		
-		<div class="weatherDay dark"> <img src="{IMAGE1}" alt="{PRECIS1}" />
-			<h4>{DAY1}</h4>
-			<p><span style="color:#f36f0e;">{HIGH1}&deg;C</span> | <span style="color:#0098d0;">{LOW1}&deg;C</span></p>
-		</div>
-		
-		<div class="weatherDay last"> <img src="{IMAGE2}" alt="{PRECIS2}" />
-			<h4>{DAY2}</h4>
-			<p><span style="color:#f36f0e;">{HIGH2}&deg;C</span> | <span style="color:#0098d0;">{LOW2}&deg;C</span></p>
-		</div>
-		
-		
-		
-	</div>
     <!-- END weather_forecast -->
+    </div>
     <!-- BEGIN weather_unavailable -->
     <br />
     <p class="information-notification">Weather service is temporarily unavailable.</p>

@@ -12,15 +12,20 @@
 class Component_Dashboard_WeatherController extends Component_Dashboard_ControllerAbstract {
 
     protected $weather;
+    protected $weatherController;
 
     public function __construct (Component_Instance $instance, User $user, SitePage $sitepage) {
         parent::__construct($instance, $user, $sitepage);
 
-        $this->weather = new Xml('http://www.google.com/ig/api?weather=' . urlencode(Cfg::get('weather_location')));
+        $this->weatherController = new Weather_Wunderground();
+
+        $loc = explode('/', Cfg::get('weather_location'));
+        $this->weatherController->setLocation(array('country' => $loc[0], 'city' => $loc[1]));
     }
 
     public function execute () {
         if(Cfg::get('weather_enable')) {
+            $this->weather = $this->weatherController->getForecast();
             return true;
         }
         else {
@@ -35,13 +40,14 @@ class Component_Dashboard_WeatherController extends Component_Dashboard_Controll
 
         $this->sitepage->setBlock($templateHandle, 'weather_forecast', 'weather_forecast_block');
         $this->sitepage->setBlock($templateHandle, 'weather_unavailable', 'weather_unavailable_block');
+        $this->sitepage->setBlock('weather_forecast', 'temp_now','temp_now_block');
+        $this->sitepage->setBlock('weather_forecast', 'temp_range','temp_range_block');
 
         $this->sitepage->setVar('weather_forecast_block', '');
         $this->sitepage->setVar('weather_unavailable_block', '');
 
-        if ($this->weather->weather->forecast_conditions) {
+        if ($this->weather['location']['city']) {
             $this->renderForecast();
-            $this->sitepage->parse('weather_forecast_block', 'weather_forecast');
         } else {
             $this->sitepage->parse('weather_unavailable_block', 'weather_unavailable');
         }
@@ -50,24 +56,39 @@ class Component_Dashboard_WeatherController extends Component_Dashboard_Controll
     }
 
     protected function renderForecast() {
-        $imageLocation = '/weather/image.php?path=';
+
+        $currentConditions = $this->weather['current'];
+        $this->setVar(array(
+            "FC_DAY"    => '<b>Now</b>',
+            "FC_IMAGE"  => $currentConditions['styles']['wxug_icon'],
+            "FC_PRECIS" => $currentConditions['conditions'],
+            "FC_ACTUAL" => $currentConditions['temp']['actual'],
+            'FC_CLASS'  => 'dark'
+        ));
+        $this->setVar('temp_range_block','');
+        $this->parse('temp_now_block','temp_now');
+        $this->parse('weather_forecast_block', 'weather_forecast', true);
 
         for ($i = 0; $i < 3; $i++) {
-            $forecast_conditions = $this->weather->weather->forecast_conditions[$i];
-            $url = parse_url((string)$forecast_conditions->icon['data']);
+            $forecastConditions = $this->weather['forecast'][$i];
+            $forecastDate = new Alaress_Date_Format($forecastConditions['datetime'], 'U');
             $this->setVar(array(
-                "DAY$i" => $forecast_conditions->day_of_week['data'],
-                "IMAGE$i" => $imageLocation . urlencode($url['path']),
-                "PRECIS$i" => $forecast_conditions->condition['data'],
-                "HIGH$i" => round(($forecast_conditions->high['data'] - 32) / 1.8),
-                "LOW$i" => round(($forecast_conditions->low['data'] - 32) / 1.8)
+                "FC_DAY"    => $forecastDate->getUsingFormat('D'),
+                "FC_IMAGE"  => $forecastConditions['styles']['wxug_icon'],
+                "FC_PRECIS" => $forecastConditions['conditions'],
+                "FC_HIGH"   => $forecastConditions['temp']['high'],
+                "FC_LOW"    => $forecastConditions['temp']['low'],
+                'FC_CLASS'  => ''
             ));
+            $this->setVar('temp_now_block','');
+            $this->parse('temp_range_block','temp_range');
+            $this->parse('weather_forecast_block', 'weather_forecast', true);
         }
 
 		$forecastDate = new Alaress_Date_Format($this->weather->weather->forecast_information->forecast_date['data'], 'y-m-d');
 
         $this->setvar(array(
-            'WEATHER_ICON' => $imageLocation . $this->weather->weather->current_conditions->icon['data'],
+            'WEATHER_ICON' => $this->weather->weather->current_conditions->icon['data'],
             'TEMP' => $this->weather->weather->current_conditions->temp_c['data'],
             'WIND' => substr($this->weather->weather->current_conditions->wind_condition['data'], 6),
             'HUMIDITY' => substr($this->weather->weather->current_conditions->humidity['data'], 10),

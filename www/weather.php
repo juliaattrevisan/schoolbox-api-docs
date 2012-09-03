@@ -19,10 +19,6 @@ $weatherController = new Weather_Wunderground();
 $weatherController->setLocation($location);
 $weather = $weatherController->getForecast();
 
-$iconPattern = 'http://icons-ak.wxug.com/i/c/k/%s.gif';
-
-// $weather = new Xml('http://www.google.com/ig/api?weather=' . urlencode($location), 60*60 );
-
 $this->setFile(TEMPLATE_content, 'weather/weather.html');
 $this->setTitle('Weather Forecast');
 
@@ -38,9 +34,6 @@ $this->setVar("forecast_block", "");
 $this->setVar("weather_unavailable_block", "");
 
 $imageLocation = '/weather/image.php?path=';
-
-//set current weather
-// $forecastDate = new Alaress_Date_Format($weather->weather->forecast_information->forecast_date['data'], 'y-m-d');
 
 $forecastDate = new Alaress_Date_Format($weather['forecast'][0]['datetime'], 'U');
 

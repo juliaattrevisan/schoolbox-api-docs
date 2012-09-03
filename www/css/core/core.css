@@ -5177,7 +5177,7 @@ li.bars {
   display: block;
 }
 /* SUBMISSION */
-.submission td span {
+.submission td span.alert  {
   background: #e8f5ff url(/images/famicons/information.png) no-repeat 50% 50%;
   font-weight: 400;
   text-indent: -9999em;
@@ -5638,7 +5638,7 @@ ul.tree .collapsable .hitarea {
   float: left;
   padding-top: 7px;
   margin-bottom: 16px;
-  width: 33%;
+  width: 25%;
   text-align: center;
 }
 .weatherDay.last {
