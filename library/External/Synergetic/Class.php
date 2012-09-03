@@ -1,35 +1,37 @@
 <?php
 /************************************************************
- *														   *
- *		 Copyright (c) 2008 Lektec Consulting				*
- *														   *
- *	This file provides access to synergetic class info		*
- *														   *
+ *                                                           *
+ *         Copyright (c) 2008 Lektec Consulting                *
+ *                                                           *
+ *    This file provides access to synergetic class info        *
+ *                                                           *
  ************************************************************/
 
-class External_Synergetic_Class implements External_ClassInterface {
+class External_Synergetic_Class implements External_ClassInterface
+{
 
-	private $database;
+    private $database;
 
-	function __construct () {
-		$this->setDatabase( new MSSQL() );
-	}
+    function __construct()
+    {
+        $this->setDatabase(new MSSQL());
+    }
 
-	public function getStudents ($subCode) {
+    public function getStudents($subCode)
+    {
 
-		if (stristr($subCode, ',')) {
-			$classQuery = 'StudentClasses.ClassCode IN(';
-			$subCodeArray = explode(',', $subCode);
-			foreach ($subCodeArray as $code) {
-				$classQuery .= "'$code',";
-			}
-			$classQuery = substr($classQuery, 0, -1) . ')';
-		}
-		else {
-			$classQuery = "StudentClasses.ClassCode = '$subCode'";
-		}
+        if (stristr($subCode, ',')) {
+            $classQuery = 'StudentClasses.ClassCode IN(';
+            $subCodeArray = explode(',', $subCode);
+            foreach ($subCodeArray as $code) {
+                $classQuery .= "'$code',";
+            }
+            $classQuery = substr($classQuery, 0, -1) . ')';
+        } else {
+            $classQuery = "StudentClasses.ClassCode = '$subCode'";
+        }
 
-		$query = "
+        $query = "
 		SELECT DISTINCT StudentSurname as lastname, StudentPreferred as firstname,
                         StudentYearLevelDescription as yearlevel, StudentHouseDescription as house,
                         StudentMedicalAlert, StudentSpecialNeedsFlag,
@@ -39,7 +41,7 @@ class External_Synergetic_Class implements External_ClassInterface {
 			vStudents.FileYear = StudentClasses.FileYear AND
 			vStudents.FileSemester = StudentClasses.FileSemester AND
 			vStudents.ID = StudentClasses.ID)
-                WHERE   (StudentStatus = 'N' OR StudentStatus = 'NOR' OR StudentStatus = 'NEW' OR StudentStatus = 'RET' OR StudentStatus = 'LV' OR StudentStatus = 'LEA' OR StudentStatus = 'RPT' OR StudentStatus = 'FUL')
+                WHERE   (StudentStatus = 'N' OR StudentStatus = 'NOR' OR StudentStatus = 'NEW' OR StudentStatus = 'RET' OR StudentStatus = 'LV' OR StudentStatus = 'LEA' OR StudentStatus = 'RPT' OR StudentStatus = 'FUL' OR StudentStatus = 'CUR')
 			AND $classQuery
 			AND (StudentClasses.FileYear='" . $_SESSION['FileYear'] . "')
 			AND (StudentClasses.FileSemester='" . $_SESSION['FileSemester'] . "')
@@ -47,41 +49,43 @@ class External_Synergetic_Class implements External_ClassInterface {
 			AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
 		ORDER BY StudentSurname, StudentPreferred";
 
-		return $this->getDatabase()->getAll($query);
-	}
+        return $this->getDatabase()->getAll($query);
+    }
 
-	public function getTeacherName ($subCode) {
+    public function getTeacherName($subCode)
+    {
 
-		if (stristr($subCode, ',')) {
-			$classQuery = 'ClassCode IN(';
-			$subCodeArray = explode(',', $subCode);
-			foreach ($subCodeArray as $code) {
-				$classQuery .= "'$code',";
-			}
-			$classQuery = substr($classQuery, 0, -1) . ')';
-		}
-		else {
-			$classQuery = "ClassCode = '$subCode'";
-		}
+        if (stristr($subCode, ',')) {
+            $classQuery = 'ClassCode IN(';
+            $subCodeArray = explode(',', $subCode);
+            foreach ($subCodeArray as $code) {
+                $classQuery .= "'$code',";
+            }
+            $classQuery = substr($classQuery, 0, -1) . ')';
+        } else {
+            $classQuery = "ClassCode = '$subCode'";
+        }
 
-		$msQuery = "SELECT DISTINCT StaffID, StaffSeq FROM vSubjectClassesStaff
+        $msQuery = "SELECT DISTINCT StaffID, StaffSeq FROM vSubjectClassesStaff
                     WHERE $classQuery AND FileYear={$_SESSION['FileYear']} AND FileSemester={$_SESSION['FileSemester']}
                     ORDER BY StaffSeq";
 
-		$this->getDatabase()->query($msQuery);
-		
-		while ($synrow = $this->getDatabase()->getNextArray()) {
-			$teachers[] = $synrow['StaffID'];
-		}
+        $this->getDatabase()->query($msQuery);
 
-		return $teachers;
-	}
-	
-	private function setDatabase ($database) {
-		$this->database = $database;
-	}
+        while ($synrow = $this->getDatabase()->getNextArray()) {
+            $teachers[] = $synrow['StaffID'];
+        }
 
-	private function getDatabase () {
-		return $this->database;
-	}
+        return $teachers;
+    }
+
+    private function setDatabase($database)
+    {
+        $this->database = $database;
+    }
+
+    private function getDatabase()
+    {
+        return $this->database;
+    }
 }
