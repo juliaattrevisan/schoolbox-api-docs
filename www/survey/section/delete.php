@@ -50,6 +50,7 @@ if ($questionList) {
         ));
 
         $answerHandler->update(array(
+			'question_id' => $currentQuestion['question_id'],
             'answer_id' => $answer['answer_id'],
             'deleted_at' => 'NOW()',
         ));
