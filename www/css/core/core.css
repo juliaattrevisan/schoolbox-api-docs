@@ -5635,24 +5635,38 @@ ul.tree .collapsable .hitarea {
   margin: 0;
 }
 .weatherDay {
-  float: left;
-  padding-top: 7px;
-  margin-bottom: 16px;
-  width: 25%;
-  text-align: center;
+    float: left;
+    margin:8px;
+    padding:4px;
+    width: 20%;
+    min-width: 125px;
+    text-align: center;
 }
-.weatherDay.last {
-  border-right: 0;
-  margin-right: 0;
-  padding-right: 0;
+.weatherDay .image {
+    width: 50px;
+    height: 50px;
+    float: left;
+    text-align: right;
+}
+.weatherDay .data {
+    float: left;
+    text-align: left;
+    height: 50px;
+    color: #aaa;
+    margin-left: 8px;
 }
 .weatherDay h4 {
-  color: #2c2c2c;
-  margin: 0.2em 0;
-  float: none;
-  line-height: normal;
-  width: auto;
+    color: #2c2c2c;
+    margin: 0.2em 0;
+    float: none;
+    width: auto;
+    height: 25px;
+    line-height: 25px;
 }
+.weatherDay .temp-actual {
+    color: #000;
+}
+
 /* Countdown */
 .ui-timepicker-list {
   overflow-y: auto;

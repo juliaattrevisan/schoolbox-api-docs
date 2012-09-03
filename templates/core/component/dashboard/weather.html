@@ -1,15 +1,15 @@
 <div class="box">
 	<h2>Weather</h2>
-    <div class="text weather clearfix">
+    <div class="weather clearfix">
     <!-- BEGIN weather_forecast -->
 		<div class="weatherDay {FC_CLASS}">
-            <div style="width:50%;float:left;text-align:right;height:50px;">
-                <img style="position:relative;right:8px;" src="{FC_IMAGE}" title="{FC_PRECIS}" alt="{FC_PRECIS}" />
+            <div class="image">
+                <img src="{FC_IMAGE}" title="{FC_PRECIS}" alt="{FC_PRECIS}" />
             </div>
-            <div style="width:50%;float:left;text-align:left;height:50px;color:#aaa;">
-                <h4 style="height:25px;line-height:25px;">{FC_DAY}</h4>
+            <div class="data">
+                <h4>{FC_DAY}</h4>
                 <!-- BEGIN temp_now -->
-                <span style="color:#000;">{FC_ACTUAL}&deg;</span>
+                <span class="temp-actual">{FC_ACTUAL}&deg;</span>
                 <!-- END temp_now -->
                 <!-- BEGIN temp_range -->
                 <span style="color:#f33;">{FC_HIGH}&deg;</span> | <span style="color:#09f;">{FC_LOW}&deg;</span>
