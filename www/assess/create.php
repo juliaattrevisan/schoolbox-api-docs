@@ -197,6 +197,13 @@ else {
 		$this->parse('max_attempts_block', 'max_attempts', true);
 	}
 
+	/* Set default to be 1 hour
+	 */
+	$this->setVar(array(
+		'DURATION_HOUR_VALUE' => 0,
+		'DURATION_MINUTE_VALUE' => 0,
+	));
+
     /* Don't display questions contents, which appears in Modify
      */
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');

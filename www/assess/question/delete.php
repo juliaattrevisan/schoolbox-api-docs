@@ -49,6 +49,7 @@ $questionHandler->update(array(
 ));
 
 $answerHandler->update(array(
+	'question_id' => $question['question_id'],
     'answer_id' => $answer['answer_id'],
     'deleted_at' => 'NOW()',
 ));
