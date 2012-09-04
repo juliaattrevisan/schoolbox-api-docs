@@ -295,6 +295,14 @@ $.widget("ui.chat",  {
                     $self.options.body_el.attr('disabled', 'disabled');
                 }
 
+                var componentID = 'component' + $self.options.component_id;
+                if(document.activeElement.id == componentID) {
+                    $('#' + componentID + '-chatmessage').focus();
+                }
+
+                console.log('end post');
+
+
             },
             dataType: 'json'
         });
