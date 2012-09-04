@@ -99,17 +99,16 @@
         color: #922;
     }
     .submission {
-        height: 36px;
+
     }
     .submission.user {
-        height: 48px;
+
     }
     .submission .btn {
         margin-top: 0;
     }
     .markForm {
-        position: relative;
-        top: -4px;
+
     }
     span.mark-input {
         float: left;
@@ -121,6 +120,23 @@
     }
     div.markForm {
         top: -9px;
+    }
+
+    .fixwidth {
+        table-layout: fixed;
+        width: 100%;
+    }
+    .submission .plag-score {
+        margin-left: 4px;
+    }
+    .no-pad {
+        padding: 0 16px 0 0;
+    }
+    .no-pad .btn {
+        margin: 7px 0 7px 7px;
+    }
+    .no-pad .btn:first-child {
+        margin-bottom: 0;
     }
 </style>
 <!-- END custom_head -->
@@ -139,35 +155,19 @@
 <p>Due on {DUEWORK_DUEDATE}</p>
 <div class="indent">
     <p>These are the assignments that have been submitted. Deleting an assignment from here will allow the student to resubmit if multiple submissions are not allowed. Assignments in red are late.</p>
-    <table class="ruler">
+    <table class="ruler fixwidth">
 		<colgroup>
 			<col width="1%"  />
 			<col width="13%" />
 			<col width="13%" />
 			<col width="30%" />
-            <col width="1%"  />
             <col width="14%"  />
 		</colgroup>
-        <!--
-        <thead>
-            <tr>
-                <th>&nbsp;</th>
-                <th>Submitted&nbsp;By</th>
-                <th>Submitted&nbsp;Date</th>
-                <th>Mark</th>
-                <th>Plagiarism</th>
-                <th>Download</th>
-                <th>Delete</th>
-                <th>History</th>
-            </tr>
-        </thead>
-        -->
         <thead>
         <tr>
             <th>&nbsp;</th>
             <th>Student</th>
             <th>Status</th>
-            <th>&nbsp;</th>
             <th>&nbsp;</th>
             <th>&nbsp;</th>
         </tr>
@@ -179,9 +179,8 @@
             <td class="nowrap"><a href="/search/user/{OWNER_ID}">{OWNER_NAME}</a></td>
             <td class="student-status {OWNER_CLASS}">{OWNER_STATUS}</td>
             <td class="column-{BOX_ID}">
-                <div class="row-fix">{OWNER_MARKING}</div>
+                <div>{OWNER_MARKING}</div>
             </td>
-            <td></td>
             <td><a href="/submission/submissionHistory/{BOX_ID}/{OWNER_ID}" class="btn"><span></span>View&nbsp;History</a></td>
         </tr>
 
@@ -189,14 +188,15 @@
         <tr class="submission user_{OWNER_ID} {SUBMISSION_EXPANDABLE} sub-table-row">
             <td></td>
             <td></td>
-            <td class="nowrap {SUBMISSION_CLASS}">{SUBMISSION_TIME}{SUBMISSION_AFTER_MARK}</td>
-            <td class="nowrap">{SUBMISSION_MIME}{SUBMISSION_FILENAME}</td>
-            <td title="{SUBMISSION_SCORE} plagiarism">{SUBMISSION_SCORE}</td>
-            <td>
-                <a href="/submission/send.php?id={SUBMISSION_ID}" class="btn download"><span></span>Download</a>
-            <!-- BEGIN delete_action -->
-                <a href="/submission/viewSubmissionForm.php?delete={SUBMISSION_ID}" onclick="return(confirm('Remove {OWNER_ESCAPED}\'s submission? '));" class="btn delete"><span></span>Delete</a>
-            <!-- END delete_action -->
+            <td class="{SUBMISSION_CLASS}">{SUBMISSION_TIME}{SUBMISSION_AFTER_MARK}</td>
+            <td class="nowrap">
+                {SUBMISSION_MIME}{SUBMISSION_FILENAME}
+                <!-- BEGIN plag_enabled -->
+                <span class="plag-score" title="{SUBMISSION_SCORE} plagiarism">({SUBMISSION_SCORE})</span>
+                <!-- END plag_enabled -->
+            </td>
+            <td class="no-pad">
+                <a href="/submission/send.php?id={SUBMISSION_ID}" class="btn download"><span></span>Download</a><!-- BEGIN delete_action --><a href="/submission/viewSubmissionForm.php?delete={SUBMISSION_ID}" onclick="return(confirm('Remove {OWNER_ESCAPED}\'s submission? '));" class="btn delete"><span></span>Delete</a><!-- END delete_action -->
             </td>
         </tr>
         <!-- END submission_row -->
