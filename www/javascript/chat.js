@@ -300,9 +300,6 @@ $.widget("ui.chat",  {
                     $('#' + componentID + '-chatmessage').focus();
                 }
 
-                console.log('end post');
-
-
             },
             dataType: 'json'
         });
