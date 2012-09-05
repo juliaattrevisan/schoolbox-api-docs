@@ -24,7 +24,7 @@ else if (($method == 'student') && ($this->arg[1] == 'export') && is_numeric($th
 
 	$leaveController->exportUserRequestList($data);
 }
-/* Export a csv history of a particular house's leave requets
+/* Export a csv history of a particular house's leave requests
  */
 else if (($method == 'house') && ($this->arg[1] == 'export') && is_numeric($this->arg[2])) {
 	$data = $leaveController->executeHouseRequestList($this->arg[2]);
