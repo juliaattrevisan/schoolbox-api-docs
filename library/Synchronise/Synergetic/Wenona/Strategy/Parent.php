@@ -72,6 +72,7 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
 
         // get WPA associations
         $newUser['WPA'] = array();
+        $newUser['WPA'][] = "Wenona Parents Association (WPA)";
 
         for ($i = 0; $i < 13; $i++) {
             if ($currentUser["Year{$i}Student"]) {
