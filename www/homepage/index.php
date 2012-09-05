@@ -14,8 +14,7 @@ $catHandler = new Category();
 
 if (preg_match('/^[1-9]+[0-9]*$/', $this->arg[0])) {
     $category = $catHandler->getByID($this->arg[0]);
-}
-else {
+} else {
     $category = null;
 }
 
@@ -38,7 +37,6 @@ $permission = $g->getPermission($categoryID);
 
 /* BUILD PAGE */
 $this->setTitle($category['name']);
-$this->setTab('resources');
 $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 $this->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
@@ -60,39 +58,39 @@ if ($permission >= WRITE_ACCESS) {
 
     $definitionCollection = $componentFactory->getDefinitionList('component_category');
 
-    foreach($definitionCollection as $definition) {
+    foreach ($definitionCollection as $definition) {
         $definition->instanceCount = 0;
-        foreach($componentCollection as $inst) {
-            if($inst->definitionId == $definition->id) {
+        foreach ($componentCollection as $inst) {
+            if ($inst->definitionId == $definition->id) {
                 ++$definition->instanceCount;
             }
         }
     }
 
-    if($total = $definitionCollection->count()) {
+    if ($total = $definitionCollection->count()) {
         $i = 0;
         $previous = null;
-        foreach($definitionCollection as $component) {
+        foreach ($definitionCollection as $component) {
             ++$i;
             $class = '';
-            if($component->multiple == 'false') {
+            if ($component->multiple == 'false') {
                 $class = 'one-only ';
-                if($component->multiple == 'false' && $component->instanceCount > 0) {
+                if ($component->multiple == 'false' && $component->instanceCount > 0) {
                     $class .= 'disabled ';
                 }
             }
-            if(!class_exists($component->class)) {
+            if (!class_exists($component->class)) {
                 $class .= 'undeveloped ';
             }
 
             $class = trim($class);
 
             $output = array(
-                'HOMEPAGE_COMPONENT_ID'          => Scrub::text($component->id),
-                'HOMEPAGE_COMPONENT_NAME'        => Scrub::text($component->name),
-                'HOMEPAGE_COMPONENT_COUNT'       => $component->instanceCount,
+                'HOMEPAGE_COMPONENT_ID' => Scrub::text($component->id),
+                'HOMEPAGE_COMPONENT_NAME' => Scrub::text($component->name),
+                'HOMEPAGE_COMPONENT_COUNT' => $component->instanceCount,
                 'HOMEPAGE_COMPONENT_DESCRIPTION' => Scrub::text($component->description),
-                'HOMEPAGE_COMPONENT_CLASS'       => $class,
+                'HOMEPAGE_COMPONENT_CLASS' => $class,
                 'HOMEPAGE_COMPONENT_CATEGORY_ID' => $previous->componentCategory,
             );
 
@@ -108,15 +106,13 @@ if ($permission >= WRITE_ACCESS) {
                     $this->setVar('HOMEPAGE_COMPONENT_CATEGORY_ID', $component->componentCategory);
                     $this->parse('homepage_component_page_block', 'homepage_component_page', true);
                 }
-            }
-            else {
+            } else {
                 // last rotation
                 if ($total == $i) {
                     $this->parse('homepage_component_block', 'homepage_component', true);
                     $this->setVar('HOMEPAGE_COMPONENT_CATEGORY_ID', $component->componentCategory);
                     $this->parse('homepage_component_page_block', 'homepage_component_page', true);
-                }
-                else {
+                } else {
                     $this->parse('homepage_component_block', 'homepage_component', true);
                 }
             }
@@ -129,12 +125,12 @@ if ($permission >= WRITE_ACCESS) {
         }
     }
 
-    if(isset($tabList) && count($tabList)) {
+    if (isset($tabList) && count($tabList)) {
         foreach ($tabList as $id => $tab) {
 
             $output = array(
-                'COMPONENT_CATEGORY_ID'    => $id,
-                'COMPONENT_CATEGORY_NAME'  => $tab['name'],
+                'COMPONENT_CATEGORY_ID' => $id,
+                'COMPONENT_CATEGORY_NAME' => $tab['name'],
                 'COMPONENT_CATEGORY_COUNT' => $tab['count']
             );
 
@@ -158,21 +154,21 @@ if ($permission >= WRITE_ACCESS) {
 
     // Defaults
     $defaultColour = array(
-        'head_font'     => Cfg::get('homepage_colour_head_font'),
-        'head_bg'       => Cfg::get('homepage_colour_head_bg'),
-        'font'          => Cfg::get('homepage_colour_font'),
-        'bg_primary'    => Cfg::get('homepage_colour_bg_primary'),
-        'bg_secondary'  => Cfg::get('homepage_colour_bg_secondary'),
-        'link'          => Cfg::get('homepage_colour_link'),
-        'hover'         => Cfg::get('homepage_colour_hover')
+        'head_font' => Cfg::get('homepage_colour_head_font'),
+        'head_bg' => Cfg::get('homepage_colour_head_bg'),
+        'font' => Cfg::get('homepage_colour_font'),
+        'bg_primary' => Cfg::get('homepage_colour_bg_primary'),
+        'bg_secondary' => Cfg::get('homepage_colour_bg_secondary'),
+        'link' => Cfg::get('homepage_colour_link'),
+        'hover' => Cfg::get('homepage_colour_hover')
     );
 
-    $columns = array('top','left','right');
+    $columns = array('top', 'left', 'right');
     $this->setVar('COLOUR_ARRAY', 'defaults');
 
-    foreach($columns as $col) {
-        foreach($defaultColour as $field => $colour) {
-            $this->setVar($col.'_'.$field, $colour);
+    foreach ($columns as $col) {
+        foreach ($defaultColour as $field => $colour) {
+            $this->setVar($col . '_' . $field, $colour);
         }
     }
 
@@ -180,17 +176,15 @@ if ($permission >= WRITE_ACCESS) {
 
     // Template control
     $template = $homepageHandler->getTemplate();
-    for($x = 1; $x <= 4; $x++) {
+    for ($x = 1; $x <= 4; $x++) {
         $this->setVar("CURRENT_TEMPLATE_$x", $template == $x ? 'current' : '');
     }
-}
-
-else {
+} else {
     $this->setVar(array(
-        'edit_page_block'      => '',
-        'modify_layout_block'  => '',
+        'edit_page_block' => '',
+        'modify_layout_block' => '',
         'customise_page_block' => '',
-        'colour_list_block'    => '',
+        'colour_list_block' => '',
     ));
 }
 
@@ -201,9 +195,9 @@ $codeCount = count(explode(',', $code));
 $allWidths = $homepageHandler->getColumnWidths();
 
 $this->setVar(array(
-    'HEADING'    => Scrub::text($category['name']) . (isset($code) && $codeCount < 2 ? ' (' . $code . ')' : ''),
-    'CODE'       => urlencode(urlencode($code)),
-    'ID'         => $categoryID,
+    'HEADING' => Scrub::text($category['name']) . (isset($code) && $codeCount < 2 ? ' (' . $code . ')' : ''),
+    'CODE' => urlencode(urlencode($code)),
+    'ID' => $categoryID,
     'USER_TOKEN' => $_SESSION['key'],
 ));
 
@@ -223,21 +217,21 @@ $this->parse('colour_list_block', 'colour_list', true);
 
 // Defaults
 $defaultColour = array(
-    'head_font'     => Cfg::get('homepage_colour_head_font'),
-    'head_bg'       => Cfg::get('homepage_colour_head_bg'),
-    'font'          => Cfg::get('homepage_colour_font'),
-    'bg_primary'    => Cfg::get('homepage_colour_bg_primary'),
-    'bg_secondary'  => Cfg::get('homepage_colour_bg_secondary'),
-    'link'          => Cfg::get('homepage_colour_link'),
-    'hover'         => Cfg::get('homepage_colour_hover')
+    'head_font' => Cfg::get('homepage_colour_head_font'),
+    'head_bg' => Cfg::get('homepage_colour_head_bg'),
+    'font' => Cfg::get('homepage_colour_font'),
+    'bg_primary' => Cfg::get('homepage_colour_bg_primary'),
+    'bg_secondary' => Cfg::get('homepage_colour_bg_secondary'),
+    'link' => Cfg::get('homepage_colour_link'),
+    'hover' => Cfg::get('homepage_colour_hover')
 );
 
-$columns = array('top','left','right');
+$columns = array('top', 'left', 'right');
 
 $this->setVar('COLOUR_ARRAY', 'defaults');
 
-foreach($columns as $col) {
-    foreach($defaultColour as $field => $colour) {
+foreach ($columns as $col) {
+    foreach ($defaultColour as $field => $colour) {
         $this->setVar($col . '_' . $field, $colour);
     }
 }
@@ -248,7 +242,7 @@ $this->parse('colour_list_block', 'colour_list', true);
 $allWidths = $homepageHandler->getColumnWidths();
 
 $this->setVar(array(
-    'TEMPLATE_LEFT_COLUMN_WIDTH'  => $allWidths['left_column_width'],
+    'TEMPLATE_LEFT_COLUMN_WIDTH' => $allWidths['left_column_width'],
     'TEMPLATE_RIGHT_COLUMN_WIDTH' => $allWidths['right_column_width'],
 ));
 
@@ -278,9 +272,7 @@ if (is_array($allowedList)) {
             $last = $allowed["iconFile"];
         }
     }
-}
-
-else {
+} else {
     $this->setVar('allowed_files_block', '');
 }
 
@@ -294,12 +286,12 @@ foreach ($componentCollection as $component) {
     $component->setup($category, $component->instance->getConfigArray());
 
     if ($component->execute() !== false) {
-		if ($component->renderTemplate($templateHandle) !== false) {
-			if (!in_array($component->instance->position, $occupiedPositionList)) {
+        if ($component->renderTemplate($templateHandle) !== false) {
+            if (!in_array($component->instance->position, $occupiedPositionList)) {
                 $occupiedPositionList[] = $component->instance->position;
             }
 
-			$this->parse($templateTarget, $templateHandle, true);
+            $this->parse($templateTarget, $templateHandle, true);
         }
     }
 }

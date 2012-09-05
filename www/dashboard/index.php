@@ -8,6 +8,7 @@
  *
  */
 $this->setFile(TEMPLATE_content, 'dashboard/index.html');
+$this->setTab('main');
 
 /* Instance factory */
 $groupID = $_SESSION['gid'];
@@ -21,13 +22,13 @@ foreach ($componentCollection as $component) {
     $templateTarget = "component_position_{$component->position}";
     $templateHandle = "component_{$component->id}";
 
-	if ($component->execute() !== false) {
-		if ($component->renderTemplate($templateHandle) !== false) {
-			if (!in_array($component->instance->position, $occupiedPositionList)) {
+    if ($component->execute() !== false) {
+        if ($component->renderTemplate($templateHandle) !== false) {
+            if (!in_array($component->instance->position, $occupiedPositionList)) {
                 $occupiedPositionList[] = $component->instance->position;
             }
 
-			$this->parse($templateTarget, $templateHandle, true);
+            $this->parse($templateTarget, $templateHandle, true);
         }
     }
 }

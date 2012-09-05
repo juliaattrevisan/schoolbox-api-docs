@@ -13,7 +13,6 @@ class SitePage extends Page
         parent::Page();
 
         $this->db = new DeprecatedDatabase;
-        $this->setTab('main');
 
         if ($login) {
             $this->initSession();
@@ -425,9 +424,8 @@ class SitePage extends Page
                 $this->setVar('WEBMAIL_LOCATION', 'href="https://mail.stmichaels.vic.edu.au/owa" rel="external"');
             } else if ($this->site == 'stk') {
                 $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.saintkentigern.com/owa" rel="external"');
-            }
-            else {
-                $this->setVar('WEBMAIL_LOCATION', 'href="'.Cfg::get('mail_webmail').'" rel="external"');
+            } else {
+                $this->setVar('WEBMAIL_LOCATION', 'href="' . Cfg::get('mail_webmail') . '" rel="external"');
             }
 
             $this->parse('wm_tab', 'webmail_tab');

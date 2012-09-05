@@ -10,181 +10,189 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Eportfolio_Image_Scroller extends Eportfolio_Image_Abstract {
-	private $timings = array(2, 5, 10, 15, 20, 30);
-	private $defaultTiming = 2;
+class Eportfolio_Image_Scroller extends Eportfolio_Image_Abstract
+{
+    private $timings = array(2, 5, 10, 15, 20, 30);
+    private $defaultTiming = 2;
 
-	/**
-	 * Setup blocks and stuff
-	 *
-	 * @return void
-	 */
-	public function setup() {
-		$this->getPage()->setBlock($this->getComponentHandle(), 'image', 'image_block');
-		$this->getPage()->setBlock('config', 'caption_state', 'caption_state_block');
-		$this->getPage()->setBlock($this->getComponentHandle(), 'show_caption', 'show_caption_block');
-		$this->getPage()->setBlock('config', 'timing', 'timing_block');
-		$this->getPage()->setBlock($this->getComponentHandle(), 'submit_image', 'submit_image_block');
+    /**
+     * Setup blocks and stuff
+     *
+     * @return void
+     */
+    public function setup()
+    {
+        $this->getPage()->setBlock($this->getComponentHandle(), 'image', 'image_block');
+        $this->getPage()->setBlock('config', 'caption_state', 'caption_state_block');
+        $this->getPage()->setBlock('image', 'show_caption', 'show_caption_block');
+        $this->getPage()->setBlock('config', 'timing', 'timing_block');
 
-		$this->setDefaultConfig();
-		$config = $this->getConfig();
+        $this->setDefaultConfig();
+        $config = $this->getConfig();
 
-		$this->getPage()->setVar(array(
-			'COMPONENT_PIXEL' => $config['pixel']
-		));
+        $this->getPage()->setVar(array(
+            'COMPONENT_PIXEL' => $config['pixel']
+        ));
 
-		$this->getPage()->parse('config_block', 'config', true);
-	}
+        $this->getPage()->parse('config_block', 'config', true);
+    }
 
-	/**
-	 * Set default config options
-	 *
-	 * @return void
-	 */
-	private function setDefaultConfig() {
-		$config = $this->getConfig();
+    /**
+     * Set default config options
+     *
+     * @return void
+     */
+    private function setDefaultConfig()
+    {
+        $config = $this->getConfig();
 
-		if (empty($config['pixel'])) {
-			$config['pixel'] = 222;
-		}
+        if (empty($config['pixel'])) {
+            $config['pixel'] = 222;
+        }
 
-		$this->setConfig($config);
-	}
+        $this->setConfig($config);
+    }
 
-	/**
-	 * Gets all the images associated with an eportfolio
-	 *
-	 * @param int $limit
-	 * @return array|bool
-	 */
-	private function getImages($limit = 0) {
-		$query = "SELECT id, myFile.description
+    /**
+     * Gets all the images associated with an eportfolio
+     *
+     * @param int $limit
+     * @return array|bool
+     */
+    private function getImages($limit = 0)
+    {
+        $query = "SELECT id, myFile.description
 				  FROM myFile
 				  LEFT JOIN allowedFileTypes ON mime_type = mime
 				  WHERE owner = '{$this->getUserId()}'
 				  AND deleted = '0' AND INSTR(mime_type, 'image/')
 				  ORDER BY submitted";
 
-		if ($limit > 0) {
-			$query .= " LIMIT 1, $limit";
+        if ($limit > 0) {
+            $query .= " LIMIT 1, $limit";
         }
 
-		return $this->db->getAll($query);
-	}
+        return $this->db->getAll($query);
+    }
 
-	/**
-	 * Render all the files in a scroller
-	 *
-	 * @return void
-	 */
-	private function renderFiles() {
-		$config = $this->getConfig();
+    /**
+     * Render all the files in a scroller
+     *
+     * @return void
+     */
+    private function renderFiles()
+    {
+        $config = $this->getConfig();
 
-		$allFiles = $this->getImages();
+        $allFiles = $this->getImages();
 
-		/* Render each
-		 */
-		if (is_array($allFiles) && count($allFiles)) {
-			foreach($allFiles as $currentFile) {
-				$this->getPage()->setVar(array(
-					'IMAGE_ID' => $currentFile['id'],
-					'IMAGE_NAME' => $currentFile['description'],
-					'IMAGE_DIMENSION' => $config['pixel']
-				));
+        /* Render each
+           */
+        if (is_array($allFiles) && count($allFiles)) {
+            foreach ($allFiles as $currentFile) {
+                $this->getPage()->setVar(array(
+                    'IMAGE_ID' => $currentFile['id'],
+                    'IMAGE_NAME' => $currentFile['description'],
+                    'IMAGE_DIMENSION' => $config['pixel']
+                ));
 
-				$this->getPage()->parse('image_block', 'image', true);
-			}
-		}
-		else {
-			$this->getPage()->setVar('image_block', '');
-		}
-	}
+                if ($config['captionState'] == 'Active') {
+                    $this->getPage()->parse('show_caption_block', 'show_caption');
+                } else {
+                    $this->getPage()->setVar('show_caption_block', '');
+                }
 
-	/**
-	 * Render captions
-	 *
-	 * @return void
-	 */
-	private function renderCaptions() {
-		$config = $this->getConfig();
+                $this->getPage()->parse('image_block', 'image', true);
+            }
+        } else {
+            $this->getPage()->setVar('image_block', '');
+        }
+    }
 
-		foreach(array('Active', 'Inactive') as $state) {
-			$this->getPage()->setVar(array(
-				'COMPONENT_CONFIG_CAPTION_STATE_NAME' => $state,
-				'COMPONENT_CONFIG_CAPTION_STATE_VALUE' => $state,
-				'COMPONENT_CONFIG_CAPTION_STATE_SELECTED' => $state == $config['captionState'] ? ' selected="selected"' : ''
-			));
+    /**
+     * Render captions
+     *
+     * @return void
+     */
+    private function renderCaptions()
+    {
+        $config = $this->getConfig();
 
-			$this->getPage()->parse("caption_state_block", "caption_state", true);
-		}
+        foreach (array('Active', 'Inactive') as $state) {
+            $this->getPage()->setVar(array(
+                'COMPONENT_CONFIG_CAPTION_STATE_NAME' => $state,
+                'COMPONENT_CONFIG_CAPTION_STATE_VALUE' => $state,
+                'COMPONENT_CONFIG_CAPTION_STATE_SELECTED' => $state == $config['captionState'] ? ' selected="selected"' : ''
+            ));
 
-		if ($config['captionState'] == 'Active') {
-			$this->getPage()->parse('show_caption_block', 'show_caption');
-		}
-		else {
-			$this->getPage()->setVar('show_caption_block', '');
-		}
-	}
+            $this->getPage()->parse("caption_state_block", "caption_state", true);
+        }
 
-	/**
-	 * Render timings dropdown
-	 *
-	 * @return void
-	 */
-	private function renderTimings() {
-		$config = $this->getConfig();
+    }
 
-		$this->getPage()->setVar(array(
-			'COMPONENT_CONFIG_TIMING_VALUE_MS' => $config['timing'] * 1000
-		));
+    /**
+     * Render timings dropdown
+     *
+     * @return void
+     */
+    private function renderTimings()
+    {
+        $config = $this->getConfig();
 
-		foreach($this->getTimings() as $currentTime) {
-			$this->getPage()->setVar(array(
-				'COMPONENT_CONFIG_TIMING_VALUE' => $currentTime,
-				'COMPONENT_CONFIG_TIMING_SELECTED' => $currentTime == $config['timing'] ? ' selected="selected"' : '',
-			));
+        $this->getPage()->setVar(array(
+            'COMPONENT_CONFIG_TIMING_VALUE_MS' => $config['timing'] * 1000
+        ));
 
-			$this->getPage()->parse('timing_block', 'timing', true);
-		}
-	}
+        foreach ($this->getTimings() as $currentTime) {
+            $this->getPage()->setVar(array(
+                'COMPONENT_CONFIG_TIMING_VALUE' => $currentTime,
+                'COMPONENT_CONFIG_TIMING_SELECTED' => $currentTime == $config['timing'] ? ' selected="selected"' : '',
+            ));
 
-	/**
-	 * Render control blocks
-	 *
-	 * @return void
-	 */
-	private function renderControls() {
-		$this->getPage()->parse('submit_image_block', 'submit_image');
-	}
+            $this->getPage()->parse('timing_block', 'timing', true);
+        }
+    }
 
-	/**
-	 * Facade method to do everything in one command
-	 *
-	 * @return void
-	 */
-	public function render() {
-		$this->setup();
-		$this->renderFiles();
-		$this->renderCaptions();
-		$this->renderTimings();
-		$this->renderControls();
-	}
+    /**
+     * Render control blocks
+     *
+     * @return void
+     */
+    private function renderControls()
+    {
+    }
 
-	/**
-	 * Get list of timing values
-	 *
-	 * @return
-	 */
-	private function getTimings() {
-		return $this->timings;
-	}
+    /**
+     * Facade method to do everything in one command
+     *
+     * @return void
+     */
+    public function render()
+    {
+        $this->setup();
+        $this->renderFiles();
+        $this->renderCaptions();
+        $this->renderTimings();
+        $this->renderControls();
+    }
 
-	/**
-	 * Return default timing when config is not set
-	 *
-	 * @return int
-	 */
-	private function getDefaultTiming() {
-		return $this->defaultTiming;
-	}
+    /**
+     * Get list of timing values
+     *
+     * @return
+     */
+    private function getTimings()
+    {
+        return $this->timings;
+    }
+
+    /**
+     * Return default timing when config is not set
+     *
+     * @return int
+     */
+    private function getDefaultTiming()
+    {
+        return $this->defaultTiming;
+    }
 }

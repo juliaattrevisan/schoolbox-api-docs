@@ -31,96 +31,91 @@ require_once('../library/user.php');
  *
  * @return void
  */
-function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $page, $currentStudent, $previousAttempt, $readonly) {
-	$firstSection = $sectionHandler->getFirst($page->arg[0]);
+function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $page, $currentStudent, $previousAttempt, $readonly)
+{
+    $firstSection = $sectionHandler->getFirst($page->arg[0]);
 
-	/* Finish time. Show the datetime when the person clicked Finish.
-	 * Otherwise, show the last time their responses were updated, or that
-	 * they never even attempted the test.
-	 */
-	if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
-		$attemptFinishDate = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d');
+    /* Finish time. Show the datetime when the person clicked Finish.
+      * Otherwise, show the last time their responses were updated, or that
+      * they never even attempted the test.
+      */
+    if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
+        $attemptFinishDate = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d');
 
-		$finish = $attemptFinishDate->getShort();
-		$timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
-	}
-	else {
-		$finish = $responseHandler->getLastSave($currentAttempt['attempt_id']);
+        $finish = $attemptFinishDate->getShort();
+        $timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
+    } else {
+        $finish = $responseHandler->getLastSave($currentAttempt['attempt_id']);
 
-		if (empty($finish)) {
-			$finish = 'Unfinished';
-		}
-		else {
-			$attemptFinishDate = new Alaress_Date_Format(strtotime($finish), 'U');
+        if (empty($finish)) {
+            $finish = 'Unfinished';
+        } else {
+            $attemptFinishDate = new Alaress_Date_Format(strtotime($finish), 'U');
 
-			$finish = $attemptFinishDate->getShort();
-		}
+            $finish = $attemptFinishDate->getShort();
+        }
 
-		$timeTaken = 'Incomplete';
-	}
+        $timeTaken = 'Incomplete';
+    }
 
-	/* The total available marks for this attempt
-	 */
-	$totalAvailableMarks = $attemptHandler->getTotalMarks($page->arg[0], $currentAttempt['attempt_id']);
+    /* The total available marks for this attempt
+      */
+    $totalAvailableMarks = $attemptHandler->getTotalMarks($page->arg[0], $currentAttempt['attempt_id']);
 
-	if ($totalAvailableMarks > 0) {
-		$percentage = round(100 * $currentAttempt['totalMarks'] / $totalAvailableMarks);
-	}
-	else {
-		$percentage = 0;
-	}
+    if ($totalAvailableMarks > 0) {
+        $percentage = round(100 * $currentAttempt['totalMarks'] / $totalAvailableMarks);
+    } else {
+        $percentage = 0;
+    }
 
-	/* Check when the test was reviewed
-	 */
-	if ($currentAttempt['reviewed_at'] != '') {
-		$reviewedDate = new Alaress_Date_Format(strtotime($currentAttempt['reviewed_at']), 'U');
+    /* Check when the test was reviewed
+      */
+    if ($currentAttempt['reviewed_at'] != '') {
+        $reviewedDate = new Alaress_Date_Format(strtotime($currentAttempt['reviewed_at']), 'U');
 
-		$reviewedAt = 'Reviewed on ' . $reviewedDate->getShort();
-	}
-	else {
-		$reviewedAt = 'Not reviewed';
-	}
+        $reviewedAt = 'Reviewed on ' . $reviewedDate->getShort();
+    } else {
+        $reviewedAt = 'Not reviewed';
+    }
 
-	/* Count how many responses haven't been automarked
-	 */
-	$numNotAutomarked = $responseHandler->numNotAutomarked($currentAttempt['attempt_id']);
+    /* Count how many responses haven't been automarked
+      */
+    $numNotAutomarked = $responseHandler->numNotAutomarked($currentAttempt['attempt_id']);
 
-	$page->setVar(array(
-		'ASSESS_ASSESS_ID' => $page->arg[0],
-		'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
-		'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
-		'USER_ID' => $currentAttempt['user_id'],
-		'ATTEMPT_NAME' => $currentAttempt['lastname'] . ', ' . $currentAttempt['firstname'],
-		'ATTEMPT_FINISH' => $finish,
-		'ATTEMPT_TIME_TAKEN' => $timeTaken,
-		'ATTEMPT_TOTAL_MARKS' => number_format($currentAttempt['totalMarks'], 2),
-		'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
-		'ATTEMPT_PERCENTAGE' => $percentage,
-		'ATTEMPT_REVIEW_STATUS' => $reviewedAt,
-		'ATTEMPT_UNMARKED_RESPONSES' => $numNotAutomarked,
-		'ATTEMPT_REVIEW_LINK' => "<a href=\"/assess/review/{$page->arg[0]}/{$firstSection['section_id']}/{$currentAttempt['attempt_id']}\">Review</a>",
-		'ATTEMPT_DELETE_LINK' => "<a href=\"/assess/deleteAttempt/{$currentAttempt['attempt_id']}\">Delete</a>",
-	));
+    $page->setVar(array(
+        'ASSESS_ASSESS_ID' => $page->arg[0],
+        'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
+        'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
+        'USER_ID' => $currentAttempt['user_id'],
+        'ATTEMPT_NAME' => $currentAttempt['lastname'] . ', ' . $currentAttempt['firstname'],
+        'ATTEMPT_FINISH' => $finish,
+        'ATTEMPT_TIME_TAKEN' => $timeTaken,
+        'ATTEMPT_TOTAL_MARKS' => number_format($currentAttempt['totalMarks'], 2),
+        'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
+        'ATTEMPT_PERCENTAGE' => $percentage,
+        'ATTEMPT_REVIEW_STATUS' => $reviewedAt,
+        'ATTEMPT_UNMARKED_RESPONSES' => $numNotAutomarked,
+        'ATTEMPT_REVIEW_LINK' => "<a href=\"/assess/review/{$page->arg[0]}/{$firstSection['section_id']}/{$currentAttempt['attempt_id']}\">Review</a>",
+        'ATTEMPT_DELETE_LINK' => "<a href=\"/assess/deleteAttempt/{$currentAttempt['attempt_id']}\">Delete</a>",
+    ));
 
-	/* Expandable attempts
-	 */
-	if (($previousAttempt == null) || ($previousAttempt['user_id'] != $currentAttempt['user_id'])) {
-		$page->setVar(array(
-			'ATTEMPT_EXPANDABLE' => '',
-			'ATTEMPT_HIDDEN' => ''
-		));
-	}
-	else {
-		$page->setVar(array(
-			'ATTEMPT_EXPANDABLE' => 'expandable',
-			'ATTEMPT_HIDDEN' => 'hide'
-		));
-	}
-    if($readonly) {
+    /* Expandable attempts
+      */
+    if (($previousAttempt == null) || ($previousAttempt['user_id'] != $currentAttempt['user_id'])) {
+        $page->setVar(array(
+            'ATTEMPT_EXPANDABLE' => '',
+            'ATTEMPT_HIDDEN' => ''
+        ));
+    } else {
+        $page->setVar(array(
+            'ATTEMPT_EXPANDABLE' => 'expandable',
+            'ATTEMPT_HIDDEN' => 'hide'
+        ));
+    }
+    if ($readonly) {
         $page->setVar('assess_delete_block', '');
         $page->setVar('attempt_delete_block', '');
-    }
-    else {
+    } else {
         $page->parse('assess_delete_block', 'delete', false);
         $page->parse('attempt_delete_block', 'attempt_delete', false);
     }
@@ -145,7 +140,7 @@ if (!$assess) {
 }
 
 if ($assessHandler->isDeleted($this->arg[0])) {
-	error(112);
+    error(112);
 }
 
 if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
@@ -161,12 +156,11 @@ $this->setBlock(TEMPLATE_content, 'download_btn', 'download_btn_block');
 $this->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
 $this->setBlock(TEMPLATE_content, 'delete', 'delete_block');
 $this->setTitle('Results for: ' . $assess['title']);
-$this->setTab('submission');
 
 $this->setVar(array(
-	'ASSESS_ASSESS_ID' => $assess['assess_id'],
+    'ASSESS_ASSESS_ID' => $assess['assess_id'],
     'ASSESS_TITLE' => $assess['title'],
-    'CID'           => $assess['category_id'],
+    'CID' => $assess['category_id'],
 ));
 
 /**
@@ -182,14 +176,13 @@ $this->setVar('ASSESS_ARCHIVED', (date('Y', strtotime($assess['finish'])) < date
 $categoryCode = $categoryHandler->getCodeForCategory($assess['category_id']);
 
 if (($categoryCode['codes'] != '') && Cfg::get('external_enable')) {
-	/* If synergy code get synergy students
-	 */
-	$synHandler = new External_Class();
-	$allStudents = $synHandler->getStudents($categoryCode['codes']);
-}
-else {
-	//Retrieve student list from group membership
-	$allStudents = $groupHandler->getMemberList($assess['category_id']);
+    /* If synergy code get synergy students
+      */
+    $synHandler = new External_Class();
+    $allStudents = $synHandler->getStudents($categoryCode['codes']);
+} else {
+    //Retrieve student list from group membership
+    $allStudents = $groupHandler->getMemberList($assess['category_id']);
 }
 
 /* Now construct list of data
@@ -198,73 +191,72 @@ $allAttempts = $attemptHandler->getList($this->arg[0]);
 
 if (is_array($allStudents) && count($allStudents)) {
 
-	/* Process each student
-	 */
-	foreach($allStudents as $currentStudent) {
-		$previousAttempt = null;
+    /* Process each student
+      */
+    foreach ($allStudents as $currentStudent) {
+        $previousAttempt = null;
         $this->setVar('attempt_delete_block', '');
 
         // need to append uid if synergetic
-        if($currentStudent['synergy_id'] && !$currentStudent['uid']) {
+        if ($currentStudent['synergy_id'] && !$currentStudent['uid']) {
             $user = $userHandler->getBySynergy($currentStudent['synergy_id']);
             $currentStudent['uid'] = $user['uid'];
         }
 
-		/* Process all attempts for this student
-		 */
-		if ($allAttempts && count($allAttempts)) {
-			for ($numAttempts = 0, $i = 0; $i < count($allAttempts); $i++) {
-				$currentAttempt = $allAttempts[$i];
+        /* Process all attempts for this student
+           */
+        if ($allAttempts && count($allAttempts)) {
+            for ($numAttempts = 0, $i = 0; $i < count($allAttempts); $i++) {
+                $currentAttempt = $allAttempts[$i];
 
-				/* Match up attempt with student then remove from list
-				 */
-				if ($currentAttempt['user_id'] == $currentStudent['uid'] || $currentAttempt['synergy_id'] == $currentStudent['synergy_id']) {
-					if ($allAttempts[$i]['processed'] != true) {
-						processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this, $currentStudent, $previousAttempt, $readonly);
+                /* Match up attempt with student then remove from list
+                     */
+                if ($currentAttempt['user_id'] == $currentStudent['uid'] || $currentAttempt['synergy_id'] == $currentStudent['synergy_id']) {
+                    if ($allAttempts[$i]['processed'] != true) {
+                        processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this, $currentStudent, $previousAttempt, $readonly);
 
-						$allAttempts[$i]['processed'] = true;
+                        $allAttempts[$i]['processed'] = true;
 
-						$numAttempts++;
+                        $numAttempts++;
 
-						$previousAttempt = $currentAttempt;
-					}
-				}
-			}
-		}
+                        $previousAttempt = $currentAttempt;
+                    }
+                }
+            }
+        }
 
-		/* If no attempts, just show name
-		 */
-		if (!$numAttempts) {
-			$this->setVar(array(
-				'ASSESS_FIRST_SECTION_ID' => '',
-				'ATTEMPT_ATTEMPT_ID' => '',
-				'USER_ID' => $currentStudent['uid'],
-				'ATTEMPT_NAME' => $currentStudent['firstname'] . ' ' . $currentStudent['lastname'],
-				'ATTEMPT_FINISH' => '',
-				'ATTEMPT_TIME_TAKEN' => '',
-				'ATTEMPT_TOTAL_MARKS' => '',
-				'ATTEMPT_TOTAL_AVAILABLE_MARKS' => '',
-				'ATTEMPT_PERCENTAGE' => '',
-				'ATTEMPT_REVIEW_STATUS' => '',
-				'ATTEMPT_UNMARKED_RESPONSES' => '',
-				'ATTEMPT_REVIEW_LINK' => '',
-				'ATTEMPT_DELETE_LINK' => '',
-				'ATTEMPT_EXPANDABLE' => '',
-				'ATTEMPT_HIDDEN' => '',
-			));
+        /* If no attempts, just show name
+           */
+        if (!$numAttempts) {
+            $this->setVar(array(
+                'ASSESS_FIRST_SECTION_ID' => '',
+                'ATTEMPT_ATTEMPT_ID' => '',
+                'USER_ID' => $currentStudent['uid'],
+                'ATTEMPT_NAME' => $currentStudent['firstname'] . ' ' . $currentStudent['lastname'],
+                'ATTEMPT_FINISH' => '',
+                'ATTEMPT_TIME_TAKEN' => '',
+                'ATTEMPT_TOTAL_MARKS' => '',
+                'ATTEMPT_TOTAL_AVAILABLE_MARKS' => '',
+                'ATTEMPT_PERCENTAGE' => '',
+                'ATTEMPT_REVIEW_STATUS' => '',
+                'ATTEMPT_UNMARKED_RESPONSES' => '',
+                'ATTEMPT_REVIEW_LINK' => '',
+                'ATTEMPT_DELETE_LINK' => '',
+                'ATTEMPT_EXPANDABLE' => '',
+                'ATTEMPT_HIDDEN' => '',
+            ));
 
-			$this->parse('attempt_block', 'attempt', true);
+            $this->parse('attempt_block', 'attempt', true);
             $this->setVar('download_btn_block', '');
-		} else {
+        } else {
             // display bulk download
             $this->parse('download_btn_block', 'download_btn', false);
         }
 
-		$numAttempts = 0;
-	}
-}
-else {
-	$this->setVar('attempt_block', '');
+        $numAttempts = 0;
+    }
+} else {
+    $this->setVar('attempt_block', '');
     $this->setVar('download_btn_block', '');
     $this->setVar('assess_delete_block', '');
 }
@@ -272,22 +264,21 @@ else {
 /* Deal with remainder attempts
  */
 if ($allAttempts && count($allAttempts)) {
-	$previousAttempt = null;
+    $previousAttempt = null;
 
-	foreach($allAttempts as $currentAttempt) {
-		if ($currentAttempt['processed'] != true) {
-			processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this, $userHandler->getByID($currentAttempt['user_id']), $previousAttempt, $readonly);
+    foreach ($allAttempts as $currentAttempt) {
+        if ($currentAttempt['processed'] != true) {
+            processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this, $userHandler->getByID($currentAttempt['user_id']), $previousAttempt, $readonly);
 
-			$previousAttempt = $currentAttempt;
-		}
-	}
+            $previousAttempt = $currentAttempt;
+        }
+    }
 }
 
-if($readonly) {
+if ($readonly) {
     $this->setVar('delete_block', '');
     $this->setVar('modify_btn_block', '');
-}
-else {
+} else {
     $this->parse('delete_block', 'delete');
     $this->parse('modify_btn_block', 'modify_btn');
 }

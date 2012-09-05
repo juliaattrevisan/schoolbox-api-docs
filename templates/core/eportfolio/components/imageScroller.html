@@ -1,113 +1,82 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.cycle.js"></script>
+<script type="text/javascript" src="/javascript/jquery.imagesloaded.js"></script>
 <script type="text/javascript">
-$j(window).load(function(){
-	$j('.cycle-content').cycle({
-		timeout: {COMPONENT_CONFIG_TIMING_VALUE_MS},
-		cleartype: true,
-		before: function(curr, next, opts) {
-			$j(next).css('margin-left', -$j(next).width()/2);
-			$j(next).css('margin-top', -$j(next).height()/2);
-		},
-        after: function()
-		 {
-			var append = $j(this).attr('alt');
-			$j('.caption-holder').text(append);
-        }
+    $j(function () {
+        $j('.slideshow-cycle img').imagesLoaded(function (images) {
+            $j('#galleryCycle').cycle({
+                timeout:{COMPONENT_CONFIG_TIMING_VALUE_MS},
+                cleartype:true
+            });
+        });
     });
-});
+
 </script>
 
-<style type="text/css">
-#galleryCycle img {
-	display:none;
-	left:50% !important;
-	top:50% !important;
-}
 
-#galleryCycle {
-	width:100%;
-
-}
-.cycle-content{position:relative; z-index:1;margin:10px auto; border:4px solid #fff;
-
-     -moz-box-shadow: 0 0 8px #000;
-  -webkit-box-shadow: 0 0 8px #000;
-          box-shadow: 0 0 8px #000; }
-
-#galleryCycle .caption-holder {
-	background: #576369;
-	color: #fff;
-	padding: 10px;
-	text-decoration: none;
-	opacity: 0.9;
-	z-index:2;
-	text-align:center;
-	margin:0 auto;
-}
-</style>
 <!-- END custom_head -->
 
 <div class="box clearfix" id="component{COMPONENT_HOMEPAGE_ID}">
     <h2>Image Scroller</h2>
     <!-- BEGIN config -->
     <a class="edit" href="#"><em>Settings</em> <span>&#9660;</span></a>
-	<a class="close-delete" href="#"><span>X</span></a>
-	<div class="editPanel settings hide">
-		<form action="/eportfolio/configForm.php" method="get">
-			<input type="hidden" name="uid" value="{ID}" />
-			<input type="hidden" name="type" value="config" />
-			<input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}" />
+    <a class="close-delete" href="#"><span>X</span></a>
 
-			<label for="url">
-				Pixels:
-				<input id='url' type="text" name="pixel" value="{COMPONENT_PIXEL}" size="4"/>
-			</label>
-			<label for="caption">
-				Captions:
-				<select id='caption' name="captionState">
-					<!-- BEGIN caption_state -->
-					<option value="{COMPONENT_CONFIG_CAPTION_STATE_VALUE}" {COMPONENT_CONFIG_CAPTION_STATE_SELECTED}>{COMPONENT_CONFIG_CAPTION_STATE_NAME}</option>
-					<!-- END caption_state -->
-				</select>
-			</label>
-			<label for="timing">
-				Timing:
-				<select id='timing' name="timing">
-					<!-- BEGIN timing -->
-					<option value="{COMPONENT_CONFIG_TIMING_VALUE}" {COMPONENT_CONFIG_TIMING_SELECTED}>{COMPONENT_CONFIG_TIMING_VALUE} seconds</option>
-					<!-- END timing -->
-				</select>
-			</label>
+    <div class="editPanel settings hide">
+        <form action="/eportfolio/configForm.php" method="get">
+            <input type="hidden" name="uid" value="{ID}"/>
+            <input type="hidden" name="type" value="config"/>
+            <input type="hidden" name="component" value="{COMPONENT_HOMEPAGE_ID}"/>
 
-			<input type="submit" value="Update" class="submit-btn update" />
-    	</form>
-  	</div>
-	<div class="editPanel delete-it hide clearfix">
-		<p>Are you sure you want to remove component?</p>
-		<form action="#" method="post">
-			<input type="hidden" name="uid" value="{ID}" />
-			<input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}" />
-			<input type="hidden" name="component" value="{COMPONENT_ID}" />
-			<a href="#" class="delete-accept btn delete"><span></span>Yes</a>
-			<a href="#" class="delete-reject btn go-to"><span></span>No</a>
-		</form>
-	</div>
+            <label for="url">
+                Pixels:
+                <input id='url' type="text" name="pixel" value="{COMPONENT_PIXEL}" size="4"/>
+            </label>
+            <label for="caption">
+                Captions:
+                <select id='caption' name="captionState">
+                    <!-- BEGIN caption_state -->
+                    <option value="{COMPONENT_CONFIG_CAPTION_STATE_VALUE}"
+                    {COMPONENT_CONFIG_CAPTION_STATE_SELECTED}>{COMPONENT_CONFIG_CAPTION_STATE_NAME}</option>
+                    <!-- END caption_state -->
+                </select>
+            </label>
+            <label for="timing">
+                Timing:
+                <select id='timing' name="timing">
+                    <!-- BEGIN timing -->
+                    <option value="{COMPONENT_CONFIG_TIMING_VALUE}"
+                    {COMPONENT_CONFIG_TIMING_SELECTED}>{COMPONENT_CONFIG_TIMING_VALUE} seconds</option>
+                    <!-- END timing -->
+                </select>
+            </label>
+
+            <input type="submit" value="Update" class="submit-btn update"/>
+        </form>
+    </div>
+    <div class="editPanel delete-it hide clearfix">
+        <p>Are you sure you want to remove component?</p>
+
+        <form action="#" method="post">
+            <input type="hidden" name="uid" value="{ID}"/>
+            <input type="hidden" name="delete" value="{COMPONENT_HOMEPAGE_ID}"/>
+            <input type="hidden" name="component" value="{COMPONENT_ID}"/>
+            <a href="#" class="delete-accept btn delete"><span></span>Yes</a>
+            <a href="#" class="delete-reject btn go-to"><span></span>No</a>
+        </form>
+    </div>
     </a>
     <!-- END config -->
 
     <div id="galleryCycle" class="box clearfix">
-		<div class="cycle-content">
-			<!-- BEGIN image -->
-			<img src="/cms/image.php?myFile=1&id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}" alt="{IMAGE_NAME}"/>
-			<!-- END image -->
-		</div>
-		<!-- BEGIN show_caption -->
-		<div class="caption-holder"></div>
-		<!-- END show_caption -->
+        <!-- BEGIN image -->
+        <div class="slideshow-cycle">
+            <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}"
+                 alt="{IMAGE_NAME}"/>
+            <!-- BEGIN show_caption -->
+            <div class="caption-holder">{IMAGE_NAME}</div>
+            <!-- END show_caption -->
+        </div>
+        <!-- END image -->
     </div>
-
-	<!-- BEGIN submit_image -->
-	<!-- <p class="interact clearfix"><a href="/cms/file/multi/{ID}" class="btn up-arrow"><span></span>Post Images</a></p> -->
-	<!-- END submit_image -->
 </div>

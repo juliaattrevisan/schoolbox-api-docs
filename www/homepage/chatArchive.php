@@ -22,7 +22,6 @@ $this->setBlock(TEMPLATE_content, 'chat_date', 'chat_date_block');
 $this->setBlock('chat_date', 'chat', 'chat_block');
 $this->setVar('category_header_block', '');
 
-$this->setTab('resources');
 
 $groupHandler = new Group();
 $categoryHandler = new Category();
@@ -31,13 +30,13 @@ $chatHandler = new Chat();
 // setup filters
 $filter = array(
     'category' => $this->arg[0],
-    'year'  => $this->arg[1],
+    'year' => $this->arg[1],
     'month' => $this->arg[2],
-    'page'  => $this->arg[3]
+    'page' => $this->arg[3]
 );
 
 // if the category doesn't exist, throw an error
-if(!($category = $categoryHandler->getByID($filter['category']))) {
+if (!($category = $categoryHandler->getByID($filter['category']))) {
     error(19);
 }
 
@@ -53,12 +52,12 @@ $visibleList = $chatHandler->get_logs($category['id']);
 // sanitise filter inputs
 // if year/month/page are null or something stupid, set to default
 $defaults = array(
-    'year'  => 'all',
+    'year' => 'all',
     'month' => 'all',
-    'page'  => 1
+    'page' => 1
 );
 foreach ($defaults as $field => $default)
-    if(!is_numeric($filter[$field]))
+    if (!is_numeric($filter[$field]))
         $filter[$field] = $default;
 
 // collate the full list of occupied dates for this category
@@ -69,37 +68,36 @@ $occupiedDateList = $chatHandler->getOccupiedDateList($filter['category']);
 $visibleListSubset = $chatHandler->getChatListing($filter['category'], $filter['year'], $filter['month']);
 
 /* Year and Month List */
-if ( $occupiedDateList ) {
+if ($occupiedDateList) {
     foreach ($occupiedDateList as $i => $date) {
 
-        $this->setVar( array(
+        $this->setVar(array(
             'YEAR' => $date['year'],
             'YEAR_ClASS' => $date['year'] == $filter['year'] ? 'selected' : ''
-        ) );
+        ));
 
         /* Highlight only for the selected month and selected year
            */
         if (($date['month'] == $filter['month']) && ($date['year'] == $filter['year'])) {
             $monthClass = 'selected';
-        }
-        else {
+        } else {
             $monthClass = '';
         }
 
         $format = new Alaress_Date_Format('70-' . $date['month'] . '-01', 'y-m-d');
 
-        $this->setVar( array(
-            'MONTH'            => $format->getUsingFormat('F'),
-            'MONTH_NUMBER'     => $date['month'],
-            'MONTH_CLASS'      => $monthClass,
+        $this->setVar(array(
+            'MONTH' => $format->getUsingFormat('F'),
+            'MONTH_NUMBER' => $date['month'],
+            'MONTH_CLASS' => $monthClass,
             'MENU_CATEGORY_CLEAN' => $filter['category']
-        ) );
+        ));
 
         $this->parse('month_block', 'month', true);
 
-        $nextYear = $occupiedDateList[$i+1]['year'];
+        $nextYear = $occupiedDateList[$i + 1]['year'];
 
-        if ( $date['year'] != $nextYear || empty($nextYear) ) {
+        if ($date['year'] != $nextYear || empty($nextYear)) {
             $this->parse('year_block', 'year', true);
             $this->setVar('month_block', '');
         }
@@ -115,12 +113,12 @@ $totalPages = ceil(count($visibleListSubset) / $chatPerPage);
 $chatIndex = $chatPerPage * ($filter['page'] - 1);
 
 // figure out which pagination buttons should be displayed
-if($filter['page'] < 2)
+if ($filter['page'] < 2)
     $this->setVar('previous_button_block', '');
 else
     $this->parse('previous_button_block', 'previous_button');
 
-if($filter['page'] >= $totalPages)
+if ($filter['page'] >= $totalPages)
     $this->setVar('next_button_block', '');
 else
     $this->parse('next_button_block', 'next_button');
@@ -128,9 +126,9 @@ else
 // set pagination button destinations
 $pageSlug = "${filter['category']}/${filter['year']}/${filter['month']}/";
 
-if($totalPages > 1) {
-    for($j = 1; $j <= $totalPages; $j++) {
-        if($filter['page'] == $j)
+if ($totalPages > 1) {
+    for ($j = 1; $j <= $totalPages; $j++) {
+        if ($filter['page'] == $j)
             $this->setVar('CURRENT', ' current');
         else
             $this->setVar('CURRENT', '');
@@ -138,16 +136,15 @@ if($totalPages > 1) {
         $this->setVar('PAGE_INDEX', $j);
         $this->setVar('PAGE_INDEX_REF', $pageSlug . $j);
 
-        $this->parse('page_number_block','page_number', true);
+        $this->parse('page_number_block', 'page_number', true);
     }
-}
-else
+} else
     $this->setVar('page_number_block', '');
 
 $outputPagination = array(
     'PREVIOUS_PAGE' => $pageSlug . ($filter['page'] - 1),
-    'NEXT_PAGE'		=> $pageSlug . ($filter['page'] + 1),
-    'LAST_PAGE'		=> $pageSlug . $totalPages,
+    'NEXT_PAGE' => $pageSlug . ($filter['page'] + 1),
+    'LAST_PAGE' => $pageSlug . $totalPages,
 );
 
 $this->setVar($outputPagination);
@@ -160,22 +157,21 @@ if (is_array($items)) {
     $userHandler = new User();
     $userList = array();
 
-    if($items) {
+    if ($items) {
         foreach ($items as $chat) {
             $i++;
 
             // get the datestamp for the post
-            if(isset($previous)) {
+            if (isset($previous)) {
                 $df = new Alaress_Date_Format($previous['time'], 'y-m-d');
-            }
-            else {
+            } else {
                 $df = new Alaress_Date_Format($chat['time'], 'y-m-d');
             }
 
             $postDay = $df->getLongDateOnly();
 
             // don't query the db for users more than we have to
-            if(isset($userList[$chat['user_id']]))
+            if (isset($userList[$chat['user_id']]))
                 $speaker = $userList[$chat['user_id']];
             else {
                 $speaker = $userHandler->getByID($chat['user_id']);
@@ -213,8 +209,7 @@ if (is_array($items)) {
                     $this->setVar('CATEGORY_NAME', Scrub::text($chat['date']));
                     $this->parse('chat_date_block', 'chat_date', true);
                 }
-            }
-            else {
+            } else {
                 if ($total == $i) {
                     /* Last rotation
                          */
@@ -222,8 +217,7 @@ if (is_array($items)) {
                     $this->setVar('CATEGORY_NAME', Scrub::text($chat['date']));
 
                     $this->parse('chat_date_block', 'chat_date', true);
-                }
-                else {
+                } else {
                     /* normal rotation
                          */
                     $this->parse("chat_block", "chat", true);
@@ -237,29 +231,27 @@ if (is_array($items)) {
         $this->setVar('year_block', 'No chat items found.');
     }
 
-/*
-    // output tabs
-    if (is_array($allCategories)) {
-        foreach ($allCategories as $category => $i) {
-            $url = new Url($category);
+    /*
+        // output tabs
+        if (is_array($allCategories)) {
+            foreach ($allCategories as $category => $i) {
+                $url = new Url($category);
 
-            $output = array(
-                'CATEGORY_CLASS' => strtolower($category) == $filter['category'] ? 'class="selected"' : '',
-                'CHAT_CATEGORY' => Scrub::text(ucwords($category)),
-                'CATEGORY_CLEAN' => strtolower($url->getSlug())
-            );
+                $output = array(
+                    'CATEGORY_CLASS' => strtolower($category) == $filter['category'] ? 'class="selected"' : '',
+                    'CHAT_CATEGORY' => Scrub::text(ucwords($category)),
+                    'CATEGORY_CLEAN' => strtolower($url->getSlug())
+                );
 
-            $this->setVar($output);
-            $this->parse('category_header_block', 'category_header', true);
+                $this->setVar($output);
+                $this->parse('category_header_block', 'category_header', true);
+            }
         }
-    }
-    else {
-        $this->setVar('category_block', '');
-    }
-*/
-}
-else
-{
+        else {
+            $this->setVar('category_block', '');
+        }
+    */
+} else {
     $this->setVar('chat_date_block', '');
     $this->setVar('year_block', 'No chat items found.');
 }
