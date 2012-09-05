@@ -560,6 +560,63 @@ class Leave_Controller extends Controller {
 		);
 	}
 
+	/**
+	 * Export a csv of leave requests belonging to a particular student
+	 *
+	 * @param $data
+	 */
+	public function exportUserRequestList($data) {
+		if ($this->getGroup()->getPermission(null)) {
+			$user = $data['user'];
+			$requestList = $data['requestList'];
+			$allRows = array();
+
+			$headings = array(
+				'User ID',
+				'Name',
+				'Year',
+				'Start',
+				'Finish',
+				'Host Type',
+				'Status',
+				'Authorised Date',
+				'Authorising User'
+			);
+
+			$allRows[] = TextFormatter::outputCSV($headings);
+
+			/* Only provide a history of approved leave requests
+			 */
+			foreach ($requestList as $request) {
+				if ($request->getStatus() == Leave_Request::STATUS_APPROVED) {
+					$rowData = array();
+					$rowData[] = $request->getUser()->getId();
+					$rowData[] = $request->getUser()->getName();
+					$rowData[] = $request->getUser()->getYear();
+					$rowData[] = $request->getStart()->getAustralian();
+					$rowData[] = $request->getFinish()->getAustralian();
+					$rowData[] = $request->getHostType(true);
+					$rowData[] = $request->getStatus(true);
+					$rowData[] = $request->getAuthorisationDatetime(true)->getAustralian();
+					$rowData[] = $request->getAuthorisationUser()->getName();
+
+					$allRows[] = TextFormatter::outputCSV($rowData);
+				}
+			}
+
+			$name = new Url('Leave Requests - ' . $user['firstname'] . ' ' . $user['lastname']);
+
+			header('Content-type: application/csv');
+			header("Content-Disposition: attachment; filename={$name->getSlug()}.csv");
+			header("Pragma: no-cache");
+			header("Expires: 0");
+
+			echo implode("\n", $allRows);
+		}
+
+		exit(1);
+	}
+
     /**
      * Renders a collection of request for a user
      *
@@ -577,7 +634,6 @@ class Leave_Controller extends Controller {
 			$requestList = $data['requestList'];
 
 			$this->getPage()->setFile(TEMPLATE_content, 'modules/leave/userRequestList.html');
-
 			$this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
 			$this->getPage()->setBlock(TEMPLATE_content, 'pending_request_list', 'pending_request_list_block');
 			$this->getPage()->setBlock(TEMPLATE_content, 'previous_request_list', 'previous_request_list_block');

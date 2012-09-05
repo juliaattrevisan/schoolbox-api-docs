@@ -17,6 +17,13 @@ else if ($method == 'student' && is_numeric($this->arg[1])) {
 	$data = $leaveController->executeUserRequestList($this->arg[1]);
 	$leaveController->renderUserRequestList($data);
 }
+/* Export a csv history of a particular student's leave requests
+ */
+else if (($method == 'student') && ($this->arg[1] == 'export') && is_numeric($this->arg[2])) {
+	$data = $leaveController->executeUserRequestList($this->arg[2]);
+
+	$leaveController->exportUserRequestList($data);
+}
 else if ($method == 'house') {
 	if (is_numeric($this->arg[1])) {
 		$houseId = $this->arg[1];

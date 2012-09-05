@@ -135,6 +135,7 @@ class Leave_RequestMapper extends Mapper {
             LEFT JOIN `user` u ON u.id = lr.user_id
             LEFT JOIN `user` au ON au.id = lr.authorisation_user_id
             WHERE lr.user_id = :userId
+            ORDER BY lr.start
         ");
 
         $statement->execute( array(
