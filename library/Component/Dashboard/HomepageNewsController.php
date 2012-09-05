@@ -6,21 +6,23 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Dashboard_HomepageNewsController extends Component_Dashboard_ControllerAbstract {
+class Component_Dashboard_HomepageNewsController extends Component_Dashboard_ControllerAbstract
+{
 
     private $feedList;
     private $limit = 20;
 
-    public function execute () {
+    public function execute()
+    {
         $feedHandler = new Feed();
         $groupHandler = new Group();
-        $userAccess = $groupHandler->getAllUserAccess($_SESSION['id']);
+        $userAccess = $groupHandler->involvedInCategoryList($_SESSION['id']);
 
-        if(is_array($userAccess) ){
+        if (is_array($userAccess)) {
             $categoryIDs = array();
 
-            foreach($userAccess as $ua)
-                $categoryIDs[] = $ua['sid'];
+            foreach ($userAccess as $ua)
+                $categoryIDs[] = $ua['id'];
 
             $this->feedList = $feedHandler->getFeed($categoryIDs, $this->limit);
 
@@ -28,8 +30,9 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
         }
     }
 
-    public function renderTemplate ($templateHandle) {
-        if ( !$this->loadTemplate($templateHandle, 'homepageNews') ) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!$this->loadTemplate($templateHandle, 'homepageNews')) {
             return false;
         }
 
@@ -51,8 +54,7 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
 
                 $this->parse('feed_block', 'feed', true);
             }
-        }
-        else {
+        } else {
             $this->setVar('feed_block', '');
         }
 
@@ -61,7 +63,8 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
     /**
      * @return Feed
      */
-    public function getFeedHandler() {
+    public function getFeedHandler()
+    {
         return $this->feedHandler;
     }
 }

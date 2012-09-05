@@ -1,65 +1,69 @@
 <?php
 /************************************************************
-*                                                           *
-* 		Copyright (c) 2009 Lektec Consulting                *
-*                                                           *
-************************************************************/
+ *                                                           *
+ *         Copyright (c) 2009 Lektec Consulting                *
+ *                                                           *
+ ************************************************************/
 
-class Feed {
+class Feed
+{
 
-	function Feed() {
-		$this->db = new DeprecatedDatabase(SQL_db);
-	}
+    function Feed()
+    {
+        $this->db = new DeprecatedDatabase(SQL_db);
+    }
 
-	function getFeed($cid, $limit) {
+    function getFeed($cid, $limit)
+    {
 
-		if($limit == 0 || $limit > 50)
-			$limit = 50;
+        if ($limit == 0 || $limit > 50)
+            $limit = 50;
 
 
-		$files = $this->getFiles($cid, $limit);
-		$links = $this->getLinks($cid, $limit);
-		$folders = $this->getFolders($cid, $limit);
-		$news = $this->getNews($cid, $limit);
-		$wiki = $this->getWiki($cid, $limit);
-		$forum = $this->getForum($cid, $limit);
+        $files = $this->getFiles($cid, $limit);
+        $links = $this->getLinks($cid, $limit);
+        $folders = $this->getFolders($cid, $limit);
+        $news = $this->getNews($cid, $limit);
+        $wiki = $this->getWiki($cid, $limit);
+        $forum = $this->getForum($cid, $limit);
         $blog = $this->getBlog($cid, $limit);
         $blogComments = $this->getBlogComments($cid, $limit);
         $onlineAssessments = $this->getOnlineAssessments($cid, $limit);
-		$surveys = $this->getSurveys($cid, $limit);
+        $surveys = $this->getSurveys($cid, $limit);
 
-		is_array($files)?0:$files=array();
-		is_array($links)?0:$links=array();
-		is_array($folders)?0:$folders=array();
-		is_array($news)?0:$news=array();
-		is_array($wiki)?0:$wiki=array();
-		is_array($forum)?0:$forum=array();
-        is_array($blog)?0:$blog=array();
-        is_array($blogComments)?0:$blogComments=array();
-        is_array($onlineAssessments)?0:$onlineAssessments=array();
-		is_array($surveys)?0:$surveys=array();
+        is_array($files) ? 0 : $files = array();
+        is_array($links) ? 0 : $links = array();
+        is_array($folders) ? 0 : $folders = array();
+        is_array($news) ? 0 : $news = array();
+        is_array($wiki) ? 0 : $wiki = array();
+        is_array($forum) ? 0 : $forum = array();
+        is_array($blog) ? 0 : $blog = array();
+        is_array($blogComments) ? 0 : $blogComments = array();
+        is_array($onlineAssessments) ? 0 : $onlineAssessments = array();
+        is_array($surveys) ? 0 : $surveys = array();
 
-		//get each of the areas
-		$feedList = array_merge($files, $links, $folders, $news, $wiki, $forum, $blog, $blogComments, $onlineAssessments, $surveys);
+        //get each of the areas
+        $feedList = array_merge($files, $links, $folders, $news, $wiki, $forum, $blog, $blogComments, $onlineAssessments, $surveys);
 
 
-		//sort them
-		usort($feedList,array($this,"timecmp"));
+        //sort them
+        usort($feedList, array($this, "timecmp"));
 
-		//cut off over limit
-		$feedList = array_slice($feedList, 0, $limit);
+        //cut off over limit
+        $feedList = array_slice($feedList, 0, $limit);
 
-		return $feedList;
-	}
+        return $feedList;
+    }
 
-	function getFiles($cid, $limit) {
+    function getFiles($cid, $limit)
+    {
 
-        if(is_array($cid))
-            $where = ' IN (' . implode(',',$cid) . ') ';
+        if (is_array($cid))
+            $where = ' IN (' . implode(',', $cid) . ') ';
         else
             $where = " = $cid ";
 
-		$query = "SELECT f.id, u.firstname, u.lastname, u.title, u.id as uid, UNIX_TIMESTAMP(f.submitted) submitted, f.description as name, realname,
+        $query = "SELECT f.id, u.firstname, u.lastname, u.title, u.id as uid, UNIX_TIMESTAMP(f.submitted) submitted, f.description as name, realname,
 						af.description as type, inline, c.name as cat_name, c.id as cat_id
 				  FROM file f
 				  LEFT JOIN user u ON u.id = f.owner
@@ -68,35 +72,35 @@ class Feed {
 				  WHERE f.category $where AND f.hidden = 0 AND f.deleted = 0
 				  ORDER BY f.submitted DESC LIMIT 0, $limit";
 
-		$this->db->query($query);
+        $this->db->query($query);
 
-		$userHandler = new User();
+        $userHandler = new User();
 
-		while($row = $this->db->getNextArray()){
-			if ($row['realname'] != '') {
-				$url = '<a href="/send.php?id='.$row['id'].'" rel="external">'.Scrub::text($row['name']).'</a>';
-			}
-			else {
-				$url = Scrub::text($row['name']);
-			}
+        while ($row = $this->db->getNextArray()) {
+            if ($row['realname'] != '') {
+                $url = '<a href="/send.php?id=' . $row['id'] . '" rel="external">' . Scrub::text($row['name']) . '</a>';
+            } else {
+                $url = Scrub::text($row['name']);
+            }
 
-			$file[] = array(
-				'date' => $row['submitted'],
-				'type' => 'file',
-				'message' => $userHandler->formatName($row) . ' uploaded the file '.Scrub::text($row['name']),
-				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">' . $userHandler->formatName($row) . '</a> uploaded the file '.$url,
+            $file[] = array(
+                'date' => $row['submitted'],
+                'type' => 'file',
+                'message' => $userHandler->formatName($row) . ' uploaded the file ' . Scrub::text($row['name']),
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> uploaded the file ' . $url,
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
-			);
-		}
+            );
+        }
 
-		return $file;
-	}
+        return $file;
+    }
 
-	function getLinks($cid, $limit) {
+    function getLinks($cid, $limit)
+    {
 
-        if(is_array($cid))
-            $where = ' IN (' . implode(',',$cid) . ') ';
+        if (is_array($cid))
+            $where = ' IN (' . implode(',', $cid) . ') ';
         else
             $where = " = $cid ";
 
@@ -107,45 +111,45 @@ class Feed {
 				  WHERE category $where AND l.hidden = 0
 				  ORDER BY l.submitted DESC LIMIT 0, $limit";
 
-		$this->db->query($query);
+        $this->db->query($query);
 
-		$userHandler = new User();
+        $userHandler = new User();
 
-		while($row = $this->db->getNextArray()){
+        while ($row = $this->db->getNextArray()) {
 
             $url = new Url($row['url']);
             if ($url->isLocalUrl()) {
                 $linkUrl = $url->getRelativeURL();
                 $linkTarget = '';
-            }
-            else {
+            } else {
                 $linkUrl = $url->getBase64EncodedRedirect();
                 $linkTarget = 'external';
             }
 
-			$link[] = array(
-				'date' => $row['submitted'],
-				'type' => 'link',
-				'message' => $userHandler->formatName($row).' submitted the link '.Scrub::text($row['name']),
-				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row).'</a> submitted the link <a href="'.$linkUrl.'" rel="'.$linkTarget.'">'.Scrub::text($row['name']).'</a>',
+            $link[] = array(
+                'date' => $row['submitted'],
+                'type' => 'link',
+                'message' => $userHandler->formatName($row) . ' submitted the link ' . Scrub::text($row['name']),
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> submitted the link <a href="' . $linkUrl . '" rel="' . $linkTarget . '">' . Scrub::text($row['name']) . '</a>',
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
-			);
-		}
-		return $link;
-	}
+            );
+        }
+        return $link;
+    }
 
-	/**
-	 * Get a list of online assessments that were created.
-	 *
-	 * @param  $cid
-	 * @param  $limit
-	 * @return
-	 */
-    public function getOnlineAssessments($cid, $limit) {
+    /**
+     * Get a list of online assessments that were created.
+     *
+     * @param  $cid
+     * @param  $limit
+     * @return
+     */
+    public function getOnlineAssessments($cid, $limit)
+    {
 
-        if(is_array($cid))
-            $where = ' IN (' . implode(',',$cid) . ') ';
+        if (is_array($cid))
+            $where = ' IN (' . implode(',', $cid) . ') ';
         else
             $where = " = $cid ";
 
@@ -163,14 +167,14 @@ class Feed {
 
         $this->db->query($query);
 
-		$userHandler = new User();
+        $userHandler = new User();
 
         while ($row = $this->db->getNextArray()) {
             $onlineAssessments[] = array(
                 'date' => $row['created_at'],
                 'type' => 'onlineassessment',
                 'message' => $userHandler->formatName($row) . ' posted the online assessment ' . Scrub::text($row['heading']),
-                'messageHTML' => '<a href="/search/user/'.$row['uid'].'">' . $userHandler->formatName($row) . '</a> posted the online assessment <a href="/assess/intro/' . $row['assess_id'] . '">' . Scrub::text($row['heading']) . '</a>',
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> posted the online assessment <a href="/assess/intro/' . $row['assess_id'] . '">' . Scrub::text($row['heading']) . '</a>',
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -179,17 +183,18 @@ class Feed {
         return $onlineAssessments;
     }
 
-	/**
-	 * Get a list of surveys that were created.
-	 *
-	 * @param  $cid
-	 * @param  $limit
-	 * @return
-	 */
-	public function getSurveys($cid, $limit) {
+    /**
+     * Get a list of surveys that were created.
+     *
+     * @param  $cid
+     * @param  $limit
+     * @return
+     */
+    public function getSurveys($cid, $limit)
+    {
 
-        if(is_array($cid))
-            $where = ' IN (' . implode(',',$cid) . ') ';
+        if (is_array($cid))
+            $where = ' IN (' . implode(',', $cid) . ') ';
         else
             $where = " = $cid ";
 
@@ -205,29 +210,30 @@ class Feed {
 				  AND assess.availability = 'survey'
 				  ORDER BY assess.created_at DESC LIMIT 0, $limit";
 
-		$this->db->query($query);
+        $this->db->query($query);
 
-		$userHandler = new User();
+        $userHandler = new User();
 
-		while ($row = $this->db->getNextArray()) {
-			$surveys[] = array(
-				'date' => $row['created_at'],
-				'type' => 'survey',
-				'message' => $userHandler->formatName($row) . ' posted the survey ' . Scrub::text($row['heading']),
-				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">' . $userHandler->formatName($row) . '</a> posted the survey <a href="/survey/intro/' . $row['assess_id'] . '">' . Scrub::text($row['heading']) . '</a>',
+        while ($row = $this->db->getNextArray()) {
+            $surveys[] = array(
+                'date' => $row['created_at'],
+                'type' => 'survey',
+                'message' => $userHandler->formatName($row) . ' posted the survey ' . Scrub::text($row['heading']),
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> posted the survey <a href="/survey/intro/' . $row['assess_id'] . '">' . Scrub::text($row['heading']) . '</a>',
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
-		}
+        }
 
-		return $surveys;
-	}
+        return $surveys;
+    }
 
 
-	function getNews($cid, $limit) {
+    function getNews($cid, $limit)
+    {
 
-        if(is_array($cid))
-            $where = ' IN (' . implode(',',$cid) . ') ';
+        if (is_array($cid))
+            $where = ' IN (' . implode(',', $cid) . ') ';
         else
             $where = " = $cid ";
 
@@ -238,29 +244,30 @@ class Feed {
 					WHERE sn.code $where AND deleted = 0
 					ORDER BY datetime_posted DESC LIMIT 0, $limit";
 
-		$this->db->query($query);
+        $this->db->query($query);
 
-		$userHandler = new User();
+        $userHandler = new User();
 
-		while($row = $this->db->getNextArray()){
+        while ($row = $this->db->getNextArray()) {
 
-			$news[] = array(
-				'date' => $row['submitted'],
-				'type' => 'news',
-				'message' => $userHandler->formatName($row) . ' posted the news '.Scrub::text($row['heading']),
-				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> posted the news <a href="/homepage/'.$row['id'].'">' . Scrub::text($row['heading']) . '</a>',
+            $news[] = array(
+                'date' => $row['submitted'],
+                'type' => 'news',
+                'message' => $userHandler->formatName($row) . ' posted the news ' . Scrub::text($row['heading']),
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> posted the news <a href="/homepage/' . $row['id'] . '">' . Scrub::text($row['heading']) . '</a>',
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
-		}
+        }
 
-		return $news;
-	}
+        return $news;
+    }
 
-	function getFolders($cid, $limit) {
+    function getFolders($cid, $limit)
+    {
 
-        if(is_array($cid))
-            $where = ' IN (' . implode(',',$cid) . ') ';
+        if (is_array($cid))
+            $where = ' IN (' . implode(',', $cid) . ') ';
         else
             $where = " = $cid ";
 
@@ -271,64 +278,68 @@ class Feed {
 					WHERE parent $where AND object = 'folder' AND action = 'create'
 					ORDER BY time DESC LIMIT 0, $limit";
 
-		$this->db->query($query);
+        $this->db->query($query);
 
-		$userHandler = new User();
+        $userHandler = new User();
 
-		while($row = $this->db->getNextArray()){
-			$folder[] = array(
-				'date' => $row['submitted'],
-				'type' => 'folder',
-				'message' => $userHandler->formatName($row) . ' created the folder '.Scrub::text($row['name']),
-				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> created the folder <a href="/homepage/'.$row['id'].'">' . Scrub::text($row['name']) . '</a>',
+        while ($row = $this->db->getNextArray()) {
+            $folder[] = array(
+                'date' => $row['submitted'],
+                'type' => 'folder',
+                'message' => $userHandler->formatName($row) . ' created the folder ' . Scrub::text($row['name']),
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> created the folder <a href="/homepage/' . $row['id'] . '">' . Scrub::text($row['name']) . '</a>',
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
-		}
+        }
 
-		return $folder;
-	}
+        return $folder;
+    }
 
-	function getForum($cid, $limit) {
+    function getForum($cid, $limit)
+    {
 
-        if(is_array($cid))
-            $where = ' IN (' . implode(',',$cid) . ') ';
+        if (is_array($cid))
+            $where = ' IN (' . implode(',', $cid) . ') ';
         else
             $where = " = $cid ";
 
-        $query = "SELECT f.id, heading, UNIX_TIMESTAMP(`date`) submitted, u.firstname, u.lastname, u.title, u.id as uid, c.name as cat_name, c.id as cat_id
-					FROM forum f
-                    JOIN user u ON u.id = f.owner
-                    LEFT JOIN category c ON c.id = f.cid
-					WHERE f.deleted = 0 AND f.cid $where
+        $query = "SELECT f.threadID, f.title as heading,  UNIX_TIMESTAMP(`date`) submitted, u.firstname, u.lastname, u.title, u.id as uid, c.name as cat_name, c.id as cat_id
+					FROM forumThread f
+                    JOIN user u ON u.id = f.userID
+                    LEFT JOIN category c ON c.id = f.categoryID
+					WHERE f.deleted = 'false' AND f.categoryID $where
 					ORDER BY `date` DESC LIMIT 0, $limit";
+        print $query;
+        $this->db->query($query);
 
-		$this->db->query($query);
+        $userHandler = new User();
 
-		$userHandler = new User();
-
-		while($row = $this->db->getNextArray()){
-			$forum[] = array(
-				'date' => $row['submitted'],
-				'type' => 'forum',
-				'message' => $userHandler->formatName($row) . ' made the comment '.Scrub::text($row['heading']),
-				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> made the comment <a href="/forum/viewForum.php?mgsid='.$row['id'].'&cid='.$cid.'">' . Scrub::text($row['heading']) . '</a>',
+        while ($row = $this->db->getNextArray()) {
+            print_r($row);
+            $forum[] = array(
+                'date' => $row['submitted'],
+                'type' => 'forum',
+                'message' => $userHandler->formatName($row) . ' started the thread ' . Scrub::text($row['heading']),
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> started the thread <a href="/forum/thread/' . $row['threadID'] . '">' . Scrub::text($row['heading']) . '</a>',
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
-		}
+        }
 
-		return $forum;
-	}
+        return $forum;
+    }
 
-	function getPoll($limit) {
+    function getPoll($limit)
+    {
 
-	}
+    }
 
-	function getWiki($cid, $limit) {
+    function getWiki($cid, $limit)
+    {
 
-        if(is_array($cid))
-            $where = ' IN (' . implode(',',$cid) . ') ';
+        if (is_array($cid))
+            $where = ' IN (' . implode(',', $cid) . ') ';
         else
             $where = " = $cid ";
 
@@ -340,35 +351,36 @@ class Feed {
 				  	WHERE w.deleted = 'false' AND w.categoryID $where
 					ORDER BY r.created DESC LIMIT 0, $limit";
 
-		$this->db->query($query);
+        $this->db->query($query);
 
-		$userHandler = new User();
+        $userHandler = new User();
 
-		while($row = $this->db->getNextArray()){
-			$wiki[] = array(
-				'date' => $row['submitted'],
-				'type' => 'wiki',
-				'message' => $userHandler->formatName($row) . ' updated the wiki '.Scrub::text($row['heading']),
-				'messageHTML' => '<a href="/search/user/'.$row['uid'].'">'.$userHandler->formatName($row) . '</a> updated the wiki <a href="/wiki/'.$row['categoryID'].'/'.$row['slug'] .'">' . Scrub::text($row['heading']) . '</a>',
+        while ($row = $this->db->getNextArray()) {
+            $wiki[] = array(
+                'date' => $row['submitted'],
+                'type' => 'wiki',
+                'message' => $userHandler->formatName($row) . ' updated the wiki ' . Scrub::text($row['heading']),
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> updated the wiki <a href="/wiki/' . $row['categoryID'] . '/' . $row['slug'] . '">' . Scrub::text($row['heading']) . '</a>',
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
-		}
+        }
 
-		return $wiki;
-	}
+        return $wiki;
+    }
 
-	/**
-	 * Get a list of new blog entries to push into the feed.
-	 *
-	 * @param  $cid
-	 * @param  $limit
-	 * @return
-	 */
-	public function getBlog($cid, $limit) {
+    /**
+     * Get a list of new blog entries to push into the feed.
+     *
+     * @param  $cid
+     * @param  $limit
+     * @return
+     */
+    public function getBlog($cid, $limit)
+    {
 
-        if(is_array($cid))
-            $where = ' IN (' . implode(',',$cid) . ') ';
+        if (is_array($cid))
+            $where = ' IN (' . implode(',', $cid) . ') ';
         else
             $where = " = $cid ";
 
@@ -381,35 +393,36 @@ class Feed {
 			AND deleted IS NULL
 			ORDER BY submitted LIMIT 0, $limit";
 
-		$this->db->query($query);
+        $this->db->query($query);
 
-		$userHandler = new User();
+        $userHandler = new User();
 
-		while ($row = $this->db->getNextArray()) {
-			$blog[] = array(
-				'date' => $row['submitted'],
-				'type' => 'blog',
-				'message' => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
-				'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> updated the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text($row['heading']) . '</a>',
+        while ($row = $this->db->getNextArray()) {
+            $blog[] = array(
+                'date' => $row['submitted'],
+                'type' => 'blog',
+                'message' => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> updated the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text($row['heading']) . '</a>',
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
-		}
+        }
 
-		return $blog;
-	}
+        return $blog;
+    }
 
-	/**
-	 * Get a list of new blog comments to push into the feed.
-	 *
-	 * @param  $cid
-	 * @param  $limit
-	 * @return
-	 */
-	public function getBlogComments($cid, $limit) {
+    /**
+     * Get a list of new blog comments to push into the feed.
+     *
+     * @param  $cid
+     * @param  $limit
+     * @return
+     */
+    public function getBlogComments($cid, $limit)
+    {
 
-        if(is_array($cid))
-            $where = ' IN (' . implode(',',$cid) . ') ';
+        if (is_array($cid))
+            $where = ' IN (' . implode(',', $cid) . ') ';
         else
             $where = " = $cid ";
 
@@ -422,42 +435,42 @@ class Feed {
 			AND b.deleted IS NULL
 			ORDER BY submitted LIMIT 0, $limit";
 
-		$this->db->query($query);
+        $this->db->query($query);
 
-		$userHandler = new User();
+        $userHandler = new User();
 
-		while ($row = $this->db->getNextArray()) {
-			$blogComments[] = array(
-				'date' => $row['submitted'],
-				'type' => 'blog',
-				'message' => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
-				'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> commented on the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text($row['heading']) . '</a>',
+        while ($row = $this->db->getNextArray()) {
+            $blogComments[] = array(
+                'date' => $row['submitted'],
+                'type' => 'blog',
+                'message' => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> commented on the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text($row['heading']) . '</a>',
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
-		}
+        }
 
-		return $blogComments;
-	}
+        return $blogComments;
+    }
 
-	// TODO: Group member changes
+    // TODO: Group member changes
 
-	// TODO: Homepage layout changes
+    // TODO: Homepage layout changes
 
-	// TODO: Submission boxes
+    // TODO: Submission boxes
 
-	// TODO: blog
+    // TODO: blog
 
-	// TODO: text box updates
+    // TODO: text box updates
 
-	function timecmp($a, $b)
-	{
-		//just a quick function to enable sorting of news based on time
-	   if ($a['date'] == $b['date']) {
-		   return 0;
-	   }
-	   return ($a['date'] > $b['date']) ? -1 : 1;
-	}
+    function timecmp($a, $b)
+    {
+        //just a quick function to enable sorting of news based on time
+        if ($a['date'] == $b['date']) {
+            return 0;
+        }
+        return ($a['date'] > $b['date']) ? -1 : 1;
+    }
 
 
 }
