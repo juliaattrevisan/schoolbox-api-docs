@@ -440,7 +440,7 @@ class Leave_Controller extends Controller {
 	}
 
 	/**
-	 * Returns a collection of requests by house id
+	 * Returns a collection of approved requests by house id
 	 *
 	 * @param Integer $houseId
 	 *
@@ -454,6 +454,68 @@ class Leave_Controller extends Controller {
 			'house' => $house,
 			'requestList' => $requestList,
 		);
+	}
+
+	public function exportHouseRequestList($data) {
+		$house = $data['house'];
+		$requestList = $data['requestList'];
+		$allRows = array();
+
+		$headings = array(
+			'User ID',
+			'Firstname',
+			'Lastname',
+			'House',
+			'Year',
+			'Start',
+			'Finish',
+			'Host Type',
+			'Status',
+			'Status Updated On',
+			'Status Updated By'
+		);
+
+		$allRows[] = TextFormatter::outputCSV($headings);
+
+		foreach ($requestList as $request) {
+			if ($request->getStatus() == Leave_Request::STATUS_APPROVED) {
+				$rowData = array();
+
+				$rowData[] = $request->getUser()->getId();
+				$rowData[] = $request->getUser()->getFirstname();
+				$rowData[] = $request->getUser()->getLastname();
+				$rowData[] = $house->getHouse();
+				$rowData[] = $request->getUser()->getYear();
+				$rowData[] = $request->getStart()->getAustralian();
+				$rowData[] = $request->getFinish()->getAustralian();
+				$rowData[] = $request->getHostTypeMapIndex($request->getHostType());
+				$rowData[] = $request->getStatus(true);
+				$rowData[] = $request->getAuthorisationDatetime(true)->getAustralian();
+				$rowData[] = $request->getAuthorisationUser()->getFirstname() . ' ' . $request->getAuthorisationUser()->getLastname();
+
+				$allRows[] = TextFormatter::outputCSV($rowData);
+			}
+		}
+
+		$this->dumpCSV("Leave Requests for {$house->getHouse()}", $allRows);
+	}
+
+	/**
+	 * Dump a csv file's contents w/ headers
+	 *
+	 * @param $filename
+	 * @param $allRows
+	 */
+	private function dumpCSV($filename, $allRows) {
+		$name = new Url($filename);
+
+		header('Content-type: application/csv');
+		header("Content-Disposition: attachment; filename={$name->getSlug()}.csv");
+		header("Pragma: no-cache");
+		header("Expires: 0");
+
+		echo implode("\n", $allRows);
+		exit(1);
 	}
 
     /**
@@ -604,14 +666,7 @@ class Leave_Controller extends Controller {
 				}
 			}
 
-			$name = new Url('Leave Requests - ' . $user['firstname'] . ' ' . $user['lastname']);
-
-			header('Content-type: application/csv');
-			header("Content-Disposition: attachment; filename={$name->getSlug()}.csv");
-			header("Pragma: no-cache");
-			header("Expires: 0");
-
-			echo implode("\n", $allRows);
+			$this->dumpCSV('Leave Requests - ' . $user['firstname'] . ' ' . $user['lastname'], $allRows);
 		}
 
 		exit(1);
