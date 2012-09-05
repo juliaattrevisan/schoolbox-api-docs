@@ -310,13 +310,13 @@ class Feed
                     LEFT JOIN category c ON c.id = f.categoryID
 					WHERE f.deleted = 'false' AND f.categoryID $where
 					ORDER BY `date` DESC LIMIT 0, $limit";
-        print $query;
+
         $this->db->query($query);
 
         $userHandler = new User();
 
         while ($row = $this->db->getNextArray()) {
-            print_r($row);
+
             $forum[] = array(
                 'date' => $row['submitted'],
                 'type' => 'forum',
