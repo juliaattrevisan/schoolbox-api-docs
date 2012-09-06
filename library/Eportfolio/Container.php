@@ -447,6 +447,10 @@ class Eportfolio_Container {
     public function canView($userID) {
         $groupHandler = new Group();
 
+        if($_SESSION['id'] == $userID) {
+            return true;
+        }
+
         // supers, staff, your parents and you can view your folio
         if ($groupHandler->isSuperUser() ||
             $groupHandler->isStaff() ||
