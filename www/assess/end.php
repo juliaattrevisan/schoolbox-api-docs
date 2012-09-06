@@ -26,7 +26,7 @@ if (!$assess) {
 }
 
 if ($assessHandler->isDeleted($assess['assess_id'])) {
-	error(112);
+    error(112);
 }
 
 /* Disabled: doing so will allow teachers to give their test a "dry run" and
@@ -45,7 +45,7 @@ if ($assessHandler->isExpired($assess['assess_id'])) {
  * but authors should be able to test out their content
  */
 if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
-	error(143);
+    error(143);
 }
 
 $this->setFile(TEMPLATE_content, 'assess/end.html');
@@ -56,7 +56,7 @@ $this->setBlock(TEMPLATE_content, 'unmarkedRemaining', 'unmarkedRemaining_block'
 $this->setTitle('Assessment: ' . $assess['title']);
 
 if ($attempt['finish'] == '0000-00-00 00:00:00') {
-	$attemptFinishDate = new Alaress_Date_Format(time(), 'U');
+    $attemptFinishDate = new Alaress_Date_Format(time(), 'U');
 
     $attemptHandler->update(array(
         'attempt_id' => $_SESSION['attempt_id'],
@@ -64,20 +64,19 @@ if ($attempt['finish'] == '0000-00-00 00:00:00') {
     ));
 
     $this->setVar(array(
-        'ASSESS_TITLE' => $assess['title'],
-		'ASSESS_CATEGORY_ID' => $assess['category_id'],
+        'ASSESS_TITLE' => scrub::text($assess['title']),
+        'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'ATTEMPT_END' => $attemptFinishDate->getShort(),
     ));
 
     $this->setVar('alreadyEnded_block', '');
     $this->parse('endAssess_block', 'endAssess');
-}
-else {
-	$attemptFinishDate = new Alaress_Date_Format(strtotime($attempt['finish']), 'U');
+} else {
+    $attemptFinishDate = new Alaress_Date_Format(strtotime($attempt['finish']), 'U');
 
     $this->setVar(array(
-        'ASSESS_TITLE' => $assess['title'],
-		'ASSESS_CATEGORY_ID' => $assess['category_id'],
+        'ASSESS_TITLE' => scrub::text($assess['title']),
+        'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'ATTEMPT_END' => $attemptFinishDate->getShort(),
     ));
 
@@ -97,7 +96,7 @@ $allAttempts = $attemptHandler->getListByAssessAndAttempt($this->arg[0], $_SESSI
 $factory = new Assess_Factory();
 
 if ($allAttempts) {
-    foreach($allAttempts as $currentAttempt) {
+    foreach ($allAttempts as $currentAttempt) {
         $allResponses = $responseHandler->getAutomarkableResponses($_SESSION['attempt_id']);
 
         if (is_array($allResponses)) {
@@ -118,28 +117,27 @@ $responseHandler->updatedAutomatedMarks($markedResponseIDs);
  */
 $marks = $attemptHandler->getMarksForAttempt($_SESSION['attempt_id']);
 $total = $attemptHandler->getTotalMarks($this->arg[0], $_SESSION['attempt_id']);
-$percentage = 100*number_format($marks/$total, 2);
+$percentage = 100 * number_format($marks / $total, 2);
 $numMarkedQuestions = $responseHandler->numAutomarked($_SESSION['attempt_id']);
 $numUnmarkedQuestions = $responseHandler->numNotAutomarked($_SESSION['attempt_id']);
 $valueUnmarkedQuestions = $responseHandler->valueNotAutomarked($_SESSION['attempt_id']);
 
 $this->setVar(array(
-	'ATTEMPT_MARKS' => $marks,
-	'ATTEMPT_PERCENTAGE' => $percentage,
-	'ATTEMPT_TOTAL' => $total,
-	'ATTEMPT_NUM_MARKED_QUESTIONS' => $numMarkedQuestions,
-	'ATTEMPT_NUM_UNMARKED_QUESTIONS' => $numUnmarkedQuestions,
-	'ATTEMPT_NUM_QUESTIONS' => $numMarkedQuestions + $numUnmarkedQuestions,
-	'ATTEMPT_VALUE_UNMARKED_QUESTIONS' => $valueUnmarkedQuestions,
+    'ATTEMPT_MARKS' => $marks,
+    'ATTEMPT_PERCENTAGE' => $percentage,
+    'ATTEMPT_TOTAL' => $total,
+    'ATTEMPT_NUM_MARKED_QUESTIONS' => $numMarkedQuestions,
+    'ATTEMPT_NUM_UNMARKED_QUESTIONS' => $numUnmarkedQuestions,
+    'ATTEMPT_NUM_QUESTIONS' => $numMarkedQuestions + $numUnmarkedQuestions,
+    'ATTEMPT_VALUE_UNMARKED_QUESTIONS' => $valueUnmarkedQuestions,
 ));
 
 /* If there are unmarked questions remaining, show the block
  */
 if ($numUnmarkedQuestions) {
-	$this->parse('unmarkedRemaining_block', 'unmarkedRemaining');
-}
-else {
-	$this->setVar('unmarkedRemaining_block', '');
+    $this->parse('unmarkedRemaining_block', 'unmarkedRemaining');
+} else {
+    $this->setVar('unmarkedRemaining_block', '');
 }
 
 /* Clear attempt

@@ -22,19 +22,19 @@ if (!empty($_POST)) {
     }
 
     $section = $sectionHandler->getByID(Scrub::text($_POST['section_id']));
-	$assess = $assessHandler->getByID($section['assess_id']);
+    $assess = $assessHandler->getByID($section['assess_id']);
 
-	if ($assessHandler->isDeleted($assess['assess_id'])) {
-		error(112);
-	}
+    if ($assessHandler->isDeleted($assess['assess_id'])) {
+        error(112);
+    }
 
-	if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
         error(130);
     }
 
-	if ($sectionHandler->isDeleted($section['section_id'])) {
-		error(115);
-	}
+    if ($sectionHandler->isDeleted($section['section_id'])) {
+        error(115);
+    }
 
     $questionHandler = $factory->createQuestionModel(Scrub::text($_POST['type_id']));
     $answerHandler = $factory->createAnswerModel(Scrub::text($_POST['type_id']));
@@ -45,8 +45,7 @@ if (!empty($_POST)) {
     /* Create new question
      */
     SitePage::localRedir('/survey/question/create/' . $section['section_id']);
-}
-else {
+} else {
     if (!is_numeric($this->arg[0])) {
         error(115);
     }
@@ -62,25 +61,25 @@ else {
     $questionHandler = new Survey_Question();
     $question = $questionHandler->getByID($this->arg[0]);
 
-	if ($question) {
-    	$section = $sectionHandler->getByID($question['section_id']);
-	}
+    if ($question) {
+        $section = $sectionHandler->getByID($question['section_id']);
+    }
 
-	if ($section) {
-		$assess = $assessHandler->getByID($section['assess_id']);
-	}
+    if ($section) {
+        $assess = $assessHandler->getByID($section['assess_id']);
+    }
 
-	if ($assessHandler->isDeleted($section['assess_id'])) {
-		error(112);
-	}
+    if ($assessHandler->isDeleted($section['assess_id'])) {
+        error(112);
+    }
 
-	if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
         error(130);
     }
 
-	if ($sectionHandler->isDeleted($section['section_id'])) {
-		error(115);
-	}
+    if ($sectionHandler->isDeleted($section['section_id'])) {
+        error(115);
+    }
 
     $answerHandler = $factory->createAnswerModel($question['type_id']);
 
@@ -99,7 +98,7 @@ else {
 
     $this->setVar(array(
         'QUESTIONTYPE_TYPE_ID' => $currentQuestionType['type_id'],
-        'QUESTIONTYPE_DESCRIPTION' => $currentQuestionType['description'],
+        'QUESTIONTYPE_DESCRIPTION' => scrub::html($currentQuestionType['description']),
         'QUESTIONTYPE_SELECTED' => $selected,
     ));
 
@@ -109,39 +108,39 @@ else {
         error(51);
     }
 
-	/* Show this Survey' contents
-	 */
-	$this->setFile('assessContentsFragment', 'survey/contents.html');
-	$this->setBlock('assessContentsFragment', 'section', 'section_block');
-	$this->setBlock('section', 'question', 'question_block');
+    /* Show this Survey' contents
+      */
+    $this->setFile('assessContentsFragment', 'survey/contents.html');
+    $this->setBlock('assessContentsFragment', 'section', 'section_block');
+    $this->setBlock('section', 'question', 'question_block');
 
-	$this->parse('allQuestions_block', 'assessContentsFragment', true);
+    $this->parse('allQuestions_block', 'assessContentsFragment', true);
 
-	/* Options for importing into the Question Bank
-	 */
-	$this->setBlock(TEMPLATE_content, 'question_category', 'question_category_block');
+    /* Options for importing into the Question Bank
+      */
+    $this->setBlock(TEMPLATE_content, 'question_category', 'question_category_block');
 
-	$assessHandler = new Survey_Main();
-	$assessHandler->renderAssessContents($section['assess_id'], $this);
+    $assessHandler = new Survey_Main();
+    $assessHandler->renderAssessContents($section['assess_id'], $this);
 
-	$assess = $assessHandler->getByID($section['assess_id']);
+    $assess = $assessHandler->getByID($section['assess_id']);
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],
-		'ASSESS_CATEGORY_ID' => $assess['category_id'],
+        'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'SECTION_ID' => $question['section_id'],
         'SEQUENCE' => $question['sequence'],
         'QUESTION_ID' => $question['question_id'],
-        'QUESTION' => $question['question'],
+        'QUESTION' => scrub::html($question['question']),
         'MARKS' => $question['marks'],
         'DISABLED_SELECTED' => '',
     ));
 
-	/* Derive and render a category list
-	 */
-	$questionBankCategoryHandler = new Survey_Question_Category();
+    /* Derive and render a category list
+      */
+    $questionBankCategoryHandler = new Survey_Question_Category();
 
-	$questionCategoryList = new Survey_Question_Category_List($this, $assess['assess_id'], 0, $questionBankCategoryHandler->getPath());
-	$questionCategoryList->render();
+    $questionCategoryList = new Survey_Question_Category_List($this, $assess['assess_id'], 0, $questionBankCategoryHandler->getPath());
+    $questionCategoryList->render();
 }
 

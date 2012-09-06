@@ -51,7 +51,7 @@ if (!$attempt) {
 }
 
 if ($assessHandler->isDeleted($this->arg[0])) {
-	error(112);
+    error(112);
 }
 
 if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
@@ -62,18 +62,16 @@ if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($as
  */
 if (is_numeric($this->arg[2])) {
     $_SESSION['attempt_id'] = $this->arg[2];
-}
-else {
+} else {
     error(114);
 }
 
 /* Find out whether the attempt has been previously finalised
  */
 if ($attempt['reviewed_at'] != '') {
-	$reviewedAt = 'true';
-}
-else {
-	$reviewedAt = 'false';
+    $reviewedAt = 'true';
+} else {
+    $reviewedAt = 'false';
 }
 
 $user = $userHandler->getByID($attempt['user_id']);
@@ -95,12 +93,12 @@ $this->setTitle('Assessment: ' . $assess['title']);
  */
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
-    'ASSESS_TITLE' => $assess['title'],
+    'ASSESS_TITLE' => Scrub::text($assess['title']),
     'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
-    'SECTION_TITLE' => $section['title'],
-    'SECTION_DESCRIPTION' => $section['description'],
-	'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
-	'RESPONDENT_NAME' => $userHandler->formatName($user),
+    'SECTION_TITLE' => Scrub::text($section['title']),
+    'SECTION_DESCRIPTION' => Scrub::text($section['description']),
+    'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
+    'RESPONDENT_NAME' => $userHandler->formatName($user),
 ));
 
 $readonly = (!($groupHandler->isSuperuser() || (!(date('Y', strtotime($assess['finish'])) < date('Y')))));
@@ -111,9 +109,9 @@ $readonly = (!($groupHandler->isSuperuser() || (!(date('Y', strtotime($assess['f
 $allQuestions = $sectionHandler->getQuestions($_SESSION['attempt_id'], $section['section_id']);
 
 if ($allQuestions) {
-	$randomQuestionNumber = 1;
+    $randomQuestionNumber = 1;
 
-    foreach($allQuestions as $currentQuestion) {
+    foreach ($allQuestions as $currentQuestion) {
         $answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
 
         /* Load answer template into answerOption block
@@ -134,19 +132,19 @@ if ($allQuestions) {
         $this->setVar(array(
             'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
             'QUESTION_SEQUENCE' => $currentQuestion['sequence'],
-            'QUESTION_QUESTION' => $currentQuestion['question'],
+            'QUESTION_QUESTION' => Scrub::html($currentQuestion['question']),
             'QUESTION_MARKS' => $currentQuestion['marks'],
         ));
 
-		/* If this is a randomised section, number each question incrementally
-		 */
-		if ($section['random'] == 1) {
-			$this->setVar(array(
-				'QUESTION_SEQUENCE' => $randomQuestionNumber
-			));
-		}
+        /* If this is a randomised section, number each question incrementally
+           */
+        if ($section['random'] == 1) {
+            $this->setVar(array(
+                'QUESTION_SEQUENCE' => $randomQuestionNumber
+            ));
+        }
 
-		$randomQuestionNumber++;
+        $randomQuestionNumber++;
 
         /* Load individual answers
          */
@@ -155,35 +153,33 @@ if ($allQuestions) {
         $this->parse('answerInputs_block', 'answerFormFragment', true);
         $this->parse('question_block', 'question', true);
 
-		/* Clear child blocks after parsing out the parent
-		 */
-		$answerHandler->cleanupParse($this);
+        /* Clear child blocks after parsing out the parent
+           */
+        $answerHandler->cleanupParse($this);
 
         $this->setVar('answerFormFragment', '');
         $this->setVar('answerInputs_block', '');
 
-        if($readonly) {
-            $this->setVar('writable_update_block','');
+        if ($readonly) {
+            $this->setVar('writable_update_block', '');
 
-            $this->setVar('writable_comment_block','');
-            $this->parse ('readonly_comment_block','readonly_comment');
+            $this->setVar('writable_comment_block', '');
+            $this->parse('readonly_comment_block', 'readonly_comment');
 
-            $this->setVar('writable_mark_block','');
-            $this->parse ('readonly_mark_block','readonly_mark');
+            $this->setVar('writable_mark_block', '');
+            $this->parse('readonly_mark_block', 'readonly_mark');
 
-        }
-        else {
-            $this->parse('writable_update_block','writable_update');
+        } else {
+            $this->parse('writable_update_block', 'writable_update');
 
-            $this->parse ('writable_comment_block','writable_comment');
-            $this->setVar('readonly_comment_block','');
+            $this->parse('writable_comment_block', 'writable_comment');
+            $this->setVar('readonly_comment_block', '');
 
-            $this->parse ('writable_mark_block','writable_mark');
-            $this->setVar('readonly_mark_block','');
+            $this->parse('writable_mark_block', 'writable_mark');
+            $this->setVar('readonly_mark_block', '');
         }
     }
-}
-else {
+} else {
     $this->setVar('question_block', '');
 }
 
@@ -199,8 +195,7 @@ if (!is_numeric($nextSection['section_id']) && !is_numeric($prevSection['section
     $this->setVar('nextSection_block', '');
     $this->setVar('prevSection_block', '');
     $this->parse('endAssess_block', 'endAssess');
-}
-/* If there is no next section, then provide the finish link and parse out the
+} /* If there is no next section, then provide the finish link and parse out the
  * previous button if applicable
  */
 else {
@@ -211,8 +206,7 @@ else {
 
         $this->parse('nextSection_block', 'nextSection');
         $this->setVar('endAssess_block', '');
-    }
-    else {
+    } else {
         $this->setVar('nextSection_block', '');
         $this->parse('endAssess_block', 'endAssess');
     }
@@ -225,15 +219,13 @@ else {
         ));
 
         $this->parse('prevSection_block', 'prevSection');
-    }
-    else {
+    } else {
         $this->setVar('prevSection_block', '');
     }
 }
 
-if($readonly) {
+if ($readonly) {
     $this->setVar('writable_finalise_block', '');
-}
-else {
+} else {
     $this->parse('writable_finalise_block', 'writable_finalise');
 }

@@ -13,17 +13,17 @@ $assessHandler = new Assess_Main();
 $groupHandler = new Group();
 
 if (!empty($_POST)) {
-	$assess = $assessHandler->getByID(Scrub::text($_POST['assess_id']));
+    $assess = $assessHandler->getByID($_POST['assess_id']);
 
-	if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
-	    error(130);
-	}
+    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+        error(130);
+    }
 
-	if ($assessHandler->isDeleted($_POST['assess_id'])) {
-		error(112);
-	}
+    if ($assessHandler->isDeleted($assess['assess_id'])) {
+        error(112);
+    }
 
-    if (!$assessHandler->isOwner(Scrub::text($_POST['assess_id']))) {
+    if (!$assessHandler->isOwner($assess['assess_id'])) {
         error(130);
     }
 
@@ -35,15 +35,14 @@ if (!empty($_POST)) {
     /* Redirect to question creation for this section
      */
     SitePage::localRedir('/assess/question/create/' . $section_id);
-}
-else {
+} else {
     if (empty($this->arg[0])) {
         error(51);
     }
 
-	if ($assessHandler->isDeleted($this->arg[0])) {
-		error(112);
-	}
+    if ($assessHandler->isDeleted($this->arg[0])) {
+        error(112);
+    }
 
     if (!$assessHandler->isOwner($this->arg[0])) {
         error(130);
@@ -68,7 +67,7 @@ else {
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $this->arg[0],
-        'ASSESS_TITLE' => $assess['title'],
+        'ASSESS_TITLE' => Scrub::text($assess['title']),
         'SECTION_ID' => '',
         'SEQUENCE' => $sectionHandler->getNextSequence($this->arg[0])
     ));

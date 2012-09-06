@@ -9,9 +9,9 @@ $this->setBlock('category_selected', 'question', 'question_block');
 $this->setBlock('question', 'answers', 'answers_block');
 
 $this->setVar(array(
-	'QUESTIONBANK_CATEGORY_ID' => $this->arg[0],
+    'QUESTIONBANK_CATEGORY_ID' => $this->arg[0],
     'SURVEY_ID' => $this->arg[1],
-	'SECTION_ID' => $this->arg[2],
+    'SECTION_ID' => $this->arg[2],
 ));
 
 $questionBankHandler = new Survey_Question_Bank();
@@ -26,51 +26,49 @@ $questionCategoryList->render();
 /* If expanding a particular category
  */
 if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
-	$category = $questionBankCategoryHandler->getByID($this->arg[0]);
+    $category = $questionBankCategoryHandler->getByID($this->arg[0]);
 
     $this->setVar(array(
-		'QUESTION_CATEGORY' => $category['name'],
-	));
+        'QUESTION_CATEGORY' => scrub::text($category['name']),
+    ));
 
-	$allQuestions = $questionBankHandler->getContents($this->arg[0]);
+    $allQuestions = $questionBankHandler->getContents($this->arg[0]);
 
     /* Iterate and show
      */
     if (is_array($allQuestions) && count($allQuestions)) {
         $previousCategory = false;
 
-        foreach($allQuestions as $currentQuestion) {
+        foreach ($allQuestions as $currentQuestion) {
             $this->setVar(array(
                 'QUESTION_BANK_ID' => $currentQuestion['question_bank_id'],
                 'QUESTION_TYPE' => $currentQuestion['description'],
-                'QUESTION' => $currentQuestion['question'],
+                'QUESTION' => scrub::text($currentQuestion['question']),
                 'MARKS' => $currentQuestion['marks'],
-                'answers_block'  => '',
+                'answers_block' => '',
             ));
 
             if ($currentQuestion['answer']) {
                 $answerList = unserialize($currentQuestion['answer']);
 
-				if (is_array($answerList)) {
-					foreach($answerList as $answer) {
+                if (is_array($answerList)) {
+                    foreach ($answerList as $answer) {
 
-						/* Matching pairs uses a different property than
-						 * multiple choice
-						 */
-						if ($currentQuestion['type_id'] == $questionBankHandler::MATCHING_PAIRS_TYPE_ID) {
-							$this->setVar('ANSWER_DESCRIPTION', $answer->answerLeft . ' - ' . $answer->answerRight);
-						}
-						else {
-							$this->setVar('ANSWER_DESCRIPTION', $answer->description);
-						}
+                        /* Matching pairs uses a different property than
+                               * multiple choice
+                               */
+                        if ($currentQuestion['type_id'] == $questionBankHandler::MATCHING_PAIRS_TYPE_ID) {
+                            $this->setVar('ANSWER_DESCRIPTION', scrub::text($answer->answerLeft . ' - ' . $answer->answerRight));
+                        } else {
+                            $this->setVar('ANSWER_DESCRIPTION', scrub::text($answer->description));
+                        }
 
-						$this->parse('answers_block', 'answers', true);
-					}
-				}
-				else {
-					$this->setVar('ANSWER_DESCRIPTION', $currentQuestion['answer']);
-					$this->parse('answers_block', 'answers', true);
-				}
+                        $this->parse('answers_block', 'answers', true);
+                    }
+                } else {
+                    $this->setVar('ANSWER_DESCRIPTION', $currentQuestion['answer']);
+                    $this->parse('answers_block', 'answers', true);
+                }
             }
 
             $this->parse('question_block', 'question', true);
@@ -78,14 +76,13 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
             $previous = $currentQuestion['question_category_id'];
         }
 
-        $this->parse('category_selected_block','category_selected');
+        $this->parse('category_selected_block', 'category_selected');
 
         /* Hide submit button if we aren't adding contents to a section
          */
         if (is_numeric($this->arg[2])) {
             $this->parse('show_submit_block', 'show_submit');
-        }
-        else {
+        } else {
             $this->setVar('show_submit_block', '');
         }
 
@@ -96,9 +93,8 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
         /* Hide 'no questions' message
          */
         $this->setVar('no_questions_block', '');
-        $this->setVar('welcome_block','');
-    }
-    else {
+        $this->setVar('welcome_block', '');
+    } else {
 
         /* There are no questions: hide the add/remove functionality and display a
          * little message
@@ -106,12 +102,11 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
         $this->setVar('show_submit_block', '');
         $this->setVar('show_delete_block', '');
         $this->setVar('question_block', '');
-        $this->setVar('welcome_block','');
+        $this->setVar('welcome_block', '');
         $this->parse('no_questions_block', 'no_questions');
-        $this->parse('category_selected_block','category_selected');
+        $this->parse('category_selected_block', 'category_selected');
     }
-}
-else {
+} else {
     $this->parse('welcome_block', 'welcome');
-    $this->setVar('category_selected_block','');
+    $this->setVar('category_selected_block', '');
 }

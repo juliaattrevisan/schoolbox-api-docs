@@ -33,7 +33,7 @@ if (!$assess) {
 }
 
 if ($assessHandler->isDeleted($assess['assess_id'])) {
-	error(112);
+    error(112);
 }
 
 if (!$section) {
@@ -57,11 +57,11 @@ if ($assessHandler->isExpired($assess['assess_id'])) {
  * but authors should be able to test out their content
  */
 if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
-	error(143);
+    error(143);
 }
 
 if (!$questionHandler->numQuestions($assess['assess_id'])) {
-	error(137);
+    error(137);
 }
 
 /* Disabled: doing so will allow teachers to give their test a "dry run" and
@@ -86,30 +86,28 @@ $attemptEndTime = $attemptStartTime + $assess['duration'];
 /* If there is a resumable attempt, resume it.
  */
 if ($attempt) {
-	$_SESSION['attempt_id'] = $attempt['attempt_id'];
-}
-/* Otherwise start a new attempt if there is a limit
+    $_SESSION['attempt_id'] = $attempt['attempt_id'];
+} /* Otherwise start a new attempt if there is a limit
  */
 else {
-	if (($assess['max_attempts'] > 0) && ($numAttempts+1 > $assess['max_attempts'])) {
+    if (($assess['max_attempts'] > 0) && ($numAttempts + 1 > $assess['max_attempts'])) {
 
-		/* Clear and exit when you attempt to make more than is allowed
-		 */
-		$_SESSION['attempt_id'] = '';
+        /* Clear and exit when you attempt to make more than is allowed
+           */
+        $_SESSION['attempt_id'] = '';
 
-		error(146);
-	}
-	else {
-		$_SESSION['attempt_id'] = $attemptHandler->start($_SESSION['id'], $this->arg[0]);
+        error(146);
+    } else {
+        $_SESSION['attempt_id'] = $attemptHandler->start($_SESSION['id'], $this->arg[0]);
 
-		$attempt = $attemptHandler->getByID($_SESSION['attempt_id']);
-	}
+        $attempt = $attemptHandler->getByID($_SESSION['attempt_id']);
+    }
 }
 
 /* Check if Attempt ran out of time
  */
 if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Assess_Main::UNLIMITED_DURATION)) {
-	error(122);
+    error(122);
 }
 
 /* Set up template
@@ -130,13 +128,13 @@ $attemptEndDate = new Alaress_Date_Format($attemptEndTime, 'U');
 
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
-    'ASSESS_TITLE' => $assess['title'],
+    'ASSESS_TITLE' => Scrub::text($assess['title']),
     'ASSESS_TIME_REMAINING' => $attemptTimeRemaining,
     'ATTEMPT_START' => $attemptStartDate->getShort(),
     'ATTEMPT_END' => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'No particular time' : $attemptEndDate->getShort(),
-    'SECTION_TITLE' => $section['title'],
-    'SECTION_DESCRIPTION' => $section['description'],
-	'CURRENT_SECTION_SEQUENCE' => $section['sequence'],
+    'SECTION_TITLE' => Scrub::text($section['title']),
+    'SECTION_DESCRIPTION' => Scrub::text($section['description']),
+    'CURRENT_SECTION_SEQUENCE' => $section['sequence'],
 ));
 
 /* Load all the questions for this section. This saves stubs for each response
@@ -147,8 +145,7 @@ if (!$responseHandler->numStubResponsesInSection($_SESSION['attempt_id'], $secti
     if ($section['random'] == 1) {
         $pool = $section['pool'];
         $randomise = Assess_Response::RANDOMISE_QUESTIONS;
-    }
-    else {
+    } else {
         $pool = 0;
         $randomise = Assess_Response::ORDERED_QUESTIONS;
     }
@@ -163,9 +160,9 @@ $allQuestions = $sectionHandler->getQuestions($_SESSION['attempt_id'], $section[
 /* Process questions now that we've got a list of 'em
  */
 if ($allQuestions) {
-	$randomQuestionNumber = 1;
+    $randomQuestionNumber = 1;
 
-    foreach($allQuestions as $currentQuestion) {
+    foreach ($allQuestions as $currentQuestion) {
         if (!is_numeric($currentQuestion['type_id'])) {
             error(133);
         }
@@ -174,7 +171,7 @@ if ($allQuestions) {
 
         /* Load answer template into answerOption block
          */
-		$path = 'assess/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/answer.html';
+        $path = 'assess/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/answer.html';
 
         $this->setFile('answerFormFragment', $path);
         $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
@@ -186,19 +183,19 @@ if ($allQuestions) {
         $this->setVar(array(
             'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
             'QUESTION_SEQUENCE' => $currentQuestion['sequence'],
-            'QUESTION_QUESTION' => $currentQuestion['question'],
+            'QUESTION_QUESTION' => Scrub::html($currentQuestion['question']),
             'QUESTION_MARKS' => $currentQuestion['marks'],
         ));
 
-		/* If this is a randomised section, number each question incrementally
-		 */
-		if ($section['random'] == 1) {
-			$this->setVar(array(
-				'QUESTION_SEQUENCE' => $randomQuestionNumber
-			));
-		}
+        /* If this is a randomised section, number each question incrementally
+           */
+        if ($section['random'] == 1) {
+            $this->setVar(array(
+                'QUESTION_SEQUENCE' => $randomQuestionNumber
+            ));
+        }
 
-		$randomQuestionNumber++;
+        $randomQuestionNumber++;
 
         /* Load individual answers
          */
@@ -207,15 +204,14 @@ if ($allQuestions) {
         $this->parse('answerInputs_block', 'answerFormFragment', true);
         $this->parse('question_block', 'question', true);
 
-		/* Clear child blocks after parsing out the parent
-		 */
-		$answerHandler->cleanupParse($this);
+        /* Clear child blocks after parsing out the parent
+           */
+        $answerHandler->cleanupParse($this);
 
         $this->setVar('answerFormFragment', '');
         $this->setVar('answerInputs_block', '');
     }
-}
-else {
+} else {
     $this->setVar('question_block', '');
 }
 
@@ -248,8 +244,7 @@ if (!is_numeric($nextSection['section_id']) && !is_numeric($prevSection['section
     $this->setVar('nextSection_block', '');
     $this->setVar('prevSection_block', '');
     $this->parse('endAssess_block', 'endAssess');
-}
-/* If there is no next section, then provide the finish link and parse out the
+} /* If there is no next section, then provide the finish link and parse out the
  * previous button if applicable
  */
 else {
@@ -260,8 +255,7 @@ else {
 
         $this->parse('nextSection_block', 'nextSection');
         $this->setVar('endAssess_block', '');
-    }
-    else {
+    } else {
         $this->setVar('nextSection_block', '');
         $this->parse('endAssess_block', 'endAssess');
     }
@@ -274,8 +268,7 @@ else {
         ));
 
         $this->parse('prevSection_block', 'prevSection');
-    }
-    else {
+    } else {
         $this->setVar('prevSection_block', '');
     }
 }

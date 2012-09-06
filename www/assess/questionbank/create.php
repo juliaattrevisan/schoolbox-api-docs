@@ -4,10 +4,10 @@
  *
  * Creates a Questionbank Category
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 require_once('../include/Bootstrap.php');
 
@@ -18,8 +18,8 @@ if (!$groupHandler->isStaff()) {
 }
 
 $newCategory = array(
-	'name' => Scrub::text($_POST['name']),
-	'parent_id' => Scrub::text($_POST['parentId']),
+    'name' => $_POST['name'],
+    'parent_id' => $_POST['parentId'],
 );
 
 $categoryHandler = new Assess_Question_Category();

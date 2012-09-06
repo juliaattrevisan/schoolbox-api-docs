@@ -13,161 +13,155 @@ $sectionHandler = new Assess_Section();
 $responseHandler = new Assess_Response();
 
 if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
-	$category = $catHandler->getByID($this->arg[1]);
+    $category = $catHandler->getByID($this->arg[1]);
 
-	/* Open an output stream so we can use fputcsv
-	 */
-	$filename = preg_replace('/[^0-9a-zA-Z()_-]/','_', $category['name']);
+    /* Open an output stream so we can use fputcsv
+      */
+    $filename = preg_replace('/[^0-9a-zA-Z()_-]/', '_', $category['name']);
 
-	header ("Pragma: ");
-	header ("Cache-control: ");
-	header ("Content-Type: text/csv");
-	header ("Content-Disposition: attachment; filename=\"".$filename.".csv\"");
+    header("Pragma: ");
+    header("Cache-control: ");
+    header("Content-Type: text/csv");
+    header("Content-Disposition: attachment; filename=\"" . $filename . ".csv\"");
 
-	$fp = fopen('php://output', 'w');
+    $fp = fopen('php://output', 'w');
 
-	if (!$groupHandler->isStaff()) {
-		error(19);
-	}
+    if (!$groupHandler->isStaff()) {
+        error(19);
+    }
 
-	/* Get full student list of class  */
+    /* Get full student list of class  */
     if ($category['code'] && Cfg::get('external_enable')) {
 
         //if synergy code get synergy students
         $synHandler = new External_Class();
         $studentList = $synHandler->getStudents($category['code']);
 
-		for ($x=0; is_array($studentList[$x]);$x++){
-			$user = $userHandler->getBySynergy($studentList[$x]['synergy_id']);
+        for ($x = 0; is_array($studentList[$x]); $x++) {
+            $user = $userHandler->getBySynergy($studentList[$x]['synergy_id']);
 
-			/* If the Synergetic user wasn't found in the portal, just remove
-			 * them from the list. Otherwise the future queries about submitted
-			 * work will break, because there are no uids.
-			 */
-			if (!$user) {
-				unset($studentList[$x]);
-			}
-			else {
-				$studentList[$x]['uid'] = $user['uid'];
-			}
-		}
-    }
-    else {
+            /* If the Synergetic user wasn't found in the portal, just remove
+                * them from the list. Otherwise the future queries about submitted
+                * work will break, because there are no uids.
+                */
+            if (!$user) {
+                unset($studentList[$x]);
+            } else {
+                $studentList[$x]['uid'] = $user['uid'];
+            }
+        }
+    } else {
         //Retrieve student list from group membership
         $groupHandler = new Group;
         $studentList = $groupHandler->getMemberList($this->arg[1]);
     }
 
-	$subList = $subHandler->getAllForUserCategory($this->arg[1], $_SESSION['id']);
+    $subList = $subHandler->getAllForUserCategory($this->arg[1], $_SESSION['id']);
 
-	if (is_array($subList)) {
-        $csv = array('Synergetic ID','Surname','Firstname');
+    if (is_array($subList)) {
+        $csv = array('Synergetic ID', 'Surname', 'Firstname');
 
-		/* Scrub::text() too aggressive, creates untranslatable &#039; for apostrophes?
-		 */
-		foreach($subList as $sub) {
-            $csv[] = html_entity_decode($sub['name'], ENT_QUOTES);
-			$csv[] = '';
-			$csv[] = '';
-		}
+        /* Scrub::text() too aggressive, creates untranslatable &#039; for apostrophes?
+           */
+        foreach ($subList as $sub) {
+            $csv[] = $sub['name'];
+            $csv[] = '';
+            $csv[] = '';
+        }
 
-		fputcsv($fp, $csv);
+        fputcsv($fp, $csv);
 
-		/* Add subheadings
-		 * These are spacers for synergetic id, surname, firstname
-		 */
-		$csv = array('', '', '');
+        /* Add subheadings
+           * These are spacers for synergetic id, surname, firstname
+           */
+        $csv = array('', '', '');
 
-		/* Actual subheadings
-		 */
-		foreach($subList as $sub) {
-			$submissionType = $subHandler->getType($sub['type_id']);
-			$csv[] = html_entity_decode($submissionType['name'], ENT_QUOTES);
-			$csv[] = '';
-			$csv[] = '';
-		}
+        /* Actual subheadings
+           */
+        foreach ($subList as $sub) {
+            $submissionType = $subHandler->getType($sub['type_id']);
+            $csv[] = $submissionType['name'];
+            $csv[] = '';
+            $csv[] = '';
+        }
 
-		fputcsv($fp, $csv);
+        fputcsv($fp, $csv);
 
-		/* Add third level subheadings
-		 */
-		$csv = array('', '', '');
+        /* Add third level subheadings
+           */
+        $csv = array('', '', '');
 
-		/* Actual subheadings
-		 */
-		foreach($subList as $sub) {
-			if ($sub['type_id'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) {
-				$csv[] = 'Grade';
-				$csv[] = 'Total';
-			}
-			else {
-				$csv[] = 'Normalised Grade';
-				$csv[] = 'Grade';
-				$csv[] = 'Comment';
-			}
-		}
+        /* Actual subheadings
+           */
+        foreach ($subList as $sub) {
+            if ($sub['type_id'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) {
+                $csv[] = 'Grade';
+                $csv[] = 'Total';
+            } else {
+                $csv[] = 'Normalised Grade';
+                $csv[] = 'Grade';
+                $csv[] = 'Comment';
+            }
+        }
 
-		fputcsv($fp, $csv);
-	}
+        fputcsv($fp, $csv);
+    }
 
-	if (is_array($studentList)) {
-		foreach($studentList as $student) {
-			$csv = array();
-			$csv[] = $student['uid'];
-			$csv[] = htmlspecialchars_decode(Scrub::text($student['lastname']), ENT_QUOTES);
-			$csv[] = htmlspecialchars_decode(Scrub::text($student['firstname']), ENT_QUOTES);
+    if (is_array($studentList)) {
+        foreach ($studentList as $student) {
+            $csv = array();
+            $csv[] = $student['uid'];
+            $csv[] = $student['lastname'];
+            $csv[] = $student['firstname'];
 
-			if (is_array($subList)) {
-				foreach($subList as $sub) {
+            if (is_array($subList)) {
+                foreach ($subList as $sub) {
                     if ($sub['type_id'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) {
                         $firstSection = $sectionHandler->getFirst($sub['id']);
                         $mostRecentAttempt = $attemptHandler->getLatestForUser($sub['id'], $student['uid']);
                         $marks = $attemptHandler->getMarksForAttempt($mostRecentAttempt['attempt_id']);
                         $total = $attemptHandler->getTotalMarks($sub['id'], $mostRecentAttempt['attempt_id']);
 
-						/* return two columns, grade and total available marks
-						 */
+                        /* return two columns, grade and total available marks
+                               */
                         if ($marks && $total) {
                             $csv[] = Scrub::text($marks);
-							$csv[] = Scrub::text($total);
+                            $csv[] = Scrub::text($total);
+                        } else {
+                            $csv[] = '';
+                            $csv[] = '';
                         }
-                        else {
-							$csv[] = '';
-							$csv[] = '';
-                        }
-                    }
-                    else {
+                    } else {
 
                         /* Return two columns, grade and comment
                          */
-                        $return = $retHandler->getByUser($student['uid'],$sub['id']);
+                        $return = $retHandler->getByUser($student['uid'], $sub['id']);
                         // if this is legacy, return Excel-escaped (ie. '-prepended) mark, otherwise norm_mark
                         $mark = $return[0]['slug'] == 'free' ? "'{$return[0]['mark']}" : $return[0]['norm_mark'];
 
-                        $csv[] = html_entity_decode(Scrub::text($mark), ENT_QUOTES);
-						$csv[] = $return[0]['mark'];
-						$csv[] = html_entity_decode(Scrub::text($return[0]['comment']), ENT_QUOTES);
+                        $csv[] = $mark;
+                        $csv[] = $return[0]['mark'];
+                        $csv[] = $return[0]['comment'];
                     }
-				}
-			}
+                }
+            }
 
-			fputcsv($fp, $csv);
-		}
-	}
+            fputcsv($fp, $csv);
+        }
+    }
 
-	fclose($fp);
+    fclose($fp);
 
     exit;
-}
-else if(is_numeric($this->arg[0])) {
-	$this->setFile(TEMPLATE_content, 'submission/markSheet.html');
-	$this->setTitle('Class Mark Sheet');
-	$this->setTab('submission');
+} else if (is_numeric($this->arg[0])) {
+    $this->setFile(TEMPLATE_content, 'submission/markSheet.html');
+    $this->setTitle('Class Mark Sheet');
+    $this->setTab('submission');
 
-	$this->setBlock(TEMPLATE_content, 'sub_head', 'sub_head_block');
-	$this->setBlock(TEMPLATE_content, 'assess_head', 'assess_head_block');
-	$this->setBlock(TEMPLATE_content, 'sub_type_head', 'sub_type_head_block');
-	$this->setBlock(TEMPLATE_content, 'assess_type_head', 'assess_type_head_block');
+    $this->setBlock(TEMPLATE_content, 'sub_head', 'sub_head_block');
+    $this->setBlock(TEMPLATE_content, 'assess_head', 'assess_head_block');
+    $this->setBlock(TEMPLATE_content, 'sub_type_head', 'sub_type_head_block');
+    $this->setBlock(TEMPLATE_content, 'assess_type_head', 'assess_type_head_block');
     $this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
     $this->setBlock(TEMPLATE_content, 'student_mark_list', 'student_mark_list_block');
     $this->setBlock('student_mark_list', 'markItem', 'markItem_block');
@@ -178,58 +172,56 @@ else if(is_numeric($this->arg[0])) {
     $this->setBlock('mark', 'mark_type_raw', 'mark_type_raw_block');
     $this->setBlock('mark', 'mark_type_free', 'mark_type_free_block');
 
-	$this->setBlock(TEMPLATE_content, 'no_submissions', 'no_submissions_block');
-	$this->setBlock(TEMPLATE_content, 'no_assessments', 'no_assessments_block');
+    $this->setBlock(TEMPLATE_content, 'no_submissions', 'no_submissions_block');
+    $this->setBlock(TEMPLATE_content, 'no_assessments', 'no_assessments_block');
 
-	if (!$groupHandler->isStaff()) {
-		error(19);
-	}
+    if (!$groupHandler->isStaff()) {
+        error(19);
+    }
 
     $category = $catHandler->getByID($this->arg[0]);
 
-	if ($category['code'] != "") {
-		$this->setVar('CATEGORY', $category['name'] . ' (' . $category['code'] . ')');
-	}
-	else {
-		$this->setVar('CATEGORY', $category['name']);
-	}
+    if ($category['code'] != "") {
+        $this->setVar('CATEGORY', $category['name'] . ' (' . $category['code'] . ')');
+    } else {
+        $this->setVar('CATEGORY', $category['name']);
+    }
 
-	$this->setVar('CID', $category['id']);
+    $this->setVar('CID', $category['id']);
 
-	/* Get full student list of class  */
+    /* Get full student list of class  */
     if ($category['code'] && Cfg::get('external_enable')) {
 
         //if synergy code get synergy students
         $synHandler = new External_Class();
         $studentList = $synHandler->getStudents($category['code']);
 
-		for ($x=0; is_array($studentList[$x]);$x++){
-			$user = $userHandler->getBySynergy($studentList[$x]['synergy_id']);
-			$studentList[$x]['uid'] = $user['uid'];
-		}
-    }
-    else {
+        for ($x = 0; is_array($studentList[$x]); $x++) {
+            $user = $userHandler->getBySynergy($studentList[$x]['synergy_id']);
+            $studentList[$x]['uid'] = $user['uid'];
+        }
+    } else {
         //Retrieve student list from group membership
         $groupHandler = new Group;
         $studentList = $groupHandler->getMemberList($this->arg[0]);
     }
 
-	$subList = $subHandler->getAllForUserCategory($this->arg[0], $_SESSION['id']);
+    $subList = $subHandler->getAllForUserCategory($this->arg[0], $_SESSION['id']);
 
     $this->setVar('sub_head_block', '');
     $this->setVar('assess_head_block', '');
     $this->setVar('sub_type_head_block', '');
     $this->setVar('assess_type_head_block', '');
 
-	$this->setVar('no_submissions_block', '');
-	$this->setVar('no_assessments_block', '');
+    $this->setVar('no_submissions_block', '');
+    $this->setVar('no_assessments_block', '');
 
-	if (is_array($subList)) {
-		foreach($subList as $sub) {
+    if (is_array($subList)) {
+        foreach ($subList as $sub) {
             $this->setVar(array(
-				'BOX_ID' => $sub['id'],
-				'SUB_NAME' => Scrub::text($sub['name']),
-				'SUB_TYPE' => Scrub::text($sub['typeName'])
+                'BOX_ID' => $sub['id'],
+                'SUB_NAME' => Scrub::text($sub['name']),
+                'SUB_TYPE' => Scrub::text($sub['typeName'])
             ));
 
             if ($sub['type_id'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) {
@@ -244,7 +236,7 @@ else if(is_numeric($this->arg[0])) {
                 $allAttempts = $attemptHandler->getList($sub['id']);
 
                 if (is_array($allAttempts)) {
-                    foreach($allAttempts as $currentAttempt) {
+                    foreach ($allAttempts as $currentAttempt) {
                         $allResponses = $responseHandler->getAutomarkableResponses($currentAttempt['attempt_id']);
 
                         if (is_array($allResponses)) {
@@ -261,65 +253,62 @@ else if(is_numeric($this->arg[0])) {
                     $responseHandler->updatedAutomatedMarks($markedResponseIDs);
                 }
 
-				$this->parse('assess_head_block','assess_head', true);
-                $this->parse('assess_type_head_block','assess_type_head', true);
+                $this->parse('assess_head_block', 'assess_head', true);
+                $this->parse('assess_type_head_block', 'assess_type_head', true);
+            } else {
+                $this->parse('sub_head_block', 'sub_head', true);
+                $this->parse('sub_type_head_block', 'sub_type_head', true);
             }
-			else {
-				$this->parse('sub_head_block','sub_head', true);
-				$this->parse('sub_type_head_block','sub_type_head', true);
-			}
-		}
-	}
-	else {
+        }
+    } else {
         $this->setVar('sub_head_block', '');
         $this->setVar('sub_type_head_block', '');
     }
 
-	if (is_array($studentList)) {
-		foreach($studentList as $student) {
+    if (is_array($studentList)) {
+        foreach ($studentList as $student) {
 
-			/* If there is no uid associated with the student, prevent them
-			 * from appearing in the markSheet.
-			 */
-			if (is_numeric($student['uid'])) {
-				$output = array(
-					'SURNAME' => Scrub::text($student['lastname']),
-					'FIRSTNAME' => Scrub::text($student['firstname']),
-					'UID' => $student['uid'],
-					'ON_OFF' => ++$i % 2 ? '' : 'dark',
-				);
+            /* If there is no uid associated with the student, prevent them
+                * from appearing in the markSheet.
+                */
+            if (is_numeric($student['uid'])) {
+                $output = array(
+                    'SURNAME' => Scrub::text($student['lastname']),
+                    'FIRSTNAME' => Scrub::text($student['firstname']),
+                    'UID' => $student['uid'],
+                    'ON_OFF' => ++$i % 2 ? '' : 'dark',
+                );
 
-				$this->setVar($output);
+                $this->setVar($output);
 
-				$this->setVar('mark_block','');
-				$this->setVar('onlineAssessmentMark_block','');
+                $this->setVar('mark_block', '');
+                $this->setVar('onlineAssessmentMark_block', '');
 
-				if (is_array($subList)) {
-					foreach($subList as $sub) {
-						if ($sub['type_id'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) {
-							$firstSection = $sectionHandler->getFirst($sub['id']);
-							$mostRecentAttempt = $attemptHandler->getLatestForUser($sub['id'], $student['uid']);
-							$marks = $attemptHandler->getMarksForAttempt($mostRecentAttempt['attempt_id']);
-							$total = $attemptHandler->getTotalMarks($sub['id'], $mostRecentAttempt['attempt_id']);
+                if (is_array($subList)) {
+                    foreach ($subList as $sub) {
+                        if ($sub['type_id'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) {
+                            $firstSection = $sectionHandler->getFirst($sub['id']);
+                            $mostRecentAttempt = $attemptHandler->getLatestForUser($sub['id'], $student['uid']);
+                            $marks = $attemptHandler->getMarksForAttempt($mostRecentAttempt['attempt_id']);
+                            $total = $attemptHandler->getTotalMarks($sub['id'], $mostRecentAttempt['attempt_id']);
 
-							$this->setVar(array(
-								'ASSESS_ASSESS_ID' => $sub['id'],
-								'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
-								'ATTEMPT_ID' => $mostRecentAttempt['attempt_id'],
-								'MARK' => ($marks && $total) ? number_format($marks, 2) . ' / ' . number_format($total, 2)  : '',
-								'BOX_ID' => ''
-							));
+                            $this->setVar(array(
+                                'ASSESS_ASSESS_ID' => $sub['id'],
+                                'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
+                                'ATTEMPT_ID' => $mostRecentAttempt['attempt_id'],
+                                'MARK' => ($marks && $total) ? number_format($marks, 2) . ' / ' . number_format($total, 2) : '',
+                                'BOX_ID' => ''
+                            ));
 
-							$this->setVar('mark_block','');
-							$this->parse('onlineAssessmentMark_block', 'onlineAssessmentMark');
-						}
-						else {
-							/* If a UID was found for the student, try to get his
-							 * submissions. Otherwise skip him (this occurs when he
-							 * exists in Synergetic but not in schoolbox)
-							 */
-							if (is_numeric($student['uid'])) {
-								$return = $retHandler->getByUser($student['uid'], $sub['id']);
+                            $this->setVar('mark_block', '');
+                            $this->parse('onlineAssessmentMark_block', 'onlineAssessmentMark');
+                        } else {
+                            /* If a UID was found for the student, try to get his
+                                    * submissions. Otherwise skip him (this occurs when he
+                                    * exists in Synergetic but not in schoolbox)
+                                    */
+                            if (is_numeric($student['uid'])) {
+                                $return = $retHandler->getByUser($student['uid'], $sub['id']);
 
                                 $subbox = $subHandler->getByID($sub['id']);
 
@@ -327,12 +316,12 @@ else if(is_numeric($this->arg[0])) {
                                 $marksheet = Marksheet_Factory::build($subbox['mark_type_slug']);
                                 $mark = $marksheet->retrieveMark($student['uid'], $sub['id']);
 
-                                switch($marksheet->getSlug()) {
+                                switch ($marksheet->getSlug()) {
                                     case 'raw':
                                         $output = array(
                                             'MAX_MARK' => $mark['max_mark'],
-                                            'MARK'     => $mark['mark'],
-                                            'COMMENT'  => $mark['comment']
+                                            'MARK' => $mark['mark'],
+                                            'COMMENT' => $mark['comment']
                                         );
                                         $this->setVar($output);
                                         break;
@@ -341,7 +330,7 @@ else if(is_numeric($this->arg[0])) {
                                         $this->setVar('grade_drop_block', '');
                                         $this->dropdown('grade_drop', $subHandler->getLetterGrades(), $mark['grade_selected'], 'mark_type_letter', array(
                                             'grade_id' => 'GRADE_VALUE',
-                                            'caption'  => 'GRADE_TEXT',
+                                            'caption' => 'GRADE_TEXT',
                                         ));
                                         $this->setVar('COMMENT', $mark['comment']);
                                         break;
@@ -350,7 +339,7 @@ else if(is_numeric($this->arg[0])) {
                                     case 'free': // legacy support
                                         $output = array(
                                             'MARK' => $mark['mark'],
-                                            'COMMENT'  => $mark['comment']
+                                            'COMMENT' => $mark['comment']
                                         );
                                         $this->setVar($output);
                                         break;
@@ -358,7 +347,7 @@ else if(is_numeric($this->arg[0])) {
                                     default:
                                         $output = array(
                                             'MARK' => '!ERROR',
-                                            'COMMENT'  => '!ERROR'
+                                            'COMMENT' => '!ERROR'
                                         );
                                         $this->setVar($output);
                                         break;
@@ -367,42 +356,39 @@ else if(is_numeric($this->arg[0])) {
                                 $marktypes = $subHandler->getMarkTypes(true);
 
                                 // parse the appropraite block, and hide the rest
-                                foreach($marktypes as $type) {
-                                    if($type['mark_type_id'] == $marksheet->getID()) {
+                                foreach ($marktypes as $type) {
+                                    if ($type['mark_type_id'] == $marksheet->getID()) {
                                         $this->parse("mark_type_{$type['slug']}_block", "mark_type_{$type['slug']}", false);
                                     } else
                                         $this->setVar("mark_type_{$type['slug']}_block", '');
                                 }
 
-								$this->setVar('BOX_ID', $sub['id']);
+                                $this->setVar('BOX_ID', $sub['id']);
 
-							}
+                            }
 
-							$this->parse('mark_block','mark');
-							$this->setVar('onlineAssessmentMark_block', '');
-						}
+                            $this->parse('mark_block', 'mark');
+                            $this->setVar('onlineAssessmentMark_block', '');
+                        }
 
-						$this->parse('markItem_block', 'markItem', true);
-						$this->setVar('mark_block', '');
-						$this->setVar('onlineAssessmentMark_block', '');
-					}
-				}
-				else {
-					$this->setVar('mark_block','');
-					$this->setVar('onlineAssessmentMark_block', '');
-				}
+                        $this->parse('markItem_block', 'markItem', true);
+                        $this->setVar('mark_block', '');
+                        $this->setVar('onlineAssessmentMark_block', '');
+                    }
+                } else {
+                    $this->setVar('mark_block', '');
+                    $this->setVar('onlineAssessmentMark_block', '');
+                }
 
-				$this->parse('student_list_block', 'student_list', true);
-				$this->parse('student_mark_list_block', 'student_mark_list', true);
-				$this->setVar('markItem_block', '');
-			}
-		}
-	}
-	else {
-		$this->setVar('student_list_block', '');
-		$this->setVar('student_mark_list_block', '');
+                $this->parse('student_list_block', 'student_list', true);
+                $this->parse('student_mark_list_block', 'student_mark_list', true);
+                $this->setVar('markItem_block', '');
+            }
+        }
+    } else {
+        $this->setVar('student_list_block', '');
+        $this->setVar('student_mark_list_block', '');
     }
-}
-else {
-	error(2);
+} else {
+    error(2);
 }

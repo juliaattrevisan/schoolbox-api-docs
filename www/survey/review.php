@@ -50,7 +50,7 @@ if (!$attempt) {
 }
 
 if ($assessHandler->isDeleted($this->arg[0])) {
-	error(112);
+    error(112);
 }
 
 if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
@@ -61,18 +61,16 @@ if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermiss
  */
 if (is_numeric($this->arg[2])) {
     $_SESSION['attempt_id'] = $this->arg[2];
-}
-else {
+} else {
     error(114);
 }
 
 /* Find out whether the attempt has been previously finalised
  */
 if ($attempt['reviewed_at'] != '') {
-	$reviewedAt = 'true';
-}
-else {
-	$reviewedAt = 'false';
+    $reviewedAt = 'true';
+} else {
+    $reviewedAt = 'false';
 }
 
 
@@ -95,14 +93,14 @@ $user = $attemptHandler->getUser($attempt['attempt_id']);
  */
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
-    'ASSESS_TITLE' => $assess['title'],
+    'ASSESS_TITLE' => scrub::text($assess['title']),
     'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
-    'SECTION_TITLE' => $section['title'],
-    'SECTION_DESCRIPTION' => $section['description'],
-	'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
-	'ATTEMPT_USERNAME' => $user['firstname'] . ' ' . $user['lastname'],
-	'ATTEMPT_START_DATETIME' => $start->getShort(),
-	'ATTEMPT_FINISH_DATETIME' => $finish->getShort(),
+    'SECTION_TITLE' => scrub::text($section['title']),
+    'SECTION_DESCRIPTION' => scrub::text($section['description']),
+    'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
+    'ATTEMPT_USERNAME' => $user['firstname'] . ' ' . $user['lastname'],
+    'ATTEMPT_START_DATETIME' => $start->getShort(),
+    'ATTEMPT_FINISH_DATETIME' => $finish->getShort(),
 ));
 
 /* Load all the questions for this section.
@@ -111,7 +109,7 @@ $this->setVar(array(
 $allQuestions = $sectionHandler->getQuestions($_SESSION['attempt_id'], $section['section_id']);
 
 if ($allQuestions) {
-    foreach($allQuestions as $currentQuestion) {
+    foreach ($allQuestions as $currentQuestion) {
         $answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
 
         /* Load answer template into answerOption block
@@ -126,7 +124,7 @@ if ($allQuestions) {
         $this->setVar(array(
             'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
             'QUESTION_SEQUENCE' => $currentQuestion['sequence'],
-            'QUESTION_QUESTION' => $currentQuestion['question'],
+            'QUESTION_QUESTION' => scrub::html($currentQuestion['question']),
             'QUESTION_MARKS' => $currentQuestion['marks'],
         ));
 
@@ -137,15 +135,14 @@ if ($allQuestions) {
         $this->parse('answerInputs_block', 'answerFormFragment', true);
         $this->parse('question_block', 'question', true);
 
-		/* Clear child blocks after parsing out the parent
-		 */
-		$answerHandler->cleanupParse($this);
+        /* Clear child blocks after parsing out the parent
+           */
+        $answerHandler->cleanupParse($this);
 
         $this->setVar('answerFormFragment', '');
         $this->setVar('answerInputs_block', '');
     }
-}
-else {
+} else {
     $this->setVar('question_block', '');
 }
 
@@ -161,8 +158,7 @@ if (!is_numeric($nextSection['section_id']) && !is_numeric($prevSection['section
     $this->setVar('nextSection_block', '');
     $this->setVar('prevSection_block', '');
     $this->parse('endAssess_block', 'endAssess');
-}
-/* If there is no next section, then provide the finish link and parse out the
+} /* If there is no next section, then provide the finish link and parse out the
  * previous button if applicable
  */
 else {
@@ -173,8 +169,7 @@ else {
 
         $this->parse('nextSection_block', 'nextSection');
         $this->setVar('endAssess_block', '');
-    }
-    else {
+    } else {
         $this->setVar('nextSection_block', '');
         $this->parse('endAssess_block', 'endAssess');
     }
@@ -187,8 +182,7 @@ else {
         ));
 
         $this->parse('prevSection_block', 'prevSection');
-    }
-    else {
+    } else {
         $this->setVar('prevSection_block', '');
     }
 }

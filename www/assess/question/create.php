@@ -24,22 +24,22 @@ $groupHandler = new Group();
  */
 if (!empty($_POST)) {
     $section = $sectionHandler->getByID($_POST['section_id']);
-	$assess = $assessHandler->getByID($section['assess_id']);
+    $assess = $assessHandler->getByID($section['assess_id']);
 
-	if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
-	    error(130);
-	}
+    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+        error(130);
+    }
 
-	if ($assessHandler->isDeleted($section['assess_id'])) {
-		error(112);
-	}
+    if ($assessHandler->isDeleted($section['assess_id'])) {
+        error(112);
+    }
 
-	if ($sectionHandler->isDeleted($section['section_id'])) {
-		error(115);
-	}
+    if ($sectionHandler->isDeleted($section['section_id'])) {
+        error(115);
+    }
 
-    $questionHandler = $factory->createQuestionModel(Scrub::text($_POST['type_id']));
-    $answerHandler = $factory->createAnswerModel(Scrub::text($_POST['type_id']));
+    $questionHandler = $factory->createQuestionModel($_POST['type_id']);
+    $answerHandler = $factory->createAnswerModel($_POST['type_id']);
 
     $question_id = $questionHandler->create($_POST);
     $answer_id = $answerHandler->create($_POST, $question_id);
@@ -54,28 +54,27 @@ if (!empty($_POST)) {
 
     /* Need to keep this so non-ajaxed questions still redirect
      */
-    SitePage::localRedir('/assess/question/create/' . Scrub::text($_POST['section_id']));
-}
-else {
+    SitePage::localRedir('/assess/question/create/' . $section['section_id']);
+} else {
     if (!is_numeric($this->arg[0])) {
         error(51);
     }
 
     $section = $sectionHandler->getByID($this->arg[0]);
-	$assess = $assessHandler->getByID($section['assess_id']);
+    $assess = $assessHandler->getByID($section['assess_id']);
 
-	if ($assessHandler->isDeleted($section['assess_id'])) {
-		error(112);
-	}
+    if ($assessHandler->isDeleted($section['assess_id'])) {
+        error(112);
+    }
 
-	if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
-	    error(130);
-	}
+    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+        error(130);
+    }
 
 
-	if ($sectionHandler->isDeleted($section['section_id'])) {
-		error(115);
-	}
+    if ($sectionHandler->isDeleted($section['section_id'])) {
+        error(115);
+    }
 
     /* Render create page
      */
@@ -85,12 +84,12 @@ else {
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
     $this->setTitle('Create Question');
 
-	$this->setVar('question_block', '');
+    $this->setVar('question_block', '');
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],
         'SECTION_ID' => $this->arg[0],
-        'CURRENT_SECTION_TITLE' => $section['title'],
+        'CURRENT_SECTION_TITLE' => Scrub::text($section['title']),
         'SEQUENCE' => $questionHandler->getNextSequence($section['section_id']),
         'QUESTION' => '',
         'MARKS' => '',
@@ -102,19 +101,17 @@ else {
         $answerHandler = $factory->createAnswerModel($this->arg[1]);
 
         $this->setVar(array(
-			'IMPORT_SELECTED' => '',
+            'IMPORT_SELECTED' => '',
             'DISABLED_SELECTED' => '',
         ));
-    }
-    else if ($this->arg[1] == 'import'){
+    } else if ($this->arg[1] == 'import') {
         $this->setVar(array(
             'IMPORT_SELECTED' => 'selected=\'selected\'',
             'ANSWER_INPUTS' => ''
         ));
-	}
-	else {
+    } else {
         $this->setVar(array(
-			'IMPORT_SELECTED' => '',
+            'IMPORT_SELECTED' => '',
             'DISABLED_SELECTED' => 'selected=\'selected\'',
             'ANSWER_INPUTS' => $answerTemplate
         ));
@@ -126,7 +123,7 @@ else {
 
     $questionTypes = $questionHandler->getAllQuestionTypes();
 
-    foreach($questionTypes as $currentQuestionType) {
+    foreach ($questionTypes as $currentQuestionType) {
         if (is_numeric($this->arg[1]) && ($this->arg[1] == $currentQuestionType['type_id'])) {
             $selected = 'selected=\'selected\'';
 
@@ -144,8 +141,7 @@ else {
             /* We've set the template, so remember this
              */
             $setTemplate = true;
-        }
-        else {
+        } else {
             $selected = '';
         }
 
@@ -174,11 +170,11 @@ else {
     $assessHandler = new Assess_Main();
     $assessHandler->renderAssessContents($section['assess_id'], $this);
 
-	$assess = $assessHandler->getByID($section['assess_id']);
+    $assess = $assessHandler->getByID($section['assess_id']);
 
-	$this->setVar(array(
-		'ASSESS_CATEGORY_ID' => $assess['category_id'],
-	));
+    $this->setVar(array(
+        'ASSESS_CATEGORY_ID' => $assess['category_id'],
+    ));
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);
 }

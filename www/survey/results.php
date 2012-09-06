@@ -23,14 +23,14 @@ if (!$assess) {
 }
 
 if ($assessHandler->isDeleted($this->arg[0])) {
-	error(112);
+    error(112);
 }
 
 if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
     error(125);
 }
 
-$surveyExporter = new Survey_Export_Graph($assess,  new Survey_Factory(), new Survey_Section(), new Survey_Attempt(), new Survey_Question());
+$surveyExporter = new Survey_Export_Graph($assess, new Survey_Factory(), new Survey_Section(), new Survey_Attempt(), new Survey_Question());
 $sectionValues = $surveyExporter->getSectionValues();
 
 /* Data collected, now we can show it.
@@ -43,52 +43,52 @@ $this->setBlock('section', 'question', 'question_block');
 $this->setBlock('question', 'graph', 'graph_block');
 
 $this->setVar(array(
-	'SURVEY_NAME' => $assess['title']
+    'SURVEY_NAME' => scrub::text($assess['title'])
 ));
 
 $factory = new Survey_Factory();
 
 if (is_array($sectionValues) && count($sectionValues)) {
-	foreach($sectionValues as $currentSection) {
-		$i = 1;
+    foreach ($sectionValues as $currentSection) {
+        $i = 1;
 
-		if (is_array($currentSection['questions']) && count($currentSection['questions'])) {
-			foreach($currentSection['questions'] as $currentQuestion) {
+        if (is_array($currentSection['questions']) && count($currentSection['questions'])) {
+            foreach ($currentSection['questions'] as $currentQuestion) {
 
-				/* Question data
-				 */
-				$this->setVar(array(
-					'ASSESS_ID' => $assess['assess_id'],
+                /* Question data
+                     */
+                $this->setVar(array(
+                    'ASSESS_ID' => $assess['assess_id'],
                     'CID' => $assess['category_id'],
-					'QUESTION_QUESTION' => $currentQuestion['question'],
-					'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
-					'QUESTION_INDEX' => $i++,
-				));
+                    'QUESTION_QUESTION' => scrub::text($currentQuestion['question']),
+                    'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
+                    'QUESTION_INDEX' => $i++,
+                ));
 
-				/* Answer and Response data
-				 */
+                /* Answer and Response data
+                     */
 
-				$answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
+                $answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
 
-				$answerHandler->graphResults($this, $currentQuestion);
+                $answerHandler->graphResults($this, $currentQuestion);
 
-				$this->parse('question_block', 'question', true);
+                $this->parse('question_block', 'question', true);
 
-				/* Clear children after parsing out the parent
-				 */
-				$this->setVar('series_block', '');
-			}
-		}
+                /* Clear children after parsing out the parent
+                     */
+                $this->setVar('series_block', '');
+            }
+        }
 
-		$this->setVar(array(
-			'SECTION_NAME' => $currentSection['section']
-		));
+        $this->setVar(array(
+            'SECTION_NAME' => scrub::text($currentSection['section'])
+        ));
 
-		$this->parse('section_block', 'section', true);
+        $this->parse('section_block', 'section', true);
 
-		/* Clear children after parsing out the parent
-		 */
-		$this->setVar('question_block', '');
-	}
+        /* Clear children after parsing out the parent
+           */
+        $this->setVar('question_block', '');
+    }
 }
 

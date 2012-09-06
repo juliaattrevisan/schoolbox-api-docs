@@ -22,7 +22,7 @@ if (!$assess) {
 }
 
 if ($assessHandler->isDeleted($this->arg[0])) {
-	error(112);
+    error(112);
 }
 
 if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
@@ -34,8 +34,8 @@ $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
 
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $this->arg[0],
-    'ASSESS_TITLE' => $assess['title'],
-    'ASSESS_DESCRIPTION' => html_entity_decode($assess['description']),
+    'ASSESS_TITLE' => Scrub::text($assess['title']),
+    'ASSESS_DESCRIPTION' => Scrub::html($assess['description']),
     'ASSESS_START' => $assessStartDate->getShort(),
     'ASSESS_FINISH' => $assessFinishDate->getShort(),
     'FIRST_SECTION' => $allSections[0]['section_id'],
@@ -52,17 +52,16 @@ $this->setVar(array(
 /* Section list and question count
  */
 if (is_array($allSummary) && count($allSummary)) {
-    foreach($allSummary as $currentSummary) {
+    foreach ($allSummary as $currentSummary) {
         $this->setVar(array(
             'SECTION_SECTION_ID' => $currentSummary['section_id'],
             'SECTION_SEQUENCE' => $currentSummary['sequence'],
-            'SECTION_TITLE' => $currentSummary['title'],
+            'SECTION_TITLE' => Scrub::text($currentSummary['title']),
             'SECTION_NUMQUESTIONS' => $currentSummary['numQuestions'],
         ));
 
         $this->parse('section_block', 'section', 'true');
     }
-}
-else {
+} else {
     $this->setVar('section_block', '');
 }

@@ -10,26 +10,29 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-abstract class Evaluation_Question extends DeprecatedModel {
+abstract class Evaluation_Question extends DeprecatedModel
+{
     public $_table = 'assess_question';
     public $_index = 'question_id';
 
     private $allowedFields = array('section_id', 'question_id', 'sequence', 'type_id', 'marks', 'question', 'deleted_at');
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-		parent::DeprecatedModel();
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        parent::DeprecatedModel();
+    }
 
-	/**
-	 * Creates a Question.
-	 *
-	 * @param  $object
-	 * @return bool|int
-	 */
-    public function create($object) {
+    /**
+     * Creates a Question.
+     *
+     * @param  $object
+     * @return bool|int
+     */
+    public function create($object)
+    {
         $question = array_intersect_key($object, array_flip($this->allowedFields));
 
         $question_id = parent::create($question);
@@ -41,29 +44,31 @@ abstract class Evaluation_Question extends DeprecatedModel {
         return $question_id;
     }
 
-	/**
-	 * Updates a question's details.
-	 *
-	 * @param  $object
-	 * @return void
-	 */
-    public function update($object) {
+    /**
+     * Updates a question's details.
+     *
+     * @param  $object
+     * @return void
+     */
+    public function update($object)
+    {
         $question = array_intersect_key($object, array_flip($this->allowedFields));
 
         parent::update($question);
     }
 
-	/**
+    /**
      * For a new Question, find out what its sequence should be. If it's the
      * first Question for an Assess, return 1
-	 *
-	 * @param  $section_id
-	 * @return int
-	 */
-    public function getNextSequence($section_id) {
+     *
+     * @param  $section_id
+     * @return int
+     */
+    public function getNextSequence($section_id)
+    {
         $query = "SELECT MAX(sequence)+1 AS num
                   FROM {$this->_table}
-                  WHERE section_id = '$section_id'
+                  WHERE section_id = " . $this->smartQuote($section_id) . "
                   AND deleted_at IS NULL";
 
         $sequence = $this->db->getOne($query);
@@ -75,12 +80,13 @@ abstract class Evaluation_Question extends DeprecatedModel {
         return 1;
     }
 
-	/**
-	 * Get all available question types.
-	 *
-	 * @return array|bool
-	 */
-    public function getAllQuestionTypes() {
+    /**
+     * Get all available question types.
+     *
+     * @return array|bool
+     */
+    public function getAllQuestionTypes()
+    {
         $query = "SELECT *
                   FROM assess_luQuestionType
                   WHERE availability = 'all'
@@ -90,43 +96,46 @@ abstract class Evaluation_Question extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
-	/**
-	 * Get a specific question type
-	 *
-	 * @param  $type_id
-	 * @return array|bool
-	 */
-    public function getQuestionType($type_id) {
+    /**
+     * Get a specific question type
+     *
+     * @param  $type_id
+     * @return array|bool
+     */
+    public function getQuestionType($type_id)
+    {
         $query = "SELECT *
                   FROM assess_luQuestionType
-                  WHERE type_id = '$type_id'";
+                  WHERE type_id = " . $this->smartQuote($type_id);
 
         return $this->db->getRow($query);
     }
 
-	/**
-	 * Whether a question type has an applicable legend
-	 *
-	 * @param  $type_id
-	 * @return array|bool
-	 */
-	public function hasLegend($type_id) {
-		$query = "SELECT *
+    /**
+     * Whether a question type has an applicable legend
+     *
+     * @param  $type_id
+     * @return array|bool
+     */
+    public function hasLegend($type_id)
+    {
+        $query = "SELECT *
 				  FROM assess_luQuestionType
-				  WHERE type_id = '$type_id'
+				  WHERE type_id = " . $this->smartQuote($type_id) . "
 				  AND has_legend = 'true'";
 
-		return $this->db->getRow($query);
-	}
+        return $this->db->getRow($query);
+    }
 
-	/**
-	 * Get all the questions in an assess
-	 *
-	 * @param $assess_id
-	 * @return array|bool
-	 */
-	public function getAll($assess_id) {
-		$query = "
+    /**
+     * Get all the questions in an assess
+     *
+     * @param $assess_id
+     * @return array|bool
+     */
+    public function getAll($assess_id)
+    {
+        $query = "
 			SELECT
 				assess_section.section_id,
 				assess_section.sequence AS section_sequence,
@@ -139,45 +148,47 @@ abstract class Evaluation_Question extends DeprecatedModel {
 			FROM assess
 			LEFT JOIN assess_section ON assess.assess_id = assess_section.assess_id
 			LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
-			WHERE assess.assess_id = '$assess_id'
+			WHERE assess.assess_id = " . $this->smartQuote($assess_id) . "
 			ORDER BY assess_section.sequence, assess_question.sequence
 		";
 
-		return $this->db->getAll($query);
-	}
+        return $this->db->getAll($query);
+    }
 
-	/**
-	 * Get a list of questions in a section
-	 *
-	 * @param  $section_id
-	 * @return array|bool
-	 */
-    public function getList($section_id) {
+    /**
+     * Get a list of questions in a section
+     *
+     * @param  $section_id
+     * @return array|bool
+     */
+    public function getList($section_id)
+    {
         $query = "SELECT *
                   FROM {$this->_table}
-                  WHERE section_id = '$section_id'
+                  WHERE section_id = " . $this->smartQuote($section_id) . "
                   AND deleted_at IS NULL
                   ORDER BY sequence";
 
         return $this->db->getAll($query);
     }
 
-	/**
-	 * Reorders a section's questions when a question has been deleted.
-	 *
-	 * @param  $assess_id
-	 * @param  $section_id
-	 * @return void
-	 */
-    public function resequenceQuestionsAfterDelete($assess_id, $section_id) {
+    /**
+     * Reorders a section's questions when a question has been deleted.
+     *
+     * @param  $assess_id
+     * @param  $section_id
+     * @return void
+     */
+    public function resequenceQuestionsAfterDelete($assess_id, $section_id)
+    {
         $allQuestions = $this->sectionHandler->getContents($assess_id, $section_id, true);
 
-        if(is_array($allQuestions) && count($allQuestions)) {
+        if (is_array($allQuestions) && count($allQuestions)) {
             $newSequence = 1;
 
             /* Resequence non-deleted questions
              */
-            foreach($allQuestions as $currentQuestion) {
+            foreach ($allQuestions as $currentQuestion) {
                 if ($currentQuestion['deleted_at'] == null) {
                     $updatedQuestion = array(
                         'question_id' => $currentQuestion['question_id'],
@@ -192,21 +203,22 @@ abstract class Evaluation_Question extends DeprecatedModel {
         }
     }
 
-	/**
-	 * Find the number of questions in this assess
-	 *
-	 * @param  $assess_id
-	 *
-	 * @return mixed
-	 */
-    public function numQuestions($assess_id) {
+    /**
+     * Find the number of questions in this assess
+     *
+     * @param  $assess_id
+     *
+     * @return mixed
+     */
+    public function numQuestions($assess_id)
+    {
         $query = "SELECT COUNT(assess_question.question_id) AS numQuestions
                   FROM assess
                   LEFT JOIN assess_section ON assess.assess_id = assess_section.assess_id
                   LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
                   WHERE assess_question.deleted_at IS NULL
 				  AND assess_section.deleted_at IS NULL
-                  AND assess.assess_id = '$assess_id'";
+                  AND assess.assess_id = " . $this->smartQuote($assess_id);
 
         return $this->db->getOne($query);
     }

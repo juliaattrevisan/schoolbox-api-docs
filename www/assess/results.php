@@ -159,7 +159,7 @@ $this->setTitle('Results for: ' . $assess['title']);
 
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
-    'ASSESS_TITLE' => $assess['title'],
+    'ASSESS_TITLE' => Scrub::text($assess['title']),
     'CID' => $assess['category_id'],
 ));
 

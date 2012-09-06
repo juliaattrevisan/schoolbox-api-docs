@@ -21,23 +21,23 @@ if (!empty($_POST)) {
         error(116);
     }
 
-    $section = $sectionHandler->getByID(Scrub::text($_POST['section_id']));
-	$assess = $assessHandler->getByID($section['assess_id']);
+    $section = $sectionHandler->getByID($_POST['section_id']);
+    $assess = $assessHandler->getByID($section['assess_id']);
 
-	if ($assessHandler->isDeleted($section['assess_id'])) {
-		error(112);
-	}
+    if ($assessHandler->isDeleted($section['assess_id'])) {
+        error(112);
+    }
 
-	if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
         error(130);
     }
 
-	if ($sectionHandler->isDeleted($section['section_id'])) {
-		error(115);
-	}
+    if ($sectionHandler->isDeleted($section['section_id'])) {
+        error(115);
+    }
 
-    $questionHandler = $factory->createQuestionModel(Scrub::text($_POST['type_id']));
-    $answerHandler = $factory->createAnswerModel(Scrub::text($_POST['type_id']));
+    $questionHandler = $factory->createQuestionModel($_POST['type_id']);
+    $answerHandler = $factory->createAnswerModel($_POST['type_id']);
 
     $questionHandler->update($_POST);
     $answerHandler->update($_POST);
@@ -45,8 +45,7 @@ if (!empty($_POST)) {
     /* Find the assess summary page
      */
     SitePage::localRedir('/assess/summary/' . $section['assess_id']);
-}
-else {
+} else {
     if (!is_numeric($this->arg[0])) {
         error(115);
     }
@@ -62,25 +61,25 @@ else {
     $questionHandler = new Assess_Question();
     $question = $questionHandler->getByID($this->arg[0]);
 
-	if ($question) {
-    	$section = $sectionHandler->getByID($question['section_id']);
-	}
+    if ($question) {
+        $section = $sectionHandler->getByID($question['section_id']);
+    }
 
-	if ($section) {
-		$assess = $assessHandler->getByID($section['assess_id']);
-	}
+    if ($section) {
+        $assess = $assessHandler->getByID($section['assess_id']);
+    }
 
-	if ($assessHandler->isDeleted($section['assess_id'])) {
-		error(112);
-	}
+    if ($assessHandler->isDeleted($section['assess_id'])) {
+        error(112);
+    }
 
-	if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
         error(130);
     }
 
-	if ($sectionHandler->isDeleted($section['section_id'])) {
-		error(115);
-	}
+    if ($sectionHandler->isDeleted($section['section_id'])) {
+        error(115);
+    }
 
     $answerHandler = $factory->createAnswerModel($question['type_id']);
 
@@ -99,7 +98,7 @@ else {
 
     $this->setVar(array(
         'QUESTIONTYPE_TYPE_ID' => $currentQuestionType['type_id'],
-        'QUESTIONTYPE_DESCRIPTION' => $currentQuestionType['description'],
+        'QUESTIONTYPE_DESCRIPTION' => Scrub::text($currentQuestionType['description']),
         'QUESTIONTYPE_SELECTED' => $selected,
     ));
 
@@ -109,39 +108,39 @@ else {
         error(51);
     }
 
-	/* Show this Assess' contents
-     */
-	$this->setFile('assessContentsFragment', 'assess/contents.html');
-	$this->setBlock('assessContentsFragment', 'section', 'section_block');
-	$this->setBlock('section', 'question', 'question_block');
+    /* Show this Assess' contents
+    */
+    $this->setFile('assessContentsFragment', 'assess/contents.html');
+    $this->setBlock('assessContentsFragment', 'section', 'section_block');
+    $this->setBlock('section', 'question', 'question_block');
 
-	$this->setVar(array(
-		'ASSESS_CATEGORY_ID' => $assess['category_id'],
-	));
+    $this->setVar(array(
+        'ASSESS_CATEGORY_ID' => $assess['category_id'],
+    ));
 
-	$this->parse('allQuestions_block', 'assessContentsFragment', true);
+    $this->parse('allQuestions_block', 'assessContentsFragment', true);
 
-	$assessHandler = new Assess_Main();
-	$assessHandler->renderAssessContents($section['assess_id'], $this);
+    $assessHandler = new Assess_Main();
+    $assessHandler->renderAssessContents($section['assess_id'], $this);
 
-	$assess = $assessHandler->getByID($section['assess_id']);
+    $assess = $assessHandler->getByID($section['assess_id']);
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],
-		'ASSESS_CATEGORY_ID' => $assess['category_id'],
+        'ASSESS_CATEGORY_ID' => $assess['category_id'],
         'SECTION_ID' => $question['section_id'],
         'SEQUENCE' => $question['sequence'],
         'QUESTION_ID' => $question['question_id'],
-        'QUESTION' => $question['question'],
+        'QUESTION' => Scrub::html($question['question']),
         'MARKS' => $question['marks'],
         'DISABLED_SELECTED' => '',
     ));
 
-	/* Derive and render a category list
-	 */
-	$questionBankCategoryHandler = new Assess_Question_Category();
+    /* Derive and render a category list
+      */
+    $questionBankCategoryHandler = new Assess_Question_Category();
 
-	$questionCategoryList = new Assess_Question_Category_List($this, $assess['assess_id'], 0, $questionBankCategoryHandler->getPath());
-	$questionCategoryList->render();
+    $questionCategoryList = new Assess_Question_Category_List($this, $assess['assess_id'], 0, $questionBankCategoryHandler->getPath());
+    $questionCategoryList->render();
 }
 

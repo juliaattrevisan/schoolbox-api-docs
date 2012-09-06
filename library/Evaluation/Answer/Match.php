@@ -9,7 +9,8 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-abstract class Evaluation_Answer_Match extends Evaluation_Answer {
+abstract class Evaluation_Answer_Match extends Evaluation_Answer
+{
     protected $correctClass = 'matchCorrect';
     protected $incorrectClass = 'matchIncorrect';
 
@@ -21,7 +22,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
      * @param  $question_id
      * @return bool|int
      */
-    public function create($object, $question_id) {
+    public function create($object, $question_id)
+    {
         $answer = array_intersect_key($object, array_flip($this->allowedFields));
         $answer['question_id'] = $question_id;
         $answer['sequence'] = 1;
@@ -53,7 +55,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
      * @param  $object
      * @return void
      */
-    public function update($object) {
+    public function update($object)
+    {
         $this->create($object, $object['question_id']);
     }
 
@@ -66,7 +69,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
      * @param string $question_id
      * @return void
      */
-    public function modify($page, $question_id = '') {
+    public function modify($page, $question_id = '')
+    {
         if (is_numeric($question_id)) {
             $answerGroup = parent::getForQuestion($question_id);
 
@@ -79,14 +83,13 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
 
                 foreach ($allAnswers as $currentAnswer) {
                     $page->setVar(array(
-                        'ANSWER_LEFT_VALUE' => $currentAnswer->answerLeft,
-                        'ANSWER_RIGHT_VALUE' => $currentAnswer->answerRight,
+                        'ANSWER_LEFT_VALUE' => Scrub::text($currentAnswer->answerLeft),
+                        'ANSWER_RIGHT_VALUE' => Scrub::text($currentAnswer->answerRight),
                     ));
 
                     $page->parse('answerOption_block', 'answerOption', true);
                 }
-            }
-			else {
+            } else {
                 $page->setVar('answerOption_block', '');
             }
         }
@@ -103,7 +106,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
      * @param  $question_id
      * @return void
      */
-    public function prepareResponse($page, $question_id) {
+    public function prepareResponse($page, $question_id)
+    {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         /* Define special blocks to handle this special answerOptions scenario,
@@ -130,8 +134,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
 
             if ($existing['response']) {
                 $right = unserialize($existing['response']);
-            }
-			else {
+            } else {
 
                 /* Randomize right-side. Do this multiple times because it's not
                  * very random after one shuffle for some reason
@@ -143,8 +146,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
 
             for ($i = 0; $i < $answerCount; $i++) {
                 $page->setVar(array(
-                    'ANSWER_LEFT_VALUE' => $left[$i],
-                    'ANSWER_RIGHT_VALUE' => $right[$i],
+                    'ANSWER_LEFT_VALUE' => Scrub::text($left[$i]),
+                    'ANSWER_RIGHT_VALUE' => Scrub::text($right[$i]),
                 ));
 
                 $page->parse('answerOptionLeft_block', 'answerOptionLeft', true);
@@ -166,7 +169,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
      * @param  $page
      * @return void
      */
-    public function cleanupParse($page) {
+    public function cleanupParse($page)
+    {
         $page->setVar('answerOptionLeft_block', '');
         $page->setVar('answerOptionRight_block', '');
     }
@@ -179,7 +183,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
      *
      * @return array
      */
-    public function saveResponse($data) {
+    public function saveResponse($data)
+    {
         $processedResponse = serialize($data['answerRight']);
 
         return parent::saveResponse($data['section_id'], $data['question_id'], $processedResponse);
@@ -193,7 +198,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
      * @param  $question_id
      * @return void
      */
-    public function exportMoodleAnswer($page, $question_id) {
+    public function exportMoodleAnswer($page, $question_id)
+    {
         $page->setBlock('answerFormFragment', 'answerCorrect', 'answerCorrect_block');
 
         $answerGroup = $this->getByQuestionID($question_id);
@@ -205,8 +211,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
                 $currentAnswer = $allAnswers[$i];
 
                 $page->setVar(array(
-                    'ANSWER_LEFT_VALUE' => $currentAnswer->answerLeft,
-                    'ANSWER_RIGHT_VALUE' => $currentAnswer->answerRight,
+                    'ANSWER_LEFT_VALUE' => Scrub::text($currentAnswer->answerLeft),
+                    'ANSWER_RIGHT_VALUE' => Scrub::text($currentAnswer->answerRight),
                 ));
 
                 $page->parse('answerCorrect_block', 'answerCorrect', true);
@@ -223,7 +229,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
      * @param  $question_id
      * @return bool|int
      */
-    public function importMoodleAnswer($xmlObj, $question_id) {
+    public function importMoodleAnswer($xmlObj, $question_id)
+    {
         foreach ($xmlObj->subquestion as $currentAnswer) {
 
             /* Set up data object in accordance with $this->create();
@@ -251,7 +258,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
      * @param  $question_id
      * @return mixed
      */
-    public function exportResponseToCSV($attempt_id, $question_id) {
+    public function exportResponseToCSV($attempt_id, $question_id)
+    {
         $response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
 
         $data = unserialize($response['response']);
@@ -259,8 +267,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
         if (is_array($data)) {
             if ($this->getLegendHTML() !== false) {
                 $data['response'] = '<ul><li>' . implode('</li><li>', $data) . '</li></ul>';
-            }
-			else {
+            } else {
                 $data['response'] = strip_tags(implode(', ', $data));
             }
         }
@@ -283,7 +290,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
      * @param  $value
      * @return string
      */
-    public function getAnswerText($question_id, $value) {
+    public function getAnswerText($question_id, $value)
+    {
         $answer = $this->getByQuestionID($question_id);
 
         $allOptions = unserialize($answer['answer']);
@@ -305,7 +313,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
      * @param  $question_id
      * @return mixed
      */
-    public function exportResponseToArray($attempt_id, $question_id) {
+    public function exportResponseToArray($attempt_id, $question_id)
+    {
         $response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
 
         $data = unserialize($response['response']);
@@ -321,7 +330,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
      *
      * @return string
      */
-    protected function getCorrectClass() {
+    protected function getCorrectClass()
+    {
         return $this->correctClass;
     }
 
@@ -330,7 +340,8 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer {
      *
      * @return string
      */
-    protected function getIncorrectClass() {
+    protected function getIncorrectClass()
+    {
         return $this->incorrectClass;
     }
 }

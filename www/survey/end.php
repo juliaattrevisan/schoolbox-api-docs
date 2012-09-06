@@ -26,7 +26,7 @@ if (!$survey) {
 }
 
 if ($surveyHandler->isDeleted($survey['assess_id'])) {
-	error(112);
+    error(112);
 }
 
 /* Disabled: doing so will allow teachers to give their test a "dry run" and
@@ -45,7 +45,7 @@ if ($surveyHandler->isExpired($survey['assess_id'])) {
  * but authors should be able to test out their content
  */
 if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
-	error(144);
+    error(144);
 }
 
 $this->setFile(TEMPLATE_content, 'survey/end.html');
@@ -54,30 +54,29 @@ $this->setBlock(TEMPLATE_content, 'alreadyEnded', 'alreadyEnded_block');
 $this->setTitle('Assessment: ' . $survey['title']);
 
 if ($attempt['finish'] == '0000-00-00 00:00:00') {
-	$finishDate = new Alaress_Date_Format(time(), 'U');
+    $finishDate = new Alaress_Date_Format(time(), 'U');
 
     $attemptHandler->update(array(
         'attempt_id' => $_SESSION['attempt_id'],
         'finish' => $finishDate->getDatabase(),
     ));
 
-	$attemptEndDate = new Alaress_Date_Format(time(), 'U');
+    $attemptEndDate = new Alaress_Date_Format(time(), 'U');
 
     $this->setVar(array(
-        'ASSESS_TITLE' => $survey['title'],
-		'ASSESS_CATEGORY_ID' => $survey['category_id'],
+        'ASSESS_TITLE' => scrub::text($survey['title']),
+        'ASSESS_CATEGORY_ID' => $survey['category_id'],
         'ATTEMPT_END' => $attemptEndDate->getShort()
     ));
 
     $this->setVar('alreadyEnded_block', '');
     $this->parse('endAssess_block', 'endAssess');
-}
-else {
-	$attemptEndDate = new Alaress_Date_Format(strtotime($attempt['finish']), 'U');
+} else {
+    $attemptEndDate = new Alaress_Date_Format(strtotime($attempt['finish']), 'U');
 
     $this->setVar(array(
-        'ASSESS_TITLE' => $survey['title'],
-		'ASSESS_CATEGORY_ID' => $survey['category_id'],
+        'ASSESS_TITLE' => scrub::text($survey['title']),
+        'ASSESS_CATEGORY_ID' => $survey['category_id'],
         'ATTEMPT_END' => $attemptEndDate->getShort()
     ));
 
@@ -88,8 +87,8 @@ else {
 /* Notify the survey author when someone completes this
  */
 if ($survey['notify_author']) {
-	$notification = new Survey_Notification($survey);
-	$notification->send();
+    $notification = new Survey_Notification($survey);
+    $notification->send();
 }
 
 /* Clear attempt

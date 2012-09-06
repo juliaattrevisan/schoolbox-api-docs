@@ -5,10 +5,10 @@
  * Moves a question around in the Questionbank Category tree, reassigning
  * parent_ids where appropriate based on $_GET['position']
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 require_once('../../../include/Bootstrap.php');
 
@@ -16,15 +16,14 @@ $page = new SitePage();
 $groupHandler = new Group();
 
 if ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
-	$categoryHandler = new Survey_Question_Category();
+    $categoryHandler = new Survey_Question_Category();
 
-	$newCategory = array(
-		'question_category_id' => Scrub::text($_POST['questionCategoryId']),
-		'name' => Scrub::text($_POST['name']),
-	);
+    $newCategory = array(
+        'question_category_id' => $_POST['questionCategoryId'],
+        'name' => $_POST['name'],
+    );
 
-	$categoryHandler->update($newCategory);
-}
-else {
-	error(126);
+    $categoryHandler->update($newCategory);
+} else {
+    error(126);
 }

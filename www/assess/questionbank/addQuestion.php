@@ -16,16 +16,15 @@ if (!$groupHandler->isStaff()) {
 $questionBankHandler = new Assess_Question_Bank();
 
 if (!empty($_POST)) {
-	$questionBankHandler->addQuestion(
-		Scrub::text($_POST['question_category']),
-		Scrub::text($_POST['type_id']),
-		Scrub::text($_POST['question_id']),
-		Scrub::text($_POST['answer_id']),
-		Scrub::text($_POST['marks'])
-	);
+    $questionBankHandler->addQuestion(
+        $_POST['question_category'],
+        $_POST['type_id'],
+        $_POST['question_id'],
+        $_POST['answer_id'],
+        $_POST['marks']
+    );
 
-	SitePage::localRedir('/assess/questionbank/added/' . Scrub::text($_POST['question_id']));
-}
-else {
-	error(2);
+    SitePage::localRedir('/assess/questionbank/added/' . $_POST['question_id']);
+} else {
+    error(2);
 }

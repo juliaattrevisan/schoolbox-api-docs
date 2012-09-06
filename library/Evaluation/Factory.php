@@ -10,96 +10,101 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-abstract class Evaluation_Factory extends DeprecatedModel {
-	protected $factoryName = 'Assess';
+abstract class Evaluation_Factory extends DeprecatedModel
+{
+    protected $factoryName = 'Assess';
 
-	protected $questionPrefix = 'Question';
+    protected $questionPrefix = 'Question';
     protected $answerPrefix = 'Answer';
 
-	/**
-	 * Spawn a Question type.
-	 *
-	 * @param  $type_id
-	 * @return class
-	 */
-    public function createQuestionModel($type_id) {
+    /**
+     * Spawn a Question type.
+     *
+     * @param  $type_id
+     * @return class
+     */
+    public function createQuestionModel($type_id)
+    {
         return $this->spawn($type_id, $this->questionPrefix);
     }
 
-	/**
-	 * Spawn an Answer type.
-	 *
-	 * @param  $type_id
-	 * @return class
-	 */
-    public function createAnswerModel($type_id) {
+    /**
+     * Spawn an Answer type.
+     *
+     * @param  $type_id
+     * @return class
+     */
+    public function createAnswerModel($type_id)
+    {
         return $this->spawn($type_id, $this->answerPrefix);
     }
 
-	/**
-	 * Spawn a model for either Questions or Answers.
-	 *
-	 * @param  $type_id
-	 * @param  $prefix
-	 * @return bool
-	 */
-    public function spawn($type_id, $prefix) {
+    /**
+     * Spawn a model for either Questions or Answers.
+     *
+     * @param  $type_id
+     * @param  $prefix
+     * @return bool
+     */
+    public function spawn($type_id, $prefix)
+    {
         if (is_numeric($type_id)) {
             $classname = $this->getQuestionClass($type_id);
 
             if ($classname) {
-				$object = $this->factoryName . '_' . $prefix . '_' . $classname;
-				return new $object;
-            }
-            else {
+                $object = $this->factoryName . '_' . $prefix . '_' . $classname;
+                return new $object;
+            } else {
                 error(133);
             }
-        }
-        else {
+        } else {
             error(133);
         }
 
         return false;
     }
 
-	/**
-	 * Find out which html file to use
-	 *
-	 * @param  $type_id
-	 * @return
-	 */
-    public function getQuestionType($type_id) {
+    /**
+     * Find out which html file to use
+     *
+     * @param  $type_id
+     * @return
+     */
+    public function getQuestionType($type_id)
+    {
         $query = "SELECT filename
                   FROM assess_luQuestionType
-                  WHERE type_id = '$type_id'";
+                  WHERE type_id = " . $this->smartQuote($type_id);
 
         return $this->db->getOne($query);
     }
 
-	/**
-	 * Find out which php class file to use
-	 *
-	 * @param  $type_id
-	 * @return
-	 */
-	public function getQuestionClass($type_id) {
+    /**
+     * Find out which php class file to use
+     *
+     * @param  $type_id
+     * @return
+     */
+    public function getQuestionClass($type_id)
+    {
         $query = "SELECT classname
                   FROM assess_luQuestionType
-                  WHERE type_id = '$type_id'";
+                  WHERE type_id = " . $this->smartQuote($type_id);
 
         return $this->db->getOne($query);
     }
 
-	/**
-	 * Find out the moodle name
-	 *
-	 * @param  $type_id
-	 * @return
-	 */
-    public function getMoodleQuestionType($type_id) {
+    /**
+     * Find out the moodle name
+     *
+     * @param  $type_id
+     * @return
+     */
+    public function getMoodleQuestionType($type_id)
+    {
         $query = "SELECT moodle
                   FROM assess_luQuestionType
-                  WHERE type_id = '$type_id'";
+                  WHERE type_id = " . $this->smartQuote($type_id);
 
         return $this->db->getOne($query);
     }

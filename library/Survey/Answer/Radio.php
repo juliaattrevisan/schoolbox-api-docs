@@ -9,48 +9,52 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-class Survey_Answer_Radio extends Evaluation_Answer_Radio {
+class Survey_Answer_Radio extends Evaluation_Answer_Radio
+{
 
-	/* Always use Correct css class
-	 */
-	protected $incorrectClass = 'multiCorrect';
+    /* Always use Correct css class
+      */
+    protected $incorrectClass = 'multiCorrect';
 
-	protected $graphTemplateFile = 'survey/answer/radio/graph.html';
+    protected $graphTemplateFile = 'survey/answer/radio/graph.html';
 
-	/* Use this to toggle between letters and actual answers
-	 */
-	protected $useLongAnswers = true;
+    /* Use this to toggle between letters and actual answers
+      */
+    protected $useLongAnswers = true;
 
-	/**
-	 * Get an instance of a responseHandler upon instantiation
-	 */
-    public function __construct() {
+    /**
+     * Get an instance of a responseHandler upon instantiation
+     */
+    public function __construct()
+    {
         parent::__construct();
 
         $this->responseHandler = new Survey_Response();
     }
 
-	/**
-	 * Graph the results for this answer type
-	 *
-	 * @param  $page
-	 * @param  $currentQuestion
-	 * @return void
-	 */
-	public function graphResults($page, $currentQuestion) {
-		$graph = new Survey_Graph_Render($page, $currentQuestion, $this->getGraphTemplateFile());
-		$graph->graph();
-	}
+    /**
+     * Graph the results for this answer type
+     *
+     * @param  $page
+     * @param  $currentQuestion
+     * @return void
+     */
+    public function graphResults($page, $currentQuestion)
+    {
+        $graph = new Survey_Graph_Render($page, $currentQuestion, $this->getGraphTemplateFile());
+        $graph->graph();
+    }
 
-	/**
-	 * Show the response someone submitted and also show the correct answer.
-	 * Provide an option for the teacher to review the mark and adjust.
-	 *
-	 * @param  $page
-	 * @param  $question_id
-	 * @return void
-	 */
-    public function reviewResponse($page, $question_id) {
+    /**
+     * Show the response someone submitted and also show the correct answer.
+     * Provide an option for the teacher to review the mark and adjust.
+     *
+     * @param  $page
+     * @param  $question_id
+     * @return void
+     */
+    public function reviewResponse($page, $question_id)
+    {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         if ($existing) {
@@ -65,17 +69,16 @@ class Survey_Answer_Radio extends Evaluation_Answer_Radio {
             $page->setVar(array(
                 'ANSWER_ID' => $answerGroup['answer_id'],
                 'RESPONSE_ID' => $existing['response_id'],
-                'REVIEWED_COMMENT' => $existing['comment'],
+                'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
                 'REVIEWED_MARKS' => $existing['mark'],
             ));
 
-            foreach($allAnswers as $currentAnswer) {
+            foreach ($allAnswers as $currentAnswer) {
                 if ($currentAnswer->correct) {
                     $page->setVar(array(
                         'ACTUAL_CORRECT_VALUE' => 'correct-answer'
                     ));
-                }
-                else {
+                } else {
                     $page->setVar(array(
                         'ACTUAL_CORRECT_VALUE' => ''
                     ));
@@ -83,7 +86,7 @@ class Survey_Answer_Radio extends Evaluation_Answer_Radio {
 
                 $page->setVar(array(
                     'ANSWER_VALUE' => $currentAnswer->value,
-                    'ANSWER_DESCRIPTION' => $currentAnswer->description,
+                    'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
 
                 if ($existing['response']) {
@@ -103,26 +106,22 @@ class Survey_Answer_Radio extends Evaluation_Answer_Radio {
                             $page->setVar(array(
                                 'CORRECT' => $this->getCorrectClass(),
                             ));
-                        }
-                        else if (in_array($currentAnswer->value, $existingAnswer)) {
+                        } else if (in_array($currentAnswer->value, $existingAnswer)) {
                             $page->setVar(array(
                                 'CORRECT' => $this->getIncorrectClass(),
                             ));
-                        }
-                        else {
+                        } else {
                             $page->setVar(array(
                                 'CORRECT' => ''
                             ));
                         }
-                    }
-                    else {
+                    } else {
                         $page->setVar(array(
                             'ANSWER_CHECKED' => '',
                             'CORRECT' => ''
                         ));
                     }
-                }
-                else {
+                } else {
                     $page->setVar(array(
                         'CORRECT' => ''
                     ));
@@ -130,8 +129,7 @@ class Survey_Answer_Radio extends Evaluation_Answer_Radio {
 
                 $page->parse('answerOption_block', 'answerOption', true);
             }
-        }
-        else {
+        } else {
             $page->setVar('answerOption_block', '');
         }
     }

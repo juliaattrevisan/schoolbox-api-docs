@@ -9,7 +9,8 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
+abstract class Evaluation_Answer_Multi extends Evaluation_Answer
+{
     protected $correctClass = 'multiCorrect';
     protected $incorrectClass = 'multiIncorrect';
 
@@ -21,7 +22,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      * @param  $question_id
      * @return bool|int
      */
-    public function create($object, $question_id) {
+    public function create($object, $question_id)
+    {
         $answer = array_intersect_key($object, array_flip($this->allowedFields));
         $answer['question_id'] = $question_id;
         $answer['sequence'] = 1;
@@ -54,7 +56,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      * @param  $object
      * @return void
      */
-    public function update($object) {
+    public function update($object)
+    {
         $this->create($object, $object['question_id']);
     }
 
@@ -67,7 +70,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      * @param string $question_id
      * @return void
      */
-    public function modify($page, $question_id = '') {
+    public function modify($page, $question_id = '')
+    {
         if (is_numeric($question_id)) {
             $answerGroup = parent::getForQuestion($question_id);
 
@@ -78,22 +82,20 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
                     foreach ($allAnswers as $currentAnswer) {
                         $page->setVar(array(
                             'ANSWER_VALUE' => $currentAnswer->value,
-                            'ANSWER_DESCRIPTION' => $currentAnswer->description,
+                            'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                             'ANSWER_CHECKED' => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
                         ));
 
                         $page->parse('answerOption_block', 'answerOption', true);
                     }
-                }
-				else {
+                } else {
                     $page->setVar('answerOption_block', '');
                 }
 
                 $page->setVar(array(
                     'ANSWER_ID' => $answerGroup['answer_id']
                 ));
-            }
-			else {
+            } else {
                 $page->setVar('answerOption_block', '');
             }
         }
@@ -107,7 +109,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      * @param  $question_id
      * @return void
      */
-    public function prepareResponse($page, $question_id) {
+    public function prepareResponse($page, $question_id)
+    {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         $answerGroup = $this->getByQuestionID($question_id);
@@ -119,7 +122,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
                 $page->setVar(array(
                     'ANSWER_ID' => $answerGroup['answer_id'],
                     'ANSWER_VALUE' => $currentAnswer->value,
-                    'ANSWER_DESCRIPTION' => $currentAnswer->description,
+                    'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
 
                 if ($existing['response']) {
@@ -154,7 +157,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      * @param  $page
      * @return void
      */
-    public function cleanupParse($page) {
+    public function cleanupParse($page)
+    {
     }
 
     /**
@@ -165,11 +169,11 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      *
      * @return array
      */
-    public function saveResponse($data) {
+    public function saveResponse($data)
+    {
         if ($data['answer'] == null) {
             $processedResponse = 'NULL';
-        }
-		else {
+        } else {
             $processedResponse = serialize($data['answer']);
         }
 
@@ -184,7 +188,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      * @param  $question_id
      * @return void
      */
-    public function exportMoodleAnswer($page, $question_id) {
+    public function exportMoodleAnswer($page, $question_id)
+    {
         $answerGroup = $this->getByQuestionID($question_id);
 
         if ($answerGroup) {
@@ -204,7 +209,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
 
                     $page->setVar(array(
                         'ANSWER_VALUE' => $currentAnswer->value,
-                        'ANSWER_DESCRIPTION' => $currentAnswer->description,
+                        'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                     ));
 
                     $page->parse('answerOption_block', 'answerOption', true);
@@ -224,7 +229,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      * @param  $question_id
      * @return bool|int
      */
-    public function importMoodleAnswer($xmlObj, $question_id) {
+    public function importMoodleAnswer($xmlObj, $question_id)
+    {
         foreach ($xmlObj->answer as $currentAnswer) {
 
             /* Set up data object in accordance with $this->create();
@@ -259,7 +265,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      * @param  $question_id
      * @return mixed
      */
-    public function exportResponseToCSV($attempt_id, $question_id) {
+    public function exportResponseToCSV($attempt_id, $question_id)
+    {
         $response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
 
         $data = unserialize($response['response']);
@@ -287,8 +294,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
 		 */
         $data['comment'] = $response['comment'];
 
-		/* Append awarded mark
-		 */
+        /* Append awarded mark
+           */
         $data['mark'] = $response['mark'];
 
         return $data;
@@ -301,7 +308,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      * @param  $value
      * @return string
      */
-    public function getAnswerText($question_id, $value) {
+    public function getAnswerText($question_id, $value)
+    {
         $answer = $this->getByQuestionID($question_id);
 
         $allOptions = unserialize($answer['answer']);
@@ -322,7 +330,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      * @param  $question_id
      * @return mixed
      */
-    public function exportResponseToArray($attempt_id, $question_id) {
+    public function exportResponseToArray($attempt_id, $question_id)
+    {
         $response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
 
         $data = unserialize($response['response']);
@@ -338,7 +347,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      * @param  $question_id
      * @return void
      */
-    public function reviewResponse($page, $question_id) {
+    public function reviewResponse($page, $question_id)
+    {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         if ($existing) {
@@ -353,7 +363,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
             $page->setVar(array(
                 'ANSWER_ID' => $answerGroup['answer_id'],
                 'RESPONSE_ID' => $existing['response_id'],
-                'REVIEWED_COMMENT' => $existing['comment'],
+                'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
                 'REVIEWED_MARKS' => $existing['mark'],
             ));
 
@@ -370,7 +380,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
 
                 $page->setVar(array(
                     'ANSWER_VALUE' => $currentAnswer->value,
-                    'ANSWER_DESCRIPTION' => $currentAnswer->description,
+                    'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
 
                 if ($existing['response']) {
@@ -426,7 +436,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      *
      * @return string
      */
-    protected function getCorrectClass() {
+    protected function getCorrectClass()
+    {
         return $this->correctClass;
     }
 
@@ -435,7 +446,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer {
      *
      * @return string
      */
-    protected function getIncorrectClass() {
+    protected function getIncorrectClass()
+    {
         return $this->incorrectClass;
     }
 }

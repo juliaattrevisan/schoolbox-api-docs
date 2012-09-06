@@ -25,7 +25,7 @@ if (!$assess) {
 }
 
 if ($assessHandler->isDeleted($this->arg[0])) {
-	error(112);
+    error(112);
 }
 
 if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
@@ -38,7 +38,7 @@ $surveyExporter->setLegendHTML(false);
 /* Optionally filter by question
  */
 if (is_numeric($this->arg[1])) {
-	$surveyExporter->setFilterByQuestion($this->arg[1]);
+    $surveyExporter->setFilterByQuestion($this->arg[1]);
 }
 
 $sectionValues = $surveyExporter->getSectionValues();
@@ -54,10 +54,9 @@ $this->setBlock('respondent', 'respondent_name', 'respondent_name_block');
 /* If not using Anonymous Result, set respondent details
  */
 if ($assess['anonymous_result']) {
-	$this->setVar('respondent_heading_block', '');
-}
-else {
-	$this->parse('respondent_heading_block', 'respondent_heading');
+    $this->setVar('respondent_heading_block', '');
+} else {
+    $this->parse('respondent_heading_block', 'respondent_heading');
 }
 
 $this->setVar('respondent_block', '');
@@ -65,64 +64,63 @@ $this->setVar('respondent_block', '');
 if (is_array($sectionValues) && count($sectionValues)) {
 
     // manual array flip
-    if(isset($allLegendItems)) {
-        foreach($allLegendItems as $key => $item) {
+    if (isset($allLegendItems)) {
+        foreach ($allLegendItems as $key => $item) {
             $legendItems[$item['text']] = $key;
         }
     }
 
-	foreach($sectionValues as $currentSection) {
-		$questionList = array();
+    foreach ($sectionValues as $currentSection) {
+        $questionList = array();
 
-		/* Get a list of questions going
-		 */
-		if (is_array($currentSection['questions']) && count($currentSection['questions'])) {
-			foreach($currentSection['questions'] as $currentQuestion) {
-				$questionList = $currentQuestion['question'];
-			}
-		}
+        /* Get a list of questions going
+           */
+        if (is_array($currentSection['questions']) && count($currentSection['questions'])) {
+            foreach ($currentSection['questions'] as $currentQuestion) {
+                $questionList = $currentQuestion['question'];
+            }
+        }
 
         $answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
 
         $answerHandler->graphResults($this, $currentQuestion);
 
-		/* A list of attempts
-		 */
-		if (count($currentQuestion['attempts'])) {
-			foreach($currentQuestion['attempts'] as $currentAttempt) {
-				$start = new Alaress_Date_Format($currentAttempt['start'], 'y-m-d h:i:s');
-				$finish = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
+        /* A list of attempts
+           */
+        if (count($currentQuestion['attempts'])) {
+            foreach ($currentQuestion['attempts'] as $currentAttempt) {
+                $start = new Alaress_Date_Format($currentAttempt['start'], 'y-m-d h:i:s');
+                $finish = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
 
-				$this->setVar(array(
-					'RESPONDENT_NAME' => $currentAttempt['name'],
-					'RESPONDENT_RESPONSE' =>  $currentAttempt['responses'],
-					'RESPONDENT_START_DATETIME' => $start->getShort(),
-					'RESPONDENT_FINISH_DATETIME' => $finish->getShort(),
-				));
+                $this->setVar(array(
+                    'RESPONDENT_NAME' => scrub::text($currentAttempt['name']),
+                    'RESPONDENT_RESPONSE' => scrub::text($currentAttempt['responses']),
+                    'RESPONDENT_START_DATETIME' => $start->getShort(),
+                    'RESPONDENT_FINISH_DATETIME' => $finish->getShort(),
+                ));
 
-				/* If not using Anonymous Result, set respondent details
-				 */
-				if ($assess['anonymous_result']) {
-					$this->setVar('respondent_name_block', '');
-				}
-				else {
-					$this->parse('respondent_name_block', 'respondent_name', true);
-				}
+                /* If not using Anonymous Result, set respondent details
+                     */
+                if ($assess['anonymous_result']) {
+                    $this->setVar('respondent_name_block', '');
+                } else {
+                    $this->parse('respondent_name_block', 'respondent_name', true);
+                }
 
-				$this->parse('respondent_block', 'respondent', true);
+                $this->parse('respondent_block', 'respondent', true);
 
-				/* Clear children after parsing out the parent
-				 */
-				$this->setVar('respondent_name_block', '');
-			}
-		}
-	}
+                /* Clear children after parsing out the parent
+                     */
+                $this->setVar('respondent_name_block', '');
+            }
+        }
+    }
 }
 
 $this->setVar(array(
-	'SURVEY_NAME' => $assess['title'],
-	'SURVEY_ID' => $assess['assess_id'],
-	'QUESTION_QUESTION' => $questionList
+    'SURVEY_NAME' => scrub::text($assess['title']),
+    'SURVEY_ID' => $assess['assess_id'],
+    'QUESTION_QUESTION' => $questionList
 ));
 
 
@@ -133,7 +131,8 @@ $this->setVar(array(
  * @param  $b
  * @return int
  */
-function cmp($a, $b) {
+function cmp($a, $b)
+{
     if ($a == $b) {
         return 0;
     }

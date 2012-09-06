@@ -6,77 +6,82 @@
  *                                                           *
  ************************************************************/
 
-require_once( dirname(__FILE__) . '/../www/conf/conf.php' );
-require_once( dirname(__FILE__) . '/DeprecatedDatabase.php' );
+require_once(dirname(__FILE__) . '/../www/conf/conf.php');
+require_once(dirname(__FILE__) . '/DeprecatedDatabase.php');
 
-class DeprecatedModel {
+class DeprecatedModel
+{
 
     var $_table;
 
     var $_index;
 
-    function DeprecatedModel () {
-        $this->db = new DeprecatedDatabase( SQL_db );
+    function DeprecatedModel()
+    {
+        $this->db = new DeprecatedDatabase(SQL_db);
     }
 
-    function getByID ($id) {
+    function getByID($id)
+    {
         $query = "	SELECT *
-					FROM `" . $this->_table . "` WHERE `" . $this->_index . "` = $id";
+					FROM `" . $this->_table . "` WHERE `" . $this->_index . "` =  " . $this->db->smartQuote($id);
         return $this->db->getRow($query);
     }
 
-    function getByField ($field, $id) {
+    function getByField($field, $id)
+    {
         $query = "	SELECT *
 					FROM `" . $this->_table . "` WHERE `" . $field . "` = " . $this->db->smartQuote($id);
         return $this->db->getRow($query);
     }
 
-    function getByArray ($fieldList, $termOp = 'AND') {
+    function getByArray($fieldList, $termOp = 'AND')
+    {
         $query = "SELECT * FROM `" . $this->_table . "` WHERE ";
 
-        if ( is_array($fieldList) ) {
-            if ( $termOp == 'AND' ) {
+        if (is_array($fieldList)) {
+            if ($termOp == 'AND') {
                 $query .= '1 = 1';
-            }
-            else {
+            } else {
                 $query .= '1 = 0';
             }
 
-            foreach ( $fieldList as $field => $value ) {
-                if ( is_numeric($value) ) {
+            foreach ($fieldList as $field => $value) {
+                if (is_numeric($value)) {
                     $query .= " $termOp `$field` = " . $this->db->smartQuote($value);
-                }
-                else {
+                } else {
                     $query .= " $termOp `$field` like " . $this->db->smartQuote($value);
                 }
             }
 
             return $this->db->getAll($query);
-        }
-        else {
+        } else {
             return false;
         }
     }
 
-    function getAllByField ($field, $id, $orderBy = "", $orderDir = "") {
+    function getAllByField($field, $id, $orderBy = "", $orderDir = "")
+    {
         $query = "	SELECT *
 					FROM `" . $this->_table . "` WHERE `" . $field . "` = " . $this->db->smartQuote($id);
-        if($orderBy != "")
+        if ($orderBy != "")
             $query .= " ORDER BY $orderBy $orderDir";
 
         return $this->db->getAll($query);
     }
 
-    function getAll ($order = '') {
+    function getAll($order = '')
+    {
         $query = "SELECT * FROM `" . $this->_table . "`";
-        if ( $order ) {
+        if ($order) {
             $query .= " ORDER BY `$order`";
         }
 
         return $this->db->getAll($query);
     }
 
-    function getIDByName ($name) {
+    function getIDByName($name)
+    {
         $query = "SELECT `" . $this->_index . "` FROM `" . $this->_table . "` WHERE name = '$name'";
         $row = $this->db->getRow($query);
         return $row[$this->_index];
@@ -88,13 +93,14 @@ class DeprecatedModel {
      * @param <type> $fields
      * @return <type>
      */
-    function getAllByFields ($fields, $type = 'AND') {
-        if ( is_array($fields) ) {
+    function getAllByFields($fields, $type = 'AND')
+    {
+        if (is_array($fields)) {
             $query = "SELECT *
 					  FROM {$this->_table}
 					  WHERE ";
 
-            foreach ( $fields as $key => $value ) {
+            foreach ($fields as $key => $value) {
                 $subquery[] = "$key = \"$value\" ";
             }
 
@@ -106,15 +112,18 @@ class DeprecatedModel {
         return false;
     }
 
-    function update ($object) {
+    function update($object)
+    {
         return $this->db->update($this->_table, $this->_index, $object);
     }
 
-    function delete ($id) {
+    function delete($id)
+    {
         return $this->db->delete($this->_table, $this->_index, $id);
     }
 
-    function create ($object) {
+    function create($object)
+    {
         $this->db->insert($this->_table, $object);
         return $this->db->insertID();
     }

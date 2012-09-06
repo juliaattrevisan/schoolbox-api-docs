@@ -14,33 +14,33 @@ $groupHandler = new Group();
 $assessHandler = new Survey_Main();
 
 if (!empty($_POST)) {
-	if ($groupHandler->getPermission(Scrub::text($_POST['category_id'])) < WRITE_ACCESS) {
-	    error(126);
-	}
+    if ($groupHandler->getPermission(Scrub::text($_POST['category_id'])) < WRITE_ACCESS) {
+        error(126);
+    }
 
     /* Format date, time
      */
-    $start = new Alaress_Date_Format($_POST['start']['date'].' '.$_POST['start']['hour'].':'.$_POST['start']['minute'].' '.$_POST['start']['meridiem'], 'd/m/y');
-    $finish = new Alaress_Date_Format($_POST['finish']['date'].' '.$_POST['finish']['hour'].':'.$_POST['finish']['minute'].' '.$_POST['finish']['meridiem'], 'd/m/y');
+    $start = new Alaress_Date_Format($_POST['start']['date'] . ' ' . $_POST['start']['hour'] . ':' . $_POST['start']['minute'] . ' ' . $_POST['start']['meridiem'], 'd/m/y');
+    $finish = new Alaress_Date_Format($_POST['finish']['date'] . ' ' . $_POST['finish']['hour'] . ':' . $_POST['finish']['minute'] . ' ' . $_POST['finish']['meridiem'], 'd/m/y');
 
-	/* Check that finish time cannot be before start time
-	 */
-	if ($start->getUnixTimestamp() >= $finish->getUnixTimestamp()) {
-		error(145);
-	}
+    /* Check that finish time cannot be before start time
+      */
+    if ($start->getUnixTimestamp() >= $finish->getUnixTimestamp()) {
+        error(145);
+    }
 
     $assess_id = $assessHandler->create(array(
-        'category_id' => Scrub::text($_POST['category_id']),
+        'category_id' => $_POST['category_id'],
         'user_id' => $_SESSION['id'],
-        'title' => Scrub::text($_POST['title']),
-        'description' => Scrub::text($_POST['description']),
+        'title' => $_POST['title'],
+        'description' => $_POST['description'],
         'start' => $start->getDatabase(),
         'finish' => $finish->getDatabase(),
-        'duration'  => Survey_Main::UNLIMITED_DURATION,
-		'availability' => 'survey',
-		'anonymous_result' => Scrub::text($_POST['anonymous_result']),
-		'notify_author' => Scrub::text($_POST['notify_author']),
-		'max_attempts' => 1,
+        'duration' => Survey_Main::UNLIMITED_DURATION,
+        'availability' => 'survey',
+        'anonymous_result' => $_POST['anonymous_result'],
+        'notify_author' => $_POST['notify_author'],
+        'max_attempts' => 1,
         'created_at' => 'NOW()',
     ));
 
@@ -49,15 +49,14 @@ if (!empty($_POST)) {
     }
 
     SitePage::localRedir('/survey/section/create/' . $assess_id);
-}
-else {
+} else {
     if (!is_numeric($this->arg[0])) {
         error(117);
     }
 
-	if ($groupHandler->getPermission($this->arg[0]) < WRITE_ACCESS) {
-		error(126);
-	}
+    if ($groupHandler->getPermission($this->arg[0]) < WRITE_ACCESS) {
+        error(126);
+    }
 
     /* Render create page
      */
@@ -68,12 +67,12 @@ else {
     $this->setBlock(TEMPLATE_content, 'finishHour', 'finishHour_block');
     $this->setBlock(TEMPLATE_content, 'finishMinute', 'finishMinute_block');
     $this->setBlock(TEMPLATE_content, 'finishMeridiem', 'finishMeridiem_block');
-	$this->setBlock(TEMPLATE_content, 'durationHour', 'durationHour_block');
-	$this->setBlock(TEMPLATE_content, 'durationMinute', 'durationMinute_block');
+    $this->setBlock(TEMPLATE_content, 'durationHour', 'durationHour_block');
+    $this->setBlock(TEMPLATE_content, 'durationMinute', 'durationMinute_block');
     $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
     $this->setTitle('Manage Assessment');
 
-	$assessDate = new Alaress_Date_Format(time(), 'U');
+    $assessDate = new Alaress_Date_Format(time(), 'U');
     $assessEndDate = new Alaress_Date_Format(strtotime('+1 week'), 'U');
 
     $this->setVar(array(
@@ -82,27 +81,26 @@ else {
         'ASSESS_CATEGORY_ID' => $this->arg[0],
         'ASSESS_TITLE' => '',
         'ASSESS_DESCRIPTION' => '',
-        'ASSESS_START_DATE'  => $assessDate->getLocalShort(),
+        'ASSESS_START_DATE' => $assessDate->getLocalShort(),
         'ASSESS_FINISH_DATE' => $assessEndDate->getLocalShort(),
-		'ASSESS_ANONYMOUS_RESULT_CHECKED' => '',
-		'ASSESS_NOTIFY_AUTHOR_CHECKED' => '',
+        'ASSESS_ANONYMOUS_RESULT_CHECKED' => '',
+        'ASSESS_NOTIFY_AUTHOR_CHECKED' => '',
     ));
 
     /* Select default settings
      */
-    $startHour = date('g', time()+3600);
-    $startMeridiem = date('a', time()+3600);
+    $startHour = date('g', time() + 3600);
+    $startMeridiem = date('a', time() + 3600);
 
-    $finishHour = date('g', time()+2*3600);
-    $finishMeridiem = date('a', time()+2*3600);
+    $finishHour = date('g', time() + 2 * 3600);
+    $finishMeridiem = date('a', time() + 2 * 3600);
 
     /* Render starting times
      */
-    for ($i=1; $i<=12; $i++) {
+    for ($i = 1; $i <= 12; $i++) {
         if ($i == $startHour) {
             $selected = 'selected=\'selected\'';
-        }
-        else {
+        } else {
             $selected = '';
         }
 
@@ -114,7 +112,7 @@ else {
         $this->parse('startHour_block', 'startHour', true);
     }
 
-    for ($i=0; $i<=45; $i += 15) {
+    for ($i = 0; $i <= 45; $i += 15) {
         $this->setVar(array(
             'START_MINUTE_VALUE' => $i == 0 ? $i = '00' : $i,
             'START_MINUTE_SELECTED' => ''
@@ -126,8 +124,7 @@ else {
     foreach (array('am', 'pm') as $meridiem) {
         if ($meridiem == $startMeridiem) {
             $selected = 'selected=\'selected\'';
-        }
-        else {
+        } else {
             $selected = '';
         }
 
@@ -141,11 +138,10 @@ else {
 
     /* Render finish times
      */
-    for ($i=1; $i<=12; $i++) {
+    for ($i = 1; $i <= 12; $i++) {
         if ($i == $finishHour) {
             $selected = 'selected=\'selected\'';
-        }
-        else {
+        } else {
             $selected = '';
         }
 
@@ -157,7 +153,7 @@ else {
         $this->parse('finishHour_block', 'finishHour', true);
     }
 
-    for ($i=0; $i<=45; $i += 15) {
+    for ($i = 0; $i <= 45; $i += 15) {
         $this->setVar(array(
             'FINISH_MINUTE_VALUE' => $i == 0 ? $i = '00' : $i,
             'FINISH_MINUTE_SELECTED' => ''
@@ -169,8 +165,7 @@ else {
     foreach (array('am', 'pm') as $meridiem) {
         if ($meridiem == $finishMeridiem) {
             $selected = 'selected=\'selected\'';
-        }
-        else {
+        } else {
             $selected = '';
         }
 
@@ -182,8 +177,8 @@ else {
         $this->parse('finishMeridiem_block', 'finishMeridiem', true);
     }
 
-	/* Don't display questions contents, which appears in Modify
-	 */
+    /* Don't display questions contents, which appears in Modify
+      */
     $this->setBlock(TEMPLATE_content, 'allQuestions', 'allQuestions_block');
     $this->setVar('allQuestions_block', '');
     $this->parse('importXML_block', 'importXML');

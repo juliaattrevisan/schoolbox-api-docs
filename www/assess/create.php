@@ -14,20 +14,20 @@ $groupHandler = new Group();
 $assessHandler = new Assess_Main();
 
 if (!empty($_POST)) {
-	if ($groupHandler->getPermission(Scrub::text($_POST['category_id'])) < WRITE_ACCESS) {
-	    error(126);
-	}
+    if ($groupHandler->getPermission($_POST['category_id']) < WRITE_ACCESS) {
+        error(126);
+    }
 
     /* Format date, time
      */
-    $start = new Alaress_Date_Format($_POST['start']['date'].' '.$_POST['start']['hour'].':'.$_POST['start']['minute'].' '.$_POST['start']['meridiem'], 'd/m/y');
-    $finish = new Alaress_Date_Format($_POST['finish']['date'].' '.$_POST['finish']['hour'].':'.$_POST['finish']['minute'].' '.$_POST['finish']['meridiem'], 'd/m/y');
+    $start = new Alaress_Date_Format($_POST['start']['date'] . ' ' . $_POST['start']['hour'] . ':' . $_POST['start']['minute'] . ' ' . $_POST['start']['meridiem'], 'd/m/y');
+    $finish = new Alaress_Date_Format($_POST['finish']['date'] . ' ' . $_POST['finish']['hour'] . ':' . $_POST['finish']['minute'] . ' ' . $_POST['finish']['meridiem'], 'd/m/y');
 
-	/* Check that finish time cannot be before start time
-	 */
-	if ($start->getUnixTimestamp() >= $finish->getUnixTimestamp()) {
-		error(145);
-	}
+    /* Check that finish time cannot be before start time
+      */
+    if ($start->getUnixTimestamp() >= $finish->getUnixTimestamp()) {
+        error(145);
+    }
 
     /* Cater for unlimited duration tests. Can't use zero because of countdown
      * timer, so we use -1
@@ -39,15 +39,15 @@ if (!empty($_POST)) {
     }
 
     $assess_id = $assessHandler->create(array(
-        'category_id' => Scrub::text($_POST['category_id']),
+        'category_id' => $_POST['category_id'],
         'user_id' => $_SESSION['id'],
-        'title' => Scrub::text($_POST['title']),
-        'description' => Scrub::text($_POST['description']),
+        'title' => $_POST['title'],
+        'description' => $_POST['description'],
         'start' => $start->getDatabase(),
         'finish' => $finish->getDatabase(),
-        'duration' => Scrub::text($duration),
-        'max_attempts' => Scrub::text($_POST['max_attempts']),
-		'availability' => 'assess',
+        'duration' => $duration,
+        'max_attempts' => $_POST['max_attempts'],
+        'availability' => 'assess',
         'created_at' => 'NOW()',
     ));
 
@@ -56,15 +56,14 @@ if (!empty($_POST)) {
     }
 
     SitePage::localRedir('/assess/section/create/' . $assess_id);
-}
-else {
+} else {
     if (!is_numeric($this->arg[0])) {
         error(117);
     }
 
-	if ($groupHandler->getPermission($this->arg[0]) < WRITE_ACCESS) {
-		error(126);
-	}
+    if ($groupHandler->getPermission($this->arg[0]) < WRITE_ACCESS) {
+        error(126);
+    }
 
     /* Render create page
      */
@@ -76,10 +75,10 @@ else {
     $this->setBlock(TEMPLATE_content, 'finishMinute', 'finishMinute_block');
     $this->setBlock(TEMPLATE_content, 'finishMeridiem', 'finishMeridiem_block');
     $this->setBlock(TEMPLATE_content, 'importXML', 'importXML_block');
-	$this->setBlock(TEMPLATE_content, 'max_attempts', 'max_attempts_block');
+    $this->setBlock(TEMPLATE_content, 'max_attempts', 'max_attempts_block');
     $this->setTitle('Manage Assessment');
 
-	$assessDate = new Alaress_Date_Format(time(), 'U');
+    $assessDate = new Alaress_Date_Format(time(), 'U');
     $assessEndDate = new Alaress_Date_Format(strtotime('+1 week'), 'U');
 
     $this->setVar(array(
@@ -88,25 +87,24 @@ else {
         'ASSESS_CATEGORY_ID' => $this->arg[0],
         'ASSESS_TITLE' => '',
         'ASSESS_DESCRIPTION' => '',
-        'ASSESS_START_DATE'  => $assessDate->getLocalShort(),
+        'ASSESS_START_DATE' => $assessDate->getLocalShort(),
         'ASSESS_FINISH_DATE' => $assessEndDate->getLocalShort()
     ));
 
     /* Select default settings
      */
-    $startHour = date('g', time()+3600);
-    $startMeridiem = date('a', time()+3600);
+    $startHour = date('g', time() + 3600);
+    $startMeridiem = date('a', time() + 3600);
 
-    $finishHour = date('g', time()+2*3600);
-    $finishMeridiem = date('a', time()+2*3600);
+    $finishHour = date('g', time() + 2 * 3600);
+    $finishMeridiem = date('a', time() + 2 * 3600);
 
     /* Render starting times
      */
-    for ($i=1; $i<=12; $i++) {
+    for ($i = 1; $i <= 12; $i++) {
         if ($i == $startHour) {
             $selected = 'selected=\'selected\'';
-        }
-        else {
+        } else {
             $selected = '';
         }
 
@@ -118,7 +116,7 @@ else {
         $this->parse('startHour_block', 'startHour', true);
     }
 
-    for ($i=0; $i<=45; $i += 15) {
+    for ($i = 0; $i <= 45; $i += 15) {
         $this->setVar(array(
             'START_MINUTE_VALUE' => $i == 0 ? $i = '00' : $i,
             'START_MINUTE_SELECTED' => ''
@@ -130,8 +128,7 @@ else {
     foreach (array('am', 'pm') as $meridiem) {
         if ($meridiem == $startMeridiem) {
             $selected = 'selected=\'selected\'';
-        }
-        else {
+        } else {
             $selected = '';
         }
 
@@ -145,11 +142,10 @@ else {
 
     /* Render finish times
      */
-    for ($i=1; $i<=12; $i++) {
+    for ($i = 1; $i <= 12; $i++) {
         if ($i == $finishHour) {
             $selected = 'selected=\'selected\'';
-        }
-        else {
+        } else {
             $selected = '';
         }
 
@@ -161,7 +157,7 @@ else {
         $this->parse('finishHour_block', 'finishHour', true);
     }
 
-    for ($i=0; $i<=45; $i += 15) {
+    for ($i = 0; $i <= 45; $i += 15) {
         $this->setVar(array(
             'FINISH_MINUTE_VALUE' => $i == 0 ? $i = '00' : $i,
             'FINISH_MINUTE_SELECTED' => ''
@@ -173,8 +169,7 @@ else {
     foreach (array('am', 'pm') as $meridiem) {
         if ($meridiem == $finishMeridiem) {
             $selected = 'selected=\'selected\'';
-        }
-        else {
+        } else {
             $selected = '';
         }
 
@@ -186,23 +181,23 @@ else {
         $this->parse('finishMeridiem_block', 'finishMeridiem', true);
     }
 
-	/* Resit amounts
-	 */
-	for ($i=1; $i<11; $i++) {
-		$this->setVar(array(
-			'MAX_ATTEMPTS_VALUE' => $i,
-			'MAX_ATTEMPTS_CHECKED' => '',
-		));
+    /* Resit amounts
+      */
+    for ($i = 1; $i < 11; $i++) {
+        $this->setVar(array(
+            'MAX_ATTEMPTS_VALUE' => $i,
+            'MAX_ATTEMPTS_CHECKED' => '',
+        ));
 
-		$this->parse('max_attempts_block', 'max_attempts', true);
-	}
+        $this->parse('max_attempts_block', 'max_attempts', true);
+    }
 
-	/* Set default to be 1 hour
-	 */
-	$this->setVar(array(
-		'DURATION_HOUR_VALUE' => 0,
-		'DURATION_MINUTE_VALUE' => 0,
-	));
+    /* Set default to be 1 hour
+      */
+    $this->setVar(array(
+        'DURATION_HOUR_VALUE' => 0,
+        'DURATION_MINUTE_VALUE' => 0,
+    ));
 
     /* Don't display questions contents, which appears in Modify
      */

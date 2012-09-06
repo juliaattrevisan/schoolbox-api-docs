@@ -13,15 +13,15 @@ $assessHandler = new Survey_Main();
 $groupHandler = new Group();
 
 if (!empty($_POST)) {
-	$assess = $assessHandler->getByID(Scrub::text($_POST['assess_id']));
+    $assess = $assessHandler->getByID(Scrub::text($_POST['assess_id']));
 
-	if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
-	    error(130);
-	}
+    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+        error(130);
+    }
 
-	if ($assessHandler->isDeleted(Scrub::text($_POST['assess_id']))) {
-		error(112);
-	}
+    if ($assessHandler->isDeleted(Scrub::text($_POST['assess_id']))) {
+        error(112);
+    }
 
     /* Create new Section
      */
@@ -31,15 +31,14 @@ if (!empty($_POST)) {
     /* Redirect to question creation for this section
      */
     SitePage::localRedir('/survey/question/create/' . $section_id);
-}
-else {
+} else {
     if (empty($this->arg[0])) {
         error(51);
     }
 
-	if ($assessHandler->isDeleted($this->arg[0])) {
-		error(112);
-	}
+    if ($assessHandler->isDeleted($this->arg[0])) {
+        error(112);
+    }
 
     /* Find out whether the test exists to which you are attempting to add a
      * new Section
@@ -50,9 +49,9 @@ else {
         error(112);
     }
 
-	if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
-	    error(130);
-	}
+    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+        error(130);
+    }
 
     /* Render create page
      */
@@ -64,7 +63,7 @@ else {
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $this->arg[0],
-        'ASSESS_TITLE' => $assess['title'],
+        'ASSESS_TITLE' => scrub::text($assess['title']),
         'SECTION_ID' => '',
         'SEQUENCE' => $sectionHandler->getNextSequence($this->arg[0])
     ));

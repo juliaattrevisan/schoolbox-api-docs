@@ -5,10 +5,10 @@
  * Show a list of attempts for a particular Survey.
  * You can delete attempts from this screen.
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 $groupHandler = new Group();
 $assessHandler = new Survey_Main();
@@ -18,7 +18,7 @@ $attemptHandler = new Survey_Attempt();
 $assess = $assessHandler->getByID($this->arg[0]);
 
 if (!$assess) {
-	error(112);
+    error(112);
 }
 
 if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
@@ -26,7 +26,7 @@ if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($as
 }
 
 if ($assessHandler->isDeleted($this->arg[0])) {
-	error(112);
+    error(112);
 }
 
 $this->setFile(TEMPLATE_content, 'survey/attempts.html');
@@ -37,18 +37,17 @@ $this->setBlock('attempt', 'respondent_name', 'respondent_name_block');
 /* If not using Anonymous Result, set respondent details
  */
 if ($assess['anonymous_result']) {
-	$this->setVar('respondent_heading_block', '');
-}
-else {
-	$this->parse('respondent_heading_block', 'respondent_heading');
+    $this->setVar('respondent_heading_block', '');
+} else {
+    $this->parse('respondent_heading_block', 'respondent_heading');
 }
 
 /* Generic details
  */
 $this->setVar(array(
-	'SURVEY_NAME' => $assess['title'],
-	'CID' => $assess['category_id'],
-	'SURVEY_ID' => $assess['assess_id']
+    'SURVEY_NAME' => scrub::text($assess['title']),
+    'CID' => $assess['category_id'],
+    'SURVEY_ID' => $assess['assess_id']
 ));
 
 /* Default
@@ -60,50 +59,48 @@ $this->setVar('attempt_block', '');
 $allAttempts = $attemptHandler->getList($this->arg[0]);
 
 if (is_array($allAttempts) && count($allAttempts)) {
-	$i = 0;
+    $i = 0;
 
-	foreach($allAttempts as $currentAttempt) {
-		$i++;
+    foreach ($allAttempts as $currentAttempt) {
+        $i++;
 
-		$startDate = new Alaress_Date_Format($currentAttempt['start'], 'y-m-d h:i:s');
+        $startDate = new Alaress_Date_Format($currentAttempt['start'], 'y-m-d h:i:s');
 
-		/* For attempts that are still in progress
-		 */
-		if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
-			$finishDate = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
-			$finishDateValue = $finishDate->getShort();
-		}
-		else {
-			$finishDateValue = 'Unfinished';
-		}
+        /* For attempts that are still in progress
+           */
+        if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
+            $finishDate = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
+            $finishDateValue = $finishDate->getShort();
+        } else {
+            $finishDateValue = 'Unfinished';
+        }
 
-		$firstSection = $sectionHandler->getFirst($this->arg[0]);
+        $firstSection = $sectionHandler->getFirst($this->arg[0]);
 
-		$this->setVar(array(
-			'ATTEMPT_USER_ID' => $currentAttempt['user_id'],
-			'ATTEMPT_FIRSTNAME' => $currentAttempt['firstname'],
-			'ATTEMPT_LASTNAME' => $currentAttempt['lastname'],
-			'ATTEMPT_START' => $startDate->getShort(),
-			'ATTEMPT_FINISH' => $finishDateValue,
-			'ATTEMPT_ASSESS_ID' => $this->arg[0],
-			'ATTEMPT_SECTION_ID' => $firstSection['section_id'],
-			'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
-			'ON_OFF' => $i % 2 ? 'dark' : ''
-		));
+        $this->setVar(array(
+            'ATTEMPT_USER_ID' => $currentAttempt['user_id'],
+            'ATTEMPT_FIRSTNAME' => $currentAttempt['firstname'],
+            'ATTEMPT_LASTNAME' => $currentAttempt['lastname'],
+            'ATTEMPT_START' => $startDate->getShort(),
+            'ATTEMPT_FINISH' => $finishDateValue,
+            'ATTEMPT_ASSESS_ID' => $this->arg[0],
+            'ATTEMPT_SECTION_ID' => $firstSection['section_id'],
+            'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
+            'ON_OFF' => $i % 2 ? 'dark' : ''
+        ));
 
-		/* If not using Anonymous Result, set respondent details
-		 */
-		if ($assess['anonymous_result']) {
-			$this->setVar('respondent_name_block', '');
-		}
-		else {
-			$this->parse('respondent_name_block', 'respondent_name', true);
-		}
+        /* If not using Anonymous Result, set respondent details
+           */
+        if ($assess['anonymous_result']) {
+            $this->setVar('respondent_name_block', '');
+        } else {
+            $this->parse('respondent_name_block', 'respondent_name', true);
+        }
 
-		$this->parse('attempt_block', 'attempt', true);
+        $this->parse('attempt_block', 'attempt', true);
 
-		/* Clear children after parsing out the parent
-		 */
-		$this->setVar('respondent_name_block', '');
-	}
+        /* Clear children after parsing out the parent
+           */
+        $this->setVar('respondent_name_block', '');
+    }
 }

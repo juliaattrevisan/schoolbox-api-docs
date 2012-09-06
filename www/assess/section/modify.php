@@ -13,33 +13,32 @@ $assessHandler = new Assess_Main();
 $groupHandler = new Group();
 
 if (!empty($_POST)) {
-	$assess = $assessHandler->getByID(Scrub::text($_POST['assess_id']));
+    $assess = $assessHandler->getByID($_POST['assess_id']);
 
-	if ($assessHandler->isDeleted($_POST['assess_id'])) {
-		error(112);
-	}
+    if ($assessHandler->isDeleted($_POST['assess_id'])) {
+        error(112);
+    }
 
-	if (!$assessHandler->isOwner($assess['assess_id']) && !($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
-		error(130);
-	}
+    if (!$assessHandler->isOwner($assess['assess_id']) && !($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+        error(130);
+    }
 
     $sectionHandler = new Assess_Section();
 
     $sectionHandler->update(array(
-        'assess_id' => Scrub::text($_POST['assess_id']),
-        'section_id' => Scrub::text($_POST['section_id']),
-        'sequence' => Scrub::text($_POST['sequence']),
-        'title' => Scrub::text($_POST['title']),
-        'random' => Scrub::text($_POST['random']),
-        'pool' => Scrub::text($_POST['pool']),
-        'description' => Scrub::text($_POST['description']),
+        'assess_id' => $_POST['assess_id'],
+        'section_id' => $_POST['section_id'],
+        'sequence' => $_POST['sequence'],
+        'title' => $_POST['title'],
+        'random' => $_POST['random'],
+        'pool' => $_POST['pool'],
+        'description' => $_POST['description'],
     ));
 
     /* Redirect to summary
      */
-    SitePage::localRedir('/assess/summary/' . Scrub::text($_POST['assess_id']));
-}
-else {
+    SitePage::localRedir('/assess/summary/' . $_POST['assess_id']);
+} else {
     if (!is_numeric($this->arg[0])) {
         error(112);
     }
@@ -47,17 +46,17 @@ else {
     $sectionHandler = new Assess_Section();
     $section = $sectionHandler->getByID($this->arg[0]);
 
-	if ($section) {
-		$assess = $assessHandler->getByID($section['assess_id']);
-	}
+    if ($section) {
+        $assess = $assessHandler->getByID($section['assess_id']);
+    }
 
-	if ($assessHandler->isDeleted($section['assess_id'])) {
-		error(112);
-	}
+    if ($assessHandler->isDeleted($section['assess_id'])) {
+        error(112);
+    }
 
-	if (!$assessHandler->isOwner($section['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
-		error(130);
-	}
+    if (!$assessHandler->isOwner($section['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+        error(130);
+    }
 
     /* Render modify page
      */
@@ -67,10 +66,10 @@ else {
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],
-        'ASSESS_TITLE' => $assess['title'],
+        'ASSESS_TITLE' => Scrub::text($assess['title']),
         'SECTION_ID' => $section['section_id'],
-        'TITLE' => $section['title'],
-        'DESCRIPTION' => $section['description'],
+        'TITLE' => Scrub::text($section['title']),
+        'DESCRIPTION' => Scrub::text($section['description']),
         'SEQUENCE' => $section['sequence'],
         'RANDOM_SELECTED' => $section['random'] == 0 ? '' : 'checked=\'checked\'',
         'POOL' => $section['pool'],

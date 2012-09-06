@@ -31,7 +31,7 @@ if (!$assess) {
 }
 
 if ($assessHandler->isDeleted($this->arg[0])) {
-	error(112);
+    error(112);
 }
 
 /* Check if you are in this category, so you can't submit other category's
@@ -51,7 +51,7 @@ if ($assessHandler->isExpired($assess['assess_id'])) {
  * but authors should be able to test out their content
  */
 if (!$assessHandler->isOpen($assess) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
-	error(144);
+    error(144);
 }
 
 /* Check if you have completed an assessment already
@@ -68,25 +68,24 @@ $attemptEndTime = $attemptStartTime + $assess['duration'];
 /* If there is a resumable attempt, resume it.
  */
 if ($attempt) {
-	$_SESSION['attempt_id'] = $attempt['attempt_id'];
-}
-/* Otherwise start a new attempt if there is a limit
+    $_SESSION['attempt_id'] = $attempt['attempt_id'];
+} /* Otherwise start a new attempt if there is a limit
  */
 else {
 
-	/* Clear and exit when you attempt to make more than is allowed
-	 */
-	$_SESSION['attempt_id'] = '';
+    /* Clear and exit when you attempt to make more than is allowed
+      */
+    $_SESSION['attempt_id'] = '';
 
-	if (($assess['max_attempts'] > 0) && ($numAttempts+1 > $assess['max_attempts'])) {
-		error(146);
-	}
+    if (($assess['max_attempts'] > 0) && ($numAttempts + 1 > $assess['max_attempts'])) {
+        error(146);
+    }
 }
 
 /* Check if Attempt ran out of time
  */
 if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($assess['duration'] != Assess_Main::UNLIMITED_DURATION)) {
-	error(122);
+    error(122);
 }
 
 /* Continue once you get past checks
@@ -106,22 +105,22 @@ $this->setTitle('Assessment: ' . $assess['title']);
 
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
-    'ASSESS_TITLE' => $assess['title'],
-    'ASSESS_DESCRIPTION' => html_entity_decode($assess['description']),
+    'ASSESS_TITLE' => scrub::text($assess['title']),
+    'ASSESS_DESCRIPTION' => scrub::html($assess['description']),
     'ASSESS_START' => $assessStartDate->getShort(),
     'ASSESS_FINISH' => $assessFinishDate->getShort(),
     'FIRST_SECTION' => $allSections[0]['section_id'],
-    'ASSESS_AUTHOR' => $author['firstname'] . ' ' . $author['lastname'],
-	'ASSESS_DURATION' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
+    'ASSESS_AUTHOR' => scrub::text($userHandler->formatName($author)),
+    'ASSESS_DURATION' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
 ));
 
 /* Section list and question count
  */
 if (is_array($allSummary) && count($allSummary)) {
-    foreach($allSummary as $currentSummary) {
+    foreach ($allSummary as $currentSummary) {
         $this->setVar(array(
             'SECTION_SEQUENCE' => $currentSummary['sequence'],
-            'SECTION_TITLE' => $currentSummary['title'],
+            'SECTION_TITLE' => scrub::text($currentSummary['title']),
             'SECTION_NUMQUESTIONS' => $currentSummary['pool'] > 0 ? $currentSummary['pool'] : $currentSummary['numQuestions'],
         ));
 
@@ -129,8 +128,7 @@ if (is_array($allSummary) && count($allSummary)) {
     }
 
     $this->parse('startTest_block', 'startTest');
-}
-else {
+} else {
     $this->setVar('section_block', '');
     $this->setVar('startTest_block', '');
 }
