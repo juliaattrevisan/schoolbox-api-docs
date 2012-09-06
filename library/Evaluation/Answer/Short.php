@@ -241,16 +241,16 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer
            */
         $page->setVar(array(
             'ANSWER_ID' => $currentAnswer['answer_id'],
-            'ANSWER' => scrub::text($existing['response']),
+            'ANSWER' => Scrub::text($existing['response']),
             'RESPONSE_ID' => $existing['response_id'],
-            'REVIEWED_COMMENT' => scrub::text($existing['comment']),
+            'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
             'REVIEWED_MARKS' => $existing['mark'],
         ));
 
         /* Show correct answer
            */
         $page->setVar(array(
-            'CORRECT_ANSWER' => scrub::text($currentAnswer['answer'])
+            'CORRECT_ANSWER' => Scrub::text($currentAnswer['answer'])
         ));
 
         $page->parse('answerOption_block', 'answerOption', true);

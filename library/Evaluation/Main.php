@@ -64,7 +64,7 @@ abstract class Evaluation_Main extends DeprecatedModel
         } else {
             $query = "SELECT *
                       FROM {$this->_table}
-                      WHERE category_id = " . $this->smartQuote($category_id) . "
+                      WHERE category_id = " . $this->db->smartQuote($category_id) . "
                       AND deleted_at IS NULL
                       ORDER BY finish";
         }
@@ -86,7 +86,7 @@ abstract class Evaluation_Main extends DeprecatedModel
     {
         $query = "SELECT *
                   FROM {$this->_table}
-                  WHERE {$this->_index} = " . $this->smartQuote($assess_id);
+                  WHERE {$this->_index} = " . $this->db->smartQuote($assess_id);
 
         return $this->db->getRow($query);
     }
@@ -108,7 +108,7 @@ abstract class Evaluation_Main extends DeprecatedModel
 				SUM(IF (assess_question.deleted_at IS NULL AND assess_question.question_id IS NOT NULL, 1, 0)) AS numQuestions
 			FROM assess_section
 			LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
-			WHERE assess_section.assess_id = " . $this->smartQuote($assess_id) . "
+			WHERE assess_section.assess_id = " . $this->db->smartQuote($assess_id) . "
 			AND assess_section.deleted_at IS NULL
 			GROUP BY assess_section.section_id
 		";
@@ -219,7 +219,7 @@ abstract class Evaluation_Main extends DeprecatedModel
 						 assess_question.deleted_at AS questionDeletedAt
                   FROM assess_section
                   LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
-                  WHERE assess_id = " . $this->smartQuote($assess_id) . "
+                  WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
                   AND assess_section.deleted_at IS NULL
                   ORDER BY sectionSequence, questionSequence";
 
@@ -309,8 +309,8 @@ abstract class Evaluation_Main extends DeprecatedModel
 
         $query = "SELECT COUNT(*)
                   FROM {$this->_table}
-                  WHERE assess_id = " . $this->smartQuote($assess_id) . "
-                  AND user_id = " . $this->smartQuote($uid);
+                  WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
+                  AND user_id = " . $this->db->smartQuote($uid);
 
         return $this->db->getOne($query);
     }
@@ -352,7 +352,7 @@ abstract class Evaluation_Main extends DeprecatedModel
     {
         $query = "SELECT COUNT(assess_id)
                   FROM assess
-                  WHERE assess_id = " . $this->smartQuote($assess_id) . "
+                  WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
                   AND finish > NOW()";
 
         $result = $this->db->getOne($query);
@@ -374,7 +374,7 @@ abstract class Evaluation_Main extends DeprecatedModel
     {
         $query = "SELECT COUNT(assess_id)
                   FROM assess
-                  WHERE assess_id = " . $this->smartQuote($assess_id) . "
+                  WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
                   AND deleted_at IS NULL";
 
         $result = $this->db->getOne($query);

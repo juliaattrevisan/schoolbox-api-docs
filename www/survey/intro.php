@@ -105,12 +105,12 @@ $this->setTitle('Assessment: ' . $assess['title']);
 
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
-    'ASSESS_TITLE' => scrub::text($assess['title']),
-    'ASSESS_DESCRIPTION' => scrub::html($assess['description']),
+    'ASSESS_TITLE' => Scrub::text($assess['title']),
+    'ASSESS_DESCRIPTION' => Scrub::html($assess['description']),
     'ASSESS_START' => $assessStartDate->getShort(),
     'ASSESS_FINISH' => $assessFinishDate->getShort(),
     'FIRST_SECTION' => $allSections[0]['section_id'],
-    'ASSESS_AUTHOR' => scrub::text($userHandler->formatName($author)),
+    'ASSESS_AUTHOR' => Scrub::text($userHandler->formatName($author)),
     'ASSESS_DURATION' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
 ));
 
@@ -120,7 +120,7 @@ if (is_array($allSummary) && count($allSummary)) {
     foreach ($allSummary as $currentSummary) {
         $this->setVar(array(
             'SECTION_SEQUENCE' => $currentSummary['sequence'],
-            'SECTION_TITLE' => scrub::text($currentSummary['title']),
+            'SECTION_TITLE' => Scrub::text($currentSummary['title']),
             'SECTION_NUMQUESTIONS' => $currentSummary['pool'] > 0 ? $currentSummary['pool'] : $currentSummary['numQuestions'],
         ));
 

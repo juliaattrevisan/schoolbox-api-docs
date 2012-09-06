@@ -86,7 +86,7 @@ if (!empty($_POST)) {
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],
         'SECTION_ID' => $this->arg[0],
-        'CURRENT_SECTION_TITLE' => scrub::text($section['title']),
+        'CURRENT_SECTION_TITLE' => Scrub::text($section['title']),
         'SEQUENCE' => $questionHandler->getNextSequence($section['section_id']),
         'QUESTION' => '',
         'MARKS' => '',
@@ -144,7 +144,7 @@ if (!empty($_POST)) {
 
         $this->setVar(array(
             'QUESTIONTYPE_TYPE_ID' => $currentQuestionType['type_id'],
-            'QUESTIONTYPE_DESCRIPTION' => scrub::html($currentQuestionType['description']),
+            'QUESTIONTYPE_DESCRIPTION' => Scrub::html($currentQuestionType['description']),
             'QUESTIONTYPE_SELECTED' => $selected,
         ));
 

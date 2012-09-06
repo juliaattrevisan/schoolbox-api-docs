@@ -58,7 +58,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
     {
         $query = "SELECT COUNT(*)
                   FROM {$this->_table}
-                  WHERE assess_id = " . $this->smartQuote($assess_id);
+                  WHERE assess_id = " . $this->db->smartQuote($assess_id);
 
         if ($groupById) {
             $query .= " GROUP BY user_id";
@@ -127,7 +127,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
     {
         $query = "SELECT COUNT(*) AS completed
                   FROM {$this->_table}
-                  WHERE assess_id = " . $this->smartQuote($assess_id) . "
+                  WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
                   AND user_id = '{$_SESSION['id']}'
                   AND finish != '0000-00-00 00:00:00'
 				  AND deleted_at IS NULL";
@@ -155,7 +155,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
                   LEFT JOIN `user` ON assess_attempt.user_id = user.id
                   LEFT JOIN assess ON assess_attempt.assess_id = assess.assess_id
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
-                  WHERE assess.assess_id = " . $this->smartQuote($assess_id) . "
+                  WHERE assess.assess_id = " . $this->db->smartQuote($assess_id) . "
 				  AND assess_attempt.deleted_at IS NULL
 				  GROUP BY assess_attempt.attempt_id";
 
@@ -182,7 +182,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
                   LEFT JOIN `user` ON assess_attempt.user_id = user.id
                   LEFT JOIN assess ON assess_attempt.assess_id = assess.assess_id
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
-                  WHERE assess.assess_id = " . $this->smartQuote($assess_id) . "
+                  WHERE assess.assess_id = " . $this->db->smartQuote($assess_id) . "
 				  AND assess_attempt.deleted_at IS NULL
 				  AND assess_attempt.user_id = '$user_id'
                   GROUP BY assess_attempt.attempt_id";
@@ -210,8 +210,8 @@ abstract class Evaluation_Attempt extends DeprecatedModel
                   LEFT JOIN `user` ON assess_attempt.user_id = user.id
                   LEFT JOIN assess ON assess_attempt.assess_id = assess.assess_id
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
-                  WHERE assess.assess_id = " . $this->smartQuote($assess_id) . "
-                  AND assess_attempt.attempt_id = " . $this->smartQuote($attempt_id) . "
+                  WHERE assess.assess_id = " . $this->db->smartQuote($assess_id) . "
+                  AND assess_attempt.attempt_id = " . $this->db->smartQuote($attempt_id) . "
 				  AND assess_attempt.deleted_at IS NULL
                   GROUP BY assess_attempt.attempt_id";
 
@@ -238,7 +238,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
                   LEFT JOIN `user` ON assess_attempt.user_id = user.id
                   LEFT JOIN assess ON assess_attempt.assess_id = assess.assess_id
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
-                  WHERE assess.assess_id = " . $this->smartQuote($assess_id) . "
+                  WHERE assess.assess_id = " . $this->db->smartQuote($assess_id) . "
 				  AND assess_response.section_id = '$section_id'
 				  AND assess_attempt.deleted_at IS NULL
                   GROUP BY assess_attempt.attempt_id";
@@ -262,8 +262,8 @@ abstract class Evaluation_Attempt extends DeprecatedModel
                   FROM assess_attempt
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
                   LEFT JOIN assess_question ON assess_response.question_id = assess_question.question_id
-                  WHERE assess_attempt.assess_id = " . $this->smartQuote($assess_id) . "
-                  AND assess_attempt.attempt_id = " . $this->smartQuote($attempt_id) . "
+                  WHERE assess_attempt.assess_id = " . $this->db->smartQuote($assess_id) . "
+                  AND assess_attempt.attempt_id = " . $this->db->smartQuote($attempt_id) . "
                   AND assess_question.deleted_at IS NULL";
 
         return $this->db->getOne($query);
@@ -280,7 +280,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
     {
         $query = "SELECT *
                   FROM {$this->_table}
-                  WHERE assess_id = " . $this->smartQuote($assess_id) . "
+                  WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
                   AND user_id = '$user_id'
 				  AND deleted_at IS NULL
                   ORDER BY start DESC";
@@ -301,7 +301,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
 			SELECT {$this->_table}.*
 			FROM {$this->_table}
 			LEFT JOIN assess ON assess.assess_id = {$this->_table}.assess_id
-			WHERE {$this->_table}.assess_id = " . $this->smartQuote($assess_id) . "
+			WHERE {$this->_table}.assess_id = " . $this->db->smartQuote($assess_id) . "
 			AND {$this->_table}.user_id = '$user_id'
 			AND {$this->_table}.deleted_at IS NULL
 			AND {$this->_table}.finish = '0000-00-00 00:00:00'
@@ -323,7 +323,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
                       SUM(assess_response.mark) AS totalMarks
                   FROM assess_attempt
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
-                  WHERE assess_attempt.attempt_id = " . $this->smartQuote($attempt_id) . "
+                  WHERE assess_attempt.attempt_id = " . $this->db->smartQuote($attempt_id) . "
                   GROUP BY assess_attempt.attempt_id";
 
         return $this->db->getOne($query);
@@ -341,7 +341,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
         $query = "
 			SELECT COUNT(*)
 			FROM {$this->_table}
-			WHERE assess_id = " . $this->smartQuote($assess_id) . "
+			WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
 			AND user_id = '$user_id'
 			AND deleted_at IS NULL
 		";
@@ -366,7 +366,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
 
         $query = "SELECT COUNT(*)
                   FROM {$this->_table}
-                  WHERE attempt_id = " . $this->smartQuote($attempt_id) . "
+                  WHERE attempt_id = " . $this->db->smartQuote($attempt_id) . "
                   AND user_id = '$uid'";
 
         return $this->db->getOne($query);
@@ -384,7 +384,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
 			SELECT `user`.firstname, `user`.lastname
 			FROM assess_attempt
 			LEFT JOIN `user` ON assess_attempt.user_id = `user`.id
-			WHERE assess_attempt.attempt_id = " . $this->smartQuote($attempt_id) . "
+			WHERE assess_attempt.attempt_id = " . $this->db->smartQuote($attempt_id) . "
 		";
 
         return $this->db->getRow($query);

@@ -45,7 +45,7 @@ if ($assess['anonymous_result']) {
 /* Generic details
  */
 $this->setVar(array(
-    'SURVEY_NAME' => scrub::text($assess['title']),
+    'SURVEY_NAME' => Scrub::text($assess['title']),
     'CID' => $assess['category_id'],
     'SURVEY_ID' => $assess['assess_id']
 ));

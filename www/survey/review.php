@@ -93,10 +93,10 @@ $user = $attemptHandler->getUser($attempt['attempt_id']);
  */
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
-    'ASSESS_TITLE' => scrub::text($assess['title']),
+    'ASSESS_TITLE' => Scrub::text($assess['title']),
     'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
-    'SECTION_TITLE' => scrub::text($section['title']),
-    'SECTION_DESCRIPTION' => scrub::text($section['description']),
+    'SECTION_TITLE' => Scrub::text($section['title']),
+    'SECTION_DESCRIPTION' => Scrub::text($section['description']),
     'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
     'ATTEMPT_USERNAME' => $user['firstname'] . ' ' . $user['lastname'],
     'ATTEMPT_START_DATETIME' => $start->getShort(),
@@ -124,7 +124,7 @@ if ($allQuestions) {
         $this->setVar(array(
             'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
             'QUESTION_SEQUENCE' => $currentQuestion['sequence'],
-            'QUESTION_QUESTION' => scrub::html($currentQuestion['question']),
+            'QUESTION_QUESTION' => Scrub::html($currentQuestion['question']),
             'QUESTION_MARKS' => $currentQuestion['marks'],
         ));
 

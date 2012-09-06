@@ -74,10 +74,10 @@ if (!empty($_POST)) {
 
     $this->setVar(array(
         'ASSESS_ASSESS_ID' => $section['assess_id'],
-        'ASSESS_TITLE' => scrub::text($assess['title']),
+        'ASSESS_TITLE' => Scrub::text($assess['title']),
         'SECTION_ID' => $section['section_id'],
-        'TITLE' => scrub::text($section['title']),
-        'DESCRIPTION' => scrub::Text($section['description']),
+        'TITLE' => Scrub::text($section['title']),
+        'DESCRIPTION' => Scrub::Text($section['description']),
         'SEQUENCE' => $section['sequence'],
         'RANDOM_SELECTED' => $section['random'] == 0 ? '' : 'checked=\'checked\'',
         'POOL' => $section['pool'],

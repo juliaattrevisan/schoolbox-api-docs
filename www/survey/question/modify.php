@@ -98,7 +98,7 @@ if (!empty($_POST)) {
 
     $this->setVar(array(
         'QUESTIONTYPE_TYPE_ID' => $currentQuestionType['type_id'],
-        'QUESTIONTYPE_DESCRIPTION' => scrub::html($currentQuestionType['description']),
+        'QUESTIONTYPE_DESCRIPTION' => Scrub::html($currentQuestionType['description']),
         'QUESTIONTYPE_SELECTED' => $selected,
     ));
 
@@ -131,7 +131,7 @@ if (!empty($_POST)) {
         'SECTION_ID' => $question['section_id'],
         'SEQUENCE' => $question['sequence'],
         'QUESTION_ID' => $question['question_id'],
-        'QUESTION' => scrub::html($question['question']),
+        'QUESTION' => Scrub::html($question['question']),
         'MARKS' => $question['marks'],
         'DISABLED_SELECTED' => '',
     ));

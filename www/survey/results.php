@@ -43,7 +43,7 @@ $this->setBlock('section', 'question', 'question_block');
 $this->setBlock('question', 'graph', 'graph_block');
 
 $this->setVar(array(
-    'SURVEY_NAME' => scrub::text($assess['title'])
+    'SURVEY_NAME' => Scrub::text($assess['title'])
 ));
 
 $factory = new Survey_Factory();
@@ -60,7 +60,7 @@ if (is_array($sectionValues) && count($sectionValues)) {
                 $this->setVar(array(
                     'ASSESS_ID' => $assess['assess_id'],
                     'CID' => $assess['category_id'],
-                    'QUESTION_QUESTION' => scrub::text($currentQuestion['question']),
+                    'QUESTION_QUESTION' => Scrub::html($currentQuestion['question']),
                     'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
                     'QUESTION_INDEX' => $i++,
                 ));
@@ -81,7 +81,7 @@ if (is_array($sectionValues) && count($sectionValues)) {
         }
 
         $this->setVar(array(
-            'SECTION_NAME' => scrub::text($currentSection['section'])
+            'SECTION_NAME' => Scrub::text($currentSection['section'])
         ));
 
         $this->parse('section_block', 'section', true);

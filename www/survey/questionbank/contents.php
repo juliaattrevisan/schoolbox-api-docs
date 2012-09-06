@@ -29,7 +29,7 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
     $category = $questionBankCategoryHandler->getByID($this->arg[0]);
 
     $this->setVar(array(
-        'QUESTION_CATEGORY' => scrub::text($category['name']),
+        'QUESTION_CATEGORY' => Scrub::text($category['name']),
     ));
 
     $allQuestions = $questionBankHandler->getContents($this->arg[0]);
@@ -43,7 +43,7 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
             $this->setVar(array(
                 'QUESTION_BANK_ID' => $currentQuestion['question_bank_id'],
                 'QUESTION_TYPE' => $currentQuestion['description'],
-                'QUESTION' => scrub::text($currentQuestion['question']),
+                'QUESTION' => Scrub::text($currentQuestion['question']),
                 'MARKS' => $currentQuestion['marks'],
                 'answers_block' => '',
             ));
@@ -58,9 +58,9 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
                                * multiple choice
                                */
                         if ($currentQuestion['type_id'] == $questionBankHandler::MATCHING_PAIRS_TYPE_ID) {
-                            $this->setVar('ANSWER_DESCRIPTION', scrub::text($answer->answerLeft . ' - ' . $answer->answerRight));
+                            $this->setVar('ANSWER_DESCRIPTION', Scrub::text($answer->answerLeft . ' - ' . $answer->answerRight));
                         } else {
-                            $this->setVar('ANSWER_DESCRIPTION', scrub::text($answer->description));
+                            $this->setVar('ANSWER_DESCRIPTION', Scrub::text($answer->description));
                         }
 
                         $this->parse('answers_block', 'answers', true);

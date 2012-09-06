@@ -82,7 +82,7 @@ if (!empty($_POST)) {
         'ACTION' => 'modify',
         'ASSESS_ASSESS_ID' => $assess['assess_id'],
         'ASSESS_CATEGORY_ID' => $assess['category_id'],
-        'ASSESS_TITLE' => scrub::text($assess['title']),
+        'ASSESS_TITLE' => Scrub::text($assess['title']),
         'ASSESS_DESCRIPTION' => $assess['description'],
         'ASSESS_START_DATE' => $assessStartDate->getLocalShort(),
         'ASSESS_FINISH_DATE' => $assessFinishDate->getLocalShort(),

@@ -81,7 +81,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
                     foreach ($allAnswers as $currentAnswer) {
                         $page->setVar(array(
                             'ANSWER_VALUE' => $currentAnswer->value,
-                            'ANSWER_DESCRIPTION' => scrub::text($currentAnswer->description),
+                            'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                             'ANSWER_CHECKED' => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
                         ));
 

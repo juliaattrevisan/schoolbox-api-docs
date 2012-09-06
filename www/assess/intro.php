@@ -110,7 +110,7 @@ $this->setVar(array(
     'ASSESS_START' => $assessStartDate->getShort(),
     'ASSESS_FINISH' => $assessFinishDate->getShort(),
     'FIRST_SECTION' => $allSections[0]['section_id'],
-    'ASSESS_AUTHOR' => scrub::text($userHandler->formatName($author)),
+    'ASSESS_AUTHOR' => Scrub::text($userHandler->formatName($author)),
     'ASSESS_DURATION' => $assess['duration'] == Assess_Main::UNLIMITED_DURATION ? 'Unlimited' : $assessHandler->sec2hms($assess['duration']),
 ));
 

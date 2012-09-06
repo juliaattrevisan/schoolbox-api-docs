@@ -365,7 +365,7 @@ class Group extends DeprecatedModel
 
         // check individual access
 
-        $query = "SELECT type FROM userAccess WHERE uid = " . $this->smartQuote($userID) . " AND ( ( service = " . $this->smartQuote($this->_service) . " ";
+        $query = "SELECT type FROM userAccess WHERE uid = " . $this->db->smartQuote($userID) . " AND ( ( service = " . $this->db->smartQuote($this->_service) . " ";
 
         if (in_array($this->_service, array(HOMEPAGE_SERVICE, CALENDAR_SERVICE)))
             $query .= "AND sid = " . mysql_real_escape_string($relationID) . " ";
@@ -382,7 +382,7 @@ class Group extends DeprecatedModel
 
         // check group access (HOMEPAGE_SERVICE only)
         if ($permission < WRITE_ACCESS && $this->_service == HOMEPAGE_SERVICE) {
-            $query = "SELECT type FROM perms WHERE cid=" . $this->smartQuote($relationID) . " AND gid=" . $this->smartQuote($user['group_id']) . " ORDER BY type DESC";
+            $query = "SELECT type FROM perms WHERE cid=" . $this->db->smartQuote($relationID) . " AND gid=" . $this->db->smartQuote($user['group_id']) . " ORDER BY type DESC";
             $groupPermission = $this->db->getOne($query);
             if ($groupPermission)
                 $permission = $groupPermission;

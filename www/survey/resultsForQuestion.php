@@ -93,8 +93,8 @@ if (is_array($sectionValues) && count($sectionValues)) {
                 $finish = new Alaress_Date_Format($currentAttempt['finish'], 'y-m-d h:i:s');
 
                 $this->setVar(array(
-                    'RESPONDENT_NAME' => scrub::text($currentAttempt['name']),
-                    'RESPONDENT_RESPONSE' => scrub::text($currentAttempt['responses']),
+                    'RESPONDENT_NAME' => Scrub::text($currentAttempt['name']),
+                    'RESPONDENT_RESPONSE' => Scrub::text($currentAttempt['responses']),
                     'RESPONDENT_START_DATETIME' => $start->getShort(),
                     'RESPONDENT_FINISH_DATETIME' => $finish->getShort(),
                 ));
@@ -118,7 +118,7 @@ if (is_array($sectionValues) && count($sectionValues)) {
 }
 
 $this->setVar(array(
-    'SURVEY_NAME' => scrub::text($assess['title']),
+    'SURVEY_NAME' => Scrub::text($assess['title']),
     'SURVEY_ID' => $assess['assess_id'],
     'QUESTION_QUESTION' => $questionList
 ));

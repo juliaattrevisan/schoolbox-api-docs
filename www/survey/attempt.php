@@ -128,12 +128,12 @@ $attemptEnd = new Alaress_Date_Format($attemptEndTime, 'U');
 
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $assess['assess_id'],
-    'ASSESS_TITLE' => scrub::text($assess['title']),
+    'ASSESS_TITLE' => Scrub::text($assess['title']),
     'ASSESS_TIME_REMAINING' => $attemptTimeRemaining,
     'ATTEMPT_START' => $attemptStart->getShort(),
     'ATTEMPT_END' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'No particular time' : $attemptEnd->getShort(),
-    'SECTION_TITLE' => scrub::text($section['title']),
-    'SECTION_DESCRIPTION' => scrub::text($section['description']),
+    'SECTION_TITLE' => Scrub::text($section['title']),
+    'SECTION_DESCRIPTION' => Scrub::text($section['description']),
     'CURRENT_SECTION_SEQUENCE' => $section['sequence'],
 ));
 
@@ -181,7 +181,7 @@ if ($allQuestions) {
         $this->setVar(array(
             'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
             'QUESTION_SEQUENCE' => $currentQuestion['sequence'],
-            'QUESTION_QUESTION' => scrub::text($currentQuestion['question']),
+            'QUESTION_QUESTION' => Scrub::text($currentQuestion['question']),
             'QUESTION_MARKS' => $currentQuestion['marks'],
         ));
 

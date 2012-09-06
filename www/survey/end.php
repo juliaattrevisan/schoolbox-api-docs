@@ -64,7 +64,7 @@ if ($attempt['finish'] == '0000-00-00 00:00:00') {
     $attemptEndDate = new Alaress_Date_Format(time(), 'U');
 
     $this->setVar(array(
-        'ASSESS_TITLE' => scrub::text($survey['title']),
+        'ASSESS_TITLE' => Scrub::text($survey['title']),
         'ASSESS_CATEGORY_ID' => $survey['category_id'],
         'ATTEMPT_END' => $attemptEndDate->getShort()
     ));
@@ -75,7 +75,7 @@ if ($attempt['finish'] == '0000-00-00 00:00:00') {
     $attemptEndDate = new Alaress_Date_Format(strtotime($attempt['finish']), 'U');
 
     $this->setVar(array(
-        'ASSESS_TITLE' => scrub::text($survey['title']),
+        'ASSESS_TITLE' => Scrub::text($survey['title']),
         'ASSESS_CATEGORY_ID' => $survey['category_id'],
         'ATTEMPT_END' => $attemptEndDate->getShort()
     ));
