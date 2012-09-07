@@ -113,41 +113,44 @@ class Weather_Wunderground implements Weather_Interface {
 
         $forecast = array();
 
-        foreach($data->forecast->simpleforecast->forecastday as $day) {
-            $forecast[] = array(
-                'datetime'   => $day->date->epoch,
-                'temp'       => array(
-                    'high'          => $day->high->celsius,
-                    'low'           => $day->low->celsius,
-                ),
-                'conditions' => $day->conditions,
-                'styles'     => array(
-                    'wxug_icon'     => $day->icon_url,
-                    'foreground'    => $day->icon,
-                    'background'    => $day->skyicon
-                ),
-                'rain'       => array(
-                    'day'           => $day->qpf_day->mm,
-                    'night'         => $day->qpf_night->mm,
-                    'all'           => $day->qpf_allday->mm
-                ),
-                'wind'       => array(
-                    'max'           => array(
-                        'speed'             => $day->maxwind->kph,
-                        'dir'               => $day->maxwind->dir
+        if(count($data->forecast->simpleforecast->forecastday)) {
+            foreach($data->forecast->simpleforecast->forecastday as $day) {
+                $forecast[] = array(
+                    'datetime'   => $day->date->epoch,
+                    'temp'       => array(
+                        'high'          => $day->high->celsius,
+                        'low'           => $day->low->celsius,
                     ),
-                    'avg'           => array(
-                        'speed'             => $day->avewind->kph,
-                        'dir'               => $day->avewind->dir
+                    'conditions' => $day->conditions,
+                    'styles'     => array(
+                        'wxug_icon'     => $day->icon_url,
+                        'foreground'    => $day->icon,
+                        'background'    => $day->skyicon
                     ),
-                ),
-                'humidity'   => array(
-                    'min'           => $day->minhumidity,
-                    'max'           => $day->maxhumidity,
-                    'avg'           => $day->avehumidity
-                )
-            );
+                    'rain'       => array(
+                        'day'           => $day->qpf_day->mm,
+                        'night'         => $day->qpf_night->mm,
+                        'all'           => $day->qpf_allday->mm
+                    ),
+                    'wind'       => array(
+                        'max'           => array(
+                            'speed'             => $day->maxwind->kph,
+                            'dir'               => $day->maxwind->dir
+                        ),
+                        'avg'           => array(
+                            'speed'             => $day->avewind->kph,
+                            'dir'               => $day->avewind->dir
+                        ),
+                    ),
+                    'humidity'   => array(
+                        'min'           => $day->minhumidity,
+                        'max'           => $day->maxhumidity,
+                        'avg'           => $day->avehumidity
+                    )
+                );
+            }
         }
+
 
         return array(
             'location'    => array(
