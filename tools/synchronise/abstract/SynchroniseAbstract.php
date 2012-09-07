@@ -105,11 +105,21 @@ class SynchroniseAbstract {
         }
         echo "\n";
 
-        for($i = 0; $i < 5; $i++) {
-            foreach($students[$i] as $field) {
-                printf("%-24s", $field);
+        $j = $k = 0;
+        for($i = 0; $i < count($students) && $j < 5; ++$i) {
+            if($students[$i]['NetworkLogin']) {
+                foreach($students[$i] as $field) {
+                    printf("%-24s", $field);
+                }
+                echo "\n";
+                ++$j;
             }
-            echo "\n";
+            else {
+                ++$k;
+            }
+        }
+        if($k) {
+            echo "$k skipped with no NetworkLogin\n";
         }
     }
 
@@ -124,11 +134,21 @@ class SynchroniseAbstract {
         }
         echo "\n";
 
-        for($i = 0; $i < 5; $i++) {
-            foreach($students[$i] as $field) {
-                printf("%-24s", $field);
+        $j = $k = 0;
+        for($i = 0; $i < count($students) && $j < 5; ++$i) {
+            if($students[$i]['NetworkLogin']) {
+                foreach($students[$i] as $field) {
+                    printf("%-24s", $field);
+                }
+                echo "\n";
+                ++$j;
             }
-            echo "\n";
+            else {
+                ++$k;
+            }
+        }
+        if($k) {
+            echo "$k skipped with no NetworkLogin\n";
         }
     }
 

@@ -34,10 +34,9 @@ class Synchronise_Synergetic_Moriah_Strategy_Staff extends Synchronise_Synergeti
 		$newUser = array();
 
 		/* Login details
-		 * We don't know how the password is given to us
+		 * If network login is blank user will be skipped
 		 */
-		$newUser['username'] = substr($currentUser['OccupEmail'], 0, strpos($currentUser['OccupEmail'], '@moriah'));
-		//$newUser['password'] = '1234';
+		$newUser['username'] = $currentUser['NetworkLogin'];
 
 		/* User details
 		 */
@@ -60,9 +59,11 @@ class Synchronise_Synergetic_Moriah_Strategy_Staff extends Synchronise_Synergeti
         }
         else {
             //Just put staff in main if no campus retrieved from timetable
-            $newUser['defaultCampus'] = 1;
-            $newUser['campus'] = array(1);
+            $newUser['defaultCampus'] = self::CG;
+            $newUser['campus'] = array(self::CG);
         }
+
+        $newUser['campus'] = array_unique($newUser['campus']);
 
 
 		/* Staff Group ID
@@ -120,6 +121,6 @@ class Synchronise_Synergetic_Moriah_Strategy_Staff extends Synchronise_Synergeti
      * Fetches staff campus from timetable table
      */
     function getCampus($staffID) {
-        $campus = $this->getExternalUserHandler()->getCampusFromTimetable($staffID);
+        return $this->getExternalUserHandler()->getCampusFromTimetable($staffID);
     }
 }

@@ -15,6 +15,36 @@
 abstract class Synchronise_Synergetic_Moriah_Strategy_Abstract extends Synchronise_Synergetic_Strategy_Abstract implements Synchronise_Synergetic_Moriah_Strategy_Interface {
 	protected $verboseFilter = null;
 
+    /*  id campus name
+
+         5 Primary School K-2
+        11 Primary School 3-5
+         9 Middle School
+         4 High School
+
+         3 Early Childhood Centre
+         6 Dover Rd Preschool
+         7 Glenayr Ave Preschool
+         8 Randwick Preschool
+        10 Preschool
+
+        12 Mt Zion
+    */
+
+
+    const CG =  1; // College General;
+    const S  =  2; // Secondary School;
+    const EC =  3; // Early Childhood Centre;
+    const HS =  4; // High School;
+    const IS =  5; // Primary School K-2;
+    const MD =  6; // Dover Rd Preschool;
+    const MG =  7; // Glenayr Ave Preschool;
+    const MR =  8; // Randwick Preschool;
+    const MS =  9; // Middle School;
+    const P  = 10; // Preschool;
+    const PS = 11; // Primary School 3-5;
+    const Z  = 12; // Mt Zion;
+
 	/**
 	 * Construct
 	 *
@@ -59,8 +89,10 @@ abstract class Synchronise_Synergetic_Moriah_Strategy_Abstract extends Synchroni
             case '12':
 				return 18;
 			case '00':
+            case '20':
 			case '30':
 			case '40':
+			case '50':
 				return 6;
 			default:
 				return false;
@@ -93,24 +125,26 @@ abstract class Synchronise_Synergetic_Moriah_Strategy_Abstract extends Synchroni
 		switch ($year) {
             case '01':
             case '02':
-                return 5;
+                return self::IS;
             case '03':
             case '04':
             case '05':
-                return 11;
+                return self::PS;
             case '06':
             case '07':
             case '08':
+                return self::MS;
             case '09':
-                return 9; // TODO check this: this cutoff is a guess
             case '10':
             case '11':
             case '12':
-                return 4;
+                return self::HS;
             case '00':
+            case '20':
 			case '30':
 			case '40':
-				return 10; // TODO check this: alternatively, can map preschool to nothing and manually apply
+			case '50':
+				return self::P; // TODO check this: alternatively, can map preschool to nothing and manually apply
 			default:
 				return false;
 		}
@@ -123,9 +157,10 @@ abstract class Synchronise_Synergetic_Moriah_Strategy_Abstract extends Synchroni
 	 * @return bool|string
 	 */
 	protected function getCampusFromCode($code) {
+        return defined('self::'.$code) ? constant(sprintf("%s::%s",'self',$code)) : self::CG;
+
+/*
 		switch($code) {
-            case 'FC':
-            	return 10;
 			case 'PS':
                 return 5;
             case 'MS':
@@ -134,8 +169,9 @@ abstract class Synchronise_Synergetic_Moriah_Strategy_Abstract extends Synchroni
                 return 4;
 			default:
                 // return 'main';
-				return 1;
+				return self::CG;
 		}
+*/
 	}
 
 	/**

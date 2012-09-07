@@ -32,11 +32,10 @@ class Synchronise_Synergetic_Moriah_Strategy_Student extends Synchronise_Synerge
 	public function setupUserDetails($currentUser) {
 		$newUser = array();
 
-		/* Login details
-		 * We don't know how the password is given to us
-		 */
-		$newUser['username'] = $currentUser['StudentPreferred'] . ' ' . $currentUser['StudentSurname']; // according to existing data, this is the full name...
-		//$newUser['password'] = '1234';
+		// Login details
+        // if the network login is present, use that, otherwise do not sync
+		$newUser['username'] = $currentUser['NetworkLogin'];
+		// $newUser['password'] = '1234';
 
 		/* User details
 		 */
@@ -56,9 +55,16 @@ class Synchronise_Synergetic_Moriah_Strategy_Student extends Synchronise_Synerge
 		$newUser['defaultCampus'] = 1;
 		$newUser['campus'] = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
 
+
+        // if they're preschool, we need to use the campus field from synergetic for mapping
+        $campus = $this->getCampusFromYearLevel($currentUser['StudentYearLevel']);
+        if($campus == self::P) {
+            $campus = $this->getCampusFromCode($currentUser['StudentCampus']);
+        }
+        $newUser['campus'] = array($campus);
+
 		/* Staff Group ID
 		 */
-		//$newUser['group_id'] = self::STUDENT_GROUP_ID;
 		$newUser['group_id'] = $this->getGroupIDFromYearLevel($currentUser['StudentYearLevel']);
 
 		/* This person is not a superuser
