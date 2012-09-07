@@ -57,10 +57,12 @@ class Component_Dashboard_WeatherController extends Component_Dashboard_Controll
 
     protected function renderForecast() {
 
+        $imageLocation = '/weather/image.php?path=';
+
         $currentConditions = $this->weather['current'];
         $this->setVar(array(
             "FC_DAY"    => '<b>Now</b>',
-            "FC_IMAGE"  => $currentConditions['styles']['wxug_icon'],
+            "FC_IMAGE"  => $imageLocation . parse_url($currentConditions['styles']['wxug_icon'], PHP_URL_PATH),
             "FC_PRECIS" => $currentConditions['conditions'],
             "FC_ACTUAL" => $currentConditions['temp']['actual'],
             'FC_CLASS'  => 'dark'
@@ -74,7 +76,7 @@ class Component_Dashboard_WeatherController extends Component_Dashboard_Controll
             $forecastDate = new Alaress_Date_Format($forecastConditions['datetime'], 'U');
             $this->setVar(array(
                 "FC_DAY"    => $forecastDate->getUsingFormat('D'),
-                "FC_IMAGE"  => $forecastConditions['styles']['wxug_icon'],
+                "FC_IMAGE"  => $imageLocation . parse_url($forecastConditions['styles']['wxug_icon'], PHP_URL_PATH),
                 "FC_PRECIS" => $forecastConditions['conditions'],
                 "FC_HIGH"   => $forecastConditions['temp']['high'],
                 "FC_LOW"    => $forecastConditions['temp']['low'],

@@ -48,7 +48,7 @@ $this->setVar(array(
     'WIND'      => $wind,
     'HUMIDITY'  => ($weather['current']['humidity'] < 0) ? '0%' : $weather['current']['humidity'],
     'PERIOD'    => $forecastDate->getLong(),
-    'C_IMAGE'   => $weather['current']['styles']['wxug_icon'],
+    'C_IMAGE'   => $imageLocation . parse_url($weather['current']['styles']['wxug_icon'], PHP_URL_PATH),
     'C_PRECIS'  => $weather['current']['conditions']
 ));
 
@@ -63,7 +63,7 @@ if($count) {
         $forecastDate = new Alaress_Date_Format($forecastConditions['datetime'], 'U');
         $this->setVar(array(
             "FC_DAY"    => $forecastDate->getUsingFormat('D'),
-            "FC_IMAGE"  => $forecastConditions['styles']['wxug_icon'],
+            "FC_IMAGE"  => $imageLocation . parse_url($forecastConditions['styles']['wxug_icon'], PHP_URL_PATH),
             "FC_PRECIS" => $forecastConditions['conditions'],
             "FC_HIGH"   => $forecastConditions['temp']['high'],
             "FC_LOW"    => $forecastConditions['temp']['low'],
