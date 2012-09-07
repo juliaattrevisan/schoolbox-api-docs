@@ -35,7 +35,8 @@
             buttonActiveClass: 'btn-file-input-active',
             fakeFileHolderClass: 'file-holder',
             defaultText: 'Choose file',
-            defaultFileSelectedText: 'File selected'
+            defaultFileSelectedText: 'File selected',
+            callback: false
 
         };
         var options = $.extend(defaults, options);
@@ -53,7 +54,7 @@
 
                 valArray = $val.split('\\');
                 newVal = valArray[valArray.length - 1];
-                $button = obj.siblings('.' + options.buttonClass + '');
+                $button = obj.siblings('.' + options.buttonClass.replace(' ', '.') + '');
                 $fakeHolder = obj.siblings('.' + options.fakeFileHolderClass + '');
 
                 if (newVal !== '') {
@@ -69,6 +70,11 @@
                 if (($fakeHolder.length > 0) && (newVal === '')) {
                     $fakeHolder.remove();
                     $button.html(options.defaultText).removeClass().addClass(options.buttonClass + ' ' + options.additionalButtonClasses);
+                }
+
+                if(options.callback) {
+                    var f = options.callback;
+                    f(this);
                 }
 
             });

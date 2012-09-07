@@ -147,13 +147,14 @@ class SubmissionReturn extends DeprecatedModel {
         $fileID = parent::create($return);
 
         if(is_array($file)) {
-
             $newFileName = $fileID . ".dat";
             move_uploaded_file($file['tmp_name'], Cfg::get('returns_dir') . "/" . $newFileName);
         }
 
         //Update student submission to be marked
         $this->db->update('student_submission', array('box_id','owner'), array('box_id'=>$return['box_id'], 'owner'=>$return['owner'], 'marked'=>'1'));
+
+        return $fileID ? true : false;
 
     }
 

@@ -16,6 +16,47 @@ class SubmissionStudent extends DeprecatedModel {
 		return $this->db->getRow($query);
 	}
 
+    // 3 CONVENIENCE WRAPPER METHODS FOR RETRIEVING WITH CERTAIN CONDITIONS
+
+    function getBySynergyID($subBoxID, $synergyID) {
+        return $this->getByCondition($subBoxID, array('synergy_id' => $synergyID));
+    }
+
+    function getByUserID($subBoxID, $userID) {
+        return $this->getByCondition($subBoxID, array('`owner`' => $userID));
+    }
+
+    function getByBoxID($subBoxID) {
+        return $this->getByCondition($subBoxID, array());
+    }
+
+    protected function getByCondition($subBoxID, array $conditions) {
+
+        $where = array();
+        if(count($conditions)) {
+            foreach($conditions as $k => $v) {
+                $where[] = "$k = '$v'";
+            }
+            $conditional = implode(' AND ', $where);
+        }
+        else {
+            $conditional = '1=1';
+        }
+
+        $query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid, username,
+                         local_email, alt_email, DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date,
+                         DATE_FORMAT(submitted, '%Y-%m-%d %H:%i') as datestamp, realname, late, marked,
+                         user.synergy_id as synergy_id, pd.score, pd.plagscan_id plag_doc_id
+                  FROM (student_submission, user)
+                  LEFT JOIN plagscan_document pd ON student_submission.id = pd.file_id
+                  WHERE $conditional
+                  AND owner = user.id
+                  AND box_id = '$subBoxID'
+                  ORDER BY lastname, firstname, datestamp DESC ";
+        return $this->db->getAll($query);
+
+    }
+/*
     function getBySynergyID($subBoxID, $synergyID) {
         $query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid, username,
                          local_email, alt_email, DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date,
@@ -56,7 +97,7 @@ class SubmissionStudent extends DeprecatedModel {
                    ORDER BY lastname, firstname";
          return $this->db->getAll($query);
     }
-
+*/
 	function checkSubmitted($box_id, $userID) {
 		$query = "SELECT s.id FROM student_submission s
 				  WHERE s.box_id = '$box_id' AND s.owner = '".$userID."'";

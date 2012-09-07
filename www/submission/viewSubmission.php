@@ -34,12 +34,12 @@ else {
     $studentList = $groupHandler->getMemberList($subBox['category']);
 }
 
-if(!is_array($studentList)) {
+if(!(is_array($studentList) && count($studentList))) {
     // failed to obtain a list of students from external sources: compile list from submissions
     $studentList = array();
 
     $allSubmissions = $studentSubHandler->getByBoxID($this->arg[0]);
-    if(count($allSubmissions)) {
+    if(is_array($allSubmissions) && count($allSubmissions)) {
         foreach($allSubmissions as $submission) {
             $studentList[] = array(
                 'title'      => $submission['title'],

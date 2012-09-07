@@ -312,46 +312,10 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 
                                 $subbox = $subHandler->getByID($sub['id']);
 
-
                                 $marksheet = Marksheet_Factory::build($subbox['mark_type_slug']);
                                 $mark = $marksheet->retrieveMark($student['uid'], $sub['id']);
 
-                                switch ($marksheet->getSlug()) {
-                                    case 'raw':
-                                        $output = array(
-                                            'MAX_MARK' => $mark['max_mark'],
-                                            'MARK' => $mark['mark'],
-                                            'COMMENT' => $mark['comment']
-                                        );
-                                        $this->setVar($output);
-                                        break;
-
-                                    case 'letter':
-                                        $this->setVar('grade_drop_block', '');
-                                        $this->dropdown('grade_drop', $subHandler->getLetterGrades(), $mark['grade_selected'], 'mark_type_letter', array(
-                                            'grade_id' => 'GRADE_VALUE',
-                                            'caption' => 'GRADE_TEXT',
-                                        ));
-                                        $this->setVar('COMMENT', $mark['comment']);
-                                        break;
-
-                                    case 'percent':
-                                    case 'free': // legacy support
-                                        $output = array(
-                                            'MARK' => $mark['mark'],
-                                            'COMMENT' => $mark['comment']
-                                        );
-                                        $this->setVar($output);
-                                        break;
-
-                                    default:
-                                        $output = array(
-                                            'MARK' => '!ERROR',
-                                            'COMMENT' => '!ERROR'
-                                        );
-                                        $this->setVar($output);
-                                        break;
-                                }
+                                $marksheet->outputUI($this, $mark);
 
                                 $marktypes = $subHandler->getMarkTypes(true);
 

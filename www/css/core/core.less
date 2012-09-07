@@ -5838,6 +5838,135 @@ table.subjectList {
     width:0px;
 }
 
+/* ---------------------------
+    submission/viewSubmission
+--------------------------- */
+.view-submission {
+    ul                          { list-style-type: disc;
+                                  margin-left: 1em;
+      li                        { line-height: 1.4em;
+                                  margin-left: 1em;
+      }
+    }
+    table                       { margin-top: 16px;
+                                  table-layout: fixed;
+                                  width: 100%;
+      th                        { position: relative;
+                                  padding-bottom: 12px;
+        input.submit-btn-plain  { position: absolute;
+                                  top: 0;
+                                  right: 120px;
+//                                  width: 160px;
+                                  margin-top: 0;
+        }
+      }
+      tr                        {
+        &.user                  {
+          .student              { padding: 10px 0;
+            .student-status     { font-size: 0.8em;
+                                  font-weight: bold;
+                                  text-transform: uppercase;
+                                  display: block;
+            }
+          }
+          .marking              { padding: 8px 8px 8px 0;
+            .comment            { min-width: 200px;
+                                  width: 80%;
+                                  float: right;
+            }
+          }
+          input, select         { border: solid 1px #ccc;
+                                  -webkit-transition: border-color 0.2s linear;
+          }
+        }
+        &.submission.file       {
+          p                     { line-height: 35px;
+                                  margin-right: 80px;
+          }
+          img                   { margin: 8px 8px 8px 0;
+                                  width: 22px;
+                                  height: 22px;
+          }
+          .button-set           { position: absolute;
+                                  bottom: 8px;
+                                  right: 8px;
+          }
+          td                    { border-bottom: solid 1px #ccc;
+                                  position: relative;
+          }
+          .plag-score           { margin-right: 8px;
+            a                   { color: inherit; }
+          }
+        }
+        td                      { padding: 0;
+
+            &.nowrap            { white-space: nowrap; }
+        }
+        p                       { float: left;
+                                  margin: 0;
+        }
+        img                     { width: 32px;
+                                  height: 32px;
+                                  float: left;
+                                  margin-right: 8px;
+        }
+      }
+    }
+    .regular                    { color: #333; }
+    .ok                         { color: #292; }
+    .warn                       { color: #e71; }
+    .critical                   { color: #922; }
+    .file-input                 { float: right;
+                                  width: 70%;
+//      .btn                      { width: 112px; }
+    }
+    .file-holder                { margin-top: 10px;
+                                  white-space: nowrap;
+                                  width: 100%;
+                                  overflow: hidden;
+                                  text-overflow: ellipsis;
+                                  float: right;
+                                  text-align: right;
+                                  display: block;
+                                  width: 45%;
+    }
+    .prettify                   { top: 3px; }
+    .drop-parent                {
+      td:first-child            { padding: 2px 0 0 9px;
+        .submission-dropdown    { border: 1px solid #D1D1D1;
+                                  color: #777 !important;
+                                  float: left;
+                                  text-shadow: 0 1px 0 white;
+                                  border-radius: 3px;
+                                  height: 19px;
+                                  line-height: 19px;
+                                  margin-top: -1px;
+                                  padding: 0 2px 0 1px;
+                                  position: relative;
+                                  font-size: 12px;
+                                  font-weight: normal;
+                                  overflow: visible;
+                                  font-family: Arial,Helvetica, sans-serif;
+                                  background-color: #FBFBFB;
+                                  background-image: -moz-linear-gradient(top, #FBFBFB, #F7F7F7);
+                                  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #FBFBFB), color-stop(1, #F7F7F7));
+                                  filter: progid:dximagetransform.microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7');
+                                  -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7')";
+                                  -moz-border-radius: 3px;
+                                  -webkit-border-radius: 3px;
+          &:hover               { text-decoration: none;
+                                  color: #FF5A00 !important;
+          }
+        }
+      }
+    }
+    .btn.no-text                { padding: 0;
+                                  padding-right: 25px;
+      span                      { left: 6px; }
+    }
+}
+
+
 /* -----------------------------------------
    Tiny Tables
 ----------------------------------------- */

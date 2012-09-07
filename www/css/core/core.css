@@ -5177,7 +5177,7 @@ li.bars {
   display: block;
 }
 /* SUBMISSION */
-.submission td span.alert  {
+.submission td span.alert {
   background: #e8f5ff url(/images/famicons/information.png) no-repeat 50% 50%;
   font-weight: 400;
   text-indent: -9999em;
@@ -5315,6 +5315,161 @@ table.subjectList {
   float: left;
   margin-left: 14px;
   width: 0px;
+}
+/* ---------------------------
+    submission/viewSubmission
+--------------------------- */
+.view-submission ul {
+  list-style-type: disc;
+  margin-left: 1em;
+}
+.view-submission ul li {
+  line-height: 1.4em;
+  margin-left: 1em;
+}
+.view-submission table {
+  margin-top: 16px;
+  table-layout: fixed;
+  width: 100%;
+}
+.view-submission table th {
+  position: relative;
+  padding-bottom: 12px;
+}
+.view-submission table th input.submit-btn-plain {
+  position: absolute;
+  top: 0;
+  right: 120px;
+  margin-top: 0;
+}
+.view-submission table tr.user .student {
+  padding: 10px 0;
+}
+.view-submission table tr.user .student .student-status {
+  font-size: 0.8em;
+  font-weight: bold;
+  text-transform: uppercase;
+  display: block;
+}
+.view-submission table tr.user .marking {
+  padding: 8px 8px 8px 0;
+}
+.view-submission table tr.user .marking .comment {
+  min-width: 200px;
+  width: 80%;
+  float: right;
+}
+.view-submission table tr.user input,
+.view-submission table tr.user select {
+  border: solid 1px #ccc;
+  -webkit-transition: border-color 0.2s linear;
+}
+.view-submission table tr.submission.file p {
+  line-height: 35px;
+  margin-right: 80px;
+}
+.view-submission table tr.submission.file img {
+  margin: 8px 8px 8px 0;
+  width: 22px;
+  height: 22px;
+}
+.view-submission table tr.submission.file .button-set {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+}
+.view-submission table tr.submission.file td {
+  border-bottom: solid 1px #ccc;
+  position: relative;
+}
+.view-submission table tr.submission.file .plag-score {
+  margin-right: 8px;
+}
+.view-submission table tr.submission.file .plag-score a {
+  color: inherit;
+}
+.view-submission table tr td {
+  padding: 0;
+}
+.view-submission table tr td.nowrap {
+  white-space: nowrap;
+}
+.view-submission table tr p {
+  float: left;
+  margin: 0;
+}
+.view-submission table tr img {
+  width: 32px;
+  height: 32px;
+  float: left;
+  margin-right: 8px;
+}
+.view-submission .regular {
+  color: #333;
+}
+.view-submission .ok {
+  color: #292;
+}
+.view-submission .warn {
+  color: #e71;
+}
+.view-submission .critical {
+  color: #922;
+}
+.view-submission .file-input {
+  float: right;
+  width: 70%;
+}
+.view-submission .file-holder {
+  margin-top: 10px;
+  white-space: nowrap;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  float: right;
+  text-align: right;
+  display: block;
+  width: 45%;
+}
+.view-submission .prettify {
+  top: 3px;
+}
+.view-submission .drop-parent td:first-child {
+  padding: 2px 0 0 9px;
+}
+.view-submission .drop-parent td:first-child .submission-dropdown {
+  border: 1px solid #D1D1D1;
+  color: #777 !important;
+  float: left;
+  text-shadow: 0 1px 0 white;
+  border-radius: 3px;
+  height: 19px;
+  line-height: 19px;
+  margin-top: -1px;
+  padding: 0 2px 0 1px;
+  position: relative;
+  font-size: 12px;
+  font-weight: normal;
+  overflow: visible;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #FBFBFB;
+  background-image: -moz-linear-gradient(top, #fbfbfb, #f7f7f7);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fbfbfb), color-stop(1, #f7f7f7));
+  filter: progid:dximagetransform.microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7');
+  -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7')";
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+}
+.view-submission .drop-parent td:first-child .submission-dropdown:hover {
+  text-decoration: none;
+  color: #FF5A00 !important;
+}
+.view-submission .btn.no-text {
+  padding: 0;
+  padding-right: 25px;
+}
+.view-submission .btn.no-text span {
+  left: 6px;
 }
 /* -----------------------------------------
    Tiny Tables
@@ -5614,7 +5769,7 @@ ul.tree .collapsable .hitarea {
 .news-index-tree li li {
   background: url(/images/mime/22x22/txt.png) no-repeat 18px 0;
 }
-/*WEATHER*/
+/* WEATHER */
 .weather p.float-left {
   font-size: 90%;
   margin: 0;
@@ -5635,38 +5790,37 @@ ul.tree .collapsable .hitarea {
   margin: 0;
 }
 .weatherDay {
-    float: left;
-    margin:8px;
-    padding:4px;
-    width: 20%;
-    min-width: 125px;
-    text-align: center;
+  float: left;
+  margin: 8px;
+  padding: 4px;
+  width: 20%;
+  min-width: 125px;
+  text-align: center;
 }
 .weatherDay .image {
-    width: 50px;
-    height: 50px;
-    float: left;
-    text-align: right;
+  width: 50px;
+  height: 50px;
+  float: left;
+  text-align: right;
 }
 .weatherDay .data {
-    float: left;
-    text-align: left;
-    height: 50px;
-    color: #aaa;
-    margin-left: 8px;
+  float: left;
+  text-align: left;
+  height: 50px;
+  color: #aaa;
+  margin-left: 8px;
 }
 .weatherDay h4 {
-    color: #2c2c2c;
-    margin: 0.2em 0;
-    float: none;
-    width: auto;
-    height: 25px;
-    line-height: 25px;
+  color: #2c2c2c;
+  margin: 0.2em 0;
+  float: none;
+  width: auto;
+  height: 25px;
+  line-height: 25px;
 }
 .weatherDay .temp-actual {
-    color: #000;
+  color: #000;
 }
-
 /* Countdown */
 .ui-timepicker-list {
   overflow-y: auto;
@@ -5857,111 +6011,3 @@ tr span.leave-pending {
     border: 0;
   }
 }
-
-.listing {
-	overflow: hidden;
-}
-
-/* COMMON TO ALL BUTTON TYPES */
-.listing .button {
-	display: block;
-	margin: 0;
-	background: #fff;
-}
-
-.listing .button:hover {
-	text-decoration: none;
-	background-color: #E9F6FF;
-}
-
-.listing .button span {
-	display: block;
-}
-
-.listing .button .name {
-	color: #000;
-}
-
-.listing .button .name em {
-	font-style: normal;
-	color: #797979;
-}
-
-.listing .button .group {
-	color: #797979;
-}
-
-.listing .button .prog {
-	height: 2px;
-	background: #76C4F9;
-	border: solid 1px #44AEFF;
-	margin: 6px 0 0 0;
-}
-
-/* BUTTON THUMB */
-.listing .button.thumb {
-	width: 64px;
-	float: left;
-	margin: 0;
-	border-top: solid 1px #DEDEDE;
-	border-left: solid 1px #DEDEDE;
-	position: relative;
-	top: -1px;
-	left: -1px;
-	padding: 5px;
-}
-
-.listing .button.thumb img {
-	width: 64px;
-	height: 64px;
-	margin: 0;
-}
-
-.listing .button.thumb .name {
-	margin-left: 1px;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-.listing .button.thumb .group {
-	margin: 1px;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-/* BUTTON BAR */
-.listing .button.bar {
-	padding: 4px;
-	border-bottom: solid 1px #dedede;
-}
-
-.listing .button.bar .name {
-	margin-left: 0px;
-}
-
-.listing .button.bar .name.single {
-	height: 30px;
-	line-height: 32px;
-}
-
-.listing .button.bar .group {
-	margin: 2px 0 0 0px;
-}
-
-.listing .button.bar:before {
-	content: "\203a";
-	float: right;
-	line-height: 14px;
-	margin-right: 24px;
-	font-size: 24px;
-}
-
-.listing .button.bar img {
-	float: left;
-	width: 32px;
-	height: 32px;
-	border: none;
-}
-
