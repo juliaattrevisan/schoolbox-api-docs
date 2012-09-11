@@ -28,4 +28,4 @@ if (strpos($remoteUrl, '?') === false) {
 
 $remoteUrl = $remoteUrl . $glue . "key=$key&time=$time&id=$externalUserId";
 
-$this->setVar('REMOTE_URL', addslashes(Scrub::text($remoteUrl)));
+$this->setVar('REMOTE_URL', addslashes($remoteUrl));
