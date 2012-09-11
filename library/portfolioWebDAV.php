@@ -1,45 +1,47 @@
 <?php
-class Sabre_DAV_Client_Extended extends Sabre_DAV_Client {
+class Sabre_DAV_Client_Extended extends Sabre_DAV_Client
+{
 
-	/**
-	 * Overridden to implement Content-Length header in $this->request call
-	 *
-	 * @param $url
-	 * @param $settings
-	 *
-	 * @return array
-	 */
-	protected function curlRequest($url, $settings) {
-		if ($settings[CURLOPT_CUSTOMREQUEST] == 'PROPFIND') {
-			$settings[CURLOPT_HTTPHEADER][] = 'Content-Length: 0';
-		}
+    /**
+     * Overridden to implement Content-Length header in $this->request call
+     *
+     * @param $url
+     * @param $settings
+     *
+     * @return array
+     */
+    protected function curlRequest($url, $settings)
+    {
+        if ($settings[CURLOPT_CUSTOMREQUEST] == 'PROPFIND') {
+            $settings[CURLOPT_HTTPHEADER][] = 'Content-Length: 0';
+        }
 
-		/* Bug in SabreDAV
-		 *
-		 * Note that this method is overridden due authentication methods being
-		 * incorrectly set.
-		 *
-		 * This is a bug in the SabreDAV client. It was using CURLAUTH_BASIC and
-		 * CURLAUTH_DIGEST as some kind of bitmask, eventually assigning
-		 * CURLOPT_HTTPAUTH to integer 3, a nonexistent authentication method.
-		 *
-		 * Fixed on 14/5/2012, hardcoded to CURLAUTH_BASIC
-		 */
-		$settings[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
+        /* Bug in SabreDAV
+           *
+           * Note that this method is overridden due authentication methods being
+           * incorrectly set.
+           *
+           * This is a bug in the SabreDAV client. It was using CURLAUTH_BASIC and
+           * CURLAUTH_DIGEST as some kind of bitmask, eventually assigning
+           * CURLOPT_HTTPAUTH to integer 3, a nonexistent authentication method.
+           *
+           * Fixed on 14/5/2012, hardcoded to CURLAUTH_BASIC
+           */
+        $settings[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
 
-		$curl = curl_init($url);
+        $curl = curl_init($url);
 
-		curl_setopt_array($curl, $settings);
+        curl_setopt_array($curl, $settings);
 
-		return array(
-			curl_exec($curl),
-			curl_getinfo($curl),
-			curl_errno($curl),
-			curl_error($curl)
-		);
-	}
+        return array(
+            curl_exec($curl),
+            curl_getinfo($curl),
+            curl_errno($curl),
+            curl_error($curl)
+        );
+    }
 
-	/**
+    /**
      * Uploads a file via a PUT request
      *
      * @param string $path Destination path on the server
@@ -47,7 +49,8 @@ class Sabre_DAV_Client_Extended extends Sabre_DAV_Client {
      *
      * @return array
      */
-    public function put($path, $file) {
+    public function put($path, $file)
+    {
 
         $curl = curl_init($this->getAbsoluteUrl($path));
 
@@ -75,14 +78,16 @@ class Sabre_DAV_Client_Extended extends Sabre_DAV_Client {
      *
      * @return array
      */
-    public function move($path, $destination) {
+    public function move($path, $destination)
+    {
         return $this->request('MOVE', $path, null, array(
-            'Destination' => $this->getAbsoluteUrl($destination))
+                'Destination' => $this->getAbsoluteUrl($destination))
         );
     }
 }
 
-class PortfolioWebDAV {
+class PortfolioWebDAV
+{
 
     /**
      * @var Sabre_DAV_Client_Extended
@@ -106,7 +111,8 @@ class PortfolioWebDAV {
      * @param \Sabre_DAV_Client_Extended $client
      * @param array $paths List of paths from the baseUri to access
      */
-    public function __construct(Sabre_DAV_Client_Extended $client, array $paths = array('/')) {
+    public function __construct(Sabre_DAV_Client_Extended $client, array $paths = array('/'))
+    {
         $this->client = $client;
 
         $this->rootPaths = $paths;
@@ -117,8 +123,8 @@ class PortfolioWebDAV {
     /**
      * Initialises the cache using the rootPaths
      */
-    private function buildTree() {
-
+    private function buildTree()
+    {
         $rootPath = md5('');
 
         // give pseudo id numbers to WebDAV files for use between requests
@@ -134,7 +140,7 @@ class PortfolioWebDAV {
 
             $_SESSION['portfolioIdPathMap'][$i] = $path;
 
-            $basename = $path == '/' ? '/' : urldecode(basename($path));
+            $basename = $path == '/' ? '/' : rawurldecode(basename($path));
 
             $cache = array(
                 'id' => $i,
@@ -151,9 +157,11 @@ class PortfolioWebDAV {
 
         $this->cache[$rootPath]['file'][] = true;
 
+
     }
 
-    public function factory() {
+    public function factory()
+    {
         require_once SITE_root . '/library/group.php';
         $groupHandler = new Group;
 
@@ -178,8 +186,7 @@ class PortfolioWebDAV {
                     '/StudentData/',
                 );
             }
-        }
-        else if ($site_location == 'jpc') {
+        } else if ($site_location == 'jpc') {
             $settings = array(
                 'baseUri' => 'http://kazon/',
                 'userName' => "jpc/" . $_SESSION['username'],
@@ -196,8 +203,7 @@ class PortfolioWebDAV {
                     '/Students/' . (date('Y') - ($_SESSION['year'] - 7)) . '/' . $_SESSION['username'] . '/',
                 );
             }
-        }
-        else if ($site_location == 'cathedral') {
+        } else if ($site_location == 'cathedral') {
 
             $settings = array(
                 'baseUri' => 'http://senior-server.school.cathedral.qld.edu.au/',
@@ -214,8 +220,7 @@ class PortfolioWebDAV {
                         '/staffhome/' . $_SESSION['username'] . '/',
                         '/ydrive/',
                     );
-                }
-                else {
+                } else {
 
                     $paths = array(
                         '/staffhome/' . $_SESSION['username'] . '/',
@@ -234,8 +239,7 @@ class PortfolioWebDAV {
                 }
             }
 
-        }
-        else if ($site_location == 'bialik') {
+        } else if ($site_location == 'bialik') {
 
             $settings = array(
                 'baseUri' => 'https://webdav.bialik.vic.edu.au/',
@@ -249,8 +253,7 @@ class PortfolioWebDAV {
                     $paths = array(
                         '/H-DRIVE/USERS/STAFF/TEACHERS/ELC/' . $_SESSION['username'] . '/',
                     );
-                }
-                else {
+                } else {
                     $paths = array(
                         '/H-DRIVE/USERS/STAFF/TEACHERS/YEAR02-12/' . $_SESSION['username'] . '/',
                     );
@@ -263,8 +266,7 @@ class PortfolioWebDAV {
             } else {
                 return false;
             }
-        }
-		else if ($site_location == 'core') {
+        } else if ($site_location == 'core') {
             $settings = array(
                 'baseUri' => 'http://webdave.alaress-dev.com.au/',
                 'userName' => 'webdave',
@@ -282,7 +284,8 @@ class PortfolioWebDAV {
     /**
      * @deprecated
      */
-    private function fixPath($path) {
+    private function fixPath($path)
+    {
 
         if ($path == '') {
             return $path;
@@ -298,7 +301,8 @@ class PortfolioWebDAV {
         return $this->rootPaths[0];
     }
 
-    public function getList($path = '', $filter = 'dir') {
+    public function getList($path = '', $filter = 'dir')
+    {
 
         $md5Path = md5($path);
 
@@ -309,19 +313,18 @@ class PortfolioWebDAV {
         $this->cache[$md5Path]['dir'] = array();
         $this->cache[$md5Path]['file'] = array();
 
-		try{
-			$response = $this->client->propFind($path, array(
-				'{DAV:}getcontentlength',
-				'{DAV:}resourcetype',
-				'{DAV:}getlastmodified',
-				'{DAV:}creationdate',),
-				1);
-		}
-		/* Handle Sabre_DAV_Exception specifically
+        try {
+            $response = $this->client->propFind($path, array(
+                    '{DAV:}getcontentlength',
+                    '{DAV:}resourcetype',
+                    '{DAV:}getlastmodified',
+                    '{DAV:}creationdate',),
+                1);
+        } /* Handle Sabre_DAV_Exception specifically
 		 */
-		catch (Sabre_DAV_Exception $e) {
-			error(141, DAV_Error::getMeaning($e->getMessage()));
-		}
+        catch (Sabre_DAV_Exception $e) {
+            error(141, DAV_Error::getMeaning($e->getMessage()));
+        }
 
         // remove parent
         array_shift($response);
@@ -351,8 +354,8 @@ class PortfolioWebDAV {
             $temp = array('id' => $index,
                 'parent' => $parentID,
                 'path' => $filepath,
-                'name' => urldecode($filename),
-                'description' => urldecode($filename),
+                'name' => rawurldecode($filename),
+                'description' => rawurldecode($filename),
                 'type' => $type,
                 'file_size' => $info['{DAV:}getcontentlength'],
                 'submitted' => $info['{DAV:}getlastmodified'],
@@ -366,17 +369,20 @@ class PortfolioWebDAV {
         return $this->cache[$md5Path][$filter];
     }
 
-    public function getDirectoryList($path) {
+    public function getDirectoryList($path)
+    {
         return $this->getList($path, 'dir');
     }
 
-    public function getFileList($path) {
+    public function getFileList($path)
+    {
         return $this->getList($path, 'file');
     }
 
     /* myfolder interface */
 
-    public function getParent($id) {
+    public function getParent($id)
+    {
 
         $path = $this->getPath($id);
         if ($path == '') {
@@ -392,7 +398,8 @@ class PortfolioWebDAV {
         return $this->getIndex($parentPath);
     }
 
-    public function getFolderNode($id) {
+    public function getFolderNode($id)
+    {
 
         $path = $this->getPath($id);
 
@@ -419,32 +426,35 @@ class PortfolioWebDAV {
             }
 
             return $siblingList;
-        }
-        else {
+        } else {
             return $directoryList;
         }
     }
 
 
-    public function hasChildren($id) {
+    public function hasChildren($id)
+    {
 
         $childrenList = $this->getDirectoryList($_SESSION['portfolioIdPathMap'][$id]);
 
         return is_array($childrenList) && count($childrenList);
     }
 
-    public function getFolderList($id) {
+    public function getFolderList($id)
+    {
         return $this->getDirectoryList($_SESSION['portfolioIdPathMap'][$id]);
     }
 
     /* MYFILE INTERFACE */
 
-    public function getAllInFolder($id) {
+    public function getAllInFolder($id)
+    {
 
         return $this->getFileList($_SESSION['portfolioIdPathMap'][$id]);
     }
 
-    public function getFile($id) {
+    public function getFile($id)
+    {
 
         $response = $this->client->request('GET', $_SESSION['portfolioIdPathMap'][$id]);
 
@@ -453,7 +463,8 @@ class PortfolioWebDAV {
         return $temp;
     }
 
-    public function getByID($id) {
+    public function getByID($id)
+    {
 
         $response = $this->client->propFind($_SESSION['portfolioIdPathMap'][$id], array(
             '{DAV:}getcontentlength',
@@ -483,36 +494,39 @@ class PortfolioWebDAV {
         return $temp;
     }
 
-    public function isRoot($id) {
+    public function isRoot($id)
+    {
         return in_array($_SESSION['portfolioIdPathMap'][$id], $this->rootPaths);
     }
 
-    public function create($data, $file = false) {
+    public function create($data, $file = false)
+    {
 
         if ($data['parent'] == 0) {
             return false;
         }
 
         if ($file) {
-            $path = $_SESSION['portfolioIdPathMap'][$data['parent']] . urlencode($file['name']);
+            $path = $_SESSION['portfolioIdPathMap'][$data['parent']] . rawurlencode($file['name']);
             $this->client->put($path, $file['tmp_name']);
         } else {
-            $path = $_SESSION['portfolioIdPathMap'][$data['parent']] . urlencode($data['name']) . '/';
+            $path = $_SESSION['portfolioIdPathMap'][$data['parent']] . rawurlencode($data['name']) . '/';
             $this->client->request('MKCOL', $path);
         }
 
-        $_SESSION['portfolioIdPathMap'][] = $path;
+        //$_SESSION['portfolioIdPathMap'][] = $path;
 
     }
 
-    public function update($data) {
+    public function update($data)
+    {
 
         if (isset($data['name'])) {
             $data['description'] = $data['name'];
         }
 
         if (isset($data['description'])) {
-            $destination = dirname($_SESSION['portfolioIdPathMap'][$data['id']]) . urlencode($data['description']);
+            $destination = dirname($_SESSION['portfolioIdPathMap'][$data['id']]) . rawurlencode($data['description']);
             $this->client->move($_SESSION['portfolioIdPathMap'][$data['id']], $destination);
 
             $_SESSION['portfolioIdPathMap'][$data['id']] = $destination;
@@ -534,7 +548,8 @@ class PortfolioWebDAV {
 
     }
 
-    public function delete($id) {
+    public function delete($id)
+    {
 
         if ($this->isRoot($id) || $id == 0) {
             return false;
@@ -545,12 +560,14 @@ class PortfolioWebDAV {
         unset($_SESSION['portfolioIdPathMap'][$id]);
     }
 
-    protected function getIndex($path) {
+    protected function getIndex($path)
+    {
         $path = rtrim($path, '/') . '/';
         return array_search($path, $_SESSION['portfolioIdPathMap']);
     }
 
-    protected function getPath($index) {
+    protected function getPath($index)
+    {
         return $_SESSION['portfolioIdPathMap'][$index];
     }
 
