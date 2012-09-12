@@ -19,11 +19,11 @@ class ZipFolder {
 
         $this->groupHandler = new Group;
 
-        $categoryHandler = new Category;
-        $this->folderDetails = $categoryHandler->getByID($folder);
+        $this->folderDetails = $this->getFolderDetails($folder);
+
         if (is_numeric($this->folderDetails['id'])) {
 
-            if ($this->groupHandler->getPermission($this->folderDetails['id']) < READ_ACCESS) {
+            if ($this->getPermission($this->folderDetails['id']) < READ_ACCESS) {
                 error(5);
             }
         } else {
@@ -82,12 +82,11 @@ class ZipFolder {
 
         if (is_array($fileList)) {
             foreach ($fileList as $file) {
-                $fileLocation = Cfg::get('file_dir') . '/' . $file['id'] . '.dat';
+                $fileLocation = $this->getFilePath($file['id']);
                 if (is_file($fileLocation)) {
                     $this->size = $this->size + $file['file_size'];
-                    $fileName = $currentDir . '/' . $file['realname'];
-                    $fileName = $this->uniqueFileName($fileName); //ensure filename is unique else puts numbers in filename
-                    copy(Cfg::get('file_dir') . '/' . $file['id'] . '.dat', $fileName);
+                    $fileName = $this->getTargetPath($currentDir, $file);
+                    copy($fileLocation, $fileName);
                 }
             }
         }
@@ -99,7 +98,7 @@ class ZipFolder {
             $folderList = $this->getFolders($folderID);
             if (is_array($folderList)) {
                 foreach ($folderList as $folder) {
-                    if ($this->groupHandler->getPermission($folder['id']) > DENY_ACCESS) {
+                    if ($this->getPermission($folder['id']) > DENY_ACCESS) {
                         $folderName = $this->cleanName($folder['name']);
                         $folderLocation = $currentDir . '/' . $folderName;
                         @mkdir($folderLocation);
@@ -146,4 +145,46 @@ class ZipFolder {
         }
     }
 
+    /**
+     * Gets a db row representing the given category id
+     *
+     * @param $folder_id
+     * @return array|bool
+     */
+    protected function getFolderDetails($folder_id) {
+        $categoryHandler = new Category;
+        return $categoryHandler->getByID($folder_id);
+    }
+
+    /**
+     * Gets a Group permission level for the given folder
+     *
+     * @param $folder_id
+     * @return DENY_ACCESS|READ_ACCESS|WRITE_ACCESS|FULL_ACCESS
+     */
+    protected function getPermission($folder_id) {
+        return $this->groupHandler->getPermission($folder_id);
+    }
+
+    /**
+     * Gets the current path of the file on disk
+     *
+     * @param $file_id Id of the file in the database
+     * @return string
+     */
+    protected function getFilePath($file_id) {
+        return Cfg::get('file_dir') . '/' . $file_id . '.dat';
+    }
+
+    /**
+     * Gets a target path the file should be copied to
+     *
+     * @param string $currentDir Parent directory the file should be copied to
+     * @param array $file File row from the database
+     * @return string
+     */
+    protected function getTargetPath($currentDir, $file) {
+        $fileName = $currentDir . '/' . $file['realname'];
+        return $this->uniqueFileName($fileName); //ensure filename is unique else puts numbers in filename
+    }
 }
