@@ -23,7 +23,7 @@ class Alaress_Image_Cache_Schoolbox {
 
 	/* This is where cached images are stored
 	 */
-	private $cacheLocation = '../data/portrait';
+	private $cacheLocation = '';
 
 	/* The filepath for processed image output
 	 * Defaults to /tmp if it couldn't figure out where the file goes
@@ -65,6 +65,7 @@ class Alaress_Image_Cache_Schoolbox {
 		$this->setGroupHandler(new Group());
 
 		$this->setPlaceholder(WEB_root . '/images/core/placeholder.png');
+        $this->setCacheLocation(SITE_root . '/data/portrait');
 
 		$this->decidePlaceholder();
 	}
