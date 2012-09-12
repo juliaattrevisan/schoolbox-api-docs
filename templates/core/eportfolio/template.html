@@ -92,7 +92,7 @@
 
 <!-- BEGIN allowed_files -->
 a.{NAME} {
-	background-image: url(/images/mime/22x22/{ICON});
+	background-image: url({ICON});
 }
 <!-- END allowed_files -->
 
@@ -152,6 +152,9 @@ a.{NAME} {
 				</tr>
 			</table>
 		</div>
+        <div class="colours-buttons clearfix">
+            <a href="/eportfolio/export.php?user_id={USER_ID}" class="submit-btn-plain">Export ePortfolio</a>
+        </div>
 	</div>
 	<!--/tabs-1-->
 	<div id="tabs-2" class="customise-components">
@@ -331,8 +334,14 @@ a.{NAME} {
 		<div class="box permanent clearfix">
 			<h2>My Profile</h2>
 			<div class="pad-it">
-				<img src="/search/portrait.php?id={SYNERGY_ID}&width=150&height=150" alt="{PERSON_NAME}" title="{PERSON_NAME}" />
-				<p> <strong><a href="/search/user/{ID}">{PERSON_NAME}</a></strong><br />
+				<img src="/portrait?userId={SYNERGY_ID}&size=constrain200" alt="{PERSON_NAME}" title="{PERSON_NAME}" />
+				<p> <!-- BEGIN full_name_link -->
+                    <strong><a href="/search/user/{ID}">{PERSON_NAME}</a></strong><br />
+                    <!-- END full_name_link -->
+                    <!-- BEGIN full_name -->
+                    <strong>{PERSON_NAME}</strong><br />
+                    <!-- END full_name -->
+
                     <!-- BEGIN student -->
 					House: {HOUSE}<br />
 					Campus: {CAMPUS}<br />

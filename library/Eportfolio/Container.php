@@ -4,6 +4,8 @@
 
 class Eportfolio_Container {
 
+    protected $exportable = false;
+
 	/**
 	 * Custom constructor
 	 *
@@ -394,6 +396,11 @@ class Eportfolio_Container {
 	 * @return bool
 	 */
     public function canEdit($userID) {
+
+        if ($this->isExportable()) {
+            return false;
+        }
+
         $groupHandler = new Group();
 
         // can always edit your own
@@ -493,4 +500,26 @@ class Eportfolio_Container {
         $this->db->update('eportfolio_config', 'uid', $columns);
 
 	}
+
+    /**
+     * Sets the exportable value
+     *.
+     * An exportable ePortfolio is a standalone html page without
+     * edit controls or links to content within the portal (such as the user directory).
+     *
+     * @param bool $value
+     */
+    public function setExportable($value = true) {
+        $this->exportable = $value;
+    }
+
+    /**
+     * Returns true if this ePortfolio is exportable
+     * @see setExportable
+     * @return bool
+     */
+    public function isExportable() {
+        return $this->exportable;
+    }
+
 }

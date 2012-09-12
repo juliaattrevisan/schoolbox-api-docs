@@ -1,4 +1,11 @@
 <?php
+$isExportable = $eportfolioHandler->isExportable();
+
+if ($isExportable) {
+    // print all comments below each blog item
+    $config['comments_size'] = 0;
+}
+
 $blogHandle = new Eportfolio_Blog_Item();
 $blogHandle->config($config);
 
@@ -18,9 +25,17 @@ $this->setBlock($componentHandle, 'blog', 'blog_block');
 $this->setBlock('blog', 'comment', 'comment_block');
 $this->setBlock('blog', 'show_all', 'show_all_block');
 $this->setBlock('blog', 'show_comment', 'show_comment_block');
+$this->setBlock('blog', 'post_comment', 'post_comment_block');
 
 $blogs = $blogHandle->getByOwnerID($userID);
 $userHandler = new User();
+
+$this->setVar('post_comment_block', '');
+$this->setVar('show_comment_block', '');
+
+if (!$isExportable) {
+    $this->parse('post_comment_block', 'post_comment');
+}
 
 if (!empty($blogs)) {
 	foreach ($blogs as $blog) {
@@ -39,7 +54,7 @@ if (!empty($blogs)) {
 			'BLOG_ID'		=> $blog['id'],
 			'BLOG_HEADING'  => Scrub::text($blog['heading']),
 			'BLOG_BODY'     => Scrub::html($blog['body']),
-			'BLOG_OWNER'    => "<a href=\"/search/user/{$blog['owner']}\">{$blog['name']}</a>",
+			'BLOG_OWNER'    => $isExportable ? $blog['name'] : "<a href=\"/search/user/{$blog['owner']}\">{$blog['name']}</a>",
 			'BLOG_CREATED'  => $createdTime->getRelativeTime(),
 			'BLOG_SHADING'  => ++$j%2 ? '' : 'dark',
 			'BLOG_COMMENTS' => ''
@@ -55,7 +70,7 @@ if (!empty($blogs)) {
 
 		$this->setVar('BLOG_TOTAL_COMMENTS', $totalComments);
 
-		if ($totalComments > $showingComments) {
+		if (!$isExportable && $totalComments > $showingComments) {
 			$this->parse('show_all_block','show_all');
         }
 		else {
@@ -64,7 +79,10 @@ if (!empty($blogs)) {
 
 		if (!empty($comments)) {
 			$this->setVar('BLOG_COMMENTS', $showingComments);
-			$this->parse('show_comment_block','show_comment' );
+
+            if (!$isExportable) {
+			    $this->parse('show_comment_block','show_comment' );
+            }
 
 			foreach ($comments as $comment) {
 				$comment['name'] = $userHandler->formatName($comment);
@@ -73,12 +91,13 @@ if (!empty($blogs)) {
 
 				$this->setVar(array(
 					'COMMENT_BODY'    => Scrub::text($comment['body']),
-					'COMMENT_OWNER'   => "<a href=\"/search/user/{$comment['owner']}\">{$comment['name']}</a>",
+					'COMMENT_OWNER'   => $isExportable ? $comment['name'] : "<a href=\"/search/user/{$comment['owner']}\">{$comment['name']}</a>",
+                    'COMMIT_CLASS'    => $isExportable ? '' : 'hide-it',
 					'COMMENT_CREATED' => $createdTime->getRelativeTime()
 				));
 
-				if ($comment['owner'] == $_SESSION['id'] || $permission >= WRITE_ACCESS) {
-					$this->setVar('DELETE_COMMENT', "<a href=\"/eportfolio/blog/comment/delete/{$comment['id']}\">Delete</a>");
+				if (!$isExportable && $comment['owner'] == $_SESSION['id'] || $permission >= WRITE_ACCESS) {
+					$this->setVar('DELETE_COMMENT', "| <a href=\"/eportfolio/blog/comment/delete/{$comment['id']}\">Delete</a>");
                 }
 				else {
 					$this->setVar('DELETE_COMMENT', '');

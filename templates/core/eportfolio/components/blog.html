@@ -69,10 +69,10 @@ $j(function(){
 					<p class="interact">{MODIFY_BLOG}</p>
 				</div>
 				<p>{BLOG_BODY}</p>
-				<div class="blog-comments hide-it">
+				<div class="blog-comments {COMMENT_CLASS}">
 					<!-- BEGIN comment -->
 					<div class="box clearfix"> {COMMENT_BODY}
-						<p class="interact">{COMMENT_OWNER} | {COMMENT_CREATED} | {DELETE_COMMENT}</p>
+						<p class="interact">{COMMENT_OWNER} | {COMMENT_CREATED} {DELETE_COMMENT}</p>
 					</div>
 					<!-- END comment -->
 
@@ -84,7 +84,9 @@ $j(function(){
 					<!-- BEGIN show_comment -->
 					<a class="show_comments" href="javascript:void();"><span>Show</span><span class="hide-it">Hide</span> {BLOG_COMMENTS} Comments</a> -
 					<!-- END show_comment -->
+                    <!-- BEGIN post_comment -->
 					<a class="interact post_comment" href="javascript:void();">Post comment</a>
+                    <!-- END post_comment -->
 				</p>
 				<form class="hide" method="post" action="/eportfolio/blog/comment/new/{BLOG_ID}">
 					<p>

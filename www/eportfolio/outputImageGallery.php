@@ -9,6 +9,6 @@ else {
 	$uid = $this->arg[0];
 }
 
-$imageGallery = new Eportfolio_Image_Gallery($this, $uid, $config, $componentHandle);
+$imageGallery = new Eportfolio_Image_Gallery($this, $uid, $config, $componentHandle, $eportfolioHandler);
 $imageGallery->render();
 

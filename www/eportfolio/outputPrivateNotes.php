@@ -16,4 +16,4 @@ else {
     $privateNotes->setCanEditPrivateNotes(false);
 }
 
-$privateNotes->render();
+$privateNotes->render($eportfolioHandler->isExportable());

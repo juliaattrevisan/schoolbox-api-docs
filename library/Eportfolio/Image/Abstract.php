@@ -13,6 +13,11 @@ abstract class Eportfolio_Image_Abstract extends DeprecatedModel implements Epor
 	protected $config = null;
 	protected $userId = null;
 
+    /**
+     * @var Eportfolio_container
+     */
+    protected $container;
+
 	/**
 	 * Constructor
 	 *
@@ -24,11 +29,12 @@ abstract class Eportfolio_Image_Abstract extends DeprecatedModel implements Epor
 	 * @param  $config
 	 * @param  $componentHandle
 	 */
-	public function __construct($page, $userId, $config, $componentHandle) {
+	public function __construct(Page $page, $userId, $config, $componentHandle, Eportfolio_Container $container) {
 		$this->setPage($page);
 		$this->setUserId($userId);
 		$this->setConfig($config);
 		$this->setComponentHandle($componentHandle);
+        $this->setEportfolioContainer($container);
 
 		parent::DeprecatedModel();
 	}
@@ -108,4 +114,22 @@ abstract class Eportfolio_Image_Abstract extends DeprecatedModel implements Epor
 	public function setComponentHandle($val) {
 		$this->componentHandle = $val;
 	}
+
+    /**
+     * Set Eportfolio_Container
+     *
+     * @param Eportfolio_Container $container
+     */
+    public function setEportfolioContainer(Eportfolio_Container $container) {
+        $this->container = $container;
+    }
+
+    /**
+     * Get Eportfolio_Container
+     *
+     * @return Eportfolio_container
+     */
+    protected function getEportfolioContainer() {
+        return $this->container;
+    }
 }

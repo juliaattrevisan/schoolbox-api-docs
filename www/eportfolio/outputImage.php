@@ -9,5 +9,5 @@ else {
 	$uid = $this->arg[0];
 }
 
-$featuredImage = new Eportfolio_Image_Feature($this, $uid, $config, $componentHandle);
+$featuredImage = new Eportfolio_Image_Feature($this, $uid, $config, $componentHandle, $eportfolioHandler);
 $featuredImage->render();

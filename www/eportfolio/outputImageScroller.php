@@ -15,5 +15,5 @@ else {
 	$uid = $this->arg[0];
 }
 
-$imageScroller = new Eportfolio_Image_Scroller($this, $uid, $config, $componentHandle);
+$imageScroller = new Eportfolio_Image_Scroller($this, $uid, $config, $componentHandle, $eportfolioHandler);
 $imageScroller->render();

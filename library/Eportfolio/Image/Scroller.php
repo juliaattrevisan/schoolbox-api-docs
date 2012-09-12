@@ -34,7 +34,6 @@ class Eportfolio_Image_Scroller extends Eportfolio_Image_Abstract
             'COMPONENT_PIXEL' => $config['pixel']
         ));
 
-        $this->getPage()->parse('config_block', 'config', true);
     }
 
     /**
@@ -54,28 +53,6 @@ class Eportfolio_Image_Scroller extends Eportfolio_Image_Abstract
     }
 
     /**
-     * Gets all the images associated with an eportfolio
-     *
-     * @param int $limit
-     * @return array|bool
-     */
-    private function getImages($limit = 0)
-    {
-        $query = "SELECT id, myFile.description
-				  FROM myFile
-				  LEFT JOIN allowedFileTypes ON mime_type = mime
-				  WHERE owner = '{$this->getUserId()}'
-				  AND deleted = '0' AND INSTR(mime_type, 'image/')
-				  ORDER BY submitted";
-
-        if ($limit > 0) {
-            $query .= " LIMIT 1, $limit";
-        }
-
-        return $this->db->getAll($query);
-    }
-
-    /**
      * Render all the files in a scroller
      *
      * @return void
@@ -84,7 +61,7 @@ class Eportfolio_Image_Scroller extends Eportfolio_Image_Abstract
     {
         $config = $this->getConfig();
 
-        $allFiles = $this->getImages();
+        $allFiles = $this->getEportfolioContainer()->getImages($this->getUserId());
 
         /* Render each
            */

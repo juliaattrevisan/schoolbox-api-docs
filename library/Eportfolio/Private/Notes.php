@@ -20,8 +20,9 @@ class Eportfolio_Private_Notes extends Eportfolio_Private_Abstract {
 	 *
 	 * @return void
 	 */
-	public function render() {
+	public function render($exportable = false) {
 		$this->getPage()->setBlock(TEMPLATE_content, 'privateNotes', 'privateNotes_block');
+        $this->getPage()->setBlock('privateNotes', 'modify_link', 'modify_link_block');
 
 		$data = $this->getByID($this->getUserId());
 
@@ -32,6 +33,12 @@ class Eportfolio_Private_Notes extends Eportfolio_Private_Abstract {
 
 		/* Show private notes edit functionality if allowed
 		 */
+
+        if (!$exportable) {
+            $this->getPage()->parse('modify_link_block', 'modify_link');
+        } else {
+            $this->getPage()->setVar('modify_link_block', '');
+        }
 
 		if ($this->getCanEditPrivateNotes()) {
 			$this->getPage()->parse('privateNotes_block', 'privateNotes');

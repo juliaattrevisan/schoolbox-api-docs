@@ -1,6 +1,11 @@
 <?php
 $this->setBlock($componentHandle, 'link', 'link_block');
 $this->setBlock('link', 'modify_link', 'modify_link_block');
+$this->setBlock('link', 'author_link', 'author_link_block');
+$this->setBlock('link', 'author', 'author_block');
+
+$this->setVar('author_link_block', '');
+$this->setVar('author_block', '');
 
 $userHandler = new User();
 $linkHandler = new Eportfolio_Link();
@@ -10,7 +15,10 @@ if (is_array($linkList)) {
 	foreach($linkList as $link) {
 		$url = new Url($link['url']);
 
-		if ($url->isLocalUrl()) {
+        if ($eportfolioHandler->isExportable()) {
+            $linkUrl = $url->getUrl();
+        }
+		else if ($url->isLocalUrl()) {
 			$linkUrl = $url->getRelativeURL();
 		}
 		else {
@@ -35,6 +43,12 @@ if (is_array($linkList)) {
         }
 		else {
 			$this->parse('modify_link_block', 'modify_link');
+        }
+
+        if ($eportfolioHandler->isExportable()) {
+            $this->parse('author_block', 'author');
+        } else {
+            $this->parse('author_link_block', 'author_link');
         }
 
 		$this->parse("link_block", "link", true);

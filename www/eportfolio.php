@@ -40,6 +40,11 @@ if (!$eportfolioHandler->canView($userID)) {
     error(19);
 }
 
+// see www/eportfolio/export.php
+if ($this->arg[1] === 'export') {
+    $eportfolioHandler->setExportable(true);
+}
+
 $canEdit = $eportfolioHandler->canEdit($userID);
 
 /* Render templates
@@ -56,6 +61,8 @@ $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 $this->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
 $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
+$this->setBlock(TEMPLATE_content, 'full_name_link', 'full_name_link_block');
+$this->setBlock(TEMPLATE_content, 'full_name', 'full_name_block');
 
 $this->setBlock('customise_page', 'homepage_component_tab', 'homepage_component_tab_block');
 $this->setBlock('customise_page', 'homepage_component_page', 'homepage_component_page_block');
@@ -64,11 +71,19 @@ $this->setBlock('homepage_component_page', 'homepage_component', 'homepage_compo
 $this->setVar('edit_page_block', '');
 $this->setVar('modify_layout_block', '');
 $this->setVar('customise_page_block', '');
+$this->setVar('full_name_link_block', '');
+$this->setVar('full_name_block', '');
 
 if ($canEdit) {
     $this->parse('modify_layout_block', 'modify_layout');
     $this->parse('edit_page_block', 'edit_page');
     $this->parse('customise_page_block', 'customise_page');
+}
+
+if ($eportfolioHandler->isExportable()) {
+    $this->parse('full_name_block', 'full_name');
+} else {
+    $this->parse('full_name_link_block', 'full_name_link');
 }
 
 /* Output components and component tabs */
@@ -206,17 +221,6 @@ $this->setVar(array(
     'TEMPLATE' => 'template' . $template['template'],
     'SYNERGY_ID' => $user['synergy_id'],
 ));
-
-/* Has elevated privileges, can write to page
- */
-if ($_SESSION['id'] == $this->arg[0] || $groupHandler->isSuperuser($_SESSION['id'])) {
-    $this->parse('edit_page_block', 'edit_page');
-    $this->parse('modify_layout_block', 'modify_layout');
-}
-else {
-    $this->setVar('edit_page_block', '');
-    $this->setVar('modify_layout_block', '');
-}
 
 /* Always include private notes for this eportfolio, which can only be seen
  * by parents, staff and superusers.
@@ -375,7 +379,7 @@ if (is_array($allowedList)) {
 		if ($last != $allowed["iconFile"]) {
 			$this->setVar(array(
 				'NAME' => $allowedFiles->getClass($allowed["iconFile"]),
-				'ICON' => $allowed["iconFile"],
+				'ICON' => ($eportfolioHandler->isExportable() ? '' : '/') .  'images/mime/22x22/' . $allowed["iconFile"],
 			));
 
 			$this->parse("allowed_files_block", "allowed_files", true);

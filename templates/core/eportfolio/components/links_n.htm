@@ -49,7 +49,14 @@
 				</div>
 
 				<p>{LINK_COMMENT}</p>
-				<p class="interact">Posted by <a href="/search/user/{LINK_POSTED_BY_ID}">{LINK_POSTED_BY}</a> on {LINK_POSTED_DATE}</p>
+				<p class="interact">Posted by
+                    <!-- BEGIN author_link -->
+                    <a href="/search/user/{LINK_POSTED_BY_ID}">{LINK_POSTED_BY}</a>
+                    <!-- END author_link -->
+                    <!-- BEGIN author -->
+                    {LINK_POSTED_BY}
+                    <!-- END author -->
+                    on {LINK_POSTED_DATE}</p>
 			</li>
 			<!-- END link -->
 		</ul>

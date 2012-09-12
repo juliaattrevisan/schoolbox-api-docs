@@ -30,11 +30,11 @@ if (is_array($fileList)) {
             'HIDDEN'            => $file['hidden'] ? 'hidden' : '',
         ));
 
-        if ($file['published'] != '') {
+        if ($eportfolioHandler->canEdit($userID)) {
             $this->parse('unpublish_block', 'unpublish');
         }
         else {
-            $this->parse('unpublish_block', '');
+            $this->setVar('unpublish_block', '');
         }
 
 		/* Set name

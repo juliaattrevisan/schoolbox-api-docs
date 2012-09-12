@@ -18,7 +18,10 @@ class Eportfolio_Image_Gallery extends Eportfolio_Image_Abstract {
 	public function setup() {
 		$this->getPage()->setBlock($this->getComponentHandle(), 'thumb_row', 'row_block');
 		$this->getPage()->setBlock('thumb_row', 'thumb_cell', 'cell_block');
-	}
+        $this->getPage()->setBlock($this->getComponentHandle(), 'gallery_link', 'gallery_link_block');
+
+        $this->getPage()->setVar('gallery_link_block', '');
+    }
 
 	/**
 	 * Set up default config stuff
@@ -41,7 +44,7 @@ class Eportfolio_Image_Gallery extends Eportfolio_Image_Abstract {
 	public function render() {
 		$this->setup();
 
-		$eportfolioHandler = new Eportfolio_Container($this->getUserId());
+        $eportfolioHandler = $this->getEportfolioContainer();
 
 		$imageList = $eportfolioHandler->getImages($this->getUserId());
 
@@ -73,6 +76,10 @@ class Eportfolio_Image_Gallery extends Eportfolio_Image_Abstract {
 		}
 		else {
 			$this->getPage()->setVar('row_block', '');
+		}
+
+        if (!$eportfolioHandler->isExportable()) {
+            $this->getPage()->parse('gallery_link_block', 'gallery_link');
 		}
 	}
 }
