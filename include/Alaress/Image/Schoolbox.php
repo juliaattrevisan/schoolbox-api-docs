@@ -11,6 +11,11 @@
  */
 class Alaress_Image_Schoolbox {
 
+    /**
+     * @var Alaress_Image_Processor
+     */
+    protected $imageProcessor = null;
+
 	/**
 	 * Constructor
 	 *
@@ -28,7 +33,40 @@ class Alaress_Image_Schoolbox {
 
 		/* Process and stream image
 		 */
-		$imageProcessor = new Alaress_Image_Processor($cache, $transformations);
-		$imageProcessor->load()->transformAll()->stream();
+		$this->imageProcessor = new Alaress_Image_Processor($cache, $transformations);
+		$this->imageProcessor->load()->transformAll();
 	}
+
+    /**
+     * Outputs the image
+     */
+    public function stream() {
+        $this->imageProcessor->stream();
+    }
+
+    /**
+     * Saves the image
+     * @return string Location of saved image
+     */
+    public function save() {
+        $this->imageProcessor->save();
+        return $this->imageProcessor->getCachedFileLocation();
+    }
+
+    /**
+     * Sets the image processor
+     * @param \Alaress_Image_Processor $imageProcessor
+     */
+    private function setImageProcessor(\Alaress_Image_Processor $imageProcessor) {
+        $this->imageProcessor = $imageProcessor;
+    }
+
+    /**
+     * Gets the image processor
+     * @return \Alaress_Image_Processor
+     */
+    private function getImageProcessor() {
+        return $this->imageProcessor;
+    }
+
 }

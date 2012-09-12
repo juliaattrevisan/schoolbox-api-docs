@@ -13,3 +13,4 @@
 require_once('../include/Autoloader.php');
 
 $image = new Alaress_Image_Schoolbox($_GET['userId'], $_GET['size'], new Alaress_Image_Transformation_Schoolbox());
+$image->stream();

@@ -127,7 +127,25 @@ class Alaress_Image_Processor extends Alaress_Image_Processor_Abstract {
 	 * Cache then stream the manipulated image
 	 */
 	public function stream() {
-		$this->getFiletypeStrategy()->save($this->getImage(), $this->getCache()->getCachedFileLocation());
+		$this->save();
 		$this->getFiletypeStrategy()->stream($this->getImage());
 	}
+
+    /**
+     * Saves the transformed image
+     * @return Alaress_Image_Processor
+     */
+    public function save() {
+        $this->getFiletypeStrategy()->save($this->getImage(), $this->getCache()->getCachedFileLocation());
+
+        return $this;
+    }
+
+    /**
+     * Gets the filepath for processed image output
+     * @return string
+     */
+    public function getCachedFileLocation() {
+        return $this->getCache()->getCachedFileLocation();
+    }
 }
