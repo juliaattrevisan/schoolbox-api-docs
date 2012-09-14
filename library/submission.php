@@ -560,6 +560,7 @@ class Submission extends DeprecatedModel {
                         WHERE a.availability = 'assess'
                         AND aa.finish != '0000-00-00 00:00'
                         AND a.user_id = '$userID'
+                        AND a.deleted_at IS NULL
                         ) attempts
                         GROUP BY id
                         ORDER BY aa.finish DESC
@@ -940,6 +941,64 @@ ORDER BY u.id ASC, c.id ASC, sb.date ASC";
                 ORDER BY category.name";
 
         return $this->db->getAll($sql);
+
+    }
+
+    /**
+     * @param $boxID
+     * @return DueWork_Rubric_Abstract
+     */
+    public function getRubric($boxID) {
+        $db = Database::getInstance();
+
+        $rubric = null;
+
+        $criteria = array();
+        $resultSet = 0;
+        $descriptors = array();
+
+        $sql = "
+            SELECT
+                c.id c_id, c.grouping c_grouping, c.name c_name,
+                sb.`rubric_result_set` sb_resultset,
+                r.value r_value, r.label r_label,
+                d.value d_value, d.`description` d_description
+            FROM rubric_usage u
+            LEFT JOIN `submission_box` sb ON u.`submission_box_id` = sb.id
+            LEFT JOIN rubric_criterion c ON u.`criterion_id` = c.id
+            LEFT JOIN rubric_result r ON r.`resultset_id` = sb.`rubric_result_set`
+                AND sb.`rubric_result_set` > 0
+            LEFT JOIN rubric_descriptor d ON d.`criterion_id` = u.`criterion_id`
+                AND d.`submission_box_id` = u.`submission_box_id`
+                AND sb.`rubric_result_set` = 0
+            WHERE u.submission_box_id = :sbid";
+
+
+        // start with list of criteria that are associated with this box
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute(array('sbid' => $boxID));
+
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            if(!isset($criteria[$row['c_id']])) {
+                $criteria[$row['c_id']] = new DueWork_Rubric_Criterion($row['c_id'], $row['c_grouping'], $row['c_name']);
+            }
+            // use resultset
+            if($row['sb_resultset'] && !$resultSet) {
+                $resultSet = $row['sb_resultset'];
+            }
+            // use descriptors
+            else {
+                $descriptors[$row['c_id']][$row['d_value']] = $row['d_description'];
+            }
+        }
+
+        // create factory
+        $rubricFactory = new DueWork_Rubric_Factory($criteria);
+
+        $rubric = $rubricFactory->buildRubric($resultSet ? $resultSet : $descriptors, $boxID);
+
+        return $rubric;
 
     }
 
