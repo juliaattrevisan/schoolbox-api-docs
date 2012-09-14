@@ -17,14 +17,14 @@ require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
  * Otherwise it will echo out a plan
  */
 $allStrategies = array(
-    'Staff',
+    //  'Staff',
     'Parent',
     'Student',
 );
 
 /* Do each strategy
  */
-foreach($allStrategies as $currentStrategy) {
+foreach ($allStrategies as $currentStrategy) {
     $sync = new Synchronise_Synergetic_Main('Synchronise_Synergetic_Wenona_Strategy_' . $currentStrategy);
 
     // Do not alter the db
