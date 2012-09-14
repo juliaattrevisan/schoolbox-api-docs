@@ -9,14 +9,34 @@
 class Marksheet_Rubric extends Marksheet_Abstract {
 
     /**
-     * Take a UI-formatted mark, normalise it, and insert it into the database
+     * Take a UI-formatted mark and normalise it
      *
      * @param $mark
      * @param $subbox
      * @return mixed
      */
-    public function normaliseMark($mark, $subbox) {
-        // TODO: Implement normaliseMark() method.
+    public function normaliseMark($rubric, $subbox) {
+        $mark = 0;
+        foreach($rubric as $i) {
+            $mark += $i;
+        }
+
+        $max = $subbox['max_mark'];
+        $normalised = (($mark / $max) * 100);
+
+        // validation: must be inside bounds
+        if($normalised < 0) {
+            $normalised = 0;
+            $mark = 0;
+        } else if($normalised > 100) {
+            $normalised = 100;
+            $mark = $max;
+        }
+
+        return array(
+            'norm_mark' => $normalised,
+            'mark'      => $this->clean_num($mark, 4, false) . " / " . $max
+        );
     }
 
     /**
@@ -29,7 +49,15 @@ class Marksheet_Rubric extends Marksheet_Abstract {
      * @return mixed
      */
     public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true) {
-        // TODO: Implement retrieveMark() method.
+        // this was copied from Raw (Total Mark), since that's the aggregate display format
+        $subReturn = $this->getSubmissionReturnHandler()->getOneByUser($user_id, $box_id);
+        $subbox = $this->getSubmissionHandler()->getByID($box_id);
+        $mark = $this->clean_num(($subReturn['norm_mark'] / 100) * $subbox['max_mark'], 4, $blankZero);
+        return array(
+            'mark'     => $asText ? "$mark / {$subbox['max_mark']}" : $mark,
+            'max_mark' => $subbox['max_mark'],
+            'comment'  => $subReturn['comment']
+        );
     }
 
     /**
@@ -52,7 +80,12 @@ class Marksheet_Rubric extends Marksheet_Abstract {
      * @param array $mark
      */
     public function outputUI(SitePage $page, $mark) {
-        // TODO: Implement outputUI() method.
+        $output = array(
+            'MARK'     => $mark['mark'],
+            'MAX_MARK' => $mark['max_mark'],
+            'COMMENT'  => $mark['comment']
+        );
+        $page->setVar($output);
     }
 
 }

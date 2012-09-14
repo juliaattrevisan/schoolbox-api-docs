@@ -8,6 +8,12 @@ $this->setBlock(TEMPLATE_content, 'browse_row', 'browse_block');
 $this->setBlock('browse_row', 'file_overwrite', 'file_overwrite_block');
 $this->setBlock('browse_row', 'existing_file', 'existing_file_block');
 $this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
+$this->setBlock('marktype', 'criterion', 'criterion_block');
+$this->setBlock('criterion', 'crit_input', 'crit_input_block');
+$this->setBlock('marktype', 'resultset', 'resultset_block');
+$this->setBlock('resultset', 'result', 'result_block');
+$this->setBlock('marktype', 'des_count', 'des_count_block');
+$this->setBlock('marktype', 'existing_marks_warning', 'existing_marks_warning_block');
 
 $this->setBlock(TEMPLATE_content, 'notification_enable', 'notification_enable_block');
 if(Cfg::get('due_work_notifications_enabled')) {
@@ -21,6 +27,7 @@ $this->setVar('category_select_block', '');
 
 $subBoxHandler = new Submission();
 
+// IF PRE-EXISTING
 if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     //Modify submission box
     $this->setTitle('Modify Submission Box');
@@ -39,17 +46,57 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         'id'   => 'TYPE_VALUE'
     ));
 
+    $resultSetID = $subbox['rubric_result_set'];
+    $criteriaArray = array();
+    $descriptorArray = array();
+
     // legacy support
     if($subbox['mark_type_slug'] == 'free') {
         $this->setVar('marktype_block', '');
-    } else {
-        /* Output marktype drop down */
-        $this->dropdown('marktype_drop', $subBoxHandler->getMarkTypes(), $subbox['mark_type'], 'marktype', array(
-            'hr_name' => 'MARKTYPE_TEXT',
-            'mark_type_id'   => 'MARKTYPE_VALUE'
-        ));
-        $this->parse('marktype_block', 'marktype');
     }
+    else {
+        // Output marktype drop down
+        $this->dropdown('marktype_drop', $subBoxHandler->getMarkTypes(), $subbox['mark_type'], 'marktype', array(
+            'hr_name'       => 'MARKTYPE_TEXT',
+            'mark_type_id'  => 'MARKTYPE_VALUE',
+            'slug'          => 'MARKTYPE_SLUG'
+        ));
+
+        if($subbox['mark_type_slug'] == 'rubric') {
+            $rubric = $subBoxHandler->getRubric($subbox['id']);
+
+            $criteriaArray = $rubric->getCriteriaIndices();
+
+            if($rubric instanceof DueWork_Rubric_DescriptorRubric) {
+                $descriptorArray = $rubric->getResultIndices();
+            }
+        }
+    }
+
+    // TODO <refactor>
+
+    // ascertain whether or not any marks have already been given
+    $stmt = Database::getInstance()->prepare("SELECT COUNT(DISTINCT student_id) FROM `rubric_mark` WHERE `submission_box_id` = :sbid");
+    $stmt->execute(array('sbid' => $subbox['id']));
+    if($stmt->fetchColumn()) {
+        $this->parse('existing_marks_warning_block', 'existing_marks_warning');
+    }
+    else {
+        $this->setVar('existing_marks_warning_block', '');
+    }
+
+    $stmt = Database::getInstance()->prepare("SELECT criterion_id FROM rubric_usage WHERE submission_box_id = :sbid");
+    $stmt->execute(array('sbid' => $subbox['id']));
+    while($cID = $stmt->fetchColumn()) {
+        $criteriaArray[] = $cID;
+    }
+
+    outputResultSets($this, $resultSetID);
+    outputCriteria($this, 250, $criteriaArray, $descriptorArray);
+    // TODO </refactor>
+
+    $this->parse('marktype_block', 'marktype');
+
 
     /* Convert times */
     $open_date = strtotime($subbox['open_date']);
@@ -138,6 +185,8 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $this->parse('browse_block', 'browse_row');
 
 }
+
+// IF NEW
 else if($this->arg[0] == 'new') {
     //Create submission box
     $this->setTitle('Create Submission Box');
@@ -149,9 +198,11 @@ else if($this->arg[0] == 'new') {
 
 	$groupHandler = new Group;
 
+    // clear blocks that aren't used in this context
     $this->setVar(array(
         'file_overwrite_block' => '',
-        'existing_file_block' => ''
+        'existing_file_block' => '',
+        'existing_marks_warning_block'
     ));
 
     if(is_numeric($this->arg[2]) && $this->arg[2] > 0) {
@@ -180,26 +231,29 @@ else if($this->arg[0] == 'new') {
 		$categoryList[$i]['name'] .= ' ('.$categoryList[$i]['code'].')';
 	}
 
-    /* Output submission type drop down */
-
-	/* Exclude online assessment type
-	 */
+    // Output submission type drop down (exclude online assessment type)
 
 	$types = $subBoxHandler->getTypesExcept(array(Assess_Main::ONLINE_ASSESSMENT_TYPE_ID));
-
 	$this->dropDown('type_drop', $types, $this->arg[3],TEMPLATE_content, array(
         'name' => 'TYPE_TEXT',
         'id'   => 'TYPE_VALUE'
     ));
 
-
-    /* Output marktype drop down */
+    // Output marktype drop down
     $this->dropdown('marktype_drop', $subBoxHandler->getMarkTypes(), $subbox['mark_type'], 'marktype', array(
         'hr_name'      => 'MARKTYPE_TEXT',
-        'mark_type_id' => 'MARKTYPE_VALUE'
+        'mark_type_id' => 'MARKTYPE_VALUE',
+        'slug'         => 'MARKTYPE_SLUG'
     ));
 
+    // TODO <refactor>
+    outputResultSets($this, -1);
+    outputCriteria($this, 250, array(), array());
+    // TODO </refactor>
+
     $this->parse('marktype_block','marktype');
+
+
 
     /* Convert times */
     $open_date = strtotime('now');
@@ -242,5 +296,104 @@ else if($this->arg[0] == 'new') {
 else {
     error(2);
 }
+
+// TODO <refactor>
+function outputResultSets(SitePage $page, $checkedIndex) {
+    $rs = array();
+
+    $sql = "
+        SELECT `resultset_id`, `value`, `label`
+        FROM `rubric_result`
+        ORDER BY `resultset_id` ASC, `value` ASC";
+
+    $result = Database::getInstance()->query($sql);
+    while($row = $result->fetch(PDO::FETCH_NUM)) {
+        $rs[$row[0]][$row[1]] = $row[2];
+    }
+
+    $page->setVar('resultset_block', '');
+
+    foreach($rs as $i => $set) {
+        $page->setVar('result_block', '');
+        foreach($set as $item) {
+            $page->setVar(array(
+                'RS_ID'           => $i,
+                'RS_RESULT_LABEL' => $item,
+                'RS_CHECKED'      => $i == $checkedIndex ? 'checked="checked' : ''
+            ));
+            $page->parse('result_block', 'result', true);
+        }
+        $page->parse('resultset_block', 'resultset', true);
+    }
+
+    // Output descriptor count drop down
+    $desCounts = array();
+    for($i = 2; $i < 7; ++$i) {
+        $desCounts[] = array('value' => $i);
+    }
+    $page->dropdown('des_count', $desCounts, -1, 'marktype', array(
+        'value'  => 'DES_COUNT_VALUE',
+    ));
+
+    $page->setVar('RS_0_CHECKED', $checkedIndex == 0 ? 'checked="checked"' : '');
+}
+
+
+function outputCriteria(SitePage $page, $catID, $checkedIDs, $descriptors) {
+    $crits = array();
+
+    $desCount = 0;
+
+    $sql = "
+        SELECT `grouping`, `id`, `name`
+        FROM `rubric_criterion`
+        WHERE `parent_id` = :pid
+        AND `parent_type` = :ptype
+        ORDER BY `grouping` ASC, `name` ASC";
+
+    $stmt = Database::getInstance()->prepare($sql);
+    $stmt->execute(array(
+        'pid'   => $catID,
+        'ptype' => 'category'
+    ));
+
+    while($row = $stmt->fetch(PDO::FETCH_NUM)) {
+        $crits[$row[0]][$row[1]] = $row[2];
+        $desCount = max($desCount, count($crits[$row[0]]));
+    }
+
+    $page->setVar('criterion_block','');
+    foreach($crits as $group => $elements) {
+        foreach($elements as $id => $elem) {
+            $page->setVar(array(
+                'CRIT_ID'      => $id,
+                'CRIT_SLUG'    => str_replace(' ','',strtolower("crit[$id]")),
+                'CRIT_LABEL'   => "$group - $elem",
+                'CRIT_CHECKED' => in_array($id, $checkedIDs) ? 'checked="checked"' : ''
+            ));
+
+            $page->setVar('crit_input_block', '');
+            if(count($descriptors[$id])) {
+                foreach($descriptors[$id] as $description) {
+                    $page->setVar(array(
+                        'CRIT_INPUT_VALUE' => $description
+                    ));
+                    $page->parse('crit_input_block','crit_input', true);
+                }
+            }
+            // disply blank inputs, they weren't used
+            else {
+                for($i = 0; $i < $desCount; ++$i) {
+                    $page->setVar('CRIT_INPUT_VALUE');
+                    $page->parse('crit_input_block','crit_input', true);
+
+                }
+            }
+
+            $page->parse('criterion_block','criterion', true);
+        }
+    }
+}
+// TODO </refactor>
 
 ?>

@@ -29,6 +29,7 @@ if(is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
                     'ASSNAME'   => Scrub::text($subbox['name']),
                     'BOX_ID'    => $this->arg[0],
                     'NAME'      => $userHandler->formatName($user),
+                    'SYN_ID'    => $user['synergy_id'],
                     'UID'       => $this->arg[1],
                 );
 
@@ -39,61 +40,79 @@ if(is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
 
     $this->setVar('MARK_TYPE_COMMENT', $marksheet->getComment());
 
-    // custom code for each marktype
-    switch($marksheet->getSlug()) {
-        case 'raw':
-            $output = array(
-                'MAX_MARK' => $mark['max_mark'],
-                'MARK'     => $mark['mark'],
-                'COMMENT'  => $mark['comment']
-            );
-            $this->setVar($output);
-            break;
+    // blockify and clear all the marktypes
+    foreach($subHandler->getMarkTypes(true) as $type) {
+        $this->setBlock(TEMPLATE_content, "mark_type_{$type['slug']}", "mark_type_{$type['slug']}_block");
+        $this->setVar("mark_type_{$type['slug']}_block", '');
+    }
 
-        case 'letter':
-            $this->dropdown('grade_drop', $subHandler->getLetterGrades(), $mark['grade_selected'], 'mark_type_letter', array(
-                'grade_id' => 'GRADE_VALUE',
-                'caption'  => 'GRADE_TEXT',
+    $rubric = $subHandler->getRubric($subbox['id']);
+
+    $rubricMark = new DueWork_Rubric_Mark($rubric);
+    $rubricMark->populateMarks($user['uid']);
+
+    $data = $rubricMark->toArray();
+
+    $json = array();
+    $legs = array();
+
+    for($i = 0; $i < count($data['criteria']); ++$i) {
+        $json[] = array($i, $data['criteria'][$i]['value'] < 0 ? 0 : $data['criteria'][$i]['value']);
+        $legs[] = array('label' => $data['criteria'][$i]['label']);
+    }
+
+    $this->setVar(array(
+        'GRAPH_DATA' => json_encode($json),
+        'GRAPH_LEGS' => json_encode($legs),
+        'GRAPH_MAX'  => count($data['criteria'][0]['results']) - 1
+    ));
+
+    $this->setBlock('mark_type_rubric', 'rubric_rating', 'rubric_rating_block');
+    $this->setBlock('mark_type_rubric', 'rubric_crit', 'rubric_crit_block');
+    $this->setBlock('rubric_crit', 'rubric_crit_rating', 'rubric_crit_rating_block');
+
+    for($i = 0; $i < count($data['criteria'][0]['results']); ++$i) {
+        $this->parse('rubric_rating_block', 'rubric_rating', true);
+    }
+
+    for($i = 0; $i < count($data['criteria']); ++$i) {
+        $this->setVar(array(
+            'rubric_crit_rating_block' => '',
+            'RUBRIC_CRIT_LABEL'        => $data['criteria'][$i]['label'],
+            'RUBRIC_CRIT_NAME'         => preg_replace("#[^a-z\-\ ]#is", '', strtolower($data['criteria'][$i]['label'])),
+            'RUBRIC_CRIT_INDEX'        => $i,
+            'RUBRIC_CRIT_ID'           => $data['criteria'][$i]['id']
+        ));
+
+        for($j = 0; $j < count($data['criteria'][0]['results']); ++$j) {
+            $this->setVar(array(
+                'RUBRIC_CRIT_RATING_LABEL' => $data['criteria'][$i]['results'][$j],
+                'RUBRIC_CRIT_RATING_VALUE' => $j,
+                'RUBRIC_CRIT_RATING_CLASS' => 'lol',
+                'RUBRIC_CRIT_RATING_SELECTED' => $data['criteria'][$i]['value'] == $j ? 'checked="checked"' : '',
             ));
-            $this->setVar('COMMENT', $mark['comment']);
-            break;
+            $this->parse('rubric_crit_rating_block', 'rubric_crit_rating', true);
+        }
 
-        case 'percent':
-        case 'free':
-            $output = array(
-            'MARK'     => $mark['mark'],
-            'COMMENT'  => $mark['comment']
-            );
-            $this->setVar($output);
-            break;
-
-        default:
-            $output = array(
-                'MARK'     => '',
-                'COMMENT'  => ''
-            );
-            $this->setVar($output);
-            break;
+        $this->parse('rubric_crit_block', 'rubric_crit', true);
     }
 
-    $marktypes = $subHandler->getMarkTypes(true);
-
-    // parse the appropraite block, and hide the rest
-    foreach($marktypes as $type) {
-        if($type['mark_type_id'] == $marksheet->getID()) {
-            $this->parse("mark_type_{$type['slug']}_block", "mark_type_{$type['slug']}", false);
-
-        } else
-        $this->setVar("mark_type_{$type['slug']}_block",'');
+    // calculate scores
+    $sum = 0;
+    $max = 0;
+    for($i = 0; $i < count($data['criteria']); ++$i) {
+        $sum += $data['criteria'][$i]['value'];
+        $max += count($data['criteria'][0]['results']) - 1;
     }
 
+    $this->setVar(array(
+        'RUBRIC_GRADE_SUM' => $sum,
+        'RUBRIC_GRADE_MAX' => $max
+    ));
 
 
-
-
-
-    /* TODO: Add code to output already marked details */
-
+    $slug = $marksheet->getSlug();
+    $this->parse("mark_type_{$slug}_block", "mark_type_{$slug}");
 
 }
 else

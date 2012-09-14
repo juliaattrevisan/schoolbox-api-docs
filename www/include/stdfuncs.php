@@ -65,3 +65,14 @@ function shutdown_safely() {
         }
     }
 }
+
+/**
+ * Uses superglobals to ascertain whether or not a file was attempted upload, but failed
+ * @return bool
+ */
+function upload_failed() {
+    return $_SERVER['REQUEST_METHOD'] == 'POST'
+        && $_SERVER['CONTENT_LENGTH'] > 0
+        && empty($_POST)
+        && empty($_FILES);
+}
