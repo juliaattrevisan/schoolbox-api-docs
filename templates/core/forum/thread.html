@@ -1,118 +1,120 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
-	$j(function(){
+    $j(function () {
 
-		$j('#forum-topic tbody tr:even td').css('background-color', '#f4f4f4');
+        $j('#forum-topic tbody tr:even td').css('background-color', '#f4f4f4');
 
-		$j('button.reply').click(function () {
-			window.open('/forum/modify/{CATEGORY_ID}/{THREAD_ID}', '_self', '');
-			return false;
-		});
+        $j('button.reply').click(function () {
+            window.open('/forum/modify/{CATEGORY_ID}/{THREAD_ID}', '_self', '');
+            return false;
+        });
 
-		$j('button.lock').click(function () {
-			window.open('/forum/modifyForm.php?toggleLock={THREAD_ID}', '_self', '');
-			return false;
-		});
+        $j('button.lock').click(function () {
+            window.open('/forum/modifyForm.php?toggleLock={THREAD_ID}', '_self', '');
+            return false;
+        });
 
-		$j('button.delete').click(function () {
-			if (confirm('Are you sure you want to delete this thread?'))
-				window.open('/forum/modifyForm.php?deleteThread={THREAD_ID}', '_self', '');
-			return false;
-		});
+        $j('button.delete').click(function () {
+            if (confirm('Are you sure you want to delete this thread?'))
+                window.open('/forum/modifyForm.php?deleteThread={THREAD_ID}', '_self', '');
+            return false;
+        });
 
-		$j('a.delete').click(function () {
-			if (confirm('Are you sure you want to delete this post?'))
-				window.open($j(this).attr('href'), '_self', '');
-			return false;
-		});
+        $j('a.delete').click(function () {
+            if (confirm('Are you sure you want to delete this post?'))
+                window.open($j(this).attr('href'), '_self', '');
+            return false;
+        });
 
-		if ($j('.post').length !== 1) {
-			$j('.post:last').css("border", "0")
-		}
+        if ($j('.post').length !== 1) {
+            $j('.post:last').css("border", "0")
+        }
 
-	});
+    });
 </script>
 <!-- END custom_head -->
 <div class="breadcrumbs navhelp">
-	<p><a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a> > <a href="/forum/{CATEGORY_ID}/">Forum</a> > {THREAD_TITLE} {LOCKED}</p>
+    <p><a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a> > <a href="/forum/{CATEGORY_ID}/">Forum</a> > {THREAD_TITLE}
+        {LOCKED}</p>
 </div>
 <p class="clearfix">
-<a href="/homepage/{CATEGORY_ID}" class="btn go-back float-left"><span></span>Return to homepage</a>
-<!-- BEGIN reply -->
-<button class="reply submit-btn-plain">Post Reply</button>
-<!-- END reply -->
-<!-- BEGIN modify_thread -->
-<button class="lock submit-btn-plain">{LOCK_UNLOCK} Thread</button>
-<button class="delete submit-btn-plain">Delete Thread</button>
-<!-- END modify_thread -->
+    <a href="/homepage/{CATEGORY_ID}" class="btn go-back float-left"><span></span>Return to homepage</a>
+    <!-- BEGIN reply -->
+    <button class="reply submit-btn-plain">Post Reply</button>
+    <!-- END reply -->
+    <!-- BEGIN modify_thread -->
+    <button class="lock submit-btn-plain">{LOCK_UNLOCK} Thread</button>
+    <button class="delete submit-btn-plain">Delete Thread</button>
+    <!-- END modify_thread -->
 
 
 </p>
 <div class="forum">
-	<table cellpadding="0" cellspacing="0" border="0" width="100%">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%">
 
-  	<!-- BEGIN post -->
-	<tr class="post">
-    	<td class="post-left" valign="top">
-			<div class="post-content" style='min-width:200px'>
-				<a name="{POST_ID}"></a>
+        <!-- BEGIN post -->
+        <tr class="post">
+            <td class="post-left" valign="top">
+                <div class="post-content" style='min-width:200px'>
+                    <a name="{POST_ID}"></a>
 
-				<div style='width:64px;height:64px;'>
-					<img src='/portrait?userId={POST_AUTHOR_EXTERNAL_ID}&size=square64' alt="{POST_AUTHOR_NAME}" title="{POST_AUTHOR_NAME}" />
-				</div>
-				<div style='position:relative;top:-64px;left:80px'>
-					<p>
-						<a href="/search/user/{POST_USER_ID}">{POST_AUTHOR}</a><br />
-						{POST_GROUP}
+                    <div style='width:64px;height:64px;'>
+                        <img src='/portrait.php?userId={POST_AUTHOR_EXTERNAL_ID}&size=square64' alt="{POST_AUTHOR_NAME}"
+                             title="{POST_AUTHOR_NAME}"/>
+                    </div>
+                    <div style='position:relative;top:-64px;left:80px'>
+                        <p>
+                            <a href="/search/user/{POST_USER_ID}">{POST_AUTHOR}</a><br/>
+                            {POST_GROUP}
 
-						<br /><br />
-						Posted {POST_TIME}
+                            <br/><br/>
+                            Posted {POST_TIME}
 
-					</p>
-				</div>
+                        </p>
+                    </div>
 
-				<!-- BEGIN modify -->
-				<p>
-					<a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}">Edit post</a> |
-					<a href="/forum/modifyForm.php?deletePost={POST_ID}" class="delete">Delete post</a><br />
-				</p>
-				<!-- END modify -->
+                    <!-- BEGIN modify -->
+                    <p>
+                        <a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}">Edit post</a> |
+                        <a href="/forum/modifyForm.php?deletePost={POST_ID}" class="delete">Delete post</a><br/>
+                    </p>
+                    <!-- END modify -->
 
-				<p>
-					<!-- BEGIN reply_post -->
-					<a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}">Reply to this post</a><br/>
-					<!-- END reply_post -->
+                    <p>
+                        <!-- BEGIN reply_post -->
+                        <a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}">Reply to this post</a><br/>
+                        <!-- END reply_post -->
 
-					<!-- BEGIN modified -->
-					<br/> edited {POST_MODIFIED} {POST_CENSORED}
-					<!-- END modified -->
-				</p>
-			</div>
-		</td>
-		<td class="post-right" valign="top">
-			<div class="post-content wysiwyg">
-       		 {POST_BODY}
-			</div>
-		</td>
-		</tr>
+                        <!-- BEGIN modified -->
+                        <br/> edited {POST_MODIFIED} {POST_CENSORED}
+                        <!-- END modified -->
+                    </p>
+                </div>
+            </td>
+            <td class="post-right" valign="top">
+                <div class="post-content wysiwyg">
+                    {POST_BODY}
+                </div>
+            </td>
+        </tr>
 
-    <!-- END post -->
-	</table>
- </div>
+        <!-- END post -->
+    </table>
+</div>
 <p class="clearfix"><a name="bottom"></a>
-<a href="/homepage/{CATEGORY_ID}" class="btn go-back float-left"><span></span>Return to homepage</a>
-<!-- BEGIN reply -->
-<button class="reply submit-btn-plain">Post Reply</button>
-<!-- END reply -->
-<!-- BEGIN modify_thread -->
-<button class="lock submit-btn-plain">{LOCK_UNLOCK} Thread</button>
-<button class="delete submit-btn-plain">Delete Thread</button>
-<!-- END modify_thread -->
+    <a href="/homepage/{CATEGORY_ID}" class="btn go-back float-left"><span></span>Return to homepage</a>
+    <!-- BEGIN reply -->
+    <button class="reply submit-btn-plain">Post Reply</button>
+    <!-- END reply -->
+    <!-- BEGIN modify_thread -->
+    <button class="lock submit-btn-plain">{LOCK_UNLOCK} Thread</button>
+    <button class="delete submit-btn-plain">Delete Thread</button>
+    <!-- END modify_thread -->
 </p>
 
 <div class="pagination navhelp">
 
-	<!-- BEGIN previous_button -->
+    <!-- BEGIN previous_button -->
     <a href="/forum/thread/{THREAD_ID}/{PREVIOUS_PAGE}">&lt; Prev</a>
     <!-- END previous_button -->
     <!-- BEGIN page_number -->
@@ -120,5 +122,5 @@
     <!-- END page_number -->
     <!-- BEGIN next_button -->
     <a href="/forum/thread/{THREAD_ID}/{NEXT_PAGE}">Next &gt;</a>
-	<!-- END next_button -->
+    <!-- END next_button -->
 </div>

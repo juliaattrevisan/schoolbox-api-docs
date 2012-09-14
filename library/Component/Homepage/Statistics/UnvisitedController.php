@@ -14,21 +14,24 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
         $this->unvisitors = array();
 
         $dateFilter = '';
-        if(count($this->dateRange)) {
-            $dateFilter = sprintf("AND datetime BETWEEN '%s' AND '%s'",date('Y-m-d', $this->dateRange[0]), date('Y-m-d', $this->dateRange[1]));
+        if (count($this->dateRange)) {
+            $dateFilter = sprintf(
+                "AND datetime BETWEEN '%s' AND '%s'", date('Y-m-d', $this->dateRange[0]),
+                date('Y-m-d', $this->dateRange[1])
+            );
         }
 
         $groupFilter = '';
-        if($this->groupType != 'all') {
+        if ($this->groupType != 'all') {
             $groupFilter = sprintf("AND g.group_type = '%s'", $this->groupType);
         }
 
         // is this a class? if it has a class code, then yes
-        if($code = $this->getContext('code')) {
+        if ($code = $this->getContext('code')) {
             $synergeticClass = new External_Class;
             $classList = $synergeticClass->getStudents($code);
 
-            if(is_array($classList)) {
+            if (is_array($classList)) {
 
                 // an iterated prepared statement is better than dozens of single queries
                 $stmt = Database::getInstance()->prepare(
@@ -47,13 +50,15 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
                      )"
                 );
 
-                foreach($classList as $student) {
-                    $stmt->execute(array(
-                        'sid' => $student['synergy_id'],
-                        'cid' => $this->getContext('id')
-                    ));
+                foreach ($classList as $student) {
+                    $stmt->execute(
+                        array(
+                            'sid' => $student['synergy_id'],
+                            'cid' => $this->getContext('id')
+                        )
+                    );
                     $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                    if(!$row['id']) {
+                    if (!$row['id']) {
                         continue;
                     }
                     $student['id'] = $row['id'];
@@ -68,7 +73,7 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
         // else is this a group?
         $stmt = Database::getInstance()->prepare("SELECT cid FROM userGroups WHERE cid = :id");
         $stmt->execute(array('id' => $this->getContext('id')));
-        if($stmt->rowCount() == 1) {
+        if ($stmt->rowCount() == 1) {
             $stmt = Database::getInstance()->prepare(
                 "SELECT
                  u.id, u.title, u.firstname, u.lastname, u.synergy_id, g.name gname
@@ -89,7 +94,7 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
 
             $stmt->execute(array('cid' => $this->getContext('id')));
 
-            while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $this->unvisitors[] = $row;
             }
             return true;
@@ -102,24 +107,25 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
     }
 
     public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'unvisited')) {
+        if (!parent::loadTemplate($templateHandle, 'unvisited')) {
             return false;
         }
-        
+
         $this->setBlock($templateHandle, 'unvisitor', 'unvisitor_block');
 
-        if(count($this->unvisitors)) {
-            for($i = 0; $i < 8 && $i < count($this->unvisitors); ++$i) {
-                $this->setVar(array(
-                    'VISITOR_ID'       => $this->unvisitors[$i]['id'],
-                    'VISITOR_THUMB'    => "/portrait?userId={$this->unvisitors[$i]['synergy_id']}&size=square64",
-                    'VISITOR_NAME'     => $this->user->formatName($this->unvisitors[$i]),
-                    'VISITOR_GROUP'    => $this->unvisitors[$i]['gname'],
-                ));
+        if (count($this->unvisitors)) {
+            for ($i = 0; $i < 8 && $i < count($this->unvisitors); ++$i) {
+                $this->setVar(
+                    array(
+                        'VISITOR_ID' => $this->unvisitors[$i]['id'],
+                        'VISITOR_THUMB' => "/portrait.php?userId={$this->unvisitors[$i]['synergy_id']}&size=square64",
+                        'VISITOR_NAME' => $this->user->formatName($this->unvisitors[$i]),
+                        'VISITOR_GROUP' => $this->unvisitors[$i]['gname'],
+                    )
+                );
                 $this->parse('unvisitor_block', 'unvisitor', true);
             }
-        }
-        else {
+        } else {
             $grp = $this->groupType == 'all' ? '' : $this->groupType;
             $this->setVar('unvisitor_block', "<p>All $grp members have visited in this time period.</p>");
         }

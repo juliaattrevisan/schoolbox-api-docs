@@ -5,12 +5,13 @@
  *
  * Example usages of Alaress_Image_Processor
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
-require_once('../include/Autoloader.php');
+require_once '../../include/Bootstrap.php';
+$sitePage = new SitePage;
 
 $image = new Alaress_Image_Schoolbox($_GET['userId'], $_GET['size'], new Alaress_Image_Transformation_Schoolbox());
 $image->stream();

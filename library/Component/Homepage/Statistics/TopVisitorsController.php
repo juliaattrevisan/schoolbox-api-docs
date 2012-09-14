@@ -14,16 +14,20 @@ class Component_Homepage_Statistics_TopVisitorsController extends Component_Home
         $visitors = array();
 
         $dateFilter = '';
-        if(count($this->dateRange)) {
-            $dateFilter = sprintf("AND datetime BETWEEN '%s' AND '%s'",date('Y-m-d', $this->dateRange[0]), date('Y-m-d', $this->dateRange[1]));
+        if (count($this->dateRange)) {
+            $dateFilter = sprintf(
+                "AND datetime BETWEEN '%s' AND '%s'", date('Y-m-d', $this->dateRange[0]),
+                date('Y-m-d', $this->dateRange[1])
+            );
         }
 
         $groupFilter = '';
-        if($this->groupType != 'all') {
+        if ($this->groupType != 'all') {
             $groupFilter = sprintf("AND g.group_type = '%s'", $this->groupType);
         }
 
-        $stmt = Database::getInstance()->prepare("
+        $stmt = Database::getInstance()->prepare(
+            "
             SELECT u.id, u.synergy_id synid, u.title, u.firstname, u.lastname, g.name group_name, SUM(hitcount) AS hits
             FROM homepage_log hl
             LEFT JOIN `user` u ON hl.user = u.id
@@ -37,7 +41,7 @@ class Component_Homepage_Statistics_TopVisitorsController extends Component_Home
         $stmt->execute(array('cat' => $this->getContext('id')));
 
         $i = 0;
-        while($visitor = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        while ($visitor = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $visitors[] = $visitor;
             $visitors[$i++]['proportion'] = $visitor['hits'] / $visitors[0]['hits'];
         }
@@ -48,28 +52,30 @@ class Component_Homepage_Statistics_TopVisitorsController extends Component_Home
 
 
     public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'topVisitors')) {
+        if (!parent::loadTemplate($templateHandle, 'topVisitors')) {
             return false;
         }
 
-        $this->setBlock($templateHandle, 'top_visitor','top_visitor_block');
+        $this->setBlock($templateHandle, 'top_visitor', 'top_visitor_block');
 
         $uHandler = new User();
 
-        for($i = 0; $i < 5 && $i < count($this->visitors); ++$i) {
-            $this->setVar(array(
-                'VISITOR_ID'       => $this->visitors[$i]['id'],
-                'VISITOR_THUMB'    => sprintf("/portrait?userId=%s&size=square32", $this->visitors[$i]['synid']),
-                'VISITOR_NAME'     => $uHandler->formatName($this->visitors[$i]),
-                'VISITOR_GROUP'    => $this->visitors[$i]['group_name'],
-                'VISITOR_PROGRESS' => (int)($this->visitors[$i]['proportion'] * 100)
-            ));
-            $this->parse('top_visitor_block','top_visitor',true);
+        for ($i = 0; $i < 5 && $i < count($this->visitors); ++$i) {
+            $this->setVar(
+                array(
+                    'VISITOR_ID' => $this->visitors[$i]['id'],
+                    'VISITOR_THUMB' => sprintf("/portrait.php?userId=%s&size=square32", $this->visitors[$i]['synid']),
+                    'VISITOR_NAME' => $uHandler->formatName($this->visitors[$i]),
+                    'VISITOR_GROUP' => $this->visitors[$i]['group_name'],
+                    'VISITOR_PROGRESS' => (int)($this->visitors[$i]['proportion'] * 100)
+                )
+            );
+            $this->parse('top_visitor_block', 'top_visitor', true);
         }
 
-        if(!count($this->visitors)) {
+        if (!count($this->visitors)) {
             $grp = $this->groupType == 'all' ? '' : $this->groupType;
-            $this->setVar('top_visitor_block',"<p>No $grp visitors in this time period.</p>");
+            $this->setVar('top_visitor_block', "<p>No $grp visitors in this time period.</p>");
         }
 
 

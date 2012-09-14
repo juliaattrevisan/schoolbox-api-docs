@@ -5,7 +5,7 @@
         <!-- BEGIN person -->
         <a href='/search/user/{PERSON_UID}' class='button {LIST_STYLE}' alt='{PERSON_NAME}' title='{PERSON_NAME}'>
             <!-- BEGIN has_portrait -->
-            <img src='/portrait?userId={PERSON_EXTERNAL_ID}&size=square64' />
+            <img src='/portrait.php?userId={PERSON_EXTERNAL_ID}&size=square64'/>
             <!-- END has_portrait -->
 
             <span class='name'>{PERSON_NAME}</span>
@@ -18,8 +18,8 @@
     </div>
     <!-- BEGIN member_email -->
     <form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
-        <input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLYTO}&gt;" />
-        <input type="hidden" name="bcc" value="{EMAILALL}" />
+        <input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLYTO}&gt;"/>
+        <input type="hidden" name="bcc" value="{EMAILALL}"/>
         <a href="#" class="btn submit-this float-right up-arrow "><span></span>Email all</a>
     </form>
     <!-- END member_email -->

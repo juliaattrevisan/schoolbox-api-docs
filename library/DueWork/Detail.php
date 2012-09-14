@@ -8,23 +8,23 @@
  */
 class DueWork_Detail {
 
-    const ACCEPT_NONE   = 0;
+    const ACCEPT_NONE = 0;
     const ACCEPT_SINGLE = 1;
-    const ACCEPT_MULTI  = 2;
+    const ACCEPT_MULTI = 2;
 
     const UNSUBMITTED = 'Unsubmitted';
-    const SUBMITTED   = 'Submitted';
+    const SUBMITTED = 'Submitted';
     const RESUBMITTED = 'Resubmitted';
-    const ON_TIME     = ' on time';
-    const LATE        = ' late';
+    const ON_TIME = ' on time';
+    const LATE = ' late';
 
     const CLASS_UNSUBMITTED = 'submit regular';
-    const CLASS_ON_TIME     = 'submit ok';
-    const CLASS_LATE        = 'submit critical';
+    const CLASS_ON_TIME = 'submit ok';
+    const CLASS_LATE = 'submit critical';
 
-    const CLASS_PLAG_0      = 'plag-score ok';
-    const CLASS_PLAG_20     = 'plag-score warn';
-    const CLASS_PLAG_60     = 'plag-score critical';
+    const CLASS_PLAG_0 = 'plag-score ok';
+    const CLASS_PLAG_20 = 'plag-score warn';
+    const CLASS_PLAG_60 = 'plag-score critical';
 
     protected $submissionHandler;
     protected $submissinoStudentHandler;
@@ -52,51 +52,49 @@ class DueWork_Detail {
 
 
     public function processStudents(array $students) {
-        if(!count($students)) {
+        if (!count($students)) {
             return;
         }
 
-        foreach($students as $user) {
+        foreach ($students as $user) {
             $insertion = array();
 
             // accepts submissions
-            if($this->getSubmissionType() != self::ACCEPT_NONE) {
+            if ($this->getSubmissionType() != self::ACCEPT_NONE) {
                 $submissions = false;
                 // search by internal id
-                if($user['uid']) {
+                if ($user['uid']) {
                     $insertion['user'] = $this->userHandler->getByID($user['uid']);
                     $submissions = $this->submissionStudentHandler->getByUserID($this->dueWork['id'], $user['uid']);
-                }
-                // try the synergetic id
-                elseif($user['synergy_id']) {
+                } // try the synergetic id
+                elseif ($user['synergy_id']) {
                     $insertion['user'] = $this->userHandler->getBySynergy($user['synergy_id']);
-                    $submissions = $this->submissionStudentHandler->getBySynergyID($this->dueWork['id'], $user['synergy_id']);
+                    $submissions = $this->submissionStudentHandler->getBySynergyID(
+                        $this->dueWork['id'], $user['synergy_id']
+                    );
                 }
 
                 // if the user doesn't exist in schoolbox, we don't want to see them (since we can't operate on them)
-                if(!isset($insertion['user']['uid'])) {
+                if (!isset($insertion['user']['uid'])) {
                     continue;
                 }
 
                 // an empty array is preferred to false
-                if(!$submissions) {
+                if (!$submissions) {
                     $insertion['submissions'] = array();
                     $insertion['user']['status'] = self::UNSUBMITTED;
                     $insertion['user']['class'] = self::CLASS_UNSUBMITTED;
                     $submissions = array();
-                }
-                // only use the first if this is a single-submit box
+                } // only use the first if this is a single-submit box
                 else {
-                    if($this->getSubmissionType() == self::ACCEPT_SINGLE) {
+                    if ($this->getSubmissionType() == self::ACCEPT_SINGLE) {
                         $insertion['submissions'] = $submissions[0];
                         $insertion['user']['status'] = self::SUBMITTED;
-                    }
-                    else {
+                    } else {
                         $insertion['submissions'] = $submissions;
-                        if(count($submissions) > 1) {
+                        if (count($submissions) > 1) {
                             $insertion['user']['status'] = self::RESUBMITTED;
-                        }
-                        else {
+                        } else {
                             $insertion['user']['status'] = self::SUBMITTED;
                         }
                     }
@@ -105,11 +103,10 @@ class DueWork_Detail {
                     $submitTime = new Alaress_Date_Format($submissions[0]['datestamp'], 'y-m-d');
                     $dueTime = new Alaress_Date_Format($this->dueWork['date'], 'y-m-d');
 
-                    if($dueTime->getUnixTimestamp() < $submitTime->getUnixTimestamp()) {
+                    if ($dueTime->getUnixTimestamp() < $submitTime->getUnixTimestamp()) {
                         $insertion['user']['status'] .= self::LATE;
                         $insertion['user']['class'] = self::CLASS_LATE;
-                    }
-                    else {
+                    } else {
                         $insertion['user']['status'] .= self::ON_TIME;
                         $insertion['user']['class'] = self::CLASS_ON_TIME;
                     }
@@ -118,20 +115,17 @@ class DueWork_Detail {
                 $this->dueWork['submissionCount'] += count($submissions);
                 $insertion['submissions'] = $submissions;
 
-            }
-            // does not accept submissions
+            } // does not accept submissions
             else {
                 $insertion['user']['status'] = '';
                 $insertion['user']['class'] = '';
 
-                if($user['uid']) {
+                if ($user['uid']) {
                     $insertion['user'] = $this->userHandler->getByID($user['uid']);
-                }
-                // try the synergetic id
-                elseif($user['synergy_id']) {
+                } // try the synergetic id
+                elseif ($user['synergy_id']) {
                     $insertion['user'] = $this->userHandler->getBySynergy($user['synergy_id']);
-                }
-                // ignore this user
+                } // ignore this user
                 else {
                     continue;
                 }
@@ -152,11 +146,11 @@ class DueWork_Detail {
      * @param SitePage $page
      */
     public function renderDetails(SitePage $page) {
-        if(!$data = $this->sitepageData) {
+        if (!$data = $this->sitepageData) {
             return;
         }
 
-        require_once(SITE_root.'/include/FileType.php');
+        require_once(SITE_root . '/include/FileType.php');
         $allowedHandler = new AllowedFile();
         $fileTypeHandler = new FileType('');
 
@@ -170,62 +164,74 @@ class DueWork_Detail {
         $page->setBlock(TEMPLATE_content, 'download_btn', 'download_btn_block');
         $page->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
 
-        $page->setBlock(TEMPLATE_content, 'spiel_single_submit','spiel_single_submit_block');
-        $page->setBlock(TEMPLATE_content, 'spiel_any_submit','spiel_any_submit_block');
+        $page->setBlock(TEMPLATE_content, 'spiel_single_submit', 'spiel_single_submit_block');
+        $page->setBlock(TEMPLATE_content, 'spiel_any_submit', 'spiel_any_submit_block');
 
         $page->setBlock('submission_row', 'download_action', 'download_action_block');
         $page->setBlock('submission_row', 'delete_action', 'delete_action_block');
         $page->setBlock('submission_row', 'plag_enabled', 'plag_enabled_block');
 
-        $page->setVar(array(
-            'DUEWORK_DESCRIPTION' => Scrub::text($this->dueWork['categoryName'])." - ".Scrub::text($this->dueWork['name']),
-            'DUEWORK_DUEDATE'     => $this->getDueDate()->getLong(),
-            'CATEGORY_ID'         => $this->dueWork['cid'],
-            'BOX_ID'              => $this->dueWork['id'],
-        ));
+        $page->setVar(
+            array(
+                'DUEWORK_DESCRIPTION' => Scrub::text($this->dueWork['categoryName']) . " - " . Scrub::text(
+                    $this->dueWork['name']
+                ),
+                'DUEWORK_DUEDATE' => $this->getDueDate()->getLong(),
+                'CATEGORY_ID' => $this->dueWork['cid'],
+                'BOX_ID' => $this->dueWork['id'],
+            )
+        );
 
-        $page->setVar('spiel_single_submit_block','');
-        $page->setVar('spiel_any_submit_block','');
+        $page->setVar('spiel_single_submit_block', '');
+        $page->setVar('spiel_any_submit_block', '');
 
-        switch($this->getSubmissionType()) {
+        switch ($this->getSubmissionType()) {
             case self::ACCEPT_SINGLE:
-                $page->parse('spiel_single_submit_block','spiel_single_submit');
+                $page->parse('spiel_single_submit_block', 'spiel_single_submit');
             case self::ACCEPT_MULTI:
-                $page->parse('spiel_any_submit_block','spiel_any_submit');
+                $page->parse('spiel_any_submit_block', 'spiel_any_submit');
         }
 
         // process each student
-        foreach($data as $record) {
+        foreach ($data as $record) {
             // printf('<pre style="margin-left: 300px">%s</pre>', print_r($record, true));
 
             // output the student row
-            $page->setVar(array(
-                'OWNER_ID'      => $record['user']['uid'],
-                'OWNER_NAME'    => $this->userHandler->formatName($record['user'], '{lastname}, {firstname}', true),
-                'OWNER_ESCAPED' => addslashes($this->userHandler->formatName($record['user'], '{firstname} {lastname}')),
-                'OWNER_STATUS'  => $record['user']['status'],
-                'OWNER_CLASS'   => $record['user']['class'],
-                'OWNER_IMG'     => sprintf('/portrait?userId=%s&size=square32', $record['user']['synergy_id'])
-            ));
+            $page->setVar(
+                array(
+                    'OWNER_ID' => $record['user']['uid'],
+                    'OWNER_NAME' => $this->userHandler->formatName($record['user'], '{lastname}, {firstname}', true),
+                    'OWNER_ESCAPED' => addslashes(
+                        $this->userHandler->formatName($record['user'], '{firstname} {lastname}')
+                    ),
+                    'OWNER_STATUS' => $record['user']['status'],
+                    'OWNER_CLASS' => $record['user']['class'],
+                    'OWNER_IMG' => sprintf('/portrait.php?userId=%s&size=square32', $record['user']['synergy_id'])
+                )
+            );
 
-            $this->renderMarking($page, 'OWNER_MARKING', $record['user']['uid'].$this->dueWork['id'], $record['mark']);
+            $this->renderMarking(
+                $page, 'OWNER_MARKING', $record['user']['uid'] . $this->dueWork['id'], $record['mark']
+            );
 
-            if(count($record['submissions'])) {
+            if (count($record['submissions'])) {
 
                 $returnTime = new Alaress_Date_Format($record['return']['returned'], 'y-m-d j:i:s');
 
-                foreach($record['submissions'] as $submission) {
+                foreach ($record['submissions'] as $submission) {
 
                     $submitTime = new Alaress_Date_Format($submission['datestamp'], 'y-m-d j:i:s');
 
-                    if($submitTime->getUnixTimestamp() > $returnTime->getUnixTimestamp() && $returnTime->getUnixTimestamp() > 0) {
+                    if ($submitTime->getUnixTimestamp() > $returnTime->getUnixTimestamp(
+                    ) && $returnTime->getUnixTimestamp() > 0
+                    ) {
                         $afterMark = '<span class="alert"></span>';
-                    }
-                    else {
+                    } else {
                         $afterMark = '';
                     }
 
-                    $class = ($submitTime->getUnixTimestamp() > $this->getDueDate()->getUnixTimestamp()) ? self::CLASS_LATE : '';
+                    $class = ($submitTime->getUnixTimestamp() > $this->getDueDate()->getUnixTimestamp(
+                    )) ? self::CLASS_LATE : '';
 
                     // needing to do this just to get the icon associated with an extension is slightly ridiculous
                     $filename = $submission['realname'];
@@ -233,53 +239,54 @@ class DueWork_Detail {
                     $icon = $fileTypeHandler->getIconFile($mime);
 
                     $plagClass = self::CLASS_PLAG_0;
-                    if(is_numeric($submission['score'])) {
-                        if($submission['score'] >= 60) {
+                    if (is_numeric($submission['score'])) {
+                        if ($submission['score'] >= 60) {
                             $plagClass = self::CLASS_PLAG_60;
-                        }
-                        elseif($submission['score'] >= 20) {
+                        } elseif ($submission['score'] >= 20) {
                             $plagClass = self::CLASS_PLAG_20;
                         }
                     }
 
-                    $page->setVar(array(
-                        'SUBMISSION_ID'         => $submission['id'],
-                        'SUBMISSION_TIME'       => $submission['date'],
-                        'SUBMISSION_FILENAME'   => $submission['realname'],
-                        'SUBMISSION_CLASS'      => $class,
-                        'SUBMISSION_AFTER_MARK' => $afterMark,
-                        'SUBMISSION_PLAG_SCORE' => sprintf("%d%%", $submission['score']),
-                        'SUBMISSION_PLAG_CLASS' => $plagClass,
-                        'SUBMISSION_PLAG_HREF'  => $submission['plag_doc_id'],
-                        'SUBMISSION_EXPANDABLE' => $this->getSubmissionType() == self::ACCEPT_MULTI ? 'hide expandable' : '',
-                        'SUBMISSION_MIMEICON'   => $icon
-                    ));
+                    $page->setVar(
+                        array(
+                            'SUBMISSION_ID' => $submission['id'],
+                            'SUBMISSION_TIME' => $submission['date'],
+                            'SUBMISSION_FILENAME' => $submission['realname'],
+                            'SUBMISSION_CLASS' => $class,
+                            'SUBMISSION_AFTER_MARK' => $afterMark,
+                            'SUBMISSION_PLAG_SCORE' => sprintf("%d%%", $submission['score']),
+                            'SUBMISSION_PLAG_CLASS' => $plagClass,
+                            'SUBMISSION_PLAG_HREF' => $submission['plag_doc_id'],
+                            'SUBMISSION_EXPANDABLE' => $this->getSubmissionType(
+                            ) == self::ACCEPT_MULTI ? 'hide expandable' : '',
+                            'SUBMISSION_MIMEICON' => $icon
+                        )
+                    );
 
                     // if plagscan is not registered for use, then clear the indicator rather than show 0%
-                    if(Cfg::get('plagscan_api_key')) {
-                        if($submission['score']) {
-                            $page->parse('plag_enabled_block','plag_enabled');
+                    if (Cfg::get('plagscan_api_key')) {
+                        if ($submission['score']) {
+                            $page->parse('plag_enabled_block', 'plag_enabled');
+                        } else {
+                            $page->setVar(
+                                'plag_enabled_block',
+                                '<span title="Plagiarism results pending" class="plag-score regular">(pending)</span>'
+                            );
                         }
-                        else {
-                            $page->setVar('plag_enabled_block','<span title="Plagiarism results pending" class="plag-score regular">(pending)</span>');
-                        }
-                    }
-                    else {
+                    } else {
                         $page->setVar('plag_enabled_block', '');
                     }
 
-                    if($this->isReadOnly()) {
-                        $page->setVar('delete_action_block','');
-                    }
-                    else {
-                        $page->parse('delete_action_block','delete_action');
+                    if ($this->isReadOnly()) {
+                        $page->setVar('delete_action_block', '');
+                    } else {
+                        $page->parse('delete_action_block', 'delete_action');
                     }
 
-                    $page->parse('submission_row_block','submission_row',true);
+                    $page->parse('submission_row_block', 'submission_row', true);
                 }
-            }
-            else {
-                $page->setVar('submission_row_block','');
+            } else {
+                $page->setVar('submission_row_block', '');
             }
             $page->parse('student_row_block', 'student_row', true);
         }
@@ -287,18 +294,16 @@ class DueWork_Detail {
         // final housekeeping
 
         // show or hide download button
-        if($this->dueWork['submissionCount']) {
-            $page->parse('download_btn_block','download_btn');
-        }
-        else {
+        if ($this->dueWork['submissionCount']) {
+            $page->parse('download_btn_block', 'download_btn');
+        } else {
             $page->setVar('download_btn_block', '');
         }
 
         // show or hide edit button, based on readonly status
-        if($this->isReadOnly()) {
+        if ($this->isReadOnly()) {
             $page->setVar('modify_btn_block', '');
-        }
-        else {
+        } else {
             $page->parse('modify_btn_block', 'modify_btn');
         }
 
@@ -316,10 +321,10 @@ class DueWork_Detail {
     public function renderMarking(SitePage $page, $handle, $htmlFormID, $markArray) {
         $templateFile = $this->isReadOnly() ? 'readonly' : 'writable';
         $page->setFile('markTpl', "submission/marktype/$templateFile.html");
-        $page->setVar('UFID',$htmlFormID);
+        $page->setVar('UFID', $htmlFormID);
 
         // blockify and clear all the marktypes
-        foreach($this->submissionHandler->getMarkTypes(true) as $type) {
+        foreach ($this->submissionHandler->getMarkTypes(true) as $type) {
             $page->setBlock('markTpl', "mark_type_{$type['slug']}", "mark_type_{$type['slug']}_block");
             $page->setVar("mark_type_{$type['slug']}_block", '');
         }
@@ -356,13 +361,11 @@ class DueWork_Detail {
      * @return int
      */
     public function getSubmissionType() {
-        if($this->dueWork['multi_submission']) {
+        if ($this->dueWork['multi_submission']) {
             return self::ACCEPT_MULTI;
-        }
-        elseif($this->dueWork['accept_submission']) {
+        } elseif ($this->dueWork['accept_submission']) {
             return self::ACCEPT_SINGLE;
-        }
-        else {
+        } else {
             return self::ACCEPT_NONE;
         }
     }

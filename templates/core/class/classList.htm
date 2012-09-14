@@ -3,17 +3,21 @@
     table {
         min-width: 700px;
     }
+
     .no-text {
         padding-right: 0;
         width: 0;
         margin-right: 2px !important;
     }
+
     .action-wrap {
         margin-top: 2px;
     }
+
     .alert-wrap {
         margin-top: 10px;
     }
+
     td.check label {
         width: 100%;
         height: 100%;
@@ -21,65 +25,69 @@
         top: 0;
         left: 0;
     }
+
     td.check {
         position: relative;
     }
+
     .firstrow {
         position: relative;
         top: 8px;
     }
+
     .formwrap {
         margin-top: 10px;
     }
+
     .action-wrap .btn {
         margin-right: 8px;
     }
 </style>
 <script type="text/javascript">
-$j(function() {
+    $j(function () {
 
-    $j('input[type=checkbox]').change(function(e) {
-        $j('#bcc').val('');
-        $j('input[type=checkbox]:checked').each(function(e) {
-            $j('#bcc').val($j('#bcc').val() + $j(this).val() + ', ');
+        $j('input[type=checkbox]').change(function (e) {
+            $j('#bcc').val('');
+            $j('input[type=checkbox]:checked').each(function (e) {
+                $j('#bcc').val($j('#bcc').val() + $j(this).val() + ', ');
+            });
         });
-    });
 
-    $j('#emailall').click(function(e) {
-        $j('#bcc').val('');
-        $j('input[type=checkbox]').each(function(e) {
-            $j('#bcc').val($j('#bcc').val() + $j(this).val() + ', ');
-        })
-    });
+        $j('#emailall').click(function (e) {
+            $j('#bcc').val('');
+            $j('input[type=checkbox]').each(function (e) {
+                $j('#bcc').val($j('#bcc').val() + $j(this).val() + ', ');
+            })
+        });
 
-    $j('#emailselected').click(function(e) {
-        if($j('input[type=checkbox]:checked').length == 0) {
-            alert('No students selected');
-        }
-    });
+        $j('#emailselected').click(function (e) {
+            if ($j('input[type=checkbox]:checked').length == 0) {
+                alert('No students selected');
+            }
+        });
 
-});
+    });
 </script>
 <!-- END custom_head -->
 <h1>{SUBJECTNAME}</h1>
 <form action="/mail/createMail.php" method="post" class="clearfix">
-<table>
-    <thead>
+    <table>
+        <thead>
         <tr>
             <th width="16px"></th>
             <th width="60px"></th>
             <th>Name</th>
             <th>Student ID</th>
-            <th>Year Level </th>
+            <th>Year Level</th>
             <th>House</th>
             <th>Last Visited</th>
         </tr>
-    </thead>
-    <tbody>
+        </thead>
+        <tbody>
         <!-- BEGIN student_list -->
         <tr class="{ON_OFF}">
             <td class="check" rowspan="2">{SELECT}</td>
-            <td rowspan="2"><img src="/search/portrait.php?id={SYNERGYID}&height=80&width=60" /></td>
+            <td rowspan="2"><img src="/portrait.php?userId={SYNERGYID}&size=square64" alt="{FIRSTNAME} {SURNAME}"/></td>
             <!-- BEGIN name_with_link -->
             <td class="firstrow"><a href="/search/user/{ID}">{SURNAME}, {FIRSTNAME}</a></td>
             <!-- END name_with_link -->
@@ -99,35 +107,37 @@ $j(function() {
                     <!-- BEGIN eportfolio -->
                     <a href="/eportfolio/{ID}" title="View ePortfolio" class="btn eportfolio float-left"><span></span>ePortfolio</a>
                     <!-- END eportfolio -->
-                    <a href="/submission/dueWork/0/{ID}" title="View due work" class="btn due-work float-left"><span></span>Due Work</a>
+                    <a href="/submission/dueWork/0/{ID}" title="View due work"
+                       class="btn due-work float-left"><span></span>Due Work</a>
                     {EMAIL_BTN}
                 </div>
                 <!-- END actions -->
             </td>
             <td valign="top" style="vertical-align:top;">
                 <div class="alert-wrap">
-                <!-- BEGIN special --><img src="/images/famicons/bell.png" title="Special Needs"/><!-- END special -->
-                <!-- BEGIN medical --><img src="/images/famicons/exclamation.png" alt="{MEDICAL_ALERT}" title="Medical Alert: {MEDICAL_ALERT}"/><!-- END medical -->
+                    <!-- BEGIN special --><img src="/images/famicons/bell.png" title="Special Needs"/><!-- END special -->
+                    <!-- BEGIN medical --><img src="/images/famicons/exclamation.png" alt="{MEDICAL_ALERT}"
+                                               title="Medical Alert: {MEDICAL_ALERT}"/><!-- END medical -->
                 </div>
             </td>
         </tr>
         <!-- END student_list -->
-    </tbody>
-</table>
+        </tbody>
+    </table>
     <!-- BEGIN email_class -->
     <div class="formwrap">
-        <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;" />
-        <input type="hidden" name="bcc" id="bcc" value="{CLASSEMAIL}" />
-        <input class="submit-btn-plain" type="submit" id="emailall" name="emailall" value="Email Class" />
-        <input class="submit-btn-plain" type="submit" name="emailselected" value="Email Selected" />
+        <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>
+        <input type="hidden" name="bcc" id="bcc" value="{CLASSEMAIL}"/>
+        <input class="submit-btn-plain" type="submit" id="emailall" name="emailall" value="Email Class"/>
+        <input class="submit-btn-plain" type="submit" name="emailselected" value="Email Selected"/>
     </div>
     <!-- END email_class -->
 
-	<!-- BEGIN parent_email -->
-	<form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
-		<input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLY_TO}&gt;"/>
-		<input type="hidden" name="bcc" value="{EMAIL_ALL_PARENTS}"/>
-		<a href="#" class="btn submit-this float-right up-arrow "><span></span>Email all parents</a>
-	</form>
-	<!-- END parent_email -->
+    <!-- BEGIN parent_email -->
+    <form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
+        <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLY_TO}&gt;"/>
+        <input type="hidden" name="bcc" value="{EMAIL_ALL_PARENTS}"/>
+        <a href="#" class="btn submit-this float-right up-arrow "><span></span>Email all parents</a>
+    </form>
+    <!-- END parent_email -->
 </form>

@@ -1,96 +1,97 @@
 <script type="text/javascript"
-		src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+        src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
 <script type="text/javascript"
-		src="/javascript/jquery.tablesorter.min.js"></script>
+        src="/javascript/jquery.tablesorter.min.js"></script>
 <script type="text/javascript">
-	$j(function () {
+    $j(function () {
 
-		$j('.small-image').each(function() {
-			var largerImage = $j(this).siblings('.larger-image').html()
-			$j(this).qtip({
-				content: largerImage,
-				position:{
-					corner:{
-						tooltip: 'leftMiddle',
-						target: 'topRight'
-					}
+        $j('.small-image').each(function () {
+            var largerImage = $j(this).siblings('.larger-image').html()
+            $j(this).qtip({
+                content:largerImage,
+                position:{
+                    corner:{
+                        tooltip:'leftMiddle',
+                        target:'topRight'
+                    }
 
-				},
-				style:{
-					background:'#fefefe',
-					color:'black',
-					border:{
-						width:3,
-						radius:4,
-						color:'#f1f1f1'
-					},
-					width: 250,
-					height: 150,
-					name:'green'
-				}
-			});
-		});
+                },
+                style:{
+                    background:'#fefefe',
+                    color:'black',
+                    border:{
+                        width:3,
+                        radius:4,
+                        color:'#f1f1f1'
+                    },
+                    width:250,
+                    height:150,
+                    name:'green'
+                }
+            });
+        });
 
-		$j('.print').click(function () {
-			window.print();
-			return false;
-		});
+        $j('.print').click(function () {
+            window.print();
+            return false;
+        });
 
-		$j('.sort-it').tablesorter({
-			headers: {
-				0: {sorter: false},
-				1: {sorter: false},
-				5: {sorter: false},
-				7: {sorter: false},
-				8: {sorter: false}
-			},
-			widgets: ['zebra'],
-			widgetZebra: {
-				css: ["", "dark"]
-			},
-			cssHeader: "directory-sorter"
-		});
-	});
+        $j('.sort-it').tablesorter({
+            headers:{
+                0:{sorter:false},
+                1:{sorter:false},
+                5:{sorter:false},
+                7:{sorter:false},
+                8:{sorter:false}
+            },
+            widgets:['zebra'],
+            widgetZebra:{
+                css:["", "dark"]
+            },
+            cssHeader:"directory-sorter"
+        });
+    });
 </script>
 
 <div class="directory staff">
-	<h1>Staff Directory</h1>
+    <h1>Staff Directory</h1>
 
 
-	<table class="sort-it" width="100%">
-		<thead>
-		<tr>
-			<th width="5%">Image</th>
-			<th width="5%">Title</th>
-			<th>First name</th>
-			<th>Surname</th>
-			<th>Department</th>
-			<th>Role</th>
-			<th>Campus</th>
-			<th>Phone</th>
-			<th>Email</th>
+    <table class="sort-it" width="100%">
+        <thead>
+        <tr>
+            <th width="5%">Image</th>
+            <th width="5%">Title</th>
+            <th>First name</th>
+            <th>Surname</th>
+            <th>Department</th>
+            <th>Role</th>
+            <th>Campus</th>
+            <th>Phone</th>
+            <th>Email</th>
 
-		</tr>
-		</thead>
-		<tbody>
-			<!-- BEGIN staff -->
-			<tr>
-				<td>
-					<img class="small-image" src="/search/portrait.php?id={STAFF_STAFFID}&height=60&width=60">
-					<div class="larger-image"><img  src="/search/portrait.php?id={STAFF_STAFFID}&width=200&height=150"></div>
-				</td>
-				<td>{STAFF_TITLE}</td>
-				<td>{STAFF_FIRSTNAME}</td>
-				<td>{STAFF_SURNAME}</td>
-				<td>{STAFF_DEPARTMENT}</td>
-				<td>{STAFF_ROLE}</td>
-				<td>{STAFF_CAMPUS}</td>
-				<td class="number" width="30%">{STAFF_PHONE}</td>
-				<td><a href="mailto:{STAFF_EMAIL}">{STAFF_EMAIL}</a></td>
-			</tr>
-			<!-- END staff -->
-		</tbody>
-	</table>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- BEGIN staff -->
+        <tr>
+            <td>
+                <img class="small-image" src="/portrait.php?userId={STAFF_STAFFID}&size=square64">
+
+                <div class="larger-image"><img src="/portrait.php?userId={STAFF_STAFFID}&size=constrain200"></div>
+            </td>
+            <td>{STAFF_TITLE}</td>
+            <td>{STAFF_FIRSTNAME}</td>
+            <td>{STAFF_SURNAME}</td>
+            <td>{STAFF_DEPARTMENT}</td>
+            <td>{STAFF_ROLE}</td>
+            <td>{STAFF_CAMPUS}</td>
+            <td class="number" width="30%">{STAFF_PHONE}</td>
+            <td><a href="mailto:{STAFF_EMAIL}">{STAFF_EMAIL}</a></td>
+        </tr>
+        <!-- END staff -->
+        </tbody>
+    </table>
 </div>
 
 

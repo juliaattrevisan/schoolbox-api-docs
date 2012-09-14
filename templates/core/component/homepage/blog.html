@@ -1,55 +1,62 @@
 <div class="box component blog clearfix" id="component{COMPONENT_INSTANCE_ID}">
-	<h2>{COMPONENT_NAME}</h2>
+    <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
-	<div class="listing">
-		<ul>
-			<!-- BEGIN blog -->
-			<li class="{BLOG_SHADING} clearfix">
-				<h4><strong>{BLOG_HEADING}</strong></h4>
-				<div class="small-right">
-					<p class="interact">{MODIFY_BLOG}</p>
-				</div>
-				<p>{BLOG_BODY}</p>
-				<div class="comments hide-it">
-					<!-- BEGIN comment -->
-					<div class="box clearfix"> {COMMENT_BODY}
+    <div class="listing">
+        <ul>
+            <!-- BEGIN blog -->
+            <li class="{BLOG_SHADING} clearfix">
+                <h4><strong>{BLOG_HEADING}</strong></h4>
+
+                <div class="small-right">
+                    <p class="interact">{MODIFY_BLOG}</p>
+                </div>
+                <p>{BLOG_BODY}</p>
+
+                <div class="comments hide-it">
+                    <!-- BEGIN comment -->
+                    <div class="box clearfix"> {COMMENT_BODY}
                         <p class="interact">
-                            <img src='/portrait?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32' alt="{COMMENT_AUTHOR_NAME}" title="{COMMENT_AUTHOR_NAME}" />
+                            <img src='/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32'
+                                 alt="{COMMENT_AUTHOR_NAME}" title="{COMMENT_AUTHOR_NAME}"/>
                             {COMMENT_OWNER} | {COMMENT_CREATED} | {DELETE_COMMENT}
                         </p>
-					</div>
-					<!-- END comment -->
+                    </div>
+                    <!-- END comment -->
 
-					<!-- BEGIN show_all -->
-					<p class="interact"><a href="/blog/{BLOG_ID}">Show All {BLOG_TOTAL_COMMENTS} Comments</a></p>
-					<!-- END show_all -->
-				</div>
-				<p class="links-house">
-					<!-- BEGIN show_comment -->
-					<a class="show_comments" href="javascript:void();"><span>Show</span><span class="hide-it">Hide</span> {BLOG_COMMENTS} Comments</a> -
-					<!-- END show_comment -->
-					<a class="interact post_comment" href="javascript:void();">Post comment</a>
-				</p>
-				<form class="hide" method="post" action="/blog/comment/new/{BLOG_ID}">
-					<p>
-						<textarea name="body" style="width: 100%;"></textarea>
-					</p>
-					<p>
-						<input type="submit" class="submit-btn-plain" name="comment" value="Comment"/>
-					</p>
-				</form>
+                    <!-- BEGIN show_all -->
+                    <p class="interact"><a href="/blog/{BLOG_ID}">Show All {BLOG_TOTAL_COMMENTS} Comments</a></p>
+                    <!-- END show_all -->
+                </div>
+                <p class="links-house">
+                    <!-- BEGIN show_comment -->
+                    <a class="show_comments" href="javascript:void();"><span>Show</span><span
+                            class="hide-it">Hide</span> {BLOG_COMMENTS} Comments</a> -
+                    <!-- END show_comment -->
+                    <a class="interact post_comment" href="javascript:void();">Post comment</a>
+                </p>
+
+                <form class="hide" method="post" action="/blog/comment/new/{BLOG_ID}">
+                    <p>
+                        <textarea name="body" style="width: 100%;"></textarea>
+                    </p>
+
+                    <p>
+                        <input type="submit" class="submit-btn-plain" name="comment" value="Comment"/>
+                    </p>
+                </form>
                 <p class="interact hide-on-small">
-                    <img src='/portrait?userId={BLOG_AUTHOR_EXTERNAL_ID}&size=square32' alt="{BLOG_AUTHOR_NAME}" title="{BLOG_AUTHOR_NAME}" />
+                    <img src='/portrait.php?userId={BLOG_AUTHOR_EXTERNAL_ID}&size=square32' alt="{BLOG_AUTHOR_NAME}"
+                         title="{BLOG_AUTHOR_NAME}"/>
                     Posted by {BLOG_OWNER} {BLOG_CREATED}
                 </p>
-			</li>
-			<!-- END blog -->
-		</ul>
-	</div>
-	<p class="interact">
-		<!-- BEGIN submit -->
-		<a href="/blog/modify/new/{BLOG_CATEGORY_ID}" class="btn up-arrow"><span></span>Post Entry</a>
-		<!-- END submit -->
-		<a href="/homepage/blogArchive/{ID}" class="btn"><span></span>Blog Archive</a>
-	</p>
+            </li>
+            <!-- END blog -->
+        </ul>
+    </div>
+    <p class="interact">
+        <!-- BEGIN submit -->
+        <a href="/blog/modify/new/{BLOG_CATEGORY_ID}" class="btn up-arrow"><span></span>Post Entry</a>
+        <!-- END submit -->
+        <a href="/homepage/blogArchive/{ID}" class="btn"><span></span>Blog Archive</a>
+    </p>
 </div>
