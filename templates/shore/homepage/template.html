@@ -336,3 +336,10 @@ var {COLOUR_ARRAY} = {
 	<div class="right clearfix" style="width: {TEMPLATE_RIGHT_COLUMN_WIDTH}%">{COLUMN2}</div>
 </div>
 <input type="hidden" id="categoryID" value="{ID}" />
+<div id="resource-browser" class="hide"></div>
+<script type="text/javascript">
+    // all forms should submit without prevention
+    $j(".homepage form").submit(function() {
+        window.check = false;
+    });
+</script>
