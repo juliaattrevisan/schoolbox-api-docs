@@ -1,18 +1,18 @@
 <script>
 function init() {
-    if(sessionStorage.getItem('session') && getCookie('PHPSESSID')){
-        if(sessionStorage.getItem('session') != getCookie('PHPSESSID')){
+    // if the session var in storage doesn't match the php session cookie, ditch it
+    if(sessionStorage.getItem('session') && getCookie('PHPSESSID')) {
+        if(sessionStorage.getItem('session') != getCookie('PHPSESSID')) {
             sessionStorage.removeItem('session');
         }
     }
 
-    //
     // Install-a-bubble
-    //
-    if(!env.fullscreen && (env.ios || env.wp )){
+    if(!env.fullscreen && (env.ios || env.wp )) {
         var style,
             instruction = '';
 
+        // load up bubble for iOS
         if (env.ios) {
             style = 'ios';
             var device = '';
@@ -23,9 +23,10 @@ function init() {
                 style  += ' iphone';
                 device += 'iPhone';
             }
-            instruction = 'Intall this web app on your ' + device + ': tap &lsquo;<span>Share</span>&rsquo; ' +
+            instruction = 'Install this web app on your ' + device + ': tap &lsquo;<span>Share</span>&rsquo; ' +
                           'and then <br />&lsquo;<strong>Add to Home Screen</strong>.&rsquo;';
         }
+        // load up bubble for Win (odd, since we don't officially support winmobile)
         else if (env.wp) {
             style       = 'wp';
             instruction = '<a href="#" class="wp">Click here to install this web app to your Windows Phone</a>';
@@ -33,33 +34,38 @@ function init() {
 
         var bubble  = '<div id="bubble" class="' + style + '">' + instruction +
                       '<a href="#" class="close">&times;</a></div>';
+
+
         $('body').append(bubble);
 
-        setTimeout(function(){
+        setTimeout(function() {
             $('#bubble').addClass('active');
-        },5000);
+        }, 5000);
     }
 
-    if(msgTimeout!=undefined){
+    // clear any kind of message timeout that might be lurking around
+    if(msgTimeout != undefined) {
         clearTimeout(msgTimeout);
     }
+
+    // logged in? good. create the sidebar
     if(env.loggedIn) {
         renderMenu('/m/core/nav/sidebar.json');
 
-        console.log(env.lastPage)
+        console.log(env.lastPage);
 
-        if(env.lastPage == null ||
-           env.lastPage == '/' ||
-           env.lastPage == '') {
-            var push = false
-            env.lastPage = '/m/facade/dashboard/display'
-            console.log('empty uri, send to dashboard')
-        } else {
-            var push = true
+        var push = true;
+
+        if(env.lastPage == null || env.lastPage == '/m/' || env.lastPage == '') {
+            push = false;
+            env.lastPage = '/m/facade/dashboard/display';
+            console.log('empty uri, send to dashboard');
         }
 
-        renderPage(env.lastPage, push)
+        // this is where the action's at
+        renderPage(env.lastPage, push);
 
+        // if the loader is still spinning, make it begone
         if($('#loading').hasClass('load')) {
             $('#spinner').remove();
             $('#loading').animate({opacity:'0'},100,'linear',function(){$(this).remove()});
@@ -69,45 +75,46 @@ function init() {
             $('#loading').remove();
         }
     }
-    else {
-        if(env.init === 0) {
+    // not logged in
+    else /*if(env.init === 0)*/ {
 
-            $('#spinner').animate({opacity:'0'},100,'linear',function(){$(this).remove()});
-            $('#loading').append('<form id="login_frm"><ul>' +
-                '<li><input type="text" id="username" name="username" placeholder="Username" value="jalbert" /></li>' +
-                '<li><input type="password" id="password" name="password" placeholder="Password" value="password" /></li>' +
-                '<li><input type="submit" id="login" name="login" value="Login" /></li>' +
-                '</ul></form>');
+        $('#spinner').animate({opacity:'0'},100,'linear',function(){$(this).remove()});
+        $('#loading').append('<form id="login_frm"><ul>' +
+            '<li><input type="text" id="username" name="username" placeholder="Username" value="jalbert" /></li>' +
+            '<li><input type="password" id="password" name="password" placeholder="Password" value="password" /></li>' +
+            '<li><input type="submit" id="login" name="login" value="Login" /></li>' +
+            '</ul></form>');
 
-            $('#loading').on('submit', '#login_frm', function(e) {
-//                $('#login_frm').append('<input type="hidden" name="env" value="'+env+'" />')
+        $('#loading').on('submit', '#login_frm', function(e) {
+//          $('#login_frm').append('<input type="hidden" name="env" value="'+env+'" />')
 
-                $.post('/m/core/auth/login_form.json', $('#login_frm').serialize() + '&env=' + JSON.stringify(env), function(data) {
+            var postdata = $('#login_frm').serialize() + '&env=' + JSON.stringify(env);
 
-                    debug($('#login_frm').serialize())
+            $.post('/m/core/auth/login_form.json', postdata, function(data) {
 
-                    if($.zepto){
-                        data = JSON.parse(data);
-                    }
+                debug($('#login_frm').serialize());
 
-                    console.log(data);
+                if($.zepto) {
+                    data = JSON.parse(data);
+                }
 
-                    if(data.session) {
-                        // success
-                        sessionStorage.setItem('session', data.session);
-                        env.loggedIn = data.session;
-                        e.preventDefault();
-                        init();
-                    }
-                    else {
-                        // failure
-                        // window.location = "/m/";
-                    }
-                });
-                e.preventDefault();
+                console.log(data);
 
+                if(data.session) {
+                    // success
+                    sessionStorage.setItem('session', data.session);
+                    env.loggedIn = data.session;
+                    e.preventDefault();
+                    init();
+                }
+                else {
+                    // failure
+                    // window.location = "/m/";
+                }
             });
-        }
+            e.preventDefault();
+
+        });
     }
     env.init = 1;
 }

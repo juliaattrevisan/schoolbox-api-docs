@@ -41,7 +41,7 @@ class External_User_DataMapper extends Generic_DataMapper implements External_Us
             foreach($list as $subject) {
                 $codes[] = $subject['code'];
             }
-            print_r($codes);
+            // print_r($codes);
             if(count($codes)) {
                 $cMap = new GizaCategory_DataMapper();
                 return $cMap->read(array('categoryCode.code' => $codes));

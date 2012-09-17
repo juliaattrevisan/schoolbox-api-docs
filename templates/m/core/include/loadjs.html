@@ -9,12 +9,12 @@
 {% include 'js/variables.html' %}
 
 <script>
-if(env.tablet) {
-    loadFile("/inc/js/libs/masonry.min.js", 'js');
-}
+//if(env.tablet) {
+//    loadFile("/inc/js/libs/masonry.min.js", 'js');
+//}
 
 function goToByScroll(id){
-    window.scrollTo(0,$("#"+id).offset().top)
+    window.scrollTo(0,$("#"+id).offset().top);
 }
 
 function size_format(bytes) {
@@ -22,34 +22,44 @@ function size_format(bytes) {
     if (bytes == 0) return 'n/a';
     var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
     return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
-};
+}
+
 function debug(msg){
     if(settings.debug){
         console.log(msg);
     }
-};
+}
 
 function getCookie(c) {
-    var i,x,y,cookies=document.cookie.split(";");
-    for (i=0;i<cookies.length;i++) {
-        x=cookies[i].substr(0,cookies[i].indexOf("="));
-        y=cookies[i].substr(cookies[i].indexOf("=")+1);
-        x=x.replace(/^\s+|\s+$/g,"");
-        if (x==c) {
-            return unescape(y);
+    var i, x, y, cookies=document.cookie.split(";");
+    for (i = 0; i < cookies.length; ++i) {
+        x = cookies[i].substr(0, cookies[i].indexOf("="));
+        y = cookies[i].substr(cookies[i].indexOf("=") + 1);
+        x = x.replace(/^\s+|\s+$/g,"");
+        if (x == c) {
+            return decodeURI(y);
         }
     }
 }
-function killCookie(c) { document.cookie = c + '=; expires=Thu, 01-Jan-70 00:00:01 GMT;'; }
-function killScroll(o) { if(o != null){ o.destroy(); o = null; } }
 
-function toast(el){
-    alert(el)
+function killCookie(c) {
+    document.cookie = c + '=; expires=Thu, 01-Jan-70 00:00:01 GMT;';
 }
 
-$('body').on('longTap','[title]',function(){
+function killScroll(o) {
+    if(o != null) {
+        o.destroy();
+        o = null;
+    }
+}
+
+function toast(el){
+    alert(el);
+}
+
+$('body').on('longTap','[title]',function() {
     toast($(this).attr('title'))
-})
+});
 
 /*
 $('#app').on(clickEvent,'a',function(e){
@@ -72,7 +82,7 @@ $('#app').on(clickEvent,'a',function(e){
 // Get response to HTTP request and save it to localStorage
 localCache.get = function(url) {
 
-    console.log('loadjs.html:73 > localCache() url should have no extension: ' + url);
+    console.log('loadjs.html:85 > localCache() url should have no extension: ' + url);
 
     var r = localStorage[url];
 

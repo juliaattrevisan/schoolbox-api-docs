@@ -1,7 +1,9 @@
 <script>
 
     function renderMenu(data){
-        data = JSON.parse(localCache.get(data));
+        var cache = localCache.get(data);
+        var json = JSON.parse(cache);
+        data = json;
 
         if(!data.menu) {
             if(data.redirect) {
