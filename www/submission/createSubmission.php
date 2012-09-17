@@ -91,8 +91,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         $criteriaArray[] = $cID;
     }
 
-    outputResultSets($this, $resultSetID);
-    outputCriteria($this, 250, $criteriaArray, $descriptorArray);
+    outputResultSets($this, $resultSetID, outputCriteria($this, $subbox['category'], $criteriaArray, $descriptorArray));
     // TODO </refactor>
 
     $this->parse('marktype_block', 'marktype');
@@ -247,8 +246,7 @@ else if($this->arg[0] == 'new') {
     ));
 
     // TODO <refactor>
-    outputResultSets($this, -1);
-    outputCriteria($this, 250, array(), array());
+    outputResultSets($this, -1, outputCriteria($this, $this->arg[1], array(), array()));
     // TODO </refactor>
 
     $this->parse('marktype_block','marktype');
@@ -298,7 +296,7 @@ else {
 }
 
 // TODO <refactor>
-function outputResultSets(SitePage $page, $checkedIndex) {
+function outputResultSets(SitePage $page, $checkedIndex, $descriptorSelected) {
     $rs = array();
 
     $sql = "
@@ -319,7 +317,7 @@ function outputResultSets(SitePage $page, $checkedIndex) {
             $page->setVar(array(
                 'RS_ID'           => $i,
                 'RS_RESULT_LABEL' => $item,
-                'RS_CHECKED'      => $i == $checkedIndex ? 'checked="checked' : ''
+                'RS_CHECKED'      => $i == $checkedIndex ? 'checked="checked"' : ''
             ));
             $page->parse('result_block', 'result', true);
         }
@@ -331,7 +329,7 @@ function outputResultSets(SitePage $page, $checkedIndex) {
     for($i = 2; $i < 7; ++$i) {
         $desCounts[] = array('value' => $i);
     }
-    $page->dropdown('des_count', $desCounts, -1, 'marktype', array(
+    $page->dropdown('des_count', $desCounts, $descriptorSelected, 'marktype', array(
         'value'  => 'DES_COUNT_VALUE',
     ));
 
@@ -342,7 +340,7 @@ function outputResultSets(SitePage $page, $checkedIndex) {
 function outputCriteria(SitePage $page, $catID, $checkedIDs, $descriptors) {
     $crits = array();
 
-    $desCount = 0;
+    $desCount = -1;
 
     $sql = "
         SELECT `grouping`, `id`, `name`
@@ -393,6 +391,7 @@ function outputCriteria(SitePage $page, $catID, $checkedIDs, $descriptors) {
             $page->parse('criterion_block','criterion', true);
         }
     }
+    return $desCount;
 }
 // TODO </refactor>
 
