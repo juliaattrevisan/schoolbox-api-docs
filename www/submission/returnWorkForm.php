@@ -9,15 +9,19 @@ $subHandler = new Submission();
 const update_window = 21600; // 60 * 60 * 6 seconds = 6 hours
 
 // Ajax from mark sheet
-if(isset($_POST['uid']) && isset($_POST['comment']) && isset($_POST['mark']) && isset($_POST['box_id']) && $_POST['markUpdate'] == 'true') {
+if(isset($_POST['uid']) && isset($_POST['comment']) /* && isset($_POST['mark']) */ && isset($_POST['box_id']) && $_POST['markUpdate'] == 'true') {
+
+    print_r($_POST);
+
     if(is_numeric($_POST['uid']) && is_numeric($_POST['box_id'])) {
         ajaxUpdate($_POST['mark'], $_POST['comment'], $_POST['uid'], $_POST['box_id']);
     }
-    elseif(is_array($_POST['uid']) && is_array($_POST['mark'])) {
+    elseif(is_array($_POST['uid']) /* && is_array($_POST['mark'])*/ ) {
         for($i = 0; $i < count($_POST['uid']); ++$i) {
             ajaxUpdate($_POST['mark'][$i], $_POST['comment'][$i], $_POST['uid'][$i], $_POST['box_id']);
         }
     }
+
 }
 
 // inline upload of files
@@ -188,6 +192,9 @@ else {
  * @param $boxID
  */
 function ajaxUpdate($givenMark, $comment, $studentID, $boxID) {
+
+    print_r(func_get_args());
+
     $returnHandler = new SubmissionReturn;
     $subHandler = new Submission();
 
@@ -199,9 +206,22 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID) {
     // get the submission box
     $subbox = $subHandler->getByID($boxID);
 
-    // normalise the new mark given, ready to be inserted
     $marksheet = Marksheet_Factory::build($subbox['mark_type_slug']);
-    $mark = $marksheet->normaliseMark($givenMark, $subbox);
+
+    echo $subbox['mark_type_slug'];
+
+    if($subbox['mark_type_slug'] == 'rubric') {
+        // in this context, no mark is supplied, so retrieve, smash to pieces, and reinsert
+        $mark = $marksheet->retrieveMark($studentID, $boxID);
+        $marksheet = Marksheet_Factory::build('raw');
+        $mark = $marksheet->normaliseMark($mark['mark'], $subbox);
+    }
+    else {
+        // normalise the new mark given, ready to be inserted
+        $mark = $marksheet->normaliseMark($givenMark, $subbox);
+    }
+
+    print_r($mark);
 
     // set up common values for the return
     $return = array(
@@ -224,7 +244,7 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID) {
         // is this submission within the window?
         if($returnTime->getUnixTimestamp() < $windowAgo->getUnixTimestamp()) {
             // outside window: create new
-            $returnHandler->create($return);
+            $success = $returnHandler->create($return);
         } else {
             // inside window: update exising
             $return['id'] = $result[0]['id'];

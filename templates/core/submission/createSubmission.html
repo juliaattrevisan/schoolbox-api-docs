@@ -13,7 +13,6 @@
 
 
 	$j(function() {
-
         var marktype = {
             total: $j('#marktype-total'),
             rubric: $j('#marktype-rubric')
@@ -24,6 +23,10 @@
         };
 
         showHideMarktype(0);
+        $j('#rubric-criteria').find('p').each(function() {
+            descriptor('show', this, 0);
+        });
+
 
 		$j('.prettify').prettyFileInput({
 			additionalButtonClasses: 'no-marg float-left',
@@ -96,13 +99,13 @@
 
             // hide the descriptors
             if(v === undefined) {
-                descriptor('hide', $j('#rubric-criteria div'));
+                descriptor('hide', $j('#rubric-criteria div'), 100);
             }
             // show them if checked
             else {
                 $j('#rubric-criteria div').each(function() {
                     var checked = $j(this).children(':checkbox').attr('checked');
-                    descriptor(checked === undefined ? 'hide' : 'show', this)
+                    descriptor(checked === undefined ? 'hide' : 'show', this, 100)
                 });
             }
         });
@@ -117,7 +120,7 @@
             if(x && y) {
                 act = 'show';
             }
-            descriptor(act, $j(this).parent('div'));
+            descriptor(act, $j(this).parent('div'), 100);
         });
 
         // trigger change of descriptor count when dropdown changed
@@ -160,8 +163,6 @@
 
         function showHideMarktype(timeout) {
             var v = $j('#marktype option:selected').first().data('slug');
-
-            console.log(v);
             if(v == 'raw') {
                 marktype.rubric.hide(timeout, function() {
                     marktype.total.show(timeout);
@@ -178,23 +179,19 @@
             }
         }
 
+        function descriptor(action, element, timeout) {
+            $j(element).find('input:not(:checkbox)').parent('li').each(function() {
+                if(action == 'show') {
+                    $j(this).slideDown(timeout);
+                    $j(element).addClass('highlight');
+                }
+                else if(action == 'hide') {
+                    $j(element).removeClass('highlight');
+                    $j(this).slideUp(timeout);
+                }
+            });
+        }
 	});
-
-    function descriptor(action, element) {
-        $j(element).find('input:not(:checkbox)').parent('li').each(function() {
-            if(action == 'show') {
-                $j(this).slideDown(100);
-                $j(element).addClass('highlight');
-            }
-            else if(action == 'hide') {
-                $j(element).removeClass('highlight');
-                $j(this).slideUp(100);
-            }
-        });
-    }
-
-
-
 </script>
 
 <style type="text/css">

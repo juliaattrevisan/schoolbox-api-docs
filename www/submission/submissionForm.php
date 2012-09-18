@@ -108,9 +108,21 @@ if ($markType['slug'] == 'raw' && empty($_POST['markvalue'])) {
 // if Rubric selected, generate the objects needed
 elseif($markType['slug'] == 'rubric') {
     $rubricFactory = new DueWork_Rubric_Factory($criteria);
-    $rubric = $rubricFactory->buildRubric($useDescriptors ? $descriptors : $resultSetID, $submissionBoxID);
 
-    print_r($rubric);
+    if($useDescriptors) {
+        $specification = array();
+        foreach($descriptors as $critID => $values) {
+            if($criteria[$critID]) {
+                foreach($values as $k => $v) {
+                    $specification[$critID][$k] = new DueWork_Rubric_Descriptor($v, $k);
+                }
+            }
+        }
+        $rubric = $rubricFactory->buildRubric($specification, $submissionBoxID);
+    }
+    else {
+        $rubric = $rubricFactory->buildRubric($resultSetID, $submissionBoxID);
+    }
 
     // need to determine if the resultset is different, and if it is, that any marks already given are invalidated
     $subbox = $submissionBoxHandler->getByID($submissionBoxID);
@@ -203,7 +215,7 @@ if(isset($rubric)) {
                         'cid'   => $i,
                         'sbid'  => $submissionBoxID,
                         'val'   => $j,
-                        'descr' => $rubric->getDescriptor($i, $j)->getDescription()
+                        'descr' => $rubric->getResult($i, $j)->getDescription()
                     ));
                 }
             }

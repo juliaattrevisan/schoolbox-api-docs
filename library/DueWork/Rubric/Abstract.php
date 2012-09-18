@@ -46,4 +46,19 @@ abstract class DueWork_Rubric_Abstract {
 
     public abstract function getResultIndices();
 
+    /**
+     * @abstract
+     * @param $criterionID
+     * @param $resultObject
+     */
+    public abstract function addResult($criterionID, $resultObject);
+
+    /**
+     * @abstract
+     * @param $criterionID
+     * @param $value
+     * @return DueWork_Rubric_Descriptor|DueWork_Rubric_Result
+     */
+    public abstract function getResult($criterionID, $value);
+
 }

@@ -371,7 +371,8 @@ function outputCriteria(SitePage $page, $catID, $checkedIDs, $descriptors) {
             ));
 
             $page->setVar('crit_input_block', '');
-            if(count($descriptors[$id])) {
+
+            if(is_array($descriptors[$id])) {
                 foreach($descriptors[$id] as $description) {
                     $page->setVar(array(
                         'CRIT_INPUT_VALUE' => $description

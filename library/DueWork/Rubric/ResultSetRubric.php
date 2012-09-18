@@ -23,7 +23,20 @@ class DueWork_Rubric_ResultSetRubric extends DueWork_Rubric_Abstract {
         return array_keys($this->resultSet->getResults());
     }
 
-    public function getResult($value) {
+    /**
+     * @param $criterionID (disregarded)
+     * @param $value
+     * @return mixed
+     */
+    public function getResult($criterionID, $value) {
         return $this->resultSet->getResult($value);
+    }
+
+    /**
+     * @param $criterionID (disregarded)
+     * @param DueWork_Rubric_Result $resultObject
+     */
+    public function addResult($criterionID, $resultObject) {
+        $this->resultSet->addResult($resultObject);
     }
 }

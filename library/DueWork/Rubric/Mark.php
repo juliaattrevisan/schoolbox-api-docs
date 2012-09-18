@@ -106,7 +106,7 @@ class DueWork_Rubric_Mark {
             // data replication for the sake of consistency
             if($this->rubric instanceof DueWork_Rubric_ResultSetRubric) {
                 foreach($this->rubric->getResultIndices() as $i) {
-                    $obj['criteria'][$cID]['results'][$i] = $this->rubric->getResult($i)->getLabel();
+                    $obj['criteria'][$cID]['results'][$i] = $this->rubric->getResult($cID, $i)->getLabel();
                 }
             }
         }
@@ -114,7 +114,7 @@ class DueWork_Rubric_Mark {
         if($this->rubric instanceof DueWork_Rubric_DescriptorRubric) {
             foreach($this->rubric->getCriteriaIndices() as $i) {
                 foreach($this->rubric->getResultIndices() as $j) {
-                    $obj['criteria'][$i]['results'][$j] = $this->rubric->getDescriptor($i, $j)->getDescription();
+                    $obj['criteria'][$i]['results'][$j] = $this->rubric->getResult($i, $j)->getDescription();
                 }
             }
         }
