@@ -97,16 +97,28 @@ class Scrub {
 		require_once dirname(__FILE__) . '/HTMLPurifier/HTMLPurifier.auto.php';
 
 		$config = HTMLPurifier_Config::createDefault();
-		//$config->set('Filter', 'YouTube', true);
-		$config->set('Filter', 'Custom', array(
-			new HTMLPurifier_Filter_Quicktime(),
-			new HTMLPurifier_Filter_Shockwave(),
-			new HTMLPurifier_Filter_Flash(),
-			new HTMLPurifier_Filter_WindowsMedia(),
-			new HTMLPurifier_Filter_Real(),
-            new HTMLPurifier_Filter_IFrame()
-		));
-		$config->set('Attr', 'AllowedFrameTargets', array(
+
+        $config->set('AutoFormat.Linkify', true);
+
+        $config->set('HTML.FlashAllowFullScreen',true);
+
+        $safeIframeSources = array( 'www.youtube.com/embed/',
+                                    'player.vimeo.com/video/',
+                                    'www.slideshare.net/slideshow/embed_code/',
+                                    '(www|edu).glogster.com/glog(/|.php)',
+                                    'wikieducator.org/index.php',
+                                    'www.google.com(.[a-z]{2})?/maps',
+                                    'maps.google.com(.[a-z]{2})?/',
+                                    'docs.google.com(.[a-z]{2})?/'
+        );
+
+        $config->set('HTML.SafeIframe', true);
+        $config->set('URI.SafeIframeRegexp','%^https?://('.implode('|', $safeIframeSources).')%');
+
+        $config->set('HTML.SafeObject', true);
+        $config->set('Output.FlashCompat',true);
+
+		$config->set('Attr.AllowedFrameTargets', array(
 			'_blank',
 			'_self',
 			'_parent',
