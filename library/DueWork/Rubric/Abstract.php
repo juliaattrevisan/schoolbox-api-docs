@@ -61,4 +61,10 @@ abstract class DueWork_Rubric_Abstract {
      */
     public abstract function getResult($criterionID, $value);
 
+    /**
+     * @abstract
+     * @param $criterionID
+     * @return mixed
+     */
+    public abstract function getResults($criterionID = 0);
 }

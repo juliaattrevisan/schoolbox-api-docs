@@ -4,6 +4,7 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 $page = new SitePage;
 $returnHandler = new SubmissionReturn;
 $subHandler = new Submission();
+$rubricHandler = new DueWork_Rubric_Handler();
 
 // TODO: refactor this to somwhere else, not sure where it should live though
 const update_window = 21600; // 60 * 60 * 6 seconds = 6 hours
@@ -84,86 +85,17 @@ elseif(is_array($_POST['rubric']) && count($_POST['rubric'])) {
         if($returnTime < $windowAgo) {
             // outside window: create new
             $returnHandler->create($return);
-
-            // TODO <refactor>
-            $db = Database::getInstance();
-            $stmt = $db->prepare("
-                INSERT INTO rubric_mark (`student_id`,`submission_box_id`, `criterion_id`, `mark`)
-                VALUES (:sid, :sbid, :cid, :mark)
-                ON DUPLICATE KEY UPDATE mark = :mark
-            ");
-
-            foreach($_POST['rubric'] as $cID => $mark) {
-                $stmt->execute(array(
-                    'sid'  => $_POST['uid'],
-                    'sbid' => $_POST['box_id'],
-                    'cid'  => $cID,
-                    'mark' => $mark
-                ));
-            }
-            // TODO </refactor>
+            $rubricHandler->saveMarks($_POST['rubric'], $_POST['uid'], $_POST['box_id']);
         }
         else {
             // inside window: update existing
             $return['id'] = $result[0]['id'];
             $returnHandler->update($return);
 
-            // TODO <refactor>
-            $db = Database::getInstance();
-            $stmt = $db->prepare("
-                SELECT MAX(tstamp) FROM rubric_mark
-                WHERE student_id = :sid
-                AND submission_box_id = :sbid
-                AND valid = 1"
-            );
+            $stamp = $rubricHandler->getLatestMarkTimestamp($_POST['uid'], $_POST['box_id']);
 
-            $stmt->execute(array(
-                'sid'   => $_POST['uid'],
-                'sbid'  => $_POST['box_id'],
-            ));
-
-            $stamp = $stmt->fetchColumn();
-
-            // if a valid timestamp is found, update, otherwise, create a new one
-            if($stamp) {
-                $stmt = $db->prepare("
-                UPDATE rubric_mark
-                SET `mark` = :mark
-                WHERE student_id = :sid
-                AND submission_box_id = :sbid
-                AND criterion_id = :cid
-                AND tstamp = :stamp
-                AND valid = 1
-            ");
-
-                foreach($_POST['rubric'] as $cID => $mark) {
-                    $stmt->execute(array(
-                        'mark'  => $mark,
-                        'sid'   => $_POST['uid'],
-                        'sbid'  => $_POST['box_id'],
-                        'cid'   => $cID,
-                        'stamp' => $stamp
-                    ));
-                }
-            }
-            else {
-                $stmt = $db->prepare("
-                INSERT INTO rubric_mark (`student_id`,`submission_box_id`, `criterion_id`, `mark`)
-                VALUES (:sid, :sbid, :cid, :mark)
-                ON DUPLICATE KEY UPDATE mark = :mark
-                ");
-
-                foreach($_POST['rubric'] as $cID => $mark) {
-                    $stmt->execute(array(
-                        'sid'  => $_POST['uid'],
-                        'sbid' => $_POST['box_id'],
-                        'cid'  => $cID,
-                        'mark' => $mark
-                    ));
-                }
-            }
-
-            // TODO </refactor>
+            // if a valid timestamp is found, update, otherwise, create a new one (selfcontained logic)
+            $rubricHandler->saveMarks($_POST['rubric'], $_POST['uid'], $_POST['box_id'], $stamp);
         }
     }
     else {

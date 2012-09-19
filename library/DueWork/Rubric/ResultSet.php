@@ -16,13 +16,8 @@ class DueWork_Rubric_ResultSet {
      */
     public function __construct($resultSetID = 0) {
         if($resultSetID) {
-            $stmt = Database::getInstance()->prepare("SELECT `value`, `label` FROM `rubric_result` WHERE `resultset_id` = :rsid");
-
-            $stmt->execute(array('rsid' => $resultSetID));
-
-            while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $this->addResult(new DueWork_Rubric_Result($row['label'], $row['value']));
-            }
+            $handler = new DueWork_Rubric_Handler();
+            $handler->populateResultSet($this, $resultSetID);
         }
     }
 

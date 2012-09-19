@@ -41,38 +41,15 @@ class DueWork_Rubric_Mark {
      * @return bool
      */
     public function populateMarks($studentID, $set = 0) {
-        // TODO <refactor>
-        $stmt = Database::getInstance()->prepare("
-            SELECT criterion_id, mark, UNIX_TIMESTAMP(tstamp) AS tstamp
-            FROM rubric_mark
-            WHERE student_id = :sid
-            AND submission_box_id = :sbid
-            AND valid = 1
-            ORDER BY tstamp DESC, criterion_id ASC"
-        );
-
-        $stmt->execute(array(
-            'sid'  => $studentID,
-            'sbid' => $this->rubric->getSubmissionBoxID()
-        ));
-
-        $marks = array();
-
-        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $marks[$row['tstamp']][$row['criterion_id']] = $row['mark'];
-        }
-
-        // remove timetstamps and replace with indices
-        $marks = array_values($marks);
-        if(isset($marks[$set])) {
-            foreach($marks[$set] as $cID => $mark) {
+        $rubricHandler = new DueWork_Rubric_Handler();
+        $marks = $rubricHandler->getStudentMarks($studentID, $this->rubric->getSubmissionBoxID(), $set);
+        if(count($marks)) {
+            foreach($marks as $cID => $mark) {
                 $this->setMark($cID, $mark);
             }
             return true;
         }
         return false;
-
-        // TODO </refactor>
     }
 
 

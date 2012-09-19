@@ -178,49 +178,8 @@ else {
 
 // persist rubric data
 if(isset($rubric)) {
-
-    // TODO refactor this SQL into handlers or DMs or something...BUT IT CANNOT LIVE HERE!!!
-    $db = Database::getInstance();
-
-    // 0) invalidate existing marks if required
-    if(isset($invalidateExistingMarks) && $invalidateExistingMarks === true) {
-        $stmt = $db->prepare("UPDATE rubric_mark SET valid = 0 WHERE submission_box_id = :sbid");
-        $stmt->execute(array('sbid' => $submissionBoxID));
-    }
-
-    // 1) remove existing rubric_usage entries for this submissionbox
-    $stmt = $db->prepare("DELETE FROM rubric_usage WHERE submission_box_id = :sbid");
-    $stmt->execute(array('sbid' => $submissionBoxID));
-
-    // 2) add the rubric usages for this submission box
-    $stmt = $db->prepare("INSERT INTO rubric_usage VALUES (:cid, :sbid)");
-    if($rubric->getCriteriaCount()) {
-        foreach($rubric->getCriteriaIndices() as $i) {
-            $stmt->execute(array(
-                'cid'  => $i,
-                'sbid' => $submissionBoxID
-            ));
-        }
-    }
-
-    // 3) add the descriptors into into the database, if necessary
-    // the ResultSetRubric doesn't need any additional data stored
-    if($rubric instanceof DueWork_Rubric_DescriptorRubric) {
-        $stmt = $db->prepare("INSERT INTO rubric_descriptor VALUES (:cid, :sbid, :val, :descr) ON DUPLICATE KEY UPDATE `description` = :descr");
-
-        if($rubric->getCriteriaCount() && $rubric->getResultCount()) {
-            foreach($rubric->getCriteriaIndices() as $i) {
-                foreach($rubric->getResultIndices() as $j) {
-                    $stmt->execute(array(
-                        'cid'   => $i,
-                        'sbid'  => $submissionBoxID,
-                        'val'   => $j,
-                        'descr' => $rubric->getResult($i, $j)->getDescription()
-                    ));
-                }
-            }
-        }
-    }
+    $rubricHandler = new DueWork_Rubric_Handler();
+    $rubricHandler->persistRubric($rubric, isset($invalidateExistingMarks) ? $invalidateExistingMarks : false, $submissionBoxID);
 }
 
 $page->localRedir('/submission/listSubmission/');

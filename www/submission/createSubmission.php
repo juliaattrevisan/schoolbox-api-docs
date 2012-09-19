@@ -26,6 +26,7 @@ else {
 $this->setVar('category_select_block', '');
 
 $subBoxHandler = new Submission();
+$rubricHandler = new DueWork_Rubric_Handler();
 
 // IF PRE-EXISTING
 if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
@@ -46,10 +47,6 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         'id'   => 'TYPE_VALUE'
     ));
 
-    $resultSetID = $subbox['rubric_result_set'];
-    $criteriaArray = array();
-    $descriptorArray = array();
-
     // legacy support
     if($subbox['mark_type_slug'] == 'free') {
         $this->setVar('marktype_block', '');
@@ -63,39 +60,27 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         ));
 
         if($subbox['mark_type_slug'] == 'rubric') {
-            $rubric = $subBoxHandler->getRubric($subbox['id']);
+            $rubric = $rubricHandler->getRubric($subbox['id']);
+            $resultSetID = $subbox['rubric_result_set'];
 
-            $criteriaArray = $rubric->getCriteriaIndices();
-
-            if($rubric instanceof DueWork_Rubric_DescriptorRubric) {
-                $descriptorArray = $rubric->getResultIndices();
+            if($rubricHandler->marksAlreadyGiven($subbox['id'])) {
+                $this->parse('existing_marks_warning_block', 'existing_marks_warning');
             }
+            else {
+                $this->setVar('existing_marks_warning_block', '');
+            }
+
+            $criteria = $rubric->getCriteriaIndices();
+            $results = $rubric->getResults();
+            $resultCount = $rubric->getResultCount();
+
+            outputCriteria($this, $subbox['category'], $criteria, $results, $resultCount);
+            outputResultSets($this, $resultSetID, $resultCount);
+
         }
     }
 
-    // TODO <refactor>
-
-    // ascertain whether or not any marks have already been given
-    $stmt = Database::getInstance()->prepare("SELECT COUNT(DISTINCT student_id) FROM `rubric_mark` WHERE `submission_box_id` = :sbid");
-    $stmt->execute(array('sbid' => $subbox['id']));
-    if($stmt->fetchColumn()) {
-        $this->parse('existing_marks_warning_block', 'existing_marks_warning');
-    }
-    else {
-        $this->setVar('existing_marks_warning_block', '');
-    }
-
-    $stmt = Database::getInstance()->prepare("SELECT criterion_id FROM rubric_usage WHERE submission_box_id = :sbid");
-    $stmt->execute(array('sbid' => $subbox['id']));
-    while($cID = $stmt->fetchColumn()) {
-        $criteriaArray[] = $cID;
-    }
-
-    outputResultSets($this, $resultSetID, outputCriteria($this, $subbox['category'], $criteriaArray, $descriptorArray));
-    // TODO </refactor>
-
     $this->parse('marktype_block', 'marktype');
-
 
     /* Convert times */
     $open_date = strtotime($subbox['open_date']);
@@ -245,12 +230,10 @@ else if($this->arg[0] == 'new') {
         'slug'         => 'MARKTYPE_SLUG'
     ));
 
-    // TODO <refactor>
-    outputResultSets($this, -1, outputCriteria($this, $this->arg[1], array(), array()));
-    // TODO </refactor>
+    outputResultSets($this);
+    outputCriteria($this, $this->arg[1], array(), array());
 
     $this->parse('marktype_block','marktype');
-
 
 
     /* Convert times */
@@ -295,41 +278,40 @@ else {
     error(2);
 }
 
-// TODO <refactor>
-function outputResultSets(SitePage $page, $checkedIndex, $descriptorSelected) {
-    $rs = array();
 
-    $sql = "
-        SELECT `resultset_id`, `value`, `label`
-        FROM `rubric_result`
-        ORDER BY `resultset_id` ASC, `value` ASC";
 
-    $result = Database::getInstance()->query($sql);
-    while($row = $result->fetch(PDO::FETCH_NUM)) {
-        $rs[$row[0]][$row[1]] = $row[2];
-    }
+
+
+
+
+
+function outputResultSets(SitePage $page, $checkedIndex = -1, $descriptorCount = 2) {
+    $rubricHandler = new DueWork_Rubric_Handler();
+    $rs = $rubricHandler->getResultSets();
 
     $page->setVar('resultset_block', '');
 
-    foreach($rs as $i => $set) {
-        $page->setVar('result_block', '');
-        foreach($set as $item) {
-            $page->setVar(array(
-                'RS_ID'           => $i,
-                'RS_RESULT_LABEL' => $item,
-                'RS_CHECKED'      => $i == $checkedIndex ? 'checked="checked"' : ''
-            ));
-            $page->parse('result_block', 'result', true);
+    if(count($rs)) {
+        foreach($rs as $i => $set) {
+            $page->setVar('result_block', '');
+            foreach($set as $item) {
+                $page->setVar(array(
+                    'RS_ID'           => $i,
+                    'RS_RESULT_LABEL' => $item,
+                    'RS_CHECKED'      => $i == $checkedIndex ? 'checked="checked"' : ''
+                ));
+                $page->parse('result_block', 'result', true);
+            }
+            $page->parse('resultset_block', 'resultset', true);
         }
-        $page->parse('resultset_block', 'resultset', true);
     }
 
-    // Output descriptor count drop down
+    // Output descriptor count drop down from 2-6
     $desCounts = array();
     for($i = 2; $i < 7; ++$i) {
         $desCounts[] = array('value' => $i);
     }
-    $page->dropdown('des_count', $desCounts, $descriptorSelected, 'marktype', array(
+    $page->dropdown('des_count', $desCounts, $descriptorCount, 'marktype', array(
         'value'  => 'DES_COUNT_VALUE',
     ));
 
@@ -337,35 +319,18 @@ function outputResultSets(SitePage $page, $checkedIndex, $descriptorSelected) {
 }
 
 
-function outputCriteria(SitePage $page, $catID, $checkedIDs, $descriptors) {
-    $crits = array();
+function outputCriteria(SitePage $page, $catID, $checkedIDs, $descriptors, $descriptorCount = 2) {
 
-    $desCount = -1;
+    $rubricHandler = new DueWork_Rubric_Handler();
 
-    $sql = "
-        SELECT `grouping`, `id`, `name`
-        FROM `rubric_criterion`
-        WHERE `parent_id` = :pid
-        AND `parent_type` = :ptype
-        ORDER BY `grouping` ASC, `name` ASC";
-
-    $stmt = Database::getInstance()->prepare($sql);
-    $stmt->execute(array(
-        'pid'   => $catID,
-        'ptype' => 'category'
-    ));
-
-    while($row = $stmt->fetch(PDO::FETCH_NUM)) {
-        $crits[$row[0]][$row[1]] = $row[2];
-        $desCount = max($desCount, count($crits[$row[0]]));
-    }
+    $crits = $rubricHandler->getAvailableCriteria($catID);
 
     $page->setVar('criterion_block','');
     foreach($crits as $group => $elements) {
         foreach($elements as $id => $elem) {
             $page->setVar(array(
                 'CRIT_ID'      => $id,
-                'CRIT_SLUG'    => str_replace(' ','',strtolower("crit[$id]")),
+                'CRIT_SLUG'    => "crit[$id]",
                 'CRIT_LABEL'   => "$group - $elem",
                 'CRIT_CHECKED' => in_array($id, $checkedIDs) ? 'checked="checked"' : ''
             ));
@@ -373,16 +338,16 @@ function outputCriteria(SitePage $page, $catID, $checkedIDs, $descriptors) {
             $page->setVar('crit_input_block', '');
 
             if(is_array($descriptors[$id])) {
-                foreach($descriptors[$id] as $description) {
+                foreach($descriptors[$id] as $descriptor) {
                     $page->setVar(array(
-                        'CRIT_INPUT_VALUE' => $description
+                        'CRIT_INPUT_VALUE' => $descriptor->getDescription()
                     ));
                     $page->parse('crit_input_block','crit_input', true);
                 }
             }
             // disply blank inputs, they weren't used
             else {
-                for($i = 0; $i < $desCount; ++$i) {
+                for($i = 0; $i < $descriptorCount; ++$i) {
                     $page->setVar('CRIT_INPUT_VALUE');
                     $page->parse('crit_input_block','crit_input', true);
 
@@ -392,8 +357,6 @@ function outputCriteria(SitePage $page, $catID, $checkedIDs, $descriptors) {
             $page->parse('criterion_block','criterion', true);
         }
     }
-    return $desCount;
 }
-// TODO </refactor>
 
 ?>

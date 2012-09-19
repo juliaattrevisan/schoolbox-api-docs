@@ -43,4 +43,16 @@ class DueWork_Rubric_DescriptorRubric extends DueWork_Rubric_Abstract {
         $keys = array_keys($this->descriptors);
         return array_keys($this->descriptors[$keys[0]]);
     }
+
+    public function getResults($criterionID = 0) {
+        if($criterionID) {
+            if(isset($this->descriptors[$criterionID])) {
+                return $this->descriptors[$criterionID];
+            }
+            return array();
+        }
+        else {
+            return $this->descriptors;
+        }
+    }
 }

@@ -1,0 +1,346 @@
+<?php
+/**
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+class DueWork_Rubric_Handler {
+
+    private $db;
+
+    public function __construct() {
+        $this->db = Database::getInstance();
+    }
+
+
+    /**
+     * @param $boxID
+     * @return DueWork_Rubric_Abstract
+     */
+    public function getRubric($boxID) {
+
+        // setup
+        $criteria = array();
+        $results = array();
+        $resultCounts = array();
+
+        // <SQL>
+        $sql = "
+            SELECT
+                c.id c_id, c.grouping c_grouping, c.name c_name,
+                sb.`rubric_result_set` sb_resultset,
+                r.value r_value, r.label r_label,
+                d.value d_value, d.`description` d_description
+            FROM rubric_usage u
+                LEFT JOIN `submission_box` sb
+                    ON u.`submission_box_id` = sb.id
+                LEFT JOIN rubric_criterion c
+                    ON u.`criterion_id` = c.id
+                LEFT JOIN rubric_result r
+                    ON r.`resultset_id` = sb.`rubric_result_set`
+                    AND sb.`rubric_result_set` > 0
+                LEFT JOIN rubric_descriptor d
+                    ON d.`criterion_id` = u.`criterion_id`
+                    AND d.`submission_box_id` = u.`submission_box_id`
+                    AND sb.`rubric_result_set` = 0
+            WHERE u.submission_box_id = :sbid
+            AND d.`valid` = 1
+            ORDER BY c.id ASC, r.value ASC, d.value ASC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(array('sbid' => $boxID));
+        // </SQL>
+
+
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            // if criterion doesn't yet exist, create it
+            if(!isset($criteria[$row['c_id']])) {
+                $criteria[$row['c_id']] = new DueWork_Rubric_Criterion($row['c_id'], $row['c_grouping'], $row['c_name']);
+            }
+
+            ++$resultCounts[$row['c_id']];
+
+            // use resultset
+            if($row['sb_resultset']) {
+                $results[$row['c_id']][$row['r_value']] = new DueWork_Rubric_Result($row['r_label'], $row['r_value']);
+            }
+            // use descriptors
+            else {
+                $results[$row['c_id']][$row['d_value']] = new DueWork_Rubric_Descriptor($row['d_description'], $row['d_value']);
+            }
+        }
+
+        // the 2nd dimension of $results must all be the same size: get the min size and truncate if required
+        $size = min($resultCounts);
+
+        foreach($results as $cID => $foo) {
+            $results[$cID] = array_slice($results[$cID], 0, $size);
+        }
+
+        // create factory
+        $rubricFactory = new DueWork_Rubric_Factory($criteria);
+
+        return $rubricFactory->buildRubric($results, $boxID);
+
+    }
+
+    public function getStudentMarks($studentID, $boxID, $set = 0) {
+        $stmt = Database::getInstance()->prepare("
+            SELECT criterion_id, mark, UNIX_TIMESTAMP(tstamp) AS tstamp
+            FROM rubric_mark
+            WHERE student_id = :sid
+            AND submission_box_id = :sbid
+            AND valid = 1
+            ORDER BY tstamp DESC, criterion_id ASC
+        ");
+
+        $stmt->execute(array(
+            'sid'  => $studentID,
+            'sbid' => $boxID
+        ));
+
+        $marks = array();
+
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $marks[$row['tstamp']][$row['criterion_id']] = $row['mark'];
+        }
+
+        // remove timetstamps and replace with indices
+        $marks = array_values($marks);
+        if(isset($marks[$set])) {
+            return $marks[$set];
+        }
+        return array();
+    }
+
+    public function populateResultSet(DueWork_Rubric_ResultSet $resultSet, $resultSetID) {
+        $stmt = $this->db->prepare("SELECT `value`, `label` FROM `rubric_result` WHERE `resultset_id` = :rsid");
+
+        $stmt->execute(array('rsid' => $resultSetID));
+
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $resultSet->addResult(new DueWork_Rubric_Result($row['label'], $row['value']));
+        }
+    }
+
+    public function populateCriteria($criterionList) {
+
+        $returnList = array();
+
+        // prepare statement for retrieving criteria if it turns out to be required
+        $stmt = Database::getInstance()->prepare("SELECT `id`, `grouping`, `name` FROM `rubric_criterion` WHERE `id` = :cid");
+
+        // insert criteria into rubric
+        foreach($criterionList as $id => $checked) {
+            if($checked instanceof DueWork_Rubric_Criterion) {
+                $returnList[$id] = $checked;
+            }
+            // if the criterion is just an index, retrieve it from the db and replace
+            elseif($checked && is_numeric($checked)) {
+                $stmt->execute(array('cid' => $id));
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                $returnList[$id] = new DueWork_Rubric_Criterion($row['id'], $row['grouping'], $row['name']);
+            }
+        }
+        return $returnList;
+    }
+
+    /**
+     * @param $boxID
+     * @return bool
+     */
+    public function marksAlreadyGiven($boxID) {
+        $stmt = $this->db->prepare("SELECT COUNT(DISTINCT student_id) FROM `rubric_mark` WHERE `submission_box_id` = :sbid");
+        $stmt->execute(array('sbid' => $boxID));
+        return $stmt->fetchColumn() ? true : false;
+    }
+
+    /**
+     * @param $parentID
+     * @param string $parentType
+     * @return array
+     */
+    public function getAvailableCriteria($parentID, $parentType = 'category') {
+        $sql = "
+            SELECT `grouping`, `id`, `name`
+            FROM `rubric_criterion`
+            WHERE `parent_id` = :pid
+            AND `parent_type` = :ptype
+            ORDER BY `grouping` ASC, `name` ASC
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(array(
+            'pid'   => $parentID,
+            'ptype' => $parentType
+        ));
+
+        $crits = array();
+        while($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $crits[$row[0]][$row[1]] = $row[2];
+        }
+        return $crits;
+    }
+
+    /**
+     * @return array
+     */
+    public function getResultSets() {
+        $sql = "
+            SELECT `resultset_id`, `value`, `label`
+            FROM `rubric_result`
+            ORDER BY `resultset_id` ASC, `value` ASC
+        ";
+
+        $rs = array();
+
+        $result = $this->db->query($sql);
+        while($row = $result->fetch(PDO::FETCH_NUM)) {
+            $rs[$row[0]][$row[1]] = $row[2];
+        }
+
+        return $rs;
+    }
+
+    public function saveMarks($marks, $studentID, $boxID, $stamp = 0) {
+        if($stamp) {
+            return $this->updateMarks($marks, $studentID, $boxID, $stamp);
+        }
+        else {
+            return $this->createMarks($marks, $studentID, $boxID);
+        }
+    }
+
+    public function createMarks($marks, $studentID, $boxID) {
+        $stmt = $this->db->prepare("
+            INSERT INTO rubric_mark (`student_id`,`submission_box_id`, `criterion_id`, `mark`)
+            VALUES (:sid, :sbid, :cid, :mark)
+            ON DUPLICATE KEY UPDATE mark = :mark
+        ");
+
+        foreach($marks as $cID => $mark) {
+            $stmt->execute(array(
+                'sid'  => $studentID,
+                'sbid' => $boxID,
+                'cid'  => $cID,
+                'mark' => $mark
+            ));
+        }
+        return true;
+    }
+
+    public function updateMarks($marks, $studentID, $boxID, $stamp) {
+        $stmt = $this->db->prepare("
+            UPDATE rubric_mark
+            SET `mark` = :mark
+            WHERE student_id = :sid
+            AND submission_box_id = :sbid
+            AND criterion_id = :cid
+            AND tstamp = :stamp
+            AND valid = 1
+        ");
+
+        foreach($marks as $cID => $mark) {
+            $stmt->execute(array(
+                'mark'  => $mark,
+                'sid'   => $studentID,
+                'sbid'  => $boxID,
+                'cid'   => $cID,
+                'stamp' => $stamp
+            ));
+        }
+        return true;
+    }
+
+    public function getLatestMarkTimestamp($studentID, $boxID) {
+        $db = Database::getInstance();
+        $stmt = $db->prepare("
+            SELECT MAX(tstamp) FROM rubric_mark
+            WHERE student_id = :sid
+            AND submission_box_id = :sbid
+            AND valid = 1
+        ");
+
+        $stmt->execute(array(
+            'sid'  => $studentID,
+            'sbid' => $boxID,
+        ));
+
+        return $stmt->fetchColumn();
+    }
+
+    /**
+     * @param $rubric DueWork_Rubric_Abstract
+     * @param $invalidateExistingMarks bool
+     * @param $submissionBoxID int
+     */
+    public function persistRubric($rubric, $invalidateExistingMarks, $submissionBoxID) {
+
+        // 0) invalidate existing marks if required
+        if(isset($invalidateExistingMarks) && $invalidateExistingMarks === true) {
+            $stmt = $this->db->prepare("
+                UPDATE rubric_mark
+                SET valid = 0
+                WHERE submission_box_id = :sbid
+            ");
+            $stmt->execute(array('sbid' => $submissionBoxID));
+        }
+
+        // 1) remove existing rubric_usage entries for this submissionbox for data integrity
+        $stmt = $this->db->prepare("
+            DELETE FROM rubric_usage
+            WHERE submission_box_id = :sbid
+        ");
+        $stmt->execute(array('sbid' => $submissionBoxID));
+
+        // 2) add the rubric usages for this submission box
+        $stmt = $this->db->prepare("
+            INSERT INTO rubric_usage
+            VALUES (:cid, :sbid)
+        ");
+        if($rubric->getCriteriaCount()) {
+            foreach($rubric->getCriteriaIndices() as $i) {
+                $stmt->execute(array(
+                    'cid'  => $i,
+                    'sbid' => $submissionBoxID
+                ));
+            }
+        }
+
+        // 3) add the descriptors into into the database, if necessary
+        // the ResultSetRubric doesn't need any additional data stored
+        if($rubric instanceof DueWork_Rubric_DescriptorRubric) {
+            // invalidate any existing descriptors for this submission box, and we will revalidate any ones we will use
+            $stmt = $this->db->prepare("
+                UPDATE rubric_descriptor
+                SET valid = 0
+                WHERE submission_box_id = :sbid
+            ");
+            $stmt->execute(array('sbid' => $submissionBoxID));
+
+            // insert nonexistent descriptors, or replace existing ones with their new descriptions
+            $stmt = $this->db->prepare("
+                INSERT INTO rubric_descriptor (`criterion_id`,`submission_box_id`,`value`,`description`)
+                VALUES (:cid, :sbid, :val, :descr)
+                ON DUPLICATE KEY UPDATE `description` = :descr, `valid` = 1
+            ");
+            if($rubric->getCriteriaCount() && $rubric->getResultCount()) {
+                foreach($rubric->getCriteriaIndices() as $i) {
+                    foreach($rubric->getResultIndices() as $j) {
+                        $subst = array(
+                            'cid'   => $i,
+                            'sbid'  => $submissionBoxID,
+                            'val'   => $j,
+                            'descr' => $rubric->getResult($i, $j)->getDescription()
+                        );
+                        print_r($subst);
+                        $stmt->execute($subst);
+                    }
+                }
+            }
+        }
+
+    }
+}

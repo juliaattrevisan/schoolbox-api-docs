@@ -29,6 +29,7 @@ class DueWork_Rubric_Factory {
         }
         else {
             if(!($size = count($specification))) {
+                echo "ZERO SPECIFICATION\n";
                 return null;
             }
 
@@ -36,6 +37,7 @@ class DueWork_Rubric_Factory {
             $keys = array_keys($specification);
             for($i = 1; $i < $size; ++$i) {
                 if(get_class($specification[$keys[$i]][0]) != get_class($specification[$keys[$i - 1]][0])) {
+                    echo "SPECIFICATION ELEMENTS ARE INCONSISTENT\n";
                     return null;
                 }
             }
@@ -48,6 +50,7 @@ class DueWork_Rubric_Factory {
                 $rubric = new DueWork_Rubric_DescriptorRubric($submissionBoxID);
             }
             else {
+                echo "SPECIFICATION IS OF UNKNOWN TYPE\n";
                 return null;
             }
         }
@@ -61,22 +64,13 @@ class DueWork_Rubric_Factory {
             }
         }
 
-        // prepare statement for retrieving criteria if it turns out to be required
-        $stmt = Database::getInstance()->prepare("SELECT `id`, `grouping`, `name` FROM `rubric_criterion` WHERE `id` = :cid");
+        $rubricHandler = new DueWork_Rubric_Handler();
+        $this->criteria = $rubricHandler->populateCriteria($this->criteria);
 
-        // insert criteria into rubric
-        foreach($this->criteria as $id => $checked) {
-            // if the criterion in question has been retrieved and created, just insert it
-            if($checked instanceof DueWork_Rubric_Criterion) {
-                $rubric->addCriterion($checked);
-            }
-            // otherwise, use it as an ID, retrieve, create and insert
-            elseif($checked) {
-                $stmt->execute(array('cid' => $id));
-                $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                $rubric->addCriterion(new DueWork_Rubric_Criterion($row['id'], $row['grouping'], $row['name']));
-            }
+        foreach($this->criteria as $criterion) {
+            $rubric->addCriterion($criterion);
         }
+
         return $rubric;
     }
 

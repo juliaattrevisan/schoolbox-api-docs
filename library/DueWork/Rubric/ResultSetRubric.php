@@ -39,4 +39,8 @@ class DueWork_Rubric_ResultSetRubric extends DueWork_Rubric_Abstract {
     public function addResult($criterionID, $resultObject) {
         $this->resultSet->addResult($resultObject);
     }
+
+    public function getResults($criterionID = 0) {
+        return $this->resultSet->getResults();
+    }
 }

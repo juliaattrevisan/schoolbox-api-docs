@@ -13,6 +13,7 @@ $this->setTitle('Return Student Work');
 $this->setTab('submission');
 
 $subHandler = new Submission;
+$rubricHandler = new DueWork_Rubric_Handler();
 $userHandler = new User;
 
 if(is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
@@ -46,7 +47,7 @@ if(is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
         $this->setVar("mark_type_{$type['slug']}_block", '');
     }
 
-    $rubric = $subHandler->getRubric($subbox['id']);
+    $rubric = $rubricHandler->getRubric($subbox['id']);
 
     $rubricMark = new DueWork_Rubric_Mark($rubric);
     $rubricMark->populateMarks($user['uid']);

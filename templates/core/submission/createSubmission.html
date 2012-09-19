@@ -13,21 +13,8 @@
 
 
 	$j(function() {
-        var marktype = {
-            total: $j('#marktype-total'),
-            rubric: $j('#marktype-rubric')
-        };
 
-        var rubric = {
-            resultset: $j('#rubric-results :checked')
-        };
-
-        showHideMarktype(0);
-        $j('#rubric-criteria').find('p').each(function() {
-            descriptor('show', this, 0);
-        });
-
-
+        // setup file input
 		$j('.prettify').prettyFileInput({
 			additionalButtonClasses: 'no-marg float-left',
 			buttonActiveClass: 'tick',
@@ -35,6 +22,7 @@
 			defaultFileSelectedText: '<span></span>File selected'
 		});
 
+        // setup datepickers
         $j('#open_date, #due_date, #late_date').datepicker({
 			dateFormat: 'dd/mm/yy',
 			showOn: 'both',
@@ -49,6 +37,25 @@
                 })
             }
 		});
+
+        var marktype = {
+            total: $j('#marktype-total'),
+            rubric: $j('#marktype-rubric')
+        };
+
+        var rubric = {
+            resultset: $j('#rubric-results :checked')
+        };
+
+        showHideMarktype(0);
+
+        if(document.getElementById('rs-0').checked) {
+            $j('#rubric-criteria').find('.crit').each(function() {
+                if($j(this).find(':checked').length) {
+                    descriptor('show', this, 0);
+                }
+            });
+        }
 
         $j('#marktype').change(function() {
             showHideMarktype(500);
@@ -95,10 +102,10 @@
 
         // trigger show or hide of descriptors when radio off
         $j('#rubric-results input').change(function() {
-            var v = $j('#rs-0').attr('checked');
+            var v = document.getElementById('rs-0').checked;
 
             // hide the descriptors
-            if(v === undefined) {
+            if(!v) {
                 descriptor('hide', $j('#rubric-criteria div'), 100);
             }
             // show them if checked
@@ -210,13 +217,19 @@
     #ui-datepicker-div {
         display: none;
     }
-    .warning {
+    div.warning {
         color: #a33;
         margin-top: 8px;
     }
     .warning ul {
         list-style-type: disc;
         margin-left: 20px;
+    }
+    .warning li {
+        color: #000;
+    }
+    .warning li.warning {
+        color: #a33;
     }
     img.mimetype {
         position: relative;
@@ -353,9 +366,9 @@
                 <!-- BEGIN existing_marks_warning -->
                 <div class="warning"><b>Warning:</b> you have already marked some students' work.
                     <ul>
-                        <li>Changing the number of descriptors, or the result set, will invalidate any existing marks given;</li>
+                        <li class="warning">Changing the number of descriptors&mdash;or the result set&mdash;will invalidate any existing marks given;</li>
                         <li>You can safely add/remove criteria;</li>
-                        <li>You can safely change wordings of descriptors.</li>
+                        <li>You can safely change wordings and orders of descriptors.</li>
                     </ul>
                     </div>
                 <!-- END existing_marks_warning -->
