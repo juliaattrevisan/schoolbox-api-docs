@@ -6363,3 +6363,18 @@ DELETE FROM `allowedFileExtension` WHERE fileTypeID = '0';
 
 UPDATE `config` SET value='12.0.4' WHERE name='site_version';
 
+/* Fix spelling errors in tooltips for config options */
+UPDATE config SET description='The maximum size of a single file that can be uploaded. Accepts formats like 40M and 1GB.' WHERE name='max_file_size';
+/* Add weather API key to config */
+INSERT INTO `config` (`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES
+('weather_api_key','784036067287ef7a','Weather API Key','A key generated in the Wunderground administration interface','input','','External DB','false','false','true'),
+('weather_api_caching','1800','Weather API Update Frequency','How long weather data should be cached for before being re-queried','input','','External DB','false','true','true');
+
+UPDATE `homepage_comp` SET `config`='a:3:{s:5:"pixel";s:3:"200";s:12:"captionState";s:6:"Active";s:6:"timing";i:5;}' WHERE `method`='outputScroller';
+
+/* Once off cleanup of userCampus table due to deleted users [SB-1369] */
+DELETE userCampus.* FROM userCampus LEFT JOIN user ON uid = id WHERE id IS NULL;
+
+UPDATE `config` SET value='12.0.5' WHERE name='site_version'
+
+
