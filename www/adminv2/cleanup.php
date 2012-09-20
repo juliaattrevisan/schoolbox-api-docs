@@ -2,9 +2,14 @@
 /* This class has functions for cleaning up the database at the end of the year */
 /* this includes removing deleted files, expired news, logs and submission boxes */
 
-//require_once("../include/include.php");
-//require_once("../include/session.php");
-//require_once("../include/adminonly.php");
+if(!isset($this)) {
+    die('fail');
+}
+
+$group = new Group();
+if ( !$group->isSuperuser() ) {
+    error(19);
+}
 
 class clean {
 	function clean()
@@ -48,7 +53,7 @@ class clean {
      */
     function cleanSubmissionBoxes()
 	{
-        error(0,'This function has been deprecated. Submission boxes are now archived, not deleted.');
+        error(9, 'This function has been deprecated. Submission boxes are now archived, not deleted.');
 
 //		//unlink all student submissions
 //		$query = "SELECT id FROM student_submission";
@@ -75,7 +80,7 @@ class clean {
      */
     function cleanReturnedWork()
 	{
-        error(0,'This function has been deprecated. Submission boxes are now archived, not deleted.');
+        error(9, 'This function has been deprecated. Submission boxes are now archived, not deleted.');
 
 //		$query = "SELECT id FROM submission_return";
 //		$this->db->query($query);
@@ -214,31 +219,24 @@ class clean {
 
 }
 
-$clean = new clean;
-
-if(!isset($this)) {
-    if($_GET['news'] == 1)
-        $clean->cleanNews();
-    if($_GET['calendar'] == 1)
-        $clean->cleanCalendar();
-    if($_GET['subnews'] == 1)
-        $clean->cleanSubNews();
-    if($_GET['file'] == 1)
-        $clean->cleanDeletedFiles();
-    if($_GET['loginlog'] == 1)
-        $clean->cleanLoginLog();
-    if($_GET['log'] == 1)
-        $clean->cleanLogs();
-    if($_GET['submission'] == 1)
-        $clean->cleanSubmissionBoxes();
-    if($_GET['return'] == 1)
-        $clean->cleanReturnedWork();
-    if($_GET['rolluser'] == 1)
-        $clean->rollStudents();
-    if($_GET['fileclean'] == 1)
-        $clean->cleanFileSystem();
-    if($_GET['thumbnail'] == 1)
-        $clean->cleanThumbnails();
+if(count($this->arg)) {
+    $clean = new clean;
+    foreach($this->arg as $arg) {
+        switch($arg) {
+            case 'news':     $clean->cleanNews(); break;
+            case 'calendar': $clean->cleanCalendar(); break;
+            case 'subnews':  $clean->cleanSubNews(); break;
+            case 'file':     $clean->cleanDeletedFiles(); break;
+            case 'loginlog': $clean->cleanLoginLog(); break;
+            case 'log':      $clean->cleanLogs(); break;
+            case 'rolluser': $clean->rollStudents(); break;
+            case 'fileclean': $clean->cleanFileSystem(); break;
+            case 'thumbnail': $clean->cleanThumbnails(); break;
+            default: $this->localRedir('/adminv2/cleanup');
+        }
+    }
+    echo '<a href="/adminv2/cleanup">Return to admin</a>';
+    die();
 }
 else {
     $this->setTitle('Admin - Cleanup');
