@@ -1,0 +1,146 @@
+<!-- BEGIN custom_head -->
+<style type="text/css">
+    #crit-list {
+        max-width: 350px;
+    }
+    #crit-list input {
+        border: solid 1px #ccc;
+        font-size: 12px;
+        padding: 2px;
+        width: 200px;
+    }
+    #crit-list input[disabled=disabled] {
+        background: transparent;
+        color: #222;
+        border: solid 1px transparent;
+    }
+    #crit-list input.group {
+        font-weight: bold;
+        margin-top: 12px;
+    }
+    #crit-list input.item {
+        margin-left: 10px;
+    }
+    #crit-list .crit-delete {
+        display: block;
+        float: right;
+    }
+    #crit-list li.group.new ul,
+    #crit-list li.item.new .delete {
+        display: none;
+    }
+    .btn.no-text.delete {
+        height: 19px;
+        padding-right: 24px;
+        right: 65px;
+        top: -2px;
+    }
+    .btn.no-text.delete span {
+        top: 3px;
+        left: 5px;
+    }
+
+</style>
+<script type="text/javascript">
+$j(function() {
+
+    // logic for adding new inputs
+    $j('#crit-list input.new').keyup(function() {
+        if(this.value.length > 0) {
+            var input = $j(this);
+            var li = input.parent();
+
+            var newli = li.clone(true, true);
+            newli.find('input').val('');
+            input.attr('placeholder', '');
+
+            newli.appendTo(li.parent());
+            input.removeClass('new');
+            li.removeClass('new');
+            input.unbind('keyup');
+        }
+    });
+
+    // logic for removing inputs
+    $j('#crit-list .delete').click(function(e) {
+        var self = $j(this);
+        var target = self.parent('.item');
+        target.remove();
+        e.preventDefault();
+    });
+
+});
+</script>
+<!-- END custom_head -->
+<h1>{PAGE_TITLE}</h1>
+<form action="/cms/categoryForm.php" method="post" id="folderForm" class="clearfix">
+    <table class="standardForm" >
+        <tr>
+            <td class="formLabelWidth"><h4>Folder</h4></td>
+            <td>{CATEGORY_NAME}</td>
+        </tr>
+        <!-- BEGIN allow_cascade -->
+        <tr>
+            <td>
+                <h4>Subfolders</h4>
+                <em>Should these criteria be made available to this folder's subfolders?</em>
+            </td>
+            <td>
+                <input type="hidden" name="cascade" value="0" />
+                <input type="checkbox" name="cascade" value="1" />
+            </td>
+        </tr>
+        <!-- END allow_cascade -->
+        <tr>
+            <td>
+                <h4>Criteria</h4>
+                <em>Add and remove criteria.<br/><br/>
+                    If you want to delete a criterion that has already been used on an assessment, you need to first
+                    remove it from the assessment, then you can delete it.<br/><br/>
+                    If you remove all the criteria from a group, the group will automatically be deleted.
+                </em>
+            </td>
+            <td>
+                <ul id="crit-list">
+                <!-- BEGIN criterion_group -->
+                <li class="group">
+                    <input class="group" type="text" value="{CRITGROUP_NAME}" />
+                    <ul>
+                        <!-- BEGIN criterion -->
+                        <li class="item">
+                            &rsaquo;
+                            <!-- BEGIN criterion_enabled -->
+                            <input class="item" type="text" value="{CRITERION_NAME}" />
+                            <a title="Delete criterion" class="btn no-text delete" href="#"><span></span></a>
+                            <!-- END criterion_enabled -->
+                            <!-- BEGIN criterion_disabled -->
+                            <input class="item" type="text" value="{CRITERION_NAME}" disabled="disabled" />
+                            <span>(used {CRITERION_USAGE})</span>
+                            <!-- END criterion_disabled -->
+                        </li>
+                        <!-- END criterion -->
+                        <li class="item new">
+                            &rsaquo;
+                            <input class="item new" type="text" value="" placeholder="Add Criterion to {CRITGROUP_NAME}..." />
+                            <a title="Delete criterion" class="btn no-text delete" href="#"><span></span></a>
+                        </li>
+                    </ul>
+                </li>
+                <!-- END criterion_group -->
+                <li class="group new">
+                    <input class="group new" type="text" value="" placeholder="Add Group..." />
+                    <ul>
+                        <li class="item new">
+                            &rsaquo;
+                            <input class="item new" type="text" value="" placeholder="Add Criterion..." />
+                            <a title="Delete criterion" class="btn no-text delete" href="#"><span></span></a>
+                        </li>
+                    </ul>
+                </li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+    <input type="submit" label="Submit" name="submit" value="Save Changes" class="submit-btn-plain"/>
+</form>

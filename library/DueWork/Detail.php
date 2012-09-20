@@ -257,8 +257,7 @@ class DueWork_Detail {
                             'SUBMISSION_PLAG_SCORE' => sprintf("%d%%", $submission['score']),
                             'SUBMISSION_PLAG_CLASS' => $plagClass,
                             'SUBMISSION_PLAG_HREF' => $submission['plag_doc_id'],
-                            'SUBMISSION_EXPANDABLE' => $this->getSubmissionType(
-                            ) == self::ACCEPT_MULTI ? 'hide expandable' : '',
+                            'SUBMISSION_EXPANDABLE' => $this->getSubmissionType() == self::ACCEPT_MULTI ? 'hide expandable' : '',
                             'SUBMISSION_MIMEICON' => $icon
                         )
                     );

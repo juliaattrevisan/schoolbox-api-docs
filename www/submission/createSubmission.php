@@ -331,7 +331,7 @@ function outputCriteria(SitePage $page, $catID, $checkedIDs, $descriptors, $desc
             $page->setVar(array(
                 'CRIT_ID'      => $id,
                 'CRIT_SLUG'    => "crit[$id]",
-                'CRIT_LABEL'   => "$group - $elem",
+                'CRIT_LABEL'   => "$group - {$elem['name']}",
                 'CRIT_CHECKED' => in_array($id, $checkedIDs) ? 'checked="checked"' : ''
             ));
 

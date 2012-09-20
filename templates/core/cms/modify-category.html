@@ -108,7 +108,14 @@ $j(function() {
 				<em>Removes all content from modules and clears the folder contents and all its sub-folders, returning the homepage to an empty space</em></td>
 				<td><a href="/cms/category/reset/{CATEGORY_ID}" onclick="return(confirm('Are you sure you wish to delete all resources from this homepage. This includes; sub-folders, files, links, news and forum posts'));">Reset Content</a></td>
 		</tr>
-		<!-- END reset_content --> 
+		<!-- END reset_content -->
+        <!-- BEGIN rubric_criteria -->
+        <tr>
+            <td><h4>Rubric Criteria</h4>
+                <em>Manage the rubric criteria for this category</em></td>
+            <td><a href="/submission/rubricCriteria/{CATEGORY_ID}">Manage criteria</a></td>
+        </tr>
+        <!-- END rubric_criteria -->
 		<!-- BEGIN synergy_input -->
 		<tr>
 			<td><h4>{DATABASE_TYPE} Subject Codes</h4>

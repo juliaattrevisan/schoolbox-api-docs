@@ -304,9 +304,9 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
                             $this->parse('onlineAssessmentMark_block', 'onlineAssessmentMark');
                         } else {
                             /* If a UID was found for the student, try to get his
-                                    * submissions. Otherwise skip him (this occurs when he
-                                    * exists in Synergetic but not in schoolbox)
-                                    */
+                             * submissions. Otherwise skip him (this occurs when he
+                             * exists in Synergetic but not in schoolbox)
+                             */
                             if (is_numeric($student['uid'])) {
                                 $return = $retHandler->getByUser($student['uid'], $sub['id']);
 
@@ -315,6 +315,38 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
                                 $marksheet = Marksheet_Factory::build($subbox['mark_type_slug']);
                                 $mark = $marksheet->retrieveMark($student['uid'], $sub['id']);
 
+                                /**
+                                 * @param SitePage $page
+                                 * @param $handle
+                                 * @param $htmlFormID
+                                 * @param $markArray
+                                 */
+                                $templateFile = 'writable';
+                                $this->setFile('markTpl', "submission/marktype/$templateFile.html");
+                                $this->setVar(array(
+                                    'UFID'     => -1,
+                                    'OWNER_ID' => $student['uid'],
+                                    'BOX_ID'   => $sub['id']
+                                ));
+
+
+                                // blockify and clear all the marktypes
+                                foreach ($subHandler->getMarkTypes(true) as $type) {
+                                    $this->setBlock('markTpl', "mark_type_{$type['slug']}", "mark_type_{$type['slug']}_block");
+                                    $this->setVar("mark_type_{$type['slug']}_block", '');
+                                }
+
+                                // each strategy knows how to output itself
+                                $marksheet->outputUI($this, $mark);
+
+                                // render the appropriate block and parse it into the handle we were provided
+                                $slug = $marksheet->getSlug();
+                                $this->parse("mark_type_{$slug}_block", "mark_type_{$slug}");
+
+                                $this->parse('STUDENT_MARKING', 'markTpl');
+
+
+/*
                                 $marksheet->outputUI($this, $mark);
 
                                 $marktypes = $subHandler->getMarkTypes(true);
@@ -326,8 +358,8 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
                                     } else
                                         $this->setVar("mark_type_{$type['slug']}_block", '');
                                 }
+*/
 
-                                $this->setVar('BOX_ID', $sub['id']);
 
                             }
 

@@ -4349,7 +4349,7 @@ ul.js_happening {
 ul.js_happening li.translucent span {
     opacity: 0.4;
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
-    filter: alpha(opacity = 40);
+    filter: ~"alpha(opacity = 40)";
     background-image: url(/images/famicons/time.png);
     background-repeat: no-repeat;
     background-position: 80% 50%;
@@ -4358,7 +4358,7 @@ ul.js_happening li.translucent span {
 ul.js_happening li.translucent span:hover {
     opacity: 0.5;
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
-    filter: alpha(opacity = 40);
+    filter: ~"alpha(opacity = 40)";
 }
 
 ul.js_happening li span:hover {
@@ -6248,14 +6248,16 @@ table.subjectList {
             }
         }
     }
-    .btn.no-text {
-        padding: 0;
-        padding-right: 25px;
-        span {
-            left: 6px;
-        }
+}
+
+.btn.no-text {
+    padding: 0;
+    padding-right: 25px;
+    span {
+        left: 6px;
     }
 }
+
 /* ---------------------------
     submission/createSubmission
 --------------------------- */

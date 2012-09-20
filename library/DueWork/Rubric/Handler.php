@@ -162,14 +162,27 @@ class DueWork_Rubric_Handler {
      * @param string $parentType
      * @return array
      */
-    public function getAvailableCriteria($parentID, $parentType = 'category') {
-        $sql = "
-            SELECT `grouping`, `id`, `name`
-            FROM `rubric_criterion`
-            WHERE `parent_id` = :pid
-            AND `parent_type` = :ptype
-            ORDER BY `grouping` ASC, `name` ASC
-        ";
+    public function getAvailableCriteria($parentID, $parentType = 'category', $withUsageCount = false) {
+        if($withUsageCount) {
+            $sql = "
+                SELECT c.grouping, c.id, c.name, COUNT(u.submission_box_id) usecount
+                FROM rubric_criterion c
+                LEFT JOIN rubric_usage u ON c.id = u.`criterion_id`
+                WHERE c.parent_id = :pid
+                AND c.parent_type = :ptype
+                GROUP BY c.id
+                ORDER BY `grouping` ASC, `name` ASC
+            ";
+        }
+        else {
+            $sql = "
+                SELECT `grouping`, `id`, `name`
+                FROM `rubric_criterion`
+                WHERE `parent_id` = :pid
+                AND `parent_type` = :ptype
+                ORDER BY `grouping` ASC, `name` ASC
+            ";
+        }
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute(array(
@@ -179,7 +192,11 @@ class DueWork_Rubric_Handler {
 
         $crits = array();
         while($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $crits[$row[0]][$row[1]] = $row[2];
+            $val = array('name' => $row[2]);
+            if($withUsageCount) {
+                $val['count'] = $row[3];
+            }
+            $crits[$row[0]][$row[1]] = $val;
         }
         return $crits;
     }
