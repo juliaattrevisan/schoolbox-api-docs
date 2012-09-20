@@ -36,7 +36,7 @@ class Weather_Wunderground implements Weather_Interface {
 
 
     public function __construct() {
-        $this->cachePattern = SITE_root . '/data/cache/weather/wunderground.%s.cache';
+        $this->cachePattern = Cfg::get('weather_dir') . '/wunderground.%s.cache';
     }
 
     /**

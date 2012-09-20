@@ -13,7 +13,7 @@ require_once '../../include/SitePage.php';
 $page = new SitePage;
 
 $real_url = 'http://icons-ak.wxug.com/';
-$cache_path = Cfg::get('xml_dir').'/../weather/';
+$cache_path = Cfg::get('weather_dir');
 $file_path = urldecode($_GET['path']);
 
 if (is_string($file_path)) {
