@@ -65,7 +65,7 @@ class Alaress_Image_Cache_Schoolbox {
 		$this->setGroupHandler(new Group());
 
 		$this->setPlaceholder(WEB_root . '/images/core/placeholder.png');
-        $this->setCacheLocation(SITE_root . '/data/portrait');
+		$this->setCacheLocation(Cfg::get('portrait_dir'));
 
 		$this->decidePlaceholder();
 	}
