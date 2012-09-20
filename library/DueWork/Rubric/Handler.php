@@ -312,7 +312,7 @@ class DueWork_Rubric_Handler {
         // 3) add the descriptors into into the database, if necessary
         // the ResultSetRubric doesn't need any additional data stored
         if($rubric instanceof DueWork_Rubric_DescriptorRubric) {
-            // invalidate any existing descriptors for this submission box, and we will revalidate any ones we will use
+            // invalidate any existing descriptors for this submission box, and we will revalidate the ones we plan to use
             $stmt = $this->db->prepare("
                 UPDATE rubric_descriptor
                 SET valid = 0
@@ -320,7 +320,7 @@ class DueWork_Rubric_Handler {
             ");
             $stmt->execute(array('sbid' => $submissionBoxID));
 
-            // insert nonexistent descriptors, or replace existing ones with their new descriptions
+            // insert nonexistent descriptors, or replace existing ones with their new descriptions if they already exist
             $stmt = $this->db->prepare("
                 INSERT INTO rubric_descriptor (`criterion_id`,`submission_box_id`,`value`,`description`)
                 VALUES (:cid, :sbid, :val, :descr)
@@ -342,5 +342,70 @@ class DueWork_Rubric_Handler {
             }
         }
 
+        // 4) if marks have been given, the most recent needs to be updated on the submission_return table
+        // note that the display mark isn't being altered, just the normalised one
+
+        // determine the scalefactor based on how the rubric has changed
+        $max = $this->getRubricMaxScore($submissionBoxID);
+
+        // get a list of students to update
+        $stmt = $this->db->prepare("
+            SELECT DISTINCT `owner` FROM submission_return WHERE box_id = :sbid
+        ");
+        $stmt->execute(array('sbid' => $submissionBoxID));
+        $studentList = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if(count($studentList)) {
+
+            // prepare statement to retrieve updated marks
+            $stmt = $this->db->prepare("
+                UPDATE submission_return
+                SET norm_mark = (
+                    SELECT SUM(mark) AS newmark FROM (
+                        SELECT * FROM (
+                            SELECT *
+                            FROM rubric_mark
+                            WHERE submission_box_id = :sbid
+                            AND student_id = :sid
+                            AND valid = 1
+                            ORDER BY tstamp DESC
+                        ) t
+                        GROUP BY criterion_id
+                    ) u
+                ) / :max * 100
+                WHERE box_id = :sbid
+                AND `owner` = :sid
+                ORDER BY returned DESC
+                LIMIT 1
+            ");
+
+            foreach($studentList as $row) {
+                $stmt->execute(array(
+                    'sbid' => $submissionBoxID,
+                    'sid'  => $row['owner'],
+                    'max'  => $max
+                ));
+            }
+        }
     }
+
+
+    public function getRubricMaxScore($submissionBoxID) {
+        $stmt = $this->db->prepare("
+            SELECT d.value d_value, r.value r_value
+            FROM submission_box sb
+            LEFT JOIN `rubric_usage` u ON sb.id = u.`submission_box_id`
+            LEFT JOIN rubric_criterion c ON c.id = u.`criterion_id`
+            LEFT JOIN rubric_descriptor d ON d.`submission_box_id` = sb.id AND d.`criterion_id` = c.id AND sb.`rubric_result_set` = 0
+            LEFT JOIN rubric_result r ON r.`resultset_id` = sb.`rubric_result_set` AND sb.`rubric_result_set` > 1
+            WHERE (d.valid = 1 OR sb.rubric_result_set > 0)
+            AND (d.value > 0 OR r.value > 0)
+            AND sb.id = :sbid
+            ORDER BY d.value DESC, r.value DESC
+        ");
+
+        $stmt->execute(array('sbid' => $submissionBoxID));
+        return $stmt->rowCount();
+    }
+
 }
