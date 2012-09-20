@@ -1,1 +1,0 @@
-INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'stream_dir','/var/www/portal-dev/www/conf/../../data/cache/stream','Stream Cache Dir','Cache folder for streaming content (RSS, XML, Twitter JSON etc)','input',NULL,'Paths','false','false','true');

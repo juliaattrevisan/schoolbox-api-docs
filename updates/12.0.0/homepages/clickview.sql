@@ -1,1 +1,0 @@
-INSERT INTO `homepage_comp`(`id`,`size`,`method`,`name`,`description`,`homepageCategoryID`,`filename`,`config`,`invisible`,`allowMultiple`) VALUES ( NULL,'0','outputClickview','ClickView','Embed Clickview Home videos directly into your homepage by providing the ID of the video','5','clickview.html','a:1:{s:3:\"url\";s:0:\"\";}','false','true');

@@ -1,1 +1,0 @@
-ALTER TABLE `user` ADD COLUMN `digest` varchar(250) NULL AFTER `hash`

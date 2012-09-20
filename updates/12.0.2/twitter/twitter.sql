@@ -1,1 +1,0 @@
-UPDATE `homepage_comp` SET `config`='a:3:{s:8:\"username\";s:7:\"alaress\";s:8:\"keywords\";s:4:\"kony\";s:4:\"size\";s:1:\"3\";}' WHERE `id`='47';
