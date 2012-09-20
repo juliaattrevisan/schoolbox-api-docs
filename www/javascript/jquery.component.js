@@ -301,37 +301,28 @@ setupCustomise = {
 				return false;
 			});
 
+            // copy top colours to left/right
 			$j("#leftRight").click(function () {
-				var rightBox;
 
-				$j('div.leftColumn div.colorBox').each(function () {
-					var str = $j(this).attr('id');
-					var newstr = str.replace(/^.*left_(.*).*$/m, '$1');
-					rightBox = $j('#' + 'right_'+newstr);
-					rightBox.css({
-						'background-color' : $j(this).css('backgroundColor')
-					});
-					rightBox.next().val($j(this).next().val());
-				});
+                // iterate top colours
+                $j('div.topColumn div.colorBox').each(function () {
+                    var suffix = $j(this).attr('id').substr(4);
 
-				$j('.right .text, .right .listing').css('background-color', $j('.left .text').css('background-color'));
-				$j('.right .dark').css('background-color', $j('.left .dark').css('background-color'));
-				$j('.right, .right p').css('color', $j('.left').css('color'));
-				$j('.right h2').css({
-                    'background-color': $j('.left h2').css('background-color'),
-                    'color':  $j('.left h2').css('color')
+                    // update pickers config
+                    pickers['left_' + suffix]
+                        = pickers['right_' + suffix]
+                        = (new RGBColor($j(this).css('background-color'))).toHex();
+
+                    // update left/right colours
+                    $j('#left_'+suffix+', #right_'+suffix)
+                        .css('backgroundColor', pickers['left_' + suffix])
+                        // set hidden field value
+                        .next()
+                        .val($j(this).next().val());
                 });
-				$j('.right, .right p').css('color', $j('.left, .left p').css('color'));
-				$j('.right a').css('color', $j('.left a').css('color'));
 
-				//send off the pickers correctly.
-				pickers.right_head_font = pickers.left_head_font;
-				pickers.right_head_bg = pickers.left_head_bg;
-				pickers.right_font = pickers.left_font;
-				pickers.right_bg_primary = pickers.left_bg_primary;
-				pickers.right_bg_secondary = pickers.left_bg_secondary;
-				pickers.right_link = pickers.left_link;
-				pickers.right_hover = pickers.left_hover;
+                // update components on page
+                resetColours(['.top', '.left' ,'.right'], pickers);
 
 			});
 
@@ -342,12 +333,15 @@ setupCustomise = {
 
                 resetColours(['.top', '.left' ,'.right']);
 
-                pickers = defaults;
+                // copy values from defaults into pickers
+                pickers = $j.extend({}, pickers, defaults);
 
 
 			});
 
-			function resetColours(area) {
+			function resetColours(area, colours) {
+
+                colours = colours || defaults;
 
                 $j.each(area, function(index, value) {
 
@@ -355,24 +349,24 @@ setupCustomise = {
                     areaVariable = value.substr(1);
 
                     $j(areaClass).find('h2').css({
-                        "color": defaults[areaVariable+'_head_font'],
-                        "background-color": defaults[areaVariable+'_head_bg']
+                        "color": colours[areaVariable+'_head_font'],
+                        "background-color": colours[areaVariable+'_head_bg']
                     });
 
                     $j(areaClass).find('p, h3, .listing p.small').css({
-                        "color": defaults[areaVariable+'_font']
+                        "color": colours[areaVariable+'_font']
                     });
 
                     $j(areaClass).find('a, .listing p.small a').css({
-                        'color': defaults[areaVariable+'_link']
+                        'color': colours[areaVariable+'_link']
                     });
 
                     $j(areaClass).find('.text, .listing').css({
-                        'background': defaults[areaVariable+'_bg_primary']
+                        'background': colours[areaVariable+'_bg_primary']
                     });
 
                     $j(areaClass).find('.dark').css({
-                        'background':  defaults[areaVariable+'_bg_secondary']
+                        'background':  colours[areaVariable+'_bg_secondary']
                     });
 
                 });
@@ -388,7 +382,8 @@ setupCustomise = {
                       $j(this).removeAttr("style");
                 });
 
-                pickers = original;
+                // copy values from original into pickers
+                pickers = $j.extend({}, pickers, original);
 
 			});
 
