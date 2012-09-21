@@ -18,24 +18,24 @@
  */
 class Scrub {
 
-	/**
-	 * Cleans plain text of all nasty stuff
-	 * Can be used on input to database or output
-	 *
-	 * @param  $text
-	 * @return string
-	 */
-	static public function text($text) {
-		/* This in built function encode html chars
-		 * the ENT_QUOTES converts all talking marks
-		 */
-		$text = htmlentities($text, ENT_QUOTES, "UTF-8");
+    /**
+     * Cleans plain text of all nasty stuff
+     * Can be used on input to database or output
+     *
+     * @param  $text
+     * @return string
+     */
+    static public function text($text) {
+        /* This in built function encode html chars
+           * the ENT_QUOTES converts all talking marks
+           */
+        $text = htmlentities($text, ENT_QUOTES, "UTF-8");
 
-		/* Get rid of any possible bad chars
-		 * $text = scrubHTML($text);
-		 */
-		return $text;
-	}
+        /* Get rid of any possible bad chars
+           * $text = scrubHTML($text);
+           */
+        return $text;
+    }
 
     /**
      * Turns html into plaintext.
@@ -46,92 +46,102 @@ class Scrub {
      */
     static public function html2text($html) {
 
-        $text = html_entity_decode(                         // 4: unconvert entities (3 -> 4 is just for normalising any rogue characters)
-                    htmlentities(                           // 3: convert all entites, including quotes, into UTF-8
-                        preg_replace(                       // 2: all recurring whitespaces (including &nbsp;) to be trimmed
-                            '/(\s|&nbsp;)+/i',
-                            ' ',
-                            strip_tags(                     // 1: remove all remaining tags from input
-                                preg_replace(               // 0: replace all text-style block-level elements with newlines
-                                    '#</(p|h[1-5]|br)>#i',
-                                    "\n",
-                                    $html
-                                )
-                            )
-                        ),
-                        ENT_QUOTES,
-                        "UTF-8"
+        $text = html_entity_decode( // 4: unconvert entities (3 -> 4 is just for normalising any rogue characters)
+            htmlentities( // 3: convert all entites, including quotes, into UTF-8
+                preg_replace( // 2: all recurring whitespaces (including &nbsp;) to be trimmed
+                    '/(\s|&nbsp;)+/i',
+                    ' ',
+                    strip_tags( // 1: remove all remaining tags from input
+                        preg_replace( // 0: replace all text-style block-level elements with newlines
+                            '#</(p|h[1-5]|br)>#i',
+                            "\n",
+                            $html
+                        )
                     )
-                );
+                ),
+                ENT_QUOTES,
+                "UTF-8"
+            )
+        );
 
         return $text;
     }
 
-	/**
-	 * Convert smart quotes to apostrophes/double quotes
-	 *
-	 * @static
-	 * @param $text
-	 * @return mixed
-	 */
-	static public function smartQuotes($text) {
-		$search = array(chr(145), chr(146), chr(147), chr(148), chr(151));
-		$replace = array("'", "'", '"', '"', '-');
+    /**
+     * Convert smart quotes to apostrophes/double quotes
+     *
+     * @static
+     * @param $text
+     * @return mixed
+     */
+    static public function smartQuotes($text) {
+        $search = array(chr(145), chr(146), chr(147), chr(148), chr(151));
+        $replace = array("'", "'", '"', '"', '-');
 
-		$data = str_replace($search, $replace, $text);
+        $data = str_replace($search, $replace, $text);
 
-		$search = array("&#8220;", "&#8221;", "&#8216;", "&#8217;", "&#8243;");
-		$replace = array("&quot;", "&quot;", "&#39;", "&#39;", "&quot;");
+        $search = array("&#8220;", "&#8221;", "&#8216;", "&#8217;", "&#8243;");
+        $replace = array("&quot;", "&quot;", "&#39;", "&#39;", "&quot;");
 
-		return str_replace($search, $replace, $data);
-	}
+        return str_replace($search, $replace, $data);
+    }
 
-	/**
-	 * Cleans crap out of input using HTMLPurifier
-	 *
-	 * @param  $html
-	 *
-	 * @return mixed
-	 */
-	static public function html($html) {
-		require_once dirname(__FILE__) . '/HTMLPurifier/HTMLPurifier.auto.php';
+    /**
+     * Cleans crap out of input using HTMLPurifier
+     *
+     * @param  $html
+     *
+     * @return mixed
+     */
+    static public function html($html) {
+        require_once dirname(__FILE__) . '/HTMLPurifier/HTMLPurifier.auto.php';
 
-		$config = HTMLPurifier_Config::createDefault();
+        $config = HTMLPurifier_Config::createDefault();
+
+        //$config->set('Cache.DefinitionImpl', null);
+        $config->set('Cache.SerializerPath', Cfg::get('xml_dir') . '/../purifier/');
 
         $config->set('AutoFormat.Linkify', true);
 
-        $config->set('HTML.FlashAllowFullScreen',true);
-
-        $safeIframeSources = array( 'www.youtube.com/embed/',
-                                    'player.vimeo.com/video/',
-                                    'www.slideshare.net/slideshow/embed_code/',
-                                    '(www|edu).glogster.com/glog(/|.php)',
-                                    'wikieducator.org/index.php',
-                                    'www.google.com(.[a-z]{2})?/maps',
-                                    'maps.google.com(.[a-z]{2})?/',
-                                    'docs.google.com(.[a-z]{2})?/'
+        // Allow Iframe
+        $config->set('HTML.SafeIframe', true);
+        $safeIframeSources = array(
+            'www.youtube.com/embed/',
+            'player.vimeo.com/video/',
+            'www.slideshare.net/slideshow/embed_code/',
+            '(www|edu).glogster.com/glog(/|.php)',
+            'wikieducator.org/index.php',
+            'www.google.com(.[a-z]{2})?/maps',
+            'maps.google.com(.[a-z]{2})?/',
+            'docs.google.com(.[a-z]{2})?/'
         );
 
-        $config->set('HTML.SafeIframe', true);
-        $config->set('URI.SafeIframeRegexp','%^https?://('.implode('|', $safeIframeSources).')%');
 
+        $config->set('URI.SafeIframeRegexp', '%^https?://(' . implode('|', $safeIframeSources) . ')%');
+
+        // Allow objects and embeds
         $config->set('HTML.SafeObject', true);
-        $config->set('Output.FlashCompat',true);
-
-		$config->set('Attr.AllowedFrameTargets', array(
-			'_blank',
-			'_self',
-			'_parent',
-			'_top'
-		));
+        $config->set('HTML.SafeEmbed', true);
+        $config->set('Output.FlashCompat', true);
+        $config->set('HTML.FlashAllowFullScreen', true);
 
 
-		$purifier = HTMLPurifier::instance();
+        $config->set(
+            'Attr.AllowedFrameTargets', array(
+                '_blank',
+                '_self',
+                '_parent',
+                '_top'
+            )
+        );
+
+
+        $purifier = HTMLPurifier::instance();
 
         /* HTML Purifier hack to prevent authentication information from being stripped out of URL */
         $registry = HTMLPurifier_URISchemeRegistry::instance();
         $registry->register('http', new Alaress_HTMLPurifier_URIScheme_Http);
 
         return $purifier->purify($html, $config);
-	}
+    }
 }

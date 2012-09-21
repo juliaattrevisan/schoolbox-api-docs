@@ -12,8 +12,7 @@
  * @warning
  *      This class expects an injector to add the necessary parameters tags.
  */
-class HTMLPurifier_AttrTransform_SafeParam extends HTMLPurifier_AttrTransform
-{
+class HTMLPurifier_AttrTransform_SafeParam extends HTMLPurifier_AttrTransform {
     public $name = "SafeParam";
     private $uri;
 
@@ -45,8 +44,9 @@ class HTMLPurifier_AttrTransform_SafeParam extends HTMLPurifier_AttrTransform
                 $attr['value'] = $this->wmode->validate($attr['value'], $config, $context);
                 break;
             case 'movie':
+            case 'url':
             case 'src':
-                $attr['name'] = "movie";
+                //$attr['name'] = "movie";
                 $attr['value'] = $this->uri->validate($attr['value'], $config, $context);
                 break;
             case 'flashvars':

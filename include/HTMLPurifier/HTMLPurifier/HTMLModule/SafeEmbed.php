@@ -3,8 +3,7 @@
 /**
  * A "safe" embed module. See SafeObject. This is a proprietary element.
  */
-class HTMLPurifier_HTMLModule_SafeEmbed extends HTMLPurifier_HTMLModule
-{
+class HTMLPurifier_HTMLModule_SafeEmbed extends HTMLPurifier_HTMLModule {
 
     public $name = 'SafeEmbed';
 
@@ -15,7 +14,7 @@ class HTMLPurifier_HTMLModule_SafeEmbed extends HTMLPurifier_HTMLModule
             'embed', 'Inline', 'Empty', 'Common',
             array(
                 'src*' => 'URI#embedded',
-                'type' => 'Enum#application/x-shockwave-flash',
+                //'type' => 'Enum#application/x-shockwave-flash',
                 'width' => 'Pixels#' . $max,
                 'height' => 'Pixels#' . $max,
                 'allowscriptaccess' => 'Enum#never',
