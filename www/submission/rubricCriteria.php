@@ -29,6 +29,7 @@ $this->setFile(TEMPLATE_content, 'submission/rubricCriteria.html');
 $this->setTab('submission');
 $this->setTitle($title);
 $this->setVar('PAGE_TITLE', $title);
+$this->setBlock(TEMPLATE_content, 'allow_cascade', 'allow_cascade_block');
 $this->setBlock(TEMPLATE_content, 'criterion_group', 'criterion_group_block');
 $this->setBlock('criterion_group', 'criterion', 'criterion_block');
 $this->setBlock('criterion', 'criterion_disabled', 'criterion_disabled_block');
@@ -44,29 +45,34 @@ $this->setVar(array(
     'CATEGORY_NAME' => $category['name']
 ));
 
+// get rubric details
 $rubricHandler = new DueWork_Rubric_Handler();
 $criteria = $rubricHandler->getAvailableCriteria($catID, 'category', true);
 
+// for now, we're not supporting inheritence
+$this->setVar('allow_cascade_block', '');
+
+$this->setVar('criterion_group_block', '');
+$topID = 0;
 if(count($criteria)) {
-    $this->setVar('criterion_group_block', '');
     foreach ($criteria as $grouping => $crits) {
         $this->setVar(array(
             'criterion_block' => '',
-            'CRITGROUP_NAME'  => $grouping
+            'CRITGROUP_NAME'  => $grouping,
+            'CRITGROUP_DISABLED' => ''
         ));
         foreach($crits as $critID => $crit) {
-
+            $topID = max($topID, $critID);
             $this->setVar(array(
                 'CRITERION_ID'   => $critID,
                 'CRITERION_NAME' => $crit['name'],
             ));
-
-
             if($crit['count']) {
-                $usage = $crit['count'] == 1 ? 'once' : $crit['count'] . 's';
+                $usage = sprintf("%s assessment%s", $crit['count'], $crit['count'] == 1 ? '' : 's');
                 $this->setVar(array(
                     'CRITERION_USAGE' => $usage,
-                    'criterion_enabled_block' => ''
+                    'criterion_enabled_block' => '',
+                    'CRITGROUP_DISABLED' => ' disabled="disabled"'
                 ));
                 $this->parse('criterion_disabled_block','criterion_disabled');
             }
@@ -74,12 +80,9 @@ if(count($criteria)) {
                 $this->setVar('criterion_disabled_block', '');
                 $this->parse('criterion_enabled_block', 'criterion_enabled');
             }
-
-
             $this->parse('criterion_block', 'criterion', true);
         }
-
         $this->parse('criterion_group_block', 'criterion_group', true);
     }
-
 }
+$this->setVar('MAX_CRIT_ID', $topID + 1);
