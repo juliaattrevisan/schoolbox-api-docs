@@ -22,6 +22,12 @@ if(!(is_array($_POST['crits']) && count($_POST['crits']) && is_numeric($_POST['c
 $criteria = $_POST['crits'];
 $catID = $_POST['categoryID'];
 
+// "security to the foyer!"
+$groupHandler = new Group();
+if(!($groupHandler->isSuperuser() || $groupHandler->getPermission($catID) >= WRITE_ACCESS)) {
+    error(6);
+}
+
 $data = array();
 
 foreach($criteria as $group) {
