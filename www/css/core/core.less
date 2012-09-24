@@ -1147,6 +1147,32 @@ Notifications
             margin: 0;
             text-align: right;
         }
+
+        .config-filters span {
+            margin-left: 6px;
+            margin-right: 4px;
+            text-align: left;
+        }
+        .config-filters input {
+            position: relative;
+            top: 2px;
+        }
+        input[type=text] {
+            border: solid 1px #bbb;
+            padding: 2px;
+        }
+
+        form div {
+            line-height: 25px;
+            display: inline;
+            white-space: nowrap;
+            .filter {
+                display: block;
+            }
+        }
+        input[type=submit] {
+            margin-top: 10px;
+        }
     }
     .listing {
         width: 100%;
@@ -6883,3 +6909,13 @@ tr span.leave-pending {
     }
 }
 
+.homepage .active {
+    background: #ddd;
+}
+.add-component.undeveloped .btn {
+    display: none;
+}
+h4 a.hidden {
+    opacity: 0.5;
+    color: #444;
+}
