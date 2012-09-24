@@ -281,7 +281,10 @@ abstract class Component_ControllerAbstract {
             // every config key has a corresponding controller and template to be called
             foreach($config as $key => $params) {
 
-                $page->setVar('CONFIG_ELEMENT_LABEL', $params['label']);
+                $page->setVar(array(
+                    'CONFIG_ELEMENT_LABEL' => $params['label'],
+                    'CONFIG_ELEMENT_CLASS' => str_replace(' ', '', strtolower($params['label']))
+                ));
 
                 $fields = array();
                 if($this->sortFields) {
