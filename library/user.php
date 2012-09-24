@@ -11,20 +11,20 @@ class User extends DeprecatedModel {
     }
 
     /**
-   	 * Gets the ID associated with a particular campus name. Returns false if
-   	 * the campus name was not matched.
-   	 *
-   	 * @param <type> $name
-   	 * @return <type>
-   	 */
-   	public function getCampusID($name) {
-   		$query = "SELECT id FROM luCampus WHERE name like '$name'";
-           return $this->db->getOne($query);
-   	}
+     * Gets the ID associated with a particular campus name. Returns false if
+     * the campus name was not matched.
+     *
+     * @param <type> $name
+     * @return <type>
+     */
+    public function getCampusID($name) {
+        $query = "SELECT id FROM luCampus WHERE name like '$name'";
+        return $this->db->getOne($query);
+    }
 
     function getGroupID($name) {
-       $query = "SELECT id FROM groups WHERE name like '$name'";
-       return $this->db->getOne($query);
+        $query = "SELECT id FROM groups WHERE name like '$name'";
+        return $this->db->getOne($query);
     }
 
     function getAllInCategory($categoryID) {
@@ -43,26 +43,26 @@ class User extends DeprecatedModel {
 
     function getByID($id) {
 
-        $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, year, `key`, eportfolio_enabled,
+        $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, year, `key`, hash, eportfolio_enabled,
 						synergy_id, local_email, alt_email, email_pass, userCampus.campus, luCampus.name as campusName, IF(superusers.id, 1, 0) as su, house, residential_house_id as residential_house, mail_handler
 				FROM user
 					LEFT JOIN groups ON user.group_id = groups.id
 					LEFT JOIN userCampus ON user.id = userCampus.uid
 					LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
 					LEFT JOIN superusers ON user.id = superusers.id
-				WHERE user.id = '".mysql_real_escape_string($id)."' ORDER BY userCampus.defaultCampus DESC";
+				WHERE user.id = '" . mysql_real_escape_string($id) . "' ORDER BY userCampus.defaultCampus DESC";
         return $this->db->getRow($query);
     }
 
     function getByUsername($username) {
 
-        $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, year, eportfolio_enabled,`key`,
+        $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, year, eportfolio_enabled,`key`, hash,
 						synergy_id, local_email, alt_email, email_pass, userCampus.campus, IF(superusers.id, 1, 0) as su, house, mail_handler
 				FROM user
 					LEFT JOIN groups ON user.group_id = groups.id
 					LEFT JOIN userCampus ON user.id = userCampus.uid
 					LEFT JOIN superusers ON user.id = superusers.id
-				WHERE user.username = " . $this->db->smartQuote($username)." ORDER BY userCampus.defaultCampus DESC";
+				WHERE user.username = " . $this->db->smartQuote($username) . " ORDER BY userCampus.defaultCampus DESC";
         return $this->db->getRow($query);
     }
 
@@ -79,11 +79,11 @@ class User extends DeprecatedModel {
         $this->db->query($campusquery);
         if ($this->db->countRows() > 0) {
             while ($campus = $this->db->getNextArray()) {
-                if ($campus['campus'])
+                if ($campus['campus']) {
                     $campusList[] = $campus['campus'];
+                }
             }
-        }
-        else {
+        } else {
             //Place user in campus 1 by default in not assigned
             $campusList[] = 1;
         }
@@ -119,33 +119,34 @@ class User extends DeprecatedModel {
 				WHERE user.synergy_id = '$sid'
 				AND ";
 
-        if(is_array($gid))
+        if (is_array($gid)) {
             $query .= "group_id IN (" . implode(", ", $gid) . ")";
-        else
+        } else {
             $query .= "group_id = '$gid'";
+        }
 
         $query .= " ORDER BY userCampus.defaultCampus DESC";
 
         return $this->db->getRow($query);
     }
 
-	/**
-	 * Search the user table for particular user(s)
-	 *
-	 * @param $keyword
-	 * @param int $offset
-	 * @param int $limit
-	 * @param null $count
-	 * @param string $sort_by
-	 * @param string $sort_dir
-	 * @return array|bool
-	 */
+    /**
+     * Search the user table for particular user(s)
+     *
+     * @param $keyword
+     * @param int $offset
+     * @param int $limit
+     * @param null $count
+     * @param string $sort_by
+     * @param string $sort_dir
+     * @return array|bool
+     */
     public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'lastname', $sort_dir = 'ASC') {
 
         // TODO: this function doesn't currently protect against all injection (eg. % gets through).
 
         // test for exact search, and if so return those results instead
-        if(preg_match('#".+"#', $keyword)) {
+        if (preg_match('#".+"#', $keyword)) {
             // strip the prepended and appended quote characters
             $keyword = substr($keyword, 1, strlen($keyword) - 2);
 
@@ -156,8 +157,8 @@ class User extends DeprecatedModel {
 
         // retreive results
 
-		/* Allow search on synergy id
-		 */
+        /* Allow search on synergy id
+           */
         $query = "
 			SELECT user.*, groups.name AS group_name, luCampus.name AS campus_name
 			FROM `user`
@@ -222,26 +223,33 @@ class User extends DeprecatedModel {
             if (is_numeric($keyword)) {
                 $query .= "( synergy_id = $keyword OR year = $keyword ) ";
             } else {
-                if (preg_match('/([[:alpha:]\']+) ([[:alpha:]\']+)/', $keyword, $name))
+                if (preg_match('/([[:alpha:]\']+) ([[:alpha:]\']+)/', $keyword, $name)) {
                     $query .= "( firstname like '%{$name[1]}%' and lastname like '%{$name[2]}%' ) ";
-                else
+                } else {
                     $query .= "( firstname like '%$keyword%' or lastname like '%$keyword%' or username like '%$keyword%' ) ";
+                }
             }
 
-            if (is_array($group))
+            if (is_array($group)) {
                 $query .= "AND group_id IN (" . implode(',', $group) . ") ";
-            else if (is_numeric($group) && $group > 0)
-                $query .= "AND group_id = '$group' ";
+            } else {
+                if (is_numeric($group) && $group > 0) {
+                    $query .= "AND group_id = '$group' ";
+                }
+            }
+        } else {
+            if ($group) {
+                $query .= "group_id = '$group' ";
+            } else {
+                error(2);
+            }
         }
-        else if ($group)
-            $query .= "group_id = '$group' ";
-        else
-            error(2);
 
         $query .= "ORDER BY group_id, year, lastname, firstname";
 
-        if (is_numeric($limit))
+        if (is_numeric($limit)) {
             $query .= " LIMIT $limit";
+        }
 
         return $this->db->getAll($query);
     }
@@ -276,7 +284,7 @@ class User extends DeprecatedModel {
 
         $newPassword = mysql_real_escape_string($newPassword);
 
-		$query = "UPDATE `" . $this->_table . "` SET password = PASSWORD('$newPassword'), email_pass = '$newPassword' WHERE `" . $this->_index . "` = $userID AND password = PASSWORD('$oldPassword')";
+        $query = "UPDATE `" . $this->_table . "` SET password = PASSWORD('$newPassword'), email_pass = '$newPassword' WHERE `" . $this->_index . "` = $userID AND password = PASSWORD('$oldPassword')";
         $this->db->query($query);
 
         return $this->db->affectedRows();
@@ -298,21 +306,26 @@ class User extends DeprecatedModel {
             require_once SITE_root . '/include/Mailer.php';
             $mailHandler = new Mailer('reset-password.html', Cfg::get('title') . ' Password Reset', $user['alt_email']);
             $mailHandler->setVar('NAME', $user['firstname']);
-            $mailHandler->setVar('RESET_LINK', "http://" . $_SERVER['HTTP_HOST'] . "/reset.php?id={$user['id']}&h=" . $hash);
+            $mailHandler->setVar(
+                'RESET_LINK', "http://" . $_SERVER['HTTP_HOST'] . "/reset.php?id={$user['id']}&h=" . $hash
+            );
             return $mailHandler->send();
         }
         return false;
     }
 
     function sendPassword($email) {
-        if (empty($email))
+        if (empty($email)) {
             return false;
+        }
         $groupHandler = new Group();
         $user = $this->getByField('alt_email', $email);
         if (isset($user['id'])) {
-            if ($groupHandler->isParent($user['id']) || Cfg::get('site_name') != 'shore'  ) {
+            if ($groupHandler->isParent($user['id']) || Cfg::get('site_name') != 'shore') {
                 require_once SITE_root . '/include/Mailer.php';
-                $mailHandler = new Mailer('new-password.html', Cfg::get('title') . ' Password Reminder', $user['alt_email']);
+                $mailHandler = new Mailer('new-password.html', Cfg::get(
+                    'title'
+                ) . ' Password Reminder', $user['alt_email']);
                 $mailHandler->setVar('NAME', $user['firstname']);
                 $mailHandler->setVar('USERNAME', $user['username']);
                 $mailHandler->setVar('PASSWORD', $user['email_pass']);
@@ -320,8 +333,9 @@ class User extends DeprecatedModel {
 
                 return true;
             }
-        } else
+        } else {
             return false;
+        }
     }
 
     function getCampusList() {
@@ -352,11 +366,13 @@ class User extends DeprecatedModel {
     }
 
     function getUserLogins($username, $limit = 10) {
-        $query = "SELECT date, ip, login FROM login_log WHERE username like " . $this->db->smartQuote($username) . " ORDER BY date DESC LIMIT 0,$limit";
+        $query = "SELECT date, ip, login FROM login_log WHERE username like " . $this->db->smartQuote(
+            $username
+        ) . " ORDER BY date DESC LIMIT 0,$limit";
         return $this->db->getAll($query);
     }
 
-    function delete($id, $trans=0) {
+    function delete($id, $trans = 0) {
 
         //first transfer ownership of date to another user
         $this->transferOwnership($id, $trans);
@@ -416,8 +432,9 @@ class User extends DeprecatedModel {
             $this->db->query($query);
             //for each student submission delete from hdd
             while ($studsub = $this->db->getNextArray()) {
-                if (!@unlink(Cfg::get('submission_dir') . "/" . $studsub['id'] . ".dat"))
+                if (!@unlink(Cfg::get('submission_dir') . "/" . $studsub['id'] . ".dat")) {
                     print "Failed to delete: " . Cfg::get('submission_dir') . "/" . $studsub['id'] . ".dat";
+                }
             }
 
             //delete all student submissions from db
@@ -435,8 +452,9 @@ class User extends DeprecatedModel {
         $this->db->query($query);
 
         while ($ret = $this->db->getNextArray()) {
-            if (!@unlink(Cfg::get('returns_dir') . "/" . $ret['id'] . ".dat"))
+            if (!@unlink(Cfg::get('returns_dir') . "/" . $ret['id'] . ".dat")) {
                 print "Failed to delete: " . Cfg::get('returns_dir') . "/" . $ret['id'] . ".dat";
+            }
         }
 
         $query = "DELETE FROM submission_return WHERE owner = '$id'";
@@ -490,21 +508,21 @@ class User extends DeprecatedModel {
 
     }
 
-	/**
-	 * Update an existing user's details
-	 *
-	 * @param <type> $user
-	 */
+    /**
+     * Update an existing user's details
+     *
+     * @param <type> $user
+     */
     public function update($user) {
 
-		/* Check if the username already exists before updating. If it does
-		 * exist already, prevent existence of duplicate usernames
-		 */
+        /* Check if the username already exists before updating. If it does
+           * exist already, prevent existence of duplicate usernames
+           */
         if ($dupeUser = $this->getByUsername($user['username'])) {
-            if($dupeUser['uid'] != $user['id']) {
+            if ($dupeUser['uid'] != $user['id']) {
                 return false;
-			}
-		}
+            }
+        }
 
         $campusArray = $user['campus'];
         $defaultCampus = $user['defaultCampus'];
@@ -512,24 +530,25 @@ class User extends DeprecatedModel {
         unset($user['campus']);
         unset($user['defaultCampus']);
 
-		/* Check if $user['su'] exists and not equal to null
-		 */
+        /* Check if $user['su'] exists and not equal to null
+           */
         if (isset($user['su'])) {
             $this->db->delete('superusers', 'id', $user['id']);
 
-			if ($user['su']) {
-				$this->db->insert('superusers', array('id' => $user['id']));
-			}
+            if ($user['su']) {
+                $this->db->insert('superusers', array('id' => $user['id']));
+            }
 
             unset($user['su']);
-        }
-		/* Check if $user['su'] exists and is null
+        } /* Check if $user['su'] exists and is null
 		 */
-		else if (array_key_exists('su', $user)) {
-			unset($user['su']);
-		}
+        else {
+            if (array_key_exists('su', $user)) {
+                unset($user['su']);
+            }
+        }
 
-        if(isset($user['password'])) {
+        if (isset($user['password'])) {
             $this->setPasswordInternal($user['id'], $user['password']);
             unset($user['password']);
         }
@@ -540,31 +559,37 @@ class User extends DeprecatedModel {
             $this->db->delete('userCampus', 'uid', $user['id']);
 
             foreach ($campusArray as $campus) {
-                $insertCampus = array('uid' => $user['id'], 'campus' => $campus, 'defaultCampus' => $campus == $defaultCampus ? 1 : 0);
+                $insertCampus = array(
+                    'uid' => $user['id'],
+                    'campus' => $campus,
+                    'defaultCampus' => $campus == $defaultCampus ? 1 : 0
+                );
                 $this->db->insert('userCampus', $insertCampus);
             }
-        } else if(is_numeric($campusArray) && $campusArray > 0) {
-            /* Note that this can insert multiple campus if the update only specified a single value like in a bulk load */
-            $campusquery = "INSERT IGNORE INTO userCampus (uid, campus) VALUES ('{$user['id']}', '$campusArray')";
-            $this->db->query($campusquery);
+        } else {
+            if (is_numeric($campusArray) && $campusArray > 0) {
+                /* Note that this can insert multiple campus if the update only specified a single value like in a bulk load */
+                $campusquery = "INSERT IGNORE INTO userCampus (uid, campus) VALUES ('{$user['id']}', '$campusArray')";
+                $this->db->query($campusquery);
+            }
         }
 
         return true;
     }
 
-	/**
-	 * Create a new user record
-	 *
-	 * @param array $user
-	 * @return <type>
-	 */
+    /**
+     * Create a new user record
+     *
+     * @param array $user
+     * @return <type>
+     */
     public function create($user) {
 
-		/* Check if the username already exists
-		 */
+        /* Check if the username already exists
+           */
         if (is_array($this->getByUsername($user['username']))) {
-			return false;
-		}
+            return false;
+        }
 
         $campusArray = $user['campus'];
         $defaultCampus = $user['defaultCampus'];
@@ -580,18 +605,24 @@ class User extends DeprecatedModel {
 
         $id = parent::create($user);
 
-        if($password) {
-             $this->setPasswordInternal($id, $password);
+        if ($password) {
+            $this->setPasswordInternal($id, $password);
         }
 
         if (is_array($campusArray) && $id) {
             foreach ($campusArray as $campus) {
-                $insertCampus = array('uid' => $id, 'campus' => $campus, 'defaultCampus' => $campus == $defaultCampus ? 1 : 0);
+                $insertCampus = array(
+                    'uid' => $id,
+                    'campus' => $campus,
+                    'defaultCampus' => $campus == $defaultCampus ? 1 : 0
+                );
                 $this->db->insert('userCampus', $insertCampus);
             }
-        } else if ($id && $campusArray) {
-            $campusquery = "INSERT INTO userCampus (uid, campus) VALUES ('$id', '$campusArray')";
-            $this->db->query($campusquery);
+        } else {
+            if ($id && $campusArray) {
+                $campusquery = "INSERT INTO userCampus (uid, campus) VALUES ('$id', '$campusArray')";
+                $this->db->query($campusquery);
+            }
         }
 
         /* If ticked, add the new user into the Superusers table as well.
@@ -619,8 +650,7 @@ class User extends DeprecatedModel {
 
         if (is_array($groupID)) {
             $query .= " IN " . '(' . implode(',', $groupID) . ')';
-        }
-        else {
+        } else {
             $query .= " = '$groupID'";
         }
 
@@ -633,86 +663,83 @@ class User extends DeprecatedModel {
 
         $query .= " ORDER BY lastname ASC, firstname ASC";
 
-        if($limit) {
+        if ($limit) {
             $query .= " LIMIT $index, $limit";
         }
 
         return $this->db->getAll($query);
     }
 
-	/**
-	 * Gets all in the system who are in a particular groupID
-	 *
-	 * @param <type> $groupID
-	 */
-	public function getByGroup($groupID, $hasSynergy = false) {
-		$query = "SELECT *
+    /**
+     * Gets all in the system who are in a particular groupID
+     *
+     * @param <type> $groupID
+     */
+    public function getByGroup($groupID, $hasSynergy = false) {
+        $query = "SELECT *
 				  FROM {$this->_table}
 				  WHERE group_id";
 
-		if (is_array($groupID)) {
-			$query .= " IN " . '(' . implode(',', $groupID) . ')';
-		}
-		else {
-			$query .= " = '$groupID'";
-		}
+        if (is_array($groupID)) {
+            $query .= " IN " . '(' . implode(',', $groupID) . ')';
+        } else {
+            $query .= " = '$groupID'";
+        }
 
-		/* Optionally exclude those without synergy ids
-		 */
-		if ($hasSynergy) {
-			$query .= " AND synergy_id IS NOT NULL
+        /* Optionally exclude those without synergy ids
+           */
+        if ($hasSynergy) {
+            $query .= " AND synergy_id IS NOT NULL
 					    AND synergy_id > 0 ";
-		}
+        }
 
-		return $this->db->getAll($query);
-	}
+        return $this->db->getAll($query);
+    }
 
-	/**
-	 * Format a name from a user object
-	 *
-	 * @param  $userInfo
-	 * @param null $format
-	 * @return mixed|null|string
-	 */
-	public function formatName($userInfo, $format = NULL, $useNonBreakingSpace = false){
+    /**
+     * Format a name from a user object
+     *
+     * @param  $userInfo
+     * @param null $format
+     * @return mixed|null|string
+     */
+    public function formatName($userInfo, $format = null, $useNonBreakingSpace = false) {
 
-		// Check for custom format
-		if (empty($format)){
-			$format = Cfg::get('name_format');
-		}
+        // Check for custom format
+        if (empty($format)) {
+            $format = Cfg::get('name_format');
+        }
 
-		/* Replace tags */
-		preg_match_all('|{\w+}|', $format, $tags);
+        /* Replace tags */
+        preg_match_all('|{\w+}|', $format, $tags);
 
-		if (empty($tags) || empty($userInfo)) {
-			return 'Unknown User';
-		}
-
-		foreach ($tags[0] as $tag) {
-			$key = trim($tag, '{}');
-
-			if (is_string($userInfo[$key])) {
-				$value = $userInfo[$key];
-			}
-			else {
-				$value = '';
-			}
-
-			$format = str_replace($tag, $value, $format);
-		}
-
-		if ($format = trim($format)) {
-            if($useNonBreakingSpace) {
-                $format = preg_replace("#[\s]#",'&nbsp;',$format);
-            }
-			return $format;
-		}
-		elseif($useNonBreakingSpace) {
-            return 'Unknown&nbsp;User';
-		}
-        else {
+        if (empty($tags) || empty($userInfo)) {
             return 'Unknown User';
         }
-	}
+
+        foreach ($tags[0] as $tag) {
+            $key = trim($tag, '{}');
+
+            if (is_string($userInfo[$key])) {
+                $value = $userInfo[$key];
+            } else {
+                $value = '';
+            }
+
+            $format = str_replace($tag, $value, $format);
+        }
+
+        if ($format = trim($format)) {
+            if ($useNonBreakingSpace) {
+                $format = preg_replace("#[\s]#", '&nbsp;', $format);
+            }
+            return $format;
+        } elseif ($useNonBreakingSpace) {
+            return 'Unknown&nbsp;User';
+        } else {
+            return 'Unknown User';
+        }
+    }
 }
+
 ?>
