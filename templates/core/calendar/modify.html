@@ -86,11 +86,9 @@
             if ($j(this).val() !== '') {
                 $j('#repeatUntil').show();
                 $j("#repeat_until").rules("add", "required");
-                console.log('Rule added')
             } else {
                 $j('#repeatUntil').hide();
                 $j("#repeat_until").rules("remove", "required");
-                console.log('Rule removed')
             }
         });
 
