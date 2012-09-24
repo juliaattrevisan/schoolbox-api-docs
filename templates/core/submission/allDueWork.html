@@ -1,4 +1,18 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.tablesorter.min.js"></script>
+<script type="text/javascript">
+    $j(function(){
+        $j('#container').css('width', $j('.ruler').outerWidth());
+        $j(".subjectList, .onlineAssessments").tablesorter({
+            cssHeader: 'sortable',
+            cssAsc: 'ascending',
+            cssDesc: 'descending',
+            headers: {
+                4: { sorter: false}
+            }
+        });
+    });
+</script>
 <style type="text/css">
 table.subjectList {
 	width: 100%;
