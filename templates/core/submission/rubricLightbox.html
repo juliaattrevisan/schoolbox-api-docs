@@ -1,0 +1,47 @@
+<div id="rubric-window">
+    <ul>
+        <li>
+        <!-- BEGIN rubric_grouping -->
+            <h3>{RUBRIC_GROUP_LABEL}</h3>
+            <ul>
+            <!-- BEGIN rubric_crit -->
+                <!-- BEGIN rubric_crit_descriptor -->
+                <li class="descriptor">{RUBRIC_CRIT_RATING_LABEL}</li>
+                <!-- END rubric_crit_descriptor -->
+                <!-- BEGIN rubric_crit_resultset -->
+                <li class="resultset">
+                    <h5>{RUBRIC_CRIT_LABEL}</h5>
+                    <h5>{RUBRIC_CRIT_RATING_LABEL}</h5>
+                    <div class="clearfix"></div>
+                </li>
+                <!-- END rubric_crit_resultset -->
+            <!-- END rubric_crit -->
+            </ul>
+        <!-- END rubric_grouping -->
+        </li>
+    </ul>
+
+    <div class="rubric-grade">
+        <span id="sum">{RUBRIC_GRADE_SUM}</span> / <span id="max">{RUBRIC_GRADE_MAX}</span>
+    </div>
+    <div id="rubric-chart"></div>
+
+
+    <a href="#" id="closebox" class="submit-btn-plain"><span></span>Close</a>
+</div>
+<script type="text/javascript">
+    // listener for submit
+    $j('#closebox').click(function() {
+        $j('#rubric-lightbox').dialog('close');
+    });
+</script>
+
+<script type="text/javascript">
+    var rubricData = setupRubricChart({GRAPH_DATA}, {GRAPH_LEGS}, {GRAPH_MAX});
+    $j(function() {
+        var plot = $j.plot($j('#rubric-chart'), rubricData.spidata.points, rubricData.options);
+        $j(document).ready(function() {
+            plot.draw();
+        });
+    });
+</script>

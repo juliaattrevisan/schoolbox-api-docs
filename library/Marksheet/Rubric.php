@@ -80,12 +80,26 @@ class Marksheet_Rubric extends Marksheet_Abstract {
      * @param array $mark
      */
     public function outputUI(SitePage $page, $mark) {
+
+        $page->setBlock('mark_type_rubric', 'rubric_marked', 'rubric_marked_block');
+        $page->setBlock('mark_type_rubric', 'rubric_unmarked', 'rubric_unmarked_block');
+
         $output = array(
             'MARK'     => $mark['mark'],
             'MAX_MARK' => $mark['max_mark'],
             'COMMENT'  => $mark['comment']
         );
         $page->setVar($output);
+
+        if($mark['mark'] || $mark['mark'] === 0) {
+            $page->parse('rubric_marked_block', 'rubric_marked');
+            $page->setVar('rubric_unmarked_block', '');
+        }
+        else {
+            $page->parse('rubric_unmarked_block', 'rubric_unmarked');
+            $page->setVar('rubric_marked_block', '');
+
+        }
     }
 
 }

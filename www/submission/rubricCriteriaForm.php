@@ -7,13 +7,11 @@
  * @version     SVN: $Id$
  */
 
-// this is a script and not to be SitePaged
+// this is a script and not to be SitePage'd
 if(isset($this)) {
     error(4);
 }
 require_once('../../include/Bootstrap.php');
-
-print_r($_POST);
 
 if(!(is_array($_POST['crits']) && count($_POST['crits']) && is_numeric($_POST['categoryID']))) {
     error(4);
@@ -22,10 +20,13 @@ if(!(is_array($_POST['crits']) && count($_POST['crits']) && is_numeric($_POST['c
 $criteria = $_POST['crits'];
 $catID = $_POST['categoryID'];
 
+// this merely re-establishes the session
+new SitePage();
+
 // "security to the foyer!"
 $groupHandler = new Group();
 if(!($groupHandler->isSuperuser() || $groupHandler->getPermission($catID) >= WRITE_ACCESS)) {
-    error(6);
+    die('You to not have write permission to this category.');
 }
 
 $data = array();
@@ -38,7 +39,6 @@ foreach($criteria as $group) {
                 'group' => $group['name'],
                 'name'  => $crit,
             );
-            printf("[%02d] %s - %s\n", $critID, $group['name'], $crit);
         }
     }
 }
@@ -47,8 +47,6 @@ foreach($criteria as $group) {
 // get pre-existing criteria details
 $rubricHandler = new DueWork_Rubric_Handler();
 $dbcriteria = $rubricHandler->getAvailableCriteria($catID, 'category', true);
-
-print_r($dbcriteria);
 
 // create a list of criteria that we cannot permit changes to
 $locked = array();
@@ -63,9 +61,6 @@ if(count($dbcriteria)) {
         }
     }
 }
-
-print_r($locked);
-print_r($existing);
 
 // to be refactored
 $db = Database::getInstance();
@@ -92,11 +87,8 @@ $stmt['delete'] = $db->prepare("
 // iterate through list of provided criteria changes
 foreach($data as $critID => $critData) {
 
-    printf("-- %s ", $critID);
-
     // don't edit locked criteria
     if(in_array($critID, $locked)) {
-        echo "(locked)\n";
         continue; // possibly throw an error of some kind
     }
 
@@ -111,8 +103,6 @@ foreach($data as $critID => $critData) {
         $method = 'insert';
     }
 
-    print_r($exec);
-
     $stmt[$method]->execute($exec);
 
 }
@@ -124,3 +114,5 @@ foreach($existing as $eID) {
         $stmt['delete']->execute(array('cid' => $eID));
     }
 }
+
+die('Criteria updated.');

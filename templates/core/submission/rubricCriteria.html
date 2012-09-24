@@ -119,10 +119,11 @@ $j(function() {
 
         $j.post(self.attr('action'), {'crits': data, 'categoryID': catID}, function(data) {
             console.log(data);
+            history.back(-1);
         });
 
         e.preventDefault();
-        history.back(-1);
+
     });
 
 });

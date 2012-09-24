@@ -3,61 +3,14 @@
 <script type="text/javascript" src="/javascript/flot/jquery.flot.js"></script>
 <script type="text/javascript" src="/javascript/flot/jquery.flot.highlighter.js"></script>
 <script type="text/javascript" src="/javascript/flot/jquery.flot.spider.js"></script>
-<script language="JavaScript" type="text/javascript">
-    var spidata = {
-        points: [
-            {
-                data: {GRAPH_DATA},
-                spider: {
-                    show: true,
-                    lineWidth: 4
-                }
-            }
-        ],
+<script type="text/javascript" src="/javascript/jquery.flot.rubric.js"></script>
+<script type="text/javascript">
 
-        legs: {GRAPH_LEGS},
-        ticks: {GRAPH_MAX}
-    };
-
-    var options = {
-        series: {
-            spider: {
-                active: true,
-                hightlight: {
-                    mode: 'area',
-                    opacity: 0.9
-                },
-                legs: {
-                    data: spidata.legs,
-                    font: '11px Arial',
-                    legStartAngle: 270,
-                    legScaleMin: 0,
-                    legScaleMax: 1
-                },
-                connection: {
-                    width: 2
-                },
-                pointSize: 3,
-                scaleMode: 'others',
-                legMin: 0,
-                legMax: spidata.ticks,
-                spiderSize: 0.9,
-                lineWidth: 1,
-                lineStyle: 'rgba(0,0,0,0.1)'
-            }
-        },
-        grid: {
-            hoverable: false,
-            clickable: false,
-            tickColor: 'rgba(0,0,0,0.15)',
-            ticks: spidata.ticks,
-            mode: 'radar'
-        }
-    };
+    var rubricData = setupRubricChart({GRAPH_DATA}, {GRAPH_LEGS}, {GRAPH_MAX});
 
     $j(function() {
         var radios = $j('#rubric-tbody :radio');
-        var plot = $j.plot($j('#rubric-chart'), spidata.points, options);
+        var plot = $j.plot($j('#rubric-chart'), rubricData.spidata.points, rubricData.options);
 
         $j(document).ready(function() {
             radios.focus(updateRadio);
@@ -74,7 +27,7 @@
 
             $j('#rubric-tbody :checked').each(function() {
                 var self = $j(this);
-                spidata.points[0].data[self.data('index')] = [self.data('index'), parseInt(self.val())];
+                rubricData.spidata.points[0].data[self.data('index')] = [self.data('index'), parseInt(self.val())];
                 ++i;
                 self.addClass('focused').next().addClass('focused');
                 self.closest('tr').children('.warning').first().children('div').css('visibility', 'hidden');
@@ -90,12 +43,7 @@
 
 
 </script>
-<script type="text/javascript">
 
-    $j(function() {
-
-    });
-</script>
 <style>
     .formLabelWidth {
         width: 150px;
@@ -105,94 +53,6 @@
         height: 32px;
         float: left;
         margin-right: 8px;
-    }
-
-    .rubric {
-        border: solid 1px #ccc;
-        background: #fff;
-        table-layout:fixed;
-    }
-    .rubric tr:hover td {
-        background: #f7f7f7;
-    }
-    .rubric tr:hover td.criterion-label {
-        background: #e7e7e7;
-    }
-    .rubric td {
-        border: solid 1px #ccc;
-        padding: 0;
-    }
-    .rubric td.criterion-value:hover {
-        background: #FFFDDB;
-    }
-    .rubric td.pad {
-        padding: 8px;
-    }
-    .rubric .criterion-label {
-        background: #F5F5F5;
-        font-weight: bold;
-    }
-    .rubric .warning {
-        border: solid 1px #FAF9F5;
-        background: #FAF9F5;
-        padding: 0;
-    }
-    .rubric .warning div {
-        margin: 8px;
-        padding: 8px 0;
-        color: #FF654A;
-        font-weight: bold;
-    }
-    .rubric .warning div span {
-        display: block;
-        width: 12px;
-        height: 12px;
-        background: transparent;
-        margin-right: 4px;
-        border: solid 2px #FF654A;
-        border-radius: 10px;
-        text-align: center;
-        font-size: 12px;
-        line-height: 11px;
-    }
-    .rubric .rubric-input {
-        display: none;
-        position: absolute;
-    }
-    .rubric input.focused {
-
-    }
-    .rubric label.focused {
-        background: #CAE9B9;
-    }
-    .rubric td label {
-        height: 100%;
-        width: 100%;
-        padding: 0;
-        margin: 0;
-    }
-    .rubric td label span {
-        padding: 8px;
-        display: block;
-    }
-    .rubric-grade {
-        background: #F4FBF1;
-        color: #3F9E00;
-        float: left;
-        padding: 8px 16px;
-        font-size: 1.5em;
-        line-height: 1.2em;
-        border: solid 1px #CAE9B9;
-        border-radius: 4px;
-    }
-    .rubric-grade span {
-
-    }
-    #sum {
-
-    }
-    #max {
-
     }
     #rubric-chart {
         width: 300px;
@@ -240,6 +100,12 @@
                 </colgroup>
                 <tbody id="rubric-tbody">
                 <!-- BEGIN rubric_crit -->
+                    <!-- BEGIN rubric_grouping -->
+                    <tr>
+                        <td class="criterion-label pad span" colspan="{RUBRIC_GROUP_SPAN}">{RUBRIC_GROUP_LABEL}</td>
+                        <td class="warning"></td>
+                    </tr>
+                    <!-- END rubric_grouping -->
                     <tr>
                         <td class="criterion-label pad">{RUBRIC_CRIT_LABEL}</td>
                         <!-- BEGIN rubric_crit_rating -->

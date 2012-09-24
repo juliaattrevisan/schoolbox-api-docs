@@ -47,6 +47,8 @@ if(is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
         $this->setVar("mark_type_{$type['slug']}_block", '');
     }
 
+    /* RUBRIC LOGICZ */
+
     $rubric = $rubricHandler->getRubric($subbox['id']);
 
     $rubricMark = new DueWork_Rubric_Mark($rubric);
@@ -71,12 +73,27 @@ if(is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
     $this->setBlock('mark_type_rubric', 'rubric_rating', 'rubric_rating_block');
     $this->setBlock('mark_type_rubric', 'rubric_crit', 'rubric_crit_block');
     $this->setBlock('rubric_crit', 'rubric_crit_rating', 'rubric_crit_rating_block');
+    $this->setBlock('rubric_crit', 'rubric_grouping', 'rubric_grouping_block');
 
-    for($i = 0; $i < count($data['criteria'][0]['results']); ++$i) {
+    $colCount = count($data['criteria'][0]['results']);
+
+    for($i = 0; $i < $colCount; ++$i) {
         $this->parse('rubric_rating_block', 'rubric_rating', true);
     }
 
     for($i = 0; $i < count($data['criteria']); ++$i) {
+        // display a grouping row
+        if($i == 0 || $data['criteria'][$i]['group'] != $data['criteria'][$i - 1]['group']) {
+            $this->setVar(array(
+                'RUBRIC_GROUP_SPAN' => $colCount + 1,
+                'RUBRIC_GROUP_LABEL' => $data['criteria'][$i]['group']
+            ));
+            $this->parse('rubric_grouping_block','rubric_grouping', false);
+        }
+        else {
+            $this->setVar('rubric_grouping_block', '');
+        }
+
         $this->setVar(array(
             'rubric_crit_rating_block' => '',
             'RUBRIC_CRIT_LABEL'        => $data['criteria'][$i]['label'],

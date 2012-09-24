@@ -19,8 +19,36 @@
     <!-- END mark_type_none -->
     <!-- BEGIN mark_type_rubric -->
     <div class="rubric-inline">
-        <a class="view" title="View Rubric" href="#">{MARK}&nbsp;/&nbsp;{MAX_MARK}</a>
-        <a class="edit" title="Edit Rubric" href="/submission/returnWork/{BOX_ID}/{OWNER_ID}"></a>
+        <!-- BEGIN rubric_marked -->
+        <a class="view" id="launchlightbox-{OWNER_ID}" title="View Rubric" href="#">{MARK}&nbsp;/&nbsp;{MAX_MARK}</a>
+        <!-- END rubric_marked -->
+        <!-- BEGIN rubric_unmarked -->
+        <a class="view" title="Mark Rubric" href="/submission/returnWork/{BOX_ID}/{OWNER_ID}">Mark</a>
+        <!-- END rubric_unmarked -->
+        <a class="edit" title="Mark Rubric" href="/submission/returnWork/{BOX_ID}/{OWNER_ID}"></a>
+
+        <script type="text/javascript">
+            $j(function () {
+                // Modal for Rubric viewing
+                $j('#rubric-lightbox').dialog({
+                    width: 750,
+                    autoOpen: false,
+                    title: "{OWNER_NAME}",
+                    modal: true,
+                    resizable: false
+                });
+
+                $j('#launchlightbox-{OWNER_ID}').click(function(e) {
+                    e.preventDefault();
+                    $j('#rubric-lightbox').load('/ajax/rubric/{BOX_ID}/{OWNER_ID}', {}, function() {
+                        $j('#rubric-lightbox').dialog('open');
+                    });
+
+                    return false;
+                });
+            });
+        </script>
+
     </div>
     <!-- END mark_type_rubric -->
     <input name="comment[]" id="comment" size="40" title="Comment" value="{COMMENT}" class="comment" type="text">
@@ -28,3 +56,6 @@
     <input type="hidden" name="box_id" value="{BOX_ID}">
     <input type="hidden" class="mark-update" name="markUpdate" value="true">
 </div>
+
+
+

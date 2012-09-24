@@ -1,10 +1,11 @@
 <!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <style type="text/css">
     .inlineform .rubric-inline {
         float: left;
         position: relative;
         top: 5px;
-        z-index: 9001;
+        z-index: 11;
         line-height: 14px;
     }
     .rubric-inline .view {
@@ -25,11 +26,61 @@
     .rubric-inline .edit:hover {
         background-position: 0 -322px;
     }
+    .rubric {
+        width: 100%;
+    }
+    #rubric-window {
+        min-height: 300px;
+    }
+    #rubric-window h3 {
+        font-weight: bold;
+    }
+    #rubric-window .resultset h5:first-child {
+        font-weight: bold;
+        width: 200px;
+    }
+    #rubric-window .resultset h5 {
+        float: left;
+    }
+    #rubric-window .descriptor {
+        /*font-family: serif;*/
+        font-style: italic;
+    }
+    #rubric-window ul {
+        margin-bottom: 8px;
+    }
+    #rubric-window ul:first-child {
+        max-width: 400px;
+    }
+    #rubric-window li {
+        margin: 4px 0;
+    }
+    #rubric-chart {
+        width: 300px;
+        height: 200px;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }
+    #rubric-window .rubric-grade {
+        position: absolute;
+        right: 20px;
+        top: 225px;
+    }
+    #closebox {
+        position: absolute;
+        bottom: 0;
+        right: 8px;
+    }
 </style>
 <script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
 <script src="/javascript/jquery.viewSubmission.js" type="text/javascript"></script>
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
-
+<script type="text/javascript" src="/javascript/excanvas.compiled.js"></script>
+<script type="text/javascript" src="/javascript/flot/jquery.flot.js"></script>
+<script type="text/javascript" src="/javascript/flot/jquery.flot.highlighter.js"></script>
+<script type="text/javascript" src="/javascript/flot/jquery.flot.spider.js"></script>
+<script type="text/javascript" src="/javascript/jquery.flot.rubric.js"></script>
 <script type="text/javascript">
     $j(function() {
         // setup prettifier
@@ -169,4 +220,4 @@
         </table>
     </form>
 </div>
-
+<div id="rubric-lightbox"></div>

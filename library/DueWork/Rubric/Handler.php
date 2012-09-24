@@ -46,8 +46,8 @@ class DueWork_Rubric_Handler {
                     AND d.`submission_box_id` = u.`submission_box_id`
                     AND sb.`rubric_result_set` = 0
             WHERE u.submission_box_id = :sbid
-            AND d.`valid` = 1
-            ORDER BY c.id ASC, r.value ASC, d.value ASC";
+            AND (d.`valid` = 1 OR sb.rubric_result_set > 0)
+            ORDER BY c.grouping ASC, c.name ASC, r.value ASC, d.value ASC";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute(array('sbid' => $boxID));

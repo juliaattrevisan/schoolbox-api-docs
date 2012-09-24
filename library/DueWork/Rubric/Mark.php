@@ -76,6 +76,7 @@ class DueWork_Rubric_Mark {
         foreach($this->rubric->getCriteriaIndices() as $cID) {
             $obj['criteria'][$cID] = array(
                 'id'    => $cID,
+                'group' => $this->rubric->getCriterion($cID)->getGrouping(),
                 'label' => $this->rubric->getCriterion($cID)->getName(),
                 'value' => $this->getMark($cID)
             );

@@ -24,6 +24,7 @@ else {
 }
 
 $this->setVar('category_select_block', '');
+$this->setVar('existing_marks_warning_block', '');
 
 $subBoxHandler = new Submission();
 $rubricHandler = new DueWork_Rubric_Handler();
@@ -65,9 +66,6 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
 
             if($rubricHandler->marksAlreadyGiven($subbox['id'])) {
                 $this->parse('existing_marks_warning_block', 'existing_marks_warning');
-            }
-            else {
-                $this->setVar('existing_marks_warning_block', '');
             }
 
             $criteria = $rubric->getCriteriaIndices();

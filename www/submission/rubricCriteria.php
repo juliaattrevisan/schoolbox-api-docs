@@ -23,6 +23,11 @@ else {
     error(2);
 }
 
+$groupHandler = new Group();
+if(!($groupHandler->isSuperuser() || $groupHandler->getPermission($catID) >= WRITE_ACCESS)) {
+    error(6);
+}
+
 $title = 'Manage Rubric Criteria';
 
 $this->setFile(TEMPLATE_content, 'submission/rubricCriteria.html');
