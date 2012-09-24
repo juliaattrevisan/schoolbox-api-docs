@@ -1,7 +1,18 @@
 <!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.tablesorter.min.js"></script>
 <script type="text/javascript">
 $j(function(){
 	$j('#container').css('width', $j('.ruler').outerWidth());
+    $j(".ruler").tablesorter({
+        cssHeader: 'sortable',
+        cssAsc: 'ascending',
+        cssDesc: 'descending',
+        headers: {
+            6: { sorter: false},
+            7: { sorter: false},
+            8: { sorter: false}
+        }
+    });
 });
 </script>
 <style type="text/css">
@@ -60,9 +71,9 @@ $j(function(){
 </form>
 
 <div class="indent">
-    <table class="ruler">
         <!-- BEGIN category_listing -->
-        <thead>
+    <table class="ruler">
+    <thead>
             <tr>
                 <td colspan="9"><h2>{CATEGORY} ({STUDENTS} Students)</h2>
                     <span class="header_option in-h2"><a href="/submission/markSheet/{CATEGORY_ID}" class="btn modify"><span></span>Class Mark Sheet</a></span>
@@ -131,8 +142,7 @@ $j(function(){
                 <!-- END onlineAssessment -->
             </tr>
             <!-- END submission_listing -->
-            <tr><td colspan="9">&nbsp;</td></tr>
         </tbody>
-        <!-- END category_listing -->
     </table>
+    <!-- END category_listing -->
 </div>
