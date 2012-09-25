@@ -13,20 +13,20 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
 
     protected $news;
 
-    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage, News $news) {
+    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage, News $news) {
         parent::__construct($instance, $user, $sitepage);
 
         $this->news = $news;
     }
 
-    public function execute () {
-        $this->headlineList = $this->news->getHeadlines();
+    public function execute() {
+        $this->headlineList = $this->news->getNewsListing(false);
 
         return true;
     }
 
-    public function renderTemplate ($templateHandle) {
-        if ( !$this->loadTemplate($templateHandle, 'news') ) {
+    public function renderTemplate($templateHandle) {
+        if (!$this->loadTemplate($templateHandle, 'news')) {
             return false;
         }
 
@@ -38,28 +38,32 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
         $this->setVar("topic_header_block", "");
         $this->setVar("news_block", "");
 
-        if ( is_array($this->headlineList) ) {
+        if (is_array($this->headlineList)) {
 
             $j = $k = 0;
             $total = count($this->headlineList);
 
-            foreach ( $this->headlineList as $item ) {
+            foreach ($this->headlineList as $item) {
                 $j++;
-                $url = new Url( $previous['topicName'] );
+                $url = new Url($previous['topicName']);
 
-                $newsTime = new Alaress_Date_Relative( $item['item_datetime_modified'] );
+                $newsTime = new Alaress_Date_Relative($item['item_datetime_modified']);
                 $newsTime->setPrefix('');
 
                 $output = array(
-                    'NEWS_TITLE' => $item['item_heading'], 'NEWS_URL' => '/news/item/' . $item['item_id'],
-                    'NEWS_TIME' => $newsTime->getRelativeTime(), 'ON_OFF' => ++$k % 2 ? '' : 'dark',
-                    'NEWS_TOPIC' => Scrub::text($previous['topicName']), 'TOPIC_CLEAN' => $url->getSlug(),
+                    'NEWS_TITLE' => $item['item_heading'],
+                    'NEWS_URL' => '/news/item/' . $item['item_id'],
+                    'NEWS_SHORT' => TextFormatter::cutSentence(Scrub::html2text($item['item_body']), 300),
+                    'NEWS_TIME' => $newsTime->getRelativeTime(),
+                    'ON_OFF' => ++$k % 2 ? '' : 'dark',
+                    'NEWS_TOPIC' => Scrub::text($previous['topicName']),
+                    'TOPIC_CLEAN' => $url->getSlug(),
                 );
 
                 $this->setVar($output);
                 $topicList[$item['topicName']] = 1;
 
-                if ( $item['topicName'] != $previous['topicName'] && $j > 1 ) {
+                if ($item['topicName'] != $previous['topicName'] && $j > 1) {
 
                     /* end topic */
                     $this->parse('topic_block', 'topic', true);
@@ -71,8 +75,8 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                     $this->parse("news_block", "news", true);
 
                     /* last rotation */
-                    if ( $total == $j ) {
-                        $url = new Url( $item['topicName'] );
+                    if ($total == $j) {
+                        $url = new Url($item['topicName']);
 
                         $this->setVar('NEWS_TOPIC', Scrub::text($item['topicName']));
                         $this->setVar('TOPIC_CLEAN', $url->getSlug());
@@ -80,14 +84,12 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                         $this->parse('topic_block', 'topic', true);
                     }
 
-                }
-                elseif ( $total == $j ) {
+                } elseif ($total == $j) {
                     /* last rotation */
                     $this->parse("news_block", "news", true);
 
                     $this->parse('topic_block', 'topic', true);
-                }
-                else {
+                } else {
                     /* normal rotation */
                     $this->parse("news_block", "news", true);
                 }
@@ -95,25 +97,24 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                 $previous = $item;
             }
 
-        }
-        else {
+        } else {
             $this->setVar("topic_block", "<li>No news articles available</li>");
         }
 
         // output tabs
-        if(is_array($topicList)) {
+        if (is_array($topicList)) {
             foreach ($topicList as $topic => $bin) {
                 $url = new Url($topic);
 
-                $output = array('NEWS_TOPIC'	=> Scrub::text($topic),
-                                'TOPIC_CLEAN'	=> $url->getSlug(),
-                                );
+                $output = array(
+                    'NEWS_TOPIC' => Scrub::text($topic),
+                    'TOPIC_CLEAN' => $url->getSlug(),
+                );
                 $this->setVar($output);
                 $this->parse('topic_header_block', 'topic_header', true);
             }
-        }
-        else{
-            $this->setVar('topic_header_block','');
+        } else {
+            $this->setVar('topic_header_block', '');
         }
 
 
