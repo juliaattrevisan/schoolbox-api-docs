@@ -143,7 +143,7 @@ body#tinymce {
 a {
   outline: none;
   text-decoration: none;
-  color: #1d9ffc;
+  color: #0066b0;
 }
 a:hover {
   text-decoration: underline;
@@ -200,10 +200,7 @@ CSS commands
   text-align: center;
 }
 .active-checkbox {
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
-  background: #cae9b9;
+  background: #0066b0;
   padding: 0 2px;
 }
 .float-right {
@@ -303,21 +300,18 @@ h1 {
   margin-bottom: 24px;
 }
 h2 {
-  background: #cae9b9;
+  background: #0066b0;
   margin: 0;
-  border-radius: 1px;
-  -webkit-border-radius: 1px;
-  -moz-border-radius: 1px;
   font-size: 12px;
   min-height: 32px;
   line-height: 32px;
   padding: 0 16px;
-  color: #013a63;
-  font-size: 18px;
+  color: #ffffff;
+  font-size: 13px;
   font-weight: bold;
 }
 h2 a {
-  color: #013a63;
+  color: #ffffff;
 }
 #tooltip {
   position: absolute;
@@ -325,10 +319,7 @@ h2 a {
   z-index: 200000;
   background: #FFFDE9;
   padding: 2px 16px;
-  border: 1px solid #f4f1ea;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  order-radius: 3px;
+  border: 1px solid #ffffff;
   font-size: 10px;
 }
 .header_option {
@@ -337,7 +328,7 @@ h2 a {
   margin: -43px 0 0 0;
   position: relative;
   line-height: normal;
-  color: #013a63;
+  color: #ffffff;
 }
 .header_option.in-h2 {
   margin: -32px 5px 0 0;
@@ -400,9 +391,6 @@ Notifications
   background: #e8f5ff url(/images/famicons/information.png) 8px 2px no-repeat;
   line-height: 16px;
   margin-bottom: 16px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
   color: #000;
   z-index: 120;
   border: 1px solid #d9effe;
@@ -412,9 +400,6 @@ Notifications
   background: #e8f5ff url(/images/famicons/information.png) 8px 2px no-repeat;
   line-height: 16px;
   margin-bottom: 16px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
   color: #000;
   z-index: 120;
   border: 1px solid #d9effe;
@@ -438,9 +423,6 @@ Notifications
   min-width: 687px;
   padding: 16px;
   background: #ffffff;
-  -moz-border-radius: 0 7px 7px 7px;
-  -webkit-border-radius: 0 7px 7px 7px;
-  border-radius: 0 7px 7px 7px;
 }
 #content {
   padding: 0;
@@ -466,10 +448,7 @@ Notifications
   width: 300px;
 }
 #search {
-  background: #fffde9;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
+  background: #ffffff;
   float: right;
   width: 288px;
   margin: 16px 16px 0 0;
@@ -487,18 +466,12 @@ Notifications
   height: 32px;
   line-height: 32px;
   border: 0;
-  background: #fffde9;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
+  background: #ffffff;
   font-family: Arial, Helvetica, sans-serif;
 }
 #search-button {
-  -webkit-border-radius: 4px;
   text-indent: -999999em;
   border: 0;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
   float: right;
   margin: 0;
   text-align: center;
@@ -540,10 +513,7 @@ Notifications
   z-index: 100;
 }
 #nav .nav-wrapper {
-  background: #faf9f5;
-  -moz-border-radius: 0 0 3px 3px;
-  -webkit-border-radius: 0 0 3px 3px;
-  border-radius: 0 0 3px 3px;
+  background: #ffffff;
 }
 #nav .nav-wrapper.my-links {
   background-color: #f3faff;
@@ -569,9 +539,6 @@ Notifications
   color: #ffffff;
   text-decoration: none;
   background: #0aa9c7;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
 }
 #nav li a span strong {
   position: absolute;
@@ -587,9 +554,6 @@ Notifications
   width: 224px;
   margin-bottom: 16px !important;
   padding: 9px 0;
-  -moz-border-radius: 0 0 3px 3px;
-  -webkit-border-radius: 0 0 3px 3px;
-  border-radius: 0 0 3px 3px;
 }
 #nav ul ul {
   display: none;
@@ -606,10 +570,7 @@ Notifications
   -webkit-box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
   z-index: 120;
   box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
-  background: #faf9f5;
+  background: #ffffff;
 }
 #nav ul ul a {
   zoom: 1;
@@ -633,10 +594,7 @@ Notifications
   line-height: 32px;
   font-weight: bold;
   text-transform: none;
-  background: #f4f1ea;
-  -moz-border-radius: 3px 3px 0 0;
-  -webkit-border-radius: 3px 3px 0 0;
-  border-radius: 3px 3px 0 0;
+  background: #ffffff;
 }
 #nav h3.my-links {
   background-color: #e8f5ff;
@@ -652,9 +610,6 @@ Notifications
   width: 39px;
   z-index: 200;
   font-size: 12px;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
 }
 /*--------------------------------------------------------------
  TABBED NAV ACROSS THE TOP
@@ -671,24 +626,23 @@ Notifications
   z-index: 1;
   float: left;
   position: relative;
+  margin-right: 2px;
 }
 #tabs li a {
   font-weight: bold;
   font-size: 12px;
-  color: #579dcf;
+  color: #0066b0;
   height: 32px;
   line-height: 32px;
   display: block;
   float: left;
   padding: 0 12px;
+  background: #ecf7ff;
 }
 #tabs li.navthis {
   z-index: 2;
 }
 #tabs li.navthis a {
-  -moz-border-radius: 7px 7px 0 0;
-  -webkit-border-radius: 7px 7px 0 0;
-  border-radius: 7px 7px 0 0;
   background: #ffffff;
   font-weight: bold;
   color: #0066b0;
@@ -728,11 +682,8 @@ Notifications
   height: 150px;
   margin: 16px;
   display: block;
-  background: #cae9b9;
+  background: #0066b0;
   z-index: 2;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
   text-align: center;
   font-size: 18px;
   color: #9cc586;
@@ -806,9 +757,6 @@ Notifications
   width: 84px;
   height: 26px;
   color: #000 !important;
-  -moz-border-radius: 3px 3px 0 0;
-  -webkit-border-radius: 3px 3px 0 0;
-  border-radius: 3px 3px 0 0;
 }
 .box a.edit {
   position: absolute;
@@ -817,9 +765,6 @@ Notifications
   width: 84px;
   height: 26px;
   color: #000 !important;
-  -moz-border-radius: 3px 3px 0 0;
-  -webkit-border-radius: 3px 3px 0 0;
-  border-radius: 3px 3px 0 0;
 }
 .box a.edit:hover {
   text-decoration: none;
@@ -834,9 +779,6 @@ Notifications
   position: absolute;
   right: 27px;
   top: 3px;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
   color: #000 !important;
   width: 50px;
   height: 20px;
@@ -849,9 +791,6 @@ Notifications
   background: #dcdcdc;
 }
 .box a.edit span {
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
   background: #ffffff;
   width: 20px;
   display: block;
@@ -864,10 +803,10 @@ Notifications
   color: #bebebe;
 }
 .dark {
-  background: #faf9f5;
+  background: #ffffff;
 }
 .dark td {
-  background: #faf9f5;
+  background: #ffffff;
   zoom: 1;
   min-height: 1px;
 }
@@ -1048,9 +987,6 @@ Notifications
   font-weight: bold;
   text-align: center;
   height: 20px;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
 }
 .box a.close-delete span {
   color: #bebebe;
@@ -1131,9 +1067,6 @@ Notifications
 h4.eventListing {
   width: 70%;
   padding: 3px 16px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
 }
 .tweets h4 span {
   display: block;
@@ -1199,9 +1132,6 @@ label.error {
   border: 1px solid #ffcc00;
   color: #ff5f45 !important;
   display: block;
-  -moz-border-radius: 0 0 3px 3px;
-  -webkit-border-radius: 0 0 3px 3px;
-  border-radius: 0 0 3px 3px;
   -moz-background-clip: padding;
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
@@ -1220,7 +1150,7 @@ fieldset {
   margin: 0;
 }
 .standardForm {
-  background: #faf9f5;
+  background: #ffffff;
   margin: 0 0 16px 0;
   width: 100%;
 }
@@ -1235,7 +1165,7 @@ fieldset {
 .standardForm td h4 {
   font-size: 16px;
   margin-bottom: 16px;
-  color: #013a63;
+  color: #ffffff;
   font-weight: bold;
 }
 .standardForm td em {
@@ -1327,9 +1257,6 @@ input.timeField {
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fbfbfb), color-stop(1, #f7f7f7));
   filter: progid:dximagetransform.microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7');
   -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7')";
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
   height: 22px;
   line-height: 22px;
   margin-left: 8px;
@@ -1579,11 +1506,8 @@ input.timeField {
   padding: 0 9px 0 38px;
   display: inline-block;
   margin: 0;
-  background: #faf9f5;
+  background: #ffffff;
   border: 0;
-  -moz-border-radius: 0;
-  -webkit-border-radius: 0;
-  border-radius: 0;
   -moz-background-clip: padding;
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
@@ -1729,13 +1653,10 @@ ADMIN NAV
   color: #579dcf;
   font-weight: bold;
   background: #f5f5f5;
-  -moz-border-radius: 8px 8px 0 0;
-  -webkit-border-radius: 8px 8px 0 0;
-  border-radius: 8px 8px 0 0;
 }
 .admin-nav li a.current {
   color: #0066b0;
-  background: #f4f1ea;
+  background: #ffffff;
 }
 /*-------------------------------------------------------------
 ADMIN BODY
@@ -1743,11 +1664,8 @@ ADMIN BODY
 .admin-contents {
   min-height: 1px;
   clear: both;
-  background: #f4f1ea;
+  background: #ffffff;
   padding: 16px;
-  -moz-border-radius: 0 0 4px 4px;
-  -webkit-border-radius: 0 0 4px 4px;
-  border-radius: 0 0 4px 4px;
   position: relative;
 }
 .admin-contents h2 {
@@ -1755,7 +1673,7 @@ ADMIN BODY
   text-indent: none;
   padding: 0;
   font-size: 18px;
-  color: #013a63;
+  color: #ffffff;
 }
 .admin-contents h2 span {
   font-size: 12px;
@@ -1765,25 +1683,19 @@ ADMIN BODY
 .admin-contents h2 strong {
   background: #ffffff;
   font-weight: normal;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
   padding: 2px 4px;
 }
 .admin-contents h3 {
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 16px;
-  color: #013a63;
+  color: #ffffff;
 }
 .admin-contents h3 span {
   background: #e9e3d6;
   font-weight: normal;
   font-size: 14px;
   padding: 4px;
-  -moz-border-radius: 16px;
-  -webkit-border-radius: 16px;
-  border-radius: 16px;
   margin: 0 8px;
 }
 .admin-contents h3 span:hover {
@@ -1817,10 +1729,7 @@ ADMIN BODY
 .admin-contents .level {
   padding: 16px;
   background: #faf9f6;
-  -moz-border-radius: 2px;
-  -webkit-border-radius: 2px;
   border: 1px solid #e9e3d6;
-  border-radius: 2px;
   margin-bottom: 16px;
   position: relative;
   min-height: 1px;
@@ -1830,10 +1739,10 @@ ADMIN BODY
 }
 .admin-contents .level.green {
   background: #edf7e7;
-  border-color: #cae9b9;
+  border-color: #0066b0;
 }
 .admin-contents .level.green .split {
-  border-color: #cae9b9;
+  border-color: #0066b0;
 }
 .admin-contents .split-container {
   width: 50%;
@@ -2020,9 +1929,6 @@ ADMIN BODY
   font-weight: bold;
   background: #EDF7E7;
   margin-bottom: 16px;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
   -moz-background-clip: padding;
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
@@ -2060,14 +1966,11 @@ ADMIN BODY
   height: 32px;
   line-height: 32px;
   padding: 0 16px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
   background: #a9e8e1;
   font-weight: bold;
 }
 .sortable li li div {
-  background: #cae9b9;
+  background: #0066b0;
   font-weight: normal;
 }
 .sortable .placeholder {
@@ -2154,7 +2057,7 @@ ADMIN BODY
   display: none;
 }
 .allowed-files tr.add-new td {
-  background: #cae9b9;
+  background: #0066b0;
 }
 .settings-nav-holder,
 .admin-contents .settings {
@@ -2177,9 +2080,6 @@ ADMIN BODY
   display: block;
   padding: 7px 16px;
   margin-right: 8px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
   border: 1px solid #E9E3D6;
   color: #579DCF;
   background: #F5F5F5;
@@ -2222,9 +2122,6 @@ ADMIN BODY
   font-size: 14px;
   padding: 2px;
   cursor: help;
-  -moz-border-radius: 16px;
-  -webkit-border-radius: 16px;
-  border-radius: 16px;
   margin: 0 8px;
 }
 .admin-form label input[type=text],
@@ -2307,16 +2204,13 @@ ADMIN BODY
   margin: 4px;
   background: #ccc;
   border: 1px solid #797979;
-  background: #f4f1ea;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
-  background-color: #f4f1ea;
-  background-image: -moz-linear-gradient(top, #f4f1ea, #eae7e0);
-  background-image: -o-linear-gradient(top, #f4f1ea, #eae7e0);
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #f4f1ea), color-stop(1, #eae7e0));
-  background-image: -webkit-linear-gradient(#f4f1ea, #eae7e0);
-  background-image: linear-gradient(top, #f4f1ea, #eae7e0);
+  background: #ffffff;
+  background-color: #ffffff;
+  background-image: -moz-linear-gradient(top, #ffffff, #eae7e0);
+  background-image: -o-linear-gradient(top, #ffffff, #eae7e0);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #ffffff), color-stop(1, #eae7e0));
+  background-image: -webkit-linear-gradient(#ffffff, #eae7e0);
+  background-image: linear-gradient(top, #ffffff, #eae7e0);
   filter: progid:dximagetransform.microsoft.gradient(startColorStr='#F4F1EA', EndColorStr='#eae7e0');
   padding: 4px 4px 0 4px;
 }
@@ -2342,10 +2236,7 @@ DASHBOARD
   padding: 7px 8px 7px 28px;
   margin: 0 16px 4px 0px;
   cursor: move;
-  border: 1px solid #1d9ffc;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
+  border: 1px solid #0066b0;
   font-size: 14px;
   font-weight: bold;
   background: #b0ddfe url(/images/famicons/arrow_out.png) no-repeat 4px 50%;
@@ -2400,9 +2291,6 @@ DASHBOARD
   display: block;
   line-height: 24px;
   text-align: center;
-  -moz-border-radius: 16px;
-  -webkit-border-radius: 16px;
-  border-radius: 16px;
   color: #000;
   font-weight: bold;
   background: #ffffff;
@@ -2425,9 +2313,6 @@ DASHBOARD
 .dashboard .component-holder {
   padding: 12px 4px 4px 4px;
   border: 1px solid #ccc;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
 }
 .dashboard #dashboard-layout {
   float: right;
@@ -2439,9 +2324,6 @@ DASHBOARD
   width: 49.5%;
   margin-right: .5%;
   min-height: 18px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
 }
 .dashboard #dashboard-layout #position-right {
   margin: 0;
@@ -2467,11 +2349,6 @@ EVALUATION
   float: right;
 }
 /****** ASSESS FORMS ********/
-.evaluation-content {
-  -moz-border-radius: 0 0 3px 3px;
-  -webkit-border-radius: 0 0 3px 3px;
-  border-radius: 0 0 3px 3px;
-}
 .evaluation-content .standardForm,
 .evaluation-content form,
 .evaluation-content.student-review .question,
@@ -2601,9 +2478,6 @@ EVALUATION
 }
 .evaluation-menu .drop-arrow {
   background: #ddefd3 url(/images/core/icons/chat-down.png) no-repeat 50% 50%;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
   background: white;
   width: 20px;
   display: block;
@@ -3020,9 +2894,6 @@ ul.section-options a.drop-arrow {
   -webkit-transform: rotate(5.5deg);
   -ms-transform: rotate(5.5deg);
   transform: rotate(5.5deg);
-  -moz-border-radius: 12px;
-  -webkit-border-radius: 12px;
-  border-radius: 12px;
   -moz-background-clip: padding;
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
@@ -3172,9 +3043,6 @@ ul.section-options a.drop-arrow {
   display: block;
   float: left;
   padding: 0 16px;
-  -moz-border-radius: 4px 0 0 4px;
-  -webkit-border-radius: 4px 0 0 4px;
-  border-radius: 4px 0 0 4px;
   margin-right: 16px;
   font-size: 14px;
   -moz-background-clip: padding;
@@ -3211,9 +3079,6 @@ ul.section-options a.drop-arrow {
   padding: 2px 6px;
   margin-right: 2px;
   display: block;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
   color: #000;
   margin-bottom: 2px;
   background: #ededed;
@@ -3223,9 +3088,6 @@ ul.section-options a.drop-arrow {
   margin-bottom: 4px;
   background: #ededed;
   margin-bottom: 4px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
   color: #000;
   display: block;
   font-weight: bold;
@@ -3249,9 +3111,6 @@ ul.section-options a.drop-arrow {
   background: #909090;
   color: #ffffff;
   text-align: center;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
   -moz-background-clip: padding;
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
@@ -3270,9 +3129,6 @@ ul.section-options a.drop-arrow {
   float: left;
   margin-left: 16px;
   border: 1px solid #e0e0e0;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
   margin-bottom: 16px;
   -webkit-box-shadow: 1px 1px 2px #e0e0e0;
   -moz-box-shadow: 1px 1px 2px #e0e0e0;
@@ -3340,9 +3196,6 @@ ul.evaluation-category-select {
   padding: 8px;
 }
 .evaluation-category-select li a {
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
   color: #000;
   -moz-background-clip: padding;
   -webkit-background-clip: padding-box;
@@ -3363,7 +3216,7 @@ ul.evaluation-category-select {
 }
 .evaluation-content.question-bank .question.checked,
 .evaluation-category-select li a.selected {
-  background: #cae9b9;
+  background: #0066b0;
   filter: none;
 }
 .question-bank input[type="text"] {
@@ -3410,9 +3263,6 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
 }
 .archive .menu ul li a,
 .archive .pagination a {
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
   color: black;
   -moz-background-clip: padding;
   -webkit-background-clip: padding-box;
@@ -3432,7 +3282,7 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
   margin-bottom: 8px;
 }
 .archive .menu ul li a.selected {
-  background: #cae9b9;
+  background: #0066b0;
   filter: none;
 }
 .archive .menu h3 {
@@ -3450,7 +3300,7 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
   margin: 2px;
 }
 .archive .pagination a.current {
-  background: #cae9b9;
+  background: #0066b0;
   filter: none;
 }
 .archive.news img {
@@ -3517,7 +3367,7 @@ CALENDAR
   color: #000000;
 }
 .calendar table .dark {
-  background: #f4f1ea;
+  background: #ffffff;
   text-align: center;
 }
 .calendar table p {
@@ -3571,13 +3421,6 @@ CALENDAR
   border-bottom: 0;
   padding: 3px;
   margin: 5px 10px 0 5px;
-  -moz-border-radius: 5px 5px 0 0;
-  -webkit-border-radius: 5px 5px 0 0;
-  /* Saf3-4 */
-
-  border-radius: 5px 5px 0 0;
-  /* Opera 10.5, IE 9, Saf5, Chrome */
-
 }
 /*the top of the calendar*/
 .calendar-controls {
@@ -3599,7 +3442,7 @@ CALENDAR
   font-weight: normal;
 }
 .calendar-controls a:hover {
-  background-color: #f4f1ea;
+  background-color: #ffffff;
 }
 .calendar-controls .float-left {
   width: 26%;
@@ -3619,7 +3462,7 @@ CALENDAR
   text-indent: -9999em;
   font-size: 1px;
   padding: 0;
-  background-color: #faf9f5;
+  background-color: #ffffff;
   margin-right: 4px;
 }
 .calendar-controls .back,
@@ -3640,7 +3483,7 @@ CALENDAR
   margin-right: 4px;
 }
 .calendar-controls .datepicker-box:hover {
-  background-color: #f4f1ea;
+  background-color: #ffffff;
 }
 .calendar-controls .filter-change {
   margin-top: 0px;
@@ -3650,7 +3493,7 @@ CALENDAR
   color: #797979;
   display: inline-block;
   text-decoration: none;
-  background: #faf9f5;
+  background: #ffffff;
   position: relative;
   margin-right: 4px;
 }
@@ -3663,7 +3506,7 @@ CALENDAR
 }
 .calendar-controls .filter-change.current,
 .calendar-controls .filter-change:hover {
-  background: #f4f1ea;
+  background: #ffffff;
 }
 .calendar-controls .filter-change.week span {
   background: url(/images/core/calendar/calendar-week.png) no-repeat;
@@ -3769,7 +3612,7 @@ CALENDAR
   color: #ffffff;
   text-align: left;
   height: 20px;
-  background-color: #cae9b9;
+  background-color: #0066b0;
   padding: 3px 5px;
   position: relative;
 }
@@ -3792,7 +3635,7 @@ CALENDAR
 .day-block {
   width: 14%;
   padding: 0;
-  background: #faf9f5;
+  background: #ffffff;
   border-bottom: 3px solid #ffffff;
   border-right: 3px solid #ffffff;
   vertical-align: top;
@@ -3809,9 +3652,6 @@ ul.js_happening li {
 ul.js_happening li span {
   display: block;
   padding: 3px;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  border-radius: 5px;
   cursor: pointer;
   overflow: hidden;
 }
@@ -3837,9 +3677,6 @@ ul.js_happening li:first-child {
   line-height: 16px;
   background: #ffffff;
   border: 3px solid #e9e3d6;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
   -moz-background-clip: padding;
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
@@ -3847,9 +3684,6 @@ ul.js_happening li:first-child {
 .cal-bubble .middle .close {
   font-weight: bold;
   z-index: 50000;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
   line-height: 16px;
   position: absolute;
   right: 24px;
@@ -3871,9 +3705,6 @@ ul.js_happening li:first-child {
 .cal-bubble .middle h4 span {
   margin: 0 0 5px 0;
   padding: 2px;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
 }
 .cal-bubble .middle p {
   font-size: 12px;
@@ -4080,13 +3911,10 @@ CHAT
 }
 .chat .chat-users .chat-user-admin {
   font-weight: bold;
-  color: #1d9ffc;
+  color: #0066b0;
 }
 .chat .show-users {
   background: #ddefd3 url(/images/core/icons/chat-down.png) no-repeat 50% 50%;
-  -moz-border-radius: 0 0 4px 4px;
-  -webkit-border-radius: 0 0 4px 4px;
-  border-radius: 0 0 4px 4px;
   display: block;
   height: 16px;
   text-align: center;
@@ -4139,11 +3967,8 @@ CHAT
   display: block;
   padding: 6px 16px;
   color: #000;
-  background: #faf9f5;
+  background: #ffffff;
   border: 1px solid #e9e3d6;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
   word-wrap: break-word;
 }
 .chat .chat-message-user .chat-time {
@@ -4164,7 +3989,7 @@ CHAT
 }
 .chat .chat-message-user-admin .chat-user {
   font-weight: bold;
-  color: #1d9ffc;
+  color: #0066b0;
 }
 .chat .chat-message-user-admin .chat-user .time {
   font-weight: bold;
@@ -4250,7 +4075,7 @@ COLOUR ADJUSTMENT BOX
   cursor: pointer;
 }
 .colours-buttons {
-  background: #f4f1ea;
+  background: #ffffff;
   padding: 16px;
   padding-bottom: 8px;
 }
@@ -4312,9 +4137,6 @@ COMPONENT
 HOMEPAGE COLUMN SLIDER
 *********************************************/
 #tabs-homepage .slider-house {
-  -moz-border-radius: 2px;
-  -webkit-border-radius: 2px;
-  border-radius: 2px;
   margin: 16px 29.5%;
   -moz-background-clip: padding;
   -webkit-background-clip: padding-box;
@@ -4334,17 +4156,11 @@ HOMEPAGE COLUMN SLIDER
   background-image: -o-linear-gradient(top, #dbdbdb, #ececec);
   background-image: linear-gradient(top, #dbdbdb, #ececec);
   filter: progid:dximagetransform.microsoft.gradient(startColorStr='#dbdbdb', EndColorStr='#ececec');
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
   -moz-background-clip: padding;
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
 }
 #tabs-homepage #slider .ui-slider-handle {
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
   border: 1px solid #d1d1d1;
   margin-top: -9px;
   -moz-background-clip: padding;
@@ -4433,9 +4249,6 @@ HOMEPAGE CUSTOMISE
 #tabs-homepage .ui-tabs-nav li a {
   padding: 8px 20px;
   display: block;
-  -moz-border-radius: 7px 7px 0 0;
-  -webkit-border-radius: 7px 7px 0 0;
-  border-radius: 7px 7px 0 0;
   font-weight: bold;
   font-size: 16px;
 }
@@ -4444,7 +4257,7 @@ HOMEPAGE CUSTOMISE
   color: #579dcf;
 }
 #tabs-homepage li.ui-tabs-selected a {
-  background: #faf9f5;
+  background: #ffffff;
   color: #0066b0;
 }
 #tabs-homepage #tabs-sub .ui-tabs-nav {
@@ -4460,9 +4273,6 @@ HOMEPAGE CUSTOMISE
   padding: 8px 0px 8px 16px;
   text-align: left;
   display: block;
-  -moz-border-radius: 0;
-  -webkit-border-radius: 0;
-  border-radius: 0;
   font-size: 12px;
   color: #000;
   width: 96px;
@@ -4470,9 +4280,6 @@ HOMEPAGE CUSTOMISE
 }
 #tabs-homepage #tabs-sub li.ui-state-default a {
   background: none;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
 }
 #tabs-sub td {
   vertical-align: top;
@@ -4489,7 +4296,7 @@ HOMEPAGE CUSTOMISE
 #tabs-homepage .customise-components {
   padding: 16px;
   margin-bottom: 16px;
-  background: #faf9f5;
+  background: #ffffff;
 }
 .saved-colours,
 .saved-layout {
@@ -4499,9 +4306,6 @@ HOMEPAGE CUSTOMISE
   height: 23px;
   line-height: 23px;
   margin-bottom: 8px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
   color: #000;
   z-index: 120;
   display: none;
@@ -4516,10 +4320,7 @@ HOMEPAGE CUSTOMISE
   width: 158px;
   padding: 16px;
   margin: 0 16px 16px 0;
-  border: 1px solid #1d9ffc;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
+  border: 1px solid #0066b0;
   min-height: 156px;
   zoom: 1;
 }
@@ -4548,15 +4349,12 @@ HOMEPAGE CUSTOMISE
   position: absolute;
   top: 50px;
   left: 50px;
-  background: #cae9b9;
+  background: #0066b0;
   color: #ffffff;
   width: 62px;
   height: 34px;
   line-height: 34px;
   padding-left: 28px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
   color: #000;
   font-weight: bold;
   border: 3px solid #aad791;
@@ -4676,9 +4474,6 @@ Dropbox
 }
 .left #calendar table.duedates-calendar span.wrapper {
   border: 1px solid #717171;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
   background: none repeat scroll 0 0 #717171;
   color: #FFFFFF;
   cursor: pointer;
@@ -4827,9 +4622,6 @@ p.bubble-name {
   margin: 4px;
   text-align: center;
   background: #fcfcfc;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
   display: block;
   -moz-transition-property: border-color, background-color;
   -moz-transition-duration: .4s;
@@ -4948,7 +4740,7 @@ FORUM
   display: block;
 }
 .post-left {
-  background-color: #faf9f5;
+  background-color: #ffffff;
   padding: 0;
   vertical-align: top;
 }
@@ -5003,9 +4795,6 @@ FORUM
   height: 23px;
   line-height: 23px;
   margin-top: 4px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
   color: #000;
   width: 111px;
   z-index: 120;
@@ -5063,18 +4852,10 @@ p.forgotten {
 .highlightedMessage div {
   padding: 20px;
 }
-.box #category {
-  -moz-border-radius: 0 0 6px 6px;
-  -webkit-border-radius: 0 0 6px 6px;
-  border-radius: 0 0 6px 6px;
-}
 #category {
-  background: #faf9f5;
+  background: #ffffff;
   list-style: none;
   margin: 0;
-  -moz-border-radius: 6px;
-  -webkit-border-radius: 6px;
-  border-radius: 6px;
   clear: both;
   width: 100%;
   float: left;
@@ -5089,9 +4870,6 @@ p.forgotten {
 #category li a {
   display: block;
   padding: 7px 16px;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
   word-break: break-word;
 }
 #category li a:hover {
@@ -5169,9 +4947,6 @@ p.forgotten {
   padding: 4px;
 }
 .visible-users li span {
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
   float: left;
   display: block;
   background: #ffffff;
@@ -5303,9 +5078,6 @@ li.bars {
   line-height: 12px;
   height: 20px;
   width: 20px;
-  -moz-border-radius: 16px;
-  -webkit-border-radius: 16px;
-  border-radius: 16px;
   margin: 0 8px;
 }
 .submission-history {
@@ -5320,10 +5092,7 @@ li.bars {
   margin-bottom: 8px;
 }
 .background {
-  background-color: #faf9f5;
-  -moz-border-radius: 0 0 4px 4px;
-  -webkit-border-radius: 0 0 4px 4px;
-  border-radius: 0 0 4px 4px;
+  background-color: #ffffff;
 }
 .submission-history h4 {
   font-size: 14px;
@@ -5348,9 +5117,6 @@ li.bars {
   padding: 4px;
   border: 1px solid #000;
   text-align: center;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
 }
 .mark-box .actual-mark {
   font-weight: bold;
@@ -5560,7 +5326,6 @@ table.subjectList {
   color: #777 !important;
   float: left;
   text-shadow: 0 1px 0 white;
-  border-radius: 3px;
   height: 19px;
   line-height: 19px;
   margin-top: -1px;
@@ -5575,8 +5340,6 @@ table.subjectList {
   background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fbfbfb), color-stop(1, #f7f7f7));
   filter: progid:dximagetransform.microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7');
   -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7')";
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
 }
 .view-submission .drop-parent td:first-child .submission-dropdown:hover {
   text-decoration: none;
@@ -5664,7 +5427,6 @@ table.subjectList {
   background: transparent;
   margin-right: 4px;
   border: solid 2px #FF654A;
-  border-radius: 10px;
   text-align: center;
   font-size: 12px;
   line-height: 11px;
@@ -5677,7 +5439,6 @@ table.subjectList {
   font-size: 1.5em;
   line-height: 1.2em;
   border: solid 1px #CAE9B9;
-  border-radius: 4px;
 }
 /* -----------------------------------------
   Tiny Tables
@@ -5751,7 +5512,7 @@ table.tiny-tables td:first-child {
   width: 100px;
 }
 .mark-sheet.assessments .dark td {
-  background-color: #faf9f5;
+  background-color: #ffffff;
 }
 .mark-sheet.assessments .mark-input {
   text-align: right;

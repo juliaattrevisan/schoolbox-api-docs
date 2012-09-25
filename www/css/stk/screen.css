@@ -77,6 +77,7 @@ h3, #nav h3, .add-component .notification {
 #tabs li {
     margin-left: 4px;
     float:right;
+    margin-right: 0;
 }
 
 #tabs li a {

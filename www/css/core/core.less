@@ -71,17 +71,17 @@ Variablahs
 @body-background: #d9effe;
 
 @h1-color: @black;
-@module-heading: #013a63;
-@module-background: #cae9b9;
+@module-heading: #ffffff;
+@module-background: #0066b0;
 @alternate-background: #faf9f5;
 @body-text: @black;
 @secondary-text: #797979;
-@link: #1d9ffc;
+@link: #0066b0;
 @link-hover: #ff5a00;
 @btn-background-color: #0aa9c7;
-@subnav-background: #faf9f5;
-@subnav-header-background: #f4f1ea;
-@subnav-stroke: #efecde;
+@subnav-background: #ffffff;
+@subnav-header-background: #ffffff;
+@subnav-stroke: #ffffff;
 @subnav-text-up: #0066b0;
 @subnav-header-text: #797979;
 @chat-list-background: #f3fbef;
@@ -205,9 +205,6 @@ CSS commands
 }
 
 .active-checkbox {
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
     background: @module-background;
     padding: 0 2px;
 }
@@ -321,13 +318,12 @@ h1 {
 h2 {
     background: @module-background;
     margin: 0;
-    .rounded-corners(1px);
     font-size: 12px;
     min-height: 32px;
     line-height: 32px;
     padding: 0 16px;
     color: @module-heading;
-    font-size: 18px;
+    font-size: 13px;
     font-weight: bold;
 
     a {
@@ -342,9 +338,6 @@ h2 {
     background: #FFFDE9;
     padding: 2px 16px;
     border: 1px solid @subnav-header-background;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    order-radius: 3px;
     font-size: 10px;
 }
 
@@ -422,9 +415,6 @@ Notifications
     background: #e8f5ff url(/images/famicons/information.png) 8px 2px no-repeat;
     line-height: 16px;
     margin-bottom: 16px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
     color: #000;
     z-index: 120;
     border: 1px solid @body-background;
@@ -456,9 +446,6 @@ Notifications
     min-width: 687px;
     padding: 16px;
     background: @white;
-    -moz-border-radius: 0 7px 7px 7px;
-    -webkit-border-radius: 0 7px 7px 7px;
-    border-radius: 0 7px 7px 7px;
 }
 
 #content {
@@ -488,10 +475,7 @@ Notifications
 }
 
 #search {
-    background: #fffde9;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
+    background: #ffffff;
     float: right;
     width: 288px;
     margin: 16px 16px 0 0;
@@ -510,19 +494,13 @@ Notifications
     height: 32px;
     line-height: 32px;
     border: 0;
-    background: #fffde9;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
+    background: #ffffff;
     font-family: Arial, Helvetica, sans-serif;
 }
 
 #search-button {
-    -webkit-border-radius: 4px;
     text-indent: -999999em;
     border: 0;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
     float: right;
     margin: 0;
     text-align: center;
@@ -567,9 +545,6 @@ Notifications
     z-index: 100;
     .nav-wrapper {
         background: @subnav-background;
-        -moz-border-radius: 0 0 3px 3px;
-        -webkit-border-radius: 0 0 3px 3px;
-        border-radius: 0 0 3px 3px;
         &.my-links {
             background-color: #f3faff;
         }
@@ -593,9 +568,6 @@ Notifications
                 color: @white;
                 text-decoration: none;
                 background: @btn-background-color;
-                -moz-border-radius: 3px;
-                -webkit-border-radius: 3px;
-                border-radius: 3px;
             }
             span strong {
                 position: absolute;
@@ -614,9 +586,6 @@ Notifications
         width: 224px;
         margin-bottom: 16px !important;
         padding: 9px 0;
-        -moz-border-radius: 0 0 3px 3px;
-        -webkit-border-radius: 0 0 3px 3px;
-        border-radius: 0 0 3px 3px;
         ul {
             display: none;
             position: absolute;
@@ -632,9 +601,6 @@ Notifications
             -webkit-box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
             z-index: 120;
             box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
-            -moz-border-radius: 3px;
-            -webkit-border-radius: 3px;
-            border-radius: 3px;
             background: @subnav-background;
             a {
                 zoom: 1;
@@ -663,9 +629,6 @@ Notifications
         font-weight: bold;
         text-transform: none;
         background: @subnav-header-background;
-        -moz-border-radius: 3px 3px 0 0;
-        -webkit-border-radius: 3px 3px 0 0;
-        border-radius: 3px 3px 0 0;
         &.my-links {
             background-color: #e8f5ff;
             a {
@@ -679,9 +642,6 @@ Notifications
                 width: 39px;
                 z-index: 200;
                 font-size: 12px;
-                -moz-border-radius: 3px;
-                -webkit-border-radius: 3px;
-                border-radius: 3px;
             }
         }
     }
@@ -701,23 +661,22 @@ Notifications
         z-index: 1;
         float: left;
         position: relative;
+        margin-right: 2px;
 
         a {
             font-weight: bold;
             font-size: 12px;
-            color: #579dcf;
+            color: #0066b0;
             height: 32px;
             line-height: 32px;
             display: block;
             float: left;
             padding: 0 12px;
+            background: #ecf7ff;
         }
         &.navthis {
             z-index: 2;
             a {
-                -moz-border-radius: 7px 7px 0 0;
-                -webkit-border-radius: 7px 7px 0 0;
-                border-radius: 7px 7px 0 0;
                 background: @white;
                 font-weight: bold;
                 color: #0066b0;
@@ -770,9 +729,6 @@ Notifications
     display: block;
     background: @module-background;
     z-index: 2;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
     text-align: center;
     font-size: 18px;
     color: #9cc586;
@@ -850,9 +806,6 @@ Notifications
         width: 84px;
         height: 26px;
         color: #000 !important;
-        -moz-border-radius: 3px 3px 0 0;
-        -webkit-border-radius: 3px 3px 0 0;
-        border-radius: 3px 3px 0 0;
     }
 
     a.edit {
@@ -862,9 +815,6 @@ Notifications
         width: 84px;
         height: 26px;
         color: #000 !important;
-        -moz-border-radius: 3px 3px 0 0;
-        -webkit-border-radius: 3px 3px 0 0;
-        border-radius: 3px 3px 0 0;
         &:hover {
             text-decoration: none;
             cursor: pointer;
@@ -878,9 +828,6 @@ Notifications
             position: absolute;
             right: 27px;
             top: 3px;
-            -moz-border-radius: 3px;
-            -webkit-border-radius: 3px;
-            border-radius: 3px;
             color: #000 !important;
             width: 50px;
             height: 20px;
@@ -893,9 +840,6 @@ Notifications
             }
         }
         span {
-            -moz-border-radius: 3px;
-            -webkit-border-radius: 3px;
-            border-radius: 3px;
             background: @white;
             width: 20px;
             display: block;
@@ -1122,9 +1066,6 @@ Notifications
         font-weight: bold;
         text-align: center;
         height: 20px;
-        -moz-border-radius: 3px;
-        -webkit-border-radius: 3px;
-        border-radius: 3px;
         span {
             color: #bebebe;
         }
@@ -1216,9 +1157,6 @@ Notifications
 h4.eventListing {
     width: 70%;
     padding: 3px 16px;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
 }
 
 .tweets h4 span {
@@ -1293,10 +1231,6 @@ label {
         border: 1px solid #ffcc00;
         color: #ff5f45 !important;
         display: block;
-
-        -moz-border-radius: 0 0 3px 3px;
-        -webkit-border-radius: 0 0 3px 3px;
-        border-radius: 0 0 3px 3px;
 
         -moz-background-clip: padding;
         -webkit-background-clip: padding-box;
@@ -1435,9 +1369,6 @@ input.timeField {
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fbfbfb), color-stop(1, #f7f7f7));
     filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#fbfbfb', EndColorStr = '#f7f7f7');
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7')";
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
     height: 22px;
     line-height: 22px;
     margin-left: 8px;
@@ -1707,10 +1638,6 @@ input.timeField {
         margin: 0;
         background: @subnav-background;
         border: 0;
-        -moz-border-radius: 0;
-        -webkit-border-radius: 0;
-        border-radius: 0;
-
         -moz-background-clip: padding;
         -webkit-background-clip: padding-box;
         background-clip: padding-box;
@@ -1868,9 +1795,6 @@ ADMIN NAV
             color: #579dcf;
             font-weight: bold;
             background: #f5f5f5;
-            -moz-border-radius: 8px 8px 0 0;
-            -webkit-border-radius: 8px 8px 0 0;
-            border-radius: 8px 8px 0 0;
             &.current {
                 color: #0066b0;
                 background: @subnav-header-background;
@@ -1887,9 +1811,6 @@ ADMIN BODY
     clear: both;
     background: @subnav-header-background;
     padding: 16px;
-    -moz-border-radius: 0 0 4px 4px;
-    -webkit-border-radius: 0 0 4px 4px;
-    border-radius: 0 0 4px 4px;
     position: relative;
     h2 {
         background: none;
@@ -1905,9 +1826,6 @@ ADMIN BODY
         strong {
             background: @white;
             font-weight: normal;
-            -moz-border-radius: 4px;
-            -webkit-border-radius: 4px;
-            border-radius: 4px;
             padding: 2px 4px;
         }
     }
@@ -1921,9 +1839,6 @@ ADMIN BODY
             font-weight: normal;
             font-size: 14px;
             padding: 4px;
-            -moz-border-radius: 16px;
-            -webkit-border-radius: 16px;
-            border-radius: 16px;
             margin: 0 8px;
             &:hover {
                 cursor: help;
@@ -1958,10 +1873,7 @@ ADMIN BODY
     .level {
         padding: 16px;
         background: #faf9f6;
-        -moz-border-radius: 2px;
-        -webkit-border-radius: 2px;
         border: 1px solid #e9e3d6;
-        border-radius: 2px;
         margin-bottom: 16px;
         position: relative;
         min-height: 1px;
@@ -2163,9 +2075,6 @@ ADMIN BODY
     font-weight: bold;
     background: #EDF7E7;
     margin-bottom: 16px;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
@@ -2211,9 +2120,6 @@ ADMIN BODY
     height: 32px;
     line-height: 32px;
     padding: 0 16px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
     background: #a9e8e1;
     font-weight: bold;
 }
@@ -2349,9 +2255,6 @@ ADMIN BODY
     display: block;
     padding: 7px 16px;
     margin-right: 8px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
     border: 1px solid #E9E3D6;
     color: #579DCF;
     background: #F5F5F5;
@@ -2401,9 +2304,6 @@ ADMIN BODY
     font-size: 14px;
     padding: 2px;
     cursor: help;
-    -moz-border-radius: 16px;
-    -webkit-border-radius: 16px;
-    border-radius: 16px;
     margin: 0 8px;
 }
 
@@ -2505,9 +2405,6 @@ ADMIN BODY
     background: #ccc;
     border: 1px solid #797979;
     background: @subnav-header-background;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
     background-color: @subnav-header-background;
     background-image: -moz-linear-gradient(top, @subnav-header-background, #eae7e0);
     background-image: -o-linear-gradient(top, @subnav-header-background, #eae7e0);
@@ -2543,9 +2440,6 @@ DASHBOARD
     margin: 0 16px 4px 0px;
     cursor: move;
     border: 1px solid @link;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
     font-size: 14px;
     font-weight: bold;
     background: #B0DDFE url(/images/famicons/arrow_out.png) no-repeat 4px 50%;
@@ -2607,9 +2501,6 @@ DASHBOARD
     display: block;
     line-height: 24px;
     text-align: center;
-    -moz-border-radius: 16px;
-    -webkit-border-radius: 16px;
-    border-radius: 16px;
     color: #000;
     font-weight: bold;
     background: @white;
@@ -2636,9 +2527,6 @@ DASHBOARD
 .dashboard .component-holder {
     padding: 12px 4px 4px 4px;
     border: 1px solid #ccc;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
 }
 
 .dashboard #dashboard-layout {
@@ -2652,9 +2540,6 @@ DASHBOARD
     width: 49.5%;
     margin-right: .5%;
     min-height: 18px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
 }
 
 .dashboard #dashboard-layout #position-right {
@@ -2688,9 +2573,6 @@ EVALUATION
 
 /****** ASSESS FORMS ********/
 .evaluation-content {
-    -moz-border-radius: 0 0 3px 3px;
-    -webkit-border-radius: 0 0 3px 3px;
-    border-radius: 0 0 3px 3px;
 }
 
 .evaluation-content .standardForm,
@@ -2846,9 +2728,6 @@ EVALUATION
 
 .evaluation-menu .drop-arrow {
     background: #ddefd3 url(/images/core/icons/chat-down.png) no-repeat 50% 50%;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
     background: white;
     width: 20px;
     display: block;
@@ -3343,9 +3222,6 @@ ul.section-options a.drop-arrow {
     -webkit-transform: rotate(5.5deg);
     -ms-transform: rotate(5.5deg);
     transform: rotate(5.5deg);
-    -moz-border-radius: 12px;
-    -webkit-border-radius: 12px;
-    border-radius: 12px;
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
@@ -3530,9 +3406,6 @@ ul.section-options a.drop-arrow {
     display: block;
     float: left;
     padding: 0 16px;
-    -moz-border-radius: 4px 0 0 4px;
-    -webkit-border-radius: 4px 0 0 4px;
-    border-radius: 4px 0 0 4px;
     margin-right: 16px;
     font-size: 14px;
     -moz-background-clip: padding;
@@ -3576,9 +3449,6 @@ ul.section-options a.drop-arrow {
     padding: 2px 6px;
     margin-right: 2px;
     display: block;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
     color: #000;
     margin-bottom: 2px;
     background: @light-grey;
@@ -3592,9 +3462,6 @@ ul.section-options a.drop-arrow {
     margin-bottom: 4px;
     background: @light-grey;
     margin-bottom: 4px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
     color: #000;
     display: block;
     font-weight: bold;
@@ -3621,9 +3488,6 @@ ul.section-options a.drop-arrow {
     background: #909090;
     color: @white;
     text-align: center;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
@@ -3646,9 +3510,6 @@ ul.section-options a.drop-arrow {
     float: left;
     margin-left: 16px;
     border: 1px solid #e0e0e0;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
 
     margin-bottom: 16px;
 
@@ -3735,9 +3596,6 @@ ul.evaluation-category-select {
 }
 
 .evaluation-category-select li a {
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
     color: #000;
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
@@ -3815,9 +3673,6 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
 
 .archive .menu ul li a,
 .archive .pagination a {
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
     color: black;
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
@@ -4006,9 +3861,6 @@ CALENDAR
     border-bottom: 0;
     padding: 3px;
     margin: 5px 10px 0 5px;
-    -moz-border-radius: 5px 5px 0 0;
-    -webkit-border-radius: 5px 5px 0 0; /* Saf3-4 */
-    border-radius: 5px 5px 0 0; /* Opera 10.5, IE 9, Saf5, Chrome */
 }
 
 /*the top of the calendar*/
@@ -4247,9 +4099,6 @@ ul.js_happening {
         span {
             display: block;
             padding: 3px;
-            -moz-border-radius: 5px;
-            -webkit-border-radius: 5px;
-            border-radius: 5px;
             cursor: pointer;
             overflow: hidden;
         }
@@ -4279,11 +4128,6 @@ ul.js_happening {
     line-height: 16px;
     background: @white;
     border: 3px solid #e9e3d6;
-
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
@@ -4293,9 +4137,6 @@ ul.js_happening {
 .cal-bubble .middle .close {
     font-weight: bold;
     z-index: 50000;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
     line-height: 16px;
     position: absolute;
     right: 24px;
@@ -4319,9 +4160,6 @@ ul.js_happening {
 .cal-bubble .middle h4 span {
     margin: 0 0 5px 0;
     padding: 2px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
 }
 
 .cal-bubble .middle p {
@@ -4549,9 +4387,6 @@ CHAT
     }
     .show-users {
         background: #ddefd3 url(/images/core/icons/chat-down.png) no-repeat 50% 50%;
-        -moz-border-radius: 0 0 4px 4px;
-        -webkit-border-radius: 0 0 4px 4px;
-        border-radius: 0 0 4px 4px;
         display: block;
         height: 16px;
         text-align: center;
@@ -4605,9 +4440,6 @@ CHAT
             color: #000;
             background: @subnav-background;
             border: 1px solid #e9e3d6;
-            -moz-border-radius: 4px;
-            -webkit-border-radius: 4px;
-            border-radius: 4px;
             word-wrap: break-word;
         }
         .chat-time {
@@ -4809,9 +4641,6 @@ COMPONENT
 HOMEPAGE COLUMN SLIDER
 *********************************************/
 #tabs-homepage .slider-house {
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
     margin: 16px 29.5%;
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
@@ -4833,11 +4662,6 @@ HOMEPAGE COLUMN SLIDER
     background-image: -o-linear-gradient(top, #dbdbdb, #ececec);
     background-image: linear-gradient(top, #dbdbdb, #ececec);
     filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#dbdbdb', EndColorStr = '#ececec');
-
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
@@ -4845,9 +4669,6 @@ HOMEPAGE COLUMN SLIDER
 }
 
 #tabs-homepage #slider .ui-slider-handle {
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
     border: 1px solid #d1d1d1;
     margin-top: -9px;
     -moz-background-clip: padding;
@@ -4951,9 +4772,6 @@ HOMEPAGE CUSTOMISE
 #tabs-homepage .ui-tabs-nav li a {
     padding: 8px 20px;
     display: block;
-    -moz-border-radius: 7px 7px 0 0;
-    -webkit-border-radius: 7px 7px 0 0;
-    border-radius: 7px 7px 0 0;
 
     font-weight: bold;
     font-size: 16px;
@@ -4984,9 +4802,6 @@ HOMEPAGE CUSTOMISE
     padding: 8px 0px 8px 16px;
     text-align: left;
     display: block;
-    -moz-border-radius: 0;
-    -webkit-border-radius: 0;
-    border-radius: 0;
     font-size: 12px;
     color: #000;
     width: 96px;
@@ -4995,9 +4810,6 @@ HOMEPAGE CUSTOMISE
 
 #tabs-homepage #tabs-sub li.ui-state-default a {
     background: none;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
 }
 
 #tabs-sub td {
@@ -5028,9 +4840,6 @@ HOMEPAGE CUSTOMISE
     height: 23px;
     line-height: 23px;
     margin-bottom: 8px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
     color: #000;
     z-index: 120;
     display: none;
@@ -5048,9 +4857,6 @@ HOMEPAGE CUSTOMISE
     padding: 16px;
     margin: 0 16px 16px 0;
     border: 1px solid @link;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
     min-height: 156px;
     zoom: 1;
 }
@@ -5094,9 +4900,6 @@ HOMEPAGE CUSTOMISE
     height: 34px;
     line-height: 34px;
     padding-left: 28px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
     color: #000;
     font-weight: bold;
     border: 3px solid #aad791;
@@ -5236,9 +5039,6 @@ Dropbox
 
 .left #calendar table.duedates-calendar span.wrapper {
     border: 1px solid #717171;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
     background: none repeat scroll 0 0 #717171;
     color: #FFFFFF;
     cursor: pointer;
@@ -5411,9 +5211,6 @@ p.bubble-name {
     margin: 4px;
     text-align: center;
     background: #fcfcfc;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
     display: block;
     -moz-transition-property: border-color, background-color;
     -moz-transition-duration: .4s;
@@ -5614,9 +5411,6 @@ FORUM
     height: 23px;
     line-height: 23px;
     margin-top: 4px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
     color: #000;
     width: 111px;
     z-index: 120;
@@ -5686,18 +5480,12 @@ p.forgotten {
 }
 
 .box #category {
-    -moz-border-radius: 0 0 6px 6px;
-    -webkit-border-radius: 0 0 6px 6px;
-    border-radius: 0 0 6px 6px;
 }
 
 #category {
     background: @subnav-background;
     list-style: none;
     margin: 0;
-    -moz-border-radius: 6px;
-    -webkit-border-radius: 6px;
-    border-radius: 6px;
     clear: both;
     width: 100%;
     float: left;
@@ -5710,9 +5498,6 @@ p.forgotten {
         a {
             display: block;
             padding: 7px 16px;
-            -moz-border-radius: 3px;
-            -webkit-border-radius: 3px;
-            border-radius: 3px;
             word-break: break-word;
             &:hover {
                 background: #d6f0f6;
@@ -5800,9 +5585,6 @@ p.forgotten {
             padding: 4px;
         }
         span {
-            -moz-border-radius: 4px;
-            -webkit-border-radius: 4px;
-            border-radius: 4px;
             float: left;
             display: block;
             background: @white;
@@ -5960,9 +5742,6 @@ li.bars {
     line-height: 12px;
     height: 20px;
     width: 20px;
-    -moz-border-radius: 16px;
-    -webkit-border-radius: 16px;
-    border-radius: 16px;
     margin: 0 8px;
 }
 
@@ -5981,9 +5760,6 @@ li.bars {
 
 .background {
     background-color: @subnav-background;
-    -moz-border-radius: 0 0 4px 4px;
-    -webkit-border-radius: 0 0 4px 4px;
-    border-radius: 0 0 4px 4px;
 }
 
 .submission-history h4 {
@@ -6012,9 +5788,6 @@ li.bars {
     padding: 4px;
     border: 1px solid #000;
     text-align: center;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
 }
 
 .mark-box .actual-mark {
@@ -6250,7 +6023,6 @@ table.subjectList {
                 color: #777 !important;
                 float: left;
                 text-shadow: 0 1px 0 white;
-                border-radius: 3px;
                 height: 19px;
                 line-height: 19px;
                 margin-top: -1px;
@@ -6265,8 +6037,6 @@ table.subjectList {
                 background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #FBFBFB), color-stop(1, #F7F7F7));
                 filter: progid:dximagetransform.microsoft.gradient(startColorStr = '#fbfbfb', EndColorStr = '#f7f7f7');
                 -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7')";
-                -moz-border-radius: 3px;
-                -webkit-border-radius: 3px;
                 &:hover {
                     text-decoration: none;
                     color: #FF5A00 !important;
@@ -6347,7 +6117,6 @@ table.subjectList {
                                         background: transparent;
                                         margin-right: 4px;
                                         border: solid 2px #FF654A;
-                                        border-radius: 10px;
                                         text-align: center;
                                         font-size: 12px;
                                         line-height: 11px;
@@ -6362,7 +6131,6 @@ table.subjectList {
                                         font-size: 1.5em;
                                         line-height: 1.2em;
                                         border: solid 1px #CAE9B9;
-                                        border-radius: 4px;
 }
 
 
