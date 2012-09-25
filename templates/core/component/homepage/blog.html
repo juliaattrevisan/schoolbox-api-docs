@@ -1,3 +1,48 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
+<script type="text/javascript" src="/javascript/jquery.confirm.1.3.js"></script>
+<script type="text/javascript">
+    $j(function(){
+        $j('a.show_comments').click(function(){
+            $j(this).closest('li').find('.comments').toggle();
+            $j(this).children('span').toggle();
+            return false;
+        });
+
+        $j('a.post_comment').click(function(){
+            $j(this).closest('li').find('form').toggle();
+            return false;
+        });
+        $j('a.delete-comment').click(function(){
+            location.href = $j(this).attr('href');
+        }).confirm({
+                    buttons: {
+                        wrapper:'<button></button>',
+                        separator:'  '
+                    }
+                });
+
+        /* Modal for URL homepage selection
+         */
+        $j('#resource-browser').dialog({
+            width:650,
+            autoOpen:false,
+            title:"Select a homepage",
+            modal:true,
+            resizable:false
+        });
+
+        $j('#launch-browser-{COMPONENT_HANDLE}').click(function () {
+            $j('#resource-browser').load('/ajax/resourceBrowser', {destination:'#homepage-blog-{COMPONENT_HANDLE}'}, function () {
+                $j('#resource-browser').dialog('open');
+            });
+
+            return false;
+        });
+    });
+</script>
+<!-- END custom_head -->
+
 <div class="box component blog clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}

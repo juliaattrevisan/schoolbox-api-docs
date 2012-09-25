@@ -70,6 +70,7 @@ Variablahs
 
 @body-background: #d9effe;
 
+@dark: #fafafa;
 @h1-color: @black;
 @module-heading: #ffffff;
 @module-background: #0066b0;
@@ -546,7 +547,6 @@ Notifications
     .nav-wrapper {
         background: @subnav-background;
         &.my-links {
-            background-color: #f3faff;
         }
     }
     li {
@@ -630,9 +630,8 @@ Notifications
         text-transform: none;
         background: @subnav-header-background;
         &.my-links {
-            background-color: #e8f5ff;
             a {
-                background: #FFFFFF;
+
                 height: 19px;
                 line-height: 19px;
                 position: absolute;
@@ -856,11 +855,11 @@ Notifications
 }
 
 .dark {
-    background: @subnav-background;
+    background: @dark;
 }
 
 .dark td {
-    background: @subnav-background;
+    background: @dark;
     zoom: 1;
     min-height: 1px;
 }
@@ -1269,7 +1268,6 @@ fieldset {
         h4 {
             font-size: 16px;
             margin-bottom: 16px;
-            color: @module-heading;
             font-weight: bold;
         }
         em {
@@ -1817,14 +1815,13 @@ ADMIN BODY
         text-indent: none;
         padding: 0;
         font-size: 18px;
-        color: @module-heading;
+        color: #000;
         span {
             font-size: 12px;
             display: block;
             line-height: 10px
         }
         strong {
-            background: @white;
             font-weight: normal;
             padding: 2px 4px;
         }
@@ -1833,7 +1830,7 @@ ADMIN BODY
         font-size: 18px;
         font-weight: bold;
         margin-bottom: 16px;
-        color: @module-heading;
+        color: #000;
         span {
             background: #e9e3d6;
             font-weight: normal;
@@ -1878,7 +1875,7 @@ ADMIN BODY
         position: relative;
         min-height: 1px;
         .dark td {
-            background: @white;
+            background: @dark;
         }
         &.green {
             background: #edf7e7;
@@ -3617,7 +3614,7 @@ ul.evaluation-category-select {
 }
 
 .evaluation-content.question-bank .question.checked, .evaluation-category-select li a.selected {
-    background: @module-background;
+    background: @dark;
     filter: none;
 }
 
@@ -3693,7 +3690,7 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
 }
 
 .archive .menu ul li a.selected {
-    background: @module-background;
+    background: @alternate-background;
     filter: none;
 }
 
@@ -3795,7 +3792,7 @@ CALENDAR
             color: @black;
         }
         .dark {
-            background: @subnav-header-background;
+            background: @dark;
             text-align: center;
         }
         p {
@@ -4063,7 +4060,6 @@ CALENDAR
 .dayWrap p {
     line-height: 20px;
     height: 20px;
-    color: #797979;
 }
 
 .calTableCurrent {
@@ -6220,7 +6216,7 @@ table.tiny-tables {
 }
 
 .mark-sheet.assessments .dark td {
-    background-color: @subnav-background;
+    background-color: @dark;
 }
 
 .mark-sheet.assessments .mark-input {
@@ -6761,4 +6757,45 @@ tr span.leave-pending {
 h4 a.hidden {
     opacity: 0.5;
     color: #444;
+}
+
+
+#rubric-window {
+    position: relative;
+    min-height: 300px;
+}
+#rubric-window h3 {
+    font-weight: bold;
+}
+#rubric-window .resultset h5:first-child {
+    font-weight: bold;
+    width: 200px;
+}
+#rubric-window .resultset h5 {
+    float: left;
+}
+#rubric-window .descriptor {
+/*font-family: serif;*/
+    font-style: italic;
+}
+#rubric-window ul {
+    margin-bottom: 8px;
+}
+#rubric-window ul:first-child {
+    max-width: 400px;
+}
+#rubric-window li {
+    margin: 4px 0;
+}
+#rubric-chart {
+    width: 300px;
+    height: 200px;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+#rubric-window .rubric-grade {
+    position: absolute;
+    right: 20px;
+    top: 225px;
 }

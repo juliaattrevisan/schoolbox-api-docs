@@ -515,9 +515,6 @@ Notifications
 #nav .nav-wrapper {
   background: #ffffff;
 }
-#nav .nav-wrapper.my-links {
-  background-color: #f3faff;
-}
 #nav li {
   display: block;
   list-style: none;
@@ -596,11 +593,7 @@ Notifications
   text-transform: none;
   background: #ffffff;
 }
-#nav h3.my-links {
-  background-color: #e8f5ff;
-}
 #nav h3.my-links a {
-  background: #FFFFFF;
   height: 19px;
   line-height: 19px;
   position: absolute;
@@ -803,10 +796,10 @@ Notifications
   color: #bebebe;
 }
 .dark {
-  background: #ffffff;
+  background: #fafafa;
 }
 .dark td {
-  background: #ffffff;
+  background: #fafafa;
   zoom: 1;
   min-height: 1px;
 }
@@ -1165,7 +1158,6 @@ fieldset {
 .standardForm td h4 {
   font-size: 16px;
   margin-bottom: 16px;
-  color: #ffffff;
   font-weight: bold;
 }
 .standardForm td em {
@@ -1673,7 +1665,7 @@ ADMIN BODY
   text-indent: none;
   padding: 0;
   font-size: 18px;
-  color: #ffffff;
+  color: #000;
 }
 .admin-contents h2 span {
   font-size: 12px;
@@ -1681,7 +1673,6 @@ ADMIN BODY
   line-height: 10px;
 }
 .admin-contents h2 strong {
-  background: #ffffff;
   font-weight: normal;
   padding: 2px 4px;
 }
@@ -1689,7 +1680,7 @@ ADMIN BODY
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 16px;
-  color: #ffffff;
+  color: #000;
 }
 .admin-contents h3 span {
   background: #e9e3d6;
@@ -1735,7 +1726,7 @@ ADMIN BODY
   min-height: 1px;
 }
 .admin-contents .level .dark td {
-  background: #ffffff;
+  background: #fafafa;
 }
 .admin-contents .level.green {
   background: #edf7e7;
@@ -3216,7 +3207,7 @@ ul.evaluation-category-select {
 }
 .evaluation-content.question-bank .question.checked,
 .evaluation-category-select li a.selected {
-  background: #0066b0;
+  background: #fafafa;
   filter: none;
 }
 .question-bank input[type="text"] {
@@ -3282,7 +3273,7 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
   margin-bottom: 8px;
 }
 .archive .menu ul li a.selected {
-  background: #0066b0;
+  background: #faf9f5;
   filter: none;
 }
 .archive .menu h3 {
@@ -3367,7 +3358,7 @@ CALENDAR
   color: #000000;
 }
 .calendar table .dark {
-  background: #ffffff;
+  background: #fafafa;
   text-align: center;
 }
 .calendar table p {
@@ -3619,7 +3610,6 @@ CALENDAR
 .dayWrap p {
   line-height: 20px;
   height: 20px;
-  color: #797979;
 }
 .calTableCurrent {
   font-weight: bold;
@@ -5512,7 +5502,7 @@ table.tiny-tables td:first-child {
   width: 100px;
 }
 .mark-sheet.assessments .dark td {
-  background-color: #ffffff;
+  background-color: #fafafa;
 }
 .mark-sheet.assessments .mark-input {
   text-align: right;
@@ -5989,4 +5979,44 @@ tr span.leave-pending {
 h4 a.hidden {
   opacity: 0.5;
   color: #444;
+}
+#rubric-window {
+  position: relative;
+  min-height: 300px;
+}
+#rubric-window h3 {
+  font-weight: bold;
+}
+#rubric-window .resultset h5:first-child {
+  font-weight: bold;
+  width: 200px;
+}
+#rubric-window .resultset h5 {
+  float: left;
+}
+#rubric-window .descriptor {
+  /*font-family: serif;*/
+
+  font-style: italic;
+}
+#rubric-window ul {
+  margin-bottom: 8px;
+}
+#rubric-window ul:first-child {
+  max-width: 400px;
+}
+#rubric-window li {
+  margin: 4px 0;
+}
+#rubric-chart {
+  width: 300px;
+  height: 200px;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+#rubric-window .rubric-grade {
+  position: absolute;
+  right: 20px;
+  top: 225px;
 }
