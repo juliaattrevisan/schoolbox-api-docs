@@ -11,8 +11,6 @@ require_once dirname(__FILE__) . '/../include/Bootstrap.php';
 include dirname(__FILE__) . '/../include/Sabre/autoload.php';
 include dirname(__FILE__) . '/../include/Session.php';
 
-$session = new Session();
-$session->create('alaress');
 
 $publicdir = new DAV_Folder('');
 
@@ -26,7 +24,6 @@ $server->addPlugin($lockPlugin);
 
 $authBackend = new DAV_Digest();
 $authPlugin = new Sabre_DAV_Auth_Plugin($authBackend, Cfg::get('site_location'));
-$server->addPlugin($authPlugin);
 
 $server->setBaseUri('/');
 $server->exec();

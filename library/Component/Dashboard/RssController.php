@@ -30,7 +30,7 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
         }
 
         $this->setBlock($templateHandle, "rss_stories", "rss_block");
-        print_r($this->rss);
+
         $this->setVar('RSS_NAME', $this->rss->channel->title);
         $this->setVar('RSS_LINK', base64_encode($this->rss->channel->link));
 
