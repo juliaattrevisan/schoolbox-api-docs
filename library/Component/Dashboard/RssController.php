@@ -13,44 +13,46 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
 
     protected $rss;
 
-    public function __construct (Component_Instance $instance, User $user, SitePage $sitepage) {
+    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage) {
         parent::__construct($instance, $user, $sitepage);
 
         $this->rss = new Xml(Cfg::get('welcome_rss_url'), RSS_cache_time);
     }
 
-    public function execute () {
+    public function execute() {
 
         return true;
     }
 
-    public function renderTemplate ($templateHandle) {
-        if ( !$this->loadTemplate($templateHandle, 'rss') ) {
+    public function renderTemplate($templateHandle) {
+        if (!$this->loadTemplate($templateHandle, 'rss')) {
             return false;
         }
 
         $this->setBlock($templateHandle, "rss_stories", "rss_block");
-
+        print_r($this->rss);
         $this->setVar('RSS_NAME', $this->rss->channel->title);
         $this->setVar('RSS_LINK', base64_encode($this->rss->channel->link));
 
-        if ( $this->rss->channel ) {
-            foreach ( $this->rss->channel->item as $i => $item ) {
-                $this->setVar(array(
-                                   'ON_OFF' => ++$j % 2 ? '' : 'dark', 'RSS_TITLE' => Scrub::text($item->title),
-                                   'RSS_URL' => Scrub::html($item->link)
-                              ));
+        if ($this->rss->channel) {
+            foreach ($this->rss->channel->item as $i => $item) {
+                $this->setVar(
+                    array(
+                        'ON_OFF' => ++$j % 2 ? '' : 'dark',
+                        'RSS_TITLE' => Scrub::text($item->title),
+                        'RSS_URL' => base64_encode($item->link),
+                    )
+                );
 
                 $this->parse("rss_block", "rss_stories", true);
 
-                if ( $j == Cfg::get('welcome_rss_limit') ) {
+                if ($j == Cfg::get('welcome_rss_limit')) {
                     break;
                 }
             }
 
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
