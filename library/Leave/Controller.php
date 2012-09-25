@@ -520,7 +520,12 @@ class Leave_Controller extends Controller {
             } elseif (isset($data['reject'])) {
                 $request->setStatus(Leave_Request::STATUS_REJECTED);
             }
+        } else {
+            if (isset($data['delete'])) {
+                $request->setStatus(Leave_Request::STATUS_DELETED);
+            }
         }
+
 
         $this->getRequestMapper()->save($request);
 
