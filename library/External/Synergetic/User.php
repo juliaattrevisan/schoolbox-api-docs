@@ -7,16 +7,14 @@
  *                                                           *
  ************************************************************/
 
-class External_Synergetic_User implements External_UserInterface
-{
+class External_Synergetic_User implements External_UserInterface {
     private $database;
     private $groupHandler;
 
     /**
      * Constructor
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->setDatabase(new MSSQL());
         $this->setGroup(new Group());
     }
@@ -27,8 +25,7 @@ class External_Synergetic_User implements External_UserInterface
      * @param Integer $externalUserId
      * @return Bool|String
      */
-    public function getPortrait($externalUserId)
-    {
+    public function getPortrait($externalUserId) {
         $query = "
             SELECT vPhotos.ModifiedDate
             FROM SynergyOne.dbo.vPhotos vPhotos
@@ -58,7 +55,9 @@ class External_Synergetic_User implements External_UserInterface
                 * Separate the queries out, fetching the photo data only if it's newer than the cached
                 * version, or if the cache version doesn't already exist.
                 */
-            if (!file_exists($photoPath) || ($portraitModifiedDate->getUnixTimestamp() > $lastModifiedDate->getUnixTimestamp())) {
+            if (!file_exists($photoPath) || ($portraitModifiedDate->getUnixTimestamp(
+            ) > $lastModifiedDate->getUnixTimestamp())
+            ) {
                 $query = "
 					SELECT vPhotos.Photo, vPhotos.PhotoType
 					FROM SynergyOne.dbo.vPhotos vPhotos
@@ -99,8 +98,7 @@ class External_Synergetic_User implements External_UserInterface
      *
      * @return mixed
      */
-    public function getParent($synID)
-    {
+    public function getParent($synID) {
         $query = "
 			SELECT
 				Contact.Title, Contact.Preferred, Contact.Surname, Contact.Email, Addresses.Phone as HomePhone,
@@ -131,8 +129,7 @@ class External_Synergetic_User implements External_UserInterface
      *
      * @return mixed
      */
-    public function getParentSync($synID)
-    {
+    public function getParentSync($synID) {
         if (is_array($synID)) {
             $assignation = ' IN (' . implode(',', $synID) . ')';
         } else {
@@ -162,8 +159,7 @@ class External_Synergetic_User implements External_UserInterface
      *
      * @return array|bool
      */
-    public function getParentsOf($synergyIds)
-    {
+    public function getParentsOf($synergyIds) {
         $query = "
 			SELECT
 				StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
@@ -188,8 +184,7 @@ class External_Synergetic_User implements External_UserInterface
      * @param  $synID
      * @return array|bool
      */
-    public function getStudent($synID)
-    {
+    public function getStudent($synID) {
         $query = "SELECT
 					vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname, vStudents.StudentBirthDate,
 					vStudents.StudentTutorName, vStudents.StudentHeadOfHouse, House.HeadOfHouseID,
@@ -224,8 +219,7 @@ class External_Synergetic_User implements External_UserInterface
         return false;
     }
 
-    function getStaff($synID)
-    {
+    function getStaff($synID) {
         $query = " SELECT SchoolStaffCode, luBuilding.Description as StaffBuilding, StaffRoom, StaffExtension,
                            StaffMobilePhone, StaffCampusDescription, StaffCategoryDescription,
                            luDepartment.Description as StaffDepartment, StaffVoiceMail
@@ -249,8 +243,7 @@ class External_Synergetic_User implements External_UserInterface
      * @param $yearlevel
      * @return mixed
      */
-    public function getStudentContactListExtended($yearlevel)
-    {
+    public function getStudentContactListExtended($yearlevel) {
         $query = "
 			SELECT
 				StudentID, StudentGiven1, StudentSurname, StudentYearLevel, House.Description AS StudentHouse, StudentBoarder,
@@ -285,8 +278,7 @@ class External_Synergetic_User implements External_UserInterface
      *
      * @return mixed
      */
-    public function getStudentBoarderContactListExtended()
-    {
+    public function getStudentBoarderContactListExtended() {
         $query = "
 			SELECT
 				StudentID, StudentGiven1, StudentSurname, StudentYearLevel, House.Description AS StudentHouse,
@@ -317,8 +309,7 @@ class External_Synergetic_User implements External_UserInterface
      * @param $externalUserId
      * @return mixed
      */
-    public function getStudentContactList($externalUserId)
-    {
+    public function getStudentContactList($externalUserId) {
         $query = "
 			SELECT
 				StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
@@ -337,8 +328,7 @@ class External_Synergetic_User implements External_UserInterface
         return $this->getDatabase()->getAll($query);
     }
 
-    function getCurrentSemester()
-    {
+    function getCurrentSemester() {
         #Get current FileSemester and FileYear
         $query = "SELECT FileSemester, FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1";
 
@@ -352,8 +342,7 @@ class External_Synergetic_User implements External_UserInterface
         }
     }
 
-    function getSubjectList($synergyID, $userID)
-    {
+    function getSubjectList($synergyID, $userID) {
         if (!isset($_SESSION['FileSemester']) || !isset($_SESSION['FileYear'])) {
             return false;
         }
@@ -392,14 +381,14 @@ class External_Synergetic_User implements External_UserInterface
             $subjectList[] = array('code' => $subject['ClassCode'], 'name' => $subject['name']);
         }
 
-        if (is_array($subjectList))
+        if (is_array($subjectList)) {
             return $subjectList;
-        else
+        } else {
             return false;
+        }
     }
 
-    function getEnrolledStudents($synergyID)
-    {
+    function getEnrolledStudents($synergyID) {
         $query = "SELECT Relationships.RelatedID
 				FROM SynergyOne.dbo.Constituencies Constituencies, SynergyOne.dbo.Relationships Relationships
 				WHERE Relationships.RelatedID = Constituencies.ID AND
@@ -412,8 +401,7 @@ class External_Synergetic_User implements External_UserInterface
 
     }
 
-    function getEmail($id)
-    {
+    function getEmail($id) {
         $query = "SELECT Email FROM Community WHERE id = $id";
         return $this->getDatabase()->getOne($query);
     }
@@ -423,8 +411,7 @@ class External_Synergetic_User implements External_UserInterface
      *
      * @return array|bool
      */
-    public function getStudentUserAccountInfo()
-    {
+    public function getStudentUserAccountInfo() {
         $query = "
 			SELECT
 				vStudents.StudentID, NetworkLogin, vStudents.StudentTitle, vStudents.StudentPreferred, vStudents.StudentSurname, StudentEmail, StudentOccupEmail,
@@ -444,8 +431,7 @@ class External_Synergetic_User implements External_UserInterface
      *
      * @return array|bool
      */
-    public function getParentUserAccountInfo()
-    {
+    public function getParentUserAccountInfo() {
         $query = "
 			SELECT DISTINCT
 				StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
@@ -466,8 +452,7 @@ class External_Synergetic_User implements External_UserInterface
      *
      * @return array|bool
      */
-    public function getStaffUserAccountInfo()
-    {
+    public function getStaffUserAccountInfo() {
         $query = "
 			SELECT
 				StaffID, NetworkLogin, ActiveFlag,
@@ -489,8 +474,7 @@ class External_Synergetic_User implements External_UserInterface
      * TODO: Make exclusion on category configurable, currently excluding
      * @return mixed
      */
-    public function getStaffContactListExtended()
-    {
+    public function getStaffContactListExtended() {
         $query = "
 			SELECT
 				vStaff.StaffID, vStaff.StaffTitle, vStaff.StaffPreferredName, vStaff.StaffSurname,
@@ -512,8 +496,7 @@ class External_Synergetic_User implements External_UserInterface
         return $this->getDatabase()->getAll($query);
     }
 
-    function getCampusFromTimetable($staffID)
-    {
+    function getCampusFromTimetable($staffID) {
         $query = "SELECT DISTINCT( ClassCampus ) as campus FROM timetable WHERE StaffID = '$staffID'";
 
         return $this->getDatabase()->getAll($query);
@@ -527,17 +510,22 @@ class External_Synergetic_User implements External_UserInterface
      * @param $boarderValue
      * @return string
      */
-    public function determineBoarderType($boarderValue)
-    {
+    public function determineBoarderType($boarderValue) {
         $boarders = array('B', 'W');
 
         if (!strlen($boarderValue)) {
             return '';
-        } else if (in_array($boarderValue, $boarders)) {
-            return 'Boarder';
+        } else {
+            if (in_array($boarderValue, $boarders)) {
+                return 'Boarder';
+            }
         }
 
         return 'Day';
+    }
+
+    public function getHousemasterByHouseId($houseID) {
+        return false;
     }
 
     /* Getters/Setters
@@ -548,8 +536,7 @@ class External_Synergetic_User implements External_UserInterface
      *
      * @param $database
      */
-    private function setDatabase($database)
-    {
+    private function setDatabase($database) {
         $this->database = $database;
     }
 
@@ -558,24 +545,21 @@ class External_Synergetic_User implements External_UserInterface
      *
      * @return mixed
      */
-    private function getDatabase()
-    {
+    private function getDatabase() {
         return $this->database;
     }
 
     /**
      * @param Group $groupHandler
      */
-    public function setGroup($groupHandler)
-    {
+    public function setGroup($groupHandler) {
         $this->groupHandler = $groupHandler;
     }
 
     /**
      * @return Group
      */
-    public function getGroup()
-    {
+    public function getGroup() {
         return $this->groupHandler;
     }
 }

@@ -12,4 +12,14 @@ class DAV_Digest extends Sabre_DAV_Auth_Backend_AbstractDigest {
         return $user['hash'];
 
     }
+
+    public function authenticate(Sabre_DAV_Server $server, $realm) {
+        if (parent::authenticate($server, $realm)) {
+            $session = new Session();
+            $session->create($this->getCurrentUser());
+            return true;
+        }
+
+        return false;
+    }
 }
