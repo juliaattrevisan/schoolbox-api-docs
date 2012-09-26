@@ -13,5 +13,5 @@
 require_once '../include/Bootstrap.php';
 $sitePage = new SitePage;
 
-$image = new Alaress_Image_Schoolbox($_GET['userId'], $_GET['size'], new Alaress_Image_Transformation_Schoolbox());
+$image = new Alaress_Image_Portrait($_GET['userId'], $_GET['size'], new Alaress_Image_Transformation_Portrait());
 $image->stream();

@@ -1,14 +1,14 @@
 <?php
 
 /**
- * 
+ *
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   2011 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
- * 
+ *
  */
- 
+
 abstract class Mapper {
     /**
      * Represents a boolean data type.
@@ -59,15 +59,15 @@ abstract class Mapper {
      * @static
      * @return Mapper
      */
-    static public function getInstance () {
-        if ( !isset($instance) ) {
+    static public function getInstance() {
+        if (!isset($instance)) {
             static::$instance = new static;
         }
 
         return static::$instance;
     }
 
-    protected function __construct () {
+    protected function __construct() {
         $this->database = Database::getInstance();
 
         $this->mapping();
@@ -77,11 +77,13 @@ abstract class Mapper {
      * @brief Retrieves the entire collection unfiltered
      * @return Collection
      */
-    public function findAll () {
-        $statement = $this->database->prepare("
+    public function findAll() {
+        $statement = $this->database->prepare(
+            "
             SELECT {$this->getColumnString()}
             FROM `{$this->table}`
-        ");
+        "
+        );
 
         $statement->execute();
 
@@ -96,24 +98,28 @@ abstract class Mapper {
      * @param Mixed $identifierValue
      * @return Model
      */
-    public function findById ($identifierValue) {
+    public function findById($identifierValue) {
         $identifierName = $this->identifier['column'];
 
-        $statement = $this->database->prepare("
+        $statement = $this->database->prepare(
+            "
             SELECT {$this->getColumnString()}
             FROM `{$this->table}`
             WHERE `{$identifierName}` = :identifierValue
-        ");
+        "
+        );
 
         $statement->bindParam(':identifierValue', $identifierValue);
 
         $statement->execute();
 
         $row = $statement->fetch();
-
-        $model = $this->hydrate($row);
-
-        return $model;
+        if ($row != false) {
+            $model = $this->hydrate($row);
+            return $model;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -124,12 +130,14 @@ abstract class Mapper {
      * @param String $columnValue
      * @return Collection
      */
-    public function findByColumn ($columnName, $columnValue) {
-        $statement = $this->database->prepare("
+    public function findByColumn($columnName, $columnValue) {
+        $statement = $this->database->prepare(
+            "
             SELECT {$this->getColumnString()}
             FROM `{$this->table}`
             WHERE `{$columnName}` = :$columnName
-        ");
+        "
+        );
 
         $statement->bindParam(":$columnName", $columnValue);
 
@@ -145,8 +153,8 @@ abstract class Mapper {
      * @param Array $columnList
      * @return Bool|Collection
      */
-    public function findByColumnList ($columnList) {
-        if ( !is_array($columnList) ) {
+    public function findByColumnList($columnList) {
+        if (!is_array($columnList)) {
             return false;
         }
 
@@ -158,11 +166,11 @@ abstract class Mapper {
 
         $index = 0;
 
-        foreach ( $columnList as $columnName => $columnValue ) {
-            if ( $index > 0 ) {
+        foreach ($columnList as $columnName => $columnValue) {
+            if ($index > 0) {
                 $query .= " AND ";
             }
-            
+
             $query .= "`$columnName` = '$columnValue'";
 
             $index++;
@@ -182,12 +190,11 @@ abstract class Mapper {
      * @param $object
      * @return Bool
      */
-    public function save ($object) {
-        if ( is_subclass_of($object, 'Model') ) {
+    public function save($object) {
+        if (is_subclass_of($object, 'Model')) {
             $collection = new Collection;
             $collection[] = $object;
-        }
-        else {
+        } else {
             $collection = $object;
         }
 
@@ -196,54 +203,60 @@ abstract class Mapper {
         $plcString = $this->getPlaceholderString();
         $updString = $this->getUpdateString();
 
-        $statement = $this->database->prepare("
+        $statement = $this->database->prepare(
+            "
             INSERT INTO `$tbl` ($colString)
             VALUES ($plcString)
             ON DUPLICATE KEY UPDATE $updString;
-        ");
+        "
+        );
+        $this->database->beginTransaction();
 
-        foreach ( $collection as $model ) {
-            foreach ( $this->map as $map ) {
+        foreach ($collection as $model) {
+            foreach ($this->map as $map) {
                 $propertyName = $map['property'];
                 $columnName = $map['column'];
 
                 $statement->bindParam(":$columnName", $model->$propertyName);
             }
 
-            if ( $statement->execute() ) {
+            if ($statement->execute()) {
                 $identifier = $this->identifier['property'];
                 if (!$model->$identifier) {
                     $model->$identifier = $this->database->lastInsertId();
                 }
-            }
-            else {
+            } else {
+                $this->database->rollBack();
                 return false;
             }
         }
 
+        $this->database->commit();
+
         return true;
     }
 
-    public function delete ($object) {
+    public function delete($object) {
         $identifierName = $this->identifier['column'];
 
-        if ( is_subclass_of($object, 'Model') ) {
+        if (is_subclass_of($object, 'Model')) {
             $collection = new Collection;
             $collection[] = $object;
-        }
-        else {
+        } else {
             $collection = $object;
         }
 
-        $statement = $this->database->prepare("
+        $statement = $this->database->prepare(
+            "
             DELETE FROM  `{$this->table}`
             WHERE `{$identifierName}` = :identifierValue
-        ");
+        "
+        );
 
-        foreach ( $collection as $model ) {
+        foreach ($collection as $model) {
             $statement->bindParam(':identifierValue', $model->id);
 
-            if ( !$statement->execute() ) {
+            if (!$statement->execute()) {
                 return false;
             }
         }
@@ -255,40 +268,40 @@ abstract class Mapper {
      * @brief Attempts to complete a partially defined map
      * @return Bool
      */
-    protected function mapping () {
-        if ( empty($this->model) ) {
-            $modelName = substr( get_class($this), 0, -6 );
+    protected function mapping() {
+        if (empty($this->model)) {
+            $modelName = substr(get_class($this), 0, -6);
 
-            if ( class_exists($modelName, true) ) {
+            if (class_exists($modelName, true)) {
                 $this->model = $modelName;
-            }
-            else {
+            } else {
                 return false;
             }
 
         }
 
-        if ( empty($this->table) ) {
+        if (empty($this->table)) {
             $this->table = $this->toUnderscore($this->model);
         }
 
-        if ( empty($this->map) ) {
-            $propertyList = array_keys( get_class_vars($this->model) );
+        if (empty($this->map)) {
+            $propertyList = array_keys(get_class_vars($this->model));
 
-            if ( !empty($propertyList) ) {
+            if (!empty($propertyList)) {
 
-                foreach ( $propertyList as $propertyName ) {
+                foreach ($propertyList as $propertyName) {
 
-                    $this->hasMap(array(
-                        'column'     => $this->toUnderscore($propertyName),
-                        'property'   => $propertyName,
-                        'identifier' => $propertyName == 'id' ? true : false
-                    ));
-                    
+                    $this->hasMap(
+                        array(
+                            'column' => $this->toUnderscore($propertyName),
+                            'property' => $propertyName,
+                            'identifier' => $propertyName == 'id' ? true : false
+                        )
+                    );
+
                 }
-                
-            }
-            else {
+
+            } else {
                 return false;
             }
         }
@@ -296,8 +309,8 @@ abstract class Mapper {
         return true;
     }
 
-    protected function hasTable ($table) {
-        if ( !is_string($table) ) {
+    protected function hasTable($table) {
+        if (!is_string($table)) {
             return false;
         }
 
@@ -306,8 +319,8 @@ abstract class Mapper {
         return true;
     }
 
-    protected function hasModel ($model) {
-        if ( !is_string($model) || !class_exists($model, true) ) {
+    protected function hasModel($model) {
+        if (!is_string($model) || !class_exists($model, true)) {
             return false;
         }
 
@@ -316,12 +329,12 @@ abstract class Mapper {
         return true;
     }
 
-    protected function hasMap ($map) {
-        if ( !is_array($map) ) {
+    protected function hasMap($map) {
+        if (!is_array($map)) {
             return false;
         }
 
-        if ( !empty($map['identifier']) ) {
+        if (!empty($map['identifier'])) {
             $this->identifier = $map;
         }
 
@@ -336,10 +349,10 @@ abstract class Mapper {
      * @param Callback $callback
      * @return Collection
      */
-    public function hydrateList ($rowList, $alias = '', $callback = null) {
+    public function hydrateList($rowList, $alias = '', $callback = null) {
         $modelList = array();
 
-        foreach ( $rowList as $row ) {
+        foreach ($rowList as $row) {
             $modelList[] = $this->hydrate($row, $alias, $callback);
         }
 
@@ -352,21 +365,21 @@ abstract class Mapper {
      * @param Function $callback
      * @return Model
      */
-    public function hydrate ($row, $alias = '', $callback = null) {
+    public function hydrate($row, $alias = '', $callback = null) {
         $model = new $this->model;
 
-        foreach ( $this->map as $map) {
+        foreach ($this->map as $map) {
             $propertyName = $map['property'];
             $columnName = $map['column'];
 
-            if ( !empty($alias) ) {
+            if (!empty($alias)) {
                 $columnName = "$alias.$columnName";
             }
 
             $model->$propertyName = $row[$columnName];
         }
 
-        if ( !empty($callback) ) {
+        if (!empty($callback)) {
             $model = $callback($this, $model, $row);
         }
 
@@ -378,16 +391,15 @@ abstract class Mapper {
      * @param String $alias
      * @return String
      */
-    public function getColumnString ($alias = '') {
+    public function getColumnString($alias = '') {
 
         $columnList = array();
 
-        foreach ( $this->map as $map) {
+        foreach ($this->map as $map) {
 
-            if ( !empty($alias) ) {
+            if (!empty($alias)) {
                 $columnString = "`$alias`.`{$map['column']}` AS `$alias.{$map['column']}`";
-            }
-            else {
+            } else {
                 $columnString = "`$this->table`.`{$map['column']}`";
             }
 
@@ -401,10 +413,10 @@ abstract class Mapper {
      * @brief Returns a comma separated list of PDO placeholders. Works with Mapper::getColumnString
      * @return String
      */
-    public function getPlaceholderString () {
+    public function getPlaceholderString() {
         $placeholderList = array();
 
-        foreach ( $this->map as $map) {
+        foreach ($this->map as $map) {
             $placeholderList[] = ":{$map['column']}";
         }
 
@@ -415,10 +427,10 @@ abstract class Mapper {
      * @brief Returns an SQL fragment containg the assignment portion of an UPDATE query
      * @return String
      */
-    public function getUpdateString () {
+    public function getUpdateString() {
         $assignmentList = array();
 
-        foreach ( $this->map as $map) {
+        foreach ($this->map as $map) {
             $assignmentList[] = "`{$this->table}`.`{$map['column']}` = :{$map['column']}";
         }
 
@@ -430,7 +442,7 @@ abstract class Mapper {
      * @param String $string
      * @return String
      */
-    protected function toCamelcase ($string) {
+    protected function toCamelcase($string) {
         $segmentList = explode('_', $string);
 
         foreach ($segmentList as &$segment) {
@@ -445,12 +457,12 @@ abstract class Mapper {
      * @param String $string
      * @return String
      */
-    public function toUnderscore ($string) {
+    public function toUnderscore($string) {
         $string = str_replace('_', '', $string);
 
         $segmentList = preg_split('/(?=[A-Z])/', $string, -1, PREG_SPLIT_NO_EMPTY);
 
-        return strtolower( implode( '_', $segmentList) );
+        return strtolower(implode('_', $segmentList));
     }
 
 }

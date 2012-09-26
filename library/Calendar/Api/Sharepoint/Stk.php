@@ -9,8 +9,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface
-{
+class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 
     /* An instance of the built-in php5 soap
       */
@@ -57,13 +56,16 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface
         'Sport' => 8,
         'EOTC' => 11,
         'Event' => 9,
+        'Co-curricular' => 9,
+        'SKOCA' => 10,
+        'Curriculum' => 11,
     );
 
     /* List of event types parents can see */
-    private $parentAllowedTypes = array(1, 3, 4, 8, 11);
+    private $parentAllowedTypes = array(1, 3, 4, 8, 9, 10, 11);
 
     /* List of event types students can see */
-    private $studentAllowedTypes = array(1, 3, 8);
+    private $studentAllowedTypes = array(1, 2, 3, 8, 9, 11);
 
 
     /* Contains all event types for reference during mapping */
@@ -73,8 +75,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface
     /**
      * Constructor
      */
-    public function __construct()
-    {
+    public function __construct() {
 
         /* Create soap client
            */
@@ -98,8 +99,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface
      *
      * @return Calendar_Event_Collection
      */
-    public function getDayEvents($currentDay)
-    {
+    public function getDayEvents($currentDay) {
 
         $groupHandler = new Group;
 
@@ -178,8 +178,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface
      *
      * @return Calendar_Event_Collection
      */
-    public function getStudentBirthdays($currentDay)
-    {
+    public function getStudentBirthdays($currentDay) {
         $collection = new Calendar_Event_Collection();
 
         /* Fill in your query result set here and populate $collection
@@ -195,8 +194,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface
      *
      * @return Calendar_Event_Collection
      */
-    public function getSubmissionEvents($currentDay)
-    {
+    public function getSubmissionEvents($currentDay) {
         $collection = new Calendar_Event_Collection();
 
         /* Fill in your query result set here and populate $collection
@@ -215,8 +213,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface
      * @param $name
      * @return mixed
      */
-    private function getCampusIdFromName($name)
-    {
+    private function getCampusIdFromName($name) {
         if ($name == 'ALL') {
             $allCampuses = $this->getCampusList();
 
@@ -236,8 +233,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface
      * @param $name
      * @return mixed
      */
-    private function getSidFromName($name)
-    {
+    private function getSidFromName($name) {
         if ($name == 'ALL') {
             $allCampuses = $this->getCampusList();
 
@@ -253,8 +249,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface
      * @param $name
      * @return mixed
      */
-    private function getTypeIdFromName($name)
-    {
+    private function getTypeIdFromName($name) {
         return $this->typeMap[$name];
     }
 
@@ -266,8 +261,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface
      *
      * @param $soap
      */
-    private function setSoap($soap)
-    {
+    private function setSoap($soap) {
         $this->soap = $soap;
     }
 
@@ -276,8 +270,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface
      *
      * @return null
      */
-    private function getSoap()
-    {
+    private function getSoap() {
         return $this->soap;
     }
 
@@ -286,8 +279,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface
      *
      * @return string
      */
-    private function getWsdl()
-    {
+    private function getWsdl() {
         return $this->wsdl;
     }
 
@@ -296,8 +288,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface
      *
      * @return array
      */
-    private function getCredentials()
-    {
+    private function getCredentials() {
         return $this->credentials;
     }
 
@@ -306,8 +297,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface
      *
      * @param $calendarHandler
      */
-    public function setCalendarHandler($calendarHandler)
-    {
+    public function setCalendarHandler($calendarHandler) {
         $this->calendarHandler = $calendarHandler;
     }
 
@@ -316,8 +306,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface
      *
      * @return null
      */
-    public function getCalendarHandler()
-    {
+    public function getCalendarHandler() {
         return $this->calendarHandler;
     }
 
@@ -326,8 +315,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface
      *
      * @array $eventTypes
      */
-    public function setEventTypes($eventTypes)
-    {
+    public function setEventTypes($eventTypes) {
         $this->typeList = $eventTypes;
     }
 
@@ -337,8 +325,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface
      * @param $eventTypeID
      * @return string
      */
-    public function getTypeNameByID($eventTypeID)
-    {
+    public function getTypeNameByID($eventTypeID) {
         foreach ($this->typeList as $type) {
             if ($type['eventTypeID'] == $eventTypeID) {
                 return $type['eventType'];
@@ -351,8 +338,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface
      *
      * @param $campusList
      */
-    private function setCampusList($campusList)
-    {
+    private function setCampusList($campusList) {
         $this->campusList = $campusList;
     }
 
@@ -361,8 +347,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface
      *
      * @return array
      */
-    private function getCampusList()
-    {
+    private function getCampusList() {
         return $this->campusList;
     }
 }

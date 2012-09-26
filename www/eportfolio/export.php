@@ -28,13 +28,15 @@ $page->setBlock(TEMPLATE_content, 'custom_head', 'custom_head_block');
 $page->setFile(TEMPLATE_body, 'include/body.html');
 $page->setFile('headerTpl', 'eportfolio/export/header.html');
 
-$page->setVar(array(
-    'MAIN_BANNER_REGION' => '',
-    'MAIN_TAB_REGION' => '',
-    'MAIN_NAV_REGION' => '',
-    'MAIN_FOOTER_REGION' => '',
-    'custom_head_block' => '',
-));
+$page->setVar(
+    array(
+        'MAIN_BANNER_REGION' => '',
+        'MAIN_TAB_REGION' => '',
+        'MAIN_NAV_REGION' => '',
+        'MAIN_FOOTER_REGION' => '',
+        'custom_head_block' => '',
+    )
+);
 
 $page->template->parse('MAIN_HEADER_REGION', 'headerTpl');
 $page->template->parse('CUSTOM_HEADER_REGION', 'custom_head');
@@ -58,22 +60,24 @@ if (is_array($myFilePaths)) {
 
     // find & replace myFile asset paths within html
     // matches paths: /cms/image?* and /send.php?myFile=1*
-    $html = preg_replace_callback('#((?:/cms/image.php\?|/send.php\?myFile=1)([^"]+))#', function ($matches) {
-        global $myFilePaths;
+    $html = preg_replace_callback(
+        '#((?:/cms/image.php\?|/send.php\?myFile=1)([^"]+))#', function ($matches) {
+            global $myFilePaths;
 
-        // parse query string
-        $query = array();
-        parse_str($matches[2], $query);
+            // parse query string
+            $query = array();
+            parse_str($matches[2], $query);
 
-        // take width/height query parameters and use them for <img> attributes
-        // only use the lower of the two to avoid stretching the image
-        if ($query['width'] > $query['height']) {
-            return sprintf('%s " height="%d', $myFilePaths[$query['id']], $query['height']);
-        } else {
-            return sprintf('%s " width="%d', $myFilePaths[$query['id']], $query['width']);
-        }
+            // take width/height query parameters and use them for <img> attributes
+            // only use the lower of the two to avoid stretching the image
+            if ($query['width'] > $query['height']) {
+                return sprintf('%s " height="%d', $myFilePaths[$query['id']], $query['height']);
+            } else {
+                return sprintf('%s " width="%d', $myFilePaths[$query['id']], $query['width']);
+            }
 
-    }, $html);
+        }, $html
+    );
 }
 
 $fileHandler = new File;
@@ -83,35 +87,37 @@ mkdir(sprintf('%s/%s', $zipFolder->tmpFolder, 'Shared'));
 
 // find & replace public resources asset paths within html
 // only finds /send.php?* paths without myFile=1 as those paths are already replaced
-$html = preg_replace_callback('#(/send.php\?([^"]+))#', function ($matches) {
-    global $fileHandler;
-    global $groupHandler;
-    global $zipFolder;
+$html = preg_replace_callback(
+    '#(/send.php\?([^"]+))#', function ($matches) {
+        global $fileHandler;
+        global $groupHandler;
+        global $zipFolder;
 
-    // parse query string
-    $query = array();
-    parse_str($matches[2], $query);
+        // parse query string
+        $query = array();
+        parse_str($matches[2], $query);
 
-    // lookup file reference
-    $file = $fileHandler->getByID($query['id']);
-    if ($file && $groupHandler->getPermission($file['category']) >= READ_ACCESS) {
+        // lookup file reference
+        $file = $fileHandler->getByID($query['id']);
+        if ($file && $groupHandler->getPermission($file['category']) >= READ_ACCESS) {
 
-        // copy actual file to tmp folder
-        $filePath = Cfg::get('file_dir') . '/' . $file['id'] . '.dat';
-        if (is_file($filePath)) {
+            // copy actual file to tmp folder
+            $filePath = Cfg::get('file_dir') . '/' . $file['id'] . '.dat';
+            if (is_file($filePath)) {
 
-            $relativePath = 'Shared/' . $zipFolder->uniqueFileName($file['realname']);
-            copy($filePath, sprintf('%s/%s', $zipFolder->tmpFolder, $relativePath));
+                $relativePath = 'Shared/' . $zipFolder->uniqueFileName($file['realname']);
+                copy($filePath, sprintf('%s/%s', $zipFolder->tmpFolder, $relativePath));
 
-            // replace html path
-            return $relativePath;
-        } else {
-            // actual file doesn't exist, leave html path as is
-            return $matches[0];
+                // replace html path
+                return $relativePath;
+            } else {
+                // actual file doesn't exist, leave html path as is
+                return $matches[0];
+            }
         }
-    }
 
-}, $html);
+    }, $html
+);
 
 // copy reachable css/js assets to tmpFolder (referenced directly from html)
 // matches the following tags with asset paths in css/, javascript/ or images/
@@ -123,46 +129,61 @@ $regex = array(
     '#((?:link|script).*?(?:href|src)=")(/(?:css|javascript|images)[^"]+)#',
     '#(url\()([^\)]+)#'
 );
-$html = preg_replace_callback($regex, function ($matches) {
+$html = preg_replace_callback(
+    $regex, function ($matches) {
 
-    global $zipFolder;
-    global $wwwDir;
+        global $zipFolder;
+        global $wwwDir;
 
-    $targetPath = sprintf('%s/%s', $zipFolder->tmpFolder, dirname($matches[2]));
-    @mkdir($targetPath, 0777, true);
-    copy(sprintf('%s/%s', $wwwDir, $matches[2]), sprintf('%s/%s', $targetPath, basename($matches[2])));
+        $targetPath = sprintf('%s/%s', $zipFolder->tmpFolder, dirname($matches[2]));
+        @mkdir($targetPath, 0777, true);
+        copy(sprintf('%s/%s', $wwwDir, $matches[2]), sprintf('%s/%s', $targetPath, basename($matches[2])));
 
-    return $matches[1] . ltrim($matches[2], '/');
+        return $matches[1] . ltrim($matches[2], '/');
 
-}, $html);
+    }, $html
+);
 
 
 // find & replace portrait image
-$html = preg_replace_callback('#/portrait\?([^"]+)#', function ($matches) {
+$html = preg_replace_callback(
+    '#/portrait\?([^"]+)#', function ($matches) {
 
-    global $serviceController;
-    global $zipFolder;
+        global $serviceController;
+        global $zipFolder;
 
-    // parse query string
-    $query = array();
-    parse_str($matches[1], $query);
+        // parse query string
+        $query = array();
+        parse_str($matches[1], $query);
 
-    $image = new Alaress_Image_Schoolbox($query['userId'], $query['size'], new Alaress_Image_Transformation_Schoolbox());
-    $srcFile = $image->save();
+        $image = new Alaress_Image_Portrait($query['userId'], $query['size'], new Alaress_Image_Transformation_Portrait());
+        $srcFile = $image->save();
 
-    $filename = 'portrait.jpg';
-    copy($srcFile, sprintf('%s/%s', $zipFolder->tmpFolder, $filename));
+        $filename = 'portrait.jpg';
+        copy($srcFile, sprintf('%s/%s', $zipFolder->tmpFolder, $filename));
 
-    return $filename;
+        return $filename;
 
-}, $html);
+    }, $html
+);
 
 // manually copy remaining assets (hidden within js or css references)
 mkdir(sprintf('%s/images/slimbox', $zipFolder->tmpFolder), 0777, true);
-copy(sprintf('%s/images/slimbox/loading.gif', $wwwDir), sprintf('%s/images/slimbox/loading.gif', $zipFolder->tmpFolder));
-copy(sprintf('%s/images/slimbox/closelabel.gif', $wwwDir), sprintf('%s/images/slimbox/closelabel.gif', $zipFolder->tmpFolder));
-copy(sprintf('%s/images/slimbox/nextlabel.gif', $wwwDir), sprintf('%s/images/slimbox/nextlabel.gif', $zipFolder->tmpFolder));
-copy(sprintf('%s/images/slimbox/prevlabel.gif', $wwwDir), sprintf('%s/images/slimbox/prevlabel.gif', $zipFolder->tmpFolder));
+copy(
+    sprintf('%s/images/slimbox/loading.gif', $wwwDir), sprintf('%s/images/slimbox/loading.gif', $zipFolder->tmpFolder)
+);
+copy(
+    sprintf('%s/images/slimbox/closelabel.gif', $wwwDir),
+    sprintf('%s/images/slimbox/closelabel.gif', $zipFolder->tmpFolder)
+);
+copy(
+    sprintf('%s/images/slimbox/nextlabel.gif', $wwwDir),
+    sprintf('%s/images/slimbox/nextlabel.gif', $zipFolder->tmpFolder)
+);
+copy(
+    sprintf('%s/images/slimbox/prevlabel.gif', $wwwDir),
+    sprintf('%s/images/slimbox/prevlabel.gif', $zipFolder->tmpFolder)
+);
 
 
 // save html to tmpFolder

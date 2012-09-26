@@ -33,10 +33,12 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
         $this->setBlock($templateHandle, "topic_header", "topic_header_block");
         $this->setBlock($templateHandle, "topic", "topic_block");
         $this->setBlock('topic', "news", "news_block");
+        $this->setBlock('news', "news_image", "news_image_block");
 
         $this->setVar("topic_block", "");
         $this->setVar("topic_header_block", "");
         $this->setVar("news_block", "");
+        $this->setVar("news_image_block", "");
 
         if (is_array($this->headlineList)) {
 
@@ -57,10 +59,18 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                     'NEWS_TIME' => $newsTime->getRelativeTime(),
                     'ON_OFF' => ++$k % 2 ? '' : 'dark',
                     'NEWS_TOPIC' => Scrub::text($previous['topicName']),
+                    'NEWS_IMAGE' => $item['item_image'],
                     'TOPIC_CLEAN' => $url->getSlug(),
                 );
 
                 $this->setVar($output);
+
+                if ($item['item_image']) {
+                    $this->parse('news_image_block', 'news_image');
+                } else {
+                    $this->setVar('news_image_block');
+                }
+
                 $topicList[$item['topicName']] = 1;
 
                 if ($item['topicName'] != $previous['topicName'] && $j > 1) {
@@ -92,6 +102,7 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                 } else {
                     /* normal rotation */
                     $this->parse("news_block", "news", true);
+                    $this->setVar('news_image_block', '');
                 }
 
                 $previous = $item;

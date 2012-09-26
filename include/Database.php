@@ -1,12 +1,12 @@
 <?php
 
 /**
- * 
+ *
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   2011 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
- * 
+ *
  */
 
 class Database {
@@ -59,8 +59,8 @@ class Database {
      * @return Database
      */
     static public function getInstance() {
-        if ( !self::$instance ) {
-                self::$instance = new self();
+        if (!self::$instance) {
+            self::$instance = new self();
         }
 
         return self::$instance;
@@ -75,8 +75,8 @@ class Database {
      * @param Array $options
      * @return Bool
      */
-    public function connect ($dsn, $username, $password, $options = array()) {
-        if ( empty($dsn) || !is_string($dsn) ) {
+    public function connect($dsn, $username, $password, $options = array()) {
+        if (empty($dsn) || !is_string($dsn)) {
             return false;
         }
 
@@ -89,9 +89,8 @@ class Database {
         /* Create PDO connection */
         try {
             $this->connection = new PDO($dsn, $username, $password);
-            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
-        }
-        catch (PDOException $exception) {
+            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
+        } catch (PDOException $exception) {
             $this->error($exception);
         }
 
@@ -106,7 +105,7 @@ class Database {
      * @param String $statement
      * @return Integer
      */
-    public function exec ($statement) {
+    public function exec($statement) {
 
         return $this->connection->exec($statement);
 
@@ -120,7 +119,7 @@ class Database {
      * @param Array $driverOptions
      * @return PDOStatement
      */
-    public function prepare ($statement, $driverOptions = array()) {
+    public function prepare($statement, $driverOptions = array()) {
 
         return $this->connection->prepare($statement, $driverOptions);
 
@@ -134,7 +133,7 @@ class Database {
      * @param String $statement
      * @return PDOStatement
      */
-    public function query ($statement) {
+    public function query($statement) {
 
         return $this->connection->query($statement);
 
@@ -149,10 +148,50 @@ class Database {
      * @param Null $name
      * @return String
      */
-    public function lastInsertId ($name = null) {
+    public function lastInsertId($name = null) {
 
         return $this->connection->lastInsertId($name);
 
+    }
+
+    /**
+     * Wrapper for PDO::beginTransaction
+     * Initiates a transaction
+     * @return bool true on success or false on failure.
+     */
+    public function beginTransaction() {
+        return $this->connection->beginTransaction();
+    }
+
+    /**
+     * Wrapper for PDO::commit
+     * Commits a transaction
+     * @link http://php.net/manual/en/pdo.commit.php
+     * @return bool true on success or false on failure.
+     */
+    public function commit() {
+        return $this->connection->commit();
+
+    }
+
+    /**
+     * Wrapper for PDO::rollBack
+     * Rolls back a transaction
+     * @link http://php.net/manual/en/pdo.rollback.php
+     * @return bool true on success or false on failure.
+     */
+    public function rollBack() {
+        return $this->connection->rollBack();
+    }
+
+    /**
+     * Wrapper for PDO::inTransaction
+     * Checks if inside a transaction
+     * @link http://php.net/manual/en/pdo.intransaction.php
+     * @return bool true if a transaction is currently active, and false if not.
+     */
+    public function inTransaction() {
+        return $this->connection->inTransaction();
     }
 
     /**
@@ -160,11 +199,10 @@ class Database {
      *
      * @return Bool
      */
-    public function isConnected () {
-        if ( isset($this->connection) && !empty($this->connection) ) {
+    public function isConnected() {
+        if (isset($this->connection) && !empty($this->connection)) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -175,7 +213,7 @@ class Database {
      * @param PDOException $exception
      * @return void
      */
-    private function error (PDOException $exception) {
+    private function error(PDOException $exception) {
         die("Database Error: {$exception->getMessage()}");
     }
 }

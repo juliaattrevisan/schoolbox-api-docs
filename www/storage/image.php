@@ -1,0 +1,20 @@
+<?php
+/**
+ * Handles image resizing and caching on images from storage engine
+ *
+ * @author      James Leckie <james.leckie@alaress.com.au>
+ * @copyright   2012 Alaress Pty Ltd
+ * @link        http://www.alaress.com.au
+ */
+
+require_once '../../include/Bootstrap.php';
+$sitePage = new SitePage;
+
+if (isset($_GET['hash']) && $_GET['hash']) {
+    $resource = Storage_ResourceMapper::getInstance()->getByHash($_GET['hash']);
+
+    if ($resource != false) {
+        $image = new Alaress_Image_Storage($resource, $_GET['size'], new Alaress_Image_Transformation_Storage());
+        $image->stream();
+    }
+}
