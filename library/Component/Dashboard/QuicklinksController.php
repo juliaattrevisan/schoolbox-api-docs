@@ -55,9 +55,7 @@ class Component_Dashboard_QuicklinksController extends Component_Dashboard_Contr
             return false;
         }
 
-        $this->setBlock($templateHandle, 'qlinks', 'qlinks_block');
-        $this->setBlock('qlinks', 'qlinks_item', 'qlinks_item_block');
-
+        $this->setBlock($templateHandle, 'qlinks_item', 'qlinks_item_block');
 
         foreach($this->quicklinks as $groupName => $items) {
             foreach($items as $class => $item) {
@@ -69,7 +67,6 @@ class Component_Dashboard_QuicklinksController extends Component_Dashboard_Contr
                 ));
                 $this->parse('qlinks_item_block', 'qlinks_item', true);
             }
-            $this->parse('qlinks_block', 'qlinks', false);
         }
 
         return true;
