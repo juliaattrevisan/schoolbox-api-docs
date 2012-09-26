@@ -1,28 +1,2 @@
-<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type='text/javascript' src='/javascript/jquery.timepicker.js'></script>
-<script type='text/javascript' src='/javascript/jquery.lwtCountdown-1.0-modified.js'></script>
-<script type='text/javascript'>
-    $j(function() {
-        $j('#countdownTime{COMPONENT_INSTANCE_ID}').timepicker({
-            'timeFormat': 'H:i',
-            'step': 15
-        });
-
-        $j('#countdownDate{COMPONENT_INSTANCE_ID}').datepicker({
-            dateFormat: 'dd M yy'
-        });
-
-        $j('#countdown{COMPONENT_INSTANCE_ID}').countDown({
-            targetDate: {
-                'day': {DEADLINE_DAY},
-                'month': {DEADLINE_MONTH},
-                'year': {DEADLINE_YEAR},
-                'hour': {DEADLINE_HOUR},
-                'min': {DEADLINE_MIN},
-                'sec': {DEADLINE_SEC}
-            }
-        });
-
-    });
-</script>
-<input id='countdownDate{COMPONENT_INSTANCE_ID}' name='date' type='text' value='{COMPONENT_CONFIG_DATE}' />
+<input id='countdownDate{COMPONENT_INSTANCE_ID}' name='date' type='text' value='{COMPONENT_CONFIG_DATE}'/>

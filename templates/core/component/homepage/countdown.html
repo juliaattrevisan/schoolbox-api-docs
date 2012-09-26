@@ -1,33 +1,63 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <script type='text/javascript' src='/javascript/jquery.lwtCountdown-1.0-modified.js'></script>
+    <script type='text/javascript'>
+        $j(function () {
+            $j('#countdownTime{COMPONENT_INSTANCE_ID}').timepicker({
+                'timeFormat':'H:i',
+                'step':15
+            });
+
+            $j('#countdownDate{COMPONENT_INSTANCE_ID}').datepicker({
+                dateFormat:'dd M yy'
+            });
+
+            $j('#countdown{COMPONENT_INSTANCE_ID}').countDown({
+                targetDate:{
+                    'day':{DEADLINE_DAY},
+                    'month':{DEADLINE_MONTH},
+                    'year':{DEADLINE_YEAR},
+                    'hour':{DEADLINE_HOUR},
+                    'min':{DEADLINE_MIN},
+                    'sec':{DEADLINE_SEC}
+                }
+            });
+
+        });
+    </script>
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
     <div id='countdown{COMPONENT_INSTANCE_ID}'>
         <div class="dash weeks_dash">
             <span class="dash_title">weeks</span>
+
             <div class="digit">0</div>
             <div class="digit">0</div>
         </div>
 
         <div class="dash days_dash">
             <span class="dash_title">days</span>
+
             <div class="digit">0</div>
             <div class="digit">0</div>
         </div>
 
         <div class="dash hours_dash">
             <span class="dash_title">hours</span>
+
             <div class="digit">0</div>
             <div class="digit">0</div>
         </div>
 
         <div class="dash minutes_dash">
             <span class="dash_title">minutes</span>
+
             <div class="digit">0</div>
             <div class="digit">0</div>
         </div>
 
         <div class="dash seconds_dash">
             <span class="dash_title">seconds</span>
+
             <div class="digit">0</div>
             <div class="digit">0</div>
         </div>
