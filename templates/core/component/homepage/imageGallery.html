@@ -1,11 +1,15 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <link rel="stylesheet" href="/css/jquery.slimbox.css" type="text/css" media="screen"/>
+    <script type="text/javascript" src="/javascript/jquery.slimbox.js"></script>
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
     <div class="clearfix">
         <!-- BEGIN image_gallery -->
-        <div class="float-left image-thumbnail" >
-            <a class="thumb" href="/cms/image.php?id={THUMBNAIL_ID}&height=600&width=800" rel="lightbox[portal]" style="height:{IMAGE_HEIGHT}px;" alt="{THUMBNAIL_DESCRIPTION}" title="{THUMBNAIL_DESCRIPTION}">
-                <img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0" alt="{THUMBNAIL_DESCRIPTION}" border="0" />
+        <div class="float-left image-thumbnail">
+            <a class="thumb" href="/cms/image.php?id={THUMBNAIL_ID}&height=600&width=800" rel="lightbox[portal]"
+               style="height:{IMAGE_HEIGHT}px;" alt="{THUMBNAIL_DESCRIPTION}" title="{THUMBNAIL_DESCRIPTION}">
+                <img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0"
+                     alt="{THUMBNAIL_DESCRIPTION}" border="0"/>
             </a>
         </div>
         <!-- END image_gallery -->
@@ -13,5 +17,6 @@
     <!-- BEGIN submit_image -->
     <a href="/cms/file/multi/{IMAGEGALLERY_CATEGORY_ID}" class="btn up-arrow"><span></span>Post Images</a>
     <!-- END submit_image -->
-    <p class="interact"><a href="/cms/imageGallery/{IMAGEGALLERY_CATEGORY_ID}" class="btn"><span></span>Full Gallery</a> </p>
+    <p class="interact"><a href="/cms/imageGallery/{IMAGEGALLERY_CATEGORY_ID}" class="btn"><span></span>Full Gallery</a>
+    </p>
 </div>
