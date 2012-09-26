@@ -535,7 +535,7 @@ Notifications
 #nav li a:hover {
   color: #ffffff;
   text-decoration: none;
-  background: #0aa9c7;
+  background: #1d9ffc;
 }
 #nav li a span strong {
   position: absolute;
@@ -561,7 +561,7 @@ Notifications
   left: 208px;
   top: -8px;
   z-index: 300;
-  border: 3px solid #efecde;
+  border: 1px solid #eee;
   padding: 5px 0;
   -moz-box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
   -webkit-box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
@@ -1484,7 +1484,7 @@ input.timeField {
   background-position: 0 -658px;
 }
 .btn.submit {
-  border-color: #0aa9c7 !important;
+  border-color: #1d9ffc !important;
   background-color: #e4f5f9;
   background-image: -moz-linear-gradient(top, #e4f5f9, #c9ebf3);
   background-image: -o-linear-gradient(top, #e4f5f9, #c9ebf3);
@@ -3513,6 +3513,14 @@ CALENDAR
 .calendar-controls .filter-change.month:hover span {
   background: url(/images/core/calendar/calendar-month.png) 0 -14px no-repeat;
 }
+.calendar-controls .filter-change.list span {
+  background: url(/images/core/icons/btn-icons.png) no-repeat;
+  background-position: 0 -224px;
+}
+.calendar-controls .filter-change.list.current span,
+.calendar-controls .filter-change.list:hover span {
+  background-position: 0 -238px;
+}
 .calendar-controls .filters {
   z-index: 5000;
   position: relative;
@@ -3645,6 +3653,11 @@ ul.js_happening li span {
   cursor: pointer;
   overflow: hidden;
 }
+ul.js_happening li span .float-right {
+  padding: 0;
+  margin-right: 6px;
+  width: auto;
+}
 ul.js_happening li:first-child {
   margin-top: 4px;
 }
@@ -3666,7 +3679,7 @@ ul.js_happening li:first-child {
   -webkit-box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
   line-height: 16px;
   background: #ffffff;
-  border: 3px solid #e9e3d6;
+  border: 1px solid #eee;
   -moz-background-clip: padding;
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
@@ -3680,7 +3693,7 @@ ul.js_happening li:first-child {
   top: 21px;
   width: 19px;
   height: 19px;
-  background: #e9e3d6;
+  background: #eee;
   color: #797979;
   text-align: center;
   cursor: pointer;
@@ -3704,40 +3717,40 @@ ul.js_happening li:first-child {
 .cal-bubble .bottom {
   width: 0px;
   height: 0px;
-  border-bottom: 28px solid transparent;
+  border-bottom: 25px solid transparent;
   /* left arrow slant */
 
   border-top: 0px solid transparent;
   /* right arrow slant */
 
-  border-right: 28px solid #E9E3D6;
+  border-right: 25px solid #eee;
   /* bottom, add background color here */
 
   font-size: 0px;
   line-height: 0px;
   position: absolute;
-  bottom: -28px;
+  bottom: -25px;
   right: 30px;
   z-index: 200002;
 }
 .cal-bubble .bottom strong {
   width: 0px;
   height: 0px;
-  border-bottom: 22px solid transparent;
+  border-bottom: 23px solid transparent;
   /* left arrow slant */
 
   border-top: 0px solid transparent;
   /* right arrow slant */
 
-  border-right: 22px solid #ffffff;
+  border-right: 23px solid #ffffff;
   /* bottom, add background color here */
 
   font-size: 0px;
   line-height: 0px;
   display: block;
   position: absolute;
-  bottom: -22px;
-  right: -26px;
+  bottom: -23px;
+  right: -24px;
   z-index: 200001;
 }
 .cal-bubble .time {
@@ -4122,6 +4135,15 @@ COMPONENT
   padding-left: 24px;
   font-weight: normal;
   display: block;
+}
+.calendar ul li {
+  padding: 0 16px;
+}
+.calendar .eventListing strong {
+  display: block;
+  float: left;
+  width: 125px;
+  padding: 5px 0;
 }
 /********************************************
 HOMEPAGE COLUMN SLIDER
@@ -4868,7 +4890,7 @@ p.forgotten {
   text-decoration: none;
 }
 #category li a.selected {
-  background: #0aa9c7;
+  background: #1d9ffc;
   color: #ffffff;
   border: none;
 }

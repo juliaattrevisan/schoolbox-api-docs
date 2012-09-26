@@ -1,3 +1,28 @@
+<script type="text/javascript">
+    $j(function () {
+        $j('a.attendance-request').live('click', function (event) {
+            event.preventDefault();
+
+            var button = $j(this);
+
+            var data = button.parent('form').serialize();
+
+            $j.post('/service/attendance/processToggleAttendance', data, function (data) {
+                if ( data.error == undefined ) {
+                    if ( button.text() == 'Attend' ) {
+                        button.html('<span></span>Unattend');
+                    }
+                    else {
+                        button.html('<span></span>Attend');
+                    }
+                }
+            });
+        } );
+    });
+</script>
+
+
+
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
 <script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
@@ -49,7 +74,7 @@
 				<a class="filter-change week" href="/calendar/week/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}" ><span></span>Week</a>
                 <a class="filter-change list current" href="#"><span></span>List</a>
 				<a class="filter-change filters" href="#"><span></span>Filters</a>
-				<a class="btn report print-it filter-change" href="#"><span></span>Print</a>
+				<a class="btn print print-it filter-change" href="#"><span></span>Print</a>
 				<div class="filter-drop clearfix">
 					<div class="filter-list">
 						<form class="clearfix">
@@ -91,75 +116,51 @@
 		<h3>{MONTH}</h3>
 	</div>
 
-	<!-- BEGIN day -->
+    <!-- BEGIN day -->
+    <div class="box text clearfix calendar">
+        <h2><a href="/calendar/week/">{DATE}</a></span></h2>
+        <div class="listing">
+            <ul class="js_happening">
+                <!-- BEGIN note -->
+                <li class="{ON_OFF} clearfix">
+                    <span class="eventListing"><strong>{TIME}</strong> <span style="background-color:{COLOUR}">{NOTE} <!-- BEGIN attendance_icon --><span class="float-right">A</span><!-- END attendance_icon --></span></span>
+                    <div class="hidden-fields clearfix">
+                        <h4><!-- BEGIN time -->
+                            <span class="time"><strong>{TIME}</strong></span>
+                            <!-- END time -->{NOTE}
+                        </h4>
+                        <p class="meta">Event Type: {TYPE}<br/>
+                            Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a><br/>
+                            {LOCATION} {DETAIL}</p>
+                        <!-- BEGIN has_category -->
+                        <p class='meta'>
+                            Homepage: <a href='/homepage/{HAS_CATEGORY_ID}'>{HAS_CATEGORY_NAME}</a>
+                        </p>
+                        <!-- END has_category -->
+                        <!-- BEGIN attendance_status -->
+                        <p class="meta">Attendance Status: {ATTENDANCE_STATUS}</p>
+                        <!-- END attendance_status -->
+                        <div>
+                            <!-- BEGIN attendance_request_button -->
+                            <form method="post">
+                                <input name="event[id]" type="hidden" value="{EVENT_ID}">
+                                <a class="btn modify float-left attendance-request" href="#"><span></span>{ATTENDANCE_REQUEST_ACTION}</a>
+                            </form>
+                            <!-- END attendance_request_button -->
 
+                            <!-- BEGIN attendance_list_button -->
+                            <a class="btn groups float-left" href="/calendar/attendance/list/{EVENT_ID}"><span></span>Attendance List</a>
+                            <!-- END attendance_list_button -->
 
-		<table class="agenda-view week-list">
-            <thead>
-                <tr>
-                    <td colspan="3">
-                        <h3>{DATE}</h3>
-                        <a class="btn add calendar-add float-left" href="{ADD}"><span></span></a>
-                    </td>
-                </tr>
-            </thead>
-            <tbody>
-			<!-- BEGIN note -->
-			<tr>
-				<td width='200'>
-					<!-- BEGIN time -->{TIME}<!-- END time -->
-				</td>
-				<td>
-					<span class="note" style="background-color:{COLOUR}; border:1px solid {COLOUR};">{NOTE}<!-- BEGIN attendance_icon --><span class="float-right">A</span><!-- END attendance_icon --></span>
-					<div class="hidden-fields clearfix">
-						<h4>
-							<div class="time">
-								<strong>{TIME}</strong>
-							</div>
-
-							<p>
-								<em>{LOCATION}</em>
-							</p>
-
-							{NOTE}
-						</h4>
-
-						<p class="meta">Event Type: {TYPE}<br />
-							<span class="created">Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a></span><br />
-							{DETAIL}
-						</p>
-
-						<!-- BEGIN has_category -->
-						<p class='meta'>
-							Homepage: <a href='/homepage/{HAS_CATEGORY_ID}'>{HAS_CATEGORY_NAME}</a>
-						</p>
-						<!-- END has_category -->
-
-						<!-- BEGIN attendance_status -->
-						<p class="meta">Attendance Status: {ATTENDANCE_STATUS}</p>
-						<!-- END attendance_status -->
-
-						<div>
-							<!-- BEGIN attendance_request_button -->
-							<form method="post">
-								<input name="event[id]" type="hidden" value="{EVENT_ID}">
-								<a class="btn modify float-left attendance-request" href="#"><span></span>{ATTENDANCE_REQUEST_ACTION}</a>
-							</form>
-							<!-- END attendance_request_button -->
-
-							<!-- BEGIN attendance_list_button -->
-							<a class="btn modify float-left" href="/calendar/attendance/list/{EVENT_ID}"><span></span>Attendance List</a>
-							<!-- END attendance_list_button -->
-
-							{MODIFY}
-						</div>
-					</div>
-				</td>
-			</tr>
-			<!-- END note -->
-        </tbody>
-	</table>
-
-	<!-- END day -->
-
+                            {MODIFY}
+                        </div>
+                    </div>
+                </li>
+                <!-- END note -->
+            </ul>
+        </div>
+        <a class="btn add" href="{ADD}"><span></span>Add Event</a>
+    </div>
+    <!-- END day -->
 </div>
+
