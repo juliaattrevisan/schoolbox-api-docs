@@ -813,3 +813,113 @@ MORRIS LIBRARY
 
 .updates #galleryCycle div{position:absolute; left:0; top:0;}
 .login-words{height:50px; width:428px; background: url(/images/mggs/mggs-login-words.png) no-repeat; position:absolute; right:50px; bottom:0;}
+
+/*--------------------------------------
+    QUICKLINKS
+--------------------------------------*/
+.quicklinks{
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+    padding: 30px 0 0 0;
+    height: 183px;
+    width: 100%;
+}
+
+.evi{
+    background: url('/images/mggs/evi.png') top left no-repeat;
+    display: block;
+    width: 160px;
+    height: 213px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.quicklinks-container{
+    background: #f2f6fa;
+    border: 1px solid #e5edf5;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    margin: 0 0 16px 62px;
+    position: relative;
+    height: 160px;
+    width: 75%;
+    padding-left: 32px;
+}
+
+.quicklinks-container ul{
+    margin: 15px 0 0 -33px;
+}
+
+.box .quicklinks-container li{
+    list-style: none;
+    padding: 0;
+}
+
+.quicklinks-container li a{
+    color: #002e52;
+    display: block;
+    float: left;
+    margin: 0 10px;
+    height: 0;
+    width: 88px;
+    text-align: center;
+    text-decoration: none;
+    padding-top: 79px;
+}
+
+.quicklinks-container li a {
+    background: url('/images/mggs/quicklinks-icons.png') no-repeat;
+}
+
+.quicklinks-container li a.calendar{ background-position: 0 0; }
+.quicklinks-container li a.news{ background-position: 0 -89px; }
+.quicklinks-container li a.my-timetable{ background-position: 0 -176px; }
+.quicklinks-container li a.synergetic{ background-position: 0 -265px; }
+
+.quicklinks-container li a.eportfolio{ background-position: -91px 0; }
+.quicklinks-container li a.synergetic-parent-portal{ background-position: -177px 0; }
+.quicklinks-container li a.evi-parent-homepage{ background-position: -177px -89px; }
+
+
+/*--------------------------------------
+    AD SPACE
+--------------------------------------*/
+
+.ad-space {
+    background: #f2f6fa;
+    border: 1px solid #e5edf5;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    width: 100%;
+    overflow: auto;
+}
+
+.ad-space .content {
+    padding: 8px;
+}
+
+.ad-space-content {
+    float: left;
+}
+
+.ad-space-img {
+    float: left;
+    margin: 0 17px 8px 0 ;
+}
+
+.ad-space-content h3 {
+    color: #002e52;
+    font-size: 18px;
+    font-weight: bold;
+    margin: 11px 0 7px 0;
+}
+
+.ad-space-content span.dates {
+    color: #002e52;
+    font-size: 12px;
+}
