@@ -63,6 +63,8 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 			'attendance_list_button_block' => '',
 		));
 
+        $j = 0;
+
         if ( is_array($this->submissionList) ) {
             foreach ( $this->submissionList as $submission ) {
 
@@ -74,7 +76,8 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
                     'EVENT_TYPE' => 'submission', 'TYPE' => 'Due Work',
                     'AUTHOR' => $this->user->formatName($submission), 'AUTHOR_ID' => $submission['owner'],
                     'EVENT_LEVEL' => '',
-                );
+                    'ON_OFF' => ++$j % 2 ? '' : 'dark',
+            );
 
                 $this->setVar($output);
                 $this->parse("note_listing", "note_block", true);
@@ -107,6 +110,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 				'TYPE' => $currentEvent->getEventType(),
 				'AUTHOR' => $currentEvent->getAuthorName(),
 				'AUTHOR_ID' => $currentEvent->getAuthorId(),
+                'ON_OFF' => ++$j % 2 ? 'dark' : '',
 			));
 
 			$this->setVar(array(
