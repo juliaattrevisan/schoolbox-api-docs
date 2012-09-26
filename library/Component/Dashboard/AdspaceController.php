@@ -15,11 +15,18 @@ class Component_Dashboard_AdspaceController extends Component_Dashboard_Controll
 
     public function execute () {
 
+
+        // $textBoxID = $this->getConfig('textbox');
+        $textBoxID = 267;
+
+        $tboxHandler = new TextBox();
+        $tbox = $tboxHandler->getByID($textBoxID);
+
         // define the 3 elements here
         $adspace = array(
-            'image' => '/images/mggs/adspace/news-image.jpg',
-            'title' => 'Science Week',
-            'detail' => '12th May - 17th May'
+            // 'image' => '/images/mggs/adspace/news-image.jpg',
+            'title' => $tbox['heading'],
+            'content' => $tbox['body']
         );
 
         // namespace the vars for the template
@@ -35,7 +42,17 @@ class Component_Dashboard_AdspaceController extends Component_Dashboard_Controll
             return false;
         }
 
+        $this->setBlock($templateHandle, 'assoc_image', 'assoc_image_block');
+
         $this->setVar($this->adspace);
+
+        if(isset($this->adspace['ADSPACE_IMAGE'])) {
+            $this->parse('assoc_image_block', 'assoc_image');
+        }
+        else {
+            $this->setVar('assoc_image_block', '');
+        }
+
         return true;
     }
 
