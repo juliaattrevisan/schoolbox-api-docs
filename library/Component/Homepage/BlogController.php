@@ -69,8 +69,6 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
         $this->setBlock($templateHandle, 'blog', 'blog_block');
         $this->setBlock($templateHandle, 'submit', 'submit_block');
         $this->setBlock('blog', 'comment', 'comment_block');
-        $this->setBlock('blog', 'show_all', 'show_all_block');
-        $this->setBlock('blog', 'show_comment', 'show_comment_block');
 
         /* Set up component name
          */
@@ -120,23 +118,28 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
 
             foreach($blogs as $blog) {
                 if($blog['owner'] == $_SESSION['id'] || $this->permission >= FULL_ACCESS || (NEWS_teacher_edit_other && $this->permission >= WRITE_ACCESS))
-                    $this->setVar('MODIFY_BLOG', "<a href=\"/blog/modify/{$blog['id']}\">Modify</a>");
+                    $this->setVar("MODIFY_BLOG", '<a class="btn modify" href="/blog/modify/'.$blog['id'].'"><span></span>Modify</a>');
                 else
                     $this->setVar('MODIFY_BLOG', '');
 
                 $blog['name'] = $userHandler->formatName($blog);
                 $createdTime = new Alaress_Date_Relative($blog['created']);
 
+                $user = $userHandler->getByID($blog['owner']);
+                $synID = $user['synergy_id'];
+
                 $this->setVar(array(
                     'BLOG_ID'		=> $blog['id'],
                     'BLOG_HEADING'  => Scrub::text($blog['heading']),
                     'BLOG_BODY'     => Scrub::html($blog['body']),
-                    'BLOG_OWNER'    => "<a href=\"/search/user/{$blog['owner']}\">{$blog['name']}</a>",
+                    // 'BLOG_OWNER'    => "<a href=\"/search/user/{}\">{}</a>",
+                    'BLOG_AUTHOR_ID' => $blog['owner'],
+                    'BLOG_AUTHOR_NAME' => $blog['name'],
+                    'BLOG_AUTHOR_THUMB' => "/portrait.php?userId=$synID&size=square32",
                     'BLOG_CREATED'  => $createdTime->getRelativeTime(),
                     'BLOG_SHADING'  => ++$j % 2 ? '' : 'dark',
                     'BLOG_COMMENTS' => '',
                     'BLOG_AUTHOR_EXTERNAL_ID' => $blog['synergy_id'],
-                    'BLOG_AUTHOR_NAME' => $blog['firstname'] . ' ' . $blog['lastname']
                 ));
 
                 // comments
@@ -147,30 +150,22 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                 $showingComments = count($comments);
 
                 $this->setVar('BLOG_TOTAL_COMMENTS', $totalComments);
-                if($totalComments > $showingComments)
-                    $this->parse('show_all_block','show_all');
-                else
-                    $this->setVar('show_all_block','');
 
                 if(!empty($comments)) {
-
-                    $this->setVar('BLOG_COMMENTS', $showingComments);
-                    $this->parse('show_comment_block','show_comment' );
-
                     foreach($comments as $comment) {
                         $createdTime = new Alaress_Date_Relative($comment['created']);
 
                         $comment['name'] = $userHandler->formatName($comment);
                         $this->setVar(array(
                             'COMMENT_BODY'    => Scrub::text($comment['body']),
-                            'COMMENT_OWNER'   => "<a href=\"/search/user/{$comment['owner']}\">{$comment['name']}</a>",
+                            'COMMENT_AUTHOR_ID'   => $comment['owner'],
+                            'COMMENT_AUTHOR_NAME'   => $comment['name'],
                             'COMMENT_CREATED' => $createdTime->getRelativeTime(),
                             'COMMENT_AUTHOR_EXTERNAL_ID' => $comment['synergy_id'],
-                            'COMMENT_AUTHOR_NAME' => $comment['firstname'] . ' ' . $comment['lastname']
                         ));
 
                         if($comment['owner'] == $_SESSION['id'] || $this->permission >= WRITE_ACCESS)
-                            $this->setVar('DELETE_COMMENT', "<a class=\"delete-comment\" href=\"/blog/comment/delete/{$comment['id']}\">Delete</a>");
+                            $this->setVar('DELETE_COMMENT', "<a class=\"delete-comment btn delete no-text\" href=\"/blog/comment/delete/{$comment['id']}\"><span></span></a>");
                         else
                             $this->setVar('DELETE_COMMENT', '');
 
@@ -178,7 +173,6 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                     }
                 } else {
                     $this->setVar('comment_block', '');
-                    $this->setVar('show_comment_block', '');
                 }
                 $this->parse('blog_block', 'blog', true);
             }

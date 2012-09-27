@@ -14,8 +14,6 @@ $this->setBlock(TEMPLATE_content, "submit_blog", "submit_blog_block");
 
 $this->setBlock(TEMPLATE_content, 'blog', 'blog_block');
 $this->setBlock('blog', 'comment', 'comment_block');
-$this->setBlock('blog', 'show_all', 'show_all_block');
-$this->setBlock('blog', 'show_comment', 'show_comment_block');
 
 $this->setBlock(TEMPLATE_content, "year", "year_block");
 $this->setBlock('year', 'month', 'month_block');
@@ -99,16 +97,19 @@ if ( $blogList = $blogHandler->getByYearAndMonth($category['id'], $yearNumber, $
 
 		/* Modify Action */
 		if ($blog['owner'] == $_SESSION['id'] || $groupHandler->getPermission($blog['id']) >= WRITE_ACCESS) {
-			$this->setVar("MOD_BLOG", "<a href=\"/blog/modify/".$blog['id']."\">Modify</a>");
+			$this->setVar("MOD_BLOG", '<a class="btn modify" href="/blog/modify/'.$blog['id'].'"><span></span>Modify</a>');
 		}
 		else {
-			$this->setVar("MOD_BLOG", "");
+			$this->setVar("MOD_BLOG", '');
 		}
 
 		/* Post */
 		$userHandler = new User();
 
-		$poster = $userHandler->formatName($blog);
+        $user = $userHandler->getByID($blog['owner']);
+
+		$poster = $userHandler->formatName($user);
+        $synID = $user['synergy_id'];
 
 		$postedDate = new Alaress_Date_Format($blog['createdTimestamp'], 'U');
 
@@ -116,8 +117,11 @@ if ( $blogList = $blogHandler->getByYearAndMonth($category['id'], $yearNumber, $
 			'BLOG_ID' => $blog['id'],
 			'BLOG_HEADING' => $blog['heading'],
 			'BLOG_BODY' => $blog['body'],
-			'EMAIL_CONTACT' => "<a href=\"/search/user/{$blog['uid']}\">$poster</a>",
-			'POSTED_DATE' => $postedDate->getShort(),
+            'BLOG_AUTHOR_ID' => $blog['owner'],
+            'BLOG_AUTHOR_NAME' => $poster,
+            'BLOG_AUTHOR_THUMB' => "/portrait.php?userId=$synID&size=square32",
+            'BLOG_AUTHOR_GROUP' => $postedDate->getShort(),
+			// 'EMAIL_CONTACT' => "<a href=\"/search/user/{$blog['uid']}\">$poster</a>",
 			'BLOG_COMMENTS' => ''
 		));
 
@@ -130,18 +134,7 @@ if ( $blogList = $blogHandler->getByYearAndMonth($category['id'], $yearNumber, $
 
 		$this->setVar('BLOG_TOTAL_COMMENTS', $totalComments);
 
-		if($totalComments > $showingComments) {
-			$this->parse('show_all_block','show_all');
-		}
-		else {
-			$this->setVar('show_all_block','');
-		}
-
 		if(!empty($comments)) {
-
-			$this->setVar('BLOG_COMMENTS', $showingComments);
-			$this->parse('show_comment_block','show_comment' );
-
 			$userHandler = new User();
 
 			foreach($comments as $comment) {
@@ -152,11 +145,14 @@ if ( $blogList = $blogHandler->getByYearAndMonth($category['id'], $yearNumber, $
 				$this->setVar(array(
 					'COMMENT_BODY'    => Scrub::text($comment['body']),
 					'COMMENT_OWNER'   => "<a href=\"/search/user/{$comment['owner']}\">{$comment['name']}</a>",
-					'COMMENT_CREATED' => $createdTime->getRelativeTime()
+					'COMMENT_CREATED' => $createdTime->getRelativeTime(),
+                    'COMMENT_AUTHOR_ID'   => $comment['owner'],
+                    'COMMENT_AUTHOR_NAME'   => $comment['name'],
+                    'COMMENT_AUTHOR_EXTERNAL_ID' => $comment['synergy_id'],
 				));
 
 				if ($comment['owner'] == $_SESSION['id'] || $permission >= WRITE_ACCESS) {
-					$this->setVar('DELETE_COMMENT', "<a class=\"delete-comment\" href=\"/blog/comment/delete/{$comment['id']}\">Delete</a>");
+					$this->setVar('DELETE_COMMENT', "<a class=\"delete-comment btn delete no-text\" href=\"/blog/comment/delete/{$comment['id']}\"><span></span></a>");
 				}
 				else {
 					$this->setVar('DELETE_COMMENT', '');
@@ -166,7 +162,6 @@ if ( $blogList = $blogHandler->getByYearAndMonth($category['id'], $yearNumber, $
 			}
 		} else {
 			$this->setVar('comment_block', '');
-			$this->setVar('show_comment_block', '');
 		}
 
 		$this->parse('blog_block', 'blog', true);

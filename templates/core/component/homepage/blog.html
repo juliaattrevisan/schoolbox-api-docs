@@ -3,24 +3,27 @@
 <script type="text/javascript" src="/javascript/jquery.confirm.1.3.js"></script>
 <script type="text/javascript">
     $j(function(){
+/*
         $j('a.show_comments').click(function(){
             $j(this).closest('li').find('.comments').toggle();
             $j(this).children('span').toggle();
             return false;
         });
-
+*/
         $j('a.post_comment').click(function(){
             $j(this).closest('li').find('form').toggle();
+            $j(this).hide();
             return false;
         });
         $j('a.delete-comment').click(function(){
             location.href = $j(this).attr('href');
         }).confirm({
-                    buttons: {
-                        wrapper:'<button></button>',
-                        separator:'  '
-                    }
-                });
+            msg: 'Delete this comment? ',
+            buttons: {
+                wrapper:'<button></button>',
+                separator:'  '
+            }
+        });
 
         /* Modal for URL homepage selection
          */
@@ -50,50 +53,46 @@
         <ul>
             <!-- BEGIN blog -->
             <li class="{BLOG_SHADING} clearfix">
-                <h4><strong>{BLOG_HEADING}</strong></h4>
-
+                <h3 class="clearfix">{BLOG_HEADING}</h3>
                 <div class="small-right">
                     <p class="interact">{MODIFY_BLOG}</p>
                 </div>
-                <p>{BLOG_BODY}</p>
+                <div class="blog-body">{BLOG_BODY}</div>
+                <a href="/search/user/{BLOG_AUTHOR_ID}" class="author profile-card bar short" data-icon="email">
+                    <img src="{BLOG_AUTHOR_THUMB}"/>
+                    <span class="name">{BLOG_AUTHOR_NAME}</span>
+                    <span class="subtitle">Posted {BLOG_CREATED}</span>
+                </a>
 
-                <div class="comments hide-it">
+
+                <div class="comments">
                     <!-- BEGIN comment -->
-                    <div class="box clearfix"> {COMMENT_BODY}
-                        <p class="interact">
-                            <img src='/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32'
-                                 alt="{COMMENT_AUTHOR_NAME}" title="{COMMENT_AUTHOR_NAME}"/>
-                            {COMMENT_OWNER} | {COMMENT_CREATED} | {DELETE_COMMENT}
-                        </p>
+                    <div class="box clearfix">
+                        <p class="interact">{DELETE_COMMENT}</p>
+                        <a href="/search/user/{COMMENT_AUTHOR_ID}" class="author profile-card bar short" data-icon="email">
+                            <img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32"/>
+                            <span class="name">{COMMENT_AUTHOR_NAME}</span>
+                            <span class="subtitle">Commented {COMMENT_CREATED}</span>
+                        </a>
+                        <p class="comment-body">{COMMENT_BODY}</p>
                     </div>
                     <!-- END comment -->
-
-                    <!-- BEGIN show_all -->
-                    <p class="interact"><a href="/blog/{BLOG_ID}">Show All {BLOG_TOTAL_COMMENTS} Comments</a></p>
-                    <!-- END show_all -->
                 </div>
                 <p class="links-house">
-                    <!-- BEGIN show_comment -->
-                    <a class="show_comments" href="javascript:void();"><span>Show</span><span
-                            class="hide-it">Hide</span> {BLOG_COMMENTS} Comments</a> -
-                    <!-- END show_comment -->
                     <a class="interact post_comment" href="javascript:void();">Post comment</a>
                 </p>
 
                 <form class="hide" method="post" action="/blog/comment/new/{BLOG_ID}">
-                    <p>
-                        <textarea name="body" style="width: 100%;"></textarea>
-                    </p>
-
-                    <p>
-                        <input type="submit" class="submit-btn-plain" name="comment" value="Comment"/>
-                    </p>
+                    <p><textarea name="body" style="width: 100%; border-color: #aaa;"></textarea></p>
+                    <p><input type="submit" class="submit-btn-plain" name="comment" value="Comment"/></p>
                 </form>
+<!--
                 <p class="interact hide-on-small">
                     <img src='/portrait.php?userId={BLOG_AUTHOR_EXTERNAL_ID}&size=square32' alt="{BLOG_AUTHOR_NAME}"
                          title="{BLOG_AUTHOR_NAME}"/>
                     Posted by {BLOG_OWNER} {BLOG_CREATED}
                 </p>
+-->
             </li>
             <!-- END blog -->
         </ul>
