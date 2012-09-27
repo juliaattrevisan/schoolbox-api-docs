@@ -6092,6 +6092,24 @@ h4 a.hidden {
   -webkit-border-radius: 100%;
   -moz-border-radius: 100%;
 }
+.active-checkbox {
+  background: #0066b0;
+  padding: 1px 10px 3px 2px;
+  color: #ffffff;
+}
+label {
+  margin-bottom: 4px;
+  display: block;
+  padding: 1px 2px 3px 2px;
+}
+.pagination a.current {
+  color: #ffffff;
+}
+.saved-colours,
+.saved-layout,
+.admin-contents .level.green {
+  background-color: #0066b0;
+}
 /* -------------------------
     profile card styles
 ------------------------- */
