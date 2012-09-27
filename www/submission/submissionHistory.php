@@ -1,4 +1,11 @@
 <?php
+
+// not in sitepage context, redirect
+if(!isset($this)) {
+    require_once('../../include/Bootstrap.php');
+    SitePage::localRedir('/submission/submissionHistory');
+}
+
 $this->setFile(TEMPLATE_content, 'submission/submissionHistory.html');
 $this->setTab('submission');
 
@@ -6,14 +13,25 @@ $this->setBlock(TEMPLATE_content, 'subject', 'subject_block');
 $this->setBlock(TEMPLATE_content, 'download', 'download_block');
 $this->setBlock(TEMPLATE_content, 'action_submit', 'action_submit_block');
 $this->setBlock(TEMPLATE_content, 'recent_submission', 'recent_submission_block');
+$this->setBlock(TEMPLATE_content, 'show_owner', 'show_owner_block');
 $this->setBlock(TEMPLATE_content, 'returned_work', 'returned_work_block');
+$this->setBlock(TEMPLATE_content, 'teacher', 'teacher_block');
+$this->setBlock(TEMPLATE_content, 'rubric', 'rubric_block');
 $this->setBlock('returned_work', 'return_file','return_file_block');
 $this->setBlock('recent_submission', 'overdue', 'overdue_block');
 $this->setBlock('recent_submission', 'action_resubmit', 'action_resubmit_block');
 $this->setBlock('recent_submission', 'recent_submission_download', 'recent_submission_download_block');
 $this->setBlock('subject', 'work', 'work_block');
-$this->setBlock('work', 'action_view_submitted', 'action_view_submitted_block');
-$this->setBlock('work', 'action_view_returned', 'action_view_returned_block');
+
+// the whole manual block setting idea is entirely overrated...
+$historyActivityTypes = array('submitted', 'returned', 'marked', 'extended');
+foreach($historyActivityTypes as $historyType) {
+    $this->setBlock('work', "history_$historyType", "history_{$historyType}_block");
+    $this->setVar("history_{$historyType}_block", '');
+}
+
+$this->setBlock('work', 'work_grade', 'work_grade_block');
+$this->setBlock('history_marked', 'history_marked_hascomment', 'history_marked_hascomment_block');
 
 $userHandler = new User;
 $groupHandler = new Group;
@@ -47,7 +65,6 @@ if (!isset($user['uid'])) {
 	error(2);
 }
 
-
 $categoryList = $groupHandler->involvedInCategoryList($user['uid']);
 
 if (is_array($categoryList)) {
@@ -73,31 +90,87 @@ if (!in_array($submissionBox['category'], $categoryIDList)) {
 	error(17);
 }
 
-$emailObj = new Email();
-$emailAddress = $emailObj->formatEmailFromArray($owner);
+$externalClassHandler = new External_Class();
+$userHandler = new User();
+$groupHandler = new Group();
+$catHandler = new Category();
 
-$dueDate = new Alaress_Date_Format($submissionBox['date'],'y-m-d');
+$this->setVar(array(
+    'teacher_block' => '',
+    'TEACHER_ID' => '0',
+    'TEACHER_NAME' => 'The teacher',
+    'TEACHER_THUMB' => '/portrait?userId=0&size=square32'
+));
+
+$codes = $catHandler->getCodeForCategory($submissionBox['category']);
+
+if($codes && count($codes)) {
+    $classCode = $codes['codes'];
+
+    $listSyns = $externalClassHandler->getTeacherName($classCode);
+    $staffGroups = $groupHandler->getStaffGroupTypeIds();
+
+    if(is_array($listSyns)) {
+        foreach($listSyns as $synid) {
+            $teacher = $userHandler->getBySynergyAndGroup($synid, $staffGroups);
+            $meta = $userHandler->getByID($teacher['uid']);
+
+            $this->setVar(array(
+                'TEACHER_ID' => $teacher['uid'],
+                'TEACHER_NAME' => $userHandler->formatName($meta),
+                'TEACHER_EXTERNAL_ID' => $synid,
+                'TEACHER_GROUP' => $meta['gname'],
+                'TEACHER_THUMB' => "/portrait?userId=$synid&size=square32"
+            ));
+
+            $this->parse('teacher_block','teacher', true);
+        }
+    }
+}
+
+$dueDate = new Alaress_Date_Relative($submissionBox['date'],'y-m-d');
+$createdDate = new Alaress_Date_Relative($submissionBox['created'], 'y-m-d');
 
 if($dueDate->getUsingFormat('H:i:s') == '23:59:59')
     $this->setVar('BOX_DUEDATE', $dueDate->getLongDateOnly());
 else
     $this->setVar('BOX_DUEDATE', $dueDate->getLong());
 
+// overridden... -_-
+$this->setVar('BOX_DUEDATE', $dueDate->getRelativeTime());
+
 $this->setVar(array(
-    'BOX_CATEGORYNAME' => Scrub::text($submissionBox['categoryName']),
-    'BOX_CATEGORYID'    => $submissionBox['cid'],
-    'BOX_NAME' => Scrub::text($submissionBox['name']),
-    'BOX_DESCRIPTION' => Scrub::text($submissionBox['description']),
-    'BOX_OWNER' => '<a href="'.$_SESSION['mailhandle'].$emailAddress.'">'.$userHandler->formatName($owner).'</a>',
+    'CATEGORY_NAME' => Scrub::text($submissionBox['categoryName']),
+    'CATEGORY_ID' => $submissionBox['cid'],
+    'CATEGORY_THUMB' => '',
     'BOX_ID' => $submissionBox['id'],
+    'BOX_NAME' => Scrub::text($submissionBox['name']),
+    'BOX_OWNER' => $userHandler->formatName($user),
+    'BOX_DESCRIPTION' => Scrub::text($submissionBox['description']),
+    'BOX_TYPE' => $submissionBox['typeName'],
+    'BOX_CREATED' => $createdDate->getRelativeTime()
 ));
+
+// determine whether to display the name of the user we're looking at
+if($userID == $_SESSION['id']) {
+    $this->setVar('show_owner_block', '');
+}
+else {
+    $this->parse('show_owner_block', 'show_owner');
+}
 
 /* Check whether a file is associated with the work
  */
-if ( ( $submissionBox['fid'] && is_numeric($submissionBox['fid']) ) ) {
+if($submissionBox['fid'] && is_numeric($submissionBox['fid'])) {
+    $fileHandler = new File;
+    $file = $fileHandler->getByID($submissionBox['fid']);
 
-  $this->setVar(array(
-        'WORK_FILE_ID' => $submissionBox['fid']
+    $this->setVar(array(
+        'FILE_ID' => $submissionBox['fid'],
+        'FILE_THUMB' => $file['iconFile'],
+        'FILE_SIZE' => Alaress_Byte_Format::bytesToString($file['file_size']),
+        'FILE_NAME' => $file['realname'],
+        'FILE_DATE' => date('jS M Y, g:ia', $file['submitted'])
     ));
 
     $this->parse('download_block', 'download');
@@ -117,45 +190,104 @@ if (is_array($allWork) && count($allWork)) {
 	$this->setVar('action_submit_block', '');
 
 	foreach($allWork as $currentWork) {
-		$workDate = new Alaress_Date_Format($currentWork['date'], 'U');
+
+        // reset blocks
+        foreach($historyActivityTypes as $historyType) {
+            $this->setVar("history_{$historyType}_block", '');
+        }
+        $this->setVar(array(
+            'history_marked_hascomment_block' => '',
+            'history_returned_block' => '',
+            'work_grade_block' => ''
+        ));
+
+        $workDate = new Alaress_Date_Relative($currentWork['date'], 'U');
+
+        // if submission item
+        if($currentWork['sid'] != null) {
+            $historyClass = 'submit';
+            $historyIcon = 'up-arrow';
+        }
+        // if return item
+        elseif($currentWork['rid'] != null) {
+            // work returned
+            if($currentWork['filename']) {
+                $historyClass = 'return';
+                $historyIcon = 'up-arrow';
+            }
+            // mark given
+            else {
+                $historyClass = 'mark';
+                $historyIcon = 'tick';
+            }
+        }
+        // otherwise extension
+        else {
+            $historyClass = 'extend';
+            $historyIcon = 'clock';
+        }
+
+
+        $comment = Scrub::Text($currentWork['comment']);
+        $mark = Scrub::Text($currentWork['mark']);
 
 		$this->setVar(array(
-			'WORK_DATE'           => $workDate->getShort(),
-			'WORK_MARK'           => Scrub::Text($currentWork['mark']),
-			'WORK_COMMENT'        => Scrub::Text($currentWork['comment']),
-			'WORK_FILE_ID'        => $currentWork['fid'],
-			'WORK_SUBMIT_FILE_ID' => $currentWork['sid'],
-			'WORK_RETURN_FILE_ID' => $currentWork['rid'],
+            'HISTORY_CLASS' => $historyClass,
+            'HISTORY_ICON' => $historyIcon,
+			'HISTORY_DATETIME' => $workDate->getRelativeTime(),
+			'HISTORY_MARK' => $mark,
+			'HISTORY_COMMENT' => $comment,
+			'HISTORY_FILE_ID' => $currentWork['fid'],
+			'HISTORY_SUBMIT_FILE_ID' => $currentWork['sid'],
+			'HISTORY_RETURN_FILE_ID' => $currentWork['rid'],
 		));
 
-		if ($currentWork['sid'] != null) {
+
+
+        // submission by student
+        if ($currentWork['sid'] != null) {
+
+            $this->setVar(array(
+                'HISTORY_USER_ID' => $currentWork['owner'],
+                'HISTORY_USER_NAME' => $userHandler->formatName($user),
+                'HISTORY_USER_THUMB' => "/portrait?userId={$user['synergy_id']}&size=square32"
+            ));
 
             // if you are a parent (and only a parent), you can only see plaintext, not a link
             if($parentOnly)
-                $this->setVar('action_view_submitted_block', 'Work Submitted');
+                $this->setVar('history_submitted_block', 'Work Submitted');
             else
-                $this->parse('action_view_submitted_block', 'action_view_submitted');
+                $this->parse('history_submitted_block', 'history_submitted');
 
-            $this->setVar('action_view_returned_block', '');
-
-            /* Remember most recent submission
-			 */
-            if(!is_numeric($recentSubmission['sid'])){
+            // Remember most recent submission
+            if(!is_numeric($recentSubmission['sid'])) {
                 $recentSubmission = $currentWork;
             }
 
         }
+        // return by teacher
 		else if ($currentWork['rid'] != null) {
-            $this->setVar('action_view_submitted_block', '');
 
+            $this->setVar(array(
+                'HISTORY_USER_ID' => $this->getVar('TEACHER_ID'),
+                'HISTORY_USER_NAME' => $this->getVar('TEACHER_NAME'),
+                'HISTORY_USER_THUMB' => $this->getVar('TEACHER_THUMB')
+            ));
+
+            // file return rather than mark
             if($currentWork['filename']) {
                 if($parentOnly)
-                    $this->setVar('action_view_returned_block', 'Work Returned');
+                    $this->setVar('history_returned_block', 'returned work');
                 else
-                    $this->parse('action_view_returned_block', 'action_view_returned');
+                    $this->parse('history_returned_block', 'history_returned');
             }
-            else
-                $this->setVar('action_view_returned_block','');
+            else {
+                if($comment) {
+                    $this->parse('history_marked_hascomment_block', 'history_marked_hascomment');
+                }
+                $this->parse('history_marked_block', 'history_marked');
+                $this->parse('work_grade_block', 'work_grade');
+            }
 
             /* Remember the most recent returned work, because we need it
              * later on
@@ -267,5 +399,16 @@ if (is_numeric($returnedWork['rid'])) {
 else {
 	$this->setVar('returned_work_block', '');
 }
+
+// do fun rubric things
+if($submissionBox['mark_type_slug'] == 'rubric') {
+    $rb = new DueWork_Rubric_Lightbox($this);
+    $rb->render('rubric_block', $submissionBox['id'], $user['uid']);
+}
+else {
+    $this->setVar('rubric_block', '');
+}
+
+
 
 ?>
