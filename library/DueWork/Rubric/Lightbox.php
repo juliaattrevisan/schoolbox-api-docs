@@ -21,6 +21,21 @@ class DueWork_Rubric_Lightbox {
     }
 
     public function render($templateHandle, $submissionBoxID, $studentID) {
+
+        // make sure it actually has permission to render
+        // to see this, you have to be the student in question, a parent of the student in question, or staff
+        $groupHandler = new Group();
+
+        if($groupHandler->isStaff()) {
+            // allow
+        } elseif($groupHandler->isParentOfChild($studentID)) {
+            // allow
+        } elseif($_SESSION['id'] == $studentID) {
+            // allow
+        } else {
+            error(17);
+        }
+
         $page = $this->page;
         $page->setFile($templateHandle, 'submission/rubricLightbox.html');
 
@@ -49,12 +64,6 @@ class DueWork_Rubric_Lightbox {
             $json[] = array($i, $data['criteria'][$i]['value'] < 0 ? 0 : $data['criteria'][$i]['value']);
             $legs[] = array('label' => $data['criteria'][$i]['label']);
         }
-
-        $page->setVar(array(
-            'GRAPH_DATA' => json_encode($json),
-            'GRAPH_LEGS' => json_encode($legs),
-            'GRAPH_MAX'  => count($data['criteria'][0]['results']) - 1
-        ));
 
         $page->setBlock($templateHandle, 'rubric_grouping', 'rubric_grouping_block');
         $page->setBlock('rubric_grouping', 'rubric_crit', 'rubric_crit_block');
@@ -100,8 +109,11 @@ class DueWork_Rubric_Lightbox {
         }
 
         $page->setVar(array(
+            'GRAPH_DATA' => json_encode($json),
+            'GRAPH_LEGS' => json_encode($legs),
+            'GRAPH_MAX'  => count($data['criteria'][0]['results']) - 1,
             'RUBRIC_GRADE_SUM' => $sum,
-            'RUBRIC_GRADE_MAX' => $max
+            'RUBRIC_GRADE_MAX' => $max,
         ));
 
 
