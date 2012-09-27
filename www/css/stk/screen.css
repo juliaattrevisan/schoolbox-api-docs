@@ -55,12 +55,12 @@ h3, #nav h3, .add-component .notification {
 
 #header, .login #header {
     height: 136px;
-    background: #19398a url(/images/stk/stk-header-background.gif) no-repeat 100% 0;
+    background: #133D8D url(/images/stk/cross.png) no-repeat right 0;
 }
 
 #header .logo {
-    height: 77px;
-    width: 377px;
+    height: 72px;
+    width: 335px;
     left: 0;
     padding: 31px 0 28px 15px;
 }

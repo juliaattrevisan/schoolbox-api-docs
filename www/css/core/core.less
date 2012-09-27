@@ -6812,12 +6812,23 @@ h4 a.hidden {
 #rubric-chart {
     width: 300px;
     height: 200px;
-    position: absolute;
-    top: 20px;
-    right: 20px;
 }
 #rubric-window .rubric-grade {
     position: absolute;
     right: 20px;
     top: 225px;
+}
+#rubric-lightbox #rubric-chart {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.rubric .warning span,
+.admin-contents h3 span,
+.admin-form label span.help,
+.dashboard .component .delete-this,
+.submission td span.alert
+{
+    .rounded-corners(100%)
 }
