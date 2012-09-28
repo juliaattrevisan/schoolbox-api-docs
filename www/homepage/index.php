@@ -28,6 +28,7 @@ if (!isset($category['id'])) {
 }
 
 $categoryID = $category['id'];
+$catHandler->logPageView($categoryID);
 
 $homepageHandler = new Homepage($categoryID);
 
