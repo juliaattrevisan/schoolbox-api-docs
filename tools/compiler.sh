@@ -42,8 +42,16 @@ echo -e "... Entering Working Directory...";
 cd /tmp/exported;
 errorCheck 1; 
 echo -e "... Now Performing a Subversion Export of the tag $@";
-svn export --username=damian.alexander --password=Maybe123 http://192.168.1.50/svn/portal/tags/$@/ &> /dev/null
+svn export --username=xxxx --password=xxxx http://192.168.1.50/svn/portal/tags/$@/ &> /dev/null
 errorCheck 1;
+
+# Remove certain files and directories that are not to be distributed
+rm -rf debian/
+rm -rf test/
+rm -rf phpunit.xml
+rm -rf .svn*
+rm -rf .git*
+
 #echo -e "Attempting to process the v$@ SQL Update file (File:/sql/update_$@.sql)";
 #cp /tmp/exported/$@/sql/update_$@.sql /tmp/ &>> /dev/null;
 #errorCheck 1;
