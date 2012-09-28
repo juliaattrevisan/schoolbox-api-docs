@@ -1048,6 +1048,17 @@ Notifications
 /*--------------------------------------------------------------
  BOX class for components.
 --------------------------------------------------------------*/
+.config-inline {
+    line-height: 25px;
+    display: inline;
+    white-space: nowrap;
+    .filter {
+        display: block;
+    }
+}
+
+.editPanel form div { .config-inline; }
+
 .box {
     .thumb {
         display: block;
@@ -1104,12 +1115,7 @@ Notifications
         }
 
         form div {
-            line-height: 25px;
-            display: inline;
-            white-space: nowrap;
-            .filter {
-                display: block;
-            }
+            .config-inline;
         }
         input[type=submit] {
             margin-top: 10px;
@@ -2544,6 +2550,156 @@ DASHBOARD
     margin: 0;
     margin-left: 0.5%;
 }
+
+/*--------------------------------------------------------------
+HOMEPAGE TEMPLATES
+--------------------------------------------------------------*/
+// homepage template mixins
+.layout-position {
+    float: left;
+    width: 49.5%;
+    margin-right: .5%;
+    min-height: 18px;
+}
+.component-draggable {
+    -webkit-transition: background-color 0.3s linear;
+    -moz-transition: background-color 0.3s linear;
+    -o-transition: background-color 0.3s linear;
+    transition: background-color 0.3s linear;
+
+    text-align: center;
+    margin: 0 8px 8px 8px;
+    border-color: #CCC;
+    border-style: dashed;
+    background: #E7E7E7;
+    color: #888;
+    min-height: 30px;
+    // line-height: 30px;
+    text-shadow: 0px 1px 1px #ffffff;
+    font-size: 16px;
+    padding: 7px 8px;
+    position: relative;
+    opacity: 0.8;
+    // background: #e7e7e7 url(/images/famicons/arrow_in.png) no-repeat 50% 8px;
+    line-height: 58px;
+}
+.manage-button(@right: 0) {
+    position: absolute;
+    top: 11px;
+    width: 20px;
+    height: 20px;
+    display: block;
+    line-height: 20px;
+    text-align: center;
+    color: #bebebe;
+    font-weight: bold;
+    font-size: 12px;
+    background-color: #ffffff;
+    text-shadow: none;
+    right: @right;
+    &:hover {
+        background: #000;
+        text-decoration: none;
+    }
+}
+
+.admin-contents.homepage                {
+    #definition-palette                 {   float: left;
+                                            width: 22%;
+    }
+    .component                          {   position: relative;
+                                            padding: 7px 8px 7px 28px;
+                                            margin: 0 16px 4px 0px;
+                                            cursor: move;
+                                            border: 1px solid #1d9ffc;
+                                            font-size: 14px;
+                                            font-weight: bold;
+                                            background: #b0ddfe url(/images/famicons/arrow_out.png) no-repeat 4px 50%;
+        &.disabled                      {   background: #EDEDED;
+                                            border-color: #CCC;
+                                            color: #A1A1A1;
+            &:hover                     {   cursor: help; }
+        }
+        &:hover                         {   cursor: move; }
+    }
+    #group-select                       {   margin: 0 2% 8px 2%;
+                                            width: 91%;
+    }
+    .ui-draggable-dragging              {   .component-draggable; }
+    #homepage-layout                    {   float: right;
+                                            width: 78%;
+        .component                      {   .component-draggable; }
+        .ui-sortable-helper             {   .component-draggable; }
+        #position-left                  {   .layout-position; }
+        #position-right                 {   .layout-position;
+                                            margin: 0;
+                                            margin-left: 0.5%;
+        }
+        #position-top                   {   width: 100%;
+
+        }
+        &:after                         {   clear: both;
+                                            content: '.';
+                                            display: block;
+                                            height: 0;
+                                            line-height: 0;
+                                            font-size: 0;
+                                            visibility: hidden;
+                                            padding: 0;
+                                            margin: 0;
+        }
+        .delete-this                    {   .manage-button(13px); }
+        .config-this                    {   .manage-button(38px); }
+    }
+    .editPanel                          {   width: 100%;
+        span                            {   font-size: 13px;
+                                            font-weight: normal;
+        }
+        label                           {   display: inline; }
+        form                            {   line-height: 25px;
+                                            text-align: right;
+        }
+        .submit-btn                     {   clear: both; }
+    }
+    .marker                             {   margin: 8px;
+                                            padding: 0;
+                                            height: 60px;
+    }
+    .layout-position                    {   margin-bottom: 8px;
+                                            background: #ffffff;
+    }
+    .component-holder                   {   padding: 12px 4px 4px 4px;
+                                            border: 1px solid #ccc;
+    }
+    .delete-it p                        {   margin: 0;
+                                            text-align: right;
+    }
+    .component input[type=text]         {   width: auto;
+                                            border: solid 1px #ccc;
+                                            padding: 2px;
+    }
+    form                                {   padding-bottom: 16px;
+        .errmsg                         {   display: block;
+                                            color: #c44;
+        }
+    }
+    #definition-palette                 {
+        select                          {   margin: 0 2% 4px 2%;
+                                            width: 91%;
+        }
+        .btn                            {   padding: 0 16px;
+                                            float: left;
+                                            margin-top: 0;
+        }
+        input[type=text]                {   border: solid 1px #ccc;
+                                            width: 91%;
+                                            margin: 8px 2% 4px 2%;
+        }
+    }
+}
+.settings-nav-holder                        {   float: none; }
+.admin-contents .settings                   {   float: none; }
+
 
 /*--------------------------------------------------------------
 EVALUATION

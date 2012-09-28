@@ -11,202 +11,57 @@
 <script type="text/javascript" src="/javascript/admin/jquery.component.js"></script>
 <script type="text/javascript">
     $j(function() {
-        /* Set up variables and urls
-         */
+
+        // Set up variables and urls
         setupCustomise.ajaxURL = '/homepage/configForm.php';
         setupCustomise.key = 'cid';
 
-        /* The controls for the individual components ie. edit, delete
-         */
+        // The controls for the individual components ie. edit, delete
         setupCustomise.activeComponents();
 
+        $j('#homepage-layout form').live('submit',function(e) {
+            var self = $j(this);
+            var panel = self.parent('.editPanel');
+            var component = panel.parent('.component');
+            var bgcol = component.css('background-color');
+
+            // perform the ajax
+            $j.ajax({
+                async: false,
+                url: "/ajax/homepageComponentConfig.php",
+                data: self.serialize(),
+                type: "POST",
+                success: function(data) {
+                    component.css({'background-color': '#C1F5C1'});
+                    panel.slideUp(300, function() {
+                        component.css({'background-color': bgcol});
+                    });
+                },
+                error: function(data) {
+                    var reason = data.statusText;
+                    var code = data.status;
+                    var explanation = data.responseText;
+
+                    var msg = 'Error: ' + reason + ' (' + code + '): ' + explanation;
+
+                    console.log(msg);
+
+                    self.append('<span class="errmsg">'+msg+'</span>');
+                    component.css({'background-color': '#fdd'});
+                    setTimeout(function() {
+                        self.find('.errmsg').slideUp(300, function() {
+                            $j(this).remove();
+                            component.css({'background-color': bgcol});
+                        });
+
+                    }, 5000);
+
+                }
+            });
+            return false
+        });
     });
 </script>
-
-
-<style type="text/css">
-    /***********************************************
-    HOMEPAGE
-    ************************************************/
-    .homepage #definition-palette {
-        float: left;
-        width: 22%;
-    }
-    .homepage .component {
-        position: relative;
-        padding: 7px 8px 7px 28px;
-        margin: 0 16px 4px 0px;
-        cursor: move;
-        border: 1px solid #1d9ffc;
-        -moz-border-radius: 4px;
-        -webkit-border-radius: 4px;
-        border-radius: 4px;
-        font-size: 14px;
-        font-weight: bold;
-        background: #b0ddfe url(/images/famicons/arrow_out.png) no-repeat 4px 50%;
-    }
-    .homepage .component.disabled {
-        background: #EDEDED;
-        border-color: #CCC;
-        color: #A1A1A1;
-    }
-    .homepage .component:hover {
-        cursor: move;
-    }
-    .homepage .component.disabled:hover {
-        cursor: help;
-    }
-    .homepage #group-select {
-        margin: 0 2% 8px 2%;
-        width: 91%;
-    }
-    .homepage #homepage-layout:after {
-        clear: both;
-        content: '.';
-        display: block;
-        height: 0;
-        line-height: 0;
-        font-size: 0;
-        visibility: hidden;
-        padding: 0;
-        margin: 0;
-    }
-    .homepage #homepage-layout .component,
-    .homepage .ui-draggable-dragging {
-        text-align: center;
-        margin: 0 8px 8px 8px;
-        border-color: #CCC;
-        border-style: dashed;
-        background: #E7E7E7;
-        color: #888;
-        min-height: 30px;
-        line-height: 30px;
-        text-shadow: 0px 1px 1px #ffffff;
-        font-size: 16px;
-        padding: 7px 8px;
-        position: relative;
-    }
-    .homepage .component .delete-this,
-    .homepage .component .config-this {
-        position: absolute;
-        top: 11px;
-        width: 20px;
-        height: 20px;
-        display: block;
-        line-height: 20px;
-        text-align: center;
-        -moz-border-radius: 3px;
-        -webkit-border-radius: 3px;
-        border-radius: 3px;
-        color: #bebebe;
-        font-weight: bold;
-        font-size: 12px;
-        background-color: #ffffff;
-        text-shadow: none;
-    }
-    .homepage .component .delete-this:hover,
-    .homepage .component .config-this:hover {
-        background: #000;
-        text-decoration: none;
-    }
-
-    .homepage .component .delete-this {
-        right: 13px;
-    }
-    .homepage .component .config-this {
-        right: 38px;
-    }
-    .homepage .component .editPanel span {
-        font-size: 13px;
-        font-weight: normal;
-    }
-
-    .homepage .component .editPanel label {
-        display: inline;
-    }
-    .homepage .component .editPanel form {
-        line-height: 25px;
-        text-align: right;
-    }
-
-    .settings-nav-holder, .admin-contents .settings {
-        float: none;
-    }
-
-    .admin-contents .settings {
-        width: 100%;
-    }
-
-    .homepage .marker {
-        margin: 8px;
-        padding: 0;
-        height: 60px;
-    }
-    .homepage #homepage-layout .component.ui-sortable-helper,
-    .homepage .ui-draggable-dragging {
-        opacity: 0.8;
-        background: #e7e7e7 url(/images/famicons/arrow_in.png) no-repeat 50% 8px;
-        line-height: 58px;
-    }
-    .homepage .layout-position {
-        margin-bottom: 8px;
-        background: #ffffff;
-    }
-    .homepage .component-holder {
-        padding: 12px 4px 4px 4px;
-        border: 1px solid #ccc;
-        -moz-border-radius: 4px;
-        -webkit-border-radius: 4px;
-        border-radius: 4px;
-    }
-    .homepage #homepage-layout {
-        float: right;
-        width: 78%;
-    }
-    .homepage #homepage-layout #position-left,
-    .homepage #homepage-layout #position-right {
-        float: left;
-        width: 49.5%;
-        margin-right: .5%;
-        min-height: 18px;
-        -moz-border-radius: 4px;
-        -webkit-border-radius: 4px;
-        border-radius: 4px;
-    }
-    .homepage #homepage-layout #position-right {
-        margin: 0;
-        margin-left: 0.5%;
-    }
-
-    .homepage .delete-it p {
-        margin: 0;
-        text-align: right;
-    }
-
-    .homepage .component input[type=text] {
-        width: auto;
-        border: solid 1px #ccc;
-        padding: 2px;
-    }
-    .homepage form {
-        padding-bottom: 16px;
-    }
-    .homepage #definition-palette select {
-        margin: 0 2% 4px 2%;
-        width: 91%;
-    }
-    .homepage #definition-palette .btn {
-        padding: 0 16px;
-        float: left;
-        margin-top: 0;
-    }
-    .homepage #definition-palette input[type=text] {
-        border: solid 1px #ccc;
-        width: 91%;
-        margin: 8px 2% 4px 2%;
-
-    }
-</style>
 <!-- END custom_head-->
 
 <h1>Schoolbox Administration</h1>

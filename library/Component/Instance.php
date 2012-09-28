@@ -27,7 +27,14 @@ class Component_Instance extends Model {
     public $config;
 
     public function getConfigArray($compat = true) {
+
         if(isset($this->config)) {
+
+            // dead index, this is actually not a config
+            if(count($this->config) == 1 && isset($this->config[''])) {
+                return array();
+            }
+
             $output = array();
             foreach($this->config as $opt) {
                 $key = $compat ? $this->compatMap($opt['key']) : $opt['key'];

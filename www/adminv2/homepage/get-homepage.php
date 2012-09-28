@@ -37,15 +37,16 @@ foreach($componentCollection as $component) {
     }
 
     $component->execute();
-//    $component->renderTemplate($position);
-
-    $component->parseConfig();
 
     $this->setVar(array(
+        'COMPONENT_INSTANCE_ID'     => $component->instance->id,
         'component.instance.id'     => $component->instance->id,
         'component.definition.id'   => $component->definition->id,
         'component.definition.name' => $component->definition->name,
     ));
+
+    $component->setup(array(), array());
+    $component->parseConfig();
 
     $this->parse("{$position}_block", $position, true);
 

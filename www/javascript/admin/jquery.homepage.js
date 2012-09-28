@@ -64,6 +64,8 @@ homepageControl = {
 
 	dragAndDrop: function(target) {
 		$this = this;
+        var instID;
+        var templID;
 
 		$j('#homepage-layout .component-holder').sortable({
 			helper: 'clone',
@@ -83,6 +85,7 @@ homepageControl = {
 				var $definitionId = $j(ui.item).attr('class').match(/definition\-id\-(\d+)/)[1];
 
 				var $templateId = $j('#template-select').val();
+                templID = $templateId;
 
 				var $position = $j(ui.item).parent().parent().attr('id').match(/position\-(\w+)/)[1];
 
@@ -99,8 +102,11 @@ homepageControl = {
 					$component.instanceId = $instanceId;
 				}
 
+                // need async to be false because this call needs to complete before the GET below begins
+                $j.ajaxSetup({async: false});
 				$j.post('/adminv2/homepage/save-instance', $component, function ($instance) {
 					$j(ui.item).attr('id', 'instance-id-'+$instance.id);
+                    instID = $instance.id;
 					$this.refreshPalette();
 				});
 			},
@@ -109,10 +115,24 @@ homepageControl = {
 			cursor: 'move',
 			stop: function(event, ui) {
 				if (!(ui.item.find('.delete-this').length > 0)) {
-					ui.item.append('<a href="#" class="config-this">&#9660;</a><a href="#" class="delete-this">X</a>')
+                    // make an ajax call to retrieve the config to be inserted
+                    $j.ajax({
+                        async: false,
+                        url: "/ajax/homepageComponentConfig.php",
+                        data: {
+                            component: instID,
+                            cid: templID
+                        },
+                        type: "GET",
+                        success: function(data) {
+                            ui.item.append(data);
+                        },
+                        error: function(data) {
+                            console.log(data);
+                        }
+                    });
 				}
 			}
-
 		});
 
 		$j('#definition-palette .component').draggable({
@@ -160,10 +180,6 @@ homepageControl = {
 	},
 
 	deleteComponent: function() {
-
-		$this = this;
-		console.log($this);
-		/*
 		  $j('.delete-this').live('click',function() {
             var $instanceId = $j(this).parent().attr('id').match(/^instance\-id\-(\d+)$/)[1];
 
@@ -178,7 +194,5 @@ homepageControl = {
 
             return false;
         })
-        */
 	}
-
-}
+};

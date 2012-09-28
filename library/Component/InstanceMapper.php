@@ -94,8 +94,10 @@ class Component_InstanceMapper extends Mapper {
 
         $statement = $this->database->prepare($sql);
 
+        /*
         $statement->bindParam(":module", $module);
         $statement->bindParam(":identifier", $identifier);
+        */
 
         $statement->execute($fields);
 

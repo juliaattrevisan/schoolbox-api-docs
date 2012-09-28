@@ -221,18 +221,18 @@ abstract class Component_ControllerAbstract {
     /**
      * @return bool
      */
-    public function parseConfig() {
+    public function parseConfig($targetHandle = 'CONFIGURATION') {
 
         $page = $this->sitepage;
 
-        $page->setVar('CONFIGURATION', '');
+        $page->setVar($targetHandle, '');
 
         $config = $this->instance->getConfigArray();
 
         // DETERMINE WHAT TO DISPLAY
 
         // there is configuration
-        if(is_array($config)) {
+        if(is_array($config) && count($config)) {
             // have write access
             if($this->permission > READ_ACCESS) {
                 // display full configuration block
@@ -274,7 +274,9 @@ abstract class Component_ControllerAbstract {
 
         $page->setFile('configTpl', $template);
 
-        $page->setBlock('configTpl', 'config_element', 'config_element_block');
+        $page->setBlock('configTpl', 'settings_link', 'settings_link_block');
+        $page->setBlock('configTpl', 'settings_panel', 'settings_panel_block');
+        $page->setBlock('settings_panel', 'config_element', 'config_element_block');
         $page->setVar('config_element_block','');
 
         if($processConfig) {
@@ -305,25 +307,29 @@ abstract class Component_ControllerAbstract {
 
                     $page->parse('config_element_block', 'config_element', true);
                 }
-
                 $page->setVar('CONFIG_ELEMENT_CONTENT', '');
             }
-
+            $page->parse('settings_panel_block', 'settings_panel', false);
         }
+        // don't process the config
         else {
 
         }
+
         // now clear things we don't want seen
         if(!$displayConfig) {
-            $page->setVar('settings_link', '');
-            $page->setVar('settings_panel', '');
+            $page->setVar('settings_link_block', '');
+            $page->setVar('settings_panel_block', '');
+        }
+        else {
+            $page->parse('settings_link_block', 'settings_link');
         }
 
         if(!$hasWriteAccess) {
             $page->setVar('config_element_block', '');
         }
 
-        $page->parse('CONFIGURATION', 'configTpl', false);
+        $page->parse($targetHandle, 'configTpl', false);
 
         return true;
     }
