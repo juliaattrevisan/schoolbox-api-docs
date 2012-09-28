@@ -31,7 +31,7 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
             $synergeticClass = new External_Class;
             $classList = $synergeticClass->getStudents($code);
 
-            if (is_array($classList)) {
+            if (is_array($classList) && count($classList)) {
 
                 // an iterated prepared statement is better than dozens of single queries
                 $stmt = Database::getInstance()->prepare(
