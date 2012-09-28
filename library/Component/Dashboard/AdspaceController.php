@@ -15,18 +15,25 @@ class Component_Dashboard_AdspaceController extends Component_Dashboard_Controll
 
     public function execute () {
 
-
+/*
+        // this relies on 12.5.0 schema, and will require dashboard component configurability
         // $textBoxID = $this->getConfig('textbox');
         $textBoxID = 267;
 
         $tboxHandler = new TextBox();
         $tbox = $tboxHandler->getByID($textBoxID);
-
         // define the 3 elements here
         $adspace = array(
             // 'image' => '/images/mggs/adspace/news-image.jpg',
             'title' => $tbox['heading'],
             'content' => $tbox['body']
+    );
+*/
+
+        $adspace = array(
+            'image' => '/images/mggs/adspace/news-image.jpg',
+            'title' => 'Science Week',
+            'content' => '<h3>Science Week</h3><p><span class="dates">12th August - 17th August</span></p>'
         );
 
         // namespace the vars for the template
