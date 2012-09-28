@@ -448,42 +448,8 @@ class Leave_Controller extends Controller {
                     'REQUEST_NOTES' => $request->getNotes(),
                 )
             );
-
-            /* What is the next/previous pending request?
-                */
-            $nextRequest = $this->getRequestMapper()->findNextPendingByHouseId(
-                $request['id'], $user->getResidentialHouseId()
-            );
-
-            if ($nextRequest) {
-                $this->getPage()->setVar(
-                    array(
-                        'NEXT_PENDING_ID' => $nextRequest['id']
-                    )
-                );
-
-                $this->getPage()->parse('next_pending_block', 'next_pending');
-            } else {
-                $this->getPage()->setVar('next_pending_block', '');
-            }
-
-            $previousRequest = $this->getRequestMapper()->findPreviousPendingByHouseId(
-                $request['id'], $user->getResidentialHouseId()
-            );
-
-            if ($previousRequest) {
-                $this->getPage()->setVar(
-                    array(
-                        'PREV_PENDING_ID' => $previousRequest['id']
-                    )
-                );
-
-                $this->getPage()->parse('prev_pending_block', 'prev_pending');
-            } else {
-                $this->getPage()->setVar('prev_pending_block', '');
-            }
         } else {
-            error(19);
+            error(1);
         }
     }
 
@@ -800,6 +766,13 @@ class Leave_Controller extends Controller {
             $this->getPage()->setBlock(TEMPLATE_content, 'previous_request_list', 'previous_request_list_block');
             $this->getPage()->setBlock('pending_request_list', 'pending_request', 'pending_request_block');
             $this->getPage()->setBlock('previous_request_list', 'previous_request', 'previous_request_block');
+            $this->getPage()->setBlock('previous_request_list', 'export', 'export_block');
+
+            if ($this->getGroup()->getPermission(null)) {
+                $this->getPage()->parse('export_block', 'export');
+            } else {
+                $this->getPage()->setVar('export_block', '');
+            }
 
             $this->getPage()->setVar(
                 array(
