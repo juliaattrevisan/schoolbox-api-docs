@@ -330,7 +330,7 @@ a{
 #header #search-button{
     background: url("/images/core/icons/search.png") no-repeat 50% 50%;
     border: 0;
-    margin: 1px 5px 0 0;
+    margin: 1px 28px 0 0;
     display: block;
     height: 30px;
     width: 30px;
@@ -851,7 +851,7 @@ MORRIS LIBRARY
 }
 
 .quicklinks-container ul{
-    margin: 15px 0 0 -33px;
+    margin: 15px 0 0 -20px;
     position: relative;
     z-index: 10;
 }
