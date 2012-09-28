@@ -1,0 +1,10 @@
+<VirtualHost *:80>
+  DocumentRoot /usr/share/schoolbox/www
+  <Directory /usr/share/schoolbox>
+        Options FollowSymLinks
+        AllowOverride All
+        Order allow,deny
+        Allow from all
+        Satisfy all
+  </Directory>
+</VirtualHost>
