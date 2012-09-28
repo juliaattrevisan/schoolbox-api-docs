@@ -31,6 +31,7 @@ case "$1" in
             chmod 0640 /etc/schoolbox/conf.php
 	    cd /usr/share/schoolbox/tools;
 	    ./update_sql.sh;
+	    ./create-data-dirs.sh;
         fi
     ;;
 
