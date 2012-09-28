@@ -846,29 +846,37 @@ MORRIS LIBRARY
     margin: 0 0 16px 62px;
     position: relative;
     height: 160px;
-    width: 75%;
+    width: 100%;
     padding-left: 32px;
 }
 
 .quicklinks-container ul{
     margin: 15px 0 0 -33px;
+    position: relative;
+    z-index: 10;
 }
 
 .box .quicklinks-container li{
     list-style: none;
     padding: 0;
+    float: left;
+    width: 21%;
 }
 
 .quicklinks-container li a{
     color: #002e52;
     display: block;
     float: left;
-    margin: 0 10px;
+    margin: 0 20px;
     height: 0;
     width: 88px;
     text-align: center;
     text-decoration: none;
     padding-top: 79px;
+}
+
+.quicklinks-container li a:hover{
+    text-decoration: underline;
 }
 
 .quicklinks-container li a {
