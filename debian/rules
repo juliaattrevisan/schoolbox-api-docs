@@ -1,0 +1,62 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+#
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+#
+# Modified to make a template file for a multi-binary package with separated
+# build-arch and build-indep targets  by Bill Allombert 2001
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+DEBVERS := $(shell dpkg-parsechangelog | sed -n -e 's/^Version: //p')
+VERSION := $(shell echo '$(DEBVERS)' | sed -e 's/^[[:digit:]]*://' -e 's/[~-].*//')
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+
+%:
+	dh $@ 
+
+override_dh_install:
+	# Fixes for --no-- deb handling of exclude
+	## Leave Module
+	mkdir -pv $(CURDIR)/leave
+	cp -a --parents templates/*/modules/leave $(CURDIR)/leave
+	rm -fR templates/*/modules/leave
+	cp -a --parents templates/*/modules/boarding $(CURDIR)/leave
+	rm -fR templates/*/modules/boarding
+	cp -a --parents www/modules/leave.php $(CURDIR)/leave
+	rm -fR www/modules/leave.php
+	cp -a --parents library/Leave $(CURDIR)/leave
+	rm -fR library/Leave
+	## End Leave Module
+	# Start install
+	dh_install
+	# Set default config paths for packaged install
+	echo "UPDATE config SET value='/usr/share/schoolbox/templates' WHERE name='template_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/files' WHERE name='file_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/myFiles' WHERE name='myfile_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/submissions' WHERE name='submission_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/returns' WHERE name='returns_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/dropbox' WHERE name='dropbox_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/zip' WHERE name='zip_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/thumbnails' WHERE name='thumbnail_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/cache/xml' WHERE name='xml_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/cache/stream' WHERE name='stream_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/cache/portrait' WHERE name='portrait_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/cache/weather' WHERE name='weather_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
+	# Add extras stuff
+	sed -i 's/newver=\"x.x.x\"/newver=\"$(VERSION)\"/g' debian/schoolbox/usr/share/schoolbox/tools/update_sql.sh
+	# Remove moved files
+	rm -rf debian/schoolbox/usr/share/schoolbox/www/conf
+
+override_dh_fixperms:
+	dh_fixperms -X var/lib/schoolbox
+	chown -vR www-data:www-data debian/schoolbox/var/lib/schoolbox
+	chmod -vR 755 debian/schoolbox/var/lib/schoolbox

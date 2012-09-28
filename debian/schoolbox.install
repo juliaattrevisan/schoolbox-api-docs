@@ -1,0 +1,11 @@
+# Directories.
+www/conf/* /etc/schoolbox/examples
+dav /usr/share/schoolbox
+include /usr/share/schoolbox
+library /usr/share/schoolbox
+sql /usr/share/schoolbox
+templates /usr/share/schoolbox
+tools /usr/share/schoolbox
+updates /usr/share/schoolbox
+www /usr/share/schoolbox
+data/* /var/lib/schoolbox

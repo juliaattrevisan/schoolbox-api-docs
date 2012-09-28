@@ -1,0 +1,2 @@
+etc/schoolbox usr/share/schoolbox/www/conf
+var/lib/schoolbox usr/share/schoolbox/data

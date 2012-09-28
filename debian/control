@@ -1,0 +1,33 @@
+Source: schoolbox
+Section: non-free/web
+Priority: optional
+Maintainer: Sam Bailey <sam.bailey@alaress.com.au>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.3
+Homepage: http://www.schoolbox.com.au
+#Vcs-Git: git://git.debian.org/collab-maint/schoolbox.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/schoolbox.git;a=summary
+
+Package: schoolbox
+Architecture: all
+Depends: apache2, libapache2-mod-auth-kerb,
+ php5, php5-imap, php5-gd, php5-curl, php5-mysql, php5-sybase, php5-ldap,
+ php-pear,
+ mysql-client, mysql-server,
+ freetds-common,
+ wget,
+ ${misc:Depends}
+Description: Schoolbox LMS by Alaress Pty. Ltd.
+ Schoolbox is at the leading edge of eLearning solutions for the K-12
+ education market. The Schoolbox system is carefully integrated with school
+ data-stores and into each unique existing infrastructure to provide an
+ interface that empowers each school's community by making data easily
+ accessible. Furthermore Schoolbox streamlines the education process by
+ increasing staff efficiency, leaving greater time for the core purpose of
+ schools - learning.
+
+Package: schoolbox-leave
+Architecture: all
+Depends: schoolbox
+Description: Leave module for the Schoolbox LMS
+ Leave module for the Schoolbox LMS
