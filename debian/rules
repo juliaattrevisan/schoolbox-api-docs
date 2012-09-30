@@ -56,5 +56,8 @@ override_dh_install:
 
 override_dh_fixperms:
 	dh_fixperms -X var/lib/schoolbox
-	chown -vR www-data:www-data debian/schoolbox/var/lib/schoolbox
-	chmod -vR 755 debian/schoolbox/var/lib/schoolbox
+	chown -R www-data:www-data debian/schoolbox/var/lib/schoolbox
+	chmod -R 755 debian/schoolbox/var/lib/schoolbox
+	chmod -R 755 debian/schoolbox/usr/share/schoolbox/tools/*.sh
+	chmod 644 debian/schoolbox/usr/share/schoolbox/www/images/mime/128x128/*.png
+
