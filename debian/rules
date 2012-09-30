@@ -29,8 +29,6 @@ override_dh_install:
 	mkdir -pv $(CURDIR)/leave
 	cp -a --parents templates/*/modules/leave $(CURDIR)/leave
 	rm -fR templates/*/modules/leave
-	cp -a --parents templates/*/modules/boarding $(CURDIR)/leave
-	rm -fR templates/*/modules/boarding
 	cp -a --parents www/modules/leave.php $(CURDIR)/leave
 	rm -fR www/modules/leave.php
 	cp -a --parents library/Leave $(CURDIR)/leave
