@@ -184,6 +184,11 @@ class External_Tass_User implements External_UserInterface {
 	private function getDatabase () {
 		return $this->database;
 	}
+
+    public function getHousemasterByHouseId($houseID) {
+    }
+
+
 }
 
 
