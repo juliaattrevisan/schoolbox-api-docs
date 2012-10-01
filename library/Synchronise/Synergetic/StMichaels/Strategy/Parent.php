@@ -26,7 +26,28 @@ class Synchronise_Synergetic_StMichaels_Strategy_Parent extends Synchronise_Syne
 	 * @return void
 	 */
 	public function generateList() {
-		$this->collateList($this->getUserHandler()->getByGroup($this->getGroupHandler()->getParentGroupTypeIds(), true));
+        $link = new MSSQL();
+        $link->query("SELECT * FROM uvParentLogin");
+
+        $parents = array();
+
+        // index by synergy_id
+        while($row = $link->getNextArray()) {
+            $parents[$row['SynergeticID']] = $row;
+        }
+
+        $internalList = $this->getUserHandler()->getByGroup($this->getGroupHandler()->getParentGroupTypeIds(), true);
+
+        // fold the password array into the user list
+        if(count($internalList)) {
+            foreach($internalList as &$parent) {
+                if(isset($parents[$parent['synergy_id']])) {
+                    $parent['password'] = $parents[$parent['synergy_id']]['UserPassword'];
+                }
+            }
+        }
+
+		$this->collateList($internalList);
 	}
 
 	/**
@@ -89,9 +110,11 @@ class Synchronise_Synergetic_StMichaels_Strategy_Parent extends Synchronise_Syne
 
 			if (($user['title'] != $currentParent['Title']) || ($user['firstname'] != $currentParent['Preferred']) || ($user['lastname'] != $currentParent['Surname']) || ($user['alt_email'] != $preferredEmail)) {
 
-				$updatedUser['id'] = $user['uid'];
+                // use the original data rather than the reloaded for the password
+                $updatedUser['id'] = $user['uid'];
                 $updatedUser['username'] = $user['username'];
-				$updatedUser['title'] = trim($currentParent['Title']);
+                $updatedUser['password'] = $currentUser['password'];
+                $updatedUser['title'] = trim($currentParent['Title']);
 				$updatedUser['firstname'] = trim($currentParent['Preferred']);
 				$updatedUser['lastname'] = trim($currentParent['Surname']);
 
