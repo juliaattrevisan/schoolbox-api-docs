@@ -82,7 +82,7 @@ function readConfig($vars) {
     $component->parseConfig();
 
     $page->setVar(array(
-//        'CID'                       => $cid,
+        'ID'                        => $vars['cid'],
         'SITE_LOCATION'             => Cfg::get('site_location'),
         'COMPONENT_INSTANCE_ID'     => $component->instance->id,
         'COMPONENT_HANDLE'          => $component->instance->id,
@@ -127,9 +127,10 @@ function writeConfig($vars) {
     }
 
     $ccm = Component_ConfigMapper::getInstance();
-
+    $updated = 0;
     foreach($cdm as $confD) {
         if(isset($vars[$confD->key])) {
+            ++$updated;
 
             // this should be 1:1 relation, so return only the first instance of this definition
             $confI = $ccm->findByColumnList(array(
@@ -137,7 +138,7 @@ function writeConfig($vars) {
                 'component_instance_id'          => $instance->id
             ))->current();
 
-            // printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->key, $confI->value, $config[$confD->key]);
+            printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->key, $confI->value, $vars[$confD->key]);
 
             if(!($confI->id)) {
                 $confI = new Component_Config();
@@ -150,8 +151,7 @@ function writeConfig($vars) {
 
         }
     }
-
-    die('Configuration updated.');
+    die($updated ? "Configuration: $updated updated." : 'No configuration change.');
 
 }
 

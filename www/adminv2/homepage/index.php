@@ -73,18 +73,18 @@ foreach($componentCollection as $component) {
         $this->setFile($position, 'adminv2/homepage/placeholder.html');
     }
 
-    $component->setup(array(), array());
     $component->execute();
-    $component->parseConfig();
 
     $this->setVar(array(
-//        'CID'                       => $cid,
         'COMPONENT_INSTANCE_ID'     => $component->instance->id,
         'COMPONENT_HANDLE'          => $component->instance->id,
         'component.instance.id'     => $component->instance->id,
         'component.definition.id'   => $component->definition->id,
         'component.definition.name' => $component->definition->name,
     ));
+
+    $component->setup(array(), array());
+    $component->parseConfig();
 
     $this->parse("{$position}_block", $position, true);
 

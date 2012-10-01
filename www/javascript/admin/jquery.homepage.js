@@ -132,7 +132,8 @@ homepageControl = {
                         }
                     });
 				}
-			}
+			},
+            cancel: '.nodrag,:input,option'
 		});
 
 		$j('#definition-palette .component').draggable({
@@ -181,12 +182,13 @@ homepageControl = {
 
 	deleteComponent: function() {
 		  $j('.delete-this').live('click',function() {
-            var $instanceId = $j(this).parent().attr('id').match(/^instance\-id\-(\d+)$/)[1];
+              var component = $j(this).parents('.component').first();
+            var $instanceId = component.attr('id').match(/^instance\-id\-(\d+)$/)[1];
 
-            $j(this).parent().slideUp(100,function(){
+            component.slideUp(100,function(){
                 $j(this).remove();
                 $this.refreshPalette();
-            })
+            });
 
             $j.post('/adminv2/homepage/remove-instance', {instanceId: $instanceId}, function () {
 

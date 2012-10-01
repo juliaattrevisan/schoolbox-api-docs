@@ -557,7 +557,16 @@ setupCustomise = {
             }
 
             $this.toggleClass('active');
-            $this.siblings('.editPanel.settings.hide').slideToggle("fast");
+
+            var sibs;
+
+            if((sibs = $this.siblings('.editPanel.settings.hide')).length) {
+                sibs.slideToggle("fast");
+            }
+            else if((sibs = $this.parent('span').siblings('.editPanel.settings.hide')).length) {
+                sibs.slideToggle("fast");
+            }
+
             $this.children('em').data('pinned', !$this.children('em').data('pinned'));
 
         });
