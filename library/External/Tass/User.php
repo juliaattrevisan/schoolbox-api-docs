@@ -102,6 +102,36 @@ class External_Tass_User implements External_UserInterface {
 		/* If the TassID is 8 characters long then it is assumed to be
 		 * someone in the split-parent scenario.
 		 */
+
+        // id has to have a [P]arent prefix
+        if(!preg_match('#P[0-9]+#s', $tassID)) {
+            return array();
+        }
+
+        // remove the P prefix
+        $id = substr($tassID, 1);
+        if (strlen($id) == self::SPLIT_PARENT_TASSID_LENGTH) {
+            $parentCode = substr($id, 0, 7);
+            $parentNum = $id[self::SPLIT_PARENT_TASSID_LENGTH-1];
+
+            $query = "
+                SELECT stud_codes AS RelatedID
+                FROM pia_sfaccess
+                WHERE cmpy_code = '01'
+                AND par_code = '$parentCode'
+                AND sfa_num = '$parentNum'
+            ";
+        }
+        else {
+            $query = "
+				SELECT
+					stud_code AS RelatedID
+				FROM student
+				WHERE par_code = '$tassID'
+				AND cmpy_code = '01'
+			";
+        }
+/*
 		if (strlen($tassID) == self::SPLIT_PARENT_TASSID_LENGTH) {
 			$parentCode = substr($tassID, 0, 7);
 			$parentNum = $tassID[self::SPLIT_PARENT_TASSID_LENGTH-1];
@@ -119,8 +149,7 @@ class External_Tass_User implements External_UserInterface {
 				AND paraddress.add_num = '$parentNum'
 			";
 		}
-		/* Otherwise just show them all
-		 */
+		// Otherwise just show them all
 		else {
 			$query = "
 				SELECT
@@ -130,8 +159,8 @@ class External_Tass_User implements External_UserInterface {
 				AND cmpy_code = '01'
 			";
 		}
-
-		$result= $this->getDatabase()->getAll($query);
+*/
+		$result = $this->getDatabase()->getAll($query);
 
         return $result;
     }

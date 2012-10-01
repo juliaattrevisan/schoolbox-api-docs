@@ -42,28 +42,26 @@ class Component_Dashboard_ShortcutController extends Component_Dashboard_Control
             return false;
         }
 
-        $this->setBlock($templateHandle, 'student_only', 'student_only_block');
-        $this->setBlock($templateHandle, 'staff_only', 'staff_only_block');
-		$this->setBlock($templateHandle, 'administrator_only', 'administrator_only_block');
+        $userGroups = array('student', 'staff', 'administrator','parent');
+        foreach($userGroups as $handle) {
+            $this->setBlock($templateHandle, $handle.'_only', $handle.'_only_block');
+            $this->setVar($handle.'_only_block', '');
+        }
 
-        $this->setVar('staff_only_block', '');
-        $this->setVar('student_only_block', '');
-		$this->setVar('administrator_only_block', '');
-
-		/* Parse administrator blocks
-		 */
+		// Parse administrator blocks
 		if ($_SESSION['gid'] == 1) {
 			$this->parse('administrator_only_block', 'administrator_only');
 		}
-		/* Parse staff blocks
-		 */
-        else if ($this->getGroup()->isStaff()) {
+		// Parse staff blocks
+        elseif ($this->getGroup()->isStaff()) {
             $this->parse('staff_only_block', 'staff_only');
         }
-		/* Parse student blocks
-		 */
-		else if ($this->getGroup()->isStudent()) {
+		// Parse student blocks
+		elseif ($this->getGroup()->isStudent()) {
             $this->parse('student_only_block', 'student_only');
+        }
+        elseif($this->getGroup()->isParent()) {
+            $this->parse('parent_only_block', 'parent_only');
         }
 
         return true;
