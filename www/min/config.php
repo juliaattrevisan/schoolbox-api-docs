@@ -40,7 +40,8 @@ $min_enableBuilder = true;
  * will have to load extra code to guess. Some examples below:
  */
 //$min_cachePath = 'c:\\WINDOWS\\Temp';
-//$min_cachePath = '/tmp';
+require_once('../../include/Bootstrap.php');
+$min_cachePath = Cfg::get('minify_dir');
 //$min_cachePath = preg_replace('/^\\d+;/', '', session_save_path());
 
 
