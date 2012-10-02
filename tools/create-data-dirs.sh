@@ -15,7 +15,7 @@ echo "Updating data directory permissions";
 mkdir -p /var/lib/schoolbox/{dropbox,files,myFiles,returns,storage,submissions,thumbnails,zip}
 
 # Cache dirs
-mkdir -p /var/lib/schoolbox/cache/{portrait,purifier,stream,weather,xml}
+mkdir -p /var/lib/schoolbox/cache/{minify,portrait,purifier,stream,weather,xml}
 
 # Fix permissions
 chown -R www-data:www-data /var/lib/schoolbox
