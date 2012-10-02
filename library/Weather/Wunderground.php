@@ -172,6 +172,76 @@ class Weather_Wunderground implements Weather_Interface {
         return strtolower(preg_replace("#[^a-z0-9\-.]#si",'_',$this->location));
     }
 
+    public function guessLocation($locationString) {
+
+        // echo "Taking a guess for '$locationString'... \n";
+
+        // take a stab as to what format this is in, and render accordingly
+        $strats = array(
+            'ip' => "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}",
+            'geo' => "(\-?[0-9]+\.[0-9]+)[, /]*(\-?[0-9]+\.[0-9]+)",
+            'airport' => "([A-Z]+){3,4}",
+            'city' => "([A-Za-z \.-]+)/([A-Za-z \.-]+)"
+        );
+
+        foreach($strats as $method => $regex) {
+            if(preg_match_all("#$regex#s", $locationString, $matches)) {
+                // echo "looks like $method: ";
+                $method = 'render_'.$method;
+                $parsed = $this->$method($matches);
+                // print_r($parsed);
+                $this->setLocation($parsed);
+                return true;
+            }
+        }
+        // echo "got nothing... <br/>\n";
+        return false;
+    }
+
+
+    /**
+     * @param array $matches
+     * @return array
+     */
+    private function render_ip($matches) {
+        return array(
+            'ip' => $matches[0][0]
+        );
+    }
+
+    /**
+     * @param array $matches
+     * @return array
+     */
+    private function render_geo($matches) {
+        return array(
+            'lat' => $matches[1][0],
+            'long' => $matches[2][0]
+        );
+    }
+
+    /**
+     * @param array $matches
+     * @return array
+     */
+    private function render_airport($matches) {
+        return array(
+            'airport' => $matches[0][0]
+        );
+    }
+
+    /**
+     * @param array $matches
+     * @return array
+     */
+    private function render_city($matches) {
+        return array(
+            'country' => str_replace(' ', '_', $matches[1][0]),
+            'city' => str_replace(' ', '_', $matches[2][0])
+        );
+
+    }
+
 
     /* INTERFACE METHODS */
 

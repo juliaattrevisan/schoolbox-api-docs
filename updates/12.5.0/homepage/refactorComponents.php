@@ -147,7 +147,38 @@ class DashboardComponentReFactory {
         'Component_Homepage_ManagersController' => 'Displays a list of group members with write access to the homepage. Useful in larger groups to show who manages the group.',
     );
 
+    /**
+     * Make sure that the fields match the columns (config is the exception, will be removed and parsed separately)
+     * @var array
+     */
+    private $newComponents = array(
+        'dashboard' => array(
+            'TextBox' => array(
+                'description' => 'Module for displaying custom content on dashboards by being linked to a pre-existing textbox.',
+                'multiple' => 'true',
+                'config' => array(
+                    'compactMode' => array(
+                        'default_value' => 'false',
+                        'label' => 'Hide heading'
+                    ),
+                    'textBox' => array(
+                        'default_value' => '0',
+                        'label' => 'Textbox location'
+                    ),
 
+                )
+            )
+        )
+    );
+
+    private $newConfigurations = array(
+        'Dashboard_News' => array(
+            'size' => array(10, 'Limit')
+        ),
+        'Dashboard_HomepageNews' => array(
+            'size' => array(10, 'Limit')
+        ),
+    );
 
 
 
@@ -190,8 +221,11 @@ class DashboardComponentReFactory {
             $this->printStatus();
         }
         else {
-            $this->refactorHomepages(!isset($options['skip-sql']), !isset($options['skip-clean-db']));
-            $this->refactorHomepageTemplates(!isset($options['skip-sql']));
+            $performSQL = !isset($options['skip-sql']);
+            $this->refactorHomepages($performSQL, !isset($options['skip-clean-db']));
+            $this->refactorHomepageTemplates($performSQL);
+            $this->createNewComponents($performSQL);
+            $this->createNewConfigurations($performSQL);
 
             if(!(isset($options['skip-instantiation']) || isset($options['skip-sql']))) {
                 $this->instantiateComponents();
@@ -447,6 +481,89 @@ class DashboardComponentReFactory {
                 'col'        => $columns[$row['column'] - 1],
                 'seq'        => $row['position'],
             ));
+        }
+    }
+
+    /**
+     * Create new custom components that need to be inserted AFTER the other new definitions
+     */
+    public function createNewComponents($performSQL) {
+        if(count($this->newComponents) && $performSQL) {
+            foreach($this->newComponents as $module => $comps) {
+                foreach($comps as $name => $details) {
+                    if(isset($details['config'])) {
+                        $config = $details['config'];
+                        unset($details['config']);
+                    }
+                    $details['name'] = $name;
+                    $details['module'] = $module;
+
+                    $pdoFields = array();
+                    foreach(array_keys($details) as $f) {
+                        $pdoFields[] = ':' . $f;
+                    }
+                    $pdoString = implode(', ', $pdoFields);
+                    $colString = implode('`, `', array_keys($details));
+
+                    $sql = "INSERT INTO `component_definition` (`$colString`) VALUES ($pdoString)";
+
+                    $this->cli("Inserting new component definition into database", '+');
+                    if($this->db->prepare($sql)->execute($details)) {
+                        if(isset($config)) {
+                            $defnID = $this->db->lastInsertId();
+                            $sql = "
+                                INSERT INTO `component_config_definition`
+                                  (`component_definition_id`, `key`, `default_value`, `label`)
+                                VALUES
+                                  (:ccid, :key, :default_value, :label)
+                                ON DUPLICATE KEY UPDATE `default_value` = :default_value, `label` = :label";
+                            $stmt = $this->db->prepare($sql);
+
+                            $this->cli("Inserting new component config definition into database", '+');
+                            foreach($config as $key => $c) {
+                                $stmt->execute(array(
+                                    'ccid' => $defnID,
+                                    'key' => $key,
+                                    'default_value' => $c['default_value'],
+                                    'label' => $c['label']
+                                ));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param $performSQL
+     */
+    public function createNewConfigurations($performSQL) {
+        if(count($this->newConfigurations) && $performSQL) {
+            $stmt = $this->db->prepare("
+                INSERT INTO component_config_definition
+                  (component_definition_id, `key`, `default_value`, `label`)
+                VALUES
+                  ((
+                    SELECT id
+                    FROM component_definition
+                    WHERE `class` LIKE :class
+                  ), :key, :dval, :lbl
+                )
+            ");
+
+            $this->cli("Inserting new configurations for existing components", '+');
+
+            foreach($this->newConfigurations as $class => $configs) {
+                foreach($configs as $key => $c) {
+                    $stmt->execute(array(
+                        'class' => sprintf("Component_%sController", $class),
+                        'key' => $key,
+                        'dval' => $c[0],
+                        'lbl' => $c[1]
+                    ));
+                }
+            }
         }
     }
 

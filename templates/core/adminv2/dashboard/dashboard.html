@@ -22,12 +22,12 @@
             var panel = self.parent('.editPanel');
             var component = panel.parent('.component');
             var bgcol = component.css('background-color');
-            var postdata = self.serialize();    z
+            var postdata = self.serialize();
 
             // perform the ajax
             $j.ajax({
                 async: false,
-                url: "/ajax/dashboardComponentConfig.php",
+                url: "/ajax/componentConfig.php",
                 data: postdata,
                 type: "POST",
                 success: function(data) {

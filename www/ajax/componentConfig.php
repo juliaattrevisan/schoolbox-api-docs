@@ -23,27 +23,15 @@ if(!isset($_SESSION['id'])) {
     fail(401, 1);
 }
 
-// mandatory arguments
-$reqd = array('component', 'cid');
 
 // retrieve the config for the specified component
 if($method == 'GET') {
-    foreach($reqd as $field) {
-        if(!isset($_GET[$field])) {
-            // necessary information is lacking
-            fail(400, 2);
-        }
-    }
+    checkFields($_GET);
     readConfig($_GET);
 }
 // update the config for the specified component
 elseif($method == 'POST') {
-    foreach($reqd as $field) {
-        if(!isset($_POST[$field])) {
-            // necessary information is lacking
-            fail(400, 2);
-        }
-    }
+    checkFields($_POST);
     writeConfig($_POST);
 }
 else {
@@ -65,8 +53,8 @@ function readConfig($vars) {
     }
 
     // get the component
-    $chf = new Component_Homepage_Factory(new User(), $page, true);
     $cim = Component_InstanceMapper::getInstance();
+    $chf = new Component_Homepage_Factory(new User(), $page, true);
 
     $instance = array_shift($cim->findByInstanceId($vars['component']));
 
@@ -155,6 +143,18 @@ function writeConfig($vars) {
 
 }
 
+
+function checkFields($array) {
+    // mandatory arguments
+    $reqd = array('component', 'cid');
+    foreach($reqd as $field) {
+        if(!isset($array[$field])) {
+            // necessary information is lacking
+            fail(400, 2);
+        }
+    }
+    return true;
+}
 
 /**
  * @param $code

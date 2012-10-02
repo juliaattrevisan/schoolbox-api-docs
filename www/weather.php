@@ -6,17 +6,16 @@
 ************************************************************/
 
 //create weather
-if(isset($this->arg[1])) {
-    $location = array('country' => $this->arg[0], 'city' => $this->arg[1]);
+
+if(count($this->arg)) {
+    $loc = str_replace('_',' ',implode('/', $this->arg));
 }
 else {
-    $loc = explode('/', Cfg::get('weather_location'));
-    $location = array('country' => $loc[0], 'city' => $loc[1]);
+    $loc = Cfg::get('weather_location');
 }
 
-
 $weatherController = new Weather_Wunderground();
-$weatherController->setLocation($location);
+$weatherController->guessLocation($loc);
 $weather = $weatherController->getForecast();
 
 $this->setFile(TEMPLATE_content, 'weather/weather.html');

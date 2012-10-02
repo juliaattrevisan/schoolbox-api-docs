@@ -59,7 +59,6 @@ $this->setBlock('layout', 'position_left', 'position_left_block');
 $this->setBlock('layout', 'position_right', 'position_right_block');
 
 $componentFactory = new Component_Dashboard_Factory(new User, $this);
-
 $componentCollection = $componentFactory->buildComponentList($groupList[0]['id']);
 
 $occupiedPositionList = array();

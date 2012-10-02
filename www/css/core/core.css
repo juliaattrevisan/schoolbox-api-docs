@@ -2233,110 +2233,127 @@ ADMIN BODY
   filter: progid:dximagetransform.microsoft.gradient(startColorStr='#edeae3', EndColorStr='#e0ddd7');
 }
 /***********************************************
-DASHBOARD
+DASHBOARD (to mostly deprecate)
 ************************************************/
+/*
 .dashboard #definition-palette {
-  float: left;
-  width: 22%;
+    float: left;
+    width: 22%;
 }
+
 .dashboard .component {
-  position: relative;
-  padding: 7px 8px 7px 28px;
-  margin: 0 16px 4px 0px;
-  cursor: move;
-  border: 1px solid #0066b0;
-  font-size: 14px;
-  font-weight: bold;
-  background: #b0ddfe url(/images/famicons/arrow_out.png) no-repeat 4px 50%;
+    position: relative;
+    padding: 7px 8px 7px 28px;
+    margin: 0 16px 4px 0px;
+    cursor: move;
+    border: 1px solid @link;
+    font-size: 14px;
+    font-weight: bold;
+    background: #B0DDFE url(/images/famicons/arrow_out.png) no-repeat 4px 50%;
 }
+
 .dashboard .component.disabled {
-  background: #EDEDED;
-  border-color: #CCC;
-  color: #A1A1A1;
+    background: #EDEDED;
+    border-color: #CCC;
+    color: #A1A1A1;
 }
+
 .dashboard .component:hover {
-  cursor: move;
+    cursor: move
 }
+
 .dashboard .component.disabled:hover {
-  cursor: help;
+    cursor: help;
 }
+
 .dashboard #group-select {
-  margin: 0 2% 8px 2%;
-  width: 91%;
+    margin: 0 2% 8px 2%;
+    width: 91%;
 }
+
 .dashboard #dashboard-layout:after {
-  clear: both;
-  content: '.';
-  display: block;
-  height: 0;
-  line-height: 0;
-  font-size: 0;
-  visibility: hidden;
-  padding: 0;
-  margin: 0;
+    clear: both;
+    content: '.';
+    display: block;
+    height: 0;
+    line-height: 0;
+    font-size: 0;
+    visibility: hidden;
+    padding: 0;
+    margin: 0;
 }
+
 .dashboard #dashboard-layout .component,
 .dashboard .ui-draggable-dragging {
-  text-align: center;
-  margin: 0 8px 8px 8px;
-  border-color: #CCC;
-  border-style: dashed;
-  background: #E7E7E7;
-  color: #888;
-  height: 40px;
-  line-height: 40px;
-  text-shadow: 0px 1px 1px #ffffff;
-  font-size: 16px;
-  padding: 7px 8px;
-  position: relative;
+    text-align: center;
+    margin: 0 8px 8px 8px;
+    border-color: #CCC;
+    border-style: dashed;
+    background: #E7E7E7;
+    color: #888;
+    height: 40px;
+    line-height: 40px;
+    text-shadow: 0px 1px 1px @white;
+    font-size: 16px;
+    padding: 7px 8px;
+    position: relative;
 }
+
 .dashboard .component .delete-this {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 24px;
-  height: 24px;
-  display: block;
-  line-height: 24px;
-  text-align: center;
-  color: #000;
-  font-weight: bold;
-  background: #ffffff;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 24px;
+    height: 24px;
+    display: block;
+    line-height: 24px;
+    text-align: center;
+    color: #000;
+    font-weight: bold;
+    background: @white;
 }
+
 .dashboard .marker {
-  margin: 8px;
-  padding: 0;
-  height: 60px;
+    margin: 8px;
+    padding: 0;
+    height: 60px;
 }
+
 .dashboard #dashboard-layout .component.ui-sortable-helper,
 .dashboard .ui-draggable-dragging {
-  opacity: 0.8;
-  background: #e7e7e7 url(/images/famicons/arrow_in.png) no-repeat 50% 8px;
-  line-height: 58px;
+    opacity: 0.8;
+    background: #E7E7E7 url(/images/famicons/arrow_in.png) no-repeat 50% 8px;
+    line-height: 58px;
 }
+
 .dashboard .layout-position {
-  margin-bottom: 8px;
-  background: #ffffff;
+    margin-bottom: 8px;
+    background: @white;
 }
+
 .dashboard .component-holder {
-  padding: 12px 4px 4px 4px;
-  border: 1px solid #ccc;
+    padding: 12px 4px 4px 4px;
+    border: 1px solid #ccc;
 }
+
 .dashboard #dashboard-layout {
-  float: right;
-  width: 78%;
+    float: right;
+    width: 78%;
 }
+
 .dashboard #dashboard-layout #position-left,
 .dashboard #dashboard-layout #position-right {
-  float: left;
-  width: 49.5%;
-  margin-right: .5%;
-  min-height: 18px;
+    float: left;
+    width: 49.5%;
+    margin-right: .5%;
+    min-height: 18px;
 }
+
 .dashboard #dashboard-layout #position-right {
-  margin: 0;
-  margin-left: 0.5%;
+    margin: 0;
+    margin-left: 0.5%;
 }
+*/
 /*--------------------------------------------------------------
 HOMEPAGE TEMPLATES
 --------------------------------------------------------------*/
@@ -2374,7 +2391,7 @@ HOMEPAGE TEMPLATES
   padding: 7px 8px 7px 28px;
   margin: 0 16px 4px 0px;
   cursor: move;
-  border: 1px solid #1d9ffc;
+  border: 1px solid #0066b0;
   font-size: 14px;
   font-weight: bold;
   background: #b0ddfe url(/images/famicons/arrow_out.png) no-repeat 4px 50%;
@@ -2465,7 +2482,7 @@ HOMEPAGE TEMPLATES
   margin: 0;
   margin-left: 0.5%;
 }
-.admin-contents #position-top {
+.admin-contents.homepage #homepage-layout #position-top {
   width: 100%;
 }
 .admin-contents.homepage #homepage-layout:after {
@@ -2519,6 +2536,7 @@ HOMEPAGE TEMPLATES
 }
 .admin-contents.homepage .editPanel {
   width: 100%;
+  float: none;
 }
 .admin-contents.homepage .editPanel span {
   font-size: 13px;
@@ -2577,11 +2595,218 @@ HOMEPAGE TEMPLATES
   width: 91%;
   margin: 8px 2% 4px 2%;
 }
-.settings-nav-holder {
+.admin-contents.dashboard #definition-palette {
+  float: left;
+  width: 22%;
+}
+.admin-contents.dashboard .component {
+  position: relative;
+  padding: 7px 8px 7px 28px;
+  margin: 0 16px 4px 0px;
+  cursor: move;
+  border: 1px solid #0066b0;
+  font-size: 14px;
+  font-weight: bold;
+  background: #b0ddfe url(/images/famicons/arrow_out.png) no-repeat 4px 50%;
+}
+.admin-contents.dashboard .component.disabled {
+  background: #EDEDED;
+  border-color: #CCC;
+  color: #A1A1A1;
+}
+.admin-contents.dashboard .component.disabled:hover {
+  cursor: help;
+}
+.admin-contents.dashboard .component:hover {
+  cursor: move;
+}
+.admin-contents.dashboard #group-select {
+  margin: 0 2% 8px 2%;
+  width: 91%;
+}
+.admin-contents.dashboard .ui-draggable-dragging {
+  -webkit-transition: background-color 0.3s linear;
+  -moz-transition: background-color 0.3s linear;
+  -o-transition: background-color 0.3s linear;
+  transition: background-color 0.3s linear;
+  text-align: center;
+  margin: 0 8px 8px 8px;
+  border-color: #CCC;
+  border-style: dashed;
+  background: #E7E7E7;
+  color: #888;
+  min-height: 30px;
+  text-shadow: 0px 1px 1px #ffffff;
+  font-size: 16px;
+  padding: 7px 8px;
+  position: relative;
+  opacity: 0.8;
+  line-height: 58px;
+}
+.admin-contents.dashboard #dashboard-layout {
+  float: right;
+  width: 78%;
+}
+.admin-contents.dashboard #dashboard-layout .component {
+  -webkit-transition: background-color 0.3s linear;
+  -moz-transition: background-color 0.3s linear;
+  -o-transition: background-color 0.3s linear;
+  transition: background-color 0.3s linear;
+  text-align: center;
+  margin: 0 8px 8px 8px;
+  border-color: #CCC;
+  border-style: dashed;
+  background: #E7E7E7;
+  color: #888;
+  min-height: 30px;
+  text-shadow: 0px 1px 1px #ffffff;
+  font-size: 16px;
+  padding: 7px 8px;
+  position: relative;
+  opacity: 0.8;
+  line-height: 58px;
+}
+.admin-contents.dashboard #dashboard-layout .ui-sortable-helper {
+  -webkit-transition: background-color 0.3s linear;
+  -moz-transition: background-color 0.3s linear;
+  -o-transition: background-color 0.3s linear;
+  transition: background-color 0.3s linear;
+  text-align: center;
+  margin: 0 8px 8px 8px;
+  border-color: #CCC;
+  border-style: dashed;
+  background: #E7E7E7;
+  color: #888;
+  min-height: 30px;
+  text-shadow: 0px 1px 1px #ffffff;
+  font-size: 16px;
+  padding: 7px 8px;
+  position: relative;
+  opacity: 0.8;
+  line-height: 58px;
+}
+.admin-contents.dashboard #dashboard-layout #position-left {
+  margin-bottom: 8px;
+  background: #ffffff;
+}
+.admin-contents.dashboard #dashboard-layout #position-right {
+  margin-bottom: 8px;
+  background: #ffffff;
+  margin: 0;
+  margin-left: 0.5%;
+}
+.admin-contents.dashboard #dashboard-layout #position-top {
+  width: 100%;
+}
+.admin-contents.dashboard #dashboard-layout:after {
+  clear: both;
+  content: '.';
+  display: block;
+  height: 0;
+  line-height: 0;
+  font-size: 0;
+  visibility: hidden;
+  padding: 0;
+  margin: 0;
+}
+.admin-contents.dashboard #dashboard-layout .delete-this {
+  position: absolute;
+  top: 11px;
+  width: 20px;
+  height: 20px;
+  display: block;
+  line-height: 20px;
+  text-align: center;
+  color: #bebebe;
+  font-weight: bold;
+  font-size: 12px;
+  background-color: #ffffff;
+  text-shadow: none;
+  right: 13px;
+}
+.admin-contents.dashboard #dashboard-layout .delete-this:hover {
+  background: #000;
+  text-decoration: none;
+}
+.admin-contents.dashboard #dashboard-layout .config-this {
+  position: absolute;
+  top: 11px;
+  width: 20px;
+  height: 20px;
+  display: block;
+  line-height: 20px;
+  text-align: center;
+  color: #bebebe;
+  font-weight: bold;
+  font-size: 12px;
+  background-color: #ffffff;
+  text-shadow: none;
+  right: 38px;
+}
+.admin-contents.dashboard #dashboard-layout .config-this:hover {
+  background: #000;
+  text-decoration: none;
+}
+.admin-contents.dashboard .editPanel {
+  width: 100%;
   float: none;
 }
-.admin-contents .settings {
-  float: none;
+.admin-contents.dashboard .editPanel span {
+  font-size: 13px;
+  font-weight: normal;
+}
+.admin-contents.dashboard .editPanel label {
+  display: inline;
+}
+.admin-contents.dashboard .editPanel form {
+  line-height: 25px;
+  text-align: right;
+}
+.admin-contents.dashboard .editPanel .submit-btn {
+  clear: both;
+}
+.admin-contents.dashboard .marker {
+  margin: 8px;
+  padding: 0;
+  height: 60px;
+}
+.admin-contents.dashboard .layout-position {
+  margin-bottom: 8px;
+  background: #ffffff;
+}
+.admin-contents.dashboard .component-holder {
+  padding: 12px 4px 4px 4px;
+  border: 1px solid #ccc;
+}
+.admin-contents.dashboard .delete-it p {
+  margin: 0;
+  text-align: right;
+}
+.admin-contents.dashboard .component input[type=text] {
+  width: auto;
+  border: solid 1px #ccc;
+  padding: 2px;
+}
+.admin-contents.dashboard form {
+  padding-bottom: 16px;
+}
+.admin-contents.dashboard form .errmsg {
+  display: block;
+  color: #c44;
+}
+.admin-contents.dashboard #definition-palette select {
+  margin: 0 2% 4px 2%;
+  width: 91%;
+}
+.admin-contents.dashboard #definition-palette .btn {
+  padding: 0 16px;
+  float: left;
+  margin-top: 0;
+}
+.admin-contents.dashboard #definition-palette input[type=text] {
+  border: solid 1px #ccc;
+  width: 91%;
+  margin: 8px 2% 4px 2%;
 }
 /*--------------------------------------------------------------
 EVALUATION
@@ -6348,7 +6573,6 @@ h4 a.hidden {
 .rubric .warning span,
 .admin-contents h3 span,
 .admin-form label span.help,
-.dashboard .component .delete-this,
 .submission td span.alert {
   border-radius: 100%;
   -webkit-border-radius: 100%;

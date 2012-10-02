@@ -18,19 +18,18 @@ class Component_Dashboard_WeatherController extends Component_Dashboard_Controll
         parent::__construct($instance, $user, $sitepage);
 
         $this->weatherController = new Weather_Wunderground();
-
-        $loc = explode('/', Cfg::get('weather_location'));
-        $this->weatherController->setLocation(array('country' => $loc[0], 'city' => $loc[1]));
     }
 
     public function execute () {
+
+        if(!$this->weatherController->guessLocation($this->getConfig('url'))) {
+            return false;
+        }
         if(Cfg::get('weather_enable')) {
             $this->weather = $this->weatherController->getForecast();
             return true;
         }
-        else {
-            return false;
-        }
+        return false;
     }
 
     public function renderTemplate ($templateHandle) {

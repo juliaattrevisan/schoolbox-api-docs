@@ -29,7 +29,6 @@ $componentCollection = $componentFactory->buildComponentList($templateId);
 
 $occupiedPositionList = array();
 foreach($componentCollection as $component) {
-
     $position = "position_{$component->position}";
 
     if ( !$this->template->exists("{$position}_block") ) {

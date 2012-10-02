@@ -2431,8 +2431,9 @@ ADMIN BODY
 }
 
 /***********************************************
-DASHBOARD
+DASHBOARD (to mostly deprecate)
 ************************************************/
+/*
 .dashboard #definition-palette {
     float: left;
     width: 22%;
@@ -2550,11 +2551,12 @@ DASHBOARD
     margin: 0;
     margin-left: 0.5%;
 }
-
+*/
 /*--------------------------------------------------------------
 HOMEPAGE TEMPLATES
 --------------------------------------------------------------*/
-// homepage template mixins
+
+// homepage template/dashboard mixins
 .layout-position {
     float: left;
     width: 49.5%;
@@ -2602,16 +2604,15 @@ HOMEPAGE TEMPLATES
         text-decoration: none;
     }
 }
-
-.admin-contents.homepage                {
+.template-configurator(@context) {
     #definition-palette                 {   float: left;
-                                            width: 22%;
+        width: 22%;
     }
     .component                          {   position: relative;
                                             padding: 7px 8px 7px 28px;
                                             margin: 0 16px 4px 0px;
                                             cursor: move;
-                                            border: 1px solid #1d9ffc;
+                                            border: 1px solid @link;
                                             font-size: 14px;
                                             font-weight: bold;
                                             background: #b0ddfe url(/images/famicons/arrow_out.png) no-repeat 4px 50%;
@@ -2626,80 +2627,86 @@ HOMEPAGE TEMPLATES
                                             width: 91%;
     }
     .ui-draggable-dragging              {   .component-draggable; }
-    #homepage-layout                    {   float: right;
-                                            width: 78%;
+    (~'#@{context}-layout')               {   float: right;
+        width: 78%;
         .component                      {   .component-draggable; }
         .ui-sortable-helper             {   .component-draggable; }
         #position-left                  {   .layout-position; }
         #position-right                 {   .layout-position;
-                                            margin: 0;
-                                            margin-left: 0.5%;
+            margin: 0;
+            margin-left: 0.5%;
         }
-        #position-top                   {   width: 100%;
-
+        #position-top                       {   width: 100%;
         }
         &:after                         {   clear: both;
-                                            content: '.';
-                                            display: block;
-                                            height: 0;
-                                            line-height: 0;
-                                            font-size: 0;
-                                            visibility: hidden;
-                                            padding: 0;
-                                            margin: 0;
+            content: '.';
+            display: block;
+            height: 0;
+            line-height: 0;
+            font-size: 0;
+            visibility: hidden;
+            padding: 0;
+            margin: 0;
         }
         .delete-this                    {   .manage-button(13px); }
         .config-this                    {   .manage-button(38px); }
     }
     .editPanel                          {   width: 100%;
+        float: none;
         span                            {   font-size: 13px;
-                                            font-weight: normal;
+            font-weight: normal;
         }
         label                           {   display: inline; }
         form                            {   line-height: 25px;
-                                            text-align: right;
+            text-align: right;
         }
         .submit-btn                     {   clear: both; }
     }
     .marker                             {   margin: 8px;
-                                            padding: 0;
-                                            height: 60px;
+        padding: 0;
+        height: 60px;
     }
     .layout-position                    {   margin-bottom: 8px;
-                                            background: #ffffff;
+        background: #ffffff;
     }
     .component-holder                   {   padding: 12px 4px 4px 4px;
-                                            border: 1px solid #ccc;
+        border: 1px solid #ccc;
     }
     .delete-it p                        {   margin: 0;
-                                            text-align: right;
+        text-align: right;
     }
     .component input[type=text]         {   width: auto;
-                                            border: solid 1px #ccc;
-                                            padding: 2px;
+        border: solid 1px #ccc;
+        padding: 2px;
     }
     form                                {   padding-bottom: 16px;
         .errmsg                         {   display: block;
-                                            color: #c44;
+            color: #c44;
         }
     }
     #definition-palette                 {
         select                          {   margin: 0 2% 4px 2%;
-                                            width: 91%;
+            width: 91%;
         }
         .btn                            {   padding: 0 16px;
-                                            float: left;
-                                            margin-top: 0;
+            float: left;
+            margin-top: 0;
         }
         input[type=text]                {   border: solid 1px #ccc;
-                                            width: 91%;
-                                            margin: 8px 2% 4px 2%;
+            width: 91%;
+            margin: 8px 2% 4px 2%;
         }
     }
 }
-.settings-nav-holder                        {   float: none; }
-.admin-contents .settings                   {   float: none; }
 
+.admin-contents {
+    &.homepage {
+        .template-configurator('homepage');
+    }
+    &.dashboard {
+        .template-configurator('dashboard');
+    }
+}
 
 /*--------------------------------------------------------------
 EVALUATION
@@ -7024,7 +7031,6 @@ h4 a.hidden {
 .rubric .warning span,
 .admin-contents h3 span,
 .admin-form label span.help,
-.dashboard .component .delete-this,
 .submission td span.alert
 {
     .rounded-corners(100%)

@@ -23,6 +23,10 @@ foreach ($componentCollection as $component) {
     $templateHandle = "component_{$component->id}";
 
     if ($component->execute() !== false) {
+
+        $component->setup(array(), array());
+        $component->parseConfig();
+
         if ($component->renderTemplate($templateHandle) !== false) {
             if (!in_array($component->instance->position, $occupiedPositionList)) {
                 $occupiedPositionList[] = $component->instance->position;
