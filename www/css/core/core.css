@@ -2465,7 +2465,7 @@ HOMEPAGE TEMPLATES
   margin: 0;
   margin-left: 0.5%;
 }
-.admin-contents.homepage #homepage-layout #position-top {
+.admin-contents #position-top {
   width: 100%;
 }
 .admin-contents.homepage #homepage-layout:after {
