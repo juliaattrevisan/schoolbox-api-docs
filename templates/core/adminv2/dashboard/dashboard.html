@@ -6,6 +6,59 @@
 		dashboardControl.init();
 	});
 </script>
+<script type="text/javascript" src="/javascript/admin/jquery.component.js"></script>
+<script type="text/javascript">
+    $j(function() {
+
+        // Set up variables and urls
+        setupCustomise.ajaxURL = '/dashboard/configForm.php';
+        setupCustomise.key = 'cid';
+
+        // The controls for the individual components ie. edit, delete
+        setupCustomise.activeComponents();
+
+        $j('#dashboard-layout form').live('submit',function(e) {
+            var self = $j(this);
+            var panel = self.parent('.editPanel');
+            var component = panel.parent('.component');
+            var bgcol = component.css('background-color');
+            var postdata = self.serialize();    z
+
+            // perform the ajax
+            $j.ajax({
+                async: false,
+                url: "/ajax/dashboardComponentConfig.php",
+                data: postdata,
+                type: "POST",
+                success: function(data) {
+                    component.css({'background-color': '#C1F5C1'});
+                    panel.slideUp(300, function() {
+                        component.css({'background-color': bgcol});
+                    });
+                },
+                error: function(data) {
+                    var reason = data.statusText;
+                    var code = data.status;
+                    var explanation = data.responseText;
+
+                    var msg = 'Error: ' + reason + ' (' + code + '): ' + explanation;
+
+                    self.append('<span class="errmsg">'+msg+'</span>');
+                    component.css({'background-color': '#fdd'});
+                    setTimeout(function() {
+                        self.find('.errmsg').slideUp(300, function() {
+                            $j(this).remove();
+                            component.css({'background-color': bgcol});
+                        });
+
+                    }, 5000);
+
+                }
+            });
+            return false
+        });
+    });
+</script>
 <!-- END custom_head-->
 
 <h1>Schoolbox Administration</h1>

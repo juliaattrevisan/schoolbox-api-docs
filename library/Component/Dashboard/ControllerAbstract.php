@@ -10,6 +10,12 @@
  */
  
 abstract class Component_Dashboard_ControllerAbstract extends Component_ControllerAbstract {
+
+    public function setup(array $context, array $config) {
+        // if you're able to see the component, you're in admin mode so full access is granted
+        $this->permission = FULL_ACCESS;
+    }
+
     protected function getTemplate ($templateName = '', $templatePath = '') {
 
         if ( empty($templatePath) ) {

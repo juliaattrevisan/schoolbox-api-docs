@@ -63,7 +63,6 @@ $componentFactory = new Component_Homepage_Factory(new User, $this, true);
 $cid = $templateList[0]['id'];
 $componentCollection = $componentFactory->buildComponentList($cid);
 
-
 $occupiedPositionList = array();
 
 foreach($componentCollection as $component) {
