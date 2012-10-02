@@ -49,6 +49,7 @@ override_dh_install:
 	echo "UPDATE config SET value='/var/lib/schoolbox/cache/stream' WHERE name='stream_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
 	echo "UPDATE config SET value='/var/lib/schoolbox/cache/portrait' WHERE name='portrait_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
 	echo "UPDATE config SET value='/var/lib/schoolbox/cache/weather' WHERE name='weather_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/cache/minify' WHERE name='minify_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
 	# Add extras stuff
 	sed -i 's/newver=\"x.x.x\"/newver=\"$(VERSION)\"/g' debian/schoolbox/usr/share/schoolbox/tools/update_sql.sh
 	# Remove moved files
