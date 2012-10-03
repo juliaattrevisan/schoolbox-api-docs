@@ -1,0 +1,54 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<!-- enable the minified version when the time is right
+<script type="text/javascript" src="/min/?b=javascript&f=admin/jquery.component.js,admin/jquery.configurator.js"></script>
+-->
+<script type="text/javascript" src="/javascript/admin/jquery.component.js"></script>
+<script type="text/javascript" src="/javascript/admin/jquery.configurator.js"></script>
+<script type="text/javascript">
+    $j(function() {
+        $j('#definition-palette').configurator().start();
+    });
+</script>
+<!-- END custom_head-->
+
+<h1>Schoolbox Administration</h1>
+<ul class="admin-nav">
+	<li><a href="/adminv2/home" >Home</a></li>
+	<li><a href="/adminv2/user">Users</a></li>
+    <li><a href="/adminv2/side-menu">Side Menu</a></li>
+    <li><a href="/adminv2/dashboard" class="current">Dashboard</a></li>
+    <li><a href="/adminv2/homepage">Homepages</a></li>
+    <li><a href="/adminv2/allowed-file">Allowed Files</a></li>
+	<li><a href="/adminv2/setting">Settings</a></li>
+	<li><a href="/adminv2/calendar">Calendar</a></li>
+	<li><a href="/adminv2/category">Category</a></li>
+	<li><a href="/adminv2/list">Lists</a></li>
+	<li><a href="/adminv2/cleanup">Cleanup</a></li>
+</ul>
+<div class="admin-contents dashboard clearfix">
+	<h3>Dashboard<span>?</span>
+    <em>
+        You can drag and reorder the main components of the dashboard here. Grab one
+        from the left column and move it to the right boxes or just re organise the components that are already active.
+    </em>
+    </h3>
+
+    <div id="definition-palette">
+        <select id="group-select">
+            <!-- BEGIN group -->
+            <option value="{group.id}">{group.name}</option>
+            <!-- END group -->
+        </select>
+
+        <!-- BEGIN definition -->
+        <div class="component definition-id-{definition.id} {definition.singleton}">{definition.name}</div>
+        <!-- END definition -->
+
+    </div>
+
+    <div id="dashboard-layout" class="clearfix">
+        <!-- BEGIN layout --><!-- END layout -->
+    </div>
+
+</div>

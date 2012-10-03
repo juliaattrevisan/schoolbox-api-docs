@@ -20,7 +20,7 @@ new SitePage();
 
 // check authorised
 if(!isset($_SESSION['id'])) {
-    fail(401, 1);
+    httpError(401, 1);
 }
 
 
@@ -36,7 +36,7 @@ elseif($method == 'POST') {
 }
 else {
     // method not recognised
-    fail(405, 'Invalid method: should be GET or POST.');
+    httpError(405, 'Invalid method: should be GET or POST.');
 }
 
 
@@ -46,10 +46,10 @@ else {
 function readConfig($vars) {
     $page = new SitePage(false);
     $groupHandler = new Group();
-    // superuser check precedes group perm, so if categoryID was passed as a templateID, it won't cause failure
+    // superuser check precedes group perm, so if categoryID was passed as a templateID, it won't cause httpErrorure
     if(!$groupHandler->isSuperuser() && !$groupHandler->getPermission($vars['cid'])) {
         // lack permission to see configuration details
-        fail(403, 6);
+        httpError(403, 6);
     }
 
     // get the component
@@ -62,7 +62,7 @@ function readConfig($vars) {
 
     // it's in an array, but there's only going to be one
     if($component === false) {
-        fail(400, "Component doesn't exist.");
+        httpError(400, "Component doesn't exist.");
     }
 
     $component->setup(array(), $component->instance->getConfigArray());
@@ -90,7 +90,7 @@ function writeConfig($vars) {
     $groupHandler = new Group();
     if(!$groupHandler->getPermission($vars['cid'])) {
         // lack permission to see configuration details
-        fail(403, 6);
+        httpError(403, 6);
     }
 
     $componentID = $vars['component'];
@@ -150,34 +150,8 @@ function checkFields($array) {
     foreach($reqd as $field) {
         if(!isset($array[$field])) {
             // necessary information is lacking
-            fail(400, 2);
+            httpError(400, 2);
         }
     }
     return true;
-}
-
-/**
- * @param $code
- * @param $message
- */
-function fail($code, $message) {
-    if(is_numeric($message)) {
-        $msg = Database::getInstance()->query("SELECT message FROM error WHERE id = $message")->fetchColumn();
-    }
-    else {
-        $msg = $message;
-    }
-    $codes = array(
-        '400' => 'Bad Request',
-        '401' => 'Unauthorized',
-        '403' => 'Forbidden',
-        '405' => 'Method Not Allowed',
-    );
-    if(isset($codes[$code])) {
-        header('HTTP/1.1 '.$code.' '.$codes[$code]);
-    }
-    else {
-        header('HTTP/1.1 400 Bad Request');
-    }
-    die($msg);
 }

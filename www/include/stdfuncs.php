@@ -76,3 +76,31 @@ function upload_failed() {
         && empty($_POST)
         && empty($_FILES);
 }
+
+
+/**
+ * An HTTP-sensitive way to send a plaintext failure response.
+ * @param $code - the HTTP code to send
+ * @param $message - if numeric, will be looked up in the error table on the DB, otherwise displayed as-is
+ */
+function httpError($code, $message) {
+    if(is_numeric($message)) {
+        $msg = Database::getInstance()->query("SELECT message FROM error WHERE id = $message")->fetchColumn();
+    }
+    else {
+        $msg = $message;
+    }
+    $codes = array(
+        '400' => 'Bad Request',
+        '401' => 'Unauthorized',
+        '403' => 'Forbidden',
+        '405' => 'Method Not Allowed',
+    );
+    if(isset($codes[$code])) {
+        header('HTTP/1.1 '.$code.' '.$codes[$code]);
+    }
+    else {
+        header('HTTP/1.1 400 Bad Request');
+    }
+    die($msg);
+}

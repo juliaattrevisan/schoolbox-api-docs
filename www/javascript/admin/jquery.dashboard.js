@@ -1,3 +1,8 @@
+/**
+ * This file has been deprecated in favour of its abstraction: jquery.configurator.js
+ * @deprecated 2012-10-03
+ * @type {Object}
+ */
 dashboardControl = {
 	
 	init: function(event){
@@ -12,11 +17,11 @@ dashboardControl = {
 		 $j.fn.qtip.defaults.position.corner = {
             target: 'topLeft',
             tooltip: 'bottomLeft'
-        }
+        };
         $j.fn.qtip.defaults.style = {
             tip: 'bottomLeft',
             name: 'green' 
-        }
+        };
 
         $j('h3 span').each(function() {
             activeContent = $j(this).siblings('em').html();
@@ -64,6 +69,8 @@ dashboardControl = {
 
 	dragAndDrop: function(target) {
 		$this = this;
+        var instID;
+        var templID;
 
 		$j('#dashboard-layout .component-holder').sortable({
 			helper: 'clone',
@@ -83,6 +90,7 @@ dashboardControl = {
 				var $definitionId = $j(ui.item).attr('class').match(/definition\-id\-(\d+)/)[1];
 
 				var $groupId = $j('#group-select').val();
+                templID = $groupId;
 
 				var $position = $j(ui.item).parent().parent().attr('id').match(/position\-(\w+)/)[1];
 
@@ -99,8 +107,11 @@ dashboardControl = {
 					$component.instanceId = $instanceId;
 				}
 
+                // need async to be false because this call needs to complete before the GET below begins
+                $j.ajaxSetup({async: false});
 				$j.post('/adminv2/dashboard/save-instance', $component, function ($instance) {
 					$j(ui.item).attr('id', 'instance-id-'+$instance.id);
+                    instID = $instance.id;
 					$this.refreshPalette();
 				});
 			},
@@ -109,10 +120,26 @@ dashboardControl = {
 			cursor: 'move',
 			stop: function(event, ui) {
 				if (!(ui.item.find('.delete-this').length > 0)) {
-					ui.item.append('<a href="#" class="delete-this">x</a>')
+					// ui.item.append('<a href="#" class="delete-this">x</a>')
+                    // make an ajax call to retrieve the config to be inserted
+                    $j.ajax({
+                        async: false,
+                        url: "/ajax/componentConfig.php",
+                        data: {
+                            component: instID,
+                            cid: templID
+                        },
+                        type: "GET",
+                        success: function(data) {
+                            ui.item.append(data);
+                        },
+                        error: function(data) {
+                            console.log(data);
+                        }
+                    });
 				}
-			}
-
+			},
+            cancel: '.nodrag,:input,option'
 		});
 
 		$j('#definition-palette .component').draggable({
@@ -160,14 +187,14 @@ dashboardControl = {
 	},
 
 	deleteComponent: function() {
-		$this = this;
 		 $j('.delete-this').live('click',function() {
-            var $instanceId = $j(this).parent().attr('id').match(/^instance\-id\-(\d+)$/)[1];
+            var component = $j(this).parents('.component').first();
+            var $instanceId = component.attr('id').match(/^instance\-id\-(\d+)$/)[1];
 
-            $j(this).parent().slideUp(100,function(){
+            component.slideUp(100,function(){
                 $j(this).remove();
                 $this.refreshPalette();
-            })
+            });
 
             $j.post('/adminv2/dashboard/remove-instance', {instanceId: $instanceId}, function () {
 

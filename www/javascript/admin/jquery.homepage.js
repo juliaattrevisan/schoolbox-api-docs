@@ -1,3 +1,8 @@
+/**
+ * This file has been deprecated in favour of its abstraction: jquery.configurator.js
+ * @deprecated 2012-10-03
+ * @type {Object}
+ */
 homepageControl = {
 	
 	init: function(event){
@@ -12,11 +17,11 @@ homepageControl = {
 		 $j.fn.qtip.defaults.position.corner = {
             target: 'topLeft',
             tooltip: 'bottomLeft'
-        }
+        };
         $j.fn.qtip.defaults.style = {
             tip: 'bottomLeft',
             name: 'green' 
-        }
+        };
 
         $j('h3 span').each(function() {
             activeContent = $j(this).siblings('em').html();
@@ -115,10 +120,11 @@ homepageControl = {
 			cursor: 'move',
 			stop: function(event, ui) {
 				if (!(ui.item.find('.delete-this').length > 0)) {
+
                     // make an ajax call to retrieve the config to be inserted
                     $j.ajax({
                         async: false,
-                        url: "/ajax/homepageComponentConfig.php",
+                        url: "/ajax/componentConfig.php",
                         data: {
                             component: instID,
                             cid: templID
@@ -181,8 +187,8 @@ homepageControl = {
 	},
 
 	deleteComponent: function() {
-		  $j('.delete-this').live('click',function() {
-              var component = $j(this).parents('.component').first();
+	    $j('.delete-this').live('click',function() {
+            var component = $j(this).parents('.component').first();
             var $instanceId = component.attr('id').match(/^instance\-id\-(\d+)$/)[1];
 
             component.slideUp(100,function(){

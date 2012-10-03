@@ -12,9 +12,10 @@
 $this->setAjax(true);
 
 /* Simple Validation */
-foreach ( array('templateId', 'definitionId', 'position', 'sequence') as $field ) {
+foreach ( array('targetId', 'definitionId', 'position', 'sequence') as $field ) {
     if ( empty($_POST[$field]) ) {
-        exit;
+        // necessary information is lacking, and silent death is not preferred
+        httpError(400, 2);
     }
 }
 
@@ -29,7 +30,7 @@ if ( $definition = Component_DefinitionMapper::getInstance()->findById($_POST['d
 
     $instance->definitionId = $definition->id;
     $instance->module       = 'homepage_template';
-    $instance->identifier   = $_POST['templateId'];
+    $instance->identifier   = $_POST['targetId'];
     $instance->position     = $_POST['position'];
     $instance->sequence     = $_POST['sequence'];
 

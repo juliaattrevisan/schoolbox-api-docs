@@ -15,7 +15,7 @@ if ( !$group->isSuperuser() ) {
     error(19);
 }
 
-$this->setFile(TEMPLATE_content, 'adminv2/homepage/homepage.html');
+$this->setFile(TEMPLATE_content, 'adminv2/homepage.html');
 $this->setTitle('Admin - Homepage Templates');
 
 /* Group Selector */
@@ -44,7 +44,8 @@ foreach($definitionCollection as $definition) {
     $this->setVar(array(
         'definition.id'          => $definition->id,
         'definition.name'        => $definition->name,
-        'definition.description' => $definition->description
+        'definition.description' => $definition->description,
+        'definition.singleton'   => $definition->multiple == 'true' ? '' : 'single-instance'
     ));
 
     $this->parse('definition_block', 'definition', true);
@@ -52,7 +53,7 @@ foreach($definitionCollection as $definition) {
 
 /* Initial group placeholders */
 $this->setBlock(TEMPLATE_content, 'layout', 'layout_block');
-$this->setFile('layout', 'adminv2/homepage/layout.html');
+$this->setFile('layout', 'adminv2/component/layout.html');
 
 $this->setBlock('layout', 'position_top', 'position_top_block');
 $this->setBlock('layout', 'position_left', 'position_left_block');
@@ -69,7 +70,7 @@ foreach($componentCollection as $component) {
     $position = "position_{$component->position}";
 
     if(!$this->template->exists("{$position}_block")) {
-        $this->setFile($position, 'adminv2/homepage/placeholder.html');
+        $this->setFile($position, 'adminv2/component/placeholder.html');
     }
 
     $component->execute();
