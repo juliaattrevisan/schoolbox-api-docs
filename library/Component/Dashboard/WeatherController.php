@@ -13,24 +13,27 @@ class Component_Dashboard_WeatherController extends Component_Dashboard_Controll
 
     protected $weather;
     protected $weatherController;
+    protected $forecastDays = 3;
+
 
     public function __construct (Component_Instance $instance, User $user, SitePage $sitepage) {
         parent::__construct($instance, $user, $sitepage);
-
         $this->weatherController = new Weather_Wunderground();
     }
 
-    public function execute () {
 
+    public function execute () {
         if(!$this->weatherController->guessLocation($this->getConfig('url'))) {
             return false;
         }
         if(Cfg::get('weather_enable')) {
             $this->weather = $this->weatherController->getForecast();
+            $this->forecastDays = $this->getConfig('size');
             return true;
         }
         return false;
     }
+
 
     public function renderTemplate ($templateHandle) {
         if ( !$this->loadTemplate($templateHandle, 'weather') ) {
@@ -54,8 +57,8 @@ class Component_Dashboard_WeatherController extends Component_Dashboard_Controll
         return true;
     }
 
-    protected function renderForecast() {
 
+    protected function renderForecast() {
         $imageLocation = '/weather/image.php?path=';
 
         $currentConditions = $this->weather['current'];
@@ -70,7 +73,7 @@ class Component_Dashboard_WeatherController extends Component_Dashboard_Controll
         $this->parse('temp_now_block','temp_now');
         $this->parse('weather_forecast_block', 'weather_forecast', true);
 
-        for ($i = 0; $i < 3; $i++) {
+        for ($i = 0; $i < $this->forecastDays && $i < count($this->weather['forecast']); $i++) {
             $forecastConditions = $this->weather['forecast'][$i];
             $forecastDate = new Alaress_Date_Format($forecastConditions['datetime'], 'U');
             $this->setVar(array(
@@ -86,15 +89,7 @@ class Component_Dashboard_WeatherController extends Component_Dashboard_Controll
             $this->parse('weather_forecast_block', 'weather_forecast', true);
         }
 
-		$forecastDate = new Alaress_Date_Format($this->weather->weather->forecast_information->forecast_date['data'], 'y-m-d');
-
-        $this->setvar(array(
-            'WEATHER_ICON' => $this->weather->weather->current_conditions->icon['data'],
-            'TEMP' => $this->weather->weather->current_conditions->temp_c['data'],
-            'WIND' => substr($this->weather->weather->current_conditions->wind_condition['data'], 6),
-            'HUMIDITY' => substr($this->weather->weather->current_conditions->humidity['data'], 10),
-            'ISSUED' => $forecastDate->getDateOnly(),
-        ));
+        $this->setVar('WEATHER_LOCATION', sprintf(' in %s, %s', $this->weather['location']['city'], $this->weather['location']['country']));
     }
 
 }
