@@ -177,15 +177,22 @@ class DashboardComponentReFactory {
      * @var array
      */
     private $newConfigurations = array(
-        'Dashboard_News' => array(
-            'size' => array(10, 'Limit')
+        'Dashboard_Greeting' => array(
+            'componentname' => array('{timeofday}, <strong>{title} {firstname} {lastname}</strong>', 'Greeting Format')
         ),
         'Dashboard_HomepageNews' => array(
             'size' => array(10, 'Limit')
         ),
-        'Dashboard_Greeting' => array(
-            'componentname' => array('{timeofday}, <strong>{title} {firstname} {lastname}</strong>', 'Greeting Format')
-        )
+        'Dashboard_News' => array(
+            'size' => array(10, 'Limit')
+        ),
+        'Dashboard_Rss' => array(
+            'url' => 'http://www.abc.net.au/news/indexes/justin/rss.xml'
+        ),
+        'Dashboard_Weather' => array(
+            'url' => 'Australia/Melbourne',
+            'size' => '3'
+        ),
     );
 
 
