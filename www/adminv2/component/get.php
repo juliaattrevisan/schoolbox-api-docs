@@ -80,14 +80,20 @@ foreach ( $emptyPositionList as $emptyPosition ) {
  */
 function buildComponentFactory($context, User $user, SitePage $sitepage) {
     $contextMap = array(
-        'dashboard' => 'dashboard',
-        'homepage' => 'homepage_template',
-        'eportfolio' => 'eportfolio_template'
+        'dashboard' => false,
+        'homepage' => true,
+        'eportfolio' => true
     );
 
     if(isset($contextMap[$context])) {
         $class = sprintf('Component_%s_Factory', ucfirst(strtolower($context)));
-        return new $class($user, $sitepage);
+
+        if($contextMap[$context]) {
+            return new $class($user, $sitepage, true);
+        }
+        else {
+            return new $class($user, $sitepage);
+        }
     }
     return null;
 }

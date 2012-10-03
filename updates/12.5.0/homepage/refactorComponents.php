@@ -171,6 +171,11 @@ class DashboardComponentReFactory {
         )
     );
 
+    /**
+     * Insert new configurations into existing components
+     * (lookup is by class rather than ID, since could differ from one DB to another)
+     * @var array
+     */
     private $newConfigurations = array(
         'Dashboard_News' => array(
             'size' => array(10, 'Limit')
@@ -178,6 +183,9 @@ class DashboardComponentReFactory {
         'Dashboard_HomepageNews' => array(
             'size' => array(10, 'Limit')
         ),
+        'Dashboard_Greeting' => array(
+            'componentname' => array('{timeofday}, <strong>{title} {firstname} {lastname}</strong>', 'Greeting Format')
+        )
     );
 
 
@@ -412,26 +420,12 @@ class DashboardComponentReFactory {
             Component_ConfigDefinitionMapper::getInstance()->save($this->newConfigDefinitions);
         }
 
-        /*
-        if($this->beVerbose) {
-            foreach($newDefinitions as $def) {
-                printf("%s [ %s%s ]\n",$def->name, $def->class, class_exists($def->class, true) ? '' : ' (does not exist)');
-                foreach($this->newConfigDefinitions as $conf) {
-                    if($conf->definitionId == $def->id) {
-                        printf(" > %s :%s\n", $conf->key, $conf->defaultValue);
-                    }
-                }
-                echo "\n";
-            }
-        }
-        */
     }
 
 
     /**
      * Method that does all the hard work on the homepage templates
      * @param $performSQL
-     * @param $cleanDB
      */
     public function refactorHomepageTemplates($performSQL) {
 
@@ -474,13 +468,15 @@ class DashboardComponentReFactory {
                 :compDefnID, 'homepage_template', :templateID, :col, :seq
             )";
 
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute(array(
-                'compDefnID' => $compDefnID,
-                'templateID' => $row['tid'],
-                'col'        => $columns[$row['column'] - 1],
-                'seq'        => $row['position'],
-            ));
+            if($performSQL) {
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute(array(
+                    'compDefnID' => $compDefnID,
+                    'templateID' => $row['tid'],
+                    'col'        => $columns[$row['column'] - 1],
+                    'seq'        => $row['position'],
+                ));
+            }
         }
     }
 

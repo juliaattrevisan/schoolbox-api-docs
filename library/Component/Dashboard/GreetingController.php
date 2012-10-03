@@ -12,13 +12,24 @@
 class Component_Dashboard_GreetingController extends Component_Dashboard_ControllerAbstract {
 
     private $greeting;
-    private $name;
 
     public function execute () {
 
         $tf = new TextFormatter();
-        $this->greeting = $tf->greeting();
-        $this->name = $this->user->formatName($this->user->getByID($_SESSION['id']), $this->getConfig('format'));
+        $greeting = $tf->greeting();
+
+        $user = $this->user->getByID($_SESSION['id']);
+
+        $availableFields = array(
+            'timeofday' => $greeting,
+            'title' => $user['title'],
+            'firstname' => $user['firstname'],
+            'lastname' => $user['lastname']
+        );
+
+        $output = $this->user->formatName($availableFields, $this->getConfig('componentname'));
+
+        $this->greeting = Scrub::html($output);
 
         return true;
     }
@@ -29,8 +40,6 @@ class Component_Dashboard_GreetingController extends Component_Dashboard_Control
         }
 
         $this->setVar('GREETING', $this->greeting);
-        $this->setVar('NAME', $this->name);
-        
         return true;
     }
 
