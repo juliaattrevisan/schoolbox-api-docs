@@ -1,0 +1,386 @@
+/*
+ * Wenona Skin for Synergetic Community Portal
+ *
+ * To install, place this file in SynergeticCommunityPortal/Site/Css
+ * Authored by @alaress, '12
+/* ========================================================================== */
+body
+{
+    font-size: 13px;
+    background: #fff !important;
+}
+
+input, select, td
+{
+    font-size: 13px !important;
+}
+
+a
+{
+    color: #006;
+}
+
+a:hover
+{
+    color: #C00;
+}
+
+
+/*
+    Header and menu styles
+*/
+.headerDiv
+{
+    display: none !important;
+}
+
+/*
+    Portal Floating menu
+*/
+
+.floatMenuDiv
+{
+    height: 28px;
+    padding-top: 11px;
+    background: #F0F0F0;
+}
+
+.floatUnderlay
+{
+    height:38px;
+}
+
+
+
+/*
+
+Portal heading style elements
+
+*/
+
+h2, .headerDiv
+{
+    background-color: transparent;
+    color: #000000;
+    border-bottom: 2px solid #002452;
+    background-image: none;
+}
+
+.heading_cell /* need to phase heading cells out.. convert to h2 or headDiv*/
+{
+    background-color: transparent;
+    color: #000000;
+    border-bottom: 2px solid #002452;
+    background-image: none;
+}
+
+/*
+    Page Layout styles
+*/
+.upperBody
+{
+    height:38px;
+}
+/*
+    Portal column framwork for left column elements.
+*/
+
+/* Top Menu Button (is actually a TableCell. SW 19/2/08 */
+.mnu_btn_cell /* lnk_drk_row */
+{
+    background-color: transparent;
+}
+
+/* Table row above the Top Menu Buttons (is a TableCell). SW 19/2/08 */
+.mnu_btn_cell_top /* lnk_drk_row_top */
+{
+    background-color: transparent;
+}
+
+
+/* In the Results and contacts pages - everything under the headings (eg. information and calender). SW 26/2/08 */
+.tableBlackTopBorder /* cla_tab */
+{
+    border-top: none;
+}
+
+/*************************
+	Weekly Timetable
+*************************/
+#TimetableWeekly table tr th
+{
+    background-color: #036;
+    color: white;
+    padding: 7px 16px;
+}
+#TimetableWeekly table tr td
+{
+    background: #FBFBFB;
+    border: 3px solid #ffffff;
+    border-width: 3px 3px 0 3px;
+}
+
+/* Weekly Timetable - Header Cells */
+.time_whc_cell
+{
+    background: none;
+}
+.time_wh_cell
+{
+    background: none;
+    background-color: #036;
+    color: white;
+    padding: 7px 16px;
+}
+
+/* Weekly Timetable - Regular Cells */
+.time_wtc_cell
+{
+    background-color: transparent;
+}
+.time_wdc_cell
+{
+    background-color: transparent;
+}
+
+/* Textual Hyperlink on each Tab eg Results, Interviews, Contact Us ... */
+.lnk_btn
+{
+    font-weight: normal;
+    padding: 7px 16px;
+    color: #036;
+    margin: 4px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+
+/* The current page Textual Hyperlink on each Tab eg Results, Interviews, Contact Us ... */
+.lnk_btn_highlight
+{
+    font-weight: normal;
+    padding: 7px 16px;
+    color: #FFF;
+    background: #036;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.lnk_btn:hover
+{
+    background: #D6F0F6;
+    color: #0066B0;
+}
+.lnk_btn_highlight:hover {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.res_ttl_cell /* Results Maintenance: Assessment Area description cell with dotted underline */
+{
+    border-bottom:none;
+}
+
+/* Student name Cell in Results when showing all students. SW 29/2/08 */
+.name_cell
+{
+    font-size: 14px !important;
+    background-color: transparent;
+    padding: 0;
+    line-height: 20px;
+    text-indent: 5px;
+    color: black;
+    border-bottom: 2px solid #002452;
+}
+
+/* Class Assessment area Table Cell (in Information section). SW 29/2/08 */
+.class_type_cell
+{
+    font-size: 14px !important;
+    background-color: transparent;
+    padding: 0;
+    line-height: 20px;
+    text-indent: 5px;
+    color: black;
+    border-bottom: 2px solid #002452;
+}
+.prepost_hdr_cell
+{
+    /* Pre and Post reports header (results page) - by default they are the same as the Class type cells eg Academic, Sports, Arts [class_type_cell]. SW 26/5/09 */
+    font-size: 14px !important;
+    background-color: transparent;
+    padding: 0;
+    line-height: 20px;
+    text-indent: 5px;
+    color: black;
+    border-bottom: 2px solid #002452;
+}
+
+.hdr_type_cell
+{
+    font-size: 14px !important;
+    background-color: transparent;
+    padding: 0;
+    line-height: 20px;
+    text-indent: 5px;
+    color: black;
+    border-bottom: 2px solid #002452;
+
+}
+
+.time_h_cell /* The Daily Timetable header Cells */
+{
+    background-color: #036;
+    color: white;
+    padding: 7px 16px;
+}
+
+.time_t_cell /* the time cell of the Daily Timetable HTMLTable */
+{
+    background: none;
+}
+
+.time_d_cell /* the other cells of the daily timetable HTMLTable */
+{
+    background: none;
+}
+
+.time_d_cell_pti_print
+{
+    background: none;
+}
+
+.time_tr_cell
+{
+    background: none;
+}
+
+.time_dr_cell
+{
+    background: none;
+}
+
+/* Table cell between each Menu Cell. SW 19/2/08 */
+.mnu_mid_img_cell /* mid_img_cell */
+{
+    background: none;
+    display: none;
+}
+/* End Table cell after all Menu Cells. SW 19/2/08 */
+.mnu_end_img_cell /* end_img_cell */
+{
+    background: none;
+    display: none;
+}
+/* right hand Cell after HeaderCell eg Available Results/Information. SW 19/2/08 */
+.tbl_hdr_end_img_cell /* triang_cell */
+{
+    background: none;
+    display: none;}
+
+/* Attendances - Cells */
+.att_grd_cell
+{
+    border-bottom:none !important;
+}
+
+#att_Selection
+{
+    height:75px;
+
+}
+
+.financeTableRow
+{
+    background: none;
+}
+.financeTableRow:hover
+{
+    background-color: #ECECEC;
+    color: #000;
+}
+
+#fin_TransactionHistoryHeader
+{
+    background-color: transparent;
+}
+
+.dataView .titleRow
+{
+    padding-right: 0;
+    padding-left: 0;
+    background-color: transparent;
+    text-indent: 5px;
+    color: #000000;
+    border-bottom: none;
+    vertical-align: bottom;
+    background-image: none;
+    line-height: 20px;
+    margin-top:0px;
+}
+
+.dataView .dataRow
+{
+    background: none;
+    font-size: 13px;
+}
+.dataView .dataRow:hover
+{
+    background-color: #ECECEC;
+    color: #000;
+}
+
+/* Styling for the docman grid and the columns. SW7012 30/06/09 */
+.docman_grd_hdr_cell /* Docman GridView header cells. SW7012 30/06/09 */
+{
+    /* width:100%; */
+    font-weight: normal;
+    background-color: transparent;
+    color: black;
+    border-bottom: 2px solid #002452;
+}
+
+.ulSideMenu li .selected
+{
+    color: #FF5A00 !important;
+}
+.ulSideMenu li a.selected
+{
+    color: #FF5A00 !important;
+}
+.ulSideMenu li a
+{
+    border: 1px solid #D1D1D1;
+    color: black !important;
+    display: block;
+    float: right;
+    text-shadow: 0 1px 0px white;
+    background-color: #FBFBFB;
+    background-image: -moz-linear-gradient(top, #FBFBFB, #F7F7F7);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #FBFBFB), color-stop(1, #F7F7F7));
+    filter: progid:dximagetransform.microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7');
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7')";
+    height: 22px;
+    line-height: 22px;
+    padding: 6px 16px 6px 30px;
+    position: relative;
+    font-weight: normal;
+    overflow: visible;
+    margin-top: 4px;
+    font-family: Arial,Helvetica,sans-serif;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+
+}
+
+.dxgvFocusedRow
+{
+    background-color: #ECECEC;
+    color: #000;
+}
+.dxgvControl, .dxgvDisabled
+{
+    border: none;
+}
