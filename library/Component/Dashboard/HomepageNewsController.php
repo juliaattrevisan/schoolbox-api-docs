@@ -12,8 +12,7 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
     private $feedList;
     private $limit = 20;
 
-    public function execute()
-    {
+    public function execute() {
         $feedHandler = new Feed();
         $groupHandler = new Group();
         $userAccess = $groupHandler->involvedInCategoryList($_SESSION['id']);
@@ -24,10 +23,11 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
             foreach ($userAccess as $ua)
                 $categoryIDs[] = $ua['id'];
 
-            $this->feedList = $feedHandler->getFeed($categoryIDs, $this->limit);
+            $this->feedList = $feedHandler->getFeed($categoryIDs, $this->getConfig('size') ? $this->getConfig('size') : $this->limit);
 
             return true;
         }
+        return false;
     }
 
     public function renderTemplate($templateHandle)
