@@ -13,7 +13,7 @@ if(!isset($this)) {
     httpError(400, 101); // resource not available
 }
 
-$this->setLite(true);
+$this->setAjax(true);
 
 $method = strtoupper($_SERVER['REQUEST_METHOD']);
 
@@ -26,7 +26,7 @@ if(!isset($_SESSION['id'])) {
 // retrieve the config for the specified component
 if($method == 'GET') {
     checkFields($_GET);
-    readConfig($_GET);
+    readConfig($_GET, $this);
 }
 // update the config for the specified component
 elseif($method == 'POST') {
@@ -41,9 +41,9 @@ else {
 
 /**
  * @param $vars
+ * @param SitePage $page
  */
-function readConfig($vars) {
-    $page = new SitePage(false);
+function readConfig($vars, SitePage $page) {
     $groupHandler = new Group();
     // superuser check precedes group perm, so if categoryID was passed as a templateID, it won't cause httpErrorure
     if(!$groupHandler->isSuperuser() && !$groupHandler->getPermission($vars['cid'])) {

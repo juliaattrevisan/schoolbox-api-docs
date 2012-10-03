@@ -140,7 +140,7 @@ $j.fn.configurator = function(opts) {
                     console.log(data);
                     $j.ajax({
                         async: false,
-                        url: "/ajax/componentConfig.php",
+                        url: "/adminv2/component/config",
                         data: data,
                         type: "GET",
                         success: function(data) {
