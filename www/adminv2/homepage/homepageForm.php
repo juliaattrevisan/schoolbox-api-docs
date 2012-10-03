@@ -17,13 +17,13 @@ $sitePage = new SitePage();
 
 // this is an admin function, so check user is super-awesome
 if(!isset($_SESSION['su']) || (!$_SESSION['su'])) {
-    $sitePage->error(101);
+    error(101);
     return;
 }
 
 // action has to be set, and not empty
 if(!isset($_POST['action']) || (!$action = strtolower($_POST['action']))) {
-    $sitePage->error(2);
+    error(2);
     return;
 }
 
@@ -32,26 +32,26 @@ switch($action) {
     case 'delete':
         // deletion requires template id
         if(!(isset($_POST['template'])) || !($templateID = $_POST['template'])) {
-            $sitePage->error(2);
+            error(2);
             return;
         }
         // will be deleting $templateID
         break;
     case 'rename':
         if(!(isset($_POST['template'])) || !($templateID = $_POST['template'])) {
-            $sitePage->error(2);
+            error(2);
             return;
         }
         // no break: going through
     case 'new':
         if(!(isset($_POST['name'])) || !($name = $_POST['name'])) {
-            $sitePage->error(2);
+            error(2);
             return;
         }
         // renaming $templateID to $name, or new with $name
         break;
     default:
-        $sitePage->error(2);
+        error(2);
         return;
 }
 
