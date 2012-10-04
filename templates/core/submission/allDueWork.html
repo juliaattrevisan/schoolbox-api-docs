@@ -3,11 +3,22 @@
 <script type="text/javascript">
     $j(function(){
         $j('#container').css('width', $j('.ruler').outerWidth());
-        $j(".subjectList, .onlineAssessments").tablesorter({
+        $j(".subjectList").tablesorter({
             cssHeader: 'sortable',
             cssAsc: 'ascending',
             cssDesc: 'descending',
             headers: {
+                2: { sorter: false},
+                3: { sorter: false},
+                4: { sorter: false}
+            }
+        });
+        $j(".onlineAssessments").tablesorter({
+            cssHeader: 'sortable',
+            cssAsc: 'ascending',
+            cssDesc: 'descending',
+            headers: {
+                3: { sorter: false},
                 4: { sorter: false}
             }
         });
@@ -82,44 +93,27 @@ table.subjectList td {
 		<table class="subjectList">
 			<thead>
 				<tr>
-					<th>Name</th>
-					<th>Due Date</th>
-					<th>Status</th>
-					<th>Mark</th>
-					<th></th>
+                    <th width="16%">Due Date</th>
+                    <th width="21%">Name</th>
+					<th width="21%">Mark</th>
+					<th width="21%">Comment</th>
+					<th width="21%">Status</th>
 				</tr>
 			</thead>
 			<tbody>
 				<!-- BEGIN work -->
 				<tr class="{ROW_COLOR}">
-					<td valign="top">{WORK_DESCRIPTION}</td>
-					<td>{WORK_DUEDATE}</td>
+                    <td>{WORK_DUEDATE}</td>
+                    <td valign="top"><a href="/submission/submissionHistory/{WORK_BOX_ID}/{WORK_USER_ID}">{WORK_DESCRIPTION}</a></td>
+                    <td valign='top'>{WORK_MARK}</td>
+                    <td valign='top'>{WORK_COMMENT}</td>
 
-					<!-- BEGIN status_due -->
-					<td valign="top">Submission Due</td>
-					<!-- END status_due -->
-
-					<!-- BEGIN status_late -->
-					<td valign="top">Submission Late</td>
-					<!-- END status_late -->
-
-					<!-- BEGIN status_closed -->
-					<td valign="top">Submission Closed</td>
-					<!-- END status_closed -->
-
-					<!-- BEGIN status_awaiting_review -->
-					<td valign="top">Awaiting mark</td>
-					<!-- END status_awaiting_review -->
-
-					<!-- BEGIN status_marked -->
-					<td valign="top">Marked</td>
-					<!-- END status_marked -->
-
-					<td valign='top'>{WORK_MARK}</td>
-
-					<td><a href="/submission/submissionHistory/{WORK_BOX_ID}/{WORK_USER_ID}">View Details</a></td>
+                    <!-- BEGIN status_due --><td valign="top">Submission Due</td><!-- END status_due -->
+					<!-- BEGIN status_late --><td valign="top">Submission Late</td><!-- END status_late -->
+					<!-- BEGIN status_closed --><td valign="top">Submission Closed</td><!-- END status_closed -->
+					<!-- BEGIN status_awaiting_review --><td valign="top">Awaiting mark</td><!-- END status_awaiting_review -->
+					<!-- BEGIN status_marked --><td valign="top">Marked</td><!-- END status_marked -->
 				</tr>
-
 				<!-- END work -->
 			</tbody>
 		</table>
@@ -129,23 +123,23 @@ table.subjectList td {
 	<!-- BEGIN allAssess -->
 	<div class="box component">
 	<h2>Online Assessments</h2>
-		<div class="text listing">
+		<div class="listing">
 			<table class="due-dates onlineAssessments">
 				<thead>
 					<tr>
-						<th width="20%">Subject</th>
-						<th width="20%">Description</th>
-						<th width="20%">Finish Date</th>
-						<th width="20%">Mark</th>
-						<th width="20%">Action</th>
+                        <th width="16%">Finish Date</th>
+                        <th width="21%">Name</th>
+                        <th width="21%">Subject</th>
+						<th width="21%">Mark</th>
+						<th width="21%">Action</th>
 					</tr>
 				</thead>
 				<tbody>
 					<!-- BEGIN attempt -->
-					<tr>
-						<td>{ASSESS_CATEGORY}</td>
-						<td>{ASSESS_TITLE}</td>
-						<td>{ASSESS_FINISH}</td>
+					<tr class="{ROW_COLOR}">
+                        <td>{ASSESS_FINISH}</td>
+                        <td>{ASSESS_TITLE}</td>
+                        <td>{ASSESS_CATEGORY}</td>
 						<td>
 							{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS} ({ATTEMPT_PERCENTAGE}%)
 							<!-- BEGIN unmarked -->

@@ -185,7 +185,8 @@ class Submission extends DeprecatedModel {
         }
         $semesterTest = DueWork_All::getSemesterLogic($semester);
 
-		$query = "SELECT
+		$outerQuery = "
+		    SELECT
 			b.id AS bid,
 			s.id AS sid,
 			r.id AS rid,
@@ -194,15 +195,7 @@ class Submission extends DeprecatedModel {
 			c.name AS categoryName,
 			b.name,
 			b.description,
-			b.created, s.submitted, r.returned,
-			(
-				SELECT mark
-				FROM submission_return
-				WHERE box_id = bid
-				AND submission_return.owner = '$userID'
-				ORDER BY returned DESC
-				LIMIT 1
-			) AS mark
+			b.created, s.submitted, r.returned
 			FROM submission_box b
 			LEFT JOIN category c ON c.id = b.category
 			LEFT JOIN student_submission s ON s.box_id = b.id AND (s.owner = '$userID' OR s.owner IS NULL)
@@ -212,9 +205,35 @@ class Submission extends DeprecatedModel {
 			AND DATE_FORMAT(b.date, '%Y') = $year
 			AND DATE_FORMAT(b.date, '%m') $semesterTest
             GROUP BY b.id
-			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC";
+			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC
+        ";
 
-		return $this->db->getAll($query);
+        $outerResult = $this->db->query($outerQuery);
+
+        /* Instead of unconditionally nesting an unindexable subquery in the above, which may or may not
+         * actually return anything, only perform the inner query if it's contextually appropriate (ie. the row
+         * in question actually has a returnID).
+         */
+        $collection = array();
+
+        // use the derived returnIDs to additionally retrieve marks, comments, etc
+        while($row = $this->db->getNextArray($outerResult)) {
+            if($row['rid']) {
+                $innerQuery = "
+                    SELECT mark, comment
+                    FROM submission_return
+                    WHERE box_id = '{$row['bid']}'
+                    AND owner = '$userID'
+                    ORDER BY returned DESC
+                    LIMIT 1
+                ";
+                $collection[] = array_merge($row, $this->db->getRow($innerQuery));
+            }
+            else {
+                $collection[] = $row;
+            }
+        }
+        return $collection;
 	}
 
 	/**

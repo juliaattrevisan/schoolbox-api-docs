@@ -202,6 +202,7 @@ class DueWork_All {
                 'WORK_DESCRIPTION'  => Scrub::Text($currentWork['name']),
                 'WORK_DUEDATE'      => $dueDate->getDateOnly(),
                 'WORK_MARK'         => $currentWork['mark'],
+                'WORK_COMMENT'      => $currentWork['comment'],
                 'WORK_BOX_ID'       => $currentWork['bid'],
                 'ROW_COLOR'         => $j % 2 ? 'dark' : ''
             ));
@@ -284,6 +285,7 @@ class DueWork_All {
                     'ATTEMPT_TOTAL_MARKS'           => number_format(0, 2),
                     'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
                     'ATTEMPT_PERCENTAGE'            => 0,
+                    'ROW_COLOR'                     => $j % 2 ? 'dark' : ''
                 ));
 
                 $this->page->setVar('viewMarks_block', '');
@@ -334,6 +336,7 @@ class DueWork_All {
                         'ATTEMPT_TOTAL_MARKS'           => number_format($marks, 2),
                         'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
                         'ATTEMPT_PERCENTAGE'            => $percentage,
+                        'ROW_COLOR'                     => $j % 2 ? 'dark' : ''
                     ));
 
                     $this->page->setVar('takeTest_block', '');
