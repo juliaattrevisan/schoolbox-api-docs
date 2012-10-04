@@ -3,42 +3,41 @@
 <!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
 <!--  Visit us at www.lektec.com.au -->
 <head>
-<title>{TITLE}</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta http-equiv="Content-Language" content="en-au" />
-<meta name="author" content="James Leckie, Alaress"/>
-<link rel="Shortcut Icon" href="/images/stk/favicon.ico" type="image/x-icon" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/css/stk/screen.css" />
+    <title>{TITLE}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Language" content="en-au"/>
+    <meta name="author" content="James Leckie, Alaress"/>
+    <link rel="Shortcut Icon" href="/images/stk/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="/css/stk/screen.css"/>
 
-<script type="text/javascript">
-window.onload = init;
-function init(){
-	document.getElementById('username').focus();
-}
-</script>
+    <script type="text/javascript">
+        window.onload = init;
+        function init() {
+            document.getElementById('username').focus();
+        }
+    </script>
 </head>
 <body class="login">
-	<div id="header">
-        <a href="/" class="logo"><img src="/images/stk/stk-logo.png" width="334" height="77" alt="Saint Kentigern School"/></a>
-	</div>
+<div id="header">
+    <a href="/" class="logo"><img src="/images/stk/stk-logo.png" width="334" height="77" alt="Saint Kentigern School"/></a>
+</div>
 
 <div id="container" class=" login">
 
-  <div id="content">
-				<h1 class="capitalize">Saint Kentigern School Policy</h1>
+    <div id="content">
+        <h1 class="capitalize">Saint Kentigern School Policy</h1>
 
-				{POLICY}
-  </div>
+        {POLICY}
+    </div>
 </div>
 
 <div id="footer" class="login">
-	<ul>
-  	<li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SCHOOL_ADDRESS}">{SITE_NAME}</a></li>
-    <li><a href="/policy.php">Guidelines of Use and Privacy Policy</a></li>
-    <li><a href="http://www.alaress.com.au" title="Web Designers">Web Design</a> by Alaress</li>
-	<li class="last"><a href="/feedback.php" title="Web Designers">Feedback and Support</a></li>
-  </ul>
+    <ul>
+        <li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SCHOOL_ADDRESS}">{SITE_NAME}</a></li>
+        <li><a href="/policy.php">Guidelines of Use and Privacy Policy</a></li>
+        <li><a href="http://www.alaress.com.au" title="Web Designers">Web Design</a> by Alaress</li>
+    </ul>
 </div>
 </body>
 </html>
