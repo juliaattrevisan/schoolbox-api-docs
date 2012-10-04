@@ -6661,3 +6661,78 @@ label {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.inline-block {
+  display: inline-block;
+  *display: inline;
+  zoom: 1;
+}
+.activity-list li {
+  padding: 8px 4px;
+  position: relative;
+  padding-left: 35px;
+  overflow: hidden;
+}
+.activity-list li:hover {
+  background-color: #e9f6ff;
+}
+.activity-list li .icon {
+  display: inline-block;
+  *display: inline;
+  zoom: 1;
+  width: 32px;
+  height: 100%;
+  position: absolute;
+  left: 0;
+}
+.activity-list li .icon.pin span {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-image: url('/images/core/icons/btn-icons.png');
+  background-position: -2px -1px;
+  margin: 4px;
+}
+.activity-list li .icon.clock span {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-image: url('/images/core/icons/btn-icons.png');
+  background-position: -2px -29px;
+  margin: 4px;
+}
+.activity-list li .icon.tick span {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-image: url('/images/core/icons/btn-icons.png');
+  background-position: -2px -57px;
+  margin: 4px;
+}
+.activity-list li .avatar {
+  display: inline-block;
+  *display: inline;
+  zoom: 1;
+  width: 32px;
+  margin: 0 5px 0 0;
+  float: left;
+  position: relative;
+  height: 100%;
+}
+.activity-list li .avatar img {
+  width: 32px;
+  height: 32px;
+}
+.activity-list li p {
+  display: inline;
+}
+.activity-list li p .grade {
+  display: inline-block;
+  *display: inline;
+  zoom: 1;
+  width: 56px;
+}
+.activity-list li .time {
+  display: block;
+  float: right;
+  color: #797979;
+}

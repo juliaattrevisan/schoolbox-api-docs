@@ -7123,3 +7123,61 @@ label {
 
     }
 }
+
+.inline-block {
+    display: inline-block;
+    *display: inline;
+    zoom: 1;
+}
+
+.activity-icon(@offset-x: 0, @offset-y: 0) {
+    span {
+        display: block;
+        width: 24px;
+        height: 24px;
+        background-image: url('/images/core/icons/btn-icons.png');
+        background-position: ~'-@{offset-x}px' ~'-@{offset-y}px';
+        margin: 4px;
+    }
+}
+
+.activity-list                                  {
+    li                                          {   // border-bottom: solid 1px @light-grey; // remove this for production, for now it's just pretty
+                                                    padding: 8px 4px;
+                                                    position: relative;
+                                                    padding-left: 35px;
+                                                    overflow: hidden;
+        &:hover                                 {   background-color: @pcard-hover }
+        .icon                                   {   .inline-block;
+                                                    width: 32px;
+                                                    height: 100%;
+                                                    position: absolute;
+                                                    left: 0;
+            &.pin                               {   .activity-icon(2, 1) }
+            &.clock                             {   .activity-icon(2, 29) }
+            &.tick                              {   .activity-icon(2, 57) }
+        }
+        .avatar                                 {   .inline-block;
+                                                    width: 32px;
+                                                    margin: 0 5px 0 0;
+                                                    float: left;
+                                                    position: relative;
+                                                    height: 100%;
+            img                                 {   width: 32px;
+                                                    height: 32px;
+            }
+        }
+        p                                       {   display: inline;
+            .grade                              {   .inline-block;
+                                                    width: 56px;
+//                                                    position: absolute;
+//                                                    top: 0;
+//                                                    right: -56px;
+            }
+        }
+        .time                                   {   display: block;
+                                                    float: right;
+                                                    color: @secondary-text;
+        }
+    }
+}
