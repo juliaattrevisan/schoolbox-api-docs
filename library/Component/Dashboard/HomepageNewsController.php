@@ -23,48 +23,37 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
             foreach ($userAccess as $ua)
                 $categoryIDs[] = $ua['id'];
 
-            $this->feedList = $feedHandler->getFeed($categoryIDs, $this->getConfig('size') ? $this->getConfig('size') : $this->limit);
+            $feedList = $feedHandler->getFeed($categoryIDs, $this->getConfig('size') ? $this->getConfig('size') : $this->limit);
 
-            return true;
+            // map the feed for the ActivityList
+            if(count($feedList)) {
+                foreach($feedList as $f) {
+                    $feedTime = new Alaress_Date_Relative($f['date']);
+                    $feedTime->setPrefix('');
+                    $this->feedList[] = array(
+                        'icon' => $f['type'],
+                        'content' => $f['messageHTML'] . (empty($f['cat_name']) ? '' : ' in <a href="/homepage/' . $f['cat_id'] . '">' . $f['cat_name'] . '</a>'),
+                        'time' => $feedTime->getRelativeTime(),
+                    );
+                }
+                return true;
+            }
         }
         return false;
     }
 
-    public function renderTemplate($templateHandle)
-    {
+    public function renderTemplate($templateHandle) {
         if (!$this->loadTemplate($templateHandle, 'homepageNews')) {
             return false;
         }
 
-        $this->setBlock($templateHandle, 'feed', 'feed_block');
-
-        if (count($this->feedList) > 0) {
-            $j = 0;
-            foreach ($this->feedList as $feed) {
-                $feedTime = new Alaress_Date_Relative($feed['date']);
-                $feedTime->setPrefix('');
-
-                $catName = empty($feed['cat_name']) ? '' : ' in <a href="/homepage/' . $feed['cat_id'] . '">' . $feed['cat_name'] . '</a>';
-
-                $this->setVar(array(
-                    'FEED_MESSAGE' => $feed['messageHTML'] . $catName,
-                    'FEED_DATE' => $feedTime->getRelativeTime(),
-                    'ON_OFF' => ++$j % 2 ? '' : 'dark'
-                ));
-
-                $this->parse('feed_block', 'feed', true);
-            }
-        } else {
-            $this->setVar('feed_block', '');
+        $alist = new Activity_ListArray($this->feedList);
+        $alist->setShowAvatars(false);
+        $alist->setTarget($this->sitepage, 'ACTIVITY_LIST');
+        foreach($alist as $a) {
+            // iterates the set
         }
-
+        return true;
     }
 
-    /**
-     * @return Feed
-     */
-    public function getFeedHandler()
-    {
-        return $this->feedHandler;
-    }
 }

@@ -616,6 +616,9 @@ $j = 0;
 $activityLog = $submissionHandler->getActivityLog($user['uid'], 15, $categoryIDList);
 
 if (is_array($activityLog)) {
+    // wrap all the activity up into a list so it can be pumped out by ActivityList
+    $feedItems = array();
+
 	foreach ($activityLog as $activity) {
         $taskName = $activity['name'];
 
@@ -675,15 +678,21 @@ if (is_array($activityLog)) {
 		$activityTime = new Alaress_Date_Relative($activity['activity_date']);
 		$activityTime->setPrefix('');
 
-		$output = array(
-			'ACTIVITY_DESCRIPTION' => $stringDesc,
-			'ACTIVITY_DATE' => $activityTime->getRelativeTime(),
-			'DARK' => $j++ % 2 ? 'dark' : '',
+		$feedItems[] = array(
+			'content' => $stringDesc,
+			'time' => $activityTime->getRelativeTime(),
+            'icon' => $activity['new'],
 		);
 
-		$this->setVar($output);
-		$this->parse('activity_block', 'activity', true);
+		//$this->setVar($output);
+		//$this->parse('activity_block', 'activity', true);
 	}
+
+    $activityList = new Activity_ListArray($feedItems);
+    $activityList->setTarget($this, 'ACTIVITY_LIST');
+    foreach($activityList as $a) {
+        // iterates across and pumps out the list
+    }
 }
 
 /* subject drop down

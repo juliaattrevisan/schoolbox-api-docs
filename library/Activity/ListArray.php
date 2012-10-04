@@ -12,6 +12,7 @@ class Activity_ListArray extends Activity_ListAbstract {
 
     public function __construct($datasource, array $config = array()) {
         parent::__construct($config);
+
         if(is_array($datasource)) {
             $this->datasource = $datasource;
         }

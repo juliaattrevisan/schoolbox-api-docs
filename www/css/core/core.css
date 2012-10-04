@@ -6666,16 +6666,18 @@ label {
   *display: inline;
   zoom: 1;
 }
-.activity-list li {
+ul.activity-list li {
+  border-bottom: solid 1px #ededed;
   padding: 8px 4px;
   position: relative;
   padding-left: 35px;
   overflow: hidden;
+  min-height: 32px;
 }
-.activity-list li:hover {
+ul.activity-list li:hover {
   background-color: #e9f6ff;
 }
-.activity-list li .icon {
+ul.activity-list li .icon {
   display: inline-block;
   *display: inline;
   zoom: 1;
@@ -6684,7 +6686,7 @@ label {
   position: absolute;
   left: 0;
 }
-.activity-list li .icon.pin span {
+ul.activity-list li .icon.pin span {
   display: block;
   width: 24px;
   height: 24px;
@@ -6692,7 +6694,7 @@ label {
   background-position: -2px -1px;
   margin: 4px;
 }
-.activity-list li .icon.clock span {
+ul.activity-list li .icon.file span {
   display: block;
   width: 24px;
   height: 24px;
@@ -6700,7 +6702,7 @@ label {
   background-position: -2px -29px;
   margin: 4px;
 }
-.activity-list li .icon.tick span {
+ul.activity-list li .icon.clock span {
   display: block;
   width: 24px;
   height: 24px;
@@ -6708,7 +6710,95 @@ label {
   background-position: -2px -57px;
   margin: 4px;
 }
-.activity-list li .avatar {
+ul.activity-list li .icon.tick span {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-image: url('/images/core/icons/btn-icons.png');
+  background-position: -2px -85px;
+  margin: 4px;
+}
+ul.activity-list li .icon.link span {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-image: url('/images/core/icons/btn-icons.png');
+  background-position: -2px -113px;
+  margin: 4px;
+}
+ul.activity-list li .icon.news span {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-image: url('/images/core/icons/btn-icons.png');
+  background-position: -2px -141px;
+  margin: 4px;
+}
+ul.activity-list li .icon.onlineassessment span {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-image: url('/images/core/icons/btn-icons.png');
+  background-position: -2px -170px;
+  margin: 4px;
+}
+ul.activity-list li .icon.survey span {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-image: url('/images/core/icons/btn-icons.png');
+  background-position: -2px -198px;
+  margin: 4px;
+}
+ul.activity-list li .icon.forum span {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-image: url('/images/core/icons/btn-icons.png');
+  background-position: -2px -225px;
+  margin: 4px;
+}
+ul.activity-list li .icon.blog span {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-image: url('/images/core/icons/btn-icons.png');
+  background-position: -2px -253px;
+  margin: 4px;
+}
+ul.activity-list li .icon.closed span {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-image: url('/images/core/icons/btn-icons.png');
+  background-position: -2px -282px;
+  margin: 4px;
+}
+ul.activity-list li .icon.returned span {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-image: url('/images/core/icons/btn-icons.png');
+  background-position: -2px -310px;
+  margin: 4px;
+}
+ul.activity-list li .icon.new span {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-image: url('/images/core/icons/btn-icons.png');
+  background-position: -2px -338px;
+  margin: 4px;
+}
+ul.activity-list li .icon.overdue span {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-image: url('/images/core/icons/btn-icons.png');
+  background-position: -2px -365px;
+  margin: 4px;
+}
+ul.activity-list li .avatar {
   display: inline-block;
   *display: inline;
   zoom: 1;
@@ -6718,20 +6808,20 @@ label {
   position: relative;
   height: 100%;
 }
-.activity-list li .avatar img {
+ul.activity-list li .avatar img {
   width: 32px;
   height: 32px;
 }
-.activity-list li p {
+ul.activity-list li p {
   display: inline;
 }
-.activity-list li p .grade {
+ul.activity-list li p .grade {
   display: inline-block;
   *display: inline;
   zoom: 1;
   width: 56px;
 }
-.activity-list li .time {
+ul.activity-list li .time {
   display: block;
   float: right;
   color: #797979;

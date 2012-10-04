@@ -7141,12 +7141,13 @@ label {
     }
 }
 
-.activity-list                                  {
-    li                                          {   // border-bottom: solid 1px @light-grey; // remove this for production, for now it's just pretty
+ul.activity-list                                {
+    li                                          {   border-bottom: solid 1px @light-grey; // remove this for production, for now it's just pretty
                                                     padding: 8px 4px;
                                                     position: relative;
                                                     padding-left: 35px;
                                                     overflow: hidden;
+                                                    min-height: 32px;
         &:hover                                 {   background-color: @pcard-hover }
         .icon                                   {   .inline-block;
                                                     width: 32px;
@@ -7154,8 +7155,19 @@ label {
                                                     position: absolute;
                                                     left: 0;
             &.pin                               {   .activity-icon(2, 1) }
-            &.clock                             {   .activity-icon(2, 29) }
-            &.tick                              {   .activity-icon(2, 57) }
+            &.file                              {   .activity-icon(2, 29) }
+            &.clock                             {   .activity-icon(2, 57) }
+            &.tick                              {   .activity-icon(2, 85) }
+            &.link                              {   .activity-icon(2, 113) }
+            &.news                              {   .activity-icon(2, 141) }
+            &.onlineassessment                  {   .activity-icon(2, 170) }
+            &.survey                            {   .activity-icon(2, 198) }
+            &.forum                             {   .activity-icon(2, 225) }
+            &.blog                              {   .activity-icon(2, 253) }
+            &.closed                            {   .activity-icon(2, 282) }
+            &.returned                          {   .activity-icon(2, 310) }
+            &.new                               {   .activity-icon(2, 338) }
+            &.overdue                           {   .activity-icon(2, 365) }
         }
         .avatar                                 {   .inline-block;
                                                     width: 32px;

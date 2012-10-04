@@ -9,12 +9,35 @@
 class Component_Homepage_FeedController extends Component_Homepage_ControllerAbstract {
 
     /**
+     * @var Activity_ListArray
+     */
+    private $activityList;
+
+    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
      */
     public function execute() {
 
+        $feedHandler = new Feed;
+        $feedList = $feedHandler->getFeed($this->getContext('id'), $this->getConfig('size'));
+
+        $feed = array();
+
+        if(count($feedList)) {
+            foreach($feedList as $f) {
+                $feedTime = new Alaress_Date_Relative($f['date']);
+                $feedTime->setPrefix('');
+                $feed[] = array(
+                    'icon' => $f['type'],
+                    'content' => $f['messageHTML'] . (empty($f['cat_name']) ? '' : ' in <a href="/homepage/' . $f['cat_id'] . '">' . $f['cat_name'] . '</a>'),
+                    'time' => $feedTime->getRelativeTime(),
+                );
+            }
+        }
+
+        $this->activityList = new Activity_ListArray($feed);
     }
 
     /**
@@ -28,30 +51,10 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
         }
         $this->parseConfig();
 
-        //output feed
-        $this->setBlock($templateHandle, 'feed', 'feed_block');
-
-        $feedHandler = new Feed;
-
-        $feedList = $feedHandler->getFeed($this->getContext('id'), $this->getConfig('size'));
-
-        if (count($feedList) > 0) {
-            $j = 0;
-            foreach ($feedList as $feed) {
-                $feedTime = new Alaress_Date_Relative($feed['date']);
-                $feedTime->setPrefix('');
-
-                $this->setVar(array(
-                    'FEED_MESSAGE' => $feed['messageHTML'],
-                    'FEED_DATE' => $feedTime->getRelativeTime(),
-                    'ON_OFF' => ++$j % 2 ? '' : 'dark'
-                ));
-
-                $this->parse('feed_block', 'feed', true);
-            }
-        }
-        else {
-            $this->setVar('feed_block', '');
+        $this->activityList->setShowAvatars(false);
+        $this->activityList->setTarget($this->sitepage, 'ACTIVITY_LIST');
+        foreach($this->activityList as $a) {
+            // iterates the set
         }
 
         return true;
