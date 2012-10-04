@@ -29,7 +29,7 @@ a:hover
 /*
     Header and menu styles
 */
-.headerDiv
+.upperBody .headerDiv
 {
     display: none !important;
 }
@@ -74,6 +74,19 @@ h2, .headerDiv
     background-image: none;
 }
 
+.name_cell, .class_type_cell, .prepost_hdr_cell, .hdr_type_cell, .time_h_cell, .time_wh_cell, .financeTableRowHeader,
+#TimetableWeekly table tr th, .dataView .columnTitleRows, .time_wh_cell_sub
+{
+    font-weight: bold;
+    background-color: #F0F0F0;
+    background-image: none;
+}
+
+.fin_ReceiptDateHeader, .fin_ReceiptNumberHeader, .fin_ReceiptAmountHeader, .fin_ReceiptDescriptionHeader, .fin_ReceiptPrintHeader, .fin_StatementDateHeader, .fin_StatementNumberHeader, .fin_StatementDueDateHeader, .fin_StatementBalanceHeader, .fin_StatementDescriptionHeader, .fin_StatementPrintHeader
+{
+    background: none;
+}
+
 /*
     Page Layout styles
 */
@@ -107,12 +120,6 @@ h2, .headerDiv
 /*************************
 	Weekly Timetable
 *************************/
-#TimetableWeekly table tr th
-{
-    background-color: #036;
-    color: white;
-    padding: 7px 16px;
-}
 #TimetableWeekly table tr td
 {
     background: #FBFBFB;
@@ -124,13 +131,6 @@ h2, .headerDiv
 .time_whc_cell
 {
     background: none;
-}
-.time_wh_cell
-{
-    background: none;
-    background-color: #036;
-    color: white;
-    padding: 7px 16px;
 }
 
 /* Weekly Timetable - Regular Cells */
@@ -180,60 +180,6 @@ h2, .headerDiv
 .res_ttl_cell /* Results Maintenance: Assessment Area description cell with dotted underline */
 {
     border-bottom:none;
-}
-
-/* Student name Cell in Results when showing all students. SW 29/2/08 */
-.name_cell
-{
-    font-size: 14px !important;
-    background-color: transparent;
-    padding: 0;
-    line-height: 20px;
-    text-indent: 5px;
-    color: black;
-    border-bottom: 2px solid #002452;
-}
-
-/* Class Assessment area Table Cell (in Information section). SW 29/2/08 */
-.class_type_cell
-{
-    font-size: 14px !important;
-    background-color: transparent;
-    padding: 0;
-    line-height: 20px;
-    text-indent: 5px;
-    color: black;
-    border-bottom: 2px solid #002452;
-}
-.prepost_hdr_cell
-{
-    /* Pre and Post reports header (results page) - by default they are the same as the Class type cells eg Academic, Sports, Arts [class_type_cell]. SW 26/5/09 */
-    font-size: 14px !important;
-    background-color: transparent;
-    padding: 0;
-    line-height: 20px;
-    text-indent: 5px;
-    color: black;
-    border-bottom: 2px solid #002452;
-}
-
-.hdr_type_cell
-{
-    font-size: 14px !important;
-    background-color: transparent;
-    padding: 0;
-    line-height: 20px;
-    text-indent: 5px;
-    color: black;
-    border-bottom: 2px solid #002452;
-
-}
-
-.time_h_cell /* The Daily Timetable header Cells */
-{
-    background-color: #036;
-    color: white;
-    padding: 7px 16px;
 }
 
 .time_t_cell /* the time cell of the Daily Timetable HTMLTable */

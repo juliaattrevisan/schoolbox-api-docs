@@ -1,0 +1,349 @@
+/*
+ * Melbourne Girls Grammar School Skin for Synergetic Community Portal
+ *
+ * To install, place this file in SynergeticCommunityPortal/Site/Css
+ * Authored by @alaress, '12
+/* ========================================================================== */
+body
+{
+    font-size: 13px;
+    background: #fff !important;
+}
+
+input, select, td
+{
+    font-size: 13px !important;
+}
+
+a
+{
+    color: #002E52;
+}
+
+a:hover
+{
+    color: #002E52;
+}
+
+
+/*
+    Header and menu styles
+*/
+.upperBody .headerDiv
+{
+    display: none !important;
+}
+
+/*
+    Portal Floating menu
+*/
+
+.floatMenuDiv
+{
+    height: 28px;
+    padding-top: 11px;
+    background: #fff;
+}
+
+.floatUnderlay
+{
+    height:38px;
+}
+
+
+
+/*
+
+Portal heading style elements
+
+*/
+
+h2, .headerDiv, .heading_cell
+{
+    background-color: #00529C;
+    color: #ffffff;
+    background-image: none;
+    font-size: 12px;
+    height: 29px;
+    line-height: 29px;
+    text-indent: 10px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    padding: 0;
+}
+.heading_cell, .headerDiv
+{
+    -moz-border-radius: 5px 5px 0 0;
+    -webkit-border-radius: 5px 5px 0 0;
+    border-radius: 5px 5px 0 0;
+}
+.name_cell, .class_type_cell, .prepost_hdr_cell, .hdr_type_cell, .time_h_cell, .time_wh_cell, .financeTableRowHeader,
+#TimetableWeekly table tr th, .dataView .columnTitleRows, .time_wh_cell_sub
+{
+    background: #F2F6FA;
+}
+
+/*
+    Page Layout styles
+*/
+.upperBody
+{
+    height:38px;
+}
+/*
+    Portal column framwork for left column elements.
+*/
+
+/* Top Menu Button (is actually a TableCell. SW 19/2/08 */
+.mnu_btn_cell /* lnk_drk_row */
+{
+    background-color: transparent;
+}
+
+/* Table row above the Top Menu Buttons (is a TableCell). SW 19/2/08 */
+.mnu_btn_cell_top /* lnk_drk_row_top */
+{
+    background-color: transparent;
+}
+
+
+/* In the Results and contacts pages - everything under the headings (eg. information and calender). SW 26/2/08 */
+.tableBlackTopBorder, .res_tab, .fin_tab
+{
+    border-top: none;
+}
+
+/*************************
+	Weekly Timetable
+*************************/
+#TimetableWeekly table tr th
+{
+    color: #000;
+    padding: 7px 16px;
+}
+#TimetableWeekly table tr td
+{
+    background: transparent;
+    border: 3px solid #ffffff;
+    border-width: 3px 3px 0 3px;
+}
+
+/* Weekly Timetable - Header Cells */
+.time_whc_cell
+{
+    background: none;
+}
+.time_wh_cell
+{
+    color: #000;
+    padding: 7px 16px;
+}
+
+/* Weekly Timetable - Regular Cells */
+.time_wtc_cell
+{
+    background-color: transparent;
+}
+.time_wdc_cell
+{
+    background-color: transparent;
+}
+
+/* Textual Hyperlink on each Tab eg Results, Interviews, Contact Us ... */
+.lnk_btn
+{
+    font-weight: normal;
+    padding: 7px 16px;
+    color: #245398;
+    margin: 4px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+
+/* The current page Textual Hyperlink on each Tab eg Results, Interviews, Contact Us ... */
+.lnk_btn_highlight
+{
+    padding: 7px 16px;
+    color: #FFF;
+    background: #129BF7;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.lnk_btn:hover
+{
+    background: #D6F0F6;
+    color: #245398;
+}
+.lnk_btn_highlight:hover {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.res_ttl_cell /* Results Maintenance: Assessment Area description cell with dotted underline */
+{
+    border-bottom:none;
+}
+
+.time_h_cell /* The Daily Timetable header Cells */
+{
+    color: #000;
+    padding: 7px 16px;
+}
+
+.time_t_cell /* the time cell of the Daily Timetable HTMLTable */
+{
+    background: none;
+}
+
+.time_d_cell /* the other cells of the daily timetable HTMLTable */
+{
+    background: none;
+}
+
+.time_d_cell_pti_print
+{
+    background: none;
+}
+
+.time_tr_cell
+{
+    background: none;
+}
+
+.time_dr_cell
+{
+    background: none;
+}
+
+/* Table cell between each Menu Cell. SW 19/2/08 */
+.mnu_mid_img_cell /* mid_img_cell */
+{
+    background: none;
+    display: none;
+}
+/* End Table cell after all Menu Cells. SW 19/2/08 */
+.mnu_end_img_cell /* end_img_cell */
+{
+    background: none;
+    display: none;
+}
+/* right hand Cell after HeaderCell eg Available Results/Information. SW 19/2/08 */
+.tbl_hdr_end_img_cell /* triang_cell */
+{
+    background: none;
+    display: none;}
+
+/* Attendances - Cells */
+.att_grd_cell
+{
+    border-bottom:none !important;
+}
+
+#att_Selection
+{
+    height:75px;
+
+}
+
+.financeTableRow
+{
+    background: none;
+}
+
+.financeTableRow:hover
+{
+    background-color: #F2F6FA;
+    color: #000;
+}
+
+#fin_TransactionHistoryHeader
+{
+    background-color: #00529C;
+    color: #fff;
+}
+
+.fin_ReceiptDateHeader, .fin_ReceiptNumberHeader, .fin_ReceiptAmountHeader, .fin_ReceiptDescriptionHeader, .fin_ReceiptPrintHeader, .fin_StatementDateHeader, .fin_StatementNumberHeader, .fin_StatementDueDateHeader, .fin_StatementBalanceHeader, .fin_StatementDescriptionHeader, .fin_StatementPrintHeader {
+    background-color: transparent;
+}
+
+.dataView .titleRow
+{
+    padding-right: 0;
+    padding-left: 0;
+    background-color: transparent;
+    text-indent: 5px;
+    border-bottom: none;
+    vertical-align: bottom;
+    background-image: none;
+    line-height: 20px;
+    margin-top:0px;
+}
+
+.dataView .dataRow
+{
+    background: none;
+    font-size: 13px;
+}
+.dataView .dataRow:hover
+{
+    background-color: #F2F6FA;
+    color: #000;
+}
+
+/* Styling for the docman grid and the columns. SW7012 30/06/09 */
+.docman_grd_hdr_cell /* Docman GridView header cells. SW7012 30/06/09 */
+{
+    /* width:100%; */
+    font-weight: normal;
+    background-color: transparent;
+    color: black;
+    border-bottom: 2px solid #002452;
+}
+
+.ulSideMenu li .selected
+{
+    color: #FF5A00 !important;
+}
+.ulSideMenu li a.selected
+{
+    color: #FF5A00 !important;
+}
+.ulSideMenu li a
+{
+    border: 1px solid #D1D1D1;
+    color: black !important;
+    display: block;
+    float: right;
+    text-shadow: 0 1px 0px white;
+    background-color: #FBFBFB;
+    background-image: -moz-linear-gradient(top, #FBFBFB, #F7F7F7);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #FBFBFB), color-stop(1, #F7F7F7));
+    filter: progid:dximagetransform.microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7');
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7')";
+    height: 22px;
+    line-height: 22px;
+    padding: 6px 16px 6px 30px;
+    position: relative;
+    font-weight: normal;
+    overflow: visible;
+    margin-top: 4px;
+    font-family: Arial,Helvetica,sans-serif;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+
+}
+
+.dxgvFocusedRow
+{
+    background-color: #ECECEC;
+    color: #000;
+}
+.dxgvControl, .dxgvDisabled
+{
+    border: none;
+}
