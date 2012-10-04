@@ -26,13 +26,13 @@ class Component_Dashboard_QuicklinksController extends Component_Dashboard_Contr
         if($groupHandler->isStaff()) {
             $this->quicklinks['staff'] = array(
                 'my-timetable' => array('/timetable', 'My Timetable'),
-                'synergetic' => array('http://synergetic.alrs:7007/', 'Synergetic Web Application'),
+                'synergetic' => array('/synergetic', 'Synergetic Web Application'),
             );
 
         }
         elseif($groupHandler->isParent()) {
             $this->quicklinks['parents'] = array(
-                'synergetic-parent-portal' => array('http://synergetic.alrs:7008/', 'Synergetic Parent Portal'),
+                'synergetic-parent-portal' => array('/synergetic', 'Synergetic Parent Portal'),
                 'evi-parent-homepage' => array('#', 'eVI Parent Homepage'),
             );
 
