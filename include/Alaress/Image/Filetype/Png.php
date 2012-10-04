@@ -2,59 +2,73 @@
 /**
  * Alaress_Image_Filetype_Png
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 class Alaress_Image_Filetype_Png implements Alaress_Image_Filetype_Interface {
-	protected $quality = 0;
+    protected $quality = 6;
 
-	/**
-	 * Create an image
-	 *
-	 * @param $filename
-	 * @return resource
-	 */
-	public function create($filename) {
-		return imagecreatefrompng($filename);
-	}
+    /**
+     * Create an image
+     *
+     * @param $filename
+     * @return resource
+     */
+    public function create($filename) {
+        return imagecreatefrompng($filename);
+    }
 
-	/**
-	 * Save image to file system
-	 *
-	 * @param $image
-	 * @param $filename
-	 */
-	public function save($image, $filename) {
-		imagepng($image, $filename, $this->getQuality());
-	}
+    /**
+     * Save image to file system
+     *
+     * @param $image
+     * @param $filename
+     */
+    public function save($image, $filename) {
+        imagepng($image, $filename, $this->getQuality());
+    }
 
-	/**
-	 * Stream image to browser directly
-	 *
-	 * @param $image
-	 */
-	public function stream($image) {
-		header('Content-type: image/png');
-		imagepng($image);
-	}
+    private function outputHeaders() {
+        header('Cache-Control: max-age=10800, public');
+        header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
+        header('Content-type: image/png');
+    }
 
-	/**
-	 * Set quality
-	 *
-	 * @param $quality
-	 */
-	private function setQuality($quality) {
-		$this->quality = $quality;
-	}
+    /**
+     * Stream image to browser directly
+     *
+     * @param $image
+     */
+    public function stream($image) {
+        $this->outputHeaders();
+        imagepng($image);
+        exit;
+    }
 
-	/**
-	 * Get quality
-	 *
-	 * @return int
-	 */
-	private function getQuality() {
-		return $this->quality;
-	}
+    public function streamFile($filename) {
+        $this->outputHeaders();
+        header('Content-length: ' . filesize($filename));
+        readfile($filename);
+        exit;
+    }
+
+    /**
+     * Set quality
+     *
+     * @param $quality
+     */
+    private function setQuality($quality) {
+        $this->quality = $quality;
+    }
+
+    /**
+     * Get quality
+     *
+     * @return int
+     */
+    private function getQuality() {
+        return $this->quality;
+    }
 }

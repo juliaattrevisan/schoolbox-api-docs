@@ -2,134 +2,138 @@
 /**
  * Alaress_Image_Processor
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 class Alaress_Image_Processor extends Alaress_Image_Processor_Abstract {
 
-	/**
-	 * Constructor
-	 *
-	 * @param $cache
-	 * @param $transformations
-	 */
-	public function __construct($cache, $transformations) {
-		$this->setCache($cache);
-		$this->setTransformations($transformations);
-	}
+    /**
+     * Constructor
+     *
+     * @param $cache
+     * @param $transformations
+     */
+    public function __construct($cache, $transformations) {
+        $this->setCache($cache);
+        $this->setTransformations($transformations);
+    }
 
-	/**
-	 * Load an image, figure out how to render/manipulate it
-	 *
-	 * Supports chained methods
-	 *
-	 * @return \Alaress_Image_Processor
-	 */
-	public function load() {
-		$imageArray = $this->getCache()->load();
+    /**
+     * Load an image, figure out how to render/manipulate it
+     *
+     * Supports chained methods
+     *
+     * @return \Alaress_Image_Processor
+     */
+    public function load() {
+        $imageArray = $this->getCache()->load();
 
-		/* Figure out what kind of file it is
-		 */
-		$this->setFiletypeStrategy($imageArray);
+        /* Figure out what kind of file it is
+         */
+        $this->setFiletypeStrategy($imageArray);
 
-		/* Prepare an image resource for chained manipulation
-		 */
-		$this->setImage($this->getFiletypeStrategy()->create($imageArray['filepath']));
+        /* Prepare an image resource for chained manipulation
+         */
+        if ($this->getCache()->isLoadedFromCache()) {
+            $this->getFiletypeStrategy()->streamFile($imageArray['filepath']);
+        } else {
+            $this->setImage($this->getFiletypeStrategy()->create($imageArray['filepath']));
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Select an image modification strategy, and supply it with any
-	 * desired arguments in an associative array
-	 *
-	 * Supports chained methods
-	 *
-	 * @param $strategy
-	 * @param null $args
-	 * @return \Alaress_Image_Processor
-	 */
-	private function loadProcessorStrategy($strategy, $args = null) {
-		$strategyName = $this->getProcessorStrategyPrefix() . $strategy;
+    /**
+     * Select an image modification strategy, and supply it with any
+     * desired arguments in an associative array
+     *
+     * Supports chained methods
+     *
+     * @param $strategy
+     * @param null $args
+     * @return \Alaress_Image_Processor
+     */
+    private function loadProcessorStrategy($strategy, $args = null) {
+        $strategyName = $this->getProcessorStrategyPrefix() . $strategy;
 
-		$this->setProcessorStrategy(new $strategyName($args));
+        $this->setProcessorStrategy(new $strategyName($args));
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Delegate method
-	 *
-	 * Use processor strategy to manipulate image resource and remember
-	 * the resultant image resource
-	 *
-	 * Supports chained methods
-	 *
-	 * @return \Alaress_Image_Processor
-	 */
-	private function manipulate() {
-		$manipulatedImage = $this->getProcessorStrategy()->manipulate($this->getImage());
+    /**
+     * Delegate method
+     *
+     * Use processor strategy to manipulate image resource and remember
+     * the resultant image resource
+     *
+     * Supports chained methods
+     *
+     * @return \Alaress_Image_Processor
+     */
+    private function manipulate() {
+        $manipulatedImage = $this->getProcessorStrategy()->manipulate($this->getImage());
 
-		$this->setImage($manipulatedImage);
+        $this->setImage($manipulatedImage);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Perform all transformations if we didn't load an image from the cache.
-	 * Otherwise transformations were done previously and saved, and we can skip
-	 * this step entirely
-	 *
-	 * @return \Alaress_Image_Processor
-	 */
-	public function transformAll() {
+    /**
+     * Perform all transformations if we didn't load an image from the cache.
+     * Otherwise transformations were done previously and saved, and we can skip
+     * this step entirely
+     *
+     * @return \Alaress_Image_Processor
+     */
+    public function transformAll() {
 
-		/* Retrieve the list of transformations and do 'em, if we haven't already
-		 * done them at some point in the past
-		 */
-		if (!$this->getCache()->isLoadedFromCache()) {
-			$allTransformations = $this->getTransformations()->retrieve($this->getCache()->getKey());
+        /* Retrieve the list of transformations and do 'em, if we haven't already
+         * done them at some point in the past
+         */
+        if (!$this->getCache()->isLoadedFromCache()) {
+            $allTransformations = $this->getTransformations()->retrieve($this->getCache()->getKey());
 
-			/* Do it
-			 */
-			foreach($allTransformations as $currentTransformation) {
-				$this->transform($currentTransformation['method'], $currentTransformation['args']);
-			}
-		}
+            /* Do it
+             */
+            foreach ($allTransformations as $currentTransformation) {
+                $this->transform($currentTransformation['method'], $currentTransformation['args']);
+            }
+        }
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Facade method
-	 *
-	 * Combines loadProcessorStrategy() and manipulate() to support chained
-	 * methods in an easy-to-ready set of statements
-	 *
-	 * Supports chained methods
-	 *
-	 * @param $strategy
-	 * @param null $args
-	 * @return Alaress_Image_Processor
-	 */
-	public function transform($strategy, $args = null) {
-		$this->loadProcessorStrategy($strategy, $args);
-		$this->manipulate();
+    /**
+     * Facade method
+     *
+     * Combines loadProcessorStrategy() and manipulate() to support chained
+     * methods in an easy-to-ready set of statements
+     *
+     * Supports chained methods
+     *
+     * @param $strategy
+     * @param null $args
+     * @return Alaress_Image_Processor
+     */
+    public function transform($strategy, $args = null) {
+        $this->loadProcessorStrategy($strategy, $args);
+        $this->manipulate();
 
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
-	 * Delegate method
-	 *
-	 * Cache then stream the manipulated image
-	 */
-	public function stream() {
-		$this->save();
-		$this->getFiletypeStrategy()->stream($this->getImage());
-	}
+    /**
+     * Delegate method
+     *
+     * Cache then stream the manipulated image
+     */
+    public function stream() {
+        $this->save();
+        $this->getFiletypeStrategy()->streamFile($this->getCache()->getCachedFileLocation());
+    }
 
     /**
      * Saves the transformed image
@@ -137,7 +141,6 @@ class Alaress_Image_Processor extends Alaress_Image_Processor_Abstract {
      */
     public function save() {
         $this->getFiletypeStrategy()->save($this->getImage(), $this->getCache()->getCachedFileLocation());
-
         return $this;
     }
 
