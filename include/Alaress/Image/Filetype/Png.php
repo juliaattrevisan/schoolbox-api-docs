@@ -50,6 +50,7 @@ class Alaress_Image_Filetype_Png implements Alaress_Image_Filetype_Interface {
     public function streamFile($filename) {
         $this->outputHeaders();
         header('Content-length: ' . filesize($filename));
+        header('Last-Modified: ' . date('r', filemtime($filename)));
         readfile($filename);
         exit;
     }
