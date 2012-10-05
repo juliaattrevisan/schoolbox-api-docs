@@ -27,19 +27,19 @@ class SynchroniseAbstract {
     /**
      * @param string[...]
      */
-    public function setStrategies() {
-        foreach(func_get_args() as $arg) {
-            if(is_string($arg)) {
-                $this->strats[] = $arg;
-            }
+    public function setStrategies($strats) {
+        if (is_array($strats)) {
+            $this->strats = $strats;
         }
     }
 
 
     public function execute() {
         // Do each strat
-        foreach($this->strats as $currentStrategy) {
-            $sync = new Synchronise_Synergetic_Main(sprintf($this->stratBase, $this->db, $this->school, $currentStrategy));
+        foreach ($this->strats as $currentStrategy) {
+            $sync = new Synchronise_Synergetic_Main(sprintf(
+                $this->stratBase, $this->db, $this->school, $currentStrategy
+            ));
 
             // Do not alter the db
             $sync->setPerformUpdate($this->perform);
@@ -62,14 +62,13 @@ class SynchroniseAbstract {
     public function diagnose() {
         // for the sake of modularity, this is split out into subordinate methods
         $refl = new ReflectionObject($this);
-        foreach($refl->getMethods(ReflectionMethod::IS_PRIVATE) as $m) {
+        foreach ($refl->getMethods(ReflectionMethod::IS_PRIVATE) as $m) {
             $meth = $m->name;
-            if(strpos($meth, $this->db) !== false || strpos($meth, 'Schoolbox') !== false) {
+            if (strpos($meth, $this->db) !== false || strpos($meth, 'Schoolbox') !== false) {
                 $this->$meth();
             }
         }
     }
-
 
 
     /* all private methods with 'Schoolbox' or the current db name will be picked up by the reflection in diagnose() */
@@ -78,17 +77,17 @@ class SynchroniseAbstract {
         $db = new MSSQL();
         $campuses = $db->getAll("SELECT DISTINCT( ClassCampus ) AS campus FROM timetable");
         echo "Campus Codes in Synergetic\n";
-        foreach($campuses as $c) {
+        foreach ($campuses as $c) {
             echo "  '" . $c['campus'] . "'\n";
         }
 
         $db = Database::getInstance();
 
         $result = $db->query("SELECT * FROM `luCampus`");
-        if($result) {
+        if ($result) {
             echo "Campuses listed in Schoolbox\n";
-            printf("%4s %-32s\n",'id','campus name');
-            while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            printf("%4s %-32s\n", 'id', 'campus name');
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 printf("%4s %-32s\n", $row['id'], $row['name']);
             }
         }
@@ -100,25 +99,24 @@ class SynchroniseAbstract {
         $esu->getCurrentSemester();
         $students = $esu->getStudentUserAccountInfo();
 
-        foreach(array_keys($students[0]) as $key) {
+        foreach (array_keys($students[0]) as $key) {
             printf("%-24s", $key);
         }
         echo "\n";
 
         $j = $k = 0;
-        for($i = 0; $i < count($students) && $j < 5; ++$i) {
-            if($students[$i]['NetworkLogin']) {
-                foreach($students[$i] as $field) {
+        for ($i = 0; $i < count($students) && $j < 5; ++$i) {
+            if ($students[$i]['NetworkLogin']) {
+                foreach ($students[$i] as $field) {
                     printf("%-24s", $field);
                 }
                 echo "\n";
                 ++$j;
-            }
-            else {
+            } else {
                 ++$k;
             }
         }
-        if($k) {
+        if ($k) {
             echo "$k skipped with no NetworkLogin\n";
         }
     }
@@ -129,25 +127,24 @@ class SynchroniseAbstract {
         $esu->getCurrentSemester();
         $students = $esu->getStaffUserAccountInfo();
 
-        foreach(array_keys($students[0]) as $key) {
+        foreach (array_keys($students[0]) as $key) {
             printf("%-24s", $key);
         }
         echo "\n";
 
         $j = $k = 0;
-        for($i = 0; $i < count($students) && $j < 5; ++$i) {
-            if($students[$i]['NetworkLogin']) {
-                foreach($students[$i] as $field) {
+        for ($i = 0; $i < count($students) && $j < 5; ++$i) {
+            if ($students[$i]['NetworkLogin']) {
+                foreach ($students[$i] as $field) {
                     printf("%-24s", $field);
                 }
                 echo "\n";
                 ++$j;
-            }
-            else {
+            } else {
                 ++$k;
             }
         }
-        if($k) {
+        if ($k) {
             echo "$k skipped with no NetworkLogin\n";
         }
     }
@@ -158,13 +155,13 @@ class SynchroniseAbstract {
         $esu->getCurrentSemester();
         $students = $esu->getParentUserAccountInfo();
 
-        foreach(array_keys($students[0]) as $key) {
+        foreach (array_keys($students[0]) as $key) {
             printf("%-24s", substr($key, 7));
         }
         echo "\n";
 
-        for($i = 0; $i < 5; $i++) {
-            foreach($students[$i] as $field) {
+        for ($i = 0; $i < 5; $i++) {
+            foreach ($students[$i] as $field) {
                 printf("%-24s", $field);
             }
             echo "\n";
@@ -176,14 +173,13 @@ class SynchroniseAbstract {
 
         $result = $db->query("SELECT * FROM `groups` WHERE `group_type` = 'student'");
 
-        if($result) {
+        if ($result) {
             echo "Student Groups in Schoolbox\n";
-            printf("%4s %-32s\n",'id','group name');
-            while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            printf("%4s %-32s\n", 'id', 'group name');
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 printf("%4s %-32s\n", $row['id'], $row['name']);
             }
-        }
-        else {
+        } else {
             echo "Failed to obtain Schoolbox student groups\n";
         }
     }

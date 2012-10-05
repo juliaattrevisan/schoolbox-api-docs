@@ -1,0 +1,29 @@
+<?php
+/**
+ * Perform Schoolbox User/Synergetic synchronisations
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+$options = getopt("v", array('perform-update', 'diagnostic'));
+
+require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../abstract/SynchroniseAbstract.php');
+
+if (Cfg::get('external_sync_data') == 1) {
+
+    $sync = new SynchroniseAbstract(Cfg::get('site_location'), isset($options['v']), isset($options['perform-update']));
+
+    $stategies = explode(Cfg::get('sync_patterns'));
+
+    $sync->setStrategies($stategies);
+
+    if (isset($options['diagnostic'])) {
+        $sync->diagnose();
+    } else {
+        $sync->execute();
+    }
+}

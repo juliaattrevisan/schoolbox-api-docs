@@ -15,11 +15,10 @@ require_once(dirname(__FILE__) . '/../abstract/SynchroniseAbstract.php');
 
 $sync = new SynchroniseAbstract('Moriah', isset($options['v']), isset($options['perform-update']));
 
-$sync->setStrategies('Staff', 'Parent', 'Student');
+$sync->setStrategies(array('Staff', 'Parent', 'Student'));
 
-if(isset($options['diagnostic'])) {
+if (isset($options['diagnostic'])) {
     $sync->diagnose();
-}
-else {
+} else {
     $sync->execute();
 }
