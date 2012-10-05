@@ -16,7 +16,9 @@ if(!isset($this)) {
 $sso = new External_Tass_SSO();
 
 // remove any non-numeric characters so it's the proper TASS id
-$tassID = preg_replace('[^0-9]', '', $_SESSION['synergy_id']);
+$tassID = preg_replace('/[^0-9]/s', '', $_SESSION['sid']);
+
+echo $_SESSION['sid'] . " == $tassID\n";
 
 $token = $sso->getUserToken(array('sso_code' => $tassID));
 
@@ -26,5 +28,5 @@ if($token) {
     header("Location: $destination");
 }
 else {
-    SitePage::localRedir('/');
+    $this->pageNotFound();
 }

@@ -8,6 +8,8 @@
  */
 class External_Tass_SSO {
 
+    private $output = false;
+
     private $server = 'http://tass-server/tassweb/external/sso_gateway.cfm';
 
     private $configuration = array(
@@ -37,7 +39,7 @@ class External_Tass_SSO {
 
     /**
      * @param array $userConf array('sso_code' => $tassID)
-     * @return string|null
+     * @return string
      */
     public function getUserToken(array $userConf) {
         $conf = array_merge($this->configuration, $userConf);
@@ -48,12 +50,18 @@ class External_Tass_SSO {
         // attempt sso authentication
         $responseString = @file_get_contents($target);
 
+        if($this->output) {
+            header('Content-Type: text/plain');
+            die("SEND : $target\nRECV : $responseString\n");
+        }
+
+
         $response = $this->qstring2array($responseString);
 
         if(isset($response['sso_token'])) {
             return $response['sso_token'];
         }
-        return null;
+        return '';
     }
 
 
