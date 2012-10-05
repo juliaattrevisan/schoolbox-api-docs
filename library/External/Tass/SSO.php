@@ -50,13 +50,12 @@ class External_Tass_SSO {
         // attempt sso authentication
         $responseString = @file_get_contents($target);
 
+        $response = $this->qstring2array($responseString);
+
         if($this->output) {
             header('Content-Type: text/plain');
             die("SEND : $target\nRECV : $responseString\n");
         }
-
-
-        $response = $this->qstring2array($responseString);
 
         if(isset($response['sso_token'])) {
             return $response['sso_token'];
@@ -94,6 +93,7 @@ class External_Tass_SSO {
                 $array[$bits[0]] = $bits[1];
             }
         }
+        return $array;
     }
 
 }
