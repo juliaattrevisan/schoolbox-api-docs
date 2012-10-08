@@ -106,7 +106,7 @@ class Calendar_Month_Grid_Default extends Calendar_Month_Abstract {
 			$date = new Alaress_Date_Format($currentDay, 'U');
 
 			$output = array(
-				'DATE' => $date->getUsingFormat('l jS'),
+				'DATE' => $date->getUsingFormat('j'),
 				'ADD' => '/calendar/modify.php?date=' . date("d-m-Y", $currentDay) . '&returnTo=month',
 				'ON_OFF' => !($day % 2) ? 'dark' : '',
 			);

@@ -48,7 +48,7 @@ class Calendar_Week_Grid_Default extends Calendar_Week_Abstract {
 		for ($i = 0; $i < 7; $i++) {
 		    $currentDay = strtotime("+$i day", $this->getStartOfWeek());
 
-		    $this->getPage()->setVar('DATE', date("l jS", $currentDay));
+		    $this->getPage()->setVar('DATE', date("j", $currentDay));
 		    $this->getPage()->setVar('ADD', '/calendar/modify.php?date=' . date("d-m-Y", $currentDay) . '&returnTo=week');
 		    $this->getPage()->parse('day_header_block', 'day_header', true);
 		}
