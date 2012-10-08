@@ -140,6 +140,17 @@ class Database {
     }
 
     /**
+     * Wrapper for PDO::quote
+     *
+     * @param $string
+     * @param int $parameter_type
+     * @return string
+     */
+    public function quote($string, $parameter_type = PDO::PARAM_STR) {
+        return $this->connection->quote($string, $parameter_type);
+    }
+
+    /**
      * Wrapper for PDO::lastInsertId
      * Returns the ID of the last inserted row, or the last value from a sequence object, depending
      * on the underlying driver. For example, PDO_PGSQL() requires you to specify the name of a sequence object

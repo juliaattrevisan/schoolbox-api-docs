@@ -545,23 +545,36 @@ class Category extends DeprecatedModel {
 
 		/* Setup homepage template */
 
-		/* If -1 is set as template, remove homepage config, remove homepage
-		 * components, then set the category's templateID to zero
-		 */
-        if ($data['template'] == Homepage::REMOVE_HOMEPAGE_TEMPLATE_ID) {
-            $categoryID = mysql_real_escape_string($data['id'], $this->db->dbf);
-            $this->db->query("DELETE FROM `component_instance` WHERE `module` = 'homepage' AND `indetifier` = '$categoryID'");
-            $data['template'] = 0;
+        // if 'keep existing template', then skip this entire section
+        if($data['template'] != Homepage::KEEP_EXISTING_HOMEPAGE) {
+
+            // if 'remove homepage', delete config and components, then set the templateID to zero
+            if ($data['template'] == Homepage::REMOVE_HOMEPAGE_TEMPLATE_ID) {
+                $categoryID = mysql_real_escape_string($data['id'], $this->db->dbf);
+
+                // locate all the component instances associated with this homepage, and clear them out
+                $cim = Component_InstanceMapper::getInstance();
+                $collection = $cim->findByColumnList(array('module' => 'homepage', 'identifier' => $categoryID));
+                $cim->delete($collection);
+
+                $data['template'] = 0;
+            }
+
+            // now continue as normal
+            if($data['template'] > 0) {
+                $this->createHomepageFromTemplate($data['id'], $data['template']);
+            }
+            else {
+                // we don't want an invalid template ID going into the database
+                $data['template'] = 0;
+            }
+
+            // deal with the template
+            $this->db->update('homepage_config','cid', array('cid' => $data['id'], 'template' => $data['template']));
+
         }
 
-        // now continue as normal
-        if($data['template']) {
-            $this->createHomepageFromTemplate($data['id'], $data['template']);
-        }
-        else {
-            // we don't want an invalid template ID going into the database
-            unset($data['template']);
-        }
+        unset($data['template']);
 
 		/* Insert synergetic subject code */
         if (isset($data['code'])) {
@@ -595,9 +608,11 @@ class Category extends DeprecatedModel {
 		$this->deletePerms($categoryID);
 		$this->db->delete('categoryCode', 'categoryID', $categoryID);
 
-		require_once dirname(__FILE__) . '/homepage.php';
-		$homepageHandler = new Homepage($categoryID);
-		$homepageHandler->deleteHomepage();
+
+        // locate all the component instances associated with this homepage, and clear them out
+        $cim = Component_InstanceMapper::getInstance();
+        $collection = $cim->findByColumnList(array('module' => 'homepage', 'identifier' => $categoryID));
+        $cim->delete($collection);
 
 		/* Delete group */
 		require_once dirname(__FILE__) . '/group.php';
@@ -745,21 +760,75 @@ class Category extends DeprecatedModel {
      */
     private function createHomepageFromTemplate($categoryID, $templateID) {
 
+        // locate all the component instances associated with this homepage (if they exist), and clear them out
+        $cim = Component_InstanceMapper::getInstance();
+        $collection = $cim->findByColumnList(array('module' => 'homepage', 'identifier' => $categoryID));
+        $cim->delete($collection);
+
         $categoryID = mysql_real_escape_string($categoryID, $this->db->dbf);
         $templateID = mysql_real_escape_string($templateID, $this->db->dbf);
 
-        $result = $this->db->query("SELECT * FROM `component_instance` WHERE `module` = 'homepage_template' AND `identifier` = $templateID");
+        $sql = "
+            SELECT id AS template, left_column_width, right_column_width
+            FROM homepageTemplate
+            WHERE id = $templateID
+        ";
 
-        // oldschool mysql functions
+        $x[] = array($sql);
+
+        // retrieve template data
+        $tpl = $this->db->getRow($sql);
+        $tpl['cid'] = $categoryID;
+
+        // insert homepage instance into homepage_config
+        $x[] = $this->duplicateRowsOnTable('homepage_config', $tpl, "WHERE cid = 0");
+
+        // insert componentry
+        $x[] = $this->duplicateRowsOnTable('component_instance',
+            array(
+                'module' => 'homepage',
+                'identifier' => $categoryID
+            ),
+            "WHERE `module` = 'homepage_template' AND `identifier` = $templateID"
+        );
+    }
+
+
+    /**
+     * Can be used as a workaround for an absence of DB default field values,
+     * but also allows for dynamic value duplication
+     *
+     * @param $table
+     * @param array $map
+     * @param string $sqlCondition
+     * @param string $indexField
+     * @return array
+     */
+    private function duplicateRowsOnTable($table, array $map, $sqlCondition = '', $indexField = 'id') {
+        $queries = array();
+        $sql = "SELECT * FROM $table $sqlCondition";
+        $queries[] = $sql;
+
+        $result = $this->db->query($sql);
         while($r = mysql_fetch_assoc($result)) {
             // hack at the data, then flick it back in
-            unset($r['id']);
-            $r['module'] = 'homepage';
-            $r['identifier'] = $categoryID;
+            unset($r[$indexField]);
+
+            if(count($map)) {
+                foreach($map as $k => $v) {
+                    $r[$k] = $v;
+                }
+            }
             $keys = implode('`, `', array_keys($r));
             $values = implode("', '", array_values($r));
-            $this->db->query("INSERT INTO `component_instance` (`$keys`) VALUES ('$values')");
+
+            $q = "INSERT INTO `$table` (`$keys`) VALUES ('$values')";
+            $queries[] = $q;
+
+            $this->db->query($q);
         }
+
+        return $queries;
     }
 
 }

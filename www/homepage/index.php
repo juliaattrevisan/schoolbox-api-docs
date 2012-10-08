@@ -28,9 +28,15 @@ if (!isset($category['id'])) {
 }
 
 $categoryID = $category['id'];
-$catHandler->logPageView($categoryID);
 
 $homepageHandler = new Homepage($categoryID);
+
+// doesn't have a template, therefore the category doesn't have a homepage: resource doesn't exist, therefore 404.
+if(!$homepageHandler->getTemplate()) {
+    $this->pageNotFound();
+}
+
+$catHandler->logPageView($categoryID);
 
 $g = new Group();
 $permission = $g->getPermission($categoryID);

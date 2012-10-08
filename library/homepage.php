@@ -7,6 +7,7 @@ class Homepage {
 	/* Used to remove homepage components and reset template
 	 */
 	const REMOVE_HOMEPAGE_TEMPLATE_ID = -1;
+    const KEEP_EXISTING_HOMEPAGE = 0;
 
 	function Homepage($cid) {
 		$this->db = new DeprecatedDatabase(SQL_db);

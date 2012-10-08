@@ -224,7 +224,9 @@ class Component_InstanceMapper extends Mapper {
     public function delete ($object) {
         $instanceMapper = Component_InstanceMapper::getInstance();
 
-        if ( is_a($object, 'Component_Instance') ) {
+        /* using instanceof over is_a(), since it's the equivalent language construct
+         * rather than a function */
+        if($object instanceof Component_Instance) {
             $instanceCollection = new Collection;
             $instanceCollection[] = $object;
         }
@@ -232,7 +234,11 @@ class Component_InstanceMapper extends Mapper {
             $instanceCollection = $object;
         }
 
+        // container for parents if configs that need deletion
+        $instanceIDs = array();
+
         foreach ( $instanceCollection as $instance ) {
+            $instanceIDs[] = $this->database->quote($instance->id, PDO::PARAM_INT);
             $sourceInstanceCollection = $instanceMapper->findByColumnList(array(
                 'module'     => 'dashboard',
                 'identifier' => $instance->identifier,
@@ -251,6 +257,16 @@ class Component_InstanceMapper extends Mapper {
             parent::save($sourceInstanceCollection);
         }
 
-        return parent::delete($instanceCollection);
+        if(parent::delete($instanceCollection)) {
+            // delete associated configs
+            $deleteIDs = implode(',', $instanceIDs);
+            $this->database->query("
+                DELETE FROM component_config_instance
+                WHERE component_instance_id IN ($deleteIDs);
+            ");
+
+            return true;
+        }
+        return false;
     }
 }
