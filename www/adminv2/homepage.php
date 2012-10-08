@@ -67,12 +67,14 @@ $componentCollection = $componentFactory->buildComponentList($cid);
 $occupiedPositionList = array();
 
 foreach($componentCollection as $component) {
+
     $position = "position_{$component->position}";
 
     if(!$this->template->exists("{$position}_block")) {
         $this->setFile($position, 'adminv2/component/placeholder.html');
     }
 
+    $component->setup(array('id' => '-1', 'code' => '', 'name' => ''), array());
     $component->execute();
 
     $this->setVar(array(
@@ -83,7 +85,7 @@ foreach($componentCollection as $component) {
         'component.definition.name' => $component->definition->name,
     ));
 
-    $component->setup(array(), array());
+
     $component->parseConfig();
 
     $this->parse("{$position}_block", $position, true);
