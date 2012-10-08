@@ -7,6 +7,11 @@
  * @version     SVN: $Id$
  */
 
+// invisibility cloak enabled
+if(isset($this)) {
+    $this->pageNotFound();
+}
+
 require_once '../../include/Bootstrap.php';
 
 // don't bother if it's disabled at a school level
@@ -15,10 +20,10 @@ if(!Cfg::get('due_work_notifications_enabled')) {
 }
 
 if(isset($_GET['upcoming'])) {
-    sendUpcomingNotifications(isset($_GET['foo']));
+    sendUpcomingNotifications(isset($_GET['view']));
 }
 elseif(isset($_GET['overdue'])) {
-    sendOverdueNotifictions(isset($_GET['foo']));
+    sendOverdueNotifictions(isset($_GET['view']));
 }
 die();
 
@@ -85,13 +90,9 @@ function sendUpcomingNotifications($testRun) {
         }
     }
 
-    // set the notif_sent flag on the submission boxes that were just processed so they don't get sent again
+    // set the sent flag on the submission boxes that were just processed so they don't get sent again
     if(!$testRun) {
-        if(count($flagAsSent)) {
-            $impl = implode("','", $flagAsSent);
-            $sql = "UPDATE `submission_box` SET `notif_sent` WHERE `id` IN ('$impl')";
-            Database::getInstance()->query($sql);
-        }
+        setNotificationsSent($flagAsSent, 'upcoming');
     }
 }
 
@@ -104,36 +105,67 @@ function sendUpcomingNotifications($testRun) {
 function sendOverdueNotifictions($testRun) {
     $shandler = new Submission();
     $list = $shandler->getSubmissionReminderList(OVERDUE_WORK_TYPE);
-    foreach($list as $overdue) {
-        if($testRun) {
-            $mailer = new SitePage(false);
-            $mailer->setFile(TEMPLATE_body, 'email/submission-overdue.html');
-            $mailer->setBlock(TEMPLATE_body, 'subject', 'subject_block');
-        }
-        else {
-            $mailer = new Mailer('submission-overdue.html', 'Overdue Work', $overdue['u_alt_email']);
-            $mailer->setBlock('tplBODY', 'subject', 'subject_block');
-        }
+    $flagAsSent = array();
+    // yes, this looks like O(n^3)... the execution time is the same as if the array were flat.
+    foreach($list as $user) {
+        foreach($user['categories'] as $category) {
+            foreach($category['work'] as $dueWork) {
+                if($testRun) {
+                    $mailer = new SitePage(false);
+                    $mailer->setFile(TEMPLATE_body, 'email/submission-overdue.html');
+                    $mailer->setBlock(TEMPLATE_body, 'subject', 'subject_block');
+                }
+                else {
+                    $mailer = new Mailer('submission-overdue.html', 'Overdue Work', $user['u_alt_email']);
+                    $mailer->setBlock('tplBODY', 'subject', 'subject_block');
+                }
 
-        $mailer->setVar('NAME',     trim($overdue['u_firstname']));
-        $mailer->setVar('CATEGORY_ID',   $overdue['c_id']);
-        $mailer->setVar('CATEGORY_NAME', $overdue['c_name']);
-        $mailer->setVar('DUEWORK_ID',    $overdue['sb_id']);
-        $mailer->setVar('DUEWORK_NAME',  $overdue['sb_name']);
-        $due = '';
-        $stamp = strtotime($overdue['sb_date']);
-        if(date('Hi', $stamp) != '2359') {
-            $due .= ' at ' . date('g:ia', $stamp);
-        }
-        $due .= ' on ' . date('D, jS M', $stamp);
-        $mailer->setVar('DUEWORK_DATE', $due);
+                $due = '';
+                $stamp = strtotime($dueWork['date']);
+                if(date('Hi', $stamp) != '2359') {
+                    $due .= ' at ' . date('g:ia', $stamp);
+                }
+                $due .= ' on ' . date('D, jS M', $stamp);
 
-        if($testRun) {
-            $mailer->outputPage(true);
-        }
-        else {
-            $mailer->send();
-        }
+                $output = array(
+                    'NAME' => trim($user['firstname']),
 
+                    'CATEGORY_ID'   => $category['id'],
+                    'CATEGORY_NAME' => $category['name'],
+
+                    'DUEWORK_ID'   => $dueWork['id'],
+                    'DUEWORK_NAME' => $dueWork['name'],
+                    'DUEWORK_DATE' => $due
+                );
+
+                $mailer->setVar($output);
+
+                if($testRun) {
+                    $mailer->outputPage(true);
+                }
+                else {
+                    $mailer->send();
+                    $flagAsSent[] = $dueWork['id'];
+                }
+            }
+        }
+    }
+    if(!$testRun) {
+        setNotificationsSent($flagAsSent, 'overdue');
+    }
+}
+
+
+/**
+ * Set the appropriate submission_notification records to indicate emails are sent
+ * @param $boxList
+ * @param $notificationType
+ */
+function setNotificationsSent($boxList, $notificationType) {
+    if(count($boxList)) {
+        $impl = implode(',', $boxList);
+        $type = Database::getInstance()->quote($notificationType);
+        $sql = "UPDATE `submission_notification` SET `sent` = 1 WHERE `box_id` IN ($impl) AND `type` = $type";
+        Database::getInstance()->query($sql);
     }
 }

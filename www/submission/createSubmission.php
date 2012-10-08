@@ -74,8 +74,12 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
 
             outputCriteria($this, $subbox['category'], $criteria, $results, $resultCount);
             outputResultSets($this, $resultSetID, $resultCount);
-
         }
+        else {
+            outputResultSets($this);
+            outputCriteria($this, $subbox['category'], array(), array());
+        }
+
     }
 
     $this->parse('marktype_block', 'marktype');
@@ -122,24 +126,28 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         'MULTI_SUBMISSION'  => $subbox['multi_submission'] ? ' checked="checked"' : '',
         'TOTAL_MARK'        => $subbox['max_mark'],
 
-        'OPEN_DATE'         => date('d/m/Y', $open_date),
-        'OPEN_HOUR'         => $open_hour,
-        'OPEN_MIN'          => $open_min,
-        'OPEN_PM'           => date('a', $open_date) == 'pm' ? 'selected' : '',
+        'OPEN_DATE' => date('d/m/Y', $open_date),
+        'OPEN_HOUR' => $open_hour,
+        'OPEN_MIN'  => $open_min,
+        'OPEN_PM'   => date('a', $open_date) == 'pm' ? 'selected' : '',
 
-        'DUE_DATE'          => date('d/m/Y', $due_date),
-        'DUE_HOUR'          => $due_hour,
-        'DUE_MIN'           => $due_min,
-        'DUE_PM'            => date('a', $due_date) == 'pm' ? 'selected' : '',
+        'DUE_DATE' => date('d/m/Y', $due_date),
+        'DUE_HOUR' => $due_hour,
+        'DUE_MIN'  => $due_min,
+        'DUE_PM'   => date('a', $due_date) == 'pm' ? 'selected' : '',
 
-        'LATE_DATE'         => date('d/m/Y', $late_date),
-        'LATE_HOUR'         => $late_hour,
-        'LATE_MIN'          => $late_min,
-        'LATE_PM'           => date('a', $late_date) == 'pm' ? 'selected' : '',
-
-        'NOTIF_ENABLED'     => $subbox['notif_enabled'] ? ' checked="checked"' : '',
+        'LATE_DATE' => date('d/m/Y', $late_date),
+        'LATE_HOUR' => $late_hour,
+        'LATE_MIN'  => $late_min,
+        'LATE_PM'   => date('a', $late_date) == 'pm' ? 'selected' : '',
 
     );
+
+    foreach(array('UPCOMING' => '1 day', 'OVERDUE' => '1 hour', 'RETURNED' => '1 hour') as $i => $j) {
+        $output["NOTIF_{$i}_ENABLED"] = $subbox['notifications'][strtolower($i)]['enabled'] ? ' checked="checked"' : '';
+        $output["{$i}_THRESHHOLD"] = $j;
+    }
+
 
     $this->setVar($output);
 
@@ -251,23 +259,27 @@ else if($this->arg[0] == 'new') {
         'MULTI_SUBMISSION'  => '',
         'TOTAL_MARK'        => '',
 
-        'OPEN_DATE'         => date('d/m/Y', $open_date),
-        'OPEN_HOUR'         => '',
-        'OPEN_MIN'          => '',
-        'OPEN_PM'           => '',
+        'OPEN_DATE' => date('d/m/Y', $open_date),
+        'OPEN_HOUR' => '',
+        'OPEN_MIN'  => '',
+        'OPEN_PM'   => '',
 
-        'DUE_DATE'          => date('d/m/Y', $due_date),
-        'DUE_HOUR'          => '',
-        'DUE_MIN'           => '',
-        'DUE_PM'            => 'selected',
+        'DUE_DATE' => date('d/m/Y', $due_date),
+        'DUE_HOUR' => '',
+        'DUE_MIN'  => '',
+        'DUE_PM'   => 'selected',
 
-        'LATE_DATE'         => date('d/m/Y', $late_date),
-        'LATE_HOUR'         => '',
-        'LATE_MIN'          => '',
-        'LATE_PM'           => 'selected',
-
-        'NOTIF_ENABLED' => ' checked="checked"', // on by default
+        'LATE_DATE' => date('d/m/Y', $late_date),
+        'LATE_HOUR' => '',
+        'LATE_MIN'  => '',
+        'LATE_PM'   => 'selected',
     );
+
+    // notifications on by default
+    foreach(array('UPCOMING' => '1 day', 'OVERDUE' => '1 hour', 'RETURNED' => '1 hour') as $i => $j) {
+        $output["NOTIF_{$i}_ENABLED"] = ' checked="checked"';
+        $output["{$i}_THRESHHOLD"] = $j;
+    }
 
     $this->setVar($output);
 

@@ -148,8 +148,12 @@ $submissionBox = array(
     'mark_type'         => $markTypeID,
     'rubric_result_set' => $markType['slug'] == 'rubric' ? $resultSetID : 0,
     'max_mark'          => $markMax,
-    'notif_enabled'     => !empty($_POST['notif_enabled']) ? true : false,
 );
+
+// append the notification data to be parsed in
+foreach(array('overdue', 'upcoming', 'returned') as $i) {
+    $submissionBox['notifications'][$i]['enabled'] = (isset($_POST['notif_'.$i])  ? 1 : 0);
+}
 
 // only set this field if there's actually something to put in it
 if($fileId) {

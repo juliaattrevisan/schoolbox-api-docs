@@ -63,14 +63,14 @@
 
         $j('input:checkbox[name=accept_submission]').change(function () {
             if ($j(this).is(':checked')) {
-                $j('.accept-hide').show(500);
+                $j('.accept-hide dark').show(500);
             } else {
-                $j('.accept-hide').hide(500);
+                $j('.accept-hide dark').hide(500);
             }
         });
 
 		if (!$j('input:checkbox[name=accept_submission]').attr('checked')) {
-			$j('.accept-hide').hide();
+			$j('.accept-hide dark').hide();
 		}
 
 /*
@@ -202,11 +202,11 @@
 </script>
 
 <style type="text/css">
-    .accept-hide, .marks-hide {
+    .accept-hide dark, .marks-hide dark {
         background-color: #E9E3D6;
     }
 
-    .accept-hide td, .marks-hide td {
+    .accept-hide dark td, .marks-hide dark td {
         border-bottom: solid 1px #FAF9F5;
     }
 
@@ -347,7 +347,7 @@
                 </select>
             </td>
         </tr>
-        <tr id="marktype-total" class="marks-hide">
+        <tr id="marktype-total" class="marks-hide dark">
             <td>
                 <h4>Total Mark</h4>
                 <em>The maximum mark for this assessment.</em></td>
@@ -357,7 +357,7 @@
                 </label>
             </td>
         </tr>
-        <tr id="marktype-rubric" class="marks-hide">
+        <tr id="marktype-rubric" class="marks-hide dark">
             <td>
                 <h4>Rubric</h4>
                 <em>Select <i>at least two</i> criteria that are being assessed, and possible results.<br/>
@@ -423,13 +423,13 @@
 				<em>Will this work be submitted electronically?</em></td>
 			<td><input name="accept_submission" type="checkbox" value="true" {ACCEPT_SUBMISSION}></td>
 		</tr>
-        <tr class="accept-hide">
+        <tr class="accept-hide dark">
             <td><h4>Multiple Submissions</h4>
                 <em>Should multiple submissions be accepted?</em></td>
             <td><input name="multi_submission" type="checkbox" value="true" {MULTI_SUBMISSION}></td>
         </tr>
 
-		<tr class="accept-hide">
+		<tr class="accept-hide dark">
 			<td class="formLabelWidth"><h4>Open Date</h4>
 				<em>The date from when the due work will be available for submission.
                     To allow submissions from the start of the day, leave the time fields blank.</em>
@@ -460,7 +460,7 @@
                 </select>
             </td>
 		</tr>
-		<tr class="accept-hide">
+		<tr class="accept-hide dark">
 			<td><h4>Late Date</h4>
 				<em>Students will not be able to submit after this date.
                     To allow submissions until the end of the day, leave the time fields blank.</em></td>
@@ -479,8 +479,15 @@
         <!-- BEGIN notification_enable -->
         <tr>
             <td><h4>Send Notifications</h4>
-                <em>Should students be sent email reminders about this due work?</em></td>
-            <td><input name="notif_enabled" type="checkbox" value="true"{NOTIF_ENABLED}/></td>
+                <em>Which email notifications should be sent to students about this due work?</em></td>
+            <td>
+                <label for="notif_upcoming">
+                    <input id="notif_upcoming" name="notif_upcoming" type="checkbox" value="true"{NOTIF_UPCOMING_ENABLED}/> Upcoming <i>(sent {UPCOMING_THRESHHOLD} prior to due date)</i>
+                </label>
+                <label for="notif_overdue">
+                    <input id="notif_overdue" name="notif_overdue" type="checkbox" value="true"{NOTIF_OVERDUE_ENABLED}/> Overdue <i>(sent {OVERDUE_THRESHHOLD} after due date)</i>
+                </label>
+            </td>
         </tr>
         <!-- END notification_enable -->
 	</table>

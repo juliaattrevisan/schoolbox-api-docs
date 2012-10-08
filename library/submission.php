@@ -56,18 +56,7 @@ class Submission extends DeprecatedModel {
      * @return array|bool
      */
     function getByID($boxID) {
-        $query = "SELECT s.*, GROUP_CONCAT(cc.code) code, category.name as categoryName, category.id as cid,
-					file.comment, ft.name as typeName, smt.slug AS mark_type_slug
-                  FROM submission_box  s
-				  JOIN category ON s.category = category.id
-				  LEFT JOIN categoryCode cc ON cc.categoryID = category.id
-				  LEFT JOIN file ON s.fid = file.id
-			 	  LEFT JOIN file_type ft ON s.type = ft.id
-			 	  LEFT JOIN submission_mark_type smt ON s.mark_type = smt.mark_type_id
-                  WHERE s.id = '$boxID'
-				  GROUP BY s.id, category.id";
-
-        return $this->db->getRow($query);
+        return $this->getByField('s.id', $boxID);
     }
 
     /**
@@ -75,21 +64,64 @@ class Submission extends DeprecatedModel {
      * @return array|bool
      */
     function getByName($boxName) {
-        $boxName = mysql_real_escape_string($boxName);
-        $query = "SELECT s.*, GROUP_CONCAT(cc.code) code, category.name as categoryName, category.id as cid,
-					file.comment, ft.name as typeName, smt.slug AS mark_type_slug
-                  FROM submission_box  s
-				  JOIN category ON s.category = category.id
-				  LEFT JOIN categoryCode cc ON cc.categoryID = category.id
-				  LEFT JOIN file ON s.fid = file.id
-			 	  LEFT JOIN file_type ft ON s.type = ft.id
-			 	  LEFT JOIN submission_mark_type smt ON s.mark_type = smt.mark_type_id
-                  WHERE s.name = '$boxName'
-				  GROUP BY s.id, category.id";
-
-        return $this->db->getRow($query);
+        return $this->getByField('s.name', $boxName);
     }
 
+    /**
+     * @param string $field
+     * @param string|array $value
+     * @return array|bool
+     */
+    function getByField($field, $value) {
+
+        // securitae
+        $field = mysql_real_escape_string($field);
+
+        if(is_array($value)) {
+            foreach($value as &$v) {
+                $v = mysql_real_escape_string($v);
+            }
+            $conditional = 'IN (' . implode(',', $value) . ')';
+
+        }
+        else {
+            $conditional = "= $value";
+        }
+
+        // general extraction query for submission boxes
+        $query = "
+            SELECT
+              s.*, GROUP_CONCAT(cc.code) `code`, c.name AS categoryName, c.id AS cid, file.comment, ft.name typeName,
+              smt.slug mark_type_slug, sn.type notif_type, sn.enabled notif_enabled, sn.sent notif_sent
+            FROM submission_box s
+            JOIN category c ON s.category = c.id
+            LEFT JOIN categoryCode cc ON cc.categoryID = c.id
+            LEFT JOIN file ON s.fid = file.id
+            LEFT JOIN file_type ft ON s.type = ft.id
+            LEFT JOIN submission_mark_type smt ON s.mark_type = smt.mark_type_id
+            LEFT JOIN submission_notification sn ON s.id = sn.`box_id`
+            WHERE $field $conditional
+            GROUP BY s.id, c.id, sn.type
+        ";
+
+        $boxTable = $this->db->getAll($query);
+
+        // subbox data will be common to all rows, so unset notifications, then push into sub-array
+        if(is_array($boxTable) && count($boxTable)) {
+            $box = $boxTable[0];
+            unset($box['notif_type']);
+            unset($box['notif_notif_enabled']);
+            unset($box['notif_notif_sent']);
+            foreach($boxTable as $row) {
+                $box['notifications'][$row['notif_type']] = array(
+                    'enabled' => $row['notif_enabled'],
+                    'sent' => $row['notif_sent']
+                );
+            }
+            return $box;
+        }
+        return false;
+    }
 
 
     /**
@@ -824,88 +856,102 @@ class Submission extends DeprecatedModel {
 
     public function getSubmissionReminderList($status) {
 
+        // "retrieve the Users, their Subjects, and the DueWorks for users that have not submitted any work"
+        $stmt = Database::getInstance()->prepare("
+            SELECT
+              u.id u_id, u.username u_username, u.firstname u_firstname, u.lastname u_lastname,
+              u.local_email u_local_email, u.alt_email u_alt_email,
+              sb.category c_id, c.name c_name, sb.id sb_id, sb.name sb_name, sb.date sb_date
+            FROM submission_box sb
+            LEFT JOIN category c ON sb.category = c.id
+            LEFT JOIN userAccess ua ON ua.service = 1 AND ua.sid = sb.category
+            LEFT JOIN `user` u ON ua.uid = u.id
+            LEFT JOIN submission_notification sn ON sb.id = sn.box_id
+            WHERE u.group_id IN (SELECT id FROM groups WHERE group_type = 'student')
+            AND sb.deleted = 0
+            AND u.id IS NOT NULL
+            AND sn.type = :notif_type
+            AND sn.enabled = :notif_enabled
+            AND sn.sent = :notif_sent
+            AND sb.`date` BETWEEN :range_start AND :range_end
+            AND u.id NOT IN (SELECT `owner` FROM student_submission ss WHERE ss.box_id = sb.id)
+            ORDER BY u.id ASC, c.id ASC, sb.date ASC
+        ");
+
+        $now = date('Y-m-d H:i:s');
+
+        // setup the parameters based on the context of the notification
         if($status == UPCOMING_WORK_TYPE) {
-            $sql =
-"SELECT
-  u.id u_id, u.firstname u_firstname, u.lastname u_lastname, u.alt_email u_alt_email,
-  sb.category c_id, c.name c_name,
-  sb.id sb_id, sb.name sb_name, sb.date sb_date
-FROM submission_box sb
-LEFT JOIN category c ON sb.category = c.id
-LEFT JOIN userAccess ua ON ua.service = 1 AND ua.sid = sb.category
-LEFT JOIN `user` u ON ua.uid = u.id
-WHERE u.group_id IN (SELECT id FROM groups WHERE group_type = 'student')
-AND sb.deleted = 0
-AND u.id IS NOT NULL
-AND sb.notif_enabled = 0
-AND sb.notif_sent = 0
-AND sb.`date` BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 1 DAY)
-AND u.id NOT IN (SELECT `owner` FROM student_submission ss WHERE ss.box_id = sb.id)
-ORDER BY u.id ASC, c.id ASC, sb.date ASC";
+            // closing dates between now and this time tomorrow
+            $params = array(
+                'notif_type' => 'upcoming',
+                'notif_enabled' => 1,
+                'notif_sent' => 0,
+                'range_start' => $now,
+                'range_end' => date('Y-m-d H:i:s', time() + 24 * 3600)
+            );
+        }
+        elseif($status == OVERDUE_WORK_TYPE) {
+            // closing dates between an hour ago and now
+            $params = array(
+                'notif_type' => 'overdue',
+                'notif_enabled' => 1,
+                'notif_sent' => 0,
+                'range_start' => date('Y-m-d H:i:s', time() - 3600),
+                'range_end' => $now
+            );
+        }
+        elseif($status == RETURNED_WORK_TYPE) {
+            // not yet implemented
+            return array();
+        }
+        else {
+            return array();
+        }
 
-            $pdo = Database::getInstance()->query($sql);
-            $output = array();
-            $prevUID = -1;
-            $prevCID = -1;
-            while($row = $pdo->fetch(PDO::FETCH_ASSOC)) {
+        $stmt->execute($params);
 
-                // different user, create user details
-                if($row['u_id'] != $prevUID) {
-                    $output[$row['u_id']] = array(
-                        'id'         => $row['u_id'],
-                        'firstname'  => $row['u_firstname'],
-                        'lastname'   => $row['u_lastname'],
-                        'alt_email'  => $row['u_alt_email'],
-                        'categories' => array()
-                    );
-                    $prevUID = $row['u_id'];
-                    $prevCID = -1;
-                }
+        $output = array();
+        $prevUID = -1;
+        $prevCID = -1;
+        $emailObj = new Email();
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
-                // different category, create category details
-                if($row['c_id'] != $prevCID) {
-                    $output[$row['u_id']]['categories'][$row['c_id']] = array(
-                        'id'   => $row['c_id'],
-                        'name' => $row['c_name'],
-                        'work' => array()
-                    );
-                    $prevCID = $row['c_id'];
-                }
-
-                $output[$row['u_id']]['categories'][$row['c_id']]['work'][$row['sb_id']] = array(
-                    'id'   => $row['sb_id'],
-                    'name' => $row['sb_name'],
-                    'date' => $row['sb_date'],
+            // different user, create user details
+            if($row['u_id'] != $prevUID) {
+                $user = array(
+                    'username'    => $row['u_username'],
+                    'alt_email'   => $row['u_alt_email'],
+                    'local_email' => $row['u_local_email']
                 );
+                $output[$row['u_id']] = array(
+                    'id'         => $row['u_id'],
+                    'firstname'  => $row['u_firstname'],
+                    'lastname'   => $row['u_lastname'],
+                    'alt_email'  => $emailObj->formatEmailFromArray($user),
+                    'categories' => array()
+                );
+                $prevUID = $row['u_id'];
+                $prevCID = -1;
             }
 
-            return $output;
+            // different category, create category details
+            if($row['c_id'] != $prevCID) {
+                $output[$row['u_id']]['categories'][$row['c_id']] = array(
+                    'id'   => $row['c_id'],
+                    'name' => $row['c_name'],
+                    'work' => array()
+                );
+                $prevCID = $row['c_id'];
+            }
+
+            $output[$row['u_id']]['categories'][$row['c_id']]['work'][$row['sb_id']] = array(
+                'id'   => $row['sb_id'],
+                'name' => $row['sb_name'],
+                'date' => $row['sb_date'],
+            );
         }
-
-        elseif($status == OVERDUE_WORK_TYPE) {
-            $sql =
-"SELECT
-  u.id u_id, u.firstname u_firstname, u.lastname u_lastname, u.alt_email u_alt_email,
-  sb.category c_id, c.name c_name,
-  sb.id sb_id, sb.name sb_name, sb.date sb_date
-FROM submission_box sb
-LEFT JOIN category c ON sb.category = c.id
-LEFT JOIN userAccess ua ON ua.service = 1 AND ua.sid = sb.category
-LEFT JOIN `user` u ON ua.uid = u.id
-WHERE u.group_id IN (SELECT id FROM groups WHERE group_type = 'student')
-AND sb.accept_submission = 1
-AND sb.deleted = 0
-AND u.id IS NOT NULL
-AND sb.notif_enabled = 1
-AND sb.`date` BETWEEN DATE_SUB(NOW(), INTERVAL 1 HOUR) AND NOW()
-AND u.id NOT IN (SELECT `owner` FROM student_submission ss WHERE ss.box_id = sb.id)
-ORDER BY u.id ASC, c.id ASC, sb.date ASC";
-
-            $pdo = Database::getInstance()->query($sql);
-            return $pdo->fetchAll(PDO::FETCH_ASSOC);
-        }
-
-        return array();
+        return $output;
     }
 
     public function getAllYearsByUser($userID = 0) {
@@ -963,4 +1009,56 @@ ORDER BY u.id ASC, c.id ASC, sb.date ASC";
 
     }
 
+    /**
+     * Create a new submission box record and associated data
+     * @param $object
+     * @return bool|int
+     */
+    function create($object) {
+        // extract notification array
+        $notifs = $object['notifications'];
+        unset($object['notifications']);
+
+        // insert the new object
+        $id = parent::create($object);
+
+        if($id && count($notifs)) {
+            // insert notification records
+            $sql = array();
+            foreach($notifs as $type => $settings) {
+                $sql[] = "($id, '$type', {$settings['enabled']}, 0)";
+            }
+            $query = "INSERT INTO submission_notification VALUES " . implode(', ', $sql);
+            $this->db->query($query);
+
+            return $id;
+        }
+        return false;
+    }
+
+    /**
+     * Update a submission box record and associated data
+     * @param $object
+     * @return bool
+     */
+    function update($object) {
+        // extract notification array
+        $id = $object[$this->_index];
+        $notifs = $object['notifications'];
+        unset($object['notifications']);
+
+        if(parent::update($object)) {
+            // update notification records
+            foreach($notifs as $type => $settings) {
+                $query = "
+                    INSERT INTO submission_notification (`box_id`, `type`, `enabled`)
+                    VALUES ($id, '$type', {$settings['enabled']})
+                    ON DUPLICATE KEY UPDATE `enabled` = {$settings['enabled']}
+                ";
+                $this->db->query($query);
+            }
+            return true;
+        }
+        return false;
+    }
 }
