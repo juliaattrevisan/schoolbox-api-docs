@@ -12,7 +12,7 @@ class Calendar_Event_Type_Day_Renderer extends Calendar_Event_Type_Renderer_Abst
 	/**
 	 * Render this event
 	 *
-	 * @param $currentEvent
+	 * @param Calendar_Event_Type_Abstract $currentEvent
 	 */
 	public function visit($currentEvent) {
 		if ($this->isVisible($currentEvent)) {
@@ -44,7 +44,9 @@ class Calendar_Event_Type_Day_Renderer extends Calendar_Event_Type_Renderer_Abst
 			 */
 			$this->getPage()->setVar(array(
 				'EVENT_ID' => $currentEvent->getEventId(),
-				'TIME' => $currentEvent->getDerivedTime(),
+				'TIME' => $currentEvent->getDerivedTime(true),
+                'START_TIME' => $currentEvent->getStartTime()->getUsingFormat('g:iA'),
+                'END_TIME' => $currentEvent->getEndTime()->getUsingFormat('g:iA'),
 				'NOTE' => $currentEvent->getNote(),
 				'COLOUR' => $currentEvent->getColour(),
 				'LOCATION' => $currentEvent->getLocation(),

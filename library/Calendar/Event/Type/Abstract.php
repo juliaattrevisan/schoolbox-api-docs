@@ -374,7 +374,7 @@ abstract class Calendar_Event_Type_Abstract {
 	/**
 	 * Get end time
 	 *
-	 * @return null
+	 * @return Alaress_Date_Format
 	 */
 	public function getEndTime() {
 		return $this->endTime;
@@ -392,7 +392,7 @@ abstract class Calendar_Event_Type_Abstract {
 	/**
 	 * Get start time
 	 *
-	 * @return null
+	 * @return Alaress_Date_Format
 	 */
 	public function getStartTime() {
 		return $this->startTime;

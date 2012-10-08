@@ -83,7 +83,7 @@ class Calendar_Event_Type_Day extends Calendar_Event_Type_Abstract {
 	 *
 	 * @return string
 	 */
-	public function getDerivedTime() {
+	public function getDerivedTime($withDate = false) {
 		$startFormat = $this->getStartTime()->getUsingFormat('g:iA');
 		$endFormat = $this->getEndTime()->getUsingFormat('g:iA');
 
@@ -91,7 +91,17 @@ class Calendar_Event_Type_Day extends Calendar_Event_Type_Abstract {
 			($startFormat != "12:00AM" ? $startFormat : "") . " - " .
 			($endFormat != "12:00AM" ? $endFormat : ""), "- ");
 
-		return $formattedTime;
+        if($withDate) {
+            $startDate = $this->getStartTime()->getUsingFormat('l, jS F');
+            if($formattedTime) {
+                $formattedTime = $startDate . ', ' . $formattedTime;
+            }
+            else {
+                $formattedTime = $startDate;
+            }
+        }
+
+		return str_replace(' - ', '&ndash;', $formattedTime);
 	}
 
 	/* Getters/Setters
