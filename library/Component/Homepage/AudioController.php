@@ -20,6 +20,7 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
      */
     public function execute() {
         $this->allowedFileHandler = new AllowedFile();
+        $this->sortFields = array('Date');
     }
 
     /**
