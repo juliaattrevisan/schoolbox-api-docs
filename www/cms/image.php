@@ -226,7 +226,8 @@ function outputImageFile($filename) {
     header('Cache-Control: max-age=10800, private');
     header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
     header('Pragma: private');
-    header("Content-Type: image/jpeg");
+    header('Last-Modified: ' . date('r', filemtime($filename)));
+    header('Content-Type: image/jpeg');
     readfile($filename);
 }
 
