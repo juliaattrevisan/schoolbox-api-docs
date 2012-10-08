@@ -7,54 +7,16 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  *
- * * * * * * * *
- * Pseudocode framework
- * * * * * * * *
-    1. Am I in archive or am I in current?
-    $timePeriod =? archive : current;
-
-    2. Get the list of news articles that I'm allowed to see within this $timePeriod.
-    Do not filter by topic yet.
-    $visibleList = [];
-
-    3. Have I selected a topic?
-    3a. Topic selected
-    Get the $visibleListTopicSubset of $visibleList for this topic.
-    Get the $occupiedDateList from $visibleListTopicSubset
-
-    3b. 'All' selected
-    Get the $occupiedDateList from $visibleList
-
-    4. Have I selected a month?
-    4a. Month selected
-    Filter $visibleList[TopicSubset] into $visibleList[TopicSubset]MonthSubset
-
-    4b. No month selected
-
-    5. Output everthing
-    5.1. Display the [archive|current] button
-    5.2. Display the topics of $visibleList
-    5.3. Display the $occupiedDateList from $visibleList[TopicSubset]
-    5.4. Display the articles in $visibleList[TopicSubset][MonthSubset]
- *
  */
 
-$this->setFile(TEMPLATE_content, 'news.html');
+$this->setFile(TEMPLATE_content, 'news/news_list.html');
 $this->setBlock(TEMPLATE_content, 'add_news', 'add_news_block');
-$this->setBlock(TEMPLATE_content, 'topic_header', 'topic_header_block');
-$this->setBlock(TEMPLATE_content, 'topic', 'topic_block');
+$this->setBlock(TEMPLATE_content, 'news', 'news_block');
+$this->setBlock('news', "news_image", "news_image_block");
 $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
 $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
 $this->setBlock(TEMPLATE_content, 'next_button', 'next_button_block');
-$this->setBlock(TEMPLATE_content, 'archive_button', 'archive_button_block');
-$this->setBlock(TEMPLATE_content, 'year_filter', 'year_filter_block');
-$this->setBlock(TEMPLATE_content, 'month_filter', 'month_filter_block');
-$this->setBlock(TEMPLATE_content, 'year', 'year_block');
-$this->setBlock('year', 'month', 'month_block');
-$this->setBlock('topic', 'news', 'news_block');
-$this->setBlock('news', 'has_modify_button', 'has_modify_button_block');
-$this->setBlock('news', 'has_publish_date', 'has_publish_date_block');
-$this->setBlock('news', 'has_expiry', 'has_expiry_block');
+$this->setBlock(TEMPLATE_content, 'topic_list', 'topic_list_block');
 
 $this->setVar('topic_header_block', '');
 
@@ -64,68 +26,20 @@ $groupHandler = new Group(NEWS_SERVICE);
 $newsHandler = new News();
 
 
-
-// determine whether to show archive or current context, and setup filters accordingly
-$archive = false;
-if($this->arg[0] == 'archive') {
-    $archive = true;
-    $filter = array(
-        'topic' => $this->arg[1],
-        'year'  => $this->arg[2],
-        'month' => $this->arg[3],
-        'page'  => $this->arg[4]
-    );
+if ($this->arg[0]) {
+    $selectedTopic = $this->arg[0];
 } else {
-    $filter = array(
-        'topic' => $this->arg[0],
-        'year'  => $this->arg[1],
-        'month' => $this->arg[2],
-        'page'  => $this->arg[3]
-    );
+    $selectedTopic = 'all';
 }
 
-// set an appropriate title based on news context
-$title = $archive ? 'News Archive' : 'News';
-$this->setTitle($title);
-$this->setVar('PAGE_TITLE', $title);
-
-// collate the full list of news the current user is allowed to see in the current context
-// this is used to populate the topic headers
-$visibleList = $newsHandler->getNewsListing($archive);
-
-// get list of visibly populated topics
-$allTopics = array('all' => 1);
-
-if (is_array($visibleList) && count($visibleList)) {
-	foreach($visibleList as $article) {
-		$allTopics[strtolower($article['topicName'])] = 1;
-	}
+if (is_numeric($this->arg[1])) {
+    $page = $this->arg[1];
+} else {
+    $page = 1;
 }
 
-// sanitise filter inputs
-if(!in_array($filter['topic'], array_keys($allTopics)))
-$filter['topic'] = 'all';
-
-// if year/month/page are null or something stupid, set to default
-$defaults = array(
-    'year'  => 'all',
-    'month' => 'all',
-    'page'  => 1
-);
-foreach ($defaults as $field => $default)
-if(!is_numeric($filter[$field]))
-$filter[$field] = $default;
-
-// add archive to the filter post-sanitise
-$filter['archive'] = $archive ? 'archive/' : '';
-
-
-// collate the full list of occupied dates for this category
-// this is used to populate the archive sidebar
-$occupiedDateList = $newsHandler->getOccupiedDateList($archive, $filter['topic']);
-
-// finally get the list of news that is visible, based on the filters applied
-$visibleListSubset = $newsHandler->getNewsListing($archive, $filter['topic'], $filter['year'], $filter['month']);
+$this->setTitle('News');
+$this->setVar('PAGE_TITLE', 'News');
 
 
 // display add news button if user is allowed to
@@ -135,177 +49,84 @@ if (($permission = $groupHandler->getPermission(0)) >= WRITE_ACCESS) {
     $this->setVar('add_news_block', '');
 }
 
+// generate news and topic lists
+$topicList = $newsHandler->getTopicList();
+array_unshift($topicList, array('name' => 'All'));
 
-/* Year and Month List */
-if ( $occupiedDateList ) {
-    foreach ($occupiedDateList as $i => $date) {
-
-        $this->setVar( array(
-            'YEAR' => $date['year'],
-            'YEAR_ClASS' => $date['year'] == $filter['year'] ? 'selected' : ''
-        ) );
-
-        /* Highlight only for the selected month and selected year
-           */
-        if (($date['month'] == $filter['month']) && ($date['year'] == $filter['year'])) {
-            $monthClass = 'selected';
-        }
-        else {
-            $monthClass = '';
-        }
-
-        $format = new Alaress_Date_Format('70-' . $date['month'] . '-01', 'y-m-d');
-
-        $this->setVar( array(
-            'MONTH'            => $format->getUsingFormat('F'),
-            'MONTH_NUMBER'     => $date['month'],
-            'MONTH_CLASS'      => $monthClass,
-            'MENU_TOPIC_CLEAN' => $filter['archive'] . $filter['topic']
-        ) );
-
-        $this->parse('month_block', 'month', true);
-
-        $nextYear = $occupiedDateList[$i+1]['year'];
-
-        if ( $date['year'] != $nextYear || empty($nextYear) ) {
-            $this->parse('year_block', 'year', true);
-            $this->setVar('month_block', '');
-        }
-    }
-} else {
-    $this->setVar('year_block', '');
+// output the list of topics for the sidebar
+foreach ($topicList as $sidebarTopic) {
+    $url = new Url($sidebarTopic['name']);
+    $output = array(
+        'LIST_TOPIC_NAME' => $sidebarTopic['name'],
+        'LIST_TOPIC_CLEAN' => $url->getSlug(),
+        'LIST_TOPIC_SELECTED' => $selectedTopic == $url->getSlug() ? 'selected' : '',
+    );
+    $this->setVar($output);
+    $this->parse('topic_list_block', 'topic_list', true);
 }
 
+$visibleListSubset = $newsHandler->getNewsListing(false, $selectedTopic);
 
 // setup pagination for display
 $newsPerPage = Cfg::get('search_type_limit');
 $totalPages = ceil(count($visibleListSubset) / $newsPerPage);
-$newsIndex = $newsPerPage * ($filter['page'] - 1);
+$newsIndex = $newsPerPage * ($page - 1);
 
 // figure out which pagination buttons should be displayed
-if($filter['page'] < 2)
+if ($page < 2) {
     $this->setVar('previous_button_block', '');
-else
+} else {
     $this->parse('previous_button_block', 'previous_button');
+}
 
-if($filter['page'] >= $totalPages)
+if ($page >= $totalPages) {
     $this->setVar('next_button_block', '');
-else
+} else {
     $this->parse('next_button_block', 'next_button');
+}
 
 // set pagination button destinations
-$pageSlug = "${filter['archive']}${filter['topic']}/${filter['year']}/${filter['month']}/";
+$pageSlug = "${selectedTopic}/";
 
-if($totalPages > 1) {
-    for($j = 1; $j <= $totalPages; $j++) {
-        if($filter['page'] == $j)
+if ($totalPages > 1) {
+    for ($j = 1; $j <= $totalPages; $j++) {
+        if ($page == $j) {
             $this->setVar('CURRENT', ' current');
-        else
+        } else {
             $this->setVar('CURRENT', '');
+        }
 
         $this->setVar('PAGE_INDEX', $j);
         $this->setVar('PAGE_INDEX_REF', $pageSlug . $j);
 
-        $this->parse('page_number_block','page_number', true);
+        $this->parse('page_number_block', 'page_number', true);
     }
-}
-else
+} else {
     $this->setVar('page_number_block', '');
+}
 
 $outputPagination = array(
-    'PREVIOUS_PAGE' => $pageSlug . ($filter['page'] - 1),
-    'NEXT_PAGE'		=> $pageSlug . ($filter['page'] + 1),
-    'LAST_PAGE'		=> $pageSlug . $totalPages,
+    'PREVIOUS_PAGE' => $pageSlug . ($page - 1),
+    'NEXT_PAGE' => $pageSlug . ($page + 1),
+    'LAST_PAGE' => $pageSlug . $totalPages,
 );
 
 $this->setVar($outputPagination);
 
-// does the bottom button link to archived news?
-if($archive) {
-    $this->setVar('archive_button_block');
-}
-else {
-    $this->setVar(array(
-        'ARCH_CURRENT' => 'Archived',
-        'ARCH_CURRENT_CLEAN' => "archive/${filter['topic']}/",
-    ));
-    $this->parse('archive_button_block', 'archive_button');
-}
 
-$items = $newsHandler->getNewsListing($archive, $filter['topic'], $filter['year'], $filter['month'], $newsIndex, $newsPerPage);
+$items = $newsHandler->getNewsListing(false, $selectedTopic, 0, 0, $newsIndex, $newsPerPage);
 
 if (is_array($items)) {
     $i = 0;
     $total = count($items);
     $userHandler = new User();
 
-    $topicList['All'] = 1;
-
-    if($items) {
+    if ($items) {
         foreach ($items as $article) {
             $i++;
 
-			/* Find out if admin-specific kind of information should be displayed with the
-			 * news article
-			 */
-			$hasAdminAccess = ($permission >= WRITE_ACCESS && $article['item_owner'] == $_SESSION['id']) || $permission >= FULL_ACCESS;
-
-			/* Offer a Modify button if you are allowed to alter this new item's contents
-			 */
-            if ($hasAdminAccess) {
-				$this->setVar(array(
-					'HAS_MODIFY_BUTTON_ITEM_ID' => $article['item_id'],
-				));
-
-				$this->parse('has_modify_button_block', 'has_modify_button');
-			}
-			else {
-				$this->setVar('has_modify_button_block', '');
-			}
-
-			/* Show publish date to administrators if it's in the future
-			 */
-			if ($hasAdminAccess) {
-				$publishDate = new Alaress_Date_Format($article['item_datetime_published'], 'y-m-d h:i:s');
-
-				if ($publishDate->getUnixTimestamp() > time()) {
-					$this->setVar(array(
-						'PUBLISH_DATE' => $publishDate->getDateOnly(),
-					));
-
-					$this->parse('has_publish_date_block', 'has_publish_date');
-				}
-				else {
-					$this->setVar('has_publish_date_block', '');
-				}
-			}
-			else {
-				$this->setVar('has_publish_date_block', '');
-			}
-
-			/* Expiry settings
-			 */
-			if ($hasAdminAccess) {
-				if ($archive) {
-					$expiryVerb = 'Expired';
-				}
-				else {
-					$expiryVerb = 'Expires';
-				}
-
-				$this->setVar(array(
-					'EXPIRY_VERB' => $expiryVerb,
-					'EXPIRY_DATE' => $article['expire_datetime'],
-				));
-
-				$this->parse('has_expiry_block', 'has_expiry');
-			}
-			else {
-				$this->setVar('has_expiry_block', '');
-			}
-
-			/* The usual stuff
-			 */
+            /* The usual stuff
+             */
             $fullname = $userHandler->formatName($article);
             $owner = "<a href=\"/search/user/{$article['uid']}\">$fullname</a>";
 
@@ -318,79 +139,25 @@ if (is_array($items)) {
                 'NEWS_TITLE' => $article['item_heading'],
                 'POSTER' => $owner,
                 'DATETIME' => $_SESSION['su'] == 1 ? $article['post_datetime'] : $article['post_datetime'],
-                'NEWS_BODY' => $archive ? $article['item_body'] : Scrub::html($article['item_body']),
+                'NEWS_SHORT' => TextFormatter::cutSentence(Scrub::html2text($article['item_body']), 300),
+                'NEWS_IMAGE' => $article['item_image'],
                 'TOPIC_NAME' => Scrub::text($previous['topicName']),
                 'TOPIC_CLEAN' => $filter['archive'] . $url->getSlug(),
             );
 
             $this->setVar($output);
-            $topicList[$article['topicName']] = 1;
 
-            $url = new Url($article['topicName']);
-
-            if ($article['topicName'] != $previous['topicName'] && $i > 1) {
-
-                /* End topic
-                    */
-                $this->parse('topic_block', 'topic', true);
-                $this->setVar("news_block", "");
-                $this->parse("news_block", "news", true);
-
-                /* Last rotation
-                    */
-                if ($total == $i) {
-                    $this->setVar('TOPIC_NAME', Scrub::text($article['topicName']));
-                    $this->setVar('TOPIC_CLEAN', $filter['archive'] . strtolower($url->getSlug()));
-                    $this->parse('topic_block', 'topic', true);
-                }
-            }
-            else {
-                if ($total == $i) {
-                    /* Last rotation
-                         */
-                    $this->parse("news_block", "news", true);
-                    $this->setVar('TOPIC_NAME', Scrub::text($article['topicName']));
-                    $this->setVar('TOPIC_CLEAN', $filter['archive'] . strtolower($url->getSlug()));
-
-                    $this->parse('topic_block', 'topic', true);
-                }
-                else {
-                    /* normal rotation
-                         */
-                    $this->parse("news_block", "news", true);
-                }
+            if ($item['item_image']) {
+                $this->parse('news_image_block', 'news_image');
+            } else {
+                $this->setVar('news_image_block');
             }
 
-            $previous = $article;
-        }
-    } else {
-        $this->setVar('topic_block', '');
-        $this->setVar('year_block', 'No news items found.');
-    }
 
-
-    // output tabs
-    if (is_array($allTopics)) {
-        foreach ($allTopics as $topic => $i) {
-            $url = new Url($topic);
-
-            $output = array(
-                'TOPIC_CLASS' => strtolower($topic) == $filter['topic'] ? 'class="selected"' : '',
-                'NEWS_TOPIC' => Scrub::text(ucwords($topic)),
-                'TOPIC_CLEAN' => $filter['archive'] . strtolower($url->getSlug())
-            );
-
-            $this->setVar($output);
-            $this->parse('topic_header_block', 'topic_header', true);
+            $this->parse("news_block", "news", true);
         }
     }
-    else {
-        $this->setVar('topic_block', '');
-    }
-}
-else
-{
-    $this->setVar('topic_block', '');
-    $this->setVar('year_block', 'No news items found.');
+} else {
+    $this->setVar('news_block', '');
 }
 

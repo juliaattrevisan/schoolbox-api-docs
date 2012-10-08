@@ -1,0 +1,41 @@
+<h1>News</h1>
+<span class="header_option">
+    <!-- BEGIN add_news -->
+    <a class="btn add" href="/news/modify"><span></span>Add News</a>
+    <!-- END add_news -->
+</span>
+<div class="news-wrapper left clearfix">
+    <!-- BEGIN news -->
+    <h2><a href="/news/item/{NEWS_ID}">{NEWS_TITLE}</a></h2>
+
+    <p class="meta">
+        {DATETIME} | Posted by {POSTER}
+    </p>
+    <!-- BEGIN news_image --> <img src="/storage/image.php?hash={NEWS_IMAGE}&size=square64"/>
+    <!-- END news_image -->
+    <div class="wysiwyg clearfix">
+        {NEWS_SHORT}
+    </div>
+    <!-- END news -->
+    <div class="pagination clearfix">
+        <!-- BEGIN previous_button -->
+        <a class="prev" href="/news/{PREVIOUS_PAGE}">&laquo; Prev</a><!-- END previous_button -->
+        <!-- BEGIN page_number -->
+        <a class="number {CURRENT}" href="/news/{PAGE_INDEX_REF}">{PAGE_INDEX}</a><!-- END page_number -->
+        <!-- BEGIN next_button -->
+        <a class="next" href="/news/{NEXT_PAGE}">Next &raquo;</a><!-- END next_button -->
+    </div>
+</div>
+
+<div class="right">
+    <ul>
+        <!-- BEGIN topic_list -->
+        <li><a href="/news/{LIST_TOPIC_CLEAN}" class="{LIST_TOPIC_SELECTED}">{LIST_TOPIC_NAME}</a>
+        </li>
+        <!-- END topic_list -->
+    </ul>
+    <!-- BEGIN allnews_button -->
+    <p class="interact clearfix"><a href="/news-archive/{TOPIC_CLEAN}" class="btn"><span></span>View Archived News</a>
+    </p>
+    <!-- END allnews_button -->
+</div>

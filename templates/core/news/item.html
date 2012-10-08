@@ -1,18 +1,3 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/jquery.treeview.min.js"></script>
-<script type="text/javascript">
-    $j(function () {
-        $j(".tree").treeview({
-            persist:"location",
-            unique:true,
-            animated:"fast",
-            collapsed:true
-        });
-
-    });
-</script>
-<!-- END custom_head -->
-
 <h1>{NEWS_TITLE}</h1>
 <span class="header_option">
 
@@ -25,8 +10,11 @@
     <!-- END modify_news -->
 </span>
 <div class="news-wrapper left clearfix">
+    <img src="/portrait.php?userId={POSTER_EXTERNAL_ID}&size=square32"/>
+
     <p class="meta">
-        Posted by {POSTER} on {DATETIME} {EXPIRY}
+        Posted by {POSTER}<br/>
+        {DATETIME}
     </p>
     <!-- BEGIN news -->
     <div class="wysiwyg clearfix">
@@ -42,27 +30,14 @@
 </div>
 
 <div class="right">
-
-    <h2>News Index</h2>
-
-    <div class="pad-it news-index-tree">
-        <ul class="tree">
-            <!-- BEGIN topic_list -->
-            <li><a href="/news/item/{LIST_TOPIC_RECENT_ARTICLE_ID}">{LIST_TOPIC_NAME}</a>
-                <!-- BEGIN article_list -->
-                <ul class="topic">
-                    <!-- BEGIN article_list_item -->
-                    <li class="{LIST_TOPIC_ARTICLE_CURRENT}"><a href="/news/item/{LIST_TOPIC_ARTICLE_ID}">{LIST_TOPIC_ARTICLE_NAME}</a>
-                    </li>
-                    <!-- END article_list_item -->
-                </ul>
-                <!-- END article_list -->
-            </li>
-            <!-- END topic_list -->
-        </ul>
-    </div>
+    <ul>
+        <!-- BEGIN topic_list -->
+        <li><a href="/news/{LIST_TOPIC_CLEAN}" class="{LIST_TOPIC_SELECTED}">{LIST_TOPIC_NAME}</a>
+        </li>
+        <!-- END topic_list -->
+    </ul>
     <!-- BEGIN allnews_button -->
-    <p class="interact clearfix"><a href="/news/archive/{TOPIC_CLEAN}" class="btn"><span></span>View Archived News</a>
+    <p class="interact clearfix"><a href="/news-archive/{TOPIC_CLEAN}" class="btn"><span></span>View Archived News</a>
     </p>
     <!-- END allnews_button -->
 </div>
