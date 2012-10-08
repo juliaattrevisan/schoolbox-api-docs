@@ -146,9 +146,6 @@ class DueWork_Detail {
      * @param SitePage $page
      */
     public function renderDetails(SitePage $page) {
-        if (!$data = $this->sitepageData) {
-            return;
-        }
 
         require_once(SITE_root . '/include/FileType.php');
         $allowedHandler = new AllowedFile();
@@ -184,6 +181,13 @@ class DueWork_Detail {
 
         $page->setVar('spiel_single_submit_block', '');
         $page->setVar('spiel_any_submit_block', '');
+
+
+        if (!$data = $this->sitepageData) {
+            $page->setVar('student_row_block', 'This subject has no students in it.');
+            return;
+        }
+
 
         switch ($this->getSubmissionType()) {
             case self::ACCEPT_SINGLE:
