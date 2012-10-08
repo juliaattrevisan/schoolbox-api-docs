@@ -38,34 +38,54 @@ if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
         if (!$eportfolioHandler->canEdit($imageInfo['owner'])) {
             error(5);
         }
-    } else if (isset($imageInfo['category'])) {
-        $groupHandler = new Group;
-
-        if ($groupHandler->getPermission($imageInfo['category']) < READ_ACCESS)
-            error(5);
     } else {
-        error(5);
+        if (isset($imageInfo['category'])) {
+            $groupHandler = new Group;
+
+            if ($groupHandler->getPermission($imageInfo['category']) < READ_ACCESS) {
+                error(5);
+            }
+        } else {
+            error(5);
+        }
     }
 
     //is image exists, the user has permission and its not deleted then output the image
     if (isset($imageInfo['id']) && !$imageInfo['deleted']) {
-        if (isset($_GET['resample']) && isset($_GET['quality']))
-            image_resize($fileDir . "/" . $imageInfo['id'] . ".dat", $_GET['width'], $_GET['height'], $_GET['resample'], $_GET['quality']);
-        else if (isset($_GET['resample']))
-            image_resize($fileDir . "/" . $imageInfo['id'] . ".dat", $_GET['width'], $_GET['height'], $_GET['resample']);
-        else if ($_GET['quality']) {
-            if ($_GET['quality'] < 50) //if low quality dont bother resampling
-                image_resize($fileDir . "/" . $imageInfo['id'] . ".dat", $_GET['width'], $_GET['height'], 0, $_GET['quality']);
-            else
-                image_resize($fileDir . "/" . $imageInfo['id'] . ".dat", $_GET['width'], $_GET['height'], 1, $_GET['quality']);
+        if (isset($_GET['resample']) && isset($_GET['quality'])) {
+            image_resize(
+                $fileDir . "/" . $imageInfo['id'] . ".dat", $_GET['width'], $_GET['height'], $_GET['resample'],
+                $_GET['quality']
+            );
+        } else {
+            if (isset($_GET['resample'])) {
+                image_resize(
+                    $fileDir . "/" . $imageInfo['id'] . ".dat", $_GET['width'], $_GET['height'], $_GET['resample']
+                );
+            } else {
+                if ($_GET['quality']) {
+                    if ($_GET['quality'] < 50) //if low quality dont bother resampling
+                    {
+                        image_resize(
+                            $fileDir . "/" . $imageInfo['id'] . ".dat", $_GET['width'], $_GET['height'], 0,
+                            $_GET['quality']
+                        );
+                    } else {
+                        image_resize(
+                            $fileDir . "/" . $imageInfo['id'] . ".dat", $_GET['width'], $_GET['height'], 1,
+                            $_GET['quality']
+                        );
+                    }
 
-        } else
-            image_resize($fileDir . "/" . $imageInfo['id'] . ".dat", $_GET['width'], $_GET['height']);
+                } else {
+                    image_resize($fileDir . "/" . $imageInfo['id'] . ".dat", $_GET['width'], $_GET['height']);
+                }
+            }
+        }
     }
 }
 
-function image_resize($src, $maxWidth, $maxHeight, $resample = 1, $quality = 75)
-{
+function image_resize($src, $maxWidth, $maxHeight, $resample = 1, $quality = 75) {
     //first check if we have a cache of this file to avoid resize process time
     //note that we ignore other values like resample and quality when retrieving cache images
     //we assume these things will mainly stay the same (cache will need to be rebuilt if they change)
@@ -124,7 +144,8 @@ function image_resize($src, $maxWidth, $maxHeight, $resample = 1, $quality = 75)
 
                     if ($originaltransparentcolor >= 0 && $originaltransparentcolor < imagecolorstotal($srcImage)) {
                         $transparentcolor = imagecolorsforindex($srcImage, $originaltransparentcolor);
-                        $newtransparentcolor = imagecolorallocate($destImage,
+                        $newtransparentcolor = imagecolorallocate(
+                            $destImage,
                             $transparentcolor['red'],
                             $transparentcolor['green'],
                             $transparentcolor['blue']
@@ -151,10 +172,15 @@ function image_resize($src, $maxWidth, $maxHeight, $resample = 1, $quality = 75)
         }
 
         // resampling
-        if ($resample)
-            imageCopyResampled($destImage, $srcImage, 0, 0, 0, 0, $destSize[0] + 1, $destSize[1] + 1, $srcSize[0], $srcSize[1]);
-        else
-            imageCopyResized($destImage, $srcImage, 0, 0, 0, 0, $destSize[0] + 1, $destSize[1] + 1, $srcSize[0], $srcSize[1]);
+        if ($resample) {
+            imageCopyResampled(
+                $destImage, $srcImage, 0, 0, 0, 0, $destSize[0] + 1, $destSize[1] + 1, $srcSize[0], $srcSize[1]
+            );
+        } else {
+            imageCopyResized(
+                $destImage, $srcImage, 0, 0, 0, 0, $destSize[0] + 1, $destSize[1] + 1, $srcSize[0], $srcSize[1]
+            );
+        }
 
 
         cacheImage($destImage, $filename, $srcSize[2], $quality);
@@ -164,39 +190,47 @@ function image_resize($src, $maxWidth, $maxHeight, $resample = 1, $quality = 75)
     }
 }
 
-function cacheImage($image, $filename, $type = 2, $quality = 75)
-{
-    if ($type == 1)
-        @imagegif($image, $filename);
-    else if ($type == 3)
-        @imagepng($image, $filename);
-    else
-        @imagejpeg($image, $filename, $quality);
-}
-
-
-function outputImage($image, $type = 2, $quality = 75)
-{
+function cacheImage($image, $filename, $type = 2, $quality = 75) {
     if ($type == 1) {
-        header("Content-Type: image/gif");
-        imagegif($image);
-    } else if ($type == 3) {
-        header("Content-Type: image/png");
-        imagepng($image);
+        @imagegif($image, $filename);
     } else {
-        header("Content-Type: image/jpeg");
-        imagejpeg($image, '', $quality);
+        if ($type == 3) {
+            @imagepng($image, $filename);
+        } else {
+            @imagejpeg($image, $filename, $quality);
+        }
     }
 }
 
-function outputImageFile($filename)
-{
+
+function outputImage($image, $type = 2, $quality = 75) {
+    header('Cache-Control: max-age=10800, private');
+    header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
+    header('Pragma: private');
+
+    if ($type == 1) {
+        header("Content-Type: image/gif");
+        imagegif($image);
+    } else {
+        if ($type == 3) {
+            header("Content-Type: image/png");
+            imagepng($image);
+        } else {
+            header("Content-Type: image/jpeg");
+            imagejpeg($image, '', $quality);
+        }
+    }
+}
+
+function outputImageFile($filename) {
+    header('Cache-Control: max-age=10800, private');
+    header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
+    header('Pragma: private');
     header("Content-Type: image/jpeg");
     readfile($filename);
 }
 
-function is_animated($filename)
-{
+function is_animated($filename) {
     //function works out if file is animated gif
 
     $filecontents = file_get_contents($filename);
@@ -205,12 +239,12 @@ function is_animated($filename)
 
     while ($count < 2) { # There is no point in continuing after we find a 2nd frame
         $where1 = strpos($filecontents, "\x00\x21\xF9\x04", $str_loc);
-        if ($where1 === FALSE) {
+        if ($where1 === false) {
             break;
         } else {
             $str_loc = $where1 + 1;
             $where2 = strpos($filecontents, "\x00\x2C", $str_loc);
-            if ($where2 === FALSE) {
+            if ($where2 === false) {
                 break;
             } else {
                 if ($where1 + 8 == $where2) {
@@ -221,10 +255,11 @@ function is_animated($filename)
         }
     }
 
-    if ($count > 1)
+    if ($count > 1) {
         return true;
-    else
+    } else {
         return false;
+    }
 }
 
 
