@@ -1,0 +1,57 @@
+<?php
+
+if (!Cfg::get('webdav_enable')) {
+    error(2);
+}
+
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
+$folderHandler = PortfolioWebDAV::factory();
+
+
+if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
+
+    if (!($folder = $folderHandler->getByID($this->arg[0])))
+        error(2);
+
+    if ($folderHandler->isRoot($this->arg[0]))
+        error(2);
+
+
+    $this->setFile(TEMPLATE_content, "cms/networkFolder.html");
+    $this->setBlock(TEMPLATE_content, 'parent_list', 'parent_list_block');
+
+
+    $this->setTitle('Modify Network Folder');
+    $this->setTab('mynetwork');
+
+    $output = array('ACTION' => 'Modify',
+        'FOLDER_ID' => $folder['id'],
+        'NAME' => Scrub::text($folder['name']),
+        'PARENT_ID' => $folder['parent'],
+    );
+    $this->setVar($output);
+
+    $this->setBlock(TEMPLATE_content, 'location', 'location_block');
+    $this->setVar('location_block', '');
+
+} else if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+
+    $this->setFile(TEMPLATE_content, 'cms/myFolder.html');
+    $this->setBlock(TEMPLATE_content, 'parent_list', 'parent_list_block');
+
+
+    $this->setTitle('Add Folder');
+    $this->setTab('resources');
+
+    $output = array('ACTION' => 'Add',
+        'FOLDER_ID' => '',
+        'NAME' => '',
+        'PARENT_ID' => $this->arg[1],
+    );
+    $this->setVar($output);
+
+    $this->setBlock(TEMPLATE_content, 'location', 'location_block');
+    $this->setVar('location_block', '');
+
+} else
+    $this->error(2);

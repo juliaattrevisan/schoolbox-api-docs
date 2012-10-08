@@ -1,0 +1,34 @@
+<!-- BEGIN custom_head -->
+<script language="JavaScript" type="text/javascript">
+    $j(function () {
+        $j('#folderForm').validate();
+    });
+</script>
+<!-- END custom_head -->
+
+<h1>{ACTION} Folder</h1>
+<form action="/cms/networkFolderForm.php" method="post" class="clearfix" id="folderForm">
+    <input type="hidden" name="parent" id="parent" value="{PARENT_ID}"/>
+    <table class="standardForm">
+        <tr>
+            <td class="formLabelWidth"><h4>Folder Name</h4></td>
+            <td><label><input type="text" name="name" class="required" maxlength="250" size="40"
+                              value="{NAME}"/></label></td>
+        </tr>
+        <!-- BEGIN location -->
+        <tr>
+            <td><h4>Folder Parent</h4>
+                <em>Location at which this folder should be placed</em>
+            </td>
+            <td><select name="parent">
+                <!-- BEGIN parent_list -->
+                <option value="{PARENT_ID}"
+                {PARENT_SELECTED}>{PARENT_INDENT}&gt; {PARENT_NAME}</option>
+                <!-- END parent_list -->
+            </select></td>
+        </tr>
+        <!-- END location -->
+    </table>
+    <input type="hidden" name="folderID" value="{FOLDER_ID}"/>
+    <input type="submit" label="Submit" name="submit" value="{ACTION} Folder" class="submit-btn-plain"/>
+</form>

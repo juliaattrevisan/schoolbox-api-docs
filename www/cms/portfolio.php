@@ -1,14 +1,7 @@
 <?php
 
-if (Cfg::get('webdav_enable')) {
-    require SITE_root . '/include/Sabre/autoload.php';
-
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
-} else {
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-folder.php';
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
-}
-
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-folder.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 
@@ -32,16 +25,8 @@ if (isset($this->arg[0])) {
     $openFolder = $_SESSION['portfolioID'];
 }
 
-
-if (Cfg::get('webdav_enable')) {
-
-    $folderHandler = PortfolioWebDAV::factory();
-    $fileHandler =& $folderHandler;
-
-} else {
-    $folderHandler = new MyFolder;
-    $fileHandler = new MyFile;
-}
+$folderHandler = new MyFolder;
+$fileHandler = new MyFile;
 
 $openFolder = (int)$openFolder;
 

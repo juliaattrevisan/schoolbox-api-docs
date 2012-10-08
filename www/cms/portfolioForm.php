@@ -6,13 +6,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 $page = new SitePage;
 $allowedFiles = new AllowedFile;
 
-if (Cfg::get('webdav_enable')) {
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
-
-    $folderHandler = PortfolioWebDAV::factory();
-    $fileHandler = $folderHandler;
-
-} elseif (isset($_POST['relationID'])) {
+if (isset($_POST['relationID'])) {
     // native folder node request
 
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-folder.php';
