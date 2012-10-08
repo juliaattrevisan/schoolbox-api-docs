@@ -6,7 +6,7 @@
  * @copyright   2011 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
- * 
+ *
  */
 require_once '../../include/SitePage.php';
 
@@ -18,16 +18,18 @@ $file_path = urldecode($_GET['path']);
 
 if (is_string($file_path)) {
     $file_name = basename($file_path);
-    if (file_exists($cache_path.'/'.$file_name)) {
-        $file_contents = file_get_contents($cache_path.'/'.$file_name);
-    } elseif ($file_contents = file_get_contents($real_url.'/'.$file_path)) {
-        file_put_contents($cache_path.'/'.$file_name, $file_contents);
+    if (file_exists($cache_path . '/' . $file_name)) {
+        $file_contents = file_get_contents($cache_path . '/' . $file_name);
+    } elseif ($file_contents = file_get_contents($real_url . '/' . $file_path)) {
+        file_put_contents($cache_path . '/' . $file_name, $file_contents);
     }
 
     //$file_info = new finfo(FILEINFO_MIME);
-
-    header('Content-Type: image/gif');
+    header('Cache-Control: max-age=31536000, public');
+    header('Expires: ' . date(DATE_RFC822, strtotime(' 1 year')));
+    header('Pragma: public');
+    header('Content-type: image/gif');
     echo $file_contents;
 }
- 
- ?>
+
+?>
