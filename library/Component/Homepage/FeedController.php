@@ -34,6 +34,7 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
                     'content' => $f['messageHTML'],
                     'time' => $feedTime->getRelativeTime(),
                     'avatar' => $f['external_id'] != false ? '/portrait.php?userId=' . $f['external_id'] . '&size=square32' : '',
+                    'avatar_title' => $f['user_name'] != false ? $f['user_name'] : '',
                 );
             }
         }

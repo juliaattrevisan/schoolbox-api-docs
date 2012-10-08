@@ -91,6 +91,7 @@ class Feed {
                     $row
                 ) . '</a> uploaded the file ' . $url,
                 'external_id' => $row['external_id'],
+                'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -139,6 +140,7 @@ class Feed {
                     $row['name']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
+                'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -190,6 +192,7 @@ class Feed {
                     $row['heading']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
+                'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -240,6 +243,7 @@ class Feed {
                     $row['heading']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
+                'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -280,6 +284,7 @@ class Feed {
                     $row['heading']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
+                'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -318,6 +323,7 @@ class Feed {
                     $row['name']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
+                'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -357,6 +363,7 @@ class Feed {
                     $row['heading']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
+                'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -400,6 +407,7 @@ class Feed {
                     $row['heading']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
+                'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -447,6 +455,7 @@ class Feed {
                     $row['heading']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
+                'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -494,6 +503,7 @@ class Feed {
                     $row['heading']
                 ) . '</a>',
                 'external_id' => $row['external_id'],
+                'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
