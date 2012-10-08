@@ -2,14 +2,12 @@
 
 require_once dirname(__FILE__) . '/../include/Bootstrap.php';
 
-class SitePage extends Page
-{
+class SitePage extends Page {
     private $ajax;
 
     private $lite;
 
-    public function SitePage($login = TRUE)
-    {
+    public function SitePage($login = true) {
         parent::Page();
 
         $this->db = new DeprecatedDatabase;
@@ -27,8 +25,7 @@ class SitePage extends Page
      *
      * @return string
      */
-    public function conType()
-    {
+    public function conType() {
         $contype = "http://";
         if (getenv("SERVER_PORT") == 443) {
             $contype = "https://";
@@ -37,8 +34,7 @@ class SitePage extends Page
         return $contype;
     }
 
-    function loadContent($pageFile, $execute = TRUE)
-    {
+    function loadContent($pageFile, $execute = true) {
         $this->pageName = $pageFile;
 
         /* sanitise data, force all 404s through pageNotFound() */
@@ -62,8 +58,7 @@ class SitePage extends Page
             } elseif (is_file(WEB_root . '/' . $filename . '/index.php') && $execute) {
                 include(WEB_root . '/' . $filename . '/index.php');
                 return true;
-            }
-            else {
+            } else {
                 if (is_file($this->templateRoot . '/' . $this->getTemplate($filename . '.html'))) {
                     $this->setFile(TEMPLATE_content, $filename . '.html');
                     return true;
@@ -82,8 +77,7 @@ class SitePage extends Page
         $this->pageNotFound();
     }
 
-    function setSite()
-    {
+    function setSite() {
         if (Cfg::get('site_detect') == 'domain') {
             //Get site templates via domain name
             if (preg_match('/([\w]+)\./', $_SERVER['HTTP_HOST'], $match)) {
@@ -96,10 +90,12 @@ class SitePage extends Page
                 if (Cfg::get('site_location') == 'mgs') {
                     if ($_SESSION['campus'][0] == 3) {
                         $this->site = 'grimwade';
-                    } else if ($_SESSION['campus'][0] == 2) {
-                        $this->site = 'wadhurst';
                     } else {
-                        $this->site = 'mgs';
+                        if ($_SESSION['campus'][0] == 2) {
+                            $this->site = 'wadhurst';
+                        } else {
+                            $this->site = 'mgs';
+                        }
                     }
 
                     return true;
@@ -112,18 +108,15 @@ class SitePage extends Page
         $this->site = Cfg::get('site_location');
     }
 
-    function setAjax($state = true)
-    {
+    function setAjax($state = true) {
         $this->ajax = $state;
     }
 
-    function setLite($state)
-    {
+    function setLite($state) {
         $this->lite = $state;
     }
 
-    function outputPage($lite = FALSE)
-    {
+    function outputPage($lite = false) {
         if ($this->ajax) {
             return true;
         }
@@ -143,6 +136,7 @@ class SitePage extends Page
             'SITE_USERNAME' => $_SESSION['username'],
             'SITE_LOCATION' => $this->site,
             'USER_ID' => $_SESSION['id'],
+            'EXTERNAL_ID' => $_SESSION['sid'],
             'SITE_VERSION' => Cfg::get('site_version'),
             'SCHOOL_ADDRESS' => Cfg::get('school_address'),
         );
@@ -158,8 +152,7 @@ class SitePage extends Page
         $this->template->pparse('finaloutput', TEMPLATE_body);
     }
 
-    function buildPage($customHead = true)
-    {
+    function buildPage($customHead = true) {
 
         $this->groupHandler = new Group;
 
@@ -204,13 +197,11 @@ class SitePage extends Page
         }
     }
 
-    function setTab($tab)
-    {
+    function setTab($tab) {
         $this->currentTab = $tab;
     }
 
-    function initSession()
-    {
+    function initSession() {
         session_start();
 
         if (!isset($_SESSION['id'])) {
@@ -242,8 +233,7 @@ class SitePage extends Page
         $_SESSION['lasttime'] = mktime();
     }
 
-    function saveHistory()
-    {
+    function saveHistory() {
         /* Function saves user page history in session so we can go back to where they came from */
         if (!is_array($_SESSION['history'])) {
             $_SESSION['history'] = array();
@@ -260,8 +250,7 @@ class SitePage extends Page
         }
     }
 
-    function backToTheFuture($page)
-    {
+    function backToTheFuture($page) {
         /* In Dans honour, time is ours */
         if (is_array($_SESSION['history'])) {
             if (count($_SESSION['history']) >= $page) {
@@ -275,8 +264,7 @@ class SitePage extends Page
 
     }
 
-    function error($ec, $message = "")
-    {
+    function error($ec, $message = "") {
 
         $db = new DeprecatedDatabase(SQL_db, 1);
 
@@ -297,15 +285,16 @@ class SitePage extends Page
 
     }
 
-    function renderSideNav()
-    {
+    function renderSideNav() {
         //this section handles the drop down menu
         if ($_SESSION['su']) {
             $query = "SELECT sideMenu.id, parent, txt, url, target FROM sideMenu ORDER BY parent, sequence, txt";
         } else {
             if (is_array($_SESSION['campus'])) {
                 $query = "	SELECT DISTINCT(sideMenu.id), parent, txt, url, target FROM sideMenu, sideMenuCampus, sideMenuGroup
-                             WHERE (sideMenu.id = sideMenuCampus.id AND sideMenuCampus.campus IN (" . implode(',', $_SESSION['campus']) . ") )
+                             WHERE (sideMenu.id = sideMenuCampus.id AND sideMenuCampus.campus IN (" . implode(
+                    ',', $_SESSION['campus']
+                ) . ") )
                                AND (sideMenu.id = sideMenuGroup.id AND sideMenuGroup.gid = '" . $_SESSION['gid'] . "')
                              ORDER BY parent, sequence, txt";
             } else {
@@ -329,8 +318,7 @@ class SitePage extends Page
         $this->setVar("MCSSMENU", $this->__outputMenu($list[0]['children'], 1));
     }
 
-    function renderTabBar()
-    {
+    function renderTabBar() {
 
         //this section hanldes the display of the timetable tab
         $this->setBlock('tabTpl', 'timetable_tab', 'tt_tab');
@@ -369,7 +357,8 @@ class SitePage extends Page
                     $this->site == 'joeys' ||
                     $this->site == 'jpc' ||
                     $this->site == 'cathedral' ||
-                    ($this->site == 'mggs' || $this->site == 'grimwade' || $this->site == 'wadhurst' || $this->site == 'stmichaels' || $this->site == 'bialik' || $this->site == 'moriah' || $this->site == 'stk') && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent())
+                    ($this->site == 'mggs' || $this->site == 'grimwade' || $this->site == 'wadhurst' || $this->site == 'stmichaels' || $this->site == 'bialik' || $this->site == 'moriah' || $this->site == 'stk') && ($this->groupHandler->isStaff(
+                    ) || $this->groupHandler->isStudent())
             )
         ) {
             if ($this->site == 'mgs' || $this->site == 'grimwade' || $this->site == 'wadhurst') {
@@ -390,42 +379,89 @@ class SitePage extends Page
                 $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.wenona.nsw.edu.au/owa" rel="external"');
             } else if ($this->site == 'shore') {
                 if ($this->groupHandler->isStaff()) {
-                    if (strpos(Session::getIP(), '192.168.') === FALSE) {
-                        $this->setVar('WEBMAIL_LOCATION', 'href="https://mail.shore.nsw.edu.au/exchange/" rel="external"');
+                    if (strpos(Session::getIP(), '192.168.') === false) {
+                        $this->setVar(
+                            'WEBMAIL_LOCATION', 'href="https://mail.shore.nsw.edu.au/exchange/" rel="external"'
+                        );
                     } else {
                         $this->setVar('WEBMAIL_LOCATION', 'href="http://shorexch01/exchange" rel="external"');
                     }
                 } else {
                     if ($this->groupHandler->isStudent()) {
-                        if (strpos(Session::getIP(), '192.168.') === FALSE) {
-                            $this->setVar('WEBMAIL_LOCATION', 'href="https://mail.student.shore.nsw.edu.au/exchange/" rel="external"');
+                        if (strpos(Session::getIP(), '192.168.') === false) {
+                            $this->setVar(
+                                'WEBMAIL_LOCATION',
+                                'href="https://mail.student.shore.nsw.edu.au/exchange/" rel="external"'
+                            );
                         } else {
                             $this->setVar('WEBMAIL_LOCATION', 'href="http://cassandra/exchange" rel="external"');
                         }
                     }
                 }
-            } else if ($this->site == 'joeys') {
-                $this->setVar('WEBMAIL_LOCATION', 'href="http://webmail/" rel="external"');
-            } else if ($this->site == 'cathedral') {
-                $this->setVar('WEBMAIL_LOCATION', 'href="http://mail.cathedral.qld.edu.au/webmail/src/login.php" rel="external"');
-            } else if ($this->site == 'mggs') {
-                $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.mggs.vic.edu.au" rel="external"');
-            } else if ($this->site == 'bialik') {
-                $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.bialik.vic.edu.au/exchange" rel="external"');
-            } else if ($this->site == 'jpc') {
-                $this->setVar('WEBMAIL_LOCATION', 'href="http://jpcmail.jpcvictoria.catholic.edu.au/owa" rel="external"');
-            } else if ($this->site == 'moriah') {
-                if ($this->groupHandler->isStaff()) {
-                    $this->setVar('WEBMAIL_LOCATION', 'href="https://mail.moriah.nsw.edu.au/owa" rel="external"');
-                } else if ($this->groupHandler->isStudent()) {
-                    $this->setVar('WEBMAIL_LOCATION', 'href="http://www.google.com/a/student.moriah.nsw.edu.au/" rel="external"');
-                }
-            } else if ($this->site == 'stmichaels') {
-                $this->setVar('WEBMAIL_LOCATION', 'href="https://mail.stmichaels.vic.edu.au/owa" rel="external"');
-            } else if ($this->site == 'stk') {
-                $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.saintkentigern.com/owa" rel="external"');
             } else {
-                $this->setVar('WEBMAIL_LOCATION', 'href="' . Cfg::get('mail_webmail') . '" rel="external"');
+                if ($this->site == 'joeys') {
+                    $this->setVar('WEBMAIL_LOCATION', 'href="http://webmail/" rel="external"');
+                } else {
+                    if ($this->site == 'cathedral') {
+                        $this->setVar(
+                            'WEBMAIL_LOCATION',
+                            'href="http://mail.cathedral.qld.edu.au/webmail/src/login.php" rel="external"'
+                        );
+                    } else {
+                        if ($this->site == 'mggs') {
+                            $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.mggs.vic.edu.au" rel="external"');
+                        } else {
+                            if ($this->site == 'bialik') {
+                                $this->setVar(
+                                    'WEBMAIL_LOCATION',
+                                    'href="https://webmail.bialik.vic.edu.au/exchange" rel="external"'
+                                );
+                            } else {
+                                if ($this->site == 'jpc') {
+                                    $this->setVar(
+                                        'WEBMAIL_LOCATION',
+                                        'href="http://jpcmail.jpcvictoria.catholic.edu.au/owa" rel="external"'
+                                    );
+                                } else {
+                                    if ($this->site == 'moriah') {
+                                        if ($this->groupHandler->isStaff()) {
+                                            $this->setVar(
+                                                'WEBMAIL_LOCATION',
+                                                'href="https://mail.moriah.nsw.edu.au/owa" rel="external"'
+                                            );
+                                        } else {
+                                            if ($this->groupHandler->isStudent()) {
+                                                $this->setVar(
+                                                    'WEBMAIL_LOCATION',
+                                                    'href="http://www.google.com/a/student.moriah.nsw.edu.au/" rel="external"'
+                                                );
+                                            }
+                                        }
+                                    } else {
+                                        if ($this->site == 'stmichaels') {
+                                            $this->setVar(
+                                                'WEBMAIL_LOCATION',
+                                                'href="https://mail.stmichaels.vic.edu.au/owa" rel="external"'
+                                            );
+                                        } else {
+                                            if ($this->site == 'stk') {
+                                                $this->setVar(
+                                                    'WEBMAIL_LOCATION',
+                                                    'href="https://webmail.saintkentigern.com/owa" rel="external"'
+                                                );
+                                            } else {
+                                                $this->setVar(
+                                                    'WEBMAIL_LOCATION',
+                                                    'href="' . Cfg::get('mail_webmail') . '" rel="external"'
+                                                );
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             $this->parse('wm_tab', 'webmail_tab');
@@ -437,7 +473,16 @@ class SitePage extends Page
         if ($this->site == 'wenona') {
             require_once WEB_root . '/include/wenona.php';
             //provide encoded login details for intranet
-            $this->setVar("ENC_LOGIN", urlencode(base64_encode(xorEncrypt(INTRANET_encryption_key, $_SESSION['username'] . ' ' . $_SESSION['password'] . ' ' . date('Y m d H i')))));
+            $this->setVar(
+                "ENC_LOGIN", urlencode(
+                    base64_encode(
+                        xorEncrypt(
+                            INTRANET_encryption_key,
+                            $_SESSION['username'] . ' ' . $_SESSION['password'] . ' ' . date('Y m d H i')
+                        )
+                    )
+                )
+            );
 
             $this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
             if ($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) {
@@ -449,7 +494,7 @@ class SitePage extends Page
         if ($this->site == 'shore') {
             $this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
             if ($this->groupHandler->isStaff()) {
-                if (strpos(Session::getIP(), '192.168.') === FALSE) {
+                if (strpos(Session::getIP(), '192.168.') === false) {
                     $this->setVar('MYFILES_LOCATION', 'https://mail.shore.nsw.edu.au/fileway');
                 } else {
                     $this->setVar('MYFILES_LOCATION', 'http://shorexch01/fileway');
@@ -458,7 +503,7 @@ class SitePage extends Page
                 $this->parse('mf_tab', 'myfiles_tab');
             } else {
                 if ($this->groupHandler->isStudent()) {
-                    if (strpos(Session::getIP(), '192.168.') === FALSE) {
+                    if (strpos(Session::getIP(), '192.168.') === false) {
                         $this->setVar('MYFILES_LOCATION', 'https://mail.student.shore.nsw.edu.au/fileway');
                     } else {
                         $this->setVar('MYFILES_LOCATION', 'http://cassandra/fileway');
@@ -509,7 +554,8 @@ class SitePage extends Page
         }
 
         // choose tab to highlight
-        $output = array('TAB_MAIN_ON' => '',
+        $output = array(
+            'TAB_MAIN_ON' => '',
             'TAB_NEWS_ON' => '',
             'TAB_WEBMAIL_ON' => '',
             'TAB_CALENDAR_ON' => '',
@@ -525,8 +571,7 @@ class SitePage extends Page
         $this->setVar($output);
     }
 
-    function renderGroupList()
-    {
+    function renderGroupList() {
         //this section handle mygroups section in the template
         $this->setBlock("navTpl", "mgroup", "mgroup_section");
         $this->setBlock("mgroup", "mgroup_block", "my_groups");
@@ -553,8 +598,7 @@ class SitePage extends Page
         }
     }
 
-    function renderSubjectList()
-    {
+    function renderSubjectList() {
         //this section handles the mysubjects section in the template
         $this->setBlock("navTpl", "msubject", "msubject_section");
         $this->setBlock("msubject", "msubject_block", "my_subjects");
@@ -576,8 +620,7 @@ class SitePage extends Page
         }
     }
 
-    function renderLinkList()
-    {
+    function renderLinkList() {
         $this->setBlock("navTpl", "mlink_block", "my_links");
         $query = "SELECT url, description FROM bookmarks WHERE owner = '" . $_SESSION['id'] . "'";
         $this->db->query($query);
@@ -586,9 +629,18 @@ class SitePage extends Page
                 $url = new Url($link['url']);
 
                 if ($url->isLocalURL()) {
-                    $this->setVar("MLINK", "<a href=\"" . $url->getRelativeURL() . "\"><span>" . Scrub::text($link['description']) . "</span></a>");
+                    $this->setVar(
+                        "MLINK", "<a href=\"" . $url->getRelativeURL() . "\"><span>" . Scrub::text(
+                        $link['description']
+                    ) . "</span></a>"
+                    );
                 } else {
-                    $this->setVar("MLINK", "<a href=\"" . $url->getBase64EncodedRedirect() . "\" target=\"_blank\"><span>" . Scrub::text($link['description']) . "</span></a>");
+                    $this->setVar(
+                        "MLINK",
+                        "<a href=\"" . $url->getBase64EncodedRedirect() . "\" target=\"_blank\"><span>" . Scrub::text(
+                            $link['description']
+                        ) . "</span></a>"
+                    );
                 }
 
                 $this->parse("my_links", "mlink_block", true);
@@ -598,8 +650,7 @@ class SitePage extends Page
         }
     }
 
-    public function renderStudents()
-    {
+    public function renderStudents() {
         /* My students section
                        */
         $this->setBlock('navTpl', 'mstudent', 'mstudent_section');
@@ -624,8 +675,7 @@ class SitePage extends Page
         }
     }
 
-    function renderScriptIncludes()
-    {
+    function renderScriptIncludes() {
         $this->setBlock('headerTpl', 'header_javascript', 'header_javascript_block');
         $this->setBlock('headerTpl', 'header_css', 'header_css_block');
 
@@ -650,18 +700,15 @@ class SitePage extends Page
     }
 
 
-    function setJavascript($file)
-    {
+    function setJavascript($file) {
         $this->jscript[] = array('HEADER_SCRIPT_LOCATION' => $file);
     }
 
-    function setCSS($file, $type = 'screen')
-    {
+    function setCSS($file, $type = 'screen') {
         $this->css[] = array('HEADER_CSS_TYPE' => $type, 'HEADER_CSS_LOCATION' => $file);
     }
 
-    function setFile($handle, $file)
-    {
+    function setFile($handle, $file) {
         if (!$this->template->setFile($handle, $this->getTemplate($file))) {
             return false;
         }
@@ -675,13 +722,11 @@ class SitePage extends Page
         return true;
     }
 
-    function setTitle($title = '')
-    {
+    function setTitle($title = '') {
         $this->setVar('TITLE', Cfg::get('title') . (!empty($title) ? ' - ' . Scrub::text($title) : ''));
     }
 
-    function getTemplate($template)
-    {
+    function getTemplate($template) {
         if (is_file($this->templateRoot . '/' . $this->site . '/' . $template)) {
             return $this->site . '/' . $template;
         } else {
@@ -695,8 +740,7 @@ class SitePage extends Page
         }
     }
 
-    function getVar($varname)
-    {
+    function getVar($varname) {
         return $this->template->getVar($varname);
     }
 
@@ -711,8 +755,7 @@ class SitePage extends Page
      * @param  $file
      * @return void
      */
-    static public function localRedir($file, $keepProcessing = false)
-    {
+    static public function localRedir($file, $keepProcessing = false) {
         header('Location: ' . SitePage::conType() . $_SERVER['HTTP_HOST'] . $file);
         // don't quit
         if ($keepProcessing) {
@@ -731,8 +774,7 @@ class SitePage extends Page
         }
     }
 
-    function goLoginPage($error = '', $page = '')
-    {
+    function goLoginPage($error = '', $page = '') {
         $this->setSite();
         $this->setFile(TEMPLATE_body, 'common/login.html');
         $this->setVar('TITLE', Cfg::get('title') . " - Login");
@@ -749,31 +791,32 @@ class SitePage extends Page
             $this->setVar('ERROR', $error);
         } else {
             if (!$page && $_SERVER['REQUEST_URI'] != '/login/' && $_SERVER['REQUEST_URI'] != '/') {
-                $this->setVar('ERROR', 'You are currently not logged in.  Your session has either expired or you are beginning a new session.  Please log in below to continue browsing the portal.');
+                $this->setVar(
+                    'ERROR',
+                    'You are currently not logged in.  Your session has either expired or you are beginning a new session.  Please log in below to continue browsing the portal.'
+                );
             } else {
                 $this->setVar('ERROR', 'To begin a new session please login with your username and password.');
             }
         }
 
 
-        $this->outputPage(TRUE);
+        $this->outputPage(true);
         exit;
     }
 
-    function pageNotFound()
-    {
+    function pageNotFound() {
         header("HTTP/1.0 404 Not Found");
         $this->setVar(TEMPLATE_content, '');
         $this->setFile(TEMPLATE_content, 'common/404.html');
         $this->setTitle('Page Not Found');
 
-        $this->buildPage(FALSE);
-        $this->outputPage(TRUE);
+        $this->buildPage(false);
+        $this->outputPage(true);
         exit;
     }
 
-    function checkList($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = '')
-    {
+    function checkList($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = '') {
         $this->setBlock($template, $handle, $handle . '_block');
         $selected = is_array($selected) ? $selected : array();
         if (is_array($data)) {
@@ -794,8 +837,7 @@ class SitePage extends Page
         }
     }
 
-    function dropDown($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = '')
-    {
+    function dropDown($handle, $data, $selected = array(), $template = TEMPLATE_content, $mapping = '') {
         $this->setBlock($template, $handle, $handle . '_block');
         $selected = is_array($selected) ? $selected : array($selected);
         if (is_array($data) || $data instanceof Traversable) {
@@ -817,13 +859,11 @@ class SitePage extends Page
         }
     }
 
-    function canRead($perm)
-    {
+    function canRead($perm) {
         return $perm >= 1 ? true : false;
     }
 
-    function canWrite($perm)
-    {
+    function canWrite($perm) {
         return $perm >= 2 ? true : false;
     }
 
@@ -831,8 +871,7 @@ class SitePage extends Page
 
 
     //function used to create data structure for drop down menu
-    function __insertChild($list, $element)
-    {
+    function __insertChild($list, $element) {
         for ($i = 0; $list[$i]; $i++) {
             //if item is parent insert item
             if ($list[$i]['id'] == $element['parent']) {
@@ -848,8 +887,7 @@ class SitePage extends Page
         return $list;
     }
 
-    function __outputMenu($list, $level)
-    {
+    function __outputMenu($list, $level) {
 
         $text = "<ul>\n";
 

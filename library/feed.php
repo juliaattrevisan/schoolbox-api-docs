@@ -5,19 +5,17 @@
  *                                                           *
  ************************************************************/
 
-class Feed
-{
+class Feed {
 
-    function Feed()
-    {
+    function Feed() {
         $this->db = new DeprecatedDatabase(SQL_db);
     }
 
-    function getFeed($cid, $limit)
-    {
+    function getFeed($cid, $limit) {
 
-        if ($limit == 0 || $limit > 50)
+        if ($limit == 0 || $limit > 50) {
             $limit = 50;
+        }
 
 
         $files = $this->getFiles($cid, $limit);
@@ -43,7 +41,9 @@ class Feed
         is_array($surveys) ? 0 : $surveys = array();
 
         //get each of the areas
-        $feedList = array_merge($files, $links, $folders, $news, $wiki, $forum, $blog, $blogComments, $onlineAssessments, $surveys);
+        $feedList = array_merge(
+            $files, $links, $folders, $news, $wiki, $forum, $blog, $blogComments, $onlineAssessments, $surveys
+        );
 
 
         //sort them
@@ -55,15 +55,15 @@ class Feed
         return $feedList;
     }
 
-    function getFiles($cid, $limit)
-    {
+    function getFiles($cid, $limit) {
 
-        if (is_array($cid))
+        if (is_array($cid)) {
             $where = ' IN (' . implode(',', $cid) . ') ';
-        else
+        } else {
             $where = " = $cid ";
+        }
 
-        $query = "SELECT f.id, u.firstname, u.lastname, u.title, u.id as uid, UNIX_TIMESTAMP(f.submitted) submitted, f.description as name, realname,
+        $query = "SELECT f.id, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, UNIX_TIMESTAMP(f.submitted) submitted, f.description as name, realname,
 						af.description as type, inline, c.name as cat_name, c.id as cat_id
 				  FROM file f
 				  LEFT JOIN user u ON u.id = f.owner
@@ -87,7 +87,10 @@ class Feed
                 'date' => $row['submitted'],
                 'type' => 'file',
                 'message' => $userHandler->formatName($row) . ' uploaded the file ' . Scrub::text($row['name']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> uploaded the file ' . $url,
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
+                    $row
+                ) . '</a> uploaded the file ' . $url,
+                'external_id' => $row['external_id'],
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -96,15 +99,15 @@ class Feed
         return $file;
     }
 
-    function getLinks($cid, $limit)
-    {
+    function getLinks($cid, $limit) {
 
-        if (is_array($cid))
+        if (is_array($cid)) {
             $where = ' IN (' . implode(',', $cid) . ') ';
-        else
+        } else {
             $where = " = $cid ";
+        }
 
-        $query = "SELECT l.id, u.firstname, u.lastname, u.title, u.id as uid, UNIX_TIMESTAMP(l.submitted) submitted, description as name, url, c.name as cat_name, c.id as cat_id
+        $query = "SELECT l.id, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, UNIX_TIMESTAMP(l.submitted) submitted, description as name, url, c.name as cat_name, c.id as cat_id
 				  FROM link l
 				  LEFT JOIN user u ON u.id = l.owner
 				  LEFT JOIN category c ON c.id = l.category
@@ -130,7 +133,12 @@ class Feed
                 'date' => $row['submitted'],
                 'type' => 'link',
                 'message' => $userHandler->formatName($row) . ' submitted the link ' . Scrub::text($row['name']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> submitted the link <a href="' . $linkUrl . '" rel="' . $linkTarget . '">' . Scrub::text($row['name']) . '</a>',
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
+                    $row
+                ) . '</a> submitted the link <a href="' . $linkUrl . '" rel="' . $linkTarget . '">' . Scrub::text(
+                    $row['name']
+                ) . '</a>',
+                'external_id' => $row['external_id'],
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -145,18 +153,18 @@ class Feed
      * @param  $limit
      * @return
      */
-    public function getOnlineAssessments($cid, $limit)
-    {
+    public function getOnlineAssessments($cid, $limit) {
 
-        if (is_array($cid))
+        if (is_array($cid)) {
             $where = ' IN (' . implode(',', $cid) . ') ';
-        else
+        } else {
             $where = " = $cid ";
+        }
 
         $query = "SELECT
                       assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.created_at) as created_at,
                       user.title, user.firstname, user.lastname,
-                      user.id AS uid, c.name as cat_name, c.id as cat_id
+                      user.id AS uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
                   FROM assess
                   LEFT JOIN user ON assess.user_id = user.id
                   LEFT JOIN category c ON c.id = assess.category_id
@@ -173,8 +181,15 @@ class Feed
             $onlineAssessments[] = array(
                 'date' => $row['created_at'],
                 'type' => 'onlineassessment',
-                'message' => $userHandler->formatName($row) . ' posted the online assessment ' . Scrub::text($row['heading']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> posted the online assessment <a href="/assess/intro/' . $row['assess_id'] . '">' . Scrub::text($row['heading']) . '</a>',
+                'message' => $userHandler->formatName($row) . ' posted the online assessment ' . Scrub::text(
+                    $row['heading']
+                ),
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
+                    $row
+                ) . '</a> posted the online assessment <a href="/assess/intro/' . $row['assess_id'] . '">' . Scrub::text(
+                    $row['heading']
+                ) . '</a>',
+                'external_id' => $row['external_id'],
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -190,18 +205,18 @@ class Feed
      * @param  $limit
      * @return
      */
-    public function getSurveys($cid, $limit)
-    {
+    public function getSurveys($cid, $limit) {
 
-        if (is_array($cid))
+        if (is_array($cid)) {
             $where = ' IN (' . implode(',', $cid) . ') ';
-        else
+        } else {
             $where = " = $cid ";
+        }
 
         $query = "SELECT
 					  assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.created_at) as created_at,
 					  user.title, user.firstname, user.lastname,
-					  user.id AS uid, c.name as cat_name, c.id as cat_id
+					  user.id AS uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
 				  FROM assess
 				  LEFT JOIN user ON assess.user_id = user.id
 				  LEFT JOIN category c ON c.id = assess.category_id
@@ -219,7 +234,12 @@ class Feed
                 'date' => $row['created_at'],
                 'type' => 'survey',
                 'message' => $userHandler->formatName($row) . ' posted the survey ' . Scrub::text($row['heading']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> posted the survey <a href="/survey/intro/' . $row['assess_id'] . '">' . Scrub::text($row['heading']) . '</a>',
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
+                    $row
+                ) . '</a> posted the survey <a href="/survey/intro/' . $row['assess_id'] . '">' . Scrub::text(
+                    $row['heading']
+                ) . '</a>',
+                'external_id' => $row['external_id'],
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -229,15 +249,15 @@ class Feed
     }
 
 
-    function getNews($cid, $limit)
-    {
+    function getNews($cid, $limit) {
 
-        if (is_array($cid))
+        if (is_array($cid)) {
             $where = ' IN (' . implode(',', $cid) . ') ';
-        else
+        } else {
             $where = " = $cid ";
+        }
 
-        $query = "SELECT sn.id, heading, UNIX_TIMESTAMP(datetime_posted) submitted, u.firstname, u.lastname, u.title, u.id as uid, c.name as cat_name, c.id as cat_id
+        $query = "SELECT sn.id, heading, UNIX_TIMESTAMP(datetime_posted) submitted, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
 					FROM subject_news sn
 					JOIN user u ON owner = u.id
 					LEFT JOIN category c ON c.id = sn.code
@@ -254,7 +274,12 @@ class Feed
                 'date' => $row['submitted'],
                 'type' => 'news',
                 'message' => $userHandler->formatName($row) . ' posted the news ' . Scrub::text($row['heading']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> posted the news <a href="/homepage/' . $row['id'] . '">' . Scrub::text($row['heading']) . '</a>',
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
+                    $row
+                ) . '</a> posted the news <a href="/homepage/' . $row['id'] . '">' . Scrub::text(
+                    $row['heading']
+                ) . '</a>',
+                'external_id' => $row['external_id'],
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -263,15 +288,15 @@ class Feed
         return $news;
     }
 
-    function getFolders($cid, $limit)
-    {
+    function getFolders($cid, $limit) {
 
-        if (is_array($cid))
+        if (is_array($cid)) {
             $where = ' IN (' . implode(',', $cid) . ') ';
-        else
+        } else {
             $where = " = $cid ";
+        }
 
-        $query = "SELECT c.id, name, UNIX_TIMESTAMP(time) submitted, action, u.firstname, u.lastname, u.title, u.id as uid, c.name as cat_name, c.id as cat_id
+        $query = "SELECT c.id, name, UNIX_TIMESTAMP(time) submitted, action, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
 					FROM cmsLog
 					JOIN category c ON objectId = c.id
 					JOIN user u ON user = u.id
@@ -287,7 +312,12 @@ class Feed
                 'date' => $row['submitted'],
                 'type' => 'folder',
                 'message' => $userHandler->formatName($row) . ' created the folder ' . Scrub::text($row['name']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> created the folder <a href="/homepage/' . $row['id'] . '">' . Scrub::text($row['name']) . '</a>',
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
+                    $row
+                ) . '</a> created the folder <a href="/homepage/' . $row['id'] . '">' . Scrub::text(
+                    $row['name']
+                ) . '</a>',
+                'external_id' => $row['external_id'],
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -296,15 +326,15 @@ class Feed
         return $folder;
     }
 
-    function getForum($cid, $limit)
-    {
+    function getForum($cid, $limit) {
 
-        if (is_array($cid))
+        if (is_array($cid)) {
             $where = ' IN (' . implode(',', $cid) . ') ';
-        else
+        } else {
             $where = " = $cid ";
+        }
 
-        $query = "SELECT f.threadID, f.title as heading,  UNIX_TIMESTAMP(`date`) submitted, u.firstname, u.lastname, u.title, u.id as uid, c.name as cat_name, c.id as cat_id
+        $query = "SELECT f.threadID, f.title as heading,  UNIX_TIMESTAMP(`date`) submitted, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
 					FROM forumThread f
                     JOIN user u ON u.id = f.userID
                     LEFT JOIN category c ON c.id = f.categoryID
@@ -321,7 +351,12 @@ class Feed
                 'date' => $row['submitted'],
                 'type' => 'forum',
                 'message' => $userHandler->formatName($row) . ' started the thread ' . Scrub::text($row['heading']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> started the thread <a href="/forum/thread/' . $row['threadID'] . '">' . Scrub::text($row['heading']) . '</a>',
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
+                    $row
+                ) . '</a> started the thread <a href="/forum/thread/' . $row['threadID'] . '">' . Scrub::text(
+                    $row['heading']
+                ) . '</a>',
+                'external_id' => $row['external_id'],
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -330,20 +365,19 @@ class Feed
         return $forum;
     }
 
-    function getPoll($limit)
-    {
+    function getPoll($limit) {
 
     }
 
-    function getWiki($cid, $limit)
-    {
+    function getWiki($cid, $limit) {
 
-        if (is_array($cid))
+        if (is_array($cid)) {
             $where = ' IN (' . implode(',', $cid) . ') ';
-        else
+        } else {
             $where = " = $cid ";
+        }
 
-        $query = "SELECT w.wikiID, heading, w.categoryID, w.slug, UNIX_TIMESTAMP(r.created) submitted, u.firstname, u.lastname, u.title, u.id as uid, c.name as cat_name, c.id as cat_id
+        $query = "SELECT w.wikiID, heading, w.categoryID, w.slug, UNIX_TIMESTAMP(r.created) submitted, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
 					FROM wikiRevision r
 						JOIN wiki w ON w.wikiID = r.wikiID
 						JOIN user u ON u.id = r.userID
@@ -360,7 +394,12 @@ class Feed
                 'date' => $row['submitted'],
                 'type' => 'wiki',
                 'message' => $userHandler->formatName($row) . ' updated the wiki ' . Scrub::text($row['heading']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> updated the wiki <a href="/wiki/' . $row['categoryID'] . '/' . $row['slug'] . '">' . Scrub::text($row['heading']) . '</a>',
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
+                    $row
+                ) . '</a> updated the wiki <a href="/wiki/' . $row['categoryID'] . '/' . $row['slug'] . '">' . Scrub::text(
+                    $row['heading']
+                ) . '</a>',
+                'external_id' => $row['external_id'],
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -376,15 +415,15 @@ class Feed
      * @param  $limit
      * @return
      */
-    public function getBlog($cid, $limit)
-    {
+    public function getBlog($cid, $limit) {
 
-        if (is_array($cid))
+        if (is_array($cid)) {
             $where = ' IN (' . implode(',', $cid) . ') ';
-        else
+        } else {
             $where = " = $cid ";
+        }
 
-        $query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, b.id AS blogID, heading, UNIX_TIMESTAMP(b.created) AS submitted, c.name as cat_name, c.id as cat_id
+        $query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, synergy_id as external_id, b.id AS blogID, heading, UNIX_TIMESTAMP(b.created) AS submitted, c.name as cat_name, c.id as cat_id
 			FROM user u
 			JOIN blog b
 			ON u.id = b.owner
@@ -402,7 +441,12 @@ class Feed
                 'date' => $row['submitted'],
                 'type' => 'blog',
                 'message' => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> updated the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text($row['heading']) . '</a>',
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
+                    $row
+                ) . '</a> updated the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text(
+                    $row['heading']
+                ) . '</a>',
+                'external_id' => $row['external_id'],
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -418,15 +462,15 @@ class Feed
      * @param  $limit
      * @return
      */
-    public function getBlogComments($cid, $limit)
-    {
+    public function getBlogComments($cid, $limit) {
 
-        if (is_array($cid))
+        if (is_array($cid)) {
             $where = ' IN (' . implode(',', $cid) . ') ';
-        else
+        } else {
             $where = " = $cid ";
+        }
 
-        $query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, UNIX_TIMESTAMP(bc.created) AS submitted, b.id AS blogID, heading, cid, c.name as cat_name, c.id as cat_id
+        $query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, synergy_id as external_id, UNIX_TIMESTAMP(bc.created) AS submitted, b.id AS blogID, heading, cid, c.name as cat_name, c.id as cat_id
 			FROM `user` u
 			JOIN blogComment bc ON u.id = bc.owner
 			JOIN blog b ON bc.bid = b.id
@@ -444,7 +488,12 @@ class Feed
                 'date' => $row['submitted'],
                 'type' => 'blog',
                 'message' => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row) . '</a> commented on the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text($row['heading']) . '</a>',
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
+                    $row
+                ) . '</a> commented on the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text(
+                    $row['heading']
+                ) . '</a>',
+                'external_id' => $row['external_id'],
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
             );
@@ -463,8 +512,7 @@ class Feed
 
     // TODO: text box updates
 
-    function timecmp($a, $b)
-    {
+    function timecmp($a, $b) {
         //just a quick function to enable sorting of news based on time
         if ($a['date'] == $b['date']) {
             return 0;

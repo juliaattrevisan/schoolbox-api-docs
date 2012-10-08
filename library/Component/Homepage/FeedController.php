@@ -25,14 +25,15 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
 
         $feed = array();
 
-        if(count($feedList)) {
-            foreach($feedList as $f) {
+        if (count($feedList)) {
+            foreach ($feedList as $f) {
                 $feedTime = new Alaress_Date_Relative($f['date']);
                 $feedTime->setPrefix('');
                 $feed[] = array(
                     'icon' => $f['type'],
-                    'content' => $f['messageHTML'] . (empty($f['cat_name']) ? '' : ' in <a href="/homepage/' . $f['cat_id'] . '">' . $f['cat_name'] . '</a>'),
+                    'content' => $f['messageHTML'],
                     'time' => $feedTime->getRelativeTime(),
+                    'avatar' => $f['external_id'] != false ? '/portrait.php?userId=' . $f['external_id'] . '&size=square32' : '',
                 );
             }
         }
@@ -46,14 +47,14 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
      * @return boolean
      */
     public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'feed')) {
+        if (!parent::loadTemplate($templateHandle, 'feed')) {
             return false;
         }
         $this->parseConfig();
 
-        $this->activityList->setShowAvatars(false);
+        $this->activityList->setShowAvatars(true);
         $this->activityList->setTarget($this->sitepage, 'ACTIVITY_LIST');
-        foreach($this->activityList as $a) {
+        foreach ($this->activityList as $a) {
             // iterates the set
         }
 

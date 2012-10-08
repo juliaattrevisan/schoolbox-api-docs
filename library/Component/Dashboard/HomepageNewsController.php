@@ -6,8 +6,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Dashboard_HomepageNewsController extends Component_Dashboard_ControllerAbstract
-{
+class Component_Dashboard_HomepageNewsController extends Component_Dashboard_ControllerAbstract {
 
     private $feedList;
     private $limit = 20;
@@ -20,21 +19,28 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
         if (is_array($userAccess)) {
             $categoryIDs = array();
 
-            foreach ($userAccess as $ua)
+            foreach ($userAccess as $ua) {
                 $categoryIDs[] = $ua['id'];
+            }
 
-            $feedList = $feedHandler->getFeed($categoryIDs, $this->getConfig('size') ? $this->getConfig('size') : $this->limit);
+            $feedList = $feedHandler->getFeed(
+                $categoryIDs, $this->getConfig('size') ? $this->getConfig('size') : $this->limit
+            );
 
             // map the feed for the ActivityList
-            if(count($feedList)) {
-                foreach($feedList as $f) {
+            if (count($feedList)) {
+                foreach ($feedList as $f) {
                     $feedTime = new Alaress_Date_Relative($f['date']);
                     $feedTime->setPrefix('');
+
                     $this->feedList[] = array(
                         'icon' => $f['type'],
                         'content' => $f['messageHTML'] . (empty($f['cat_name']) ? '' : ' in <a href="/homepage/' . $f['cat_id'] . '">' . $f['cat_name'] . '</a>'),
                         'time' => $feedTime->getRelativeTime(),
+                        'avatar' => $f['external_id'] != false ? '/portrait.php?userId=' . $f['external_id'] . '&size=square32' : '',
                     );
+
+
                 }
                 return true;
             }
@@ -48,9 +54,9 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
         }
 
         $alist = new Activity_ListArray($this->feedList);
-        $alist->setShowAvatars(false);
+        $alist->setShowAvatars(true);
         $alist->setTarget($this->sitepage, 'ACTIVITY_LIST');
-        foreach($alist as $a) {
+        foreach ($alist as $a) {
             // iterates the set
         }
         return true;
