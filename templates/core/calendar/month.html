@@ -44,6 +44,9 @@
 
 			<a class="forward" href="/calendar/month/{FORWARD}" title="Forward one month"><strong>&gt;&gt;</strong></a>
 		</div>
+
+         <h3>{MONTH} {YEAR}</h3>
+
 		<div class="float-right">
 			<div class="link-case">
 			<a class="filter-change month current" href="#"><span></span>Month</a>
@@ -86,20 +89,19 @@
 				</div>
 			</div>
 		</div>
-		<h3>{MONTH} {YEAR}</h3>
 
 	</div>
       <table id="month-view" cellpadding="0" cellspacing="0">
       	<thead>
 
 		<tr>
-        	<td class="dark border-left">Sun</td>
-            <td class="dark">Mon</td>
-            <td class="dark">Tue</td>
-            <td class="dark">Wed</td>
-            <td class="dark">Thu</td>
-            <td class="dark">Fri</td>
-            <td class="dark">Sat</td>
+        	<th class="dark">Sun</th>
+            <th class="dark">Mon</th>
+            <th class="dark">Tue</th>
+            <th class="dark">Wed</th>
+            <th class="dark">Thu</th>
+            <th class="dark">Fri</th>
+            <th class="dark">Sat</th>
         </tr>
         </thead>
         <tbody>
@@ -115,7 +117,7 @@
 					<ul class="js_happening">
 						<!-- BEGIN note -->
                         <li class="{EVENT_TYPE} {EVENT_LEVEL} {EVENT_VISIBLE}">
-                            <span style="background-color:{COLOUR}; border:1px solid {COLOUR};">{NOTE}
+                            <span style="background-color:{COLOUR}; border:1px solid {COLOUR};"><strong>{TIME}</strong> {NOTE}
                                 <!-- BEGIN attendance_icon --><strong class="float-right">A</strong><!-- END attendance_icon -->
                             </span>
 

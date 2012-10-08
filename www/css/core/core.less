@@ -89,6 +89,9 @@ Variablahs
 @chat-list-alternative-background: #ecf7e7;
 @search-background: #fffde9;
 
+@border-color: #eeeeee;
+@highlight-color: #ffffb2;
+
 /*
 Mixarns
 */
@@ -806,6 +809,7 @@ Notifications
         height: 26px;
         color: #000 !important;
         font-size: 22px;
+        background: @dark;
     }
 
     a.edit {
@@ -848,7 +852,8 @@ Notifications
             position: absolute;
             top: 0;
             right: 0;
-            color: #fff;
+            color: #000;
+            background: @dark;
         }
     }
 
@@ -1075,9 +1080,6 @@ Notifications
         font-weight: bold;
         text-align: center;
         height: 20px;
-        span {
-            color: #fff;
-        }
         &:hover {
             text-decoration: none;
             background: #000;
@@ -1268,7 +1270,7 @@ fieldset {
     td {
         vertical-align: top;
         padding: 16px;
-        border-bottom: 1px solid #e9e3d6;
+        border-bottom: 1px solid @border-color;
         h4 {
             font-size: 16px;
             margin-bottom: 16px;
@@ -3988,13 +3990,17 @@ CALENDAR
         width: 100%;
         background: @white;
         position: relative;
-        thead td {
-            text-align: center;
+        border-top: 1px solid @border-color;
+        border-left: 1px solid @border-color;
+        thead th {
+            font-weight: bold;
             color: @black;
+            border-right: 1px solid @border-color;
+            border-bottom: 1px solid darken(@border-color,10%);
+            padding: 7px 5px;
         }
         .dark {
             background: @dark;
-            text-align: center;
         }
         p {
             margin-bottom: 0.5em;
@@ -4005,9 +4011,9 @@ CALENDAR
     }
     h3 {
         font-weight: bold;
-        line-height: 24px;
-        font-size: 20px;
-        color: #000;
+        font-size: 13px;
+        line-height: 32px;
+        color: @module-heading;
     }
     .agenda-view {
         h3 {
@@ -4054,8 +4060,7 @@ CALENDAR
 
 .day-block span.time {
     display: block;
-    background: @white;
-    border: 1px #ccc solid;
+    border: 1px solid @border-color;
     border-bottom: 0;
     padding: 3px;
     margin: 5px 10px 0 5px;
@@ -4063,12 +4068,25 @@ CALENDAR
 
 /*the top of the calendar*/
 .calendar-controls {
+    background: @module-background;
+    margin: 0;
+    font-size: 12px;
+    min-height: 32px;
+    line-height: 32px;
+    padding: 0 16px;
+    color: @module-heading;
+    font-size: 13px;
+    font-weight: bold;
+    a {
+        color: @module-heading;
+    }
     text-align: right;
     padding: 0;
-    z-index: 10;
     text-align: left;
     h3 {
         float: left;
+        font-size: 13px;
+        color: @module-heading;
     }
     a {
         display: block;
@@ -4086,20 +4104,26 @@ CALENDAR
         width: 26%;
     }
     .float-right {
-        width: 50%;
         z-index: 1000;
+        margin-right: 6px;
         .filter-change {
             float: right;
         }
+    select {
+        width: 150px;
+        max-width: 150px;
+    }
     }
     .back, .forward, .datepicker-box {
-        width: 46px;
-        height: 24px;
+        width: 22px;
+        height: 22px;
         text-indent: -9999em;
         font-size: 1px;
         padding: 0;
         background-color: @subnav-background;
-        margin-right: 4px;
+        margin-left: 6px;
+        margin-top: 4px;
+        border: 1px solid #D1D1D1;
     }
     .back, .forward {
         text-indent: -99999em;
@@ -4113,28 +4137,26 @@ CALENDAR
     .datepicker-box {
         float: left;
         text-align: center;
-        width: 43px;
-        margin: 0;
-        margin-right: 4px;
         &:hover {
             background-color: @subnav-header-background;
         }
     }
 
     .filter-change {
-        margin-top: 0px;
-        height: 24px;
-        line-height: 24px;
+        margin-top: 4px;
+        height: 22px;
+        line-height: 22px;
         padding: 0 9px 0 38px;
         color: #797979;
         display: inline-block;
         text-decoration: none;
         background: @subnav-background;
+        border: 1px solid #D1D1D1;
         position: relative;
-        margin-right: 4px;
+        margin-left: 6px;
         span {
             position: absolute;
-            top: 5px;
+            top: 4px;
             left: 12px;
             height: 14px;
             width: 12px;
@@ -4173,7 +4195,6 @@ CALENDAR
         background: #fffde9 url(/images/core/calendar/filter-list.png) 11px 6px no-repeat;
         padding: 0 12px 0 39px;
         color: #797979;
-        margin-right: 4px;
         &:hover {
             background: #e6f6f9 url(/images/core/calendar/filter-list.png) 11px 6px no-repeat;
         }
@@ -4188,15 +4209,14 @@ CALENDAR
     .ui-datepicker-trigger {
         cursor: pointer;
         display: block;
-        margin: 4px auto 0;
-        padding: 0 16px;
+        margin: 4px auto 4px;
         &:hover {
             cursor: pointer;
         }
     }
     #ui-datepicker-div {
         display: none;
-        z-index: 20;
+        z-index: 99;
     }
     .filter-cat {
         float: left;
@@ -4250,7 +4270,9 @@ CALENDAR
             }
             .filter-list {
                 background: #e6f6f9;
-                padding: 16px 16px 0 16px
+                padding: 16px 16px 0 16px;
+                line-height: 16px;
+                color: #000;
             }
         }
     }
@@ -4258,10 +4280,8 @@ CALENDAR
 
 /*day specific styles*/
 .dayWrap {
-    color: @white;
     text-align: left;
     height: 20px;
-    background-color: @module-background;
     padding: 3px 5px;
     position: relative;
 }
@@ -4289,15 +4309,18 @@ CALENDAR
     width: 14%;
     padding: 0;
     background: @subnav-background;
-    border-bottom: 3px solid @white;
-    border-right: 3px solid @white;
+    border-bottom: 1px solid @border-color;
+    border-right: 1px solid @border-color;
     vertical-align: top;
+    &.calTableSelected {
+        background: @highlight-color;
+    }
 }
 
 ul.js_happening {
     width: 100%;
     li {
-        margin: 4px;
+        margin-top: 1px;
         position: relative;
         min-height: 1px;
         overflow: hidden;
@@ -4313,7 +4336,7 @@ ul.js_happening {
             }
         }
         &:first-child {
-            margin-top: 4px;
+            margin-top: 0px;
         }
     }
 }
@@ -4455,12 +4478,12 @@ ul.js_happening li span:hover {
     font-weight: normal;
 }
 
-.otherMonth .dayWrap, .past .dayWrap {
-    background-color: #eaf6e3;
+.otherMonth, .past {
+    background-color: @dark;
 }
 
 .otherMonth .dayWrap p, .otherMonth .dayWrap a {
-    color: #1597cb;
+    /*color: #1597cb;*/
 }
 
 .otherMonth .day-num {
@@ -4468,7 +4491,7 @@ ul.js_happening li span:hover {
 }
 
 .otherMonth ul li span {
-    opacity: .3
+    opacity: .5
 }
 
 .otherMonth select {
@@ -4848,7 +4871,7 @@ COMPONENT
 }
 
 .calendar ul li {
-    padding: 0 16px;
+    padding: 0;
 }
 .calendar .eventListing strong {
     display: block;
@@ -5222,15 +5245,18 @@ Dropbox
 
 #calendar table th.dark {
     border: 0;
+    padding: 7px 5px;
+    border-right: 1px solid @border-color;
+    border-bottom: 1px solid darken(@border-color,10%);
 }
 
 .left #calendar table.duedates-calendar {
     width: 100%;
     margin-bottom: 20px;
     border: none;
-    border-right: 1px dotted #cdcdcd;
+    border-right: 1px solid @border-color;
     height: 101px;
-    border-bottom: 1px dotted #cdcdcd;
+    border-bottom: 1px solid @border-color;
 }
 
 .left #calendar table.duedates-calendar thead td {
@@ -5240,13 +5266,15 @@ Dropbox
 
 .left #calendar table.duedates-calendar td {
     height: 101px;
-    border-left: 1px dotted #cdcdcd;
-    border-top: 1px dotted #cdcdcd;
-    background: none repeat scroll 0 0 #FFFFFF;
+    border-left: 1px solid @border-color;
+    border-top: 1px solid @border-color;
     font-weight: normal;
     padding: 0;
     text-align: left;
     vertical-align: top;
+    &.today {
+        background: @highlight-color;
+    }
 }
 
 .left #calendar table.duedates-calendar h3 {
@@ -5257,7 +5285,6 @@ Dropbox
 }
 
 .left #calendar table.duedates-calendar span.wrapper {
-    border: 1px solid #717171;
     background: none repeat scroll 0 0 #717171;
     color: #FFFFFF;
     cursor: pointer;
@@ -5269,20 +5296,15 @@ Dropbox
     background: none repeat scroll 0 50% transparent;
     color: #007DCD;
     font-size: 11px;
-    margin: 2px 0 0 0;
-    padding: 0 2px;
+    margin: 1px 0 0 0;
     position: relative;
 }
 
 .left #calendar table.duedates-calendar ul {
     line-height: 1.5;
-    margin: 0 0 2px;
 }
 
 .current-date {
-    line-height: 24px;
-    padding: 0 10px;
-    height: 24px;
     float: left;
 }
 
@@ -7139,8 +7161,7 @@ label {
 }
 
 ul.activity-list                                {
-    li                                          {   border-bottom: solid 1px @light-grey; // remove this for production, for now it's just pretty
-                                                    padding: 8px 4px;
+    li                                          {   padding: 8px 4px;
                                                     position: relative;
                                                     padding-left: 35px;
                                                     overflow: hidden;
@@ -7186,7 +7207,6 @@ ul.activity-list                                {
         }
         .time                                   {   display: block;
                                                     float: right;
-                                                    color: @secondary-text;
         }
     }
 }

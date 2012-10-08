@@ -10,6 +10,9 @@
     }
 </style>
 <script type="text/javascript" src="/javascript/ui.core.js"></script>
+<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript" src="/javascript/jquery.progressbar.js"></script>
 <script type="text/javascript" src="/javascript/jquery.tmpl.min.js"></script>
 <script type="text/javascript">
@@ -81,6 +84,18 @@ $j(function () {
             return false;
         });
     }
+
+    $j('.datepicker').datepicker({
+        dateFormat:'yy-mm-dd',
+        showOn:'both',
+        buttonImage:'/images/core/calendar/calendar-click.png',
+        buttonImageOnly:true,
+        constrainInput:false,
+        onSelect: function(dateText, inst) {
+            var url = '/submission/dueWork/' + dateText + '/{WORK_USER_ID}';
+            window.open(url, "_self");
+        }
+    });
 });
 </script>
 <!-- END custom_head -->
@@ -107,13 +122,16 @@ $j(function () {
 <div class="left">
 	<div id="calendar">
         <div class="calendar-controls clearfix">
-            <div>
+            <div class="float-left clearfix">
 
                 <a class="back" href="/submission/dueWork/{PREV_MONTH}/{WORK_USER_ID}" title="Back one month"><strong>&lt;&lt;</strong></a>
-                <div class="current-date">{CURRENT_DATE}</div>
+                <div class="datepicker-box">
+                    <input type="hidden" class="datepicker" />
+                </div>
                 <a class="forward" href="/submission/dueWork/{NEXT_MONTH}/{WORK_USER_ID}" title="Forward one month"><strong>&gt;&gt;</strong></a>
 
             </div>
+            <div class="current-date">{CURRENT_DATE}</div>
             <div class="float-right">
                 <select name="subject" id="subjectFilter">
                     <option value="">Show All</option>
