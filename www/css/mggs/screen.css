@@ -669,13 +669,10 @@ ul.js_happening li:nth-child(odd){
 /*****************************************
 	LOGIN
 *****************************************/
-.mggs-login {
-	background: #f4f3ef;
-}
 .mggs-login #container {
 	margin: 0;
 	padding: 0;
-	background:#F4F3EF;
+	background:#fff;
 }
 .mggs-login #content {
 	background: url(/images/mggs/login-bg.png) no-repeat;
@@ -811,7 +808,7 @@ MORRIS LIBRARY
 #morris .cybersmart p{line-height:18px; margin-bottom:0;}
 
 .updates #galleryCycle div{position:absolute; left:0; top:0;}
-.login-words{height:50px; width:428px; background: url(/images/mggs/mggs-login-words.png) no-repeat; position:absolute; right:50px; bottom:0;}
+/*.login-words{height:50px; width:428px; background: url(/images/mggs/mggs-login-words.png) no-repeat; position:absolute; right:50px; bottom:0;}*/
 
 /*--------------------------------------
     QUICKLINKS
