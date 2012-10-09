@@ -180,7 +180,42 @@ $j(function () {
 			</tbody>
 		</table>
 	</div>
-	<div class="box component">
+
+    <div class="box component">
+        <h2>Upcoming Due Work
+            <!-- BEGIN view_all_due_work --><a href="/submission/allDueWork/{WORK_USER_ID}" class="btn"><span></span>View all work</a>
+            <!-- END view_all_due_work -->
+        </h2>
+        <div class="listing">
+            <table class="due-dates">
+                <tbody>
+                <tr class="dark">
+                    <td><a href="">Due Work Title</a><br />
+                        <a href="">Subject</a> work type</td>
+                    <td><span style="color:orange;">Due Tomorrow</span> at Time</td>
+                    <td><a class="btn up-arrow"><span></span> Submit</a></td>
+                </tr>
+                <tr>
+                    <td><a href="">Eating bacon</a><br />
+                        <a href="">Home Economics</a> Oral</td>
+                    <td><span style="color:red;">Due Today</span> at 7PM</td>
+                    <td><a class="btn modify"><span></span> Sit</a></td>
+                </tr>
+
+                <!-- BEGIN work -->
+                <tr class="{ROW_COLOR}">
+                    <td>{WORK_DESCRIPTION}<br />
+                        {WORK_SUBJECT}</td>
+                    <td>{WORK_DATE}</td>
+                    <td nowrap="nowrap"><a href="/submission/submissionHistory/{WORK_BOX_ID}/{WORK_USER_ID}">{WORK_ACTION}</a></td>
+                </tr>
+                <!-- END work -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="box component">
 		<h2>Recent Work Activity
             <!-- BEGIN view_all_due_work --><a href="/submission/allDueWork/{WORK_USER_ID}" class="btn"><span></span>View all work</a>
             <!-- END view_all_due_work -->
