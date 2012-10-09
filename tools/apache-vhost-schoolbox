@@ -1,10 +1,75 @@
 <VirtualHost *:80>
-  DocumentRoot /usr/share/schoolbox/www
-  <Directory /usr/share/schoolbox>
-        Options FollowSymLinks
-        AllowOverride All
-        Order allow,deny
-        Allow from all
-        Satisfy all
-  </Directory>
+	ServerName schoolbox.schoolname.edu
+	DocumentRoot /usr/share/schoolbox/www
+
+	<Directory /usr/share/schoolbox>
+		Options FollowSymLinks
+		AllowOverride All
+		Order allow,deny
+		Allow from all
+		Satisfy all
+	</Directory>
+
+	ErrorDocument 404 /index.php?page=common/404
+
+	Options +FollowSymLinks
+	Options -Multiviews
+
+	RewriteEngine on
+
+	# PHP Error handling
+	php_flag display_startup_errors off
+	php_flag display_errors off
+	php_flag html_errors off
+	php_flag log_errors on
+	#php_value error_reporting 6135
+	php_value error_reporting 30711
+	php_flag auto_detect_line_endings On
+	php_value docref_root 0
+	php_value docref_ext 0
+	php_value upload_max_filesize 512M
+	php_value post_max_size 512M
+	php_flag session.use_trans_sid on
+	php_value session.gc_maxlifetime 43200
+	php_value session.cache_expire 43200
+	php_value session.cookie_lifetime 43200
+
+	# Assess uses JSON arrays to transfer data in multi-choice/matching pairs
+	# JSON arrays don't like being escaped!!
+	php_flag magic_quotes_gpc Off
+
+	RewriteCond  %{REQUEST_URI} login.php$
+	RewriteRule ^(.*)$ http://%{HTTP_HOST}/ [R,L]
+
+	# apply ssl
+	#RewriteCond %{SERVER_PORT} !^443$
+	#RewriteCond %{REQUEST_URI} ^/$
+	#RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R,L]
+
+	# remove ssl
+	#RewriteCond %{SERVER_PORT} ^443$
+	#RewriteCond %{REQUEST_URI} !^/$
+	#RewriteCond %{REQUEST_URI} !\.[A-Za-z]{2,4}$
+	#RewriteRule ^(.*)$ http://%{HTTP_HOST}/$1 [R,L]
+
+	RewriteCond %{SCRIPT_FILENAME}/ -d
+	RewriteRule [^/]$ %{REQUEST_URI}/ [R=301,L]
+
+	# required to bypass central authentication for RSS feeds
+	RewriteCond %{REQUEST_URI} /homepage/rss/[0-9]*
+	RewriteRule ^(.*)$ /homepage/rss.php?page=$1 [L]
+
+	# Mobile Edition
+	#RewriteCond %{REQUEST_URI} !/m/inc/.*
+	#RewriteCond %{REQUEST_URI} !/m/manifest.php
+	#RewriteCond %{REQUEST_FILENAME} !-d
+	#RewriteCond %{REQUEST_FILENAME} !-f
+	#RewriteRule ^(.*)$ m/index.php?url=$1 [L,QSA]
+
+	RewriteCond %{REQUEST_URI} !/dav/.*
+	# Mobile Edition
+	#RewriteCond %{REQUEST_URI} !/m/.*
+	RewriteCond %{REQUEST_URI} !\.[A-Za-z]{2,4}$
+	RewriteRule ^(.*)$ /index.php?page=$1 [L,QSA]
+
 </VirtualHost>
