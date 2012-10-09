@@ -57,7 +57,8 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
 
         $this->setBlock($templateHandle, 'wiki_row', 'wiki_row_block');
         $this->setBlock($templateHandle, 'submit_wiki', 'submit_wiki_block');
-        $this->setBlock('wiki_row', 'modify_wiki', 'modify_wiki_block');
+        $this->setBlock('wiki_row', 'compact_hide', 'compact_hide_block');
+        $this->setBlock('compact_hide', 'modify_wiki', 'modify_wiki_block');
 
         // Custom sorting options
 
@@ -106,7 +107,16 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
                     'ON_OFF' => ++$j % 2 ? '' : 'dark',
                 ));
 
-                $this->setVar('modify_wiki_block', '');
+                if($this->getConfig('compactMode')) {
+                    $this->setVar('compact_hide_block', '');
+                }
+                else {
+                    $this->parse('compact_hide_block', 'compact_hide');
+                }
+
+                $this->setVar(array(
+                    'modify_wiki_block' => ''
+                ));
 
                 if (($this->permission >= READ_ACCESS && $wiki['locked'] == 'false') || $this->permission >= WRITE_ACCESS) {
                     $this->parse('modify_wiki_block', 'modify_wiki');

@@ -106,6 +106,9 @@ class DashboardComponentReFactory {
         ),
         'Teachers'    => array(
             'displayPortraits' => ''
+        ),
+        'Wiki'        => array(
+            'compactMode' => 'false'
         )
     );
 
