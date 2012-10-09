@@ -77,10 +77,11 @@ class Calendar_Event_Type_Day_Renderer extends Calendar_Event_Type_Renderer_Abst
 			}
 
 			/* If a time was specified, show it; otherwise hide it
-			 */
-			if (strlen($currentEvent->getDerivedTime())) {
-				$this->getPage()->parse('time_block', 'time');
-			}
+			 TODO Stevespection */
+
+//			if (strlen($currentEvent->getDerivedTime(true))) {
+//				$this->getPage()->parse('time_block', 'time');
+//			}
 
 			/* Event attendance
 			 */
