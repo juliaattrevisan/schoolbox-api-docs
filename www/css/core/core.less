@@ -1178,6 +1178,14 @@ p.interact {
     margin: 0 0 0 15px;
     float: right;
     text-align: right;
+    color: @secondary-text;
+}
+.left, .right, .top {
+    p.interact,
+    p.hide-on-small,
+    p.small {
+        color: @secondary-text;
+    }
 }
 
 p.interact-left {
@@ -5275,6 +5283,17 @@ Dropbox
     text-align: left;
 }
 
+.upcoming-work {
+    width: 100%;
+    td {
+        vertical-align: bottom;
+        color: @secondary-text;
+    }
+    .title {
+        font-weight: bold;
+    }
+}
+
 #calendar table th.dark {
     border: 0;
     padding: 7px 5px;
@@ -6094,6 +6113,7 @@ table.subjectList {
     vertical-align: bottom;
     text-align: left;
     font-size: 12px;
+    white-space: nowrap;
 }
 
 .mark-sheet.names {
@@ -7288,6 +7308,7 @@ ul.activity-list {
         .time {
             display: block;
             float: right;
+            color: @secondary-text;
         }
     }
 }
