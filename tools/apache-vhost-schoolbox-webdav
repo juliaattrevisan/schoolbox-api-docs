@@ -4,7 +4,6 @@
 
 	<Directory /usr/share/schoolbox>
 		Options FollowSymLinks
-		AllowOverride All
 		Order allow,deny
 		Allow from all
 		Satisfy all
