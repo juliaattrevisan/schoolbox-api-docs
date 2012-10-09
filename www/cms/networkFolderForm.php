@@ -27,14 +27,12 @@ if (isset($_POST['name'])) {
 
         $folder['id'] = $_POST['folderID'];
         $folderHandler->update($folder);
-    }
-    else {
+    } else {
         $folder['id'] = $folderHandler->create($folder);
     }
 
-    SitePage::localRedir('/cms/portfolio/' . $folder['id']);
-}
-elseif (is_numeric($_GET['delete'])) {
+    SitePage::localRedir('/cms/network/' . $folder['id']);
+} elseif (is_numeric($_GET['delete'])) {
 
     if (!$folder = $folderHandler->getByID($_GET['delete'])) {
         error(2);
@@ -46,9 +44,8 @@ elseif (is_numeric($_GET['delete'])) {
 
     $folderHandler->delete($_GET['delete']);
 
-    SitePage::localRedir('/cms/portfolio/' . $folder['parent']);
-}
-elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
+    SitePage::localRedir('/cms/network/' . $folder['parent']);
+} elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
     /* Move file from one category to another, after checking permission on both from and to categories */
     if ($_POST['move'] == $_POST['categoryID'] || !$folder = $folderHandler->getByID($_POST['move'])) {
         echo "Failed";
@@ -59,8 +56,7 @@ elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
     }
 
     $folderHandler->update(array('id' => $_POST['move'], 'parent' => $_POST['categoryID']));
-}
-elseif (is_numeric($_POST['portfolioID'])) {
+} elseif (is_numeric($_POST['portfolioID'])) {
     $_SESSION['portfolioID'] = $_POST['portfolioID'];
 }
 

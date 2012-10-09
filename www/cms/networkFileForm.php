@@ -28,17 +28,15 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
 
         $file['id'] = $_POST['fileID'];
         $fileHandler->update($file);
-    }
-    else {
+    } else {
         $allowedFileHandler = new AllowedFile;
         $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 
         $fileHandler->create($file, $_FILES['file']);
     }
 
-    SitePage::localRedir('/cms/portfolio/' . $_POST['parent']);
-}
-elseif (is_numeric($_GET['delete'])) {
+    SitePage::localRedir('/cms/network/' . $_POST['parent']);
+} elseif (is_numeric($_GET['delete'])) {
 
     if (!$file = $fileHandler->getByID($_GET['delete'])) {
         error(2);
@@ -50,18 +48,19 @@ elseif (is_numeric($_GET['delete'])) {
 
     $fileHandler->delete($_GET['delete']);
 
-    SitePage::localRedir('/cms/portfolio/' . $file['parent']);
-}
-else if (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
-    /* Move file from one category to another, after checking permission on both from and to categories
-      */
-    if (!$file = $fileHandler->getByID($_POST['move'])) {
-        echo "Failed";
-    }
+    SitePage::localRedir('/cms/network/' . $file['parent']);
+} else {
+    if (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
+        /* Move file from one category to another, after checking permission on both from and to categories
+          */
+        if (!$file = $fileHandler->getByID($_POST['move'])) {
+            echo "Failed";
+        }
 
-    if ($file['owner'] != $_SESSION['id']) {
-        echo "Insufficient permssions";
-    }
+        if ($file['owner'] != $_SESSION['id']) {
+            echo "Insufficient permssions";
+        }
 
-    $fileHandler->update(array('id' => $_POST['move'], 'parent' => $_POST['categoryID']));
+        $fileHandler->update(array('id' => $_POST['move'], 'parent' => $_POST['categoryID']));
+    }
 }

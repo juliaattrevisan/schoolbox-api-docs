@@ -7,6 +7,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/allowed-file.php';
 if (!Cfg::get('webdav_enable')) {
     error(2);
 }
+
 $this->setFile(TEMPLATE_content, 'cms/network.html');
 $this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
 $this->setBlock(TEMPLATE_content, 'file_list', 'file_list_block');
@@ -21,7 +22,7 @@ $allowedFiles = new AllowedFile;
 unset($_SESSION['portfolioID']);
 if (isset($this->arg[0])) {
     $_SESSION['portfolioID'] = $this->arg[0];
-    SitePage::localRedir('/cms/portfolio/');
+    SitePage::localRedir('/cms/network/');
 } else {
     $openFolder = $_SESSION['portfolioID'];
 }
@@ -74,7 +75,8 @@ if (is_array($folderList)) {
         // write access
         $class[] = "write";
 
-        $output = array('CATEGORY_ID' => $folder['id'],
+        $output = array(
+            'CATEGORY_ID' => $folder['id'],
             'CATEGORY_NAME' => Scrub::text($folder['name']),
             'CLASS' => implode(" ", $class),
         );
@@ -102,7 +104,8 @@ if (is_array($fileList) && count($fileList) > 0) {
            */
         $modifiedTime = new Alaress_Date_Format(strtotime($file['submitted']), 'U');
 
-        $output = array('FILE_ID' => $file['id'],
+        $output = array(
+            'FILE_ID' => $file['id'],
             'TYPE' => 'file',
             'FILE_NAME' => Scrub::text($file['description']),
             'FILE_MODIFIED' => $modifiedTime->getShort(),
@@ -117,7 +120,9 @@ if (is_array($fileList) && count($fileList) > 0) {
 
     }
 } else {
-    $this->setVar('file_list_block', '<tr class="category-' . $openFolder . ' empty"><td>No files to display</td></tr>');
+    $this->setVar(
+        'file_list_block', '<tr class="category-' . $openFolder . ' empty"><td>No files to display</td></tr>'
+    );
 }
 
 // output mime classes
@@ -127,7 +132,8 @@ if (is_array($allowedList)) {
     $last = '';
     foreach ($allowedList as $allowed) {
         if ($last != $allowed["iconFile"]) {
-            $output = array("NAME" => $allowedFiles->getClass($allowed["iconFile"]),
+            $output = array(
+                "NAME" => $allowedFiles->getClass($allowed["iconFile"]),
                 "ICON" => $allowed["iconFile"],
             );
 

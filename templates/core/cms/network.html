@@ -34,24 +34,7 @@ $j(document).ready(function () {
                     window.open("/cms/networkFileForm.php?delete=" + $j(this).attr("id").substring(5), "_self");
             },
             icon:'/images/famicons/page_delete.png'
-        }},
-        $j.contextMenu.separator,
-        {
-            "Publish":{
-                onclick:function () {
-                    window.open("/cms/networkFileForm.php?publish=" + $j(this).attr('id').substring(5), '_self');
-                },
-                icon:'/images/famicons/page_edit.png'
-            }
-        },
-        {
-            "Unpublish":{
-                onclick:function () {
-                    window.open("/cms/networkFileForm.php?unpublish=" + $j(this).attr('id').substring(5), '_self');
-                },
-                icon:'/images/famicons/page_edit.png'
-            }
-        }
+        }}
     ];
 
     // define folder context menu
@@ -90,7 +73,7 @@ $j(document).ready(function () {
         node:'tr',
         onOff:'dark',
         sequencing:false,
-        url:'/cms/portfolioForm.php',
+        url:'/cms/networkForm.php',
         fileAjax:'/cms/networkFileForm.php',
         categoryAjax:'/cms/networkFolderForm.php'
     });

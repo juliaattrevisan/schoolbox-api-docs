@@ -10,11 +10,13 @@ $folderHandler = PortfolioWebDAV::factory();
 
 if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
 
-    if (!($folder = $folderHandler->getByID($this->arg[0])))
+    if (!($folder = $folderHandler->getByID($this->arg[0]))) {
         error(2);
+    }
 
-    if ($folderHandler->isRoot($this->arg[0]))
+    if ($folderHandler->isRoot($this->arg[0])) {
         error(2);
+    }
 
 
     $this->setFile(TEMPLATE_content, "cms/networkFolder.html");
@@ -24,7 +26,8 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     $this->setTitle('Modify Network Folder');
     $this->setTab('mynetwork');
 
-    $output = array('ACTION' => 'Modify',
+    $output = array(
+        'ACTION' => 'Modify',
         'FOLDER_ID' => $folder['id'],
         'NAME' => Scrub::text($folder['name']),
         'PARENT_ID' => $folder['parent'],
@@ -34,24 +37,28 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     $this->setBlock(TEMPLATE_content, 'location', 'location_block');
     $this->setVar('location_block', '');
 
-} else if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+} else {
+    if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
-    $this->setFile(TEMPLATE_content, 'cms/myFolder.html');
-    $this->setBlock(TEMPLATE_content, 'parent_list', 'parent_list_block');
+        $this->setFile(TEMPLATE_content, 'cms/networkFolder.html');
+        $this->setBlock(TEMPLATE_content, 'parent_list', 'parent_list_block');
 
 
-    $this->setTitle('Add Folder');
-    $this->setTab('resources');
+        $this->setTitle('Add Folder');
+        $this->setTab('resources');
 
-    $output = array('ACTION' => 'Add',
-        'FOLDER_ID' => '',
-        'NAME' => '',
-        'PARENT_ID' => $this->arg[1],
-    );
-    $this->setVar($output);
+        $output = array(
+            'ACTION' => 'Add',
+            'FOLDER_ID' => '',
+            'NAME' => '',
+            'PARENT_ID' => $this->arg[1],
+        );
+        $this->setVar($output);
 
-    $this->setBlock(TEMPLATE_content, 'location', 'location_block');
-    $this->setVar('location_block', '');
+        $this->setBlock(TEMPLATE_content, 'location', 'location_block');
+        $this->setVar('location_block', '');
 
-} else
-    $this->error(2);
+    } else {
+        $this->error(2);
+    }
+}
