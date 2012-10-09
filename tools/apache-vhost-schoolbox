@@ -10,13 +10,13 @@
 	</Directory>
 
 	# Minify Exceptions
-	<Directory /usr/share/schoolbox/www/min/>
+	<Directory /usr/share/schoolbox/www/min>
 		RewriteEngine on
 		RewriteRule ^([a-z]=.*)  index.php?$1  [L,NE]
 	</Directory>
 
 	# MGS Sport Module Exceptions
-	#<Directory /usr/share/schoolbox/www/min/>
+	#<Directory /usr/share/schoolbox/www/modules/sport>
 	#	php_flag apc.enabled off
 	#</Directory>
 
