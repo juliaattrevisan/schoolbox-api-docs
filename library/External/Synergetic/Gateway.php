@@ -124,6 +124,8 @@ class External_Synergetic_Gateway {
 			$staffID,
 			$timetableGroup
 		);
+
+		print_r($input);
 	}
 
 	public function selectWkAttendances($wkAttendanceMasterSeq) {

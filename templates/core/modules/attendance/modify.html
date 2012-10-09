@@ -1,0 +1,46 @@
+<h1>Student Attendance</h1>
+<h2>{ATTENDANCE_DATE_FORMATTED}</h2>
+
+<table>
+	<tr>
+		<th></th>
+		<th>Firstname</th>
+		<th>Surname</th>
+		<th>Absent</th>
+		<th style='width:500px'>Absentee Details</th>
+	</tr>
+	<!-- BEGIN student -->
+	<tr class='{ON_OFF}'>
+		<td><img src='/portrait.php?userId={STUDENT_UID}&size=square64' width='32' height='32' alt="{STUDENT_FIRSTNAME} {STUDENT_LASTNAME}" /></td>
+		<td><a href='/search/user/{STUDENT_UID}'>{STUDENT_FIRSTNAME}</a></td>
+		<td><a href='/search/user/{STUDENT_UID}'>{STUDENT_LASTNAME}</a></td>
+		<td><input type='checkbox' name='attending[]' value='{STUDENT_SYNERGY_ID}' {IS_ABSENT} /></td>
+		<td>
+
+			<div style='border:1px solid #f00;'>
+				<form method='post' action='/modules/attendance/modifyForm'>
+					<label>Absence Options</label>
+					<select name='absenceCode_{STUDENT_SYNERGY_ID}'>
+						<!-- BEGIN absence_options -->
+						<option value='ABSENCE_OPTIONS_VALUE' {ABSENCE_OPTIONS_SELECTED}>{ABSENCE_OPTIONS_DESCRIPTION}</option>
+						<!-- END absence_options -->
+					</select>
+
+					<label>Reason Options</label>
+					<select name='reason_{STUDENT_SYNERGY_ID}'>
+						<!-- BEGIN reason_options -->
+						<option value='REASON_OPTIONS_VALUE' {REASON_OPTIONS_SELECTED}>{REASON_OPTIONS_DESCRIPTION}</option>
+						<!-- END reason_options -->
+					</select>
+
+					<!-- Maximum length of this description is 100, as it's set in synergetic db -->
+					<label>Reason Description</label>
+					<input type='text' maxlength='100' name='possibleReasonDescription_{STUDENT_SYNERGY_ID}' value="{STUDENT_REASON_DESCRIPTION}" />
+
+					<input class='btn update' type='submit' value='update' />
+				</form>
+			</div>
+		</td>
+	</tr>
+	<!-- END student -->
+</table>

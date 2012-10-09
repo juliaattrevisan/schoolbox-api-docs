@@ -17,6 +17,16 @@ class External_Synergetic_Class implements External_ClassInterface
         $this->setDatabase(new MSSQL());
     }
 
+	public function getClass($classCode) {
+		$query = "
+			SELECT *
+			FROM SynergyOne.dbo.SubjectClasses
+			WHERE ClassCode = '$classCode'
+		";
+
+		return $this->getDatabase()->getRow($query);
+	}
+
     public function getStudents($subCode)
     {
 
