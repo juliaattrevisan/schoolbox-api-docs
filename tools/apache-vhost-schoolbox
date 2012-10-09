@@ -16,6 +16,11 @@
 		RewriteRule ^([a-z]=.*)  index.php?$1  [L,NE]
 	</Directory>
 
+	# MGS Sport Module Exceptions
+	#<Directory /usr/share/schoolbox/www/min/>
+	#	php_flag apc.enabled off
+	#</Directory>
+
 	ErrorDocument 404 /index.php?page=common/404
 
 	Options +FollowSymLinks
