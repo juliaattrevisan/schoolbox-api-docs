@@ -10,6 +10,12 @@
 		Satisfy all
 	</Directory>
 
+	# Minify Exceptions
+	<Directory /usr/share/schoolbox/www/min/>
+		RewriteEngine on
+		RewriteRule ^([a-z]=.*)  index.php?$1  [L,NE]
+	</Directory>
+
 	ErrorDocument 404 /index.php?page=common/404
 
 	Options +FollowSymLinks
