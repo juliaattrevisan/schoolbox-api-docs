@@ -147,7 +147,7 @@ if (is_array($items)) {
 
             $this->setVar($output);
 
-            if ($item['item_image']) {
+            if ($article['item_image']) {
                 $this->parse('news_image_block', 'news_image');
             } else {
                 $this->setVar('news_image_block');
