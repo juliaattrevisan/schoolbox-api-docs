@@ -123,24 +123,15 @@
 					<li class="{EVENT_TYPE} {EVENT_LEVEL} {EVENT_VISIBLE}">
 
 						<span class="note" style="background-color:{COLOUR}; border:1px solid {COLOUR};">
-                            <strong><!-- BEGIN time -->{TIME}<!-- END time --></strong>
+                            <strong><!-- BEGIN time -->{START_TIME}<!-- END time --></strong>
                              {NOTE}<!-- BEGIN attendance_icon --><span class="float-right">A</span><!-- END attendance_icon --></span>
 
 						<div class="hidden-fields clearfix">
-							<h4>
-								<div class="time">
-									<strong>{TIME}</strong>
-								</div>
-
-								<p>
-									<em>{LOCATION}</em>
-								</p>
-
-								{NOTE}
-							</h4>
+							<h3>{NOTE}</h3>
+						    <h4>{TIME}</h4>
+                            <em>{LOCATION}</em>
 							<p class="meta">Event Type: {TYPE}<br />
 								<span class="created">Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a></span><br />
-
 								{DETAIL}
 							</p>
 
