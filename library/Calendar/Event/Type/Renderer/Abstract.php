@@ -83,7 +83,7 @@ abstract class Calendar_Event_Type_Renderer_Abstract {
 	/**
 	 * Get page
 	 *
-	 * @return null
+	 * @return SitePage
 	 */
 	protected function getPage() {
 		return $this->page;

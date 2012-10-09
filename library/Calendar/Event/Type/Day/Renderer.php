@@ -40,14 +40,22 @@ class Calendar_Event_Type_Day_Renderer extends Calendar_Event_Type_Renderer_Abst
 				$cssClass = '';
 			}
 
-			/* Render normally if we haven't already skipped it due to being unpublished
-			 */
-			$this->getPage()->setVar(array(
+            $time['start'] = $currentEvent->getStartTime()->getUsingFormat('g:iA');
+            $time['end'] = $currentEvent->getEndTime()->getUsingFormat('g:iA');
+            foreach($time as &$t) {
+                if($t == '12:00AM') {
+                    $t = '';
+                }
+            }
+
+            /* Render normally if we haven't already skipped it due to being unpublished
+             */
+            $this->getPage()->setVar(array(
 				'EVENT_ID' => $currentEvent->getEventId(),
 				'TIME' => $currentEvent->getDerivedTime(true),
-                'START_TIME' => $currentEvent->getStartTime()->getUsingFormat('g:iA'),
-                'END_TIME' => $currentEvent->getEndTime()->getUsingFormat('g:iA'),
-				'NOTE' => $currentEvent->getNote(),
+                'START_TIME' => $time['start'],
+                'END_TIME' => $time['end'],
+                'NOTE' => $currentEvent->getNote(),
 				'COLOUR' => $currentEvent->getColour(),
 				'LOCATION' => $currentEvent->getLocation(),
 				'DETAIL' => $currentEvent->getDetail(),
@@ -63,8 +71,8 @@ class Calendar_Event_Type_Day_Renderer extends Calendar_Event_Type_Renderer_Abst
 				'EVENT_LEVEL' => $currentEvent->getDerivedEventLevel(),
 			));
 
-			/* Modify link. Should be templated...
-			 */
+            /* Modify link. Should be templated...
+                */
 			if ($currentEvent->getIsEditable()) {
 				$this->getPage()->setVar(array(
 					'MODIFY' => $this->getCalendarHandler()->getPerm($currentEvent->getEventId()) > 1 ? '<a class="btn modify float-left" href="/calendar/modify.php?eventID=' . $currentEvent->getEventId() . '&returnTo=month"><span></span>Modify</a>' : '',
