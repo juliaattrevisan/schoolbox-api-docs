@@ -20,7 +20,8 @@ class Marksheet_Letter extends Marksheet_Abstract {
         $subReturn = $this->getSubmissionReturnHandler()->getLetterGradeByUser($user_id, $box_id);
         return array(
             'grade_selected' => $subReturn['grade_id'],
-            'comment' => $subReturn['comment'],
+            'norm_mark'      => $subReturn['lower_bound'],
+            'comment'        => $subReturn['comment'],
         );
     }
 

@@ -12,10 +12,12 @@ class Marksheet_Percent extends Marksheet_Abstract {
     public function normaliseMark($mark, $subbox) {
 
         // validation: must be within 0 - 100
-        if($mark < 0)
+        if($mark < 0) {
             $mark = 0;
-        else if ($mark > 100)
+        }
+        elseif($mark > 100) {
             $mark = 100;
+        }
 
         return array(
             'norm_mark' => $mark,
@@ -28,8 +30,9 @@ class Marksheet_Percent extends Marksheet_Abstract {
         $mark = $this->clean_num($subReturn['norm_mark'], 0, $blankZero);
 
         return array(
-            'mark'     => $asText ? "$mark%" : $mark,
-            'comment'  => $subReturn['comment']
+            'mark'      => $asText ? "$mark%" : $mark,
+            'norm_mark' => $subReturn['norm_mark'],
+            'comment'   => $subReturn['comment']
         );
     }
 

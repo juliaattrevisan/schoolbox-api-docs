@@ -102,7 +102,7 @@ class SubmissionReturn extends DeprecatedModel {
     }
 
     function getLetterGradeByUser($user_id, $box_id = 0) {
-        $query = "SELECT g.grade_id, r.comment FROM submission_return r, submission_grade g
+        $query = "SELECT g.*, r.comment FROM submission_return r, submission_grade g
                   WHERE r.owner = " . $this->db->smartQuote($user_id) . "
                   AND r.box_id = " . $this->db->smartQuote($box_id) . "
                   AND  g.lower_bound <= r.norm_mark
@@ -121,6 +121,67 @@ class SubmissionReturn extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
+    function getStudentMarksForCategory($catID, $studentID) {
+        $catID = $this->db->smartQuote($catID);
+        $studentID = $this->db->smartQuote($studentID);
+
+        // get marks from due work
+        $sql = "
+            SELECT r.id, r.box_id, r.norm_mark
+            FROM submission_return r
+            LEFT JOIN submission_box b ON r.box_id = b.id
+            WHERE b.category = $catID
+            AND r.owner = $studentID
+            AND b.deleted = 0
+            ORDER BY b.id ASC, r.returned DESC
+        ";
+
+        $this->db->query($sql);
+        $marks = array();
+        while($row = $this->db->getNextArray()) {
+            // based on the nature of the query, the first of each different box_id is the most recent mark
+            if(isset($marks[$row['box_id']])) {
+                continue;
+            }
+            $marks[$row['box_id']] = $row['norm_mark'];
+        }
+
+        // get marks from online assess
+        $sql = "
+            SELECT assess_attempt.attempt_id, assess_id, SUM(mark) AS mark, SUM(marks) AS max_mark
+            FROM assess_attempt
+            LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
+            LEFT JOIN assess_question ON assess_response.question_id = assess_question.question_id
+            WHERE assess_attempt.attempt_id IN (
+              SELECT aa.attempt_id
+              FROM assess_attempt aa
+              LEFT JOIN assess a
+                ON aa.assess_id = a.assess_id
+              WHERE a.category_id = $catID
+                AND aa.user_id = $studentID
+                AND aa.deleted_at IS NULL
+              ORDER BY aa.start DESC
+            )
+            AND assess_question.deleted_at IS NULL
+            GROUP BY assess_attempt.assess_id, assess_attempt.attempt_id
+            ORDER BY assess_attempt.start DESC
+        ";
+
+        $this->db->query($sql);
+        $attempts = array();
+        while($row = $this->db->getNextArray()) {
+            if(isset($attempts[$row['assess_id']])) {
+                continue;
+            }
+            $attempts[$row['assess_id']] = ($row['mark'] / $row['max_mark']) * 100;
+        }
+
+        $merged = array_merge($marks, $attempts);
+
+        $avg = array_sum($merged) / count($merged);
+        $merged['avg'] = sprintf('%0.2f', $avg);
+        return $merged;
+    }
 
     function securityCheck($box_id, $sid)
     {

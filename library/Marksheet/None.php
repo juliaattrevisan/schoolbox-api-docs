@@ -19,8 +19,9 @@ class Marksheet_None extends Marksheet_Abstract {
     public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true) {
         $subReturn = $this->getSubmissionReturnHandler()->getOneByUser($user_id, $box_id);
         return array(
-            'mark'     => null,
-            'comment'  => $subReturn['comment']
+            'mark'      => null,
+            'norm_mark' => null,
+            'comment'   => $subReturn['comment']
         );
     }
 
