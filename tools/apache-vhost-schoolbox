@@ -4,7 +4,6 @@
 
 	<Directory /usr/share/schoolbox>
 		Options FollowSymLinks
-		AllowOverride All
 		Order allow,deny
 		Allow from all
 		Satisfy all
@@ -33,7 +32,6 @@
 	php_flag display_errors off
 	php_flag html_errors off
 	php_flag log_errors on
-	#php_value error_reporting 6135
 	php_value error_reporting 30711
 	php_flag auto_detect_line_endings On
 	php_value docref_root 0
@@ -47,17 +45,17 @@
 
 	# Assess uses JSON arrays to transfer data in multi-choice/matching pairs
 	# JSON arrays don't like being escaped!!
-	php_flag magic_quotes_gpc Off
+	php_flag magic_quotes_gpc off
 
 	RewriteCond  %{REQUEST_URI} login.php$
 	RewriteRule ^(.*)$ http://%{HTTP_HOST}/ [R,L]
 
-	# apply ssl
+	# Force SSL
 	#RewriteCond %{SERVER_PORT} !^443$
 	#RewriteCond %{REQUEST_URI} ^/$
 	#RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R,L]
 
-	# remove ssl
+	# Force non-secure
 	#RewriteCond %{SERVER_PORT} ^443$
 	#RewriteCond %{REQUEST_URI} !^/$
 	#RewriteCond %{REQUEST_URI} !\.[A-Za-z]{2,4}$
@@ -66,7 +64,7 @@
 	RewriteCond %{SCRIPT_FILENAME}/ -d
 	RewriteRule [^/]$ %{REQUEST_URI}/ [R=301,L]
 
-	# required to bypass central authentication for RSS feeds
+	# Required to bypass central authentication for RSS feeds
 	RewriteCond %{REQUEST_URI} /homepage/rss/[0-9]*
 	RewriteRule ^(.*)$ /homepage/rss.php?page=$1 [L]
 
