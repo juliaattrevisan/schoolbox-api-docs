@@ -10,9 +10,10 @@ require_once dirname(__FILE__) . '/../include/Bootstrap.php';
     xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
 }*/
 
-if ( (isset($_GET['page']) && $_GET['page']) || $_GET['page'] == '/') {
+if((isset($_GET['page']) && $_GET['page']) && $_GET['page'] != '/') {
     $pageName = $_GET['page'];
-} else {
+}
+else {
     $pageName = 'dashboard';
 }
 
