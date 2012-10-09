@@ -172,7 +172,7 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
                 else if($event['endTimeString'] == "12:00AM")
                     $this->setVar("CAL_TIME", $event['startTimeString']);
                 else
-                    $this->setVar("CAL_TIME", $event['startTimeString']." till ".$event['endTimeString']);
+                    $this->setVar("CAL_TIME", $event['startTimeString']."&ndash;".$event['endTimeString']);
 
                 $this->parse("group_events_block", "group_events", true);
 

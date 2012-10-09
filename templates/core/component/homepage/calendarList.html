@@ -28,19 +28,13 @@
         <ul class="js_happening calendar-event">
             <!-- BEGIN group_events -->
             <li class="{ON_OFF} clearfix">
-                <p class="interact-left"><strong>{CAL_DATE}</strong><br>{CAL_TIME}</p>
-
-                <h4 class="eventListing">
-                    <span style="background-color:{CAL_COLOUR}">{CAL_NOTE}</span>
-                    <!-- BEGIN attendance_icon --><span class="float-right">A</span><!-- END attendance_icon -->
-                </h4>
+                <span class="eventListing"><strong>{CAL_TIME}</strong> <span style="background-color:{CAL_COLOUR}">{CAL_NOTE} <!-- BEGIN attendance_icon --><span class="float-right">A</span><!-- END attendance_icon --></span></span>
 
                 <div class="hidden-fields clearfix">
-                    <h4><!-- BEGIN time -->
-                        <span class="time"><strong>{CAL_TIME}</strong></span>
-                        <!-- END time -->
-                        {CAL_NOTE}
-                    </h4>
+                    <h3>{CAL_NOTE}</h3>
+                    <h4>{CAL_DATE} {CAL_TIME}</h4>
+                    <em>{CAL_LOCATION}</em>
+
                     <p class="meta">
                         Event Type: {CAL_TYPE}<br/>
                         Created by: <a href="/search/user/{CAL_AUTHOR_ID}">{CAL_AUTHOR}</a><br/>
@@ -63,7 +57,9 @@
                         <a class="btn modify float-left" href="/calendar/attendance/list/{CAL_ID}"><span></span>Attendance List</a>
                         <!-- END attendance_list_button -->
 
-                        <span class="modify">{CAL_MODIFY}</span>
+                        <!-- BEGIN modify_link -->
+                        <a class="btn modify float-left" href="/calendar/modify.php?eventID={EVENT_ID}&returnTo=month"><span></span>Modify</a>
+                        <!-- END modify_link -->
                     </div>
                 </div>
             </li>

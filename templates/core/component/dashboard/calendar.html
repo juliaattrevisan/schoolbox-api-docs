@@ -7,13 +7,13 @@
             <li class="{ON_OFF} clearfix">
                 <span class="eventListing"><strong>{TIME}</strong> <span style="background-color:{COLOUR}">{NOTE} <!-- BEGIN attendance_icon --><span class="float-right">A</span><!-- END attendance_icon --></span></span>
                 <div class="hidden-fields clearfix">
-                    <h4><!-- BEGIN time -->
-                        <span class="time"><strong>{TIME}</strong></span>
-                        <!-- END time -->{NOTE}
-                    </h4>
-                    <p class="meta">Event Type: {TYPE}<br/>
-                        Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a><br/>
-                        {LOCATION} {DETAIL}</p>
+                    <h3>{NOTE}</h3>
+                    <!-- BEGIN time --><h4>{DATE} {TIME}</h4><!-- END time -->
+                    <em>{LOCATION}</em>
+                    <p class="meta">Event Type: {TYPE}<br />
+                        <span class="created">Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a></span><br />
+                        {DETAIL}
+                    </p>
                     <!-- BEGIN attendance_status -->
                     <p class="meta">Attendance Status: {ATTENDANCE_STATUS}</p>
                     <!-- END attendance_status -->
@@ -29,7 +29,9 @@
                         <a class="btn groups float-left" href="/calendar/attendance/list/{EVENT_ID}"><span></span>Attendance List</a>
                         <!-- END attendance_list_button -->
 
-                        {MODIFY}
+                        <!-- BEGIN modify_link -->
+                        <a class="btn modify float-left" href="/calendar/modify.php?eventID={EVENT_ID}&returnTo=month"><span></span>Modify</a>
+                        <!-- END modify_link -->
                     </div>
                 </div>
             </li>
