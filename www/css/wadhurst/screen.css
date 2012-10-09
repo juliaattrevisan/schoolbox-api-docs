@@ -67,7 +67,6 @@ h4.eventListing,
 .saved-colours, .saved-layout,
 .add-component,
 .add-component .notification,
-.left #calendar table.duedates-calendar span.wrapper,
 .image-thumbnail a,
 .shared-success,
 .visible-users li span,
@@ -110,20 +109,6 @@ laber.error,
     -moz-border-radius: 3px 3px 0 0;
     -webkit-border-radius: 3px 3px 0 0;
     border-radius: 3px 3px 0 0;
-}
-
-.js_happening li span
-{
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-}
-
-.day-block span.time
-{
-    -moz-border-radius: 5px 5px 0 0;
-    -webkit-border-radius: 5px 5px 0 0;
-    border-radius: 5px 5px 0 0;
 }
 
 #category
@@ -200,7 +185,7 @@ h2, h2 a, .header_option {
 	font-size:12px;
 }
 
-h2 {
+h2, .calendar-controls {
 	background-repeat:repeat-x;
 	background-color:#0089d5;
 	color:#fff;
@@ -459,22 +444,18 @@ h3, #nav h3, .add-component .notification { color: #FFFFFF; }
 .otherMonth .dayWrap p, .otherMonth .dayWrap a { color: #797979; }
 
 td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box, td.cal-left a.back,
-td.cal-left a.forward, td.cal-right a.filter-change, .day-block, .timetable td.dayCurrent { background-color: #f2f6fa; }
+td.cal-left a.forward, td.cal-right a.filter-change, .timetable td.dayCurrent { background-color: #f2f6fa; }
 .otherMonth.day-block, .timetable td.normal { background-color: #FAF9F5; }
 
 td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-change.current, td.cal-right a.filter-change:hover { background-color: #D3D3E4; }
 
 #assess h3 { color:#000; }
 
-.dayWrap { background-color: #e4e4e4; }
-
 .timetable td.dayCurrent { font-size: 1em; color: #000; }
 .timetable td, .timetable th { border-right: none; }
 .dayWrap p { color:#000; }
 
 .calTableCurrent .dayWrap { background-color:#ffffff; }
-
-.otherMonth .dayWrap, .past .dayWrap { background-color: #f4f4f4; }
 
 #month-view td.dark, 
 #week-view td.dark,

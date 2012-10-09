@@ -67,7 +67,6 @@ h4.eventListing,
 .saved-colours, .saved-layout,
 .add-component,
 .add-component .notification,
-.left #calendar table.duedates-calendar span.wrapper,
 .image-thumbnail a,
 .shared-success,
 .visible-users li span,
@@ -110,20 +109,6 @@ laber.error,
     -moz-border-radius: 3px 3px 0 0;
     -webkit-border-radius: 3px 3px 0 0;
     border-radius: 3px 3px 0 0;
-}
-
-.js_happening li span
-{
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-}
-
-.day-block span.time
-{
-    -moz-border-radius: 5px 5px 0 0;
-    -webkit-border-radius: 5px 5px 0 0;
-    border-radius: 5px 5px 0 0;
 }
 
 #category
@@ -198,13 +183,13 @@ a:hover {
 	color: #1d9ffc;
 }
 
-h2, h2 a, .header_option {
+h2, h2 a, .header_option, .calendar-controls {
 	background-color: none;
 	font-weight: normal;
 	color: #fff;
 }
 
-h2 {
+h2, .calendar-controls {
 	background-image: url(/images/donvale/h2-background.png);
 	background-color: #00396f;
 	background-repeat: repeat-x;
@@ -432,7 +417,7 @@ h3, .add-component .notification {
 td.cal-left a.back,
 td.cal-left a.forward,
 td.cal-left .datepicker-box,
-td.cal-left a.back, td.cal-left a.forward, td.cal-right a.filter-change, .day-block {
+td.cal-left a.back, td.cal-left a.forward, td.cal-right a.filter-change {
 	background-color: #f2f6fa;
 }
 
@@ -444,20 +429,8 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 	color: #000;
 }
 
-.dayWrap {
-	background-color: #BACBD6;
-}
-
 .dayWrap p {
 	color: #00305E;
-}
-
-.calTableCurrent .dayWrap {
-	background-color: #ffffff;
-}
-
-.otherMonth .dayWrap, .past .dayWrap {
-	background-color: #deeef8;
 }
 
 #month-view td.dark, #week-view td.dark {
@@ -600,4 +573,29 @@ font-weight: bold;
 
 .standardForm tr.advanced td {
 	background: #f8f8f8;
+}
+
+/*
+ * Table border fixes
+ */
+.calendar table .dark,
+.otherMonth,
+.past
+{
+    background: #EDF2F6;
+}
+
+.calendar table thead th,
+.day-block,
+.calendar table,
+.left #calendar table.duedates-calendar td,
+.left #calendar table.duedates-calendar,
+#calendar table th.dark
+{
+    border-color: #BACBD6;
+}
+.calendar table thead th,
+#calendar table th.dark
+{
+    border-bottom-color: #BACBD6;
 }

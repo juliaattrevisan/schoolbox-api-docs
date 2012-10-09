@@ -67,7 +67,6 @@ h4.eventListing,
 .saved-colours, .saved-layout,
 .add-component,
 .add-component .notification,
-.left #calendar table.duedates-calendar span.wrapper,
 .image-thumbnail a,
 .shared-success,
 .visible-users li span,
@@ -110,20 +109,6 @@ laber.error,
     -moz-border-radius: 3px 3px 0 0;
     -webkit-border-radius: 3px 3px 0 0;
     border-radius: 3px 3px 0 0;
-}
-
-.js_happening li span
-{
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-}
-
-.day-block span.time
-{
-    -moz-border-radius: 5px 5px 0 0;
-    -webkit-border-radius: 5px 5px 0 0;
-    border-radius: 5px 5px 0 0;
 }
 
 #category
@@ -189,10 +174,11 @@ laber.error,
 body {
     background: url("/images/jpc/background-repeater.jpg") repeat-x scroll 0 0 #E6E4F2;
 }
-h2, h2 a, .header_option {
+h2, h2 a, .header_option, .calendar-controls {
     background-color: #EDE4A6;
     color: #000000;
 }
+.calendar-controls h3 { color: #000; }
 .cal-bubble .time {
     background: none repeat scroll 0 0 transparent;
 }
@@ -286,7 +272,7 @@ color:#fff;
 .otherMonth .dayWrap p, .otherMonth .dayWrap a {
     color: #797979;
 }
-td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box, td.cal-left a.back, td.cal-left a.forward, td.cal-right a.filter-change, .day-block {
+td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box, td.cal-left a.back, td.cal-left a.forward, td.cal-right a.filter-change {
     background-color: #F4F4F8;
 }
 td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-change.current, td.cal-right a.filter-change:hover {
@@ -393,3 +379,28 @@ td.cal-right .link-case .filter-drop .filter-list {
 .box.calendar { width: 49%; float: right; }
 
 .box ul li { padding: 5px 16px; }
+
+/*
+ * Table border fixes
+ */
+.calendar table .dark,
+.otherMonth,
+.past
+{
+    background: #FAF9F5;
+}
+
+.calendar table thead th,
+.day-block,
+.calendar table,
+.left #calendar table.duedates-calendar td,
+.left #calendar table.duedates-calendar,
+#calendar table th.dark
+{
+    border-color: #FAF9F5;
+}
+.calendar table thead th,
+#calendar table th.dark
+{
+    border-bottom-color: #FAF9F5;
+}

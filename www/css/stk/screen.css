@@ -10,7 +10,7 @@ a:hover {
     color: #1955ff;
 }
 
-h2  {
+h2, .calendar-controls  {
     background:#002b5c;
     color:white;
     -moz-border-radius: 0;
@@ -21,6 +21,12 @@ h2  {
     padding: 8px 0 4px 16px;
     min-height:20px;
     font-size:16px;
+}
+.calendar-controls {
+    padding: 2px;
+}
+.current-date {
+    padding-top: 8px;
 }
 
 h2 a, .header_option{
@@ -277,7 +283,7 @@ h3, #nav h3, .add-component .notification {
     color: #000;
 }
 
-td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box, td.cal-left a.back, td.cal-left a.forward, td.cal-right a.filter-change, .day-block {
+td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box, td.cal-left a.back, td.cal-left a.forward, td.cal-right a.filter-change {
     background-color: #eee;
 }
 
@@ -287,23 +293,6 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 
 #assess h3 {
     color: #000;
-}
-
-.dayWrap {
-    background-color: #19398A;
-}
-
-.dayWrap p {
-    color: #fff;
-}
-
-.calTableCurrent .dayWrap {
-    background-color: #ffffff;
-}
-
-.otherMonth .dayWrap, .past .dayWrap {
-    background-color: #E5F4FB;
-    color:#000;
 }
 
 #month-view td.dark, #week-view td.dark {

@@ -67,7 +67,6 @@ h4.eventListing,
 .saved-colours, .saved-layout,
 .add-component,
 .add-component .notification,
-.left #calendar table.duedates-calendar span.wrapper,
 .image-thumbnail a,
 .shared-success,
 .visible-users li span,
@@ -110,20 +109,6 @@ laber.error,
     -moz-border-radius: 3px 3px 0 0;
     -webkit-border-radius: 3px 3px 0 0;
     border-radius: 3px 3px 0 0;
-}
-
-.js_happening li span
-{
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-}
-
-.day-block span.time
-{
-    -moz-border-radius: 5px 5px 0 0;
-    -webkit-border-radius: 5px 5px 0 0;
-    border-radius: 5px 5px 0 0;
 }
 
 #category
@@ -223,7 +208,7 @@ h1{
 h1 a.customise {
 	font-size: 12px;
 	}
-h2, .homepage h2 {
+h2, .homepage h2, .calendar-controls {
 	background: #003e7e url(/images/shore/box-bg.png) repeat-x;
 	font-weight:bold;
 	-moz-border-radius:0;
@@ -233,7 +218,7 @@ h2, .homepage h2 {
 	color:#fff;
 	}
 
-#content h2 a {
+#content h2 a, .calendar-controls h3 {
 	color: #fff;
 	}	
 #content .header_option a {
@@ -280,9 +265,6 @@ p.important {
 #month-view td.dark, #week-view td.dark {
     background-color: #003E7E;
 	color:#fff;
-}
-.dayWrap {
-    background-color:  #CAE4FF
 }
 .dayWrap p{color:#000;}
 
@@ -507,4 +489,32 @@ p.interact a {
 
 .mark-sheet.names{
     top: 95px
+}
+
+/*
+ * Table border fixes
+ */
+.calendar table .dark
+{
+    background: #E4E4E4;
+}
+.otherMonth,
+.past
+{
+    background: #F7FBFF;
+}
+
+.calendar table thead th,
+.day-block,
+.calendar table,
+.left #calendar table.duedates-calendar td,
+.left #calendar table.duedates-calendar,
+#calendar table th.dark
+{
+    border-color: #E4E4E4;
+}
+.calendar table thead th,
+#calendar table th.dark
+{
+    border-bottom-color: #E4E4E4;
 }

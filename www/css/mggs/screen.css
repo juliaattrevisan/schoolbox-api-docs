@@ -67,7 +67,6 @@ h4.eventListing,
 .saved-colours, .saved-layout,
 .add-component,
 .add-component .notification,
-.left #calendar table.duedates-calendar span.wrapper,
 .image-thumbnail a,
 .shared-success,
 .visible-users li span,
@@ -110,20 +109,6 @@ laber.error,
     -moz-border-radius: 3px 3px 0 0;
     -webkit-border-radius: 3px 3px 0 0;
     border-radius: 3px 3px 0 0;
-}
-
-.js_happening li span
-{
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-}
-
-.day-block span.time
-{
-    -moz-border-radius: 5px 5px 0 0;
-    -webkit-border-radius: 5px 5px 0 0;
-    border-radius: 5px 5px 0 0;
 }
 
 #category
@@ -225,9 +210,6 @@ a{
     -webkit-border-top-right-radius: 3px;
     -moz-border-top-right-radius: 3px;
 }
-
-.day-block{background:#f2f6fa;}
-.dayWrap{background:#f2f6fa;}
 
 .otherMonth .dayWrap, .past .dayWrap{background:#f2f6fa;}
 .otherMonth .dayWrap p, .otherMonth .dayWrap a{color:#000;}
@@ -423,7 +405,7 @@ a{
     display: block;
 }
 
-h2 {
+h2, .calendar-controls {
 	background: #00529c;
 	font-size: 12px;
 	height: 29px;
@@ -434,6 +416,7 @@ h2 {
     border-radius: 5px;
 	padding:0;
 }
+.calendar-controls .back, .calendar-controls .forward, .calendar-controls .datepicker-box,.calendar-controls .filter-change { border-color: #F3B02E; }
 .homepage h2 {
 	background: 0;
 }
@@ -926,4 +909,28 @@ MORRIS LIBRARY
 .ad-space-content span.dates {
     color: #002e52;
     font-size: 12px;
+}
+
+/*
+ * Table border fixes
+ */
+.calendar table .dark,
+.otherMonth,
+.past
+{
+    background: #F2F6FA;
+}
+.calendar table thead th,
+.day-block,
+.calendar table,
+.left #calendar table.duedates-calendar td,
+.left #calendar table.duedates-calendar,
+#calendar table th.dark
+{
+    border-color: #F2F6FA;
+}
+.calendar table thead th,
+#calendar table th.dark
+{
+    border-bottom-color: #F2F6FA;
 }

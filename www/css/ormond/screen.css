@@ -240,7 +240,7 @@ h1 a.customise {
 	top: 5px;
 }
 
-h2, .homepage h2 {
+h2, .homepage h2, .calendar-controls {
 	background: #f9f8f1 url(/images/ormond/heading-back.png) repeat-x;
 	border-bottom: 1px dotted #1C1713;
 	font-weight: bold;
@@ -255,7 +255,7 @@ h2, .homepage h2 {
 	border-radius: 0px; /* Opera 10.5, IE9, Saf5, Chrome */
 }
 
-#content h2 a { color: #000; }
+#content h2 a, .calendar-controls h3 { color: #000; }
 
 .dayWrap{background:url("/images/ormond/heading-back.png") repeat-x scroll 0 0 #F9F8F1}
 
@@ -367,4 +367,27 @@ h2, .homepage h2 {
 	top: -2px;
 }
 
+/*
+ * Table border fixes
+ */
+.calendar table .dark,
+.otherMonth,
+.past
+{
+    background: #EEEEE7;
+}
 
+.calendar table thead th,
+.day-block,
+.calendar table,
+.left #calendar table.duedates-calendar td,
+.left #calendar table.duedates-calendar,
+#calendar table th.dark
+{
+    border-color: #EEEEE7;
+}
+.calendar table thead th,
+#calendar table th.dark
+{
+    border-color: #EEEEE7;
+}

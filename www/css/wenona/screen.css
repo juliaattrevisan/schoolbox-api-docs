@@ -67,7 +67,6 @@ h4.eventListing,
 .saved-colours, .saved-layout,
 .add-component,
 .add-component .notification,
-.left #calendar table.duedates-calendar span.wrapper,
 .image-thumbnail a,
 .shared-success,
 .visible-users li span,
@@ -110,20 +109,6 @@ laber.error,
     -moz-border-radius: 3px 3px 0 0;
     -webkit-border-radius: 3px 3px 0 0;
     border-radius: 3px 3px 0 0;
-}
-
-.js_happening li span
-{
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-}
-
-.day-block span.time
-{
-    -moz-border-radius: 5px 5px 0 0;
-    -webkit-border-radius: 5px 5px 0 0;
-    border-radius: 5px 5px 0 0;
 }
 
 #category
@@ -415,14 +400,15 @@ h1 {
 
 h1 a.customise { font-size: 12px; }
 
-h2 {
+h2, .calendar-controls {
 	border-bottom: 2px solid #002452;
 	font-weight: bold;
 	color: #000;
 	background: 0;
 	text-indent: 4px;
 }
-
+.calendar-controls { padding: 0; }
+.calendar-controls h3 { color: #000; }
 
 
 
@@ -557,17 +543,13 @@ CALENDAR
 
 .otherMonth .dayWrap p, .otherMonth .dayWrap a { color: #797979; }
 
-td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box, td.cal-left a.back, td.cal-left a.forward, td.cal-right a.filter-change, .day-block { background-color: #fbfbfb; }
+td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box, td.cal-left a.back, td.cal-left a.forward, td.cal-right a.filter-change { background-color: #fbfbfb; }
 
 td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-change.current, td.cal-right a.filter-change:hover { background-color: #fbfbfb; }
 
 #assess h3 { color:#000; }
 
-.dayWrap { background-color: #ededed; }
-
 .calTableCurrent .dayWrap { background-color:#ffffff; }
-
-.otherMonth .dayWrap, .past .dayWrap { background-color: #b6d6f4; }
 
 #month-view td.dark, #week-view td.dark {
 	background-color:  #003366;
@@ -619,4 +601,29 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 .mark-sheet.names{
     left:160px;
     top:91px;
+}
+
+/*
+ * Table border fixes
+ */
+.calendar table .dark,
+.otherMonth,
+.past
+{
+    background: #ECECEC;
+}
+
+.calendar table thead th,
+.day-block,
+.calendar table,
+.left #calendar table.duedates-calendar td,
+.left #calendar table.duedates-calendar,
+#calendar table th.dark
+{
+    border-color: #ECECEC;
+}
+.calendar table thead th,
+#calendar table th.dark
+{
+    border-bottom-color: #ECECEC;
 }

@@ -67,7 +67,6 @@ h4.eventListing,
 .saved-colours, .saved-layout,
 .add-component,
 .add-component .notification,
-.left #calendar table.duedates-calendar span.wrapper,
 .image-thumbnail a,
 .shared-success,
 .visible-users li span,
@@ -110,20 +109,6 @@ laber.error,
     -moz-border-radius: 3px 3px 0 0;
     -webkit-border-radius: 3px 3px 0 0;
     border-radius: 3px 3px 0 0;
-}
-
-.js_happening li span
-{
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-}
-
-.day-block span.time
-{
-    -moz-border-radius: 5px 5px 0 0;
-    -webkit-border-radius: 5px 5px 0 0;
-    border-radius: 5px 5px 0 0;
 }
 
 #category
@@ -197,16 +182,16 @@ a:hover {
     color: #0053a0;
 }
 
-h2, h2 a, .header_option {
+h2, h2 a, .header_option, .calendar-controls {
     background-color: #fff0b0;
 }
 
-h2{	
+h2, .calendar-controls{
 	background-image:url(/images/bialik/content/h2-background.png);
 	background-repeat:repeat-x;
 }
 
-h1, h2, h2 a {
+h1, h2, h2 a, .calendar-controls, .calendar-controls h3 {
 	color:#0053a0;
 }
 
@@ -360,7 +345,7 @@ h3, #nav h3, .add-component .notification {
 .otherMonth .dayWrap p, .otherMonth .dayWrap a {
     color: #797979;
 }
-td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box, td.cal-left a.back, td.cal-left a.forward, td.cal-right a.filter-change, .day-block {
+td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box, td.cal-left a.back, td.cal-left a.forward, td.cal-right a.filter-change {
     background-color: #f2f6fa;
 }
 td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-change.current, td.cal-right a.filter-change:hover {
@@ -368,9 +353,6 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 }
 #assess h3{color:#000;}
 
-.dayWrap {
-    background-color: #A6C3DE;
-}
 .calTableCurrent .dayWrap{
 	background-color:#ffffff;	
 	
@@ -378,9 +360,6 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 
 #calendar h3{color:#000;}
 
-.otherMonth .dayWrap, .past .dayWrap {
-    background-color: #b6d6f4;
-}
 #month-view td.dark, #week-view td.dark {
     background-color:  #3375b3;
 	color:#fff;
@@ -468,3 +447,28 @@ td.cal-right .link-case .filter-drop .filter-list {
 .cal-bubble .middle{border-color:#0053A0}
 .cal-bubble .bottom{border-right-color:#0053A0}
 .cal-bubble .middle .close{background:#0053A0; color:#fff;}
+
+/*
+ * Table border fixes
+ */
+.calendar table .dark,
+.otherMonth,
+.past
+{
+    background: #F2F6FA;
+}
+
+.calendar table thead th,
+.day-block,
+.calendar table,
+.left #calendar table.duedates-calendar td,
+.left #calendar table.duedates-calendar,
+#calendar table th.dark
+{
+    border-color: #F2F6FA;
+}
+.calendar table thead th,
+#calendar table th.dark
+{
+    border-bottom-color: #A6C3DE;
+}
