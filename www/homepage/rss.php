@@ -5,7 +5,9 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
 $categoryHandler = new Category();
 $feedHandler = new Feed();
 
-$args = explode('/', $_GET['page']);
+// trim in case the leading slash is captured in the URI
+$page = trim($_GET['page'], '/');
+$args = explode('/', $page);
 
 $catID = isset($args[2]) ? $args[2] : '';
 $token = isset($args[3]) && !empty($args[3]) ? $args[3] : '';
