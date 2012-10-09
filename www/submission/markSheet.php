@@ -162,8 +162,10 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
     $this->setBlock(TEMPLATE_content, 'assess_head', 'assess_head_block');
     $this->setBlock(TEMPLATE_content, 'sub_type_head', 'sub_type_head_block');
     $this->setBlock(TEMPLATE_content, 'assess_type_head', 'assess_type_head_block');
+    $this->setBlock(TEMPLATE_content, 'average_type_head', 'average_type_head_block');
     $this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
     $this->setBlock(TEMPLATE_content, 'student_mark_list', 'student_mark_list_block');
+    $this->setBlock('student_mark_list', 'mark_average', 'mark_average_block');
     $this->setBlock('student_mark_list', 'markItem', 'markItem_block');
     $this->setBlock('markItem', 'mark', 'mark_block');
     $this->setBlock('markItem', 'onlineAssessmentMark', 'onlineAssessmentMark_block');
@@ -268,6 +270,9 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
     if (is_array($studentList)) {
         foreach ($studentList as $student) {
 
+            $avgSum = 0;
+            $avgCount = 0;
+
             /* If there is no uid associated with the student, prevent them
                 * from appearing in the markSheet.
                 */
@@ -292,6 +297,11 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
                             $marks = $attemptHandler->getMarksForAttempt($mostRecentAttempt['attempt_id']);
                             $total = $attemptHandler->getTotalMarks($sub['id'], $mostRecentAttempt['attempt_id']);
 
+                            if($total) {
+                                $avgSum += ($marks / $total) * 100;
+                                ++$avgCount;
+                            }
+
                             $this->setVar(array(
                                 'ASSESS_ASSESS_ID' => $sub['id'],
                                 'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
@@ -313,7 +323,12 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
                                 $subbox = $subHandler->getByID($sub['id']);
 
                                 $marksheet = Marksheet_Factory::build($subbox['mark_type_slug']);
-                                $mark = $marksheet->retrieveMark($student['uid'], $sub['id']);
+                                $mark = $marksheet->retrieveMark($student['uid'], $sub['id'], false, true);
+
+                                if(isset($mark['norm_mark'])) {
+                                    $avgSum += $mark['norm_mark'];
+                                    ++$avgCount;
+                                }
 
                                 /**
                                  * @param SitePage $page
@@ -344,23 +359,6 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
                                 $this->parse("mark_type_{$slug}_block", "mark_type_{$slug}");
 
                                 $this->parse('STUDENT_MARKING', 'markTpl');
-
-
-/*
-                                $marksheet->outputUI($this, $mark);
-
-                                $marktypes = $subHandler->getMarkTypes(true);
-
-                                // parse the appropraite block, and hide the rest
-                                foreach ($marktypes as $type) {
-                                    if ($type['mark_type_id'] == $marksheet->getID()) {
-                                        $this->parse("mark_type_{$type['slug']}_block", "mark_type_{$type['slug']}", false);
-                                    } else
-                                        $this->setVar("mark_type_{$type['slug']}_block", '');
-                                }
-*/
-
-
                             }
 
                             $this->parse('mark_block', 'mark');
@@ -370,20 +368,39 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
                         $this->parse('markItem_block', 'markItem', true);
                         $this->setVar('mark_block', '');
                         $this->setVar('onlineAssessmentMark_block', '');
+
                     }
                 } else {
                     $this->setVar('mark_block', '');
                     $this->setVar('onlineAssessmentMark_block', '');
                 }
 
+                // at the end of each student, output their average
+                if($avgCount > 0) {
+                    $studentAverage = $avgSum / $avgCount;
+                    $this->setVar('STUDENT_AVERAGE_MARK', sprintf('%0.2f', $studentAverage));
+                }
+                else {
+                    $this->setVar('STUDENT_AVERAGE_MARK', '&mdash;');
+                }
+                $this->parse('mark_average_block', 'mark_average');
+
                 $this->parse('student_list_block', 'student_list', true);
                 $this->parse('student_mark_list_block', 'student_mark_list', true);
                 $this->setVar('markItem_block', '');
             }
+
         }
-    } else {
-        $this->setVar('student_list_block', '');
-        $this->setVar('student_mark_list_block', '');
+        // add the average header
+        $this->parse('average_type_head_block', 'average_type_head');
+    }
+    else {
+        $this->setVar(array(
+            'average_type_head_block' => '',
+            'mark_average_block' => '',
+            'student_list_block' => '',
+            'student_mark_list_block' => ''
+        ));
     }
 } else {
     error(2);

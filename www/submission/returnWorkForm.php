@@ -12,7 +12,7 @@ const update_window = 21600; // 60 * 60 * 6 seconds = 6 hours
 // Ajax from mark sheet
 if(isset($_POST['uid']) && isset($_POST['comment']) /* && isset($_POST['mark']) */ && isset($_POST['box_id']) && $_POST['markUpdate'] == 'true') {
 
-    print_r($_POST);
+    // print_r($_POST);
 
     if(is_numeric($_POST['uid']) && is_numeric($_POST['box_id'])) {
         ajaxUpdate($_POST['mark'], $_POST['comment'], $_POST['uid'], $_POST['box_id']);
@@ -125,7 +125,7 @@ else {
  */
 function ajaxUpdate($givenMark, $comment, $studentID, $boxID) {
 
-    print_r(func_get_args());
+    // print_r(func_get_args());
 
     $returnHandler = new SubmissionReturn;
     $subHandler = new Submission();
@@ -140,7 +140,7 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID) {
 
     $marksheet = Marksheet_Factory::build($subbox['mark_type_slug']);
 
-    echo $subbox['mark_type_slug'];
+    // echo $subbox['mark_type_slug'];
 
     if($subbox['mark_type_slug'] == 'rubric') {
         // in this context, no mark is supplied, so retrieve, smash to pieces, and reinsert
@@ -153,7 +153,7 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID) {
         $mark = $marksheet->normaliseMark($givenMark, $subbox);
     }
 
-    print_r($mark);
+    // print_r($mark);
 
     // set up common values for the return
     $return = array(
@@ -164,7 +164,7 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID) {
         'comment'   => $comment,
     );
 
-    print_r($return);
+    // print_r($return);
 
     $success = false;
     // previous submission exists
@@ -187,7 +187,17 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID) {
         // no previous submission
         $success = $returnHandler->create($return);
     }
-    var_dump($success);
+
+    $marks = $returnHandler->getStudentMarksForCategory($subbox['category'], $studentID);
+
+    header('Content-Type: application/json');
+    die(json_encode(array(
+        'id' => $studentID,
+        'marks' => $marks
+    )));
+
+    // var_dump($success);
+
     /*
         INSERT INTO `submission_return` (`box_id`,`owner`,`mark`,`norm_mark`,`comment`,`filename`,`returned`) VALUES ('7','17','47','47','comment here!!!!','',NOW());
         UPDATE `student_submission` SET `marked`='1' WHERE 1=1 AND `box_id`= '7' AND `owner`= '17';

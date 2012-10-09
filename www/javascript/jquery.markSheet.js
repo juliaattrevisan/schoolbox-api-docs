@@ -18,7 +18,7 @@ $j(function() {
                     'width': markSheet.assessmentCellWidth,
                     'padding-bottom': 0
                 });
-            };
+            }
 
             $j('.mark-sheet.assessments table').css('width', markSheet.assessmentCellWidth * markSheet.columnCount);
 
@@ -143,13 +143,13 @@ $j(function() {
                     submitHandler: function(form) {
                         var notification = $j(form).find('input, select');
                         $j.post('/submission/returnWorkForm.php', $j(form).serialize(), function(data) {
-                           notification.css({
-                               'border': '1px solid green'
-                           });
+                            var avg = $j('#avg-'+data.id+' span');
+                            avg.html(data.marks.avg);
+                            notification.css({ 'border': '1px solid green' });
+                            avg.css({ 'color': 'green' });
                             setTimeout(function() {
-                                notification.css({
-                                    'border': '1px solid #ccc'
-                                });
+                                notification.css({ 'border': '1px solid #ccc' });
+                                avg.css({ 'color': '#000' });
                             }, 1000)
                         });
                         return false;
