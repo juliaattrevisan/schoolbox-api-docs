@@ -60,10 +60,10 @@ class Calendar_Event_Type_Submission_Renderer extends Calendar_Event_Type_Render
 		));
 
 		/* If a time was specified, show it; otherwise hide it
-		 TODO Stevespection */
-//		if (strlen($currentEvent->getDerivedTime())) {
-//			$this->getPage()->parse('time_block', 'time');
-//		}
+		 */
+		if (strlen($currentEvent->getDerivedTime())) {
+			$this->getPage()->parse('time_block', 'time');
+		}
 
 		$this->getPage()->parse("note_block", "note", true);
 	}
