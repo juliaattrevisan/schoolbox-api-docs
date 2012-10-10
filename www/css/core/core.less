@@ -7250,8 +7250,8 @@ label {
         display: block;
         width: 24px;
         height: 24px;
-        background-image: url('/images/core/icons/btn-icons.png');
-        background-position: ~'-@{offset-x}px' ~'-@{offset-y}px';
+        background-image: url('/images/core/icons/activity-icons.png');
+        background-position: -@offset-x * 24px -@offset-y * 24px;
         margin: 4px;
     }
 }
@@ -7266,27 +7266,31 @@ ul.activity-list {
         &:hover {
             background-color: @pcard-hover
         }
-        .icon {   .inline-block;
+        .icon {
+            .inline-block;
             width: 32px;
-            height: 100%;
+            height: 22px;
             position: absolute;
+            top: 50%;
+            margin-top: -11px;
             left: 0;
-            &.pin {   .activity-icon(2, 1) }
-            &.file {   .activity-icon(2, 29) }
-            &.clock {   .activity-icon(2, 57) }
-            &.tick {   .activity-icon(2, 85) }
-            &.link {   .activity-icon(2, 113) }
-            &.news {   .activity-icon(2, 141) }
-            &.onlineassessment {   .activity-icon(2, 170) }
-            &.survey {   .activity-icon(2, 198) }
-            &.forum {   .activity-icon(2, 225) }
-            &.blog {   .activity-icon(2, 253) }
-            &.closed {   .activity-icon(2, 282) }
-            &.returned {   .activity-icon(2, 310) }
-            &.new {   .activity-icon(2, 338) }
-            &.overdue {   .activity-icon(2, 365) }
+            &.pin               { .activity-icon(0, 0) }
+            &.file              { .activity-icon(0, 1) }
+            &.clock             { .activity-icon(0, 2) }
+            &.tick              { .activity-icon(0, 3) }
+            &.link              { .activity-icon(0, 4) }
+            &.news              { .activity-icon(0, 5) }
+            &.onlineassessment  { .activity-icon(0, 6) }
+            &.survey            { .activity-icon(0, 7) }
+            &.forum             { .activity-icon(0, 8) }
+            &.blog              { .activity-icon(0, 9) }
+            &.closed            { .activity-icon(0, 10) }
+            &.returned          { .activity-icon(0, 11) }
+            &.new               { .activity-icon(0, 12) }
+            &.overdue           { .activity-icon(0, 13) }
         }
-        .avatar {   .inline-block;
+        .avatar {
+            .inline-block;
             width: 32px;
             margin: 0 5px 0 0;
             float: left;
@@ -7300,9 +7304,7 @@ ul.activity-list {
         p {
             display: inline;
             .grade {   .inline-block;
-                width: 56px; //                                                    position: absolute;
-            //                                                    top: 0;
-            //                                                    right: -56px;
+                width: 56px;
             }
         }
         .time {
@@ -7312,5 +7314,61 @@ ul.activity-list {
         }
     }
 }
+
+.listing .subject-list {
+    color: @secondary-text;
+    li {
+        position: relative;
+        padding: 0;
+        min-height: 64px;
+    }
+    a {
+        display: block;
+        padding: 8px 4px;
+        padding-left: 40px;
+        margin-right: 60px;
+        position: relative;
+        color: @body-text;
+        &.subject {
+            font-weight: bold;
+        }
+        &:hover {
+            background-color: @pcard-hover
+        }
+    }
+    img {
+        position: absolute;
+        left: 0;
+        top: 0;
+        max-width: 32px;
+        max-height: 32px;
+    }
+    .grade {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 60px;
+        padding-top: .5em;
+        span {
+            font-size: 2em;
+            line-height: 1;
+            font-weight: bold;
+        }
+    }
+}
+
+// Brace yourself - loop for the index of colorX, outputting a the class 'gradient-index' each time, adding the rules for 'color'
+.colorX (@index) when (@index > 0) {
+    @i: (@index - 1);
+    (~".gradient-@{i}") { .color(@index); }
+    .colorX(@index - 1);
+}
+.colorX (0) {}
+
+.color (@index) {
+    color: spin(#BB0000, @index * 10);
+}
+.colorX(11);
 
 @import url('dr.less');
