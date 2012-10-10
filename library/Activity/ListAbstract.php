@@ -35,6 +35,11 @@ abstract class Activity_ListAbstract implements Iterator {
     protected $handle;
 
     /**
+     * @var string
+     */
+    protected $templateFile = self::TEMPLATE_FILE;
+
+    /**
      * @param $datasource
      * @param array $config
      */
@@ -59,6 +64,10 @@ abstract class Activity_ListAbstract implements Iterator {
         $this->handle = $targetHandle;
     }
 
+    public function setTemplateFile($templateFile) {
+        $this->templateFile = $templateFile;
+    }
+
     /**
      * @param $data
      * @return string
@@ -72,7 +81,7 @@ abstract class Activity_ListAbstract implements Iterator {
         }
         $page = $this->sitepage;
 
-        $page->setFile('activityTpl', self::TEMPLATE_FILE);
+        $page->setFile('activityTpl', $this->templateFile);
 
         $page->setVar('DARK', ++$this->j % 2 ? '' : 'dark');
 
