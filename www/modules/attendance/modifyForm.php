@@ -7,26 +7,35 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-
 $externalClass = new External_Synergetic_Class();
-
-//$class = $externalClass->getClass($_POST['classCode']);
-//$attendanceDate = new Alaress_Date_Format($_POST['attendanceDate'], '2012-10-09');
-//$attendancePeriod = $_POST['attendancePeriod'];
 
 /* Hardcoded test data
  */
-$class = $externalClass->getClass('ENC11');
-$attendanceDate = new Alaress_Date_Format('2012-10-09', 'y-m-d');
+$class = $externalClass->getClass($_POST['classCode']);
+$attendanceDate = new Alaress_Date_Format($_POST['attendanceDate'], 'y-m-d');
+
+/* TODO: Attendance Period
+ * Figger out how to figger this out
+ */
 $attendancePeriod = 6;
 
+/* Return url once non-ajax updates are done
+ */
+$redirect = '/modules/attendance/modify/' . $class['ClassCode'] . '/' . $attendanceDate->getDatabaseDate() . '/' . $attendancePeriod;
+
+/* Deal with it all
+ */
 $attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $attendancePeriod, new MSSQL());
 $now = new Alaress_Date_Format(time(), 'U');
 
-/* Create/update everyone's attendance
+/* Create/update everyone's attendance initially
  */
 if (isset($_POST['updateAll']) && ($_POST['updateAll'] == 'true')) {
 
+	/* TODO: Batch Saving
+	 * Save a record for everyone the first time you mark the roll
+	 * After that, just hide this button
+	 */
 }
 /* Update an individual person's attendance details individually
  *
@@ -40,6 +49,7 @@ else if (isset($_POST['updateOne']) && is_numeric($_POST['updateOne'])) {
 	$existingRecord = $attendanceHandler->existingRecord($_POST['updateOne']);
 
 	/* Update what's already in there, leaving other settings untarnished
+	 * You'll need to scrub to allow double-quotes (mssql seems to hate those)
 	 */
 	if (is_array($existingRecord) && isset($existingRecord['AttendanceSeq']) && is_numeric($existingRecord['AttendanceSeq'])) {
 		$data = $existingRecord;
@@ -50,6 +60,8 @@ else if (isset($_POST['updateOne']) && is_numeric($_POST['updateOne'])) {
 		$data['ModifiedByID'] = $_SESSION['id'];
 
 		$attendanceHandler->update($data);
+
+		SitePage::localRedir($redirect);
 	}
 	/* Create a new record
 	 */
@@ -79,13 +91,15 @@ else if (isset($_POST['updateOne']) && is_numeric($_POST['updateOne'])) {
 		);
 
 		$attendanceHandler->create($data);
+
+		SitePage::localRedir($redirect);
 	}
 }
 /* Mark this person as present (non-absent)
  * Should occur when a checkbox went from ticked to unticked states.
  */
-else if (isset($_POST['present']) && is_numeric($_POST['ExternalId'])) {
-	$existingRecord = $attendanceHandler->existingRecord($_POST['ExternalId']);
+else if (isset($_POST['present']) && is_numeric($_POST['externalId'])) {
+	$existingRecord = $attendanceHandler->existingRecord($_POST['externalId']);
 
 	/* Update what's already in there, leaving other settings untarnished
 	 */

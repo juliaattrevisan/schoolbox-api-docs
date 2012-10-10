@@ -160,7 +160,7 @@ else {
  */
 $this->setVar(array(
 	'JS_CLASS_CODE' => $class['ClassCode'],
-	'JS_ATTENDANCE_DATE' => $attendanceDate->getDateOnly(),
+	'JS_ATTENDANCE_DATE' => $attendanceDate->getDatabaseDate(),
 	'JS_ATTENDANCE_PERIOD' => $attendancePeriod,
 ));
 
@@ -168,6 +168,8 @@ $this->setVar(array(
  */
 $this->setVar(array(
 	'CLASS_CODE' => $class['ClassCode'],
+	'ATTENDANCE_DATE' => $attendanceDate->getDatabaseDate(),
 	'ATTENDANCE_DATE_FORMATTED' => $attendanceDate->getDateOnly(),
+	'ATTENDANCE_PERIOD' => $attendancePeriod,
 ));
 

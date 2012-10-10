@@ -14,14 +14,13 @@
 						 */
 						var data = {
 							present: true,
-							ExternalId: id,
-							ClassCode: '{JS_CLASS_CODE}',
-							AttendanceDate: '{JS_ATTENDANCE_DATE}',
-							AttendancePeriod: '{JS_ATTENDANCE_PERIOD}'
+							externalId: id,
+							classCode: '{JS_CLASS_CODE}',
+							attendanceDate: '{JS_ATTENDANCE_DATE}',
+							attendancePeriod: '{JS_ATTENDANCE_PERIOD}'
 						};
 
 						$j.post('/modules/attendance/modifyForm', data, function(responseText) {
-							console.log(responseText);
 						});
 
 						/* Hide options form and remove link
@@ -54,6 +53,10 @@
 	label {
 		float: left;
 	}
+
+	.genericWidth {
+		width: 200px;
+	}
 </style>
 
 <h1>Student Attendances for {CLASS_CODE}</h1>
@@ -62,9 +65,9 @@
 <table>
 	<tr>
 		<th></th>
-		<th style='width:200px;'>Firstname</th>
-		<th style='width:200px;'>Surname</th>
-		<th style='width:200px;'>Absent</th>
+		<th class='genericWidth'>Firstname</th>
+		<th class='genericWidth'>Surname</th>
+		<th class='genericWidth'>Absent</th>
 	</tr>
 	<!-- BEGIN student -->
 	<tr class='{ON_OFF}'>
@@ -85,6 +88,9 @@
 			<form method='post' action='/modules/attendance/modifyForm'>
 				<div>
 					<input name='updateOne' type='text' value='{STUDENT_SYNERGY_ID}' />
+					<input name='classCode' type='text' value='{CLASS_CODE}' />
+					<input name='attendanceDate' type='text' value='{ATTENDANCE_DATE}' />
+					<input name='attendancePeriod' type='text' value='{ATTENDANCE_PERIOD}' />
 				</div>
 				<label>Absence Options<br />
 					<select name='PossibleAbsenceCode'>
