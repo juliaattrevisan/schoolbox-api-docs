@@ -19,7 +19,7 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
      * @return void
      */
     public function execute() {
-        $allowedFileHandler = new AllowedFile();
+        $this->allowedFileHandler = new AllowedFile();
     }
 
     /**
