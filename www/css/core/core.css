@@ -830,7 +830,7 @@ Notifications
   margin: 0;
   clear: both;
   text-align: right;
-  color: #989898;
+  color: #797979;
   float: right;
   display: block;
 }
@@ -1086,6 +1086,18 @@ p.interact {
   margin: 0 0 0 15px;
   float: right;
   text-align: right;
+  color: #797979;
+}
+.left p.interact,
+.right p.interact,
+.top p.interact,
+.left p.hide-on-small,
+.right p.hide-on-small,
+.top p.hide-on-small,
+.left p.small,
+.right p.small,
+.top p.small {
+  color: #797979;
 }
 p.interact-left {
   float: left;
@@ -4994,6 +5006,16 @@ Dropbox
   height: 1em;
   text-align: left;
 }
+.upcoming-work {
+  width: 100%;
+}
+.upcoming-work td {
+  vertical-align: bottom;
+  color: #797979;
+}
+.upcoming-work .title {
+  font-weight: bold;
+}
 #calendar table th.dark {
   border: 0;
   padding: 7px 5px;
@@ -5696,6 +5718,7 @@ table.subjectList {
   vertical-align: bottom;
   text-align: left;
   font-size: 12px;
+  white-space: nowrap;
 }
 .mark-sheet.names {
   position: absolute;
@@ -6686,6 +6709,7 @@ ul.activity-list li {
   padding-left: 35px;
   overflow: hidden;
   min-height: 32px;
+  border-bottom: 1px solid #eeeeee;
 }
 ul.activity-list li:hover {
   background-color: #e9f6ff;
@@ -6695,120 +6719,122 @@ ul.activity-list li .icon {
   *display: inline;
   zoom: 1;
   width: 32px;
-  height: 100%;
+  height: 22px;
   position: absolute;
+  top: 50%;
+  margin-top: -11px;
   left: 0;
 }
 ul.activity-list li .icon.pin span {
   display: block;
   width: 24px;
   height: 24px;
-  background-image: url('/images/core/icons/btn-icons.png');
-  background-position: -2px -1px;
+  background-image: url('/images/core/icons/activity-icons.png');
+  background-position: 0px 0px;
   margin: 4px;
 }
 ul.activity-list li .icon.file span {
   display: block;
   width: 24px;
   height: 24px;
-  background-image: url('/images/core/icons/btn-icons.png');
-  background-position: -2px -29px;
+  background-image: url('/images/core/icons/activity-icons.png');
+  background-position: 0px -24px;
   margin: 4px;
 }
 ul.activity-list li .icon.clock span {
   display: block;
   width: 24px;
   height: 24px;
-  background-image: url('/images/core/icons/btn-icons.png');
-  background-position: -2px -57px;
+  background-image: url('/images/core/icons/activity-icons.png');
+  background-position: 0px -48px;
   margin: 4px;
 }
 ul.activity-list li .icon.tick span {
   display: block;
   width: 24px;
   height: 24px;
-  background-image: url('/images/core/icons/btn-icons.png');
-  background-position: -2px -85px;
+  background-image: url('/images/core/icons/activity-icons.png');
+  background-position: 0px -72px;
   margin: 4px;
 }
 ul.activity-list li .icon.link span {
   display: block;
   width: 24px;
   height: 24px;
-  background-image: url('/images/core/icons/btn-icons.png');
-  background-position: -2px -113px;
+  background-image: url('/images/core/icons/activity-icons.png');
+  background-position: 0px -96px;
   margin: 4px;
 }
 ul.activity-list li .icon.news span {
   display: block;
   width: 24px;
   height: 24px;
-  background-image: url('/images/core/icons/btn-icons.png');
-  background-position: -2px -141px;
+  background-image: url('/images/core/icons/activity-icons.png');
+  background-position: 0px -120px;
   margin: 4px;
 }
 ul.activity-list li .icon.onlineassessment span {
   display: block;
   width: 24px;
   height: 24px;
-  background-image: url('/images/core/icons/btn-icons.png');
-  background-position: -2px -170px;
+  background-image: url('/images/core/icons/activity-icons.png');
+  background-position: 0px -144px;
   margin: 4px;
 }
 ul.activity-list li .icon.survey span {
   display: block;
   width: 24px;
   height: 24px;
-  background-image: url('/images/core/icons/btn-icons.png');
-  background-position: -2px -198px;
+  background-image: url('/images/core/icons/activity-icons.png');
+  background-position: 0px -168px;
   margin: 4px;
 }
 ul.activity-list li .icon.forum span {
   display: block;
   width: 24px;
   height: 24px;
-  background-image: url('/images/core/icons/btn-icons.png');
-  background-position: -2px -225px;
+  background-image: url('/images/core/icons/activity-icons.png');
+  background-position: 0px -192px;
   margin: 4px;
 }
 ul.activity-list li .icon.blog span {
   display: block;
   width: 24px;
   height: 24px;
-  background-image: url('/images/core/icons/btn-icons.png');
-  background-position: -2px -253px;
+  background-image: url('/images/core/icons/activity-icons.png');
+  background-position: 0px -216px;
   margin: 4px;
 }
 ul.activity-list li .icon.closed span {
   display: block;
   width: 24px;
   height: 24px;
-  background-image: url('/images/core/icons/btn-icons.png');
-  background-position: -2px -282px;
+  background-image: url('/images/core/icons/activity-icons.png');
+  background-position: 0px -240px;
   margin: 4px;
 }
 ul.activity-list li .icon.returned span {
   display: block;
   width: 24px;
   height: 24px;
-  background-image: url('/images/core/icons/btn-icons.png');
-  background-position: -2px -310px;
+  background-image: url('/images/core/icons/activity-icons.png');
+  background-position: 0px -264px;
   margin: 4px;
 }
 ul.activity-list li .icon.new span {
   display: block;
   width: 24px;
   height: 24px;
-  background-image: url('/images/core/icons/btn-icons.png');
-  background-position: -2px -338px;
+  background-image: url('/images/core/icons/activity-icons.png');
+  background-position: 0px -288px;
   margin: 4px;
 }
 ul.activity-list li .icon.overdue span {
   display: block;
   width: 24px;
   height: 24px;
-  background-image: url('/images/core/icons/btn-icons.png');
-  background-position: -2px -365px;
+  background-image: url('/images/core/icons/activity-icons.png');
+  background-position: 0px -312px;
   margin: 4px;
 }
 ul.activity-list li .avatar {
@@ -6837,6 +6863,122 @@ ul.activity-list li p .grade {
 ul.activity-list li .time {
   display: block;
   float: right;
+  color: #797979;
+}
+.listing .subject-list {
+  color: #797979;
+}
+.listing .subject-list li {
+  position: relative;
+  padding: 0;
+  vertical-align: middle;
+  border-bottom: 1px solid #eeeeee;
+}
+.listing .subject-list a {
+  display: block;
+  padding: 5px 4px;
+  padding-left: 40px;
+  padding-right: 20px;
+  margin-right: 60px;
+  position: relative;
+  color: #000000;
+  height: 30px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  border-right: 1px solid #eeeeee;
+}
+.listing .subject-list a.subject {
+  font-weight: bold;
+  line-height: 30px;
+}
+.listing .subject-list a.subject .icon {
+  position: absolute;
+  top: 50%;
+  margin-top: -10px;
+  right: 8px;
+  display: block;
+  width: 18px;
+  height: 20px;
+  background-image: url('/images/core/icons/action-icons.png');
+  background-position: 0px 0px;
+}
+.listing .subject-list a.teacher {
+  border-top: 1px solid #eeeeee;
+  line-height: 15px;
+}
+.listing .subject-list a.teacher .icon {
+  position: absolute;
+  top: 50%;
+  margin-top: -10px;
+  right: 8px;
+  display: block;
+  width: 18px;
+  height: 20px;
+  background-image: url('/images/core/icons/action-icons.png');
+  background-position: 0px -20px;
+}
+.listing .subject-list a.teacher span {
+  display: block;
+  color: #797979;
+}
+.listing .subject-list a:hover {
+  background-color: #e9f6ff;
+}
+.listing .subject-list img {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  max-width: 32px;
+  max-height: 32px;
+}
+.listing .subject-list .grade {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 50px;
+  padding: 5px;
+  vertical-align: middle;
+}
+.listing .subject-list .grade span {
+  vertical-align: middle;
+  font-size: 1.5em;
+  line-height: 1;
+  font-weight: bold;
+}
+.gradient-10 {
+  color: #1fbb00;
+}
+.gradient-9 {
+  color: #3ebb00;
+}
+.gradient-8 {
+  color: #5ebb00;
+}
+.gradient-7 {
+  color: #7dbb00;
+}
+.gradient-6 {
+  color: #9cbb00;
+}
+.gradient-5 {
+  color: #bbbb00;
+}
+.gradient-4 {
+  color: #bb9c00;
+}
+.gradient-3 {
+  color: #bb7d00;
+}
+.gradient-2 {
+  color: #bb5d00;
+}
+.gradient-1 {
+  color: #bb3e00;
+}
+.gradient-0 {
+  color: #bb1f00;
 }
 /*
    DR., make yo changes here!

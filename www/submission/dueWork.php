@@ -599,7 +599,7 @@ foreach ($categoryList as $category) {
         'SUBJ_SUBJECT_NAME' => Scrub::Text($category['name']),
         'SUBJ_SUBJECT_ICON' => '/images/mime/60x60/man.png',
         'SUBJ_SUBJECT_CODE' => $categoryCode,
-        'SUBJ_SUBJECT_URL' => $categoryID,
+        'SUBJ_SUBJECT_URL' => '/homepage/'.$categoryID,
 
 		'SUBJ_TOTAL' => $summary[$category['id']]['total'],
 		'SUBJ_DUE' => $summary[$category['id']]['due'],
