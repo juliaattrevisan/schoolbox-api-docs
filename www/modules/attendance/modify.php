@@ -12,10 +12,11 @@ $this->setFile(TEMPLATE_content, 'modules/attendance/modify.html');
 $this->setBlock(TEMPLATE_content, 'student', 'student_block');
 $this->setBlock('student', 'absence_options', 'absence_options_block');
 $this->setBlock('student', 'reason_options', 'reason_options_block');
+$this->setBlock('student', 'has_attendance_options', 'has_attendance_options_block');
 
 /* TODO: Figger out a way to get this value from somewhere, like a timetable
  */
-$period = 6;
+$attendancePeriod = 6;
 
 /* Selected date for which to deal with attendances
  */
@@ -25,10 +26,6 @@ if (strlen($this->arg[1])) {
 else {
 	$attendanceDate = new Alaress_Date_Format(time(), 'U');
 }
-
-$this->setVar(array(
-	'ATTENDANCE_DATE_FORMATTED' => $attendanceDate->getDateOnly(),
-));
 
 /* Get a class list which we'll match up manually with their attendance records
  * but only if this class exists
@@ -46,7 +43,7 @@ if ($class) {
 
 		/* Get the attendance record for this class
 		 */
-		$attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $period, new MSSQL());
+		$attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $attendancePeriod, new MSSQL());
 		$attendanceHandler->findAttendanceRecords();
 
 		/* Dropdown options
@@ -54,6 +51,8 @@ if ($class) {
 		$absenceDropdownOptions = $attendanceHandler->findAbsenceDropdownOptions();
 		$reasonDropdownOptions = $attendanceHandler->findReasonDropdownOptions();
 
+		/* Iterate each guy
+		 */
 		foreach($allStudents as $currentStudent) {
 			$user = $userHandler->getBySynergy($currentStudent['synergy_id']);
 
@@ -61,10 +60,16 @@ if ($class) {
 			 */
 			$attendanceRecord = $attendanceHandler->getAttendanceRecord($currentStudent['synergy_id']);
 
-			/* Default setting for the checkbox
+			/* Default setting for the checkbox and Edit link
 			 */
 			if (is_array($attendanceRecord) && ($attendanceRecord['AttendedFlag'] == 0)) {
 				$isAbsent = "checked='checked'";
+
+				$this->setVar(array(
+					'STUDENT_SYNERGY_ID' => $currentStudent['synergy_id']
+				));
+
+				$this->parse('has_attendance_options_block', 'has_attendance_options');
 			}
 			else {
 				$isAbsent = '';
@@ -72,6 +77,8 @@ if ($class) {
 				/* Clear this as we don't want it to display anything
 				 */
 				$attendanceRecord = array();
+
+				$this->setVar('has_attendance_options_block', '');
 			}
 
 			/* Replace everything with everything
@@ -138,11 +145,30 @@ if ($class) {
 			 */
 			$this->setVar('absence_options_block', '');
 			$this->setVar('reason_options_block', '');
+			$this->setVar('has_attendance_options_block', '');
+			break;
 		}
 	}
 	else {
 		$this->setVar('student_block', '');
 	}
 }
+else {
+	$this->setVar('student_block', '');
+}
 
+/* Synthesise a javascript cure!
+ */
+$this->setVar(array(
+	'JS_CLASS_CODE' => $class['ClassCode'],
+	'JS_ATTENDANCE_DATE' => $attendanceDate->getDateOnly(),
+	'JS_ATTENDANCE_PERIOD' => $attendancePeriod,
+));
+
+/* Cosmetic makeup for the masses
+ */
+$this->setVar(array(
+	'CLASS_CODE' => $class['ClassCode'],
+	'ATTENDANCE_DATE_FORMATTED' => $attendanceDate->getDateOnly(),
+));
 

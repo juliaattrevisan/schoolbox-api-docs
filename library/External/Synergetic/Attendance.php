@@ -144,6 +144,8 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 
 	/**
 	 * Find the attendance record for a particular synergy_id
+	 * simply by traversing an array, rather than drumming the
+	 * db all over again
 	 *
 	 * @param $externalId
 	 *
@@ -187,6 +189,62 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 		";
 
 		return $this->getDatabase()->getAll($query);
+	}
+
+	/**
+	 * Find out of an attendance record exists for a particular person
+	 * in the class, date and period specified
+	 *
+	 * @param $externalId
+	 * @return bool
+	 */
+	public function existingRecord($externalId) {
+		$query = "
+			SELECT *
+			FROM SynergyOne.dbo.tAttendances
+			WHERE AttendanceMasterSeq = '{$this->getAttendanceMasterSeq()}'
+			AND ID = '{$externalId}'
+		";
+
+		return $this->getDatabase()->getRow($query);
+	}
+
+	/**
+	 * Create an attendance record
+	 *
+	 * @param $data
+	 */
+	public function create($data) {
+		$query = "
+			INSERT INTO
+		";
+
+		echo $query;
+		exit(1);
+	}
+
+	/**
+	 * Update an attendance record
+	 *
+	 * @param $data
+	 *
+	 * @return \PDOStatement
+	 */
+	public function update($data) {
+		$query = "
+			UPDATE SynergyOne.dbo.tAttendances
+			SET
+				PossibleAbsenceCode = '{$data['PossibleAbsenceCode']}',
+				PossibleDescription = \"{$data['PossibleDescription']}\",
+				PossibleReasonCode = '{$data['PossibleReasonCode']}',
+				AttendedFlag = '{$data['AttendedFlag']}',
+				ModifiedDate = GETDATE(),
+				ModifiedByID = '{$data['ModifiedByID']}'
+			WHERE AttendanceSeq = '{$data['AttendanceSeq']}'
+			AND	ID = '{$data['ID']}'
+		";
+
+		return $this->getDatabase()->query($query);
 	}
 
 	/* Getters/Setters

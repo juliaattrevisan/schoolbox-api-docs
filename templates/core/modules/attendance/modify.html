@@ -1,45 +1,116 @@
-<h1>Student Attendance</h1>
+<script type='text/javascript'>
+	$j(function() {
+		$j('.attendanceOptions').each(function(index, element) {
+			$j(element).click(function() {
+				var id = $j(element).val();
+
+				if ($j(element).is(':checked')) {
+					$j('#attendanceOptionsForm_' + id).show();
+				}
+				else {
+					if (confirm("Are you sure you want to mark this person as present?")) {
+
+						/* Ajax clear existing reason
+						 */
+						var data = {
+							present: true,
+							ExternalId: id,
+							ClassCode: '{JS_CLASS_CODE}',
+							AttendanceDate: '{JS_ATTENDANCE_DATE}',
+							AttendancePeriod: '{JS_ATTENDANCE_PERIOD}'
+						};
+
+						$j.post('/modules/attendance/modifyForm', data, function(responseText) {
+							console.log(responseText);
+						});
+
+						/* Hide options form and remove link
+						 */
+						$j('#attendanceOptionsForm_' + id).hide();
+						$j('#viewAttendanceOptions_' + id).remove();
+					}
+					else {
+						return false;
+					}
+				};
+			});
+		});
+	});
+
+	$j(function() {
+		$j('.viewAttendanceOptions').click(function(event) {
+			event.preventDefault();
+			var id = $j(this).attr('id').replace(/viewAttendanceOptions_/, '');
+
+			if ($j('#attendanceOptions_' + id).is(':checked')) {
+				$j('#attendanceOptionsForm_' + id).toggle();
+			}
+
+			return false;
+		});
+	});
+</script>
+<style type='text/css'>
+	label {
+		float: left;
+	}
+</style>
+
+<h1>Student Attendances for {CLASS_CODE}</h1>
 <h2>{ATTENDANCE_DATE_FORMATTED}</h2>
 
 <table>
 	<tr>
 		<th></th>
-		<th>Firstname</th>
-		<th>Surname</th>
-		<th>Absent</th>
-		<th style='width:500px'>Absentee Details</th>
+		<th style='width:200px;'>Firstname</th>
+		<th style='width:200px;'>Surname</th>
+		<th style='width:200px;'>Absent</th>
 	</tr>
 	<!-- BEGIN student -->
 	<tr class='{ON_OFF}'>
 		<td><img src='/portrait.php?userId={STUDENT_UID}&size=square64' width='32' height='32' alt="{STUDENT_FIRSTNAME} {STUDENT_LASTNAME}" /></td>
 		<td><a href='/search/user/{STUDENT_UID}'>{STUDENT_FIRSTNAME}</a></td>
 		<td><a href='/search/user/{STUDENT_UID}'>{STUDENT_LASTNAME}</a></td>
-		<td><input type='checkbox' name='attending[]' value='{STUDENT_SYNERGY_ID}' {IS_ABSENT} /></td>
 		<td>
+			<input id='attendanceOptions_{STUDENT_SYNERGY_ID}' class='attendanceOptions' type='checkbox' name='attending[]' value='{STUDENT_SYNERGY_ID}' {IS_ABSENT} />
+			<!-- BEGIN has_attendance_options -->
+			<a id='viewAttendanceOptions_{STUDENT_SYNERGY_ID}' class='viewAttendanceOptions' href=''>Edit</a>
+			<!-- END has_attendance_options -->
+		</td>
+	</tr>
+	<tr id='attendanceOptionsForm_{STUDENT_SYNERGY_ID}' class='{ON_OFF}' style='display:none;'>
 
-			<div style='border:1px solid #f00;'>
-				<form method='post' action='/modules/attendance/modifyForm'>
-					<label>Absence Options</label>
-					<select name='absenceCode_{STUDENT_SYNERGY_ID}'>
+		<!-- Non-aligned columns ;( -->
+		<td colspan='4'>
+			<form method='post' action='/modules/attendance/modifyForm'>
+				<div>
+					<input name='updateOne' type='text' value='{STUDENT_SYNERGY_ID}' />
+				</div>
+				<label>Absence Options<br />
+					<select name='PossibleAbsenceCode'>
 						<!-- BEGIN absence_options -->
-						<option value='ABSENCE_OPTIONS_VALUE' {ABSENCE_OPTIONS_SELECTED}>{ABSENCE_OPTIONS_DESCRIPTION}</option>
+						<option value='{ABSENCE_OPTIONS_VALUE}' {ABSENCE_OPTIONS_SELECTED}>{ABSENCE_OPTIONS_DESCRIPTION}</option>
 						<!-- END absence_options -->
 					</select>
+				</label>
 
-					<label>Reason Options</label>
-					<select name='reason_{STUDENT_SYNERGY_ID}'>
+				<label>Reason Options<br />
+					<select name='PossibleReasonCode'>
 						<!-- BEGIN reason_options -->
-						<option value='REASON_OPTIONS_VALUE' {REASON_OPTIONS_SELECTED}>{REASON_OPTIONS_DESCRIPTION}</option>
+						<option value='{REASON_OPTIONS_VALUE}' {REASON_OPTIONS_SELECTED}>{REASON_OPTIONS_DESCRIPTION}</option>
 						<!-- END reason_options -->
 					</select>
+				</label>
 
-					<!-- Maximum length of this description is 100, as it's set in synergetic db -->
-					<label>Reason Description</label>
-					<input type='text' maxlength='100' name='possibleReasonDescription_{STUDENT_SYNERGY_ID}' value="{STUDENT_REASON_DESCRIPTION}" />
+				<!-- Maximum length of this description is 100, as it's set in synergetic db -->
+				<label>Reason Description<br />
+					<input type='text' maxlength='100' name='PossibleReasonDescription' value="{STUDENT_REASON_DESCRIPTION}" />
+				</label>
 
+				<label><br />
 					<input class='btn update' type='submit' value='update' />
-				</form>
-			</div>
+				</label>
+			</form>
 		</td>
 	</tr>
 	<!-- END student -->
