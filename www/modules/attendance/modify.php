@@ -146,7 +146,6 @@ if ($class) {
 			$this->setVar('absence_options_block', '');
 			$this->setVar('reason_options_block', '');
 			$this->setVar('has_attendance_options_block', '');
-			break;
 		}
 	}
 	else {

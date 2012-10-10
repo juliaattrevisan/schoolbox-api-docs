@@ -14,10 +14,11 @@ $externalClass = new External_Synergetic_Class();
 //$attendanceDate = new Alaress_Date_Format($_POST['attendanceDate'], '2012-10-09');
 //$attendancePeriod = $_POST['attendancePeriod'];
 
+/* Hardcoded test data
+ */
 $class = $externalClass->getClass('ENC11');
 $attendanceDate = new Alaress_Date_Format('2012-10-09', 'y-m-d');
 $attendancePeriod = 6;
-$synergyId = 312;
 
 $attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $attendancePeriod, new MSSQL());
 $now = new Alaress_Date_Format(time(), 'U');
