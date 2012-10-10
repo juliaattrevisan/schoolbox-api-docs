@@ -32,8 +32,8 @@ $this->setBlock(TEMPLATE_content, 'week', 'week_block');
 $this->setBlock('week', 'day', 'day_block');
 $this->setBlock('day', 'event', 'event_block');
 
-$this->setBlock(TEMPLATE_content, 'summary', 'summary_block');
-$this->setBlock('summary', 'summary_due', 'summary_due_block');
+//$this->setBlock(TEMPLATE_content, 'summary', 'summary_block');
+//$this->setBlock('summary', 'summary_due', 'summary_due_block');
 
 $this->setBlock(TEMPLATE_content, 'activity', 'activity_block');
 $this->setBlock(TEMPLATE_content, 'is_parent', 'is_parent_block');
@@ -552,55 +552,93 @@ foreach ($categoryList as $category) {
                     $emailObj = new Email();
                     $emailAddress = $emailObj->formatEmailFromArray($teacher);
 
-                    $teacherOutput[] = '<a href="'.$_SESSION['mailhandle']."$emailAddress\">$teacherName</a>";
+                    $teacherOutput[] = array(
+                        'id' => 0,
+                        'name' => $teacherName,
+                        'email' => $_SESSION['mailhandle'] . $emailAddress,
+                        'synid' => $teacherSynID,
+                    );
                 }
 			}
 		}
 	}
 
-    /* Count the number of submission boxes for this Subject, and the percentage
-     * of items submitted. If there are no submission boxes, just have 100%
-     */
-    /*
-    $submissions = $submissionHandler->getSubmissionsForSubject($categoryID);
-    $numBoxes = $submissionHandler->countSubmissionBoxes($categoryID);
-
-    if ($numBoxes) {
-        $thisPercentage = round(100*count($submissions)/$numBoxes);
-    }
-    else {
-        $thisPercentage = 100;
-    }
-    */
-
-    /* Accumulate into array for Javascript
-     */
-    //$percentage[] = $thisPercentage;
     $categoryIDs[] = $categoryID;
-    $categoryCode = $category['code']?$category['code']:$categoryID;
+    $categoryCode = $category['code'] ? '(' . $category['code'] .')' : '';
+
+    // retrieve subject grades
+    $studentGrades = $returnHandler->getStudentMarksForCategory($category['id'], $userID);
+    $gradeAvg = $studentGrades['avg'];
+    unset($studentGrades['avg']);
+
+    $trendDir = '';
+    $trendAmt = '';
+    // if more than 1 assessment, can calculate trending
+    if(count($studentGrades) > 1) {
+        // get previous average
+        array_pop($studentGrades);
+        $prevAvg = array_sum($studentGrades) / count($studentGrades);
+        if($gradeAvg > $prevAvg) {
+            $trendDir = '&#x25B2;';
+        }
+        elseif($gradeAvg < $prevAvg) {
+            $trendDir = '&#x25BC;';
+        }
+        $trendAmt = sprintf('%0.1f', ($gradeAvg - $prevAvg) / $prevAvg * 100) . '%';
+    }
+
+    // calculate grade averages and trending
+    $this->setFile('subjectTpl', 'activity/subjectlist.html');
+    $this->setBlock('subjectTpl', 'teacher', 'teacher_block');
+    $this->setBlock('subjectTpl', 'icon', 'icon_block');
 
 	$output = array(
-		'SUMMARY_CAT_ID' => $categoryID,
-        'SUMMARY_CAT_NAME' => $groupHandler->getPermission($categoryID) >= READ_ACCESS ?
-            '<a href="/homepage/' . $categoryCode . '">' .Scrub::Text($category['name']) . '</a>'
-            : Scrub::Text($category['name']),
-		'SUMMARY_TOTAL' => $summary[$category['id']]['total'],
-		'SUMMARY_DUE' => $summary[$category['id']]['due'],
-		'SUMMARY_TEACHER' => Cfg::get('external_enable') ? implode(', ', $teacherOutput) : '',
-		'DARK' => $j++ % 2 ? 'dark' : '',
-		'PERCENTAGE_COMPLETED' => $thisPercentage,
+        'SUBJ_HAS_GRADE' => '',
+		'SUBJ_CAT_ID' => $categoryID,
+
+        'SUBJ_SUBJECT_NAME' => Scrub::Text($category['name']),
+        'SUBJ_SUBJECT_ICON' => '/images/mime/60x60/man.png',
+        'SUBJ_SUBJECT_CODE' => $categoryCode,
+        'SUBJ_SUBJECT_URL' => $categoryID,
+
+		'SUBJ_TOTAL' => $summary[$category['id']]['total'],
+		'SUBJ_DUE' => $summary[$category['id']]['due'],
+
+        'SUBJ_GRADE' => $gradeAvg == -1 ? '&ndash;' : $returnHandler->percent2letter($gradeAvg),
+        'SUBJ_GRADEIANT' => ($gradeAvg == -1 ? 'na' : (int)($gradeAvg / 10)),
+        'SUBJ_TREND_DIR' => $trendDir,
+        'SUBJ_TREND_AMT' => $trendAmt,
+
+        'DARK' => ++$j % 2 ? '' : 'dark'
 	);
 
-	$this->setVar($output);
+    $this->setVar($output);
 
-	$this->setVar('summary_due_block', '');
+    if(Cfg::get('external_enable')) {
+        $this->setVar('teacher_block', '');
+        if(count($teacherOutput)) {
+            foreach($teacherOutput as $teacher) {
+                $tOutput = array(
+                    'SUBJ_TEACHER_NAME' => $teacher['name'],
+                    'SUBJ_TEACHER_URL' => $teacher['email'],
+                    'SUBJ_TEACHER_ROLE' => 'Teacher',
+                    'SUBJ_TEACHER_AVATAR' => "/portrait?userId={$teacher['synid']}&size=square32",
+                    'SUBJ_TEACHER_AVATAR_TITLE' => $teacher['name']
+                );
+                $this->setVar($tOutput);
+                $this->parse('teacher_block', 'teacher', true);
+            }
+        }
+    }
+    else {
+        $this->setVar('teacher_block', '');
+    }
 
-	if ($category['due'] > 0) {
-		$this->parse('summary_due_block', 'summary_due');
-	}
+    $this->parse('icon_block', 'icon');
+    $this->parse('SUBJECT_LIST', 'subjectTpl', true);
 
-	$this->parse('summary_block', 'summary', true);
 }
+
 
 /* Give jquery ProgressBar values to use
  */

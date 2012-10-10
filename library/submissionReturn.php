@@ -112,6 +112,10 @@ class SubmissionReturn extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
+    /**
+     * @param float $mark
+     * @return array|bool
+     */
     function getLetterGradeByValue($mark) {
         $query = "SELECT * FROM submission_grade
                   WHERE lower_bound <= $mark
@@ -170,17 +174,54 @@ class SubmissionReturn extends DeprecatedModel {
         $this->db->query($sql);
         $attempts = array();
         while($row = $this->db->getNextArray()) {
-            if(isset($attempts[$row['assess_id']])) {
-                continue;
+            if(!isset($attempts[$row['assess_id']]) && $row['max_mark'] != 0) {
+                $attempts[$row['assess_id']] = ($row['mark'] / $row['max_mark']) * 100;
             }
-            $attempts[$row['assess_id']] = ($row['mark'] / $row['max_mark']) * 100;
         }
 
         $merged = array_merge($marks, $attempts);
 
-        $avg = array_sum($merged) / count($merged);
-        $merged['avg'] = sprintf('%0.2f', $avg);
+
+        if(count($merged)) {
+            $avg = array_sum($merged) / count($merged);
+            $merged['avg'] = sprintf('%0.2f', $avg);
+        }
+        else {
+            $merged['avg'] = -1;
+        }
         return $merged;
+    }
+
+    /**
+     * Converts a number to a letter-grade, and then shortens the string
+     *  - 'A+' remains 'A+'
+     *  - 'Credit' becomes 'CR'
+     *  - 'High Distinction' becomes 'HD'
+     *
+     * @param float $percentage
+     */
+    function percent2letter($percentage) {
+        $letterArray = $this->getLetterGradeByValue($percentage);
+
+        // this function is intended for narrow spaces, so do some string manipulation
+        // if you don't need this, just use self::getLetterGradeByValue()
+        $letter = $letterArray['caption'];
+        if(strlen($letter) < 3) {
+            return $letter;
+        }
+        // no spaces, take first two letters
+        if(strpos($letter, ' ') === false) {
+            $rtn = substr($letter, 0, 2);
+        }
+        else {
+            // take the first letter from the first 2 words
+            $words = explode(' ', $letter);
+            $rtn = '';
+            for($i = 0; $i < 2; ++$i) {
+                $rtn .= $words[$i][0];
+            }
+        }
+        return strtoupper($rtn);
     }
 
     function securityCheck($box_id, $sid)

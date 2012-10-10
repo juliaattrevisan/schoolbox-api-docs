@@ -21,7 +21,7 @@ class Activity_ListArray extends Activity_ListAbstract {
 
     /**
      * Will return the render of the current list item
-     * @return string
+     * @return SitePage
      */
     public function current() {
         return $this->renderItem($this->datasource[$this->ptr]);

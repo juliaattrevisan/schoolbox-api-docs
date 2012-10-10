@@ -70,7 +70,7 @@ abstract class Activity_ListAbstract implements Iterator {
 
     /**
      * @param $data
-     * @return string
+     * @return SitePage
      */
     protected function renderItem($data) {
         // instantiate a new sitepage if the monolith wasn't provided
@@ -111,7 +111,7 @@ abstract class Activity_ListAbstract implements Iterator {
         }
 
         $page->parse($this->handle, 'activityTpl', true);
-        return 'true';
+        return $page;
     }
 
 
