@@ -21,6 +21,12 @@
 	#	php_flag apc.enabled off
 	#</Directory>
 
+	# Mobile Edition - Comment out this section to enable
+	<Location /m>
+	       RewriteEngine on
+	       RewriteRule ^/*(.*)$ /index.php?page=common/404
+	</Location>
+
 	ErrorDocument 404 /index.php?page=common/404
 
 	Options +FollowSymLinks
@@ -70,16 +76,15 @@
 	RewriteRule ^(.*)$ /homepage/rss.php?page=$1 [L]
 
 	# Mobile Edition
-	#RewriteCond %{REQUEST_URI} /m/.*
-	#RewriteCond %{REQUEST_URI} !/m/inc/.*
-	#RewriteCond %{REQUEST_URI} !/m/manifest.php
-	#RewriteCond %{REQUEST_FILENAME} !-d
-	#RewriteCond %{REQUEST_FILENAME} !-f
-	#RewriteRule ^(.*)$ /m/index.php?url=$1 [L,QSA]
+	RewriteCond %{REQUEST_URI} /m/.*
+	RewriteCond %{REQUEST_URI} !/m/inc/.*
+	RewriteCond %{REQUEST_URI} !/m/manifest.php
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule ^(.*)$ /m/index.php?url=$1 [L,QSA]
 
 	RewriteCond %{REQUEST_URI} !/dav/.*
-	# Mobile Edition
-	#RewriteCond %{REQUEST_URI} !/m/.*
+	RewriteCond %{REQUEST_URI} !/m/.*
 	RewriteCond %{REQUEST_URI} !\.[A-Za-z]{2,4}$
 	RewriteRule ^(.*)$ /index.php?page=$1 [L,QSA]
 
