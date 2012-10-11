@@ -5,6 +5,15 @@
  * Note that Synergetic's table uses "Seq" where we use "id"
  * They are synonymous in meaning (though sometimes disorientating)
  *
+ * Reset sql for admin:
+
+DELETE FROM SynergyOne.dbo.tAttendances WHERE AttendanceMasterSeq > 336;
+DELETE FROM SynergyOne.dbo.AttendanceMaster WHERE AttendanceMasterSeq > 336;
+
+SELECT * FROM SynergyOne.dbo.AttendanceMaster ORDER BY AttendanceMasterSeq DESC;
+SELECT * FROM SynergyOne.dbo.tAttendances ORDER BY AttendanceMasterSeq DESC;
+
+ *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
