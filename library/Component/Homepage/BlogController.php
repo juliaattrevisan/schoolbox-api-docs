@@ -150,6 +150,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                 $showingComments = count($comments);
 
                 $this->setVar('BLOG_TOTAL_COMMENTS', $totalComments);
+                $j = 0;
 
                 if(!empty($comments)) {
                     foreach($comments as $comment) {
@@ -162,6 +163,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                             'COMMENT_AUTHOR_NAME'   => $comment['name'],
                             'COMMENT_CREATED' => $createdTime->getRelativeTime(),
                             'COMMENT_AUTHOR_EXTERNAL_ID' => $comment['synergy_id'],
+                            'ON_OFF'          => ++$j % 2 ? 'dark' : ''
                         ));
 
                         if($comment['owner'] == $_SESSION['id'] || $this->permission >= WRITE_ACCESS)

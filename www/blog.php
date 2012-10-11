@@ -37,6 +37,7 @@ if(is_numeric($this->arg[0])) {
 		$this->setVar('BLOG_COMMENTS', count($comments) . ' Comments');
 
 		$userHandler = new User();
+        $j = 0;
 
 		foreach($comments as $comment) {
 			$actionDate = new Alaress_Date_Relative($comment['created']);
@@ -45,7 +46,8 @@ if(is_numeric($this->arg[0])) {
 				'COMMENT_BODY'    => $comment['body'],
 				'COMMENT_OWNER'   => $userHandler->formatName($comment),
 				'COMMENT_CREATED' => $actionDate->getRelativeTime(),
-				'DELETE_COMMENT'  => "<a class=\"delete-comment\" href=\"/blog/comment/delete/{$comment['id']}\"><span></span>Delete</a>"
+				'DELETE_COMMENT'  => "<a class=\"delete-comment\" href=\"/blog/comment/delete/{$comment['id']}\"><span></span>Delete</a>",
+                'ON_OFF'          => ++$j % 2 ? 'rofl' : 'copter'
 			));
 
 			if($comment['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS || NEWS_teacher_edit_other)

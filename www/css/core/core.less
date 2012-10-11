@@ -904,6 +904,9 @@ Notifications
     }
     li {
         border-bottom: 1px solid @border-color;
+        li {
+            border-bottom-width: 0;
+        }
     }
 }
 
@@ -1899,10 +1902,10 @@ ADMIN BODY
             background: @dark;
         }
         &.green {
-            background: #edf7e7;
-            border-color: @module-background;
+            background: @alternate-background;
+            border-color: #e9e3d6;
             .split {
-                border-color: @module-background;
+                border-color: #e9e3d6;
             }
         }
     }
@@ -3965,21 +3968,47 @@ BLOG COMPONENT
 ************************/
 
 .blog {
+    p.author {
+        clear: left;
+        color: @secondary-text;
+        padding-left: 40px;
+        img {
+            float: left;
+            margin-left: -40px;
+        }
+        .subtitle {
+            display: block;
+        }
+    }
     .comments {
-        margin: 10px 0;
+        margin: 0;
         p {
             &.interact {
-                border-top: 1px dashed #ccc;
-                padding-top: 0.5em;
-                margin-top: 7px; //  float: none;
-                line-height: 32px;
+                float: none;
+                text-align: right;
             }
             &.comment-body {
                 margin-top: 4px;
+                margin-bottom: 0;
             }
         }
         h3 {
             margin-bottom: 16px;
+        }
+        li {
+            clear: both;
+            padding: 10px 8px 10px 50px;
+            margin: 0;
+            border-top: 1px solid @border-color;
+        }
+        .author {
+            img {
+                float: left;
+                margin-left: -40px;
+            }
+        }
+        .subtitle {
+            color: @secondary-text;
         }
         .box {
             background: #fafafa;
@@ -3990,12 +4019,24 @@ BLOG COMPONENT
             float: none;
             margin: 3px 0;
         }
+        .btn {
+            margin-top: -5px;
+        }
+        .confirm {
+            float: right;
+            margin: -6px 0 0 0;
+        }
     }
     .blog-body {
         clear: both;
     }
     .detail ul {
         list-style: disc;
+    }
+    form {
+        textarea {
+            width: 100%;
+        }
     }
 }
 
@@ -7162,7 +7203,7 @@ label {
 .saved-layout,
 .admin-contents .level.green,
 {
-    background-color: @module-background;
+    background-color: @alternate-background;
 }
 
 /* -------------------------
@@ -7258,7 +7299,6 @@ label {
         height: 24px;
         background-image: url('/images/core/icons/activity-icons.png');
         background-position: -@offset-x * 24px -@offset-y * 24px;
-        margin: 4px;
     }
 }
 
@@ -7280,7 +7320,7 @@ ul.activity-list {
             position: absolute;
             top: 50%;
             margin-top: -11px;
-            left: 0;
+            left: 4px;
             &.pin               { .activity-icon(0, 0) }
             &.file              { .activity-icon(0, 1) }
             &.clock             { .activity-icon(0, 2) }
@@ -7346,7 +7386,7 @@ ul.activity-list {
         display: block;
         padding: 5px 4px;
         padding-left: 40px;
-        padding-right: 20px;
+        padding-right: 30px;
         margin-right: 60px;
         position: relative;
         color: @body-text;
@@ -7387,10 +7427,10 @@ ul.activity-list {
         height: 100%;
         width: 50px;
         padding: 5px;
-        vertical-align: middle;
+        font-size: 0.8em;
         span {
-            vertical-align: middle;
-            font-size: 1.5em;
+            display: block;
+            font-size: 1.6em;
             line-height: 1;
             font-weight: bold;
         }

@@ -925,7 +925,13 @@ MORRIS LIBRARY
 .calendar table,
 .left #calendar table.duedates-calendar td,
 .left #calendar table.duedates-calendar,
-#calendar table th.dark
+#calendar table th.dark,
+table tr,
+.listing li,
+.listing .subject-list li,
+.listing .subject-list a,
+.listing .subject-list a.teacher,
+ul.activity-list li
 {
     border-color: #F2F6FA;
 }

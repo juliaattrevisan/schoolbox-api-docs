@@ -11,6 +11,7 @@
             location.href = $j(this).attr('href');
         }).confirm({
             msg: 'Delete this comment? ',
+            wrapper: '<span class="confirm"></span>',
             buttons: {
                 wrapper:'<button></button>',
                 separator:'  '
@@ -52,34 +53,33 @@
                 <p class="interact">{MOD_BLOG}</p>
             </div>
 			<div class="pad-it">
+                <p class="author">
+                    <a href="/search/user/{BLOG_AUTHOR_ID}" class="author">
+                        <img src="{BLOG_AUTHOR_THUMB}"/>
+                        <span class="name">{BLOG_AUTHOR_NAME}</span>
+                    </a>
+                    <span class="subtitle">Posted {BLOG_AUTHOR_GROUP}</span>
+                </p>
                 <div class="blog-body">{BLOG_BODY}</div>
-                <a href="/search/user/{BLOG_AUTHOR_ID}" class="author profile-card bar short" data-icon="email">
-                    <img src="{BLOG_AUTHOR_THUMB}"/>
-                    <span class="name">{BLOG_AUTHOR_NAME}</span>
-                    <span class="subtitle">{BLOG_AUTHOR_GROUP}</span>
-                </a>
 
-                <div class="comments">
+
+                <ul class="comments">
                     <!-- BEGIN comment -->
-                    <div class="box clearfix">
-                        <p class="interact">{DELETE_COMMENT}</p>
-                        <a href="/search/user/{COMMENT_AUTHOR_ID}" class="author profile-card bar short" data-icon="email">
+                    <li class="{ON_OFF}">{DELETE_COMMENT}
+                        <a href="/search/user/{COMMENT_AUTHOR_ID}" class="author">
                             <img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32"/>
                             <span class="name">{COMMENT_AUTHOR_NAME}</span>
-                            <span class="subtitle">Commented {COMMENT_CREATED}</span>
                         </a>
+                        <span class="subtitle">Commented {COMMENT_CREATED}</span>
                         <p class="comment-body">{COMMENT_BODY}</p>
-                    </div>
+                    </li>
                     <!-- END comment -->
-                </div>
-                <p class="links-house">
-					<a class="interact post_comment" href="javascript:void();">Post comment</a>
-				</p>
+                </ul>
 
-				<form class="hide" method="post" action="/blog/comment/new/{BLOG_ID}">
-					<p><textarea name="body" style="width: 100%; border-color: #aaa;"></textarea></p>
-					<p><input type="submit" class="submit-btn-plain" name="comment" value="Comment"/></p>
-				</form>
+                <form method="post" action="/blog/comment/new/{BLOG_ID}">
+                    <p><textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
+                        <input type="submit" class="submit-btn-plain" name="comment" value="Add comment"/></p>
+                </form>
 			</div>
 		</li>
 		<!-- END blog -->

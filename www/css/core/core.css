@@ -383,6 +383,9 @@ table th.sortable.descending {
 table th.sortable.ascending {
   background: url('/images/core/tablesorter/sort-ascending.gif') no-repeat 8px 19.5px;
 }
+table tr {
+  border-bottom: 1px solid #eeeeee;
+}
 /*--------------------------------------------------------------
 Notifications
 --------------------------------------------------------------*/
@@ -833,6 +836,12 @@ Notifications
   color: #797979;
   float: right;
   display: block;
+}
+.listing li {
+  border-bottom: 1px solid #eeeeee;
+}
+.listing li li {
+  border-bottom-width: 0;
 }
 /* This needs to get refactored into core.css and core.less in some way.
  *
@@ -1755,11 +1764,11 @@ ADMIN BODY
   background: #fafafa;
 }
 .admin-contents .level.green {
-  background: #edf7e7;
-  border-color: #0066b0;
+  background: #faf9f5;
+  border-color: #e9e3d6;
 }
 .admin-contents .level.green .split {
-  border-color: #0066b0;
+  border-color: #e9e3d6;
 }
 .admin-contents .split-container {
   width: 50%;
@@ -3819,20 +3828,44 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
 /************************
 BLOG COMPONENT
 ************************/
+.blog p.author {
+  clear: left;
+  color: #797979;
+  padding-left: 40px;
+}
+.blog p.author img {
+  float: left;
+  margin-left: -40px;
+}
+.blog p.author .subtitle {
+  display: block;
+}
 .blog .comments {
-  margin: 10px 0;
+  margin: 0;
 }
 .blog .comments p.interact {
-  border-top: 1px dashed #ccc;
-  padding-top: 0.5em;
-  margin-top: 7px;
-  line-height: 32px;
+  float: none;
+  text-align: right;
 }
 .blog .comments p.comment-body {
   margin-top: 4px;
+  margin-bottom: 0;
 }
 .blog .comments h3 {
   margin-bottom: 16px;
+}
+.blog .comments li {
+  clear: both;
+  padding: 10px 8px 10px 50px;
+  margin: 0;
+  border-top: 1px solid #eeeeee;
+}
+.blog .comments .author img {
+  float: left;
+  margin-left: -40px;
+}
+.blog .comments .subtitle {
+  color: #797979;
 }
 .blog .comments .box {
   background: #fafafa;
@@ -3843,11 +3876,21 @@ BLOG COMPONENT
   float: none;
   margin: 3px 0;
 }
+.blog .comments .btn {
+  margin-top: -5px;
+}
+.blog .comments .confirm {
+  float: right;
+  margin: -6px 0 0 0;
+}
 .blog .blog-body {
   clear: both;
 }
 .blog .detail ul {
   list-style: disc;
+}
+.blog form textarea {
+  width: 100%;
 }
 /*
 .blog .comments {
@@ -6631,7 +6674,7 @@ label {
 .saved-colours,
 .saved-layout,
 .admin-contents .level.green {
-  background-color: #0066b0;
+  background-color: #faf9f5;
 }
 /* -------------------------
     profile card styles
@@ -6723,7 +6766,7 @@ ul.activity-list li .icon {
   position: absolute;
   top: 50%;
   margin-top: -11px;
-  left: 0;
+  left: 4px;
 }
 ul.activity-list li .icon.pin span {
   display: block;
@@ -6731,7 +6774,6 @@ ul.activity-list li .icon.pin span {
   height: 24px;
   background-image: url('/images/core/icons/activity-icons.png');
   background-position: 0px 0px;
-  margin: 4px;
 }
 ul.activity-list li .icon.file span {
   display: block;
@@ -6739,7 +6781,6 @@ ul.activity-list li .icon.file span {
   height: 24px;
   background-image: url('/images/core/icons/activity-icons.png');
   background-position: 0px -24px;
-  margin: 4px;
 }
 ul.activity-list li .icon.clock span {
   display: block;
@@ -6747,7 +6788,6 @@ ul.activity-list li .icon.clock span {
   height: 24px;
   background-image: url('/images/core/icons/activity-icons.png');
   background-position: 0px -48px;
-  margin: 4px;
 }
 ul.activity-list li .icon.tick span {
   display: block;
@@ -6755,7 +6795,6 @@ ul.activity-list li .icon.tick span {
   height: 24px;
   background-image: url('/images/core/icons/activity-icons.png');
   background-position: 0px -72px;
-  margin: 4px;
 }
 ul.activity-list li .icon.link span {
   display: block;
@@ -6763,7 +6802,6 @@ ul.activity-list li .icon.link span {
   height: 24px;
   background-image: url('/images/core/icons/activity-icons.png');
   background-position: 0px -96px;
-  margin: 4px;
 }
 ul.activity-list li .icon.news span {
   display: block;
@@ -6771,7 +6809,6 @@ ul.activity-list li .icon.news span {
   height: 24px;
   background-image: url('/images/core/icons/activity-icons.png');
   background-position: 0px -120px;
-  margin: 4px;
 }
 ul.activity-list li .icon.onlineassessment span {
   display: block;
@@ -6779,7 +6816,6 @@ ul.activity-list li .icon.onlineassessment span {
   height: 24px;
   background-image: url('/images/core/icons/activity-icons.png');
   background-position: 0px -144px;
-  margin: 4px;
 }
 ul.activity-list li .icon.survey span {
   display: block;
@@ -6787,7 +6823,6 @@ ul.activity-list li .icon.survey span {
   height: 24px;
   background-image: url('/images/core/icons/activity-icons.png');
   background-position: 0px -168px;
-  margin: 4px;
 }
 ul.activity-list li .icon.forum span {
   display: block;
@@ -6795,7 +6830,6 @@ ul.activity-list li .icon.forum span {
   height: 24px;
   background-image: url('/images/core/icons/activity-icons.png');
   background-position: 0px -192px;
-  margin: 4px;
 }
 ul.activity-list li .icon.blog span {
   display: block;
@@ -6803,7 +6837,6 @@ ul.activity-list li .icon.blog span {
   height: 24px;
   background-image: url('/images/core/icons/activity-icons.png');
   background-position: 0px -216px;
-  margin: 4px;
 }
 ul.activity-list li .icon.closed span {
   display: block;
@@ -6811,7 +6844,6 @@ ul.activity-list li .icon.closed span {
   height: 24px;
   background-image: url('/images/core/icons/activity-icons.png');
   background-position: 0px -240px;
-  margin: 4px;
 }
 ul.activity-list li .icon.returned span {
   display: block;
@@ -6819,7 +6851,6 @@ ul.activity-list li .icon.returned span {
   height: 24px;
   background-image: url('/images/core/icons/activity-icons.png');
   background-position: 0px -264px;
-  margin: 4px;
 }
 ul.activity-list li .icon.new span {
   display: block;
@@ -6827,7 +6858,6 @@ ul.activity-list li .icon.new span {
   height: 24px;
   background-image: url('/images/core/icons/activity-icons.png');
   background-position: 0px -288px;
-  margin: 4px;
 }
 ul.activity-list li .icon.overdue span {
   display: block;
@@ -6835,7 +6865,6 @@ ul.activity-list li .icon.overdue span {
   height: 24px;
   background-image: url('/images/core/icons/activity-icons.png');
   background-position: 0px -312px;
-  margin: 4px;
 }
 ul.activity-list li .avatar {
   display: inline-block;
@@ -6878,7 +6907,7 @@ ul.activity-list li .time {
   display: block;
   padding: 5px 4px;
   padding-left: 40px;
-  padding-right: 20px;
+  padding-right: 30px;
   margin-right: 60px;
   position: relative;
   color: #000000;
@@ -6939,11 +6968,11 @@ ul.activity-list li .time {
   height: 100%;
   width: 50px;
   padding: 5px;
-  vertical-align: middle;
+  font-size: 0.8em;
 }
 .listing .subject-list .grade span {
-  vertical-align: middle;
-  font-size: 1.5em;
+  display: block;
+  font-size: 1.6em;
   line-height: 1;
   font-weight: bold;
 }

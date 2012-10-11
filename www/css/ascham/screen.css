@@ -190,7 +190,7 @@ h2, h2 a, .header_option {
 	font-size:12px;
 }
 
-h2 {
+h2, .calendar-controls {
 	background-color:#093888;
 	-moz-border-radius:  0;
 	-webkit-border-radius:  0;
@@ -642,8 +642,13 @@ color: #0066B0;
 .calendar table,
 .left #calendar table.duedates-calendar td,
 .left #calendar table.duedates-calendar,
-#calendar table th.dark
-{
+#calendar table th.dark,
+table tr,
+.listing li,
+.listing .subject-list li,
+.listing .subject-list a,
+.listing .subject-list a.teacher,
+ul.activity-list li{
     border-color: #F1F1ED;
 }
 .calendar table thead th,
