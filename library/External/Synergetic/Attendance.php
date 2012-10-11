@@ -34,12 +34,11 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 	private $attendancePeriod = -1;
 
 	/**
-	 * The primary key associated with the selected class, date and period
-	 * This is used in SynergyOne.dbo.AttendanceMaster
+	 * An instance of Attendance_Synergetic_AttendanceMaster_Abstract
 	 *
-	 * @var int
+	 * @var null
 	 */
-	private $attendanceMasterSeq = -1;
+	private $attendanceMaster = null;
 
 	/**
 	 * The attendance records for all students in the selected class, date and period
@@ -61,9 +60,11 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 	 * @param $class
 	 * @param Alaress_Date_Format $attendanceDate
 	 * @param $attendancePeriod
+	 * @param $fileYear
+	 * @param $fileSemester
 	 * @param $database
 	 */
-	public function __construct($class, Alaress_Date_Format $attendanceDate, $attendancePeriod, $database) {
+	public function __construct($class, Alaress_Date_Format $attendanceDate, $attendancePeriod, $fileYear, $fileSemester, $database) {
 		$this->setClassCode($class['ClassCode']);
 		$this->setAttendanceDate($attendanceDate->getDatabaseDate());
 		$this->setAttendancePeriod($attendancePeriod);
@@ -71,7 +72,21 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 
 		/* Get the primary key associated with the selected class, date and period
  		 */
-		$this->setAttendanceMasterSeq($this->findAttendanceMasterSeq($this->getClassCode(), $this->getAttendanceDate(), $this->getAttendancePeriod()));
+
+		/* Find out whether the specified class, date and period have an existing AttendanceMaster record
+		 * If it does, the roll has been marked before and we only need to edit individual people
+		 *
+		 * Otherwise set up a new record for the AttendanceMaster table
+		 *
+		 * This can be encapsulated further in a Factory
+		*/
+		$attendanceMaster = new Attendance_Synergetic_AttendanceMaster_Existing($class, $attendanceDate, $attendancePeriod, $fileYear, $fileSemester, $database);
+
+		if (!$attendanceMaster->hasAttendanceMasterSeq()) {
+			$attendanceMaster = new Attendance_Synergetic_AttendanceMaster_New($class, $attendanceDate, $attendancePeriod, $fileYear, $fileSemester, $database);
+		}
+
+		$this->setAttendanceMaster($attendanceMaster);
 
 		/* Hook method which should be protected if this class becomes subclassed
 		 */
@@ -82,34 +97,6 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 	 * Hook method
 	 */
 	private function setup() {
-	}
-
-	/**
-	 * Get the primary Attendance key associated with the selected class, date and period
-	 *
-	 * @param $classCode
-	 * @param $attendanceDate
-	 * @param $attendancePeriod
-	 *
-	 * @return int
-	 */
-	private function findAttendanceMasterSeq($classCode, $attendanceDate, $attendancePeriod) {
-		$query = "
-			SELECT AttendanceMasterSeq
-			FROM SynergyOne.dbo.AttendanceMaster
-			WHERE ClassCode='{$classCode}'
-			AND AttendanceDate='{$attendanceDate} 00:00:00.000'
-			AND AttendancePeriod='{$attendancePeriod}'
-			ORDER BY AttendanceMasterSeq
-		";
-
-		$result = $this->getDatabase()->getRow($query);
-
-		if (is_array($result)) {
-			return $result['AttendanceMasterSeq'];
-		}
-
-		return -1;
 	}
 
 	/**
@@ -217,11 +204,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 	 * @return bool
 	 */
 	public function hasAttendanceMasterSeq() {
-		if ($this->getAttendanceMasterSeq() > 0) {
-			return true;
-		}
-
-		return false;
+		return $this->getAttendanceMaster()->hasAttendanceMasterSeq();
 	}
 
 	/* Getters/Setters
@@ -300,21 +283,14 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 	}
 
 	/**
-	 * Set attendance master seq
+	 * Delegation method
 	 *
-	 * @param int $attendanceMasterSeq
-	 */
-	private function setAttendanceMasterSeq($attendanceMasterSeq) {
-		$this->attendanceMasterSeq = $attendanceMasterSeq;
-	}
-
-	/**
 	 * Get attendance master seq
 	 *
 	 * @return int
 	 */
 	private function getAttendanceMasterSeq() {
-		return $this->attendanceMasterSeq;
+		return $this->getAttendanceMaster()->getAttendanceMasterSeq();
 	}
 
 	/**
@@ -333,5 +309,23 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 	 */
 	private function getAllAttendanceRecords() {
 		return $this->allAttendanceRecords;
+	}
+
+	/**
+	 * Set attendance master
+	 *
+	 * @param null $attendanceMaster
+	 */
+	private function setAttendanceMaster($attendanceMaster) {
+		$this->attendanceMaster = $attendanceMaster;
+	}
+
+	/**
+	 * Get attendance master
+	 *
+	 * @return null
+	 */
+	public function getAttendanceMaster() {
+		return $this->attendanceMaster;
 	}
 }

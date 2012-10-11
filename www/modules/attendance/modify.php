@@ -80,7 +80,7 @@ if ($class) {
 
 		/* Get the attendance record for this class
 		 */
-		$attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $attendancePeriod, new MSSQL());
+		$attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $attendancePeriod, $_SESSION['FileYear'], $_SESSION['FileSemester'], new MSSQL());
 		$attendanceHandler->findAttendanceRecords();
 
 		/* Dropdown options

@@ -38,10 +38,9 @@ $redirect = '/modules/attendance/modify/' . $class['ClassCode'] . '/' . $attenda
 
 /* Deal with it all
  */
-$attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $attendancePeriod, new MSSQL());
-$now = new Alaress_Date_Format(time(), 'U');
+$attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $attendancePeriod, $_SESSION['FileYear'], $_SESSION['FileSemester'], new MSSQL());
 
-/* Create/update everyone's attendance initially
+/* Create everyone's attendance initially
  */
 if (isset($_POST['updateAll']) && ($_POST['updateAll'] == 'true')) {
 
@@ -52,8 +51,7 @@ if (isset($_POST['updateAll']) && ($_POST['updateAll'] == 'true')) {
 
 		/* First generate an AttendanceMasterSeq value by ramming in a new record
 		 */
-		$attendanceMaster = new Attendance_Synergetic_AttendanceMaster_New($class, $attendanceDate, $attendancePeriod, $_SESSION['FileYear'], $_SESSION['FileSemester'], new MSSQL());
-		$attendanceMaster->insertStub();
+		$attendanceHandler->getAttendanceMaster()->insertStub();
 
 		/* This is a pretty hollow shell of a class, it just contains the mssql
 		 * instance and a query to insert/update
@@ -67,7 +65,7 @@ if (isset($_POST['updateAll']) && ($_POST['updateAll'] == 'true')) {
 			/* Create a new record
 			 */
 			$data = array(
-				'AttendanceMasterSeq' => $attendanceMaster->getAttendanceMasterSeq(),
+				'AttendanceMasterSeq' => $attendanceHandler->getAttendanceMaster()->getAttendanceMasterSeq(),
 				'ID' => Scrub::text($currentPerson['externalId']),
 				'PossibleAbsenceCode' => Scrub::text(trim($currentPerson['PossibleAbsenceCode'])),
 				'PossibleReasonCode' => Scrub::text(trim($currentPerson['PossibleReasonCode'])),
