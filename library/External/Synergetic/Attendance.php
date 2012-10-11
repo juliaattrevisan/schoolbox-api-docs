@@ -210,44 +210,6 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 	}
 
 	/**
-	 * Create an attendance record
-	 *
-	 * @param $data
-	 */
-	public function create($data) {
-		$query = "
-			INSERT INTO
-		";
-
-		echo $query;
-		exit(1);
-	}
-
-	/**
-	 * Update an attendance record
-	 *
-	 * @param $data
-	 *
-	 * @return \PDOStatement
-	 */
-	public function update($data) {
-		$query = "
-			UPDATE SynergyOne.dbo.tAttendances
-			SET
-				PossibleAbsenceCode = '{$data['PossibleAbsenceCode']}',
-				PossibleDescription = \"{$data['PossibleDescription']}\",
-				PossibleReasonCode = '{$data['PossibleReasonCode']}',
-				AttendedFlag = '{$data['AttendedFlag']}',
-				ModifiedDate = GETDATE(),
-				ModifiedByID = '{$data['ModifiedByID']}'
-			WHERE AttendanceSeq = '{$data['AttendanceSeq']}'
-			AND	ID = '{$data['ID']}'
-		";
-
-		return $this->getDatabase()->query($query);
-	}
-
-	/**
 	 * Determine if there are attendance records for this particular
 	 * class, date and period by checking if the AttendanceMasterSeq
 	 * value was found

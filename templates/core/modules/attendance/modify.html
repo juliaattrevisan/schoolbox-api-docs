@@ -38,6 +38,7 @@
 		 */
 		$j('.viewAttendanceOptions').click(function(event) {
 			event.preventDefault();
+
 			var id = $j(this).attr('id').replace(/viewAttendanceOptions_/, '');
 
 			if ($j('#attendanceOptions_' + id).is(':checked')) {
@@ -52,21 +53,26 @@
 		 * I don't trust JSON Stringify or jquery serialize(), so I
 		 * do it the Long Way
 		 */
-		$j('#submitAll').click(function() {
+		$j('#saveAll').click(function() {
 			var allPeople = new Array();
 
 			/* Collect the contents of each form
 			 */
 			$j('.collectible').each(function(index, element) {
 				var currentPersonId = $j(element).find('input[name=updateOne]').val();
-				var AbsentFlag = 1;
+				var AttendedFlag = 1;
 
 				/* Find out if they are marked as absent
 				 */
 				if ($j('#attendanceOptions_' + currentPersonId).is(':checked')) {
-					var AbsentFlag = 0;
+					var AttendedFlag = 0;
 				}
 
+				/* Always save each guy's absentee info the first time
+				 *
+				 * This will allow you to fill in absentee info as you're doing it,
+				 * or modify existing info retroactively
+				 */
 				var currentPerson = {
 					externalId: currentPersonId,
 					classCode: $j(element).find('input[name=classCode]').val(),
@@ -75,7 +81,7 @@
 					PossibleAbsenceCode: $j(element).find('select[name=PossibleAbsenceCode]').val(),
 					PossibleReasonCode: $j(element).find('select[name=PossibleReasonCode]').val(),
 					PossibleReasonDescription: $j(element).find('input[name=PossibleReasonDescription]').val(),
-					AbsentFlag: AbsentFlag
+					AttendedFlag: AttendedFlag
 				}
 
 				allPeople.push(currentPerson);
@@ -85,13 +91,16 @@
 			 */
 			var data = {
 				updateAll: 'true',
+				classCode: '{JS_CLASS_CODE}',
+				attendanceDate: '{JS_ATTENDANCE_DATE}',
+				attendancePeriod: '{JS_ATTENDANCE_PERIOD}',
 				data: allPeople
 			}
 
 			/* Send in the clones!
 			 */
 			$j.post('/modules/attendance/modifyForm', data, function(responseText) {
-				console.log(responseText);
+				window.location.href = window.location.href;
 			});
 		});
 	});
@@ -114,7 +123,7 @@
 		<th></th>
 		<th class='genericWidth'>Firstname</th>
 		<th class='genericWidth'>Surname</th>
-		<th class='genericWidth'>Absent</th>
+		<th>Absent</th>
 	</tr>
 	<!-- BEGIN student -->
 	<tr class='{ON_OFF}'>
@@ -173,6 +182,6 @@
 
 <!-- BEGIN has_save_all -->
 <div>
-	<input type='button' id='submitAll' value='Save All' />
+	<a id='saveAll' class='btn add'><span></span>Save All</a>
 </div>
 <!-- END has_save_all -->

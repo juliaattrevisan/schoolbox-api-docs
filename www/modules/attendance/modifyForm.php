@@ -7,17 +7,30 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-$externalClass = new External_Synergetic_Class();
 
-/* Hardcoded test data
+/* THE THREE MUSKETEERS
  */
+$externalClass = new External_Synergetic_Class();
 $class = $externalClass->getClass($_POST['classCode']);
+
+/* TODO: Error message
+ */
+if (!$class) {
+	throw new Exception('Class does not exist.');
+}
+
 $attendanceDate = new Alaress_Date_Format($_POST['attendanceDate'], 'y-m-d');
+
+/* TODO: Error message
+ */
+if (!is_numeric(preg_replace('/[^0-9]+/', '', $_POST['attendancePeriod']))) {
+	throw new Exception('Attendance Period must be an integer.');
+}
 
 /* TODO: Attendance Period
  * Figger out how to figger this out
  */
-$attendancePeriod = 6;
+$attendancePeriod = $_POST['attendancePeriod'];
 
 /* Return url once non-ajax updates are done
  */
@@ -32,10 +45,55 @@ $now = new Alaress_Date_Format(time(), 'U');
  */
 if (isset($_POST['updateAll']) && ($_POST['updateAll'] == 'true')) {
 
-	/* TODO: Batch Saving
-	 * Save a record for everyone the first time you mark the roll
+	/* Save a record for everyone the first time you mark the roll
 	 * After that, just hide this button
 	 */
+	if (is_array($_POST['data']) && count($_POST['data'])) {
+
+		/* First generate an AttendanceMasterSeq value by ramming in a new record
+		 */
+		$attendanceMaster = new Attendance_Synergetic_AttendanceMaster_New($class, $attendanceDate, $attendancePeriod, $_SESSION['FileYear'], $_SESSION['FileSemester'], new MSSQL());
+		$attendanceMaster->insertStub();
+
+		/* This is a pretty hollow shell of a class, it just contains the mssql
+		 * instance and a query to insert/update
+		 */
+		$attendanceRecord = new Attendance_Synergetic_AttendanceRecord(new MSSQL());
+
+		/* Then if you could do that, save each person
+		 */
+		foreach($_POST['data'] as $currentPerson) {
+
+			/* Create a new record
+			 */
+			$data = array(
+				'AttendanceMasterSeq' => $attendanceMaster->getAttendanceMasterSeq(),
+				'ID' => Scrub::text($currentPerson['externalId']),
+				'PossibleAbsenceCode' => Scrub::text(trim($currentPerson['PossibleAbsenceCode'])),
+				'PossibleReasonCode' => Scrub::text(trim($currentPerson['PossibleReasonCode'])),
+				'PossibleDescription' => Scrub::text(trim($currentPerson['PossibleReasonDescription'])),
+				'AttendedFlag' => $currentPerson['AttendedFlag'],
+				'ModifiedByID' => $_SESSION['userID'],
+
+				/* I don't know what these really do but these seem to be
+				 * the usual default values
+				 */
+				'UserFlag1' => 0,
+				'UserFlag2' => 0,
+				'UserFlag3' => 0,
+				'UserFlag4' => 0,
+				'UserFlag5' => 0,
+				'LateArrivalFlag' => 0,
+				'LatearrivalTime' => null,
+				'EarlyDepartureFlag' => 0,
+				'EarlyDepartureTime' => null,
+				'AbsenceEventsSeq' => 0,
+				'NonAttendCreatedAbsenceEventsFlag' => 0
+			);
+
+			$attendanceRecord->create($data);
+		}
+	}
 }
 /* Update an individual person's attendance details individually
  *
@@ -59,38 +117,11 @@ else if (isset($_POST['updateOne']) && is_numeric($_POST['updateOne'])) {
 		$data['AttendedFlag'] = 0;
 		$data['ModifiedByID'] = $_SESSION['id'];
 
-		$attendanceHandler->update($data);
-
-		SitePage::localRedir($redirect);
-	}
-	/* Create a new record
-	 */
-	else {
-		$data = array(
-			'ID' => $_POST['synergy_id'],
-			'PossibleAbsenceCode' => Scrub::text(trim($_POST['PossibleAbsenceCode'])),
-			'PossibleReasonCode' => Scrub::text(trim($_POST['PossibleReasonCode'])),
-			'PossibleDescription' => Scrub::text(trim($_POST['PossibleReasonDescription'])),
-			'AttendedFlag' => 0,
-			'ModifiedByID' => $_SESSION['userID'],
-
-			/* I don't know what these really do but these seem to be
-			 * the usual default values
-			 */
-			'UserFlag1' => 0,
-			'UserFlag2' => 0,
-			'UserFlag3' => 0,
-			'UserFlag4' => 0,
-			'UserFlag5' => 0,
-			'LateArrivalFlag' => 0,
-			'LatearrivalTime' => null,
-			'EarlyDepartureFlag' => 0,
-			'EarlyDepartureTime' => null,
-			'AbsenceEventsSeq' => 0,
-			'NonAttendCreatedAbsenceEventsFlag' => 0
-		);
-
-		$attendanceHandler->create($data);
+		/* This is a pretty hollow shell of a class, it just contains the mssql
+		 * instance and a query to insert/update
+		 */
+		$attendanceRecord = new Attendance_Synergetic_AttendanceRecord(new MSSQL());
+		$attendanceRecord->update($data);
 
 		SitePage::localRedir($redirect);
 	}
@@ -117,6 +148,10 @@ else if (isset($_POST['present']) && is_numeric($_POST['externalId'])) {
 		 * If you want to ditch it all, just set these three fields to empty string.
 		 */
 
-		$attendanceHandler->update($data);
+		/* This is a pretty hollow shell of a class, it just contains the mssql
+		 * instance and a query to insert/update
+		 */
+		$attendanceRecord = new Attendance_Synergetic_AttendanceRecord(new MSSQL());
+		$attendanceRecord->update($data);
 	}
 }

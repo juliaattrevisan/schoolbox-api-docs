@@ -32,10 +32,20 @@ $this->setBlock('student', 'has_update', 'has_update_block');
  */
 $this->setBlock(TEMPLATE_content, 'has_save_all', 'has_save_all_block');
 
-
-/* TODO: Figger out a way to get this value from somewhere, like a timetable
+/* THE THREE MUSKETEERS
  */
-$attendancePeriod = $this->arg[2];
+
+/* Get a class list which we'll match up manually with their attendance records
+ * but only if this class exists
+ */
+$externalClass = new External_Synergetic_Class();
+$class = $externalClass->getClass($this->arg[0]);
+
+/* TODO: Error message
+ */
+if (!$class) {
+	throw new Exception('Class does not exist.');
+}
 
 /* Selected date for which to deal with attendances
  */
@@ -46,12 +56,20 @@ else {
 	$attendanceDate = new Alaress_Date_Format(time(), 'U');
 }
 
-/* Get a class list which we'll match up manually with their attendance records
- * but only if this class exists
+/* TODO: Attendance Period
+ * Figger out a way to get this value from somewhere, like a timetable
  */
-$externalClass = new External_Synergetic_Class();
-$class = $externalClass->getClass($this->arg[0]);
 
+/* TODO: Error message
+ */
+if (!is_numeric(preg_replace('/[^0-9]+/', '', $this->arg[2]))) {
+	throw new Exception('Attendance Period must be an integer.');
+}
+
+$attendancePeriod = $this->arg[2];
+
+/* Let's do it
+ */
 if ($class) {
 	$allStudents = $externalClass->getStudents($class['ClassCode']);
 
@@ -192,6 +210,11 @@ if ($class) {
 	}
 }
 else {
+	/* TODO: Error message
+	 * Class doesn't exist
+	 */
+	throw new Exception('Class does not exist.');
+
 	$this->setVar('student_block', '');
 	$this->setVar('has_save_all_block', '');
 }
