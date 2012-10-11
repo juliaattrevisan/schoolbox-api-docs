@@ -247,6 +247,21 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 		return $this->getDatabase()->query($query);
 	}
 
+	/**
+	 * Determine if there are attendance records for this particular
+	 * class, date and period by checking if the AttendanceMasterSeq
+	 * value was found
+	 *
+	 * @return bool
+	 */
+	public function hasAttendanceMasterSeq() {
+		if ($this->getAttendanceMasterSeq() > 0) {
+			return true;
+		}
+
+		return false;
+	}
+
 	/* Getters/Setters
 	 */
 

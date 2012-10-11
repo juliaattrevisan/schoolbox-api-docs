@@ -10,13 +10,32 @@
 $this->setTitle('Student Attendance');
 $this->setFile(TEMPLATE_content, 'modules/attendance/modify.html');
 $this->setBlock(TEMPLATE_content, 'student', 'student_block');
+
+/* Dropdowns and such for each student
+ */
 $this->setBlock('student', 'absence_options', 'absence_options_block');
 $this->setBlock('student', 'reason_options', 'reason_options_block');
+
+/* This link only appears if the student is marked as absent (has the checkbox
+ * ticked) as its purpose is to toggle the form into which you enter the details
+ * regarding the absentee
+ */
 $this->setBlock('student', 'has_attendance_options', 'has_attendance_options_block');
+
+/* This button only appears if the AttendanceMasterSeq existed, indicating
+ * that the roll has been called and saved at least once
+ */
+$this->setBlock('student', 'has_update', 'has_update_block');
+
+/* This button only appears if the AttendanceMasterSeq didn't exist, indicating
+ * that the roll has not yet been called for this class, date and period
+ */
+$this->setBlock(TEMPLATE_content, 'has_save_all', 'has_save_all_block');
+
 
 /* TODO: Figger out a way to get this value from somewhere, like a timetable
  */
-$attendancePeriod = 6;
+$attendancePeriod = $this->arg[2];
 
 /* Selected date for which to deal with attendances
  */
@@ -139,6 +158,15 @@ if ($class) {
 				$this->parse('reason_options_block', 'reason_options', true);
 			}
 
+			/* Update button in absentee reasons form
+			 */
+			if ($attendanceHandler->hasAttendanceMasterSeq()) {
+				$this->parse('has_update_block', 'has_update');
+			}
+			else {
+				$this->setVar('has_update_block', '');
+			}
+
 			$this->parse('student_block', 'student', true);
 
 			/* Clear children after parsing out the parent
@@ -146,14 +174,26 @@ if ($class) {
 			$this->setVar('absence_options_block', '');
 			$this->setVar('reason_options_block', '');
 			$this->setVar('has_attendance_options_block', '');
+			$this->setVar('has_update_block', '');
+		}
+
+		/* Remove special save-all
+		 */
+		if ($attendanceHandler->hasAttendanceMasterSeq()) {
+			$this->setVar('has_save_all_block', '');
+		}
+		else {
+			$this->parse('has_save_all_block', 'has_save_all');
 		}
 	}
 	else {
 		$this->setVar('student_block', '');
+		$this->setVar('has_save_all_block', '');
 	}
 }
 else {
 	$this->setVar('student_block', '');
+	$this->setVar('has_save_all_block', '');
 }
 
 /* Synthesise a javascript cure!
@@ -172,4 +212,3 @@ $this->setVar(array(
 	'ATTENDANCE_DATE_FORMATTED' => $attendanceDate->getDateOnly(),
 	'ATTENDANCE_PERIOD' => $attendancePeriod,
 ));
-

@@ -1,5 +1,8 @@
 <script type='text/javascript'>
 	$j(function() {
+
+		/* Update of absentees
+		 */
 		$j('.attendanceOptions').each(function(index, element) {
 			$j(element).click(function() {
 				var id = $j(element).val();
@@ -8,35 +11,31 @@
 					$j('#attendanceOptionsForm_' + id).show();
 				}
 				else {
-					if (confirm("Are you sure you want to mark this person as present?")) {
+					/* TODO: Clear Existing Data
+					 * See modifyForm.php for related commentary
+					 */
+					var data = {
+						present: true,
+						externalId: id,
+						classCode: '{JS_CLASS_CODE}',
+						attendanceDate: '{JS_ATTENDANCE_DATE}',
+						attendancePeriod: '{JS_ATTENDANCE_PERIOD}'
+					};
 
-						/* Ajax clear existing reason
-						 */
-						var data = {
-							present: true,
-							externalId: id,
-							classCode: '{JS_CLASS_CODE}',
-							attendanceDate: '{JS_ATTENDANCE_DATE}',
-							attendancePeriod: '{JS_ATTENDANCE_PERIOD}'
-						};
+					$j.post('/modules/attendance/modifyForm', data, function(responseText) {
+					});
 
-						$j.post('/modules/attendance/modifyForm', data, function(responseText) {
-						});
-
-						/* Hide options form and remove link
-						 */
-						$j('#attendanceOptionsForm_' + id).hide();
-						$j('#viewAttendanceOptions_' + id).remove();
-					}
-					else {
-						return false;
-					}
+					/* Hide options form and remove link
+					 */
+					$j('#attendanceOptionsForm_' + id).hide();
+					$j('#viewAttendanceOptions_' + id).remove();
 				};
 			});
 		});
-	});
 
-	$j(function() {
+		/* Make the input form available for absentees when
+		 * making individual modifications
+		 */
 		$j('.viewAttendanceOptions').click(function(event) {
 			event.preventDefault();
 			var id = $j(this).attr('id').replace(/viewAttendanceOptions_/, '');
@@ -46,6 +45,54 @@
 			}
 
 			return false;
+		});
+
+		/* Save All (for the first time)
+		 *
+		 * I don't trust JSON Stringify or jquery serialize(), so I
+		 * do it the Long Way
+		 */
+		$j('#submitAll').click(function() {
+			var allPeople = new Array();
+
+			/* Collect the contents of each form
+			 */
+			$j('.collectible').each(function(index, element) {
+				var currentPersonId = $j(element).find('input[name=updateOne]').val();
+				var AbsentFlag = 1;
+
+				/* Find out if they are marked as absent
+				 */
+				if ($j('#attendanceOptions_' + currentPersonId).is(':checked')) {
+					var AbsentFlag = 0;
+				}
+
+				var currentPerson = {
+					externalId: currentPersonId,
+					classCode: $j(element).find('input[name=classCode]').val(),
+					attendanceDate: $j(element).find('input[name=attendanceDate]').val(),
+					attendancePeriod: $j(element).find('input[name=attendancePeriod]').val(),
+					PossibleAbsenceCode: $j(element).find('select[name=PossibleAbsenceCode]').val(),
+					PossibleReasonCode: $j(element).find('select[name=PossibleReasonCode]').val(),
+					PossibleReasonDescription: $j(element).find('input[name=PossibleReasonDescription]').val(),
+					AbsentFlag: AbsentFlag
+				}
+
+				allPeople.push(currentPerson);
+			});
+
+			/* Compile!
+			 */
+			var data = {
+				updateAll: 'true',
+				data: allPeople
+			}
+
+			/* Send in the clones!
+			 */
+			$j.post('/modules/attendance/modifyForm', data, function(responseText) {
+				console.log(responseText);
+			});
 		});
 	});
 </script>
@@ -85,12 +132,12 @@
 
 		<!-- Non-aligned columns ;( -->
 		<td colspan='4'>
-			<form method='post' action='/modules/attendance/modifyForm'>
+			<form method='post' action='/modules/attendance/modifyForm' class='collectible'>
 				<div>
-					<input name='updateOne' type='text' value='{STUDENT_SYNERGY_ID}' />
-					<input name='classCode' type='text' value='{CLASS_CODE}' />
-					<input name='attendanceDate' type='text' value='{ATTENDANCE_DATE}' />
-					<input name='attendancePeriod' type='text' value='{ATTENDANCE_PERIOD}' />
+					<input name='updateOne' type='hidden' value='{STUDENT_SYNERGY_ID}' />
+					<input name='classCode' type='hidden' value='{CLASS_CODE}' />
+					<input name='attendanceDate' type='hidden' value='{ATTENDANCE_DATE}' />
+					<input name='attendancePeriod' type='hidden' value='{ATTENDANCE_PERIOD}' />
 				</div>
 				<label>Absence Options<br />
 					<select name='PossibleAbsenceCode'>
@@ -113,11 +160,19 @@
 					<input type='text' maxlength='100' name='PossibleReasonDescription' value="{STUDENT_REASON_DESCRIPTION}" />
 				</label>
 
+				<!-- BEGIN has_update -->
 				<label><br />
 					<input class='btn update' type='submit' value='update' />
 				</label>
+				<!-- END has_update -->
 			</form>
 		</td>
 	</tr>
 	<!-- END student -->
 </table>
+
+<!-- BEGIN has_save_all -->
+<div>
+	<input type='button' id='submitAll' value='Save All' />
+</div>
+<!-- END has_save_all -->
