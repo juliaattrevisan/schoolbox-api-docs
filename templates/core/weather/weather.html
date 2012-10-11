@@ -1,100 +1,62 @@
-<!-- BEGIN custom_head -->
-<style>
-    .temp {
-        color: #aaa;
-    }
-    .temp-h {
-        color:#f33;
-    }
-    .temp-l {
-        color:#09f;
-    }
-    .supplied-by {
-        line-height: 22px;
-        height: 22px;
-        display: block;
-    }
-    .supplied-by img {
-        max-width: 150px;
-        margin-left: 1em;
-        margin-top: 2px;
-    }
-    #forecast td {
-        vertical-align: top;
-    }
-    .current li {
-        height: 25px;
-        line-height: 25px;
-        list-style: none;
-    }
-    .current img {
-        float: left;
-        padding: 25px 25px 25px 9px;
-    }
-    .fade {
-        color: #555;
-    }
-</style>
-<!-- END custom_head -->
 <!-- BEGIN current -->
 <h1>Weather for {LOCATION}</h1>
 <h2>Currently</h2>
-
-<div class="current pad-it">
-<img src="{C_IMAGE}" alt="{C_PRECIS}" title="{C_PRECIS}" width="50" height="50"/>
-<ul>
-    <li><strong>Temperature:</strong> {TEMP}&deg; (feels like {TEMP_FL}&deg;)</li>
-    <li><strong>Wind: </strong>{WIND}</li>
-    <li><strong>Humidity: </strong>{HUMIDITY}</li>
-    <li class="fade">Last updated {PERIOD}</li>
-</ul>
-</div>
-<br/>
-<!-- END current -->
-<!-- BEGIN forecast -->
-<div class="left">
-    <h2>Forecast</h2>
-    <table id="forecast">
-        <tr>
-            <!-- BEGIN forecast_header -->
-            <th width="{FC_WIDTH}%">{FC_DAY}</th>
-            <!-- END forecast_header -->
-        </tr>
-        <tr>
-            <!-- BEGIN forecast_image -->
-            <td><img src="{FC_IMAGE}" alt="{FC_PRECIS}" width="50" height="50"/><br/>
-                {FC_PRECIS}
-            </td>
-            <!-- END forecast_image -->
-        </tr>
-        <tr>
-            <!-- BEGIN forecast_data -->
-            <td class="temp"><span class="temp-h">{FC_HIGH}&deg;</span> | <span class="temp-l">{FC_LOW}&deg;</span></td>
-            <!-- END forecast_data -->
-        </tr>
-    </table>
-
-    <p>&nbsp;</p>
-    <span class="sub_footer supplied-by"> Weather supplied by <a href="{SUPPLIED_BY_URL}" target="_blank">{SUPPLIED_BY_NAME}</a><img alt="{SUPPLIED_BY_NAME}" src="{SUPPLIED_BY_LOGO}" /></span>
-</div>
-<!-- END forecast -->
-
-<!-- BEGIN weather_unavailable -->
-<div class="left">
-    <h2>Weather</h2>
-    <br />
-
-    <p class="information-notification pad-it">Weather service is temporarily unavailable.</p>
-
-</div>
-<!-- END weather_unavailable -->
-
-<div class="right">
-    <h2>Weather around Australia</h2>
-    <ul style="margin-top: 10px;" class="pad-it">
-        <!-- BEGIN regions -->
-        <li><a href="/weather/{LOCATION_VALUE}">{LOCATION_NAME}</a></li>
-        <!-- END regions -->
+<div class="weather">
+    <div class="current pad-it">
+    <img src="{C_IMAGE}" alt="{C_PRECIS}" title="{C_PRECIS}" width="50" height="50"/>
+    <ul>
+        <li><strong>Temperature:</strong> {TEMP}&deg; (feels like {TEMP_FL}&deg;)</li>
+        <li><strong>Wind: </strong>{WIND}</li>
+        <li><strong>Humidity: </strong>{HUMIDITY}</li>
+        <li class="fade">Last updated {PERIOD}</li>
     </ul>
-</div>
+    </div>
+    <br/>
+    <!-- END current -->
+    <!-- BEGIN forecast -->
+    <div class="left">
+        <h2>Forecast</h2>
+        <table id="forecast">
+            <tr>
+                <!-- BEGIN forecast_header -->
+                <th width="{FC_WIDTH}%">{FC_DAY}</th>
+                <!-- END forecast_header -->
+            </tr>
+            <tr>
+                <!-- BEGIN forecast_image -->
+                <td><img src="{FC_IMAGE}" alt="{FC_PRECIS}" width="50" height="50"/><br/>
+                    {FC_PRECIS}
+                </td>
+                <!-- END forecast_image -->
+            </tr>
+            <tr>
+                <!-- BEGIN forecast_data -->
+                <td class="temp"><span class="temp-h">{FC_HIGH}&deg;</span> | <span class="temp-l">{FC_LOW}&deg;</span></td>
+                <!-- END forecast_data -->
+            </tr>
+        </table>
 
+        <p>&nbsp;</p>
+        <span class="sub_footer supplied-by"> Weather supplied by <a href="{SUPPLIED_BY_URL}" target="_blank">{SUPPLIED_BY_NAME}</a><img alt="{SUPPLIED_BY_NAME}" src="{SUPPLIED_BY_LOGO}" /></span>
+    </div>
+    <!-- END forecast -->
+
+    <!-- BEGIN weather_unavailable -->
+    <div class="left">
+        <h2>Weather</h2>
+        <br />
+
+        <p class="information-notification pad-it">Weather service is temporarily unavailable.</p>
+
+    </div>
+    <!-- END weather_unavailable -->
+
+    <div class="right">
+        <h2>Weather around Australia</h2>
+        <ul style="margin-top: 10px;" class="pad-it">
+            <!-- BEGIN regions -->
+            <li><a href="/weather/{LOCATION_VALUE}">{LOCATION_NAME}</a></li>
+            <!-- END regions -->
+        </ul>
+    </div>
+</div>

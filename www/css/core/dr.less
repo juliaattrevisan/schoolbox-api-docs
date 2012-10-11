@@ -2,5 +2,750 @@
    DR., make yo changes here!
 */
 
+/* varibless */
+@hot: #f33;
+@cold: #09f;
+
+@more-border: #0066B0;
+
+@rlblue: #def;
+
+@dgrey: #797979;
+@mgrey: #aaa;
+@lgrey: #dedede;
+
+@input-border: #ccc;
+
+@markavg: #f1f1f1;
+@markavg-dark: #e9e9e9;
+
+@warning: #a33;
+
+@hlight-green: #CAE9B9;
+
+@button-hov: #E9F6FF;
+@button-prog-bg: #76C4F9;
+@button-prog-bdr: #44AEFF;
 
 
+/* WEATHER PAGE */
+.weather {
+    .temp {
+        color: @mgrey;
+    }
+    .temp-h {
+        color: @hot;
+    }
+    .temp-l {
+        color: @cold;
+    }
+    .supplied-by {
+        line-height: 22px;
+        height: 22px;
+        display: block;
+    }
+    .supplied-by img {
+        max-width: 150px;
+        margin-left: 1em;
+        margin-top: 2px;
+    }
+    .current li {
+        height: 25px;
+        line-height: 25px;
+        list-style: none;
+    }
+    .current img {
+        float: left;
+        padding: 25px 25px 25px 9px;
+    }
+    .fade {
+        color: #555;
+    }
+}
+#forecast td {
+    vertical-align: top;
+}
+
+/* submission/viewSubmission */
+.inlineform .rubric-inline {
+    top: 5px;
+}
+.rubric {
+    width: 100%;
+}
+#closebox {
+    position: absolute;
+    bottom: 0;
+    right: 8px;
+}
+
+/* submission/submissionHistory */
+#submission-history {
+    h2 span {
+        font-weight: normal;
+    }
+    .one-third {
+        width: 32%;
+        float: left;
+        margin-left: 2%;
+    }
+    .two-thirds {
+        width: 66%;
+        float: left;
+        ul {
+            width: 49%;
+            float: left;
+            &.last {
+                margin-left: 2%;
+            }
+        }
+    }
+    #history-more {
+        display: block;
+        border: solid 1px @more-border;
+        text-align: center;
+        padding: 2px 0;
+        margin: 8px 0;
+        opacity: 0.7;
+        &:hover {
+            text-decoration: none;
+            background: @rlblue;
+        }
+    }
+    #history {
+        li {
+            border-bottom: solid 1px ;
+            padding: 4px;
+        }
+        img {
+            width: 32px;
+            height: 32px;
+        }
+    }
+}
+
+/* submission/rubricCriteria */
+#crit-list {
+    max-width: 350px;
+
+    input {
+        border: solid 1px @input-border;
+        font-size: 12px;
+        padding: 2px;
+        width: 200px;
+
+        &[disabled=disabled] {
+            background: transparent;
+            color: #222;
+            border: solid 1px transparent;
+        }
+        &.group {
+            font-weight: bold;
+            margin-top: 12px;
+        }
+        &.item {
+            margin-left: 10px;
+        }
+    }
+    .crit-delete {
+        display: block;
+        float: right;
+    }
+    li {
+        &.group.new ul, &.item.new .delete {
+            display: none;
+        }
+        &.item {
+            position: relative;
+        }
+    }
+}
+
+.btn {
+    &.no-text.delete {
+        position: absolute;
+        height: 19px;
+        padding-right: 24px;
+        right: 65px;
+        top: -2px;
+        span {
+            top: 3px;
+            left: 5px;
+        }
+    }
+    &.disabled {
+        &.delete:hover span {
+            background-position: 0 -336px;
+        }
+        span {
+            opacity: 0.5;
+        }
+    }
+}
+
+/* submission/returnWork */
+.formLabelWidth {
+    width: 150px;
+}
+.student-img {
+    width: 32px;
+    height: 32px;
+    float: left;
+    margin-right: 8px;
+}
+#rubric-chart {
+    width: 300px;
+    height: 200px;
+    float: right;
+}
+
+
+/* submission/markSheet */
+.inlineform {
+    .rubric-inline {
+        float: left;
+        position: absolute;
+        z-index: 11;
+        line-height: 14px;
+        .view {
+            display: block;
+            float: left;
+        }
+        .edit {
+            display: block;
+            float: left;
+            height: 14px;
+            width: 14px;
+            position: relative;
+            top: -2px;
+            left: 8px;
+            background: url(/images/core/icons/btn-icons.png) no-repeat;
+            background-position: 0 -308px;
+            &:hover {
+                background-position: 0 -322px;
+            }
+        }
+    }
+}
+.mark-sheet {
+    td.mark-average {
+        background: @markavg;
+    }
+    &.dark td.mark-average {
+        background: @markavg-dark;
+    }
+    th, td {
+        padding: 7px 16px 7px 0;
+    }
+}
+
+/* submission/listSubmission */
+.fade {
+    color: #333;
+    padding-left: 1em;
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: inline;
+    font-size: 18px; /* why we can't use 1em I don't know... */
+    font-weight: bold;
+    select {
+        font-size: 1em;
+        font-weight: bold;
+        color: #333;
+        background: transparent;
+        border: none;
+    }
+    span {
+        margin-right: 85px;
+        label {
+            display: inline;
+        }
+    }
+    .btn {
+        position:absolute;
+        top: 0;
+        right: 0;
+        padding: 0 16px;
+        line-height: 28px;
+        height: 28px;
+        margin-top: 0;
+    }
+}
+
+
+/* submission/dueWork */
+table.onlineAssessments td {
+    vertical-align: top;
+}
+p.unmarkedResponses {
+    margin-top: 8px;
+}
+
+
+/* submission/createSubmission */
+.accept-hide, .marks-hide {
+    dark {
+        background-color: #E9E3D6;
+        td  {
+            border-bottom: solid 1px #FAF9F5;
+        }
+    }
+}
+
+input[type="text"], select, textarea {
+    border: solid 1px @input-border;
+}
+
+#ui-datepicker-div {
+    display: none;
+}
+
+.warning {
+    color: @warning;
+    margin-top: 8px;
+    ul {
+        list-style-type: disc;
+        margin-left: 20px;
+    }
+    li {
+        color: @black;
+        &.warning {
+            color: @warning;
+        }
+    }
+}
+img.mimetype {
+    position: relative;
+    top: 7px;
+    margin-left: 8px;
+    margin-right: 2px;
+}
+
+#rubric {
+    p {
+        margin-bottom: 0;
+    }
+    input {
+        padding: 0;
+        display: inline;
+    }
+    .result {
+        &:after {
+            content: ', ';
+        }
+        &:last-child:after {
+            content: '';
+        }
+    }
+    label {
+        display: inline;
+    }
+    em {
+        margin-top: 8px;
+        font-weight: bold;
+    }
+    .crit {
+        width: 375px;
+    }
+    .highlight {
+        background: @hlight-green;
+        border-radius: 4px;
+        padding-bottom: 5px;
+        margin-bottom: 4px;
+    }
+}
+
+#rubric-criteria {
+    input {
+        width: 340px;
+    }
+    span input {
+        display: block;
+        margin-left: 30px;
+    }
+}
+
+.descs span {
+    display: block;
+    float: left;
+    width: 16px;
+    height: 16px;
+    background: url('/images/famicons/arrow_out.png') no-repeat;
+    margin: 3px 3px 3px 5px;
+}
+.ui-state-highlight {
+    height: 20px;
+}
+
+/* submission/allDueWork */
+.allduework table.subjectList {
+    width: 100%;
+    th, td {
+        width: 20%;
+    }
+}
+
+.pick-semester {
+    color: #333;
+    padding-left: 1em;
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: inline;
+    font-size: 18px; // why we can't use 1em here I don't know...
+    font-weight: bold;
+    select {
+        font-size: 1em;
+        font-weight: bold;
+        color: #333;
+        background: transparent;
+        border: none;
+    }
+    span {
+        margin-right: 85px;
+        label {
+            display: inline;
+        }
+    }
+    .btn {
+        position:absolute;
+        top: 0;
+        right: 0;
+        padding: 0 16px;
+        line-height: 28px;
+        height: 28px;
+        margin-top: 0;
+    }
+}
+
+
+
+/* statistics/homepage */
+.homepage-statistics {
+    .left, .right {
+        width: 49.5%;
+    }
+    h2 {
+        margin-top: 20px;
+    }
+    .module {
+        overflow: hidden;
+        p {
+            padding: 8px;
+        }
+    }
+
+    // component/homepage/statistics
+    .page-visits {
+        border: solid 1px #eee;
+        border-top: none;
+        min-height: 100px;
+    }
+    #visit-chart {
+        width: 100%;
+        height: 200px;
+    }
+
+    // component/homepage/navigator
+    .navigator {
+        border: solid 1px #eee;
+        border-radius: 4px;
+        background: #FAF9F5;
+        height: 40px;
+        .star-rating {
+            margin: 10px 0 0 10px;
+            float: left;
+            position: relative;
+            .star {
+                display: block;
+                width: 21px;
+                height: 20px;
+                float:left;
+                background: url("/images/core/icons/star.png");
+                &.mask {
+                    background-position: top left;
+                }
+                &.on {
+                    background-position: bottom left;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    background-repeat: repeat-x;
+                }
+                &.off {
+                    background-position: top left;
+                }
+            }
+        }
+        .totheright {
+            float: right;
+            margin-top: 6px;
+            margin-right: 75px;
+            label {
+                margin: 0 8px 0 4px;
+                display: inline;
+            }
+            select {
+                border: solid 1px #DEDEDE;
+                background: #FDFDFD;
+                padding: 2px;
+            }
+            .btn {
+                position: absolute;
+                top: 9px;
+                right: 9px;
+                padding: 0 8px;
+                line-height: 24px;
+                height: 24px;
+                margin: 0;
+            }
+        }
+    }
+}
+
+
+
+.button {
+    /* COMMON TO ALL BUTTON TYPES */
+    display: block;
+    margin:  0;
+    background: @white;
+
+    &:hover {
+        text-decoration: none;
+        background-color: @button-hov;
+    }
+    span {
+        display: block;
+    }
+    .name {
+        color: @black;
+        em {
+            font-style: normal;
+            color: @dgrey;
+        }
+    }
+    .group {
+        color: @dgrey;
+    }
+    .prog {
+        height: 2px;
+        background: @button-prog-bg;
+        border: solid 1px @button-prog-bdr;
+        margin: 6px 0 0 0;
+    }
+
+    /* BUTTON THUMB */
+    &.thumb {
+        width: 64px;
+        float: left;
+        margin: 0;
+        border-top: solid 1px @lgrey;
+        border-left: solid 1px @lgrey;
+        position: relative;
+        top: -1px;
+        left: -1px;
+        padding: 5px;
+        img {
+            width: 64px;
+            height: 64px;
+            margin: 0;
+        }
+        .name {
+            margin-left: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .group {
+            margin: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    /* BUTTON BAR */
+    &.bar {
+        height: 40px;
+        padding: 4px;
+        border-bottom: solid 1px @lgrey;
+        .name {
+            margin-left: 44px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            &.single {
+                height: 30px;
+                line-height: 32px;
+            }
+        }
+        .group {
+            margin: 2px 0 0 44px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        &:before {
+            content: "\203a";
+            float: right;
+            line-height: 40px;
+            margin-right: 24px;
+            font-size: 24px;
+        }
+        img {
+            float: left;
+            width: 32px;
+            height: 32px;
+            border: none;
+        }
+    }
+
+    /* BUTTON LIST */
+    &.list {
+        height: 16px;
+        padding: 6px 4px 4px 4px;
+        border-bottom: solid 1px @lgrey;
+        .name {
+            margin-left: 4px;
+        }
+        &:before {
+            content: "\203a";
+            float: right;
+            line-height: 14px;
+            margin-right: 24px;
+            font-size: 24px;
+        }
+    }
+}
+
+/* homepage/customise */
+
+.colorBox {
+    width: 15px;
+    height: 15px;
+    border: 1px solid #000;
+    cursor: pointer;
+}
+.selected {
+    font-weight: bold;
+}
+#currentColour {
+    text-align: center;
+    width: 200px;
+}
+div.colours p {
+    cursor: pointer;
+}
+
+/* component/dashboard/slideshow  */
+#galleryCycle {
+    border: 1px solid #dbdbdb;
+    div {
+        position: relative;
+        img {
+            display: block;
+            width: 230px;
+            height: 156px;
+        }
+    }
+    span {
+        background: #576369;
+        color: #fff;
+        display: none;
+        width: 100%;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        padding: 10px 0;
+        text-decoration: none;
+        opacity: 0.9;
+        text-indent: 10px;
+    }
+}
+
+/* calendar/modify */
+#dialog-bulk, #dialog-delete, .bulk-delete, .bulk-update {
+    display: none;
+}
+
+
+/* adminv2/report */
+.reporting {
+    .directory {
+        table td {
+            vertical-align: middle;
+        }
+        th a {
+            color: @black;
+        }
+    }
+    .orderby {
+        background: #dfdfdf;
+    }
+    .archive {
+        .pagination {
+            padding-top: 10px;
+            span {
+                float: left;
+                padding: 7px 2px;
+                margin: 2px;
+            }
+        }
+    }
+    .filter {
+        label {
+            font-weight: bold;
+            padding-bottom: 5px;
+        }
+        input[type="text"] {
+            border: solid 1px #ccc;
+            margin-top: 5px;
+        }
+        ul li {
+            width: 200px;
+            float: left;
+            margin-right: 8px;
+        }
+        .submit-btn-plain {
+            clear: both;
+        }
+    }
+    #report-result table td {
+        padding: 2px 0;
+    }
+}
+
+/* search */
+.no_results li {
+    list-style: disc;
+    margin-left: 20px;
+}
+#inline_search {
+    margin-top: 20px;
+    .submit-btn-plain {
+        float: none;
+        display: inline;
+    }
+    label {
+        display: inline;
+    }
+    .default {
+        border: solid 1px #ccc;
+    }
+}
+
+/* resource_browser */
+#resource-browser {
+    .submit-btn-plain {
+        float: right;
+    }
+    .left {
+        float: none;
+        width: 100%;
+    }
+}
+
+/* group/modify */
+.checkAll, .delCheck, .acceptCheck { position: relative; top: 3px; }
