@@ -15,6 +15,15 @@ class Alaress_Date_Relative extends Alaress_Date_Format {
 	private $suffix = 'ago';
 	private $now = 0;
 
+    private $intervals = array(
+        array(60, 'second'),
+        array(60, 'minute'),
+        array(24, 'hour'),
+        array(7,  'day'),
+        array(4.38,  'week'),
+        array(12, 'month'),
+    );
+
 	/**
 	 * Constructor
 	 * Does nothing, so allows you to set options
@@ -60,48 +69,88 @@ class Alaress_Date_Relative extends Alaress_Date_Format {
 		 */
 		$diff = $currentTime - $this->getUnixTimestamp();
 
-		if ($diff < 60) {
-			return $diff . ' second' . $this->plural($diff) . ' ' . $this->getSuffix();
-		}
+        if($diff > 0) {
+            return $this->getRelativePast($diff);
+        }
+        elseif($diff < 0) {
+            return $this->getRelativeFuture($diff);
+        }
+        else {
+            return 'just then';
+        }
 
-		$diff = round($diff/60);
-
-		if ($diff < 60) {
-			return $diff . ' minute' . $this->plural($diff) . ' ' . $this->getSuffix();
-		}
-
-		$diff = round($diff/60);
-
-		if ($diff < 24) {
-			return $diff . ' hour' . $this->plural($diff) . ' ' . $this->getSuffix();
-		}
-
-		$diff = round($diff/24);
-
-		if ($diff < 2) {
-			return 'Yesterday';
-		}
-
-		if ($diff < 7) {
-			return $diff . ' days ' . $this->getSuffix();
-		}
-
-		$diff = round($diff/7);
-
-		if ($diff < 2) {
-			return 'Last week';
-		}
-
-		if ($diff < 4) {
-			return $diff . ' weeks ' . $this->getSuffix();
-		}
-
-		/* If it can't be measured using weeks, just return the date using the
-		 * superclass methods
-		 */
-		return $this->getPrefix() . ' ' . $this->getDateOnly();
-		//date(Cfg::get('date_notime'), $date);
 	}
+
+
+    /**
+     * Output a relative string from the past
+     * @param $diff
+     * @return string
+     */
+    private function getRelativePast($diff) {
+        for($i = 0; $i < count($this->intervals); ++$i) {
+            if ($diff < $this->intervals[$i][0]) {
+                return sprintf('%s %s%s %s', $diff, $this->intervals[$i][1], $this->plural($diff), $this->getSuffix());
+            }
+            $diff = round($diff / $this->intervals[$i][0]);
+
+            // exceptional cases
+            if($i == 2) {
+                if ($diff < 2) {
+                    return 'Yesterday';
+                }
+            }
+            elseif($i == 3) {
+                if ($diff < 2) {
+                    return 'Last week';
+                }
+            }
+        }
+
+        // fall back to full format
+        return $this->getPrefix() . ' ' . $this->getUsingFormat('jS M Y');
+    }
+
+    /**
+     * Output a relative time in the future
+     * @param $diff
+     * @return string
+     */
+    private function getRelativeFuture($diff) {
+        // ensure positivity
+        if($diff < 0) {
+            $diff = 0 - $diff;
+        }
+
+        for($i = 0; $i < count($this->intervals); ++$i) {
+            if ($diff < $this->intervals[$i][0]) {
+                return sprintf('in %s %s%s', $diff, $this->intervals[$i][1], $this->plural($diff));
+            }
+            $diff = round($diff / $this->intervals[$i][0]);
+
+            // exceptional cases
+            if($i == 2) {
+                if ($diff < 2) {
+                    return 'Tomorrow';
+                }
+                elseif($diff < 7) {
+                    $dow = $this->getUsingFormat('l');
+                    return 'on ' . $dow;
+                }
+                elseif($diff < 14) {
+                    $dow = $this->getUsingFormat('l');
+                    return 'next ' . $dow;
+                }
+            }
+        }
+
+        // fall back to full format
+        return $this->getPrefix() . ' ' . $this->getUsingFormat('jS M Y');
+    }
+
+
+
+
 
 	/**
 	 * Pluralise something. Used in getRelativeTime()

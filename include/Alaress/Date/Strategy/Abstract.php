@@ -32,7 +32,6 @@ abstract class Alaress_Date_Strategy_Abstract {
 		 */
 		if ($inputDateFormat == 'U') {
             $this->setByTimestamp($dateTime);
-            return true;
 		}
 		else if ($inputDateFormat !== null) {
 			$this->setInputDateFormat($inputDateFormat);
@@ -52,12 +51,17 @@ abstract class Alaress_Date_Strategy_Abstract {
              */
             $parts = explode(' ', $dateTime);
 
+            for($i = 0; $i < 3; ++$i) {
+                if(!isset($parts[$i])) {
+                    $parts[$i] = '';
+                }
+            }
+
             /* Remember date components
              * Remember time components
              */
             $this->setDateComponents($parts[0]);
             $this->setTimeComponents($parts[1], $parts[2]);
-            return true;
         }
 	}
 
