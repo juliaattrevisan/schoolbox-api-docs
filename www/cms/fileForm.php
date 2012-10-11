@@ -71,25 +71,8 @@ if ( is_string($_POST['description']) && ( is_numeric($_POST['category']) || is_
     }
     else {
         /* Add file */
-        $file['owner'] = $_SESSION['id'];
-        $allowedFileHandler = new AllowedFile;
-
-        if ( is_numeric($_POST['myfile']) ) {
-            /* Make this appear as a file upload */
-            $myFileHandler = new MyFile();
-
-            if ( !$privFile = $myFileHandler->getByID($_POST['myfile']) ) {
-                error(41);
-            }
-
-            $_FILES['file'] = array(
-                'name' => $privFile['realname'], 'type' => $privFile['mime_type'],
-                'tmp_name' => Cfg::get('myfile_dir') . '/' . $privFile['id'] . '.dat',
-            );
-        }
-
-        if ( $_FILES['file']['name'] ) {
-            /* Submitted file with form, run security checks */
+        if (is_readable($_FILES['file']['tmp_name'])) {
+            $allowedFileHandler = new AllowedFile;
             if ( is_numeric($_POST['myfile']) ) {
                 $allowedFileHandler->handleError($allowedFileHandler->isAllowed($_FILES['file']['name']));
             }
@@ -97,46 +80,92 @@ if ( is_string($_POST['description']) && ( is_numeric($_POST['category']) || is_
                 $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
             }
 
-            /* Add to multiple locations */
-            if ( is_array($_POST['category']) ) {
-                foreach ( $_POST['category'] as $cat ) {
-                    if ( $groupHandler->getPermission($cat) < WRITE_ACCESS ) {
-                        error(6);
-                    }
+            $imageResource = Storage_ResourceMapper::getInstance()->create(
+                $_FILES['file']['name'], $_FILES['file']['tmp_name'], $_SESSION['id']
+            );
+            $storageHash = $imageResource->hash;
 
-                    $file['category'] = $cat;
-                    $fileHandler->create($file, $_FILES['file']);
-                }
-
-                // redirect to first category
-                SitePage::localRedir('/resources/' . $_POST['category'][0]);
-            }
-            else {
-                if ( $groupHandler->getPermission($_POST['category']) < WRITE_ACCESS ) {
-                    error(6);
-                }
-
-                $file['category'] = $_POST['category'];
-                $fileID = $fileHandler->create($file, $_FILES['file']);
+            // For some reason this is necessary for upload indication to reach Completed status.
+            if ( $_POST['uploadifydie'] == true ) {
+                exit( true );
             }
 
+            if ( isset( $_POST['return'] ) ) {
+                SitePage::localRedir($_POST['return'] . '&hash=' . $storageHash);
+            }
         }
+        $page->backToTheFuture(2);
 
 
-        /* For some reason this is necessary for upload indication to reach
-                  * Completed status.
-                  */
-        if ( $_POST['uploadifydie'] == true ) {
-            exit( true );
-        }
 
 
-        if ( isset( $_POST['return'] ) ) {
-            SitePage::localRedir($_POST['return'] . '&fileID=' . $fileID);
-        }
-        else {
-            $page->backToTheFuture(2);
-        }
+
+//        $file['owner'] = $_SESSION['id'];
+//        $allowedFileHandler = new AllowedFile;
+//
+//        if ( is_numeric($_POST['myfile']) ) {
+//            /* Make this appear as a file upload */
+//            $myFileHandler = new MyFile();
+//
+//            if ( !$privFile = $myFileHandler->getByID($_POST['myfile']) ) {
+//                error(41);
+//            }
+//
+//            $_FILES['file'] = array(
+//                'name' => $privFile['realname'], 'type' => $privFile['mime_type'],
+//                'tmp_name' => Cfg::get('myfile_dir') . '/' . $privFile['id'] . '.dat',
+//            );
+//        }
+//
+//        if ( $_FILES['file']['name'] ) {
+//            /* Submitted file with form, run security checks */
+//            if ( is_numeric($_POST['myfile']) ) {
+//                $allowedFileHandler->handleError($allowedFileHandler->isAllowed($_FILES['file']['name']));
+//            }
+//            else {
+//                $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
+//            }
+//
+//            /* Add to multiple locations */
+//            if ( is_array($_POST['category']) ) {
+//                foreach ( $_POST['category'] as $cat ) {
+//                    if ( $groupHandler->getPermission($cat) < WRITE_ACCESS ) {
+//                        error(6);
+//                    }
+//
+//                    $file['category'] = $cat;
+//                    $fileHandler->create($file, $_FILES['file']);
+//                }
+//
+//                // redirect to first category
+//                SitePage::localRedir('/resources/' . $_POST['category'][0]);
+//            }
+//            else {
+//                if ( $groupHandler->getPermission($_POST['category']) < WRITE_ACCESS ) {
+//                    error(6);
+//                }
+//
+//                $file['category'] = $_POST['category'];
+//                $fileID = $fileHandler->create($file, $_FILES['file']);
+//            }
+//
+//        }
+//
+//
+//        /* For some reason this is necessary for upload indication to reach
+//                  * Completed status.
+//                  */
+//        if ( $_POST['uploadifydie'] == true ) {
+//            exit( true );
+//        }
+//
+//
+//        if ( isset( $_POST['return'] ) ) {
+//            SitePage::localRedir($_POST['return'] . '&fileID=' . $fileID);
+//        }
+//        else {
+//            $page->backToTheFuture(2);
+//        }
     }
 }
 
