@@ -55,6 +55,20 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 	private $database = null;
 
 	/**
+	 * Usually from the session
+	 *
+	 * @var int
+	 */
+	private $fileYear = -1;
+
+	/**
+	 * Usually from the session
+	 *
+	 * @var int
+	 */
+	private $fileSemester = -1;
+
+	/**
 	 * Constructor
 	 *
 	 * @param $class
@@ -68,6 +82,8 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 		$this->setClassCode($class['ClassCode']);
 		$this->setAttendanceDate($attendanceDate->getDatabaseDate());
 		$this->setAttendancePeriod($attendancePeriod);
+		$this->setFileYear($fileYear);
+		$this->setFileSemester($fileSemester);
 		$this->setDatabase($database);
 
 		/* Get the primary key associated with the selected class, date and period
@@ -97,6 +113,74 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 	 * Hook method
 	 */
 	private function setup() {
+	}
+
+	/**
+	 * Get all the student ids for a particular AttendanceMasterSeq
+	 *
+	 * @param $attendanceMasterSeq
+	 * @return mixed
+	 */
+	private function getStudentIds($attendanceMasterSeq) {
+		$query = "
+			SELECT ID
+			FROM SynergyOne.dbo.tAttendances
+			WHERE attendanceMasterSeq = '{$attendanceMasterSeq}'
+		";
+
+		$allIds = array();
+
+		$result = $this->getDatabase()->getAll($query);
+
+		if (is_array($result) && count($result)) {
+			foreach($result as $current) {
+				$allIds[] = $current['ID'];
+			}
+		}
+
+		return $allIds;
+	}
+
+	/**
+	 * Get student data given a set of ids associated with a particular AttendanceMasterSeq
+	 * and thus associated with a particular point in time
+	 *
+	 * @param $attendanceMasterSeq
+	 *
+	 * @internal param $ids
+	 * @return mixed
+	 */
+	public function getStudents($attendanceMasterSeq) {
+		$allIds = $this->getStudentIds($attendanceMasterSeq);
+
+		if (count($allIds)) {
+			$ids = implode(',', $allIds);
+
+			$query = "
+				SELECT DISTINCT
+					StudentSurname as lastname, StudentPreferred as firstname,
+					StudentYearLevelDescription as yearlevel, StudentHouseDescription as house,
+					StudentMedicalAlert, StudentSpecialNeedsFlag,
+					StudentID as synergy_id
+				FROM
+					SynergyOne.dbo.StudentClasses StudentClasses
+				JOIN SynergyOne.dbo.vStudents vStudents ON (
+					vStudents.FileYear = StudentClasses.FileYear AND
+					vStudents.FileSemester = StudentClasses.FileSemester AND
+					vStudents.ID = StudentClasses.ID
+				)
+				WHERE StudentID IN ({$ids})
+				AND (StudentClasses.FileYear='{$this->getFileYear()}')
+				AND (StudentClasses.FileSemester='{$this->getFileSemester()}')
+				AND (StudentClasses.FileType != 'A' OR StudentClasses.StartDate <= getdate())
+				AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
+				ORDER BY StudentSurname, StudentPreferred
+			";
+
+			return $this->getDatabase()->getAll($query);
+		}
+
+		return array();
 	}
 
 	/**
@@ -327,5 +411,41 @@ class External_Synergetic_Attendance implements External_AttendanceInterface {
 	 */
 	public function getAttendanceMaster() {
 		return $this->attendanceMaster;
+	}
+
+	/**
+	 * Set file year
+	 *
+	 * @param int $fileYear
+	 */
+	private function setFileYear($fileYear) {
+		$this->fileYear = $fileYear;
+	}
+
+	/**
+	 * Get file year
+	 *
+	 * @return int
+	 */
+	private function getFileYear() {
+		return $this->fileYear;
+	}
+
+	/**
+	 * Set file semester
+	 *
+	 * @param int $fileSemester
+	 */
+	private function setFileSemester($fileSemester) {
+		$this->fileSemester = $fileSemester;
+	}
+
+	/**
+	 * Get file semester
+	 *
+	 * @return int
+	 */
+	private function getFileSemester() {
+		return $this->fileSemester;
 	}
 }

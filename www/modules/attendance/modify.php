@@ -71,17 +71,27 @@ $attendancePeriod = $this->arg[2];
 /* Let's do it
  */
 if ($class) {
-	$allStudents = $externalClass->getStudents($class['ClassCode']);
+
+	/* Get the attendance record for this class
+	 */
+	$attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $attendancePeriod, $_SESSION['FileYear'], $_SESSION['FileSemester'], new MSSQL());
+	$attendanceHandler->findAttendanceRecords();
+
+	/* If the roll has been marked before, just show the students that were originally
+	 * in that roll. Students could be added to a class and would unexpectedly make an
+	 * appearance in history
+	 */
+	if ($attendanceHandler->getAttendanceMaster()->hasAttendanceMasterSeq()) {
+		$allStudents = $attendanceHandler->getStudents($attendanceHandler->getAttendanceMaster()->getAttendanceMasterSeq());
+	}
+	else {
+		$allStudents = $externalClass->getStudents($class['ClassCode']);
+	}
 
 	/* Dish out each row
 	 */
 	if (is_array($allStudents) && count($allStudents)) {
 		$userHandler = new User();
-
-		/* Get the attendance record for this class
-		 */
-		$attendanceHandler = new External_Synergetic_Attendance($class, $attendanceDate, $attendancePeriod, $_SESSION['FileYear'], $_SESSION['FileSemester'], new MSSQL());
-		$attendanceHandler->findAttendanceRecords();
 
 		/* Dropdown options
 		 */
