@@ -38,24 +38,28 @@
 		</thead>
 		<tbody>
 		<!-- BEGIN thread -->
-		<tr>
+		<tr class="{ON_OFF}">
 			<!-- BEGIN modify_thread -->
 			<td>
 				<input type="checkbox" name="deleteThreads[]"
 					   value="{THREAD_ID}"/>
 			</td>
 			<!-- END modify_thread -->
-			<td>
-				<h3><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE}</a>
-					{THREAD_LOCKED}</h3>
+			<td class="avatar">
+                <a href="/search/user/{THREAD_AUTHOR_ID}" class="author">
+                    <img height="32" width="32" src="/portrait.php?userId={THREAD_AUTHOR_EXTERNAL_ID}&size=square32"/>
+                </a>
+                <h3><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE} {THREAD_LOCKED}</a></h3>
 
-				<p>{THREAD_AUTHOR} - {THREAD_TIME} </p></td>
-			<td><!-- BEGIN last_post -->
+                <span class="subtitle">Posted {THREAD_TIME} by </span>
+                <a href="/search/user/{THREAD_AUTHOR_ID}" class="author">{THREAD_AUTHOR}</a>
+			<td class="avatar"><!-- BEGIN last_post -->
+            <a href="/search/user/{THREAD_LAST_POST_USER_ID}" class="author">
+                <img height="32" width="32" src="/portrait.php?userId={THREAD_LAST_POST_USER_EXTERNAL_ID}&size=square32"/>
+                <a href="/search/user/{THREAD_LAST_POST_USER_ID}">{THREAD_LAST_POST_USER}</a>
+            </a><br />
+            <span class="subtitle">{THREAD_LAST_POST_TIME}</span>
 
-				<h3><a href="/search/user/{THREAD_LAST_POST_USER_ID}">{THREAD_LAST_POST_USER}</a>
-				</h3>
-
-				<p>{THREAD_LAST_POST_TIME}</p>
 				<!-- END last_post --></td>
 			<td> {THREAD_REPLIES}</td>
 			<td> {THREAD_VIEWS}</td>

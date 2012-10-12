@@ -132,6 +132,7 @@ $this->setVar($outputPagination);
 $postList = $forumHandler->getPostList($thread['threadID'], $postIndex, $postPerPage);
 if (is_array($postList)) {
 	$userHandler = new User();
+    $j = 0;
 
 	foreach ($postList as $post) {
 
@@ -156,7 +157,8 @@ if (is_array($postList)) {
 						'POST_MODIFIED' => $modifiedTime->getRelativeTime(),
 						'POST_CENSORED' => $post['censored'] == 'true' ? '(Administrator)' : '',
 						'POST_AUTHOR_EXTERNAL_ID' => $post['synergy_id'],
-						'POST_AUTHOR_NAME' => $post['firstname'] . ' ' . $post['lastname']
+						'POST_AUTHOR_NAME' => $post['firstname'] . ' ' . $post['lastname'],
+                        'ON_OFF'          => ++$j % 2 ? 'dark' : ''
 		);
 		$this->setVar($output);
 

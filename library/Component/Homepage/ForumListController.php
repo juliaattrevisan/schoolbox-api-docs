@@ -100,6 +100,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
                     'THREAD_ID' => $thread['threadID'],
                     'THREAD_USER' => $userHandler->formatName($user),
                     'THREAD_USER_ID' => $thread['userID'],
+                    'THREAD_USER_EXTERNAL_ID' => $thread['synergy_id'],
                     'THREAD_DATE' => $threadTime->getRelativeTime(),
                     'THREAD_TITLE' => Scrub::text($thread['title']),
                     'ON_OFF' => ++$j % 2 ? '' : 'dark',

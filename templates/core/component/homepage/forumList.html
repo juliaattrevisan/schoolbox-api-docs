@@ -1,19 +1,21 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
-    <div class="listing">
-        <ul>
+    <div class="listing forum">
+        <ul class="comments">
             <!-- BEGIN forum -->
-            <li class="{ON_OFF} clearfix">
-                <div class="clearfix">
-                    <h4><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE}</a></h4>
-                    <!-- BEGIN forum_reply -->
-                    <p class="interact"><a href="/forum/modify/{ID}/{THREAD_ID}">Reply</a></p>
-                    <!-- END forum_reply -->
-                </div>
-                <div class='{COMPONENT_COMPACTMODE}'>
-                    <p class="small hide-on-small">Posted by <a href="/search/user/{THREAD_USER_ID}">{THREAD_USER}</a> {THREAD_DATE}</p>
-                </div>
+            <li class="{ON_OFF}">
+                <!-- BEGIN forum_reply -->
+                <a class="btn modify" href="/forum/modify/{ID}/{THREAD_ID}"><span></span>Reply</a>
+                <!-- END forum_reply -->
+                <a href="/search/user/{THREAD_USER_ID}" class="author">
+                    <img height="32" width="32" src="/portrait.php?userId={THREAD_USER_EXTERNAL_ID}&size=square32"/>
+                </a>
+                <h4><a href="/forum/thread/{THREAD_ID}">{THREAD_TITLE}</a></h4>
+
+                <span class="subtitle">Posted {THREAD_DATE} by </span>
+                <a href="/search/user/{THREAD_USER_ID}" class="author">{THREAD_USER}</a>
+                <p class="comment-body"></p>
             </li>
             <!-- END forum -->
         </ul>

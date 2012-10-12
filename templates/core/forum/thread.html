@@ -49,57 +49,34 @@
 
 
 </p>
-<div class="forum">
-    <table cellpadding="0" cellspacing="0" border="0" width="100%">
-
+<div class="forum listing">
+    <ul class="comments">
         <!-- BEGIN post -->
-        <tr class="post">
-            <td class="post-left" valign="top">
-                <div class="post-content" style='min-width:200px'>
-                    <a name="{POST_ID}"></a>
+        <li id="{POST_ID}" class="{ON_OFF}">
+            <!-- BEGIN modify -->
+            <a class="btn delete no-text" title="Delete post" href="/forum/modifyForm.php?deletePost={POST_ID}" class="delete"><span></span></a>
+            <a class="btn modify no-text" title="Edit post" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}"><span></span></a>
+            <!-- END modify -->
+            <a href="/search/user/{POST_USER_ID}" class="author">
+                <img width="32" height="32" src="/portrait.php?userId={POST_AUTHOR_EXTERNAL_ID}&size=square32"/>
+                <span class="name">{POST_AUTHOR}</span>
+            </a>
+            <span class="subtitle">Posted {POST_TIME}</span>
+            <div class="post-content wysiwyg">
+                {POST_BODY}
+            </div>
+            <p>
+                <!-- BEGIN reply_post -->
+                <a class=" btn modify" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}"><span></span>Reply to post</a>
+                <!-- END reply_post -->
 
-                    <div style='width:64px;height:64px;'>
-                        <img src='/portrait.php?userId={POST_AUTHOR_EXTERNAL_ID}&size=square64' alt="{POST_AUTHOR_NAME}"
-                             title="{POST_AUTHOR_NAME}"/>
-                    </div>
-                    <div style='position:relative;top:-64px;left:80px'>
-                        <p>
-                            <a href="/search/user/{POST_USER_ID}">{POST_AUTHOR}</a><br/>
-                            {POST_GROUP}
-
-                            <br/><br/>
-                            Posted {POST_TIME}
-
-                        </p>
-                    </div>
-
-                    <!-- BEGIN modify -->
-                    <p>
-                        <a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}">Edit post</a> |
-                        <a href="/forum/modifyForm.php?deletePost={POST_ID}" class="delete">Delete post</a><br/>
-                    </p>
-                    <!-- END modify -->
-
-                    <p>
-                        <!-- BEGIN reply_post -->
-                        <a href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}">Reply to this post</a><br/>
-                        <!-- END reply_post -->
-
-                        <!-- BEGIN modified -->
-                        <br/> edited {POST_MODIFIED} {POST_CENSORED}
-                        <!-- END modified -->
-                    </p>
-                </div>
-            </td>
-            <td class="post-right" valign="top">
-                <div class="post-content wysiwyg">
-                    {POST_BODY}
-                </div>
-            </td>
-        </tr>
-
+                <!-- BEGIN modified -->
+                <br/> edited {POST_MODIFIED} {POST_CENSORED}
+                <!-- END modified -->
+            </p>
+        </li>
         <!-- END post -->
-    </table>
+    </ul>
 </div>
 <p class="clearfix"><a name="bottom"></a>
     <a href="/homepage/{CATEGORY_ID}" class="btn go-back float-left"><span></span>Return to homepage</a>
