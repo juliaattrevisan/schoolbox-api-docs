@@ -181,7 +181,7 @@ $j(function () {
             <table class="upcoming-work">
                 <tbody>
                 <!-- BEGIN upcoming_work -->
-                <tr class="{ON_OFF}">
+                <tr class="{ON_OFF} {HIDEME}">
                     <td><a class="title" href="{UPCOMING_HREF}{UPCOMING_ID}">{UPCOMING_TITLE}</a><br />
                         <a href="/homepage/{UPCOMING_SUBJ_ID}">{UPCOMING_SUBJ_NAME}</a> {UPCOMING_TYPE}</td>
                     <td><span class="gradient-{UPCOMING_URGENCY}">Due {UPCOMING_DATE}</span> on {UPCOMING_TIME}</td>
@@ -192,166 +192,11 @@ $j(function () {
                     </td>
                 </tr>
                 <!-- END upcoming_work -->
-                <tr>
-                    <td><a class="title" href="">Eating bacon</a><br />
-                        <a href="">Home Economics</a> Oral</td>
-                    <td><span class="gradient-1">Due Today</span> at 7PM</td>
-                    <td><a class="btn modify"><span></span> Sit</a></td>
-                </tr>
-                <tr class="dark">
-                    <td><a class="title" href="">Essay on Bacon</a><br />
-                        <a href="">English</a> Bacon</td>
-                    <td><span class="gradient-2">Due Wednesday</span> at 2PM</td>
-                    <td>No submissions</td>
-                </tr>
-                <tr>
-                    <td><a class="title" href="">Due Work Title</a><br />
-                        <a href="">Subject</a> work type</td>
-                    <td><span class="gradient-3">Due Tomorrow</span> at Time</td>
-                    <td><a class="btn up-arrow"><span></span> Resubmit</a></td>
-                </tr>
-                <tr class="dark">
-                    <td><a class="title" href="">Eating bacon</a><br />
-                        <a href="">Home Economics</a> Oral</td>
-                    <td><span class="gradient-4">Due Today</span> at 7PM</td>
-                    <td><a class="btn modify"><span></span> Sit</a></td>
-                </tr>
-                <tr>
-                    <td><a class="title" href="">Essay on Bacon</a><br />
-                        <a href="">English</a> Bacon</td>
-                    <td><span class="gradient-5">Due Wednesday</span> at 2PM</td>
-                    <td><a class="btn modify"><span></span> Resit</a></td>
-                </tr>
-                <tr class="dark">
-                    <td><a class="title" href="">Due Work Title</a><br />
-                        <a href="">Subject</a> work type</td>
-                    <td><span class="gradient-6">Due Tomorrow</span> at Time</td>
-                    <td><a class="btn up-arrow"><span></span> Submit</a></td>
-                </tr>
-                <tr>
-                    <td><a class="title" href="">Eating bacon</a><br />
-                        <a href="">Home Economics</a> Oral</td>
-                    <td><span class="gradient-7">Due Today</span> at 7PM</td>
-                    <td><a class="btn modify"><span></span> Sit</a></td>
-                </tr>
-                <tr class="dark">
-                    <td><a class="title" href="">Essay on Bacon</a><br />
-                        <a href="">English</a> Bacon</td>
-                    <td><span class="gradient-8">Due Wednesday</span> at 2PM</td>
-                    <td>No submissions</td>
-                </tr>
-                <tr>
-                    <td><a class="title" href="">Due Work Title</a><br />
-                        <a href="">Subject</a> work type</td>
-                    <td><span class="gradient-9">Due Tomorrow</span> at Time</td>
-                    <td><a class="btn up-arrow"><span></span> Resubmit</a></td>
-                </tr>
-                <tr class="dark">
-                    <td><a class="title" href="">Eating bacon</a><br />
-                        <a href="">Home Economics</a> Oral</td>
-                    <td><span class="gradient-10">Due Today</span> at 7PM</td>
-                    <td><a class="btn modify"><span></span> Sit</a></td>
-                </tr>
-                <tr>
-                    <td><a class="title" href="">Eating bacon</a><br />
-                        <a href="">Home Economics</a> Oral</td>
-                    <td><span class="gradient-10">Due Today</span> at 7PM</td>
-                    <td><a class="btn modify"><span></span> Sit</a></td>
-                </tr>
-
-                <!-- BEGIN work -->
-                <tr class="{ROW_COLOR}">
-                    <td>{WORK_DESCRIPTION}<br />
-                        {WORK_SUBJECT}</td>
-                    <td>{WORK_DATE}</td>
-                    <td nowrap="nowrap"><a href="/submission/submissionHistory/{WORK_BOX_ID}/{WORK_USER_ID}">{WORK_ACTION}</a></td>
-                </tr>
-                <!-- END work -->
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div class="box component">
-		<h2>Recent Work Activity
-            <!-- BEGIN view_all_due_work --><a href="/submission/allDueWork/{WORK_USER_ID}" class="btn"><span></span>View all work</a>
-            <!-- END view_all_due_work -->
-        </h2>
-		<div class="listing">
-			<table class="due-dates">
-				<thead>
-					<tr>
-						<th width="22%">Date</th>
-						<th width="20%">Subject</th>
-						<th width="25%">Description</th>
-						<th width="17%">Status</th>
-						<th width="15%"></th>
-					</tr>
-				</thead>
-				<tbody>
-					<!-- BEGIN work -->
-					<tr class="{ROW_COLOR}">
-						<td>{WORK_DATE}</td>
-						<td>{WORK_SUBJECT}</td>
-						<td>{WORK_DESCRIPTION}</td>
-						<td valign="top">{WORK_STATUS}</td>
-						<td nowrap="nowrap"><a href="/submission/submissionHistory/{WORK_BOX_ID}/{WORK_USER_ID}">{WORK_ACTION}</a></td>
-					</tr>
-					<!-- END work -->
-				</tbody>
-			</table>
-		</div>
-	</div>
-
-	<!-- BEGIN allAssess -->
-	<div class="box component">
-		<h2>Online Assessments</h2>
-		<div class="listing">
-			<table class="due-dates onlineAssessments">
-				<thead>
-					<tr>
-						<th width="20%">Subject</th>
-						<th width="20%">Description</th>
-						<th width="20%">Finish Date</th>
-						<th width="20%">Mark</th>
-						<th width="20%">Action</th>
-					</tr>
-				</thead>
-				<tbody>
-					<!-- BEGIN attempt -->
-					<tr class="{DARK}">
-						<td>{ASSESS_CATEGORY}</td>
-						<td>{ASSESS_TITLE}</td>
-						<td>{ASSESS_FINISH}</td>
-						<td>
-							<!-- BEGIN restricted_student_submissions_marks -->
-							{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS} ({ATTEMPT_PERCENTAGE}%)
-							<!-- BEGIN unmarked -->
-
-							<p class="unmarkedResponses">
-								<strong>Unconfirmed mark.</strong><br />
-								{ATTEMPT_UNMARKED_RESPONSES} questions not yet marked
-							</p>
-							<!-- END unmarked -->
-							<!-- END restricted_student_submissions_marks -->
-						</td>
-						<td>
-							<!-- BEGIN restricted_student_submissions_actions -->
-							<!-- BEGIN viewMarks -->
-							<a href="/assess/studentReview/{ASSESS_ASSESS_ID}/{ASSESS_FIRST_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}">View Results</a>
-							<!-- END viewMarks -->
-							<!-- BEGIN takeTest -->
-							<a href="/assess/intro/{ASSESS_ASSESS_ID}">Take Test</a>
-							<!-- END takeTest -->
-							<!-- END restricted_student_submissions_actions -->
-						</td>
-					</tr>
-					<!-- END attempt -->
-				</tbody>
-			</table>
-		</div>
-	</div>
-	<!-- END allAssess -->
 </div>
 <div class="right">
 	<div class="box component">
@@ -371,4 +216,3 @@ $j(function () {
 		</div>
 	</div>
 </div>
-<!-- END returned_block -->
