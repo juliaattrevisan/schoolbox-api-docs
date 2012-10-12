@@ -42,9 +42,12 @@ class Forum extends DeprecatedModel {
 	}
 
 	function getThreadList ($categoryID, $index = 0, $limit = 0) {
-		$query = "SELECT t.*, u.title userTitle, u.firstname userFirstname, u.lastname userLastname, COUNT(DISTINCT p.postID) - 1 replies
-				  FROM forumThread t
-				  LEFT JOIN user u ON u.id = t.userID
+		$query = "SELECT t.*, u2.synergy_id last_post_user_synid, u.id userID, u.title userTitle,
+                    u.firstname userFirstname, u.lastname userLastname, u.synergy_id userSynID,
+                    COUNT(DISTINCT p.postID) - 1 replies
+                  FROM forumThread t
+				  LEFT JOIN `user` u ON u.id = t.userID
+                  LEFT JOIN `user` u2 ON u2.id = t.last_post_user_id
 				  LEFT JOIN forumPost p ON p.threadID = t.threadID AND p.deleted = 'false'
 				  WHERE t.categoryID = $categoryID
 				  AND t.deleted = 'false'
