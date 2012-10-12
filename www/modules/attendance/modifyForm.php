@@ -13,22 +13,16 @@
 $externalClass = new External_Synergetic_Class();
 $class = $externalClass->getClass($_POST['classCode']);
 
-/* TODO: Error message
- */
 if (!$class) {
-	throw new Exception('Class does not exist.');
+	error(148);
 }
 
-/* TODO: Error message
- */
 if (!strlen($_POST['attendanceDate'])) {
-	throw new Exception('Please specify a date.');
+	error(149);
 }
 
-/* TODO: Error message
- */
 if (!is_numeric(preg_replace('/[^0-9]+/', '', $_POST['attendancePeriod']))) {
-	throw new Exception('Attendance Period must be an integer.');
+	error(150);
 }
 
 /* Selected date for which to deal with attendances
@@ -39,11 +33,11 @@ $attendanceDate = new Alaress_Date_Format($_POST['attendanceDate'], 'y-m-d');
 $now = new Alaress_Date_Format(time(), 'U');
 
 if ($attendanceDate->getUsingFormat('W')  < ($now->getUsingFormat('W')-1)) {
-	throw new Exception('You can\'t edit back that far.');
+	error(151);
 }
 
 if ($attendanceDate->getUnixTimestamp() > $now->getUnixTimestamp()) {
-	throw new Exception('You can\'t edit future attendance records.');
+	error(152);
 }
 
 /* Only teachers of this class (and superusers) can edit attendance records
@@ -51,14 +45,13 @@ if ($attendanceDate->getUnixTimestamp() > $now->getUnixTimestamp()) {
 $groupHandler = new Group();
 
 if (!in_array($_SESSION['sid'], $externalClass->getTeacherName($class['ClassCode'])) && !$groupHandler->isSuperuser()) {
-	throw new Exception('You do not have permission to edit this page.');
+	error(19);
 }
 
 /* Validation check ends here
  */
 
-/* TODO: Attendance Period
- * Figger out how to figger this out
+/* Attendance Period
  */
 $attendancePeriod = $_POST['attendancePeriod'];
 

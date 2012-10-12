@@ -34,11 +34,8 @@ $this->setBlock(TEMPLATE_content, 'has_save_all', 'has_save_all_block');
 
 /* THE THREE MUSKETEERS
  */
-
-/* TODO: Error message
- */
 if (count($this->arg) < 3) {
-	throw new Exception('Please specify class code, date and period.');
+	error(147);
 }
 
 /* Get a class list which we'll match up manually with their attendance records
@@ -47,22 +44,16 @@ if (count($this->arg) < 3) {
 $externalClass = new External_Synergetic_Class();
 $class = $externalClass->getClass($this->arg[0]);
 
-/* TODO: Error message
- */
 if (!$class) {
-	throw new Exception('Class does not exist.');
+	error(148);
 }
 
-/* TODO: Error message
- */
 if (!strlen($this->arg[1])) {
-	throw new Exception('Please specify a date.');
+	error(149);
 }
 
-/* TODO: Error message
- */
 if (!is_numeric(preg_replace('/[^0-9]+/', '', $this->arg[2]))) {
-	throw new Exception('Attendance Period must be an integer.');
+	error(150);
 }
 
 /* Selected date for which to deal with attendances
@@ -73,11 +64,11 @@ $attendanceDate = new Alaress_Date_Format($this->arg[1], 'y-m-d');
 $now = new Alaress_Date_Format(time(), 'U');
 
 if ($attendanceDate->getUsingFormat('W')  < ($now->getUsingFormat('W')-1)) {
-	throw new Exception('You can\'t edit back that far.');
+	error(151);
 }
 
 if ($attendanceDate->getUnixTimestamp() > $now->getUnixTimestamp()) {
-	throw new Exception('You can\'t edit future attendance records.');
+	error(152);
 }
 
 /* Only teachers of this class (and superusers) can edit attendance records
@@ -85,11 +76,10 @@ if ($attendanceDate->getUnixTimestamp() > $now->getUnixTimestamp()) {
 $groupHandler = new Group();
 
 if (!in_array($_SESSION['sid'], $externalClass->getTeacherName($class['ClassCode'])) && !$groupHandler->isSuperuser()) {
-	throw new Exception('You do not have permission to edit this page.');
+	error(19);
 }
 
-/* TODO: Attendance Period
- * Figger out how to figger this out
+/* Attendance Period
  */
 $attendancePeriod = $this->arg[2];
 
@@ -247,10 +237,7 @@ if ($class) {
 	}
 }
 else {
-	/* TODO: Error message
-	 * Class doesn't exist
-	 */
-	throw new Exception('Class does not exist.');
+	error(148);
 
 	$this->setVar('student_block', '');
 	$this->setVar('has_save_all_block', '');
