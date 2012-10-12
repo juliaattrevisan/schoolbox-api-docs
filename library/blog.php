@@ -12,7 +12,7 @@ class Blog extends DeprecatedModel {
 	}
 
 	function getByID($id) {
-		$query = "SELECT {$this->_table}.*, user.title, user.firstname, user.lastname
+		$query = "SELECT {$this->_table}.*, user.title, user.firstname, user.lastname, user.synergy_id
 			FROM {$this->_table} LEFT JOIN user ON {$this->_table}.owner = user.id
 			WHERE {$this->_table}.id = $id AND deleted IS NULL
 			ORDER BY {$this->_table}.created DESC";

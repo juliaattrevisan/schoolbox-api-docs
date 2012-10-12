@@ -22,12 +22,20 @@ if(is_numeric($this->arg[0])) {
 	else
 		$this->setVar('MODIFY_BLOG', '');
 
+    $adr = new Alaress_Date_Relative($blog['created']);
+    $userHandler = new User();
+
 	$this->setVar(array(
 		'BLOG_CID'      => $blog['cid'],
 		'BLOG_HEADING'  => $blog['heading'],
 		'BLOG_BODY'     => $blog['body'],
 		'BLOG_COMMENTS' => 'No Comments',
 		'BLOG_ID'       => $blog['id'],
+        'BLOG_CREATED'  => $adr->getRelativeTime(),
+
+        'BLOG_AUTHOR_ID'    => $blog['owner'],
+        'BLOG_AUTHOR_NAME'  => $userHandler->formatName($blog),
+        'BLOG_AUTHOR_THUMB' => sprintf('/portrait?userId=%s&size=square32', $blog['synergy_id']),
 	));
 
 	$comments = $commentHandler->getByBID($blog['id']);
@@ -36,7 +44,7 @@ if(is_numeric($this->arg[0])) {
 	if(!empty($comments)) {
 		$this->setVar('BLOG_COMMENTS', count($comments) . ' Comments');
 
-		$userHandler = new User();
+
         $j = 0;
 
 		foreach($comments as $comment) {
@@ -46,9 +54,12 @@ if(is_numeric($this->arg[0])) {
 				'COMMENT_BODY'    => $comment['body'],
 				'COMMENT_OWNER'   => $userHandler->formatName($comment),
 				'COMMENT_CREATED' => $actionDate->getRelativeTime(),
+
+                'COMMENT_AUTHOR_ID'          => $comment['owner'],
                 'COMMENT_AUTHOR_EXTERNAL_ID' => $comment['synergy_id'],
-				'DELETE_COMMENT'  => "<a class=\"delete-comment btn delete no-text\" href=\"/blog/comment/delete/{$comment['id']}\"><span></span></a>",
-                'ON_OFF'          => ++$j % 2 ? 'dark' : ''
+
+                'DELETE_COMMENT' => "<a class=\"delete-comment btn delete no-text\" href=\"/blog/comment/delete/{$comment['id']}\"><span></span></a>",
+                'ON_OFF'         => ++$j % 2 ? 'dark' : ''
 			));
 
 			if($comment['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS || NEWS_teacher_edit_other)
