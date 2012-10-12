@@ -35,6 +35,12 @@ $this->setBlock(TEMPLATE_content, 'has_save_all', 'has_save_all_block');
 /* THE THREE MUSKETEERS
  */
 
+/* TODO: Error message
+ */
+if (count($this->arg) < 3) {
+	throw new Exception('Please specify class code, date and period.');
+}
+
 /* Get a class list which we'll match up manually with their attendance records
  * but only if this class exists
  */
@@ -47,18 +53,11 @@ if (!$class) {
 	throw new Exception('Class does not exist.');
 }
 
-/* Selected date for which to deal with attendances
+/* TODO: Error message
  */
-if (strlen($this->arg[1])) {
-	$attendanceDate = new Alaress_Date_Format($this->arg[1], 'y-m-d');
+if (!strlen($this->arg[1])) {
+	throw new Exception('Please specify a date.');
 }
-else {
-	$attendanceDate = new Alaress_Date_Format(time(), 'U');
-}
-
-/* TODO: Attendance Period
- * Figger out a way to get this value from somewhere, like a timetable
- */
 
 /* TODO: Error message
  */
@@ -66,6 +65,32 @@ if (!is_numeric(preg_replace('/[^0-9]+/', '', $this->arg[2]))) {
 	throw new Exception('Attendance Period must be an integer.');
 }
 
+/* Selected date for which to deal with attendances
+ * Check that you are allowed to edit something in a particular date range
+ * (You cannot edit anything older than the previous week)
+ */
+$attendanceDate = new Alaress_Date_Format($this->arg[1], 'y-m-d');
+$now = new Alaress_Date_Format(time(), 'U');
+
+if ($attendanceDate->getUsingFormat('W')  < ($now->getUsingFormat('W')-1)) {
+	throw new Exception('You can\'t edit back that far.');
+}
+
+if ($attendanceDate->getUnixTimestamp() > $now->getUnixTimestamp()) {
+	throw new Exception('You can\'t edit future attendance records.');
+}
+
+/* Only teachers of this class (and superusers) can edit attendance records
+ */
+$groupHandler = new Group();
+
+if (!in_array($_SESSION['sid'], $externalClass->getTeacherName($class['ClassCode'])) && !$groupHandler->isSuperuser()) {
+	throw new Exception('You do not have permission to edit this page.');
+}
+
+/* TODO: Attendance Period
+ * Figger out how to figger this out
+ */
 $attendancePeriod = $this->arg[2];
 
 /* Let's do it
@@ -78,8 +103,10 @@ if ($class) {
 	$attendanceHandler->findAttendanceRecords();
 
 	/* If the roll has been marked before, just show the students that were originally
-	 * in that roll. Students could be added to a class and would unexpectedly make an
-	 * appearance in history
+	 * in that roll. Otherwise load all the students in the class.
+	 *
+	 * Students could be added to a class and could unexpectedly make an
+	 * appearance in history if you don't do this.
 	 */
 	if ($attendanceHandler->getAttendanceMaster()->hasAttendanceMasterSeq()) {
 		$allStudents = $attendanceHandler->getStudents($attendanceHandler->getAttendanceMaster()->getAttendanceMasterSeq());

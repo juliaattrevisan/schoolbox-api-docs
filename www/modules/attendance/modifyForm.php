@@ -19,13 +19,43 @@ if (!$class) {
 	throw new Exception('Class does not exist.');
 }
 
-$attendanceDate = new Alaress_Date_Format($_POST['attendanceDate'], 'y-m-d');
+/* TODO: Error message
+ */
+if (!strlen($_POST['attendanceDate'])) {
+	throw new Exception('Please specify a date.');
+}
 
 /* TODO: Error message
  */
 if (!is_numeric(preg_replace('/[^0-9]+/', '', $_POST['attendancePeriod']))) {
 	throw new Exception('Attendance Period must be an integer.');
 }
+
+/* Selected date for which to deal with attendances
+ * Check that you are allowed to edit something in a particular date range
+ * (You cannot edit anything older than the previous week)
+ */
+$attendanceDate = new Alaress_Date_Format($_POST['attendanceDate'], 'y-m-d');
+$now = new Alaress_Date_Format(time(), 'U');
+
+if ($attendanceDate->getUsingFormat('W')  < ($now->getUsingFormat('W')-1)) {
+	throw new Exception('You can\'t edit back that far.');
+}
+
+if ($attendanceDate->getUnixTimestamp() > $now->getUnixTimestamp()) {
+	throw new Exception('You can\'t edit future attendance records.');
+}
+
+/* Only teachers of this class (and superusers) can edit attendance records
+ */
+$groupHandler = new Group();
+
+if (!in_array($_SESSION['sid'], $externalClass->getTeacherName($class['ClassCode'])) && !$groupHandler->isSuperuser()) {
+	throw new Exception('You do not have permission to edit this page.');
+}
+
+/* Validation check ends here
+ */
 
 /* TODO: Attendance Period
  * Figger out how to figger this out
