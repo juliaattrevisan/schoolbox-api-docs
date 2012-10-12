@@ -36,7 +36,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             $this->currentPeriod = $timetableHandler->getPeriodNumber($_SESSION['campus'][0]);
 
             $this->timetable = $timetableHandler->getDayTimetable($_SESSION['sid'], $_SESSION['id'], $_SESSION['campus'][0], $this->dayNumber);
-   
+
 			return true;
         }
 		else {
@@ -52,6 +52,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
         $this->setBlock($templateHandle, "timetable_period", "timetable_period_block");
         $this->setBlock($templateHandle, "timetable_header", "timetable_header_block");
+		$this->setBlock('timetable_period', 'has_attendances', "has_attendances_block");
 
         $this->setVar("DAYNUMBER", $this->dayNumber);
 
@@ -122,9 +123,30 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                         $this->setVar("PERIOD_CLASS", "normal");
                     }
 
+					/* Link to Attendance Records
+					 */
+					if (strlen($period['code'])) {
+						$now = new Alaress_Date_Format(time(), 'U');
+
+						$this->setVar(array(
+							'ATTENDANCE_CLASS_CODE' => $period['code'],
+							'ATTENDANCE_ATTENDANCE_DATE' => $now->getDatabaseDate(),
+							'ATTENDANCE_ATTENDANCE_PERIOD' => $period['periodNumber'],
+						));
+
+						$this->parse('has_attendances_block', 'has_attendances');
+					}
+					else {
+						$this->setVar('has_attendances_block', '');
+					}
+
                     //output period block
                     $this->parse("timetable_header_block", "timetable_header", true);
                     $this->parse("timetable_period_block", "timetable_period", true);
+
+					/* Clear children after parsing out the parent
+					 */
+					$this->setVar('has_attendance_block', '');
                 }
             }
 
