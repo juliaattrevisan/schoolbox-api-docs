@@ -1061,4 +1061,69 @@ class Submission extends DeprecatedModel {
         }
         return false;
     }
+
+
+    /**
+     * Somehow a merge and sort is ~200-300% faster than a Union of these two queries...
+     *
+     * @param $uid
+     * @return array
+     */
+    function getAllUpcomingWorkAndAssessments($uid) {
+        $q0 = "
+            SELECT
+              '0' kind, sb.id, sb.name `title`, ft.name `type`, UNIX_TIMESTAMP(sb.date) AS `date`, UNIX_TIMESTAMP(sb.late_date) AS late_date,
+              c.`name` subj_name, c.id subj_id, sb.accept_submission submittable, sb.multi_submission multi_submit, COUNT(ss.id) submit_count
+            FROM submission_box sb
+            LEFT JOIN file_type ft ON ft.id = sb.type
+            LEFT JOIN category c ON c.`id` = sb.`category`
+            LEFT JOIN userAccess ua ON ua.`sid` = c.id AND ua.`service` = 1
+            LEFT JOIN student_submission ss ON sb.id = ss.box_id
+            WHERE ua.`uid` = $uid
+            GROUP BY sb.id
+            ORDER BY sb.date ASC
+            ";
+
+        $q1 = "
+            SELECT
+              '1' kind, a.assess_id id, a.title, ft.name `type`, a.finish `date`, UNIX_TIMESTAMP(a.finish) AS `date`,
+              c.`name` subj_name, c.id subj_id, a.max_attempts, COUNT(aa.attempt_id) attempt_count
+            FROM assess a
+            LEFT JOIN file_type ft ON ft.id = a.`type`
+            LEFT JOIN category c ON c.`id` = a.`category_id`
+            LEFT JOIN userAccess ua ON ua.`sid` = c.id AND ua.`service` = 1
+            LEFT JOIN assess_attempt aa ON a.`assess_id` = aa.`assess_id`
+            WHERE ua.`uid` = $uid
+            GROUP BY a.assess_id
+            ORDER BY a.finish ASC
+        ";
+
+        /* execute queries and retrieve */
+        $r0 = $this->db->getAll($q0);
+        $r1 = $this->db->getAll($q1);
+
+        /* merge, and sort by date */
+        if(!is_array($r0)) {
+            $r0 = array();
+        }
+        if(!is_array($r1)) {
+            $r1 = array();
+        }
+        $r = array_merge($r0, $r1);
+        usort($r, array($this, 'cmpDates'));
+
+        /* iterate and output */
+        return $r;
+
+    }
+
+    function cmpDates($a, $b) {
+        if($a['date'] < $b['date']) {
+            return -1;
+        }
+        elseif($a['date'] > $b['date']) {
+            return 1;
+        }
+        return 0;
+    }
 }
