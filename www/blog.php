@@ -27,7 +27,7 @@ if(is_numeric($this->arg[0])) {
 		'BLOG_HEADING'  => $blog['heading'],
 		'BLOG_BODY'     => $blog['body'],
 		'BLOG_COMMENTS' => 'No Comments',
-		'BLOG_ID'       => $blog['id']
+		'BLOG_ID'       => $blog['id'],
 	));
 
 	$comments = $commentHandler->getByBID($blog['id']);
@@ -46,12 +46,13 @@ if(is_numeric($this->arg[0])) {
 				'COMMENT_BODY'    => $comment['body'],
 				'COMMENT_OWNER'   => $userHandler->formatName($comment),
 				'COMMENT_CREATED' => $actionDate->getRelativeTime(),
-				'DELETE_COMMENT'  => "<a class=\"delete-comment\" href=\"/blog/comment/delete/{$comment['id']}\"><span></span>Delete</a>",
-                'ON_OFF'          => ++$j % 2 ? 'rofl' : 'copter'
+                'COMMENT_AUTHOR_EXTERNAL_ID' => $comment['synergy_id'],
+				'DELETE_COMMENT'  => "<a class=\"delete-comment btn delete no-text\" href=\"/blog/comment/delete/{$comment['id']}\"><span></span></a>",
+                'ON_OFF'          => ++$j % 2 ? 'dark' : ''
 			));
 
 			if($comment['owner'] == $_SESSION['id'] || $permission >= FULL_ACCESS || NEWS_teacher_edit_other)
-				$this->setVar('DELETE_COMMENT', "<a class=\"delete-comment\" href=\"/blog/comment/delete/{$comment['id']}\">Delete</a> | ");
+				$this->setVar('DELETE_COMMENT', "<a class=\"delete-comment btn delete no-text\" href=\"/blog/comment/delete/{$comment['id']}\"><span></span></a>");
 			else
 				$this->setVar('DELETE_COMMENT', '');
 

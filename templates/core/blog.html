@@ -3,13 +3,14 @@
 $j(function() {
 		$j('a.delete-comment').click(function(){
 			location.href = $j(this).attr('href');
-		}).confirm({
-		buttons: {
-			wrapper:'<button></button>',
-			separator:'  '
-		}
-	});
-
+        }).confirm({
+                    msg: 'Delete this comment? ',
+                    wrapper: '<span class="confirm"></span>',
+                    buttons: {
+                        wrapper:'<button></button>',
+                        separator:'  '
+                    }
+                });
 });
 
 
@@ -18,19 +19,31 @@ $j(function() {
 <h1>{BLOG_HEADING}</h1>
 <span class="header_option">{MODIFY_BLOG}<a href="/homepage/{BLOG_CID}" class="btn go-back"><span></span>Back to Homepage</a></span>
 <div class="clearfix"></div>
-<div class="blog-detail">
+<div class="blog blog-detail">
+    <p class="author">
+        <a href="/search/user/{BLOG_AUTHOR_ID}" class="author">
+            <img src="{BLOG_AUTHOR_THUMB}"/>
+            <span class="name">{BLOG_AUTHOR_NAME}</span>
+        </a>
+        <span class="subtitle">Posted {BLOG_CREATED}</span>
+    </p>
 	<p>{BLOG_BODY}</p>
-	<div class="blog-comments">
-		<h3>{BLOG_COMMENTS}</h3>
-		<!-- BEGIN comment -->
-		<div class="box">
-			<p>{COMMENT_BODY}</p>
-			<p class="interact">{DELETE_COMMENT} {COMMENT_OWNER} {COMMENT_CREATED}</p>
-		</div>
-		<!-- END comment -->
-	</div>
-	<form class="" method="post" action="/blog/comment/new/{BLOG_ID}">
-		<p><textarea name="body" style="width: 100%;"></textarea></p>
-		<p><input type="submit" class="submit-btn-plain" name="comment" value="Comment"/></p>
-	</form>
+
+    <ul class="comments">
+        <!-- BEGIN comment -->
+        <li class="{ON_OFF}">{DELETE_COMMENT}
+            <a href="/search/user/{COMMENT_AUTHOR_ID}" class="author">
+                <img src="/portrait.php?userId={COMMENT_AUTHOR_EXTERNAL_ID}&size=square32"/>
+                <span class="name">{COMMENT_OWNER}</span>
+            </a>
+            <span class="subtitle">Commented {COMMENT_CREATED}</span>
+            <p class="comment-body">{COMMENT_BODY}</p>
+        </li>
+        <!-- END comment -->
+    </ul>
+
+    <form method="post" action="/blog/comment/new/{BLOG_ID}">
+        <p><textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
+            <input type="submit" class="submit-btn-plain" name="comment" value="Add comment"/></p>
+    </form>
 </div>
