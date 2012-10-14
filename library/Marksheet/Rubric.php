@@ -70,7 +70,8 @@ class Marksheet_Rubric extends Marksheet_Abstract {
      * @param bool $blankZero
      */
     public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true) {
-        // TODO: Implement convertRawMark() method.
+        $mark = $this->clean_num(($rawMark / 100) * $maxMark, 4, $blankZero);
+        return $asText ? "$mark / $maxMark" : $mark;
     }
 
     /**

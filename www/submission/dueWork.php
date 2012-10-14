@@ -1,27 +1,8 @@
 <?php
 
-require_once SITE_root . '/library/submission.php';
-require_once SITE_root . '/library/submissionReturn.php';
-require_once SITE_root . '/library/group.php';
-require_once SITE_root . '/library/user.php';
-
-/**
- * Order by date descending.
- *
- * @param $a
- * @param $b
- *
- * @return int
- */
-function cmp($a, $b) {
-	if ($a['relevant_date'] == $b['relevant_date']) {
-		return 0;
-	}
-	else if ($a['relevant_date'] < $b['relevant_date']) {
-		return 1;
-	}
-
-	return -1;
+if(!isset($this)) {
+    require_once(dirname(__FILE__).'/../../include/Bootstrap.php');
+    SitePage::localRedir('/submission/dueWork');
 }
 
 $this->setFile(TEMPLATE_content, 'submission/dueWork.html');
@@ -61,90 +42,123 @@ if (is_array($_SESSION['children'])) {
 	}
 }
 
-/* From calendar format url e.g. /submission/dueWork/10/04/2012/17
- */
-if (count($this->arg) > 3) {
-	$userID = $this->arg[3];
+/* possible uri formats
+ - /y-m-d/uid - date and user
+ - /y-m-d/    - date only
+ - /uid       - user only
+ - /          - default
+*/
+
+// parse the datums!
+switch(count($this->arg)) {
+    case 2:
+        // set both the date and uid
+        $userID = $this->arg[1];
+        $targetDate = new Alaress_Date_Format(preg_replace('[^0-9\-]','', $this->arg[0]), 'y-m-d');
+        break;
+    case 1:
+        // determine whether this is a uid or date
+        if(is_numeric($this->arg[0])) {
+            $userID = $this->arg[0];
+        }
+        else {
+            $targetDate = new Alaress_Date_Format(preg_replace('[^0-9\-]','', $this->arg[0]), 'y-m-d');
+        }
+        break;
+    case 0:
+        // everything set below
+        break;
+    default:
+        error(2);
+        return;
 }
 
-/* get selected user from session (?)
- */
-else if (is_array($_SESSION['children'])) {
-    $userID = $_SESSION['children'][0]['id'];
-}
-else {
-    //displaying users on due work, so log this as the last time they viewed due work
-    $submissionHandler->logPageView(1);
-    $submissionHandler->logPageView(2);
-    $userID = $_SESSION['id'];
+// dynamically generate userID
+if(!isset($userID)) {
+    // check for parenthood
+    if(count($childList)) {
+        $userID = $_SESSION['children'][0]['id'];
+    }
+    else {
+        // not specified means looking at our own, so log the view
+        $submissionHandler->logPageView(1);
+        $submissionHandler->logPageView(2);
+        $userID = $_SESSION['id'];
+    }
 }
 
-if ((count($this->arg) < 3) && is_numeric($this->arg[1]) && in_array($this->arg[1], $childList)) {
-	$userID = $this->arg[1];
+// prevent students from seeing anything but their own work
+if($groupHandler->isStudent()) {
+    if($userID != $_SESSION['id']) {
+        error(19);
+    }
 }
-else if ((count($this->arg) < 3) && is_numeric($this->arg[1]) && $groupHandler->isStaff()) {
-	$userID = $this->arg[1];
+elseif(!($groupHandler->isStaff() || $groupHandler->isParentOfChild($userID))) {
+    error(19);
+}
+
+
+
+
+
+if(!isset($targetDate)) {
+    $targetDate = new Alaress_Date_Format(time(), 'U');
 }
 
 $user = $userHandler->getByID($userID);
 
+// check this is a valid user
 if (!isset($user['uid'])) {
-	error(2);
+	error(19);
 }
 
+// supplement the user array with additional information
+$user['self'] = $user['uid'] == $_SESSION['id'];
+$user['person_label'] = $user['self'] ? 'You' : $user['firstname'];
+
+// if parent, output the child selector
 if (is_array($_SESSION['children'])) {
 	$this->dropDown('child', $_SESSION['children'], $user['uid'], 'is_parent', array('id' => 'CHILD_ID', 'name' => 'CHILD_NAME'));
 	$this->parse('is_parent_block', 'is_parent');
 }
 
+// retrieve category listing
 $categoryList = $groupHandler->involvedInCategoryList($user['uid']);
 
+// parse IDs into array
 if (is_array($categoryList)) {
 	foreach($categoryList as $category) {
 		$categoryIDList[] = $category['id'];
 	}
 }
 
-/* Catch if not involved in any categories
- */
-if (count($categoryList) == 0) {
+// Catch if not involved in any categories
+if(!isset($categoryIDList)) {
 	error(135);
+    exit;
 }
 
-/* get selected date
- */
-if (isset($this->arg[0])) {
-	$selectedDate = strtotime($this->arg[0]);
-}
-
-if ($selectedDate <= 0) {
-	$selectedDate = time();
-}
-
-$selectedDateObj = new Alaress_Date_Format($selectedDate, 'U');
-
-/* output general data
- */
+// output general data
 $output = array(
-	'CURRENT_DATE' => date('F Y', $selectedDateObj->getUnixTimestamp()),
-	'NOT_TODAY' => date('dmY', $selectedDate) != date('dmY') ? 'not-today' : '',
+	'CURRENT_DATE' => date('F Y', $targetDate->getUnixTimestamp()),
+	'NOT_TODAY' => $targetDate->getUsingFormat('dmY') == date('dmY') ? '' : 'not-today',
 	'TODAY_DATE' => date('Y-m-d'),
-	'NEXT_MONTH' => date('Y-m-d', strtotime('+1 month', $selectedDate)),
-	'PREV_MONTH' => date('Y-m-d', strtotime('-1 month', $selectedDate)),
-	'SELECTED_DATE' => $selectedDateObj->getLocalShort(),
+	'NEXT_MONTH' => date('Y-m-d', strtotime('+1 month', $targetDate->getUsingFormat('U'))),
+	'PREV_MONTH' => date('Y-m-d', strtotime('-1 month', $targetDate->getUsingFormat('U'))),
+	'SELECTED_DATE' => $targetDate->getLocalShort(),
 	'WORK_USER_ID' => $userID,
 	'WORK_USER_NAME' => $userID == $_SESSION['id'] ? 'My' : $userHandler->formatName($user) . "'s",
 );
 
 $this->setVar($output);
 
-$selectedMonth 	= date("n", $selectedDate);
-$selectedYear 	= date("Y", $selectedDate);
+$selectedMonth 	= $targetDate->getUsingFormat('n');
+$selectedYear 	= $targetDate->getUsingFormat('Y');
 
 /* calculate month layout
  */
-$firstDay = date("w", mktime(0, 0, 0, $selectedMonth, 1, $selectedYear));
-$numDaysinMonth = date("d", mktime(0, 0, 0, $selectedMonth + 1, 0, $selectedYear));
+$firstDay = (int)date("w", mktime(0, 0, 0, $selectedMonth, 1, $selectedYear));
+$numDaysinMonth = (int)date("d", mktime(0, 0, 0, $selectedMonth + 1, 0, $selectedYear));
 $numWeeksMonth = ceil(($firstDay + $numDaysinMonth) / 7);
 $totalDays = $numWeeksMonth * 7 + (6 - $firstDay);
 
@@ -165,7 +179,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 	$output = array(
 		'DATE' => date("j", $currentDay),
 		'PAST' => $i >= $firstDay && $i < $numDaysinMonth + $firstDay ? '' : 'past',
-		'ACTIVE' => date('dmY', $currentDay) == date('dmY', $selectedDate) ? 'active' : '',
+		'ACTIVE' => date('dmY', $currentDay) == $targetDate->getUsingFormat('dmY') ? 'active' : '',
 		'TODAY' => date('dmY') == date('dmY', $currentDay) ? 'today' : '',
 		'RIGHTY' => $day > 3 ? 'righty' : '',
 	);
@@ -210,322 +224,160 @@ for ($i = 0; $i < $totalDays; $i++) {
 	}
 }
 
-/** UPCOMING WORK **/
+$this->setBlock(TEMPLATE_content, 'upcoming_work', 'upcoming_work_block');
+$this->setBlock('upcoming_work', 'upcoming_work_actionable', 'upcoming_work_actionable_block');
 
-/* Upcoming and Returned work segments are now combined. Returned from the
- * submissionHandler as key/value pair. Limits are in the context of "limits
- * per work type (either upcoming or returned)"
- */
-$allUpcomingWork = $submissionHandler->getRecentWork($userID, $categoryIDList, UPCOMING_WORK_TYPE);
-$allAwaitingWork = $submissionHandler->getRecentWork($userID, $categoryIDList, AWAITING_WORK_TYPE);
-$allReturnedWork = $submissionHandler->getRecentWork($userID, $categoryIDList, RETURNED_WORK_TYPE);
+$upcoming = $submissionHandler->getAllUpcomingWorkAndAssessments($userID);
 
-/* Try to get the $limit. If it can't get even amounts of one type, try to fill
- * it out with remainders from the other type, balancing the numbers. It works
- * unidirectionally, so balancing occurs between the current type and the next,
- * rather than looking at the limits of all three and dividing up meaningfully.
- */
-$max = 12/3;
+$now = time();
+$j = 0;
+foreach($upcoming as $item) {
+    $this->setVar(array(
+        'HIDEME' => '',
+        'upcoming_work_actionable_block' => ''
+    ));
 
-$limit = $max;
-$allWork = array();
+    // find out if we're actually showing this item
+    if($item['kind'] == 0) {
+        // duework
+        if($item['submittable']) {
+            if($item['multi_submit']) {
+                // if unsubmitted, hide if LATE date passed
+                if(!$item['item_count'] && $item['late_date'] < $now) {
+                    $this->setVar('HIDEME', 'hideme multi unsubmitted late-passed');
+                    $this->setVar('upcoming_work_actionable_block', 'hideme multi unsubmitted late-passed');
+                }
+                // if submitted, hide if DUE date passed
+                elseif($item['submit_count'] && $item['date'] < $now) {
+                    $this->setVar('HIDEME', 'hideme multi submitted due-passed');
+                    $this->setVar('upcoming_work_actionable_block', 'hideme multi submitted due-passed');
+                }
+            }
+            else {
+                // single submit: hide if completed or DUE date in past
+                if($item['date'] < $now || $item['submit_count']) {
+                    $this->setVar('HIDEME', 'hideme single due-passed-or-submitted');
+                    $this->setVar('upcoming_work_actionable_block', 'hideme single due-passed-or-submitted');
+                }
+            }
+        }
+        else {
+            // no submissions: hide if DUE date in past
+            if($item['date'] < $now) {
+                $this->setVar('HIDEME', 'hideme nosubmit due-passed');
+                $this->setVar('upcoming_work_actionable_block', 'hideme nosubmit due-passed');
+            }
+        }
+    }
+    else {
+        // assess
+        if($item['max_attempts'] == 0) {
+            // 0 max attempts is unlimited: hide if FINISH in past
+            if($item['date'] < $now) {
+                $this->setVar('HIDEME', 'hideme unlimited due-passed');
+                $this->setVar('upcoming_work_actionable_block', 'hideme unlimited due-passed');
+            }
+        }
+        elseif($item['attempt_count'] >= $item['max_attempts']) {
+            // if limited attempts, hide if limit has been reached
+            $this->setVar('HIDEME', 'hideme attempts-exhausted');
+            $this->setVar('upcoming_work_actionable_block', 'hideme attempts-exhausted');
+        }
+        elseif($item['date'] < $now) {
+            $this->setVar('HIDEME', 'hideme due-passed');
+            $this->setVar('upcoming_work_actionable_block', 'hideme due-passed');
+        }
+    }
 
-foreach(array($allUpcomingWork, $allAwaitingWork, $allReturnedWork) as $current) {
-	for ($i=0; (is_array($current) && $i < count($current)) && ($i < $limit); $i++) {
-		$allWork[] = $current[$i];
-	}
+    // skip if hideme was populated for some reason
+    if($this->getVar('HIDEME')) {
+        continue;
+    }
 
-	/* Recalculate how much can be displayed of the next type, if the current type
-	 * doesn't have enough items
-	 */
-	if ($i < ($limit-1)) {
-		$limit = ($limit - $i) + $max;
-	}
+
+    $adr = new Alaress_Date_Relative($item['date'], 'y-m-d');
+
+    // how many days left, 0 <= x <= 10
+    $urgency = max(0, min(10, (int)(($adr->getUnixTimestamp() - $now) / 86400)));
+
+    $output = array(
+        'UPCOMING_ID'      => $item['id'],
+        'UPCOMING_TITLE'   => $item['title'],
+        'UPCOMING_TYPE'    => $item['type'],
+        'UPCOMING_DATE'    => $adr->getRelativeTime(),
+        'UPCOMING_TIME'    => $adr->getUsingFormat('Hi') == '2359' ? $adr->getDateOnly() : $adr->getShort(),
+        'UPCOMING_URGENCY' => $urgency,
+
+        'UPCOMING_SUBJ_NAME' => $item['subj_name'],
+        'UPCOMING_SUBJ_ID'   => $item['subj_id'],
+
+        'ON_OFF' => ++$j % 2 ? '' : 'dark'
+    );
+
+
+
+    // determine actions available
+    if($item['kind'] == 0) {
+        // duework
+        $output['UPCOMING_HREF'] = 'submission/submissionHistory/';
+        $output['UPCOMING_BTN_ICON']  = 'modify';
+
+        if($item['submittable']) {
+            if($item['multi_submit'] && $item['submit_count']) {
+                // allow resubmit
+                $output['UPCOMING_BTN_LABEL'] = 'Resubmit';
+            }
+            else {
+                // no resubmit
+                $output['UPCOMING_BTN_LABEL'] = 'Submit';
+            }
+        }
+        else {
+            $this->setVar('upcoming_work_actionable_block', 'No submissions');
+        }
+    }
+    else {
+        // assess
+        $output['UPCOMING_HREF'] = 'assess/intro/';
+        $output['UPCOMING_BTN_ICON']  = 'up-arrow';
+
+        if($item['attempt_count']) {
+            $output['UPCOMING_BTN_LABEL'] = 'Resit';
+        }
+        else {
+            $output['UPCOMING_BTN_LABEL'] = 'Sit';
+        }
+    }
+
+    $this->setVar($output);
+
+    if($this->getVar('upcoming_work_actionable_block') != 'No submissions') {
+        $this->parse('upcoming_work_actionable_block', 'upcoming_work_actionable');
+    }
+
+    $this->parse('upcoming_work_block','upcoming_work', true);
+
 }
-
-usort($allWork, 'cmp');
 
 $this->setBlock(TEMPLATE_content, 'work', 'work_block');
 $this->setBlock(TEMPLATE_content, 'view_all_due_work','view_all_due_work_block');
-
-/* Alternating row color index */
-$j = 0;
-
 
 /* Check if system config restrict_student_submissions is on
  *
  * This is used to hide marks in the Recent Work Activity/Online Assessments
  * parts of the page
  */
-$restrictedSubmissions = false;
-
-if ($groupHandler->isParentOfChild($this->arg[1]) && Cfg::get('restrict_student_submissions')) {
-		$restrictedSubmissions = true;
+if ($groupHandler->isParentOfChild($userID) && Cfg::get('restrict_student_submissions')) {
         $this->setVar('view_all_due_work_block','');
 }
 else {
     $this->parse('view_all_due_work_block','view_all_due_work');
 }
 
-
-
-
-
-if (count($allWork) > 0) {
-    foreach($allWork as $currentWork) {
-
-		if (!$restrictedSubmissions) {
-			if ($currentWork['status'] == UPCOMING_WORK_TYPE) {
-				if (!$currentWork['accept_submission']) {
-					$status = 'Work due';
-					$action = 'View Details';
-				}
-				else if ($current_time > $currentWork['open_date']) {
-					if ($current_time < $currentWork['date']) {
-						$status = 'Work due';
-						$action = 'Submit Work';
-					}
-					else if ($current_time < $currentWork['late_date']) {
-						$status = 'Work overdue';
-						$action = 'Submit Work';
-					}
-					else {
-						$status = 'Missed due date';
-						$action = 'View Details';
-					}
-				}
-				else {
-					$status = 'Open date approaching';
-					$action = 'View Details';
-				}
-			}
-			else if ($currentWork['status'] == AWAITING_WORK_TYPE) {
-				$action = 'View Details';
-
-				if ($current_time < $currentWork['date']) {
-					$status = 'Work submitted';
-				}
-				else if ($currentWork['submitted'] < $currentWork['late_date']) {
-					$status = 'Work submitted late';
-				}
-			}
-			else if ($currentWork['status'] == RETURNED_WORK_TYPE) {
-				$action = 'View Details';
-
-				if (!empty($currentWork['mark'])) {
-					$status = 'Work marked';
-				}
-				else {
-					$status = 'Work returned';
-				}
-			}
-		}
-		/* Status to display when Restrict Student Submissions is on
- 		 */
-		else {
-			$status = '';
-			$action = '';
-		}
-
-        // if the relevant_date is set to the start of end of a day, only show the day itselfand truncate the time
-        $shortFormat = Cfg::get('date_short');
-        $timePos = strpos($shortFormat, 'g:i') ? strpos($shortFormat, 'g:i') - 1 : strlen($shortFormat);
-        if( $currentWork['relevant_date']->format('H:i:s') == '00:00:00' ||
-            $currentWork['relevant_date']->format('H:i:s') == '23:59:59' )
-        {
-            $this->setVar('WORK_DATE', $currentWork['relevant_date']->format(substr($shortFormat, 0, $timePos)));
-        } else {
-            $this->setVar('WORK_DATE', $currentWork['relevant_date']->format(Cfg::get('date_short')));
-        }
-
-
-        $this->setVar(array(
-            'WORK_SUBJECT' => $currentWork['categoryName'],
-            'WORK_DESCRIPTION' => $currentWork['name'],
-            'WORK_ACTION' => $action,
-            'WORK_STATUS' => $status,
-            'WORK_BOX_ID' => $currentWork['bid'],
-            'WORK_FILE_ID' => $currentWork['fid'],
-            'ROW_COLOR' => !($j++ % 2) ? 'dark' : ''
-        ));
-
-        $this->parse('work_block', 'work', true);
-    }
-}
-else {
-    $this->setVar('work_block','');
-}
-
-/* Online Assessments
- */
-$this->setBlock(TEMPLATE_content, 'allAssess', 'allAssess_block');
-$this->setBlock('allAssess', 'attempt', 'attempt_block');
-
-$this->setBlock('attempt', 'restricted_student_submissions_marks', 'restricted_student_submissions_marks_block');
-$this->setBlock('restricted_student_submissions_marks', 'unmarked', 'unmarked_block');
-
-$this->setBlock('attempt', 'restricted_student_submissions_actions', 'restricted_student_submissions_actions_block');
-$this->setBlock('restricted_student_submissions_actions', 'viewMarks', 'viewMarks_block');
-$this->setBlock('restricted_student_submissions_actions', 'takeTest', 'takeTest_block');
-
-$assessHandler = new Assess_Main();
-$attemptHandler = new Assess_Attempt();
-$responseHandler = new Assess_Response();
-$sectionHandler = new Assess_Section();
-
-/* Store a lookup so you don't need to make new queries all day
- */
-foreach($categoryList as $key => $value) {
-    $categoryLookup[$value['id']] = $value['name'];
-}
-
-/* Make a list of assessments
- */
-$allAssessments = $assessHandler->getList($categoryIDList, 10);
-$j=0;
-
-if ($allAssessments) {
-	$attemptsExisted = false;
-
-    foreach($allAssessments as $currentAssessment) {
-		$allAttempts = $attemptHandler->getListForUser($currentAssessment['assess_id'], $userID);
-
-		/* If multiple attempts were made, list them
-		 */
-		if (is_array($allAttempts) && count($allAttempts)) {
-			$attemptsExisted = true;
-
-			foreach($allAttempts as $currentAttempt) {
-				$firstSection = $sectionHandler->getFirst($currentAssessment['assess_id']);
-
-				/* No attempts yet
-				 */
-				if (!$currentAttempt) {
-					$this->setVar(array(
-						'ASSESS_CATEGORY' => $categoryLookup[$currentAssessment['category_id']],
-						'ASSESS_ASSESS_ID' => $currentAssessment['assess_id'],
-						'ASSESS_TITLE' => $currentAssessment['title'],
-						'ASSESS_FINISH' => '',
-						'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
-						'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
-						'ATTEMPT_TOTAL_MARKS' => number_format(0, 2),
-						'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
-						'ATTEMPT_PERCENTAGE' => 0,
-					));
-
-					$this->setVar('viewMarks_block', '');
-					$this->parse('takeTest_block', 'takeTest');
-					$this->setVar('unmarked_block', '');
-				}
-				else {
-
-					/* Finish time
-					 */
-					if ($currentAttempt['finish'] != '0000-00-00 00:00:00') {
-						$finish = date('jS F Y, g:i:sa', strtotime($currentAttempt['finish']));
-						$timeTaken = $assessHandler->sec2hms($currentAttempt['timeTaken']);
-					}
-					else {
-						$finish = '';
-						$timeTaken = '';
-					}
-
-					/* Hide marks and actions
-					 */
-					if ($restrictedSubmissions) {
-						$this->setVar('restricted_student_submissions_marks_block', '');
-						$this->setVar('restricted_student_submissions_actions_block', '');
-					}
-					else {
-						$this->parse('restricted_student_submissions_marks_block', 'restricted_student_submissions_marks');
-						$this->parse('restricted_student_submissions_actions_block', 'restricted_student_submissions_actions');
-					}
-
-					/* The total available marks for this attempt
-					 */
-					$totalAvailableMarks = $attemptHandler->getTotalMarks($currentAssessment['assess_id'], $currentAttempt['attempt_id']);
-
-					if ($totalAvailableMarks > 0) {
-						$marks = $attemptHandler->getMarksForAttempt($currentAttempt['attempt_id']);
-
-						$percentage = round(100 * $marks / $totalAvailableMarks);
-					}
-					else {
-						$percentage = 0;
-					}
-
-					/* Count how many responses haven't been automarked; indicate
-					 * whether the assess has been reviewed or not
-					 */
-					if ($currentAttempt['reviewed_at'] == null) {
-						$numNotAutomarked = $responseHandler->numNotAutomarked($currentAttempt['attempt_id']);
-
-						$this->setVar(array(
-							'ATTEMPT_UNMARKED_RESPONSES' => $numNotAutomarked
-						));
-
-						$this->parse('unmarked_block', 'unmarked');
-					}
-					else {
-						$this->setVar('unmarked_block', '');
-					}
-
-					$this->setVar(array(
-						'ASSESS_CATEGORY' => $categoryLookup[$currentAssessment['category_id']],
-						'ASSESS_ASSESS_ID' => $currentAssessment['assess_id'],
-						'ASSESS_TITLE' => $currentAssessment['title'],
-						'ASSESS_FINISH' => date('jS F Y, g:i:sa', strtotime($currentAttempt['finish'])),
-						'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
-						'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
-						'ATTEMPT_TOTAL_MARKS' => number_format($marks, 2),
-						'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
-						'ATTEMPT_PERCENTAGE' => $percentage,
-					));
-
-					/* Hide link to take the unattempted assesment directly
-					 */
-					$this->setVar('takeTest_block', '');
-
-					/* Find out if this test has been marked; if it has, allow the
-					 * student to see the feedback, otherwise remove link altogether
-					 */
-					if ($currentAttempt['reviewed_at']) {
-						$this->parse('viewMarks_block', 'viewMarks');
-					}
-					else {
-						$this->setVar('viewMarks_block', '');
-					}
-				}
-
-                $this->setVar('DARK',$j++ % 2 ?'' : 'dark');
-				$this->parse('attempt_block', 'attempt', true);
-			}
-		}
-    }
-
-	/* Clear only if attempts never existed for any assess.
-	 * Previously this would get incorrectly cleared for an
-	 * assess that existed but had no attempts coming after
-	 * an assess that existed and had attempts.
-	 */
-	if (!$attemptsExisted) {
-		$this->setVar('attempt_block', '');
-	}
-
-	$this->parse('allAssess_block', 'allAssess', true);
-}
-else {
-    $this->setVar('allAssess_block', '');
-}
-
-/* Completed percentages for each subject
- */
-$percentage = array();
-$categoryIDs = array();
+// subject listings
 $j = 0;
 $synClass = new External_Class;
 
-// subject summary
 foreach ($categoryList as $category) {
 	$categoryID = $category['id'];
 
@@ -553,8 +405,8 @@ foreach ($categoryList as $category) {
                     $emailAddress = $emailObj->formatEmailFromArray($teacher);
 
                     $teacherOutput[] = array(
-                        'id' => 0,
-                        'name' => $teacherName,
+                        'id'    => 0,
+                        'name'  => $teacherName,
                         'email' => $_SESSION['mailhandle'] . $emailAddress,
                         'synid' => $teacherSynID,
                     );
@@ -616,7 +468,7 @@ foreach ($categoryList as $category) {
 
     if(Cfg::get('external_enable')) {
         $this->setVar('teacher_block', '');
-        if(count($teacherOutput)) {
+        if(isset($teacherOutput) && count($teacherOutput)) {
             foreach($teacherOutput as $teacher) {
                 $tOutput = array(
                     'SUBJ_TEACHER_NAME' => $teacher['name'],
@@ -633,24 +485,11 @@ foreach ($categoryList as $category) {
     else {
         $this->setVar('teacher_block', '');
     }
-
     $this->parse('icon_block', 'icon');
     $this->parse('SUBJECT_LIST', 'subjectTpl', true);
-
 }
 
-
-/* Give jquery ProgressBar values to use
- */
-$this->setVar(array(
-    'PERCENTAGE_COMPLETED_ARRAY' => implode(',', $percentage),
-    'CATEGORY_IDS' => implode(',', $categoryIDs)
-));
-
-$j = 0;
-
-/* activities feed
- */
+// activities feed
 $activityLog = $submissionHandler->getActivityLog($user['uid'], 15, $categoryIDList);
 
 if (is_array($activityLog)) {
@@ -667,17 +506,16 @@ if (is_array($activityLog)) {
 		$categoryName = '<a href="/homepage/' . $activity['category'] . '">' . Scrub::text($activity['categoryName']) . '</a>';
 
         switch($activity['new']) {
-
             case 'new':
-                $stringDesc = "New {$activity['typeName']} $taskName added for $categoryName";
+                $stringDesc = sprintf('New %s "%s" added in %s', strtolower($activity['typeName']), $taskName, $categoryName);
                 break;
 
             case 'overdue':
-                $stringDesc = "<strong>$taskName for $categoryName is overdue</strong> ";
+                $stringDesc = sprintf('<span class="overdue">"%s" in %s is now overdue</span>', $taskName, $categoryName);
                 break;
 
             case 'submitted':
-                $stringDesc = 'Work submitted to '.$activity['name'] .' for <a href="/homepage/' . $activity['category'] . '">' . Scrub::text($activity['categoryName']) . '</a>';
+                $stringDesc = sprintf('%s submitted work for "%s" in %s', $user['person_label'], $taskName, $categoryName);
                 break;
 
             case 'returned':
@@ -695,21 +533,24 @@ if (is_array($activityLog)) {
 							$mark = $marksheet->convertRawMark($rtn['norm_mark'], $rtn['max_mark'], true, false);
 						}
 
-						$stringDesc = 'You received ' . $mark;
+                        $mark = sprintf('<a href="/submission/submissionHistory/%s/%s">%s</a>', $rtn['box_id'], $rtn['owner'], $mark);
+
+						$beginning = $user['person_label'] . ' received ' . $mark;
 					}
 					else if($activity['fid']) {
-						$stringDesc = '<a href="/submission/send.php?id='.$activity['fid'].'&return=1">Work returned</a>';
+                        $beginning = '<a href="/submission/send.php?id='.$activity['fid'].'&return=1">Work returned</a>';
 					}
 					else {
-						$stringDesc = 'Work returned';
+                        $beginning = 'Work returned';
 					}
 
-					$stringDesc .= ' for '.$activity['name']. ' in <a href="/homepage/' . $activity['category'] . '">' . Scrub::text($activity['categoryName']) . '</a>';
+                    $stringDesc = sprintf('%s for "%s" in %s', $beginning, $taskName, $categoryName);
+
 				}
 				break;
 
             default:
-                $stringDesc = $categoryName . ' submissions for ' . Scrub::text($activity['name']) . ' are now closed ';
+                $stringDesc = sprintf('Submissions for "%s" in %s are now closed', $taskName, $categoryName);
                 break;
         }
 
@@ -721,9 +562,6 @@ if (is_array($activityLog)) {
 			'time' => $activityTime->getRelativeTime(),
             'icon' => $activity['new'],
 		);
-
-		//$this->setVar($output);
-		//$this->parse('activity_block', 'activity', true);
 	}
 
     $activityList = new Activity_ListArray($feedItems);
@@ -733,6 +571,5 @@ if (is_array($activityLog)) {
     }
 }
 
-/* subject drop down
- */
+// subject drop down
 $this->dropDown('subject', $categoryList, '', TEMPLATE_content, array('id' => 'SUBJECT_ID', 'name' => 'SUBJECT_NAME'));

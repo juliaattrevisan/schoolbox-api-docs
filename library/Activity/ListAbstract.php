@@ -62,6 +62,7 @@ abstract class Activity_ListAbstract implements Iterator {
     public function setTarget(SitePage $page, $targetHandle) {
         $this->sitepage = $page;
         $this->handle = $targetHandle;
+        $this->sitepage->setVar($targetHandle, '');
     }
 
     public function setTemplateFile($templateFile) {

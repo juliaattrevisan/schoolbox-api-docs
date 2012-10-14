@@ -24,14 +24,6 @@ $j(function () {
         return false;
     });
 
-    /* Category Completion */
-    var categories = [{CATEGORY_IDS}];
-    var completion = [{PERCENTAGE_COMPLETED_ARRAY}];
-
-    for (var i=0; i < categories.length; i++) {
-        $j('#progressbar-' + categories[i]).progressbar({value: completion[i]});
-    }
-
     /* Calendar Popup */
 	$j('.calendarTable ul li span').live("click", function(){
 		$j('.duework-popup.cal-bubble.cal-bubble').remove();
@@ -174,7 +166,8 @@ $j(function () {
 
     <div class="box component">
         <h2>Upcoming Due Work
-            <!-- BEGIN view_all_due_work --><a href="/submission/allDueWork/{WORK_USER_ID}" class="btn"><span></span>View all work</a>
+            <!-- BEGIN view_all_due_work -->
+            <a href="/submission/allDueWork/{WORK_USER_ID}" class="btn"><span></span>View all work</a>
             <!-- END view_all_due_work -->
         </h2>
         <div class="listing">
@@ -182,12 +175,12 @@ $j(function () {
                 <tbody>
                 <!-- BEGIN upcoming_work -->
                 <tr class="{ON_OFF} {HIDEME}">
-                    <td><a class="title" href="{UPCOMING_HREF}{UPCOMING_ID}">{UPCOMING_TITLE}</a><br />
+                    <td><a class="title" href="/{UPCOMING_HREF}{UPCOMING_ID}">{UPCOMING_TITLE}</a><br />
                         <a href="/homepage/{UPCOMING_SUBJ_ID}">{UPCOMING_SUBJ_NAME}</a> {UPCOMING_TYPE}</td>
                     <td><span class="gradient-{UPCOMING_URGENCY}">Due {UPCOMING_DATE}</span> on {UPCOMING_TIME}</td>
                     <td>
                         <!-- BEGIN upcoming_work_actionable -->
-                        <a class="btn {UPCOMING_BTN_ICON}"><span></span> {UPCOMING_BTN_LABEL}</a>
+                        <a href="/{UPCOMING_HREF}{UPCOMING_ID}" class="btn {UPCOMING_BTN_ICON}"><span></span> {UPCOMING_BTN_LABEL}</a>
                         <!-- END upcoming_work_actionable -->
                     </td>
                 </tr>
