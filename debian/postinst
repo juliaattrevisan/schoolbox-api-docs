@@ -29,11 +29,11 @@ case "$1" in
         if [ -f /etc/schoolbox/conf.php ]; then
             chown root:www-data /etc/schoolbox/conf.php
             chmod 0640 /etc/schoolbox/conf.php
-	    cd /usr/share/schoolbox/tools;
-	    ./update_sql.sh;
-	    ./create-data-dirs.sh;
-	    ./upgrade-clean-cache.sh;
         fi
+        cd /usr/share/schoolbox/tools;
+        ./update_sql.sh;
+        ./create-data-dirs.sh;
+        ./upgrade-clean-cache.sh;
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
