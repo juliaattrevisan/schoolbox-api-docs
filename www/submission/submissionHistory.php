@@ -131,18 +131,19 @@ if($codes && count($codes)) {
 $dueDate = new Alaress_Date_Relative($submissionBox['date'],'y-m-d');
 $createdDate = new Alaress_Date_Relative($submissionBox['created'], 'y-m-d');
 
-if($dueDate->getUsingFormat('H:i:s') == '23:59:59')
-    $this->setVar('BOX_DUEDATE', $dueDate->getLongDateOnly());
-else
-    $this->setVar('BOX_DUEDATE', $dueDate->getLong());
+$allWork = $submissionHandler->getSubmissionHistory($userID, $this->arg[0]);
 
-// overridden... -_-
-$this->setVar('BOX_DUEDATE', $dueDate->getRelativeTime());
+$urgency = ($dueDate->getUnixTimestamp() - time()) / 86400;
+$gradient = max(0, min(10, $urgency));
 
 $this->setVar(array(
     'CATEGORY_NAME' => Scrub::text($submissionBox['categoryName']),
     'CATEGORY_ID' => $submissionBox['cid'],
     'CATEGORY_THUMB' => '',
+
+    'BOX_DUEDATE' => $dueDate->getRelativeTime(),
+    'BOX_DUEDATE_GRADIENT' => $gradient,
+
     'BOX_ID' => $submissionBox['id'],
     'BOX_NAME' => Scrub::text($submissionBox['name']),
     'BOX_OWNER' => $userHandler->formatName($user),
@@ -179,7 +180,6 @@ else {
 	$this->setVar('download_block', '');
 }
 
-$allWork = $submissionHandler->getSubmissionHistory($userID, $this->arg[0]);
 
 if (is_array($allWork) && count($allWork)) {
 	$j = 0;
@@ -331,6 +331,9 @@ if($recentSubmission['sid']) {
     * Find out whether the latest submission was overdue
     */
 
+    // override the due gradient because we have submitted
+    $this->setVar('BOX_DUEDATE_GRADIENT', 'black');
+
    if ($recentSubmission['date'] > date('U', strtotime($submissionBox['date']))) {
        $this->setVar('OVERDUE', 'overdue');
        $this->parse('overdue_block', 'overdue');
@@ -391,6 +394,7 @@ if (is_numeric($returnedWork['rid'])) {
 		'RETURNED_WORK_COMMENT' => Scrub::Text($returnedWork['comment']),
 		'RETURNED_WORK_MARK' => Scrub::Text($returnedWork['mark']),
 		'RETURNED_WORK_FILE_ID' => $returnedWork['rid'],
+        'RETURNED_WORK_GRADIENT' => max(0, min(10, (int)($returnedWork['norm_mark'] / 10))),
 	));
 
     if($returnedWork['filename'] && !$parentOnly)
