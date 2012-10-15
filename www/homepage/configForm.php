@@ -59,7 +59,7 @@ if (is_numeric($_REQUEST['cid'])) {
 
 
 	// POST new component to page and output render of component
-	else if ($_POST['cid'] && is_numeric($_POST['add'])) {
+	else if (is_numeric($_POST['cid']) && is_numeric($_POST['add'])) {
 
         $newComp = new Component_Instance();
         $newComp->definitionId = $_POST['add'];
@@ -68,14 +68,26 @@ if (is_numeric($_REQUEST['cid'])) {
         $newComp->sequence = 0;
         $newComp->position = 'left';
 
-        $ids = $componentInstanceMapper->save($newComp);
-        $instanceID = $ids[0];
-
         // check perms
         $groupHandler = new Group(HOMEPAGE_SERVICE);
         if (($permission = $groupHandler->getPermission($_POST['cid'])) < WRITE_ACCESS) {
             exit;
         }
+
+        $ids = $componentInstanceMapper->save($newComp);
+        $instanceID = $ids[0];
+
+        // cascade the sequence change
+        $stmt = Database::getInstance()->prepare("
+            UPDATE component_instance ci
+            SET ci.`sequence` = ci.sequence + 1
+            WHERE `position` = 'left'
+            AND ci.`module` = 'homepage'
+            AND ci.`identifier` = :cid
+        ");
+        $stmt->execute(array(
+            'cid' => $_POST['cid']
+        ));
 
         // get the Instance's Definition's Controller
         $factory = new Component_Homepage_Factory(new User(), new SitePage(false));
