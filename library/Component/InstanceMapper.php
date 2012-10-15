@@ -82,23 +82,19 @@ class Component_InstanceMapper extends Mapper {
             WHERE ci.id = :id
             ORDER BY identifier ASC, `position` ASC, ci.sequence ASC
         ";
-        return $this->findByFields($sql, array(':id' => $id));
+
+        $foo = $this->findByFields($sql, array(':id' => $id));
+
+        return $foo;
     }
 
     /**
-     * @param String $module
-     * @param Integer $identifier
+     * @param $sql
+     * @param $fields
      * @return Collection
      */
     protected function findByFields($sql, $fields) {
-
         $statement = $this->database->prepare($sql);
-
-        /*
-        $statement->bindParam(":module", $module);
-        $statement->bindParam(":identifier", $identifier);
-        */
-
         $statement->execute($fields);
 
         $rowset = $statement->fetchAll();

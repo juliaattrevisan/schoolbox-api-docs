@@ -68,10 +68,8 @@ if (is_numeric($_REQUEST['cid'])) {
         $newComp->sequence = 0;
         $newComp->position = 'left';
 
-        $componentInstanceMapper->save($newComp);
-
-
-        $instanceID = Database::getInstance()->lastInsertId();
+        $ids = $componentInstanceMapper->save($newComp);
+        $instanceID = $ids[0];
 
         // check perms
         $groupHandler = new Group(HOMEPAGE_SERVICE);
@@ -83,9 +81,12 @@ if (is_numeric($_REQUEST['cid'])) {
         $factory = new Component_Homepage_Factory(new User(), new SitePage(false));
 
         // $component instanceof Component_ControllerAbstract
-        $component = $factory->buildComponent($instanceID);
+        $componentList = $componentInstanceMapper->findByInstanceId($instanceID);
+        $cList = array_values($componentList);
 
-        if(!$component) {
+        $component = $factory->buildComponent($cList[0]);
+
+        if(!($component instanceof Component_ControllerAbstract)) {
             die("<h2>Error adding component</h2><p>Could not find component to instantiate.</p>");
         }
 
@@ -93,10 +94,10 @@ if (is_numeric($_REQUEST['cid'])) {
         $templateHandle = "component_{$component->instance->id}";
         $templateHandle = TEMPLATE_content;
 
-        $component->setup(array('id' => $_POST['cid']), $component->instance->getConfigArray());
-        $component->parseConfig();
+        $component->setup(array('id' => $_POST['cid']), array());
 
         if ($component->execute() !== false) {
+            $component->parseConfig();
             if ($component->renderTemplate($templateHandle) !== false) {
                 $component->parse($templateTarget, $templateHandle, true);
             }
