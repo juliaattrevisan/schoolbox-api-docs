@@ -20,6 +20,7 @@ conffile3="/var/www/schoolbox/www/conf/conf.php";
 instdir=`readlink -f ../$1`;
 sqlfile=$instdir"/updates/sql_updates.sql";
 tmpfile="/tmp/schoolbox_sql_updates_`date -I`.sql";
+backupfile="/tmp/schoolbox_backup_`date -I`.sql";
 
 echo "Starting SQL update process";
 
@@ -96,6 +97,9 @@ else
                 exit;
         fi
         
+        echo "Backing up database before changes";
+        mysqldump --allow-keywords -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile;
+        
         sed -n "$start","$end"p $sqlfile | sed -n '/\-\-\ End\ of\ Release/!p' > $tmpfile;
         mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $tmpfile > /dev/null 2>&1;
         
@@ -103,13 +107,15 @@ else
         then
                 echo "SQL updated to version $newver";
         else
+                # Revert database to backup
+                mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $backupfile > /dev/null 2>&1;
                 echo "SQL update failed. Please attempt a manual update.";
         fi
         
-        # Cleanup tmpfile
+        # Cleanup tmpfile and backup
         if [ -f $tmpfile ];
         then
-                rm -rf $tmpfile;
+                rm -rf {$tmpfile,$backupfile};
         fi
 fi
 
