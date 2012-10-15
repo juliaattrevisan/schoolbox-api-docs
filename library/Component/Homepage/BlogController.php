@@ -82,16 +82,12 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
             'BLOG_CATEGORY_ID' => $this->source['id'],
         ));
 
-
         /* Prevent multiple blog entries from other categories stacking up in the wrong place
         * and initialise empty blog roll by default
         */
         $this->setVar('blog_block', '');
 
         $this->blogHandler->config(array('size' => $this->getConfig('size')));
-
-        $this->commentHandler->config(array('comments_size' => $this->getConfig('comments_size')));
-
         $blogs = $this->blogHandler->getByCID($this->source['id']);
 
         /* Have update form to back to this homepage, not the wiki's homepage

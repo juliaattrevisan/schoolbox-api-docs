@@ -198,6 +198,12 @@ class DashboardComponentReFactory {
         ),
     );
 
+    /**
+     * Once the migration has been done, any configurations specified here will be deleted due to deprecation
+     * @var array
+     */
+    private $deprecatedConfigurations = array('comments_size');
+
 
 
     /* EVERYTHING ABOVE THIS POINT IS CONFIGURATION
@@ -244,6 +250,7 @@ class DashboardComponentReFactory {
             $this->refactorHomepageTemplates($performSQL);
             $this->createNewComponents($performSQL);
             $this->createNewConfigurations($performSQL);
+            $this->deprecateConfigurations($performSQL);
 
             if(!(isset($options['skip-instantiation']) || isset($options['skip-sql']))) {
                 $this->instantiateComponents();
@@ -570,6 +577,31 @@ class DashboardComponentReFactory {
                     ));
                 }
             }
+        }
+    }
+
+
+    /**
+     * Will deprecate old configurations from components that haven't been deprecated themselves.
+     * This query simply deletes any instances of the configuration in question, then deletes the definition
+     * itself so that it won't be reinstantiated when it comes to creating new componentry
+     * @param $performSQL
+     */
+    public function deprecateConfigurations($performSQL) {
+        if(!$performSQL) {
+            return;
+        }
+
+        foreach($this->deprecatedConfigurations as $conf) {
+            $stmt = $this->db->prepare("
+                DELETE cci, ccd
+                FROM component_config_definition ccd
+                LEFT JOIN component_config_instance cci ON ccd.`id` = cci.`component_config_definition_id`
+                WHERE ccd.`key` LIKE :ckey
+            ");
+            $stmt->execute(array(
+                'ckey' => $conf
+            ));
         }
     }
 
