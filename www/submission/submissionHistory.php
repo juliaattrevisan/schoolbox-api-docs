@@ -2,7 +2,7 @@
 
 // not in sitepage context, redirect
 if(!isset($this)) {
-    require_once('../../include/Bootstrap.php');
+    require_once(dirname(__FILE__). '/../../include/Bootstrap.php');
     SitePage::localRedir('/submission/submissionHistory');
 }
 
@@ -227,19 +227,23 @@ if (is_array($allWork) && count($allWork)) {
             $historyIcon = 'clock';
         }
 
-
         $comment = Scrub::Text($currentWork['comment']);
         $mark = Scrub::Text($currentWork['mark']);
+
+        $gradient = max(0, min(10, (int)($currentWork['norm_mark'] / 10)));
 
 		$this->setVar(array(
             'HISTORY_CLASS' => $historyClass,
             'HISTORY_ICON' => $historyIcon,
+            'HISTORY_GRADIENT' => $gradient,
 			'HISTORY_DATETIME' => $workDate->getRelativeTime(),
 			'HISTORY_MARK' => $mark,
 			'HISTORY_COMMENT' => $comment,
 			'HISTORY_FILE_ID' => $currentWork['fid'],
 			'HISTORY_SUBMIT_FILE_ID' => $currentWork['sid'],
 			'HISTORY_RETURN_FILE_ID' => $currentWork['rid'],
+
+            'HAS_GRADE' => $mark || $mark === 0 ? 'grade' : '',
 		));
 
 

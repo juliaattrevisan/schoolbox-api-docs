@@ -374,6 +374,7 @@ class Submission extends DeprecatedModel {
 			UNIX_TIMESTAMP(s.submitted) AS date,
 			NULL AS comment,
 			NULL AS mark,
+			NULL AS norm_mark,
 			NULL AS filename
 			FROM submission_box b
 			LEFT JOIN student_submission s ON s.box_id = b.id
@@ -390,6 +391,7 @@ class Submission extends DeprecatedModel {
 			UNIX_TIMESTAMP(r.returned) AS date,
 			r.comment,
 			r.mark,
+			r.norm_mark,
 			r.filename
 			FROM submission_box b
 			LEFT JOIN submission_return r ON r.box_id = b.id
