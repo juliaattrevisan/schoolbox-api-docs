@@ -136,14 +136,14 @@ ALTER TABLE `component_instance`
 
 /* 'Move' surveys from learning to collaboration */
 UPDATE homepage_comp SET homepageCategoryID = 2 WHERE method = 'outputSurvey';
-DROP TABLE `rc_cache`;
-DROP TABLE `rc_contactgroupmembers`;
-DROP TABLE `rc_contactgroups`;
-DROP TABLE `rc_contacts`;
-DROP TABLE `rc_identities`;
-DROP TABLE `rc_messages`;
-DROP TABLE `rc_session`;
-DROP TABLE `rc_users`;
+DROP TABLE `rc_cache` IF EXISTS;
+DROP TABLE `rc_contactgroupmembers` IF EXISTS;
+DROP TABLE `rc_contactgroups` IF EXISTS;
+DROP TABLE `rc_contacts` IF EXISTS;
+DROP TABLE `rc_identities` IF EXISTS;
+DROP TABLE `rc_messages` IF EXISTS;
+DROP TABLE `rc_session` IF EXISTS;
+DROP TABLE `rc_users` IF EXISTS;
 
 DELETE FROM config WHERE name = 'mail_type';
 DELETE FROM config WHERE name = 'mail_host';
@@ -291,13 +291,6 @@ CREATE TABLE `submission_notification` (
   UNIQUE INDEX (`box_id`),
   UNIQUE INDEX (`type`)
 ) CHARSET=utf8;
-
-/* remap the existing notification handling into the new table; currently, all the notifications are overdue ones */
-INSERT INTO
-submission_notification (
-  SELECT id AS `box_id`, 'overdue' AS `type`, notif_enabled AS `enabled`, notif_sent AS `sent`
-  FROM submission_box sb
-);
 
 /* Error messages
  */

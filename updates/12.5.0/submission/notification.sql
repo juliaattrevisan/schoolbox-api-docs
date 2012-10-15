@@ -8,10 +8,3 @@ CREATE TABLE `submission_notification` (
   UNIQUE INDEX (`box_id`),
   UNIQUE INDEX (`type`)
 ) CHARSET=utf8;
-
-/* remap the existing notification handling into the new table; currently, all the notifications are overdue ones */
-INSERT INTO
-submission_notification (
-  SELECT id AS `box_id`, 'overdue' AS `type`, notif_enabled AS `enabled`, notif_sent AS `sent`
-  FROM submission_box sb
-);
