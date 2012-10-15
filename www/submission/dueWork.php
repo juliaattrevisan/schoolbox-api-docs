@@ -445,7 +445,6 @@ foreach ($categoryList as $category) {
     $this->setBlock('subjectTpl', 'icon', 'icon_block');
 
 	$output = array(
-        'SUBJ_HAS_GRADE' => '',
 		'SUBJ_CAT_ID' => $categoryID,
 
         'SUBJ_SUBJECT_NAME' => Scrub::Text($category['name']),
@@ -456,15 +455,29 @@ foreach ($categoryList as $category) {
 		'SUBJ_TOTAL' => $summary[$category['id']]['total'],
 		'SUBJ_DUE' => $summary[$category['id']]['due'],
 
-        'SUBJ_GRADE' => $gradeAvg == -1 ? '&ndash;' : $returnHandler->percent2letter($gradeAvg),
-        'SUBJ_GRADEIANT' => ($gradeAvg == -1 ? 'na' : (int)($gradeAvg / 10)),
         'SUBJ_TREND_DIR' => $trendDir,
         'SUBJ_TREND_AMT' => $trendAmt,
+        'SUBJ_HAS_GRADE' => 'grade',
 
         'DARK' => ++$j % 2 ? '' : 'dark'
 	);
+    $this->setVar($output);
+
+    if($gradeAvg == -1) {
+        $output = array(
+            'SUBJ_GRADE' => '',
+            'SUBJ_GRADEIANT' => 'na'
+        );
+    }
+    else {
+        $output = array(
+            'SUBJ_GRADE' => $returnHandler->percent2letter($gradeAvg),
+            'SUBJ_GRADEIANT' => (int)($gradeAvg / 10),
+        );
+    }
 
     $this->setVar($output);
+
 
     if(Cfg::get('external_enable')) {
         $this->setVar('teacher_block', '');
