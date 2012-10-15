@@ -1,4 +1,4 @@
-CREATE TABLE `portal-dev`.`lu_timetable_colours`( `timetable_colour_id` INT UNSIGNED NOT NULL AUTO_INCREMENT, `hex_colour` VARCHAR(8), PRIMARY KEY (`timetable_colour_id`) );
+CREATE TABLE `lu_timetable_colour`( `timetable_colour_id` INT UNSIGNED NOT NULL AUTO_INCREMENT, `hex_colour` VARCHAR(8), PRIMARY KEY (`timetable_colour_id`) );
 
 insert into `lu_timetable_colour` (`timetable_colour_id`, `hex_colour`) values('17','ffe0cc');
 insert into `lu_timetable_colour` (`timetable_colour_id`, `hex_colour`) values('18','ccffcc');

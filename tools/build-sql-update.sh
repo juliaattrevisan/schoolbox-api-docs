@@ -36,7 +36,7 @@ for i in `grep ".sql" $release/scripts_list | grep -v "#"`;do
         echo "" >> $tmpfile
 done
 echo "" >> $tmpfile
-echo "UPDATE \`config\` SET value='$release' WHERE name='site_version'" >> $tmpfile
+echo "UPDATE \`config\` SET value='$release' WHERE name='site_version';" >> $tmpfile
 echo "" >> $tmpfile
 echo "-- End of Release $release" >> $tmpfile
 echo "" >> $tmpfile

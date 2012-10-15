@@ -1,4 +1,4 @@
-ALTER TABLE `portal-dev`.`config` CHANGE `type` `type` ENUM('Site','Security','Policy','Paths','Resources','Email','Welcome','Localisation','External DB','Colours','Board Leave') CHARSET utf8 COLLATE utf8_general_ci NULL;
+ALTER TABLE `config` CHANGE `type` `type` ENUM('Site','Security','Policy','Paths','Resources','Email','Welcome','Localisation','External DB','Colours','Board Leave') CHARSET utf8 COLLATE utf8_general_ci NULL;
 
 
 UPDATE `config` SET `type`='Policy' WHERE `name`='policy';

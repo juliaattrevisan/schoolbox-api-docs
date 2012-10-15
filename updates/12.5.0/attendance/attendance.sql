@@ -6,5 +6,5 @@ INSERT INTO error (id, message) VALUES
 (149, 'Please specify a date in the format: yyyy-mm-dd'),
 (150, 'Please specify a valid period number.'),
 (151, 'You cannot edit attendance records this far in the past.'),
-(152, 'You cannot edit attendance records in the future.')
+(152, 'You cannot edit attendance records in the future.');
 
