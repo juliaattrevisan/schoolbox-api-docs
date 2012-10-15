@@ -313,5 +313,5 @@ INSERT INTO error (id, message) VALUES
 
 UPDATE `config` SET value='12.5.0' WHERE name='site_version'
 
--- End of Release 
+-- End of Release 12.5.0
 

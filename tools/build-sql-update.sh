@@ -38,7 +38,7 @@ done
 echo "" >> $tmpfile
 echo "UPDATE \`config\` SET value='$release' WHERE name='site_version'" >> $tmpfile
 echo "" >> $tmpfile
-echo "-- End of Release $1" >> $tmpfile
+echo "-- End of Release $release" >> $tmpfile
 echo "" >> $tmpfile
 echo "Created sql updates delta";
 

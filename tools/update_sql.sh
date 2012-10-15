@@ -58,10 +58,10 @@ then
 fi
 
 # Collect Credentials
-sqluser=`grep "\"SQL_user" $conffile | cut -d'"' -f4`
-sqlpasswd=`grep "\"SQL_passwd" $conffile | cut -d'"' -f4`
-sqlhost=`grep "\"SQL_host" $conffile | cut -d'"' -f4`
-sqldb=`grep "\"SQL_db" $conffile | cut -d'"' -f4`
+sqluser=`grep "\"SQL_user" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`
+sqlpasswd=`grep "\"SQL_passwd" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`
+sqlhost=`grep "\"SQL_host" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`
+sqldb=`grep "\"SQL_db" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`
 
 echo "Checking for SQL updates";
 
