@@ -19,29 +19,32 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
     private $timetable;
 
+    private $colourList;
+
     public function __construct (Component_Instance $instance, User $user, SitePage $sitepage, External_Timetable $externalTimetable) {
         parent::__construct($instance, $user, $sitepage);
 
         $this->externalTimetable = $externalTimetable;
     }
 
-    public function execute () {
+    public function execute() {
 
-        if ( $_SESSION['timetable'] && Cfg::get('external_enable') ) {
-
-            $timetableHandler = $this->externalTimetable;
-
-            //get current day and period
-            $this->dayNumber = $timetableHandler->getDayNumber($_SESSION['campus'][0]);
-            $this->currentPeriod = $timetableHandler->getPeriodNumber($_SESSION['campus'][0]);
-
-            $this->timetable = $timetableHandler->getDayTimetable($_SESSION['sid'], $_SESSION['id'], $_SESSION['campus'][0], $this->dayNumber);
-
-			return true;
+        if(!($_SESSION['timetable'] && Cfg::get('external_enable'))) {
+            return false;
         }
-		else {
-			return false;
-		}
+
+        $timetableHandler = $this->externalTimetable;
+
+        //get current day and period
+        $this->dayNumber = $timetableHandler->getDayNumber($_SESSION['campus'][0]);
+        $this->currentPeriod = $timetableHandler->getPeriodNumber($_SESSION['campus'][0]);
+
+        $this->timetable = $timetableHandler->getDayTimetable($_SESSION['sid'], $_SESSION['id'], $_SESSION['campus'][0], $this->dayNumber);
+
+        $this->colourList = Timetable_ColourMapper::getInstance()->findAll();
+
+        return true;
+
 
     }
 
@@ -58,7 +61,10 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
         $periodCount = 0;
 
-        if ( is_array($this->timetable) && !empty($this->timetable)) {
+        if(is_array($this->timetable) && !empty($this->timetable)) {
+            /* Setup colour map */
+            $subjectColourMap = array();
+            $colourIndex = 0;
 
             //for each period set result
             foreach ( $this->timetable as $period ) {
@@ -69,6 +75,13 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                     $periodCount++;
 
                     if ( $period['description'] ) {
+
+                        /* Handle colour array */
+                        if ($period['code'] && !array_key_exists($period['code'], $subjectColourMap)) {
+                            $subjectColourMap[$period['code']] = $this->colourList[$colourIndex]->hex_colour;
+                            ++$colourIndex;
+                        }
+
                         //custom stuff for grimwade
                         if ( $_SESSION['campus'][0] == 3 && Cfg::get('site_location') == 'mgs' ) {
                             $post = strpos($period['code'], "EN");
@@ -107,13 +120,20 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                             }
                         }
 
+                        $this->setVar('PERIOD_COLOUR', '#' . $subjectColourMap[$period['code']]);
+
                     }
                     else {
-                        $this->setVar('PERIOD_DESC', '');
-                        $this->setVar('PERIOD_CODE', '');
-                        $this->setVar('PERIOD_ROOM', '');
-                        $this->setVar('PERIOD_ABSENTEES', '');
-                        $this->setVar('PERIOD_ONCLICK', '');
+                        $this->setVar(array(
+                            'PERIOD_COLOUR' => '',
+                            'PERIOD_DESC' => '',
+                            'PERIOD_CODE' => '',
+                            'PERIOD_ROOM' => '',
+                            'PERIOD_ABSENTEES' => '',
+                            'PERIOD_ONCLICK' => '',
+                        ));
+
+
                     }
 
                     if ( $this->currentPeriod['PeriodNumber'] == $period['periodNumber'] ) {
