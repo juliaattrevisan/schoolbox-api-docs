@@ -190,11 +190,11 @@ class DashboardComponentReFactory {
             'size' => array(10, 'Limit')
         ),
         'Dashboard_Rss' => array(
-            'url' => 'http://www.abc.net.au/news/indexes/justin/rss.xml'
+            'url' => array('[TOBEOVERWRITTEN]', 'Url')
         ),
         'Dashboard_Weather' => array(
-            'url' => 'Australia/Melbourne',
-            'size' => '3'
+            'url' => array('[TOBEOVERWRITTEN]', 'Location'),
+            'size' => array('3', 'Forecast Days')
         ),
     );
 
@@ -353,25 +353,27 @@ class DashboardComponentReFactory {
         if($cleanDB) {
             // gather a list of all the things that need clearing
             $defIDs = $this->flatten($this->db->query("SELECT `id` FROM `component_definition` WHERE `module` = 'homepage'")->fetchAll(PDO::FETCH_ASSOC));
-            $defList = implode(",", $defIDs);
 
-            $conIDs = $this->flatten($this->db->query("SELECT `id` FROM `component_config_definition` WHERE `component_definition_id` IN ($defList)")->fetchAll(PDO::FETCH_ASSOC));
-            $conList = implode(",", $conIDs);
+            if(is_array($defIDs) && count($defIDs)) {
+                $defList = implode(",", $defIDs);
+                $conIDs = $this->flatten($this->db->query("SELECT `id` FROM `component_config_definition` WHERE `component_definition_id` IN ($defList)")->fetchAll(PDO::FETCH_ASSOC));
+                $conList = implode(",", $conIDs);
 
-            $this->cli("Deleting from component_config_instance", '-');
-            $this->db->query("DELETE FROM `component_config_instance` WHERE `component_config_definition_id` IN ($conList)");
+                $this->cli("Deleting from component_config_instance", '-');
+                $this->db->query("DELETE FROM `component_config_instance` WHERE `component_config_definition_id` IN ($conList)");
 
-            $this->cli("Deleting from component_config_definition", '-');
-            $this->db->query("DELETE FROM `component_config_definition` WHERE `component_definition_id` IN ($defList)");
+                $this->cli("Deleting from component_config_definition", '-');
+                $this->db->query("DELETE FROM `component_config_definition` WHERE `component_definition_id` IN ($defList)");
 
-            $this->cli("Deleting from component_instance", '-');
-            $this->db->query("DELETE FROM `component_instance` WHERE `component_definition_id` IN ($defList)");
+                $this->cli("Deleting from component_instance", '-');
+                $this->db->query("DELETE FROM `component_instance` WHERE `component_definition_id` IN ($defList)");
 
-            $this->cli("Deleting from component_definition", '-');
-            $this->db->query("DELETE FROM `component_definition` WHERE `id` IN ($defList)");
+                $this->cli("Deleting from component_definition", '-');
+                $this->db->query("DELETE FROM `component_definition` WHERE `id` IN ($defList)");
 
-            // reset index counters on account of the mass deletion
-            $this->cli("Resetting auto-increment counters");
+                // reset index counters on account of the mass deletion
+                $this->cli("Resetting auto-increment counters");
+            }
 
             $this->db->query("ALTER TABLE `component_definition` AUTO_INCREMENT = 1");
             $this->db->query("ALTER TABLE `component_instance` AUTO_INCREMENT = 1");
@@ -568,7 +570,21 @@ class DashboardComponentReFactory {
             $this->cli("Inserting new configurations for existing components", '+');
 
             foreach($this->newConfigurations as $class => $configs) {
+
+
                 foreach($configs as $key => $c) {
+
+                    if($c[0] == '[TOBEOVERWRITTEN]') {
+                        // yay, special cases! -_-
+                        if($class == 'Dashboard_Weather') {
+                            // retrieve weather from global config
+                            $c[0] = Cfg::get('weather_location');
+                        }
+                        elseif($class == 'Dashboard_Rss') {
+                            $c[0] = Cfg::get('welcome_rss_url');
+                        }
+                    }
+
                     $stmt->execute(array(
                         'class' => sprintf("Component_%sController", $class),
                         'key' => $key,
