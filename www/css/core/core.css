@@ -3851,6 +3851,15 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
 /************************
 BLOG COMPONENT
 ************************/
+.blog li,
+.news li {
+  padding: 7px 16px;
+}
+.blog h3,
+.news h3 {
+  font-weight: bold;
+  padding: 7px 0;
+}
 .blog p.author,
 .news p.author {
   clear: left;

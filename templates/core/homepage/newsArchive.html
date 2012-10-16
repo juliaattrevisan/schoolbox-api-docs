@@ -4,14 +4,25 @@
 <a href="/news/homepage/new/{ID}" class="btn up-arrow"><span></span>Post News</a>
 <!-- END submit_news -->
 <a href="/homepage/{ID}" class="btn go-back"><span></span>Return to Homepage</a>
-<div class="float-fix"></div>
-<!-- BEGIN news -->
-<a name="{NEWS_ID}"></a>
-<h2>{NEWS_HEADING}</h2>
-<div class="indent pad-it"> {NEWS_BODY}
-  <hr>
-  
-  <span class="element_footer">Posted by {EMAIL_CONTACT} on {POSTED_DATE} {MOD_NEWS}</span>
-  
+<div class="blog listing">
+
+<ul>
+    <!-- BEGIN news -->
+    <li class="{ON_OFF} clearfix">
+        <h3 class="clearfix">{NEWS_HEADING}</h3>
+        <div class="small-right">
+            <p class="interact">{MOD_NEWS}</p>
+        </div>
+        <p class="author">
+            <a href="/search/user/{AUTHOR_ID}" class="author">
+                <img width="32" height="32" src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square32"/>
+                <span class="name">{AUTHOR}</span>
+            </a>
+                    <span class="subtitle">Posted {POSTED_DATE}</span>
+        </p>
+        <div class="blog-body">{NEWS_BODY}</div>
+    </li>
+    <!-- END news -->
+</ul>
+
 </div>
-<!-- END news -->

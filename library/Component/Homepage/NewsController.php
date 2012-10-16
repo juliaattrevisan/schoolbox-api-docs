@@ -120,6 +120,7 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                     "NEWS_HEADING" => Scrub::text($news['heading']),
                     "NEWS_BODY" => Scrub::html($news['body']),
                     "EMAIL_CONTACT" => "<a href=\"/search/user/{$news['uid']}\">" . $userHandler->formatName($news) . "</a>",
+                    "AUTHOR" => $userHandler->formatName($news),
                     "AUTHOR_ID" => $news['uid'],
                     "AUTHOR_EXTERNAL_ID" => $news['synid'],
                     "POSTED_DATE" => $postedTime->getRelativeTime(),
