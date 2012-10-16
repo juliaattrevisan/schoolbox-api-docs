@@ -362,19 +362,7 @@ class SitePage extends Page {
             )
         ) {
             if ($this->site == 'mgs' || $this->site == 'grimwade' || $this->site == 'wadhurst') {
-
-                if ($this->groupHandler->isStaff()) {
-                    $this->setVar("WEBMAIL_LOCATION", 'href="https://owa.mgs.vic.edu.au/owa" rel="external"');
-                } else {
-                    $this->setVar("WEBMAIL_LOCATION", 'href="https://owa.mgs.vic.edu.au/OWA" rel="external"');
-                }
-
-            } else if ($this->site == 'ormond') {
-                if ($this->groupHandler->isStaff()) {
-                    $this->setVar("WEBMAIL_LOCATION", 'href="http://owa.ormond.unimelb.edu.au" rel="external"');
-                } else {
-                    $this->setVar('WEBMAIL_LOCATION', 'href="/mail/"');
-                }
+                $this->setVar("WEBMAIL_LOCATION", 'href="https://owa.mgs.vic.edu.au/owa" rel="external"');
             } else if ($this->site == 'wenona') {
                 $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.wenona.nsw.edu.au/owa" rel="external"');
             } else if ($this->site == 'shore') {
@@ -516,10 +504,9 @@ class SitePage extends Page {
                 }
             }
 
-
             /* Remove these links if parent logged in:
-                               * Webmail, Resources
-                               */
+               * Webmail, Resources, Network
+               */
             if ($this->groupHandler->isParent()) {
                 $this->setVar('wm_tab', '');
 
@@ -540,6 +527,14 @@ class SitePage extends Page {
             } else {
                 $this->setVar('mf_tab', '');
             }
+        }
+
+        /* Output webdav client tab if enabled */
+        $this->setBlock('tabTpl', 'network_tab', 'network_tab_block');
+        if (Cfg::get('webdav_enable') && !$this->groupHandler->isParent()) {
+            $this->parse('network_tab_block', 'network_tab');
+        } else {
+            $this->setVar('network_tab_block', '');
         }
 
         /* Check if eportfolio tab should be enabled
