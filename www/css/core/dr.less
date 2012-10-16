@@ -80,14 +80,14 @@
 }
 
 /* submission/rubricCriteria */
-#crit-list {
-    max-width: 350px;
+#crit-list, #crit-list-lightbox {
+    max-width: 400px;
 
     input {
         border: solid 1px @input-border;
         font-size: 12px;
         padding: 2px;
-        width: 200px;
+        width: 250px;
 
         &[disabled=disabled] {
             background: transparent;
@@ -113,6 +113,11 @@
         &.item {
             position: relative;
         }
+    }
+    p {
+        color: #222;
+        margin: 0;
+        line-height: 1.4em;
     }
 }
 
@@ -713,5 +718,58 @@ div.colours p {
             display: none;
         }
     }
-
 }
+
+#rubricForm {
+    .listing {
+        ul {
+            li {
+                padding: 10px 0;
+                li {
+                    padding: 0;
+                    font-size: 12px;
+                    input, code {
+                        font-size: 12px;
+                        margin-right: 5px;
+                    }
+                }
+            }
+        }
+    }
+    .prompt {
+        color: #bbb;
+    }
+    .hidden {
+        display: none;
+    }
+    .err {
+        code {
+            color: #c00;
+        }
+        input {
+            border: solid 1px #c00;
+        }
+    }
+    #add-set {
+        margin-left: 20px;
+    }
+    #resultset-editor .formLabelWidth {
+        width: 300px;
+    }
+    input {
+        border: solid 1px #ccc;
+        padding: 2px;
+        width: 250px;
+        margin-left: 10px;
+    }
+    #rubric-results p {
+        margin: 0 0 7px 16px;
+    }
+    #err-expl {
+        margin-top: 26px;
+        display: none;
+        color: #c00;
+    }
+}
+
+

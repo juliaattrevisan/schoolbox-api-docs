@@ -1,0 +1,156 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript">
+    $j(function() {
+        $j('#rubric-results input').live('change', function(e) {
+            var self = $j(this);
+            var anchor = self.siblings('a').first();
+            if(self.val() == anchor.attr('data-label')) {
+                anchor.addClass('hidden');
+            } else {
+                anchor.removeClass('hidden');
+            }
+            if(!(self.hasClass('nullable')) && self.val() == '') {
+                self.parent('li').addClass('err');
+            } else {
+                self.parent('li').removeClass('err');
+            }
+        });
+        $j('#rubric-results li a:not(.btn)').live('click', function(e) {
+            var self = $j(this);
+            var input = self.siblings('input').first();
+            input.val(self.attr('data-label'));
+            input.trigger('change');
+            self.addClass('hidden');
+            e.preventDefault();
+        });
+        $j('#rubric-results li.new-item input').live('change', function(e) {
+            var self = $j(this);
+            var li = self.parent('li');
+            var newli = li.clone();
+            var code = newli.find('code');
+            newli.find('input').val('');
+            // code.html(parseInt(code.html()) + 1);
+            code.html('&nbsp;');
+            li.removeClass('new-item');
+            li.find('code').removeClass('prompt');
+            li.parent('ul').append(newli);
+        });
+        $j('#add-set').live('click', function(e) {
+            e.preventDefault();
+        });
+        $j('#save-changes').live('click', function(e) {
+            var valid = true;
+            var frm = $j('#rubricForm');
+            var method = frm.attr('method');
+            var action = frm.attr('action');
+
+            var frmdata = {};
+            var ii = 0;
+            var j = 0;
+            frm.find('input').each(function() {
+                var self = $j(this);
+
+                if(!self.hasClass('nullable')) {
+                    if(self.val() == '') {
+                        valid = false;
+                        return valid;
+                    }
+                }
+
+                var i = self.parents('ul').first().parent('li').index();
+                if(i != ii) {
+                    j = 0;
+                }
+                ii = i;
+
+                // if blank, just leave it
+                if(self.val() != '') {
+                    if(frmdata[i] === undefined) {
+                        frmdata[i] = {};
+                    }
+                    frmdata[i][j] = self.val();
+                    ++j;
+                }
+            });
+
+            if(valid) {
+                console.log(frmdata);
+                $j.ajax({
+                    async: false,
+                    url: action,
+                    type: method,
+                    data: {
+                        'action': 'set',
+                        'items': frmdata
+                    },
+                    success: function(data) {
+                        console.log('success '+data);
+                    },
+                    failure: function(data) {
+                        console.log('le fail '+data);
+                        e.preventDefault();
+                    }
+                });
+            }
+            else {
+                e.preventDefault();
+                $j('#err-expl').css('display', 'block');
+            }
+        });
+    });
+</script>
+<!-- END custom_head -->
+<h1>Test Rubric Editing</h1>
+<form id="rubricForm" method="POST" action="/adminv2/rubricForm.php">
+    <table id="resultset-editor" class="standardForm">
+        <tr>
+            <td class="formLabelWidth">
+                <h4>Rubric ResultSets</h4>
+                <div class="listing">
+                    <ul>
+                        <li>Edit the rubric resultsets here: these are the pre-populated default values that will appear on every rubric.</li>
+                        <li>Note that once results have been created, they cannot be removed; they can be renamed, but ensure that if you do
+                            that you rename them to something semantically equivalent, since it will affect all marks already given.</li>
+                        <li>Each set should be a discrete list of items of a single measurement;
+                            for example, 'Very Good' and 'Yes' should not be in the same set.</li>
+                        <li>The first element is always valued zero, and sets must contain at least two elements.</li>
+                        <li>Type into empty fields to add result elements; if you wish to remove a newly created element, just leave it blank.</li>
+                        <li>New sets cannot be deleted once created.</li>
+                    </ul>
+                </div>
+            </td>
+            <td class="listing">
+                <ul id="rubric-results">
+                    <!-- BEGIN list -->
+                    <li class="{ON_OFF}">
+                        <ul>
+                            <!-- BEGIN list_item -->
+                            <li>
+                                <code>{RR_VALUE}</code> &rsaquo;
+                                <input type="text" value="{RR_SANE_LABEL}" />
+                                <a class="hidden" data-label="{RR_SANE_LABEL}" href="#">revert to '{RR_LABEL}'</a>
+                            </li>
+                            <!-- END list_item -->
+                            <li class="new-item">
+                                <code class="prompt">&nbsp;</code> &rsaquo;
+                                <input class="nullable" type="text" value="" />
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- END list -->
+                    <li class="{ON_OFF}">
+                        <p>New set...</p>
+                        <ul>
+                            <li class="new-item">
+                                <code class="prompt">&nbsp;</code> &rsaquo;
+                                <input class="nullable" type="text" value="" />
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+    <a href="/adminv2/rubric-results" id="save-changes" class="submit-btn-plain">Save changes</a>
+    <span id="err-expl">Ensure all pre-existing results are not blank.</span>
+</form>
