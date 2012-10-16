@@ -6,11 +6,12 @@ class DAV_Digest extends Sabre_DAV_Auth_Backend_AbstractDigest {
 
     function getDigestHash($realm, $username) {
         $userHandler = new User;
-
         $user = $userHandler->getByUsername($username);
-
-        return $user['hash'];
-
+        if ($user['hash']) {
+            return $user['hash'];
+        } else {
+            return false;
+        }
     }
 
     public function authenticate(Sabre_DAV_Server $server, $realm) {

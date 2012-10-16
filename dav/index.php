@@ -24,6 +24,7 @@ $server->addPlugin($lockPlugin);
 
 $authBackend = new DAV_Digest();
 $authPlugin = new Sabre_DAV_Auth_Plugin($authBackend, Cfg::get('site_location'));
+$server->addPlugin($authPlugin);
 
 $server->setBaseUri('/');
 $server->exec();
