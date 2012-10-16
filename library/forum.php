@@ -28,7 +28,7 @@ class Forum extends DeprecatedModel {
          $sortField = 't.date';
       }
 
-		$query = "SELECT t.*, u.title userTitle, u.firstname userFirstname, u.lastname userLastname
+		$query = "SELECT t.*, u.title userTitle, u.firstname userFirstname, u.lastname userLastname, u.synergy_id
 				  FROM forumThread t
 				  LEFT JOIN user u ON u.id = t.userID
 				  WHERE t.categoryID = $categoryID
