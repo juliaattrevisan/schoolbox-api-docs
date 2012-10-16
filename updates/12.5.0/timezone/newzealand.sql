@@ -1,2 +1,2 @@
-ALTER TABLE `schoolbox`.`config` CHANGE `options` `options` VARCHAR(300) CHARSET utf8 COLLATE utf8_general_ci NULL;
-UPDATE `schoolbox`.`config` SET `options`='Australia/Victoria:Australia/NSW:Australia/Queensland:Australia/West:Australia/South:Pacific/Auckland' WHERE `name`='date_timezone';
+ALTER TABLE `config` CHANGE `options` `options` VARCHAR(300) CHARSET utf8 COLLATE utf8_general_ci NULL;
+UPDATE `config` SET `options`='Australia/Victoria:Australia/NSW:Australia/Queensland:Australia/West:Australia/South:Pacific/Auckland' WHERE `name`='date_timezone';
