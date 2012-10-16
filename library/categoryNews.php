@@ -13,7 +13,8 @@ class CategoryNews extends DeprecatedModel {
 	function getAllForCategory($categoryID, $config = false, $archive = false, $userID = 0) {
         $userID = $userID ? $userID : $_SESSION['id'];
 		$query = "SELECT n.id, heading, UNIX_TIMESTAMP(datetime_posted) posted, UNIX_TIMESTAMP(datetime_published) published,
-					UNIX_TIMESTAMP(datetime_expires) expires, body, deleted, code, owner, u.firstname, u.lastname, u.title, u.id as uid
+					UNIX_TIMESTAMP(datetime_expires) expires, body, deleted, code, owner, u.firstname, u.lastname, u.title,
+					u.id uid, u.synergy_id synid
 				  FROM ".$this->_table." n
 				  LEFT JOIN user u ON u.id = n.owner
 				  WHERE code = '$categoryID'  AND deleted = 0 ";
