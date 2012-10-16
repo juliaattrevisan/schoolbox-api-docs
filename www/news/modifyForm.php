@@ -40,16 +40,14 @@ if ($_POST['heading']) {
             error(23);
         }
 
-        $news['item_id'] = $_POST['newsID'];
+        $newsID = $news['item_id'] = $_POST['newsID'];
         $newsHandler->update($news);
     } else {
-        $newsHandler->create($news);
+        $newsID = $newsHandler->create($news);
     }
 
-    //SitePage::localRedir("/news/");
-} /* Check user is news owner
- */
-else {
+    SitePage::localRedir("/news/item/$newsID");
+} else {
     if (is_numeric($_GET['delete'])) {
         $news = $newsHandler->getByID($_GET['delete']);
 
