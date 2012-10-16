@@ -8,102 +8,148 @@
  */
 class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_ControllerAbstract {
 
-    private $groupHandler;
-    private $userHandler;
-    private $returnHandler;
-    private $submissionHandler;
-    private $max;
-    private $allWork;
+    private $upcomingWork = array();
 
     /**
      * Business logic to collate data ready for output
      */
-    public function execute () {
-        // initialise handlers
-        $this->groupHandler = new Group();
-        $this->userHandler = new User();
-        $this->returnHandler = new SubmissionReturn();
-        $this->submissionHandler = new Submission();
-        $this->max = 12; // should there be a limit?
+    public function execute() {
 
-        // determine for which user (or users) we will be retrieving data
-        // at the end of this, we want an array of user ids that we will parse
-        $userIDs = array();
-
-        // if activeUser is a parent, collate their children into this view
-        if($this->getGroupHandler()->isParent()) {
-            // for now, we don't want this, but leave it as an option
-            return false;
-            if (is_array($_SESSION['children'])) {
-                foreach ($_SESSION['children'] as $child) {
-                    $userIDs[] = $child['id'];
-                }
-            }
-        }
-        // elseif activeUser is a student, display current user's data
-        elseif ($this->getGroupHandler()->isStudent()) {
-            $userIDs[] = $_SESSION['id'];
-        }
-        // not parent and not student? bug out.
-        else {
+        // TODO DOES THIS COMPONENT HAVE ACCESS RESTRICTIONS?
+        // assumption: this component is only visible to students
+        $groupHandler = new Group();
+        if(!$groupHandler->isStudent()) {
             return false;
         }
 
-        // setup array to get all work from all users to be displayed
-        $allWork = array();
+        $submissionHandler = new Submission();
 
-        // set the limit of how many more we can display
-        $limit = $this->max;
+        $userID = $_SESSION['id'];
 
-        // iterate through all students and get their work
-        foreach($userIDs as $userID) {
-            $user = $this->getUserHandler()->getByID($userID);
-            if (!isset($user['uid']))
-                error(2);
+        $upcoming = $submissionHandler->getAllUpcomingWorkAndAssessments($userID);
 
+        $now = time();
+        $j = 0;
 
-            $categoryList = $this->getGroupHandler()->involvedInCategoryList($user['uid']);
+        if(!count($upcoming)) {
+            return false;
+        }
 
-            $categoryIDList = array();
-            if (is_array($categoryList)) {
-                foreach($categoryList as $category) {
-                    $categoryIDList[] = $category['id'];
+        foreach($upcoming as $item) {
+            unset($output);
+            // find out if we're actually showing this item
+            if($item['kind'] == 0) {
+                // duework
+                if($item['submittable']) {
+                    if($item['multi_submit']) {
+                        // if unsubmitted, hide if LATE date passed
+                        if(!$item['item_count'] && $item['late_date'] < $now) {
+                            $output['HIDEME'] = 'hideme multi unsubmitted late-passed';
+                            $output['upcoming_work_actionable_block'] = 'hideme multi unsubmitted late-passed';
+                        }
+                        // if submitted, hide if DUE date passed
+                        elseif($item['submit_count'] && $item['date'] < $now) {
+                            $output['HIDEME'] = 'hideme multi submitted due-passed';
+                            $output['upcoming_work_actionable_block'] = 'hideme multi submitted due-passed';
+                        }
+                    }
+                    else {
+                        // single submit: hide if completed or DUE date in past
+                        if($item['date'] < $now || $item['submit_count']) {
+                            $output['HIDEME'] = 'hideme single due-passed-or-submitted';
+                            $output['upcoming_work_actionable_block'] = 'hideme single due-passed-or-submitted';
+                        }
+                    }
+                }
+                else {
+                    // no submissions: hide if DUE date in past
+                    if($item['date'] < $now) {
+                        $output['HIDEME'] = 'hideme nosubmit due-passed';
+                        $output['upcoming_work_actionable_block'] = 'hideme nosubmit due-passed';
+                    }
+                }
+            }
+            else {
+                // assess
+                if($item['max_attempts'] == 0) {
+                    // 0 max attempts is unlimited: hide if FINISH in past
+                    if($item['date'] < $now) {
+                        $output['HIDEME'] = 'hideme unlimited due-passed';
+                        $output['upcoming_work_actionable_block'] = 'hideme unlimited due-passed';
+                    }
+                }
+                elseif($item['attempt_count'] >= $item['max_attempts']) {
+                    // if limited attempts, hide if limit has been reached
+                    $output['HIDEME'] = 'hideme attempts-exhausted';
+                    $output['upcoming_work_actionable_block'] = 'hideme attempts-exhausted';
+                }
+                elseif($item['date'] < $now) {
+                    $output['HIDEME'] = 'hideme due-passed';
+                    $output['upcoming_work_actionable_block'] = 'hideme due-passed';
                 }
             }
 
-            //Catch if not involved in any categories
-            if (count($categoryList) == 0)
-                return false;
+            // skip if hideme was populated for some reason
+            if(isset($output['HIDEME'])) {
+                continue;
+            }
 
-            // get all the upcoming, awaiting and returned work for this student
-            $works = array(
-                $this->getSubmissionHandler()->getRecentWork($userID, $categoryIDList, UPCOMING_WORK_TYPE),
-                //$this->getSubmissionHandler()->getRecentWork($userID, $categoryIDList, AWAITING_WORK_TYPE),
-                //$this->getSubmissionHandler()->getRecentWork($userID, $categoryIDList, RETURNED_WORK_TYPE),
+            $adr = new Alaress_Date_Relative($item['date'], 'y-m-d');
+
+            // how many days left, 0 <= x <= 10
+            $urgency = max(0, min(10, (int)(($adr->getUnixTimestamp() - $now) / 86400)));
+
+            // override the above manipulation of output (we don't need it)
+            $output = array(
+                'UPCOMING_ID'      => $item['id'],
+                'UPCOMING_TITLE'   => $item['title'],
+                'UPCOMING_TYPE'    => $item['type'],
+                'UPCOMING_DATE'    => $adr->getRelativeTime(),
+                'UPCOMING_TIME'    => $adr->getUsingFormat('Hi') == '2359' ? $adr->getDateOnly() : $adr->getShort(),
+                'UPCOMING_URGENCY' => $urgency,
+
+                'UPCOMING_SUBJ_NAME' => $item['subj_name'],
+                'UPCOMING_SUBJ_ID'   => $item['subj_id'],
+
+                'ON_OFF' => ++$j % 2 ? '' : 'dark'
             );
 
-            // iterate through this student's work and return all the works up to the limit
-            foreach($works as $current) {
-                for ($i=0; (is_array($current) && $i < count($current)) && ($i < $limit); $i++) {
-                    $current[$i]['owner'] = $user['uid'];
-                    $allWork[] = $current[$i];
+            // determine actions available
+            if($item['kind'] == 0) {
+                // duework
+                $output['UPCOMING_HREF'] = 'submission/submissionHistory/';
+                $output['UPCOMING_BTN_ICON']  = 'modify';
+
+                if($item['submittable']) {
+                    if($item['multi_submit'] && $item['submit_count']) {
+                        // allow resubmit
+                        $output['UPCOMING_BTN_LABEL'] = 'Resubmit';
+                    }
+                    else {
+                        // no resubmit
+                        $output['UPCOMING_BTN_LABEL'] = 'Submit';
+                    }
                 }
-
-                /* Recalculate how much can be displayed of the next type, if the current type
-                 * doesn't have enough items
-                 */
-                if ($i < ($limit - 1)) {
-                    $limit = ($limit - $i) + $this->max;
+                else {
+                    $output['upcoming_work_actionable_block'] = 'No submissions';
                 }
-            } // end foreach work
+            }
+            else {
+                // assess
+                $output['UPCOMING_HREF'] = 'assess/intro/';
+                $output['UPCOMING_BTN_ICON']  = 'up-arrow';
 
-        } // end foreach user
+                if($item['attempt_count']) {
+                    $output['UPCOMING_BTN_LABEL'] = 'Resit';
+                }
+                else {
+                    $output['UPCOMING_BTN_LABEL'] = 'Sit';
+                }
+            }
+            $this->upcomingWork[] = $output;
+        }
 
-        usort($allWork, 'cmp');
-
-        $this->allWork = $allWork;
-
-        return true;
+        return count($this->upcomingWork) ? true : false;
     }
 
     /**
@@ -114,189 +160,18 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
             return false;
         }
 
-        $this->setBlock($templateHandle, 'work', 'work_block');
+        $this->setBlock($templateHandle, 'upcoming_work', 'upcoming_work_block');
+        $this->setBlock('upcoming_work', 'upcoming_work_actionable', 'upcoming_work_actionable_block');
 
-        // get now()
-        $current_time = new DateTime();
-
-        // permissions check
-        $restrictedSubmissions = false;
-        $childList = array();
-        if($this->getGroupHandler()->isParent()) {
-            // for now, we don't want this, but leave it as an option
-            // this will become relevant if due work welcome component is opened to parents
-            return false;
-            if (is_array($_SESSION['children'])) {
-                foreach ($_SESSION['children'] as $child) {
-                    $childList[] = $child['id'];
-                }
+        foreach ($this->upcomingWork as $output) {
+            $this->setVar($output);
+            if($output['upcoming_work_actionable_block'] != 'No submissions') {
+                $this->parse('upcoming_work_actionable_block', 'upcoming_work_actionable');
             }
-            $restrictedSubmissions = Cfg::get('restrict_student_submissions');
-        } else {
-            $childList = array($_SESSION['id']);
+            $this->parse('upcoming_work_block','upcoming_work', true);
         }
-
-        // count for dark/light
-        $j = 0;
-
-        // for all the work, render output
-        if(count($this->allWork) > 0) {
-            $workRendered = false;
-
-            foreach($this->allWork as $currentWork) {
-
-                // in the case of parents if somehow we got a student who's not our child, skip over it
-                if(!in_array($currentWork['owner'], $childList))
-                    continue;
-
-                // if relevant date is in the past, we don't want to know about it
-                if($currentWork['relevant_date'] < $current_time)
-                    continue;
-
-                // if there is no parent restriction in place
-                if (!$restrictedSubmissions) {
-                    if ($currentWork['status'] == UPCOMING_WORK_TYPE) {
-                        if (!$currentWork['accept_submission']) {
-                            $status = 'Work due';
-                            $action = 'View Details';
-                        }
-                        else if ($current_time > $currentWork['open_date']) {
-                            if ($current_time < $currentWork['date']) {
-                                $status = 'Work due';
-                                $action = 'Submit Work';
-                            }
-                            else if ($current_time < $currentWork['late_date']) {
-                                $status = 'Work overdue';
-                                $action = 'Submit Work';
-                            }
-                            else {
-                                $status = 'Missed due date';
-                                $action = 'View Details';
-                            }
-                        }
-                        else {
-                            $status = 'Open date approaching';
-                            $action = 'View Details';
-                        }
-                    }
-                    else if ($currentWork['status'] == AWAITING_WORK_TYPE) {
-                        $action = 'View Details';
-
-                        if ($current_time < $currentWork['date']) {
-                            $status = 'Work submitted';
-                        }
-                        else if ($currentWork['submitted'] < $currentWork['late_date']) {
-                            $status = 'Work submitted late';
-                        }
-                    }
-                    else if ($currentWork['status'] == RETURNED_WORK_TYPE) {
-                        $action = 'View Details';
-
-                        if (!empty($currentWork['mark'])) {
-                            $status = 'Work marked';
-                        }
-                        else {
-                            $status = 'Work returned';
-                        }
-                    }
-                }
-                /* Status to display when Restrict Student Submissions is on
-              */
-                else {
-                    $status = '';
-                    $action = '';
-                }
-
-                // if the relevant_date is set to the start of end of a day, only show the day itself and truncate the time
-                $shortFormat = Cfg::get('date_short');
-                $timePos = strpos($shortFormat, 'g:i') ? strpos($shortFormat, 'g:i') - 1 : strlen($shortFormat);
-                if( $currentWork['relevant_date']->format('H:i:s') == '00:00:00' ||
-                    $currentWork['relevant_date']->format('H:i:s') == '23:59:59' )
-                {
-                    $this->setVar('WORK_DATE', $currentWork['relevant_date']->format(substr($shortFormat, 0, $timePos)));
-                } else {
-                    $this->setVar('WORK_DATE', $currentWork['relevant_date']->format(Cfg::get('date_short')));
-                }
-
-
-
-                $this->setVar(array(
-                    'WORK_SUBJECT' => Scrub::text($currentWork['categoryName']),
-                    'WORK_SUBJECT_ID' => $currentWork['cid'],
-                    'WORK_DESCRIPTION' => Scrub::text($currentWork['name']),
-                    'WORK_ACTION' => $action,
-                    'WORK_STATUS' => $status,
-                    'WORK_BOX_ID' => $currentWork['bid'],
-                    'WORK_FILE_ID' => $currentWork['fid'],
-                    'ROW_COLOR' => !($j++ % 2) ? 'dark' : ''
-                ));
-
-                $this->parse('work_block', 'work', true);
-                $workRendered = true;
-            }
-            if(!$workRendered) {
-                $this->setVar(array(
-                    'WORK_DATE'         => 'No due work.',
-                    'WORK_SUBJECT'      => '',
-                    'WORK_SUBJECT_ID'   => '',
-                    'WORK_DESCRIPTION'  => '',
-                    'WORK_ACTION'       => '',
-                    'WORK_STATUS'       => '',
-                    'WORK_BOX_ID'       => '',
-                    'WORK_FILE_ID'      => '',
-                    'ROW_COLOR'         => 'dark',
-                ));
-                $this->parse('work_block', 'work', false);
-            }
-        }
-        else {
-            $this->setVar('work_block','');
-        }
-
-
-
-
-
-
-
-
 
         return true;
-    }
-
-    /**
-     * @return Group
-     */
-    private function getGroupHandler() {
-        return $this->groupHandler;
-    }
-
-    /**
-     * @return User
-     */
-    private function getUserHandler() {
-        return $this->userHandler;
-    }
-
-    /**
-     * @return SubmissionReturn
-     */
-    private function getReturnHandler() {
-        return $this->returnHandler;
-    }
-
-    /**
-     * @return Submission
-     */
-    private function getSubmissionHandler() {
-        return $this->submissionHandler;
-    }
-
-    /**
-     * @return array|null
-     */
-    private function getAllWork() {
-        return $this->allWork;
     }
 }
 
