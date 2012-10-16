@@ -29,14 +29,14 @@
         <ul class="topic">
             <!-- BEGIN topic -->
             <li class="hide {TOPIC_CLEAN}">
-                <ul>
+                <ul class="news-list">
                     <!-- BEGIN news -->
                     <li class="{ON_OFF} clearfix">
-                        <h4><a href="{NEWS_URL}" title="{NEWS_TITLE}">{NEWS_TITLE}</a></h4>
-                        <!-- BEGIN news_image --> <img src="/storage/image.php?hash={NEWS_IMAGE}&size=square64"/>
+                        <!-- BEGIN news_image -->
+                        <img width="64" height="64" src="/storage/image.php?hash={NEWS_IMAGE}&size=square64"/>
                         <!-- END news_image -->
-                        <p class="interact">{NEWS_TIME}</p>
-
+                        <h3><a href="{NEWS_URL}" title="{NEWS_TITLE}">{NEWS_TITLE}</a></h3>
+                        <span class="time">{NEWS_TIME}</span>
                         <p>{NEWS_SHORT}</p>
                     </li>
                     <!-- END news -->

@@ -107,7 +107,7 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
             $j = 0;
             foreach($newsList as $news) {
                 if($news['owner'] == $_SESSION['id'] || $this->permission >= FULL_ACCESS || (NEWS_teacher_edit_other && $this->permission >= WRITE_ACCESS)) {
-                    $this->setVar('MOD_NEWS', '<a href="/news/homepage/'.$news['id'].'">Modify</a>');
+                    $this->setVar('MOD_NEWS', '<a class="btn modify" href="/news/homepage/'.$news['id'].'"><span></span>Modify</a>');
                 }
                 else {
                     $this->setVar('MOD_NEWS', '');
@@ -120,6 +120,8 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                     "NEWS_HEADING" => Scrub::text($news['heading']),
                     "NEWS_BODY" => Scrub::html($news['body']),
                     "EMAIL_CONTACT" => "<a href=\"/search/user/{$news['uid']}\">" . $userHandler->formatName($news) . "</a>",
+                    "AUTHOR_ID" => $news['uid'],
+                    "AUTHOR_EXTERNAL_ID" => 0,
                     "POSTED_DATE" => $postedTime->getRelativeTime(),
                     'ON_OFF' => ++$j % 2 ? '' : 'dark'
                 ));

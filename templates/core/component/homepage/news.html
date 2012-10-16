@@ -1,22 +1,25 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
-    <div class="listing ">
+    <div class="listing blog">
         <ul>
             <!-- BEGIN news -->
             <li class="{ON_OFF} clearfix">
-                <a name="news-{NEWS_ID}"></a>
-                <h5 id="news-header">{NEWS_HEADING}<span>{MOD_NEWS}</span></h5>
-                <div class="wysiwyg">
-                    {NEWS_BODY}
+                <h3 class="clearfix">{NEWS_HEADING}</h3>
+                <div class="small-right">
+                    <p class="interact">{MOD_NEWS}</p>
                 </div>
-                <p class="interact hide-on-small">
-                    Posted by {EMAIL_CONTACT} {POSTED_DATE}
+                <p class="author">
+                    <a href="/search/user/{AUTHOR_ID}" class="author">
+                        <img width="32" height="32" src="/portrait.php?userId={AUTHOR_EXTERNAL_ID}&size=square32"/>
+                        <span class="name">{EMAIL_CONTACT}</span>
+                    </a>
+                    <span class="subtitle">Posted {POSTED_DATE}
                     <!-- BEGIN has_publish_date -->
-                    <br />
-                    Published on {NEWS_PUBLISH_DATE}
-                    <!-- END has_publish_date -->
+                        (Published on {NEWS_PUBLISH_DATE})
+                    <!-- END has_publish_date --></span>
                 </p>
+                <div class="blog-body">{NEWS_BODY}</div>
             </li>
             <!-- END news -->
         </ul>

@@ -9,17 +9,19 @@
     <a class="btn modify" href="/news/modify/{NEWS_ID}"><span></span>Modify Article</a>
     <!-- END modify_news -->
 </span>
-<div class="news-wrapper left clearfix">
-    <img src="/portrait.php?userId={POSTER_EXTERNAL_ID}&size=square32"/>
-
-    <p class="meta">
-        Posted by {POSTER}<br/>
-        {DATETIME}
+<div class="news left clearfix">
+    <p class="author">
+        <a href="/search/user/{POSTER_ID}" class="author">
+            <img width="32" height="32" src="/portrait.php?userId={POSTER_EXTERNAL_ID}&size=square32"/>
+            <span class="name">{POSTER}</span>
+        </a>
+        <span class="subtitle">{DATETIME}</span>
     </p>
+
+
     <!-- BEGIN news -->
-    <div class="wysiwyg clearfix">
-        {NEWS_BODY}
-    </div>
+
+    {NEWS_BODY}
 
     <!-- BEGIN previous_article -->
     <a class="btn no-icon float-left" href="/news/item/{PREVIOUS_ARTICLE_ID}">&laquo; {PREVIOUS_ARTICLE_TITLE}</a>
@@ -35,9 +37,8 @@
         <li><a href="/news/{LIST_TOPIC_CLEAN}" class="{LIST_TOPIC_SELECTED}">{LIST_TOPIC_NAME}</a>
         </li>
         <!-- END topic_list -->
+        <!-- BEGIN allnews_button -->
+        <li><a href="/news-archive/{TOPIC_CLEAN}" class="btn"><span></span>View Archived News</a></li>
+        <!-- END allnews_button -->
     </ul>
-    <!-- BEGIN allnews_button -->
-    <p class="interact clearfix"><a href="/news-archive/{TOPIC_CLEAN}" class="btn"><span></span>View Archived News</a>
-    </p>
-    <!-- END allnews_button -->
 </div>

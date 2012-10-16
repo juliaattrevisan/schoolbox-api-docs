@@ -1,33 +1,29 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript">
-    $j(function () {
-        $j('#container').css('width', $j('.timetable').outerWidth());
-    });
-
-
-</script>
-<!-- END custom_head -->
 <!-- BEGIN timetable -->
 <h1>Timetable for {PERSON}{YEAR}</h1>
 <table class="timetable" style="display:table">
-    <tr>
-        <th style="width:{TIMETABLE_FIELD_WIDTH}%;">&nbsp;</th>
-        <!-- BEGIN day_header -->
-        <th style="width:{TIMETABLE_FIELD_WIDTH}%;cursor:pointer;">Day {DAY_NUMBER}</th>
-        <!-- END day_header -->
-    </tr>
-    <!-- BEGIN period -->
-    <tr>
-        <th style="white-space:nowrap;">{PERIOD_NAME}
-            <span style="font-size:0.8em;word-wrap:break-word; text-align:center;display:block">{PERIOD_START}-{PERIOD_END}</span>
-        </th>
-        <!-- BEGIN day -->
-        <td class="{TIMETABLE_CLASS}" style="background-color: {PERIOD_COLOUR};"
-        {PERIOD_ONCLICK}>{PERIOD_DESC} {PERIOD_CODE}<br/>{PERIOD_ROOM} {PERIOD_STAFF}</td>
-        <!-- END day -->
-    </tr>
-    <!-- END period -->
+    <thead>
+        <tr>
+            <th style="width:{TIMETABLE_FIELD_WIDTH}%;">&nbsp;</th>
+            <!-- BEGIN day_header -->
+            <th scope="col" style="width:{TIMETABLE_FIELD_WIDTH}%;">Day {DAY_NUMBER}</th>
+            <!-- END day_header -->
+        </tr>
+    </thead>
+    <tbody>
+        <!-- BEGIN period -->
+        <tr>
+            <th scope="row">{PERIOD_NAME}
+                <span class="time">{PERIOD_START}&ndash;{PERIOD_END}</span>
+            </th>
+            <!-- BEGIN day -->
+            <td class="{TIMETABLE_CLASS}" style="background-color: {PERIOD_COLOUR};"
+            {PERIOD_ONCLICK}>
+                <span class="title">{PERIOD_DESC}</span>
+                {PERIOD_CODE}<br/>{PERIOD_ROOM} {PERIOD_STAFF}
+            </td>
+            <!-- END day -->
+        </tr>
+        <!-- END period -->
+    </tbody>
 </table>
-<br/>
 <!-- END timetable -->
-

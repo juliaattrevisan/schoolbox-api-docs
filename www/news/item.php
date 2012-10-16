@@ -45,7 +45,6 @@ $url = new Url($topic['name']);
 
 $user = $userHandler->getByID($article['item_owner']);
 $fullname = $userHandler->formatName($user);
-$owner = "<a href=\"/search/user/{$article['item_owner']}\">$fullname</a>";
 
 $d = new Alaress_Date_Format($article['item_datetime_posted'], 'y-m-d');
 $e = new Alaress_Date_Format($article['item_datetime_expires'], 'y-m-d');
@@ -53,13 +52,14 @@ $e = new Alaress_Date_Format($article['item_datetime_expires'], 'y-m-d');
 $output = array(
     'NEWS_ID' => $article['item_id'],
     'NEWS_TITLE' => $article['item_heading'],
-    'POSTER' => $owner,
+    'POSTER' => $fullname,
     'POSTER_EXTERNAL_ID' => $user['synergy_id'],
     'DATETIME' => $d->getLong(),
     'EXPIRY' => $_SESSION['su'] == 1 ? ' - ' . $e->getLong() : '',
     'NEWS_BODY' => Scrub::html($article['item_body']),
     'TOPIC_NAME' => Scrub::text($topic['name']),
-    'TOPIC_CLEAN' => $url->getSlug()
+    'TOPIC_CLEAN' => $url->getSlug(),
+    'POSTER_ID' => $article['item_owner']
 );
 
 $this->setVar($output);

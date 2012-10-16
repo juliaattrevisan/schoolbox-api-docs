@@ -120,6 +120,7 @@ if (is_array($items)) {
     $i = 0;
     $total = count($items);
     $userHandler = new User();
+    $j = 0;
 
     if ($items) {
         foreach ($items as $article) {
@@ -143,6 +144,7 @@ if (is_array($items)) {
                 'NEWS_IMAGE' => $article['item_image'],
                 'TOPIC_NAME' => Scrub::text($previous['topicName']),
                 'TOPIC_CLEAN' => $filter['archive'] . $url->getSlug(),
+                'ON_OFF'         => ++$j % 2 ? 'dark' : ''
             );
 
             $this->setVar($output);

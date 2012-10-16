@@ -3967,11 +3967,34 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
     float: right;
 }
 
+.news-list {
+    li {
+        padding: 7px 16px;
+        line-height: 16px;
+        border-bottom: 1px solid @border-color;
+        clear: left;
+        h3 {
+            font-size: 1.3em;
+            font-weight: bold;
+            line-height: 1.3em;
+            padding: 0;
+            float: none;
+        }
+        img {
+            float: left;
+            margin-right: 10px;
+        }
+        .time {
+            color: @secondary-text;
+        }
+    }
+}
+
 /************************
 BLOG COMPONENT
 ************************/
 
-.blog {
+.blog, .news {
     p.author {
         clear: left;
         color: @secondary-text;
@@ -6645,76 +6668,41 @@ dd {
 }
 
 /*TIMETABLE*/
-#timetable {
-    width: 100%;
-    background: #ececec;
-    border-spacing: 5px;
-    border-collapse: separate;
-    td {
-        background: @white;
-        padding: 0;
-        font-size: 80%;
-        width: 10%;
-        vertical-align: top;
-    }
-    th {
-        background: #6b6b6b;
-        color: @white;
-        padding: 6px 10px;
-    }
-    .colour {
-        display: table-cell;
-    }
-    p {
-        padding: 6px 0 6px 10px;
-    }
-}
-
-.timetable td, .timetable th {
-    border-right: 1px solid @white;
-    border-bottom: 1px solid @white;
-}
-
 .timetable {
     width: 100%;
-    margin: 0;
-    background: transparent;
-}
-
-.timetable th {
-    padding: 3px;
-    background: #666;
-    color: @white;
-    font-size: 100%;
-    font-weight: bold;
-    line-height: 1.5;
-    text-align: center;
-}
-
-.timetable td {
-    background: #efefef;
-    color: #000;
-    font: 80% arial, sans-serif, serif;
-    cursor: hand;
-    padding: 4px;
-    text-align: center;
-}
-
-.timetable td.dayCurrent {
-    background: #a0a0a0;
-    color: @white;
-
-}
-
-.timetable td.dayCurrent.current, #timetable td.current {
-    background: #e8f5ff;
-    color: #000;
-    border: 1px solid @body-background;
-
-}
-
-.timetable td.dayCurrent.current a, #timetable td.current a {
-    text-decoration: underline;
+    th {
+        background: @dark;
+    }
+    .dayCurrent {
+        background: lighten(@highlight-color,10%);
+    }
+    .current {
+        background: @highlight-color;
+    }
+    td, th {
+        border-left: 1px solid @border-color;
+        border-bottom: 1px solid @border-color;
+    }
+    td {
+        vertical-align: top;
+        .title { font-weight: bold; display: block; }
+        .class { display: block; }
+        a { color: @body-text; }
+    }
+    tr {
+        td,th{&:first-child{
+            border-left: 0;
+        }}
+    }
+    thead th {
+        border-bottom: 1px solid darken(@border-color, 10%);
+    }
+    .time {
+        display: block;
+        color: @secondary-text;
+        font-weight: normal;
+        white-space: nowrap;
+    }
 }
 
 .home {
@@ -7385,6 +7373,24 @@ ul.activity-list {
             float: right;
             color: @secondary-text;
         }
+        &.grade {
+            padding-right: 65px;
+        }
+        .grade {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 50px;
+            padding: 5px;
+            font-size: 0.8em;
+            border-left: 1px solid @border-color;
+            span {
+                display: block;
+                font-size: 1.6em;
+                font-weight: bold;
+            }
+        }
     }
 }
 
@@ -7400,27 +7406,29 @@ ul.activity-list {
     background-position: -@offset-x * 20px -@offset-y * 20px;
 }
 
-.listing .subject-list {
+.subject-list {
     color: @secondary-text;
     li {
         position: relative;
-        padding: 0;
+        padding: 0 !important;
         vertical-align: middle;
         border-bottom: 1px solid @border-color;
+        &.grade a {
+            margin-right: 60px;
+            border-right: 1px solid @border-color;
+        }
     }
     a {
         display: block;
         padding: 5px 4px;
         padding-left: 40px;
         padding-right: 30px;
-        margin-right: 60px;
         position: relative;
         color: @body-text;
         height: 30px;
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
-        border-right: 1px solid @border-color;
         &.subject {
             font-weight: bold;
             line-height: 30px;
@@ -7446,7 +7454,7 @@ ul.activity-list {
         max-width: 32px;
         max-height: 32px;
     }
-    .grade {
+    span.grade {
         position: absolute;
         top: 0;
         right: 0;
@@ -7463,6 +7471,80 @@ ul.activity-list {
     }
 }
 
+.file-list {
+    color: @secondary-text;
+    li {
+        position: relative;
+        padding: 0 !important;
+        vertical-align: middle;
+        border-bottom: 1px solid @border-color;
+    }
+    a {
+        display: block;
+        padding: 5px 4px;
+        padding-left: 40px;
+        padding-right: 30px;
+        position: relative;
+        color: @secondary-text;
+        height: 30px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        .icon { .action-icon(0,2) }
+        .time { display: block; }
+        .name { color: @body-text; }
+        &:hover {
+            background-color: @pcard-hover
+        }
+    }
+    img {
+        position: absolute;
+        left: 4px;
+        top: 4px;
+        max-width: 32px;
+        max-height: 32px;
+    }
+}
+
+
+/* submission/submissionHistory */
+#submission-history {
+    h2 span {
+        font-weight: normal;
+    }
+    h3 {
+        font-weight: bold;
+        margin-top: 2em;
+        margin-bottom: 1em;
+    }
+    .one-third {
+        width: 32%;
+        float: left;
+        margin-left: 2%;
+    }
+    .two-thirds {
+        width: 66%;
+        float: left;
+        div {
+            width: 49%;
+            float: left;
+            &:first-of-type {
+                margin-right: 2%;
+            }
+        }
+    }
+    .returned-mark {
+        font-size: 1.5em;
+    }
+
+    #rubric-chart {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }
+}
+
+
 // Brace yourself - loop for the index of colorX, outputting a the class 'gradient-index' each time, adding the rules for 'color'
 .colorX (@index) when (@index > 0) {
     @i: (@index - 1);
@@ -7477,4 +7559,3 @@ ul.activity-list {
 .colorX(11);
 
 @import url('dr.less');
-@import url('sm.less');
