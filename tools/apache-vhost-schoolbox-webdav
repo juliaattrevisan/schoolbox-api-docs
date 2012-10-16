@@ -2,7 +2,7 @@
 	ServerName dav.schoolbox.schoolname.edu
 	DocumentRoot /usr/share/schoolbox/dav
 
-	<Directory /usr/share/schoolbox>
+	<Directory /usr/share/schoolbox/dav>
 		Options FollowSymLinks
 		AllowOverride None
 		Order allow,deny
