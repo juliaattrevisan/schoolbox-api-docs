@@ -279,7 +279,7 @@ class News extends DeprecatedModel {
             DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, item_image,
             news_items.item_datetime_posted, news_items.item_datetime_modified, news_items.item_datetime_published,
             DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
-            user.lastname, user.title, user.id as uid, user.firstname, newsTopic.name topicName, newsTopicID
+            user.lastname, user.title, user.id as uid, user.firstname, user.synergy_id synid, newsTopic.name topicName, newsTopicID
          FROM `" . $this->_table . "`
          LEFT JOIN user ON news_items.item_owner = user.id
          JOIN newsCampus ON newsCampus.id = news_items.item_id
@@ -303,7 +303,7 @@ class News extends DeprecatedModel {
 		SELECT DISTINCT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_body, item_image,
 			DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
 			DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime, news_items.item_datetime_published,
-			user.lastname, user.title, user.firstname, user.id as uid, newsTopic.name topicName, newsTopicID
+			user.lastname, user.title, user.firstname, user.id as uid, user.synergy_id synid, newsTopic.name topicName, newsTopicID
 		FROM `" . $this->_table . "`
 		LEFT JOIN user ON news_items.item_owner = user.id
         LEFT JOIN newsUser ON newsUser.newsID = news_items.item_id

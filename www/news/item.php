@@ -52,14 +52,18 @@ $e = new Alaress_Date_Format($article['item_datetime_expires'], 'y-m-d');
 $output = array(
     'NEWS_ID' => $article['item_id'],
     'NEWS_TITLE' => $article['item_heading'],
+    'NEWS_BODY' => Scrub::html($article['item_body']),
+    'NEWS_IMAGE' => $article['item_image'],
+
     'POSTER' => $fullname,
     'POSTER_EXTERNAL_ID' => $user['synergy_id'],
-    'DATETIME' => $d->getLong(),
-    'EXPIRY' => $_SESSION['su'] == 1 ? ' - ' . $e->getLong() : '',
-    'NEWS_BODY' => Scrub::html($article['item_body']),
+    'POSTER_ID' => $article['item_owner'],
+
     'TOPIC_NAME' => Scrub::text($topic['name']),
     'TOPIC_CLEAN' => $url->getSlug(),
-    'POSTER_ID' => $article['item_owner']
+
+    'DATETIME' => $d->getLong(),
+    'EXPIRY' => $_SESSION['su'] == 1 ? ' - ' . $e->getLong() : '',
 );
 
 $this->setVar($output);
