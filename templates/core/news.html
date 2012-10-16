@@ -48,12 +48,16 @@
             <div id="a{NEWS_ID}" class="item">
                 <h2><a href="/news/item/{NEWS_ID}">{NEWS_TITLE}</a></h2>
 
-                <div class="wysiwyg">
-                    {NEWS_BODY}
-
-                    <p class="submitted-by">
-                        Submitted by {POSTER} on {DATETIME}.
+                <div class="pad-it">
+                    <p class="author">
+                        <a href="/search/user/{POSTER_ID}" class="author">
+                            <img width="32" height="32" src="/portrait.php?userId={POSTER_EXTERNAL_ID}&size=square32"/>
+                            <span class="name">{POSTER}</span>
+                        </a>
+                        <span class="subtitle">Posted {DATETIME}</span>
                     </p>
+
+                    {NEWS_BODY}
 
                     <!-- BEGIN has_expiry -->
                     <p class="submitted-by">
@@ -72,8 +76,8 @@
                         <a href="/news/modify/{HAS_MODIFY_BUTTON_ITEM_ID}" class='btn'><span></span>Modify</a>
                     </p>
                     <!-- END has_modify_button -->
-
                 </div>
+
             </div>
             <!-- END news -->
         </div>

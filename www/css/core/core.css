@@ -180,6 +180,8 @@ hr {
 }
 img {
   border: 0;
+  max-width: 100%;
+  height: auto;
 }
 sub,
 sup {
@@ -3803,8 +3805,23 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
   background: #0066b0;
   filter: none;
 }
-.archive.news img {
-  padding: 10px;
+.archive .menu li {
+  padding: 0;
+}
+.topic-list li a {
+  display: block;
+  padding: 16px;
+  word-break: break-word;
+}
+.topic-list li a:hover {
+  background: #d6f0f6;
+  color: #0066b0;
+  text-decoration: none;
+}
+.topic-list li a.selected {
+  background: #1d9ffc;
+  color: #ffffff;
+  border: none;
 }
 #news-header {
   font-weight: bold;

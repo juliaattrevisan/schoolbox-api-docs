@@ -306,7 +306,6 @@ if (is_array($items)) {
             /* The usual stuff
              */
             $fullname = $userHandler->formatName($article);
-            $owner = "<a href=\"/search/user/{$article['uid']}\">$fullname</a>";
 
             $url = new Url($previous['topicName']);
 
@@ -315,7 +314,9 @@ if (is_array($items)) {
             $output = array(
                 'NEWS_ID' => $article['item_id'],
                 'NEWS_TITLE' => $article['item_heading'],
-                'POSTER' => $owner,
+                'POSTER' => $fullname,
+                'POSTER_ID' => $article['uid'],
+                'POSTER_EXTERNAL_ID' => $article['synid'],
                 'DATETIME' => $_SESSION['su'] == 1 ? $article['post_datetime'] : $article['post_datetime'],
                 'NEWS_BODY' => $archive ? $article['item_body'] : Scrub::html($article['item_body']),
                 'TOPIC_NAME' => Scrub::text($previous['topicName']),
