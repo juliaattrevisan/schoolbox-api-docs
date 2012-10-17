@@ -23,15 +23,18 @@ class Component_Dashboard_WeatherController extends Component_Dashboard_Controll
 
 
     public function execute () {
-        if(!$this->weatherController->guessLocation($this->getConfig('url'))) {
+        if(!Cfg::get('weather_enable')) {
             return false;
         }
-        if(Cfg::get('weather_enable')) {
-            $this->weather = $this->weatherController->getForecast();
-            $this->forecastDays = $this->getConfig('size');
-            return true;
+
+        $guessLocation = $this->getConfig('url') ? $this->getConfig('url') : Cfg::get('weather_location');
+        if(!$this->weatherController->guessLocation($guessLocation)) {
+            return false;
         }
-        return false;
+
+        $this->weather = $this->weatherController->getForecast();
+        $this->forecastDays = $this->getConfig('size');
+        return true;
     }
 
 
