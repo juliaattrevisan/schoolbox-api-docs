@@ -26,7 +26,6 @@ class Calendar_Month_List_Default extends Calendar_Month_Abstract {
 
         $this->getPage()->setBlock(TEMPLATE_content, "day", "day_block");
         $this->getPage()->setBlock("day", "note", "note_block");
-        $this->getPage()->setBlock("note", "time", "time_block");
         $this->getPage()->setBlock("note", "attendance_icon", "attendance_icon_block");
         $this->getPage()->setBlock("note", "attendance_status", "attendance_status_block");
         $this->getPage()->setBlock("note", "attendance_request_button", "attendance_request_button_block");

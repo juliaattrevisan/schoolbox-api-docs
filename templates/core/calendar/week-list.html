@@ -8,8 +8,8 @@
             var data = button.parent('form').serialize();
 
             $j.post('/service/attendance/processToggleAttendance', data, function (data) {
-                if ( data.error == undefined ) {
-                    if ( button.text() == 'Attend' ) {
+                if (data.error == undefined) {
+                    if (button.text() == 'Attend') {
                         button.html('<span></span>Unattend');
                     }
                     else {
@@ -17,22 +17,21 @@
                     }
                 }
             });
-        } );
+        });
     });
 </script>
-
 
 
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
 <script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
-<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css"/>
 <script type="text/javascript">
-	$j(function () {
-		setupCalendar.calendarFormat = "{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}";
-		setupCalendar.calendarImageURL = "/images/core/calendar/calendar-click.png";
-		setupCalendar.calendarView = 'week';
- 		setupCalendar.init();
+    $j(function () {
+        setupCalendar.calendarFormat = "{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}";
+        setupCalendar.calendarImageURL = "/images/core/calendar/calendar-click.png";
+        setupCalendar.calendarView = 'week';
+        setupCalendar.init();
 
         $j('a.attendance-request').live('click', function (event) {
             event.preventDefault();
@@ -42,8 +41,8 @@
             var data = button.parent('form').serialize();
 
             $j.post('/service/attendance/processToggleAttendance', data, function (data) {
-                if ( data.error == undefined ) {
-                    if ( button.text() == 'Attend' ) {
+                if (data.error == undefined) {
+                    if (button.text() == 'Attend') {
                         button.html('<span></span>Unattend');
                     }
                     else {
@@ -52,84 +51,97 @@
                 }
             });
         });
-	});
+    });
 </script>
 <!-- END custom_head -->
 
 <div class="calendar">
-	<div class="calendar-controls clearfix">
-		<div class="float-left clearfix">
+    <div class="calendar-controls clearfix">
+        <div class="float-left clearfix">
 
-			<a class="back" href="/calendar/week-list/{BACK}" title="Back one week"><strong>&lt;&lt;</strong></a>
+            <a class="back" href="/calendar/week-list/{BACK}" title="Back one week"><strong>&lt;&lt;</strong></a>
 
-			<div class="datepicker-box">
-				<input type="hidden" class="datepicker" />
-			</div>
+            <div class="datepicker-box">
+                <input type="hidden" class="datepicker"/>
+            </div>
 
-			<a class="forward" href="/calendar/week-list/{FORWARD}" title="Forward one week"><strong>&gt;&gt;</strong></a>
-		</div>
-		<div class="float-right">
-			<div class="link-case">
-				<a class="filter-change month" href="/calendar/month/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}"><span></span>Month</a>
-				<a class="filter-change week" href="/calendar/week/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}" ><span></span>Week</a>
+            <a class="forward" href="/calendar/week-list/{FORWARD}" title="Forward one week"><strong>
+                &gt;&gt;</strong></a>
+        </div>
+        <div class="float-right">
+            <div class="link-case">
+                <a class="filter-change month"
+                   href="/calendar/month/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}"><span></span>Month</a>
+                <a class="filter-change week"
+                   href="/calendar/week/{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}"><span></span>Week</a>
                 <a class="filter-change list current" href="#"><span></span>List</a>
-				<a class="filter-change filters" href="#"><span></span>Filters</a>
-				<a class="btn print print-it filter-change" href="#"><span></span>Print</a>
-				<div class="filter-drop clearfix">
-					<div class="filter-list">
-						<form class="clearfix">
-							<div class="filter-cat groups clearfix">
-								<span>Groups</span>
-								<!-- BEGIN group -->
-								<label title="{GROUP_NAME}">
-									<input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}" {GROUP_ID_SELECTED} class="checkbox applyFilters"/>
-									{GROUP_NAME}
-								</label>
-								<!-- END group -->
-							</div>
-							<div class="filter-cat campus">
-								<span>Campus</span>
-								<!-- BEGIN campus -->
-								<label title="{CAMPUS_NAME}">
-									<input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="checkbox applyFilters"/>
-									{CAMPUS_NAME}
-								</label>
-								<!-- END campus -->
-							</div>
-							<div class="filter-cat events last">
-								<span>Event</span>
-								<!-- BEGIN event_type -->
-								<label title="{EVENT_TYPE_NAME}">
-									<input type="checkbox" name="events" id="{EVENT_TYPE_ID}" {EVENT_TYPE_ID_SELECTED} value="type{EVENT_TYPE_ID}" class="checkbox applyFilters"/>
-									<span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span>
-								</label>
-								<!-- END event_type -->
-							</div>
-							<!--/filter-list-->
-						</form>
-						<p class="clearfix"><a href="#" id="applyFilters" class="btn float-right"><span></span>Apply Filters</a></p>
-						<!--/filter-drop-->
-					</div>
-				</div>
-			</div>
-		</div>
-		<h3>{MONTH}</h3>
-	</div>
+                <a class="filter-change filters" href="#"><span></span>Filters</a>
+                <a class="btn print print-it filter-change" href="#"><span></span>Print</a>
+
+                <div class="filter-drop clearfix">
+                    <div class="filter-list">
+                        <form class="clearfix">
+                            <div class="filter-cat groups clearfix">
+                                <span>Groups</span>
+                                <!-- BEGIN group -->
+                                <label title="{GROUP_NAME}">
+                                    <input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}"
+                                    {GROUP_ID_SELECTED} class="checkbox applyFilters"/>
+                                    {GROUP_NAME}
+                                </label>
+                                <!-- END group -->
+                            </div>
+                            <div class="filter-cat campus">
+                                <span>Campus</span>
+                                <!-- BEGIN campus -->
+                                <label title="{CAMPUS_NAME}">
+                                    <input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}
+                                    value="campus{CAMPUS_ID}" class="checkbox applyFilters"/>
+                                    {CAMPUS_NAME}
+                                </label>
+                                <!-- END campus -->
+                            </div>
+                            <div class="filter-cat events last">
+                                <span>Event</span>
+                                <!-- BEGIN event_type -->
+                                <label title="{EVENT_TYPE_NAME}">
+                                    <input type="checkbox" name="events" id="{EVENT_TYPE_ID}" {EVENT_TYPE_ID_SELECTED}
+                                    value="type{EVENT_TYPE_ID}" class="checkbox applyFilters"/>
+                                    <span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span>
+                                </label>
+                                <!-- END event_type -->
+                            </div>
+                            <!--/filter-list-->
+                        </form>
+                        <p class="clearfix"><a href="#" id="applyFilters" class="btn float-right"><span></span>Apply
+                            Filters</a></p>
+                        <!--/filter-drop-->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h3>{MONTH}</h3>
+    </div>
 
     <!-- BEGIN day -->
     <div class="box text clearfix calendar">
         <h2><a href="/calendar/week/">{DATE}</a></span></h2>
+
         <div class="listing">
             <ul class="js_happening">
                 <!-- BEGIN note -->
                 <li class="{ON_OFF} clearfix">
-                    <span class="eventListing"><strong>{START_TIME}</strong> <span style="background-color:{COLOUR}">{NOTE} <!-- BEGIN attendance_icon --><span class="float-right">A</span><!-- END attendance_icon --></span></span>
+                    <span class="eventListing"><strong>{TIME}</strong> <span style="background-color:{COLOUR}">{NOTE} <!-- BEGIN attendance_icon --><span
+                            class="float-right">A</span><!-- END attendance_icon --></span></span>
+
                     <div class="hidden-fields clearfix">
                         <h3>{NOTE}</h3>
-                        <!-- BEGIN time --><h4>{TIME}</h4><!-- END time -->
+                        <h4>{FULL_TIME}</h4>
                         <em>{LOCATION}</em>
-                        <p class="meta">Event Type: {TYPE}<br />
-                            <span class="created">Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a></span><br />
+
+                        <p class="meta">Event Type: {TYPE}<br/>
+                            <span class="created">Created by: <a
+                                    href="/search/user/{AUTHOR_ID}">{AUTHOR}</a></span><br/>
                             {DETAIL}
                         </p>
                         <!-- BEGIN has_category -->
@@ -149,12 +161,11 @@
                             <!-- END attendance_request_button -->
 
                             <!-- BEGIN attendance_list_button -->
-                            <a class="btn groups float-left" href="/calendar/attendance/list/{EVENT_ID}"><span></span>Attendance List</a>
+                            <a class="btn groups float-left" href="/calendar/attendance/list/{EVENT_ID}"><span></span>Attendance
+                                List</a>
                             <!-- END attendance_list_button -->
 
-                            <!-- BEGIN modify_link -->
-                            <a class="btn modify float-left" href="/calendar/modify.php?eventID={EVENT_ID}&returnTo=month"><span></span>Modify</a>
-                            <!-- END modify_link -->
+                            {MODIFY}
                         </div>
                     </div>
                 </li>

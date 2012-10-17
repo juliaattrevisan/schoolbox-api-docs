@@ -8,13 +8,16 @@
  * When adding a new type of event collection e.g. getDayEvents(),
  * add it here first.
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 interface Calendar_Api_Interface {
-	public function getDayEvents($currentDay);
-	public function getStudentBirthdays($currentDay);
-	public function getSubmissionEvents($currentDay);
+    public function getSubmissionEvents($currentDay);
+
+    public function getStudentBirthdays($currentDay);
+
+    public function getDayEvents($currentDay);
+
 }

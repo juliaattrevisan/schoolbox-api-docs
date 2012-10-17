@@ -6,7 +6,7 @@
     $j(function () {
         setupCalendar.calendarFormat = "{SELECTED_DAY}-{SELECTED_MONTH}-{SELECTED_YEAR}";
         setupCalendar.calendarImageURL = "/images/core/calendar/calendar-click.png";
-		setupCalendar.calendarView = 'month';
+        setupCalendar.calendarView = 'month';
         setupCalendar.init();
 
         $j('a.attendance-request').live('click', function (event) {
@@ -114,19 +114,19 @@
                         </span>
 
                         <div class="hidden-fields clearfix">
-                            <h4><!-- BEGIN time -->
-                                <div class="time"><strong>{TIME}</strong></div>
-                                <!-- END time -->
+                            <h4>
+                                <div class="time"><strong>{FULL_TIME}</strong></div>
 
-								<p>
-									<em>{LOCATION}</em>
-								</p>
 
-								{NOTE}
+                                <p>
+                                    <em>{LOCATION}</em>
+                                </p>
+
+                                {NOTE}
                             </h4>
                             <p class="meta">Event Type: {TYPE}<br/>
                                 Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a><br/>
-								{DETAIL}
+                                {DETAIL}
                             </p>
 
                             <!-- BEGIN has_category -->
@@ -152,9 +152,7 @@
                                    href="/calendar/attendance/list/{EVENT_ID}"><span></span>Attendance List</a>
                                 <!-- END attendance_list_button -->
 
-                                <!-- BEGIN modify_link -->
-                                <a class="btn modify float-left" href="/calendar/modify.php?eventID={EVENT_ID}&returnTo=month"><span></span>Modify</a>
-                                <!-- END modify_link -->
+                                {MODIFY}
                             </div>
                         </div>
 

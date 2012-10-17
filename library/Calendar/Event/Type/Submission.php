@@ -6,140 +6,176 @@
  * the data structure from rendering methodology in a highly granular environment
  * without needing to use singletons.
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 class Calendar_Event_Type_Submission extends Calendar_Event_Type_Abstract {
 
-	/* Renderer
-	 */
-	protected $rendererClass = 'Calendar_Event_Type_Submission_Renderer';
+    /* Renderer
+     */
+    protected $rendererClass = 'Calendar_Event_Type_Submission_Renderer';
 
-	/* Contextual: The date for submissions
-	 */
-	protected $date = null;
+    /* Contextual: The date for submissions
+     */
+    protected $date = null;
 
-	/* Contextual: The owner of the submission box
- 	 */
-	protected $authorId = -1;
-	protected $authorName = '';
+    /* Contextual: The owner of the submission box
+      */
+    protected $authorId = -1;
+    protected $authorName = '';
 
-	/* Category to which this submission box belongs
-	 */
-	protected $categoryName = '';
+    /* Category to which this submission box belongs
+     */
+    protected $categoryName = '';
 
-	/* TODO: Hardcoded?
-	 */
-	protected $eventType = 'Due Work';
+    /* TODO: Hardcoded?
+     */
+    protected $eventType = 'Due Work';
 
-	/* CSV string of class (category) codes
-	 */
-	private $categoryCodes = '';
+    /* CSV string of class (category) codes
+     */
+    private $categoryCodes = array();
 
-	/* Submission box information
-	 */
-	private $submissionBoxId = -1;
-	private $submissionBoxName = '';
+    /* Submission box information
+     */
+    private $submissionBoxId = -1;
+    private $submissionBoxName = '';
+    private $submissionBoxDetail = '';
 
-	/**
-	 * Render via external class
-	 *
-	 * @param \Calendar_Event_Submission_Renderer $visitor
-	 */
-	public function accept($visitor) {
-		$visitor->visit($this);
-	}
+    /**
+     * Render via external class
+     *
+     * @param \Calendar_Event_Submission_Renderer $visitor
+     */
+    public function accept($visitor) {
+        $visitor->visit($this);
+    }
 
-	/**
-	 * Set submission note
-	 */
-	public function setSubmissionNote() {
+    /**
+     * Get submission note
+     */
+    public function getNote() {
 
-		/* Optional categoryCodes suffix
-		 */
-		if (count($this->getCategoryCodes())) {
-			$extended = ' (' . implode(', ',$this->getCategoryCodes()) . ')';
-		}
-		else {
-			$extended = '';
-		}
+        /* Optional categoryCodes suffix
+         */
 
-		$note = $this->getCategoryName() . $extended . '<br />' . $this->getSubmissionBoxName();
+        if (count($this->getCategoryCodes())) {
+            $extended = ' (' . implode(', ', $this->getCategoryCodes()) . ')';
+        } else {
+            $extended = '';
+        }
 
-		$this->setNote($note);
-	}
+        return Scrub::text($this->getCategoryName() . $extended) . '<br />' . Scrub::text(
+            $this->getSubmissionBoxName()
+        );
+    }
 
-	/**
-	 * Special time formattng
-	 *
-	 * @return string
-	 */
-	public function getDerivedTime() {
-		$formatted = $this->getDate()->getUsingFormat('g:iA');
+    /**
+     * Special time formattng
+     *
+     * @return string
+     */
+    public function getTime() {
+        $formattedTime = $this->getDate()->getUsingFormat('g:iA');
 
-		if ($formatted != '11:59PM') {
-			return $formatted;
-		}
+        if ($formattedTime == '11:59PM') {
+            $formattedTime = false;
+        }
 
-		return '';
-	}
+        return $formattedTime;
+    }
 
-	/* Getters/Setters
-	 */
+    public function getFullDate() {
 
-	/**
-	 * Set category codes
-	 *
-	 * @param $categoryCodes
-	 */
-	public function setCategoryCodes($categoryCodes) {
-		$this->categoryCodes = explode(',',$categoryCodes);
-	}
+        $formattedTime = $this->getTime();
 
-	/**
-	 * Get category codes
-	 *
-	 * @return string
-	 */
-	public function getCategoryCodes() {
-		return $this->categoryCodes;
-	}
+        $startDate = $this->getDate()->getUsingFormat('l, jS F');
+        if ($formattedTime) {
+            $formattedTime = $startDate . ', ' . $formattedTime;
+        } else {
+            $formattedTime = $startDate;
+        }
 
-	/**
-	 * Set submission box id
-	 *
-	 * @param $submissionBoxId
-	 */
-	public function setSubmissionBoxId($submissionBoxId) {
-		$this->submissionBoxId = $submissionBoxId;
-	}
+        return $formattedTime;
+    }
 
-	/**
-	 * Get submission box id
-	 *
-	 * @return int
-	 */
-	public function getSubmissionBoxId() {
-		return $this->submissionBoxId;
-	}
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set submission box name
-	 *
-	 * @param $submissionBoxName
-	 */
-	public function setSubmissionBoxName($submissionBoxName) {
-		$this->submissionBoxName = $submissionBoxName;
-	}
+    /**
+     * Set category codes
+     *
+     * @param $categoryCodes
+     */
+    public function setCategoryCodes($categoryCodes) {
+        if ($categoryCodes) {
+            $this->categoryCodes = explode(',', $categoryCodes);
+        }
+    }
 
-	/**
-	 * Get submission box name
-	 *
-	 * @return string
-	 */
-	public function getSubmissionBoxName() {
-		return $this->submissionBoxName;
-	}
+    /**
+     * Get category codes
+     *
+     * @return string
+     */
+    public function getCategoryCodes() {
+        return $this->categoryCodes;
+    }
+
+    /**
+     * Set submission box id
+     *
+     * @param $submissionBoxId
+     */
+    public function setSubmissionBoxId($submissionBoxId) {
+        $this->submissionBoxId = $submissionBoxId;
+    }
+
+    /**
+     * Get submission box id
+     *
+     * @return int
+     */
+    public function getSubmissionBoxId() {
+        return $this->submissionBoxId;
+    }
+
+    /**
+     * Set submission box name
+     *
+     * @param $submissionBoxName
+     */
+    public function setSubmissionBoxName($submissionBoxName) {
+        $this->submissionBoxName = $submissionBoxName;
+    }
+
+
+    /**
+     * Get submission box name
+     *
+     * @return string
+     */
+    public function getSubmissionBoxName() {
+        return $this->submissionBoxName;
+    }
+
+    /**
+     * Set submission box detail
+     *
+     * @param $submissionBoxName
+     */
+    public function setSubmissionBoxDetail($submissionBoxDetail) {
+        $this->submissionBoxDetail = $submissionBoxDetail;
+    }
+
+    /**
+     * Get submission box name
+     *
+     * @return string
+     */
+    public function getSubmissionBoxDetail() {
+        return $this->submissionBoxDetail;
+    }
 }

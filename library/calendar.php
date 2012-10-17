@@ -457,24 +457,6 @@ class Calendar extends DeprecatedModel {
             }
 
             $submissions = $this->db->getAll($query);
-
-            if (!empty($submissions)) {
-                /* Convert date fields and set status */
-                $date_fields = array('open_date', 'date', 'created', 'late_date', 'submitted', 'returned');
-
-                foreach ($submissions as &$submission) {
-                    if (!empty($submission['returned'])) {
-                        $submission['status'] = 3;
-                        $submission['relevant_date'] = $submission['returned'];
-                    } elseif (!empty($submission['submitted'])) {
-                        $submission['status'] = 2;
-                        $submission['relevant_date'] = $submission['submitted'];
-                    } else {
-                        $submission['status'] = 1;
-                        $submission['relevant_date'] = $submission['date'];
-                    }
-                }
-            }
         }
 
         /* Standardised output
@@ -492,7 +474,7 @@ class Calendar extends DeprecatedModel {
                 $event->setAuthorName($submission['firstname'] . ' ' . $submission['lastname']);
                 $event->setSubmissionBoxId($submission['id']);
                 $event->setSubmissionBoxName($submission['name']);
-                $event->setSubmissionNote();
+                $event->setSubmissionBoxDetail($submission['description']);
                 $event->setColour($this->displayColour(4));
                 $event->setStartTime(new Alaress_Date_Format($submission['date'], 'y-m-d h:i:s'));
 
@@ -693,8 +675,16 @@ class Calendar extends DeprecatedModel {
                 $event->setColour($currentEvent['eventColour']);
                 $event->setPublishDate($currentEvent['publish_date']);
                 $event->setSid($currentEvent['sid']);
-                $event->setCategoryId($currentEvent['categoryId']);
-                $event->setCategoryname($currentEvent['categoryName']);
+                if ($this->getPerm($currentEvent) > 1) {
+                    $event->setIsEditable(true);
+                } else {
+                    $event->setIsEditable(false);
+                }
+
+                if ($currentEvent['type'] == 2) {
+                    $event->setCategoryId($currentEvent['categoryId']);
+                    $event->setCategoryname($currentEvent['categoryName']);
+                }
                 $event->setAttendance($currentEvent['attendance']);
 
                 $stack->add($event);
