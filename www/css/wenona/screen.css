@@ -458,7 +458,8 @@ h2, .calendar-controls {
 	text-decoration: none;
 }
 
-#nav li a:hover {
+#nav li a:hover,
+.topic-list li a.selected {
 	background-color: #9CC7DE;
 	text-decoration: none;
 }
@@ -608,7 +609,11 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
  */
 .calendar table .dark,
 .otherMonth,
-.past
+.past,
+.timetable th,
+.top .listing .dark,
+.right .listing .dark,
+.left .listing .dark
 {
     background: #ECECEC;
 }
@@ -618,12 +623,21 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 .calendar table,
 .left #calendar table.duedates-calendar td,
 .left #calendar table.duedates-calendar,
-#calendar table th.dark
+#calendar table th.dark,
+table tr,
+.listing li,
+.listing .subject-list li,
+.listing .subject-list a,
+.listing .subject-list a.teacher,
+ul.activity-list li,
+.timetable td, .timetable th,
+.forum .comments li, .blog .comments li
 {
     border-color: #ECECEC;
 }
 .calendar table thead th,
-#calendar table th.dark
+#calendar table th.dark,
+.timetable thead th
 {
     border-bottom-color: #ECECEC;
 }

@@ -213,7 +213,8 @@ a{color:#0076fa;}
     background: none repeat scroll 0 0 #fcfbf2;
 }
 
-#category li a.selected, #tabs-sub li.ui-tabs-selected a {background:#004b93; color:#ffffff;}
+#category li a.selected, #tabs-sub li.ui-tabs-selected a,
+.topic-list li a.selected {background:#004b93; color:#ffffff;}
 .submit-btn-plain {
 
 	background-color: #eff4f8;
@@ -305,7 +306,11 @@ Home page icons
  */
 .calendar table .dark,
 .otherMonth,
-.past
+.past,
+.timetable th,
+.top .listing .dark,
+.right .listing .dark,
+.left .listing .dark
 {
     background: #FCFBF2;
 }
@@ -321,12 +326,15 @@ table tr,
 .listing .subject-list li,
 .listing .subject-list a,
 .listing .subject-list a.teacher,
-ul.activity-list li
+ul.activity-list li,
+.timetable td, .timetable th,
+.forum .comments li, .blog .comments li
 {
     border-color: #F2F6F9;
 }
 .calendar table thead th,
-#calendar table th.dark
+#calendar table th.dark,
+.timetable thead th
 {
     border-bottom-color: #D4E1ED;
 }

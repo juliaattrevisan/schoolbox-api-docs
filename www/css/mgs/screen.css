@@ -52,7 +52,8 @@ a:hover { color: #0066CC; }
 
 #category li a { border:1px solid #888; }
 
-#category li a.selected {
+#category li a.selected,
+.topic-list li a.selected {
 	background-color:#1F2482;
 	color: #fff;
 }

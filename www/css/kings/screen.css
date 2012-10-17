@@ -278,7 +278,8 @@ h3, #nav h3, .add-component .notification { color: #FFFFFF; }
 	box-shadow: 0px -1px 1px #bdbdbd;
 }
 
-#tabs-homepage li.ui-state-default a {
+#tabs-homepage li.ui-state-default a,
+.topic-list li a.selected  {
 	background-color: #0053A0;
 	color: #FFFFFF;
 }

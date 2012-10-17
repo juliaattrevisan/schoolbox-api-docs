@@ -240,7 +240,8 @@ h2, .calendar-controls {
 
 #wrap-inner { padding-bottom:0; }
 
-#nav ul ul a { background:#1965B3; }
+#nav ul ul a,
+.topic-list li a.selected { background:#1965B3; }
 
 #nav li a:hover { background-color: #1965b4; }
 
@@ -505,7 +506,11 @@ td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box {
  */
 .calendar table .dark,
 .otherMonth,
-.past
+.past,
+.timetable th,
+.top .listing .dark,
+.right .listing .dark,
+.left .listing .dark
 {
     background: #ECECEC;
 }
@@ -521,12 +526,15 @@ table tr,
 .listing .subject-list li,
 .listing .subject-list a,
 .listing .subject-list a.teacher,
-ul.activity-list li
+ul.activity-list li,
+.timetable td, .timetable th,
+.forum .comments li, .blog .comments li
 {
     border-color: #ECECEC;
 }
 .calendar table thead th,
-#calendar table th.dark
+#calendar table th.dark,
+.timetable thead th
 {
     border-bottom-color: #ECECEC;
 }

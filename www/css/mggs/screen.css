@@ -196,7 +196,8 @@ a{
 #tabs-homepage li.ui-state-default a{font-size:14px; padding:8px 16px}
 #tabs-sub li.ui-state-default a{padding:8px 0 8px 16px; font-size:12px;}
 
-#month-view td.dark, #week-view td.dark { background:#00529c; color:#fff; }
+#month-view td.dark, #week-view td.dark,
+.topic-list li a.selected  { background:#00529c; color:#fff; }
 
 #month-view td:first-child,
 #week-view td:first-child{
@@ -916,10 +917,15 @@ MORRIS LIBRARY
  */
 .calendar table .dark,
 .otherMonth,
-.past
+.past,
+.timetable th,
+.top .listing .dark,
+.right .listing .dark,
+.left .listing .dark
 {
     background: #F2F6FA;
 }
+
 .calendar table thead th,
 .day-block,
 .calendar table,
@@ -931,12 +937,15 @@ table tr,
 .listing .subject-list li,
 .listing .subject-list a,
 .listing .subject-list a.teacher,
-ul.activity-list li
+ul.activity-list li,
+.timetable td, .timetable th,
+.forum .comments li, .blog .comments li
 {
     border-color: #F2F6FA;
 }
 .calendar table thead th,
-#calendar table th.dark
+#calendar table th.dark,
+.timetable thead th
 {
     border-bottom-color: #F2F6FA;
 }

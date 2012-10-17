@@ -3910,7 +3910,7 @@ BLOG COMPONENT
 }
 .blog .dark .dark,
 .news .dark .dark {
-  background: #eaeaea !important;
+  background: rgba(0, 0, 0, 0.05) !important;
 }
 .forum .comments,
 .blog .comments {
@@ -6262,6 +6262,7 @@ dd {
 }
 .timetable th {
   background: #fafafa;
+  vertical-align: top;
 }
 .timetable .dayCurrent {
   background: #ffffe5;

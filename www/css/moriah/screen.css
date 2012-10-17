@@ -294,7 +294,7 @@ h3, #nav h3, .add-component .notification { color: #FFFFFF; }
 	color: #0066B0;
 }
 
-#tabs-homepage #tabs-sub .ui-tabs-nav li a {
+#tabs-homepage #tabs-sub .ui-tabs-nav li a,.topic-list li a.selected {
 	margin-bottom:4px;
 	color:#fff;
 	background:#579dcf;
@@ -304,6 +304,7 @@ h3, #nav h3, .add-component .notification { color: #FFFFFF; }
 	-webkit-box-shadow: none;
 	box-shadow: none;
 }
+.topic-list li a.selected { margin-bottom: 0;}
 
 #tabs-homepage #tabs-sub .ui-tabs-nav li.ui-state-active a, #tabs-homepage #tabs-sub .ui-tabs-nav li a:hover, .colours-buttons { background:#0066b0; }
 
@@ -700,7 +701,11 @@ color: #0066B0;
  */
 .calendar table .dark,
 .otherMonth,
-.past
+.past,
+.timetable th,
+.top .listing .dark,
+.right .listing .dark,
+.left .listing .dark
 {
     background: #f2f6fa;
 }
@@ -716,12 +721,15 @@ table tr,
 .listing .subject-list li,
 .listing .subject-list a,
 .listing .subject-list a.teacher,
-ul.activity-list li
+ul.activity-list li,
+.timetable td, .timetable th,
+.forum .comments li, .blog .comments li
 {
     border-color: #f2f6fa;
 }
 .calendar table thead th,
-#calendar table th.dark
+#calendar table th.dark,
+.timetable thead th
 {
     border-bottom-color: #f2f6fa;
 }

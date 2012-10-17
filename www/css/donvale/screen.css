@@ -384,7 +384,8 @@ h3, .add-component .notification {
 }
 
 #category li a.selected,
-#category li a:hover {
+#category li a:hover,
+.topic-list li a.selected {
 	background: #1d9ffc;
 	color: #fff;
 }
@@ -580,7 +581,11 @@ font-weight: bold;
  */
 .calendar table .dark,
 .otherMonth,
-.past
+.past,
+.timetable th,
+.top .listing .dark,
+.right .listing .dark,
+.left .listing .dark
 {
     background: #EDF2F6;
 }
@@ -596,12 +601,15 @@ table tr,
 .listing .subject-list li,
 .listing .subject-list a,
 .listing .subject-list a.teacher,
-ul.activity-list li
+ul.activity-list li,
+.timetable td, .timetable th,
+.forum .comments li, .blog .comments li
 {
     border-color: #BACBD6;
 }
 .calendar table thead th,
-#calendar table th.dark
+#calendar table th.dark,
+.timetable thead th
 {
     border-bottom-color: #BACBD6;
 }

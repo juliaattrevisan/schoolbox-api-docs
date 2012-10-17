@@ -2,17 +2,17 @@
 <h1>Timetable for {PERSON}{YEAR}</h1>
 <table class="timetable" style="display:table">
     <thead>
-        <tr>
-            <th style="width:{TIMETABLE_FIELD_WIDTH}%;">&nbsp;</th>
-            <!-- BEGIN day_header -->
-            <th scope="col" style="width:{TIMETABLE_FIELD_WIDTH}%;">Day {DAY_NUMBER}</th>
+    <tr>
+        <th style="width:{TIMETABLE_FIELD_WIDTH}%;">&nbsp;</th>
+        <!-- BEGIN day_header -->
+            <th scope="col" class="{TIMETABLE_CLASS}" style="width:{TIMETABLE_FIELD_WIDTH}%;">Day {DAY_NUMBER}</th>
             <!-- END day_header -->
         </tr>
     </thead>
     <tbody>
         <!-- BEGIN period -->
         <tr>
-            <th scope="row">{PERIOD_NAME}
+            <th scope="row" class="{TIMETABLE_CLASS}">{PERIOD_NAME}
                 <span class="time">{PERIOD_START}&ndash;{PERIOD_END}</span>
             </th>
             <!-- BEGIN day -->

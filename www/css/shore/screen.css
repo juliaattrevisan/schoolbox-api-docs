@@ -433,7 +433,9 @@ p.interact a {
 .dark{background: #e4e4e4;}
 
 #category li{margin:7px 0;}
-#category li a.selected {
+#category li a.selected,
+.topic-list li a.selected
+{
     background-color:#003E7E;
     color: #fff;
 }
@@ -494,14 +496,19 @@ p.interact a {
 /*
  * Table border fixes
  */
-.calendar table .dark
-{
-    background: #E4E4E4;
-}
 .otherMonth,
 .past
 {
     background: #F7FBFF;
+}
+
+.calendar table .dark,
+.timetable th,
+.top .listing .dark,
+.right .listing .dark,
+.left .listing .dark
+{
+    background: #E4E4E4;
 }
 
 .calendar table thead th,
@@ -515,12 +522,15 @@ table tr,
 .listing .subject-list li,
 .listing .subject-list a,
 .listing .subject-list a.teacher,
-ul.activity-list li
+ul.activity-list li,
+.timetable td, .timetable th,
+.forum .comments li, .blog .comments li
 {
     border-color: #E4E4E4;
 }
 .calendar table thead th,
-#calendar table th.dark
+#calendar table th.dark,
+.timetable thead th
 {
     border-bottom-color: #E4E4E4;
 }

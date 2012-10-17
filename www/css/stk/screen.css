@@ -133,7 +133,9 @@ h3, #nav h3, .add-component .notification {
     border-radius:0;
 }
 
-#tabs-homepage li.ui-state-default a {
+#tabs-homepage li.ui-state-default a,
+.topic-list li a.selected
+{
     background-color: #eee;
     color: #002B5C;
     -moz-border-radius: 0;
