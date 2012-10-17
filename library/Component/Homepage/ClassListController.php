@@ -28,7 +28,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
      * @return boolean
      */
     public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'classList')) {
+        if (!parent::loadTemplate($templateHandle, 'classList')) {
             return false;
         }
         $this->parseConfig();
@@ -45,19 +45,22 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
         $this->setVar('has_portrait_block', '');
         $this->setVar('has_group_block', '');
         $this->setVar('person_block', '');
+        $this->setVar('student_email_block', '');
+        $this->setVar('parent_email_block', '');
+
 
         /* Display options
          */
         $displayOptions = array(
             'grid' => array(
-                'name'  => 'Grid',
+                'name' => 'Grid',
                 'value' => 'grid',
-                'css'   => 'thumb',
+                'css' => 'thumb',
             ),
             'list' => array(
-                'name'  => 'List',
+                'name' => 'List',
                 'value' => 'list',
-                'css'   => 'bar',
+                'css' => 'bar',
             ),
         );
 
@@ -91,21 +94,22 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                         $allStudentEmails[] = $email;
                     }
 
-                    $this->setVar(array(
-                        'PERSON_UID'         => $user['uid'],
-                        'PERSON_EXTERNAL_ID' => $user['synergy_id'],
-                        'PERSON_NAME'        => $name,
-                        'PERSON_GROUP'       => $user['gname'],
-                        'LIST_STYLE'         => $displayOptions[$this->getConfig('displayPortraits')]['css'],
-                    ));
+                    $this->setVar(
+                        array(
+                            'PERSON_UID' => $user['uid'],
+                            'PERSON_EXTERNAL_ID' => $user['synergy_id'],
+                            'PERSON_NAME' => $name,
+                            'PERSON_GROUP' => $user['gname'],
+                            'LIST_STYLE' => $displayOptions[$this->getConfig('displayPortraits')]['css'],
+                        )
+                    );
 
                     /* Don't display images in list view
                         */
                     if ($this->getConfig('displayPortraits') == 'grid') {
                         $this->parse('has_portrait_block', 'has_portrait');
                         $this->parse('has_group_block', 'has_group');
-                    }
-                    else {
+                    } else {
                         $this->setVar('has_portrait_block', '');
                         $this->setVar('has_group_block', '');
                     }
@@ -124,14 +128,15 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             /* Student bulk email
               */
             if ($this->groupHandler->isStaff()) {
-                $this->setVar(array(
-                    'REPLY_TO'           => $emailHandler->formatEmailFromArray($_SESSION),
-                    'EMAIL_ALL_STUDENTS' => $emailAllStudents,
-                ));
+                $this->setVar(
+                    array(
+                        'REPLY_TO' => $emailHandler->formatEmailFromArray($_SESSION),
+                        'EMAIL_ALL_STUDENTS' => $emailAllStudents,
+                    )
+                );
 
                 $this->parse('student_email_block', 'student_email');
-            }
-            else {
+            } else {
                 $this->setVar('student_email_block', '');
             }
 
@@ -145,7 +150,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                 $allParents = $externalHandler->getParentsOf($allSynergyIds);
 
                 if (is_array($allParents) && count($allParents)) {
-                    foreach($allParents as $currentParent) {
+                    foreach ($allParents as $currentParent) {
                         $email = trim($currentParent['StudentContactDefaultEmail']);
 
                         if (strlen($email)) {
@@ -158,20 +163,20 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                     $emailAllParents = implode(', ', array_filter(array_unique($allParentEmails)));
                 }
 
-                $this->setVar(array(
-                    'REPLY_TO'          => $emailHandler->formatEmailFromArray($_SESSION),
-                    'EMAIL_ALL_PARENTS' => $emailAllParents,
-                ));
+                $this->setVar(
+                    array(
+                        'REPLY_TO' => $emailHandler->formatEmailFromArray($_SESSION),
+                        'EMAIL_ALL_PARENTS' => $emailAllParents,
+                    )
+                );
 
                 $this->parse('parent_email_block', 'parent_email');
-            }
-            else {
+            } else {
                 $this->setVar('parent_email_block', '');
             }
-        }
-        else {
+        } else {
             $this->setVar('student_block', '');
-            $this->setVar('student_email_block','');
+            $this->setVar('student_email_block', '');
         }
 
 
