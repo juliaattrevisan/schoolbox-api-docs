@@ -637,8 +637,11 @@ class Submission extends DeprecatedModel {
     }
 
     function getBoxCount($box_id) {
-        $query = "SELECT COUNT(*) AS total, SUM(marked) AS marked FROM student_submission WHERE box_id = '" . $box_id . "'";
-        return $this->db->getRow($query);
+        $query = "SELECT COUNT(DISTINCT(owner)) FROM student_submission WHERE box_id = '" . $box_id . "'";
+        $count['total'] = $this->db->getOne($query);
+        $query = "SELECT COUNT(DISTINCT(owner)) FROM submission_return WHERE box_id = '$box_id'";
+        $count['marked'] = $this->db->getOne($query);
+        return $count;
     }
 
     function getTypes() {
