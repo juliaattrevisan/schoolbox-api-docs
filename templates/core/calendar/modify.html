@@ -3,43 +3,32 @@
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css"/>
 <script type="text/javascript">
 
-    function confirmDelete(eventID) {
+function confirmDelete(eventID) {
 
 
 
-        /*
-         if (confirm('Delete this event?')) {
-         window.open('/calendar/modify.php?delete=' + eventID + '&return={RETURN_TO}', '_self', '');
-         }
-         */
-    }
+    /*
+     if (confirm('Delete this event?')) {
+     window.open('/calendar/modify.php?delete=' + eventID + '&return={RETURN_TO}', '_self', '');
+     }
+     */
+}
 
-    $j(function () {
+$j(function () {
 
-        $j('#level').change(function () {
-            $j('#groupDrop, #campusList, #groupList, #attendance').hide();
-
-            if ($j('#level').val() == '1') {
-                var attendance_input = $j('#attendance input');
-                attendance_input.removeAttr('checked');
-
-                if (attendance_input.parent().hasClass('active-checkbox')) {
-                    attendance_input.parent().removeClass('active-checkbox')
-
-                } else {
-                    attendance_input.parent().addClass('active-checkbox');
-                }
-            }
-            else if ($j('#level').val() == "2") {
-                $j('#groupDrop, #attendance').show()
-            }
-            else if ($j('#level').val() == "3") {
-                $j('#campusList, #groupList, #attendance').show()
-            }
-        });
+    $j('#level').change(function () {
+        $j('#groupDrop, #campusList, #groupList, #attendance').hide();
 
         if ($j('#level').val() == '1') {
-            $j('#attendance input').removeAttr('checked');
+            var attendance_input = $j('#attendance input');
+            attendance_input.removeAttr('checked');
+
+            if (attendance_input.parent().hasClass('active-checkbox')) {
+                attendance_input.parent().removeClass('active-checkbox')
+
+            } else {
+                attendance_input.parent().addClass('active-checkbox');
+            }
         }
         else if ($j('#level').val() == "2") {
             $j('#groupDrop, #attendance').show()
@@ -47,164 +36,182 @@
         else if ($j('#level').val() == "3") {
             $j('#campusList, #groupList, #attendance').show()
         }
-
-        /* Datepickers for event date, repeat until and publish date
-         */
-        $j('#cal_date, #repeat_until, #publishDate').datepicker({
-            dateFormat:'dd/mm/yy',
-            showOn:'both',
-            buttonImage:'/images/core/calendar/calendar-click.png',
-            buttonImageOnly:true,
-            constrainInput:false,
-            onClose:function (string) {
-                var input = $j(this);
-
-                $j.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
-                    input.val(data.time);
-                })
-            }
-        });
-
-        //greenerising the checkboxes if they're ticked.
-        $j(':checkbox').each(function () {
-            if ($j(this).is(':checked')) {
-                $j(this).parent().addClass('active-checkbox');
-            }
-        });
-
-        $j(':checkbox').click(function () {
-            if ($j(this).parent().hasClass('active-checkbox')) {
-                $j(this).parent().removeClass('active-checkbox')
-
-            } else {
-                $j(this).parent().addClass('active-checkbox');
-            }
-        });
-
-        $j('#repeatUntilSelect').change(function () {
-
-            if ($j(this).val() !== '') {
-                $j('#repeatUntil').show();
-                $j("#repeat_until").rules("add", "required");
-            } else {
-                $j('#repeatUntil').hide();
-                $j("#repeat_until").rules("remove", "required");
-            }
-        });
-
-        var form = document.getElementById('#eventForm');
-
-        $j('#eventForm').validate({
-            submitHandler:function (form) {
-
-                // the desired action, and if this is a series event or not
-                var act = $j('#action').val();
-                var multi = $j('#repeat-reminder').length != 0;
-
-                // series
-                if (multi) {
-                    if (act == 'Update') {
-                        $j('.bulk-update').css('display', 'inline');
-                        $j('.bulk-delete').css('display', 'none');
-                        $j("#dialog-bulk").dialog({
-                            resizable:false,
-                            height:180,
-                            width:400,
-                            modal:true,
-                            draggable:false,
-                            buttons:{
-                                "Only this event":function () {
-                                    $j('#efficacy').val('self');
-                                    form.submit();
-                                },
-                                "All events in the series":function () {
-                                    $j('#efficacy').val('series');
-                                    form.submit();
-                                }
-                            },
-                            close:function () {
-                                return false;
-                            }
-                        });
-                    }
-                    else if (act == 'Delete') {
-                        $j('.bulk-update').css('display', 'none');
-                        $j('.bulk-delete').css('display', 'inline');
-                        $j("#dialog-bulk").dialog({
-                            resizable:false,
-                            height:140,
-                            width:400,
-                            modal:true,
-                            draggable:false,
-                            buttons:{
-                                "Only this event":function () {
-                                    $j('#efficacy').val('self');
-                                    form.submit();
-                                },
-                                "All events in the series":function () {
-                                    $j('#efficacy').val('series');
-                                    form.submit();
-                                }
-                            },
-                            close:function () {
-                                return false;
-                            }
-                        });
-                    }
-                }
-                // single event
-                else {
-                    if (act == 'Update') {
-                        form.submit();
-                    }
-                    else if (act == 'Delete') {
-                        $j("#dialog-delete").dialog({
-                            resizable:false,
-                            height:100,
-                            width:400,
-                            modal:true,
-                            draggable:false,
-                            buttons:{
-                                "Yes":function () {
-                                    form.submit();
-                                },
-                                "No":function () {
-                                    $j(this).dialog('close');
-                                    return false;
-                                }
-                            },
-                            close:function () {
-                                return false;
-                            }
-                        });
-                    }
-                    else {
-                        // add
-                        form.submit();
-                    }
-                }
-            }
-        });
-
-        $j('#b{FUNCTION}').click(function () {
-            $j('#action').val('{FUNCTION}');
-        });
-
-        $j('#bDelete').click(function () {
-            $j('#action').val('Delete');
-        });
-
-
     });
+
+    if ($j('#level').val() == '1') {
+        $j('#attendance input').removeAttr('checked');
+    }
+    else if ($j('#level').val() == "2") {
+        $j('#groupDrop, #attendance').show()
+    }
+    else if ($j('#level').val() == "3") {
+        $j('#campusList, #groupList, #attendance').show()
+    }
+
+    /* Datepickers for event date, repeat until and publish date
+     */
+    $j('#cal_date, #repeat_until, #publishDate').datepicker({
+        dateFormat:'dd/mm/yy',
+        showOn:'both',
+        buttonImage:'/images/core/calendar/calendar-click.png',
+        buttonImageOnly:true,
+        constrainInput:false,
+        onClose:function (string) {
+            var input = $j(this);
+
+            $j.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
+                input.val(data.time);
+            })
+        }
+    });
+
+    //greenerising the checkboxes if they're ticked.
+    $j(':checkbox').each(function () {
+        if ($j(this).is(':checked')) {
+            $j(this).parent().addClass('active-checkbox');
+        }
+    });
+
+    $j(':checkbox').click(function () {
+        if ($j(this).parent().hasClass('active-checkbox')) {
+            $j(this).parent().removeClass('active-checkbox')
+
+        } else {
+            $j(this).parent().addClass('active-checkbox');
+        }
+    });
+
+    $j('#repeatUntilSelect').change(function () {
+
+        if ($j(this).val() !== '') {
+            $j('#repeatUntil').show();
+            $j("#repeat_until").rules("add", "required");
+        } else {
+            $j('#repeatUntil').hide();
+            $j("#repeat_until").rules("remove", "required");
+        }
+    });
+
+    var form = document.getElementById('#eventForm');
+
+    $j('#eventForm').validate({
+        submitHandler:function (form) {
+
+            // the desired action, and if this is a series event or not
+            var act = $j('#action').val();
+            var multi = $j('#repeat-reminder').length != 0;
+
+            // series
+            if (multi) {
+                if (act == 'Update') {
+                    $j('.bulk-update').css('display', 'inline');
+                    $j('.bulk-delete').css('display', 'none');
+                    $j("#dialog-bulk").dialog({
+                        resizable:false,
+                        height:180,
+                        width:400,
+                        modal:true,
+                        draggable:false,
+                        buttons:{
+                            "Only this event":function () {
+                                $j('#efficacy').val('self');
+                                form.submit();
+                            },
+                            "All events in the series":function () {
+                                $j('#efficacy').val('series');
+                                form.submit();
+                            }
+                        },
+                        close:function () {
+                            return false;
+                        }
+                    });
+                }
+                else if (act == 'Delete') {
+                    $j('.bulk-update').css('display', 'none');
+                    $j('.bulk-delete').css('display', 'inline');
+                    $j("#dialog-bulk").dialog({
+                        resizable:false,
+                        height:140,
+                        width:400,
+                        modal:true,
+                        draggable:false,
+                        buttons:{
+                            "Only this event":function () {
+                                $j('#efficacy').val('self');
+                                form.submit();
+                            },
+                            "All events in the series":function () {
+                                $j('#efficacy').val('series');
+                                form.submit();
+                            }
+                        },
+                        close:function () {
+                            return false;
+                        }
+                    });
+                }
+            }
+            // single event
+            else {
+                if (act == 'Update') {
+                    form.submit();
+                }
+                else if (act == 'Delete') {
+                    $j("#dialog-delete").dialog({
+                        resizable:false,
+                        height:100,
+                        width:400,
+                        modal:true,
+                        draggable:false,
+                        buttons:{
+                            "Yes":function () {
+                                form.submit();
+                            },
+                            "No":function () {
+                                $j(this).dialog('close');
+                                return false;
+                            }
+                        },
+                        close:function () {
+                            return false;
+                        }
+                    });
+                }
+                else {
+                    // add
+                    form.submit();
+                }
+            }
+        }
+    });
+
+    $j('#b{FUNCTION}').click(function () {
+        $j('#action').val('{FUNCTION}');
+    });
+
+    $j('#bDelete').click(function () {
+        $j('#action').val('Delete');
+    });
+
+    $j('.customise').click(function (event) {
+        event.preventDefault();
+        $j(this).children('span').toggle();
+        $j('.advanced').toggle();
+        if ($j('.advanced').is(':visible')) {
+            $j('.advanced').children('td').delay(1000).animate({opacity:'1'});
+        } else {
+            $j('.advanced').queue('fx', []);
+        }
+    });
+
+});
 
 </script>
 <!-- END custom_head -->
 
-<h1><span>{FUNCTION} Event</span></h1>
-
-<span class="header_option">
-    <a class="btn go-back" href="/calendar/{RETURN_TO}"><span></span>Back to Calendar</a>
-</span>
+<h1><span>{FUNCTION} Event</span><a class="customise" href="#">span{ADV_OFF}>Show Advanced Options</span><span{ADV_ON}>Close
+    Advanced Options</span></a></h1>
 
 <form method="post" action="/calendar/modifyForm.php" id="eventForm">
     <table class="standardForm">
@@ -218,25 +225,32 @@
             </td>
             <td><input name="date" id="cal_date" type="text" size="15" maxlength="30" value="{DATE}"/></td>
         </tr>
-        <tr>
-            <td class="formLabelWidth" valign="top"><h4>Publish Date</h4>
-                <em>This event will only be visible to the public after this date. Leave blank to publish
-                    immediately.</em>
-            </td>
-            <td><input name="publishDate" id="publishDate" type="text" size="15" maxlength="30" value="{PUBLISH_DATE}"/>
-            </td>
+        <tr class="advanced"
+        {SHOW_ADVANCED}>
+        <td class="formLabelWidth" valign="top"
+        {OPAC_ADVANCED} ><h4>Publish Date</h4>
+        <em>This event will only be visible to the public after this date. Leave blank to publish
+            immediately.</em>
+        </td>
+        <td
+        {OPAC_ADVANCED} ><input name="publishDate" id="publishDate" type="text" size="15" maxlength="30"
+                                value="{PUBLISH_DATE}"/>
+        </td>
         </tr>
         <!-- BEGIN recurring_dates -->
-        <tr>
-            <td class="formLabelWidth" valign="top"><h4>Repeat</h4>
-                <em>The frequency with which this event recurs, if at all.</em></td>
-            <td><select name="repeat" id="repeatUntilSelect">
-                <option value="">Single Event</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="fortnightly">Fortnightly</option>
-                <option value="monthly">Monthly</option>
-            </select></td>
+        <tr class="advanced"
+        {SHOW_ADVANCED}>
+        <td class="formLabelWidth" valign="top"
+        {OPAC_ADVANCED}><h4>Repeat</h4>
+        <em>The frequency with which this event recurs, if at all.</em></td>
+        <td
+        {OPAC_ADVANCED}><select name="repeat" id="repeatUntilSelect">
+        <option value="">Single Event</option>
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="fortnightly">Fortnightly</option>
+        <option value="monthly">Monthly</option>
+    </select></td>
         </tr>
         <tr id="repeatUntil" style="display: none;">
             <td class="formLabelWidth" valign="top"><h4>Repeat Until</h4>

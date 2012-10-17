@@ -14,24 +14,24 @@ class Calendar extends DeprecatedModel {
 
     const ATTENDANCE_INTENTION_ABSENT = 3;
 
-	function Calendar () {
+    function Calendar() {
 
-		$this->_table = "event";
-		$this->_index = "id";
+        $this->_table = "event";
+        $this->_index = "id";
 
-		$this->groupHandler = new Group(CALENDAR_SERVICE);
+        $this->groupHandler = new Group(CALENDAR_SERVICE);
 
-		parent::DeprecatedModel();
-	}
+        parent::DeprecatedModel();
+    }
 
-	/**
-	 * Get a list of upcoming events with a summary tally of attendances
-	 * for both Pending and Approved statuses
-	 *
-	 * @return array|bool
-	 */
-	public function getUpcomingEventAttendance() {
-		$query = "
+    /**
+     * Get a list of upcoming events with a summary tally of attendances
+     * for both Pending and Approved statuses
+     *
+     * @return array|bool
+     */
+    public function getUpcomingEventAttendance() {
+        $query = "
 			SELECT
 				event.id,
 				event.note,
@@ -53,19 +53,19 @@ class Calendar extends DeprecatedModel {
 			ORDER BY CONCAT(event.date, ' ', event.startTime) DESC
 		";
 
-		return $this->db->getAll($query);
-	}
+        return $this->db->getAll($query);
+    }
 
-	/**
-	 * Get a list of people who are attending/pending for a particular
-	 * event attendance
-	 *
-	 * @param $eventId
-	 * @param $status
-	 * @return mixed
-	 */
-	private function getByStatus($eventId, $status) {
-		$query = "
+    /**
+     * Get a list of people who are attending/pending for a particular
+     * event attendance
+     *
+     * @param $eventId
+     * @param $status
+     * @return mixed
+     */
+    private function getByStatus($eventId, $status) {
+        $query = "
 			SELECT
 				user.*,
 				IF(user.local_email = 0, user.alt_email, user.local_email) AS email,
@@ -78,40 +78,40 @@ class Calendar extends DeprecatedModel {
 			AND ea.status = {$status}
 		";
 
-		return $this->db->getAll($query);
-	}
+        return $this->db->getAll($query);
+    }
 
-	/**
-	 * Get all the people pending for an event
-	 *
-	 * @param $eventId
-	 * @return mixed
-	 */
-	public function getPending($eventId) {
-		return $this->getByStatus($eventId, self::ATTENDANCE_STATUS_PENDING);
-	}
+    /**
+     * Get all the people pending for an event
+     *
+     * @param $eventId
+     * @return mixed
+     */
+    public function getPending($eventId) {
+        return $this->getByStatus($eventId, self::ATTENDANCE_STATUS_PENDING);
+    }
 
-	/**
-	 * Get all the people approved for an event
-	 *
-	 * @param $eventId
-	 * @return mixed
-	 */
-	public function getAttending($eventId) {
-		return $this->getByStatus($eventId, self::ATTENDANCE_STATUS_APPROVED);
-	}
+    /**
+     * Get all the people approved for an event
+     *
+     * @param $eventId
+     * @return mixed
+     */
+    public function getAttending($eventId) {
+        return $this->getByStatus($eventId, self::ATTENDANCE_STATUS_APPROVED);
+    }
 
-	/**
-	 * Get all the people approved for an event
-	 *
-	 * @param $eventId
-	 * @return mixed
-	 */
-	public function getRejected($eventId) {
-		return $this->getByStatus($eventId, self::ATTENDANCE_STATUS_REJECTED);
-	}
+    /**
+     * Get all the people approved for an event
+     *
+     * @param $eventId
+     * @return mixed
+     */
+    public function getRejected($eventId) {
+        return $this->getByStatus($eventId, self::ATTENDANCE_STATUS_REJECTED);
+    }
 
-    public function getAttendeeList ($eventId) {
+    public function getAttendeeList($eventId) {
         $event = $this->getByID($eventId);
 
         $query = "
@@ -125,7 +125,7 @@ class Calendar extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
-    public function getAttendance ($attendanceId) {
+    public function getAttendance($attendanceId) {
         $query = "
             SELECT *
             FROM event_attendance
@@ -136,7 +136,7 @@ class Calendar extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
-    public function getAttendanceByEventAndUser ($eventId, $userId) {
+    public function getAttendanceByEventAndUser($eventId, $userId) {
         $query = "
             SELECT *
             FROM event_attendance
@@ -148,161 +148,164 @@ class Calendar extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
-    public function createAttendance ($attendance) {
+    public function createAttendance($attendance) {
         return $this->db->insert('event_attendance', $attendance);
     }
 
-    public function updateAttendance ($attendance) {
+    public function updateAttendance($attendance) {
         return $this->db->update('event_attendance', 'id', $attendance);
     }
 
-    public function removeAttendance ($attendanceId) {
+    public function removeAttendance($attendanceId) {
         return $this->db->delete('event_attendance', 'id', $attendanceId);
     }
 
-    public function removeAttendanceByEvent ($eventId) {
+    public function removeAttendanceByEvent($eventId) {
         return $this->db->delete('event_attendance', 'event_id', $eventId);
     }
 
-	function displayColour($id) {
-		if(!is_array($this->colourSet) ) {
-			//build cache of colours on first call
-			$query = "SELECT eventTypeID, eventColour FROM luEventType";
-			$result = $this->db->query($query);
-			while($row = $this->db->getNextArray($result) ) {
-				$this->colourSet[$row['eventTypeID']] = '#'.$row['eventColour'];
-			}
-		}
-		return $this->colourSet[$id];
+    function displayColour($id) {
+        if (!is_array($this->colourSet)) {
+            //build cache of colours on first call
+            $query = "SELECT eventTypeID, eventColour FROM luEventType";
+            $result = $this->db->query($query);
+            while ($row = $this->db->getNextArray($result)) {
+                $this->colourSet[$row['eventTypeID']] = '#' . $row['eventColour'];
+            }
+        }
+        return $this->colourSet[$id];
 
-	}
+    }
 
-	function getPerm($eventID) {
+    function getPerm($eventID) {
 
-		if (is_array($eventID))
-			$event =& $eventID;
-		else
-			$event = $this->getByID($eventID);
+        if (is_array($eventID)) {
+            $event =& $eventID;
+        } else {
+            $event = $this->getByID($eventID);
+        }
 
-		if ($_SESSION['su'])
-			return 3;
+        if ($_SESSION['su']) {
+            return 3;
+        }
 
-		switch ($event['access']) {
+        switch ($event['access']) {
 
-			case 1: // personal
-				return $event['owner'] == $_SESSION['id'] ? 2 : 0;
+            case 1: // personal
+                return $event['owner'] == $_SESSION['id'] ? 2 : 0;
 
-			case 2: // single group
-				$this->groupHandler->setService(HOMEPAGE_SERVICE);
-				$permission = $this->groupHandler->getPermission($event['sid']);
-				$this->groupHandler->setService(CALENDAR_SERVICE);
-				return $permission;
+            case 2: // single group
+                $this->groupHandler->setService(HOMEPAGE_SERVICE);
+                $permission = $this->groupHandler->getPermission($event['sid']);
+                $this->groupHandler->setService(CALENDAR_SERVICE);
+                return $permission;
 
-			case 3: // campus
+            case 3: // campus
 
-				if (is_array($event['campusList']))
-					$campusList = $event['campusList'];
-				else
-					$campusList = $this->getEventCampus($event['id']);
+                if (is_array($event['campusList'])) {
+                    $campusList = $event['campusList'];
+                } else {
+                    $campusList = $this->getEventCampus($event['id']);
+                }
 
-				//all campuses are represented by 0. if the user has all let them in
-				$campusList[] = 0;
-				if(is_array($campusList)) {
-					foreach($campusList as $campus) {
-						$permission = $this->groupHandler->getPermission($campus);
-						if($output < $permission || !$output)
-							$output = $permission;
-					}
-				}
+                //all campuses are represented by 0. if the user has all let them in
+                $campusList[] = 0;
+                if (is_array($campusList)) {
+                    foreach ($campusList as $campus) {
+                        $permission = $this->groupHandler->getPermission($campus);
+                        if ($output < $permission || !$output) {
+                            $output = $permission;
+                        }
+                    }
+                }
 
-				return $output;
+                return $output;
 
-			default:
-				return 0;
-		}
-	}
+            default:
+                return 0;
+        }
+    }
 
-	function getTypeList() {
-		$query = "SELECT eventTypeID, eventType, eventColour FROM luEventType";
-		return $this->db->getAll($query);
-	}
+    function getTypeList() {
+        $query = "SELECT eventTypeID, eventType, eventColour FROM luEventType";
+        return $this->db->getAll($query);
+    }
 
-	function getCampusList($type = 1) {
-		$query = "SELECT id, name FROM luCampus";
-		if (!$_SESSION['su']) {
-			$query .=", userAccess WHERE (luCampus.id = userAccess.sid OR userAccess.sid = 0) AND
-				userAccess.service = '2' AND uid = ".$_SESSION['id']." AND type > $type";
-		}
-		$campusList = $this->db->getAll($query);
-		if (is_array($campusList)) {
-			foreach ($campusList as $campus) {
-				$data['CAMPUS_NAME'] = $campus['name'];
-				$data['CAMPUS_ID'] 	= $campus['id'];
-				$output[] = $data;
-			}
-		}
-		return $output;
-	}
+    function getCampusList($type = 1) {
+        $query = "SELECT id, name FROM luCampus";
+        if (!$_SESSION['su']) {
+            $query .= ", userAccess WHERE (luCampus.id = userAccess.sid OR userAccess.sid = 0) AND
+				userAccess.service = '2' AND uid = " . $_SESSION['id'] . " AND type > $type";
+        }
+        $campusList = $this->db->getAll($query);
+        if (is_array($campusList)) {
+            foreach ($campusList as $campus) {
+                $data['CAMPUS_NAME'] = $campus['name'];
+                $data['CAMPUS_ID'] = $campus['id'];
+                $output[] = $data;
+            }
+        }
+        return $output;
+    }
 
-	/**
-	 * Used on the Calendar screens to filter events
-	 *
-	 * @param $userId
-	 *
-	 * @return array
-	 */
-	public function getFilterCampusList($userId) {
-		$query = "
+    /**
+     * Used on the Calendar screens to filter events
+     *
+     * @param $userId
+     *
+     * @return array
+     */
+    public function getFilterCampusList($userId) {
+        $query = "
 			SELECT id, name
 			FROM luCampus
 		";
 
-		if (!$_SESSION['su']) {
-			$query .= "
+        if (!$_SESSION['su']) {
+            $query .= "
 				LEFT JOIN userCampus ON userCampus.campus = luCampus.id
 				WHERE userCampus.uid = '$userId'
 			";
-		}
+        }
 
-		$allCampuses = $this->db->getAll($query);
+        $allCampuses = $this->db->getAll($query);
 
-		if (is_array($allCampuses) && count($allCampuses)) {
-			foreach($allCampuses as $currentCampus) {
-				$output[] = array(
-					'CAMPUS_ID' => $currentCampus['id'],
-					'CAMPUS_NAME' => $currentCampus['name'],
-				);
-			}
-		}
-		else {
-			$output = array();
-		}
+        if (is_array($allCampuses) && count($allCampuses)) {
+            foreach ($allCampuses as $currentCampus) {
+                $output[] = array(
+                    'CAMPUS_ID' => $currentCampus['id'],
+                    'CAMPUS_NAME' => $currentCampus['name'],
+                );
+            }
+        } else {
+            $output = array();
+        }
 
-		return $output;
-	}
+        return $output;
+    }
 
 
-	function getGroupList() {
-		$query = "SELECT * FROM groups";
-		$groupList = $this->db->getAll($query);
-		if (is_array($groupList)) {
-			foreach ($groupList as $group) {
-				$data['GROUP_ID'] 	= $group['id'];
-				$data['GROUP_NAME'] = $group['name'];
-				$output[] = $data;
-			}
-		}
-		return $output;
-	}
+    function getGroupList() {
+        $query = "SELECT * FROM groups";
+        $groupList = $this->db->getAll($query);
+        if (is_array($groupList)) {
+            foreach ($groupList as $group) {
+                $data['GROUP_ID'] = $group['id'];
+                $data['GROUP_NAME'] = $group['name'];
+                $output[] = $data;
+            }
+        }
+        return $output;
+    }
 
-	/**
-	 * Get an event by its id
-	 *
-	 * @param $eventID
-	 * @return array|bool
-	 */
-	public function getByID($eventID) {
-		$query = "
+    /**
+     * Get an event by its id
+     *
+     * @param $eventID
+     * @return array|bool
+     */
+    public function getByID($eventID) {
+        $query = "
 			SELECT
 				e.id, e.series_id, e.owner, e.access, e.sid, e.type, e.note, e.date, e.location, e.attendance, e.detail, e.publish_date,
 				DATE_FORMAT(e.startTime, '" . Cfg::get('calendar_time_format') . "') startTime,
@@ -313,22 +316,23 @@ class Calendar extends DeprecatedModel {
 			WHERE e.{$this->_index} = $eventID
 		";
 
-		return $this->db->getRow($query);
-	}
+        return $this->db->getRow($query);
+    }
 
-	function getAllInCategory($categoryID, $config = false) {
+    function getAllInCategory($categoryID, $config = false) {
 
-		//event limit changed from posts to days
-		if($config['size'] != 0 && $config['size'] != '')
-				$where = " AND date < ADDDATE(CURDATE(), INTERVAL {$config['size']} DAY) ";
-		else
-				$where = "";
+        //event limit changed from posts to days
+        if ($config['size'] != 0 && $config['size'] != '') {
+            $where = " AND date < ADDDATE(CURDATE(), INTERVAL {$config['size']} DAY) ";
+        } else {
+            $where = "";
+        }
 
-		$query = "SELECT event.id, DATE_FORMAT(date, '%a %D %b') as outputDate,
+        $query = "SELECT event.id, DATE_FORMAT(date, '%a %D %b') as outputDate,
 						date,
 						DATE_FORMAT(date, '%Y') as year, DATE_FORMAT(date, '%c') as month, DATE_FORMAT(date, '%e') as day,
-						TIME_FORMAT(startTime, '".Cfg::get('calendar_time_format')."') as startTimeString,
-						TIME_FORMAT(endTime, '".Cfg::get('calendar_time_format')."') as endTimeString,
+						TIME_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') as startTimeString,
+						TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTimeString,
 						type, note, location, detail,
 						user.id as uid, title, firstname, lastname,
 						eventType, eventColour,
@@ -336,10 +340,10 @@ class Calendar extends DeprecatedModel {
 				  FROM event
 				  LEFT JOIN user ON owner = user.id
 				  LEFT JOIN luEventType ON type = eventTypeID
-				  WHERE access = '2' AND sid = '".$categoryID."' AND( date >= CURRENT_DATE() $where) ORDER BY date, startTime";
+				  WHERE access = '2' AND sid = '" . $categoryID . "' AND( date >= CURRENT_DATE() $where) ORDER BY date, startTime";
 
-		return $this->db->getAll($query);
-	}
+        return $this->db->getAll($query);
+    }
 
     function getAllInSeriesByEventID($eventID) {
         $query = "SELECT * FROM event WHERE series_id = (
@@ -385,8 +389,8 @@ class Calendar extends DeprecatedModel {
         $diff = (int)(($dateNext->getUnixTimestamp() - $dateFirst->getUnixTimestamp()) / 86400);
 
         $recurMap = array(
-            1  => 'daily',
-            7  => 'weekly',
+            1 => 'daily',
+            7 => 'weekly',
             14 => 'fortnightly',
             28 => 'monthly',
             29 => 'monthly',
@@ -394,7 +398,7 @@ class Calendar extends DeprecatedModel {
             31 => 'monthly',
         );
 
-        if(isset($recurMap[$diff])) {
+        if (isset($recurMap[$diff])) {
             return array(
                 'freq' => $recurMap[$diff],
                 'start' => $dateFirst,
@@ -409,25 +413,25 @@ class Calendar extends DeprecatedModel {
         );
     }
 
-	/**
-	 * Get all the submission events for the specified day
-	 *
-	 * @param  $currentDay
-	 * @return array|bool
-	 */
-	public function getSubmissionEvents($currentDay) {
+    /**
+     * Get all the submission events for the specified day
+     *
+     * @param  $currentDay
+     * @return array|bool
+     */
+    public function getSubmissionEvents($currentDay) {
 
-		//get a list of all the possible submission box categories
-		$this->groupHandler->setService(HOMEPAGE_SERVICE);
-		$catList = $this->groupHandler->involvedInCategoryList($_SESSION['id']);
-		$this->groupHandler->setService(CALENDAR_SERVICE);
+        //get a list of all the possible submission box categories
+        $this->groupHandler->setService(HOMEPAGE_SERVICE);
+        $catList = $this->groupHandler->involvedInCategoryList($_SESSION['id']);
+        $this->groupHandler->setService(CALENDAR_SERVICE);
 
-		if (is_array($catList)) {
-			foreach($catList as $cat) {
-				$catQuery[] = $cat['id'];
-			}
+        if (is_array($catList)) {
+            foreach ($catList as $cat) {
+                $catQuery[] = $cat['id'];
+            }
 
-			$query = "SELECT DISTINCT category.name AS category, GROUP_CONCAT(co.code) AS synergyCode, submission_box.name, submission_box.description,
+            $query = "SELECT DISTINCT category.name AS category, GROUP_CONCAT(co.code) AS synergyCode, submission_box.name, submission_box.description,
                         submission_box.owner, submission_box.id, user.firstname, user.lastname, user.title,
                         DATE_FORMAT(submission_box.date, '%w') as dayIndex,
 					    DATE_FORMAT(submission_box.date, '" . Cfg::get('calendar_time_format') . "') as dueTime,
@@ -436,24 +440,23 @@ class Calendar extends DeprecatedModel {
                       LEFT JOIN categoryCode co ON co.categoryID = category.id
                       LEFT JOIN user ON user.id = submission_box.owner ";
 
-			/* If you aren't part of any categories, don't try to
-			 * do a whereIn
-			 */
-			if (count($catQuery)) {
-            	$query .= "WHERE category.id = submission_box.category
-							AND submission_box.category IN (".implode(',', $catQuery).")
+            /* If you aren't part of any categories, don't try to
+             * do a whereIn
+             */
+            if (count($catQuery)) {
+                $query .= "WHERE category.id = submission_box.category
+							AND submission_box.category IN (" . implode(',', $catQuery) . ")
 							AND submission_box.deleted = 0
 							AND	DATE(submission_box.date) = DATE(FROM_UNIXTIME('$currentDay'))
 							GROUP BY submission_box.id, category.id
 							ORDER BY submission_box.date";
-			}
-			else {
-				$query .= "WHERE DATE(submission_box.date) = DATE(FROM_UNIXTIME('$currentDay'))
+            } else {
+                $query .= "WHERE DATE(submission_box.date) = DATE(FROM_UNIXTIME('$currentDay'))
 							GROUP BY submission_box.id
 							ORDER BY submission_box.date";
-			}
+            }
 
-			$submissions = $this->db->getAll($query);
+            $submissions = $this->db->getAll($query);
 
             if (!empty($submissions)) {
                 /* Convert date fields and set status */
@@ -472,35 +475,35 @@ class Calendar extends DeprecatedModel {
                     }
                 }
             }
-		}
+        }
 
-		/* Standardised output
-		 */
-		$stack = new Calendar_Event_Collection();
+        /* Standardised output
+         */
+        $stack = new Calendar_Event_Collection();
 
-		if (is_array($submissions) && count($submissions)) {
-			foreach($submissions as $submission) {
-				$event = new Calendar_Event_Type_Submission();
+        if (is_array($submissions) && count($submissions)) {
+            foreach ($submissions as $submission) {
+                $event = new Calendar_Event_Type_Submission();
 
-				$event->setDate(new Alaress_Date_Format($submission['date'], 'y-m-d h:i:s'));
-				$event->setCategoryName($submission['category']);
-				$event->setCategoryCodes($submission['synergyCode']);
-				$event->setAuthorId($submission['owner']);
-				$event->setAuthorName($submission['firstname'] . ' ' . $submission['lastname']);
-				$event->setSubmissionBoxId($submission['id']);
-				$event->setSubmissionBoxName($submission['name']);
-				$event->setSubmissionNote();
-				$event->setColour($this->displayColour(4));
-				$event->setStartTime(new Alaress_Date_Format($submission['date'], 'y-m-d h:i:s'));
+                $event->setDate(new Alaress_Date_Format($submission['date'], 'y-m-d h:i:s'));
+                $event->setCategoryName($submission['category']);
+                $event->setCategoryCodes($submission['synergyCode']);
+                $event->setAuthorId($submission['owner']);
+                $event->setAuthorName($submission['firstname'] . ' ' . $submission['lastname']);
+                $event->setSubmissionBoxId($submission['id']);
+                $event->setSubmissionBoxName($submission['name']);
+                $event->setSubmissionNote();
+                $event->setColour($this->displayColour(4));
+                $event->setStartTime(new Alaress_Date_Format($submission['date'], 'y-m-d h:i:s'));
 
-				$stack->add($event);
-			}
-		}
+                $stack->add($event);
+            }
+        }
 
-		return $stack;
-	}
+        return $stack;
+    }
 
-    function search ($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
+    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'score', $sort_dir = 'desc') {
         $keyword = mysql_real_escape_string($keyword);
 
         if (is_array($_SESSION['campus'])) {
@@ -526,20 +529,20 @@ class Calendar extends DeprecatedModel {
                 $groupList[] = $temp['id'];
             }
 
-			/* If there are no groups prevent sql error
-			 */
-			if (count($groupList)) {
-            	$groupQuery = "OR (access = '2' AND sid IN (".implode(',', $groupList)."))";
-			}
+            /* If there are no groups prevent sql error
+             */
+            if (count($groupList)) {
+                $groupQuery = "OR (access = '2' AND sid IN (" . implode(',', $groupList) . "))";
+            }
         }
 
         $this->groupHandler->setService(CALENDAR_SERVICE);
 
         //give people with userAccess to moderate Calendar Access to view all Camups Posts
-        if(is_array($_SESSION['campus'])) {
-            if($this->groupHandler->getPermission($_SESSION['campus'][0]) > WRITE_ACCESS)
+        if (is_array($_SESSION['campus'])) {
+            if ($this->groupHandler->getPermission($_SESSION['campus'][0]) > WRITE_ACCESS) {
                 $groupChunk = "";
-            else {
+            } else {
                 $groupChunk = "AND eventGroup.groupID = {$_SESSION['gid']}";
             }
         }
@@ -559,9 +562,9 @@ class Calendar extends DeprecatedModel {
                         LEFT JOIN luEventType ON type = eventTypeID
                         LEFT JOIN eventCampus ON event.id = eventCampus.eventID
                         LEFT JOIN eventGroup ON event.id = eventGroup.eventID
-                        WHERE (    (access = '1' AND owner = '".$_SESSION['id']."')
+                        WHERE (    (access = '1' AND owner = '" . $_SESSION['id'] . "')
                                   $groupQuery
-                                  OR (access = '3' AND $campusQuery $groupChunk OR owner = '".$_SESSION['id']."')
+                                  OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
                                 )
                             AND MATCH (`note`, `detail`, `location`) AGAINST ('$keyword')
                         GROUP BY id
@@ -589,57 +592,55 @@ class Calendar extends DeprecatedModel {
         return $events;
     }
 
-	/**
-	 * Get all events occurring on the specified date
-	 *
-	 * @param $currentDay
-	 * @return array|bool
-	 */
-	public function getDayEvents($currentDay) {
-		if (is_array($_SESSION['campus'])) {
-			$campusList = $_SESSION['campus'];
-			$campusQuery = "eventCampus.campusID IN(" . implode(',', $campusList) . ")";
-		}
-		else {
-			$campusList = array(1);
-			$campusQuery = '1 = 1';
-		}
+    /**
+     * Get all events occurring on the specified date
+     *
+     * @param $currentDay
+     * @return array|bool
+     */
+    public function getDayEvents($currentDay) {
+        if (is_array($_SESSION['campus'])) {
+            $campusList = $_SESSION['campus'];
+            $campusQuery = "eventCampus.campusID IN(" . implode(',', $campusList) . ")";
+        } else {
+            $campusList = array(1);
+            $campusQuery = '1 = 1';
+        }
 
-		/* get accessible groups
-		 */
-		$groupList = array();
-		$groupQuery = '';
+        /* get accessible groups
+         */
+        $groupList = array();
+        $groupQuery = '';
 
-		$this->groupHandler->setService(HOMEPAGE_SERVICE);
-		$tempList = $this->groupHandler->involvedInCategoryList($_SESSION['id']);
+        $this->groupHandler->setService(HOMEPAGE_SERVICE);
+        $tempList = $this->groupHandler->involvedInCategoryList($_SESSION['id']);
 
-		if (is_array($tempList)) {
-			foreach ($tempList as $temp) {
-				$groupList[] = $temp['id'];
-			}
+        if (is_array($tempList)) {
+            foreach ($tempList as $temp) {
+                $groupList[] = $temp['id'];
+            }
 
-			/* If there are no groups prevent sql error
-			 */
-			if (count($groupList)) {
-				$groupQuery = "OR (access = '2' AND sid IN (".implode(',', $groupList)."))";
-			}
-		}
+            /* If there are no groups prevent sql error
+             */
+            if (count($groupList)) {
+                $groupQuery = "OR (access = '2' AND sid IN (" . implode(',', $groupList) . "))";
+            }
+        }
 
-		$this->groupHandler->setService(CALENDAR_SERVICE);
+        $this->groupHandler->setService(CALENDAR_SERVICE);
 
-		/* Give people with userAccess to moderate Calendar Access to view all Camups Posts
-		 */
-		if (is_array($_SESSION['campus'])) {
-			if ($this->groupHandler->getPermission($_SESSION['campus'][0]) > WRITE_ACCESS) {
-				$groupChunk = "";
-			}
-			else {
-				$groupChunk = "AND eventGroup.groupID = {$_SESSION['gid']}";
-			}
-		}
+        /* Give people with userAccess to moderate Calendar Access to view all Camups Posts
+         */
+        if (is_array($_SESSION['campus'])) {
+            if ($this->groupHandler->getPermission($_SESSION['campus'][0]) > WRITE_ACCESS) {
+                $groupChunk = "";
+            } else {
+                $groupChunk = "AND eventGroup.groupID = {$_SESSION['gid']}";
+            }
+        }
 
-		//get single events for the day
-		$query = "
+        //get single events for the day
+        $query = "
 			SELECT DISTINCT event.id, owner,
 				GROUP_CONCAT(DISTINCT eventCampus.campusID) as campusList,
 				startTime, endTime, date AS eventDate,
@@ -658,50 +659,54 @@ class Calendar extends DeprecatedModel {
 			LEFT JOIN eventGroup ON event.id = eventGroup.eventID
 			LEFT JOIN category ON event.sid = category.id AND event.sid IS NOT NULL
 			WHERE date = '" . date("Y-m-d", $currentDay) . "'
-				AND (    (access = '1' AND owner = '".$_SESSION['id']."')
+				AND (    (access = '1' AND owner = '" . $_SESSION['id'] . "')
 					  $groupQuery
-					  OR (access = '3' AND $campusQuery $groupChunk OR owner = '".$_SESSION['id']."')
+					  OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
 					)
 			GROUP BY id
 			ORDER BY event.startTime, event.endTime
 		";
 
-		$allEvents = $this->db->getAll($query);
+        $allEvents = $this->db->getAll($query);
 
-		/* Standardised output
-		 */
-		$stack = new Calendar_Event_Collection();
+        /* Standardised output
+         */
+        $stack = new Calendar_Event_Collection();
 
-		if (is_array($allEvents) && count($allEvents)) {
-			foreach($allEvents as $currentEvent) {
-				$event = new Calendar_Event_Type_Day();
+        if (is_array($allEvents) && count($allEvents)) {
+            foreach ($allEvents as $currentEvent) {
+                $event = new Calendar_Event_Type_Day();
 
-				$event->setAuthorName($currentEvent['firstname'] . ' ' . $currentEvent['lastname']);
-				$event->setAuthorId($currentEvent['uid']);
-				$event->setEventId($currentEvent['id']);
-				$event->setStartTime(new Alaress_Date_Format($currentEvent['eventDate'] . ' ' . $currentEvent['startTime'], 'y-m-d h:i:s'));
-				$event->setEndTime(new Alaress_Date_Format($currentEvent['eventDate'] . ' ' . $currentEvent['endTime'],  'y-m-d h:i:s'));
-				$event->setType($currentEvent['type']);
-				$event->setNote($currentEvent['note']);
-				$event->setAccess($currentEvent['access']);
-				$event->setEventType($currentEvent['eventType']);
-				$event->setColour($currentEvent['eventColour']);
-				$event->setPublishDate($currentEvent['publish_date']);
-				$event->setSid($currentEvent['sid']);
-				$event->setCategoryId($currentEvent['categoryId']);
-				$event->setCategoryname($currentEvent['categoryName']);
-				$event->setAttendance($currentEvent['attendance']);
+                $event->setAuthorName($currentEvent['firstname'] . ' ' . $currentEvent['lastname']);
+                $event->setAuthorId($currentEvent['uid']);
+                $event->setEventId($currentEvent['id']);
+                $event->setStartTime(
+                    new Alaress_Date_Format($currentEvent['eventDate'] . ' ' . $currentEvent['startTime'], 'y-m-d h:i:s')
+                );
+                $event->setEndTime(
+                    new Alaress_Date_Format($currentEvent['eventDate'] . ' ' . $currentEvent['endTime'], 'y-m-d h:i:s')
+                );
+                $event->setType($currentEvent['type']);
+                $event->setNote($currentEvent['note']);
+                $event->setAccess($currentEvent['access']);
+                $event->setEventType($currentEvent['eventType']);
+                $event->setColour($currentEvent['eventColour']);
+                $event->setPublishDate($currentEvent['publish_date']);
+                $event->setSid($currentEvent['sid']);
+                $event->setCategoryId($currentEvent['categoryId']);
+                $event->setCategoryname($currentEvent['categoryName']);
+                $event->setAttendance($currentEvent['attendance']);
 
-				$stack->add($event);
-			}
-		}
+                $stack->add($event);
+            }
+        }
 
-		return $stack;
-	}
+        return $stack;
+    }
 
-	function getDayByGroup($currentDay, $groupList, $campusList) {
+    function getDayByGroup($currentDay, $groupList, $campusList) {
 
-		$query = "SELECT DISTINCT id, owner,
+        $query = "SELECT DISTINCT id, owner,
 							TIME_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') as startTime,
 							TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTime,
 							type, note, location, detail, access, eventCampus.campusID as sid
@@ -710,18 +715,20 @@ class Calendar extends DeprecatedModel {
 						LEFT JOIN eventGroup ON event.id = eventGroup.eventID
 						WHERE date = '" . date("Y-m-d", $currentDay) . "'
 							AND (
-								  (access = '3' AND eventCampus.campusID IN(" . implode(',', $campusList) . ") AND eventGroup.groupID IN(" . implode(',', $groupList) . ") )
+								  (access = '3' AND eventCampus.campusID IN(" . implode(
+            ',', $campusList
+        ) . ") AND eventGroup.groupID IN(" . implode(',', $groupList) . ") )
 								)
 						GROUP BY id
 						ORDER BY event.startTime, event.endTime";
 
-		return $this->db->getAll($query);
-	}
+        return $this->db->getAll($query);
+    }
 
-	function getStudentBirthdays($currentDay) {
+    function getStudentBirthdays($currentDay) {
 
-		require_once '../library/mssql.php';
-		$db = new MSSQL;
+        require_once '../library/mssql.php';
+        $db = new MSSQL;
 
 //		$query = "SELECT  vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname,
 //						vStudents.StudentBirthDate, vStudents.StudentCampus, datediff(year,studentbirthdate,getdate()) as age,
@@ -734,170 +741,182 @@ class Calendar extends DeprecatedModel {
 //						AND month(studentbirthdate) =". date("n", $currentDay) ."
 //						AND StudentCampus = 'G'";
 
-		$query = "SELECT  vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname,
+        $query = "SELECT  vStudents.StudentID, vStudents.StudentGiven1, vStudents.StudentSurname,
 						vStudents.StudentBirthDate, vStudents.StudentCampus, datediff(year,studentbirthdate,getdate()) as age,
 						vStudents.StudentFormDescription, convert(varchar,studentbirthdate,106)  as 'la'
 						FROM SynergyOne.dbo.vStudents vStudents
 						WHERE
-						vStudents.FileSemester=".$_SESSION['FileSemester']."
-						AND vStudents.FileYear=".$_SESSION[ 'FileYear']."
-						AND day(studentbirthdate) = ". date("j", $currentDay) ."
-						AND month(studentbirthdate) =". date("n", $currentDay);
+						vStudents.FileSemester=" . $_SESSION['FileSemester'] . "
+						AND vStudents.FileYear=" . $_SESSION['FileYear'] . "
+						AND day(studentbirthdate) = " . date("j", $currentDay) . "
+						AND month(studentbirthdate) =" . date("n", $currentDay);
 
-		$birthdayList = $db->getAll($query);
+        $birthdayList = $db->getAll($query);
 
-		/* Standardised output
-		 */
-		$stack = new Calendar_Event_Collection();
+        /* Standardised output
+         */
+        $stack = new Calendar_Event_Collection();
 
-		if (is_array($birthdayList) && count($birthdayList)) {
-			foreach($birthdayList as $birthday) {
-				$event = new Calendar_Event_Type_StudentBirthday();
-				$event->setName($birthday['StudentGiven1'] . ' ' . $birthday['StudentSurname']);
-				$event->setForm($birthday['StudentFormDescription']);
-				$event->setAge($birthday['age']);
-				$event->setDate($birthday['la']);
-				$event->setStartTime(new Alaress_Date_Format(strtotime($birthday['StudentBirthdate']), 'U'));
-				$event->setBirthdayNote();
-				$stack->add($event);
-			}
-		}
+        if (is_array($birthdayList) && count($birthdayList)) {
+            foreach ($birthdayList as $birthday) {
+                $event = new Calendar_Event_Type_StudentBirthday();
+                $event->setName($birthday['StudentGiven1'] . ' ' . $birthday['StudentSurname']);
+                $event->setForm($birthday['StudentFormDescription']);
+                $event->setAge($birthday['age']);
+                $event->setDate($birthday['la']);
+                $event->setStartTime(new Alaress_Date_Format(strtotime($birthday['StudentBirthdate']), 'U'));
+                $event->setBirthdayNote();
+                $stack->add($event);
+            }
+        }
 
-		return $stack;
-	}
+        return $stack;
+    }
 
-	function getEventGroup($eventID) {
-		$output = array();
-		$query = "SELECT groupID FROM eventGroup WHERE eventID = $eventID";
-		$result = $this->db->query($query);
-		while($event = $this->db->getNextArray($result)) {
-			$output[] = $event['groupID'];
-		}
-		return $output;
-	}
+    function getEventGroup($eventID) {
+        $output = array();
+        $query = "SELECT groupID FROM eventGroup WHERE eventID = $eventID";
+        $result = $this->db->query($query);
+        while ($event = $this->db->getNextArray($result)) {
+            $output[] = $event['groupID'];
+        }
+        return $output;
+    }
 
-	function getEventCampus($eventID) {
-		$output = array();
-		$query = "SELECT campusID FROM eventCampus WHERE eventID = $eventID";
-		$result = $this->db->query($query);
-		while($event = $this->db->getNextArray($result)) {
-			$output[] = $event['campusID'];
-		}
-		return $output;
-	}
+    function getEventCampus($eventID) {
+        $output = array();
+        $query = "SELECT campusID FROM eventCampus WHERE eventID = $eventID";
+        $result = $this->db->query($query);
+        while ($event = $this->db->getNextArray($result)) {
+            $output[] = $event['campusID'];
+        }
+        return $output;
+    }
 
-	function getMonthList() {
-		for($i=1; $i <= 12; $i++) {
-			$output['DROP_MONTH_NUMBER'] = $i;
-			$output['DROP_MONTH_NAME'] = date('F', mktime(0,0,0,$i,1));
-			$monthList[] = $output;
-		}
-		return $monthList;
-	}
+    function getMonthList() {
+        for ($i = 1; $i <= 12; $i++) {
+            $output['DROP_MONTH_NUMBER'] = $i;
+            $output['DROP_MONTH_NAME'] = date('F', mktime(0, 0, 0, $i, 1));
+            $monthList[] = $output;
+        }
+        return $monthList;
+    }
 
-	function getYearList() {
-		for($i=date('Y')-2; $i <= date('Y')+1; $i++) {
-			$output['DROP_YEAR_NUMBER'] = $i;
-			$yearList[] = $output;
-		}
-		return $yearList;
-	}
+    function getYearList() {
+        for ($i = date('Y') - 2; $i <= date('Y') + 1; $i++) {
+            $output['DROP_YEAR_NUMBER'] = $i;
+            $yearList[] = $output;
+        }
+        return $yearList;
+    }
 
-	function createGroups($groupList, $eventID) {
-		if (is_array($groupList)) {
-			foreach ($groupList as $groupID) {
-				$eventGroup = array('eventID'	=> $eventID,
-									'groupID'	=> $groupID,
-									);
-				$this->db->insert('eventGroup', $eventGroup);
-			}
-		}
-	}
+    function createGroups($groupList, $eventID) {
+        if (is_array($groupList)) {
+            foreach ($groupList as $groupID) {
+                $eventGroup = array(
+                    'eventID' => $eventID,
+                    'groupID' => $groupID,
+                );
+                $this->db->insert('eventGroup', $eventGroup);
+            }
+        }
+    }
 
-	function createCampus($campusList, $eventID) {
-		if (is_array($campusList)) {
-			foreach ($campusList as $campusID) {
-				$eventCampus = array('eventID'	=> $eventID,
-									 'campusID'	=> $campusID,
-									);
-				$this->db->insert('eventCampus', $eventCampus);
-			}
-		}
-	}
+    function createCampus($campusList, $eventID) {
+        if (is_array($campusList)) {
+            foreach ($campusList as $campusID) {
+                $eventCampus = array(
+                    'eventID' => $eventID,
+                    'campusID' => $campusID,
+                );
+                $this->db->insert('eventCampus', $eventCampus);
+            }
+        }
+    }
 
-	function delPerms($eventID) {
-		$this->db->delete('eventGroup', 'eventID', $eventID);
-		$this->db->delete('eventCampus', 'eventID', $eventID);
-	}
+    function delPerms($eventID) {
+        $this->db->delete('eventGroup', 'eventID', $eventID);
+        $this->db->delete('eventCampus', 'eventID', $eventID);
+    }
 
-	function create($event) {
+    function create($event) {
 
-		if($this->getPerm($event) < WRITE_ACCESS)
-			error(35);
+        if ($this->getPerm($event) < WRITE_ACCESS) {
+            error(35);
+        }
 
-		$groupList = $event['groupList'];
-		$campusList = $event['campusList'];
+        $groupList = $event['groupList'];
+        $campusList = $event['campusList'];
 
-		unset($event['groupList']);
-		unset($event['campusList']);
+        unset($event['groupList']);
+        unset($event['campusList']);
 
-		$eventID = parent::create($event);
+        $eventID = parent::create($event);
 
-		$this->createGroups($groupList, $eventID);
-		$this->createCampus($campusList, $eventID);
+        $this->createGroups($groupList, $eventID);
+        $this->createCampus($campusList, $eventID);
 
-		return $eventID;
-	}
+        return $eventID;
+    }
 
-	function update($event) {
+    function update($event) {
 
         $cleanEvent = $this->getByID($event['id']);
 
-		if($this->getPerm($event['id']) < WRITE_ACCESS)
-			error(34);
 
-		$groupList = $event['groupList'];
-		$campusList = $event['campusList'];
+        /* Check perms on existing event */
+        if ($this->getPerm($event['id']) < WRITE_ACCESS) {
+            error(34);
+        }
 
-		unset($event['groupList']);
-		unset($event['campusList']);
+        /* Check perms on what we want the event to become */
+        if ($this->getPerm($event) < WRITE_ACCESS) {
+            error(34);
+        }
+
+        $groupList = $event['groupList'];
+        $campusList = $event['campusList'];
+
+        unset($event['groupList']);
+        unset($event['campusList']);
 
         /* Clear attendance if it has changed from true to false */
-        if ( $event['attendance'] < $cleanEvent['attendance'] ) {
+        if ($event['attendance'] < $cleanEvent['attendance']) {
             $this->removeAttendanceByEvent($event['id']);
         }
 
-		parent::update($event);
+        parent::update($event);
 
-		$this->delPerms($event['id']);
+        $this->delPerms($event['id']);
 
-		$this->createGroups($groupList, $event['id']);
-		$this->createCampus($campusList, $event['id']);
+        $this->createGroups($groupList, $event['id']);
+        $this->createCampus($campusList, $event['id']);
 
-		return $event['id'];
-	}
+        return $event['id'];
+    }
 
-	function delete ($eventID) {
-		$event = $this->getByID($eventID);
+    function delete($eventID) {
+        $event = $this->getByID($eventID);
 
-		if($this->getPerm($eventID) < WRITE_ACCESS)
-			error(34);
+        if ($this->getPerm($eventID) < WRITE_ACCESS) {
+            error(34);
+        }
 
         $this->removeAttendanceByEvent($eventID);
 
-		parent::delete($eventID);
-		$this->delPerms($eventID);
-	}
+        parent::delete($eventID);
+        $this->delPerms($eventID);
+    }
 
-	/**
-	 * Removes content
-	 *
-	 * TODO: Refactor
-	 *
-	 * @param  $cid
-	 * @return void
-	 */
-	public function homepageClean($cid) {
-		$this->db->delete($this->_table, 'sid', $cid);
-	}
+    /**
+     * Removes content
+     *
+     * TODO: Refactor
+     *
+     * @param  $cid
+     * @return void
+     */
+    public function homepageClean($cid) {
+        $this->db->delete($this->_table, 'sid', $cid);
+    }
 }
