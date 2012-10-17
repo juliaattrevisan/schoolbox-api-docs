@@ -91,6 +91,7 @@ Variablahs
 
 @border-color: #eeeeee;
 @highlight-color: #ffffb2;
+@dark-dark: #eaeaea;
 
 /*
 Mixarns
@@ -187,6 +188,10 @@ img {
     border: 0;
     max-width: 100%;
     height: auto;
+}
+.featured_image {
+    float: left;
+    margin: 0 10px 10px 0;
 }
 
 sub, sup {
@@ -3881,13 +3886,13 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
 }
 
 .archive .menu {
-    float: left;
+    float: right;
     width: 17%;
 }
 
 .archive .posts {
     width: 82%;
-    float: right;
+    float: left;
 }
 
 .archive .menu ul li a,
@@ -4049,6 +4054,9 @@ BLOG COMPONENT
         textarea {
             width: 100%;
         }
+    }
+    .dark .dark {
+        background: @dark-dark !important;
     }
 }
 

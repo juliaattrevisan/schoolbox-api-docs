@@ -92,6 +92,8 @@ if ( $dateList = $blogHandler->getOccupiedDateList($category['id']) ) {
 
 /* Blog Posts */
 if ( $blogList = $blogHandler->getByYearAndMonth($category['id'], $yearNumber, $monthNumber) ) {
+
+    $i = 0;
 	foreach ($blogList as $blog) {
 		$currentDate = date_parse($blog['created']);
 
@@ -122,7 +124,8 @@ if ( $blogList = $blogHandler->getByYearAndMonth($category['id'], $yearNumber, $
             'BLOG_AUTHOR_THUMB' => "/portrait.php?userId=$synID&size=square32",
             'BLOG_AUTHOR_GROUP' => $postedDate->getShort(),
 			// 'EMAIL_CONTACT' => "<a href=\"/search/user/{$blog['uid']}\">$poster</a>",
-			'BLOG_COMMENTS' => ''
+			'BLOG_COMMENTS' => '',
+            'BLOG_SHADING' => ++$i % 2 ? 'dark' : ''
 		));
 
 		/* Comments */
@@ -135,6 +138,7 @@ if ( $blogList = $blogHandler->getByYearAndMonth($category['id'], $yearNumber, $
 		$this->setVar('BLOG_TOTAL_COMMENTS', $totalComments);
 
 		if(!empty($comments)) {
+            $j = 0;
 			$userHandler = new User();
 
 			foreach($comments as $comment) {
@@ -149,6 +153,7 @@ if ( $blogList = $blogHandler->getByYearAndMonth($category['id'], $yearNumber, $
                     'COMMENT_AUTHOR_ID'   => $comment['owner'],
                     'COMMENT_AUTHOR_NAME'   => $comment['name'],
                     'COMMENT_AUTHOR_EXTERNAL_ID' => $comment['synergy_id'],
+                    'ON_OFF' => ++$j % 2 ? 'dark' : ''
 				));
 
 				if ($comment['owner'] == $_SESSION['id'] || $permission >= WRITE_ACCESS) {

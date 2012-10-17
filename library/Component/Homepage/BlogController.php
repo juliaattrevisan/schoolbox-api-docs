@@ -133,7 +133,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                     'BLOG_AUTHOR_NAME' => $blog['name'],
                     'BLOG_AUTHOR_THUMB' => "/portrait.php?userId=$synID&size=square32",
                     'BLOG_CREATED'  => $createdTime->getRelativeTime(),
-                    'BLOG_SHADING'  => ++$i % 2 ? '' : 'dark',
+                    'BLOG_SHADING'  => ++$i % 2 ? 'dark' : '',
                     'BLOG_COMMENTS' => '',
                     'BLOG_AUTHOR_EXTERNAL_ID' => $blog['synergy_id'],
                 ));
@@ -159,7 +159,7 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
                             'COMMENT_AUTHOR_NAME'   => $comment['name'],
                             'COMMENT_CREATED' => $createdTime->getRelativeTime(),
                             'COMMENT_AUTHOR_EXTERNAL_ID' => $comment['synergy_id'],
-                            'ON_OFF'          => ++$j % 2 ? '' : 'dark'
+                            'ON_OFF'          => ++$j % 2 ? 'dark' : ''
                         ));
 
                         if($comment['owner'] == $_SESSION['id'] || $this->permission >= WRITE_ACCESS)

@@ -240,6 +240,8 @@ if (is_array($items)) {
     $topicList['All'] = 1;
 
     if ($items) {
+        $j = 0;
+
         foreach ($items as $article) {
             $i++;
 
@@ -321,6 +323,7 @@ if (is_array($items)) {
                 'NEWS_BODY' => $archive ? $article['item_body'] : Scrub::html($article['item_body']),
                 'TOPIC_NAME' => Scrub::text($previous['topicName']),
                 'TOPIC_CLEAN' => $filter['archive'] . $url->getSlug(),
+                'ON_OFF' => ++$j % 2 ? 'dark' : ''
             );
 
             $this->setVar($output);

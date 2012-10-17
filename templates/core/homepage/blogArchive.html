@@ -44,15 +44,12 @@
 		</ul>
 	</div>
 
-	<ul class="posts">
+	<ul class="posts blog listing">
 		<!-- BEGIN blog -->
-		<li>
+		<li class="clearfix {BLOG_SHADING}">
 			<a name="{BLOG_ID}"></a>
-			<h2>{BLOG_HEADING}</h2>
-            <div class="small-right">
-                <p class="interact">{MOD_BLOG}</p>
-            </div>
-			<div class="pad-it">
+			<h3>{BLOG_HEADING}</h3>
+                {MOD_BLOG}
                 <p class="author">
                     <a href="/search/user/{BLOG_AUTHOR_ID}" class="author">
                         <img src="{BLOG_AUTHOR_THUMB}"/>
@@ -60,7 +57,7 @@
                     </a>
                     <span class="subtitle">Posted {BLOG_AUTHOR_GROUP}</span>
                 </p>
-                <div class="blog-body">{BLOG_BODY}</div>
+                {BLOG_BODY}
 
 
                 <ul class="comments">
@@ -80,7 +77,6 @@
                     <p><textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
                         <input type="submit" class="submit-btn-plain" name="comment" value="Add comment"/></p>
                 </form>
-			</div>
 		</li>
 		<!-- END blog -->
 	</ul>

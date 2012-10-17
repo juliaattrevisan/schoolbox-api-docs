@@ -183,6 +183,10 @@ img {
   max-width: 100%;
   height: auto;
 }
+.featured_image {
+  float: left;
+  margin: 0 10px 10px 0;
+}
 sub,
 sup {
   font-size: 75%;
@@ -3756,12 +3760,12 @@ ARCHIVE for BLOG, HOMEPAGE BLOG and NEWS
   margin-bottom: 16px;
 }
 .archive .menu {
-  float: left;
+  float: right;
   width: 17%;
 }
 .archive .posts {
   width: 82%;
-  float: right;
+  float: left;
 }
 .archive .menu ul li a,
 .archive .pagination a {
@@ -3903,6 +3907,10 @@ BLOG COMPONENT
 .blog form textarea,
 .news form textarea {
   width: 100%;
+}
+.blog .dark .dark,
+.news .dark .dark {
+  background: #eaeaea !important;
 }
 .forum .comments,
 .blog .comments {
@@ -7225,37 +7233,52 @@ ul.activity-list li .grade span {
   right: 8px;
 }
 /* submission/rubricCriteria */
-#crit-list {
-  max-width: 350px;
+#crit-list,
+#crit-list-lightbox {
+  max-width: 400px;
 }
-#crit-list input {
+#crit-list input,
+#crit-list-lightbox input {
   border: solid 1px #cccccc;
   font-size: 12px;
   padding: 2px;
-  width: 200px;
+  width: 250px;
 }
-#crit-list input[disabled=disabled] {
+#crit-list input[disabled=disabled],
+#crit-list-lightbox input[disabled=disabled] {
   background: transparent;
   color: #222;
   border: solid 1px transparent;
 }
-#crit-list input.group {
+#crit-list input.group,
+#crit-list-lightbox input.group {
   font-weight: bold;
   margin-top: 12px;
 }
-#crit-list input.item {
+#crit-list input.item,
+#crit-list-lightbox input.item {
   margin-left: 10px;
 }
-#crit-list .crit-delete {
+#crit-list .crit-delete,
+#crit-list-lightbox .crit-delete {
   display: block;
   float: right;
 }
 #crit-list li.group.new ul,
-#crit-list li.item.new .delete {
+#crit-list-lightbox li.group.new ul,
+#crit-list li.item.new .delete,
+#crit-list-lightbox li.item.new .delete {
   display: none;
 }
-#crit-list li.item {
+#crit-list li.item,
+#crit-list-lightbox li.item {
   position: relative;
+}
+#crit-list p,
+#crit-list-lightbox p {
+  color: #222;
+  margin: 0;
+  line-height: 1.4em;
 }
 .rubric-settings .btn.no-text.delete {
   position: absolute;
@@ -7809,4 +7832,48 @@ div.colours p {
 .upcoming-work .hideme td .btn,
 .upcoming-work .hideme td br {
   display: none;
+}
+#rubricForm .listing ul li {
+  padding: 10px 0;
+}
+#rubricForm .listing ul li li {
+  padding: 0;
+  font-size: 12px;
+}
+#rubricForm .listing ul li li input,
+#rubricForm .listing ul li li code {
+  font-size: 12px;
+  margin-right: 5px;
+}
+#rubricForm .prompt {
+  color: #bbb;
+}
+#rubricForm .hidden {
+  display: none;
+}
+#rubricForm .err code {
+  color: #c00;
+}
+#rubricForm .err input {
+  border: solid 1px #c00;
+}
+#rubricForm #add-set {
+  margin-left: 20px;
+}
+#rubricForm #resultset-editor .formLabelWidth {
+  width: 300px;
+}
+#rubricForm input {
+  border: solid 1px #ccc;
+  padding: 2px;
+  width: 250px;
+  margin-left: 10px;
+}
+#rubricForm #rubric-results p {
+  margin: 0 0 7px 16px;
+}
+#rubricForm #err-expl {
+  margin-top: 26px;
+  display: none;
+  color: #c00;
 }

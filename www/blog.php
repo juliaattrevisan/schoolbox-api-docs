@@ -10,6 +10,7 @@ $commentHandler = new Comment();
 
 $this->setFile(TEMPLATE_content, 'blog.html');
 
+$i = 0;
 if(is_numeric($this->arg[0])) {
 	$blog = $blogHandler->getByID($this->arg[0]);
 	$permission = $groupHandler->getPermission($blog['cid']);
@@ -26,13 +27,13 @@ if(is_numeric($this->arg[0])) {
     $userHandler = new User();
 
 	$this->setVar(array(
-		'BLOG_CID'      => $blog['cid'],
-		'BLOG_HEADING'  => $blog['heading'],
-		'BLOG_BODY'     => $blog['body'],
-		'BLOG_COMMENTS' => 'No Comments',
-		'BLOG_ID'       => $blog['id'],
-        'BLOG_CREATED'  => $adr->getRelativeTime(),
-
+		'BLOG_CID'          => $blog['cid'],
+		'BLOG_HEADING'      => $blog['heading'],
+		'BLOG_BODY'         => $blog['body'],
+		'BLOG_COMMENTS'     => 'No Comments',
+		'BLOG_ID'           => $blog['id'],
+        'BLOG_CREATED'      => $adr->getRelativeTime(),
+        'BLOG_SHADING'      => ++$i % 2 ? 'dark' : '',
         'BLOG_AUTHOR_ID'    => $blog['owner'],
         'BLOG_AUTHOR_NAME'  => $userHandler->formatName($blog),
         'BLOG_AUTHOR_THUMB' => sprintf('/portrait?userId=%s&size=square32', $blog['synergy_id']),

@@ -58,5 +58,17 @@ class Alaress_Image_Transformation_Storage extends Alaress_Image_Transformation_
                 'method' => 'Sharpen'
             ),
         ),
+        'maxsize' => array(
+            array(
+                'method' => 'Constrain',
+                'args' => array(
+                    'width' => 1024,
+                    'height' => 1024
+                ),
+                array(
+                    'method' => 'Sharpen'
+                )
+            )
+        )
     );
 }
