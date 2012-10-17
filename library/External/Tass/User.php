@@ -121,15 +121,34 @@ class External_Tass_User implements External_UserInterface {
                 AND par_code = '$parentCode'
                 AND sfa_num = '$parentNum'
             ";
+
+            $return = array();
+            $result = $this->getDatabase()->getAll($query);
+
+            // parse the array, because this data is stored in a funky way
+            if(count($result)) {
+                foreach ($result as $row) {
+                    // data is stored in a single field, comma separated
+                    $list = explode(',', $row['RelatedID']);
+                    foreach($list as $childID) {
+                        $return[] = array('RelatedID' => $childID);
+                    }
+                }
+            }
+
+            return $return;
+
         }
         else {
             $query = "
-				SELECT
-					stud_code AS RelatedID
+				SELECT stud_code AS RelatedID
 				FROM student
 				WHERE par_code = '$tassID'
 				AND cmpy_code = '01'
 			";
+
+            $result = $this->getDatabase()->getAll($query);
+            return $result;
         }
 /*
 		if (strlen($tassID) == self::SPLIT_PARENT_TASSID_LENGTH) {
@@ -160,9 +179,8 @@ class External_Tass_User implements External_UserInterface {
 			";
 		}
 */
-		$result = $this->getDatabase()->getAll($query);
+        return false;
 
-        return $result;
     }
 
 	/**
