@@ -77,17 +77,7 @@ if (is_numeric($_REQUEST['cid'])) {
         $ids = $componentInstanceMapper->save($newComp);
         $instanceID = $ids[0];
 
-        // cascade the sequence change
-        $stmt = Database::getInstance()->prepare("
-            UPDATE component_instance ci
-            SET ci.`sequence` = ci.sequence + 1
-            WHERE `position` = 'left'
-            AND ci.`module` = 'homepage'
-            AND ci.`identifier` = :cid
-        ");
-        $stmt->execute(array(
-            'cid' => $_POST['cid']
-        ));
+        $componentInstanceMapper->cascadeSequence($_POST['cid']);
 
         // get the Instance's Definition's Controller
         $factory = new Component_Homepage_Factory(new User(), new SitePage(false));

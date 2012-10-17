@@ -26,8 +26,11 @@ foreach ( array('context', 'targetId', 'definitionId', 'position', 'sequence') a
     }
 }
 
+$cim = Component_InstanceMapper::getInstance();
+$cdm = Component_DefinitionMapper::getInstance();
+
 if ( !empty($_POST['instanceId']) ) {
-    $instance = Component_InstanceMapper::getInstance()->findById($_POST['instanceId']);
+    $instance = $cim->findById($_POST['instanceId']);
 }
 else {
     $instance = new Component_Instance;
@@ -45,14 +48,16 @@ if(!isset($contextMap[$_POST['context']])) {
 }
 $context = $contextMap[$_POST['context']];
 
-if ( $definition = Component_DefinitionMapper::getInstance()->findById($_POST['definitionId']) ) {
+if ( $definition = $cdm->findById($_POST['definitionId']) ) {
     $instance->definitionId = $definition->id;
     $instance->module       = $context;
     $instance->identifier   = $_POST['targetId'];
     $instance->position     = $_POST['position'];
     $instance->sequence     = $_POST['sequence'];
 
-    Component_InstanceMapper::getInstance()->save($instance);
+    // it's an array, but there will only be 1
+    $ids = $cim->save($instance);
+    $cim->resequenceComponents($context, $_POST['targetId'], $protect = $ids[0]);
 
     header('Content-type: application/json');
     echo json_encode($instance);

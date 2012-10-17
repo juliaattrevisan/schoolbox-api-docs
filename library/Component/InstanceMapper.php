@@ -265,4 +265,115 @@ class Component_InstanceMapper extends Mapper {
         }
         return false;
     }
+
+    /**
+     * Forcibly resequence a set of components, optionally protecting one
+     *
+     * @param $module
+     * @param $identifier
+     * @param int $protect - the component that has had its sequence changed, and so should be preserved
+     * @param string $position
+     * @return bool
+     */
+    public function resequenceComponents($module, $identifier, $protect = 0, $position = '') {
+        $cols = array('top', 'left', 'right');
+
+        if($position) {
+            if(!in_array($position, $cols)) {
+                return false;
+            }
+            return $this->resequenceColumn($module, $identifier, $protect, $position);
+        }
+        else {
+            foreach($cols as $c) {
+                $success[] = $this->resequenceColumn($module, $identifier, $protect, $c);
+            }
+            return array_reduce($success, function($result, $item) {
+                return $result || $item;
+            });
+        }
+    }
+
+    private function resequenceColumn($module, $identifier, $protect, $position) {
+        // extract the current listing
+        $stmt = $this->database->prepare("
+            SELECT * FROM component_instance ci
+            WHERE ci.module = :mod
+            AND ci.identifier = :id
+            AND ci.position = :pos
+            ORDER BY ci.identifier ASC, ci.position ASC, ci.sequence ASC
+        ");
+
+        $stmt->execute(array(
+            'mod' => $module,
+            'id' => $identifier,
+            'pos' => $position
+        ));
+
+        $cursequence = array();
+        $resequence = array();
+
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            if($protect && $row['id'] == $protect) {
+                $resequence[$row['sequence']] = $row['id'];
+            }
+            else {
+                $cursequence[] = $row['id'];
+            }
+        }
+
+        if(!count($cursequence)) {
+            return true;
+        }
+
+        for($i = 0, $j = 1; $i < count($cursequence); ++$i, ++$j) {
+            // protected has already been set
+            if(isset($resequence[$j])) {
+                // increment to bypass this sequence index it and keep going
+                ++$j;
+            }
+            $resequence[$j] = $cursequence[$i];
+        }
+
+        // put them in the right order
+        ksort($resequence);
+
+        $stmt = $this->database->prepare("
+            UPDATE component_instance ci
+            SET ci.`sequence` = :cis
+            WHERE ci.id = :ciid
+        ");
+
+        // apply the sequence changes
+        foreach($resequence as $s => $id) {
+            $stmt->execute(array(
+                'ciid' => $id,
+                'cis' => $s
+            ));
+        }
+
+        return true;
+    }
+
+    /**
+     * When a new component is inserted at sequence 0, increment all the indices
+     * @param $identifier
+     * @param string $position
+     * @param string $module
+     */
+    public function cascadeSequence($identifier, $position = 'left', $module = 'homepage') {
+        // cascade the sequence change
+        $stmt = Database::getInstance()->prepare("
+            UPDATE component_instance ci
+            SET ci.`sequence` = ci.sequence + 1
+            WHERE `position` = :pos
+            AND ci.`module` = :mod
+            AND ci.`identifier` = :id
+        ");
+        $stmt->execute(array(
+            'pos' => $position,
+            'mod' => $module,
+            'id' => $identifier
+        ));
+    }
 }
