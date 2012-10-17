@@ -10,29 +10,48 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
 
     private $upcomingWork = array();
 
+    private $restrictedMode;
+
+    private $limit = 0;
+
+    private $userID;
+
+    private $actionable;
+
     /**
      * Business logic to collate data ready for output
      */
     public function execute() {
 
+        if($this->getConfig('allow_parents')) {
+            $this->restrictedMode = false;
+        }
+
+        $this->userID = $this->getConfig('user') ? $this->getConfig('user') : $_SESSION['id'];
+        $this->actionable = $this->getConfig('actionable');
+        $this->limit = is_numeric($this->getConfig('size')) ? $this->getConfig('size') : 0;
+
         // TODO DOES THIS COMPONENT HAVE ACCESS RESTRICTIONS?
-        // assumption: this component is only visible to students
+        // assumption: this component is only visible to students on dashboard
         $groupHandler = new Group();
-        if(!$groupHandler->isStudent()) {
+        if(!$groupHandler->isStudent() && $this->restrictedMode) {
             return false;
         }
 
         $submissionHandler = new Submission();
 
-        $userID = $_SESSION['id'];
-
-        $upcoming = $submissionHandler->getAllUpcomingWorkAndAssessments($userID);
+        $upcoming = $submissionHandler->getAllUpcomingWorkAndAssessments($this->userID);
 
         $now = time();
         $j = 0;
 
         if(!count($upcoming)) {
             return false;
+        }
+
+        // Check if system config restrict_student_submissions is on.
+        if ($groupHandler->isParentOfChild($this->userID) && Cfg::get('restrict_student_submissions')) {
+            $this->restrictedMode = true;
         }
 
         foreach($upcoming as $item) {
@@ -115,7 +134,10 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
             );
 
             // determine actions available
-            if($item['kind'] == 0) {
+            if(!$this->actionable) {
+                $output['upcoming_work_actionable_block'] = '';
+            }
+            elseif($item['kind'] == 0) {
                 // duework
                 $output['UPCOMING_HREF'] = 'submission/submissionHistory/';
                 $output['UPCOMING_BTN_ICON']  = 'modify';
@@ -147,6 +169,10 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
                 }
             }
             $this->upcomingWork[] = $output;
+
+            if($this->limit > 0 && count($this->upcomingWork) >= $this->limit) {
+                break;
+            }
         }
 
         return count($this->upcomingWork) ? true : false;
@@ -161,11 +187,19 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
         }
 
         $this->setBlock($templateHandle, 'upcoming_work', 'upcoming_work_block');
+        $this->setBlock($templateHandle, 'view_all_due_work', 'view_all_due_work_block');
         $this->setBlock('upcoming_work', 'upcoming_work_actionable', 'upcoming_work_actionable_block');
+
+        if($this->actionable && !$this->restrictedMode) {
+            $this->parse('view_all_due_work_block', 'view_all_due_work');
+        }
+        else {
+            $this->setVar('view_all_due_work_block', '');
+        }
 
         foreach ($this->upcomingWork as $output) {
             $this->setVar($output);
-            if($output['upcoming_work_actionable_block'] != 'No submissions') {
+            if(!isset($output['upcoming_work_actionable_block'])) {
                 $this->parse('upcoming_work_actionable_block', 'upcoming_work_actionable');
             }
             $this->parse('upcoming_work_block','upcoming_work', true);

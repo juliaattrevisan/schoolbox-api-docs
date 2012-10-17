@@ -59,7 +59,7 @@ abstract class Component_FactoryAbstract {
     /**
      * Builds a component from a component instance or id
      * @param Component_Instance|Integer $instance
-     * @return Object|Bool
+     * @return Component_ControllerAbstract|Bool
      */
     public function buildComponent ($instance) {
         if ( is_numeric($instance) ) {

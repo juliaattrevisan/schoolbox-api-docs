@@ -192,6 +192,9 @@ class DashboardComponentReFactory {
         'Dashboard_Rss' => array(
             'url' => array('[TOBEOVERWRITTEN]', 'Url')
         ),
+        'Dashboard_UpcomingWork' => array(
+            'size' => array('10', 'Limit')
+        ),
         'Dashboard_Weather' => array(
             'url' => array('[TOBEOVERWRITTEN]', 'Location'),
             'size' => array('3', 'Forecast Days')
