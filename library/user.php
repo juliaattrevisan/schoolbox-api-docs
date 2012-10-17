@@ -166,8 +166,7 @@ class User extends DeprecatedModel {
 			LEFT JOIN `userCampus` ON `user`.id = `userCampus`.uid AND defaultCampus = 1
 			LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
 			WHERE CONCAT_WS(' ',firstname,lastname) LIKE '%$keyword%'
-			OR username LIKE '%$keyword%' OR alt_email LIKE '%$keyword%'
-			OR synergy_id = '$keyword'
+			OR username LIKE '%$keyword%' OR synergy_id = '$keyword'
 		";
 
         $query .= " ORDER BY `$sort_by` $sort_dir
@@ -177,7 +176,7 @@ class User extends DeprecatedModel {
         $count_query = "SELECT COUNT(*)
                                 FROM `user`
                                 WHERE CONCAT_WS(' ',firstname,lastname) LIKE '%$keyword%'
-                                OR username LIKE '%$keyword%' OR alt_email LIKE '%$keyword%'";
+                                OR username LIKE '%$keyword%' OR synergy_id = '$keyword'";
 
         $count = $this->db->getOne($count_query);
 
