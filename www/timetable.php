@@ -5,9 +5,11 @@
  *                                                           *
  ************************************************************/
 //timetable object that displays the users timetable
-require_once '../library/user.php';
-require_once '../library/group.php';
-require_once '../library/category.php';
+
+if(!isset($this)) {
+    require_once dirname(__FILE__).'/../include/Bootstrap.php';
+    SitePage::localRedir('/timetable/');
+}
 
 //synergy not enabled do not display page
 if (!Cfg::get('external_enable')) {
@@ -90,9 +92,16 @@ if (is_array($outputList)) {
                 $dayCount = 1;
                 //for each day
                 foreach ($row['day'] as $period) {
-                    if ($periodCount == 1) // only output header on first run through
-                    {
+                    // only output header on first run through
+                    if ($periodCount == 1) {
                         //output day header
+                        if($dayCount == $dayCurrent) {
+                            $this->setVar('TIMETABLE_CLASS', 'dayCurrent');
+                        }
+                        // compensate for the 'off by 1' scenario that's occurring
+                        elseif($dayCount == $dayCurrent + 1) {
+                            $this->setVar('TIMETABLE_CLASS', 'normal');
+                        }
                         $this->setVar("DAY_NUMBER", $dayCount);
                         $this->parse("day_header_listing", "day_header", true);
                     }
@@ -104,6 +113,7 @@ if (is_array($outputList)) {
                         'PERIOD_ONCLICK' => '',
                         'PERIOD_STAFF' => '',
                         'PERIOD_COLOUR' => '',
+                        'TIMETABLE_CLASS' => '',
                     );
 
                     if ($period['description']) {
@@ -158,25 +168,32 @@ if (is_array($outputList)) {
                             $catCache[$period['code']] = $cat['id'];
                         }
 
-                        if ($catCache[$period['code']] && $groupHandler->getPermission(
-                            $catCache[$period['code']]
-                        ) >= READ_ACCESS
-                        ) {
+                        if($catCache[$period['code']] && $groupHandler->getPermission($catCache[$period['code']]) >= READ_ACCESS) {
                             $outputPeriod['PERIOD_ONCLICK'] = 'onClick="window.location=\'/homepage/' . urlencode(
                                 $period['code']
                             ) . '\'"';
                         }
-
                     }
 
-                    if ($dayCount == $dayCurrent) {
-                        if ($row['periodNumber'] == $periodCurrent['PeriodNumber'] && $row['periodSequence'] == $periodCurrent['PeriodNumberSeq']) {
+                    if ($row['periodNumber'] == $periodCurrent['PeriodNumber'] && $row['periodSequence'] == $periodCurrent['PeriodNumberSeq']) {
+                        if($dayCount == $dayCurrent) {
+                            // current period, also current day: intersection
                             $outputPeriod['TIMETABLE_CLASS'] = 'dayCurrent current';
-                        } else {
+                        }
+                        else {
+                            // current period, not current day: display row
                             $outputPeriod['TIMETABLE_CLASS'] = 'dayCurrent';
                         }
-                    } else {
-                        $outputPeriod['TIMETABLE_CLASS'] = 'normal';
+                    }
+                    else {
+                        if($dayCount == $dayCurrent) {
+                            // not current period, but is current day: display column
+                            $outputPeriod['TIMETABLE_CLASS'] = 'dayCurrent';
+                        }
+                        else {
+                            // neither current period nor current day
+                            $outputPeriod['TIMETABLE_CLASS'] = 'normal';
+                        }
                     }
 
                     $this->setVar($outputPeriod);

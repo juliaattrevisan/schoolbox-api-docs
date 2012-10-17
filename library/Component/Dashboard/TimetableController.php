@@ -156,10 +156,17 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                     }
 
-                    if ($this->currentPeriod['PeriodNumber'] == $period['periodNumber']) {
-                        $this->setVar("PERIOD_CLASS", "current");
-                    } else {
-                        $this->setVar("PERIOD_CLASS", "normal");
+                    if($this->currentPeriod['PeriodNumber'] == $period['periodNumber']) {
+                        $this->setVar(array(
+                            'PERIOD_CLASS' => 'current',
+                            'PERIOD_TH_CLASS' => 'dayCurrent'
+                        ));
+                    }
+                    else {
+                        $this->setVar(array(
+                            'PERIOD_CLASS' => 'normal',
+                            'PERIOD_TH_CLASS' => 'normal'
+                        ));
                     }
 
 
