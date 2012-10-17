@@ -20,7 +20,7 @@ conffile3="/var/www/schoolbox/www/conf/conf.php";
 instdir=`readlink -f ../$1`;
 sqlfile=$instdir"/updates/sql_updates.sql";
 tmpfile="/tmp/schoolbox_sql_updates_`date -I`.sql";
-backupfile="/tmp/schoolbox_backup_`date -I`.sql";
+backupfile="/var/lib/schoolbox/schoolbox_backup_`date -I`.sql";
 
 echo "Starting SQL update process";
 
@@ -107,15 +107,20 @@ else
         then
                 echo "SQL updated to version $newver";
         else
-                # Revert database to backup
+                # Revert database to original
                 mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $backupfile > /dev/null 2>&1;
+                if [ $? -eq 0 ];
+                then
+                        echo "Database returned to original pre-update state.";
+                fi
                 echo "SQL update failed. Please attempt a manual update.";
+                echo "A backup of the original database is located at: $backupfile";
         fi
         
         # Cleanup tmpfile and backup
         if [ -f $tmpfile ];
         then
-                rm -rf {$tmpfile,$backupfile};
+                rm -rf {$tmpfile};
         fi
 fi
 
