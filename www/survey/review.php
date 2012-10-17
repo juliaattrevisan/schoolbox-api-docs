@@ -20,6 +20,7 @@ $attemptHandler = new Survey_Attempt();
 $responseHandler = new Survey_Response();
 $sectionHandler = new Survey_Section();
 $groupHandler = new Group();
+$userHandler = new User;
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -53,7 +54,10 @@ if ($assessHandler->isDeleted($this->arg[0])) {
     error(112);
 }
 
-if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission(
+    $assess['category_id']
+) < WRITE_ACCESS)
+) {
     error(127);
 }
 
@@ -91,17 +95,19 @@ $user = $attemptHandler->getUser($attempt['attempt_id']);
 /* Show current Section's data, and other mandatory tokens needed to complete
  * the Assessment.
  */
-$this->setVar(array(
-    'ASSESS_ASSESS_ID' => $assess['assess_id'],
-    'ASSESS_TITLE' => Scrub::text($assess['title']),
-    'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
-    'SECTION_TITLE' => Scrub::text($section['title']),
-    'SECTION_DESCRIPTION' => Scrub::text($section['description']),
-    'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
-    'ATTEMPT_USERNAME' => $user['firstname'] . ' ' . $user['lastname'],
-    'ATTEMPT_START_DATETIME' => $start->getShort(),
-    'ATTEMPT_FINISH_DATETIME' => $finish->getShort(),
-));
+$this->setVar(
+    array(
+        'ASSESS_ASSESS_ID' => $assess['assess_id'],
+        'ASSESS_TITLE' => Scrub::text($assess['title']),
+        'ATTEMPT_ATTEMPT_ID' => $_SESSION['attempt_id'],
+        'SECTION_TITLE' => Scrub::text($section['title']),
+        'SECTION_DESCRIPTION' => Scrub::text($section['description']),
+        'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
+        'ATTEMPT_USERNAME' => $assess['anonymous_result'] ? 'Anonymous' : $userHandler->formatName($user),
+        'ATTEMPT_START_DATETIME' => $start->getShort(),
+        'ATTEMPT_FINISH_DATETIME' => $finish->getShort(),
+    )
+);
 
 /* Load all the questions for this section.
  * Note: only show the randomly-selected ones
@@ -114,19 +120,24 @@ if ($allQuestions) {
 
         /* Load answer template into answerOption block
          */
-        $this->setFile('answerFormFragment', 'survey/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/review.html');
+        $this->setFile(
+            'answerFormFragment',
+            'survey/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/review.html'
+        );
         $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
         /* Reset answer options from previous iteration
          */
         $this->setVar('answerOption_block', '');
 
-        $this->setVar(array(
-            'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
-            'QUESTION_SEQUENCE' => $currentQuestion['sequence'],
-            'QUESTION_QUESTION' => Scrub::html($currentQuestion['question']),
-            'QUESTION_MARKS' => $currentQuestion['marks'],
-        ));
+        $this->setVar(
+            array(
+                'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
+                'QUESTION_SEQUENCE' => $currentQuestion['sequence'],
+                'QUESTION_QUESTION' => Scrub::html($currentQuestion['question']),
+                'QUESTION_MARKS' => $currentQuestion['marks'],
+            )
+        );
 
         /* Load individual answers
          */
@@ -163,9 +174,11 @@ if (!is_numeric($nextSection['section_id']) && !is_numeric($prevSection['section
  */
 else {
     if (is_numeric($nextSection['section_id'])) {
-        $this->setVar(array(
-            'NEXT_SECTION_ID' => $nextSection['section_id'],
-        ));
+        $this->setVar(
+            array(
+                'NEXT_SECTION_ID' => $nextSection['section_id'],
+            )
+        );
 
         $this->parse('nextSection_block', 'nextSection');
         $this->setVar('endAssess_block', '');
@@ -177,9 +190,11 @@ else {
     /* Conditions where the previous button is available
      */
     if (is_numeric($prevSection['section_id'])) {
-        $this->setVar(array(
-            'PREV_SECTION_ID' => $prevSection['section_id'],
-        ));
+        $this->setVar(
+            array(
+                'PREV_SECTION_ID' => $prevSection['section_id'],
+            )
+        );
 
         $this->parse('prevSection_block', 'prevSection');
     } else {
