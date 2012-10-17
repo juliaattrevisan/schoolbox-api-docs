@@ -6,12 +6,12 @@
 define('UPCOMING_WORK_TYPE', 1);
 define('AWAITING_WORK_TYPE', 2);
 define('RETURNED_WORK_TYPE', 3);
-define('OVERDUE_WORK_TYPE',  4);
+define('OVERDUE_WORK_TYPE', 4);
 define('RECENT_WORK_LIMIT', 12);
 
 class Submission extends DeprecatedModel {
 
-    function Submission () {
+    function Submission() {
 
         $this->_table = "submission_box";
         $this->_index = "id";
@@ -77,14 +77,13 @@ class Submission extends DeprecatedModel {
         // securitae
         $field = mysql_real_escape_string($field);
 
-        if(is_array($value)) {
-            foreach($value as &$v) {
+        if (is_array($value)) {
+            foreach ($value as &$v) {
                 $v = mysql_real_escape_string($v);
             }
             $conditional = 'IN (' . implode(',', $value) . ')';
 
-        }
-        else {
+        } else {
             $conditional = "= $value";
         }
 
@@ -107,12 +106,12 @@ class Submission extends DeprecatedModel {
         $boxTable = $this->db->getAll($query);
 
         // subbox data will be common to all rows, so unset notifications, then push into sub-array
-        if(is_array($boxTable) && count($boxTable)) {
+        if (is_array($boxTable) && count($boxTable)) {
             $box = $boxTable[0];
             unset($box['notif_type']);
             unset($box['notif_notif_enabled']);
             unset($box['notif_notif_sent']);
-            foreach($boxTable as $row) {
+            foreach ($boxTable as $row) {
                 $box['notifications'][$row['notif_type']] = array(
                     'enabled' => $row['notif_enabled'],
                     'sent' => $row['notif_sent']
@@ -133,7 +132,7 @@ class Submission extends DeprecatedModel {
      * @param <type> $categoryList
      * @return <type>
      */
-	function getByDate($date, $userID, $categoryList) {
+    function getByDate($date, $userID, $categoryList) {
         $query = "(SELECT
                     s.id, s.category, s.type, s.owner, s.open_date, s.date, s.late_date, s.fid, s.accept_submission,
                     s.deleted, s.name, s.description, s.created, s.mark_type, s.max_mark,
@@ -147,7 +146,7 @@ class Submission extends DeprecatedModel {
                     WHERE s.deleted = 0
                     AND s.category = c.id
                     AND DATE(s.date) = DATE(FROM_UNIXTIME({$date}))
-                    AND c.id IN (".implode(',',$categoryList).")
+                    AND c.id IN (" . implode(',', $categoryList) . ")
                     GROUP BY s.id
                     )
                     UNION
@@ -175,7 +174,7 @@ class Submission extends DeprecatedModel {
                     LEFT JOIN categoryCode ON categoryCode.categoryID = assess.category_id
                     WHERE assess.deleted_at IS NULL
                     AND DATE(assess.finish) = DATE(FROM_UNIXTIME({$date}))
-                    AND category.id IN (".implode(',',$categoryList).")
+                    AND category.id IN (" . implode(',', $categoryList) . ")
                     GROUP BY id
                     )
                     ORDER BY date";
@@ -183,41 +182,41 @@ class Submission extends DeprecatedModel {
         $result = $this->db->getAll($query);
 
         return $result;
-	}
+    }
 
-	function getUpcoming($userID, $categoryList) {
-		$query = "SELECT s.*, UNIX_TIMESTAMP(s.date) date, ft.name as type, file.realname, file.id file_id, a.inline, c.name categoryName
+    function getUpcoming($userID, $categoryList) {
+        $query = "SELECT s.*, UNIX_TIMESTAMP(s.date) date, ft.name as type, file.realname, file.id file_id, a.inline, c.name categoryName
 				  FROM ( submission_box s, category c )
 				  LEFT JOIN student_submission t ON t.box_id = s.id AND t.owner = '$userID'
 				  LEFT JOIN file ON s.fid = file.id
 				  LEFT JOIN allowedFileTypes a ON file.mime_type = a.mime
 			 	  LEFT JOIN file_type ft ON s.type = ft.id
 				  WHERE s.category = c.id AND s.deleted = 0 AND s.late_date > NOW() AND s.owner != '$userID' AND t.id IS NULL
-                    AND c.id IN (".implode(',',$categoryList).") ORDER BY s.date";
+                    AND c.id IN (" . implode(',', $categoryList) . ") ORDER BY s.date";
 
-		return $this->db->getAll($query);
-	}
+        return $this->db->getAll($query);
+    }
 
-	/**
-	 * Gets all the due/submitted/returned work via Submission Boxes.
-	 *
-	 * @param $userID
-	 * @param $categoryIDList
-	 *
-	 * @return array|bool
-	 */
-	public function getAllDueWork($userID, $categoryIDList, $year = 0, $semester = 0) {
+    /**
+     * Gets all the due/submitted/returned work via Submission Boxes.
+     *
+     * @param $userID
+     * @param $categoryIDList
+     *
+     * @return array|bool
+     */
+    public function getAllDueWork($userID, $categoryIDList, $year = 0, $semester = 0) {
 
-        if(!$categoryIDList) {
+        if (!$categoryIDList) {
             return array();
         }
 
-        if(!$year) {
+        if (!$year) {
             $year = date('Y');
         }
         $semesterTest = DueWork_All::getSemesterLogic($semester);
 
-		$outerQuery = "
+        $outerQuery = "
 		    SELECT
 			b.id AS bid,
 			s.id AS sid,
@@ -249,8 +248,8 @@ class Submission extends DeprecatedModel {
         $collection = array();
 
         // use the derived returnIDs to additionally retrieve marks, comments, etc
-        while($row = $this->db->getNextArray($outerResult)) {
-            if($row['rid']) {
+        while ($row = $this->db->getNextArray($outerResult)) {
+            if ($row['rid']) {
                 $innerQuery = "
                     SELECT mark, comment
                     FROM submission_return
@@ -260,42 +259,43 @@ class Submission extends DeprecatedModel {
                     LIMIT 1
                 ";
                 $collection[] = array_merge($row, $this->db->getRow($innerQuery));
-            }
-            else {
+            } else {
                 $collection[] = $row;
             }
         }
         return $collection;
-	}
+    }
 
-	/**
-	 * The most recent activity regarding work submissions and returns.
-	 *
-	 * @param <type> $categoryIDList
-	 * @param <type> $limit
-	 * @return <type>
-	 */
-	function getRecentWork($userID, $categoryIDList, $type) {
-		$query = "SELECT
+    /**
+     * The most recent activity regarding work submissions and returns.
+     *
+     * @param <type> $categoryIDList
+     * @param <type> $limit
+     * @return <type>
+     */
+    function getRecentWork($userID, $categoryIDList, $type) {
+        $query = "SELECT
 			b.id AS bid,
 			s.id AS sid,
 			r.id AS rid,
 			f.id AS fid,";
 
-		if ($type == UPCOMING_WORK_TYPE) {
-			$query .= ' UNIX_TIMESTAMP(b.date) AS date, ';
-			$orderBy = 'b.date';
-		}
-		else if ($type == AWAITING_WORK_TYPE) {
-			$query .= ' UNIX_TIMESTAMP(s.submitted) AS date, ';
-			$orderBy = 's.submitted';
-		}
-		else if ($type == RETURNED_WORK_TYPE) {
-			$query .= ' UNIX_TIMESTAMP(r.returned) AS date, ';
-			$orderBy = 'r.returned';
-		}
+        if ($type == UPCOMING_WORK_TYPE) {
+            $query .= ' UNIX_TIMESTAMP(b.date) AS date, ';
+            $orderBy = 'b.date';
+        } else {
+            if ($type == AWAITING_WORK_TYPE) {
+                $query .= ' UNIX_TIMESTAMP(s.submitted) AS date, ';
+                $orderBy = 's.submitted';
+            } else {
+                if ($type == RETURNED_WORK_TYPE) {
+                    $query .= ' UNIX_TIMESTAMP(r.returned) AS date, ';
+                    $orderBy = 'r.returned';
+                }
+            }
+        }
 
-		$query .= "
+        $query .= "
 			c.name AS categoryName,
 			c.id as cid,
 			b.name, b.description, b.accept_submission,
@@ -311,25 +311,27 @@ class Submission extends DeprecatedModel {
 			AND b.category IN (" . implode(',', $categoryIDList) . ")
 			AND $orderBy IS NOT NULL";
 
-		/* For items that have been submitted but not returned
-		 */
-		if ($type == UPCOMING_WORK_TYPE) {
-			$query .= " AND s.submitted IS NULL
+        /* For items that have been submitted but not returned
+         */
+        if ($type == UPCOMING_WORK_TYPE) {
+            $query .= " AND s.submitted IS NULL
 						AND r.returned IS NULL
 						ORDER BY $orderBy DESC";
-		}
-		else if ($type == AWAITING_WORK_TYPE) {
-			$query .= " AND s.submitted IS NOT NULL
+        } else {
+            if ($type == AWAITING_WORK_TYPE) {
+                $query .= " AND s.submitted IS NOT NULL
 						AND r.returned IS NULL
 						ORDER BY $orderBy DESC";
-		}
-		else if ($type == RETURNED_WORK_TYPE) {
-			$query .= " AND r.returned IS NOT NULL
+            } else {
+                if ($type == RETURNED_WORK_TYPE) {
+                    $query .= " AND r.returned IS NOT NULL
 			            GROUP BY rid
 						ORDER BY $orderBy DESC";
-		}
+                }
+            }
+        }
 
-		$result = $this->db->getAll($query);
+        $result = $this->db->getAll($query);
 
         if (!empty($result)) {
             /* Convert date fields and set status */
@@ -344,10 +346,14 @@ class Submission extends DeprecatedModel {
 
                 if ($type == UPCOMING_WORK_TYPE) {
                     $work['relevant_date'] = $work['date'];
-                } else if ($type == AWAITING_WORK_TYPE) {
-                    $work['relevant_date'] = $work['submitted'];
-                } else if ($type == RETURNED_WORK_TYPE) {
-                    $work['relevant_date'] = $work['returned'];
+                } else {
+                    if ($type == AWAITING_WORK_TYPE) {
+                        $work['relevant_date'] = $work['submitted'];
+                    } else {
+                        if ($type == RETURNED_WORK_TYPE) {
+                            $work['relevant_date'] = $work['returned'];
+                        }
+                    }
                 }
 
                 $work['status'] = $type;
@@ -355,18 +361,18 @@ class Submission extends DeprecatedModel {
         }
 
         return $result;
-	}
+    }
 
-	/**
-	 * Gets all the due/submitted/returned work via Submission Boxes.
-	 * Unions Submissions and Returns, orders by the date they occurred
-	 *
-	 * @param <type> $categoryIDList
-	 * @param <type> $limit
-	 * @return <type>
-	 */
-	function getSubmissionHistory($userID, $boxID) {
-		$query = "(SELECT
+    /**
+     * Gets all the due/submitted/returned work via Submission Boxes.
+     * Unions Submissions and Returns, orders by the date they occurred
+     *
+     * @param <type> $categoryIDList
+     * @param <type> $limit
+     * @return <type>
+     */
+    function getSubmissionHistory($userID, $boxID) {
+        $query = "(SELECT
 			b.id AS bid,
 			s.id AS sid,
 		    NULL AS rid,
@@ -402,12 +408,14 @@ class Submission extends DeprecatedModel {
 			AND r.returned IS NOT NULL)
 		ORDER BY date DESC";
 
-		return $this->db->getAll($query);
-	}
+        return $this->db->getAll($query);
+    }
 
     function getAllForCategory($categoryID, $config = false, $distinct = false, $userID = -1) {
-        if($userID == -1) $userID = $_SESSION['id'];
-            $query = "SELECT sb.id, sb.category, ft.name as typeName, sb.owner,
+        if ($userID == -1) {
+            $userID = $_SESSION['id'];
+        }
+        $query = "SELECT sb.id, sb.category, ft.name as typeName, sb.owner,
                               UNIX_TIMESTAMP(sb.open_date) AS open,
                               UNIX_TIMESTAMP(sb.date) AS date,
                               UNIX_TIMESTAMP(sb.late_date) AS late,
@@ -420,20 +428,22 @@ class Submission extends DeprecatedModel {
                               LEFT JOIN submission_return sr ON sr.box_id = sb.id AND (sr.owner = '$userID' OR sr.owner IS NULL)
                               LEFT JOIN file_type ft ON sb.type = ft.id
                               WHERE
-                              sb.category = '".$categoryID."'
+                              sb.category = '" . $categoryID . "'
                               AND sb.deleted = '0'";
-            if($distinct)
-                $query .= " GROUP BY id";
-            $query .= " ORDER BY sb.date DESC";
+        if ($distinct) {
+            $query .= " GROUP BY id";
+        }
+        $query .= " ORDER BY sb.date DESC";
 
-            if($config['size'] > 0)
-                    $query .= " LIMIT 0, " . $config['size'];
+        if ($config['size'] > 0) {
+            $query .= " LIMIT 0, " . $config['size'];
+        }
 
-            return $this->db->getAll($query);
+        return $this->db->getAll($query);
     }
 
-        function getAllForUserCategory($categoryID, $userID) {
-            $query = "(SELECT
+    function getAllForUserCategory($categoryID, $userID) {
+        $query = "(SELECT
                             sb.id,
                             sb.category,
                             ft.id AS type_id,
@@ -469,13 +479,13 @@ class Submission extends DeprecatedModel {
 						AND assess.deleted_at IS NULL
                         AND assess.user_id = '$userID')";
 
-            return $this->db->getAll($query);
+        return $this->db->getAll($query);
     }
 
 
     function getHomework($categoryID, $config = false, $type = 3) {
 
-            $query = "SELECT sb.id, sb.category, ft.name as typeName, sb.owner,
+        $query = "SELECT sb.id, sb.category, ft.name as typeName, sb.owner,
                               UNIX_TIMESTAMP(sb.open_date) AS open,
                               UNIX_TIMESTAMP(sb.date) AS date,
                               UNIX_TIMESTAMP(sb.late_date) AS late,
@@ -485,34 +495,37 @@ class Submission extends DeprecatedModel {
                               LEFT JOIN allowedFileTypes af ON f.mime_type = mime
                               LEFT JOIN student_submission ss ON ss.box_id = sb.id AND ss.owner = '" . $_SESSION['id'] . "'
                               LEFT JOIN file_type ft ON sb.type = ft.id
-                              WHERE sb.category = '".$categoryID."' AND sb.deleted = '0' AND sb.type = '".$type."'
+                              WHERE sb.category = '" . $categoryID . "' AND sb.deleted = '0' AND sb.type = '" . $type . "'
                               ORDER BY sb.date DESC";
 
-            if($config['size'] > 0)
-                    $query .= " LIMIT 0, " . $config['size'];
+        if ($config['size'] > 0) {
+            $query .= " LIMIT 0, " . $config['size'];
+        }
 
-            return $this->db->getAll($query);
+        return $this->db->getAll($query);
     }
 
-	/**
-	 * Note the empty string for Availability for the first half of the Union
-	 * This is to keep the column count matching for the second half of the
-	 * Union (this is the only way to determine whether an Evaluation record is
-	 * an Assess or a Survey)
-	 *
-	 * @param  $userID
-	 * @return array|bool
-	 */
+    /**
+     * Note the empty string for Availability for the first half of the Union
+     * This is to keep the column count matching for the second half of the
+     * Union (this is the only way to determine whether an Evaluation record is
+     * an Assess or a Survey)
+     *
+     * @param  $userID
+     * @return array|bool
+     */
     public function getAllForUser($userID, $year = 0, $semester = 0) {
         $dateConditionA = '';
         $dateConditionB = '';
 
-        if($year) {
-            $dateConditionA .= " AND DATE_FORMAT(submission_box.open_date, '%Y') = $year";
+        if ($year) {
+            $dateConditionA .= " AND DATE_FORMAT(submission_box.date, '%Y') = $year";
             $dateConditionB .= " AND DATE_FORMAT(assess.start, '%Y') = $year";
         }
-        if($semester) {
-            $dateConditionA .= " AND DATE_FORMAT(submission_box.open_date, '%m') " . DueWork_All::getSemesterLogic($semester);
+        if ($semester) {
+            $dateConditionA .= " AND DATE_FORMAT(submission_box.date, '%m') " . DueWork_All::getSemesterLogic(
+                $semester
+            );
             $dateConditionB .= " AND DATE_FORMAT(assess.start, '%m') " . DueWork_All::getSemesterLogic($semester);
         }
 
@@ -624,11 +637,11 @@ class Submission extends DeprecatedModel {
     }
 
     function getBoxCount($box_id) {
-         $query = "SELECT COUNT(*) AS total, SUM(marked) AS marked FROM student_submission WHERE box_id = '".$box_id."'";
-         return $this->db->getRow($query);
+        $query = "SELECT COUNT(*) AS total, SUM(marked) AS marked FROM student_submission WHERE box_id = '" . $box_id . "'";
+        return $this->db->getRow($query);
     }
 
-    function getTypes(){
+    function getTypes() {
         $query = "SELECT * FROM file_type";
         return $this->db->getAll($query);
     }
@@ -641,9 +654,9 @@ class Submission extends DeprecatedModel {
         // in addition to the db, give 'none' option.
         $default = array(
             array(
-                'grade_id'    => '-1',
+                'grade_id' => '-1',
                 'lower_bound' => '-1',
-                'caption'     => '(none)'
+                'caption' => '(none)'
             )
         );
         $query = "SELECT * FROM submission_grade";
@@ -661,8 +674,9 @@ class Submission extends DeprecatedModel {
         $query = "SELECT *
                   FROM submission_mark_type";
 
-        if(!$includeDisabled)
+        if (!$includeDisabled) {
             $query .= " WHERE enabled = '1'";
+        }
 
 
         return $this->db->getAll($query);
@@ -702,34 +716,40 @@ class Submission extends DeprecatedModel {
 
 
     /**
-	 * Get all the types except the id's mentioned in $vals. Used to exclude
-	 * Online Assessments from selection on createSubmission/
-	 *
-	 * @param <type> $vals
-	 * @return <type>
-	 */
-    function getTypesExcept($vals){
+     * Get all the types except the id's mentioned in $vals. Used to exclude
+     * Online Assessments from selection on createSubmission/
+     *
+     * @param <type> $vals
+     * @return <type>
+     */
+    function getTypesExcept($vals) {
         $query = "SELECT * FROM file_type";
 
-		if (is_array($vals) && count($vals)) {
-			$query .= " WHERE id NOT IN (" . implode(',', $vals) . ")";
-		}
+        if (is_array($vals) && count($vals)) {
+            $query .= " WHERE id NOT IN (" . implode(',', $vals) . ")";
+        }
 
         return $this->db->getAll($query);
     }
 
-	function getActivityLog($userID, $limit = 5, $categoryList) {
-        $implodedCategoryList = implode(',',$categoryList);
+    function getActivityLog($userID, $limit = 5, $categoryList) {
+        $implodedCategoryList = implode(',', $categoryList);
 
-		$query = " ( SELECT open_date activity_date, f.name typeName, s.name, s.description, s.category, c.name categoryName, s.fid, 'new' FROM submission_box s, category c, file_type f
-					  WHERE s.category = c.id AND f.id = s.type AND open_date < NOW() AND c.id IN (".implode(',',$categoryList).") )
+        $query = " ( SELECT open_date activity_date, f.name typeName, s.name, s.description, s.category, c.name categoryName, s.fid, 'new' FROM submission_box s, category c, file_type f
+					  WHERE s.category = c.id AND f.id = s.type AND open_date < NOW() AND c.id IN (" . implode(
+            ',', $categoryList
+        ) . ") )
 					UNION
 				    ( SELECT `date`, l.name typeName, u.name, u.description, u.category, e.name categoryName, u.fid, 'overdue' FROM ( submission_box u, category e, file_type l )
 					  LEFT JOIN student_submission d ON d.box_id = u.id AND d.owner = $userID
-					  WHERE d.id IS NOT NULL AND u.category = e.id AND l.id = u.type AND `date` < NOW() AND e.id IN (".implode(',',$categoryList).") )
+					  WHERE d.id IS NOT NULL AND u.category = e.id AND l.id = u.type AND `date` < NOW() AND e.id IN (" . implode(
+            ',', $categoryList
+        ) . ") )
 					UNION
 					( SELECT `late_date`, i.name typeName, t.name, t.description, t.category, a.name categoryName, t.fid, 'closed' FROM submission_box t, category a, file_type i
-					  WHERE t.category = a.id AND i.id = t.type AND `late_date` < NOW() AND a.id IN (".implode(',',$categoryList).") )
+					  WHERE t.category = a.id AND i.id = t.type AND `late_date` < NOW() AND a.id IN (" . implode(
+            ',', $categoryList
+        ) . ") )
 					UNION
 					( SELECT g.`submitted` activity_date, g.realname typeName, m.name, m.description, m.category, n.name categoryName, m.fid, 'submitted'  FROM  student_submission g, submission_box m, category n
 					  WHERE g.box_id = m.id AND m.category = n.id AND g.owner = $userID )
@@ -767,52 +787,48 @@ class Submission extends DeprecatedModel {
                      AND assess.category_id IN ($implodedCategoryList))
 					ORDER BY activity_date DESC LIMIT $limit";
 
-		return $this->db->getAll($query);
-	}
+        return $this->db->getAll($query);
+    }
 
-    function logPageView($page, $box_id = 0)
-    {
-            //Page 1=due work page, 2 = returned work page (deprecated), 3 = submission page
+    function logPageView($page, $box_id = 0) {
+        //Page 1=due work page, 2 = returned work page (deprecated), 3 = submission page
 
 
-            /* TODO: rewrite this code in simpler method probably use mysql insert/update */
-            $testquery = "SELECT datetime FROM submission_log WHERE page = '$page'
-            AND user = '".$_SESSION['id']."' AND sid = '$box_id'";
+        /* TODO: rewrite this code in simpler method probably use mysql insert/update */
+        $testquery = "SELECT datetime FROM submission_log WHERE page = '$page'
+            AND user = '" . $_SESSION['id'] . "' AND sid = '$box_id'";
 
-            $this->db->query($testquery);
+        $this->db->query($testquery);
 
-            if($row = $this->db->getNextArray() )
-            {
-                    $query = "UPDATE submission_log SET datetime = NOW() WHERE page =
-                    '$page' AND user = '".$_SESSION['id']."' AND sid = '$box_id'";
-            }
-            else
-            {
-                    $query = "INSERT INTO submission_log (datetime, user, page, sid) VALUES
-                            (NOW(), '".$_SESSION['id']."', '$page', '$box_id')";
-            }
+        if ($row = $this->db->getNextArray()) {
+            $query = "UPDATE submission_log SET datetime = NOW() WHERE page =
+                    '$page' AND user = '" . $_SESSION['id'] . "' AND sid = '$box_id'";
+        } else {
+            $query = "INSERT INTO submission_log (datetime, user, page, sid) VALUES
+                            (NOW(), '" . $_SESSION['id'] . "', '$page', '$box_id')";
+        }
 
-            $this->db->query($query);
+        $this->db->query($query);
     }
 
     function getAssignments($categoryID, $config = false) {
-            return $this->getHomework($categoryID, $config, 2);
+        return $this->getHomework($categoryID, $config, 2);
     }
 
     function delete($id, $clean = false) {
-            return $this->update(array('id'=>$id,'deleted'=>1));
+        return $this->update(array('id' => $id, 'deleted' => 1));
     }
 
     function homepageClean($cid) {
-            return $this->db->update($this->_table, 'category', array('category'=>$cid, 'deleted'=>1));
+        return $this->db->update($this->_table, 'category', array('category' => $cid, 'deleted' => 1));
     }
 
     function getBoxOwner($box_id) {
-       $query = "SELECT owner
+        $query = "SELECT owner
                  FROM submission_box
                  WHERE id = $box_id";
 
-       return $this->db->getRow($query);
+        return $this->db->getRow($query);
     }
 
     function getAllForBox($box_id) {
@@ -820,12 +836,12 @@ class Submission extends DeprecatedModel {
         $multi = $this->db->getOne($query);
 
         // if multiselect has been disabled, return THE MOST RECENT submission from each student in the box
-        if($multi)
+        if ($multi) {
             $query = "SELECT ss.id, submitted, realname, u.firstname, u.lastname
                       FROM student_submission ss
                       JOIN `user` u ON ss.owner = u.id
                       WHERE box_id = $box_id ";
-        else
+        } else {
             $query = "SELECT * FROM
                       (
                           SELECT ss.id, submitted, realname, u.firstname, u.lastname, u.id AS uid
@@ -836,30 +852,32 @@ class Submission extends DeprecatedModel {
                       ) foo
                       GROUP BY uid
                       ORDER BY lastname, firstname ";
+        }
 
-       return $this->db->getAll($query);
+        return $this->db->getAll($query);
     }
 
-	/**
-	 * Get the name of a file_type by id. Used in submissions reporting
-	 *
-	 * @param $typeId
-	 * @return array|bool
-	 */
-	public function getType($typeId) {
-		$query = "
+    /**
+     * Get the name of a file_type by id. Used in submissions reporting
+     *
+     * @param $typeId
+     * @return array|bool
+     */
+    public function getType($typeId) {
+        $query = "
 			SELECT name
 			FROM file_type
 			WHERE id = '$typeId'
 		";
 
-		return $this->db->getRow($query);
-	}
+        return $this->db->getRow($query);
+    }
 
     public function getSubmissionReminderList($status) {
 
         // "retrieve the Users, their Subjects, and the DueWorks for users that have not submitted any work"
-        $stmt = Database::getInstance()->prepare("
+        $stmt = Database::getInstance()->prepare(
+            "
             SELECT
               u.id u_id, u.username u_username, u.firstname u_firstname, u.lastname u_lastname,
               u.local_email u_local_email, u.alt_email u_alt_email,
@@ -878,12 +896,13 @@ class Submission extends DeprecatedModel {
             AND sb.`date` BETWEEN :range_start AND :range_end
             AND u.id NOT IN (SELECT `owner` FROM student_submission ss WHERE ss.box_id = sb.id)
             ORDER BY u.id ASC, c.id ASC, sb.date ASC
-        ");
+        "
+        );
 
         $now = date('Y-m-d H:i:s');
 
         // setup the parameters based on the context of the notification
-        if($status == UPCOMING_WORK_TYPE) {
+        if ($status == UPCOMING_WORK_TYPE) {
             // closing dates between now and this time tomorrow
             $params = array(
                 'notif_type' => 'upcoming',
@@ -892,8 +911,7 @@ class Submission extends DeprecatedModel {
                 'range_start' => $now,
                 'range_end' => date('Y-m-d H:i:s', time() + 24 * 3600)
             );
-        }
-        elseif($status == OVERDUE_WORK_TYPE) {
+        } elseif ($status == OVERDUE_WORK_TYPE) {
             // closing dates between an hour ago and now
             $params = array(
                 'notif_type' => 'overdue',
@@ -902,12 +920,10 @@ class Submission extends DeprecatedModel {
                 'range_start' => date('Y-m-d H:i:s', time() - 3600),
                 'range_end' => $now
             );
-        }
-        elseif($status == RETURNED_WORK_TYPE) {
+        } elseif ($status == RETURNED_WORK_TYPE) {
             // not yet implemented
             return array();
-        }
-        else {
+        } else {
             return array();
         }
 
@@ -917,20 +933,20 @@ class Submission extends DeprecatedModel {
         $prevUID = -1;
         $prevCID = -1;
         $emailObj = new Email();
-        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
             // different user, create user details
-            if($row['u_id'] != $prevUID) {
+            if ($row['u_id'] != $prevUID) {
                 $user = array(
-                    'username'    => $row['u_username'],
-                    'alt_email'   => $row['u_alt_email'],
+                    'username' => $row['u_username'],
+                    'alt_email' => $row['u_alt_email'],
                     'local_email' => $row['u_local_email']
                 );
                 $output[$row['u_id']] = array(
-                    'id'         => $row['u_id'],
-                    'firstname'  => $row['u_firstname'],
-                    'lastname'   => $row['u_lastname'],
-                    'alt_email'  => $emailObj->formatEmailFromArray($user),
+                    'id' => $row['u_id'],
+                    'firstname' => $row['u_firstname'],
+                    'lastname' => $row['u_lastname'],
+                    'alt_email' => $emailObj->formatEmailFromArray($user),
                     'categories' => array()
                 );
                 $prevUID = $row['u_id'];
@@ -938,9 +954,9 @@ class Submission extends DeprecatedModel {
             }
 
             // different category, create category details
-            if($row['c_id'] != $prevCID) {
+            if ($row['c_id'] != $prevCID) {
                 $output[$row['u_id']]['categories'][$row['c_id']] = array(
-                    'id'   => $row['c_id'],
+                    'id' => $row['c_id'],
                     'name' => $row['c_name'],
                     'work' => array()
                 );
@@ -948,7 +964,7 @@ class Submission extends DeprecatedModel {
             }
 
             $output[$row['u_id']]['categories'][$row['c_id']]['work'][$row['sb_id']] = array(
-                'id'   => $row['sb_id'],
+                'id' => $row['sb_id'],
                 'name' => $row['sb_name'],
                 'date' => $row['sb_date'],
             );
@@ -957,7 +973,7 @@ class Submission extends DeprecatedModel {
     }
 
     public function getAllYearsByUser($userID = 0) {
-        if(!$userID) {
+        if (!$userID) {
             $userID = $_SESSION['id'];
         }
 
@@ -970,7 +986,7 @@ class Submission extends DeprecatedModel {
         $result = $this->db->query($sql);
 
         // rather than user getAll(), we want this as an ordinal array, not associative, so iterate manually
-        while($y = mysql_fetch_assoc($result)) {
+        while ($y = mysql_fetch_assoc($result)) {
             $years[] = $y['year'];
         }
 
@@ -1024,10 +1040,10 @@ class Submission extends DeprecatedModel {
         // insert the new object
         $id = parent::create($object);
 
-        if($id && count($notifs)) {
+        if ($id && count($notifs)) {
             // insert notification records
             $sql = array();
-            foreach($notifs as $type => $settings) {
+            foreach ($notifs as $type => $settings) {
                 $sql[] = "($id, '$type', {$settings['enabled']}, 0)";
             }
             $query = "INSERT INTO submission_notification VALUES " . implode(', ', $sql);
@@ -1049,9 +1065,9 @@ class Submission extends DeprecatedModel {
         $notifs = $object['notifications'];
         unset($object['notifications']);
 
-        if(parent::update($object)) {
+        if (parent::update($object)) {
             // update notification records
-            foreach($notifs as $type => $settings) {
+            foreach ($notifs as $type => $settings) {
                 $query = "
                     INSERT INTO submission_notification (`box_id`, `type`, `enabled`)
                     VALUES ($id, '$type', {$settings['enabled']})
@@ -1105,10 +1121,10 @@ class Submission extends DeprecatedModel {
         $r1 = $this->db->getAll($q1);
 
         /* merge, and sort by date */
-        if(!is_array($r0)) {
+        if (!is_array($r0)) {
             $r0 = array();
         }
-        if(!is_array($r1)) {
+        if (!is_array($r1)) {
             $r1 = array();
         }
         $r = array_merge($r0, $r1);
@@ -1120,10 +1136,9 @@ class Submission extends DeprecatedModel {
     }
 
     function cmpDates($a, $b) {
-        if($a['date'] < $b['date']) {
+        if ($a['date'] < $b['date']) {
             return -1;
-        }
-        elseif($a['date'] > $b['date']) {
+        } elseif ($a['date'] > $b['date']) {
             return 1;
         }
         return 0;
