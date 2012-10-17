@@ -1,26 +1,28 @@
 <div class="box tt">
-	<h2>Timetable <span>&mdash; Day {DAYNUMBER}</span></h2>
-	<table id="timetable" class="timetable">
-		<thead>
-			<tr>
-				<!-- BEGIN timetable_header -->
-				<th scope="col">{PERIOD_NAME}
-                    <span class="time">{PERIOD_START}&ndash;{PERIOD_END}</span></th>
-				<!-- END timetable_header -->
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<!-- BEGIN timetable_period -->
-				<td class="{PERIOD_CLASS}" style="background:{PERIOD_COLOUR};">
-                    <span class="title">{PERIOD_DESC}</span>
-                        {PERIOD_CODE}<br/>{PERIOD_ROOM}
-					<!-- BEGIN has_attendances -->
-						<br /><a href='/modules/attendance/modify/{ATTENDANCE_CLASS_CODE}/{ATTENDANCE_ATTENDANCE_DATE}/{ATTENDANCE_ATTENDANCE_PERIOD}'>Attendance Records</a>
-					<!-- END has_attendances -->
-				</td>
-				<!-- END timetable_period -->
-			</tr>
-		</tbody>
-	</table>
+    <h2>Timetable <span>&mdash; Day {DAYNUMBER}</span></h2>
+    <table id="timetable" class="timetable">
+        <thead>
+        <tr>
+            <!-- BEGIN timetable_header -->
+            <th scope="col">{PERIOD_NAME}
+                <span class="time">{PERIOD_START}&ndash;{PERIOD_END}</span></th>
+            <!-- END timetable_header -->
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <!-- BEGIN timetable_period -->
+            <td class="{PERIOD_CLASS}" style="background:{PERIOD_COLOUR};">
+                <span class="title">{PERIOD_DESC}</span>
+                {PERIOD_CODE}<br/>{PERIOD_ROOM}
+                <!-- BEGIN has_attendances -->
+                <br/><a
+                    href='/modules/attendance/modify/{ATTENDANCE_CLASS_CODE}/{ATTENDANCE_ATTENDANCE_DATE}/{ATTENDANCE_ATTENDANCE_PERIOD}'>Mark
+                Attendance</a>
+                <!-- END has_attendances -->
+            </td>
+            <!-- END timetable_period -->
+        </tr>
+        </tbody>
+    </table>
 </div>
