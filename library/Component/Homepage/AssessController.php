@@ -23,7 +23,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
      * @return boolean
      */
     public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'assess')) {
+        if (!parent::loadTemplate($templateHandle, 'assess')) {
             return false;
         }
         $this->parseConfig();
@@ -47,8 +47,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
 
         if ($this->permission >= WRITE_ACCESS) {
             $this->parse('createAssessment_block', 'createAssessment');
-        }
-        else {
+        } else {
             $this->setVar('createAssessment_block', '');
         }
 
@@ -57,9 +56,9 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
         $allAssess = $assessHandler->getList($this->getContext('id'));
 
         if (is_array($allAssess)) {
-            $i=0;
+            $i = 0;
 
-            foreach($allAssess as $currentAssess) {
+            foreach ($allAssess as $currentAssess) {
 
                 /* Hide it from students if the start date hasn't passed yet
              */
@@ -71,18 +70,20 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                     /* Note that Assess Descriptions can now contain html, so we decode them
                   * and remove the html from the short description in homepage components
                   */
-                    $this->setVar(array(
-                        'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
-                        'ASSESS_TITLE' => $currentAssess['title'],
-                        'ASSESS_START_DATE' => date('jS M Y', strtotime($currentAssess['start'])),
-                        'ASSESS_FINISH_DATE' => date('jS M Y', strtotime($currentAssess['finish'])),
-                        'ASSESS_DESCRIPTION' => Scrub::html(html_entity_decode($currentAssess['description'])),
-                        'ASSESS_CREATED' => $createdTime->getRelativeTime(),
-                        'ASSESS_USER_ID' => $author['uid'],
-                        'ASSESS_USER_FIRSTNAME' => $author['firstname'],
-                        'ASSESS_USER_LASTNAME' => $author['lastname'],
-                        'ON_OFF' => $i++%2 ? 'dark' : '',
-                    ));
+                    $this->setVar(
+                        array(
+                            'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
+                            'ASSESS_TITLE' => Scrub::Text($currentAssess['title']),
+                            'ASSESS_START_DATE' => date('jS M Y', strtotime($currentAssess['start'])),
+                            'ASSESS_FINISH_DATE' => date('jS M Y', strtotime($currentAssess['finish'])),
+                            'ASSESS_DESCRIPTION' => Scrub::html($currentAssess['description']),
+                            'ASSESS_CREATED' => $createdTime->getRelativeTime(),
+                            'ASSESS_USER_ID' => $author['uid'],
+                            'ASSESS_USER_FIRSTNAME' => $author['firstname'],
+                            'ASSESS_USER_LASTNAME' => $author['lastname'],
+                            'ON_OFF' => $i++ % 2 ? 'dark' : '',
+                        )
+                    );
 
                     /* Check if you have completed an assessment already
                   *
@@ -107,67 +108,71 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                         if ($attempt['finish'] == '0000-00-00 00:00:00' && ($attemptTimeRemaining < 0 || $currentAssess['duration'] == Assess_Main::UNLIMITED_DURATION)) {
                             $firstSection = $sectionHandler->getFirst($currentAssess['assess_id']);
 
-                            $this->setVar(array(
-                                'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
-                                'ASSESS_SECTION_ID' => $firstSection['section_id'],
-                                'ASSESS_FINISH_DATE' => 'In progress'
-                            ));
+                            $this->setVar(
+                                array(
+                                    'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
+                                    'ASSESS_SECTION_ID' => $firstSection['section_id'],
+                                    'ASSESS_FINISH_DATE' => 'In progress'
+                                )
+                            );
 
                             $this->parse('resumeLink_block', 'resumeLink');
                             $this->setVar('assessLink_block', '');
                             $this->setVar('assessNoLink_block', '');
-                        }
-                        // allow to resit
-                        else if (!(($currentAssess['max_attempts'] > 0) && ($numAttempts+1 > $currentAssess['max_attempts']))) {
-                            $this->parse('assessLink_block', 'assessLink');
-                            $this->setVar('assessNoLink_block', '');
-                            $this->setVar('resumeLink_block', '');
-                        }
-                        // else dont let them complete it again
+                        } // allow to resit
                         else {
-                            $this->parse('assessNoLink_block', 'assessNoLink');
-                            $this->setVar('assessLink_block', '');
-                            $this->setVar('resumeLink_block', '');
-                            $this->setVar('ASSESS_FINISH_DATE', 'Completed');
+                            if (!(($currentAssess['max_attempts'] > 0) && ($numAttempts + 1 > $currentAssess['max_attempts']))) {
+                                $this->parse('assessLink_block', 'assessLink');
+                                $this->setVar('assessNoLink_block', '');
+                                $this->setVar('resumeLink_block', '');
+                            } // else dont let them complete it again
+                            else {
+                                $this->parse('assessNoLink_block', 'assessNoLink');
+                                $this->setVar('assessLink_block', '');
+                                $this->setVar('resumeLink_block', '');
+                                $this->setVar('ASSESS_FINISH_DATE', 'Completed');
+                            }
                         }
-                    }
-                    else {
+                    } else {
 
                         /* Do not show link if past finish date */
                         if ($assessHandler->isExpired($currentAssess['assess_id'])) {
                             $this->parse('assessNoLink_block', 'assessNoLink');
                             $this->setVar('assessLink_block', '');
                             $this->setVar('resumeLink_block', '');
-                        }
-                        /* only show test link to owner and enrolled students */
-                        else if($enroled || $currentAssess['user_id'] == $_SESSION['id'] ) {
-                            $numAttempts = $attemptHandler->userHasAttempted($currentAssess['assess_id'], $_SESSION['id']);
-
-                            if (($currentAssess['max_attempts'] > 0) && ($numAttempts+1 > $currentAssess['max_attempts'])) {
-                                $this->setVar('assessLink_block', '');
-                                $this->parse('assessNoLink_block', 'assessNoLink');
-                                $this->setVar('resumeLink_block', '');
-                            }
-                            else {
-                                $this->parse('assessLink_block', 'assessLink');
-                                $this->setVar('assessNoLink_block', '');
-                                $this->setVar('resumeLink_block', '');
-                            }
-                        }
+                        } /* only show test link to owner and enrolled students */
                         else {
-                            $this->parse('assessNoLink_block', 'assessNoLink');
-                            $this->setVar('assessLink_block', '');
-                            $this->setVar('resumeLink_block', '');
+                            if ($enroled || $currentAssess['user_id'] == $_SESSION['id']) {
+                                $numAttempts = $attemptHandler->userHasAttempted(
+                                    $currentAssess['assess_id'], $_SESSION['id']
+                                );
+
+                                if (($currentAssess['max_attempts'] > 0) && ($numAttempts + 1 > $currentAssess['max_attempts'])) {
+                                    $this->setVar('assessLink_block', '');
+                                    $this->parse('assessNoLink_block', 'assessNoLink');
+                                    $this->setVar('resumeLink_block', '');
+                                } else {
+                                    $this->parse('assessLink_block', 'assessLink');
+                                    $this->setVar('assessNoLink_block', '');
+                                    $this->setVar('resumeLink_block', '');
+                                }
+                            } else {
+                                $this->parse('assessNoLink_block', 'assessNoLink');
+                                $this->setVar('assessLink_block', '');
+                                $this->setVar('resumeLink_block', '');
+                            }
                         }
                     }
 
                     /* Modified this check so that only the owner or a superuser can get
                   * these links which allow you to modify the assessment
                   */
-                    if ($assessHandler->isOwner($currentAssess['assess_id']) || $groupHandler->getPermission($currentAssess['category_id']) >= WRITE_ACCESS) {
+                    if ($assessHandler->isOwner($currentAssess['assess_id']) || $groupHandler->getPermission(
+                        $currentAssess['category_id']
+                    ) >= WRITE_ACCESS
+                    ) {
                         $this->parse('teacherLink_block', 'teacherLink');
-                    }
-                    else {
+                    } else {
                         $this->setVar('teacherLink_block', '');
                     }
 

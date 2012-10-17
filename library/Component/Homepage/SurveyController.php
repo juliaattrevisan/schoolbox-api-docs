@@ -30,7 +30,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
      * @return boolean
      */
     public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'survey')) {
+        if (!parent::loadTemplate($templateHandle, 'survey')) {
             return false;
         }
         $this->parseConfig();
@@ -54,17 +54,16 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
 
         if ($this->permission >= WRITE_ACCESS) {
             $this->parse('createSurvey_block', 'createSurvey');
-        }
-        else {
+        } else {
             $this->setVar('createSurvey_block', '');
         }
 
         $this->setVar('survey_block', '');
 
         if (is_array($allSurveys)) {
-            $i=0;
+            $i = 0;
 
-            foreach($allSurveys as $currentSurvey) {
+            foreach ($allSurveys as $currentSurvey) {
 
                 // Do not show the survey if you are a participant and the survey is not yet open
                 if (($this->permission >= WRITE_ACCESS) || $surveyHandler->isOpen($currentSurvey)) {
@@ -72,18 +71,20 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
 
                     $author = $userHandler->getByID($currentSurvey['user_id']);
 
-                    $this->setVar(array(
-                        'SURVEY_ASSESS_ID' => $currentSurvey['assess_id'],
-                        'SURVEY_TITLE' => $currentSurvey['title'],
-                        'SURVEY_START_DATE' => date('jS M Y', strtotime($currentSurvey['start'])),
-                        'SURVEY_FINISH_DATE' => date('jS M Y', strtotime($currentSurvey['finish'])),
-                        'SURVEY_DESCRIPTION' => Scrub::html(html_entity_decode($currentSurvey['description'])),
-                        'SURVEY_CREATED' => $createdTime->getRelativeTime(),
-                        'SURVEY_USER_ID' => $author['uid'],
-                        'SURVEY_USER_FIRSTNAME' => $author['firstname'],
-                        'SURVEY_USER_LASTNAME' => $author['lastname'],
-                        'ON_OFF' => $i++%2 ? 'dark' : '',
-                    ));
+                    $this->setVar(
+                        array(
+                            'SURVEY_ASSESS_ID' => $currentSurvey['assess_id'],
+                            'SURVEY_TITLE' => Scrub::text($currentSurvey['title']),
+                            'SURVEY_START_DATE' => date('jS M Y', strtotime($currentSurvey['start'])),
+                            'SURVEY_FINISH_DATE' => date('jS M Y', strtotime($currentSurvey['finish'])),
+                            'SURVEY_DESCRIPTION' => Scrub::html($currentSurvey['description']),
+                            'SURVEY_CREATED' => $createdTime->getRelativeTime(),
+                            'SURVEY_USER_ID' => $author['uid'],
+                            'SURVEY_USER_FIRSTNAME' => $author['firstname'],
+                            'SURVEY_USER_LASTNAME' => $author['lastname'],
+                            'ON_OFF' => $i++ % 2 ? 'dark' : '',
+                        )
+                    );
 
                     /* Check if you have completed an assessment already
                   *
@@ -108,40 +109,40 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                         if ($attempt['finish'] == '0000-00-00 00:00:00' && ($attemptTimeRemaining < 0 || $currentSurvey['duration'] == Assess_Main::UNLIMITED_DURATION)) {
                             $firstSection = $sectionHandler->getFirst($currentSurvey['assess_id']);
 
-                            $this->setVar(array(
-                                'SURVEY_ASSESS_ID' => $currentSurvey['assess_id'],
-                                'SURVEY_SECTION_ID' => $firstSection['section_id'],
-                                'SURVEY_FINISH_DATE'  => 'In progress'
-                            ));
+                            $this->setVar(
+                                array(
+                                    'SURVEY_ASSESS_ID' => $currentSurvey['assess_id'],
+                                    'SURVEY_SECTION_ID' => $firstSection['section_id'],
+                                    'SURVEY_FINISH_DATE' => 'In progress'
+                                )
+                            );
 
                             $this->parse('resumeLink_block', 'resumeLink');
                             $this->setVar('surveyLink_block', '');
                             $this->setVar('surveyNoLink_block', '');
-                        }
-                        // allow to resit
-                        else if (!(($currentSurvey['max_attempts'] > 0) && ($numAttempts+1 > $currentSurvey['max_attempts']))) {
-                            $this->parse('surveyLink_block', 'surveyLink');
-                            $this->setVar('surveyNoLink_block', '');
-                            $this->setVar('resumeLink_block', '');
-                        }
-                        // else dont let them complete it again
+                        } // allow to resit
                         else {
-                            $this->setVar('surveyLink_block', '');
-                            $this->parse('surveyNoLink_block', 'surveyNoLink');
-                            $this->setVar('assessLink_block', '');
-                            $this->setVar('resumeLink_block', '');
-                            $this->setVar('SURVEY_FINISH_DATE', 'Completed');
+                            if (!(($currentSurvey['max_attempts'] > 0) && ($numAttempts + 1 > $currentSurvey['max_attempts']))) {
+                                $this->parse('surveyLink_block', 'surveyLink');
+                                $this->setVar('surveyNoLink_block', '');
+                                $this->setVar('resumeLink_block', '');
+                            } // else dont let them complete it again
+                            else {
+                                $this->setVar('surveyLink_block', '');
+                                $this->parse('surveyNoLink_block', 'surveyNoLink');
+                                $this->setVar('assessLink_block', '');
+                                $this->setVar('resumeLink_block', '');
+                                $this->setVar('SURVEY_FINISH_DATE', 'Completed');
+                            }
                         }
-                    }
-                    else {
+                    } else {
 
                         // show to everyone unless expired
-                        if (strtotime($currentSurvey['finish']) < mktime() ) {
+                        if (strtotime($currentSurvey['finish']) < mktime()) {
                             $this->parse('surveyNoLink_block', 'surveyNoLink');
                             $this->setVar('surveyLink_block', '');
                             $this->setVar('resumeLink_block', '');
-                        }
-                        else {
+                        } else {
                             $this->parse('surveyLink_block', 'surveyLink');
                             $this->setVar('surveyNoLink_block', '');
                             $this->setVar('resumeLink_block', '');
@@ -151,10 +152,12 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                     /* Modified this check so that only the owner or a superuser can get
                   * these links which allow you to modify the assessment
                   */
-                    if ($surveyHandler->isOwner($currentSurvey['assess_id']) || $this->groupHandler->getPermission($currentSurvey['category_id']) >= WRITE_ACCESS) {
+                    if ($surveyHandler->isOwner($currentSurvey['assess_id']) || $this->groupHandler->getPermission(
+                        $currentSurvey['category_id']
+                    ) >= WRITE_ACCESS
+                    ) {
                         $this->parse('teacherLink_block', 'teacherLink');
-                    }
-                    else {
+                    } else {
                         $this->setVar('teacherLink_block', '');
                     }
 
