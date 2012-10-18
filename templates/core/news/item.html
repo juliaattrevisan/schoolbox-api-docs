@@ -23,12 +23,14 @@
     <img class="featured_image" src="/storage/image.php?hash={NEWS_IMAGE}&size=maxsize" />
     {NEWS_BODY}
 
-    <!-- BEGIN previous_article -->
-    <a class="btn no-icon float-left" href="/news/item/{PREVIOUS_ARTICLE_ID}">&laquo; {PREVIOUS_ARTICLE_TITLE}</a>
-    <!-- END previous_article -->
-    <!-- BEGIN next_article -->
-    <a class="btn no-icon" href="/news/item/{NEXT_ARTICLE_ID}">{NEXT_ARTICLE_TITLE} &raquo;</a>
-    <!-- END next_article -->
+    <p class="clear">
+        <!-- BEGIN previous_article -->
+        <a class="btn no-icon float-left" href="/news/item/{PREVIOUS_ARTICLE_ID}">&laquo; {PREVIOUS_ARTICLE_TITLE}</a>
+        <!-- END previous_article -->
+        <!-- BEGIN next_article -->
+        <a class="btn no-icon" href="/news/item/{NEXT_ARTICLE_ID}">{NEXT_ARTICLE_TITLE} &raquo;</a>
+        <!-- END next_article -->
+    </p>
 </div>
 
 <div class="right">
