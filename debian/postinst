@@ -32,7 +32,7 @@ case "$1" in
         fi
         cd /usr/share/schoolbox/tools;
         ./create-data-dirs.sh;
-        ./update_sql.sh;
+        ./update-sql.sh;
         ./upgrade-clean-cache.sh;
     ;;
 
