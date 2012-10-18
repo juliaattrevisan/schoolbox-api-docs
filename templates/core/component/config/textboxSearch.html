@@ -1,0 +1,21 @@
+<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css"/>
+<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
+<script type="text/javascript">
+
+    $j(function () {
+        $j('#textbox_search').autocomplete({
+            serviceUrl:'/ajax/textbox.php',
+            minChars:2,
+            maxHeight:300,
+            width:275,
+            noCache:true,
+            onSelect:function (element, data) {
+                $j('#textboxSearch').val(data);
+            },
+        });
+    });
+</script>
+
+
+<input type="text" id="textbox_search" value="{COMPONENT_TEXTBOX_NAME}">
+<input type="hidden" id="textboxSearch" name="textboxSearch" value="{COMPONENT_TEXTBOX_ID}">

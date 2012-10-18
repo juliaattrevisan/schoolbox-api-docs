@@ -32,19 +32,19 @@ class DashboardComponentReFactory {
      * @var array
      */
     private $labelMappings = array(
-        'size'              => 'Limit',
-        'componentname'     => 'Heading',
-        'src'               => 'Source',
-        'pixel'             => 'Max width / height',
-        'sort'              => 'Sort by',
-        'sortdir'           => 'Direction',
-        'comments_size'     => 'Number of comments',
-        'username'          => 'Author',
-        'keywords'          => 'Hashtags',
+        'size' => 'Limit',
+        'componentname' => 'Heading',
+        'src' => 'Source',
+        'pixel' => 'Max width / height',
+        'sort' => 'Sort by',
+        'sortdir' => 'Direction',
+        'comments_size' => 'Number of comments',
+        'username' => 'Author',
+        'keywords' => 'Hashtags',
         'teacher_timestamp' => '',
-        'muted_users'       => '',
-        'captionState'      => 'Captions',
-        'displayPortraits'  => 'Display Portraits',
+        'muted_users' => '',
+        'captionState' => 'Captions',
+        'displayPortraits' => 'Display Portraits',
     );
 
     /**
@@ -54,60 +54,60 @@ class DashboardComponentReFactory {
      * @var array
      */
     private $customConfigs = array(
-        'Assess'     => array(
+        'Assess' => array(
             'compactMode' => 'false'
         ),
-        'ForumList'  => array(
+        'ForumList' => array(
             'componentname' => 'Forum',
-            'compactMode'   => 'false',
-            'src'           => '',
+            'compactMode' => 'false',
+            'src' => '',
         ),
-        'FileList'   => array(
+        'FileList' => array(
             'componentname' => 'Files',
-            'compactMode'   => 'false',
-            'src'           => '',
+            'compactMode' => 'false',
+            'src' => '',
         ),
-        'RSS'        => array(
+        'RSS' => array(
             'compactMode' => 'false'
         ),
-        'Survey'     => array(
+        'Survey' => array(
             'compactMode' => 'false'
         ),
-        'LinkList'   => array(
+        'LinkList' => array(
             'compactMode' => 'false',
             'src' => ''
         ),
-        'News'       => array(
-            'src'  => '',
+        'News' => array(
+            'src' => '',
         ),
-        'Podcast'    => array(
+        'Podcast' => array(
             'compactMode' => 'false'
         ),
         'DueWorkList' => array(
             'compactMode' => 'false',
         ),
-        'Scroller'    => array(
+        'Scroller' => array(
             'componentname' => 'Image Scroller',
-            'src'           => '',
-            'captionState'  => 'on',
-            'timing'        => '2',
+            'src' => '',
+            'captionState' => 'on',
+            'timing' => '2',
         ),
-        'Chat'        => array(
-            'muted_users'   => 'a:0:{}',
+        'Chat' => array(
+            'muted_users' => 'a:0:{}',
         ),
-        'ClassList'   => array(
+        'ClassList' => array(
             'displayPortraits' => 'grid'
         ),
-        'Managers'    => array(
+        'Managers' => array(
             'displayPortraits' => 'grid'
         ),
-        'Members'     => array(
+        'Members' => array(
             'displayPortraits' => 'grid'
         ),
-        'Teachers'    => array(
+        'Teachers' => array(
             'displayPortraits' => 'grid'
         ),
-        'Wiki'        => array(
+        'Wiki' => array(
             'compactMode' => 'false'
         )
     );
@@ -127,10 +127,10 @@ class DashboardComponentReFactory {
      * @var array
      */
     private $configKeyRemappings = array(
-        '#(homepage|import)-.*#is'  => 'src',
-        '#pollID#s'                 => 'poll',
-        '#textBoxID#s'              => 'textbox',
-        '#maxtweets#s'              => 'size',
+        '#(homepage|import)-.*#is' => 'src',
+        '#pollID#s' => 'poll',
+        '#textBoxID#s' => 'textbox',
+        '#maxtweets#s' => 'size',
     );
 
     /**
@@ -138,7 +138,7 @@ class DashboardComponentReFactory {
      * @var array
      */
     private $customControllers = array(
-        'initSubject'  => 'ManageClass',
+        'initSubject' => 'ManageClass',
         'folderManage' => 'ManageFolder',
     );
 
@@ -164,9 +164,9 @@ class DashboardComponentReFactory {
                         'default_value' => 'false',
                         'label' => 'Hide heading'
                     ),
-                    'textBox' => array(
+                    'textboxSearch' => array(
                         'default_value' => '0',
-                        'label' => 'Textbox location'
+                        'label' => 'Textbox Search'
                     ),
 
                 )
@@ -208,12 +208,9 @@ class DashboardComponentReFactory {
     private $deprecatedConfigurations = array('comments_size');
 
 
-
     /* EVERYTHING ABOVE THIS POINT IS CONFIGURATION
        --------------------------------------------
        EVERYTHING BELOW THIS POINT IS LOGIC        */
-
-
 
 
     /**
@@ -240,14 +237,13 @@ class DashboardComponentReFactory {
         $this->beVerbose = isset($options['v']);
         $this->db = Database::getInstance();
 
-        if($this->beVerbose) {
+        if ($this->beVerbose) {
             printf("\n **********\n * Refactor Homepage Components\n **********\n");
         }
 
-        if(isset($options['status'])) {
+        if (isset($options['status'])) {
             $this->printStatus();
-        }
-        else {
+        } else {
             $performSQL = !isset($options['skip-sql']);
             $this->refactorHomepages($performSQL, !isset($options['skip-clean-db']));
             $this->refactorHomepageTemplates($performSQL);
@@ -255,11 +251,11 @@ class DashboardComponentReFactory {
             $this->createNewConfigurations($performSQL);
             $this->deprecateConfigurations($performSQL);
 
-            if(!(isset($options['skip-instantiation']) || isset($options['skip-sql']))) {
+            if (!(isset($options['skip-instantiation']) || isset($options['skip-sql']))) {
                 $this->instantiateComponents();
             }
 
-            if(isset($options['create-components'])) {
+            if (isset($options['create-components'])) {
                 $this->generateMissingComponents();
             }
         }
@@ -275,7 +271,7 @@ class DashboardComponentReFactory {
 
         // get list of old components
         $origin = $this->db->query("SELECT * FROM `homepage_comp`");
-        while($r = $origin->fetch(PDO::FETCH_ASSOC)) {
+        while ($r = $origin->fetch(PDO::FETCH_ASSOC)) {
             $comp['old'][] = $r;
             // convert old list to new controller classnames
             $comp['new'][] = array('class' => $this->method2controller($r['method']));
@@ -284,47 +280,48 @@ class DashboardComponentReFactory {
         // test the existence of new controller names in database
         $source = $this->db->query("SELECT `id`, `class` FROM `component_definition` WHERE `module` = 'homepage'");
         $registeredControllers = array();
-        while($r = $source->fetch(PDO::FETCH_ASSOC)) {
+        while ($r = $source->fetch(PDO::FETCH_ASSOC)) {
             $registeredControllers[$r['class']] = $r['id'];
         }
 
         $source = $this->db->query("SELECT * FROM `component_config_definition`");
         $registeredConfigs = array();
-        while($r = $source->fetch(PDO::FETCH_ASSOC)) {
+        while ($r = $source->fetch(PDO::FETCH_ASSOC)) {
             $registeredConfigs[$r['component_definition_id']][] = $r;
         }
 
-        foreach($comp['new'] as &$nc) {
-            if(in_array($nc['class'], array_keys($registeredControllers))) {
+        foreach ($comp['new'] as &$nc) {
+            if (in_array($nc['class'], array_keys($registeredControllers))) {
                 $nc['registered'] = true;
 
                 // it's registered, so we'll assume its configs are registered as well
-                if(isset($registeredConfigs[$registeredControllers[$nc['class']]])) {
-                    foreach($registeredConfigs[$registeredControllers[$nc['class']]] as $conf) {
+                if (isset($registeredConfigs[$registeredControllers[$nc['class']]])) {
+                    foreach ($registeredConfigs[$registeredControllers[$nc['class']]] as $conf) {
                         print_r($conf);
                     }
-                }
-                else {
+                } else {
                     echo "Missing configs for {$nc['class']}\n";
                 }
-            }
-            else {
+            } else {
                 $nc['registered'] = false;
             }
 
             // test the existence of new controller classes
-            if(class_exists($nc['class'])) {
+            if (class_exists($nc['class'])) {
                 $nc['exists'] = true;
-            }
-            else {
+            } else {
                 $nc['exists'] = false;
             }
         }
 
-        printf("\n%23s    %-45s%-8s%s\n",'method','controller','reg','file');
-        for($i = 0; $i < 100; $i++) echo "-"; echo "\n";
-        for($i = 0; $i < count($comp['old']); ++$i) {
-            printf(" [%s] %18s => %-42s :  %-8s%s\n",
+        printf("\n%23s    %-45s%-8s%s\n", 'method', 'controller', 'reg', 'file');
+        for ($i = 0; $i < 100; $i++) {
+            echo "-";
+        }
+        echo "\n";
+        for ($i = 0; $i < count($comp['old']); ++$i) {
+            printf(
+                " [%s] %18s => %-42s :  %-8s%s\n",
                 ($comp['new'][$i]['registered'] && $comp['new'][$i]['exists']) ? ' ' : '!',
                 $comp['old'][$i]['method'],
                 $comp['new'][$i]['class'],
@@ -332,7 +329,7 @@ class DashboardComponentReFactory {
                 $comp['new'][$i]['exists'] ? 'Y' : 'N'
             );
             // if the component is registered, display the status of its config template files
-            if($comp['new'][$i]['registered']) {
+            if ($comp['new'][$i]['registered']) {
 
             }
         }
@@ -349,24 +346,36 @@ class DashboardComponentReFactory {
     public function refactorHomepages($performSQL, $cleanDB) {
 
         // if not doing SQL, forcibly prevent cleaning of the DB
-        if(!$performSQL) {
+        if (!$performSQL) {
             $cleanDB = false;
         }
 
-        if($cleanDB) {
+        if ($cleanDB) {
             // gather a list of all the things that need clearing
-            $defIDs = $this->flatten($this->db->query("SELECT `id` FROM `component_definition` WHERE `module` = 'homepage'")->fetchAll(PDO::FETCH_ASSOC));
+            $defIDs = $this->flatten(
+                $this->db->query("SELECT `id` FROM `component_definition` WHERE `module` = 'homepage'")->fetchAll(
+                    PDO::FETCH_ASSOC
+                )
+            );
 
-            if(is_array($defIDs) && count($defIDs)) {
+            if (is_array($defIDs) && count($defIDs)) {
                 $defList = implode(",", $defIDs);
-                $conIDs = $this->flatten($this->db->query("SELECT `id` FROM `component_config_definition` WHERE `component_definition_id` IN ($defList)")->fetchAll(PDO::FETCH_ASSOC));
+                $conIDs = $this->flatten(
+                    $this->db->query(
+                        "SELECT `id` FROM `component_config_definition` WHERE `component_definition_id` IN ($defList)"
+                    )->fetchAll(PDO::FETCH_ASSOC)
+                );
                 $conList = implode(",", $conIDs);
 
                 $this->cli("Deleting from component_config_instance", '-');
-                $this->db->query("DELETE FROM `component_config_instance` WHERE `component_config_definition_id` IN ($conList)");
+                $this->db->query(
+                    "DELETE FROM `component_config_instance` WHERE `component_config_definition_id` IN ($conList)"
+                );
 
                 $this->cli("Deleting from component_config_definition", '-');
-                $this->db->query("DELETE FROM `component_config_definition` WHERE `component_definition_id` IN ($defList)");
+                $this->db->query(
+                    "DELETE FROM `component_config_definition` WHERE `component_definition_id` IN ($defList)"
+                );
 
                 $this->cli("Deleting from component_instance", '-');
                 $this->db->query("DELETE FROM `component_instance` WHERE `component_definition_id` IN ($defList)");
@@ -386,7 +395,7 @@ class DashboardComponentReFactory {
 
         $dataset = $this->db->query("SELECT * FROM `component_config_definition`")->fetchAll(PDO::FETCH_ASSOC);
         $existingConfigDefinitions = array();
-        foreach($dataset as $d) {
+        foreach ($dataset as $d) {
             $existingConfigDefinitions[$d['key']] = $d;
         }
         unset($dataset);
@@ -398,26 +407,24 @@ class DashboardComponentReFactory {
 
         $origin = $this->db->query("SELECT * FROM `homepage_comp`");
 
-        while($oldComp = $origin->fetch(PDO::FETCH_ASSOC)) {
+        while ($oldComp = $origin->fetch(PDO::FETCH_ASSOC)) {
             $newComp = new Component_Definition();
 
-            if(($newComp->class = $this->method2controller($oldComp['method'])) === false) {
+            if (($newComp->class = $this->method2controller($oldComp['method'])) === false) {
                 continue;
             }
 
             $this->cli("Converting {$oldComp['method']} to $newComp->class");
 
-            if(isset($this->customNames[$newComp->class])) {
+            if (isset($this->customNames[$newComp->class])) {
                 $name = $this->customNames[$newComp->class];
-            }
-            else {
+            } else {
                 $name = $oldComp['name'];
             }
 
-            if(isset($this->customDescriptions[$newComp->class])) {
+            if (isset($this->customDescriptions[$newComp->class])) {
                 $description = $this->customDescriptions[$newComp->class];
-            }
-            else {
+            } else {
                 $description = $oldComp['description'];
             }
 
@@ -426,7 +433,9 @@ class DashboardComponentReFactory {
             $newComp->description = $description;
             $newComp->module = 'homepage';
             $newComp->componentCategory = $oldComp['homepageCategoryID'];
-            $newComp->visible = ($oldComp['invisible'] == 'true' || in_array($newComp->class, $this->disableByDefault)) ? 'false' : 'true';
+            $newComp->visible = ($oldComp['invisible'] == 'true' || in_array(
+                $newComp->class, $this->disableByDefault
+            )) ? 'false' : 'true';
             $newComp->multiple = $oldComp['allowMultiple'];
 
             /* config definitions and instances */
@@ -435,7 +444,7 @@ class DashboardComponentReFactory {
             $newDefinitions[] = $newComp;
         }
 
-        if($performSQL) {
+        if ($performSQL) {
             $this->cli("Inserting component definitions into database", '+');
             Component_DefinitionMapper::getInstance()->save($newDefinitions);
             $this->cli("Inserting component configuration definitions into database", '+');
@@ -471,14 +480,14 @@ class DashboardComponentReFactory {
         $templates = array();
         $columns = array('left', 'right', 'top');
 
-        while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
 
-            if(!($class = $this->method2controller($row['method']))) {
+            if (!($class = $this->method2controller($row['method']))) {
                 continue;
             }
 
             $stmt = $this->db->prepare("SELECT `id` FROM `component_definition` WHERE `class` = :cls");
-            if(!$stmt->execute(array('cls' => $class))) {
+            if (!$stmt->execute(array('cls' => $class))) {
                 $this->cli("Couldn't find an appropriate definition for $class", '!');
                 continue;
             }
@@ -490,14 +499,16 @@ class DashboardComponentReFactory {
                 :compDefnID, 'homepage_template', :templateID, :col, :seq
             )";
 
-            if($performSQL) {
+            if ($performSQL) {
                 $stmt = $this->db->prepare($sql);
-                $stmt->execute(array(
-                    'compDefnID' => $compDefnID,
-                    'templateID' => $row['tid'],
-                    'col'        => $columns[$row['column'] - 1],
-                    'seq'        => $row['position'],
-                ));
+                $stmt->execute(
+                    array(
+                        'compDefnID' => $compDefnID,
+                        'templateID' => $row['tid'],
+                        'col' => $columns[$row['column'] - 1],
+                        'seq' => $row['position'],
+                    )
+                );
             }
         }
     }
@@ -506,10 +517,10 @@ class DashboardComponentReFactory {
      * Create new custom components that need to be inserted AFTER the other new definitions
      */
     public function createNewComponents($performSQL) {
-        if(count($this->newComponents) && $performSQL) {
-            foreach($this->newComponents as $module => $comps) {
-                foreach($comps as $name => $details) {
-                    if(isset($details['config'])) {
+        if (count($this->newComponents) && $performSQL) {
+            foreach ($this->newComponents as $module => $comps) {
+                foreach ($comps as $name => $details) {
+                    if (isset($details['config'])) {
                         $config = $details['config'];
                         unset($details['config']);
                     }
@@ -517,7 +528,7 @@ class DashboardComponentReFactory {
                     $details['module'] = $module;
 
                     $pdoFields = array();
-                    foreach(array_keys($details) as $f) {
+                    foreach (array_keys($details) as $f) {
                         $pdoFields[] = ':' . $f;
                     }
                     $pdoString = implode(', ', $pdoFields);
@@ -526,8 +537,8 @@ class DashboardComponentReFactory {
                     $sql = "INSERT INTO `component_definition` (`$colString`) VALUES ($pdoString)";
 
                     $this->cli("Inserting new component definition into database", '+');
-                    if($this->db->prepare($sql)->execute($details)) {
-                        if(isset($config)) {
+                    if ($this->db->prepare($sql)->execute($details)) {
+                        if (isset($config)) {
                             $defnID = $this->db->lastInsertId();
                             $sql = "
                                 INSERT INTO `component_config_definition`
@@ -538,13 +549,15 @@ class DashboardComponentReFactory {
                             $stmt = $this->db->prepare($sql);
 
                             $this->cli("Inserting new component config definition into database", '+');
-                            foreach($config as $key => $c) {
-                                $stmt->execute(array(
-                                    'ccid' => $defnID,
-                                    'key' => $key,
-                                    'default_value' => $c['default_value'],
-                                    'label' => $c['label']
-                                ));
+                            foreach ($config as $key => $c) {
+                                $stmt->execute(
+                                    array(
+                                        'ccid' => $defnID,
+                                        'key' => $key,
+                                        'default_value' => $c['default_value'],
+                                        'label' => $c['label']
+                                    )
+                                );
                             }
                         }
                     }
@@ -557,8 +570,9 @@ class DashboardComponentReFactory {
      * @param $performSQL
      */
     public function createNewConfigurations($performSQL) {
-        if(count($this->newConfigurations) && $performSQL) {
-            $stmt = $this->db->prepare("
+        if (count($this->newConfigurations) && $performSQL) {
+            $stmt = $this->db->prepare(
+                "
                 INSERT INTO component_config_definition
                   (component_definition_id, `key`, `default_value`, `label`)
                 VALUES
@@ -568,32 +582,34 @@ class DashboardComponentReFactory {
                     WHERE `class` LIKE :class
                   ), :key, :dval, :lbl
                 )
-            ");
+            "
+            );
 
             $this->cli("Inserting new configurations for existing components", '+');
 
-            foreach($this->newConfigurations as $class => $configs) {
+            foreach ($this->newConfigurations as $class => $configs) {
 
 
-                foreach($configs as $key => $c) {
+                foreach ($configs as $key => $c) {
 
-                    if($c[0] == '[TOBEOVERWRITTEN]') {
+                    if ($c[0] == '[TOBEOVERWRITTEN]') {
                         // yay, special cases! -_-
-                        if($class == 'Dashboard_Weather') {
+                        if ($class == 'Dashboard_Weather') {
                             // retrieve weather from global config
                             $c[0] = Cfg::get('weather_location');
-                        }
-                        elseif($class == 'Dashboard_Rss') {
+                        } elseif ($class == 'Dashboard_Rss') {
                             $c[0] = Cfg::get('welcome_rss_url');
                         }
                     }
 
-                    $stmt->execute(array(
-                        'class' => sprintf("Component_%sController", $class),
-                        'key' => $key,
-                        'dval' => $c[0],
-                        'lbl' => $c[1]
-                    ));
+                    $stmt->execute(
+                        array(
+                            'class' => sprintf("Component_%sController", $class),
+                            'key' => $key,
+                            'dval' => $c[0],
+                            'lbl' => $c[1]
+                        )
+                    );
                 }
             }
         }
@@ -607,20 +623,24 @@ class DashboardComponentReFactory {
      * @param $performSQL
      */
     public function deprecateConfigurations($performSQL) {
-        if(!$performSQL) {
+        if (!$performSQL) {
             return;
         }
 
-        foreach($this->deprecatedConfigurations as $conf) {
-            $stmt = $this->db->prepare("
+        foreach ($this->deprecatedConfigurations as $conf) {
+            $stmt = $this->db->prepare(
+                "
                 DELETE cci, ccd
                 FROM component_config_definition ccd
                 LEFT JOIN component_config_instance cci ON ccd.`id` = cci.`component_config_definition_id`
                 WHERE ccd.`key` LIKE :ckey
-            ");
-            $stmt->execute(array(
-                'ckey' => $conf
-            ));
+            "
+            );
+            $stmt->execute(
+                array(
+                    'ckey' => $conf
+                )
+            );
         }
     }
 
@@ -634,15 +654,15 @@ class DashboardComponentReFactory {
 
         $rtn = array();
 
-        if($newComp) {
+        if ($newComp) {
             $oldCompConfig = $this->mergeCustomConfig($newComp, $oldCompConfig);
         }
 
-        if(is_array($oldCompConfig) && count($oldCompConfig)) {
-            foreach($oldCompConfig as $key => $value) {
+        if (is_array($oldCompConfig) && count($oldCompConfig)) {
+            foreach ($oldCompConfig as $key => $value) {
 
-                foreach($this->configKeyRemappings as $pattern => $replacement) {
-                    if(preg_match($pattern, $key)) {
+                foreach ($this->configKeyRemappings as $pattern => $replacement) {
+                    if (preg_match($pattern, $key)) {
                         $key = $replacement;
                         break;
                     }
@@ -654,11 +674,11 @@ class DashboardComponentReFactory {
                 $confDefinition->id = null;
                 $confDefinition->key = $key;
 
-                if($newComp) {
+                if ($newComp) {
                     $confDefinition->definitionId = $newComp->id;
                 }
 
-                if(($confDefinition->defaultValue = $this->refactorDefaultValue($key, $value)) === false) {
+                if (($confDefinition->defaultValue = $this->refactorDefaultValue($key, $value)) === false) {
                     continue;
                 }
 
@@ -666,17 +686,16 @@ class DashboardComponentReFactory {
 
                 $this->cli("  config: $key", ' ');
 
-                if($return) {
+                if ($return) {
                     $rtn[] = $confDefinition;
-                }
-                else {
+                } else {
                     $this->newConfigDefinitions[] = $confDefinition;
                 }
 
             }
         }
 
-        if($return) {
+        if ($return) {
             return $rtn;
         }
     }
@@ -690,8 +709,8 @@ class DashboardComponentReFactory {
         // merge any configurations that we come across that weren't specified in the db into the old config array
 
         $k = preg_replace("#Component_Homepage_([A-Za-z]*)Controller#i", "$1", $newComp->class);
-        if(isset($this->customConfigs[$k])) {
-            if(!is_array($oldCompConfig)) {
+        if (isset($this->customConfigs[$k])) {
+            if (!is_array($oldCompConfig)) {
                 $oldCompConfig = array();
             }
             return array_merge($oldCompConfig, $this->customConfigs[$k]);
@@ -707,16 +726,12 @@ class DashboardComponentReFactory {
     public function method2controller($method) {
 
         // standard component
-        if(strpos($method, 'output') !== false) {
+        if (strpos($method, 'output') !== false) {
             $method = substr($method, 6);
-        }
-
-        // mandatory non-customisable components
-        elseif(isset($this->customControllers[$method])) {
+        } // mandatory non-customisable components
+        elseif (isset($this->customControllers[$method])) {
             $method = $this->customControllers[$method];
-        }
-
-        // fail
+        } // fail
         else {
             $this->cli("Couldn't map method $method", '!');
             return false;
@@ -732,17 +747,15 @@ class DashboardComponentReFactory {
      * @return mixed
      */
     public function refactorDefaultValue($key, $value) {
-        if(is_array($value)) {
+        if (is_array($value)) {
             // exceptional case: array of booleans to be stored as array
-            if($key == 'filter') {
+            if ($key == 'filter') {
                 $v = pow(2, count($value)) - 1;
-            }
-            // ignore all other cases (only other known is filterOptions)
+            } // ignore all other cases (only other known is filterOptions)
             else {
                 return false;
             }
-        }
-        else {
+        } else {
             $v = $value;
         }
 
@@ -756,15 +769,13 @@ class DashboardComponentReFactory {
      */
     public function refactorLabel($key) {
         // cases for handling the labels
-        if(isset($this->labelMappings[$key])) {
+        if (isset($this->labelMappings[$key])) {
             return $this->labelMappings[$key];
-        }
-        elseif(strpos($key,'_') !== false) {
+        } elseif (strpos($key, '_') !== false) {
             return ucwords(str_replace('_', ' ', $key));
-        }
-        else {
+        } else {
             // by default, make camel-case human friendly
-            return ucwords(preg_replace('#[A-Z][^A-Z]#sm',' $0', $key));
+            return ucwords(preg_replace('#[A-Z][^A-Z]#sm', ' $0', $key));
         }
     }
 
@@ -775,15 +786,15 @@ class DashboardComponentReFactory {
     public function generateMissingComponents() {
         $_DIR = realpath(dirname(__FILE__) . '/../../..');
 
-        $phpTemplate  = 'library/Component/_ControllerTemplate.php';
+        $phpTemplate = 'library/Component/_ControllerTemplate.php';
         $htmlTemplate = 'templates/core/component/_templateTemplate.html';
 
         $result = $this->db->query("SELECT class FROM `component_definition` WHERE `module` = 'homepage'");
 
-        while($class = $result->fetchColumn(0)) {
-            if(!class_exists($class)) {
+        while ($class = $result->fetchColumn(0)) {
+            if (!class_exists($class)) {
                 // remap classname to filename
-                $newPHPFile  = 'library/' . str_replace('_', '/', $class) . '.php';
+                $newPHPFile = 'library/' . str_replace('_', '/', $class) . '.php';
                 $component = preg_replace("#Component_Homepage_([A-Za-z]*)Controller#s", "$1", $class);
                 $templateName = lcfirst($component);
                 $newHTMLFile = "templates/core/component/homepage/$templateName.html";
@@ -791,12 +802,12 @@ class DashboardComponentReFactory {
                 // create php file
                 $this->cli("Creating $_DIR/$newPHPFile from $_DIR/$phpTemplate", '+');
                 $phpContents = file_get_contents("$_DIR/$phpTemplate");
-                $phpContents = str_replace('{MODULE}','Homepage',$phpContents);
+                $phpContents = str_replace('{MODULE}', 'Homepage', $phpContents);
                 $phpContents = str_replace('{COMPONENT}', $component, $phpContents);
                 $phpContents = str_replace('{COMPONENT_TEMPLATE}', $templateName, $phpContents);
 
                 $fp = fopen("$_DIR/$newPHPFile", 'w');
-                fwrite($fp,$phpContents);
+                fwrite($fp, $phpContents);
                 fclose($fp);
 
                 // create html file
@@ -819,7 +830,7 @@ class DashboardComponentReFactory {
 
         $defResult = $this->db->query("SELECT * FROM component_definition");
 
-        while($defn = $defResult->fetch(PDO::FETCH_ASSOC)) {
+        while ($defn = $defResult->fetch(PDO::FETCH_ASSOC)) {
             $definitions[$defn['class']] = $defn;
         }
 
@@ -830,7 +841,8 @@ class DashboardComponentReFactory {
             $configurations[$c['component_definition_id']][$c['key']] = $c;
         }
 
-        $result = $this->db->query("
+        $result = $this->db->query(
+            "
         SELECT
             hcl.`cid` catID,
             hcl.`column` `column`,
@@ -841,22 +853,23 @@ class DashboardComponentReFactory {
         FROM `homepage_comp_location` hcl
         LEFT JOIN homepage_comp hc ON hcl.`component` = hc.`id`
         ORDER BY hcl.`cid` ASC, hcl.`column` ASC, hcl.`position` ASC
-        ");
+        "
+        );
 
         // highest instance index
         $i = $this->db->query("SELECT MAX(`id`) FROM `component_instance`")->fetchColumn();
         $j = $this->db->query("SELECT MAX(`id`) FROM `component_config_instance`")->fetchColumn() + 1;
 
-        $colNames = array('left','right','top');
+        $colNames = array('left', 'right', 'top');
 
         $this->cli("Inserting component instances into database", '+');
 
-        while($instance = $result->fetch(PDO::FETCH_ASSOC)) {
+        while ($instance = $result->fetch(PDO::FETCH_ASSOC)) {
             $i++;
 
             $oldConfig = $instance['config'] ? unserialize($instance['config']) : array();
 
-            if(!($class = $this->method2controller($instance['method']))) {
+            if (!($class = $this->method2controller($instance['method']))) {
                 // le fail
                 continue;
             }
@@ -868,36 +881,38 @@ class DashboardComponentReFactory {
 
             // insert instance
             $stmt = $this->db->prepare($sql);
-            $stmt->execute(array(
-                'id'         => $i,
-                'cdi'        => $definitions[$class]['id'],
-                'identifier' => $instance['catID'],
-                'posn'       => $colNames[$instance['column'] - 1],
-                'seq'        => $instance['sequence'],
-            ));
+            $stmt->execute(
+                array(
+                    'id' => $i,
+                    'cdi' => $definitions[$class]['id'],
+                    'identifier' => $instance['catID'],
+                    'posn' => $colNames[$instance['column'] - 1],
+                    'seq' => $instance['sequence'],
+                )
+            );
 
             // insert instance's config
-            if(count($oldConfig)) {
+            if (count($oldConfig)) {
 
-                foreach($oldConfig as $key => $value) {
+                foreach ($oldConfig as $key => $value) {
 
                     // this has been deprecated
-                    if($key == 'filterOptions') {
+                    if ($key == 'filterOptions') {
                         continue;
                     }
 
-                    foreach($this->configKeyRemappings as $pattern => $replacement) {
-                        if(preg_match($pattern, $key)) {
+                    foreach ($this->configKeyRemappings as $pattern => $replacement) {
+                        if (preg_match($pattern, $key)) {
                             $key = $replacement;
                             break;
                         }
                     }
 
                     // will only ever be binary
-                    if(is_array($value)) {
+                    if (is_array($value)) {
                         $temp = 0;
                         $ord = 0;
-                        foreach($value as $v) {
+                        foreach ($value as $v) {
                             $temp += ($v) ? pow(2, $ord) : 0;
                             $ord++;
                         }
@@ -906,17 +921,20 @@ class DashboardComponentReFactory {
 
                     // there are some ridiculous data in the dev databse (probably worse in production) so do some
                     // sanity checking (though the output to check back over is useful)
-                    if(!isset($configurations[$definitions[$class]['id']][$key])) {
+                    if (!isset($configurations[$definitions[$class]['id']][$key])) {
                         $missingConfigs[$class][$key] = true;
-                    }
-                    else {
-                        $stmt = $this->db->prepare("INSERT INTO `component_config_instance` VALUES (:id, :ccdi, :cii, :val)");
-                        $stmt->execute(array(
-                            'id'   => $j++,
-                            'ccdi' => $configurations[$definitions[$class]['id']][$key]['id'],
-                            'cii'  => $i,
-                            'val'  => $value,
-                        ));
+                    } else {
+                        $stmt = $this->db->prepare(
+                            "INSERT INTO `component_config_instance` VALUES (:id, :ccdi, :cii, :val)"
+                        );
+                        $stmt->execute(
+                            array(
+                                'id' => $j++,
+                                'ccdi' => $configurations[$definitions[$class]['id']][$key]['id'],
+                                'cii' => $i,
+                                'val' => $value,
+                            )
+                        );
 
                     } // if config key set
 
@@ -928,9 +946,11 @@ class DashboardComponentReFactory {
 
         $this->cli("DONE!");
 
-        if(count($missingConfigs)) {
-            foreach($missingConfigs as $class => $missing) {
-                $this->cli(sprintf("Possibly missing configs for %s: %s", $class, implode(', ', array_keys($missing))), '?');
+        if (count($missingConfigs)) {
+            foreach ($missingConfigs as $class => $missing) {
+                $this->cli(
+                    sprintf("Possibly missing configs for %s: %s", $class, implode(', ', array_keys($missing))), '?'
+                );
             }
         }
 
@@ -943,15 +963,14 @@ class DashboardComponentReFactory {
      * @return array
      */
     public function flatten($array) {
-        if(count($array)) {
+        if (count($array)) {
             $replacement = array();
-            foreach($array as $i) {
-                if(count($i)) {
+            foreach ($array as $i) {
+                if (count($i)) {
                     foreach ($i as $k => $v) {
                         $replacement[] = $v;
                     }
-                }
-                else {
+                } else {
                     $replacement[] = $i;
                 }
             }
@@ -965,7 +984,7 @@ class DashboardComponentReFactory {
      * @param string $error
      */
     public function cli($msg, $type = ' ') {
-        if($this->beVerbose || in_array($type[0], array('?', '!', '*'))) {
+        if ($this->beVerbose || in_array($type[0], array('?', '!', '*'))) {
             printf(" [%s] %s\n", $type[0], $msg);
         }
     }
