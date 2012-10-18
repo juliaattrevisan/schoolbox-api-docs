@@ -197,13 +197,23 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
             $this->setVar('view_all_due_work_block', '');
         }
 
-        foreach ($this->upcomingWork as $output) {
-            $this->setVar($output);
-            if(!isset($output['upcoming_work_actionable_block'])) {
-                $this->parse('upcoming_work_actionable_block', 'upcoming_work_actionable');
+        if(count($this->upcomingWork)) {
+            foreach ($this->upcomingWork as $output) {
+                $this->setVar($output);
+                if(!isset($output['upcoming_work_actionable_block'])) {
+                    $this->parse('upcoming_work_actionable_block', 'upcoming_work_actionable');
+                }
+                $this->parse('upcoming_work_block','upcoming_work', true);
             }
-            $this->parse('upcoming_work_block','upcoming_work', true);
         }
+        else {
+            $userHandler = new User();
+            $pronoun = ($this->userID == $_SESSION['id'])
+                ? 'You have'
+                : ($userHandler->formatName($userHandler->getByID($this->userID),'{firstname} has'));
+            $this->setVar('upcoming_work_block', "<ul><li>$pronoun no upcoming work.</li></ul>");
+        }
+
 
         return true;
     }
