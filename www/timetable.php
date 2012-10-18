@@ -28,6 +28,7 @@ $this->setTab('timetable');
 $this->setBlock(TEMPLATE_content, "timetable", "timetable_listing");
 $this->setBlock("timetable", "period", "period_listing");
 $this->setBlock("period", "day", "day_listing");
+$this->setBlock('day', 'period_class', 'period_class_block');
 $this->setBlock("timetable", "day_header", "day_header_listing");
 $outputList = false;
 
@@ -157,22 +158,24 @@ if (is_array($outputList)) {
                             'PERIOD_CODE' => '(' . Scrub::Text($period['code']) . ')',
                             'PERIOD_ROOM' => Scrub::Text($period['room']),
                             'PERIOD_STAFF' => Scrub::Text($period_staff),
-                            'PERIOD_URL' => '',
                             'PERIOD_COLOUR' => '#' . $subjectColourMap[$period['code']],
                         );
-
 
                         /* Lookup subject code and check permissions, if read access provide a link to the user */
                         if (!isset($catCache[$period['code']])) {
                             $cat = $categoryHandler->getByCode($period['code']);
                             $catCache[$period['code']] = $cat['id'];
                         }
-
-                        if($catCache[$period['code']] && $groupHandler->getPermission($catCache[$period['code']]) >= READ_ACCESS) {
-                            $outputPeriod['PERIOD_URL'] = '/homepage/' . urlencode($period['code']);
-                        } else {
-                            $outputPeriod['PERIOD_URL'] = '#';
-                        }
+                    }
+                    else {
+                        $outputPeriod = array(
+                            'PERIOD_DESC' => '',
+                            'PERIOD_CODE' => '',
+                            'PERIOD_ROOM' => '',
+                            'PERIOD_STAFF' => '',
+                            'PERIOD_URL' => '',
+                            'PERIOD_COLOUR' => '',
+                        );
                     }
 
                     if ($row['periodNumber'] == $periodCurrent['PeriodNumber'] && $row['periodSequence'] == $periodCurrent['PeriodNumberSeq']) {
@@ -197,6 +200,14 @@ if (is_array($outputList)) {
                     }
 
                     $this->setVar($outputPeriod);
+
+                    if($catCache[$period['code']] && $groupHandler->getPermission($catCache[$period['code']]) >= READ_ACCESS) {
+                        $this->setVar('PERIOD_URL', '/homepage/' . $period['code']);
+                        $this->parse('period_class_block', 'period_class');
+                    }
+                    else {
+                        $this->setVar('period_class_block', '');
+                    }
 
                     $this->parse('day_listing', 'day', true);
                     $dayCount++;
