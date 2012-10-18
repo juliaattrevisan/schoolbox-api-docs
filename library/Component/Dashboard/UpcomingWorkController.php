@@ -134,10 +134,7 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
             );
 
             // determine actions available
-            if(!$this->actionable) {
-                $output['upcoming_work_actionable_block'] = '';
-            }
-            elseif($item['kind'] == 0) {
+            if($item['kind'] == 0) {
                 // duework
                 $output['UPCOMING_HREF'] = 'submission/submissionHistory/';
                 $output['UPCOMING_BTN_ICON']  = 'modify';
@@ -168,6 +165,12 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
                     $output['UPCOMING_BTN_LABEL'] = 'Sit';
                 }
             }
+
+            // if the actionable flag is false, don't display the buttons
+            if(!$this->actionable) {
+                $output['upcoming_work_actionable_block'] = '';
+            }
+
             $this->upcomingWork[] = $output;
 
             if($this->limit > 0 && count($this->upcomingWork) >= $this->limit) {
