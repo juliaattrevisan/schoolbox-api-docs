@@ -101,6 +101,7 @@ elseif(is_array($_POST['rubric']) && count($_POST['rubric'])) {
     else {
         // no previous submission
         $returnHandler->create($return);
+        $rubricHandler->saveMarks($_POST['rubric'], $_POST['uid'], $_POST['box_id']);
     }
 
     // in all possible scenarios, *something* happened above, so redirect the user
