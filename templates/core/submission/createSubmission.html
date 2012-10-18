@@ -69,44 +69,72 @@
             showHideMarktype(500);
         });
 
-        $j('input:checkbox[name=accept_submission]').change(function () {
+        // cache lookups
+        var acceptSubmit = $j('input:checkbox[name=accept_submission]');
+        var acceptHide = $j('.accept-hide');
+
+        acceptSubmit.change(function () {
             if ($j(this).is(':checked')) {
-                $j('.accept-hide').show(500);
+                acceptHide.show(500);
             } else {
-                $j('.accept-hide').hide(500);
+                acceptHide.hide(500);
             }
         });
 
-        if ($j('input:checkbox[name=accept_submission]').is('checked')) {
-            $j('.accept-hide').hide();
+        if (!(acceptSubmit.is('checked') || acceptSubmit.attr('checked') == 'checked')) {
+            acceptHide.hide();
         }
 
-        /*
-         jQuery.validator.addMethod("markTypeTotalCheck", function(value, element) {
-         return ((marktype.total.is(':visible')) && (value == ''));
-         }, "Please enter a mark amount");
+        // validation rules
+        jQuery.validator.addMethod("markTypeTotalCheck", function(value, element) {
+            if(marktype.total.is(':visible')) {
+                console.log('validating TotalMark: "'+value+'" should be numeric.');
+                return value != '';
+            }
+            else {
+                return true;
+            }
+        }, "Please enter a numeric mark amount");
 
-         jQuery.validator.addMethod('markTypeRubricCheck', function(value, element) {
-         return marktype.rubric.is(':visible') && $j('#rubric-criteria').find('input:checked').length > 1;
-         }, 'Please select at least two criteria');
+        jQuery.validator.addMethod('markTypeRubricCriteriaCheck', function(value, element) {
+            if(marktype.rubric.is(':visible')) {
+                var i = $j('#rubric-criteria').find('input:checked').length;
+                i = i ? i : 0;
+                console.log('validating Criteria count: "'
+                        + i + '" should be > 1');
+                return $j('#rubric-criteria').find('input:checked').length > 1;
+            }
+            else {
+                return true;
+            }
+        }, 'Please select at least two criteria');
 
-         jQuery.validator.addMethod('markTypeRubricResultsetCheck', function(value, element) {
-         return marktype.rubric.is(':visible') && $j('#rubric-results').find('input:checked').length == 1;
-         }, 'Please select at least two criteria');
+        jQuery.validator.addMethod('markTypeRubricResultsetCheck', function(value, element) {
+            if(marktype.rubric.is(':visible')) {
+                console.log('validating ResultSet: "'
+                        + $j('#rubric-results').find('input:checked').length
+                        + '" should be == 1');
+                return $j('#rubric-results').find('input:checked').length == 1;
+            }
+            else {
+                return true;
+            }
+        }, 'Please select a result set');
 
-
-         $j('#createSubmissionForm').validate({
-         rules: {
-         markvalue: {
-         markTypeTotalCheck: true,
-         number: true
-         },
-         resultset: {
-         markTypeRubricResultsetCheck: true
-         }
-         }
-         });
-         */
+        $j('#createSubmissionForm').validate({
+            rules: {
+                markvalue: {
+                    markTypeTotalCheck: true,
+                    number: true
+                },
+                result_set: {
+                    markTypeRubricResultsetCheck: true
+                },
+                criteria: {
+                    markTypeRubricCriteriaCheck: true
+                }
+            }
+        });
 
         // trigger show or hide of descriptors when radio off
         $j('#rubric-results input').change(function () {
@@ -327,6 +355,7 @@
                         </select> levels
                     </label>
                 </p>
+                <input type="hidden" name="result_set" />
             </div>
             <div class="clearfix"></div>
             <div id="rubric-criteria">
@@ -344,6 +373,7 @@
                     </ul>
                 </div>
                 <!-- END criterion -->
+                <input type="hidden" name="criteria" />
             </div>
             <p class="pad-it"><a href="/submission/rubricCriteria/{CATEGORY}">Manage available criteria</a></p>
         </td>
