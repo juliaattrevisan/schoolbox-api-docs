@@ -363,6 +363,14 @@ abstract class Component_ControllerAbstract {
         return $return;
     }
 
+    public function getSortFields() {
+        return $this->sortFields;
+    }
+
+    public function getFilterFields() {
+        return $this->filterFields;
+    }
+
     public function getPageTemplate() {
         return $this->sitepage->template;
     }

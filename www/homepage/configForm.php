@@ -125,19 +125,35 @@ if (is_numeric($_REQUEST['cid'])) {
 	else if ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {
         $config = $_GET;
 
-        $instance = $componentInstanceMapper->findById($config['component']);
+        $instance = reset($componentInstanceMapper->findByInstanceId($config['component']));
         $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
 
         $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn('component_definition_id', $instance->definitionId);
 
 		unset($config['cid'], $config['type'], $config['component']);
 
-        // much as I hate exceptional cases, this is an exceptional case: remove the prepended '/homepage/'
+        // much as I hate exceptional cases, there are exceptional cases...
+
+        //remove the prepended '/homepage/'
         if(isset($config['src'])) {
             preg_match("#[^0-9]*([0-9]*)#i", $config['src'], $matches);
             if($matches) {
                 $config['src'] = $matches[1];
             }
+        }
+        // prepare filter value
+        if(isset($config['filter'])) {
+            // retrieve the instance so we know how to insert this data
+            $cclass = $instance->definition->class;
+            $controller = new $cclass($instance, new User(), $page);
+            $controller->execute();
+            $fields = $controller->getFilterFields();
+            $val = 0;
+            for($i = 0; $i < count($fields); $i++) {
+                $add = isset($config['filter'][$fields[$i]]) && $config['filter'][$fields[$i]] ? 1 : 0;
+                $val += $add * pow(2, $i);
+            }
+            $config['filter'] = $val;
         }
 
         foreach($configDefinitionCollection as $confD) {
@@ -149,7 +165,7 @@ if (is_numeric($_REQUEST['cid'])) {
                     'component_instance_id'          => $instance->id
                 ))->current();
 
-                // printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->key, $confI->value, $config[$confD->key]);
+                printf("Changing value of key `%s` from '%s' to '%s'<br/>\n", $confD->key, $confI->value, $config[$confD->key]);
 
                 if(!($confI->id)) {
                     $confI = new Component_Config();
@@ -162,7 +178,6 @@ if (is_numeric($_REQUEST['cid'])) {
 
             }
         }
-
 		SitePage::localRedir("/homepage/" . $_GET['cid']);
 	}
 
