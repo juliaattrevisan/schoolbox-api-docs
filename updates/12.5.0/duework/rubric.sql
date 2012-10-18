@@ -8,8 +8,8 @@ VALUES
 -- NEW TABLES!
 CREATE TABLE `rubric_criterion`(
 	`id` int(11) NOT NULL  auto_increment ,
-	`grouping` varchar(32) COLLATE latin1_swedish_ci NOT NULL  ,
-	`name` varchar(32) COLLATE latin1_swedish_ci NOT NULL  ,
+	`grouping` varchar(64) COLLATE latin1_swedish_ci NOT NULL  ,
+	`name` varchar(128) COLLATE latin1_swedish_ci NOT NULL  ,
 	`parent_id` int(11) NOT NULL  ,
 	`parent_type` enum('submission','category','curriculum') COLLATE latin1_swedish_ci NOT NULL  DEFAULT 'category' ,
 	PRIMARY KEY (`id`) ,
