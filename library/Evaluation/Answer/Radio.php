@@ -9,8 +9,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-abstract class Evaluation_Answer_Radio extends Evaluation_Answer
-{
+abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
     protected $correctClass = 'multiCorrect';
     protected $incorrectClass = 'multiIncorrect';
 
@@ -22,8 +21,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
      * @param  $question_id
      * @return bool|int
      */
-    public function create($object, $question_id)
-    {
+    public function create($object, $question_id) {
         $answer = array_intersect_key($object, array_flip($this->allowedFields));
         $answer['question_id'] = $question_id;
         $answer['sequence'] = 1;
@@ -55,8 +53,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
      * @param  $object
      * @return void
      */
-    public function update($object)
-    {
+    public function update($object) {
         $this->create($object, $object['question_id']);
     }
 
@@ -69,8 +66,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
      * @param string $question_id
      * @return void
      */
-    public function modify($page, $question_id = '')
-    {
+    public function modify($page, $question_id = '') {
         if (is_numeric($question_id)) {
             $answerGroup = parent::getForQuestion($question_id);
 
@@ -79,11 +75,13 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
 
                 if (is_array($allAnswers) && count($allAnswers)) {
                     foreach ($allAnswers as $currentAnswer) {
-                        $page->setVar(array(
-                            'ANSWER_VALUE' => $currentAnswer->value,
-                            'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
-                            'ANSWER_CHECKED' => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
-                        ));
+                        $page->setVar(
+                            array(
+                                'ANSWER_VALUE' => $currentAnswer->value,
+                                'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
+                                'ANSWER_CHECKED' => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
+                            )
+                        );
 
                         $page->parse('answerOption_block', 'answerOption', true);
                     }
@@ -91,9 +89,11 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
                     $page->setVar('answerOption_block', '');
                 }
 
-                $page->setVar(array(
-                    'ANSWER_ID' => $answerGroup['answer_id']
-                ));
+                $page->setVar(
+                    array(
+                        'ANSWER_ID' => $answerGroup['answer_id']
+                    )
+                );
             } else {
                 $page->setVar('answerOption_block', '');
             }
@@ -108,8 +108,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
      * @param  $question_id
      * @return void
      */
-    public function prepareResponse($page, $question_id)
-    {
+    public function prepareResponse($page, $question_id) {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         $answerGroup = $this->getByQuestionID($question_id);
@@ -118,28 +117,36 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
             $allAnswers = unserialize($answerGroup['answer']);
 
             foreach ($allAnswers as $currentAnswer) {
-                $page->setVar(array(
-                    'ANSWER_ID' => $answerGroup['answer_id'],
-                    'ANSWER_VALUE' => $currentAnswer->value,
-                    'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
-                ));
+                $page->setVar(
+                    array(
+                        'ANSWER_ID' => $answerGroup['answer_id'],
+                        'ANSWER_VALUE' => $currentAnswer->value,
+                        'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
+                    )
+                );
 
                 if ($existing['response']) {
                     $existingAnswer = unserialize($existing['response']);
 
                     if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
-                        $page->setVar(array(
-                            'ANSWER_CHECKED' => 'checked=\'checked\'',
-                        ));
+                        $page->setVar(
+                            array(
+                                'ANSWER_CHECKED' => 'checked=\'checked\'',
+                            )
+                        );
                     } else {
-                        $page->setVar(array(
-                            'ANSWER_CHECKED' => '',
-                        ));
+                        $page->setVar(
+                            array(
+                                'ANSWER_CHECKED' => '',
+                            )
+                        );
                     }
                 } else {
-                    $page->setVar(array(
-                        'ANSWER_CHECKED' => '',
-                    ));
+                    $page->setVar(
+                        array(
+                            'ANSWER_CHECKED' => '',
+                        )
+                    );
                 }
 
                 $page->parse('answerOption_block', 'answerOption', true);
@@ -156,8 +163,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
      * @param  $page
      * @return void
      */
-    public function cleanupParse($page)
-    {
+    public function cleanupParse($page) {
     }
 
     /**
@@ -168,8 +174,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
      *
      * @return array
      */
-    public function saveResponse($data)
-    {
+    public function saveResponse($data) {
 
         /* Enforce array format for radio answers
            */
@@ -190,8 +195,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
      * @param  $question_id
      * @return void
      */
-    public function exportMoodleAnswer($page, $question_id)
-    {
+    public function exportMoodleAnswer($page, $question_id) {
         $answerGroup = $this->getByQuestionID($question_id);
 
         if ($answerGroup) {
@@ -199,19 +203,25 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
 
             foreach ($allAnswers as $currentAnswer) {
                 if ($currentAnswer->correct) {
-                    $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => '100'
-                    ));
+                    $page->setVar(
+                        array(
+                            'ACTUAL_CORRECT_VALUE' => '100'
+                        )
+                    );
                 } else {
-                    $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => '0'
-                    ));
+                    $page->setVar(
+                        array(
+                            'ACTUAL_CORRECT_VALUE' => '0'
+                        )
+                    );
                 }
 
-                $page->setVar(array(
-                    'ANSWER_VALUE' => $currentAnswer->value,
-                    'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
-                ));
+                $page->setVar(
+                    array(
+                        'ANSWER_VALUE' => $currentAnswer->value,
+                        'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
+                    )
+                );
 
                 $page->parse('answerOption_block', 'answerOption', true);
             }
@@ -227,8 +237,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
      * @param  $question_id
      * @return bool|int
      */
-    public function importMoodleAnswer($xmlObj, $question_id)
-    {
+    public function importMoodleAnswer($xmlObj, $question_id) {
         foreach ($xmlObj->answer as $currentAnswer) {
 
             /* Set up data object in accordance with $this->create();
@@ -263,8 +272,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
      * @param  $question_id
      * @return mixed
      */
-    public function exportResponseToCSV($attempt_id, $question_id)
-    {
+    public function exportResponseToCSV($attempt_id, $question_id) {
         $response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
 
         $data = unserialize($response['response']);
@@ -306,8 +314,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
      * @param  $value
      * @return string
      */
-    public function getAnswerText($question_id, $value)
-    {
+    public function getAnswerText($question_id, $value) {
         $answer = $this->getByQuestionID($question_id);
 
         $allOptions = unserialize($answer['answer']);
@@ -328,8 +335,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
      * @param  $question_id
      * @return mixed
      */
-    public function exportResponseToArray($attempt_id, $question_id)
-    {
+    public function exportResponseToArray($attempt_id, $question_id) {
         $response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
 
         $data = unserialize($response['response']);
@@ -345,8 +351,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
      * @param  $question_id
      * @return void
      */
-    public function reviewResponse($page, $question_id)
-    {
+    public function reviewResponse($page, $question_id) {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         if ($existing) {
@@ -358,34 +363,44 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
 
-            $page->setVar(array(
-                'ANSWER_ID' => $answerGroup['answer_id'],
-                'RESPONSE_ID' => $existing['response_id'],
-                'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
-                'REVIEWED_MARKS' => $existing['mark'],
-            ));
+            $page->setVar(
+                array(
+                    'ANSWER_ID' => $answerGroup['answer_id'],
+                    'RESPONSE_ID' => $existing['response_id'],
+                    'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
+                    'REVIEWED_MARKS' => $existing['mark'],
+                )
+            );
 
             foreach ($allAnswers as $currentAnswer) {
                 if ($currentAnswer->correct) {
-                    $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => 'correct-answer'
-                    ));
+                    $page->setVar(
+                        array(
+                            'ACTUAL_CORRECT_VALUE' => 'correct-answer'
+                        )
+                    );
                 } else {
-                    $page->setVar(array(
-                        'ACTUAL_CORRECT_VALUE' => ''
-                    ));
+                    $page->setVar(
+                        array(
+                            'ACTUAL_CORRECT_VALUE' => ''
+                        )
+                    );
                 }
 
-                $page->setVar(array(
-                    'ANSWER_VALUE' => $currentAnswer->value,
-                    'ANSWER_DESCRIPTION' => Scub::text($currentAnswer->description),
-                ));
+                $page->setVar(
+                    array(
+                        'ANSWER_VALUE' => $currentAnswer->value,
+                        'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
+                    )
+                );
 
                 if ($existing['response']) {
                     if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
-                        $page->setVar(array(
-                            'ANSWER_CHECKED' => 'checked=\'checked\'',
-                        ));
+                        $page->setVar(
+                            array(
+                                'ANSWER_CHECKED' => 'checked=\'checked\'',
+                            )
+                        );
 
                         /* Was this a correctly-selected response? If so apply a
                          * special class to it. The three cases are:
@@ -395,28 +410,40 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
                          * Unselected
                          */
                         if ($currentAnswer->correct && in_array($currentAnswer->value, $existingAnswer)) {
-                            $page->setVar(array(
-                                'CORRECT' => $this->getCorrectClass(),
-                            ));
-                        } else if (in_array($currentAnswer->value, $existingAnswer)) {
-                            $page->setVar(array(
-                                'CORRECT' => $this->getIncorrectClass(),
-                            ));
+                            $page->setVar(
+                                array(
+                                    'CORRECT' => $this->getCorrectClass(),
+                                )
+                            );
                         } else {
-                            $page->setVar(array(
-                                'CORRECT' => ''
-                            ));
+                            if (in_array($currentAnswer->value, $existingAnswer)) {
+                                $page->setVar(
+                                    array(
+                                        'CORRECT' => $this->getIncorrectClass(),
+                                    )
+                                );
+                            } else {
+                                $page->setVar(
+                                    array(
+                                        'CORRECT' => ''
+                                    )
+                                );
+                            }
                         }
                     } else {
-                        $page->setVar(array(
-                            'ANSWER_CHECKED' => '',
-                            'CORRECT' => ''
-                        ));
+                        $page->setVar(
+                            array(
+                                'ANSWER_CHECKED' => '',
+                                'CORRECT' => ''
+                            )
+                        );
                     }
                 } else {
-                    $page->setVar(array(
-                        'CORRECT' => ''
-                    ));
+                    $page->setVar(
+                        array(
+                            'CORRECT' => ''
+                        )
+                    );
                 }
 
                 $page->parse('answerOption_block', 'answerOption', true);
@@ -434,8 +461,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
      *
      * @return string
      */
-    protected function getCorrectClass()
-    {
+    protected function getCorrectClass() {
         return $this->correctClass;
     }
 
@@ -444,8 +470,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
      *
      * @return string
      */
-    protected function getIncorrectClass()
-    {
+    protected function getIncorrectClass() {
         return $this->incorrectClass;
     }
 }
