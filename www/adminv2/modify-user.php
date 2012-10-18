@@ -24,7 +24,11 @@ if(is_numeric($this->arg[0])) {
 	$this->setBlock(TEMPLATE_content, 'user_cms', 'user_cms_block');
     $this->setBlock(TEMPLATE_content, 'user_housemaster', 'user_housemaster_block');
 
-	$this->setVar(array(
+    // include the admin navigation
+    $nav = new AdminV2_Nav();
+    $nav->parse($this, 'user');
+
+    $this->setVar(array(
 		'user_calendar_block' => '',
 		'user_news_block' => '',
 		'user_cms_block'=> '',

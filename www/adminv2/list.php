@@ -24,6 +24,10 @@ $this->setBlock(TEMPLATE_content, 'newSelect', 'newSelect_block');
 $this->setBlock('newSelect', 'newSelect_option', 'newSelect_option_block');
 $this->setBlock(TEMPLATE_content, 'create_new', 'create_new_block');
 
+// include the admin navigation
+$nav = new AdminV2_Nav();
+$nav->parse($this, 'list');
+
 $this->setVar('table_cell_static_block', '');
 $this->setVar('table_cell_select_block', '');
 $this->setVar('newSelect_block', '');

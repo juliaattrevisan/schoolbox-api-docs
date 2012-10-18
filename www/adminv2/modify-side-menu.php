@@ -14,6 +14,10 @@ $this->setTitle('Admin - Modify Side Menu');
 $this->setBlock(TEMPLATE_content, 'parent_select', 'parent_select_block');
 $this->setBlock('parent_select', 'menu_select', 'menu_select_block');
 
+// include the admin navigation
+$nav = new AdminV2_Nav();
+$nav->parse($this, 'side-menu');
+
 $menuHandler = new SideMenu;
 $userHandler = new User;
 

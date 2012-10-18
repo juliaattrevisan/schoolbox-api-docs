@@ -11,6 +11,10 @@ if (!$groupHandler->isSuperuser()) {
 $this->setFile(TEMPLATE_content, 'adminv2/calendar.html');
 $this->setTitle('Admin - Calendar');
 
+// include the admin navigation
+$nav = new AdminV2_Nav();
+$nav->parse($this, 'calendar');
+
 $userHandler = new User();
 
 $this->checkList('campus_check_list', $userHandler->getCampusList(), '', TEMPLATE_content, array('id'=>'CAMPUSID','name'=>'CAMPUSNAME'));

@@ -56,17 +56,9 @@ $j(function () {
 
 <h1>Schoolbox Administration</h1>
 <ul class="admin-nav">
-	<li><a href="/adminv2/home">Home</a></li>
-	<li><a href="/adminv2/user">Users</a></li>
-	<li><a href="/adminv2/side-menu" class="current">Side Menu</a></li>
-    <li><a href="/adminv2/dashboard">Dashboard</a></li>
-<li><a href="/adminv2/homepage">Homepages</a></li>
-<li><a href="/adminv2/allowed-file">Allowed Files</a></li>
-	<li><a href="/adminv2/setting">Settings</a></li>
-	<li><a href="/adminv2/calendar">Calendar</a></li>
-	<li><a href="/adminv2/category">Category</a></li>
-	<li><a href="/adminv2/list">Lists</a></li>
-	<li><a href="/adminv2/cleanup">Cleanup</a></li>
+    <!-- BEGIN admin_nav_item -->
+    <li><a href="/adminv2/{ADMNAV_HREF}" class="{ADMNAV_CURRENT}">{ADMNAV_LABEL}</a></li>
+    <!-- END admin_nav_item -->
 </ul>
 <div class="admin-contents clearfix">
 	<h2>Side Menu</h2>

@@ -13,6 +13,10 @@ $this->setFile(TEMPLATE_content, 'adminv2/allowed-files.html');
 $this->setBlock(TEMPLATE_content, 'file', 'file_block');
 $this->setBlock(TEMPLATE_content, 'image', 'image_block');
 
+// include the admin navigation
+$nav = new AdminV2_Nav();
+$nav->parse($this, 'allowed-file');
+
 $allowedFile = new AllowedFile;
 
 $fileList = $allowedFile->getAll('mime');

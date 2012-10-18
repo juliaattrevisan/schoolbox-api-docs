@@ -14,28 +14,42 @@ $this->setBlock(TEMPLATE_content, 'recent_log', 'recent_log_block');
 $this->setBlock(TEMPLATE_content, 'memory', 'memory_block');
 $this->setBlock(TEMPLATE_content, 'no_js_warning', 'no_js_warning_block');
 
+// include the admin navigation
+$nav = new AdminV2_Nav();
+$nav->parse($this, 'home');
+
 $this->setTitle('Admin - Home');
 
 /* Disk space */
 $total = disk_total_space(Cfg::get('file_dir'));
 $free = disk_free_space(Cfg::get('file_dir'));
 $used = $total - $free;
-$perc = round(($used/$total)*100);
+$procPerc = round(($used / $total) * 100);
+$procGradient = 10 - floor($procPerc / 10);
 
-$disk = array( 'DISK_USED'  => Alaress_Byte_Format::bytesToString($used),
-               'DISK_TOTAL' => Alaress_Byte_Format::bytesToString($total),
-               'DISK_PERC'  => $perc);
+$disk = array(
+    'DISK_USED' => Alaress_Byte_Format::bytesToString($used),
+    'DISK_TOTAL' => Alaress_Byte_Format::bytesToString($total),
+    'DISK_PERC' => $procPerc,
+    'DISK_GRADIENT' => $procGradient
+);
 $this->setVar($disk);
 
 /* Memory Usage */
 if(is_readable('/proc/meminfo')) {
-    foreach(file('/proc/meminfo') as $ri)
+    foreach(file('/proc/meminfo') as $ri) {
         $m[strtok($ri, ':')] = str_replace(' kB','',strtok(''))*1024;
-
+    }
     $usedMem = $m['MemTotal'] - $m['MemFree'] - $m['Cached'];
-    $memory = array('MEMORY_USED'   => Alaress_Byte_Format::bytesToString($usedMem),
-                    'MEMORY_TOTAL'  => Alaress_Byte_Format::bytesToString($m['MemTotal']),
-                    'MEMORY_PERC'   => round($usedMem / $m['MemTotal'] * 100));
+    $memPerc = round($usedMem / $m['MemTotal'] * 100);
+    $memGradient = 10 - floor($memPerc / 10);
+
+    $memory = array(
+        'MEMORY_USED' => Alaress_Byte_Format::bytesToString($usedMem),
+        'MEMORY_TOTAL' => Alaress_Byte_Format::bytesToString($m['MemTotal']),
+        'MEMORY_PERC' => $memPerc,
+        'MEMORY_GRADIENT' => $memGradient
+    );
     $this->setVar($memory);
     $this->parse('memory_block', 'memory');
 }

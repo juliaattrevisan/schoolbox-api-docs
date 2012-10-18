@@ -21,6 +21,10 @@ $this->setFile(TEMPLATE_content, 'adminv2/rubric-results.html');
 $this->setBlock(TEMPLATE_content, 'list', 'list_block');
 $this->setBlock('list', 'list_item', 'list_item_block');
 
+// include the admin navigation
+$nav = new AdminV2_Nav();
+$nav->parse($this, 'rubric-results');
+
 $stmt = Database::getInstance()->prepare("
     SELECT * FROM rubric_result ORDER BY resultset_id ASC, `value` ASC
 ");

@@ -11,6 +11,10 @@ $this->setTitle('Admin - Bulk Add Categories');
 $this->setFile(TEMPLATE_content, 'adminv2/bulkAddCategories.html');
 $this->setBlock(TEMPLATE_content, 'category', 'category_block');
 
+// include the admin navigation
+$nav = new AdminV2_Nav();
+$nav->parse($this, 'category');
+
 /* Two types of upload.. either single user.. or via csv file..
  */
 if (isset($_FILES['bulkadd']['tmp_name']) && $_FILES['bulkadd']['tmp_name']) {

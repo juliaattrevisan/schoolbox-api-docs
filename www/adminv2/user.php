@@ -11,6 +11,10 @@ $this->setFile(TEMPLATE_content, 'adminv2/user.html');
 $this->setTitle('Admin - Users');
 $this->setBlock(TEMPLATE_content, 'superusers', 'superusers_block');
 
+// include the admin navigation
+$nav = new AdminV2_Nav();
+$nav->parse($this, 'user');
+
 require_once SITE_root . '/library/user.php';
 $userHandler = new User();
 

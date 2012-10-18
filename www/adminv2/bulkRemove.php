@@ -11,6 +11,10 @@ $this->setTitle('Admin - Bulk Remove Users');
 $this->setFile(TEMPLATE_content, 'adminv2/bulkRemove.html');
 $this->setBlock(TEMPLATE_content, 'user', 'user_block');
 
+// include the admin navigation
+$nav = new AdminV2_Nav();
+$nav->parse($this, 'user');
+
 /* Two types of upload.. either single user.. or via csv file..
  */
 if (isset($_FILES['bulkremove']['tmp_name']) && $_FILES['bulkremove']['tmp_name']) {

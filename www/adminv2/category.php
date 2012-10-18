@@ -14,6 +14,10 @@ $this->setFile(TEMPLATE_content, 'adminv2/category.html');
 $this->setBlock(TEMPLATE_content, 'group', 'group_block');
 $this->setBlock(TEMPLATE_content, 'homepage_template', 'homepage_template_block');
 
+// include the admin navigation
+$nav = new AdminV2_Nav();
+$nav->parse($this, 'category');
+
 $userHandler = new User();
 
 /* Show all the groups for permission selection

@@ -29,6 +29,10 @@ $this->setBlock(TEMPLATE_content, 'filter', 'filter_block');
 $this->setBlock(TEMPLATE_content, 'download_report', 'download_report_block');
 $this->setVar('filter_block', '');
 
+// include the admin navigation
+$nav = new AdminV2_Nav();
+$nav->parse($this, 'home');
+
 $this->setTitle('Admin - Reports');
 
 if(count($this->arg) < 2) {

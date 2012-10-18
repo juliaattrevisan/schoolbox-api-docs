@@ -21,6 +21,10 @@ $this->setBlock(TEMPLATE_content, 'setting_type_check', 'setting_type_check_bloc
 $this->setBlock(TEMPLATE_content, 'setting_type_list', 'setting_type_list_block');
 $this->setBlock(TEMPLATE_content, 'setting_save', 'setting_save_block');
 
+// include the admin navigation
+$nav = new AdminV2_Nav();
+$nav->parse($this, 'setting');
+
 $output = array(
 	'setting_type_noneditable_block' => '',
 	'setting_type_input_block'       => '',

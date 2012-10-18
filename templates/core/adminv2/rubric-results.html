@@ -1,3 +1,4 @@
+
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
     $j(function() {
@@ -100,12 +101,19 @@
     });
 </script>
 <!-- END custom_head -->
-<h1>Test Rubric Editing</h1>
+<h1>Schoolbox Administration</h1>
+<ul class="admin-nav">
+    <!-- BEGIN admin_nav_item -->
+    <li><a href="/adminv2/{ADMNAV_HREF}" class="{ADMNAV_CURRENT}">{ADMNAV_LABEL}</a></li>
+    <!-- END admin_nav_item -->
+</ul>
+<div class="admin-contents">
+    <h2>Rubric ResultSets</h2>
 <form id="rubricForm" method="POST" action="/adminv2/rubricForm.php">
     <table id="resultset-editor" class="standardForm">
         <tr>
             <td class="formLabelWidth">
-                <h4>Rubric ResultSets</h4>
+
                 <div class="listing">
                     <ul>
                         <li>Edit the rubric resultsets here: these are the pre-populated default values that will appear on every rubric.</li>
@@ -154,3 +162,4 @@
     <a href="/adminv2/rubric-results" id="save-changes" class="submit-btn-plain">Save changes</a>
     <span id="err-expl">Ensure all pre-existing results are not blank.</span>
 </form>
+</div>

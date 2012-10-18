@@ -241,6 +241,11 @@ if(count($this->arg)) {
 else {
     $this->setTitle('Admin - Cleanup');
     $this->setFile(TEMPLATE_content, 'adminv2/cleanup.html');
+
+    // include the admin navigation
+    $nav = new AdminV2_Nav();
+    $nav->parse($this, 'cleanup');
+
 }
 
 ?>

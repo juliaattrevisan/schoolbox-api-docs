@@ -39,14 +39,6 @@ $j(function() {
 			});
 		});
 	}
-	
-	//control at what percent the number turns red.
-	$j('.bar').each(function() {
-		var percent = Math.round(Number($j(this).children('span:first').width() / $j(this).width() * 100));
-		if (percent > 50) {
-			$j(this).parent().next('.number').addClass('bad');
-		}
-	});
 
     $j(window).load( function() {
         // test that the non-js page has not been requested
@@ -87,17 +79,9 @@ $j(function() {
 
 <h1>Schoolbox Administration</h1>
 <ul class="admin-nav">
-	<li><a href="/adminv2/home" class="current">Home</a></li>
-	<li><a href="/adminv2/user">Users</a></li>
-	<li><a href="/adminv2/side-menu">Side Menu</a></li>
-    <li><a href="/adminv2/dashboard">Dashboard</a></li>
-    <li><a href="/adminv2/homepage">Homepages</a></li>
-    <li><a href="/adminv2/allowed-file">Allowed Files</a></li>
-	<li><a href="/adminv2/setting">Settings</a></li>
-	<li><a href="/adminv2/calendar">Calendar</a></li>
-	<li><a href="/adminv2/category">Category</a></li>
-	<li><a href="/adminv2/list">Lists</a></li>
-	<li><a href="/adminv2/cleanup">Cleanup</a></li>
+    <!-- BEGIN admin_nav_item -->
+    <li><a href="/adminv2/{ADMNAV_HREF}" class="{ADMNAV_CURRENT}">{ADMNAV_LABEL}</a></li>
+    <!-- END admin_nav_item -->
 </ul>
 <div class="admin-contents clearfix">
 	<h2>Home</h2>
@@ -126,7 +110,7 @@ $j(function() {
 						<span style="width:{DISK_PERC}%"><span class="style"></span></span>
 					</div>
 				</div>
-				<span class="number">{DISK_PERC}%</span>
+				<span class="number gradient-{DISK_GRADIENT}">{DISK_PERC}%</span>
 			</div>
 			<!-- BEGIN memory -->
 			<h4>Memory <span>{MEMORY_USED}/{MEMORY_TOTAL}</span></h4>
@@ -136,7 +120,7 @@ $j(function() {
 						<span style="width:{MEMORY_PERC}%"><span class="style"></span></span>
 					</div>
 				</div>
-				<span class="number">{MEMORY_PERC}%</span>
+				<span class="number gradient-{MEMORY_GRADIENT}">{MEMORY_PERC}%</span>
 			</div>
 			<!-- END memory -->
 			<h4 style="margin-top:8px">Status of services</h4>

@@ -21,6 +21,10 @@ $this->setTitle('Admin - Homepage Templates');
 /* Group Selector */
 $this->setBlock(TEMPLATE_content, 'template', 'template_block');
 
+// include the admin navigation
+$nav = new AdminV2_Nav();
+$nav->parse($this, 'homepage');
+
 $templateHandler = new HomepageTemplate();
 $templateList = $templateHandler->getAll();
 

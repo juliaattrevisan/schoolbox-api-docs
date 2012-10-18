@@ -21,6 +21,11 @@ $this->setTitle('Admin - Dashboard');
 /* Group Selector */
 $this->setBlock(TEMPLATE_content, 'group', 'group_block');
 
+// include the admin navigation
+$nav = new AdminV2_Nav();
+$nav->parse($this, 'dashboard');
+
+
 $userHandle = new User;
 $groupList = $userHandle->getGroupList();
 
