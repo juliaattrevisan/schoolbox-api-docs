@@ -448,6 +448,7 @@ Notifications
     min-height: 100%;
     height: auto !important;
     height: 100%;
+    position: relative;
 }
 
 #wrap-inner {
@@ -6748,6 +6749,11 @@ dd {
             }
         }
     }
+    .attendance {
+        border: 0;
+        background: none;
+        text-shadow: none;
+    }
     tr {
         td,th{&:first-child{
             border-left: 0;
@@ -7246,6 +7252,16 @@ h4 a.hidden {
     position: absolute;
     top: 20px;
     right: 20px;
+}
+
+#rubric-criteria {
+    input[type=text] {
+        width: 340px;
+    }
+    span input {
+        display: block;
+        margin-left: 30px;
+    }
 }
 
 .rubric .warning span,

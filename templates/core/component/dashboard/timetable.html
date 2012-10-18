@@ -12,15 +12,17 @@
 		<tbody>
 			<tr>
 				<!-- BEGIN timetable_period -->
-				<td class="{PERIOD_CLASS}">
-                    <a href="{PERIOD_URL}" class="class" style="background:{PERIOD_COLOUR};">
+				<td class="{PERIOD_CLASS}"style="background:{PERIOD_COLOUR};">
+                    <!-- BEGIN period_class -->
+                    <a href="{PERIOD_URL}" class="class">
                         <span class="title">{PERIOD_DESC}</span>
                             {PERIOD_CODE}<br/>{PERIOD_ROOM}
-                        <!-- BEGIN has_attendances -->
-                        <br/><a href='/modules/attendance/modify/{ATTENDANCE_CLASS_CODE}/{ATTENDANCE_ATTENDANCE_DATE}/{ATTENDANCE_ATTENDANCE_PERIOD}'>Mark
-                        Attendance</a>
-                        <!-- END has_attendances -->
                     </a>
+                    <!-- BEGIN has_attendances -->
+                    <a class="btn modify float-left attendance" href='/modules/attendance/modify/{ATTENDANCE_CLASS_CODE}/{ATTENDANCE_ATTENDANCE_DATE}/{ATTENDANCE_ATTENDANCE_PERIOD}'>
+                        <span></span>Mark Attendance</a>
+                    <!-- END has_attendances -->
+                    <!-- END period_class -->
 				</td>
 				<!-- END timetable_period -->
 			</tr>

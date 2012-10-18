@@ -422,6 +422,7 @@ Notifications
   min-height: 100%;
   height: auto !important;
   height: 100%;
+  position: relative;
 }
 #wrap-inner {
   padding-bottom: 45px;
@@ -6306,6 +6307,11 @@ dd {
 .timetable .class:hover .title {
   text-decoration: underline;
 }
+.timetable .attendance {
+  border: 0;
+  background: none;
+  text-shadow: none;
+}
 .timetable tr td:first-child,
 .timetable tr th:first-child {
   border-left: 0;
@@ -6739,6 +6745,13 @@ h4 a.hidden {
   position: absolute;
   top: 20px;
   right: 20px;
+}
+#rubric-criteria input[type=text] {
+  width: 340px;
+}
+#rubric-criteria span input {
+  display: block;
+  margin-left: 30px;
 }
 .rubric .warning span,
 .admin-contents h3 span,
@@ -7477,13 +7490,6 @@ img.mimetype {
   border-radius: 4px;
   padding-bottom: 5px;
   margin-bottom: 4px;
-}
-#rubric-criteria input {
-  width: 340px;
-}
-#rubric-criteria span input {
-  display: block;
-  margin-left: 30px;
 }
 .descs span {
   display: block;
