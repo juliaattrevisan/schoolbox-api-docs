@@ -88,7 +88,6 @@
         // validation rules
         jQuery.validator.addMethod("markTypeTotalCheck", function(value, element) {
             if(marktype.total.is(':visible')) {
-                console.log('validating TotalMark: "'+value+'" should be numeric.');
                 return value != '';
             }
             else {
@@ -98,10 +97,6 @@
 
         jQuery.validator.addMethod('markTypeRubricCriteriaCheck', function(value, element) {
             if(marktype.rubric.is(':visible')) {
-                var i = $j('#rubric-criteria').find('input:checked').length;
-                i = i ? i : 0;
-                console.log('validating Criteria count: "'
-                        + i + '" should be > 1');
                 return $j('#rubric-criteria').find('input:checked').length > 1;
             }
             else {
@@ -111,9 +106,6 @@
 
         jQuery.validator.addMethod('markTypeRubricResultsetCheck', function(value, element) {
             if(marktype.rubric.is(':visible')) {
-                console.log('validating ResultSet: "'
-                        + $j('#rubric-results').find('input:checked').length
-                        + '" should be == 1');
                 return $j('#rubric-results').find('input:checked').length == 1;
             }
             else {
