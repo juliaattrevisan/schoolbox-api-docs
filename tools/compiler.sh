@@ -52,6 +52,11 @@ rm -rf phpunit.xml
 rm -rf .svn*
 rm -rf .git*
 
+curdir=`pwd`;
+cd /tmp/exported/$@/tools;
+./build-sql-update.sh
+cd $curdir;
+
 #echo -e "Attempting to process the v$@ SQL Update file (File:/sql/update_$@.sql)";
 #cp /tmp/exported/$@/sql/update_$@.sql /tmp/ &>> /dev/null;
 #errorCheck 1;
