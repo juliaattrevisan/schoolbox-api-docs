@@ -96,16 +96,16 @@ class DashboardComponentReFactory {
             'muted_users'   => 'a:0:{}',
         ),
         'ClassList'   => array(
-            'displayPortraits' => ''
+            'displayPortraits' => 'grid'
         ),
         'Managers'    => array(
-            'displayPortraits' => ''
+            'displayPortraits' => 'grid'
         ),
         'Members'     => array(
-            'displayPortraits' => ''
+            'displayPortraits' => 'grid'
         ),
         'Teachers'    => array(
-            'displayPortraits' => ''
+            'displayPortraits' => 'grid'
         ),
         'Wiki'        => array(
             'compactMode' => 'false'
