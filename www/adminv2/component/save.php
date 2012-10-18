@@ -57,7 +57,7 @@ if ( $definition = $cdm->findById($_POST['definitionId']) ) {
 
     // it's an array, but there will only be 1
     $ids = $cim->save($instance);
-    $cim->resequenceComponents($context, $_POST['targetId'], $protect = $ids[0]);
+    $cim->resequenceComponents($context, $_POST['targetId'], $ids[0]);
 
     header('Content-type: application/json');
     echo json_encode($instance);

@@ -1,4 +1,11 @@
 <?php
+
+// require no sitepage context
+if(isset($this)) {
+    // vicious lies
+    $this->pageNotFound();
+}
+
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 $page = new SitePage();
@@ -25,17 +32,19 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
 		$textBox['textBoxID'] = $textBoxHandler->create($textBox);
 	}
 
-	/* select this textBox
-	 */
-	$homepageHandler = new Homepage($_POST['categoryID']);
+	// select this textBox
+    $cim = Component_InstanceMapper::getInstance();
+    $instances = array_values($cim->findByInstanceId($_POST['componentID']));
+    $instance = $instances[0];
 
-	$config = serialize(array(
-		'textBoxID' => $textBox['textBoxID']
-	));
+    $ccm = Component_ConfigMapper::getInstance();
+    $config = new Component_Config();
+    $config->instanceId = $instance->id;
+    $config->configDefinitionId = reset($instance->config)->id;
+    $config->value = $textBox['textBoxID'];
+    $ccm->save($config);
 
-	$homepageHandler->updateComponentConfig($_POST['componentID'], $config);
-
-	SitePage::localRedir('/homepage/' . $_POST['categoryID']);
+    SitePage::localRedir('/homepage/' . $_POST['categoryID']);
 }
 else if (is_numeric($_GET['delete'])) {
 	$textBox = $textBoxHandler->getByID($_GET['delete']);
@@ -49,15 +58,6 @@ else if (is_numeric($_GET['delete'])) {
 	}
 
 	$textBoxHandler->delete($_GET['delete']);
-
-	$current = $textBoxHandler->getCurrent($textBox['categoryID']);
-	$homepageHandler = new Homepage($textBox['categoryID']);
-
-	$config = serialize(array(
-		'textBoxID' => $current['textBoxID']
-	));
-
-	$homepageHandler->updateComponentConfig($_POST['componentID'], $config);
 
 	SitePage::localRedir('/homepage/' . $textBox['categoryID']);
 }
