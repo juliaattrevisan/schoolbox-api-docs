@@ -85,10 +85,12 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                             if ($post == 2) {
                                 $this->setVar('PERIOD_DESC', 'Homeroom');
+                                $this->setVar('PERIOD_URL', '#');
                                 $this->setVar('PERIOD_CODE', '');
                                 $this->setVar('PERIOD_ROOM', '');
                             } else {
                                 $this->setVar('PERIOD_DESC', $period['description']);
+                                $this->setVar('PERIOD_URL', '/homepage/'. urlencode($period['code']));
                                 $this->setVar('PERIOD_CODE', '');
                                 $this->setVar('PERIOD_ROOM', $period['room']);
                             }
@@ -97,15 +99,13 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                         } else {
                             if ($_SESSION['campus'][0] == 2 && Cfg::get('site_location') == 'wenona') {
                                 $this->setVar('PERIOD_DESC', $period['description']);
+                                $this->setVar('PERIOD_URL', '/homepage/'. urlencode($period['code']));
                                 $this->setVar('PERIOD_CODE', '');
                                 $this->setVar('PERIOD_ROOM', $period['room']);
                                 $this->setVar('PERIOD_ABSENTEES', '');
                             } else {
-                                $this->setVar(
-                                    'PERIOD_DESC', "<a href=\"/homepage/" . urlencode(
-                                    $period['code']
-                                ) . "\">{$period['description']}</a>"
-                                );
+                                $this->setVar('PERIOD_DESC', $period['description']);
+                                $this->setVar('PERIOD_URL', '/homepage/'. urlencode($period['code']));
                                 $this->setVar('PERIOD_CODE', '(' . $period['code'] . ')');
                                 $this->setVar('PERIOD_ROOM', $period['room']);
 

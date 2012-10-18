@@ -157,7 +157,7 @@ if (is_array($outputList)) {
                             'PERIOD_CODE' => '(' . Scrub::Text($period['code']) . ')',
                             'PERIOD_ROOM' => Scrub::Text($period['room']),
                             'PERIOD_STAFF' => Scrub::Text($period_staff),
-                            'PERIOD_ONCLICK' => '',
+                            'PERIOD_URL' => '',
                             'PERIOD_COLOUR' => '#' . $subjectColourMap[$period['code']],
                         );
 
@@ -169,9 +169,9 @@ if (is_array($outputList)) {
                         }
 
                         if($catCache[$period['code']] && $groupHandler->getPermission($catCache[$period['code']]) >= READ_ACCESS) {
-                            $outputPeriod['PERIOD_ONCLICK'] = 'onClick="window.location=\'/homepage/' . urlencode(
-                                $period['code']
-                            ) . '\'"';
+                            $outputPeriod['PERIOD_URL'] = '/homepage/' . urlencode($period['code']);
+                        } else {
+                            $outputPeriod['PERIOD_URL'] = '#';
                         }
                     }
 

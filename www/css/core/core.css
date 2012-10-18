@@ -5847,6 +5847,12 @@ table.subjectList {
 .mark-sheet.names table {
   table-layout: fixed;
 }
+.mark-sheet.names table td {
+  white-space: nowrap;
+  word-break: break-all;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
 .mark-sheet.assessments th {
   vertical-align: bottom;
   text-align: left;
@@ -6205,6 +6211,7 @@ table.tiny-tables td:first-child {
 /*.mark-sheet.assessments .active-assessment{width:471px !important;}*/
 .mark-sheet.assessments .active-assessment .row-fix {
   width: 360px !important;
+  overflow: visible;
 }
 .mark-sheet.assessments span {
   position: relative;
@@ -6277,6 +6284,7 @@ dd {
 }
 .timetable td {
   vertical-align: top;
+  padding: 0;
 }
 .timetable td .title {
   font-weight: bold;
@@ -6287,6 +6295,16 @@ dd {
 }
 .timetable td a {
   color: #000000;
+}
+.timetable .class {
+  display: block;
+  padding: 7px 16px;
+}
+.timetable .class:hover {
+  text-decoration: none;
+}
+.timetable .class:hover .title {
+  text-decoration: underline;
 }
 .timetable tr td:first-child,
 .timetable tr th:first-child {
