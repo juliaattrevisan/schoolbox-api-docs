@@ -54,7 +54,7 @@ override_dh_install:
 	echo "UPDATE config SET value='/var/lib/schoolbox/cache/minify' WHERE name='minify_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
 	echo "UPDATE config SET value='/var/lib/schoolbox/storage' WHERE name='storage_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
 	# Add extras stuff
-	sed -i 's/newver=\"x.x.x\"/newver=\"$(VERSION)\"/g' debian/schoolbox/usr/share/schoolbox/tools/update_sql.sh
+	sed -i 's/newver=\"x.x.x\"/newver=\"$(VERSION)\"/g' debian/schoolbox/usr/share/schoolbox/tools/update-sql.sh
 	# Remove moved files
 	rm -rf debian/schoolbox/usr/share/schoolbox/www/conf
 
