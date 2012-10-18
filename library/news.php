@@ -352,7 +352,7 @@ class News extends DeprecatedModel {
             return false;
         }
 
-        usort($allNews, array($this, "timecmp"));
+        usort($allNews, array($this, "cattimecmp"));
 
         if ($limit > 0) {
             $allNews = array_slice($allNews, $index, $limit);
