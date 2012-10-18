@@ -188,14 +188,16 @@
     }
 }
 .mark-sheet {
-    td.mark-average {
-        background: @markavg;
-    }
-    &.dark td.mark-average {
-        background: @markavg-dark;
-    }
-    th, td {
-        padding: 7px 16px 7px 0;
+    tr {
+        td.mark-average {
+            background: @markavg;
+        }
+        &.dark td.mark-average {
+            background: @markavg-dark;
+        }
+        th, td {
+            padding: 7px 16px 7px 0;
+        }
     }
 }
 
@@ -765,4 +767,16 @@ div.colours p {
     }
 }
 
+.mark-sheet.assessments {
+    thead {
+        :first-child {
+            border: none;
+        }
+    }
+}
 
+#assess {
+    table td a {
+        line-height: 20px;
+    }
+}
