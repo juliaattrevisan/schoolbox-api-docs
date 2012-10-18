@@ -58,7 +58,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
         $this->setBlock($templateHandle, "timetable_period", "timetable_period_block");
         $this->setBlock($templateHandle, "timetable_header", "timetable_header_block");
-        $this->setBlock('timetable_period', 'has_attendances', "has_attendances_block");
+        $this->setBlock('timetable_period', 'period_class', 'period_class_block');
+        $this->setBlock('period_class', 'has_attendances', "has_attendances_block");
 
         $this->setVar("DAYNUMBER", $this->dayNumber);
 
@@ -148,7 +149,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                 'PERIOD_CODE' => '',
                                 'PERIOD_ROOM' => '',
                                 'PERIOD_ABSENTEES' => '',
-                                'PERIOD_ONCLICK' => '',
+                                'PERIOD_URL' => '#',
                                 'has_attendances_block' => '',
                             )
                         );
@@ -169,6 +170,12 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                         ));
                     }
 
+                    if($period['description']) {
+                        $this->parse('period_class_block', 'period_class');
+                    }
+                    else {
+                        $this->setVar('period_class_block', '');
+                    }
 
                     //output period block
                     $this->parse("timetable_header_block", "timetable_header", true);
