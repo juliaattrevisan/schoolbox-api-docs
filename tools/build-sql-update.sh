@@ -5,7 +5,7 @@
 #       Updates the updates/sql_updates.sql file for package based updating
 #
 # Usage:
-#       Needs to be run from the tools dir and commited before a release is built
+#       Run automatically as part of the build/compile process
 #
 # @author      Sam Bailey <sam.bailey@alaress.com.au>
 # @copyright   2012 Alaress Pty Ltd
@@ -13,40 +13,41 @@
 #
 #
 
-tmpfile="/tmp/sql_updates_delta.sql";
 curdir=`pwd`;
-
 cd ../updates;
-release=`find . -maxdepth 1 -type d | sort | tail -n 1 | cut -c3-1000`
-echo "Release: $release";
-echo "Building scripts_list";
-cd $release;
-rm -f scripts_list;
-find . -type f | cut -c3-1000 | grep .sql >> scripts_list;
-find . -type f | cut -c3-1000 | grep .php >> scripts_list;
 
-echo "Built scripts_list";
+# Only allow upgrades from 12.0.5 onwards
+sqlupdatestart="-- End of Release 12.0.5";
+echo $sqlupdatestart > "sql_updates.sql";
+echo "" >> "sql_updates.sql";
 
-cd ../;
+# Auto create scripts_list and sql_updates.sql for each folder in updates
+for release in `find . -maxdepth 1 -type d | sort | cut -c3-1000`;
+do
+	echo "Release: $release";
+	echo "- Building scripts_list";
+	cd $release;
+	rm -f scripts_list;
+	find . -type f | cut -c3-1000 | grep .sql >> scripts_list;
+	find . -type f | cut -c3-1000 | grep .php >> scripts_list;
+	echo "- Built scripts_list";
 
-rm -f $tmpfile;
-echo "Starting creation of sql updates delta"
-for i in `grep ".sql" $release/scripts_list | grep -v "#"`;do
-        cat $release/$i >> $tmpfile
-        echo "" >> $tmpfile
+	cd ../;
+
+	echo "- Starting creation of sql updates"
+	for i in `grep ".sql" $release/scripts_list | grep -v "#"`;
+	do
+		cat $release/$i >> "sql_updates.sql";
+		echo "" >> "sql_updates.sql";
+	done
+
+	echo "" >> "sql_updates.sql";
+	echo "UPDATE \`config\` SET value='$release' WHERE name='site_version';" >> "sql_updates.sql";
+	echo "" >> "sql_updates.sql";
+	echo "-- End of Release $release" >> "sql_updates.sql";
+	echo "" >> "sql_updates.sql";
+	echo "- Created sql updates";
 done
-echo "" >> $tmpfile
-echo "UPDATE \`config\` SET value='$release' WHERE name='site_version';" >> $tmpfile
-echo "" >> $tmpfile
-echo "-- End of Release $release" >> $tmpfile
-echo "" >> $tmpfile
-echo "Created sql updates delta";
-
-echo "Creating new version files"
-cat $tmpfile >> "sql_updates.sql";
-sed -n '/\-\-\ End\ of\ Release/!p' $tmpfile >> "../sql/schoolbox-initial.sql"
-
-rm -vf $tmpfile;
 
 cd $curdir;
 
