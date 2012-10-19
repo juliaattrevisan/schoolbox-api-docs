@@ -20,7 +20,7 @@ $recaptcha = new ReCaptcha( Config::get('recaptcha_public_api_key'), Config::get
 
 if ( !isset($_SESSION['id']) && !$recaptcha->check_answer($_SERVER['REMOTE_ADDR'], $_POST['recaptcha_challenge_field'], $_POST['recaptcha_response_field']) ) {
     $page = new SitePage( false );
-    //error(137);
+    error(105,"The Human Checker (reCAPTCHA) words you entered did not match.");
 }
 
 if(validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.html$/", $_POST['template'])) {
