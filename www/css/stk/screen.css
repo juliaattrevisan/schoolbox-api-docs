@@ -87,6 +87,8 @@ h3, #nav h3, .add-component .notification {
 }
 
 #tabs li a {
+    text-align: center;
+    width: 75px;
     height: 32px;
     font-size: 12px;
     padding: 0 12px;
