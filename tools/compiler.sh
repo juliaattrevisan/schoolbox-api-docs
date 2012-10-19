@@ -51,6 +51,7 @@ rm -rf test/
 rm -rf phpunit.xml
 rm -rf .svn*
 rm -rf .git*
+rm -rf README.md
 
 curdir=`pwd`;
 cd /tmp/exported/$@/tools;
