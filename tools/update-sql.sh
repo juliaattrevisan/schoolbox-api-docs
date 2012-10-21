@@ -101,7 +101,7 @@ else
         mysqldump --allow-keywords -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile;
         
         sed -n "$start","$end"p $sqlfile | sed -n '/\-\-\ End\ of\ Release/!p' > $tmpfile;
-        mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $tmpfile > /dev/null 2>&1;
+        mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $tmpfile;
         
         if [ $? -eq 0 ];
         then
@@ -120,7 +120,7 @@ else
         # Cleanup tmpfile and backup
         if [ -f $tmpfile ];
         then
-                rm -rf {$tmpfile};
+                rm -f $tmpfile;
         fi
 fi
 
