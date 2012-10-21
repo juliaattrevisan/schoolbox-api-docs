@@ -33,6 +33,11 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         if(!parent::loadTemplate($templateHandle, 'manageClass')) {
             return false;
         }
+
+        if($this->permission < WRITE_ACCESS) {
+            return false;
+        }
+
         $this->parseConfig();
 
         $this->setBlock($templateHandle, "class_list", "class_list_block");

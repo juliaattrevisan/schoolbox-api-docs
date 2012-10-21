@@ -326,7 +326,7 @@ abstract class Component_ControllerAbstract {
         }
 
         if(!$hasWriteAccess) {
-            $page->setVar('config_element_block', '');
+            return false;
         }
 
         $page->parse($targetHandle, 'configTpl', false);
