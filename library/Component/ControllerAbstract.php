@@ -97,6 +97,7 @@ abstract class Component_ControllerAbstract {
 
         $output = array(
             'COMPONENT_INSTANCE_ID' => $this->instance->id,
+            'COMPONENT_DEFINITION_ID' => $this->instance->definitionId,
             'COMPONENT_HANDLE'      => $templateHandle . '_' . $this->instance->id
         );
 
