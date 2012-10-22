@@ -228,7 +228,7 @@ a{
 }
 #wrap-inner {
     background: url(/images/mggs/body-cross.png) -31px 100% no-repeat;
-	padding-bottom: 45px;
+	padding-bottom: 13px;
 }
 #header {
     background: url(/images/mggs/header-cross.png) 303px 12px no-repeat;
@@ -574,7 +574,7 @@ table.ruler span.header_option a{color:#fff; font-weight:bold; }
     background: #e6f7fd;
 	margin: 0;
 	font-size: 11px;
-	padding-left: 20px;
+	padding: 0 0 16px 0;
 }
 
 #footer ul{
