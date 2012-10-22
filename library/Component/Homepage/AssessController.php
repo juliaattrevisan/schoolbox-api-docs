@@ -134,7 +134,6 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                             }
                         }
                     } else {
-
                         /* Do not show link if past finish date */
                         if ($assessHandler->isExpired($currentAssess['assess_id'])) {
                             $this->parse('assessNoLink_block', 'assessNoLink');
@@ -142,6 +141,19 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                             $this->setVar('resumeLink_block', '');
                         } /* only show test link to owner and enrolled students */
                         else {
+
+                            $enroled = false;
+                            $categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], true);
+                            /* See if you're in the Category first
+                             */
+                            if (is_array($categoryList)) {
+                                foreach ($categoryList as $key => $value) {
+                                    if ($value['id'] == $this->getContext('id')) {
+                                        $enroled = true;
+                                    }
+                                }
+                            }
+
                             if ($enroled || $currentAssess['user_id'] == $_SESSION['id']) {
                                 $numAttempts = $attemptHandler->userHasAttempted(
                                     $currentAssess['assess_id'], $_SESSION['id']
