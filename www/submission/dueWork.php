@@ -1,7 +1,7 @@
 <?php
 
-if(!isset($this)) {
-    require_once(dirname(__FILE__).'/../../include/Bootstrap.php');
+if (!isset($this)) {
+    require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
     SitePage::localRedir('/submission/dueWork');
 }
 
@@ -37,9 +37,9 @@ $current_time = new DateTime();
 $childList = array();
 
 if (is_array($_SESSION['children'])) {
-	foreach ($_SESSION['children'] as $child) {
-		$childList[] = $child['id'];
-	}
+    foreach ($_SESSION['children'] as $child) {
+        $childList[] = $child['id'];
+    }
 }
 
 /* possible uri formats
@@ -50,19 +50,23 @@ if (is_array($_SESSION['children'])) {
 */
 
 // parse the datums!
-switch(count($this->arg)) {
+switch (count($this->arg)) {
     case 2:
         // set both the date and uid
         $userID = $this->arg[1];
-        $targetDate = new Alaress_Date_Format(preg_replace('[^0-9\-]','', $this->arg[0]), 'y-m-d');
+        if ($this->arg[0] == 0) {
+            $targetDate = new Alaress_Date_Format(mktime(), 'U'); // if no date use today
+        } else {
+            $targetDate = new Alaress_Date_Format(preg_replace('[^0-9\-]', '', $this->arg[0]), 'y-m-d');
+        }
+
         break;
     case 1:
         // determine whether this is a uid or date
-        if(is_numeric($this->arg[0])) {
+        if (is_numeric($this->arg[0])) {
             $userID = $this->arg[0];
-        }
-        else {
-            $targetDate = new Alaress_Date_Format(preg_replace('[^0-9\-]','', $this->arg[0]), 'y-m-d');
+        } else {
+            $targetDate = new Alaress_Date_Format(preg_replace('[^0-9\-]', '', $this->arg[0]), 'y-m-d');
         }
         break;
     case 0:
@@ -74,12 +78,11 @@ switch(count($this->arg)) {
 }
 
 // dynamically generate userID
-if(!isset($userID)) {
+if (!isset($userID)) {
     // check for parenthood
-    if(count($childList)) {
+    if (count($childList)) {
         $userID = $_SESSION['children'][0]['id'];
-    }
-    else {
+    } else {
         // not specified means looking at our own, so log the view
         $submissionHandler->logPageView(1);
         $submissionHandler->logPageView(2);
@@ -88,20 +91,16 @@ if(!isset($userID)) {
 }
 
 // prevent students from seeing anything but their own work
-if($groupHandler->isStudent()) {
-    if($userID != $_SESSION['id']) {
+if ($groupHandler->isStudent()) {
+    if ($userID != $_SESSION['id']) {
         error(19);
     }
-}
-elseif(!($groupHandler->isStaff() || $groupHandler->isParentOfChild($userID))) {
+} elseif (!($groupHandler->isStaff() || $groupHandler->isParentOfChild($userID))) {
     error(19);
 }
 
 
-
-
-
-if(!isset($targetDate)) {
+if (!isset($targetDate)) {
     $targetDate = new Alaress_Date_Format(time(), 'U');
 }
 
@@ -109,7 +108,7 @@ $user = $userHandler->getByID($userID);
 
 // check this is a valid user
 if (!isset($user['uid'])) {
-	error(19);
+    error(19);
 }
 
 // supplement the user array with additional information
@@ -118,8 +117,10 @@ $user['person_label'] = $user['self'] ? 'You' : $user['firstname'];
 
 // if parent, output the child selector
 if (is_array($_SESSION['children'])) {
-	$this->dropDown('child', $_SESSION['children'], $user['uid'], 'is_parent', array('id' => 'CHILD_ID', 'name' => 'CHILD_NAME'));
-	$this->parse('is_parent_block', 'is_parent');
+    $this->dropDown(
+        'child', $_SESSION['children'], $user['uid'], 'is_parent', array('id' => 'CHILD_ID', 'name' => 'CHILD_NAME')
+    );
+    $this->parse('is_parent_block', 'is_parent');
 }
 
 // retrieve category listing
@@ -127,33 +128,33 @@ $categoryList = $groupHandler->involvedInCategoryList($user['uid']);
 
 // parse IDs into array
 if (is_array($categoryList)) {
-	foreach($categoryList as $category) {
-		$categoryIDList[] = $category['id'];
-	}
+    foreach ($categoryList as $category) {
+        $categoryIDList[] = $category['id'];
+    }
 }
 
 // Catch if not involved in any categories
-if(!isset($categoryIDList)) {
-	error(135);
+if (!isset($categoryIDList)) {
+    error(135);
     exit;
 }
 
 // output general data
 $output = array(
-	'CURRENT_DATE' => date('F Y', $targetDate->getUnixTimestamp()),
-	'NOT_TODAY' => $targetDate->getUsingFormat('dmY') == date('dmY') ? '' : 'not-today',
-	'TODAY_DATE' => date('Y-m-d'),
-	'NEXT_MONTH' => date('Y-m-d', strtotime('+1 month', $targetDate->getUsingFormat('U'))),
-	'PREV_MONTH' => date('Y-m-d', strtotime('-1 month', $targetDate->getUsingFormat('U'))),
-	'SELECTED_DATE' => $targetDate->getLocalShort(),
-	'WORK_USER_ID' => $userID,
-	'WORK_USER_NAME' => $userID == $_SESSION['id'] ? 'My' : $userHandler->formatName($user) . "'s",
+    'CURRENT_DATE' => date('F Y', $targetDate->getUnixTimestamp()),
+    'NOT_TODAY' => $targetDate->getUsingFormat('dmY') == date('dmY') ? '' : 'not-today',
+    'TODAY_DATE' => date('Y-m-d'),
+    'NEXT_MONTH' => date('Y-m-d', strtotime('+1 month', $targetDate->getUsingFormat('U'))),
+    'PREV_MONTH' => date('Y-m-d', strtotime('-1 month', $targetDate->getUsingFormat('U'))),
+    'SELECTED_DATE' => $targetDate->getLocalShort(),
+    'WORK_USER_ID' => $userID,
+    'WORK_USER_NAME' => $userID == $_SESSION['id'] ? 'My' : $userHandler->formatName($user) . "'s",
 );
 
 $this->setVar($output);
 
-$selectedMonth 	= $targetDate->getUsingFormat('n');
-$selectedYear 	= $targetDate->getUsingFormat('Y');
+$selectedMonth = $targetDate->getUsingFormat('n');
+$selectedYear = $targetDate->getUsingFormat('Y');
 
 /* calculate month layout
  */
@@ -168,60 +169,61 @@ $startDay = mktime(12, 0, 0, $selectedMonth, 1, $selectedYear) - strtotime("+$fi
 $summary = array();
 
 for ($i = 0; $i < $totalDays; $i++) {
-	$currentDay = strtotime("+$i day", $startDay);
+    $currentDay = strtotime("+$i day", $startDay);
 
-	$day = $i % 7;
+    $day = $i % 7;
 
-	if ($i >= $firstDay && $i < $numDaysinMonth + $firstDay) {
-		$this->setVar('OTHER_MONTH', '');
-	}
+    if ($i >= $firstDay && $i < $numDaysinMonth + $firstDay) {
+        $this->setVar('OTHER_MONTH', '');
+    }
 
-	$output = array(
-		'DATE' => date("j", $currentDay),
-		'PAST' => $i >= $firstDay && $i < $numDaysinMonth + $firstDay ? '' : 'past',
-		'ACTIVE' => date('dmY', $currentDay) == $targetDate->getUsingFormat('dmY') ? 'active' : '',
-		'TODAY' => date('dmY') == date('dmY', $currentDay) ? 'today' : '',
-		'RIGHTY' => $day > 3 ? 'righty' : '',
-	);
+    $output = array(
+        'DATE' => date("j", $currentDay),
+        'PAST' => $i >= $firstDay && $i < $numDaysinMonth + $firstDay ? '' : 'past',
+        'ACTIVE' => date('dmY', $currentDay) == $targetDate->getUsingFormat('dmY') ? 'active' : '',
+        'TODAY' => date('dmY') == date('dmY', $currentDay) ? 'today' : '',
+        'RIGHTY' => $day > 3 ? 'righty' : '',
+    );
 
-	$this->setVar($output);
+    $this->setVar($output);
 
-	$eventList = $submissionHandler->getByDate($currentDay, $user['uid'], $categoryIDList);
+    $eventList = $submissionHandler->getByDate($currentDay, $user['uid'], $categoryIDList);
 
-	if (is_array($eventList)) {
-		foreach ($eventList as $event) {
-			$due = ($event['realname'] && $event['open_date'] < time() && $event['late_date'] > time() && $event['accept_submission']);
+    if (is_array($eventList)) {
+        foreach ($eventList as $event) {
+            $due = ($event['realname'] && $event['open_date'] < time() && $event['late_date'] > time(
+            ) && $event['accept_submission']);
 
-			$date = new Alaress_Date_Format(strtotime($event['date']), 'U');
+            $date = new Alaress_Date_Format(strtotime($event['date']), 'U');
 
-			$output = array(
-				'EVENT_ID' => $event['id'],
-				'TIME' => $date->getTimeOnly(),
-				'EVENT' => Scrub::text($event['name']),
-				'EVENT_PAST' => !$due ? 'fade' : '',
-				'EVENT_CAT_ID' => $event['category'],
-			);
+            $output = array(
+                'EVENT_ID' => $event['id'],
+                'TIME' => $date->getTimeOnly(),
+                'EVENT' => Scrub::text($event['name']),
+                'EVENT_PAST' => !$due ? 'fade' : '',
+                'EVENT_CAT_ID' => $event['category'],
+            );
 
-			$this->setVar($output);
-			$this->parse('event_block', 'event', true);
+            $this->setVar($output);
+            $this->parse('event_block', 'event', true);
 
-			/* record overview for summary box */
-			$summary[$event['category']] = array(
-				'name' => $event['categoryName'],
-				'total' => ++$summary[$event['category']]['total'],
-				'due' => $due ? ++$summary[$event['category']]['due'] : $summary[$event['category']]['due'],
-				'code' => explode(',', $event['categoryCode']),
-			);
-		}
-	}
+            /* record overview for summary box */
+            $summary[$event['category']] = array(
+                'name' => $event['categoryName'],
+                'total' => ++$summary[$event['category']]['total'],
+                'due' => $due ? ++$summary[$event['category']]['due'] : $summary[$event['category']]['due'],
+                'code' => explode(',', $event['categoryCode']),
+            );
+        }
+    }
 
-	$this->parse('day_block', 'day', true);
-	$this->setVar('event_block', '');
+    $this->parse('day_block', 'day', true);
+    $this->setVar('event_block', '');
 
-	if ($day == 6 && $i) {
-		$this->parse('week_block', 'week', true);
-		$this->setVar('day_block', '');
-	}
+    if ($day == 6 && $i) {
+        $this->parse('week_block', 'week', true);
+        $this->setVar('day_block', '');
+    }
 }
 
 
@@ -235,16 +237,17 @@ $instance->definition = $definition[0];
 $dueWorkController = $chf->buildComponent($instance);
 
 // apply configs
-$dueWorkController->setup(array(), array(
-    'actionable'    => array('value' => true),
-    'allow_parents' => array('value' => true),
-    'size'          => array('value' => 0),
-    'user'          => array('value' => $userID),
-));
+$dueWorkController->setup(
+    array(), array(
+        'actionable' => array('value' => true),
+        'allow_parents' => array('value' => true),
+        'size' => array('value' => 0),
+        'user' => array('value' => $userID),
+    )
+);
 
 $dueWorkController->execute();
 $dueWorkController->renderTemplate('UPCOMING_WORK');
-
 
 
 // subject listings
@@ -252,44 +255,44 @@ $j = 0;
 $synClass = new External_Class;
 
 foreach ($categoryList as $category) {
-	$categoryID = $category['id'];
+    $categoryID = $category['id'];
 
-	/* yes it actually requires THIS MUCH code to get a teachers name. */
-	if (Cfg::get('external_enable')) {
-		$teacherOutput = array();
-		$teacherList = array();
-        $codeList = explode(',',$category['code']);
+    /* yes it actually requires THIS MUCH code to get a teachers name. */
+    if (Cfg::get('external_enable')) {
+        $teacherOutput = array();
+        $teacherList = array();
+        $codeList = explode(',', $category['code']);
 
-		if (is_array($codeList)) {
-			foreach ($codeList as $code) {
-				if(is_array($temp = $synClass->getTeacherName($code))) {
+        if (is_array($codeList)) {
+            foreach ($codeList as $code) {
+                if (is_array($temp = $synClass->getTeacherName($code))) {
                     $teacherList = array_merge($teacherList, $temp);
-				}
-			}
-		}
+                }
+            }
+        }
 
-		if (is_array($teacherList)) {
-			foreach ($teacherList as $teacherSynID) {
-				$teacher = $userHandler->getBySynergy($teacherSynID);
-                if(is_array($teacher)) {
+        if (is_array($teacherList)) {
+            foreach ($teacherList as $teacherSynID) {
+                $teacher = $userHandler->getBySynergy($teacherSynID);
+                if (is_array($teacher)) {
                     $teacherName = $userHandler->formatName($teacher);
 
                     $emailObj = new Email();
                     $emailAddress = $emailObj->formatEmailFromArray($teacher);
 
                     $teacherOutput[] = array(
-                        'id'    => 0,
-                        'name'  => $teacherName,
+                        'id' => 0,
+                        'name' => $teacherName,
                         'email' => $_SESSION['mailhandle'] . $emailAddress,
                         'synid' => $teacherSynID,
                     );
                 }
-			}
-		}
-	}
+            }
+        }
+    }
 
     $categoryIDs[] = $categoryID;
-    $categoryCode = $category['code'] ? '(' . $category['code'] .')' : '';
+    $categoryCode = $category['code'] ? '(' . $category['code'] . ')' : '';
 
     // retrieve subject grades
     $studentGrades = $returnHandler->getStudentMarksForCategory($category['id'], $userID);
@@ -299,14 +302,13 @@ foreach ($categoryList as $category) {
     $trendDir = '';
     $trendAmt = '';
     // if more than 1 assessment, can calculate trending
-    if(count($studentGrades) > 1) {
+    if (count($studentGrades) > 1) {
         // get previous average
         array_pop($studentGrades);
         $prevAvg = array_sum($studentGrades) / count($studentGrades);
-        if($gradeAvg > $prevAvg) {
+        if ($gradeAvg > $prevAvg) {
             $trendDir = '&#x25B2;';
-        }
-        elseif($gradeAvg < $prevAvg) {
+        } elseif ($gradeAvg < $prevAvg) {
             $trendDir = '&#x25BC;';
         }
         $trendAmt = sprintf('%0.1f', ($gradeAvg - $prevAvg) / $prevAvg * 100) . '%';
@@ -317,32 +319,27 @@ foreach ($categoryList as $category) {
     $this->setBlock('subjectTpl', 'teacher', 'teacher_block');
     $this->setBlock('subjectTpl', 'icon', 'icon_block');
 
-	$output = array(
-		'SUBJ_CAT_ID' => $categoryID,
-
+    $output = array(
+        'SUBJ_CAT_ID' => $categoryID,
         'SUBJ_SUBJECT_NAME' => Scrub::Text($category['name']),
         'SUBJ_SUBJECT_ICON' => '/images/mime/60x60/man.png',
         'SUBJ_SUBJECT_CODE' => $categoryCode,
-        'SUBJ_SUBJECT_URL' => '/homepage/'.$categoryID,
-
-		'SUBJ_TOTAL' => $summary[$category['id']]['total'],
-		'SUBJ_DUE' => $summary[$category['id']]['due'],
-
+        'SUBJ_SUBJECT_URL' => '/homepage/' . $categoryID,
+        'SUBJ_TOTAL' => $summary[$category['id']]['total'],
+        'SUBJ_DUE' => $summary[$category['id']]['due'],
         'SUBJ_TREND_DIR' => $trendDir,
         'SUBJ_TREND_AMT' => $trendAmt,
         'SUBJ_HAS_GRADE' => 'grade',
-
         'DARK' => ++$j % 2 ? '' : 'dark'
-	);
+    );
     $this->setVar($output);
 
-    if($gradeAvg == -1) {
+    if ($gradeAvg == -1) {
         $output = array(
             'SUBJ_GRADE' => '',
             'SUBJ_GRADEIANT' => 'na'
         );
-    }
-    else {
+    } else {
         $output = array(
             'SUBJ_GRADE' => $returnHandler->percent2letter($gradeAvg),
             'SUBJ_GRADEIANT' => (int)($gradeAvg / 10),
@@ -352,10 +349,10 @@ foreach ($categoryList as $category) {
     $this->setVar($output);
 
 
-    if(Cfg::get('external_enable')) {
+    if (Cfg::get('external_enable')) {
         $this->setVar('teacher_block', '');
-        if(isset($teacherOutput) && count($teacherOutput)) {
-            foreach($teacherOutput as $teacher) {
+        if (isset($teacherOutput) && count($teacherOutput)) {
+            foreach ($teacherOutput as $teacher) {
                 $tOutput = array(
                     'SUBJ_TEACHER_NAME' => $teacher['name'],
                     'SUBJ_TEACHER_URL' => $teacher['email'],
@@ -367,8 +364,7 @@ foreach ($categoryList as $category) {
                 $this->parse('teacher_block', 'teacher', true);
             }
         }
-    }
-    else {
+    } else {
         $this->setVar('teacher_block', '');
     }
     $this->parse('icon_block', 'icon');
@@ -382,77 +378,86 @@ if (is_array($activityLog)) {
     // wrap all the activity up into a list so it can be pumped out by ActivityList
     $feedItems = array();
 
-	foreach ($activityLog as $activity) {
+    foreach ($activityLog as $activity) {
         $taskName = $activity['name'];
 
-		if ($activity['fid']) {
-			$taskName = '<a href="/send.php?id=' . $activity['fid'] . '&save=1">' . $activity['name'] . '</a>';
-		}
+        if ($activity['fid']) {
+            $taskName = '<a href="/send.php?id=' . $activity['fid'] . '&save=1">' . $activity['name'] . '</a>';
+        }
 
-		$categoryName = '<a href="/homepage/' . $activity['category'] . '">' . Scrub::text($activity['categoryName']) . '</a>';
+        $categoryName = '<a href="/homepage/' . $activity['category'] . '">' . Scrub::text(
+            $activity['categoryName']
+        ) . '</a>';
 
-        switch($activity['new']) {
+        switch ($activity['new']) {
             case 'new':
-                $stringDesc = sprintf('New %s "%s" added in %s', strtolower($activity['typeName']), $taskName, $categoryName);
+                $stringDesc = sprintf(
+                    'New %s "%s" added in %s', strtolower($activity['typeName']), $taskName, $categoryName
+                );
                 break;
 
             case 'overdue':
-                $stringDesc = sprintf('<span class="overdue">"%s" in %s is now overdue</span>', $taskName, $categoryName);
+                $stringDesc = sprintf(
+                    '<span class="overdue">"%s" in %s is now overdue</span>', $taskName, $categoryName
+                );
                 break;
 
             case 'submitted':
-                $stringDesc = sprintf('%s submitted work for "%s" in %s', $user['person_label'], $taskName, $categoryName);
+                $stringDesc = sprintf(
+                    '%s submitted work for "%s" in %s', $user['person_label'], $taskName, $categoryName
+                );
                 break;
 
             case 'returned':
-				if(!(Cfg::get('restrict_student_submissions') && $groupHandler->isParent())) {
-					if( $activity['typeName']) {
-						// format for output
-						$rtn = $returnHandler->getByUserAndTime($user['uid'], $activity['activity_date']);
-						$marksheet = Marksheet_Factory::build($rtn['slug']);
+                if (!(Cfg::get('restrict_student_submissions') && $groupHandler->isParent())) {
+                    if ($activity['typeName']) {
+                        // format for output
+                        $rtn = $returnHandler->getByUserAndTime($user['uid'], $activity['activity_date']);
+                        $marksheet = Marksheet_Factory::build($rtn['slug']);
 
-						// legacy support
-						if($rtn['slug'] == 'free') {
-							$mark = $rtn['mark'];
-						}
-						else {
-							$mark = $marksheet->convertRawMark($rtn['norm_mark'], $rtn['max_mark'], true, false);
-						}
+                        // legacy support
+                        if ($rtn['slug'] == 'free') {
+                            $mark = $rtn['mark'];
+                        } else {
+                            $mark = $marksheet->convertRawMark($rtn['norm_mark'], $rtn['max_mark'], true, false);
+                        }
 
-                        $mark = sprintf('<a href="/submission/submissionHistory/%s/%s">%s</a>', $rtn['box_id'], $rtn['owner'], $mark);
+                        $mark = sprintf(
+                            '<a href="/submission/submissionHistory/%s/%s">%s</a>', $rtn['box_id'], $rtn['owner'], $mark
+                        );
 
-						$beginning = $user['person_label'] . ' received ' . $mark;
-					}
-					else if($activity['fid']) {
-                        $beginning = '<a href="/submission/send.php?id='.$activity['fid'].'&return=1">Work returned</a>';
-					}
-					else {
-                        $beginning = 'Work returned';
-					}
+                        $beginning = $user['person_label'] . ' received ' . $mark;
+                    } else {
+                        if ($activity['fid']) {
+                            $beginning = '<a href="/submission/send.php?id=' . $activity['fid'] . '&return=1">Work returned</a>';
+                        } else {
+                            $beginning = 'Work returned';
+                        }
+                    }
 
                     $stringDesc = sprintf('%s for "%s" in %s', $beginning, $taskName, $categoryName);
 
-				}
-				break;
+                }
+                break;
 
             default:
                 $stringDesc = sprintf('Submissions for "%s" in %s are now closed', $taskName, $categoryName);
                 break;
         }
 
-		$activityTime = new Alaress_Date_Relative($activity['activity_date']);
-		$activityTime->setPrefix('');
+        $activityTime = new Alaress_Date_Relative($activity['activity_date']);
+        $activityTime->setPrefix('');
 
-		$feedItems[] = array(
-			'content' => $stringDesc,
-			'time' => $activityTime->getRelativeTime(),
+        $feedItems[] = array(
+            'content' => $stringDesc,
+            'time' => $activityTime->getRelativeTime(),
             'icon' => $activity['new'],
-		);
-	}
+        );
+    }
 
     $activityList = new Activity_ListArray($feedItems);
     $activityList->setTarget($this, 'ACTIVITY_LIST');
-    foreach($activityList as $a) {
+    foreach ($activityList as $a) {
         // iterates across and pumps out the list
     }
 }
