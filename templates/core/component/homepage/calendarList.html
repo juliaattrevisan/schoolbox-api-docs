@@ -1,6 +1,6 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <script type='text/javascript'>
-        $j(function() {
+        $j(function () {
             $j('a.{CALENDAR_PREFIX}-attendance-request').live('click', function (event) {
                 event.preventDefault();
 
@@ -28,7 +28,8 @@
         <ul class="js_happening calendar-event">
             <!-- BEGIN group_events -->
             <li class="{ON_OFF} clearfix">
-                <span class="eventListing"><strong>{CAL_TIME}</strong> <span style="background-color:{CAL_COLOUR}">{CAL_NOTE} <!-- BEGIN attendance_icon --><span class="float-right">A</span><!-- END attendance_icon --></span></span>
+                <span class="eventListing"><strong>{CAL_TIME}</strong> <span style="background-color:{CAL_COLOUR}">{CAL_NOTE} <!-- BEGIN attendance_icon --><span
+                        class="float-right">A</span><!-- END attendance_icon --></span></span>
 
                 <div class="hidden-fields clearfix">
                     <h3>{CAL_NOTE}</h3>
@@ -54,12 +55,10 @@
                         <!-- END attendance_request_button -->
 
                         <!-- BEGIN attendance_list_button -->
-                        <a class="btn modify float-left" href="/calendar/attendance/list/{CAL_ID}"><span></span>Attendance List</a>
+                        <a class="btn modify float-left" href="/calendar/attendance/list/{CAL_ID}"><span></span>Attendance
+                            List</a>
                         <!-- END attendance_list_button -->
-
-                        <!-- BEGIN modify_link -->
-                        <a class="btn modify float-left" href="/calendar/modify.php?eventID={EVENT_ID}&returnTo=month"><span></span>Modify</a>
-                        <!-- END modify_link -->
+                        {CAL_MODIFY}
                     </div>
                 </div>
             </li>
@@ -67,6 +66,6 @@
         </ul>
     </div>
     <!-- BEGIN submit_event -->
-    <p class="interact"><a href="/calendar/modify.php?level=2&sid={ID}" class="btn add"><span></span>Add Event</a></p>
+    <p class="interact"><a href="/calendar/modify.php?level=3" class="btn add"><span></span>Add Event</a></p>
     <!-- END submit_event -->
 </div>
