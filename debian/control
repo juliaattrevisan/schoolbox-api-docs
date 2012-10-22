@@ -5,8 +5,8 @@ Maintainer: Alaress Support <support@schoolbox.com.au>
 Build-Depends: debhelper (>= 8.0.0), npm
 Standards-Version: 3.9.3
 Homepage: http://www.schoolbox.com.au
-#Vcs-Git: git://git.debian.org/collab-maint/schoolbox.git
-#Vcs-Browser: http://git.debian.org/?p=collab-maint/schoolbox.git;a=summary
+Vcs-Git: https://github.com/alaress/schoolbox.git
+Vcs-Browser: https://github.com/alaress/schoolbox
 
 Package: schoolbox
 Architecture: all
