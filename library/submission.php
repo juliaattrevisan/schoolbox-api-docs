@@ -103,23 +103,39 @@ class Submission extends DeprecatedModel {
             GROUP BY s.id, c.id, sn.type
         ";
 
-        $boxTable = $this->db->getAll($query);
+        $this->db->query($query);
 
-        // subbox data will be common to all rows, so unset notifications, then push into sub-array
-        if (is_array($boxTable) && count($boxTable)) {
-            $box = $boxTable[0];
-            unset($box['notif_type']);
-            unset($box['notif_notif_enabled']);
-            unset($box['notif_notif_sent']);
-            foreach ($boxTable as $row) {
-                $box['notifications'][$row['notif_type']] = array(
-                    'enabled' => $row['notif_enabled'],
-                    'sent' => $row['notif_sent']
-                );
+        $boxes = array();
+
+        while($row = $this->db->getNextArray()) {
+            // if we haven't seen this box yet, create it
+            if(!isset($boxes[$row['id']])) {
+                $boxes[$row['id']] = $row;
+                unset($boxes[$row['id']]['notif_type']);
+                unset($boxes[$row['id']]['notif_notif_enabled']);
+                unset($boxes[$row['id']]['notif_notif_sent']);
             }
-            return $box;
+            $boxes[$row['id']]['notifications'][$row['notif_type']] = array(
+                'enabled' => $row['notif_enabled'],
+                'sent' => $row['notif_sent']
+            );
         }
-        return false;
+
+        $output = array_values($boxes);
+
+        // return just the one (dodgy, but it will break too much not to do this)
+        if(count($boxes) == 1) {
+            return $output[0];
+        }
+        // return everything
+        elseif(count($boxes) > 1) {
+            return $output;
+        }
+        // return failure
+        else {
+            return false;
+        }
+
     }
 
 
@@ -173,6 +189,7 @@ class Submission extends DeprecatedModel {
                     LEFT JOIN category ON category.id = assess.category_id
                     LEFT JOIN categoryCode ON categoryCode.categoryID = assess.category_id
                     WHERE assess.deleted_at IS NULL
+                    AND assess.availability = 'assess'
                     AND DATE(assess.finish) = DATE(FROM_UNIXTIME({$date}))
                     AND category.id IN (" . implode(',', $categoryList) . ")
                     GROUP BY id
@@ -1115,6 +1132,7 @@ class Submission extends DeprecatedModel {
             LEFT JOIN userAccess ua ON ua.`sid` = c.id AND ua.`service` = 1
             LEFT JOIN assess_attempt aa ON a.`assess_id` = aa.`assess_id`
             WHERE ua.`uid` = $uid
+            AND a.availability = 'assess'
             GROUP BY a.assess_id
             ORDER BY a.finish ASC
         ";
