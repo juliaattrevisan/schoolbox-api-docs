@@ -3,6 +3,8 @@
 # Description:
 #	Performs a soft creation of each data directory, and sets permissions
 #	Only to be used by packaging post install
+# Usage:
+#	create-data-dirs.sh [base data directory] (optional)
 #
 # @author      Sam Bailey <sam.bailey@alaress.com.au>
 # @copyright   2012 Alaress Pty Ltd
@@ -11,14 +13,24 @@
 
 echo "Updating data directory permissions";
 
+datadir='/var/lib/schoolbox';
+
+if [ ! -z $1 ];
+then
+	if [ -d $1 ];
+	then
+		datadir=`readlink -f $1`;
+	fi
+fi
+
 # First level dirs
-mkdir -p /var/lib/schoolbox/{dropbox,files,myFiles,returns,storage,submissions,thumbnails,zip}
+mkdir -p $datadir/{dropbox,files,myFiles,returns,storage,submissions,thumbnails,zip}
 
 # Cache dirs
-mkdir -p /var/lib/schoolbox/cache/{minify,portrait,purifier,stream,weather,xml}
+mkdir -p $datadir/cache/{minify,portrait,purifier,stream,weather,xml}
 
 # Fix permissions
-chown -R www-data:www-data /var/lib/schoolbox
-chmod -R 755 /var/lib/schoolbox
+chown -R www-data:www-data $datadir
+chmod -R 755 $datadir
 
 # End of script
