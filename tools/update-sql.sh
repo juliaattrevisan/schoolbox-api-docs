@@ -57,7 +57,7 @@ else
         fi
 fi
 
-echo "Using db credentials from: "$conffile;
+echo "Using db credentials from: "`readlink -f $conffile`;
 
 if [ ! -f $sqlfile ];
 then

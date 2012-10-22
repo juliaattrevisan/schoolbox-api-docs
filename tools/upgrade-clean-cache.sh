@@ -42,7 +42,7 @@ else
 	fi
 fi
 
-echo "Using db credentials from: "$conffile;
+echo "Using db credentials from: "`readlink -f $conffile`;
 
 # Collect Credentials
 sqluser=`grep "\"SQL_user" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`
