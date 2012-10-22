@@ -57,8 +57,10 @@ override_dh_install:
 	sed -i 's/newver=\"x.x.x\"/newver=\"$(VERSION)\"/g' debian/schoolbox/usr/share/schoolbox/tools/update-sql.sh
 	# Remove moved files
 	rm -rf debian/schoolbox/usr/share/schoolbox/www/conf
+	# Ensure less is installed
+	npm install less@1.3.0 /home/vagrant
 	# Auto build the lessified core.css
-	lessc debian/schoolbox/usr/share/schoolbox/www/css/core/core.less > debian/schoolbox/usr/share/schoolbox/www/css/core/core.css
+	/home/vagrant/node_modules/.bin/lessc debian/schoolbox/usr/share/schoolbox/www/css/core/core.less > debian/schoolbox/usr/share/schoolbox/www/css/core/core.css
 
 override_dh_fixperms:
 	dh_fixperms -X var/lib/schoolbox
