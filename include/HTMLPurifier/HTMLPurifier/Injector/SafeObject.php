@@ -4,13 +4,12 @@
  * Adds important param elements to inside of object in order to make
  * things safe.
  */
-class HTMLPurifier_Injector_SafeObject extends HTMLPurifier_Injector
-{
+class HTMLPurifier_Injector_SafeObject extends HTMLPurifier_Injector {
     public $name = 'SafeObject';
     public $needed = array('object', 'param');
 
     protected $objectStack = array();
-    protected $paramStack  = array();
+    protected $paramStack = array();
 
     // Keep this synchronized with AttrTransform/SafeParam.php
     protected $addParam = array(
@@ -23,6 +22,8 @@ class HTMLPurifier_Injector_SafeObject extends HTMLPurifier_Injector
         'flashvars' => true,
         'src' => true,
         'allowFullScreen' => true, // if omitted, assume to be 'false'
+        'autoplay' => true,
+        'autostart' => true,
     );
 
     public function prepare($config, $context) {
@@ -51,7 +52,8 @@ class HTMLPurifier_Injector_SafeObject extends HTMLPurifier_Injector
                 // attribute, which we need if a type is specified. This is
                 // *very* Flash specific.
                 if (!isset($this->objectStack[$i]->attr['data']) &&
-                    ($token->attr['name'] == 'movie' || $token->attr['name'] == 'src')) {
+                    ($token->attr['name'] == 'movie' || $token->attr['name'] == 'src')
+                ) {
                     $this->objectStack[$i]->attr['data'] = $token->attr['value'];
                 }
                 // Check if the parameter is the correct value but has not
