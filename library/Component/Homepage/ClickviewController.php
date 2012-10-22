@@ -23,7 +23,7 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
      * @return boolean
      */
     public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'clickview')) {
+        if (!parent::loadTemplate($templateHandle, 'clickview')) {
             return false;
         }
         $this->parseConfig();
@@ -40,22 +40,22 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
              *
              * http://webplayer.clickview.com.au/?p=kwRu&v1=home.clickview.com.au
              */
-            $pattern = '/\?p=([a-zA-Z0-9]+)&/';
+            $pattern = '/\?p=([a-zA-Z0-9#]+)/';
 
             $matches = array();
 
             if (preg_match($pattern, $this->getConfig('url'), $matches)) {
-                $this->setVar(array(
-                    'URL' => $matches[1],
-                ));
+                $this->setVar(
+                    array(
+                        'URL' => $matches[1],
+                    )
+                );
 
                 $this->parse('has_clickview_block', 'has_clickview');
-            }
-            else {
+            } else {
                 $this->setVar('has_clickview_block', '');
             }
-        }
-        else {
+        } else {
             $this->setVar('has_clickview_block', '');
         }
 
