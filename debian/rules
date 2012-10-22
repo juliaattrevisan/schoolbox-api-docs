@@ -37,7 +37,7 @@ override_dh_install:
 	# Start install
 	dh_install
 	# Auto build the sql update scripts
-	debian/schoolbox/usr/share/schoolbox/tools/build-sql-update.sh package
+	debian/schoolbox/usr/share/schoolbox/tools/build-sql-update.sh package schoolbox
 	# Set default config paths for packaged install
 	echo "UPDATE config SET value='/usr/share/schoolbox/templates' WHERE name='template_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
 	echo "UPDATE config SET value='/var/lib/schoolbox/files' WHERE name='file_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql

@@ -15,7 +15,12 @@
 
 if [ ! -z $1 ];
 then
-	basedir=`readlink -f debian/schoolbox/usr/share/schoolbox`;
+	if [ ! -z $2 ];
+	then
+		basedir=`readlink -f debian/schoolbox/usr/share/schoolbox`;
+	else
+		basedir=`readlink -f debian/$2/usr/share/$2`;
+	fi
 else
 	basedir=`readlink -f ../`;
 fi

@@ -13,14 +13,22 @@
 # newver (new version) to be updated during packaging
 newver="x.x.x";
 
+package="schoolbox";
+
+if [ ! -z $1 ];
+then
+	package=$1;
+fi
+
 conffile1="../www/conf/conf.php";
-conffile2="/etc/schoolbox/conf.php";
-conffile3="/var/www/schoolbox/www/conf/conf.php";
+conffile2="/etc/$package/conf.php";
+conffile3="/var/www/$package/www/conf/conf.php";
 
 instdir=`readlink -f ../$1`;
 sqlfile=$instdir"/updates/sql_updates.sql";
-tmpfile="/tmp/schoolbox_sql_updates_`date -I`.sql";
-backupfile="/var/lib/schoolbox/schoolbox_backup_`date -I`.sql";
+tmpfile="/tmp/$package_sql_updates_`date -I`.sql";
+backupdir="/var/lib/$package";
+backupfile="$backupdir/$package_backup_`date -I`.sql";
 
 echo "Starting SQL update process";
 
@@ -98,6 +106,7 @@ else
         fi
         
         echo "Backing up database before changes";
+        mkdir -p $backupdir;
         mysqldump --allow-keywords -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile;
         
         sed -n "$start","$end"p $sqlfile | sed -n '/\-\-\ End\ of\ Release/!p' > $tmpfile;

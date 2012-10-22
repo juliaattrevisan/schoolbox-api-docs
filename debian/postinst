@@ -31,9 +31,9 @@ case "$1" in
             chmod 0640 /etc/schoolbox/conf.php
         fi
         cd /usr/share/schoolbox/tools;
-        ./create-data-dirs.sh;
-        ./update-sql.sh;
-        ./upgrade-clean-cache.sh;
+        ./create-data-dirs.sh /var/lib/schoolbox;
+        ./update-sql.sh schoolbox;
+        ./upgrade-clean-cache.sh schoolbox;
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

@@ -10,9 +10,16 @@
 #
 #
 
+package="schoolbox";
+
+if [ ! -z $1 ];
+then
+	package=$1;
+fi
+
 conffile1="../www/conf/conf.php";
-conffile2="/etc/schoolbox/conf.php";
-conffile3="/var/www/schoolbox/www/conf/conf.php";
+conffile2="/etc/$package/conf.php";
+conffile3="/var/www/$package/www/conf/conf.php";
 
 echo "Starting Cache Cleaning process";
 
