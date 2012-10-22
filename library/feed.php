@@ -163,17 +163,20 @@ class Feed {
             $where = " = $cid ";
         }
 
-        $query = "SELECT
-                      assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.created_at) as created_at,
-                      user.title, user.firstname, user.lastname,
-                      user.id AS uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
-                  FROM assess
-                  LEFT JOIN user ON assess.user_id = user.id
-                  LEFT JOIN category c ON c.id = assess.category_id
-                  WHERE assess.category_id $where
-                  AND assess.deleted_at IS NULL
-                  AND assess.availability = 'assess'
-                  ORDER BY assess.created_at DESC LIMIT 0, $limit";
+        $query = "
+          SELECT
+              assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.start) as start,
+              user.title, user.firstname, user.lastname,
+              user.id AS uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
+          FROM assess
+          LEFT JOIN user ON assess.user_id = user.id
+          LEFT JOIN category c ON c.id = assess.category_id
+          WHERE assess.category_id $where
+          AND assess.start < NOW()
+          AND assess.deleted_at IS NULL
+          AND assess.availability = 'assess'
+          ORDER BY assess.created_at DESC LIMIT 0, $limit
+        ";
 
         $this->db->query($query);
 
@@ -181,16 +184,14 @@ class Feed {
 
         while ($row = $this->db->getNextArray()) {
             $onlineAssessments[] = array(
-                'date' => $row['created_at'],
+                'date' => $row['start'],
                 'type' => 'onlineassessment',
-                'message' => $userHandler->formatName($row) . ' posted the online assessment ' . Scrub::text(
-                    $row['heading']
-                ),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
-                    $row
-                ) . '</a> posted the online assessment <a href="/assess/intro/' . $row['assess_id'] . '">' . Scrub::text(
-                    $row['heading']
-                ) . '</a>',
+                'message' => $userHandler->formatName($row)
+                    . ' opened the online assessment '
+                    . Scrub::text( $row['heading']),
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row)
+                    . '</a> opened the online assessment <a href="/assess/intro/' . $row['assess_id'] . '">'
+                    . Scrub::text($row['heading']) . '</a>',
                 'external_id' => $row['external_id'],
                 'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
@@ -216,17 +217,20 @@ class Feed {
             $where = " = $cid ";
         }
 
-        $query = "SELECT
-					  assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.created_at) as created_at,
-					  user.title, user.firstname, user.lastname,
-					  user.id AS uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
-				  FROM assess
-				  LEFT JOIN user ON assess.user_id = user.id
-				  LEFT JOIN category c ON c.id = assess.category_id
-				  WHERE assess.category_id $where
-				  AND assess.deleted_at IS NULL
-				  AND assess.availability = 'survey'
-				  ORDER BY assess.created_at DESC LIMIT 0, $limit";
+        $query = "
+          SELECT
+              assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.start) as start,
+              user.title, user.firstname, user.lastname,
+              user.id AS uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
+          FROM assess
+          LEFT JOIN user ON assess.user_id = user.id
+          LEFT JOIN category c ON c.id = assess.category_id
+          WHERE assess.category_id $where
+          AND assess.start < NOW()
+          AND assess.deleted_at IS NULL
+          AND assess.availability = 'survey'
+          ORDER BY assess.created_at DESC LIMIT 0, $limit
+        ";
 
         $this->db->query($query);
 
@@ -234,14 +238,14 @@ class Feed {
 
         while ($row = $this->db->getNextArray()) {
             $surveys[] = array(
-                'date' => $row['created_at'],
+                'date' => $row['start'],
                 'type' => 'survey',
-                'message' => $userHandler->formatName($row) . ' posted the survey ' . Scrub::text($row['heading']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
-                    $row
-                ) . '</a> posted the survey <a href="/survey/intro/' . $row['assess_id'] . '">' . Scrub::text(
-                    $row['heading']
-                ) . '</a>',
+                'message' => $userHandler->formatName($row)
+                    . ' opened the survey '
+                    . Scrub::text($row['heading']),
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName($row)
+                    . '</a> opened the survey <a href="/survey/intro/' . $row['assess_id'] . '">'
+                    . Scrub::text($row['heading']) . '</a>',
                 'external_id' => $row['external_id'],
                 'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
