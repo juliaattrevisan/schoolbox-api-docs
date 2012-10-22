@@ -172,10 +172,15 @@ laber.error,
 /* Rounded-corners end */
 
 /* CSS Document */
-html { height: 100%; }
+html,
+body{
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
 body {
-    background: #e6f7fd url(/images/mggs/bg.jpg) top left repeat-x;
-	height: 100%;
+    /*background: #e6f7fd url(/images/mggs/bg.jpg) top left repeat-x;*/
+    background: #ffffff url(/images/mggs/body-top.jpg) top left repeat-x;
 	min-width: 991px;
 }
 h2, h2 span a, h2 a {
@@ -218,9 +223,11 @@ a{
 .standardForm, .blog-comments .box {background:#ededed; border-color:#ffffff;}
 .standardForm td{border-color:#ffffff;}
 #wrap {
+    background: url(/images/mggs/body-bottom.jpg) bottom left repeat-x;
 	min-height: 100%;
 }
 #wrap-inner {
+    background: url(/images/mggs/body-cross.png) -31px 100% no-repeat;
 	padding-bottom: 45px;
 }
 #header {
@@ -313,7 +320,7 @@ a{
 #header #search-button{
     background: url("/images/core/icons/search.png") no-repeat 50% 50%;
     border: 0;
-    margin: 1px 28px 0 0;
+    margin: 1px 3px 0 0;
     display: block;
     height: 30px;
     width: 30px;
@@ -330,7 +337,7 @@ a{
     border:none;
     color: #003a6c;
     line-height:12px;
-    width:227px;
+    width:253px;
     font-size:12px;
     height:32px;
     line-height:22px;
@@ -564,10 +571,10 @@ ul.tree .collapsable .hitarea {
 table.ruler span.header_option a{color:#fff; font-weight:bold; }
 
 #footer {
+    background: #e6f7fd;
 	margin: 0;
 	font-size: 11px;
 	padding-left: 20px;
-	margin-top: -35px;
 }
 
 #footer ul{
@@ -653,6 +660,10 @@ ul.js_happening li:nth-child(odd){
 /*****************************************
 	LOGIN
 *****************************************/
+#loginForm label {
+    width: 105px;
+}
+
 .mggs-login #container {
 	margin: 0;
 	padding: 0;
