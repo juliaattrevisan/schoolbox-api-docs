@@ -114,32 +114,23 @@
                         </span>
 
                         <div class="hidden-fields clearfix">
-                            <h4>
-                                <div class="time"><strong>{FULL_TIME}</strong></div>
+                            <h3>{NOTE}</h3>
+                            <h4>{TYPE}: {FULL_TIME}</h4>
+                            <em>{LOCATION}</em>
 
-
-                                <p>
-                                    <em>{LOCATION}</em>
-                                </p>
-
-                                {NOTE}
-                            </h4>
-                            <p class="meta">Event Type: {TYPE}<br/>
-                                Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a><br/>
+                            <p class="meta">
                                 {DETAIL}
-                            </p>
 
-                            <!-- BEGIN has_category -->
-                            <p class='meta'>
-                                Homepage: <a href='/homepage/{HAS_CATEGORY_ID}'>{HAS_CATEGORY_NAME}</a>
+                            <div class="created">Posted by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a>
+                                <!-- BEGIN has_category -->
+                                in <a href='/homepage/{HAS_CATEGORY_ID}'>{HAS_CATEGORY_NAME}</a>
+                                <!-- END has_category -->
+                            </div>
                             </p>
-                            <!-- END has_category -->
-
                             <!-- BEGIN attendance_status -->
                             <p class="meta">Attendance Status: {ATTENDANCE_STATUS}</p>
                             <!-- END attendance_status -->
-
-                            <div class="modify-event">
+                            <div>
                                 <!-- BEGIN attendance_request_button -->
                                 <form method="post">
                                     <input name="event[id]" type="hidden" value="{EVENT_ID}">
@@ -151,7 +142,6 @@
                                 <a class="btn groups float-left"
                                    href="/calendar/attendance/list/{EVENT_ID}"><span></span>Attendance List</a>
                                 <!-- END attendance_list_button -->
-
                                 {MODIFY}
                             </div>
                         </div>

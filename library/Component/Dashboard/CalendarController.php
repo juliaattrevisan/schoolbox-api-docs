@@ -49,6 +49,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
         $this->setBlock($templateHandle, "note_block", "note_listing");
 
+        $this->setBlock("note_block", "has_category", "has_category_block");
         $this->setBlock("note_block", "attendance_icon", "attendance_icon_block");
         $this->setBlock("note_block", "attendance_status", "attendance_status_block");
         $this->setBlock("note_block", "attendance_request_button", "attendance_request_button_block");
@@ -100,6 +101,8 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
                         'NOTE' => $currentEvent->getNote(),
                         'COLOUR' => $currentEvent->getColour(),
                         'LOCATION' => '',
+                        'HAS_CATEGORY_ID' => $currentEvent->getCategoryId(),
+                        'HAS_CATEGORY_NAME' => Scrub::text($currentEvent->getCategoryName()),
                         'DETAIL' => Scrub::text($currentEvent->getSubmissionBoxDetail()),
                         /* Wtf - EVENT_TYPE => 'type' . $event['type']; and TYPE => $event['eventType']
                          */
@@ -111,7 +114,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
                         'EVENT_LEVEL' => '',
                     )
                 );
-
+                $this->parse('has_category_block', 'has_category');
                 $this->parse("note_listing", "note_block", true);
             }
         }

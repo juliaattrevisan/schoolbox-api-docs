@@ -58,7 +58,7 @@ class Calendar_Event_Type_Day_Renderer extends Calendar_Event_Type_Renderer_Abst
                      */
                     'EVENT_TYPE' => 'type' . $currentEvent->getType(),
                     'TYPE' => $currentEvent->getEventType(),
-                    'AUTHOR' => $currentEvent->getAuthorName(),
+                    'AUTHOR' => Scrub::text($currentEvent->getAuthorName()),
                     'AUTHOR_ID' => $currentEvent->getAuthorId(),
                     'EVENT_VISIBLE' => $cssClass,
                     'EVENT_LEVEL' => $currentEvent->getDerivedEventLevel(),
@@ -127,18 +127,19 @@ class Calendar_Event_Type_Day_Renderer extends Calendar_Event_Type_Renderer_Abst
 
             /* Show a homepage if appropriate
              */
+
             if ($currentEvent->getCategoryId() > 0) {
                 $this->getPage()->setVar(
                     array(
                         'HAS_CATEGORY_ID' => $currentEvent->getCategoryId(),
-                        'HAS_CATEGORY_NAME' => $currentEvent->getCategoryName(),
+                        'HAS_CATEGORY_NAME' => Scrub::text($currentEvent->getCategoryName()),
                     )
                 );
 
                 $this->getPage()->parse('has_category_block', 'has_category');
             }
 
-            $this->getPage()->parse("note_block", "note", true);
+            $this->getPage()->parse('note_block', 'note', true);
         }
     }
 

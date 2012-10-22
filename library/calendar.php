@@ -431,7 +431,7 @@ class Calendar extends DeprecatedModel {
                 $catQuery[] = $cat['id'];
             }
 
-            $query = "SELECT DISTINCT category.name AS category, GROUP_CONCAT(co.code) AS synergyCode, submission_box.name, submission_box.description,
+            $query = "SELECT DISTINCT category.name AS category, category.id as cid, GROUP_CONCAT(co.code) AS synergyCode, submission_box.name, submission_box.description,
                         submission_box.owner, submission_box.id, user.firstname, user.lastname, user.title,
                         DATE_FORMAT(submission_box.date, '%w') as dayIndex,
 					    DATE_FORMAT(submission_box.date, '" . Cfg::get('calendar_time_format') . "') as dueTime,
@@ -451,7 +451,7 @@ class Calendar extends DeprecatedModel {
 							GROUP BY submission_box.id, category.id
 							ORDER BY submission_box.date";
             } else {
-                $query .= "WHERE DATE(submission_box.date) = DATE(FROM_UNIXTIME('$currentDay'))
+                $query .= "WHERE DATE(submission_box.date) = DATE(FROM_UNIXTIME('$currentDay')) AND submission_box.deleted = 0
 							GROUP BY submission_box.id
 							ORDER BY submission_box.date";
             }
@@ -468,6 +468,7 @@ class Calendar extends DeprecatedModel {
                 $event = new Calendar_Event_Type_Submission();
 
                 $event->setDate(new Alaress_Date_Format($submission['date'], 'y-m-d h:i:s'));
+                $event->setCategoryId($submission['cid']);
                 $event->setCategoryName($submission['category']);
                 $event->setCategoryCodes($submission['synergyCode']);
                 $event->setAuthorId($submission['owner']);
@@ -673,6 +674,7 @@ class Calendar extends DeprecatedModel {
                 $event->setAccess($currentEvent['access']);
                 $event->setEventType($currentEvent['eventType']);
                 $event->setColour($currentEvent['eventColour']);
+                $event->setDetail($currentEvent['detail']);
                 $event->setPublishDate($currentEvent['publish_date']);
                 $event->setSid($currentEvent['sid']);
                 if ($this->getPerm($currentEvent) > 1) {
@@ -681,7 +683,7 @@ class Calendar extends DeprecatedModel {
                     $event->setIsEditable(false);
                 }
 
-                if ($currentEvent['type'] == 2) {
+                if ($currentEvent['access'] == 2) {
                     $event->setCategoryId($currentEvent['categoryId']);
                     $event->setCategoryname($currentEvent['categoryName']);
                 }

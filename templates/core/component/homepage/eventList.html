@@ -33,15 +33,13 @@
 
                 <div class="hidden-fields clearfix">
                     <h3>{CAL_NOTE}</h3>
-                    <h4>{CAL_DATE} {CAL_TIME}</h4>
+                    <h4>{CAL_TYPE}: {CAL_DATE} {CAL_TIME}</h4>
                     <em>{CAL_LOCATION}</em>
 
                     <p class="meta">
-                        Event Type: {CAL_TYPE}<br/>
-                        Created by: <a href="/search/user/{CAL_AUTHOR_ID}">{CAL_AUTHOR}</a><br/>
-                        {CAL_LOCATION} {CAL_DETAIL}
+                        {CAL_DETAIL}
+                        Posted by <a href="/search/user/{CAL_AUTHOR_ID}">{CAL_AUTHOR}</a><br/>
                     </p>
-
                     <!-- BEGIN attendance_status -->
                     <p class="meta">Attendance Status: {ATTENDANCE_STATUS}</p>
                     <!-- END attendance_status -->

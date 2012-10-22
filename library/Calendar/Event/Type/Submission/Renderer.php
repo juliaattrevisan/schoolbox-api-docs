@@ -57,19 +57,20 @@ class Calendar_Event_Type_Submission_Renderer extends Calendar_Event_Type_Render
                 'NOTE' => $currentEvent->getNote(),
                 'COLOUR' => $currentEvent->getColour(),
                 'LOCATION' => '',
+                'HAS_CATEGORY_ID' => $currentEvent->getCategoryId(),
+                'HAS_CATEGORY_NAME' => Scrub::text($currentEvent->getCategoryName()),
                 'DETAIL' => Scrub::text($currentEvent->getSubmissionBoxDetail()),
                 /* Wtf - EVENT_TYPE => 'type' . $event['type']; and TYPE => $event['eventType']
                  */
                 'EVENT_TYPE' => 'submission',
                 'TYPE' => $currentEvent->getEventType(),
-                'AUTHOR' => $currentEvent->getAuthorName(),
+                'AUTHOR' => Scrub::text($currentEvent->getAuthorName()),
                 'AUTHOR_ID' => $currentEvent->getAuthorId(),
                 'EVENT_VISIBLE' => '',
                 'EVENT_LEVEL' => '',
             )
         );
-
-
-        $this->getPage()->parse("note_block", "note", true);
+        $this->getPage()->parse('has_category_block', 'has_category');
+        $this->getPage()->parse('note_block', 'note', true);
     }
 }

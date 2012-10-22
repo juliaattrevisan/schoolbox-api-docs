@@ -135,20 +135,18 @@
 
                         <div class="hidden-fields clearfix">
                             <h3>{NOTE}</h3>
-                            <h4>{FULL_TIME}</h4>
+                            <h4>{TYPE}: {FULL_TIME}</h4>
                             <em>{LOCATION}</em>
 
-                            <p class="meta">Event Type: {TYPE}<br/>
-                                <span class="created">Created by: <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a></span><br/>
+                            <p class="meta">
                                 {DETAIL}
-                            </p>
 
-                            <!-- BEGIN has_category -->
-                            <p class='meta'>
-                                Homepage: <a href='/homepage/{HAS_CATEGORY_ID}'>{HAS_CATEGORY_NAME}</a>
+                            <div class="created">Posted by <a href="/search/user/{AUTHOR_ID}">{AUTHOR}</a>
+                                <!-- BEGIN has_category -->
+                                in <a href='/homepage/{HAS_CATEGORY_ID}'>{HAS_CATEGORY_NAME}</a>
+                                <!-- END has_category -->
+                            </div>
                             </p>
-                            <!-- END has_category -->
-
                             <!-- BEGIN attendance_status -->
                             <p class="meta">Attendance Status: {ATTENDANCE_STATUS}</p>
                             <!-- END attendance_status -->
