@@ -37,20 +37,11 @@ fi
 
 echo "Using db credentials from: "$conffile;
 
-if [ ! -f $sqlfile ];
-then
-	echo "SQL update file ($sqlfile) missing";
-	echo "No cache directories cleaned";
-	exit;
-fi
-
 # Collect Credentials
 sqluser=`grep "\"SQL_user" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`
 sqlpasswd=`grep "\"SQL_passwd" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`
 sqlhost=`grep "\"SQL_host" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`
 sqldb=`grep "\"SQL_db" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`
-
-echo "Checking for SQL updates";
 
 # Collect minify cache dir location
 minifydir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='minify_dir' \G;" | grep 'value' | cut -d' ' -f2`
@@ -63,7 +54,7 @@ fi
 
 if [ -d $minifydir ];
 then
-	rm -rf $minifydir/minify*;
+	rm -f $minifydir/minify*;
 	echo "Minify cache directory cleaned";
 else
 	echo "No cache directories cleaned";
