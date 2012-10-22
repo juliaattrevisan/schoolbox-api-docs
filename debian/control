@@ -1,8 +1,8 @@
 Source: schoolbox
 Section: non-free/web
 Priority: optional
-Maintainer: Sam Bailey <sam.bailey@alaress.com.au>
-Build-Depends: debhelper (>= 8.0.0)
+Maintainer: Alaress Support <support@schoolbox.com.au>
+Build-Depends: debhelper (>= 8.0.0), node-less
 Standards-Version: 3.9.3
 Homepage: http://www.schoolbox.com.au
 #Vcs-Git: git://git.debian.org/collab-maint/schoolbox.git
