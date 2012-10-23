@@ -9,8 +9,7 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-abstract class Evaluation_Answer_Short extends Evaluation_Answer
-{
+abstract class Evaluation_Answer_Short extends Evaluation_Answer {
 
     /**
      * Creates an Answer. This is used when creating Questions and Answers in
@@ -20,8 +19,7 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer
      * @param  $question_id
      * @return bool|int
      */
-    public function create($object, $question_id)
-    {
+    public function create($object, $question_id) {
         $answer = array_intersect_key($object, array_flip($this->allowedFields));
         $answer['question_id'] = $question_id;
 
@@ -45,8 +43,7 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer
      * @param  $object
      * @return void
      */
-    public function update($object)
-    {
+    public function update($object) {
         $answer = array_intersect_key($object, array_flip($this->allowedFields));
 
         parent::update($answer);
@@ -61,20 +58,23 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer
      * @param string $question_id
      * @return void
      */
-    public function modify($page, $question_id = '')
-    {
+    public function modify($page, $question_id = '') {
         if (is_numeric($question_id)) {
             $currentAnswer = parent::getForQuestion($question_id);
 
-            $page->setVar(array(
-                'ANSWER_ID' => $currentAnswer['answer_id'],
-                'ANSWER' => Scub::text($currentAnswer['answer']),
-            ));
+            $page->setVar(
+                array(
+                    'ANSWER_ID' => $currentAnswer['answer_id'],
+                    'ANSWER' => Scrub::text($currentAnswer['answer']),
+                )
+            );
         } else {
-            $page->setVar(array(
-                'ANSWER_ID' => '',
-                'ANSWER' => '',
-            ));
+            $page->setVar(
+                array(
+                    'ANSWER_ID' => '',
+                    'ANSWER' => '',
+                )
+            );
         }
     }
 
@@ -86,22 +86,25 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer
      * @param  $question_id
      * @return void
      */
-    public function prepareResponse($page, $question_id)
-    {
+    public function prepareResponse($page, $question_id) {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         $currentAnswer = $this->getByQuestionID($question_id);
 
         if ($existing['response']) {
-            $page->setVar(array(
-                'ANSWER_ID' => $currentAnswer['answer_id'],
-                'ANSWER' => Scrub::text($existing['response']),
-            ));
+            $page->setVar(
+                array(
+                    'ANSWER_ID' => $currentAnswer['answer_id'],
+                    'ANSWER' => Scrub::text($existing['response']),
+                )
+            );
         } else {
-            $page->setVar(array(
-                'ANSWER_ID' => $currentAnswer['answer_id'],
-                'ANSWER' => '',
-            ));
+            $page->setVar(
+                array(
+                    'ANSWER_ID' => $currentAnswer['answer_id'],
+                    'ANSWER' => '',
+                )
+            );
         }
 
         $page->parse('answerOption_block', 'answerOption', true);
@@ -114,8 +117,7 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer
      * @param  $page
      * @return void
      */
-    public function cleanupParse($page)
-    {
+    public function cleanupParse($page) {
     }
 
     /**
@@ -126,8 +128,7 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer
      *
      * @return array
      */
-    public function saveResponse($data)
-    {
+    public function saveResponse($data) {
         $processedResponse = $data['answer'];
 
         return parent::saveResponse($data['section_id'], $data['question_id'], $processedResponse);
@@ -141,15 +142,16 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer
      * @param  $question_id
      * @return void
      */
-    public function exportMoodleAnswer($page, $question_id)
-    {
+    public function exportMoodleAnswer($page, $question_id) {
         $currentAnswer = $this->getByQuestionID($question_id);
 
         /* Show correct answer
          */
-        $page->setVar(array(
-            'CORRECT_ANSWER' => Scrub::text($currentAnswer['answer'])
-        ));
+        $page->setVar(
+            array(
+                'CORRECT_ANSWER' => Scrub::text($currentAnswer['answer'])
+            )
+        );
 
         $page->parse('answerOption_block', 'answerOption', true);
     }
@@ -163,8 +165,7 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer
      * @param  $question_id
      * @return bool|int
      */
-    public function importMoodleAnswer($xmlObj, $question_id)
-    {
+    public function importMoodleAnswer($xmlObj, $question_id) {
         $object = array(
             'answer_id' => '',
             'question_id' => $question_id,
@@ -183,8 +184,7 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer
      *
      * @return array
      */
-    public function exportResponseToCSV($attempt_id, $question_id)
-    {
+    public function exportResponseToCSV($attempt_id, $question_id) {
         $response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
 
         /* Remove tab characters
@@ -210,8 +210,7 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer
      *
      * @return mixed
      */
-    public function exportResponseToArray($attempt_id, $question_id)
-    {
+    public function exportResponseToArray($attempt_id, $question_id) {
         $response = $this->responseHandler->getByAttemptAndQuestion($attempt_id, $question_id);
 
         $data = $response['response'];
@@ -227,8 +226,7 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer
      * @param  $question_id
      * @return void
      */
-    public function reviewResponse($page, $question_id)
-    {
+    public function reviewResponse($page, $question_id) {
         $existing = $this->responseHandler->isResponseExists($_SESSION['attempt_id'], $question_id);
 
         $currentAnswer = $this->getByQuestionID($question_id);
@@ -239,19 +237,23 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer
            *
            * if ($existing['response'] != null) { ... } else { ... }
            */
-        $page->setVar(array(
-            'ANSWER_ID' => $currentAnswer['answer_id'],
-            'ANSWER' => Scrub::text($existing['response']),
-            'RESPONSE_ID' => $existing['response_id'],
-            'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
-            'REVIEWED_MARKS' => $existing['mark'],
-        ));
+        $page->setVar(
+            array(
+                'ANSWER_ID' => $currentAnswer['answer_id'],
+                'ANSWER' => Scrub::text($existing['response']),
+                'RESPONSE_ID' => $existing['response_id'],
+                'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
+                'REVIEWED_MARKS' => $existing['mark'],
+            )
+        );
 
         /* Show correct answer
            */
-        $page->setVar(array(
-            'CORRECT_ANSWER' => Scrub::text($currentAnswer['answer'])
-        ));
+        $page->setVar(
+            array(
+                'CORRECT_ANSWER' => Scrub::text($currentAnswer['answer'])
+            )
+        );
 
         $page->parse('answerOption_block', 'answerOption', true);
     }
