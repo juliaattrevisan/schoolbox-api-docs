@@ -11,8 +11,8 @@ class Component_Config_Image extends Component_Config_Abstract {
     public function parse(SitePage $page, $key, $keyblock, $configValue) {
 
         // has an internal block for the select element
-        $page->setBlock($keyblock, 'images', 'images_block');
-        $page->setVar('images_block', '');
+        $page->setBlock($keyblock, 'config_images', 'config_images_block');
+        $page->setVar('config_images_block', '');
 
         $catHandler = new Category();
         $imageList = $catHandler->getImages($this->getCategory('id'), true);
@@ -20,14 +20,16 @@ class Component_Config_Image extends Component_Config_Abstract {
         if (is_array($imageList)) {
             foreach ($imageList as $image) {
                 $page->setVar('COMPONENT_CONFIG_IMAGE', $image['description']);
-                $page->setVar('COMPONENT_CONFIG_IMAGE_SELECTED', $image['description'] == $configValue ? ' selected="selected"' : '');
-                $page->parse('images_block', 'images', true);
+                $page->setVar(
+                    'COMPONENT_CONFIG_IMAGE_SELECTED',
+                    $image['description'] == $configValue ? ' selected="selected"' : ''
+                );
+                $page->parse('config_images_block', 'config_images', true);
             }
-        }
-        else {
+        } else {
             $page->setVar('COMPONENT_CONFIG_IMAGE', '(none)');
             $page->setVar('COMPONENT_CONFIG_IMAGE_SELECTED', '');
-            $page->parse('images_block', 'images', false);
+            $page->parse('config_images_block', 'config_images', false);
         }
 
     }

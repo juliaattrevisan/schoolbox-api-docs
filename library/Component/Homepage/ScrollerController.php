@@ -6,8 +6,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Homepage_ScrollerController extends Component_Homepage_ControllerAbstract
-{
+class Component_Homepage_ScrollerController extends Component_Homepage_ControllerAbstract {
 
     /**
      * @var Group
@@ -34,8 +33,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
      *
      * @return void
      */
-    public function execute()
-    {
+    public function execute() {
         $this->groupHandler = new Group();
         $this->fileHandler = new File();
 
@@ -53,32 +51,38 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle)
-    {
+    public function renderTemplate($templateHandle) {
         if (!parent::loadTemplate($templateHandle, 'scroller')) {
             return false;
         }
         $this->parseConfig();
 
-        $this->setBlock($templateHandle, 'image', 'image_block');
-        $this->setBlock('image', 'show_caption', 'show_caption_block');
+        $this->setBlock($templateHandle, 'image_scroller', 'image_scroller_block');
+        $this->setBlock('image_scroller', 'show_caption', 'show_caption_block');
         $this->setBlock($templateHandle, 'submit_image', 'submit_image_block');
 
         // Make sure there a config option
         $pixel = $this->getConfig('pixel') ? $this->getConfig('pixel') : 200;
 
-        $this->setVar(array(
-            'COMPONENT_PIXEL' => $pixel,
-            'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig('timing') * 1000 : '2000',
-        ));
+        $this->setVar(
+            array(
+                'COMPONENT_PIXEL' => $pixel,
+                'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig(
+                    'timing'
+                ) * 1000 : '2000',
+            )
+        );
 
         // Set up component name
-        $this->setVar('COMPONENT_NAME', strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Image Scroller');
+        $this->setVar(
+            'COMPONENT_NAME',
+            strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Image Scroller'
+        );
 
         /* Prevent multiple galleries from other categories stacking up in the wrong place
          * and initialise empty gallery by default
          */
-        $this->setVar('image_block', '');
+        $this->setVar('image_scroller_block', '');
 
         // Load images for the current homepage
         $allFiles = $this->catHandler->getImages($this->source['id'], 0, true);
@@ -96,11 +100,13 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         // Iterate
         if (is_array($allFiles)) {
             foreach ($allFiles as $currentFile) {
-                $this->setVar(array(
-                    'IMAGE_ID' => $currentFile['id'],
-                    'IMAGE_NAME' => $currentFile['description'],
-                    'IMAGE_DIMENSION' => $pixel
-                ));
+                $this->setVar(
+                    array(
+                        'IMAGE_ID' => $currentFile['id'],
+                        'IMAGE_NAME' => $currentFile['description'],
+                        'IMAGE_DIMENSION' => $pixel
+                    )
+                );
 
                 // Display captions
                 if ($this->getConfig('captionState') == 'Active') {
@@ -109,7 +115,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
                     $this->setVar('show_caption_block', '');
                 }
 
-                $this->parse('image_block', 'image', true);
+                $this->parse('image_scroller_block', 'image_scroller', true);
             }
         }
 

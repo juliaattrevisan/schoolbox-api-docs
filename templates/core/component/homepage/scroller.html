@@ -14,8 +14,9 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
-    <div id="galleryCycle-{COMPONENT_INSTANCE_ID}" class="scroller box clearfix" style="height:0;padding:0;border:0;margin:0;">
-        <!-- BEGIN image -->
+    <div id="galleryCycle-{COMPONENT_INSTANCE_ID}" class="scroller box clearfix"
+         style="height:0;padding:0;border:0;margin:0;">
+        <!-- BEGIN image_scroller -->
         <div class="slideshow-cycle">
             <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}"
                  alt="{IMAGE_NAME}"/>
@@ -23,9 +24,10 @@
             <div class="caption-holder">{IMAGE_NAME}</div>
             <!-- END show_caption -->
         </div>
-        <!-- END image -->
+        <!-- END image_scroller -->
     </div>
     <!-- BEGIN submit_image -->
-    <p class="interact clearfix"><a href="/cms/file/multi/{IMAGESCROLLER_CATEGORY_ID}" class="btn up-arrow"><span></span>Post Images</a></p>
+    <p class="interact clearfix"><a href="/cms/file/multi/{IMAGESCROLLER_CATEGORY_ID}"
+                                    class="btn up-arrow"><span></span>Post Images</a></p>
     <!-- END submit_image -->
 </div>
