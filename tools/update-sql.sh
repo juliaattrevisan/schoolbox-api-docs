@@ -24,7 +24,7 @@ conffile1="../www/conf/conf.php";
 conffile2="/etc/$package/conf.php";
 conffile3="/var/www/$package/www/conf/conf.php";
 
-instdir=`readlink -f ../$1`;
+instdir=`readlink -f ../`;
 sqlfile=$instdir"/updates/sql_updates.sql";
 tmpfile="/tmp/$package_sql_updates_`date -I`.sql";
 backupdir="/var/lib/$package";
