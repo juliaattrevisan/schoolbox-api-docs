@@ -4,23 +4,13 @@
 
         $j('#forum-topic tbody tr:even td').css('background-color', '#f4f4f4');
 
-        $j('button.reply').click(function () {
-            window.open('/forum/modify/{CATEGORY_ID}/{THREAD_ID}', '_self', '');
-            return false;
-        });
-
-        $j('button.lock').click(function () {
-            window.open('/forum/modifyForm.php?toggleLock={THREAD_ID}', '_self', '');
-            return false;
-        });
-
-        $j('button.delete').click(function () {
+        $j('a.delete.float-left').click(function () {
             if (confirm('Are you sure you want to delete this thread?'))
-                window.open('/forum/modifyForm.php?deleteThread={THREAD_ID}', '_self', '');
+                window.open($j(this).attr('href'), '_self', '');
             return false;
         });
 
-        $j('a.delete').click(function () {
+        $j('a.delete.no-text').click(function () {
             if (confirm('Are you sure you want to delete this post?'))
                 window.open($j(this).attr('href'), '_self', '');
             return false;
@@ -35,16 +25,20 @@
 <!-- END custom_head -->
 <div class="breadcrumbs navhelp">
     <p><a href="/homepage/{CATEGORY_ID}/">{CATEGORY}</a> > <a href="/forum/{CATEGORY_ID}/">Forum</a> > {THREAD_TITLE}
-        {LOCKED}</p>
+        {LOCKED}
+        <a href="/homepage/{CATEGORY_ID}" class="btn go-back"><span></span>Return to homepage</a></p>
 </div>
 <p class="clearfix">
-    <a href="/homepage/{CATEGORY_ID}" class="btn go-back float-left"><span></span>Return to homepage</a>
+
     <!-- BEGIN reply -->
-    <button class="reply submit-btn-plain">Post Reply</button>
+    <a class="btn reply float-left" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}"><span></span>Post Reply</a>
     <!-- END reply -->
     <!-- BEGIN modify_thread -->
-    <button class="lock submit-btn-plain">{LOCK_UNLOCK} Thread</button>
-    <button class="delete submit-btn-plain">Delete Thread</button>
+
+    <a href="/forum/modifyForm.php?toggleLock={THREAD_ID}" class="btn weather float-left"><span></span>{LOCK_UNLOCK}
+        Thread</a>
+    <a href="/forum/modifyForm.php?deleteThread={THREAD_ID}" class="btn delete float-left"><span></span>Delete
+        Thread</a>
     <!-- END modify_thread -->
 
 
@@ -62,12 +56,13 @@
                 <span class="name">{POST_AUTHOR}</span>
             </a>
             <span class="subtitle">Posted {POST_TIME}</span>
+
             <div class="post-content wysiwyg">
                 {POST_BODY}
             </div>
             <p>
                 <!-- BEGIN reply_post -->
-                <a class=" btn modify" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}"><span></span>Reply to post</a>
+                <a class=" btn reply" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/0/{POST_ID}"><span></span>Reply</a>
                 <!-- END reply_post -->
 
                 <!-- BEGIN modified -->
@@ -79,9 +74,8 @@
     </ul>
 </div>
 <p class="clearfix"><a name="bottom"></a>
-    <a href="/homepage/{CATEGORY_ID}" class="btn go-back float-left"><span></span>Return to homepage</a>
     <!-- BEGIN reply -->
-    <button class="reply submit-btn-plain">Post Reply</button>
+    <a class="btn reply float-left" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}"><span></span>Post Reply</a>
     <!-- END reply -->
     <!-- BEGIN modify_thread -->
     <button class="lock submit-btn-plain">{LOCK_UNLOCK} Thread</button>
