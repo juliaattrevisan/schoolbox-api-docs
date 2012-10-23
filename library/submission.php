@@ -1108,6 +1108,22 @@ class Submission extends DeprecatedModel {
      * @return array
      */
     function getAllUpcomingWorkAndAssessments($uid) {
+        $groupHandler = new Group();
+
+        // start by getting the membership for the student in question
+        $involvement = $groupHandler->involvedInCategoryList($uid);
+        $catIDs = array();
+
+        if(is_array($involvement) && count($involvement)) {
+            foreach($involvement as $cat) {
+                $catIDs[] = $cat['id'];
+            }
+            $conditional = 'IN (' . implode(',',$catIDs) . ')';
+        }
+        else {
+            $conditional = '= 0';
+        }
+
         $q0 = "
             SELECT
               '0' kind, sb.id, sb.name `title`, ft.name `type`, UNIX_TIMESTAMP(sb.date) AS `date`, UNIX_TIMESTAMP(sb.late_date) AS late_date,
@@ -1115,9 +1131,8 @@ class Submission extends DeprecatedModel {
             FROM submission_box sb
             LEFT JOIN file_type ft ON ft.id = sb.type
             LEFT JOIN category c ON c.`id` = sb.`category`
-            LEFT JOIN userAccess ua ON ua.`sid` = c.id AND ua.`service` = 1
             LEFT JOIN student_submission ss ON sb.id = ss.box_id
-            WHERE ua.`uid` = $uid
+            WHERE c.id $conditional
             GROUP BY sb.id
             ORDER BY sb.date ASC
             ";
@@ -1129,9 +1144,8 @@ class Submission extends DeprecatedModel {
             FROM assess a
             LEFT JOIN file_type ft ON ft.id = a.`type`
             LEFT JOIN category c ON c.`id` = a.`category_id`
-            LEFT JOIN userAccess ua ON ua.`sid` = c.id AND ua.`service` = 1
             LEFT JOIN assess_attempt aa ON a.`assess_id` = aa.`assess_id`
-            WHERE ua.`uid` = $uid
+            WHERE c.id $conditional
             AND a.availability = 'assess'
             GROUP BY a.assess_id
             ORDER BY a.finish ASC
