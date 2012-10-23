@@ -4,79 +4,81 @@
 
 class Category extends DeprecatedModel {
 
-	function Category () {
+    function Category() {
 
-		$this->_table = "category";
-		$this->_index = "id";
-		$this->categoryTree = array();
-		$this->nodeList = array();
+        $this->_table = "category";
+        $this->_index = "id";
+        $this->categoryTree = array();
+        $this->nodeList = array();
 
-		parent::DeprecatedModel();
-	}
+        parent::DeprecatedModel();
+    }
 
-	/**
-	 * Get a category by name
-	 *
-	 * @param  $name
-	 * @return array|bool
-	 */
-	public function searchByName($name) {
-		$query = "SELECT category.*
+    /**
+     * Get a category by name
+     *
+     * @param  $name
+     * @return array|bool
+     */
+    public function searchByName($name) {
+        $query = "SELECT category.*
 				  FROM category
 				  LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
 				  WHERE category.name LIKE \"%{$name}%\"
 				  OR categoryCode.code LIKE \"%{$name}%\"";
 
-		return $this->db->getAll($query);
-	}
+        return $this->db->getAll($query);
+    }
 
-	/**
-	 * Get the code for a category. Uses the categoryCode table in a join, as
-	 * category.code is deprecated
-	 *
-	 * @param <type> $category_id
-	 * @return <type>
-	 */
-	function getCodeForCategory($category_id) {
-		$query = "SELECT GROUP_CONCAT(categoryCode.code) AS codes
+    /**
+     * Get the code for a category. Uses the categoryCode table in a join, as
+     * category.code is deprecated
+     *
+     * @param <type> $category_id
+     * @return <type>
+     */
+    function getCodeForCategory($category_id) {
+        $query = "SELECT GROUP_CONCAT(categoryCode.code) AS codes
 				  FROM category
 				  LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
 				  WHERE category.id = '$category_id'";
 
-		return $this->db->getRow($query);
-	}
+        return $this->db->getRow($query);
+    }
 
-	function getCategoryList ($categoryID, $config = false) {
+    function getCategoryList($categoryID, $config = false) {
 
-        if(is_array($categoryID)) {
+        if (is_array($categoryID)) {
             $cats = " IN ('" . implode("', '", $categoryID) . "') ";
-        } else
+        } else {
             $cats = " = '$categoryID' ";
+        }
 
-		$query = "SELECT id, name, GROUP_CONCAT(co.code) code, cf.template, parent,
-					(SELECT 1 FROM `".$this->_table."` k
-					 LEFT JOIN perms p ON p.cid = k.id AND p.gid = '".$_SESSION['gid']."' AND p.type > 0
-					 LEFT JOIN userAccess ua ON ua.uid = '".$_SESSION['id']."' AND ua.service = 1 AND ua.sid = k.id AND ua.type > 0
-					 WHERE k.parent = ca.id AND (p.type IS NOT NULL OR ua.type IS NOT NULL OR 1 = ".(int)$_SESSION['su'].") LIMIT 1) isParent
+        $query = "SELECT id, name, GROUP_CONCAT(co.code) code, cf.template, parent,
+					(SELECT 1 FROM `" . $this->_table . "` k
+					 LEFT JOIN perms p ON p.cid = k.id AND p.gid = '" . $_SESSION['gid'] . "' AND p.type > 0
+					 LEFT JOIN userAccess ua ON ua.uid = '" . $_SESSION['id'] . "' AND ua.service = 1 AND ua.sid = k.id AND ua.type > 0
+					 WHERE k.parent = ca.id AND (p.type IS NOT NULL OR ua.type IS NOT NULL OR 1 = " . (int)$_SESSION['su'] . ") LIMIT 1) isParent
 				  FROM category ca
 				  LEFT JOIN categoryCode co ON co.categoryID = ca.id
 				  LEFT JOIN homepage_config cf ON cf.cid = ca.id
 				  WHERE parent $cats
 				  GROUP BY ca.id";
 
-		$sortFields = array('name' => 'name', 'date' => 'id');
-		$config['sort'] = in_array($config['sort'], $sortFields) ? $config['sort'] : 'name';
-		$config['sortdir'] = strtoupper($config['sortdir']) == 'DESC' ? 'DESC' : 'ASC';
+        $sortFields = array('name' => 'name', 'date' => 'id');
+        $config['sort'] = in_array($config['sort'], $sortFields) ? $config['sort'] : 'name';
+        $config['sortdir'] = strtoupper($config['sortdir']) == 'DESC' ? 'DESC' : 'ASC';
 
-		$query .= " ORDER BY " . $config['sort'] . " " . $config['sortdir'];
+        $query .= " ORDER BY " . $config['sort'] . " " . $config['sortdir'];
 
-		if($config['size'] > 0)
-			$query .= " LIMIT 0, " . $config['size'];
+        if ($config['size'] > 0) {
+            $query .= " LIMIT 0, " . $config['size'];
+        }
 
-		return $this->db->getAll($query);
-	}
+        return $this->db->getAll($query);
+    }
 
-    public function getSimpleCategoryList ($categoryId) {
+    public function getSimpleCategoryList($categoryId) {
         $query = "SELECT id, name, parent, cf.template, GROUP_CONCAT(co.code) code
       				  FROM category ca
       				  LEFT JOIN categoryCode co ON co.categoryID = ca.id
@@ -90,25 +92,25 @@ class Category extends DeprecatedModel {
         return $categoryList;
     }
 
-	function hasChildren($categoryID) {
-		$query = "SELECT c.id as children
+    function hasChildren($categoryID) {
+        $query = "SELECT c.id as children
 				  FROM category c
 				  WHERE parent = $categoryID
 				  LIMIT 1";
 
-		return $this->db->getOne($query);
-	}
+        return $this->db->getOne($query);
+    }
 
-	function getParent($categoryID) {
-		$query = "SELECT parent FROM category WHERE id = $categoryID";
-		return $this->db->getOne($query);
-	}
+    function getParent($categoryID) {
+        $query = "SELECT parent FROM category WHERE id = $categoryID";
+        return $this->db->getOne($query);
+    }
 
-	function getByID($categoryID) {
+    function getByID($categoryID) {
 
         require_once dirname(__FILE__) . '/group.php';
 
-		$query = "SELECT c.*, GROUP_CONCAT(co.code) code, u.id owner, u.title, u.firstname, u.lastname, g.type type, cf.template
+        $query = "SELECT c.*, GROUP_CONCAT(co.code) code, u.id owner, u.title, u.firstname, u.lastname, g.type type, cf.template
 				  FROM (category c)
 				  LEFT JOIN categoryCode co ON co.categoryID = c.id
 				  LEFT JOIN userAccess a ON a.sid = c.id AND a.type = 3 AND service = " . HOMEPAGE_SERVICE . "
@@ -118,10 +120,10 @@ class Category extends DeprecatedModel {
 				  WHERE c.id = '$categoryID'
 				  GROUP BY c.id";
 
-		return $this->db->getRow($query);
-	}
+        return $this->db->getRow($query);
+    }
 
-	function getByCode($code) {
+    function getByCode($code) {
 
         require_once dirname(__FILE__) . '/group.php';
 
@@ -135,77 +137,78 @@ class Category extends DeprecatedModel {
                   WHERE co.code = {$this->db->smartQuote($code)}
                   GROUP BY c.id";
 
-		return $this->db->getRow($query);
-	}
+        return $this->db->getRow($query);
+    }
 
-	function logPageView($categoryID) {
+    function logPageView($categoryID) {
         // new mechanism for storing pageviews
         // the use of NOW() generates a truncation warning (non-fatal and non-critical) since a datetime is being
         // shoved into a date field, but it can be safely ignored: the data inserts correctly
-        $stmt = Database::getInstance()->prepare("
+        $stmt = Database::getInstance()->prepare(
+            "
             INSERT INTO homepage_visits (`date`, `user_group_id`, `category_id`)
             VALUES (NOW(), :gid, :cid)
             ON DUPLICATE KEY
             UPDATE `hitcount` = `hitcount` + 1"
         );
 
-        $stmt->execute(array(
-            'cid' => $categoryID,
-            'gid' => $_SESSION['gid']
-        ));
+        $stmt->execute(
+            array(
+                'cid' => $categoryID,
+                'gid' => $_SESSION['gid']
+            )
+        );
 
         // old mechanism for storing pageviews - will use both in tandem for the time being
-		$query = "SELECT datetime FROM homepage_log WHERE cid = '". $categoryID. "' AND user = '".$_SESSION['id']."'";
-		$this->db->query($query);
+        $query = "SELECT datetime FROM homepage_log WHERE cid = '" . $categoryID . "' AND user = '" . $_SESSION['id'] . "'";
+        $this->db->query($query);
 
-		if($row = $this->db->getNextArray() ) {
-			$query = "UPDATE homepage_log SET datetime = NOW(), hitcount = hitcount + 1 WHERE cid = '" .$categoryID ."'
-			AND user = '".$_SESSION['id']."'";
-		}
-		else
-		{
-			$query = "INSERT INTO homepage_log (datetime, user, cid,hitcount) VALUES ( NOW() ,
-			'".$_SESSION['id']."', '" . $categoryID . "', '0')";
-		}
+        if ($row = $this->db->getNextArray()) {
+            $query = "UPDATE homepage_log SET datetime = NOW(), hitcount = hitcount + 1 WHERE cid = '" . $categoryID . "'
+			AND user = '" . $_SESSION['id'] . "'";
+        } else {
+            $query = "INSERT INTO homepage_log (datetime, user, cid,hitcount) VALUES ( NOW() ,
+			'" . $_SESSION['id'] . "', '" . $categoryID . "', '0')";
+        }
 
-		$this->db->query($query);
-	}
+        $this->db->query($query);
+    }
 
-	function lastVisit($categoryID, $userID) {
-		//get the time since the last visit to this homepage
-		$query = "SELECT DATE_FORMAT(`datetime`, '%a %D %b %H:%i') as visit FROM homepage_log, category
+    function lastVisit($categoryID, $userID) {
+        //get the time since the last visit to this homepage
+        $query = "SELECT DATE_FORMAT(`datetime`, '%a %D %b %H:%i') as visit FROM homepage_log, category
 				  WHERE category.id = '$categoryID'
 				  AND	category.id = homepage_log.cid
 				  AND   homepage_log.user = '$userID'
 		";
-		return $this->db->getOne($query);
-	}
+        return $this->db->getOne($query);
+    }
 
-	function getComponents($categoryID) {
+    function getComponents($categoryID) {
 
-		$query = "SELECT homepageComponentLocationID, position, `column`, component, homepage_comp.config dfconfig,
+        $query = "SELECT homepageComponentLocationID, position, `column`, component, homepage_comp.config dfconfig,
                         homepage_comp_location.config, name, method, filename
 				  FROM homepage_comp_location, homepage_comp
 				  WHERE component = id AND cid = '" . $categoryID . "'
 				  ORDER BY position";
 
-		return $this->db->getAll($query);
+        return $this->db->getAll($query);
 
-	}
+    }
 
-        function getComponent($categoryID, $componentID) {
+    function getComponent($categoryID, $componentID) {
 
-		$query = "SELECT homepageComponentLocationID, position, `column`, component, homepage_comp.config dfconfig,
+        $query = "SELECT homepageComponentLocationID, position, `column`, component, homepage_comp.config dfconfig,
                         homepage_comp_location.config, name, method, filename
 				  FROM homepage_comp_location JOIN homepage_comp ON component = id
-				  WHERE cid = '" . $categoryID . "' AND component = '".$componentID."'
+				  WHERE cid = '" . $categoryID . "' AND component = '" . $componentID . "'
 				  ORDER BY `column`, `position` LIMIT 1";
-		return $this->db->getRow($query);
+        return $this->db->getRow($query);
 
-	}
+    }
 
-	function getImages($categoryID, $limit = 0, $excludeWork = false) {
-		$query = "SELECT id, file.description, file.type
+    function getImages($categoryID, $limit = 0, $excludeWork = false) {
+        $query = "SELECT id, file.description, file.type
 				  FROM file
 				  LEFT JOIN allowedFileTypes ON mime_type = mime
 				  WHERE category = '$categoryID'
@@ -213,25 +216,25 @@ class Category extends DeprecatedModel {
 				  AND INSTR(mime_type, 'image/')
 				  AND inline = 'true'";
 
-        if($excludeWork) {
+        if ($excludeWork) {
             $query .= " AND file.type = '0'";
         }
 
         $query .= "ORDER BY submitted";
 
 
-		if ($limit > 0) {
-            $query .= " LIMIT 1, $limit";
+        if ($limit > 0) {
+            $query .= " LIMIT 0, $limit";
         }
 
-		return $this->db->getAll($query);
-	}
+        return $this->db->getAll($query);
+    }
 
     /**
      * @param $sourceCategoryId
      * @param $destinationCategoryId
      */
-    public function migrateCategory ($sourceCategoryId, $destinationCategoryId) {
+    public function migrateCategory($sourceCategoryId, $destinationCategoryId) {
         $homepageHandler = new Homepage($sourceCategoryId);
         $fileHandler = new File;
         $linkHandler = new Link;
@@ -243,11 +246,11 @@ class Category extends DeprecatedModel {
         $linkHandler->migrateCategory($sourceCategoryId, $destinationCategoryId);
         $textBoxHandler->migrateCategory($sourceCategoryId, $destinationCategoryId);
 
-        if ( $sourceChildList = $this->getSimpleCategoryList($sourceCategoryId) ) {
-            foreach ( $sourceChildList as $sourceChild ) {
+        if ($sourceChildList = $this->getSimpleCategoryList($sourceCategoryId)) {
+            foreach ($sourceChildList as $sourceChild) {
 
                 /* Create destination child if it doesn't exist */
-                if ( !$destinationChild = $this->getByNameAndParent($sourceChild['name'], $destinationCategoryId) ) {
+                if (!$destinationChild = $this->getByNameAndParent($sourceChild['name'], $destinationCategoryId)) {
                     $destinationChild = $sourceChild;
 
                     unset($destinationChild['id'], $destinationChild['code']);
@@ -267,17 +270,17 @@ class Category extends DeprecatedModel {
      * @param $sourceCategoryId
      * @param $destinationCategoryId
      */
-    public function migratePermissionList ($sourceCategoryId, $destinationCategoryId) {
+    public function migratePermissionList($sourceCategoryId, $destinationCategoryId) {
         $query = "
             SELECT cid, gid, type
             FROM perms
             WHERE cid = $sourceCategoryId
         ";
 
-        if ( $permissionList = $this->db->getAll($query) ) {
+        if ($permissionList = $this->db->getAll($query)) {
             $this->db->delete('perms', 'cid', $destinationCategoryId);
 
-            foreach ( $permissionList as $permission ) {
+            foreach ($permissionList as $permission) {
                 $permission['cid'] = $destinationCategoryId;
 
                 $this->db->insert('perms', $permission);
@@ -285,135 +288,141 @@ class Category extends DeprecatedModel {
         }
     }
 
-	function getCategoryTree($parent = 0, $indent = '') {
+    function getCategoryTree($parent = 0, $indent = '') {
 
-		$categoryList = $this->getCategoryList($parent);
-		if (is_array($categoryList)) {
-			foreach ($categoryList as $category) {
+        $categoryList = $this->getCategoryList($parent);
+        if (is_array($categoryList)) {
+            foreach ($categoryList as $category) {
 
-				$thisRow['CAT_ID'] = $category['id'];
-				$thisRow['CAT_NAME'] = $indent . Scrub::text($category['name']) . ' ' . Scrub::text($category['code']);
-				array_push($this->categoryTree, $thisRow);
+                $thisRow['CAT_ID'] = $category['id'];
+                $thisRow['CAT_NAME'] = $indent . Scrub::text($category['name']) . ' ' . Scrub::text($category['code']);
+                array_push($this->categoryTree, $thisRow);
 
-				$this->getCategoryTree($category['id'], $indent . "&nbsp; &nbsp;|&nbsp;");
-			}
-		}
-		return $this->categoryTree;
-	}
+                $this->getCategoryTree($category['id'], $indent . "&nbsp; &nbsp;|&nbsp;");
+            }
+        }
+        return $this->categoryTree;
+    }
 
-	function getCategoryNode($categoryID = 0) {
-		$categoryID = (int)$categoryID;
+    function getCategoryNode($categoryID = 0) {
+        $categoryID = (int)$categoryID;
 
-		// get folder contents
-		$categoryList = $this->getCategoryList($categoryID);
+        // get folder contents
+        $categoryList = $this->getCategoryList($categoryID);
 
-		if ($categoryID > 0) {
-			// get parent folder contents
-			$siblingList = $this->getCategoryNode($this->getParent($categoryID));
+        if ($categoryID > 0) {
+            // get parent folder contents
+            $siblingList = $this->getCategoryNode($this->getParent($categoryID));
 
-			if (is_array($categoryList)) {
-				// find index of parent node in siblingList
-				$total = count($siblingList);
-				for ($i = 0; $i < $total; $i++)
-					if ($siblingList[$i]['id'] == $categoryID) break;
+            if (is_array($categoryList)) {
+                // find index of parent node in siblingList
+                $total = count($siblingList);
+                for ($i = 0; $i < $total; $i++) {
+                    if ($siblingList[$i]['id'] == $categoryID) {
+                        break;
+                    }
+                }
 
-				// insert folder contents next to parent node
-				array_splice($siblingList, $i+1, 0, $categoryList);
-			}
-			return $siblingList;
-		}
-		else {
-			return $categoryList;
-		}
-	}
+                // insert folder contents next to parent node
+                array_splice($siblingList, $i + 1, 0, $categoryList);
+            }
+            return $siblingList;
+        } else {
+            return $categoryList;
+        }
+    }
 
-	function getGroupPerms($categoryID) {
-		$query = "SELECT id, name, type FROM groups g
+    function getGroupPerms($categoryID) {
+        $query = "SELECT id, name, type FROM groups g
 				  LEFT JOIN perms p ON p.gid = g.id AND p.cid = '$categoryID'
 				  ORDER BY id";
-		return $this->db->getAll($query);
-	}
+        return $this->db->getAll($query);
+    }
 
-	function checkForChildren($id)
-	{
-		//check for child folders
-		$query = "SELECT id FROM category WHERE parent = '".$id."' LIMIT 1";
-		if( $this->db->getOne($query) )
-			return true;
-
-
-		//check for files/links in category
-		$query = "SELECT id FROM link WHERE category = '".$id."' LIMIT 1";
-		if( $this->db->getOne($query) )
-			return true;
-
-		$query = "SELECT id FROM file WHERE category = '".$id."' AND deleted = '0' LIMIT 1";
-		if( $this->db->getOne($query) )
-			return true;
-
-		return false;
-	}
+    function checkForChildren($id) {
+        //check for child folders
+        $query = "SELECT id FROM category WHERE parent = '" . $id . "' LIMIT 1";
+        if ($this->db->getOne($query)) {
+            return true;
+        }
 
 
-	function logAction ($categoryID, $action) {
-		$logEntry = array(	'object'	=> 'folder',
-							'objectId'	=> $categoryID,
-							'action'	=> $action,
-							'user'		=> $_SESSION['id'],
-							);
+        //check for files/links in category
+        $query = "SELECT id FROM link WHERE category = '" . $id . "' LIMIT 1";
+        if ($this->db->getOne($query)) {
+            return true;
+        }
 
-		$this->db->insert('cmsLog', $logEntry);
-	}
+        $query = "SELECT id FROM file WHERE category = '" . $id . "' AND deleted = '0' LIMIT 1";
+        if ($this->db->getOne($query)) {
+            return true;
+        }
 
-	function deletePerms($cid) {
-		$this->db->delete('perms', 'cid', $cid);
-	}
+        return false;
+    }
 
-	function insertPerm($cid, $group, $access) {
-		$perm = array(	'cid'		=> $cid,
-						'gid'		=> $group,
-						'type' 	=> $access,
-					);
-		$this->db->insert('perms', $perm);
-	}
 
-	/**
-	 * Determine whether a categoryCode already exists. Accepts an array of
-	 * categoryCodes, or a single categoryCode string
-	 *
-	 * @param  $code
+    function logAction($categoryID, $action) {
+        $logEntry = array(
+            'object' => 'folder',
+            'objectId' => $categoryID,
+            'action' => $action,
+            'user' => $_SESSION['id'],
+        );
+
+        $this->db->insert('cmsLog', $logEntry);
+    }
+
+    function deletePerms($cid) {
+        $this->db->delete('perms', 'cid', $cid);
+    }
+
+    function insertPerm($cid, $group, $access) {
+        $perm = array(
+            'cid' => $cid,
+            'gid' => $group,
+            'type' => $access,
+        );
+        $this->db->insert('perms', $perm);
+    }
+
+    /**
+     * Determine whether a categoryCode already exists. Accepts an array of
+     * categoryCodes, or a single categoryCode string
+     *
+     * @param  $code
      * @param $updateID ID of element to ignore in update situation
-	 * @return array|bool
-	 */
-	public function isCodeExists($codeList, $updateID = FALSE) {
-		if (empty($codeList)) {
-			return false;
-		}
+     * @return array|bool
+     */
+    public function isCodeExists($codeList, $updateID = false) {
+        if (empty($codeList)) {
+            return false;
+        }
 
-		$query = "SELECT * FROM categoryCode WHERE  ";
+        $query = "SELECT * FROM categoryCode WHERE  ";
 
         /* When updating ignore the item your updating */
-        if($updateID)
+        if ($updateID) {
             $query .= " categoryID != $updateID AND ";
+        }
 
-		/* Re-implode the filtered components into a query-friendly format
-		 */
-		if (is_array($codeList) && count($codeList)) {
+        /* Re-implode the filtered components into a query-friendly format
+         */
+        if (is_array($codeList) && count($codeList)) {
 
-			foreach($codeList as $currentCode) {
-				$temp[] = '"' . $currentCode . '"';
-			}
+            foreach ($codeList as $currentCode) {
+                $temp[] = '"' . $currentCode . '"';
+            }
 
-			$codeList = implode(',', $temp);
+            $codeList = implode(',', $temp);
 
-			$query .= " code IN ({$codeList}) ";
-		}
-		else {
-			$query .= " code = '$codeList' ";
-		}
+            $query .= " code IN ({$codeList}) ";
+        } else {
+            $query .= " code = '$codeList' ";
+        }
 
-		return $this->db->getAll($query);
-	}
+        return $this->db->getAll($query);
+    }
 
 
     public function applyPermissions($id, $group, $recursive) {
@@ -430,16 +439,16 @@ class Category extends DeprecatedModel {
         $this->deletePerms($id);
 
         // insert new permissions
-        foreach($group as $groupID => $perm) {
+        foreach ($group as $groupID => $perm) {
             $this->insertPerm($id, $groupID, $perm);
         }
 
         // if doing this recursively, apply perms to all child nodes
-        if($recursive) {
+        if ($recursive) {
             $childList = $this->getCategoryList($id);
-            if(is_array($childList)) {
+            if (is_array($childList)) {
                 /* Recurse into child folders */
-                foreach($childList as $child) {
+                foreach ($childList as $child) {
                     $this->applyPermissions($child['id'], $group, $recursive);
                 }
             }
@@ -448,105 +457,104 @@ class Category extends DeprecatedModel {
     }
 
 
-
-	/**
-	 * Create a new category
-	 *
-	 * @param  $data
-	 * @return int
-	 */
-	public function create($data) {
-		$group = $data['group'];
-		unset($data['group']);
+    /**
+     * Create a new category
+     *
+     * @param  $data
+     * @return int
+     */
+    public function create($data) {
+        $group = $data['group'];
+        unset($data['group']);
         unset($data['recursive']);
 
-		/* Check if the category code exists. If it already does, spawn error;
-		 * otherwise continue creating. array_filter() removes empty, false
-		 * and null elements from the array
-		 */
-		$codeList = explode(',', trim($data['code']));
+        /* Check if the category code exists. If it already does, spawn error;
+         * otherwise continue creating. array_filter() removes empty, false
+         * and null elements from the array
+         */
+        $codeList = explode(',', trim($data['code']));
 
-		if (is_array($codeList) && count($codeList)) {
-			$codeList = array_values(array_filter($codeList, 'trim'));
-		}
-
-		$codeExists = $this->isCodeExists($codeList);
-
-		if ($codeExists) {
-			error(136);
-		}
-
-		/* Continue normally
-		 */
-		$categoryID = parent::create($data);
-
-		/* Setup group permissions */
-		if(is_array($group)) {
-			foreach($group as $groupID => $perm) {
-				$this->insertPerm($categoryID, $groupID, $perm);
-			}
-		}
-
-        if($data['template']) {
-            $this->createHomepageFromTemplate($categoryID, $data['template']);
+        if (is_array($codeList) && count($codeList)) {
+            $codeList = array_values(array_filter($codeList, 'trim'));
         }
-        else {
+
+        $codeExists = $this->isCodeExists($codeList);
+
+        if ($codeExists) {
+            error(136);
+        }
+
+        /* Continue normally
+         */
+        $categoryID = parent::create($data);
+
+        /* Setup group permissions */
+        if (is_array($group)) {
+            foreach ($group as $groupID => $perm) {
+                $this->insertPerm($categoryID, $groupID, $perm);
+            }
+        }
+
+        if ($data['template']) {
+            $this->createHomepageFromTemplate($categoryID, $data['template']);
+        } else {
             // we don't want an invalid template ID going into the database
             unset($data['template']);
         }
 
-		/* Insert synergetic subject code */
-		$codeList = explode(",", $data['code']);
-		if (is_array($codeList)) {
-			$codeList = array_map('trim',$codeList);
-			$codeList = array_unique($codeList);
-			foreach ($codeList as $code) {
-				if($code)
-					$this->db->insert('categoryCode', array('categoryID' => $categoryID, 'code' => $code));
-			}
-		}
+        /* Insert synergetic subject code */
+        $codeList = explode(",", $data['code']);
+        if (is_array($codeList)) {
+            $codeList = array_map('trim', $codeList);
+            $codeList = array_unique($codeList);
+            foreach ($codeList as $code) {
+                if ($code) {
+                    $this->db->insert('categoryCode', array('categoryID' => $categoryID, 'code' => $code));
+                }
+            }
+        }
 
-		$this->logAction($categoryID, 'create');
-		return $categoryID;
-	}
+        $this->logAction($categoryID, 'create');
+        return $categoryID;
+    }
 
-	/**
-	 * Update category
-	 *
-	 * @param  $data
-	 * @return void
-	 */
-	public function update($data) {
+    /**
+     * Update category
+     *
+     * @param  $data
+     * @return void
+     */
+    public function update($data) {
 
-		/* Check if the category code exists. If it already does, spawn error;
-		 * otherwise continue creating. array_filter() removes empty, false
-		 * and null elements from the array
-		 */
-		$codeList = explode(',', trim($data['code']));
+        /* Check if the category code exists. If it already does, spawn error;
+         * otherwise continue creating. array_filter() removes empty, false
+         * and null elements from the array
+         */
+        $codeList = explode(',', trim($data['code']));
 
-		if (is_array($codeList) && count($codeList)) {
-			$codeList = array_values(array_filter($codeList, 'trim'));
-		}
+        if (is_array($codeList) && count($codeList)) {
+            $codeList = array_values(array_filter($codeList, 'trim'));
+        }
 
-		$codeExists = $this->isCodeExists($codeList,$data['id']);
+        $codeExists = $this->isCodeExists($codeList, $data['id']);
 
-		if ($codeExists) {
-			error(136);
-		}
+        if ($codeExists) {
+            error(136);
+        }
 
-		/* Redo group permissions */
-		if (is_array($data['group'])) {
+        /* Redo group permissions */
+        if (is_array($data['group'])) {
             // apply permissions, recursively or not depending on 3rd variable
             $this->applyPermissions($data['id'], $data['group'], $data['recursive']);
-		}
+        }
 
-		unset($data['group']);
+        unset($data['group']);
         unset($data['recursive']);
 
-		/* Setup homepage template */
+        /* Setup homepage template */
 
         // if 'keep existing template', then skip this entire section
-        if($data['template'] != Homepage::KEEP_EXISTING_HOMEPAGE) {
+        if ($data['template'] != Homepage::KEEP_EXISTING_HOMEPAGE) {
 
             // if 'remove homepage', delete config and components, then set the templateID to zero
             if ($data['template'] == Homepage::REMOVE_HOMEPAGE_TEMPLATE_ID) {
@@ -561,52 +569,52 @@ class Category extends DeprecatedModel {
             }
 
             // now continue as normal
-            if($data['template'] > 0) {
+            if ($data['template'] > 0) {
                 $this->createHomepageFromTemplate($data['id'], $data['template']);
-            }
-            else {
+            } else {
                 // we don't want an invalid template ID going into the database
                 $data['template'] = 0;
             }
 
             // deal with the template
-            $this->db->update('homepage_config','cid', array('cid' => $data['id'], 'template' => $data['template']));
+            $this->db->update('homepage_config', 'cid', array('cid' => $data['id'], 'template' => $data['template']));
 
         }
 
         unset($data['template']);
 
-		/* Insert synergetic subject code */
+        /* Insert synergetic subject code */
         if (isset($data['code'])) {
             $this->db->delete('categoryCode', 'categoryID', $data['id']);
 
             $codeList = explode(",", $data['code']);
 
-			if (is_array($codeList)) {
-                $codeList = array_map('trim',$codeList);
+            if (is_array($codeList)) {
+                $codeList = array_map('trim', $codeList);
                 $codeList = array_unique($codeList);
 
                 foreach ($codeList as $code) {
                     if ($code) {
                         $this->db->insert('categoryCode', array('categoryID' => $data['id'], 'code' => $code));
-					}
+                    }
                 }
             }
         }
 
-		parent::update($data);
+        parent::update($data);
 
-		$this->logAction($data[$this->_index], 'modify');
-	}
+        $this->logAction($data[$this->_index], 'modify');
+    }
 
-	function delete($categoryID) {
+    function delete($categoryID) {
 
-		/* Check its empty before deleting */
-		if($this->checkForChildren($categoryID) )
-			error(12);
+        /* Check its empty before deleting */
+        if ($this->checkForChildren($categoryID)) {
+            error(12);
+        }
 
-		$this->deletePerms($categoryID);
-		$this->db->delete('categoryCode', 'categoryID', $categoryID);
+        $this->deletePerms($categoryID);
+        $this->db->delete('categoryCode', 'categoryID', $categoryID);
 
 
         // locate all the component instances associated with this homepage, and clear them out
@@ -614,74 +622,76 @@ class Category extends DeprecatedModel {
         $collection = $cim->findByColumnList(array('module' => 'homepage', 'identifier' => $categoryID));
         $cim->delete($collection);
 
-		/* Delete group */
-		require_once dirname(__FILE__) . '/group.php';
-		$groupHandler = new Group();
-		$groupHandler->disbandGroup($categoryID);
+        /* Delete group */
+        require_once dirname(__FILE__) . '/group.php';
+        $groupHandler = new Group();
+        $groupHandler->disbandGroup($categoryID);
 
-		$this->logAction($categoryID, 'delete');
+        $this->logAction($categoryID, 'delete');
 
         parent::delete($categoryID);
-	}
+    }
 
-	function recursiveDelete($categoryID, $deleteSelf = true) {
+    function recursiveDelete($categoryID, $deleteSelf = true) {
 
-		require_once dirname(__FILE__) . '/file.php';
-		require_once dirname(__FILE__) . '/link.php';
-		require_once dirname(__FILE__) . '/group.php';
+        require_once dirname(__FILE__) . '/file.php';
+        require_once dirname(__FILE__) . '/link.php';
+        require_once dirname(__FILE__) . '/group.php';
 
-		$groupHandler = new Group;
+        $groupHandler = new Group;
 
-		if ($groupHandler->getPermission($categoryID) < WRITE_ACCESS)
-			error(6);
+        if ($groupHandler->getPermission($categoryID) < WRITE_ACCESS) {
+            error(6);
+        }
 
-		$childList = $this->getCategoryList($categoryID);
+        $childList = $this->getCategoryList($categoryID);
 
-		if(is_array($childList)) {
-			/* Recurse into child folders */
-			foreach($childList as $child) {
-				$this->recursiveDelete($child['id']);
-			}
-		}
+        if (is_array($childList)) {
+            /* Recurse into child folders */
+            foreach ($childList as $child) {
+                $this->recursiveDelete($child['id']);
+            }
+        }
 
-		/* Delete all files */
-		$fileHandler = new File;
-		$fileList = $fileHandler->getAllInCategory($categoryID);
-		if(is_array($fileList)) {
-			foreach($fileList as $file) {
-				$fileHandler->delete($file['id']);
-			}
-		}
+        /* Delete all files */
+        $fileHandler = new File;
+        $fileList = $fileHandler->getAllInCategory($categoryID);
+        if (is_array($fileList)) {
+            foreach ($fileList as $file) {
+                $fileHandler->delete($file['id']);
+            }
+        }
 
-		/* Delete all links */
-		$linkHandler = new Link;
-		$linkList = $linkHandler->getAllInCategory($categoryID);
-		if(is_array($linkList)) {
-			foreach($linkList as $link) {
-				$linkHandler->delete($link['id']);
-			}
-		}
+        /* Delete all links */
+        $linkHandler = new Link;
+        $linkList = $linkHandler->getAllInCategory($categoryID);
+        if (is_array($linkList)) {
+            foreach ($linkList as $link) {
+                $linkHandler->delete($link['id']);
+            }
+        }
 
-		/* Delete folder */
-		if($deleteSelf)
-			$this->delete($categoryID);
-	}
+        /* Delete folder */
+        if ($deleteSelf) {
+            $this->delete($categoryID);
+        }
+    }
 
-	/**
-	 * Search for a category. Now uses the normalised categoryCode table
-	 *
-	 * @param $keyword
-	 * @param int $offset
-	 * @param int $limit
-	 * @param null $count
-	 * @param string $sort_by
-	 * @param string $sort_dir
-	 * @return array|bool
-	 */
-	public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'id', $sort_dir = 'desc') {
-		$keyword = mysql_real_escape_string($keyword);
+    /**
+     * Search for a category. Now uses the normalised categoryCode table
+     *
+     * @param $keyword
+     * @param int $offset
+     * @param int $limit
+     * @param null $count
+     * @param string $sort_by
+     * @param string $sort_dir
+     * @return array|bool
+     */
+    public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'id', $sort_dir = 'desc') {
+        $keyword = mysql_real_escape_string($keyword);
 
-		$query = "SELECT SQL_CALC_FOUND_ROWS `category`.*, GROUP_CONCAT(categoryCode.code) as code,
+        $query = "SELECT SQL_CALC_FOUND_ROWS `category`.*, GROUP_CONCAT(categoryCode.code) as code,
 						MATCH(`name`) AGAINST (\"*$keyword*\" IN BOOLEAN MODE) AS `score`,
 						MATCH(`categoryCode`.code) AGAINST (\"*$keyword*\" IN BOOLEAN MODE) AS `cscore`,
 						`perms`.type AS perms_type,
@@ -703,14 +713,14 @@ class Category extends DeprecatedModel {
 					ORDER BY `$sort_by` $sort_dir
 					LIMIT $offset, $limit;
 		";
-        
-		$count_query = "SELECT FOUND_ROWS()";
+
+        $count_query = "SELECT FOUND_ROWS()";
 
         $result = $this->db->getAll($query);
-		$count = $this->db->getOne($count_query);
+        $count = $this->db->getOne($count_query);
 
-		return $result;
-	}
+        return $result;
+    }
 
     /**
      * Creates a breadcrumb of a category's heirarchical navigation
@@ -722,20 +732,21 @@ class Category extends DeprecatedModel {
         $breadcrumb = array();
 
         // get the breadcrumb back up to the root directory
-        while($id != 0) {
+        while ($id != 0) {
             $category = $this->getByID($id);
             $id = $category['parent'];
 
             // recursion! something in the DB is borked! TODO: some form of logging or aux checks
-            if(in_array($category, $breadcrumb))
+            if (in_array($category, $breadcrumb)) {
                 break;
-            else
+            } else {
                 $breadcrumb[] = $category;
+            }
         }
         return array_reverse($breadcrumb);
     }
 
-    public function getByNameAndParent ($name, $parentId) {
+    public function getByNameAndParent($name, $parentId) {
         $query = "SELECT id, name, parent, cf.template, GROUP_CONCAT(co.code) code
       				  FROM category ca
       				  LEFT JOIN categoryCode co ON co.categoryID = ca.id
@@ -784,7 +795,8 @@ class Category extends DeprecatedModel {
         $x[] = $this->duplicateRowsOnTable('homepage_config', $tpl, "WHERE cid = 0");
 
         // insert componentry
-        $x[] = $this->duplicateRowsOnTable('component_instance',
+        $x[] = $this->duplicateRowsOnTable(
+            'component_instance',
             array(
                 'module' => 'homepage',
                 'identifier' => $categoryID
@@ -810,12 +822,12 @@ class Category extends DeprecatedModel {
         $queries[] = $sql;
 
         $result = $this->db->query($sql);
-        while($r = mysql_fetch_assoc($result)) {
+        while ($r = mysql_fetch_assoc($result)) {
             // hack at the data, then flick it back in
             unset($r[$indexField]);
 
-            if(count($map)) {
-                foreach($map as $k => $v) {
+            if (count($map)) {
+                foreach ($map as $k => $v) {
                     $r[$k] = $v;
                 }
             }
