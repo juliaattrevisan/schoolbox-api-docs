@@ -75,13 +75,11 @@ DAY0=`date -I`;
 #$copies days ago in ISO-8601 format
 DAYX=`date -I -d "$copies days ago"`;
 
-CURDATE=`date +%Y-%m-%d\ %H:%M:%S`;
-
 logfile="/var/log/schoolboxbackup_$DAY0.log";
 
 errorcheck=0;
 
-echo -e "[$CURDATE] Backup Started" >> $logfile;
+echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Backup Started" >> $logfile;
 
 targetdir=$backup_dir/$DAY0;
 
@@ -141,7 +139,7 @@ then
 	mkdir -p $targetdir;
 
 	# Backup SQL
-	echo -e "[$CURDATE] Starting backup of SQL" >> $logfile;
+	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup of SQL" >> $logfile;
 	mysqldump --allow-keywords -i -e -q -a -c -u $sql_user -p$sql_pass $sql_db 2>>$logfile > $targetdir/$sql_db-$DAY0.sql;
 	if [ $? -ne 0 ];
 	then
@@ -152,15 +150,15 @@ then
 		fi
 		
 	fi
-	echo -e "[$CURDATE] Compressing backup of SQL" >> $logfile;
+	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Compressing backup of SQL" >> $logfile;
 	gzip -f $targetdir/$sql_db-$DAY0.sql;
 
 	# Backup etc directory
-	echo -e "[$CURDATE] Starting backup of /etc" >> $logfile;
+	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup of /etc" >> $logfile;
 	tar -czf $targetdir/etc-$DAY0.tar.gz /etc >> $logfile 2>&1;
 
 	# Backup $data_dir directory
-	echo -e "[$CURDATE] Starting backup of $data_dir" >> $logfile;
+	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup of $data_dir" >> $logfile;
 	tar -czf $targetdir/schoolboxdata-$DAY0.tar.gz $data_dir >> $logfile 2>&1;
 
 	# Remove old backup
@@ -182,8 +180,8 @@ fi
 # On error, email logfile
 if [ `grep -i error $logfile | wc -l` -ne 0 ];
 then
-	echo -e "[$CURDATE] Sending Email to support@schoolbox.com.au" >> $logfile;
-	mail -s "[$CURDATE] Schoolbox Backup on '$HOSTNAME'" support@schoolbox.com.au < $logfile 2>>$logfile;
+	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Sending Email to support@schoolbox.com.au" >> $logfile;
+	mail -s "[`date +%Y-%m-%d\ %H:%M:%S`] Schoolbox Backup on '$HOSTNAME'" support@schoolbox.com.au < $logfile 2>>$logfile;
 fi
 
-echo -e "[$CURDATE] Backup Completed" >> $logfile;
+echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Backup Completed" >> $logfile;
