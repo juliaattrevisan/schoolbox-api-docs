@@ -39,28 +39,28 @@ override_dh_install:
 	# Auto build the sql update scripts
 	debian/schoolbox/usr/share/schoolbox/tools/build-sql-update.sh package schoolbox
 	# Set default config paths for packaged install
-	echo "UPDATE config SET value='/usr/share/schoolbox/templates' WHERE name='template_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/files' WHERE name='file_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/myFiles' WHERE name='myfile_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/submissions' WHERE name='submission_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/returns' WHERE name='returns_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/dropbox' WHERE name='dropbox_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/zip' WHERE name='zip_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/thumbnails' WHERE name='thumbnail_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/cache/xml' WHERE name='xml_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/cache/stream' WHERE name='stream_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/cache/portrait' WHERE name='portrait_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/cache/weather' WHERE name='weather_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/cache/minify' WHERE name='minify_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/storage' WHERE name='storage_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-initial.sql
+	echo "UPDATE config SET value='/usr/share/schoolbox/templates' WHERE name='template_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/files' WHERE name='file_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/myFiles' WHERE name='myfile_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/submissions' WHERE name='submission_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/returns' WHERE name='returns_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/dropbox' WHERE name='dropbox_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/zip' WHERE name='zip_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/thumbnails' WHERE name='thumbnail_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/cache/xml' WHERE name='xml_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/cache/stream' WHERE name='stream_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/cache/portrait' WHERE name='portrait_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/cache/weather' WHERE name='weather_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/cache/minify' WHERE name='minify_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/storage' WHERE name='storage_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
 	# Add extras stuff
 	sed -i 's/newver=\"x.x.x\"/newver=\"$(VERSION)\"/g' debian/schoolbox/usr/share/schoolbox/tools/update-sql.sh
 	# Remove moved files
 	rm -rf debian/schoolbox/usr/share/schoolbox/www/conf
 	# Ensure less is installed
-	npm install less@1.3.0 /home/vagrant
+	npm install less@1.3.0 ~
 	# Auto build the lessified core.css
-	/home/vagrant/node_modules/.bin/lessc debian/schoolbox/usr/share/schoolbox/www/css/core/core.less > debian/schoolbox/usr/share/schoolbox/www/css/core/core.css
+	~/node_modules/.bin/lessc debian/schoolbox/usr/share/schoolbox/www/css/core/core.less > debian/schoolbox/usr/share/schoolbox/www/css/core/core.css
 	echo "/* less (`/home/vagrant/node_modules/.bin/lessc -v | cut -d' ' -f2`) build at `date +%Y-%m-%d\ %H:%M:%S` */" >> debian/schoolbox/usr/share/schoolbox/www/css/core/core.css
 
 override_dh_fixperms:
@@ -69,4 +69,5 @@ override_dh_fixperms:
 	chmod -R 755 debian/schoolbox/var/lib/schoolbox
 	chmod -R 755 debian/schoolbox/usr/share/schoolbox/tools/*.sh
 	chmod 644 debian/schoolbox/usr/share/schoolbox/www/images/mime/128x128/*.png
+	chmod 644 debian/schoolbox/usr/share/schoolbox/www/images/mooRainbow/*
 
