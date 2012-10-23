@@ -97,7 +97,7 @@ if(is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
         $this->setVar(array(
             'rubric_crit_rating_block' => '',
             'RUBRIC_CRIT_LABEL'        => $data['criteria'][$i]['label'],
-            'RUBRIC_CRIT_NAME'         => preg_replace("#[^a-z\-\ ]#is", '', strtolower($data['criteria'][$i]['label'])),
+            'RUBRIC_CRIT_NAME'         => preg_replace("#[^a-z0-9\-]#is", '', strtolower($data['criteria'][$i]['label'])),
             'RUBRIC_CRIT_INDEX'        => $i,
             'RUBRIC_CRIT_ID'           => $data['criteria'][$i]['id']
         ));
