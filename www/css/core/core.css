@@ -7091,6 +7091,20 @@ ul.activity-list li .icon.overdue span {
   background-image: url('/images/core/icons/activity-icons.png');
   background-position: 0px -312px;
 }
+ul.activity-list li .icon.submitted span {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-image: url('/images/core/icons/activity-icons.png');
+  background-position: 0px -336px;
+}
+ul.activity-list li .icon.wiki span {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-image: url('/images/core/icons/activity-icons.png');
+  background-position: 0px -360px;
+}
 ul.activity-list li .avatar {
   display: inline-block;
   *display: inline;
