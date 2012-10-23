@@ -22,6 +22,7 @@ if (!is_numeric($this->arg[0])) {
 }
 
 $this->setFile(TEMPLATE_content, 'news/item.html');
+$this->setBlock(TEMPLATE_content, 'featured_image', 'featured_image_block');
 $this->setBlock(TEMPLATE_content, 'modify_news', 'modify_news_block');
 $this->setBlock(TEMPLATE_content, 'add_news', 'add_news_block');
 $this->setBlock(TEMPLATE_content, 'topic_list', 'topic_list_block');
@@ -54,19 +55,23 @@ $output = array(
     'NEWS_TITLE' => $article['item_heading'],
     'NEWS_BODY' => Scrub::html($article['item_body']),
     'NEWS_IMAGE' => $article['item_image'],
-
     'POSTER' => $fullname,
     'POSTER_EXTERNAL_ID' => $user['synergy_id'],
     'POSTER_ID' => $article['item_owner'],
-
     'TOPIC_NAME' => Scrub::text($topic['name']),
     'TOPIC_CLEAN' => $url->getSlug(),
-
     'DATETIME' => $d->getLong(),
     'EXPIRY' => $_SESSION['su'] == 1 ? ' - ' . $e->getLong() : '',
 );
 
 $this->setVar($output);
+
+// is there an image to output
+if ($article['item_image']) {
+    $this->parse('featured_image_block', 'featured_image');
+} else {
+    $this->setVar('featured_image_block', '');
+}
 
 // does the current user have permission to modify this news article?
 if (($permission = $groupHandler->getPermission(0)) >= WRITE_ACCESS) {
