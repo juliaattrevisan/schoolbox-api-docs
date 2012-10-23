@@ -1,0 +1,189 @@
+#!/bin/bash
+# Backup Script
+# Description:
+#       Creates a backup of sql, etc, and data_dir on a remote fileshare mounted via smb/cifs
+#       Requires cifs-utils be installed
+#
+# Usage:
+#       To be run nightly via crontab as root
+# 
+# @author      Sam Bailey <sam.bailey@alaress.com.au>
+# @copyright   2012 Alaress Pty Ltd
+# @link        http://www.alaress.com.au
+#
+#
+
+################# Config Options ##################
+
+# Schoolbox Data Directory - e.g. /var/lib/schoolbox or /var/www/schoolbox/data
+data_dir='/var/lib/schoolbox';
+
+# Number of backup copies to keep in days, 7 = 7 days. Default = 2;
+copies='2';
+
+# MySQL Database
+sql_db='schoolbox';
+
+# MySQL Username
+sql_user='schoolbox';
+
+# MySQL Password
+sql_pass='password';
+
+# SMB/CIFS Remote Fileshare
+backup_share='//servername/share/';
+
+# SMB/CIFS Username
+backup_username='domain\username';
+
+# SMB/CIFS Password
+backup_password='password';
+
+# SMB/CIFS Mount Directory
+backup_dir='/mnt/SchoolboxBackup';
+
+# SMB/CIFS Exta Options (Optional) - E.g. ',domain=DomainX,sec=ntlmv2' (must start with comma)
+backup_extra_options='';
+
+# Disk usage override - set to 1 to not check SMB/CIFS disk usage before backup
+backup_usage_override=0;
+
+############## End of Config Options ##############
+########### DO NOT EDIT past this line! ###########
+
+# Ensure running with root privileges
+if [ $EUID -ne 0 ]; then
+	echo -e "This script requires Administrator Privileges. You must run this with the sudo command or as root.";
+	exit 1;
+fi
+
+# If copies not set, assume default (2)
+if [ -z $copies ];
+then
+	copies='2';
+fi
+
+# If copies not 1 or greater, assume default (2)
+if [ $copies -lt 1 ];
+then
+	copies='2';
+fi
+
+#Todays date in ISO-8601 format:
+DAY0=`date -I`;
+
+#$copies days ago in ISO-8601 format
+DAYX=`date -I -d "$copies days ago"`;
+
+CURDATE=`date +%Y-%m-%d\ %H:%M:%S`;
+
+logfile="/var/log/schoolboxbackup_$DAY0.log";
+
+errorcheck=0;
+
+echo -e "[$CURDATE] Backup Started" >> $logfile;
+
+targetdir=$backup_dir/$DAY0;
+
+# Check if script already running
+process=`ps -Af | grep $0 | wc -l`;
+if [ $process -ne 3 ];
+then
+	echo -e "Error: Script already running" >> $logfile;
+	echo -e "Error: Script already running";
+	exit 1;
+fi
+
+# Check if smb/cifs share is mounted and attempt mount if necessary
+mount_count=`df | grep $backup_dir | wc -l`;
+if [ $mount_count -eq 0 ];
+then
+	echo -e "Fileshare not mounted. Attempting to mount" >> $logfile;
+	mkdir -p $backup_dir;
+	mount -t cifs $backup_share $backup_dir -o username=$backup_username,password=$backup_password$backup_extra_options >> $logfile 2>&1;
+fi
+
+# If share mounted, check available disk space [>90% WARN, >97% FAIL]
+mount_count=`df | grep $backup_dir | wc -l`;
+if [ $mount_count -ne 0 ];
+then
+	echo -e "CIFS remote share ($backup_share) is mounted" >> $logfile;
+	mount_space=`df | grep $backup_dir | awk '{print $5;}' | cut -d'%' -f1`;
+	if [ -z $mount_space ];
+	then
+		echo -e "Error: CIFS remote share not mounted correctly.\nHalting backup." >> $logfile;
+		errorcheck=1;
+	fi
+	if [ $mount_space -gt 97 ];
+	then
+		echo -e "Error: CIFS remote share ($backup_share) reporting $mount_space% usage. Backup cannot successfully complete." >> $logfile;
+		if [ $backup_usage_override -eq 1 ];
+		then
+			echo -e "Continuing backup as override is enabled." >> $logfile;
+		else
+			echo -e "Halting backup." >> $logfile;
+			errorcheck=1;
+		fi
+		exit 1;
+	fi
+	if [ $mount_space -gt 90 ];
+	then
+		echo -e "Warning: CIFS remote share ($backup_share) reporting $mount_space% usage." >> $logfile;
+	fi
+else
+	echo -e "Error: CIFS remote share ($backup_share) is unable to mount.\nHalting backup" >> $logfile;
+	errorcheck=1;
+fi
+
+if [ $errorcheck -eq 0 ];
+then
+	# Run Backup of {sql,etc,$data_dir}
+	mkdir -p $targetdir;
+
+	# Backup SQL
+	echo -e "[$CURDATE] Starting backup of SQL" >> $logfile;
+	mysqldump --allow-keywords -i -e -q -a -c -u $sql_user -p$sql_pass $sql_db 2>>$logfile > $targetdir/$sql_db-$DAY0.sql;
+	if [ $? -ne 0 ];
+	then
+		echo -e "Error: SQL Backup Failed" >> $logfile;
+		if [ $? -ne 1 ];
+		then
+			echo  $? >> $logfile;
+		fi
+		
+	fi
+	echo -e "[$CURDATE] Compressing backup of SQL" >> $logfile;
+	gzip -f $targetdir/$sql_db-$DAY0.sql;
+
+	# Backup etc directory
+	echo -e "[$CURDATE] Starting backup of /etc" >> $logfile;
+	tar -czf $targetdir/etc-$DAY0.tar.gz /etc >> $logfile 2>&1;
+
+	# Backup $data_dir directory
+	echo -e "[$CURDATE] Starting backup of $data_dir" >> $logfile;
+	tar -czf $targetdir/schoolboxdata-$DAY0.tar.gz $data_dir >> $logfile 2>&1;
+
+	# Remove old backup
+	if [ -d $backup_dir/$DAYX ]
+	then
+		rm -rf $backup_dir/$DAYX > /dev/null 2>&1;
+	fi
+
+	# Remove old backup logfile
+	if [ -f "/var/log/schoolboxbackup_$DAYX.log" ]
+	then
+		rm -f "/var/log/schoolboxbackup_$DAYX.log" > /dev/null 2>&1;
+	fi
+
+	# Unmount
+	umount -f $backup_dir;
+fi
+
+# On error, email logfile
+if [ `grep -i error $logfile | wc -l` -ne 0 ];
+then
+	echo -e "[$CURDATE] Sending Email to support@schoolbox.com.au" >> $logfile;
+	mail -s "[$CURDATE] Schoolbox Backup on '$HOSTNAME'" support@schoolbox.com.au < $logfile 2>>$logfile;
+fi
+
+echo -e "[$CURDATE] Backup Completed" >> $logfile;
