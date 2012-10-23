@@ -126,16 +126,19 @@ $this->setTitle('Assessment: ' . $assess['title']);
 $attemptStart = new Alaress_Date_Format($attemptStartTime, 'U');
 $attemptEnd = new Alaress_Date_Format($attemptEndTime, 'U');
 
-$this->setVar(array(
-    'ASSESS_ASSESS_ID' => $assess['assess_id'],
-    'ASSESS_TITLE' => Scrub::text($assess['title']),
-    'ASSESS_TIME_REMAINING' => $attemptTimeRemaining,
-    'ATTEMPT_START' => $attemptStart->getShort(),
-    'ATTEMPT_END' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'No particular time' : $attemptEnd->getShort(),
-    'SECTION_TITLE' => Scrub::text($section['title']),
-    'SECTION_DESCRIPTION' => Scrub::text($section['description']),
-    'CURRENT_SECTION_SEQUENCE' => $section['sequence'],
-));
+$this->setVar(
+    array(
+        'ASSESS_ASSESS_ID' => $assess['assess_id'],
+        'ASSESS_TITLE' => Scrub::text($assess['title']),
+        'ASSESS_TIME_REMAINING' => $attemptTimeRemaining,
+        'ATTEMPT_START' => $attemptStart->getShort(),
+        'ATTEMPT_END' => $assess['duration'] == Survey_Main::UNLIMITED_DURATION ? 'No particular time' : $attemptEnd->getShort(
+        ),
+        'SECTION_TITLE' => Scrub::text($section['title']),
+        'SECTION_DESCRIPTION' => Scrub::text($section['description']),
+        'CURRENT_SECTION_SEQUENCE' => $section['sequence'],
+    )
+);
 
 /* Load all the questions for this section. This saves stubs for each response
  * and also the questions that were attempted, allowing an overview of which
@@ -178,12 +181,14 @@ if ($allQuestions) {
          */
         $this->setVar('answerOption_block', '');
 
-        $this->setVar(array(
-            'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
-            'QUESTION_SEQUENCE' => $currentQuestion['sequence'],
-            'QUESTION_QUESTION' => Scrub::text($currentQuestion['question']),
-            'QUESTION_MARKS' => $currentQuestion['marks'],
-        ));
+        $this->setVar(
+            array(
+                'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
+                'QUESTION_SEQUENCE' => $currentQuestion['sequence'],
+                'QUESTION_QUESTION' => Scrub::html($currentQuestion['question']),
+                'QUESTION_MARKS' => $currentQuestion['marks'],
+            )
+        );
 
         /* Load individual answers
          */
@@ -210,12 +215,14 @@ $this->setBlock(TEMPLATE_content, 'sectionPercentageComplete', 'sectionPercentag
 $allPercentageComplete = $sectionHandler->sectionPercentageComplete($this->arg[1]);
 
 foreach ($allPercentageComplete as $currentPercentageComplete) {
-    $this->setVar(array(
-        'SECTION_PERCENTAGE_COMPLETE_TITLE' => $currentPercentageComplete['title'],
-        'SECTION_PERCENTAGE_COMPLETE_SECTION_ID' => $currentPercentageComplete['section_id'],
-        'SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE' => $currentPercentageComplete['percentageComplete'],
-        'SECTION_SEQUENCE' => $currentPercentageComplete['sequence'],
-    ));
+    $this->setVar(
+        array(
+            'SECTION_PERCENTAGE_COMPLETE_TITLE' => $currentPercentageComplete['title'],
+            'SECTION_PERCENTAGE_COMPLETE_SECTION_ID' => $currentPercentageComplete['section_id'],
+            'SECTION_PERCENTAGE_COMPLETE_PERCENTAGE_COMPLETE' => $currentPercentageComplete['percentageComplete'],
+            'SECTION_SEQUENCE' => $currentPercentageComplete['sequence'],
+        )
+    );
 
     $this->parse('sectionPercentageComplete_block', 'sectionPercentageComplete', true);
 }
@@ -237,9 +244,11 @@ if (!is_numeric($nextSection['section_id']) && !is_numeric($prevSection['section
  */
 else {
     if (is_numeric($nextSection['section_id'])) {
-        $this->setVar(array(
-            'NEXT_SECTION_ID' => $nextSection['section_id'],
-        ));
+        $this->setVar(
+            array(
+                'NEXT_SECTION_ID' => $nextSection['section_id'],
+            )
+        );
 
         $this->parse('nextSection_block', 'nextSection');
         $this->setVar('endAssess_block', '');
@@ -251,9 +260,11 @@ else {
     /* Conditions where the previous button is available
      */
     if (is_numeric($prevSection['section_id'])) {
-        $this->setVar(array(
-            'PREV_SECTION_ID' => $prevSection['section_id'],
-        ));
+        $this->setVar(
+            array(
+                'PREV_SECTION_ID' => $prevSection['section_id'],
+            )
+        );
 
         $this->parse('prevSection_block', 'prevSection');
     } else {
