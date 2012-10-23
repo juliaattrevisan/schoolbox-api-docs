@@ -53,27 +53,34 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
      * @return boolean
      */
     public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'linkList')) {
+        if (!parent::loadTemplate($templateHandle, 'linkList')) {
             return false;
         }
 
         $this->parseConfig();
 
         // Set up component name
-        $this->setVar(array(
-            // These are for the Select Alternate Source resourcebrowser
-            'COMPONENT_CONFIG_SRC_ID'   => $this->source['id'],
-            'COMPONENT_CONFIG_SRC_NAME' => $this->source['id'] == $this->getContext('id') ? 'Local' : $this->source['name'],
-            'LINK_CATEGORY_ID' => $this->source['id'],
-            'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'News',
-        ));
+        $this->setVar(
+            array(
+                // These are for the Select Alternate Source resourcebrowser
+                'COMPONENT_CONFIG_SRC_ID' => $this->source['id'],
+                'COMPONENT_CONFIG_SRC_NAME' => $this->source['id'] == $this->getContext(
+                    'id'
+                ) ? 'Local' : $this->source['name'],
+                'LINK_CATEGORY_ID' => $this->source['id'],
+                'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig(
+                    'componentname'
+                ) : 'News',
+            )
+        );
 
         //link output
         $this->setBlock($templateHandle, 'link', 'link_block');
         $this->setBlock('link', 'modify_link', 'modify_link_block');
-        $this->setBlock('link', 'show_posted_by', 'show_posted_by_block');
 
-        $linkList = $this->linkHandler->getAllInCategory($this->source['id'], array('size' => $this->getConfig('size')));
+        $linkList = $this->linkHandler->getAllInCategory(
+            $this->source['id'], array('size' => $this->getConfig('size'))
+        );
 
         $this->setVar('link_block', '');
 
@@ -88,8 +95,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                 if ($url->isLocalUrl()) {
                     $linkUrl = $url->getRelativeURL();
                     $linkTarget = '';
-                }
-                else {
+                } else {
                     $linkUrl = $url->getBase64EncodedRedirect();
                     $linkTarget = 'external';
                 }
@@ -106,31 +112,21 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                     'LINK_POSTED_DATE' => $date->getShort(),
                     'LINK_COMMENT' => nl2br(Scrub::text($link['comment'])),
                     'ON_OFF' => ++$j % 2 ? '' : 'dark',
-                    'HIDDEN'  => $link['hidden'] ? 'hidden' : '',
+                    'HIDDEN' => $link['hidden'] ? 'hidden' : '',
                 );
 
                 $this->setVar($output);
 
-                // If the config option is set to show Posted By information
-                if ($this->getConfig('show_posted_by')) {
-                    $this->parse('show_posted_by_block', 'show_posted_by');
-                }
-                else {
-                    $this->setVar('show_posted_by_block', '');
-                }
-
                 // Controls
                 if ($this->permission < WRITE_ACCESS) {
                     $this->setVar('modify_link_block', '');
-                }
-                else {
+                } else {
                     $this->parse('modify_link_block', 'modify_link');
                 }
 
                 $this->parse("link_block", "link", true);
             }
-        }
-        else {
+        } else {
             $this->setVar("link_block", "");
         }
 
@@ -140,8 +136,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 
         if ($this->permission < WRITE_ACCESS) {
             $this->setVar("submit_link_block", "");
-        }
-        else {
+        } else {
             $this->parse("submit_link_block", "submit_link");
         }
 
