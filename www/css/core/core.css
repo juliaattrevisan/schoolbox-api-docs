@@ -6863,8 +6863,13 @@ h4 a.hidden {
   top: 20px;
   right: 20px;
 }
+#rubric-criteria li {
+  height: 24px;
+}
 #rubric-criteria input[type=text] {
   width: 340px;
+  float: right;
+  margin-right: 5px;
 }
 #rubric-criteria span input {
   display: block;
