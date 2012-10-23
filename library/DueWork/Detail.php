@@ -176,6 +176,7 @@ class DueWork_Detail {
                 'DUEWORK_DUEDATE' => $this->getDueDate()->getLong(),
                 'CATEGORY_ID' => $this->dueWork['cid'],
                 'BOX_ID' => $this->dueWork['id'],
+                'SITE_ROOT' => $page->conType() . $_SERVER['HTTP_HOST'],
             )
         );
 
@@ -251,6 +252,10 @@ class DueWork_Detail {
                         }
                     }
 
+                    $plagHref = sprintf("%s%s/submission/plagiarismReport/%s/?zx_h=600px",
+                        $page->conType(), $_SERVER['HTTP_HOST'], $submission['plag_doc_id']
+                    );
+
                     $page->setVar(
                         array(
                             'SUBMISSION_ID' => $submission['id'],
@@ -260,17 +265,25 @@ class DueWork_Detail {
                             'SUBMISSION_AFTER_MARK' => $afterMark,
                             'SUBMISSION_PLAG_SCORE' => sprintf("%d%%", $submission['score']),
                             'SUBMISSION_PLAG_CLASS' => $plagClass,
-                            'SUBMISSION_PLAG_HREF' => $submission['plag_doc_id'],
-                            'SUBMISSION_EXPANDABLE' => $this->getSubmissionType() == self::ACCEPT_MULTI ? 'hide expandable' : '',
+                            'SUBMISSION_PLAG_HREF' => base64_encode($plagHref),
+                            'SUBMISSION_EXPANDABLE' => $this->getSubmissionType() == self::ACCEPT_MULTI
+                                ? 'hide expandable'
+                                : '',
                             'SUBMISSION_MIMEICON' => $icon
                         )
                     );
 
                     // if plagscan is not registered for use, then clear the indicator rather than show 0%
                     if (Cfg::get('plagscan_api_key')) {
-                        if ($submission['score']) {
+                        if ($submission['plag_status'] == Plagscan_Document::STATUS_COMPLETE) {
                             $page->parse('plag_enabled_block', 'plag_enabled');
-                        } else {
+                        }
+                        // is this even a plagiarism document?
+                        elseif(!$submission['plag_doc_id']) {
+                            $page->setVar('plag_enabled_block', '');
+                        }
+                        // is being checked, but is still pending, so tell the user
+                        else {
                             $page->setVar(
                                 'plag_enabled_block',
                                 '<span title="Plagiarism results pending" class="plag-score regular">(pending)</span>'
@@ -299,7 +312,8 @@ class DueWork_Detail {
         // show or hide download button
         if ($this->dueWork['submissionCount']) {
             $page->parse('download_btn_block', 'download_btn');
-        } else {
+        }
+        else {
             $page->setVar('download_btn_block', '');
         }
 

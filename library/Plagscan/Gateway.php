@@ -10,15 +10,26 @@
  */
  
 class Plagscan_Gateway {
-    const API_VERSION = '2.0';
 
+    const API_VERSION = '2.0';
     const API_URL = 'https://www.plagscan.com/api/';
 
     const METHOD_SUBMIT = 'Submit';
-
     const METHOD_RETRIEVE = 'Retrieve';
-
     const METHOD_CHECK = 'Check';
+
+    const MODE_RETRIEVE_STATISTICS_ONLY = 0;
+
+    const MODE_RETRIEVE_PLAINTEXT = 1;
+    const MODE_RETRIEVE_XML = 2;
+    const MODE_RETRIEVE_DOCX = 3;
+
+    const MODE_RETRIEVE_HTML_ANNOTATED = 4;
+    const MODE_RETRIEVE_HTML_SOURCES = 5;
+    const MODE_RETRIEVE_HTML_INTERACTIVE = 6;
+
+    const MODE_RETRIEVE_PDF_ANNOTATED = 8;
+    const MODE_RETRIEVE_PDF_SOURCES = 9;
 
     private $username;
 
@@ -82,6 +93,12 @@ class Plagscan_Gateway {
         return $response->PID;
     }
 
+    /**
+     * Data Retrieval is based on $retrieveMode, each mode will return a different set of results
+     * @param $documentId
+     * @param $retrieveMode
+     * @return bool|SimpleXMLElement
+     */
     public function retrieve ($documentId, $retrieveMode) {
         $parameterList = $this->createParameters(array(
             'METHOD' => self::METHOD_RETRIEVE,
@@ -90,9 +107,22 @@ class Plagscan_Gateway {
         ));
 
         if ( $this->createRequest($parameterList) ) {
-            $response = $this->parseXmlResponse($this->response);
-
-            return $response;
+            // plaintext
+            if($retrieveMode == self::MODE_RETRIEVE_PLAINTEXT) {
+                return $this->parsePlainResponse($this->response);
+            }
+            // xml
+            elseif($retrieveMode < self::MODE_RETRIEVE_DOCX) {
+                return $this->parseXmlResponse($this->response);
+            }
+            // file download
+            elseif($retrieveMode == self::MODE_RETRIEVE_DOCX || $retrieveMode > self::MODE_RETRIEVE_HTML_INTERACTIVE) {
+                return $this->parseFileResponse($this->response);
+            }
+            // html
+            else {
+                return $this->parseHtmlResponse($this->response);
+            }
         }
         else {
             return false;
@@ -107,7 +137,6 @@ class Plagscan_Gateway {
 
         if ( $this->createRequest($parameterList) ) {
             $response = $this->parseXmlResponse($this->response);
-
             return $response;
         }
         else {
@@ -183,10 +212,31 @@ class Plagscan_Gateway {
         list($header, $content) = explode("\r\n\r\n", $response, 2);
 
         try {
-            return new SimpleXMLElement($content);
+            // unfortunately try-catch isn't enough here, temporarily set a custom error handler for this scenario
+            set_error_handler(function($errno, $errstr, $errfile, $errline, $errcontext) {
+                throw new ErrorException($errstr, $errno, 1, $errfile, $errline);
+            });
+            $sxe = new SimpleXMLElement($content);
+            restore_error_handler();
+            return $sxe;
         }
         catch(Exception $e) {
+            restore_error_handler();
             return false;
         }
+    }
+
+    private function parsePlainResponse($response) {
+        list($header, $content) = explode("\r\n\r\n", $response, 2);
+        return $content;
+    }
+
+    private function parseFileResponse($response) {
+        return $response;
+    }
+
+    private function parseHtmlResponse($response) {
+        list($header, $content) = explode("\r\n\r\n", $response, 2);
+        return $content;
     }
 }

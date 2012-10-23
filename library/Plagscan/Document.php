@@ -29,4 +29,6 @@ class Plagscan_Document extends Model {
     public $state;
 
     public $status;
+
+    public $html;
 }

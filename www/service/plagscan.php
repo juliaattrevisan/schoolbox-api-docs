@@ -20,23 +20,34 @@ class Plagscan_ServiceController {
         $this->gateway = new Plagscan_Gateway($plagscanUsername, $plagscanApiKey);
     }
 
+    /**
+     * Executed when callback from PlagScan is triggered, and requests the report from PlagScan
+     * @param $documentId
+     * @param int $mode
+     * @return bool
+     */
     public function notifyComplete ($documentId) {
         $documentCollection = Plagscan_DocumentMapper::getInstance()->findByColumn('plagscan_id', $documentId);
 
         if ( $documentCollection ) {
             $document = $documentCollection[0];
 
-            $documentSummary = $this->gateway->retrieve($documentId, 0);
+            $plagscanStat = $this->gateway->retrieve($documentId, Plagscan_Gateway::MODE_RETRIEVE_STATISTICS_ONLY);
+            $plagscanHtml = $this->gateway->retrieve($documentId, Plagscan_Gateway::MODE_RETRIEVE_HTML_INTERACTIVE);
 
-            $document->score = $documentSummary->LEVEL / 10;
+            $document->score = $plagscanStat->LEVEL / 10;
             $document->status = Plagscan_Document::STATUS_COMPLETE;
+
+            $document->html = $plagscanHtml;
 
             Plagscan_DocumentMapper::getInstance()->save($document);
         }
         else {
             return false;
         }
+        return true;
     }
+
 }
 
 /* Handles responses from PlagScan which indicate a document has completed plagiarism scanning */

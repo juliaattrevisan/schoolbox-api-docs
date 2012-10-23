@@ -53,6 +53,12 @@ class Plagscan_DocumentMapper extends Mapper {
             'type'       => Mapper::TYPE_STRING,
         ));
 
+        $this->hasMap(array(
+            'column'     => 'html',
+            'property'   => 'html',
+            'type'       => Mapper::TYPE_STRING,
+        ));
+
         parent::mapping();
     }
 

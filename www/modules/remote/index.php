@@ -7,6 +7,15 @@ if ($this->arg[1] == 'window') {
 }
 $remoteUrl = base64_decode($this->arg[0]);
 
+// is this specifying a height for the parent frame?
+$height = '460px';
+if(strpos($remoteUrl, 'zx_h=')) {
+    preg_match("#zx_h=([0-9]*(?:%|px|&))#", $remoteUrl, $matches);
+    if(isset($matches[1])) {
+        $height = str_replace('&', '', $matches[1]);
+    }
+}
+
 if (!filter_var($remoteUrl, FILTER_VALIDATE_URL)) {
     $this->error(2);
 }
@@ -28,4 +37,7 @@ if (strpos($remoteUrl, '?') === false) {
 
 $remoteUrl = $remoteUrl . $glue . "key=$key&time=$time&id=$externalUserId";
 
-$this->setVar('REMOTE_URL', addslashes($remoteUrl));
+$this->setVar(array(
+    'REMOTE_URL' => addslashes($remoteUrl),
+    'FRAME_HEIGHT' => $height,
+));
