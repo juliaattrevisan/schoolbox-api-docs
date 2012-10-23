@@ -1125,6 +1125,19 @@ p.interact-left.home-calendar {
   margin: 0;
   margin-top: 2px;
 }
+.scroller {
+  width: 100%;
+}
+.scroller .caption-holder {
+  background: #576369;
+  color: #fff;
+  padding: 10px;
+  text-decoration: none;
+  opacity: 0.9;
+  z-index: 2;
+  text-align: center;
+  margin: 0 auto;
+}
 #galleryCycle {
   width: 100%;
 }
@@ -5115,7 +5128,7 @@ HOMEPAGE CUSTOMISE
   position: absolute;
   top: 50px;
   left: 50px;
-  background: #0066b0;
+  background: #cae9b9;
   color: #ffffff;
   width: 62px;
   height: 34px;

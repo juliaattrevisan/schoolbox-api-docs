@@ -3,18 +3,18 @@
 <script type="text/javascript">
     $j(function () {
         $j('.slideshow-cycle img').imagesLoaded(function (images) {
-            $j('#galleryCycle').cycle({
+            $j('#galleryCycle-{COMPONENT_INSTANCE_ID}').cycle({
                 timeout:{COMPONENT_CONFIG_TIMING_VALUE_MS},
-                cleartype:true
+                cleartype:true,
+                height:'auto'
             });
         });
     });
-
 </script>
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
-    <div id="galleryCycle" class="box clearfix" style="height:0; padding:0; border:0;margin:0;">
+    <div id="galleryCycle-{COMPONENT_INSTANCE_ID}" class="scroller box clearfix" style="height:0;padding:0;border:0;margin:0;">
         <!-- BEGIN image -->
         <div class="slideshow-cycle">
             <img src="/cms/image.php?id={IMAGE_ID}&height={IMAGE_DIMENSION}&width={IMAGE_DIMENSION}"
@@ -26,7 +26,6 @@
         <!-- END image -->
     </div>
     <!-- BEGIN submit_image -->
-    <p class="interact clearfix"><a href="/cms/file/multi/{IMAGESCROLLER_CATEGORY_ID}"
-                                    class="btn up-arrow"><span></span>Post Images</a></p>
+    <p class="interact clearfix"><a href="/cms/file/multi/{IMAGESCROLLER_CATEGORY_ID}" class="btn up-arrow"><span></span>Post Images</a></p>
     <!-- END submit_image -->
 </div>
