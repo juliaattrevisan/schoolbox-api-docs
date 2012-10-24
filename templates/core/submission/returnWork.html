@@ -39,8 +39,29 @@
             plot.draw();
         }
 
+        $j('#returnWorkForm').validate({
+            submitHandler: function(form) {
+                var success = true;
+                $j('#rubric-tbody').find('tr').each(function() {
+                    var tr = $j(this);
+                    var radios = $j(this).find('input');
+                    if(radios.length) {
+                        var name = radios.first().attr('name');
+                        if(tr.find('input:checked').length == 0) {
+                            success = false;
+                            return false;
+                        }
+                    }
+                });
+                if(!success) {
+                    $j('#errnotif').removeClass('hide');
+                }
+                else {
+                    form.submit();
+                }
+            }
+        });
     });
-
 
 </script>
 <!-- END custom_head -->
@@ -120,5 +141,6 @@
             </td>
         </tr>
     </table>
-	 <input name="Submit" type="submit" id="Submit" value="Submit" class="submit-btn-plain" />
+	<input name="Submit" type="submit" id="Submit" value="Submit" class="submit-btn-plain" />
+    <p id="errnotif" class="float-left err hide">Ensure you have selected a mark for every criterion.</p>
 </form>
