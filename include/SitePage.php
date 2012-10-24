@@ -557,6 +557,7 @@ class SitePage extends Page {
             'TAB_TIMETABLE_ON' => '',
             'TAB_RESOURCES_ON' => '',
             'TAB_MYFILES_ON' => '',
+            'TAB_NETWORK_ON' => '',
             'TAB_PORTFOLIO_ON' => '',
             'TAB_EPORTFOLIO_ON' => '',
             'TAB_SUBMISSION_ON' => '',
