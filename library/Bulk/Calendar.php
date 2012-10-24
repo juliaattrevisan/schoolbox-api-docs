@@ -79,7 +79,7 @@ class Bulk_Calendar extends Bulk_Abstract {
                 if (strlen(trim($thisRow[8]))) {
                     $publishDate = new Alaress_Date_Format($thisRow[8], 'd/m/y');
                 } else {
-                    $publishDate = clone $date;
+                    $publishDate = new Alaress_Date_Format('0000-00-00', 'y-m-d');
                 }
 
                 if ((trim($thisRow[0]) != '') && (trim($thisRow[3]) != '')) {
