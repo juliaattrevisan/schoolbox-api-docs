@@ -28,7 +28,7 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
      * @return boolean
      */
     public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, 'randImage')) {
+        if (!parent::loadTemplate($templateHandle, 'randImage')) {
             return false;
         }
         $this->parseConfig();
@@ -49,8 +49,10 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
 
         $this->db->query($query);
 
-        if($image = $this->db->getNextArray()) {
-            $pixel = $this->getConfig('pixel') < 0 ? '400' : ($this->getConfig('pixel') > 600 ? 600 : $this->getConfig('pixel'));
+        if ($image = $this->db->getNextArray()) {
+            $pixel = $this->getConfig('pixel') < 20 ? '400' : ($this->getConfig('pixel') > 600 ? 600 : $this->getConfig(
+                'pixel'
+            ));
 
             //get link
             $imageurl = "/cms/image.php?id={$image['id']}&height=$pixel&width=$pixel";
@@ -59,8 +61,7 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
             $this->setVar("PREVIEW_IMAGE_DESC", Scrub::text($image['comment']));
 
             $this->parse("preview_block", "previewimage");
-        }
-        else {
+        } else {
             $this->setVar("preview_block", "");
         }
 
