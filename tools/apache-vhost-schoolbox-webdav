@@ -1,5 +1,5 @@
 <VirtualHost *:80>
-	ServerName dav.schoolbox.schoolname.edu
+	ServerName schoolboxdav.schoolname.edu
 	DocumentRoot /usr/share/schoolbox/dav
 
 	<Directory /usr/share/schoolbox/dav>

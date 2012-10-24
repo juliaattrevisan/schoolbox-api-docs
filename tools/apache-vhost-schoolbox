@@ -17,9 +17,9 @@
 	</Directory>
 
 	# MGS Sport Module Exceptions
-	#<Directory /usr/share/schoolbox/www/modules/sport>
-	#	php_flag apc.enabled off
-	#</Directory>
+	<Directory /usr/share/schoolbox/www/modules/sport>
+		php_flag apc.enabled off
+	</Directory>
 
 	# Mobile Edition - Comment out this section to enable
 	<Location /m>
