@@ -675,6 +675,7 @@ class Calendar extends DeprecatedModel {
                 $event->setEventType($currentEvent['eventType']);
                 $event->setColour($currentEvent['eventColour']);
                 $event->setDetail($currentEvent['detail']);
+                $event->setLocation($currentEvent['location']);
                 $event->setPublishDate($currentEvent['publish_date']);
                 $event->setSid($currentEvent['sid']);
                 if ($this->getPerm($currentEvent) > 1) {
