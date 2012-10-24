@@ -58,6 +58,12 @@ cd /tmp/exported/$@/tools;
 ./build-sql-update.sh
 cd $curdir;
 
+# Ensure less is installed
+npm install less@1.3.0 ~
+# Auto build the lessified core.css
+~/node_modules/.bin/lessc www/css/core/core.less > www/css/core/core.css
+echo "/* less (`~/node_modules/.bin/lessc -v | cut -d' ' -f2`) build at `date +%Y-%m-%d\ %H:%M:%S` */" >> www/css/core/core.css
+
 #echo -e "Attempting to process the v$@ SQL Update file (File:/sql/update_$@.sql)";
 #cp /tmp/exported/$@/sql/update_$@.sql /tmp/ &>> /dev/null;
 #errorCheck 1;
