@@ -1,8 +1,30 @@
 <!-- BEGIN custom_head -->
+<style>
+    li.ui-menu-item, .ui-combobox input {
+        width: 85px;
+    }
+    li.ui-menu-item {
+        background: #fff;
+    }
+    li.ui-menu-item .ui-corner-all {
+        display: block;
+        padding: 2px;
+    }
+    li.ui-menu-item .ui-corner-all:hover {
+        background: #e7e7e7;
+        cursor: pointer;
+        text-decoration: none;
+    }
+</style>
 <script src="/javascript/jquery.autoellipsis-1.0.3.min.js" type="text/javascript" xmlns="http://www.w3.org/1999/html"></script>
+<script src="/javascript/jquery.combobox.js" type="text/javascript"></script>
 <script src="/javascript/jquery.markSheet.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $j(function() {
+        $j('.combobox').combobox({COMBO_OPTIONS});
+    });
+</script>
 <!-- END custom_head -->
-
 <h1>{CATEGORY}</h1>
 <span class="header_option"><a href="/submission/markSheet/export/{CID}" class="btn download" ><span></span>Download Spreadsheet</a>
 <a class="btn add" href="/submission/createSubmission/new/{CID}/"><span></span>Add Due Work</a>
