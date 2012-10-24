@@ -108,7 +108,11 @@ $j(function() {
             * */
 
             jQuery.validator.addMethod("percentage", function(value, element) {
-                return this.optional(element) || (parseFloat(value) <= 100);
+                return this.optional(element)
+                    || (parseFloat(value) <= 100)
+                    || (value == 'Absent')
+                    || (value == 'Not Assessed')
+                    || (value == 'Not Submitted');
             }, "Please enter a value out of 100");
 
             jQuery.validator.addMethod("markLimit", function(value, element) {
@@ -116,7 +120,10 @@ $j(function() {
                 var markLimit = parseInt($j(element).siblings('span').children('.validation-limit').text());
 
                 if (value !== "") {
-                    if (parseInt(value) <= markLimit) {
+                    if ((parseInt(value) <= markLimit)
+                        || (value == 'Absent')
+                        || (value == 'Not Assessed')
+                        || (value == 'Not Submitted')) {
                         return true;
                     } else {
                         return false;
