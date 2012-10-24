@@ -135,7 +135,7 @@ if (is_array($categoryList)) {
 
 // Catch if not involved in any categories
 if (!isset($categoryIDList)) {
-    error(135);
+    error(153);
     exit;
 }
 
