@@ -110,7 +110,7 @@ class Scrub {
             'player.vimeo.com/video/',
             'www.slideshare.net/slideshow/embed_code/',
             '(www|edu).glogster.com/glog(/|.php)',
-            'wikieducator.org/index.php',
+            'wikieducator.org/',
             'www.google.com(.[a-z]{2})?/maps',
             'maps.google.com(.[a-z]{2})?/',
             'docs.google.com(.[a-z]{2})?/',
