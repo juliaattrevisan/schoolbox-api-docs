@@ -14,7 +14,7 @@ $this->setBlock(TEMPLATE_content, 'file_list', 'file_list_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 
 $this->setTitle('My Network');
-$this->setTab('portfolio');
+$this->setTab('network');
 
 $groupHandler = new Group;
 $allowedFiles = new AllowedFile;

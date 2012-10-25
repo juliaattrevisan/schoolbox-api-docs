@@ -4,17 +4,19 @@ $folderHandler = new MyFolder;
 
 if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
 
-    if (!($folder = $folderHandler->getByID($this->arg[0])))
+    if (!($folder = $folderHandler->getByID($this->arg[0]))) {
         error(2);
+    }
 
     $this->setFile(TEMPLATE_content, "cms/myFolder.html");
     $this->setBlock(TEMPLATE_content, 'parent_list', 'parent_list_block');
 
 
     $this->setTitle('Modify Folder');
-    $this->setTab('resources');
+    $this->setTab('myfiles');
 
-    $output = array('ACTION' => 'Modify',
+    $output = array(
+        'ACTION' => 'Modify',
         'FOLDER_ID' => $folder['id'],
         'NAME' => Scrub::text($folder['name']),
         'PARENT_ID' => $folder['parent'],
@@ -31,7 +33,8 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         $parentTree = is_array($parentTree) ? $parentTree : array();
         array_unshift($parentTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
         foreach ($parentTree as $parent) {
-            $output = array('PARENT_ID' => $parent['id'],
+            $output = array(
+                'PARENT_ID' => $parent['id'],
                 'PARENT_NAME' => $parent['name'],
                 'PARENT_INDENT' => str_repeat('&nbsp;', ($parent['depth'] + 1) * 4),
                 'PARENT_SELECTED' => $parent['id'] == $folder['parent'] ? 'selected="selected"' : '',
@@ -51,7 +54,8 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     $this->setTitle('Add Folder');
     $this->setTab('resources');
 
-    $output = array('ACTION' => 'Add',
+    $output = array(
+        'ACTION' => 'Add',
         'FOLDER_ID' => '',
         'NAME' => '',
         'PARENT_ID' => $this->arg[1],
@@ -69,7 +73,8 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         $parentTree = is_array($parentTree) ? $parentTree : array();
         array_unshift($parentTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
         foreach ($parentTree as $parent) {
-            $output = array('PARENT_ID' => $parent['id'],
+            $output = array(
+                'PARENT_ID' => $parent['id'],
                 'PARENT_NAME' => $parent['name'],
                 'PARENT_INDENT' => str_repeat('&nbsp;', ($parent['depth'] + 1) * 4),
                 'PARENT_SELECTED' => $parent['id'] == $this->arg[1] ? 'selected="selected"' : '',
@@ -80,7 +85,8 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     }
 
 
-} else
+} else {
     $this->error(2);
+}
 
 ?>

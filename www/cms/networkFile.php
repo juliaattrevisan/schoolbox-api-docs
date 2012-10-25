@@ -19,6 +19,7 @@ if (is_numeric($this->arg[0])) {
     }
 
     $this->setFile(TEMPLATE_content, 'cms/networkFile.html');
+    $this->setFile(TEMPLATE_content, 'cms/networkFile.html');
     $this->setBlock(TEMPLATE_content, 'browse_row', 'browse_row_block');
     $this->setBlock(TEMPLATE_content, 'folder_list', 'folder_list_block');
     $this->setTitle('Modify Network File');
