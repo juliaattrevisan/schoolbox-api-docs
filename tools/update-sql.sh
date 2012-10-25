@@ -13,18 +13,15 @@
 # newver (new version) to be updated during packaging
 newver="x.x.x";
 
-package="schoolbox";
+filepath=`readlink -f $0`;
+fullpath=${filepath%/*};
 
-if [ ! -z $1 ];
-then
-	package=$1;
-fi
+conffile="$fullpath/../www/conf/conf.php";
+conffile=`readlink -f $conffile`;
 
-conffile1="../www/conf/conf.php";
-conffile2="/etc/$package/conf.php";
-conffile3="/var/www/$package/www/conf/conf.php";
+instdir=`readlink -f $fullpath/../`;
+package=${instdir##*/};
 
-instdir=`readlink -f ../`;
 sqlfile=$instdir"/updates/sql_updates.sql";
 tmpfile="/tmp/$package_sql_updates_`date -I`.sql";
 backupdir="/var/lib/$package";
@@ -34,36 +31,24 @@ echo "Starting SQL update process";
 
 if [ $newver == "x.x.x" ];
 then
-    echo "Please specify the new sql version in "`readlink -f $0`;
-    exit;
+	echo "Please specify the new sql version in "`readlink -f $0`;
+	exit;
 fi
 
-if [ -f $conffile1 ];
+if [ ! -f $conffile ];
 then
-        conffile=$conffile1
-else
-        if [ -f $conffile2 ];
-        then
-                conffile=$conffile2
-        else
-                if [ -f $conffile3 ];
-                then
-                        conffile=$conffile3
-                else
-                        echo "New installation or conf file missing";
-                        echo "No SQL updates performed";
-                        exit;
-                fi
-        fi
+	echo "New installation or conf file missing";
+	echo "No cache directories cleaned";
+	exit;
 fi
 
 echo "Using db credentials from: "`readlink -f $conffile`;
 
 if [ ! -f $sqlfile ];
 then
-        echo "SQL update file ($sqlfile) missing";
-        echo "No SQL updates performed";
-        exit;
+	echo "SQL update file ($sqlfile) missing";
+	echo "No SQL updates performed";
+	exit;
 fi
 
 # Collect Credentials
@@ -79,8 +64,8 @@ sqlver=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM 
 
 if [ -z $sqlver ];
 then
-        echo "Unable to collect current database version. Please check your database credentials.";
-        exit;
+	echo "Unable to collect current database version. Please check your database credentials.";
+	exit;
 fi
 
 echo "Current SQL Version: "$sqlver;
@@ -88,48 +73,48 @@ echo "New SQL Version: "$newver;
 
 if [ $sqlver = $newver ];
 then
-        echo "No SQL updates required";
+	echo "No SQL updates required";
 else 
-        start=`grep -n "\-\-\ End\ of\ Release\ $sqlver" $sqlfile | cut -d':' -f1`;
-        end=`grep -n "\-\-\ End\ of\ Release\ $newver" $sqlfile | cut -d':' -f1`;
-        
-        if [ -z $start ];
-        then
-                echo "SQL version greater than update, no changes made";
-                exit;
-        fi
-        
-        if [ $start -gt $end ];
-        then
-                echo "SQL version greater than update, no changes made";
-                exit;
-        fi
-        
-        echo "Backing up database before changes";
-        mkdir -p $backupdir;
-        mysqldump --allow-keywords -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile;
-        
-        sed -n "$start","$end"p $sqlfile | sed -n '/\-\-\ End\ of\ Release/!p' > $tmpfile;
-        mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $tmpfile;
-        
-        if [ $? -eq 0 ];
-        then
-                echo "SQL updated to version $newver";
-        else
-                # Revert database to original
-                mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $backupfile > /dev/null 2>&1;
-                if [ $? -eq 0 ];
-                then
-                        echo "Database returned to original pre-update state.";
-                fi
-                echo "SQL update failed. Please attempt a manual update.";
-                echo "A backup of the original database is located at: $backupfile";
-        fi
-        
-        # Cleanup tmpfile and backup
-        if [ -f $tmpfile ];
-        then
-                rm -f $tmpfile;
-        fi
+	start=`grep -n "\-\-\ End\ of\ Release\ $sqlver" $sqlfile | cut -d':' -f1`;
+	end=`grep -n "\-\-\ End\ of\ Release\ $newver" $sqlfile | cut -d':' -f1`;
+	
+	if [ -z $start ];
+	then
+		echo "SQL version greater than update, no changes made";
+		exit;
+	fi
+	
+	if [ $start -gt $end ];
+	then
+		echo "SQL version greater than update, no changes made";
+		exit;
+	fi
+	
+	echo "Backing up database before changes";
+	mkdir -p $backupdir;
+	mysqldump --allow-keywords -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile;
+	
+	sed -n "$start","$end"p $sqlfile | sed -n '/\-\-\ End\ of\ Release/!p' > $tmpfile;
+	mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $tmpfile;
+	
+	if [ $? -eq 0 ];
+	then
+		echo "SQL updated to version $newver";
+	else
+		# Revert database to original
+		mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $backupfile > /dev/null 2>&1;
+		if [ $? -eq 0 ];
+		then
+			echo "Database returned to original pre-update state.";
+		fi
+		echo "SQL update failed. Please attempt a manual update.";
+		echo "A backup of the original database is located at: $backupfile";
+	fi
+	
+	# Cleanup tmpfile and backup
+	if [ -f $tmpfile ];
+	then
+		rm -f $tmpfile;
+	fi
 fi
 

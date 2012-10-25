@@ -10,39 +10,18 @@
 #
 #
 
-package="schoolbox";
+filepath=`readlink -f $0`;
+fullpath=${filepath%/*};
 
-if [ ! -z $1 ];
+conffile="$fullpath/../www/conf/conf.php";
+conffile=`readlink -f $conffile`;
+
+if [ ! -f $conffile ];
 then
-	package=$1;
+	echo "New installation or conf file missing";
+	echo "No cache directories cleaned";
+	exit;
 fi
-
-conffile1="../www/conf/conf.php";
-conffile2="/etc/$package/conf.php";
-conffile3="/var/www/$package/www/conf/conf.php";
-
-echo "Starting Cache Cleaning process";
-
-if [ -f $conffile1 ];
-then
-	conffile=$conffile1
-else
-	if [ -f $conffile2 ];
-	then
-		conffile=$conffile2
-	else
-		if [ -f $conffile3 ];
-		then
-			conffile=$conffile3
-		else
-			echo "New installation or conf file missing";
-			echo "No cache directories cleaned";
-			exit;
-		fi
-	fi
-fi
-
-echo "Using db credentials from: "`readlink -f $conffile`;
 
 # Collect Credentials
 sqluser=`grep "\"SQL_user" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`
@@ -62,7 +41,7 @@ fi
 if [ -d $minifydir ];
 then
 	rm -f $minifydir/minify*;
-	echo "Minify cache directory cleaned";
+	echo "Minify cache directory cleaned ($minifydir)";
 else
 	echo "No cache directories cleaned";
 fi
