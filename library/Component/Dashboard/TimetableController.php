@@ -119,8 +119,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                         if ($period['description']) {
                             $cat = $this->category->getByCode($period['code']);
-
-                            if (is_array($cat) && $this->group->getPermission($cat['cid']) >= READ_ACCESS) {
+                            if ($cat['id'] && $this->group->getPermission($cat['id']) >= READ_ACCESS) {
                                 $this->parse('period_class_link_block', 'period_class_link');
                             } else {
                                 $this->parse('period_class_block', 'period_class');
