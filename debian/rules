@@ -45,7 +45,7 @@ override_dh_install:
 	echo "UPDATE config SET value='/var/lib/schoolbox/submissions' WHERE name='submission_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
 	echo "UPDATE config SET value='/var/lib/schoolbox/returns' WHERE name='returns_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
 	echo "UPDATE config SET value='/var/lib/schoolbox/dropbox' WHERE name='dropbox_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/zip' WHERE name='zip_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/cache/zip' WHERE name='zip_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
 	echo "UPDATE config SET value='/var/lib/schoolbox/thumbnails' WHERE name='thumbnail_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
 	echo "UPDATE config SET value='/var/lib/schoolbox/cache/xml' WHERE name='xml_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
 	echo "UPDATE config SET value='/var/lib/schoolbox/cache/stream' WHERE name='stream_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql

@@ -24,10 +24,10 @@ then
 fi
 
 # First level dirs
-mkdir -p $datadir/{dropbox,files,myFiles,returns,storage,submissions,thumbnails,zip}
+mkdir -p $datadir/{dropbox,files,myFiles,returns,storage,submissions,thumbnails}
 
 # Cache dirs
-mkdir -p $datadir/cache/{minify,portrait,purifier,stream,weather,xml}
+mkdir -p $datadir/cache/{minify,portrait,purifier,stream,weather,xml,zip}
 
 # Fix permissions
 chown -R www-data:www-data $datadir
