@@ -1,3 +1,7 @@
+function isNumber(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 $j(function() {
     var markSheet =  {
 
@@ -5,12 +9,22 @@ $j(function() {
         assessmentCellWidth : '200',
 
         init: function() {
+            markSheet.setHeight();
             markSheet.columns();
             markSheet.inputs();
             markSheet.cells();
             markSheet.cellValidation();
+            markSheet.selectGrouping();
         },
 
+        /**
+         * add 50px to the table to make room for the dropdowns
+         */
+        setHeight: function() {
+            var tbl = $j('#content .mark-sheet.assessments');
+            var h = tbl.height();
+            tbl.css('height', (h+50)+'px');
+        },
 
         columns: function() {
             for (i=0; i <= markSheet.columnCount; i++) {
@@ -21,15 +35,11 @@ $j(function() {
             }
 
             $j('.mark-sheet.assessments table').css('width', markSheet.assessmentCellWidth * markSheet.columnCount);
-
             $j('.height-control').ellipsis();
 
-
             if (!$j('.assessments').find('td').length > 0) {
-
                 $j('.assessments').height($j('.names').height()+92)
             }
-
         },
 
         inputs: function() {
@@ -40,22 +50,14 @@ $j(function() {
                 rowIndex = $this.closest("tr").prevAll("tr").length + 1,
                 colIndex = assignmentClass.index() + 1;
 
-                /*
-                * Row highlighting
-                *
-                * */
-
+                // Row highlighting
                 $j('table').find('tr').removeClass('highlight-student');
 
                 if (!$j('table').find('tr:nth-child('+rowIndex+')').hasClass('highlight-student')) {
                     $j('table').find('tr:nth-child('+rowIndex+')').addClass('highlight-student');
                 }
 
-                /*
-                * Comment input showing
-                *
-                * */
-
+                // Comment input showing
                 $j('.active-assessment').each(function() {
                     $j(this).removeClass('active-assessment');
                 });
@@ -68,11 +70,7 @@ $j(function() {
 
         cells: function() {
 
-            /*
-             * Hovering a td should make the entire row change colour
-             *
-             * */
-
+             // Hovering a td should make the entire row change colour
              $j('td').hover(function(evt) {
                 var rowNumber = $j(evt.target).closest("tr").prevAll("tr").length + 1;
 
@@ -102,36 +100,31 @@ $j(function() {
             });
 
 
-            /*
-            * Depends on the presence of the jquery.validate library.
-            *
-            * */
 
+            // Depends on the presence of the jquery.validate library.
             jQuery.validator.addMethod("percentage", function(value, element) {
-                return this.optional(element)
-                    || (parseFloat(value) <= 100)
-                    || (value == 'Absent')
-                    || (value == 'Not Assessed')
-                    || (value == 'Not Submitted');
+                if(jQuery.combobox.instances.length) {
+                    var valid = jQuery.combobox.instances[0].selector.allSelectOptions;
+                    if(jQuery.inArray(value, valid) != -1) {
+                        return true;
+                    }
+                }
+                return this.optional(element) || (parseFloat(value) <= 100);
             }, "Please enter a value out of 100");
 
             jQuery.validator.addMethod("markLimit", function(value, element) {
-
-                var markLimit = parseInt($j(element).siblings('span').children('.validation-limit').text());
-
-                if (value !== "") {
-                    if ((parseInt(value) <= markLimit)
-                        || (value == 'Absent')
-                        || (value == 'Not Assessed')
-                        || (value == 'Not Submitted')) {
+                if(jQuery.combobox.instances.length) {
+                    var valid = jQuery.combobox.instances[0].selector.allSelectOptions;
+                    if(jQuery.inArray(value, valid) != -1) {
                         return true;
-                    } else {
-                        return false;
                     }
+                }
+                var markLimit = parseInt($j(element).closest('form.markForm').find('.validation-limit').text());
+                if (value !== "") {
+                    return parseInt(value) <= markLimit;
                 } else {
                     return true;
                 }
-
             }, "Amount must be less or equal to mark limit");
 
 
@@ -151,7 +144,13 @@ $j(function() {
                         var notification = $j(form).find('input, select');
                         $j.post('/submission/returnWorkForm.php', $j(form).serialize(), function(data) {
                             var avg = $j('#avg-'+data.id+' span');
-                            avg.html(data.marks.avg);
+                            var dataAvg = data.marks.avg;
+                            if(dataAvg == -1) {
+                                avg.html('&mdash;');
+                            }
+                            else {
+                                avg.html(dataAvg);
+                            }
                             notification.css({ 'border': '1px solid green' });
                             avg.css({ 'color': 'green' });
                             setTimeout(function() {
@@ -163,9 +162,27 @@ $j(function() {
                     }
                 });
             });
+        },
 
+        selectGrouping: function() {
+            $j('#content select.mark-input').each(function() {
+                // if the select doesn't contain a separator for the error codes, slot it in
+                var self = $j(this);
+                if (self.find('optgroup').length == 0) {
+                    // find the first error (non-numeric) option
+                    self.children('option').each(function() {
+                        if(!isNumber($j(this).attr('value'))) {
+                            // insert before me
+                            $j(this).before('<optgroup></optgroup>');
+                            // break the loop
+                            return false;
+                        }
+                    });
+                }
+            });
         }
-    }
+
+    };
     markSheet.init();
 
 });

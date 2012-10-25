@@ -143,12 +143,29 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID) {
 
     // echo $subbox['mark_type_slug'];
 
-    if($subbox['mark_type_slug'] == 'rubric') {
+    // retrieve error codes
+    $dem = DueWork_ErrorMapper::getInstance();
+    $err = $dem->findAll();
+
+    // make associative by label (since that's what's being transmitted)
+    $errors = array();
+    foreach($err as $e) {
+        $errors[$e->displayAs] = $e;
+    }
+
+    // error given
+    if(isset($errors[$givenMark])) {
+        $mark['mark'] = $errors[$givenMark]->displayAs;
+        $mark['norm_mark'] = $errors[$givenMark]->normaliseAs === NULL ? 'NULL' : $errors[$givenMark]->normaliseAs;
+    }
+    // not a recognised error code, check for rubric
+    elseif($subbox['mark_type_slug'] == 'rubric') {
         // in this context, no mark is supplied, so retrieve, smash to pieces, and reinsert
         $mark = $marksheet->retrieveMark($studentID, $boxID);
         $marksheet = Marksheet_Factory::build('raw');
         $mark = $marksheet->normaliseMark($mark['mark'], $subbox);
     }
+    // treat as numeric
     else {
         // normalise the new mark given, ready to be inserted
         $mark = $marksheet->normaliseMark($givenMark, $subbox);

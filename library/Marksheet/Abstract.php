@@ -87,9 +87,13 @@ abstract class Marksheet_Abstract {
      */
     function clean_num($value, $decimals, $blankZero = true) {
 
-        // handle null, blank and zero
-        if($value == 0 || is_null($value)) {
-            return $blankZero ? "" : 0;
+        // handle null value and blank string, distinct from zero
+        if($value === null || $value === '') {
+            return '';
+        }
+        // handle zero
+        elseif($value === 0) {
+            return $blankZero ? '' : 0;
         }
 
         if($decimals < 1) {

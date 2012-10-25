@@ -1,6 +1,7 @@
 <div id="inlineform{UFID}" class="inlineform markForm clearfix">
     <!-- BEGIN mark_type_percent -->
-    <input name="mark[]" class="mark-input percent" type="text" size="3" maxlength="3" value="{MARK}"/><span>&nbsp;%</span>
+    <input name="mark[]" class="combobox mark-input percent" type="text" size="3" value="{MARK}"/>
+    <span>&nbsp;%</span>
     <!-- END mark_type_percent -->
     <!-- BEGIN mark_type_letter -->
     <select id="mark" class="mark-input" name="mark[]">
@@ -10,45 +11,32 @@
     </select>
     <!-- END mark_type_letter -->
     <!-- BEGIN mark_type_raw -->
-    <input name="mark[]" class="mark-input out-of" type="text"  size="4" maxlength="15" value="{MARK}"/><span>&nbsp;/&nbsp;<strong class="validation-limit">{MAX_MARK}</strong></span>
+    <input name="mark[]" class="combobox mark-input out-of" type="text" size="4" maxlength="15" value="{MARK}"/>
+    <span>&nbsp;/&nbsp;<strong class="validation-limit">{MAX_MARK}</strong></span>
     <!-- END mark_type_raw -->
     <!-- BEGIN mark_type_free -->
     <input name="mark[]" class="mark-input free" type="text" size="4" maxlength="15" value="{MARK}"/>
     <!-- END mark_type_free -->
     <!-- BEGIN mark_type_none -->
+    <span class="disabled">N/A</span>
     <!-- END mark_type_none -->
     <!-- BEGIN mark_type_rubric -->
     <div class="rubric-inline">
-        <!-- BEGIN rubric_marked -->
-        <a class="view" id="launchlightbox-{OWNER_ID}" title="View Rubric" href="#">{MARK}&nbsp;/&nbsp;{MAX_MARK}</a>
-        <!-- END rubric_marked -->
-        <!-- BEGIN rubric_unmarked -->
-        <a class="view" title="Mark Rubric" href="/submission/returnWork/{BOX_ID}/{OWNER_ID}">Mark</a>
-        <!-- END rubric_unmarked -->
+        <select id="rubricmark" class="mark-input" name="mark[]">
+            <!-- BEGIN rubric_marked -->
+            <option value="0">{MARK}&nbsp;/&nbsp;{MAX_MARK}</option>
+        <!-- <a class="view" id="launchlightbox-{OWNER_ID}" title="View Rubric" href="#">{MARK}&nbsp;/&nbsp;{MAX_MARK}</a> -->
+            <!-- END rubric_marked -->
+            <!-- BEGIN rubric_unmarked -->
+            <option value="-1">(none)</option>
+        <!-- <a class="view" title="Mark Rubric" href="/submission/returnWork/{BOX_ID}/{OWNER_ID}">Mark</a> -->
+            <!-- END rubric_unmarked -->
+            <!-- BEGIN rubric_grade_drop -->
+            <option value="{RUBRIC_GRADE_VALUE}" {RUBRIC_GRADE_VALUE_SELECTED}>{RUBRIC_GRADE_TEXT}</option>
+            <!-- END rubric_grade_drop -->
+        </select>
+
         <a class="edit" title="Mark Rubric" href="/submission/returnWork/{BOX_ID}/{OWNER_ID}"></a>
-
-        <script type="text/javascript">
-            $j(function () {
-                // Modal for Rubric viewing
-                $j('#rubric-lightbox').dialog({
-                    width: 750,
-                    autoOpen: false,
-                    title: "{OWNER_NAME}",
-                    modal: true,
-                    resizable: false
-                });
-
-                $j('#launchlightbox-{OWNER_ID}').click(function(e) {
-                    e.preventDefault();
-                    $j('#rubric-lightbox').load('/ajax/rubric/{BOX_ID}/{OWNER_ID}', {}, function() {
-                        $j('#rubric-lightbox').dialog('open');
-                    });
-
-                    return false;
-                });
-            });
-        </script>
-
     </div>
     <!-- END mark_type_rubric -->
     <input name="comment[]" id="comment" size="40" title="Comment" value="{COMMENT}" class="comment" type="text">

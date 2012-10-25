@@ -100,8 +100,25 @@ class Marksheet_Rubric extends Marksheet_Abstract {
         else {
             $page->parse('rubric_unmarked_block', 'rubric_unmarked');
             $page->setVar('rubric_marked_block', '');
-
         }
+
+        $grades = array();
+        $dem = DueWork_ErrorMapper::getInstance();
+        $errs = $dem->listDisplayValues();
+        foreach($errs as $e) {
+            $grades[] = array(
+                'grade_id' => $e,
+                'lower_bound' => -1,
+                'caption' => $e,
+            );
+        }
+
+        $page->setVar('rubric_grade_drop_block', '');
+        $page->dropdown('rubric_grade_drop', $grades, $mark['mark'], 'mark_type_rubric', array(
+            'grade_id' => 'RUBRIC_GRADE_VALUE',
+            'caption'  => 'RUBRIC_GRADE_TEXT',
+        ));
+
     }
 
 }

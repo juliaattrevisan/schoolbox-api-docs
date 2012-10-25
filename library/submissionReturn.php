@@ -102,14 +102,29 @@ class SubmissionReturn extends DeprecatedModel {
     }
 
     function getLetterGradeByUser($user_id, $box_id = 0) {
-        $query = "SELECT g.*, r.comment FROM submission_return r, submission_grade g
-                  WHERE r.owner = " . $this->db->smartQuote($user_id) . "
-                  AND r.box_id = " . $this->db->smartQuote($box_id) . "
-                  AND  g.lower_bound <= r.norm_mark
-                  ORDER BY returned DESC, lower_bound DESC
-                  LIMIT 1";
+        $query = "
+            SELECT g.*, r.mark, r.comment FROM submission_return r, submission_grade g
+            WHERE r.owner = " . $this->db->smartQuote($user_id) . "
+            AND r.box_id = " . $this->db->smartQuote($box_id) . "
+            AND (g.lower_bound <= r.norm_mark OR r.norm_mark IS NULL)
+            ORDER BY returned DESC, lower_bound DESC
+            LIMIT 1
+        ";
 
-        return $this->db->getRow($query);
+        $result = $this->db->getRow($query);
+
+        // confirm this isn't an error, and if it is, overwrite the values
+        $dem = DueWork_ErrorMapper::getInstance();
+        $errs = $dem->listDisplayValues();
+
+        if(in_array($result['mark'], $errs)) {
+            $result['grade_id'] = $result['mark'];
+            $result['caption'] = $result['mark'];
+        }
+        unset($result['mark']);
+
+        return $result;
+
     }
 
     /**
@@ -144,7 +159,7 @@ class SubmissionReturn extends DeprecatedModel {
         $marks = array();
         while($row = $this->db->getNextArray()) {
             // based on the nature of the query, the first of each different box_id is the most recent mark
-            if(isset($marks[$row['box_id']])) {
+            if(array_key_exists($row['box_id'], $marks)) {
                 continue;
             }
             $marks[$row['box_id']] = $row['norm_mark'];
@@ -181,15 +196,22 @@ class SubmissionReturn extends DeprecatedModel {
 
         $merged = array_merge($marks, $attempts);
 
+        // clear out all
+        $filtered = array();
+        foreach($merged as $line) {
+            if($line !== null) {
+                $filtered[] = $line;
+            }
+        }
 
-        if(count($merged)) {
-            $avg = array_sum($merged) / count($merged);
-            $merged['avg'] = sprintf('%0.2f', $avg);
+        if(count($filtered)) {
+            $avg = array_sum($filtered) / count($filtered);
+            $filtered['avg'] = sprintf('%0.2f', $avg);
         }
         else {
-            $merged['avg'] = -1;
+            $filtered['avg'] = -1;
         }
-        return $merged;
+        return $filtered;
     }
 
     /**
@@ -199,6 +221,7 @@ class SubmissionReturn extends DeprecatedModel {
      *  - 'High Distinction' becomes 'HD'
      *
      * @param float $percentage
+     * @return string
      */
     function percent2letter($percentage) {
         $letterArray = $this->getLetterGradeByValue($percentage);

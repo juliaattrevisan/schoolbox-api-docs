@@ -36,7 +36,7 @@ if($action == 'delete') {
 // CREATE OR UPDATE
 
 // localise important variables
-$submissionBoxID = isset($_POST['id']) ? $_POST['id'] : 0;
+$submissionBoxID = isset($_POST['id']) && $_POST['id'] ? $_POST['id'] : 0;
 $categoryID = $_POST['category'];
 $markTypeID = $_POST['marktype'];
 $resultSetID = $_POST['resultset'];
@@ -80,6 +80,7 @@ $dueDate = generateDate('due', '23:59:59');
 // if we're not accepting submissions. override the open date to now() and late date to due date
 if(!$acceptSubmissions) {
     $openDate = new Alaress_Date_Format(time(), 'U');
+    $openDate = $openDate->getDatabase();
     $lateDate = $dueDate;
 }
 else {

@@ -1,5 +1,23 @@
 <?php
 
+if(!isset($this)) {
+    require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
+    SitePage::localRedir('/submission/markSheet');
+}
+
+if(is_numeric($this->arg[0])) {
+    $categoryID = $this->arg[0];
+    $performExport = false;
+}
+elseif($this->arg[0] == 'export' && $this->arg[1]) {
+    $categoryID = $this->arg[1];
+    $performExport = true;
+}
+else {
+    error(2); // not enough info submitted ...is there a better error?
+    exit;
+}
+
 $subHandler = new Submission();
 $retHandler = new SubmissionReturn();
 $catHandler = new Category();
@@ -153,7 +171,8 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
     fclose($fp);
 
     exit;
-} else if (is_numeric($this->arg[0])) {
+}
+elseif (is_numeric($this->arg[0])) {
     $this->setFile(TEMPLATE_content, 'submission/markSheet.html');
     $this->setTitle('Class Mark Sheet');
     $this->setTab('submission');
@@ -185,9 +204,19 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 
     if ($category['code'] != "") {
         $this->setVar('CATEGORY', $category['name'] . ' (' . $category['code'] . ')');
-    } else {
+    }
+    // no code
+    else {
         $this->setVar('CATEGORY', $category['name']);
     }
+
+    $dem = DueWork_ErrorMapper::getInstance();
+    $errs = $dem->findAll();
+    $combo = array();
+    foreach($errs as $e) {
+        $combo[] = $e->displayAs;
+    }
+    $this->setVar('COMBO_OPTIONS', json_encode($combo));
 
     $this->setVar('CID', $category['id']);
 
@@ -202,8 +231,9 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
             $user = $userHandler->getBySynergy($studentList[$x]['synergy_id']);
             $studentList[$x]['uid'] = $user['uid'];
         }
-    } else {
-        //Retrieve student list from group membership
+    }
+    // retrieve student list from group membership
+    else {
         $groupHandler = new Group;
         $studentList = $groupHandler->getMemberList($this->arg[0]);
     }
@@ -325,7 +355,7 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
                                 $marksheet = Marksheet_Factory::build($subbox['mark_type_slug']);
                                 $mark = $marksheet->retrieveMark($student['uid'], $sub['id'], false, true);
 
-                                if(isset($mark['norm_mark'])) {
+                                if(isset($mark['norm_mark']) && $mark['norm_mark'] !== null) {
                                     $avgSum += $mark['norm_mark'];
                                     ++$avgCount;
                                 }

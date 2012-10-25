@@ -31,10 +31,20 @@ class Marksheet_Raw extends Marksheet_Abstract {
     public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true) {
         $subReturn = $this->getSubmissionReturnHandler()->getOneByUser($user_id, $box_id);
         $subbox = $this->getSubmissionHandler()->getByID($box_id);
-        $mark = $this->clean_num(($subReturn['norm_mark'] / 100) * $subbox['max_mark'], 4, $blankZero);
+
+        $dem = DueWork_ErrorMapper::getInstance();
+        $errs = $dem->listDisplayValues();
+
+        if(in_array($subReturn['mark'], $errs)) {
+            $rawMark = $subReturn['mark'];
+        }
+        else {
+            $mark = $this->clean_num(($subReturn['norm_mark'] / 100) * $subbox['max_mark'], 0, $blankZero);
+            $rawMark = $asText ? "$mark / {$subbox['max_mark']}" : $mark;
+        }
 
         return array(
-            'mark'      => $asText ? "$mark / {$subbox['max_mark']}" : $mark,
+            'mark'      => $rawMark,
             'max_mark'  => $subbox['max_mark'],
             'norm_mark' => $subReturn['norm_mark'],
             'comment'   => $subReturn['comment']

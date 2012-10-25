@@ -352,7 +352,6 @@ class DueWork_Rubric_Handler {
                             'val'   => $j,
                             'descr' => $rubric->getResult($i, $j)->getDescription()
                         );
-                        print_r($subst);
                         $stmt->execute($subst);
                     }
                 }

@@ -1,11 +1,16 @@
 <?php
 
-$submissionBoxID = $this->arg[0];
+if(!isset($this)) {
+    require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
+    SitePage::localRedir('/submission/viewSubmission');
+}
 
 // check the ID is valid
-if (!is_numeric($submissionBoxID)) {
+if (!is_numeric($this->arg[0])) {
     error(2);
 }
+
+$submissionBoxID = $this->arg[0];
 
 $userHandler = new User();
 $groupHandler = new Group();

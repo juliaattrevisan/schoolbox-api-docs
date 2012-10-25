@@ -27,10 +27,20 @@ class Marksheet_Percent extends Marksheet_Abstract {
 
     public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true) {
         $subReturn = $this->getSubmissionReturnHandler()->getOneByUser($user_id, $box_id);
-        $mark = $this->clean_num($subReturn['norm_mark'], 0, $blankZero);
+
+        $dem = DueWork_ErrorMapper::getInstance();
+        $errs = $dem->listDisplayValues();
+
+        if(in_array($subReturn['mark'], $errs)) {
+            $rawMark = $subReturn['mark'];
+        }
+        else {
+            $mark = $this->clean_num($subReturn['norm_mark'], 0, $blankZero);
+            $rawMark = $asText ? "$mark%" : $mark;
+        }
 
         return array(
-            'mark'      => $asText ? "$mark%" : $mark,
+            'mark'      => $rawMark,
             'norm_mark' => $subReturn['norm_mark'],
             'comment'   => $subReturn['comment']
         );

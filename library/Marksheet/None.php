@@ -30,6 +30,9 @@ class Marksheet_None extends Marksheet_Abstract {
     }
 
     public function outputUI(SitePage $page, $mark) {
-        return;
+        $output = array(
+            'COMMENT'  => $mark['comment']
+        );
+        $page->setVar($output);
     }
 }

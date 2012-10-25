@@ -18,6 +18,7 @@ class Marksheet_Letter extends Marksheet_Abstract {
 
     public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true) {
         $subReturn = $this->getSubmissionReturnHandler()->getLetterGradeByUser($user_id, $box_id);
+
         return array(
             'grade_selected' => $subReturn['grade_id'],
             'norm_mark'      => $subReturn['lower_bound'],
@@ -26,6 +27,9 @@ class Marksheet_Letter extends Marksheet_Abstract {
     }
 
     public function convertRawMark($rawMark, $maxMark = 0, $asText = false, $blankZero = true) {
+        if($rawMark === null) {
+            $rawMark = -1;
+        }
         $grade = $this->getSubmissionReturnHandler()->getLetterGradeByValue($rawMark);
         return $grade['caption'];
     }
@@ -34,7 +38,20 @@ class Marksheet_Letter extends Marksheet_Abstract {
         $subHandler = new Submission();
 
         $page->setVar('grade_drop_block', '');
-        $page->dropdown('grade_drop', $subHandler->getLetterGrades(), $mark['grade_selected'], 'mark_type_letter', array(
+
+        $grades = $subHandler->getLetterGrades();
+
+        $dem = DueWork_ErrorMapper::getInstance();
+        $errs = $dem->listDisplayValues();
+        foreach($errs as $e) {
+            $grades[] = array(
+                'grade_id' => $e,
+                'lower_bound' => -1,
+                'caption' => $e,
+            );
+        }
+
+        $page->dropdown('grade_drop', $grades, $mark['grade_selected'], 'mark_type_letter', array(
             'grade_id' => 'GRADE_VALUE',
             'caption'  => 'GRADE_TEXT',
         ));
