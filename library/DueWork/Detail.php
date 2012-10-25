@@ -56,13 +56,13 @@ class DueWork_Detail {
             return;
         }
 
-
         foreach ($students as $user) {
             $insertion = array();
 
             // accepts submissions
             if ($this->getSubmissionType() != self::ACCEPT_NONE) {
                 $submissions = false;
+
                 // search by internal id
                 if ($user['uid']) {
                     $insertion['user'] = $this->userHandler->getByID($user['uid']);
@@ -127,6 +127,7 @@ class DueWork_Detail {
                 } // try the synergetic id
                 elseif ($user['synergy_id']) {
                     $insertion['user'] = $this->userHandler->getBySynergy($user['synergy_id']);
+                    $user['uid'] = $insertion['user']['uid'];
                 } // ignore this user
                 else {
                     continue;
