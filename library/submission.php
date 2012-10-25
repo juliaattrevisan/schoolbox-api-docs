@@ -107,9 +107,9 @@ class Submission extends DeprecatedModel {
 
         $boxes = array();
 
-        while($row = $this->db->getNextArray()) {
+        while ($row = $this->db->getNextArray()) {
             // if we haven't seen this box yet, create it
-            if(!isset($boxes[$row['id']])) {
+            if (!isset($boxes[$row['id']])) {
                 $boxes[$row['id']] = $row;
                 unset($boxes[$row['id']]['notif_type']);
                 unset($boxes[$row['id']]['notif_notif_enabled']);
@@ -124,14 +124,12 @@ class Submission extends DeprecatedModel {
         $output = array_values($boxes);
 
         // return just the one (dodgy, but it will break too much not to do this)
-        if(count($boxes) == 1) {
+        if (count($boxes) == 1) {
             return $output[0];
-        }
-        // return everything
-        elseif(count($boxes) > 1) {
+        } // return everything
+        elseif (count($boxes) > 1) {
             return $output;
-        }
-        // return failure
+        } // return failure
         else {
             return false;
         }
@@ -755,30 +753,31 @@ class Submission extends DeprecatedModel {
     function getActivityLog($userID, $limit = 5, $categoryList) {
         $implodedCategoryList = implode(',', $categoryList);
 
-        $query = " ( SELECT open_date activity_date, f.name typeName, s.name, s.description, s.category, c.name categoryName, s.fid, 'new' FROM submission_box s, category c, file_type f
+        $query = " ( SELECT open_date activity_date, f.name typeName,s.id box_id, s.name, s.description, s.category, c.name categoryName, s.fid, 'new' FROM submission_box s, category c, file_type f
 					  WHERE s.category = c.id AND f.id = s.type AND open_date < NOW() AND c.id IN (" . implode(
             ',', $categoryList
         ) . ") )
 					UNION
-				    ( SELECT `date`, l.name typeName, u.name, u.description, u.category, e.name categoryName, u.fid, 'overdue' FROM ( submission_box u, category e, file_type l )
+				    ( SELECT `date`, l.name typeName, u.id box_id, u.name, u.description, u.category, e.name categoryName, u.fid, 'overdue' FROM ( submission_box u, category e, file_type l )
 					  LEFT JOIN student_submission d ON d.box_id = u.id AND d.owner = $userID
 					  WHERE d.id IS NOT NULL AND u.category = e.id AND l.id = u.type AND `date` < NOW() AND e.id IN (" . implode(
             ',', $categoryList
         ) . ") )
 					UNION
-					( SELECT `late_date`, i.name typeName, t.name, t.description, t.category, a.name categoryName, t.fid, 'closed' FROM submission_box t, category a, file_type i
+					( SELECT `late_date`, i.name typeName, t.id box_id, t.name, t.description, t.category, a.name categoryName, t.fid, 'closed' FROM submission_box t, category a, file_type i
 					  WHERE t.category = a.id AND i.id = t.type AND `late_date` < NOW() AND a.id IN (" . implode(
             ',', $categoryList
         ) . ") )
 					UNION
-					( SELECT g.`submitted` activity_date, g.realname typeName, m.name, m.description, m.category, n.name categoryName, m.fid, 'submitted'  FROM  student_submission g, submission_box m, category n
+					( SELECT g.`submitted` activity_date, g.realname typeName, m.id box_id, m.name, m.description, m.category, n.name categoryName, m.fid, 'submitted'  FROM  student_submission g, submission_box m, category n
 					  WHERE g.box_id = m.id AND m.category = n.id AND g.owner = $userID )
 					UNION
-				   ( SELECT v.`returned` activity_date, v.mark typeName, w.name, w.description, w.category, x.name categoryName, v.id fid, 'returned'  FROM  submission_return v, submission_box w, category x
+				   ( SELECT v.`returned` activity_date, v.mark typeName, w.id box_id, w.name, w.description, w.category, x.name categoryName, v.id fid, 'returned'  FROM  submission_return v, submission_box w, category x
 					  WHERE v.box_id = w.id AND w.category = x.id AND v.owner = $userID )
                     UNION
 				   (SELECT start AS activity_date,
                         file_type.name AS typeName,
+                        assess.assess_id AS box_id,
                         assess.title AS name,
                         assess.description AS description,
                         assess.category_id,
@@ -794,6 +793,7 @@ class Submission extends DeprecatedModel {
                     UNION
                    (SELECT finish AS activity_date,
                         file_type.name AS typeName,
+                        assess.assess_id AS box_id,
                         assess.title AS name,
                         assess.description AS description,
                         assess.category_id,
@@ -1114,13 +1114,12 @@ class Submission extends DeprecatedModel {
         $involvement = $groupHandler->involvedInCategoryList($uid);
         $catIDs = array();
 
-        if(is_array($involvement) && count($involvement)) {
-            foreach($involvement as $cat) {
+        if (is_array($involvement) && count($involvement)) {
+            foreach ($involvement as $cat) {
                 $catIDs[] = $cat['id'];
             }
-            $conditional = 'IN (' . implode(',',$catIDs) . ')';
-        }
-        else {
+            $conditional = 'IN (' . implode(',', $catIDs) . ')';
+        } else {
             $conditional = '= 0';
         }
 

@@ -6,29 +6,29 @@
 <script type="text/javascript" src="/javascript/flot/jquery.flot.spider.js"></script>
 <script type="text/javascript" src="/javascript/jquery.flot.rubric.js"></script>
 <script language="JavaScript" type="text/javascript">
-	$j(function() {
-		$j('.prettify').prettyFileInput({
-			additionalButtonClasses: 'no-marg float-left',
-			buttonActiveClass: 'tick',
-			defaultText: '<span></span>Choose file',
-			defaultFileSelectedText: '<span></span>File selected'
-		});
+    $j(function () {
+        $j('.prettify').prettyFileInput({
+            additionalButtonClasses:'no-marg float-left',
+            buttonActiveClass:'tick',
+            defaultText:'<span></span>Choose file',
+            defaultFileSelectedText:'<span></span>File selected'
+        });
 
         var x = 5, i = x - 1;
-        $j('#history li:gt('+i+')').hide();
-        if($j('#history li:hidden').length) {
+        $j('#history li:gt(' + i + ')').hide();
+        if ($j('#history li:hidden').length) {
             $j('#history-more').show();
         }
-        $j('#history-more').click(function(e) {
+        $j('#history-more').click(function (e) {
             e.preventDefault();
             i += 2 * x + 1;
-            $j('#history li:lt('+i+')').slideDown(100);
-            if(!$j('#history li:hidden').length) {
+            $j('#history li:lt(' + i + ')').slideDown(100);
+            if (!$j('#history li:hidden').length) {
                 $j('#history-more').hide();
             }
         });
         $j('#closebox').remove();
-	});
+    });
 </script>
 <!-- END custom_head -->
 <div id="submission-history">
@@ -40,20 +40,21 @@
         </h2>
 
         <div>
-        <h3>Due <span class="gradient-{BOX_DUEDATE_GRADIENT}">{BOX_DUEDATE}</span></h3>
-        <p>{BOX_DESCRIPTION}</p>
-        <ul class="file-list">
-            <!-- BEGIN download -->
-            <li>
-                <a href="/send.php?id={FILE_ID}&save=1">
-                    <img width="32" height="32" src="/images/mime/60x60/{FILE_THUMB}"/>
-                    <span class="name">{FILE_NAME}</span> ({FILE_SIZE})
-                    <span class="time">{FILE_DATE}</span>
-                    <span class="icon"></span>
-                </a>
-            </li>
-            <!-- END download -->
-        </ul>
+            <h3>Due <span class="gradient-{BOX_DUEDATE_GRADIENT}">{BOX_DUEDATE}</span></h3>
+
+            <p>{BOX_DESCRIPTION}</p>
+            <ul class="file-list">
+                <!-- BEGIN download -->
+                <li>
+                    <a href="/send.php?id={FILE_ID}&save=1">
+                        <img width="32" height="32" src="/images/mime/60x60/{FILE_THUMB}"/>
+                        <span class="name">{FILE_NAME}</span> ({FILE_SIZE})
+                        <span class="time">{FILE_DATE}</span>
+                        <span class="icon"></span>
+                    </a>
+                </li>
+                <!-- END download -->
+            </ul>
 
             <h3>Subject</h3>
             <ul class="subject-list">
@@ -81,7 +82,9 @@
 
         <div>
             <!-- BEGIN returned_work -->
-            <h3>Returned Mark <span class="returned-mark gradient-{RETURNED_WORK_GRADIENT}">{RETURNED_WORK_MARK}</span></h3>
+            <h3>Returned Mark <span class="returned-mark gradient-{RETURNED_WORK_GRADIENT}">{RETURNED_WORK_MARK}</span>
+            </h3>
+
             <p class="returned-comment"> {RETURNED_WORK_COMMENT}</p>
             <ul class="file-list">
                 <!-- BEGIN return_file -->
@@ -115,34 +118,36 @@
             </ul>
 
             <!-- BEGIN action_resubmit -->
-                <h3>Resubmit work</h3>
-                <form method="post" action="/submission/submitWorkForm.php" class="clearfix" enctype="multipart/form-data">
-                    <p>You may resubmit your work by locating the file on your drive.
-                       Make sure the file is saved and closed before submitting the form.</p>
-                    <input type="file" class="prettify" name="file"/>
-                    <label class="clearfix">
-                        <input type="hidden" name="box_id" value="{BOX_ID}"/>
-                    </label>
-                    <label>
-                        <input type="submit" name="Submit2" value="Submit" class="submit-btn-plain"/>
-                    </label>
-                </form>
+            <h3>Resubmit work</h3>
+
+            <form method="post" action="/submission/submitWorkForm.php" class="clearfix" enctype="multipart/form-data">
+                <p>You may resubmit your work by locating the file on your drive.
+                    Make sure the file is saved and closed before submitting the form.</p>
+                <input type="file" class="prettify" name="file"/>
+                <label class="clearfix">
+                    <input type="hidden" name="box_id" value="{BOX_ID}"/>
+                </label>
+                <label>
+                    <input type="submit" name="Submit2" value="Submit" class="submit-btn-plain"/>
+                </label>
+            </form>
             <!-- END action_resubmit -->
             <!-- END recent_submission -->
             <!-- BEGIN action_submit -->
-                <h3>Submit Work</h3>
-                <form method="post" action="/submission/submitWorkForm.php" class="clearfix" enctype="multipart/form-data">
-                    <p>You must attach your work by locating the file on your drive.
-                       Make sure the file is saved and closed before submitting the form.
-                    </p>
-                    <input type="file" class="prettify" name="file"/>
-                    <label class="clearfix">
-                        <input type="hidden" name="box_id" value="{BOX_ID}"/>
-                    </label>
-                    <label>
-                        <input type="submit" name="Submit2" value="Submit" class="submit-btn-plain"/>
-                    </label>
-                </form>
+            <h3>Submit Work</h3>
+
+            <form method="post" action="/submission/submitWorkForm.php" class="clearfix" enctype="multipart/form-data">
+                <p>You must attach your work by locating the file on your drive.
+                    Make sure the file is saved and closed before submitting the form.
+                </p>
+                <input type="file" class="prettify" name="file"/>
+                <label class="clearfix">
+                    <input type="hidden" name="box_id" value="{BOX_ID}"/>
+                </label>
+                <label>
+                    <input type="submit" name="Submit2" value="Submit" class="submit-btn-plain"/>
+                </label>
+            </form>
             <!-- END action_submit -->
         </div>
     </div>
@@ -154,20 +159,22 @@
             <!-- BEGIN work -->
             <li class="{HISTORY_CLASS} {ROW_COLOR} {HAS_GRADE}">
                 <span class="icon {HISTORY_ICON}"><span></span></span>
-                <span class="avatar"><img width="32" height="32" src="{HISTORY_USER_THUMB}" alt="{HISTORY_USER_NAME}" /></span>
+                <span class="avatar"><img width="32" height="32" src="{HISTORY_USER_THUMB}" alt="{HISTORY_USER_NAME}"/></span>
+
                 <p>
                     <a href="/search/user/{HISTORY_USER_ID}">{HISTORY_USER_NAME}</a>
                     <!-- BEGIN history_submitted -->
-                        submitted <a href="/submission/send.php?{HISTORY_SUBMISSION_FILE_ID}&save=1">{HISTORY_SUBMISSION_FILE_NAME}</a>
+                    submitted <a href="/submission/send.php?{HISTORY_SUBMISSION_FILE_ID}&save=1">{HISTORY_SUBMISSION_FILE_NAME}</a>
                     <!-- END history_submitted -->
                     <!-- BEGIN history_returned -->
-                        returned <a href="/submission/send.php?{HISTORY_RETURN_FILE_ID}&return=1">{HISTORY_RETURN_FILE_NAME}</a>
+                    returned
+                    <a href="/submission/send.php?{HISTORY_RETURN_FILE_ID}&return=1">{HISTORY_RETURN_FILE_NAME}</a>
                     <!-- END history_returned -->
                     <!-- BEGIN history_marked -->
-                        gave a {HISTORY_MARK}<!-- BEGIN history_marked_hascomment -->: <span class="return-comment">{HISTORY_COMMENT}</span><!-- END history_marked_hascomment -->
+                    graded your work.<!-- BEGIN history_marked_hascomment --> <span class="return-comment">"{HISTORY_COMMENT}"</span><!-- END history_marked_hascomment -->
                     <!-- END history_marked -->
                     <!-- BEGIN history_extended -->
-                        extended the due date to {HISTORY_EXTENSION}
+                    extended the due date to {HISTORY_EXTENSION}
                     <!-- END history_extended -->
                     <span class="time">{HISTORY_DATETIME}</span>
                 </p>
@@ -181,7 +188,8 @@
             <!-- END work -->
             <li class="create">
                 <span class="icon pin"><span></span></span>
-                <img class="avatar" width="32" height="32" src="{TEACHER_THUMB}" alt="{TEACHER_NAME}" />
+                <img class="avatar" width="32" height="32" src="{TEACHER_THUMB}" alt="{TEACHER_NAME}"/>
+
                 <p>
                     <a href="/search/user/{TEACHER_ID}">{TEACHER_NAME}</a> posted <a href=".">{BOX_NAME}</a>
                     <span class="time">{BOX_CREATED}</span>

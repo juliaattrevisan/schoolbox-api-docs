@@ -381,30 +381,28 @@ if (is_array($activityLog)) {
     foreach ($activityLog as $activity) {
         $taskName = $activity['name'];
 
-        if ($activity['fid']) {
-            $taskName = '<a href="/send.php?id=' . $activity['fid'] . '&save=1">' . $activity['name'] . '</a>';
-        }
-
         $categoryName = '<a href="/homepage/' . $activity['category'] . '">' . Scrub::text(
             $activity['categoryName']
         ) . '</a>';
 
+        $boxUrl = "<a href=\"/submission/submissionHistory/{$activity['box_id']}/$userID\">$taskName</a>";
+
         switch ($activity['new']) {
             case 'new':
                 $stringDesc = sprintf(
-                    'New %s "%s" added in %s', strtolower($activity['typeName']), $taskName, $categoryName
+                    'New %s %s added in %s', strtolower($activity['typeName']), $boxUrl, $categoryName
                 );
                 break;
 
             case 'overdue':
                 $stringDesc = sprintf(
-                    '<span class="overdue">"%s" in %s is now overdue</span>', $taskName, $categoryName
+                    '<span class="overdue">"%s" in %s is now overdue</span>', $boxUrl, $categoryName
                 );
                 break;
 
             case 'submitted':
                 $stringDesc = sprintf(
-                    '%s submitted work for "%s" in %s', $user['person_label'], $taskName, $categoryName
+                    '%s submitted work for %s in %s', $user['person_label'], $boxUrl, $categoryName
                 );
                 break;
 
@@ -435,13 +433,13 @@ if (is_array($activityLog)) {
                         }
                     }
 
-                    $stringDesc = sprintf('%s for "%s" in %s', $beginning, $taskName, $categoryName);
+                    $stringDesc = sprintf('%s for %s in %s', $beginning, $boxUrl, $categoryName);
 
                 }
                 break;
 
             default:
-                $stringDesc = sprintf('Submissions for "%s" in %s are now closed', $taskName, $categoryName);
+                $stringDesc = sprintf('Submissions for %s in %s are now closed', $boxUrl, $categoryName);
                 break;
         }
 
