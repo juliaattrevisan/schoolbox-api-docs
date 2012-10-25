@@ -6,8 +6,8 @@
  ************************************************************/
 //timetable object that displays the users timetable
 
-if(!isset($this)) {
-    require_once dirname(__FILE__).'/../include/Bootstrap.php';
+if (!isset($this)) {
+    require_once dirname(__FILE__) . '/../include/Bootstrap.php';
     SitePage::localRedir('/timetable/');
 }
 
@@ -29,6 +29,7 @@ $this->setBlock(TEMPLATE_content, "timetable", "timetable_listing");
 $this->setBlock("timetable", "period", "period_listing");
 $this->setBlock("period", "day", "day_listing");
 $this->setBlock('day', 'period_class', 'period_class_block');
+$this->setBlock('day', 'period_class_link', 'period_class_link_block');
 $this->setBlock("timetable", "day_header", "day_header_listing");
 $outputList = false;
 
@@ -96,11 +97,10 @@ if (is_array($outputList)) {
                     // only output header on first run through
                     if ($periodCount == 1) {
                         //output day header
-                        if($dayCount == $dayCurrent) {
+                        if ($dayCount == $dayCurrent) {
                             $this->setVar('TIMETABLE_CLASS', 'dayCurrent');
-                        }
-                        // compensate for the 'off by 1' scenario that's occurring
-                        elseif($dayCount == $dayCurrent + 1) {
+                        } // compensate for the 'off by 1' scenario that's occurring
+                        elseif ($dayCount == $dayCurrent + 1) {
                             $this->setVar('TIMETABLE_CLASS', 'normal');
                         }
                         $this->setVar("DAY_NUMBER", $dayCount);
@@ -166,8 +166,7 @@ if (is_array($outputList)) {
                             $cat = $categoryHandler->getByCode($period['code']);
                             $catCache[$period['code']] = $cat['id'];
                         }
-                    }
-                    else {
+                    } else {
                         $outputPeriod = array(
                             'PERIOD_DESC' => '',
                             'PERIOD_CODE' => '',
@@ -179,21 +178,18 @@ if (is_array($outputList)) {
                     }
 
                     if ($row['periodNumber'] == $periodCurrent['PeriodNumber'] && $row['periodSequence'] == $periodCurrent['PeriodNumberSeq']) {
-                        if($dayCount == $dayCurrent) {
+                        if ($dayCount == $dayCurrent) {
                             // current period, also current day: intersection
                             $outputPeriod['TIMETABLE_CLASS'] = 'dayCurrent current';
-                        }
-                        else {
+                        } else {
                             // current period, not current day: display row
                             $outputPeriod['TIMETABLE_CLASS'] = 'dayCurrent';
                         }
-                    }
-                    else {
-                        if($dayCount == $dayCurrent) {
+                    } else {
+                        if ($dayCount == $dayCurrent) {
                             // not current period, but is current day: display column
                             $outputPeriod['TIMETABLE_CLASS'] = 'dayCurrent';
-                        }
-                        else {
+                        } else {
                             // neither current period nor current day
                             $outputPeriod['TIMETABLE_CLASS'] = 'normal';
                         }
@@ -201,12 +197,16 @@ if (is_array($outputList)) {
 
                     $this->setVar($outputPeriod);
 
-                    if($catCache[$period['code']] && $groupHandler->getPermission($catCache[$period['code']]) >= READ_ACCESS) {
+                    if ($catCache[$period['code']] && $groupHandler->getPermission(
+                        $catCache[$period['code']]
+                    ) >= READ_ACCESS
+                    ) {
                         $this->setVar('PERIOD_URL', '/homepage/' . $period['code']);
-                        $this->parse('period_class_block', 'period_class');
-                    }
-                    else {
+                        $this->parse('period_class_link_block', 'period_class_link');
                         $this->setVar('period_class_block', '');
+                    } else {
+                        $this->setVar('period_class_link_block', '');
+                        $this->parse('period_class_block', 'period_class');
                     }
 
                     $this->parse('day_listing', 'day', true);
