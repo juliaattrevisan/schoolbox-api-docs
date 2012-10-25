@@ -1,6 +1,6 @@
 <?php
 
-if(!isset($this)) {
+if (!isset($this)) {
     require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
     SitePage::localRedir('/submission/viewSubmission');
 }
@@ -20,7 +20,7 @@ $studentSubHandler = new SubmissionStudent();
 $subBox = $submissionHandler->getByID($this->arg[0]);
 
 // if you aren't the owner or a super, you aren't allowed to be here
-if($subBox['owner'] != $_SESSION['id'] && !$groupHandler->isSuperuser()) {
+if ($subBox['owner'] != $_SESSION['id'] && !$groupHandler->isSuperuser()) {
     error(17);
 }
 
@@ -33,31 +33,33 @@ $submissionHandler->logPageView(3, $this->arg[0]);
 if ($subBox['code'] && Cfg::get('external_enable')) {
     $synHandler = new External_Class();
     $studentList = $synHandler->getStudents($subBox['code']);
-}
-// failing that, retrieve student list from group membership
+
+} // failing that, retrieve student list from group membership
 else {
     $studentList = $groupHandler->getMemberList($subBox['category']);
 }
 
-if(!(is_array($studentList) && count($studentList))) {
+
+if (!(is_array($studentList) && count($studentList))) {
     // failed to obtain a list of students from external sources: compile list from submissions
     $studentList = array();
 
     $allSubmissions = $studentSubHandler->getByBoxID($this->arg[0]);
-    if(is_array($allSubmissions) && count($allSubmissions)) {
-        foreach($allSubmissions as $submission) {
+    if (is_array($allSubmissions) && count($allSubmissions)) {
+        foreach ($allSubmissions as $submission) {
             $studentList[] = array(
-                'title'      => $submission['title'],
-                'firstname'  => $submission['firstname'],
-                'lastname'   => $submission['lastname'],
-                'uid'        => $submission['uid'],
+                'title' => $submission['title'],
+                'firstname' => $submission['firstname'],
+                'lastname' => $submission['lastname'],
+                'uid' => $submission['uid'],
                 'synergy_id' => $submission['synergy_id'],
-                'type'       => $submission['type'],
-                'group_id'   => $submission['group_id'],
+                'type' => $submission['type'],
+                'group_id' => $submission['group_id'],
             );
         }
     }
 }
+
 
 $dueWorkDetail = new DueWork_Detail($submissionBoxID);
 $dueWorkDetail->processStudents($studentList);

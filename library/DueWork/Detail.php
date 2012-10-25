@@ -56,6 +56,7 @@ class DueWork_Detail {
             return;
         }
 
+
         foreach ($students as $user) {
             $insertion = array();
 
@@ -69,6 +70,7 @@ class DueWork_Detail {
                 } // try the synergetic id
                 elseif ($user['synergy_id']) {
                     $insertion['user'] = $this->userHandler->getBySynergy($user['synergy_id']);
+                    $user['uid'] = $insertion['user']['uid'];
                     $submissions = $this->submissionStudentHandler->getBySynergyID(
                         $this->dueWork['id'], $user['synergy_id']
                     );
@@ -161,9 +163,6 @@ class DueWork_Detail {
         $page->setBlock(TEMPLATE_content, 'download_btn', 'download_btn_block');
         $page->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
 
-        $page->setBlock(TEMPLATE_content, 'spiel_single_submit', 'spiel_single_submit_block');
-        $page->setBlock(TEMPLATE_content, 'spiel_any_submit', 'spiel_any_submit_block');
-
         $page->setBlock('submission_row', 'download_action', 'download_action_block');
         $page->setBlock('submission_row', 'delete_action', 'delete_action_block');
         $page->setBlock('submission_row', 'plag_enabled', 'plag_enabled_block');
@@ -173,6 +172,7 @@ class DueWork_Detail {
                 'DUEWORK_DESCRIPTION' => Scrub::text($this->dueWork['categoryName']) . " - " . Scrub::text(
                     $this->dueWork['name']
                 ),
+                'DUEWORK_TYPE' => $this->dueWork['typeName'],
                 'DUEWORK_DUEDATE' => $this->getDueDate()->getLong(),
                 'CATEGORY_ID' => $this->dueWork['cid'],
                 'BOX_ID' => $this->dueWork['id'],
@@ -180,21 +180,10 @@ class DueWork_Detail {
             )
         );
 
-        $page->setVar('spiel_single_submit_block', '');
-        $page->setVar('spiel_any_submit_block', '');
-
 
         if (!$data = $this->sitepageData) {
             $page->setVar('student_row_block', 'This subject has no students in it.');
             return;
-        }
-
-
-        switch ($this->getSubmissionType()) {
-            case self::ACCEPT_SINGLE:
-                $page->parse('spiel_single_submit_block', 'spiel_single_submit');
-            case self::ACCEPT_MULTI:
-                $page->parse('spiel_any_submit_block', 'spiel_any_submit');
         }
 
         // process each student
@@ -252,7 +241,8 @@ class DueWork_Detail {
                         }
                     }
 
-                    $plagHref = sprintf("%s%s/submission/plagiarismReport/%s/?zx_h=600px",
+                    $plagHref = sprintf(
+                        "%s%s/submission/plagiarismReport/%s/?zx_h=600px",
                         $page->conType(), $_SERVER['HTTP_HOST'], $submission['plag_doc_id']
                     );
 
@@ -277,12 +267,10 @@ class DueWork_Detail {
                     if (Cfg::get('plagscan_api_key')) {
                         if ($submission['plag_status'] == Plagscan_Document::STATUS_COMPLETE) {
                             $page->parse('plag_enabled_block', 'plag_enabled');
-                        }
-                        // is this even a plagiarism document?
-                        elseif(!$submission['plag_doc_id']) {
+                        } // is this even a plagiarism document?
+                        elseif (!$submission['plag_doc_id']) {
                             $page->setVar('plag_enabled_block', '');
-                        }
-                        // is being checked, but is still pending, so tell the user
+                        } // is being checked, but is still pending, so tell the user
                         else {
                             $page->setVar(
                                 'plag_enabled_block',
@@ -312,8 +300,7 @@ class DueWork_Detail {
         // show or hide download button
         if ($this->dueWork['submissionCount']) {
             $page->parse('download_btn_block', 'download_btn');
-        }
-        else {
+        } else {
             $page->setVar('download_btn_block', '');
         }
 
