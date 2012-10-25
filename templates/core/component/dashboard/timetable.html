@@ -1,31 +1,38 @@
 <div class="box tt">
-	<h2>Timetable <span>&mdash; Day {DAYNUMBER}</span></h2>
-	<table id="timetable" class="timetable">
-		<thead>
-			<tr>
-				<!-- BEGIN timetable_header -->
-				<th scope="col" class="{PERIOD_TH_CLASS}">{PERIOD_NAME}
-                    <span class="time">{PERIOD_START}&ndash;{PERIOD_END}</span></th>
-				<!-- END timetable_header -->
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<!-- BEGIN timetable_period -->
-				<td class="{PERIOD_CLASS}"style="background:{PERIOD_COLOUR};">
-                    <!-- BEGIN period_class -->
-                    <a href="{PERIOD_URL}" class="class">
+    <h2>Timetable <span>- Day {DAYNUMBER}</span></h2>
+    <table id="timetable" class="timetable">
+        <thead>
+        <tr>
+            <!-- BEGIN timetable_header -->
+            <th scope="col" class="{PERIOD_TH_CLASS}">{PERIOD_NAME}
+                <span class="time">{PERIOD_START} - {PERIOD_END}</span></th>
+            <!-- END timetable_header -->
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <!-- BEGIN timetable_period -->
+            <td class="{PERIOD_CLASS}" style="background:{PERIOD_COLOUR};">
+                <!-- BEGIN period_class_link -->
+                <a href="{PERIOD_URL}" class="class">
+                    <span class="title">{PERIOD_DESC}</span>
+                    {PERIOD_CODE}<br/>{PERIOD_ROOM}
+                </a>
+                <!-- END period_class_link -->
+                <!-- BEGIN period_class -->
+                    <span class="class">
                         <span class="title">{PERIOD_DESC}</span>
-                            {PERIOD_CODE}<br/>{PERIOD_ROOM}
-                    </a>
-                    <!-- BEGIN has_attendances -->
-                    <a class="btn modify float-left attendance" href='/modules/attendance/modify/{ATTENDANCE_CLASS_CODE}/{ATTENDANCE_ATTENDANCE_DATE}/{ATTENDANCE_ATTENDANCE_PERIOD}'>
-                        <span></span>Mark Attendance</a>
-                    <!-- END has_attendances -->
-                    <!-- END period_class -->
-				</td>
-				<!-- END timetable_period -->
-			</tr>
-		</tbody>
-	</table>
+                        {PERIOD_CODE}<br/>{PERIOD_ROOM}
+                    </span>
+                <!-- END period_class -->
+                <!-- BEGIN has_attendances -->
+                <a class="btn modify float-left attendance" href='/modules/attendance/modify/{ATTENDANCE_CLASS_CODE}/{ATTENDANCE_ATTENDANCE_DATE}/{ATTENDANCE_ATTENDANCE_PERIOD}'>
+                    <span></span>Mark Attendance</a>
+                <!-- END has_attendances -->
+
+            </td>
+            <!-- END timetable_period -->
+        </tr>
+        </tbody>
+    </table>
 </div>

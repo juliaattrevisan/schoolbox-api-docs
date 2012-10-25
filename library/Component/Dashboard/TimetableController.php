@@ -21,11 +21,12 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
     private $colourList;
 
-    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage, Group $group, External_Timetable $externalTimetable) {
+    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage, Group $group, Category $category, External_Timetable $externalTimetable) {
         parent::__construct($instance, $user, $sitepage);
 
         $this->externalTimetable = $externalTimetable;
         $this->group = $group;
+        $this->category = $category;
     }
 
     public function execute() {
@@ -58,8 +59,9 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
         $this->setBlock($templateHandle, "timetable_period", "timetable_period_block");
         $this->setBlock($templateHandle, "timetable_header", "timetable_header_block");
+        $this->setBlock('timetable_period', 'period_class_link', 'period_class_link_block');
         $this->setBlock('timetable_period', 'period_class', 'period_class_block');
-        $this->setBlock('period_class', 'has_attendances', "has_attendances_block");
+        $this->setBlock('timetable_period', 'has_attendances', "has_attendances_block");
 
         $this->setVar("DAYNUMBER", $this->dayNumber);
 
@@ -80,37 +82,51 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                     if ($period['description']) {
 
-                        //custom stuff for grimwade
-                        if ($_SESSION['campus'][0] == 3 && Cfg::get('site_location') == 'mgs') {
-                            $post = strpos($period['code'], "EN");
+                        $this->setVar('PERIOD_DESC', $period['description']);
+                        $this->setVar('PERIOD_URL', '/homepage/' . urlencode($period['code']));
+                        $this->setVar('PERIOD_CODE', '(' . $period['code'] . ')');
+                        $this->setVar('PERIOD_ROOM', $period['room']);
+                        $this->setVar('PERIOD_URL', '/homepage/' . urlencode($period['code']));
 
-                            if ($post == 2) {
-                                $this->setVar('PERIOD_DESC', 'Homeroom');
-                                $this->setVar('PERIOD_URL', '#');
-                                $this->setVar('PERIOD_CODE', '');
-                                $this->setVar('PERIOD_ROOM', '');
-                            } else {
-                                $this->setVar('PERIOD_DESC', $period['description']);
-                                $this->setVar('PERIOD_URL', '/homepage/'. urlencode($period['code']));
-                                $this->setVar('PERIOD_CODE', '');
-                                $this->setVar('PERIOD_ROOM', $period['room']);
-                            }
 
-                            $this->setVar('PERIOD_ABSENTEES', '');
+                        if ($this->currentPeriod['PeriodNumber'] == $period['periodNumber']) {
+                            $this->setVar(
+                                array(
+                                    'PERIOD_CLASS' => 'current',
+                                    'PERIOD_TH_CLASS' => 'dayCurrent'
+                                )
+                            );
                         } else {
-                            if ($_SESSION['campus'][0] == 2 && Cfg::get('site_location') == 'wenona') {
-                                $this->setVar('PERIOD_DESC', $period['description']);
-                                $this->setVar('PERIOD_URL', '/homepage/'. urlencode($period['code']));
-                                $this->setVar('PERIOD_CODE', '');
-                                $this->setVar('PERIOD_ROOM', $period['room']);
-                                $this->setVar('PERIOD_ABSENTEES', '');
-                            } else {
-                                $this->setVar('PERIOD_DESC', $period['description']);
-                                $this->setVar('PERIOD_URL', '/homepage/'. urlencode($period['code']));
-                                $this->setVar('PERIOD_CODE', '(' . $period['code'] . ')');
-                                $this->setVar('PERIOD_ROOM', $period['room']);
+                            $this->setVar(
+                                array(
+                                    'PERIOD_CLASS' => 'normal',
+                                    'PERIOD_TH_CLASS' => 'normal'
+                                )
+                            );
+                        }
 
+                        /* Handle colour array */
+                        if ($period['code'] && !array_key_exists($period['code'], $subjectColourMap)) {
+                            $subjectColourMap[$period['code']] = $this->colourList[$colourIndex]->hex_colour;
+                            ++$colourIndex;
+                        }
+
+                        $this->setVar('PERIOD_COLOUR', '#' . $subjectColourMap[$period['code']]);
+
+
+                        $this->setVar('period_class_block', '');
+                        $this->setVar('period_class_link_block', '');
+
+                        if ($period['description']) {
+                            $cat = $this->category->getByCode($period['code']);
+
+                            if (is_array($cat) && $this->group->getPermission($cat['cid']) >= READ_ACCESS) {
+                                $this->parse('period_class_link_block', 'period_class_link');
+                            } else {
+                                $this->parse('period_class_block', 'period_class');
                             }
+
+
                         }
 
                         // Link to Attendance Records
@@ -133,13 +149,6 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                             $this->setVar('has_attendances_block', '');
                         }
 
-                        /* Handle colour array */
-                        if ($period['code'] && !array_key_exists($period['code'], $subjectColourMap)) {
-                            $subjectColourMap[$period['code']] = $this->colourList[$colourIndex]->hex_colour;
-                            ++$colourIndex;
-                        }
-
-                        $this->setVar('PERIOD_COLOUR', '#' . $subjectColourMap[$period['code']]);
 
                     } else {
                         $this->setVar(
@@ -153,29 +162,11 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                 'has_attendances_block' => '',
                             )
                         );
-
-
-                    }
-
-                    if($this->currentPeriod['PeriodNumber'] == $period['periodNumber']) {
-                        $this->setVar(array(
-                            'PERIOD_CLASS' => 'current',
-                            'PERIOD_TH_CLASS' => 'dayCurrent'
-                        ));
-                    }
-                    else {
-                        $this->setVar(array(
-                            'PERIOD_CLASS' => 'normal',
-                            'PERIOD_TH_CLASS' => 'normal'
-                        ));
-                    }
-
-                    if($period['description']) {
                         $this->parse('period_class_block', 'period_class');
+
+
                     }
-                    else {
-                        $this->setVar('period_class_block', '');
-                    }
+
 
                     //output period block
                     $this->parse("timetable_header_block", "timetable_header", true);
