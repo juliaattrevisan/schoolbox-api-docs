@@ -15,24 +15,21 @@ class Component_Dashboard_TextboxController extends Component_Dashboard_Controll
     private $hideHeader;
 
     public function execute() {
-        $textBoxID = $this->getConfig('textbox');
+        $textBoxID = $this->getConfig('textboxSearch');
         $this->hideHeader = $this->getConfig('compactMode');
 
-        $tboxHandler = new TextBox();
-        $tbox = $tboxHandler->getByID($textBoxID);
+        if ($textBoxID > 0) {
+            $tboxHandler = new TextBox();
+            $tbox = $tboxHandler->getByID($textBoxID);
 
-        // define the 3 elements here
-        $content = array(
-            'title' => $tbox['heading'],
-            'content' => $tbox['body']
-        );
-
-        // namespace the vars for the template
-        foreach($content as $k => $v) {
-            $this->content['BOX_'.strtoupper($k)] = $v;
+            $this->content = array(
+                'BOX_TITLE' => Scrub::text($tbox['heading']),
+                'BOX_CONTENT' => Scrub::HTML($tbox['body'])
+            );
+            return true;
+        } else {
+            return false;
         }
-
-        return true;
     }
 
     public function renderTemplate($templateHandle) {
@@ -44,10 +41,9 @@ class Component_Dashboard_TextboxController extends Component_Dashboard_Controll
 
         $this->setVar($this->content);
 
-        if($this->hideHeader) {
+        if ($this->hideHeader) {
             $this->setVar('head_block', '');
-        }
-        else {
+        } else {
             $this->parse('head_block', 'head');
         }
 
