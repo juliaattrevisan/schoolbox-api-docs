@@ -60,25 +60,32 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
             'slug'          => 'MARKTYPE_SLUG'
         ));
 
-        if($subbox['mark_type_slug'] == 'rubric') {
-            $rubric = $rubricHandler->getRubric($subbox['id']);
-            $resultSetID = $subbox['rubric_result_set'];
+        // if the rubric creation fails it will throw an exception, in which case just output the empty sets
+        try {
+            if($subbox['mark_type_slug'] == 'rubric') {
+                $rubric = $rubricHandler->getRubric($subbox['id']);
+                $resultSetID = $subbox['rubric_result_set'];
 
-            if($rubricHandler->marksAlreadyGiven($subbox['id'])) {
-                $this->parse('existing_marks_warning_block', 'existing_marks_warning');
+                if($rubricHandler->marksAlreadyGiven($subbox['id'])) {
+                    $this->parse('existing_marks_warning_block', 'existing_marks_warning');
+                }
+
+                $criteria = $rubric->getCriteriaIndices();
+                $results = $rubric->getResults();
+                $resultCount = $rubric->getResultCount();
+
+                outputCriteria($this, $subbox['category'], $criteria, $results, $resultCount);
+                outputResultSets($this, $resultSetID, $resultCount);
             }
-
-            $criteria = $rubric->getCriteriaIndices();
-            $results = $rubric->getResults();
-            $resultCount = $rubric->getResultCount();
-
-            outputCriteria($this, $subbox['category'], $criteria, $results, $resultCount);
-            outputResultSets($this, $resultSetID, $resultCount);
-        }
-        else {
+            else {
+                outputResultSets($this);
+                outputCriteria($this, $subbox['category'], array(), array());
+            }
+        } catch(Exception $e) {
             outputResultSets($this);
             outputCriteria($this, $subbox['category'], array(), array());
         }
+
 
     }
 

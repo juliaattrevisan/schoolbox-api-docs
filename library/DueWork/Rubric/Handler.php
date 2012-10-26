@@ -73,7 +73,7 @@ class DueWork_Rubric_Handler {
         }
 
         // the 2nd dimension of $results must all be the same size: get the min size and truncate if required
-        $size = min($resultCounts);
+        $size = count($resultCounts) ? min($resultCounts) : 0;
 
         foreach($results as $cID => $foo) {
             $results[$cID] = array_slice($results[$cID], 0, $size);

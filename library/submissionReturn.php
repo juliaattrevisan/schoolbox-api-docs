@@ -225,10 +225,17 @@ class SubmissionReturn extends DeprecatedModel {
      */
     function percent2letter($percentage) {
         $letterArray = $this->getLetterGradeByValue($percentage);
+        return $this->shortenGrade($letterArray['caption']);
+    }
 
-        // this function is intended for narrow spaces, so do some string manipulation
-        // if you don't need this, just use self::getLetterGradeByValue()
-        $letter = $letterArray['caption'];
+    /**
+     * This function is intended for narrow spaces, so do some string manipulation.
+     * If you don't need this, just use self::getLetterGradeByValue()
+     *
+     * @param $letter
+     * @return string
+     */
+    function shortenGrade($letter) {
         if(strlen($letter) < 3) {
             return $letter;
         }

@@ -311,7 +311,9 @@ foreach ($categoryList as $category) {
         } elseif ($gradeAvg < $prevAvg) {
             $trendDir = '&#x25BC;';
         }
-        $trendAmt = sprintf('%0.1f', ($gradeAvg - $prevAvg) / $prevAvg * 100) . '%';
+        if($prevAvg != 0) {
+            $trendAmt = sprintf('%0.1f', ($gradeAvg - $prevAvg) / $prevAvg * 100) . '%';
+        }
     }
 
     // calculate grade averages and trending

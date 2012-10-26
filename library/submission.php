@@ -390,6 +390,8 @@ class Submission extends DeprecatedModel {
         $query = "(SELECT
 			b.id AS bid,
 			s.id AS sid,
+            s.realname AS sfname,
+            s.owner as owner,
 		    NULL AS rid,
 			f.id AS fid,
 			UNIX_TIMESTAMP(s.submitted) AS date,
@@ -407,6 +409,8 @@ class Submission extends DeprecatedModel {
 		UNION (SELECT
 			b.id AS bid,
 		    NULL AS sid,
+            NULL AS sfname,
+            b.owner as owner,
 		    r.id AS rid,
 			f.id AS fid,
 			UNIX_TIMESTAMP(r.returned) AS date,

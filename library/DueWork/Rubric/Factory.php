@@ -29,16 +29,14 @@ class DueWork_Rubric_Factory {
         }
         else {
             if(!($size = count($specification))) {
-                echo "ZERO SPECIFICATION\n";
-                return null;
+                throw new Exception("Zero Specification (resultset or criteria list is empty)");
             }
 
             // all types in the array must match
             $keys = array_keys($specification);
             for($i = 1; $i < $size; ++$i) {
                 if(get_class($specification[$keys[$i]][0]) != get_class($specification[$keys[$i - 1]][0])) {
-                    echo "SPECIFICATION ELEMENTS ARE INCONSISTENT\n";
-                    return null;
+                    throw new Exception("Specification elements are inconsistent");
                 }
             }
 
@@ -50,8 +48,7 @@ class DueWork_Rubric_Factory {
                 $rubric = new DueWork_Rubric_DescriptorRubric($submissionBoxID);
             }
             else {
-                echo "SPECIFICATION IS OF UNKNOWN TYPE\n";
-                return null;
+                throw new Exception("Specification is of unknown type");
             }
         }
 

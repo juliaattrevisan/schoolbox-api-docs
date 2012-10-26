@@ -32,6 +32,7 @@ foreach($historyActivityTypes as $historyType) {
 
 $this->setBlock('work', 'work_grade', 'work_grade_block');
 $this->setBlock('history_marked', 'history_marked_hascomment', 'history_marked_hascomment_block');
+$this->setVar('teacher_block', '');
 
 $userHandler = new User;
 $groupHandler = new Group;
@@ -65,17 +66,16 @@ if (!isset($user['uid'])) {
 	error(2);
 }
 
-$categoryList = $groupHandler->involvedInCategoryList($user['uid']);
 
+if($user['synergy_id'] || $user['synergy_id'] === 0) {
+    $categoryList = $groupHandler->involvedInCategoryList($user['uid']);
+}
+
+$categoryIDList = array();
 if (is_array($categoryList)) {
 	foreach($categoryList as $category) {
 		$categoryIDList[] = $category['id'];
 	}
-}
-
-// Catch if not involved in any categories
-if (count($categoryList) == 0) {
-	error(135);
 }
 
 /* Submission Box Details
@@ -83,24 +83,10 @@ if (count($categoryList) == 0) {
 $submissionBox = $submissionHandler->getByID($this->arg[0]);
 $owner = $userHandler->getByID($submissionBox['owner']);
 
-/* If you aren't in the category, deny access
- */
-
-if (!in_array($submissionBox['category'], $categoryIDList)) {
-	error(17);
-}
-
 $externalClassHandler = new External_Class();
 $userHandler = new User();
 $groupHandler = new Group();
 $catHandler = new Category();
-
-$this->setVar(array(
-    'teacher_block' => '',
-    'TEACHER_ID' => '0',
-    'TEACHER_NAME' => 'The teacher',
-    'TEACHER_THUMB' => '/portrait?userId=0&size=square32'
-));
 
 $codes = $catHandler->getCodeForCategory($submissionBox['category']);
 
@@ -180,6 +166,7 @@ else {
 	$this->setVar('download_block', '');
 }
 
+$usersList = array();
 
 if (is_array($allWork) && count($allWork)) {
 	$j = 0;
@@ -188,6 +175,9 @@ if (is_array($allWork) && count($allWork)) {
 	 * returns from $allWork
 	 */
 	$this->setVar('action_submit_block', '');
+
+    $dem = DueWork_ErrorMapper::getInstance();
+    $errors = $dem->listDisplayValues();
 
 	foreach($allWork as $currentWork) {
 
@@ -213,7 +203,7 @@ if (is_array($allWork) && count($allWork)) {
             // work returned
             if($currentWork['filename']) {
                 $historyClass = 'return';
-                $historyIcon = 'up-arrow';
+                $historyIcon = 'submitted';
             }
             // mark given
             else {
@@ -228,7 +218,13 @@ if (is_array($allWork) && count($allWork)) {
         }
 
         $comment = Scrub::Text($currentWork['comment']);
-        $mark = Scrub::Text($currentWork['mark']);
+
+        // perform shortening if the marktype is letter, or if the given grade is an error
+        if($submissionBox['mark_type_slug'] == 'letter' || in_array($currentWork['mark'], $errors)) {
+            $mark = $returnHandler->shortenGrade($currentWork['mark']);
+        } else {
+            $mark = Scrub::Text($currentWork['mark']);
+        }
 
         $gradient = max(0, min(10, (int)($currentWork['norm_mark'] / 10)));
 
@@ -240,28 +236,34 @@ if (is_array($allWork) && count($allWork)) {
 			'HISTORY_MARK' => $mark,
 			'HISTORY_COMMENT' => $comment,
 			'HISTORY_FILE_ID' => $currentWork['fid'],
-			'HISTORY_SUBMIT_FILE_ID' => $currentWork['sid'],
+			'HISTORY_SUBMISSION_FILE_ID' => $currentWork['sid'],
+			'HISTORY_SUBMISSION_FILE_NAME' => $currentWork['sfname'],
 			'HISTORY_RETURN_FILE_ID' => $currentWork['rid'],
 
             'HAS_GRADE' => $mark || $mark === 0 ? 'grade' : '',
 		));
 
+         // if the user in question has not previously been seen, retrieve
+        if(!isset($usersList[$currentWork['owner']])) {
+            $usersList[$currentWork['owner']] = $userHandler->getByID($currentWork['owner']);
+        }
 
+        // [owner] is contextually set to either the student or teacher, depending on whether it's submit or return
+        $this->setVar(array(
+            'HISTORY_USER_ID' => $currentWork['owner'],
+            'HISTORY_USER_NAME' => $userHandler->formatName($usersList[$currentWork['owner']]),
+            'HISTORY_USER_THUMB' => "/portrait?userId={$usersList[$currentWork['owner']]['synergy_id']}&size=square32"
+        ));
 
         // submission by student
         if ($currentWork['sid'] != null) {
 
-            $this->setVar(array(
-                'HISTORY_USER_ID' => $currentWork['owner'],
-                'HISTORY_USER_NAME' => $userHandler->formatName($user),
-                'HISTORY_USER_THUMB' => "/portrait?userId={$user['synergy_id']}&size=square32"
-            ));
-
             // if you are a parent (and only a parent), you can only see plaintext, not a link
-            if($parentOnly)
+            if($parentOnly) {
                 $this->setVar('history_submitted_block', 'Work Submitted');
-            else
+            } else {
                 $this->parse('history_submitted_block', 'history_submitted');
+            }
 
             // Remember most recent submission
             if(!is_numeric($recentSubmission['sid'])) {
@@ -272,18 +274,13 @@ if (is_array($allWork) && count($allWork)) {
         // return by teacher
 		else if ($currentWork['rid'] != null) {
 
-            $this->setVar(array(
-                'HISTORY_USER_ID' => $this->getVar('TEACHER_ID'),
-                'HISTORY_USER_NAME' => $this->getVar('TEACHER_NAME'),
-                'HISTORY_USER_THUMB' => $this->getVar('TEACHER_THUMB')
-            ));
-
             // file return rather than mark
             if($currentWork['filename']) {
-                if($parentOnly)
+                if($parentOnly) {
                     $this->setVar('history_returned_block', 'returned work');
-                else
+                } else {
                     $this->parse('history_returned_block', 'history_returned');
+                }
             }
             else {
                 if($comment) {
@@ -319,9 +316,17 @@ if (is_array($allWork) && count($allWork)) {
 	$this->parse('subject_block', 'subject');
 }
 else {
-    $this->setVar('subject_block','');
+    $this->setVar('work_block','');
+    $this->parse('subject_block', 'subject');
 }
 
+// set the teacher details
+$teacher = $userHandler->getByID($submissionBox['owner']);
+$this->setVar(array(
+    'TEACHER_ID' => $teacher['uid'],
+    'TEACHER_NAME' => $userHandler->formatName($teacher),
+    'TEACHER_THUMB' => "/portrait?userId={$teacher['synergy_id']}&size=square32",
+));
 
 if($recentSubmission['sid']) {
 
@@ -334,34 +339,51 @@ if($recentSubmission['sid']) {
     // override the due gradient because we have submitted
     $this->setVar('BOX_DUEDATE_GRADIENT', 'black');
 
-   if ($recentSubmission['date'] > date('U', strtotime($submissionBox['date']))) {
-       $this->setVar('OVERDUE', 'overdue');
-       $this->parse('overdue_block', 'overdue');
-   }
-   else {
-       $this->setVar('OVERDUE','');
-       $this->setVar('overdue_block', '');
-   }
+    if ($recentSubmission['date'] > date('U', strtotime($submissionBox['date']))) {
+        $this->setVar('OVERDUE', 'overdue');
+        $this->parse('overdue_block', 'overdue');
+    }
+    else {
+        $this->setVar('OVERDUE','');
+        $this->setVar('overdue_block', '');
+    }
 
-   $recentSubmissionDate = new Alaress_Date_Format($recentSubmission['date'], 'U');
+    $recentSubmissionDate = new Alaress_Date_Relative($recentSubmission['date'], 'U');
 
-   $this->setVar(array(
-       'MOST_RECENT_SUBMISSION_DATE' => $recentSubmissionDate->getLong(),
-       'MOST_RECENT_SUBMISSION_FILE_ID' => $recentSubmission['sid'],
-   ));
+    // get filetype details
+    $allowedHandler = new AllowedFile();
+    $ext = substr($recentSubmission['sfname'], strrpos($recentSubmission['sfname'], '.') + 1);
+    $mime = $allowedHandler->getMime($ext);
+    $ftype = $allowedHandler->getByField('mime', $mime);
+
+    // get filesize (isn't cached on db table, unfortunately)
+    $filename = Cfg::get('submission_dir') . '/' . $recentSubmission['sid'] . '.dat';
+    if(file_exists($filename)) {
+        $size = Alaress_Byte_Format::bytesToString(filesize($filename));
+    } else {
+        $size = '0 KB';
+    }
+
+    $this->setVar(array(
+        'MOST_RECENT_SUBMISSION_FILE_NAME' => $recentSubmission['sfname'],
+        'MOST_RECENT_SUBMISSION_FILE_SIZE' => $size,
+        'MOST_RECENT_SUBMISSION_FILE_THUMB' => $ftype['iconFile'],
+        'MOST_RECENT_SUBMISSION_FILE_DATE' => $recentSubmissionDate->getRelativeTime(),
+        'MOST_RECENT_SUBMISSION_FILE_ID' => $recentSubmission['sid'],
+    ));
 
     // only allow a resubmission if the current user is the owner, if the submission box is accepting submissions, and if the current time is between open and late
-   if(
-       $userID == $_SESSION['id'] &&
-       mktime() > strtotime($submissionBox['open_date']) &&
-       mktime() < strtotime($submissionBox['late_date']) &&
-       $submissionBox['accept_submission'] &&
-       $submissionBox['multi_submission']
-   ) {
-       $this->parse('action_resubmit_block', 'action_resubmit');
-   } else {
-       $this->setVar('action_resubmit_block', '');
-   }
+    if(
+        $userID == $_SESSION['id'] &&
+        mktime() > strtotime($submissionBox['open_date']) &&
+        mktime() < strtotime($submissionBox['late_date']) &&
+        $submissionBox['accept_submission'] &&
+        $submissionBox['multi_submission']
+    ) {
+        $this->parse('action_resubmit_block', 'action_resubmit');
+    } else {
+        $this->setVar('action_resubmit_block', '');
+    }
 
     // if parent, hide the "view submitted work" button
     if($parentOnly) {
@@ -370,7 +392,7 @@ if($recentSubmission['sid']) {
         $this->parse('recent_submission_download_block', 'recent_submission_download');
     }
 
-   $this->parse('recent_submission_block', 'recent_submission');
+    $this->parse('recent_submission_block', 'recent_submission');
 }
 else {
 	/* Hide most recent submission
@@ -385,6 +407,13 @@ else {
 	$this->setVar('recent_submission_block', '');
     $this->setVar('action_resubmit_block', '');
 
+}
+
+if (!in_array($submissionBox['category'], $categoryIDList)) {
+    $this->setVar(array(
+        'action_submit_block' => '',
+        'action_resubmit_block' => ''
+    ));
 }
 
 /* Detect returned work
@@ -416,7 +445,5 @@ if($submissionBox['mark_type_slug'] == 'rubric') {
 else {
     $this->setVar('rubric_block', '');
 }
-
-
 
 ?>

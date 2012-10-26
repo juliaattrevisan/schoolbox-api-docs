@@ -327,7 +327,7 @@ elseif (is_numeric($this->arg[0])) {
                             $marks = $attemptHandler->getMarksForAttempt($mostRecentAttempt['attempt_id']);
                             $total = $attemptHandler->getTotalMarks($sub['id'], $mostRecentAttempt['attempt_id']);
 
-                            if($total) {
+                            if($total != 0) {
                                 $avgSum += ($marks / $total) * 100;
                                 ++$avgCount;
                             }
