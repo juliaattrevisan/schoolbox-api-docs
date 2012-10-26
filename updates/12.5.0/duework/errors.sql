@@ -13,6 +13,6 @@ INSERT INTO `submission_errors`
   (`code`, `display_as`, `normalise_as`)
 VALUES
   ('ABS', 'Absent', '0'),
-  ('NA', 'Not Assessed', NULL)
+  ('NA', 'Not Assessed', NULL),
   ('NS', 'Not Submitted', '0')
 ;
