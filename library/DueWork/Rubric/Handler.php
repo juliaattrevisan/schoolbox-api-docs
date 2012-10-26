@@ -86,6 +86,14 @@ class DueWork_Rubric_Handler {
 
     }
 
+    /**
+     * Gets an array representing the marks given by the rubric marking in question
+     *
+     * @param $studentID
+     * @param $boxID
+     * @param int $set
+     * @return array
+     */
     public function getStudentMarks($studentID, $boxID, $set = 0) {
         $stmt = Database::getInstance()->prepare("
             SELECT criterion_id, mark, UNIX_TIMESTAMP(tstamp) AS tstamp
@@ -113,6 +121,45 @@ class DueWork_Rubric_Handler {
             return $marks[$set];
         }
         return array();
+    }
+
+    /**
+     * Gets the total mark for the rubric marking in question
+     *
+     * @param $studentID
+     * @param $boxID
+     * @param int $set
+     * @return array
+     */
+    public function getStudentMarksTotal($studentID, $boxID, $set = 0) {
+
+        // test for a rubric mark
+        $marks = $this->getStudentMarks($studentID, $boxID, $set);
+
+        if(count($marks)) {
+            $result = array(
+                'mark' => array_sum($marks),
+                'max'  => $this->getRubricMaxScore($boxID)
+            );
+        }
+        else {
+            $result = array(
+                'mark' => -1,
+                'max'  => -1
+            );
+        }
+
+        // make sure there's not an error code on the submissionreturn table
+        $dem = DueWork_ErrorMapper::getInstance();
+        $errs = $dem->listDisplayValues();
+
+        $returnHandler = new SubmissionReturn();
+        $rtn = $returnHandler->getOneByUser($studentID, $boxID);
+        if(in_array($rtn['mark'], $errs)) {
+            $result['err'] = $rtn['mark'];
+        }
+
+        return $result;
     }
 
     public function populateResultSet(DueWork_Rubric_ResultSet $resultSet, $resultSetID) {

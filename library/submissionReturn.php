@@ -196,7 +196,7 @@ class SubmissionReturn extends DeprecatedModel {
 
         $merged = array_merge($marks, $attempts);
 
-        // clear out all
+        // clear out all null values
         $filtered = array();
         foreach($merged as $line) {
             if($line !== null) {

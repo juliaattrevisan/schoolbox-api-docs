@@ -11,7 +11,7 @@ class Marksheet_None extends Marksheet_Abstract {
 
     public function normaliseMark($mark, $subbox) {
         return array(
-            'norm_mark' => null,
+            'norm_mark' => 'NULL',
             'mark'      => null
         );
     }

@@ -17,12 +17,13 @@ class Marksheet_Letter extends Marksheet_Abstract {
     }
 
     public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true) {
-        $subReturn = $this->getSubmissionReturnHandler()->getLetterGradeByUser($user_id, $box_id);
+        $return = $this->getSubmissionReturnHandler()->getOneByUser($user_id, $box_id);
+        $grade = $this->getSubmissionReturnHandler()->getLetterGradeByUser($user_id, $box_id);
 
         return array(
-            'grade_selected' => $subReturn['grade_id'],
-            'norm_mark'      => $subReturn['lower_bound'],
-            'comment'        => $subReturn['comment'],
+            'grade_selected' => $grade['grade_id'],
+            'norm_mark' => $return['norm_mark'],
+            'comment' => $return['comment']
         );
     }
 

@@ -8,6 +8,14 @@
  */
 class Marksheet_Rubric extends Marksheet_Abstract {
 
+    private $rubricHandler;
+
+    public function __construct($mark_type) {
+        parent::__construct($mark_type);
+        $this->rubricHandler = new DueWork_Rubric_Handler();
+    }
+
+
     /**
      * Take a UI-formatted mark and normalise it
      *
@@ -49,14 +57,22 @@ class Marksheet_Rubric extends Marksheet_Abstract {
      * @return mixed
      */
     public function retrieveMark($user_id, $box_id, $asText = false, $blankZero = true) {
-        // this was copied from Raw (Total Mark), since that's the aggregate display format
+
+        // we can't trust the submission_box table, because it may have been set to null, so retrieve rubric data
+        $marks = $this->getRubricHandler()->getStudentMarksTotal($user_id, $box_id);
         $subReturn = $this->getSubmissionReturnHandler()->getOneByUser($user_id, $box_id);
+
+/*
         $subbox = $this->getSubmissionHandler()->getByID($box_id);
         $mark = $this->clean_num(($subReturn['norm_mark'] / 100) * $subbox['max_mark'], 4, $blankZero);
+*/
+
         return array(
-            'mark'      => $asText ? "$mark / {$subbox['max_mark']}" : $mark,
-            'max_mark'  => $subbox['max_mark'],
+            'mark'      => $asText ? sprintf('%d / %d', $marks['mark'], $marks['max']) : $marks['mark'],
+            'max_mark'  => $marks['max'],
+//            'norm_mark' => $marks['max'] <= 0 ? 0 : ($marks['mark'] / $marks['max']) * 100,
             'norm_mark' => $subReturn['norm_mark'],
+            'err'       => isset($marks['err']) ? $marks['err'] : -1,
             'comment'   => $subReturn['comment']
         );
     }
@@ -93,13 +109,14 @@ class Marksheet_Rubric extends Marksheet_Abstract {
         );
         $page->setVar($output);
 
-        if($mark['mark'] || $mark['mark'] === 0) {
-            $page->parse('rubric_marked_block', 'rubric_marked');
-            $page->setVar('rubric_unmarked_block', '');
-        }
-        else {
+        // no mark given yet
+        if($mark['max_mark'] == -1) {
             $page->parse('rubric_unmarked_block', 'rubric_unmarked');
             $page->setVar('rubric_marked_block', '');
+        }
+        else {
+            $page->parse('rubric_marked_block', 'rubric_marked');
+            $page->setVar('rubric_unmarked_block', '');
         }
 
         $grades = array();
@@ -108,17 +125,23 @@ class Marksheet_Rubric extends Marksheet_Abstract {
         foreach($errs as $e) {
             $grades[] = array(
                 'grade_id' => $e,
-                'lower_bound' => -1,
                 'caption' => $e,
             );
         }
 
         $page->setVar('rubric_grade_drop_block', '');
-        $page->dropdown('rubric_grade_drop', $grades, $mark['mark'], 'mark_type_rubric', array(
+        $page->dropdown('rubric_grade_drop', $grades, $mark['err'], 'mark_type_rubric', array(
             'grade_id' => 'RUBRIC_GRADE_VALUE',
             'caption'  => 'RUBRIC_GRADE_TEXT',
         ));
 
+    }
+
+    /**
+     * @return DueWork_Rubric_Handler
+     */
+    public function getRubricHandler() {
+        return $this->rubricHandler;
     }
 
 }
