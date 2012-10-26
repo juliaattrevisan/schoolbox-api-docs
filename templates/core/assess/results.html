@@ -1,46 +1,46 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
-$j(function() {
+    $j(function () {
 
-    /*
-    * Add the dark class only to even rows that are visible (skip over the hidden ones)
-    * */
-	$j('tbody tr:visible:even').addClass('dark');
+        /*
+         * Add the dark class only to even rows that are visible (skip over the hidden ones)
+         * */
+        $j('tbody tr:visible:even').addClass('dark');
 
-    /*
-    * Add another, darker class to th
-    *
-    * */
-    $j('tbody tr:hidden').addClass('sub-table-row');
+        /*
+         * Add another, darker class to th
+         *
+         * */
+        $j('tbody tr:hidden').addClass('sub-table-row');
 
 
-    $j('tr.attempt').each(function() {
-        if ($j(this).next().hasClass('expandable') && !$j(this).hasClass('expandable')) {
-            $j(this).addClass('drop-parent').children('td:first-child').prepend('<a href="#" class="submission-dropdown">&#9660;</a>');
-        }
-    })
+        $j('tr.attempt').each(function () {
+            if ($j(this).next().hasClass('expandable') && !$j(this).hasClass('expandable')) {
+                $j(this).addClass('drop-parent').children('td:first-child').prepend('<a href="#" class="submission-dropdown">&#9660;</a>');
+            }
+        })
 
-    $j('.submission-dropdown').live('click', function() {
-        var currentUnicode = $j(this).html().charCodeAt(0);
+        $j('.submission-dropdown').live('click', function () {
+            var currentUnicode = $j(this).html().charCodeAt(0);
 
-        if (currentUnicode == '9660') {
-            $j(this).html('&#9650;')
-        }
-		else {
-            $j(this).html('&#9660;')
-        }
+            if (currentUnicode == '9660') {
+                $j(this).html('&#9650;')
+            }
+            else {
+                $j(this).html('&#9660;')
+            }
 
-        var matchingClasses = $j(this).parents('tr').attr('class').toString().match(/user_(\d+)/);
-        var expandables = '.' + matchingClasses[0] + '.expandable';
+            var matchingClasses = $j(this).parents('tr').attr('class').toString().match(/user_(\d+)/);
+            var expandables = '.' + matchingClasses[0] + '.expandable';
 
-		/* Clear queue and complete animation
-		 */
-        $j(this).parents('tbody').find(expandables).stop(true, true).fadeToggle();
+            /* Clear queue and complete animation
+             */
+            $j(this).parents('tbody').find(expandables).stop(true, true).fadeToggle();
 
-        return false;
+            return false;
+        });
+
     });
-
-});
 </script>
 <style>
     .warning {
@@ -51,6 +51,7 @@ $j(function() {
         background: #fbf9f9;
         border-radius: 3px;
     }
+
     .warning:hover {
         background: #c44;
         color: #fff;
@@ -68,43 +69,46 @@ $j(function() {
         <a href="/assess/modify/{ASSESS_ASSESS_ID}" class="btn modify"><span></span>Modify</a>
         <!-- END modify_btn -->
     </span>
-	<form action='/assess/deleteAttempt' method='post'>
-		<table width="100%">
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th>Last submitted on</th>
-					<th>Time taken</th>
-					<th>Mark</th>
-					<th>Percentage</th>
-					<th>Unmarked Questions</th>
-					<th>Review Test</th>
-					<th>Review Status</th>
-					<th>Delete Attempt</th>
-				</tr>
-			</thead>
-			<tbody>
-				<!-- BEGIN attempt -->
-				<tr class='attempt user_{USER_ID} {ATTEMPT_EXPANDABLE} {ATTEMPT_HIDDEN}'>
-					<td><a href="/search/user/{USER_ID}">{ATTEMPT_NAME}</a></td>
-					<td>{ATTEMPT_FINISH}</td>
-					<td>{ATTEMPT_TIME_TAKEN}</td>
-					<td>{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS}</td>
-					<td>{ATTEMPT_PERCENTAGE}%</td>
-					<td>{ATTEMPT_UNMARKED_RESPONSES}</td>
-					<td>{ATTEMPT_REVIEW_LINK}</td>
-					<td>{ATTEMPT_REVIEW_STATUS}</td>
-                    <td>
+
+    <form action='/assess/deleteAttempt' method='post'>
+        <table width="100%">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Last submitted on</th>
+                <th>Time taken</th>
+                <th>Mark</th>
+                <th>Percentage</th>
+                <th>Unmarked Questions</th>
+                <th>Review Test</th>
+                <th>Review Status</th>
+                <th>Delete Attempt</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- BEGIN attempt -->
+            <tr class='attempt user_{USER_ID} {ATTEMPT_EXPANDABLE} {ATTEMPT_HIDDEN}'>
+                <td>
+                    <img class="student-icon" src="/portrait.php?userId={ATTEMPT_EXTERNAL_ID}&size=square32" alt="{ATTEMPT_FIRSTNAME} {ATTEMPT_SURNAME}"/><a href="/search/user/{USER_ID}">
+                    {ATTEMPT_SURNAME}, {ATTEMPT_FIRSTNAME}</a></td>
+                <td>{ATTEMPT_FINISH}</td>
+                <td>{ATTEMPT_TIME_TAKEN}</td>
+                <td>{ATTEMPT_TOTAL_MARKS} / {ATTEMPT_TOTAL_AVAILABLE_MARKS}</td>
+                <td>{ATTEMPT_PERCENTAGE}%</td>
+                <td>{ATTEMPT_UNMARKED_RESPONSES}</td>
+                <td>{ATTEMPT_REVIEW_LINK}</td>
+                <td>{ATTEMPT_REVIEW_STATUS}</td>
+                <td>
                     <!-- BEGIN attempt_delete -->
-					<input type='checkbox' name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'>
+                    <input type='checkbox' name='attemptIds[]' value='{ATTEMPT_ATTEMPT_ID}'>
                     <!-- END attempt_delete -->
-                    </td>
-				</tr>
-				<!-- END attempt -->
-			</tbody>
-		</table>
+                </td>
+            </tr>
+            <!-- END attempt -->
+            </tbody>
+        </table>
         <!-- BEGIN delete -->
-		<input class='submit-btn-plain' type='submit' value='Delete selected' />
+        <input class='submit-btn-plain' type='submit' value='Delete selected'/>
         <!-- END delete -->
-	</form>
+    </form>
 </div>

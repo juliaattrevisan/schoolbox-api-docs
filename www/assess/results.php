@@ -31,8 +31,7 @@ require_once('../library/user.php');
  *
  * @return void
  */
-function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $page, $currentStudent, $previousAttempt, $readonly)
-{
+function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $page, $currentStudent, $previousAttempt, $readonly) {
     $firstSection = $sectionHandler->getFirst($page->arg[0]);
 
     /* Finish time. Show the datetime when the person clicked Finish.
@@ -82,35 +81,43 @@ function processAttempt($assessHandler, $attemptHandler, $responseHandler, $sect
       */
     $numNotAutomarked = $responseHandler->numNotAutomarked($currentAttempt['attempt_id']);
 
-    $page->setVar(array(
-        'ASSESS_ASSESS_ID' => $page->arg[0],
-        'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
-        'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
-        'USER_ID' => $currentAttempt['user_id'],
-        'ATTEMPT_NAME' => $currentAttempt['lastname'] . ', ' . $currentAttempt['firstname'],
-        'ATTEMPT_FINISH' => $finish,
-        'ATTEMPT_TIME_TAKEN' => $timeTaken,
-        'ATTEMPT_TOTAL_MARKS' => number_format($currentAttempt['totalMarks'], 2),
-        'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
-        'ATTEMPT_PERCENTAGE' => $percentage,
-        'ATTEMPT_REVIEW_STATUS' => $reviewedAt,
-        'ATTEMPT_UNMARKED_RESPONSES' => $numNotAutomarked,
-        'ATTEMPT_REVIEW_LINK' => "<a href=\"/assess/review/{$page->arg[0]}/{$firstSection['section_id']}/{$currentAttempt['attempt_id']}\">Review</a>",
-        'ATTEMPT_DELETE_LINK' => "<a href=\"/assess/deleteAttempt/{$currentAttempt['attempt_id']}\">Delete</a>",
-    ));
+    $page->setVar(
+        array(
+            'ASSESS_ASSESS_ID' => $page->arg[0],
+            'ASSESS_FIRST_SECTION_ID' => $firstSection['section_id'],
+            'ATTEMPT_ATTEMPT_ID' => $currentAttempt['attempt_id'],
+            'USER_ID' => $currentAttempt['user_id'],
+            'ATTEMPT_EXTERNAL_ID' => $currentAttempt['synergy_id'],
+            'ATTEMPT_FIRSTNAME' => $currentAttempt['firstname'],
+            'ATTEMPT_SURNAME' => $currentAttempt['lastname'],
+            'ATTEMPT_FINISH' => $finish,
+            'ATTEMPT_TIME_TAKEN' => $timeTaken,
+            'ATTEMPT_TOTAL_MARKS' => number_format($currentAttempt['totalMarks'], 2),
+            'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
+            'ATTEMPT_PERCENTAGE' => $percentage,
+            'ATTEMPT_REVIEW_STATUS' => $reviewedAt,
+            'ATTEMPT_UNMARKED_RESPONSES' => $numNotAutomarked,
+            'ATTEMPT_REVIEW_LINK' => "<a href=\"/assess/review/{$page->arg[0]}/{$firstSection['section_id']}/{$currentAttempt['attempt_id']}\">Review</a>",
+            'ATTEMPT_DELETE_LINK' => "<a href=\"/assess/deleteAttempt/{$currentAttempt['attempt_id']}\">Delete</a>",
+        )
+    );
 
     /* Expandable attempts
       */
     if (($previousAttempt == null) || ($previousAttempt['user_id'] != $currentAttempt['user_id'])) {
-        $page->setVar(array(
-            'ATTEMPT_EXPANDABLE' => '',
-            'ATTEMPT_HIDDEN' => ''
-        ));
+        $page->setVar(
+            array(
+                'ATTEMPT_EXPANDABLE' => '',
+                'ATTEMPT_HIDDEN' => ''
+            )
+        );
     } else {
-        $page->setVar(array(
-            'ATTEMPT_EXPANDABLE' => 'expandable',
-            'ATTEMPT_HIDDEN' => 'hide'
-        ));
+        $page->setVar(
+            array(
+                'ATTEMPT_EXPANDABLE' => 'expandable',
+                'ATTEMPT_HIDDEN' => 'hide'
+            )
+        );
     }
     if ($readonly) {
         $page->setVar('assess_delete_block', '');
@@ -157,17 +164,21 @@ $this->setBlock(TEMPLATE_content, 'modify_btn', 'modify_btn_block');
 $this->setBlock(TEMPLATE_content, 'delete', 'delete_block');
 $this->setTitle('Results for: ' . $assess['title']);
 
-$this->setVar(array(
-    'ASSESS_ASSESS_ID' => $assess['assess_id'],
-    'ASSESS_TITLE' => Scrub::text($assess['title']),
-    'CID' => $assess['category_id'],
-));
+$this->setVar(
+    array(
+        'ASSESS_ASSESS_ID' => $assess['assess_id'],
+        'ASSESS_TITLE' => Scrub::text($assess['title']),
+        'CID' => $assess['category_id'],
+    )
+);
 
 /**
  * If this assessment finishes in the past, don't allow editing except to superadmins
  */
 $readonly = (!($groupHandler->isSuperuser() || (!(date('Y', strtotime($assess['finish'])) < date('Y')))));
-$this->setVar('ASSESS_ARCHIVED', (date('Y', strtotime($assess['finish'])) < date('Y')) ? '<b class="warning">Archived</b>' : '');
+$this->setVar(
+    'ASSESS_ARCHIVED', (date('Y', strtotime($assess['finish'])) < date('Y')) ? '<b class="warning">Archived</b>' : ''
+);
 
 /* Get a list of students who could have submitted data to this Assess, then
  * join up all the attempts via php, so we can see who has submitted to this
@@ -213,7 +224,10 @@ if (is_array($allStudents) && count($allStudents)) {
                      */
                 if ($currentAttempt['user_id'] == $currentStudent['uid'] || $currentAttempt['synergy_id'] == $currentStudent['synergy_id']) {
                     if ($allAttempts[$i]['processed'] != true) {
-                        processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this, $currentStudent, $previousAttempt, $readonly);
+                        processAttempt(
+                            $assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this,
+                            $currentStudent, $previousAttempt, $readonly
+                        );
 
                         $allAttempts[$i]['processed'] = true;
 
@@ -228,23 +242,27 @@ if (is_array($allStudents) && count($allStudents)) {
         /* If no attempts, just show name
            */
         if (!$numAttempts) {
-            $this->setVar(array(
-                'ASSESS_FIRST_SECTION_ID' => '',
-                'ATTEMPT_ATTEMPT_ID' => '',
-                'USER_ID' => $currentStudent['uid'],
-                'ATTEMPT_NAME' => $currentStudent['firstname'] . ' ' . $currentStudent['lastname'],
-                'ATTEMPT_FINISH' => '',
-                'ATTEMPT_TIME_TAKEN' => '',
-                'ATTEMPT_TOTAL_MARKS' => '',
-                'ATTEMPT_TOTAL_AVAILABLE_MARKS' => '',
-                'ATTEMPT_PERCENTAGE' => '',
-                'ATTEMPT_REVIEW_STATUS' => '',
-                'ATTEMPT_UNMARKED_RESPONSES' => '',
-                'ATTEMPT_REVIEW_LINK' => '',
-                'ATTEMPT_DELETE_LINK' => '',
-                'ATTEMPT_EXPANDABLE' => '',
-                'ATTEMPT_HIDDEN' => '',
-            ));
+            $this->setVar(
+                array(
+                    'ASSESS_FIRST_SECTION_ID' => '',
+                    'ATTEMPT_ATTEMPT_ID' => '',
+                    'USER_ID' => $currentStudent['uid'],
+                    'ATTEMPT_EXTERNAL_ID' => $currentStudent['synergy_id'],
+                    'ATTEMPT_FIRSTNAME' => $currentStudent['firstname'],
+                    'ATTEMPT_SURNAME' => $currentStudent['lastname'],
+                    'ATTEMPT_FINISH' => '',
+                    'ATTEMPT_TIME_TAKEN' => '',
+                    'ATTEMPT_TOTAL_MARKS' => '',
+                    'ATTEMPT_TOTAL_AVAILABLE_MARKS' => '',
+                    'ATTEMPT_PERCENTAGE' => '',
+                    'ATTEMPT_REVIEW_STATUS' => '',
+                    'ATTEMPT_UNMARKED_RESPONSES' => '',
+                    'ATTEMPT_REVIEW_LINK' => '',
+                    'ATTEMPT_DELETE_LINK' => '',
+                    'ATTEMPT_EXPANDABLE' => '',
+                    'ATTEMPT_HIDDEN' => '',
+                )
+            );
 
             $this->parse('attempt_block', 'attempt', true);
             $this->setVar('download_btn_block', '');
@@ -268,7 +286,10 @@ if ($allAttempts && count($allAttempts)) {
 
     foreach ($allAttempts as $currentAttempt) {
         if ($currentAttempt['processed'] != true) {
-            processAttempt($assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this, $userHandler->getByID($currentAttempt['user_id']), $previousAttempt, $readonly);
+            processAttempt(
+                $assessHandler, $attemptHandler, $responseHandler, $sectionHandler, $currentAttempt, $this,
+                $userHandler->getByID($currentAttempt['user_id']), $previousAttempt, $readonly
+            );
 
             $previousAttempt = $currentAttempt;
         }
