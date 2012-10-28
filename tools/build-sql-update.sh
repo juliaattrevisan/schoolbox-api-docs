@@ -33,7 +33,7 @@ echo $sqlupdatestart > "$basedir/updates/sql_updates.sql";
 echo "" >> "$basedir/updates/sql_updates.sql";
 
 # Auto create scripts_list and sql_updates.sql for each folder in updates
-for release in `find $basedir/updates -maxdepth 1 -type d | sort | cut -c$baselength-1000`;
+for release in `find $basedir/updates -maxdepth 1 -type d | sort -V | cut -c$baselength-1000`;
 do
 	echo "Release: $release";
 	echo "- Building scripts_list";
