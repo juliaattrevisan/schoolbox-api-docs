@@ -7337,6 +7337,13 @@ ul.activity-list li .grade span {
   top: 20px;
   right: 20px;
 }
+td.name {
+  padding: 7px 16px 7px 7px;
+}
+td.name img {
+  float: left;
+  margin: 0 7px 0 0;
+}
 .gradient-10 {
   color: #1fbb00;
 }
