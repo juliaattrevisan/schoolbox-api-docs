@@ -13,7 +13,7 @@ CREATE TABLE `rubric_criterion`(
 	`parent_id` int(11) NOT NULL  ,
 	`parent_type` enum('submission','category','curriculum') COLLATE latin1_swedish_ci NOT NULL  DEFAULT 'category' ,
 	PRIMARY KEY (`id`) ,
-	UNIQUE KEY `name`(`name`)
+	UNIQUE INDEX `grouping` (`grouping`, `name`, `parent_id`, `parent_type`)
 ) ENGINE=MyISAM DEFAULT CHARSET='utf8';
 
 CREATE TABLE `rubric_descriptor`(
