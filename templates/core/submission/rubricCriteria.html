@@ -65,10 +65,7 @@ $j(function() {
 
         });
 
-        console.log(data);
-
         $j.post(self.attr('action'), {'crits': data, 'categoryID': catID}, function(data) {
-            console.log(data);
             history.back(-1);
         });
 
@@ -167,39 +164,39 @@ $j(function() {
     </table>
     <input type="hidden" id="categoryID" name="categoryID" value="{CATEGORY_ID}" />
     <input type="submit" value="Save Changes" class="submit-btn-plain"/>
-    <div id="crit-list-lightbox" style="display: none;">
-        <p>Each criterion should be a word or short sentence that describes what is being assessed,
-           organised into logical groupings.
-        </p>
-        <ul>
-            <li class="group">
-                <input disabled="disabled" class="group" type="text" value="Algebra">
-                <ul>
-                    <li class="item">
-                        › <input disabled="disabled" class="item" type="text" value="Factorisation">
-                    </li><li class="item">
-                        › <input disabled="disabled" class="item" type="text" value="Algebraic simplification using index laws">
-                    </li><li class="item">
-                        › <input disabled="disabled" class="item" type="text" value="Fraction operations">
-                    </li><li class="item">
-                        › <input disabled="disabled" class="item" type="text" value="Determining an unknown by substitution">
-                    </li>
-                </ul>
-            </li>
-            <li class="group">
-                <input disabled="disabled" class="group" type="text" value="Linear and non-linear relations">
-                <ul>
-                    <li class="item">
-                        › <input disabled="disabled" class="item" type="text" value="Solving linear equations">
-                    </li><li class="item">
-                        › <input disabled="disabled" class="item" type="text" value="Solving simultaneous equations">
-                    </li><li class="item">
-                        › <input disabled="disabled" class="item" type="text" value="Solving simple quadratic equations">
-                    </li>
-                </ul>
-            </li>
-        </ul>
-        <br/>
-        <a href="#" id="close-lightbox" class="submit-btn-plain">Close</a>
-    </div>
 </form>
+<div id="crit-list-lightbox" style="display: none;">
+    <p>Each criterion should be a word or short sentence that describes what is being assessed,
+        organised into logical groupings.
+    </p>
+    <ul>
+        <li class="group">
+            <input disabled="disabled" class="group" type="text" value="Algebra">
+            <ul>
+            <li class="item">
+                › <input disabled="disabled" class="item" type="text" value="Factorisation">
+            </li><li class="item">
+                › <input disabled="disabled" class="item" type="text" value="Algebraic simplification using index laws">
+            </li><li class="item">
+                › <input disabled="disabled" class="item" type="text" value="Fraction operations">
+            </li><li class="item">
+                › <input disabled="disabled" class="item" type="text" value="Determining an unknown by substitution">
+            </li>
+            </ul>
+        </li>
+        <li class="group">
+            <input disabled="disabled" class="group" type="text" value="Linear and non-linear relations">
+            <ul>
+            <li class="item">
+                › <input disabled="disabled" class="item" type="text" value="Solving linear equations">
+            </li><li class="item">
+                › <input disabled="disabled" class="item" type="text" value="Solving simultaneous equations">
+            </li><li class="item">
+                › <input disabled="disabled" class="item" type="text" value="Solving simple quadratic equations">
+            </li>
+            </ul>
+        </li>
+    </ul>
+    <br/>
+    <a href="#" id="close-lightbox" class="submit-btn-plain">Close</a>
+</div>
