@@ -22,17 +22,19 @@ if(is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
     $user = $userHandler->getByID($this->arg[1]);
     // $subReturn = $subReturnHandler->getOneByUser($this->arg[1], $this->arg[0]);
 
-    //Check user owners box they are returning to
-    if($subbox['owner'] != $_SESSION['id'])
-            error(25);
+    // Check user owners box they are returning to
+    if($subbox['owner'] != $_SESSION['id']) {
+        error(25);
+    }
 
-    $output = array('CATEGORY'  => Scrub::text($subbox['categoryName']),
-                    'ASSNAME'   => Scrub::text($subbox['name']),
-                    'BOX_ID'    => $this->arg[0],
-                    'NAME'      => $userHandler->formatName($user),
-                    'SYN_ID'    => $user['synergy_id'],
-                    'UID'       => $this->arg[1],
-                );
+    $output = array(
+        'CATEGORY'  => Scrub::text($subbox['categoryName']),
+        'ASSNAME'   => Scrub::text($subbox['name']),
+        'BOX_ID'    => $this->arg[0],
+        'NAME'      => $userHandler->formatName($user),
+        'SYN_ID'    => $user['synergy_id'],
+        'UID'       => $this->arg[1],
+    );
 
     $this->setVar($output);
 
@@ -96,10 +98,10 @@ if(is_numeric($this->arg[0]) && is_numeric($this->arg[1]) ) {
 
         $this->setVar(array(
             'rubric_crit_rating_block' => '',
-            'RUBRIC_CRIT_LABEL'        => $data['criteria'][$i]['label'],
-            'RUBRIC_CRIT_NAME'         => preg_replace("#[^a-z0-9\-]#is", '', strtolower($data['criteria'][$i]['label'])),
-            'RUBRIC_CRIT_INDEX'        => $i,
-            'RUBRIC_CRIT_ID'           => $data['criteria'][$i]['id']
+            'RUBRIC_CRIT_LABEL' => $data['criteria'][$i]['label'],
+            'RUBRIC_CRIT_NAME' => preg_replace("#[^a-z0-9\-]#is", '', strtolower($data['criteria'][$i]['label'])),
+            'RUBRIC_CRIT_INDEX' => $i,
+            'RUBRIC_CRIT_ID' => $data['criteria'][$i]['id']
         ));
 
         for($j = 0; $j < count($data['criteria'][0]['results']); ++$j) {

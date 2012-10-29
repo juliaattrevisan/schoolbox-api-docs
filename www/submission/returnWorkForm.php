@@ -82,7 +82,7 @@ elseif(is_array($_POST['rubric']) && count($_POST['rubric'])) {
         $windowAgo = new Alaress_Date_Format(time() - update_window, 'U');
 
         // is this submission within the window?
-        if($returnTime < $windowAgo) {
+        if($returnTime->getUnixTimestamp() < $windowAgo->getUnixTimestamp()) {
             // outside window: create new
             $returnHandler->create($return);
             $rubricHandler->saveMarks($_POST['rubric'], $_POST['uid'], $_POST['box_id']);

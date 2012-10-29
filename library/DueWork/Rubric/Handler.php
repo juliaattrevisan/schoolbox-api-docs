@@ -296,7 +296,15 @@ class DueWork_Rubric_Handler {
     }
 
     public function updateMarks($marks, $studentID, $boxID, $stamp) {
-        $stmt = $this->db->prepare("
+
+        // the ON DUPLICATE clause is equivalent to the nonexistent ON DUPLICATE KEY IGNORE
+        $insertStmt = $this->db->prepare("
+            INSERT INTO rubric_mark (`student_id`,`submission_box_id`, `criterion_id`, `tstamp`, `mark`)
+            VALUES (:sid, :sbid, :cid, :stamp, :mark)
+            ON DUPLICATE KEY UPDATE valid = valid
+        ");
+
+        $updateStmt = $this->db->prepare("
             UPDATE rubric_mark
             SET `mark` = :mark
             WHERE student_id = :sid
@@ -307,13 +315,25 @@ class DueWork_Rubric_Handler {
         ");
 
         foreach($marks as $cID => $mark) {
-            $stmt->execute(array(
+            // attempt an update of a record
+            $updateStmt->execute(array(
                 'mark'  => $mark,
                 'sid'   => $studentID,
                 'sbid'  => $boxID,
                 'cid'   => $cID,
                 'stamp' => $stamp
             ));
+
+            // if nothing happened, we need to insert a record that matches the timestamp in question
+            if(!$updateStmt->rowCount()) {
+                $insertStmt->execute(array(
+                    'sid' => $studentID,
+                    'sbid' => $boxID,
+                    'cid' => $cID,
+                    'stamp' => $stamp,
+                    'mark' => $mark
+                ));
+            }
         }
         return true;
     }
