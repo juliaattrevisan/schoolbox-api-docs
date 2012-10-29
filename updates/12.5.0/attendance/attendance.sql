@@ -9,4 +9,4 @@ INSERT INTO error (id, message) VALUES
 (152, 'You cannot edit attendance records in the future.');
 
 
-INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'external_attendance','1','Enable Online Attendance','Allows teachers to mark attendance online, only compatible with Synergetic.','boolean',NULL,'External DB','true','false','false');
+INSERT INTO `config`(`configID`,`name`,`value`,`title`,`description`,`field`,`options`,`type`,`editable`,`hidden`,`required`) VALUES ( NULL,'external_attendance','0','Enable Online Attendance','Allows teachers to mark attendance online, only compatible with Synergetic.','boolean',NULL,'External DB','true','false','false');
