@@ -381,6 +381,8 @@ if (is_array($activityLog)) {
     $feedItems = array();
 
     foreach ($activityLog as $activity) {
+        $mark = null;
+        $numericMark = null;
         $taskName = $activity['name'];
 
         $categoryName = '<a href="/homepage/' . $activity['category'] . '">' . Scrub::text(
@@ -417,13 +419,13 @@ if (is_array($activityLog)) {
 
                         // legacy support
                         if ($rtn['slug'] == 'free') {
-                            $mark = $rtn['mark'];
+                            $numericMark = $rtn['mark'];
                         } else {
-                            $mark = $marksheet->convertRawMark($rtn['norm_mark'], $rtn['max_mark'], true, false);
+                            $numericMark = $marksheet->convertRawMark($rtn['norm_mark'], $rtn['max_mark'], true, false);
                         }
 
                         $mark = sprintf(
-                            '<a href="/submission/submissionHistory/%s/%s">%s</a>', $rtn['box_id'], $rtn['owner'], $mark
+                            '<a href="/submission/submissionHistory/%s/%s">%s</a>', $rtn['box_id'], $rtn['owner'], $numericMark
                         );
 
                         $beginning = $user['person_label'] . ' received ' . $mark;
@@ -448,10 +450,15 @@ if (is_array($activityLog)) {
         $activityTime = new Alaress_Date_Relative($activity['activity_date']);
         $activityTime->setPrefix('');
 
+        $mark = $returnHandler->shortenGrade($numericMark);
+
         $feedItems[] = array(
             'content' => $stringDesc,
             'time' => $activityTime->getRelativeTime(),
             'icon' => $activity['new'],
+            'grade' => isset($mark) ? $mark : null,
+            'gradeiant' => isset($mark) ? (int)($rtn['norm_mark'] / 10) : '',
+            'has_grade' => isset($mark) ? 'grade' : 'no-grade',
         );
     }
 

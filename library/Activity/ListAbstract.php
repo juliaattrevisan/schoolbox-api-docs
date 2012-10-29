@@ -22,6 +22,7 @@ abstract class Activity_ListAbstract implements Iterator {
     protected $showIcons = true;
     protected $showAvatars = true;
     protected $showTimes = true;
+    protected $showTrends = true;
     protected $asHTML = true;
 
     /**
@@ -86,13 +87,14 @@ abstract class Activity_ListAbstract implements Iterator {
 
         $page->setVar('DARK', ++$this->j % 2 ? '' : 'dark');
 
-        $blocks = array('icon', 'avatar', 'time');
+        $blocks = array('icon', 'avatar', 'time', 'trend');
 
         foreach($blocks as $blk) {
             $page->setBlock('activityTpl', $blk, $blk.'_block');
         }
 
         foreach($data as $key => $value) {
+            // printf("%s =&gt; %s<br/>", 'ACTLIST_' . strtoupper($key), $value);
             $page->setVar('ACTLIST_' . strtoupper($key), $value);
         }
 
@@ -137,6 +139,10 @@ abstract class Activity_ListAbstract implements Iterator {
         return $this->showAvatars ? true : false;
     }
 
+    public function willShowTrends() {
+        return $this->showTrends ? true : false;
+    }
+
     /**
      * @return bool
      */
@@ -168,6 +174,12 @@ abstract class Activity_ListAbstract implements Iterator {
     public function setShowAvatars($bool) {
         if(is_bool($bool)) {
             $this->showAvatars = $bool;
+        }
+    }
+
+    public function setShowTrends($bool) {
+        if(is_bool($bool)) {
+            $this->showTrends = $bool;
         }
     }
 
