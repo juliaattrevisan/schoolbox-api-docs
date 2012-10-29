@@ -7666,11 +7666,20 @@ ul.activity-list {
 }
 
 td.name {
-    padding: 7px 16px 7px 7px;
+    padding: 7px 16px 7px 49px;
+    overflow: none;
     img {
         float: left;
-        margin: 0 7px 0 0;
+        margin: 0 7px 0 -39px;
+
     }
+    .submission-dropdown {
+        margin-left: -71px;
+        margin-top: 7px;
+    }
+}
+.expandable, .drop-parent {
+    td.name { padding-left: 88px; }
 }
 
 // Brace yourself - loop for the index of colorX, outputting a the class 'gradient-index' each time, adding the rules for 'color'

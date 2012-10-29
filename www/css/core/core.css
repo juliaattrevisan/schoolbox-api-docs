@@ -7157,6 +7157,10 @@ ul.activity-list li .time {
 ul.activity-list li.grade {
   padding-right: 65px;
 }
+ul.activity-list li.no-grade .grade {
+  display: none;
+  visibility: hidden;
+}
 ul.activity-list li .grade {
   position: absolute;
   top: 0;
@@ -7338,11 +7342,20 @@ ul.activity-list li .grade span {
   right: 20px;
 }
 td.name {
-  padding: 7px 16px 7px 7px;
+  padding: 7px 16px 7px 49px;
+  overflow: none;
 }
 td.name img {
   float: left;
-  margin: 0 7px 0 0;
+  margin: 0 7px 0 -39px;
+}
+td.name .submission-dropdown {
+  margin-left: -71px;
+  margin-top: 7px;
+}
+.expandable td.name,
+.drop-parent td.name {
+  padding-left: 88px;
 }
 .gradient-10 {
   color: #1fbb00;
@@ -7427,6 +7440,14 @@ td.name img {
   position: absolute;
   bottom: 0;
   right: 8px;
+}
+#returnWorkForm .mark-input {
+  text-align: right;
+  width: 85px;
+  font-size: 12px;
+}
+#returnWorkForm select {
+  float: left;
 }
 /* submission/rubricCriteria */
 #crit-list,
@@ -8153,6 +8174,7 @@ div.colours p {
 }
 .combobox_selector li {
   padding: 2px 3px;
+  margin: 0 !important;
 }
 .combobox_selector li:hover,
 .combobox_selector li.selected {

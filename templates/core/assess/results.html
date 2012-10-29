@@ -89,7 +89,8 @@
             <!-- BEGIN attempt -->
             <tr class='attempt user_{USER_ID} {ATTEMPT_EXPANDABLE} {ATTEMPT_HIDDEN}'>
                 <td class="name">
-                    <img class="student-icon" src="/portrait.php?userId={ATTEMPT_EXTERNAL_ID}&size=square32" alt="{ATTEMPT_FIRSTNAME} {ATTEMPT_SURNAME}"/><a href="/search/user/{USER_ID}">
+                    <a href="/search/user/{USER_ID}" title="{ATTEMPT_FIRSTNAME} {ATTEMPT_SURNAME}">
+                        <img height="32" width="32" class="student-icon" src="/portrait.php?userId={ATTEMPT_EXTERNAL_ID}&size=square32" alt="{ATTEMPT_FIRSTNAME} {ATTEMPT_SURNAME}"/>
                     {ATTEMPT_SURNAME}, {ATTEMPT_FIRSTNAME}</a></td>
                 <td>{ATTEMPT_FINISH}</td>
                 <td>{ATTEMPT_TIME_TAKEN}</td>
