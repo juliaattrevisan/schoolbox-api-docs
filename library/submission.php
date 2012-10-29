@@ -559,8 +559,10 @@ class Submission extends DeprecatedModel {
                     GROUP_CONCAT(co.code) code,
                     category.name AS category_name,
                     DATE_FORMAT(submission_box.date, '%a, %D %b %l:%i%p') AS date,
+                    UNIX_TIMESTAMP(date) AS date_stamp,
                     submission_box.date AS due_date,
                     DATE_FORMAT(submission_box.open_date, '%a, %D %b %l:%i%p') AS open_date,
+                    UNIX_TIMESTAMP(submission_box.open_date) AS open_date_stamp,
                     submission_box.type AS type_id,
                     file_type.name AS type,
                     '' as availability
@@ -584,8 +586,10 @@ class Submission extends DeprecatedModel {
                     '' AS code,
                     category.name AS name,
                     DATE_FORMAT(assess.finish, '%a, %D %b %l:%i%p') AS date,
+                    UNIX_TIMESTAMP(assess.finish) AS date_stamp,
                     assess.finish as due_date,
                     DATE_FORMAT(assess.start, '%a, %D %b %l:%i%p') AS open_date,
+                    UNIX_TIMESTAMP(assess.start) AS open_date_stamp,
                     file_type.id AS type_id,
                     file_type.name AS type,
                     assess.availability

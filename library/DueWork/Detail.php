@@ -168,13 +168,25 @@ class DueWork_Detail {
         $page->setBlock('submission_row', 'delete_action', 'delete_action_block');
         $page->setBlock('submission_row', 'plag_enabled', 'plag_enabled_block');
 
+        $closeADF = $this->getDueDate();
+        $formatDateOnly = 'l, jS F Y';
+        $formatDateTime = $formatDateOnly . ' g:ia';
+
+        if($closeADF->getUsingFormat('Hi') == '2359') {
+            $closeString = $closeADF->getUsingFormat($formatDateOnly);
+        }
+        else {
+            $closeString = $closeADF->getUsingFormat($formatDateTime);
+        }
+
+
         $page->setVar(
             array(
                 'DUEWORK_DESCRIPTION' => Scrub::text($this->dueWork['categoryName']) . " - " . Scrub::text(
                     $this->dueWork['name']
                 ),
                 'DUEWORK_TYPE' => $this->dueWork['typeName'],
-                'DUEWORK_DUEDATE' => $this->getDueDate()->getLong(),
+                'DUEWORK_DUEDATE' => $closeString,
                 'CATEGORY_ID' => $this->dueWork['cid'],
                 'BOX_ID' => $this->dueWork['id'],
                 'SITE_ROOT' => $page->conType() . $_SERVER['HTTP_HOST'],

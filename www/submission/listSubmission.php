@@ -118,14 +118,33 @@ if (is_array($subList)) {
 
         $readonly = !($groupHandler->isSuperuser() || date('Y', strtotime($sub['due_date'])) >= date('Y'));
 
+        $openADF = new Alaress_Date_Format($sub['open_date_stamp'], 'U');
+        $closeADF = new Alaress_Date_Format($sub['date_stamp'], 'U');
+        $formatDateOnly = 'D, jS M Y';
+        $formatDateTime = $formatDateOnly . ' g:ia';
+
+        if($openADF->getUsingFormat('Hi') == '0000') {
+            $openString = $openADF->getUsingFormat($formatDateOnly);
+        }
+        else {
+            $openString = $openADF->getUsingFormat($formatDateTime);
+        }
+
+        if($closeADF->getUsingFormat('Hi') == '2359') {
+            $closeString = $closeADF->getUsingFormat($formatDateOnly);
+        }
+        else {
+            $closeString = $closeADF->getUsingFormat($formatDateTime);
+        }
+
         if (($sub['type_id'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) && ($sub['availability'] == 'assess')) {
             $this->setVar(array(
                 'ASSESS_ASSESS_ID' => $sub['id'],
                 'ASSESS_TITLE' => Scrub::text($sub['name']),
                 'ASSESS_TYPE' => $sub['type'],
                 'JAVAASSDESC' => addslashes(Scrub::text($sub['name'])),
-                'ASSESS_START' => $sub['open_date'],
-                'ASSESS_FINISH' => $sub['date'],
+                'ASSESS_START' => $openString,
+                'ASSESS_FINISH' => $closeString,
                 'ASSESS_ATTEMPTS' => $attemptHandler->numAttempted($sub['id']),
                 'ASSESS_REVIEWED' => $attemptHandler->numReviewed($sub['id']),
                 'ON_OFF' => ++$i % 2 ? 'dark' : '',
@@ -158,8 +177,8 @@ if (is_array($subList)) {
                 'ASSDESC' => Scrub::text($sub['name']),
                 'TYPE' => $sub['type'],
                 'JAVAASSDESC' => addslashes(Scrub::text($sub['name'])),
-                'OPENDATE' => $sub['accept_submission'] ? $sub['open_date'] : '',
-                'DUEDATE' => $sub['date'],
+                'OPENDATE' => $sub['accept_submission'] ? $openString : '',
+                'DUEDATE' => $closeString,
                 'MARKED' => (int)$totals['marked'],
                 'TOTAL' => $totals['total'],
                 'ON_OFF' => ++$i % 2 ? 'dark' : '',
