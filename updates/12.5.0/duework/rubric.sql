@@ -55,3 +55,17 @@ ALTER TABLE `submission_box`
 ALTER TABLE `submission_return`
 	CHANGE `comment` `comment` text  COLLATE utf8_general_ci NULL after `owner`;
 
+-- Insert default rubric resultsets
+INSERT INTO `rubric_result`
+  (`resultset_id`, `value`, `label`)
+VALUES
+  ('1','0','Never'),
+  ('1','1','Sometimes'),
+  ('1','2','Always'),
+  ('2','0','None'),
+  ('2','1','Very Poor'),
+  ('2','2','Poor'),
+  ('2','3','Average'),
+  ('2','4','Good'),
+  ('2','5','Very Good');
+
