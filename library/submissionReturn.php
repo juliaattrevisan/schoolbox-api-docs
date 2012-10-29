@@ -243,8 +243,12 @@ class SubmissionReturn extends DeprecatedModel {
         if(strpos($letter, ' ') === false) {
             $rtn = substr($letter, 0, 2);
         }
+        // contains slash: is x / y, so leave as is
+        elseif(strpos($letter, '/') !== false) {
+            $rtn = $letter;
+        }
+        // spaces: take the first letter from the first 2 words
         else {
-            // take the first letter from the first 2 words
             $words = explode(' ', $letter);
             $rtn = '';
             for($i = 0; $i < 2; ++$i) {
