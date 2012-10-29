@@ -211,12 +211,8 @@ elseif (is_numeric($this->arg[0])) {
     }
 
     $dem = DueWork_ErrorMapper::getInstance();
-    $errs = $dem->findAll();
-    $combo = array();
-    foreach($errs as $e) {
-        $combo[] = $e->displayAs;
-    }
-    $this->setVar('COMBO_OPTIONS', json_encode($combo));
+    $errs = $dem->listDisplayValues();
+    $this->setVar('COMBO_OPTIONS', json_encode($errs));
 
     $this->setVar('CID', $category['id']);
 

@@ -11,18 +11,19 @@ const update_window = 21600; // 60 * 60 * 6 seconds = 6 hours
 
 // Ajax from mark sheet
 if(isset($_POST['uid']) && isset($_POST['comment']) /* && isset($_POST['mark']) */ && isset($_POST['box_id']) && $_POST['markUpdate'] == 'true') {
-
-    // print_r($_POST);
+    $response = array();
 
     if(is_numeric($_POST['uid']) && is_numeric($_POST['box_id'])) {
-        ajaxUpdate($_POST['mark'], $_POST['comment'], $_POST['uid'], $_POST['box_id']);
+        $response[] = ajaxUpdate($_POST['mark'], $_POST['comment'], $_POST['uid'], $_POST['box_id'], true);
     }
     elseif(is_array($_POST['uid']) /* && is_array($_POST['mark'])*/ ) {
         for($i = 0; $i < count($_POST['uid']); ++$i) {
-            ajaxUpdate($_POST['mark'][$i], $_POST['comment'][$i], $_POST['uid'][$i], $_POST['box_id']);
+            $response[] = ajaxUpdate($_POST['mark'][$i], $_POST['comment'][$i], $_POST['uid'][$i], $_POST['box_id'], false);
         }
     }
 
+    header('Content-Type: application/json');
+    die(json_encode($response));
 }
 
 // inline upload of files
@@ -119,12 +120,13 @@ else {
 }
 
 /**
- * @param $mark
- * @param $comment
- * @param $studentID
- * @param $boxID
+ * @param int $mark
+ * @param string $comment
+ * @param int $studentID
+ * @param int $boxID
+ * @param bool $respond
  */
-function ajaxUpdate($givenMark, $comment, $studentID, $boxID) {
+function ajaxUpdate($givenMark, $comment, $studentID, $boxID, $respond) {
 
     // print_r(func_get_args());
 
@@ -208,11 +210,10 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID) {
 
     $marks = $returnHandler->getStudentMarksForCategory($subbox['category'], $studentID);
 
-    header('Content-Type: application/json');
-    die(json_encode(array(
+    return array(
         'id' => $studentID,
         'marks' => $marks
-    )));
+    );
 
     // var_dump($success);
 

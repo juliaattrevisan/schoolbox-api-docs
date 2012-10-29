@@ -143,8 +143,8 @@ $j(function() {
                     submitHandler: function(form) {
                         var notification = $j(form).find('input, select');
                         $j.post('/submission/returnWorkForm.php', $j(form).serialize(), function(data) {
-                            var avg = $j('#avg-'+data.id+' span');
-                            var dataAvg = data.marks.avg;
+                            var avg = $j('#avg-'+data[0].id+' span');
+                            var dataAvg = data[0].marks.avg;
                             if(dataAvg == -1) {
                                 avg.html('&mdash;');
                             }

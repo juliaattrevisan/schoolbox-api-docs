@@ -1,13 +1,15 @@
+function isNumber(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 $j(function() {
     var ajax = true;
     var markSheet =  {
         cellValidation: function() {
             $j('.mark-input, .comment').blur(function(){
                 if ($j(this).val() !== '') {
-
-                    console.log($j(this).closest('.inlineform'));
-
-                    $j(this).closest('.inlineform').submit();
+                    var inlinefrm = $j(this).closest('.inlineform');
+                    inlinefrm.submit();
                 }
             });
 
@@ -15,19 +17,28 @@ $j(function() {
             * Depends on the presence of the jquery.validate library.
             * */
             jQuery.validator.addMethod("percentage", function(value, element) {
+                if(jQuery.combobox.instances.length) {
+                    var valid = jQuery.combobox.instances[0].selector.allSelectOptions;
+                    if(jQuery.inArray(value, valid) != -1) {
+                        return true;
+                    }
+                }
                 return this.optional(element) || (parseFloat(value) <= 100);
             }, "Please enter a value out of 100");
 
             jQuery.validator.addMethod("markLimit", function(value, element) {
-
-                var markLimit = parseInt($j(element).siblings('span').children('.validation-limit').text());
-
-                if (value === '') {
-                    return true;
-                } else {
-                    return parseInt(value) <= markLimit;
+                if(jQuery.combobox.instances.length) {
+                    var valid = jQuery.combobox.instances[0].selector.allSelectOptions;
+                    if(jQuery.inArray(value, valid) != -1) {
+                        return true;
+                    }
                 }
-
+                var markLimit = parseInt($j(element).closest('.inlineform').find('.validation-limit').text());
+                if (value !== "") {
+                    return parseInt(value) <= markLimit;
+                } else {
+                    return true;
+                }
             }, "Amount must be less or equal to mark limit");
 
 
@@ -73,8 +84,27 @@ $j(function() {
             $j('#upload-returns-submit').click(function() {
                 ajax = false;
             });
+        },
+
+        selectGrouping: function() {
+            $j('#content select.mark-input').each(function() {
+                // if the select doesn't contain a separator for the error codes, slot it in
+                var self = $j(this);
+                if (self.find('optgroup').length == 0) {
+                    // find the first error (non-numeric) option
+                    self.children('option').each(function() {
+                        if(!isNumber($j(this).attr('value'))) {
+                            // insert before me
+                            $j(this).before('<optgroup></optgroup>');
+                            // break the loop
+                            return false;
+                        }
+                    });
+                }
+            });
         }
     };
 
     markSheet.cellValidation();
+    markSheet.selectGrouping();
 });

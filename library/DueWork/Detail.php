@@ -181,6 +181,10 @@ class DueWork_Detail {
             )
         );
 
+        $dem = DueWork_ErrorMapper::getInstance();
+        $errs = $dem->listDisplayValues();
+        $page->setVar('COMBO_OPTIONS', json_encode($errs));
+
 
         if (!$data = $this->sitepageData) {
             $page->setVar('student_row_block', 'This subject has no students in it.');
