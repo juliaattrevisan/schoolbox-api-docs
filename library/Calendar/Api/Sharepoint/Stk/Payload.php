@@ -48,16 +48,28 @@ class Calendar_Api_Sharepoint_Stk_Payload {
 										<Value Type="DateTime">%s</Value>
 									</Leq>
 								</And>
-								<And>
-									<Eq>
-										<FieldRef Name="EventDate"/>
-										<Value Type="DateTime">%s</Value>
-									</Eq>
-									<Eq>
-										<FieldRef Name="fAllDayEvent"/>
-										<Value Type="Number">1</Value>
-									</Eq>
-								</And>
+								<Or>
+									<And>
+										<Eq>
+											<FieldRef Name="EventDate"/>
+											<Value Type="DateTime">%s</Value>
+										</Eq>
+										<Eq>
+											<FieldRef Name="fAllDayEvent"/>
+											<Value Type="Number">1</Value>
+										</Eq>
+									</And>
+									<And>
+										<Leq>
+											<FieldRef Name="EventDate"/>
+											<Value Type="DateTime">%s</Value>
+										</Leq>
+										<Geq>
+											<FieldRef Name="EndDate"/>
+											<Value Type="DateTime">%s</Value>
+										</Geq>
+									</And>
+								</Or>
 							</Or>
 							<Eq>
 								<FieldRef Name="_ModerationStatus"/>
@@ -116,7 +128,9 @@ class Calendar_Api_Sharepoint_Stk_Payload {
 			$this->getRowLimit(),
 			$this->getStartDate(),
 			$this->getEndDate(),
-			$this->getStartDate()
+			$this->getStartDate(),
+			$this->getStartDate(),
+			$this->getEndDate()
 		);
 
 		$this->setPayload($payload);
