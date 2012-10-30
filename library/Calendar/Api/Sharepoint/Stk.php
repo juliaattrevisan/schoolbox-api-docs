@@ -71,6 +71,21 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
     /* Contains all event types for reference during mapping */
     private $typeList = array();
 
+	/**
+	 * This maps the attributes for recurring events to a numerican day of the week
+	 * to find out whether to display a recurring event on a particular day
+	 *
+	 * @var array
+	 */
+	private $weekMapping = array(
+		'su' => 0,
+		'mo' => 1,
+		'tu' => 2,
+		'we' => 3,
+		'th' => 4,
+		'fr' => 5,
+		'sa' => 6
+	);
 
     /**
      * Constructor
@@ -104,7 +119,6 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
         $groupHandler = new Group;
 
         $now = new Alaress_Date_Format($currentDay, 'U');
-
         $start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:01', 'y-m-d h:i:s');
         $end = new Alaress_Date_Format($now->getDatabaseDate() . ' 23:59:59', 'y-m-d h:i:s');
 
@@ -141,6 +155,15 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
                 continue;
             }
 
+			/* Find out if this is a recurring event and if it should be displayed
+			 * on the currently viewed day
+			 */
+			if (!$this->isRecurringToday($now, $attribs)) {
+				continue;
+			}
+
+			/* An event is meant to display today so let's add it to the stack
+			 */
             $event = new Calendar_Event_Type_Day();
             $event->setAuthorName('');
             $event->setAuthorId('');
@@ -159,7 +182,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
             $event->setAttendance('');
 
 			/* Simulate all-day event if appropriate since Sharepoint thinks the end of the
-			 * day is at 11:59pm, whereas Schoolbox makes it 12:00am
+			 * day is at 11:59pm, whereas Schoolbox makes it 12:00am. "Mangle it", he said.
 			 */
 			$event->setStartTime(new Alaress_Date_Format((string)$attribs->ows_EventDate, 'y-m-d h:i:s'));
 
@@ -193,7 +216,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
         $collection = new Calendar_Event_Collection();
 
         /* Fill in your query result set here and populate $collection
-           */
+         */
 
         return $collection;
     }
@@ -209,10 +232,59 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
         $collection = new Calendar_Event_Collection();
 
         /* Fill in your query result set here and populate $collection
-           */
+         */
 
         return $collection;
     }
+
+	/**
+	 * Figure out if a particular event should recur today and thus be
+	 * displayed in the calendar
+	 *
+	 * @param $now
+	 * @param $attribs
+	 * @return bool
+	 */
+	private function isRecurringToday($now, $attribs) {
+		if ($attribs->ows_RecurrenceData) {
+			$currentDayOfWeek = $now->getUsingFormat('w');
+
+			$recurrenceXml = simplexml_load_string((string)$attribs->ows_RecurrenceData, 'SimpleXMLElement', LIBXML_NOCDATA);
+
+			/* If it repeats weekly
+			 */
+			if ($recurrenceXml->rule->repeat->weekly) {
+				$recurrenceAttribs = $recurrenceXml->rule->repeat->weekly->attributes();
+
+				/* Find out this stupid attribute rubbish to figure out
+				 * when an event recurs
+				 */
+				foreach($recurrenceAttribs as $key => $value) {
+					$mapping = $this->getWeekMapping();
+
+					if (array_key_exists($key, $mapping)) {
+						$index = $mapping[$key];
+					}
+
+					break;
+				}
+
+				/* Forget this loop if the recurring event is not meant to
+				 * display today
+				 */
+				if ($currentDayOfWeek != $index) {
+					return false;
+				}
+
+				return true;
+			}
+
+			/* TODO: If it repeats daily
+			 */
+		}
+
+		return true;
+	}
 
     /**
      * Get the campus id from its initials as provided by Sharepoint.
@@ -229,7 +301,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
             $allCampuses = $this->getCampusList();
 
             /* Remove 'All'
-                */
+             */
             array_pop($allCampuses);
 
             return implode(',', $allCampuses);
@@ -323,11 +395,13 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
         return $this->calendarHandler;
     }
 
-    /**
-     * Set event type list
-     *
-     * @array $eventTypes
-     */
+	/**
+	 * Set event type list
+	 *
+	 * @array $eventTypes
+	 *
+	 * @param $eventTypes
+	 */
     public function setEventTypes($eventTypes) {
         $this->typeList = $eventTypes;
     }
@@ -363,4 +437,13 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
     private function getCampusList() {
         return $this->campusList;
     }
+
+	/**
+	 * Get week mapping
+	 *
+	 * @return array
+	 */
+	private function getWeekMapping() {
+		return $this->weekMapping;
+	}
 }

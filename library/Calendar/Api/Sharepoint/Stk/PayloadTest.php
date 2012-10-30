@@ -88,12 +88,16 @@ class Calendar_Api_Sharepoint_Stk_PayloadTest {
 					<FieldRef Name="EventDate"/>
 					<FieldRef Name="EndDate"/>
 					<FieldRef Name="Created"/>
+					<FieldRef Name="RecurrenceID"/>
+					<FieldRef Name="RecurrenceData"/>
 				</ViewFields>
 			</viewFields>
 			<queryOptions>
 				<QueryOptions xmlns="">
-				   <IncludeMandatoryColumns>FALSE</IncludeMandatoryColumns>
-				   <ViewAttributes Scope="Recursive" />
+					<ExpandRecurrence>TRUE</ExpandRecurrence>
+					<IncludeMandatoryColumns>FALSE</IncludeMandatoryColumns>
+					<ViewAttributes Scope="RecursiveAll" />
+					<RecurrencePatternXMLVersion>v3</RecurrencePatternXMLVersion>
 				</QueryOptions>
 			</queryOptions>
 		</GetListItems>

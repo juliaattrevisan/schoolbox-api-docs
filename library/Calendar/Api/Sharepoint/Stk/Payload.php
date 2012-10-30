@@ -77,6 +77,9 @@ class Calendar_Api_Sharepoint_Stk_Payload {
 							</Eq>
 						</And>
 					</Where>
+					<OrderBy>
+						<FieldRef Name="EventDate"/>
+					</OrderBy>
 				</Query>
 			</query>
 			<viewFields>
@@ -88,12 +91,15 @@ class Calendar_Api_Sharepoint_Stk_Payload {
 					<FieldRef Name="EventDate"/>
 					<FieldRef Name="EndDate"/>
 					<FieldRef Name="Created"/>
+					<FieldRef Name="RecurrenceData"/>
 				</ViewFields>
 			</viewFields>
 			<queryOptions>
 				<QueryOptions xmlns="">
-				   <IncludeMandatoryColumns>FALSE</IncludeMandatoryColumns>
-				   <ViewAttributes Scope="Recursive" />
+					<ExpandRecurrence>TRUE</ExpandRecurrence>
+					<IncludeMandatoryColumns>FALSE</IncludeMandatoryColumns>
+					<ViewAttributes Scope="RecursiveAll" />
+					<RecurrencePatternXMLVersion>v3</RecurrencePatternXMLVersion>
 				</QueryOptions>
 			</queryOptions>
 		</GetListItems>

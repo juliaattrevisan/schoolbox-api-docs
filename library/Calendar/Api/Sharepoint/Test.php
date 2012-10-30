@@ -20,13 +20,13 @@ class Calendar_Api_Sharepoint_Test extends Calendar_Api_Sharepoint_Stk {
 		$now = new Alaress_Date_Format($currentDay, 'U');
 
 		$start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d h:i:s');
-		$end = new Alaress_Date_Format('2012-10-22' . ' 23:59:59', 'y-m-d h:i:s');
+		$end = new Alaress_Date_Format($now->getDatabaseDate() . ' 23:59:59', 'y-m-d h:i:s');
 
 		echo $start->getDatabase();
-		echo "\n";
+		echo "<BR>\n";
 		echo $end->getDatabase();
-		echo "\n";
-		echo "\n";
+		echo "<BR>\n";
+		echo "<BR>\n";
 
 		$startDate = $start->getDatabase();
 		$endDate = $end->getDatabase();
@@ -44,8 +44,8 @@ class Calendar_Api_Sharepoint_Test extends Calendar_Api_Sharepoint_Stk {
 		foreach($allEvents->rsdata->zrow as $currentEvent) {
 			$attribs = $currentEvent->attributes();
 
-			if ((string)$attribs->ows_fAllDayEvent == 1) {
-				echo "All Day";
+			if ($attribs->ows_RecurrenceData) {
+				echo "IS recurring";
 			}
 
 			print_r($currentEvent);
