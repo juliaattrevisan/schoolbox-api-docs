@@ -7355,7 +7355,7 @@ td.name .submission-dropdown {
 }
 .expandable td.name,
 .drop-parent td.name {
-  padding-left: 88px;
+  padding: 7px 16px 7px 88px;
 }
 .gradient-10 {
   color: #1fbb00;
