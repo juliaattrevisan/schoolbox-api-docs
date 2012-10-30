@@ -267,10 +267,12 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 
     /**
      * Get soap
+	 *
+	 * This is actually set to protected for test class inheritance
      *
      * @return null
      */
-    private function getSoap() {
+    protected function getSoap() {
         return $this->soap;
     }
 

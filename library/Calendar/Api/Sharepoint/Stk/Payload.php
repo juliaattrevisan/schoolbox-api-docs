@@ -37,16 +37,28 @@ class Calendar_Api_Sharepoint_Stk_Payload {
 				<Query xmlns="">
 					<Where>
 						<And>
-							<And>
-								<Geq>
-									<FieldRef Name="EventDate"/>
-									<Value Type="DateTime">%s</Value>
-								</Geq>
-								<Leq>
-									<FieldRef Name="EndDate"/>
-									<Value Type="DateTime">%s</Value>
-								</Leq>
-							</And>
+							<Or>
+								<And>
+									<Geq>
+										<FieldRef Name="EventDate"/>
+										<Value Type="DateTime">%s</Value>
+									</Geq>
+									<Leq>
+										<FieldRef Name="EndDate"/>
+										<Value Type="DateTime">%s</Value>
+									</Leq>
+								</And>
+								<And>
+									<Eq>
+										<FieldRef Name="EventDate"/>
+										<Value Type="DateTime">%s</Value>
+									</Eq>
+									<Eq>
+										<FieldRef Name="fAllDayEvent"/>
+										<Value Type="Number">1</Value>
+									</Eq>
+								</And>
+							</Or>
 							<Eq>
 								<FieldRef Name="_ModerationStatus"/>
 								<Value Type="Number">0</Value>
@@ -103,7 +115,8 @@ class Calendar_Api_Sharepoint_Stk_Payload {
 			$this->getListName(),
 			$this->getRowLimit(),
 			$this->getStartDate(),
-			$this->getEndDate()
+			$this->getEndDate(),
+			$this->getStartDate()
 		);
 
 		$this->setPayload($payload);
