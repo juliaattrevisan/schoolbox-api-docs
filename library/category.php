@@ -20,12 +20,16 @@ class Category extends DeprecatedModel {
      * @param  $name
      * @return array|bool
      */
-    public function searchByName($name) {
+    public function searchByName($name, $parent = false) {
         $query = "SELECT category.*
 				  FROM category
 				  LEFT JOIN categoryCode ON category.id = categoryCode.categoryID
-				  WHERE category.name LIKE \"%{$name}%\"
-				  OR categoryCode.code LIKE \"%{$name}%\"";
+				  WHERE (category.name LIKE \"%{$name}%\"
+				  OR categoryCode.code LIKE \"%{$name}%\")";
+
+        if($parent != false && is_numeric($parent)) {
+            $query .= " AND parent = '$parent'";
+        }
 
         return $this->db->getAll($query);
     }

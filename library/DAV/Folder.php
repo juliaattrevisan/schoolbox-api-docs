@@ -141,10 +141,17 @@ class DAV_Folder extends Sabre_DAV_Collection {
         else {
 
             $folderList = explode('/',$path);
-            $this->folderName = array_pop($folderList);
+            array_shift($folderList);
+            $parent = 0;
+            foreach($folderList as $folderName) {
 
-            $folder =  $this->getFolderHandler()->searchByName($this->folderName);
+                $folder =  $this->getFolderHandler()->searchByName($folderName, $parent);
+                $parent = $folder[0]['id'];
+            }
+
+            $this->folderName = $folderName;
             $this->folder = $folder[0];
+
             if(!is_numeric($this->folderID))
                 $this->folderID = 0;
       }
