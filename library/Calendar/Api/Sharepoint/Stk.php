@@ -141,13 +141,10 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
                 continue;
             }
 
-
             $event = new Calendar_Event_Type_Day();
             $event->setAuthorName('');
             $event->setAuthorId('');
             $event->setEventId(1);
-            $event->setStartTime(new Alaress_Date_Format((string)$attribs->ows_EventDate, 'y-m-d h:i:s'));
-            $event->setEndTime(new Alaress_Date_Format((string)$attribs->ows_EndDate, 'y-m-d h:i:s'));
             $event->setType($eventTypeID);
             $event->setNote((string)$attribs->ows_Title);
             $event->setLocation((string)$attribs->ows_School);
@@ -161,8 +158,22 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
             $event->setCategoryName('');
             $event->setAttendance('');
 
+			/* Simulate all-day event if appropriate since Sharepoint thinks the end of the
+			 * day is at 11:59pm, whereas Schoolbox makes it 12:00am
+			 */
+			$event->setStartTime(new Alaress_Date_Format((string)$attribs->ows_EventDate, 'y-m-d h:i:s'));
+
+			if ((string)$attribs->ows_fAllDayEvent == 1) {
+				$endDate = substr((string)$attribs->ows_EndDate, 0, 10);
+
+				$event->setEndTime(new Alaress_Date_Format($endDate . ' 00:00:00', 'y-m-d h:i:s'));
+			}
+			else {
+				$event->setEndTime(new Alaress_Date_Format((string)$attribs->ows_EndDate, 'y-m-d h:i:s'));
+			}
+
             /* Prevent modify link
-                */
+             */
             $event->setIsEditable(false);
 
             $collection->add($event);

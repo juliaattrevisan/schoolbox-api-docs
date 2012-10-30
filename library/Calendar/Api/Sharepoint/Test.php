@@ -39,7 +39,20 @@ class Calendar_Api_Sharepoint_Test extends Calendar_Api_Sharepoint_Stk {
 
 		/* See what happened
 		 */
-		print_r($allEvents);
+		echo "<PRE>";
+
+		foreach($allEvents->rsdata->zrow as $currentEvent) {
+			$attribs = $currentEvent->attributes();
+
+			if ((string)$attribs->ows_fAllDayEvent == 1) {
+				echo "All Day";
+			}
+
+			print_r($currentEvent);
+
+		}
+
+
 		die();
 	}
 }
