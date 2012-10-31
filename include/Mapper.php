@@ -188,7 +188,7 @@ abstract class Mapper {
     /**
      * @brief Saves an object to the database. Updates or inserts
      * @param $object
-     * @return Bool
+     * @return array<int>
      */
     public function save($object) {
         if (is_subclass_of($object, 'Model')) {
@@ -203,29 +203,29 @@ abstract class Mapper {
         $plcString = $this->getPlaceholderString();
         $updString = $this->getUpdateString();
 
-        $statement = $this->database->prepare(
-            "
+        $statement = $this->database->prepare("
             INSERT INTO `$tbl` ($colString)
             VALUES ($plcString)
             ON DUPLICATE KEY UPDATE $updString;
-        "
-        );
+        ");
         $this->database->beginTransaction();
+
+        $affectedIDs = array();
 
         foreach ($collection as $model) {
             foreach ($this->map as $map) {
                 $propertyName = $map['property'];
                 $columnName = $map['column'];
-
                 $statement->bindParam(":$columnName", $model->$propertyName);
             }
-
             if ($statement->execute()) {
                 $identifier = $this->identifier['property'];
                 if (!$model->$identifier) {
                     $model->$identifier = $this->database->lastInsertId();
                 }
-            } else {
+                $affectedIDs[] = $model->$identifier;
+            }
+            else {
                 $this->database->rollBack();
                 return false;
             }
@@ -233,7 +233,7 @@ abstract class Mapper {
 
         $this->database->commit();
 
-        return true;
+        return $affectedIDs;
     }
 
     public function delete($object) {
