@@ -174,7 +174,7 @@ class Mediator {
                 // response creation failed, so we need to create one and populate it with failure
                 $obj = new Response_HTTP($this->getResponseCode());
                 $obj->setError('code', $this->getResponseCode());
-                $obj->setError("Failed to call method", $e->getErrorMessage());
+                $obj->setError("Failed to call method `{$this->getMethodName()}`", $e->getErrorMessage());
                 $obj->setError('Backtrace', $e->getTraceAsString());
 
                 $this->setResponse($obj);
@@ -185,7 +185,7 @@ class Mediator {
                 // response creation failed, so we need to create one and populate it with failure
                 $obj = new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
                 $obj->setError('code', '404');
-                $obj->setError("Failed to call method", $e);
+                $obj->setError("Failed to call method `{$this->getMethodName()}`", $e);
                 $this->setResponse($obj);
             }
         }
@@ -196,7 +196,7 @@ class Mediator {
             // response creation failed, so we need to create one and populate it with failure
             $obj = new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
             $obj->setError('code', '404');
-            $obj->setError("Failed to instantiate class", $e);
+            $obj->setError("Failed to instantiate class `{$this->getClassName()}`", $e);
 
             $this->setResponse($obj);
         }

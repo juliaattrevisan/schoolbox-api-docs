@@ -29,7 +29,7 @@ class Router {
         try {
 
             // this $url is in the format : bundle/module/method[/args...][.view]
-            $args = explode('/', $url);
+            $args = array_values(array_filter(explode('/', $url)));
 
             // find last position of period in the final argument
             $dot = strripos($args[count($args) - 1], '.');
