@@ -25,7 +25,7 @@ package=${instdir##*/};
 sqlfile=$instdir"/updates/sql_updates.sql";
 tmpfile="/tmp/$package_sql_updates_`date -I`.sql";
 backupdir="/var/lib/$package";
-backupfile="$backupdir/$package_backup_`date -I`.sql";
+backupfile="$backupdir/`date +%Y-%m-%d_%H-%M-%S`.sql";
 
 echo "Starting SQL update process";
 
@@ -101,6 +101,11 @@ else
 	then
 		echo "SQL updated to version $newver";
 	else
+		# Drop all tables in database before restore (drop database may not be available)
+		for table in `mysql -u $sqluser  -p$sqlpasswd $sqldb -e 'show tables'| grep -v Tables_in`;
+		do
+			mysql -u $sqluser -p$sqlpasswd $sqldb -e "drop table $table";
+		done;
 		# Revert database to original
 		mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $backupfile > /dev/null 2>&1;
 		if [ $? -eq 0 ];
