@@ -20,7 +20,8 @@ CREATE TABLE `rubric_descriptor`(
 	`criterion_id` int(10) unsigned NOT NULL  ,
 	`submission_box_id` int(10) unsigned NOT NULL  ,
 	`value` int(10) unsigned NOT NULL  ,
-	`description` varchar(127) COLLATE latin1_swedish_ci NULL  ,
+	`description` varchar(512) COLLATE latin1_swedish_ci NULL  ,
+	`valid` tinyint(1) NULL  DEFAULT 1 ,
 	PRIMARY KEY (`criterion_id`,`value`,`submission_box_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET='utf8';
 
