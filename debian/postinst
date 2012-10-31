@@ -30,6 +30,7 @@ case "$1" in
             chown root:www-data /etc/schoolbox/conf.php
             chmod 0640 /etc/schoolbox/conf.php
         fi
+        chown -R alaress:alaress /usr/share/schoolbox
         /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox;
         /usr/share/schoolbox/tools/update-sql.sh;
         /usr/share/schoolbox/tools/clean-cache-dir.sh;
