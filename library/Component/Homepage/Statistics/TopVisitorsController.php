@@ -16,7 +16,7 @@ class Component_Homepage_Statistics_TopVisitorsController extends Component_Home
         $dateFilter = '';
         if (count($this->dateRange)) {
             $dateFilter = sprintf(
-                "AND datetime BETWEEN '%s' AND '%s'", date('Y-m-d', $this->dateRange[0]),
+                "AND datetime BETWEEN '%s 00:00:00' AND '%s 23:59:59'", date('Y-m-d', $this->dateRange[0]),
                 date('Y-m-d', $this->dateRange[1])
             );
         }
@@ -42,8 +42,10 @@ class Component_Homepage_Statistics_TopVisitorsController extends Component_Home
 
         $i = 0;
         while ($visitor = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $visitors[] = $visitor;
-            $visitors[$i++]['proportion'] = $visitor['hits'] / $visitors[0]['hits'];
+            if($visitor['hits'] > 0) {
+                $visitors[] = $visitor;
+                $visitors[$i++]['proportion'] = $visitor['hits'] / $visitors[0]['hits'];
+            }
         }
 
         $this->visitors = $visitors;
