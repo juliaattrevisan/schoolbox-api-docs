@@ -7449,6 +7449,14 @@ td.name .submission-dropdown {
 #returnWorkForm select {
   float: left;
 }
+#returnWorkForm.error {
+  border-color: #f00 !important;
+  background: #fee;
+}
+#returnWorkForm label.error {
+  position: absolute;
+  width: 300px;
+}
 /* submission/rubricCriteria */
 #crit-list,
 #crit-list-lightbox {

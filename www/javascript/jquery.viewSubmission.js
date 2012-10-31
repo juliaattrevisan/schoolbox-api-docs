@@ -5,10 +5,27 @@ function isNumber(n) {
 $j(function() {
     var ajax = true;
     var markSheet =  {
+        makeValidatable: function() {
+            // the validator doesn't seem to be able to handle two inputs with the same name, so they need to be
+            // uniqu-ified, then ajax submitted
+            var inputs = $j('#returnWorkForm').find('input.mark-input');
+            inputs.each(function() {
+                var self = $j(this);
+                var pInline = self.closest('.inlineform');
+                var uid = pInline.find('input.uid');
+                self.attr('name', self.attr('name').substring(0, self.attr('name').length - 2) + '[' + uid.val() + ']');
+            });
+        },
+
         cellValidation: function() {
             $j('.mark-input, .comment').blur(function(){
                 if ($j(this).val() !== '') {
                     var inlinefrm = $j(this).closest('.inlineform');
+                    // remove '.inline-submit' from all inline forms, then apply it to this one so the form
+                    // knows to only submit this row
+                    $j("#returnWorkForm div.inlineform").removeClass('inline-submit');
+                    inlinefrm.addClass('inline-submit');
+                    // this will submit the whole form, unfortunately
                     inlinefrm.submit();
                 }
             });
@@ -35,7 +52,8 @@ $j(function() {
                 }
                 var markLimit = parseInt($j(element).closest('.inlineform').find('.validation-limit').text());
                 if (value !== "") {
-                    return parseInt(value) <= markLimit;
+                    var v = parseInt(value);
+                    return v <= markLimit && v >= 0;
                 } else {
                     return true;
                 }
@@ -57,8 +75,21 @@ $j(function() {
                     submitHandler: function(form) {
                         if(ajax) {
                             // perform ajax update of work, no file upload
-                            var notification = $j(form).closest('.inlineform').find('input, select');
-                            $j.post('/submission/returnWorkForm.php', $j(form).serialize(), function(data) {
+                            var submitDiv = $j(form).find('div.inline-submit');
+                            var submitForm = submitDiv.clone();
+
+                            // if there's a select, align the values
+                            submitForm.find('select').val(submitDiv.find('select').val());
+
+                            var notification = submitDiv.find('input, select');
+
+                            // remove all the [] from all the elements
+                            submitForm.find('input, select').each(function() {
+                                var self = $j(this);
+                                self.attr('name', self.attr('name').replace(/\[[0-9]*\]/,''));
+                            });
+
+                            $j.post('/submission/returnWorkForm.php', submitForm.find('input, select').serialize(), function(data) {
                                 notification.css({
                                     'border-color': '#080'
                                 });
@@ -105,6 +136,7 @@ $j(function() {
         }
     };
 
+    markSheet.makeValidatable();
     markSheet.cellValidation();
     markSheet.selectGrouping();
 });
