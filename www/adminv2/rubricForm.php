@@ -47,8 +47,9 @@ function setRubricResultSets($items) {
 
         // do a cursory check that none of the labels are blank
         foreach($results as $lbl) {
-            if(strlen($lbl) == 0) {}
-            httpError(400, 2);
+            if(strlen($lbl) == 0) {
+                httpError(400, 2);
+            }
         }
 
         foreach($results as $value => $label) {
