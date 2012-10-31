@@ -67,6 +67,11 @@ class DashboardComponentReFactory {
             'compactMode' => 'false',
             'src' => '',
         ),
+        'FolderList' => array(
+            'componentname' => 'Folders',
+            'compactMode' => 'false',
+            'src' => '',
+        ),
         'RSS' => array(
             'compactMode' => 'false'
         ),
@@ -157,6 +162,7 @@ class DashboardComponentReFactory {
     private $newComponents = array(
         'dashboard' => array(
             'TextBox' => array(
+                'class' => 'Component_Dashboard_TextboxController',
                 'description' => 'Module for displaying custom content on dashboards by being linked to a pre-existing textbox.',
                 'multiple' => 'true',
                 'config' => array(
