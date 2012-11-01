@@ -793,10 +793,30 @@ class Category extends DeprecatedModel {
 
         // retrieve template data
         $tpl = $this->db->getRow($sql);
-        $tpl['cid'] = $categoryID;
 
         // insert homepage instance into homepage_config
-        $x[] = $this->duplicateRowsOnTable('homepage_config', $tpl, "WHERE cid = 0");
+        $homepageConfig = array(
+            'cid' => $categoryID,
+            'template' => $templateID,
+            'left_column_width' => $tpl['left_column_width'],
+            'right_column_width' => $tpl['right_column_width'],
+        );
+
+        foreach(array('top','left','right') as $position) {
+            $homepageConfig = array_merge($homepageConfig, array(
+                $position . '_head_font' => Cfg::get('homepage_colour_head_font'),
+                $position . '_head_bg' => Cfg::get('homepage_colour_head_bg'),
+                $position . '_font' => Cfg::get('homepage_colour_font'),
+                $position . '_bg_primary' => Cfg::get('homepage_colour_bg_primary'),
+                $position . '_bg_secondary' => Cfg::get('homepage_colour_bg_secondary'),
+                $position . '_link' => Cfg::get('homepage_colour_link'),
+                $position . '_hover' => Cfg::get('homepage_colour_hover')
+            ));
+        }
+
+        // remove (if exists) and replace the homepage config with the new template details
+        $this->db->delete('homepage_config', 'cid', $categoryID);
+        $this->db->insert('homepage_config', $homepageConfig);
 
         // insert componentry
         $x[] = $this->duplicateRowsOnTable(
