@@ -1,73 +1,80 @@
+<!-- BEGIN custom_head -->
+<script src="/javascript/jquery.classlist.js" type="text/javascript"></script>
+<!-- END custom_head -->
 <h1>{SUBJECTNAME}</h1>
-<table>
-    <thead>
-    <tr>
-        <th>Photo</th>
-        <th>Surname</th>
-        <th>Preferred Name</th>
-        <th>Student ID</th>
-        <th>Year Level</th>
-        <th>House</th>
-        <th>Email</th>
-        <th>Last Visited</th>
-    </tr>
-    </thead>
-    <tbody>
-    <!-- BEGIN student_list -->
-    <tr class="{ON_OFF}">
-        <td rowspan="2"><img src="/portrait.php?userId={SYNERGYID}&size=square64"/></td>
-        <td>
-            <!-- BEGIN surname_with_link --><a href="/search/user/{ID}">{SURNAME}</a><!-- END surname_with_link -->
-            <!-- BEGIN surname_without_link -->{SURNAME}<!-- END surname_without_link -->
-        </td>
-        <td>
-            <!-- BEGIN firstname_with_link --><a href="/search/user/{ID}">{FIRSTNAME}</a><!-- END firstname_with_link -->
-            <!-- BEGIN firstname_without_link -->{FIRSTNAME}<!-- END firstname_without_link -->
-        </td>
-        <td>{SYNERGYID}</td>
-        <td>{YEARLEVEL}</td>
-        <td>{HOUSE}</td>
-        <td>{EMAIL}</td>
-        <td nowrap="nowrap">{LASTVISIT}</td>
-    </tr>
-    <tr class="{ON_OFF}">
-
-        <td width="150" valign="top" style="vertical-align:top;">
-            <a href="/modules/helpdesk/{ID}" class="btn help float-left"><span></span>Help Desk</a>
-            <a href="/timetable/{ID}" class="btn report float-left" style="width:60px !important;"><span></span>Timetable</a><br/>
-            <!-- BEGIN eportfolio --> <a href="/eportfolio/{ID}" class="btn eportfolio float-left"
-                                         style="width:60px !important;"><span></span>ePortfolio</a><!-- END eportfolio -->
-            <a href="/submission/dueWork/0/{ID}" class="btn due-work float-left"
-               style="width:60px !important;"><span></span>Due Work</a>
-
-            <div class="float-fix"></div>
-        </td>
-        <td colspan="6" valign="top" style="vertical-align:top;">
-            <!-- BEGIN special --> <!-- END special -->
-            <!-- BEGIN medical --> <!-- END medical -->
-
-        </td>
-    </tr>
-    <!-- END student_list -->
-    <!-- BEGIN email_class -->
-    <tr>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td><br/>
-
-            <form action="/mail/createMail.php" method="post">
-                <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>
-                <input type="hidden" name="bcc" value="{CLASSEMAIL}"/>
-                <input class="submit-btn-plain" type="submit" name="emailall" value="Email Class"/>
-
-                <div class="float-fix"></div>
-            </form>
-        </td>
-        <td>&nbsp;</td>
-    </tr>
-    <!-- END email_class -->
-    </tbody>
-</table>
+<div class="classlist">
+    <form action="/mail/createMail.php" method="post" id="contact-table" class="clearfix">
+        <table>
+            <thead>
+            <tr>
+                <th width="16px"></th>
+                <th width="60px"></th>
+                <th>Name</th>
+                <th>Student ID</th>
+                <th>Year Level</th>
+                <th>House</th>
+                <th>Last Visited</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- BEGIN student_list -->
+            <tr class="no-bdr {ON_OFF}">
+                <td class="check" rowspan="2">{SELECT}</td>
+                <td rowspan="2"><img src="/portrait?userId={SYNERGYID}&size=square64" alt="{FIRSTNAME} {SURNAME}"/></td>
+                <!-- BEGIN name_with_link -->
+                <td class="firstrow"><a href="/search/user/{ID}">{SURNAME}, {FIRSTNAME}</a></td>
+                <!-- END name_with_link -->
+                <!-- BEGIN name_without_link -->
+                <td class="firstrow">{SURNAME}, {FIRSTNAME}</td>
+                <!-- END name_without_link -->
+                <td class="firstrow">{SYNERGYID}</td>
+                <td class="firstrow">{YEARLEVEL}</td>
+                <td class="firstrow">{HOUSE}</td>
+                <td class="firstrow" nowrap="nowrap">{LASTVISIT}</td>
+            </tr>
+            <tr class="{ON_OFF}">
+                <td colspan="4" valign="top" style="vertical-align:top;">
+                    <!-- BEGIN actions -->
+                    <div class="clearfix action-wrap">
+                        <a href="/timetable/{ID}" title="View timetable" class="btn report float-left">
+                            <span></span>Timetable
+                        </a>
+                        <!-- BEGIN eportfolio -->
+                        <a href="/eportfolio/{ID}" title="View ePortfolio" class="btn eportfolio float-left">
+                            <span></span>ePortfolio
+                        </a>
+                        <!-- END eportfolio -->
+                        <a href="/submission/dueWork/{ID}" title="View due work" class="btn due-work float-left">
+                            <span></span>Due Work
+                        </a>
+                        {EMAIL_BTN}
+                    </div>
+                    <!-- END actions -->
+                </td>
+                <td valign="top" style="vertical-align:top;">
+                    <!-- BEGIN special -->&nbsp;<!-- END special -->
+                    <!-- BEGIN medical -->&nbsp;<!-- END medical -->
+                </td>
+            </tr>
+            <!-- END student_list -->
+            </tbody>
+        </table>
+        <!-- BEGIN email_class -->
+        <div class="formwrap">
+            <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>
+            <input type="hidden" name="bcc" id="bcc" class="required" value=""/>
+            <input class="submit-btn-plain" type="submit" id="emailselected"
+                   name="emailselected" value="Email Selected Students"/>
+            <input class="clearfix submit-btn-plain" style="clear:both" type="submit" id="emailall"
+                   name="emailall" value="Email Whole Class"/>
+        </div>
+        <!-- END email_class -->
+    </form>
+    <!-- BEGIN parent_email -->
+    <form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
+        <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLY_TO}&gt;"/>
+        <input type="hidden" name="bcc" value="{EMAIL_ALL_PARENTS}"/>
+        <input type="submit" class="submit-btn-plain" value="Email All Parents"/>
+    </form>
+    <!-- END parent_email -->
+</div>
