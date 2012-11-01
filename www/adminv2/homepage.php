@@ -42,7 +42,10 @@ if(is_array($templateList)) {
 /* Component Palette */
 $this->setBlock(TEMPLATE_content, 'definition', 'definition_block');
 
-$definitionCollection = Component_DefinitionMapper::getInstance()->findByColumn('module', 'homepage');
+$definitionCollection = Component_DefinitionMapper::getInstance()->findByColumnList(array(
+    'module' => 'homepage',
+    'visible' => 'true'
+));
 
 foreach($definitionCollection as $definition) {
     $this->setVar(array(

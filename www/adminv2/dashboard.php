@@ -43,7 +43,10 @@ if ( is_array($groupList) ) {
 /* Component Palette */
 $this->setBlock(TEMPLATE_content, 'definition', 'definition_block');
 
-$definitionCollection = Component_DefinitionMapper::getInstance()->findByColumn('module', 'dashboard');
+$definitionCollection = Component_DefinitionMapper::getInstance()->findByColumnList(array(
+    'module' => 'dashboard',
+    'visible' => 'true'
+));
 
 foreach ( $definitionCollection as $definition ) {
     $this->setVar(array(
