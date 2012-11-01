@@ -266,6 +266,26 @@ class PortfolioWebDAV
             } else {
                 return false;
             }
+        } else if ($site_location='stmichaels') {
+            $settings = array(
+                'baseUri' => 'https://smgs-data/',
+                'userName' => "smgs/" . $_SESSION['username'],
+                'password' => $_SESSION['password'],
+            );
+
+
+            if ($groupHandler->isStaff()) {
+                $paths = array(
+                    '/staff/' . $_SESSION['username'] . '/',
+                );
+            } else if ($groupHandler->isStudent()) {
+                $paths = array(
+                    '/students/Year' . str_pad($_SESSION['year'], 2, '0', STR_PAD_LEFT) . '/' . $_SESSION['username'] . '/',
+                );
+            } else {
+                return false;
+            }
+
         } else if ($site_location == 'core') {
             $settings = array(
                 'baseUri' => 'http://webdave.alaress-dev.com.au/',
