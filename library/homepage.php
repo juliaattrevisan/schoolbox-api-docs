@@ -21,7 +21,13 @@ class Homepage {
 			return $this->db->getOne($query);
 	}
 
-	function getComponentList($type = null, $categoryId = null)
+    /**
+     * @deprecated
+     * @param null $type
+     * @param null $categoryId
+     * @return array|bool
+     */
+    function getComponentList($type = null, $categoryId = null)
 	{
         if ( !is_numeric($categoryId) ) {
             $categoryId = $this->cid;
@@ -45,6 +51,11 @@ class Homepage {
 		return $this->db->getAll($query);
 	}
 
+    /**
+     * @deprecated
+     * @param null $categoryId
+     * @return array|bool
+     */
     public function getSimpleComponentList ($categoryId = null) {
         if ( !is_numeric($categoryId) ) {
             $categoryId = $this->cid;
@@ -61,6 +72,11 @@ class Homepage {
         return $componentList;
     }
 
+    /**
+     * @deprecated
+     * @param $componentList
+     * @param null $categoryId
+     */
     public function setComponentList ($componentList, $categoryId = null) {
         if ( !is_numeric($categoryId) ) {
             $categoryId = $this->cid;
@@ -124,23 +140,20 @@ class Homepage {
 	}
 
 
-	function savePageTemplate($template)
-	{
-			$query = "SELECT cid FROM homepage_config WHERE cid = '".$this->cid."'";
-			$this->db->query($query);
-			if($row = $this->db->getNextArray())
-			{
-				$query = "UPDATE homepage_config SET template = '$template' WHERE cid = '".$this->cid."'";
-			}
-			else
-			{
-				$query = "INSERT INTO homepage_config (cid, template) VALUES ('$this->cid', '$template')";
-			}
-			$this->db->query($query);
+	function savePageTemplate($template) {
+        $query = "SELECT cid FROM homepage_config WHERE cid = '".$this->cid."'";
+        $this->db->query($query);
+        if($row = $this->db->getNextArray()) {
+            $query = "UPDATE homepage_config SET template = '$template' WHERE cid = '".$this->cid."'";
+        }
+        else {
+            $query = "INSERT INTO homepage_config (cid, template) VALUES ('$this->cid', '$template')";
+        }
+        $this->db->query($query);
 	}
 
-	function deleteHomepage()
-	{
+
+	function deleteHomepage() {
 		require_once dirname(__FILE__) . '/group.php';
 		$groupHandler = new Group;
 		$groupHandler->disbandGroup($this->cid);
@@ -151,45 +164,194 @@ class Homepage {
         $this->deleteComponentPositions();
 	}
 
+
 	/**
-	 * Soft-deletes persistent data and files associated with a homepage
-	 * on a per-component basis.
+	 * Removes componentry from homepage and resets to the template that was used to create it.
+     * Also soft-deletes homepage content where applicable
 	 *
 	 * @return void
 	 */
 	public function emptyHomepage() {
-		/* Delete components, TODO move this into calling component delete functions */
+        // TODO for 13.0.0: refactor this to call iterate across Component_Homepage_*Controllers instead, and call deleteData() if available
+        // soft delete the data using handlers
+        $allComponents = array(
+            'Assess_Main', 'Blog', 'Calendar', 'CategoryNews', 'Chat', 'Dropbox', 'File', 'Forum',
+            'Poll', 'Submission', 'Survey_Main', 'TextBox', 'Wiki'
+        );
 
-		/* Abstract the homepageClean() method into each Component
-		 * The Component should know how to remove itself
-		 *
-		 * $allComponents = getAllComponentInstances($category);
-		 *
-		 * foreach($allComponents as $currentComponent) {
-		 *     $currentComponent->removeFromHomepage();
-		 * }
-		 */
-		$allComponents = array(
-			'Assess_Main', 'Blog', 'Calendar', 'CategoryNews', 'Chat', 'Dropbox', 'File', 'Forum',
-			'Poll', 'Submission', 'Survey_Main', 'TextBox', 'Wiki'
-		);
+        if (is_array($allComponents) && count($allComponents)) {
+            foreach ($allComponents as $currentComponent) {
+                $handler = new $currentComponent();
+                $handler->homepageClean($this->cid);
+            }
+        }
 
-		if (is_array($allComponents) && count($allComponents)) {
-			foreach ($allComponents as $currentComponent) {
-				$handler = new $currentComponent();
-				$handler->homepageClean($this->cid);
-			}
-		}
+        // reset the homepage
+        $categoryHandler = new Category();
+        $category = $categoryHandler->getByID($this->cid);
+        $this->resetHomepageToTemplate($category['template']);
 
-		/* Reset to template defaults
-		 */
-		$categoryHandler = new Category();
-		$category = $categoryHandler->getByID($this->cid);
+    }
 
-		$homepageTemplate = new HomepageTemplate();
-		$homepageTemplate->createTemplate($this->cid, $category['template']);
-	}
 
+    /**
+     * Resets a homepage to a template, or destroys the homepage if it is to be removed.
+     * Returns the ID of the template used, or 0 if none.
+     *
+     * @param $categoryID
+     * @param $templateID
+     * @return int
+     */
+    public function resetHomepageToTemplate($templateID) {
+        $categoryID = $this->cid;
+
+        if ($templateID != Homepage::KEEP_EXISTING_HOMEPAGE) {
+
+            // if 'remove homepage', delete config and components, then set the templateID to zero
+            if ($templateID == Homepage::REMOVE_HOMEPAGE_TEMPLATE_ID) {
+                $templateID = $this->removeAllComponentsFromHomepage($categoryID);
+            }
+
+            // now continue as normal
+            if ($templateID > 0) {
+                $this->createHomepageFromTemplate($templateID);
+            }
+            else {
+                // we don't want an invalid template ID going into the database
+                $templateID = 0;
+            }
+
+            // deal with the template
+            $this->db->update('homepage_config', 'cid', array('cid' => $categoryID, 'template' => $templateID));
+        }
+
+        return $templateID;
+    }
+
+
+    /**
+     * This simply copies a bunch of rows, changing 'homepage_template' to 'homepage'...quite simple, really.
+     *
+     * @param $categoryID
+     * @param $templateID
+     */
+    public function createHomepageFromTemplate($templateID) {
+        $categoryID = $this->cid;
+
+        // locate all the component instances associated with this homepage (if they exist), and clear them out
+        $cim = Component_InstanceMapper::getInstance();
+        $collection = $cim->findByColumnList(array('module' => 'homepage', 'identifier' => $categoryID));
+        $cim->delete($collection);
+
+        $categoryID = mysql_real_escape_string($categoryID, $this->db->dbf);
+        $templateID = mysql_real_escape_string($templateID, $this->db->dbf);
+
+        $sql = "
+            SELECT id AS template, left_column_width, right_column_width
+            FROM homepageTemplate
+            WHERE id = $templateID
+        ";
+
+        $x[] = array($sql);
+
+        // retrieve template data
+        $tpl = $this->db->getRow($sql);
+
+        // insert homepage instance into homepage_config
+        $homepageConfig = array(
+            'cid' => $categoryID,
+            'template' => $templateID,
+            'left_column_width' => $tpl['left_column_width'],
+            'right_column_width' => $tpl['right_column_width'],
+        );
+
+        foreach(array('top','left','right') as $position) {
+            $homepageConfig = array_merge($homepageConfig, array(
+                $position . '_head_font' => Cfg::get('homepage_colour_head_font'),
+                $position . '_head_bg' => Cfg::get('homepage_colour_head_bg'),
+                $position . '_font' => Cfg::get('homepage_colour_font'),
+                $position . '_bg_primary' => Cfg::get('homepage_colour_bg_primary'),
+                $position . '_bg_secondary' => Cfg::get('homepage_colour_bg_secondary'),
+                $position . '_link' => Cfg::get('homepage_colour_link'),
+                $position . '_hover' => Cfg::get('homepage_colour_hover')
+            ));
+        }
+
+        // remove (if exists) and replace the homepage config with the new template details
+        $this->db->delete('homepage_config', 'cid', $categoryID);
+        $this->db->insert('homepage_config', $homepageConfig);
+
+        // insert componentry
+        $x[] = $this->duplicateRowsOnTable(
+            'component_instance',
+            array(
+                'module' => 'homepage',
+                'identifier' => $categoryID
+            ),
+            "WHERE `module` = 'homepage_template' AND `identifier` = $templateID"
+        );
+    }
+
+
+    /**
+     * Can be used as a workaround for an absence of DB default field values,
+     * but also allows for dynamic value duplication
+     *
+     * @param $table
+     * @param array $map
+     * @param string $sqlCondition
+     * @param string $indexField
+     * @return array
+     */
+    private function duplicateRowsOnTable($table, array $map, $sqlCondition = '', $indexField = 'id') {
+        $queries = array();
+        $sql = "SELECT * FROM $table $sqlCondition";
+        $queries[] = $sql;
+
+        $result = $this->db->query($sql);
+        while ($r = mysql_fetch_assoc($result)) {
+            // hack at the data, then flick it back in
+            unset($r[$indexField]);
+
+            if (count($map)) {
+                foreach ($map as $k => $v) {
+                    $r[$k] = $v;
+                }
+            }
+            $keys = implode('`, `', array_keys($r));
+            $values = implode("', '", array_values($r));
+
+            $q = "INSERT INTO `$table` (`$keys`) VALUES ('$values')";
+            $queries[] = $q;
+
+            $this->db->query($q);
+        }
+
+        return $queries;
+    }
+
+
+    /**
+     * Delete all componentry from a homepage
+     *
+     * @return int
+     */
+    function removeAllComponentsFromHomepage() {
+        $categoryID = mysql_real_escape_string($this->cid, $this->db->dbf);
+
+        // locate all the component instances associated with this homepage, and clear them out
+        $cim = Component_InstanceMapper::getInstance();
+        $collection = $cim->findByColumnList(array('module' => 'homepage', 'identifier' => $categoryID));
+        $cim->delete($collection);
+
+        return 0;
+    }
+
+    /**
+     * @deprecated
+     * @param $component
+     * @return int
+     */
     function addComponent($component) {
         $query = "SELECT config FROM homepage_comp WHERE id = '$component'";
 	    $componentSetup = $this->db->getRow($query);
@@ -202,7 +364,11 @@ class Homepage {
 
     }
 
-	function deleteComponentPositions($categoryId = null)
+    /**
+     * @deprecated
+     * @param null $categoryId
+     */
+    function deleteComponentPositions($categoryId = null)
 	{
         if ( !is_numeric($categoryId) ) {
             $categoryId = $this->cid;
@@ -211,6 +377,10 @@ class Homepage {
 		$this->db->delete('homepage_comp_location', 'cid', $categoryId);
 	}
 
+    /**
+     * @deprecated
+     * @param $component
+     */
     function deleteComponent($component)
 	{
         $query = "DELETE FROM homepage_comp_location WHERE cid = '$this->cid' AND homepageComponentLocationID = '$component'";
@@ -218,7 +388,13 @@ class Homepage {
 	}
 
 
-	function updateComponentPosition($component, $column, $position)
+    /**
+     * @deprecated
+     * @param $component
+     * @param $column
+     * @param $position
+     */
+    function updateComponentPosition($component, $column, $position)
 	{
 		$query = array(
 			"homepageComponentLocationID" => $component,
@@ -229,7 +405,12 @@ class Homepage {
 		$result = $this->db->update('homepage_comp_location', 'homepageComponentLocationID', $query);
 	}
 
-	function updateComponentConfig($component, $config)
+    /**
+     * @deprecated
+     * @param $component
+     * @param $config
+     */
+    function updateComponentConfig($component, $config)
 	{
 		$query = array(
 			"homepageComponentLocationID" => $component,
@@ -238,8 +419,14 @@ class Homepage {
 		$this->db->update('homepage_comp_location', 'homepageComponentLocationID', $query);
 	}
 
-	// For updating available components
-	function updateComponents($submitListComp, $categoryId = null){
+    /**
+     * For updating available components
+     *
+     * @deprecated
+     * @param $submitListComp
+     * @param null $categoryId
+     */
+    function updateComponents($submitListComp, $categoryId = null){
         if ( !is_numeric($categoryId) ) {
             $categoryId = $this->cid;
         }
@@ -302,8 +489,15 @@ class Homepage {
 	}
 
 
-
-	function saveComponentPosition($component, $column, $position, $config)
+    /**
+     * @deprecated
+     * @param $component
+     * @param $column
+     * @param $position
+     * @param $config
+     * @return int
+     */
+    function saveComponentPosition($component, $column, $position, $config)
 	{
 		$query = array(
 			"cid" => $this->cid,
@@ -318,6 +512,12 @@ class Homepage {
 
 	}
 
+    /**
+     * @deprecated
+     * @param $homepageComponentLocationID
+     * @param $config
+     * @return bool
+     */
     function setComponentConfig($homepageComponentLocationID, $config) {
         $result =  $this->db->update('homepage_comp_location', 'homepageComponentLocationID', array(
             'homepageComponentLocationID' => $homepageComponentLocationID,
@@ -327,6 +527,11 @@ class Homepage {
         return $result;
     }
 
+    /**
+     * @deprecated
+     * @param $homepageComponentLocationID
+     * @return mixed
+     */
     function getComponentConfig($homepageComponentLocationID) {
         $query = "SELECT config FROM homepage_comp_location WHERE homepageComponentLocationID = $homepageComponentLocationID";
 

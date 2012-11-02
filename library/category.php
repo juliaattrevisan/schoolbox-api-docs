@@ -500,7 +500,8 @@ class Category extends DeprecatedModel {
         }
 
         if ($data['template']) {
-            $this->createHomepageFromTemplate($categoryID, $data['template']);
+            $homepageHandler = new Homepage($categoryID);
+            $homepageHandler->createHomepageFromTemplate($data['template']);
         } else {
             // we don't want an invalid template ID going into the database
             unset($data['template']);
@@ -552,39 +553,13 @@ class Category extends DeprecatedModel {
             $this->applyPermissions($data['id'], $data['group'], $data['recursive']);
         }
 
+        /* Setup homepage template */
+        $homepageHandler = new Homepage($data['id']);
+        $homepageHandler->resetHomepageToTemplate($data['template']);
+
+        // clear extraneous data
         unset($data['group']);
         unset($data['recursive']);
-
-        /* Setup homepage template */
-
-        // if 'keep existing template', then skip this entire section
-        if ($data['template'] != Homepage::KEEP_EXISTING_HOMEPAGE) {
-
-            // if 'remove homepage', delete config and components, then set the templateID to zero
-            if ($data['template'] == Homepage::REMOVE_HOMEPAGE_TEMPLATE_ID) {
-                $categoryID = mysql_real_escape_string($data['id'], $this->db->dbf);
-
-                // locate all the component instances associated with this homepage, and clear them out
-                $cim = Component_InstanceMapper::getInstance();
-                $collection = $cim->findByColumnList(array('module' => 'homepage', 'identifier' => $categoryID));
-                $cim->delete($collection);
-
-                $data['template'] = 0;
-            }
-
-            // now continue as normal
-            if ($data['template'] > 0) {
-                $this->createHomepageFromTemplate($data['id'], $data['template']);
-            } else {
-                // we don't want an invalid template ID going into the database
-                $data['template'] = 0;
-            }
-
-            // deal with the template
-            $this->db->update('homepage_config', 'cid', array('cid' => $data['id'], 'template' => $data['template']));
-
-        }
-
         unset($data['template']);
 
         /* Insert synergetic subject code */
@@ -609,6 +584,7 @@ class Category extends DeprecatedModel {
 
         $this->logAction($data[$this->_index], 'modify');
     }
+
 
     function delete($categoryID) {
 
@@ -764,107 +740,6 @@ class Category extends DeprecatedModel {
         $category = $this->db->getRow($query);
 
         return is_numeric($category['id']) ? $category : false;
-    }
-
-
-    /**
-     * This simply copies a bunch of rows, changing 'homepage_template' to 'homepage'...quite simple, really.
-     *
-     * @param $categoryID
-     * @param $templateID
-     */
-    private function createHomepageFromTemplate($categoryID, $templateID) {
-
-        // locate all the component instances associated with this homepage (if they exist), and clear them out
-        $cim = Component_InstanceMapper::getInstance();
-        $collection = $cim->findByColumnList(array('module' => 'homepage', 'identifier' => $categoryID));
-        $cim->delete($collection);
-
-        $categoryID = mysql_real_escape_string($categoryID, $this->db->dbf);
-        $templateID = mysql_real_escape_string($templateID, $this->db->dbf);
-
-        $sql = "
-            SELECT id AS template, left_column_width, right_column_width
-            FROM homepageTemplate
-            WHERE id = $templateID
-        ";
-
-        $x[] = array($sql);
-
-        // retrieve template data
-        $tpl = $this->db->getRow($sql);
-
-        // insert homepage instance into homepage_config
-        $homepageConfig = array(
-            'cid' => $categoryID,
-            'template' => $templateID,
-            'left_column_width' => $tpl['left_column_width'],
-            'right_column_width' => $tpl['right_column_width'],
-        );
-
-        foreach(array('top','left','right') as $position) {
-            $homepageConfig = array_merge($homepageConfig, array(
-                $position . '_head_font' => Cfg::get('homepage_colour_head_font'),
-                $position . '_head_bg' => Cfg::get('homepage_colour_head_bg'),
-                $position . '_font' => Cfg::get('homepage_colour_font'),
-                $position . '_bg_primary' => Cfg::get('homepage_colour_bg_primary'),
-                $position . '_bg_secondary' => Cfg::get('homepage_colour_bg_secondary'),
-                $position . '_link' => Cfg::get('homepage_colour_link'),
-                $position . '_hover' => Cfg::get('homepage_colour_hover')
-            ));
-        }
-
-        // remove (if exists) and replace the homepage config with the new template details
-        $this->db->delete('homepage_config', 'cid', $categoryID);
-        $this->db->insert('homepage_config', $homepageConfig);
-
-        // insert componentry
-        $x[] = $this->duplicateRowsOnTable(
-            'component_instance',
-            array(
-                'module' => 'homepage',
-                'identifier' => $categoryID
-            ),
-            "WHERE `module` = 'homepage_template' AND `identifier` = $templateID"
-        );
-    }
-
-
-    /**
-     * Can be used as a workaround for an absence of DB default field values,
-     * but also allows for dynamic value duplication
-     *
-     * @param $table
-     * @param array $map
-     * @param string $sqlCondition
-     * @param string $indexField
-     * @return array
-     */
-    private function duplicateRowsOnTable($table, array $map, $sqlCondition = '', $indexField = 'id') {
-        $queries = array();
-        $sql = "SELECT * FROM $table $sqlCondition";
-        $queries[] = $sql;
-
-        $result = $this->db->query($sql);
-        while ($r = mysql_fetch_assoc($result)) {
-            // hack at the data, then flick it back in
-            unset($r[$indexField]);
-
-            if (count($map)) {
-                foreach ($map as $k => $v) {
-                    $r[$k] = $v;
-                }
-            }
-            $keys = implode('`, `', array_keys($r));
-            $values = implode("', '", array_values($r));
-
-            $q = "INSERT INTO `$table` (`$keys`) VALUES ('$values')";
-            $queries[] = $q;
-
-            $this->db->query($q);
-        }
-
-        return $queries;
     }
 
 }
