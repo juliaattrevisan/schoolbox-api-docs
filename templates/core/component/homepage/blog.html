@@ -15,6 +15,13 @@
             }
         });
 
+        $j("#component{COMPONENT_INSTANCE_ID} a.show-comments").live('click', function(e) {
+            $j(this).siblings('ul.comments').show(100);
+            $j(this).siblings('form').show(100);
+            $j(this).hide();
+            e.preventDefault();
+        });
+
         /* Modal for URL homepage selection
          */
         $j('#resource-browser').dialog({
@@ -56,7 +63,7 @@
                 </p>
                 <div class="blog-body">{BLOG_BODY}</div>
 
-                <ul class="comments">
+                <ul class="comments" style="display: none;">
                     <!-- BEGIN comment -->
                     <li class="{ON_OFF}">{DELETE_COMMENT}
                         <a href="/search/user/{COMMENT_AUTHOR_ID}" class="author">
@@ -68,12 +75,11 @@
                     </li>
                     <!-- END comment -->
                 </ul>
-
-                <form method="post" action="/blog/comment/new/{BLOG_ID}">
+                <form method="post" action="/blog/comment/new/{BLOG_ID}" style="display: none;">
                     <p><textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
                         <input type="submit" class="submit-btn-plain" name="comment" value="Add comment"/></p>
                 </form>
-
+                <a href="#" class="btn show-comments"><span></span>Show comments</a>
             </li>
             <!-- END blog -->
         </ul>
