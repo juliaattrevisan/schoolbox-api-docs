@@ -112,7 +112,7 @@ $j.fn.configurator = function(opts) {
                     sequence: sequence
                 };
 
-                console.log(component);
+                // console.log(component);
 
                 if ( instanceID != null ) {
                     component.instanceId = instanceID;
@@ -123,7 +123,7 @@ $j.fn.configurator = function(opts) {
                 $j.post('/adminv2/component/save', component, function (instance) {
                     $j(ui.item).attr('id', 'instance-id-'+instance.id);
                     instID = instance.id;
-                    console.log(instID);
+                    // console.log(instID);
                     configurator.refreshPalette();
                 });
             },
@@ -137,7 +137,7 @@ $j.fn.configurator = function(opts) {
                         component: instID,
                         cid: templID
                     };
-                    console.log(data);
+                    // console.log(data);
                     $j.ajax({
                         async: false,
                         url: "/adminv2/component/config",
@@ -147,7 +147,7 @@ $j.fn.configurator = function(opts) {
                             ui.item.append(data);
                         },
                         error: function(data) {
-                            console.log(data);
+                            // console.log(data);
                         }
                     });
                 }
@@ -176,10 +176,10 @@ $j.fn.configurator = function(opts) {
             var singleton = definitionElement.hasClass('single-instance');
             var instantiated = $j(search).length > 0;
 
-            console.log('searching for ' + search + ': ' + $j(search).length + ' found');
+            // console.log('searching for ' + search + ': ' + $j(search).length + ' found');
 
             if(definitionIDClass == 'definition-id-29') {
-                console.log($j(search));
+                // console.log($j(search));
             }
 
         /*

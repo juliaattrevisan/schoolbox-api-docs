@@ -75,7 +75,7 @@
             });
 
             if(valid) {
-                console.log(frmdata);
+                // console.log(frmdata);
                 $j.ajax({
                     async: false,
                     url: action,
@@ -85,10 +85,10 @@
                         'items': frmdata
                     },
                     success: function(data) {
-                        console.log('success '+data);
+                        // console.log('success '+data);
                     },
                     failure: function(data) {
-                        console.log('le fail '+data);
+                        // console.log('le fail '+data);
                         e.preventDefault();
                     }
                 });

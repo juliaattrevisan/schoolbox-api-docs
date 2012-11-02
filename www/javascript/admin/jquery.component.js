@@ -588,7 +588,7 @@ setupCustomise = {
 
             $this = homepageControl;
 
-            console.log($this);
+            // console.log($this);
 
             $j('.delete-this').live('click',function() {
                 var $instanceId = $j(this).parent().attr('id').match(/^instance\-id\-(\d+)$/)[1];
