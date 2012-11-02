@@ -202,7 +202,7 @@ class DashboardComponentReFactory {
             'size' => array('10', 'Limit')
         ),
         'Dashboard_Weather' => array(
-            'url' => array('[TOBEOVERWRITTEN]', 'Location'),
+            'url' => array('', 'Location'),
             'size' => array('3', 'Forecast Days')
         ),
     );
@@ -600,10 +600,7 @@ class DashboardComponentReFactory {
 
                     if ($c[0] == '[TOBEOVERWRITTEN]') {
                         // yay, special cases! -_-
-                        if ($class == 'Dashboard_Weather') {
-                            // retrieve weather from global config
-                            $c[0] = Cfg::get('weather_location');
-                        } elseif ($class == 'Dashboard_Rss') {
+                        if ($class == 'Dashboard_Rss') {
                             $c[0] = Cfg::get('welcome_rss_url');
                         }
                     }
