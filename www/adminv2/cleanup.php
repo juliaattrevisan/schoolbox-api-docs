@@ -219,7 +219,7 @@ class clean {
 	
 	function cleanZip() {
 
-		foreach(glob(Cfg::get('zip_dir').'/*.jpg') as $file) {
+		foreach(glob(Cfg::get('zip_dir').'/*') as $file) {
 					print "Deleting $file<br>";
 					if(!@unlink($file))
 						print "Failed to delete $file<br>";
