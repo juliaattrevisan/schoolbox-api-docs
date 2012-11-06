@@ -31,9 +31,9 @@ $categoryID = $category['id'];
 
 $homepageHandler = new Homepage($categoryID);
 
-// doesn't have a template, therefore the category doesn't have a homepage: resource doesn't exist, therefore 404.
+// doesn't have a template, therefore the category doesn't have a homepage: redirect to resource browser.
 if(!$homepageHandler->getTemplate()) {
-    $this->pageNotFound();
+    $this->localRedir('/resources/'.$categoryID);
 }
 
 $catHandler->logPageView($categoryID);
