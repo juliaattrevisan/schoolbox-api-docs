@@ -1,4 +1,6 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <h2>{COMPONENT_NAME}</h2>
+    {CONFIGURATION}
     <script type='text/javascript' src='/javascript/jquery.lwtCountdown-1.0-modified.js'></script>
     <script type='text/javascript'>
         $j(function () {
@@ -21,11 +23,8 @@
                     'sec':{DEADLINE_SEC}
                 }
             });
-
         });
     </script>
-    <h2>{COMPONENT_NAME}</h2>
-    {CONFIGURATION}
     <div id='countdown{COMPONENT_INSTANCE_ID}'>
         <div class="dash weeks_dash">
             <span class="dash_title">weeks</span>
