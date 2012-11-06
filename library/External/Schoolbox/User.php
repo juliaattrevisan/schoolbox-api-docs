@@ -312,4 +312,8 @@ class External_Schoolbox_User implements External_UserInterface {
     {
         return $this->user;
     }
+
+    public function getHousemasterByHouseId($houseID) {
+        return false;
+    }
 }
