@@ -108,43 +108,45 @@ setupCalendar = {
 		},
 
 		organise: function(filterArray) {
-            var flist = new Array();
+            var flist = {};
 
-			for (i = 0; i < filterArray.length; i++) {
+			for (var i = 0; i < filterArray.length; i++) {
 
-                k = 0;
-                flist[i] = new Array(filterArray[i], new Array());
+                var k = 0;
+                flist[i] = [filterArray[i], {}];
 
-				$j('.filter-list .' + filterArray[i] + ' input:not(:checked)').each(function(){
-					var n = $j(this).attr('value');
-                    //flist[i][1][k++] = new Array($j(this), n);
-                    if ($j('ul.js_happening .' + n).is(':visible')) {
-					  $j('ul.js_happening .' + n).hide();
-					}
-				});
-
-				$j('.filter-list .' + filterArray[i] + ' input:checked').each(function(){
-					var n = $j(this).attr('value');
-                    flist[i][1][k++] = n;
-					$j('ul.js_happening li.' + n).show();
-				});
-
+                $j('.filter-list .' + filterArray[i] + ' input').each(function() {
+                    // show related entries
+                    var n = $j(this).attr('value');
+                    if(this.checked) {
+                        flist[i][1][k++] = n;
+                        $j('ul.js_happening li.' + n).show();
+                    }
+                    // hide related entries
+                    else {
+                        if ($j('ul.js_happening .' + n).is(':visible')) {
+                            $j('ul.js_happening .' + n).hide();
+                        }
+                    }
+                });
 			}
 
-            $j('.filter-list .events input:not(:checked)').each(function(){
-				var n = $j(this).attr('value');
-				if ($j('ul.js_happening .' + n).is(':visible')) {
-				  $j('ul.js_happening .' + n).hide();
-				}
-			});
-
             k = 0;
+            flist[filterArray.length] = ['events', {}];
 
-            flist[filterArray.length] = new Array('events', new Array());
-
-            $j('.filter-list .events input:checked').each(function(){
+            $j('.filter-list .events input').each(function() {
+                // show related entries
                 var n = $j(this).attr('value');
-                flist[filterArray.length][1][k++] = n;
+                if(this.checked) {
+                    flist[i][1][k++] = n;
+                    $j('ul.js_happening li.' + n).show();
+                }
+                // hide related entries
+                else {
+                    if ($j('ul.js_happening .' + n).is(':visible')) {
+                        $j('ul.js_happening .' + n).hide();
+                    }
+                }
             });
 
             $j.post('/ajax/calendarFilter.php', {fList : flist});
