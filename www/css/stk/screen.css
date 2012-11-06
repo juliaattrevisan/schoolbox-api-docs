@@ -9,7 +9,9 @@ a {
 a:hover {
     color: #1955ff;
 }
-
+h2 {
+    font-size:16px;
+}
 h2, .calendar-controls  {
     background:#002b5c;
     color:white;
@@ -20,10 +22,10 @@ h2, .calendar-controls  {
     text-indent:0;
     padding: 8px 0 4px 16px;
     min-height:20px;
-    font-size:16px;
 }
 .calendar-controls {
     padding: 2px;
+    font-size: 12px;
 }
 .current-date {
     padding-top: 8px;
