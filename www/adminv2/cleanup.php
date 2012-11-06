@@ -216,6 +216,15 @@ class clean {
 						print "Failed to delete $file<br>";
 		}
 	}
+	
+	function cleanZip() {
+
+		foreach(glob(Cfg::get('zip_dir').'/*.jpg') as $file) {
+					print "Deleting $file<br>";
+					if(!@unlink($file))
+						print "Failed to delete $file<br>";
+		}
+	}
 
 }
 
@@ -232,6 +241,7 @@ if(count($this->arg)) {
             case 'rolluser': $clean->rollStudents(); break;
             case 'fileclean': $clean->cleanFileSystem(); break;
             case 'thumbnail': $clean->cleanThumbnails(); break;
+            case 'zip':      $clean->cleanZip(); break;
             default: $this->localRedir('/adminv2/cleanup');
         }
     }
