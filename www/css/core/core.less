@@ -6821,6 +6821,15 @@ dd {
     th, .class {
         padding: 6px 8px;
     }
+    td {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        word-break: all;
+        .class {
+            max-width: 15px;
+        }
+    }
 }
 
 .home {
