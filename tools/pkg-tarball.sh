@@ -18,7 +18,7 @@ rm -rf $thistempdir;
 mkdir -p $thistempdir;
 cd $thistempdir;
 
-echo "Schoolbox Tarball Package Build Scri[t";
+echo "Schoolbox Tarball Package Build Script";
 
 # provide a tag to build
 echo -e "Tag to build: \c" && read tag;
