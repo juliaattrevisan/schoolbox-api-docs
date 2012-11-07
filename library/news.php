@@ -256,7 +256,7 @@ class News extends DeprecatedModel {
         return $headlines;
     }
 
-    function getNewsListing($archive = true, $topic = '', $year = 0, $month = 0, $index = 0, $limit = 0) {
+    function getNewsListing($archive = true, $topic = '', $year = 0, $month = 0, $index = 0, $limit = 0, $orderByDate = false) {
         $userHandler = new Group;
         $shareResults = array();
 
@@ -352,7 +352,13 @@ class News extends DeprecatedModel {
             return false;
         }
 
-        usort($allNews, array($this, "cattimecmp"));
+        // depending on the ordering required, sort the news
+        if($orderByDate) {
+            usort($allNews, array($this, "timecmp"));
+        }
+        else {
+            usort($allNews, array($this, "cattimecmp"));
+        }
 
         if ($limit > 0) {
             $allNews = array_slice($allNews, $index, $limit);

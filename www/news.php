@@ -113,8 +113,7 @@ $outputPagination = array(
 
 $this->setVar($outputPagination);
 
-
-$items = $newsHandler->getNewsListing(false, $selectedTopic, 0, 0, $newsIndex, $newsPerPage);
+$items = $newsHandler->getNewsListing(false, $selectedTopic, 0, 0, $newsIndex, $newsPerPage, true);
 
 if (is_array($items)) {
     $i = 0;
