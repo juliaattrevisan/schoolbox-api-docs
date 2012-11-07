@@ -80,6 +80,7 @@ class DashboardComponentReFactory {
         ),
         'LinkList' => array(
             'compactMode' => 'false',
+            'componentname' => 'Links',
             'src' => ''
         ),
         'News' => array(
