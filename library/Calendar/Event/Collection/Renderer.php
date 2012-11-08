@@ -138,7 +138,7 @@ class Calendar_Event_Collection_Renderer {
 	/**
 	 * Set all events
 	 *
-	 * @param $allEvents
+	 * @param Calendar_Event_Collection $allEvents
 	 */
 	private function setAllEvents($allEvents) {
 		$this->allEvents = $allEvents;
@@ -147,7 +147,7 @@ class Calendar_Event_Collection_Renderer {
 	/**
 	 * Get all events
 	 *
-	 * @return null
+	 * @return Calendar_Event_Collection
 	 */
 	private function getAllEvents() {
 		return $this->allEvents;

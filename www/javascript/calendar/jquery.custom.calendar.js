@@ -116,8 +116,8 @@ setupCalendar = {
                 flist[i] = [filterArray[i], {}];
 
                 $j('.filter-list .' + filterArray[i] + ' input').each(function() {
-                    // show related entries
                     var n = $j(this).attr('value');
+                    // show related entries
                     if(this.checked) {
                         flist[i][1][k++] = n;
                         $j('ul.js_happening li.' + n).show();
@@ -135,8 +135,8 @@ setupCalendar = {
             flist[filterArray.length] = ['events', {}];
 
             $j('.filter-list .events input').each(function() {
-                // show related entries
                 var n = $j(this).attr('value');
+                // show related entries
                 if(this.checked) {
                     flist[i][1][k++] = n;
                     $j('ul.js_happening li.' + n).show();

@@ -674,6 +674,7 @@ class Calendar extends DeprecatedModel {
                 $event->setAccess($currentEvent['access']);
                 $event->setEventType($currentEvent['eventType']);
                 $event->setColour($currentEvent['eventColour']);
+                $event->setCampusList($currentEvent['campusList']);
                 $event->setDetail($currentEvent['detail']);
                 $event->setLocation($currentEvent['location']);
                 $event->setPublishDate($currentEvent['publish_date']);
