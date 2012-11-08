@@ -135,51 +135,18 @@ class External_Tass_User implements External_UserInterface {
                     }
                 }
             }
-
-            return $return;
-
         }
         else {
             $query = "
 				SELECT stud_code AS RelatedID
 				FROM student
-				WHERE par_code = '$tassID'
+				WHERE par_code = '$id'
 				AND cmpy_code = '01'
 			";
-
-            $result = $this->getDatabase()->getAll($query);
-            return $result;
+            $return = $this->getDatabase()->getAll($query);
         }
-/*
-		if (strlen($tassID) == self::SPLIT_PARENT_TASSID_LENGTH) {
-			$parentCode = substr($tassID, 0, 7);
-			$parentNum = $tassID[self::SPLIT_PARENT_TASSID_LENGTH-1];
 
-			$query = "
-				SELECT
-					stud_code AS RelatedID
-				FROM student
-				INNER JOIN paraddress
-					ON student.cmpy_code = paraddress.cmpy_code
-					AND student.par_code = paraddress.par_code
-					AND student.sud19_code = paraddress.add_num
-				WHERE student.cmpy_code = '01'
-				AND student.par_code = '$parentCode'
-				AND paraddress.add_num = '$parentNum'
-			";
-		}
-		// Otherwise just show them all
-		else {
-			$query = "
-				SELECT
-					stud_code AS RelatedID
-				FROM student
-				WHERE par_code = '$tassID'
-				AND cmpy_code = '01'
-			";
-		}
-*/
-        return false;
+        return $return;
 
     }
 
