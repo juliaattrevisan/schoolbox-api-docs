@@ -69,6 +69,7 @@ class GizaCategory_DataMapper extends Generic_DataMapper {
     public function hydrateHomepage(GizaCategory $instance, $args = '') {
         $hMap = new Facade_Homepage_DataMapper();
         $page = $hMap->read($instance->get('id'));
+
         $instance->set('homepage', $page);
     }
 

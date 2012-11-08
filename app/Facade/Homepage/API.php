@@ -15,11 +15,11 @@ class Facade_Homepage_API extends Generic_API {
             $response = new Response_HTTP();
             list($user, $cat, $page) = $this->getHomepage($categoryID);
 
-            $components = $page->get()->get('components');
-
+            $components = $page->get('components');
             list($catTitle, $articles) = $this->renderComponents($user, $cat, $components);
             $response->setPage('title', $catTitle);
             $response->setResponse('articles', $articles);
+
 
             return $response;
         }
@@ -29,12 +29,12 @@ class Facade_Homepage_API extends Generic_API {
     }
 
     // module methods
-    public function News($cID)    { return $this->getModule($cID, 'outputNews');        }
-    public function DueWork($cID) { return $this->getModule($cID, 'outputDueWorkList'); }
-    public function Grades($cID)  { return $this->getModule($cID, 'outputGradesList');  }
-    public function Links($cID)   { return $this->getModule($cID, 'outputLinkList');    }
-    public function Forums($cID)  { return $this->getModule($cID, 'outputForumList');   }
-    public function Folders($cID) { return $this->getModule($cID, 'outputFolderList');  }
+    public function News($cID)    { return $this->getModule($cID, 'News');        }
+    public function DueWork($cID) { return $this->getModule($cID, 'DueWorkList'); }
+    public function Grades($cID)  { return $this->getModule($cID, 'GradesList');  }
+    public function Links($cID)   { return $this->getModule($cID, 'LinkList');    }
+    public function Forums($cID)  { return $this->getModule($cID, 'ForumList');   }
+    public function Folders($cID) { return $this->getModule($cID, 'FolderList');  }
 
     /**
      * This could be far more efficient, but at the moment...
@@ -46,6 +46,7 @@ class Facade_Homepage_API extends Generic_API {
         $response = new Response_HTTP();
         list($user, $cat, $page) = $this->getHomepage($categoryID);
 
+        $method = sprintf("Component_Homepage_%sController", $method);
         foreach($page->get('components') as $comp) {
             if($comp->get('method') == $method) {
                 list($catTitle, $articles) = $this->renderComponents($user, $cat, array($comp));
@@ -88,22 +89,21 @@ class Facade_Homepage_API extends Generic_API {
             if(is_array($components) || $components instanceof GizaCollection) {
                 // plz render mine components
                 foreach($components as $component) {
-                    foreach($this->componentRefactoryMap($component->get('method')) as $m) {
-                        if(in_array($m, $this->custom)) {
-                            $className = "Facade_Component_$m";
+                    foreach($this->componentRefactoryMap($component->get('controller')) as $className) {
+                        if(in_array($className, $this->custom)) {
                             if(class_exists($className)) {
                                 $instance = new $className();
 
                                 if(is_a($instance, 'Facade_Component_Generic')) {
-                                    $articles[$m] = $instance->render($user, $cat->get('id'));
+                                    $articles[$className] = $instance->render($user, $cat->get('id'));
                                 }
                                 else {
-                                    $articles[$m] = array();
+                                    $articles[$className] = array();
                                 }
                             }
                         }
                         else {
-                            $articles[$m] = $this->renderComponent($component, $cat->get('id'), $user);
+                            $articles[$className] = $this->renderComponent($component, $cat->get('id'), $user);
                         }
                     }
                 }
@@ -146,9 +146,8 @@ class Facade_Homepage_API extends Generic_API {
 
         try {
             // TODO component definitions should be refactored in database to point to new modules
-            foreach($this->componentRefactoryMap($component->get('method')) as $m) {
-                $className = "Facade_Component_$m";
-
+            foreach($this->componentRefactoryMap($component->get('controller')) as $className) {
+                $className = "Facade_Component_$className";
                 if(class_exists($className)) {
                     $instance = new $className();
                     if(is_a($instance, 'Facade_Component_Generic')) {
@@ -172,15 +171,19 @@ class Facade_Homepage_API extends Generic_API {
      * @return array
      */
     private function componentRefactoryMap($oldFunctionCallName) {
+
+        preg_match('#Component_([a-z]*)_([a-z]*)Controller#i', $oldFunctionCallName, $matches);
+        $call = $matches[2];
+
         $map = array(
-            'outputNews'        => array('HomepageNews'),
-            'outputDueWorkList' => array('SubjectDueWork', 'SubjectGrades'),  // duplicate one
-            'outputGradesList'  => array('SubjectGrades'), // will only be called from getModule
-            'outputLinkList'    => array('HomepageLinks'),
-            'outputForumList'   => array('CategoryForums'),
-            'outputFolderList'  => array('CategoryFolders'),
+            'News'        => array('HomepageNews'),
+            'DueWorkList' => array('SubjectDueWork', 'SubjectGrades'),  // duplicate one
+            'GradesList'  => array('SubjectGrades'), // will only be called from getModule
+            'LinkList'    => array('HomepageLinks'),
+            'ForumList'   => array('CategoryForums'),
+            'FolderList'  => array('CategoryFolders'),
         );
-        return isset($map[$oldFunctionCallName]) ? $map[$oldFunctionCallName] : array('UNKN0WN');
+        return isset($map[$call]) ? $map[$call] : array('UNKN0WN');
     }
 
 }

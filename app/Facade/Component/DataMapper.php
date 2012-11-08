@@ -8,20 +8,36 @@
  */
 class Facade_Component_DataMapper extends Generic_DataMapper {
 
-    const TABLE = 'homepage_comp_location';
-    const INDEX = 'homepageComponentLocationID';
+    const TABLE = 'component_instance';
 
     public function __construct() {
         parent::__construct();
 
-        $this->select('column');
+        $this->select('component_instance.id', 'id');
+        $this->select('component_definition_id');
+        $this->select('component_instance.module');
+        $this->select('identifier');
         $this->select('position');
-        $this->select('homepage_comp_location.config');
+        $this->select('sequence');
         $this->select('name');
-        $this->select('method');
-        $this->leftJoin('homepage_comp', 'homepage_comp_location.component', 'homepage_comp.id');
-        $this->order('column', 'asc');
+        $this->select('class', 'controller');
+        $this->leftJoin('component_definition', 'component_instance.component_definition_id', 'component_definition.id');
+        $this->where('component_definition.visible', '=', 'true');
         $this->order('position','asc');
+        $this->order('sequence', 'asc');
+
+        $this->setHydrateField('config');
+    }
+
+    public function hydrateConfig(Facade_Component $component, $args = '') {
+        $ccMap = new Facade_Component_Config_DataMapper();
+        try {
+            $collection = $ccMap->read(array('component_instance_id' => $component->get('id')));
+            $component->set('config', $collection);
+        } catch(Exception_Schoolbox $e) {
+            $component->set('config', false);
+        }
+
     }
 
 

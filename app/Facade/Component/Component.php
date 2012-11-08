@@ -7,9 +7,4 @@
  * @version     SVN: $Id$
  */
 class Facade_Component extends Generic_Object {
-
-    public function unserializeConfig() {
-        $this->fields['config'] = unserialize($this->fields['config']);
-    }
-
 }

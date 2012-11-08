@@ -23,10 +23,14 @@ class Facade_Homepage_DataMapper extends Generic_DataMapper {
     public function hydrateComponents(Facade_Homepage $homepage, $args = '') {
         $cMap = new Facade_Component_DataMapper();
 
-        $components = $cMap->read(array('cid' => $homepage->get('cid')));
+        $components = $cMap->read(array(
+            'component_instance.module' => 'homepage',
+            'component_instance.identifier' => $homepage->get('cid')
+        ));
 
+        // force hydration of configs
         foreach($components as $c) {
-            $c->unserializeConfig();
+            $c->get('config');
         }
 
         $homepage->set('components', $components);
