@@ -280,7 +280,7 @@ class PortfolioWebDAV
                 );
             } else if ($groupHandler->isStudent()) {
                 $paths = array(
-                    '/students/Year' . str_pad($_SESSION['year'], 2, '0', STR_PAD_LEFT) . '/' . $_SESSION['username'] . '/',
+                    '/students/Year' . $_SESSION['year'] . '/' . $_SESSION['username'] . '/',
                 );
             } else {
                 return false;
