@@ -161,11 +161,124 @@ class Core_Nav_Sidebar {
 
     public function createUpcomingWork() {
 
-        $subjects = $this->user->getSubjects();
-
         // GENERATE UPCOMING WORK
         $subHandler = new Submission();
+        $upcoming = $subHandler->getAllUpcomingWorkAndAssessments($this->user->get('uid'));
+        $work = array();
 
+        if(!count($upcoming)) {
+            return;
+        }
+
+        $prev = '';
+        $now = time();
+        $j = 0;
+
+        foreach($upcoming as &$item) {
+            $invalid = false;
+
+            if($item['kind'] == 0) {
+                // duework
+                if($item['submittable']) {
+                    if($item['multi_submit']) {
+                        // if unsubmitted, hide if LATE date passed
+                        if(!$item['submit_count'] && $item['late_date'] < $now) {
+                            $invalid = 'a';
+                        }
+                        // if submitted, hide if DUE date passed
+                        elseif($item['submit_count'] && $item['date'] < $now) {
+                            $invalid = 'b';
+                        }
+                    }
+                    else {
+                        // single submit: hide if completed or DUE date in past
+                        if($item['date'] < $now || $item['submit_count']) {
+                            $invalid = 'c';
+                        }
+                    }
+                }
+                else {
+                    // no submissions: hide if DUE date in past
+                    if($item['date'] < $now) {
+                        $invalid = 'd';
+                    }
+                }
+            }
+            else {
+                // assess
+                if($item['max_attempts'] == 0) {
+                    // 0 max attempts is unlimited: hide if FINISH in past
+                    if($item['date'] < $now) {
+                        $invalid = 'e';
+                    }
+                }
+                elseif($item['attempt_count'] >= $item['max_attempts']) {
+                    // if limited attempts, hide if limit has been reached
+                    $invalid = 'f';
+                }
+                elseif($item['date'] < $now) {
+                    $invalid = 'g';
+                }
+            }
+
+            // skip if invalid for some reason
+            if($invalid) {
+                continue;
+            }
+
+            $adr = new Alaress_Date_Relative($item['date'], 'y-m-d');
+
+            // how many days left, 0 <= x <= 10
+            $item['urgency'] = max(0, min(10, (int)(($adr->getUnixTimestamp() - $now) / 86400)));
+            $item['date_relative'] = $adr->getRelativeTime();
+
+            $status = ($adr->getUnixTimestamp() > $now) ? 'Upcoming Work Due' : 'Overdue Work';
+            if($status != $prev) {
+                $work[] = array(
+                    'value' => $status,
+                    'type'  => '__SEPARATOR__'
+                );
+                $prev = $status;
+            }
+
+            $workitem = array(
+                'value'  => $item['title'],
+                'date'   => $item['date_relative'],
+                'status' => $status,
+            );
+
+            if($item['kind'] == 0) {
+                $workitem['href'] = 'due_work/submission_box/display/' . $item['id'];
+            }
+
+            $work[] = $workitem;
+
+        }
+        $this->work = $work;
+
+        return;
+
+        $prev = '';
+        $now = new DateTime();
+        foreach($allWork as $sub) {
+            $date = $sub['date']->format(Config::get('date_short'));
+            $status = ($sub['date'] > $now) ? 'Upcoming Work Due' : ($sub['late_date'] > $now ? 'Overdue Work' : 'Missed Deadlines');
+            if($status != $prev) {
+                $work[] = array(
+                    'value' => $status,
+                    'type'  => '__SEPARATOR__'
+                );
+                $prev = $status;
+            }
+            $work[] = array(
+                'value'  => "{$sub['name']}",
+                'date'   => $date,
+                'status' => $status,
+                'href'   => "due_work/submission_box/display/{$sub['bid']}",
+            );
+        }
+
+        $subjects = $this->user->getSubjects();
         $categoryIDList = array();
         if ($subjects->count()) {
             foreach($subjects as $category) {
@@ -222,11 +335,10 @@ class Core_Nav_Sidebar {
                 'value' => 'Settings',
                 'href'  => 'core/settings/preferences'
             ),
-            array(
-                'value' => 'Logout',
-                'href'  => '/m/core/auth/logout'
-
-            ),
+//            array(
+//                'value' => 'Logout',
+//                'href'  => '/m/core/auth/logout'
+//            ),
         );
     }
 
