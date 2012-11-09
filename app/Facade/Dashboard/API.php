@@ -14,38 +14,28 @@ class Facade_Dashboard_API extends Generic_API {
         $s = new Authenticator();
         $user = $s->getSessionUser();
 
-        // TODO replace this with a database call to find out what to render
-        $dashDefinition = array(
-            'student' => array(
-                'Salutation',
-                'CurrentPeriod',
-                'SchoolNews',
-                'YourNews',
-                'SchoolEvents',
-            ),
-            'staff'   => array(
-                'Salutation',
-                'CurrentPeriod',
-                'SchoolEvents',
-                'SchoolNews',
-            )
-        );
-
-        if(isset($dashDefinition[$user->getGroupType()])) {
-            $userDashboard = $dashDefinition[$user->getGroupType()];
-        }
-        // you are not allowed to be using this system!!!!!!!11!!!!1!!
-        else {
-            $response->addInternalRedirectHeader('GO_AWAY');
-            return $response;
+        // 2n is better than n^2, so iterate across the dash and index by controller name
+        $componentry = array();
+        foreach($user->get('group')->get()->get('dashboard') as $comp) {
+            $componentry[$comp->get('controller')] = $comp;
         }
 
-        $articles = array();
-
-        // plz render mine component(s)
         if($component == 'all') {
-            foreach($userDashboard as $component) {
-                $articles[$component] = $this->renderComponent($component, $user);
+            // map desktop components to mobile equivalents
+            $dashMap = array(
+                'Greeting' => 'Salutation',
+                'Timetable' => 'CurrentPeriod',
+                'News' => 'SchoolNews',
+                'HomepageNews' => 'YourNews',
+                'Calendar' => 'SchoolEvents',
+            );
+
+            $pattern = "Component_Dashboard_%sController";
+            // order this based on the order in the map, rather than the order specified on the desktop dashboard
+            foreach($dashMap as $desktop => $mobile) {
+                if(isset($componentry[sprintf($pattern, $desktop)])) {
+                    $articles[$mobile] = $this->renderComponent($mobile, $user);
+                }
             }
         }
         else {

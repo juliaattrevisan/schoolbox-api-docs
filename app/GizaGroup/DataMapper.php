@@ -22,14 +22,30 @@ class GizaGroup_DataMapper extends Generic_DataMapper {
         $this->select('name');
         $this->select('group_type');
 
-        // specifiy foreign tables in this object
-/*
-        $this->join('LEFT', 'groups', 'user.group_id', 'groups.id');
-        $this->join('LEFT', 'userCampus', 'user.id', 'userCampus.uid');
-        $this->join('LEFT', 'luCampus', 'userCampus.campus', 'luCampus.id');
-        $this->join('LEFT', 'superusers', 'user.id', 'superusers.id');
-*/
         // specify fields that can by hydrated
         $this->setHydrateField('members');
+        $this->setHydrateField('dashboard');
+    }
+
+    public function hydrateDashboard(GizaGroup $group, $args = '') {
+        $cMap = new Facade_Component_DataMapper();
+
+        $components = $cMap->read(array(
+            'component_instance.module' => 'dashboard',
+            'component_instance.identifier' => $group->get('gid')
+        ));
+
+        // force hydration of configs
+        foreach($components as $c) {
+            $c->get('config');
+        }
+
+        $group->set('dashboard', $components);
+    }
+
+    public function hydrateMembers(GizaGroup $group, $args = '') {
+        $uMap = new GizaUser_DataMapper();
+        $collection = $uMap->read(array('group_id' => $group->get('gid')));
+        $group->set('members', $collection);
     }
 }

@@ -205,7 +205,7 @@ class Authenticator {
     }
 
     /**
-     * @return User
+     * @return GizaUser
      */
     public function getSessionUser() {
         // $uMap = new GizaUser_DataMapper();
