@@ -18,33 +18,77 @@ class Facade_Component_SubjectDueWork extends Facade_Component_Generic {
         // GENERATE UPCOMING WORK
         $subHandler = new Submission();
         $work = array();
-
-        $allWork = array();
+        $now = time();
 
         $uid = $user->get('uid');
 
-        $works = $subHandler->getRecentWork($uid, array($catID), UPCOMING_WORK_TYPE);
-        for ($i = 0; (is_array($works) && $i < count($works)); $i++) {
-            $works[$i]['owner'] = $uid;
-            $allWork[] = $works[$i];
-        }
+        $upcoming = $subHandler->getUpcomingWorkAndAssessmentsByCategory($uid, $catID);
 
-        usort($allWork, function($a, $b) {
-            if ($a['relevant_date'] == $b['relevant_date'])
-                return 0;
-            else if ($a['relevant_date'] > $b['relevant_date'])
-                return 1;
-            return -1;
-        });
+        if(count($upcoming) && is_array($upcoming)) {
 
-        if(count($allWork) && is_array($allWork)) {
-            foreach($allWork as $sub) {
-                $date = $sub['relevant_date']->format(Config::get('date_short'));
-                $work[] = array(
-                    'name' => $sub['name'],
-                    'date' => $date,
-                    'href'  => "/m/due_work/submission_box/display/{$sub['bid']}",
-                );
+            foreach($upcoming as &$item) {
+                $invalid = false;
+
+                if($item['kind'] == 0) {
+                    // duework
+                    if($item['submittable']) {
+                        if($item['multi_submit']) {
+                            // if unsubmitted, hide if LATE date passed
+                            if(!$item['submit_count'] && $item['late_date'] < $now) {
+                                $invalid = 'a';
+                            }
+                            // if submitted, hide if DUE date passed
+                            elseif($item['submit_count'] && $item['date'] < $now) {
+                                $invalid = 'b';
+                            }
+                        }
+                        else {
+                            // single submit: hide if completed or DUE date in past
+                            if($item['date'] < $now || $item['submit_count']) {
+                                $invalid = 'c';
+                            }
+                        }
+                    }
+                    else {
+                        // no submissions: hide if DUE date in past
+                        if($item['date'] < $now) {
+                            $invalid = 'd';
+                        }
+                    }
+                }
+                else {
+                    // assess
+                    if($item['max_attempts'] == 0) {
+                        // 0 max attempts is unlimited: hide if FINISH in past
+                        if($item['date'] < $now) {
+                            $invalid = 'e';
+                        }
+                    }
+                    elseif($item['attempt_count'] >= $item['max_attempts']) {
+                        // if limited attempts, hide if limit has been reached
+                        $invalid = 'f';
+                    }
+                    elseif($item['date'] < $now) {
+                        $invalid = 'g';
+                    }
+                }
+
+                // skip if invalid for some reason
+                if($invalid) {
+                    continue;
+                }
+
+                $adr = new Alaress_Date_Relative($item['date'], 'y-m-d');
+
+                // how many days left, 0 <= x <= 10
+                $item['urgency'] = max(0, min(10, (int)(($adr->getUnixTimestamp() - $now) / 86400)));
+                $item['date_relative'] = $adr->getRelativeTime();
+
+                if($item['kind'] == 0) {
+                    $item['href'] = '/m/due_work/submission_box/display/' . $item['id'];
+                }
+
+                $work[] = $item;
             }
         }
 

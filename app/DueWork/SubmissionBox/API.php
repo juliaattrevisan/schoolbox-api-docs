@@ -14,7 +14,6 @@ class DueWork_SubmissionBox_API {
         $boxHandler = new Submission();
         $box = $boxHandler->getByID($dueWorkID);
 
-
         $cMap = new GizaCategory_DataMapper();
         $cat = $cMap->read($box['category']);
 
@@ -32,13 +31,15 @@ class DueWork_SubmissionBox_API {
             )) ? 'false' : 'true';
         }
 
-        $due = strtotime($box['date']);
+        $due = new Alaress_Date_Relative($box['date'], 'y-m-d');
 
-        $d = date('D, jS M', $due);
+        $d = $due->getUsingFormat('jS M');
+        $rel = $due->getRelativeTime();
 
-        if(date('Hi',$due) != '2359') {
-            $d .= date(' h:ia', $due);
+        if($due->getUsingFormat('Hi') != '2359') {
+            $d .= $due->getUsingFormat(' h:ia');
         }
+        $d = "$rel ($d)";
 
         $catDetails = array(
             'title'   => 'Due ' . $d,
@@ -66,9 +67,10 @@ class DueWork_SubmissionBox_API {
 
         if(is_array($allWork) && count($allWork)) {
             foreach($allWork as $currentWork) {
-                $workDate = new Alaress_Date_Format($currentWork['date'], 'U');
+                $workDate = new Alaress_Date_Relative($currentWork['date'], 'U');
                 $historyContent[] = array(
                     'date'           => $workDate->getShort(),
+                    'date_relative'  => $workDate->getRelativeTime(),
                     'mark'           => $currentWork['mark'],
                     'comment'        => $currentWork['comment'],
                     'file_id'        => $currentWork['fid'],

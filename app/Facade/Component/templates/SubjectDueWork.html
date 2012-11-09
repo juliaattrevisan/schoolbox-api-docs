@@ -1,9 +1,9 @@
 <ul>
     {% if content %}
     {% for work in content %}
-    <li title="{{ work.name }}" class="dashbutton">
-        <a href="{{ work.href }}">{{ work.name }}
-            <p>{{ work.date }}</p>
+    <li title="{{ work.title }}" class="dashbutton">
+        <a href="{{ work.href }}">{{ work.title }}
+            <p>{{ work.date_relative }}</p>
         </a>
     </li>
     {% endfor %}
