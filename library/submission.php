@@ -1110,24 +1110,41 @@ class Submission extends DeprecatedModel {
 
 
     /**
-     * Somehow a merge and sort is ~200-300% faster than a Union of these two queries...
-     *
-     * @param $uid
+     * Retreieve all the upcoming or expired-but-relevant due work for a student
+     * @param $studentID
      * @return array
      */
-    function getAllUpcomingWorkAndAssessments($uid) {
+    function getAllUpcomingWorkAndAssessments($studentID) {
         $groupHandler = new Group();
 
         // start by getting the membership for the student in question
-        $involvement = $groupHandler->involvedInCategoryList($uid);
+        $involvement = $groupHandler->involvedInCategoryList($studentID);
         $catIDs = array();
 
         if (is_array($involvement) && count($involvement)) {
             foreach ($involvement as $cat) {
                 $catIDs[] = $cat['id'];
             }
-            $conditional = 'IN (' . implode(',', $catIDs) . ')';
-        } else {
+        }
+
+        return $this->getUpcomingWorkAndAssessmentsByCategory($studentID, $catIDs);
+    }
+
+
+    /**
+     * Somehow a merge and sort is ~200-300% faster than a Union of these two queries...
+     *
+     * @param $cats
+     * @return array
+     */
+    function getUpcomingWorkAndAssessmentsByCategory($studentID, $cats) {
+        if (is_array($cats) && count($cats)) {
+            $conditional = 'IN (' . implode(',', $cats) . ')';
+        }
+        elseif(is_numeric($cats)) {
+            $conditional = '= ' . (int)$cats;
+        }
+        else {
             $conditional = '= 0';
         }
 
@@ -1138,7 +1155,7 @@ class Submission extends DeprecatedModel {
             FROM submission_box sb
             LEFT JOIN file_type ft ON ft.id = sb.type
             LEFT JOIN category c ON c.`id` = sb.`category`
-            LEFT JOIN student_submission ss ON sb.id = ss.box_id
+            LEFT JOIN student_submission ss ON sb.id = ss.box_id AND ss.owner = '$studentID'
             WHERE c.id $conditional
             GROUP BY sb.id
             ORDER BY sb.date ASC
@@ -1151,12 +1168,14 @@ class Submission extends DeprecatedModel {
             FROM assess a
             LEFT JOIN file_type ft ON ft.id = a.`type`
             LEFT JOIN category c ON c.`id` = a.`category_id`
-            LEFT JOIN assess_attempt aa ON a.`assess_id` = aa.`assess_id`
+            LEFT JOIN assess_attempt aa ON a.`assess_id` = aa.`assess_id` AND aa.user_id = '$studentID'
             WHERE c.id $conditional
             AND a.availability = 'assess'
             GROUP BY a.assess_id
             ORDER BY a.finish ASC
         ";
+
+        echo $q0, "\n\n", $q1;
 
         /* execute queries and retrieve */
         $r0 = $this->db->getAll($q0);
