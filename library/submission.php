@@ -1175,8 +1175,6 @@ class Submission extends DeprecatedModel {
             ORDER BY a.finish ASC
         ";
 
-        echo $q0, "\n\n", $q1;
-
         /* execute queries and retrieve */
         $r0 = $this->db->getAll($q0);
         $r1 = $this->db->getAll($q1);
