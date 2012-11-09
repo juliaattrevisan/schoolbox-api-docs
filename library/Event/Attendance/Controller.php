@@ -311,7 +311,11 @@ class Event_Attendance_Controller extends Controller
                 if ( isset($data['approve']) ) {
                     $attendance['status'] = Calendar::ATTENDANCE_STATUS_APPROVED;
 
-                    $this->createLeaveRequest($event, $attendance);
+					/* Check if Border Leave is enabled first, before doing this
+					 */
+					if ((Cfg::get('boarder_leave_enabled') == 1) || (Cfg::get('boarder_leave_enabled') == 'true')) {
+                    	$this->createLeaveRequest($event, $attendance);
+					}
                 }
                 elseif ( isset($data['reject']) ) {
                     $attendance['status'] = Calendar::ATTENDANCE_STATUS_REJECTED;
