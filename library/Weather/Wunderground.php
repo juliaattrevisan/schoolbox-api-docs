@@ -280,13 +280,20 @@ class Weather_Wunderground implements Weather_Interface {
         // update every half hour: suppress error
         if(!(file_exists($file) && time() - @filemtime($file) < Cfg::get('weather_api_caching'))) {
 
+            // file is writable, behave as normal
             if(($json = $this->getWundergroundData(array('geolookup', 'forecast10day', 'conditions'))) === false) {
                 return array();
             }
 
             $fp = fopen($file, 'w');
-            fwrite($fp, $json);
-            fclose($fp);
+
+            if($fp === false) {
+                return $this->parseJSON(file_get_contents($file));
+            }
+            else {
+                fwrite($fp, $json);
+                fclose($fp);
+            }
 
             return $this->parseJSON($json);
         }
