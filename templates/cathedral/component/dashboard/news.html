@@ -7,30 +7,27 @@
 
 <div class="box">
   <h2>TCS Headlines</h2>
-  <div class="listing">
-  	
       <!-- BEGIN topic_header -->
-     
-      <!-- END topic_header -->
-    
-    <ul class="topic">
-    <!-- BEGIN topic -->
-    	<li class="hide {TOPIC_CLEAN}">
-    	<ul>
-      <!-- BEGIN news -->
-      <li class="{ON_OFF}">
-      	<h4><a href="{NEWS_URL}" title="{NEWS_TITLE}">{NEWS_TITLE}</a></h4>
-        <p class="interact">{NEWS_TIME}</p>
-        <div class="float-fix"></div>
-      </li>
-      <!-- END news -->
-    </ul>
- 
-    </li>
-    <!-- END topic -->
-    </ul> 
 
-  </div>      
-  <div class="float-fix"></div>
-</div>
-<div class="float-fix"></div>
+      <!-- END topic_header -->
+      <div class="listing clearfix">
+          <ul class="topic">
+              <!-- BEGIN topic -->
+              <li class="hide {TOPIC_CLEAN}">
+                  <ul class="news-list">
+                      <!-- BEGIN news -->
+                      <li class="{ON_OFF} clearfix">
+                          <!-- BEGIN news_image -->
+                          <img width="64" height="64" src="/storage/image.php?hash={NEWS_IMAGE}&size=square64"/>
+                          <!-- END news_image -->
+                          <h3><a href="{NEWS_URL}" title="{NEWS_TITLE}">{NEWS_TITLE}</a></h3>
+                          <span class="time">{NEWS_TIME}</span>
+                          <p>{NEWS_SHORT}</p>
+                      </li>
+                      <!-- END news -->
+                  </ul>
+              </li>
+              <!-- END topic -->
+          </ul>
+      </div>
+  </div>
