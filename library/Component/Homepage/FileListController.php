@@ -20,7 +20,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     private $catHandler;
 
     /**
-     * @var Link
+     * @var File
      */
     private $fileHandler;
 
@@ -79,7 +79,15 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             'FILES_CATEGORY_ID' => $this->source['id'],
         ));
 
-
+        $configValue = $this->getConfig('filter');
+        $filter = array();
+        for($i = 0; $i < count($this->filterFields); $i++) {
+            $j = $configValue % 2;
+            if($j) {
+                $filter[] = $this->filterFields[$i];
+            }
+            $configValue = (int) $configValue / 2;
+        }
 
         //file output
         $this->setBlock($templateHandle, 'files', 'files_block');
@@ -87,7 +95,10 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         $this->setBlock('files', 'file_no_url', 'file_no_url_block');
         $this->setBlock('files', 'modify_file', 'modify_file_block');
 
-        $fileList = $this->fileHandler->getAllInCategory($this->source['id'], array('size' => $this->getConfig('size')));
+        $fileList = $this->fileHandler->getAllInCategory($this->source['id'], array(
+            'size' => $this->getConfig('size'),
+            'filter' => $filter
+        ));
 
         $this->setVar('files_block', '');
 
