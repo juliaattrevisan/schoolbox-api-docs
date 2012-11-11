@@ -78,6 +78,7 @@
 	# Mobile Edition
 	RewriteCond %{REQUEST_URI} /m/.*
 	RewriteCond %{REQUEST_URI} !/m/inc/.*
+	RewriteCond %{REQUEST_URI} !/m/img/.*
 	RewriteCond %{REQUEST_URI} !/m/manifest.php
 	RewriteCond %{REQUEST_FILENAME} !-d
 	RewriteCond %{REQUEST_FILENAME} !-f
