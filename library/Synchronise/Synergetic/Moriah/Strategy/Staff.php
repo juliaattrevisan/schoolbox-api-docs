@@ -57,6 +57,10 @@ class Synchronise_Synergetic_Moriah_Strategy_Staff extends Synchronise_Synergeti
                 $newUser['campus'][] = $this->getCampusFromCode($campus['campus']);
             }
         }
+        else if( $currentUser['StaffCampus'] ) {
+            $newUser['defaultCampus'] = $this->getCampusFromCode($currentUser['StaffCampus']);
+            $newUser['campus'] = array($this->getCampusFromCode($currentUser['StaffCampus']));
+        }
         else {
             //Just put staff in main if no campus retrieved from timetable
             $newUser['defaultCampus'] = self::CG;
