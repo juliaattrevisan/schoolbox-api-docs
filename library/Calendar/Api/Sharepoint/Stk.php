@@ -24,8 +24,8 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
       * User account to authenticate with. (Must have read/write/edit permissions to given Lists)
       */
     private $credentials = array(
-        'login' => 'alaress',
-        'password' => 'Tjs782',
+        'login' => 'sk-sb-iport',
+        'password' => 'j7tdPyZ1Zc',
         'authentication' => SOAP_AUTHENTICATION_BASIC,
         'trace' => true,
     );
@@ -96,15 +96,19 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
            */
         try {
             $soapClient = new SoapClient($this->getWsdl(), $this->getCredentials());
+
+            $this->setSoap($soapClient);
+
+            $this->setCalendarHandler(new Calendar());
+            $this->setEventTypes($this->getCalendarHandler()->getTypeList());
+
         } catch (SoapFault $fault) {
-            var_dump($fault);
-            die();
+            //var_dump($fault);
+            //die();
+            return false;
         }
 
-        $this->setSoap($soapClient);
 
-        $this->setCalendarHandler(new Calendar());
-        $this->setEventTypes($this->getCalendarHandler()->getTypeList());
     }
 
     /**
@@ -119,11 +123,11 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
         $groupHandler = new Group;
 
         $now = new Alaress_Date_Format($currentDay, 'U');
-        $start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:01', 'y-m-d h:i:s');
+        $start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d h:i:s');
         $end = new Alaress_Date_Format($now->getDatabaseDate() . ' 23:59:59', 'y-m-d h:i:s');
 
-        $startDate = $start->getDatabase();
-        $endDate = $end->getDatabase();
+        $startDate = $start->getUsingFormat('c');
+        $endDate = $end->getUsingFormat('c');
 
         $xmlPayload = new Calendar_Api_Sharepoint_Stk_Payload($startDate, $endDate);
 
