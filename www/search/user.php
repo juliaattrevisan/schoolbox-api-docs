@@ -90,16 +90,10 @@ if (is_numeric($this->arg[0])) {
     /* Dont display emails of students to parents
       */
     if ($emailAddress) {
-        if ($groupHandler->isStudent($user['uid']) && $groupHandler->isParent() && !$groupHandler->isParentOfChild(
-            $user['uid']
-        )
-        ) {
+        if ($groupHandler->isStudent($user['uid']) && $groupHandler->isParent() && !$groupHandler->isParentOfChild($user['uid'])) {
             $email = '';
         } else {
-            if (in_array(Cfg::get('site_location'), array('bialik', 'wenona')) && $groupHandler->isParent(
-                $user['uid']
-            ) && !$groupHandler->isStaff()
-            ) {
+            if (in_array(Cfg::get('site_location'), array('bialik', 'wenona')) && $groupHandler->isParent($user['uid']) && !$groupHandler->isStaff()) {
                 //dont display parent emails to anyone but staff
                 $email = '';
             } else {
@@ -165,10 +159,7 @@ if (is_numeric($this->arg[0])) {
                 $this->setVar('parent_synergy_form_block');
             }
         } else {
-            if ($groupHandler->isStudent($user['uid']) && ($groupHandler->isStaff() || $groupHandler->isParentOfChild(
-                $user['uid']
-            ) || $_SESSION['id'] == $user['uid'])
-            ) {
+            if ($groupHandler->isStudent($user['uid']) && ($groupHandler->isStaff() || $groupHandler->isParentOfChild( $user['uid']) || $_SESSION['id'] == $user['uid']) ) {
                 ////only allow staff to see student information or parent
                 $this->parse("portrait_block", "portrait");
 
@@ -302,11 +293,7 @@ if (is_numeric($this->arg[0])) {
 
                         $category = $catHandler->getByCode($subject['code']);
 
-                        //TODO add a config option to control if all subjects are shown or just those in schoolbox
-                        if ((Cfg::get('site_location') != 'stmichaels' && Cfg::get(
-                            'site_location'
-                        ) != 'jpc') || ($category['id'] && $groupHandler->getPermission($category['id']) >= READ_ACCESS)
-                        ) {
+                        if ((Cfg::get('show_all_subjects') == 1) || ($category['id'] && $groupHandler->getPermission($category['id']) >= READ_ACCESS)) {
 
                             /* Fetch teacher names */
                             $teacherList = $synClass->getTeacherName($subject['code']);
