@@ -20,7 +20,8 @@ CREATE TABLE `component_config_instance`(
 	`component_instance_id` int(10) unsigned NOT NULL  ,
 	`value` varchar(128) COLLATE utf8_general_ci NULL  ,
 	PRIMARY KEY (`id`) ,
-	KEY `fk_dashboard_component_option_dashboard_component_instance1`(`component_config_definition_id`)
+	KEY `fk_dashboard_component_option_dashboard_component_instance1`(`component_config_definition_id`),
+	UNIQUE KEY `component_config_definition` (`component_config_definition_id`, `component_instance_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET='utf8';
 
 

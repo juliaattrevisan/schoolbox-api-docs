@@ -281,15 +281,38 @@ class Homepage {
         $this->db->delete('homepage_config', 'cid', $categoryID);
         $this->db->insert('homepage_config', $homepageConfig);
 
-        // insert componentry
-        $x[] = $this->duplicateRowsOnTable(
-            'component_instance',
-            array(
-                'module' => 'homepage',
-                'identifier' => $categoryID
-            ),
-            "WHERE `module` = 'homepage_template' AND `identifier` = $templateID"
-        );
+        // retrieve, rearrange and reinsert the componentry
+        $cim = Component_InstanceMapper::getInstance();
+        $ccm = Component_ConfigMapper::getInstance();
+        $instances = $cim->findByContext('homepage_template', $templateID);
+
+        if(count($instances)) {
+            foreach($instances as $inst) {
+                // preserve the config
+                $configs = $inst->config;
+
+                unset($inst->id);
+                unset($inst->config);
+
+                $inst->module = 'homepage';
+                $inst->identifier = $categoryID;
+
+                $ids = $cim->save($inst);
+                $id = $ids[0];
+
+                if(count($configs)) {
+                    foreach($configs as $c) {
+                        if($c->id) {
+                            $conf = new Component_Config();
+                            $conf->instanceId = $id;
+                            $conf->value = $c->value;
+                            $conf->configDefinitionId = $c->id;
+                            $ccm->save($conf);
+                        }
+                    }
+                }
+            }
+        }
     }
 
 
