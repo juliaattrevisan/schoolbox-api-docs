@@ -158,6 +158,14 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
                 continue;
             }
 
+			/* Find out if this is a recurring event and if it should be displayed
+			 * on the currently viewed day. If not, ignore it and don't put it on
+			 * the stack at all.
+			 */
+			if (!$this->isRecurringToday($now, $attribs)) {
+				continue;
+			}
+
 			/* An event is meant to display today so let's add it to the stack
 			 */
             $event = new Calendar_Event_Type_Day();
@@ -205,13 +213,6 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 				$event->setEndTime(new Alaress_Date_Format((string)$attribs->ows_EndDate, 'y-m-d h:i:s'));
 			}
 
-			/* Find out if this is a recurring event and if it should be displayed
-			 * on the currently viewed day. If not, ignore it and don't put it on
-			 * the stack at all.
-			 */
-			if (!$this->isRecurringToday($now, $attribs)) {
-				continue;
-			}
 			/* If it is recurring today, set the event's start date to Today.
 			 * Sharepoint only knows the start and end PERIOD of a recurring
 			 * event, and does not specify the exact date when a recurrence
@@ -221,22 +222,20 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 				[ows_EndDate] => 2012-12-21 09:30:00
 				[ows_RecurrenceData] => mo2012-12-20T20:30:00Z
 			 */
-			else {
-				if ($event->getEndTime()->getDatabaseDate() >= $now->getDatabaseDate()) {
-					$event->setDate($now);
+			if ($event->getEndTime()->getDatabaseDate() >= $now->getDatabaseDate()) {
+				$event->setDate($now);
 
-					$startTime = new Alaress_Date_Format((string)$attribs->ows_EventDate, 'y-m-d h:i:s');
-					$event->setStartTime(new Alaress_Date_Format($now->getDatabaseDate() . ' ' . $startTime->getDatabaseTime(), 'y-m-d h:i:s'));
-				}
-				/* Sometimes events come out that shouldn't so we manually exclude them
-				 * due to Sharepoint timezones
-				 */
-				else {
-					continue;
-				}
+				$startTime = new Alaress_Date_Format((string)$attribs->ows_EventDate, 'y-m-d h:i:s');
+				$event->setStartTime(new Alaress_Date_Format($now->getDatabaseDate() . ' ' . $startTime->getDatabaseTime(), 'y-m-d h:i:s'));
+			}
+			/* Sometimes events come out that shouldn't so we manually exclude them
+			 * due to Sharepoint timezones
+			 */
+			else {
+				continue;
 			}
 
-            $collection->add($event);
+			$collection->add($event);
         }
 
         return $collection;
