@@ -119,15 +119,14 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
      * @return Calendar_Event_Collection
      */
     public function getDayEvents($currentDay) {
-
-        $groupHandler = new Group;
+        $groupHandler = new Group();
 
         $now = new Alaress_Date_Format($currentDay, 'U');
         $start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d h:i:s');
         $end = new Alaress_Date_Format($now->getDatabaseDate() . ' 23:59:59', 'y-m-d h:i:s');
 
-        $startDate = $start->getUsingFormat('c');
-        $endDate = $end->getUsingFormat('c');
+		$startDate = $start->getDatabase();
+		$endDate = $end->getDatabase();
 
         $xmlPayload = new Calendar_Api_Sharepoint_Stk_Payload($startDate, $endDate);
 
@@ -159,13 +158,6 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
                 continue;
             }
 
-			/* Find out if this is a recurring event and if it should be displayed
-			 * on the currently viewed day
-			 */
-			if (!$this->isRecurringToday($now, $attribs)) {
-				continue;
-			}
-
 			/* An event is meant to display today so let's add it to the stack
 			 */
             $event = new Calendar_Event_Type_Day();
@@ -185,10 +177,24 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
             $event->setCategoryName('');
             $event->setAttendance('');
 
+			/* Prevent modify link
+    		 */
+			$event->setIsEditable(false);
+
+			/* Event inspection
+			 * A nice place to see what's currently being examined
+			 */
+//			if ((string)$attribs->ows_Title == 'AKSS Junior Boys Volleyball Championships') {
+//				new Alaress_Probe($currentEvent);
+//				new Alaress_Probe($now->getDatabaseDate());
+//			}
+
 			/* Simulate all-day event if appropriate since Sharepoint thinks the end of the
 			 * day is at 11:59pm, whereas Schoolbox makes it 12:00am. "Mangle it", he said.
 			 */
-			$event->setStartTime(new Alaress_Date_Format((string)$attribs->ows_EventDate, 'y-m-d h:i:s'));
+			$startDate = new Alaress_Date_Format((string)$attribs->ows_EventDate, 'y-m-d h:i:s');
+
+			$event->setStartTime($startDate);
 
 			if ((string)$attribs->ows_fAllDayEvent == 1) {
 				$endDate = substr((string)$attribs->ows_EndDate, 0, 10);
@@ -199,9 +205,36 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 				$event->setEndTime(new Alaress_Date_Format((string)$attribs->ows_EndDate, 'y-m-d h:i:s'));
 			}
 
-            /* Prevent modify link
-             */
-            $event->setIsEditable(false);
+			/* Find out if this is a recurring event and if it should be displayed
+			 * on the currently viewed day. If not, ignore it and don't put it on
+			 * the stack at all.
+			 */
+			if (!$this->isRecurringToday($now, $attribs)) {
+				continue;
+			}
+			/* If it is recurring today, set the event's start date to Today.
+			 * Sharepoint only knows the start and end PERIOD of a recurring
+			 * event, and does not specify the exact date when a recurrence
+			 * takes place.
+			 *
+				[ows_EventDate] => 2012-09-14 09:15:00
+				[ows_EndDate] => 2012-12-21 09:30:00
+				[ows_RecurrenceData] => mo2012-12-20T20:30:00Z
+			 */
+			else {
+				if ($event->getEndTime()->getDatabaseDate() >= $now->getDatabaseDate()) {
+					$event->setDate($now);
+
+					$startTime = new Alaress_Date_Format((string)$attribs->ows_EventDate, 'y-m-d h:i:s');
+					$event->setStartTime(new Alaress_Date_Format($now->getDatabaseDate() . ' ' . $startTime->getDatabaseTime(), 'y-m-d h:i:s'));
+				}
+				/* Sometimes events come out that shouldn't so we manually exclude them
+				 * due to Sharepoint timezones
+				 */
+				else {
+					continue;
+				}
+			}
 
             $collection->add($event);
         }
@@ -263,14 +296,16 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 				/* Find out this stupid attribute rubbish to figure out
 				 * when an event recurs
 				 */
+				$index = -1;
+
 				foreach($recurrenceAttribs as $key => $value) {
 					$mapping = $this->getWeekMapping();
 
 					if (array_key_exists($key, $mapping)) {
 						$index = $mapping[$key];
-					}
 
-					break;
+						break;
+					}
 				}
 
 				/* Forget this loop if the recurring event is not meant to
