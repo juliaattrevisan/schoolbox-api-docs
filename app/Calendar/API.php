@@ -78,8 +78,7 @@ class Calendar_API extends Generic_API {
 
         $aside = sprintf('<a href="%s" data-icon="back">%s</a><a href="%s" data-icon="next">%s</a>',
             "/m/calendar/month/$prevMonthSlug", '',
-            "/m/calendar/month/$nextMonthSlug", '',
-            '/m/ofl'
+            "/m/calendar/month/$nextMonthSlug", ''
         );
 
         $calendar = array(
@@ -381,41 +380,14 @@ class Calendar_API extends Generic_API {
      * @return Response_HTTP
      */
     public function Event($event_id) {
-        $calFactory = new Calendar_Api_Factory();
-        $calendarHandler = $calFactory->produce();
+        $calendarHandler = new Calendar();
         $event = $calendarHandler->getByID($event_id);
 
+        $adf = new Alaress_Date_Format($event['date'], 'y-m-d');
+
         if($event) {
-
-            // manhandle the data
-
-            $withTime = 'D, jS M \a\t H:i';
-            $noTime   = 'D, jS M';
-
-            if($event->getStartTime() == $event->getEndTime()) {
-                $event->setEndTime('');
-            }
-            else {
-                if($event->getEndTime()->format('Hi') == '0000') {
-                    $event->setEndTime($event->getEndTime()->format($noTime));
-                }
-                else {
-                    $event->setEndTime($event->getEndTime()->format($withTime));
-                }
-            }
-
-
-            if($event->getStartTime()->format('Hi') == '0000') {
-                $event->setStartTime($event->getStartTime()->format($noTime));
-            }
-            else {
-                $event->setStartTime($event->getStartTime()->format($withTime));
-            }
-
-
-
             $time = array(
-                'title'   => 'Date',
+                'title'   => $adf->getDateOnly(),
                 'aside'   => '',
                 'class'   => '',
                 'icon'    => 'clock',
@@ -428,12 +400,12 @@ class Calendar_API extends Generic_API {
                 'class'   => '',
                 'icon'    => 'news',
                 'content' => array(
-                    'detail' => $event->getDetail()
+                    'detail' => $event['detail']
                 )
             );
 
             $response = new Response_HTTP();
-            $response->setPage('title', $event->getNote());
+            $response->setPage('title', $event['note']);
             $response->setResponse('articles', array($time, $detail));
         }
 

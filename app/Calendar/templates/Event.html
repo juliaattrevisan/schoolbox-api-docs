@@ -1,18 +1,19 @@
 <ul>
     {% if content.startTime %}
-    <li><span>starts</span>{{ content.startTime }}
-
-        {% if content.endTime %}
-        <li><span>ends</span>{{ content.endTime }}</li>
+        {% if content.startTime == '12:00AM' and content.endTime == content.startTime %}
+            <li><p>All day event</p></li>
+        {% else %}
+            <li><span>starts</span>{{ content.startTime }}</li>
+            {% if content.endTime %}
+            <li><span>ends</span>{{ content.endTime }}</li>
+            {% endif %}
         {% endif %}
         {% if content.location %}
-        <li><span>location</span>{{ content.location }}</li>
+            <li><span>location</span>{{ content.location }}</li>
         {% endif %}
-
-    {% if content.series_id %}
-    <li><p>This event is part of a series.</p></li>
-    {% endif %}
-
+        {% if content.series_id %}
+            <li><p>This event is part of a series.</p></li>
+        {% endif %}
     {% else %}
         {% if content.detail %}
         <li>{{ content.detail }}</li>
