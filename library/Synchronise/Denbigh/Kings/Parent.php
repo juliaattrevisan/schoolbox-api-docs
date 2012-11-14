@@ -44,7 +44,7 @@ class Synchronise_Denbigh_Kings_Parent extends Synchronise_Denbigh_Kings_Abstrac
 
      // $newuser['email_pass']          = 'abc123';
         $newUser['synergy_id']          = $currentUser['denbighID'];
-        $newUser['campus']              = self::DEFAULT_CAMPUS_ID;
+        $newUser['campus']              = array(self::DEFAULT_CAMPUS_ID);
         $newUser['year']                = null;
         $newUser['house']               = null;
 

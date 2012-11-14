@@ -36,7 +36,7 @@ class Synchronise_Denbigh_Kings_Staff extends Synchronise_Denbigh_Kings_Abstract
         $newUser['lastname']            = $currentUser['surname'];
      // $newuser['email_pass']          = 'abc123';
         $newUser['synergy_id']          = $currentUser['denbighID']; // change this to denbighID, requires SQL modification
-        $newUser['campus']              = self::DEFAULT_CAMPUS_ID;
+        $newUser['campus']              = array(self::DEFAULT_CAMPUS_ID);
         $newUser['year']                = '';
         $newUser['house']               = '';
         $newUser['alt_email']           = $currentUser['email'] == NULL ? strtolower($currentUser['staffCode'] . "@kings.edu.au")
