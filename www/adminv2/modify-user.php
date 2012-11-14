@@ -70,7 +70,7 @@ if(is_numeric($this->arg[0])) {
         $this->setBlock(TEMPLATE_content, 'reveal_password','reveal_password_block');
         $this->setVar('reveal_password_block','');
 
-        if($user['email_pass']) {
+        if(Cfg::get('reveal_password') && $user['email_pass']) {
             $this->parse('reveal_password_block','reveal_password');
         }
 
