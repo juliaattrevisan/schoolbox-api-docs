@@ -393,7 +393,7 @@ class SitePage extends Page {
                     if ($this->site == 'cathedral') {
                         $this->setVar(
                             'WEBMAIL_LOCATION',
-                            'href="http://mail.cathedral.qld.edu.au/webmail/src/login.php" rel="external"'
+                            'href="http://outlook.com/cathedral.qld.edu.au" rel="external"'
                         );
                     } else {
                         if ($this->site == 'mggs') {
