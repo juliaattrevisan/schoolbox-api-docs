@@ -52,20 +52,21 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
 
         // the view inverts the boolean campus flags for some reason
         $campus = array();
-        if (!$currentUser['FutureStudent']) {
-            if (!$currentUser['SeniorSchoolStudent']) {
-                $campus[] = 1;
-            }
-            if (!$currentUser['JuniorSchoolStudent']) {
-                $campus[] = 2;
-            }
-            if (!$currentUser['MiddleSchoolStudent']) {
-                $campus[] = 3;
-            }
-            $newUser['defaultCampus'] = $campus[0];
-        } else {
-            $newUser['defaultCampus'] = 0;
+        if ($currentUser['SeniorSchoolStudent'] == 1) {
+            $campus[] = 1;
         }
+        if ($currentUser['JuniorSchoolStudent'] == 1) {
+            $campus[] = 2;
+        }
+        if ($currentUser['MiddleSchoolStudent'] == 1) {
+            $campus[] = 3;
+        }
+
+        if(count($campus) < 1) {
+            $campus[] = 1;
+        }
+
+        $newUser['defaultCampus'] = $campus[0];
 
         // get WPA associations
         $newUser['WPA'] = array();
@@ -81,10 +82,10 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
             }
         }
 
+
         // get campuses of attached children
         $newUser['campus'] = $campus;
         $newUser['group_id'] = self::PARENT_GROUP_ID;
-
 
         return $newUser;
     }
@@ -126,38 +127,38 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
                 $previousUser = $newUser;
             } /* Previous was different person to Current
                 */
-            else {
-                if ($previousUser['username'] != $newUser['username']) {
-                    $previousUser['campus'] = $compiledCampus;
+            else if ($previousUser['username'] != $newUser['username']) {
+                $previousUser['campus'] = $compiledCampus;
 
-                    /* Uniquify campus list
-                    */
-                    $previousUser['campus'] = array_unique($previousUser['campus']);
-
-                    /* Update previous user
-                    */
-                    $this->executeCreateUpdate($previousUser);
-
-                    // map parents into their WPA categories
-                    foreach ($previousUser['WPA'] as $wpa) {
-                        if ($this->getPerformUpdate() === true) {
-                            echo "^  Adding parent to $wpa\n";
-                            $groupHandler->addUser($wpaCats[$wpa], $previousUser['id']);
-                        } else {
-                            echo "^  Planning to add parent to $wpa\n";
-                        }
-                    }
-
-                    /* Recompile
-                    */
-                    $compiledCampus = $newUser['campus'];
-
-                    $previousUser = $newUser;
-                } /* They are the same person
+                /* Uniquify campus list
                 */
-                else {
-                    $compiledCampus = array_merge($compiledCampus, $newUser['campus']);
+                $previousUser['campus'] = array_unique($previousUser['campus']);
+
+                /* Update previous user
+                */
+                $this->executeCreateUpdate($previousUser);
+
+                $user = $userHandler->getBySynergy($previousUser['synergy_id']);
+
+                // map parents into their WPA categories
+                foreach ($previousUser['WPA'] as $wpa) {
+                    if ($this->getPerformUpdate() === true && isset($user['id'])) {
+                        echo "^  Adding parent to $wpa\n";
+                        $groupHandler->addUser($wpaCats[$wpa], $user['id']);
+                    } else {
+                        echo "^  Planning to add parent to $wpa\n";
+                    }
                 }
+
+                /* Recompile
+                */
+                $compiledCampus = $newUser['campus'];
+
+                $previousUser = $newUser;
+            } /* They are the same person
+            */
+            else {
+                $compiledCampus = array_merge($compiledCampus, $newUser['campus']);
             }
         }
 
