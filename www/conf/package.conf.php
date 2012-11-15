@@ -32,8 +32,6 @@ define('SYN_CAMPUS_Codes', serialize(array(
 define('TIMETABLE_day_count',serialize(array(1=>7,7,5)));
 define('TIMETABLE_day_offset', 0);
 
-define('RSS_cache_time', 3000);
-
 //module config options
 define('HELPDESK_enable', false);
 define('HELPDESK_location', '/var/www/helpdesk');

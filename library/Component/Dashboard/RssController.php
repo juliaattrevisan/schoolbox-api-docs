@@ -16,7 +16,7 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage) {
         parent::__construct($instance, $user, $sitepage);
 
-        $this->rss = new Xml($this->getConfig('url'), RSS_cache_time);
+        $this->rss = new Xml($this->getConfig('url'), Cfg::get('xml_cache_timeout'));
     }
 
     public function execute() {

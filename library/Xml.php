@@ -20,10 +20,14 @@ class Xml {
 	 * @param  $url
 	 * @param int $cache_time
 	 */
-    public function __construct($url, $cache_time = RSS_cache_time) {
+    public function __construct($url, $cache_time) {
 		if (empty($url)) {
 			return false;
 		}
+
+		if (empty($cache_time)) {
+			$cache_time = Cfg::get('xml_cache_timeout');
+		}	
 
 		/* Set up cached file
 		 */
