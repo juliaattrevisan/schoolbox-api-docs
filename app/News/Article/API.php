@@ -17,9 +17,12 @@ class News_Article_API {
         $article = array(
             'title'   => $news['item_heading'],
             'aside'   => '',
-            'class'   => '',
+            'class'   => 'news wide',
             'icon'    => 'news',
-            'content' => $news['item_body']
+            'content' => array(
+                'body' => $news['item_body'],
+                'image' => $news['item_image']
+            )
         );
 
         $response->setPage('title', 'News');
@@ -37,7 +40,7 @@ class News_Article_API {
         $article = array(
             'title'   => $news['heading'],
             'aside'   => '',
-            'class'   => '',
+            'class'   => 'news wide',
             'icon'    => 'news',
             'content' => $news['body']
         );
