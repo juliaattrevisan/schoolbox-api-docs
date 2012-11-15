@@ -12,34 +12,42 @@ $this->setFile(TEMPLATE_content, 'homepage/index.html');
 $groupID = $_SESSION['gid'];
 $catHandler = new Category();
 
+// retrieve the category ID from the URI, must be an integer and at least 1 character long
 if (preg_match('/^[1-9]+[0-9]*$/', $this->arg[0])) {
     $category = $catHandler->getByID($this->arg[0]);
 } else {
     $category = null;
 }
 
+// if no category was found by ID, attempt a lookup by code
 if (!is_array($category)) {
     $code = implode('/', $this->arg);
     $category = $catHandler->getByCode(urldecode(urldecode($code)));
 }
 
+// if we still have no category, advise that these are not the droids you're looking for
 if (!isset($category['id'])) {
     error(18);
 }
 
 $categoryID = $category['id'];
 
+// confirm that the user has permission to view this page
+$g = new Group();
+if (($permission = $g->getPermission($categoryID)) < READ_ACCESS) {
+    error(14);
+}
+
+// setup the homepage handler
 $homepageHandler = new Homepage($categoryID);
 
-// doesn't have a template, therefore the category doesn't have a homepage: redirect to resource browser.
+// this category doesn't have a template, therefore doesn't have a homepage: redirect to resource browser.
 if(!$homepageHandler->getTemplate()) {
     $this->localRedir('/resources/'.$categoryID);
 }
 
+// moving forward! log the pageview
 $catHandler->logPageView($categoryID);
-
-$g = new Group();
-$permission = $g->getPermission($categoryID);
 
 
 /* BUILD PAGE */
