@@ -9,6 +9,10 @@
 
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
+if(!Cfg::get('mobile_enabled')) {
+    SitePage::localRedir('/');
+}
+
 // instantiate mediator
 $mediator = new Mediator();
 
