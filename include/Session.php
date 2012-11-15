@@ -92,7 +92,9 @@ class Session
                     VALUES ('" . mysql_real_escape_string($username) . "', NOW(), '$ip', '1')";
             $this->db->query($loginlogquery);
 
-            return true;
+            // add mobile session data
+            $sbmAuth = new Authenticator();
+            return $sbmAuth->appendSession($username);
         } else
             return false;
     }

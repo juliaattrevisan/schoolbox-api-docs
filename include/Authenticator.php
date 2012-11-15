@@ -123,30 +123,18 @@ class Authenticator {
 
         $this->destroySession();
 
+        // start by creating a desktop session, then we will add the mobile elements into it
+        $session = new Session();
+        $session->create($username);
+
+        return session_start() ? $this->appendSession($username) : false;
+    }
+
+    public function appendSession($username) {
         $uMap = new GizaUser_DataMapper();
         $user = $uMap->read(array('username' => $username))->get();
 
-        if(session_start() && count($user)) {
-
-            $this->setSessionUser($user);
-
-            if(Config::get('mail_enable') == 0 ||
-                $user->get('mail_handler') ||
-                ( $user->getGroupType() == 'parent' && $user->get('local_email'))
-            ) {
-                $sessions['mailhandle'] = "mailto:";
-            }
-            else {
-                $sessions['mailhandle'] = "/mail/createMail.php?replyto=";
-            }
-
-            /*
-             * Not sure this needs to be hydrated yet
-            $user->getSubjects();
-            */
-
-            // commit the array to the $_SESSION superglobal
-            $this->setSessionVars($sessions);
+        if(count($user)) {
             $this->setSessionUser($user);
 
             // indicate that session creation was successful
@@ -190,18 +178,7 @@ class Authenticator {
         // $_SESSION['user'] = $user->get('uid');
         // -- or --
         $_SESSION['user'] = $user;
-
-
-        // TODO refactor the system to make the following
-        $uMap = new GizaUser_DataMapper();
-        $uMap->hydrateCampus($user);
-
-        $_SESSION['id'] = $user->get('uid');
-        foreach($user->get('campus')->asArray() as $c) {
-            $_SESSION['campus'][$c->get('campus')] = $c->get('campus');
-        }
-        $_SESSION['campus'] = array_values($_SESSION['campus']);
-        $_SESSION['gid'] = $user->get('group_id');
+        $this->touch();
     }
 
     /**
@@ -210,10 +187,17 @@ class Authenticator {
     public function getSessionUser() {
         // $uMap = new GizaUser_DataMapper();
         // return $uMap->read($_SESSION['user']);
+        $this->touch();
         // -- or --
         return $_SESSION['user'];
     }
 
+    /**
+     * Update the latest touch of the site by the user to being now
+     */
+    private function touch() {
+        $_SESSION['lasttime'] = time();
+    }
 
     public function destroySession() {
         @session_destroy();
