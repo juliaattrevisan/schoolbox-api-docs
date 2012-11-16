@@ -276,9 +276,9 @@ class News extends DeprecatedModel {
         if (!$userHandler->isSuperuser()) {
             $query = "
          SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner, news_items.item_body,
-            DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, item_image,
+            UNIX_TIMESTAMP(news_items.item_datetime_posted) AS post_datetime, item_image,
             news_items.item_datetime_posted, news_items.item_datetime_modified, news_items.item_datetime_published,
-            DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
+            UNIX_TIMESTAMP(news_items.item_datetime_expires) AS expire_datetime,
             user.lastname, user.title, user.id as uid, user.firstname, user.synergy_id synid, newsTopic.name topicName, newsTopicID
          FROM `" . $this->_table . "`
          LEFT JOIN user ON news_items.item_owner = user.id
@@ -301,8 +301,8 @@ class News extends DeprecatedModel {
 
         $query = "
 		SELECT DISTINCT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_body, item_image,
-			DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
-			DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime, news_items.item_datetime_published,
+			UNIX_TIMESTAMP(news_items.item_datetime_posted) AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
+			UNIX_TIMESTAMP(news_items.item_datetime_expires) AS expire_datetime, news_items.item_datetime_published,
 			user.lastname, user.title, user.firstname, user.id as uid, user.synergy_id synid, newsTopic.name topicName, newsTopicID
 		FROM `" . $this->_table . "`
 		LEFT JOIN user ON news_items.item_owner = user.id
@@ -377,8 +377,8 @@ class News extends DeprecatedModel {
         if (!$userHandler->isSuperuser($userID)) {
             $query = "
          SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner, news_items.item_body, item_image
-            DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
-            DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
+            UNIX_TIMESTAMP(news_items.item_datetime_posted) AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
+            UNIX_TIMESTAMP(news_items.item_datetime_expires) AS expire_datetime,
             user.lastname, user.title, user.id as uid, user.firstname, newsTopic.name topicName, newsTopicID
          FROM `" . $this->_table . "`
          LEFT JOIN user ON news_items.item_owner = user.id
@@ -408,8 +408,8 @@ class News extends DeprecatedModel {
 
         $query = "
 		SELECT DISTINCT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_body,
-			DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
-			DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
+			UNIX_TIMESTAMP(news_items.item_datetime_posted) AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
+			UNIX_TIMESTAMP(news_items.item_datetime_expires) AS expire_datetime,
 			user.lastname, user.title, user.firstname, user.id as uid, newsTopic.name topicName, newsTopicID
 		FROM `" . $this->_table . "`
 		LEFT JOIN user ON news_items.item_owner = user.id
@@ -658,8 +658,8 @@ class News extends DeprecatedModel {
         if (!$userHandler->isSuperuser()) {
             $query = "
         SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner, news_items.item_body,
-            DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
-            DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime,
+            UNIX_TIMESTAMP(news_items.item_datetime_posted) AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
+            UNIX_TIMESTAMP(news_items.item_datetime_expires) AS expire_datetime,
             user.lastname, user.title, user.id as uid, user.firstname, newsTopic.name topicName, newsTopicID,
             MATCH(`item_heading`,`item_body`) AGAINST ('$keyword') AS `score`
         FROM `" . $this->_table . "`
@@ -681,8 +681,8 @@ class News extends DeprecatedModel {
 
         $query = "
 		SELECT DISTINCT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_body,
-			DATE_FORMAT(news_items.item_datetime_posted, '%W %M %e @ %l:%i%p') AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
-			DATE_FORMAT(news_items.item_datetime_expires, '%W %M %e @ %l:%i%p') AS expire_datetime, news_items.item_datetime_expires,
+			UNIX_TIMESTAMP(news_items.item_datetime_posted) AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
+			UNIX_TIMESTAMP(news_items.item_datetime_expires) AS expire_datetime, news_items.item_datetime_expires,
 			user.lastname, user.title, user.firstname, user.id as uid, newsTopic.name topicName, newsTopicID,
 		    MATCH(`item_heading`,`item_body`) AGAINST ('$keyword') AS `score`
 		FROM `" . $this->_table . "`

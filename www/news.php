@@ -133,12 +133,14 @@ if (is_array($items)) {
             $url = new Url($previous['topicName']);
 
             $formatter = new TextFormatter();
+            
+            $postDate = new Alaress_Date_Format($article['post_datetime'], 'U');
 
             $output = array(
                 'NEWS_ID' => $article['item_id'],
                 'NEWS_TITLE' => $article['item_heading'],
                 'POSTER' => $owner,
-                'DATETIME' => $_SESSION['su'] == 1 ? $article['post_datetime'] : $article['post_datetime'],
+                'DATETIME' => $postDate->getLong(),
                 'NEWS_SHORT' => TextFormatter::cutSentence(Scrub::html2text($article['item_body']), 300),
                 'NEWS_IMAGE' => $article['item_image'],
                 'TOPIC_NAME' => Scrub::text($previous['topicName']),

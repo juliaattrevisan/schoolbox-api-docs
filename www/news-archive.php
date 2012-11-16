@@ -293,10 +293,12 @@ if (is_array($items)) {
                     $expiryVerb = 'Expires';
                 }
 
+                $expireDate = new Alaress_Date_Format($article['expire_datetime'], 'U');
+                
                 $this->setVar(
                     array(
                         'EXPIRY_VERB' => $expiryVerb,
-                        'EXPIRY_DATE' => $article['expire_datetime'],
+                        'EXPIRY_DATE' => $expireDate->getLong(),
                     )
                 );
 
@@ -312,6 +314,8 @@ if (is_array($items)) {
             $url = new Url($previous['topicName']);
 
             $formatter = new TextFormatter();
+            
+            $postDate = new Alaress_Date_Format($article['post_datetime'], 'U');
 
             $output = array(
                 'NEWS_ID' => $article['item_id'],
@@ -319,7 +323,7 @@ if (is_array($items)) {
                 'POSTER' => $fullname,
                 'POSTER_ID' => $article['uid'],
                 'POSTER_EXTERNAL_ID' => $article['synid'],
-                'DATETIME' => $_SESSION['su'] == 1 ? $article['post_datetime'] : $article['post_datetime'],
+                'DATETIME' => $postDate->getLong(),
                 'NEWS_BODY' => $archive ? $article['item_body'] : Scrub::html($article['item_body']),
                 'TOPIC_NAME' => Scrub::text($previous['topicName']),
                 'TOPIC_CLEAN' => $filter['archive'] . $url->getSlug(),
