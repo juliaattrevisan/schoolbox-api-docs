@@ -3,7 +3,7 @@
 // =============================================================================
 // Colours
 @link-color: 		#237CFF;
-@highlight-color: 	#CAE9B9;
+@highlight-color: 	#FFF3B2;
 @brand-blue:        #0066b0;
 @light-blue:        #D9EFFE;
 
@@ -11,19 +11,28 @@
 @brand-color:        #0066b0;
 @brand-secondary:    #D9EFFE;
 
-
 @marked-color:      rgba(255,255,0,0.4);
 @body-color: 		#222;
+@body-color-light:  #6f6f6f;
 @negative: 			~`'@{body-color}'.replace(/./gi,function(s){return 'fedcba9876543210#'.charAt('0123456789abcdef#'.indexOf(s));})`;
 @light-grey:    	#ddd;
 @grey:              #999;
 @dark-grey:         #333;
+@article-bg:        #fff;
+@border-color:      @dark-grey;
+
+// event (and other groupings of like-items) colours
+@colourA:           #CEE6EA;
+@colourB:           #D2CEF2;
+@colourC:           #D4EFC4;
+@colourD:           #F2CED6;
+@colourE:           #F8DEB8;
+@colourF:           #FFF3B2;
 
 // Font stacks
 @font-family: 		~'"Roboto Light", "Roboto", "Helvetica Neue", sans-serif';
 @font-family: 		~'sans-serif';
 @monospace: 		~'"Courier new", monospace';		// make sure monospace is defined
-
 
 // DP
 // Density-independent pixel
@@ -34,6 +43,9 @@
 @dp4:               @dp / 4;        // 12
 @dp6:               @dp / 6;        //  8
 @dp12:              @dp / 12;       //  4
+
+// default rouding
+@radius:            @dp12;
 
 // Type variables
 @baseline:			@dp / 2;							// baseline height
@@ -49,7 +61,11 @@
 @bodyfont: 			100% * (@fontpx/16); 			// body font size in percentages
 @bodyoffset:		0px;
 
+// opacity compatibility
 @opacity: 			0.5;
 @ie-opacity-value: 	@opacity * 100;
 @ie-opacity: 		"alpha(opacity=@{ie-opacity-value})";
 
+// scrolling
+@scrollOffset:      0px;
+@scrollWidth:       @dp12;

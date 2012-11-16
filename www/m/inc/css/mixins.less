@@ -150,8 +150,8 @@
 .threshold (@a) when (lightness(@a) < 50%)  { color: white; }
 .threshold_neg (@a) when (lightness(@a) < 50%) { color: black; }
 .threshold_neg (@a) when (lightness(@a) >= 50%)  { color: white; }
-.shadow (@a) when (lightness(@a) < 50%) { text-shadow: 1px 1px 0 black; }
-.shadow (@a) when (lightness(@a) >= 50%)  { text-shadow: 1px 1px 0 white; }
+.shadow (@a) when (lightness(@a) < 50%) { text-shadow: 0 -1px 0 black; }
+.shadow (@a) when (lightness(@a) >= 50%)  { text-shadow: 0 1px 0 white; }
 
 
 .striped() {

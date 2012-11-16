@@ -14,7 +14,7 @@
         h3              { margin: 0 - @dp4 0 - @dp4 0; }
         h4              { margin: 0; }
         time            { float: none; display: block; width: auto; }
-        &.current       { background: lighten(@colourF,7%); font-weight: bold; }
+        &.current       { background: lighten(@highlight-color,7%); font-weight: bold; }
     }
 
 }
@@ -31,7 +31,7 @@
     td                  { overflow: hidden; text-overflow: ellipsis; word-break: break-all; white-space: nowrap; border-color: darken(#fff,7%); }
     a                   { display: block; height: 100%; vertical-align: top; }
     time, span          { text-style: italic; font-size: 90%; display: block; color: lighten(@body-color,20%); }
-    .current            { background: lighten(@colourF,7%); font-weight: bold; border-color: @colourF; }
+    .current            { background: lighten(@highlight-color,7%); font-weight: bold; border-color: @highlight-color; }
 }
 
 
@@ -81,13 +81,31 @@
 #login_frm {
     margin-top: @dp6;
     input {
-        border: solid 1px #49f;
-        background-color: rgba(255, 255, 255, 0.2);
+        border: none;
+        background-color: rgba(255, 255, 255, 0.1);
         color: #fff;
-        border-radius: @radius;
         padding: @dp12 @dp6;
+        &:focus {
+            background-color: rgba(255, 255, 255, 0.2);
+            outline: none;
+        }
     }
     input[type="submit"] {
         padding: 0 @dp4;
     }
+    li {
+        border-bottom: none;
+    }
 }
+
+.news {
+    img {
+        max-width: 200px;
+        float: left;
+        padding: 8px;
+    }
+    .news-content {
+
+    }
+}
+
