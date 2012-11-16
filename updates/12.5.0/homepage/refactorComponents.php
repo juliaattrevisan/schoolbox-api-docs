@@ -197,7 +197,8 @@ class DashboardComponentReFactory {
             'size' => array(10, 'Limit')
         ),
         'Dashboard_Rss' => array(
-            'url' => array('[TOBEOVERWRITTEN]', 'Url')
+            'url' => array('[TOBEOVERWRITTEN]', 'Url'),
+            'size' => array(10, 'Limit')
         ),
         'Dashboard_UpcomingWork' => array(
             'size' => array('10', 'Limit')
