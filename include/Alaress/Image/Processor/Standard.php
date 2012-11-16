@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Alaress_Image_Processor extends Alaress_Image_Processor_Abstract {
+class Alaress_Image_Processor_Standard extends Alaress_Image_Processor_Abstract {
 
     /**
      * Constructor
@@ -38,7 +38,8 @@ class Alaress_Image_Processor extends Alaress_Image_Processor_Abstract {
          */
         if ($this->getCache()->isLoadedFromCache()) {
             $this->getFiletypeStrategy()->streamFile($imageArray['filepath']);
-        } else {
+        }
+		else {
             $this->setImage($this->getFiletypeStrategy()->create($imageArray['filepath']));
         }
 

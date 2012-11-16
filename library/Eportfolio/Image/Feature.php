@@ -157,7 +157,7 @@ class Eportfolio_Image_Feature extends Eportfolio_Image_Abstract {
 				$config['pixel'] = 20;
 			}
 
-			$imageurl = "/cms/image.php?myFile=1&id={$image['id']}&height={$config['pixel']}&width={$config['pixel']}";
+			$imageurl = "/cms/myImage.php?id={$image['id']}&width={$config['pixel']}&height={$config['pixel']}";
 
 			$this->getPage()->setVar('PREVIEW_IMAGE_URL', $imageurl);
 			$this->getPage()->setVar('PREVIEW_IMAGE_DESC', Scrub::text($image['comment']));

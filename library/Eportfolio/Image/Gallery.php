@@ -53,8 +53,8 @@ class Eportfolio_Image_Gallery extends Eportfolio_Image_Abstract {
 		if (is_array($imageList) ) {
 			foreach ($imageList as $thumbnail) {
 				$this->getPage()->setVar('THUMBNAIL', "
-					<a style='height:100px' class=\"float-left thumb\" href=\"/cms/image.php?myFile=1&id={$thumbnail['id']}&height=600&width=800\" rel=\"lightbox[portal]\" title=\"{$thumbnail['description']}\">
-					<img src=\"/cms/image.php?myFile=1&id={$thumbnail['id']}&height=".Cfg::get('thumbnail_size')."&width=".Cfg::get('thumbnail_size')."&resample=0\" alt=\"{$thumbnail['description']}\" border=\"0\">
+					<a style='height:100px' class=\"float-left thumb\" href=\"/cms/myImage.php?id={$thumbnail['id']}&width=800&height=600\" rel=\"lightbox[portal]\" title=\"{$thumbnail['description']}\">
+					<img src=\"/cms/myImage.php?id={$thumbnail['id']}&width=".Cfg::get('thumbnail_size')."&height=".Cfg::get('thumbnail_size')."\" alt=\"{$thumbnail['description']}\" border=\"0\">
 					</a>");
 
 				$this->getPage()->parse('cell_block', 'thumb_cell', true);

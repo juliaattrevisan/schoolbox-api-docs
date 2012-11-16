@@ -28,12 +28,12 @@ class Alaress_Image_Portrait {
     public function __construct($externalUserId, $key, $transformations) {
 
         /* Choose a caching method to use
-           */
+         */
         $cache = new Alaress_Image_Cache_Portrait($externalUserId, $key);
 
         /* Process and stream image
-           */
-        $this->imageProcessor = new Alaress_Image_Processor($cache, $transformations);
+         */
+        $this->imageProcessor = new Alaress_Image_Processor_Standard($cache, $transformations);
         $this->imageProcessor->load()->transformAll();
     }
 

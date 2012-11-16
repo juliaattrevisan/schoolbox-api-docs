@@ -140,7 +140,7 @@ $(function () {
 					clone.find('img').attr('alt', row.description)
 
 					if ('{FILTER}' == 'image') {
-						clone.find('img').attr('src', '/cms/image.php?id=' + row.id + '&height=100&width=75&resample=1&myFile=1');
+						clone.find('img').attr('src', '/cms/myImage.php?id=' + row.id + '&width=75&height=100');
 					} else {
 						clone.find('img').attr('src', '/images/mime/22x22/' + row.iconFile + '?id=' + row.id + '&myFile=1');
 					}
@@ -199,7 +199,7 @@ $(window).load(function () {
       <li id="file-{FILE_ID}">
         <div class="taskbar">{TITLE_SHORT}</div>
         <div class="image">
-		<!-- BEGIN thumbnail_image --><img alt="{DESCRIPTION}" src="/cms/image.php?id={FILE_ID}&height=100&width=75&resample=1&myFile=1" /> <!-- END thumbnail_image -->
+		<!-- BEGIN thumbnail_image --><img alt="{DESCRIPTION}" src="/cms/myImage.php?id={FILE_ID}&width=75&height=100" /> <!-- END thumbnail_image -->
         <!-- BEGIN thumbnail_flash --><img alt="{DESCRIPTION}" src="/images/mime/22x22/{FILE_ICON}?id={FILE_ID}" /> <!-- END thumbnail_flash -->
         	<input type="hidden" class="hide file-url" value="{URL}" /> </div>
       </li>

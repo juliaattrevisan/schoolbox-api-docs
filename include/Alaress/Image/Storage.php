@@ -11,23 +11,23 @@
  */
 class Alaress_Image_Storage {
 
-    /**
-     * Consructor
-     * Sets up the caching implementation, image processor and streams it
-     *
-     * @param $imageId
-     * @param $key
-     * @param $transformations
-     */
+	/**
+	 * Consructor
+	 * Sets up the caching implementation, image processor and streams it
+	 *
+	 * @param $resource
+	 * @param $key
+	 * @param $transformations
+	 */
     public function __construct($resource, $key, $transformations) {
 
         /* Choose a caching method to use
-           */
+         */
         $cache = new Alaress_Image_Cache_Storage($resource, $key);
 
         /* Process and stream image
-           */
-        $imageProcessor = new Alaress_Image_Processor($cache, $transformations);
+         */
+        $imageProcessor = new Alaress_Image_Processor_Standard($cache, $transformations);
         $imageProcessor->load()->transformAll()->stream();
     }
 }
