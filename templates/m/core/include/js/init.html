@@ -4,7 +4,15 @@ function init() {
     if(sessionStorage.getItem('session') && getCookie('PHPSESSID')) {
         if(sessionStorage.getItem('session') != getCookie('PHPSESSID')) {
             sessionStorage.removeItem('session');
+            localStorage.removeItem('lastPage');
+            localStorage.removeItem('skin');
+            localStorage.removeItem('/m/core/nav/sidebar.json');
         }
+    }
+    else {
+        localStorage.removeItem('lastPage');
+        localStorage.removeItem('skin');
+        localStorage.removeItem('/m/core/nav/sidebar.json');
     }
 
     // Install-a-bubble
@@ -52,14 +60,14 @@ function init() {
     if(env.loggedIn) {
         renderMenu('/m/core/nav/sidebar.json');
 
-        console.log(env.lastPage);
+        debug(env.lastPage);
 
         var push = true;
 
         if(env.lastPage == null || env.lastPage == '/m/' || env.lastPage == '') {
             push = false;
             env.lastPage = '/m/facade/dashboard/display';
-            console.log('empty uri, send to dashboard');
+            debug('empty uri, send to dashboard');
         }
 
         // this is where the action's at
@@ -98,7 +106,7 @@ function init() {
                     data = JSON.parse(data);
                 }
 
-                console.log(data);
+                debug(data);
 
                 if(data.session) {
                     // success
@@ -109,6 +117,7 @@ function init() {
                 }
                 else {
                     // failure
+                    toast('Your username or password is incorrect.', 'error');
                     // window.location = "/m/";
                 }
             });

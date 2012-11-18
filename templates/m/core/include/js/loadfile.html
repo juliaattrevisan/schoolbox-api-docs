@@ -25,8 +25,21 @@
         document.getElementsByTagName("head")[0].appendChild(fileref);
     }
 
+    function getSkin() {
+        if(localStorage.getItem('skin') == null || localStorage.getItem('skin') == 'undefined') {
+            $.ajax({
+                url: '/m/core/settings/skin.json',
+                dataType: 'json',
+                async: false,
+                success: function(data) {
+                    localStorage.setItem('skin', data.skin);
+                }
+            });
+        }
+        return localStorage.getItem('skin');
+    }
+
     loadFile("/m/inc/js/libs/iscroll.js",'js');
-    loadFile("/m/inc/css/chrome.css",'css');
-    loadFile("/m/inc/css/chrome-ext.css", 'css');
+    loadFile("/css/" + getSkin() + "/mchrome.css", 'css');
 
 </script>

@@ -5,11 +5,18 @@
         var json = JSON.parse(cache);
         data = json;
 
-        if(!data.menu) {
-            if(data.redirect) {
-                sessionStorage.clear();
-                return;
+        if(data) {
+            if(!data.menu) {
+                if(data.redirect) {
+                    sessionStorage.clear();
+                    return;
+                }
             }
+        }
+        else {
+            sessionStorage.clear();
+            localStorage.clear();
+            return;
         }
 
         var menu = '<ul role="tablist" id="tablist">'+'\n';
@@ -50,14 +57,20 @@
             menu += '</li>'+'\n';
         });
 
-        $('#nav').append(menu);
+        // Ok. So this replace() is here after all kinds of fun.
+        // The current server config has session.use_trans_sid ON, which is causing it to append "?PHPSESSID=x" to
+        // the HREFs in the 30 lines above here each time it sees '<a href="'+ v.href +'">' ...*SOMETIMES* (not always).
+        // It shouldn't be doing this, and the flag needs to remain enabled for uploadify (used in desktop version),
+        // therefore, regex the querystring out of the links...
+        var sessionless = menu.replace(/(href="[^"]*)\?PHPSESSID=[a-z0-9]*"/ig, '$1"');
+        $('#nav').append(sessionless);
     }
 
     // data should be coming through with no extension
     function renderPage(data, push){
         if(push === undefined) push = true;
 
-        console.log('render.html:54 > renderPage() url should have no extension: ' + data);
+        debug('render.html:54 > renderPage() url should have no extension: ' + data);
 
         env.status(1); // Loading
 
@@ -80,9 +93,9 @@
             }
 
             // Get the page content
-            console.log( 'render.html:75 renderPage() requesting content for ' + data );
+            debug( 'render.html:75 renderPage() requesting content for ' + data );
             data = localCache.get(data)
-            //console.log(data)
+            //debug(data)
             page = $(data).find('article')
 
             if(!title) var title = ''
@@ -137,11 +150,11 @@
 
         if(push && location.pathname != data && data != '/') {
             history.pushState(null, null, data);
-            console.log('pushed '+data);
+            debug('pushed '+data);
             localStorage.setItem('lastPage', data)
         }
         else {
-            console.log('suppressed push of '+data);
+            debug('suppressed push of '+data);
         }
 
     }

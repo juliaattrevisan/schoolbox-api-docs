@@ -40,10 +40,11 @@ function getCookie(c) {
             return decodeURI(y);
         }
     }
+    return null;
 }
 
 function killCookie(c) {
-    document.cookie = c + '=; expires=Thu, 01-Jan-70 00:00:01 GMT;';
+    document.cookie = c + '=; expires=Thu, 01-Jan-70 00:00:01 GMT; path=/';
 }
 
 function killScroll(o) {
@@ -53,8 +54,30 @@ function killScroll(o) {
     }
 }
 
-function toast(el){
-    alert(el);
+function toast(message, type){
+    if(type === undefined) {
+        type = 'info';
+    }
+
+    // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+    var uid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+        return v.toString(16);
+    });
+
+    var errDialog = $('<div class="toast"></div>');
+    errDialog.attr('id', uid);
+    errDialog.addClass(type);
+    errDialog.html(message);
+    $('body').prepend(errDialog);
+
+    setTimeout(function() {
+        $('#'+uid).css('opacity', '0');
+        setTimeout(function() {
+            $('#'+uid).remove();
+        }, 500);
+    }, 2000);
+
 }
 
 $('body').on('longTap','[title]',function() {
@@ -82,7 +105,7 @@ $('#app').on(clickEvent,'a',function(e){
 // Get response to HTTP request and save it to localStorage
 localCache.get = function(url) {
 
-    console.log('loadjs.html:85 > localCache() url should have no extension: ' + url);
+    debug('loadjs.html:85 > localCache() url should have no extension: ' + url);
 
     var r = localStorage[url];
 
@@ -104,17 +127,17 @@ localCache.get = function(url) {
         }
         // check headers: use content-disposition as trigger for file download
         if(xhr.getResponseHeader('Content-Disposition')) {
-            console.log('HOKAY, IMMA DOWNLOAD YO FILE!');
-            console.log('Create iframe!');
+            debug('HOKAY, IMMA DOWNLOAD YO FILE!');
+            debug('Create iframe!');
             var f = document.createElement('iframe');
             f.style.display = 'none';
 
-            console.log('Point iframe to ' + url);
+            debug('Point iframe to ' + url);
             f.src = url;
             // download is sent here
             document.body.appendChild(f);
 
-            console.log('Go back to ' + localStorage.getItem('lastPage'));
+            debug('Go back to ' + localStorage.getItem('lastPage'));
             history.go(-1);
 
             return '';
@@ -159,26 +182,26 @@ $('#page').on(clickEvent,'.calendar td',function(){
 
 
 
-document.addEventListener('deviceready', onDeviceReady);
-function onDeviceReady() {
-    alert('Device ready!')
-    navigator.notification.vibrate(1000)
-}
+//document.addEventListener('deviceready', onDeviceReady);
+//function onDeviceReady() {
+//    alert('Device ready!')
+//    navigator.notification.vibrate(1000)
+//}
 
 // history navigation listener
 window.addEventListener("popstate", function(e) {
-    if(location.pathname != '/') {
-        console.log('popping ' + location.pathname)
-        renderPage(location.pathname, false)
+    if(location.pathname == '/m/' || location.pathname == '/') {
+        debug('popping / : using dashboard instead')
+        renderPage('/m/facade/dashboard/display', false)
     }
     else {
-        console.log('popping / : using dashboard instead')
-        renderPage('/m/facade/dashboard/display', false)
+        debug('popping ' + location.pathname)
+        renderPage(location.pathname, false)
     }
 })
 
 // back button listener
-$('#nav_back').on(clickEvent, function(e) {
+$('#nav').delegate('#nav_back', clickEvent, function(e) {
     history.go(-1)
 });
 
@@ -249,7 +272,7 @@ $("#page").on(clickEvent, '#logout', function(){
     localStorage.clear();
     sessionStorage.clear();
     killCookie('PHPSESSID');
-    window.location.reload();
+    window.location = window.location.protocol +'//' + window.location.hostname + '/m/';
 });
 
 
