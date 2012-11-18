@@ -29,6 +29,9 @@
                       .addClass('active');
             $('#menu_wrapper').append($(this).siblings('ul[role="navigation"]').clone());
 
+            // set the menu_wrapper height: viewport - 70px
+            $('#menu_wrapper').css({max_height: $(window).height() - 70});
+
             scrollMenu = new iScroll('menu_wrapper', { bounce: true, vScroll: true });
 
             // Display menu

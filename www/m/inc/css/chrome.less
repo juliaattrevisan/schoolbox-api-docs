@@ -346,7 +346,7 @@ h1, li, a, article, #status {
     #nav                { width: 100%; height: @dp; top: 0; border-top-color: lighten(@banner-color,15%); position: fixed;
                           box-shadow: 0 @dp12 @dp6 0 - @dp12 rgba(0,0,0,0.3); text-align: center; z-index: 5;
         ul              { display: block; width: 100%; }
-        li              { display: inline-block; width: @dp;
+        li              { display: inline-block; width: @dp; top: 0;
             a           { display: block; height: @dp; font-size: 21px; line-height: @dp;
             }
             &:first-of-type { position: absolute; left: 0; }
@@ -386,19 +386,28 @@ h1, li, a, article, #status {
    Landscape phone
    ========================================================================== */
 @media (orientation: landscape) and (max-width: 767px) {
-    body                { padding: @dp 0 0 @dp; }
-    body:after          { content:"landscape phone";display:none;visibility:hidden; }
-    #app                { margin: @dp 0 0; }
-    #logo               { top: 0; }
-    #header             { background: @banner-color; .threshold(@banner-color);
-        text-shadow: 0 -1px 0 darken(@banner-color,59%); border-bottom: 1px solid darken(@banner-color,20%);
-        height: @dp - 1;
+    body                    { padding: 0 0 0 @dp; }
+    body:after              { content:"landscape phone";display:none;visibility:hidden; }
+    #app                    { margin: @dp 0 0; }
+    #logo                   { top: 0; }
+    #header                 { background: @banner-color; .threshold(@banner-color);
+                              text-shadow: 0 -1px 0 darken(@banner-color,59%);
+                              border-right: 1px solid darken(@banner-color,20%); width: @dp - 1; height: 100%;
     }
-    #status             { top: 0; right: 0; }
-    #app                { padding: 0 0 0 @dp; bottom: 0; }
-    #nav                { width: @dp; height: auto; top: @dp; border-top: 0; bottom: 0; border-right: 1px solid @border-color; }
-    #tablist, #tablist li { display: block; }
-    #nav li ul          { top: 0; bottom: 0; left: @dp + 1; width: @dp * 6 - 1; margin: 0; }
+    #status                 { top: 0 - @dp; right: 0; }
+    #app                    { padding: 0 0 0 @dp; bottom: 0; }
+    #nav                    { position:fixed; left:0; z-index:5; width: @dp; height: auto; top: 0; border-top: none; bottom: 0; }
+    #tablist                { display: block;
+        li                  { display: block;
+            &.active:after  { content: ''; display: block; height: 0; width: 0; margin-left: 0;
+                              position: absolute; left: auto; right: 0 - @dp6; bottom: 50%; margin-bottom: 0 - @dp6;
+                              border: @dp6 solid transparent; border-right-color: @banner-color;
+            }
+        }
+    }
+    #menu                   { left: 52px; }
+    article                 { background: @article-bg; }
+    #nav li ul              { top: 0; bottom: 0; left: @dp + 1; width: @dp * 6 - 1; margin: 0; }
 }
 
 /* =============================================================================
