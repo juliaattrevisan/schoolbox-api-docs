@@ -45,7 +45,7 @@ html 									{ font-size: 100%;
                                           -webkit-text-size-adjust: none; -ms-text-size-adjust: 100%; }
 body 									{ margin: 0; font-size: @basefont; line-height: @baseline; }
 body, button, input, select, textarea 	{ font:@font; color: @body-color; }
-* 				           				{ margin: 0; padding: 0; } // The Universal Problem Solver 5000
+* 				           				{ margin: 0; padding: 0; -webkit-tap-highlight-color: rgba(0,0,0,0); } // The Universal Problem Solver 5000
 
 /* =============================================================================
    Links
@@ -171,7 +171,7 @@ th                              { text-transform: uppercase; font-size: 0.9em; c
 .calendar                       {
     td                          { vertical-align: top; border-right: solid 1px #eee; border-bottom: solid 1px #eee; overflow: hidden; }
     h3                          { background-color: #eee; .striped(); font-size: 1em; color: rgba(0,0,0,0.4);
-                                  text-shadow: 0 1px rgba(255,255,255,0.8); padding: 0 @dp4; }
+                                  text-shadow: 0 1px rgba(255,255,255,0.8); padding: 0; }
     .empty                      { font-size: 1em; color: rgba(0,0,0,0.6); }
     li a                        { word-break: break-word; white-space: normal; }
 }
@@ -280,8 +280,8 @@ article                 { position: relative; //border-radius: @radius; backgrou
         span            { text-transform: none; font-weight: normal; }
     }
     img                 { max-width: 100%; }
-    &[data-icon]:before { position: absolute; top: @dp4; right: @dp6; z-index: 1; font-size: @dp2; opacity: 0.5;
-                          //color: darken(@header-color,50%); text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+    &[data-icon]:before { position: absolute; top: @dp4; right: @dp6; z-index: 1; font-size: @dp2; opacity: 0.4;
+                          .threshold(@header-color);
                         }
 }
 
@@ -406,7 +406,9 @@ h1, li, a, article, #status {
         }
     }
     #menu                   { left: 52px; }
-    article                 { background: @article-bg; }
+    article                 { background: @article-bg;
+        h1                  { border-radius: 0; }
+    }
     #nav li ul              { top: 0; bottom: 0; left: @dp + 1; width: @dp * 6 - 1; margin: 0; }
 }
 
