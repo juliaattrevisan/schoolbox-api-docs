@@ -73,20 +73,9 @@ echo "Building update scripts";
 cd tools
 ./build-sql-update.sh
 
-echo "Ensuring correct version of lessc is installed";
-cd ~;
-mkdir -p ~/node_modules
-npm install less@1.3.0 ~
-if [ ! -f ~/node_modules/.bin/lessc ];
-then
-	echo "Error: lessc not installed as expected";
-	exit 1;
-fi
-
-echo "Building core.css with lessc";
+echo "Building css files from less";
 cd $thistempdir/schoolbox-$tag;
-~/node_modules/.bin/lessc www/css/core/core.less > www/css/core/core.css
-echo "/* less (`~/node_modules/.bin/lessc -v | cut -d' ' -f2`) build at `date +%Y-%m-%d\ %H:%M:%S` */" >> www/css/core/core.css
+tools/build-less-css.sh
 
 echo "Removing unrequired files and directories";
 rm -rf {debian,phpunit.xml,README.md,test,.git*}
