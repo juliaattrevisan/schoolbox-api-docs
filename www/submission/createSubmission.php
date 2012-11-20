@@ -184,7 +184,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
 }
 
 // IF NEW
-else if($this->arg[0] == 'new') {
+else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     //Create submission box
     $this->setTitle('Create Submission Box');
 
