@@ -6,3 +6,6 @@ CREATE TABLE `homepage_visits`(
 	`hitcount` int(10) unsigned NULL  DEFAULT 1 ,
 	PRIMARY KEY (`date`,`user_group_id`,`category_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET='utf8';
+
+/* turns out this is somewhat critical */
+ALTER TABLE `homepage_log` ADD INDEX (`cid`);
