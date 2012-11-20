@@ -152,10 +152,14 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                         );
 
                         $this->parse('has_publish_date_block', 'has_publish_date');
-                    } else {
+                    }
+                    else {
                         $this->setVar('has_publish_date_block', '');
                     }
 
+                }
+                else {
+                    $this->setVar('has_publish_date_block', '');
                 }
 
                 $this->parse("news_block", "news", true);
