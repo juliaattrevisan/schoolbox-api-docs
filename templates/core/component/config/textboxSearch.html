@@ -3,19 +3,19 @@
 <script type="text/javascript">
 
     $j(function () {
-        $j('#textbox_search').autocomplete({
+        $j('#textbox_search{COMPONENT_TEXTBOX_ID}').autocomplete({
             serviceUrl:'/ajax/textbox.php',
             minChars:2,
             maxHeight:300,
             width:275,
             noCache:true,
             onSelect:function (element, data) {
-                $j('#textboxSearch').val(data);
+                $j('#textboxSearch{COMPONENT_TEXTBOX_ID}').val(data);
             },
         });
     });
 </script>
 
 
-<input type="text" id="textbox_search" value="{COMPONENT_TEXTBOX_NAME}">
-<input type="hidden" id="textboxSearch" name="textboxSearch" value="{COMPONENT_TEXTBOX_ID}">
+<input type="text" id="textbox_search{COMPONENT_TEXTBOX_ID}" value="{COMPONENT_TEXTBOX_NAME}">
+<input type="hidden" id="textboxSearch{COMPONENT_TEXTBOX_ID}" name="textboxSearch" value="{COMPONENT_TEXTBOX_ID}">
