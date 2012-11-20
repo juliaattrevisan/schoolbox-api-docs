@@ -20,12 +20,12 @@ class Xml {
 	 * @param  $url
 	 * @param int $cache_time
 	 */
-    public function __construct($url, $cache_time) {
+    public function __construct($url, $cache_time = false) {
 		if (empty($url)) {
 			return false;
 		}
 
-		if (empty($cache_time)) {
+		if ($cache_time === false) {
 			$cache_time = Cfg::get('xml_cache_timeout');
 		}	
 
