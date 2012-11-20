@@ -14,6 +14,7 @@ if (($permission = $groupHandler->getPermission(0)) < WRITE_ACCESS) {
 // if we are editing an existing news article
 if (is_numeric($this->arg[0])) {
 	$this->setFile(TEMPLATE_content, 'news/modify.html');
+    $this->setBlock(TEMPLATE_content, 'image', 'image_block');
 	$this->setBlock(TEMPLATE_content, 'campus_row', 'campus_row_block');
 	$this->setBlock(TEMPLATE_content, 'current_users', 'current_users_block');
 	$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
@@ -39,12 +40,20 @@ if (is_numeric($this->arg[0])) {
 		'ACTION' => 'Modify',
 		'NEWS_ID' => $news['item_id'],
 		'HEADING' => $news['item_heading'],
+        'NEWS_IMAGE' => $news['item_image'],
 		'BODY' => $news['item_body'],
 		'ITEM_DATETIME_PUBLISHED' => $publishedDate->getLocalShort(),
 		'ITEM_DATETIME_EXPIRES' => $expiryDate->getLocalShort(),
 	);
 
 	$this->setVar($output);
+
+    if($news['item_image']) {
+        $this->parse('image_block','image');
+    }
+    else {
+        $this->setVar('image_block','');
+    }
 
 	$groupList = $newsHandler->getGroupList();
 	$campusList = $newsHandler->getCampusList();

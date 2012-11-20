@@ -173,7 +173,11 @@
         <tr>
             <td><h4>Image</h4>
                 <em>Upload an image to be attached to your news post</em></td>
-            <td><input id="custom_file_upload" name="file" type="file"/></td>
+            <td><!-- BEGIN image -->
+                <img width="64" height="64" src="/storage/image.php?hash={NEWS_IMAGE}&size=square64"/><br />
+                <a href="/news/modifyForm.php?removeImage={NEWS_ID}">Remove</a> <br />
+                <!-- END image -->
+                <input id="custom_file_upload" name="file" type="file"/></td>
         </tr>
         <tr>
             <td><h4>Topic</h4></td>

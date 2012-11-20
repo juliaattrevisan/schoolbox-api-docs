@@ -47,6 +47,9 @@ if ($_POST['heading']) {
     }
 
     SitePage::localRedir("/news/item/$newsID");
+} else if (is_numeric($_GET['removeImage'])) {
+   $newsHandler->update(array('item_id'=>$_GET['removeImage'], 'item_image'=>''));
+    SitePage::localRedir('/news/item/'.$_GET['removeImage']);
 } else {
     if (is_numeric($_GET['delete'])) {
         $news = $newsHandler->getByID($_GET['delete']);

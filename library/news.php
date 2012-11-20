@@ -148,20 +148,19 @@ class News extends DeprecatedModel {
 
         parent::update($news);
 
-        $this->db->delete('newsGroup', 'id', $news['item_id']);
-        $this->db->delete('newsCampus', 'id', $news['item_id']);
-        $this->db->delete('newsUser', 'newsID', $news['item_id']);
-
         if (is_array($groupList)) {
+            $this->db->delete('newsGroup', 'id', $news['item_id']);
             foreach ($groupList as $group) {
                 $this->db->insert('newsGroup', array('id' => $news['item_id'], 'gid' => $group));
             }
         }
         if (is_array($campusList)) {
+            $this->db->delete('newsCampus', 'id', $news['item_id']);
             foreach ($campusList as $campus) {
                 $this->db->insert('newsCampus', array('id' => $news['item_id'], 'campus' => $campus));
             }
         } else {
+            $this->db->delete('newsUser', 'newsID', $news['item_id']);
             if (is_numeric($campusList)) {
                 $this->db->insert('newsCampus', array('id' => $news['item_id'], 'campus' => $campusList));
             } else {
