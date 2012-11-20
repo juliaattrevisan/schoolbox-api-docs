@@ -92,7 +92,7 @@ $(function () {
 		if (altValue == 'Homepage')
             url = '/homepage/'+relationID[1].toString();
 		else
-		    url = '/send.php?myFile=1&' + relationID[0].toString();
+		    url = '/cms/sendMyFile.php?' + relationID[0].toString();
 
 		win.document.getElementById(input).value = url;
 

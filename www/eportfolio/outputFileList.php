@@ -40,7 +40,7 @@ if (is_array($fileList)) {
 		/* Set name
          */
 		if ($file['realname'] != "") {
-			$this->setVar('FILE_URL', '/send.php?myFile=1&published=' . PUBLISHED_FILE . '&id=' . $file['id']);
+			$this->setVar('FILE_URL', '/cms/sendMyFile.php?id=' . $file['id']);
 
 			$this->setVar('file_no_url_block', '');
 			$this->parse('file_url_block', 'file_url');

@@ -9,12 +9,12 @@ $j(document).ready(function() {
 	var fileMenu = [
 		{"Open": {
 			onclick: function () {
-				window.open("/send.php?myFile=1&id="+$j(this).attr("id").substring(5),"_blank");
+				window.open("/cms/sendMyFile.php?id="+$j(this).attr("id").substring(5),"_blank");
 			},
 			icon: '/images/famicons/page_go.png'
 		}},
 		{"Save As": {
-			onclick: function () { window.open("/send.php?myFile=1&save=1&id="+$j(this).attr("id").substring(5),"_self"); },
+			onclick: function () { window.open("/cms/sendMyFile.php?save=1&id="+$j(this).attr("id").substring(5),"_self"); },
 			icon: '/images/famicons/disk.png'
 		}},
 		$j.contextMenu.separator,
@@ -192,7 +192,7 @@ $j(document).ready(function() {
 				window.open("/redir.php?myFile=1&id="+$j(this).attr("id").substring(5),"_blank");
 			}
 			else {
-				window.open("/send.php?myFile=1&id="+$j(this).attr("id").substring(5),"_blank");
+				window.open("/cms/sendMyFile.php?id="+$j(this).attr("id").substring(5),"_blank");
 			}
 		});
 

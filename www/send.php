@@ -11,45 +11,18 @@
 //includes
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
 
 if (is_numeric($_GET['id'])) {
     $page = new SitePage;
     $groupHandler = new Group;
 
-
-    if (isset($_GET['myFile'])) {
-        if (Cfg::get('webdav_enable')) {
-            require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/portfolioWebDAV.php';
-            $fileHandler = PortfolioWebDAV::factory();
-            $filename = $fileHandler->getFile($_GET['id']);
-            $file['realname'] = substr($_SESSION['portfolioIdPathMap'][$_GET['id']], strrpos($_SESSION['portfolioIdPathMap'][$_GET['id']], '/') + 1);
-        } else {
-            require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
-
-            $myFileHandler = new MyFile;
-            $file = $myFileHandler->getByID($_GET['id']);
-            if (!is_array($file))
-                error(41);
-
-            if ($file['published']) {
-                $eportfolioHandler = new Eportfolio_Container($file['owner']);
-
-                if (!$eportfolioHandler->canEdit($file['owner'])) {
-                    error(5);
-                }
-            } else {
-                if ($file['owner'] != $_SESSION['id'])
-                    error(5);
-            }
-
-            $filename = Cfg::get('myfile_dir') . "/" . $file['id'] . ".dat";
-        }
-    } elseif (isset($_GET['folder'])) {
+    if (isset($_GET['folder'])) {
 
         if ($groupHandler->getPermission($_GET['id']) < READ_ACCESS)
             error(5);
 
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
+
 
         $config = array(
             'sort' => 'Date',
@@ -67,7 +40,6 @@ if (is_numeric($_GET['id'])) {
         $filename = Cfg::get('file_dir') . "/" . $file['id'] . ".dat";
     }
     else {
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
 
         $fileHandler = new File;
         $file = $fileHandler->getByID($_GET['id']);
@@ -82,7 +54,6 @@ if (is_numeric($_GET['id'])) {
         $fileHandler->logAction($_GET['id'], 'access');
 
     }
-
 
     if ($_GET['save'])
         $attach = "attachment;";

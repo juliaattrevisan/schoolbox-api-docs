@@ -61,7 +61,7 @@ if (is_array($myFilePaths)) {
     // find & replace myFile asset paths within html
     // matches paths: /cms/image?* and /send.php?myFile=1*
     $html = preg_replace_callback(
-        '#((?:/cms/image.php\?|/send.php\?myFile=1)([^"]+))#', function ($matches) {
+        '#((?:/cms/image.php\?|/cms/sendMyFile.php\?)([^"]+))#', function ($matches) {
             global $myFilePaths;
 
             // parse query string
