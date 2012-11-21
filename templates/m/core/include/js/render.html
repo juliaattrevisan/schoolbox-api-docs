@@ -14,6 +14,7 @@
             }
         }
         else {
+            // if we attempt to render the menu and have no data, we're not logged in, so clear storage
             sessionStorage.clear();
             localStorage.clear();
             return;
@@ -66,7 +67,11 @@
         $('#nav').append(sessionless);
     }
 
-    // data should be coming through with no extension
+    /**
+     * data should be coming through with no extension on the URI
+     * @param data
+     * @param push
+     */
     function renderPage(data, push){
         if(push === undefined) push = true;
 
@@ -96,16 +101,11 @@
             debug( 'render.html:75 renderPage() requesting content for ' + data );
             data = localCache.get(data)
             //debug(data)
-            page = $(data).find('article')
-
-            if(!title) var title = ''
-            if(!titleAside) var titleAside = ''
+            var page = $(data).find('article')
+            var title = $(data).find('header');
 
             $('#currentPage').html(title)
-            $('#header aside').html(titleAside)
-
-            $('#page').html(page).animate({opacity:'1'},200);
-            scrollTop()
+            $('#page').html(page).prepend(title).animate({opacity:'1'},200);
 
             // Create scroll wrappers
             setTimeout(function () {
