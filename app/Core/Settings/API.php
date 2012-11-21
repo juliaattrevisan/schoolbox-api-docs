@@ -30,7 +30,12 @@ class Core_Settings_API {
                 'content' => array('this data is being ignored'),
             )
         ));
+        return $response;
+    }
 
+    public function Skin() {
+        $response = new Response_HTTP();
+        $response->setResponse('skin', Mediator::detectSite());
         return $response;
 
     }

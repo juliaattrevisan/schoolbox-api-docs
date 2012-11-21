@@ -42,6 +42,8 @@ class View_Site implements View_Interface {
         return;
         */
 
+        $response->setPage('siteRoot', Config::get('siteRoot'));
+
         $skin = $response->getPage('skin');
 
         // register Twig
@@ -64,6 +66,7 @@ class View_Site implements View_Interface {
         $dirs = array(
             Config::get('siteRoot') . "/templates/m/core/include/",
             Config::get('siteRoot') . "/templates/m/$skin/include/",
+            Config::get('siteRoot') . "/templates/$skin/m/",
         );
 
         // if the template has been overridden, apply the default
@@ -113,9 +116,11 @@ class View_Site implements View_Interface {
         catch (Twig_Error_Loader $e) {
             // don't recommend a redirect here, but can't think of anything better
             // ...go home
-            die('TRY PREPENDING core. TO THE URL: ' . $e);
-            $response->addInternalRedirectHeader('mobile');
             $response->sendHeaders();
+            echo '<html><head><style type="text/css">body{background:#fee;font-family:monospace;}pre{background:#fff;margin:5px;padding:5px;border:solid 1px #F44;white-space:pre-wrap;}</style></head><body><h1>Twig Exception:</h1><pre>',
+                nl2br($e),
+                '</pre></body></html>';
+            exit;
         }
     }
 
