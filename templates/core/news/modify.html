@@ -171,11 +171,11 @@
             <td><textarea id="body" name="body" style="width:100%;height:350px">{BODY}</textarea></td>
         </tr>
         <tr>
-            <td><h4>Image</h4>
+            <td><h4>Feature Image</h4>
                 <em>Upload an image to be attached to your news post</em></td>
             <td><!-- BEGIN image -->
                 <img width="64" height="64" src="/storage/image.php?hash={NEWS_IMAGE}&size=square64"/><br />
-                <a href="/news/modifyForm.php?removeImage={NEWS_ID}">Remove</a> <br />
+                <a href="/news/modifyForm.php?removeImage={NEWS_ID}" onclick="return(confirm('Are you sure you wish to remove this image from the post'))">Remove</a> <br />
                 <!-- END image -->
                 <input id="custom_file_upload" name="file" type="file"/></td>
         </tr>
