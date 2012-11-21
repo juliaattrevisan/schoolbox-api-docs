@@ -139,7 +139,7 @@ setupCalendar = {
                 // show related entries
                 if(this.checked) {
                     flist[i][1][k++] = n;
-                    $j('ul.js_happening li.' + n).show();
+                    $j('ul.js_happening li.personal.' + n).show();
                 }
                 // hide related entries
                 else {
