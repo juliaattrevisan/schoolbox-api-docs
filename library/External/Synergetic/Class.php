@@ -64,7 +64,8 @@ class External_Synergetic_Class implements External_ClassInterface
 
     public function getTeacherName($subCode)
     {
-
+        $teachers = array();
+    
         if (stristr($subCode, ',')) {
             $classQuery = 'ClassCode IN(';
             $subCodeArray = explode(',', $subCode);
@@ -83,7 +84,9 @@ class External_Synergetic_Class implements External_ClassInterface
         $this->getDatabase()->query($msQuery);
 
         while ($synrow = $this->getDatabase()->getNextArray()) {
-            $teachers[] = $synrow['StaffID'];
+            if (is_numeric($synrow['StaffID'])) {
+                $teachers[] = $synrow['StaffID'];
+            }
         }
 
         return $teachers;
