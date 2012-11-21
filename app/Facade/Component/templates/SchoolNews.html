@@ -3,12 +3,18 @@
     <div class="news-container scroller" style="width: {{ content | length }}00%;">
     {% for topic in content | keys %}
         <ul data-topic="{{ topic }}" style="width: {{ 100 / content | length }}%;">
-                {% for news in content[topic] %}
+            {% for news in content[topic] %}
             <li title="{{ news.item_heading }}">
-                <a href="/m/news/article/school/{{ news.item_id }}">{{ news.item_heading }}
-                    <p>Posted {{ news.item_datetime_posted|date("F jS") }}</p></a>
+                <a href="/m/news/article/school/{{ news.item_id }}">
+                    {% if news.item_image %}
+                    <img class="thumb" width="64" height="64" src="/storage/image.php?hash={{ news.item_image }}&size=square64">
+                    {% endif %}
+                    {{ news.item_heading }}
+                    <p>{{ news.item_body_clean | raw }}</p>
+                    <p>{{ news.post_datetime_relative }} by {{ news.poster }}</p>
+                </a>
             </li>
-                {% endfor %}
+            {% endfor %}
         </ul>
     {% endfor %}
     </div>
@@ -28,6 +34,7 @@
 </ul>
 {% endif %}
 
+<!--
 </article>
 <article data-icon="settings">
 <h1>Test</h1>
@@ -69,3 +76,4 @@
         <p>12th July - English (Essay)</p></a></li>
 </ul>
 </article>
+-->

@@ -13,6 +13,7 @@ class Facade_Component_SchoolNews extends Facade_Component_Generic {
         $limit = 3;
 
         $newsHandler = new News();
+        $userHandler = new User();
 
         $topics = $newsHandler->getTopicList();
 
@@ -22,10 +23,10 @@ class Facade_Component_SchoolNews extends Facade_Component_Generic {
             $topicList[$t['newsTopicID']] = $t['name'];
         }
 
-        $headlines = $newsHandler->getHeadlines();
+//        $headlines = $newsHandler->getHeadlines();
+        $headlines = $newsHandler->getNewsListing(false);
 
         $newsList = array();
-
 
         if(is_array($headlines)) {
             foreach($headlines as $headline) {
@@ -34,6 +35,10 @@ class Facade_Component_SchoolNews extends Facade_Component_Generic {
                         count($newsList[$topicList[$headline['newsTopicID']]]) >= $limit ) {
                         continue;
                     }
+                    $adr = new Alaress_Date_Relative($headline['post_datetime']);
+                    $headline['post_datetime_relative'] = $adr->getRelativeTime();
+                    $headline['poster'] = $userHandler->formatName($headline);
+                    $headline['item_body_clean'] = TextFormatter::cutSentence(Scrub::html2text($headline['item_body']), 300);
                     $newsList[$topicList[$headline['newsTopicID']]][] = $headline;
                 }
             }

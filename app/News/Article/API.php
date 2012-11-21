@@ -13,6 +13,7 @@ class News_Article_API {
 
         $newsHandler = new News();
         $news = $newsHandler->getByID($newsID);
+        $topic = $newsHandler->getTopicByID($news['item_topic_id']);
 
         $article = array(
             'title'   => $news['item_heading'],
@@ -25,7 +26,7 @@ class News_Article_API {
             )
         );
 
-        $response->setPage('title', 'News');
+        $response->setPage('title', 'School News &rsaquo; ' . $topic['name']);
         $response->setResponse('articles',array($article));
 
         return $response;

@@ -26,6 +26,7 @@ class Core_Nav_Sidebar {
                 'dashboard' => array('facade/dashboard/display', 'home'),
                 'timetable' => array('timetable/display',        'clock'),
                 'calendar'  => array('calendar/month',           'calendar'),
+                'news'      => array('news/school',              'news'),
             );
 
             $list = array();
@@ -43,7 +44,7 @@ class Core_Nav_Sidebar {
         }
 
         elseif($items == 'all') {
-            return $this->createAgenda(array('dashboard', 'timetable', 'calendar'));
+            return $this->createAgenda(array('dashboard', 'timetable', 'calendar', 'news'));
         }
 
         return array();
@@ -250,6 +251,10 @@ class Core_Nav_Sidebar {
             if($item['kind'] == 0) {
                 $workitem['href'] = 'due_work/submission_box/display/' . $item['id'];
             }
+            else {
+                $workitem['href'] = '#';
+                $workitem['value'] .= ' <p>(Assessment)</p>';
+            }
 
             $work[] = $workitem;
 
@@ -257,76 +262,6 @@ class Core_Nav_Sidebar {
         $this->work = $work;
 
         return;
-
-        $prev = '';
-        $now = new DateTime();
-        foreach($allWork as $sub) {
-            $date = $sub['date']->format(Config::get('date_short'));
-            $status = ($sub['date'] > $now) ? 'Upcoming Work Due' : ($sub['late_date'] > $now ? 'Overdue Work' : 'Missed Deadlines');
-            if($status != $prev) {
-                $work[] = array(
-                    'value' => $status,
-                    'type'  => '__SEPARATOR__'
-                );
-                $prev = $status;
-            }
-            $work[] = array(
-                'value'  => "{$sub['name']}",
-                'date'   => $date,
-                'status' => $status,
-                'href'   => "due_work/submission_box/display/{$sub['bid']}",
-            );
-        }
-
-        $subjects = $this->user->getSubjects();
-        $categoryIDList = array();
-        if ($subjects->count()) {
-            foreach($subjects as $category) {
-                $categoryIDList[] = $category->get('id');
-            }
-        }
-
-        $work = array();
-
-        //Catch if not involved in any categories
-        if (count($categoryIDList)) {
-
-            // set how many to show
-            $allWork = array();
-
-            $uid = $this->user->get('uid');
-
-            $works = $subHandler->getRecentWork($uid, $categoryIDList, UPCOMING_WORK_TYPE);
-            for ($i = 0; (is_array($works) && $i < count($works)); $i++) {
-                $works[$i]['owner'] = $uid;
-                $allWork[] = $works[$i];
-            }
-
-            usort($allWork, 'cmp');
-
-            if(count($allWork) && is_array($allWork)) {
-                $prev = '';
-                $now = new DateTime();
-                foreach($allWork as $sub) {
-                    $date = $sub['date']->format(Config::get('date_short'));
-                    $status = ($sub['date'] > $now) ? 'Upcoming Work Due' : ($sub['late_date'] > $now ? 'Overdue Work' : 'Missed Deadlines');
-                    if($status != $prev) {
-                        $work[] = array(
-                            'value' => $status,
-                            'type'  => '__SEPARATOR__'
-                        );
-                        $prev = $status;
-                    }
-                    $work[] = array(
-                        'value'  => "{$sub['name']}",
-                        'date'   => $date,
-                        'status' => $status,
-                        'href'   => "due_work/submission_box/display/{$sub['bid']}",
-                    );
-                }
-                $this->work = $work;
-            }
-        }
     }
 
     public function createSettings() {
