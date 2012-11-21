@@ -369,9 +369,7 @@ if (is_numeric($this->arg[0])) {
                 if (is_array($studentContactList)) {
                     foreach ($studentContactList as $studentContact) {
 
-                        if ((int)$studentContact['StudentContactID'] == (int)$_SESSION['sid'] || $studentContact['StudentContactSpouseID'] == $_SESSION['sid'] || $groupHandler->isStaff(
-                        ) || $_SESSION['su']
-                        ) {
+                        if ((int)$studentContact['StudentContactID'] == (int)$_SESSION['sid'] || $studentContact['StudentContactSpouseID'] == $_SESSION['sid'] || $groupHandler->isStaff() || $_SESSION['su']) {
                             $j++;
 
                             if ($studentContact['StudentContactDefaultEmail']) {
@@ -421,11 +419,11 @@ if (is_numeric($this->arg[0])) {
 
                             $this->setVar($output);
 
-                            if (trim($studentContact['StudentContactSpouseTitle']) || trim(
-                                $studentContact['StudentContactSpousePreferred']
-                            )
-                            ) {
+                            if (trim($studentContact['StudentContactSpouseTitle']) || trim($studentContact['StudentContactSpousePreferred'])) {
                                 $this->parse('spouse_details_block', 'spouse_details');
+                            }
+                            else {
+                                $this->parse('spouse_details_block','');
                             }
 
                             $this->parse('contact_details_block', 'contact_details', true);
