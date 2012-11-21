@@ -52,18 +52,26 @@ class Core_Nav_Sidebar {
     }
 
     public function createSubjectList() {
-        $subjects = $this->user->getSubjects();
+        try {
+            $subjects = $this->user->getSubjects();
 
-        $list = array(array('type' => '__SEPARATOR__', 'value' => 'Your Subjects'));
+            $list = array(array('type' => '__SEPARATOR__', 'value' => 'Your Subjects'));
 
-        if($subjects->count()) {
-            // GENERATE SUBJECT LIST
-            foreach($subjects as $cat) {
-                $list[] = $this->createSubject($cat);
+            if($subjects->count()) {
+                // GENERATE SUBJECT LIST
+                foreach($subjects as $cat) {
+                    $list[] = $this->createSubject($cat);
+                }
             }
-        }
 
-        $this->subjects = $list;
+            $this->subjects = $list;
+        }
+        catch(ErrorException $e) {
+            // TODO log this somewhere, it will likely mean synergy is down
+        }
+        catch(Exception_Schoolbox $e) {
+            // TODO log this somewhere, it will likely mean synergy is down
+        }
     }
 
     public function createSubject(GizaCategory $cat, $items = 'all') {
@@ -107,18 +115,22 @@ class Core_Nav_Sidebar {
     }
 
     public function createGroupList() {
-        $groups = $this->user->getGroups();
+        try {
+            $groups = $this->user->getGroups();
 
-        $list = array(array('type' => '__SEPARATOR__', 'value' => 'Your Groups'));
+            $list = array(array('type' => '__SEPARATOR__', 'value' => 'Your Groups'));
 
-        if($groups->count()) {
-            // GENERATE GROUP LIST
-            foreach($groups as $cat) {
-                $list[] = $this->createGroup($cat);
+            if($groups->count()) {
+                // GENERATE GROUP LIST
+                foreach($groups as $cat) {
+                    $list[] = $this->createGroup($cat);
+                }
             }
+            $this->subjects = array_merge($this->subjects, $list);
         }
-
-        $this->subjects = array_merge($this->subjects, $list);
+        catch(Exception_Schoolbox $e) {
+            // TODO log this somewhere, it will likely mean synergy is down
+        }
     }
 
     public function createGroup(GizaCategory $cat, $items = 'all') {

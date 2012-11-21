@@ -63,7 +63,6 @@ class Mediator {
 
         // THE GAUNTLET: you don't pass through here, you don't get access to *anything*...
         try {
-
             if(!$this->isAuthExcepted()) {
                 $this->authenticate();
             }
@@ -86,7 +85,10 @@ class Mediator {
         }
     }
 
-    // perhaps a little too much encapsulation
+    /**
+     * perhaps a little too much encapsulation
+     * @param Router $router
+     */
     private function parseRoute(Router $router) {
         $this->setClassName($router->getClassName(false));
         $this->setMethodName($router->getMethodName());
@@ -96,8 +98,7 @@ class Mediator {
 
     /**
      * Pass credentials into the authenticator and behave accordingly
-     * @param $username
-     * @param $password
+     * @param $forceReauth
      */
     public function authenticate($forceReauth = false) {
         // perform authentication
@@ -309,6 +310,7 @@ class Mediator {
             'Core_Auth_API::Login',
             'Core_Auth_API::ForgotPassword',
             'Core_Auth_API::Logout',
+            'Core_Settings_API::Skin'
         );
 
         if( in_array("{$this->getClassName()}::{$this->getMethodName()}", $AUTH_EXCEPTION) ) {
@@ -379,6 +381,10 @@ class Mediator {
     }
 
 
+    /**
+     * @static
+     * @return mixed|string
+     */
     public static function detectSite() {
         switch(Config::get('site_detect')) {
             case 'domain':

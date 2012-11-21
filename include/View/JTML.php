@@ -19,8 +19,9 @@ class View_JTML implements View_Interface {
     }
 
     public function sendHeaders() {
-        if(empty($this->headers))
+        if(empty($this->headers)) {
             $this->headers = $this->getDefaultHeaders();
+        }
 
         foreach($this->headers as $header) {
             header($header);
@@ -137,46 +138,38 @@ class View_JTML implements View_Interface {
             }
             // actually display some error handling so we can see what's going on.......
             else {
-//                $mailTo = 'matt.day';
-//                $subject = 'SBM%20error%20report';
-//                $school = 'dev';
-//                $emailString = sprintf("mailto:%s@alaress.com.au?subject=%s&body=%s%20got%20a%20{{CODE}}%20trying%20to%20access%20%s.%20The%20following%20errors%20occurred:%20{{ERRORS}}.{{BACKTRACE}}");
+                //                $mailTo = 'matt.day';
+                //                $subject = 'SBM%20error%20report';
+                //                $school = 'dev';
+                //                $emailString = sprintf("mailto:%s@alaress.com.au?subject=%s&body=%s%20got%20a%20{{CODE}}%20trying%20to%20access%20%s.%20The%20following%20errors%20occurred:%20{{ERRORS}}.{{BACKTRACE}}");
 
                 $err[] = array(
-                    'title'   => 'OH N0ES!!1II! What u wanna do?',
-                    'aside'   => '',
-                    'class'   => 'giza-error',
-                    'icon'    => 'error',
-                    'content' => sprintf("<ul><li>%s</li><li>%s</li></ul>",
-                        '<a href="#">&larr; Go back to the depths from whence you came.</a>',
-                        '<a href="#">&rarr; Be good and send an error report.</a>'
-                    )
+                    'title' => 'Sorry, Schoolbox Mobile encountered an error.',
+                    'aside' => '',
+                    'class' => 'giza-error',
+                    'icon' => 'error',
+                    'content' => '<ul><li><a href="#" id="wipeCache">Whoops! Tap here to clear the cache and go back to the dashboard.</li></ul>'
                 );
 
                 $err[] = array(
-                    'title'   => 'URI',
-                    'aside'   => '',
-                    'class'   => 'giza-error',
-                    'icon'    => 'error',
+                    'title' => 'URI',
+                    'aside' => '',
+                    'class' => 'giza-error',
+                    'icon' => 'error',
                     'content' => sprintf("<ul><li>%s</li></ul>", $_SERVER['REQUEST_URI'])
                 );
 
                 if(count($response->getError())) {
                     foreach($response->getError() as $k => $v) {
-                        $v = sprintf("<pre style=%s>%s</pre>", '"font-size:0.6em; padding: 1em;"',$v);
+                        $v = sprintf("<pre style=%s>%s</pre>", '"font-size:0.6em; padding: 1em;"', $v);
                         $err[] = array(
-                            'title'   => $k,
-                            'aside'   => '',
-                            'class'   => 'giza-error',
-                            'icon'    => 'error',
-                            'content' => $v
+                            'title' => $k, 'aside' => '', 'class' => 'giza-error', 'icon' => 'error', 'content' => $v
                         );
                     }
                 }
                 $jsonOutput = array(
                     'page' => array(
-                        'title'    => "ERR0R",
-                        'articles' => $err
+                        'title' => "ERR0R", 'articles' => $err
                     ),
                 );
             }
@@ -194,17 +187,14 @@ class View_JTML implements View_Interface {
                 die(json_encode($jsonOutput));
             }
 
-        }
-
-            // could not load the templates. Fall back to something of a default nature...
-        catch (Twig_Error_Loader $e) {
+        } // could not load the templates. Fall back to something of a default nature...
+        catch(Twig_Error_Loader $e) {
             // don't recommend a redirect here, but can't think of anything better
             // ...go home
             die('TRY PREPENDING core. TO THE URL: ' . $e);
             $response->addInternalRedirectHeader('mobile');
             $response->sendHeaders();
-        }
-        catch (ErrorException $e) {
+        } catch(ErrorException $e) {
             die($e);
         }
 
@@ -223,9 +213,7 @@ class View_JTML implements View_Interface {
             else {
                 return preg_replace('/\s\s+/', ' ', str_replace('\n', '', $twig->render("$templateFile.html", $data)));
             }
-        }
-
-        catch (Twig_Error_Loader $e) {
+        } catch(Twig_Error_Loader $e) {
             // aaaaand ignore it.
             return '';
         }

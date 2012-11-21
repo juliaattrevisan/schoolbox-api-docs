@@ -48,7 +48,7 @@ class Facade_Homepage_API extends Generic_API {
 
         $method = sprintf("Component_Homepage_%sController", $method);
         foreach($page->get('components') as $comp) {
-            if($comp->get('method') == $method) {
+            if($comp->get('controller') == $method) {
                 list($catTitle, $articles) = $this->renderComponents($user, $cat, array($comp));
             }
         }
@@ -90,11 +90,13 @@ class Facade_Homepage_API extends Generic_API {
                 // plz render mine components
                 foreach($components as $component) {
                     foreach($this->componentRefactoryMap($component->get('controller')) as $className) {
+//                        echo "`$className` ";
                         if(in_array($className, $this->custom)) {
                             if(class_exists($className)) {
                                 $instance = new $className();
 
-                                if(is_a($instance, 'Facade_Component_Generic')) {
+                                if($instance instanceof Facade_Component_Generic) {
+                                    echo " ~$className~ ";
                                     $articles[$className] = $instance->render($user, $cat->get('id'));
                                 }
                                 else {

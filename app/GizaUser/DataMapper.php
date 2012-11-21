@@ -72,24 +72,39 @@ class GizaUser_DataMapper extends Generic_DataMapper {
 
 
     /**
-     * Hydrates the user with their
+     * Hydrates the user with their external subjects
      * @param GizaUser $user
      * @param $args
      */
     public function hydrateSubjects(GizaUser $user, $args = array('service' => HOMEPAGE_SERVICE, 'access' => READ_ACCESS)) {
         /* EXTERNAL SUBJECT DEFINTIONS */
-        $euMap = new External_User_DataMapper();
-        $euMap->getCurrentSemester();
-        $foo = $euMap->getSubjectList($user->get('synergy_id'), $user);
-        $user->set('subjects', $foo);
+        try {
+            $euMap = new External_User_DataMapper();
+            $euMap->getCurrentSemester();
+            $foo = $euMap->getSubjectList($user->get('synergy_id'), $user);
+            $user->set('subjects', $foo);
+        }
+        catch(Exception_Schoolbox $e) {
+            // couldn't hydrate, probably because there's nothing there, so just set the subjects to a blank collection
+            $user->set('subjects', new GizaCollection());
+        }
     }
 
-
+    /**
+     * Hydrates the user with their internal categories
+     * @param GizaUser $user
+     * @param array $args
+     */
     public function hydrateGroups(GizaUser $user, $args = array('service' => HOMEPAGE_SERVICE, 'access' => READ_ACCESS)) {
         /* INTERNAL CATEGORIES */
-        $cMap = new GizaCategory_DataMapper();
-        $cats = $cMap->readUserCategories($user->get('uid'), $args);
-        $user->set('groups', $cats);
+        try {
+            $cMap = new GizaCategory_DataMapper();
+            $cats = $cMap->readUserCategories($user->get('uid'), $args);
+            $user->set('groups', $cats);
+        }
+        catch(Exception_Schoolbox $e) {
+            // couldn't hydrate, probably because there's nothing there, so just set the subjects to a blank collection
+            $user->set('subjects', new GizaCollection());
+        }
     }
-
 }

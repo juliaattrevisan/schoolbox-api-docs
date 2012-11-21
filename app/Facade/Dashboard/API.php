@@ -46,6 +46,10 @@ class Facade_Dashboard_API extends Generic_API {
             $response->setPage('title', $articles['Salutation']['title']);
             unset($articles['Salutation']);
         }
+        // it may be that there's no greeting component present, in which case the page still needs a title
+        else {
+            $response->setPage('title', 'Your Dashboard');
+        }
 
         $response->setResponse('articles', $articles);
         return $response;

@@ -9,7 +9,7 @@
 class View_HTML implements View_Interface {
 
     public function getDefaultHeaders() {
-        return array('Content-Type: text/xml; charset=UTF-8');
+        return array('Content-Type: text/html; charset=UTF-8');
     }
 
     public function addHeader($header) {
