@@ -16,7 +16,7 @@
     mkdir -vp ~/.gnupg
 ```
 * Copy the keyrings to the .gnupg directory
-````
+```
     cp -v /vagrant/*.gpg ~/.gnupg/
 ```
 * All ready to go
