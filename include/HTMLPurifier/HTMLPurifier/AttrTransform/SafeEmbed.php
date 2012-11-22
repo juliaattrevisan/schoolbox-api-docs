@@ -7,7 +7,6 @@ class HTMLPurifier_AttrTransform_SafeEmbed extends HTMLPurifier_AttrTransform
     public function transform($attr, $config, $context) {
         $attr['allowscriptaccess'] = 'never';
         $attr['allownetworking'] = 'internal';
-        $attr['type'] = 'application/x-shockwave-flash';
         return $attr;
     }
 }

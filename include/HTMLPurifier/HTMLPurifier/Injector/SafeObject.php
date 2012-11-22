@@ -24,6 +24,8 @@ class HTMLPurifier_Injector_SafeObject extends HTMLPurifier_Injector {
         'allowFullScreen' => true, // if omitted, assume to be 'false'
         'autoplay' => true,
         'autostart' => true,
+        'classid'   => true,
+        'type'      => true,
     );
 
     public function prepare($config, $context) {

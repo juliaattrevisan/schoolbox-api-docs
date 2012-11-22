@@ -28,6 +28,7 @@ class HTMLPurifier_HTMLModule_SafeObject extends HTMLPurifier_HTMLModule {
                 'width' => 'Pixels#' . $max,
                 'height' => 'Pixels#' . $max,
                 'data' => 'URI#embedded',
+                'classid' => 'Text',
                 //'codebase' => new HTMLPurifier_AttrDef_Enum(array(
                 //    'http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0')),
             )
@@ -39,7 +40,7 @@ class HTMLPurifier_HTMLModule_SafeObject extends HTMLPurifier_HTMLModule {
             array(
                 'id' => 'ID',
                 'name*' => 'Text',
-                'value' => 'Text'
+                'value' => 'Text',
             )
         );
         $param->attr_transform_post[] = new HTMLPurifier_AttrTransform_SafeParam();

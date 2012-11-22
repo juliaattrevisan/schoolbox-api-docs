@@ -52,6 +52,7 @@ class HTMLPurifier_AttrTransform_SafeParam extends HTMLPurifier_AttrTransform {
             case 'flashvars':
             case 'autoplay':
             case 'autostart':
+            case 'classid':
                 // we're going to allow arbitrary inputs to the SWF, on
                 // the reasoning that it could only hack the SWF, not us.
                 break;
