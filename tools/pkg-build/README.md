@@ -11,9 +11,12 @@
 ```
     vagrant ssh
 ```
-* Create the .gnupg directory and copy in the keyrings
+* Create the .gnupg directory
 ```
     mkdir -vp ~/.gnupg
+```
+* Copy the keyrings to the .gnupg directory
+````
     cp -v /vagrant/*.gpg ~/.gnupg/
 ```
 * All ready to go
