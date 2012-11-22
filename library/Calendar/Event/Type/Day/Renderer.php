@@ -29,10 +29,7 @@ class Calendar_Event_Type_Day_Renderer extends Calendar_Event_Type_Renderer_Abst
 
             /* Future events are visible to superusers, event owners, group members with write access
              */
-            $isFutureEvent = ($currentEvent->getPublishDate()->getUnixTimestamp() >= time());
-            $isVisibleToUser = ($this->getGroupHandler()->isSuperuser() || $currentEvent->isOwner() || (is_numeric($currentEvent->getCategoryId()) && ($this->getGroupHandler()->getPermission($currentEvent->getCategoryId())) > READ_ACCESS));
-
-            if ($isFutureEvent && $isVisibleToUser) {
+            if ($currentEvent->getPublishDate()->getUnixTimestamp() >= time()) {
 				$cssClass = 'translucent';
 			}
 			else {
@@ -139,7 +136,11 @@ class Calendar_Event_Type_Day_Renderer extends Calendar_Event_Type_Renderer_Abst
      * @return bool
      */
     private function isVisible($currentEvent) {
-        if (($currentEvent->getPublishDate()->getUnixTimestamp() >= time()) && !$this->getGroupHandler()->isSuperuser()) {
+
+        $isFutureEvent = ($currentEvent->getPublishDate()->getUnixTimestamp() >= time());
+        $isVisibleToUser = ($this->getGroupHandler()->isSuperuser() || $currentEvent->isOwner() || (is_numeric($currentEvent->getCategoryId()) && ($this->getGroupHandler()->getPermission($currentEvent->getCategoryId())) > READ_ACCESS));
+
+        if ($isFutureEvent && !($isVisibleToUser)) {
             return false;
         }
 
