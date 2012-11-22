@@ -1,0 +1,14 @@
+Vagrant::Config.run do |config|
+
+  config.vm.box = "ubuntu-12.04"
+  config.vm.box_url = "http://hydra.alrs/boxes/ubuntu-12.04.box"
+  
+  config.vm.network :bridged
+  config.vm.host_name = "ubuntubuild-schoolbox"
+
+  config.vm.provision :puppet do |puppet|
+     puppet.manifests_path = "manifests"
+     puppet.manifest_file  = "ubuntubuild.pp"
+  end
+
+end
