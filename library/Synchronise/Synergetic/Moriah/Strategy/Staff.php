@@ -58,8 +58,19 @@ class Synchronise_Synergetic_Moriah_Strategy_Staff extends Synchronise_Synergeti
             }
         }
         else if( $currentUser['StaffCampus'] ) {
-            $newUser['defaultCampus'] = $this->getCampusFromCode($currentUser['StaffCampus']);
-            $newUser['campus'] = array($this->getCampusFromCode($currentUser['StaffCampus']));
+
+            if($currentUser['StaffCampus'] == 'CG') { //Users in College General are put in all campuses
+                $newUser['campus'] = array(3,4,5,6,7,8,9,10,11,12);
+                $newUser['defaultCampus'] = 4;
+            }
+            else if($currentUser['StaffCampus'] == 'S') { //Users in Secondary School are put in MS & HS
+                $newUser['campus'] = array(9,4);
+                $newUser['defaultCampus'] = 4;
+            }
+            else {
+                $newUser['defaultCampus'] = $this->getCampusFromCode($currentUser['StaffCampus']);
+                $newUser['campus'] = array($this->getCampusFromCode($currentUser['StaffCampus']));
+            }
         }
         else {
             //Just put staff in main if no campus retrieved from timetable
