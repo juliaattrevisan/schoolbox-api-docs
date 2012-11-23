@@ -178,8 +178,10 @@ h2,.calendar-controls{color:#000000; background:#eeeeee;}
 .calendar-controls h3{color:#000000;}
 a{color:#0054d3;}
 a:hover{color:#ff5a00}
-#header, .login #header{height:138px;background: #0f2034; /* Old browsers */
-    background: -moz-linear-gradient(left,  #0f2034 0%, #3394ad 100%); /* FF3.6+ */
+#header, .login #header{height:138px;background: #014A7F; /* Old browsers */
+    
+	/*background:#014A7F; solid blue for 2013 smgs website */
+	background: -moz-linear-gradient(left,  #0f2034 0%, #3394ad 100%); /* FF3.6+ */
     background: -webkit-gradient(linear, left top, right top, color-stop(0%,#0f2034), color-stop(100%,#3394ad)); /* Chrome,Safari4+ */
     background: -webkit-linear-gradient(left,  #0f2034 0%,#3394ad 100%); /* Chrome10+,Safari5.1+ */
     background: -o-linear-gradient(left,  #0f2034 0%,#3394ad 100%); /* Opera 11.10+ */
@@ -219,7 +221,22 @@ a:hover{color:#ff5a00}
     filter:none;
 }
 
-#nav{top:152px;}
+#nav{
+	top:147px; /* 152 in original smgs skin */
+	left:-15px; /* Change from 15px in the core */
+	padding-left:5px;
+	padding-right:5px;
+	width:200px; /* core width is 224 */
+	}
+	
+	#container {
+	/*left:-72px; /* core was 272px */
+	margin-left:200px;
+	top: 5px;
+	margin-right:5px;	
+	padding-top:6px;
+	}
+	
 #nav h3,
 #nav h3.my-links{background: #77b5f9; /* Old browsers */
     background: -moz-linear-gradient(top,  #77b5f9 0%, #5ca1f8 100%); /* FF3.6+ */
@@ -232,7 +249,7 @@ a:hover{color:#ff5a00}
 
 #nav .nav-wrapper, #nav ul ul,.colours-buttons, #nav .nav-wrapper.my-links {background:#eeeeee;}
 
-#nav ul ul{border-color:#6faff9;}
+#nav ul ul{border-color:#6faff9; left:200px;}
 
 #tabs-homepage li.ui-state-default a {
     background: none repeat scroll 0 0 #eee;
@@ -254,6 +271,7 @@ a:hover{color:#ff5a00}
     background-color: #6faff9;
     color: #ffffff;
 }
+#nav li.parent {width:200px;} /* attempt to reduce overhang which enables pop-out*/
 
 .dark,
 .dark td,
