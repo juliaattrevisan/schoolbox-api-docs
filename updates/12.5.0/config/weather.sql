@@ -19,3 +19,8 @@ UPDATE `config` SET `hidden` = 'true', `editable` = 'false'
 	OR `name` = 'welcome_rss_limit';
 
 DELETE FROM `config` WHERE `name` = 'welcome_image_folder';
+
+INSERT INTO `config`
+  (`name`, `value`, `title`, `description`, `field`, `type`,`editable`, `hidden`, `required`)
+VALUES
+  ('xml_cache_timeout', '3000', 'XML Update Frequency', 'How long xml data should be cached for before being re-queried in seconds', 'input', '3rd Party Services', 'true', 'false', 'true');
