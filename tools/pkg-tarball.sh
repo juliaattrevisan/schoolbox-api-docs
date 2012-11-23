@@ -80,6 +80,9 @@ tools/build-less-css.sh
 echo "Removing unrequired files and directories";
 rm -rf {debian,phpunit.xml,README.md,test,.git*}
 
+echo "Removing MGS Sport compatibility files";
+rm -rf www/include/permission.php;
+
 echo "Packaging Release into .tgz";
 tar -czf $thistempdir/release_$tag.tgz *
 cd $thistempdir;
