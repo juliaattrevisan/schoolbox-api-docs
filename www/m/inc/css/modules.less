@@ -74,12 +74,21 @@
 
 .cal-today h1               { background-color: #49f; background-image: none; }
 
+
+
+/* =============================================================================
+   Login
+   ========================================================================== */
+#loading {
+    .login-background(@login-color, lighten(@login-color, @login-lighten));
+}
+
 #login_frm                  { margin-top: @dp6;
-    input                   { border: none; background-color: rgba(255, 255, 255, 0.1); color: #fff; padding: @dp12 @dp6;
-        &:focus             { background-color: rgba(255, 255, 255, 0.2); outline: none; }
-        &::-webkit-input-placeholder { color: #e7e7e7; }
-        &:-moz-placeholder { color: #e7e7e7; }
-        &:-ms-input-placeholder { color: #e7e7e7; }
+    input                   { border: none; .login-input(10%); padding: @dp12 @dp6;
+        &:focus             { .login-input(20%); outline: none; }
+        &::-webkit-input-placeholder { .threshold(@login-color); }
+        &:-moz-placeholder { .threshold(@login-color); }
+        &:-ms-input-placeholder { .threshold(@login-color); }
         // no opera support available :(
     }
     input[type="submit"]    { padding: 0 @dp4; }

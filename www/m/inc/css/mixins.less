@@ -3,6 +3,26 @@
 // Though I walk through the valley of the shadow of prefixes, I will fear no evil: for {less} is with me
 // Note: For multi-parameter mixins, @arguments only works if the first is defined when you use the mixin. Don't ask why
 // =============================================================================
+
+.login-background(@darker, @lighter) {
+    background: @darker;
+    background-image:-webkit-radial-gradient(center top, ellipse cover, @lighter 0%, @darker 60%);
+//    background-image:    -ms-linear-gradient(top, rgba(red(@lighter),green(@lighter),blue(@lighter),1) 0%,rgba(red(@darker),green(@darker),blue(@darker),1) 100%);
+    background-image:    -ms-linear-gradient(top, @lighter 0%, @darker 100%);
+    background-image:     -o-radial-gradient(center top, ellipse cover, @lighter 0%, @darker 60%);
+//    background-image:        linear-gradient(top, rgba(red(@lighter),green(@lighter),blue(@lighter),1) 0%,rgba(red(@darker),green(@darker),blue(@darker),1) 100%);
+    background-image:        linear-gradient(top, @lighter 0%, @darker 100%);
+}
+
+.login-input(@opacity) when (lightness(@login-color) >= 50%) {
+    background: fade(#fff, @opacity + 10);
+    color: #000;
+}
+.login-input(@opacity) when (lightness(@login-color) < 50%) {
+    background: fade(#fff, @opacity);
+    color: #fff;
+}
+
 .gradient (@startColor: black, @endColor: white, @dir: top) {
     .stopped-gradient(@startColor, 0%, @endColor, 100%, @dir);
 }
