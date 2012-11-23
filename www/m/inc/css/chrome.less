@@ -333,7 +333,7 @@ h1, li, a, article, #status {
 }
 
 #page header            { background: #222; color: #eee; text-align: center; text-transform: uppercase;
-                          font-size: @dp5-24; font-weight: bold; padding: 0; line-height: @dp2; height: @dp2;
+                          font-size: @dp4; font-weight: bold; padding: @dp24 0; line-height: @dp2; height: @dp2;
                           .gradient(#111, #222); border-bottom: solid 1px lighten(@header-color, 10%); }
 
 /* =============================================================================
@@ -433,7 +433,8 @@ h1, li, a, article, #status {
     }
     #page               { background: #fff; border-radius: @radius;
                           position: absolute; top: @dp; left: @dp; right: @dp6;
-        header          { position: relative;  }
+        header          { position: relative; height: 0; top: (0 - @dp); line-height: @dp; background: transparent;
+                          .hi-contrast(@background, @banner-color); border: none; }
     }
     #status             { bottom: 0; left: 0; }
     #nav                { width: @dp; height: 100%; position: fixed; z-index: 3;
