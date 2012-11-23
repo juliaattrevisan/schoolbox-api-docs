@@ -112,13 +112,15 @@
                 // TODO probably should not be hardcoded quite like this.
                 if($('#table-wrapper').length > 0){
                     scrollTable = new iScroll('table-wrapper', {
-                        snap: 'th'
+                        snap: 'th',
+                        vscroll: true
                     });
                     scrollTable.scrollToElement('td.current',200);
                 }
                 if($('#school-news-wrapper').length > 0){
                     scrollTable = new iScroll('school-news-wrapper', {
                         snap: 'ul',
+                        vscroll: true,
                         onScrollEnd: function(){
                             $('#school-news-wrapper .pagination li').removeClass('active');
                             $('#school-news-wrapper .pagination li:nth-child(' + (this.currPageX+1) + ')').addClass('active');
@@ -129,6 +131,7 @@
                 if($('#your-news-wrapper').length > 0){
                     scrollTable = new iScroll('your-news-wrapper', {
                         snap: 'ul',
+                        vscroll: true,
                         momentum: false,
                         onScrollEnd: function(){
                             var el = $('#your-news-wrapper');
@@ -141,12 +144,15 @@
                 if($('#dashboard-timetable-wrapper').length > 0){
                     scrollTable = new iScroll('dashboard-timetable-wrapper', {
                         snap: 'li',
+                        vscroll: true,
                         momentum: false
                     });
                     scrollTable.scrollToElement('li.current',200);
                 }
             }, 100);
         });
+
+        window.scrollTop();
 
         if(push && location.pathname != data && data != '/') {
             history.pushState(null, null, data);

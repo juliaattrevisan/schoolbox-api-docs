@@ -97,13 +97,13 @@ var m = Math,
 
 			// Events
 			onRefresh: null,
-			onBeforeScrollStart: function (e) { e.preventDefault(); },
+			onBeforeScrollStart: function (e) { /*e.preventDefault();*/ }, // EDIT FOR VSCROLL ON HSCROLL
 			onScrollStart: null,
 			onBeforeScrollMove: null,
 			onScrollMove: null,
 			onBeforeScrollEnd: null,
 			onScrollEnd: null,
-			onTouchEnd: null,
+			onTouchEnd: function (e) { e.preventDefault(); }, // EDIT FOR VSCROLL ON HSCROLL
 			onDestroy: null,
 			onZoomStart: null,
 			onZoom: null,
@@ -215,7 +215,8 @@ iScroll.prototype = {
 			bar = doc.createElement('div');
 
 			if (that.options.scrollbarClass) bar.className = that.options.scrollbarClass + dir.toUpperCase();
-			else bar.style.cssText = 'position:absolute;z-index:100;' + (dir == 'h' ? 'height:7px;bottom:1px;left:2px;right:' + (that.vScrollbar ? '7' : '2') + 'px' : 'width:7px;bottom:' + (that.hScrollbar ? '7' : '2') + 'px;top:2px;right:1px');
+//			else bar.style.cssText = 'position:absolute;z-index:100;' + (dir == 'h' ? 'height:7px;bottom:1px;left:2px;right:' + (that.vScrollbar ? '7' : '2') + 'px' : 'width:7px;bottom:' + (that.hScrollbar ? '7' : '2') + 'px;top:2px;right:1px');
+            else bar.style.cssText = 'position:relative;z-index:100;' + (dir == 'h' ? 'height:7px;bottom:7px;left:2px;right:' + (that.vScrollbar ? '7' : '2') + 'px' : 'width:7px;bottom:' + (that.hScrollbar ? '7' : '2') + 'px;top:2px;right:1px'); // EDIT FOR VSCROLL ON HSCROLL
 
 			bar.style.cssText += ';pointer-events:none;-' + vendor + '-transition-property:opacity;-' + vendor + '-transition-duration:' + (that.options.fadeScrollbar ? '350ms' : '0') + ';overflow:hidden;opacity:' + (that.options.hideScrollbar ? '0' : '1');
 
@@ -388,6 +389,7 @@ iScroll.prototype = {
 			newY = that.y + deltaY,
 			c1, c2, scale,
 			timestamp = e.timeStamp || Date.now();
+            if( Math.sqrt( deltaX*deltaX ) > 5 ) { e.preventDefault(); } // EDIT FOR VSCROLL ON HSCROLL
 
 		if (that.options.onBeforeScrollMove) that.options.onBeforeScrollMove.call(that, e);
 
