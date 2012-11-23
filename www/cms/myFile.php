@@ -27,6 +27,7 @@ if (is_numeric($this->arg[0])) {
         'DESCRIPTION' => Scrub::text($file['description']),
         'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
         'PARENT_ID' => $file['parent'],
+        'PUBLISHED' => $file['published']?'checked="checked"':'',
     );
     $this->setVar($output);
 
@@ -62,6 +63,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         'DESCRIPTION' => '',
         'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
         'PARENT_ID' => $parent['id'],
+        'PUBLISHED' => '',
     );
 
     $this->setVar($output);

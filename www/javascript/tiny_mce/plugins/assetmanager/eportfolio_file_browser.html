@@ -90,7 +90,7 @@ $(function () {
             alt.value = altValue;
 
 		if (altValue == 'Homepage')
-            url = '/homepage/'+relationID[1].toString();
+            url = '#';
 		else
 		    url = '/cms/sendMyFile.php?' + relationID[0].toString();
 
@@ -159,30 +159,35 @@ $(function () {
 
 
 });
-$(window).load(function () {
-	/* auto select uploaded image */
-	var matched;
-	if (matched = window.location.href.match(/fileID=([\d]+)/)) {
-		var image = $('#file-' + matched[1].toString());
-		image.click();
-	}
-});
+//TODO FIXME: Crashes Chrome in its current state so commented out for further investigation later
+/*$(window).load(function () {
+    // auto select uploaded image
+    var matched;
+    if (matched = window.location.href.match(/fileID=([\d]+)/)) {
+        alert(matched[1].toString());
+        var image = $('#file-' + matched[1].toString());
+        image.click();
+    }
+});*/
+
 </script>
 <base target="_self" />
 </head>
 <body>
 
 <div id="content">
-  <div class="control">
-    <form action="/cms/fileForm.php" method="post" enctype="multipart/form-data" id="upload-form">
+ <div class="control">
 
-        <span class="bold">UPLOAD NEW FILE:</span> <input type="file" name="file" id="file" />
-        <span class="bold">DESCRIPTION:</span> <input type="text" name="description" id="description" />
-        <input type="hidden" name="return" id="return" value="{REQUEST_URI}" />
-        <input type="hidden" name="category" id="categoryID" value="{FILE_CATEGORY_ID}" />
-        <input type="submit" class="submit" value="Upload" />
-    </form>
-  </div>
+   <form action="/cms/myFileForm.php" method="post" enctype="multipart/form-data" id="upload-form">
+
+       <span class="bold">UPLOAD NEW FILE:</span> <input type="file" name="file" id="file" />
+       <span class="bold">DESCRIPTION:</span> <input type="text" name="description" id="description" />
+       <input type="hidden" name="return" id="return" value="{REQUEST_URI}" />
+       <input type="hidden" name="category" id="parent" value="{FILE_CATEGORY_ID}" />
+       <input type="hidden" name="published" value="true" />
+       <input type="submit" class="submit" value="Upload" />
+   </form>
+ </div>
   <div class="left">
     <ul id="tree">
       <li id="node-0" class="server"><span class="root">Resources</span></li>
@@ -201,7 +206,7 @@ $(window).load(function () {
         <div class="image">
 		<!-- BEGIN thumbnail_image --><img alt="{DESCRIPTION}" src="/cms/myImage.php?id={FILE_ID}&width=75&height=100" /> <!-- END thumbnail_image -->
         <!-- BEGIN thumbnail_flash --><img alt="{DESCRIPTION}" src="/images/mime/22x22/{FILE_ICON}?id={FILE_ID}" /> <!-- END thumbnail_flash -->
-        	<input type="hidden" class="hide file-url" value="{URL}" /> </div>
+        	<input type="hidden" class="hide file-url" value="/cms/sendMyFile.php?id={FILE_ID}" /> </div>
       </li>
       <!-- END file -->
       <li class="node-template">

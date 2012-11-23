@@ -73,10 +73,10 @@ $fileHandler = new MyFile();
 
 /* Note that categoryID is synonymous with the parent id
  */
-$allFiles = $fileHandler->getAllByFields(array(
-	'owner' => $_GET['userID'],
-	'parent' => $_GET['categoryID'],
-));
+$config['filter'] = $filter;
+$config['published'] = true;
+
+$allFiles = $fileHandler->getAllInFolder($_GET['categoryID'],$config);
 
 /* For some reason, not being found by the autoloader?
  */
@@ -114,26 +114,16 @@ if (is_array($allFiles)) {
 		 */
 		$fileType->setMime($currentFile['mime_type']);
 
-		/* In Image Embed utility (hide non-images)
+		/* In Image Embed utility show thumbnail
 		 */
 		if ($filter['filter'] == 'image') {
-			if ($fileType->isImage()) {
-				$page->parse('thumbnail_image_block', 'thumbnail_image');
-			}
-			else {
-				continue;
-			}
+			$page->parse('thumbnail_image_block', 'thumbnail_image');
 		}
-		/* Otherwise in Media Embed utility (hide images)
+		/* Otherwise in just output normal icon
 		 */
-		else {
-			if (!$fileType->isImage()) {
-				$page->parse('thumbnail_flash_block', 'thumbnail_flash');
-			}
-			else {
-				continue;
-			}
-		}
+        else {
+            $page->parse('thumbnail_flash_block', 'thumbnail_flash');
+        }
 
         $page->parse('file_block', 'file', true);
 	}

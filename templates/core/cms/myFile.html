@@ -27,15 +27,11 @@ $j(function() {
       <input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}" /></td>
     </tr>
     <!-- END browse_row -->
-    <!-- BEGIN desc -->
     <tr>
       <td class="formLabelWidth"><h4>Description</h4>
         <em>One line description of the file for use as the title</em></td>
 		<td><label><input type="text" name="description" maxlength="250" size="40" class="required" value="{DESCRIPTION}" /></label></td>
     </tr>
-    <!-- END desc -->
-    
-    <!-- BEGIN location -->
     <tr>
       <td><h4>Location</h4>
         <em>Select an appropriate location within the system that reflects the use of the file</em></td>
@@ -45,8 +41,11 @@ $j(function() {
           <!-- END folder_list -->
         </select></td>
     </tr>
-    <!-- END location -->
-
+      <tr>
+          <td class="formLabelWidth"><h4>Published</h4>
+              <em>If enabled this file will be visible to all Schoolbox users</em></td>
+          <td><label><input type="checkbox" value="true" name="published" {PUBLISHED} /></label></td>
+      </tr>
   </table>
   <input type="hidden" name="fileID" value="{FILE_ID}" />
   <input type="submit" name="Submit" value="{ACTION} File" class="submit-btn-plain" />

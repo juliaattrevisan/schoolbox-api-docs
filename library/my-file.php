@@ -54,10 +54,40 @@ class MyFile extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
-	function getAllInFolder($folderID) {
+	function getAllInFolder($folderID, $config = false) {
 		$query = "SELECT f.*, f.submitted, af.iconFile FROM ".$this->_table." f
 				  LEFT JOIN allowedFileTypes af ON f.mime_type = af.mime
 				  WHERE owner = " . $this->owner . " AND parent = ".(int)$folderID." AND deleted = 0";
+
+        if($config['published'] == true) {
+            $query .= " AND published IS NOT NULL";
+        }
+
+        if ( !empty( $config['filter'] ) && $config['filter'][0] != 'all' ) {
+
+            $config['filter'] = is_array($config['filter']) ? $config['filter'] : array( $config['filter'] );
+
+            $query .= " AND ( 1=2 ";
+
+            $filter_sql = array(
+                'document' => " OR ( f.mime_type LIKE '%pdf%' OR f.mime_type LIKE '%msword' OR f.mime_type LIKE '%officedoc%' OR f.mime_type LIKE '%rtf' OR f.mime_type LIKE 'text%' OR f.mime_type LIKE '%document%' OR f.mime_type LIKE '%powerpoint%') ",
+                'image' => " OR ( f.mime_type LIKE '%image%' ) ", 'audio' => " OR ( f.mime_type LIKE '%audio%' ) ",
+                'video' => " OR ( f.mime_type LIKE '%video%' OR f.mime_type LIKE '%flash%' OR f.mime_type LIKE '%realmedia%' ) ",
+                'other' => " OR ( f.mime_type LIKE 'application%' AND f.mime_type NOT LIKE '%pdf' AND f.mime_type NOT LIKE '%msword' AND f.mime_type NOT LIKE '%rtf' AND f.mime_type NOT LIKE 'text%' AND f.mime_type NOT LIKE '%document%' AND f.mime_type NOT LIKE '%powerpoint%') "
+            );
+
+            foreach ( $config['filter'] as $filter ) {
+                if ( array_key_exists($filter, $filter_sql) ) {
+                    $query .= $filter_sql[$filter];
+                }
+                else {
+                    $query .= " OR ( f.mime_type = '$filter ' ) ";
+                }
+            }
+
+            $query .= ") ";
+        }
+
 		return $this->db->getAll($query);
 	}
 

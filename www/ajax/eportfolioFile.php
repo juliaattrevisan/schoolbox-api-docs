@@ -10,12 +10,11 @@ if (is_numeric($_POST['categoryID'])) {
 	$linkHandler = new Link();
 	$allowedFiles = new AllowedFile();
 
-	$fileList = $fileHandler->getAllInFolder($_POST['categoryID'], in_array($_POST['filter'], $allowFilter) ? array('filter' => $_POST['filter']) : false);
+    $config['filter'] = in_array($_POST['filter'], $allowFilter) ?  $_POST['filter'] : false;
+    $config['published'] = true;
 
-	if (!in_array($_POST['filter'], $allowFilter)) {
-		$linkList = $linkHandler->getAllInFolder($_POST['categoryID']);
-		$fileList = $fileHandler->mergeLinks( $fileList, $linkList);
-	}
+	$fileList = $fileHandler->getAllInFolder($_POST['categoryID'],$config);
+
 
 	if (!is_array($fileList)) {
 		$output = array();
@@ -29,7 +28,7 @@ if (is_numeric($_POST['categoryID'])) {
 
 			$file['user'] = $userHandler->formatName($file);
 			$file['relative'] = $fileTime->getRelativeTime();
-			$file['mimeClass'] = !empty($file['iconFile']) ? $allowedFiles->getClass($file["iconFile"]) : "textfile";
+			$file['mimeClass'] = !$file['iconFile'] ? $allowedFiles->getClass($file["iconFile"]) : "textfile";
 			$file['description'] = TextFormatter::cutString($file['description'], 32);
 			$output[] = $file;
 		}

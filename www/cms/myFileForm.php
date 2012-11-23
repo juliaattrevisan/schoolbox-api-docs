@@ -13,6 +13,13 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
         'description' => $_POST['description'],
     );
 
+    if($_POST['published'] == 'true'){
+        $file['published'] = 'NOW()';
+    }else {
+        $file['published'] = 'NULL';
+    }
+
+
     if (is_numeric($_POST['fileID'])) {
         // check user owns file
         $current = $fileHandler->getByID($_POST['fileID']);
@@ -21,17 +28,23 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
             $page->error(47);
         }
 
-        $file['id'] = $_POST['fileID'];
+        $fileID = $file['id'] = $_POST['fileID'];
         $fileHandler->update($file);
     }
     else {
         $allowedFileHandler = new AllowedFile;
         $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 
-        $fileHandler->create($file, $_FILES['file']);
+        $fileID = $fileHandler->create($file, $_FILES['file']);
     }
 
-    SitePage::localRedir('/cms/portfolio/' . $_POST['parent']);
+
+    if ( isset( $_POST['return'] ) ) {
+        SitePage::localRedir($_POST['return'] . '&fileID=' . $fileID);
+    }
+    else {
+        SitePage::localRedir('/cms/portfolio/' . $_POST['parent']);
+    }
 }
 elseif (is_numeric($_GET['delete'])) {
 
