@@ -52,10 +52,9 @@
 		 */
 		fileBrowser : function (field_name, url, type, win) {
 			var ed = tinyMCE.activeEditor, file;
-
 			if (type.toLowerCase() == 'image')
 				file = '/file_browser.php?filter=image';
-			else if (type.toLowerCase() == 'video')
+			else if (type.toLowerCase() == 'media')
                 file = '/file_browser.php?filter=video';
          	else
 				file = '/file_browser.php?filter=none';
@@ -80,7 +79,7 @@
 
             if (type.toLowerCase() == 'image')
                 file = '/eportfolio_file_browser.php?filter=image';
-            else if (type.toLowerCase() == 'video')
+            else if (type.toLowerCase() == 'media')
                   file = '/eportfolio_file_browser.php?filter=video';
             else
                 file = '/eportfolio_file_browser.php?filter=none';

@@ -95,7 +95,7 @@ $page->setVar($output);
 if (is_array($fileList)) {
 
     // add homepage "file"
-    if ($category['template'] > 0) {
+    if ($category['template'] > 0 && !is_array($filter)) {
         $homepage = array('id'          => $category['id'],
                           'description' => 'Homepage',
                           'size'        => 1,
@@ -118,7 +118,7 @@ if (is_array($fileList)) {
 
 		$page->setVar('thumbnail_image_block', '');
 		$page->setVar('thumbnail_flash_block', '');
-		if ($filter == 'image')
+		if ($filter['filter'] == 'image')
 			$page->parse('thumbnail_image_block', 'thumbnail_image');
 		else
 			$page->parse('thumbnail_flash_block', 'thumbnail_flash');
