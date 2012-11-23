@@ -1,157 +1,114 @@
 
-.scroller               { height: @dp * 3;
-    ul                  { float: left; }
-    li:before, li:after { content: ''; position: absolute; top: 0; height: 100%; width: 1px;}
-    li:before           { border-left: solid 1px rgba(0,0,0,0.1); left: -1px; }
-    li:after            { border-right: solid 1px rgba(0,0,0,0.1); right: 0; }
+.scroller                   { height: @dp * 3;
+    ul                      { float: left; }
+    li:before, li:after     { content: ''; position: absolute; top: 0; height: 100%; width: 1px;}
+    li:before               { border-left: solid 1px rgba(0,0,0,0.1); left: -1px; }
+    li:after                { border-right: solid 1px rgba(0,0,0,0.1); right: 0; }
 }
 
 
 #dashboard-timetable-wrapper { height:@dp * 3;
-    ul li               { display: block; float: left; height: @dp * 3; box-sizing: border-box;
-        a               { height: 100%; }
-        span            { padding-left: @dp4 - 2; display: block; }
-        h3              { margin: 0 - @dp4 0 - @dp4 0; }
-        h4              { margin: 0; }
-        time            { float: none; display: block; width: auto; }
-        &.current       { background: lighten(@highlight-color,7%); font-weight: bold; }
+    ul li                   { display: block; float: left; height: @dp * 3; box-sizing: border-box;
+        a                   { height: 100%; }
+        span                { padding-left: @dp4 - 2; display: block; }
+        h3                  { margin: 0 - @dp4 0 - @dp4 0; }
+        h4                  { margin: 0; }
+        time                { float: none; display: block; width: auto; }
+        &.current           { background: lighten(@highlight-color,7%); font-weight: bold; }
     }
-
 }
 
-.timetable-container    { position: relative; top: 0 - @dp - 1;
-    .timetable-periods  { min-width: @dp * 2.5; float: left; margin-right: -1px;
-        table           { width: 100%; }
-    }
-    table               { border-spacing: 0; border-collapse: collapse; }
-    thead               {
-        tr              { height: @dp; }
-    }
-    td, th              { padding: 0 @dp12; border: 1px solid darken(@header-color,7%); border-width: 0 1px 1px 0; min-width: @dp * 2; }
-    td                  { overflow: hidden; text-overflow: ellipsis; word-break: break-all; white-space: nowrap; border-color: darken(#fff,7%); }
-    a                   { display: block; height: 100%; vertical-align: top; }
-    time, span          { text-style: italic; font-size: 90%; display: block; color: lighten(@body-color,20%); }
-    .current            { background: lighten(@highlight-color,7%); font-weight: bold; border-color: @highlight-color; }
+.timetable                  {
+    h1                      { display: none; visibility: hidden; }
 }
-
-
-
-
-
-
-.timetable-container tr {
-    height: 65px;
-    overflow: hidden;
-}
-
-
-.timetable-container td {
-    border-top: solid 1px #ddd;
-}
-
-
-
-/* This is the current cell */
-.period-today.highlight {
-    background-color: #ffe;
-    font-weight: bold;
-}
-
-
-
-.period-today.highlight {
-    background-color: #fff3b2;
-}
-
-.period-def.highlight {
-    font-weight: bold;
-}
-
-
-
-#menu li {
-    overflow: hidden;
-}
-
-.cal-today h1 {
-    background-color: #49f;
-    background-image: none;
-}
-
-#login_frm {
-    margin-top: @dp6;
-    input {
-        border: none;
-        background-color: rgba(255, 255, 255, 0.1);
-        color: #fff;
-        padding: @dp12 @dp6;
-        &:focus {
-            background-color: rgba(255, 255, 255, 0.2);
-            outline: none;
+.timetable-container        { position: relative; top: 0; font-size: @secfont;
+    *                       { text-transform: none; }
+    h3                      { color: #555; font-size: 1em; }
+    .timetable-periods      { min-width: @dp * 2.5; float: left; margin-right: -1px;
+        h3                  { margin-top: 12px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;
+                              max-width: 105px;
+        }
+        table               { width: 100%; }
+        td                  { padding-left: 12px; background: @subtle-shade;
+            &.current       { background: lighten(@highlight-color,2%); }
         }
     }
-    input[type="submit"] {
-        padding: 0 @dp4;
-    }
-    li {
-        border-bottom: none;
-    }
-}
-
-.news {
-    img {
-        max-width: 200px;
-        float: left;
-        padding: 8px;
-    }
-    .news-content {
-
-    }
-}
-
-.calendar {
-    .today {
-        background: lighten(@highlight-color, 7%);
-    }
-    .selected {
-        box-shadow: inset 0 4px 16px rgba(0, 0, 0, 0.2);
-    }
-}
-
-h1 a {
-    &[data-icon=back], &[data-icon=next] {
-        position: relative;
-        top: -5px;
-        padding: 10px 10px;
-        font-size: 18px;
-        font-weight: normal;
-        margin-left: 8px;
-        &:before {
-            .threshold(@header-color);
-            .shadow(@header-color);
-            opacity: 0.3;
+    table                   { border-spacing: 0; border-collapse: collapse; }
+    thead                   {
+        tr                  { height: @dp2; }
+        th                  { text-transform: uppercase; background: @header-color; border-color: @header-color; .threshold(@header-color);
+            &.current       { background: lighten(@highlight-color, 2%); .hi-contrast(@highlight-color, @banner-color); }
         }
     }
+    tbody td                { height: 80px; }
+    tr                      { height: 65px; overflow: hidden; }
+    td                      { border-top: solid 1px #ddd; overflow: hidden; text-overflow: ellipsis; word-break: break-all;
+                              white-space: nowrap;
+    }
+    td, th                  { border: 1px solid #ddd; border-width: 0 1px 1px 0; min-width: @dp * 2;
+                              padding: 0; vertical-align: top;
+    }
+    ul, li                  { height: 100%; }
+    a                       { display: block; height: 100%; vertical-align: top; }
+    time, span              { text-style: italic; display: block; color: lighten(@body-color,20%); }
+    span                    { font-size: 1em; width: 100%; height: 1.5em; float: none; line-height: 1em; }
+    .class-title            { font-weight: bold; }
+    .class-code             { display: none; }
+    .current                { background: lighten(@highlight-color,7%); font-weight: bold; border-color: @highlight-color; }
+}
+#table-wrapper              {
+    td                      { min-width: 140px;
+        span                { height: 2.2em; line-height: 1.1em; }
+        .class-title        { white-space: normal; word-break: normal; }
+    }
+}
+
+#menu li                    { overflow: hidden; }
+
+.cal-today h1               { background-color: #49f; background-image: none; }
+
+#login_frm                  { margin-top: @dp6;
+    input                   { border: none; background-color: rgba(255, 255, 255, 0.1); color: #fff; padding: @dp12 @dp6;
+        &:focus             { background-color: rgba(255, 255, 255, 0.2); outline: none; }
+        &::-webkit-input-placeholder { color: #e7e7e7; }
+        &:-moz-placeholder { color: #e7e7e7; }
+        &:-ms-input-placeholder { color: #e7e7e7; }
+        // no opera support available :(
+    }
+    input[type="submit"]    { padding: 0 @dp4; }
+    li                      { border-bottom: none; }
+}
+
+.news                       {
+    img                     { max-width: 200px; float: left; padding: 8px; }
+    .news-content           { }
+}
+
+.calendar                   {
+    .today                  { background: lighten(@highlight-color, 7%); }
+    .selected               { box-shadow: inset 0 4px 16px rgba(0, 0, 0, 0.2); }
+    td.empty                { background: @subtle-shade; }
 }
 
 // define on an article basis
-article {
+article                     {
     // news module
-    &.news {
-        a {
-            padding: @dp8 @dp8 @dp8 (@dp8 - 1);
-            .thumb {
-                padding: 0 @dp6 @dp24 @dp24;
-            }
+    &.news                  {
+        a                   { padding: @dp8 @dp8 @dp8 (@dp8 - 1);
+            .thumb          { padding: 0 @dp6 @dp24 @dp24; }
         }
     }
 
     // dashboard component
-    &.dashboard-news {
-        .thumb {
-            float: left;
-            padding-right: 4px;
-            margin-top: 3px;
-        }
+    &.dashboard-news        {
+        .thumb              { float: left; padding-right: @dp4; margin-top: @dp16; }
+    }
+}
+
+h1 a {
+    &[data-icon=back],
+    &[data-icon=next]       { position: relative; top: -5px; padding: 10px 10px; font-size: 18px; font-weight: normal;
+                              margin-left: 8px;
+        &:before            { .threshold(@header-color); .shadow(@header-color); opacity: 0.3; }
     }
 }

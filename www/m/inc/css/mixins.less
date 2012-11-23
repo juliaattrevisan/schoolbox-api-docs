@@ -4,14 +4,18 @@
 // Note: For multi-parameter mixins, @arguments only works if the first is defined when you use the mixin. Don't ask why
 // =============================================================================
 .gradient (@startColor: black, @endColor: white, @dir: top) {
-	background-color: @endColor;
-	background-repeat: repeat-x;
-	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, @startColor), color-stop(100%, @endColor));
-	background-image: -webkit-linear-gradient(@dir, @startColor, @endColor);
+    .stopped-gradient(@startColor, 0%, @endColor, 100%, @dir);
+}
+
+.stopped-gradient(@startColor: black, @startPoint: 0%, @endColor: white, @endPoint: 100%, @dir: top) {
+    background-color: @endColor;
+    background-repeat: repeat-x;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(@startPoint, @startColor), color-stop(@endPoint, @endColor));
+    background-image: -webkit-linear-gradient(@dir, @startColor, @endColor);
 //	   background-image: -moz-linear-gradient(@dir, @startColor, @endColor);
 //		background-image: -ms-linear-gradient(@dir, @startColor, @endColor);
-		 background-image: -o-linear-gradient(@dir, @startColor, @endColor);
-			background-image: linear-gradient(@dir, @startColor, @endColor);
+    background-image: -o-linear-gradient(@dir, @startColor, @endColor);
+    background-image: linear-gradient(@dir, @startColor, @endColor);
 }
 
 .box-shadow (@x: 0, @y: 0, @blur:.25em, @color: rgba(0,0,0,0.5)) {
@@ -153,6 +157,16 @@
 .shadow (@a) when (lightness(@a) < 50%) { text-shadow: 0 -1px 0 black; }
 .shadow (@a) when (lightness(@a) >= 50%)  { text-shadow: 0 1px 0 white; }
 
+.hi-contrast(@bg, @fg) when
+    (lightness(@bg) - lightness(@fg) < @contrast-threshold),
+    (hue(@bg) - hue(@fg) < 5),
+    (hue(@bg) - hue(@fg) > -5) {
+        color: darken(@fg, 40%);
+}
+.hi-contrast(@bg, @fg) when
+    (lightness(@bg) - lightness(@fg) >= @contrast-threshold) {
+        color: @fg;
+}
 
 .striped() {
     background-image: -webkit-gradient(linear, 0 0, 100% 100%,

@@ -16,7 +16,7 @@
         {% if i % 7 == 0 %}
     </tr><tr>
         {% endif %}
-        <td class="{% if content[i].events %}has-events {% endif %}{% if content[i].isToday %}today{% endif %}">
+        <td class="{% if content[i].events %}has-events {% endif %}{% if content[i].isToday %}today {% endif %}{% if content[i] == '_blank' %}empty{% endif %}">
         {% if content[i].niceDay %}
             <h3 data-date="{{ content[i].dayOfMonth }}">{{content[i].niceDay}}</h3>
         {% else %}
