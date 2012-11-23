@@ -71,8 +71,13 @@
     var scrollTable;
 
     // Make clicks eat-my-dust fast, and touch when possible
-    var clickEvent = ((document.ontouchstart!==null)?'click':'click');
-    var clickEnded = ((document.ontouchstart!==null)?'mouseup':'touchend');
+    var clickEvent = 'click';
+    var touchEvent = 'click';
+    var clickEnded = 'mouseup';
+    if(isEventSupported('touchstart', document)) {
+        touchEvent = 'touchstart';
+    }
+
     var page = document.getElementById('app');
 
     if(settings.offline){

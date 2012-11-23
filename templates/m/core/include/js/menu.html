@@ -3,16 +3,41 @@
     // Nav events
     var nav  = $('#nav');
     var menu = $('#menu');
+    var menuCache = {};
     var ni   = -1;
     var mi   = -1;
 
-    nav.on(clickEvent,'a',function(e){
-        if($(this).attr('href') != '#') {
-            renderPage($(this).attr('href'));
+/*
+    var fb = new QuickTap(nav[0], function(e) {
+        var elem = e.srcElement;
+        if($(elem).attr('href')) {
+            console.log('wendy');
+            foo(elem);
+            console.log('morton');
+        }
+    });
+*/
+
+    nav.on(touchEvent, 'a', function(e) {
+        e.preventDefault();
+        return navigate(this);
+    });
+
+    /**
+     * Explore the navigation
+     *
+     * @param target
+     * @return {Boolean}
+     */
+    function navigate(target) {
+        var elem = $(target);
+
+        if(elem.attr('href') != '#') {
+            renderPage(elem.attr('href'));
             return false;
         }
         // If its a new page
-        if(ni != $(this).parent().index()){
+        if(ni != elem.parent().index()) {
 
             // Clear classes
             nav.find('.active').removeClass('active');
@@ -21,28 +46,33 @@
             killScroll(scrollMenu);
 
             // Get index of clicked nav
-            ni = $(this).parent().index();
+            ni = elem.parent().index();
 
             // Build menu HTML
-            $('#menu').html('<a href="#" class="back"></a>' +
-                            '<div id="menu_wrapper"></div>')
-                      .addClass('active');
-            $('#menu_wrapper').append($(this).siblings('ul[role="navigation"]').clone());
+            var menuWrapper = $('<div />').attr('id', 'menu_wrapper').css({ max_height: $(window).height() - 70 });
 
-            // set the menu_wrapper height: viewport - 70px
-            $('#menu_wrapper').css({max_height: $(window).height() - 70});
+            // this could probably be done during startup rather than on-demand
+            if(menuCache[elem.attr('title')] === undefined) {
+                menuCache[elem.attr('title')] = elem.siblings('ul').filter('[role="navigation"]').clone();
+            }
 
+            // wrap it in something arbitrary so we can get its innerHTML
+            var wrap = $('<div/>').append(menuWrapper.append(menuCache[elem.attr('title')]));
+
+            menu.html('<a href="#" class="back"></a>' + wrap.html()).addClass('active');
+
+            // apply scrollability to the menu
             scrollMenu = new iScroll('menu_wrapper', { bounce: true, vScroll: true });
 
-            // Display menu
-            $(this).parent().addClass('active');
+            // aaaand scene.
+            elem.parent().addClass('active');
 
         } else {
             nav.find('li[role="tab"]:nth-of-type('+ (ni + 1) +')').toggleClass('active');
             menu.toggleClass('active');
         }
         return false;
-    });
+    }
 
     // Menu events
     menu.on(clickEvent,'a',function(e){
@@ -84,36 +114,5 @@
         }
         return false
     });
-
-/*
-    nav.on(clickEvent, '.back', function(e){
-        $('#tablist ul li').removeClass('current')
-        return false
-    });
-
-    menu.on(clickEvent, '.back', function(e){
-        $('#menu').removeClass('active')
-        nav.find('li.active').removeClass('active')
-        return false
-    });
-
-    menu.on($.Event(clickEvent), 'ul .back', function(e){
-        $('#menu .active').removeClass('active')
-        return false
-    });
-
-    /*        if($(this).parent('li').hasClass('current')){
-                $(this).parent('li').removeClass('current');
-            } else {
-                $(this).parent('li').siblings('li').removeClass('current');
-                $(this).parent('li').addClass('current');
-            }
-            var href = $(this).attr('href');
-            if(href != '#' && href != 'undefined'){
-                renderPage('/'+href);
-            }
-    */
-
-
 
 </script>
