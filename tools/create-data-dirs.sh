@@ -27,7 +27,7 @@ fi
 mkdir -p $datadir/{dropbox,files,myFiles,returns,storage,submissions,thumbnails}
 
 # Cache dirs
-mkdir -p $datadir/cache/{minify,portrait,purifier,stream,weather,xml,zip}
+mkdir -p $datadir/cache/{minify,myfiles,portrait,purifier,stream,weather,xml,zip}
 
 # Fix permissions
 chown -R www-data:www-data $datadir
