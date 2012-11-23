@@ -122,7 +122,7 @@
                         onScrollEnd: function(){
                             $('#school-news-wrapper .pagination li').removeClass('active');
                             $('#school-news-wrapper .pagination li:nth-child(' + (this.currPageX+1) + ')').addClass('active');
-                            $('#school-news-wrapper').siblings('h1').html('School News: <span>'+$('#school-news-wrapper ul:nth-child('+(this.currPageX+1)+')').attr('data-topic')+'</span>');
+                            $('#school-news-wrapper').siblings('h1').html('School News <span>'+$('#school-news-wrapper ul:nth-child('+(this.currPageX+1)+')').attr('data-topic')+'</span>');
                         }
                     });
                 }
@@ -134,7 +134,7 @@
                             var el = $('#your-news-wrapper');
                             $('#your-news-wrapper .pagination li').removeClass('active');
                             $('#your-news-wrapper .pagination li:nth-child(' + (this.currPageX+1) + ')').addClass('active');
-                            $('#your-news-wrapper').siblings('h1').html('My News: <span>'+$('#your-news-wrapper ul:nth-child('+(this.currPageX+1)+')').attr('data-topic')+'</span>');
+                            $('#your-news-wrapper').siblings('h1').html('My News <span>'+$('#your-news-wrapper ul:nth-child('+(this.currPageX+1)+')').attr('data-topic')+'</span>');
                         }
                     });
                 }

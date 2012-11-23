@@ -13,9 +13,14 @@
         span                { padding-left: @dp4 - 2; display: block; }
         h3                  { margin: 0 - @dp4 0 - @dp4 0; }
         h4                  { margin: 0; }
-        time                { float: none; display: block; width: auto; }
+        time                { float: none; display: block; width: auto;
+            &.class-time    { font-weight: normal; position: absolute; bottom: 4px; color: rgba(0, 0, 0, 0.4); }
+        }
         &.current           { background: lighten(@highlight-color,7%); font-weight: bold; }
     }
+    h5.class-room,
+    h5.class-staff          { color: rgba(0, 0, 0, 0.6); }
+
 }
 
 .timetable                  {

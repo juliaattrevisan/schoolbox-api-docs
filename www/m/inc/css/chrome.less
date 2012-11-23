@@ -278,12 +278,14 @@ article                 { position: relative; //border-radius: @radius; backgrou
                           background: @header-color; .threshold(@header-color); border-radius: @radius @radius 0 0;
                           // border-bottom: 1px solid darken(@header-color,10%);
         aside           { position: absolute; top: @dp12; right: @dp6; }
-        span            { text-transform: none; font-weight: normal; }
+        span            { text-transform: none; font-weight: normal; font-style: italic; display: block;
+                          position: absolute; top: 0; right: @dp; width: 100%; text-align: right;
+        }
     }
     img                 { max-width: 100%; }
     &[data-icon]:before { position: absolute; top: @dp4; right: @dp6; z-index: 1; font-size: @dp2; opacity: 0.4;
                           .threshold(@header-color);
-                        }
+    }
 }
 
 .pagination             { display: block; text-align: center; float: none; clear: both; margin: 0; //background: @background;

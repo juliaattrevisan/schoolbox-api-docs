@@ -1,25 +1,3 @@
-<style>
-    #dashboard-timetable-wrapper h5.class-room, h5.class-staff {
-        color: rgba(0, 0, 0, 0.6);
-    }
-    #dashboard-timetable-wrapper time.class-time {
-        font-weight: normal;
-        position: absolute;
-        bottom: 4px;
-        color: rgba(0, 0, 0, 0.4);
-    }
-    /* this is an override of an existing style */
-    article h1 span {
-        text-transform: uppercase;
-        font-weight: bold;
-        font-size: 0.9em;
-        display: block;
-        position: absolute;
-        top: 0;
-        width: 100%;
-        text-align: center;
-    }
-</style>
 <div id="dashboard-timetable-wrapper">
 <ul style="width: {{ content | length * 50 }}%;" class="scroller">
 {% for period in content %}
