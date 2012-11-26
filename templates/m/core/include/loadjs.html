@@ -170,6 +170,14 @@ localCache.get = function(url) {
         return "Resource not cached, please try again when you are connected";
     }
 };
+
+
+// Browser chrome removal
+function scrollTop(){
+    var i = (env.android) ? 1 : 0;
+    setTimeout(scrollTo(0,i),100)
+}
+
 </script>
 
 {% include 'js/render.html' %}
@@ -209,11 +217,6 @@ $('#nav').delegate('#nav_back', clickEvent, function(e) {
     history.go(-1)
 });
 
-    // Browser chrome removal
-function scrollTop(){
-    i = (env.android) ? 1 : 0;
-    setTimeout(scrollTo(0,i),100)
-}
 $("#header").on(clickEvent, '#currentPage', scrollTop)
 
 // Stop craaazzzzyyy bounce on iPhail

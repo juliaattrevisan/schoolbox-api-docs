@@ -1,4 +1,4 @@
-<script>
+loadjs.html<script>
 
     function renderMenu(data){
         var cache = localCache.get(data);
@@ -152,7 +152,7 @@
             }, 100);
         });
 
-        window.scrollTop();
+        scrollTop();
 
         if(push && location.pathname != data && data != '/') {
             history.pushState(null, null, data);
