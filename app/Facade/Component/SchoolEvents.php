@@ -27,13 +27,13 @@ class Facade_Component_SchoolEvents extends Facade_Component_Generic {
         // check that there aren't events with Alaress_Date_Formats as their date fields (which is a 50:50)
         foreach($cList['events'] as &$e) {
             if($e->getEndTime() instanceof Alaress_Date_Format) {
-                $e->setEndTime($e->getEndTime()->getShort());
+                $e->setEndTime($e->getEndTime()->getTimeOnly());
             }
             if($e->getStartTime() instanceof Alaress_Date_Format) {
-                $e->setStartTime($e->getStartTime()->getShort());
+                $e->setStartTime($e->getStartTime()->getTimeOnly());
             }
             if($e->getDate() instanceof Alaress_Date_Format) {
-                $e->setDate($e->getDate()->getShort());
+                $e->setDate($e->getDate()->getDateOnly());
             }
         }
 
