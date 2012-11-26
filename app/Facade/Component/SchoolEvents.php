@@ -19,29 +19,24 @@ class Facade_Component_SchoolEvents extends Facade_Component_Generic {
         $calendarHandler = $calFactory->produce();
 
         $now = time();
+        $cList = array(
+            'submissions' => $calendarHandler->getSubmissionEvents($now)->getStack(),
+            'events' => $calendarHandler->getDayEvents($now)->getStack()
+        );
 
-        $cList = array();
-
-        $cList['submissions'] = $calendarHandler->getSubmissionEvents($now)->getStack();
-/*
-        if($cList['submissions']) {
-            foreach($cList['submissions'] as &$item) {
-                $adf = new Alaress_Date_Format($item['date']->getTimestamp(), 'U');
-                $item['dueTime'] = $adf->getTimeOnly();
+        // check that there aren't events with Alaress_Date_Formats as their date fields (which is a 50:50)
+        foreach($cList['events'] as &$e) {
+            if($e->getEndTime() instanceof Alaress_Date_Format) {
+                $e->setEndTime($e->getEndTime()->getShort());
+            }
+            if($e->getStartTime() instanceof Alaress_Date_Format) {
+                $e->setStartTime($e->getStartTime()->getShort());
+            }
+            if($e->getDate() instanceof Alaress_Date_Format) {
+                $e->setDate($e->getDate()->getShort());
             }
         }
-*/
-        $cList['events'] = $calendarHandler->getDayEvents($now)->getStack();
 
-/*
-        if($cList['events']) {
-            foreach($cList['events'] as &$e) {
-                if($e['startTime'] == '12:00AM') {
-                    unset($e['startTime']);
-                }
-            }
-        }
-*/
         return array(
             'title'   => "Today's Events",
             'aside'   => '',
