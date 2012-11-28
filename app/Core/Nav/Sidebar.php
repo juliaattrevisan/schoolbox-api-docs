@@ -282,10 +282,16 @@ class Core_Nav_Sidebar {
                 'value' => 'Settings',
                 'href'  => 'core/settings/preferences'
             ),
-//            array(
-//                'value' => 'Logout',
-//                'href'  => '/m/core/auth/logout'
-//            ),
+            array(
+                'id'    => 'switch',
+                'value' => 'Switch to Desktop',
+                'href'  => '/switch.php?v=desktop'
+            ),
+            array(
+                'id'    => 'logout',
+                'value' => 'Logout',
+                'href'  => 'core/auth/logout'
+            ),
         );
     }
 

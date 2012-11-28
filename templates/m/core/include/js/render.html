@@ -38,7 +38,15 @@
                     // If children
                     if (v.items){ menu += ' class="parent"' }
                     menu += '>'
-                    if (v.href) { menu += '<a href="'+ v.href +'">' } else { menu += '<h3>' }
+                    if (v.href) {
+                        if(v.id) {
+                            menu += '<a id="' + v.id + '" href="' + v.href + '">';
+                        }
+                        else {
+                            menu += '<a href="'+ v.href +'">'
+                        }
+
+                    } else { menu += '<h3>' }
                     menu += v.value
                     if (v.href) { menu += '</a>' } else { menu += '</h3>' }
                     // Subnav
