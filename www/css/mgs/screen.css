@@ -490,11 +490,12 @@ p.interact a { color: #03c; }
 	border: 0;
 }
 
-#footer p {
+#footer p, #footer li {
 	margin: 0;
 	text-align: right;
 	color: #ccc;
 	font-size: 80%;
 }
+#footer li { list-style: none;}
 
-#footer p a { color: #ccc; }
+#footer p a, #footer li a { color: #ccc; }

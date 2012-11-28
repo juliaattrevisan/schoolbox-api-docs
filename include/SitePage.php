@@ -139,6 +139,7 @@ class SitePage extends Page {
             'EXTERNAL_ID' => $_SESSION['sid'],
             'SITE_VERSION' => Cfg::get('site_version'),
             'SCHOOL_ADDRESS' => Cfg::get('school_address'),
+            'MOBILE_SWITCH_LINK' => Cfg::get('mobile_enabled') ? '<li><a href="/switch.php?v=mobile">Switch to Mobile</a></li>' : '',
         );
 
         $this->setVar($templateVar);
