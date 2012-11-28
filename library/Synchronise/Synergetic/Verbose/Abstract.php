@@ -217,7 +217,7 @@ abstract class Synchronise_Synergetic_Verbose_Abstract {
 	 *
 	 * @return bool
 	 */
-	protected function getVerbose() {
+	public function getVerbose() {
 		return $this->verbose;
 	}
 
