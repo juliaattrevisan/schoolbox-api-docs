@@ -22,33 +22,10 @@ class Authenticator {
      * @param $password
      * @param string $method
      */
-    public function authenticate($username, &$password, $method = 'all') {
-        // authentication methods in order of usage
-        $authMethods = array('sso', 'ldap', 'mysql');
+    public function authenticate($username, &$password) {
 
-        // test all methods in order
-        if($method == 'all') {
-            foreach($authMethods as $test) {
-                // if the previous method succeeded, don't bother trying to authenticate
-                if($this->isAuthenticated()) {
-                    return;
-                }
-                $func = 'auth' . strtoupper($test);
-                if(method_exists($this, $func)) {
-                    $this->$func($username, $password);
-                }
-            }
-        }
-
-        // test a single method
-        elseif(in_array($method, $authMethods)) {
-            if(!$this->isAuthenticated()) {
-                $func = 'auth' . strtoupper($method);
-                if(method_exists($this, $func)) {
-                    $this->$func($username, $password);
-                }
-            }
-        }
+        $s = new Session();
+        $this->authenticated = $s->authenticate($username, $password);
 
         // for security, unset password that was delivered
         unset($password);
@@ -70,49 +47,6 @@ class Authenticator {
         $this->authenticated = false;
         $this->authenticate($username, $password, $method);
     }
-
-    /**
-     * Private method for testing Single Sign-On authentication
-     * Sets $this->authenticated = true upon success
-     * @param $username
-     * @param $password
-     */
-    private function authSSO($username, &$password) {
-
-    }
-
-    /**
-     * Private method for testing LDAP authentication
-     * Sets $this->authenticated = true upon success
-     * @param $username
-     * @param $password
-     */
-    private function authLDAP($username, &$password) {
-
-    }
-
-    /**
-     * Private method for testing MySQL authentication
-     * Sets $this->authenticated = true upon success
-     * @param $username
-     * @param $password
-     */
-    private function authMYSQL($username, &$password) {
-        $query = "SELECT user.id
-                  FROM user
-                  WHERE username = '". mysql_real_escape_string($username)."'
-                  AND password = PASSWORD('".mysql_real_escape_string($password)."')";
-
-        $db = DeprecatedDatabase::getInstance();
-        // DeprecatedDatabank
-        // DeprecatedUser
-        $db->query($query);
-        $result = $db->countRows();
-
-        if($result == 1)
-            $this->authenticated = true;
-    }
-
 
     /* Session Functions */
 

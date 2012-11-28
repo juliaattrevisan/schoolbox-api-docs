@@ -355,7 +355,6 @@ class Group extends DeprecatedModel
             return $this->cache[$this->_service][$relationID][$userID];
         }
 
-        require_once dirname(__FILE__) . '/user.php';
         $userHandler = new User;
         $user = $userHandler->getByID($userID);
 
@@ -419,8 +418,6 @@ class Group extends DeprecatedModel
     function getTutorialPermission($userID)
     {
 
-        require_once dirname(__FILE__) . '/user.php';
-        require_once dirname(__FILE__) . '/mssql.php';
         $userHandler = new User;
         $mssql = new MSSQL;
 
@@ -444,7 +441,6 @@ class Group extends DeprecatedModel
         // checks if user is a student
         // default to current user
         if ($userID > 0) {
-            require_once dirname(__FILE__) . '/user.php';
             $userHandler = new User;
             $user = $userHandler->getByID($userID);
             $groupID = $user['group_id'];
@@ -470,7 +466,6 @@ class Group extends DeprecatedModel
 
         // default to current user
         if ($userID > 0) {
-            require_once dirname(__FILE__) . '/user.php';
             $userHandler = new User;
             $user = $userHandler->getByID($userID);
 
@@ -488,7 +483,6 @@ class Group extends DeprecatedModel
         // checks if user is staff
         // default to current user
         if ($userID > 0) {
-            require_once dirname(__FILE__) . '/user.php';
             $userHandler = new User;
             $user = $userHandler->getByID($userID);
             $groupID = $user['group_id'];
@@ -509,7 +503,6 @@ class Group extends DeprecatedModel
         // checks if user is a parent
         // default to current user
         if ($userID > 0) {
-            require_once dirname(__FILE__) . '/user.php';
             $userHandler = new User;
             $user = $userHandler->getByID($userID);
             $groupID = $user['group_id'];
