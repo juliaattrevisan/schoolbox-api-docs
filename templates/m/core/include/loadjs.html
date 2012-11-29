@@ -267,7 +267,7 @@ $("body").on(clickEvent, '#grid', function(){
     $("#grid").remove();
 });
 
-
+// register the cache-wipe listener
 $("#page").on(clickEvent, '#wipeCache', function(){
     $('html').attr('manifest','manifest_obsolete.php');
     document.cookie = 'PHPSESSID' + '=; expires=Thu, 01-Jan-70 00:00:01 GMT;';
@@ -276,12 +276,20 @@ $("#page").on(clickEvent, '#wipeCache', function(){
     window.location.reload();
 });
 
-$("#page").on(clickEvent, '#logout', function(){
+// register the logout listener
+$("#page,#menu").on(clickEvent, '#logout', function(){
     localStorage.clear();
     sessionStorage.clear();
     killCookie('PHPSESSID');
     window.location = window.location.protocol +'//' + window.location.hostname + '/m/';
 });
+
+// register the site-switch listener
+$("#menu").on(clickEvent, '#switch', function() {
+    var sw = window.location.protocol +'//' + window.location.hostname + $(this).attr('href');
+    debug('switch to: ' + sw);
+    window.location = sw;
+})
 
 function debug_storage(){
     // Request storage usage and capacity left

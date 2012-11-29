@@ -143,6 +143,15 @@ class SitePage extends Page {
 
         $this->setVar($templateVar);
 
+        // determine whether or not to show a mobile switch link
+        $this->setBlock(TEMPLATE_body, 'mobile_switch', 'mobile_switch_block');
+        if(Cfg::get('mobile_enabled')) {
+            $this->parse('mobile_switch_block', 'mobile_switch');
+        }
+        else {
+            $this->setVar('mobile_switch_block', '');
+        }
+
         $title = $this->getVar('TITLE');
 
         if (empty($title)) {
