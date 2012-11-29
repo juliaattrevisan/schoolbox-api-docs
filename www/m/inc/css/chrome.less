@@ -477,6 +477,12 @@ h1, li, a, article, #status {
 /* =============================================================================
    Notifications
    ========================================================================== */
+.alert(@colour) {
+    background: @colour;
+    border: solid 1px darken(@colour, 40%);
+    .threshold(@colour);
+}
+
 .toast {
     z-index: 999;
     position: absolute;
@@ -485,26 +491,14 @@ h1, li, a, article, #status {
     width: 92%;
     padding: 10px 2%;
     font-weight: bold;
-    transition: opacity 5s linear;
-    -o-transition: opacity 5s linear;
-    -moz-transition: opacity 5s linear;
-    -webkit-transition: opacity 5s linear;
+    transition: opacity 2s linear;
+    -o-transition: opacity 2s linear;
+    -moz-transition: opacity 2s linear;
+    -webkit-transition: opacity 2s linear;
 
-    &.info {
-        background: #c8dbb8;
-        border: solid 1px #004411;
-        color: white;
-    }
-    &.warn {
-        background: #feda76;
-        border: solid 1px #c67815;
-        color: white;
-    }
-    &.error {
-        background: #A11;
-        border: solid 1px #400;
-        color: white;
-    }
+    &.info { .alert(@alert-info); }
+    &.warn { .alert(@alert-warning); }
+    &.error { .alert(@alert-error); }
 }
 
 /* =============================================================================
