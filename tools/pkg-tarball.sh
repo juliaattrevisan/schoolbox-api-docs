@@ -78,7 +78,7 @@ cd $thistempdir/schoolbox-$tag;
 tools/build-less-css.sh
 
 echo "Removing unrequired files and directories";
-rm -rf {debian,phpunit.xml,README.md,test,.git*}
+rm -rf {debian,phpunit.xml,README.md,test,.git*,Vagrantfile,tools/vagrant*,tools/pkg-*}
 
 echo "Removing MGS Sport compatibility files";
 rm -rf www/include/permission.php;

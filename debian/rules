@@ -41,6 +41,13 @@ override_dh_install:
 	cp -a --parents www/include/permission.php $(CURDIR)/mgssport
 	rm -fR www/include/permission.php
 	## End MGS Sport Module
+	# Remove non-deployable files and folders
+	rm -fR phpunit.xml
+	rm -fR README.md
+	rm -fR test
+	rm -fR Vagrantfile
+	rm -fR tools/vagrant*
+	rm -fR tools/pkg-*
 	# Start install
 	dh_install
 	# Auto build the sql update scripts
