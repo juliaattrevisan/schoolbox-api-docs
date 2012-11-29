@@ -3,3 +3,4 @@ updates/sql_updates.sql
 data/
 www/conf/conf.php
 .vagrant
+Vagrantfile
