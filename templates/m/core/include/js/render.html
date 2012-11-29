@@ -91,7 +91,13 @@
             $('#logo').data('icon','back')
         }
 
-        $('#page').animate({opacity:'0'},200,'linear',function(){
+        var p = $('#page');
+
+        if(p.css('opacity') < 0.01) {
+            p.css('opacity', 0.01);
+        }
+
+        p.animate({opacity:'0'},200,'linear',function(){
 
             // Cleanup
             $(this).html('');
@@ -113,7 +119,7 @@
             var title = $(data).find('header');
 
             $('#currentPage').html(title)
-            $('#page').html(page).prepend(title).animate({opacity:'1'},200);
+            p.html(page).prepend(title).animate({opacity:'1'},200);
 
             // Create scroll wrappers
             setTimeout(function () {
