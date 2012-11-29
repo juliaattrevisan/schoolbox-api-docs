@@ -268,7 +268,7 @@ class PortfolioWebDAV
             }
         } else if ($site_location='stmichaels') {
             $settings = array(
-                'baseUri' => 'https://smgs-data/',
+                'baseUri' => 'https://smgs-data.stmichaels.vic.edu.au/',
                 'userName' => "smgs/" . $_SESSION['username'],
                 'password' => $_SESSION['password'],
             );
