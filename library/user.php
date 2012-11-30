@@ -195,7 +195,6 @@ class User extends DeprecatedModel {
                     WHERE firstname = '$keyword'
                     OR lastname = '$keyword'
                     OR username = '$keyword'
-                    OR alt_email = '$keyword'
                     ORDER BY `$sort_by` $sort_dir
                     LIMIT $offset, $limit;";
 
@@ -203,8 +202,9 @@ class User extends DeprecatedModel {
         // retreive count
         $count_query = "SELECT COUNT(*)
                                 FROM `user`
-                                WHERE firstname = '$keyword' OR lastname = '$keyword'
-                                OR username = '$keyword' OR alt_email = '$keyword'";
+                                WHERE firstname = '$keyword' 
+				OR lastname = '$keyword'
+                                OR username = '$keyword'";
 
         $count = $this->db->getOne($count_query);
         return $this->db->getAll($query);
