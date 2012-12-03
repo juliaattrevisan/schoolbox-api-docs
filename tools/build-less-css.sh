@@ -18,14 +18,32 @@ fullpath=${filepath%/*};
 instdir=`readlink -f $fullpath/../`;
 package=${instdir##*/};
 
+curdir=`pwd`;
+
+# Ensure npm is installed
+checknpm=`whereis -b npm | awk '{ print $2}'`;
+if [ -z $checknpm ];
+then
+	checkpuppet=`whereis -b puppet | awk '{ print $2}'`;
+	if [ -z $checkpuppet ];
+	then
+	        echo "NPM is not installed. Please install npm via your package utilities.";
+		exit 1;
+	else
+	        sudo puppet apply -e 'package { "npm": ensure => installed }';
+	fi
+fi
+
 # Ensure less is installed
 mkdir -p ~/node_modules;
+cd ~;
 npm install less@1.3.0 ~;
 if [ ! -f ~/node_modules/.bin/lessc ];
 then
 	echo "Error: lessc not installed as expected";
 	exit 1;
 fi
+cd $curdir;
 
 # Build core.css
 echo "Building core.css";

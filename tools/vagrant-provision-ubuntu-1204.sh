@@ -31,5 +31,7 @@ then
 	echo "$vag Creating Schoolbox conf file";
 	cp -f /vagrant/www/conf/tarball.conf.php /vagrant/www/conf/conf.php;
 	sed -i 's/xxxxxx/tnp879/g' /vagrant/www/conf/conf.php;
+	echo "$vag Building css files via less";
+	/vagrant/tools/build-less-css.sh;
 	echo "$vag Loading all demo data complete";
 fi
