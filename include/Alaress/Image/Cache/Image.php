@@ -27,7 +27,7 @@ class Alaress_Image_Cache_Image extends DeprecatedModel {
 
 	/* This is where original images are stored
 	 */
-	private $originalsLocation = '../../data/files';
+	private $originalsLocation = null;
 
 	/* This is where cached images are stored
 	 */
