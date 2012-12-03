@@ -125,6 +125,9 @@ class SitePage extends Page {
             $this->buildPage();
             $this->saveHistory();
         }
+        else {
+            $this->parseFooterMobileLink(TEMPLATE_body);
+        }
 
         $userHandler = new User();
 
@@ -142,15 +145,6 @@ class SitePage extends Page {
         );
 
         $this->setVar($templateVar);
-
-        // determine whether or not to show a mobile switch link
-        $this->setBlock(TEMPLATE_body, 'mobile_switch', 'mobile_switch_block');
-        if(Cfg::get('mobile_enabled')) {
-            $this->parse('mobile_switch_block', 'mobile_switch');
-        }
-        else {
-            $this->setVar('mobile_switch_block', '');
-        }
 
         $title = $this->getVar('TITLE');
 
@@ -179,6 +173,8 @@ class SitePage extends Page {
         $this->renderSubjectList();
         $this->renderLinkList();
         $this->renderStudents();
+
+        $this->parseFooterMobileLink('footerTpl');
 
         $this->parse('MAIN_HEADER_REGION', 'headerTpl');
         $this->parse('MAIN_FOOTER_REGION', 'footerTpl');
@@ -927,5 +923,15 @@ class SitePage extends Page {
         return $text;
     }
 
+    private function parseFooterMobileLink($parent = TEMPLATE_content) {
+        // determine whether or not to show a mobile switch link
+        $this->setBlock($parent, 'mobile_switch', "mobile_switch_{$parent}_block");
 
+        if(Cfg::get('mobile_enabled')) {
+            $this->parse("mobile_switch_{$parent}_block", 'mobile_switch');
+        }
+        else {
+            $this->setVar("mobile_switch_{$parent}_block", '');
+        }
+    }
 }
