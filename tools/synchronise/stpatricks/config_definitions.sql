@@ -1,3 +1,5 @@
+UPDATE `config` SET `value` = 'Staff Student Parent ParentRelation Class Enrolment Timetable' WHERE `name` LIKE 'sync_patterns';
+
 -- class: Classes.csv
 INSERT INTO config (`name`, `value`, `title`, `description`, `type`, `required`) VALUES (
   'external_sync_class_csv', '/vagrant/tools/synchronise/stpatricks/testdata/Classes.csv', 'Synchronise Class: CSV file', 'Location of CSV file for class synchronisation', 'External DB', 'true'
