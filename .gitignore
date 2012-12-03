@@ -4,3 +4,6 @@ data/
 www/conf/conf.php
 .vagrant
 Vagrantfile
+core.css
+mchrome.css
+*.log
