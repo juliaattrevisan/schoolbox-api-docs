@@ -28,9 +28,9 @@ class Synchronise_External_Stpatricks_Strategy_Timetable extends Synchronise_Ext
 
             // btw, also no sync data supplied for timetable_period
 
-
+            // if it's days 1 - 4, use the day 0 template, and on day 5 use day 5
             $periodStmt = Database::getInstance()->prepare("
-                SELECT `id` FROM `timetable_period` WHERE `day` = :day AND `sequence` = :seq
+                SELECT `id` FROM `timetable_period` WHERE `day` = :day AND `title` LIKE :seq
             ");
             $classStmt = Database::getInstance()->prepare("
                 SELECT `id` FROM `class` WHERE `code` = :code
@@ -41,7 +41,7 @@ class Synchronise_External_Stpatricks_Strategy_Timetable extends Synchronise_Ext
 
             foreach($this->entityData as $timetable) {
                 // check the period and class exist
-                $periodStmt->execute(array('day' => $timetable['day'], 'seq' => $timetable['period']));
+                $periodStmt->execute(array('day' => $timetable['day'], 'seq' => 'Period ' . $timetable['period']));
                 $period = $periodStmt->fetchColumn();
                 $classStmt->execute(array('code' => $timetable['classCode']));
                 $class = $classStmt->fetchColumn();
