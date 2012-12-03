@@ -584,7 +584,7 @@ CREATE TABLE `class` (
   `code` varchar(16) NOT NULL,
   `description` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -608,7 +608,7 @@ CREATE TABLE `class_period` (
   `class_id` int(11) NOT NULL,
   `period_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -632,7 +632,7 @@ CREATE TABLE `class_user` (
   `class_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3143,7 +3143,7 @@ CREATE TABLE `timetable_campus` (
   `finish` date NOT NULL,
   `offset` int(11) DEFAULT NULL,
   PRIMARY KEY (`cycle_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3171,8 +3171,10 @@ CREATE TABLE `timetable_period` (
   `start` time DEFAULT NULL,
   `finish` time DEFAULT NULL,
   `usable` tinyint(1) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `day` (`day`,`sequence`),
+  UNIQUE KEY `title` (`title`,`day`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3374,7 +3376,7 @@ CREATE TABLE `user_profile` (
   `gender` int(11) DEFAULT NULL,
   `email` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`user_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3398,7 +3400,7 @@ CREATE TABLE `user_relation` (
   `relation_id` int(11) NOT NULL,
   `relation_type` int(11) NOT NULL,
   PRIMARY KEY (`user_id`,`relation_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3554,3 +3556,14 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2012-11-23 16:11:45
+
+/* Fix for missing timetable_cycle SB-1661 */
+DROP TABLE IF EXISTS `timetable_cycle`;
+CREATE TABLE `timetable_cycle` (
+	  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+	  `title` varchar(32) NOT NULL,
+	  `cycle_length` int(11) unsigned DEFAULT NULL,
+	  `day_length` int(10) unsigned DEFAULT NULL,
+	  `regular` tinyint(1) NOT NULL DEFAULT '1',
+	  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
