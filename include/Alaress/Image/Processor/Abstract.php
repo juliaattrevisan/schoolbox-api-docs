@@ -61,6 +61,7 @@ class Alaress_Image_Processor_Abstract {
 	protected function setFiletypeStrategy($imageArray) {
 		switch($imageArray['mime']) {
 			case 'image/jpeg':
+            case 'image/pjpeg':
 				$className = 'Jpg';
 				break;
 			case 'image/gif':

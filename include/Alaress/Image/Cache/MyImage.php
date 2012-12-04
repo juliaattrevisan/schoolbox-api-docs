@@ -27,7 +27,7 @@ class Alaress_Image_Cache_MyImage extends DeprecatedModel {
 
 	/* This is where original images are stored
 	 */
-	private $originalsLocation = '../../data/myFiles';
+	private $originalsLocation = null;
 
 	/* This is where cached images are stored
 	 */
@@ -60,6 +60,7 @@ class Alaress_Image_Cache_MyImage extends DeprecatedModel {
 
 		$this->setImageId($imageId);
 		$this->setKey($key);
+        $this->setOriginalsLocation(Cfg::get('myfile_dir'));
 		$this->setCacheLocation(Cfg::get('myfiles_cache_dir'));
 	}
 
