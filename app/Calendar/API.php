@@ -47,6 +47,7 @@ class Calendar_API extends Generic_API {
 
             $dayData = array();
             $collection = $calendarHandler->getDayEvents($currentDay);
+            $collection->sort();
 
             if($collection->getCount()) {
                 foreach($collection->getStack() as $c) {
