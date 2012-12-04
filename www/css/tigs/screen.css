@@ -181,7 +181,7 @@ body{
     background-image: url('/images/tigs/body-bottom-3.png'),     -ms-linear-gradient(top, #121c2d, #66a1c0);
     background-image: url('/images/tigs/body-bottom-3.png'),      -o-linear-gradient(top, #121c2d, #66a1c0);
     filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#121c2d, endColorstr=#66a1c0);
-    background-color: #66a1c0;
+    background-color: #6ca4c2;
     background-repeat: no-repeat;
     background-position: left bottom;
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient (GradientType=0, startColorstr=#121c2d, endColorstr=#66a1c0)";
@@ -191,6 +191,13 @@ body{
     background: url('/images/tigs/wrap-top-2.png') -213px 0px no-repeat;
     height: auto;
     min-height: 100%;
+}
+
+/* When Wrap has no content, the image gets cut off, this hides the image when screen height under 300px */
+@media screen and (max-height: 400px){
+    #wrap{
+        background: transparent;
+    }
 }
 
 #wrap-inner{
@@ -226,6 +233,7 @@ a:hover, h2 a:hover{color:#006bbd;}
     right: auto !important;
     left: 255px !important;
     min-width: auto !important;
+    float: left;
 }
 #tabs{
     position: absolute;
@@ -392,7 +400,7 @@ ADMIN!
 #search-field{
     color:#797979;
     font-style: italic;
-    padding: 6px 12px;
+    padding: 0px 12px;
     height: 27px;
     font-weight: normal;
     line-height: 20px;
@@ -407,8 +415,8 @@ ADMIN!
     margin-left: 256px;
 }
 #footer ul {float:right;padding-right: 40px;}
-#footer ul li {color:#c9c9c9}
-#footer ul li a{color:#c9c9c9}
+#footer ul li {color:#fff}
+#footer ul li a{color:#fff}
 
 .standardForm td {
     border-bottom: 1px solid #eee;
