@@ -8,6 +8,17 @@
  */
 class Synchronise_External_Stpatricks_Strategy_ParentRelation extends Synchronise_External_Stpatricks_Strategy_Abstract {
 
+    public function __construct($csvFile, $columns) {
+        parent::__construct($csvFile, $columns);
+        $this->setup();
+    }
+
+    protected function setup() {
+        // clear existing relations registered
+        $this->clearRelations();
+    }
+
+
     /**
      * Process user
      */
@@ -16,9 +27,6 @@ class Synchronise_External_Stpatricks_Strategy_ParentRelation extends Synchronis
         $this->getVerboseFilter()->intro();
 
         if(is_array($this->entityData)) {
-
-            // clear existing relations registered
-            $this->clearRelations();
 
             $synStmt = Database::getInstance()->prepare("
                 SELECT `id` FROM `user` WHERE synergy_id = :sid

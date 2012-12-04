@@ -8,6 +8,16 @@
  */
 class Synchronise_External_Stpatricks_Strategy_Timetable extends Synchronise_External_Stpatricks_Strategy_Abstract {
 
+    public function __construct($csvFile, $columns) {
+        parent::__construct($csvFile, $columns);
+        $this->setup();
+    }
+
+    protected function setup() {
+        // clear existing timetable registered
+        $this->clearTimetable();
+    }
+
 
     /**
      * Process the classes
@@ -17,9 +27,6 @@ class Synchronise_External_Stpatricks_Strategy_Timetable extends Synchronise_Ext
         $this->getVerboseFilter()->intro();
 
         if(is_array($this->entityData)) {
-
-            // clear existing relations registered
-            $this->clearTimetable();
 
             // prepare the bounds of the timetable from timetable_cycle
             // StPats is a single campus so we will assume one cycle definition

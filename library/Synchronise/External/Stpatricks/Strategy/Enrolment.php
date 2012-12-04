@@ -8,6 +8,16 @@
  */
 class Synchronise_External_Stpatricks_Strategy_Enrolment extends Synchronise_External_Stpatricks_Strategy_Abstract {
 
+    public function __construct($csvFile, $columns) {
+        parent::__construct($csvFile, $columns);
+        $this->setup();
+    }
+
+    protected function setup() {
+        // clear existing enrolments registered
+        $this->clearEnrolment();
+    }
+
 
     /**
      * Process the classes
@@ -17,9 +27,6 @@ class Synchronise_External_Stpatricks_Strategy_Enrolment extends Synchronise_Ext
         $this->getVerboseFilter()->intro();
 
         if(is_array($this->entityData)) {
-
-            // clear existing relations registered
-            $this->clearEnrolment();
 
             $synStmt = Database::getInstance()->prepare("
                 SELECT `id` FROM `user` WHERE synergy_id = :sid

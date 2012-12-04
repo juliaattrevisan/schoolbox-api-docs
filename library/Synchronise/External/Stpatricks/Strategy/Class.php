@@ -8,6 +8,17 @@
  */
 class Synchronise_External_Stpatricks_Strategy_Class extends Synchronise_External_Stpatricks_Strategy_Abstract {
 
+    public function __construct($csvFile, $columns) {
+        parent::__construct($csvFile, $columns);
+        $this->setup();
+    }
+
+    protected function setup() {
+        // clear existing classes registered
+        $this->clearClasses();
+    }
+
+
     /**
      * Process the classes
      *
@@ -17,14 +28,17 @@ class Synchronise_External_Stpatricks_Strategy_Class extends Synchronise_Externa
 
         if(is_array($this->entityData)) {
 
-            // clear existing relations registered
-            $this->clearClasses();
+            $db = Database::getInstance();
 
-            $synStmt = Database::getInstance()->prepare("
+            $synStmt = $db->prepare("
                 SELECT `id` FROM `user` WHERE synergy_id = :sid
             ");
-            $classStmt = Database::getInstance()->prepare("
+            $classStmt = $db->prepare("
                 INSERT INTO `class` VALUES (NULL, :name, :code, '')
+            ");
+
+            $enrolmentStmt = $db->prepare("
+                INSERT INTO `class_user` (class_id, user_id) VALUES (:classID, :userID)
             ");
 
             foreach($this->entityData as $class) {
@@ -37,6 +51,13 @@ class Synchronise_External_Stpatricks_Strategy_Class extends Synchronise_Externa
                     $classStmt->execute(array(
                         'name' => trim($matches[1]),
                         'code' => $class['code']
+                    ));
+
+                    $classID = $db->lastInsertId();
+                    echo "adding staff member {$teacher} to class {$classID}\n";
+                    $enrolmentStmt->execute(array(
+                        'classID' => $classID,
+                        'userID' => $teacher
                     ));
                 }
                 elseif($this->getVerboseFilter()->getVerbose()) {
