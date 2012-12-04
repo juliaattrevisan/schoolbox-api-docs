@@ -377,7 +377,7 @@ h1, li, a, article, #status {
         }
         p,a             { display: none; }
         //.has-events     { background: @colourD; }
-        ul              { line-height: @dp12; padding: @dp12 / 2; position: absolute; bottom: 0; }
+        ul              { max-height: (@dp2 + @dp12); line-height: @dp12; padding: @dp12 / 2; position: absolute; bottom: 0; }
         li              { display: inline-block; height: @dp12 + 1; width: @dp12 + 1; border-radius: @dp12 + 1; padding: 0;
                           border: none; background: @header-color; margin-right: 1px;
             &.Event                 { background: @colourA; }
