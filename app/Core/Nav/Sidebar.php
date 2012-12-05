@@ -177,12 +177,18 @@ class Core_Nav_Sidebar {
         // GENERATE UPCOMING WORK
         $subHandler = new Submission();
         $upcoming = $subHandler->getAllUpcomingWorkAndAssessments($this->user->get('uid'));
-        $work = array();
+
+        $noWork = array(array(
+            'value' => '<i>No upcoming work</i>',
+            'href' => '#'
+        ));
 
         if(!count($upcoming)) {
+            $this->work = $noWork;
             return;
         }
 
+        $work = array();
         $prev = '';
         $now = time();
         $j = 0;
@@ -271,7 +277,14 @@ class Core_Nav_Sidebar {
             $work[] = $workitem;
 
         }
-        $this->work = $work;
+
+        if(!count($work)) {
+            $this->work = $noWork;
+        }
+        else {
+            $this->work = $work;
+        }
+
 
         return;
     }
