@@ -19,7 +19,7 @@ class Calendar_Full_Javascript extends Calendar_Week_Abstract {
 	 * Choose template file
 	 */
 	protected function setupTemplateFile() {
-		$this->setTemplateFile('calendar/javascript/week.html');
+		$this->setTemplateFile('calendar/full.html');
 	}
 
 	/**

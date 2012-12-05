@@ -1,6 +1,6 @@
 <?php
 /**
- * ${NAME}
+ * Render the javascript-based Fullcalendar implementation
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
