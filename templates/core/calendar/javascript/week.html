@@ -1,0 +1,73 @@
+<!-- BEGIN custom_head -->
+<link rel='stylesheet' type='text/css' href='/css/core/fullcalendar/fullcalendar.css' />
+<link rel='stylesheet' type='text/css' href='/css/core/fullcalendar/fullcalendar.print.css' media='print' />
+<script type='text/javascript' src='/javascript/fullcalendar/fullcalendar.min.js'></script>
+<script type='text/javascript'>
+
+	$j(function() {
+
+		var date = new Date();
+		var d = date.getDate();
+		var m = date.getMonth();
+		var y = date.getFullYear();
+
+		$j('#calendar').fullCalendar({
+			eventClick: function(calEvent, jsEvent, view) {
+				console.log(calEvent);
+				$j('#calendarBubbleTitle').html('');
+				$j('#calendarBubbleLocation').html('');
+				$j('#calendarBubbleStartTime').html('');
+				$j('#calendarBubbleEndTime').html('');
+				$j('#calendarBubbleCategoryLink').html('');
+
+				$j('#calendarBubbleTitle').html(calEvent.title);
+				$j('#calendarBubbleLocation').html(calEvent.data.description);
+				$j('#calendarBubbleStartTime').html(calEvent.start.toString());
+				$j('#calendarBubbleEndTime').html(calEvent.end.toString());
+
+				$j('#calendarBubbleCategoryLink').attr('href', calEvent.data.categoryLink);
+				$j('#calendarBubbleCategoryLink').html(calEvent.data.categoryLink);
+
+				// change the border color just for fun
+				$j(this).css('border-color', 'red');
+			},
+			header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: 'month,agendaWeek,agendaDay'
+			},
+			editable: true,
+			events: '/calendar/ajax/fullcalendar',
+			eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc) {
+				alert('update somethign via ajax');
+			}
+		});
+	});
+</script>
+
+<style type='text/css'>
+	body {
+		margin-top: 40px;
+		text-align: center;
+		font-size: 14px;
+		font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
+		}
+
+	#calendar {
+		width: 900px;
+		margin: 0 auto;
+		}
+
+</style>
+<!-- END custom_head -->
+
+<div id='calendarBubble' style='border: 1px solid #f00;width:400px;height:200px;'>
+	<h1>Event Details</h1>
+	<p id='calendarBubbleTitle'></p>
+	<p><span id='calendarBubbleStartTime'></span> - <span id='calendarBubbleEndTime'></span></p>
+	<p id='calendarBubbleLocation'></p>
+	<a href='' id='calendarBubbleCategoryLink'></a>
+</div>
+
+<div id='calendar'></div>
+

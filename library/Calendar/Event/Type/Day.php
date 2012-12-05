@@ -15,7 +15,7 @@ class Calendar_Event_Type_Day extends Calendar_Event_Type_Abstract {
 
     /* Renderer
      */
-    protected $rendererClass = 'Calendar_Event_Type_Day_Renderer';
+    protected $rendererClass = 'Calendar_Event_Type_Day_Renderer_Javascript';
 
     /* Attendance flag
      */

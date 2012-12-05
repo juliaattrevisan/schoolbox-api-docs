@@ -1,13 +1,13 @@
 <?php
 /**
- * Calendar_Event_Type_Submission_Renderer
+ * Calendar_Event_Type_Submission_Renderer_Default
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Calendar_Event_Type_Submission_Renderer extends Calendar_Event_Type_Renderer_Abstract {
+class Calendar_Event_Type_Submission_Renderer_Default extends Calendar_Event_Type_Renderer_Abstract {
 
     /**
      * Render this event
