@@ -12,4 +12,6 @@ $j(function() {
         $j(this).append('<strong>&rsaquo;</strong>');
     });
 
+    $j('#tabs li.navthis').prev().css('border', '0');
+
 });

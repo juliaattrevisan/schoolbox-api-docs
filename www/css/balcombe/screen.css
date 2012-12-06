@@ -193,9 +193,14 @@ h2,.calendar-controls{color:#696b73 !important; background:#eaeaeb;}
 .calendar-controls h3{color:#696b73;}
 a, h2 a{color:#696b73;}
 a:hover, h2 a:hover{color:#787a83;}
-#header, .login #header{
+#wrap{ overflow: hidden }
+#header{
     height:143px;
     background: url('/images/balcombe/header-bg.png') 256px 70px no-repeat;
+}
+.login #header{
+    background: url('/images/balcombe/header-bg.png') 255px 131px no-repeat;
+    height: 162px;
 }
 #header .logo{padding:0; width:109px; height:128px; left:48px; top:15px}
 #tabs{
@@ -208,12 +213,15 @@ ul.balcombe{
     background: #b81237;
     right: auto !important;
     left: 256px !important;
-    min-width: auto !important;
+    min-width: 100% !important;
+    height: 46px;
 }
 #tabs li{
-    float:right;
-    margin: 0;
+    border-right: 1px solid #fff;
+    float:left;
+    margin: 8px 0;
     top: 0px;
+    height: 30px;
 }
 #tabs li a{
     /*background: url('/images/balcombe/nav-div.png') center right no-repeat;*/
@@ -223,8 +231,12 @@ ul.balcombe{
     -moz-border-radius: 0;
     border-radius: 0;
     font-weight:normal;
-    height: 40px;
-    line-height: 40px;
+    line-height: 30px;
+}
+
+#tabs li.navthis{
+    margin: 0;
+    border: 0;
 }
 
 #tabs li.navthis a{
@@ -235,7 +247,9 @@ ul.balcombe{
     font-weight:bold;
     background:#fff;
     filter:none;
-    height: 40px;
+    height: 46px;
+    margin: 0;
+    line-height: 45px;
 }
 
 #nav{
@@ -302,7 +316,7 @@ ul.balcombe{
 }
 
 .topic-list li a:hover {
-    background: #007fdb;
+    background: #787a83;
     color: #fff;
 }
 
@@ -315,14 +329,14 @@ ul.balcombe{
 }
 
 .submit-btn-plain {
-    background: #006461;
+    background: #696b73;
     border: 0;
     color: #ffffff !important;
     font-weight:normal;
     text-shadow:none;
 }
 .submit-btn-plain:hover {
-    background: #006f6c;
+    background: #787a83;
     border: 0;
     color: #fff !important;
     cursor: pointer;
@@ -380,8 +394,8 @@ ADMIN!
 #search-field{
     color:#797979;
     font-style: normal;
-    padding: 6px 12px;
-    height: 15px;
+    padding: 0;
+    height: 27px;
     font-weight: normal;
     line-height: 27px;
 }
@@ -389,10 +403,16 @@ ADMIN!
 #infoPanel li{color:#b7b9bf;}
 #infoPanel li a{color:#ffffff; text-decoration: underline;}
 
-#footer {background: transparent;}
+#footer {
+    background: transparent;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin-bottom: 0;
+}
 #footer ul {float:right;padding-right: 40px;}
-#footer ul li {color:#b7b9bf;}
-#footer ul li a{color:#b7b9bf;}
+#footer ul li {color:#696b73;}
+#footer ul li a{color:#696b73;}
 
 .standardForm td {
     border-bottom: 1px solid #eee;
