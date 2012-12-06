@@ -14,6 +14,7 @@
 #
 
 ################# Config Options ##################
+# Please set these config options in /etc/schoolbox-backup-cifs.conf
 
 # Schoolbox Data Directory - e.g. /var/lib/schoolbox or /var/www/schoolbox/data
 data_dir='/var/lib/schoolbox';
@@ -51,8 +52,17 @@ backup_usage_override=0;
 ############## End of Config Options ##############
 ########### DO NOT EDIT past this line! ###########
 
+if [ -f /etc/schoolbox-backup-cifs.conf ];
+then
+	source /etc/schoolbox-backup-cifs.conf;
+else
+	echo -e "Please set the configuration options for this script in /etc/schoolbox-backup-cifs.sh";
+	exit 1;
+fi
+
 # Ensure running with root privileges
-if [ $EUID -ne 0 ]; then
+if [ $EUID -ne 0 ];
+then
 	echo -e "This script requires Administrator Privileges. You must run this with the sudo command or as root.";
 	exit 1;
 fi
@@ -96,8 +106,11 @@ fi
 mount_count=`df | grep $backup_dir | wc -l`;
 if [ $mount_count -eq 0 ];
 then
-	echo -e "Fileshare not mounted. Attempting to mount" >> $logfile;
-	mkdir -p $backup_dir;
+	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`]  Fileshare not mounted. Attempting to mount" >> $logfile;
+	if [ ! -d $backup_dir ]
+	then
+		mkdir -p $backup_dir >> $logfile 2>&1;
+	fi
 	mount -t cifs $backup_share $backup_dir -o username=$backup_username,password=$backup_password$backup_extra_options >> $logfile 2>&1;
 fi
 
@@ -105,7 +118,7 @@ fi
 mount_count=`df | grep $backup_dir | wc -l`;
 if [ $mount_count -ne 0 ];
 then
-	echo -e "CIFS remote share ($backup_share) is mounted" >> $logfile;
+	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] CIFS remote share ($backup_share) is mounted" >> $logfile;
 	mount_space=`df | grep $backup_dir | awk '{print $5;}' | cut -d'%' -f1`;
 	if [ -z $mount_space ];
 	then
@@ -128,6 +141,12 @@ then
 	then
 		echo -e "Warning: CIFS remote share ($backup_share) reporting $mount_space% usage." >> $logfile;
 	fi
+	# Remove backup directory if already exists
+	if [ -d $targetdir ]
+	then
+		echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting removal of duplicate backup: $targetdir" >> $logfile;
+		rm -rf $targetdir >> $logfile 2>&1;
+	fi
 else
 	echo -e "Error: CIFS remote share ($backup_share) is unable to mount.\nHalting backup" >> $logfile;
 	errorcheck=1;
@@ -136,7 +155,7 @@ fi
 if [ $errorcheck -eq 0 ];
 then
 	# Run Backup of {sql,etc,$data_dir}
-	mkdir -p $targetdir;
+	mkdir -p $targetdir >> $logfile 2>&1;
 
 	# Backup SQL
 	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup of SQL" >> $logfile;
@@ -150,8 +169,6 @@ then
 		fi
 		
 	fi
-	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Compressing backup of SQL" >> $logfile;
-	gzip -f $targetdir/$sql_db-$DAY0.sql;
 
 	# Backup etc directory
 	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup of /etc" >> $logfile;
@@ -164,13 +181,15 @@ then
 	# Remove old backup
 	if [ -d $backup_dir/$DAYX ]
 	then
-		rm -rf $backup_dir/$DAYX > /dev/null 2>&1;
+		echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting removal of old backup: $backup_dir/$DAYX" >> $logfile;
+		rm -rf $backup_dir/$DAYX >> $logfile 2>&1;
 	fi
 
 	# Remove old backup logfile
 	if [ -f "/var/log/schoolboxbackup_$DAYX.log" ]
 	then
-		rm -f "/var/log/schoolboxbackup_$DAYX.log" > /dev/null 2>&1;
+		echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting removal of old backup logfile: /var/log/schoolboxbackup_$DAYX.log" >> $logfile;
+		rm -f "/var/log/schoolboxbackup_$DAYX.log" >> $logfile 2>&1;
 	fi
 
 	# Unmount
@@ -178,10 +197,15 @@ then
 fi
 
 # On error, email logfile
+if [ `grep -i "Permission denied" $logfile | wc -l` -ne 0 ];
+then
+	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Error: permission denied errors detected" >> $logfile;
+fi
 if [ `grep -i error $logfile | wc -l` -ne 0 ];
 then
 	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Sending Email to support@schoolbox.com.au" >> $logfile;
 	mail -s "[`date +%Y-%m-%d\ %H:%M:%S`] Schoolbox Backup on '$HOSTNAME'" support@schoolbox.com.au < $logfile 2>>$logfile;
+	exit 1;
 fi
 
 echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Backup Completed" >> $logfile;
