@@ -171,9 +171,12 @@ laber.error,
     border-radius: 16px;
 }
 /* Rounded-corners end */
-
+html, body{
+    padding: 0;
+    margin: 0;
+    height: 100%;
+}
 body{
-
     background-image: url(images/fallback-gradient.png);
     background-image: url('/images/tigs/body-bottom-3.png'), -webkit-gradient(linear, 0% 0%, 0% 100%, from(#121c2d), to(#66a1c0));
     background-image: url('/images/tigs/body-bottom-3.png'), -webkit-linear-gradient(top, #121c2d, #66a1c0);
@@ -191,6 +194,7 @@ body{
     background: url('/images/tigs/wrap-top-2.png') -213px 0px no-repeat;
     height: auto;
     min-height: 100%;
+    overflow: hidden;
 }
 
 /* When Wrap has no content, the image gets cut off, this hides the image when screen height under 300px */
@@ -224,16 +228,17 @@ a:hover, h2 a:hover{color:#006bbd;}
     top: 15px;
 }
 #header .world-school{
-    position: relative;
+    position: absolute;
     float: right;
-    top: -12px;
-    left: -15px;
+    top: 25px;
+    right: 320px;
 }
 .tigs{
     right: auto !important;
     left: 255px !important;
     min-width: auto !important;
     float: left;
+    width: 100%;
 }
 #tabs{
     position: absolute;
@@ -242,7 +247,7 @@ a:hover, h2 a:hover{color:#006bbd;}
     right: auto;
 }
 #tabs li{
-    float:right;
+    float:left;
     margin: 0 1px;
     top: 1px;
 }
@@ -401,7 +406,7 @@ ADMIN!
     color:#797979;
     font-style: italic;
     padding: 0px 12px;
-    height: 27px;
+    height: 26px;
     font-weight: normal;
     line-height: 20px;
 }
