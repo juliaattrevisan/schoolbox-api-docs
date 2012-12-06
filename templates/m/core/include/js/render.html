@@ -99,6 +99,9 @@
 
         p.animate({opacity:'0'},200,'linear',function(){
 
+            // reset the expansion symbols to plus in case they're not
+            $('#menu [data-icon="minus"]').data('icon','plus');
+
             // Cleanup
             $(this).html('');
             killScroll(scrollTable)
