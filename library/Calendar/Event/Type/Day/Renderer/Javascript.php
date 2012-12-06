@@ -32,11 +32,9 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 			 */
 			if ($currentEvent->getIsEditable()) {
 				$editable = true;
-				$modifyLink = '<a class="btn modify float-left" href="/calendar/modify.php?eventID=' . $currentEvent->getEventId() . '&returnTo=week"><span></span>Modify</a>';
 			}
 			else {
 				$editable = false;
-				$modifyLink = '';
 			}
 
 			/* Show a homepage if appropriate
@@ -114,7 +112,6 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 						'level' => $currentEvent->getDerivedEventLevel()
 					),
 					'links' => array(
-						'modify' => $modifyLink,
 						'category' => array(
 							'id' => $categoryId,
 							'name' => $categoryName,

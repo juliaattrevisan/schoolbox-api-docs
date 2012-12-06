@@ -2,6 +2,26 @@
 <link rel='stylesheet' type='text/css' href='/css/core/fullcalendar/fullcalendar.css' />
 <link rel='stylesheet' type='text/css' href='/css/core/fullcalendar/fullcalendar.print.css' media='print' />
 <script type='text/javascript'>
+	bubble = {
+		init: function() {
+			$j('#calendarBubbleTitle').html('');
+			$j('#calendarBubbleLocation').html('');
+			$j('#calendarBubbleAuthor').html('');
+			$j('#calendarBubbleAuthorId').html('');
+			$j('#calendarBubbleStartTime').html('');
+			$j('#calendarBubbleEndTime').html('');
+			$j('#calendarBubbleColor').css('backgroundColor', 'transparent');
+			$j('#calendarBubbleModifyLink').html('');
+
+			/* Attendances
+			 */
+			$j('#calendarBubbleAttendanceIcon').html('');
+			$j('#calendarBubbleAttendanceStatus').html('');
+			$j('#calendarBubbleAttendanceListButton').html('');
+			$j('#calendarBubbleAttendanceRequestButton').html('');
+		}
+	};
+
 	$j(function() {
 		var date = new Date();
 		var d = date.getDate();
@@ -10,30 +30,79 @@
 
 		$j('#calendar').fullCalendar({
 			eventClick: function(calEvent, jsEvent, view) {
+				bubble.init();
+
 				console.log(calEvent);
-				$j('#calendarBubbleTitle').html('');
-				$j('#calendarBubbleLocation').html('');
-				$j('#calendarBubbleStartTime').html('');
-				$j('#calendarBubbleEndTime').html('');
-				$j('#calendarBubbleCategoryLink').html('');
 
 				$j('#calendarBubbleTitle').html(calEvent.title);
 				$j('#calendarBubbleLocation').html(calEvent.data.description);
-				$j('#calendarBubbleStartTime').html(calEvent.start.toString());
-				$j('#calendarBubbleEndTime').html(calEvent.end.toString());
 
-				$j('#calendarBubbleCategoryLink').attr('href', calEvent.data.categoryLink);
-				$j('#calendarBubbleCategoryLink').html(calEvent.data.categoryLink);
+				/* Event author
+				 */
+				$j('#calendarBubbleAuthor').html(calEvent.data.meta.author);
+				$j('#calendarBubbleAuthor').attr('href', '/search/user/' + calEvent.data.meta.authorId);
 
-				// change the border color just for fun
-				$j(this).css('border-color', 'red');
+				/* Start time
+				 */
+				if (calEvent.start != null) {
+					$j('#calendarBubbleStartTime').html(calEvent.start.toString());
+				}
+
+				/* End time
+				 */
+				if (calEvent.end != null) {
+					$j('#calendarBubbleEndTime').html(calEvent.end.toString());
+				}
+
+				/* Event color
+				 */
+				$j('#calendarBubbleColor').css('backgroundColor', calEvent.data.styles.color);
+
+				/* Links to Modify Screen
+				 */
+				if (calEvent.editable == true) {
+					$j('#calendarBubbleModifyLink').html("<a class='btn modify float-left' href='/calendar/modify.php?eventID=" + calEvent.data.meta.eventId + "&returnTo=week'><span></span>Modify</a>");
+				}
+
+				/* Attendances
+				 */
+				$j('#calendarBubbleAttendanceIcon').html(calEvent.data.attendance.icon.toString());
+				$j('#calendarBubbleAttendanceStatus').html(calEvent.data.attendance.status.toString());
+
+				/* Attendance List butonye
+				 */
+				if (calEvent.data.attendance.listButton.toString() == 'true') {
+					$j('#calendarBubbleAttendanceListButton').html("<a href='/calendar/attendance/list/" + calEvent.data.meta.eventId + "'>Attendance List</a>");
+				}
+
+				/* Attend/Unattend butonye
+				 */
+				if (calEvent.data.attendance.requestButton.toString() != 'false') {
+					$j('#calendarBubbleAttendanceRequestButton').html("<span></span>" + calEvent.data.attendance.requestButton.toString());
+
+					var data = {
+						eventId: calEvent.data.meta.eventId
+					}
+
+					$j('#calendarBubbleAttendanceRequestButton').live('click', function(event) {
+						$j.post('/service/attendance/processToggleAttendance', data, function (data) {
+							if (data.error == undefined) {
+								if ($j('#calendarBubbleAttendanceRequestButton').text() == 'Attend') {
+									$j('#calendarBubbleAttendanceRequestButton').html('<span></span>Unattend');
+								}
+								else {
+									$j('#calendarBubbleAttendanceRequestButton').html('<span></span>Attend');
+								}
+							}
+						});
+					});
+				}
 			},
 			header: {
-				left: 'prev,next today',
+				left: 'prev,today,next ',
 				center: 'title',
 				right: 'month,agendaWeek,agendaDay'
 			},
-			editable: true,
 			events: '/calendar/ajax/full',
 			eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc) {
 				alert('update somethign via ajax');
@@ -58,12 +127,97 @@
 </style>
 <!-- END custom_head -->
 
-<div id='calendarBubble' style='border: 1px solid #f00;width:400px;height:200px;'>
-	<h1>Event Details</h1>
-	<p id='calendarBubbleTitle'></p>
-	<p><span id='calendarBubbleStartTime'></span> - <span id='calendarBubbleEndTime'></span></p>
-	<p id='calendarBubbleLocation'></p>
-	<a href='' id='calendarBubbleCategoryLink'></a>
+<div id='calendarBubble' style='border: 1px solid #f00;width:500px;height:500px;'>
+	<div style='width:100%;display:block;clear:both;'>
+		<h1>Event Details</h1>
+
+		<dl>
+			<dt>
+				Event Title
+			</dt>
+			<dd>
+				<p id='calendarBubbleTitle'></p>
+			</dd>
+
+			<dt>
+				Event Time
+			</dt>
+			<dd>
+				<p><span id='calendarBubbleStartTime'></span> - <span id='calendarBubbleEndTime'></span></p>
+			</dd>
+
+			<dt>
+				Location
+			</dt>
+			<dd>
+				<p id='calendarBubbleLocation'></p>
+			</dd>
+			<dt>
+				Posted by
+			</dt>
+			<dd>
+				<a id='calendarBubbleAuthor' href='#'></a>
+			</dd>
+		</dl>
+	</div>
+	<div style='width:100%;display:block;clear:both;'>
+		<h1>Styles</h1>
+
+		<dl>
+			<dt>
+				Color
+			</dt>
+			<dd>
+				<div id='calendarBubbleColor'style='width:20px;height:20px;display:block'></div>
+			</dd>
+		</dl>
+	</div>
+
+	<div style='width:100%;display:block;clear:both;'>
+		<h1>Links</h1>
+
+		<dl>
+			<dt>
+				Modify
+			</dt>
+			<dd>
+				<p id='calendarBubbleModifyLink'></p>
+			</dd>
+		</dl>
+	</div>
+
+	<div style='width:100%;display:block;clear:both;'>
+		<h1>Attendance</h1>
+
+		<dl>
+			<dt>
+				Icon
+			</dt>
+			<dd>
+				<p id='calendarBubbleAttendanceIcon'></p>
+			</dd>
+			<dt>
+				Status
+			</dt>
+			<dd>
+				<p id='calendarBubbleAttendanceStatus'></p>
+			</dd>
+			<dt>
+				List Button
+			</dt>
+			<dd>
+				<p id='calendarBubbleAttendanceListButton'>
+				</p>
+			</dd>
+			<dt>
+				Request Button
+			</dt>
+			<dd>
+				<p id='calendarBubbleAttendanceRequestButton'></p>
+			</dd>
+		</dl>
+	</div>
+
 </div>
 
 <div id='calendar'></div>
