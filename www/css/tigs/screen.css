@@ -340,18 +340,22 @@ a:hover, h2 a:hover{color:#006bbd;}
 }
 
 .submit-btn-plain {
-    background: #002b5c;
+    background-color: #002b5c;
+    background-image: none !important;
     border: 0;
     color: #ffffff !important;
     font-weight:normal;
     text-shadow:none;
+    filter: none;
 }
+
 .submit-btn-plain:hover {
-    background: #135882;
+    background-color: #135882;
     border: 0;
     color: #fff !important;
     cursor: pointer;
     text-shadow:none;
+    filter: none;
 }
 
 /****** Calendar ******/
