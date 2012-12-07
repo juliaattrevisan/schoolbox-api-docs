@@ -45,8 +45,13 @@
 			/* When you click on an event in the calendar, populate the bubble
 			 */
 			eventClick: function(calEvent, jsEvent, view) {
+
+				/* Burst bubble
+				 */
 				bubble.init();
 
+				/* The usual event and description
+				 */
 				$j('#calendarBubbleTitle').html(calEvent.title);
 				$j('#calendarBubbleLocation').html(calEvent.data.description);
 
@@ -66,10 +71,6 @@
 				if (calEvent.end != null) {
 					$j('#calendarBubbleEndTime').html(calEvent.end.toString());
 				}
-
-				/* Event color
-				 */
-				$j('#calendarBubbleColor').css('backgroundColor', calEvent.data.styles.color);
 
 				/* Links to Modify Screen
 				 */
