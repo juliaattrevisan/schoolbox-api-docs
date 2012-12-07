@@ -29,10 +29,23 @@
 		var y = date.getFullYear();
 
 		$j('#calendar').fullCalendar({
+
+			/* When an event is drawn on the calendar
+			 */
+			eventRender: function(calEvent, jsEvent, view) {
+
+				/* Indicate this event can be attended
+				 */
+				if (calEvent.data.attendance.icon.toString() == 'true') {
+					$j(jsEvent).append('<span>(A)</span>');
+					$j('#calendarBubbleAttendanceIcon').html("[A]");
+				}
+			},
+
+			/* When you click on an event in the calendar
+			 */
 			eventClick: function(calEvent, jsEvent, view) {
 				bubble.init();
-
-				console.log(calEvent);
 
 				$j('#calendarBubbleTitle').html(calEvent.title);
 				$j('#calendarBubbleLocation').html(calEvent.data.description);
@@ -66,7 +79,7 @@
 
 				/* Attendances
 				 */
-				$j('#calendarBubbleAttendanceIcon').html(calEvent.data.attendance.icon.toString());
+
 				$j('#calendarBubbleAttendanceStatus').html(calEvent.data.attendance.status.toString());
 
 				/* Attendance List butonye
@@ -84,6 +97,8 @@
 						eventId: calEvent.data.meta.eventId
 					}
 
+					/* Bugalug shenanigans
+					 */
 					$j('#calendarBubbleAttendanceRequestButton').live('click', function(event) {
 						$j.post('/service/attendance/processToggleAttendance', data, function (data) {
 							if (data.error == undefined) {
@@ -98,15 +113,30 @@
 					});
 				}
 			},
+
+			/* When you finish resizing an event
+			 */
+			eventResizeStop: function(calEvent, jsEvent, ui, view) {
+				alert('mort: respecify times');
+			},
+
+			/* When you finish dragging an event to its new home
+			 */
+			eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc) {
+				alert('mort: update date via ajax');
+			},
+
+			/* Butonye
+			 */
 			header: {
 				left: 'prev,today,next ',
 				center: 'title',
 				right: 'month,agendaWeek,agendaDay'
 			},
-			events: '/calendar/ajax/full',
-			eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc) {
-				alert('update somethign via ajax');
-			}
+
+			/* Stream location
+			 */
+			events: '/calendar/ajax/full'
 		});
 	});
 </script>

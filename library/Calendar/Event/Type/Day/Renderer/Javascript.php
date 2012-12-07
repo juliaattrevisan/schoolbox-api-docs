@@ -94,11 +94,15 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 
 			/* Congeal all that stuff
 			 */
+			$start = $currentEvent->getStartTime()->getDatabaseDate() . ' ' . $currentEvent->getStartTime()->getDatabaseTime();
+			$end = $currentEvent->getEndTime()->getDatabaseDate() . ' ' . $currentEvent->getEndTime()->getDatabaseTime();
+
 			$event = array(
 				'title' => $currentEvent->getNote(),
-				'start' => $currentEvent->getStartTime()->getDatabaseDate(),
-				'end' => $currentEvent->getStartTime()->getDatabaseDate,
+				'start' => "$start",
+				'end' => "$end",
 				'editable' => $editable,
+				'allDay' => false,
 				'data' => array(
 					'meta' => array(
 						'eventId' => $currentEvent->getEventId(),
@@ -130,7 +134,6 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 				)
 			);
 
-//			new Alaress_Probe($event);
 			echo json_encode($event);
 			echo ",";
 		}
