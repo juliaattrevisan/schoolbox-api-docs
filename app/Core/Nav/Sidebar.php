@@ -80,12 +80,10 @@ class Core_Nav_Sidebar {
             $code = $cat->__isset('code') ? " ({$cat->get('code')})" : '';
             $cid = $cat->get('id');
             $itemMap = array(
-                'files'     => 'Files',
                 'news'      => 'News',
                 'due_work'  => 'Due Work',
                 'grades'    => 'Recent Grades',
                 'links'     => 'Links',
-                'forums'    => 'Forums',
                 'folders'   => 'Folders',
             );
 

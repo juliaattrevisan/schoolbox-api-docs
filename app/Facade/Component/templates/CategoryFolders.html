@@ -1,8 +1,12 @@
 <ul>
     {% if content %}
     {% for folder in content %}
-    <li title="{{ folder.name }}" class="dashbutton">
-        <a href="{{ folder.href }}">{{ folder.value }}</a>
+    <li title="{{ folder.name }}">
+        {% if folder.template %}
+        <a href="/m/facade/homepage/display/{{ folder.id }}">{{ folder.name }}</a>
+        {% else %}
+        <p>{{ folder.name }}</p>
+        {% endif %}
     </li>
     {% endfor %}
     {% else %}
