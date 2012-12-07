@@ -42,7 +42,7 @@
 				}
 			},
 
-			/* When you click on an event in the calendar
+			/* When you click on an event in the calendar, populate the bubble
 			 */
 			eventClick: function(calEvent, jsEvent, view) {
 				bubble.init();
@@ -79,7 +79,6 @@
 
 				/* Attendances
 				 */
-
 				$j('#calendarBubbleAttendanceStatus').html(calEvent.data.attendance.status.toString());
 
 				/* Attendance List butonye

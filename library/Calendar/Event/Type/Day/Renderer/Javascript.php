@@ -101,8 +101,25 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 				'title' => $currentEvent->getNote(),
 				'start' => "$start",
 				'end' => "$end",
+
+				/* Whether you can edit this event or not
+				 */
 				'editable' => $editable,
+
+				/* Whether it's an all-day event or not
+				 * If allDay is true, then you can't resize it
+				 *
+				 * Schoolbox usage would be that all events are not
+				 * allDay events
+				 */
 				'allDay' => false,
+
+				/* Colour of the event
+				 */
+				'color' => $currentEvent->getColour(),
+
+				/* Extra data that the Event Object doesn't directly support
+				 */
 				'data' => array(
 					'meta' => array(
 						'eventId' => $currentEvent->getEventId(),
@@ -122,7 +139,6 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 						)
 					),
 					'styles' => array(
-						'color' => $currentEvent->getColour(),
 						'visible' => $cssClass,
 					),
 					'attendance' => array(
