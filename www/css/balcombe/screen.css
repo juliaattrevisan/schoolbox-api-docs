@@ -11,7 +11,7 @@
 #tabs-homepage .slider-house
 {
     -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
+    -webkit-border-radius:F 2px;
     border-radius: 2px;
 }
 
@@ -320,18 +320,22 @@ ul.balcombe{
 }
 
 .submit-btn-plain {
-    background: #696b73;
+    background-color: #696b73;
+    background-image: none;
     border: 0;
     color: #ffffff !important;
     font-weight:normal;
     text-shadow:none;
+    filter: none;
 }
 .submit-btn-plain:hover {
-    background: #787a83;
+    background-color: #787a83;
+    background-image: none;
     border: 0;
     color: #fff !important;
     cursor: pointer;
     text-shadow:none;
+    filter: none;
 }
 
 /****** Calendar ******/
