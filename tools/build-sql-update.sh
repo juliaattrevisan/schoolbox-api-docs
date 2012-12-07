@@ -39,8 +39,8 @@ do
 	echo "- Building scripts_list";
 	basereleaselength=`echo $basedir/updates/$release/ | wc -m`;
 	rm -f "$basedir/updates/$release/scripts_list";
-	find $basedir/updates/$release -type f | cut -c$basereleaselength-1000 | grep .sql >> "$basedir/updates/$release/scripts_list";
-	find $basedir/updates/$release -type f | cut -c$basereleaselength-1000 | grep .php >> "$basedir/updates/$release/scripts_list";
+	find $basedir/updates/$release -type f | cut -c$basereleaselength-1000 | grep .sql | sort >> "$basedir/updates/$release/scripts_list";
+	find $basedir/updates/$release -type f | cut -c$basereleaselength-1000 | grep .php | sort >> "$basedir/updates/$release/scripts_list";
 	echo "- Built scripts_list";
 
 	echo "- Starting creation of sql updates"
