@@ -61,6 +61,27 @@
 
             menu.html('<a href="#" class="back"></a>' + wrap.html()).addClass('active');
 
+            // align the menu to its arrow if it's poorly position
+            menu.css('padding-top', '');
+
+            var headerPadding = 56,
+                eos = elem.offset(),
+                mos = menu.offset(),
+                upperBound = eos.top,
+                lowerBound = eos.top + eos.height;
+
+            // if the height of the menu doesn't reach lower bound, reposition the menu as high as possible
+            if(mos.height < lowerBound) {
+                // compensate for default padding
+                var menuHeight = mos.height - headerPadding,
+                    windowHeight = $(window).height();
+
+                //  align to the bottom edge of the nav item
+                var menuTop = Math.max(headerPadding, lowerBound - mos.height + headerPadding);
+
+                menu.css('padding-top', menuTop);
+            }
+
             // apply scrollability to the menu
             scrollMenu = new iScroll('menu_wrapper', { bounce: true, vScroll: true });
 
