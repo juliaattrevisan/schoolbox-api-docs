@@ -8,7 +8,7 @@
  */
 class Facade_Homepage_API extends Generic_API {
 
-    private $custom = array('outputGradesList', 'SubjectGrades');
+    private $custom = array('Component_Homepage_SubjectGradesController', 'SubjectGrades');
 
     public function Display($categoryID) {
         try {
@@ -31,9 +31,8 @@ class Facade_Homepage_API extends Generic_API {
     // module methods
     public function News($cID)    { return $this->getModule($cID, 'News');        }
     public function DueWork($cID) { return $this->getModule($cID, 'DueWorkList'); }
-    public function Grades($cID)  { return $this->getModule($cID, 'GradesList');  }
+    public function Grades($cID)  { return $this->getModule($cID, 'SubjectGrades');  }
     public function Links($cID)   { return $this->getModule($cID, 'LinkList');    }
-    public function Forums($cID)  { return $this->getModule($cID, 'ForumList');   }
     public function Folders($cID) { return $this->getModule($cID, 'FolderList');  }
 
     /**
@@ -52,7 +51,6 @@ class Facade_Homepage_API extends Generic_API {
                 list($catTitle, $articles) = $this->renderComponents($user, $cat, array($comp));
             }
         }
-
         if(isset($catTitle)) {
             $response->setPage('title', $catTitle);
             $response->setResponse('articles', $articles);
@@ -96,7 +94,7 @@ class Facade_Homepage_API extends Generic_API {
                                 $instance = new $className();
 
                                 if($instance instanceof Facade_Component_Generic) {
-                                    echo " ~$className~ ";
+//                                    echo " ~$className~ ";
                                     $articles[$className] = $instance->render($user, $cat->get('id'));
                                 }
                                 else {
@@ -113,17 +111,18 @@ class Facade_Homepage_API extends Generic_API {
             // bypassing the whole subroutine = duplicate code -_-
             elseif(in_array($components, $this->custom)) {
 
-                $className = "Facade_Component_$components";
+                preg_match('#Component_([a-z]*)_([a-z]*)Controller#i', $components, $matches);
+                $className = 'Facade_Component_' . $matches[2];
 
                 if(class_exists($className)) {
                     $instance = new $className();
 
-                    if(is_a($instance, 'Facade_Component_Generic')) {
-                        $articles[$components] = $instance->render($user, $cat->get('id'));
+                    if($instance instanceof Facade_Component_Generic) {
+                        $articles[$matches[2]] = $instance->render($user, $cat->get('id'));
                     }
 
                     else {
-                        $articles[$components] = array();
+                        $articles[$matches[2]] = array();
                     }
                 }
             }
@@ -152,7 +151,7 @@ class Facade_Homepage_API extends Generic_API {
                 $className = "Facade_Component_$className";
                 if(class_exists($className)) {
                     $instance = new $className();
-                    if(is_a($instance, 'Facade_Component_Generic')) {
+                    if($instance instanceof Facade_Component_Generic) {
                         return $instance->render($user, $catID);
                     }
                     else {
@@ -179,10 +178,9 @@ class Facade_Homepage_API extends Generic_API {
 
         $map = array(
             'News'        => array('HomepageNews'),
-            'DueWorkList' => array('SubjectDueWork', 'SubjectGrades'),  // duplicate one
+            'DueWorkList' => array('SubjectDueWork'),
             'GradesList'  => array('SubjectGrades'), // will only be called from getModule
             'LinkList'    => array('HomepageLinks'),
-            'ForumList'   => array('CategoryForums'),
             'FolderList'  => array('CategoryFolders'),
         );
         return isset($map[$call]) ? $map[$call] : array('UNKN0WN');

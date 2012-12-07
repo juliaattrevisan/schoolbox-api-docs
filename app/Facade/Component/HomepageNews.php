@@ -24,6 +24,7 @@ class Facade_Component_HomepageNews extends Facade_Component_Generic {
         $newsList = array();
 
         $homepageNewsHandler = new CategoryNews();
+        $userHandler = new User();
 
         $catNews = $homepageNewsHandler->getAllForCategory($catID);
 
@@ -32,6 +33,10 @@ class Facade_Component_HomepageNews extends Facade_Component_Generic {
                 if(count($newsList) >= $limit) {
                     break;
                 }
+                $adr = new Alaress_Date_Relative($item['posted']);
+                $item['post_datetime_relative'] = $adr->getRelativeTime();
+                $item['poster'] = $userHandler->formatName($item);
+                $item['item_body_clean'] = TextFormatter::cutSentence(Scrub::html2text($item['body']), 300);
                 $newsList[] = $item;
             }
         }

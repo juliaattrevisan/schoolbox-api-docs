@@ -16,13 +16,22 @@ class Facade_Component_CategoryFolders extends Facade_Component_Generic {
     public function render(GizaUser $user, $catID = 0) {
 
         // generate data
+        $catHandler = new Category();
+        $groupHandler = new Group();
+        $children = $catHandler->getCategoryList($catID);
+
+        for($i = 0; $i < count($children); ++$i) {
+            if($groupHandler->getPermission($catID) < READ_ACCESS) {
+                unset($children[$i]);
+            }
+        }
 
         return array(
             'title'   => 'Folders',
             'aside'   => '',
             'class'   => 'category-folders',
             'icon'    => 'work',
-            'content' => array(),
+            'content' => $children,
         );
     }
 
