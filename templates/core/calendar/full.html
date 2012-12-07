@@ -123,7 +123,29 @@
 			/* When you finish dragging an event to its new home
 			 */
 			eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc) {
-				alert('mort: update date via ajax');
+				var data = {
+					eventId: event.data.meta.eventId,
+					dayDelta: dayDelta,
+					minuteDelta: minuteDelta,
+					allDay: allDay
+				};
+
+				/* TODO: Event re-render
+				 *
+				 * If an event's length exceeds the threshold of the current day
+				 * (e.g. a five-hour event got dragged to 11pm) the back-end changes
+				 * its end date to be 23:59:59 of the current day. However this
+				 * doesn't update the DOM until you reload the page. I haven't found
+				 * a re-render method for individual events.
+				 */
+				$j.post('/calendar/ajax/update.php', data, function(responseText) {
+				});
+			},
+
+			/* When you click on a day to add a new event
+			 */
+			dayClick: function(date, allDay, jsEvent, view) {
+				console.log('mort: clicked on a day, provide a form');
 			},
 
 			/* Butonye
