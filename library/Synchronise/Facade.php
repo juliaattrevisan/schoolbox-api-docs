@@ -42,11 +42,17 @@ class Synchronise_Facade {
 
     public function execute() {
         // Do each strat
-        foreach ($this->strats as $currentStrategy) {
-            $facade = sprintf($this->facadeBase, $this->db);
+        $strats = array();
+        $facade = sprintf($this->facadeBase, $this->db);
 
+        foreach($this->strats as $currentStrategy) {
             // double-nested polymorphism anyone? This may need refactoring.
-            $sync = new $facade(sprintf($this->stratBase, $this->db, $this->school, $currentStrategy));
+            // this will also call setup() in some cases, which is reserved for destructive changes
+            $strats[$currentStrategy] = new $facade(sprintf($this->stratBase, $this->db, $this->school, $currentStrategy));
+        }
+
+        foreach ($this->strats as $currentStrategy) {
+            $sync = $strats[$currentStrategy];
 
             // Do not alter the db
             $sync->setPerformUpdate($this->perform);
