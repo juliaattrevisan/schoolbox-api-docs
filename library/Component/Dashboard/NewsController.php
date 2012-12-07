@@ -12,6 +12,7 @@
 class Component_Dashboard_NewsController extends Component_Dashboard_ControllerAbstract {
 
     protected $news;
+    protected $headlineList;
 
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage, News $news) {
         parent::__construct($instance, $user, $sitepage);
@@ -42,8 +43,30 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
 
         if (is_array($this->headlineList)) {
 
+            $limits = array();
+
             $j = $k = 0;
             $total = count($this->headlineList);
+
+            // iterate and truncate down to the max limit
+            if($this->getConfig('size') > 0) {
+                foreach ($this->headlineList as $index => $item) {
+                    if(isset($limits[$item['topicName']])) {
+                        // skip over this article if the category has hit the size limit
+                        if($limits[$item['topicName']] >= $this->getConfig('size')) {
+                            // decrement the total expected by 1
+                            --$total;
+                            // remove the news article
+                            unset($this->headlineList[$index]);
+                            continue;
+                        }
+                        ++$limits[$item['topicName']];
+                    }
+                    else {
+                        $limits[$item['topicName']] = 1;
+                    }
+                }
+            }
 
             foreach ($this->headlineList as $item) {
                 $j++;
