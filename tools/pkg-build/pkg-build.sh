@@ -1,7 +1,7 @@
 #!/bin/bash
 
 helpmsg() {
-	echo "Usage: pkg-build.sh commithash main/dev release/snapshot";
+	echo "Usage: pkg-build.sh [commithash/committag] [main/dev] [release/snapshot]";
 	exit 1;
 }
 
@@ -43,15 +43,14 @@ then
 		rm ~/{tarballs,build-area}/* -fR;
 		cd ~/schoolbox;
 		git checkout master;
-		git reset --hard HEAD^;
+		# Reset back to known pre-git point in history
+		git reset --hard 5c4e8abdc184fac1126f3b9148ee66740e64076a;
+		# Update the respository
 		git pull origin master --force;
+		# Reset back to specified commit/tag
 		git reset --hard $1;
-		git branch -d upstream;
+		git branch -D upstream;
 		git branch upstream;
-		git checkout upstream;
-		git tag -d upstream/12.5.0;
-		git tag upstream/12.5.0;
-		git checkout master;
 		commitdate=`git log -n 1 | grep "Date:" | cut -c9-32`
 		# Build changelog (and release version) based on type of release
 		if [ $reltype == "release" ];
@@ -73,7 +72,16 @@ then
 		fi
 		sed -i "s/`grep '\-\- vagrant' debian/changelog | cut -d' ' -f3`\ `grep '\-\- vagrant' debian/changelog | cut -d' ' -f4`/Alaress\ \(Schoolbox\ Signing\ Key\)\ <support@schoolbox.com.au>/g" debian/changelog;\
 		git add debian;
-		git commit -a -m "snapshot build"
+		git commit -a -m "update changelog for building";
+		debver=`dpkg-parsechangelog | sed -n -e 's/^Version: //p'`;
+		version=`echo $debver | sed -e 's/^[[:digit:]]*://' -e 's/[~-].*//'`;
+		git checkout upstream;
+		echo "Deleting old upstream tag: $version";
+		git tag -d upstream/$version;
+		echo "Deleting old upstream tag: $version";
+		git tag upstream/$version;
+		git checkout master;
+		echo "Begin package build";
 		git-buildpackage -us -uc
 	else
 		echo "Unable to create git repository for cloning.";
