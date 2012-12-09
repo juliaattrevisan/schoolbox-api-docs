@@ -23,10 +23,7 @@
 	};
 
 	$j(function() {
-		var date = new Date();
-		var d = date.getDate();
-		var m = date.getMonth();
-		var y = date.getFullYear();
+		$j('#createEvent').hide();
 
 		$j('#calendar').fullCalendar({
 
@@ -145,7 +142,7 @@
 			/* When you click on a day to add a new event
 			 */
 			dayClick: function(date, allDay, jsEvent, view) {
-				console.log('mort: clicked on a day, provide a form');
+				$j('#createEvent').show();
 			},
 
 			/* Butonye
@@ -179,7 +176,22 @@
 </style>
 <!-- END custom_head -->
 
-<div id='calendarBubble' style='border: 1px solid #f00;width:500px;height:500px;'>
+<div id='createEvent' style='border: 1px solid #f0f;width:500px;height:200px;float:right;'>
+	<h1>Quick Create Event</h1>
+	<form method='post' action='/calendar/ajax/create.php'>
+		<input name='id' type='text' value='{USER_ID}' /><br />
+		<input name='level' type='text' value='(insert level)' /><br />
+		<input name='group' type='text' value='(insert group)' /><br />
+
+		<label>Note
+			<input name='note' type='text' value='' />
+		</label>
+
+		<input type='submit' value='Create Event' />
+	</form>
+</div>
+
+<div id='calendarBubble' style='border: 1px solid #f00;width:500px;height:500px;float:left;'>
 	<div style='width:100%;display:block;clear:both;'>
 		<h1>Event Details</h1>
 
