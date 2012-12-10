@@ -20,7 +20,8 @@ $j(function () {
     });
 
     $j('#childSelect').change(function () {
-        window.open('/submission/dueWork/{SELECTED_DATE}/' + $j(this).val(), '_self', '');
+
+        window.open(window.location.pathname.replace(/\/(\d+)$/, "/"+$j(this).val()), '_self', '');
         return false;
     });
 
