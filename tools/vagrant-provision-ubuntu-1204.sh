@@ -10,12 +10,6 @@ then
 	wget -q http://hydra.alrs/boxes/schoolboxdemo-latest.tar.gz
 	wget -q http://hydra.alrs/boxes/schoolboxdemo-latest.sql
 	wget -q http://hydra.alrs/boxes/schoolboxdemo-latest.vhost
-	echo "$vag Removing existing apache vhosts";
-	rm -f /etc/apache2/sites-enabled/*;
-	echo "$vag Enabling Schoolbox apache vhost";
-	cp /home/vagrant/schoolboxdemo-latest.vhost /etc/apache2/sites-available/schoolbox.vhost
-	a2ensite schoolbox.vhost
-	service apache2 restart
 	echo "$vag Restarting MySQL";
 	service mysql restart;
 	echo "$vag Removing current Schoolbox MySQL database";
@@ -33,5 +27,12 @@ then
 	sed -i 's/xxxxxx/tnp879/g' /vagrant/www/conf/conf.php;
 	echo "$vag Building css files via less";
 	/vagrant/tools/build-less-css.sh;
+        echo "$vag Removing existing apache vhosts";
+        rm -f /etc/apache2/sites-enabled/*;
+        echo "$vag Enabling Schoolbox apache vhost";
+        cp /home/vagrant/schoolboxdemo-latest.vhost /etc/apache2/sites-available/schoolbox.vhost
+        a2ensite schoolbox.vhost
+	puppet apply -e 'package { "javascript-common": ensure => absent }';
+        service apache2 restart
 	echo "$vag Loading all demo data complete";
 fi

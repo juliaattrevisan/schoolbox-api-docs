@@ -17,6 +17,7 @@ Depends: apache2, libapache2-mod-auth-kerb,
  freetds-common,
  wget,
  ${misc:Depends}
+Conflicts: javascript-common
 Description: Schoolbox LMS by Alaress Pty. Ltd.
  Schoolbox is at the leading edge of eLearning solutions for the K-12
  education market. The Schoolbox system is carefully integrated with school
