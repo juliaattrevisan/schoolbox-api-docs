@@ -15,7 +15,7 @@ class Calendar_Event_Type_StudentBirthday extends Calendar_Event_Type_Abstract {
 
 	/* Renderer
 	 */
-	protected $rendererClass = 'Calendar_Event_Type_StudentBirthday_Renderer';
+	protected $rendererClass = 'Calendar_Event_Type_StudentBirthday_Renderer_Javascript';
 
 	/* Contextual: The actual birthdate
 	 */

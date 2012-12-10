@@ -1,6 +1,6 @@
 <?php
 /**
- * Calendar_Event_Type_Day_Renderer_Javascript
+ * Calendar_Event_Type_StudentBirthday_Renderer_Javascript
  *
  * Renders out a JSON mob of event objects
  *
@@ -9,7 +9,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Renderer_Abstract {
+class Calendar_Event_Type_StudentBirthday_Renderer_Javascript extends Calendar_Event_Type_Renderer_Abstract {
 
 	/**
 	 * Visitor

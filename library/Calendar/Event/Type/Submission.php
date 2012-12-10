@@ -15,7 +15,7 @@ class Calendar_Event_Type_Submission extends Calendar_Event_Type_Abstract {
 
     /* Renderer
      */
-    protected $rendererClass = 'Calendar_Event_Type_Submission_Renderer';
+    protected $rendererClass = 'Calendar_Event_Type_Submission_Renderer_Javascript';
 
     /* Contextual: The date for submissions
      */

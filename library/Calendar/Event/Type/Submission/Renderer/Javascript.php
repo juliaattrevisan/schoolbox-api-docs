@@ -1,6 +1,6 @@
 <?php
 /**
- * Calendar_Event_Type_StudentBirthday_Renderer_Javascript
+ * Calendar_Event_Type_Submission_Renderer_Javascript
  *
  * Renders out a JSON mob of event objects
  *
@@ -9,7 +9,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Event_Type_StudentBirthday_Renderer_Javascript extends Calendar_Event_Type_Renderer_Abstract {
+class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_Type_Renderer_Abstract {
 
 	/**
 	 * Visitor
@@ -21,12 +21,12 @@ class Calendar_Event_Type_StudentBirthday_Renderer_Javascript extends Calendar_E
 
 			/* Future events are visible to superusers, event owners, group members with write access
 			 */
-			if ($currentEvent->getPublishDate()->getUnixTimestamp() >= time()) {
-				$cssClass = 'translucent';
-			}
-			else {
-				$cssClass = '';
-			}
+//			if ($currentEvent->getPublishDate()->getUnixTimestamp() >= time()) {
+//				$cssClass = 'translucent';
+//			}
+//			else {
+//				$cssClass = '';
+//			}
 
 			/* Modify link. Should be templated...
 			 */
@@ -55,7 +55,7 @@ class Calendar_Event_Type_StudentBirthday_Renderer_Javascript extends Calendar_E
 			$hasAttendanceRequestButton = false;
 			$hasListButton = false;
 
-			if ($currentEvent->canAttend()) {
+//			if ($currentEvent->canAttend()) {
 				$hasIcon = true;
 
 				/* Anyone with write access can approve attendance
@@ -90,13 +90,15 @@ class Calendar_Event_Type_StudentBirthday_Renderer_Javascript extends Calendar_E
 				else if ($this->getGroupHandler()->isStaff($_SESSION['id'])) {
 					$hasListButton = true;
 				}
-			}
+//			}
 
 			/* Congeal all that stuff
 			 */
-			$start = $currentEvent->getStartTime()->getDatabaseDate() . ' ' . $currentEvent->getStartTime()->getDatabaseTime();
-			$end = $currentEvent->getEndTime()->getDatabaseDate() . ' ' . $currentEvent->getEndTime()->getDatabaseTime();
+//			$start = $currentEvent->getStartTime()->getDatabaseDate() . ' ' . $currentEvent->getStartTime()->getDatabaseTime();
+//			$end = $currentEvent->getEndTime()->getDatabaseDate() . ' ' . $currentEvent->getEndTime()->getDatabaseTime();
 
+			$start = '2012-12-10 14:13:00';
+			
 			$event = array(
 				'title' => $currentEvent->getNote(),
 				'start' => "$start",
@@ -130,7 +132,7 @@ class Calendar_Event_Type_StudentBirthday_Renderer_Javascript extends Calendar_E
 						'type' => $currentEvent->getEventType(),
 						'author' => Scrub::text($currentEvent->getAuthorName()),
 						'authorId' => $currentEvent->getAuthorId(),
-						'level' => $currentEvent->getDerivedEventLevel()
+//						'level' => $currentEvent->getDerivedEventLevel()
 					),
 					'links' => array(
 						'category' => array(
@@ -139,7 +141,7 @@ class Calendar_Event_Type_StudentBirthday_Renderer_Javascript extends Calendar_E
 						)
 					),
 					'styles' => array(
-						'visible' => $cssClass,
+						'visible' => $this->isVisible($currentEvent),
 					),
 					'attendance' => array(
 						'icon' => $hasIcon,
@@ -165,12 +167,12 @@ class Calendar_Event_Type_StudentBirthday_Renderer_Javascript extends Calendar_E
 	 * @return bool
 	 */
 	private function isVisible($currentEvent) {
-		$isFutureEvent = ($currentEvent->getPublishDate()->getUnixTimestamp() >= time());
-		$isVisibleToUser = ($this->getGroupHandler()->isSuperuser() || $currentEvent->isOwner() || (is_numeric($currentEvent->getCategoryId()) && ($this->getGroupHandler()->getPermission($currentEvent->getCategoryId())) > READ_ACCESS));
-
-		if ($isFutureEvent && !($isVisibleToUser)) {
-			return false;
-		}
+//		$isFutureEvent = ($currentEvent->getPublishDate()->getUnixTimestamp() >= time());
+//		$isVisibleToUser = ($this->getGroupHandler()->isSuperuser() || $currentEvent->isOwner() || (is_numeric($currentEvent->getCategoryId()) && ($this->getGroupHandler()->getPermission($currentEvent->getCategoryId())) > READ_ACCESS));
+//
+//		if ($isFutureEvent && !($isVisibleToUser)) {
+//			return false;
+//		}
 
 		return true;
 	}
