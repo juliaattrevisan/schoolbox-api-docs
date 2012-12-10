@@ -127,4 +127,51 @@ class Component_DefinitionMapper extends Mapper {
 
         return $collection;
     }
+
+
+    /**
+     * Create new custom components that need to be inserted AFTER the other new definitions
+     */
+    public function create($component) {
+
+
+        if (isset($component['config'])) {
+            $config = $component['config'];
+            unset($component['config']);
+        }
+
+        $pdoFields = array();
+        foreach (array_keys($component) as $f) {
+            $pdoFields[] = ':' . $f;
+        }
+        $pdoString = implode(', ', $pdoFields);
+        $colString = implode('`, `', array_keys($component));
+
+        $sql = "INSERT INTO `component_definition` (`$colString`) VALUES ($pdoString)";
+
+        if ($this->database->prepare($sql)->execute($component)) {
+            if (isset($config)) {
+                $defnID = $this->database->lastInsertId();
+                $sql = "
+                    INSERT INTO `component_config_definition`
+                      (`component_definition_id`, `key`, `default_value`, `label`)
+                    VALUES
+                      (:ccid, :key, :default_value, :label)
+                    ON DUPLICATE KEY UPDATE `default_value` = :default_value, `label` = :label";
+                $stmt = $this->database->prepare($sql);
+
+
+                foreach ($config as $key => $c) {
+                    $stmt->execute(
+                        array(
+                            'ccid' => $defnID,
+                            'key' => $key,
+                            'default_value' => $c['default_value'],
+                            'label' => $c['label']
+                        )
+                    );
+                }
+            }
+        }
+    }
 }
