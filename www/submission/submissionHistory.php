@@ -38,6 +38,7 @@ $userHandler = new User;
 $groupHandler = new Group;
 $submissionHandler = new Submission;
 $returnHandler = new SubmissionReturn;
+$allowedHandler = new AllowedFile;
 
 if (is_numeric($this->arg[1]) && ($groupHandler->isParentOfChild($this->arg[1]) || $groupHandler->isStaff() || $_SESSION['id'] == $this->arg[1])) {
 	$userID = $this->arg[1];
@@ -274,6 +275,8 @@ if (is_array($allWork) && count($allWork)) {
         // return by teacher
 		else if ($currentWork['rid'] != null) {
 
+            $this->setVar('HISTORY_RETURN_FILE_NAME', Scrub::text($currentWork['filename']));
+
             // file return rather than mark
             if($currentWork['filename']) {
                 if($parentOnly) {
@@ -351,7 +354,6 @@ if($recentSubmission['sid']) {
     $recentSubmissionDate = new Alaress_Date_Relative($recentSubmission['date'], 'U');
 
     // get filetype details
-    $allowedHandler = new AllowedFile();
     $ext = substr($recentSubmission['sfname'], strrpos($recentSubmission['sfname'], '.') + 1);
     $mime = $allowedHandler->getMime($ext);
     $ftype = $allowedHandler->getByField('mime', $mime);
@@ -418,12 +420,32 @@ if (!in_array($submissionBox['category'], $categoryIDList)) {
 
 /* Detect returned work
  */
+
 if (is_numeric($returnedWork['rid'])) {
+
+    // get filetype details
+    $ext = substr($returnedWork['filename'], strrpos($returnedWork['filename'], '.') + 1);
+    $mime = $allowedHandler->getMime($ext);
+    $ftype = $allowedHandler->getByField('mime', $mime);
+
+    $filename = Cfg::get('returns_dir') . '/' . $returnedWork['rid'] . '.dat';
+    if(file_exists($filename)) {
+        $size = Alaress_Byte_Format::bytesToString(filesize($filename));
+    } else {
+        $size = '0 KB';
+    }
+
+    $returnDate = new Alaress_Date_Relative($submissionBox['date'],'y-m-d');
+
 	$this->setVar(array(
 		'RETURNED_WORK_COMMENT' => Scrub::Text($returnedWork['comment']),
 		'RETURNED_WORK_MARK' => Scrub::Text($returnedWork['mark']),
 		'RETURNED_WORK_FILE_ID' => $returnedWork['rid'],
         'RETURNED_WORK_GRADIENT' => max(0, min(10, (int)($returnedWork['norm_mark'] / 10))),
+        'RETURNED_WORK_FILE_SIZE' => $size,
+        'RETURNED_WORK_FILE_NAME' => Scrub::Text($returnedWork['filename']),
+        'RETURNED_WORK_FILE_DATE' => $returnDate->getLongDateOnly(),
+        'RETURNED_WORK_FILE_THUMB'=> $ftype['iconFile'],
 	));
 
     if($returnedWork['filename'] && !$parentOnly)
