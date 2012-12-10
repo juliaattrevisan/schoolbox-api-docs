@@ -142,6 +142,8 @@
 			/* When you click on a day to add a new event
 			 */
 			dayClick: function(date, allDay, jsEvent, view) {
+				$j('#createEvent').find('input[name=date]').val(date.getTime());
+
 				$j('#createEvent').show();
 			},
 
@@ -156,6 +158,23 @@
 			/* Stream location
 			 */
 			events: '/calendar/ajax/full'
+		});
+
+		$j('#createEventForm').submit(function(event) {
+			var data = $j(this).serialize();
+
+			$j.post('/calendar/ajax/create', data, function(responseText) {
+				if (responseText.length) {
+					var responseData = new Function('return ' + responseText);
+					var newEvent = responseData();
+
+					console.log(newEvent);
+					$j('#calendar').fullCalendar('renderEvent', newEvent);
+
+				}
+			});
+
+			return false;
 		});
 	});
 </script>
@@ -178,12 +197,10 @@
 
 <div id='createEvent' style='border: 1px solid #f0f;width:500px;height:200px;float:right;'>
 	<h1>Quick Create Event</h1>
-	<form method='post' action='/calendar/ajax/create.php'>
-		<input name='id' type='text' value='{USER_ID}' /><br />
-		<input name='level' type='text' value='(insert level)' /><br />
-		<input name='group' type='text' value='(insert group)' /><br />
+	<form id='createEventForm' method='post' action='#'>
+		<input name='date' type='hidden' value='' /><br />
 
-		<label>Note
+		<label>Event Title
 			<input name='note' type='text' value='' />
 		</label>
 

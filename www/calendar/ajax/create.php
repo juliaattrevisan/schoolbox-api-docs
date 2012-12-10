@@ -12,26 +12,80 @@ require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 $calendarHandler = new Calendar();
 $page = new SitePage();
 
-$dateObj = new Alaress_Date_Format($_POST['date'], 'd/m/y');
-$date = $dateObj->getUnixTimestamp();
-
-$untilObj = new Alaress_Date_Format($_POST['repeat_until'], 'd/m/y');
-$until = $untilObj->getUnixTimestamp();
+/* Javascript returns date as milliseconds from 1/1/1970
+ */
+$dateObj = new Alaress_Date_Format($_POST['date']/1000, 'U');
 
 $event = array(
-    'owner'         => $_SESSION['id'],
-    'access'        => $_POST['level'],
-    'sid'           => $_POST['group'],
-    'campusList'    => !empty($_POST['campus']) ? $_POST['campus'] : array($_SESSION['campus'][0]),
-    'groupList'     => $_POST['groupCheck'],
-    'type'          => $_POST['type'],
-    'note'          => $_POST['note'],
-    'startTime'     => (($_POST['period'] == 'pm' && $_POST['hour'] != 12 ? 12 : 0) + $_POST['hour']) . ":" . $_POST['minute'] . ":00",
-    'endTime'       => (($_POST['toperiod'] == 'pm' && $_POST['tohour'] != 12 ? 12 : 0) + $_POST['tohour']) . ":" . $_POST['tominute'] . ":00",
-    'location'      => $_POST['location'],
-    'attendance'    => $_POST['attendance'],
-    'detail'        => $_POST['detail'],
-    'publish_date'  => 'NULL',
+	'owner' => $_SESSION['id'],
+	'access' => 1,
+	'sid' => $_SESSION['id'],
+	'campusList' => !empty($_POST['campus']) ? $_POST['campus'] : array($_SESSION['campus'][0]),
+	'groupList' => $_POST['groupCheck'],
+	'type' => $_POST['type'],
+	'note' => $_POST['note'],
+	'date' => $dateObj->getDatabaseDate(),
+	'startTime' => '00:00:00',
+	'endTime' => '00:00:00',
+	'location' => $_POST['location'],
+	'attendance' => $_POST['attendance'],
+	'detail' => $_POST['detail'],
+	'publish_date' => 'NULL',
 );
 
-echo "Creating";
+if ($calendarHandler->create($event)) {
+	$json =  array(
+		'title' => $event['note'],
+		'start' => strtotime($event['date'] . ' ' . $event['startTime']),
+
+		/* Whether you can edit this event or not
+		 */
+		'editable' => $editable,
+
+		/* Whether it's an all-day event or not
+		 * If allDay is true, then you can't resize it
+		 *
+		 * Schoolbox usage would be that all events are not
+		 * allDay events
+		 */
+		'allDay' => false,
+
+		/* Colour of the event
+		 */
+		'color' => '#aaaaaa',
+
+		/* Extra data that the Event Object doesn't directly support
+		 */
+		'data' => array(
+			'meta' => array(
+				'eventId' => $event['eventId'],
+				'detail' => '',
+				'location' => '',
+				'eventType' => '',
+				'type' => '',
+				'author' => '',
+				'authorId' => '',
+				'level' => ''
+			),
+			'links' => array(
+				'category' => array(
+					'id' => '',
+					'name' => '',
+				)
+			),
+			'styles' => array(
+				'visible' => '',
+			),
+			'attendance' => array(
+				'icon' => false,
+				'status' => false,
+				'requestButton' => false,
+				'listButton' => false,
+			)
+		)
+	);
+
+	echo json_encode($json);
+}
+
+exit(1);
