@@ -282,11 +282,8 @@ class Feed {
                 'date' => $row['submitted'],
                 'type' => 'news',
                 'message' => $userHandler->formatName($row) . ' posted the news ' . Scrub::text($row['heading']),
-                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName(
-                    $row
-                ) . '</a> posted the news <a href="/homepage/' . $row['id'] . '">' . Scrub::text(
-                    $row['heading']
-                ) . '</a>',
+                'messageHTML' => '<a href="/search/user/' . $row['uid'] . '">' . $userHandler->formatName( $row ) .
+                                 '</a> posted the news '. Scrub::text( $row['heading'] ),
                 'external_id' => $row['external_id'],
                 'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
