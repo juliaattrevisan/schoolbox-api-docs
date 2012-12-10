@@ -131,6 +131,24 @@ class Component_DefinitionMapper extends Mapper {
 
     /**
      * Create new custom components that need to be inserted AFTER the other new definitions
+     *
+     * Takes component structures in the following format (yes i know it should be in a Definition Object.. but it doesnt have support for config)
+     *
+     * $classList = array(
+                'name'  => 'Class List',
+                'module' => 'homepage',
+                'component_category' => '3',
+                'class' => 'Component_Homepage_ClassListController',
+                'description' => 'Show your students portraits on your class homepage',
+                'multiple' => 'false',
+                'config' => array(
+                    'displayPortraits' => array(
+                        'default_value' => 'grid',
+                        'label' => 'Layout Style'
+                    ),
+                )
+            );
+     *
      */
     public function create($component) {
 
