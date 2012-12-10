@@ -184,7 +184,13 @@ h2,.calendar-controls{color:#696b73 !important; background:#eaeaeb;}
 .calendar-controls h3{color:#696b73;}
 a, h2 a{color:#696b73;}
 a:hover, h2 a:hover{color:#787a83;}
-#wrap{ overflow: hidden }
+#wrap{
+    overflow: hidden;
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -26px;
+}
 #header{
     height:143px;
     background: url('/images/balcombe/header-bg.png') 256px 70px no-repeat;
@@ -400,15 +406,17 @@ ADMIN!
 
 #footer {
     background: transparent;
-    position: relativee;
-    bottom: 0;
+    position: relative;
     right: 0;
     margin-bottom: 0;
 }
 #footer ul {float:right;padding-right: 40px;}
 #footer ul li {color:#696b73;}
 #footer ul li a{color:#696b73;}
-
+#footer, .push {
+    height: 26px;
+    clear: both;
+}
 .standardForm td {
     border-bottom: 1px solid #eee;
 }
