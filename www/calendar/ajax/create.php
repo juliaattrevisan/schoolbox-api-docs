@@ -33,14 +33,14 @@ $event = array(
 	'publish_date' => 'NULL',
 );
 
-if ($calendarHandler->create($event)) {
+if ($eventId = $calendarHandler->create($event)) {
 	$json =  array(
 		'title' => $event['note'],
 		'start' => strtotime($event['date'] . ' ' . $event['startTime']),
 
 		/* Whether you can edit this event or not
 		 */
-		'editable' => $editable,
+		'editable' => true,
 
 		/* Whether it's an all-day event or not
 		 * If allDay is true, then you can't resize it
@@ -58,7 +58,7 @@ if ($calendarHandler->create($event)) {
 		 */
 		'data' => array(
 			'meta' => array(
-				'eventId' => $event['eventId'],
+				'eventId' => $eventId,
 				'detail' => '',
 				'location' => '',
 				'eventType' => '',
