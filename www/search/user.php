@@ -423,7 +423,7 @@ if (is_numeric($this->arg[0])) {
                                 $this->parse('spouse_details_block', 'spouse_details');
                             }
                             else {
-                                $this->parse('spouse_details_block','');
+                                $this->setVar('spouse_details_block','');
                             }
 
                             $this->parse('contact_details_block', 'contact_details', true);
