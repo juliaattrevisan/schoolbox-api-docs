@@ -938,3 +938,111 @@ div.colours p {
         border-bottom: none;
     }
 }
+
+
+/**********************
+  FULL CALENDAR
+***********************/
+
+// styles common to popup divs
+.popup() {
+//    border: solid 1px #3f9;
+//    min-height: 200px;
+//    background: #fff;
+    left: 500px;
+//    width: 500px;
+    position: absolute;
+    z-index: 140;
+    h3 {
+        margin-bottom: 4px;
+    }
+    h3, h4, dt {
+        text-align: left;
+    }
+    dt, dd {
+        font-size: 13px;
+        padding: 0 10px;
+        &.rm {
+            display: none;
+            visibility: hidden;
+        }
+    }
+    dd {
+        margin-bottom: 4px;
+    }
+    .post-by {
+        font-style: italic;
+        text-align: left;
+    }
+    div.close {
+        width: 20px;
+        font-size: 24px;
+        line-height: 20px;
+    }
+}
+
+// event detail popup
+#calendarBubble {
+    .popup();
+
+    #calendarBubbleClose {
+        position: absolute;
+        top: 3px;
+        right: 10px;
+        font-size: 20px;
+        color: #555;
+    }
+    #calendarBubbleAttendanceIcon {
+        color: #333;
+        margin: 0;
+        padding-right: 20px;
+    }
+    .title {
+        margin: 0;
+        padding: 10px;
+        h1 {
+            margin: 0;
+        }
+    }
+    .datetime {
+        clear: both;
+        padding: 0 10px 10px 10px;
+        h4 {
+            margin-bottom: 0;
+            width: auto;
+        }
+        p {
+            padding: 0;
+            margin: 0;
+        }
+    }
+    .actions {
+        position: relative;
+        top: -3px;
+        dd {
+            float: right;
+        }
+    }
+    .attendance {
+        height: 18px;
+        dd {
+            width: 100%;
+            p {
+                text-align: right;
+            }
+        }
+    }
+    div {
+        width:100%;
+        display:block;
+        clear:both;
+    }
+    dd {
+        float: none;
+    }
+}
+
+// event creation popup
+#createEvent {
+    .popup();
+}
