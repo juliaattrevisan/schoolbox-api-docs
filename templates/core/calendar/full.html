@@ -142,8 +142,38 @@
 			/* When you click on a day to add a new event
 			 */
 			dayClick: function(date, allDay, jsEvent, view) {
-				$j('#createEvent').find('input[name=date]').val(date.getTime());
 
+				/* Date formatting
+				 */
+				var weekday = new Array(
+					"Sun",
+					"Mon",
+					"Tue",
+					"Wed",
+					"Thu",
+					"Fri",
+					"Sat"
+				);
+
+				var month = new Array(
+					"January",
+					"February",
+					"March",
+					"April",
+					"May",
+					"June",
+					"July",
+					"August",
+					"September",
+					"October",
+					"November",
+					"December"
+				);
+
+				var displayDate = weekday[date.getDay()] + ', ' + date.getDate() + ' ' + month[date.getMonth()];
+
+				$j('#createEvent').find('input[name=date]').val(date.getTime());
+				$j('#createEvent').find('span').html(displayDate);
 				$j('#createEvent').show();
 			},
 
@@ -200,6 +230,7 @@
 	<form id='createEventForm' method='post' action='#'>
 		<input name='date' type='hidden' value='' /><br />
 
+		<span></span>
 		<label>Event Title
 			<input name='note' type='text' value='' />
 		</label>
