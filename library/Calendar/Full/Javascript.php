@@ -27,6 +27,7 @@ class Calendar_Full_Javascript extends Calendar_Week_Abstract {
 	 */
 	protected function setupBlocks() {
 		$this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
+		$this->getPage()->setBlock(TEMPLATE_content, 'event_type', 'event_type_block');
 	}
 
 	/**
@@ -39,5 +40,23 @@ class Calendar_Full_Javascript extends Calendar_Week_Abstract {
 	 * Render calendar
 	 */
 	public function render() {
+
+		/* Render event types to chooze from
+		 */
+		$allTypes = $this->getCalendarHandler()->getTypeList();
+
+		if (is_array($allTypes) && count($allTypes)) {
+			foreach($allTypes as $currentType) {
+				$this->getPage()->setVar(array(
+					'EVENT_TYPE_ID' => $currentType['eventTypeID'],
+					'EVENT_TYPE_NAME' => $currentType['eventType'],
+				));
+
+				$this->getPage()->parse('event_type_block', 'event_type', true);
+			}
+		}
+		else {
+			$this->getPage()->setVar('event_type_block', '');
+		}
 	}
 }

@@ -204,6 +204,14 @@
 			<input name='note' type='text' value='' />
 		</label>
 
+		<label>Event Type
+			<select name='type'>
+				<!-- BEGIN event_type -->
+				<option value='{EVENT_TYPE_ID}' />{EVENT_TYPE_NAME}</option>
+				<!-- END event_type -->
+			</select>
+		</label>
+
 		<input type='submit' value='Create Event' />
 	</form>
 </div>
