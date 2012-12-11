@@ -186,6 +186,12 @@ h2, h2 a, .header_option, .calendar-controls {
     background-color: #f7e19b;
     color: #000000;
 }
+#wrap{
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -80px;
+}
 .calendar-controls h3 { color: #000; }
 .cal-bubble .time {
     background: none repeat scroll 0 0 transparent;
@@ -206,7 +212,6 @@ a:hover {
     position: absolute;
     top: 0;
 }
-
 #tabs{
     min-width:1000px;
     left: 184px;
@@ -220,7 +225,7 @@ h3, #infoPanel li, #nav h3, .add-component .notification {
 }
 #infoPanel{
     color: #faedc3;
-    margin: 15px 360px 0 0px;
+    margin: 15px 318px 0 0px;
 }
 #infoPanel a {
     color: #faedc3;
@@ -280,6 +285,9 @@ h3, #infoPanel li, #nav h3, .add-component .notification {
     background-color: #faedc3;
     color: #0066b0;
 }
+.news-headlines li{
+    border: 0 !important;
+}
 #category li a:hover {
     background: none repeat scroll 0 0 #FAEDC3;
 }
@@ -289,6 +297,7 @@ h3, #infoPanel li, #nav h3, .add-component .notification {
 .dark, .dark td, #tree .dark, .standardForm, #assess .standardForm, #assess .additional-details, #assess .assess-body, .blog-comments .box, .post-left, #category, .search-item:nth-child(2n) {
     background: none repeat scroll 0 0 #F4F4F8;
 }
+ul.news-headlines{ background: transparent !important; }
 #nav .nav-wrapper{ background: transparent; }
 .nav-wrapper{background:none;}
 .dark td {
@@ -319,15 +328,22 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
     background-color: #BCBDD6;
 }
 #month-view h3, #week-view h3{color:#000;}
-
+#nav h3{ padding: 0 0 0 14px; }
 #nav h3, #tooltip,
 .topic-list li a.selected  {
     background: transparent;
     color: #222478;
-    padding: 0 0 0 14px;
+}
+.topic-list li a:hover{
+    background: #ffeaa6;
 }
 .top-split {
     border-color: #222478;
+}
+.topic-list li a.selected {
+    background: #f7e19b;
+    color: #000;
+    border: none;
 }
 #header #tabs li.navthis a {
     color: #222478;
@@ -363,29 +379,18 @@ td.cal-right .link-case .filter-drop .filter-list {
     background: none repeat scroll 0 0 #FAEDC3;
 }
 .submit-btn-plain {
-    background-color: #F0F1F6;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#F0F1F6), to(#E0E2EC));
-    background-image: -webkit-linear-gradient(top, #F0F1F6, #E0E2EC);
-    background-image:    -moz-linear-gradient(top, #F0F1F6, #E0E2EC);
-    background-image:     -ms-linear-gradient(top, #F0F1F6, #E0E2EC);
-    background-image:      -o-linear-gradient(top, #F0F1F6, #E0E2EC);
-    background-image:         linear-gradient(top, #F0F1F6, #E0E2EC);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#F0F1F6', EndColorStr='#E0E2EC');
-    border-color: #BCBDD6;
+    background-color: #F7E19B;
+    background-image: none;
+    border: none;
     color: #222478 !important;
-    text-shadow: 0 1px 0 #D6F0F6;
+    filter: none;
+    text-shadow: none;
 }
 .submit-btn-plain:hover {
-    background-color: #FDF7E5;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#FDF7E5), to(#FBEFCA));
-    background-image: -webkit-linear-gradient(top, #FDF7E5, #FBEFCA);
-    background-image:    -moz-linear-gradient(top, #FDF7E5, #FBEFCA);
-    background-image:     -ms-linear-gradient(top, #FDF7E5, #FBEFCA);
-    background-image:      -o-linear-gradient(top, #FDF7E5, #FBEFCA);
-    background-image:         linear-gradient(top, #FDF7E5, #FBEFCA);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#FDF7E5', EndColorStr='#FBEFCA');
-    border-color: #F0C437;
-    color: #FF5A00 !important;
+    background-color: #ffeaa6;
+    background-image: none;
+    border: none;
+    color: #222478 !important;
     cursor: pointer;
 }
 .standardForm td {
@@ -430,7 +435,7 @@ td.cal-right .link-case .filter-drop .filter-list {
 .box.news { width: 49%; float: left; }
 .box.calendar { width: 49%; float: right; }
 
-.box ul li { padding: 5px 16px; }
+.box ul li { padding: 5px 16px; border-bottom: 1px solid #eee; }
 
 /*
  * Table border fixes
@@ -443,7 +448,7 @@ td.cal-right .link-case .filter-drop .filter-list {
 .right .listing .dark,
 .left .listing .dark
 {
-    background: #FAF9F5;
+    background: #fafafa;
 }
 
 .calendar table thead th,
@@ -478,4 +483,10 @@ ul.activity-list li,
 #footer ul li,
 #footer ul li a{
     color: #404040;
+}
+
+#footer, .push{
+    height: 46px;
+    clear: both;
+    position: relative;
 }
