@@ -73,6 +73,13 @@ abstract class Calendar_Event_Type_Abstract {
      */
     protected $isEditable = true;
 
+	/**
+	 * Whether or not this Task has been completed
+	 *
+	 * @var int
+	 */
+	protected $completed = 0;
+
     /**
      * Constructor
      *
@@ -477,4 +484,22 @@ abstract class Calendar_Event_Type_Abstract {
     public function getIsEditable() {
         return $this->isEditable;
     }
+
+	/**
+	 * Set completed
+	 *
+	 * @param int $completed
+	 */
+	public function setCompleted($completed) {
+		$this->completed = $completed;
+	}
+
+	/**
+	 * Get completed
+	 *
+	 * @return int
+	 */
+	public function getCompleted() {
+		return $this->completed;
+	}
 }

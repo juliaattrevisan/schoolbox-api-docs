@@ -53,6 +53,14 @@ class Calendar_Full_Javascript extends Calendar_Week_Abstract {
 				));
 
 				$this->getPage()->parse('event_type_block', 'event_type', true);
+
+				/* Event Task id
+				 */
+				if ($currentType['eventType'] == 'Task') {
+					$this->getPage()->setVar(array(
+						'TASK_TYPE_ID' => $currentType['eventTypeID']
+					));
+				}
 			}
 		}
 		else {

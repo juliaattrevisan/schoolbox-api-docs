@@ -31,8 +31,6 @@ $endTime->addMinutes($minuteDelta);
  * only last till 11:59:59 that day instead of spanning into
  * the next day since schoolbox treats event days individually
  */
-print_r($startTime->getDatabase() . ' ' . $endTime->getDatabase());
-
 if ($endTime->getDatabaseDate() != $startTime->getDatabaseDate()) {
 	$endTime = new Alaress_Date_Format($event['date'] . ' 23:59:59', 'y-m-d h:i:s');
 }
@@ -44,5 +42,19 @@ $updatedEvent['id'] = $event['id'];
 $updatedEvent['date'] = $startTime->getDatabaseDate();
 $updatedEvent['startTime'] = $startTime->getDatabaseTime();
 $updatedEvent['endTime'] = $endTime->getDatabaseTime();
+
+/* For tasks
+ */
+if (isset($_POST['note'])) {
+	$updatedEvent['note'] = $_POST['note'];
+}
+
+if (isset($_POST['detail'])) {
+	$updatedEvent['detail'] = $_POST['detail'];
+}
+
+if (isset($_POST['completed'])) {
+	$updatedEvent['completed'] = $_POST['completed'];
+}
 
 $calendarHandler->update($updatedEvent);

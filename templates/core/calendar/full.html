@@ -3,6 +3,11 @@
 <link rel='stylesheet' type='text/css' href='/css/core/fullcalendar/fullcalendar.print.css' media='print' />
 <script type='text/javascript'>
 	bubble = {
+		allBubbles: new Array('#calendarBubble',  '#createEventBubble', '#modifyTaskBubble'),
+
+		/**
+		 * Initialise
+		 */
 		init: function() {
 			$j('#calendarBubbleTitle').html('');
 			$j('#calendarBubbleLocation').html('');
@@ -19,11 +24,28 @@
 			$j('#calendarBubbleAttendanceStatus').html('');
 			$j('#calendarBubbleAttendanceListButton').html('');
 			$j('#calendarBubbleAttendanceRequestButton').html('');
+
+			$j('#modifyTaskBubbleNote').val('');
+			$j('#modifyTaskBubbleDetail').val('');
+
+			this.hideAllBubbles();
+		},
+
+		/**
+		 * Hide all bubbles
+		 */
+		hideAllBubbles: function() {
+			for (i = 0; i < this.allBubbles.length; i++) {
+				$j(this.allBubbles[i]).hide();
+			}
 		}
 	};
 
 	$j(function() {
-		$j('#createEvent').hide();
+
+		/* Burst bubble
+		 */
+		bubble.init();
 
 		$j('#calendar').fullCalendar({
 
@@ -43,71 +65,105 @@
 			 */
 			eventClick: function(calEvent, jsEvent, view) {
 
-				/* Burst bubble
+				/* Burst bubble again
 				 */
 				bubble.init();
 
-				/* The usual event and description
+				/* Do different things if one is a Task vs. an Event
 				 */
-				$j('#calendarBubbleTitle').html(calEvent.title);
-				$j('#calendarBubbleLocation').html(calEvent.data.meta.location);
+				if (calEvent.data.meta.eventTypeId == '{TASK_TYPE_ID}') {
 
-				/* Event author
-				 */
-				$j('#calendarBubbleAuthor').html(calEvent.data.meta.author);
-				$j('#calendarBubbleAuthor').attr('href', '/search/user/' + calEvent.data.meta.authorId);
+					/* Prefill with task info
+					 */
+					$j('#modifyTaskBubbleNote').val(calEvent.title);
+					$j('#modifyTaskBubbleDetail').val(calEvent.data.meta.detail);
 
-				/* Start time
-				 */
-				if (calEvent.start != null) {
-					$j('#calendarBubbleStartTime').html(calEvent.start.toString());
+					/* Show special modify dialog -_-
+					 */
+					$j('#modifyTaskBubble').show();
+
+					$j('#modifyTaskForm').submit(function() {
+
+
+						var data = {
+							eventId: calEvent.data.meta.eventId,
+							note: $j('#modifyTaskBubbleNote').val(),
+							detail: $j('#modifyTaskBubbleDetail').val(),
+							completed: $j('#modifyTaskBubbleCompleted').checked
+						};
+
+						$j.post('/calendar/ajax/update.php', data, function(responseText) {
+						});
+
+						return false;
+					});
 				}
+				else {
 
-				/* End time
-				 */
-				if (calEvent.end != null) {
-					$j('#calendarBubbleEndTime').html(calEvent.end.toString());
-				}
+					/* The usual event and description
+					 */
+					$j('#calendarBubbleTitle').html(calEvent.title);
+					$j('#calendarBubbleLocation').html(calEvent.data.meta.location);
 
-				/* Links to Modify Screen
-				 */
-				if (calEvent.editable == true) {
-					$j('#calendarBubbleModifyLink').html("<a class='btn modify float-left' href='/calendar/modify.php?eventID=" + calEvent.data.meta.eventId + "&returnTo=week'><span></span>Modify</a>");
-				}
+					/* Event author
+					 */
+					$j('#calendarBubbleAuthor').html(calEvent.data.meta.author);
+					$j('#calendarBubbleAuthor').attr('href', '/search/user/' + calEvent.data.meta.authorId);
 
-				/* Attendances
-				 */
-				$j('#calendarBubbleAttendanceStatus').html(calEvent.data.attendance.status.toString());
-
-				/* Attendance List butonye
-				 */
-				if (calEvent.data.attendance.listButton.toString() == 'true') {
-					$j('#calendarBubbleAttendanceListButton').html("<a href='/calendar/attendance/list/" + calEvent.data.meta.eventId + "'>Attendance List</a>");
-				}
-
-				/* Attend/Unattend butonye
-				 */
-				if (calEvent.data.attendance.requestButton.toString() != 'false') {
-					$j('#calendarBubbleAttendanceRequestButton').html("<span></span>" + calEvent.data.attendance.requestButton.toString());
-
-					var data = {
-						eventId: calEvent.data.meta.eventId
+					/* Start time
+					 */
+					if (calEvent.start != null) {
+						$j('#calendarBubbleStartTime').html(calEvent.start.toString());
 					}
 
-					/* Bugalug shenanigans
+					/* End time
 					 */
-					$j('#calendarBubbleAttendanceRequestButton').live('click', function(event) {
-						$j.post('/service/attendance/processToggleAttendance', data, function (data) {
-							if (data.error == undefined) {
-								if ($j('#calendarBubbleAttendanceRequestButton').text() == 'Attend') {
-									$j('#calendarBubbleAttendanceRequestButton').html('<span></span>Unattend');
+					if (calEvent.end != null) {
+						$j('#calendarBubbleEndTime').html(calEvent.end.toString());
+					}
+
+					/* Links to Modify Screen
+					 */
+					if (calEvent.editable == true) {
+						$j('#calendarBubbleModifyLink').html("<a class='btn modify float-left' href='/calendar/modify.php?eventID=" + calEvent.data.meta.eventId + "&returnTo=week'><span></span>Modify</a>");
+					}
+
+					/* Attendances
+					 */
+					$j('#calendarBubbleAttendanceStatus').html(calEvent.data.attendance.status.toString());
+
+					/* Attendance List butonye
+					 */
+					if (calEvent.data.attendance.listButton.toString() == 'true') {
+						$j('#calendarBubbleAttendanceListButton').html("<a href='/calendar/attendance/list/" + calEvent.data.meta.eventId + "'>Attendance List</a>");
+					}
+
+					/* Attend/Unattend butonye
+					 */
+					if (calEvent.data.attendance.requestButton.toString() != 'false') {
+						$j('#calendarBubbleAttendanceRequestButton').html("<span></span>" + calEvent.data.attendance.requestButton.toString());
+
+						var data = {
+							eventId: calEvent.data.meta.eventId
+						}
+
+						/* Bugalug shenanigans
+						 */
+						$j('#calendarBubbleAttendanceRequestButton').live('click', function(event) {
+							$j.post('/service/attendance/processToggleAttendance', data, function (data) {
+								if (data.error == undefined) {
+									if ($j('#calendarBubbleAttendanceRequestButton').text() == 'Attend') {
+										$j('#calendarBubbleAttendanceRequestButton').html('<span></span>Unattend');
+									}
+									else {
+										$j('#calendarBubbleAttendanceRequestButton').html('<span></span>Attend');
+									}
 								}
-								else {
-									$j('#calendarBubbleAttendanceRequestButton').html('<span></span>Attend');
-								}
-							}
+							});
 						});
-					});
+					}
+
+					$j('#calendarBubble').show();
 				}
 			},
 
@@ -172,9 +228,14 @@
 
 				var displayDate = weekday[date.getDay()] + ', ' + date.getDate() + ' ' + month[date.getMonth()];
 
-				$j('#createEvent').find('input[name=date]').val(date.getTime());
-				$j('#createEvent').find('span').html(displayDate);
-				$j('#createEvent').show();
+				$j('#createEventBubble').find('input[name=date]').val(date.getTime());
+				$j('#createEventBubble').find('span').html(displayDate);
+
+				/* Gotta hide them all
+				 */
+				bubble.hideAllBubbles();
+
+				$j('#createEventBubble').show();
 			},
 
 			/* Butonye
@@ -190,7 +251,9 @@
 			events: '/calendar/ajax/full'
 		});
 
-		$j('#createEventForm').submit(function(event) {
+		/* Event creation forms
+		 */
+		$j('#createEventForm, #createTaskForm').submit(function(event) {
 			var data = $j(this).serialize();
 
 			$j.post('/calendar/ajax/create', data, function(responseText) {
@@ -198,13 +261,41 @@
 					var responseData = new Function('return ' + responseText);
 					var newEvent = responseData();
 
-					console.log(newEvent);
-					$j('#calendar').fullCalendar('renderEvent', newEvent);
+					if (newEvent.data.meta.type == '{TASK_TYPE_ID}') {
+						if (newEvent.data.meta.completed) {
+							$j('#createTaskForm').find('input[name=completed]').checked == true;
+						}
+						else {
+							$j('#createTaskForm').find('input[name=completed]').checked == false;
+						}
+					}
 
+					$j('#calendar').fullCalendar('renderEvent', newEvent);
 				}
 			});
 
 			return false;
+		});
+
+		/* Hide Task forms by default
+		 */
+		$j('#createTaskForm').hide();
+
+		/* Event/Task form control. This switches between
+		 * which event type you are creating (event or task)
+		 */
+		$j('#showCreateTaskForm').click(function() {
+			event.preventDefault();
+
+			$j('#createEventForm').hide();
+			$j('#createTaskForm').show();
+		});
+
+		$j('#showCreateEventForm').click(function() {
+			event.preventDefault();
+
+			$j('#createEventForm').show();
+			$j('#createTaskForm').hide();
 		});
 	});
 </script>
@@ -220,17 +311,21 @@
 	#calendar {
 		width: 900px;
 		margin: 0 auto;
-		}
-
+	}
 </style>
 <!-- END custom_head -->
 
-<div id='createEvent' style='border: 1px solid #f0f;width:500px;height:200px;float:right;'>
-	<h1>Quick Create Event</h1>
+<div id='createEventBubble' style='border: 1px solid #f0f;width:500px;height:200px;float:right;'>
+	<ul>
+		<li><a href='#' id='showCreateEventForm'>Event</a></li>
+		<li><a href='#' id='showCreateTaskForm'>Task</a></li>
+	</ul>
 	<form id='createEventForm' method='post' action='#'>
-		<input name='date' type='hidden' value='' /><br />
+		<h1>Quick Create Event</h1>
+		<input name='date' type='hidden' value='' />
 
-		<span></span>
+		<span><!-- Date gets shoved in here --></span>
+
 		<label>Event Title
 			<input name='note' type='text' value='' />
 		</label>
@@ -245,7 +340,45 @@
 
 		<input type='submit' value='Create Event' />
 	</form>
+	<form id='createTaskForm' method='post' action='#'>
+		<h1>Quick Create Task</h1>
+		<input name='date' type='hidden' value='' />
+		<input name='type' type='hidden' value='{TASK_TYPE_ID}' />
+
+		<span><!-- Date gets shoved in here --></span>
+
+		<label>Task Title
+			<input name='note' type='text' value='' />
+		</label>
+
+		<label>Task Description
+			<input name='detail' type='text' value='' />
+		</label>
+
+		<label>Task Completed?
+			<input name='completed' type='checkbox' value='' />
+		</label>
+
+		<input type='submit' value='Create Task' />
+	</form>
 </div>
+
+<div id='modifyTaskBubble' style='border: 1px solid #ff0;width:500px;height:200px;float:right;'>
+	<h1>Modify Task -_-</h1>
+
+	<form id='modifyTaskForm'>
+		<label>Task Title
+			<input id='modifyTaskBubbleNote' type='text' value='' />
+		</label>
+
+		<label>Task Detail
+			<input id='modifyTaskBubbleDetail' type='text' value='' />
+		</label>
+
+		<input type='submit' value='Update Task' />
+	</form>
+</div>
+
 
 <div id='calendarBubble' style='border: 1px solid #f00;width:500px;height:500px;float:left;'>
 	<div style='width:100%;display:block;clear:both;'>

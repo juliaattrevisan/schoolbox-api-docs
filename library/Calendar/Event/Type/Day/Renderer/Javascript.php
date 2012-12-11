@@ -126,11 +126,12 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 						'time' => $currentEvent->getTime(),
 						'detail' => $currentEvent->getDetail(),
 						'location' => $currentEvent->getLocation(),
+						'eventTypeId' => $currentEvent->getType(),
 						'eventType' => 'type' . $currentEvent->getType(),
 						'type' => $currentEvent->getEventType(),
 						'author' => Scrub::text($currentEvent->getAuthorName()),
 						'authorId' => $currentEvent->getAuthorId(),
-						'level' => $currentEvent->getDerivedEventLevel()
+						'level' => $currentEvent->getDerivedEventLevel(),
 					),
 					'links' => array(
 						'category' => array(

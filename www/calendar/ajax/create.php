@@ -31,6 +31,7 @@ $event = array(
 	'attendance' => $_POST['attendance'],
 	'detail' => $_POST['detail'],
 	'publish_date' => 'NULL',
+	'completed' => $_POST['completed'],
 );
 
 if ($eventId = $calendarHandler->create($event)) {
