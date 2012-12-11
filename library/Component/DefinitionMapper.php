@@ -168,7 +168,7 @@ class Component_DefinitionMapper extends Mapper {
         $sql = "INSERT INTO `component_definition` (`$colString`) VALUES ($pdoString)";
 
         if ($this->database->prepare($sql)->execute($component)) {
-            if (isset($config)) {
+            if (is_array($config)) {
                 $defnID = $this->database->lastInsertId();
                 $sql = "
                     INSERT INTO `component_config_definition`
