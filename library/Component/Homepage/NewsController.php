@@ -38,9 +38,10 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
         $this->newsHandler = new CategoryNews();
         $this->catHandler = new Category();
 
+        // remove any non-numeric values from the source config
         $this->source = $this->catHandler->getByID(
             $this->getConfig('src') ?
-                $this->getConfig('src') :
+                preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
                 $this->getContext('id')
         );
 

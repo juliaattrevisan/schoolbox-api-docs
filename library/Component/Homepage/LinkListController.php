@@ -38,9 +38,10 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         $this->catHandler = new Category();
         $this->linkHandler = new Link();
 
+        // remove any non-numeric values from the source config
         $this->source = $this->catHandler->getByID(
             $this->getConfig('src') ?
-                $this->getConfig('src') :
+                preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
                 $this->getContext('id')
         );
 
