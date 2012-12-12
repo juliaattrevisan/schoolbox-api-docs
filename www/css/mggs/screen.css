@@ -230,6 +230,9 @@ a{
     background: url(/images/mggs/body-cross.png) -31px 100% no-repeat;
 	padding-bottom: 13px;
 }
+.mggs-login #wrap-inner {
+    background: none;
+}
 #header {
     background: url(/images/mggs/header-cross.png) 303px 12px no-repeat;
     height: 137px;
@@ -337,7 +340,7 @@ a{
     border:none;
     color: #003a6c;
     line-height:12px;
-    width:253px;
+    width:227px;
     font-size:12px;
     height:32px;
     line-height:22px;
@@ -615,11 +618,11 @@ ul.js_happening li:nth-child(odd){
 .calendar-controls .datepicker-box,
 .calendar-controls .forward,
 .calendar-controls .filter-change{
-    background-color: #f3b02e;
+    background-color: #fff;
     border-radius: 3px 3px 0px 0px;
     -webkit-border-radius: 3px 3px 0px 0px;
     -moz-border-radius: 3px 3px 0px 0px;
-    color: #002e52;
+    color: #002e52 !important;
     text-shadow: none;
 }
 
@@ -629,25 +632,17 @@ ul.js_happening li:nth-child(odd){
 .calendar-controls .filter-change:hover,
 .calendar-controls .filter-change.current,
 .calendar-controls .filter-change:hover{
-    background-color: #f5ca15;
+    background-color: #e1e1e1;
 }
 
-.calendar-controls .back{ background-image: url(/images/mggs/cal-left.png); }
+/*.calendar-controls .back{ background-image: url(/images/mggs/cal-left.png); }
 .calendar-controls .forward{ background-image: url(/images/mggs/cal-right.png); }
-
 .calendar-controls .print-it span{ background: url(/images/mggs/print.png); }
 .calendar-controls .print-it{ color: #002e52 !important; }
-
 .calendar-controls .filters{ background-image: url(/images/mggs/filter-list.png) !important; }
-
 .calendar-controls .list span{ background: url(/images/mggs/list.png) no-repeat; background-position: 0px 0px;}
-
 .calendar-controls .filter-change.week span{ background-image: url(/images/mggs/calendar-week.png) !important; }
-
-.calendar-controls .filter-change.month span{ background: url(/images/mggs/calendar-click.png) no-repeat; background-position: 0px 0px !important;}
-
-
-
+.calendar-controls .filter-change.month span{ background: url(/images/mggs/calendar-click.png) no-repeat; background-position: 0px 0px !important;}*/
 
 /*****************************************
 	FOLDERS
