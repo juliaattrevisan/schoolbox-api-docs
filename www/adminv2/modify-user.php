@@ -244,6 +244,10 @@ else {
     $this->setFile(TEMPLATE_content, 'adminv2/new-user.html');
     $this->setTitle('Admin - New User');
 
+    // include the admin navigation
+    $nav = new AdminV2_Nav();
+    $nav->parse($this, 'user');
+
     $this->setVar('DATABASE_TYPE', ucfirst(Cfg::get('external_type')));
 
     /* Output title list */
