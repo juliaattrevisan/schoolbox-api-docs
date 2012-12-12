@@ -16,8 +16,7 @@ versionlist="/tmp/sb_version_list";
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};
 
-conffile="$fullpath/../www/conf/conf.php";
-conffile=`readlink -f $conffile`;
+conffile=`readlink -f $fullpath/../www/conf/conf.php`;
 
 instdir=`readlink -f $fullpath/../`;
 baselength=`echo $instdir/updates/ | wc -m`;
@@ -151,10 +150,10 @@ echo "SQL Updates Completed";
 # In case of update failure, rollback database to original state
 rollback() {
 	# Drop all tables in database before restore (drop database may not be available)
-	for table in `mysql -u $sqluser  -p$sqlpasswd $sqldb -e 'show tables'| grep -v Tables_in`;
+	for table in `mysql -u $sqluser -p$sqlpasswd $sqldb -e 'show tables'| grep -v Tables_in`;
 	do
 		mysql -u $sqluser -p$sqlpasswd $sqldb -e "drop table $table";
-	done;
+	done
 	# Revert database to original
 	mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $backupfile > /dev/null 2>&1;
 	if [ $? -eq 0 ];
