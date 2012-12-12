@@ -69,7 +69,6 @@ if (is_numeric($_REQUEST['cid'])) {
         $newComp->position = 'left';
 
         // check perms
-        $groupHandler = new Group(HOMEPAGE_SERVICE);
         if (($permission = $groupHandler->getPermission($_POST['cid'])) < WRITE_ACCESS) {
             exit;
         }
@@ -92,11 +91,14 @@ if (is_numeric($_REQUEST['cid'])) {
             die("<h2>Error adding component</h2><p>Could not find component to instantiate.</p>");
         }
 
+        $catHandler = new Category;
+        $category = $catHandler->getByID($_POST['cid']);
+
         $templateTarget = "component_position_{$component->instance->position}";
         $templateHandle = "component_{$component->instance->id}";
         $templateHandle = TEMPLATE_content;
 
-        $component->setup(array('id' => $_POST['cid']), array());
+        $component->setup($category, $component->instance->getConfigArray() );
 
         if ($component->execute() !== false) {
             $component->parseConfig();
