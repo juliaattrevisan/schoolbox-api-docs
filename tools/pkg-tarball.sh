@@ -72,7 +72,6 @@ tools/create-data-dirs.sh data
 echo "Building update scripts";
 cd tools
 ./build-sql-update.sh
-sed -i "s/newver=\"x.x.x\"/newver=\"$tag\"/g" update-sql.sh
 
 echo "Building css files from less";
 cd $thistempdir/schoolbox-$tag;
