@@ -1043,6 +1043,43 @@ div.colours p {
 }
 
 // event creation popup
-#createEvent {
+#createEventBubble {
     .popup();
+
+    label {
+        text-align: left;
+        * {
+            position: absolute;
+            right: 20px;
+            width: 280px;
+        }
+        &.note {
+            height: 40px;
+            textarea {
+                height: 30px;
+            }
+        }
+    }
+    form {
+        clear: both;
+    }
+    #createSwitch {
+        li {
+            float: left;
+            padding: 0 3px;
+            &:last-child:before {
+                content: " | ";
+                padding-right: 2px;
+            }
+            a {
+                &.selected {
+                    color: @black;
+                    font-weight: bold;
+                    &:hover {
+                        text-decoration: none;
+                    }
+                }
+            }
+        }
+    }
 }

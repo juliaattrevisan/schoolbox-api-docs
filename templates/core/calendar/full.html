@@ -43,8 +43,9 @@
             bubbleElemCache[val] = $j('#calendarBubble' + val)
         })
 
-        var eventCreateBubble = $j('#createEvent')
-        var calendarBubble = $j('#calendarBubble')
+        var calendarBubble =  $j(bubble.allBubbles[0])
+        var eventCreateBubble = $j(bubble.allBubbles[1])
+        var taskModifyBubble = $j(bubble.allBubbles[2])
         var fullCalendar = $j('#calendar')
 
         eventCreateBubble.hide()
@@ -61,7 +62,7 @@
 				 */
 				if (calEvent.data.attendance.icon.toString() == 'true') {
 					$j(jsEvent).append('<span>(A)</span>')
-					bubbleElemCache.AttendanceIcon.html("This event can be attended.")
+
 				}
 			},
 
@@ -133,6 +134,7 @@
     
                     // Attendance List butonye
                     if (calEvent.data.attendance.listButton.toString() == 'true') {
+                        bubbleElemCache.AttendanceIcon.html("This event can be attended.")
                         bubbleElemCache.AttendanceListButton.html('<a class="btn float-right" href="/calendar/attendance/list/'
                                 + calEvent.data.meta.eventId + '"><span></span>Attendance List</a>')
                     }
@@ -363,49 +365,29 @@
     <div class="middle">
         <div class="close">&times;</div>
         <div class="js-data clearfix">
-            <ul>
+            <ul id="createSwitch">
                 <li><a href='#' id='showCreateEventForm'>Event</a></li>
                 <li><a href='#' id='showCreateTaskForm'>Task</a></li>
             </ul>
             <form id='createEventForm' method='post' action='#'>
                 <h1>Quick Create Event</h1>
                 <input name='date' type='hidden' value='' />
-
-                <span><!-- Date gets shoved in here --></span>
-
-                <label>Event Title
-                    <input name='note' type='text' value='' />
-                </label>
-
-                <label>Event Type
-                    <select name='type'>
-                        <!-- BEGIN event_type -->
-                        <option value='{EVENT_TYPE_ID}' />{EVENT_TYPE_NAME}</option>
-                        <!-- END event_type -->
-                    </select>
-                </label>
-
+                <label>When<span><!-- Date gets shoved in here --></span></label>
+                <label>Event Title<input name='note' type='text' value='' /></label>
+                <label>Event Type<select name='type'>
+                    <!-- BEGIN event_type -->
+                    <option value='{EVENT_TYPE_ID}' />{EVENT_TYPE_NAME}</option>
+                    <!-- END event_type -->
+                </select></label>
                 <input class="btn modify float-right no-icon" type='submit' value='Create Event' />
             </form>
             <form id='createTaskForm' method='post' action='#'>
                 <h1>Quick Create Task</h1>
                 <input name='date' type='hidden' value='' />
                 <input name='type' type='hidden' value='{TASK_TYPE_ID}' />
-
-                <span><!-- Date gets shoved in here --></span>
-
-                <label>Task Title
-                    <input name='note' type='text' value='' />
-                </label>
-
-                <label>Task Description
-                    <input name='detail' type='text' value='' />
-                </label>
-
-                <label>Task Completed?
-                    <input name='completed' type='checkbox' value='' />
-                </label>
-
+                <label>Task<input name='note' type='text' value='' /></label>
+                <label>Due Date<span><!-- Date gets shoved in here --></span></label>
+                <label class="note">Note<textarea name='detail'></textarea></label>
                 <input class="btn modify float-right no-icon" type='submit' value='Create Task' />
             </form>
         </div>
@@ -414,21 +396,14 @@
 </div>
 
 <div id='modifyTaskBubble' style='border: 1px solid #ff0;width:500px;height:200px;float:right;'>
-	<h1>Modify Task -_-</h1>
-
+	<h1>Modify Task</h1>
 	<form id='modifyTaskForm'>
-		<label>Task Title
-			<input id='modifyTaskBubbleNote' type='text' value='' />
-		</label>
-
-		<label>Task Detail
-			<input id='modifyTaskBubbleDetail' type='text' value='' />
-		</label>
-
-		<label>Task Completed?
-			<input id='modifyTaskBubbleCompleted' type='checkbox' value='1' />
-		</label>
-
+		<label>
+            <input id='modifyTaskBubbleCompleted' type='checkbox' value='1' />
+            Task
+            <input id='modifyTaskBubbleNote' type='text' value='' />
+        </label>
+        <label class="note">Note<textarea id='modifyTaskBubbleDetail' name='detail'></textarea></label>
 		<input type='submit' value='Update Task' />
 	</form>
 </div>
