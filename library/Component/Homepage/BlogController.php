@@ -44,9 +44,10 @@ class Component_Homepage_BlogController extends Component_Homepage_ControllerAbs
         $this->blogHandler = new Blog();
         $this->commentHandler = new Comment();
 
+        // remove any non-numeric values from the source config
         $this->source = $this->catHandler->getByID(
             $this->getConfig('src') ?
-                $this->getConfig('src') :
+                preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
                 $this->getContext('id')
         );
 

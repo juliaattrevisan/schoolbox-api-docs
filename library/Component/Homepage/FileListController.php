@@ -45,9 +45,10 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         $this->fileHandler = new File();
         $this->allowedFileHandler = new AllowedFile();
 
+        // remove any non-numeric values from the source config
         $this->source = $this->catHandler->getByID(
             $this->getConfig('src') ?
-                $this->getConfig('src') :
+                preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')) :
                 $this->getContext('id')
         );
 
@@ -94,7 +95,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         $this->setBlock('files', 'file_url', 'file_url_block');
         $this->setBlock('files', 'file_no_url', 'file_no_url_block');
         $this->setBlock('files', 'modify_file', 'modify_file_block');
-        //print_r($filter);
+
         $fileList = $this->fileHandler->getAllInCategory($this->source['id'], array(
             'size' => $this->getConfig('size'),
             'filter' => $filter,
