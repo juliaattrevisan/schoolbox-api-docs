@@ -41,17 +41,6 @@ class DueWork_Rubric_Lightbox {
 
         $rubric = $this->rubricHandler->getRubric($submissionBoxID);
 
-        $rType = self::RUBRIC_UNKNOWN;
-        if($rubric instanceof DueWork_Rubric_ResultSetRubric) {
-            $rType = self::RUBRIC_RESULTSET;
-        }
-        elseif($rubric instanceof DueWork_Rubric_DescriptorRubric) {
-            $rType = self::RUBRIC_DESCRIPTOR;
-        }
-        else {
-            return;
-        }
-
         $rubricMark = new DueWork_Rubric_Mark($rubric);
         $rubricMark->populateMarks($studentID);
 
@@ -65,46 +54,56 @@ class DueWork_Rubric_Lightbox {
             $legs[] = array('label' => $data['criteria'][$i]['label']);
         }
 
-        $page->setBlock($templateHandle, 'rubric_grouping', 'rubric_grouping_block');
-        $page->setBlock('rubric_grouping', 'rubric_crit', 'rubric_crit_block');
-        $page->setBlock('rubric_crit', 'rubric_crit_descriptor', 'rubric_crit_descriptor_block');
-        $page->setBlock('rubric_crit', 'rubric_crit_resultset', 'rubric_crit_resultset_block');
+        $page->setBlock($templateHandle, 'rubric_rating', 'rubric_rating_block');
+        $page->setBlock($templateHandle, 'rubric_crit', 'rubric_crit_block');
+        $page->setBlock('rubric_crit', 'rubric_crit_rating', 'rubric_crit_rating_block');
+        $page->setBlock('rubric_crit', 'rubric_grouping', 'rubric_grouping_block');
+
+        $colCount = count($data['criteria'][0]['results']);
+
+        for($i = 0; $i < $colCount; ++$i) {
+            $page->parse('rubric_rating_block', 'rubric_rating', true);
+        }
 
         for($i = 0; $i < count($data['criteria']); ++$i) {
-            // display a grouping
-            if($data['criteria'][$i]['group'] != $data['criteria'][$i - 1]['group']) {
-                if($i != 0) {
-                    $page->parse('rubric_grouping_block','rubric_grouping', true);
-                    $page->setVar('rubric_crit_block', '');
-                }
+            // display a grouping row
+            if($i == 0 || $data['criteria'][$i]['group'] != $data['criteria'][$i - 1]['group']) {
                 $page->setVar(array(
+                    'RUBRIC_GROUP_SPAN' => $colCount + 1,
                     'RUBRIC_GROUP_LABEL' => $data['criteria'][$i]['group']
                 ));
+                $page->parse('rubric_grouping_block','rubric_grouping', false);
+            }
+            else {
+                $page->setVar('rubric_grouping_block', '');
             }
 
             $page->setVar(array(
-                'RUBRIC_CRIT_LABEL'        => $data['criteria'][$i]['label'],
-                'RUBRIC_CRIT_RATING_LABEL' => $data['criteria'][$i]['results'][$data['criteria'][$i]['value']]
+                'rubric_crit_rating_block' => '',
+                'RUBRIC_CRIT_LABEL' => $data['criteria'][$i]['label'],
+                'RUBRIC_CRIT_NAME' => preg_replace("#[^a-z0-9\-]#is", '', strtolower($data['criteria'][$i]['label'])),
+                'RUBRIC_CRIT_INDEX' => $i,
+                'RUBRIC_CRIT_ID' => $data['criteria'][$i]['id']
             ));
 
-            if($rType == self::RUBRIC_DESCRIPTOR) {
-                $page->parse('rubric_crit_descriptor_block', 'rubric_crit_descriptor');
-                $page->setVar('rubric_crit_resultset_block', '');
+            for($j = 0; $j < count($data['criteria'][0]['results']); ++$j) {
+                $page->setVar(array(
+                    'RUBRIC_CRIT_RATING_LABEL' => $data['criteria'][$i]['results'][$j],
+                    'RUBRIC_CRIT_RATING_VALUE' => $j,
+                    'RUBRIC_CRIT_RATING_CLASS' => 'lol',
+                    'RUBRIC_CRIT_RATING_SELECTED' => $data['criteria'][$i]['value'] == $j ? 'checked="checked"' : '',
+                ));
+                $page->parse('rubric_crit_rating_block', 'rubric_crit_rating', true);
             }
-            else {
-                $page->parse('rubric_crit_resultset_block', 'rubric_crit_resultset');
-                $page->setVar('rubric_crit_descriptor_block', '');
-            }
-            $page->parse('rubric_crit_block', 'rubric_crit', true);
 
+            $page->parse('rubric_crit_block', 'rubric_crit', true);
         }
-        $page->parse('rubric_grouping_block', 'rubric_grouping', true);
 
         // calculate scores
         $sum = 0;
         $max = 0;
         for($i = 0; $i < count($data['criteria']); ++$i) {
-            $sum += $data['criteria'][$i]['value'];
+            $sum += $data['criteria'][$i]['value'] > 0 ? $data['criteria'][$i]['value'] : 0;
             $max += count($data['criteria'][0]['results']) - 1;
         }
 

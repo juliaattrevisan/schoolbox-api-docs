@@ -1,30 +1,41 @@
 <div id="rubric-window">
-    <ul>
-        <li>
-        <!-- BEGIN rubric_grouping -->
-            <h3>{RUBRIC_GROUP_LABEL}</h3>
-            <ul>
-            <!-- BEGIN rubric_crit -->
-                <!-- BEGIN rubric_crit_descriptor -->
-                <li class="descriptor">{RUBRIC_CRIT_RATING_LABEL}</li>
-                <!-- END rubric_crit_descriptor -->
-                <!-- BEGIN rubric_crit_resultset -->
-                <li class="resultset">
-                    <h5>{RUBRIC_CRIT_LABEL}</h5>
-                    <h5>{RUBRIC_CRIT_RATING_LABEL}</h5>
-                    <div class="clearfix"></div>
-                </li>
-                <!-- END rubric_crit_resultset -->
-            <!-- END rubric_crit -->
-            </ul>
-        <!-- END rubric_grouping -->
-        </li>
-    </ul>
 
-    <div class="rubric-grade">
-        <span id="sum">{RUBRIC_GRADE_SUM}</span> / <span id="max">{RUBRIC_GRADE_MAX}</span>
+    <table class="rubric">
+        <colgroup>
+            <col class="criterion-label" />
+            <!-- BEGIN rubric_rating -->
+            <col />
+            <!-- END rubric_rating -->
+        </colgroup>
+        <tbody id="rubric-tbody">
+        <!-- BEGIN rubric_crit -->
+        <!-- BEGIN rubric_grouping -->
+        <tr>
+            <td class="criterion-label pad span" colspan="{RUBRIC_GROUP_SPAN}">{RUBRIC_GROUP_LABEL}</td>
+        </tr>
+        <!-- END rubric_grouping -->
+        <tr>
+            <td class="criterion-label pad">{RUBRIC_CRIT_LABEL}</td>
+            <!-- BEGIN rubric_crit_rating -->
+            <td class="criterion-value {RUBRIC_CRIT_RATING_CLASS}">
+                <input id="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_RATING_VALUE}" class="rubric-input" type="radio"
+                       name="rubric[{RUBRIC_CRIT_ID}]" data-index="{RUBRIC_CRIT_INDEX}" disabled="disabled"
+                       value="{RUBRIC_CRIT_RATING_VALUE}" {RUBRIC_CRIT_RATING_SELECTED} />
+                <label for="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_RATING_VALUE}">
+                    <span>{RUBRIC_CRIT_RATING_LABEL}</span>
+                </label>
+            </td>
+            <!-- END rubric_crit_rating -->
+        </tr>
+        <!-- END rubric_crit -->
+        </tbody>
+    </table>
+    <div class="rubric-display">
+        <div class="rubric-grade">
+            <span id="sum">{RUBRIC_GRADE_SUM}</span> / <span id="max">{RUBRIC_GRADE_MAX}</span>
+        </div>
+        <div id="rubric-chart"></div>
     </div>
-    <div id="rubric-chart"></div>
 
 
     <a href="#" id="closebox" class="submit-btn-plain"><span></span>Close</a>
@@ -43,5 +54,15 @@
         $j(document).ready(function() {
             plot.draw();
         });
-    });
+
+        $j(document).ready(function() {
+            var radios = $j('#rubric-tbody :radio');
+            radios.removeClass('focused').next().removeClass('focused');
+            $j('#rubric-tbody :checked').each(function() {
+                var self = $j(this);
+                self.addClass('focused').next().addClass('focused');
+                self.closest('tr').children('.warning').first().children('div').css('visibility', 'hidden');
+            })
+        })
+    })
 </script>
