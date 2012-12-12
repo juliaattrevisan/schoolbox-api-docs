@@ -1,8 +1,9 @@
 #!/bin/bash
-# SQL Database Update Script
+# SQL Update Script
 # Description:
 #       Updates the database schema and values to match the installed version
-#       Completes all the sql updates between the current and new versions
+#       Completes all the updates between the current and new versions
+#       For each update release, the sql scripts are run first, then the php scripts
 #
 # @author      Sam Bailey <sam.bailey@alaress.com.au>
 # @copyright   2012 Alaress Pty Ltd
@@ -10,30 +11,31 @@
 #
 #
 
-# newver (new version) to be updated during packaging
-newver="x.x.x";
+versionlist="/tmp/sb_version_list";
 
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};
 
-conffile="$fullpath/../www/conf/conf.php";
-conffile=`readlink -f $conffile`;
+conffile=`readlink -f $fullpath/../www/conf/conf.php`;
 
 instdir=`readlink -f $fullpath/../`;
+baselength=`echo $instdir/updates/ | wc -m`;
 package=${instdir##*/};
 
-sqlfile=$instdir"/updates/sql_updates.sql";
-tmpfile="/tmp/$package_sql_updates_`date -I`.sql";
 backupdir="/var/lib/$package";
 backupfile="$backupdir/`date +%Y-%m-%d_%H-%M-%S`.sql";
 
+curdir=`pwd`;
+
 echo "Starting SQL update process";
 
-if [ $newver == "x.x.x" ];
-then
-	echo "Please specify the new sql version in "`readlink -f $0`;
-	exit;
-fi
+# Build update version list
+rm -f $versionlist;
+for release in `echo "12.0.5";find $instdir/updates -maxdepth 1 -type d | sort -V | cut -c$baselength-1000`;
+do
+	echo $release >> $versionlist;
+	newver=$release;
+done
 
 if [ ! -f $conffile ];
 then
@@ -44,23 +46,16 @@ fi
 
 echo "Using db credentials from: "`readlink -f $conffile`;
 
-if [ ! -f $sqlfile ];
-then
-	echo "SQL update file ($sqlfile) missing";
-	echo "No SQL updates performed";
-	exit;
-fi
-
 # Collect Credentials
-sqluser=`grep "\"SQL_user" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`
-sqlpasswd=`grep "\"SQL_passwd" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`
-sqlhost=`grep "\"SQL_host" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`
-sqldb=`grep "\"SQL_db" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`
+sqluser=`grep "\"SQL_user" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
+sqlpasswd=`grep "\"SQL_passwd" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
+sqlhost=`grep "\"SQL_host" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
+sqldb=`grep "\"SQL_db" $conffile | grep -v "#" | grep -v "\/\/" | cut -d'"' -f4`;
 
 echo "Checking for SQL updates";
 
 # Collect current SQL version
-sqlver=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='site_version' \G;" | grep 'value' | cut -d' ' -f2`
+sqlver=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='site_version' \G;" | grep 'value' | cut -d' ' -f2`;
 
 if [ -z $sqlver ];
 then
@@ -71,55 +66,101 @@ fi
 echo "Current SQL Version: "$sqlver;
 echo "New SQL Version: "$newver;
 
-if [ $sqlver = $newver ];
+start=`grep -n "$sqlver" $versionlist | cut -d':' -f1`;
+end=`grep -n "$newver" $versionlist | cut -d':' -f1`;
+
+if [ -z $start ];
 then
-	echo "No SQL updates required";
-else 
-	start=`grep -n "\-\-\ End\ of\ Release\ $sqlver" $sqlfile | cut -d':' -f1`;
-	end=`grep -n "\-\-\ End\ of\ Release\ $newver" $sqlfile | cut -d':' -f1`;
-	
-	if [ -z $start ];
-	then
-		echo "SQL version greater than update, no changes made";
-		exit;
-	fi
-	
-	if [ $start -gt $end ];
-	then
-		echo "SQL version greater than update, no changes made";
-		exit;
-	fi
-	
-	echo "Backing up database before changes";
-	mkdir -p $backupdir;
-	mysqldump --allow-keywords -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile;
-	
-	sed -n "$start","$end"p $sqlfile | sed -n '/\-\-\ End\ of\ Release/!p' > $tmpfile;
-	mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $tmpfile;
-	
-	if [ $? -eq 0 ];
-	then
-		echo "SQL updated to version $newver";
-	else
-		# Drop all tables in database before restore (drop database may not be available)
-		for table in `mysql -u $sqluser  -p$sqlpasswd $sqldb -e 'show tables'| grep -v Tables_in`;
-		do
-			mysql -u $sqluser -p$sqlpasswd $sqldb -e "drop table $table";
-		done;
-		# Revert database to original
-		mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $backupfile > /dev/null 2>&1;
-		if [ $? -eq 0 ];
-		then
-			echo "Database returned to original pre-update state.";
-		fi
-		echo "SQL update failed. Please attempt a manual update.";
-		echo "A backup of the original database is located at: $backupfile";
-	fi
-	
-	# Cleanup tmpfile and backup
-	if [ -f $tmpfile ];
-	then
-		rm -f $tmpfile;
-	fi
+	echo "SQL version not supported for update, no changes made";
+	exit;
 fi
 
+if [ -z $end ];
+then
+	echo "SQL version greater than update, no changes made";
+	exit;
+fi
+
+if [ $start -gt $end ];
+then
+	echo "SQL version greater than update, no changes made";
+	exit;
+fi
+
+echo "Backing up database before changes";
+mkdir -p $backupdir;
+mysqldump --allow-keywords -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile 2>&1;
+
+echo "Updating database to new version";
+# Run update scripts in release order, SQL first then PHP for each release
+for release in `sed -n "$start","$end"p $versionlist`;
+do
+	# Don't run update if already at that release version
+	if [ $release != $sqlver ];
+	then
+		# Only run release upgrade if the scripts_list actually exists
+		if [ -f $instdir/updates/$release/scripts_list ];
+		then
+			# Run SQL update scripts for this release
+			for sqlscript in `grep "\.sql" $instdir/updates/$release/scripts_list`
+			do
+				script="$instdir/updates/$release/$sqlscript";
+				# Check script listed in scripts_list actually exists
+				if [ -f $script ];
+				then
+					mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $script 2>&1;
+					# Check for and report errors
+					if [ $? -ne 0 ];
+					then
+						echo "Error running update: $script";
+						rollback();
+					fi
+				fi
+			done
+			
+			# Run PHP update scripts for this release
+			for phpscript in `grep "\.php" $instdir/updates/$release/scripts_list`
+			do
+				script="$instdir/updates/$release/$phpscript";
+				# Check script listed in scripts_list actually exists
+				if [ -f $script ];
+				then
+					scriptpath=${script%/*};
+					cd $scriptpath;
+					php -f $phpscript 2>&1;
+					# Check for and report errors
+					if [ $? -ne 0 ];
+					then
+						cd $curdir;
+						echo "Error running update: $script";
+						rollback();
+					fi
+					cd $curdir;
+				fi
+			done
+			
+			# Update the config table to show current release version
+			mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb -e "UPDATE \`config\` SET value='$release' WHERE name='site_version';";
+		fi
+	fi
+done
+
+echo "SQL Updates Completed";
+
+# In case of update failure, rollback database to original state
+rollback() {
+	# Drop all tables in database before restore (drop database may not be available)
+	for table in `mysql -u $sqluser -p$sqlpasswd $sqldb -e 'show tables'| grep -v Tables_in`;
+	do
+		mysql -u $sqluser -p$sqlpasswd $sqldb -e "drop table $table";
+	done
+	# Revert database to original
+	mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $backupfile > /dev/null 2>&1;
+	if [ $? -eq 0 ];
+	then
+		echo "Database returned to original pre-update state.";
+	fi
+	echo "SQL update failed. Please attempt a manual update.";
+	echo "A backup of the original database is located at: $backupfile";
+	exit;
+}
