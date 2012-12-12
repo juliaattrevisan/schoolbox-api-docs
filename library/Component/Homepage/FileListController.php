@@ -96,8 +96,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         $this->setBlock('files', 'file_no_url', 'file_no_url_block');
         $this->setBlock('files', 'modify_file', 'modify_file_block');
 
-        print_r($this->source);
-
         $fileList = $this->fileHandler->getAllInCategory($this->source['id'], array(
             'size' => $this->getConfig('size'),
             'filter' => $filter,
