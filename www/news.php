@@ -53,6 +53,7 @@ if (($permission = $groupHandler->getPermission(0)) >= WRITE_ACCESS) {
 $topicList = $newsHandler->getTopicList();
 array_unshift($topicList, array('name' => 'All'));
 
+$topicSlugMap = array();
 // output the list of topics for the sidebar
 foreach ($topicList as $sidebarTopic) {
     $url = new Url($sidebarTopic['name']);
@@ -62,10 +63,14 @@ foreach ($topicList as $sidebarTopic) {
         'LIST_TOPIC_SELECTED' => $selectedTopic == $url->getSlug() ? 'selected' : '',
     );
     $this->setVar($output);
+    $topicSlugMap[$url->getSlug()] = $sidebarTopic['name'];
     $this->parse('topic_list_block', 'topic_list', true);
 }
 
-$visibleListSubset = $newsHandler->getNewsListing(false, $selectedTopic);
+// forcibly remap 'all' to blank
+$topicSlugMap['all'] = '';
+
+$visibleListSubset = $newsHandler->getNewsListing(false, $topicSlugMap[$selectedTopic]);
 
 // setup pagination for display
 $newsPerPage = Cfg::get('search_type_limit');
@@ -113,7 +118,9 @@ $outputPagination = array(
 
 $this->setVar($outputPagination);
 
-$items = $newsHandler->getNewsListing(false, $selectedTopic, 0, 0, $newsIndex, $newsPerPage, true);
+$items = $newsHandler->getNewsListing(false, $topicSlugMap[$selectedTopic], 0, 0, $newsIndex, $newsPerPage, true);
+
+$this->setVar('TOPIC_CLEAN', $selectedTopic);
 
 if (is_array($items)) {
     $i = 0;
@@ -144,10 +151,8 @@ if (is_array($items)) {
                 'NEWS_SHORT' => TextFormatter::cutSentence(Scrub::html2text($article['item_body']), 300),
                 'NEWS_IMAGE' => $article['item_image'],
                 'TOPIC_NAME' => Scrub::text($previous['topicName']),
-                'TOPIC_CLEAN' => $filter['archive'] . $url->getSlug(),
                 'ON_OFF'         => ++$j % 2 ? 'dark' : ''
             );
-
             $this->setVar($output);
 
             if ($article['item_image']) {
@@ -161,6 +166,6 @@ if (is_array($items)) {
         }
     }
 } else {
-    $this->setVar('news_block', '');
+    $this->setVar('news_block', 'No current news in this topic.');
 }
 
