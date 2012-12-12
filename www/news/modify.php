@@ -110,11 +110,13 @@ if (is_numeric($this->arg[0])) {
 else {
 	$this->setFile(TEMPLATE_content, 'news/modify.html');
 	$this->setBlock(TEMPLATE_content, 'campus_row', 'campus_row_block');
+    $this->setBlock(TEMPLATE_content, 'image', 'image_block');
 	$this->setBlock(TEMPLATE_content, 'current_users', 'current_users_block');
 	$this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
 	$this->setTitle('Add News');
 	$this->setTab('news');
+
 
     $pubTime = time();
     $expTime = strtotime(Cfg::get('news_default_expiry'));
@@ -152,7 +154,10 @@ else {
 		$this->setVar('campus_row_block', '');
 	}
 
+    $this->setVar('image_block','');
+    
 	$this->setVar('delete_button_block', '');
+
 
     // set the advanced options to be hidden by default since there can't be any data in there
     $this->setVar(array('SHOW_ADVANCED' => '',
