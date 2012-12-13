@@ -66,6 +66,12 @@ fi
 echo "Current SQL Version: "$sqlver;
 echo "New SQL Version: "$newver;
 
+if [ $sqlver == $newver ];
+then
+	echo "No updates required";
+	exit;
+fi
+
 start=`grep -n "$sqlver" $versionlist | cut -d':' -f1`;
 end=`grep -n "$newver" $versionlist | cut -d':' -f1`;
 
@@ -113,7 +119,7 @@ do
 					if [ $? -ne 0 ];
 					then
 						echo "Error running update: $script";
-						rollback();
+						rollback;
 					fi
 				fi
 			done
@@ -133,7 +139,7 @@ do
 					then
 						cd $curdir;
 						echo "Error running update: $script";
-						rollback();
+						rollback;
 					fi
 					cd $curdir;
 				fi
