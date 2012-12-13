@@ -938,3 +938,215 @@ div.colours p {
         border-bottom: none;
     }
 }
+
+
+/**********************
+  FULL CALENDAR
+***********************/
+
+// styles common to popup divs
+.popup() {
+//    border: solid 1px #3f9;
+//    min-height: 200px;
+//    background: #fff;
+    display: none;
+    left: 500px;
+//    width: 500px;
+    position: absolute;
+    z-index: 140;
+    h1 {
+        display: none;
+        visibility: hidden;
+    }
+    h3 {
+        margin-bottom: 4px;
+    }
+    h3, h4, dt {
+        text-align: left;
+    }
+    dt, dd {
+        font-size: 13px;
+        padding: 0 10px;
+        &.rm {
+            display: none;
+            visibility: hidden;
+        }
+    }
+    dd {
+        margin-bottom: 4px;
+    }
+    .post-by {
+        font-style: italic;
+        text-align: left;
+    }
+    div.close {
+        width: 20px;
+        font-size: 24px;
+        line-height: 20px;
+    }
+}
+
+// event detail popup
+#calendarBubble {
+    .popup();
+
+    #calendarBubbleClose {
+        position: absolute;
+        top: 3px;
+        right: 10px;
+        font-size: 20px;
+        color: #555;
+    }
+    #calendarBubbleAttendanceIcon {
+        color: #333;
+        margin: 0;
+        padding-right: 20px;
+    }
+    .title {
+        margin: 0;
+        padding: 10px;
+        h1 {
+            margin: 0;
+        }
+    }
+    .datetime {
+        clear: both;
+        padding: 0 10px 10px 10px;
+        h4 {
+            margin-bottom: 0;
+            width: auto;
+        }
+        p {
+            padding: 0;
+            margin: 0;
+        }
+    }
+    .actions {
+        position: relative;
+        top: -3px;
+        dd {
+            float: right;
+        }
+    }
+    .attendance {
+        height: 18px;
+        dd {
+            width: 100%;
+            p {
+                text-align: right;
+            }
+        }
+    }
+    div {
+        width:100%;
+        display:block;
+        clear:both;
+    }
+    dd {
+        float: none;
+    }
+}
+
+// event creation popup
+#createEventBubble {
+    .popup();
+
+    label {
+        text-align: left;
+        * {
+            position: absolute;
+            right: 20px;
+            width: 280px;
+        }
+        &.note {
+            height: 40px;
+            textarea {
+                height: 30px;
+            }
+        }
+    }
+    form {
+        clear: both;
+    }
+    #createSwitch {
+        height: 30px;
+        li {
+            float: left;
+            padding: 0 3px;
+            &:last-child:before {
+                content: " | ";
+                padding-right: 2px;
+            }
+            a {
+                &.selected {
+                    color: @black;
+                    font-weight: bold;
+                    &:hover {
+                        text-decoration: none;
+                    }
+                }
+            }
+        }
+    }
+    #edit-full {
+        float: right;
+        height: 30px;
+        line-height: 30px;
+        display: block;
+        margin-left: 10px;
+    }
+}
+#modifyTaskBubble {
+    .popup();
+}
+
+// overrides for the fullcalendar stylings so that it looks like the previous SB calendar implementation
+#calendar {
+    margin: 0 auto;
+    &.fc {
+        table {
+            font-size: 13px;
+        }
+    }
+    .fc-button-content {
+        height: 1.5em;
+        line-height: 1.5em;
+        text-transform: capitalize;
+    }
+    .fc-grid {
+        th, td {
+            text-align: left;
+        }
+        .fc-day-number {
+            float: left;
+            padding: 2px 5px;
+            font-size: 0.9em;
+        }
+    }
+    .fc-header {
+        background: #0066B0;
+    }
+    .fc-header .fc-button {
+        margin: 5px 3px;
+    }
+    .fc-header-left {
+        padding-left: 3px;
+    }
+    .fc-header-right {
+        padding-right: 3px;
+    }
+    .fc-event {
+        font-size: 1em;
+    }
+    .fc-event-skin {
+        color: @black;
+    }
+    .fc-widget-header {
+        font-weight: bold;
+        color: black;
+        border-right: 1px solid #EEE;
+        border-bottom: 1px solid #D5D5D5;
+        padding: 7px 5px;
+        background: @dark;
+    }
+}
