@@ -133,6 +133,7 @@ do
 				then
 					scriptpath=${script%/*};
 					cd $scriptpath;
+					phpscript=${phpscript##*/};
 					php -f $phpscript 2>&1;
 					# Check for and report errors
 					if [ $? -ne 0 ];
