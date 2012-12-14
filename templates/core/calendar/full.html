@@ -11,7 +11,90 @@
     var eventBubbleElemCache = {}
     var taskBubbleElemCache = {}
 
-	bubble = {
+    var filters = {
+
+        interaction: function() {
+
+            var filterBtn = $j('#calendar td.fc-header-right span.filters')
+
+            $j('#fc-button-filter').click(function(){
+                $j('.filter-drop').toggle()
+                $j('.cal-bubble').hide()
+                filterBtn.toggleClass('engaged')
+                return false
+            })
+
+            //run the filter checker to show and hide the items
+            $j('.applyFilters').click(function() {
+                filters.organise(["campus", "groups"])
+            })
+
+            $j('#applyFilters').click(function() {
+                filters.organise(["campus", "groups"])
+                $j('.filter-drop').hide()
+                filterBtn.removeClass('engaged')
+                return false
+            })
+
+            $j("body").click(function() {
+                $j('.filter-drop').hide()
+                filterBtn.removeClass('engaged')
+            })
+
+            $j('.filter-drop').click(function(e) {
+                e.stopPropagation()
+            })
+
+            filters.organise(["campus", "groups"])
+        },
+
+        organise: function(filterArray) {
+            var flist = {};
+
+            for (var i = 0; i < filterArray.length; i++) {
+
+                var k = 0;
+                flist[i] = [filterArray[i], {}];
+
+                $j('.filter-list .' + filterArray[i] + ' input').each(function() {
+                    var n = $j(this).attr('value');
+                    // show related entries
+                    if(this.checked) {
+                        flist[i][1][k++] = n;
+                        $j('#calendar div.fc-event.' + n).show();
+                    }
+                    // hide related entries
+                    else {
+                        if ($j('#calendar div.fc-event.' + n).is(':visible')) {
+                            $j('#calendar div.fc-event.' + n).hide();
+                        }
+                    }
+                });
+            }
+
+            k = 0;
+            flist[filterArray.length] = ['events', {}];
+
+            $j('.filter-list .events input').each(function() {
+                var n = $j(this).attr('value');
+                // show related entries
+                if(this.checked) {
+                    flist[i][1][k++] = n;
+                    $j('#calendar div.fc-event.personal.' + n).show();
+                }
+                // hide related entries
+                else {
+                    if ($j('#calendar div.fc-event.' + n).is(':visible')) {
+                        $j('#calendar div.fc-event.' + n).hide();
+                    }
+                }
+            });
+
+            $j.post('/ajax/calendarFilter.php', {fList : flist});
+        }
+    }
+
+    bubble = {
 		allBubbles: ['#calendarBubble',  '#createEventBubble', '#modifyTaskBubble'],
 
 		/**
@@ -109,10 +192,15 @@
 			 */
 			eventRender: function(calEvent, jsEvent, view) {
 
-				/* Indicate this event can be attended
-				 */
+				// Indicate this event can be attended
+                var span = '<span class="att">(A)</span>';
 				if (calEvent.data.attendance.icon.toString() == 'true') {
-					$j(jsEvent).append('<span>(A)</span>')
+                    if((content = jsEvent.find('.fc-event-content')).length == 1) {
+                        content.append(span)
+                    }
+                    else {
+                        jsEvent.find('.fc-event-inner').append(span)
+                    }
 
 				}
 			},
@@ -394,7 +482,32 @@
             eventCreateBubble.hide()
             calendarBubble.hide()
         })
-	});
+
+        // mash the filters in
+        var headerRight = fullCalendar.find('td.fc-header-right')
+        headerRight.prepend(headerRight.children('.fc-button')
+                .first().clone().removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
+                .addClass('fc-button-filter').attr('id','fc-button-filter')
+        )
+
+        $j('#fc-button-filter').find('.fc-button-content').html('filters')
+
+        // and now make all the buttons on the header look the way they're meant to
+        var header = fullCalendar.children('.fc-header')
+        header.addClass('calendar-controls')
+        header.find('span.fc-button').each(function() {
+            var self = $j(this)
+            var text = self.find('span.fc-button-content').html()
+            self.addClass('filter-change '+text).html('<span></span>'+text)
+
+        })
+
+        // once the document has loaded, set the listeners
+        $j(window).load(function() {
+            filters.interaction()
+        })
+
+	})
 </script>
 <!-- END custom_head -->
 
@@ -470,6 +583,48 @@
             </div>
         </div>
         <div class="bottom"><strong></strong></div>
+    </div>
+</div>
+<div class="calendar-controls no-height clearfix">
+    <div class="link-case">
+        <div class="filter-drop clearfix">
+            <div class="filter-list">
+                <form class="clearfix">
+                    <div class="filter-cat groups clearfix"><span class="filter-title">Groups</span>
+                        <!-- BEGIN filter_group -->
+                        <label title="{GROUP_NAME}">
+                            <input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}"
+                            {GROUP_ID_SELECTED} class="checkbox applyFilters"/>
+                            {GROUP_NAME} </label>
+
+                        <!-- END filter_group -->
+                    </div>
+                    <div class="filter-cat campus"><span class="filter-title">Campus</span>
+                        <!-- BEGIN filter_campus -->
+                        <label title="{CAMPUS_NAME}">
+                            <input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}
+                            value="campus{CAMPUS_ID}" class="checkbox applyFilters"/>
+                            {CAMPUS_NAME} </label>
+
+                        <!-- END filter_campus -->
+                    </div>
+                    <div class="filter-cat events last"><span class="filter-title">Event</span>
+                        <!-- BEGIN filter_event_type -->
+                        <label title="{EVENT_TYPE_NAME}">
+                            <input type="checkbox" name="events" id="{EVENT_TYPE_ID}" {EVENT_TYPE_ID_SELECTED}
+                            value="type{EVENT_TYPE_ID}" class="checkbox applyFilters"/>
+                            <span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span>
+                        </label>
+                        <!-- END filter_event_type -->
+
+                    </div>
+                    <!--/filter-list-->
+                </form>
+                <p class="clearfix"><a href="#" id="applyFilters" class="btn float-right"><span></span>Apply
+                    Filters</a></p>
+                <!--/filter-drop-->
+            </div>
+        </div>
     </div>
 </div>
 <div id="calendar"></div>
