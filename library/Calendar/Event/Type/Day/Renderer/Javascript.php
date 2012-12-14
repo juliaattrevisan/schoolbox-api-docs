@@ -139,6 +139,7 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 						'author' => Scrub::text($currentEvent->getAuthorName()),
 						'authorId' => $currentEvent->getAuthorId(),
 						'level' => $currentEvent->getDerivedEventLevel(),
+						'completed' => $currentEvent->getCompleted(),
 					),
 					'links' => array(
 						'category' => array(

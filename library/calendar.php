@@ -634,7 +634,8 @@ class Calendar extends DeprecatedModel {
 				user.id as uid, title, firstname, lastname,
 				eventType, eventColour,
 				event.publish_date,
-				category.id AS categoryId, category.name AS categoryName
+				category.id AS categoryId, category.name AS categoryName,
+				event.completed
 			FROM event
 			LEFT JOIN user ON owner = user.id
 			LEFT JOIN luEventType ON type = eventTypeID
@@ -690,6 +691,7 @@ class Calendar extends DeprecatedModel {
                     $event->setCategoryname($currentEvent['categoryName']);
                 }
                 $event->setAttendance($currentEvent['attendance']);
+				$event->setCompleted($currentEvent['completed']);
 
                 $stack->add($event);
             }

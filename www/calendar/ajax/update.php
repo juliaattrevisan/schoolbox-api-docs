@@ -13,7 +13,7 @@ $calendarHandler = new Calendar();
 $page = new SitePage();
 
 $event = $calendarHandler->getByID($_POST['eventId']);
-print_r($event);
+
 /* If you are resizing an event in the week view the new start
  * and end times are expressed as a date string
  */
@@ -54,21 +54,19 @@ $updatedEvent['id'] = $event['id'];
 $updatedEvent['date'] = $startTime->getDatabaseDate();
 $updatedEvent['startTime'] = $startTime->getDatabaseTime();
 $updatedEvent['endTime'] = $endTime->getDatabaseTime();
-$updatedEvent['groupList'] = $calendarHandler->getEventGroup($event['id']);
-$updatedEvent['campusList'] = $calendarHandler->getEventCampus($event['id']);
 
 /* For tasks
  */
-if (isset($_POST['note'])) {
+if (isset($_POST['note']) && isset($_POST['detail'])) {
 	$updatedEvent['note'] = $_POST['note'];
-}
-
-if (isset($_POST['detail'])) {
 	$updatedEvent['detail'] = $_POST['detail'];
-}
-
-if (isset($_POST['completed'])) {
 	$updatedEvent['completed'] = $_POST['completed'];
+}
+/* Otherwise maintain groupList and campusList for non-tasks
+ */
+else {
+	$updatedEvent['groupList'] = $calendarHandler->getEventGroup($event['id']);
+	$updatedEvent['campusList'] = $calendarHandler->getEventCampus($event['id']);
 }
 
 $calendarHandler->update($updatedEvent);

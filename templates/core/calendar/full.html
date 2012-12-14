@@ -194,6 +194,7 @@
 
 				// Indicate this event can be attended
                 var span = '<span class="att">(A)</span>';
+
 				if (calEvent.data.attendance.icon.toString() == 'true') {
                     if((content = jsEvent.find('.fc-event-content')).length == 1) {
                         content.append(span)
@@ -201,7 +202,17 @@
                     else {
                         jsEvent.find('.fc-event-inner').append(span)
                     }
+				}
 
+				/* If this event is a task, alter the state of the checkbox accordingly
+				 */
+				if (calEvent.data.meta.eventTypeId == '{TASK_TYPE_ID}') {
+					if (calEvent.data.meta.completed == '1') {
+						taskModifyBubble.find('input[name=completed]').prop('checked', true);
+					}
+					else {
+						taskModifyBubble.find('input[name=completed]').prop('checked', false);
+					}
 				}
 			},
 
@@ -209,7 +220,6 @@
              * When you click on an event in the calendar, populate the bubble
 			 */
 			eventClick: function(calEvent, jsEvent, view) {
-
                 eventCreateBubble.hide()
 
 				// Burst bubble
@@ -219,19 +229,28 @@
 
                     /* Prefill with task info
                      */
-                    taskBubbleElems.Note.val(calEvent.title);
-                    taskBubbleElems.Detail.val(calEvent.data.meta.detail);
+					taskModifyBubble.find('input[name=note]').val(calEvent.title);
+					taskModifyBubble.find('textarea[name=detail]').val(calEvent.data.meta.detail);
 
                     /* Show special modify dialog -_-
                      */
                     taskModifyBubble.show();
 
                     $j('#modifyTaskForm').submit(function() {
+
+						/* Checkbox state
+						 */
+						var completedChecked = 0;
+
+						if ($j('#modifyTaskBubbleCompleted').prop('checked')) {
+							var completedChecked = 1;
+						}
+
                         var data = {
                             eventId: calEvent.data.meta.eventId,
                             note: $j('#modifyTaskBubbleNote').val(),
                             detail: $j('#modifyTaskBubbleDetail').val(),
-                            completed: $j('#modifyTaskBubbleCompleted').checked
+                            completed: completedChecked
                         };
 
                         $j.post('/calendar/ajax/update.php', data, function(responseText) {
@@ -433,13 +452,10 @@
 
 			$j.post('/calendar/ajax/create', data, function(responseText) {
 				if (responseText.length) {
-					var responseData = new Function('return ' + responseText)
-					var newEvent = responseData()
+					var responseData = new Function('return ' + responseText);
+					var newEvent = responseData();
 
-					if (newEvent.data.meta.type == '{TASK_TYPE_ID}') {
-                        createTaskForm.find('input[name=completed]').checked = newEvent.data.meta.completed
-					}
-					fullCalendar.fullCalendar('renderEvent', newEvent)
+					fullCalendar.fullCalendar('renderEvent', newEvent);
 				}
 			})
 			return false;
@@ -550,9 +566,9 @@
 	<h1>Modify Task</h1>
 	<form id='modifyTaskForm'>
 		<label>
-            <input id='modifyTaskBubbleCompleted' type='checkbox' value='1' />
+            <input id='modifyTaskBubbleCompleted' name='completed' type='checkbox' value='1' />
             Task
-            <input id='modifyTaskBubbleNote' type='text' value='' />
+            <input id='modifyTaskBubbleNote' name='note' type='text' value='' />
         </label>
         <label class="note">Note<textarea id='modifyTaskBubbleDetail' name='detail'></textarea></label>
 		<input type='submit' value='Update Task' />

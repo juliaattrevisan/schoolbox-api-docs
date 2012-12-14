@@ -93,6 +93,8 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
 						'type' => $currentEvent->getEventType(),
 						'author' => Scrub::text($currentEvent->getAuthorName()),
 						'authorId' => $currentEvent->getAuthorId(),
+						'level' => $currentEvent->getDerivedEventLevel(),
+						'completed' => $currentEvent->getCompleted(),
 					),
 					'links' => array(
 						'category' => array(
