@@ -30,7 +30,7 @@ class Calendar_Event_Type_StudentBirthday_Renderer_Javascript extends Calendar_E
 
 			/* Modify link. Should be templated...
 			 */
-			if ($currentEvent->getIsEditable()) {
+			if ($currentEvent->getIsEditable() && ($currentEvent->getEventId() > -1)) {
 				$editable = true;
 			}
 			else {
@@ -54,43 +54,6 @@ class Calendar_Event_Type_StudentBirthday_Renderer_Javascript extends Calendar_E
 			$hasStatus = false;
 			$hasAttendanceRequestButton = false;
 			$hasListButton = false;
-
-			if ($currentEvent->canAttend()) {
-				$hasIcon = true;
-
-				/* Anyone with write access can approve attendance
-				 */
-				if (is_numeric($currentEvent->getCategoryId())) {
-					if ($this->getGroupHandler()->getPermission($currentEvent->getCategoryId()) > READ_ACCESS) {
-						$hasListButton = true;
-					}
-				}
-
-				if ($this->getGroupHandler()->isStudent($_SESSION['id'])) {
-					if ($attendance = $this->getCalendarHandler()->getAttendanceByEventAndUser($currentEvent->getEventId(), $_SESSION['id'])) {
-
-						/* Attendance Status
-	  					 */
-						if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
-							$hasStatus = 'Pending';
-						}
-						else if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
-							$hasStatus = 'Approved';
-						}
-						else if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
-							$hasStatus = 'Rejected';
-						}
-
-						$hasAttendanceRequestButton = 'Unattend';
-					}
-					else {
-						$hasAttendanceRequestButton = 'Attend';
-					}
-				}
-				else if ($this->getGroupHandler()->isStaff($_SESSION['id'])) {
-					$hasListButton = true;
-				}
-			}
 
 			/* Congeal all that stuff
 			 */

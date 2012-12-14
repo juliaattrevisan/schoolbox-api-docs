@@ -30,7 +30,7 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 
 			/* Modify link. Should be templated...
 			 */
-			if ($currentEvent->getIsEditable()) {
+			if ($currentEvent->getIsEditable() && ($currentEvent->getEventId() > -1)) {
 				$editable = true;
 			}
 			else {
@@ -120,7 +120,10 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 
 				/* Campus slug so you can filter events
 				 */
-				'className' => $currentEvent->getDerivedEventLevel(),
+				'className' => array(
+					$currentEvent->getDerivedEventLevel(),
+					'type' . $currentEvent->getType()
+				),
 
 				/* Extra data that the Event Object doesn't directly support
 				 */

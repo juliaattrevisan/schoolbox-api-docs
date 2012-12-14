@@ -235,9 +235,24 @@
 
 			},
 
-			// When you finish resizing an event
-			eventResizeStop: function(calEvent, jsEvent, ui, view) {
-				alert('mort: respecify times');
+			/**
+			 * When you finish resizing an event, update it
+			 *
+			 * Note the difference between eventResize() and eventResizeStop()
+ 			 */
+			eventResize: function(calEvent, jsEvent, ui, view) {
+				var data = {
+					eventId: calEvent.data.meta.eventId,
+					resize: true,
+					start: calendarDate(calEvent.start),
+					end: calendarDate(calEvent.end)
+				};
+
+				console.log('mort');
+
+				$j.post('/calendar/ajax/update.php', data, function(responseText) {
+					console.log(responseText);
+				});
 			},
 
 			// When you finish dragging an event to its new home

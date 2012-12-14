@@ -30,7 +30,7 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
 
 			/* Modify link. Should be templated...
 			 */
-			if ($currentEvent->getIsEditable()) {
+			if ($currentEvent->getIsEditable() && ($currentEvent->getEventId() > -1)) {
 				$editable = true;
 			}
 			else {
@@ -55,54 +55,15 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
 			$hasAttendanceRequestButton = false;
 			$hasListButton = false;
 
-//			if ($currentEvent->canAttend()) {
-				$hasIcon = true;
-
-				/* Anyone with write access can approve attendance
-				 */
-				if (is_numeric($currentEvent->getCategoryId())) {
-					if ($this->getGroupHandler()->getPermission($currentEvent->getCategoryId()) > READ_ACCESS) {
-						$hasListButton = true;
-					}
-				}
-
-				if ($this->getGroupHandler()->isStudent($_SESSION['id'])) {
-					if ($attendance = $this->getCalendarHandler()->getAttendanceByEventAndUser($currentEvent->getEventId(), $_SESSION['id'])) {
-
-						/* Attendance Status
-	  					 */
-						if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
-							$hasStatus = 'Pending';
-						}
-						else if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
-							$hasStatus = 'Approved';
-						}
-						else if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
-							$hasStatus = 'Rejected';
-						}
-
-						$hasAttendanceRequestButton = 'Unattend';
-					}
-					else {
-						$hasAttendanceRequestButton = 'Attend';
-					}
-				}
-				else if ($this->getGroupHandler()->isStaff($_SESSION['id'])) {
-					$hasListButton = true;
-				}
-//			}
-
 			/* Congeal all that stuff
 			 */
-//			$start = $currentEvent->getStartTime()->getDatabaseDate() . ' ' . $currentEvent->getStartTime()->getDatabaseTime();
+			$start = $currentEvent->getStartTime()->getDatabaseDate() . ' ' . $currentEvent->getStartTime()->getDatabaseTime();
 //			$end = $currentEvent->getEndTime()->getDatabaseDate() . ' ' . $currentEvent->getEndTime()->getDatabaseTime();
 
-			$start = '2012-12-10 14:13:00';
-			
 			$event = array(
 				'title' => $currentEvent->getNote(),
 				'start' => "$start",
-				'end' => "$end",
+				'end' => "",
 
 				/* Whether you can edit this event or not
 				 */
@@ -132,7 +93,6 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
 						'type' => $currentEvent->getEventType(),
 						'author' => Scrub::text($currentEvent->getAuthorName()),
 						'authorId' => $currentEvent->getAuthorId(),
-//						'level' => $currentEvent->getDerivedEventLevel()
 					),
 					'links' => array(
 						'category' => array(

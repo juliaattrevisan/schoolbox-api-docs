@@ -12,18 +12,30 @@ require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 $calendarHandler = new Calendar();
 $page = new SitePage();
 
-$dayDelta = $_POST['dayDelta'];
-$minuteDelta = $_POST['minuteDelta'];
-
 $event = $calendarHandler->getByID($_POST['eventId']);
+print_r($event);
+/* If you are resizing an event in the week view the new start
+ * and end times are expressed as a date string
+ */
+if (isset($_POST['resize']) && $_POST['resize']) {
+	$startTime = new Alaress_Date_Format(strtotime($_POST['start']), 'U');
+	$endTime = new Alaress_Date_Format(strtotime($_POST['end']), 'U');
+}
+/* Otherwise you are moving an event on the Month view, which makes
+ * the new datetime transfer as a difference value -_-
+ */
+else {
+	$dayDelta = $_POST['dayDelta'];
+	$minuteDelta = $_POST['minuteDelta'];
 
-$startTime = new Alaress_Date_Format(strtotime($event['date'] . ' ' . $event['startTime']), 'U');
-$startTime->addDays($dayDelta);
-$startTime->addMinutes($minuteDelta);
+	$startTime = new Alaress_Date_Format(strtotime($event['date'] . ' ' . $event['startTime']), 'U');
+	$startTime->addDays($dayDelta);
+	$startTime->addMinutes($minuteDelta);
 
-$endTime = new Alaress_Date_Format(strtotime($event['date'] . ' ' . $event['endTime']), 'U');
-$endTime->addDays($dayDelta);
-$endTime->addMinutes($minuteDelta);
+	$endTime = new Alaress_Date_Format(strtotime($event['date'] . ' ' . $event['endTime']), 'U');
+	$endTime->addDays($dayDelta);
+	$endTime->addMinutes($minuteDelta);
+}
 
 /* Check maximum endtime so that it's always on the same day
  *
@@ -42,6 +54,8 @@ $updatedEvent['id'] = $event['id'];
 $updatedEvent['date'] = $startTime->getDatabaseDate();
 $updatedEvent['startTime'] = $startTime->getDatabaseTime();
 $updatedEvent['endTime'] = $endTime->getDatabaseTime();
+$updatedEvent['groupList'] = $calendarHandler->getEventGroup($event['id']);
+$updatedEvent['campusList'] = $calendarHandler->getEventCampus($event['id']);
 
 /* For tasks
  */
