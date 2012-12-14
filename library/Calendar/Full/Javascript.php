@@ -41,6 +41,8 @@ class Calendar_Full_Javascript extends Calendar_Week_Abstract {
 	 */
 	public function render() {
 
+        $this->setupMovementButtons();
+
 		/* Render event types to chooze from
 		 */
 		$allTypes = $this->getCalendarHandler()->getTypeList();
