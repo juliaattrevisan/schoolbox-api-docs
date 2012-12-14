@@ -37,7 +37,7 @@
             })
 
         },
-        
+
         /**
          * Hide all bubbles
          */
@@ -153,34 +153,34 @@
                     });
                 }
                 else {
-    
+
                     // The usual event and description
                     eventBubbleElemCache.Title.html(calEvent.title)
                     eventBubbleElemCache.Location.html(calEvent.data.meta.location)
-    
+
                     // Event author
                     eventBubbleElemCache.Author.html(calEvent.data.meta.author)
                     eventBubbleElemCache.Author.attr('href', '/search/user/' + calEvent.data.meta.authorId)
-    
+
                     // Start time
                     if (calEvent.start != null) {
                         eventBubbleElemCache.StartTime.html(calEvent.data.meta.type + ': ' + calendarDate(calEvent.start))
                     }
-    
+
                     // End time
                     if (calEvent.end != null) {
                         eventBubbleElemCache.EndTime.html(" &ndash; " + calendarTime(calEvent.end))
                     }
-    
+
                     // Links to Modify Screen
                     if (calEvent.editable == true) {
                         eventBubbleElemCache.ModifyLink.html('<a class="btn modify float-right" href="/calendar/modify.php?eventID='
                                 + calEvent.data.meta.eventId + '&returnTo=week"><span></span>Modify</a>')
                     }
-    
+
                     // Attendances
                     eventBubbleElemCache.AttendanceStatus.html(calEvent.data.attendance.status.toString())
-    
+
                     // Attendance List butonye
                     if (calEvent.data.attendance.listButton.toString() == 'true') {
                         eventBubbleElemCache.AttendanceIcon.html("This event can be attended.")
@@ -188,16 +188,16 @@
                                 + calEvent.data.meta.eventId + '"><span></span>Attendance List</a>')
                     }
                     else {
-        
+
                         // Attend/Unattend butonye
                         if (calEvent.data.attendance.requestButton.toString() != 'false') {
                             eventBubbleElemCache.AttendanceRequestButton.html("<span></span>" + calEvent.data.attendance.requestButton.toString())
-        
+
                             // Start time
                             if (calEvent.start != null) {
                                 eventBubbleElemCache.StartTime.html(calendarDate(calEvent.start));
                             }
-        
+
                             // Bugalug shenanigans
                             eventBubbleElemCache.AttendanceRequestButton.live('click', function(event) {
                                 $j.post('/service/attendance/processToggleAttendance', data, function (data) {

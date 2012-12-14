@@ -118,6 +118,10 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 				 */
 				'color' => $currentEvent->getColour(),
 
+				/* Campus slug so you can filter events
+				 */
+				'className' => $currentEvent->getDerivedEventLevel(),
+
 				/* Extra data that the Event Object doesn't directly support
 				 */
 				'data' => array(
