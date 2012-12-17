@@ -70,3 +70,4 @@ else {
 }
 
 $calendarHandler->update($updatedEvent);
+exit(1);

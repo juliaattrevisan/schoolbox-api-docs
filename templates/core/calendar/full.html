@@ -236,6 +236,18 @@
                      */
                     taskModifyBubble.show();
 
+					$j('#modifyTaskForm').find('.deleteTask').click(function() {
+						event.preventDefault();
+
+						var data = {
+							eventId: calEvent.data.meta.eventId
+						}
+
+						$j.post('/calendar/ajax/delete', data, function(responseText) {
+							console.log(responseText);
+						});
+					});
+
                     $j('#modifyTaskForm').submit(function() {
 
 						/* Checkbox state
@@ -523,6 +535,7 @@
             filters.interaction()
         })
 
+
 	})
 </script>
 <!-- END custom_head -->
@@ -572,6 +585,7 @@
         </label>
         <label class="note">Note<textarea id='modifyTaskBubbleDetail' name='detail'></textarea></label>
 		<input type='submit' value='Update Task' />
+		<a class='deleteTask' href='#'>Delete Task</a>
 	</form>
 </div>
 <div id="calendarBubble" class="cal-bubble">
