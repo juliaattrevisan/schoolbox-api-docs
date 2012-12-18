@@ -455,7 +455,7 @@ if (is_numeric($this->arg[0])) {
                 }
 
                 /* Display boarder leave for kings */
-                if (Cfg::get('site_location') == 'kings') {
+                if (Cfg::get('boarder_leave_enabled') == '1') {
                     if ($groupHandler->isStaff() || $_SESSION['id'] == $user['uid']) {
                         $this->parse('boarder_leave_block', 'boarder_leave');
                     }
