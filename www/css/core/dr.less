@@ -989,10 +989,40 @@ div.colours p {
         font-size: 24px;
         line-height: 20px;
     }
+
+    label {
+        text-align: left;
+        * {
+            position: absolute;
+            right: 20px;
+            width: 276px;
+            padding: 0;
+        }
+        input[type=checkbox] {
+            width: 20px;
+            right: 275px;
+        }
+        &.detail {
+            height: 40px;
+            textarea {
+                height: 30px;
+            }
+        }
+    }
+    form {
+        clear: both;
+    }
 }
 
 // event detail popup
 #calendarBubble {
+    .popup();
+
+
+}
+
+// event creation popup
+#calendar-bubble {
     .popup();
 
     #calendarBubbleClose {
@@ -1050,31 +1080,27 @@ div.colours p {
     dd {
         float: none;
     }
-}
 
-// event creation popup
-#createEventBubble {
-    .popup();
-
-    label {
-        text-align: left;
-        * {
-            position: absolute;
-            right: 20px;
-            width: 276px;
-            padding: 0;
-        }
-        &.note {
-            height: 40px;
-            textarea {
-                height: 30px;
-            }
-        }
-    }
-    form {
-        clear: both;
-    }
-    #createSwitch {
+//
+//    label {
+//        text-align: left;
+//        * {
+//            position: absolute;
+//            right: 20px;
+//            width: 276px;
+//            padding: 0;
+//        }
+//        &.note {
+//            height: 40px;
+//            textarea {
+//                height: 30px;
+//            }
+//        }
+//    }
+//    form {
+//        clear: both;
+//    }
+    .createSwitch {
         height: 30px;
         li {
             float: left;
@@ -1101,9 +1127,6 @@ div.colours p {
         display: block;
         margin-left: 10px;
     }
-}
-#modifyTaskBubble {
-    .popup();
 }
 
 // overrides for the fullcalendar stylings so that it looks like the previous SB calendar implementation
@@ -1134,9 +1157,21 @@ div.colours p {
             padding: 2px 5px;
             font-size: 0.9em;
         }
+        .fc-event-hori {
+            border-width: 1px;
+        }
+        .fc-event-title {
+            &.strike {
+                text-decoration: line-through;
+            }
+        }
+        .fc-corner-left {
+            margin-left: 0;
+        }
     }
+
     .fc-header {
-        background: #0066B0;
+        background: @module-background;
         .fc-button {
             z-index: 4;
             margin: 5px 3px;
@@ -1202,6 +1237,8 @@ div.colours p {
         background: @dark;
     }
 }
+
+// filter list styles
 #content .link-case .filter-drop {
     top: 34px;
     right: 0px;

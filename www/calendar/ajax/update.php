@@ -62,6 +62,11 @@ if (isset($_POST['note']) && isset($_POST['detail'])) {
 	$updatedEvent['detail'] = $_POST['detail'];
 	$updatedEvent['completed'] = $_POST['completed'];
 }
+/* If checkbox on the calendar is interacted, note and detail won't be passed
+ */
+elseif(isset($_POST['completed'])) {
+    $updatedEvent['completed'] = $_POST['completed'];
+}
 /* Otherwise maintain groupList and campusList for non-tasks
  */
 else {
@@ -69,5 +74,61 @@ else {
 	$updatedEvent['campusList'] = $calendarHandler->getEventCampus($event['id']);
 }
 
-$calendarHandler->update($updatedEvent);
+if($eventId = $calendarHandler->update($updatedEvent)) {
+    $event = $calendarHandler->getByID($eventId);
+
+    $json = array(
+        'title' => $event['note'],
+        'start' => strtotime($event['date'] . ' ' . $event['startTime']),
+
+        /* Whether you can edit this event or not
+           */
+        'editable' => true,
+
+        /* Whether it's an all-day event or not
+           * If allDay is true, then you can't resize it
+           *
+           * Schoolbox usage would be that all events are not
+           * allDay events
+           */
+        'allDay' => false,
+
+        /* Colour of the event
+           */
+        'color' => '#aaaaaa',
+
+        /* Extra data that the Event Object doesn't directly support
+           */
+        'data' => array(
+            'meta' => array(
+                'eventId' => $eventId,
+                'detail' => $event['detail'],
+                'location' => $event['location'],
+                'eventType' => '',
+                'eventTypeId' => $event['type'],
+                'type' => $event['type'],
+                'author' => '',
+                'authorId' => $event['owner'],
+                'level' => '',
+                'completed' => $event['completed'],
+            ),
+            'links' => array(
+                'category' => array(
+                    'id' => '',
+                    'name' => '',
+                )
+            ),
+            'styles' => array(
+                'visible' => '',
+            ),
+            'attendance' => array(
+                'icon' => false,
+                'status' => false,
+                'requestButton' => false,
+                'listButton' => false,
+            )
+        )
+    );
+    echo json_encode($json);
+}
 exit(1);
