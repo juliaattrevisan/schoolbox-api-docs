@@ -270,6 +270,14 @@
             chk.trigger('change')
         })
 
+        c.getForm('editTask').delegate('.deleteTask', 'click', function(e) {
+            var id = $j(this).siblings('input[name=eventId]').val()
+            c.delete({eventId: id})
+            c.bubble.hide()
+            e.preventDefault()
+            return false
+        })
+
         // if a checkbox on the calendar is interacted, ajax
         c.dom.delegate('input[type=checkbox]', 'change', function(e) {
 
