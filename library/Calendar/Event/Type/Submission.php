@@ -72,6 +72,15 @@ class Calendar_Event_Type_Submission extends Calendar_Event_Type_Abstract {
         );
     }
 
+	/**
+	 * Event visibility; generates a CSS string
+	 *
+	 * @return string
+	 */
+	public function getDerivedEventLevel() {
+		return 'personal';
+	}
+
     /**
      * Special time formattng
      *
