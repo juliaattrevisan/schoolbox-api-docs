@@ -14,11 +14,16 @@
             taskTypeId: '{TASK_TYPE_ID}',
             crud: {
                 c: '/calendar/ajax/create',
-                r: '/calendar/ajax/full',
+             // r: don't need it
                 u: '/calendar/ajax/update',
                 d: '/calendar/ajax/delete'
             },
+            filter: {
+                ajax: '/calendar/ajax/filter'
+            },
             fullCalendar: {
+
+                defaultView: '{CALENDAR_VIEW}',
 
                 /**
                  * When an event is drawn on the calendar
@@ -112,9 +117,7 @@
 
                     // console.log('mort');
 
-                    c.update(data, function(responseText) {
-                        // console.log(responseText);
-                    });
+                    c.update(data);
                 },
 
                 /**
@@ -141,8 +144,7 @@
                      * doesn't update the DOM until you reload the page. I haven't found
                      * a re-render method for individual events.
                      */
-                    c.update(data, function(responseText) {
-                    });
+                    c.update(data);
                 },
 
                 /**
@@ -199,6 +201,17 @@
                         })
 
                         // reapply filters
+                        c.filters.organise(c, ["campus", "groups"], false)
+                    }
+                },
+
+                /**
+                 * Whenever the view is changes
+                 * @param view
+                 */
+                viewDisplay: function(view) {
+                    // apply filters, which will also ajax the change of view to store in the db
+                    if(c !== undefined) {
                         c.filters.organise(c, ["campus", "groups"])
                     }
                 },

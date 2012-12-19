@@ -30,6 +30,7 @@ function Calendar(id, bubbleId, opts) {
             d: '.'
         },
         filter: {
+            ajax: '.',
             enabled: true,
             parentSelector: '#calendar-controls',
             btnSelector: '#fc-button-filter',
@@ -75,7 +76,8 @@ function Calendar(id, bubbleId, opts) {
             })
 
             $j('body').click(function() {
-                $j(cal.options.filter.boxSelector).removeClass('engaged').hide()
+                $j(cal.options.filter.boxSelector).hide()
+                $j(cal.options.filter.btnSelector).removeClass('engaged')
             })
 
             calendarControls.delegate(cal.options.filter.boxSelector, 'click', function(e) {
@@ -85,7 +87,9 @@ function Calendar(id, bubbleId, opts) {
             cal.filters.organise(cal, ["campus", "groups"])
         },
 
-        organise: function(cal, filterArray) {
+        organise: function(cal, filterArray, performAjax) {
+            performAjax = performAjax === undefined ? true : performAjax
+
             var flist = {}
             var calendarControls = $j(cal.options.filter.parentSelector)
 
@@ -106,29 +110,32 @@ function Calendar(id, bubbleId, opts) {
                             cal.dom.find('div.fc-event.' + n).hide()
                         }
                     }
-                });
+                })
             }
 
-            k = 0;
-            flist[filterArray.length] = ['events', {}];
+            k = 0
+            flist[filterArray.length] = ['events', {}]
 
             calendarControls.find(cal.options.filter.listSelector + ' .events input').each(function() {
-                var n = $j(this).attr('value');
+                var n = $j(this).attr('value')
                 // show related entries
                 if(this.checked) {
-                    flist[i][1][k++] = n;
-                    cal.dom.find('div.fc-event.personal.' + n).show();
+                    flist[i][1][k++] = n
+                    cal.dom.find('div.fc-event.personal.' + n).show()
                 }
                 // hide related entries
                 else {
                     if (cal.dom.find('div.fc-event.' + n).is(':visible')) {
-                        cal.dom.find('div.fc-event.' + n).hide();
+                        cal.dom.find('div.fc-event.' + n).hide()
                     }
                 }
-            });
+            })
 
-            cal.post('/ajax/calendarFilter.php', {fList : flist}, null, false);
-
+            // only send data to the server if we actually need to
+            if(performAjax) {
+                var view = cal.dom.fullCalendar('getView').name
+                cal.post(cal.options.filter.ajax, {fList : flist, view: view}, null, false)
+            }
         }
     }
 
