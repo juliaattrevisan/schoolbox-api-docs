@@ -43,6 +43,10 @@ class Calendar_Full_Javascript extends Calendar_Week_Abstract {
 
         $this->setupMovementButtons();
 
+        $this->getPage()->setVar(array(
+            'CALENDAR_VIEW' => $_SESSION['calendar_view']
+        ));
+
 		/* Render event types to chooze from
 		 */
 		$allTypes = $this->getCalendarHandler()->getTypeList();
@@ -60,7 +64,7 @@ class Calendar_Full_Javascript extends Calendar_Week_Abstract {
 				 */
 				if ($currentType['eventType'] == 'Task') {
 					$this->getPage()->setVar(array(
-						'TASK_TYPE_ID' => $currentType['eventTypeID']
+						'TASK_TYPE_ID' => $currentType['eventTypeID'],
 					));
 				}
 			}
