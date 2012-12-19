@@ -9,7 +9,7 @@ String.prototype.capitalise = function() {
 }
 
 /**
- * Calendar object
+ * Calendar object constructor
  * @param id
  * @constructor
  */
@@ -18,14 +18,22 @@ function Calendar(id, bubbleId, opts) {
     this.id = id
     this.dom = $j('#'+id)
     this.bubble = new Bubble(this, bubbleId)
+    this.suppress = false
 
     // default options
     this.options = {
         taskTypeId: 0,  // disabled by default
+        crud: {
+            c: '.',
+            r: '.',
+            u: '.',
+            d: '.'
+        },
         filter: {
             enabled: true,
+            parentSelector: '#calendar-controls',
             btnSelector: '#fc-button-filter',
-            domSelector: '.applyFilters',
+            checkboxSelector: '.applyFilters',
             applyFiltersSelector: '#applyFilters',
             boxSelector: '.filter-drop',
             listSelector: '.filter-list'
@@ -43,33 +51,34 @@ function Calendar(id, bubbleId, opts) {
     this.filters = {
 
         interaction: function(cal) {
-            var filterBtn = $j(cal.options.filter.btnSelector)
 
-            $j(filterBtn).click(function(){
+            var calendarControls = $j(cal.options.filter.parentSelector)
+
+            // show the filter 'dialog' when the button is clicked
+            cal.dom.delegate(cal.options.filter.btnSelector, 'click', function() {
                 cal.bubble.hide()
-                $j('.filter-drop').toggle()
-                filterBtn.toggleClass('engaged')
+                calendarControls.find(cal.options.filter.boxSelector).toggle()
+                $j(cal.options.filter.btnSelector).toggleClass('engaged')
                 return false
             })
 
             // run the filter checker to show and hide the items
-            $j(cal.options.filter.domSelector).click(function() {
+            calendarControls.delegate(cal.options.filter.checkboxSelector, 'click', function() {
                 cal.filters.organise(cal, ["campus", "groups"])
             })
 
-            $j(cal.options.filter.applyFiltersSelector).click(function() {
+            calendarControls.delegate(cal.options.filter.applyFiltersSelector, 'click', function() {
                 cal.filters.organise(cal, ["campus", "groups"])
-                $j('.filter-drop').hide()
-                filterBtn.removeClass('engaged')
+                calendarControls.find(cal.options.filter.boxSelector).hide()
+                $j(cal.options.filter.btnSelector).removeClass('engaged')
                 return false
             })
 
-            $j("body").click(function() {
-                $j(cal.options.filter.boxSelector).hide()
-                filterBtn.removeClass('engaged')
+            $j('body').click(function() {
+                $j(cal.options.filter.boxSelector).removeClass('engaged').hide()
             })
 
-            $j('.filter-drop').click(function(e) {
+            calendarControls.delegate(cal.options.filter.boxSelector, 'click', function(e) {
                 e.stopPropagation()
             })
 
@@ -77,24 +86,24 @@ function Calendar(id, bubbleId, opts) {
         },
 
         organise: function(cal, filterArray) {
-            var flist = {};
+            var flist = {}
+            var calendarControls = $j(cal.options.filter.parentSelector)
 
             for (var i = 0; i < filterArray.length; i++) {
+                var k = 0
+                flist[i] = [filterArray[i], {}]
 
-                var k = 0;
-                flist[i] = [filterArray[i], {}];
-
-                $j(cal.options.filter.listSelector + ' .' + filterArray[i] + ' input').each(function() {
-                    var n = $j(this).attr('value');
+                calendarControls.find(cal.options.filter.listSelector + ' .' + filterArray[i] + ' input').each(function() {
+                    var n = $j(this).attr('value')
                     // show related entries
                     if(this.checked) {
-                        flist[i][1][k++] = n;
-                        $j(cal.id + ' div.fc-event.' + n).show();
+                        flist[i][1][k++] = n
+                        cal.dom.find('div.fc-event.' + n).show()
                     }
                     // hide related entries
                     else {
-                        if ($j(cal.id + ' div.fc-event.' + n).is(':visible')) {
-                            $j(cal.id + ' div.fc-event.' + n).hide();
+                        if (cal.dom.find('div.fc-event.' + n).is(':visible')) {
+                            cal.dom.find('div.fc-event.' + n).hide()
                         }
                     }
                 });
@@ -103,22 +112,22 @@ function Calendar(id, bubbleId, opts) {
             k = 0;
             flist[filterArray.length] = ['events', {}];
 
-            $j('.filter-list .events input').each(function() {
+            calendarControls.find(cal.options.filter.listSelector + ' .events input').each(function() {
                 var n = $j(this).attr('value');
                 // show related entries
                 if(this.checked) {
                     flist[i][1][k++] = n;
-                    $j(cal.id + ' div.fc-event.personal.' + n).show();
+                    cal.dom.find('div.fc-event.personal.' + n).show();
                 }
                 // hide related entries
                 else {
-                    if ($j(cal.id + ' div.fc-event.' + n).is(':visible')) {
-                        $j(cal.id + ' div.fc-event.' + n).hide();
+                    if (cal.dom.find('div.fc-event.' + n).is(':visible')) {
+                        cal.dom.find('div.fc-event.' + n).hide();
                     }
                 }
             });
 
-            $j.post('/ajax/calendarFilter.php', {fList : flist});
+            cal.post('/ajax/calendarFilter.php', {fList : flist}, null, false);
 
         }
     }
@@ -142,9 +151,10 @@ function Calendar(id, bubbleId, opts) {
 }
 
 /**
- *
+ * Initialise the calendar
  */
 Calendar.prototype.init = function() {
+    var c = this
     this.dom.fullCalendar(this.options.fullCalendar)
 
     if(this.options.filter.enabled) {
@@ -167,15 +177,148 @@ Calendar.prototype.init = function() {
 
         })
     }
+
+
+    // Event creation form listeners
+    $j.each(this.getForms(), function(k, v) {
+
+        if(k.slice(0, 6) == 'create') {
+            this.submit(function() {
+                var data = $j(this).serialize()
+
+                c.create(data, function(responseText) {
+                    if (responseText.length) {
+                        var responseData = new Function('return ' + responseText)
+                        var newEvent = responseData()
+
+                        c.dom.fullCalendar('renderEvent', newEvent)
+                    }
+                })
+                c.bubble.hide()
+                return false
+            })
+        }
+        else {
+            this.submit(function() {
+                var data = $j(this).serialize()
+
+                c.update(data, function(responseText) {
+                    if (responseText.length) {
+                        var responseData = new Function('return ' + responseText)
+                        var newEvent = responseData()
+
+                        c.dom.fullCalendar('renderEvent', newEvent)
+                    }
+                })
+                c.bubble.hide()
+                return false
+            })
+
+        }
+
+    })
+
+
     return this
 }
 
+/**
+ * A more sementically-correct version of getForm({no args})
+ * @return {*}
+ */
+Calendar.prototype.getForms = function() {
+    return this.getForm()
+}
+
+/**
+ * Helper method for getting a form from the bubble
+ * @param id
+ * @return {*}
+ */
 Calendar.prototype.getForm = function(id) {
+    if(id === undefined) {
+        return this.bubble.forms
+    }
     if(this.bubble.forms[id] === undefined) {
         return []
     }
     return this.bubble.forms[id]
 }
+
+/**
+ * Wrapping method for jQuery post so that a common success callback can be applied to all requests
+ * @param url
+ * @param data
+ * @param successCallback
+ */
+Calendar.prototype.post = function(url, data, successCallback, refetch) {
+
+    refetch = refetch === undefined
+
+    var cal = this
+
+    $j.post(url, data, function(data) {
+        // if a callback is defined, just use that
+        if (successCallback && typeof(successCallback) === "function") {
+            successCallback(data)
+        }
+        // if no callback defined, use a default which provides user feedback that the AJAX call worked
+        else {
+            // console.log('-- Default AJAX callback --')
+            // console.log(data)
+        }
+
+        // refetch all the events in the view by default
+        // this is horribly inefficient, but fullCalendar's cache needs to be refreshed when changes are made
+        if(refetch) {
+            cal.dom.fullCalendar('refetchEvents')
+        }
+    })
+}
+
+/**
+ * Set the bubble suppressor to true
+ */
+Calendar.prototype.suppressOne = function() {
+    this.suppress = true
+}
+
+/**
+ * CRUD method: create
+ * @param data
+ * @param callback
+ */
+Calendar.prototype.create = function(data, callback) {
+    this.post(this.options.crud.c, data, callback)
+}
+
+/**
+ * CRUD method: read
+ * @param data
+ * @param callback
+ */
+Calendar.prototype.read = function(data, callback) {
+    this.post(this.options.crud.r, data, callback)
+}
+
+/**
+ * CRUD method: update
+ * @param data
+ * @param callback
+ */
+Calendar.prototype.update = function(data, callback) {
+    this.post(this.options.crud.u, data, callback)
+}
+
+/**
+ * CRUD method: delete
+ * @param data
+ * @param callback
+ */
+Calendar.prototype.delete = function(data, callback) {
+    this.post(this.options.crud.d, data, callback)
+}
+
 
 
 /**
@@ -189,6 +332,10 @@ function Bubble(calendar, bubbleDomId) {
     this.initForms(bubbleDomId)
 }
 
+/**
+ * Go through the bubble's DOM and cache all its forms
+ * @param bubbleDomId
+ */
 Bubble.prototype.initForms = function(bubbleDomId) {
     var bbl = $j('#'+bubbleDomId)
 
@@ -203,8 +350,21 @@ Bubble.prototype.initForms = function(bubbleDomId) {
 
 }
 
-
+/**
+ * Wrapper method for positioning a bubble and filling it with content
+ * @param method
+ * @param eventData
+ * @param mouseEvent
+ * @param targetElement
+ */
 Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement) {
+
+    // check that this isn't being suppressed
+    if(this.calendar.suppress === true) {
+        this.calendar.suppress = false
+        return
+    }
+
     var id = method
     if(eventData !== undefined) {
         id += (eventData.eventTypeId == this.calendar.options.taskTypeId ? 'Task' : 'Event')
@@ -219,7 +379,7 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
 }
 
 /**
- *
+ * Display a form in a particular location - does not perform data loading
  * @param id
  * @param x horizontal position of the bubble speech point
  * @param y vertical position of the bubble speech point
@@ -261,13 +421,19 @@ Bubble.prototype.showForm = function(id, x, y) {
 
 }
 
+/**
+ * Make the bubble go away
+ */
 Bubble.prototype.hide = function() {
     this.dom.css({visibility:'visible', display:'none'})
 }
 
+/**
+ * Populate the nominated form with the data supplied
+ * @param formId
+ * @param vars
+ */
 Bubble.prototype.fillForm = function(formId, vars) {
-    console.log(vars)
-
     // retrieve form from cache
     var form = this.forms[formId]
 
@@ -302,6 +468,30 @@ Bubble.prototype.fillForm = function(formId, vars) {
 }
 
 /* Helper functions */
+
+/**
+ * Copy data from one form to another
+ * @param from
+ * @param to
+ * @param selector
+ */
+function cp(from, to, selector) {
+
+    $j.each(selector, function() {
+        // copy the date in the createEvent form into the createTask form
+        $j(['input[name='+this+']', '.'+this]).each(function() {
+            var orig = c.bubble.forms['create'+from.capitalise()].find(this.toString())
+            var targ = c.bubble.forms['create'+to.capitalise()].find(this.toString())
+
+            if(orig.is('input')) {
+                targ.val(orig.val())
+            }
+            else {
+                targ.html(orig.html())
+            }
+        })
+    })
+}
 
 /**
  * Convert a datetime to sentence format

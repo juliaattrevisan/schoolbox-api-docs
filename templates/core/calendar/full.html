@@ -12,6 +12,12 @@
         c = new Calendar('calendar', 'calendar-bubble', {
             // overrides and callbacks
             taskTypeId: '{TASK_TYPE_ID}',
+            crud: {
+                c: '/calendar/ajax/create',
+                r: '/calendar/ajax/full',
+                u: '/calendar/ajax/update',
+                d: '/calendar/ajax/delete'
+            },
             fullCalendar: {
 
                 /**
@@ -87,6 +93,7 @@
                     c.bubble.display('edit', data, jsEvent, this)
                 },
 
+
                 /**
                  * When you finish resizing an event, update it
                  * Note the difference between eventResize() and eventResizeStop()
@@ -103,10 +110,10 @@
                         end: calendarDate(calEvent.end)
                     };
 
-                    console.log('mort');
+                    // console.log('mort');
 
-                    $j.post('/calendar/ajax/update.php', data, function(responseText) {
-                        console.log(responseText);
+                    c.update(data, function(responseText) {
+                        // console.log(responseText);
                     });
                 },
 
@@ -134,7 +141,7 @@
                      * doesn't update the DOM until you reload the page. I haven't found
                      * a re-render method for individual events.
                      */
-                    $j.post('/calendar/ajax/update.php', data, function(responseText) {
+                    c.update(data, function(responseText) {
                     });
                 },
 
@@ -156,7 +163,8 @@
                     var displayDate = weekday[date.getDay()] + ', ' + date.getDate() + ' ' + month[date.getMonth()];
 
                     var eventData = {
-                        date: displayDate
+                        date: date.valueOf(),
+                        displayDate: displayDate
                     }
 
                     c.bubble.display('create', eventData, jsEvent, this)
@@ -173,6 +181,28 @@
                     c.dom.fullCalendar('option','contentHeight',wHeight - calTop - 60)
                 },
 
+                /**
+                 * When external data is being fetched
+                 * @param isLoading
+                 * @param view
+                 */
+                loading: function(isLoading, view) {
+                    // has finished loading
+                    if(isLoading === false) {
+                        // console.log('finished loading')
+                        // update any tasks that have been completed by strikethrough-ing them
+                        $j(this).find('input[type=checkbox]').each(function() {
+                            var self = $j(this)
+                            if(self.prop('checked')) {
+                                self.siblings('.fc-event-title').addClass('strike')
+                            }
+                        })
+
+                        // reapply filters
+                        c.filters.organise(c, ["campus", "groups"])
+                    }
+                },
+
                 // Stream location
                 events: '/calendar/ajax/full'
             },
@@ -181,43 +211,26 @@
         }).init()
 
 
-
         /* LISTENERS */
-
-        // Event creation forms
-        $j('#createEvent, #createTask').submit(function(event) {
-            var data = $j(this).serialize()
-
-            $j.post('/calendar/ajax/create', data, function(responseText) {
-                if (responseText.length) {
-                    var responseData = new Function('return ' + responseText)
-                    var newEvent = responseData()
-
-                    c.dom.fullCalendar('renderEvent', newEvent)
-                }
-            })
-            return false
-        })
-
         // toggle onto the create task form
         $j('#showCreateTaskForm').click(function(e) {
             e.preventDefault()
-            c.bubble.forms['createEvent'].hide()
-            c.bubble.forms['createTask'].show()
+            c.getForm('createEvent').hide()
+            c.getForm('createTask').show()
 
             // copy details from event to task
-            cp('event', 'task', ['date', 'note'])
+            cp('event', 'task', ['date', 'displayDate', 'note'])
 
         });
 
         // toggle onto the create event form
         $j('#showCreateEventForm').click(function(e) {
             e.preventDefault()
-            c.bubble.forms['createEvent'].show()
-            c.bubble.forms['createTask'].hide()
+            c.getForm('createEvent').show()
+            c.getForm('createTask').hide()
 
             // copy details from event to task
-            cp('task', 'event', ['date', 'note'])
+            cp('task', 'event', ['date', 'displayDate', 'note'])
 
         })
 
@@ -234,9 +247,9 @@
         })
 
         // AJAX update attendance when the attendance toggle-button is clicked
-        c.bubble.forms['editEvent'].delegate('.attendanceRequestButton', 'click', function(e) {
-            $j.post('/service/attendance/processToggleAttendance', c.bubble.forms['editEvent'].serialize(), function (data) {
-                var btn = c.bubble.forms['editEvent'].find('.attendanceRequestButton')
+        c.getForm('editEvent').delegate('.attendanceRequestButton', 'click', function(e) {
+            c.post('/service/attendance/processToggleAttendance', c.getForm('editEvent').serialize(), function (data) {
+                var btn = c.getForm('editEvent').find('.attendanceRequestButton')
                 if (data.error == undefined) {
                     if (btn.text() == 'Attend') {
                         btn.html('<span></span>Unattend')
@@ -254,11 +267,12 @@
             var eventId = self.closest('form').find('input[name=eventId]').val()
             var chk = c.dom.find('#t'+eventId)
             chk.prop('checked', self.prop('checked'))
+            chk.trigger('change')
         })
 
         // if a checkbox on the calendar is interacted, ajax
-        c.dom.delegate('input[type=checkbox]', 'click', function(e) {
-            c.bubble.hide()
+        c.dom.delegate('input[type=checkbox]', 'change', function(e) {
+
             var self = $j(this)
             var ttl = self.siblings('.fc-event-title')
             if(self.prop('checked')) {
@@ -267,28 +281,19 @@
             else {
                 ttl.removeClass('strike')
             }
-
+            data = {
+                eventId: self.attr('id').slice(1),
+                completed: self.prop('checked') ? 1 : 0
+            }
+            c.update(data)
+            c.bubble.hide()
+            c.suppressOne()
+            e.stopPropagation()
+            e.preventDefault()
+            return false
         })
 
 
-
-        function cp(from, to, selector) {
-
-            $j.each(selector, function() {
-                // copy the date in the createEvent form into the createTask form
-                $j(['input[name='+this+']', '.'+this]).each(function() {
-                    var orig = c.bubble.forms['create'+from.capitalise()].find(this.toString())
-                    var targ = c.bubble.forms['create'+to.capitalise()].find(this.toString())
-
-                    if(orig.is('input')) {
-                        targ.val(orig.val())
-                    }
-                    else {
-                        targ.html(orig.html())
-                    }
-                })
-            })
-        }
     })
 </script>
 <!-- END custom_head -->
@@ -306,7 +311,7 @@
                 </ul>
                 <h1>Create Event</h1>
                 <input name="date" type="hidden" value="" />
-                <label>When<span class="date"><!-- Date gets shoved in here --></span></label>
+                <label>When<span class="displayDate"><!-- Date gets shoved in here --></span></label>
                 <label>Event Title<input name="note" type="text" value="" /></label>
                 <label>Event Type<select name="type">
                     <!-- BEGIN event_type -->
@@ -327,7 +332,7 @@
                 <input name="date" type="hidden" value="" />
                 <input name="type" type="hidden" value="{TASK_TYPE_ID}" />
                 <label>Task<input name="note" type="text" value="" /></label>
-                <label>Due Date<span class="date"><!-- Date gets shoved in here --></span></label>
+                <label>Due Date<span class="displayDate"><!-- Date gets shoved in here --></span></label>
                 <label class="detail">Note<textarea name="detail"></textarea></label>
                 <input class="btn modify float-right no-icon" type="submit" value="Create Task" />
             </form>
@@ -372,7 +377,7 @@
     </div>
 </div>
 
-<div class="calendar-controls no-height clearfix">
+<div id="calendar-controls" class="calendar-controls no-height clearfix">
     <div class="link-case">
         <div class="filter-drop clearfix">
             <div class="filter-list">
