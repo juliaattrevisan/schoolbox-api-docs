@@ -125,9 +125,6 @@ class SitePage extends Page {
             $this->buildPage();
             $this->saveHistory();
         }
-        else {
-            $this->parseFooterMobileLink(TEMPLATE_body);
-        }
 
         $userHandler = new User();
 
@@ -801,7 +798,7 @@ class SitePage extends Page {
             }
         }
 
-
+        $this->parseFooterMobileLink(TEMPLATE_body);
         $this->outputPage(true);
         exit;
     }
@@ -923,7 +920,7 @@ class SitePage extends Page {
         return $text;
     }
 
-    private function parseFooterMobileLink($parent = TEMPLATE_content) {
+    public function parseFooterMobileLink($parent = TEMPLATE_content) {
         // determine whether or not to show a mobile switch link
         $this->setBlock($parent, 'mobile_switch', "mobile_switch_{$parent}_block");
 
