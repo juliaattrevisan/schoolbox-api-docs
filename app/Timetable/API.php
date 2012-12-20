@@ -19,8 +19,7 @@ class Timetable_API {
 
         $timetableHandler = new External_Timetable();
 
-
-        $eUser = new External_Synergetic_User();
+        $eUser = new External_User();
         $eUser->getCurrentSemester();
 
         $campus = $user->get('campus_id');

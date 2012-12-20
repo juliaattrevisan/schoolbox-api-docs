@@ -189,4 +189,11 @@ class External_User {
 		return $this->database;
 	}
 
+    public function determineBoarderType($boarderValue) {
+        // TODO: Implement determineBoarderType() method.
+    }
+
+    public function getHousemasterByHouseId($houseID) {
+        // TODO: Implement getHousemasterByHouseId() method.
+    }
 }
