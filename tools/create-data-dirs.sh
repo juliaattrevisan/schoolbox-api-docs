@@ -31,6 +31,6 @@ mkdir -p $datadir/cache/{minify,myfiles,portrait,purifier,stream,weather,xml,zip
 
 # Fix permissions
 chown -R www-data:www-data $datadir
-chmod -R 755 $datadir
+chmod -R 775 $datadir
 
 # End of script
