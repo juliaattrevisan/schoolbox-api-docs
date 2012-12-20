@@ -20,6 +20,7 @@ class Calendar_Full_Javascript extends Calendar_Week_Abstract {
 	 */
 	protected function setupTemplateFile() {
 		$this->setTemplateFile('calendar/full.html');
+        $this->getPage()->setTab('calendar');
 	}
 
 	/**
