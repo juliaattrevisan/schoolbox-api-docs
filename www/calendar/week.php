@@ -5,5 +5,7 @@
  *                                                           *
  ************************************************************/
 
-$calendar = new Calendar_Week_Grid_Default($this, $this->arg[0]);
-$calendar->render();
+SitePage::localRedir('/calendar/full');
+
+//$calendar = new Calendar_Week_Grid_Default($this, $this->arg[0]);
+//$calendar->render();
