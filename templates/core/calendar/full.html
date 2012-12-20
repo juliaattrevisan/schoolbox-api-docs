@@ -66,7 +66,14 @@
                     // setup data to be displayed
                     var data = $j.extend(true, {}, calEvent.data.meta)
                     data.note = calEvent.title
-                    data.date = calendarDate(calEvent.start)
+
+                    if(calEvent.data.meta.eventTypeId == c.options.taskTypeId) {
+                        data.date = calendarDateOnly(calEvent.start)
+                    }
+                    else {
+                        data.date = calendarDate(calEvent.start)
+                    }
+
 
                     // end time
                     if (calEvent.end != null) {
@@ -330,7 +337,6 @@
                     <li><a href="#" class="selected">Event</a></li>
                     <li><a href="#" id="showCreateTaskForm">Task</a></li>
                 </ul>
-                <h1>Create Event</h1>
                 <input name="date" type="hidden" value="" />
                 <label>When<span class="displayDate"><!-- Date gets shoved in here --></span></label>
                 <label>Event Title<input name="note" type="text" value="" /></label>
@@ -349,7 +355,6 @@
                     <li><a href="#" id="showCreateEventForm">Event</a></li>
                     <li><a href="#" class="selected">Task</a></li>
                 </ul>
-                <h1>Create Task</h1>
                 <input name="date" type="hidden" value="" />
                 <input name="type" type="hidden" value="{TASK_TYPE_ID}" />
                 <label>Task<input name="note" type="text" value="" /></label>
@@ -383,14 +388,14 @@
 
             <!-- Modify Task Form -->
             <form id="editTask">
-                <h1>Modify Task</h1>
+                <h3>Task</h3>
                 <input type="hidden" name="eventId" />
+                <label style="font-weight: bold;">Due Date<span class="date"><!-- Date gets shoved in here --></span></label>
                 <label>Complete<input id="modifyTaskBubbleCompleted" name="completed" type="checkbox" value="1" /></label>
                 <label>Task<input id="modifyTaskBubbleNote" name="note" type="text" value="" /></label>
-                <label>Due Date<span class="date"><!-- Date gets shoved in here --></span></label>
                 <label class="detail">Note<textarea id="modifyTaskBubbleDetail" name="detail"></textarea></label>
                 <input type="submit" class="btn float-right no-icon" value="Update Task" />
-                <a href="#" class="deleteTask">Delete</a>
+                <a href="#" class="deleteTask btn no-icon float-right">Delete</a>
             </form>
 
         </div>
