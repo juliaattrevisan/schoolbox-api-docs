@@ -634,7 +634,8 @@ class Calendar extends DeprecatedModel {
 				user.id as uid, title, firstname, lastname,
 				eventType, eventColour,
 				event.publish_date,
-				category.id AS categoryId, category.name AS categoryName
+				category.id AS categoryId, category.name AS categoryName,
+				event.completed
 			FROM event
 			LEFT JOIN user ON owner = user.id
 			LEFT JOIN luEventType ON type = eventTypeID
@@ -690,6 +691,7 @@ class Calendar extends DeprecatedModel {
                     $event->setCategoryname($currentEvent['categoryName']);
                 }
                 $event->setAttendance($currentEvent['attendance']);
+				$event->setCompleted($currentEvent['completed']);
 
                 $stack->add($event);
             }
@@ -829,8 +831,24 @@ class Calendar extends DeprecatedModel {
     }
 
     function delPerms($eventID) {
+
         $this->db->delete('eventGroup', 'eventID', $eventID);
         $this->db->delete('eventCampus', 'eventID', $eventID);
+    }
+
+    function updateFilters($filters, $view) {
+        // set the filters into the session
+        foreach($filters as $filter) {
+            $_SESSION['calendarFilter'][$filter[0]] = preg_replace('/[^0-9]/', '', $filter[1]);
+        }
+
+        // update the user table to hold onto the view that they last used
+        if($this->db->update('user', 'id', array('id' => $_SESSION['id'], 'calendar_view' => $view))) {
+            // update the session to cache the db change
+            $_SESSION['calendar_view'] = $view;
+            return true;
+        }
+        return false;
     }
 
     function create($event) {

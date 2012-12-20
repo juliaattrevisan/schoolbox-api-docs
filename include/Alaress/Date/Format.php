@@ -31,6 +31,17 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface {
 	}
 
 	/**
+	 * Add/subtract minutes and reinitialise
+	 *
+	 * @param $val
+	 */
+	public function addMinutes($val) {
+		$time = $this->getStrategy()->getUnixTimestamp() + (60*$val);
+
+		$this->getStrategy()->__construct($time, 'U');
+	}
+
+	/**
 	 * Add/subtract hours and reinitialise
 	 *
 	 * @param $val

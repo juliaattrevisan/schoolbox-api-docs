@@ -130,9 +130,9 @@ abstract class Calendar_Week_Abstract {
 
 		$this->setSelected($selected);
 
-		$this->getPage()->checkList('group', $this->getCategoryList(), $selected['group'], TEMPLATE_content, array('name' => 'GROUP_NAME', 'id' => 'GROUP_ID'));
-		$this->getPage()->checkList('campus', $this->getCalendarHandler()->getFilterCampusList($_SESSION['id']), $selected['campus']);
-		$this->getPage()->checkList('event_type', $this->getCalendarHandler()->getTypeList(), $selected['event_type'], TEMPLATE_content, array('eventType' => 'EVENT_TYPE_NAME', 'eventTypeID' => 'EVENT_TYPE_ID', 'eventColour' => 'EVENT_TYPE_COLOUR'));
+		$this->getPage()->checkList('filter_group', $this->getCategoryList(), $selected['group'], TEMPLATE_content, array('name' => 'GROUP_NAME', 'id' => 'GROUP_ID'));
+		$this->getPage()->checkList('filter_campus', $this->getCalendarHandler()->getFilterCampusList($_SESSION['id']), $selected['campus']);
+		$this->getPage()->checkList('filter_event_type', $this->getCalendarHandler()->getTypeList(), $selected['event_type'], TEMPLATE_content, array('eventType' => 'EVENT_TYPE_NAME', 'eventTypeID' => 'EVENT_TYPE_ID', 'eventColour' => 'EVENT_TYPE_COLOUR'));
 		$this->getPage()->setVar('BACK', date("j-n-Y", strtotime("-1 week", $this->getSelectedDate())));
 		$this->getPage()->setVar('FORWARD', date("j-n-Y", strtotime("+1 week", $this->getSelectedDate())));
 	}
@@ -225,7 +225,7 @@ abstract class Calendar_Week_Abstract {
 	/**
 	 * Get page
 	 *
-	 * @return null
+	 * @return SitePage
 	 */
 	protected function getPage() {
 		return $this->page;

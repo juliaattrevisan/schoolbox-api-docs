@@ -67,6 +67,7 @@ class Session
             $_SESSION['eportfolio_enabled'] = $user['eportfolio_enabled'];
             $_SESSION['ip'] = $ip;
             $_SESSION['campus'] = $userHandler->getUserCampus($user['uid']);
+            $_SESSION['calendar_view'] = $user['calendar_view'];
 
             //if no webmail enabled or user has elected to use external client set mailhandle to mailto:
             if (Cfg::get('mail_enable') == 0 || $user['mail_handler'] || ($groupHandler->isParent() && !$user['local_email']))

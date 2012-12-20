@@ -1,0 +1,449 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.css" />
+<link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.print.css" media="print" />
+<script type="text/javascript" src="/javascript/jquery.fullcalendar.js"></script>
+<script type="text/javascript">
+
+    // provide page-wide access to the calendar object so the callbacks can actually use it
+    var c;
+
+    // once the DOM has loaded, punch a fancy calendar into it
+    $j(document).ready(function() {
+        c = new Calendar('calendar', 'calendar-bubble', {
+            // overrides and callbacks
+            taskTypeId: '{TASK_TYPE_ID}',
+            crud: {
+                c: '/calendar/ajax/create',
+             // r: don't need it
+                u: '/calendar/ajax/update',
+                d: '/calendar/ajax/delete'
+            },
+            filter: {
+                ajax: '/calendar/ajax/filter'
+            },
+            fullCalendar: {
+
+                defaultView: '{CALENDAR_VIEW}',
+
+                /**
+                 * When an event is drawn on the calendar
+                 * @param calEvent
+                 * @param jsEvent
+                 * @param view
+                 */
+                eventRender: function(calEvent, jsEvent, view) {
+
+                    // If appropriate, indicate this event can be attended
+                    var span = '<span class="att">(A)</span>';
+
+                    if (calEvent.data.attendance.icon.toString() == 'true') {
+                        if((content = jsEvent.find('.fc-event-content')).length == 1) {
+                            content.append(span)
+                        }
+                        else {
+                            jsEvent.find('.fc-event-inner').append(span)
+                        }
+                    }
+
+                    // If this event is a task, alter the state of the checkbox accordingly
+                    if (calEvent.data.meta.eventTypeId == c.options.taskTypeId) {
+                        $j(jsEvent).find('.fc-event-inner').prepend('<input id="t'
+                            + calEvent.data.meta.eventId + '" type="checkbox" name="completed" />')
+                        if (calEvent.data.meta.completed == '1') {
+                            $j(jsEvent).find('.fc-event-inner input').prop('checked', true)
+                        }
+                    }
+                },
+
+                /**
+                 * When an event is clicked
+                 * @param calEvent
+                 * @param jsEvent
+                 * @param view
+                 */
+                eventClick: function(calEvent, jsEvent, view) {
+
+                    // setup data to be displayed
+                    var data = $j.extend(true, {}, calEvent.data.meta)
+                    data.note = calEvent.title
+
+                    if(calEvent.data.meta.eventTypeId == c.options.taskTypeId) {
+                        data.date = calendarDateOnly(calEvent.start)
+                    }
+                    else {
+                        data.date = calendarDate(calEvent.start)
+                    }
+
+
+                    // end time
+                    if (calEvent.end != null) {
+                        data.date += " &ndash; " + calendarTime(calEvent.end)
+                    }
+
+                    // Links to Modify Screen
+                    if (calEvent.editable == true) {
+                        data.modifyLink = '<a class="btn modify float-right" href="/calendar/modify.php?eventID='
+                                        + calEvent.data.meta.eventId + '&returnTo=week"><span></span>Modify</a>'
+                    }
+
+
+                    $j.each(calEvent.data.attendance, function(k, v) {
+                        data['attendance' + k.capitalise()] = v
+                    })
+
+                    // Attendance List butonye
+                    if (data.attendanceListButton.toString() == 'true') {
+                        data.attendanceIcon = "This event can be attended."
+                        data.attendanceListButton = '<a class="btn float-right" href="/calendar/attendance/list/'
+                                                  + calEvent.data.meta.eventId + '"><span></span>Attendance List</a>'
+                    }
+                    // Attend/Unattend butonye
+                    else if (data.attendanceRequestButton.toString() != 'false') {
+                        data.attendanceRequestButton = "<span></span>" + calEvent.data.attendance.requestButton.toString()
+                    }
+
+                    c.bubble.display('edit', data, jsEvent, this)
+                },
+
+
+                /**
+                 * When you finish resizing an event, update it
+                 * Note the difference between eventResize() and eventResizeStop()
+                 * @param calEvent
+                 * @param jsEvent
+                 * @param ui
+                 * @param view
+                 */
+                eventResize: function(calEvent, jsEvent, ui, view) {
+                    var data = {
+                        eventId: calEvent.data.meta.eventId,
+                        resize: true,
+                        start: calendarDate(calEvent.start),
+                        end: calendarDate(calEvent.end)
+                    };
+
+                    // console.log('mort');
+
+                    c.update(data);
+                },
+
+                /**
+                 * When you finish dragging an event to its new home
+                 * @param event
+                 * @param dayDelta
+                 * @param minuteDelta
+                 * @param allDay
+                 * @param revertFunc
+                 */
+                eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc) {
+                    var data = {
+                        eventId: event.data.meta.eventId,
+                        dayDelta: dayDelta,
+                        minuteDelta: minuteDelta,
+                        allDay: allDay
+                    };
+
+                    /* TODO: Event re-render
+                     *
+                     * If an event's length exceeds the threshold of the current day
+                     * (e.g. a five-hour event got dragged to 11pm) the back-end changes
+                     * its end date to be 23:59:59 of the current day. However this
+                     * doesn't update the DOM until you reload the page. I haven't found
+                     * a re-render method for individual events.
+                     */
+                    c.update(data);
+                },
+
+                /**
+                 * When you click on a day to add a new event
+                 * @param date
+                 * @param allDay
+                 * @param jsEvent
+                 * @param view
+                 */
+                dayClick: function(date, allDay, jsEvent, view) {
+
+                    // Date formatting
+                    var weekday = [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ]
+
+                    var month = [ "January", "February", "March", "April", "May", "June", "July", "August",
+                                  "September", "October", "November", "December" ]
+
+                    var displayDate = weekday[date.getDay()] + ', ' + date.getDate() + ' ' + month[date.getMonth()];
+
+                    var eventData = {
+                        date: date.valueOf(),
+                        displayDate: displayDate
+                    }
+
+                    c.bubble.display('create', eventData, jsEvent, this)
+
+                },
+
+                /**
+                 * When the window is resized
+                 * @param view
+                 */
+                windowResize: function(view) {
+                    var wHeight = $j(window).height()
+                    var calTop = c.dom.offset().top
+                    c.dom.fullCalendar('option','contentHeight',wHeight - calTop - 60)
+                },
+
+                /**
+                 * When external data is being fetched
+                 * @param isLoading
+                 * @param view
+                 */
+                loading: function(isLoading, view) {
+                    // has finished loading
+                    if(isLoading === false) {
+                        // console.log('finished loading')
+                        // update any tasks that have been completed by strikethrough-ing them
+                        $j(this).find('input[type=checkbox]').each(function() {
+                            var self = $j(this)
+                            if(self.prop('checked')) {
+                                self.siblings('.fc-event-title').addClass('strike')
+                            }
+                        })
+
+                        // reapply filters
+                        c.filters.organise(c, ["campus", "groups"], false)
+                    }
+                },
+
+                /**
+                 * Whenever the view is changes
+                 * @param view
+                 */
+                viewDisplay: function(view) {
+                    // apply filters, which will also ajax the change of view to store in the db
+                    if(c !== undefined) {
+                        c.filters.organise(c, ["campus", "groups"])
+                    }
+                },
+
+                // Stream location
+                events: '/calendar/ajax/full'
+            },
+
+            x: false
+        }).init()
+
+
+        /* LISTENERS */
+        // toggle onto the create task form
+        $j('#showCreateTaskForm').click(function(e) {
+            e.preventDefault()
+            c.getForm('createEvent').hide()
+            c.getForm('createTask').show()
+
+            // copy details from event to task
+            cp('event', 'task', ['date', 'displayDate', 'note'])
+
+        });
+
+        // toggle onto the create event form
+        $j('#showCreateEventForm').click(function(e) {
+            e.preventDefault()
+            c.getForm('createEvent').show()
+            c.getForm('createTask').hide()
+
+            // copy details from event to task
+            cp('task', 'event', ['date', 'displayDate', 'note'])
+
+        })
+
+        // click 'Edit Event' and push data through to main form page
+        $j('#edit-full').click(function(e) {
+            var getstring = $j(this).closest('form').serialize()
+            var l = window.location
+            window.location = l.protocol + '//' + l.hostname + '/calendar/modify.php?from=inline&' + getstring
+        })
+
+        // hide bubbles if any header buttons are clicked
+        $j('#calendar .fc-header').delegate('span.fc-button', 'click', function(e) {
+            c.bubble.hide()
+        })
+
+        // AJAX update attendance when the attendance toggle-button is clicked
+        c.getForm('editEvent').delegate('.attendanceRequestButton', 'click', function(e) {
+            c.post('/service/attendance/processToggleAttendance', c.getForm('editEvent').serialize(), function (data) {
+                var btn = c.getForm('editEvent').find('.attendanceRequestButton')
+                if (data.error == undefined) {
+                    if (btn.text() == 'Attend') {
+                        btn.html('<span></span>Unattend')
+                    }
+                    else {
+                        btn.html('<span></span>Attend')
+                    }
+                }
+            })
+        })
+
+        // if a checkbox on the editTask form is interacted, update the appropriate event on the calendar
+        c.getForm('editTask').delegate('input[name=completed]', 'change', function(e) {
+            var self = $j(this)
+            var eventId = self.closest('form').find('input[name=eventId]').val()
+            var chk = c.dom.find('#t'+eventId)
+            chk.prop('checked', self.prop('checked'))
+            chk.trigger('change')
+        })
+
+        c.getForm('editTask').delegate('.deleteTask', 'click', function(e) {
+            var id = $j(this).siblings('input[name=eventId]').val()
+            c.delete({eventId: id})
+            c.bubble.hide()
+            e.preventDefault()
+            return false
+        })
+
+        // if a checkbox on the calendar is interacted, ajax
+        c.dom.delegate('input[type=checkbox]', 'change', function(e) {
+
+            var self = $j(this)
+            var ttl = self.siblings('.fc-event-title')
+            if(self.prop('checked')) {
+                ttl.addClass('strike')
+            }
+            else {
+                ttl.removeClass('strike')
+            }
+            data = {
+                eventId: self.attr('id').slice(1),
+                completed: self.prop('checked') ? 1 : 0
+            }
+            c.update(data)
+            c.bubble.hide()
+            c.suppressOne()
+            e.stopPropagation()
+            e.preventDefault()
+            return false
+        })
+
+
+    })
+</script>
+<!-- END custom_head -->
+
+<div id="calendar-bubble" class="cal-bubble">
+    <div class="middle">
+        <div class="close">&times;</div>
+        <div class="js-data clearfix">
+
+            <!-- Create Event Form-->
+            <form id="createEvent" method="post" action="#">
+                <ul class="createSwitch">
+                    <li><a href="#" class="selected">Event</a></li>
+                    <li><a href="#" id="showCreateTaskForm">Task</a></li>
+                </ul>
+                <input name="date" type="hidden" value="" />
+                <label>When<span class="displayDate"><!-- Date gets shoved in here --></span></label>
+                <label>Event Title<input name="note" type="text" value="" /></label>
+                <label>Event Type<select name="type">
+                    <!-- BEGIN event_type -->
+                    <option value="{EVENT_TYPE_ID}">{EVENT_TYPE_NAME}</option>
+                    <!-- END event_type -->
+                </select></label>
+                <a href="#" id="edit-full">Edit event &raquo;</a>
+                <input class="btn modify float-right no-icon" type="submit" value="Create Event" />
+            </form>
+
+            <!-- Create Task Form -->
+            <form id="createTask" method="post" action="#">
+                <ul class="createSwitch">
+                    <li><a href="#" id="showCreateEventForm">Event</a></li>
+                    <li><a href="#" class="selected">Task</a></li>
+                </ul>
+                <input name="date" type="hidden" value="" />
+                <input name="type" type="hidden" value="{TASK_TYPE_ID}" />
+                <label>Task<input name="note" type="text" value="" /></label>
+                <label>Due Date<span class="displayDate"><!-- Date gets shoved in here --></span></label>
+                <label class="detail">Note<textarea name="detail"></textarea></label>
+                <input class="btn modify float-right no-icon" type="submit" value="Create Task" />
+            </form>
+
+            <!-- Edit Event Form -->
+            <form id="editEvent">
+                <dl>
+                    <dd><h3 class="note"></h3></dd>
+                    <dd><h4><span class="date"></span></h4></dd>
+                    <dd><p class="location"></p></dd>
+                    <dd class="post-by">Posted by <a class="author" href="#"></a></dd>
+                </dl>
+                <div class="attendance">
+                    <dl>
+                        <dd><p class="attendanceIcon"></p></dd>
+                        <dd class="rm"><p class="attendanceStatus"></p></dd>
+                    </dl>
+                </div>
+                <div class="actions">
+                    <dl>
+                        <dd><p class="modifyLink"></p></dd>
+                        <dd><p class="attendanceListButton"></p></dd>
+                        <dd><p class="attendanceRequestButton"></p></dd>
+                    </dl>
+                </div>
+            </form>
+
+            <!-- Modify Task Form -->
+            <form id="editTask">
+                <h3>Task</h3>
+                <input type="hidden" name="eventId" />
+                <label style="font-weight: bold;">Due Date<span class="date"><!-- Date gets shoved in here --></span></label>
+                <label>Complete<input id="modifyTaskBubbleCompleted" name="completed" type="checkbox" value="1" /></label>
+                <label>Task<input id="modifyTaskBubbleNote" name="note" type="text" value="" /></label>
+                <label class="detail">Note<textarea id="modifyTaskBubbleDetail" name="detail"></textarea></label>
+                <input type="submit" class="btn float-right no-icon" value="Update Task" />
+                <a href="#" class="deleteTask btn no-icon float-right">Delete</a>
+            </form>
+
+        </div>
+        <div class="bottom"><strong></strong></div>
+    </div>
+</div>
+
+<div id="calendar-controls" class="calendar-controls no-height clearfix">
+    <div class="link-case">
+        <div class="filter-drop clearfix">
+            <div class="filter-list">
+                <form class="clearfix">
+                    <div class="filter-cat groups clearfix"><span class="filter-title">Groups</span>
+                        <!-- BEGIN filter_group -->
+                        <label title="{GROUP_NAME}">
+                            <input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}"
+                            {GROUP_ID_SELECTED} class="checkbox applyFilters"/>
+                            {GROUP_NAME} </label>
+
+                        <!-- END filter_group -->
+                    </div>
+                    <div class="filter-cat campus"><span class="filter-title">Campus</span>
+                        <!-- BEGIN filter_campus -->
+                        <label title="{CAMPUS_NAME}">
+                            <input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}
+                            value="campus{CAMPUS_ID}" class="checkbox applyFilters"/>
+                            {CAMPUS_NAME} </label>
+
+                        <!-- END filter_campus -->
+                    </div>
+                    <div class="filter-cat events last"><span class="filter-title">Event</span>
+                        <!-- BEGIN filter_event_type -->
+                        <label title="{EVENT_TYPE_NAME}">
+                            <input type="checkbox" name="events" id="{EVENT_TYPE_ID}" {EVENT_TYPE_ID_SELECTED}
+                            value="type{EVENT_TYPE_ID}" class="checkbox applyFilters"/>
+                            <span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span>
+                        </label>
+                        <!-- END filter_event_type -->
+
+                    </div>
+                    <!--/filter-list-->
+                </form>
+                <p class="clearfix"><a href="#" id="applyFilters" class="btn float-right"><span></span>Apply
+                    Filters</a></p>
+                <!--/filter-drop-->
+            </div>
+        </div>
+    </div>
+</div>
+<div id="calendar"></div>
+

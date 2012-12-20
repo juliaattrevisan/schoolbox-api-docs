@@ -146,7 +146,18 @@ else {
     $page->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
     $page->setTitle('Add Calendar Event');
 
-    list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $_GET['date']);
+    $date = $_GET['date'];
+    $note = '';
+    $type = '';
+
+    // test whether or not this has come from an inline form on the calendar, or not
+    if(isset($_GET['from']) && $_GET['from'] == 'inline') {
+        $date = date('d-m-Y', $_GET['date'] / 1000);
+        $note = $_GET['note'];
+        $type = $_GET['type'];
+    }
+
+    list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $date);
 
     $selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
 
@@ -168,7 +179,7 @@ else {
         'PMTO' => '',
         'LEVEL' => '',
         'GROUP' => '',
-        'DESCRIPTION' => '',
+        'DESCRIPTION' => $note,
         'LOCATION' => '',
         'ATTENDANCE' => '',
         'DETAIL' => '',
@@ -179,7 +190,7 @@ else {
     $page->setVar($output);
 
     $page->dropDown(
-        'type_drop', $calendarHandler->getTypeList(), '', TEMPLATE_content,
+        'type_drop', $calendarHandler->getTypeList(), $type, TEMPLATE_content,
         array('eventTypeID' => 'TYPE_NUMBER', 'eventType' => 'TYPE_NAME')
     );
 

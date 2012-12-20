@@ -55,6 +55,7 @@ class Calendar_Event_Collection_Renderer {
 		/* Sort all the events in order of time
 		 */
 		$this->getAllEvents()->sort();
+
 	}
 
 	/**
