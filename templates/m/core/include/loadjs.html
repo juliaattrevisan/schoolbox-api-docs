@@ -235,16 +235,6 @@ $("#bubble").on(clickEvent, '.wp', function(e){
     return false;
 });
 
-var nyan = 0;
-$("#page").on(clickEvent, '#nyan', function(e){
-    debug('nyan clicked');
-    if (nyan < 3) { nyan++ }
-    else { $('body').load('/m/nyan.html'); }
-
-    return false;
-});
-
-
 $("#page, #header aside").on(clickEvent, 'a', function(){
     var href = $(this).attr('href')
 

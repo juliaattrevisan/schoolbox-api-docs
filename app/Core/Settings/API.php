@@ -27,7 +27,7 @@ class Core_Settings_API {
                 'aside'   => '',
                 'class'   => 'about',
                 'icon'    => 'settings',
-                'content' => array('this data is being ignored'),
+                'content' => array('site_version' => Cfg::get('site_version')),
             )
         ));
         return $response;
