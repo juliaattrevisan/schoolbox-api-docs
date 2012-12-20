@@ -506,9 +506,18 @@ function cp(from, to, selector) {
  * @return {String}
  */
 function calendarDate(datetime) {
-    var S,
-        p = datetime.toString().split(/[ :]/),
-        hm = calendarTime(datetime)
+    var hm = calendarTime(datetime)
+    var d = calendarDateOnly(datetime)
+    return d + ', ' + hm
+}
+
+/**
+ * Convert a datetime into a date only
+ * @param datetime
+ * @return {String}
+ */
+function calendarDateOnly(datetime) {
+    var S, p = datetime.toString().split(/[ :]/)
 
     if(p[2] == 11 || p[2] == 12) { S = 'th'; }
     else { var i = p[2].charAt(p[2].length - 1)
@@ -517,7 +526,7 @@ function calendarDate(datetime) {
         else if(i == 3) { S = 'rd' }
         else { S = 'th' }
     }
-    return p[0] + ', ' + parseInt(p[2]) + S + ' ' + p[1] + ', ' + hm
+    return p[0] + ', ' + parseInt(p[2]) + S + ' ' + p[1]
 }
 
 /**

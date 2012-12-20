@@ -11,6 +11,47 @@
  */
 class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Renderer_Abstract {
 
+    /**
+     * The typeId of Task event types
+     *
+     * @var int
+     */
+    private $taskTypeId = -1;
+
+    /**
+     * Stinky Call Super style -_-
+     *
+     * @param $page
+     */
+    public function __construct($page) {
+
+        /* Forgive me, for I have sinned
+         */
+        parent::__construct($page);
+
+        /* Determine which event type is the Task one
+         */
+        $this->detectTaskTypeId();
+    }
+
+    /**
+     * Detect the task type id
+     */
+    private function detectTaskTypeId() {
+        $allTypes = $this->getCalendarHandler()->getTypeList();
+
+        if (is_array($allTypes) && count($allTypes)) {
+            foreach($allTypes as $currentType) {
+
+                /* Event Task id
+                 */
+                if ($currentType['eventType'] == 'Task') {
+                    $this->setTaskTypeId($currentType['eventTypeID']);
+                }
+            }
+        }
+    }
+
 	/**
 	 * Visitor
 	 *
@@ -97,6 +138,15 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 			$start = $currentEvent->getStartTime()->getDatabaseDate() . ' ' . $currentEvent->getStartTime()->getDatabaseTime();
 			$end = $currentEvent->getEndTime()->getDatabaseDate() . ' ' . $currentEvent->getEndTime()->getDatabaseTime();
 
+            /* Make tasks allDay events by default
+             */
+            if ($this->isTask($currentEvent)) {
+                $allDay = true;
+            }
+            else {
+                $allDay = false;
+            }
+
 			$event = array(
 				'title' => $currentEvent->getNote(),
 				'start' => "$start",
@@ -112,7 +162,7 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 				 * Schoolbox usage would be that all events are not
 				 * allDay events
 				 */
-				'allDay' => false,
+				'allDay' => $allDay,
 
 				/* Colour of the event
 				 */
@@ -183,4 +233,35 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 
 		return true;
 	}
+
+    /**
+     * Determine whether an event is a task or not
+     *
+     * @param $currentEvent
+     * @return bool
+     */
+    private function isTask($currentEvent) {
+        if ($currentEvent->getType() == $this->getTaskTypeId()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @param int $taskTypeId
+     */
+    private function setTaskTypeId($taskTypeId) {
+        $this->taskTypeId = $taskTypeId;
+    }
+
+    /**
+     * @return int
+     */
+    private function getTaskTypeId() {
+        return $this->taskTypeId;
+    }
 }
