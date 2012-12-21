@@ -94,9 +94,6 @@ if ($permission >= WRITE_ACCESS) {
                     $class .= 'disabled ';
                 }
             }
-            if (!class_exists($component->class)) {
-                $class .= 'undeveloped ';
-            }
 
             $class = trim($class);
 
@@ -138,6 +135,13 @@ if ($permission >= WRITE_ACCESS) {
             $tabList[$component->componentCategory]['count']++;
 
         }
+    }
+    else {
+        $this->setVar(array(
+            'homepage_component_block' => '',
+            'homepage_component_page_block' => 'No components are available for you to add.',
+            'homepage_component_tab_block' => '',
+        ));
     }
 
     if (isset($tabList) && count($tabList)) {
