@@ -525,7 +525,7 @@ class SitePage extends Page {
 
 
         }
-        if ($this->site == 'cathedral') {
+        else {
             $this->setBlock('tabTpl', 'myfiles_tab', 'mf_tab');
             if ($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) {
                 $this->parse('mf_tab', 'myfiles_tab');
