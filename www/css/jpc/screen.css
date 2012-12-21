@@ -180,7 +180,7 @@ html, body{
 }
 
 body {
-    /*background: url("/images/jpc/background-repeater.jpg") repeat-x scroll 0 0 #E6E4F2;*/
+    background: #E6E4F2;
 }
 h2, h2 a, .header_option, .calendar-controls {
     background-color: #f7e19b;

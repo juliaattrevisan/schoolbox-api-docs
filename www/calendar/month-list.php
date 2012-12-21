@@ -8,5 +8,7 @@
  * @version	 SVN: $Id$
  */
 
-$calendar = new Calendar_Month_List_Default($this, $this->arg[0]);
-$calendar->render();
+SitePage::localRedir('/calendar/full');
+
+//$calendar = new Calendar_Month_List_Default($this, $this->arg[0]);
+//$calendar->render();
