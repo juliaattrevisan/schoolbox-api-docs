@@ -12,7 +12,7 @@
                 <th>Name</th>
                 <th>Student ID</th>
                 <th>Year Level</th>
-                <th>House</th>
+                <th>Clan</th>
                 <th>Last Visited</th>
             </tr>
             </thead>
@@ -52,8 +52,15 @@
                     <!-- END actions -->
                 </td>
                 <td valign="top" style="vertical-align:top;">
-                    <!-- BEGIN special -->&nbsp;<!-- END special -->
-                    <!-- BEGIN medical -->&nbsp;<!-- END medical -->
+                <div class="alert-wrap">
+                    <!-- BEGIN special -->
+                    <img src="/images/famicons/bell.png" title="Special Needs"/>
+                    <!-- END special -->
+                    <!-- BEGIN medical -->
+                    <img src="/images/famicons/exclamation.png" alt="{MEDICAL_ALERT}"
+                         title="Medical Alert: {MEDICAL_ALERT}"/>
+                    <!-- END medical -->
+                </div>
                 </td>
             </tr>
             <!-- END student_list -->
