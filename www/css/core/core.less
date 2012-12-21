@@ -4355,6 +4355,15 @@ CALENDAR
         &.current, &:hover {
             background: @subnav-header-background;
         }
+        &.day {
+            span {
+                background: url(/images/core/calendar/calendar-day.png) no-repeat;
+            }
+        }
+        &.day.current span,
+        &.day:hover span {
+            background: url(/images/core/calendar/calendar-day.png) 0 -14px no-repeat;
+        }
         &.week {
             span {
                 background: url(/images/core/calendar/calendar-week.png) no-repeat;
