@@ -19,12 +19,15 @@ if(is_numeric($_GET['id']))
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submissionReturn.php';
 		$submissionReturn = new SubmissionReturn;
 
+        $groupHandler = new Group;
+
 		$return = $submissionReturn->getByID($_GET['id']);
 
 		if(!isset($return['id']))
 			error(44);
 
-		if($return['owner'] != $_SESSION['id'])
+        // Allow file return owner, parent of owner or all staff access to this file
+		if( !( $return['owner'] == $_SESSION['id'] || $groupHandler->isParentOfChild($return['owner']) || $groupHandler->isStaff()  ) )
 			error(44);
 
 		$file = Cfg::get('returns_dir') . '/' . $return['id']. '.dat';
