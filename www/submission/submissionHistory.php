@@ -261,7 +261,7 @@ if (is_array($allWork) && count($allWork)) {
 
             // if you are a parent (and only a parent), you can only see plaintext, not a link
             if($parentOnly) {
-                $this->setVar('history_submitted_block', 'Work Submitted');
+                $this->setVar('history_submitted_block', 'submitted work');
             } else {
                 $this->parse('history_submitted_block', 'history_submitted');
             }
@@ -389,12 +389,12 @@ if($recentSubmission['sid']) {
 
     // if parent, hide the "view submitted work" button
     if($parentOnly) {
-        $this->setVar('recent_submission_download_block', '');
+        $this->setVar('recent_submission_block', '');
     } else {
         $this->parse('recent_submission_download_block', 'recent_submission_download');
+        $this->parse('recent_submission_block', 'recent_submission');
     }
 
-    $this->parse('recent_submission_block', 'recent_submission');
 }
 else {
 	/* Hide most recent submission
