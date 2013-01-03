@@ -359,6 +359,14 @@ abstract class Component_ControllerAbstract {
         return $return;
     }
 
+    /**
+     * @param $key
+     * @return bool
+     */
+    protected function hasConfig($key) {
+        return isset($this->config[$key]) ? true : false;
+    }
+
     public function getSortFields() {
         return $this->sortFields;
     }
