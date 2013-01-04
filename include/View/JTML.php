@@ -136,34 +136,39 @@ class View_JTML implements View_Interface {
                     ),
                 );
             }
-            // actually display some error handling so we can see what's going on.......
+            // display a helpful message to the user, and give the option of sending an equally helpful error report
             else {
-                //                $mailTo = 'matt.day';
-                //                $subject = 'SBM%20error%20report';
-                //                $school = 'dev';
-                //                $emailString = sprintf("mailto:%s@alaress.com.au?subject=%s&body=%s%20got%20a%20{{CODE}}%20trying%20to%20access%20%s.%20The%20following%20errors%20occurred:%20{{ERRORS}}.{{BACKTRACE}}");
-
                 $err[] = array(
                     'title' => 'Sorry, Schoolbox Mobile encountered an error.',
                     'aside' => '',
-                    'class' => 'giza-error',
+                    'class' => 'giza-error wide',
                     'icon' => 'error',
-                    'content' => '<ul><li><a href="#" id="wipeCache">Whoops! Tap here to clear the cache and go back to the dashboard.</li></ul>'
+                    'content' => '
+                    <ul><li>
+                        <a href="#" id="sendReport">Tap here to send an error report</a>
+                    </li><li>
+                        <a href="#" id="wipeCache">Tap here to go back to the dashboard</a>
+                    </li></ul>
+                    '
                 );
 
                 $err[] = array(
                     'title' => 'URI',
                     'aside' => '',
-                    'class' => 'giza-error',
+                    'class' => 'giza-error technical',
                     'icon' => 'error',
                     'content' => sprintf("<ul><li>%s</li></ul>", $_SERVER['REQUEST_URI'])
                 );
 
                 if(count($response->getError())) {
                     foreach($response->getError() as $k => $v) {
-                        $v = sprintf("<pre style=%s>%s</pre>", '"font-size:0.6em; padding: 1em;"', $v);
+                        // $v = sprintf("<pre style=%s>%s</pre>", '"font-size:0.6em; padding: 1em;"', $v);
                         $err[] = array(
-                            'title' => $k, 'aside' => '', 'class' => 'giza-error', 'icon' => 'error', 'content' => $v
+                            'title' => $k,
+                            'aside' => '',
+                            'class' => 'giza-error technical',
+                            'icon' => 'error',
+                            'content' => $v
                         );
                     }
                 }
@@ -173,12 +178,13 @@ class View_JTML implements View_Interface {
                     ),
                 );
             }
-
+/*
+            THIS IS FOR DEBUGGING REQUESTS IF REQUIRED, WILL DUMP THE WHOLE REQUEST AND RESPONSE TO FILE
             $fp = fopen('/tmp/lasttrace.txt', 'w');
             $trace = debug_backtrace();
             fwrite($fp, serialize($trace));
             fclose($fp);
-
+*/
             if($returnOutput) {
                 return $jsonOutput;
             }
@@ -187,13 +193,10 @@ class View_JTML implements View_Interface {
                 die(json_encode($jsonOutput));
             }
 
-        } // could not load the templates. Fall back to something of a default nature...
+        }
+        // could not load the templates
         catch(Twig_Error_Loader $e) {
-            // don't recommend a redirect here, but can't think of anything better
-            // ...go home
-            die('TRY PREPENDING core. TO THE URL: ' . $e);
-            $response->addInternalRedirectHeader('mobile');
-            $response->sendHeaders();
+            die($e);
         } catch(ErrorException $e) {
             die($e);
         }
