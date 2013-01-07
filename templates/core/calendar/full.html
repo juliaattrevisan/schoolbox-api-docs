@@ -124,7 +124,7 @@
 
                     // console.log('mort');
 
-                    c.update(data);
+                    c.cupdate(data);
                 },
 
                 /**
@@ -151,7 +151,7 @@
                      * doesn't update the DOM until you reload the page. I haven't found
                      * a re-render method for individual events.
                      */
-                    c.update(data);
+                    c.cupdate(data);
                 },
 
                 /**
@@ -292,7 +292,7 @@
 
         c.getForm('editTask').delegate('.deleteTask', 'click', function(e) {
             var id = $j(this).siblings('input[name=eventId]').val()
-            c.delete({eventId: id})
+            c.cdelete({eventId: id})
             c.bubble.hide()
             e.preventDefault()
             return false
@@ -313,7 +313,7 @@
                 eventId: self.attr('id').slice(1),
                 completed: self.prop('checked') ? 1 : 0
             }
-            c.update(data)
+            c.cupdate(data)
             c.bubble.hide()
             c.suppressOne()
             e.stopPropagation()

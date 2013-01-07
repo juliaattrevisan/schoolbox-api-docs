@@ -193,7 +193,7 @@ Calendar.prototype.init = function() {
             this.submit(function() {
                 var data = $j(this).serialize()
 
-                c.create(data, function(responseText) {
+                c.ccreate(data, function(responseText) {
                     if (responseText.length) {
                         var responseData = new Function('return ' + responseText)
                         var newEvent = responseData()
@@ -210,7 +210,7 @@ Calendar.prototype.init = function() {
             this.submit(function() {
                 var data = $j(this).serialize()
 
-                c.update(data, function(responseText) {
+                c.cupdate(data, function(responseText) {
                     if (responseText.length) {
                         var responseData = new Function('return ' + responseText)
                         var newEvent = responseData()
@@ -303,7 +303,7 @@ Calendar.prototype.suppressOne = function() {
  * @param data
  * @param callback
  */
-Calendar.prototype.create = function(data, callback) {
+Calendar.prototype.ccreate = function(data, callback) {
     this.post(this.options.crud.c, data, callback)
 }
 
@@ -312,7 +312,7 @@ Calendar.prototype.create = function(data, callback) {
  * @param data
  * @param callback
  */
-Calendar.prototype.read = function(data, callback) {
+Calendar.prototype.cread = function(data, callback) {
     this.post(this.options.crud.r, data, callback)
 }
 
@@ -321,7 +321,7 @@ Calendar.prototype.read = function(data, callback) {
  * @param data
  * @param callback
  */
-Calendar.prototype.update = function(data, callback) {
+Calendar.prototype.cupdate = function(data, callback) {
     this.post(this.options.crud.u, data, callback)
 }
 
@@ -330,7 +330,7 @@ Calendar.prototype.update = function(data, callback) {
  * @param data
  * @param callback
  */
-Calendar.prototype.delete = function(data, callback) {
+Calendar.prototype.cdelete = function(data, callback) {
     this.post(this.options.crud.d, data, callback)
 }
 
