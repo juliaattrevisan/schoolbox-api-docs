@@ -201,6 +201,7 @@ Calendar.prototype.init = function() {
                         c.dom.fullCalendar('renderEvent', newEvent)
                     }
                 })
+                c.clearForms()
                 c.bubble.hide()
                 return false
             })
@@ -282,6 +283,13 @@ Calendar.prototype.post = function(url, data, successCallback, refetch) {
         }
     })
 }
+
+Calendar.prototype.clearForms = function() {
+    $j.each(this.getForms(), function() {
+        this.find('input[type=text], textarea').val('')
+    })
+}
+
 
 /**
  * Set the bubble suppressor to true
