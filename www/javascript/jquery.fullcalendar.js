@@ -400,6 +400,10 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
  * @param y vertical position of the bubble speech point
  */
 Bubble.prototype.showForm = function(id, x, y) {
+
+    var minEdgeDistance = 5
+    var navWidth = $j('#nav').width()
+
     // hide the bubble, but keep it displayed
     this.dom.css({visibility:'hidden', display:'block'})
     $j.each(this.forms, function(i, elem) {
@@ -420,13 +424,20 @@ Bubble.prototype.showForm = function(id, x, y) {
     this.dom.show()
 
     var bubbleHeight = mid.outerHeight() + mid.find('.bottom').outerHeight()
-    var topEdge = Math.max(0, y - bubbleHeight)
+    // don't allow the bubble to fall off the top of the page
+    var topEdge = Math.max(minEdgeDistance, y - bubbleHeight)
 
     var bubbleWidth = mid.outerWidth()
     var desiredX  = x - bubbleWidth + 25
-    var leftEdge = Math.max(desiredX, 5)
 
-    var talkMarkX = 22 + leftEdge - desiredX
+    // don't allow the bubble to overlap the left nav (z-index issues)
+    var leftEdge = Math.max(desiredX, minEdgeDistance + navWidth)
+
+    // don't allow the bubble to fall off the right edge of the page
+    console.log($j(window).width(), bubbleWidth, minEdgeDistance)
+    leftEdge = Math.min(x, leftEdge, $j(window).width() - bubbleWidth - minEdgeDistance)
+
+    var talkMarkX = Math.min(22 + leftEdge - desiredX, mid.width())
 
     var pos = {top: topEdge, left: leftEdge}
 
