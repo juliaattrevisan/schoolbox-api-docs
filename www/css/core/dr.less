@@ -280,6 +280,7 @@ input[type="text"], select, textarea {
 
 #ui-datepicker-div {
     display: none;
+    z-index: 10;
 }
 
 .warning {
@@ -1182,6 +1183,12 @@ div.colours p {
                 &.fc-state-disabled {
                     color: #797979;
                 }
+            }
+            &.fc-button-datepick {
+                margin-left: 10px;
+            }
+            &.no-text {
+                padding: 0 0 0 36px;
             }
         }
         .filter-change {

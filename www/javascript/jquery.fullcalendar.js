@@ -45,8 +45,12 @@ function Calendar(id, bubbleId, opts) {
                 left: 'prev,today,next',
                 center: 'title',
                 right: 'month,agendaWeek,agendaDay'
-            }
+            },
+            date: null,
+            month: null,
+            year: null
         },
+        datepickerIcon: "/images/core/calendar/calendar-click.png",
         x: true
     }
     this.filters = {
@@ -174,6 +178,16 @@ Calendar.prototype.init = function() {
 
         $j(this.options.filter.btnSelector).find('.fc-button-content').html('filters')
 
+        /*
+        // mash the datepicker in
+        var headerCenter = this.dom.find('td.fc-header-center')
+        headerCenter.prepend(headerRight.children('.fc-button-month').clone().removeClass('fc-button-month')
+            .addClass('fc-button-datepick month no-text').attr('id','fc-button-datepick')
+        )
+
+        $j('#fc-button-datepick').find('.fc-button-content').html('')
+        */
+
         // and now make all the buttons on the header look the way they're meant to
         var header = this.dom.children('.fc-header')
         header.addClass('calendar-controls')
@@ -181,8 +195,12 @@ Calendar.prototype.init = function() {
             var self = $j(this)
             var text = self.find('span.fc-button-content').html()
             self.addClass('filter-change '+text).html('<span></span>'+text)
-
         })
+
+        // mash in the datepicker
+        var headerCenter = this.dom.find('td.fc-header-center')
+        headerCenter.prepend('<div id="jqdp" class="datepicker-box"><input type="hidden" id="datepicker"/></div>')
+
     }
 
 
@@ -221,11 +239,22 @@ Calendar.prototype.init = function() {
                 c.bubble.hide()
                 return false
             })
-
         }
-
     })
 
+    $j('#datepicker').datepicker({
+        dateFormat: 'dd-mm-yy',
+        onSelect: function(dateText, inst) {
+            var url = location.pathname.match(/^[^0-9]+/g).toString().replace(/\/*$/g, '') + '/' + dateText;
+            window.open(url, "_self");
+        },
+        defaultDate: $j.datepicker.parseDate("dd-mm-yy", c.options.fullCalendar.date + '-' +
+            (parseInt(c.options.fullCalendar.month) + 1) + '-' + c.options.fullCalendar.year),
+        showOn: 'button',
+        buttonImage: c.options.datepickerIcon,
+        buttonImageOnly: true,
+        showAnim: 'slideDown'
+    });
 
     return this
 }

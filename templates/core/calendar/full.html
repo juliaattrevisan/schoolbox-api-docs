@@ -1,7 +1,9 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.css" />
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.print.css" media="print" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css"/>
 <script type="text/javascript" src="/javascript/jquery.fullcalendar.js"></script>
+<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
 <script type="text/javascript">
 
     // provide page-wide access to the calendar object so the callbacks can actually use it
@@ -22,7 +24,9 @@
                 ajax: '/calendar/ajax/filter'
             },
             fullCalendar: {
-
+                date: '{SELECTED_DAY}',
+                month: '{SELECTED_MONTH}',
+                year: '{SELECTED_YEAR}',
                 defaultView: '{CALENDAR_VIEW}',
 
                 /**
@@ -209,6 +213,12 @@
 
                         // reapply filters
                         c.filters.organise(c, ["campus", "groups"], false)
+
+                        // update datepicker
+                        var d = c.dom.fullCalendar('getDate')
+                        $j('#datepicker').datepicker('setDate', d)
+                        console.log(d)
+
                     }
                 },
 
