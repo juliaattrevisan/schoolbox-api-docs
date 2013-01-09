@@ -76,7 +76,77 @@ class Synchronise_Synergetic_Seymour_Verbose_Parent extends Synchronise_Synerget
 		}
 	}
 
-	/**
+
+    /**
+     * Echo message about performing creation
+     *
+     * @param  $user
+     * @param  $currentSynergyId
+     * @param  $updatedUser
+     * @param  $currentParent
+     * @return void
+     */
+    public function performCreation($user, $currentSynergyId, $updatedUser, $currentParent) {
+        if ($this->getVerbose() === true) {
+
+            /* Update email addresses for publicly listed people
+                * Otherwise clear email address for those who aren't publicly listed
+                */
+            if ($this->isPubliclyListed($currentParent)) {
+                $emailString = 'and updating email address';
+            }
+            else {
+                $emailString  = 'and clearing email address because it is not publicly listed';
+            }
+
+            $str = array();
+            $str[] = "synergetic #{$currentSynergyId}:";
+            $str[] = "{$updatedUser['title']} {$updatedUser['firstname']} {$updatedUser['lastname']} ({$updatedUser['alt_email']})";
+            $str[] = "{$emailString}";
+
+            $summary = (implode(' ', $str));
+
+            echo "+  Performing create of $summary\n";
+        }
+
+    }
+
+
+    /**
+     * Echo message about planning creation
+     *
+     * @param  $user
+     * @param  $currentSynergyId
+     * @param  $updatedUser
+     * @param  $currentParent
+     * @return void
+     */
+    public function planCreation($user, $currentSynergyId, $updatedUser, $currentParent) {
+        if ($this->getVerbose() === true) {
+
+            /* Update email addresses for publicly listed people
+                * Otherwise clear email address for those who aren't publicly listed
+                */
+            if ($this->isPubliclyListed($currentParent)) {
+                $emailString = 'and updating email address';
+            }
+            else {
+                $emailString  = 'and clearing email address because it is not publicly listed';
+            }
+
+            $str = array();
+            $str[] = "synergetic #{$currentSynergyId}:";
+            $str[] = "{$updatedUser['title']} {$updatedUser['firstname']} {$updatedUser['lastname']} ({$updatedUser['alt_email']})";
+            $str[] = "{$emailString}";
+
+            $summary = (implode(' ', $str));
+
+            echo "+  Planning create of $summary\n";
+        }
+    }
+
+
+    /**
 	 * Echo message about skipping create/update
 	 *
 	 * @param  $user
