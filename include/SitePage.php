@@ -356,13 +356,11 @@ class SitePage extends Page {
 
         if ((MAIL_enable && $_SESSION['local_email']) ||
             (
-                $this->site == 'wenona' && ($this->groupHandler->isStaff() || $this->groupHandler->isStudent()) ||
                     $this->site == 'ormond' ||
                     $this->site == 'shore' && !($_SESSION['gid'] == 6 || $_SESSION['gid'] == 7 || $_SESSION['gid'] == '8') ||
                     $this->site == 'joeys' ||
-                    $this->site == 'jpc' ||
                     $this->site == 'cathedral' ||
-                    ($this->site == 'mggs' || $this->site == 'grimwade' || $this->site == 'wadhurst' || $this->site == 'stmichaels' || $this->site == 'bialik' || $this->site == 'moriah' || $this->site == 'stk') && ($this->groupHandler->isStaff(
+                    ($this->site == 'wenona' || $this->site == 'jpc' || $this->site == 'mggs' || $this->site == 'grimwade' || $this->site == 'wadhurst' || $this->site == 'stmichaels' || $this->site == 'bialik' || $this->site == 'moriah' || $this->site == 'stk') && ($this->groupHandler->isStaff(
                     ) || $this->groupHandler->isStudent())
             )
         ) {
