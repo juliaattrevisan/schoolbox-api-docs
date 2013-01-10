@@ -51,19 +51,19 @@ $j(function() {
     <!-- END admin_nav_item -->
 </ul>
 <div class="admin-contents">
-	<h2>Bulk Add Categories</h2>
-	<form action="/adminv2/bulkAddCategories" method="post" enctype="multipart/form-data" name="form" id="form" class="clearfix">
+	<h2>Bulk Add Folders</h2>
+	<form action="/adminv2/bulkAddFolders" method="post" enctype="multipart/form-data" name="form" id="form" class="clearfix">
 		<div class="level clearfix">
 			<div class="one-third">
-				<h3>Bulk<span>?</span><em>The File that contains the Category Infomation must be a Comma Seperated Text File</em></h3>
-					<p>In order to update categories in bulk first download the template then fill it out and upload using the provided tool, finalising the process by pressing the "save" button.</p>
+				<h3>Bulk<span>?</span><em>The File that contains the Folder Infomation must be a Comma Seperated Text File</em></h3>
+					<p>In order to update folders in bulk first download the template then fill it out and upload using the provided tool, finalising the process by pressing the "save" button.</p>
 
-				<h4>Download Bulk Category CSV template</h4>
+				<h4>Download Bulk Folder CSV template</h4>
 				<p class="clearfix">
-				<a href="/adminv2/csv/categoryBulkAdd.csv" class="btn report float-left" ><span></span>Download</a>
+				<a href="/adminv2/csv/folderBulkAdd.csv" class="btn report float-left" ><span></span>Download</a>
 				</p>
 
-				<h4>Upload Bulk Category CSV</h4>
+				<h4>Upload Bulk Folder CSV</h4>
 				<label><input name="bulkadd" type="file" /></label>
 			</div>
 			<div class="two-thirds last">
@@ -92,7 +92,7 @@ $j(function() {
 					</tbody>
 				</table>
 
-				<h3>Template<span>?</span><em>Select the Homepage Template that will be applied to each uploaded Category</em></h3>
+				<h3>Template<span>?</span><em>Select the Homepage Template that will be applied to each uploaded Folder</em></h3>
 				<select name='template'>
 					<option value='0'>No template</option>
 					<!-- BEGIN homepage_template -->

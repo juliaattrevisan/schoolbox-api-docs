@@ -17,7 +17,7 @@ class AdminV2_Nav {
         'allowed-file' => 'Allowed Files',
         'setting' => 'Settings',
         'calendar' => 'Calendar',
-        'category' => 'Category',
+        'folder' => 'Folder',
         'rubric-results' => 'Rubrics',
         'list' => 'Lists',
         'cleanup' => 'Cleanup'

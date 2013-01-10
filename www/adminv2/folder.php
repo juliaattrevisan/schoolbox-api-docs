@@ -10,13 +10,13 @@ if (!$groupHandler->isSuperuser()) {
 }
 
 $this->setTitle('Admin - Category');
-$this->setFile(TEMPLATE_content, 'adminv2/category.html');
+$this->setFile(TEMPLATE_content, 'adminv2/folder.html');
 $this->setBlock(TEMPLATE_content, 'group', 'group_block');
 $this->setBlock(TEMPLATE_content, 'homepage_template', 'homepage_template_block');
 
 // include the admin navigation
 $nav = new AdminV2_Nav();
-$nav->parse($this, 'category');
+$nav->parse($this, 'folder');
 
 $userHandler = new User();
 
