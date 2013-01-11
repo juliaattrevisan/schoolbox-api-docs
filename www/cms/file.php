@@ -239,7 +239,7 @@ else if($this->arg[0] == 'multicat') {
 	$groupHandler = new Group;
 	$categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], TRUE, WRITE_ACCESS);
 
-	if (is_array($categoryList)) {
+	if (is_array($categoryList) && count($categoryList)) {
 		foreach($categoryList as $category) {
 			$output = array(
 				'CATEGORY_NAME' =>Scrub::text($category['name']) . ($category['code']?' ('.$category['code'].')':''),
@@ -254,8 +254,7 @@ else if($this->arg[0] == 'multicat') {
 		$this->setVar('no_categories_block', '');
 	}
 	else {
-		$this->parse('no_categories_block', 'no_categories');
-		$this->setVar('category_list_block', '');
+		error(154);
 	}
 
 	$myFolderHandler = new MyFolder;
