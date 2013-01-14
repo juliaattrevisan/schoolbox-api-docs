@@ -75,7 +75,7 @@ else if($this->arg[0] == 'multicat') {
 	$groupHandler = new Group;
 	$categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
 
-	if(is_array($categoryList)) {
+	if(is_array($categoryList) && count($categoryList)) {
 		foreach($categoryList as $category) {
 			$name = $category['name'];
 
@@ -93,6 +93,9 @@ else if($this->arg[0] == 'multicat') {
 			$this->parse('category_list_block', 'category_list', true);
 		}
 	}
+    else {
+        error(154);
+    }
 }
 else {
 	error(2);
