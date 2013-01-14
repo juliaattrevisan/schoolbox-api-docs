@@ -147,7 +147,7 @@ abstract class Synchronise_Synergetic_Strategy_Abstract implements Synchronise_S
 	/**
 	 * Get the External User handler
 	 *
-	 * @return
+	 * @return External_UserInterface
 	 */
 	protected function getExternalUserHandler() {
 		return $this->externalUserHandler;

@@ -20,7 +20,7 @@ class Synchronise_Synergetic_Mggs_Strategy_Staff extends Synchronise_Synergetic_
 	 * Setup
 	 */
 	protected function setup() {
-		$this->setVerboseFilter(new Synchronise_Synergetic_Mggs_Verbose_Staff());
+		$this->setVerboseFilter(new Synchronise_Synergetic_Mggs_Verbose());
 	}
 
 	/**

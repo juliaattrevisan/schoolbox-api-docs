@@ -19,7 +19,7 @@ class Synchronise_Synergetic_Mggs_Strategy_Student extends Synchronise_Synergeti
 	 * Setup
 	 */
 	protected function setup() {
-		$this->setVerboseFilter(new Synchronise_Synergetic_Mggs_Verbose_Student());
+		$this->setVerboseFilter(new Synchronise_Synergetic_Mggs_Verbose());
 	}
 
 	/**
