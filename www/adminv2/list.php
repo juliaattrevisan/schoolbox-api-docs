@@ -78,12 +78,16 @@ $tableList = array(
         'index' => 'grade_id'
     ),
     array(
-        'name' => 'homepage_comp',
-        'title' => 'Homepage Components',
+        'name' => 'component_definition',
+        'title' => 'Components',
         'index' => 'id',
         'create' => false,
         'fields' => array(
             'id' => array(
+                'readonly' => '1'
+            ),
+            'module' => array(
+                'caption' => 'Module',
                 'readonly' => '1'
             ),
             'name' => array(
@@ -94,8 +98,8 @@ $tableList = array(
                 'caption' => 'Description',
                 'readonly' => '1'
             ),
-            'invisible' => array(
-                'caption' => 'Hidden?',
+            'visible' => array(
+                'caption' => 'Visible',
                 'readonly' => '0'
             ),
         ),
