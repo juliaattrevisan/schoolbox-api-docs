@@ -94,12 +94,12 @@ echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Backup Started" >> $logfile;
 targetdir=$backup_dir/$DAY0;
 
 # Check if script already running
-process=`ps -Af | grep $0 | wc -l`;
-if [ $process -ne 3 ];
+process=`pgrep backup-cifs.sh | wc -l`;
+if [ $process -gt 2 ];
 then
-	echo -e "Error: Script already running" >> $logfile;
-	echo -e "Error: Script already running";
-	exit 1;
+        echo -e "Error: Script already running\nReported Processses: $process" >> $logfile;
+        echo -e "Error: Script already running\nReported Processses: $process";
+        exit 1;
 fi
 
 # Check if smb/cifs share is mounted and attempt mount if necessary
