@@ -177,7 +177,7 @@ class DueWork_All {
 
         $allWork = $this->submissionHandler->getAllDueWork($this->user['uid'], $this->getCategoryIDList(), $this->year, $this->semester);
 
-        if (!is_array($allWork)) {
+        if (!is_array($allWork) || !count($allWork)) {
             return false;
         }
 
