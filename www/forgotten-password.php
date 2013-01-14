@@ -33,6 +33,7 @@ if (isset($_POST['email'])) {
 }
 
 //$page->buildPage(false);
+$page->parseFooterMobileLink(TEMPLATE_body);
 $page->outputPage(true);
 
 ?>
