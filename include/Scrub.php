@@ -115,6 +115,7 @@ class Scrub {
             'maps.google.com(.[a-z]{2})?/',
             'docs.google.com(.[a-z]{2})?/',
             'www.tiki-toki.com/timeline/embed/',
+            'www.thinglink.com/card/',
         );
 
 
