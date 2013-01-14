@@ -173,6 +173,26 @@ class External_User {
 		return $this->getDatabase()->getStaffUserAccountInfo();
 	}
 
+    /**
+     * Determine the boarder type of a student
+     *
+     * @param $boarderValue
+     * @return mixed
+     */
+    public function determineBoarderType ($boarderValue) {
+        return $this->getDatabase()->determineBoarderType($boarderValue);
+    }
+
+    /**
+     * Return the housemaster of the specified house
+     *
+     * @param $houseID
+     * @return mixed
+     */
+    public function getHousemasterByHouseId ($houseID) {
+        return $this->getDatabase()->getHousemasterByHouseId($houseID);
+    }
+
 	public function __call ($methodName, $argumentList) {
 		$database = $this->getDatabase();
 
@@ -185,7 +205,10 @@ class External_User {
 		$this->database = $database;
 	}
 
-	private function getDatabase () {
+    /**
+     * @return External_UserInterface
+     */
+    private function getDatabase () {
 		return $this->database;
 	}
 
