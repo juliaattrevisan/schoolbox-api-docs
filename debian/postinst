@@ -24,6 +24,7 @@ case "$1" in
             # Enable the Apache2 rewrite module if not already enabled
             a2enmod rewrite > /dev/null || true
             a2enmod ssl > /dev/null || true
+            a2enmod headers > /dev/null || true
         fi
         # Fix ownership and permissions of existing configuration.
         if [ -f /etc/schoolbox/conf.php ]; then
