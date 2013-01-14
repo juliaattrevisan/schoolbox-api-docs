@@ -17,9 +17,7 @@ class ReCaptcha {
 
     var $api_create = 'https://www.google.com/recaptcha/admin/create';
 
-    var $api_server = 'http://www.google.com/recaptcha/api';
-
-    var $api_secure_server = 'https://www.google.com/recaptcha/api';
+    var $api_server = 'https://www.google.com/recaptcha/api';
 
     var $verify_server = 'www.google.com';
 
@@ -85,8 +83,6 @@ class ReCaptcha {
             exit( 'To use reCAPTCHA you must get an API key from <a href="' . $this->api_create . '">' . $this->api_create . '</a>' );
         }
 
-        $server = ( $use_ssl ? $this->api_secure_server : $this->api_server );
-
         $errorpart = '';
 
         if ( $error ) {
@@ -94,9 +90,9 @@ class ReCaptcha {
         }
 
         return '
-        <script type="text/javascript" src="' . $server . '/challenge?k=' . $this->public_key . $errorpart . '"></script>
+        <script type="text/javascript" src="' . $this->api_server . '/challenge?k=' . $this->public_key . $errorpart . '"></script>
         <noscript>
-            <iframe src="' . $server . '/noscript?k=' . $this->public_key . $errorpart . '" height="300" width="500" frameborder="0"></iframe><br/>
+            <iframe src="' . $this->api_server . '/noscript?k=' . $this->public_key . $errorpart . '" height="300" width="500" frameborder="0"></iframe><br/>
             <textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
             <input type="hidden" name="recaptcha_response_field" value="manual_challenge"/>
         </noscript>';
@@ -117,7 +113,7 @@ class ReCaptcha {
         if ( is_null($challenge) || strlen($challenge) == 0 || is_null($response) || strlen($response) == 0 ) {
             $this->is_valid = false;
             $this->error_message = 'incorrect-captcha-sol';
-            return;
+            return false;
         }
 
         $response = $this->post($this->verify_server, '/recaptcha/api/verify', array(
