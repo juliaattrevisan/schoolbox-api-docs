@@ -61,6 +61,7 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
             $staffGroups = $groupHandler->getStaffGroupTypeIds();
 
             if (is_array($listSyns)) {
+                $display = $this->getConfig('displayPortraits') ? $this->getConfig('displayPortraits') : 'grid';
                 foreach($listSyns as $synid) {
                     $teacher = $userHandler->getBySynergyAndGroup($synid, $staffGroups);
                     $meta = $userHandler->getByID($teacher['uid']);
@@ -71,12 +72,12 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                             'PERSON_NAME' => $teacher['firstname'] . ' ' . $teacher['lastname'],
                             'PERSON_EXTERNAL_ID' => $synid,
                             'PERSON_GROUP' => $meta['gname'],
-                            'LIST_STYLE' => $displayOptions[$this->getConfig('displayPortraits')]['css'],
+                            'LIST_STYLE' => $displayOptions[$display]['css'],
                         ));
 
                         /* Don't display images in list view
                        */
-                        if ($this->getConfig('displayPortraits') == 'grid') {
+                        if ($display == 'grid') {
                             $this->parse('has_portrait_block', 'has_portrait');
                             $this->parse('has_group_block', 'has_group');
                         }
