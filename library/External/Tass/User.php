@@ -22,6 +22,18 @@ class External_Tass_User implements External_UserInterface {
 
     }
 
+
+    /**
+     * Get all the parents of the students id
+     *
+     * @param $synergyIds
+     *
+     * @return array|bool
+     */
+    public function getParentsOf($externalUserId) {
+
+    }
+
 	function getStudent($tassID)
 	{
 

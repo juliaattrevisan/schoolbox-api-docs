@@ -153,7 +153,7 @@ class External_Synergetic_User implements External_UserInterface {
     }
 
     /**
-     * Get all the parents of the $synergyIds
+     * Get all the parents of the students id $synergyIds
      *
      * @param $synergyIds
      *
