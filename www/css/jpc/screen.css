@@ -190,7 +190,7 @@ h2, h2 a, .header_option, .calendar-controls {
     min-height: 100%;
     height: auto !important;
     height: 100%;
-    margin: 0 auto -80px;
+    margin: 0 auto -60px auto;
 }
 .calendar-controls h3 { color: #000; }
 .cal-bubble .time {
@@ -213,7 +213,7 @@ a:hover {
     top: 0;
 }
 #tabs{
-    min-width:1000px;
+    min-width: 790px;
     left: 184px;
 }
 .nav-wrapper{background:#f4f4f8;}
@@ -231,6 +231,7 @@ h3, #infoPanel li, #nav h3, .add-component .notification {
     color: #faedc3;
 }
 #header{
+    min-width: 980px;
     background: url('/images/jpc/header.png') top left repeat-x;
     height: 72px;
 }
@@ -475,13 +476,25 @@ ul.activity-list li,
     border-bottom-color: #FAF9F5;
 }
 
+
+
+#wrap-inner {
+    padding-bottom: 60px;
+}
+
+#footer {
+    margin-left: 184px;
+    height: auto !important;
+    padding: 20px 12px;
+    line-height: 1.6;
+}
 #footer ul{
-    float: right;
-    margin: 0 20px 0 0;
+    margin: 0;
 }
 
 #footer ul li,
 #footer ul li a{
+    white-space: nowrap;
     color: #404040;
 }
 
