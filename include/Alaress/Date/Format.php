@@ -209,4 +209,14 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface {
 	private function getStrategy() {
 		return $this->strategy;
 	}
+
+    /**
+     * Returns whether this date is valid, according to the strategy that this date was set up with.
+     *
+     * @return bool
+     */
+    public function isValid()
+    {
+        return $this->getStrategy()->isValid();
+    }
 }
