@@ -361,4 +361,77 @@ abstract class Alaress_Date_Strategy_Abstract {
 	protected function getLocale() {
 		return $this->locale;
 	}
+
+
+
+    /**
+     * Validates whether this date is actually valid.
+     *
+     * For a date to be valid, the year, month, day, hour, minute and second fields must all be valid.
+     *
+     * @return bool
+     */
+    public function isValid()
+    {
+        return $this->isValidYear()
+            && $this->isValidMonth()
+            && $this->isValidDay()
+            && $this->isValidHour()
+            && $this->isValidMinute()
+            && $this->isValidSecond()
+        ;
+    }
+
+    /**
+     * Helper function used by isValid*() to determine if a value is a valid integer or integer-format string.
+     *
+     * @param $val The value to check.
+     * @param $min If set, validates that $val is not less than this value.
+     * @param $max If set, validates that $val is not greater than this value.
+     *
+     * @return bool
+     */
+    private function isInteger($val, $min = null, $max = null)
+    {
+        $val = trim($val);
+        $is_valid = preg_match('/^\d+$/', $val) ? true : false;
+        if (isset($min)) {
+            $is_valid = $is_valid && ($val >= $min);
+        }
+        if (isset($max)) {
+            $is_valid = $is_valid && ($val <= $max);
+        }
+        return $is_valid;
+    }
+
+    public function isValidYear()
+    {
+        return $this->isInteger($this->getYear());
+    }
+
+    public function isValidMonth()
+    {
+        return $this->isInteger($this->getMonth(), 1, 12);
+    }
+
+    public function isValidDay()
+    {
+        $day = $this->getDay();
+        return ($this->isInteger($day) && checkdate($this->getMonth(), $day, $this->getYear()));
+    }
+
+    public function isValidHour()
+    {
+        return $this->isInteger($this->getHour(), 0, 23);
+    }
+
+    public function isValidMinute()
+    {
+        return $this->isInteger($this->getMinute(), 0, 59);
+    }
+
+    public function isValidSecond()
+    {
+        return $this->isInteger($this->getSecond(), 0, 59);
+    }
 }
