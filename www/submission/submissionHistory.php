@@ -84,6 +84,12 @@ if (is_array($categoryList)) {
 $submissionBox = $submissionHandler->getByID($this->arg[0]);
 $owner = $userHandler->getByID($submissionBox['owner']);
 
+$this->setVar(array(
+    'OWNER_ID' => $owner['uid'],
+    'OWNER_NAME' => $userHandler->formatName($owner),
+    'OWNER_THUMB' => "/portrait?userId={$owner['synergy_id']}&size=square32"
+));
+
 $externalClassHandler = new External_Class();
 $userHandler = new User();
 $groupHandler = new Group();
