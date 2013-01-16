@@ -1,0 +1,1 @@
+ALTER TABLE `schoolbox`.`news_items` ADD INDEX `topic` (`item_topic_id`), ADD INDEX `published` (`item_datetime_published`), ADD INDEX `expires` (`item_datetime_expires`);
