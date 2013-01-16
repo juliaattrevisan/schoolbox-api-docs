@@ -8,34 +8,67 @@
  */
 class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_ControllerAbstract {
 
+    /**
+     * Stores the list of upcoming work returned and parsed from the database
+     * @var array
+     */
     private $upcomingWork = array();
 
+    /**
+     * Used to indicate whether or not the 'View all Due Work' button should be displayed (if actionable is true)
+     * @var bool
+     */
     private $restrictedMode;
 
+    /**
+     * The maximum number of items to show
+     * @var int
+     */
     private $limit = 0;
 
+    /**
+     * The ID of the user being displayed
+     * @var int
+     */
     private $userID;
 
+    /**
+     * Determines whether or not the action buttons should be displayed on each list item
+     * @var bool
+     */
     private $actionable;
 
     /**
      * Business logic to collate data ready for output
+     * @return bool
      */
     public function execute() {
+
+        $this->userID = $this->getConfig('user') ? $this->getConfig('user') : $_SESSION['id'];
+        // if actionable is absent, then this is the dashboard component and restricted should be true
+        if($this->hasConfig('actionable')) {
+            $this->actionable = $this->getConfig('actionable') ? true : false;
+        }
+        else {
+            $this->actionable = false;
+            $this->restrictedMode = true;
+        }
+
+        $this->limit = is_numeric($this->getConfig('size')) ? $this->getConfig('size') : 0;
 
         if($this->getConfig('allow_parents')) {
             $this->restrictedMode = false;
         }
 
-        $this->userID = $this->getConfig('user') ? $this->getConfig('user') : $_SESSION['id'];
-        $this->actionable = $this->getConfig('actionable');
-        $this->limit = is_numeric($this->getConfig('size')) ? $this->getConfig('size') : 0;
-
-        // TODO DOES THIS COMPONENT HAVE ACCESS RESTRICTIONS?
-        // assumption: this component is only visible to students on dashboard
+        // This component has access restrictions
+        // when displayed to a student, actions are available, otherwise not
         $groupHandler = new Group();
-        if(!$groupHandler->isStudent() && $this->restrictedMode) {
-            return false;
+
+        if(!$groupHandler->isStudent()) {
+            if($this->restrictedMode) {
+                return false;
+            }
+            $this->actionable = false;
         }
 
         $submissionHandler = new Submission();
@@ -49,9 +82,10 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
             return false;
         }
 
-        // Check if system config restrict_student_submissions is on.
-        if ($groupHandler->isParentOfChild($this->userID) && Cfg::get('restrict_student_submissions')) {
-            $this->restrictedMode = true;
+        // if this is a parent viewing their child's work
+        if($groupHandler->isParentOfChild($this->userID)) {
+            // Check if system config restrict_student_submissions is on.
+            $this->restrictedMode = Cfg::get('restrict_student_submissions');
         }
 
         foreach($upcoming as $item) {
@@ -183,6 +217,9 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
 
     /**
      * Output the data we collected in exec()
+     *
+     * @param String $templateHandle
+     * @return bool
      */
     public function renderTemplate ($templateHandle) {
         if ( !$this->loadTemplate($templateHandle, 'upcomingWork') ) {
@@ -193,11 +230,12 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
         $this->setBlock($templateHandle, 'view_all_due_work', 'view_all_due_work_block');
         $this->setBlock('upcoming_work', 'upcoming_work_actionable', 'upcoming_work_actionable_block');
 
-        if($this->actionable && !$this->restrictedMode) {
-            $this->parse('view_all_due_work_block', 'view_all_due_work');
+        // To display the "view all" button, we must be not restricted
+        if($this->restrictedMode) {
+            $this->setVar('view_all_due_work_block', '');
         }
         else {
-            $this->setVar('view_all_due_work_block', '');
+            $this->parse('view_all_due_work_block', 'view_all_due_work');
         }
 
         if(count($this->upcomingWork)) {

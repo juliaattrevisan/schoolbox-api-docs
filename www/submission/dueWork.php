@@ -239,10 +239,10 @@ $dueWorkController = $chf->buildComponent($instance);
 // apply configs
 $dueWorkController->setup(
     array(), array(
-        'actionable' => array('value' => true),
-        'allow_parents' => array('value' => true),
-        'size' => array('value' => 0),
-        'user' => array('value' => $userID),
+        'actionable' => array('label' => 'actionable', 'value' => true),
+        'allow_parents' => array('label' => 'allow_parents', 'value' => true),
+        'size' => array('label' => 'size', 'value' => 0),
+        'user' => array('label' => 'user', 'value' => $userID),
     )
 );
 
