@@ -29,12 +29,34 @@ class Calendar_Full_Javascript extends Calendar_Week_Abstract {
 	protected function setupBlocks() {
 		$this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
 		$this->getPage()->setBlock(TEMPLATE_content, 'event_type', 'event_type_block');
+        $this->setupSelectedDayMonthYear();
 	}
 
 	/**
 	 * Set up selected day/month/year
 	 */
 	protected function setupSelectedDayMonthYear() {
+        list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->getDate());
+
+        $selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
+
+        $this->setSelectedDate($selectedDate);
+
+        if ($selectedDate <= 0) {
+            $selectedDate = time();
+        }
+
+        $selectedDay = date("j", $selectedDate);
+        $selectedMonth = date("n", $selectedDate);
+        $selectedYear = date("Y", $selectedDate);
+
+        $this->getPage()->setVar(
+            array(
+                'SELECTED_DAY' => $selectedDay,
+                'SELECTED_MONTH' => $selectedMonth - 1,
+                'SELECTED_YEAR' => $selectedYear,
+            )
+        );
 	}
 
 	/**
@@ -45,7 +67,7 @@ class Calendar_Full_Javascript extends Calendar_Week_Abstract {
         $this->setupMovementButtons();
 
         $this->getPage()->setVar(array(
-            'CALENDAR_VIEW' => $_SESSION['calendar_view']
+            'CALENDAR_VIEW' => $_SESSION['calendar_view'] ? $_SESSION['calendar_view'] : 'month'
         ));
 
 		/* Render event types to chooze from

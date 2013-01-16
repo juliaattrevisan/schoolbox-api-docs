@@ -45,8 +45,12 @@ function Calendar(id, bubbleId, opts) {
                 left: 'prev,today,next',
                 center: 'title',
                 right: 'month,agendaWeek,agendaDay'
-            }
+            },
+            date: null,
+            month: null,
+            year: null
         },
+        datepickerIcon: "/images/core/calendar/calendar-click.png",
         x: true
     }
     this.filters = {
@@ -174,6 +178,16 @@ Calendar.prototype.init = function() {
 
         $j(this.options.filter.btnSelector).find('.fc-button-content').html('filters')
 
+        /*
+        // mash the datepicker in
+        var headerCenter = this.dom.find('td.fc-header-center')
+        headerCenter.prepend(headerRight.children('.fc-button-month').clone().removeClass('fc-button-month')
+            .addClass('fc-button-datepick month no-text').attr('id','fc-button-datepick')
+        )
+
+        $j('#fc-button-datepick').find('.fc-button-content').html('')
+        */
+
         // and now make all the buttons on the header look the way they're meant to
         var header = this.dom.children('.fc-header')
         header.addClass('calendar-controls')
@@ -181,8 +195,12 @@ Calendar.prototype.init = function() {
             var self = $j(this)
             var text = self.find('span.fc-button-content').html()
             self.addClass('filter-change '+text).html('<span></span>'+text)
-
         })
+
+        // mash in the datepicker
+        var headerCenter = this.dom.find('td.fc-header-center')
+        headerCenter.prepend('<div id="jqdp" class="datepicker-box"><input type="hidden" id="datepicker"/></div>')
+
     }
 
 
@@ -193,7 +211,7 @@ Calendar.prototype.init = function() {
             this.submit(function() {
                 var data = $j(this).serialize()
 
-                c.create(data, function(responseText) {
+                c.ccreate(data, function(responseText) {
                     if (responseText.length) {
                         var responseData = new Function('return ' + responseText)
                         var newEvent = responseData()
@@ -201,6 +219,7 @@ Calendar.prototype.init = function() {
                         c.dom.fullCalendar('renderEvent', newEvent)
                     }
                 })
+                c.clearForms()
                 c.bubble.hide()
                 return false
             })
@@ -209,7 +228,7 @@ Calendar.prototype.init = function() {
             this.submit(function() {
                 var data = $j(this).serialize()
 
-                c.update(data, function(responseText) {
+                c.cupdate(data, function(responseText) {
                     if (responseText.length) {
                         var responseData = new Function('return ' + responseText)
                         var newEvent = responseData()
@@ -220,11 +239,22 @@ Calendar.prototype.init = function() {
                 c.bubble.hide()
                 return false
             })
-
         }
-
     })
 
+    $j('#datepicker').datepicker({
+        dateFormat: 'dd-mm-yy',
+        onSelect: function(dateText, inst) {
+            var url = location.pathname.match(/^[^0-9]+/g).toString().replace(/\/*$/g, '') + '/' + dateText;
+            window.open(url, "_self");
+        },
+        defaultDate: $j.datepicker.parseDate("dd-mm-yy", c.options.fullCalendar.date + '-' +
+            (parseInt(c.options.fullCalendar.month) + 1) + '-' + c.options.fullCalendar.year),
+        showOn: 'button',
+        buttonImage: c.options.datepickerIcon,
+        buttonImageOnly: true,
+        showAnim: 'slideDown'
+    });
 
     return this
 }
@@ -283,6 +313,13 @@ Calendar.prototype.post = function(url, data, successCallback, refetch) {
     })
 }
 
+Calendar.prototype.clearForms = function() {
+    $j.each(this.getForms(), function() {
+        this.find('input[type=text], textarea').val('')
+    })
+}
+
+
 /**
  * Set the bubble suppressor to true
  */
@@ -295,7 +332,7 @@ Calendar.prototype.suppressOne = function() {
  * @param data
  * @param callback
  */
-Calendar.prototype.create = function(data, callback) {
+Calendar.prototype.ccreate = function(data, callback) {
     this.post(this.options.crud.c, data, callback)
 }
 
@@ -304,7 +341,7 @@ Calendar.prototype.create = function(data, callback) {
  * @param data
  * @param callback
  */
-Calendar.prototype.read = function(data, callback) {
+Calendar.prototype.cread = function(data, callback) {
     this.post(this.options.crud.r, data, callback)
 }
 
@@ -313,7 +350,7 @@ Calendar.prototype.read = function(data, callback) {
  * @param data
  * @param callback
  */
-Calendar.prototype.update = function(data, callback) {
+Calendar.prototype.cupdate = function(data, callback) {
     this.post(this.options.crud.u, data, callback)
 }
 
@@ -322,7 +359,7 @@ Calendar.prototype.update = function(data, callback) {
  * @param data
  * @param callback
  */
-Calendar.prototype.delete = function(data, callback) {
+Calendar.prototype.cdelete = function(data, callback) {
     this.post(this.options.crud.d, data, callback)
 }
 
@@ -392,6 +429,10 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
  * @param y vertical position of the bubble speech point
  */
 Bubble.prototype.showForm = function(id, x, y) {
+
+    var minEdgeDistance = 5
+    var navWidth = $j('#nav').width()
+
     // hide the bubble, but keep it displayed
     this.dom.css({visibility:'hidden', display:'block'})
     $j.each(this.forms, function(i, elem) {
@@ -412,13 +453,20 @@ Bubble.prototype.showForm = function(id, x, y) {
     this.dom.show()
 
     var bubbleHeight = mid.outerHeight() + mid.find('.bottom').outerHeight()
-    var topEdge = Math.max(0, y - bubbleHeight)
+    // don't allow the bubble to fall off the top of the page
+    var topEdge = Math.max(minEdgeDistance, y - bubbleHeight)
 
     var bubbleWidth = mid.outerWidth()
     var desiredX  = x - bubbleWidth + 25
-    var leftEdge = Math.max(desiredX, 5)
 
-    var talkMarkX = 22 + leftEdge - desiredX
+    // don't allow the bubble to overlap the left nav (z-index issues)
+    var leftEdge = Math.max(desiredX, minEdgeDistance + navWidth)
+
+    // don't allow the bubble to fall off the right edge of the page
+    console.log($j(window).width(), bubbleWidth, minEdgeDistance)
+    leftEdge = Math.min(x, leftEdge, $j(window).width() - bubbleWidth - minEdgeDistance)
+
+    var talkMarkX = Math.min(22 + leftEdge - desiredX, mid.width())
 
     var pos = {top: topEdge, left: leftEdge}
 
