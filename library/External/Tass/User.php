@@ -170,7 +170,22 @@ class External_Tass_User implements External_UserInterface {
 		return 'Day';
 	}
 
+    /**
+     * Returns a local path to the user's portrait
+     *
+     * @param Integer $externalUserId
+     * @return Bool|String
+     */
     public function getPortrait ($externalUserId) {
+
+        $portraitPath = realpath( Config::get('portrait_dir') ) . "/$externalUserId.jpg";
+
+        if ( is_readable($portraitPath) ) {
+            return $portraitPath;
+        }
+        else {
+            return false;
+        }
     }
 
     public function getEmail ($id) {
