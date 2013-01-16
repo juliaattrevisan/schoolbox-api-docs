@@ -65,6 +65,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
         $emailObj = new Email();
 
         if (is_array($managerList)) {
+            $display = $this->getConfig('displayPortraits') ? $this->getConfig('displayPortraits') : 'grid';
             foreach ($managerList as $manager) {
 
                 $name = $userHandler->formatName($manager);
@@ -84,12 +85,12 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                     'PERSON_NAME' => $name,
                     'PERSON_EXTERNAL_ID' => $manager['synergy_id'],
                     'PERSON_GROUP' => $meta['gname'],
-                    'LIST_STYLE' => $displayOptions[$this->getConfig('displayPortraits')]['css'],
+                    'LIST_STYLE' => $displayOptions[$display]['css'],
                 ));
 
                 /* Don't display images in list view
              */
-                if ($this->getConfig('displayPortraits') == 'grid') {
+                if ($display == 'grid') {
                     $this->parse('has_portrait_block', 'has_portrait');
                     $this->parse('has_group_block', 'has_group');
                 }
