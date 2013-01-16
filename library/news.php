@@ -283,7 +283,6 @@ class News extends DeprecatedModel {
          LEFT JOIN user ON news_items.item_owner = user.id
          JOIN newsCampus ON newsCampus.id = news_items.item_id
             AND newsCampus.campus IN(" . implode(',', $_SESSION['campus']) . ")
-            OR news_items.item_campus='4'
          JOIN newsGroup ON newsGroup.id = news_items.item_id
             AND newsGroup.gid = '" . $_SESSION['gid'] . "'
          JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
@@ -294,7 +293,7 @@ class News extends DeprecatedModel {
             $topicFilter $yearFilter $monthFilter
          GROUP BY news_items.item_id
          ORDER BY newsTopic.newsTopicID, news_items.item_datetime_posted DESC";
-
+            print $query;
             $shareResults = $this->db->getAll($query);
         }
 
@@ -383,7 +382,6 @@ class News extends DeprecatedModel {
          LEFT JOIN user ON news_items.item_owner = user.id
          JOIN newsCampus ON newsCampus.id = news_items.item_id
             AND newsCampus.campus IN(" . implode(',', $campus) . ")
-            OR news_items.item_campus='4'
          JOIN newsGroup ON newsGroup.id = news_items.item_id
             AND newsGroup.gid = '" . $groupID . "'
          JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
@@ -495,7 +493,6 @@ class News extends DeprecatedModel {
 				  JOIN user ON news_items.item_owner = user.id
 				  JOIN newsCampus ON newsCampus.id = news_items.item_id
 					AND newsCampus.campus IN(" . implode(',', $campusList) . ")
-					OR news_items.item_campus='4'
 				  JOIN newsGroup ON newsGroup.id = news_items.item_id
 					AND newsGroup.gid IN (" . implode(',', $groupList) . ")
 				  JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
@@ -665,7 +662,6 @@ class News extends DeprecatedModel {
         LEFT JOIN user ON news_items.item_owner = user.id
         JOIN newsCampus ON newsCampus.id = news_items.item_id
             AND newsCampus.campus IN(" . implode(',', $_SESSION['campus']) . ")
-            OR news_items.item_campus='4'
         JOIN newsGroup ON newsGroup.id = news_items.item_id
             AND newsGroup.gid = '" . $_SESSION['gid'] . "'
         JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
