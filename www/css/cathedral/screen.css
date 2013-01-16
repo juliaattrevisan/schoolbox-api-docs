@@ -293,13 +293,17 @@ Home page icons
 
 .custom-boxes .box .listing{margin:0;}
 .custom-boxes .box a.my-classes{background-image: url(/images/cathedral/home-icons/home-classes.png)}
-.custom-boxes .box a.my-groups{background-image:url(/images/cathedral/home-icons/home-groups.png)}
 .custom-boxes .box a.my-files{background-image: url(/images/cathedral/home-icons/home-files.png)}
-.custom-boxes .box a.parent-lounge{background-image: url(/images/cathedral/home-icons/home-parent-lounge.png)}
-.custom-boxes .box a.google{background-image:url(/images/cathedral/home-icons/home-google.png)}
+.custom-boxes .box a.parent-lounge{background-image: url(/images/cathedral/home-icons/home-parent-lounge.png); background-position:50% 10px;}
 .custom-boxes .box a.kiosk{background-image: url(/images/cathedral/home-icons/home-kiosk.png)}
 .custom-boxes .box a.tass{background-image: url(/images/cathedral/home-icons/home-tass.png); background-position:50% 10px;}
 .custom-boxes .box a.tass-webbook{background-image: url(/images/cathedral/home-icons/home-tass-webbook.png); background-position:50% 10px;}
+.custom-boxes .box a.ext-website{background-image: url(/images/cathedral/home-icons/home-ext-website.png); background-position: 50% 7px;}
+.custom-boxes .box a.ext-fb{background-image: url(/images/cathedral/home-icons/home-ext-fb.png); background-position:50% 10px;}
+.custom-boxes .box a.webmail{background-image: url(/images/cathedral/home-icons/home-webmail.png); background-position: 50% 8px;}
+
+/* .custom-boxes .box a.my-groups{background-image:url(/images/cathedral/home-icons/home-groups.png)} */
+/* .custom-boxes .box a.google{background-image:url(/images/cathedral/home-icons/home-google.png)} */
 
 /*
  * Table border fixes
