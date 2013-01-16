@@ -8682,3 +8682,315 @@ div.colours p {
 
 /* FIX FOR SB-1653 */
 table img { max-width: none; }
+
+
+/**********************
+  FULL CALENDAR
+***********************/
+
+.no-height {
+    height: 0;
+    min-height: 0;
+}
+
+// styles common to popup divs
+.popup() {
+    display: none;
+    left: 500px;
+    position: absolute;
+    z-index: 140;
+    h1 {
+        display: none;
+        visibility: hidden;
+    }
+    h3 {
+        margin-bottom: 4px;
+    }
+    h3, h4, dt {
+        text-align: left;
+    }
+    dt, dd {
+        font-size: 13px;
+        padding: 0 10px;
+        &.rm {
+            display: none;
+            visibility: hidden;
+        }
+    }
+    dd {
+        margin-bottom: 4px;
+    }
+    .post-by {
+        font-style: italic;
+        text-align: left;
+    }
+    div.close {
+        width: 20px;
+        font-size: 24px;
+        line-height: 20px;
+    }
+
+    label {
+        text-align: left;
+        * {
+            position: absolute;
+            right: 20px;
+            width: 276px;
+            padding: 0;
+        }
+        input[type=checkbox] {
+            width: 20px;
+            right: 275px;
+        }
+        &.detail {
+            height: 40px;
+            textarea {
+                height: 30px;
+            }
+        }
+    }
+    form {
+        clear: both;
+    }
+}
+
+// event detail popup
+#calendarBubble {
+    .popup();
+}
+
+// event creation popup
+#calendar-bubble {
+    .popup();
+
+    #calendarBubbleClose {
+        position: absolute;
+        top: 3px;
+        right: 10px;
+        font-size: 20px;
+        color: #555;
+    }
+    #calendarBubbleAttendanceIcon {
+        color: #333;
+        margin: 0;
+        padding-right: 20px;
+    }
+    .title {
+        margin: 0;
+        padding: 10px;
+        h1 {
+            margin: 0;
+        }
+    }
+    .datetime {
+        clear: both;
+        padding: 0 10px 10px 10px;
+        h4 {
+            margin-bottom: 0;
+            width: auto;
+        }
+        p {
+            padding: 0;
+            margin: 0;
+        }
+    }
+    .actions {
+        position: relative;
+        top: -3px;
+        dd {
+            float: right;
+        }
+    }
+    .attendance {
+        height: 18px;
+        dd {
+            width: 100%;
+            p {
+                text-align: right;
+            }
+        }
+    }
+    div {
+        width:100%;
+        display:block;
+        clear:both;
+    }
+    dd {
+        float: none;
+    }
+    .createSwitch {
+        height: 30px;
+        li {
+            float: left;
+            padding: 0 3px;
+            &:last-child:before {
+                content: " | ";
+                padding-right: 2px;
+            }
+            a {
+                &.selected {
+                    color: @black;
+                    font-weight: bold;
+                    &:hover {
+                        text-decoration: none;
+                    }
+                }
+            }
+        }
+    }
+    #edit-full {
+        float: right;
+        height: 30px;
+        line-height: 30px;
+        display: block;
+        margin-left: 10px;
+    }
+}
+
+// overrides for the fullcalendar stylings so that it looks like the previous SB calendar implementation
+#calendar {
+    margin: 0 auto;
+    &.fc {
+        table {
+            font-size: 13px;
+        }
+    }
+    .att {
+        display: block;
+        text-align: right;
+        padding-right: 3px;
+        padding-bottom: 1px;
+    }
+    .fc-button-content {
+        height: 1.5em;
+        line-height: 1.5em;
+        text-transform: capitalize;
+    }
+    .fc-grid {
+        th, td {
+            text-align: left;
+        }
+        .fc-day-number {
+            float: left;
+            padding: 2px 5px;
+            font-size: 0.9em;
+        }
+        .fc-event-hori {
+            border-width: 1px;
+        }
+        .fc-event-title {
+            &.strike {
+                text-decoration: line-through;
+            }
+        }
+        .fc-corner-left {
+            margin-left: 0;
+        }
+    }
+
+    .fc-header {
+        .fc-button {
+            z-index: 4;
+            margin: 5px 3px;
+            &.fc-state-hover {
+                color: @black;
+            }
+            &.fc-button-today {
+                color: @black;
+                &.fc-state-disabled {
+                    color: #797979;
+                }
+            }
+        }
+        .filter-change {
+            text-transform: capitalize;
+            font-weight: normal;
+            &.filters {
+                &.engaged {
+                    background-color: #FDFDFD;
+                    span {
+                        display: block;
+                        top: 22px;
+                        left: -1px;
+                        width: 100%;
+                        height: 6px;
+                        background: #FDFDFD;
+                        border: solid 1px #D1D1D1;
+                        border-top-width: 0;
+                        border-bottom-width: 0;
+                    }
+                }
+                span {
+                    display: none;
+                }
+            }
+        }
+        .fc-header-left {
+            padding-left: 3px;
+            width: 135px;
+            .filter-change {
+                padding: 0 5px;
+            }
+        }
+        .fc-header-center {
+            text-align: left;
+            h2 {
+                padding-left: 5px;
+            }
+        }
+        .fc-header-right {
+            padding-right: 3px;
+            .filter-change {
+
+            }
+        }
+
+    }
+    .fc-event {
+        font-size: 1em;
+    }
+    .fc-event-skin {
+        color: @black;
+    }
+    .fc-widget-header {
+        font-weight: bold;
+        color: black;
+        border-right: 1px solid #EEE;
+        border-bottom: 1px solid #D5D5D5;
+        padding: 7px 5px;
+        background: @dark;
+    }
+}
+
+// filter list styles
+#content .link-case .filter-drop {
+    top: 34px;
+    right: 0px;
+    .filter-list {
+        background: rgba(255, 255, 255, 0.9);
+        border: solid 1px #E7E7E7;
+        border-top-width: 0;
+        .filter-cat {
+            position: relative;
+            label {
+                padding: 2px 0 2px 18px;
+                position: relative;
+                width: 119px;
+                input {
+                    position: absolute;
+                    left: 0;
+                    top: 4px;
+                }
+            }
+            .filter-title {
+                text-align: left;
+                padding-left: 18px;
+                margin-bottom: 8px;
+            }
+            span {
+                padding: 2px 5px;
+                font-weight: normal;
+            }
+        }
+    }
+}
