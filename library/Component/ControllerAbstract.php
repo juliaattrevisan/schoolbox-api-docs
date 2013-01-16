@@ -345,7 +345,7 @@ abstract class Component_ControllerAbstract {
      * @param string $key
      * @return mixed
      */
-    protected function getConfig($key = '', $attr = 'value') {
+    public function getConfig($key = '', $attr = 'value') {
         if ($key) {
             return isset($this->config[$key][$attr]) ? $this->config[$key][$attr] : false;
         }
@@ -363,7 +363,7 @@ abstract class Component_ControllerAbstract {
      * @param $key
      * @return bool
      */
-    protected function hasConfig($key) {
+    public function hasConfig($key) {
         return isset($this->config[$key]) ? true : false;
     }
 
