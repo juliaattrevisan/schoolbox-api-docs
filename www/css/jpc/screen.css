@@ -487,6 +487,7 @@ ul.activity-list li,
     height: auto !important;
     padding: 20px 12px;
     line-height: 1.6;
+    text-align: center;
 }
 #footer ul{
     margin: 0;
