@@ -63,6 +63,17 @@ class External_User {
 		return $this->getDatabase()->getParentSync($externalUserId);
 	}
 
+    /**
+     * No usages found
+     *
+     * @param Integer $externalUserId
+     * @return Array
+     */
+    public function getParentsOf ($externalUserId) {
+        return $this->getDatabase()->getParentsOf($externalUserId);
+    }
+
+
 	/**
 	 * Used in search
 	 *

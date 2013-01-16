@@ -12,6 +12,8 @@ interface External_UserInterface {
 
     public function getParentSync($externalUserId);
 
+    public function getParentsOf($externalUserId);
+
     public function getStudent($externalUserId);
 
     public function getStaff($externalUserId);

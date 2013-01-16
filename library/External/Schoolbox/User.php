@@ -26,6 +26,7 @@ class External_Schoolbox_User implements External_UserInterface {
 
     }
 
+
     public function getParentSync ($externalUserId) {
 
     }
@@ -63,7 +64,7 @@ class External_Schoolbox_User implements External_UserInterface {
 			FROM user
 			INNER JOIN user_relation ON user.id = user_relation.user_id
 			INNER JOIN user parent ON parent.id = user_relation.relation_id
-			WHERE user.synergy_id = :externalUserId
+			WHERE user.synergy_id IN(:externalUserId)
 		");
 
 		$statement->execute(array(
