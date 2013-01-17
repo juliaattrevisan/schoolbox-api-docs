@@ -293,7 +293,7 @@ class News extends DeprecatedModel {
             $topicFilter $yearFilter $monthFilter
          GROUP BY news_items.item_id
          ORDER BY newsTopic.newsTopicID, news_items.item_datetime_posted DESC";
-            print $query;
+
             $shareResults = $this->db->getAll($query);
         }
 
