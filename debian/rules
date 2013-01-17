@@ -67,6 +67,7 @@ override_dh_install:
 	echo "UPDATE config SET value='/var/lib/schoolbox/cache/weather' WHERE name='weather_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
 	echo "UPDATE config SET value='/var/lib/schoolbox/cache/minify' WHERE name='minify_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
 	echo "UPDATE config SET value='/var/lib/schoolbox/cache/myfiles' WHERE name='myfiles_cache_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
+	echo "UPDATE config SET value='/var/lib/schoolbox/cache/logs' WHERE name='logs_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
 	echo "UPDATE config SET value='/var/lib/schoolbox/storage' WHERE name='storage_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
 	# Remove moved files
 	rm -rf debian/schoolbox/usr/share/schoolbox/www/conf
