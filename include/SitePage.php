@@ -357,14 +357,12 @@ class SitePage extends Page {
                     $this->site == 'shore' && !($_SESSION['gid'] == 6 || $_SESSION['gid'] == 7 || $_SESSION['gid'] == '8') ||
                     $this->site == 'joeys' ||
                     $this->site == 'cathedral' ||
-                    ($this->site == 'wenona' || $this->site == 'jpc' || $this->site == 'mggs' || $this->site == 'grimwade' || $this->site == 'wadhurst' || $this->site == 'stmichaels' || $this->site == 'bialik' || $this->site == 'moriah' || $this->site == 'stk') && ($this->groupHandler->isStaff(
+                    ($this->site == 'jpc' || $this->site == 'mggs' || $this->site == 'grimwade' || $this->site == 'wadhurst' || $this->site == 'stmichaels' || $this->site == 'bialik' || $this->site == 'moriah' || $this->site == 'stk') && ($this->groupHandler->isStaff(
                     ) || $this->groupHandler->isStudent())
             )
         ) {
             if ($this->site == 'mgs' || $this->site == 'grimwade' || $this->site == 'wadhurst') {
                 $this->setVar("WEBMAIL_LOCATION", 'href="https://owa.mgs.vic.edu.au/owa" rel="external"');
-            } else if ($this->site == 'wenona') {
-                $this->setVar('WEBMAIL_LOCATION', 'href="https://webmail.wenona.nsw.edu.au/owa" rel="external"');
             } else if ($this->site == 'shore') {
                 if ($this->groupHandler->isStaff()) {
                     if (strpos(Session::getIP(), '192.168.') === false) {
