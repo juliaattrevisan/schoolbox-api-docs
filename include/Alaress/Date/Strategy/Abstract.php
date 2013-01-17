@@ -363,75 +363,117 @@ abstract class Alaress_Date_Strategy_Abstract {
 	}
 
 
+	/**
+	 * Validates whether this date is actually valid.
+	 *
+	 * For a date to be valid, the year, month, day, hour, minute and second fields must all be valid, and must be
+	 * integer values - no passing dates like "12th", "Jun", etc.
+	 *
+	 * @return bool
+	 */
+	public function isValid() {
+		return $this->isValidYear()
+			&& $this->isValidMonth()
+			&& $this->isValidDay()
+			&& $this->isValidHour()
+			&& $this->isValidMinute()
+			&& $this->isValidSecond();
+	}
 
-    /**
-     * Validates whether this date is actually valid.
-     *
-     * For a date to be valid, the year, month, day, hour, minute and second fields must all be valid.
-     *
-     * @return bool
-     */
-    public function isValid()
-    {
-        return $this->isValidYear()
-            && $this->isValidMonth()
-            && $this->isValidDay()
-            && $this->isValidHour()
-            && $this->isValidMinute()
-            && $this->isValidSecond()
-        ;
-    }
 
-    /**
-     * Helper function used by isValid*() to determine if a value is a valid integer or integer-format string.
-     *
-     * @param $val The value to check.
-     * @param $min If set, validates that $val is not less than this value.
-     * @param $max If set, validates that $val is not greater than this value.
-     *
-     * @return bool
-     */
-    private function isInteger($val, $min = null, $max = null)
-    {
-        $val = trim($val);
-        $is_valid = preg_match('/^\d+$/', $val) ? true : false;
-        if (isset($min)) {
-            $is_valid = $is_valid && ($val >= $min);
-        }
-        if (isset($max)) {
-            $is_valid = $is_valid && ($val <= $max);
-        }
-        return $is_valid;
-    }
+	/**
+	 * Helper function used by isValid*() to determine if a value is a valid integer or integer-format string.
+	 *
+	 * @param int $val The value to check.
+	 * @param int $min If set, validates that $val is not less than this value.
+	 * @param int $max If set, validates that $val is not greater than this value.
+	 *
+	 * @return bool
+	 */
+	private function isInteger($val, $min = null, $max = null) {
+		$val      = trim($val);
+		$min      = intval($min);
+		$max      = intval($max);
+		$is_valid = preg_match('/^\d+$/', $val) ? true : false;
+		if (isset($min)) {
+			$is_valid = $is_valid && ($val >= $min);
+		}
+		if (isset($max)) {
+			$is_valid = $is_valid && ($val <= $max);
+		}
+		return $is_valid;
+	}
 
-    public function isValidYear()
-    {
-        return $this->isInteger($this->getYear());
-    }
 
-    public function isValidMonth()
-    {
-        return $this->isInteger($this->getMonth(), 1, 12);
-    }
+	/**
+	 * Is this date's year valid?
+	 *
+	 * It just needs to be a valid integer value - there's no bounds checking yet.
+	 *
+	 * @return bool
+	 */
+	public function isValidYear() {
+		return $this->isInteger($this->getYear());
+	}
 
-    public function isValidDay()
-    {
-        $day = $this->getDay();
-        return ($this->isInteger($day) && checkdate($this->getMonth(), $day, $this->getYear()));
-    }
 
-    public function isValidHour()
-    {
-        return $this->isInteger($this->getHour(), 0, 23);
-    }
+	/**
+	 * Is this date's year valid?
+	 *
+	 * It just needs to be a valid integer value - there's no bounds checking yet.
+	 *
+	 * @return bool
+	 */
+	public function isValidMonth() {
+		return $this->isInteger($this->getMonth(), 1, 12);
+	}
 
-    public function isValidMinute()
-    {
-        return $this->isInteger($this->getMinute(), 0, 59);
-    }
 
-    public function isValidSecond()
-    {
-        return $this->isInteger($this->getSecond(), 0, 59);
-    }
+	/**
+	 * Is this date's day valid?
+	 *
+	 * It needs to be a valid day for the date's month and year.
+	 *
+	 * @return bool
+	 */
+	public function isValidDay() {
+		$day = $this->getDay();
+		return ($this->isInteger($day) && checkdate($this->getMonth(), $day, $this->getYear()));
+	}
+
+
+	/**
+	 * Is this date's hour valid?
+	 *
+	 * Currently checks whether hour is between 0 and 23 - there's no daylight saving checking yet.
+	 *
+	 * @return bool
+	 */
+	public function isValidHour() {
+		return $this->isInteger($this->getHour(), 0, 23);
+	}
+
+
+	/**
+	 * Is this date's minute valid?
+	 *
+	 * Currently checks whether minute is between 0 and 59.
+	 *
+	 * @return bool
+	 */
+	public function isValidMinute() {
+		return $this->isInteger($this->getMinute(), 0, 59);
+	}
+
+
+	/**
+	 * Is this date's second valid?
+	 *
+	 * Currently checks whether second is between 0 and 59.
+	 *
+	 * @return bool
+	 */
+	public function isValidSecond() {
+		return $this->isInteger($this->getSecond(), 0, 59);
+	}
 }
