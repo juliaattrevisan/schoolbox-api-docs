@@ -8,15 +8,32 @@
  * @version	 SVN: $Id$
  */
 class Calendar_Event_Collection_Renderer {
-	private $interfaceClass = 'Calendar_Api_Interface';
+	protected $interfaceClass = 'Calendar_Api_Interface';
 
-	private $api = null;
-	private $currentDay = -1;
-	private $page = null;
+	/**
+	 * An instance of a Calendar API class
+	 *
+	 * @var null
+	 */
+	protected $api = null;
+
+	/**
+	 * A unix timestamp
+	 *
+	 * @var int
+	 */
+	protected $currentDay = -1;
+
+	/**
+	 * An instance of sitepage
+	 *
+	 * @var null
+	 */
+	protected $page = null;
 
 	/* Mega-stack Calendar_Event_Collection instance which stores all events
 	 */
-	private $allEvents = null;
+	protected $allEvents = null;
 
 	/**
 	 * Constructor
@@ -41,7 +58,7 @@ class Calendar_Event_Collection_Renderer {
 	 * Do this by using ReflectionClass on the API Interface to
 	 * get all the mandatory methods
 	 */
-	private function collectAllEvents() {
+	protected function collectAllEvents() {
 		$reflection = new ReflectionClass($this->getInterfaceClass());
 
 		foreach ($reflection->getMethods() as $currentMethod) {
@@ -87,7 +104,7 @@ class Calendar_Event_Collection_Renderer {
 	 *
 	 * @param $api
 	 */
-	private function setApi($api) {
+	protected function setApi($api) {
 		$this->api = $api;
 	}
 
@@ -96,7 +113,7 @@ class Calendar_Event_Collection_Renderer {
 	 *
 	 * @return null
 	 */
-	private function getApi() {
+	protected function getApi() {
 		return $this->api;
 	}
 
@@ -105,7 +122,7 @@ class Calendar_Event_Collection_Renderer {
 	 *
 	 * @param $currentDay
 	 */
-	private function setCurrentDay($currentDay) {
+	protected function setCurrentDay($currentDay) {
 		$this->currentDay = $currentDay;
 	}
 
@@ -114,7 +131,7 @@ class Calendar_Event_Collection_Renderer {
 	 *
 	 * @return int
 	 */
-	private function getCurrentDay() {
+	protected function getCurrentDay() {
 		return $this->currentDay;
 	}
 
@@ -123,7 +140,7 @@ class Calendar_Event_Collection_Renderer {
 	 *
 	 * @param $page
 	 */
-	private function setPage($page) {
+	protected function setPage($page) {
 		$this->page = $page;
 	}
 
@@ -132,7 +149,7 @@ class Calendar_Event_Collection_Renderer {
 	 *
 	 * @return null
 	 */
-	private function getPage() {
+	protected function getPage() {
 		return $this->page;
 	}
 
@@ -141,7 +158,7 @@ class Calendar_Event_Collection_Renderer {
 	 *
 	 * @param Calendar_Event_Collection $allEvents
 	 */
-	private function setAllEvents($allEvents) {
+	protected function setAllEvents($allEvents) {
 		$this->allEvents = $allEvents;
 	}
 
@@ -150,7 +167,7 @@ class Calendar_Event_Collection_Renderer {
 	 *
 	 * @return Calendar_Event_Collection
 	 */
-	private function getAllEvents() {
+	protected function getAllEvents() {
 		return $this->allEvents;
 	}
 
