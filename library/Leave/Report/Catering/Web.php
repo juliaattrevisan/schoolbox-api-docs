@@ -31,13 +31,8 @@ class Leave_Report_Catering_Web extends Leave_Report_Catering_Abstract {
 		$this->getPage()->setBlock(TEMPLATE_content, 'request_period_total', 'request_period_total_block');
 		$this->getPage()->setBlock('house', 'request_period', 'request_period_block');
 
-		/* Current House for navigation elements
-		 */
-		$currentHouse = $this->getHouseMapper()->findById($this->getPage()->arg[2]);
 
 		$this->getPage()->setVar(array(
-			'CURRENT_HOUSE_NAME' => $currentHouse->getHouse(),
-			'CURRENT_HOUSE_ID' => $currentHouse->getId(),
 			'REPORT_DATE' => $data['date']
 		));
 

@@ -25,10 +25,16 @@ class Leave_Core_Report_House_Web {
 	protected $decoration = array(
 		'pendingStart' => "<span class='leave-pending'>",
 		'pendingEnd' => "</span><br />",
-
-		'approvedStart' => "<span>",
+        'approvedStart' => "<span class='leave-approved'>",
 		'approvedEnd' => "</span><br />",
 	);
+
+    protected $rangePeriods = array('morning', 'day', 'night');
+
+    // Types of leave directions
+    const LEAVING = 1;
+    const AWAY = 2;
+    const RETURNING = 3;
 
 	/**
 	 * Constructor
@@ -85,12 +91,13 @@ class Leave_Core_Report_House_Web {
 			}
 			/* Non-pending requests (authorised requests)
 			 */
-			else if ($request->getId()) {
-				$combined[$key]['request_authorisation_user_id'][$request->getAuthorisationUser()->getId()] = Scrub::smartQuotes(trim($request->getAuthorisationUser()->getName()));
-				$combined[$key]['row_css_class'][] = 'leave-pending';
-			}
 			else {
-				$combined[$key]['row_css_class'][] = '';
+                if ($request->getId()) {
+                    $combined[$key]['request_authorisation_user_id'][$request->getAuthorisationUser()->getId()] = Scrub::smartQuotes(trim($request->getAuthorisationUser()->getName()));
+                    $combined[$key]['row_css_class'][] = 'leave-approved';
+                } else {
+				    $combined[$key]['row_css_class'][] = '';
+                }
 			}
 
 			/* Text color if request is still pending
@@ -114,16 +121,16 @@ class Leave_Core_Report_House_Web {
 			 *
 			 * Render 3 columns each day for 3 days
 			 *
-			 * Morning: 00:00:00 to 09:59:59
-			 * Day: 10:00:00 to 18:59:59
-			 * Night: 19:00:00 to 21:59:59
+                * AM: 10:00:00 to 18:59:59
+                * PM: 19:00:00 to 21:59:59
+                * Night: 22:00:00 to 9:59:59
 			 */
 			$data = $this->getData();
 
-			$morningStart = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp(), 'U');
-			$dayStart = new Alaress_Date_Format($morningStart->getUnixTimestamp() + 10*60*60, 'U');
-			$nightStart = new Alaress_Date_Format($dayStart->getUnixTimestamp() + 9*60*60, 'U');
-			$nightEnd = new Alaress_Date_Format($nightStart->getUnixTimestamp() + 5*60*60, 'U');
+            $morningStart = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp() + 10 * 60 * 60, 'U');
+            $dayStart = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp() + 19 * 60 * 60, 'U');
+            $nightStart = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp() + 22 * 60 * 60, 'U');
+            $nightEnd = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp() + 34 * 60 * 60, 'U');
 
 			$showStartTime = true;
 
@@ -141,57 +148,63 @@ class Leave_Core_Report_House_Web {
 						 * then he left and returned in the same period
 						 */
 						if (!$request->getOccupancy($dayStart, $nightStart)) {
-							$requestPeriodMorning = $decorationStart . $requestDateStart->getTimeOnly() . $decorationEnd;
-							$requestPeriodMorning .= $decorationStart . $requestDateFinish->getTimeOnly() . $decorationEnd;
-						}
-						else {
+                            $requestPeriodMorning = $requestDateStart->getTimeOnly(
+                            ) . ' ' . $requestDateFinish->getTimeOnly();
+                            $requestPeriodMorningDirection = self::LEAVING;
+                        } else {
 
 							/* Specifically check for this day, to account for multi-week leave
 							 */
 							if ($requestDateStart->getDatabaseDate() == $morningStart->getDatabaseDate()) {
-								$requestPeriodMorning = $decorationStart . $requestDateStart->getTimeOnly() . $decorationEnd;
+                                $requestPeriodMorning = $requestDateStart->getTimeOnly();
+                                $requestPeriodMorningDirection = self::LEAVING;
+                            } else {
+                                $requestPeriodMorning = 'L';
+                                $requestPeriodMorningDirection = self::AWAY;
 							}
-							else {
-								$requestPeriodMorning = $decorationStart . 'L' . $decorationEnd;
-							}
-						}
+                        }
 
 						$showStartTime = false;
+                    } else {
+                        if (!$showStartTime && !$request->getOccupancy($dayStart, $nightStart)) {
+                            $requestPeriodMorning = $requestDateFinish->getTimeOnly();
+                            $requestPeriodMorningDirection = self::RETURNING;
+                        } else {
+                            $requestPeriodMorning = 'L';
+                            $requestPeriodMorningDirection = self::AWAY;
+                        }
 					}
-					else if (!$showStartTime && !$request->getOccupancy($dayStart, $nightStart)) {
-						$requestPeriodMorning = $decorationStart . $requestDateFinish->getTimeOnly() . $decorationEnd;
-					}
-					else {
-						$requestPeriodMorning = $decorationStart . 'L' . $decorationEnd;
-					}
-				}
+                }
 
 				/* If this person is on leave during the day
 				 */
 				if ($request->getOccupancy($dayStart, $nightStart)) {
 					if ($showStartTime) {
 						if (!$request->getOccupancy($nightStart, $nightEnd)) {
-							$requestPeriodDay = $decorationStart . $requestDateStart->getTimeOnly() . $decorationEnd;
-							$requestPeriodDay .= $decorationStart . $requestDateFinish->getTimeOnly() . $decorationEnd;
-						}
-						else {
+                            $requestPeriodDay = $requestDateStart->getTimeOnly(
+                            ) . ' ' . $requestDateFinish->getTimeOnly();
+                            $requestPeriodDayDirection = self::LEAVING;
+                        } else {
 							if ($requestDateStart->getDatabaseDate() == $dayStart->getDatabaseDate()) {
-								$requestPeriodDay = $decorationStart . $requestDateStart->getTimeOnly() . $decorationEnd;
-							}
-							else {
-								$requestPeriodDay = $decorationStart . 'L' . $decorationEnd;
+                                $requestPeriodDay = $requestDateStart->getTimeOnly();
+                                $requestPeriodDayDirection = self::LEAVING;
+                            } else {
+                                $requestPeriodDay = 'L';
+                                $requestPeriodDayDirection = self::AWAY;
 							}
 						}
 
 						$showStartTime = false;
+                    } else {
+                        if (!$showStartTime && !$request->getOccupancy($nightStart, $nightEnd)) {
+                            $requestPeriodDay = $requestDateFinish->getTimeOnly();
+                            $requestPeriodDayDirection = self::RETURNING;
+                        } else {
+                            $requestPeriodDay = 'L';
+                            $requestPeriodDayDirection = self::AWAY;
+                        }
 					}
-					else if (!$showStartTime && !$request->getOccupancy($nightStart, $nightEnd)) {
-						$requestPeriodDay = $decorationStart . $requestDateFinish->getTimeOnly() . $decorationEnd;
-					}
-					else {
-						$requestPeriodDay = $decorationStart . 'L' . $decorationEnd;
-					}
-				}
+                }
 
 				/* If this person is on leave during the night
 				 */
@@ -204,33 +217,50 @@ class Leave_Core_Report_House_Web {
 
 					if ($showStartTime) {
 						if (!$request->getOccupancy($nightEnd, $nextMorning)) {
-							$requestPeriodNight = $decorationStart . $requestDateStart->getTimeOnly() . $decorationEnd;
-							$requestPeriodNight .= $decorationStart . $requestDateFinish->getTimeOnly() . $decorationEnd;
-						}
-						else {
+                            $requestPeriodNight = $requestDateStart->getTimeOnly(
+                            ) . ' ' . $requestDateFinish->getTimeOnly();
+                            $requestPeriodNightDirection = self::LEAVING;
+                        } else {
 							if ($requestDateStart->getDatabaseDate() == $nightStart->getDatabaseDate()) {
-								$requestPeriodNight = $decorationStart . $requestDateStart->getTimeOnly() . $decorationEnd;
+                                $requestPeriodNight = $requestDateStart->getTimeOnly();
+                                $requestPeriodNightDirection = self::LEAVING;
+                            } else {
+                                $requestPeriodNight = 'L';
+                                $requestPeriodNightDirection = self::AWAY;
 							}
-							else {
-								$requestPeriodNight = $decorationStart . 'L' . $decorationEnd;
-							}
-						}
+                        }
 
 						$showStartTime = false;
+                    } else {
+                        if (!$showStartTime && !$request->getOccupancy($nightEnd, $nextMorning)) {
+                            $requestPeriodNight = $requestDateFinish->getTimeOnly();
+                            $requestPeriodNightDirection = self::RETURNING;
+
+                        } else {
+                            $requestPeriodNight = 'L';
+                            $requestPeriodNightDirection = self::AWAY;
+                        }
 					}
-					else if (!$showStartTime && !$request->getOccupancy($nightEnd, $nextMorning)) {
-						$requestPeriodNight = $decorationStart . $requestDateFinish->getTimeOnly() . $decorationEnd;
-					}
-					else {
-						$requestPeriodNight = $decorationStart . 'L' . $decorationEnd;
-					}
-				}
+                }
 
 				/* Display icon and time where appropriate
 				 */
-				$combined[$key]['periods'][$j]['request_period_morning'] .= $requestPeriodMorning;
-				$combined[$key]['periods'][$j]['request_period_day'] .= $requestPeriodDay;
-				$combined[$key]['periods'][$j]['request_period_night'] .= $requestPeriodNight;
+                $combined[$key]['periods'][$j]['request_period']['morning'][] = array(
+                    'display' => $requestPeriodMorning,
+                    'direction' => $requestPeriodMorningDirection,
+                    'status' => $request->getStatus()
+                );
+                $combined[$key]['periods'][$j]['request_period']['day'][] = array(
+                    'display' => $requestPeriodDay,
+                    'direction' => $requestPeriodDayDirection,
+                    'status' => $request->getStatus()
+                );
+                $combined[$key]['periods'][$j]['request_period']['night'][] = array(
+                    'display' => $requestPeriodNight,
+                    'direction' => $requestPeriodNightDirection,
+                    'status' => $request->getStatus()
+                );
+
 
 				/* Iteration reset
 				 */
@@ -239,7 +269,7 @@ class Leave_Core_Report_House_Web {
 				$nightStart->addDays(1);
 				$nightEnd->addDays(1);
 
-				unset($requestPeriodMorning, $requestPeriodDay, $requestPeriodNight);
+                unset($requestPeriodMorning, $requestPeriodDay, $requestPeriodNight, $requestPeriodMorningDirection, $requestPeriodDayDirection, $requestPeriodNightDirection);
 			}
 		}
 
@@ -266,6 +296,7 @@ class Leave_Core_Report_House_Web {
         $this->getPage()->setBlock(TEMPLATE_content, 'house', 'house_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'row', 'row_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'request_period_total', 'request_period_total_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'report_header', 'report_header_block');
 
 		$this->getPage()->setBlock(TEMPLATE_content, 'report_header_subtitle', 'report_header_subtitle_block');
@@ -302,19 +333,23 @@ class Leave_Core_Report_House_Web {
 	protected function renderRequests() {
 		if (count($this->getRequestList())) {
 			$allPeople = $this->getCombined();
+            $totalPeople = count($allPeople);
 
-			if (is_array($allPeople) && count($allPeople)) {
+            // Create base totals for all ranges and periods
+            for ($j = 0; $j < $this->getRange(); $j++) {
+                $totals[] = array('morning' => $totalPeople, 'day' => $totalPeople, 'night' => $totalPeople);
+            }
+
+            if (is_array($allPeople) && $totalPeople) {
 				foreach($allPeople as $currentPerson) {
 					$this->getPage()->setVar(array(
 						'USER_ID' => $currentPerson['user_id'],
 						'USER_NAME' => $currentPerson['user_name'],
 						'USER_YEAR' => $currentPerson['user_year'],
 						'USER_BOARDING_STATUS' => $currentPerson['user_boarding_status'],
-
 						'REQUEST_STATUS' => implode('<hr />', $currentPerson['request_status']),
 						'REQUEST_HOST' => implode('<hr />', $currentPerson['request_host_type']),
 						'REQUEST_ACTIVITY' => implode('<hr />', $currentPerson['request_description']),
-
 						'CLASS' => implode(' ', $currentPerson['row_css_class']),
 					));
 
@@ -339,11 +374,34 @@ class Leave_Core_Report_House_Web {
 					$i = 0;
 
 					foreach($currentPerson['periods'] as $currentPeriod) {
-						$this->getPage()->setVar(array(
-							'REQUEST_PERIOD_MORNING' => $currentPeriod['request_period_morning'],
-							'REQUEST_PERIOD_DAY' => $currentPeriod['request_period_day'],
-							'REQUEST_PERIOD_NIGHT' => $currentPeriod['request_period_night'],
-						));
+
+                        foreach ($this->rangePeriods as $section) {
+
+                            $requestOutput = '';
+                            $removeFromTotal = false;
+
+                            foreach ($currentPeriod['request_period'][$section] as $request) {
+                                if ($request['status'] == Leave_Request::STATUS_PENDING && $request['display']) {
+                                    $requestOutput .= $this->getDecorationPendingStart(
+                                    ) . $request['display'] . $this->getDecorationPendingEnd();
+
+                                } else {
+                                    if ($request['status'] == Leave_Request::STATUS_APPROVED && $request['display']) {
+                                        $requestOutput .= $this->getDecorationApprovedStart(
+                                        ) . $request['display'] . $this->getDecorationApprovedEnd();
+
+                                        if ($request['direction'] == self::AWAY || $request['direction'] == self::RETURNING) {
+                                            $removeFromTotal = true;
+                                        }
+                                    }
+                                }
+                            }
+                            $this->getPage()->setVar('REQUEST_PERIOD_' . strtoupper($section), $requestOutput);
+                            $removeFromTotal ? $totals[$i][$section]-- : false;
+
+
+                        }
+
 
 						if (!$i) {
 							$this->getPage()->setVar('request_period_show_am_block', '');
@@ -369,7 +427,10 @@ class Leave_Core_Report_House_Web {
 						$this->getPage()->setVar('request_period_hide_am_block', '');
 						$this->getPage()->setVar('request_period_hide_day_block', '');
 
+
 						$i++;
+
+
 					}
 
 					$this->getPage()->setVar('empty_request_block', '');
@@ -390,7 +451,17 @@ class Leave_Core_Report_House_Web {
 			$this->getPage()->parse('no_requests_block', 'no_requests');
 			$this->getPage()->setVar('row_block', '');
 		}
-	}
+
+        /* Output totals */
+        for ($j = 0; $j < $this->getRange(); $j++) {
+            foreach ($this->rangePeriods as $period) {
+                if (!($j == 0 && $period == 'morning')) {
+                    $this->getPage()->setVar('PERIOD_TOTAL', $totals[$j][$period]);
+                    $this->getPage()->parse('request_period_total_block', 'request_period_total', true);
+                }
+            }
+        }
+    }
 
 	/**
 	 * Render headings for each day in the specified range

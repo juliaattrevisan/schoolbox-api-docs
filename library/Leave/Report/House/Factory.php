@@ -33,7 +33,11 @@ class Leave_Report_House_Factory {
 	 * @return mixed
 	 */
 	public function produceCSV() {
-		return $this->produce("Leave_{$this->getClassname()}_Report_House_CSV");
+        $fullname = "Leave_{$this->getClassname()}_Report_House_CSV";
+        if(!class_exists($fullname)) {
+            $fullname = "Leave_Core_Report_House_CSV";
+        }
+		return $this->produce($fullname);
 	}
 
 	/**
@@ -42,7 +46,11 @@ class Leave_Report_House_Factory {
 	 * @return mixed
 	 */
 	public function producePrint() {
-		return $this->produce("Leave_{$this->getClassname()}_Report_House_Print");
+        $fullname = "Leave_{$this->getClassname()}_Report_House_Print";
+        if(!class_exists($fullname)) {
+		   $fullname = "Leave_Core_Report_House_Print";
+        }
+        return $this->produce($fullname);
 	}
 
 	/**
@@ -51,7 +59,11 @@ class Leave_Report_House_Factory {
 	 * @return mixed
 	 */
 	public function produceWeb() {
-		return $this->produce("Leave_{$this->getClassname()}_Report_House_Web");
+        $fullname = "Leave_{$this->getClassname()}_Report_House_Web";
+        if(!class_exists($fullname)) {
+            $fullname = "Leave_Core_Report_House_Web";
+        }
+		return $this->produce($fullname);
 	}
 
 	/**

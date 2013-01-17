@@ -36,7 +36,11 @@ class Leave_Notice_Factory {
 	public function produceParentFactory() {
 		$fullClassname = "Leave_{$this->getClassname()}_Notice_Parent_Factory";
 
-		return new $fullClassname($this->getRequestData());
+        if(!class_exists($fullClassname)) {
+            $fullClassname = "Leave_Core_Notice_Parent_Factory";
+        }
+
+        return new $fullClassname($this->getRequestData());
 	}
 
 	/**
@@ -47,7 +51,11 @@ class Leave_Notice_Factory {
 	public function produceUserFactory() {
 		$fullClassname = "Leave_{$this->getClassname()}_Notice_User_Factory";
 
-		return new $fullClassname($this->getRequestData());
+        if(!class_exists($fullClassname)) { //Default to core
+            $fullClassname = "Leave_Core_Notice_User_Factory";
+        }
+
+        return new $fullClassname($this->getRequestData());
 	}
 
 	/* Getters/Setters
