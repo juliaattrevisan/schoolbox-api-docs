@@ -431,6 +431,11 @@ abstract class Mapper {
         $assignmentList = array();
 
         foreach ($this->map as $map) {
+            //
+            // Don't update the identifier column.
+            if (!empty($map['identifier'])) {
+                continue;
+            }
             $assignmentList[] = "`{$this->table}`.`{$map['column']}` = :{$map['column']}";
         }
 
