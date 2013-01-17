@@ -23,7 +23,7 @@ class Calendar_Event_Type_Exporter extends Calendar_Event_Type_Renderer_Abstract
 
 			/* Manufacture month and day values
 			 */
-			$currentDay = strtotime($currentEvent->getDate());
+			$currentDay = strtotime($currentEvent->getStartTime()->getDatabase());
 			$month = date('n', $currentDay);
 			$day = date('j', $currentDay);
 
