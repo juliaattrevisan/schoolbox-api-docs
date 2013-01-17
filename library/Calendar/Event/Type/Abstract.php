@@ -458,6 +458,15 @@ abstract class Calendar_Event_Type_Abstract {
         return $this->categoryName;
     }
 
+	/**
+	 * Set renderer class
+	 *
+	 * @param $rendererClass
+	 */
+	public function setRendererClass($rendererClass) {
+		$this->rendererClass = $rendererClass;
+	}
+
     /**
      * Get renderer class
      *
