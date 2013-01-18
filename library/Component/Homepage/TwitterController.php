@@ -30,7 +30,7 @@ class Component_Homepage_TwitterController extends Component_Homepage_Controller
 
         $this->setBlock($templateHandle, 'tweet', 'tweet_block');
 
-        $allTweets = new Alaress_Twitter_Search($this->getConfig('username'), $this->getConfig('keywords'));
+        $allTweets = new Alaress_Twitter_Search11($this->getConfig('username'), $this->getConfig('keywords'));
         $allTweets->setMaxTweets($this->getConfig('size'))->load();
 
         $allResults = $allTweets->getTweets();
