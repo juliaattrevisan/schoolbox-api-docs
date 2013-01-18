@@ -14,11 +14,11 @@ if(isset($_POST['uid']) && isset($_POST['comment']) /* && isset($_POST['mark']) 
     $response = array();
 
     if(is_numeric($_POST['uid']) && is_numeric($_POST['box_id'])) {
-        $response[] = ajaxUpdate($_POST['mark'], $_POST['comment'], $_POST['uid'], $_POST['box_id'], true);
+        $response[] = ajaxUpdate($_POST['mark'], $_POST['comment'], $_POST['uid'], $_POST['box_id'], $_POST['year'], $_POST['semester']);
     }
     elseif(is_array($_POST['uid']) /* && is_array($_POST['mark'])*/ ) {
         for($i = 0; $i < count($_POST['uid']); ++$i) {
-            $response[] = ajaxUpdate($_POST['mark'][$i], $_POST['comment'][$i], $_POST['uid'][$i], $_POST['box_id'], false);
+            $response[] = ajaxUpdate($_POST['mark'][$i], $_POST['comment'][$i], $_POST['uid'][$i], $_POST['box_id'], $_POST['year'], $_POST['semester']);
         }
     }
 
@@ -126,9 +126,10 @@ else {
  * @param int $boxID
  * @param bool $respond
  */
-function ajaxUpdate($givenMark, $comment, $studentID, $boxID, $respond) {
+function ajaxUpdate($givenMark, $comment, $studentID, $boxID, $year = 0, $semester = 0) {
 
-    // print_r(func_get_args());
+    $year = (int)$year;
+    $semester = (int)$semester;
 
     $returnHandler = new SubmissionReturn;
     $subHandler = new Submission();
@@ -208,7 +209,7 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID, $respond) {
         $success = $returnHandler->create($return);
     }
 
-    $marks = $returnHandler->getStudentMarksForCategory($subbox['category'], $studentID);
+    $marks = $returnHandler->getStudentMarksForCategory($subbox['category'], $studentID, $_SESSION['id'], $year, $semester);
 
     return array(
         'id' => $studentID,

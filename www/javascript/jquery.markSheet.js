@@ -141,8 +141,9 @@ $j(function() {
             $j('.markForm').each(function() {
                 $j(this).validate({
                     submitHandler: function(form) {
+                        var qstring = ($j(form).serialize() ? ($j(form).serialize() + '&') : '') + $j('#time-pick').serialize();
                         var notification = $j(form).find('input, select');
-                        $j.post('/submission/returnWorkForm.php', $j(form).serialize(), function(data) {
+                        $j.post('/submission/returnWorkForm.php', qstring, function(data) {
                             var avg = $j('#avg-'+data[0].id+' span');
                             var dataAvg = data[0].marks.avg;
                             if(dataAvg == -1) {

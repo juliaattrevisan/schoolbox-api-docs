@@ -18,6 +18,31 @@ else {
     exit;
 }
 
+
+if (isset($_GET['year']) || isset($_GET['semester'])) {
+    $this->localRedir("/submission/markSheet/{$this->arg[0]}/{$_GET['year']}/{$_GET['semester']}");
+}
+
+$currentYear = date('Y');
+$currentSemester = date('m') > 6 ? 2 : 1;
+
+if(isset($this->arg[1])) {
+    if(!(is_numeric($this->arg[1]) && is_numeric($this->arg[2]))) {
+        error(2); // TODO find a more appropriate error
+    }
+
+    if($this->arg[2] < 1 || $this->arg[2] > 2) {
+        error(2); // TODO find a more appropriate error
+    }
+
+    $year = (int)$this->arg[1];
+    $semester = (int)$this->arg[2];
+}
+else {
+    $year = $currentYear;
+    $semester = $currentSemester;
+}
+
 $subHandler = new Submission();
 $retHandler = new SubmissionReturn();
 $catHandler = new Category();
@@ -196,8 +221,31 @@ elseif (is_numeric($this->arg[0])) {
     $this->setBlock(TEMPLATE_content, 'no_submissions', 'no_submissions_block');
     $this->setBlock(TEMPLATE_content, 'no_assessments', 'no_assessments_block');
 
+    $this->setBlock(TEMPLATE_content, 'semester_option', 'semester_option_block');
+    $this->setBlock(TEMPLATE_content, 'year_option', 'year_option_block');
+
     if (!$groupHandler->isStaff()) {
         error(19);
+    }
+
+    // Semesters can be hardcoded, no need to look anything up (may change if a school wants Term breakdowns rather than Semester)
+    $semesters = array(1, 2);
+    foreach ($semesters as $sem) {
+        $this->setVar(array(
+            'SEMESTER_SELECTED' => $sem == $semester ? ' selected="selected"' : '',
+            'SEMESTER_VALUE' => $sem
+        ));
+        $this->parse('semester_option_block', 'semester_option', true);
+    }
+
+    // Years is trickier, because we first need to find out all the years in which the teacher has ...taught
+    // while we figure that out, let's go with "the past 6 years"
+    for ($y = $currentYear; $y > $currentYear - 6; --$y) {
+        $this->setVar(array(
+            'YEAR_SELECTED' => $y == $year ? ' selected="selected"' : '',
+            'YEAR_VALUE' => $y
+        ));
+        $this->parse('year_option_block', 'year_option', true);
     }
 
     $category = $catHandler->getByID($this->arg[0]);
@@ -234,7 +282,7 @@ elseif (is_numeric($this->arg[0])) {
         $studentList = $groupHandler->getMemberList($this->arg[0]);
     }
 
-    $subList = $subHandler->getAllForUserCategory($this->arg[0], $_SESSION['id']);
+    $subList = $subHandler->getAllForUserCategory($this->arg[0], $_SESSION['id'], $year, $semester);
 
     $this->setVar('sub_head_block', '');
     $this->setVar('assess_head_block', '');
@@ -289,7 +337,12 @@ elseif (is_numeric($this->arg[0])) {
             }
         }
     } else {
-        $this->setVar('sub_head_block', '');
+        $this->setVar(array(
+            'BOX_ID' => 'x',
+            'SUB_NAME' => '',
+            'SUB_TYPE' => ''
+        ));
+        $this->parse('sub_head_block', 'sub_head');
         $this->setVar('sub_type_head_block', '');
     }
 
