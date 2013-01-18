@@ -22,18 +22,17 @@ class Alaress_Twitter_Search11 extends Alaress_Twitter_Search {
 	 * @return string
 	 */
 	protected function generateParameters() {
-		$params = '';
+		$search = '';
 		if (strlen($this->getUser())) {
-			$params .= "from:{$this->getUser()} ";
+			$search .= "from:{$this->getUser()} ";
 		}
 
 		//
 		// No idea how hashtags should work. #tag1 #tag2?
 		if (strlen($this->getKeywords())) {
-			$params .= '#'.implode(' #', preg_split('/\W+/', $this->getKeywords()));
+			$search .= '#'.implode(' #', preg_split('/\W+/', $this->getKeywords()));
 		}
-
-		return array('q' => trim($params));
+		return array('q' => trim($search));
 	}
 
 	/**
@@ -41,24 +40,34 @@ class Alaress_Twitter_Search11 extends Alaress_Twitter_Search {
 	 */
 	public function load() {
 		$processed = array();
-		$resource = 'https://api.twitter.com/1.1/search/tweets.json';
-		$params = $this->generateParameters();
+		$resource  = 'https://api.twitter.com/1.1/search/tweets.json';
+		$params    = $this->generateParameters();
 
 		if (!empty($params)) {
 			$twitter_loader = new Alaress_Twitter_Loader_OAuth();
 			$twitter_loader->setResource($resource);
 			$twitter_loader->setParams($params);
-			$processed = $twitter_loader->load();
-//			foreach ($twitter_loader->load() as $result) {
-//				var_dump($result);
-//				$processed[] = array(
-//					'text' => $this->getFilter()->filterText($result->text),
-//					'date' => $result->created_at,
-//					'author' => $result->user->screen_name,
-//					'avatar' => $result->user->profile_image_url,
-//				);
-//
+
+			//
+			// Add loading from cache.
+			$all_tweets = $twitter_loader->load();
+
+//            if ($this->getMaxTweets() && is_numeric($this->getMaxTweets()) && is_array($allTweets->results)) {
+//				$all_tweets = array_slice($allTweets->results, 0, $this->getMaxTweets());
 //			}
+//			else {
+//				$all_tweets = $allTweets->results;
+//			}
+
+			foreach ($all_tweets as $result) {
+				$processed[] = array(
+					'text'   => $this->getFilter()->filterText($result->text),
+					'date'   => $result->created_at,
+					'author' => $result->user->screen_name,
+					'avatar' => $result->user->profile_image_url,
+				);
+			}
+//			var_dump($processed);
 //			var_dump($twitter_loader->load());
 //			$this->setSearchUrl($this->getSearchPrefix() . $params);
 

@@ -43,22 +43,16 @@ class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface {
 	 * @return array
 	 */
 	public function load() {
-		$allTweets = $this->getConnection()->get($this->getResource(), $this->getParams());
-
-		$preprocessed = array();
-
-		/* Iterate to set up for Filters and get rid of unwanted stuff
-		 */
-		foreach($allTweets->statuses as $currentTweet) {
-			$preprocessed[] = array(
-				'text' => $currentTweet->text,
-				'date' => $currentTweet->created_at,
-				'author' => $currentTweet->user->screen_name,
-				'avatar' => $currentTweet->user->profile_image_url,
-			);
+		$result = $this->getConnection()->get($this->getResource(), $this->getParams());
+		$code   = intval($this->getConnection()->http_code);
+		if ($code >= 400) {
+			//
+			// Log errors somewhere, and return an empty array?
+//			var_dump($result->errors);
+//			throw new Alaress_Twitter_Loader_Exception($result->errors);
+			return array();
 		}
-
-		return $preprocessed;
+		return $result->statuses;
 	}
 
 	/* Getters/Setters
