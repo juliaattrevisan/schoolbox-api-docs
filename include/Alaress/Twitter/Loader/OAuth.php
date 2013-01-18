@@ -43,16 +43,18 @@ class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface {
 	 * @return array
 	 */
 	public function load() {
-		$allTweets = $this->getConnection()->get($this->getResource());
+		$allTweets = $this->getConnection()->get($this->getResource(), $this->getParams());
 
 		$preprocessed = array();
 
 		/* Iterate to set up for Filters and get rid of unwanted stuff
 		 */
-		foreach($allTweets as $currentTweet) {
+		foreach($allTweets->statuses as $currentTweet) {
 			$preprocessed[] = array(
 				'text' => $currentTweet->text,
 				'date' => $currentTweet->created_at,
+				'author' => $currentTweet->user->screen_name,
+				'avatar' => $currentTweet->user->profile_image_url,
 			);
 		}
 
@@ -102,5 +104,24 @@ class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface {
 	 */
 	private function getResource() {
 		return $this->resource;
+	}
+
+	/**
+	 * Gets URL parameters that will be sent to Twitter interface.
+	 *
+	 * @return mixed
+	 */
+	public function getParams() {
+		return $this->params;
+	}
+
+	/**
+	 * Sets URL parameters that are sent to Twitter interface.
+	 *
+	 * @return $this
+	 */
+	public function setParams($params) {
+		$this->params = $params;
+		return $this;
 	}
 }
