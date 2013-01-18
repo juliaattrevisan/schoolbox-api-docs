@@ -53,7 +53,7 @@ class Alaress_Twitter_Search {
 	 *
 	 * @return string
 	 */
-	private function generateParameters() {
+	protected function generateParameters() {
 		$params = '';
 
 		/* Construct query parameters for tweet authors
@@ -127,7 +127,7 @@ class Alaress_Twitter_Search {
 	 *
 	 * @param $tweets
 	 */
-	private function setTweets($tweets) {
+	protected function setTweets($tweets) {
 		$this->tweets = $tweets;
 	}
 
@@ -145,7 +145,7 @@ class Alaress_Twitter_Search {
 	 *
 	 * @return string
 	 */
-	private function getKeywords() {
+	protected function getKeywords() {
 		return $this->keywords;
 	}
 
@@ -154,7 +154,7 @@ class Alaress_Twitter_Search {
 	 *
 	 * @param $searchUrl
 	 */
-	private function setSearchUrl($searchUrl) {
+	protected function setSearchUrl($searchUrl) {
 		$this->searchUrl = $searchUrl;
 	}
 
@@ -163,7 +163,7 @@ class Alaress_Twitter_Search {
 	 *
 	 * @return string
 	 */
-	private function getSearchUrl() {
+	protected function getSearchUrl() {
 		return $this->searchUrl;
 	}
 
@@ -181,7 +181,7 @@ class Alaress_Twitter_Search {
 	 *
 	 * @return string
 	 */
-	private function getUser() {
+	protected function getUser() {
 		return $this->user;
 	}
 
@@ -204,7 +204,7 @@ class Alaress_Twitter_Search {
 	 *
 	 * @return int
 	 */
-	private function getMaxTweets() {
+	protected function getMaxTweets() {
 		return $this->maxTweets;
 	}
 
@@ -213,7 +213,7 @@ class Alaress_Twitter_Search {
 	 *
 	 * @return string
 	 */
-	private function getSearchPrefix() {
+	protected function getSearchPrefix() {
 		return $this->searchPrefix;
 	}
 
@@ -222,7 +222,7 @@ class Alaress_Twitter_Search {
 	 *
 	 * @param $filter
 	 */
-	private function setFilter($filter) {
+	protected function setFilter($filter) {
 		$this->filter = $filter;
 	}
 
@@ -231,7 +231,7 @@ class Alaress_Twitter_Search {
 	 *
 	 * @return null
 	 */
-	private function getFilter() {
+	protected function getFilter() {
 		return $this->filter;
 	}
 }
