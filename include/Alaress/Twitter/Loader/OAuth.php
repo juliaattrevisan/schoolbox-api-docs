@@ -42,8 +42,14 @@ class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface {
 	 *
 	 * @return array
 	 */
-	public function load() {
-		$result = $this->getConnection()->get($this->getResource(), $this->getParams());
+	public function load($resource = null, $params = null) {
+		if (!isset($resource)) {
+			$resource = $this->getResource();
+		}
+		if (!isset($params)) {
+			$params = $this->getParams();
+		}
+		$result = $this->getConnection()->get($resource, $params);
 		$code   = intval($this->getConnection()->http_code);
 		if ($code >= 400) {
 			//
