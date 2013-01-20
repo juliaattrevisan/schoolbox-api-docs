@@ -44,20 +44,15 @@ class Alaress_Twitter_Search11 extends Alaress_Twitter_Search {
 		$params    = $this->generateParameters();
 
 		if (!empty($params)) {
-			$twitter_loader = new Alaress_Twitter_Loader_OAuth();
-			$twitter_loader->setResource($resource);
-			$twitter_loader->setParams($params);
+			$cache = new Alaress_Cache_Callable(
+				array(new Alaress_Twitter_Loader_OAuth(), 'load'),
+				array($resource, $params,)
+			);
+			$all_tweets = $cache->load();
 
-			//
-			// Add loading from cache.
-			$all_tweets = $twitter_loader->load();
-
-//            if ($this->getMaxTweets() && is_numeric($this->getMaxTweets()) && is_array($allTweets->results)) {
-//				$all_tweets = array_slice($allTweets->results, 0, $this->getMaxTweets());
-//			}
-//			else {
-//				$all_tweets = $allTweets->results;
-//			}
+            if ($this->getMaxTweets() && is_numeric($this->getMaxTweets()) && is_array($all_tweets)) {
+				$all_tweets = array_slice($all_tweets, 0, $this->getMaxTweets());
+			}
 
 			foreach ($all_tweets as $result) {
 				$processed[] = array(
@@ -67,36 +62,6 @@ class Alaress_Twitter_Search11 extends Alaress_Twitter_Search {
 					'avatar' => $result->user->profile_image_url,
 				);
 			}
-//			var_dump($processed);
-//			var_dump($twitter_loader->load());
-//			$this->setSearchUrl($this->getSearchPrefix() . $params);
-
-			/* Instantiate a cache and load from it
-			 */
-//			$cache = new Alaress_Twitter_Cache($this->getUser(), $this->getKeywords(), $this->getSearchUrl());
-//
-//			$allTweets = json_decode($cache->load());
-//
-//			/* Slice the required number of elements out
-//			 * Otherwise return all tweets when a limit is not specified (ie blank)
-//			 */
-//            if ($this->getMaxTweets() && is_numeric($this->getMaxTweets()) && is_array($allTweets->results)) {
-//                $allResults = array_slice($allTweets->results, 0, $this->getMaxTweets());
-//			}
-//			else {
-//				$allResults = $allTweets->results;
-//			}
-//
-//			/* Iterate and process
-//			 */
-//			for ($i = 0; $i < count($allResults); $i++) {
-//				$processed[] = array(
-//					'text' => $this->getFilter()->filterText($allResults[$i]->text),
-//					'date' => $allResults[$i]->created_at,
-//					'author' => $allResults[$i]->from_user,
-//					'avatar' => $allResults[$i]->profile_image_url,
-//				);
-//			}
 		}
 
 		$this->setTweets($processed);
