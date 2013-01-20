@@ -167,7 +167,7 @@ abstract class Alaress_Cache_Abstract {
 	 *
 	 * @return bool
 	 */
-	private function getVerbose() {
+	protected function getVerbose() {
 		return $this->verbose;
 	}
 }
