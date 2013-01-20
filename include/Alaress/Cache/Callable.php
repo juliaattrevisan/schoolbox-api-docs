@@ -15,6 +15,13 @@ class Alaress_Cache_Callable extends Alaress_Cache_Abstract {
 	protected $params   = array();
 //	protected $cacheHours = 1;
 
+	/**
+	 * Creates the cache object.
+	 *
+	 * @param callable $callback The callback to cache the result of.
+	 *                           @see http://php.net/manual/en/language.types.callable.php
+	 * @param array    $params   The parameters to pass to $callback
+	 */
 	public function __construct($callback, $params = array()) {
 		//
 		// Callback types:
@@ -30,17 +37,9 @@ class Alaress_Cache_Callable extends Alaress_Cache_Abstract {
 	 */
 	private $verbose = false;
 
-	/**
-	 * Load contents from the cache
-	 *
-	 * @abstract
-	 */
-//	abstract public function load();
-
 
 	/**
-	 * Generate the filename that would be associated with this particular
-	 * combination of user (author) and any optional keywords
+	 * Generate the filename for this callback and parameters.
 	 *
 	 * @internal param $author
 	 * @return string
@@ -54,16 +53,13 @@ class Alaress_Cache_Callable extends Alaress_Cache_Abstract {
 		// array(object, method)
 		// callable
 
-//		$callback_key = array();
-//		if (is_array())
+
 		$key = array();
 		$callable_name = null;
-		if (is_callable($this->callback, false, $callable_name)) {
-			$key[] = $callable_name;
-			$key[] = $this->params;
-		}
+		$is_callable = is_callable($this->callback, false, $callable_name);
+		$key[] = $callable_name;
+		$key[] = $this->params;
 		$filename = Cfg::get('stream_dir') . '/method_' . md5(serialize($key)) . '.json';
-		var_dump($filename);
 		return $filename;
 	}
 
@@ -85,10 +81,10 @@ class Alaress_Cache_Callable extends Alaress_Cache_Abstract {
 
 
 	/**
-	 * Set up cached contents of the url
-	 * Overwrite an expired cached file if necessary
+	 * Sets up the cached result.
 	 *
-	 * @param $url
+	 * If the cache file doesn't exist or is expired, calls the callback passed
+	 * into the constructor, and loads that value into the cache file.
 	 *
 	 * @return bool
 	 */
@@ -96,44 +92,16 @@ class Alaress_Cache_Callable extends Alaress_Cache_Abstract {
 		$cache_file = $this->getCacheFile();
 		if (!file_exists($cache_file) || $this->isCacheExpired()) {
 			$result = call_user_func_array($this->callback, $this->params);
-//			var_dump($result);
-//			$streamHandle = @fopen($url, 'r');
-//			$cacheHandle = @fopen($cache_file, 'w');
-
-//			/* Could not open stream source for reading
-//			 */
-//			if (!$streamHandle) {
-//				return false;
-//			}
-//
-//			/* Could not open cache file for writing
-//			 */
-//			if (!$cacheHandle) {
-//				return false;
-//			}
-
-			/* Verbose debugging
-			 */
 			if ($this->getVerbose()) {
 				echo 'Writing new ' . get_class($this) . ' file. ';
 			}
-
-			file_put_contents($cache_file, serialize($result));
-
-//			while (!feof($streamHandle)) {
-//				fwrite($cacheHandle, fread($streamHandle, 8192), 8192);
-//			}
-//
-//			fclose($streamHandle);
-//			fclose($cacheHandle);
+			return file_put_contents($cache_file, serialize($result));
 		}
 		else {
-
-			/* Verbose debugging
-			 */
 			if ($this->getVerbose()) {
 				echo 'Loading from cache. ';
 			}
 		}
+		return true;
 	}
 }
