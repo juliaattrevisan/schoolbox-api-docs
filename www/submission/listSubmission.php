@@ -9,9 +9,7 @@ $currentYear = date('Y');
 $currentSemester = date('m') > 6 ? 2 : 1;
 
 if (isset($this->arg[0])) {
-    if (!isset($this->arg[0])) {
-        error(2);
-    } elseif (!(is_numeric($this->arg[0]) && is_numeric($this->arg[1]))) {
+    if(!(is_numeric($this->arg[0]) && is_numeric($this->arg[1]))) {
         error(2); // TODO find a more appropriate error
     }
 
@@ -21,9 +19,11 @@ if (isset($this->arg[0])) {
 
     $year = (int)$this->arg[0];
     $semester = (int)$this->arg[1];
+    $semesterSlug = "/$year/$semester";
 } else {
     $year = $currentYear;
     $semester = $currentSemester;
+    $semesterSlug = '';
 }
 
 
@@ -49,6 +49,8 @@ $this->setBlock('normalSubmission', 'writable_close', 'writable_close_block');
 
 $this->setBlock(TEMPLATE_content, 'semester_option', 'semester_option_block');
 $this->setBlock(TEMPLATE_content, 'year_option', 'year_option_block');
+
+$this->setVar('SEM_SLUG', $semesterSlug);
 
 $submissionHandler = new Submission();
 
