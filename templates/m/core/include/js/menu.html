@@ -36,6 +36,13 @@
             renderPage(elem.attr('href'));
             return false;
         }
+
+        // exception for webmail: quick and nasty solution for SB-1724
+        if(elem.attr('title') == 'Webmail') {
+            window.location = elem.parent().find('li').find('a').eq(0).attr('href');
+            return false;
+        }
+
         // If its a new page
         if(ni != elem.parent().index()) {
 

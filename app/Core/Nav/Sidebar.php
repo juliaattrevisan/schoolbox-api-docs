@@ -10,6 +10,7 @@ class Core_Nav_Sidebar {
 
     private $user;
     private $agenda;
+    private $email;
     private $subjects;
     private $groups;
     private $work;
@@ -50,6 +51,24 @@ class Core_Nav_Sidebar {
         return array();
 
     }
+
+    /**
+     * Quick and nasty implementation of webmail link in mobile, to be replaced [SB-1724]
+     *
+     * @deprecated
+     * @return array
+     */
+    public function createWebmail() {
+        // ensure there's some manner of protocol on the target address, otherwise it will hit local
+        $addr = (strpos(Cfg::get('mail_address'), 'http') === false ? 'http://' : '') . Cfg::get('mail_address');
+
+        $this->email = array(array(
+            'href' => $addr,
+            'value' => 'Launch Webmail'
+        ));
+        return array();
+    }
+
 
     public function createSubjectList() {
         try {
@@ -309,10 +328,11 @@ class Core_Nav_Sidebar {
     public function getAll() {
 
         $opts = array(
-            'agenda'    => 'Agenda',
-            'subjects'  => 'Categories',
-            'work'      => 'Due Work',
-            'more'      => 'More',
+            'agenda'   => 'Agenda',
+            'email'    => 'Webmail',
+            'subjects' => 'Categories',
+            'work'     => 'Due Work',
+            'more'     => 'More',
         );
 
         $output = array();
