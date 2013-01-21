@@ -290,7 +290,7 @@ class External_Synergetic_User implements External_UserInterface {
 		}
 
 		/* Search for a particular boarding status
-		 * In synergetic, assume it's a B
+		 * In synergetic, assume it's a B or a W
 		 */
 		if ($boardingStatus) {
 			$query .= "
