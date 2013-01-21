@@ -173,7 +173,7 @@ class External_Schoolbox_User implements External_UserInterface {
 
 	}
 
-    public function getStudentContactListExtended ($yearLevel) {
+    public function getStudentContactListExtended ($yearlevel, $name, $boardingStatus, $form) {
 
     }
 
