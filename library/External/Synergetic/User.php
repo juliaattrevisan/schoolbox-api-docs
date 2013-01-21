@@ -249,7 +249,7 @@ class External_Synergetic_User implements External_UserInterface {
     public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form) {
         $query = "
 			SELECT
-				StudentID, StudentGiven1, StudentSurname, StudentYearLevel, House.Description AS StudentHouse, StudentBoarder,
+				StudentID, StudentGiven1, StudentSurname, StudentYearLevel, House.Description AS StudentHouse, StudentBoarder, StudentForm,
 				StudentContactID,
 				StudentContactTitle, StudentContactPreferred, StudentContactLegalFullName, StudentContactSurname,
 				StudentContactDefaultEmail,
@@ -295,6 +295,14 @@ class External_Synergetic_User implements External_UserInterface {
 		if ($boardingStatus) {
 			$query .= "
 				AND StudentBoarder != ''
+			";
+		}
+
+		/* Search for a particular form
+		 */
+		if ($form) {
+			$query .= "
+				AND StudentForm LIKE '%{$form}%'
 			";
 		}
 
