@@ -26,26 +26,101 @@ $j(function(){
 		window.print();
 		return false;
 	});
+
+	/* Make search filter options panel appear either by
+	 * clicking the button or by default, if any search
+	 * parameters were used
+	 */
+	$j('.search').click(function() {
+		$j('#searchFilterOptions').toggle();
+	});
+
+	/* Search filter validation only when Restrictions are on
+	 */
+	<!-- BEGIN use_parent_directory_validation -->
+	$j('#searchFilterOptions').find('form').validate({
+		rules:{
+			'searchYear':{
+				required: true,
+				minlength:1
+			}
+		},
+		messages:{
+			'searchYear':"Please select a year level"
+		},
+		errorPlacement:function (error, element) {
+			if (element.parent().parent().hasClass('checkboxes')) {
+				error.insertAfter(element.parent().parent().parent().children(':last-child'));
+			}
+			else {
+				error.insertAfter(element);
+			}
+		}
+	});
+	<!-- END use_parent_directory_validation -->
 });
 </script>
 
-
 <div class="directory parents">
 	<h1>Year List - Year {YEAR}</h1>
-	<span class="header_option"><a class="btn print" href="#"><span></span>Print</a></span>
+	<span class="header_option">
+		<a class="btn print" href="#"><span></span>Print</a>
+		<a class="btn search" href="#"><span></span>Search</a>
+	</span>
 
-	<div>
+	<div id='searchFilterOptions' style='display:none;'>
 		<form method='get' action='?' />
-		<label>Name <input type='text' name='searchName' value="{SEARCH_NAME}" /></label>
-		<label>Boarder
-			<select name='searchBoardingStatus'>
-				<option value='1' {SEARCH_BOARDINGSTATUS_YES} />Yes</option>
-				<option value='0' {SEARCH_BOARDINGSTATUS_NO} />No</option>
-			</select>
-		</label>
-		<label>Form <input type='text' name='searchForm' value="{SEARCH_FORM}" /></label>
-		<label>Year <input type='text' name='searchYear' value="{SEARCH_YEAR}" /></label>
-		<label><input type='submit' value='Search' /></label>
+			<h2>Search Filter Options</h2>
+			<table class="standardForm">
+				<colgroup>
+					<col width="250"/>
+				</colgroup>
+				<tr>
+					<td>
+						<h4>Name</h4>
+					</td>
+					<td>
+						<input type='text' name='searchName' value="{SEARCH_NAME}"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<h4>Boarder</h4>
+					</td>
+					<td>
+						<select name='searchBoardingStatus'>
+							<option value='1' {SEARCH_BOARDINGSTATUS_YES} />Yes</option>
+							<option value='0' {SEARCH_BOARDINGSTATUS_NO} />No</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<h4>Form</h4>
+					</td>
+					<td>
+						<input type='text' name='searchForm' value="{SEARCH_FORM}"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<h4>Year</h4>
+						<!-- BEGIN parent_directory_restriction_note -->
+						<em>You must specify this value.</em><br />
+						<em>You can only view Parent Directories for year levels in which you have a child.</em>
+						<!-- END parent_directory_restriction_note -->
+					</td>
+					<td>
+						<input type='text' name='searchYear' value="{SEARCH_YEAR}"/>
+					</td>
+				</tr>
+			</table>
+
+			<label>
+				<input class='submit-btn-plain' type='submit' value='Search' />
+			</label>
+
+			<div class='float-fix'></div>
 		</form>
 	</div>
 	<!-- BEGIN student -->
