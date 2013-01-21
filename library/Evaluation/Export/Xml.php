@@ -63,7 +63,7 @@ abstract class Evaluation_Export_Xml {
 			'ASSESS_START' => $assess['start'],
 			'ASSESS_FINISH' => $assess['finish'],
 			'ASSESS_DURATION' => $assess['duration'],
-			'ASSESS_ALLOW_RESIT' => $assess['allow_resit'],
+			'ASSESS_MAX_ATTEMPTS' => $assess['max_attempts'],
 			'ASSESS_AVAILABILITY' => $assess['availability'],
 		));
 
