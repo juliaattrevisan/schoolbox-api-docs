@@ -69,7 +69,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         $imageList = $this->categoryHandler->getImages($this->source['id'], $limit, true);
 
         // Have update form point to the gallery's homepage, not this page (if this is from an alt source)
-		$this->setVar('IMAGEGALLERY_CATEGORY_ID', $this->source['id']);
+        $this->setVar('IMAGEGALLERY_CATEGORY_ID', $this->source['id']);
 
         // Controls such as Post News
         if ($this->permission < WRITE_ACCESS) {

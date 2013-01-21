@@ -34,25 +34,6 @@ if (is_numeric($this->arg[0])) {
 	$this->setVar('CATEGORY_ID',	$category['id']);
 
 	$imageList = $categoryHandler->getImages($category['id']);
-//    $componentFactory    = new Component_Homepage_Factory(new User, $this);
-//    $componentCollection = $componentFactory->buildComponentList($this->arg[0]);
-//    $imageList           = array();
-//    $used_component_ids  = array();
-//    foreach ($componentCollection as $component) {
-//        if ($component instanceof Component_Homepage_ImageGalleryController) {
-//            $component_id = $component->getConfig('src');
-//            if (empty($component_id)) {
-//                $component_id = $component->identifier;
-//            }
-//            if (!in_array($component_id, $used_component_ids)) {
-//                $used_component_ids[] = $component_id;
-//                $this_image_list      = $categoryHandler->getImages($component_id);
-//                if (is_array($this_image_list)) {
-//                    $imageList = array_merge($imageList, $this_image_list);
-//                }
-//            }
-//        }
-//    }
 
 	if (is_array($imageList)) {
 		foreach($imageList as $thumbnail) {
@@ -61,10 +42,8 @@ if (is_numeric($this->arg[0])) {
 				'THUMBNAIL_DESCRIPTION' => $thumbnail['description'],
 				'THUMBNAIL_SIZE' =>	Cfg::get('thumbnail_size'),
 			));
-	
 			$this->parse('image_gallery_block', 'image_gallery', true);
 		}
-		
 		$this->setVar(array(
 			'IMAGE_HEIGHT' => Cfg::get('thumbnail_size'),
 		));
