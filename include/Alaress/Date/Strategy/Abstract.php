@@ -14,7 +14,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-abstract class Alaress_Date_Strategy_Abstract {
+abstract class Alaress_Date_Strategy_Abstract implements Alaress_Validator_ValidatableInterface {
 	private $year = '0000';
 	private $month = '00';
 	private $day = '00';
@@ -360,5 +360,25 @@ abstract class Alaress_Date_Strategy_Abstract {
 	 */
 	protected function getLocale() {
 		return $this->locale;
+	}
+
+
+	/**
+	 * Validates whether this date is actually valid.
+	 *
+	 * @return bool
+	 */
+	public function isValid() {
+		$validator = new Alaress_Validator_Date();
+		return $validator->isValid(
+			array(
+				 'year'   => $this->getYear(),
+				 'month'  => $this->getMonth(),
+				 'day'    => $this->getDay(),
+				 'hour'   => $this->getHour(),
+				 'minute' => $this->getMinute(),
+				 'second' => $this->getSecond(),
+			)
+		);
 	}
 }

@@ -80,7 +80,6 @@ $dueDate = generateDate('due', '23:59:59');
 // if we're not accepting submissions. override the open date to now() and late date to due date
 if(!$acceptSubmissions) {
     $openDate = new Alaress_Date_Format(time(), 'U');
-    $openDate = $openDate->getDatabase();
     $lateDate = $dueDate;
 }
 else {
@@ -89,12 +88,12 @@ else {
 }
 
 // if any of the dates failed to parse
-if (!($openDate && $dueDate && $lateDate)) {
+if (!($openDate->isValid() && $dueDate->isValid() && $lateDate->isValid())) {
     error(15);
 }
 
 // late date is greater than due date
-if (!empty($_POST['accept_submission']) && $dueDate > $lateDate) {
+if (!empty($_POST['accept_submission']) && $dueDate->getDatabase() > $lateDate->getDatabase()) {
     error(15);
 }
 
@@ -140,9 +139,9 @@ elseif($markType['slug'] == 'rubric') {
 $submissionBox = array(
     'accept_submission' => !empty($_POST['accept_submission']) ? true : false,
     'multi_submission'  => !empty($_POST['multi_submission'])  ? true : false,
-    'open_date'         => $openDate,
-    'date'              => $dueDate,
-    'late_date'         => $lateDate,
+    'open_date'         => $openDate->getDatabase(),
+    'date'              => $dueDate->getDatabase(),
+    'late_date'         => $lateDate->getDatabase(),
     'name'              => $_POST['name'],
     'description'       => $_POST['description'],
     'type'              => $_POST['type'],
@@ -193,7 +192,7 @@ $page->localRedir('/submission/listSubmission/');
  * Uses POST variables to create dates
  * @param $field
  * @param $placeholder
- * @return mixed
+ * @return Alaress_Date_Format
  */
 function generateDate($field, $placeholder) {
     if(empty($_POST[$field . '_hour'])) {
@@ -202,5 +201,5 @@ function generateDate($field, $placeholder) {
     else {
         $adf = new Alaress_Date_Format(sprintf("%s %s:%s %s", $_POST[$field.'_date'], $_POST[$field.'_hour'], $_POST[$field.'_minute'], $_POST[$field.'_period']), 'd/m/y');
     }
-    return $adf->getDatabase();
+    return $adf;
 }

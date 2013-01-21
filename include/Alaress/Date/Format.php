@@ -13,7 +13,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Alaress_Date_Format implements Alaress_Date_Format_Interface {
+class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Validator_ValidatableInterface {
 
 	/**
 	 * Set up datetime data for processing. Choose your strategy here!
@@ -209,4 +209,15 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface {
 	private function getStrategy() {
 		return $this->strategy;
 	}
+
+
+    /**
+     * Returns whether this date is valid, according to the strategy that this date was set up with.
+     *
+     * @return bool
+     */
+    public function isValid()
+    {
+        return $this->getStrategy()->isValid();
+    }
 }
