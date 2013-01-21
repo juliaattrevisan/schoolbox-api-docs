@@ -234,16 +234,19 @@ class External_Synergetic_User implements External_UserInterface {
 
     }
 
-    /**
-     * Gets a list of Contacts for all Students in a particular year level. The
-     * year level is stored in Synergetic.
-     *
-     * Used in reporting.
-     *
-     * @param $yearlevel
-     * @return mixed
-     */
-    public function getStudentContactListExtended($yearlevel) {
+	/**
+	 * Gets a list of Contacts for all Students in a particular year level. The
+	 * year level is stored in Synergetic.
+	 * Used in reporting.
+	 *
+	 * @param $yearlevel
+	 * @param $name
+	 * @param $boardingStatus
+	 * @param $form
+	 *
+	 * @return mixed
+	 */
+    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form) {
         $query = "
 			SELECT
 				StudentID, StudentGiven1, StudentSurname, StudentYearLevel, House.Description AS StudentHouse, StudentBoarder,
@@ -264,9 +267,40 @@ class External_Synergetic_User implements External_UserInterface {
 			LEFT JOIN SynergyOne.dbo.luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
 			WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
 			AND FileSemester = " . $_SESSION['FileSemester'] . "
-			AND FileYear = " . $_SESSION['FileYear'] . "
-			AND StudentYearLevel = '$yearlevel'
-			ORDER BY StudentSurname, StudentID, StudentContactType";
+			AND FileYear = " . $_SESSION['FileYear'];
+
+		/* Search for a particular year level
+		 */
+		if (strlen($yearlevel)) {
+			$query .= "
+				AND StudentYearLevel = '{$yearlevel}'
+			";
+		}
+
+		/* Search for a student name
+		 */
+		if (strlen($name)) {
+			$query .= "
+				AND (
+					(StudentSurname LIKE '%{$name}%')
+					OR
+					(StudentGiven1 LIKE '%{$name}%')
+				)
+			";
+		}
+
+		/* Search for a particular boarding status
+		 * In synergetic, assume it's a B
+		 */
+		if ($boardingStatus) {
+			$query .= "
+				AND StudentBoarder != ''
+			";
+		}
+
+		$query .= "
+			ORDER BY StudentSurname, StudentID, StudentContactType
+		";
 
         return $this->getDatabase()->getAll($query);
     }
