@@ -12,6 +12,7 @@ class DAV_Folder extends Sabre_DAV_Collection {
     private $folder;
     private $folderHandler;
     private $fileHandler;
+    private $groupHandler;
 
     public function __construct($path) {
 
@@ -19,6 +20,7 @@ class DAV_Folder extends Sabre_DAV_Collection {
 
         $this->setFolderHandler();
         $this->setFileHandler();
+        $this->setGroupHandler();
 
         $this->setFolderID($path);
 
@@ -31,33 +33,55 @@ class DAV_Folder extends Sabre_DAV_Collection {
 
         $categoryList = $this->getFolderHandler()->getSimpleCategoryList($this->getFolderID());
 
-        // Loop through the directory, and create objects for each node
+        // Loop through the directory, and create objects for each node that the user has permission to access
         if(is_array($categoryList)){
             foreach($categoryList as $folder) {
-                $children[] = new DAV_Folder($this->myPath.'/'.$folder['name']);
+                if($this->getGroupHandler()->getPermission($folder['id']) >= READ_ACCESS) {
+                    $children[] = new DAV_Folder($this->myPath.'/'.$folder['name']);
+                }
             }
         }
 
-        $fileList = $this->getFileHandler()->getAllInCategory($this->getFolderID());
-        if(is_array($fileList)){
-            foreach($fileList as $file) {
-                if(is_array($file) && is_readable(Cfg::get('file_dir') .'/'. $file['id'] . '.dat') )
-                    $children[] = new DAV_File($this->myPath.'/'.$file['realname']);
+        //Loop through all the files and output them if the user has access
+        if($this->getGroupHandler()->getPermission($this->getFolderID()) >= READ_ACCESS ) {
+            $fileList = $this->getFileHandler()->getAllInCategory($this->getFolderID());
+            if(is_array($fileList)){
+                foreach($fileList as $file) {
+                    if(is_array($file) && is_readable(Cfg::get('file_dir') .'/'. $file['id'] . '.dat') ) {
+                        $children[] = new DAV_File($this->myPath.'/'.$file['realname']);
+                    }
+                }
             }
         }
 
         return $children;
     }
 
+    /**
+     * Returns a child object, by its name.
+     *
+     * Checks if name refers to a folder it then returns a folder object otherwise searches for a file in the current path
+     *
+     * @param string $name
+     * @throws Sabre_DAV_Exception_NotFound
+     * @return Sabre_DAV_INode
+     */
     public function getChild($name) {
 
-        if($this->isFolder($name)) {
+        //Prevent queries if permission is not allowed
+        if($this->getFolderID() > 0) {
+            if($this->getGroupHandler()->getPermission($this->getFolderID()) < READ_ACCESS) {
+                throw new Sabre_DAV_Exception_Forbidden('Permission denied');
+            }
+        }
+
+        if($this->isFolder($name, $this->getFolderID())) {
             return new DAV_Folder($this->myPath.'/'.$name);
         }
         else {
             $result = $this->getFileHandler()->getByArray(array('realname' => $name,'category'=>$this->getFolderID()));
             $file = $result[0];
-            if(is_array($file) && is_readable(Cfg::get('file_dir') .'/'. $file['id'] . '.dat') ){
+            if(is_array($file) && is_readable(Cfg::get('file_dir') .'/'. $file['id'] . '.dat') ) {
                 return new DAV_File($this->myPath.'/'.$file['realname']);
             }
             else
@@ -66,11 +90,17 @@ class DAV_Folder extends Sabre_DAV_Collection {
 
     }
 
-    /*
+
+    /**
+     * Checks is a child-node exists.
+     *
      * Tests if the provided node name exists whithin folder, could be file or folder.
+     *
+     * @param string $name
+     * @return bool
      */
     public function childExists($name) {
-        if($this->isFolder($name) ){
+        if($this->isFolder($name, $this->getFolderID()) ){
                return true;
         }
         else {
@@ -88,20 +118,26 @@ class DAV_Folder extends Sabre_DAV_Collection {
 
     public function createFile($name, $data = null){
 
-        $tmpLoc = tempnam(sys_get_temp_dir(),'DAV');
-        file_put_contents($tmpLoc, $data);
+        if($this->getGroupHandler()->getPermission($this->getFolderID()) >= WRITE_ACCESS) {
 
-        $file = array('description'   => $name,
-                    'category'      => $this->getFolderID(),
-                    'owner'         => $_SESSION['id']);
-        $fileData = array('tmp_name' => $tmpLoc,
-                        'name'      => $name);
-        $this->getFileHandler()->create($file, $fileData);
-        unlink($tmpLoc);
+            $tmpLoc = tempnam(sys_get_temp_dir(),'DAV');
+            file_put_contents($tmpLoc, $data);
+
+            $file = array('description'   => $name,
+                        'category'      => $this->getFolderID(),
+                        'owner'         => $_SESSION['id']);
+            $fileData = array('tmp_name' => $tmpLoc,
+                            'name'      => $name);
+            $this->getFileHandler()->create($file, $fileData);
+            unlink($tmpLoc);
+        }
+        else {
+            throw new Sabre_DAV_Exception_Forbidden('Permission denied to create file');
+        }
     }
 
     public function createDirectory($name) {
-
+        throw new Sabre_DAV_Exception_Forbidden('Permission denied to create directory');
     }
 
 
@@ -119,8 +155,8 @@ class DAV_Folder extends Sabre_DAV_Collection {
         $this->getFolderHandler()->update($folder);
     }
 
-    private function isFolder($name) {
-        if( is_array( $this->getFolderHandler()->searchByName($name) )  )
+    private function isFolder($name, $parent = false) {
+        if( is_array( $this->getFolderHandler()->searchByName($name, $parent) )  )
             return true;
         else
             return false;
@@ -171,5 +207,13 @@ class DAV_Folder extends Sabre_DAV_Collection {
 
     private function setFileHandler() {
         $this->fileHandler = new File();
+    }
+
+    private function setGroupHandler() {
+        $this->groupHandler = new Group();
+    }
+
+    private function getGroupHandler() {
+        return $this->groupHandler;
     }
 }
