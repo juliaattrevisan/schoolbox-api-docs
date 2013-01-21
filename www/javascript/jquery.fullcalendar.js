@@ -574,7 +574,7 @@ function calendarDateOnly(datetime) {
         else if(i == 3) { S = 'rd' }
         else { S = 'th' }
     }
-    return p[0] + ', ' + parseInt(p[2]) + S + ' ' + p[1]
+    return p[0] + ', ' + parseInt(p[2], 10) + S + ' ' + p[1]
 }
 
 /**
@@ -586,6 +586,6 @@ function calendarTime(datetime) {
     var p = datetime.toString().split(/[ :]/)
     if(p[4] == 0) { return '12:00am' }
     else if(p[4] > 12) { return (p[4] - 12) + ':' + p[5] + 'pm' }
-    else { return parseInt(p[4]) + ':' + p[5] + 'am' }
+    else { return parseInt(p[4], 10) + ':' + p[5] + 'am' }
 
 }
