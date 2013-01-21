@@ -50,7 +50,7 @@ class Report_Parent extends Report_Abstract {
 		$this->setSearchForm($searchForm);
 
 		if (!$this->checkPermissions()) {
-			error(19);
+			error(155);
 		}
 		else {
 			$this->setPage($page);
@@ -103,6 +103,8 @@ class Report_Parent extends Report_Abstract {
 	protected function setup() {
 		$this->getPage()->setFile(TEMPLATE_content, 'modules/report/parents.html');
 		$this->getPage()->setBlock(TEMPLATE_content, 'student', 'student_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'parent_directory_restriction_note', 'parent_directory_restriction_note_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'use_parent_directory_validation', 'use_parent_directory_validation_block');
 		$this->getPage()->setTitle('Parent Contact info');
 		$this->getPage()->setBlock('student', 'contact', 'contact_block');
 		$this->getPage()->setBlock('contact', 'spouse', 'spouse_block');
@@ -133,6 +135,17 @@ class Report_Parent extends Report_Abstract {
 				'SEARCH_BOARDINGSTATUS_YES' => '',
 				'SEARCH_BOARDINGSTATUS_NO' => 'selected',
 			));
+		}
+
+		/* Note about using Year Level in Parent Directory search options
+		 */
+		if (Cfg::get('restrict_parent_directory')) {
+			$this->getPage()->parse('parent_directory_restriction_note_block', 'parent_directory_restriction_note');
+			$this->getPage()->parse('use_parent_directory_validation_block', 'use_parent_directory_validation');
+		}
+		else {
+			$this->getPage()->setVar('parent_directory_restriction_note_block', '');
+			$this->getPage()->setVar('use_parent_directory_validation_block', '');
 		}
 	}
 
