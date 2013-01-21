@@ -18,7 +18,7 @@ interface External_UserInterface {
 
     public function getStaff($externalUserId);
 
-    public function getStudentContactListExtended($yearLevel);
+    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form);
 
     public function getStudentContactList($externalUserId);
 

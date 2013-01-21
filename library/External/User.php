@@ -6,8 +6,8 @@
  * Time: 4:40 PM
  * To change this template use File | Settings | File Templates.
  */
- 
-class External_User {
+
+class External_User implements External_UserInterface {
 	private $database;
 
 	/**
@@ -97,11 +97,16 @@ class External_User {
 	/**
 	 * Used in report module
 	 *
-	 * @param Integer $yearLevel
+	 * @param $yearlevel
+	 * @param $name
+	 * @param $boardingStatus
+	 * @param $form
+	 *
+	 * @internal param int $yearLevel
 	 * @return Array
 	 */
-	public function getStudentContactListExtended ($yearLevel) {
-		return $this->getDatabase()->getStudentContactListExtended($yearLevel);
+	public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form) {
+		return $this->getDatabase()->getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form);
 	}
 
 	/**
@@ -156,7 +161,7 @@ class External_User {
 
 	/**
 	 * No usages found
-	 * 
+	 *
 	 * @todo Review usage of method
 	 * @return Array
 	 */
