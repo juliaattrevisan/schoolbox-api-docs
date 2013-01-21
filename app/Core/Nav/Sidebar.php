@@ -60,7 +60,7 @@ class Core_Nav_Sidebar {
      */
     public function createWebmail() {
         // ensure there's some manner of protocol on the target address, otherwise it will hit local
-        $addr = (strpos(Cfg::get('webmail_address'), 'http') === false ? 'http://' : '') . Cfg::get('mail_address');
+        $addr = (strpos(Cfg::get('mail_address'), 'http') === false ? 'http://' : '') . Cfg::get('mail_address');
 
         $this->email = array(array(
             'href' => $addr,
