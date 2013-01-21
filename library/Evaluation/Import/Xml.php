@@ -61,8 +61,16 @@ class Evaluation_Import_Xml {
 	public function import() {
 		$xml = $this->loadData();
 
-		/* Set up assess
-		 */
+		//
+		// Try to get max attempts if it's there, otherwise fall back to
+		// allowresit (not allow_resit).
+		// if allowresit is true, or is not unspecified:
+		// max_attempts = 0 (unlimited), otherwise 1.
+		$max_attempts = Scrub::text($xml->maxattempts);
+		if (strlen($max_attempts) === 0) {
+			$allow_resit = Scrub::text($xml->allowresit);
+			$max_attempts = ($allow_resit || strlen($allow_resit) === 0) ? 0 : 1;
+		}
 		$assess_id = $this->getAssessHandler()->create(array(
 			'category_id' => Scrub::text($this->getCategoryId()),
 			'user_id' => $_SESSION['id'],
@@ -71,7 +79,7 @@ class Evaluation_Import_Xml {
 			'start' => Scrub::text($xml->start),
 			'finish' => Scrub::text($xml->finish),
 			'duration' => Scrub::text($xml->duration),
-			'allow_resit' => Scrub::text($xml->allow_resit),
+			'max_attempts' => $max_attempts,
 			'availability' => Scrub::text($xml->availability),
 			'created_at' => 'NOW()',
 		));
