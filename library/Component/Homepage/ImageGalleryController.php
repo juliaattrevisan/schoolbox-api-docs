@@ -68,8 +68,8 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         // Load images for the requested homepage
         $imageList = $this->categoryHandler->getImages($this->source['id'], $limit, true);
 
-        // Have update form to back to this homepage, not the gallery's homepage
-        $this->setVar('IMAGEGALLERY_CATEGORY_ID', $this->getContext('id'));
+        // Have update form point to the gallery's homepage, not this page (if this is from an alt source)
+        $this->setVar('IMAGEGALLERY_CATEGORY_ID', $this->source['id']);
 
         // Controls such as Post News
         if ($this->permission < WRITE_ACCESS) {
