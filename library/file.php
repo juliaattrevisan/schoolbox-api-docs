@@ -79,13 +79,12 @@ class File extends DeprecatedModel {
         $sortFields = array( 'name' => 'f.description', 'date' => 'f.submitted' );
 
         $config['sort'] = isset( $sortFields[$config['sort']] ) ? $config['sort'] : 'name';
-        $config['sortdir'] = strtoupper($config['sortdir']) == 'desc' ? 'DESC' : 'ASC';
+        $config['sortdir'] = strtoupper($config['sortdir']) == 'DESC' ? 'DESC' : 'ASC';
         $query .= " ORDER BY " . $sortFields[$config['sort']] . " " . $config['sortdir'];
 
         if ( $config['size'] > 0 ) {
             $query .= " LIMIT 0, " . $config['size'];
         }
-
         return $this->db->getAll($query);
 
     }
