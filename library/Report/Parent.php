@@ -10,16 +10,46 @@
 class Report_Parent extends Report_Abstract {
 
 	/**
+	 * The name of someone you are searching for
+	 *
+	 * @var string
+	 */
+	private $searchName = '';
+
+	/**
+	 * The boarding status of someone you are searching for
+	 *
+	 * @var bool
+	 */
+	private $searchBoardingStatus = false;
+
+	/**
+	 * The form of someone you are searching for
+	 *
+	 * This seems to be some kind of arbitrary text string
+	 * found in the Synergetic "School" tab
+	 *
+	 * @var string
+	 */
+	private $searchForm = '';
+
+	/**
 	 * Constructor
 	 *
 	 * @param $page
 	 * @param $yearLevel
+	 * @param $searchName
+	 * @param $searchBoardingStatus
+	 * @param $searchForm
 	 */
-	public function __construct($page, $yearLevel) {
+	public function __construct($page, $yearLevel, $searchName, $searchBoardingStatus, $searchForm) {
 		$this->setGroupHandler(new Group());
 		$this->setYearLevel($yearLevel);
+		$this->setSearchName($searchName);
+		$this->setSearchBoardingStatus($searchBoardingStatus);
+		$this->setSearchForm($searchForm);
 
-		if (!is_numeric($yearLevel) || !$this->checkPermissions()) {
+		if (!$this->checkPermissions()) {
 			error(19);
 		}
 		else {
@@ -30,7 +60,7 @@ class Report_Parent extends Report_Abstract {
 
 			$this->setup();
 
-			$this->setAllRecords($this->getExternalUserHandler()->getStudentContactListExtended($this->getYearLevel()));
+			$this->setAllRecords($this->getExternalUserHandler()->getStudentContactListExtended($this->getYearLevel(), $this->getSearchName(), $this->getSearchBoardingStatus(), $this->getSearchForm()));
 		}
 	}
 
@@ -46,13 +76,11 @@ class Report_Parent extends Report_Abstract {
 		}
 		else if ($this->getGroupHandler()->isParent()) {
 
-            // enable/disable this check with a config variable
-            if(Cfg::get('restrict_parent_directory')) {
-                /* If you are a parent, ensure that you have a child in the selected year level.
-                 * If you don't have a child in this year level, you can't view it.
-                 */
-
-                // if check enabled
+			/* If Restrict Parent Directory is on, the following conditions apply:
+			 * If you are a parent, ensure that you have a child in the selected year level.
+			 * If you don't have a child in this year level, you can't view it.
+			 */
+            if (Cfg::get('restrict_parent_directory')) {
                 if (is_array($_SESSION['children']) && count($_SESSION['children'])) {
                     foreach($_SESSION['children'] as $currentChild) {
                         if ($currentChild['year'] == $this->getYearLevel()) {
@@ -60,8 +88,8 @@ class Report_Parent extends Report_Abstract {
                         }
                     }
                 }
-            } else {
-                // if check disabled
+            }
+			else {
                 return true;
             }
 		}
@@ -87,7 +115,25 @@ class Report_Parent extends Report_Abstract {
 
 		$this->getPage()->setVar(array(
 			'YEAR' => $this->getYearLevel(),
+			'SEARCH_NAME' => $this->getSearchName(),
+			'SEARCH_FORM' => $this->getSearchForm(),
+			'SEARCH_YEAR' => $this->getYearLevel(),
 		));
+
+		/* Search boarding status dropdown preselection
+		 */
+		if ($this->getSearchBoardingStatus()) {
+			$this->getPage()->setVar(array(
+				'SEARCH_BOARDINGSTATUS_YES' => 'selected',
+				'SEARCH_BOARDINGSTATUS_NO' => '',
+			));
+		}
+		else {
+			$this->getPage()->setVar(array(
+				'SEARCH_BOARDINGSTATUS_YES' => '',
+				'SEARCH_BOARDINGSTATUS_NO' => 'selected',
+			));
+		}
 	}
 
 	/**
@@ -279,11 +325,72 @@ class Report_Parent extends Report_Abstract {
 		}
 	}
 
+	/**
+	 * Export parent list
+	 *
+	 * @param Report_Exporter $exporter
+	 * @param string $format
+	 */
     public function export(Report_Exporter $exporter, $format = 'csv') {
         // function stub to appease interpreter
         // can be implemented if export required.
     }
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set search boarding status
+	 *
+	 * @param boolean $searchBoardingStatus
+	 */
+	private function setSearchBoardingStatus($searchBoardingStatus) {
+		$this->searchBoardingStatus = $searchBoardingStatus;
+	}
+
+	/**
+	 * Get search boarding status
+	 *
+	 * @return boolean
+	 */
+	private function getSearchBoardingStatus() {
+		return $this->searchBoardingStatus;
+	}
+
+	/**
+	 * Set search form
+	 *
+	 * @param string $searchForm
+	 */
+	private function setSearchForm($searchForm) {
+		$this->searchForm = $searchForm;
+	}
+
+	/**
+	 * Get search form
+	 *
+	 * @return string
+	 */
+	private function getSearchForm() {
+		return $this->searchForm;
+	}
+
+	/**
+	 * Set search name
+	 *
+	 * @param string $searchName
+	 */
+	private function setSearchName($searchName) {
+		$this->searchName = $searchName;
+	}
+
+	/**
+	 * Get search name
+	 *
+	 * @return string
+	 */
+	private function getSearchName() {
+		return $this->searchName;
+	}
 }
-
-
 
