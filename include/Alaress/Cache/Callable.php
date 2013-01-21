@@ -59,7 +59,7 @@ class Alaress_Cache_Callable extends Alaress_Cache_Abstract {
 		$is_callable = is_callable($this->callback, false, $callable_name);
 		$key[] = $callable_name;
 		$key[] = $this->params;
-		$filename = Cfg::get('stream_dir') . '/method_' . md5(serialize($key)) . '.json';
+		$filename = Cfg::get('stream_dir') . '/callable_' . md5(serialize($key)) . '.txt';
 		return $filename;
 	}
 
