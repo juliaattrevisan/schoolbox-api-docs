@@ -116,10 +116,10 @@ class Report_Parent extends Report_Abstract {
 		));
 
 		$this->getPage()->setVar(array(
-			'YEAR' => $this->getYearLevel(),
-			'SEARCH_NAME' => $this->getSearchName(),
-			'SEARCH_FORM' => $this->getSearchForm(),
-			'SEARCH_YEAR' => $this->getYearLevel(),
+			'YEAR' => trim($this->getYearLevel()),
+			'SEARCH_NAME' => trim($this->getSearchName()),
+			'SEARCH_FORM' => trim($this->getSearchForm()),
+			'SEARCH_YEAR' => trim($this->getYearLevel()),
 		));
 
 		/* Search boarding status dropdown preselection
