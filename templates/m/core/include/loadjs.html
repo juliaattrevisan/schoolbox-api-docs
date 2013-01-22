@@ -263,7 +263,8 @@ $("#page").on(clickEvent, '#wipeCache', function(){
     document.cookie = 'PHPSESSID' + '=; expires=Thu, 01-Jan-70 00:00:01 GMT;';
     appCache.OBSOLETE;
     localStorage.clear();
-    window.location.reload();
+    localStorage.setItem('lastPage', '/');
+    window.location = window.location.protocol +'//' + window.location.hostname + '/m/';
 });
 
 // register the logout listener
@@ -273,6 +274,21 @@ $("#page,#menu").on(clickEvent, '#logout', function(){
     killCookie('PHPSESSID');
     window.location = window.location.protocol +'//' + window.location.hostname + '/m/';
 });
+
+// register the 'send report' listener
+$("#page").on(clickEvent, "#sendReport", function(e){
+    e.preventDefault()
+    var report = {}
+    var i = 0
+    $("#sendReport").html('Sending...')
+    $("#page").find('article.giza-error.technical').each(function() {
+        report[i++] = '<div class="e">' + $(this).html() + '</div>'
+    })
+    $.post('/ajax/errorReport', {err : report}, function(data) {
+        // success response
+        $("#sendReport").html('<p>'+data+'</p>').attr('id', '')
+    })
+})
 
 // register the site-switch listener
 $("#menu").on(clickEvent, '#switch', function() {
