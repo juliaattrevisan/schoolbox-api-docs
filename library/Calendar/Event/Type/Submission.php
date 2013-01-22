@@ -44,18 +44,22 @@ class Calendar_Event_Type_Submission extends Calendar_Event_Type_Abstract {
     private $submissionBoxName = '';
     private $submissionBoxDetail = '';
 
-    /**
-     * Render via external class
-     *
-     * @param \Calendar_Event_Submission_Renderer $visitor
-     */
+	/**
+	 * Render via external class
+	 *
+	 * @param \Calendar_Event_StudentBirthday_Renderer $visitor
+	 *
+	 * @return mixed
+	 */
     public function accept($visitor) {
-        $visitor->visit($this);
+        return $visitor->visit($this);
     }
 
     /**
      * Get submission note
-     */
+	 *
+	 * @return string
+	 */
     public function getNote() {
 
         /* Optional categoryCodes suffix

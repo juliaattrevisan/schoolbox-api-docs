@@ -26,13 +26,15 @@ class Calendar_Event_Type_Day extends Calendar_Event_Type_Abstract {
      */
     private $publishDate = null;
 
-    /**
-     * Render via external class
-     *
-     * @param Calendar_Event_Day_Renderer $visitor
-     */
+	/**
+	 * Render via external class
+	 *
+	 * @param \Calendar_Event_StudentBirthday_Renderer $visitor
+	 *
+	 * @return mixed
+	 */
     public function accept($visitor) {
-        $visitor->visit($this);
+        return $visitor->visit($this);
     }
 
     /**
