@@ -21,24 +21,6 @@
             $j(this).hide();
             e.preventDefault();
         });
-
-        /* Modal for URL homepage selection
-         */
-        $j('#resource-browser').dialog({
-            width:650,
-            autoOpen:false,
-            title:"Select a homepage",
-            modal:true,
-            resizable:false
-        });
-
-        $j('#launch-browser-{COMPONENT_HANDLE}').click(function () {
-            $j('#resource-browser').load('/ajax/resourceBrowser', {destination:'#src-{COMPONENT_HANDLE}'}, function () {
-                $j('#resource-browser').dialog('open');
-            });
-
-            return false;
-        });
     });
 </script>
 <!-- END custom_head -->
