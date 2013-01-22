@@ -38,7 +38,7 @@ if (is_numeric($_GET['eventID'])) {
         $endTime = array('', '', '', '');
     }
 
-    if ($event['publish_date'] != null) {
+    if ($event['publish_date'] != null && !preg_match('/^0000-00-00/', $event['publish_date'])) {
         $pubDateObject = new Alaress_Date_Format($event['publish_date'], 'y-m-d h:i:s');
         $publishDate = $pubDateObject->getLocalShort();
     } else {
