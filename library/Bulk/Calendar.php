@@ -79,8 +79,8 @@ class Bulk_Calendar extends Bulk_Abstract {
 				/* If a publish date is specified, use it; otherwise assume the
 				 * Publish Date is the same as the Event Date
 				 */
-				if (strlen(trim($thisRow[8]))) {
-					$publishDate = new Alaress_Date_Format($thisRow[8], 'd/m/y');
+				if (strlen(trim($thisRow[7]))) {
+					$publishDate = new Alaress_Date_Format($thisRow[7], 'd/m/y');
 				}
 				else {
 					$publishDate = new Alaress_Date_Format('0000-00-00', 'y-m-d');
@@ -96,9 +96,13 @@ class Bulk_Calendar extends Bulk_Abstract {
 						'note' => $thisRow[3],
 						'detail' => $thisRow[4],
 						'location' => $thisRow[5],
-						'priority' => $thisRow[6],
-						'type' => $thisRow[7],
-						'attendance' => $thisRow[9],
+
+						/* Hard-coded to zero as this is deprecated
+						 */
+						'priority' => 0,
+
+						'type' => $thisRow[6],
+						'attendance' => $thisRow[8],
 						'publish_date' => $publishDate->getDatabase(),
 						'campusList' => $campusList,
 						'groupList' => $groupList,
