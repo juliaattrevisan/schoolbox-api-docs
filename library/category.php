@@ -75,8 +75,8 @@ class Category extends DeprecatedModel {
 
         $query .= " ORDER BY " . $config['sort'] . " " . $config['sortdir'];
 
-        if ($config['size'] > 0) {
-            $query .= " LIMIT 0, " . $config['size'];
+        if ($config['Limit'] > 0) {
+            $query .= " LIMIT 0, " . $config['Limit'];
         }
 
         return $this->db->getAll($query);
