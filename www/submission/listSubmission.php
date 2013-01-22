@@ -10,7 +10,7 @@ $currentSemester = date('m') > 6 ? 2 : 1;
 
 if (isset($this->arg[0])) {
     if(!(is_numeric($this->arg[0]) && is_numeric($this->arg[1]))) {
-        error(2); // TODO find a more appropriate error
+        $this->localRedir('/submission/listSubmission');
     }
 
     if ($this->arg[1] < 1 || $this->arg[1] > 2) {
