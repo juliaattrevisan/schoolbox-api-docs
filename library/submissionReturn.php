@@ -140,9 +140,27 @@ class SubmissionReturn extends DeprecatedModel {
         return $this->db->getRow($query);
     }
 
-    function getStudentMarksForCategory($catID, $studentID) {
+    function getStudentMarksForCategory($catID, $studentID, $ownerID = 0, $year = 0, $semester = 0) {
         $catID = $this->db->smartQuote($catID);
         $studentID = $this->db->smartQuote($studentID);
+
+        $dateCondA = '';
+        $dateCondB = '';
+        $ownCondA = '';
+        $ownCondB = '';
+
+        if ($year) {
+            $dateCondA .= " AND DATE_FORMAT(b.date, '%Y') = $year";
+            $dateCondB .= " AND DATE_FORMAT(a.start, '%Y') = $year";
+        }
+        if ($semester) {
+            $dateCondA .= " AND DATE_FORMAT(b.date, '%m') " . DueWork_All::getSemesterLogic($semester);
+            $dateCondB .= " AND DATE_FORMAT(a.start, '%m') " . DueWork_All::getSemesterLogic($semester);
+        }
+        if($ownerID) {
+            $ownCondA .= " AND b.owner = $ownerID";
+            $ownCondB .= " AND a.user_id = $ownerID";
+        }
 
         // get marks from due work
         $sql = "
@@ -152,6 +170,8 @@ class SubmissionReturn extends DeprecatedModel {
             WHERE b.category = $catID
             AND r.owner = $studentID
             AND b.deleted = 0
+            $dateCondA
+            $ownCondA
             ORDER BY b.id ASC, r.returned DESC
         ";
 
@@ -179,6 +199,8 @@ class SubmissionReturn extends DeprecatedModel {
               WHERE a.category_id = $catID
                 AND aa.user_id = $studentID
                 AND aa.deleted_at IS NULL
+                $dateCondB
+                $ownCondB
               ORDER BY aa.start DESC
             )
             AND assess_question.deleted_at IS NULL

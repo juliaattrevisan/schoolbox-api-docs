@@ -461,44 +461,56 @@ class Submission extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
-    function getAllForUserCategory($categoryID, $userID) {
-        $query = "(SELECT
-                            sb.id,
-                            sb.category,
-                            ft.id AS type_id,
-                            ft.name AS typeName,
-                            sb.owner,
-                            UNIX_TIMESTAMP(sb.open_date) AS open,
-                            UNIX_TIMESTAMP(sb.date) AS date,
-                            UNIX_TIMESTAMP(sb.late_date) AS late,
-                            sb.name,
-                            sb.description,
-                            sb.created
-                        FROM submission_box sb
-                        LEFT JOIN file_type ft ON sb.type = ft.id
-                        WHERE sb.category = '$categoryID'
-                        AND sb.owner = '$userID'
-                        AND sb.deleted = '0')
-                        UNION
-                        (SELECT
-                            assess.assess_id,
-                            assess.category_id,
-                            file_type.id AS type_id,
-                            file_type.name AS typeName,
-                            assess.user_id AS owner,
-                            UNIX_TIMESTAMP(assess.start) AS open,
-                            UNIX_TIMESTAMP(assess.finish) AS date,
-                            '' AS late,
-                            assess.title AS name,
-                            assess.description AS description,
-                            assess.created_at AS created
-                        FROM assess
-                        LEFT JOIN file_type ON file_type.id = assess.type
-                        WHERE category_id = '$categoryID'
-						AND assess.deleted_at IS NULL
-                        AND assess.user_id = '$userID')";
+    function getAllForUserCategory($categoryID, $userID, $year = 0, $semester = 0) {
+        $dateCondA = '';
+        $dateCondB = '';
 
-        return $this->db->getAll($query);
+        if ($year) {
+            $dateCondA .= " AND DATE_FORMAT(sb.date, '%Y') = $year";
+            $dateCondB .= " AND DATE_FORMAT(assess.start, '%Y') = $year";
+        }
+        if ($semester) {
+            $dateCondA .= " AND DATE_FORMAT(sb.date, '%m') " . DueWork_All::getSemesterLogic($semester);
+            $dateCondB .= " AND DATE_FORMAT(assess.start, '%m') " . DueWork_All::getSemesterLogic($semester);
+        }
+
+        $q[] = "
+            SELECT sb.id, sb.category, ft.id AS type_id, ft.name AS typeName, sb.owner,
+              UNIX_TIMESTAMP(sb.open_date) AS open, UNIX_TIMESTAMP(sb.date) AS date,
+              UNIX_TIMESTAMP(sb.late_date) AS late, sb.name, sb.description, sb.created
+            FROM submission_box sb
+            LEFT JOIN file_type ft ON sb.type = ft.id
+            WHERE sb.category = '$categoryID'
+            AND sb.owner = '$userID'
+            AND sb.deleted = '0'
+            $dateCondA
+        ";
+
+        $q[] = "
+            SELECT assess.assess_id, assess.category_id, file_type.id AS type_id, file_type.name AS typeName,
+              assess.user_id AS owner, UNIX_TIMESTAMP(assess.start) AS open, UNIX_TIMESTAMP(assess.finish) AS date,
+              '' AS late, assess.title AS name, assess.description AS description, assess.created_at AS created
+            FROM assess
+            LEFT JOIN file_type ON file_type.id = assess.type
+            WHERE category_id = '$categoryID'
+            AND assess.deleted_at IS NULL
+            AND assess.user_id = '$userID'
+            $dateCondB
+        ";
+
+        $r = array();
+        foreach($q as $k => $query) {
+            $r[$k] = $this->db->getAll($query);
+            if(!is_array($r[$k])) {
+                $r[$k] = array();
+            }
+        }
+
+        $result = call_user_func_array('array_merge', $r);
+        usort($result, array($this, 'cmpDates'));
+
+        // keep the interface consistent and return false if there's nothing here
+        return count($result) ? $result : false;
     }
 
 
