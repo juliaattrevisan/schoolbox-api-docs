@@ -237,14 +237,15 @@ h3, #infoPanel li, #nav h3, .add-component .notification {
 }
 
 #header .logo {
-    height: 72px;
+    height: 150px;
     padding-top: 0;
-    width: 184px;
-    left: 0;
+    width: 152px;
+    left: 15px;
+    top: 17px;
 }
 #nav {
     top: 84px;
-    margin: 0;
+    margin: 100px 0 0 0;
 }
 #nav, #nav ul{
     width: 185px;
@@ -292,6 +293,11 @@ h3, #infoPanel li, #nav h3, .add-component .notification {
 #category li a:hover {
     background: none repeat scroll 0 0 #FAEDC3;
 }
+
+.login #container{
+    padding: 110px 0 15px 15px;
+}
+
 .login #header {
     height: 72px;
 }
@@ -329,7 +335,11 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
     background-color: #BCBDD6;
 }
 #month-view h3, #week-view h3{color:#000;}
-#nav h3{ padding: 0 0 0 14px; }
+#nav h3{
+    background: #222478 !important;
+    color: #fff !important;
+    padding: 0 0 0 14px;
+}
 #nav h3, #tooltip,
 .topic-list li a.selected  {
     background: transparent;
