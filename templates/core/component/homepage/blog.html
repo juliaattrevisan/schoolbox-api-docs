@@ -33,7 +33,7 @@
         });
 
         $j('#launch-browser-{COMPONENT_HANDLE}').click(function () {
-            $j('#resource-browser').load('/ajax/resourceBrowser', {destination:'#homepage-blog-{COMPONENT_HANDLE}'}, function () {
+            $j('#resource-browser').load('/ajax/resourceBrowser', {destination:'#src-{COMPONENT_HANDLE}'}, function () {
                 $j('#resource-browser').dialog('open');
             });
 
