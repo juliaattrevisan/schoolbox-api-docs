@@ -20,6 +20,13 @@ class Alaress_Image_Processor_Strategy_Placement extends Alaress_Image_Processor
 	private $position = 'topleft';
 
 	/**
+	 * Background colours are used for deciding transparency in pngs
+	 *
+	 * @var array
+	 */
+	private $bgColors = array();
+
+	/**
 	 * Constructor
 	 *
 	 * @param $args
@@ -37,6 +44,7 @@ class Alaress_Image_Processor_Strategy_Placement extends Alaress_Image_Processor
 
 		/* Apply background color
 		 */
+		$this->setBgColors($args['bgcolor']);
 		$this->applyBackgroundColor($args['bgcolor']);
 	}
 
@@ -56,6 +64,12 @@ class Alaress_Image_Processor_Strategy_Placement extends Alaress_Image_Processor
 		/* Constrain to half canvas width and position where told
 		 */
 		$positioning = $this->determinePositioning($resizedWidth, $resizedHeight);
+
+		$bgColor = $this->getBgColors();
+
+		imagealphablending($this->getCanvas(), false);
+		imagesavealpha($this->getCanvas(), true);
+		imagecolortransparent($this->getCanvas(), imagecolorallocate($this->getCanvas(), $bgColor['red'], $bgColor['green'], $bgColor['blue']));
 
 		imagecopyresampled($this->getCanvas(), $image, $positioning['dst_x'], $positioning['dst_y'], 0, 0, $resizedWidth, $resizedHeight, imagesx($image), imagesy($image));
 
@@ -150,5 +164,21 @@ class Alaress_Image_Processor_Strategy_Placement extends Alaress_Image_Processor
 		return $this->position;
 	}
 
+	/**
+	 * Set bgcolours
+	 *
+	 * @param array $bgColors
+	 */
+	private function setBgColors($bgColors) {
+		$this->bgColors = $bgColors;
+	}
 
+	/**
+	 * Get bgcolours
+	 *
+	 * @return array
+	 */
+	private function getBgColors() {
+		return $this->bgColors;
+	}
 }

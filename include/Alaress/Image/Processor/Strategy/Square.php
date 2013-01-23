@@ -79,6 +79,10 @@ class Alaress_Image_Processor_Strategy_Square extends Alaress_Image_Processor_St
 			$startY = 0;
 		}
 
+		imagealphablending($this->getCanvas(), false);
+		imagesavealpha($this->getCanvas(), true);
+		imagecolortransparent($this->getCanvas(), imagecolorallocate($this->getCanvas(), 0, 0, 0));
+
 		/* Resize the canvas to fit the new resized dimensions, so
 		 * you don't get excess canvas space
 		 */
