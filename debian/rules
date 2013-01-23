@@ -25,6 +25,11 @@ export DH_OPTIONS
 
 override_dh_install:
 	# Fixes for --no-- deb handling of exclude
+	## SSO
+	mkdir -pv ${CURDIR)/sso
+	cp -a --parents tools/apache-vhost-schoolbox-sso
+	rm -fR tools/apache-vhost-schoolbox-sso
+	## End SSO
 	## Leave Module
 	mkdir -pv $(CURDIR)/leave
 	cp -a --parents templates/*/modules/leave $(CURDIR)/leave
