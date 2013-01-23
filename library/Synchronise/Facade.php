@@ -181,6 +181,27 @@ class Synchronise_Facade {
         }
     }
 
+    private function lookupSynergeticStaffCategory() {
+        echo "Synergetic Staff Category List\n";
+        $esu = new External_Synergetic_User();
+        $esu->getCurrentSemester();
+        $staff = $esu->getStaffUserAccountInfo();
+        $cats = array();
+
+        for($i = 0; $i < count($staff); ++$i) {
+            if(isset($cats[$staff[$i]['StaffCategory']])) {
+                continue;
+            }
+            $cats[$staff[$i]['StaffCategory']] = true;
+        }
+
+        if(count($cats)) {
+            foreach($cats as $cat => $isTrue) {
+                echo "  $cat\n";
+            }
+        }
+    }
+
     private final function lookupSchoolboxGroupsFromYearLevel() {
         $db = Database::getInstance();
 
