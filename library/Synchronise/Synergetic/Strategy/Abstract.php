@@ -12,7 +12,10 @@
  * @version     SVN: $Id$
  */
 abstract class Synchronise_Synergetic_Strategy_Abstract implements Synchronise_Synergetic_Strategy_Interface {
-	protected $userHandler;
+    /**
+     * @var User
+     */
+    protected $userHandler;
 	protected $groupHandler;
 	protected $externalUserHandler;
 	protected $performUpdate = false;
