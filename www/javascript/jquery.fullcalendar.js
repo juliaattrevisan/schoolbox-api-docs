@@ -463,7 +463,7 @@ Bubble.prototype.showForm = function(id, x, y) {
     var leftEdge = Math.max(desiredX, minEdgeDistance + navWidth)
 
     // don't allow the bubble to fall off the right edge of the page
-    console.log($j(window).width(), bubbleWidth, minEdgeDistance)
+//    console.log($j(window).width(), bubbleWidth, minEdgeDistance)
     leftEdge = Math.min(x, leftEdge, $j(window).width() - bubbleWidth - minEdgeDistance)
 
     var talkMarkX = Math.min(22 + leftEdge - desiredX, mid.width())
