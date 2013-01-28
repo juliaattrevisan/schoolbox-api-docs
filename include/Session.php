@@ -326,11 +326,6 @@ class Session
 
             //if user is parent get information regarding enrolled students
             if ($groupHandler->isParent()) {
-                if (Cfg::get('external_sync_data')) {
-                    //Updates parents email from synergetic
-                    $email = $synUser->getEmail($synergy_id);
-                    $mydb->update('user', 'id', array('id' => $_SESSION['id'], 'alt_email' => $email));
-                }
 
                 $children = $synUser->getEnrolledStudents($synergy_id);
 
