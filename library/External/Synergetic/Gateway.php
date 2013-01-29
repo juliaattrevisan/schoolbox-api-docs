@@ -24,20 +24,75 @@ class External_Synergetic_Gateway {
         $this->setVendorTokenGUID($vendorTokenGUID);
         $this->setVendorPassword($vendorPassword);
 
-        $this->client = new SoapClient($wsdlUrl);
+        $this->client = new SoapClient($wsdlUrl, array('trace' => true));
     }
 
     /**
      * Updates a Synergetic user password
      *
-     * @param integer $communityId Synergetic community id
+	 * @param int    $communityId
      * @param string $currentPassword
      * @param string $newPassword
+	 * @param string $username Schoolbox/Synergetic community username
      * @throws SoapFault
      *
      * @return string Web service output (XMLOutput, ErrorMessage, SourceIPAddress)
      */
-    public function changeCommunityLoginPassword($communityId, $currentPassword, $newPassword) {
+    public function changeCommunityLoginPassword($communityId, $currentPassword, $newPassword, $username) {
+		//
+		// LoginUser
+		$login_input = new DOMDocument();
+//		$login_input->loadXML('
+//			<InputXML>
+//				<VendorTokenGUID></VendorTokenGUID>
+//				<VendorPassword></VendorPassword>
+//				<USERNAME></USERNAME>
+//				<PASSWORD></PASSWORD>
+//				<INSTALLGUID></INSTALLGUID>
+//			</InputXML>
+//		', LIBXML_NOXMLDECL);
+//		$login_input->xmlStandalone = true;
+		$login_input->normalizeDocument();
+		$guid          = bin2hex(openssl_random_pseudo_bytes(16));
+		$input_element = $login_input->createElement('InputXML');
+		$input_element->appendChild($login_input->createElement('VendorTokenGUID', $this->getVendorTokenGUID()));
+		$input_element->appendChild($login_input->createElement('VendorPassword', $this->getVendorPassword()));
+		$input_element->appendChild($login_input->createElement('USERNAME', $username));
+		$input_element->appendChild($login_input->createElement('PASSWORD', $currentPassword));
+		$input_element->appendChild($login_input->createElement('INSTALLGUID', $guid));
+		$login_input->appendChild($input_element);
+		$login_input->formatOutput = true;
+//		var_dump($login_input);
+//		var_dump($login_input->InputXML);
+//		var_dump($login_input->InputXML->VendorTokenGUID);
+//		$login_input->InputXML->VendorTokenGUID->appendChild($login_input->createTextNode($this->getVendorTokenGUID()));
+//		$login_input->InputXML->VendorPassword->appendChild($login_input->createTextNode($this->getVendorPassword()));
+//		$login_input->InputXML->USERNAME->appendChild($login_input->createTextNode($username));
+//		$login_input->InputXML->PASSWORD->appendChild($login_input->createTextNode($currentPassword));
+//		//
+//		// Shit out a GUID
+//		$login_input->InputXML->INSTALLGUID     = bin2hex(openssl_random_pseudo_bytes(16));
+//		var_dump($login_input->InputXML);
+//		var_dump($login_input->InputXML->VendorTokenGUID);
+		var_dump($login_input->saveXML());
+		$output = $this->client->GeneratePIN(
+			array(
+				'aInputParamObj' => array(
+					'XMLInput' => trim($login_input->saveXML())
+				),
+			)
+		);
+//		var_dump($this->client->__getFunctions());
+		echo nl2br(htmlspecialchars($this->client->__getLastRequestHeaders()))."<br />";
+		echo nl2br(htmlspecialchars($this->client->__getLastRequest()))."<br />";
+		echo nl2br(htmlspecialchars($this->client->__getLastResponseHeaders()))."<br />";
+		echo nl2br(htmlspecialchars($this->client->__getLastResponse()))."<br />";
+		var_dump($output);
+		exit;
+
+
+		// change password
+		// LogoutUser
         $input =
                 "<aInputParamObj>".
                 "<InputXML>" .
@@ -60,13 +115,23 @@ class External_Synergetic_Gateway {
             $currentPassword,
             $newPassword
 		);
+		var_dump($input);
 
         try {
-            return $this->client->ChangeCommunityLoginPassword(array(
+			//
+			// XMLInput is passed as a string, instead of as, you know, XML.
+			// Words cannot express how stupid that is!
+            $output = $this->client->ChangeCommunityLoginPassword(array(
 				'aInputParamObj' => array(
 					'XMLInput' => $input
 				)
 			));
+//			$b = new DOMDocument();
+//			$b->loadXML($output->GetCommunityRelationshipsResult->XMLOutput);
+			echo htmlspecialchars($output->GetCommunityDetailsResult->XMLOutput);
+			var_dump($output);
+			exit;
+			return $output;
         }
 		catch (Exception $e) {
 			echo $e->getMessage();
