@@ -57,7 +57,7 @@ class External_Synergetic_Gateway {
 		$input_element = $login_input->createElement('InputXML');
 		$input_element->appendChild($login_input->createElement('VendorTokenGUID', $this->getVendorTokenGUID()));
 		$input_element->appendChild($login_input->createElement('VendorPassword', $this->getVendorPassword()));
-		$input_element->appendChild($login_input->createElement('USERNAME', $username));
+		$input_element->appendChild($login_input->createElement('USERNAME', $communityId));
 		$input_element->appendChild($login_input->createElement('PASSWORD', $currentPassword));
 		$input_element->appendChild($login_input->createElement('INSTALLGUID', $guid));
 		$login_input->appendChild($input_element);
