@@ -43,7 +43,7 @@ class External_Synergetic_Gateway {
             $output = $this->client->ChangeCommunityLoginPassword(
 				$this->getXmlInput(
 					array(
-						'ID'              => 21,
+						'ID'              => $communityId,
 						'CurrentPassword' => $currentPassword,
 						'NewPassword'     => $newPassword,
 					)
