@@ -10,7 +10,7 @@ Vcs-Browser: https://github.com/alaress/schoolbox
 
 Package: schoolbox
 Architecture: all
-Depends: apache2, libapache2-mod-auth-kerb, krb5-config, krb5-user,
+Depends: apache2,
  php5, php5-imap, php5-gd, php5-curl, php5-mysql, php5-sybase, php5-ldap,
  php-pear, php-apc,
  mysql-client, mysql-server,
@@ -26,6 +26,15 @@ Description: Schoolbox LMS by Alaress Pty. Ltd.
  accessible. Furthermore Schoolbox streamlines the education process by
  increasing staff efficiency, leaving greater time for the core purpose of
  schools - learning.
+
+Package: schoolbox-sso
+Architecture: all
+Depends: schoolbox,
+ libapache2-mod-auth-kerb, krb5-config, krb5-user,
+ ${misc:Depends}
+Description: Kerberos dependencies for SSO usage
+ Ensures the Kerberos dependencies for SSO are installed and provides an
+ example apache vhost file
 
 Package: schoolbox-leave
 Architecture: all
