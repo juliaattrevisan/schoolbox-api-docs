@@ -45,7 +45,7 @@ class External_Denbigh_User implements External_UserInterface {
     public function getParentEmails($externalUserId) {
         $statement = $this->getExternalDatabase()->query(
             "
-			SELECT email
+			SELECT Family.email
 			FROM Schoolbox_Students
 			LEFT JOIN Family ON Schoolbox_Students.familyDenbighID = Family.familyDenbighID
 			WHERE Schoolbox_Students.denbighID = $externalUserId
