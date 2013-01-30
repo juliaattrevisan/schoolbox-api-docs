@@ -39,26 +39,16 @@ class External_Synergetic_Gateway {
      * @return string Web service output (XMLOutput, ErrorMessage, SourceIPAddress)
      */
     public function changeCommunityLoginPassword($communityId, $currentPassword, $newPassword, $username) {
-		$input_doc = new DOMDocument();
-		$input_doc->normalizeDocument();
-		$input_element = $input_doc->createElement('InputXML');
-		$input_element->appendChild($input_doc->createElement('VendorTokenGUID', $this->getVendorTokenGUID()));
-		$input_element->appendChild($input_doc->createElement('VendorPassword',  $this->getVendorPassword()));
-		$input_element->appendChild($input_doc->createElement('ID',              $communityId));
-		$input_element->appendChild($input_doc->createElement('CurrentPassword', $currentPassword));
-		$input_element->appendChild($input_doc->createElement('NewPassword',     $newPassword));
-		$input_doc->appendChild($input_element);
-		$input = trim($input_doc->saveXML($input_element));
-
         try {
-			//
-			// XMLInput is passed as a string, instead of as, you know, XML.
-			// Words cannot express how stupid that is!
-            $output = $this->client->ChangeCommunityLoginPassword(array(
-				'aInputParamObj' => array(
-					'XMLInput' => $input
+            $output = $this->client->ChangeCommunityLoginPassword(
+				$this->getXmlInput(
+					array(
+						'ID'              => 21,
+						'CurrentPassword' => $currentPassword,
+						'NewPassword'     => $newPassword,
+					)
 				)
-			));
+			);
 //			echo nl2br(htmlspecialchars($this->client->__getLastRequest())).'<br />';
 //			echo nl2br(htmlspecialchars($this->client->__getLastResponse()));
 //			var_dump($output);exit;
@@ -69,6 +59,38 @@ class External_Synergetic_Gateway {
         }
     }
 
+
+	/**
+	 * Creates input for the Synergetic API.
+	 *
+	 * The Synergetic API stupidly accepts XML input as a text attribute that
+	 * happens to be encoded XML. This method makes generating that XML a bit
+	 * less painful.
+	 *
+	 * @param array $params        The parameters to pass in XMLInput.
+	 * @param bool  $add_vendor_id If false, then don't add the VendorTokenGUID
+	 *                             and VendorPassword to the input.
+	 *
+	 * @return array A wrapper for an XML string representation of $params.
+	 *               This can be passed as a parameter to a web service call.
+	 */
+	protected function getXmlInput($params, $add_vendor_id = true) {
+		$input_doc = new DOMDocument();
+		$input_doc->normalizeDocument();
+		$input_element = $input_doc->createElement('InputXML');
+		if ($add_vendor_id) {
+			$input_element->appendChild($input_doc->createElement('VendorTokenGUID', $this->getVendorTokenGUID()));
+			$input_element->appendChild($input_doc->createElement('VendorPassword',  $this->getVendorPassword()));
+		}
+		foreach ($params as $key => $value) {
+			$input_element->appendChild($input_doc->createElement($key, $value));
+		}
+		return array(
+			'aInputParamObj' => array(
+				'XMLInput' => trim($input_doc->saveXML($input_element)),
+			)
+		);
+	}
 
 	public function loginUser($username, $password, $installGUID) {
 		$input = "
