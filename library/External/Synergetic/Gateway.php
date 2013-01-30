@@ -39,83 +39,16 @@ class External_Synergetic_Gateway {
      * @return string Web service output (XMLOutput, ErrorMessage, SourceIPAddress)
      */
     public function changeCommunityLoginPassword($communityId, $currentPassword, $newPassword, $username) {
-		//
-		// LoginUser
-		$login_input = new DOMDocument();
-//		$login_input->loadXML('
-//			<InputXML>
-//				<VendorTokenGUID></VendorTokenGUID>
-//				<VendorPassword></VendorPassword>
-//				<USERNAME></USERNAME>
-//				<PASSWORD></PASSWORD>
-//				<INSTALLGUID></INSTALLGUID>
-//			</InputXML>
-//		', LIBXML_NOXMLDECL);
-//		$login_input->xmlStandalone = true;
-		$login_input->normalizeDocument();
-		$guid          = bin2hex(openssl_random_pseudo_bytes(16));
-		$input_element = $login_input->createElement('InputXML');
-		$input_element->appendChild($login_input->createElement('VendorTokenGUID', $this->getVendorTokenGUID()));
-		$input_element->appendChild($login_input->createElement('VendorPassword', $this->getVendorPassword()));
-		$input_element->appendChild($login_input->createElement('USERNAME', $communityId));
-		$input_element->appendChild($login_input->createElement('PASSWORD', $currentPassword));
-		$input_element->appendChild($login_input->createElement('INSTALLGUID', $guid));
-		$login_input->appendChild($input_element);
-		$login_input->formatOutput = true;
-//		var_dump($login_input);
-//		var_dump($login_input->InputXML);
-//		var_dump($login_input->InputXML->VendorTokenGUID);
-//		$login_input->InputXML->VendorTokenGUID->appendChild($login_input->createTextNode($this->getVendorTokenGUID()));
-//		$login_input->InputXML->VendorPassword->appendChild($login_input->createTextNode($this->getVendorPassword()));
-//		$login_input->InputXML->USERNAME->appendChild($login_input->createTextNode($username));
-//		$login_input->InputXML->PASSWORD->appendChild($login_input->createTextNode($currentPassword));
-//		//
-//		// Shit out a GUID
-//		$login_input->InputXML->INSTALLGUID     = bin2hex(openssl_random_pseudo_bytes(16));
-//		var_dump($login_input->InputXML);
-//		var_dump($login_input->InputXML->VendorTokenGUID);
-		var_dump($login_input->saveXML($input_element));
-		$output = $this->client->GeneratePIN(
-			array(
-				'aInputParamObj' => array(
-					'XMLInput' => trim($login_input->saveXML($input_element))
-				),
-			)
-		);
-//		var_dump($this->client->__getFunctions());
-		echo nl2br(htmlspecialchars($this->client->__getLastRequestHeaders()))."<br />";
-		echo nl2br(htmlspecialchars($this->client->__getLastRequest()))."<br />";
-		echo nl2br(htmlspecialchars($this->client->__getLastResponseHeaders()))."<br />";
-		echo nl2br(htmlspecialchars($this->client->__getLastResponse()))."<br />";
-		var_dump($output);
-		exit;
-
-
-		// change password
-		// LogoutUser
-        $input =
-                "<aInputParamObj>".
-                "<InputXML>" .
-                        "<VendorTokenGUID>%s</VendorTokenGUID>" .
-                        "<VendorPassword>%s</VendorPassword>" .
-                        "<VersionNumber>1.2</VersionNumber>" .
-                        "<ConfigFileName></ConfigFileName>" .
-                        "<ID>%d</ID>" .
-                        "<CurrentPassword>%s</CurrentPassword>" .
-                        "<NewPassword>%s</NewPassword>" .
-                 "</InputXML>".
-                "</aInputParamObj>";
-
-
-        $input = sprintf(
-			$input,
-            $this->getVendorTokenGUID(),
-            $this->getVendorPassword(),
-            $communityId,
-            $currentPassword,
-            $newPassword
-		);
-		var_dump($input);
+		$input_doc = new DOMDocument();
+		$input_doc->normalizeDocument();
+		$input_element = $input_doc->createElement('InputXML');
+		$input_element->appendChild($input_doc->createElement('VendorTokenGUID', $this->getVendorTokenGUID()));
+		$input_element->appendChild($input_doc->createElement('VendorPassword',  $this->getVendorPassword()));
+		$input_element->appendChild($input_doc->createElement('ID',              $communityId));
+		$input_element->appendChild($input_doc->createElement('CurrentPassword', $currentPassword));
+		$input_element->appendChild($input_doc->createElement('NewPassword',     $newPassword));
+		$input_doc->appendChild($input_element);
+		$input = trim($input_doc->saveXML($input_element));
 
         try {
 			//
@@ -126,17 +59,16 @@ class External_Synergetic_Gateway {
 					'XMLInput' => $input
 				)
 			));
-//			$b = new DOMDocument();
-//			$b->loadXML($output->GetCommunityRelationshipsResult->XMLOutput);
-			echo htmlspecialchars($output->GetCommunityDetailsResult->XMLOutput);
-			var_dump($output);
-			exit;
+//			echo nl2br(htmlspecialchars($this->client->__getLastRequest())).'<br />';
+//			echo nl2br(htmlspecialchars($this->client->__getLastResponse()));
+//			var_dump($output);exit;
 			return $output;
         }
 		catch (Exception $e) {
 			echo $e->getMessage();
         }
     }
+
 
 	public function loginUser($username, $password, $installGUID) {
 		$input = "
