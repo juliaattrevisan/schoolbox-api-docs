@@ -74,11 +74,11 @@ class External_Synergetic_Gateway {
 //		$login_input->InputXML->INSTALLGUID     = bin2hex(openssl_random_pseudo_bytes(16));
 //		var_dump($login_input->InputXML);
 //		var_dump($login_input->InputXML->VendorTokenGUID);
-		var_dump($login_input->saveXML());
+		var_dump($login_input->saveXML($input_element));
 		$output = $this->client->GeneratePIN(
 			array(
 				'aInputParamObj' => array(
-					'XMLInput' => trim($login_input->saveXML())
+					'XMLInput' => trim($login_input->saveXML($input_element))
 				),
 			)
 		);
