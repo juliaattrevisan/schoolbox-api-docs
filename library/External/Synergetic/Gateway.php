@@ -33,12 +33,11 @@ class External_Synergetic_Gateway {
 	 * @param int    $communityId
      * @param string $currentPassword
      * @param string $newPassword
-	 * @param string $username Schoolbox/Synergetic community username
      * @throws SoapFault
      *
      * @return string Web service output (XMLOutput, ErrorMessage, SourceIPAddress)
      */
-    public function changeCommunityLoginPassword($communityId, $currentPassword, $newPassword, $username) {
+    public function changeCommunityLoginPassword($communityId, $currentPassword, $newPassword) {
         try {
             $output = $this->client->ChangeCommunityLoginPassword(
 				$this->getXmlInput(
@@ -49,9 +48,6 @@ class External_Synergetic_Gateway {
 					)
 				)
 			);
-//			echo nl2br(htmlspecialchars($this->client->__getLastRequest())).'<br />';
-//			echo nl2br(htmlspecialchars($this->client->__getLastResponse()));
-//			var_dump($output);exit;
 			return $output;
         }
 		catch (Exception $e) {

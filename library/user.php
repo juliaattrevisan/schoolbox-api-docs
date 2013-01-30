@@ -259,18 +259,17 @@ class User extends DeprecatedModel {
      * @param $synergeticID
      * @param $currentPassword
      * @param $newPassword
-	 * @param $username
      *
      * @return string
      */
-    private function setSynergeticPassword($synergeticID, $currentPassword, $newPassword, $username) {
+    private function setSynergeticPassword($synergeticID, $currentPassword, $newPassword) {
 
         $api = new External_Synergetic_Gateway(
             Cfg::get('external_web_services_url'),
             Cfg::get('external_vendor_token_guid'),
             Cfg::get('external_vendor_password'));
 
-        return $api->changeCommunityLoginPassword($synergeticID, $currentPassword, $newPassword, $username);
+        return $api->changeCommunityLoginPassword($synergeticID, $currentPassword, $newPassword);
     }
 
     function setPassword($userID, $oldPassword, $newPassword) {
@@ -279,7 +278,7 @@ class User extends DeprecatedModel {
         $webServicesUrl = Cfg::get('external_web_services_url');
         if (Cfg::get('external_enable') && Cfg::get('external_type') === 'synergetic' && !empty($webServicesUrl)) {
             $user = $this->getByID($userID);
-            $this->setSynergeticPassword($user['synergy_id'], $oldPassword, $newPassword, $user['username']);
+            $this->setSynergeticPassword($user['synergy_id'], $oldPassword, $newPassword);
         }
 
         $newPassword = mysql_real_escape_string($newPassword);
