@@ -103,7 +103,9 @@ class Timetable_API {
                         }
                     }
                 }
+				unset($class);
             }
+			unset($period);
 
             $r = array(
                 'title'   => 'Timetable',
