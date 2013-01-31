@@ -258,8 +258,8 @@ class User extends DeprecatedModel {
 	 * Sets the user's password.
 	 *
 	 * If the Synergetic API is enabled, this also attempts to set their
-	 * password in Synergetic, and doesn't attempt to update their database
-	 * password if that fails.
+	 * password in Synergetic. If that process fails, then the password will be
+	 * reverted.
 	 *
 	 * @param $userID
 	 * @param $oldPassword
@@ -268,45 +268,71 @@ class User extends DeprecatedModel {
 	 * @return bool Was the password changed?
 	 */
 	function setPassword($userID, $oldPassword, $newPassword) {
-		$userID          = intval($userID);
-		$update_password = true;
-        //
-		// update password in synergetic, if it's set up.
-        $webServicesUrl = Cfg::get('external_web_services_url');
-        if (Cfg::get('external_enable') && Cfg::get('external_type') === 'synergetic' && !empty($webServicesUrl)) {
-            $user = $this->getByID($userID);
-			$api  = new External_Synergetic_Gateway(
-				$webServicesUrl,
-				Cfg::get('external_vendor_token_guid'),
-				Cfg::get('external_vendor_password')
-			);
-			if (!$api->changeCommunityLoginPassword($user['synergy_id'], $oldPassword, $newPassword)) {
+		//
+		// Set password, and set it back if updating via Synergetic fails.
+		if ($this->checkPassword($userID, $oldPassword)
+			&& $this->setPasswordInternal($userID, $newPassword)
+		) {
+			$webServicesUrl = Cfg::get('external_web_services_url');
+			if (Cfg::get('external_enable') && Cfg::get('external_type') === 'synergetic' && !empty($webServicesUrl)) {
 				//
-				// Should throw a different error message if the remote pwd doesn't get changed.
-				$update_password = false;
+				// Attempt to set with Synergetic.
+				// If that is set up and fails, then revert their password.
+				$user = $this->getByID($userID);
+				$api  = new External_Synergetic_Gateway(
+					$webServicesUrl,
+					Cfg::get('external_vendor_token_guid'),
+					Cfg::get('external_vendor_password')
+				);
+				if (!$api->changeCommunityLoginPassword($user['synergy_id'], $oldPassword, $newPassword)) {
+					//
+					// Should throw a different error message if the remote pwd doesn't get changed.
+					$this->setPasswordInternal($userID, $oldPassword);
+					return false;
+				}
 			}
-		}
-		if ($update_password) {
-			$oldPassword = mysql_real_escape_string($oldPassword);
-			$newPassword = mysql_real_escape_string($newPassword);
-			$query =
-				"UPDATE `" . $this->_table .
-				"` SET password = PASSWORD('$newPassword'), email_pass = '$newPassword' " .
-				"WHERE `" . $this->_index . "` = $userID AND password = PASSWORD('$oldPassword')"
-			;
-			$this->db->query($query);
-			return ($this->db->affectedRows() > 0);
+			return true;
 		}
 		return false;
-    }
+	}
 
-    function setPasswordInternal($userID, $newPassword) {
-        $newPassword = mysql_real_escape_string($newPassword);
-        $query = "UPDATE `" . $this->_table . "` SET password = PASSWORD('$newPassword'), email_pass = '$newPassword' WHERE `" . $this->_index . "` = $userID";
-        $this->db->query($query);
 
-        return $this->db->affectedRows();
-    }
+	/**
+	 * Checks the user's password in the database.
+	 *
+	 * @param int    $user_id
+	 * @param string $password
+	 *
+	 * @return bool Does the user ID have this password?
+	 */
+	protected function checkPassword($user_id, $password) {
+		$esc_user_id  = mysql_real_escape_string($user_id);
+		$esc_password = mysql_real_escape_string($password);
+		$query        =
+			"SELECT `" . $this->_index . "` FROM `" . $this->_table . '` ' .
+				"WHERE `" . $this->_index . "` = $esc_user_id AND password = PASSWORD('$esc_password')";
+		;
+		$this->db->query($query);
+		return ($this->db->countRows() > 0);
+	}
+
+
+	/**
+	 * Sets the user's password in the database.
+	 *
+	 * @param int    $userID
+	 * @param string $newPassword
+	 *
+	 * @return bool
+	 */
+	function setPasswordInternal($userID, $newPassword) {
+		$newPassword = mysql_real_escape_string($newPassword);
+		$query       = "UPDATE `" . $this->_table . "` SET password = PASSWORD('$newPassword'), email_pass = '$newPassword' WHERE `" . $this->_index . "` = $userID";
+		$this->db->query($query);
+
+		return $this->db->affectedRows();
+	}
+
 
     function sendResetPasswordEmail($email) {
         if (false != ($user = $this->getByField('alt_email', $email))) {
