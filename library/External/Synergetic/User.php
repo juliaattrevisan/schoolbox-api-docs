@@ -37,27 +37,19 @@ class External_Synergetic_User implements External_UserInterface {
 
             //TODO: delete photos on rollover
 
-            /* If the file exists, check that it hasn't expired.
-                * If it has, update the image and return that instead
-                */
-            $userHandler = new User();
-            $user = $userHandler->getBySynergy($externalUserId);
-
             /* If our cached version timestamp is the same as the synergetic
-                * modified timestamp, the image is still the same
-                */
+             * modified timestamp, the image is still the same
+             */
             $portraitModifiedDate = new Alaress_Date_Format(strtotime($photo['ModifiedDate']), 'U');
-            $lastModifiedDate = new Alaress_Date_Format($user['portrait_updated_at'], 'y-m-d h:i:s');
+            $lastModifiedDate = new Alaress_Date_Format(filemtime($photoPath), 'U');
 
             /* If the cached file doesn't exist, or the synergetic image is more recent than our
-                * last known cached version, regenerate cached version.
-                *
-                * Separate the queries out, fetching the photo data only if it's newer than the cached
-                * version, or if the cache version doesn't already exist.
-                */
-            if (!file_exists($photoPath) || ($portraitModifiedDate->getUnixTimestamp(
-            ) > $lastModifiedDate->getUnixTimestamp())
-            ) {
+             * last known cached version, regenerate cached version.
+             *
+             * Separate the queries out, fetching the photo data only if it's newer than the cached
+             * version, or if the cache version doesn't already exist.
+             */
+            if (!file_exists($photoPath) || ($portraitModifiedDate->getUnixTimestamp() > $lastModifiedDate->getUnixTimestamp())) {
                 $query = "
 					SELECT vPhotos.Photo, vPhotos.PhotoType
 					FROM SynergyOne.dbo.vPhotos vPhotos
@@ -67,21 +59,10 @@ class External_Synergetic_User implements External_UserInterface {
                 $photo = $this->getDatabase()->getRow($query);
 
                 /* Save the image
-                     */
+                 */
                 $photoHandle = fopen($photoPath, "w");
                 fwrite($photoHandle, $photo['Photo']);
                 fclose($photoHandle);
-
-                /* To avoid the dupe username check which uses the 'id' key
-                     */
-                $updatedUser = array(
-                    'id' => $user['uid'],
-                    'portrait_updated_at' => $portraitModifiedDate->getDatabase(),
-                );
-
-                /* Update user table to remember when the portrait was last generated
-                     */
-                $userHandler->update($updatedUser);
             }
 
             return $photoPath;

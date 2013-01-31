@@ -94,8 +94,7 @@ class User extends DeprecatedModel {
     function getBySynergy($sid) {
 
         $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id,
-						synergy_id, local_email, alt_email, userCampus.campus, year, eportfolio_enabled, house,
-						portrait_updated_at
+						synergy_id, local_email, alt_email, userCampus.campus, year, eportfolio_enabled, house
 				FROM user
 					LEFT JOIN groups ON user.group_id = groups.id
 					LEFT JOIN userCampus ON user.id = userCampus.uid
