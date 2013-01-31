@@ -57,7 +57,7 @@ class Timetable_API {
 
             // if $i iterated all the way to the end, wrap around
             if($i == $tableDefinition['periodCount']) {
-                $today = ($today + 1) % $tableDefinition['dayCount'];
+                $today = $today % $tableDefinition['dayCount'];
             }
 
             // row * count(rows) + sequence
