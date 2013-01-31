@@ -253,40 +253,51 @@ class User extends DeprecatedModel {
         return $this->db->getAll($query);
     }
 
-    /**
-     * Wrapper for the SynergeticAPI
-     *
-     * @param $synergeticID
-     * @param $currentPassword
-     * @param $newPassword
-     *
-     * @return string
-     */
-    private function setSynergeticPassword($synergeticID, $currentPassword, $newPassword) {
 
-        $api = new External_Synergetic_Gateway(
-            Cfg::get('external_web_services_url'),
-            Cfg::get('external_vendor_token_guid'),
-            Cfg::get('external_vendor_password'));
-
-        return $api->changeCommunityLoginPassword($synergeticID, $currentPassword, $newPassword);
-    }
-
-    function setPassword($userID, $oldPassword, $newPassword) {
-
-        // update password in synergetic
+	/**
+	 * Sets the user's password.
+	 *
+	 * If the Synergetic API is enabled, this also attempts to set their
+	 * password in Synergetic, and doesn't attempt to update their database
+	 * password if that fails.
+	 *
+	 * @param $userID
+	 * @param $oldPassword
+	 * @param $newPassword
+	 *
+	 * @return bool Was the password changed?
+	 */
+	function setPassword($userID, $oldPassword, $newPassword) {
+		$userID          = intval($userID);
+		$update_password = true;
+        //
+		// update password in synergetic, if it's set up.
         $webServicesUrl = Cfg::get('external_web_services_url');
         if (Cfg::get('external_enable') && Cfg::get('external_type') === 'synergetic' && !empty($webServicesUrl)) {
             $user = $this->getByID($userID);
-            $this->setSynergeticPassword($user['synergy_id'], $oldPassword, $newPassword);
-        }
-
-        $newPassword = mysql_real_escape_string($newPassword);
-
-        $query = "UPDATE `" . $this->_table . "` SET password = PASSWORD('$newPassword'), email_pass = '$newPassword' WHERE `" . $this->_index . "` = $userID AND password = PASSWORD('$oldPassword')";
-        $this->db->query($query);
-
-        return $this->db->affectedRows();
+			$api  = new External_Synergetic_Gateway(
+				$webServicesUrl,
+				Cfg::get('external_vendor_token_guid'),
+				Cfg::get('external_vendor_password')
+			);
+			if (!$api->changeCommunityLoginPassword($user['synergy_id'], $oldPassword, $newPassword)) {
+				//
+				// Should throw a different error message if the remote pwd doesn't get changed.
+				$update_password = false;
+			}
+		}
+		if ($update_password) {
+			$oldPassword = mysql_real_escape_string($oldPassword);
+			$newPassword = mysql_real_escape_string($newPassword);
+			$query =
+				"UPDATE `" . $this->_table .
+				"` SET password = PASSWORD('$newPassword'), email_pass = '$newPassword' " .
+				"WHERE `" . $this->_index . "` = $userID AND password = PASSWORD('$oldPassword')"
+			;
+			$this->db->query($query);
+			return ($this->db->affectedRows() > 0);
+		}
+		return false;
     }
 
     function setPasswordInternal($userID, $newPassword) {
