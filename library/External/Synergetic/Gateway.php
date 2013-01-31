@@ -11,7 +11,10 @@ class External_Synergetic_Gateway {
 
     protected $client,
               $vendorTokenGUID,
-              $vendorPassword;
+              $vendorPassword,
+		      $last_response,
+		      $last_error,
+	          $last_exception;
 
     /**
 	 * Constructor
@@ -19,12 +22,12 @@ class External_Synergetic_Gateway {
      * @param string $wsdlUrl SOAP web services WSDL URL (external_web_services_url)
      * @param string $vendorTokenGUID Synergetic VendorTokenGUID (external_vendor_token_guid)
      * @param string $vendorPassword Synergetic VendorPassword (external_vendor_password)
+	 * @param bool   $trace Is request tracing enabled? (for debugging)
      */
-    public function __construct($wsdlUrl, $vendorTokenGUID, $vendorPassword) {
+    public function __construct($wsdlUrl, $vendorTokenGUID, $vendorPassword, $trace = false) {
         $this->setVendorTokenGUID($vendorTokenGUID);
         $this->setVendorPassword($vendorPassword);
-
-        $this->client = new SoapClient($wsdlUrl, array('trace' => true));
+        $this->client = new SoapClient($wsdlUrl, array('trace' => $trace));
     }
 
     /**
@@ -38,22 +41,91 @@ class External_Synergetic_Gateway {
      * @return string Web service output (XMLOutput, ErrorMessage, SourceIPAddress)
      */
     public function changeCommunityLoginPassword($communityId, $currentPassword, $newPassword) {
-        try {
-            $output = $this->client->ChangeCommunityLoginPassword(
-				$this->getXmlInput(
-					array(
-						'ID'              => $communityId,
-						'CurrentPassword' => $currentPassword,
-						'NewPassword'     => $newPassword,
-					)
-				)
-			);
-			return $output;
-        }
-		catch (Exception $e) {
-			echo $e->getMessage();
-        }
+		return $this->makeRequest(
+			'ChangeCommunityLoginPassword',
+			array(
+				 'ID'              => $communityId,
+				 'CurrentPassword' => $currentPassword,
+				 'NewPassword'     => $newPassword,
+			)
+		);
     }
+
+
+	/**
+	 * Makes a SOAP request, storing the error and exception (if one was thrown)
+	 *
+	 * @param string $soap_function The SOAP function to call.
+	 * @param array  $params        The parameters to pass to the SOAP call.
+	 * @param bool   $add_vendor_id If false, then don't add the VendorTokenGUID
+	 *                              and VendorPassword to the input.
+	 *
+	 * @return bool
+	 */
+	protected function makeRequest($soap_function, $params, $add_vendor_id = true)
+	{
+		$this->last_error     = null;
+		$this->last_exception = null;
+		$this->last_response  = null;
+		try {
+			$this->last_response = $this->client->$soap_function(
+				$this->getXmlInput($params, $add_vendor_id)
+			);
+			//
+			// Error handling:
+			// For simplicity, return true/false
+			// Store error/exception message in $this->lastError/$this->lastException?
+			$result_key = $soap_function.'Result';
+			$error      = $this->last_response->$result_key->ErrorMessage;
+			if (strlen($error) === 0) {
+				return true;
+			}
+			else {
+				$this->last_error = $error;
+			}
+		}
+		catch (Exception $e) {
+			$this->last_error     = sprintf('%s: %s', get_class($e), $e->getMessage());
+			$this->last_exception = $e;
+		}
+		return false;
+	}
+
+
+	/**
+	 * Gets the response from the last SOAP call.
+	 * Will only be filled if the request was made thru makeRequest().
+	 *
+	 * @return object|null
+	 */
+	public function getLastResponse()
+	{
+		return $this->last_response;
+	}
+
+
+	/**
+	 * Gets an error string that may have been raised in the last SOAP request.
+	 * Will only be filled if the request was made thru makeRequest().
+	 *
+	 * @return string|null
+	 */
+	public function getLastError()
+	{
+		return $this->last_error;
+	}
+
+
+	/**
+	 * Gets an exception that may have been raised in the last SOAP request.
+	 * Will only be filled if the request was made thru makeRequest().
+	 *
+	 * @return Exception|null
+	 */
+	public function getLastException()
+	{
+		return $this->last_exception;
+	}
 
 
 	/**
