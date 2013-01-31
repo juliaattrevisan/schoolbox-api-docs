@@ -37,14 +37,7 @@ $j(function(){
 
 	/* Default visibility of search panel
 	 */
-	var searchName = $j.trim($j('#searchFilterOptions').find('input[name=searchName]').val()).length;
-	var searchBoardingStatus = $j('#searchFilterOptions').find('select[name=searchBoardingStatus]').val() == 1;
-	var searchYear = $j.trim($j('#searchFilterOptions').find('input[name=searchYear]').val()).length;
-	var searchForm = $j.trim($j('#searchFilterOptions').find('input[name=searchForm]').val()).length;
-
-	if (searchName || searchBoardingStatus || searchYear || searchForm) {
-		$j('#searchFilterOptions').show();
-	}
+	$j('#searchFilterOptions').show();
 
 	/* Search filter validation only when Restrictions are on
 	 */
@@ -100,8 +93,9 @@ $j(function(){
 					</td>
 					<td>
 						<select name='searchBoardingStatus'>
-							<option value='1' {SEARCH_BOARDINGSTATUS_YES} />Yes</option>
-							<option value='0' {SEARCH_BOARDINGSTATUS_NO} />No</option>
+							<option value='' {SEARCH_BOARDINGSTATUS_NONE} /></option>
+							<option value='yes' {SEARCH_BOARDINGSTATUS_YES} />Yes</option>
+							<option value='no' {SEARCH_BOARDINGSTATUS_NO} />No</option>
 						</select>
 					</td>
 				</tr>

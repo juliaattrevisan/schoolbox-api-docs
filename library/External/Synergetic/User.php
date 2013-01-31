@@ -290,11 +290,25 @@ class External_Synergetic_User implements External_UserInterface {
 		}
 
 		/* Search for a particular boarding status
-		 * In synergetic, assume it's a B or a W
+		 *
+		 * In Synergetic, assume the following:
+		 * B: Boarder
+		 * D: Day student
+		 * HS: Home stay
 		 */
-		if ($boardingStatus) {
+		if ($boardingStatus == '') {
+
+			/* No restrictions on result set
+			 */
+		}
+		else if ($boardingStatus == 'yes') {
 			$query .= "
-				AND StudentBoarder != ''
+				AND StudentBoarder = 'B'
+			";
+		}
+		else {
+			$query .= "
+				AND StudentBoarder != 'B' AND StudentBoarder != ''
 			";
 		}
 

@@ -34,6 +34,13 @@ class Report_Parent extends Report_Abstract {
 	private $searchForm = '';
 
 	/**
+	 * Options for boarding status
+	 *
+	 * @var array
+	 */
+	private $boardingStatusOptions = array('any', 'yes', 'no');
+
+	/**
 	 * Constructor
 	 *
 	 * @param $page
@@ -44,10 +51,10 @@ class Report_Parent extends Report_Abstract {
 	 */
 	public function __construct($page, $yearLevel, $searchName, $searchBoardingStatus, $searchForm) {
 		$this->setGroupHandler(new Group());
-		$this->setYearLevel($yearLevel);
-		$this->setSearchName($searchName);
-		$this->setSearchBoardingStatus($searchBoardingStatus);
-		$this->setSearchForm($searchForm);
+		$this->setYearLevel(trim($yearLevel));
+		$this->setSearchName(trim($searchName));
+		$this->setSearchBoardingStatus(trim($searchBoardingStatus));
+		$this->setSearchForm(trim($searchForm));
 
 		if (!$this->checkPermissions()) {
 			error(155);
@@ -60,7 +67,12 @@ class Report_Parent extends Report_Abstract {
 
 			$this->setup();
 
-			$this->setAllRecords($this->getExternalUserHandler()->getStudentContactListExtended($this->getYearLevel(), $this->getSearchName(), $this->getSearchBoardingStatus(), $this->getSearchForm()));
+			/* If all four options are empty, just show search form - don't show
+			 * all results (default is empty array)
+			 */
+			if (strlen($this->getYearLevel().$this->getSearchName().$this->getSearchForm().$this->getSearchBoardingStatus())) {
+				$this->setAllRecords($this->getExternalUserHandler()->getStudentContactListExtended($this->getYearLevel(), $this->getSearchName(), $this->getSearchBoardingStatus(), $this->getSearchForm()));
+			}
 		}
 	}
 
@@ -116,25 +128,27 @@ class Report_Parent extends Report_Abstract {
 		));
 
 		$this->getPage()->setVar(array(
-			'YEAR' => trim($this->getYearLevel()),
-			'SEARCH_NAME' => trim($this->getSearchName()),
-			'SEARCH_FORM' => trim($this->getSearchForm()),
-			'SEARCH_YEAR' => trim($this->getYearLevel()),
+			'YEAR' => strlen($this->getYearLevel()) ? $this->getYearLevel() : 'not selected',
+			'SEARCH_NAME' => $this->getSearchName(),
+			'SEARCH_FORM' => $this->getSearchForm(),
+			'SEARCH_YEAR' => $this->getYearLevel(),
 		));
 
 		/* Search boarding status dropdown preselection
 		 */
-		if ($this->getSearchBoardingStatus()) {
-			$this->getPage()->setVar(array(
-				'SEARCH_BOARDINGSTATUS_YES' => 'selected',
-				'SEARCH_BOARDINGSTATUS_NO' => '',
-			));
-		}
-		else {
-			$this->getPage()->setVar(array(
-				'SEARCH_BOARDINGSTATUS_YES' => '',
-				'SEARCH_BOARDINGSTATUS_NO' => 'selected',
-			));
+		foreach ($this->getBoardingStatusOptions() as $currentBoardingStatus) {
+			$key = 'SEARCH_BOARDINGSTATUS_' . strtoupper($currentBoardingStatus);
+
+			if ($currentBoardingStatus == $this->getSearchBoardingStatus()) {
+				$this->getPage()->setVar(array(
+					$key => 'selected'
+				));
+			}
+			else {
+				$this->getPage()->setVar(array(
+					$key => ''
+				));
+			}
 		}
 
 		/* Note about using Year Level in Parent Directory search options
@@ -404,6 +418,24 @@ class Report_Parent extends Report_Abstract {
 	 */
 	private function getSearchName() {
 		return $this->searchName;
+	}
+
+	/**
+	 * Set boarding status options
+	 *
+	 * @param array $boardingStatusOptions
+	 */
+	private function setBoardingStatusOptions($boardingStatusOptions) {
+		$this->boardingStatusOptions = $boardingStatusOptions;
+	}
+
+	/**
+	 * Get boarding status options
+	 *
+	 * @return array
+	 */
+	private function getBoardingStatusOptions() {
+		return $this->boardingStatusOptions;
 	}
 }
 
