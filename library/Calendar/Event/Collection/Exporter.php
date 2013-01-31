@@ -95,9 +95,13 @@ class Calendar_Event_Collection_Exporter extends Calendar_Event_Collection_Rende
 			$currentEvent = $iterator->current();
 			$currentEvent->setRendererClass('Calendar_Event_Type_Exporter');
 
+			//
+			// Only add valid components, because exporter's visitor can return null.
 			$classname = $currentEvent->getRendererClass();
-
-			$v->addComponent($currentEvent->accept(new $classname(null)));
+			$component = $currentEvent->accept(new $classname(null));
+			if ($component instanceof calendarComponent) {
+				$v->addComponent($component);
+			}
 		}
 
 		$str = $v->createCalendar();
