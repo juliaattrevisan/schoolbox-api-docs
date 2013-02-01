@@ -158,7 +158,7 @@ class Alaress_Image_Cache_Portrait {
             /* If this particular transformation key existed at some point,
              * this is what it's name would be
              *
-             * e.g. <md5_hash>-Web.dat, <md5_hash>-ChickenPox.dat, etc. where Web and ChickenPox
+             * e.g. <id>-Web.dat, <id>-ChickenPox.dat, etc. where Web and ChickenPox
              * correspond to a series of transformations
              */
 			$id = substr($info['filename'], 0, strrpos($info['filename'], '.'));
