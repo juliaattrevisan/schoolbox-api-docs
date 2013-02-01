@@ -58,6 +58,14 @@ class External_Synergetic_User implements External_UserInterface {
 
                 $photo = $this->getDatabase()->getRow($query);
 
+				/* Purge all previously transformed copies
+				 */
+				$pattern = Config::get('portrait_dir') . '/' . $externalUserId . '-*.dat';
+
+				foreach (glob($pattern) as $oldCacheFile) {
+					unlink($oldCacheFile);
+				}
+
                 /* Save the image
                  */
                 $photoHandle = fopen($photoPath, "w");

@@ -153,22 +153,24 @@ class Alaress_Image_Cache_Portrait {
             $info['size'] = filesize($this->getFilename());
 
             /* We do this step if we are using Filesystem Cache directly
-                */
+             */
 
             /* If this particular transformation key existed at some point,
-                * this is what it's name would be
-                *
-                * e.g. <md5_hash>-Web.dat, <md5_hash>-ChickenPox.dat, etc. where Web and ChickenPox
-                * correspond to a series of transformations
-                */
-            $cachedFilename = md5($this->getFilename()) . '-' . $this->getKey() . '.dat';
+             * this is what it's name would be
+             *
+             * e.g. <md5_hash>-Web.dat, <md5_hash>-ChickenPox.dat, etc. where Web and ChickenPox
+             * correspond to a series of transformations
+             */
+			$id = substr($info['filename'], 0, strrpos($info['filename'], '.'));
+
+            $cachedFilename = $id . '-' . $this->getKey() . '.dat';
 
             /* This is where you'd find it in the filesystem if it existed previously
-                */
+             */
             $this->setCachedFileLocation($this->getCacheLocation() . '/' . $cachedFilename);
 
             /* Load a preprocessed version directly from cache
-                */
+             */
             if (file_exists($this->getCachedFileLocation())) {
                 $this->setLoadedFromCache(true);
 
@@ -179,7 +181,8 @@ class Alaress_Image_Cache_Portrait {
             }
 
             return $this->standardise($info);
-        } else {
+        }
+		else {
             die('Could not read file.');
         }
     }
