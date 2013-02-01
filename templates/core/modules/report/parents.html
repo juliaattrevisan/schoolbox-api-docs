@@ -38,30 +38,6 @@ $j(function(){
 	/* Default visibility of search panel
 	 */
 	$j('#searchFilterOptions').show();
-
-	/* Search filter validation only when Restrictions are on
-	 */
-	<!-- BEGIN use_parent_directory_validation -->
-	$j('#searchFilterOptions').find('form').validate({
-		rules:{
-			'searchYear':{
-				required: true,
-				minlength:1
-			}
-		},
-		messages:{
-			'searchYear':"Please select a year level"
-		},
-		errorPlacement:function (error, element) {
-			if (element.parent().parent().hasClass('checkboxes')) {
-				error.insertAfter(element.parent().parent().parent().children(':last-child'));
-			}
-			else {
-				error.insertAfter(element);
-			}
-		}
-	});
-	<!-- END use_parent_directory_validation -->
 });
 </script>
 
@@ -114,13 +90,19 @@ $j(function(){
 				<tr>
 					<td>
 						<h4>Year</h4>
-						<!-- BEGIN parent_directory_restriction_note -->
-						<em>You must specify this value.</em><br />
-						<em>You can only view Parent Directories for year levels in which you have a child.</em>
-						<!-- END parent_directory_restriction_note -->
 					</td>
 					<td>
+						<!-- BEGIN has_year_selector -->
+						<select name='searchYear'>
+							<!-- BEGIN year_selector_option -->
+							<option value="{YEAR_SELECTOR_VALUE}" {YEAR_SELECTOR_SELECTED}>{YEAR_SELECTOR_DESCRIPTION}</option>
+							<!-- END year_selector_option -->
+						</select>
+						<!-- END has_year_selector -->
+
+						<!-- BEGIN has_year_input -->
 						<input type='text' name='searchYear' value="{SEARCH_YEAR}"/>
+						<!-- END has_year_input -->
 					</td>
 				</tr>
 			</table>

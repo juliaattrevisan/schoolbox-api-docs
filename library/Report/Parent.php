@@ -52,12 +52,18 @@ class Report_Parent extends Report_Abstract {
 	public function __construct($page, $yearLevel, $searchName, $searchBoardingStatus, $searchForm) {
 		$this->setGroupHandler(new Group());
 
+		/* Must provide an int or be empty
+		 */
+		if (strlen($yearLevel) && !preg_match('/^(\d*)$/', $yearLevel)) {
+			error(155);
+		}
+
 		$this->setYearLevel(trim($yearLevel));
 		$this->setSearchName(trim($searchName));
 		$this->setSearchBoardingStatus(trim($searchBoardingStatus));
 		$this->setSearchForm(trim($searchForm));
 
-		if (!$this->checkPermissions()) {
+		if (strlen($page->arg[0]) && !$this->checkPermissions()) {
 			error(155);
 		}
 		else {
@@ -116,8 +122,9 @@ class Report_Parent extends Report_Abstract {
 	protected function setup() {
 		$this->getPage()->setFile(TEMPLATE_content, 'modules/report/parents.html');
 		$this->getPage()->setBlock(TEMPLATE_content, 'student', 'student_block');
-		$this->getPage()->setBlock(TEMPLATE_content, 'parent_directory_restriction_note', 'parent_directory_restriction_note_block');
-		$this->getPage()->setBlock(TEMPLATE_content, 'use_parent_directory_validation', 'use_parent_directory_validation_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'has_year_selector', 'has_year_selector_block');
+		$this->getPage()->setBlock('has_year_selector', 'year_selector_option', 'year_selector_option_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'has_year_input', 'has_year_input_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'search_form_option', 'search_form_option_block');
 		$this->getPage()->setTitle('Parent Contact info');
 		$this->getPage()->setBlock('student', 'contact', 'contact_block');
@@ -155,7 +162,6 @@ class Report_Parent extends Report_Abstract {
 
 		/* Search Form dropdown preselection
 		 */
-
 		$allForms = $this->getExternalUserHandler()->retrieveLuForm();
 
 		if (is_array($allForms) && count($allForms)) {
@@ -174,15 +180,47 @@ class Report_Parent extends Report_Abstract {
 			$this->getPage()->setVar('search_form_option_block', '');
 		}
 
-		/* Note about using Year Level in Parent Directory search options
+		/* If restrict_parent_directory is on, give people a list of Years they can
+		 * search on so they don't need to guess. But this only applies to parents
 		 */
-		if (Cfg::get('restrict_parent_directory')) {
-			$this->getPage()->parse('parent_directory_restriction_note_block', 'parent_directory_restriction_note');
-			$this->getPage()->parse('use_parent_directory_validation_block', 'use_parent_directory_validation');
+		if (Cfg::get('restrict_parent_directory') && !$this->getGroupHandler()->isSuperuser() && !$this->getGroupHandler()->isStaff()) {
+			$allYears = array();
+
+			/* Find all years you can chooze
+			 */
+			if (is_array($_SESSION['children']) && count($_SESSION['children'])) {
+				foreach($_SESSION['children'] as $currentChild) {
+					$allYears[$currentChild['year']] = true;
+				}
+			}
+
+			/* Compress options
+			 */
+			$allYears = array_keys($allYears);
+
+			foreach($allYears as $currentYear) {
+				if ($currentYear == $this->getYearLevel()) {
+					$selected = 'selected="selected"';
+				}
+				else {
+					$selected = '';
+				}
+
+				$this->getPage()->setVar(array(
+					'YEAR_SELECTOR_VALUE' => $currentYear,
+					'YEAR_SELECTOR_SELECTED' => $selected,
+					'YEAR_SELECTOR_DESCRIPTION' => $currentYear,
+				));
+
+				$this->getPage()->parse('year_selector_option_block', 'year_selector_option', true);
+			}
+
+			$this->getPage()->parse('has_year_selector_block', 'has_year_selector');
+			$this->getPage()->setVar('has_year_input_block', '');
 		}
 		else {
-			$this->getPage()->setVar('parent_directory_restriction_note_block', '');
-			$this->getPage()->setVar('use_parent_directory_validation_block', '');
+			$this->getPage()->setVar('has_year_selector_block', '');
+			$this->getPage()->parse('has_year_input_block', 'has_year_input');
 		}
 	}
 
