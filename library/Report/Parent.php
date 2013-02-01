@@ -51,6 +51,7 @@ class Report_Parent extends Report_Abstract {
 	 */
 	public function __construct($page, $yearLevel, $searchName, $searchBoardingStatus, $searchForm) {
 		$this->setGroupHandler(new Group());
+
 		$this->setYearLevel(trim($yearLevel));
 		$this->setSearchName(trim($searchName));
 		$this->setSearchBoardingStatus(trim($searchBoardingStatus));
@@ -117,6 +118,7 @@ class Report_Parent extends Report_Abstract {
 		$this->getPage()->setBlock(TEMPLATE_content, 'student', 'student_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'parent_directory_restriction_note', 'parent_directory_restriction_note_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'use_parent_directory_validation', 'use_parent_directory_validation_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'search_form_option', 'search_form_option_block');
 		$this->getPage()->setTitle('Parent Contact info');
 		$this->getPage()->setBlock('student', 'contact', 'contact_block');
 		$this->getPage()->setBlock('contact', 'spouse', 'spouse_block');
@@ -149,6 +151,27 @@ class Report_Parent extends Report_Abstract {
 					$key => ''
 				));
 			}
+		}
+
+		/* Search Form dropdown preselection
+		 */
+
+		$allForms = $this->getExternalUserHandler()->retrieveLuForm();
+
+		if (is_array($allForms) && count($allForms)) {
+			foreach($allForms as $currentForm) {
+				$this->getPage()->setVar(array(
+					'SEARCHFORM_VALUE' => $currentForm['Code'],
+					'SEARCHFORM_SELECTED' => $currentForm['Code'] == $this->getSearchForm() ? 'selected="selected"' : '',
+					'SEARCHFORM_DESCRIPTION' => $currentForm['Description'],
+
+				));
+
+				$this->getPage()->parse('search_form_option_block', 'search_form_option', true);
+			}
+		}
+		else {
+			$this->getPage()->setVar('search_form_option_block', '');
 		}
 
 		/* Note about using Year Level in Parent Directory search options

@@ -104,7 +104,11 @@ $j(function(){
 						<h4>Form</h4>
 					</td>
 					<td>
-						<input type='text' name='searchForm' value="{SEARCH_FORM}"/>
+						<select name="searchForm">
+							<!-- BEGIN search_form_option -->
+							<option value='{SEARCHFORM_VALUE}' {SEARCHFORM_SELECTED}>{SEARCHFORM_DESCRIPTION}</option>
+							<!-- END search_form_option -->
+						</select>
 					</td>
 				</tr>
 				<tr>

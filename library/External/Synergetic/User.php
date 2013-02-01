@@ -308,7 +308,7 @@ class External_Synergetic_User implements External_UserInterface {
 		}
 		else {
 			$query .= "
-				AND StudentBoarder != 'B' AND StudentBoarder != ''
+				AND StudentBoarder != 'B'
 			";
 		}
 
@@ -316,7 +316,7 @@ class External_Synergetic_User implements External_UserInterface {
 		 */
 		if ($form) {
 			$query .= "
-				AND StudentForm LIKE '%{$form}%'
+				AND StudentForm = '{$form}'
 			";
 		}
 
@@ -583,6 +583,21 @@ class External_Synergetic_User implements External_UserInterface {
     public function getHousemasterByHouseId($houseID) {
         return false;
     }
+
+	/**
+	 * Retrieve all the options from luForm table
+	 *
+	 * @return mixed
+	 */
+	public function retrieveLuForm() {
+		$query = "
+			SELECT Code, Description
+			FROM SynergyOne.dbo.luForm
+			WHERE ActiveFlag = 1
+		";
+
+		return $this->getDatabase()->getAll($query);
+	}
 
     /* Getters/Setters
       */
