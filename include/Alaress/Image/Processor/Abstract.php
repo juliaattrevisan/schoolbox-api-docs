@@ -68,6 +68,7 @@ class Alaress_Image_Processor_Abstract {
 				$className = 'Gif';
 				break;
 			case 'image/png':
+			case 'image/x-png':
 				$className = 'Png';
 				break;
 			default:
