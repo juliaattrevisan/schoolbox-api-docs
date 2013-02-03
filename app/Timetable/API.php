@@ -12,23 +12,115 @@ class Timetable_API {
 
     public function Display() {
 
-        $auth = new Authenticator();
-        $user = $auth->getSessionUser();
-
         $response = new Response_HTTP();
 
-        $timetableHandler = new External_Timetable();
+        try {
+            $auth = new Authenticator();
+            $user = $auth->getSessionUser();
 
-        $eUser = new External_User();
-        $eUser->getCurrentSemester();
+            $timetableHandler = new External_Timetable();
 
-        $campus = $user->get('campus_id');
+            $eUser = new External_User();
+            $eUser->getCurrentSemester();
 
-        $today = $timetableHandler->getDayNumber($campus);
+            $campus = $user->get('campus_id');
 
-        $tableDefinition = $timetableHandler->getTimetableDefinition($campus, 0);
+            $today = $timetableHandler->getDayNumber($campus);
 
-        if(!is_array($tableDefinition) || !count($tableDefinition) || $_SESSION['timetable'] != 1) {
+            $tableDefinition = $timetableHandler->getTimetableDefinition($campus, 0);
+
+            if(!is_array($tableDefinition) || !count($tableDefinition) || $_SESSION['timetable'] != 1) {
+                $r = array(
+                    'title'   => 'Timetable',
+                    'aside'   => '',
+                    'class'   => 'timetable wide',
+                    'icon'    => '',
+                    'content' => array(),
+                );
+
+                $response->setPage('title','Timetable');
+                $response->setResponse('articles', array($r));
+
+                return $response;
+            }
+
+            $now = time();
+
+            // get the current period (or next if we're not in one)
+
+            // set $i to the current period index based on time
+            for($i = 0; $i < $tableDefinition['periodCount']; $i++) {
+                if(strtotime($tableDefinition['end'][$i]) > $now) {
+                    break;
+                }
+            }
+
+            // if $i iterated all the way to the end, wrap around
+            if($i == $tableDefinition['periodCount']) {
+                $today = ($today + 1) % $tableDefinition['dayCount'];
+            }
+
+            // row * count(rows) + sequence
+            $hIndex = $i % $tableDefinition['periodCount'];
+            $highlightedRow = ($tableDefinition['number'][$hIndex]) * $tableDefinition['periodCount']
+                            + $tableDefinition['sequence'][$hIndex];
+
+            // retrieve from handler -_-
+            $table = $timetableHandler->getFullTimetable(
+                $user->get('synergy_id'),
+                $user->get('uid'),
+                $campus
+            );
+
+            // man-handle the data
+            $uMap = new GizaUser_DataMapper();
+            $cMap = new GizaCategory_DataMapper();
+
+            foreach($table as &$period) {
+                if(($period['periodNumber'] * $tableDefinition['periodCount'] + $period['periodSequence']) == $highlightedRow) {
+                    $period['highlight'] = '1';
+                }
+                foreach($period['day'] as $day => &$class) {
+                    if($day == $today) {
+                        $class['today'] = '1';
+                    }
+                    if(isset($class['staffID'])) {
+                        try {
+                            $user = $this->readData($uMap, $class['staffID']);
+                            $class['teacherName'] = $user->getName();
+                            $class['room'] = trim($class['room']);
+                        }
+                        catch (Exception_Schoolbox $e) {
+                            $class['err'][] = "Failed to read staff with `synergy_id` = '{$class['staffID']}': {$e->getErrorMessage()}";
+                        }
+
+                        try {
+                            $response->setResponse('debug', array($class));
+                            $class['catID'] = $this->readData($cMap, $class['code'])->get('id');
+                        }
+                        catch (Exception_Schoolbox $e) {
+                            $class['err'][] = "Failed to read category with `categoryCode`.`code` = '{$class['code']}': {$e->getErrorMessage()}";
+                        }
+                    }
+                }
+            }
+
+            $r = array(
+                'title'   => 'Timetable',
+                'aside'   => '',
+                'class'   => 'timetable wide',
+                'icon'    => '',
+                'content' => $table,
+            );
+
+            $response->setPage('title','Timetable');
+            $response->setResponse('articles', array($r));
+
+            return $response;
+        }
+
+        // if the datamapper fails to retrieve correctly for any reason, recover and advise timetable is unavailable
+        catch(Exception_Schoolbox $e) {
             $r = array(
                 'title'   => 'Timetable',
                 'aside'   => '',
@@ -42,80 +134,6 @@ class Timetable_API {
 
             return $response;
         }
-
-        $now = time();
-
-        // get the current period (or next if we're not in one)
-
-        // set $i to the current period index based on time
-        for($i = 0; $i < $tableDefinition['periodCount']; $i++) {
-            if(strtotime($tableDefinition['end'][$i]) > $now) {
-                break;
-            }
-        }
-
-        // if $i iterated all the way to the end, wrap around
-        if($i == $tableDefinition['periodCount']) {
-            $today = ($today + 1) % $tableDefinition['dayCount'];
-        }
-
-        // row * count(rows) + sequence
-        $hIndex = $i % $tableDefinition['periodCount'];
-        $highlightedRow = ($tableDefinition['number'][$hIndex]) * $tableDefinition['periodCount']
-                        + $tableDefinition['sequence'][$hIndex];
-
-        // retrieve from handler -_-
-        $table = $timetableHandler->getFullTimetable(
-            $user->get('synergy_id'),
-            $user->get('uid'),
-            $campus
-        );
-
-        // man-handle the data
-        $uMap = new GizaUser_DataMapper();
-        $cMap = new GizaCategory_DataMapper();
-
-        foreach($table as &$period) {
-            if(($period['periodNumber'] * $tableDefinition['periodCount'] + $period['periodSequence']) == $highlightedRow) {
-                $period['highlight'] = '1';
-            }
-            foreach($period['day'] as $day => &$class) {
-                if($day == $today) {
-                    $class['today'] = '1';
-                }
-                if(isset($class['staffID'])) {
-                    try {
-                        $user = $this->readData($uMap, $class['staffID']);
-                        $class['teacherName'] = $user->getName();
-                        $class['room'] = trim($class['room']);
-                    }
-                    catch (Exception_Schoolbox $e) {
-                        $class['err'][] = "Failed to read staff with `synergy_id` = '{$class['staffID']}': {$e->getErrorMessage()}";
-                    }
-
-                    try {
-                        $response->setResponse('debug', array($class));
-                        $class['catID'] = $this->readData($cMap, $class['code'])->get('id');
-                    }
-                    catch (Exception_Schoolbox $e) {
-                        $class['err'][] = "Failed to read category with `categoryCode`.`code` = '{$class['code']}': {$e->getErrorMessage()}";
-                    }
-                }
-            }
-        }
-
-        $r = array(
-            'title'   => 'Timetable',
-            'aside'   => '',
-            'class'   => 'timetable wide',
-            'icon'    => '',
-            'content' => $table,
-        );
-
-        $response->setPage('title','Timetable');
-        $response->setResponse('articles', array($r));
-
-        return $response;
     }
 
     /**
