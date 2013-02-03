@@ -28,7 +28,7 @@ class Timetable_API {
 
         $tableDefinition = $timetableHandler->getTimetableDefinition($campus, 0);
 
-        if(!is_array($tableDefinition) || !count($tableDefinition) || $_SESSION['timetalbe'] != 1) {
+        if(!is_array($tableDefinition) || !count($tableDefinition) || $_SESSION['timetable'] != 1) {
             $r = array(
                 'title'   => 'Timetable',
                 'aside'   => '',
