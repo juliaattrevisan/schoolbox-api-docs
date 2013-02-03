@@ -28,6 +28,21 @@ class Timetable_API {
 
         $tableDefinition = $timetableHandler->getTimetableDefinition($campus, 0);
 
+        if(!is_array($tableDefinition) || !count($tableDefinition) || $_SESSION['timetalbe'] != 1) {
+            $r = array(
+                'title'   => 'Timetable',
+                'aside'   => '',
+                'class'   => 'timetable wide',
+                'icon'    => '',
+                'content' => array(),
+            );
+
+            $response->setPage('title','Timetable');
+            $response->setResponse('articles', array($r));
+
+            return $response;
+        }
+
         $now = time();
 
         // get the current period (or next if we're not in one)
@@ -90,7 +105,7 @@ class Timetable_API {
         }
 
         $r = array(
-            'title'   => 'Term 2 Timetable',
+            'title'   => 'Timetable',
             'aside'   => '',
             'class'   => 'timetable wide',
             'icon'    => '',

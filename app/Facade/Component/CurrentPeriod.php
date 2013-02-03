@@ -9,6 +9,13 @@
 class Facade_Component_CurrentPeriod extends Facade_Component_Generic {
 
     public function render(GizaUser $user) {
+
+        if($_SESSION['timetable'] == 0) {
+            // return an array without title set, which will prevent the article rendering
+            // *content needs to remain set
+            return array('content'  => array());
+        }
+
         /* REFACTOR */
         $timetableHandler = new External_Timetable();
 
@@ -25,6 +32,13 @@ class Facade_Component_CurrentPeriod extends Facade_Component_Generic {
         $now = time();
 
         $def = $timetableHandler->getTimetableDefinition($campus, 0);
+
+        if(!count($def) || !is_array($def)) {
+            // return an array without title set, which will prevent the article rendering
+            // *content needs to remain set
+            return array('content'  => array());
+        }
+
         $dayCount = $def['dayCount'];
 
         // if we're still inside today

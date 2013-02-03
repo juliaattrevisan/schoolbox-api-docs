@@ -1,3 +1,4 @@
+{% if content[0].day %}
 <div class="timetable-container">
     <div class="timetable-periods">
         <table>
@@ -66,3 +67,6 @@
         </table>
     </div>
 </div>
+{% else %}
+<div><p>No timetable available.</p></div>
+{% endif %}

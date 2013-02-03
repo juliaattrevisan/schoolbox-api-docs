@@ -23,12 +23,10 @@ class Core_Nav_Sidebar {
     public function createAgenda($items = 'all') {
 
         if(is_array($items) && count($items)) {
-            $agenda = array(
-                'dashboard' => array('facade/dashboard/display', 'home'),
-                'timetable' => array('timetable/display',        'clock'),
-                'calendar'  => array('calendar/month',           'calendar'),
-                'news'      => array('news/school',              'news'),
-            );
+            $agenda['dashboard'] = array('facade/dashboard/display', 'home');
+            $agenda['timetable'] = array('timetable/display', 'clock');
+            $agenda['calendar'] = array('calendar/month', 'calendar');
+            $agenda['news'] = array('news/school', 'news');
 
             $list = array();
 
@@ -45,7 +43,12 @@ class Core_Nav_Sidebar {
         }
 
         elseif($items == 'all') {
-            return $this->createAgenda(array('dashboard', 'timetable', 'calendar', 'news'));
+            if($_SESSION['timetable'] == 1) {
+                return $this->createAgenda(array('dashboard', 'timetable', 'calendar', 'news'));
+            }
+            else {
+                return $this->createAgenda(array('dashboard', 'calendar', 'news'));
+            }
         }
 
         return array();
