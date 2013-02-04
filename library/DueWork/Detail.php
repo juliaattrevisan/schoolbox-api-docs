@@ -225,6 +225,10 @@ class DueWork_Detail {
                 $page, 'OWNER_MARKING', $record['user']['uid'] . $this->dueWork['id'], $record['mark']
             );
 
+            //
+            // Reset the contents of the submission row block, so that each student starts with a fresh row
+            // (without the previous student's rows)
+            $page->setVar('submission_row_block', '');
             if (count($record['submissions'])) {
 
                 $returnTime = new Alaress_Date_Format($record['return']['returned'], 'y-m-d j:i:s');
@@ -306,8 +310,6 @@ class DueWork_Detail {
 
                     $page->parse('submission_row_block', 'submission_row', true);
                 }
-            } else {
-                $page->setVar('submission_row_block', '');
             }
             $page->parse('student_row_block', 'student_row', true);
         }
