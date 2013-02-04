@@ -7,33 +7,33 @@ if (!$groupHandler->isSuperuser()) {
     error(19);
 }
 
-$this->setTitle('Admin - Bulk Add Categories');
-$this->setFile(TEMPLATE_content, 'adminv2/bulkAddCategories.html');
-$this->setBlock(TEMPLATE_content, 'category', 'category_block');
+$this->setTitle('Admin - Bulk Add Folders');
+$this->setFile(TEMPLATE_content, 'adminv2/bulkAddFolders.html');
+$this->setBlock(TEMPLATE_content, 'folder', 'folder_block');
 
 // include the admin navigation
 $nav = new AdminV2_Nav();
-$nav->parse($this, 'category');
+$nav->parse($this, 'folder');
 
 /* Two types of upload.. either single user.. or via csv file..
  */
 if (isset($_FILES['bulkadd']['tmp_name']) && $_FILES['bulkadd']['tmp_name']) {
 	$bulkHandler = new Bulk_Category($_FILES['bulkadd']['tmp_name'], Scrub::text($_POST['template']));
-	$allCategories = $bulkHandler->addCategories();
+	$allFolders = $bulkHandler->addCategories();
 
-	if ($allCategories && count($allCategories)) {
-		foreach ($allCategories as $currentCategory) {
+	if ($allFolders && count($allFolders)) {
+		foreach ($allFolders as $currentFolder) {
 			$this->setVar(array(
-				'CATEGORY_CATEGORY' => $currentCategory['category'],
-				'CATEGORY_STATUS' => $currentCategory['status'],
-				'CATEGORY_ERROR' => $currentCategory['error'],
+				'FOLDER_FOLDER' => $currentFolder['category'],
+				'FOLDER_STATUS' => $currentFolder['status'],
+				'FOLDER_ERROR' => $currentFolder['error'],
 			));
 
-			$this->parse('category_block', 'category', true);
+			$this->parse('folder_block', 'folder', true);
 		}
 	}
 	else {
-		$this->setVar('category_block', '');
+		$this->setVar('folder_block', '');
 	}
 }
 else {
