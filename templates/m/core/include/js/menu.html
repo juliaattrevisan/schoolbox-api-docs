@@ -135,9 +135,13 @@
 
             // Link to page
             var href = $(this).attr('href')
-            if(href != '#' && href != 'undefined'){
+            if(href.indexOf('http') == 0 || href.indexOf('/') === 0) {
                 $('#menu, #menu li, #nav li').removeClass('active')
-                renderPage('/m/'+href)
+                renderPage(href, false)
+            }
+            else if(href != '#' && href != 'undefined'){
+                $('#menu, #menu li, #nav li').removeClass('active')
+                renderPage('/m/'+href, true)
             }
         }
         return false

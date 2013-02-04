@@ -238,8 +238,8 @@ $("#bubble").on(clickEvent, '.wp', function(e){
 $("#page, #header aside").on(clickEvent, 'a', function(){
     var href = $(this).attr('href')
 
-    if(href != '#' && href != 'undefined' && !href.match('^https?://') && !href.match('^mailto:')){
-        renderPage(href)
+    if(href.match('^/m/')){
+        renderPage(href, true)
         return false
     } else if(href == '#' || href == 'undefined'){
         return false
