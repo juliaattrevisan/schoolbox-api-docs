@@ -128,5 +128,9 @@ class Facade_Component_CurrentPeriod extends Facade_Component_Generic {
         catch(Exception_Schoolbox $e) {
             return array('content'  => array());
         }
+        // generic catch for Exceptions raised by Errors occurring. Minor errors and warnings should simply pass through
+        catch(ErrorException $e) {
+            return array('content'  => array());
+        }
     }
 }

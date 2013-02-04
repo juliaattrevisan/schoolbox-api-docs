@@ -121,18 +121,11 @@ class Timetable_API {
 
         // if the datamapper fails to retrieve correctly for any reason, recover and advise timetable is unavailable
         catch(Exception_Schoolbox $e) {
-            $r = array(
-                'title'   => 'Timetable',
-                'aside'   => '',
-                'class'   => 'timetable wide',
-                'icon'    => '',
-                'content' => array(),
-            );
-
-            $response->setPage('title','Timetable');
-            $response->setResponse('articles', array($r));
-
-            return $response;
+            return $this->generateErrorResponse($response);
+        }
+        // if something entirely unexpected happens, like tables on the db are missing
+        catch(ErrorException $e) {
+            return $this->generateErrorResponse($response);
         }
     }
 
@@ -158,5 +151,20 @@ class Timetable_API {
         }
         // fail
         return null;
+    }
+
+    private function generateErrorResponse(Response_HTTP $response) {
+        $r = array(
+            'title'   => 'Timetable',
+            'aside'   => '',
+            'class'   => 'timetable wide',
+            'icon'    => '',
+            'content' => array(),
+        );
+
+        $response->setPage('title','Timetable');
+        $response->setResponse('articles', array($r));
+
+        return $response;
     }
 }
