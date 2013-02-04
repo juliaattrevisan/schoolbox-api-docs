@@ -1,10 +1,11 @@
 <ul>
 {% if content.events %}
     {% for event in content.events %}
+
     <li class="{{ event.eventType }}">
-        <a href="/m/calendar/event/{{ event.id }}" class="aside">
-            {% if event.date %}
-            <time>{{ event.date }}</time>
+        <a href="/m/calendar/event/{{ event.eventId }}" class="aside">
+            {% if event.startTime %}
+            <time>{{ event.startTime }}</time>
             {% endif %}
             {{ event.note }}
             {% if event.topic %}
