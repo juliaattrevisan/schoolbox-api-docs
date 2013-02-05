@@ -41,14 +41,38 @@ class View_JTML implements View_Interface {
         if($response->hasError()) {
             switch($response->getStatusCode()) {
                 case Response_HTTP::HTTP_NOT_FOUND:
-                    $response->overrideTemplate("templates/$skin/common/error.html");
+
+                    $jtml = array(
+                        'page' => array(
+                            'title' => "ERROR",
+                            'articles' => array(array(
+                                'title' => 'Page not found',
+                                'aside' => '',
+                                'class' => 'giza-error wide',
+                                'icon' => 'error',
+                                'content' => "
+<ul>
+  <li>Sorry, the page you're looking for can't be found.</li>
+</ul>
+"
+                            ))
+                        ),
+                    );
+
+                    if($returnOutput) {
+                        return $jtml;
+                    }
+                    else {
+                        $this->sendHeaders();
+                        die(json_encode($jtml));
+                    }
+
                     break;
                 case Response_HTTP::HTTP_UNAUTHORIZED:
                 case Response_HTTP::HTTP_BAD_REQUEST:
                 case Response_HTTP::HTTP_FORBIDDEN:
                 case Response_HTTP::HTTP_SERVER_ERROR:
                 default:
-                    //$response->overrideTemplate('templates/core/common/error.html');
                     break;
             }
         }
@@ -174,7 +198,7 @@ class View_JTML implements View_Interface {
                 }
                 $jsonOutput = array(
                     'page' => array(
-                        'title' => "ERR0R", 'articles' => $err
+                        'title' => "ERROR", 'articles' => $err
                     ),
                 );
             }

@@ -41,9 +41,12 @@ class Mediator {
         set_error_handler('Core_Mediator_ErrorHandler');
         session_start();
 
+        $regex = "#^/m/(.*)$#si";
+        // echo ' == ', $_GET['url'], ' -> ', preg_replace($regex,"$1",$_GET['url']), " ==\n";
+
         // if default url is to be used, retrieve from $_GET
         // need to clear the prefixed 'm/' from the uri if it exists
-        $url = $url ? $url : isset($_GET['url']) ? preg_replace("#m/(.*)#si","$1",$_GET['url']) : '';
+        $url = $url ? $url : isset($_GET['url']) ? preg_replace($regex,"$1",$_GET['url']) : '';
 
         $router = new Router();
 
@@ -137,20 +140,17 @@ class Mediator {
         try {
 
             // avoid a fatal error by checking the class is registered
-            if(!class_exists($this->getClassName()))
+            if(!class_exists($this->getClassName())) {
                 throw new Exception_Schoolbox("Class does not exist");
+            }
 
             $classname = $this->getClassName();
             $class = new $classname($this->getResponseCode());
 
             // try to dynamically call the method specified with the args specified
             try {
-
                 // bad request or not authenticated
                 if($this->getResponseCode() != Response_HTTP::HTTP_OK) {
-
-
-                    // TODO MORTON
 
                     if(!$this->isAuthExcepted()) {
                         throw new Exception_Schoolbox('Cannot generate response, response code is ' . $this->getResponseCode());
@@ -160,6 +160,7 @@ class Mediator {
                 // THE FUNKY CALL THAT MAKES EVERYTHING GO!
                 $this->setResponse(call_user_func_array(array($class, $this->getMethodName()), $this->getMethodArgs()));
 
+                /* this is for debugging, and only if the SQL server supports it anyway
                 $db = DeprecatedDatabase::getInstance();
                 $dbProf = $db->query('SHOW profiles');
 
@@ -167,6 +168,7 @@ class Mediator {
                     $a[] = $row;
 
                 $this->getResponse()->setResponse('sqldump', $a);
+                */
             }
 
             // catch method call failure
@@ -292,6 +294,8 @@ class Mediator {
         $this->generatePage($view);
 
         // step 4: output view
+        // send the http response code header
+        header($this->getResponse()->getStatusCode());
         $view->render($this->getResponse());
     }
 
