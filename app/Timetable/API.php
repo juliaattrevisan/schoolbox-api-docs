@@ -55,15 +55,17 @@ class Timetable_API {
                 }
             }
 
-            // if $i iterated all the way to the end, wrap around
-            if($i == $tableDefinition['periodCount']) {
-                $today = ($today + 1) % $tableDefinition['dayCount'];
+            $highlightedRow = -1;
+            //
+            // If $i didn't wrap all the way around, then set the highlighed row.
+            // If it did, then don't highlight any row, and don't wrap to the next day.
+            // (same behavior as desktop site)
+            if ($i < $tableDefinition['periodCount']) {
+                // row * count(rows) + sequence
+                $hIndex = $i % $tableDefinition['periodCount'];
+                $highlightedRow = ($tableDefinition['number'][$hIndex]) * $tableDefinition['periodCount']
+                    + $tableDefinition['sequence'][$hIndex];
             }
-
-            // row * count(rows) + sequence
-            $hIndex = $i % $tableDefinition['periodCount'];
-            $highlightedRow = ($tableDefinition['number'][$hIndex]) * $tableDefinition['periodCount']
-                            + $tableDefinition['sequence'][$hIndex];
 
             // retrieve from handler -_-
             $table = $timetableHandler->getFullTimetable(
@@ -103,7 +105,9 @@ class Timetable_API {
                         }
                     }
                 }
+				unset($class);
             }
+			unset($period);
 
             $r = array(
                 'title'   => 'Timetable',
