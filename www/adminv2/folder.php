@@ -9,7 +9,7 @@ if (!$groupHandler->isSuperuser()) {
     error(19);
 }
 
-$this->setTitle('Admin - Category');
+$this->setTitle('Admin - Folder');
 $this->setFile(TEMPLATE_content, 'adminv2/folder.html');
 $this->setBlock(TEMPLATE_content, 'group', 'group_block');
 $this->setBlock(TEMPLATE_content, 'homepage_template', 'homepage_template_block');
