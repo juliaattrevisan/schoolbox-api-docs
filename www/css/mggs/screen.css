@@ -535,7 +535,6 @@ li p.interact {
 #tabs li a span.last {
     background: url(/images/mggs/nav-bg.png) 0px -120px no-repeat;
     border-right: none;
-    width: 75px;
 }
 #tabs li a span.last:hover {
     background: url(/images/mggs/nav-bg.png) 0px -150px no-repeat;
