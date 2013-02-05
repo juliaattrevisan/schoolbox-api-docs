@@ -197,11 +197,11 @@ $j(function () {
     $j('.customise').click(function (event) {
         event.preventDefault();
         $j(this).children('span').toggle();
-        $j('.advanced').toggle();
-        if ($j('.advanced').is(':visible')) {
-            $j('.advanced').children('td').delay(1000).animate({opacity:'1'});
+        $j('.adv_hide').toggle();
+        if ($j('.adv_hide').is(':visible')) {
+            $j('.adv_hide').children('td').delay(1000).animate({opacity:'1'});
         } else {
-            $j('.advanced').queue('fx', []);
+            $j('.adv_hide').queue('fx', []);
         }
     });
 
@@ -226,10 +226,8 @@ $j(function () {
             </td>
             <td><input name="date" id="cal_date" type="text" size="15" maxlength="30" value="{DATE}"/></td>
         </tr>
-        <tr class="advanced"
-        {SHOW_ADVANCED}>
-        <td class="formLabelWidth" valign="top"
-        {OPAC_ADVANCED} ><h4>Publish Date</h4>
+        <tr class="advanced adv_hide" {SHOW_ADVANCED}>
+        <td class="formLabelWidth" valign="top" {OPAC_ADVANCED} ><h4>Publish Date</h4>
         <em>This event will only be visible to the public after this date. Leave blank to publish
             immediately.</em>
         </td>
@@ -239,8 +237,7 @@ $j(function () {
         </td>
         </tr>
         <!-- BEGIN recurring_dates -->
-        <tr class="advanced"
-        {SHOW_ADVANCED}>
+        <tr class="advanced adv_hide" {SHOW_ADVANCED}>
         <td class="formLabelWidth" valign="top"
         {OPAC_ADVANCED}><h4>Repeat</h4>
         <em>The frequency with which this event recurs, if at all.</em></td>
@@ -253,7 +250,7 @@ $j(function () {
         <option value="monthly">Monthly</option>
     </select></td>
         </tr>
-        <tr id="repeatUntil" style="display: none;">
+        <tr class="advanced" id="repeatUntil" style="display: none;">
             <td class="formLabelWidth" valign="top"><h4>Repeat Until</h4>
                 <em>The date at which recurrence should cease.</em></td>
             <td><input name="repeat_until" id="repeat_until" type="text" size="15" maxlength="30" value=""/></td>
