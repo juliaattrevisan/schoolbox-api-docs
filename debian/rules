@@ -27,8 +27,8 @@ override_dh_install:
 	# Fixes for --no-- deb handling of exclude
 	## SSO
 	mkdir -pv $(CURDIR)/sso
-	cp -a --parents tools/apache-vhost-schoolbox-sso $(CURDIR)/sso
-	rm -fR tools/apache-vhost-schoolbox-sso
+	cp -a --parents tools/apache-vhost-*-sso $(CURDIR)/sso
+	rm -fR tools/apache-vhost-*-sso
 	## End SSO
 	## Leave Module
 	mkdir -pv $(CURDIR)/leave
