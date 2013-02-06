@@ -264,7 +264,7 @@ class External_Denbigh_User implements External_UserInterface {
         return $adaption;
     }
 
-    public function getStudentContactListExtended($yearLevel) {
+    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form) {
 
     }
 

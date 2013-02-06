@@ -223,19 +223,22 @@ class External_Synergetic_User implements External_UserInterface {
 
     }
 
-    /**
-     * Gets a list of Contacts for all Students in a particular year level. The
-     * year level is stored in Synergetic.
-     *
-     * Used in reporting.
-     *
-     * @param $yearlevel
-     * @return mixed
-     */
-    public function getStudentContactListExtended($yearlevel) {
+	/**
+	 * Gets a list of Contacts for all Students in a particular year level. The
+	 * year level is stored in Synergetic.
+	 * Used in reporting.
+	 *
+	 * @param $yearlevel
+	 * @param $name
+	 * @param $boardingStatus
+	 * @param $form
+	 *
+	 * @return mixed
+	 */
+    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form) {
         $query = "
 			SELECT
-				StudentID, StudentGiven1, StudentSurname, StudentYearLevel, House.Description AS StudentHouse, StudentBoarder,
+				StudentID, StudentGiven1, StudentSurname, StudentYearLevel, House.Description AS StudentHouse, StudentBoarder, StudentForm,
 				StudentContactID,
 				StudentContactTitle, StudentContactPreferred, StudentContactLegalFullName, StudentContactSurname,
 				StudentContactDefaultEmail,
@@ -253,9 +256,62 @@ class External_Synergetic_User implements External_UserInterface {
 			LEFT JOIN SynergyOne.dbo.luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
 			WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
 			AND FileSemester = " . $_SESSION['FileSemester'] . "
-			AND FileYear = " . $_SESSION['FileYear'] . "
-			AND StudentYearLevel = '$yearlevel'
-			ORDER BY StudentSurname, StudentID, StudentContactType";
+			AND FileYear = " . $_SESSION['FileYear'];
+
+		/* Search for a particular year level
+		 */
+		if (strlen($yearlevel)) {
+			$query .= "
+				AND StudentYearLevel = '{$yearlevel}'
+			";
+		}
+
+		/* Search for a student name
+		 */
+		if (strlen($name)) {
+			$query .= "
+				AND (
+					(StudentSurname LIKE '%{$name}%')
+					OR
+					(StudentGiven1 LIKE '%{$name}%')
+				)
+			";
+		}
+
+		/* Search for a particular boarding status
+		 *
+		 * In Synergetic, assume the following:
+		 * B: Boarder
+		 * D: Day student
+		 * HS: Home stay
+		 */
+		if ($boardingStatus == '') {
+
+			/* No restrictions on result set
+			 */
+		}
+		else if ($boardingStatus == 'yes') {
+			$query .= "
+				AND StudentBoarder = 'B'
+			";
+		}
+		else {
+			$query .= "
+				AND StudentBoarder != 'B'
+			";
+		}
+
+		/* Search for a particular form
+		 */
+		if ($form) {
+			$query .= "
+				AND StudentForm = '{$form}'
+			";
+		}
+
+		$query .= "
+			ORDER BY StudentSurname, StudentID, StudentContactType
+		";
 
         return $this->getDatabase()->getAll($query);
     }
@@ -516,6 +572,21 @@ class External_Synergetic_User implements External_UserInterface {
     public function getHousemasterByHouseId($houseID) {
         return false;
     }
+
+	/**
+	 * Retrieve all the options from luForm table
+	 *
+	 * @return mixed
+	 */
+	public function retrieveLuForm() {
+		$query = "
+			SELECT Code, Description
+			FROM SynergyOne.dbo.luForm
+			WHERE ActiveFlag = 1
+		";
+
+		return $this->getDatabase()->getAll($query);
+	}
 
     /* Getters/Setters
       */

@@ -10,17 +10,61 @@
 class Report_Parent extends Report_Abstract {
 
 	/**
+	 * The name of someone you are searching for
+	 *
+	 * @var string
+	 */
+	private $searchName = '';
+
+	/**
+	 * The boarding status of someone you are searching for
+	 *
+	 * @var bool
+	 */
+	private $searchBoardingStatus = false;
+
+	/**
+	 * The form of someone you are searching for
+	 *
+	 * This seems to be some kind of arbitrary text string
+	 * found in the Synergetic "School" tab
+	 *
+	 * @var string
+	 */
+	private $searchForm = '';
+
+	/**
+	 * Options for boarding status
+	 *
+	 * @var array
+	 */
+	private $boardingStatusOptions = array('any', 'yes', 'no');
+
+	/**
 	 * Constructor
 	 *
 	 * @param $page
 	 * @param $yearLevel
+	 * @param $searchName
+	 * @param $searchBoardingStatus
+	 * @param $searchForm
 	 */
-	public function __construct($page, $yearLevel) {
+	public function __construct($page, $yearLevel, $searchName, $searchBoardingStatus, $searchForm) {
 		$this->setGroupHandler(new Group());
-		$this->setYearLevel($yearLevel);
 
-		if (!is_numeric($yearLevel) || !$this->checkPermissions()) {
-			error(19);
+		/* Must provide an int or be empty
+		 */
+		if (strlen($yearLevel) && !preg_match('/^(\d*)$/', $yearLevel)) {
+			error(155);
+		}
+
+		$this->setYearLevel(trim($yearLevel));
+		$this->setSearchName(trim($searchName));
+		$this->setSearchBoardingStatus(trim($searchBoardingStatus));
+		$this->setSearchForm(trim($searchForm));
+
+		if (strlen($page->arg[0]) && !$this->checkPermissions()) {
+			error(155);
 		}
 		else {
 			$this->setPage($page);
@@ -30,7 +74,12 @@ class Report_Parent extends Report_Abstract {
 
 			$this->setup();
 
-			$this->setAllRecords($this->getExternalUserHandler()->getStudentContactListExtended($this->getYearLevel()));
+			/* If all four options are empty, just show search form - don't show
+			 * all results (default is empty array)
+			 */
+			if (strlen($this->getYearLevel().$this->getSearchName().$this->getSearchForm().$this->getSearchBoardingStatus())) {
+				$this->setAllRecords($this->getExternalUserHandler()->getStudentContactListExtended($this->getYearLevel(), $this->getSearchName(), $this->getSearchBoardingStatus(), $this->getSearchForm()));
+			}
 		}
 	}
 
@@ -46,13 +95,11 @@ class Report_Parent extends Report_Abstract {
 		}
 		else if ($this->getGroupHandler()->isParent()) {
 
-            // enable/disable this check with a config variable
-            if(Cfg::get('restrict_parent_directory')) {
-                /* If you are a parent, ensure that you have a child in the selected year level.
-                 * If you don't have a child in this year level, you can't view it.
-                 */
-
-                // if check enabled
+			/* If Restrict Parent Directory is on, the following conditions apply:
+			 * If you are a parent, ensure that you have a child in the selected year level.
+			 * If you don't have a child in this year level, you can't view it.
+			 */
+            if (Cfg::get('restrict_parent_directory')) {
                 if (is_array($_SESSION['children']) && count($_SESSION['children'])) {
                     foreach($_SESSION['children'] as $currentChild) {
                         if ($currentChild['year'] == $this->getYearLevel()) {
@@ -60,8 +107,8 @@ class Report_Parent extends Report_Abstract {
                         }
                     }
                 }
-            } else {
-                // if check disabled
+            }
+			else {
                 return true;
             }
 		}
@@ -75,6 +122,10 @@ class Report_Parent extends Report_Abstract {
 	protected function setup() {
 		$this->getPage()->setFile(TEMPLATE_content, 'modules/report/parents.html');
 		$this->getPage()->setBlock(TEMPLATE_content, 'student', 'student_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'has_year_selector', 'has_year_selector_block');
+		$this->getPage()->setBlock('has_year_selector', 'year_selector_option', 'year_selector_option_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'has_year_input', 'has_year_input_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'search_form_option', 'search_form_option_block');
 		$this->getPage()->setTitle('Parent Contact info');
 		$this->getPage()->setBlock('student', 'contact', 'contact_block');
 		$this->getPage()->setBlock('contact', 'spouse', 'spouse_block');
@@ -86,8 +137,91 @@ class Report_Parent extends Report_Abstract {
 		));
 
 		$this->getPage()->setVar(array(
-			'YEAR' => $this->getYearLevel(),
+			'YEAR' => strlen($this->getYearLevel()) ? $this->getYearLevel() : 'not selected',
+			'SEARCH_NAME' => $this->getSearchName(),
+			'SEARCH_FORM' => $this->getSearchForm(),
+			'SEARCH_YEAR' => $this->getYearLevel(),
 		));
+
+		/* Search boarding status dropdown preselection
+		 */
+		foreach ($this->getBoardingStatusOptions() as $currentBoardingStatus) {
+			$key = 'SEARCH_BOARDINGSTATUS_' . strtoupper($currentBoardingStatus);
+
+			if ($currentBoardingStatus == $this->getSearchBoardingStatus()) {
+				$this->getPage()->setVar(array(
+					$key => 'selected'
+				));
+			}
+			else {
+				$this->getPage()->setVar(array(
+					$key => ''
+				));
+			}
+		}
+
+		/* Search Form dropdown preselection
+		 */
+		$allForms = $this->getExternalUserHandler()->retrieveLuForm();
+
+		if (is_array($allForms) && count($allForms)) {
+			foreach($allForms as $currentForm) {
+				$this->getPage()->setVar(array(
+					'SEARCHFORM_VALUE' => $currentForm['Code'],
+					'SEARCHFORM_SELECTED' => $currentForm['Code'] == $this->getSearchForm() ? 'selected="selected"' : '',
+					'SEARCHFORM_DESCRIPTION' => $currentForm['Description'],
+
+				));
+
+				$this->getPage()->parse('search_form_option_block', 'search_form_option', true);
+			}
+		}
+		else {
+			$this->getPage()->setVar('search_form_option_block', '');
+		}
+
+		/* If restrict_parent_directory is on, give people a list of Years they can
+		 * search on so they don't need to guess. But this only applies to parents
+		 */
+		if (Cfg::get('restrict_parent_directory') && !$this->getGroupHandler()->isSuperuser() && !$this->getGroupHandler()->isStaff()) {
+			$allYears = array();
+
+			/* Find all years you can chooze
+			 */
+			if (is_array($_SESSION['children']) && count($_SESSION['children'])) {
+				foreach($_SESSION['children'] as $currentChild) {
+					$allYears[$currentChild['year']] = true;
+				}
+			}
+
+			/* Compress options
+			 */
+			$allYears = array_keys($allYears);
+
+			foreach($allYears as $currentYear) {
+				if ($currentYear == $this->getYearLevel()) {
+					$selected = 'selected="selected"';
+				}
+				else {
+					$selected = '';
+				}
+
+				$this->getPage()->setVar(array(
+					'YEAR_SELECTOR_VALUE' => $currentYear,
+					'YEAR_SELECTOR_SELECTED' => $selected,
+					'YEAR_SELECTOR_DESCRIPTION' => $currentYear,
+				));
+
+				$this->getPage()->parse('year_selector_option_block', 'year_selector_option', true);
+			}
+
+			$this->getPage()->parse('has_year_selector_block', 'has_year_selector');
+			$this->getPage()->setVar('has_year_input_block', '');
+		}
+		else {
+			$this->getPage()->setVar('has_year_selector_block', '');
+			$this->getPage()->parse('has_year_input_block', 'has_year_input');
+		}
 	}
 
 	/**
@@ -279,11 +413,90 @@ class Report_Parent extends Report_Abstract {
 		}
 	}
 
+	/**
+	 * Export parent list
+	 *
+	 * @param Report_Exporter $exporter
+	 * @param string $format
+	 */
     public function export(Report_Exporter $exporter, $format = 'csv') {
         // function stub to appease interpreter
         // can be implemented if export required.
     }
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set search boarding status
+	 *
+	 * @param boolean $searchBoardingStatus
+	 */
+	private function setSearchBoardingStatus($searchBoardingStatus) {
+		$this->searchBoardingStatus = $searchBoardingStatus;
+	}
+
+	/**
+	 * Get search boarding status
+	 *
+	 * @return boolean
+	 */
+	private function getSearchBoardingStatus() {
+		return $this->searchBoardingStatus;
+	}
+
+	/**
+	 * Set search form
+	 *
+	 * @param string $searchForm
+	 */
+	private function setSearchForm($searchForm) {
+		$this->searchForm = $searchForm;
+	}
+
+	/**
+	 * Get search form
+	 *
+	 * @return string
+	 */
+	private function getSearchForm() {
+		return $this->searchForm;
+	}
+
+	/**
+	 * Set search name
+	 *
+	 * @param string $searchName
+	 */
+	private function setSearchName($searchName) {
+		$this->searchName = $searchName;
+	}
+
+	/**
+	 * Get search name
+	 *
+	 * @return string
+	 */
+	private function getSearchName() {
+		return $this->searchName;
+	}
+
+	/**
+	 * Set boarding status options
+	 *
+	 * @param array $boardingStatusOptions
+	 */
+	private function setBoardingStatusOptions($boardingStatusOptions) {
+		$this->boardingStatusOptions = $boardingStatusOptions;
+	}
+
+	/**
+	 * Get boarding status options
+	 *
+	 * @return array
+	 */
+	private function getBoardingStatusOptions() {
+		return $this->boardingStatusOptions;
+	}
 }
-
-
 

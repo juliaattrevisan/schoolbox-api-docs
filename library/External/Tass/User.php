@@ -209,7 +209,7 @@ class External_Tass_User implements External_UserInterface {
 	public function getStudentUserAccountInfo () {
 	}
 
-	public function getStudentContactListExtended ($yearLevel) {
+	public function getStudentContactListExtended ($yearlevel, $name, $boardingStatus, $form) {
 	}
 
 	public function getParentSync ($externalUserId) {
