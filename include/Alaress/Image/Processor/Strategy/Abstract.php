@@ -131,4 +131,24 @@ abstract class Alaress_Image_Processor_Strategy_Abstract {
 	protected function getCanvasWidth() {
 		return $this->canvasWidth;
 	}
+
+    /**
+     * Fills the given canvas with a blank alpha layer, so that alpha blending
+     * looks passable after the image is sharpened.
+     *
+     * This should be called before calling imagecopyresampled() on $canvas.
+     *
+     * @param resource $canvas The canvas resource to fill, or
+     *                         $this->getCanvas() if not set.
+     *
+     * @return void
+     */
+    protected function alphaFill($canvas = null) {
+        if (!isset($canvas)) {
+            $canvas = $this->getCanvas();
+        }
+        imagesavealpha($canvas, true);
+        $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
+        imagefill($canvas, 0, 0, $transparent);
+    }
 }
