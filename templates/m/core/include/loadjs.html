@@ -136,7 +136,8 @@ localCache.get = function(url) {
         xhr.open("GET", url, false);
 
         xhr.send(null);
-        if (xhr.status != 200) {
+        // check that either the expected response, or a not-found, came back from the server
+        if (xhr.status != 200 && xhr.status != 404) {
             env.status(4); // Error
             return null;
         }

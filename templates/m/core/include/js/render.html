@@ -108,8 +108,8 @@
 
             if(data != '/m/') {
                 // remove trailing slash if present
-                if(data.substr(data.length - 1, 1) == '/') {
-                    data = data.substr(0, data.length - 2);
+                if(data.substr(data.length - 1) == '/') {
+                    data = data.substr(0, data.length - 1);
                 }
                 data += '.html';
             }
