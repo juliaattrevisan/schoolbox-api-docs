@@ -67,10 +67,7 @@ class Alaress_Image_Processor_Strategy_Placement extends Alaress_Image_Processor
 
 		$bgColor = $this->getBgColors();
 
-		imagealphablending($this->getCanvas(), false);
-		imagesavealpha($this->getCanvas(), true);
-		imagecolortransparent($this->getCanvas(), imagecolorallocate($this->getCanvas(), $bgColor['red'], $bgColor['green'], $bgColor['blue']));
-
+		$this->alphaFill();
 		imagecopyresampled($this->getCanvas(), $image, $positioning['dst_x'], $positioning['dst_y'], 0, 0, $resizedWidth, $resizedHeight, imagesx($image), imagesy($image));
 
 		return $this->getCanvas();

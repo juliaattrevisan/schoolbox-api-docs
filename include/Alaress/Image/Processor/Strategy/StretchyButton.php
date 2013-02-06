@@ -63,6 +63,7 @@ class Alaress_Image_Processor_Strategy_StretchyButton extends Alaress_Image_Proc
 
 			list($width, $height) = getimagesize($this->getMiddleImage());
 
+			$this->alphaFill($image);
 			imagecopyresampled($image, $middleImage, 0, 0, 0, 0, imagesx($image), $height, $width, $height);
 		}
 	}
@@ -79,6 +80,7 @@ class Alaress_Image_Processor_Strategy_StretchyButton extends Alaress_Image_Proc
 
 			list($width, $height) = getimagesize($this->getLeftImage());
 
+			$this->alphaFill($image);
 			imagecopyresampled($image, $leftImage, 0, 0, 0, 0, $width, $height, $width, $height);
 		}
 	}
@@ -95,6 +97,7 @@ class Alaress_Image_Processor_Strategy_StretchyButton extends Alaress_Image_Proc
 
 			list($width, $height) = getimagesize($this->getRightImage());
 
+			$this->alphaFill($image);
 			imagecopyresampled($image, $rightImage, imagesx($image)-$width, 0, 0, 0, $width, $height, $width, $height);
 		}
 	}

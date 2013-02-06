@@ -50,11 +50,7 @@ class Alaress_Image_Processor_Strategy_Constrain extends Alaress_Image_Processor
 		 * you don't get excess canvas space
 		 */
 		$resizedCanvas = imagecreatetruecolor($dimensions['width'], $dimensions['height']);
-
-		imagealphablending($resizedCanvas, false);
-		imagesavealpha($resizedCanvas, true);
-		imagecolortransparent($resizedCanvas, imagecolorallocate($resizedCanvas, 0, 0, 0));
-
+        $this->alphaFill($resizedCanvas);
 		imagecopyresampled($resizedCanvas, $image, 0, 0, 0, 0, $dimensions['width'], $dimensions['height'], imagesx($image), imagesy($image));
 
 		return $resizedCanvas;

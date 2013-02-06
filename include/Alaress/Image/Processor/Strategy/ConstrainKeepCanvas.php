@@ -60,10 +60,7 @@ class Alaress_Image_Processor_Strategy_ConstrainKeepCanvas extends Alaress_Image
 
 		$bgColor = $this->getBgColors();
 
-		imagealphablending($this->getCanvas(), false);
-		imagesavealpha($this->getCanvas(), true);
-		imagecolortransparent($this->getCanvas(), imagecolorallocate($this->getCanvas(), $bgColor['red'], $bgColor['green'], $bgColor['blue']));
-
+		$this->alphaFill();
 		imagecopyresampled($this->getCanvas(), $image, 0, 0, 0, 0, $dimensions['width'], $dimensions['height'], imagesx($image), imagesy($image));
 
 		return $this->getCanvas();

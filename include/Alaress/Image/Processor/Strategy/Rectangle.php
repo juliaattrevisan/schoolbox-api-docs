@@ -140,13 +140,10 @@ class Alaress_Image_Processor_Strategy_Rectangle extends Alaress_Image_Processor
 
 			$bgColor = $this->getBgColors();
 
-			imagealphablending($this->getCanvas(), false);
-			imagesavealpha($this->getCanvas(), true);
-			imagecolortransparent($this->getCanvas(), imagecolorallocate($this->getCanvas(), $bgColor['red'], $bgColor['green'], $bgColor['blue']));
-
 			/* Resize the canvas to fit the new resized dimensions, so
 			 * you don't get excess canvas space
 			 */
+			$this->alphaFill();
 			imagecopyresampled($this->getCanvas(), $image, 0, 0, $startX, $startY, $this->getCanvasWidth(), $this->getCanvasHeight(), $endX, $endY);
 		}
 		else {
@@ -158,6 +155,7 @@ class Alaress_Image_Processor_Strategy_Rectangle extends Alaress_Image_Processor
 
 			/* Put small image in the middle of the canvas
 			 */
+			$this->alphaFill();
 			imagecopyresampled($this->getCanvas(), $image, ($this->getCanvasWidth() - $currentWidth)/2, ($this->getCanvasHeight() - $currentHeight)/2, $startX, $startY, $currentWidth, $currentHeight, $endX, $endY);
 		}
 

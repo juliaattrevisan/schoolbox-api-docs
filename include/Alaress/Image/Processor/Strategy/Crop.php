@@ -54,10 +54,7 @@ class Alaress_Image_Processor_Strategy_Crop extends Alaress_Image_Processor_Stra
 		 */
 		$canvas = imagecreatetruecolor($src_w, $src_h);
 
-		imagealphablending($canvas, false);
-		imagesavealpha($canvas, true);
-		imagecolortransparent($canvas, imagecolorallocate($this->getCanvas(), 0, 0, 0));
-
+		$this->alphaFill($canvas);
 		imagecopyresampled($canvas, $image, 0, 0, $src_x, $src_y, $src_w, $src_h, $src_w, $src_h);
 
 		return $canvas;
