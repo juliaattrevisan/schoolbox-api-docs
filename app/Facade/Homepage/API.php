@@ -11,8 +11,8 @@ class Facade_Homepage_API extends Generic_API {
     private $custom = array('Component_Homepage_SubjectGradesController', 'SubjectGrades');
 
     public function Display($categoryID) {
+        $response = new Response_HTTP();
         try {
-            $response = new Response_HTTP();
             list($user, $cat, $page) = $this->getHomepage($categoryID);
 
             $components = $page->get('components');
@@ -20,11 +20,22 @@ class Facade_Homepage_API extends Generic_API {
             $response->setPage('title', $catTitle);
             $response->setResponse('articles', $articles);
 
-
             return $response;
         }
         catch(ErrorException $e) {
             die($e);
+        }
+        catch(Exception_Schoolbox $e) {
+            $response->setPage('title', 'Folder Not Found');
+            $response->setResponse('articles', array('Error' => array(
+                'title' => 'Folder Not Found',
+                'icon' => '',
+                'class' => 'wide no-title',
+                'content' => array(
+                    'reason' => 'Sorry, the homepage requested could not be found.'
+                )
+            )));
+            return $response;
         }
     }
 
