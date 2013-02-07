@@ -112,12 +112,10 @@ abstract class Synchronise_Synergetic_Balcombe_Strategy_Abstract extends Synchro
 	}
 
 	/**
-	 * Determine if user exists in Schoolbox
+	 * Determine if user exists in Schoolbox, to be implemented by extending classes
 	 *
 	 * @param $newUser
 	 * @return mixed
 	 */
-	protected function userExists($newUser) {
-		return $this->getUserHandler()->getBySynergy($newUser['synergy_id']);
-	}
+	abstract protected function userExists($newUser);
 }

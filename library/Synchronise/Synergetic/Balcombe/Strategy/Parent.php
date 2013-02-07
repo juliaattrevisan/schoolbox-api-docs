@@ -82,4 +82,35 @@ class Synchronise_Synergetic_Balcombe_Strategy_Parent extends Synchronise_Synerg
 	private function isPubliclyListed($currentParent) {
         return $currentParent['DirectoryIncludeFlag'] == 0 ? false : true;
 	}
+
+    /**
+     * Determine if user exists in Schoolbox
+     *
+     * @param $newUser
+     * @return array|bool
+     */
+    protected function userExists($newUser) {
+        $query = "
+            SELECT
+                    user.id as uid, synergy_id,
+                    title, firstname, lastname, username,
+                    local_email, alt_email,
+                    userCampus.campus, year, house,
+                    eportfolio_enabled,
+                    groups.name AS gname, group_id
+            FROM user
+            LEFT JOIN groups ON user.group_id = groups.id
+            LEFT JOIN userCampus ON user.id = userCampus.uid
+            WHERE user.synergy_id = '{$newUser['synergy_id']}'
+        ";
+
+        // Only lock user to group if parent account
+        if ($newUser['group_id'] == self::PARENT_GROUP_ID)
+            $query .= " AND groups.id = '{$newUser['group_id']}'";
+
+
+        $query .= " ORDER BY userCampus.defaultCampus DESC";
+
+        return $this->getUserHandler()->db->getRow($query);
+    }
 }
