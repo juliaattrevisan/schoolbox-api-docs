@@ -81,4 +81,14 @@ class Synchronise_Synergetic_Balcombe_Strategy_Student extends Synchronise_Syner
 
 		$this->getVerboseFilter()->summary();
 	}
+
+    /**
+     * Determine if user exists in Schoolbox
+     *
+     * @param $newUser
+     * @return array|bool
+     */
+    protected function userExists($newUser) {
+        return $this->getUserHandler()->getBySynergy($newUser['synergy_id']);
+    }
 }
