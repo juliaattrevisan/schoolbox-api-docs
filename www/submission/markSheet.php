@@ -19,7 +19,7 @@ else {
 
 
 if (isset($_GET['year']) || isset($_GET['semester'])) {
-    $this->localRedir("/submission/markSheet/{$this->arg[0]}/{$_GET['year']}/{$_GET['semester']}");
+    $this->localRedir("/submission/markSheet/{$categoryID}/{$_GET['year']}/{$_GET['semester']}");
 }
 
 $currentYear = date('Y');
@@ -201,7 +201,7 @@ if ($performExport && $categoryID) {
 
     exit;
 }
-elseif (is_numeric($this->arg[0])) {
+elseif (is_numeric($categoryID)) {
     $this->setFile(TEMPLATE_content, 'submission/markSheet.html');
     $this->setTitle('Class Mark Sheet');
     $this->setTab('submission');
@@ -252,7 +252,7 @@ elseif (is_numeric($this->arg[0])) {
         $this->parse('year_option_block', 'year_option', true);
     }
 
-    $category = $catHandler->getByID($this->arg[0]);
+    $category = $catHandler->getByID($categoryID);
 
     if ($category['code'] != "") {
         $this->setVar('CATEGORY', $category['name'] . ' (' . $category['code'] . ')');
@@ -283,10 +283,10 @@ elseif (is_numeric($this->arg[0])) {
     // retrieve student list from group membership
     else {
         $groupHandler = new Group;
-        $studentList = $groupHandler->getMemberList($this->arg[0]);
+        $studentList = $groupHandler->getMemberList($categoryID);
     }
 
-    $subList = $subHandler->getAllForUserCategory($this->arg[0], $_SESSION['id'], $year, $semester);
+    $subList = $subHandler->getAllForUserCategory($categoryID, $_SESSION['id'], $year, $semester);
 
     $this->setVar('sub_head_block', '');
     $this->setVar('assess_head_block', '');
