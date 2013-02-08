@@ -475,9 +475,18 @@ class Submission extends DeprecatedModel {
         }
 
         $q[] = "
-            SELECT sb.id, sb.category, ft.id AS type_id, ft.name AS typeName, sb.owner,
-              UNIX_TIMESTAMP(sb.open_date) AS open, UNIX_TIMESTAMP(sb.date) AS date,
-              UNIX_TIMESTAMP(sb.late_date) AS late, sb.name, sb.description, sb.created
+            SELECT
+                sb.id,
+                sb.category,
+                ft.id AS type_id,
+                ft.name AS typeName,
+                sb.owner,
+                UNIX_TIMESTAMP(sb.open_date) AS open,
+                UNIX_TIMESTAMP(sb.date) AS date,
+                UNIX_TIMESTAMP(sb.late_date) AS late,
+                sb.name,
+                sb.description,
+                sb.created
             FROM submission_box sb
             LEFT JOIN file_type ft ON sb.type = ft.id
             WHERE sb.category = '$categoryID'
@@ -487,9 +496,18 @@ class Submission extends DeprecatedModel {
         ";
 
         $q[] = "
-            SELECT assess.assess_id, assess.category_id, file_type.id AS type_id, file_type.name AS typeName,
-              assess.user_id AS owner, UNIX_TIMESTAMP(assess.start) AS open, UNIX_TIMESTAMP(assess.finish) AS date,
-              '' AS late, assess.title AS name, assess.description AS description, assess.created_at AS created
+            SELECT
+                assess.assess_id AS id,
+                assess.category_id AS category,
+                file_type.id AS type_id,
+                file_type.name AS typeName,
+                assess.user_id AS owner,
+                UNIX_TIMESTAMP(assess.start) AS open,
+                UNIX_TIMESTAMP(assess.finish) AS date,
+                '' AS late,
+                assess.title AS name,
+                assess.description AS description,
+                assess.created_at AS created
             FROM assess
             LEFT JOIN file_type ON file_type.id = assess.type
             WHERE category_id = '$categoryID'
