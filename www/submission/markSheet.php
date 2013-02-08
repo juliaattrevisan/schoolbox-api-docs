@@ -103,7 +103,7 @@ if ($performExport && $categoryID) {
         $studentList = $groupHandler->getMemberList($categoryID);
     }
 
-    $subList = $subHandler->getAllForUserCategory($categoryID, $_SESSION['id']);
+    $subList = $subHandler->getAllForUserCategory($categoryID, $_SESSION['id'], $year, $semester);
 
     if (is_array($subList)) {
         $csv = array('Synergetic ID', 'Surname', 'Firstname');
