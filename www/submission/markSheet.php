@@ -5,13 +5,12 @@ if(!isset($this)) {
     SitePage::localRedir('/submission/markSheet');
 }
 
+$performExport = false;
 if(is_numeric($this->arg[0])) {
     $categoryID = $this->arg[0];
-    $performExport = false;
-}
-elseif($this->arg[0] == 'export' && $this->arg[1]) {
-    $categoryID = $this->arg[1];
-    $performExport = true;
+	if ($this->arg[3] == 'export') {
+		$performExport = true;
+	}
 }
 else {
     error(2); // not enough info submitted ...is there a better error?
@@ -43,6 +42,11 @@ else {
     $semester = $currentSemester;
 }
 
+//
+// Set year and semester into the template.
+$this->setVar('SELECTED_YEAR',     $year);
+$this->setVar('SELECTED_SEMESTER', $semester);
+
 $subHandler = new Submission();
 $retHandler = new SubmissionReturn();
 $catHandler = new Category();
@@ -55,8 +59,8 @@ $attemptHandler = new Assess_Attempt();
 $sectionHandler = new Assess_Section();
 $responseHandler = new Assess_Response();
 
-if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
-    $category = $catHandler->getByID($this->arg[1]);
+if ($performExport && $categoryID) {
+    $category = $catHandler->getByID($categoryID);
 
     /* Open an output stream so we can use fputcsv
       */
@@ -96,10 +100,10 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
     } else {
         //Retrieve student list from group membership
         $groupHandler = new Group;
-        $studentList = $groupHandler->getMemberList($this->arg[1]);
+        $studentList = $groupHandler->getMemberList($categoryID);
     }
 
-    $subList = $subHandler->getAllForUserCategory($this->arg[1], $_SESSION['id']);
+    $subList = $subHandler->getAllForUserCategory($categoryID, $_SESSION['id']);
 
     if (is_array($subList)) {
         $csv = array('Synergetic ID', 'Surname', 'Firstname');
