@@ -1160,6 +1160,9 @@ class Submission extends DeprecatedModel {
             $conditional = '= 0';
         }
 
+		//
+		// Only return work due this year [SB-1872]
+		$this_year = date('Y');
         $q0 = "
             SELECT
               '0' kind, sb.id, sb.name `title`, ft.name `type`, UNIX_TIMESTAMP(sb.date) AS `date`, UNIX_TIMESTAMP(sb.late_date) AS late_date,
@@ -1169,6 +1172,7 @@ class Submission extends DeprecatedModel {
             LEFT JOIN category c ON c.`id` = sb.`category`
             LEFT JOIN student_submission ss ON sb.id = ss.box_id AND ss.owner = '$studentID'
             WHERE c.id $conditional
+            AND YEAR(sb.date) = $this_year
             GROUP BY sb.id
             ORDER BY sb.date ASC
             ";
@@ -1183,9 +1187,11 @@ class Submission extends DeprecatedModel {
             LEFT JOIN assess_attempt aa ON a.`assess_id` = aa.`assess_id` AND aa.user_id = '$studentID'
             WHERE c.id $conditional
             AND a.availability = 'assess'
+            AND YEAR(a.finish) = $this_year
             GROUP BY a.assess_id
             ORDER BY a.finish ASC
         ";
+//		printf("<pre>%s\n%s</pre>", $q0, $q1);
 
         /* execute queries and retrieve */
         $r0 = $this->db->getAll($q0);
