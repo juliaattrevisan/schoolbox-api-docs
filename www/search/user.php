@@ -293,7 +293,7 @@ if (is_numeric($this->arg[0])) {
 
                         $category = $catHandler->getByCode($subject['code']);
 
-                        if ((Cfg::get('show_all_subjects') == 1) || ($category['id'] && $groupHandler->getPermission($category['id']) >= READ_ACCESS)) {
+                        if ((Cfg::get('show_all_subjects') == 1) || $category['id'] ) {
 
                             /* Fetch teacher names */
                             $teacherList = $synClass->getTeacherName($subject['code']);
@@ -321,12 +321,8 @@ if (is_numeric($this->arg[0])) {
                             }
 
                             $output = array(
-                                'SUBJECT_NAME' => is_array($category) && $groupHandler->getPermission(
-                                    $category['id']
-                                ) >= READ_ACCESS ?
-                                    '<a href="/homepage/' . $subject['code'] . '">' .
-                                        Scrub::Text($category['name']) .
-                                        '</a>' : Scrub::Text($subject['name']),
+                                'SUBJECT_NAME' => is_array($category) && $groupHandler->getPermission( $category['id']  ) >= READ_ACCESS ?
+                                    '<a href="/homepage/' . $subject['code'] . '">' . Scrub::Text($category['name']) . '</a>' : Scrub::Text($subject['name']),
                                 'SUBJECT_TEACHER_NAME' => implode(', ', $teacherOutput),
                                 'SUBJECT_TEACHER_ID' => $teacherList[0],
                             );
