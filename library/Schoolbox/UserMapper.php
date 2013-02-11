@@ -6,12 +6,16 @@
  * @copyright   2013 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
  */
+
+namespace Schoolbox;
+use Schoolbox;
+
 class UserMapper extends Mapper {
 
     protected function mapping () {
 
         $this->hasTable('user');
-        $this->hasModel('NewUser');
+        $this->hasModel('\Schoolbox\User');
 
         $this->hasMap(array(
                 'column'     => 'id',
@@ -32,11 +36,6 @@ class UserMapper extends Mapper {
                 'type'       => Mapper::TYPE_STRING,
             ));
 
-        $this->hasMap(array(
-                'column'     => 'group_id',
-                'property'   => 'groupId',
-                'type'       => Mapper::TYPE_INTEGER,
-            ));
 
         $this->hasMap(array(
                 'column'     => 'title',
@@ -56,21 +55,10 @@ class UserMapper extends Mapper {
                 'type'       => Mapper::TYPE_STRING,
             ));
 
-        $this->hasMap(array(
-                'column'     => 'email_pass',
-                'property'   => 'emailPass',
-                'type'       => Mapper::TYPE_STRING,
-            ));
 
         $this->hasMap(array(
                 'column'     => 'synergy_id',
-                'property'   => 'synergyId',
-                'type'       => Mapper::TYPE_INTEGER,
-            ));
-
-        $this->hasMap(array(
-                'column'     => 'campus',
-                'property'   => 'campus',
+                'property'   => 'externalId',
                 'type'       => Mapper::TYPE_INTEGER,
             ));
 
@@ -82,21 +70,16 @@ class UserMapper extends Mapper {
 
         $this->hasMap(array(
                 'column'     => 'house',
-                'property'   => 'house',
+                'property'   => 'schoolHouse',
                 'type'       => Mapper::TYPE_INTEGER,
             ));
 
         $this->hasMap(array(
                 'column' => 'residential_house_id',
-                'property' => 'residentialHouseId',
+                'property' => 'residentialHouse',
                 'type' => Mapper::TYPE_INTEGER,
             ));
 
-        $this->hasMap(array(
-                'column' => 'boarding_status',
-                'property' => 'boardingStatus',
-                'type' => Mapper::TYPE_STRING,
-            ));
 
         $this->hasMap(array(
                 'column'     => 'local_email',
@@ -112,7 +95,7 @@ class UserMapper extends Mapper {
 
         $this->hasMap(array(
                 'column'     => 'mail_handler',
-                'property'   => 'mailHandler',
+                'property'   => 'useInternalMail',
                 'type'       => Mapper::TYPE_INTEGER,
             ));
 
@@ -130,17 +113,53 @@ class UserMapper extends Mapper {
 
         $this->hasMap(array(
                 'column'     => 'eportfolio_enabled',
-                'property'   => 'eportfolioEnabled',
+                'property'   => 'eportfolioEnable',
                 'type'       => Mapper::TYPE_STRING,
             ));
 
         parent::mapping();
     }
 
-    public function findById() {
-        $query = "SELECT user JOIN groups JOIN userCampus JOIN campus";
+    public function findById($id) {
+
+        $user = false;
+        $roleMapper = new RoleMapper;
+        $campusMapper = new CampusMapper;
+
+        $statement = $this->database->prepare( "
+            SELECT {$this->getColumnString('u')}, IF(su.id, 1, 0) as `u.superuser`,
+                    {$roleMapper->getColumnString('g')},
+                    {$campusMapper->getColumnString('c')}, uc.defaultCampus as `uc.defaultCampus`
+                    FROM `user` u
+            LEFT JOIN `groups` g ON group_id = g.`id`
+            LEFT JOIN userCampus uc ON uc.`uid`=u.id
+            LEFT JOIN superusers su ON su.id = u.id
+            INNER JOIN luCampus c ON c.id = uc.`campus`
+            WHERE u.id = ?
+            " );
+
+        $statement->execute(array($id));
+
+        foreach( $statement as $row ) {
+            if(!is_object($user)){
+                $user = $this->hydrate($row, 'u');
+                $user->setSuperUser($row['u.superuser'] == 1);
+
+                $user->setRole($roleMapper->hydrate($row, 'g'));
+            }
+
+            $campus = $campusMapper->hydrate($row, 'c');
+
+            $user->getCampusCollection()->add($campus);
+
+            if($row['uc.defaultCampus'] == 1) {
+                $user->setDefaultCampus($campus);
+            }
 
 
+
+        }
+        return $user;
     }
 
 }

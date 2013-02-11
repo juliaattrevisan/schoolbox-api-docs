@@ -10,7 +10,7 @@
 namespace Schoolbox;
 use Schoolbox;
 
-class CampusCollection extends Collection implements Iterator {
+class CampusCollection extends Collection {
 
     /**
      * Searches the collection for provided campus object, if matches return true
