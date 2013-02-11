@@ -11,7 +11,10 @@
  * @version     SVN: $Id$
  */
 class Synchronise_Synergetic_StMichaels_Strategy_Parent extends Synchronise_Synergetic_StMichaels_Strategy_Abstract {
-	protected $strategyTitle = "Update Schoolbox Parent Details Synchronisation";
+
+    const PARENT_GROUP_ID = 3;
+
+    protected $strategyTitle = "Update Schoolbox Parent Details Synchronisation";
 
 	/**
 	 * Setup
@@ -26,28 +29,43 @@ class Synchronise_Synergetic_StMichaels_Strategy_Parent extends Synchronise_Syne
 	 * @return void
 	 */
 	public function generateList() {
+        // start by retrieving a list of parents from the regular part of Synergetic
+        $parentAccountListUnindexed = $this->getExternalUserHandler()->getParentUserAccountInfo();
+
+        // index returned parents by synergy id
+        $parentUserAccounts = array();
+        for($i = 0; $i < count($parentAccountListUnindexed); ++$i) {
+            $parentUserAccounts[$parentAccountListUnindexed[$i]['StudentContactID']] = $parentAccountListUnindexed[$i];
+        }
+
+        // and now we can get rid of this duplication
+        unset($parentAccountListUnindexed);
+
+        // get the parent list from the passwords table
         $link = new MSSQL();
         $link->query("SELECT * FROM uvParentLogin");
 
-        $parents = array();
-
-        // index by synergy_id
-        while($row = $link->getNextArray()) {
-            $parents[$row['SynergeticID']] = $row;
-        }
-
-        $internalList = $this->getUserHandler()->getByGroup($this->getGroupHandler()->getParentGroupTypeIds(), true);
-
-        // fold the password array into the user list
-        if(count($internalList)) {
-            foreach($internalList as &$parent) {
-                if(isset($parents[$parent['synergy_id']])) {
-                    $parent['password'] = $parents[$parent['synergy_id']]['UserPassword'];
-                }
+        // iterate across the password list and fold the details list into it where possible
+        $parentList = array();
+        $nonExistent = array();
+        while($parentLogin = $link->getNextArray()) {
+            $synID = $parentLogin['SynergeticID'];
+            if(isset($parentUserAccounts[$synID])) {
+                $parent = $parentUserAccounts[$synID];
+                $parent['password'] = $parentLogin['UserPassword'];
+                $parentList[] = $parent;
+            }
+            else {
+                $nonExistent[] = $synID;
             }
         }
 
-		$this->collateList($internalList);
+        printf("Parent Sync Notice: %d logins linked to accounts, %d accounts do not exist\n",
+            count($parentList),
+            count($nonExistent)
+        );
+
+		$this->collateList($parentList);
 	}
 
 	/**
@@ -85,17 +103,15 @@ class Synchronise_Synergetic_StMichaels_Strategy_Parent extends Synchronise_Syne
 	 * @param $currentUser
 	 */
 	public function executeCreateUpdate($currentUser) {
-		$currentSynergyId = $currentUser['synergy_id'];
+
+		$currentSynergyId = $currentUser['StudentContactID'];
 
 		$currentParent = $this->getExternalUserHandler()->getParentSync($currentSynergyId);
 
-		/* If the parent could be found, try updating him in Synergetic
-		 */
+		// If the parent could be found, try updating him in Synergetic
 		if ($currentParent) {
 
-			/* The drop down in synergetic's Phone and Occupation tabs indicates
-			 * which email the person prefers to use.
-			 */
+			// The drop down in synergetic's Phone and Occupation tabs indicates which email the person prefers to use.
 			if ($currentParent['DefaultEmailCode'] == 'O') {
 				$preferredEmail = $currentParent['OccupEmail'];
 			}
@@ -103,50 +119,66 @@ class Synchronise_Synergetic_StMichaels_Strategy_Parent extends Synchronise_Syne
 				$preferredEmail = $currentParent['Email'];
 			}
 
-			/* Update Portal with Synergetic data if there is something
-			 * different contained in Synergetic db
-			 */
+            // we can't know whether or not the password has been changed, always sync all parents...no skipping
 			$user = $this->getUserHandler()->getBySynergy($currentSynergyId);
 
-			if (($user['title'] != $currentParent['Title']) || ($user['firstname'] != $currentParent['Preferred']) || ($user['lastname'] != $currentParent['Surname']) || ($user['alt_email'] != $preferredEmail)) {
+            // user exists in schoolbox: perform update
+            if($user) {
+                // use immutable data from schoolbox here rather than synergy
+                $targetUser['id'] = $user['uid'];
+                $targetUser['username'] = $user['username'];
+                $targetUser['synergy_id'] = $user['synergy_id'];
+            }
+            // user does not exist, retrieve immutable fields from synergetic
+            else {
+                // ['id'] is not populated because this is a create
+                $targetUser['username'] = $currentParent['ID'];
+                $targetUser['synergy_id'] = $currentParent['ID'];
+            }
 
-                // use the original data rather than the reloaded for the password
-                $updatedUser['id'] = $user['uid'];
-                $updatedUser['username'] = $user['username'];
-                $updatedUser['password'] = $currentUser['password'];
-                $updatedUser['title'] = trim($currentParent['Title']);
-				$updatedUser['firstname'] = trim($currentParent['Preferred']);
-				$updatedUser['lastname'] = trim($currentParent['Surname']);
+            // insert password
+            $targetUser['password'] = $currentUser['password'];
 
-				$updatedUser['campus'] = $this->getUserHandler()->getUserCampus($user['uid']);
-				$updatedUser['defaultCampus'] = array();
+            // from here on, use synergy data
+            $targetUser['title'] = trim($currentParent['Title']);
+            $targetUser['firstname'] = trim($currentParent['Preferred']);
+            $targetUser['lastname'] = trim($currentParent['Surname']);
+            $targetUser['group_id'] = self::PARENT_GROUP_ID;
 
-				/* Clear email address in Portal if the user is not meant to be
-				 * publicly listed
-				 */
-				if ($this->isPubliclyListed($currentParent)) {
-					$updatedUser['alt_email'] = trim($preferredEmail);
-				}
-				else {
-					$updatedUser['alt_email'] = '';
-				}
+            $targetUser['campus'] = $this->getUserHandler()->getUserCampus($user['uid']);
+            $targetUser['defaultCampus'] = array();
 
-				/* Actually perform db update
-				 */
-				if ($this->getPerformUpdate() === true) {
-					$this->getUserHandler()->update($updatedUser);
-					$this->getVerboseFilter()->performUpdate($user, $currentSynergyId, $updatedUser, $currentParent);
-					$this->getVerboseFilter()->incrementUpdated();
-				}
-				else {
-					$this->getVerboseFilter()->planUpdate($user, $currentSynergyId, $updatedUser, $currentParent);
-					$this->getVerboseFilter()->incrementUpdated();
-				}
-			}
-			else {
-				$this->getVerboseFilter()->skip($user, $currentSynergyId);
-				$this->getVerboseFilter()->incrementSkipped();
-			}
+            $targetUser['alt_email'] = $this->isPubliclyListed($currentParent) ? trim($preferredEmail) : '';
+
+            $this->getVerboseFilter()->setNewUser($targetUser);
+
+            // perform update
+            if($user) {
+                if ($this->getPerformUpdate() === true) {
+                    $this->getUserHandler()->update($targetUser);
+                    $this->getVerboseFilter()->performUpdate($user, $currentSynergyId, $targetUser, $currentParent);
+                    $this->getVerboseFilter()->incrementUpdated();
+                }
+                else {
+                    $this->getVerboseFilter()->planUpdate($user, $currentSynergyId, $targetUser, $currentParent);
+                    $this->getVerboseFilter()->incrementUpdated();
+                }
+            }
+            // perform create
+            else {
+                if ($this->getPerformUpdate() === true) {
+                    $this->getUserHandler()->create($targetUser);
+                    $this->getVerboseFilter()->performCreation();
+                    $this->getVerboseFilter()->incrementCreated();
+                }
+                else {
+                    $this->getVerboseFilter()->planCreation();
+                    $this->getVerboseFilter()->incrementCreated();
+                }
+            }
+
+
+
 		}
 	}
 
