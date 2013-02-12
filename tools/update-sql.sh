@@ -22,9 +22,6 @@ instdir=`readlink -f $fullpath/../`;
 baselength=`echo $instdir/updates/ | wc -m`;
 package=${instdir##*/};
 
-backupdir="/var/lib/$package";
-backupfile="$backupdir/`date +%Y-%m-%d_%H-%M-%S`.sql";
-
 curdir=`pwd`;
 
 echo "Starting SQL update process";
@@ -63,6 +60,10 @@ then
 	exit;
 fi
 
+backupdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='file_dir' \G;" | grep 'value' | cut -d' ' -f2`;
+backupdir=`readlink -f $backupdir/../`
+backupfile="$backupdir/`date +%Y-%m-%d_%H-%M-%S`.sql";
+
 echo "Current SQL Version: "$sqlver;
 echo "New SQL Version: "$newver;
 
@@ -98,12 +99,14 @@ mkdir -p $backupdir;
 mysqldump --allow-keywords -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile 2>&1;
 
 echo "Updating database to new version";
+errorint=0;
 # Run update scripts in release order, SQL first then PHP for each release
 for release in `sed -n "$start","$end"p $versionlist`;
 do
 	# Don't run update if already at that release version
 	if [ $release != $sqlver ];
 	then
+		echo "Running update $release";
 		# Only run release upgrade if the scripts_list actually exists
 		if [ -f $instdir/updates/$release/scripts_list ];
 		then
@@ -119,7 +122,7 @@ do
 					if [ $? -ne 0 ];
 					then
 						echo "Error running update: $script";
-						rollback;
+						errorint=1;
 					fi
 				fi
 			done
@@ -140,7 +143,7 @@ do
 					then
 						cd $curdir;
 						echo "Error running update: $script";
-						rollback;
+						errorint=1;
 					fi
 					cd $curdir;
 				fi
@@ -152,22 +155,11 @@ do
 	fi
 done
 
-echo "SQL Updates Completed";
+echo "Backup of database at version $sqlver located at: $backupfile";
 
-# In case of update failure, rollback database to original state
-rollback() {
-	# Drop all tables in database before restore (drop database may not be available)
-	for table in `mysql -u $sqluser -p$sqlpasswd $sqldb -e 'show tables'| grep -v Tables_in`;
-	do
-		mysql -u $sqluser -p$sqlpasswd $sqldb -e "drop table $table";
-	done
-	# Revert database to original
-	mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $backupfile > /dev/null 2>&1;
-	if [ $? -eq 0 ];
-	then
-		echo "Database returned to original pre-update state.";
-	fi
-	echo "SQL update failed. Please attempt a manual update.";
-	echo "A backup of the original database is located at: $backupfile";
-	exit;
-}
+if [ $errorint -ne 0 ];
+then
+	echo "SQL updates completed with errors. Please manually fix issues or rollback to pre-update backup.";
+else
+	echo "SQL updates completed";
+fi
