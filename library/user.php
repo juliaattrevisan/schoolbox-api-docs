@@ -467,9 +467,7 @@ class User extends DeprecatedModel {
             $this->db->query($query);
             //for each student submission delete from hdd
             while ($studsub = $this->db->getNextArray()) {
-                if (!@unlink(Cfg::get('submission_dir') . "/" . $studsub['id'] . ".dat")) {
-                    print "Failed to delete: " . Cfg::get('submission_dir') . "/" . $studsub['id'] . ".dat";
-                }
+				@unlink(Cfg::get('submission_dir') . "/" . $studsub['id'] . ".dat");
             }
 
             //delete all student submissions from db
@@ -487,9 +485,7 @@ class User extends DeprecatedModel {
         $this->db->query($query);
 
         while ($ret = $this->db->getNextArray()) {
-            if (!@unlink(Cfg::get('returns_dir') . "/" . $ret['id'] . ".dat")) {
-                print "Failed to delete: " . Cfg::get('returns_dir') . "/" . $ret['id'] . ".dat";
-            }
+			@unlink(Cfg::get('returns_dir') . "/" . $ret['id'] . ".dat");
         }
 
         $query = "DELETE FROM submission_return WHERE owner = '$id'";
