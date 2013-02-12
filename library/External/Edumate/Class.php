@@ -17,12 +17,17 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
      * @return array
      */
     public function getStudents($classCode) {
+
+        // fully qualified table names
+        $studentClass = 'db2inst1.schoolbox_studentclass';
+        $students = 'db2inst1.schoolbox_students';
+
         // prepare
         $stmt = $this->getDatabase()->prepare("
-            SELECT s.Firstname, s.Surname, s.student_number AS synergy_id, year_level AS yearlevel, s.house
-            FROM db2inst1.schoolbox_studentclass sc
-            LEFT JOIN db2inst1.schoolbox_students s ON sc.student_number = s.student_number
-            WHERE sc.class_code = :code
+            SELECT firstname, surname, $studentClass.student_number AS synergy_id, year_level AS yearlevel, house
+            FROM  $studentClass
+            LEFT JOIN $students ON $studentClass.student_number = $students.student_number
+            WHERE $studentClass.class_code = :code
         ");
 
         // retrieve
@@ -33,11 +38,12 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
         // manipulate
         $students = array();
         while($student = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            if(is_numeric($student)) {
-                $students[$student['synergy_id']] = $student;
+            // distinct-ify
+            if(is_numeric($student['SYNERGY_ID'])) {
+                $student['YEARLEVEL'] = preg_replace("/[^0-9]/", '', $student['YEARLEVEL']);
+                $students[$student['SYNERGY_ID']] = $student;
             }
         }
-
         return array_values($students);
     }
 

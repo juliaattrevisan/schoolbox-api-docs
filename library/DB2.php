@@ -28,12 +28,17 @@ class DB2 {
      * @param $options array
      * @throw PDOException
      */
-    public function __construct($dsn, $username = '', $password = '', array $options = null) {
+    public function __construct($dsn, $username = '', $password = '', array $options = array()) {
         // compile the username and password into the DSN (it's dirty, but necessary
         $connDSN = sprintf("DRIVER={IBM DB2 JDBC DRIVER};%sPROTOCOL=TCPIP;UID=%s;PWD=%s;", $dsn, $username, $password);
 
+        // check the function actually exists
+        if(!function_exists('db2_connect')) {
+            throw new PDOException('DB2 extension is not installed. Please contact your Network Administrator.');
+        }
+
         if(!($this->db2 = db2_connect($connDSN, '', '', $options))) {
-            throw new PDOException('Could not connect to DB2');
+            throw new PDOException('Could not connect to DB2: attempted connection string was '.$connDSN);
         }
     }
 

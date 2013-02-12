@@ -30,22 +30,22 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
             'id' => $externalUserId
         ));
 
-        if($stmt->rowCount() == 0) {
+        $parent = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if($parent === false) {
             return false;
         }
-
-        $parent = $stmt->fetch(PDO::FETCH_ASSOC);
 
         // manipulate
         // split out [spouse_]full_name fields and try to guess name pieces
         // ** ASSIGNMENT (=) HERE INTENTIONAL, NOT COMPARISON (==)
-        if($selfName = $this->guessNamePartsFromFull($parent['full_name'])) {
+        if($selfName = $this->guessNamePartsFromFull($parent['FULL_NAME'])) {
             $parent = array_merge($parent, $selfName);
-            unset($parent['full_name']);
+            unset($parent['FULL_NAME']);
         }
-        if($spouseName = $this->guessNamePartsFromFull($parent['spouse_full_name'], 'Spouse')) {
+        if($spouseName = $this->guessNamePartsFromFull($parent['SPOUSE_FULL_NAME'], 'Spouse')) {
             $parent = array_merge($parent, $spouseName);
-            unset($parent['spouse_full_name']);
+            unset($parent['SPOUSE_FULL_NAME']);
         }
 
         return $parent;
@@ -57,7 +57,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      * @param string $prefix
      * @return array|bool
      */
-    public function guessNamePartsFromFull($fullName, $prefix = '') {
+    protected function guessNamePartsFromFull($fullName, $prefix = '') {
         // strip out any consecutive or trailing spaces
         $fullName = trim(preg_replace("/\s\s+/", ' ', $fullName));
 
@@ -110,7 +110,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         */
 
         $stmt = $this->getDatabase()->prepare("
-            SELECT s.student_id AS StudentID, s.firstname AS StudentGiven1, s.surname AS StudentSurname,
+            SELECT s.student_number AS StudentID, s.firstname AS StudentGiven1, s.surname AS StudentSurname,
               s.birthdate AS StudentBirthDate, s.house AS StudentHouse, s.year_level AS StudentYearLevel,
               s.tutor_name AS StudentTutor, s.head_of_house AS StudentHeadOfHouse, s.form_name AS StudentForm,
               s.form_staff_name AS StudentFormStaffName, p.full_name AS StudentEmergencyName,
@@ -118,7 +118,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
             FROM db2inst1.schoolbox_students s
             LEFT JOIN db2inst1.schoolbox_parent_student ps ON s.student_number = ps.student_number
             LEFT JOIN db2inst1.schoolbox_parents p ON ps.carer_number = p.carer_number
-            WHERE student_number = :id
+            WHERE s.student_number = :id
         ");
 
         // retrieve
@@ -126,14 +126,12 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
             'id' => $externalUserId
         ));
 
-        if($stmt->rowCount() == 0) {
-            return false;
-        }
-
         // manipulate
 
-        // use the first record to plaster the data into an array
+        // use the first record to plaster the data into an array, or it will be returned false if nonexistent
         $student = $stmt->fetch(PDO::FETCH_ASSOC);
+        $student['STUDENTYEARLEVEL'] = preg_replace('/[^0-9]/', '', $student['STUDENTYEARLEVEL']);
+
         // parse rows into student - it will be replicated by being joined to parent rows, so need to flatten
         while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             // now populate emergency contacts by stacking
@@ -146,11 +144,8 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
             }
         }
 
-        // normalise the birth date
-        // TODO check this regex actually works
-        preg_match('/([\w]+)\s+([\d]+)\s+([\d]+)/', $student['StudentBirthDate'], $matches);
-        $student['StudentBirthDate'] = strtotime($matches[2] . ' ' . $matches[1] . ' ' . $matches[3]);
-
+        // normalise the birth date: change YYYY-mm-dd to timestamp
+        $student['STUDENTBIRTHDATE'] = strtotime($student['STUDENTBIRTHDATE']);
 
         return $student;
     }
@@ -167,8 +162,31 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      * @param $externalUserId
      */
     public function getStudentContactList($externalUserId) {
-        // TODO not yet implemented in edumate views
-        return -1;
+        $stmt = $this->getDatabase()->prepare("
+            SELECT p.carer_number, full_name, email, mobile
+            FROM db2inst1.schoolbox_parents p
+            INNER JOIN db2inst1.schoolbox_parent_student ps ON p.carer_number = ps.carer_number
+            WHERE ps.student_number = :id
+        ");
+
+        $stmt->execute(array(
+            'id' => $externalUserId
+        ));
+
+        $parents = array();
+        while($row = $stmt->fetch(DB2::FETCH_ASSOC)) {
+            // split out [spouse_]full_name fields and try to guess name pieces
+            // ** ASSIGNMENT (=) HERE INTENTIONAL, NOT COMPARISON (==)
+            if($selfName = $this->guessNamePartsFromFull($row['FULL_NAME'])) {
+                $row = array_merge($row, $selfName);
+                unset($row['FULL_NAME']);
+            }
+
+            $parents[] = $row;
+        }
+
+        return $parents;
+
     }
 
 
@@ -179,21 +197,22 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     public function getCurrentSemester() {
         $stmt = $this->getDatabase()->prepare("
             SELECT report_period
-            FROM db2inst1.report_periods
-            WHERE start_date < NOW()
-            AND end_date > NOW()
+            FROM db2inst1.schoolbox_report_periods
+            WHERE start_date < CURRENT_TIMESTAMP
+            AND end_date > CURRENT_TIMESTAMP
         ");
 
         $stmt->execute();
 
-        if($stmt->rowCount() != 1) {
-            return false;
+        $semester = $stmt->fetchColumn();
+
+        if($semester) {
+            $_SESSION['FileSemester'] = $semester;
+            $_SESSION['FileYear'] = date('Y');
+            return true;
         }
 
-        $_SESSION['FileSemester'] = $stmt->fetchColumn();
-        $_SESSION['FileYear'] = date('Y');
-
-        return true;
+        return false;
     }
 
 
@@ -206,7 +225,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     public function getSubjectList($externalUserId, $userId) {
         if($this->getGroupHandler()->isStaff($userId)) {
             $sql = "
-                SELECT class_code AS ClassCode, class AS `name`
+                SELECT c.class_code AS ClassCode, class AS name
                 FROM db2inst1.schoolbox_teacherclass tc
                 LEFT JOIN db2inst1.schoolbox_classes c ON tc.class_code = c.class_code
                 WHERE tc.staff_number = :id
@@ -214,10 +233,10 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         }
         elseif($this->getGroupHandler()->isStudent($userId)) {
             $sql = "
-                SELECT class_code AS ClassCode, class AS `name`
+                SELECT c.class_code AS ClassCode, class AS name
                 FROM db2inst1.schoolbox_studentclass sc
                 LEFT JOIN db2inst1.schoolbox_classes c ON sc.class_code = c.class_code
-                WHERE tc.student_number = :id
+                WHERE sc.student_number = :id
             ";
         }
         else {
@@ -233,7 +252,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         $classes = array();
 
         while($class = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $classes[$class['ClassCode']] = $class;
+            $classes[$class['CLASSCODE']] = $class;
         }
 
         return array_values($classes);
@@ -271,23 +290,32 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
 
 
     public function getEmail($externalUserId) {
-        // TODO: Implement getEmail() method.
+        // TODO implement from schoolbox internal rather than external
     }
 
     public function getPortrait($externalUserId) {
         // TODO find out strategy for locating and returning portraits at TIGS
     }
 
+    /**
+     * Sync Method: Student
+     */
     public function getStudentUserAccountInfo() {
-        // TODO: Implement getStudentUserAccountInfo() method.
+        // TODO Student Sync
     }
 
+    /**
+     * Sync Method: Parent
+     */
     public function getParentUserAccountInfo() {
-        // TODO: Implement getParentUserAccountInfo() method.
+        // TODO Parent Sync
     }
 
+    /**
+     * Sync Method: Staff
+     */
     public function getStaffUserAccountInfo() {
-        // TODO: Implement getStaffUserAccountInfo() method.
+        // TODO Staff Sync
     }
 
 
@@ -299,10 +327,12 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     public function getParentSync($externalUserId) { }
 
     /**
-     * Method not implemented
+     * Duplicate method, use getStudentContactList() instead
      * @deprecated
      */
-    public function getParentsOf($externalUserId) { }
+    public function getParentsOf($externalUserId) {
+        return $this->getStudentContactList($externalUserId);
+    }
 
     /**
      * Method not implemented

@@ -7,7 +7,10 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class DB2Statement {
+class DB2Statement implements Iterator {
+
+    private $ptr = null;
+    private $valid = false;
 
     /**
      * The SQL being executed
@@ -59,7 +62,17 @@ class DB2Statement {
             }
         }
 
-        return db2_execute($this->statement, $sequential);
+        $success = db2_execute($this->statement, $sequential);
+
+        if($success) {
+            $this->ptr = 0;
+            $this->valid = true;
+        }
+        else {
+            echo 'DB2 SQL Error: ', db2_stmt_errormsg($this->statement);
+        }
+
+        return $success;
     }
 
     /**
@@ -119,7 +132,7 @@ class DB2Statement {
     }
 
     /**
-     * Magic method for
+     * Magic method for returning the query string
      *
      * @param $name
      * @return mixed
@@ -130,4 +143,58 @@ class DB2Statement {
         }
         return null;
     }
+
+
+    /*** ITERATOR METHODS FOR MAXIMUM PDO COMPATIBILITY ***/
+
+    /**
+     * Return the current element
+     *
+     * @return mixed Can return any type.
+     */
+    public function current() {
+        $fetch = $this->fetch();
+        if($fetch === false) {
+            $this->valid = false;
+        }
+        return $fetch;
+    }
+
+    /**
+     * Move forward to next element
+     *
+     * @return void Any returned value is ignored.
+     */
+    public function next() {
+        ++$this->ptr;
+    }
+
+    /**
+     * Return the key of the current element
+     *
+     * @return mixed scalar on success, or null on failure.
+     */
+    public function key() {
+        return $this->ptr;
+    }
+
+    /**
+     * Checks if current position is valid
+     *
+     * @return boolean The return value will be casted to boolean and then evaluated.
+     *       Returns true on success or false on failure.
+     */
+    public function valid() {
+        return $this->valid;
+    }
+
+    /**
+     * Rewind the Iterator to the first element
+     *
+     * @return void Any returned value is ignored.
+     */
+    public function rewind() {
+        // cursor cannot be rewound, do nothing
+    }
+
 }

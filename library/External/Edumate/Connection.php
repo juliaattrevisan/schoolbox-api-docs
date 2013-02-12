@@ -20,7 +20,7 @@ abstract class External_Edumate_Connection {
     private $userHandler;
 
     /**
-     * @var PDO
+     * @var DB2
      */
     private $database;
 
@@ -28,10 +28,25 @@ abstract class External_Edumate_Connection {
      * Build a generic connection to an Edumate db
      */
     public function __construct () {
-        // TODO : CONFIRM -- external_db_host can contain the DSN
-        $this->setDatabase(new PDO(Cfg::get('external_db_host'), Cfg::get('external_db_user'), Cfg::get('external_db_passwd')));
+        // build a DSN from the config vars
+        $host = Cfg::get('external_db_host');
+        $db = Cfg::get('external_db_db');
+        $un = Cfg::get('external_db_user');
+        $pw = Cfg::get('external_db_passwd');
+
+        $dsn = "DATABASE=$db;";
+        $hosts = explode(':', $host);
+
+        if(count($hosts) == 2) {
+            $dsn .= "HOSTNAME={$hosts[0]};PORT={$hosts[1]};";
+        }
+        elseif(count($hosts) == 1) {
+            $dsn .= "HOSTNAME={$hosts[0]};";
+        }
+
+        $this->setDatabase(new DB2($dsn, $un, $pw));
         $this->setGroupHandler(new Group());
-        $this->getUserHandler(new User());
+        $this->setUserHandler(new User());
     }
 
     /**
@@ -44,7 +59,7 @@ abstract class External_Edumate_Connection {
 
     /**
      * Retrieve the database connector
-     * @return PDO
+     * @return DB2
      */
     protected function getDatabase() {
         return $this->database;
