@@ -106,7 +106,9 @@ $html = preg_replace_callback(
             if (is_file($filePath)) {
 
                 $relativePath = 'Shared/' . $zipFolder->uniqueFileName($file['realname']);
-                copy($filePath, sprintf('%s/%s', $zipFolder->tmpFolder, $relativePath));
+				if (is_readable($filePath)) {
+					copy($filePath, sprintf('%s/%s', $zipFolder->tmpFolder, $relativePath));
+				}
 
                 // replace html path
                 return $relativePath;
@@ -137,7 +139,10 @@ $html = preg_replace_callback(
 
         $targetPath = sprintf('%s/%s', $zipFolder->tmpFolder, dirname($matches[2]));
         @mkdir($targetPath, 0777, true);
-        copy(sprintf('%s/%s', $wwwDir, $matches[2]), sprintf('%s/%s', $targetPath, basename($matches[2])));
+		$src_file = sprintf('%s/%s', $wwwDir, $matches[2]);
+		if (is_readable($src_file)) {
+			copy($src_file, sprintf('%s/%s', $targetPath, basename($matches[2])));
+		}
 
         return $matches[1] . ltrim($matches[2], '/');
 
@@ -160,7 +165,9 @@ $html = preg_replace_callback(
         $srcFile = $image->save();
 
         $filename = 'portrait.jpg';
-        copy($srcFile, sprintf('%s/%s', $zipFolder->tmpFolder, $filename));
+		if (is_readable($srcFile)) {
+			copy($srcFile, sprintf('%s/%s', $zipFolder->tmpFolder, $filename));
+		}
 
         return $filename;
 
@@ -169,22 +176,13 @@ $html = preg_replace_callback(
 
 // manually copy remaining assets (hidden within js or css references)
 mkdir(sprintf('%s/images/slimbox', $zipFolder->tmpFolder), 0777, true);
-copy(
-    sprintf('%s/images/slimbox/loading.gif', $wwwDir), sprintf('%s/images/slimbox/loading.gif', $zipFolder->tmpFolder)
-);
-copy(
-    sprintf('%s/images/slimbox/closelabel.gif', $wwwDir),
-    sprintf('%s/images/slimbox/closelabel.gif', $zipFolder->tmpFolder)
-);
-copy(
-    sprintf('%s/images/slimbox/nextlabel.gif', $wwwDir),
-    sprintf('%s/images/slimbox/nextlabel.gif', $zipFolder->tmpFolder)
-);
-copy(
-    sprintf('%s/images/slimbox/prevlabel.gif', $wwwDir),
-    sprintf('%s/images/slimbox/prevlabel.gif', $zipFolder->tmpFolder)
-);
-
+foreach (array('loading.gif', 'closelabel.gif', 'nextlabel.gif', 'prevlabel.gif') as $file) {
+	$src_file = sprintf('%s/images/slimbox/%s', $wwwDir, $file);
+	$dst_file = sprintf('%s/images/slimbox/%s', $zipFolder->tmpFolder, $file);
+	if (is_readable($src_file)) {
+		copy($src_file, $dst_file);
+	}
+}
 
 // save html to tmpFolder
 file_put_contents(sprintf('%s/%s', $zipFolder->tmpFolder, 'index.html'), $html);
