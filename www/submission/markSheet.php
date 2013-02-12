@@ -5,13 +5,12 @@ if(!isset($this)) {
     SitePage::localRedir('/submission/markSheet');
 }
 
+$performExport = false;
 if(is_numeric($this->arg[0])) {
     $categoryID = $this->arg[0];
-    $performExport = false;
-}
-elseif($this->arg[0] == 'export' && $this->arg[1]) {
-    $categoryID = $this->arg[1];
-    $performExport = true;
+	if ($this->arg[3] == 'export') {
+		$performExport = true;
+	}
 }
 else {
     error(2); // not enough info submitted ...is there a better error?
@@ -20,7 +19,7 @@ else {
 
 
 if (isset($_GET['year']) || isset($_GET['semester'])) {
-    $this->localRedir("/submission/markSheet/{$this->arg[0]}/{$_GET['year']}/{$_GET['semester']}");
+    $this->localRedir("/submission/markSheet/{$categoryID}/{$_GET['year']}/{$_GET['semester']}");
 }
 
 $currentYear = date('Y');
@@ -43,6 +42,11 @@ else {
     $semester = $currentSemester;
 }
 
+//
+// Set year and semester into the template.
+$this->setVar('SELECTED_YEAR',     $year);
+$this->setVar('SELECTED_SEMESTER', $semester);
+
 $subHandler = new Submission();
 $retHandler = new SubmissionReturn();
 $catHandler = new Category();
@@ -55,8 +59,8 @@ $attemptHandler = new Assess_Attempt();
 $sectionHandler = new Assess_Section();
 $responseHandler = new Assess_Response();
 
-if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
-    $category = $catHandler->getByID($this->arg[1]);
+if ($performExport && $categoryID) {
+    $category = $catHandler->getByID($categoryID);
 
     /* Open an output stream so we can use fputcsv
       */
@@ -96,10 +100,10 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
     } else {
         //Retrieve student list from group membership
         $groupHandler = new Group;
-        $studentList = $groupHandler->getMemberList($this->arg[1]);
+        $studentList = $groupHandler->getMemberList($categoryID);
     }
 
-    $subList = $subHandler->getAllForUserCategory($this->arg[1], $_SESSION['id']);
+    $subList = $subHandler->getAllForUserCategory($categoryID, $_SESSION['id'], $year, $semester);
 
     if (is_array($subList)) {
         $csv = array('Synergetic ID', 'Surname', 'Firstname');
@@ -197,7 +201,7 @@ if ($this->arg[0] == 'export' && is_numeric($this->arg[1])) {
 
     exit;
 }
-elseif (is_numeric($this->arg[0])) {
+elseif (is_numeric($categoryID)) {
     $this->setFile(TEMPLATE_content, 'submission/markSheet.html');
     $this->setTitle('Class Mark Sheet');
     $this->setTab('submission');
@@ -248,7 +252,7 @@ elseif (is_numeric($this->arg[0])) {
         $this->parse('year_option_block', 'year_option', true);
     }
 
-    $category = $catHandler->getByID($this->arg[0]);
+    $category = $catHandler->getByID($categoryID);
 
     if ($category['code'] != "") {
         $this->setVar('CATEGORY', $category['name'] . ' (' . $category['code'] . ')');
@@ -279,10 +283,10 @@ elseif (is_numeric($this->arg[0])) {
     // retrieve student list from group membership
     else {
         $groupHandler = new Group;
-        $studentList = $groupHandler->getMemberList($this->arg[0]);
+        $studentList = $groupHandler->getMemberList($categoryID);
     }
 
-    $subList = $subHandler->getAllForUserCategory($this->arg[0], $_SESSION['id'], $year, $semester);
+    $subList = $subHandler->getAllForUserCategory($categoryID, $_SESSION['id'], $year, $semester);
 
     $this->setVar('sub_head_block', '');
     $this->setVar('assess_head_block', '');
