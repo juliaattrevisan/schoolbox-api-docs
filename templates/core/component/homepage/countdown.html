@@ -4,15 +4,6 @@
     <script type='text/javascript' src='/javascript/jquery.lwtCountdown-1.0-modified.js'></script>
     <script type='text/javascript'>
         $j(function () {
-            $j('#countdownTime{COMPONENT_INSTANCE_ID}').timepicker({
-                'timeFormat':'H:i',
-                'step':15
-            });
-
-            $j('#countdownDate{COMPONENT_INSTANCE_ID}').datepicker({
-                dateFormat:'dd M yy'
-            });
-
             $j('#countdown{COMPONENT_INSTANCE_ID}').countDown({
                 targetDate:{
                     'day':{DEADLINE_DAY},

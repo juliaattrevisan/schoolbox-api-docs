@@ -1,2 +1,13 @@
 <script type='text/javascript' src='/javascript/jquery.timepicker.js'></script>
+<script type="text/javascript">
+$j(function() {
+    $j('#countdownTime{COMPONENT_INSTANCE_ID}').timepicker({
+        'timeFormat':'H:i',
+        'step':15
+    });
+    $j('#countdownDate{COMPONENT_INSTANCE_ID}').datepicker({
+        dateFormat:'dd M yy'
+    });
+});
+</script>
 <input id='countdownDate{COMPONENT_INSTANCE_ID}' name='date' type='text' value='{COMPONENT_CONFIG_DATE}'/>
