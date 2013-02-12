@@ -48,6 +48,12 @@ class Alaress_Image_Cache_Portrait {
       */
     private $externalHandler = null;
     private $groupHandler = null;
+    protected $userHandler = null;
+
+    /**
+     * Schoolbox user ID (as opposed to external ID)
+     */
+    protected $user_id = null;
 
     /**
      * Constructor
@@ -61,6 +67,7 @@ class Alaress_Image_Cache_Portrait {
         $this->setExternalUserId($externalUserId);
         $this->setKey($key);
 
+        $this->setUserHandler(new User());
         $this->setExternalHandler(new External_User());
         $this->setGroupHandler(new Group());
 
@@ -161,7 +168,7 @@ class Alaress_Image_Cache_Portrait {
              * e.g. <id>-Web.dat, <id>-ChickenPox.dat, etc. where Web and ChickenPox
              * correspond to a series of transformations
              */
-			$id = substr($info['filename'], 0, strrpos($info['filename'], '.'));
+            $id = substr($info['filename'], 0, strrpos($info['filename'], '.'));
 
             $cachedFilename = $id . '-' . $this->getKey() . '.dat';
 
@@ -182,7 +189,7 @@ class Alaress_Image_Cache_Portrait {
 
             return $this->standardise($info);
         }
-		else {
+        else {
             die('Could not read file.');
         }
     }
@@ -343,7 +350,11 @@ class Alaress_Image_Cache_Portrait {
      * @return mixed
      */
     private function getUserId() {
-        return $this->user['uid'];
+        if (!isset($this->user_id)) {
+            $user_details = $this->getUserHandler()->getBySynergy($this->getExternalUserId());
+            $this->user_id = $user_details['uid'];
+        }
+        return $this->user_id;
     }
 
     /**
@@ -362,6 +373,27 @@ class Alaress_Image_Cache_Portrait {
      */
     private function getExternalHandler() {
         return $this->externalHandler;
+    }
+
+
+    /**
+     * Sets Schoolbox user handler, required for retrieving user's ID.
+     *
+     * @param $userHandler
+     */
+    public function setUserHandler($userHandler)
+    {
+        $this->userHandler = $userHandler;
+    }
+
+    /**
+     * Gets Schoolbox user handler.
+     *
+     * @return User
+     */
+    public function getUserHandler()
+    {
+        return $this->userHandler;
     }
 
     /**
