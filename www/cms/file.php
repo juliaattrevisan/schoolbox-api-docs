@@ -140,6 +140,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
             );
 			$this->setVar($output);
 			$fileList = $myFileHandler->getAllInFolder($folder['id']);
+			$this->setVar('my_files_block', '');
 			if (is_array($fileList)) {
 				foreach ($fileList as $file) {
 					$output = array(
@@ -150,10 +151,10 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 					$this->parse('my_files_block', 'my_files', true);
 				}
 			}
+			$this->parse('optgroup_block', 'optgroup', true);
 		}
 	}
 
-	$this->parse('optgroup_block', 'optgroup', true);
 	$this->setVar('my_files_block', '');
 
 	/* Check for files in the root
