@@ -107,7 +107,6 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 	if(strrchr($bcc, '@'))
 	{
 		$bcc = str_replace(";",",",$bcc);
-		$headers['Bcc'] = $bcc;
 		$recipients['Bcc'] = $bcc;
 	}
 
