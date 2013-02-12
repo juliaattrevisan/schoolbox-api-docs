@@ -155,6 +155,10 @@ class Session
         ldap_set_option($ds, LDAP_OPT_REFERRALS, $referrals);
         @ldap_bind($ds, $this->ldap_escape($ldap_user), utf8_encode(Cfg::get('ldap_pass')));
         $searchString = "(" . Cfg::get('ldap_username') . "=" . $this->ldap_escape($username) . ")";
+        $ldap_search_filter = Cfg::get('ldap_search_filter');
+        if (strlen($ldap_search_filter)) {
+            $searchString = sprintf('(&(%s)%s)', $ldap_search_filter, $searchString);
+        }
         $result = ldap_search($ds, $ldap_base, $searchString, array('dn'));
         // user exists
         if ($result) {
