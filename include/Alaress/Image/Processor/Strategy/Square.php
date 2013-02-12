@@ -79,6 +79,8 @@ class Alaress_Image_Processor_Strategy_Square extends Alaress_Image_Processor_St
 			$startY = 0;
 		}
 
+        $this->alphaFill();
+
 		/* Resize the canvas to fit the new resized dimensions, so
 		 * you don't get excess canvas space
 		 */
