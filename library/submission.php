@@ -475,9 +475,18 @@ class Submission extends DeprecatedModel {
         }
 
         $q[] = "
-            SELECT sb.id, sb.category, ft.id AS type_id, ft.name AS typeName, sb.owner,
-              UNIX_TIMESTAMP(sb.open_date) AS open, UNIX_TIMESTAMP(sb.date) AS date,
-              UNIX_TIMESTAMP(sb.late_date) AS late, sb.name, sb.description, sb.created
+            SELECT
+                sb.id,
+                sb.category,
+                ft.id AS type_id,
+                ft.name AS typeName,
+                sb.owner,
+                UNIX_TIMESTAMP(sb.open_date) AS open,
+                UNIX_TIMESTAMP(sb.date) AS date,
+                UNIX_TIMESTAMP(sb.late_date) AS late,
+                sb.name,
+                sb.description,
+                sb.created
             FROM submission_box sb
             LEFT JOIN file_type ft ON sb.type = ft.id
             WHERE sb.category = '$categoryID'
@@ -487,9 +496,18 @@ class Submission extends DeprecatedModel {
         ";
 
         $q[] = "
-            SELECT assess.assess_id, assess.category_id, file_type.id AS type_id, file_type.name AS typeName,
-              assess.user_id AS owner, UNIX_TIMESTAMP(assess.start) AS open, UNIX_TIMESTAMP(assess.finish) AS date,
-              '' AS late, assess.title AS name, assess.description AS description, assess.created_at AS created
+            SELECT
+                assess.assess_id AS id,
+                assess.category_id AS category,
+                file_type.id AS type_id,
+                file_type.name AS typeName,
+                assess.user_id AS owner,
+                UNIX_TIMESTAMP(assess.start) AS open,
+                UNIX_TIMESTAMP(assess.finish) AS date,
+                '' AS late,
+                assess.title AS name,
+                assess.description AS description,
+                assess.created_at AS created
             FROM assess
             LEFT JOIN file_type ON file_type.id = assess.type
             WHERE category_id = '$categoryID'
@@ -1160,6 +1178,7 @@ class Submission extends DeprecatedModel {
             $conditional = '= 0';
         }
 
+        $this_year = date('Y');
         $q0 = "
             SELECT
               '0' kind, sb.id, sb.name `title`, ft.name `type`, UNIX_TIMESTAMP(sb.date) AS `date`, UNIX_TIMESTAMP(sb.late_date) AS late_date,
@@ -1169,6 +1188,7 @@ class Submission extends DeprecatedModel {
             LEFT JOIN category c ON c.`id` = sb.`category`
             LEFT JOIN student_submission ss ON sb.id = ss.box_id AND ss.owner = '$studentID'
             WHERE c.id $conditional AND sb.deleted IS FALSE
+            AND YEAR(sb.date) = $this_year
             GROUP BY sb.id
             ORDER BY sb.date ASC
             ";
@@ -1181,8 +1201,9 @@ class Submission extends DeprecatedModel {
             LEFT JOIN file_type ft ON ft.id = a.`type`
             LEFT JOIN category c ON c.`id` = a.`category_id`
             LEFT JOIN assess_attempt aa ON a.`assess_id` = aa.`assess_id` AND aa.user_id = '$studentID'
-            WHERE c.id $conditional AND a.deleted_at IS NULL
+            WHERE c.id $conditional
             AND a.availability = 'assess'
+            AND YEAR(a.finish) = $this_year
             GROUP BY a.assess_id
             ORDER BY a.finish ASC
         ";

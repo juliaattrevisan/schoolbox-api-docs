@@ -216,10 +216,6 @@ echo -e "Backing up Config File:\c";
 cp $schoolbox_dir/www/conf/conf.php /tmp/schoolbox_config.php >> /dev/null;
 errorCheck;
 
-echo -e "Backing up HTACCESS File:\c";
-cp $schoolbox_dir/www/.htaccess /tmp/htaccess.file >> /dev/null;
-errorCheck;
-
 echo -e "Backing up Database:\c";
 mysqldump --user=$sqluser --password=$sqlpass $sqldb >> /tmp/schoolbox_$sqldb$cur_ver.sql
 errorCheck;
@@ -231,8 +227,8 @@ errorCheck;
 echo -e "Restoring Configuration File:\c";
 mv /tmp/schoolbox_config.php $schoolbox_dir/www/conf/conf.php;
 errorCheck;
-echo -e "Restoring HTACCESS File:\c";
-cp /tmp/htaccess.file $schoolbox_dir/www/.htaccess  >> /dev/null;
+echo -e "Ensuring .htaccess file does not exist:\c";
+rm -f $schoolbox_dir/www/.htaccess;
 errorCheck;
 
 }

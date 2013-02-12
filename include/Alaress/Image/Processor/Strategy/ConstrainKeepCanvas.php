@@ -17,6 +17,13 @@
 class Alaress_Image_Processor_Strategy_ConstrainKeepCanvas extends Alaress_Image_Processor_Strategy_Abstract implements Alaress_Image_Processor_Strategy_Interface {
 
 	/**
+	 * Background colours are used for deciding transparency in pngs
+	 *
+	 * @var array
+	 */
+	private $bgColors = array();
+
+	/**
 	 * Constructor
 	 *
 	 * @param $args
@@ -33,11 +40,14 @@ class Alaress_Image_Processor_Strategy_ConstrainKeepCanvas extends Alaress_Image
 
 		/* Apply background color
 		 */
+		$this->setBgColors($args['bgcolor']);
 		$this->applyBackgroundColor($args['bgcolor']);
 	}
 
 	/**
 	 * Manipulate image
+	 *
+	 * Extended canvas backgrounds are always transparent
 	 *
 	 * @param $image
 	 * @return null
@@ -48,8 +58,32 @@ class Alaress_Image_Processor_Strategy_ConstrainKeepCanvas extends Alaress_Image
 		*/
 		$dimensions = $this->boundingBox($image);
 
+		$bgColor = $this->getBgColors();
+
+		$this->alphaFill();
 		imagecopyresampled($this->getCanvas(), $image, 0, 0, 0, 0, $dimensions['width'], $dimensions['height'], imagesx($image), imagesy($image));
 
 		return $this->getCanvas();
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set bgcolours
+	 *
+	 * @param array $bgColors
+	 */
+	private function setBgColors($bgColors) {
+		$this->bgColors = $bgColors;
+	}
+
+	/**
+	 * Get bgcolours
+	 *
+	 * @return array
+	 */
+	private function getBgColors() {
+		return $this->bgColors;
 	}
 }
