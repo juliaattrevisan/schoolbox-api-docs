@@ -1160,9 +1160,7 @@ class Submission extends DeprecatedModel {
             $conditional = '= 0';
         }
 
-		//
-		// Only return work due this year [SB-1872]
-		$this_year = date('Y');
+        $this_year = date('Y');
         $q0 = "
             SELECT
               '0' kind, sb.id, sb.name `title`, ft.name `type`, UNIX_TIMESTAMP(sb.date) AS `date`, UNIX_TIMESTAMP(sb.late_date) AS late_date,
@@ -1191,7 +1189,6 @@ class Submission extends DeprecatedModel {
             GROUP BY a.assess_id
             ORDER BY a.finish ASC
         ";
-//		printf("<pre>%s\n%s</pre>", $q0, $q1);
 
         /* execute queries and retrieve */
         $r0 = $this->db->getAll($q0);
