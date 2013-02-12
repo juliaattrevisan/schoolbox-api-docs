@@ -15,7 +15,7 @@ class Component_Config_Image extends Component_Config_Abstract {
         $page->setVar('config_images_block', '');
 
         $catHandler = new Category();
-        $imageList = $catHandler->getImages($this->getCategory('id'), true);
+        $imageList = $catHandler->getImages($this->getCategory('id'), 0, true);
 
         if (is_array($imageList)) {
             foreach ($imageList as $image) {
