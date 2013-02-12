@@ -120,7 +120,7 @@ class Synchronise_Synergetic_StMichaels_Strategy_Parent extends Synchronise_Syne
 			}
 
             // we can't know whether or not the password has been changed, always sync all parents...no skipping
-			$user = $this->getUserHandler()->getBySynergy($currentSynergyId);
+			$user = $this->getUserHandler()->getBySynergyAndGroup($currentSynergyId, self::PARENT_GROUP_ID);
 
             // user exists in schoolbox: perform update
             if($user) {
