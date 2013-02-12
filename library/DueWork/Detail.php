@@ -199,7 +199,10 @@ class DueWork_Detail {
 
 
         if (!$data = $this->sitepageData) {
-            $page->setVar('student_row_block', 'This subject has no students in it.');
+            $page->setVar('student_row_block',  'This subject has no students in it.');
+			$page->setVar('download_btn_block', '');
+			$page->setVar('modify_btn_block',   '');
+			$page->setVar('DUEWORK_ARCHIVED',   '');
             return;
         }
 
