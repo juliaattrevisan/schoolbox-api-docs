@@ -105,6 +105,7 @@ do
 	# Don't run update if already at that release version
 	if [ $release != $sqlver ];
 	then
+		echo "Running update $release";
 		# Only run release upgrade if the scripts_list actually exists
 		if [ -f $instdir/updates/$release/scripts_list ];
 		then
