@@ -22,9 +22,6 @@ instdir=`readlink -f $fullpath/../`;
 baselength=`echo $instdir/updates/ | wc -m`;
 package=${instdir##*/};
 
-backupdir="/var/lib/$package";
-backupfile="$backupdir/`date +%Y-%m-%d_%H-%M-%S`.sql";
-
 curdir=`pwd`;
 
 echo "Starting SQL update process";
@@ -62,6 +59,10 @@ then
 	echo "Unable to collect current database version. Please check your database credentials.";
 	exit;
 fi
+
+backupdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='file_dir' \G;" | grep 'value' | cut -d' ' -f2`;
+backupdir=`readlink -f $backupdir/../`
+backupfile="$backupdir/`date +%Y-%m-%d_%H-%M-%S`.sql";
 
 echo "Current SQL Version: "$sqlver;
 echo "New SQL Version: "$newver;
