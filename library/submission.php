@@ -1187,7 +1187,7 @@ class Submission extends DeprecatedModel {
             LEFT JOIN file_type ft ON ft.id = sb.type
             LEFT JOIN category c ON c.`id` = sb.`category`
             LEFT JOIN student_submission ss ON sb.id = ss.box_id AND ss.owner = '$studentID'
-            WHERE c.id $conditional
+            WHERE c.id $conditional AND sb.deleted IS FALSE
             AND YEAR(sb.date) = $this_year
             GROUP BY sb.id
             ORDER BY sb.date ASC
