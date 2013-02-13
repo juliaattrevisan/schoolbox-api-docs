@@ -570,15 +570,17 @@ class SitePage extends Page {
         $this->setBlock("navTpl", "mgroup", "mgroup_section");
         $this->setBlock("mgroup", "mgroup_block", "my_groups");
 
-        $query = "SELECT category.name, userAccess.sid, userAccess.type
-                     FROM userAccess, category
-                     WHERE userAccess.uid = '" . $_SESSION['id'] . "'
-                     AND userAccess.sid = category.id
-                     AND userAccess.type > 0
-                     AND category.template <> 0
-                     ORDER BY category.name
-               ";
-        $this->db->query($query);
+        $query = "
+            SELECT cat.name, ua.sid, ua.type
+            FROM userAccess AS ua
+            INNER JOIN category AS cat ON ua.sid=cat.id
+            INNER JOIN homepage_config AS hc ON cat.id=hc.cid
+            WHERE ua.uid = %d
+            AND ua.type > 0
+            AND hc.template <> 0
+            ORDER BY cat.name
+        ";
+        $this->db->query(sprintf($query, $_SESSION['id']));
         if ($this->db->countRows() > 0) {
 
             while ($group = $this->db->getNextArray()) {
