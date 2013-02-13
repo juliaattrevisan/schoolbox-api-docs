@@ -39,12 +39,12 @@ class Synchronise_Synergetic_StMichaels_Strategy_Parent extends Synchronise_Syne
 			SELECT DISTINCT
 				StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname,
 				StudentContactDefaultEmail, StudentContactOccupEmail, c1.DefaultEmailCode, c1.DirectoryIncludeFlag,
-				pl1.UserPassword StudentContactPassword,
+				c1.NetworkLogin StudentContactNetworkLogin, pl1.UserPassword StudentContactPassword,
 
 				StudentContactSpouseID, StudentContactSpouseTitle, StudentContactSpousePreferred,
 				StudentContactSpouseSurname, StudentContactSpouseDefaultEmail, StudentContactSpouseOccupEmail,
 				c2.DefaultEmailCode SpouseDefaultEmailCode, c2.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
-				pl2.UserPassword StudentContactSpousePassword,
+				c2.NetworkLogin StudentContactSpouseNetworkLogin, pl2.UserPassword StudentContactSpousePassword,
 
 				StudentYearLevel
 			FROM SynergyOne.dbo.vStudentContactAllAddress vscaa
@@ -134,7 +134,7 @@ class Synchronise_Synergetic_StMichaels_Strategy_Parent extends Synchronise_Syne
         // user does not exist, retrieve immutable fields from synergetic
         else {
             // ['id'] is not populated because this is a create
-            $targetUser['username'] = $currentUser["StudentContact{$fieldVariant}ID"];
+            $targetUser['username'] = $currentUser["StudentContact{$fieldVariant}NetworkLogin"];
             $targetUser['synergy_id'] = $currentUser["StudentContact{$fieldVariant}ID"];
         }
 
