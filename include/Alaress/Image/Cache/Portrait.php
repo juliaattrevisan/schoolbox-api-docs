@@ -113,7 +113,8 @@ class Alaress_Image_Cache_Portrait {
         /* Everyone can always see their own pics
            * Otherwise implement specific policies
            */
-        if ($_SESSION['id'] == $this->getUserId()) {
+        $user_id = $this->getUserId();
+        if ($_SESSION['id'] == $user_id) {
             return true;
         }
 
@@ -123,24 +124,30 @@ class Alaress_Image_Cache_Portrait {
             return true;
         }
 
-        /* Parents can always see their children's portraits
-           */
-        if ($this->getGroupHandler()->isParentOfChild($this->getUserId())) {
+        //
+        // Student photos:
+        // always visible by their parents
+        // visible by other students if photos are not protected.
+        if ($this->getGroupHandler()->isParentOfChild($user_id)) {
             return true;
         }
-
-        /* Students can see other students' portraits if Hide Student Photo policy is disabled
-           */
-        if ((Cfg::get('protect_student_photo') == 0) && ($this->getGroupHandler()->isStudent(
-        )) && ($this->getGroupHandler()->isStudent($this->getUserId()))
-        ) {
-            return true;
+        if ($this->getGroupHandler()->isStudent($user_id)) {
+            if (!Cfg::get('protect_student_photo')
+                && $this->getGroupHandler()->isStudent()
+            ) {
+                return true;
+            }
         }
 
-        /* Staff members can see other staff members' portraits if Hide Teacher Photo policy is disabled
-           */
-        if ((Cfg::get('protect_teacher_photo') == 0) && $this->getGroupHandler()->isStaff($this->getUserId())) {
-            return true;
+        //
+        // Staff photos:
+        // visible by students and parents, if staff photos aren't protected.
+        if ($this->getGroupHandler()->isStaff($user_id)) {
+            if (!Cfg::get('protect_teacher_photo')
+                && ($this->getGroupHandler()->isStudent() || $this->getGroupHandler()->isParent())
+            ) {
+                return true;
+            }
         }
 
         return false;
