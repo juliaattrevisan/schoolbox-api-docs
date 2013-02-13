@@ -95,7 +95,7 @@ class Synchronise_Synergetic_Moriah_Strategy_Parent extends Synchronise_Synerget
         elseif($currentUser['StudentYearLevel'] < 13) {
             $newUser['ParentCat'][] = sprintf("Year %02d Information", $currentUser['StudentYearLevel']);
         }
-        elseif($currentUser['StudentYearLevel'] <= 40) {
+        elseif($currentUser['StudentYearLevel'] <= 50) {
             $newUser['ParentCat'][] = "Preschool Information";
         }
 
@@ -148,7 +148,7 @@ class Synchronise_Synergetic_Moriah_Strategy_Parent extends Synchronise_Synerget
         elseif($currentUser['StudentYearLevel'] < 13) {
             $spouse['ParentCat'][] = sprintf("Year %02d Information", $currentUser['StudentYearLevel']);
         }
-        elseif($currentUser['StudentYearLevel'] <= 40) {
+        elseif($currentUser['StudentYearLevel'] <= 50) {
             $newUser['ParentCat'][] = "Preschool Information";
         }
 
@@ -261,7 +261,7 @@ class Synchronise_Synergetic_Moriah_Strategy_Parent extends Synchronise_Synerget
                 $cats = $user['ParentCat'];
                 unset($user['ParentCat']);
                 $this->executeCreateUpdate($user);
-                $dbUser = $this->userHandler->getBySynergy($user['synergy_id']);
+                $dbUser = $this->userHandler->getBySynergyAndGroup($user['synergy_id'], self::PARENT_GROUP_ID);
                 $dbUser['ParentCat'] = $cats;
                 $this->unenrolFromParentGroups($dbUser);
                 $this->enrolIntoParentGroups($dbUser);
