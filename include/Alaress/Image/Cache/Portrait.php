@@ -48,6 +48,12 @@ class Alaress_Image_Cache_Portrait {
       */
     private $externalHandler = null;
     private $groupHandler = null;
+    protected $userHandler = null;
+
+    /**
+     * Schoolbox user ID (as opposed to external ID)
+     */
+    protected $user_id = null;
 
     /**
      * Constructor
@@ -61,6 +67,7 @@ class Alaress_Image_Cache_Portrait {
         $this->setExternalUserId($externalUserId);
         $this->setKey($key);
 
+        $this->setUserHandler(new User());
         $this->setExternalHandler(new External_User());
         $this->setGroupHandler(new Group());
 
@@ -106,7 +113,8 @@ class Alaress_Image_Cache_Portrait {
         /* Everyone can always see their own pics
            * Otherwise implement specific policies
            */
-        if ($_SESSION['id'] == $this->getUserId()) {
+        $user_id = $this->getUserId();
+        if ($_SESSION['id'] == $user_id) {
             return true;
         }
 
@@ -116,24 +124,30 @@ class Alaress_Image_Cache_Portrait {
             return true;
         }
 
-        /* Parents can always see their children's portraits
-           */
-        if ($this->getGroupHandler()->isParentOfChild($this->getUserId())) {
+        //
+        // Student photos:
+        // always visible by their parents
+        // visible by other students if photos are not protected.
+        if ($this->getGroupHandler()->isParentOfChild($user_id)) {
             return true;
         }
-
-        /* Students can see other students' portraits if Hide Student Photo policy is disabled
-           */
-        if ((Cfg::get('protect_student_photo') == 0) && ($this->getGroupHandler()->isStudent(
-        )) && ($this->getGroupHandler()->isStudent($this->getUserId()))
-        ) {
-            return true;
+        if ($this->getGroupHandler()->isStudent($user_id)) {
+            if (!Cfg::get('protect_student_photo')
+                && $this->getGroupHandler()->isStudent()
+            ) {
+                return true;
+            }
         }
 
-        /* Staff members can see other staff members' portraits if Hide Teacher Photo policy is disabled
-           */
-        if ((Cfg::get('protect_teacher_photo') == 0) && $this->getGroupHandler()->isStaff($this->getUserId())) {
-            return true;
+        //
+        // Staff photos:
+        // visible by students and parents, if staff photos aren't protected.
+        if ($this->getGroupHandler()->isStaff($user_id)) {
+            if (!Cfg::get('protect_teacher_photo')
+                && ($this->getGroupHandler()->isStudent() || $this->getGroupHandler()->isParent())
+            ) {
+                return true;
+            }
         }
 
         return false;
@@ -161,7 +175,7 @@ class Alaress_Image_Cache_Portrait {
              * e.g. <id>-Web.dat, <id>-ChickenPox.dat, etc. where Web and ChickenPox
              * correspond to a series of transformations
              */
-			$id = substr($info['filename'], 0, strrpos($info['filename'], '.'));
+            $id = substr($info['filename'], 0, strrpos($info['filename'], '.'));
 
             $cachedFilename = $id . '-' . $this->getKey() . '.dat';
 
@@ -182,7 +196,7 @@ class Alaress_Image_Cache_Portrait {
 
             return $this->standardise($info);
         }
-		else {
+        else {
             die('Could not read file.');
         }
     }
@@ -343,7 +357,11 @@ class Alaress_Image_Cache_Portrait {
      * @return mixed
      */
     private function getUserId() {
-        return $this->user['uid'];
+        if (!isset($this->user_id)) {
+            $user_details = $this->getUserHandler()->getBySynergy($this->getExternalUserId());
+            $this->user_id = $user_details['uid'];
+        }
+        return $this->user_id;
     }
 
     /**
@@ -362,6 +380,27 @@ class Alaress_Image_Cache_Portrait {
      */
     private function getExternalHandler() {
         return $this->externalHandler;
+    }
+
+
+    /**
+     * Sets Schoolbox user handler, required for retrieving user's ID.
+     *
+     * @param $userHandler
+     */
+    public function setUserHandler($userHandler)
+    {
+        $this->userHandler = $userHandler;
+    }
+
+    /**
+     * Gets Schoolbox user handler.
+     *
+     * @return User
+     */
+    public function getUserHandler()
+    {
+        return $this->userHandler;
     }
 
     /**
