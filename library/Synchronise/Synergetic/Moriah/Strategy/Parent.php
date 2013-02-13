@@ -221,7 +221,7 @@ class Synchronise_Synergetic_Moriah_Strategy_Parent extends Synchronise_Synerget
                     $cats = $user['ParentCat'];
                     unset($user['ParentCat']);
                     $this->executeCreateUpdate($user);
-                    $dbUser = $this->userHandler->getBySynergy($user['synergy_id']);
+                    $dbUser = $this->userHandler->getBySynergyAndGroup($user['synergy_id'], self::PARENT_GROUP_ID);
                     $dbUser['ParentCat'] = $cats;
                     $this->unenrolFromParentGroups($dbUser);
                     $this->enrolIntoParentGroups($dbUser);
