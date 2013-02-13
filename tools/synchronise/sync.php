@@ -14,7 +14,15 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 if (Cfg::get('external_sync_data') == 1) {
 
-    $sync = new Synchronise_Facade(ucfirst(Cfg::get('site_location')), isset($options['v']), isset($options['perform-update']));
+    $siteLocation = Cfg::get('site_location');
+
+    // check for Saint Something as best we can in a simple fashion
+    if(preg_match('/^st([^aeiouyr])/', $siteLocation, $matches) > 0) {
+        // uppercase the 3rd character (eg stmichaels to stMichaels)
+        $siteLocation[2] = strtoupper($siteLocation[2]);
+    }
+
+    $sync = new Synchronise_Facade(ucfirst($siteLocation), isset($options['v']), isset($options['perform-update']));
 
     $stategies = explode(' ', Cfg::get('sync_patterns'));
 
