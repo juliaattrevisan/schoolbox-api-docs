@@ -39,12 +39,12 @@ class Synchronise_Synergetic_StMichaels_Strategy_Parent extends Synchronise_Syne
 			SELECT DISTINCT
 				StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname,
 				StudentContactDefaultEmail, StudentContactOccupEmail, c1.DefaultEmailCode, c1.DirectoryIncludeFlag,
-				c1.NetworkLogin StudentContactNetworkLogin, pl1.UserPassword StudentContactPassword,
+				pl1.UserName StudentContactNetworkLogin, pl1.UserPassword StudentContactPassword,
 
 				StudentContactSpouseID, StudentContactSpouseTitle, StudentContactSpousePreferred,
 				StudentContactSpouseSurname, StudentContactSpouseDefaultEmail, StudentContactSpouseOccupEmail,
 				c2.DefaultEmailCode SpouseDefaultEmailCode, c2.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
-				c2.NetworkLogin StudentContactSpouseNetworkLogin, pl2.UserPassword StudentContactSpousePassword,
+				pl2.UserName StudentContactSpouseNetworkLogin, pl2.UserPassword StudentContactSpousePassword,
 
 				StudentYearLevel
 			FROM SynergyOne.dbo.vStudentContactAllAddress vscaa
@@ -189,6 +189,11 @@ class Synchronise_Synergetic_StMichaels_Strategy_Parent extends Synchronise_Syne
         }
 
         $this->getVerboseFilter()->setNewUser($currentUser);
+
+        if(!$currentUser['username']) {
+            $this->getVerboseFilter()->skip();
+            return;
+        }
 
         // perform update if the user has an existing Schoolbox ID set
         if(isset($currentUser['id'])) {
