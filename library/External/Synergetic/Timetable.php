@@ -35,9 +35,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 		$periodCount = 0;
 
 		while($period = $this->getDatabase()->getNextArray() ) {
-
-            print_r($period);
-
 			preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['TimeTo'], $TimeToMatches);
 			preg_match('/([0-9]+):([0-9]+):[0-9]+:[0-9]+(AM|PM)/', $period['TimeFrom'], $TimeFromMatches);
 
