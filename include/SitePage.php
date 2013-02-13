@@ -577,7 +577,6 @@ class SitePage extends Page {
             INNER JOIN homepage_config AS hc ON cat.id=hc.cid
             WHERE ua.uid = %d
             AND ua.type > 0
-            AND hc.template <> 0
             ORDER BY cat.name
         ";
         $this->db->query(sprintf($query, $_SESSION['id']));
