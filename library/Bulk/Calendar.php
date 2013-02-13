@@ -86,14 +86,16 @@ class Bulk_Calendar extends Bulk_Abstract {
 					$publishDate = new Alaress_Date_Format('0000-00-00', 'y-m-d');
 				}
 
-				if ((trim($thisRow[0]) != '') && (trim($thisRow[3]) != '')) {
+				$name       = $thisRow[3];
+				$event_type = $thisRow[6];
+				if ((trim($thisRow[0]) != '') && (trim($name) != '')) {
 					$event = array(
 						'owner' => $uid,
 						'access' => 3,
 						'date' => $date->getDatabase(),
 						'startTime' => $thisRow[1],
 						'endTime' => $thisRow[2],
-						'note' => $thisRow[3],
+						'note' => $name,
 						'detail' => $thisRow[4],
 						'location' => $thisRow[5],
 
@@ -101,23 +103,29 @@ class Bulk_Calendar extends Bulk_Abstract {
 						 */
 						'priority' => 0,
 
-						'type' => $thisRow[6],
+						'type' => $event_type,
 						'attendance' => $thisRow[8],
 						'publish_date' => $publishDate->getDatabase(),
 						'campusList' => $campusList,
 						'groupList' => $groupList,
 					);
-
-					if ($calendarHandler->create($event)) {
+					if (empty($event_type)) {
 						$output[] = array(
-							'name' => Scrub::html($thisRow[3]),
+							'name' => Scrub::html($name),
+							'status' => 'Not Added',
+							'error' => 'Event type not set',
+						);
+					}
+					elseif ($calendarHandler->create($event)) {
+						$output[] = array(
+							'name' => Scrub::html($name),
 							'status' => 'Added',
 							'error' => 'OK',
 						);
 					}
 					else {
 						$output[] = array(
-							'name' => Scrub::html($thisRow[3]),
+							'name' => Scrub::html($name),
 							'status' => 'Not Added',
 							'error' => 'Could not create event',
 						);
@@ -125,7 +133,7 @@ class Bulk_Calendar extends Bulk_Abstract {
 				}
 				else {
 					$output[] = array(
-						'name' => Scrub::html($thisRow[3]),
+						'name' => Scrub::html($name),
 						'status' => 'Not Added',
 						'error' => 'Missing date and/or name',
 					);
