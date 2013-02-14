@@ -90,7 +90,7 @@ class Synchronise_Synergetic_Moriah_Strategy_Parent extends Synchronise_Synerget
 //        printf(" ** %s **\n", $currentUser['StudentYearLevel']);
 
         if($currentUser['StudentYearLevel'] == 0) {
-            $newUser['ParentCat'][] = "Year O-K Information";
+            $newUser['ParentCat'][] = "Year 0-K Information";
         }
         elseif($currentUser['StudentYearLevel'] < 13) {
             $newUser['ParentCat'][] = sprintf("Year %02d Information", $currentUser['StudentYearLevel']);
