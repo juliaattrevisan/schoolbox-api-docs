@@ -125,9 +125,14 @@ if ($allQuestions) {
         $this->setBlock('answerFormFragment', 'writable_mark', 'writable_mark_block');
         $this->setBlock('answerFormFragment', 'readonly_mark', 'readonly_mark_block');
 
-        /* Reset answer options from previous iteration
+        /* Reset answer options and marks from previous iteration
          */
         $this->setVar('answerOption_block', '');
+        $this->setVar('writable_update_block', '');
+        $this->setVar('writable_comment_block', '');
+        $this->setVar('writable_mark_block', '');
+        $this->setVar('readonly_comment_block', '');
+        $this->setVar('readonly_mark_block', '');
 
         $this->setVar(array(
             'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
@@ -150,6 +155,19 @@ if ($allQuestions) {
          */
         $answerHandler->reviewResponse($this, $currentQuestion['question_id']);
 
+        //
+        // Mark and comment blocks must be parsed before the answerInputs block
+        // gets parsed, so that the correct template vars are exposed to these
+        // blocks.
+        if ($readonly) {
+            $this->parse('readonly_comment_block', 'readonly_comment');
+            $this->parse('readonly_mark_block',    'readonly_mark');
+        }
+        else {
+            $this->parse('writable_update_block',  'writable_update');
+            $this->parse('writable_comment_block', 'writable_comment');
+            $this->parse('writable_mark_block',    'writable_mark');
+        }
         $this->parse('answerInputs_block', 'answerFormFragment', true);
         $this->parse('question_block', 'question', true);
 
@@ -159,27 +177,9 @@ if ($allQuestions) {
 
         $this->setVar('answerFormFragment', '');
         $this->setVar('answerInputs_block', '');
-
-        if ($readonly) {
-            $this->setVar('writable_update_block', '');
-
-            $this->setVar('writable_comment_block', '');
-            $this->parse('readonly_comment_block', 'readonly_comment');
-
-            $this->setVar('writable_mark_block', '');
-            $this->parse('readonly_mark_block', 'readonly_mark');
-
-        } else {
-            $this->parse('writable_update_block', 'writable_update');
-
-            $this->parse('writable_comment_block', 'writable_comment');
-            $this->setVar('readonly_comment_block', '');
-
-            $this->parse('writable_mark_block', 'writable_mark');
-            $this->setVar('readonly_mark_block', '');
-        }
     }
-} else {
+}
+else {
     $this->setVar('question_block', '');
 }
 
