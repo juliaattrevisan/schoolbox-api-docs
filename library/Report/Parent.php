@@ -58,6 +58,12 @@ class Report_Parent extends Report_Abstract {
 			error(155);
 		}
 
+		//
+		// Parents may only search in their student's year level
+		if ($this->isYearsRestricted() && !in_array($yearLevel, $this->getChildrensYears())) {
+			error(155);
+		}
+
 		$this->setYearLevel(trim($yearLevel));
 		$this->setSearchName(trim($searchName));
 		$this->setSearchBoardingStatus(trim($searchBoardingStatus));
@@ -180,23 +186,8 @@ class Report_Parent extends Report_Abstract {
 			$this->getPage()->setVar('search_form_option_block', '');
 		}
 
-		/* If restrict_parent_directory is on, give people a list of Years they can
-		 * search on so they don't need to guess. But this only applies to parents
-		 */
-		if (Cfg::get('restrict_parent_directory') && !$this->getGroupHandler()->isSuperuser() && !$this->getGroupHandler()->isStaff()) {
-			$allYears = array();
-
-			/* Find all years you can chooze
-			 */
-			if (is_array($_SESSION['children']) && count($_SESSION['children'])) {
-				foreach($_SESSION['children'] as $currentChild) {
-					$allYears[$currentChild['year']] = true;
-				}
-			}
-
-			/* Compress options
-			 */
-			$allYears = array_keys($allYears);
+		if ($this->isYearsRestricted()) {
+			$allYears = $this->getChildrensYears();
 
 			foreach($allYears as $currentYear) {
 				if ($currentYear == $this->getYearLevel()) {
@@ -223,6 +214,42 @@ class Report_Parent extends Report_Abstract {
 			$this->getPage()->parse('has_year_input_block', 'has_year_input');
 		}
 	}
+
+
+	/**
+	 * Is this user restricted to accessing certain year levels?
+	 *
+	 * e.g. a parent may be restricted from viewing the details outside of
+	 * children outside of their children's year levels.
+	 *
+	 * @return bool
+	 */
+	protected function isYearsRestricted()
+	{
+		return Cfg::get('restrict_parent_directory')
+			&& !$this->getGroupHandler()->isSuperuser()
+			&& !$this->getGroupHandler()->isStaff()
+		;
+	}
+
+
+	/**
+	 * Gets the year levels in which this parent has got children.
+	 *
+	 * @return array
+	 */
+	protected function getChildrensYears()
+	{
+		$allYears = array();
+		if (is_array($_SESSION['children']) && count($_SESSION['children'])) {
+			foreach ($_SESSION['children'] as $currentChild) {
+				$allYears[$currentChild['year']] = true;
+			}
+		}
+		$allYears = array_keys($allYears);
+		return $allYears;
+	}
+
 
 	/**
 	 * Render data
