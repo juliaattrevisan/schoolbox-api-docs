@@ -185,6 +185,7 @@ if (!empty($result['user'])) {
     $page->setBlock('user', 'helpdesk', 'helpdesk_block');
     $page->setBlock('user', 'eportfolio', 'eportfolio_block');
     $page->setBlock('user', 'modify', 'modify_block');
+    $page->setBlock('user', 'boarder_leave', 'boarder_leave_block');
     $page->setVar(array(
         'USER_DISP_COUNT' => count($result['user']),
         'USER_COUNT' => $count['user'],
@@ -228,6 +229,7 @@ if (!empty($result['user'])) {
         $page->setVar('helpdesk_block');
         $page->setVar('timetable_block');
         $page->setVar('eportfolio_block');
+        $page->setVar('boarder_leave_block');
 
         if (!$group->isStudent($user['id']) || (!$group->isStaff() && !$group->isParentOfChild($user['id'])))
             $page->setVar('due_work_block');
@@ -253,6 +255,11 @@ if (!empty($result['user'])) {
                 if ($user['eportfolio_enabled'])
                     $page->parse('eportfolio_block', 'eportfolio');
 
+            }
+            if (Cfg::get('boarder_leave_enabled') == '1') {
+                if ($group->isStaff()) {
+                    $page->parse('boarder_leave_block', 'boarder_leave');
+                }
             }
         } else {
             $page->setVar('helpdesk_block');
