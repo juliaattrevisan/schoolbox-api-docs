@@ -53,9 +53,14 @@ class Synchronise_Synergetic_Balcombe_Strategy_Student extends Synchronise_Syner
 		// Year level
 		$newUser['year'] = $currentUser['StudentYearLevel'];
 
+        // we are only including student in the 'B' campus in this sync
+        if($currentUser['StudentCampus'] !== 'B') {
+            return false;
+        }
+
 		// Campus config: needs to map to a campus id
-		$newUser['defaultCampus'] = $this->getCampusFromCode($currentUser['StudentCampus']);
-		$newUser['campus'] = array($this->getCampusFromCode($currentUser['StudentCampus']));
+		$newUser['defaultCampus'] = 1;
+		$newUser['campus'] = array(1);
 
 		// Student Group ID
 		$newUser['group_id'] = $this->getGroupIDFromYearLevel($currentUser['StudentYearLevel']);
@@ -73,6 +78,11 @@ class Synchronise_Synergetic_Balcombe_Strategy_Student extends Synchronise_Syner
 		$this->getVerboseFilter()->intro();
 
 		foreach($this->getList() as $currentUser) {
+
+            // if the student was skipped in setup, don't attempt to create/update them
+            if($currentUser === false) {
+                continue;
+            }
 
 			/* Generate details about the new user
 			 */
