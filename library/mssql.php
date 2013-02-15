@@ -19,6 +19,22 @@ class MSSQL {
 	 */
 	protected $encoding = 'ISO-8859-1';
 
+	/**
+	 * Is encoding converted or not for calls to getAll/Row/One?
+	 *
+	 * @var bool
+	 */
+	protected $convert_encoding = false;
+
+	/**
+	 * If encoding has been switched on or off for a single request, the
+	 * previous value of $this->convert_encoding is here.
+	 *
+	 * @var bool
+	 */
+	protected $previous_encoding = null;
+
+
 	function MSSQL($db = false, $optionalConfig = false) {
 
 		/* Blasphemy (heresy unavoidable)
@@ -95,15 +111,14 @@ class MSSQL {
 	 * Returns an associative array of row, false if none exists
 	 *
 	 * @param string $sql_q
-	 * @param bool   $convert_encoding True if all fields are to be converted
-	 *                                 from DB's encoding to UTF-8
 	 *
 	 * @return array|bool
 	 */
-	function getRow($sql_q, $convert_encoding = false)
+	function getRow($sql_q)
 	{
 		$result = $this->query($sql_q);
-		$row = $this->getNextArray($result, $convert_encoding);
+		$row = $this->getNextArray($result);
+		$this->resetConvertEncoding();
 		return $row;
 	}
 
@@ -112,19 +127,18 @@ class MSSQL {
 	 * Returns an associative array of row, false if none exists
 	 *
  	 * @param string $sql_q
-	 * @param bool   $convert_encoding True if all fields are to be converted
-	 *                                 from DB's encoding to UTF-8
 	 *
 	 * @return array|bool
 	 */
-	function getOne($sql_q, $convert_encoding = false)
+	function getOne($sql_q)
 	{
 		$result = $this->query($sql_q);
 		$row = mssql_fetch_assoc($result);
 		$one = $row[0];
-		if ($convert_encoding) {
+		if ($this->getConvertEncoding()) {
 			$one = $this->convertEncoding($one);
 		}
+		$this->resetConvertEncoding();
 		return $one;
 	}
 
@@ -133,21 +147,19 @@ class MSSQL {
 	 * returns false if no rows
 	 *
 	 * @param string $sql_q
-	 * @param bool   $convert_encoding True if all fields are to be converted
-	 *                                 from DB's encoding to UTF-8
 	 * @return array|bool
 	 */
-	function getAll($sql_q, $convert_encoding = false)
+	function getAll($sql_q)
 	{
 		$result = $this->query($sql_q);
 		$table = array();
 		$results = false;
 		//loop through all records and insert into array table
-		while($line = $this->getNextArray($result, $convert_encoding))
-		{
+		while ($line = $this->getNextArray($result)) {
 			$table[] = $line;
 			$results = true;
 		}
+		$this->resetConvertEncoding();
 		if($results)
 			return $table;
 		else
@@ -159,14 +171,11 @@ class MSSQL {
 	 * Returns the next result from a query result resource
 	 * Can be optionally passed a result resource otherwise it uses current result resource
 	 *
-	 * @param int  $result           The resource to use, or 0 to use
-	 *                               $this->result
-	 * @param bool $convert_encoding True if all fields are to be converted
-	 *                               from DB's encoding to UTF-8
+	 * @param int  $result The resource to use, or 0 to use $this->result
 	 *
 	 * @return array|bool
 	 */
-	function getNextArray($result = 0, $convert_encoding = false)
+	function getNextArray($result = 0)
 	{
 		if($result)
 				$return_array = mssql_fetch_assoc($result);
@@ -175,7 +184,7 @@ class MSSQL {
 		else
 			return false;
 
-		if ($convert_encoding && is_array($return_array)) {
+		if ($this->getConvertEncoding() && is_array($return_array)) {
 			$return_array = array_map(array($this, 'convertEncoding'), $return_array);
 		}
 
@@ -211,6 +220,84 @@ class MSSQL {
 	protected function convertEncoding($value)
 	{
 		return mb_convert_encoding($value, 'UTF-8', $this->encoding);
+	}
+
+
+	/**
+	 * Gets whether character set conversion is enabled.
+	 *
+	 * @return bool
+	 */
+	public function getConvertEncoding()
+	{
+		return $this->convert_encoding;
+	}
+
+
+	/**
+	 * Sets whether character set conversion is enabled.
+	 *
+	 * @param $convert
+	 */
+	public function setConvertEncoding($convert)
+	{
+		$this->convert_encoding = $convert;
+	}
+
+
+	/**
+	 * Sets whether character set conversion was enabled for previous request.
+	 *
+	 * @param $previous_encoding
+	 */
+	protected function setPreviousEncoding($previous_encoding)
+	{
+		$this->previous_encoding = $previous_encoding;
+	}
+
+	/**
+	 * Gets whether character set conversion was enabled for previous request.
+	 *
+	 * @return bool
+	 */
+	protected function getPreviousEncoding()
+	{
+		return $this->previous_encoding;
+	}
+
+
+	/**
+	 * Sets character set conversion, for the next call to getAll(), getRow() or
+	 * getOne() only.
+	 *
+	 * After that call is returned, character set conversion is switched back to
+	 * its previous setting.
+	 *
+	 * @param bool $convert
+	 */
+	public function setConvertEncodingForNextResult($convert)
+	{
+		$previous_encoding = $this->getPreviousEncoding();
+		if (!isset($previous_encoding)) {
+			$this->setPreviousEncoding($this->getConvertEncoding());
+		}
+		$this->setConvertEncoding($convert);
+	}
+
+
+	/**
+	 * Sets character set conversion back to what it was before
+	 * setConvertEncodingForNextResult was called.
+	 *
+	 * @return void
+	 */
+	protected function resetConvertEncoding()
+	{
+		$previous_encoding = $this->getPreviousEncoding();
+		if (isset($previous_encoding)) {
+			$this->setConvertEncoding($previous_encoding);
+		}
+		$this->setPreviousEncoding(null);
 	}
 
 }
