@@ -96,4 +96,22 @@ abstract class External_Edumate_Connection {
     protected function getUserHandler() {
         return $this->userHandler;
     }
+
+    /**
+     * Internal DB2-specific code to turn CAPITALISEDFIELDS into NotCapitalisedFields
+     *
+     * @param array $record
+     * @param array $fieldNames
+     * @return array
+     */
+    protected function normaliseFields(array $record, array $fieldNames) {
+        foreach($fieldNames as $field) {
+            $upper = strtoupper($field);
+            if(array_key_exists($upper, $record)) {
+                $record[$field] = $record[$upper];
+                unset($record[$upper]);
+            }
+        }
+        return $record;
+    }
 }

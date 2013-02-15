@@ -69,7 +69,11 @@ class DB2Statement implements Iterator {
             $this->valid = true;
         }
         else {
-            echo 'DB2 SQL Error: ', db2_stmt_errormsg($this->statement);
+            // non-fatal errors can occur here, so don't want them displayed but would like a log of them
+            $logFile = Config::get('logs_dir') . '/' . 'db2.err';
+            $fp = fopen($logFile, 'a');
+            fwrite($fp, sprintf("[%s] %s", date("Y-m-d H:i:s"), db2_stmt_errormsg($this->statement)));
+            fclose($fp);
         }
 
         return $success;

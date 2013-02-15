@@ -24,7 +24,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
 
         // prepare
         $stmt = $this->getDatabase()->prepare("
-            SELECT firstname, surname, $studentClass.student_number AS synergy_id, year_level AS yearlevel, house
+            SELECT firstname, surname AS lastname, $studentClass.student_number AS synergy_id, year_level AS yearlevel, house
             FROM  $studentClass
             LEFT JOIN $students ON $studentClass.student_number = $students.student_number
             WHERE $studentClass.class_code = :code
@@ -41,7 +41,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
             // distinct-ify
             if(is_numeric($student['SYNERGY_ID'])) {
                 $student['YEARLEVEL'] = preg_replace("/[^0-9]/", '', $student['YEARLEVEL']);
-                $students[$student['SYNERGY_ID']] = $student;
+                $students[$student['SYNERGY_ID']] = array_change_key_case($student, CASE_LOWER);
             }
         }
         return array_values($students);
@@ -57,7 +57,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
     public function getTeacherName($classCode) {
         // prepare
         $stmt = $this->getDatabase()->prepare("
-            SELECT staff_number
+            SELECT staff_number AS StaffID
                 FROM db2inst1.schoolbox_teacherclass
                 WHERE class_code = :code
         ");
@@ -69,9 +69,13 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
 
         // manipulate
         $teachers = array();
+        $i = 0;
         while($teacher = $stmt->fetchColumn()) {
             if(is_numeric($teacher)) {
-                $teachers[$teacher] = $teacher;
+                $teachers[$teacher] = array(
+                    'StaffID' => $teacher['STAFFID'],
+                    'StaffSeq' => $i++
+                );
             }
         }
 

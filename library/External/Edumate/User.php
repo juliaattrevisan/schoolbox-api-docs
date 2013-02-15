@@ -18,8 +18,10 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     public function getParent($externalUserId) {
         // prepare
 
+        $caseSensitiveFields = array('ID', 'Email', 'MobilePhone', 'SpouseID', 'SpouseMobilePhone');
+
         $stmt = $this->getDatabase()->prepare("
-            SELECT full_name, email AS Email, mobile AS MobilePhone, spouse_carer_number AS SpouseID, spouse_full_name,
+            SELECT carer_number AS ID, full_name, email AS Email, mobile AS MobilePhone, spouse_carer_number AS SpouseID, spouse_full_name,
               spouse_mobile AS SpouseMobilePhone
             FROM db2inst1.schoolbox_parents
             WHERE carer_number = :id
@@ -48,7 +50,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
             unset($parent['SPOUSE_FULL_NAME']);
         }
 
-        return $parent;
+        return $this->normaliseFields($parent, $caseSensitiveFields);
     }
 
     /**
@@ -109,9 +111,14 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
              vStudents.StudentBoarder
         */
 
+        // use this for mapping DB2INDICES to NormalIndices
+        $caseSensitiveFields = array('StudentID', 'StudentGiven1', 'StudentSurname', 'StudentBirthDate',
+            'StudentHouseDescription', 'StudentYearLevel', 'StudentTutor', 'StudentHeadOfHouse', 'StudentForm',
+            'StudentFormStaffName', 'StudentEmergencyName', 'StudentEmergencyPhone');
+
         $stmt = $this->getDatabase()->prepare("
             SELECT s.student_number AS StudentID, s.firstname AS StudentGiven1, s.surname AS StudentSurname,
-              s.birthdate AS StudentBirthDate, s.house AS StudentHouse, s.year_level AS StudentYearLevel,
+              s.birthdate AS StudentBirthDate, s.house AS StudentHouseDescription, s.year_level AS StudentYearLevel,
               s.tutor_name AS StudentTutor, s.head_of_house AS StudentHeadOfHouse, s.form_name AS StudentForm,
               s.form_staff_name AS StudentFormStaffName, p.full_name AS StudentEmergencyName,
               p.mobile AS StudentEmergencyPhone
@@ -130,24 +137,50 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
 
         // use the first record to plaster the data into an array, or it will be returned false if nonexistent
         $student = $stmt->fetch(PDO::FETCH_ASSOC);
-        $student['STUDENTYEARLEVEL'] = preg_replace('/[^0-9]/', '', $student['STUDENTYEARLEVEL']);
+
+        if(!$student) {
+            return false;
+        }
+
+        // turn 'Year 08' into 8
+        $student['STUDENTYEARLEVEL'] = preg_replace('/[^0-9]/', '', $student['STUDENTYEARLEVEL']) + 0;
+
+        // sometimes Edumate will return blank emergency contact on the first record...
+        if(strlen($student['STUDENTEMERGENCYNAME'])) {
+            $start = 2;
+        }
+        else {
+            $start = 1;
+            unset($student['STUDENTEMERGENCYNAME']);
+            unset($student['STUDENTEMERGENCYPHONE']);
+        }
 
         // parse rows into student - it will be replicated by being joined to parent rows, so need to flatten
-        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            // now populate emergency contacts by stacking
-            for($i = 2; $i < 4; ++$i) {
-                if(isset($student['StudentEmergency'.$i.'Name'])) {
-                    continue;
-                }
-                $student['StudentEmergency'.$i.'Name'] = $row['StudentEmergencyName'];
-                $student['StudentEmergency'.$i.'Phone'] = $row['StudentEmergencyPhone'];
+        // populate emergency contacts by stacking
+        for($i = $start; $i < 4, $row = $stmt->fetch(PDO::FETCH_ASSOC); ++$i) {
+
+            // logic to compensate for Edumate returning blank emergency contact
+            if(!strlen($row['STUDENTEMERGENCYNAME'])) {
+                --$i;
+                continue;
+            }
+
+            if($i == 1) {
+                $i = '';
+            }
+
+            $student['StudentEmergency'.$i.'Name'] = $row['STUDENTEMERGENCYNAME'];
+            $student['StudentEmergency'.$i.'Phone'] = $row['STUDENTEMERGENCYPHONE'];
+
+            if($i == '') {
+                $i = 1;
             }
         }
 
         // normalise the birth date: change YYYY-mm-dd to timestamp
         $student['STUDENTBIRTHDATE'] = strtotime($student['STUDENTBIRTHDATE']);
 
-        return $student;
+        return $this->normaliseFields($student, $caseSensitiveFields);
     }
 
 
@@ -162,8 +195,17 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      * @param $externalUserId
      */
     public function getStudentContactList($externalUserId) {
+
+        $caseSensitiveFields = array('StudentContactID', 'StudentContactTitle', 'StudentContactPreferred',
+            'StudentContactSurname', 'StudentContactDefaultEmail', 'StudentContactAddress1', 'StudentContactSuburb',
+            'StudentContactPostCode', 'StudentContactState', 'StudentContactPhoneActual', 'StudentContactMobilePhone',
+            'StudentContactOccupPhone', 'StudentContactSpouseID', 'StudentContactSpouseTitle',
+            'StudentContactSpousePreferred', 'StudentContactSpouseSurname', 'StudentContactSpouseMobilePhone',
+            'StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail', 'StudentContactType');
+
         $stmt = $this->getDatabase()->prepare("
-            SELECT p.carer_number, full_name, email, mobile
+            SELECT p.carer_number AS StudentContactID, full_name, email AS StudentContactDefaultEmail,
+              mobile AS StudentContactMobilePhone
             FROM db2inst1.schoolbox_parents p
             INNER JOIN db2inst1.schoolbox_parent_student ps ON p.carer_number = ps.carer_number
             WHERE ps.student_number = :id
@@ -177,12 +219,12 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         while($row = $stmt->fetch(DB2::FETCH_ASSOC)) {
             // split out [spouse_]full_name fields and try to guess name pieces
             // ** ASSIGNMENT (=) HERE INTENTIONAL, NOT COMPARISON (==)
-            if($selfName = $this->guessNamePartsFromFull($row['FULL_NAME'])) {
+            if($selfName = $this->guessNamePartsFromFull($row['FULL_NAME'], 'StudentContact')) {
                 $row = array_merge($row, $selfName);
                 unset($row['FULL_NAME']);
             }
 
-            $parents[] = $row;
+            $parents[] = $this->normaliseFields($row, $caseSensitiveFields);
         }
 
         return $parents;
@@ -225,7 +267,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     public function getSubjectList($externalUserId, $userId) {
         if($this->getGroupHandler()->isStaff($userId)) {
             $sql = "
-                SELECT c.class_code AS ClassCode, class AS name
+                SELECT c.class_code AS code, class AS name
                 FROM db2inst1.schoolbox_teacherclass tc
                 LEFT JOIN db2inst1.schoolbox_classes c ON tc.class_code = c.class_code
                 WHERE tc.staff_number = :id
@@ -233,7 +275,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         }
         elseif($this->getGroupHandler()->isStudent($userId)) {
             $sql = "
-                SELECT c.class_code AS ClassCode, class AS name
+                SELECT c.class_code AS code, class AS name
                 FROM db2inst1.schoolbox_studentclass sc
                 LEFT JOIN db2inst1.schoolbox_classes c ON sc.class_code = c.class_code
                 WHERE sc.student_number = :id
@@ -252,7 +294,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         $classes = array();
 
         while($class = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $classes[$class['CLASSCODE']] = $class;
+            $classes[$class['CODE']] = array_change_key_case($class, CASE_LOWER);
         }
 
         return array_values($classes);
@@ -266,7 +308,6 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      */
     public function getEnrolledStudents($externalUserId) {
         // prepare
-        //
         $stmt = $this->getDatabase()->prepare("
             SELECT student_number
             FROM db2inst1.schoolbox_parent_student
@@ -282,7 +323,9 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         $children = array();
         while($synId = $stmt->fetchColumn()) {
             // ensure a lack of duplicates
-            $children[$synId] = $synId;
+            $children[$synId] = array(
+                'RelatedID' => $synId
+            );
         }
 
         return array_values($children);
