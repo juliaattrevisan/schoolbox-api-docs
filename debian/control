@@ -16,6 +16,7 @@ Depends: apache2,
  mysql-client, mysql-server,
  freetds-common,
  wget,
+ cifs-utils,
  ${misc:Depends}
 Conflicts: javascript-common
 Description: Schoolbox LMS by Alaress Pty. Ltd.
