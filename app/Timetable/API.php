@@ -27,7 +27,7 @@ class Timetable_API {
 
             $today = $timetableHandler->getDayNumber($campus);
 
-            $tableDefinition = $timetableHandler->getTimetableDefinition($campus, 0);
+            $tableDefinition = $timetableHandler->getTimetableDefinition($campus, 1);
 
             if(!is_array($tableDefinition) || !count($tableDefinition) || $_SESSION['timetable'] != 1) {
                 $r = array(
