@@ -307,7 +307,8 @@
 
 /* Overlays */
 .ui-widget-overlay { background: #a6bac9 url(/images/core/jqueryui/ui-bg_flat_20_a6bac9_40x100.png) 50% 50% repeat-x; opacity: .60;filter:Alpha(Opacity=60); }
-.ui-widget-shadow { margin: -10 0 0 6px; padding: 3px; background: #000000 url(/images/core/jqueryui/ui-bg_flat_40_000000_40x100.png) 50% 50% repeat-x; opacity: .20;filter:Alpha(Opacity=20); }/*
+.ui-widget-shadow { margin: -10 0 0 6px; padding: 3px; background: #000000 url(/images/core/jqueryui/ui-bg_flat_40_000000_40x100.png) 50% 50% repeat-x; opacity: .20;filter:Alpha(Opacity=20); }
+/*
  * jQuery UI Resizable 1.8.6
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
