@@ -126,21 +126,23 @@
                 <td></td>
                 <td class="{SUBMISSION_CLASS}">{SUBMISSION_TIME}{SUBMISSION_AFTER_MARK}</td>
                 <td>
+					<div class="table-wrap">
                     <p>
-                        <img class="mimetype" src="/images/mime/22x22/{SUBMISSION_MIMEICON}" alt="{SUBMISSION_FILENAME}"/>
-                        <!-- BEGIN plag_enabled -->
-                        <span class="plag-score {SUBMISSION_PLAG_CLASS}" title="{SUBMISSION_PLAG_SCORE} plagiarism - click to see report">(<a target="_blank" href="{SITE_ROOT}/modules/remote/{SUBMISSION_PLAG_HREF}">{SUBMISSION_PLAG_SCORE}</a>)</span>
-                        <!-- END plag_enabled -->
-                        <span class="submit-filename">{SUBMISSION_FILENAME}</span>
-                    </p>
+						<img class="mimetype" src="/images/mime/22x22/{SUBMISSION_MIMEICON}" alt="{SUBMISSION_FILENAME}"/>
+						<!-- BEGIN plag_enabled -->
+						<span class="plag-score {SUBMISSION_PLAG_CLASS}" title="{SUBMISSION_PLAG_SCORE} plagiarism - click to see report">(<a target="_blank" href="{SITE_ROOT}/modules/remote/{SUBMISSION_PLAG_HREF}">{SUBMISSION_PLAG_SCORE}</a>)</span>
+						<!-- END plag_enabled -->
+						<span class="submit-filename">{SUBMISSION_FILENAME}</span>
+					</p>
 
-                    <div class="button-set">
-                        <a href="/submission/send.php?id={SUBMISSION_ID}" class="btn no-text download" title="Download submission"><span></span></a>
-                        <!-- BEGIN delete_action -->
-                        <a href="/submission/viewSubmissionForm.php?delete={SUBMISSION_ID}" onclick="return(confirm('Remove {OWNER_ESCAPED}\'s submission? '));" class="btn no-text delete" title="Delete submission"><span></span></a>
-                        <!-- END delete_action -->
-                    </div>
-                </td>
+					<div class="button-set">
+						<a href="/submission/send.php?id={SUBMISSION_ID}" class="btn no-text download" title="Download submission"><span></span></a>
+						<!-- BEGIN delete_action -->
+						<a href="/submission/viewSubmissionForm.php?delete={SUBMISSION_ID}" onclick="return(confirm('Remove {OWNER_ESCAPED}\'s submission? '));" class="btn no-text delete" title="Delete submission"><span></span></a>
+						<!-- END delete_action -->
+					</div>
+					</div>
+				</td>
             </tr>
             <!-- END submission_row -->
             <!-- END student_row -->
