@@ -213,8 +213,9 @@ a:hover {
     top: 0;
 }
 #tabs{
-    min-width: 790px;
-    left: 184px;
+    clear: right;
+    position: static;
+    margin-left: 184px;
 }
 .nav-wrapper{background:#f4f4f8;}
 h3, #infoPanel li, #nav h3, .add-component .notification {
@@ -232,8 +233,9 @@ h3, #infoPanel li, #nav h3, .add-component .notification {
 }
 #header{
     min-width: 980px;
-    background: url('/images/jpc/header.png') top left repeat-x;
-    height: 72px;
+    background: #1e125e url('/images/jpc/header.png') top left repeat-x;
+    height: auto;
+    width: 100%;
 }
 
 #header .logo {
@@ -375,6 +377,7 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 #search{
     background: transparent;
     top: -39px;
+    margin-bottom: -31px;
 }
 #search-field{
     background: url('/images/jpc/search-bg.png') top left repeat;
