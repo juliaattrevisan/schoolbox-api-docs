@@ -26,6 +26,7 @@ if (is_numeric($this->arg[0])) {
         $this->setBlock(TEMPLATE_content, "helpdesk", "helpdesk_block");
         $this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
         $this->setBlock(TEMPLATE_content, "boarder_leave", "boarder_leave_block");
+        $this->setBlock(TEMPLATE_content, 'modify', 'modify_block');
         $this->setBlock(TEMPLATE_content, "student_synergy_form", "student_synergy_form_block");
         $this->setBlock(TEMPLATE_content, "student_synergy_tutor", "student_synergy_tutor_block");
         $this->setBlock(TEMPLATE_content, 'contact_synergy', 'contact_synergy_block');
@@ -53,6 +54,7 @@ if (is_numeric($this->arg[0])) {
             $this->setBlock(TEMPLATE_content, "eportfolio", "eportfolio_block");
             $this->setBlock(TEMPLATE_content, "due_work", "due_work_block");
             $this->setBlock(TEMPLATE_content, "staff_synergy", "staff_synergy_block");
+            $this->setBlock(TEMPLATE_content, 'modify', 'modify_block');
         }
     }
 
@@ -70,6 +72,7 @@ if (is_numeric($this->arg[0])) {
         'timetable_link_block' => '',
         'eportfolio_block' => '',
         'boarder_leave_block' => '',
+        'modify_block' => '',
         'contact_synergy_block' => '',
         'due_work_block' => '',
         'helpdesk_block' => '',
@@ -456,6 +459,10 @@ if (is_numeric($this->arg[0])) {
                         $this->parse('boarder_leave_block', 'boarder_leave');
                     }
                 }
+                
+                if ($_SESSION['su']) {
+                    $this->parse('modify_block', 'modify');
+                }
 
                 $this->parse('contact_synergy_block', 'contact_synergy');
 
@@ -484,6 +491,9 @@ if (is_numeric($this->arg[0])) {
                     $this->setVar('VOICEMAIL', $synInfo['StaffVoiceMail']);
 
                     $this->parse('staff_synergy_block', 'staff_synergy');
+                    if ($_SESSION['su']) {
+                        $this->parse('modify_block', 'modify');
+                    }
                 }
             }
         }
