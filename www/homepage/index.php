@@ -214,7 +214,7 @@ $codeCount = count(explode(',', $code));
 $allWidths = $homepageHandler->getColumnWidths();
 
 $this->setVar(array(
-    'HEADING' => Scrub::text($category['name']) . (isset($code) && $codeCount < 2 ? ' (' . $code . ')' : ''),
+    'HEADING' => Scrub::text($category['name']) . (isset($code) && $codeCount < 5 ? ' (' . $code . ')' : ''),
     'CODE' => urlencode(urlencode($code)),
     'ID' => $categoryID,
     'USER_TOKEN' => $_SESSION['key'],
