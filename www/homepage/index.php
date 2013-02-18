@@ -210,11 +210,19 @@ if ($permission >= WRITE_ACCESS) {
 //set the page-level parameters in the template
 $categoryCodes = $catHandler->getCodeForCategory($categoryID);
 $code = $categoryCodes['codes'];
-$codeCount = count(explode(',', $code));
+$codeArray = explode(',', $code);
+
+if(count($codeArray) > 4) {
+    $codeString = implode(',',array_slice($codeArray, 0, 4)).'....';
+}
+else {
+    $codeString = $code;
+}
+
 $allWidths = $homepageHandler->getColumnWidths();
 
 $this->setVar(array(
-    'HEADING' => Scrub::text($category['name']) . (isset($code) && $codeCount < 5 ? ' (' . $code . ')' : ''),
+    'HEADING' => Scrub::text($category['name']) . (isset($code) ? ' (' . $codeString . ')' : ''),
     'CODE' => urlencode(urlencode($code)),
     'ID' => $categoryID,
     'USER_TOKEN' => $_SESSION['key'],
