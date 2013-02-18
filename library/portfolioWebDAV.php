@@ -17,8 +17,11 @@ class Sabre_DAV_Client_Extended extends Sabre_DAV_Client
         }
 
         $settings[CURLOPT_HTTPAUTH] = CURLAUTH_ANY;
-        $settings[CURLOPT_SSL_VERIFYHOST] = false;
-        $settings[CURLOPT_SSL_VERIFYPEER] = false;
+
+        if (Cfg::get('webdav_allow_insecure')) {
+            $settings[CURLOPT_SSL_VERIFYHOST] = false;
+            $settings[CURLOPT_SSL_VERIFYPEER] = false;
+        }
 
         $curl = curl_init($url);
 
@@ -45,15 +48,18 @@ class Sabre_DAV_Client_Extended extends Sabre_DAV_Client
 
         $curl = curl_init($this->getAbsoluteUrl($path));
 
-        curl_setopt_array($curl, array(
-            CURLOPT_HTTPAUTH => CURLAUTH_ANY,
-            CURLOPT_USERPWD => $this->userName . ':' . $this->password,
-            CURLOPT_PUT => true,
-            CURLOPT_INFILE => fopen($file, "r"),
+        $settings = array(
+            CURLOPT_HTTPAUTH   => CURLAUTH_ANY,
+            CURLOPT_USERPWD    => $this->userName . ':' . $this->password,
+            CURLOPT_PUT        => true,
+            CURLOPT_INFILE     => fopen($file, "r"),
             CURLOPT_INFILESIZE => filesize($file),
-            CURLOPT_SSL_VERIFYHOST => 0,
-            CURLOPT_SSL_VERIFYPEER => 0,
-        ));
+        );
+        if (Cfg::get('webdav_allow_insecure')) {
+            $settings[CURLOPT_SSL_VERIFYHOST] = false;
+            $settings[CURLOPT_SSL_VERIFYPEER] = false;
+        }
+        curl_setopt_array($curl, $settings);
 
         return array(
             curl_exec($curl),
