@@ -1,0 +1,18 @@
+<!-- BEGIN banner_logged_in -->
+<form id="search" action="/search.php" method="get">
+	<fieldset>
+		<input id="search-field" type="text" name="keyword" title="search"/>
+		<input id="search-button" type="submit" value="Search"/>
+	</fieldset>
+</form>
+
+<ul id="infoPanel">
+	<li class="first">{SITE_GREETING} <a href="/search/user/{USER_ID}" alt="View Profile" title="View Profile">{SITE_LOGINNAME}</a>|
+	</li>
+	<li><a href="/logout.php" alt="Logout" title="Logout">Logout</a></li>
+	<li><img height="32" width="32" src="/portrait.php?userId={EXTERNAL_ID}&size=square32"/></li>
+</ul>
+
+<!-- END banner_logged_in -->
+<div class="school"></div>
+

@@ -1,0 +1,36 @@
+<div id="nav">
+	<a class="logo" href="/" title="Melbourne Grammar School"><img src="/images/wadhurst/mgs-logo.png" height="146" width="130" /></a>
+	<h3>{SITE_LOCATION} Intranet</h3>
+  {MCSSMENU}
+	<!-- BEGIN msubject -->
+	<h3>My Subjects</h3>
+  <ul>
+    <!-- BEGIN msubject_block --> 
+    <li><a href="/homepage/{MSUBCODE}/">{MSUBJECT}</a></li> 
+    <!-- END msubject_block -->
+  </ul>
+  <!-- END msubject -->
+  <!-- BEGIN mstudent -->
+	<h3>My Students</h3>
+  <ul>
+    <!-- BEGIN mstudent_block --> 
+    <li><a href="/search/user/{MSTUDENT_ID}">{MSTUDENT_NAME} ({MSTUDENT_YEAR})</a></li> 
+    <!-- END mstudent_block -->
+  </ul>
+  <!-- END mstudent -->
+  <!-- BEGIN mgroup --> 
+  <h3>My Groups</h3>
+  <ul>
+  	<!-- BEGIN mgroup_block --> 
+		<li><a href="/homepage/{MGID}/">{MGNAME}</a></li> 
+		<!-- END mgroup_block -->
+  </ul>	
+  <!-- END mgroup --> 
+  <h3>My Links</h3>
+  <ul>
+  	<!-- BEGIN mlink_block -->
+  	<li>{MLINK}</li>
+    <!-- END mlink_block --> 
+    <li><a href="/cms/myLinks">Add Link</a></li>
+  </ul>	
+</div>

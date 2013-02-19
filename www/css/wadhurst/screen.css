@@ -1,596 +1,275 @@
-/* Rounded corners re-added after removed from core */
-.btn.print-it,
-#tabs-homepage #tabs-sub .ui-tabs-nav li a
-{
-    -moz-border-radius: 0;
-    -webkit-border-radius: 0;
-    border-radius: 0;
-}
 
-.admin-contents .level,
-#tabs-homepage .slider-house
-{
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
-}
-
-#tooltip,
-#search,
-#search-field,
-#nav li a:hover,
-#nav ul ul,
-#nav .my-links a,
-.box .close-delete,
-.box .edit em,
-.box .edit span,
-h4.eventListing,
-.btn,
-.submit-btn-plain,
-.evaluation-menu .drop-arrow,
-.cal-bubble .middle,
-.cal-bubble .middle .close,
-.cal-bubble .middle h4 span,
-#category li a,
-.view-submission .drop-parent td:first-child .submission-dropdown
-{
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-}
-
-.active-checkbox,
-.information-notification,
-#search-button,
-.marker,
-.empty-column,
-.admin-contents h2 strong,
-.parent-selection,
-.sortable li div ,
-.settings-nav li a,
-.new-button,
-.dashboard .component,
-.dashboard .component-holder,
-.dashboard #dashboard-layout #position-left,
-.dashboard #dashboard-layout #position-right,
-.evaluation-response li a,
-.evaluation-legend ul li a,
-.submission-dropdown,
-.evaluation-graph-holder .legend,
-.evaluation-category-select li a,
-.archive .menu ul li a,
-.archive .pagination a,
-.chat .chat-message,
-#tabs-homepage #slider,
-#tabs-homepage #slider .ui-slider-handle,
-#tabs-homepage #tabs-sub li.ui-state-default a,
-.saved-colours, .saved-layout,
-.add-component,
-.add-component .notification,
-.image-thumbnail a,
-.shared-success,
-.visible-users li span,
-.mark-box .mark-content,
-.rubric-grade
-{
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-}
-
-.admin-contents,
-.chat .show-users,
-.background
-{
-    -moz-border-radius: 0 0 4px 4px;
-    -webkit-border-radius: 0 0 4px 4px;
-    border-radius: 0 0 4px 4px;
-}
-
-.evaluation-content h2 span
-{
-    -moz-border-radius: 4px 0 0 4px;
-    -webkit-border-radius: 4px 0 0 4px;
-    border-radius: 4px 0 0 4px;
-}
-
-#nav .nav-wrapper,
-#nav ul,
-laber.error,
-.evaluation-content
-{
-    -moz-border-radius: 0 0 3px 3px;
-    -webkit-border-radius: 0 0 3px 3px;
-    border-radius: 0 0 3px 3px;
-}
-#nav h3,
-.box .edit
-{
-    -moz-border-radius: 3px 3px 0 0;
-    -webkit-border-radius: 3px 3px 0 0;
-    border-radius: 3px 3px 0 0;
-}
-
-#category
-{
-    -moz-border-radius: 6px;
-    -webkit-border-radius: 6px;
-    border-radius: 6px;
-}
-
-.box #category
-{
-    -moz-border-radius: 0 0 6px 6px;
-    -webkit-border-radius: 0 0 6px 6px;
-    border-radius: 0 0 6px 6px;
-}
-
-#tabs .navthis a,
-#tabs-homepage .ui-tabs-nav li a
-{
-    -moz-border-radius: 7px 7px 0 0;
-    -webkit-border-radius: 7px 7px 0 0;
-    border-radius: 7px 7px 0 0;
-}
-
-#container {
-    -moz-border-radius: 0 7px 7px 7px;
-    -webkit-border-radius: 0 7px 7px 7px;
-    border-radius: 0 7px 7px 7px;
-}
-
-.admin-nav
-{
-    -moz-border-radius: 8px 8px 0 0;
-    -webkit-border-radius: 8px 8px 0 0;
-    border-radius: 8px 8px 0 0;
-}
-
-.rubric .warning span
-{
-    -moz-border-radius: 10px;
-    -webkit-border-radius: 10px;
-    border-radius: 10px;
-}
-
-.evaluation-content.student-review p.marks-amount
-{
-    -moz-border-radius: 12px;
-    -webkit-border-radius: 12px;
-    border-radius: 12px;
-}
-
-.admin-contents h3 span,
-.admin-form label span.help,
-.dashboard .component .delete-this,
-.submission td span.alert
-{
-    -moz-border-radius: 16px;
-    -webkit-border-radius: 16px;
-    border-radius: 16px;
-}
-/* Rounded-corners end */
-
-
-body  { background:  #213765 url('/images/wadhurst/body-grad.png') repeat-x top; }
-#wrap { background: url('/images/wadhurst/background.png') no-repeat top left; }
-
-a { color: #0079bc; }
-
-a:hover { color: #002c58; }
-
-h2, h2 a, .header_option {
-	color:#fff;
-	background-color: none;
-	font-size:12px;
-}
-
-h2, .calendar-controls {
-	background-repeat:repeat-x;
-	background-color:#0089d5;
-	color:#fff;
-	-moz-background-clip: padding;
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
-	font-weight:bold;
-	font-size:14px;
-	-moz-box-shadow: 0px 1px 2px #b9b9b9, inset 0 0 1px rgba(0,0,0,0.3);
-	box-shadow: 0px 1px 2px #b9b9b9, inset 0 0 1px rgba(0,0,0,0.2);
-    background-image: url('/images/wadhurst/h2-background.png');
+html, body { min-height: 100%; }
+body {
+    background-image: url('/images/wadhurst/background.png');
+    background-color: #fff;
+    background-repeat: repeat-x;
     background-position: left bottom;
 }
-.top h2, .left h2, .right h2 { color: #fff; }
-
-.cal-bubble .time { background: none repeat scroll 0 0 transparent; }
-
-.header_option { background: none repeat scroll 0 0 transparent; }
-
-#tabs {
-	min-width:924px;
-	top:120px;
-	left:256px;
-	height:32px;
-}
 
 #container {
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
-	border-radius: 0;
-	-moz-box-shadow: 0px 1px 1px #bdbdbd;
-	-webkit-box-shadow: 0px 1px 1px #bdbdbd;
-	box-shadow: 0px 1px 1px #bdbdbd;
-	-moz-background-clip: padding;
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
-    position: relative; z-index: 50;
+    margin-left: 200px;
+    margin-right: 0px;
+}
+#wrap-inner {
+    background: -moz-linear-gradient(top,  rgba(255,255,255,1) 202px, rgba(255,255,255,0) 302px);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(202px,rgba(255,255,255,1)), color-stop(302px,rgba(255,255,255,0)));
+    background: -webkit-linear-gradient(top,  rgba(255,255,255,1) 202px,rgba(255,255,255,0) 302px);
+    background: -o-linear-gradient(top,  rgba(255,255,255,1) 202px,rgba(255,255,255,0) 302px);
+    background: -ms-linear-gradient(top,  rgba(255,255,255,1) 202px,rgba(255,255,255,0) 302px);
+    background: linear-gradient(to bottom,  rgba(255,255,255,1) 202px,rgba(255,255,255,0) 302px);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#00ffffff',GradientType=0 );
+    min-height: 302px;
 }
 
-h3, #nav h3, .add-component .notification { color: #FFFFFF; }
+h1,h2,h3{ color: #000000; }
+h3.my-links a{ color: #000; }
+h2,.calendar-controls{color:#fff; background:#0079bc;}
+.calendar-controls h3{color:#fff;}
+a, h2 a{color:#4661b2;}
+.box h2 a{color:#fff;}
+a:hover{color:#4661b2;}
 
-#tabs-homepage .customise-components h3 { color: #000000; }
-
-#infoPanel li { color:#fff; }
-
-#infoPanel a { color: #c5ad62; }
-
-#header {
-    background: url('/images/wadhurst/wadhurst.jpg') no-repeat 240px top;
-	height:152px;
+#header, .login #header{
+    background: #00133d;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#00133d), color-stop(22%,#001844), color-stop(76%,#002d5e), color-stop(100%,#003366));
+    background: -webkit-linear-gradient(top, #00133d 0%,#001844 22%,#002d5e 76%,#003366 100%);
+    background:    -moz-linear-gradient(top, #00133d 0%,#001844 22%,#002d5e 76%,#003366 100%);
+    background:     -ms-linear-gradient(top, #00133d 0%,#001844 22%,#002d5e 76%,#003366 100%);
+    background:      -o-linear-gradient(top, #00133d 0%,#001844 22%,#002d5e 76%,#003366 100%);
+    background:         linear-gradient(to bottom, #00133d 0%,#001844 22%,#002d5e 76%,#003366 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00133d', endColorstr='#003366',GradientType=0 );
+    height: 96px;
+    border-bottom: 4px solid #b19a53;
 }
-
-.login #header { background: none; }
-
-#header .logo {
-    background: #c8b064;
-	height: 158px;
-	padding-top: 0;
-	width: 224px;
+#header .school {
+    position: absolute;
     top: 0;
-	left:16px;
-    -moz-border-radius: 0 0 3px 3px;
-    -webkit-border-radius: 0 0 3px 3px;
-    border-radius: 0 0 3px 3px;
-    -moz-box-shadow: 0px 2px 3px rgba(0,0,0,0.45);
-    -webkit-box-shadow: 0px 2px 3px rgba(0,0,0,0.45);
-    box-shadow: 0px 2px 3px rgba(0,0,0,0.45);
+    left: 0;
+    background: url('/images/wadhurst/wadhurst-house.png') no-repeat top left;
+    height: 96px;
+    width: 855px;
+    z-index: 0;
 }
 
-#nav { top: 174px; }
-
-.colours-buttons { background-color: #3375b3; }
-
-#tabs-homepage .customise-components {
-	background-color: #F8F8FC;
-	color: #000000;
-	-moz-box-shadow: 0px 1px 1px #bdbdbd;
-	-webkit-box-shadow: 0px 1px 1px #bdbdbd;
-	box-shadow: 0px 1px 1px #bdbdbd;
+#header .logo{
+    padding: 0;
+    width: 228px;
+    height: 67px;
+    left: 20px;
+    top: 15px;
 }
 
-#nav li a { color:#0079bc; }
 
-#tabs-homepage .ui-tabs-nav li a {
-	height:32px;
-	font-size:12px;
-	padding:0 12px;
-	line-height:32px;
-	color:#000;
-	-moz-border-radius: 6px 6px 0 0;
-	-webkit-border-radius: 6px 6px 0 0;
-	border-radius: 6px 6px 0 0;
-	background:#e6e6e6;
-	-moz-background-clip: padding;
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
-	-moz-box-shadow: 0px -1px 1px #bdbdbd;
-	-webkit-box-shadow: 0px -1px 1px #bdbdbd;
-	box-shadow: 0px -1px 1px #bdbdbd;
+#tabs{
+    position: absolute;
+    bottom: 0;
+    left: 200px;
+    right: auto;
+}
+#tabs li{
+    float:left;
+    margin: 0 1px;
+    top: 1px;
+}
+#tabs li a{
+    background: transparent;
+    color:#fff;
+    font-size: 13px;
+    height: 24px;
+    line-height: 24px;
+    font-weight:normal;
 }
 
-#tabs-homepage li.ui-state-default a,
-.topic-list li a.selected {
-	background-color: #0053A0;
-	color: #FFFFFF;
+#tabs li.navthis a {
+    color: #fff;
+    background: #b19a53;
+    font-weight: bold;
+}
+
+#nav .logo {
+    height: 168px;
+    width: 152px;
+    background: #fff;
+    display: block;
+    margin: 16px;
+    text-align: center;
+    padding-top: 16px;
+}
+#nav{ top: 0; margin-left: 0; width: 200px; }
+#nav h3,
+#nav h3.my-links{background: transparent;}
+#nav li a { color: #5a5a5a; margin-left: 8px; padding-left: 8px; }
+#nav h3{ color: #5a5a5a; margin-left: 16px; padding-left: 0; font-size: 14px; height: 24px; }
+
+#nav .nav-wrapper, #nav ul ul,.colours-buttons, #nav .nav-wrapper.my-links {background:transparent;}
+#nav ul { width: auto;}
+
+#nav ul ul{background: #fff; border-color:#b19a53; left: 190px; width: 200px; }
+#nav ul ul ul { left: 190px; }
+
+
+#tabs-homepage li.ui-state-default a {
+    background: none repeat scroll 0 0 #eee;
+    color: #000;
 }
 
 #tabs-homepage li.ui-tabs-selected a {
-	background-color: #F8F8FC;
-	color: #0066B0;
+    background: none repeat scroll 0 0 #F0F7FE;
+    color: #000;
+}
+#tabs-homepage #tabs-sub li.ui-tabs-selected a{
+    background:#eee
+}
+#tabs-sub .ui-tabs-nav li a {
+    background:#fcfbf2;
 }
 
-#tabs-homepage #tabs-sub .ui-tabs-nav li a {
-	margin-bottom:4px;
-	color:#fff;
-	background:#579dcf;
-	line-height:16px;
-	height:auto;
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;
-	box-shadow: none;
+#nav ul li.hover > a, #nav ul li a:hover, #nav li li a:hover, #category ul li a:hover, #tabs-sub .ui-tabs-nav li a:hover{
+    background-color: #b19a53;
+    color: #ffffff;
 }
 
-#tabs-homepage #tabs-sub .ui-tabs-nav li.ui-state-active a, #tabs-homepage #tabs-sub .ui-tabs-nav li a:hover, .colours-buttons { background:#0066b0; }
-
-#tabs li { margin-right:4px; }
-
-#tabs li a {
-	height:32px;
-	font-size:12px;
-	padding:0 12px;
-	line-height:32px;
-	color:#002c58;
-	-moz-border-radius: 6px 6px 0 0;
-	-webkit-border-radius: 6px 6px 0 0;
-	border-radius: 6px 6px 0 0;
-	background:#f4f4f4;
-	-moz-background-clip: padding;
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
-	box-shadow: 0px 2px 3px rgba(0,0,0,0.45);
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#f4f4f4), to(#d0e3ed));
-   	background-image: -webkit-linear-gradient(top, #f4f4f4, #d0e3ed);
-   	background-image:    -moz-linear-gradient(top, #f4f4f4, #d0e3ed);
-   	background-image:     -ms-linear-gradient(top, #f4f4f4, #d0e3ed);
-   	background-image:      -o-linear-gradient(top, #f4f4f4, #d0e3ed);
-   	background-image:         linear-gradient(top, #f4f4f4, #d0e3ed);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#f4f4f4', EndColorStr='#d0e3ed');
+.dark,
+.dark td,
+#tree .dark,
+.standardForm,
+#assess .standardForm,
+#assess .additional-details,
+#assess .assess-body,
+.blog-comments .box,
+.post-left,
+#category,
+#tabs-homepage .customise-components,
+.mark-sheet.assessments .dark td {
+    background: none repeat scroll 0 0 #fafafa;
 }
 
-#tabs li.navthis a { background:#fff; }
-
-#header #tabs li.navthis a { color:#000; }
-
-#tabs-sub li.ui-state-default a {
-	background-color: #F8F8FC;
-	color: #000000;
+.search-item:nth-child(2n){
+    background: none repeat scroll 0 0 #fafafa;
+}
+#category li a { padding: 4px 16px; }
+#category li a.selected,
+#tabs-sub li.ui-tabs-selected a,
+.topic-list li a.selected{
+    background:#b19a53; color:#ffffff; font-weight: bold;
 }
 
-#tabs-sub li.ui-tabs-selected a, .active-box, #tabs-sub .ui-tabs-nav li a:hover {
-	background-color: #FAEDC3;
-	color: #000000;
+.topic-list li a:hover {
+    background: #b19a53;
+    color: #fff;
 }
 
-.box a.edit span, .box a.close-delete {
-	height:22px;
-	width:22px;
-	background:#002c58;
-    box-shadow: 0px -1px 1px rgba(0,0,0,0.26);
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#002c58), to(#001326));
-    background-image: -webkit-linear-gradient(top, #002c58, #001326);
-    background-image:    -moz-linear-gradient(top, #002c58, #001326);
-    background-image:     -ms-linear-gradient(top, #002c58, #001326);
-    background-image:      -o-linear-gradient(top, #002c58, #001326);
-    background-image:         linear-gradient(top, #002c58, #001326);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#002c58', EndColorStr='#001326');
+#category li a:hover{
+    background:#b19a53;
+    color:#ffffff;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    border-radius: 0px;
 }
-
-.box a.edit:hover span, .box a.close-delete:hover {
-    background-color: #c5ad62;
-   	background-image: -webkit-gradient(linear, left top, left bottom, from(#c5ad62), to(#ad9857));
-   	background-image: -webkit-linear-gradient(top, #c5ad62, #ad9857);
-   	background-image:    -moz-linear-gradient(top, #c5ad62, #ad9857);
-   	background-image:     -ms-linear-gradient(top, #c5ad62, #ad9857);
-   	background-image:      -o-linear-gradient(top, #c5ad62, #ad9857);
-   	background-image:         linear-gradient(top, #c5ad62, #ad9857);
-}
-
-.box a.edit em { color: #fff !important; text-decoration: underline; }
-.box a.edit.active { height: 32px; background: #e4e4e4; }
-.box a.edit.active em { color: #002c58 !important; text-decoration: underline; }
-
-.box a.close-delete span, .box a.edit span { color:#fff; }
-
-.box a.close-delete:hover span { color:#fff; }
-
-.box .editPanel {
-    background: #e4e4e4;
-    border: 1px solid #d1d1d1;
-}
-
-#nav li a:hover, #nav li li a:hover, #nav li.parent.hover > a {
-	background:#0089d5;
-	color:#fff;
-}
-
-#category li a.selected {
-	background:#0089d5;
-	color:#fff;
-}
-
-#nav h3.my-links a {
-	right: 8px;
-	top: 6px;
-}
-
-#category li a:hover {
-	background:#c5ad62;
-	color:#fff;
-}
-
-.login #header { height: 164px; background: url('/images/wadhurst/wadhurst.jpg') no-repeat 240px top; }
-
-.login #container {
-    margin: 16px;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	border-radius: 3px;
-}
-
-.standardForm, .dark, .dark td, #tree .dark, #assess .standardForm, #assess .additional-details,
-#assess .assess-body, .blog-comments .box.post-left, #category{background-color:#f4f4f4 ;}
-
-#tree tbody tr.selected td, #file-list tbody tr.selected td { background-color: #0089d5 !important; color: #fff; }
-
-.search-item:nth-child(2n) { background:#f4f4f4 !important; }
-
-#nav .nav-wrapper {
-	background:#fff;
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
-	border-radius: 0;
-	-moz-box-shadow: 0px 1px 1px #bdbdbd;
-	-webkit-box-shadow: 0px 1px 1px #bdbdbd;
-	box-shadow: 0px 1px 1px #bdbdbd;
-	-moz-background-clip: padding;
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
-}
-
-#nav .nav-wrapper.my-links { background:#fff; }
-
-.dark td { min-height: 1px; }
-
-.dayWrap p { color: #000000; }
-
-.otherMonth .dayWrap p, .otherMonth .dayWrap a { color: #797979; }
-
-td.cal-left a.back, td.cal-left a.forward, td.cal-left .datepicker-box, td.cal-left a.back,
-td.cal-left a.forward, td.cal-right a.filter-change, .timetable td.dayCurrent { background-color: #f2f6fa; }
-.otherMonth.day-block, .timetable td.normal { background-color: #FAF9F5; }
-
-td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-change.current, td.cal-right a.filter-change:hover { background-color: #D3D3E4; }
-
-#assess h3 { color:#000; }
-
-.timetable td.dayCurrent { font-size: 1em; color: #000; }
-.timetable td, .timetable th { border-right: none; }
-.dayWrap p { color:#000; }
-
-.calTableCurrent .dayWrap { background-color:#ffffff; }
-
-#month-view h3, #week-view h3 { color:#000; }
-
-#tooltip { background-color: #222478; }
-
-#nav h3 {
-	height:24px;
-	padding-top:8px;
-	color:#002c58;
-	font-size:16px;
-	line-height:20px;
-	-moz-background-clip: padding;
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
-	background-color: #c5ad62;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.26);
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#c5ad62), to(#ad9857));
-	background-image: -webkit-linear-gradient(top, #c5ad62, #ad9857);
-	background-image:    -moz-linear-gradient(top, #c5ad62, #ad9857);
-	background-image:     -ms-linear-gradient(top, #c5ad62, #ad9857);
-	background-image:      -o-linear-gradient(top, #c5ad62, #ad9857);
-	background-image:         linear-gradient(top, #c5ad62, #ad9857);
- filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#c5ad62', EndColorStr='#ad9857');
-}
-
-.top-split { border-color: #222478; }
-
-#nav ul ul, .blog-comments p.interact {
-	background-color: #fff;
-	border-color: #fff;
-	-moz-border-radius: 0;
-	-webkit-border-radius: 0;
-	border-radius: 0;
-	-moz-box-shadow: 0px 0px 4px #bababa;
-	-webkit-box-shadow: 0px 0px 4px #bababa;
-	box-shadow: 0px 0px 4px #bababa;
-	border:1px solid #bababa;
-	-moz-background-clip: padding;
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
-}
-
-#search {
-	background:url(/images/moriah/search.jpg) no-repeat;
-	width:289px;
-	height:35px;
-}
-
-#search-field { background: none; color: #002c58; }
-
-td.cal-right .link-case .filter-drop .filter-list { background: none repeat scroll 0 0 #FAEDC3; }
 
 .submit-btn-plain {
-	background-color: #eef2fa;
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#eef2fa), to(#dde6f4));
-	background-image: -webkit-linear-gradient(top, #eef2fa, #dde6f4);
-	background-image:    -moz-linear-gradient(top, #eef2fa, #dde6f4);
-	background-image:     -ms-linear-gradient(top, #eef2fa, #dde6f4);
-	background-image:      -o-linear-gradient(top, #eef2fa, #dde6f4);
-	background-image:         linear-gradient(top, #eef2fa, #dde6f4);
- filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#eef2fa', EndColorStr='#dde6f4');
-	border-color: #b3c7e8;
-	color: #000 !important;
-	text-shadow: 0 1px 1px #fff;
-	font-family:Arial, Helvetica, sans-serif;
-	font-weight:normal;
+    background-color: #002b5c;
+    background-image: none !important;
+    border: 0;
+    color: #ffffff !important;
+    font-weight:normal;
+    text-shadow:none;
+    filter: none;
 }
 
 .submit-btn-plain:hover {
-	background-color: #fff7db;
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#fff7db), to(#ffefb8));
-	background-image: -webkit-linear-gradient(top, #fff7db, #ffefb8);
-	background-image:    -moz-linear-gradient(top, #fff7db, #ffefb8);
-	background-image:     -ms-linear-gradient(top, #fff7db, #ffefb8);
-	background-image:      -o-linear-gradient(top, #fff7db, #ffefb8);
-	background-image:         linear-gradient(top, #fff7db, #ffefb8);
- filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fff7db', EndColorStr='#ffefb8');
-	border-color: #c5ad62;
-	color: #000 !important;
-	cursor: pointer;
+    background-color: #135882;
+    border: 0;
+    color: #fff !important;
+    cursor: pointer;
+    text-shadow:none;
+    filter: none;
 }
 
-.standardForm td { border-color: #dddddd; }
 
-#footer ul {
-	float:right;
-	margin-right:16px
+/*
+ADMIN!
+*/
+.admin-contents{background:#F0F7FE;}
+.admin-nav li a{background:#eee; color:#054B93; font-weight:normal;    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;}
+.admin-nav li a.current{background:#F0F7FE;color:#054B93; font-weight:bold;}
+
+#search-button{
+    background: url('/images/wadhurst/search-button.png') 6px 6px no-repeat !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 24px;
+    width: 24px;
+}
+#search, #search-field{ height: 24px; }
+.admin-contents .level{background:#eee; border-color:#ddd;}
+.admin-contents h4{border-color:#ddd;}
+
+#search { background: transparent; width: 214px; position: relative; z-index: 2; }
+#search fieldset { width: 208px; }
+#search-field {
+    color:#fff;
+    background: #fff;
+    background: rgba(255,255,255,0.3);
+    padding: 0 0 0 25px;
+    width: 183px;
+    height: 24px;
+    font-weight: normal;
+    line-height: 20px;
+}
+#infoPanel {margin-top: 22px; position: relative; z-index: 2; }
+#infoPanel li{color:#fff;}
+#infoPanel li a{color:#b19a53; }
+#infoPanel img { margin-top: -14px; }
+
+#footer { margin: 0; }
+
+#footer ul {float:right;padding-right: 40px;}
+#footer ul li {color:#5a5a5a}
+#footer ul li a{color:#5a5a5a}
+
+.standardForm td {
+    border-bottom: 1px solid #eee;
 }
 
-#footer ul li, #footer ul li a { color: #fff; }
-
-.cal-bubble .middle { border-color:#BABABA }
-
-.cal-bubble .bottom { border-right-color:#BABABA }
-
-.cal-bubble .middle .close {
-	background:#0053A0;
-	color:#fff;
+/*
+ * Table border fixes
+ */
+.calendar table .dark,
+.otherMonth,
+.past,
+.timetable th,
+.top .listing .dark,
+.right .listing .dark,
+.left .listing .dark
+{
+    background: #fafafa;
 }
 
-.admin-contents h2 {
-	border:0;
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;
-	box-shadow: none;
+.calendar table thead th,
+.day-block,
+.calendar table,
+.left #calendar table.duedates-calendar td,
+.left #calendar table.duedates-calendar,
+#calendar table th.dark,
+table tr,
+.listing li,
+.listing .subject-list li,
+.listing .subject-list a,
+.listing .subject-list a.teacher,
+ul.activity-list li,
+.timetable td, .timetable th,
+.forum .comments li, .blog .comments li
+{
+    border-color: #EEE;
 }
-.admin-contents{background-color: #F8F8FC;
-color: black;
--moz-box-shadow: 0px 1px 1px #BDBDBD;
--webkit-box-shadow: 0px 1px 1px #BDBDBD;
-box-shadow: 0px 1px 1px #BDBDBD;}
-
-.admin-nav li a {background-color: #0053A0;-moz-box-shadow: 0px -1px 1px #BDBDBD;
--webkit-box-shadow: 0px -1px 1px #BDBDBD;
-box-shadow: 0px -1px 1px #BDBDBD;
-color: white;}
-.admin-nav li a.current{
-background-color: #F8F8FC;
-color: #0066B0;
+.calendar table thead th,
+#calendar table th.dark,
+.timetable thead th
+{
+    border-bottom-color: #EEE;
 }
-
-.admin-contents .level{background:#fff;border:1px solid #bdbdbd;}
-.admin-contents h4{border-color:#bdbdbd;}
-
-.settings-nav li a {background:#fff; border-color:#bdbdbd}
-.settings-nav li a.current {background:#bdbdbd;}
-.settings-nav li a.current span {border-left: 8px solid #bdbdbd;}
-
-.row-holder{background:#f4f4f4; }
-.standardForm tr.advanced td{background:#f8f8f8;}
-
-.calendar-controls a.filters,
-.calendar-controls .link-case .filter-drop .filter-list {
-    background-color: #e4e4e4;
-}
-
-#ui-datepicker-div { z-index: 50; }

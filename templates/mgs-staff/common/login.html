@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!--  Copyright 2005 Lektec Consulting Melbourne Australia -->
+<!--  Visit us at www.lektec.com.au -->
+<head>
+	<title>{TITLE}</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Language" content="en-au" />
+	<meta name="author" content="James Leckie, Lektec Consulting"/>
+	<link rel="stylesheet" type="text/css" media="screen" href="/css/core/core.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/screen.css" />
+	<script type="text/javascript">
+		window.onload = init;
+		function init(){
+			document.getElementById('username').focus();
+		}
+	</script>
+</head>
+<body>
+<div id="wrap-inner">
+	<div id="nav">
+		<a class="logo" href="/" title="Melbourne Grammar School"><img src="/images/mgs-staff/mgs-logo.png" height="146" width="130"></a>
+	</div>
+
+	<div id="header" >
+		<div id="banner-wrap">
+			<div class="school"></div>
+		</div>
+	</div>
+	<div id="container">
+		<div id="content">
+			<h1>{SITE_LOCATION} Portal</h1>
+			<p class="error">{ERROR}</p>
+			<form id="loginForm" method="post" action="/loginForm.php">
+				<fieldset>
+					<label for="username">Login Name:</label>
+					<input type="text" name="username" id="username" />
+				</fieldset>
+				<fieldset>
+					<label for="password">Password:</label>
+					<input type="password" name="password" id="password" />
+				</fieldset>
+				<input type="hidden" name="page" value="{HIDDEN}" />
+				<input class="login submit-btn-plain" type="submit" name="Submit" value="Login" alt="Login" />
+			</form>
+			<div class="float-fix"></div>
+		</div>
+	</div>
+
+	<div id="footer">
+		<ul>
+			<li>{TEMPLATE_YEAR} &copy; Copyright <a href="{SCHOOL_ADDRESS}">{SITE_NAME}</a></li>
+			<li><a href="/policy.php">Guidelines of Use and Privacy Policy</a></li>
+			<li>Powered by <a href="http://www.schoolbox.com.au" title="Virtual Learning Environment, Learning Management System, LMS">Schoolbox</a></li>
+			<!-- BEGIN mobile_switch -->
+			<li><a href="/switch.php?v=mobile">Switch to Mobile</a></li>
+			<!-- END mobile_switch -->
+			<li><a href="http://alaress.com.au" title="Web Development Melbourne">Web Development</a> by <a href="http://alaress.com.au">Alaress</a></li>
+			<li class="last"><a href="/feedback.php" title="Web Designers">Feedback and Support</a></li>
+		</ul>
+	</div>
+</div>
+</body>
+</html>
+
+
