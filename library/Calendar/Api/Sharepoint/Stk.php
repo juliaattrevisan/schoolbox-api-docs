@@ -12,17 +12,17 @@
 class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 
     /* An instance of the built-in php5 soap
-      */
+     */
     private $soap = null;
 
     /* The place where we found the wsdl file
-      * Note: Sharepoint queries are sent here too, otherwise it won't work!
-      */
+     * Note: Sharepoint queries are sent here too, otherwise it won't work!
+     */
     private $wsdl = 'http://iportexternal/_vti_bin/Lists.asmx?wsdl';
 
     /* STK credentials
-      * User account to authenticate with. (Must have read/write/edit permissions to given Lists)
-      */
+     * User account to authenticate with. (Must have read/write/edit permissions to given Lists)
+     */
     private $credentials = array(
         'login' => 'sk-sb-iport',
         'password' => 'j7tdPyZ1Zc',
@@ -31,7 +31,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
     );
 
     /* A campus name-id relation from the luCampus table.
-      */
+     */
     private $campusList = array(
         'SKC' => 1,
         'SKG' => 2,
@@ -40,7 +40,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
     );
 
     /* Event type mapping from the luEventType table.
-      */
+     */
     private $typeMap = array(
         'Arts' => 1,
         'Assembly' => 2,
@@ -67,7 +67,6 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
     /* List of event types students can see */
     private $studentAllowedTypes = array(1, 2, 3, 8, 9, 11);
 
-
     /* Contains all event types for reference during mapping */
     private $typeList = array();
 
@@ -87,13 +86,20 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 		'sa' => 6
 	);
 
+	/**
+	 * Whether the SOAP connection failed. If it did, silently proceed
+	 *
+	 * @var bool
+	 */
+	private $error = false;
+
     /**
      * Constructor
      */
     public function __construct() {
 
         /* Create soap client
-           */
+         */
         try {
             $soapClient = new SoapClient($this->getWsdl(), $this->getCredentials());
 
@@ -101,14 +107,12 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 
             $this->setCalendarHandler(new Calendar());
             $this->setEventTypes($this->getCalendarHandler()->getTypeList());
+        }
+		catch (SoapFault $fault) {
+			$this->setError($fault);
 
-        } catch (SoapFault $fault) {
-            //var_dump($fault);
-            //die();
             return false;
         }
-
-
     }
 
     /**
@@ -130,113 +134,119 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 
         $xmlPayload = new Calendar_Api_Sharepoint_Stk_Payload($startDate, $endDate);
 
-        $response = $this->getSoap()->GetListItems(new SoapVar($xmlPayload->getPayload(), XSD_ANYXML));
-
-        $allEvents = $xmlPayload->parseXml($response->GetListItemsResult->any);
-
-        /* Fill in your query result set here and populate $collection
+		/* Fill in your query result set here and populate $collection
 		 */
-        $collection = new Calendar_Event_Collection();
+		$collection = new Calendar_Event_Collection();
 
-        foreach ($allEvents->rsdata->zrow as $currentEvent) {
-            $attribs = $currentEvent->attributes();
+		/* If the SOAP connection succeeded, proceed normally
+		 * Otherwise return an empty collection
+		 */
+		if (!$this->hasError()) {
+			$response = $this->getSoap()->GetListItems(new SoapVar($xmlPayload->getPayload(), XSD_ANYXML));
 
-            $eventTypeID = $this->getTypeIdFromName((string)$attribs->ows_ContentType);
-            $eventCampusID = $this->getCampusIdFromName((string)$attribs->ows_School);
+			$allEvents = $xmlPayload->parseXml($response->GetListItemsResult->any);
 
-            /* Hide events based on role and type of event */
-            if ($groupHandler->isParent() && !in_array($eventTypeID, $this->parentAllowedTypes)) {
-                continue;
-            }
 
-            if ($groupHandler->isStudent() && !in_array($eventTypeID, $this->studentAllowedTypes)) {
-                continue;
-            }
+			foreach ($allEvents->rsdata->zrow as $currentEvent) {
+				$attribs = $currentEvent->attributes();
 
-            /* Hide events that are not in the users campus list */
-            if (!in_array($eventCampusID, $_SESSION['campus'])) {
-                continue;
-            }
+				$eventTypeID = $this->getTypeIdFromName((string)$attribs->ows_ContentType);
+				$eventCampusID = $this->getCampusIdFromName((string)$attribs->ows_School);
 
-			/* Find out if this is a recurring event and if it should be displayed
-			 * on the currently viewed day. If not, ignore it and don't put it on
-			 * the stack at all.
-			 */
-			if (!$this->isRecurringToday($now, $attribs)) {
-				continue;
+				/* Hide events based on role and type of event */
+				if ($groupHandler->isParent() && !in_array($eventTypeID, $this->parentAllowedTypes)) {
+					continue;
+				}
+
+				if ($groupHandler->isStudent() && !in_array($eventTypeID, $this->studentAllowedTypes)) {
+					continue;
+				}
+
+				/* Hide events that are not in the users campus list */
+				if (!in_array($eventCampusID, $_SESSION['campus'])) {
+					continue;
+				}
+
+				/* Find out if this is a recurring event and if it should be displayed
+				 * on the currently viewed day. If not, ignore it and don't put it on
+				 * the stack at all.
+				 */
+				if (!$this->isRecurringToday($now, $attribs)) {
+					continue;
+				}
+
+				/* An event is meant to display today so let's add it to the stack
+				 */
+				$event = new Calendar_Event_Type_Day();
+				$event->setAuthorName('');
+				$event->setAuthorId('');
+				$event->setEventId(1);
+				$event->setType($eventTypeID);
+				$event->setNote((string)$attribs->ows_Title);
+				$event->setLocation((string)$attribs->ows_School);
+				$event->setAccess(Calendar_Event_Type_Abstract::CAMPUS_ACCESS);
+				$event->setCampusList($eventCampusID);
+				$event->setEventType($this->getTypeNameByID($eventTypeID));
+				$event->setColour($this->getCalendarHandler()->displayColour($eventTypeID));
+				$event->setPublishDate((string)$attribs->ows_Created);
+				$event->setSid($this->getSidFromName((string)$attribs->ows_School));
+				$event->setCategoryId('');
+				$event->setCategoryName('');
+				$event->setAttendance('');
+
+				/* Prevent modify link
+				 */
+				$event->setIsEditable(false);
+
+				/* Event inspection
+				 * A nice place to see what's currently being examined
+				 */
+	//			if ((string)$attribs->ows_Title == 'AKSS Junior Boys Volleyball Championships') {
+	//				new Alaress_Probe($currentEvent);
+	//				new Alaress_Probe($now->getDatabaseDate());
+	//			}
+
+				/* Simulate all-day event if appropriate since Sharepoint thinks the end of the
+				 * day is at 11:59pm, whereas Schoolbox makes it 12:00am. "Mangle it", he said.
+				 */
+				$startDate = new Alaress_Date_Format((string)$attribs->ows_EventDate, 'y-m-d h:i:s');
+
+				$event->setStartTime($startDate);
+
+				if ((string)$attribs->ows_fAllDayEvent == 1) {
+					$endDate = substr((string)$attribs->ows_EndDate, 0, 10);
+
+					$event->setEndTime(new Alaress_Date_Format($endDate . ' 00:00:00', 'y-m-d h:i:s'));
+				}
+				else {
+					$event->setEndTime(new Alaress_Date_Format((string)$attribs->ows_EndDate, 'y-m-d h:i:s'));
+				}
+
+				/* If it is recurring today, set the event's start date to Today.
+				 * Sharepoint only knows the start and end PERIOD of a recurring
+				 * event, and does not specify the exact date when a recurrence
+				 * takes place.
+				 *
+					[ows_EventDate] => 2012-09-14 09:15:00
+					[ows_EndDate] => 2012-12-21 09:30:00
+					[ows_RecurrenceData] => mo2012-12-20T20:30:00Z
+				 */
+				if ($event->getEndTime()->getDatabaseDate() >= $now->getDatabaseDate()) {
+					$event->setDate($now);
+
+					$startTime = new Alaress_Date_Format((string)$attribs->ows_EventDate, 'y-m-d h:i:s');
+					$event->setStartTime(new Alaress_Date_Format($now->getDatabaseDate() . ' ' . $startTime->getDatabaseTime(), 'y-m-d h:i:s'));
+				}
+				/* Sometimes events come out that shouldn't so we manually exclude them
+				 * due to Sharepoint timezones
+				 */
+				else {
+					continue;
+				}
+
+				$collection->add($event);
 			}
-
-			/* An event is meant to display today so let's add it to the stack
-			 */
-            $event = new Calendar_Event_Type_Day();
-            $event->setAuthorName('');
-            $event->setAuthorId('');
-            $event->setEventId(1);
-            $event->setType($eventTypeID);
-            $event->setNote((string)$attribs->ows_Title);
-            $event->setLocation((string)$attribs->ows_School);
-            $event->setAccess(Calendar_Event_Type_Abstract::CAMPUS_ACCESS);
-            $event->setCampusList($eventCampusID);
-            $event->setEventType($this->getTypeNameByID($eventTypeID));
-            $event->setColour($this->getCalendarHandler()->displayColour($eventTypeID));
-            $event->setPublishDate((string)$attribs->ows_Created);
-            $event->setSid($this->getSidFromName((string)$attribs->ows_School));
-            $event->setCategoryId('');
-            $event->setCategoryName('');
-            $event->setAttendance('');
-
-			/* Prevent modify link
-    		 */
-			$event->setIsEditable(false);
-
-			/* Event inspection
-			 * A nice place to see what's currently being examined
-			 */
-//			if ((string)$attribs->ows_Title == 'AKSS Junior Boys Volleyball Championships') {
-//				new Alaress_Probe($currentEvent);
-//				new Alaress_Probe($now->getDatabaseDate());
-//			}
-
-			/* Simulate all-day event if appropriate since Sharepoint thinks the end of the
-			 * day is at 11:59pm, whereas Schoolbox makes it 12:00am. "Mangle it", he said.
-			 */
-			$startDate = new Alaress_Date_Format((string)$attribs->ows_EventDate, 'y-m-d h:i:s');
-
-			$event->setStartTime($startDate);
-
-			if ((string)$attribs->ows_fAllDayEvent == 1) {
-				$endDate = substr((string)$attribs->ows_EndDate, 0, 10);
-
-				$event->setEndTime(new Alaress_Date_Format($endDate . ' 00:00:00', 'y-m-d h:i:s'));
-			}
-			else {
-				$event->setEndTime(new Alaress_Date_Format((string)$attribs->ows_EndDate, 'y-m-d h:i:s'));
-			}
-
-			/* If it is recurring today, set the event's start date to Today.
-			 * Sharepoint only knows the start and end PERIOD of a recurring
-			 * event, and does not specify the exact date when a recurrence
-			 * takes place.
-			 *
-				[ows_EventDate] => 2012-09-14 09:15:00
-				[ows_EndDate] => 2012-12-21 09:30:00
-				[ows_RecurrenceData] => mo2012-12-20T20:30:00Z
-			 */
-			if ($event->getEndTime()->getDatabaseDate() >= $now->getDatabaseDate()) {
-				$event->setDate($now);
-
-				$startTime = new Alaress_Date_Format((string)$attribs->ows_EventDate, 'y-m-d h:i:s');
-				$event->setStartTime(new Alaress_Date_Format($now->getDatabaseDate() . ' ' . $startTime->getDatabaseTime(), 'y-m-d h:i:s'));
-			}
-			/* Sometimes events come out that shouldn't so we manually exclude them
-			 * due to Sharepoint timezones
-			 */
-			else {
-				continue;
-			}
-
-			$collection->add($event);
-        }
+		}
 
         return $collection;
     }
@@ -483,5 +493,23 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 	 */
 	private function getWeekMapping() {
 		return $this->weekMapping;
+	}
+
+	/**
+	 * @param boolean $error
+	 */
+	private function setError($error) {
+		$this->error = $error;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	private function hasError() {
+		if ($this->error === false) {
+			return false;
+		}
+
+		return true;
 	}
 }
