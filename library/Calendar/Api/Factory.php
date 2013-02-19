@@ -14,6 +14,7 @@
  * @version	 SVN: $Id$
  */
 class Calendar_Api_Factory {
+	private $allTypes = array('Event', 'StudentBirthday', 'Submission');
 	private $allSources = array('Sharepoint', 'Schoolbox');
 
 	/**
@@ -26,18 +27,21 @@ class Calendar_Api_Factory {
 
 		/* Alternative data sources
 		 */
-		foreach ($this->getAllSources() as $currentSource) {
-			$defaultImplementation = 'Calendar_Api_' . $currentSource . '_Default';
-			$uniqueImplementation = 'Calendar_Api_' . $currentSource . '_' . ucwords(Cfg::get('site_location'));
+		foreach($this->getAllTypes() as $currentType) {
+			foreach ($this->getAllSources() as $currentSource) {
 
-			/* Decide which to use (unique or default)
-			 * Or create no class, if neither exists
-			 */
-			if (class_exists($uniqueImplementation)) {
-				$compositeApi->add(new $uniqueImplementation);
-			}
-			else if (class_exists($defaultImplementation)) {
-				$compositeApi->add(new $defaultImplementation);
+				$defaultImplementation = 'Calendar_Api_' . $currentType . '_' . $currentSource . '_Default';
+				$uniqueImplementation = 'Calendar_Api_' . $currentType . '_' . $currentSource . '_' . ucwords(Cfg::get('site_location'));
+
+				/* Decide which to use (unique or default)
+				 * Or create no class, if neither exists
+				 */
+				if (class_exists($uniqueImplementation)) {
+					$compositeApi->add(new $uniqueImplementation);
+				}
+				else if (class_exists($defaultImplementation)) {
+					$compositeApi->add(new $defaultImplementation);
+				}
 			}
 		}
 
@@ -58,7 +62,16 @@ class Calendar_Api_Factory {
 	 *
 	 * @return array
 	 */
-	public function getAllSources() {
+	private function getAllSources() {
 		return $this->allSources;
+	}
+
+	/**
+	 * Get all types
+	 *
+	 * @return array
+	 */
+	private function getAllTypes() {
+		return $this->allTypes;
 	}
 }

@@ -38,38 +38,6 @@ class Calendar_Api_Composite implements Calendar_Api_Interface {
 	}
 
 	/**
-	 * Get student birthdays
-	 *
-	 * @param $currentDay
-	 * @return Calendar_Event_Collection
-	 */
-	public function getStudentBirthdays($currentDay) {
-		$result = new Calendar_Event_Collection();
-
-		foreach($this->getApi() as $currentApi) {
-			$result->merge($currentApi->getStudentBirthdays($currentDay));
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Get submission events
-	 *
-	 * @param $currentDay
-	 * @return Calendar_Event_Collection
-	 */
-	public function getSubmissionEvents($currentDay) {
-		$result = new Calendar_Event_Collection();
-
-		foreach($this->getApi() as $currentApi) {
-			$result->merge($currentApi->getSubmissionEvents($currentDay));
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Add an api to the stack
 	 *
 	 * @param $api
