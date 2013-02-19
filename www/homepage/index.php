@@ -213,10 +213,10 @@ $code = $categoryCodes['codes'];
 $codeArray = explode(',', $code);
 
 if(count($codeArray) > 4) {
-    $codeString = implode(',',array_slice($codeArray, 0, 4)).'....';
+    $codeString = Scrub::text(implode(',',array_slice($codeArray, 0, 4)).'....');
 }
 else {
-    $codeString = $code;
+    $codeString = Scrub::text($code);
 }
 
 $allWidths = $homepageHandler->getColumnWidths();
