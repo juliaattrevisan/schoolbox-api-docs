@@ -30,6 +30,27 @@ class Calendar_Api_Factory {
 	private $allSources = array('Sharepoint', 'Schoolbox');
 
 	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		$config1 = new Calendar_Api_Config_Vcal();
+		$config1->setUrl('http://www.google.com/calendar/ical/steve.chan%40alaress.com.au/private-41226de2f5ba54c921f3eb6b46131d8b/basic.ics');
+		$config1->setEventType('Event');
+		$config1->setConnector('Schoolbox');
+
+		$config2 = new Calendar_Api_Config_Default();
+		$config2->setEventType('Event');
+		$config2->setConnector('Sharepoint');
+
+		$allTypes = array(
+			$config1,
+			$config2,
+		);
+
+		$this->setAllTypes($allTypes);
+	}
+
+	/**
 	 * Produce an API Composite
 	 *
 	 * @return Calendar_Api_Composite
@@ -37,23 +58,20 @@ class Calendar_Api_Factory {
 	public function produce() {
 		$compositeApi = new Calendar_Api_Composite();
 
-		/* Alternative data sources
-		 */
-		foreach($this->getAllTypes() as $currentType) {
-			foreach ($this->getAllSources() as $currentSource) {
+		foreach($this->getAllTypes() as $config) {
+			$defaultImplementation = 'Calendar_Api_' . $config->getEventType() . '_' . $config->getConnector() . '_Default';
+			$uniqueImplementation = 'Calendar_Api_' . $config->getEventType() . '_' . $config->getConnector() . '_' . ucwords(Cfg::get('site_location'));
 
-				$defaultImplementation = 'Calendar_Api_' . $currentType . '_' . $currentSource . '_Default';
-				$uniqueImplementation = 'Calendar_Api_' . $currentType . '_' . $currentSource . '_' . ucwords(Cfg::get('site_location'));
-
-				/* Decide which to use (unique or default)
-				 * Or create no class, if neither exists
-				 */
-				if (class_exists($uniqueImplementation)) {
-					$compositeApi->add(new $uniqueImplementation);
-				}
-				else if (class_exists($defaultImplementation)) {
-					$compositeApi->add(new $defaultImplementation);
-				}
+			/* Decide which to use (unique or default)
+			 * Or create no class, if neither exists
+			 *
+			 * Inject config settings
+			 */
+			if (class_exists($uniqueImplementation)) {
+				$compositeApi->add(new $uniqueImplementation($config));
+			}
+			else if (class_exists($defaultImplementation)) {
+				$compositeApi->add(new $defaultImplementation($config));
 			}
 		}
 
@@ -70,12 +88,30 @@ class Calendar_Api_Factory {
 	 */
 
 	/**
+	 * Set all sources
+	 *
+	 * @param array $allSources
+	 */
+	private function setAllSources($allSources) {
+		$this->allSources = $allSources;
+	}
+
+	/**
 	 * Get all sources
 	 *
 	 * @return array
 	 */
 	private function getAllSources() {
 		return $this->allSources;
+	}
+
+	/**
+	 * Set all types
+	 *
+	 * @param array $allTypes
+	 */
+	private function setAllTypes($allTypes) {
+		$this->allTypes = $allTypes;
 	}
 
 	/**
