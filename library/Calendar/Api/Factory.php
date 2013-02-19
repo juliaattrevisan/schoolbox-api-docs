@@ -14,7 +14,19 @@
  * @version	 SVN: $Id$
  */
 class Calendar_Api_Factory {
+
+	/**
+	 * A list of all the possible event types to display
+	 * 
+	 * @var array
+	 */
 	private $allTypes = array('Event', 'StudentBirthday', 'Submission');
+
+	/**
+	 * Available accessor classes for each event type
+	 *
+	 * @var array
+	 */
 	private $allSources = array('Sharepoint', 'Schoolbox');
 
 	/**
