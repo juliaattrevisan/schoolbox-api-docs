@@ -1,13 +1,13 @@
 <?php
 /**
- * Calendar_Api_Event_Vcal_Default
+ * Calendar_Api_StudentBirthday_Vcal_Default
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Api_Event_Vcal_Default implements Calendar_Api_Interface {
+class Calendar_Api_StudentBirthday_Vcal_Default implements Calendar_Api_Interface {
 
 	/**
 	 * Get day events from this data source
