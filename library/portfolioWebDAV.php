@@ -16,18 +16,12 @@ class Sabre_DAV_Client_Extended extends Sabre_DAV_Client
             $settings[CURLOPT_HTTPHEADER][] = 'Content-Length: 0';
         }
 
-        /* Bug in SabreDAV
-           *
-           * Note that this method is overridden due authentication methods being
-           * incorrectly set.
-           *
-           * This is a bug in the SabreDAV client. It was using CURLAUTH_BASIC and
-           * CURLAUTH_DIGEST as some kind of bitmask, eventually assigning
-           * CURLOPT_HTTPAUTH to integer 3, a nonexistent authentication method.
-           *
-           * Fixed on 14/5/2012, hardcoded to CURLAUTH_BASIC
-           */
-        $settings[CURLOPT_HTTPAUTH] = CURLAUTH_BASIC;
+        $settings[CURLOPT_HTTPAUTH] = CURLAUTH_ANY;
+
+        if (Cfg::get('webdav_allow_insecure')) {
+            $settings[CURLOPT_SSL_VERIFYHOST] = false;
+            $settings[CURLOPT_SSL_VERIFYPEER] = false;
+        }
 
         $curl = curl_init($url);
 
@@ -54,13 +48,18 @@ class Sabre_DAV_Client_Extended extends Sabre_DAV_Client
 
         $curl = curl_init($this->getAbsoluteUrl($path));
 
-        curl_setopt_array($curl, array(
-            CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-            CURLOPT_USERPWD => $this->userName . ':' . $this->password,
-            CURLOPT_PUT => true,
-            CURLOPT_INFILE => fopen($file, "r"),
+        $settings = array(
+            CURLOPT_HTTPAUTH   => CURLAUTH_ANY,
+            CURLOPT_USERPWD    => $this->userName . ':' . $this->password,
+            CURLOPT_PUT        => true,
+            CURLOPT_INFILE     => fopen($file, "r"),
             CURLOPT_INFILESIZE => filesize($file),
-        ));
+        );
+        if (Cfg::get('webdav_allow_insecure')) {
+            $settings[CURLOPT_SSL_VERIFYHOST] = false;
+            $settings[CURLOPT_SSL_VERIFYPEER] = false;
+        }
+        curl_setopt_array($curl, $settings);
 
         return array(
             curl_exec($curl),
@@ -266,7 +265,7 @@ class PortfolioWebDAV
             } else {
                 return false;
             }
-        } else if ($site_location='stmichaels') {
+        } else if ($site_location=='stmichaels') {
             $settings = array(
                 'baseUri' => 'https://smgs-data.stmichaels.vic.edu.au/',
                 'userName' => "smgs/" . $_SESSION['username'],
@@ -286,7 +285,16 @@ class PortfolioWebDAV
                 return false;
             }
 
-        } else if ($site_location == 'core') {
+        }
+        else if ($site_location=='seymour') {
+            $settings = array(
+                'baseUri' => 'https://netstorage.seymour.sa.edu.au/',
+                'userName' => $_SESSION['username'],
+                'password' => $_SESSION['password'],
+            );
+            $paths = array('/oneNet/NetStorage/');
+        }
+        else if ($site_location == 'core') {
             $settings = array(
                 'baseUri' => 'http://webdave.alaress-dev.com.au/',
                 'userName' => 'webdave',
@@ -341,7 +349,7 @@ class PortfolioWebDAV
                     '{DAV:}creationdate',),
                 1);
         } /* Handle Sabre_DAV_Exception specifically
-		 */
+         */
         catch (Sabre_DAV_Exception $e) {
             error(141, DAV_Error::getMeaning($e->getMessage()));
         }
