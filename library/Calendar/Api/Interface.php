@@ -14,10 +14,5 @@
  * @version     SVN: $Id$
  */
 interface Calendar_Api_Interface {
-    public function getSubmissionEvents($currentDay);
-
-    public function getStudentBirthdays($currentDay);
-
-    public function getDayEvents($currentDay);
-
+    public function getEvents($currentDay);
 }

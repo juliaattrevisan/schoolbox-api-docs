@@ -1,6 +1,6 @@
 <?php
 /**
- * Calendar_Api_Sharepoint_Stk_Payload
+ * Calendar_Api_Event_Sharepoint_Stk_Payload
  *
  * See http://www.threewill.com/2011/08/remote-sharepoint-calendars/ for more info
  *
@@ -9,7 +9,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Api_Sharepoint_Stk_PayloadTest {
+class Calendar_Api_Event_Sharepoint_Stk_Payload {
 
 	/* Name or guid of the list
 	 */
@@ -77,6 +77,9 @@ class Calendar_Api_Sharepoint_Stk_PayloadTest {
 							</Eq>
 						</And>
 					</Where>
+					<OrderBy>
+						<FieldRef Name="EventDate"/>
+					</OrderBy>
 				</Query>
 			</query>
 			<viewFields>
@@ -88,7 +91,6 @@ class Calendar_Api_Sharepoint_Stk_PayloadTest {
 					<FieldRef Name="EventDate"/>
 					<FieldRef Name="EndDate"/>
 					<FieldRef Name="Created"/>
-					<FieldRef Name="RecurrenceID"/>
 					<FieldRef Name="RecurrenceData"/>
 				</ViewFields>
 			</viewFields>

@@ -1,6 +1,6 @@
 <?php
 /**
- * Calendar_Api_Sharepoint_Stk
+ * Calendar_Api_Event_Sharepoint_Stk
  *
  * St. Kentigern uses iport, a customisation of Sharepoint.
  *
@@ -9,7 +9,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
+class Calendar_Api_Event_Sharepoint_Stk implements Calendar_Api_Interface {
 
     /* An instance of the built-in php5 soap
      */
@@ -122,7 +122,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
      *
      * @return Calendar_Event_Collection
      */
-    public function getDayEvents($currentDay) {
+    public function getEvents($currentDay) {
         $groupHandler = new Group();
 
         $now = new Alaress_Date_Format($currentDay, 'U');
@@ -132,7 +132,7 @@ class Calendar_Api_Sharepoint_Stk implements Calendar_Api_Interface {
 		$startDate = $start->getDatabase();
 		$endDate = $end->getDatabase();
 
-        $xmlPayload = new Calendar_Api_Sharepoint_Stk_Payload($startDate, $endDate);
+        $xmlPayload = new Calendar_Api_Event_Sharepoint_Stk_Payload($startDate, $endDate);
 
 		/* Fill in your query result set here and populate $collection
 		 */

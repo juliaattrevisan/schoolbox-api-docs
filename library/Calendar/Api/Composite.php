@@ -13,6 +13,12 @@
  * @version	 SVN: $Id$
  */
 class Calendar_Api_Composite implements Calendar_Api_Interface {
+
+	/**
+	 * A list of all the api classes which produce Collections to combine
+	 *
+	 * @var array
+	 */
 	private $api = array();
 
 	/**
@@ -21,11 +27,11 @@ class Calendar_Api_Composite implements Calendar_Api_Interface {
 	 * @param $currentDay
 	 * @return Calendar_Event_Collection
 	 */
-	public function getDayEvents($currentDay) {
+	public function getEvents($currentDay) {
 		$result = new Calendar_Event_Collection();
 
 		foreach($this->getApi() as $currentApi) {
-			$result->merge($currentApi->getDayEvents($currentDay));
+			$result->merge($currentApi->getEvents($currentDay));
 		}
 
 		return $result;
