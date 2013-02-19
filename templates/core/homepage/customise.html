@@ -31,16 +31,22 @@ $j(function () {
 	});
 	
 
-	var f = $j.farbtastic('#picker');
-	f.linkTo($j('#bg_primary').next().add($j('#bg_primary')).add($j('#currentColour')));
-	
+    var is_colorpicker_present = ($j('#picker').length > 0);
+    var colorpicker            = null;
+    if (is_colorpicker_present) {
+        colorpicker = $j.farbtastic('#picker');
+        colorpicker.linkTo($j('#bg_primary').next().add($j('#bg_primary')).add($j('#currentColour')));
+    }
+
 
 	$j('div.colorBox').click(function () {
 		$j('.selected').removeClass('selected');
-		f.linkTo($j(this).next().add(this).add($j('#currentColour')));
+        if (is_colorpicker_present) {
+            colorpicker.linkTo($j(this).next().add(this).add($j('#currentColour')));
+        }
 		$j(this).next().next().addClass('selected');
 	});
-	
+
 	$j('div.colours p').click(function () {
 		$j(this).prev().prev().click();
 	});
@@ -53,7 +59,7 @@ $j(function () {
 			$j(this).next().val(colour);
 		});
 	});
-	
+
 	$j("#leftRight").click(function () {
 		var rightBox;
 		$j('div.leftColumn div.colorBox').each(function () {
