@@ -58,7 +58,24 @@ class Synchronise_Synergetic_StMichaels_Strategy_Staff extends Synchronise_Syner
 		/* Campus config: needs to map to a campus id
 		 */
 		$newUser['defaultCampus'] = $this->getCampusFromCode($currentUser['StaffCampus']);
-		$newUser['campus'] = array($this->getCampusFromCode($currentUser['StaffCampus']));
+		$newUser['campus']        = array($newUser['defaultCampus']);
+
+		//
+		// Campus list: should not override what's already there. [SB-1916]
+		$schoolbox_user = ($this->getUserHandler()->getBySynergy($currentUser['StaffID']));
+		if (!empty($schoolbox_user)) {
+			if (!empty($schoolbox_user['uid'])) {
+				$newUser['campus'] = $this->getUserHandler()->getUserCampus($schoolbox_user['uid']);
+			}
+		}
+
+		/* Default campus to 1, as per James' email
+		 * but only if no campuses were determined
+		 * (use array filter to remove empty elements)
+		 */
+		if (!count(array_filter($newUser['campus']))) {
+			$newUser['campus'] = array(self::STAFF_DEFAULT_CAMPUS);
+		}
 
 		/* Staff Group ID
 		 */
@@ -78,21 +95,7 @@ class Synchronise_Synergetic_StMichaels_Strategy_Staff extends Synchronise_Syner
 		$this->getVerboseFilter()->intro();
 
 		foreach($this->getList() as $currentUser) {
-
-
-			/* Generate details about the new user
-			 */
-			$newUser = $this->setupUserDetails($currentUser);
-
-			/* Default campus to 1, as per James' email
-			 * but only if no campuses were determined
-			 * (use array filter to remove empty elements)
-			 */
-			if (!count(array_filter($newUser['campus']))) {
-				$newUser['campus'] = array(self::STAFF_DEFAULT_CAMPUS);
-			}
-
-			$this->executeCreateUpdate($newUser);
+			$this->executeCreateUpdate($this->setupUserDetails($currentUser));
 		}
 
 		$this->getVerboseFilter()->summary();
