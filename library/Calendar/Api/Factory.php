@@ -20,7 +20,7 @@ class Calendar_Api_Factory {
 	 * 
 	 * @var array
 	 */
-	private $allTypes = array();
+	protected $allTypes = array();
 
 	/**
 	 * Constructor
@@ -96,20 +96,11 @@ class Calendar_Api_Factory {
 	 */
 
 	/**
-	 * Set all types
-	 *
-	 * @param array $allTypes
-	 */
-	private function setAllTypes($allTypes) {
-		$this->allTypes = $allTypes;
-	}
-
-	/**
 	 * Get all types
 	 *
 	 * @return array
 	 */
-	private function getAllTypes() {
+	protected function getAllTypes() {
 		return $this->allTypes;
 	}
 }
