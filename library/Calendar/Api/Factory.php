@@ -26,17 +26,13 @@ class Calendar_Api_Factory {
 	 * Constructor
 	 */
 	public function __construct() {
-		$configMapper = Calendar_Api_Config_Mapper::getInstance();
+		$allConfigs = Calendar_Api_Config_Mapper::getInstance()->findAll();
 
-		$allConfigs = $configMapper->findAll();
-
+		/* These configs are base64-encode()'d to get around a weird issue with unserialize
+		 * http://stackoverflow.com/questions/4264270/unserialize-sometimes-returns-false
+		 */
 		for ($allConfigs->rewind(); $allConfigs->valid(); $allConfigs->next()) {
-			$current = $allConfigs->current();
-
-			/* These configs are base64-encode()'d to get around a weird issue with unserialize
-			 * http://stackoverflow.com/questions/4264270/unserialize-sometimes-returns-false
-			 */
-			$this->addConfig(unserialize(base64_decode($current->getConfig())));
+			$this->addConfig($allConfigs->current()->decodeConfig());
 		}
 	}
 

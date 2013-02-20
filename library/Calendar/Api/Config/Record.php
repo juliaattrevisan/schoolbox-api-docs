@@ -46,6 +46,28 @@ class Calendar_Api_Config_Record {
 	 */
 	public $config = '';
 
+	/* These configs are base64-encode()'d to get around a weird issue with unserialize
+	 * http://stackoverflow.com/questions/4264270/unserialize-sometimes-returns-false
+	 */
+
+	/**
+	 * Encode config object for storage in db
+	 *
+	 * @return string
+	 */
+	public function encodeConfig() {
+		return base64_decode(serialize($this->getConfig()));
+	}
+
+	/**
+	 * Decode config object when retrieving from db
+	 *
+	 * @return mixed
+	 */
+	public function decodeConfig() {
+		return unserialize(base64_decode($this->getConfig()));
+	}
+
 	/* Getters/Setters
 	 */
 
