@@ -84,6 +84,28 @@ class Calendar_Api_Factory {
 		return $compositeApi;
 	}
 
+	/**
+	 * Empty list of configs
+	 */
+	public function resetConfigs() {
+		$this->allTypes = array();
+
+		return $this;
+	}
+
+	/**
+	 * Use only preselected configs
+	 *
+	 * @param $config
+	 *
+	 * @return \Calendar_Api_Factory
+	 */
+	public function addConfig($config) {
+		$this->allTypes[] = $config;
+
+		return $this;
+	}
+
 	/* Getters/Setters
 	 */
 
