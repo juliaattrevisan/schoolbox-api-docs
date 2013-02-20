@@ -314,6 +314,7 @@ class Mediator {
             'Core_Auth_API::Login',
             'Core_Auth_API::ForgotPassword',
             'Core_Auth_API::Logout',
+            'Core_Auth_API::AmILoggedIn',
             'Core_Settings_API::Skin'
         );
 
