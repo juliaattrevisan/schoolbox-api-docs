@@ -31,26 +31,40 @@ $this->setBlock("period", "day", "day_listing");
 $this->setBlock('day', 'period_class', 'period_class_block');
 $this->setBlock('day', 'period_class_link', 'period_class_link_block');
 $this->setBlock("timetable", "day_header", "day_header_listing");
-$outputList = false;
+$outputList = array();
 
 /* Fetch list of homepage colours for use */
 $colourList = Timetable_ColourMapper::getInstance()->findAll();
 
-
+$child_id = $this->arg[0];
 if ($groupHandler->isParent()) {
     if (is_array($_SESSION['children'])) {
         foreach ($_SESSION['children'] as $child) {
-            $outputList[] = $userHandler->getByID($child['id']);
+            //
+            // Was a specific child ID requested? show them only, otherwise
+			// show everyone.
+            if (!$child_id || ($child_id == $child['id'])) {
+                $outputList[] = $userHandler->getByID($child['id']);
+            }
         }
     }
-} else {
-    if ($this->arg[0]) {
+	//
+	// Requesting a child that isn't yours? Access Denied
+	if ($child_id && empty($outputList)) {
+		error(19);
+	}
+
+}
+else {
+    if ($child_id) {
         if ($groupHandler->isStaff()) {
-            $outputList[] = $userHandler->getByID($this->arg[0]);
-        } else {
+            $outputList[] = $userHandler->getByID($child_id);
+        }
+        else {
             error(19);
         }
-    } else {
+    }
+    else {
         $outputList[] = $userHandler->getByID($_SESSION['id']);
     }
 }
