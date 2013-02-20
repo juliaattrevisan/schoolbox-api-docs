@@ -20,35 +20,38 @@ class Calendar_Api_Factory {
 	 * 
 	 * @var array
 	 */
-	private $allTypes = array('Event', 'StudentBirthday', 'Submission');
-
-	/**
-	 * Available accessor classes for each event type
-	 *
-	 * @var array
-	 */
-	private $allSources = array('Sharepoint', 'Schoolbox');
+	private $allTypes = array();
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
+		$configMapper = Calendar_Api_Config_Mapper::getInstance();
+
 //		$config1 = new Calendar_Api_Config_Type_Vcal();
 //		$config1->setUrl('http://www.google.com/calendar/ical/steve.chan%40alaress.com.au/private-41226de2f5ba54c921f3eb6b46131d8b/basic.ics');
 //		$config1->setEventType('Event');
-//		$config1->setConnector('Schoolbox');
+//		$config1->setConnectorClass('Schoolbox');
 //
 //		$config2 = new Calendar_Api_Config_Type_Default();
 //		$config2->setEventType('Event');
-//		$config2->setConnector('Sharepoint');
-
-		$configMapper = Calendar_Api_Config_Mapper::getInstance();
+//		$config2->setConnectorClass('Sharepoint');
+//
+//		echo base64_encode(serialize($config1));
+//		echo "<HR>";
+//		echo base64_encode(serialize($config2));
 
 		$allConfigs = $configMapper->findAll();
 
-		foreach($allConfigs as $currentConfig) {
-			new Alaress_Probe($currentConfig);
-			$allTypes[] = unserialize($currentConfig->getConfig());
+		$allTypes = array();
+
+		for ($allConfigs->rewind(); $allConfigs->valid(); $allConfigs->next()) {
+			$current = $allConfigs->current();
+
+			/* These configs are base64-encode()'d to get around a weird issue with unserialize
+			 * http://stackoverflow.com/questions/4264270/unserialize-sometimes-returns-false
+			 */
+			$allTypes[] = unserialize(base64_decode($current->getConfig()));
 		}
 
 		$this->setAllTypes($allTypes);
@@ -112,24 +115,6 @@ class Calendar_Api_Factory {
 
 	/* Getters/Setters
 	 */
-
-	/**
-	 * Set all sources
-	 *
-	 * @param array $allSources
-	 */
-	private function setAllSources($allSources) {
-		$this->allSources = $allSources;
-	}
-
-	/**
-	 * Get all sources
-	 *
-	 * @return array
-	 */
-	private function getAllSources() {
-		return $this->allSources;
-	}
 
 	/**
 	 * Set all types
