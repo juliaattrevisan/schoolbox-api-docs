@@ -1,8 +1,26 @@
 <script>
 function init() {
+    // if there's a PHPSESSID but no session in storage? Use the PHPSESSID.
+    // (but PHPSESSID can exist without a login. Call sessionStorage on desktop site?)
+    var session_cookie = getCookie('PHPSESSID');
+    var session_stored = sessionStorage.getItem('session');
+    if (session_cookie && !session_stored) {
+        //
+        // Get if the user is logged in, store them if they are.
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/m/core/auth/am_i_logged_in.json', false); // E.T. Phone Home
+        xhr.send(null);
+        if (xhr.status === 200) {
+            var result = JSON.parse(xhr.response);
+            if (result.logged_in) {
+                sessionStorage.setItem('session', session_stored);
+                session_stored = session_cookie;
+            }
+        }
+    }
     // if the session var in storage doesn't match the php session cookie, ditch it
-    if(sessionStorage.getItem('session') && getCookie('PHPSESSID')) {
-        if(sessionStorage.getItem('session') != getCookie('PHPSESSID')) {
+    if(session_stored && session_cookie) {
+        if(session_stored != session_cookie) {
             sessionStorage.removeItem('session');
             localStorage.removeItem('lastPage');
             localStorage.removeItem('skin');
