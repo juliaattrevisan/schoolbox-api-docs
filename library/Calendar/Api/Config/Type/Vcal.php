@@ -27,6 +27,8 @@ class Calendar_Api_Config_Type_Vcal extends Calendar_Api_Config_Abstract {
 	 */
 
 	/**
+	 * Set url
+	 *
 	 * @param string $url
 	 */
 	public function setUrl($url) {
@@ -34,6 +36,8 @@ class Calendar_Api_Config_Type_Vcal extends Calendar_Api_Config_Abstract {
 	}
 
 	/**
+	 * Get url
+	 *
 	 * @return string
 	 */
 	public function getUrl() {
@@ -41,6 +45,8 @@ class Calendar_Api_Config_Type_Vcal extends Calendar_Api_Config_Abstract {
 	}
 
 	/**
+	 * Set perms
+	 *
 	 * @param array $perms
 	 */
 	public function setPerms($perms) {
@@ -48,6 +54,8 @@ class Calendar_Api_Config_Type_Vcal extends Calendar_Api_Config_Abstract {
 	}
 
 	/**
+	 * Get perms
+	 *
 	 * @return array
 	 */
 	public function getPerms() {
