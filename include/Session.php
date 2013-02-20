@@ -267,6 +267,24 @@ class Session
             return false;
     }
 
+
+    protected function authenticateEdumate($username, $password)
+    {
+        //
+        // Only for parents.
+        $url = "https://edumate.tigs.nsw.edu.au/tigs/pages/main/authenticate_externally.php";
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 2);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array("username" => $username, "password" => $password)));
+        $result = curl_exec($ch);
+        curl_close($ch);
+        unset($ch);
+        return $result;
+    }
+
+
     private function ldap_escape($str, $for_dn = false)
     {
 
