@@ -27,6 +27,15 @@
             onLine = (xhr.status === 200);
             return onLine;
         },
+        isCurrentlyLoggedIn: function() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/m/core/auth/am_i_logged_in.json', false);
+            xhr.send(null);
+            if (xhr.status === 200) {
+                return JSON.parse(xhr.response).logged_in;
+            }
+            return false;
+        },
         status: function (x) {
             if(!x){
                 return null;
