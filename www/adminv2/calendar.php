@@ -20,14 +20,19 @@ $userHandler = new User();
 $this->checkList('campus_check_list', $userHandler->getCampusList(), '', TEMPLATE_content, array('id'=>'CAMPUSID','name'=>'CAMPUSNAME'));
 $this->checkList('user_group_check_list', $userHandler->getGroupList(), '', TEMPLATE_content, array('id'=>'USERGROUPID','name'=>'USERGROUPNAME'));
 
-/* Stolen from settings
+/* Stolen from Settings
  */
 $this->setBlock(TEMPLATE_content, 'setting_tab', 'setting_tab_block');
 $this->setBlock(TEMPLATE_content, 'import', 'import_block');
 $this->setBlock(TEMPLATE_content, 'subscribe', 'subscribe_block');
+$this->setBlock('subscribe', 'eventType', 'eventType_block');
+$this->setBlock('eventType', 'connector', 'connector_block');
+$this->setBlock('connector', 'connectorConfig', 'connectorConfig_block');
 
 $this->setVar('import_block', '');
 $this->setVar('subscribe_block', '');
+$this->setVar('eventType_block', '');
+$this->setVar('connector_block', '');
 
 if ($this->arg[0]) {
 	$selectedType = urldecode($this->arg[0]);
@@ -47,6 +52,7 @@ $typeList = array(
 
 if (is_array($typeList)) {
 	foreach ($typeList as $type) {
+
 		/* Navigation stuff
  		 */
 		$output = array(
@@ -64,16 +70,92 @@ if (is_array($typeList)) {
 		$this->parse('setting_tab_block', 'setting_tab', true);
 
 		/* Individual pages
+		 * Import page
 		 */
 		if (($type['type'] == 'Import') && ($selectedType == 'Import')) {
 			$this->parse('import_block', 'import');
 		}
-		else {
+		/* Subscribe page
+	 	 */
+		else if (($type['type'] == 'Subscribe') && ($selectedType == 'Subscribe')) {
+
+			$allEventTypes = array('Event', 'StudentBirthday', 'Submission');
+			$allConnectors = array('Schoolbox', 'Sharepoint', 'Vcal');
+
+			$config1 = new Calendar_Api_Config_Type_Vcal();
+			$config1->setUrl('http://www.google.com');
+
+			$config2 = new Calendar_Api_Config_Type_Vcal();
+			$config2->setUrl('http://www.theage.com.au');
+
+			$config3 = new Calendar_Api_Config_Type_Vcal();
+			$config3->setUrl('http://www.alaress.com.au');
+
+			$allConfigs = array($config1, $config2, $config3);
 
 			/* All calendar subscription options go here
 			 */
+			foreach($allEventTypes as $currentEventType) {
+				$this->setVar(array(
+					'EVENTTYPE_NAME' => $currentEventType
+				));
+
+				/* Inject individual templates just like before -_-
+				 */
+				foreach($allConnectors as $currentConnector) {
+					$connectorId = rand();
+
+					$this->setVar(array(
+						'CONNECTOR_ID' => $connectorId,
+						'CONNECTOR_NAME' => $currentConnector
+					));
+
+					/* Process each config for this kind of connector
+					 */
+					foreach($allConfigs as $currentConfig) {
+						$this->setFile('configFragment', "adminv2/calendar/config/{$currentConnector}.html");
+
+						$this->setVar(array(
+							'CONNECTOR_ID' => $connectorId,
+							'URL' => $currentConfig->getUrl()
+						));
+
+						$this->parse('connectorConfig_block', 'configFragment', true);
+					}
+
+					$this->parse('connector_block', 'connector', true);
+
+					/* Clear children after parsing out the parent
+					 */
+					$this->setVar('connectorConfig_block', '');
+					$this->setVar('configFragment', '');
+				}
+
+				$this->parse('eventType_block', 'eventType', true);
+
+				/* Clear children after parsing out the parent
+				 */
+				$this->setVar('connector_block', '');
+			}
 
 			$this->parse('subscribe_block', 'subscribe');
 		}
 	}
 }
+
+//$config1 = new Calendar_Api_Config_Type_Vcal();
+//$config1->setUrl('http://www.google.com');
+//
+//$config2 = new Calendar_Api_Config_Type_Vcal();
+//$config2->setUrl('http://www.theage.com.au');
+//
+//$config3 = new Calendar_Api_Config_Type_Vcal();
+//$config3->setUrl('http://www.alaress.com.au');
+//
+//
+//echo base64_encode(serialize($config1));
+//echo "<HR>";
+//echo base64_encode(serialize($config2));
+//echo "<HR>";
+//echo base64_encode(serialize($config3));
+//echo "<HR>";

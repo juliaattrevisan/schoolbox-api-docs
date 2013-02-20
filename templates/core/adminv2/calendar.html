@@ -141,12 +141,22 @@ $j(function() {
 		<!-- END import -->
 		<!-- BEGIN subscribe -->
 		<div class="level clearfix">
-			<form action="/adminv2/bulkAddCalendar" method="post" enctype="multipart/form-data" name="form" id="subscribeForm" class="clearfix">
+			<form action="/adminv2/updateCalendarConnector" method="post" enctype="multipart/form-data" name="form" id="subscribeForm" class="clearfix">
 				<div class="clearfix"></div>
 
 				<!-- BEGIN eventType -->
-				<div style='border:2px dashed #f00;width:100%;display:block;'>
-					{EVENTTYPE_NAME}
+				<div style='border:2px dashed #f00;width:100%;display:block;margin:20px 0px;padding:20px;'>
+					<strong>{EVENTTYPE_NAME}</strong>
+
+					<!-- BEGIN connector -->
+					<div style='border: 1px solid #0f0;width:100%;display:block;padding:4px'>
+						<input type='hidden' name="connectorId[]" value='{CONNECTOR_ID}' />
+						<input type="checkbox" name='connector_{EVENTTYPE_NAME}[]' value='{CONNECTOR_NAME}' /> <em>{CONNECTOR_NAME}</em>
+
+						<!-- BEGIN connectorConfig -->
+						<!-- END connectorConfig -->
+					</div>
+					<!-- END connector -->
 				</div>
 				<!-- END eventType -->
 
