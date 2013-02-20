@@ -125,8 +125,11 @@ class Session
         // Function to check username exists and password is correct
         if (Cfg::get('ldap_enable')) {
             $result = $this->authenticateLDAP($username, $password);
-
         }
+
+		if (!$result && Cfg::get('edumate_auth_enabled')) {
+			$result = $this->authenticateEdumate($username, $password);
+		}
 
         if (!$result) {
             //fall back on SQL if ldap is not enable or fails
@@ -272,7 +275,10 @@ class Session
     {
         //
         // Only for parents.
-        $url = "https://edumate.tigs.nsw.edu.au/tigs/pages/main/authenticate_externally.php";
+        $url = Cfg::get('edumate_auth_url');
+		if (empty($url)) {
+			return false;
+		}
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -281,7 +287,10 @@ class Session
         $result = curl_exec($ch);
         curl_close($ch);
         unset($ch);
-        return $result;
+		//
+		// Edumate always returns a string - "You have not been authenticated"
+		// or a session ID which i'm guessing is either an int or hex number.
+		return ($result != "You have not been authenticated");
     }
 
 
