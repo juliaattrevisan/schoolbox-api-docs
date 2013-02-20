@@ -87,44 +87,46 @@ function init() {
     else /*if(env.init === 0)*/ {
 
         $('#spinner').animate({opacity:'0'},100,'linear',function(){$(this).remove()});
-        $('#loading').append('<form id="login_frm"><ul>' +
-            '<li><input type="text" id="username" name="username" placeholder="Username" value="" /></li>' +
-            '<li><input type="password" id="password" name="password" placeholder="Password" value="" /></li>' +
-            '<li><input type="submit" id="login" name="login" value="Login" /></li>' +
-            '</ul></form>');
-        $('#loading').css('min-height', $('#login_frm').offset().top + $('#login_frm').height() + 96);
+        if ($('#loading').find('#login_frm').length === 0) {
+            $('#loading').append('<form id="login_frm"><ul>' +
+                    '<li><input type="text" id="username" name="username" placeholder="Username" value="" /></li>' +
+                    '<li><input type="password" id="password" name="password" placeholder="Password" value="" /></li>' +
+                    '<li><input type="submit" id="login" name="login" value="Login" /></li>' +
+                    '</ul></form>');
+            $('#loading').css('min-height', $('#login_frm').offset().top + $('#login_frm').height() + 96);
 
-        $('#loading').on('submit', '#login_frm', function(e) {
+            $('#loading').on('submit', '#login_frm', function(e) {
 //          $('#login_frm').append('<input type="hidden" name="env" value="'+env+'" />')
 
-            var postdata = $('#login_frm').serialize() + '&env=' + JSON.stringify(env);
+                var postdata = $('#login_frm').serialize() + '&env=' + JSON.stringify(env);
 
-            $.post('/m/core/auth/login_form.json', postdata, function(data) {
+                $.post('/m/core/auth/login_form.json', postdata, function(data) {
 
-                debug($('#login_frm').serialize());
+                    debug($('#login_frm').serialize());
 
-                if($.zepto) {
-                    data = JSON.parse(data);
-                }
+                    if($.zepto) {
+                        data = JSON.parse(data);
+                    }
 
-                debug(data);
+                    debug(data);
 
-                if(data.session) {
-                    // success
-                    sessionStorage.setItem('session', data.session);
-                    env.loggedIn = data.session;
-                    e.preventDefault();
-                    init();
-                }
-                else {
-                    // failure
-                    toast('Your username or password is incorrect.', 'error');
-                    // window.location = "/m/";
-                }
+                    if(data.session) {
+                        // success
+                        sessionStorage.setItem('session', data.session);
+                        env.loggedIn = data.session;
+                        e.preventDefault();
+                        init();
+                    }
+                    else {
+                        // failure
+                        toast('Your username or password is incorrect.', 'error');
+                        // window.location = "/m/";
+                    }
+                });
+                e.preventDefault();
+
             });
-            e.preventDefault();
-
-        });
+        }
     }
     env.init = 1;
 }
