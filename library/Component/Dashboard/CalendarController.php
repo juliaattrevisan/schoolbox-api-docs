@@ -28,26 +28,20 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
         $this->setVar("DATE", date("l jS F"));
 
-		$factory = new Calendar_Api_Factory();
-
 		/* A list of submissions
 		 */
-		$submissionConfig = new Calendar_Api_Config_Default();
-		$submissionConfig->setEventType('Submission');
-		$submissionConfig->setConnector('Schoolbox');
+		$submissionFactory = new Calendar_Api_DashboardFactory("Submission");
 
-		$api = $factory->resetConfigs()->addConfig($submissionConfig)->produce();
+		$api = $submissionFactory->produce();
 
 		$this->submissionList = $api->getEvents($currDay);
 		$this->submissionList->sort();
 
 		/* A list of events
 		 */
-		$eventListConfig = new Calendar_Api_Config_Default();
-		$eventListConfig->setEventType('Event');
-		$eventListConfig->setConnector('Schoolbox');
+		$eventFactory = new Calendar_Api_DashboardFactory("Event");
 
-		$api = $factory->resetConfigs()->addConfig($eventListConfig)->produce();
+		$api = $eventFactory->produce();
 
         $this->eventList = $api->getEvents($currDay);
         $this->eventList->sort();
