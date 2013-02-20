@@ -134,94 +134,94 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
             }
         }
 
-//        $iterator = $this->eventList->createIterator();
-//
-//        for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
-//            $currentEvent = $iterator->current();
-//
-//            $this->setVar(
-//                array(
-//                    'EVENT_ID' => $currentEvent->getEventId(),
-//                    'TIME' => $currentEvent->getTime(),
-//                    'FULL_TIME' => $currentEvent->getFullDate(),
-//                    'NOTE' => $currentEvent->getNote(),
-//                    'LOCATION' => $currentEvent->getLocation(),
-//                    'DETAIL' => $currentEvent->getDetail(),
-//                    'COLOUR' => $currentEvent->getColour(),
-//                    'EVENT_TYPE' => 'type' . $currentEvent->getType(),
-//                    'TYPE' => $currentEvent->getEventType(),
-//                    'AUTHOR' => $currentEvent->getAuthorName(),
-//                    'AUTHOR_ID' => $currentEvent->getAuthorId(),
-//                    'ON_OFF' => ++$j % 2 ? 'dark' : '',
-//                )
-//            );
-//
-//            /* Modify link. Should be templated...
-//                */
-//            if ($currentEvent->getIsEditable()) {
-//                $this->setVar(
-//                    'MODIFY',
-//                    '<a class="btn modify float-left" href="/calendar/modify.php?eventID=' . $currentEvent->getEventId(
-//                    ) . '&returnTo=month"><span></span>Modify</a>'
-//                );
-//            } else {
-//                $this->setVar('MODIFY', '');
-//            }
-//
-//            /* Event attendance
-//             */
-//            if ($currentEvent->canAttend()) {
-//                $this->parse('attendance_icon_block', 'attendance_icon');
-//
-//                if ($this->getGroup()->isStudent($_SESSION['id'])) {
-//                    if ($attendance = $this->getCalendar()->getAttendanceByEventAndUser(
-//                        $currentEvent->getEventId(), $_SESSION['id']
-//                    )
-//                    ) {
-//
-//                        /* Attendance Status
-//                         */
-//                        if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
-//                            $this->setVar('ATTENDANCE_STATUS', 'Pending');
-//                        } else {
-//                            if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
-//                                $this->setVar('ATTENDANCE_STATUS', 'Approved');
-//                            } else {
-//                                if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
-//                                    $this->setVar('ATTENDANCE_STATUS', 'Rejected');
-//                                }
-//                            }
-//                        }
-//
-//                        $this->parse('attendance_status_block', 'attendance_status');
-//
-//                        $this->setVar('ATTENDANCE_REQUEST_ACTION', 'Unattend');
-//                    } else {
-//                        $this->setVar('ATTENDANCE_REQUEST_ACTION', 'Attend');
-//                    }
-//
-//                    $this->parse('attendance_request_button_block', 'attendance_request_button');
-//                } else {
-//                    if ($this->getGroup()->isStaff($_SESSION['id'])) {
-//                        $this->parse('attendance_list_button_block', 'attendance_list_button');
-//                    }
-//                }
-//            }
-//
-//            /* Show a homepage if appropriate
-//             */
-//            if ($currentEvent->getCategoryId() > 0) {
-//                $this->setVar(
-//                    array(
-//                        'HAS_CATEGORY_ID' => $currentEvent->getCategoryId(),
-//                        'HAS_CATEGORY_NAME' => $currentEvent->getCategoryName(),
-//                    )
-//                );
-//
-//                $this->parse('has_category_block', 'has_category');
-//            }
-//            $this->parse("note_listing", "note_block", true);
-//        }
+        $iterator = $this->eventList->createIterator();
+
+        for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
+            $currentEvent = $iterator->current();
+
+            $this->setVar(
+                array(
+                    'EVENT_ID' => $currentEvent->getEventId(),
+                    'TIME' => $currentEvent->getTime(),
+                    'FULL_TIME' => $currentEvent->getFullDate(),
+                    'NOTE' => $currentEvent->getNote(),
+                    'LOCATION' => $currentEvent->getLocation(),
+                    'DETAIL' => $currentEvent->getDetail(),
+                    'COLOUR' => $currentEvent->getColour(),
+                    'EVENT_TYPE' => 'type' . $currentEvent->getType(),
+                    'TYPE' => $currentEvent->getEventType(),
+                    'AUTHOR' => $currentEvent->getAuthorName(),
+                    'AUTHOR_ID' => $currentEvent->getAuthorId(),
+                    'ON_OFF' => ++$j % 2 ? 'dark' : '',
+                )
+            );
+
+            /* Modify link. Should be templated...
+                */
+            if ($currentEvent->getIsEditable()) {
+                $this->setVar(
+                    'MODIFY',
+                    '<a class="btn modify float-left" href="/calendar/modify.php?eventID=' . $currentEvent->getEventId(
+                    ) . '&returnTo=month"><span></span>Modify</a>'
+                );
+            } else {
+                $this->setVar('MODIFY', '');
+            }
+
+            /* Event attendance
+             */
+            if ($currentEvent->canAttend()) {
+                $this->parse('attendance_icon_block', 'attendance_icon');
+
+                if ($this->getGroup()->isStudent($_SESSION['id'])) {
+                    if ($attendance = $this->getCalendar()->getAttendanceByEventAndUser(
+                        $currentEvent->getEventId(), $_SESSION['id']
+                    )
+                    ) {
+
+                        /* Attendance Status
+                         */
+                        if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
+                            $this->setVar('ATTENDANCE_STATUS', 'Pending');
+                        } else {
+                            if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
+                                $this->setVar('ATTENDANCE_STATUS', 'Approved');
+                            } else {
+                                if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
+                                    $this->setVar('ATTENDANCE_STATUS', 'Rejected');
+                                }
+                            }
+                        }
+
+                        $this->parse('attendance_status_block', 'attendance_status');
+
+                        $this->setVar('ATTENDANCE_REQUEST_ACTION', 'Unattend');
+                    } else {
+                        $this->setVar('ATTENDANCE_REQUEST_ACTION', 'Attend');
+                    }
+
+                    $this->parse('attendance_request_button_block', 'attendance_request_button');
+                } else {
+                    if ($this->getGroup()->isStaff($_SESSION['id'])) {
+                        $this->parse('attendance_list_button_block', 'attendance_list_button');
+                    }
+                }
+            }
+
+            /* Show a homepage if appropriate
+             */
+            if ($currentEvent->getCategoryId() > 0) {
+                $this->setVar(
+                    array(
+                        'HAS_CATEGORY_ID' => $currentEvent->getCategoryId(),
+                        'HAS_CATEGORY_NAME' => $currentEvent->getCategoryName(),
+                    )
+                );
+
+                $this->parse('has_category_block', 'has_category');
+            }
+            $this->parse("note_listing", "note_block", true);
+        }
 
         return true;
     }
