@@ -33,19 +33,23 @@ class Calendar_Api_Factory {
 	 * Constructor
 	 */
 	public function __construct() {
-		$config1 = new Calendar_Api_Config_Vcal();
-		$config1->setUrl('http://www.google.com/calendar/ical/steve.chan%40alaress.com.au/private-41226de2f5ba54c921f3eb6b46131d8b/basic.ics');
-		$config1->setEventType('Event');
-		$config1->setConnector('Schoolbox');
+//		$config1 = new Calendar_Api_Config_Type_Vcal();
+//		$config1->setUrl('http://www.google.com/calendar/ical/steve.chan%40alaress.com.au/private-41226de2f5ba54c921f3eb6b46131d8b/basic.ics');
+//		$config1->setEventType('Event');
+//		$config1->setConnector('Schoolbox');
+//
+//		$config2 = new Calendar_Api_Config_Type_Default();
+//		$config2->setEventType('Event');
+//		$config2->setConnector('Sharepoint');
 
-		$config2 = new Calendar_Api_Config_Default();
-		$config2->setEventType('Event');
-		$config2->setConnector('Sharepoint');
+		$configMapper = Calendar_Api_Config_Mapper::getInstance();
 
-		$allTypes = array(
-			$config1,
-			$config2,
-		);
+		$allConfigs = $configMapper->findAll();
+
+		foreach($allConfigs as $currentConfig) {
+			new Alaress_Probe($currentConfig);
+			$allTypes[] = unserialize($currentConfig->getConfig());
+		}
 
 		$this->setAllTypes($allTypes);
 	}
