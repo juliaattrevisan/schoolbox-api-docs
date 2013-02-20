@@ -27,12 +27,14 @@ abstract class Calendar_Api_Config_Abstract {
 	 *
 	 * @var string
 	 */
-	protected $connector = '';
+	protected $connectorClass = '';
 
 	/* Getters/Setters
 	 */
 
 	/**
+	 * Set event type
+	 *
 	 * @param string $eventType
 	 */
 	public function setEventType($eventType) {
@@ -40,6 +42,8 @@ abstract class Calendar_Api_Config_Abstract {
 	}
 
 	/**
+	 * Get event type
+	 *
 	 * @return string
 	 */
 	public function getEventType() {
@@ -47,16 +51,20 @@ abstract class Calendar_Api_Config_Abstract {
 	}
 
 	/**
-	 * @param string $connector
+	 * Set connector class
+	 *
+	 * @param string $connectorClass
 	 */
-	public function setConnector($connector) {
-		$this->connector = $connector;
+	public function setConnectorClass($connectorClass) {
+		$this->connectorClass = $connectorClass;
 	}
 
 	/**
+	 * Get connector class
+	 *
 	 * @return string
 	 */
-	public function getConnector() {
-		return $this->connector;
+	public function getConnectorClass() {
+		return $this->connectorClass;
 	}
 }
