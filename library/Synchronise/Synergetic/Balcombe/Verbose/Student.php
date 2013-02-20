@@ -70,17 +70,18 @@ class Synchronise_Synergetic_Balcombe_Verbose_Student extends Synchronise_Synerg
      * @param $data
      */
     private function printline($action, $data) {
-
-        printf(" %-16s of %-10s from %8s => %-52s %-52s (%-8s) Yr%-3s %3s\n",
-            $action,
-            $data['username'],
-            $data['synergy_id'],
-            $data['firstname'] . ' ' . $data['lastname'],
-            '<'.$data['alt_email'].'>',
-            implode(' ',$data['campus']),
-            $data['year'],
-            $data['group_id']
-        );
+        if(is_array($data)) {
+            printf(" %-16s of %-10s from %8s => %-52s %-52s (%-8s) Yr%-3s %3s\n",
+                $action,
+                $data['username'],
+                $data['synergy_id'],
+                $data['firstname'] . ' ' . $data['lastname'],
+                '<'.$data['alt_email'].'>',
+                implode(' ',$data['campus']),
+                $data['year'],
+                $data['group_id']
+            );
+        }
 
     }
 }
