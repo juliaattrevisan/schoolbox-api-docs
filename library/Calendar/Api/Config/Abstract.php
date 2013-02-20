@@ -13,6 +13,8 @@ abstract class Calendar_Api_Config_Abstract {
 	 * The kind of event this configuration is for
 	 * e.g. 'Event', 'Submission'
 	 *
+	 * Public because of Mapper
+	 *
 	 * @var string
 	 */
 	protected $eventType = '';
@@ -20,6 +22,8 @@ abstract class Calendar_Api_Config_Abstract {
 	/**
 	 * Class name of the API which will use this config
 	 * e.g. 'Schoolbox', 'Sharepoint'
+	 *
+	 * Public because of Mapper
 	 *
 	 * @var string
 	 */
