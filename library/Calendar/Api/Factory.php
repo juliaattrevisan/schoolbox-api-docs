@@ -28,22 +28,7 @@ class Calendar_Api_Factory {
 	public function __construct() {
 		$configMapper = Calendar_Api_Config_Mapper::getInstance();
 
-//		$config1 = new Calendar_Api_Config_Type_Vcal();
-//		$config1->setUrl('http://www.google.com/calendar/ical/steve.chan%40alaress.com.au/private-41226de2f5ba54c921f3eb6b46131d8b/basic.ics');
-//		$config1->setEventType('Event');
-//		$config1->setConnectorClass('Schoolbox');
-//
-//		$config2 = new Calendar_Api_Config_Type_Default();
-//		$config2->setEventType('Event');
-//		$config2->setConnectorClass('Sharepoint');
-//
-//		echo base64_encode(serialize($config1));
-//		echo "<HR>";
-//		echo base64_encode(serialize($config2));
-
 		$allConfigs = $configMapper->findAll();
-
-		$allTypes = array();
 
 		for ($allConfigs->rewind(); $allConfigs->valid(); $allConfigs->next()) {
 			$current = $allConfigs->current();
@@ -51,10 +36,8 @@ class Calendar_Api_Factory {
 			/* These configs are base64-encode()'d to get around a weird issue with unserialize
 			 * http://stackoverflow.com/questions/4264270/unserialize-sometimes-returns-false
 			 */
-			$allTypes[] = unserialize(base64_decode($current->getConfig()));
+			$this->addConfig(unserialize(base64_decode($current->getConfig())));
 		}
-
-		$this->setAllTypes($allTypes);
 	}
 
 	/**
@@ -66,8 +49,8 @@ class Calendar_Api_Factory {
 		$compositeApi = new Calendar_Api_Composite();
 
 		foreach($this->getAllTypes() as $config) {
-			$defaultImplementation = 'Calendar_Api_' . $config->getEventType() . '_' . $config->getConnector() . '_Default';
-			$uniqueImplementation = 'Calendar_Api_' . $config->getEventType() . '_' . $config->getConnector() . '_' . ucwords(Cfg::get('site_location'));
+			$defaultImplementation = 'Calendar_Api_' . $config->getEventType() . '_' . $config->getConnectorClass() . '_Default';
+			$uniqueImplementation = 'Calendar_Api_' . $config->getEventType() . '_' . $config->getConnectorClass() . '_' . ucwords(Cfg::get('site_location'));
 
 			/* Decide which to use (unique or default)
 			 * Or create no class, if neither exists
