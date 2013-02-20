@@ -1,0 +1,33 @@
+<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <h2>Students</h2>
+    {CONFIGURATION}
+    <div class="listing">
+        <!-- BEGIN person -->
+        <a href="/search/user/{PERSON_UID}" class="button {LIST_STYLE}" alt="{PERSON_NAME}" title="{PERSON_NAME}">
+            <!-- BEGIN has_portrait -->
+            <img src='/portrait.php?userId={PERSON_EXTERNAL_ID}&size=square64'/>
+            <!-- END has_portrait -->
+
+            <span class="name">{PERSON_NAME}</span>
+
+            <!-- BEGIN has_group -->
+            <span class="group">{PERSON_GROUP}</span>
+            <!-- END has_group -->
+        </a>
+        <!-- END person -->
+
+        <div style='clear: both;'>
+            <!-- BEGIN student_email -->
+            <form action="/mail/createMail.php" method="post" class="clearfix" name="form2" style="float:right;">
+                <input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLY_TO}&gt;"/>
+                <input type="hidden" name="bcc" value="{EMAIL_ALL_STUDENTS}"/>
+                <a href="#" class="btn submit-this float-right up-arrow "><span></span>Email all</a>
+            </form>
+            <!-- END student_email -->
+
+            <!-- BEGIN parent_email -->
+	    <!-- Removed by request SB-1914 -->
+	    <!-- END parent_email -->
+        </div>
+    </div>
+</div>
