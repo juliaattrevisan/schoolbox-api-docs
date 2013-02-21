@@ -41,10 +41,25 @@ var calendar = {
 			 */
 			if ($j(this).is(':checked')) {
 				console.log('activate all associated with ' + suffix);
+
+				var data = {
+					id: parts,
+					status: 1
+				}
 			}
 			else {
 				console.log('deactivate all associated with ' + suffix);
+
+				var data = {
+					id: parts,
+					status: 0
+				}
 			}
+
+			$j.post('/adminv2/calendar/updateStatus', data, function(responseText) {
+				console.log(responseText);
+			});
+
 		});
 	},
 
