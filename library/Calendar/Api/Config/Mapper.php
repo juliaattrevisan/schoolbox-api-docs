@@ -55,4 +55,29 @@ class Calendar_Api_Config_Mapper extends Mapper {
 
 		parent::mapping();
 	}
+
+	/**
+	 * Return a set of decoded config objects for the specified event_type and connector_class
+	 *
+	 * @param $currentEventType
+	 * @param $currentConnector
+	 * @return array
+	 */
+	public function getAllConfigs($currentEventType, $currentConnector) {
+		$configs = Calendar_Api_Config_Mapper::getInstance()->findByColumnList(array(
+			'event_type' => $currentEventType,
+			'connector_class' => $currentConnector
+		));
+
+		$allConfigs = array();
+
+		foreach($configs as $currentConfig) {
+			$config = $currentConfig->decodeConfig();
+			$config->setId($currentConfig->getId());
+
+			$allConfigs[] = $config;
+		}
+
+		return $allConfigs;
+	}
 }
