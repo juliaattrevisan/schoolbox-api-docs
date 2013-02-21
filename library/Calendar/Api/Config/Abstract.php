@@ -10,6 +10,13 @@
 abstract class Calendar_Api_Config_Abstract {
 
 	/**
+	 * Primary key
+	 *
+	 * @var int
+	 */
+	protected $id = -1;
+
+	/**
 	 * The kind of event this configuration is for
 	 * e.g. 'Event', 'Submission'
 	 *
@@ -28,6 +35,15 @@ abstract class Calendar_Api_Config_Abstract {
 	 * @var string
 	 */
 	protected $connectorClass = '';
+
+	/**
+	 * Method for uniquely rendering on admin screen
+	 *
+	 * @param $page
+	 * @param $currentConnector
+	 * @return mixed
+	 */
+	abstract public function render($page, $currentConnector);
 
 	/* Getters/Setters
 	 */
@@ -66,5 +82,23 @@ abstract class Calendar_Api_Config_Abstract {
 	 */
 	public function getConnectorClass() {
 		return $this->connectorClass;
+	}
+
+	/**
+	 * Set id
+	 *
+	 * @param int $id
+	 */
+	public function setId($id) {
+		$this->id = $id;
+	}
+
+	/**
+	 * Get id
+	 *
+	 * @return int
+	 */
+	public function getId() {
+		return $this->id;
 	}
 }
