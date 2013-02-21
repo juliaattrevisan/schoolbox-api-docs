@@ -28,6 +28,7 @@ $this->setBlock(TEMPLATE_content, 'subscribe', 'subscribe_block');
 $this->setBlock('subscribe', 'eventType', 'eventType_block');
 $this->setBlock('eventType', 'connector', 'connector_block');
 $this->setBlock('connector', 'connectorConfig', 'connectorConfig_block');
+$this->setBlock('connector', 'has_multiple_options', 'has_multiple_options_block');
 
 $this->setVar('import_block', '');
 $this->setVar('subscribe_block', '');
@@ -95,6 +96,15 @@ if (is_array($typeList)) {
 						'CONNECTOR_NAME' => $currentConnector
 					));
 
+					/* Only Vcal has multiple options
+					 */
+					if ($currentConnector == 'Vcal') {
+						$this->parse('has_multiple_options_block', 'has_multiple_options');
+					}
+					else {
+						$this->setVar('has_multiple_options_block', '');
+					}
+
 					/* Process each config for this kind of connector
 					 */
 					$allConfigs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigs($currentEventType, $currentConnector);
@@ -113,6 +123,7 @@ if (is_array($typeList)) {
 					 */
 					$this->setVar('connectorConfig_block', '');
 					$this->setVar('configFragment', '');
+					$this->setVar('has_multiple_options_block', '');
 				}
 
 				$this->parse('eventType_block', 'eventType', true);

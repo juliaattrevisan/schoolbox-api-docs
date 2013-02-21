@@ -145,13 +145,21 @@ $j(function() {
 				<div class="clearfix"></div>
 
 				<!-- BEGIN eventType -->
-				<div style='border:2px dashed #f00;width:100%;display:block;margin:20px 0px;padding:20px;'>
+				<div class='eventList'>
 					<strong>{EVENTTYPE_NAME}</strong>
 
 					<!-- BEGIN connector -->
-					<div style='border: 1px solid #0f0;width:100%;display:block;padding:4px'>
+					<div id='configOptions_{CONNECTOR_NAME}' class='configList'>
 						<input type='hidden' name="connectorId[]" value='{CONNECTOR_ID}' />
-						<input type="checkbox" name='connector_{EVENTTYPE_NAME}[]' value='{CONNECTOR_NAME}' /> <em>{CONNECTOR_NAME}</em>
+						<input type="checkbox" name='connector_{CONNECTOR_NAME}[]' value='{CONNECTOR_NAME}' />
+
+						<em>{CONNECTOR_NAME}</em>
+
+						<!-- BEGIN has_multiple_options -->
+						<button id="add_{CONNECTOR_NAME}" class='addConfig' />+</button>
+						<!-- END has_multiple_options -->
+
+						<div class="clearfix"></div>
 
 						<!-- BEGIN connectorConfig -->
 						<!-- END connectorConfig -->
@@ -166,3 +174,24 @@ $j(function() {
 		<!-- END subscribe -->
 	</div>
 </div>
+
+<style type='text/css'>
+	div.eventList {
+		width:100%;
+		display:block;
+		margin:20px 0px;
+		padding:20px;
+	}
+
+	div.configList {
+		border: 1px solid #ddd;
+		width:100%;
+		display:block;
+		padding:4px;
+		margin: 4px 0px;
+	}
+
+	button.addConfig, button.removeConfig {
+		float: right;
+	}
+</style>
