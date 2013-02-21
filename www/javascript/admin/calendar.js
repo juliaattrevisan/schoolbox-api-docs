@@ -9,9 +9,34 @@ var calendar = {
 	 * Init
 	 */
 	init: function() {
+
+		/* Connector status actions - activate/deactive individual connectors
+		 * by setting all their Configs to inactive
+		 */
+		this.initConnectorStatus();
+
+		/* Config actions - add, update and remove individual configs
+		 */
 		this.initAdd();
 		this.initUpdate();
 		this.initRemove();
+	},
+
+	initConnectorStatus: function() {
+		$j('.connectorActive').click(function() {
+			var suffix = $j(this).attr('id').toString().replace(/connector_/, '');
+
+			var parts = suffix.split('_');
+
+			/* Ajax activate/deactivate status
+			 */
+			if ($j(this).is(':checked')) {
+				console.log('activate all associated with ' + suffix);
+			}
+			else {
+				console.log('deactivate all associated with ' + suffix);
+			}
+		});
 	},
 
 	/**

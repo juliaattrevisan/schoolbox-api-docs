@@ -92,8 +92,31 @@ if (is_array($typeList)) {
 				/* Inject individual templates just like before -_-
 				 */
 				foreach($allConnectors as $currentConnector) {
+
+					/* Process each config for this kind of connector
+					 */
+					$allConfigs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigs($currentEventType, $currentConnector);
+
+					if (count($allConfigs)) {
+						foreach($allConfigs as $currentConfig) {
+							$this->setFile('configFragment', "adminv2/calendar/config/{$currentConnector}.html");
+
+							$currentConfig->render($this);
+
+							$this->parse('connectorConfig_block', 'configFragment', true);
+						}
+
+						/* Whether this connector displays at Ticked or not
+						 */
+						$connectorChecked = 'checked="checked"';
+					}
+					else {
+						$connectorChecked = '';
+					}
+
 					$this->setVar(array(
-						'CONNECTOR_NAME' => $currentConnector
+						'CONNECTOR_NAME' => $currentConnector,
+						'CONNECTOR_CHECKED' => $connectorChecked,
 					));
 
 					/* Only Vcal has multiple options
@@ -105,17 +128,6 @@ if (is_array($typeList)) {
 						$this->setVar('has_multiple_options_block', '');
 					}
 
-					/* Process each config for this kind of connector
-					 */
-					$allConfigs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigs($currentEventType, $currentConnector);
-
-					foreach($allConfigs as $currentConfig) {
-						$this->setFile('configFragment', "adminv2/calendar/config/{$currentConnector}.html");
-
-						$currentConfig->render($this);
-
-						$this->parse('connectorConfig_block', 'configFragment', true);
-					}
 
 					$this->parse('connector_block', 'connector', true);
 
