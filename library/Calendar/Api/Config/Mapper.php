@@ -66,7 +66,8 @@ class Calendar_Api_Config_Mapper extends Mapper {
 	public function getAllConfigs($currentEventType, $currentConnector) {
 		$configs = Calendar_Api_Config_Mapper::getInstance()->findByColumnList(array(
 			'event_type' => $currentEventType,
-			'connector_class' => $currentConnector
+			'connector_class' => $currentConnector,
+			'status' => 1
 		));
 
 		$allConfigs = array();
