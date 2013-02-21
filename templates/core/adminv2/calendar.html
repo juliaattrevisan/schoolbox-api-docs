@@ -150,8 +150,8 @@ $j(function() {
 				<!-- BEGIN connector -->
 				<div id='configOptions_{CONNECTOR_NAME}' class='configList'>
 					<form>
-						<input type='hidden' name="connectorId[]" value='{CONNECTOR_ID}' />
-						<input type="checkbox" id="connector_{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='connectorActive' name='connector_{CONNECTOR_NAME}[]' value='{CONNECTOR_NAME}' {CONNECTOR_CHECKED} />
+						<input type='hidden' name="connectorId" value='{CONNECTOR_ID}' />
+						<input type="checkbox" id="connector_{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='connectorActive' value='{EVENTTYPE_NAME}_{CONNECTOR_NAME}' {CONNECTOR_CHECKED} />
 						<em>{CONNECTOR_NAME}</em>
 					</form>
 
