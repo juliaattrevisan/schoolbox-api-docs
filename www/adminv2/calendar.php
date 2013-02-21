@@ -38,7 +38,7 @@ if ($this->arg[0]) {
 	$selectedType = urldecode($this->arg[0]);
 }
 else {
-	$selectedType = 'Site';
+	$selectedType = 'Import';
 }
 
 $typeList = array(
