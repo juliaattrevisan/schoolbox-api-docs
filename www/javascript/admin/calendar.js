@@ -18,7 +18,6 @@ var calendar = {
 		/* Config actions - add, update and remove individual configs
 		 */
 		this.initAdd();
-		this.initUpdate();
 		this.initRemove();
 	},
 
@@ -61,25 +60,6 @@ var calendar = {
 			/* Ajax add this config option
 			 */
 			console.log('add ' + id);
-
-			/* Reload screen
-			 */
-			self.refresh();
-		});
-	},
-
-	/**
-	 * Set up Update behaviours
-	 */
-	initUpdate: function() {
-		var self = this;
-
-		$j('input.updateConfig').change(function() {
-			var id = $j(this).attr('id').toString().replace(/update_/, '');
-
-			/* Ajax update this config option
-			 */
-			console.log('update ' + id);
 
 			/* Reload screen
 			 */
