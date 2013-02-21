@@ -23,6 +23,16 @@ class Calendar_Api_Config_Type_Vcal extends Calendar_Api_Config_Abstract {
 	 */
 	private $perms = array();
 
+	/**
+	 * Render configs into admin screen
+	 */
+	public function render($page, $currentConnector) {
+		$page->setVar(array(
+			'CONNECTOR_ID' => $this->getId(),
+			'URL' => $this->getUrl()
+		));
+	}
+
 	/* Getters/Setters
 	 */
 
