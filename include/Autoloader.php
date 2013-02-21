@@ -60,7 +60,7 @@ class Autoloader {
      * @return String|Bool The path to the file containing the class or false
      */
     private static function getClassFile ($className) {
-        $classSegments = explode('_', $className);
+        $classSegments = preg_split('/[_\\\\]/', $className);
         $unqualClassName = $classSegments[count($classSegments) - 1];
         $pathSegments = $classSegments;
 
