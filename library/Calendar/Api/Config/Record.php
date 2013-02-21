@@ -13,6 +13,16 @@
 class Calendar_Api_Config_Record {
 
 	/**
+	 * Status of a config record
+	 *
+	 * If all config records for a connector are inactive, that connector is deemed
+	 * inactive too. This is the equivalent of checking that checkbox next to the connector
+	 * in admin, but without having to delete the settings.
+	 */
+	const ACTIVE = 1;
+	const INACTIVE = 0;
+
+	/**
 	 * Primary key
 	 *
 	 * @var int
@@ -45,6 +55,13 @@ class Calendar_Api_Config_Record {
 	 * @var string
 	 */
 	public $config = '';
+
+	/**
+	 * Status of the config
+	 *
+	 * @var int
+	 */
+	public $status = 1;
 
 	/* These configs are base64-encode()'d to get around a weird issue with unserialize
 	 * http://stackoverflow.com/questions/4264270/unserialize-sometimes-returns-false
@@ -82,6 +99,20 @@ class Calendar_Api_Config_Record {
 	 */
 	public function decodeConfig() {
 		return unserialize(base64_decode($this->getConfig()));
+	}
+
+	/**
+	 * Activate this config record
+	 */
+	public function activate() {
+		$this->setStatus(self::ACTIVE);
+	}
+
+	/**
+	 * Deactivate this config record, but not delete it
+	 */
+	public function deactivate() {
+		$this->setStatus(self::INACTIVE);
 	}
 
 	/* Getters/Setters
@@ -154,4 +185,23 @@ class Calendar_Api_Config_Record {
 	public function getId() {
 		return $this->id;
 	}
+
+	/**
+	 * Set status
+	 *
+	 * @param int $status
+	 */
+	public function setStatus($status) {
+		$this->status = $status;
+	}
+
+	/**
+	 * Get status
+	 *
+	 * @return int
+	 */
+	public function getStatus() {
+		return $this->status;
+	}
+
 }

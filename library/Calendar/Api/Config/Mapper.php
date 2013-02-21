@@ -53,6 +53,12 @@ class Calendar_Api_Config_Mapper extends Mapper {
 			'type'       => Mapper::TYPE_STRING,
 		));
 
+		$this->hasMap(array(
+			'column'     => 'status',
+			'property'   => 'status',
+			'type'       => Mapper::TYPE_INTEGER,
+		));
+
 		parent::mapping();
 	}
 
