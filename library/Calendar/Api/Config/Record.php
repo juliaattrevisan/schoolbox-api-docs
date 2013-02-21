@@ -51,12 +51,21 @@ class Calendar_Api_Config_Record {
 	 */
 
 	/**
+	 * Update config object
+	 *
+	 * @param Calendar_Api_Config_Abstract $config
+	 */
+	public function updateConfig(Calendar_Api_Config_Abstract $config) {
+		$this->setConfig($this->encodeConfig($config));
+	}
+
+	/**
 	 * Encode config object for storage in db
 	 *
 	 * @return string
 	 */
 	public function encodeConfig() {
-		return base64_decode(serialize($this->getConfig()));
+		return base64_encode(serialize($this->getConfig()));
 	}
 
 	/**
