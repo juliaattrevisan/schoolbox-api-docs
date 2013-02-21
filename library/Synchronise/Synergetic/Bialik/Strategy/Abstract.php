@@ -136,7 +136,7 @@ abstract class Synchronise_Synergetic_Bialik_Strategy_Abstract extends Synchroni
 		/* Does this person have a username? If not, skip them
 		 */
 		if ($this->hasUsername($newUser)) {
-			$existing = $this->userExistsBySynergyAndGroup($newUser);
+			$existing = $this->userExists($newUser);
 
 			/* If the current user exists in Schoolbox, update them
 			 */

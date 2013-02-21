@@ -205,4 +205,14 @@ class Synchronise_Synergetic_Bialik_Strategy_Parent extends Synchronise_Synerget
 
 		$this->getVerboseFilter()->summary();
 	}
+
+    /**
+     * Do not move parents between groups
+     *
+     * @param $newUser
+     * @return mixed
+     */
+    protected function userExists($newUser) {
+        return $this->userExistsBySynergyAndGroup($newUser);
+    }
 }
