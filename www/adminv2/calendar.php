@@ -128,7 +128,6 @@ if (is_array($typeList)) {
 						$this->setVar('has_multiple_options_block', '');
 					}
 
-
 					$this->parse('connector_block', 'connector', true);
 
 					/* Clear children after parsing out the parent

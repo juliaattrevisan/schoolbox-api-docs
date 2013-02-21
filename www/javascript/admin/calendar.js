@@ -97,6 +97,7 @@ var calendar = {
 			var id = $j(this).attr('id').toString().replace(/remove_/, '');
 
 			if (confirm('Are you sure you want to remove this configuration option?')) {
+
 				/* Ajax remove this config option
 				 */
 				console.log('remove ' + id);
