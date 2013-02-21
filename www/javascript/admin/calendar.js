@@ -22,6 +22,9 @@ var calendar = {
 		this.initRemove();
 	},
 
+	/**
+	 * Set up connector activate/deactivate
+	 */
 	initConnectorStatus: function() {
 		$j('.connectorActive').click(function() {
 			var suffix = $j(this).attr('id').toString().replace(/connector_/, '');
