@@ -5,6 +5,8 @@ switch($_POST['connectorClass']) {
 		if (is_array($_POST['url']) && count($_POST['url'])) {
 			foreach($_POST['url'] as $key => $value) {
 
+				/* Update each url
+				 */
 				$config = new Calendar_Api_Config_Type_Vcal();
 				$config->setId($key);
 				$config->setUrl($value);
@@ -14,9 +16,11 @@ switch($_POST['connectorClass']) {
 
 				Calendar_Api_Config_Mapper::getInstance()->save(array($configRecord));
 			}
+
+			$this->backToTheFuture(1);
 		}
 
-	break;
+		break;
 
 	default:
 	break;
