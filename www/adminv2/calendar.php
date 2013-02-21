@@ -102,7 +102,7 @@ if (is_array($typeList)) {
 					foreach($allConfigs as $currentConfig) {
 						$this->setFile('configFragment', "adminv2/calendar/config/{$currentConnector}.html");
 
-						$currentConfig->render($this, $currentConnector);
+						$currentConfig->render($this);
 
 						$this->parse('connectorConfig_block', 'configFragment', true);
 					}
