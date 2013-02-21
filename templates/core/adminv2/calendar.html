@@ -141,35 +141,36 @@ $j(function() {
 		<!-- END import -->
 		<!-- BEGIN subscribe -->
 		<div class="level clearfix">
-			<form action="/adminv2/updateCalendarConnector" method="post" enctype="multipart/form-data" name="form" id="subscribeForm" class="clearfix">
-				<div class="clearfix"></div>
+			<div class="clearfix"></div>
 
-				<!-- BEGIN eventType -->
-				<div class='eventList'>
-					<strong>{EVENTTYPE_NAME}</strong>
+			<!-- BEGIN eventType -->
+			<div class='eventList'>
+				<strong>{EVENTTYPE_NAME}</strong>
 
-					<!-- BEGIN connector -->
-					<div id='configOptions_{CONNECTOR_NAME}' class='configList'>
+				<!-- BEGIN connector -->
+				<div id='configOptions_{CONNECTOR_NAME}' class='configList'>
+					<form>
 						<input type='hidden' name="connectorId[]" value='{CONNECTOR_ID}' />
 						<input type="checkbox" id="connector_{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='connectorActive' name='connector_{CONNECTOR_NAME}[]' value='{CONNECTOR_NAME}' {CONNECTOR_CHECKED} />
-
 						<em>{CONNECTOR_NAME}</em>
+					</form>
 
-						<!-- BEGIN has_multiple_options -->
-						<a id="add_{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='addConfig' />+</a>
-						<!-- END has_multiple_options -->
+					<!-- BEGIN has_multiple_options -->
+					<a id="add_{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='addConfig' />+</a>
+					<!-- END has_multiple_options -->
 
-						<div class="clearfix"></div>
+					<div class="clearfix"></div>
 
+					<form method='post' action='/adminv2/calendar/updateOption'>
+						<input type="hidden" name="connectorClass" value="{CONNECTOR_NAME}" />
 						<!-- BEGIN connectorConfig -->
 						<!-- END connectorConfig -->
-					</div>
-					<!-- END connector -->
+						<input type="submit" value='Update' />
+					</form>
 				</div>
-				<!-- END eventType -->
-
-				<a class="btn add float-left submit" href="#"><span></span>Save</a>
-			</form>
+				<!-- END connector -->
+			</div>
+			<!-- END eventType -->
 		</div>
 		<!-- END subscribe -->
 	</div>
