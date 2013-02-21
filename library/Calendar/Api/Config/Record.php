@@ -56,7 +56,14 @@ class Calendar_Api_Config_Record {
 	 * @param Calendar_Api_Config_Abstract $config
 	 */
 	public function updateConfig(Calendar_Api_Config_Abstract $config) {
-		$this->setConfig($this->encodeConfig($config));
+
+		/* Update member contents with new config object
+		 */
+		$this->setConfig($config);
+
+		/* Encode and save it
+		 */
+		$this->setConfig($this->encodeConfig());
 	}
 
 	/**
