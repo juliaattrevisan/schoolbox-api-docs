@@ -9,14 +9,31 @@ var calendar = {
 	 * Init
 	 */
 	init: function() {
-		this.updateInit();
-		this.removeInit();
+		this.initAdd();
+		this.initUpdate();
+		this.initRemove();
+	},
+
+	/**
+	 * Set up Add behaviours
+	 */
+	initAdd: function() {
+		$j('a.addConfig').click(function() {
+			var id = $j(this).attr('id').toString().replace(/add_/, '');
+
+			/* Ajax add this config option
+			 */
+			console.log('add ' + id);
+
+			/* Reload screen
+			 */
+		});
 	},
 
 	/**
 	 * Set up Update behaviours
 	 */
-	updateInit: function() {
+	initUpdate: function() {
 		$j('input.updateConfig').change(function() {
 			var id = $j(this).attr('id').toString().replace(/update_/, '');
 
@@ -32,7 +49,7 @@ var calendar = {
 	/**
 	 * Set up Remove behaviours
 	 */
-	removeInit: function() {
+	initRemove: function() {
 		$j('a.removeConfig').click(function() {
 			var id = $j(this).attr('id').toString().replace(/remove_/, '');
 

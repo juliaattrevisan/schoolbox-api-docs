@@ -156,7 +156,7 @@ $j(function() {
 						<em>{CONNECTOR_NAME}</em>
 
 						<!-- BEGIN has_multiple_options -->
-						<a id="add_{CONNECTOR_NAME}" class='addConfig' />+</a>
+						<a id="add_{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='addConfig' />+</a>
 						<!-- END has_multiple_options -->
 
 						<div class="clearfix"></div>
@@ -198,7 +198,7 @@ $j(function() {
 </style>
 
 <!-- BEGIN custom_javascript -->
-<script type='text/javascript' src='/inc/javascript/admin/calendar.js'></script>
+<script type='text/javascript' src='/javascript/admin/calendar.js'></script>
 <script type='text/javascript'>
 	$j(function() {
 		calendar.init();
