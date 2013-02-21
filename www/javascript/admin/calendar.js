@@ -32,24 +32,20 @@ var calendar = {
 	 * Set up connector activate/deactivate
 	 */
 	initConnectorStatus: function() {
-		$j('.connectorActive').click(function() {
-			var suffix = $j(this).attr('id').toString().replace(/connector_/, '');
+		var self = this;
 
-			var parts = suffix.split('_');
+		$j('.connectorActive').click(function() {
+			var parts = $j(this).attr('id').toString().replace(/connector_/, '').split('_');
 
 			/* Ajax activate/deactivate status
 			 */
 			if ($j(this).is(':checked')) {
-				console.log('activate all associated with ' + suffix);
-
 				var data = {
 					id: parts,
 					status: 1
 				}
 			}
 			else {
-				console.log('deactivate all associated with ' + suffix);
-
 				var data = {
 					id: parts,
 					status: 0
@@ -57,9 +53,8 @@ var calendar = {
 			}
 
 			$j.post('/adminv2/calendar/updateStatus', data, function(responseText) {
-				console.log(responseText);
+				self.refresh();
 			});
-
 		});
 	},
 
