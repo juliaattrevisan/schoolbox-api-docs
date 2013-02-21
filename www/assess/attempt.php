@@ -79,8 +79,8 @@ if ($assessHandler->isOwner($this->arg[0])) {
 $numAttempts = $attemptHandler->userHasAttempted($assess['assess_id'], $_SESSION['id']);
 
 $attempt = $attemptHandler->getLatestResumableForUser($assess['assess_id'], $_SESSION['id']);
-$attemptStartTime = strtotime($attempt['start']);
-$attemptTimeRemaining = $attemptStartTime + $assess['duration'] - time();
+$attemptStartTime     = ($attempt['start'] ? strtotime($attempt['start']) : $_SERVER['REQUEST_TIME']);
+$attemptTimeRemaining = $attemptStartTime + $assess['duration'] - $_SERVER['REQUEST_TIME'];
 $attemptEndTime = $attemptStartTime + $assess['duration'];
 
 /* If there is a resumable attempt, resume it.
