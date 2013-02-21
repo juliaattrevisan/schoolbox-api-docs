@@ -13,9 +13,8 @@ class Calendar_Api_Config_Type_Default extends Calendar_Api_Config_Abstract {
 	 * Render configs into admin screen
 	 *
 	 * @param $page
-	 * @param $currentConnector
 	 * @return mixed|void
 	 */
-	public function render($page, $currentConnector) {
+	public function render($page) {
 	}
 }

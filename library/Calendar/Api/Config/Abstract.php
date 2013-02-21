@@ -40,10 +40,9 @@ abstract class Calendar_Api_Config_Abstract {
 	 * Method for uniquely rendering on admin screen
 	 *
 	 * @param $page
-	 * @param $currentConnector
 	 * @return mixed
 	 */
-	abstract public function render($page, $currentConnector);
+	abstract public function render($page);
 
 	/* Getters/Setters
 	 */

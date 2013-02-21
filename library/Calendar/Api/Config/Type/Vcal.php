@@ -25,8 +25,11 @@ class Calendar_Api_Config_Type_Vcal extends Calendar_Api_Config_Abstract {
 
 	/**
 	 * Render configs into admin screen
+	 *
+	 * @param $page
+	 * @return mixed|void
 	 */
-	public function render($page, $currentConnector) {
+	public function render($page) {
 		$page->setVar(array(
 			'CONNECTOR_ID' => $this->getId(),
 			'URL' => $this->getUrl()

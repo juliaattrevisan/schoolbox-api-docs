@@ -78,20 +78,8 @@ if (is_array($typeList)) {
 		/* Subscribe page
 	 	 */
 		else if (($type['type'] == 'Subscribe') && ($selectedType == 'Subscribe')) {
-
 			$allEventTypes = array('Event', 'StudentBirthday', 'Submission');
 			$allConnectors = array('Schoolbox', 'Sharepoint', 'Vcal');
-
-//			$config1 = new Calendar_Api_Config_Type_Vcal();
-//			$config1->setUrl('http://www.google.com');
-//
-//			$config2 = new Calendar_Api_Config_Type_Vcal();
-//			$config2->setUrl('http://www.theage.com.au');
-//
-//			$config3 = new Calendar_Api_Config_Type_Vcal();
-//			$config3->setUrl('http://www.alaress.com.au');
-//
-//			$allConfigs = array($config1, $config2, $config3);
 
 			/* All calendar subscription options go here
 			 */
@@ -103,10 +91,9 @@ if (is_array($typeList)) {
 				/* Inject individual templates just like before -_-
 				 */
 				foreach($allConnectors as $currentConnector) {
-//					$this->setVar(array(
-//						'CONNECTOR_ID' => $connectorId,
-//						'CONNECTOR_NAME' => $currentConnector
-//					));
+					$this->setVar(array(
+						'CONNECTOR_NAME' => $currentConnector
+					));
 
 					/* Process each config for this kind of connector
 					 */
@@ -116,7 +103,6 @@ if (is_array($typeList)) {
 						$this->setFile('configFragment', "adminv2/calendar/config/{$currentConnector}.html");
 
 						$currentConfig->render($this, $currentConnector);
-
 
 						$this->parse('connectorConfig_block', 'configFragment', true);
 					}
@@ -140,20 +126,3 @@ if (is_array($typeList)) {
 		}
 	}
 }
-
-//$config1 = new Calendar_Api_Config_Type_Vcal();
-//$config1->setUrl('http://www.google.com');
-//
-//$config2 = new Calendar_Api_Config_Type_Vcal();
-//$config2->setUrl('http://www.theage.com.au');
-//
-//$config3 = new Calendar_Api_Config_Type_Vcal();
-//$config3->setUrl('http://www.alaress.com.au');
-//
-//
-//echo base64_encode(serialize($config1));
-//echo "<HR>";
-//echo base64_encode(serialize($config2));
-//echo "<HR>";
-//echo base64_encode(serialize($config3));
-//echo "<HR>";
