@@ -23,6 +23,13 @@ var calendar = {
 	},
 
 	/**
+	 * Reload screen
+	 */
+	refresh: function() {
+		window.location.href = window.location.href;
+	},
+
+	/**
 	 * Set up connector activate/deactivate
 	 */
 	initConnectorStatus: function() {
@@ -46,6 +53,8 @@ var calendar = {
 	 * Set up Add behaviours
 	 */
 	initAdd: function() {
+		var self = this;
+
 		$j('a.addConfig').click(function() {
 			var id = $j(this).attr('id').toString().replace(/add_/, '');
 
@@ -55,6 +64,7 @@ var calendar = {
 
 			/* Reload screen
 			 */
+			self.refresh();
 		});
 	},
 
@@ -62,6 +72,8 @@ var calendar = {
 	 * Set up Update behaviours
 	 */
 	initUpdate: function() {
+		var self = this;
+
 		$j('input.updateConfig').change(function() {
 			var id = $j(this).attr('id').toString().replace(/update_/, '');
 
@@ -71,6 +83,7 @@ var calendar = {
 
 			/* Reload screen
 			 */
+			self.refresh();
 		});
 	},
 
@@ -78,6 +91,8 @@ var calendar = {
 	 * Set up Remove behaviours
 	 */
 	initRemove: function() {
+		var self = this;
+
 		$j('a.removeConfig').click(function() {
 			var id = $j(this).attr('id').toString().replace(/remove_/, '');
 
@@ -88,6 +103,7 @@ var calendar = {
 
 				/* Reload screen
 				 */
+				self.refresh();
 			}
 
 			return false;
