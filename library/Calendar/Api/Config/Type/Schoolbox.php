@@ -16,5 +16,9 @@ class Calendar_Api_Config_Type_Schoolbox extends Calendar_Api_Config_Abstract {
 	 * @return mixed|void
 	 */
 	public function render($page) {
+		$page->setVar(array(
+			'CONNECTOR_ID' => $this->getId(),
+			'CONNECTOR_CLASS' => $this->getConnectorClass(),
+		));
 	}
 }

@@ -32,6 +32,7 @@ class Calendar_Api_Config_Type_Vcal extends Calendar_Api_Config_Abstract {
 	public function render($page) {
 		$page->setVar(array(
 			'CONNECTOR_ID' => $this->getId(),
+			'CONNECTOR_CLASS' => $this->getConnectorClass(),
 			'URL' => $this->getUrl()
 		));
 	}

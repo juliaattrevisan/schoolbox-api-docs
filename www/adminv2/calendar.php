@@ -27,9 +27,8 @@ $this->setBlock(TEMPLATE_content, 'import', 'import_block');
 $this->setBlock(TEMPLATE_content, 'subscribe', 'subscribe_block');
 $this->setBlock('subscribe', 'eventType', 'eventType_block');
 $this->setBlock('eventType', 'connector', 'connector_block');
-$this->setBlock('connector', 'has_multiple_options', 'has_multiple_options_block');
-$this->setBlock('connector', 'has_updatable_options', 'has_updatable_options_block');
-$this->setBlock('has_updatable_options', 'connectorConfig', 'connectorConfig_block');
+$this->setBlock('connector', 'connectorConfig', 'connectorConfig_block');
+//$this->setBlock('connector', 'has_multiple_options', 'has_multiple_options_block');
 
 $this->setVar('import_block', '');
 $this->setVar('subscribe_block', '');
@@ -87,7 +86,7 @@ if (is_array($typeList)) {
 			 */
 			foreach($allEventTypes as $currentEventType) {
 				$this->setVar(array(
-					'EVENTTYPE_NAME' => $currentEventType
+					'EVENTTYPE_NAME' => $currentEventType,
 				));
 
 				/* Inject individual templates just like before -_-
@@ -124,14 +123,12 @@ if (is_array($typeList)) {
 
 					/* Only Vcal has multiple updatable options
 					 */
-					if ($currentConnector == 'Vcal') {
-						$this->parse('has_multiple_options_block', 'has_multiple_options');
-						$this->parse('has_updatable_options_block', 'has_updatable_options');
-					}
-					else {
-						$this->setVar('has_multiple_options_block', '');
-						$this->setVar('has_updatable_options_block', '');
-					}
+//					if ($currentConnector == 'Vcal') {
+//						$this->parse('has_multiple_options_block', 'has_multiple_options');
+//					}
+//					else {
+//						$this->setVar('has_multiple_options_block', '');
+//					}
 
 					$this->parse('connector_block', 'connector', true);
 
@@ -139,8 +136,7 @@ if (is_array($typeList)) {
 					 */
 					$this->setVar('connectorConfig_block', '');
 					$this->setVar('configFragment', '');
-					$this->setVar('has_multiple_options_block', '');
-					$this->setVar('has_updatable_options_block', '');
+//					$this->setVar('has_multiple_options_block', '');
 				}
 
 				$this->parse('eventType_block', 'eventType', true);
@@ -154,3 +150,57 @@ if (is_array($typeList)) {
 		}
 	}
 }
+
+/* Defaults
+ */
+//$start = 85;
+//
+//$config = new Calendar_Api_Config_Type_Vcal();
+//$config->setId($start);
+//$config->setEventType('Event');
+//$config->setConnectorClass('Vcal');
+//$config->setUrl('http://www.google.com');
+//
+//$configRecord = new Calendar_Api_Config_Record();
+//$configRecord->setEventType('Event');
+//$configRecord->setConnectorClass('Vcal');
+//$configRecord->updateConfig($config);
+//
+//Calendar_Api_Config_Mapper::getInstance()->save(array($configRecord));
+//
+//$config = new Calendar_Api_Config_Type_Vcal();
+//$config->setId($start++);
+//$config->setEventType('Event');
+//$config->setConnectorClass('Vcal');
+//$config->setUrl('http://www.gruber.org');
+//
+//$configRecord = new Calendar_Api_Config_Record();
+//$configRecord->setEventType('Event');
+//$configRecord->setConnectorClass('Vcal');
+//$configRecord->updateConfig($config);
+//
+//Calendar_Api_Config_Mapper::getInstance()->save(array($configRecord));
+//
+//$config = new Calendar_Api_Config_Type_Sharepoint();
+//$config->setId($start++);
+//$config->setEventType('Submission');
+//$config->setConnectorClass('Schoolbox');
+//
+//$configRecord = new Calendar_Api_Config_Record();
+//$configRecord->setEventType('Submission');
+//$configRecord->setConnectorClass('Schoolbox');
+//$configRecord->updateConfig($config);
+//
+//Calendar_Api_Config_Mapper::getInstance()->save(array($configRecord));
+//
+//$config = new Calendar_Api_Config_Type_Sharepoint();
+//$config->setId($start++);
+//$config->setEventType('StudentBirthday');
+//$config->setConnectorClass('Sharepoint');
+//
+//$configRecord = new Calendar_Api_Config_Record();
+//$configRecord->setEventType('StudentBirthday');
+//$configRecord->setConnectorClass('Sharepoint');
+//$configRecord->updateConfig($config);
+//
+//Calendar_Api_Config_Mapper::getInstance()->save(array($configRecord));

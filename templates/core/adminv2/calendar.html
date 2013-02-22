@@ -140,40 +140,35 @@ $j(function() {
 		</div>
 		<!-- END import -->
 		<!-- BEGIN subscribe -->
-		<div class="level clearfix">
-			<div class="clearfix"></div>
+		<form method='post' action='/adminv2/calendar/updateOption'>
+			<div class="level clearfix">
+				<div class="clearfix"></div>
 
-			<!-- BEGIN eventType -->
-			<div class='eventList'>
-				<strong>{EVENTTYPE_NAME}</strong>
+				<!-- BEGIN eventType -->
+				<div class='eventList'>
+					<strong>{EVENTTYPE_NAME}</strong>
 
-				<!-- BEGIN connector -->
-				<div id='configOptions_{CONNECTOR_NAME}' class='configList'>
-					<form>
-						<input type='hidden' name="connectorId" value='{CONNECTOR_ID}' />
-						<input type="checkbox" id="connector_{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='connectorActive' value='{EVENTTYPE_NAME}_{CONNECTOR_NAME}' {CONNECTOR_CHECKED} />
+					<!-- BEGIN connector -->
+					<div id='configOptions_{CONNECTOR_NAME}' class='configList'>
+						<input type="checkbox" id="connector_{CONNECTOR_ID}_{EVENTTYPE_NAME}_{CONNECTOR_NAME}[]" name="record[{CONNECTOR_ID}][status]" class='connectorActive' value='1' {CONNECTOR_CHECKED} />
 						<em>{CONNECTOR_NAME}</em>
-					</form>
 
-					<!-- BEGIN has_multiple_options -->
-					<a id="add_{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='addConfig' />+</a>
-					<!-- END has_multiple_options -->
+						<!-- BEGIN has_multiple_options -->
+						<a id="add_{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='addConfig' />+</a>
+						<!-- END has_multiple_options -->
 
-					<div class="clearfix"></div>
+						<div class="clearfix"></div>
 
-					<!-- BEGIN has_updatable_options -->
-					<form method='post' action='/adminv2/calendar/updateOption'>
-						<input type="hidden" name="connectorClass" value="{CONNECTOR_NAME}" />
 						<!-- BEGIN connectorConfig -->
 						<!-- END connectorConfig -->
-						<input type="submit" value='Update' />
-					</form>
-					<!-- END has_updatable_options -->
+					</div>
+					<!-- END connector -->
 				</div>
-				<!-- END connector -->
+				<!-- END eventType -->
 			</div>
-			<!-- END eventType -->
-		</div>
+
+			<input type="submit" value='Update' />
+		</form>
 		<!-- END subscribe -->
 	</div>
 </div>

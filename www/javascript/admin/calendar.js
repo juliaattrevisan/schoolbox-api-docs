@@ -57,7 +57,7 @@ var calendar = {
 			}
 
 			$j.post('/adminv2/calendar/updateStatus', data, function(responseText) {
-				self.refresh();
+				//self.refresh();
 			});
 		});
 	},
@@ -77,7 +77,7 @@ var calendar = {
 
 			/* Reload screen
 			 */
-			self.refresh();
+			//self.refresh();
 		});
 	},
 
