@@ -27,7 +27,7 @@ class Calendar_Api_Config_Record {
 	 *
 	 * @var int
 	 */
-	public $id = -1;
+	public $id = null;
 
 	/**
 	 * The kind of event this configuration is for
