@@ -86,10 +86,7 @@ if ($groupHandler->isStaff()) {
                     ) : '',
                     'MEDICAL_ALERT' => $student['StudentMedicalAlert'],
                     'ON_OFF' => ++$j % 2 ? '' : 'dark',
-                    'SELECT' => $emailaddr ? sprintf(
-                        '<label class="checklabel" for="c%s"></label><input id="c%s" name="c%s" type="checkbox" value="%s"/>',
-                        $j, $j, $j, $emailaddr
-                    ) : '',
+                    'SELECT' => $emailaddr ? sprintf('<input id="c%s" name="c%s" type="checkbox" value="%s"/>', $j, $j, $emailaddr) : '',
                 );
 
                 $this->setVar($studentOutput);
