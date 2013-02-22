@@ -19,7 +19,7 @@
     <tbody>
     <!-- BEGIN student_list -->
     <tr class="no-bdr {ON_OFF}">
-        <td class="check" rowspan="2">{SELECT}</td>
+        <td class="check">{SELECT}</td>
         <td rowspan="2"><img src="/portrait?userId={SYNERGYID}&size=square64" alt="{FIRSTNAME} {SURNAME}"/></td>
         <!-- BEGIN name_with_link -->
         <td class="firstrow"><a href="/search/user/{ID}">{SURNAME}, {FIRSTNAME}</a></td>
@@ -33,6 +33,7 @@
         <td class="firstrow" nowrap="nowrap">{LASTVISIT}</td>
     </tr>
     <tr class="no-bdr {ON_OFF}">
+        <td>&nbsp;</td>
         <td colspan="4" valign="top" style="vertical-align:top;">
             <!-- BEGIN actions -->
             <div class="clearfix action-wrap">
