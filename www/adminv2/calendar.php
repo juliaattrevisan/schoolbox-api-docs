@@ -27,8 +27,9 @@ $this->setBlock(TEMPLATE_content, 'import', 'import_block');
 $this->setBlock(TEMPLATE_content, 'subscribe', 'subscribe_block');
 $this->setBlock('subscribe', 'eventType', 'eventType_block');
 $this->setBlock('eventType', 'connector', 'connector_block');
-$this->setBlock('connector', 'connectorConfig', 'connectorConfig_block');
 $this->setBlock('connector', 'has_multiple_options', 'has_multiple_options_block');
+$this->setBlock('connector', 'has_updatable_options', 'has_updatable_options_block');
+$this->setBlock('has_updatable_options', 'connectorConfig', 'connectorConfig_block');
 
 $this->setVar('import_block', '');
 $this->setVar('subscribe_block', '');
@@ -114,18 +115,22 @@ if (is_array($typeList)) {
 						$connectorChecked = '';
 					}
 
+					/* Render titles etc.
+					 */
 					$this->setVar(array(
 						'CONNECTOR_NAME' => $currentConnector,
 						'CONNECTOR_CHECKED' => $connectorChecked,
 					));
 
-					/* Only Vcal has multiple options
+					/* Only Vcal has multiple updatable options
 					 */
 					if ($currentConnector == 'Vcal') {
 						$this->parse('has_multiple_options_block', 'has_multiple_options');
+						$this->parse('has_updatable_options_block', 'has_updatable_options');
 					}
 					else {
 						$this->setVar('has_multiple_options_block', '');
+						$this->setVar('has_updatable_options_block', '');
 					}
 
 					$this->parse('connector_block', 'connector', true);
@@ -135,6 +140,7 @@ if (is_array($typeList)) {
 					$this->setVar('connectorConfig_block', '');
 					$this->setVar('configFragment', '');
 					$this->setVar('has_multiple_options_block', '');
+					$this->setVar('has_updatable_options_block', '');
 				}
 
 				$this->parse('eventType_block', 'eventType', true);
