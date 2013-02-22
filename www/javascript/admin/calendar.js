@@ -47,13 +47,13 @@ var calendar = {
 				var data = {
 					id: parts,
 					status: 1
-				}
+				};
 			}
 			else {
 				var data = {
 					id: parts,
 					status: 0
-				}
+				};
 			}
 
 			$j.post('/adminv2/calendar/updateStatus', data, function(responseText) {
@@ -94,11 +94,15 @@ var calendar = {
 
 				/* Ajax remove this config option
 				 */
-				console.log('remove ' + id);
+				var data = {
+					id: id
+				};
 
 				/* Reload screen
 				 */
-				self.refresh();
+				$j.post('/adminv2/calendar/removeOption', data, function(responseText) {
+					self.refresh();
+				});
 			}
 
 			return false;
