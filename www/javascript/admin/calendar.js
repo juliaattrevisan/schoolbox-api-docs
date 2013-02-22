@@ -98,10 +98,12 @@ var calendar = {
 					id: id
 				};
 
-				/* Reload screen
+				/* Remove element silently, rather than force reload
 				 */
+				var row = $j(this).parent('label');
+
 				$j.post('/adminv2/calendar/removeOption', data, function(responseText) {
-					self.refresh();
+					$j(row).remove();
 				});
 			}
 
