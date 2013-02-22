@@ -1,0 +1,20 @@
+<?php
+/**
+ * Calendar_Api_Config_Type_Schoolbox
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+class Calendar_Api_Config_Type_Schoolbox extends Calendar_Api_Config_Abstract {
+
+	/**
+	 * Render configs into admin screen
+	 *
+	 * @param $page
+	 * @return mixed|void
+	 */
+	public function render($page) {
+	}
+}
