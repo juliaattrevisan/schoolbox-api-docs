@@ -1,5 +1,8 @@
 <?php
 
+/* Update the options for each connector
+ * Currently, only Vcal has options which can be modified
+ */
 switch($_POST['connectorClass']) {
 	case 'Vcal':
 		if (is_array($_POST['url']) && count($_POST['url'])) {
@@ -26,5 +29,4 @@ switch($_POST['connectorClass']) {
 	break;
 }
 
-//new Alaress_Probe($_POST);
 exit();
