@@ -9,6 +9,7 @@ then
 	wget -q http://hydra.alrs/boxes/schoolboxdemo-latest.tar.gz
 	wget -q http://hydra.alrs/boxes/schoolboxdemo-latest.sql
 	wget -q http://hydra.alrs/boxes/schoolboxdemo-latest.vhost
+	wget -q http://hydra.alrs/boxes/schoolboxdemo-latest-dav.vhost
 	wget -q http://hydra.alrs/boxes/schoolboxdemo-vagrant-latest.sql
 	echo "$vag Restarting MySQL";
 	service mysql restart;
@@ -43,6 +44,8 @@ then
         echo "$vag Enabling Schoolbox apache vhost";
         cp /home/vagrant/schoolboxdemo-latest.vhost /etc/apache2/sites-available/schoolbox.vhost
         a2ensite schoolbox.vhost
+	cp /home/vagrant/schoolboxdemo-latest-dav.vhost /etc/apache2/sites-available/schoolbox-dav.vhost
+	a2ensite schoolbox-dav.vhost
 	puppet apply -e 'package { "javascript-common": ensure => absent }' > /dev/null;
         service apache2 restart
 	echo "$vag Loading all demo data complete";
@@ -51,4 +54,5 @@ echo "$vag Ensure all services are running";
 service mysql restart;
 service apache2 restart;
 echo "$vag Bridged Network Address => $bridgeip";
-echo "$vag URL => http://$bridgeip/";
+echo "$vag WebDav URL => http://$bridgeip:8000/";
+echo "$vag Website URL => http://$bridgeip/";
