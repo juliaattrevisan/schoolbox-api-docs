@@ -16,16 +16,26 @@ if (is_array($_POST['record']) && count($_POST['record'])) {
 			/* Update each url
 			 */
 			$config = $configRecord->decodeConfig();
-			$config->setUrl($value);
+			$config->setUrl($attribs['url']);
 
 			$configRecord->updateConfig($config);
 		}
 
-//		Calendar_Api_Config_Mapper::getInstance()->save(array($configRecord));
+		Calendar_Api_Config_Mapper::getInstance()->save(array($configRecord));
 	}
 }
 
-/* Update the status of each connector
+/* Update the status of each connector by deactivating everything,
+ * then selectively reactivating
  */
-$allConfigRecords = Calendar_Api_Config_Mapper::getInstance()->findAll();
+Calendar_Api_Config_Mapper::getInstance()->deactivateAll();
 
+if (is_array($_POST['active']) && count($_POST['active'])) {
+	foreach($_POST['active'] as $currentActive) {
+		$bits = explode('_', $currentActive);
+
+		Calendar_Api_Config_Mapper::getInstance()->activate($bits[0], $bits[1]);
+	}
+}
+
+$this->backToTheFuture(1);

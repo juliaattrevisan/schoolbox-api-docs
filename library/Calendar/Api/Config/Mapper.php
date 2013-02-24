@@ -87,4 +87,42 @@ class Calendar_Api_Config_Mapper extends Mapper {
 
 		return $allConfigs;
 	}
+
+	/**
+	 * Deactivate all configs (used when updating)
+	 */
+	public function deactivateAll() {
+		$statement = $this->database->prepare("
+			UPDATE `{$this->table}`
+			SET status = 0
+		");
+
+		$statement->execute();
+
+		return $this;
+	}
+
+	/**
+	 * Activate a particular connector
+	 *
+	 * @param $eventType
+	 * @param $connectorClass
+	 *
+	 * @return \Calendar_Api_Config_Mapper
+	 */
+	public function activate($eventType, $connectorClass) {
+		$statement = $this->database->prepare("
+			UPDATE `{$this->table}`
+			SET status = 1
+			WHERE event_type = :eventType
+			AND connector_class = :connectorClass
+		");
+
+		$statement->bindParam(':eventType', $eventType);
+		$statement->bindParam(':connectorClass', $connectorClass);
+
+		$statement->execute();
+
+		return $this;
+	}
 }
