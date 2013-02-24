@@ -1,34 +1,31 @@
 <?php
 
+new Alaress_Probe($_POST);
+
 /* Update the options for each connector
  * Currently, only Vcal has options which can be modified
  */
+if (is_array($_POST['record']) && count($_POST['record'])) {
+	foreach($_POST['record'] as $id => $attribs) {
+		$configRecord = Calendar_Api_Config_Mapper::getInstance()->findById($id);
 
-new Alaress_Probe($_POST);
-//switch($_POST['connectorClass']) {
-//	case 'Vcal':
-//		if (is_array($_POST['url']) && count($_POST['url'])) {
-//			foreach($_POST['url'] as $key => $value) {
-//
-//				/* Update each url
-//				 */
-//				$config = new Calendar_Api_Config_Type_Vcal();
-//				$config->setId($key);
-//				$config->setUrl($value);
-//
-//				$configRecord = Calendar_Api_Config_Mapper::getInstance()->findById($key);
-//				$configRecord->updateConfig($config);
-//
-//				Calendar_Api_Config_Mapper::getInstance()->save(array($configRecord));
-//			}
-//
-//			$this->backToTheFuture(1);
-//		}
-//
-//		break;
-//
-//	default:
-//	break;
-//}
-//
-//exit();
+		/* Process multiple Vcals
+		 */
+		if ($attribs['connectorClass'] == 'Vcal') {
+
+			/* Update each url
+			 */
+			$config = $configRecord->decodeConfig();
+			$config->setUrl($value);
+
+			$configRecord->updateConfig($config);
+		}
+
+//		Calendar_Api_Config_Mapper::getInstance()->save(array($configRecord));
+	}
+}
+
+/* Update the status of each connector
+ */
+$allConfigRecords = Calendar_Api_Config_Mapper::getInstance()->findAll();
+
