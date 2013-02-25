@@ -181,8 +181,18 @@ setupCustomise = {
 				$j(this).css('backgroundColor', pickers[$j(this).attr('id')]);
 			});
 
-			var f = $j.farbtastic('#picker');
-			f.setColor("#b6b6ff"); //set initial color
+            var is_colorpicker_present = ($j('#picker').length > 0);
+            var colorpicker            = null;
+            //
+            // Return early if colorpicker is not there, because none of this
+            // does anything.
+            if (is_colorpicker_present) {
+                colorpicker = $j.farbtastic('#picker');
+                colorpicker.setColor("#b6b6ff");
+            }
+            else {
+                return;
+            }
 
 			$j('#head_font').parent().addClass('active-box');
 			var instantColour = new RGBColor($j('#left_head_font').css('background-color'));
@@ -191,10 +201,10 @@ setupCustomise = {
 			$j('#currentColour').css('background-color',initialColour);
 			$j('#currentColour').val(initialColour);
 
-			f.linkTo(onColorChange);
+			colorpicker.linkTo(onColorChange);
 
 			$j('#currentColour').keyup(function() {
-				f.setColor($j(this).val());
+				colorpicker.setColor($j(this).val());
 			});
 
 			function h2d(h) {return parseInt(h,16);}
