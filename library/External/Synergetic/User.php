@@ -312,8 +312,6 @@ class External_Synergetic_User implements External_UserInterface {
 		$query .= "
 			ORDER BY StudentSurname, StudentID, StudentContactType
 		";
-
-		$this->getDatabase()->setConvertEncodingForNextResult(true);
 		return $this->getDatabase()->getAll($query);
     }
 
