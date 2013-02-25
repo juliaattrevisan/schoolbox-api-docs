@@ -73,8 +73,7 @@
         });
 
         $j('.print').click(function (e) {
-            window.location = $j(this).attr('href') + '/print';
-            console.log($j(this).attr('href').toString().replace(/\#/, '') + '/print');
+            window.print();
             e.preventDefault();
         });
 
