@@ -1,19 +1,19 @@
 <?php
 /**
- * Calendar_Month_Grid_Default
+ * Calendar_Layout_Month_List_Default
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Calendar_Month_Grid_Default extends Calendar_Month_Abstract {
+class Calendar_Layout_Month_List_Default extends Calendar_Layout_Month_Abstract {
 
     /**
      * Choose template file
      */
     protected function setupTemplateFile() {
-        $this->setTemplateFile('calendar/month.html');
+        $this->setTemplateFile('calendar/month-list.html');
     }
 
     /**
@@ -24,8 +24,7 @@ class Calendar_Month_Grid_Default extends Calendar_Month_Abstract {
         $this->getPage()->setTab("calendar");
         $this->getPage()->setTitle('Calendar Month');
 
-        $this->getPage()->setBlock(TEMPLATE_content, "month_week", "month_week_listing");
-        $this->getPage()->setBlock("month_week", "day", "day_block");
+        $this->getPage()->setBlock(TEMPLATE_content, "day", "day_block");
         $this->getPage()->setBlock("day", "note", "note_block");
         $this->getPage()->setBlock("note", "attendance_icon", "attendance_icon_block");
         $this->getPage()->setBlock("note", "attendance_status", "attendance_status_block");
@@ -34,8 +33,8 @@ class Calendar_Month_Grid_Default extends Calendar_Month_Abstract {
         $this->getPage()->setBlock('note', 'has_category', 'has_category_block');
 
         /* Initialise selectedDay, selectedMonth, selectedYear
-         * Initialise movement buttons
-         */
+           * Initialise movement buttons
+           */
         $this->setupSelectedDayMonthYear();
         $this->setupMovementButtons();
     }
@@ -75,10 +74,17 @@ class Calendar_Month_Grid_Default extends Calendar_Month_Abstract {
 
         $firstDay = date("w", mktime(0, 0, 0, $selectedMonth, 1, $selectedYear));
         $numDaysInMonth = date("d", mktime(0, 0, 0, $selectedMonth + 1, 0, $this->getDate())); //
-        $numWeeksMonth = ceil(($firstDay + $numDaysInMonth) / 7);
-        $totalDays = $numWeeksMonth * 7 + (6 - $firstDay);
 
-        $this->setStartDay(mktime(3, 0, 0, $selectedMonth, 1, $selectedYear) - strtotime("+$firstDay day", 0));
+        /* totalDays is used to populate remainder of grid with data from the following month.
+           * But we probably don't need that in the list view.
+
+          $numWeeksMonth = ceil(($firstDay + $numDaysInMonth) / 7);
+          $totalDays = $numWeeksMonth * 7 + (6 - $firstDay);
+           */
+        $totalDays = $numDaysInMonth;
+
+        $this->setStartDay(mktime(3, 0, 0, $selectedMonth, 1, $selectedYear));
+
         $this->setFirstDay($firstDay);
         $this->setNumDaysInMonth($numDaysInMonth);
         $this->setTotalDays($totalDays);
@@ -108,8 +114,8 @@ class Calendar_Month_Grid_Default extends Calendar_Month_Abstract {
             $date = new Alaress_Date_Format($currentDay, 'U');
 
             $output = array(
-                'DATE' => $date->getUsingFormat('j'),
-                'ADD' => '/calendar/modify.php?date=' . date("d-m-Y", $currentDay) . '&returnTo=month',
+                'DATE' => $date->getUsingFormat('l jS'),
+                'ADD' => '/calendar/modify.php?date=' . date("d-m-Y", $currentDay) . '&returnTo=month-list',
                 'ON_OFF' => !($day % 2) ? 'dark' : '',
             );
 
@@ -126,17 +132,12 @@ class Calendar_Month_Grid_Default extends Calendar_Month_Abstract {
             $this->getPage()->setVar($output);
 
             /* Render all registered event types
-             */
+                */
             $renderer = new Calendar_Event_Collection_Renderer($this->getApi(), $currentDay, $this->getPage());
             $renderer->renderAll();
 
             $this->getPage()->parse("day_block", "day", true);
             $this->getPage()->setVar("note_block", "");
-
-            if ($day == 6 && $i) {
-                $this->getPage()->parse('month_week_listing', 'month_week', true);
-                $this->getPage()->setVar('day_block', '');
-            }
         }
     }
 }

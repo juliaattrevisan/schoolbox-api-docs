@@ -1,19 +1,19 @@
 <?php
 /**
- * Calendar_Week_Grid_Default
+ * Calendar_Layout_Week_List_Default
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Calendar_Week_Grid_Default extends Calendar_Week_Abstract {
+class Calendar_Layout_Week_List_Default extends Calendar_Layout_Week_Abstract {
 
     /**
      * Choose template file
      */
     protected function setupTemplateFile() {
-        $this->setTemplateFile('calendar/week.html');
+        $this->setTemplateFile('calendar/week-list.html');
     }
 
     /**
@@ -24,8 +24,7 @@ class Calendar_Week_Grid_Default extends Calendar_Week_Abstract {
         $this->getPage()->setTab("calendar");
         $this->getPage()->setTitle('Calendar Week');
 
-        $this->getPage()->setBlock(TEMPLATE_content, "day_header", "day_header_block");
-        $this->getPage()->setBlock(TEMPLATE_content, "day", "day_block");
+        $this->getPage()->setBlock(TEMPLATE_content, 'day', 'day_block');
         $this->getPage()->setBlock("day", "note", "note_block");
         $this->getPage()->setBlock("note", "attendance_icon", "attendance_icon_block");
         $this->getPage()->setBlock("note", "attendance_status", "attendance_status_block");
@@ -34,8 +33,8 @@ class Calendar_Week_Grid_Default extends Calendar_Week_Abstract {
         $this->getPage()->setBlock('note', 'has_category', 'has_category_block');
 
         /* Initialise selectedDay, selectedMonth, selectedYear
-         * Initialise movement buttons
-         */
+           * Initialise movement buttons
+           */
         $this->setupSelectedDayMonthYear();
         $this->setupMovementButtons();
     }
@@ -44,17 +43,22 @@ class Calendar_Week_Grid_Default extends Calendar_Week_Abstract {
      * Render calendar
      */
     public function render() {
+        $this->getPage()->setVar(
+            array(
+                'day_block' => '',
+                'note_block' => '',
+            )
+        );
+
         for ($i = 0; $i < 7; $i++) {
             $currentDay = strtotime("+$i day", $this->getStartOfWeek());
 
-            $this->getPage()->setVar('DATE', date("j", $currentDay));
             $this->getPage()->setVar(
-                'ADD', '/calendar/modify.php?date=' . date("d-m-Y", $currentDay) . '&returnTo=week'
+                array(
+                    'DATE' => date("l jS", $currentDay),
+                    'ADD' => '/calendar/modify.php?date=' . date("d-m-Y", $currentDay) . '&returnTo=week-list',
+                )
             );
-            $this->getPage()->parse('day_header_block', 'day_header', true);
-        }
-
-        for ($i = 0; $i < 7; $i++) {
 
             // output submission events
             $currentDay = strtotime("+$i day", $this->getStartOfWeek());
@@ -71,7 +75,7 @@ class Calendar_Week_Grid_Default extends Calendar_Week_Abstract {
             }
 
             /* Render all registered event types
-             */
+                */
             $renderer = new Calendar_Event_Collection_Renderer($this->getApi(), $currentDay, $this->getPage());
             $renderer->renderAll();
 

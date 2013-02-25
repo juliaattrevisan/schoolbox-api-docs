@@ -1,13 +1,13 @@
 <?php
 /**
- * Calendar_Month_Abstract
+ * Calendar_Layout_Week_Abstract
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-abstract class Calendar_Month_Abstract {
+abstract class Calendar_Layout_Week_Abstract {
 	protected $calendarHandler = null;
 	protected $groupHandler = null;
 	protected $subStuHandler = null;
@@ -17,10 +17,7 @@ abstract class Calendar_Month_Abstract {
 	protected $templateFile = '';
 	protected $selected = array();
 	protected $selectedDate = null;
-	protected $firstDay = null;
-	protected $numDaysInMonth = null;
-	protected $totalDays = null;
-	protected $startDay = null;
+	protected $startOfWeek = null;
 
 	/* Actual connector instance
 	 */
@@ -52,7 +49,57 @@ abstract class Calendar_Month_Abstract {
 		$this->setupBlocks();
 	}
 
-	abstract protected function setupSelectedDayMonthYear();
+	abstract protected function setupTemplateFile();
+	abstract protected function setupBlocks();
+	abstract protected function render();
+
+	/**
+	 * Set up selected day/month/year
+	 */
+	protected function setupSelectedDayMonthYear() {
+		list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->getDate());
+
+		$selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
+
+		/* Default url access doesn't have a date portion
+		 * i.e. /calendar/week/. In that case, just use now
+		 */
+		if ($selectedDate <= 0) {
+		    $selectedDate = time();
+		}
+
+		$this->setSelectedDate($selectedDate);
+
+		if ($selectedDate <= 0) {
+			$selectedDate = time();
+		}
+
+		$selectedDay = date("j", $selectedDate);
+		$selectedMonth = date("n", $selectedDate);
+		$selectedYear = date("Y", $selectedDate);
+
+		$dayOfWeek = date("w", mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear));
+		$startOfWeek = mktime(0, 0, 0, $selectedMonth, ($selectedDay - $dayOfWeek), $selectedYear);
+		$endOfWeek = strtotime("+6 days", $startOfWeek);
+
+		if (date("m", $startOfWeek) != date("m", $endOfWeek)) {
+			$month = date('jS F', $startOfWeek) . ' - ' . date("jS F", $endOfWeek);
+		}
+		else {
+			$month = date("jS", $startOfWeek) . ' - ' . date('jS F', $endOfWeek);
+		}
+
+		$this->getPage()->setVar(array(
+			'SELECTED_DAY' => $selectedDay,
+			'SELECTED_MONTH' => $selectedMonth,
+			'SELECTED_YEAR' => $selectedYear,
+			'YEAR' => date("Y", $startOfWeek),
+			'MONTH' => $month,
+			'DAY' => $selectedDay,
+		));
+
+		$this->setStartOfWeek($startOfWeek);
+	}
 
 	/**
 	 * Setup movement buttons
@@ -83,15 +130,16 @@ abstract class Calendar_Month_Abstract {
 
 		$this->setSelected($selected);
 
-		$this->getPage()->checkList('group', $this->getCategoryList(), $selected['group'], TEMPLATE_content, array('name' => 'GROUP_NAME', 'id' => 'GROUP_ID'));
-		$this->getPage()->checkList('campus', $this->getCalendarHandler()->getFilterCampusList($_SESSION['id']), $selected['campus']);
-		$this->getPage()->checkList('event_type', $this->getCalendarHandler()->getTypeList(), $selected['event_type'], TEMPLATE_content, array('eventType' => 'EVENT_TYPE_NAME', 'eventTypeID' => 'EVENT_TYPE_ID', 'eventColour' => 'EVENT_TYPE_COLOUR'));
-		$this->getPage()->setVar('BACK', date("j-n-Y", strtotime("-1 month", $this->getSelectedDate())));
-		$this->getPage()->setVar('FORWARD', date("j-n-Y", strtotime("+1 month", $this->getSelectedDate())));
+		$this->getPage()->checkList('filter_group', $this->getCategoryList(), $selected['group'], TEMPLATE_content, array('name' => 'GROUP_NAME', 'id' => 'GROUP_ID'));
+		$this->getPage()->checkList('filter_campus', $this->getCalendarHandler()->getFilterCampusList($_SESSION['id']), $selected['campus']);
+		$this->getPage()->checkList('filter_event_type', $this->getCalendarHandler()->getTypeList(), $selected['event_type'], TEMPLATE_content, array('eventType' => 'EVENT_TYPE_NAME', 'eventTypeID' => 'EVENT_TYPE_ID', 'eventColour' => 'EVENT_TYPE_COLOUR'));
+		$this->getPage()->setVar('BACK', date("j-n-Y", strtotime("-1 week", $this->getSelectedDate())));
+		$this->getPage()->setVar('FORWARD', date("j-n-Y", strtotime("+1 week", $this->getSelectedDate())));
 	}
 
 	/* Getters/Setters
 	 */
+
 
 	/**
 	 * Set calendar handler
@@ -177,7 +225,7 @@ abstract class Calendar_Month_Abstract {
 	/**
 	 * Get page
 	 *
-	 * @return null
+	 * @return SitePage
 	 */
 	protected function getPage() {
 		return $this->page;
@@ -271,80 +319,6 @@ abstract class Calendar_Month_Abstract {
 	 */
 	protected function getStartOfWeek() {
 		return $this->startOfWeek;
-	}
-
-	/**
-	 * Set total days
-	 *
-	 * @param $totalDays
-	 */
-	protected function setTotalDays($totalDays) {
-		$this->totalDays = $totalDays;
-	}
-
-	/**
-	 * Get total days
-	 *
-	 * Get total days
-	 *
-	 * @return null
-	 */
-	protected function getTotalDays() {
-		return $this->totalDays;
-	}
-
-	/**
-	 * Set first day
-	 *
-	 * @param $firstDay
-	 */
-	protected function setFirstDay($firstDay) {
-		$this->firstDay = $firstDay;
-	}
-
-	/**
-	 * Get first day
-	 *
-	 * @return null
-	 */
-	protected function getFirstDay() {
-		return $this->firstDay;
-	}
-
-	/**
-	 * Set num days in month
-	 *
-	 * @param $numDaysInMonth
-	 */
-	protected function setNumDaysInMonth($numDaysInMonth) {
-		$this->numDaysInMonth = $numDaysInMonth;
-	}
-
-	/**
-	 * Get num days in month
-	 *
-	 * @return null
-	 */
-	protected function getNumDaysInMonth() {
-		return $this->numDaysInMonth;
-	}
-
-	/**
-	 * Set start day
-	 *
-	 * @param $startDay
-	 */
-	protected function setStartDay($startDay) {
-		$this->startDay = $startDay;
-	}
-
-	/**
-	 * Get start day
-	 *
-	 * @return null
-	 */
-	protected function getStartDay() {
-		return $this->startDay;
 	}
 
 	/**
