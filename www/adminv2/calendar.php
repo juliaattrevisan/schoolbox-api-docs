@@ -77,17 +77,11 @@ if (is_array($typeList)) {
 		/* Subscribe page
 	 	 */
 		else if (($type['type'] == 'Subscribe') && ($selectedType == 'Subscribe')) {
-
-			foreach(glob("../library/Calendar/Api/*") as $dirname) {
-				echo $dirname . '<BR>';
-			}
-
-			$allEventTypes = array('Event', 'StudentBirthday', 'Submission');
-			$allConnectors = array('Schoolbox', 'Sharepoint', 'Vcal');
+			$allApi = Calendar_Api_Config_Mapper::getInstance()->generateApiHierarchy();
 
 			/* All calendar subscription options go here
 			 */
-			foreach($allEventTypes as $currentEventType) {
+			foreach($allApi as $currentEventType => $allConnectors) {
 				$this->setVar(array(
 					'EVENTTYPE_NAME' => $currentEventType,
 				));
@@ -145,56 +139,3 @@ if (is_array($typeList)) {
 	}
 }
 
-/* Defaults
- */
-//$start = 85;
-//
-//$config = new Calendar_Api_Config_Type_Vcal();
-//$config->setId($start);
-//$config->setEventType('Event');
-//$config->setConnectorClass('Vcal');
-//$config->setUrl('http://www.google.com');
-//
-//$configRecord = new Calendar_Api_Config_Record();
-//$configRecord->setEventType('Event');
-//$configRecord->setConnectorClass('Vcal');
-//$configRecord->updateConfig($config);
-//
-//Calendar_Api_Config_Mapper::getInstance()->save(array($configRecord));
-//
-//$config = new Calendar_Api_Config_Type_Vcal();
-//$config->setId($start++);
-//$config->setEventType('Event');
-//$config->setConnectorClass('Vcal');
-//$config->setUrl('http://www.gruber.org');
-//
-//$configRecord = new Calendar_Api_Config_Record();
-//$configRecord->setEventType('Event');
-//$configRecord->setConnectorClass('Vcal');
-//$configRecord->updateConfig($config);
-//
-//Calendar_Api_Config_Mapper::getInstance()->save(array($configRecord));
-//
-//$config = new Calendar_Api_Config_Type_Sharepoint();
-//$config->setId($start++);
-//$config->setEventType('Submission');
-//$config->setConnectorClass('Schoolbox');
-//
-//$configRecord = new Calendar_Api_Config_Record();
-//$configRecord->setEventType('Submission');
-//$configRecord->setConnectorClass('Schoolbox');
-//$configRecord->updateConfig($config);
-//
-//Calendar_Api_Config_Mapper::getInstance()->save(array($configRecord));
-//
-//$config = new Calendar_Api_Config_Type_Sharepoint();
-//$config->setId($start++);
-//$config->setEventType('StudentBirthday');
-//$config->setConnectorClass('Sharepoint');
-//
-//$configRecord = new Calendar_Api_Config_Record();
-//$configRecord->setEventType('StudentBirthday');
-//$configRecord->setConnectorClass('Sharepoint');
-//$configRecord->updateConfig($config);
-//
-//Calendar_Api_Config_Mapper::getInstance()->save(array($configRecord));
