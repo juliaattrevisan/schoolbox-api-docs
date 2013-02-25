@@ -12,7 +12,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Layout_Full_Ajax_JSON extends Calendar_Week_Abstract {
+class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Week_Abstract {
 
 	/**
 	 * Choose template file
