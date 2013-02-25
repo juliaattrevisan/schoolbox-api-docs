@@ -226,11 +226,17 @@ h3, #infoPanel li, #nav h3, .add-component .notification {
 }
 #infoPanel{
     color: #faedc3;
-    margin: 15px 318px 0 0px;
+    margin: 25px 318px 0 0px;
+    height: 20px;
+}
+#infoPanel li {
+    min-width: 32px;
 }
 #infoPanel a {
     color: #faedc3;
 }
+#infoPanel img { margin-top: -14px; }
+
 #header{
     min-width: 980px;
     background: #1e125e url('/images/jpc/header.png') top left repeat-x;
@@ -376,7 +382,7 @@ td.cal-left a:hover, td.cal-left .datepicker-box:hover, td.cal-right a.filter-ch
 }
 #search{
     background: transparent;
-    top: -39px;
+    top: -50px;
     margin-bottom: -31px;
 }
 #search-field{
