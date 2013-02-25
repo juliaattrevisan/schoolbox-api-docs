@@ -64,7 +64,7 @@ class MSSQL {
 		if (!empty($encoding)) {
 			$this->encoding = $encoding;
 		}
-    }
+	}
 
 	function connect() {
 		if(!isset($this->dbf))
@@ -89,21 +89,21 @@ class MSSQL {
 
 	function query($sql_q)
 	{
-        if($this->dbf) {
-            $this->result = mssql_query($sql_q, $this->dbf);
+		if($this->dbf) {
+			$this->result = mssql_query($sql_q, $this->dbf);
 
-            if ($this->result == false) {
-                if($this->debug)
-                    print "<b>Query:</b> $sql_q<br />";
-                else
-                    error(21, 'Error in Synegetic query<br /><br /><p>'.mssql_get_last_message().'</p>' );
+			if ($this->result == false) {
+				if($this->debug)
+					print "<b>Query:</b> $sql_q<br />";
+				else
+					error(21, 'Error in Synegetic query<br /><br /><p>'.mssql_get_last_message().'</p>' );
 
-            }
+			}
 
-            return $this->result;
-        }
-        else
-            return false;
+			return $this->result;
+		}
+		else
+			return false;
 	}
 
 	/**
@@ -124,7 +124,7 @@ class MSSQL {
 	 * Gets the first value of the first result returned by the query
 	 * Returns an associative array of row, false if none exists
 	 *
- 	 * @param string $sql_q
+	 * @param string $sql_q
 	 *
 	 * @return array|bool
 	 */
