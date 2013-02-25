@@ -117,9 +117,7 @@ class MSSQL {
 	function getRow($sql_q)
 	{
 		$result = $this->query($sql_q);
-		$row = $this->getNextArray($result);
-		$this->resetConvertEncoding();
-		return $row;
+		return $this->getNextArray($result);
 	}
 
 	/**
@@ -138,7 +136,6 @@ class MSSQL {
 		if ($this->getConvertEncoding()) {
 			$one = $this->convertEncoding($one);
 		}
-		$this->resetConvertEncoding();
 		return $one;
 	}
 
@@ -159,7 +156,6 @@ class MSSQL {
 			$table[] = $line;
 			$results = true;
 		}
-		$this->resetConvertEncoding();
 		if($results)
 			return $table;
 		else
@@ -264,40 +260,4 @@ class MSSQL {
 	{
 		return $this->previous_encoding;
 	}
-
-
-	/**
-	 * Sets character set conversion, for the next call to getAll(), getRow() or
-	 * getOne() only.
-	 *
-	 * After that call is returned, character set conversion is switched back to
-	 * its previous setting.
-	 *
-	 * @param bool $convert
-	 */
-	public function setConvertEncodingForNextResult($convert)
-	{
-		$previous_encoding = $this->getPreviousEncoding();
-		if (!isset($previous_encoding)) {
-			$this->setPreviousEncoding($this->getConvertEncoding());
-		}
-		$this->setConvertEncoding($convert);
-	}
-
-
-	/**
-	 * Sets character set conversion back to what it was before
-	 * setConvertEncodingForNextResult was called.
-	 *
-	 * @return void
-	 */
-	protected function resetConvertEncoding()
-	{
-		$previous_encoding = $this->getPreviousEncoding();
-		if (isset($previous_encoding)) {
-			$this->setConvertEncoding($previous_encoding);
-		}
-		$this->setPreviousEncoding(null);
-	}
-
 }
