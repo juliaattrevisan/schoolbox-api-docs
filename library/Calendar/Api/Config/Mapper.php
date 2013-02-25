@@ -168,7 +168,7 @@ class Calendar_Api_Config_Mapper extends Mapper {
 	public function setupDefaults() {
 		$start = 85;
 
-		$config = new Calendar_Api_Config_Type_Vcal();
+		$config = new Calendar_Api_Config_Connector_Vcal();
 		$config->setId($start);
 		$config->setEventType('Event');
 		$config->setConnectorClass('Vcal');
@@ -181,7 +181,7 @@ class Calendar_Api_Config_Mapper extends Mapper {
 
 		$this->save(array($configRecord));
 
-		$config = new Calendar_Api_Config_Type_Vcal();
+		$config = new Calendar_Api_Config_Connector_Vcal();
 		$config->setId($start++);
 		$config->setEventType('Event');
 		$config->setConnectorClass('Vcal');
@@ -194,7 +194,7 @@ class Calendar_Api_Config_Mapper extends Mapper {
 
 		$this->save(array($configRecord));
 
-		$config = new Calendar_Api_Config_Type_Schoolbox();
+		$config = new Calendar_Api_Config_Connector_Schoolbox();
 		$config->setId($start++);
 		$config->setEventType('Submission');
 		$config->setConnectorClass('Schoolbox');
@@ -206,7 +206,7 @@ class Calendar_Api_Config_Mapper extends Mapper {
 
 		$this->save(array($configRecord));
 
-		$config = new Calendar_Api_Config_Type_Sharepoint();
+		$config = new Calendar_Api_Config_Connector_Sharepoint();
 		$config->setId($start++);
 		$config->setEventType('StudentBirthday');
 		$config->setConnectorClass('Sharepoint');

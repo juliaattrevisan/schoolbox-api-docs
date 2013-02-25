@@ -45,7 +45,7 @@ if (is_array($_POST['active']) && count($_POST['active'])) {
 		/* Add it
 		 */
 		if (!$allConfigs->count()) {
-			$className = 'Calendar_Api_Config_Type_' . Scrub::text($bits[1]);
+			$className = 'Calendar_Api_Config_Connector_' . Scrub::text($bits[1]);
 
 			if (class_exists($className)) {
 				$config = new $className();
