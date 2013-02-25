@@ -35,6 +35,8 @@ class Calendar_Api_Config_Type_Vcal extends Calendar_Api_Config_Abstract {
 			'CONNECTOR_CLASS' => $this->getConnectorClass(),
 			'URL' => $this->getUrl()
 		));
+
+		$page->parse('has_multiple_options_block', 'has_multiple_options');
 	}
 
 	/* Getters/Setters

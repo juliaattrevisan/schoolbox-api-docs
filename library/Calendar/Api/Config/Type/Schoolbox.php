@@ -20,5 +20,7 @@ class Calendar_Api_Config_Type_Schoolbox extends Calendar_Api_Config_Abstract {
 			'CONNECTOR_ID' => $this->getId(),
 			'CONNECTOR_CLASS' => $this->getConnectorClass(),
 		));
+
+		$page->setVar('has_multiple_options_block', '');
 	}
 }

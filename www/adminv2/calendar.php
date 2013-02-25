@@ -28,7 +28,7 @@ $this->setBlock(TEMPLATE_content, 'subscribe', 'subscribe_block');
 $this->setBlock('subscribe', 'eventType', 'eventType_block');
 $this->setBlock('eventType', 'connector', 'connector_block');
 $this->setBlock('connector', 'connectorConfig', 'connectorConfig_block');
-//$this->setBlock('connector', 'has_multiple_options', 'has_multiple_options_block');
+$this->setBlock('connector', 'has_multiple_options', 'has_multiple_options_block');
 
 $this->setVar('import_block', '');
 $this->setVar('subscribe_block', '');
@@ -56,13 +56,11 @@ if (is_array($typeList)) {
 
 		/* Navigation stuff
  		 */
-		$output = array(
+		$this->setVar(array(
 			'SETTING_TAB_NAME' => $type['type'],
 			'SETTING_TAB_URL' => urlencode($type['type']),
 			'SETTING_TAB_CURRENT' => '',
-		);
-
-		$this->setVar($output);
+		));
 
 		if ($selectedType == $type['type']) {
 			$this->setVar('SETTING_TAB_CURRENT', 'current');
@@ -121,22 +119,13 @@ if (is_array($typeList)) {
 						'CONNECTOR_CHECKED' => $connectorChecked,
 					));
 
-					/* Only Vcal has multiple updatable options
-					 */
-//					if ($currentConnector == 'Vcal') {
-//						$this->parse('has_multiple_options_block', 'has_multiple_options');
-//					}
-//					else {
-//						$this->setVar('has_multiple_options_block', '');
-//					}
-
 					$this->parse('connector_block', 'connector', true);
 
 					/* Clear children after parsing out the parent
 					 */
 					$this->setVar('connectorConfig_block', '');
 					$this->setVar('configFragment', '');
-//					$this->setVar('has_multiple_options_block', '');
+					$this->setVar('has_multiple_options_block', '');
 				}
 
 				$this->parse('eventType_block', 'eventType', true);
