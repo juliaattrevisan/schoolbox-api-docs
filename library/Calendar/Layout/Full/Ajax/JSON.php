@@ -1,6 +1,6 @@
 <?php
 /**
- * Calendar_Full_Ajax_JSON
+ * Calendar_Layout_Full_Ajax_JSON
  *
  * This renders the JSON data, but not the page
  * The JSON array contains a set of events that lie
@@ -12,7 +12,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Full_Ajax_JSON extends Calendar_Week_Abstract {
+class Calendar_Layout_Full_Ajax_JSON extends Calendar_Week_Abstract {
 
 	/**
 	 * Choose template file

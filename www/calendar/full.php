@@ -7,5 +7,5 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-$calendar = new Calendar_Full_Javascript($this, $this->arg[0]);
+$calendar = new Calendar_Layout_Full_Javascript($this, $this->arg[0]);
 $calendar->render();

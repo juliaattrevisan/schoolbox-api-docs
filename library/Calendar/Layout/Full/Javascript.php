@@ -1,6 +1,6 @@
 <?php
 /**
- * Calendar_Full_Javascript
+ * Calendar_Layout_Full_Javascript
  *
  * This renders the page in which the calendar will live,
  * but not the data. This separates responsibilities even
@@ -13,7 +13,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Full_Javascript extends Calendar_Week_Abstract {
+class Calendar_Layout_Full_Javascript extends Calendar_Week_Abstract {
 
 	/**
 	 * Choose template file
