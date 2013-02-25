@@ -107,6 +107,12 @@ if (is_numeric($_REQUEST['cid'])) {
             }
         }
 
+        //
+        // Forgive me for I have sinned and copy-pasted this (double encoding
+        // and all) from www/homepage/index.php
+        $categoryCodes = $catHandler->getCodeForCategory($_POST['cid']);
+        $component->getPageTemplate()->setVar('CODE', urlencode(urlencode($categoryCodes['codes'])));
+
         $component->getPageTemplate()->pparse($templateTarget, $templateHandle);
 
 	}
