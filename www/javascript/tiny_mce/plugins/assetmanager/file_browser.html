@@ -88,10 +88,15 @@ $(function () {
         if (alt)
             alt.value = altValue;
 
-		if (altValue == 'Homepage')
-            url = '/homepage/'+relationID[1].toString();
-		else
-		    url = '/send.php?' + relationID[0].toString();
+		if (altValue == 'Homepage') {
+			url = '/homepage/'+relationID[1].toString();
+		}
+		else if ('{FILTER}' == 'image') {
+			url = '/cms/image.php?' + relationID[0].toString() + '&width=1024&height=2000';
+		}
+		else {
+			url = '/send.php?' + relationID[0].toString();
+		}
 
 		win.document.getElementById(input).value = url;
 
