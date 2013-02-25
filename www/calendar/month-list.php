@@ -10,5 +10,5 @@
 
 SitePage::localRedir('/calendar/full');
 
-//$calendar = new Calendar_Month_List_Default($this, $this->arg[0]);
+//$calendar = new Calendar_Layout_Month_List_Default($this, $this->arg[0]);
 //$calendar->render();
