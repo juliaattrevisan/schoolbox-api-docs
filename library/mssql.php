@@ -24,7 +24,7 @@ class MSSQL {
 	 *
 	 * @var bool
 	 */
-	protected $convert_encoding = false;
+	protected $convert_encoding = true;
 
 	/**
 	 * If encoding has been switched on or off for a single request, the
