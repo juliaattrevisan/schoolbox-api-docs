@@ -45,8 +45,8 @@ class Calendar_Api_Factory {
 		$compositeApi = new Calendar_Api_Composite();
 
 		foreach($this->getAllTypes() as $config) {
-			$defaultImplementation = 'Calendar_Api_' . $config->getEventType() . '_' . $config->getConnectorClass() . '_Default';
-			$uniqueImplementation = 'Calendar_Api_' . $config->getEventType() . '_' . $config->getConnectorClass() . '_' . ucwords(Cfg::get('site_location'));
+			$defaultImplementation = 'Calendar_Api_Type_' . $config->getEventType() . '_' . $config->getConnectorClass() . '_Default';
+			$uniqueImplementation = 'Calendar_Api_Type_' . $config->getEventType() . '_' . $config->getConnectorClass() . '_' . ucwords(Cfg::get('site_location'));
 
 			/* Decide which to use (unique or default)
 			 * Or create no class, if neither exists

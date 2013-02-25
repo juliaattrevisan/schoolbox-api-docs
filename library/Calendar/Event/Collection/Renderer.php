@@ -8,7 +8,7 @@
  * @version	 SVN: $Id$
  */
 class Calendar_Event_Collection_Renderer {
-	protected $interfaceClass = 'Calendar_Api_Interface';
+	protected $interfaceClass = 'Calendar_Api_Type_Interface';
 
 	/**
 	 * An instance of a Calendar API class

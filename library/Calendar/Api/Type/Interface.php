@@ -1,6 +1,6 @@
 <?php
 /**
- * Calendar_Api_Interface
+ * Calendar_Api_Type_Interface
  *
  * Each method must return an instance of Calendar_Event_Collection
  * containing Calender_Event_Type subclasses in their stacks.
@@ -13,6 +13,6 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-interface Calendar_Api_Interface {
+interface Calendar_Api_Type_Interface {
     public function getEvents($currentDay);
 }

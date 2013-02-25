@@ -77,6 +77,11 @@ if (is_array($typeList)) {
 		/* Subscribe page
 	 	 */
 		else if (($type['type'] == 'Subscribe') && ($selectedType == 'Subscribe')) {
+
+			foreach(glob("../library/Calendar/Api/*") as $dirname) {
+				echo $dirname . '<BR>';
+			}
+
 			$allEventTypes = array('Event', 'StudentBirthday', 'Submission');
 			$allConnectors = array('Schoolbox', 'Sharepoint', 'Vcal');
 
