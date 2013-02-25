@@ -60,7 +60,18 @@ class Synchronise_Synergetic_Moriah_Strategy_Parent extends Synchronise_Synerget
 		$this->collateList($this->getExternalUserHandler()->getParentUserAccountInfo());
 	}
 
-	/**
+    /**
+     * Do not move parents between groups
+     *
+     * @param $newUser
+     * @return mixed
+     */
+    protected function userExists($newUser) {
+        return $this->userExistsBySynergyAndGroup($newUser);
+    }
+
+
+    /**
 	 * Set up the new user's details
 	 *
 	 * @param  $currentUser
