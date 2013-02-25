@@ -125,4 +125,97 @@ class Calendar_Api_Config_Mapper extends Mapper {
 
 		return $this;
 	}
+
+	/**
+	 * Generate a tree of EventType/Connector pairs
+	 *
+	 * @return array
+	 */
+	public function generateApiHierarchy() {
+
+		/* Figger out which Event Types are around, and which Connectors
+		 * are available for each Event Type.
+		 */
+		$path = '../library/Calendar/Api/Type';
+
+		$allApi = array();
+
+		/* Just get the dir names (these correspond to event types)
+		 */
+		foreach(array_filter(glob("$path/*"), 'is_dir') as $dirname) {
+			$eventTypeFilename = basename($dirname);
+
+			/* Path to connectors
+			 */
+			$subpath = "$path/$eventTypeFilename";
+
+			foreach(array_filter(glob("$subpath/*"), 'is_dir') as $subdirname) {
+				$connectorClassFilename = basename($subdirname);
+
+				/* Augment that array
+				 */
+				$allApi[$eventTypeFilename][] = $connectorClassFilename;
+			}
+		}
+
+		return $allApi;
+	}
+
+	/**
+	 * Some generic test values used to populate the calendar_connector table
+	 * while developing the admin ui
+	 */
+	public function setupDefaults() {
+		$start = 85;
+
+		$config = new Calendar_Api_Config_Type_Vcal();
+		$config->setId($start);
+		$config->setEventType('Event');
+		$config->setConnectorClass('Vcal');
+		$config->setUrl('http://www.google.com');
+
+		$configRecord = new Calendar_Api_Config_Record();
+		$configRecord->setEventType('Event');
+		$configRecord->setConnectorClass('Vcal');
+		$configRecord->updateConfig($config);
+
+		$this->save(array($configRecord));
+
+		$config = new Calendar_Api_Config_Type_Vcal();
+		$config->setId($start++);
+		$config->setEventType('Event');
+		$config->setConnectorClass('Vcal');
+		$config->setUrl('http://www.gruber.org');
+
+		$configRecord = new Calendar_Api_Config_Record();
+		$configRecord->setEventType('Event');
+		$configRecord->setConnectorClass('Vcal');
+		$configRecord->updateConfig($config);
+
+		$this->save(array($configRecord));
+
+		$config = new Calendar_Api_Config_Type_Schoolbox();
+		$config->setId($start++);
+		$config->setEventType('Submission');
+		$config->setConnectorClass('Schoolbox');
+
+		$configRecord = new Calendar_Api_Config_Record();
+		$configRecord->setEventType('Submission');
+		$configRecord->setConnectorClass('Schoolbox');
+		$configRecord->updateConfig($config);
+
+		$this->save(array($configRecord));
+
+		$config = new Calendar_Api_Config_Type_Sharepoint();
+		$config->setId($start++);
+		$config->setEventType('StudentBirthday');
+		$config->setConnectorClass('Sharepoint');
+
+		$configRecord = new Calendar_Api_Config_Record();
+		$configRecord->setEventType('StudentBirthday');
+		$configRecord->setConnectorClass('Sharepoint');
+		$configRecord->updateConfig($config);
+
+		$this->save(array($configRecord));
+	}
 }
