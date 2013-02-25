@@ -136,7 +136,7 @@ class Calendar_Api_Config_Mapper extends Mapper {
 		/* Figger out which Event Types are around, and which Connectors
 		 * are available for each Event Type.
 		 */
-		$path = '../library/Calendar/Api/Type';
+		$path = '../library/Calendar/Api/EventType';
 
 		$allApi = array();
 

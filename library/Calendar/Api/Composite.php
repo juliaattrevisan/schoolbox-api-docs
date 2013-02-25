@@ -12,7 +12,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Api_Composite implements Calendar_Api_Type_Interface {
+class Calendar_Api_Composite implements Calendar_Api_EventType_Interface {
 
 	/**
 	 * A list of all the api classes which produce Collections to combine

@@ -1,6 +1,6 @@
 <?php
 /**
- * Calendar_Api_Type_Event_Sharepoint_Stk
+ * Calendar_Api_EventType_Event_Sharepoint_Stk
  *
  * St. Kentigern uses iport, a customisation of Sharepoint.
  *
@@ -9,7 +9,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Calendar_Api_Type_Event_Sharepoint_Stk implements Calendar_Api_Type_Interface {
+class Calendar_Api_EventType_Event_Sharepoint_Stk implements Calendar_Api_EventType_Interface {
 
     /* An instance of the built-in php5 soap
      */

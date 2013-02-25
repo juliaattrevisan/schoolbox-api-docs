@@ -1,19 +1,13 @@
 <?php
 /**
- * Calendar_Api_Type_StudentBirthday_Schoolbox_Default
+ * Calendar_Api_EventType_Submission_Schoolbox_Default
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Api_Type_StudentBirthday_Schoolbox_Default implements Calendar_Api_Type_Interface {
-
-	/**
-	 * A schoobox event handler instance
-	 *
-	 * @var null
-	 */
+class Calendar_Api_EventType_Submission_Schoolbox_Default implements Calendar_Api_EventType_Interface {
 	private $calendarHandler = null;
 
 	/**
@@ -33,7 +27,7 @@ class Calendar_Api_Type_StudentBirthday_Schoolbox_Default implements Calendar_Ap
 	 * @return Calendar_Event_Collection
 	 */
 	public function getEvents($currentDay) {
-		$collection = new Calendar_Event_Collection();
+		$collection = $this->getCalendarHandler()->getSubmissionEvents($currentDay);
 
 		return $collection;
 	}
