@@ -38,11 +38,17 @@ var calendar = {
 
 			/* Ajax add this config option
 			 */
-			console.log('add ' + id);
+			var data = {
+				id: id
+			};
 
-			/* Reload screen
+			/* Remove element silently, rather than force reload
 			 */
-			//self.refresh();
+			var row = $j(this).parent('label');
+
+			$j.post('/adminv2/calendar/addOption', data, function(responseText) {
+				self.refresh();
+			});
 		});
 	},
 

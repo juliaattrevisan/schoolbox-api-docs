@@ -82,6 +82,9 @@ if (is_array($typeList)) {
 			/* All calendar subscription options go here
 			 */
 			foreach($allApi as $currentEventType => $allConnectors) {
+
+				/* Render titles etc
+				 */
 				$this->setVar(array(
 					'EVENTTYPE_NAME' => $currentEventType,
 				));
@@ -89,6 +92,15 @@ if (is_array($typeList)) {
 				/* Inject individual templates just like before -_-
 				 */
 				foreach($allConnectors as $currentConnector) {
+
+					/* Render titles etc
+					 *
+					 * Some kind of rendering issue exists where I can't combine it with the other
+					 * setVar() further down. It leads to the wrong connector name being used.
+					 */
+					$this->setVar(array(
+						'CONNECTOR_NAME' => $currentConnector,
+					));
 
 					/* Process each config for this kind of connector
 					 */
@@ -111,10 +123,9 @@ if (is_array($typeList)) {
 						$connectorChecked = '';
 					}
 
-					/* Render titles etc.
+					/* Render checkbox setting
 					 */
 					$this->setVar(array(
-						'CONNECTOR_NAME' => $currentConnector,
 						'CONNECTOR_CHECKED' => $connectorChecked,
 					));
 
