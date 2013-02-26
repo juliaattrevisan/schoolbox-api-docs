@@ -19,12 +19,13 @@ class DAV_SubjectServer_SubjectList extends Sabre_DAV_SimpleCollection {
 	 * @return array
 	 */
 	public function getChildren() {
-		$children = array();
-		$this->loadSubjects();
-		foreach ($this->getSubjects() as $subject) {
-			$children[] = new DAV_SubjectServer_Subject($subject);
+		if (!empty($this->children)) {
+			return $this->children;
 		}
-		return $children;
+		foreach ($this->getSubjects() as $subject) {
+			$this->children[] = new DAV_SubjectServer_Subject($subject);
+		}
+		return $this->children;
 	}
 
 
@@ -90,34 +91,16 @@ class DAV_SubjectServer_SubjectList extends Sabre_DAV_SimpleCollection {
 
 
 	/**
-	 * @param \Schoolbox\External\SubjectCollection $subjects
-	 */
-	public function setSubjects($subjects) {
-		$this->subjects = $subjects;
-	}
-
-
-	/**
+	 * Retrieves list of subjects, loading the list if required.
+	 *
 	 * @return \Schoolbox\External\SubjectCollection
 	 */
 	public function getSubjects() {
+		if (!empty($this->subjects)) {
+			return $this->subjects;
+		}
+		$mapper = new \Schoolbox\UserMapper();
+		$this->subjects = $mapper->findWithSubjects($_SESSION['id'])->getSubjectCollection();
 		return $this->subjects;
 	}
-
-
-	/**
-	 * Loads list of subjects for this user if they haven't already been loaded,
-	 * so they can be returned by getSubjects().
-	 *
-	 * @return void
-	 */
-	protected function loadSubjects() {
-		$subjects = $this->getSubjects();
-		if (!isset($subjects)) {
-			$mapper = new \Schoolbox\UserMapper();
-			$user = $mapper->findWithSubjects($_SESSION['id']);
-			$this->setSubjects($user->getSubjectCollection());
-		}
-	}
-
 }
