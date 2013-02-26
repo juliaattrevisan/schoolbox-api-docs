@@ -349,6 +349,28 @@ class User extends DeprecatedModel {
         return false;
     }
 
+
+	/**
+	 * Sends a change password confirmation email.
+	 *
+	 * @param int $id The user ID to send to.
+	 *
+	 * @return bool
+	 */
+	public function sendChangePasswordEmail($id) {
+
+		if ($user = $this->getByID($id)) {
+			$hash = substr(md5(uniqid() . time()), 0, 25);
+			$this->update(array('id' => $user['id'], 'hash' => $hash));
+
+			require_once SITE_root . '/include/Mailer.php';
+			$mailHandler = new Mailer('change-password.html', Cfg::get('title') . ' Password Change', $user['alt_email']);
+			$mailHandler->setVar('NAME', $user['firstname']);
+			return $mailHandler->send();
+		}
+		return false;
+	}
+
     function sendPassword($email) {
         if (empty($email)) {
             return false;

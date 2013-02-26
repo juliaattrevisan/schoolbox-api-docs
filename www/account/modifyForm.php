@@ -33,8 +33,11 @@ if (isset($_POST['current_password'])) {
 		}
 	}
 
-	if (empty($error) && !$userHandler->setPassword($_SESSION['id'], $_POST['current_password'], $_POST['new_password'])) {
+	if (!$userHandler->setPassword($_SESSION['id'], $_POST['current_password'], $_POST['new_password'])) {
 		error(105, "Your current password did not match what is stored in the database.");
+	}
+	else {
+		$userHandler->sendChangePasswordEmail($_SESSION['id']);
 	}
 
 	SitePage::localRedir('/account/modify/success');
