@@ -6,39 +6,39 @@ $j(document).ready(function () {
 		event.stopPropagation();
 
 		var current = $j('#current_password').val(),
-            password = $j('#new_password').val(),
-            confirmp = $j('#confirm_password').val(),
-            msgs = [],
-            letter_re = /[a-z]/i,
-            number_re = /\d/,
-            nonalpha_re = /[^a-z\d]/i
-        ;
+			password = $j('#new_password').val(),
+			confirmp = $j('#confirm_password').val(),
+			msgs = [],
+			letter_re = /[a-z]/i,
+			number_re = /\d/,
+			nonalpha_re = /[^a-z\d]/i
+		;
 
 		if (current == '') {
-            msgs.push('You must enter your current password.');
-        }
+			msgs.push('You must enter your current password.');
+		}
 		if (password.length < 6) {
-            msgs.push('Your new password must be at least 6 characters long.');
-        }
-        else {
-            if (!letter_re.test(password)) {
-                msgs.push('Your new password must have at least one letter.');
-            }
-            if (!number_re.test(password)) {
-                msgs.push('Your new password must have at least one number.');
-            }
-            if (!nonalpha_re.test(password)) {
-                msgs.push('Your new password must have at least one non-letter or number character.');
-            }
-        }
-        if (password != confirmp) {
-            msgs.push('The new and confirmation passwords you entered do not match.');
-        }
+			msgs.push('Your new password must be at least 6 characters long.');
+		}
+		else {
+			if (!letter_re.test(password)) {
+				msgs.push('Your new password must have at least one letter.');
+			}
+			if (!number_re.test(password)) {
+				msgs.push('Your new password must have at least one number.');
+			}
+			if (!nonalpha_re.test(password)) {
+				msgs.push('Your new password must have at least one non-letter or number character.');
+			}
+		}
+		if (password != confirmp) {
+			msgs.push('The new and confirmation passwords you entered do not match.');
+		}
 
 		if (msgs.length === 0) {
 			return true;
 		}
-        else {
+		else {
 			alert(msgs.join("\n"));
 			return false;
 		}
@@ -54,28 +54,28 @@ $j(document).ready(function () {
 <!-- END success -->
 
 <form id="accountForm"  method="post" class="clearfix" action="/account/modifyForm.php">
-  <table class="standardForm">
-    <tr>
-      <td class="formLabelWidth"><h4>Current Password</h4>
-        <em></em>
-		</td>
-	<td>
-	<input type="password" name="current_password" id="current_password" size="35" maxlength="50" />
-	</td>
-    </tr>
-    <tr>
-      <td><h4>New Password</h4>
-        <em>Your new password must be at least 6 characters in length and contain at least one letter and at least one number.</em><br />
-		</td>
-	<td><input type="password" name="new_password" id="new_password" size="35" maxlength="50" /></td>
-    </tr>
-    <tr>
-      <td><h4>Confirm New Password</h4>
-        <em>Enter your new password again to confirm you typed it correctly.</em><br />
-		</td>
-	<td><input type="password" name="confirm_password" id="confirm_password" size="35" maxlength="50" /></td>
-    </tr>
+	<table class="standardForm">
+		<tr>
+			<td class="formLabelWidth"><h4>Current Password</h4>
+				<em></em>
+			</td>
+			<td>
+				<input type="password" name="current_password" id="current_password" size="35" maxlength="50" />
+			</td>
+		</tr>
+		<tr>
+			<td><h4>New Password</h4>
+				<em>Your new password must be at least 6 characters in length and contain at least one letter and at least one number.</em><br />
+			</td>
+			<td><input type="password" name="new_password" id="new_password" size="35" maxlength="50" /></td>
+		</tr>
+		<tr>
+			<td><h4>Confirm New Password</h4>
+				<em>Enter your new password again to confirm you typed it correctly.</em><br />
+			</td>
+			<td><input type="password" name="confirm_password" id="confirm_password" size="35" maxlength="50" /></td>
+		</tr>
 
-  </table>
-  <input class="submit-btn-plain" type="submit" name="submit" value="Modify" />
+	</table>
+	<input class="submit-btn-plain" type="submit" name="submit" value="Modify" />
 </form>
