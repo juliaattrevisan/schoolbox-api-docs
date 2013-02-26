@@ -2,23 +2,44 @@
 <script type="text/javascript">
 $j(document).ready(function () {
 	$j('#accountForm').submit(function (event) {
-		
+
 		event.stopPropagation();
-		
-		var current = $j('#current_password').val(), password = $j('#new_password').val(), confirmp = $j('#confirm_password').val(), msg = ''; 
-		if (current == '')
-			msg += 'You must enter your current password.\n';
-		
-		if (password.length < 6)
-			msg += 'Your new password must be at least 6 characters long.\n';
-		
-		if (password != confirmp)
-			msg += 'The new and confirmation passwords you entered do not match.';
-		
-		if (msg == '') {
+
+		var current = $j('#current_password').val(),
+            password = $j('#new_password').val(),
+            confirmp = $j('#confirm_password').val(),
+            msgs = [],
+            letter_re = /[a-z]/i,
+            number_re = /\d/,
+            nonalpha_re = /[^a-z\d]/i
+        ;
+
+		if (current == '') {
+            msgs.push('You must enter your current password.');
+        }
+		if (password.length < 6) {
+            msgs.push('Your new password must be at least 6 characters long.');
+        }
+        else {
+            if (!letter_re.test(password)) {
+                msgs.push('Your new password must have at least one letter.');
+            }
+            if (!number_re.test(password)) {
+                msgs.push('Your new password must have at least one number.');
+            }
+            if (!nonalpha_re.test(password)) {
+                msgs.push('Your new password must have at least one non-letter or number character.');
+            }
+        }
+        if (password != confirmp) {
+            msgs.push('The new and confirmation passwords you entered do not match.');
+        }
+
+		if (msgs.length === 0) {
 			return true;
-		} else {
-			alert(msg);
+		}
+        else {
+			alert(msgs.join("\n"));
 			return false;
 		}
 	});

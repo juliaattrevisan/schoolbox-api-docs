@@ -21,6 +21,17 @@ if (isset($_POST['current_password'])) {
 	if (strlen($_POST['new_password']) < 6) {
 		error(105, "Your new password must be at least 6 characters long.");
 	}
+	else {
+		if (!preg_match('/[a-z]/i', $_POST['new_password'])) {
+			error(105, "Your new password must have at least one letter.");
+		}
+		if (!preg_match('/\\d/', $_POST['new_password'])) {
+			error(105, "Your new password must have at least one number.");
+		}
+		if (!preg_match('/[^a-z\\d]/i', $_POST['new_password'])) {
+			error(105, "Your new password must have at least one non-letter or number character.");
+		}
+	}
 
 	if (empty($error) && !$userHandler->setPassword($_SESSION['id'], $_POST['current_password'], $_POST['new_password'])) {
 		error(105, "Your current password did not match what is stored in the database.");
