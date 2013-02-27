@@ -24,7 +24,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
     }
 
     public function execute() {
-        $currDay = time();
+        $today = new Alaress_Date_Format(date('y-m-d', time()), 'y-m-d');
 
         $this->setVar("DATE", date("l jS F"));
 
@@ -34,7 +34,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
 		$api = $submissionFactory->produce();
 
-		$this->submissionList = $api->getEvents($currDay);
+		$this->submissionList = $api->getEvents($today->getDatabase(), $today->addDays(1)->getDatabase());
 		$this->submissionList->sort();
 
 		/* A list of events
@@ -43,7 +43,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
 		$api = $eventFactory->produce();
 
-        $this->eventList = $api->getEvents($currDay);
+        $this->eventList = $api->getEvents($today->getDatabase(), $today->addDays(1)->getDatabase());
         $this->eventList->sort();
 
         return true;
