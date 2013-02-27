@@ -575,13 +575,14 @@ class Calendar extends DeprecatedModel {
         return $events;
     }
 
-    /**
-     * Get all events occurring on the specified date
-     *
-     * @param $currentDay
-     * @return array|bool
-     */
-    public function getDayEvents($currentDay) {
+	/**
+	 * Get all events occurring on the specified date
+	 *
+	 * @param $startTimestamp
+	 * @param $endTimestamp
+	 * @return Calendar_Event_Collection
+	 */
+	public function getDayEvents($startTimestamp, $endTimestamp) {
         if (is_array($_SESSION['campus'])) {
             $campusList = $_SESSION['campus'];
             $campusQuery = "eventCampus.campusID IN(" . implode(',', $campusList) . ")";
@@ -622,6 +623,9 @@ class Calendar extends DeprecatedModel {
             }
         }
 
+		$start = new Alaress_Date_Format($startTimestamp, 'U');
+		$end = new Alaress_Date_Format($endTimestamp, 'U');
+
         //get single events for the day
         $query = "
 			SELECT DISTINCT event.id, owner,
@@ -642,10 +646,12 @@ class Calendar extends DeprecatedModel {
 			LEFT JOIN eventCampus ON event.id = eventCampus.eventID
 			LEFT JOIN eventGroup ON event.id = eventGroup.eventID
 			LEFT JOIN category ON event.sid = category.id AND event.sid IS NOT NULL
-			WHERE date = '" . date("Y-m-d", $currentDay) . "'
-				AND (    (access = '1' AND owner = '" . $_SESSION['id'] . "')
+			WHERE
+				date >= '{$start->getDatabaseDate()}'
+				AND date <= '{$end->getDatabaseDate()}'
+				AND ((access = '1' AND owner = '{$_SESSION['id']}')
 					  $groupQuery
-					  OR (access = '3' AND $campusQuery $groupChunk OR owner = '" . $_SESSION['id'] . "')
+					  OR (access = '3' AND $campusQuery $groupChunk OR owner = '{$_SESSION['id']}')
 					)
 			GROUP BY id
 			ORDER BY event.startTime, event.endTime
