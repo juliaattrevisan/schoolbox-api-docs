@@ -61,8 +61,8 @@ class Calendar_Api_EventType_Event_Vcal_Default implements Calendar_Api_EventTyp
 						$event->setAuthorId('');
 						$event->setEventId(-1);
 
-						$event->setStartTime(new Alaress_Date_Format($startTimestamp, 'U'));
-						$event->setEndTime(new Alaress_Date_Format($endTimestamp, 'U'));
+						$event->setStartTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
+						$event->setEndTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
 
 						$event->setType('');
 						$event->setNote($currentEvent->children[$name]->value);
