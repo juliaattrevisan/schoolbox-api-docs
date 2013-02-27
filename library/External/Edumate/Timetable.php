@@ -19,7 +19,6 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     protected $labelMap = array(
         'BS' => array('Before School', 1),
         'MG' => array('Morning Activities', 1),
-        'RC' => array('Roll Call', 2),
         '1'  => array('Period 1', 1),
         '2'  => array('Period 2', 1),
         'R'  => array('Recess', 2),
@@ -34,19 +33,18 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     );
 
     protected $timeMap = array(
-        'BS' => array('08:00', '08:39'),
-        'MG' => array('08:40', '08:59'),
-        'RC' => array('09:00', '09:01'),
-        '1'  => array('09:02', '09:44'),
-        '2'  => array('09:45', '10:29'),
-        'R'  => array('10:30', '10:49'),
-        '3'  => array('10:50', '11:34'),
-        '4'  => array('11:35', '12:19'),
-        '5'  => array('12:20', '13:04'),
-        'L1' => array('13:05', '13:21'),
-        'L2' => array('13:22', '13:39'),
-        '6'  => array('13:40', '12:24'),
-        '7'  => array('14:25', '15:09'),
+        'BS' => array('08:00', '08:40'),
+        'MG' => array('08:40', '09:00'),
+        '1'  => array('09:00', '09:45'),
+        '2'  => array('09:45', '10:30'),
+        'R'  => array('10:30', '10:50'),
+        '3'  => array('10:50', '11:35'),
+        '4'  => array('11:35', '12:20'),
+        '5'  => array('12:20', '13:05'),
+        'L1' => array('13:05', '13:20'),
+        'L2' => array('13:22', '13:40'),
+        '6'  => array('13:40', '12:25'),
+        '7'  => array('14:25', '15:10'),
         'AS' => array('15:10', '15:55'),
     );
 
