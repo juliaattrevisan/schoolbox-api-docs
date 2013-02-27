@@ -35,16 +35,32 @@ abstract class Mapper {
      */
     const TYPE_LOB = 3;
 
+	/**
+	 * @var Database
+	 */
+	protected $database;
 
-    protected $database;
+	/**
+	 * @var string
+	 */
+	protected $table;
 
-    protected $table;
+	/**
+	 * Class name of the model to associate with this mapper.
+	 *
+	 * @var string
+	 */
+	protected $model;
 
-    protected $model;
+	/**
+	 * @var array
+	 */
+	protected $map;
 
-    protected $map;
-
-    protected $identifier;
+	/**
+	 * @var array
+	 */
+	protected $identifier;
 
     /**
      * Stores the singleton instance of the mapper
@@ -72,6 +88,20 @@ abstract class Mapper {
 
         $this->mapping();
     }
+
+	/**
+	 * @return string
+	 */
+	public function getTable() {
+		return $this->table;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getModel() {
+		return $this->model;
+	}
 
     /**
      * @brief Retrieves the entire collection unfiltered
@@ -389,14 +419,17 @@ abstract class Mapper {
     /**
      * @brief Returns an SQL fragement containing a comma separated list of column names possibly aliased
      * @param String $alias
+     * @param array  $whitelist If not empty, a whitelist of column names to use
      * @return String
      */
-    public function getColumnString($alias = '') {
+    public function getColumnString($alias = '', $whitelist = array()) {
 
         $columnList = array();
 
         foreach ($this->map as $map) {
-
+			if (!empty($whitelist) && !in_array($map['column'], $whitelist)) {
+				continue;
+			}
             if (!empty($alias)) {
                 $columnString = "`$alias`.`{$map['column']}` AS `$alias.{$map['column']}`";
             } else {
