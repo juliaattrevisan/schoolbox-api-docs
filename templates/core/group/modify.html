@@ -98,6 +98,20 @@ $j(document).ready(function() {
 			<td class="formLabelWidth"><h4>Group Admin</h4></td>
 			<td><a href="/search/user/{OWNER_ID}">{GROUP_OWNER}</a></td>
 		</tr>
+		<!-- BEGIN mail_all -->
+		<tr>
+			<td class="formLabelWidth"><h4>Mailing List</h4>
+			</td>
+			<td>
+				<!-- BEGIN mail_all -->
+				<form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
+					<input type="hidden" name="replyto" value="&quot;{CATEGORY_NAME}&quot; &lt;{REPLYTO}&gt;"/>
+					<input type="hidden" name="bcc"     value="{EMAILALL}"/>
+					<a href="#" class="btn submit-this float-left up-arrow "><span></span>Email all</a>
+				</form>
+				<!-- END mail_all -->
+			</td>
+		</tr>
 		<tr>
 			<td valign="top"><h4>Add users</h4>
 				<em>You may add users individually by typing their name and selecting from the list.  Alternatively you can add many users via a list of synergetic id's or usernames.</em>

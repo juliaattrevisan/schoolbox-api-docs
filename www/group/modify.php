@@ -7,6 +7,8 @@ $this->setFile(TEMPLATE_content, 'group/modify.html');
 $this->setBlock(TEMPLATE_content, 'member', 'member_block');
 $this->setBlock('member', 'make_owner', 'make_owner_block');
 
+$this->setBlock(TEMPLATE_content, 'mail_all', 'mail_all_block');
+
 $this->setBlock(TEMPLATE_content, "authorisation", "authorisation_block");
 $this->setBlock("authorisation", "waiting", "waiting_block");
 
@@ -37,9 +39,18 @@ if (is_numeric($this->arg[0])) {
 
 	$this->setVar($output);
 
-	$memberList = $groupHandler->getMemberList($category['id']);
+	$memberList   = $groupHandler->getMemberList($category['id']);
+	//
+	// Keep list of everyone to email
+	$all_emails   = array();
+	$email_object = new Email();
 	if (is_array($memberList)) {
 		foreach ($memberList as $member) {
+			//
+			// Don't email yourself
+			if ($member['uid'] != $_SESSION['id']) {
+				$all_emails[] = $email_object->formatEmailFromArray($member);
+			}
 			$output = array('USER_NAME'		=> $userHandler->formatName($member),
 							'USER_JAVA'		=> addslashes($userHandler->formatName($member)),
 							'USER_ID'		=> $member['uid'],
@@ -56,10 +67,24 @@ if (is_numeric($this->arg[0])) {
 
 			$this->parse('member_block', 'member', true);
 		}
-	} else
+
+	}
+	else {
 		$this->setVar('member_block', '');
+	}
 
-
+	//
+	// Set up the email all block (PHPLib sucks)
+	if (!empty($all_emails)) {
+		$this->setVar(array(
+			'REPLYTO'  => $email_object->formatEmailFromArray($_SESSION),
+			'EMAILALL' => implode(',', $all_emails),
+		));
+		$this->parse('mail_all_block', 'mail_all');
+	}
+	else {
+		$this->setVar('mail_all_block', '');
+	}
 
 	$waitingList = $groupHandler->getWaitingList($category['id']);
 	if (is_array($waitingList)) {
