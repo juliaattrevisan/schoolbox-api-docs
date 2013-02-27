@@ -285,7 +285,7 @@ class Group extends DeprecatedModel
 
     function getMemberList($relationID)
     {
-        $query = "SELECT title, firstname, lastname, uid, synergy_id, type, group_id
+        $query = "SELECT title, firstname, lastname, uid, synergy_id, type, group_id, local_email, alt_email, username
 				  FROM userAccess, user
 				  WHERE uid = id AND service = " . $this->_service . " AND sid = $relationID AND type < " . FULL_ACCESS . " AND type > " . DENY_ACCESS
             . " ORDER BY lastname, firstname";
