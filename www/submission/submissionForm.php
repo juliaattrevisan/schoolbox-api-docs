@@ -48,24 +48,25 @@ $descriptors = $_POST['des'];
 $criteria = $_POST['crit'];
 $useDescriptors = $resultSetID == 0;
 
-// parse file upload if there's one to parse
+//
+// File uploads are now stored in the storage engine. (eventually will support
+// multiple uploads)
+// Legacy file ID: files stored directly on the file system.
+$legacy_file_id = 0;
+$storage_id     = 0;
 if (isset($_FILES['file']['name']) && $_FILES['file']['name']) {
     $allowedFileHandler = new AllowedFile();
     $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 
-    $fileHandler = new File();
-    $data = array(
-        'owner'       => $_SESSION['id'],
-        'description' => $_POST['name'],
-        'type'        => $_POST['type'],
-        'comment'     => $_POST['comment'],
-        'category'    => $categoryID,
-        'hidden'      => '1',
-    );
-    $fileId = $fileHandler->create($data, $_FILES['file']);
+	$storage_id = Storage_ResourceMapper::getInstance()->create(
+		$_FILES['file']['name'],
+		$_FILES['file']['tmp_name'],
+		$_SESSION['id']
+	);
 }
 else {
-    $fileId = $action == 'create' ? $_POST['fileId'] : 0;
+	$legacy_file_id = $action == 'create' ? $_POST['fileId'] : 0;
+	$storage_id     = $action == 'create' ? $_POST['storageId'] : 0;
 }
 
 
@@ -156,8 +157,11 @@ foreach(array('overdue', 'upcoming', 'returned') as $i) {
 }
 
 // only set this field if there's actually something to put in it
-if($fileId) {
-    $submissionBox['fid'] = $fileId;
+if ($legacy_file_id) {
+	$submissionBox['fid'] = $legacy_file_id;
+}
+if ($storage_id) {
+	$submissionBox['storage_id'] = $storage_id;
 }
 
 //die();
