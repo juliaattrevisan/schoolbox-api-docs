@@ -61,6 +61,8 @@ class Facade_Component_CurrentPeriod extends Facade_Component_Generic {
             else {
 
                 $dayNum = ($dayNum + 1) % $dayCount;
+                $dayNum = $dayNum == 0 ? $dayCount : $dayNum;  //dont let daynumber be 0
+
 
                 $todayDef = $timetableHandler->getDayTimetable(
                     $user->get('synergy_id'),
