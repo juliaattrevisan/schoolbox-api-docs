@@ -67,15 +67,12 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Week_Abstract {
 		$startSequence = new Alaress_Date_Format(Scrub::text($_GET['start']), 'U');
 		$endSequence = new Alaress_Date_Format(Scrub::text($_GET['end']), 'U');
 
+		/* Render all registered event types
+		 */
 		echo "[";
 
-		for ($currentDay = $startSequence->getUnixTimestamp(); $currentDay < $endSequence->getUnixTimestamp(); $currentDay += 60*60*24) {
-
-			/* Render all registered event types
- 		     */
-			$renderer = new Calendar_Event_Collection_Renderer($this->getApi(), $currentDay, $this->getPage());
-			$renderer->renderAll();
-		}
+		$renderer = new Calendar_Event_Collection_Renderer($this->getApi(), $startSequence->getUnixTimestamp(), $endSequence->getUnixTimestamp(), $this->getPage());
+		$renderer->renderAll();
 
 		/* Final null element to help keep IE happy
 		 */

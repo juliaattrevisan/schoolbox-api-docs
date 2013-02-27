@@ -22,7 +22,14 @@ class Calendar_Event_Collection_Renderer {
 	 *
 	 * @var int
 	 */
-	protected $currentDay = -1;
+	protected $startTimestamp = -1;
+
+	/**
+	 * A unix timestamp
+	 *
+	 * @var int
+	 */
+	protected $endTimestamp = -1;
 
 	/**
 	 * An instance of sitepage
@@ -31,7 +38,13 @@ class Calendar_Event_Collection_Renderer {
 	 */
 	protected $page = null;
 
-	/* Mega-stack Calendar_Event_Collection instance which stores all events
+	/*
+	 */
+	/**
+	 * Mega-stack Calendar_Event_Collection instance which stores all events
+	 * An instance of Calendar_Event_Collection
+	 *
+	 * @var null
 	 */
 	protected $allEvents = null;
 
@@ -39,12 +52,14 @@ class Calendar_Event_Collection_Renderer {
 	 * Constructor
 	 *
 	 * @param $api
-	 * @param $currentDay
+	 * @param $startTimestamp
+	 * @param $endTimestamp
 	 * @param $page
 	 */
-	public function __construct($api, $currentDay, $page) {
+	public function __construct($api, $startTimestamp, $endTimestamp, $page) {
 		$this->setApi($api);
-		$this->setCurrentDay($currentDay);
+		$this->setStartTimestamp($startTimestamp);
+		$this->setEndTimestamp($endTimestamp);
 		$this->setPage($page);
 
 		$this->setAllEvents(new Calendar_Event_Collection());
@@ -64,7 +79,7 @@ class Calendar_Event_Collection_Renderer {
 		foreach ($reflection->getMethods() as $currentMethod) {
 			$methodName = $currentMethod->getName();
 
-			$eventList = $this->getApi()->$methodName($this->getCurrentDay());
+			$eventList = $this->getApi()->$methodName($this->getStartTimestamp(), $this->getEndTimestamp());
 
 			$this->getAllEvents()->merge($eventList);
 		}
@@ -118,21 +133,39 @@ class Calendar_Event_Collection_Renderer {
 	}
 
 	/**
-	 * Set current day
+	 * Set end timestamp
 	 *
-	 * @param $currentDay
+	 * @param int $endTimestamp
 	 */
-	protected function setCurrentDay($currentDay) {
-		$this->currentDay = $currentDay;
+	protected function setEndTimestamp($endTimestamp) {
+		$this->endTimestamp = $endTimestamp;
 	}
 
 	/**
-	 * Get current day
+	 * Get end timestamp
 	 *
 	 * @return int
 	 */
-	protected function getCurrentDay() {
-		return $this->currentDay;
+	protected function getEndTimestamp() {
+		return $this->endTimestamp;
+	}
+
+	/**
+	 * Set start timestamp
+	 *
+	 * @param int $startTimestamp
+	 */
+	protected function setStartTimestamp($startTimestamp) {
+		$this->startTimestamp = $startTimestamp;
+	}
+
+	/**
+	 * Get start timestamp
+	 *
+	 * @return int
+	 */
+	protected function getStartTimestamp() {
+		return $this->startTimestamp;
 	}
 
 	/**

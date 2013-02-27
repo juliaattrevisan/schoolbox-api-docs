@@ -24,14 +24,16 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface {
 	/**
 	 * Get day events
 	 *
-	 * @param $currentDay
+	 * @param $startTimestamp
+	 * @param $endTimestamp
+	 * @internal param $currentDay
 	 * @return Calendar_Event_Collection
 	 */
-	public function getEvents($currentDay) {
+	public function getEvents($startTimestamp, $endTimestamp) {
 		$result = new Calendar_Event_Collection();
 
 		foreach($this->getApi() as $currentApi) {
-			$result->merge($currentApi->getEvents($currentDay));
+			$result->merge($currentApi->getEvents($startTimestamp, $endTimestamp));
 		}
 
 		return $result;

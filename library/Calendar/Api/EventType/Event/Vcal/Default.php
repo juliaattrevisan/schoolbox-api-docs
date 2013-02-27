@@ -20,11 +20,13 @@ class Calendar_Api_EventType_Event_Vcal_Default implements Calendar_Api_EventTyp
 	/**
 	 * Get day events from this data source
 	 *
-	 * @param $currentDay
+	 * @param $startTimestamp
+	 * @param $endTimestamp
+	 * @internal param $currentDay
 	 *
 	 * @return Calendar_Event_Collection
 	 */
-	public function getEvents($currentDay) {
+	public function getEvents($startTimestamp, $endTimestamp) {
 		$collection = new Calendar_Event_Collection();
 
 		$allConfigs = Calendar_Api_Config_Mapper::getInstance()->findByColumnList(array(
@@ -49,14 +51,10 @@ class Calendar_Api_EventType_Event_Vcal_Default implements Calendar_Api_EventTyp
 
 			foreach($gloop->children as $currentEvent) {
 				if ($currentEvent instanceof Sabre_VObject_Component_VEvent) {
-					$startTimestamp = strtotime($currentEvent->children[$dtstart]->value);
-					$endTimestamp = strtotime($currentEvent->children[$dtend]->value);
+					$eventStartTimestamp = strtotime($currentEvent->children[$dtstart]->value);
+					$eventEndTimestamp = strtotime($currentEvent->children[$dtend]->value);
 
-					$currentDayStart = new Alaress_Date_Format($currentDay, "U");
-					$currentDayEnd = new Alaress_Date_Format($currentDay, "U");
-					$currentDayEnd->addDays(1);
-
-					if (($startTimestamp >= $currentDayStart->getUnixTimestamp()) && ($endTimestamp <= $currentDayEnd->getUnixTimestamp())) {
+					if (($eventStartTimestamp >= $startTimestamp) && ($eventEndTimestamp <= $endTimestamp)) {
 						$event = new Calendar_Event_Type_Day();
 
 						$event->setAuthorName('');

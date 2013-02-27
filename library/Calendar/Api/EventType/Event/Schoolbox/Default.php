@@ -28,12 +28,14 @@ class Calendar_Api_EventType_Event_Schoolbox_Default implements Calendar_Api_Eve
 	/**
 	 * Get day events from this data source
 	 *
-	 * @param $currentDay
+	 * @param $startTimestamp
+	 * @param $endTimestamp
+	 * @internal param $currentDay
 	 *
 	 * @return Calendar_Event_Collection
 	 */
-	public function getEvents($currentDay) {
-		$collection = $this->getCalendarHandler()->getDayEvents($currentDay);
+	public function getEvents($startTimestamp, $endTimestamp) {
+		$collection = $this->getCalendarHandler()->getDayEvents($startTimestamp, $endTimestamp);
 
 		return $collection;
 	}

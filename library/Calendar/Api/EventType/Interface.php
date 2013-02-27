@@ -14,5 +14,5 @@
  * @version     SVN: $Id$
  */
 interface Calendar_Api_EventType_Interface {
-    public function getEvents($currentDay);
+    public function getEvents($startTimestamp, $endTimestamp);
 }

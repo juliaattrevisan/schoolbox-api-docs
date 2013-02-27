@@ -20,11 +20,13 @@ class Calendar_Api_EventType_StudentBirthday_Vcal_Default implements Calendar_Ap
 	/**
 	 * Get day events from this data source
 	 *
-	 * @param $currentDay
+	 * @param $startTimestamp
+	 * @param $endTimestamp
+	 * @internal param $currentDay
 	 *
 	 * @return Calendar_Event_Collection
 	 */
-	public function getEvents($currentDay) {
+	public function getEvents($startTimestamp, $endTimestamp) {
 		$collection = new Calendar_Event_Collection();
 
 		/* Fill in your query result set here and populate $collection

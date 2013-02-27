@@ -115,16 +115,20 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk implements Calendar_Api_EventT
         }
     }
 
-    /**
-     * Get day events from this data source
-     *
-     * @param $currentDay
-     *
-     * @return Calendar_Event_Collection
-     */
-    public function getEvents($currentDay) {
+	/**
+	 * Get day events from this data source
+	 *
+	 * @param $startTimestamp
+	 * @param $endTimestamp
+	 * @internal param $currentDay
+	 *
+	 * @return Calendar_Event_Collection
+	 */
+    public function getEvents($startTimestamp, $endTimestamp) {
         $groupHandler = new Group();
 
+		/* TODO: Update this for SK
+		 */
         $now = new Alaress_Date_Format($currentDay, 'U');
         $start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d h:i:s');
         $end = new Alaress_Date_Format($now->getDatabaseDate() . ' 23:59:59', 'y-m-d h:i:s');

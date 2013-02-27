@@ -22,11 +22,13 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default implements Calendar_Ap
 	/**
 	 * Get day events from this data source
 	 *
-	 * @param $currentDay
+	 * @param $startTimestamp
+	 * @param $endTimestamp
+	 * @internal param $currentDay
 	 *
 	 * @return Calendar_Event_Collection
 	 */
-	public function getEvents($currentDay) {
+	public function getEvents($startTimestamp, $endTimestamp) {
 		$collection = $this->getCalendarHandler()->getSubmissionEvents($currentDay);
 
 		return $collection;
