@@ -54,7 +54,7 @@ if (is_numeric($this->arg[0])) {
 			$output = array('USER_NAME'		=> $userHandler->formatName($member),
 							'USER_JAVA'		=> addslashes($userHandler->formatName($member)),
 							'USER_ID'		=> $member['uid'],
-                            'GROUP_CHECKED'	=> $member['type'] > 1 ? 'checked=\'checked\'' : ''
+							'GROUP_CHECKED'	=> $member['type'] > 1 ? 'checked=\'checked\'' : ''
 							);
 
 			$this->setVar($output);
