@@ -63,6 +63,28 @@ class Calendar_Api_Config_Mapper extends Mapper {
 	}
 
 	/**
+	 * Return a set of unique types of config records being used
+	 *
+	 * @return Bool|Collection
+	 */
+	public function getAllConfigRecords() {
+		$query = "
+            SELECT *, CONCAT(event_type, '_', connector_class) AS unified
+            FROM `{$this->table}`
+            WHERE status = 1
+            GROUP BY unified
+        ";
+
+		$statement = $this->database->prepare($query);
+
+		$statement->execute();
+
+		$rowset = $statement->fetchAll();
+
+		return $this->hydrateList($rowset);
+	}
+
+	/**
 	 * Return a set of decoded config objects for the specified event_type and connector_class
 	 *
 	 * @param $currentEventType
