@@ -240,10 +240,9 @@ h3, #nav h3, .add-component .notification { color: #FFFFFF; }
 }
 
 #header .logo {
-	height: 88px;
-	padding-top: 0;
-	width: 538px;
 	left:0;
+        padding-top: 20px;
+        padding-left: 20px;
 }
 
 #nav { top: 120px; }
