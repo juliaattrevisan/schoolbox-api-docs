@@ -70,9 +70,9 @@ class Calendar_Api_Config_Record {
 	/**
 	 * Update config object
 	 *
-	 * @param Calendar_Api_Config_Abstract $config
+	 * @param Calendar_Api_Config_Connector_Abstract $config
 	 */
-	public function updateConfig(Calendar_Api_Config_Abstract $config) {
+	public function updateConfig(Calendar_Api_Config_Connector_Abstract $config) {
 
 		/* Update member contents with new config object
 		 */
