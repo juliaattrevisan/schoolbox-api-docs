@@ -37,6 +37,13 @@ abstract class Calendar_Api_Config_Connector_Abstract {
 	protected $connectorClass = '';
 
 	/**
+	 * Corresponds to the luEventType table
+	 *
+	 * @var string
+	 */
+	protected $luEventType = '1';
+
+	/**
 	 * Method for uniquely rendering on admin screen
 	 *
 	 * @param $page
@@ -52,8 +59,6 @@ abstract class Calendar_Api_Config_Connector_Abstract {
 	 * @param $preselected
 	 */
 	protected function renderEventType($page, $preselected) {
-
-
 		$eventHandler = new Calendar();
 
 		$allLookupEventTypes = $eventHandler->getTypeList();
@@ -136,5 +141,23 @@ abstract class Calendar_Api_Config_Connector_Abstract {
 	 */
 	public function getId() {
 		return $this->id;
+	}
+
+	/**
+	 * Set luEventType
+	 *
+	 * @param string $luEventType
+	 */
+	public function setLuEventType($luEventType) {
+		$this->luEventType = $luEventType;
+	}
+
+	/**
+	 * Get luEventType
+	 *
+	 * @return string
+	 */
+	public function getLuEventType() {
+		return $this->luEventType;
 	}
 }

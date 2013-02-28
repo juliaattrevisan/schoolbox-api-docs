@@ -9,17 +9,21 @@ if (is_array($_POST['record']) && count($_POST['record'])) {
 	foreach($_POST['record'] as $id => $attribs) {
 		$configRecord = Calendar_Api_Config_Mapper::getInstance()->findById($id);
 
+		$config = $configRecord->decodeConfig();
+
+		/* Add eventType option for all configs
+		 */
+		$config->setLuEventType($attribs['luEventType']);
+
 		/* Process multiple Vcals
 		 */
 		if ($attribs['connectorClass'] == 'Vcal') {
-
-			/* Update each url
-			 */
-			$config = $configRecord->decodeConfig();
 			$config->setUrl($attribs['url']);
-
-			$configRecord->updateConfig($config);
 		}
+
+		/* Update and save config
+		 */
+		$configRecord->updateConfig($config);
 
 		Calendar_Api_Config_Mapper::getInstance()->save(array($configRecord));
 	}
@@ -78,4 +82,4 @@ if (is_array($_POST['active']) && count($_POST['active'])) {
 	}
 }
 
-$this->backToTheFuture(1);
+//$this->backToTheFuture(1);

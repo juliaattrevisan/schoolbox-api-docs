@@ -1,5 +1,4 @@
 <?php
-print_r($_POST);
 if (strlen($_POST['id'])) {
 	$bits = explode('_', $_POST['id']);
 

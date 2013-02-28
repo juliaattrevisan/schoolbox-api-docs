@@ -25,6 +25,6 @@ class Calendar_Api_Config_Connector_Sharepoint extends Calendar_Api_Config_Conne
 
 		/* Render event type options
 		 */
-		$this->renderEventType($page, -1);
+		$this->renderEventType($page, $this->getLuEventType());
 	}
 }

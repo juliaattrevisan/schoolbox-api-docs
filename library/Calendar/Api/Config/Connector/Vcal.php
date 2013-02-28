@@ -40,7 +40,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
 
 		/* Render event type options
 		 */
-		$this->renderEventType($page, -1);
+		$this->renderEventType($page, $this->getLuEventType());
 	}
 
 	/* Getters/Setters
