@@ -22,5 +22,9 @@ class Calendar_Api_Config_Connector_Sharepoint extends Calendar_Api_Config_Conne
 		));
 
 		$page->setVar('has_multiple_options_block', '');
+
+		/* Render event type options
+		 */
+		$this->renderEventType($page, -1);
 	}
 }

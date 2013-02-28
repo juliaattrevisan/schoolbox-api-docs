@@ -109,10 +109,15 @@ if (is_array($typeList)) {
 					if (count($allConfigs)) {
 						foreach($allConfigs as $currentConfig) {
 							$this->setFile('configFragment', "adminv2/calendar/config/{$currentConnector}.html");
+							$this->setBlock('configFragment', 'luEventType', 'luEventType_block');
 
 							$currentConfig->render($this);
 
 							$this->parse('connectorConfig_block', 'configFragment', true);
+
+							/* Clear children after parsing out the parent
+							 */
+							$this->setVar('luEventType_block', '');
 						}
 
 						/* Whether this connector displays at Ticked or not

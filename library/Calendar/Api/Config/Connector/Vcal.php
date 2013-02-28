@@ -37,6 +37,10 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
 		));
 
 		$page->parse('has_multiple_options_block', 'has_multiple_options');
+
+		/* Render event type options
+		 */
+		$this->renderEventType($page, -1);
 	}
 
 	/* Getters/Setters

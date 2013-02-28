@@ -44,6 +44,43 @@ abstract class Calendar_Api_Config_Connector_Abstract {
 	 */
 	abstract public function render($page);
 
+	/**
+	 * Render event type lookup selector with the currently chosen
+	 * value preselected
+	 *
+	 * @param $page
+	 * @param $preselected
+	 */
+	protected function renderEventType($page, $preselected) {
+
+
+		$eventHandler = new Calendar();
+
+		$allLookupEventTypes = $eventHandler->getTypeList();
+
+		if (is_array($allLookupEventTypes) && count($allLookupEventTypes)) {
+			foreach($allLookupEventTypes as $currentLookupEventType) {
+				if ($currentLookupEventType['eventTypeID'] == $preselected) {
+					$selected = 'selected="selected"';
+				}
+				else {
+					$selected = '';
+				}
+
+				$page->setVar(array(
+					'LUEVENTTYPE_VALUE' => $currentLookupEventType['eventTypeID'],
+					'LUEVENTTYPE_NAME' => $currentLookupEventType['eventType'],
+					'LUEVENTTYPE_SELECTED' => $selected,
+				));
+
+				$page->parse('luEventType_block', 'luEventType', true);
+			}
+		}
+		else {
+			$page->setVar('luEventType_block', '');
+		}
+	}
+
 	/* Getters/Setters
 	 */
 
