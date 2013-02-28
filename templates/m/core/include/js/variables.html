@@ -13,11 +13,11 @@
         wp:     ~navigator.userAgent.indexOf('WP7')
                 || ~navigator.userAgent.indexOf('Windows Phone'),
         fullscreen: (window.navigator.standalone) ? window.navigator.standalone : localStorage.getItem('pinned'),
-        loggedIn: (sessionStorage.getItem('session')),
+        loggedIn: (sessionStorage.getItem('session') || "{{ core.sessionId | default('') | e('js')}}"),
         tablet: (screen.width>=768 || screen.height>=768),
         style: window.getComputedStyle(document.body,':after').getPropertyValue('content'),
         lastWidth: 0,
-        init: 0,
+        init: 0,d
         lastPage: (localStorage.getItem('lastPage')) ? localStorage.getItem('lastPage') : null,
         online: function () {
             var onLine = false;
@@ -28,13 +28,7 @@
             return onLine;
         },
         isCurrentlyLoggedIn: function() {
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', '/m/core/auth/am_i_logged_in.json', false);
-            xhr.send(null);
-            if (xhr.status === 200) {
-                return JSON.parse(xhr.response).logged_in;
-            }
-            return false;
+            return env.loggedIn;
         },
         status: function (x) {
             if(!x){
