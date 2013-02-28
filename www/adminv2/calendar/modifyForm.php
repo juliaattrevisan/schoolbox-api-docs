@@ -1,7 +1,5 @@
 <?php
 
-new Alaress_Probe($_POST);
-
 /* Update the options for each connector
  * Currently, only Vcal has options which can be modified
  */
@@ -11,13 +9,16 @@ if (is_array($_POST['record']) && count($_POST['record'])) {
 
 		$config = $configRecord->decodeConfig();
 
-		/* Add eventType option for all configs
-		 */
-		$config->setLuEventType($attribs['luEventType']);
-
 		/* Process multiple Vcals
 		 */
 		if ($attribs['connectorClass'] == 'Vcal') {
+
+			/* Add eventType option
+			 */
+			$config->setLuEventType($attribs['luEventType']);
+
+			/* Add urls
+			 */
 			$config->setUrl($attribs['url']);
 		}
 
@@ -82,4 +83,4 @@ if (is_array($_POST['active']) && count($_POST['active'])) {
 	}
 }
 
-//$this->backToTheFuture(1);
+$this->backToTheFuture(1);
