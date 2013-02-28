@@ -22,9 +22,5 @@ class Calendar_Api_Config_Connector_Schoolbox extends Calendar_Api_Config_Connec
 		));
 
 		$page->setVar('has_multiple_options_block', '');
-
-		/* Render event type options
-		 */
-		$this->renderEventType($page, $this->getLuEventType());
 	}
 }
