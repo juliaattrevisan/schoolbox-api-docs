@@ -7,14 +7,14 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Component\Learning;
+namespace Schoolbox\Assessment\Component;
 use Schoolbox;
 
 class SubmissionBoxMapper extends Schoolbox\Mapper {
 
 	protected function mapping () {
 		$this->hasTable('submission_box');
-		$this->hasModel('\\Schoolbox\\Component\\Learning\\SubmissionBox');
+		$this->hasModel('\\Schoolbox\\Assessment\\Component\\SubmissionBox');
 		$this->hasMap(array(
 			'column'     => 'id',
 			'property'   => 'id',
