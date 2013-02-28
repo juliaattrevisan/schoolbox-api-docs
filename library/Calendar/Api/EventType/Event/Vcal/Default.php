@@ -10,11 +10,38 @@
 class Calendar_Api_EventType_Event_Vcal_Default implements Calendar_Api_EventType_Interface {
 
 	/**
+	 * A list of luEventType records. You can assign a "colour scheme" to Vcal events
+	 * using the luEventType table.
+	 *
+	 * @var array
+	 */
+	private $allLuEventTypes = array();
+
+	/**
 	 * Constructor
 	 *
 	 * @param $config
 	 */
 	public function __construct($config) {
+		$eventHandler = new Calendar();
+
+		$this->setAllLuEventTypes($eventHandler->getTypeList());
+	}
+
+	/**
+	 * Associate a colour scheme with this event stream
+	 *
+	 * @param $id
+	 * @return array
+	 */
+	private function findLuEventType($id) {
+		foreach($this->getAllLuEventTypes() as $currentLuEventType) {
+			if ($currentLuEventType['eventTypeID'] == $id) {
+				return $currentLuEventType;
+			}
+		}
+
+		return array();
 	}
 
 	/**
@@ -31,13 +58,16 @@ class Calendar_Api_EventType_Event_Vcal_Default implements Calendar_Api_EventTyp
 
 		$allConfigs = Calendar_Api_Config_Mapper::getInstance()->findByColumnList(array(
 			'event_type' => 'Event',
-			'connector_class' => 'Vcal'
+			'connector_class' => 'Vcal',
+			'status' => 1
 		));
 
 		//http://dc01.alrs/owa/calendar/ade01b2b2d6143578d38c4bb45f2b71e@demo2008r2.alrs/6bb887da9d854711b8b015a5bdd73c1929569147020194918/calendar.ics
 
-		for($allConfigs->rewind(), $currentConfig = $allConfigs->current(); $allConfigs->valid(); $allConfigs->next()) {
-			$source = file_get_contents($currentConfig->decodeConfig()->getUrl());
+		foreach($allConfigs as $currentConfig) {
+			$decodedConfig = $currentConfig->decodeConfig();
+
+			$source = file_get_contents($decodedConfig->getUrl());
 
 			$allEvents = Sabre_VObject_Reader::read($source);
 
@@ -56,6 +86,8 @@ class Calendar_Api_EventType_Event_Vcal_Default implements Calendar_Api_EventTyp
 					/* Only get events that fit within the range specified
 					 */
 					if (($eventStartTimestamp >= $startTimestamp) && ($eventEndTimestamp <= $endTimestamp)) {
+						$metaDetails = $this->findLuEventType($decodedConfig->getLuEventType());
+
 						$event = new Calendar_Event_Type_Day();
 
 						$event->setAuthorName('');
@@ -65,11 +97,11 @@ class Calendar_Api_EventType_Event_Vcal_Default implements Calendar_Api_EventTyp
 						$event->setStartTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
 						$event->setEndTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
 
-						$event->setType('');
+						$event->setType($metaDetails['eventTypeID']);
 						$event->setNote($currentEvent->SUMMARY->value);
 						$event->setAccess('');
-						$event->setEventType('Day');
-						$event->setColour('');
+						$event->setEventType($metaDetails['eventType']);
+						$event->setColour($metaDetails['eventColour']);
 						$event->setCampusList('');
 						$event->setDetail($currentEvent->DESCRIPTION->value);
 						$event->setLocation($currentEvent->LOCATION->value);
@@ -88,5 +120,26 @@ class Calendar_Api_EventType_Event_Vcal_Default implements Calendar_Api_EventTyp
 		}
 
 		return $collection;
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set allLuEventTypes
+	 *
+	 * @param array $allLuEventTypes
+	 */
+	private function setAllLuEventTypes($allLuEventTypes) {
+		$this->allLuEventTypes = $allLuEventTypes;
+	}
+
+	/**
+	 * Get allLuEventTypes
+	 *
+	 * @return array
+	 */
+	private function getAllLuEventTypes() {
+		return $this->allLuEventTypes;
 	}
 }
