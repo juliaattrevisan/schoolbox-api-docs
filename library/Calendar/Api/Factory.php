@@ -26,7 +26,7 @@ class Calendar_Api_Factory {
 	 * Constructor
 	 */
 	public function __construct() {
-		$allConfigs = Calendar_Api_Config_Mapper::getInstance()->findAll();
+		$allConfigs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
 
 		/* These configs are base64-encode()'d to get around a weird issue with unserialize
 		 * http://stackoverflow.com/questions/4264270/unserialize-sometimes-returns-false
