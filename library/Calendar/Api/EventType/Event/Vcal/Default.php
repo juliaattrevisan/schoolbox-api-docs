@@ -40,6 +40,7 @@ class Calendar_Api_EventType_Event_Vcal_Default implements Calendar_Api_EventTyp
 		$name = 1;
 		$dtstart = 2;
 		$dtend = 3;
+		$uid = 4;
 		$location = 11;
 
 		//http://dc01.alrs/owa/calendar/ade01b2b2d6143578d38c4bb45f2b71e@demo2008r2.alrs/6bb887da9d854711b8b015a5bdd73c1929569147020194918/calendar.ics
@@ -47,19 +48,27 @@ class Calendar_Api_EventType_Event_Vcal_Default implements Calendar_Api_EventTyp
 		for($allConfigs->rewind(), $currentConfig = $allConfigs->current(); $allConfigs->valid(); $allConfigs->next()) {
 			$source = file_get_contents($currentConfig->decodeConfig()->getUrl());
 
-			$gloop = Sabre_VObject_Reader::read($source);
+			$allEvents = Sabre_VObject_Reader::read($source);
 
-			foreach($gloop->children as $currentEvent) {
+			foreach($allEvents->children as $currentEvent) {
+
+				/* gloop returns a whole bunch of stuff all mixed up
+				 *
+				 * We only want to deal with Sabre_VObject_Component_VEvent objects
+				 * as they seem to be the calendar items themselves
+				 */
 				if ($currentEvent instanceof Sabre_VObject_Component_VEvent) {
 					$eventStartTimestamp = strtotime($currentEvent->children[$dtstart]->value);
 					$eventEndTimestamp = strtotime($currentEvent->children[$dtend]->value);
 
+					/* Only get events that fit within the range specified
+					 */
 					if (($eventStartTimestamp >= $startTimestamp) && ($eventEndTimestamp <= $endTimestamp)) {
 						$event = new Calendar_Event_Type_Day();
 
 						$event->setAuthorName('');
-						$event->setAuthorId('');
-						$event->setEventId(-1);
+						$event->setAuthorId(-1);
+						$event->setEventId($currentEvent->children[$uid]->value);
 
 						$event->setStartTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
 						$event->setEndTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
