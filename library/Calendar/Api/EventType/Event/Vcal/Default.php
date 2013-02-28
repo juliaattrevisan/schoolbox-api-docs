@@ -34,15 +34,6 @@ class Calendar_Api_EventType_Event_Vcal_Default implements Calendar_Api_EventTyp
 			'connector_class' => 'Vcal'
 		));
 
-		/* Indexes
-		 */
-		$description = 0;
-		$name = 1;
-		$dtstart = 2;
-		$dtend = 3;
-		$uid = 4;
-		$location = 11;
-
 		//http://dc01.alrs/owa/calendar/ade01b2b2d6143578d38c4bb45f2b71e@demo2008r2.alrs/6bb887da9d854711b8b015a5bdd73c1929569147020194918/calendar.ics
 
 		for($allConfigs->rewind(), $currentConfig = $allConfigs->current(); $allConfigs->valid(); $allConfigs->next()) {
@@ -58,8 +49,9 @@ class Calendar_Api_EventType_Event_Vcal_Default implements Calendar_Api_EventTyp
 				 * as they seem to be the calendar items themselves
 				 */
 				if ($currentEvent instanceof Sabre_VObject_Component_VEvent) {
-					$eventStartTimestamp = strtotime($currentEvent->children[$dtstart]->value);
-					$eventEndTimestamp = strtotime($currentEvent->children[$dtend]->value);
+
+					$eventStartTimestamp = strtotime($currentEvent->DTSTART->value);
+					$eventEndTimestamp = strtotime($currentEvent->DTEND->value);
 
 					/* Only get events that fit within the range specified
 					 */
@@ -68,19 +60,19 @@ class Calendar_Api_EventType_Event_Vcal_Default implements Calendar_Api_EventTyp
 
 						$event->setAuthorName('');
 						$event->setAuthorId(-1);
-						$event->setEventId($currentEvent->children[$uid]->value);
+						$event->setEventId($currentEvent->UID->value);
 
 						$event->setStartTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
 						$event->setEndTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
 
 						$event->setType('');
-						$event->setNote($currentEvent->children[$name]->value);
+						$event->setNote($currentEvent->SUMMARY->value);
 						$event->setAccess('');
 						$event->setEventType('Day');
 						$event->setColour('');
 						$event->setCampusList('');
-						$event->setDetail($currentEvent->children[$description]->value);
-						$event->setLocation($currentEvent->children[$location]->value);
+						$event->setDetail($currentEvent->DESCRIPTION->value);
+						$event->setLocation($currentEvent->LOCATION->value);
 						$event->setPublishDate('');
 						$event->setSid('');
 
