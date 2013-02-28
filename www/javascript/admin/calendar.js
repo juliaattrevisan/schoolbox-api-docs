@@ -42,10 +42,6 @@ var calendar = {
 				id: id
 			};
 
-			/* Remove element silently, rather than force reload
-			 */
-			var row = $j(this).parent('label');
-
 			$j.post('/adminv2/calendar/addOption', data, function(responseText) {
 				self.refresh();
 			});
@@ -69,12 +65,8 @@ var calendar = {
 					id: id
 				};
 
-				/* Remove element silently, rather than force reload
-				 */
-				var row = $j(this).parent('label');
-
 				$j.post('/adminv2/calendar/removeOption', data, function(responseText) {
-					$j(row).remove();
+					self.refresh();
 				});
 			}
 
