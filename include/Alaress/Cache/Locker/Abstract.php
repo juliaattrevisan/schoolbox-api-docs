@@ -68,12 +68,23 @@ abstract class Alaress_Cache_Locker_Abstract {
 	private $streamContents = '';
 
 	/**
+	 * A logging class
+	 *
+	 * @var null
+	 */
+	private $log = null;
+
+	/**
 	 * Constructor
 	 *
 	 * This is deliberately empty so you can instantiate an instance and set custom options
 	 * such as expiry durations, urls, etc
 	 */
 	final public function __construct() {
+
+		/* Logging class handles verbosity and any logging
+		 */
+		$this->setLog(new Alaress_Cache_Locker_Log($this->getVerbose()));
 
 		/* Example usage with multiple settings
 
@@ -122,21 +133,21 @@ abstract class Alaress_Cache_Locker_Abstract {
 
 						/* newCacheUpdate()
 						 */
-						$this->log("Cache expired, lockfile expired perhaps due to timeout or halted. Regenerate everything.");
+						$this->getLog()->report("Cache expired, lockfile expired perhaps due to timeout or halted. Regenerate everything.");
 						$this->newCacheUpdate();
 
 					}
 					else {
 						/* Load content from cached version
 						 */
-						$this->log("Cache expired, lockfile still fresh. Loading from cache: {$this->getCachedFile()}, while in process of retrieving new stream contents.");
+						$this->getLog()->report("Cache expired, lockfile still fresh. Loading from cache: {$this->getCachedFile()}, while in process of retrieving new stream contents.");
 						$this->setStreamContents(file_get_contents($this->getCachedFile()));
 					}
 				}
 				else {
 					/* newCacheUpdate()
 					 */
-					$this->log("Cache expired, lockfile doesn't exist. Regenerate everything.");
+					$this->getLog()->report("Cache expired, lockfile doesn't exist. Regenerate everything.");
 					$this->newCacheUpdate();
 				}
 			}
@@ -144,7 +155,7 @@ abstract class Alaress_Cache_Locker_Abstract {
 			else {
 				/* Load content from cached version
 				 */
-				$this->log("Cached file exists and is still fresh. Loading from cache: {$this->getCachedFile()}");
+				$this->getLog()->report("Cached file exists and is still fresh. Loading from cache: {$this->getCachedFile()}");
 				$this->setStreamContents(file_get_contents($this->getCachedFile()));
 			}
 		}
@@ -152,17 +163,6 @@ abstract class Alaress_Cache_Locker_Abstract {
 		 */
 		else {
 			$this->newCacheUpdate();
-		}
-	}
-
-	/**
-	 * Logging mechanism
-	 *
-	 * @param $text
-	 */
-	private function log($text) {
-		if ($this->getVerbose()) {
-			echo $text . "<BR>";
 		}
 	}
 
@@ -175,23 +175,23 @@ abstract class Alaress_Cache_Locker_Abstract {
 
 		/* Remove lock files for this stream url
 		 */
-		$this->log('Removing lock file.');
+		$this->getLog()->report('Removing lock file.');
 		$this->remove($this->getLockFile());
 
 		/* Create new lock file for this stream url
 		 */
-		$this->log('Creating lock file.');
+		$this->getLog()->report('Creating lock file.');
 		$this->createLockFile();
 
 		/* Fetch new content from stream url
 		 * Save content to cached file
 		 */
-		$this->log('Saving stream contents to cache file.');
+		$this->getLog()->report('Saving stream contents to cache file.');
 		$this->saveStreamContents();
 
 		/* Remove lock file for this stream url
 		 */
-		$this->log('Removing lock file.');
+		$this->getLog()->report('Removing lock file.');
 		$this->remove($this->getLockFile());
 
 		return $this;
@@ -214,7 +214,7 @@ abstract class Alaress_Cache_Locker_Abstract {
 
 		/* Verbose debugging
 		 */
-		$this->log('Writing new ' . get_class($this) . ' file: ' . $this->getCachedFile());
+		$this->getLog()->report('Writing new ' . get_class($this) . ' file: ' . $this->getCachedFile());
 
 		while (!feof($streamHandle)) {
 			fwrite($cacheHandle, fread($streamHandle, 8192), 8192);
@@ -262,11 +262,11 @@ abstract class Alaress_Cache_Locker_Abstract {
 		 */
 		$remaining = $duration - $difference;
 
-		$this->log(get_class($this) . ' file expires in ' . $remaining . ' seconds.');
-		$this->log('[' . $difference . '] ' . $now . ' - ' . filectime($file));
+		$this->getLog()->report(get_class($this) . ' file expires in ' . $remaining . ' seconds.');
+		$this->getLog()->report('[' . $difference . '] ' . $now . ' - ' . filectime($file));
 
 		if (filectime($file) < ($now - $duration)) {
-			$this->log($file . ' expired.');
+			$this->getLog()->report($file . ' expired.');
 			return true;
 		}
 
@@ -348,7 +348,7 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 * @return \Alaress_Cache_Abstract2
 	 */
 	public function setCachedTime($cachedTime) {
-		$this->log("Setting cached duration to $cachedTime");
+		$this->getLog()->report("Setting cached duration to $cachedTime");
 
 		$this->cachedTime = $cachedTime;
 
@@ -422,7 +422,7 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 * Set verbose
 	 *
 	 * @param boolean $verbose
-	 * @return \Alaress_Cache_Abstract2
+	 * @return \Alaress_Cache_Locker_Abstract
 	 */
 	public function setVerbose($verbose) {
 		$this->verbose = $verbose;
@@ -443,10 +443,10 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 * Set lock time
 	 *
 	 * @param int $lockTime
-	 * @return \Alaress_Cache_Abstract2
+	 * @return \Alaress_Cache_Locker_Abstract
 	 */
 	public function setLockTime($lockTime) {
-		$this->log("Setting locked duration to $lockTime");
+		$this->getLog()->report("Setting locked duration to $lockTime");
 
 		$this->lockTime = $lockTime;
 
@@ -460,6 +460,24 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 */
 	private function getLockTime() {
 		return $this->lockTime;
+	}
+
+	/**
+	 * Set log
+	 *
+	 * @param null $log
+	 */
+	private function setLog($log) {
+		$this->log = $log;
+	}
+
+	/**
+	 * Get log
+	 *
+	 * @return null
+	 */
+	private function getLog() {
+		return $this->log;
 	}
 }
 
