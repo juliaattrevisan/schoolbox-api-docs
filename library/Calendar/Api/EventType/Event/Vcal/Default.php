@@ -62,13 +62,16 @@ class Calendar_Api_EventType_Event_Vcal_Default implements Calendar_Api_EventTyp
 			'status' => 1
 		));
 
-		//http://dc01.alrs/owa/calendar/ade01b2b2d6143578d38c4bb45f2b71e@demo2008r2.alrs/6bb887da9d854711b8b015a5bdd73c1929569147020194918/calendar.ics
-
 		foreach($allConfigs as $currentConfig) {
 			$decodedConfig = $currentConfig->decodeConfig();
 
-			$source = file_get_contents($decodedConfig->getUrl());
+			/* Load calendar from locker cache
+			 */
+			$cache = new Calendar_Api_Cache();
+			$source = $cache->setVerbose(false)->init($decodedConfig->getUrl())->getStreamContents();
 
+			/* Parse it all
+			 */
 			$allEvents = Sabre_VObject_Reader::read($source);
 
 			foreach($allEvents->children as $currentEvent) {
