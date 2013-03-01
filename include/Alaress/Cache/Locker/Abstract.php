@@ -101,10 +101,6 @@ abstract class Alaress_Cache_Locker_Abstract {
 						->init('http://www.google.com')
 						->getStreamContents();
 		*/
-
-		/* Logging class handles verbosity and any logging
-		 */
-		$this->registerObserver('Alaress_Cache_Locker_Log');
 	}
 
 	/**
@@ -115,6 +111,10 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 */
 	public function init($url) {
 		$this->setUrl($url);
+
+		/* Logging class handles verbosity and any logging
+		 */
+		$this->registerObserver('Alaress_Cache_Locker_Log');
 
 		/* Determine the filenames of files that could be used
 		 */
