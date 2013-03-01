@@ -67,12 +67,22 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 */
 	private $streamContents = '';
 
+	/* These next two are for logging purposes, using the Observer Design Pattern
+	 */
+
 	/**
 	 * A logging class
 	 *
 	 * @var null
 	 */
 	private $log = null;
+
+	/**
+	 * A list of all observers
+	 *
+	 * @var array
+	 */
+	private $observerRegistry = array();
 
 	/**
 	 * Constructor
@@ -82,13 +92,8 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 */
 	final public function __construct() {
 
-		/* Logging class handles verbosity and any logging
-		 */
-		$this->setLog(new Alaress_Cache_Locker_Log($this->getVerbose()));
-
 		/* Example usage with multiple settings
-
-		$cache = new Alaress_Cache_Abstract2();
+		$cache = new Alaress_Cache_Locker_Abstract();
 
 		$contents = $cache->setCachedTime(7200)
 						->setLockTime(3600)
@@ -96,13 +101,17 @@ abstract class Alaress_Cache_Locker_Abstract {
 						->init('http://www.google.com')
 						->getStreamContents();
 		*/
+
+		/* Logging class handles verbosity and any logging
+		 */
+		$this->registerObserver('Alaress_Cache_Locker_Log');
 	}
 
 	/**
 	 * Setup method
 	 *
 	 * @param $url
-	 * @return \Alaress_Cache_Abstract2
+	 * @return \Alaress_Cache_Locker_Abstract
 	 */
 	public function init($url) {
 		$this->setUrl($url);
@@ -133,21 +142,21 @@ abstract class Alaress_Cache_Locker_Abstract {
 
 						/* newCacheUpdate()
 						 */
-						$this->getLog()->report("Cache expired, lockfile expired perhaps due to timeout or halted. Regenerate everything.");
+						$this->notifyObservers("Cache expired, lockfile expired perhaps due to timeout or halted. Regenerate everything.");
 						$this->newCacheUpdate();
 
 					}
 					else {
 						/* Load content from cached version
 						 */
-						$this->getLog()->report("Cache expired, lockfile still fresh. Loading from cache: {$this->getCachedFile()}, while in process of retrieving new stream contents.");
+						$this->notifyObservers("Cache expired, lockfile still fresh. Loading from cache: {$this->getCachedFile()}, while in process of retrieving new stream contents.");
 						$this->setStreamContents(file_get_contents($this->getCachedFile()));
 					}
 				}
 				else {
 					/* newCacheUpdate()
 					 */
-					$this->getLog()->report("Cache expired, lockfile doesn't exist. Regenerate everything.");
+					$this->notifyObservers("Cache expired, lockfile doesn't exist. Regenerate everything.");
 					$this->newCacheUpdate();
 				}
 			}
@@ -155,7 +164,7 @@ abstract class Alaress_Cache_Locker_Abstract {
 			else {
 				/* Load content from cached version
 				 */
-				$this->getLog()->report("Cached file exists and is still fresh. Loading from cache: {$this->getCachedFile()}");
+				$this->notifyObservers("Cached file exists and is still fresh. Loading from cache: {$this->getCachedFile()}");
 				$this->setStreamContents(file_get_contents($this->getCachedFile()));
 			}
 		}
@@ -175,23 +184,23 @@ abstract class Alaress_Cache_Locker_Abstract {
 
 		/* Remove lock files for this stream url
 		 */
-		$this->getLog()->report('Removing lock file.');
+		$this->notifyObservers('Removing lock file.');
 		$this->remove($this->getLockFile());
 
 		/* Create new lock file for this stream url
 		 */
-		$this->getLog()->report('Creating lock file.');
+		$this->notifyObservers('Creating lock file.');
 		$this->createLockFile();
 
 		/* Fetch new content from stream url
 		 * Save content to cached file
 		 */
-		$this->getLog()->report('Saving stream contents to cache file.');
+		$this->notifyObservers('Saving stream contents to cache file.');
 		$this->saveStreamContents();
 
 		/* Remove lock file for this stream url
 		 */
-		$this->getLog()->report('Removing lock file.');
+		$this->notifyObservers('Removing lock file.');
 		$this->remove($this->getLockFile());
 
 		return $this;
@@ -214,7 +223,7 @@ abstract class Alaress_Cache_Locker_Abstract {
 
 		/* Verbose debugging
 		 */
-		$this->getLog()->report('Writing new ' . get_class($this) . ' file: ' . $this->getCachedFile());
+		$this->notifyObservers('Writing new ' . get_class($this) . ' file: ' . $this->getCachedFile());
 
 		while (!feof($streamHandle)) {
 			fwrite($cacheHandle, fread($streamHandle, 8192), 8192);
@@ -262,11 +271,11 @@ abstract class Alaress_Cache_Locker_Abstract {
 		 */
 		$remaining = $duration - $difference;
 
-		$this->getLog()->report(get_class($this) . ' file expires in ' . $remaining . ' seconds.');
-		$this->getLog()->report('[' . $difference . '] ' . $now . ' - ' . filectime($file));
+		$this->notifyObservers(get_class($this) . ' file expires in ' . $remaining . ' seconds.');
+		$this->notifyObservers('[' . $difference . '] ' . $now . ' - ' . filectime($file));
 
 		if (filectime($file) < ($now - $duration)) {
-			$this->getLog()->report($file . ' expired.');
+			$this->notifyObservers($file . ' expired.');
 			return true;
 		}
 
@@ -300,6 +309,35 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 */
 	protected function encode($data) {
 		return md5($data);
+	}
+
+	/**
+	 * Add an observer
+	 *
+	 * @param $observer
+	 */
+	private function registerObserver($observer) {
+		$this->observerRegistry[$observer] = new $observer($this->getVerbose());
+	}
+
+	/**
+	 * Remove an observer
+	 *
+	 * @param $observer
+	 */
+	private function unregisterObserver($observer) {
+		unset($this->observerRegistry[$observer]);
+	}
+
+	/**
+	 * All observers - do something with data
+	 *
+	 * @param $text
+	 */
+	private function notifyObservers($text) {
+		foreach ($this->getObserverRegistry() as $key => $instance) {
+			$instance->report($text);
+		}
 	}
 
 	/* Getters/Setters
@@ -348,7 +386,7 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 * @return \Alaress_Cache_Abstract2
 	 */
 	public function setCachedTime($cachedTime) {
-		$this->getLog()->report("Setting cached duration to $cachedTime");
+		$this->notifyObservers("Setting cached duration to $cachedTime");
 
 		$this->cachedTime = $cachedTime;
 
@@ -446,7 +484,7 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 * @return \Alaress_Cache_Locker_Abstract
 	 */
 	public function setLockTime($lockTime) {
-		$this->getLog()->report("Setting locked duration to $lockTime");
+		$this->notifyObservers("Setting locked duration to $lockTime");
 
 		$this->lockTime = $lockTime;
 
@@ -478,6 +516,15 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 */
 	private function getLog() {
 		return $this->log;
+	}
+
+	/**
+	 * Get observer registry
+	 *
+	 * @return array
+	 */
+	private function getObserverRegistry() {
+		return $this->observerRegistry;
 	}
 }
 
