@@ -129,7 +129,7 @@ abstract class Alaress_Cache_Abstract2 {
 					else {
 						/* Load content from cached version
 						 */
-						$this->log("Cache expired, lockfile still fresh. Loading from cache while in process of retrieving new stream contents.");
+						$this->log("Cache expired, lockfile still fresh. Loading from cache: {$this->getCachedFile()}, while in process of retrieving new stream contents.");
 						$this->setStreamContents(file_get_contents($this->getCachedFile()));
 					}
 				}
@@ -144,7 +144,7 @@ abstract class Alaress_Cache_Abstract2 {
 			else {
 				/* Load content from cached version
 				 */
-				$this->log('Cached file exists and is still fresh. Loading from cache.');
+				$this->log("Cached file exists and is still fresh. Loading from cache: {$this->getCachedFile()}");
 				$this->setStreamContents(file_get_contents($this->getCachedFile()));
 			}
 		}
@@ -214,7 +214,7 @@ abstract class Alaress_Cache_Abstract2 {
 
 		/* Verbose debugging
 		 */
-		$this->log('Writing new ' . get_class($this) . ' file. ');
+		$this->log('Writing new ' . get_class($this) . ' file: ' . $this->getCachedFile());
 
 		while (!feof($streamHandle)) {
 			fwrite($cacheHandle, fread($streamHandle, 8192), 8192);
