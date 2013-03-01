@@ -348,6 +348,8 @@ abstract class Alaress_Cache_Abstract2 {
 	 * @return \Alaress_Cache_Abstract2
 	 */
 	public function setCachedTime($cachedTime) {
+		$this->log("Setting cached duration to $cachedTime");
+
 		$this->cachedTime = $cachedTime;
 
 		return $this;
@@ -444,6 +446,8 @@ abstract class Alaress_Cache_Abstract2 {
 	 * @return \Alaress_Cache_Abstract2
 	 */
 	public function setLockTime($lockTime) {
+		$this->log("Setting locked duration to $lockTime");
+
 		$this->lockTime = $lockTime;
 
 		return $this;
