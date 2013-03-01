@@ -45,5 +45,5 @@ class Calendar_Api_Cache extends Alaress_Cache_Locker_Abstract {
 	 *
 	 * @var bool
 	 */
-	protected $verbose = true;
+	protected $verbose = false;
 }

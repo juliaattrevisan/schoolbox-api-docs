@@ -68,7 +68,7 @@ class Calendar_Api_EventType_Event_Vcal_Default implements Calendar_Api_EventTyp
 			/* Load calendar from locker cache
 			 */
 			$cache = new Calendar_Api_Cache();
-			$source = $cache->setVerbose(false)->init($decodedConfig->getUrl())->getStreamContents();
+			$source = $cache->init($decodedConfig->getUrl())->getStreamContents();
 
 			/* Parse it all
 			 */
