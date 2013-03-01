@@ -32,6 +32,9 @@
             radios.focus(updateRadio);
             radios.blur(updateRadio);
             radios.change(updateRadio);
+			$j('#rubric-tbody td').click(function(){
+				$j(this).find(':radio').trigger('focus');
+			});
             updateRadio();
         });
 
@@ -39,13 +42,13 @@
             var i = 0;
             var sum = 0;
 
-            radios.removeClass('focused').next().removeClass('focused');
+            radios.removeClass('focused').parent('td').removeClass('focused');
 
             $j('#rubric-tbody :checked').each(function() {
                 var self = $j(this);
                 rubricData.spidata.points[0].data[self.data('index')] = [self.data('index'), parseInt(self.val())];
                 ++i;
-                self.addClass('focused').next().addClass('focused');
+                self.addClass('focused').parent('td').addClass('focused');
                 self.closest('tr').children('.warning').first().children('div').css('visibility', 'hidden');
                 sum += parseInt(self.val());
             });

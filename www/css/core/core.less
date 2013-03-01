@@ -6627,7 +6627,6 @@ table.subjectList {
                 padding: 8px;
             }
             label {
-                height: 100%;
                 width: 100%;
                 padding: 0;
                 margin: 0;
@@ -6639,18 +6638,22 @@ table.subjectList {
                     display: block;
                 }
             }
+			&.criterion-value.focused {
+				background: #CAE9B9;
+			}
         }
     }
     .rubric-input {
         z-index: -1000;
         position: absolute;
+		display: none;
     }
     .warning {
         border: solid 1px #FAF9F5;
         background: #FAF9F5;
         padding: 0;
         div {
-            margin: 8px;
+            margin-left: 8px;
             padding: 8px 0;
             color: #FF654A;
             font-weight: bold;
