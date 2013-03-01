@@ -37,7 +37,7 @@ class Calendar_Api_Cache extends Alaress_Cache_Abstract2 {
 	 *
 	 * @var int
 	 */
-	protected $lockTime =7200;
+	protected $lockTime = 7200;
 
 	/**
 	 * Show plain debugging messages
