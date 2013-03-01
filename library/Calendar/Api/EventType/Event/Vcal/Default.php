@@ -72,51 +72,62 @@ class Calendar_Api_EventType_Event_Vcal_Default implements Calendar_Api_EventTyp
 
 			/* Parse it all
 			 */
-			$allEvents = Sabre_VObject_Reader::read($source);
+			try {
+				$allEvents = Sabre_VObject_Reader::read($source);
+			}
+			catch(Exception $e) {
 
-			foreach($allEvents->children as $currentEvent) {
-
-				/* gloop returns a whole bunch of stuff all mixed up
-				 *
-				 * We only want to deal with Sabre_VObject_Component_VEvent objects
-				 * as they seem to be the calendar items themselves
+				/* Some google calendars don't follow sabre's expected format?
+				echo $decodedConfig->getUrl();
+				echo $e->getMessage();
 				 */
-				if ($currentEvent instanceof Sabre_VObject_Component_VEvent) {
+			}
 
-					$eventStartTimestamp = strtotime($currentEvent->DTSTART->value);
-					$eventEndTimestamp = strtotime($currentEvent->DTEND->value);
+			if ($allEvents !== null) {
+				foreach($allEvents->children as $currentEvent) {
 
-					/* Only get events that fit within the range specified
+					/* gloop returns a whole bunch of stuff all mixed up
+					 *
+					 * We only want to deal with Sabre_VObject_Component_VEvent objects
+					 * as they seem to be the calendar items themselves
 					 */
-					if (($eventStartTimestamp >= $startTimestamp) && ($eventEndTimestamp <= $endTimestamp)) {
-						$metaDetails = $this->findLuEventType($decodedConfig->getLuEventType());
+					if ($currentEvent instanceof Sabre_VObject_Component_VEvent) {
 
-						$event = new Calendar_Event_Type_Day();
+						$eventStartTimestamp = strtotime($currentEvent->DTSTART->value);
+						$eventEndTimestamp = strtotime($currentEvent->DTEND->value);
 
-						$event->setAuthorName('');
-						$event->setAuthorId(-1);
-						$event->setEventId($currentEvent->UID->value);
+						/* Only get events that fit within the range specified
+						 */
+						if (($eventStartTimestamp >= $startTimestamp) && ($eventEndTimestamp <= $endTimestamp)) {
+							$metaDetails = $this->findLuEventType($decodedConfig->getLuEventType());
 
-						$event->setStartTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
-						$event->setEndTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
+							$event = new Calendar_Event_Type_Day();
 
-						$event->setType($metaDetails['eventTypeID']);
-						$event->setNote($currentEvent->SUMMARY->value);
-						$event->setAccess('');
-						$event->setEventType($metaDetails['eventType']);
-						$event->setColour($metaDetails['eventColour']);
-						$event->setCampusList('');
-						$event->setDetail($currentEvent->DESCRIPTION->value);
-						$event->setLocation($currentEvent->LOCATION->value);
-						$event->setPublishDate('');
-						$event->setSid('');
+							$event->setAuthorName('');
+							$event->setAuthorId(-1);
+							$event->setEventId($currentEvent->UID->value);
 
-						$event->setIsEditable(false);
+							$event->setStartTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
+							$event->setEndTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
 
-						$event->setAttendance(0);
-						$event->setCompleted(0);
+							$event->setType($metaDetails['eventTypeID']);
+							$event->setNote($currentEvent->SUMMARY->value);
+							$event->setAccess('');
+							$event->setEventType($metaDetails['eventType']);
+							$event->setColour($metaDetails['eventColour']);
+							$event->setCampusList('');
+							$event->setDetail($currentEvent->DESCRIPTION->value);
+							$event->setLocation($currentEvent->LOCATION->value);
+							$event->setPublishDate('');
+							$event->setSid('');
 
-						$collection->add($event);
+							$event->setIsEditable(false);
+
+							$event->setAttendance(0);
+							$event->setCompleted(0);
+
+							$collection->add($event);
+						}
 					}
 				}
 			}
