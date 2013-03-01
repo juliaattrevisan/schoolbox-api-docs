@@ -1,0 +1,305 @@
+@import "../../m/inc/css/mixins.less";
+
+@skin: 							'demo';
+@banner-background: 			#013A63;
+@banner-color:      			#FFFFFF;
+@banner-links:      			@banner-color;
+@banner-height:     			72px;
+
+@navigation-background:  		transparent;
+@navigation-color:  			#000;
+@navigation-links:  			#0066B0;
+@navigation-hover-background: 	@navigation-links;
+@navigation-hover-color:  		#FFFFFF;
+@navigation-sub-background:  	@background-color;
+@navigation-width:				200px;
+@navigation-padding:			16px;
+
+@header-background:				#E5EFF7;
+@header-color:      			#000000;
+@header-links:					@header-color;
+
+@tab-background:				#0066B0;
+@tab-color:						#FFFFFF;
+@tab-hover-background:			@tab-color;
+@tab-hover-color:				@tab-background;
+
+@background-color:  			#EEEEEE;
+@link-color: 	    			#237CFF;
+@link-hover-color: 				lighten(@link-color,20%);
+
+
+html, body { min-height: 100%; }
+body {
+	background: @background-color;
+}
+
+#container {
+	margin-left: @navigation-width;
+	margin-right: 0px;
+}
+
+h1,h2,h3{ color: @header-color; }
+h3.my-links a{ color: @header-color; }
+h2,.calendar-controls{color:@header-color; background:@header-background;}
+.calendar-controls h3{color:@header-color;}
+a, h2 a{color:@link-color;}
+.box h2 a{color:@header-links;}
+a:hover{color:@link-color;}
+
+/*
+ * Header
+ */
+#header, .login #header{
+	background: @banner-background;
+	height: auto; min-height: @banner-height;
+	float: right; width: 100%; min-width: 0;
+}
+
+#header .logo{
+	padding: 0;
+	width: 173px;
+	height: 35px;
+	left: 3px;
+	top: 18px;
+	z-index: 3;
+	zoom: 1;
+	img {
+		display: block;
+		height: 35px;
+		width: 173px;
+		zoom: 1;
+	}
+}
+#container { clear: right; }
+
+@search-width: 256px;
+
+#search { background: transparent; width: @search-width;
+		  position: absolute; z-index: 3; right: 0; margin: 8px;
+	fieldset { width: 100%; }
+}
+#search-field {
+	color:#fff;
+	background: saturate(lighten(@banner-background,25%),-70%);
+	background: rgba(255,255,255,0.3);
+	padding: 8px 0 0 25px;
+	width: @search-width - 25px; height: 24px;
+	font-weight: normal;
+	font-size: 13px; line-height: 13px;
+}
+#search-button{
+	background: url('/images/demo/search-button.png') 6px 6px no-repeat !important;
+	position: absolute;
+	left: 0; right: auto;
+	height: 24px;
+	width: 24px;
+}
+#infoPanel { margin-top: 22px; position: relative; right: @search-width; z-index: 2; height: @banner-height - 22px - 24px;
+	li {	color:@banner-color;
+		a {	color: @banner-links; text-decoration: underline; }
+	}
+	img { 	margin-top: -14px; }
+}
+
+/*
+ * Tabs
+ */
+#tabs{		position: static; margin-left: @navigation-width; clear: right;
+	li { 	margin-right: 1px; margin-top: 1px;
+		a {
+			background: @tab-background;
+			color:@tab-color;
+			font-size: 13px;
+			height: 24px;
+			line-height: 24px;
+			font-weight:normal;
+			padding-left: 20px;
+			padding-right: 20px;
+		}
+		&.navthis a {
+			background: @tab-hover-background;
+			color: @tab-hover-color;
+			font-weight: normal;
+		}
+	}
+}
+
+/*
+ * Navigation
+ */
+#nav{ 		margin-top: 12px; margin-left: 0; width: @navigation-width; float: left; position: static;
+	h3, .nav-wrapper {
+			background: @navigation-background;
+	}
+	h3 {	color: @navigation-color;
+			padding-left: @navigation-padding;
+			font-size: 14px; height: 24px;
+	}
+	li a {
+			color: @navigation-links;
+			padding: 4px @navigation-padding;
+			margin: 0;
+			font-size: 13px;
+	}
+	ul ul {	background: @navigation-sub-background;
+			border: none;
+			width: @navigation-width; padding: 0;
+			left: @navigation-width; top: 0;
+		ul {
+			width: @navigation-width; padding: 0;
+			left: @navigation-width; top: 0;
+		}
+	}
+	ul, li, li a {
+			width: @navigation-width - @navigation-padding * 2;
+	}
+}
+
+#nav ul li.hover > a,
+#nav ul li a:hover,
+#nav li li a:hover,
+#category ul li a:hover,
+#tabs-sub .ui-tabs-nav li a:hover {
+	background-color: @navigation-hover-background;
+	color: @navigation-hover-color;
+}
+
+
+
+#tabs-homepage li.ui-state-default a {
+	background: none repeat scroll 0 0 #eee;
+	color: #000;
+}
+
+#tabs-homepage li.ui-tabs-selected a {
+	background: none repeat scroll 0 0 #F0F7FE;
+	color: #000;
+}
+#tabs-homepage #tabs-sub li.ui-tabs-selected a{
+	background:#eee
+}
+#tabs-sub .ui-tabs-nav li a {
+	background:#fcfbf2;
+}
+
+
+
+.dark,
+.dark td,
+#tree .dark,
+.standardForm,
+#assess .standardForm,
+#assess .additional-details,
+#assess .assess-body,
+.blog-comments .box,
+.post-left,
+#category,
+#tabs-homepage .customise-components,
+.mark-sheet.assessments .dark td {
+	background: none repeat scroll 0 0 #fafafa;
+}
+
+.search-item:nth-child(2n){
+	background: none repeat scroll 0 0 #fafafa;
+}
+#category li a { padding: 4px 16px; }
+#category li a.selected,
+#tabs-sub li.ui-tabs-selected a,
+.topic-list li a.selected{
+	background:#b19a53; color:#ffffff; font-weight: bold;
+}
+
+.topic-list li a:hover {
+	background: #b19a53;
+	color: #fff;
+}
+
+#category li a:hover{
+	background:#b19a53;
+	color:#ffffff;
+	-moz-border-radius: 0px;
+	-webkit-border-radius: 0px;
+	border-radius: 0px;
+}
+
+.submit-btn-plain {
+	background-color: #002b5c;
+	background-image: none !important;
+	border: 0;
+	color: #ffffff !important;
+	font-weight:normal;
+	text-shadow:none;
+	filter: none;
+}
+
+.submit-btn-plain:hover {
+	background-color: #135882;
+	border: 0;
+	color: #fff !important;
+	cursor: pointer;
+	text-shadow:none;
+	filter: none;
+}
+
+
+/*
+ADMIN!
+*/
+.admin-contents{background:#F0F7FE;}
+.admin-nav li a{background:#eee; color:#054B93; font-weight:normal;    -webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;}
+.admin-nav li a.current{background:#F0F7FE;color:#054B93; font-weight:bold;}
+
+.admin-contents .level{background:#eee; border-color:#ddd;}
+.admin-contents h4{border-color:#ddd;}
+
+
+#footer { margin: 0; }
+
+#footer ul {float:right;padding-right: 40px;}
+#footer ul li {color:#5a5a5a}
+#footer ul li a{color:#5a5a5a}
+
+.standardForm td {
+	border-bottom: 1px solid #eee;
+}
+
+/*
+ * Table border fixes
+ */
+.calendar table .dark,
+.otherMonth,
+.past,
+.timetable th,
+.top .listing .dark,
+.right .listing .dark,
+.left .listing .dark
+{
+	background: #fafafa;
+}
+
+.calendar table thead th,
+.day-block,
+.calendar table,
+.left #calendar table.duedates-calendar td,
+.left #calendar table.duedates-calendar,
+#calendar table th.dark,
+table tr,
+.listing li,
+.listing .subject-list li,
+.listing .subject-list a,
+.listing .subject-list a.teacher,
+ul.activity-list li,
+.timetable td, .timetable th,
+.forum .comments li, .blog .comments li
+{
+	border-color: #EEE;
+}
+.calendar table thead th,
+#calendar table th.dark,
+.timetable thead th
+{
+	border-bottom-color: #EEE;
+}
