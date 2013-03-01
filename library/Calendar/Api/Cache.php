@@ -2,105 +2,47 @@
 /**
  * Calendar_Api_Cache
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
-class Calendar_Api_Cache extends Alaress_Cache_Abstract {
-
-	/* Chooze the number of hours to cache the tweets.
-	 * This is converted into seconds via $cacheTime
-	 */
-	protected $cacheHours = 1;
-
-	/* 9 seconds for testing
-	 */
-//	protected $cacheHours = 0.0025;
-
-	/* Derived cache settings, don't need to change these
-	 */
-	protected $cacheFile = '';
-	protected $cacheTime = 0;
+class Calendar_Api_Cache extends Alaress_Cache_Abstract2 {
 
 	/**
 	 * The url of the stream you just got
 	 *
 	 * @var
 	 */
-	private $url = '';
+	protected $url = '';
 
 	/**
-	 * Constructor
+	 * A prefix for cached filenames
 	 *
-	 * @param $url
+	 * @var string
 	 */
-	public function __construct($url) {
-		$this->setUrl($url);
-
-		/* Interpret cache details
-		 */
-		$this->setCacheFile($this->generateCacheFilename($url));
-		$this->setCacheTime(60*60*$this->getCacheHours());
-
-		/* Set up a cached version of the url
-		 */
-		$this->setup($url);
-	}
+	protected $cacheFilePrefix = 'calendar';
 
 	/**
-	 * Generate the filename that would be associated with this url
+	 * The duration of a cached version before it becomes expired
+	 * This is a duration measured in seconds
 	 *
-	 * @return string
+	 * @var null
 	 */
-	protected function generateCacheFilename() {
-		$filename = Cfg::get('stream_dir') . '/' . 'calendar_' . md5($this->getUrl()) . '.txt';
-
-		return $filename;
-	}
+	protected $cachedTime = 3600;
 
 	/**
-	 * Load contents from the cache
+	 * The duration of a lock file before it becomes expired
+	 * This is a duration measured in seconds
 	 *
-	 * @return void
+	 * @var int
 	 */
-	public function load() {
-		$path = $this->getCacheFile();
-
-		if (file_exists($path)) {
-			return file_get_contents($path);
-		}
-
-		return false;
-	}
-
-	/* Getters/Setters
-	 */
+	protected $lockTime =7200;
 
 	/**
-	 * Get cache hours
+	 * Show plain debugging messages
 	 *
-	 * @return int
+	 * @var bool
 	 */
-	private function getCacheHours() {
-		return $this->cacheHours;
-	}
-
-	/**
-	 * Set url
-	 *
-	 * @param  $url
-	 */
-	private function setUrl($url) {
-		$this->url = $url;
-	}
-
-	/**
-	 * Get url
-	 *
-	 * @return string
-	 */
-	private function getUrl() {
-		return $this->url;
-	}
+	protected $verbose = true;
 }

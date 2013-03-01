@@ -21,7 +21,7 @@ abstract class Alaress_Cache_Abstract2 {
 	 *
 	 * @var string
 	 */
-	protected $cacheFilePrefix = 'calendar';
+	protected $cacheFilePrefix = '';
 
 	/**
 	 * The duration of a cached version before it becomes expired
