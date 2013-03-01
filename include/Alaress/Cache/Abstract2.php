@@ -117,7 +117,7 @@ abstract class Alaress_Cache_Abstract2 {
 		 */
 		if (file_exists($this->getCachedFile())) {
 			if ($this->isExpired($this->getCachedFile(), $this->getCachedTime())) {
-				if ($this->lockFileExists()) {
+				if (file_exists($this->getLockFile())) {
 					if ($this->isExpired($this->getLockFile(), $this->getCachedTime())) {
 
 						/* newCacheUpdate()
@@ -252,9 +252,21 @@ abstract class Alaress_Cache_Abstract2 {
 	 * @return bool
 	 */
 	private function isExpired($file, $duration) {
-		$this->log(get_class($this) . ' file expires in ' . ((60*60*1) - (time() - filectime($file))) . ' seconds. ');
+		$now = time();
 
-		if (filectime($file) < (time() - $duration)) {
+		/* Difference between now and when file was created
+		 */
+		$difference = $now - filectime($file);
+
+		/* How much time is remaining
+		 */
+		$remaining = $duration - $difference;
+
+		$this->log(get_class($this) . ' file expires in ' . $remaining . ' seconds.');
+		$this->log('[' . $difference . '] ' . $now . ' - ' . filectime($file));
+
+		if (filectime($file) < ($now - $duration)) {
+			$this->log($file . ' expired.');
 			return true;
 		}
 
