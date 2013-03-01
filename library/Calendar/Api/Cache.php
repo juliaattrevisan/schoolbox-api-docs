@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Calendar_Api_Cache extends Alaress_Cache_Abstract2 {
+class Calendar_Api_Cache extends Alaress_Cache_Locker_Abstract {
 
 	/**
 	 * The url of the stream you just got

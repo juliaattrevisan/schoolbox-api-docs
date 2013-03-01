@@ -1,13 +1,13 @@
 <?php
 /**
- * Alaress_Cache_Abstract2
+ * Alaress_Cache_Locker_Abstract
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-abstract class Alaress_Cache_Abstract2 {
+abstract class Alaress_Cache_Locker_Abstract {
 
 	/**
 	 * The url of the stream you just got
