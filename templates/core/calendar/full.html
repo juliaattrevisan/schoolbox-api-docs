@@ -201,12 +201,27 @@
                  * @param view
                  */
                 loading: function(isLoading, view) {
-                    // has finished loading
-                    if(isLoading === false) {
-                        // console.log('finished loading')
+
+					/* Show loading div right in the middle
+					 */
+					if (isLoading === true) {
+						$j('#calendar-loading').css({
+							top: ($j('#calendar').height() - $j('#calendar-loading').height())/2,
+							left: ($j('#calendar').width() - $j('#calendar-loading').width())/2
+						}).show();
+					}
+					/* Has finished loading
+					 */
+					else {
+
+						/* Hide loading div
+						 */
+						$j('#calendar-loading').hide();
+
                         // update any tasks that have been completed by strikethrough-ing them
                         $j(this).find('input[type=checkbox]').each(function() {
                             var self = $j(this)
+
                             if(self.prop('checked')) {
                                 self.siblings('.fc-event-title').addClass('strike')
                             }
@@ -217,9 +232,8 @@
 
                         // update datepicker
                         var d = c.dom.fullCalendar('getDate')
-                        $j('#datepicker').datepicker('setDate', d)
-//                        console.log(d)
 
+                        $j('#datepicker').datepicker('setDate', d)
                     }
                 },
 
@@ -336,6 +350,10 @@
     })
 </script>
 <!-- END custom_head -->
+
+<div id="calendar-loading" style='z-index:1; background-color:#fff;border:4px solid #f00;position:absolute;top:100px;left:100px;width:200px;height:200px'>
+	<strong>Loading</strong>
+</div>
 
 <div id="calendar-bubble" class="cal-bubble">
     <div class="middle">
