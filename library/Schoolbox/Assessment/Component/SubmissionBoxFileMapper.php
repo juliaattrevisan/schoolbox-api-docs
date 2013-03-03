@@ -23,13 +23,18 @@ class SubmissionBoxFileMapper extends Schoolbox\Mapper {
 		));
 		$this->hasMap(array(
 			'column'     => 'storage_id',
-			'property'   => 'storageId',
+			'property'   => 'fileId',
 			'type'       => self::TYPE_INTEGER,
 		));
 		$this->hasMap(array(
 			'column'     => 'box_id',
 			'property'   => 'submissionBoxId',
 			'type'       => self::TYPE_INTEGER,
+		));
+		$this->hasJoin('file', array(
+			'mapper'    => new \Schoolbox\Resource\FileMapper(),
+			'this_key'  => 'storage_id',
+			'other_key' => 'storage_id',
 		));
 	}
 }

@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\Component;
 use Schoolbox;
+use Schoolbox\Resource\File;
 
 class SubmissionBoxFile {
 
@@ -20,12 +21,17 @@ class SubmissionBoxFile {
 	/**
 	 * @var int
 	 */
-	protected $storage_id;
+	protected $file_id;
 
 	/**
 	 * @var int
 	 */
 	protected $submission_box_id;
+
+	/**
+	 * @var File
+	 */
+	protected $file;
 
 	/**
 	 * @param int $id
@@ -42,17 +48,17 @@ class SubmissionBoxFile {
 	}
 
 	/**
-	 * @param int $storage_id
+	 * @param int $file_id
 	 */
-	public function setStorageId($storage_id) {
-		$this->storage_id = $storage_id;
+	public function setFileId($file_id) {
+		$this->file_id = $file_id;
 	}
 
 	/**
 	 * @return int
 	 */
-	public function getStorageId() {
-		return $this->storage_id;
+	public function getFileId() {
+		return $this->file_id;
 	}
 
 	/**
@@ -69,4 +75,17 @@ class SubmissionBoxFile {
 		return $this->submission_box_id;
 	}
 
+	/**
+	 * @param File $file
+	 */
+	public function setFile(File $file) {
+		$this->file = $file;
+	}
+
+	/**
+	 * @return File
+	 */
+	public function getFile() {
+		return $this->file;
+	}
 }
