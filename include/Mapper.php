@@ -58,6 +58,13 @@ abstract class Mapper {
 	protected $map;
 
 	/**
+	 * A list of joins that this mapper has had defined.
+	 *
+	 * @var array
+	 */
+	protected $joins;
+
+	/**
 	 * @var array
 	 */
 	protected $identifier;
@@ -371,6 +378,64 @@ abstract class Mapper {
         $this->map[] = $map;
 
         return true;
+    }
+
+    /**
+     * Adds a join to this mapper.
+     *
+     * @param string $name The identifier for this join.
+     * @param array  $join A definition for this join, with these keys:
+     *                     mapper:    a Mapper instance for the related table
+     *                     this_key:  the key for this side of the relation
+     *                     other_key: the key for the other side of the relation
+     *
+     * @return bool
+     */
+    protected function hasJoin($name, $join) {
+        if (!is_array($join)) {
+            return false;
+        }
+        $this->joins[$name] = $join;
+        return true;
+    }
+
+    /**
+     * Retrieves SQL for building a join that has been defined in hasJoin().
+     *
+     * @param string $name        The join's identifier as passed in hasJoin().
+     * @param string $this_alias  The alias to use for this side of the join,
+     *                            defaults to this mapper's table name.
+     * @param string $other_alias The alias to use for the other side of the
+     *                            join, defaults to other mapper's table name.
+     *
+     * @return bool|string
+     */
+    public function getJoin($name, $this_alias = '', $other_alias = '') {
+        if (!array_key_exists($name, $this->joins)) {
+            return false;
+        }
+        $join = $this->joins[$name];
+
+        $this_table   = $this->getTable();
+        $other_mapper = $join['mapper'];
+        $other_table  = $other_mapper->getTable();
+
+        if (strlen($this_alias) === 0) {
+            $this_alias = $this_table;
+        }
+        if (strlen($other_alias) === 0) {
+            $other_alias = $other_table;
+        }
+        return strtr(
+            '`other_table` AS `other_alias` ON `this_alias`.`this_key` = `other_alias`.`other_key`',
+            array(
+                'this_alias'  => $this_alias,
+                'this_key'    => $join['this_key'],
+                'other_table' => $other_table,
+                'other_alias' => $other_alias,
+                'other_key'   => $join['other_key'],
+            )
+        );
     }
 
     /**
