@@ -46,28 +46,36 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'property'   => 'legacyFileId',
 			'type'       => self::TYPE_INTEGER,
 		));
+
+		$this->hasJoin('files', array(
+			'mapper'    => new SubmissionBoxFileMapper(),
+			'this_key'  => 'id',
+			'other_key' => 'box_id',
+		));
 	}
 
 	public function findById($id) {
-		$submission_box_files_mapper = new SubmissionBoxFileMapper();
+		$box_file_mapper = new SubmissionBoxFileMapper();
+		$file_mapper     = new Schoolbox\Resource\FileMapper();
 		$query = "
 			SELECT
 				{$this->getColumnString('sb')},
-				{$submission_box_files_mapper->getColumnString('sm')}
+				{$box_file_mapper->getColumnString('sm')},
+				{$file_mapper->getColumnString('f')}
 			FROM {$this->getTable()} sb
-			LEFT JOIN {$submission_box_files_mapper->getTable()} sm ON sb.id=sm.box_id
+			LEFT JOIN {$this->getJoin('files', 'sb', 'sm')}
+			LEFT JOIN {$box_file_mapper->getJoin('file', 'sm', 'f')}
 			WHERE sb.id=?
 		";
 		$statement = $this->database->prepare($query);
 		$statement->execute(array($id));
 		if ($row = $statement->fetch()) {
 			$submission_box = $this->hydrate($row, 'sb');
-			$submission_box->setStorage($submission_box_files_mapper->hydrate($row, 'sm'));
+			$box_file       = $box_file_mapper->hydrate($row, 'sm');
+			$box_file->setFile($file_mapper->hydrate($row, 'f'));
+			$submission_box->setStorage($box_file);
 			return $submission_box;
 		}
-	}
-
-	public function save($object) {
-		return parent::save($object);
+		return false;
 	}
 }
