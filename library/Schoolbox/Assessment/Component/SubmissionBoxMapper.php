@@ -82,6 +82,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'column'     => 'created',
 			'property'   => 'created',
 			'type'       => self::TYPE_STRING,
+			'created_timestamp' => true,
 		));
 		$this->hasMap(array(
 			'column'     => 'mark_type',
