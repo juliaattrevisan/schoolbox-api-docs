@@ -37,4 +37,24 @@ class SubmissionBoxFileMapper extends Schoolbox\Mapper {
 			'other_key' => 'storage_id',
 		));
 	}
+
+	public function save($object) {
+		//
+		// Create/save associated file item first if it isn't already saved.
+		$objects = $this->getAsCollection($object);
+		foreach ($objects as &$this_object) {
+			//
+			// pre-save callback on this object?
+			// subscribe('preSave:SubmissionBoxFileMapper', $this_object)
+			// in mapper->save(): publish('preSave:'.$this->name, true(default))
+			if ($file = $this_object->getFile()) {
+				if (!($file->getId())) {
+					$this->getJoinMapper('file')->save($file);
+					$this_object->setFileId($file->getId());
+				}
+			}
+		}
+		unset($this_object);
+		return parent::save($objects);
+	}
 }
