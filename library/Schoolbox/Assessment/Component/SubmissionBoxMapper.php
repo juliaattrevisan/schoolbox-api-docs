@@ -46,6 +46,64 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'property'   => 'legacyFileId',
 			'type'       => self::TYPE_INTEGER,
 		));
+		$this->hasMap(array(
+			'column'     => 'owner',
+			'property'   => 'owner',
+			'type'       => self::TYPE_INTEGER,
+		));
+		$this->hasMap(array(
+			'column'     => 'open_date',
+			'property'   => 'openDate',
+			//
+			// Will become DATE or DATETIME type.
+			'type'       => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column'     => 'date',
+			'property'   => 'dueDate',
+			'type'       => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column'     => 'late_date',
+			'property'   => 'lateDate',
+			'type'       => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column'     => 'accept_submission',
+			'property'   => 'acceptOnline',
+			'type'       => self::TYPE_BOOLEAN,
+		));
+		$this->hasMap(array(
+			'column'     => 'multi_submission',
+			'property'   => 'acceptMultiple',
+			'type'       => self::TYPE_BOOLEAN,
+		));
+		$this->hasMap(array(
+			'column'     => 'created',
+			'property'   => 'created',
+			'type'       => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column'     => 'mark_type',
+			'property'   => 'markType',
+			'type'       => self::TYPE_BOOLEAN,
+		));
+		$this->hasMap(array(
+			'column'     => 'max_mark',
+			'property'   => 'maxMark',
+			'type'       => self::TYPE_INTEGER,
+		));
+		$this->hasMap(array(
+			'column'     => 'rubric_result_set',
+			'property'   => 'rubricResultSet',
+			'type'       => self::TYPE_INTEGER,
+		));
+
+		//
+		// adds listeners:
+		// buildSelectQuery('\\Schoolbox\\Assessment\\Component\\SubmissionBox')
+		// undefinedMethod('hardDelete', function() {hard delete})
+		// $this->hasSoftDeleteField('deleted');
 
 		$this->hasJoin('files', array(
 			'mapper'    => new SubmissionBoxFileMapper(),

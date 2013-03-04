@@ -47,6 +47,58 @@ class SubmissionBox {
 	protected $file_link;
 
 	/**
+	 * @var int
+	 */
+	protected $owner;
+
+	/**
+	 * Eventually, will accept DateTime fields.
+	 *
+	 * @var string
+	 */
+	protected $open_date;
+
+	/**
+	 * @var string
+	 */
+	protected $due_date;
+
+	/**
+	 * @var string
+	 */
+	protected $late_date;
+
+	/**
+	 * @var bool
+	 */
+	protected $accept_online;
+
+	/**
+	 * @var bool
+	 */
+	protected $accept_multiple;
+
+	/**
+	 * @var string
+	 */
+	protected $created;
+
+	/**
+	 * @var int
+	 */
+	protected $max_mark;
+
+	/**
+	 * @var int
+	 */
+	protected $mark_type;
+
+	/**
+	 * @var int
+	 */
+	protected $rubric_result_set;
+
+	/**
 	 * @param int $category
 	 */
 	public function setCategory($category) {
@@ -143,4 +195,145 @@ class SubmissionBox {
 	public function getFileLink() {
 		return $this->file_link;
 	}
+
+	/**
+	 * @param boolean $accept_multiple
+	 */
+	public function setAcceptMultiple($accept_multiple) {
+		$this->accept_multiple = $accept_multiple;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getAcceptMultiple() {
+		return $this->accept_multiple;
+	}
+
+	/**
+	 * @param boolean $accept_online
+	 */
+	public function setAcceptOnline($accept_online) {
+		$this->accept_online = $accept_online;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getAcceptOnline() {
+		return $this->accept_online;
+	}
+
+	/**
+	 * @param string $created
+	 */
+	public function setCreated($created) {
+		$this->created = $created;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCreated() {
+		return $this->created;
+	}
+
+	/**
+	 * @param string $due_date
+	 */
+	public function setDueDate($due_date) {
+		$this->due_date = $due_date;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDueDate() {
+		return $this->due_date;
+	}
+
+	/**
+	 * @param string $late_date
+	 */
+	public function setLateDate($late_date) {
+		$this->late_date = $late_date;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getLateDate() {
+		return $this->late_date;
+	}
+
+	/**
+	 * @param int $mark_type
+	 */
+	public function setMarkType($mark_type) {
+		$this->mark_type = $mark_type;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getMarkType() {
+		return $this->mark_type;
+	}
+
+	/**
+	 * @param int $max_mark
+	 */
+	public function setMaxMark($max_mark) {
+		$this->max_mark = $max_mark;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getMaxMark() {
+		return $this->max_mark;
+	}
+
+	/**
+	 * @param string $open_date
+	 */
+	public function setOpenDate($open_date) {
+		$this->open_date = $open_date;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getOpenDate() {
+		return $this->open_date;
+	}
+
+	/**
+	 * @param int $owner
+	 */
+	public function setOwner($owner) {
+		$this->owner = $owner;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getOwner() {
+		return $this->owner;
+	}
+
+	/**
+	 * @param int $rubric_result_set
+	 */
+	public function setRubricResultSet($rubric_result_set) {
+		$this->rubric_result_set = $rubric_result_set;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getRubricResultSet() {
+		return $this->rubric_result_set;
+	}
+
 }
