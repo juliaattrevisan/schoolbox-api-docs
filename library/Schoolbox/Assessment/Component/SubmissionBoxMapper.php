@@ -55,8 +55,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	}
 
 	public function findById($id) {
-		$box_file_mapper = new SubmissionBoxFileMapper();
-		$file_mapper     = new Schoolbox\Resource\FileMapper();
+		$box_file_mapper = $this->getJoinMapper('files');
+		$file_mapper     = $box_file_mapper->getJoinMapper('file');
 		$query = "
 			SELECT
 				{$this->getColumnString('sb')},
