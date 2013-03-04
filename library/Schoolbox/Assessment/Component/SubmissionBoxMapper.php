@@ -63,8 +63,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 				{$box_file_mapper->getColumnString('sm')},
 				{$file_mapper->getColumnString('f')}
 			FROM {$this->getTable()} sb
-			LEFT JOIN {$this->getJoin('files', 'sb', 'sm')}
-			LEFT JOIN {$box_file_mapper->getJoin('file', 'sm', 'f')}
+			LEFT JOIN {$this->getJoinSql('files', 'sb', 'sm')}
+			LEFT JOIN {$box_file_mapper->getJoinSql('file', 'sm', 'f')}
 			WHERE sb.id=?
 		";
 		$statement = $this->database->prepare($query);

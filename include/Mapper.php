@@ -422,9 +422,9 @@ abstract class Mapper {
      * @param string $other_alias The alias to use for the other side of the
      *                            join, defaults to other mapper's table name.
      *
-     * @return bool|string
+     * @return string
      */
-    public function getJoin($name, $this_alias = '', $other_alias = '') {
+    public function getJoinSql($name, $this_alias = '', $other_alias = '') {
         if (!array_key_exists($name, $this->joins)) {
             return false;
         }
