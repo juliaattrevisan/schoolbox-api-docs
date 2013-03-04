@@ -13,6 +13,8 @@ then
 	wget -q http://hydra.alrs/boxes/schoolboxdemo-vagrant-latest.sql
 	echo "$vag Restarting MySQL";
 	service mysql restart;
+	echo "$vag Stopping Apache";
+	service apache2 stop;
 	echo "$vag Removing current Schoolbox MySQL database";
 	mysql -u root -ptnp879 -e "drop database if exists schoolbox";
 	echo "$vag Loading Schoolbox MySQL Demo data";
