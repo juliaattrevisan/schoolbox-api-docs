@@ -47,6 +47,11 @@ class SubmissionBox {
 	protected $file_link;
 
 	/**
+	 * @var SubmissionBoxNotificationCollection
+	 */
+	protected $notifications;
+
+	/**
 	 * @var int
 	 */
 	protected $owner;
@@ -97,6 +102,10 @@ class SubmissionBox {
 	 * @var int
 	 */
 	protected $rubric_result_set;
+
+	public function __construct() {
+		$this->setNotifications(new SubmissionBoxNotificationCollection(array()));
+	}
 
 	/**
 	 * @param int $category
@@ -336,4 +345,24 @@ class SubmissionBox {
 		return $this->rubric_result_set;
 	}
 
+	/**
+	 * @param SubmissionBoxNotificationCollection $notifications
+	 */
+	public function setNotifications($notifications) {
+		$this->notifications = $notifications;
+	}
+
+	/**
+	 * @return SubmissionBoxNotificationCollection
+	 */
+	public function getNotifications() {
+		return $this->notifications;
+	}
+
+	/**
+	 * @param SubmissionBoxNotification
+	 */
+	public function addNotification(SubmissionBoxNotification $notification) {
+		$this->notifications->add($notification);
+	}
 }

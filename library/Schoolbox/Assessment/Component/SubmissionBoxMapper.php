@@ -106,36 +106,68 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		// undefinedMethod('hardDelete', function() {hard delete})
 		// $this->hasSoftDeleteField('deleted');
 
+		//
+		// $this->hasOne?
 		$this->hasJoin('files', array(
 			'mapper'    => new SubmissionBoxFileMapper(),
 			'this_key'  => 'id',
 			'other_key' => 'box_id',
 		));
+
+		//
+		// $this->hasCollection?
+		$this->hasJoin('notify', array(
+			'multiple'  => true,
+			'mapper'    => new SubmissionBoxNotificationMapper(),
+			'this_key'  => 'id',
+			'other_key' => 'box_id',
+//			'extra'     => "`:other_alias`.`type` = 'overdue'",
+		));
+//		$this->hasJoin('notify_upcoming', array(
+//			'mapper'    => new SubmissionBoxNotificationMapper(),
+//			'this_key'  => 'id',
+//			'other_key' => 'box_id',
+//			'extra'     => "`:other_alias`.`type` = 'upcoming'",
+//		));
+//		$this->hasJoin('notify_returned', array(
+//			'mapper'    => new SubmissionBoxNotificationMapper(),
+//			'this_key'  => 'id',
+//			'other_key' => 'box_id',
+//			'extra'     => "`:other_alias`.`type` = 'returned'",
+//		));
 	}
 
 	public function findById($id) {
 		$box_file_mapper = $this->getJoinMapper('files');
 		$file_mapper     = $box_file_mapper->getJoinMapper('file');
+		$notify_mapper   = $this->getJoinMapper('notify');
 		$query = "
 			SELECT
 				{$this->getColumnString('sb')},
 				{$box_file_mapper->getColumnString('sm')},
-				{$file_mapper->getColumnString('f')}
+				{$file_mapper->getColumnString('f')},
+				{$notify_mapper->getColumnString('n')}
 			FROM {$this->getTable()} sb
 			LEFT JOIN {$this->getJoinSql('files', 'sb', 'sm')}
 			LEFT JOIN {$box_file_mapper->getJoinSql('file', 'sm', 'f')}
+			LEFT JOIN {$this->getJoinSql('notify', 'sb', 'n')}
 			WHERE sb.id=?
 		";
 		$statement = $this->database->prepare($query);
 		$statement->execute(array($id));
-		if ($row = $statement->fetch()) {
-			$submission_box = $this->hydrate($row, 'sb');
-			$box_file       = $box_file_mapper->hydrate($row, 'sm');
-			$box_file->setFile($file_mapper->hydrate($row, 'f'));
-			$submission_box->setFileLink($box_file);
-			return $submission_box;
+
+		$submission_box = false;
+		foreach ($statement as $row) {
+			if (!$submission_box) {
+				$submission_box = $this->hydrate($row, 'sb');
+				$box_file       = $box_file_mapper->hydrate($row, 'sm');
+				$box_file->setFile($file_mapper->hydrate($row, 'f'));
+				$submission_box->setFileLink($box_file);
+				$submission_box->setFileLink($box_file);
+			}
+			$submission_box->addNotification($notify_mapper->hydrate($row, 'n'));
 		}
-		return false;
+		return $submission_box;
 	}
 
 	public function save($object) {
