@@ -260,6 +260,7 @@ abstract class Mapper {
             VALUES ($plcString)
             ON DUPLICATE KEY UPDATE $updString;
         ");
+	    new Alaress_Probe($statement);
         $this->database->beginTransaction();
 
         $affectedIDs = array();
@@ -564,7 +565,14 @@ abstract class Mapper {
         $placeholderList = array();
 
         foreach ($this->map as $map) {
-            $placeholderList[] = ":{$map['column']}";
+            //
+            // Is this a create or update timestamp field?
+            // Update with now() instead of a placeholder.
+            $placeholder = ":{$map['column']}";
+            if ($map['created_timestamp'] || $map['updated_timestamp']) {
+                $placeholder = 'NOW()';
+            }
+            $placeholderList[] = $placeholder;
         }
 
         return implode(', ', $placeholderList);
@@ -579,11 +587,19 @@ abstract class Mapper {
 
         foreach ($this->map as $map) {
             //
-            // Don't update the identifier column.
+            // Don't update the identifier column, or the created timestamp.
             if (!empty($map['identifier'])) {
                 continue;
             }
-            $assignmentList[] = "`{$this->table}`.`{$map['column']}` = :{$map['column']}";
+            if ($map['created_timestamp']) {
+                continue;
+            }
+            $assignment  = "`{$this->table}`.`{$map['column']}`";
+            $placeholder = ":{$map['column']}";
+            if ($map['updated_timestamp']) {
+                $placeholder = 'NOW()';
+            }
+            $assignmentList[] = "$assignment = $placeholder";
         }
 
         return implode(', ', $assignmentList);
