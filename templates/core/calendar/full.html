@@ -349,10 +349,30 @@
 
     })
 </script>
+<style type='text/css'>
+	#calendar-loading {
+		border:4px solid #aaa;
+		width:280px;
+		height:80px;
+		background-color:#fff;
+		background-image: url('/images/loading-bar.gif');
+		background-repeat: no-repeat;
+		background-position: 50% 40px;
+		position:absolute;
+		top:100px;
+		left:100px;
+		z-index:1;
+	}
+
+	#calendar-loading p {
+		margin-top: 15px;
+		text-align: center;
+	}
+</style>
 <!-- END custom_head -->
 
-<div id="calendar-loading" style='z-index:1; background-color:#fff;border:4px solid #f00;position:absolute;top:100px;left:100px;width:200px;height:200px'>
-	<strong>Loading</strong>
+<div id="calendar-loading">
+	<p><strong>Loading events...</strong></p>
 </div>
 
 <div id="calendar-bubble" class="cal-bubble">
