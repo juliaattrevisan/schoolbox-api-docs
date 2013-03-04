@@ -16,6 +16,7 @@ $nav = new AdminV2_Nav();
 $nav->parse($this, 'calendar');
 
 $userHandler = new User();
+$calendarHandler = new Calendar();
 
 $this->checkList('campus_check_list', $userHandler->getCampusList(), '', TEMPLATE_content, array('id'=>'CAMPUSID','name'=>'CAMPUSNAME'));
 $this->checkList('user_group_check_list', $userHandler->getGroupList(), '', TEMPLATE_content, array('id'=>'USERGROUPID','name'=>'USERGROUPNAME'));
@@ -102,6 +103,10 @@ if (is_array($typeList)) {
 						'CONNECTOR_NAME' => $currentConnector,
 					));
 
+					/* Permissions for this connector
+					 */
+					$campusList = $calendarHandler->getCampusList();
+
 					/* Process each config for this kind of connector
 					 */
 					$allConfigs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigs($currentEventType, $currentConnector);
@@ -110,14 +115,54 @@ if (is_array($typeList)) {
 						foreach($allConfigs as $currentConfig) {
 							$this->setFile('configFragment', "adminv2/calendar/config/{$currentConnector}.html");
 							$this->setBlock('configFragment', 'luEventType', 'luEventType_block');
+							$this->setBlock('configFragment', 'level_drop', 'level_drop_block');
+							$this->setBlock('configFragment', 'campus_list', 'campus_list_block');
+							$this->setBlock('configFragment', 'group_list', 'group_list_block');
 
+							/* Render individual connector inputs
+							 */
 							$currentConfig->render($this);
 
+							/* Level
+							 */
+							$levelList = array();
+							$levelList[] = array('LEVEL_ID' => 1, 'LEVEL_NAME' => 'Personal');
+
+							if (count($groupList) > 0) {
+								$levelList[] = array('LEVEL_ID' => 2, 'LEVEL_NAME' => 'Group');
+							}
+
+							if (count($campusList) > 0) {
+								$levelList[] = array('LEVEL_ID' => 3, 'LEVEL_NAME' => 'Campus');
+							}
+
+							$this->dropDown('level_drop', $levelList, $event['access'], 'configFragment');
+
+							/* Campus permissions
+							 */
+							if (count($campusList) > 1) {
+								$this->checkList('campus_list', $campusList, array(), 'configFragment');
+							}
+							else {
+								$this->setVar('campus_list_block', $campusList[0]['CAMPUS_NAME']);
+							}
+
+							/* Group permissions
+							 */
+							$groupList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
+
+							$this->checkList('group_list', $calendarHandler->getGroupList(), array());
+
+							/* Parse connector row
+							 */
 							$this->parse('connectorConfig_block', 'configFragment', true);
 
 							/* Clear children after parsing out the parent
 							 */
 							$this->setVar('luEventType_block', '');
+							$this->setVar('level_drop_block', '');
+							$this->setVar('campus_list_block', '');
+							$this->setVar('group_list_block', '');
 						}
 
 						/* Whether this connector displays at Ticked or not

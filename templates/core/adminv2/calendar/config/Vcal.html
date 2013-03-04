@@ -3,16 +3,15 @@
 
 <fieldset class='calendarOptions'>
 	<label class='medium'>
+		<h4>URL</h4>
 		<p>
-			URL:<br />
 			<input type='text' id='update_{CONNECTOR_ID}' class='updateConfig' name="record[{CONNECTOR_ID}][url]" value='{URL}' />
 		</p>
 	</label>
 
 	<label>
+		<h4>Event Type</h4>
 		<p>
-			Event Type:<br />
-
 			<select name="record[{CONNECTOR_ID}][luEventType]">
 				<!-- BEGIN luEventType -->
 				<option value='{LUEVENTTYPE_VALUE}' {LUEVENTTYPE_SELECTED}>{LUEVENTTYPE_NAME}</option>
@@ -22,8 +21,30 @@
 	</label>
 
 	<label>
+		<h4>Level</h4>
 		<p>
-			Permissions go here<br />
+			<select name="record[{CONNECTOR_ID}][level]">
+				<!-- BEGIN level_drop -->
+				<option value="{LEVEL_ID}" {LEVEL_ID_SELECTED}>{LEVEL_NAME}</option>
+				<!-- END level_drop -->
+			</select>
+		</p>
+	</label>
+	<label>
+		<h4>Campus</h4>
+		<p>
+			<!-- BEGIN campus_list -->
+			<input type="checkbox" class="campusCheck" name="record[{CONNECTOR_ID}][campus][]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} /> {CAMPUS_NAME}<br />
+			<!-- END campus_list -->
+		</p>
+	</label>
+
+	<label>
+		<h4>Group</h4>
+		<p>
+			<!-- BEGIN group_list -->
+			<input type="checkbox" name="record[{CONNECTOR_ID}][groupCheck][]" value="{GROUP_ID}" {GROUP_ID_SELECTED} /> {GROUP_NAME}<br />
+			<!-- END group_list -->
 		</p>
 	</label>
 
