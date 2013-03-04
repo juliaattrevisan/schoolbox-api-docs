@@ -115,28 +115,12 @@ if (is_array($typeList)) {
 						foreach($allConfigs as $currentConfig) {
 							$this->setFile('configFragment', "adminv2/calendar/config/{$currentConnector}.html");
 							$this->setBlock('configFragment', 'luEventType', 'luEventType_block');
-							$this->setBlock('configFragment', 'level_drop', 'level_drop_block');
 							$this->setBlock('configFragment', 'campus_list', 'campus_list_block');
 							$this->setBlock('configFragment', 'group_list', 'group_list_block');
 
 							/* Render individual connector inputs
 							 */
 							$currentConfig->render($this);
-
-							/* Level
-							 */
-							$levelList = array();
-							$levelList[] = array('LEVEL_ID' => 1, 'LEVEL_NAME' => 'Personal');
-
-							if (count($groupList) > 0) {
-								$levelList[] = array('LEVEL_ID' => 2, 'LEVEL_NAME' => 'Group');
-							}
-
-							if (count($campusList) > 0) {
-								$levelList[] = array('LEVEL_ID' => 3, 'LEVEL_NAME' => 'Campus');
-							}
-
-							$this->dropDown('level_drop', $levelList, $event['access'], 'configFragment');
 
 							/* Campus permissions
 							 */
@@ -160,7 +144,6 @@ if (is_array($typeList)) {
 							/* Clear children after parsing out the parent
 							 */
 							$this->setVar('luEventType_block', '');
-							$this->setVar('level_drop_block', '');
 							$this->setVar('campus_list_block', '');
 							$this->setVar('group_list_block', '');
 						}
