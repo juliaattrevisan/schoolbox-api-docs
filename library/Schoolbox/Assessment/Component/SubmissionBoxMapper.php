@@ -78,4 +78,14 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		}
 		return false;
 	}
+
+	public function save($object) {
+		parent::save($object);
+		//
+		// Save sub-objects (file links)
+		if ($box_file = $object->getFile()) {
+			$box_file->setBoxId($this->getId());
+			$this->getJoinMapper('files')->save($box_file);
+		}
+	}
 }
