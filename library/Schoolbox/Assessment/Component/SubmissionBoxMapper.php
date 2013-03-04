@@ -176,8 +176,12 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		if ($result) {
 			foreach ($objects as $this_object) {
 				if ($box_file = $this_object->getFileLink()) {
-					$box_file->setBoxId($this->getId());
+					$box_file->setSubmissionBoxId($this_object->getId());
 					$this->getJoinMapper('files')->save($box_file);
+				}
+				foreach ($this_object->getNotifications() as $notification) {
+					$notification->setSubmissionBoxId($this_object->getId());
+					$this->getJoinMapper('notify')->save($notification);
 				}
 			}
 		}
