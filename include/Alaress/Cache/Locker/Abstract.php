@@ -67,15 +67,8 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 */
 	private $streamContents = '';
 
-	/* These next two are for logging purposes, using the Observer Design Pattern
+	/* These are for logging purposes, using the Observer Design Pattern
 	 */
-
-	/**
-	 * A logging class
-	 *
-	 * @var null
-	 */
-	private $log = null;
 
 	/**
 	 * A list of all observers
@@ -499,24 +492,6 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 */
 	private function getLockTime() {
 		return $this->lockTime;
-	}
-
-	/**
-	 * Set log
-	 *
-	 * @param null $log
-	 */
-	private function setLog($log) {
-		$this->log = $log;
-	}
-
-	/**
-	 * Get log
-	 *
-	 * @return null
-	 */
-	private function getLog() {
-		return $this->log;
 	}
 
 	/**
