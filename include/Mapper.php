@@ -260,7 +260,6 @@ abstract class Mapper {
             VALUES ($plcString)
             ON DUPLICATE KEY UPDATE $updString;
         ");
-	    new Alaress_Probe($statement);
         $this->database->beginTransaction();
 
         $affectedIDs = array();
