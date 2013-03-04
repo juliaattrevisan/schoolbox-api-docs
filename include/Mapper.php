@@ -402,7 +402,7 @@ abstract class Mapper {
     /**
      * Retrieves the mapper that this join uses.
      *
-     * @param $name The identifier for this join.
+     * @param string $name The identifier for this join.
      *
      * @return Mapper
      */
