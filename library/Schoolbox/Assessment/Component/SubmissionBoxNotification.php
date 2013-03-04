@@ -24,12 +24,12 @@ class SubmissionBoxNotification {
 	/**
 	 * @var bool
 	 */
-	protected $enabled;
+	protected $enabled = false;
 
 	/**
 	 * @var bool
 	 */
-	protected $sent;
+	protected $sent = false;
 
 	/**
 	 * @param boolean $enabled
