@@ -32,7 +32,7 @@ class Alaress_Cache_Locker_Log {
 	 */
 	public function report($text) {
 		if ($this->getVerbose()) {
-			echo $text . "<BR>";
+			echo $text . "<BR>\n";
 		}
 	}
 
