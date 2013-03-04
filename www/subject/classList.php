@@ -171,7 +171,11 @@ if ($groupHandler->isStaff()) {
                     )
                 );
 
-                $this->parse('parent_email_block', 'parent_email');
+		if (Cfg::get('email_all_parents') == 1) {
+			$this->parse('parent_email_block', 'parent_email');
+		} else {
+			$this->setVar('parent_email_block', '');
+		}
             }
         } else {
             $this->setVar('student_list_block', '');
