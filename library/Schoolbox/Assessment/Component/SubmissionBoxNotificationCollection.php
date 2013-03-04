@@ -18,9 +18,12 @@ class SubmissionBoxNotificationCollection extends Collection {
 				return $item;
 			}
 		}
-		//
-		// blank item with default values.
-		return new SubmissionBoxNotification();
+		return false;
+//		//
+//		// consider returning blank item with default values.
+//		$notification = new SubmissionBoxNotification();
+//		$notification->setType($type);
+//		return $notification;
 	}
 
 	protected function getOverdue() {
@@ -28,10 +31,10 @@ class SubmissionBoxNotificationCollection extends Collection {
 	}
 
 	protected function getUpcoming() {
-		return $this->getOfType('overdue');
+		return $this->getOfType('upcoming');
 	}
 
 	protected function getReturned() {
-		return $this->getOfType('overdue');
+		return $this->getOfType('returned');
 	}
 }
