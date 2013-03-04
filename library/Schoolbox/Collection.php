@@ -25,7 +25,7 @@ class Collection implements \Iterator {
     /**
      * Constructor
      *
-     * @param Calendar_Event_Collection $stack
+     * @param array $stack
      */
     public function __construct($stack) {
         $this->setStack($stack);
