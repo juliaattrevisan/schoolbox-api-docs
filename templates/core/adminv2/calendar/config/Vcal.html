@@ -1,23 +1,33 @@
 <input type="hidden" name="record[{CONNECTOR_ID}][eventType]" value='{EVENTTYPE_NAME}' />
 <input type="hidden" name="record[{CONNECTOR_ID}][connectorClass]" value='{CONNECTOR_CLASS}' />
 
-<fieldset>
-	<label>
-		URL: <input type='text' style='width:67%;' id='update_{CONNECTOR_ID}' class='updateConfig' name="record[{CONNECTOR_ID}][url]" value='{URL}' />
-
+<fieldset class='calendarOptions'>
+	<label class='medium'>
+		<p>
+			URL:<br />
+			<input type='text' id='update_{CONNECTOR_ID}' class='updateConfig' name="record[{CONNECTOR_ID}][url]" value='{URL}' />
+		</p>
 	</label>
 
 	<label>
-		Event Type:
+		<p>
+			Event Type:<br />
 
-		<select name="record[{CONNECTOR_ID}][luEventType]">
-			<!-- BEGIN luEventType -->
-			<option value='{LUEVENTTYPE_VALUE}' {LUEVENTTYPE_SELECTED}>{LUEVENTTYPE_NAME}</option>
-			<!-- END luEventType -->
-		</select>
+			<select name="record[{CONNECTOR_ID}][luEventType]">
+				<!-- BEGIN luEventType -->
+				<option value='{LUEVENTTYPE_VALUE}' {LUEVENTTYPE_SELECTED}>{LUEVENTTYPE_NAME}</option>
+				<!-- END luEventType -->
+			</select>
+		</p>
 	</label>
 
 	<label>
+		<p>
+			Permissions go here<br />
+		</p>
+	</label>
+
+	<label class='control'>
 		<a id="remove_{CONNECTOR_ID}" class='removeConfig' />-</a>
 	</label>
 </fieldset>
