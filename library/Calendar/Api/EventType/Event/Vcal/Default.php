@@ -65,68 +65,73 @@ class Calendar_Api_EventType_Event_Vcal_Default implements Calendar_Api_EventTyp
 		foreach($allConfigs as $currentConfig) {
 			$decodedConfig = $currentConfig->decodeConfig();
 
-			/* Load calendar from locker cache
+			/* Check permissions - if you can view these events according to the Permissions
+			 * settings then accumulate the events. Otherwise ignore them.
 			 */
-			$cache = new Calendar_Api_Cache();
-			$source = $cache->init($decodedConfig->getUrl())->getStreamContents();
+			if ($decodedConfig->hasPermissions($_SESSION['campus'], $_SESSION['gid'])) {
 
-			/* Parse it all
-			 */
-			try {
-				$allEvents = Sabre_VObject_Reader::read($source);
-			}
-			catch(Exception $e) {
-
-				/* Some google calendars don't follow sabre's expected format?
-				echo $decodedConfig->getUrl();
-				echo $e->getMessage();
+				/* Load calendar from locker cache
 				 */
-			}
+				$cache = new Calendar_Api_Cache();
+				$source = $cache->init($decodedConfig->getUrl())->getStreamContents();
 
-			if ($allEvents !== null) {
-				foreach($allEvents->children as $currentEvent) {
+				/* Parse it all
+				 */
+				try {
+					$allEvents = Sabre_VObject_Reader::read($source);
+				}
+				catch(Exception $e) {
 
-					/* gloop returns a whole bunch of stuff all mixed up
-					 *
-					 * We only want to deal with Sabre_VObject_Component_VEvent objects
-					 * as they seem to be the calendar items themselves
+					/* Some google calendars don't follow sabre's expected format?
+					echo $decodedConfig->getUrl();
+					echo $e->getMessage();
 					 */
-					if ($currentEvent instanceof Sabre_VObject_Component_VEvent) {
+				}
 
-						$eventStartTimestamp = strtotime($currentEvent->DTSTART->value);
-						$eventEndTimestamp = strtotime($currentEvent->DTEND->value);
+				if ($allEvents !== null) {
+					foreach($allEvents->children as $currentEvent) {
 
-						/* Only get events that fit within the range specified
+						/* gloop returns a whole bunch of stuff all mixed up
+						 *
+						 * We only want to deal with Sabre_VObject_Component_VEvent objects
+						 * as they seem to be the calendar items themselves
 						 */
-						if (($eventStartTimestamp >= $startTimestamp) && ($eventEndTimestamp <= $endTimestamp)) {
-							$metaDetails = $this->findLuEventType($decodedConfig->getLuEventType());
+						if ($currentEvent instanceof Sabre_VObject_Component_VEvent) {
+							$eventStartTimestamp = strtotime($currentEvent->DTSTART->value);
+							$eventEndTimestamp = strtotime($currentEvent->DTEND->value);
 
-							$event = new Calendar_Event_Type_Day();
+							/* Only get events that fit within the range specified
+							 */
+							if (($eventStartTimestamp >= $startTimestamp) && ($eventEndTimestamp <= $endTimestamp)) {
+								$metaDetails = $this->findLuEventType($decodedConfig->getLuEventType());
 
-							$event->setAuthorName('');
-							$event->setAuthorId(-1);
-							$event->setEventId($currentEvent->UID->value);
+								$event = new Calendar_Event_Type_Day();
 
-							$event->setStartTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
-							$event->setEndTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
+								$event->setAuthorName('');
+								$event->setAuthorId(-1);
+								$event->setEventId($currentEvent->UID->value);
 
-							$event->setType($metaDetails['eventTypeID']);
-							$event->setNote($currentEvent->SUMMARY->value);
-							$event->setAccess('');
-							$event->setEventType($metaDetails['eventType']);
-							$event->setColour($metaDetails['eventColour']);
-							$event->setCampusList('');
-							$event->setDetail($currentEvent->DESCRIPTION->value);
-							$event->setLocation($currentEvent->LOCATION->value);
-							$event->setPublishDate('');
-							$event->setSid('');
+								$event->setStartTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
+								$event->setEndTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
 
-							$event->setIsEditable(false);
+								$event->setType($metaDetails['eventTypeID']);
+								$event->setNote($currentEvent->SUMMARY->value);
+								$event->setAccess('');
+								$event->setEventType($metaDetails['eventType']);
+								$event->setColour($metaDetails['eventColour']);
+								$event->setCampusList('');
+								$event->setDetail($currentEvent->DESCRIPTION->value);
+								$event->setLocation($currentEvent->LOCATION->value);
+								$event->setPublishDate('');
+								$event->setSid('');
 
-							$event->setAttendance(0);
-							$event->setCompleted(0);
+								$event->setIsEditable(false);
 
-							$collection->add($event);
+								$event->setAttendance(0);
+								$event->setCompleted(0);
+
+								$collection->add($event);
+							}
 						}
 					}
 				}

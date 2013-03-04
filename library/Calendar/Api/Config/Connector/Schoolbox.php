@@ -23,4 +23,15 @@ class Calendar_Api_Config_Connector_Schoolbox extends Calendar_Api_Config_Connec
 
 		$page->setVar('has_multiple_options_block', '');
 	}
+
+	/**
+	 * Check if current user has permissions to see this event
+	 *
+	 * @param $userCampus
+	 * @param $userGroup
+	 * @return bool
+	 */
+	public function hasPermissions($userCampus, $userGroup) {
+		return true;
+	}
 }

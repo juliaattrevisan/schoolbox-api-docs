@@ -69,6 +69,21 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
 		$page->checkList('group_list', $calendarHandler->getGroupList(), $this->getGroups());
 	}
 
+	/**
+	 * Check if current user has permissions to see this event
+	 *
+	 * @param $userCampus
+	 * @param $userGroup
+	 * @return bool
+	 */
+	public function hasPermissions($userCampus, $userGroup) {
+		if ((count(array_intersect($userCampus, $this->getCampus()))) && in_array($userGroup, $this->getGroups())) {
+			return true;
+		}
+
+		return false;
+	}
+
 	/* Getters/Setters
 	 */
 

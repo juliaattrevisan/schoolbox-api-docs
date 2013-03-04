@@ -21,10 +21,17 @@ if (is_array($_POST['record']) && count($_POST['record'])) {
 			 */
 			$config->setUrl($attribs['url']);
 
-			/* Add permissions
+			/* Add permissions for campus (or use the default empty array if not chosen)
 			 */
-			$config->setCampus($attribs['campus']);
-			$config->setGroups($attribs['groupCheck']);
+			if (is_array($attribs['campus'])) {
+				$config->setCampus($attribs['campus']);
+			}
+
+			/* Add permission for groups (or use the default empty array if not chosen)
+			 */
+			if (is_array($attribs['groupCheck'])) {
+				$config->setGroups($attribs['groupCheck']);
+			}
 		}
 
 		/* Update and save config

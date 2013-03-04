@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-abstract class Calendar_Api_Config_Connector_Abstract {
+abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Config_Connector_Interface {
 
 	/**
 	 * Primary key
@@ -44,12 +44,12 @@ abstract class Calendar_Api_Config_Connector_Abstract {
 	protected $luEventType = '1';
 
 	/**
-	 * Method for uniquely rendering on admin screen
+	 * Whether or not the current user can view these events
+	 * Setting this to False prevents event accumulation
 	 *
-	 * @param $page
-	 * @return mixed
+	 * @var bool
 	 */
-	abstract public function render($page);
+	protected $hasPermissions = false;
 
 	/**
 	 * Render event type lookup selector with the currently chosen
@@ -85,6 +85,17 @@ abstract class Calendar_Api_Config_Connector_Abstract {
 			$page->setVar('luEventType_block', '');
 		}
 	}
+
+
+	/**
+	 * Find out if the current user's settings of $userCampus and $userGroup
+	 * are in the selections for this config
+	 *
+	 * @param $userCampus
+	 * @param $userGroup
+	 * @return bool
+	 */
+
 
 	/* Getters/Setters
 	 */
