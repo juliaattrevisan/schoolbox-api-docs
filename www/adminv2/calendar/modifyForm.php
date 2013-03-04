@@ -26,11 +26,17 @@ if (is_array($_POST['record']) && count($_POST['record'])) {
 			if (is_array($attribs['campus'])) {
 				$config->setCampus($attribs['campus']);
 			}
+			else {
+				$config->setCampus(array());
+			}
 
 			/* Add permission for groups (or use the default empty array if not chosen)
 			 */
 			if (is_array($attribs['groupCheck'])) {
 				$config->setGroups($attribs['groupCheck']);
+			}
+			else {
+				$config->setGroups(array());
 			}
 		}
 
