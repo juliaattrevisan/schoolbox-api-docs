@@ -400,6 +400,20 @@ abstract class Mapper {
     }
 
     /**
+     * Retrieves the mapper that this join uses.
+     *
+     * @param $name The identifier for this join.
+     *
+     * @return Mapper
+     */
+    public function getJoinMapper($name) {
+        if (!array_key_exists($name, $this->joins)) {
+            return false;
+        }
+        return $this->joins[$name]['mapper'];
+    }
+
+    /**
      * Retrieves SQL for building a join that has been defined in hasJoin().
      *
      * @param string $name        The join's identifier as passed in hasJoin().
