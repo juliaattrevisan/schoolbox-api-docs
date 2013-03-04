@@ -222,18 +222,33 @@ abstract class Mapper {
         return $this->hydrateList($rowset);
     }
 
+
+    /**
+     * Gets a single object as a collection, if it isn't one already.
+     *
+     * @param mixed $object
+     *
+     * @return Collection
+     */
+    public function getAsCollection($object) {
+        if (is_subclass_of($object, 'Model')) {
+            $collection = new Collection;
+            $collection[] = $object;
+        }
+        else {
+            $collection = $object;
+        }
+        return $collection;
+    }
+
+
     /**
      * @brief Saves an object to the database. Updates or inserts
      * @param $object
      * @return array<int>
      */
     public function save($object) {
-        if (is_subclass_of($object, 'Model')) {
-            $collection = new Collection;
-            $collection[] = $object;
-        } else {
-            $collection = $object;
-        }
+        $collection = $this->getAsCollection($object);
 
         $tbl = $this->table;
         $colString = $this->getColumnString();
@@ -276,12 +291,7 @@ abstract class Mapper {
     public function delete($object) {
         $identifierName = $this->identifier['column'];
 
-        if (is_subclass_of($object, 'Model')) {
-            $collection = new Collection;
-            $collection[] = $object;
-        } else {
-            $collection = $object;
-        }
+        $collection = $this->getAsCollection($object);
 
         $statement = $this->database->prepare(
             "
