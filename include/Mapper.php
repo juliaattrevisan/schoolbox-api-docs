@@ -268,14 +268,14 @@ abstract class Mapper {
             foreach ($this->map as $map) {
                 $propertyName = $map['property'];
                 $columnName = $map['column'];
-                $statement->bindParam(":$columnName", $model->$propertyName);
+                $statement->bindParam(":$columnName", $this->getModelProperty($model, $propertyName));
             }
             if ($statement->execute()) {
                 $identifier = $this->identifier['property'];
-                if (!$model->$identifier) {
-                    $model->$identifier = $this->database->lastInsertId();
+                if (!$this->getModelProperty($model, $identifier)) {
+                    $this->setModelProperty($model, $identifier, $this->database->lastInsertId());
                 }
-                $affectedIDs[] = $model->$identifier;
+                $affectedIDs[] = $this->getModelProperty($model, $identifier);
             }
             else {
                 $this->database->rollBack();
@@ -301,7 +301,7 @@ abstract class Mapper {
         );
 
         foreach ($collection as $model) {
-            $statement->bindParam(':identifierValue', $model->id);
+            $statement->bindParam(':identifierValue', $this->getModelProperty($model, $identifierName));
 
             if (!$statement->execute()) {
                 return false;
@@ -495,7 +495,7 @@ abstract class Mapper {
                 $columnName = "$alias.$columnName";
             }
 
-            $model->$propertyName = $row[$columnName];
+            $this->setModelProperty($model, $propertyName, $row[$columnName]);
         }
 
         if (!empty($callback)) {
@@ -503,6 +503,31 @@ abstract class Mapper {
         }
 
         return $model;
+    }
+
+    /**
+     * Overridable method for getting a model's property.
+     *
+     * @param object $model
+     * @param string $property
+     *
+     * @return mixed
+     */
+    protected function getModelProperty($model, $property) {
+        return $model->$property;
+    }
+
+    /**
+     * Overridable method for setting a model's property.
+     *
+     * @param object $model
+     * @param string $property
+     * @param mixed  $value
+     *
+     * @return void
+     */
+    protected function setModelProperty($model, $property, $value) {
+        $model->$property = $value;
     }
 
     /**
