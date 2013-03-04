@@ -16,6 +16,22 @@ class Mapper extends \Mapper {
     }
 
     /**
+     * Updated because hydrated objects won't usually belong to the Model class.
+     * Collections will always be \Schoolbox\Collection instances for these
+     * classes, though.
+     *
+     * @param mixed $object
+     *
+     * @return Collection
+     */
+    public function getAsCollection($object) {
+        if ($object instanceof Collection) {
+            return $object;
+        }
+        return new Collection(array($object));
+    }
+
+    /**
      * @param Array $row
      * @param String $alias
      * @param Function $callback
