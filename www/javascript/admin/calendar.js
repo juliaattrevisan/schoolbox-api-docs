@@ -34,17 +34,29 @@ var calendar = {
 		var self = this;
 
 		$j('a.addConfig').click(function() {
-			var id = $j(this).attr('id').toString().replace(/add_/, '');
 
-			/* Ajax add this config option
+			/* Only add if all inputs are filled
+			 * Jump to latest input field when trying to add while you have an empty input
+			 *
+			 * This prevents you from adding a url, not hitting Update, then adding a new record
+			 * which refreshes the screen - causing you to lose the url
 			 */
-			var data = {
-				id: id
-			};
+			if (!$j(this).parent().find('input[value=""]').length) {
+				var id = $j(this).attr('id').toString().replace(/add_/, '');
 
-			$j.post('/adminv2/calendar/addOption', data, function(responseText) {
-				self.refresh();
-			});
+				/* Ajax add this config option
+				 */
+				var data = {
+					id: id
+				};
+
+				$j.post('/adminv2/calendar/addOption', data, function(responseText) {
+					self.refresh();
+				});
+			}
+			else {
+				$j(this).parent().find('input[value=""]').focus();
+			}
 		});
 	},
 
