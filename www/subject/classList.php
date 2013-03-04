@@ -94,13 +94,13 @@ if ($groupHandler->isStaff()) {
                 $student['StudentMedicalAlert'] = trim($student['StudentMedicalAlert']);
                 $student['StudentSpecialNeedsFlag'] = trim($student['StudentSpecialNeedsFlag']);
 
-                if (!empty($student['StudentMedicalAlert'])) {
+                if (!empty($student['StudentMedicalAlert']) && Cfg::get('protect_medicalspecial') == 0) {
                     $this->parse('medical_block', 'medical');
                 } else {
                     $this->setVar('medical_block', '');
                 }
 
-                if (!empty($student['StudentSpecialNeedsFlag'])) {
+                if (!empty($student['StudentSpecialNeedsFlag']) && Cfg::get('protect_medicalspecial') == 0) {
                     $this->parse('special_block', 'special');
                 } else {
                     $this->setVar('special_block', '');
