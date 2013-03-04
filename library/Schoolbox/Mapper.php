@@ -59,4 +59,20 @@ class Mapper extends \Mapper {
 
         return $model;
     }
+
+	public function delete($object) {
+		$id_column  = $this->identifier['column'];
+		$collection = $this->getAsCollection($object);
+		$statement  = $this->database->prepare(
+			"DELETE FROM `{$this->table}` WHERE `{$id_column}` = :id_value"
+		);
+		foreach ($collection as $model) {
+			$property_method = 'get'.ucfirst($this->identifier['property']);
+			$statement->bindParam(':id_value', $model->$property_method());
+			if (!$statement->execute()) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
