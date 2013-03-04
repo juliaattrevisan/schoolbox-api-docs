@@ -32,6 +32,9 @@
             radios.focus(updateRadio);
             radios.blur(updateRadio);
             radios.change(updateRadio);
+			$j('#rubric-tbody td').click(function(){
+				$j(this).find(':radio').trigger('focus');
+			});
             updateRadio();
         });
 
@@ -39,13 +42,13 @@
             var i = 0;
             var sum = 0;
 
-            radios.removeClass('focused').next().removeClass('focused');
+            radios.removeClass('focused').parent('td').removeClass('focused');
 
             $j('#rubric-tbody :checked').each(function() {
                 var self = $j(this);
                 rubricData.spidata.points[0].data[self.data('index')] = [self.data('index'), parseInt(self.val())];
                 ++i;
-                self.addClass('focused').next().addClass('focused');
+                self.addClass('focused').parent('td').addClass('focused');
                 self.closest('tr').children('.warning').first().children('div').css('visibility', 'hidden');
                 sum += parseInt(self.val());
             });
@@ -130,8 +133,8 @@
                         <td class="criterion-label pad">{RUBRIC_CRIT_LABEL}</td>
                         <!-- BEGIN rubric_crit_rating -->
                         <td class="criterion-value {RUBRIC_CRIT_RATING_CLASS}">
-                            <input id="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_RATING_VALUE}" class="rubric-input" type="radio" name="rubric[{RUBRIC_CRIT_ID}]" data-index="{RUBRIC_CRIT_INDEX}" value="{RUBRIC_CRIT_RATING_VALUE}" {RUBRIC_CRIT_RATING_SELECTED} />
-                            <label for="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_RATING_VALUE}"><span>{RUBRIC_CRIT_RATING_LABEL}</span></label>
+                            <input id="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_ID}-{RUBRIC_CRIT_RATING_VALUE}" class="rubric-input" type="radio" name="rubric[{RUBRIC_CRIT_ID}]" data-index="{RUBRIC_CRIT_INDEX}" value="{RUBRIC_CRIT_RATING_VALUE}" {RUBRIC_CRIT_RATING_SELECTED} />
+                            <label for="rubric{RUBRIC_CRIT_NAME}{RUBRIC_CRIT_ID}-{RUBRIC_CRIT_RATING_VALUE}"><span>{RUBRIC_CRIT_RATING_LABEL}</span></label>
                         </td>
                         <!-- END rubric_crit_rating -->
                         <td class="warning">

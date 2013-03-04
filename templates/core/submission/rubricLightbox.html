@@ -57,10 +57,10 @@
 
         $j(document).ready(function() {
             var radios = $j('#rubric-tbody :radio');
-            radios.removeClass('focused').next().removeClass('focused');
+            radios.removeClass('focused').parent('td').removeClass('focused');
             $j('#rubric-tbody :checked').each(function() {
                 var self = $j(this);
-                self.addClass('focused').next().addClass('focused');
+                self.addClass('focused').parent('td').addClass('focused');
                 self.closest('tr').children('.warning').first().children('div').css('visibility', 'hidden');
             })
         })
