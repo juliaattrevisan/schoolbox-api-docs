@@ -230,7 +230,7 @@ abstract class Mapper {
      *
      * @return Collection
      */
-    public function getAsCollection($object) {
+    public function getModelAsCollection($object) {
         if (is_subclass_of($object, 'Model')) {
             $collection = new Collection;
             $collection[] = $object;
@@ -248,7 +248,7 @@ abstract class Mapper {
      * @return array<int>
      */
     public function save($object) {
-        $collection = $this->getAsCollection($object);
+        $collection = $this->getModelAsCollection($object);
 
         $tbl = $this->table;
         $colString = $this->getColumnString();
@@ -291,7 +291,7 @@ abstract class Mapper {
     public function delete($object) {
         $identifierName = $this->identifier['column'];
 
-        $collection = $this->getAsCollection($object);
+        $collection = $this->getModelAsCollection($object);
 
         $statement = $this->database->prepare(
             "

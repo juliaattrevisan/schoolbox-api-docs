@@ -24,7 +24,7 @@ class Mapper extends \Mapper {
      *
      * @return Collection
      */
-    public function getAsCollection($object) {
+    public function getModelAsCollection($object) {
         if ($object instanceof Collection) {
             return $object;
         }

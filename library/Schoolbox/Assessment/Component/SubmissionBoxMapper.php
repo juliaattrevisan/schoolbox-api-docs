@@ -80,7 +80,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	}
 
 	public function save($object) {
-		$objects = $this->getAsCollection($object);
+		$objects = $this->getModelAsCollection($object);
 		$result  = parent::save($objects);
 		if ($result) {
 			foreach ($objects as $this_object) {

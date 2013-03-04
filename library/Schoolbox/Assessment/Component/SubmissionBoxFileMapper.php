@@ -41,7 +41,7 @@ class SubmissionBoxFileMapper extends Schoolbox\Mapper {
 	public function save($object) {
 		//
 		// Create/save associated file item first if it isn't already saved.
-		$objects = $this->getAsCollection($object);
+		$objects = $this->getModelAsCollection($object);
 		foreach ($objects as &$this_object) {
 			//
 			// pre-save callback on this object?
