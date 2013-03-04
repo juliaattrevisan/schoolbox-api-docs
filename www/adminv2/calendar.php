@@ -16,7 +16,6 @@ $nav = new AdminV2_Nav();
 $nav->parse($this, 'calendar');
 
 $userHandler = new User();
-$calendarHandler = new Calendar();
 
 $this->checkList('campus_check_list', $userHandler->getCampusList(), '', TEMPLATE_content, array('id'=>'CAMPUSID','name'=>'CAMPUSNAME'));
 $this->checkList('user_group_check_list', $userHandler->getGroupList(), '', TEMPLATE_content, array('id'=>'USERGROUPID','name'=>'USERGROUPNAME'));
@@ -103,10 +102,6 @@ if (is_array($typeList)) {
 						'CONNECTOR_NAME' => $currentConnector,
 					));
 
-					/* Permissions for this connector
-					 */
-					$campusList = $calendarHandler->getCampusList();
-
 					/* Process each config for this kind of connector
 					 */
 					$allConfigs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigs($currentEventType, $currentConnector);
@@ -121,21 +116,6 @@ if (is_array($typeList)) {
 							/* Render individual connector inputs
 							 */
 							$currentConfig->render($this);
-
-							/* Campus permissions
-							 */
-							if (count($campusList) > 1) {
-								$this->checkList('campus_list', $campusList, array(), 'configFragment');
-							}
-							else {
-								$this->setVar('campus_list_block', $campusList[0]['CAMPUS_NAME']);
-							}
-
-							/* Group permissions
-							 */
-							$groupList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
-
-							$this->checkList('group_list', $calendarHandler->getGroupList(), array());
 
 							/* Parse connector row
 							 */
