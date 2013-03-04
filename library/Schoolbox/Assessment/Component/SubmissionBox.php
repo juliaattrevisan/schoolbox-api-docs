@@ -44,7 +44,7 @@ class SubmissionBox {
 	/**
 	 * @var SubmissionBoxFile
 	 */
-	protected $storage;
+	protected $file_link;
 
 	/**
 	 * @param int $category
@@ -131,16 +131,16 @@ class SubmissionBox {
 	}
 
 	/**
-	 * @param SubmissionBoxFile $storage
+	 * @param SubmissionBoxFile $link
 	 */
-	public function setStorage(SubmissionBoxFile $storage) {
-		$this->storage = $storage;
+	public function setFileLink(SubmissionBoxFile $link) {
+		$this->file_link = $link;
 	}
 
 	/**
 	 * @return SubmissionBoxFile
 	 */
-	public function getStorage() {
-		return $this->storage;
+	public function getFileLink() {
+		return $this->file_link;
 	}
 }

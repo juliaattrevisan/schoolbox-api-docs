@@ -73,7 +73,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			$submission_box = $this->hydrate($row, 'sb');
 			$box_file       = $box_file_mapper->hydrate($row, 'sm');
 			$box_file->setFile($file_mapper->hydrate($row, 'f'));
-			$submission_box->setStorage($box_file);
+			$submission_box->setFileLink($box_file);
 			return $submission_box;
 		}
 		return false;
