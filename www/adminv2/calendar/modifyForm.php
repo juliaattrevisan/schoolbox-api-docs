@@ -20,6 +20,11 @@ if (is_array($_POST['record']) && count($_POST['record'])) {
 			/* Add urls
 			 */
 			$config->setUrl($attribs['url']);
+
+			/* Add permissions
+			 */
+			$config->setCampus($attribs['campus']);
+			$config->setGroups($attribs['groupCheck']);
 		}
 
 		/* Update and save config

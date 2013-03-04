@@ -17,11 +17,18 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
 	private $url = '';
 
 	/**
-	 * All the perms associated with the vcal stream
+	 * Campus visibility for this stream
 	 *
 	 * @var array
 	 */
-	private $perms = array();
+	private $campus = array();
+
+	/**
+	 * Group visibility for this stream
+	 *
+	 * @var array
+	 */
+	private $groups = array();
 
 	/**
 	 * Render configs into admin screen
@@ -65,20 +72,38 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
 	}
 
 	/**
-	 * Set perms
+	 * Set campus
 	 *
-	 * @param array $perms
+	 * @param array $campus
 	 */
-	public function setPerms($perms) {
-		$this->perms = $perms;
+	public function setCampus($campus) {
+		$this->campus = $campus;
 	}
 
 	/**
-	 * Get perms
+	 * Get campus
 	 *
 	 * @return array
 	 */
-	public function getPerms() {
-		return $this->perms;
+	public function getCampus() {
+		return $this->campus;
+	}
+
+	/**
+	 * Set groups
+	 *
+	 * @param array $groups
+	 */
+	public function setGroups($groups) {
+		$this->groups = $groups;
+	}
+
+	/**
+	 * Get groups
+	 *
+	 * @return array
+	 */
+	public function getGroups() {
+		return $this->groups;
 	}
 }
