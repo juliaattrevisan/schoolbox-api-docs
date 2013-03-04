@@ -399,6 +399,7 @@ abstract class Mapper {
      *                     mapper:    a Mapper instance for the related table
      *                     this_key:  the key for this side of the relation
      *                     other_key: the key for the other side of the relation
+     *                     extra:     any extra conditions on the join
      *
      * @return bool
      */
@@ -451,14 +452,18 @@ abstract class Mapper {
         if (strlen($other_alias) === 0) {
             $other_alias = $other_table;
         }
+        $join_sql = '`:other_table` AS `:other_alias` ON `:this_alias`.`:this_key` = `:other_alias`.`:other_key`';
+        if (strlen($join['extra']) > 0) {
+            $join_sql .= ' AND ' . $join['extra'];
+        }
         return strtr(
-            '`other_table` AS `other_alias` ON `this_alias`.`this_key` = `other_alias`.`other_key`',
+            $join_sql,
             array(
-                'this_alias'  => $this_alias,
-                'this_key'    => $join['this_key'],
-                'other_table' => $other_table,
-                'other_alias' => $other_alias,
-                'other_key'   => $join['other_key'],
+                ':this_alias'  => $this_alias,
+                ':this_key'    => $join['this_key'],
+                ':other_table' => $other_table,
+                ':other_alias' => $other_alias,
+                ':other_key'   => $join['other_key'],
             )
         );
     }
