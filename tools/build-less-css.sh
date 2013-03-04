@@ -50,6 +50,18 @@ echo "Building core.css";
 ~/node_modules/.bin/lessc $instdir/www/css/core/core.less > $instdir/www/css/core/core.css;
 echo "/* less (`~/node_modules/.bin/lessc -v | cut -d' ' -f2`) build at `date +%Y-%m-%d\ %H:%M:%S` */" >> $instdir/www/css/core/core.css;
 
+# Build screen.css for each template
+for i in `ls -1 $instdir/www/css/*/screen.less`;
+do
+        filepath=`readlink -f $i`;
+        fullpath=${filepath%/*};
+        template=${fullpath##*/};
+        newfile="$fullpath/screen.css";
+        echo "Building $template screen css";
+        ~/node_modules/.bin/lessc $filepath > $newfile;
+        echo "/* less (`~/node_modules/.bin/lessc -v | cut -d' ' -f2`) build at `date +%Y-%m-%d\ %H:%M:%S` */" >> $newfile;
+done
+
 # Build mchrome.css for each template
 for i in `ls -1 $instdir/www/css/*/mchrome.less`;
 do
