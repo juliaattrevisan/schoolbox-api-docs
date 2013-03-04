@@ -140,32 +140,28 @@ abstract class Alaress_Cache_Locker_Abstract {
 				if (file_exists($this->getLockFile())) {
 					if ($this->isExpired($this->getLockFile(), $this->getCachedTime())) {
 
-						/* newCacheUpdate()
+						/* Update cached version
 						 */
 						$this->notifyObservers("Cache expired, lockfile expired perhaps due to timeout or halted. Regenerate everything.");
 						$this->newCacheUpdate();
-
 					}
 					else {
 						/* Load content from cached version
 						 */
 						$this->notifyObservers("Cache expired, lockfile still fresh. Loading from cache: {$this->getCachedFile()}, while in process of retrieving new stream contents.");
-						$this->setStreamContents(file_get_contents($this->getCachedFile()));
 					}
 				}
 				else {
-					/* newCacheUpdate()
+					/* Update cached version
 					 */
 					$this->notifyObservers("Cache expired, lockfile doesn't exist. Regenerate everything.");
 					$this->newCacheUpdate();
 				}
 			}
-
 			else {
 				/* Load content from cached version
 				 */
 				$this->notifyObservers("Cached file exists and is still fresh. Loading from cache: {$this->getCachedFile()}");
-				$this->setStreamContents(file_get_contents($this->getCachedFile()));
 			}
 		}
 		/* First load
@@ -173,6 +169,11 @@ abstract class Alaress_Cache_Locker_Abstract {
 		else {
 			$this->newCacheUpdate();
 		}
+
+		/* Prepare contents
+		 */
+		$this->notifyObservers("Streaming contents from {$this->getCachedFile()}");
+		$this->setStreamContents(file_get_contents($this->getCachedFile()));
 	}
 
 	/**
