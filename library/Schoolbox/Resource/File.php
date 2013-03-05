@@ -214,13 +214,13 @@ class File {
 	}
 
 	/**
-	 * Loads the hash for this file, based on the filename.
+	 * Loads the hash for this file, based on the file hash.
 	 *
 	 * @return bool
 	 */
-	public function loadHashFromFilename() {
-		if ($hash = $this->getFilenameHash()) {
-			$this->setHash($hash);
+	public function loadHashFromTempLocation() {
+		if (file_exists($temp_location = $this->getTempLocation())) {
+			$this->setHash(sha1_file($temp_location));
 			return true;
 		}
 		return false;
