@@ -96,8 +96,8 @@ if (is_numeric($this->arg[0])) {
         if ($groupHandler->isStudent($user['uid']) && $groupHandler->isParent() && !$groupHandler->isParentOfChild($user['uid'])) {
             $email = '';
         } else {
-            if (in_array(Cfg::get('site_location'), array('bialik', 'wenona')) && $groupHandler->isParent($user['uid']) && !$groupHandler->isStaff()) {
-                //dont display parent emails to anyone but staff
+            /* If restrict_parent_emails and not a staff member, remove the email address */
+            if ((Cfg::get('restrict_parent_emails') == '1') && $groupHandler->isParent($user['uid']) && !$groupHandler->isStaff()) {
                 $email = '';
             } else {
                 if (Cfg::get('site_location') == 'wenona') {
@@ -140,7 +140,7 @@ if (is_numeric($this->arg[0])) {
                 );
 
                 $this->setVar($output);
-
+                             
                 if ($parent['SpouseDirectoryIncludeFlag'] && $parent['SpouseSurname']) {
                     $output = array(
 
@@ -150,7 +150,12 @@ if (is_numeric($this->arg[0])) {
                         'SPOUSE_MOBILE' => $parent['SpouseMobilePhone'],
                         'SPOUSE_EMAIL' => '<a href="' . $_SESSION['mailhandle'] . $parent['SpouseEmail'] . '\">' . $parent['SpouseEmail'] . '</a>',
                     );
-
+                    
+                    /* If restrict_parent_emails and not a staff member, remove the email address */
+                    if ((Cfg::get('restrict_parent_emails') == '1') && $groupHandler->isParent($user['uid']) && !$groupHandler->isStaff()) {
+                        $output['SPOUSE_EMAIL'] = '';
+                    }
+                    
                     $this->setVar($output);
                     $this->parse('parent_spouse_block', 'parent_spouse');
                 } else {
