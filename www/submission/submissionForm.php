@@ -64,11 +64,17 @@ if (isset($_FILES['file']['name']) && $_FILES['file']['name']) {
     $allowedFileHandler = new AllowedFile();
     $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 
-	$storage_id = Storage_ResourceMapper::getInstance()->create(
-		$_FILES['file']['name'],
-		$_FILES['file']['tmp_name'],
-		$_SESSION['id']
-	);
+	//
+	// Delete existing file link (if there is one!)
+
+	//
+	// Add the uploaded file to the submission box.
+	$submission->getFileLink()->setFilename($_FILES['file']['name']);
+	$submission->getFileLink()->setTempLocation($_FILES['file']['tmp_name']);
+	$submission->getFileLink()->setUploadedBy($_SESSION['id']);
+	$submission->getFileLink()->loadHashFromFilename();
+	$submission->getFileLink()->loadMimetypeFromFilename();
+	$submission->getFileLink()->loadFilesizeFromTempLocation();
 }
 else {
 	$legacy_file_id = $action == 'create' ? $_POST['fileId'] : 0;
@@ -142,19 +148,6 @@ elseif($markTypeID == SubmissionBox::MARKTYPE_RUBRIC) {
 
 
 // define submissionBox 'object': elements common to both scenarios
-$submissionBox = array(
-    'accept_submission' => !empty($_POST['accept_submission']) ? true : false,
-    'multi_submission'  => !empty($_POST['multi_submission'])  ? true : false,
-    'open_date'         => $openDate->getDatabase(),
-    'date'              => $dueDate->getDatabase(),
-    'late_date'         => $lateDate->getDatabase(),
-    'name'              => $_POST['name'],
-    'description'       => $_POST['description'],
-    'type'              => $_POST['type'],
-    'mark_type'         => $markTypeID,
-    'rubric_result_set' => $resultSetID,
-    'max_mark'          => $markMax,
-);
 $submission->setAcceptOnline(!empty($_POST['accept_submission']) ? true : false);
 $submission->setAcceptMultiple(!empty($_POST['multi_submission'])  ? true : false);
 $submission->setOpenDate($openDate->getDatabase());
@@ -166,6 +159,12 @@ $submission->setType($_POST['type']);
 $submission->setMarkType($markTypeID);
 $submission->setRubricResultSet($resultSetID);
 $submission->setMaxMark($markMax);
+if ($legacy_file_id) {
+	$submission->setLegacyFileId($legacy_file_id);
+}
+//if ($storage_id) {
+//	$storage_id
+//}
 
 // append the notification data to be parsed in
 foreach(array('overdue', 'upcoming', 'returned') as $i) {
@@ -173,30 +172,21 @@ foreach(array('overdue', 'upcoming', 'returned') as $i) {
 	$notification->setType($i);
 	$notification->setEnabled(isset($_POST['notif_'.$i]));
 	$submission->addNotification($notification);
-	//
-	// Add mapper for notification
-    $submissionBox['notifications'][$i]['enabled'] = (isset($_POST['notif_'.$i])  ? 1 : 0);
 }
 
-// only set this field if there's actually something to put in it
-if ($legacy_file_id) {
-	$submissionBox['fid'] = $legacy_file_id;
-}
-if ($storage_id) {
-	$submissionBox['storage_id'] = $storage_id;
-}
+//// only set this field if there's actually something to put in it
+//if ($legacy_file_id) {
+//	$submissionBox['fid'] = $legacy_file_id;
+//}
+//if ($storage_id) {
+//	$submissionBox['storage_id'] = $storage_id;
+//}
 
 //die();
 // create new
 if($action == 'create') {
-//    // additonal fields unique to creation
-//    $submissionBox['category'] = $categoryID;
-//    $submissionBox['created'] = 'NOW()';
-//    $submissionBox['owner'] = $_SESSION['id'];
-
 	$submission->setCategory($categoryID);
 	$submission->setOwner($_SESSION['id']);
-
 	$mapper->save($submission);
 	$submissionBoxID = $submission->getId();
 }
