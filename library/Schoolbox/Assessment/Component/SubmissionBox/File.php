@@ -33,6 +33,10 @@ class File {
 	 */
 	protected $file;
 
+	public function __construct() {
+		$this->setFile(new Resource\File());
+	}
+
 	/**
 	 * @param int $id
 	 */

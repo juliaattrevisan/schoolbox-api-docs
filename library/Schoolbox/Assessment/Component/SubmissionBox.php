@@ -117,6 +117,7 @@ class SubmissionBox {
 
 	public function __construct() {
 		$this->setNotifications(new NotificationCollection(array()));
+		$this->setFileLink(new File());
 	}
 
 	/**
