@@ -187,20 +187,6 @@ class File {
 	}
 
 	/**
-	 * Gets the hash for this file object's filename. This is used to retrieve
-	 * the file from the DB.
-	 *
-	 * @return string
-	 */
-	public function getFilenameHash() {
-		$filename = $this->getFilename();
-		if (!isset($filename)) {
-			return false;
-		}
-		return sha1_file($filename);
-	}
-
-	/**
 	 * Gets the location at which this file would be stored.
 	 *
 	 * @return string
