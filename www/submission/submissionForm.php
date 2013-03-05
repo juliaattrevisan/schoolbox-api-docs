@@ -26,10 +26,14 @@ else {
 
 // create required objects
 $page = new SitePage();
-$submissionBoxHandler = new Submission();
+
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Notification;
+$mapper = new SubmissionBoxMapper();
 
 if($action == 'delete') {
-    $submissionBoxHandler->delete($_GET['deleteBox']);
+	$mapper->delete($mapper->findById($_GET['deleteBox']));
     $page->localRedir("/submission/listSubmission/");
 }
 
@@ -37,6 +41,8 @@ if($action == 'delete') {
 
 // localise important variables
 $submissionBoxID = isset($_POST['id']) && $_POST['id'] ? $_POST['id'] : 0;
+$submission = !empty($submissionBoxID) ? $mapper->findById($submissionBoxID) : new SubmissionBox();
+
 $categoryID = $_POST['category'];
 $markTypeID = $_POST['marktype'];
 $resultSetID = $_POST['resultset'];
@@ -98,16 +104,14 @@ if (!empty($_POST['accept_submission']) && $dueDate->getDatabase() > $lateDate->
     error(15);
 }
 
-$markType = $submissionBoxHandler->getMarkTypeByID($markTypeID);
-
 $markMax = !$_POST['markvalue'] ? '100' : $_POST['markvalue']; // if not set, default to 100
-
+$resultSetID = 0;
 // if Total Mark selected, mark value must be specified
-if ($markType['slug'] == 'raw' && empty($_POST['markvalue'])) {
+if ($markTypeID == SubmissionBox::MARKTYPE_RAW && empty($_POST['markvalue'])) {
     error(15);
 }
 // if Rubric selected, generate the objects needed
-elseif($markType['slug'] == 'rubric') {
+elseif($markTypeID == SubmissionBox::MARKTYPE_RUBRIC) {
     $rubricFactory = new DueWork_Rubric_Factory($criteria);
 
     if($useDescriptors) {
@@ -126,11 +130,12 @@ elseif($markType['slug'] == 'rubric') {
     }
 
     // need to determine if the resultset is different, and if it is, that any marks already given are invalidated
-    $subbox = $submissionBoxHandler->getByID($submissionBoxID);
-    if($resultSetID != $subbox['rubric_result_set']) {
-        // invalidate
-        $invalidateExistingMarks = true;
-    }
+	if (!empty($submissionBoxID)) {
+		$this_submission = $mapper->findById($submissionBoxID);
+		if ($resultSetID != $this_submission->getRubricResultSet()) {
+			$invalidateExistingMarks = true;
+		}
+	}
 
     $markMax = $rubric->getCriteriaCount() * ($rubric->getResultCount() - 1);
 }
@@ -147,12 +152,29 @@ $submissionBox = array(
     'description'       => $_POST['description'],
     'type'              => $_POST['type'],
     'mark_type'         => $markTypeID,
-    'rubric_result_set' => $markType['slug'] == 'rubric' ? $resultSetID : 0,
+    'rubric_result_set' => $resultSetID,
     'max_mark'          => $markMax,
 );
+$submission->setAcceptOnline(!empty($_POST['accept_submission']) ? true : false);
+$submission->setAcceptMultiple(!empty($_POST['multi_submission'])  ? true : false);
+$submission->setOpenDate($openDate->getDatabase());
+$submission->setDueDate($dueDate->getDatabase());
+$submission->setLateDate($lateDate->getDatabase());
+$submission->setName($_POST['name']);
+$submission->setDescription($_POST['description']);
+$submission->setType($_POST['type']);
+$submission->setMarkType($markTypeID);
+$submission->setRubricResultSet($resultSetID);
+$submission->setMaxMark($markMax);
 
 // append the notification data to be parsed in
 foreach(array('overdue', 'upcoming', 'returned') as $i) {
+	$notification = new Notification();
+	$notification->setType($i);
+	$notification->setEnabled(isset($_POST['notif_'.$i]));
+	$submission->addNotification($notification);
+	//
+	// Add mapper for notification
     $submissionBox['notifications'][$i]['enabled'] = (isset($_POST['notif_'.$i])  ? 1 : 0);
 }
 
@@ -167,17 +189,20 @@ if ($storage_id) {
 //die();
 // create new
 if($action == 'create') {
-    // additonal fields unique to creation
-    $submissionBox['category'] = $categoryID;
-    $submissionBox['created'] = 'NOW()';
-    $submissionBox['owner'] = $_SESSION['id'];
-    $submissionBoxID = $submissionBoxHandler->create($submissionBox);
+//    // additonal fields unique to creation
+//    $submissionBox['category'] = $categoryID;
+//    $submissionBox['created'] = 'NOW()';
+//    $submissionBox['owner'] = $_SESSION['id'];
+
+	$submission->setCategory($categoryID);
+	$submission->setOwner($_SESSION['id']);
+
+	$mapper->save($submission);
+	$submissionBoxID = $submission->getId();
 }
 // update existing
 elseif($action == 'update') {
-    // additonal field unique to updating
-    $submissionBox['id'] = $submissionBoxID;
-    $submissionBoxHandler->update($submissionBox);
+	$mapper->save($submission);
 }
 // something happened that shouldn't have
 else {
