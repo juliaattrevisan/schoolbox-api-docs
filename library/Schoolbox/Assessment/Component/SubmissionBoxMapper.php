@@ -9,6 +9,8 @@
 
 namespace Schoolbox\Assessment\Component;
 use Schoolbox;
+use Schoolbox\Assessment\Component\SubmissionBox\FileMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\NotificationMapper;
 
 class SubmissionBoxMapper extends Schoolbox\Mapper {
 
@@ -109,7 +111,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		//
 		// $this->hasOne?
 		$this->hasJoin('files', array(
-			'mapper'    => new SubmissionBoxFileMapper(),
+			'mapper'    => new FileMapper(),
 			'this_key'  => 'id',
 			'other_key' => 'box_id',
 		));
@@ -118,7 +120,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		// $this->hasCollection?
 		$this->hasJoin('notify', array(
 			'multiple'  => true,
-			'mapper'    => new SubmissionBoxNotificationMapper(),
+			'mapper'    => new NotificationMapper(),
 			'this_key'  => 'id',
 			'other_key' => 'box_id',
 //			'extra'     => "`:other_alias`.`type` = 'overdue'",

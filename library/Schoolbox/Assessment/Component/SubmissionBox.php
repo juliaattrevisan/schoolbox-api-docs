@@ -10,6 +10,10 @@
 namespace Schoolbox\Assessment\Component;
 use Schoolbox;
 
+use Schoolbox\Assessment\Component\SubmissionBox\File;
+use Schoolbox\Assessment\Component\SubmissionBox\Notification;
+use Schoolbox\Assessment\Component\SubmissionBox\NotificationCollection;
+
 class SubmissionBox {
 	/**
 	 * @var int
@@ -42,12 +46,12 @@ class SubmissionBox {
 	protected $legacy_file_id;
 
 	/**
-	 * @var SubmissionBoxFile
+	 * @var File
 	 */
 	protected $file_link;
 
 	/**
-	 * @var SubmissionBoxNotificationCollection
+	 * @var NotificationCollection
 	 */
 	protected $notifications;
 
@@ -104,7 +108,7 @@ class SubmissionBox {
 	protected $rubric_result_set;
 
 	public function __construct() {
-		$this->setNotifications(new SubmissionBoxNotificationCollection(array()));
+		$this->setNotifications(new NotificationCollection(array()));
 	}
 
 	/**
@@ -192,14 +196,14 @@ class SubmissionBox {
 	}
 
 	/**
-	 * @param SubmissionBoxFile $link
+	 * @param File $link
 	 */
-	public function setFileLink(SubmissionBoxFile $link) {
+	public function setFileLink(File $link) {
 		$this->file_link = $link;
 	}
 
 	/**
-	 * @return SubmissionBoxFile
+	 * @return File
 	 */
 	public function getFileLink() {
 		return $this->file_link;
@@ -346,23 +350,23 @@ class SubmissionBox {
 	}
 
 	/**
-	 * @param SubmissionBoxNotificationCollection $notifications
+	 * @param NotificationCollection $notifications
 	 */
 	public function setNotifications($notifications) {
 		$this->notifications = $notifications;
 	}
 
 	/**
-	 * @return SubmissionBoxNotificationCollection
+	 * @return NotificationCollection
 	 */
 	public function getNotifications() {
 		return $this->notifications;
 	}
 
 	/**
-	 * @param SubmissionBoxNotification
+	 * @param Notification
 	 */
-	public function addNotification(SubmissionBoxNotification $notification) {
+	public function addNotification(Notification $notification) {
 		$this->notifications->add($notification);
 	}
 }

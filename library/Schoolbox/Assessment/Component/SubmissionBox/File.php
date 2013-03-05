@@ -7,11 +7,11 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Component;
+namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox;
-use Schoolbox\Resource\File;
+use Schoolbox\Resource;
 
-class SubmissionBoxFile {
+class File {
 
 	/**
 	 * @var int
@@ -29,7 +29,7 @@ class SubmissionBoxFile {
 	protected $submission_box_id;
 
 	/**
-	 * @var File
+	 * @var Resource\File
 	 */
 	protected $file;
 
@@ -76,14 +76,14 @@ class SubmissionBoxFile {
 	}
 
 	/**
-	 * @param File $file
+	 * @param Resource\File $file
 	 */
-	public function setFile(File $file) {
+	public function setFile(Resource\File $file) {
 		$this->file = $file;
 	}
 
 	/**
-	 * @return File
+	 * @return Resource\File
 	 */
 	public function getFile() {
 		return $this->file;

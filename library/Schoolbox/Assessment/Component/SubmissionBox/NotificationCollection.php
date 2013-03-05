@@ -7,10 +7,10 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Component;
+namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
 
-class SubmissionBoxNotificationCollection extends Collection {
+class NotificationCollection extends Collection {
 
 	protected function getOfType($type) {
 		foreach ($this as $item) {
