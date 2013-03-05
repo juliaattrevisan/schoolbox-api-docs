@@ -15,6 +15,14 @@ use Schoolbox\Assessment\Component\SubmissionBox\Notification;
 use Schoolbox\Assessment\Component\SubmissionBox\NotificationCollection;
 
 class SubmissionBox {
+
+	const MARKTYPE_PERCENT = 1;
+	const MARKTYPE_LETTER  = 2;
+	const MARKTYPE_RAW     = 3;
+	const MARKTYPE_FREE    = 4;
+	const MARKTYPE_RUBRIC  = 5;
+	const MARKTYPE_NONE    = 6;
+
 	/**
 	 * @var int
 	 */
