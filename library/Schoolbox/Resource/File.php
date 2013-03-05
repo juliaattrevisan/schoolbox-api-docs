@@ -218,8 +218,18 @@ class File {
 	 * @return bool
 	 */
 	public function loadMimetypeFromFilename() {
+		$filename = $this->getFilename();
+		if (!isset($filename)) {
+			return false;
+		}
 		//
-		// Submission handler awfulness.
+		// Don't really want to load a mapper here, but meh.
+		$mapper = new MimetypeMapper();
+		if ($mimetype = $mapper->getMimetypeForFilename($filename)) {
+			$this->setMime($mimetype);
+			return true;
+		}
+		return false;
 	}
 
 	/**
