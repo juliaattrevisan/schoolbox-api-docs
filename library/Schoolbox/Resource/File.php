@@ -8,6 +8,8 @@
  */
 
 namespace Schoolbox\Resource;
+use \Cfg;
+
 class File {
 
 	/**
