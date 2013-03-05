@@ -42,19 +42,16 @@ class FileMapper extends Schoolbox\Mapper {
 		//
 		// Create/save associated file item first if it isn't already saved.
 		$objects = $this->getModelAsCollection($object);
-		foreach ($objects as &$this_object) {
+		foreach ($objects as $this_object) {
 			//
 			// pre-save callback on this object?
 			// subscribe('preSave:SubmissionBoxFileMapper', $this_object)
 			// in mapper->save(): publish('preSave:'.$this->name, true(default))
 			if ($file = $this_object->getFile()) {
-				if (!($file->getId())) {
-					$this->getJoinMapper('file')->save($file);
-					$this_object->setFileId($file->getId());
-				}
+				$this->getJoinMapper('file')->save($file);
+				$this_object->setFileId($file->getId());
 			}
 		}
-		unset($this_object);
 		return parent::save($objects);
 	}
 }
