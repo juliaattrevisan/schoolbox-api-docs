@@ -69,12 +69,13 @@ if (isset($_FILES['file']['name']) && $_FILES['file']['name']) {
 
 	//
 	// Add the uploaded file to the submission box.
-	$submission->getFileLink()->setFilename($_FILES['file']['name']);
-	$submission->getFileLink()->setTempLocation($_FILES['file']['tmp_name']);
-	$submission->getFileLink()->setUploadedBy($_SESSION['id']);
-	$submission->getFileLink()->loadHashFromFilename();
-	$submission->getFileLink()->loadMimetypeFromFilename();
-	$submission->getFileLink()->loadFilesizeFromTempLocation();
+	$file = $submission->getFileLink()->getFile();
+	$file->setFilename($_FILES['file']['name']);
+	$file->setTempLocation($_FILES['file']['tmp_name']);
+	$file->setUploadedBy($_SESSION['id']);
+	$file->loadHashFromTempLocation();
+	$file->loadMimetypeFromFilename();
+	$file->loadFilesizeFromTempLocation();
 }
 else {
 	$legacy_file_id = $action == 'create' ? $_POST['fileId'] : 0;
