@@ -42,7 +42,7 @@ abstract class Synchronise_Synergetic_Verbose_Abstract {
 		echo "+  Performing create: The script will create a Schoolbox account with data found in Synergetic.\n";
 		echo "^  Performing update: The script will to update a Schoolbox account with data found in Synergetic.\n\n";
 
-		echo "o  Sipping create/update: The script intends to ignore this record altogether, regardless of mode.\n\n";
+		echo "o  Skipping create/update: The script intends to ignore this record altogether, regardless of mode.\n\n";
 		echo "-------------------------------------------------------------\n";
 		echo "\n\n";
 	}
@@ -115,21 +115,23 @@ abstract class Synchronise_Synergetic_Verbose_Abstract {
 	 * @return string
 	 */
 	protected function verboseUserSummary($newUser) {
-		$data = array();
-		$data[] = "username: {$newUser['username']}";
-        $data[] = "synergy_id: " .$newUser['synergy_id'];
-		$data[] = "title: {$newUser['title']}";
-		$data[] = "firstname: {$newUser['firstname']}";
-		$data[] = "lastname: {$newUser['lastname']}";
-		$data[] = "alt_email: {$newUser['alt_email']}";
-		$data[] = "campus: " . '[' . implode(',', $newUser['campus']) . ']';
-		$data[] = "groupIDs: " . $newUser['group_id'];
+        if(is_array($newUser)){
+            $data = array();
+            $data[] = "username: {$newUser['username']}";
+            $data[] = "synergy_id: " .$newUser['synergy_id'];
+            $data[] = "title: {$newUser['title']}";
+            $data[] = "firstname: {$newUser['firstname']}";
+            $data[] = "lastname: {$newUser['lastname']}";
+            $data[] = "alt_email: {$newUser['alt_email']}";
+            $data[] = "campus: " . '[' . implode(',', $newUser['campus']) . ']';
+            $data[] = "groupIDs: " . $newUser['group_id'];
 
-		if (array_key_exists('year', $newUser)) {
-			$data[] = 'year: ' . $newUser['year'];
-		}
+            if (array_key_exists('year', $newUser)) {
+                $data[] = 'year: ' . $newUser['year'];
+            }
 
-		return '(' . implode(', ', $data) . ')';
+            return '(' . implode(', ', $data) . ')';
+        }
 	}
 
 	/**
