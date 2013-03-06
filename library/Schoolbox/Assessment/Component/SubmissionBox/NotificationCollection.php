@@ -12,7 +12,7 @@ use Schoolbox\Collection;
 
 class NotificationCollection extends Collection {
 
-	protected function getOfType($type) {
+	public function getOfType($type) {
 		foreach ($this as $item) {
 			if ($item->getType() === $type) {
 				return $item;
@@ -26,15 +26,15 @@ class NotificationCollection extends Collection {
 //		return $notification;
 	}
 
-	protected function getOverdue() {
+	public function getOverdue() {
 		return $this->getOfType('overdue');
 	}
 
-	protected function getUpcoming() {
+	public function getUpcoming() {
 		return $this->getOfType('upcoming');
 	}
 
-	protected function getReturned() {
+	public function getReturned() {
 		return $this->getOfType('returned');
 	}
 }
