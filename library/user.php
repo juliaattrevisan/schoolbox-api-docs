@@ -269,6 +269,8 @@ class User extends DeprecatedModel {
 	function setPassword($userID, $oldPassword, $newPassword) {
 		//
 		// Set password, and set it back if updating via Synergetic fails.
+		$user     = $this->getByID($userID);
+		$username = $user['username'];
 		if ($this->checkPassword($userID, $oldPassword)
 			&& $this->setPasswordInternal($userID, $newPassword)
 		) {
@@ -287,12 +289,15 @@ class User extends DeprecatedModel {
 					//
 					// Should throw a different error message if the remote pwd doesn't get changed.
 					$this->setPasswordInternal($userID, $oldPassword);
+					$this->logUserPasswordChange($username, 'change_pwd_syn_fail', 'warn');
 					$this->sendPasswordChangeFailureEmail($userID, true);
 					return false;
 				}
 			}
+			$this->logUserPasswordChange($username, 'change_pwd', 'info');
 			return true;
 		}
+		$this->logUserPasswordChange($username, 'change_pwd_fail', 'warn');
 		$this->sendPasswordChangeFailureEmail($userID);
 		return false;
 	}
@@ -337,6 +342,7 @@ class User extends DeprecatedModel {
 
 	function sendResetPasswordEmail($email) {
 		if (false != ($user = $this->getByField('alt_email', $email))) {
+			$this->logUserPasswordChange($user['username'], 'email_reset_pwd', 'info');
 			$hash = substr(md5(uniqid() . time()), 0, 25);
 			$this->update(array('id' => $user['id'], 'hash' => $hash));
 
@@ -361,6 +367,7 @@ class User extends DeprecatedModel {
 	 */
 	public function sendChangePasswordEmail($id) {
 		if ($user = $this->getByID($id)) {
+			$this->logUserPasswordChange($user['username'], 'email_change_pwd', 'info');
 			$hash = substr(md5(uniqid() . time()), 0, 25);
 			$this->update(array('id' => $user['id'], 'hash' => $hash));
 
@@ -832,6 +839,34 @@ class User extends DeprecatedModel {
 			return 'Unknown User';
 		}
 	}
-}
 
-?>
+	/**
+	 * Logs user-related activity in the database.
+	 *
+	 * @param string $user    The user's username.
+	 * @param string $event   A simple code to describe the error, 20 chars max.
+	 * @param string $level   The log level: trace, debug, info, warning, error
+	 * @param string $message Optional extra information, 250 chars max.
+	 *
+	 * @return bool
+	 */
+	public function logUserPasswordChange($user, $event, $level, $message = '') {
+		//
+		// I will NOT log passwords here!
+		// when user changes password (change_pwd, info)
+		// when user tries to change password but enters wrong password (change_pwd_fail, warn)
+		// when user tries but is foild by Synergetic (change_pwd_syn_fail, warn)
+		// when an admin or someone changes other user's password (change_other_password, info)
+		return $this->db->insert(
+			'user_activity_log',
+			array(
+				'username' => $user,
+				'date'     => 'NOW()',
+				'ip'       => $_SERVER['REMOTE_ADDR'],
+				'event'    => $event,
+				'level'    => $level,
+				'message'  => $message,
+			)
+		);
+	}
+}
