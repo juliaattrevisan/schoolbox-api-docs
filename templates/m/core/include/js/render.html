@@ -117,9 +117,18 @@
             // Get the page content
             debug( 'render.html:75 renderPage() requesting content for ' + data );
             data = localCache.get(data)
-            //debug(data)
             var page = $(data).find('article')
             var title = $(data).find('header');
+
+            //
+            // Is there a login on the returned page? If so, reload the page
+            // (which shows a login form), unless there's already a login page
+            // available.
+            if (page.find('#login_frm').length > 0 && $('#login_frm').length == 0) {
+                sessionStorage.clear();
+                window.location.reload();
+                return;
+            }
 
             $('#currentPage').html(title)
             p.html(page).prepend(title).animate({opacity:'1'},200);
