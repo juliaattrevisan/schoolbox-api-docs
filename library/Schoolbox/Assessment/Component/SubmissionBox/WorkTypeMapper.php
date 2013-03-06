@@ -39,4 +39,19 @@ class WorkTypeMapper extends Schoolbox\Mapper {
 		}
 		return $collection;
 	}
+
+	public function getAllExcept($type) {
+		$query = "
+			SELECT {$this->getColumnString('t')}
+			FROM {$this->getTable()} t
+			WHERE t.id != ?
+		";
+		$statement = $this->database->prepare($query);
+		$statement->execute(array($type));
+		$collection = new Schoolbox\Collection(array());
+		foreach ($statement as $row) {
+			$collection->add($this->hydrate($row, 't'));
+		}
+		return $collection;
+	}
 }
