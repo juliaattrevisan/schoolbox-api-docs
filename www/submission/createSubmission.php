@@ -47,28 +47,35 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     //Modify submission box
     $this->setTitle('Modify Submission Box');
 
-//	$submission = $mapper->findById($this->arg[1]);
+    $submission = $mapper->findById($this->arg[1]);
     $subbox = $subBoxHandler->getByID($this->arg[1]);
 
-    /* Output category information */
-    if($subbox['code'])
-        $catOutput = "<b>".$subbox['categoryName']." (".$subbox['code'].")</b>";
-    else
-        $catOutput = "<b>".$subbox['categoryName']."</b>";
+//	$submission->get
 
-    /* Output submission type drop down */
-    $this->dropdown('type_drop', $work_types, $subbox['type'], TEMPLATE_content, array(
+    /* Output category information */
+	$cat_name = $submission->getCategoryName();
+	$codes    = $submission->getCategoryCodes();
+    if (!empty($codes)) {
+	    $catOutput = "<b>".$cat_name." (".implode(', ', $codes).")</b>";
+    }
+    else {
+	    $catOutput = "<b>".$cat_name."</b>";
+    }
+
+    /* Output submission work_type drop down */
+    $this->dropdown('type_drop', $work_types, $submission->getWorkType(), TEMPLATE_content, array(
         'name' => 'TYPE_TEXT',
         'id'   => 'TYPE_VALUE'
     ));
 
     // legacy support
-    if($subbox['mark_type_slug'] == 'free') {
+	$mark_type = $submission->getMarkType();
+    if ($mark_type == SubmissionBox::MARKTYPE_FREE) {
         $this->setVar('marktype_block', '');
     }
     else {
         // Output marktype drop down
-        $this->dropdown('marktype_drop', $mark_types, $subbox['mark_type'], 'marktype', array(
+        $this->dropdown('marktype_drop', $mark_types, $mark_type, 'marktype', array(
             'name' => 'MARKTYPE_TEXT',
             'id'   => 'MARKTYPE_VALUE',
             'slug' => 'MARKTYPE_SLUG'
@@ -76,11 +83,11 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
 
         // if the rubric creation fails it will throw an exception, in which case just output the empty sets
         try {
-            if($subbox['mark_type_slug'] == 'rubric') {
-                $rubric = $rubricHandler->getRubric($subbox['id']);
-                $resultSetID = $subbox['rubric_result_set'];
+            if($mark_type == SubmissionBox::MARKTYPE_RUBRIC) {
+                $rubric = $rubricHandler->getRubric($submission->getId());
+                $resultSetID = $submission->getRubricResultSet();
 
-                if($rubricHandler->marksAlreadyGiven($subbox['id'])) {
+                if($rubricHandler->marksAlreadyGiven($submission->getId())) {
                     $this->parse('existing_marks_warning_block', 'existing_marks_warning');
                 }
 
@@ -88,16 +95,16 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
                 $results = $rubric->getResults();
                 $resultCount = $rubric->getResultCount();
 
-                outputCriteria($this, $subbox['category'], $criteria, $results, $resultCount);
+                outputCriteria($this, $submission->getCategory(), $criteria, $results, $resultCount);
                 outputResultSets($this, $resultSetID, $resultCount);
             }
             else {
                 outputResultSets($this);
-                outputCriteria($this, $subbox['category'], array(), array());
+                outputCriteria($this, $submission->getCategory(), array(), array());
             }
         } catch(Exception $e) {
             outputResultSets($this);
-            outputCriteria($this, $subbox['category'], array(), array());
+            outputCriteria($this, $submission->getCategory(), array(), array());
         }
 
 
@@ -106,9 +113,9 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $this->parse('marktype_block', 'marktype');
 
     /* Convert times */
-    $open_date = strtotime($subbox['open_date']);
-    $due_date  = strtotime($subbox['date']);
-    $late_date = strtotime($subbox['late_date']);
+    $open_date = strtotime($submission->getOpenDate());
+    $due_date  = strtotime($submission->getDueDate());
+    $late_date = strtotime($submission->getLateDate());
 
     if(date('H:i:s', $open_date) == '00:00:00') {
         $open_hour = '';
@@ -137,15 +144,15 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
 
     $output = array(
         'HEADING'           => 'Modify',
-        'ID'                => $subbox['id'],
-        'CATEGORY'          => $subbox['category'],
+        'ID'                => $submission->getId(),
+        'CATEGORY'          => $submission->getCategory(),
         'CURRENT_CAT'       => $catOutput,
-        'NAME'              => $subbox['name'],
-        'DESCRIPTION'       => $subbox['description'],
-        'FILEID'            => $subbox['fid'],
-        'ACCEPT_SUBMISSION' => $subbox['accept_submission'] ? ' checked="checked"' : '',
-        'MULTI_SUBMISSION'  => $subbox['multi_submission'] ? ' checked="checked"' : '',
-        'TOTAL_MARK'        => $subbox['max_mark'],
+        'NAME'              => $submission->getName(),
+        'DESCRIPTION'       => $submission->getDescription(),
+        'FILEID'            => $submission->getLegacyFileId(),
+        'ACCEPT_SUBMISSION' => $submission->getAcceptOnline() ? ' checked="checked"' : '',
+        'MULTI_SUBMISSION'  => $submission->getAcceptMultiple() ? ' checked="checked"' : '',
+        'TOTAL_MARK'        => $submission->getMaxMark(),
 
         'OPEN_DATE' => date('d/m/Y', $open_date),
         'OPEN_HOUR' => $open_hour,
@@ -165,7 +172,9 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     );
 
     foreach(array('UPCOMING' => '1 day', 'OVERDUE' => '1 hour', 'RETURNED' => '1 hour') as $i => $j) {
-        $output["NOTIF_{$i}_ENABLED"] = $subbox['notifications'][strtolower($i)]['enabled'] ? ' checked="checked"' : '';
+	    $notification = $submission->getNotifications()->getOfType(strtolower($i));
+	    $is_enabled   = $notification instanceof SubmissionBox\Notification && $notification->getEnabled();
+        $output["NOTIF_{$i}_ENABLED"] = $is_enabled ? ' checked="checked"' : '';
         $output["{$i}_THRESHHOLD"] = $j;
     }
 
@@ -173,10 +182,10 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $this->setVar($output);
 
     // check for an associated file
-    if($subbox['fid']) {
+    if($submission->getLegacyFileId()) {
 
         $fileHandler = new File;
-        $file = $fileHandler->getByID($subbox['fid']);
+        $file = $fileHandler->getByID($submission->getLegacyFileId());
 
         $this->setVar('CURRENT_FILE_NAME', $file['realname']);
         $this->setVar('CURRENT_FILE_ICON', $file['iconFile']);
@@ -243,7 +252,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 		$categoryList[$i]['name'] .= ' ('.$categoryList[$i]['code'].')';
 	}
 
-    // Output submission type drop down (exclude online assessment type)
+    // Output submission work_type drop down (exclude online assessment work_type)
 
 //	$types = $subBoxHandler->getTypesExcept(array(Assess_Main::ONLINE_ASSESSMENT_TYPE_ID));
 	$this->dropDown('type_drop', $work_types, $this->arg[3], TEMPLATE_content, array(
