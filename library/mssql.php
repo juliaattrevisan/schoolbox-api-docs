@@ -10,6 +10,31 @@
 ************************************************************/
 class MSSQL {
 
+	/**
+	 * This database's default encoding.
+	 *
+	 * Referenced when converting strings from database to UTF-8.
+	 *
+	 * @var string
+	 */
+	protected $encoding = 'ISO-8859-1';
+
+	/**
+	 * Is encoding converted or not for calls to getAll/Row/One?
+	 *
+	 * @var bool
+	 */
+	protected $convert_encoding = true;
+
+	/**
+	 * If encoding has been switched on or off for a single request, the
+	 * previous value of $this->convert_encoding is here.
+	 *
+	 * @var bool
+	 */
+	protected $previous_encoding = null;
+
+
 	function MSSQL($db = false, $optionalConfig = false) {
 
 		/* Blasphemy (heresy unavoidable)
@@ -19,12 +44,10 @@ class MSSQL {
 			$this->host = $optionalConfig['host'];
 			$this->user = $optionalConfig['user'];
 			$this->passwd = $optionalConfig['passwd'];
-
-			/* Database name
-			 */
 			$this->db = $optionalConfig['db'];
 
 			$this->connect();
+			$encoding = $optionalConfig['encoding'];
 		}
 		else {
 			$this->host = Cfg::get('external_db_host');
@@ -36,8 +59,12 @@ class MSSQL {
 			if(Cfg::get('external_enable') == 1) {
 				$this->connect();
 			}
+			$encoding = Cfg::get('external_db_encoding');
 		}
-    }
+		if (!empty($encoding)) {
+			$this->encoding = $encoding;
+		}
+	}
 
 	function connect() {
 		if(!isset($this->dbf))
@@ -62,51 +89,70 @@ class MSSQL {
 
 	function query($sql_q)
 	{
-        if($this->dbf) {
-            $this->result = mssql_query($sql_q, $this->dbf);
+		if($this->dbf) {
+			$this->result = mssql_query($sql_q, $this->dbf);
 
-            if ($this->result == FALSE) {
-                if($this->debug)
-                    print "<b>Query:</b> $sql_q<br />";
-                else
-                    error(21, 'Error in Synegetic query<br /><br /><p>'.mssql_get_last_message().'</p>' );
+			if ($this->result == false) {
+				if($this->debug)
+					print "<b>Query:</b> $sql_q<br />";
+				else
+					error(21, 'Error in Synegetic query<br /><br /><p>'.mssql_get_last_message().'</p>' );
 
-            }
+			}
 
-            return $this->result;
-        }
-        else
-            return false;
+			return $this->result;
+		}
+		else
+			return false;
 	}
 
-	/* Gets the first result returned by the query */
-	/* Returns an associative array of row, false if none exists */
+	/**
+	 * Gets the first result returned by the query
+	 * Returns an associative array of row, false if none exists
+	 *
+	 * @param string $sql_q
+	 *
+	 * @return array|bool
+	 */
 	function getRow($sql_q)
 	{
 		$result = $this->query($sql_q);
-		$row = $this->getNextArray($result);
-		return $row;
+		return $this->getNextArray($result);
 	}
 
-	/* Gets the first value of the first result returned by the query */
-	/* Returns an associative array of row, false if none exists */
+	/**
+	 * Gets the first value of the first result returned by the query
+	 * Returns an associative array of row, false if none exists
+	 *
+	 * @param string $sql_q
+	 *
+	 * @return array|bool
+	 */
 	function getOne($sql_q)
 	{
 		$result = $this->query($sql_q);
 		$row = mssql_fetch_assoc($result);
-		return $row[0];
+		$one = $row[0];
+		if ($this->getConvertEncoding()) {
+			$one = $this->convertEncoding($one);
+		}
+		return $one;
 	}
 
-	/* Gets an 3 dimensional associative array of all rows returned by query, */
-	/*	returns false if no rows */
+	/**
+	 * Gets an 3 dimensional associative array of all rows returned by query,
+	 * returns false if no rows
+	 *
+	 * @param string $sql_q
+	 * @return array|bool
+	 */
 	function getAll($sql_q)
 	{
 		$result = $this->query($sql_q);
 		$table = array();
 		$results = false;
 		//loop through all records and insert into array table
-		while($line = $this->getNextArray($result))
-		{
+		while ($line = $this->getNextArray($result)) {
 			$table[] = $line;
 			$results = true;
 		}
@@ -116,8 +162,15 @@ class MSSQL {
 			return false;
 	}
 
-	/* Returns the next result from a query result resource */
-	/* Can be optionally passed a result resource otherwise it uses current result resource */
+
+	/**
+	 * Returns the next result from a query result resource
+	 * Can be optionally passed a result resource otherwise it uses current result resource
+	 *
+	 * @param int  $result The resource to use, or 0 to use $this->result
+	 *
+	 * @return array|bool
+	 */
 	function getNextArray($result = 0)
 	{
 		if($result)
@@ -127,10 +180,20 @@ class MSSQL {
 		else
 			return false;
 
+		if ($this->getConvertEncoding() && is_array($return_array)) {
+			$return_array = array_map(array($this, 'convertEncoding'), $return_array);
+		}
+
 		return $return_array;
 	}
 
-	/* Returns the number of rows returned by the query */
+	/**
+	 * Returns the number of rows returned by the query
+	 *
+	 * @param int $result
+	 *
+	 * @return bool|int
+	 */
 	function countRows($result = 0)
 	{
 		if($result)
@@ -142,5 +205,59 @@ class MSSQL {
 		return $return_count;
 	}
 
+	/**
+	 * Converts $value's encoding to UTF-8, based on whatever this connection's
+	 * encoding is (ISO-8859-1 if not specified).
+	 *
+	 * @param $value
+	 *
+	 * @return string
+	 */
+	protected function convertEncoding($value)
+	{
+		return mb_convert_encoding($value, 'UTF-8', $this->encoding);
+	}
+
+
+	/**
+	 * Gets whether character set conversion is enabled.
+	 *
+	 * @return bool
+	 */
+	public function getConvertEncoding()
+	{
+		return $this->convert_encoding;
+	}
+
+
+	/**
+	 * Sets whether character set conversion is enabled.
+	 *
+	 * @param $convert
+	 */
+	public function setConvertEncoding($convert)
+	{
+		$this->convert_encoding = $convert;
+	}
+
+
+	/**
+	 * Sets whether character set conversion was enabled for previous request.
+	 *
+	 * @param $previous_encoding
+	 */
+	protected function setPreviousEncoding($previous_encoding)
+	{
+		$this->previous_encoding = $previous_encoding;
+	}
+
+	/**
+	 * Gets whether character set conversion was enabled for previous request.
+	 *
+	 * @return bool
+	 */
+	protected function getPreviousEncoding()
+	{
+		return $this->previous_encoding;
+	}
 }
-?>
