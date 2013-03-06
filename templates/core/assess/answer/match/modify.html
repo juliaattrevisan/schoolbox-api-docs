@@ -26,8 +26,8 @@ var validator = $j("#createQuestionForm").submit(function() {
 				 */
 				if (($j.trim(answerLeft) != '') && ($j.trim(answerRight) != '')) {
 					answerCollection.push({
-						answerLeft: answerLeft,
-						answerRight: answerRight
+						answerLeft: $j.trim(answerLeft),
+						answerRight: $j.trim(answerRight)
 					});
 				}
 			});
