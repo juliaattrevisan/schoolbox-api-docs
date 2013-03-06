@@ -17,6 +17,7 @@ class Sabre_DAV_Client_Extended extends Sabre_DAV_Client
         }
 
         $settings[CURLOPT_HTTPAUTH] = Cfg::get('webdav_allow_any_auth') ? CURLAUTH_ANY : CURLAUTH_BASIC;
+        $settings[CURLOPT_COOKIEFILE] = '';
 
         if (Cfg::get('webdav_allow_insecure')) {
             $settings[CURLOPT_SSL_VERIFYHOST] = false;
@@ -51,6 +52,7 @@ class Sabre_DAV_Client_Extended extends Sabre_DAV_Client
         $settings = array(
             CURLOPT_HTTPAUTH   => Cfg::get('webdav_allow_any_auth') ? CURLAUTH_ANY : CURLAUTH_BASIC,
             CURLOPT_USERPWD    => $this->userName . ':' . $this->password,
+            CURLOPT_COOKIEFILE => '',
             CURLOPT_PUT        => true,
             CURLOPT_INFILE     => fopen($file, "r"),
             CURLOPT_INFILESIZE => filesize($file),
