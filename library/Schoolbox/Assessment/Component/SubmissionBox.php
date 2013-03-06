@@ -126,6 +126,22 @@ class SubmissionBox {
 	 */
 	protected $rubric_result_set;
 
+	/**
+	 * Temporary variable for storing category name.
+	 * TODO create category mapper and load the category into the submission.
+	 *
+	 * @var string
+	 */
+	protected $category_name;
+
+	/**
+	 * Temporary variable for storing category codes for the category.
+	 * TODO create category mapper and load the category into the submission.
+	 *
+	 * @var array
+	 */
+	protected $category_codes;
+
 	public function __construct() {
 		$this->setNotifications(new NotificationCollection(array()));
 		$this->setFileLink(new File());
@@ -388,5 +404,33 @@ class SubmissionBox {
 	 */
 	public function addNotification(Notification $notification) {
 		$this->notifications->add($notification);
+	}
+
+	/**
+	 * @param array $category_codes
+	 */
+	public function setCategoryCodes($category_codes) {
+		$this->category_codes = $category_codes;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getCategoryCodes() {
+		return $this->category_codes;
+	}
+
+	/**
+	 * @param string $category_name
+	 */
+	public function setCategoryName($category_name) {
+		$this->category_name = $category_name;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCategoryName() {
+		return $this->category_name;
 	}
 }

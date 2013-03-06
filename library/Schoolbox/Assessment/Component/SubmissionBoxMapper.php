@@ -139,6 +139,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 //		));
 	}
 
+	/**
+	 * @param int $id
+	 *
+	 * @return SubmissionBox
+	 */
 	public function findById($id) {
 		$box_file_mapper = $this->getJoinMapper('files');
 		$file_mapper     = $box_file_mapper->getJoinMapper('file');
@@ -168,6 +173,27 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 				$submission_box->setFileLink($box_file);
 			}
 			$submission_box->addNotification($notify_mapper->hydrate($row, 'n'));
+		}
+		if ($submission_box instanceof SubmissionBox) {
+			//
+			// Get category and codes.
+			// TODO include category and category codes properly as models.
+			$query = "
+				SELECT c.name, cc.code
+				FROM category AS c
+				LEFT JOIN categoryCode AS cc ON cc.categoryID = c.id
+				WHERE c.id = ?
+			";
+			$statement = $this->database->prepare($query);
+			$statement->execute(array($submission_box->getId()));
+			$category_name  = '';
+			$category_codes = array();
+			foreach ($statement as $row) {
+				$category_name    = $row['name'];
+				$category_codes[] = $row['code'];
+			}
+			$submission_box->setCategoryName($category_name);
+			$submission_box->setCategoryCodes($category_codes);
 		}
 		return $submission_box;
 	}
