@@ -26,8 +26,18 @@ else {
 $this->setVar('category_select_block', '');
 $this->setVar('existing_marks_warning_block', '');
 
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+
+$mapper      = new SubmissionBoxMapper();
+$type_mapper = new SubmissionBox\WorkTypeMapper();
+$mark_mapper = new SubmissionBox\MarkTypeMapper();
+
 $subBoxHandler = new Submission();
 $rubricHandler = new DueWork_Rubric_Handler();
+
+$work_types = $type_mapper->getAll();
+$mark_types = $mark_mapper->getAll();
 
 // IF PRE-EXISTING
 if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
@@ -43,7 +53,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         $catOutput = "<b>".$subbox['categoryName']."</b>";
 
     /* Output submission type drop down */
-    $this->dropdown('type_drop', $subBoxHandler->getTypes(), $subbox['type'], TEMPLATE_content, array(
+    $this->dropdown('type_drop', $work_types, $subbox['type'], TEMPLATE_content, array(
         'name' => 'TYPE_TEXT',
         'id'   => 'TYPE_VALUE'
     ));
@@ -54,10 +64,10 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     }
     else {
         // Output marktype drop down
-        $this->dropdown('marktype_drop', $subBoxHandler->getMarkTypes(), $subbox['mark_type'], 'marktype', array(
-            'hr_name'       => 'MARKTYPE_TEXT',
-            'mark_type_id'  => 'MARKTYPE_VALUE',
-            'slug'          => 'MARKTYPE_SLUG'
+        $this->dropdown('marktype_drop', $mark_types, $subbox['mark_type'], 'marktype', array(
+            'name' => 'MARKTYPE_TEXT',
+            'id'   => 'MARKTYPE_VALUE',
+            'slug' => 'MARKTYPE_SLUG'
         ));
 
         // if the rubric creation fails it will throw an exception, in which case just output the empty sets
