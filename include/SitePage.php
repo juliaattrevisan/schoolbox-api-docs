@@ -843,13 +843,34 @@ class SitePage extends Page {
         $selected = is_array($selected) ? $selected : array($selected);
         if (is_array($data) || $data instanceof Traversable) {
             foreach ($data as $row) {
-                foreach ($row as $key => $value) {
-                    $mapping[$key] ? $key = $mapping[$key] : '';
-                    $this->setVar($key, $value);
-                    if (in_array($value, $selected)) {
-                        $this->setVar($key . '_SELECTED', 'selected="selected"');
-                    } else {
-                        $this->setVar($key . '_SELECTED', '');
+                if (is_array($row) || $row instanceof Traversable) {
+                    foreach ($row as $key => $value) {
+                        $mapping[$key] ? $key = $mapping[$key] : '';
+                        $this->setVar($key, $value);
+                        if (in_array($value, $selected)) {
+                            $this->setVar($key . '_SELECTED', 'selected="selected"');
+                        }
+                        else {
+                            $this->setVar($key . '_SELECTED', '');
+                        }
+                    }
+                }
+                elseif (is_object($row)) {
+                    //
+                    // This is an object of some sort.
+                    // SitePage is going to have to learn how to traverse models
+                    // before it dies, because I'm not going to give every model
+                    // array access.
+                    foreach ($mapping as $property => $template_var) {
+                        $get_method = 'get'.ucfirst($property);
+                        $value      = call_user_func(array($row, $get_method));
+                        $this->setVar($template_var, $value);
+                        if (in_array($value, $selected)) {
+                            $this->setVar($template_var . '_SELECTED', 'selected="selected"');
+                        }
+                        else {
+                            $this->setVar($template_var . '_SELECTED', '');
+                        }
                     }
                 }
 
