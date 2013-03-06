@@ -30,7 +30,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		));
 		$this->hasMap(array(
 			'column'     => 'type',
-			'property'   => 'type',
+			'property'   => 'workType',
 			'type'       => self::TYPE_INTEGER,
 		));
 		$this->hasMap(array(

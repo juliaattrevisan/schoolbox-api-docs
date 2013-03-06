@@ -47,7 +47,7 @@ class SubmissionBox {
 	/**
 	 * @var int
 	 */
-	protected $type;
+	protected $work_type;
 
 	/**
 	 * @var string
@@ -220,15 +220,15 @@ class SubmissionBox {
 	/**
 	 * @param int $type
 	 */
-	public function setType($type) {
-		$this->type = $type;
+	public function setWorkType($type) {
+		$this->work_type = $type;
 	}
 
 	/**
 	 * @return int
 	 */
-	public function getType() {
-		return $this->type;
+	public function getWorkType() {
+		return $this->work_type;
 	}
 
 	/**
