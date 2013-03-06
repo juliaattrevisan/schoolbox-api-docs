@@ -36,7 +36,10 @@ $mark_mapper = new SubmissionBox\MarkTypeMapper();
 $subBoxHandler = new Submission();
 $rubricHandler = new DueWork_Rubric_Handler();
 
-$work_types = $type_mapper->getAll();
+//
+// Should work types include or not include online assessments?
+// They do for pre-existing items, they don't for new items.
+$work_types = $type_mapper->getAllExcept(SubmissionBox::WORKTYPE_ONLINE_ASSESSMENT);
 $mark_types = $mark_mapper->getAll();
 
 // IF PRE-EXISTING
@@ -44,6 +47,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     //Modify submission box
     $this->setTitle('Modify Submission Box');
 
+//	$submission = $mapper->findById($this->arg[1]);
     $subbox = $subBoxHandler->getByID($this->arg[1]);
 
     /* Output category information */
@@ -198,6 +202,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     //Create submission box
     $this->setTitle('Create Submission Box');
 
+//	$submission = $mapper->findById($this->arg[1]);
     $subbox = $subBoxHandler->getByID($this->arg[1]);
 
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
@@ -240,17 +245,17 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
     // Output submission type drop down (exclude online assessment type)
 
-	$types = $subBoxHandler->getTypesExcept(array(Assess_Main::ONLINE_ASSESSMENT_TYPE_ID));
-	$this->dropDown('type_drop', $types, $this->arg[3],TEMPLATE_content, array(
+//	$types = $subBoxHandler->getTypesExcept(array(Assess_Main::ONLINE_ASSESSMENT_TYPE_ID));
+	$this->dropDown('type_drop', $work_types, $this->arg[3], TEMPLATE_content, array(
         'name' => 'TYPE_TEXT',
         'id'   => 'TYPE_VALUE'
     ));
 
     // Output marktype drop down
-    $this->dropdown('marktype_drop', $subBoxHandler->getMarkTypes(), $subbox['mark_type'], 'marktype', array(
-        'hr_name'      => 'MARKTYPE_TEXT',
-        'mark_type_id' => 'MARKTYPE_VALUE',
-        'slug'         => 'MARKTYPE_SLUG'
+    $this->dropdown('marktype_drop', $mark_types, $subbox['mark_type'], 'marktype', array(
+        'name' => 'MARKTYPE_TEXT',
+        'id'   => 'MARKTYPE_VALUE',
+        'slug' => 'MARKTYPE_SLUG'
     ));
 
     outputResultSets($this);
