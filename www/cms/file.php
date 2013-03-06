@@ -115,7 +115,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 		'FILE_ID' => '',
 		'DESCRIPTION' => '',
 		'COMMENT' => '',
-		'HIDDEN_SELECTED' => '',
+		'HIDDEN_SELECTED' => (Cfg::get('file_default_to_hidden') ? 'checked="checked"' : ''),
 		'MAX_FILE_SIZE' => Cfg::get('max_file_size'),
 		'CATEGORY_NAME' => Scrub::text($category['name']),
 		'CATEGORY_ID' => $category['id'],
@@ -212,6 +212,7 @@ else if($this->arg[0] == 'multi' && is_numeric($this->arg[1])) {
         'CATEGORY_NAME'		=> Scrub::text($category['name']),
         'CATEGORY_ID'		=> $category['id'],
         'FILE_max_upload'	=> Cfg::get('file_upload_count'),
+        'HIDDEN_SELECTED'	=> (Cfg::get('file_default_to_hidden') ? 'checked="checked"' : ''),
         'SESSION_NAME'		=> session_name(),
         'SESSION_ID'		=> session_id(),
     );
@@ -231,7 +232,8 @@ else if($this->arg[0] == 'multicat') {
 	$this->setTab('resources');
 
 	$output = array(
-		'MAX_FILE_SIZE'	=> Cfg::get('max_file_size'),
+		'MAX_FILE_SIZE'   => Cfg::get('max_file_size'),
+		'HIDDEN_SELECTED' => (Cfg::get('file_default_to_hidden') ? 'checked="checked"' : ''),
 	);
 
 	$this->setVar($output);
