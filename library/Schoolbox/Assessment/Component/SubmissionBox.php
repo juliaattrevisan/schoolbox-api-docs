@@ -16,6 +16,17 @@ use Schoolbox\Assessment\Component\SubmissionBox\NotificationCollection;
 
 class SubmissionBox {
 
+	const WORKTYPE_ASSESSMENT_TASK   = 1;
+	const WORKTYPE_ASSIGNMENT        = 2;
+	const WORKTYPE_HOMEWORK          = 3;
+	const WORKTYPE_ESSAY             = 5;
+	const WORKTYPE_RESEARCH_PROJECT  = 6;
+	const WORKTYPE_CLASS_WORK        = 7;
+	const WORKTYPE_PRESENTATION      = 8;
+	const WORKTYPE_ORAL              = 9;
+	const WORKTYPE_EXTENSION         = 10;
+	const WORKTYPE_ONLINE_ASSESSMENT = 11;
+
 	const MARKTYPE_PERCENT = 1;
 	const MARKTYPE_LETTER  = 2;
 	const MARKTYPE_RAW     = 3;
