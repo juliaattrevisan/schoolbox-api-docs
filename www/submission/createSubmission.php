@@ -207,8 +207,6 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     //Create submission box
     $this->setTitle('Create Submission Box');
 
-	$submission = $mapper->findById($this->arg[1]);
-
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
@@ -255,7 +253,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     ));
 
     // Output marktype drop down
-    $this->dropdown('marktype_drop', $mark_types, $submission->getMarkType(), 'marktype', array(
+    $this->dropdown('marktype_drop', $mark_types, null, 'marktype', array(
         'name' => 'MARKTYPE_TEXT',
         'id'   => 'MARKTYPE_VALUE',
         'slug' => 'MARKTYPE_SLUG'
