@@ -80,16 +80,20 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'property'   => 'acceptMultiple',
 			'type'       => self::TYPE_BOOLEAN,
 		));
+		//
+		// TODO add TYPE_DATETIME
 		$this->hasMap(array(
 			'column'     => 'created',
 			'property'   => 'created',
 			'type'       => self::TYPE_STRING,
 			'created_timestamp' => true,
 		));
+		//
+		// TODO add TYPE_MODEL and TYPE_COLLECTION
 		$this->hasMap(array(
 			'column'     => 'mark_type',
 			'property'   => 'markType',
-			'type'       => self::TYPE_BOOLEAN,
+			'type'       => self::TYPE_INTEGER,
 		));
 		$this->hasMap(array(
 			'column'     => 'max_mark',
@@ -116,8 +120,20 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'other_key' => 'box_id',
 		));
 
+		$this->hasJoin('work_type', array(
+			'mapper'    => new SubmissionBox\WorkTypeMapper(),
+			'this_key'  => 'type',
+			'other_key' => 'id',
+		));
+
+		$this->hasJoin('mark_type', array(
+			'mapper'    => new SubmissionBox\MarkTypeMapper(),
+			'this_key'  => 'mark_type',
+			'other_key' => 'mark_type_id',
+		));
+
 		//
-		// $this->hasCollection?
+		// TODO add Mapper->hasCollection?
 		$this->hasJoin('notify', array(
 			'multiple'  => true,
 			'mapper'    => new NotificationMapper(),
@@ -164,6 +180,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$statement->execute(array($id));
 
 		$submission_box = false;
+		//
+		// TODO Add work type and mark type models.
 		foreach ($statement as $row) {
 			if (!$submission_box) {
 				$submission_box = $this->hydrate($row, 'sb');
