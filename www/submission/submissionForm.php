@@ -156,7 +156,7 @@ $submission->setDueDate($dueDate->getDatabase());
 $submission->setLateDate($lateDate->getDatabase());
 $submission->setName($_POST['name']);
 $submission->setDescription($_POST['description']);
-$submission->setType($_POST['type']);
+$submission->setWorkType($_POST['type']);
 $submission->setMarkType($markTypeID);
 $submission->setRubricResultSet($resultSetID);
 $submission->setMaxMark($markMax);
