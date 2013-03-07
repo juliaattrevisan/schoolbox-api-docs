@@ -33,7 +33,6 @@ $mapper      = new SubmissionBoxMapper();
 $type_mapper = new SubmissionBox\WorkTypeMapper();
 $mark_mapper = new SubmissionBox\MarkTypeMapper();
 
-$subBoxHandler = new Submission();
 $rubricHandler = new DueWork_Rubric_Handler();
 
 //
@@ -48,9 +47,6 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $this->setTitle('Modify Submission Box');
 
     $submission = $mapper->findById($this->arg[1]);
-    $subbox = $subBoxHandler->getByID($this->arg[1]);
-
-//	$submission->get
 
     /* Output category information */
 	$cat_name = $submission->getCategoryName();
@@ -211,8 +207,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     //Create submission box
     $this->setTitle('Create Submission Box');
 
-//	$submission = $mapper->findById($this->arg[1]);
-    $subbox = $subBoxHandler->getByID($this->arg[1]);
+	$submission = $mapper->findById($this->arg[1]);
 
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
@@ -254,14 +249,13 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
     // Output submission work_type drop down (exclude online assessment work_type)
 
-//	$types = $subBoxHandler->getTypesExcept(array(Assess_Main::ONLINE_ASSESSMENT_TYPE_ID));
 	$this->dropDown('type_drop', $work_types, $this->arg[3], TEMPLATE_content, array(
         'name' => 'TYPE_TEXT',
         'id'   => 'TYPE_VALUE'
     ));
 
     // Output marktype drop down
-    $this->dropdown('marktype_drop', $mark_types, $subbox['mark_type'], 'marktype', array(
+    $this->dropdown('marktype_drop', $mark_types, $submission->getMarkType(), 'marktype', array(
         'name' => 'MARKTYPE_TEXT',
         'id'   => 'MARKTYPE_VALUE',
         'slug' => 'MARKTYPE_SLUG'
