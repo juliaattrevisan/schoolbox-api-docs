@@ -116,6 +116,16 @@ class Synchronise_Synergetic_Bialik_Strategy_Staff extends Synchronise_Synergeti
 		$this->getVerboseFilter()->summary();
 	}
 
+    /**
+     * Do not move staff between groups
+     *
+     * @param $newUser
+     * @return mixed
+     */
+    protected function userExists($newUser) {
+        return $this->userExistsBySynergyAndGroup($newUser);
+    }
+
     /*
      * Fetches staff campus from timetable table
      */
