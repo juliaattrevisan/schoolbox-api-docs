@@ -220,6 +220,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$objects = $this->getModelAsCollection($object);
 		$result  = parent::save($objects);
 		if ($result) {
+			//
+			// TODO: add pre-save, pre-delete, post-save, post-delete hooks.
+			// Implement this sort of logic in those instead of in extended
+			// save methods.
+			// Consider a publish/subscribe event system.
 			foreach ($objects as $this_object) {
 				if ($box_file = $this_object->getFileLink()) {
 					$box_file->setSubmissionBoxId($this_object->getId());
