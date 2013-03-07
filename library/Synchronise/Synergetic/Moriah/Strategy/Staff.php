@@ -24,6 +24,16 @@ class Synchronise_Synergetic_Moriah_Strategy_Staff extends Synchronise_Synergeti
 		$this->collateList($this->getExternalUserHandler()->getStaffUserAccountInfo());
 	}
 
+    /**
+     * Do not move staff between groups
+     *
+     * @param $newUser
+     * @return mixed
+     */
+    protected function userExists($newUser) {
+        return $this->userExistsBySynergyAndGroup($newUser);
+    }
+
 	/**
 	 * Set up the new user's details
 	 *
