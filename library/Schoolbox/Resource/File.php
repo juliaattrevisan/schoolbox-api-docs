@@ -260,6 +260,16 @@ class File {
 	}
 
 	/**
+	 * Gets the icon for this file from its filename.
+	 *
+	 * @return string
+	 */
+	public function getIconFromFilename() {
+		$mapper = new MimetypeMapper();
+		return $mapper->getIconForFilename($this->getFilename());
+	}
+
+	/**
 	 * Deletes file from permanent upload location.
 	 *
 	 * @return bool

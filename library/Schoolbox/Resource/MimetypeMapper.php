@@ -11,12 +11,13 @@ namespace Schoolbox\Resource;
 use Schoolbox;
 
 class MimetypeMapper extends Schoolbox\Mapper {
-	public function getMimetypeForFilename($filename) {
+
+	protected function getExtensionInfo($filename) {
 		//
 		// Copied from AllowedFile methods getExtension() and getMimetype()
 		$extension = substr(strrchr($filename, "."), 1);
 		$query = "
-			SELECT mime
+			SELECT mime, iconFile
 			FROM allowedFileExtension afe
 			LEFT JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
 			WHERE extension = ?
@@ -25,8 +26,18 @@ class MimetypeMapper extends Schoolbox\Mapper {
 		$statement->execute(array($extension));
 
 		if ($row = $statement->fetch()) {
-			return $row['mime'];
+			return $row;
 		}
 		return false;
+	}
+
+	public function getMimetypeForFilename($filename) {
+		$extension_info = $this->getExtensionInfo($filename);
+		return $extension_info['mime'];
+	}
+
+	public function getIconForFilename($filename) {
+		$extension_info = $this->getExtensionInfo($filename);
+		return $extension_info['iconFile'];
 	}
 }
