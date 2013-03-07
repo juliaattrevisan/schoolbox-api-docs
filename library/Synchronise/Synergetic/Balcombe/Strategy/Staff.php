@@ -45,8 +45,7 @@ class Synchronise_Synergetic_Balcombe_Strategy_Staff extends Synchronise_Synerge
 		$newUser['firstname'] = $currentUser['StaffPreferredName'];
 		$newUser['lastname'] = $currentUser['StaffSurname'];
         $newUser['synergy_id'] = $currentUser['StaffID'];
-		$newUser['alt_email'] = '';
-        $newUser['local_email'] = 1;
+		$newUser['alt_email'] = $currentUser['Email'];
 
 		// Campus config: needs to map to a campus id
 		$newUser['defaultCampus'] = $this->getCampusFromCode($currentUser['StaffCampus']);
@@ -55,6 +54,8 @@ class Synchronise_Synergetic_Balcombe_Strategy_Staff extends Synchronise_Synerge
 		// Staff Group ID
         // TODO determine how to map to the 10 different groups, or perhaps not at all
 		$newUser['group_id'] =  $this->getGroupIDFromCategory($currentUser['StaffCategoryType']);
+
+		$newUser = $this->setMailSettingsOnNewUser($newUser);
 
 		return $newUser;
 	}

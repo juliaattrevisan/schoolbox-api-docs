@@ -65,6 +65,8 @@ class Synchronise_Synergetic_Balcombe_Strategy_Student extends Synchronise_Syner
 		// Student Group ID
 		$newUser['group_id'] = $this->getGroupIDFromYearLevel($currentUser['StudentYearLevel']);
 
+		$newUser = $this->setMailSettingsOnNewUser($newUser);
+
 		return $newUser;
 	}
 

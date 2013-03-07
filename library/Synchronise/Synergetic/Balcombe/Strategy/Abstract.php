@@ -112,6 +112,24 @@ abstract class Synchronise_Synergetic_Balcombe_Strategy_Abstract extends Synchro
 	}
 
 	/**
+	 * Sets mail settings on the new user - mail handler is on, and local email
+	 * is switched off for new users, but unchanged for existing users.
+	 *
+	 * @param  $newUser
+	 * @return array
+	 */
+	protected function setMailSettingsOnNewUser($newUser) {
+		if ($this->userExists($newUser)) {
+			unset($newUser['local_email']);
+		}
+		else {
+			$newUser['local_email'] = 0;
+		}
+		$newUser['mail_handler'] = 1;
+		return $newUser;
+	}
+
+	/**
 	 * Determine if user exists in Schoolbox, to be implemented by extending classes
 	 *
 	 * @param $newUser

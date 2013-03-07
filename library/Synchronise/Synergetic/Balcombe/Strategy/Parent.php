@@ -70,6 +70,8 @@ class Synchronise_Synergetic_Balcombe_Strategy_Parent extends Synchronise_Synerg
         $newUser['group_id'] = self::PARENT_GROUP_ID;
         $newUser['defaultCampus'] = $newUser['campus'][0];
 
+		$newUser = $this->setMailSettingsOnNewUser($newUser);
+
         return $newUser;
 	}
 
