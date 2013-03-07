@@ -8,7 +8,7 @@
  */
 
 namespace Schoolbox\Resource;
-use \Cfg;
+use Schoolbox\ConfigLoader;
 
 class File {
 
@@ -60,9 +60,24 @@ class File {
 	protected $temp_location;
 
 	/**
-	 * @var callable
+	 * @var MimetypeMapper
 	 */
-	protected $file_location_method;
+	protected $mimetype_loader;
+
+	/**
+	 * @var ConfigLoader
+	 */
+	protected $config_loader;
+
+	/**
+	 * Creates object and sets up sub-objects.
+	 */
+	public function __construct() {
+		//
+		// Don't really want to load a mapper here, but meh.
+		$this->mimetype_loader = new MimetypeMapper();
+		$this->config_loader   = new ConfigLoader();
+	}
 
 	/**
 	 * @param string $filename
@@ -191,25 +206,6 @@ class File {
 	}
 
 	/**
-	 * Sets the method for getting file location as different from the default.
-	 *
-	 * The default method uses the Config singleton, which is a pain to unit
-	 * test!
-	 *
-	 * @param callable $callback
-	 */
-	public function setFileLocationMethod($callback) {
-		$this->file_location_method = $callback;
-	}
-
-	/**
-	 * Clears file location method set with setFileLocationMethod().
-	 */
-	public function clearFileLocationMethod() {
-		$this->file_location_method = null;
-	}
-
-	/**
 	 * Gets the location at which this file would be stored.
 	 *
 	 * @return string
@@ -225,13 +221,7 @@ class File {
 		// post-construct configuration as possible, but I also want this to be
 		// testable.
 		// Dependiency Injection to the rescue?
-		$file_location = null;
-		if (is_callable($this->file_location_method)) {
-			return call_user_func($this->file_location_method, $id);
-		}
-		else {
-			return Cfg::get('storage_dir') . '/' . $id . '.dat';
-		}
+		return $this->config_loader->get('storage_dir') . '/' . $id . '.dat';
 	}
 
 	/**
@@ -257,10 +247,7 @@ class File {
 		if (!isset($filename)) {
 			return false;
 		}
-		//
-		// Don't really want to load a mapper here, but meh.
-		$mapper = new MimetypeMapper();
-		if ($mimetype = $mapper->getMimetypeForFilename($filename)) {
+		if ($mimetype = $this->mimetype_loader->getMimetypeForFilename($filename)) {
 			$this->setMime($mimetype);
 			return true;
 		}
@@ -300,8 +287,7 @@ class File {
 	 * @return string
 	 */
 	public function getIconFromFilename() {
-		$mapper = new MimetypeMapper();
-		return $mapper->getIconForFilename($this->getFilename());
+		return $this->mimetype_loader->getIconForFilename($this->getFilename());
 	}
 
 	/**
@@ -313,5 +299,33 @@ class File {
 		if (file_exists($file_location = $this->getFileLocation())) {
 			return unlink($file_location);
 		}
+	}
+
+	/**
+	 * @param \Schoolbox\ConfigLoader $config_loader
+	 */
+	public function setConfigLoader($config_loader) {
+		$this->config_loader = $config_loader;
+	}
+
+	/**
+	 * @return \Schoolbox\ConfigLoader
+	 */
+	public function getConfigLoader() {
+		return $this->config_loader;
+	}
+
+	/**
+	 * @param \Schoolbox\Resource\MimetypeMapper $mimetype_loader
+	 */
+	public function setMimetypeLoader($mimetype_loader) {
+		$this->mimetype_loader = $mimetype_loader;
+	}
+
+	/**
+	 * @return \Schoolbox\Resource\MimetypeMapper
+	 */
+	public function getMimetypeLoader() {
+		return $this->mimetype_loader;
 	}
 }
