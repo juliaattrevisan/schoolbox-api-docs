@@ -336,9 +336,24 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         // TODO implement from schoolbox internal rather than external
     }
 
-    public function getPortrait($externalUserId) {
-        // TODO find out strategy for locating and returning portraits at TIGS
+    /**
+     * Returns a local path to the user's portrait
+     *
+     * @param Integer $externalUserId
+     * @return Bool|String
+     */
+    public function getPortrait ($externalUserId) {
+
+        $portraitPath = realpath( Config::get('portrait_dir') ) . "/$externalUserId.jpg";
+
+        if ( is_readable($portraitPath) ) {
+            return $portraitPath;
+        }
+        else {
+            return false;
+        }
     }
+
 
     /**
      * Sync Method: Student
@@ -381,7 +396,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      * Method not implemented
      * @deprecated
      */
-    public function getStudentContactListExtended($yearLevel) { }
+    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form) { }
 
     /**
      * Method not implemented
