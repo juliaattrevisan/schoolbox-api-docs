@@ -70,6 +70,13 @@ abstract class Synchronise_Denbigh_Kings_Abstract extends Synchronise_Denbigh_Ab
             return;
         }
 
+        //
+        // SB-2035: strip non-ASCII chars from input.
+        $newUser = array_map(
+            function($v) { return iconv('UTF-8', 'ASCII//TRANSLIT', $v); },
+            $newUser
+        );
+
         // does the user exist in schoolbox?
         if($this->userExists($newUser)) {
             // if yes, update details
