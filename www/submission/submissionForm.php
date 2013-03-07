@@ -66,6 +66,12 @@ if (isset($_FILES['file']['name']) && $_FILES['file']['name']) {
 
 	//
 	// Delete existing file link (if there is one!)
+	$file_link = $submission->getFileLink();
+	if ($file_link_id = $file_link->getId()) {
+		SubmissionBox\FileMapper::getInstance()->delete($file_link);
+		$file_link->setId(null);
+		$file_link->setFileId(null);
+	}
 
 	//
 	// Add the uploaded file to the submission box.
@@ -163,9 +169,6 @@ $submission->setMaxMark($markMax);
 if ($legacy_file_id) {
 	$submission->setLegacyFileId($legacy_file_id);
 }
-//if ($storage_id) {
-//	$storage_id
-//}
 
 // append the notification data to be parsed in
 foreach(array('overdue', 'upcoming', 'returned') as $i) {
@@ -175,15 +178,6 @@ foreach(array('overdue', 'upcoming', 'returned') as $i) {
 	$submission->addNotification($notification);
 }
 
-//// only set this field if there's actually something to put in it
-//if ($legacy_file_id) {
-//	$submissionBox['fid'] = $legacy_file_id;
-//}
-//if ($storage_id) {
-//	$submissionBox['storage_id'] = $storage_id;
-//}
-
-//die();
 // create new
 if($action == 'create') {
 	$submission->setCategory($categoryID);
