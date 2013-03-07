@@ -11,6 +11,7 @@ $this->setTab('submission');
 
 $this->setBlock(TEMPLATE_content, 'subject', 'subject_block');
 $this->setBlock(TEMPLATE_content, 'download', 'download_block');
+$this->setBlock(TEMPLATE_content, 'legacy_download', 'legacy_download_block');
 $this->setBlock(TEMPLATE_content, 'action_submit', 'action_submit_block');
 $this->setBlock(TEMPLATE_content, 'recent_submission', 'recent_submission_block');
 $this->setBlock(TEMPLATE_content, 'show_owner', 'show_owner_block');
@@ -35,6 +36,9 @@ $this->setBlock('work', 'work_grade', 'work_grade_block');
 $this->setBlock('history_marked', 'history_marked_hascomment', 'history_marked_hascomment_block');
 $this->setVar('teacher_block', '');
 
+use Schoolbox\Assessment\Component;
+$mapper = new Component\SubmissionBoxMapper();
+
 $userHandler = new User;
 $groupHandler = new Group;
 $submissionHandler = new Submission;
@@ -46,6 +50,8 @@ if (is_numeric($this->arg[1]) && ($groupHandler->isParentOfChild($this->arg[1]) 
 }
 else {
     //displaying users on due work, so log this as the last time they viewed due work
+	// logger, level, event, message, extras = array()
+//	Logger::log('info', 'view_due_work');
     $submissionHandler->logPageView(1);
     $submissionHandler->logPageView(2);
     $userID = $_SESSION['id'];
@@ -82,8 +88,10 @@ if (is_array($categoryList)) {
 
 /* Submission Box Details
  */
+$submission = $mapper->findById($this->arg[0]);
 $submissionBox = $submissionHandler->getByID($this->arg[0]);
-$owner = $userHandler->getByID($submissionBox['owner']);
+$owner = $userHandler->getByID($submission->getOwner());
+//var_dump($submission);
 
 $this->setVar(array(
     'OWNER_ID' => $owner['uid'],
@@ -96,7 +104,7 @@ $userHandler = new User();
 $groupHandler = new Group();
 $catHandler = new Category();
 
-$codes = $catHandler->getCodeForCategory($submissionBox['category']);
+$codes = $catHandler->getCodeForCategory($submission->getCategory());
 
 if($codes && count($codes)) {
     $classCode = $codes['codes'];
@@ -122,8 +130,8 @@ if($codes && count($codes)) {
     }
 }
 
-$dueDate = new Alaress_Date_Relative($submissionBox['date'],'y-m-d');
-$createdDate = new Alaress_Date_Relative($submissionBox['created'], 'y-m-d');
+$dueDate = new Alaress_Date_Relative($submission->getDueDate(),'y-m-d');
+$createdDate = new Alaress_Date_Relative($submission->getCreated(), 'y-m-d');
 
 $allWork = $submissionHandler->getSubmissionHistory($userID, $this->arg[0]);
 
@@ -131,17 +139,17 @@ $urgency = ($dueDate->getUnixTimestamp() - time()) / 86400;
 $gradient = max(0, min(10, $urgency));
 
 $this->setVar(array(
-    'CATEGORY_NAME' => Scrub::text($submissionBox['categoryName']),
-    'CATEGORY_ID' => $submissionBox['cid'],
+    'CATEGORY_NAME' => Scrub::text($submission->getCategoryName()),
+    'CATEGORY_ID'   => $submission->getCategory(),
     'CATEGORY_THUMB' => '',
 
     'BOX_DUEDATE' => $dueDate->getRelativeTime(),
     'BOX_DUEDATE_GRADIENT' => $gradient,
 
-    'BOX_ID' => $submissionBox['id'],
-    'BOX_NAME' => Scrub::text($submissionBox['name']),
+    'BOX_ID' => $submission->getId(),
+    'BOX_NAME' => Scrub::text($submission->getName()),
     'BOX_OWNER' => $userHandler->formatName($user),
-    'BOX_DESCRIPTION' => Scrub::text($submissionBox['description']),
+    'BOX_DESCRIPTION' => Scrub::text($submission->getDescription()),
     'BOX_TYPE' => $submissionBox['typeName'],
     'BOX_CREATED' => $createdDate->getRelativeTime()
 ));
@@ -156,22 +164,36 @@ else {
 
 /* Check whether a file is associated with the work
  */
-if($submissionBox['fid'] && is_numeric($submissionBox['fid'])) {
+$legacy_file_id = $submission->getLegacyFileId();
+if($legacy_file_id && is_numeric($legacy_file_id)) {
     $fileHandler = new File;
     $file = $fileHandler->getByID($submissionBox['fid']);
 
     $this->setVar(array(
-        'FILE_ID' => $submissionBox['fid'],
+        'FILE_ID'    => $submissionBox['fid'],
         'FILE_THUMB' => $file['iconFile'],
-        'FILE_SIZE' => Alaress_Byte_Format::bytesToString($file['file_size']),
-        'FILE_NAME' => $file['realname'],
-        'FILE_DATE' => date('jS M Y, g:ia', $file['submitted'])
+        'FILE_SIZE'  => Alaress_Byte_Format::bytesToString($file['file_size']),
+        'FILE_NAME'  => $file['realname'],
+        'FILE_DATE'  => date('jS M Y, g:ia', $file['submitted'])
     ));
-
+    $this->parse('legacy_download_block', 'legacy_download');
+    $this->setVar('download_block', '');
+}
+elseif ($file_id = $submission->getFileLink()->getId()) {
+    $file = $submission->getFileLink()->getFile();
+    $this->setVar(array(
+        'FILE_HASH'  => $file->getHash(),
+        'FILE_THUMB' => $file->getIconFromFilename(),
+        'FILE_SIZE'  => Alaress_Byte_Format::bytesToString($file->getFilesize()),
+        'FILE_NAME'  => $file->getFilename(),
+        'FILE_DATE'  => date('jS M Y, g:ia', strtotime($file->getUploadedOn()))
+    ));
     $this->parse('download_block', 'download');
+    $this->setVar('legacy_download_block', '');
 }
 else {
-	$this->setVar('download_block', '');
+    $this->setVar('legacy_download_block', '');
+    $this->setVar('download_block', '');
 }
 
 $usersList = array();
