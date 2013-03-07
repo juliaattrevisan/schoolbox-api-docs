@@ -500,7 +500,8 @@ abstract class Mapper {
                 $columnName = "$alias.$columnName";
             }
 
-            $this->setModelProperty($model, $propertyName, $row[$columnName]);
+			$columnValue = array_key_exists($columnName, $row) ? $row[$columnName] : null;
+            $this->setModelProperty($model, $propertyName, $columnValue);
         }
 
         if (!empty($callback)) {
