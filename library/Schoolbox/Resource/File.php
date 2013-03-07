@@ -59,6 +59,10 @@ class File {
 	 */
 	protected $temp_location;
 
+	/**
+	 * @var callable
+	 */
+	protected $file_location_method;
 
 	/**
 	 * @param string $filename
@@ -187,6 +191,25 @@ class File {
 	}
 
 	/**
+	 * Sets the method for getting file location as different from the default.
+	 *
+	 * The default method uses the Config singleton, which is a pain to unit
+	 * test!
+	 *
+	 * @param callable $callback
+	 */
+	public function setFileLocationMethod($callback) {
+		$this->file_location_method = $callback;
+	}
+
+	/**
+	 * Clears file location method set with setFileLocationMethod().
+	 */
+	public function clearFileLocationMethod() {
+		$this->file_location_method = null;
+	}
+
+	/**
 	 * Gets the location at which this file would be stored.
 	 *
 	 * @return string
@@ -196,7 +219,19 @@ class File {
 		if (!isset($id)) {
 			return false;
 		}
-		return Cfg::get('storage_dir') . '/' . $id . '.dat';
+		//
+		// TODO move away from singletons, and move toward some other config.
+		// We have a dilemma - I want this class to require as little
+		// post-construct configuration as possible, but I also want this to be
+		// testable.
+		// Dependiency Injection to the rescue?
+		$file_location = null;
+		if (is_callable($this->file_location_method)) {
+			return call_user_func($this->file_location_method, $id);
+		}
+		else {
+			return Cfg::get('storage_dir') . '/' . $id . '.dat';
+		}
 	}
 
 	/**
