@@ -215,6 +215,9 @@ class Mediator {
         $r->setCore('className',  $this->getClassName(false));
         $r->setCore('methodName', $this->getMethodName());
         $r->setCore('methodArgs', $this->getMethodArgs());
+        //
+        // Makes sense to fit session ID in core, I think.
+        $r->setCore('sessionId',  session_id());
 
         // map simple site config variables
         $map = array(
@@ -314,6 +317,7 @@ class Mediator {
             'Core_Auth_API::Login',
             'Core_Auth_API::ForgotPassword',
             'Core_Auth_API::Logout',
+            'Core_Auth_API::AmILoggedIn',
             'Core_Settings_API::Skin'
         );
 

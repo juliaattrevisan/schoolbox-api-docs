@@ -54,4 +54,12 @@ class Core_Auth_API extends Generic_API {
         $response->addInternalRedirectHeader('core/auth/login');
         return $response;
     }
+
+    public function AmILoggedIn() {
+        $a = new Authenticator();
+        $response = new Response_HTTP();
+        $response->setResponse('logged_in', $a->isAuthenticated());
+        $response->setPage('type', 'json');
+        return $response;
+    }
 }

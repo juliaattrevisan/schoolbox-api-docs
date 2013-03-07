@@ -13,7 +13,7 @@
         wp:     ~navigator.userAgent.indexOf('WP7')
                 || ~navigator.userAgent.indexOf('Windows Phone'),
         fullscreen: (window.navigator.standalone) ? window.navigator.standalone : localStorage.getItem('pinned'),
-        loggedIn: (sessionStorage.getItem('session')),
+        loggedIn: (sessionStorage.getItem('session') || "{{ core.sessionId | default('') | e('js')}}"),
         tablet: (screen.width>=768 || screen.height>=768),
         style: window.getComputedStyle(document.body,':after').getPropertyValue('content'),
         lastWidth: 0,
@@ -26,6 +26,9 @@
                 xhr.send(null);
             onLine = (xhr.status === 200);
             return onLine;
+        },
+        isCurrentlyLoggedIn: function() {
+            return env.loggedIn;
         },
         status: function (x) {
             if(!x){
