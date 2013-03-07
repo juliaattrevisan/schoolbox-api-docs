@@ -38,6 +38,7 @@ $this->setVar('teacher_block', '');
 
 use Schoolbox\Assessment\Component;
 $mapper = new Component\SubmissionBoxMapper();
+$work_mapper = new Component\SubmissionBox\WorkTypeMapper();
 
 $userHandler = new User;
 $groupHandler = new Group;
@@ -89,9 +90,7 @@ if (is_array($categoryList)) {
 /* Submission Box Details
  */
 $submission = $mapper->findById($this->arg[0]);
-$submissionBox = $submissionHandler->getByID($this->arg[0]);
 $owner = $userHandler->getByID($submission->getOwner());
-//var_dump($submission);
 
 $this->setVar(array(
     'OWNER_ID' => $owner['uid'],
@@ -150,7 +149,7 @@ $this->setVar(array(
     'BOX_NAME' => Scrub::text($submission->getName()),
     'BOX_OWNER' => $userHandler->formatName($user),
     'BOX_DESCRIPTION' => Scrub::text($submission->getDescription()),
-    'BOX_TYPE' => $submissionBox['typeName'],
+    'BOX_TYPE' => $work_mapper->getNameFromId($submission->getWorkType()),
     'BOX_CREATED' => $createdDate->getRelativeTime()
 ));
 
@@ -167,10 +166,10 @@ else {
 $legacy_file_id = $submission->getLegacyFileId();
 if($legacy_file_id && is_numeric($legacy_file_id)) {
     $fileHandler = new File;
-    $file = $fileHandler->getByID($submissionBox['fid']);
+    $file = $fileHandler->getByID($legacy_file_id);
 
     $this->setVar(array(
-        'FILE_ID'    => $submissionBox['fid'],
+        'FILE_ID'    => $legacy_file_id,
         'FILE_THUMB' => $file['iconFile'],
         'FILE_SIZE'  => Alaress_Byte_Format::bytesToString($file['file_size']),
         'FILE_NAME'  => $file['realname'],
@@ -250,7 +249,7 @@ if (is_array($allWork) && count($allWork)) {
         $comment = Scrub::Text($currentWork['comment']);
 
         // perform shortening if the marktype is letter, or if the given grade is an error
-        if($submissionBox['mark_type_slug'] == 'letter' || in_array($currentWork['mark'], $errors)) {
+        if($submission->getMarkType() == Component\SubmissionBox::MARKTYPE_LETTER || in_array($currentWork['mark'], $errors)) {
             $mark = $returnHandler->shortenGrade($currentWork['mark']);
         } else {
             $mark = Scrub::Text($currentWork['mark']);
@@ -353,7 +352,7 @@ else {
 }
 
 // set the teacher details
-$teacher = $userHandler->getByID($submissionBox['owner']);
+$teacher = $userHandler->getByID($submission->getOwner());
 $this->setVar(array(
     'TEACHER_ID' => $teacher['uid'],
     'TEACHER_NAME' => $userHandler->formatName($teacher),
@@ -371,7 +370,7 @@ if($recentSubmission['sid']) {
     // override the due gradient because we have submitted
     $this->setVar('BOX_DUEDATE_GRADIENT', 'black');
 
-    if ($recentSubmission['date'] > date('U', strtotime($submissionBox['date']))) {
+    if ($recentSubmission['date'] > date('U', strtotime($submission->getDueDate()))) {
         $this->setVar('OVERDUE', 'overdue');
         $this->parse('overdue_block', 'overdue');
     }
@@ -445,13 +444,15 @@ if($recentSubmission['sid']) {
 		$this->setVar('plag_score_block', '');
 	}
 
+	$submission->getOpenDate();
+	$submission->getAcceptMultiple();
     // only allow a resubmission if the current user is the owner, if the submission box is accepting submissions, and if the current time is between open and late
     if(
         $userID == $_SESSION['id'] &&
-        mktime() > strtotime($submissionBox['open_date']) &&
-        mktime() < strtotime($submissionBox['late_date']) &&
-        $submissionBox['accept_submission'] &&
-        $submissionBox['multi_submission']
+        mktime() > strtotime($submission->getOpenDate()) &&
+        mktime() < strtotime($submission->getLateDate()) &&
+        $submission->getAcceptOnline() &&
+        $submission->getAcceptMultiple()
     ) {
         $this->parse('action_resubmit_block', 'action_resubmit');
     } else {
@@ -472,7 +473,7 @@ else {
 	 * Show Submit form
 	 * Hide the Resubmit form
 	 */
-    if($userID == $_SESSION['id'] && mktime() > strtotime($submissionBox['open_date']) && mktime() < strtotime($submissionBox['late_date']) && $submissionBox['accept_submission'])
+    if($userID == $_SESSION['id'] && mktime() > strtotime($submission->getOpenDate()) && mktime() < strtotime($submission->getLateDate()) && $submission->getAcceptOnline())
 	    $this->parse('action_submit_block', 'action_submit');
     else
         $this->setVar('action_submit_block','');
@@ -482,7 +483,7 @@ else {
 
 }
 
-if (!in_array($submissionBox['category'], $categoryIDList)) {
+if (!in_array($submission->getCategory(), $categoryIDList)) {
     $this->setVar(array(
         'action_submit_block' => '',
         'action_resubmit_block' => ''
@@ -506,7 +507,7 @@ if (is_numeric($returnedWork['rid'])) {
         $size = '0 KB';
     }
 
-    $returnDate = new Alaress_Date_Relative($submissionBox['date'],'y-m-d');
+    $returnDate = new Alaress_Date_Relative($submission->getDueDate(),'y-m-d');
 
 	$this->setVar(array(
 		'RETURNED_WORK_COMMENT' => Scrub::Text($returnedWork['comment']),
@@ -531,9 +532,9 @@ else {
 }
 
 // do fun rubric things
-if($submissionBox['mark_type_slug'] == 'rubric') {
+if($submission->getMarkType() == Component\SubmissionBox::MARKTYPE_RUBRIC) {
     $rb = new DueWork_Rubric_Lightbox($this);
-    $rb->render('rubric_block', $submissionBox['id'], $user['uid']);
+    $rb->render('rubric_block', $submission->getId(), $user['uid']);
 }
 else {
     $this->setVar('rubric_block', '');
