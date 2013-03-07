@@ -96,11 +96,18 @@ class FileTest extends PHPUnit_Framework_TestCase {
 		return $mimetype;
 	}
 
-	public function testSetHashFromFileLocation() {
+	public function testLoadHashFromTempLocation() {
 		$this->file->setTempLocation(__FILE__);
 		$this->assertEquals($this->file->getHash(), '');
 		$this->file->loadHashFromTempLocation();
 		$this->assertEquals($this->file->getHash(), sha1_file(__FILE__));
+	}
+
+	public function testLoadFilesizeFromTempLocation() {
+		$this->file->setTempLocation(__FILE__);
+		$this->assertEquals($this->file->getFilesize(), false);
+		$this->file->loadFilesizeFromTempLocation();
+		$this->assertEquals($this->file->getFilesize(), filesize(__FILE__));
 	}
 
 	public function testGetFileLocation() {
