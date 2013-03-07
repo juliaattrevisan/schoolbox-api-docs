@@ -28,6 +28,15 @@ class WorkTypeMapper extends Schoolbox\Mapper {
 		));
 	}
 
+	public function getNameFromId($id) {
+		$query = "SELECT `name` FROM {$this->getTable()} t WHERE t.id=?";
+		$statement = $this->database->prepare($query);
+		$statement->execute(array($id));
+		if ($row = $statement->fetch()) {
+			return $row['name'];
+		}
+		return false;
+	}
 
 	public function getAll() {
 		$query = "SELECT {$this->getColumnString('t')} FROM {$this->getTable()} t";
