@@ -1,7 +1,7 @@
 Vagrant::Config.run do |config|
 
   config.vm.box = "ubuntu-12.04"
-  config.vm.box_url = "http://hydra.alrs/boxes/ubuntu-12.04.box"
+  config.vm.box_url = "http://vagrant.alaress-dev.com.au/ubuntu-12.04.box"
   
   config.vm.network :bridged
   config.vm.host_name = "ubuntubuild-schoolbox"
