@@ -12,20 +12,18 @@
 
 namespace Schoolbox\Resource\Test;
 use Schoolbox\Resource\FileMapper;
-use PHPUnit_Framework_TestCase;
+use Schoolbox\Test\TestCase;
 
-class FileMapperTest extends PHPUnit_Framework_TestCase {
+class FileMapperTest extends TestCase {
 
 	/**
-	 * The file mapper that's being tested.
-	 *
 	 * @var FileMapper
 	 */
-	protected $file_mapper;
+	protected $object;
 
 	public function setUp() {
-		unset($this->file_mapper);
-		$this->file_mapper = new FileMapper();
+		parent::setUp();
+		$this->object = new FileMapper();
 	}
 
 	public function testHydrate() {
@@ -37,7 +35,7 @@ class FileMapperTest extends PHPUnit_Framework_TestCase {
 			'filename'      => 'stuff.png',
 			'temp_location' => '/tmp/pngsomewhere'
 		);
-		$file = $this->file_mapper->hydrate($data);
+		$file = $this->object->hydrate($data);
 		$this->assertInstanceOf('Schoolbox\\Resource\\File', $file);
 		$this->assertEquals(4, $file->getId());
 		$this->assertEquals('stuff.png', $file->getFilename());
