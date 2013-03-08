@@ -37,10 +37,14 @@ class User {
     private $useInternalMail;  //Controls mailto or internal schoolbox mail sending
     private $calendarView; //Controls default calendar view
 
+    /**
+     * @var ConfigLoader
+     */
+    protected $config_loader;
 
     public function __construct() {
         $this->setCampusCollection(new CampusCollection(array()));
-
+        $this->setConfigLoader(new ConfigLoader());
     }
 
     /**
@@ -91,11 +95,9 @@ class User {
 
     public function getEmail() {
         if($this->localEmail == true) {
-            return $this->username .'@'. Config::get('site_domain');
+            return $this->username .'@'. $this->config_loader->get('site_domain');
         }
-
         return $this->altEmail;
-
     }
 
     public function setAltEmail($altEmail) {
@@ -251,5 +253,17 @@ class User {
     }
 
 
+    /**
+     * @param \Schoolbox\ConfigLoader $config_loader
+     */
+    public function setConfigLoader($config_loader) {
+        $this->config_loader = $config_loader;
+    }
 
+    /**
+     * @return \Schoolbox\ConfigLoader
+     */
+    public function getConfigLoader() {
+        return $this->config_loader;
+    }
 }
