@@ -19,9 +19,9 @@ class CategoryNews extends DeprecatedModel {
 				  LEFT JOIN user u ON u.id = n.owner
 				  WHERE code = '$categoryID'  AND deleted = 0 ";
 		if ($archive)
-			$query .= " AND (datetime_published <= CUR_DATE() OR owner = $userID) AND datetime_expires <  CUR_DATE()";
+			$query .= " AND (datetime_published <= CURDATE() OR owner = $userID) AND datetime_expires <  CURDATE()";
     	else
-			$query .= " AND (datetime_published <= CUR_DATE() OR owner = $userID) AND datetime_expires >= CUR_DATE()";
+			$query .= " AND (datetime_published <= CURDATE() OR owner = $userID) AND datetime_expires >= CURDATE()";
 
 		$query .= "ORDER BY datetime_posted DESC";
 
@@ -59,7 +59,7 @@ class CategoryNews extends DeprecatedModel {
                         AND `userAccess`.uid = {$_SESSION['id']}
                     WHERE (`perms`.cid OR `userAccess`.sid)
                         AND MATCH(`heading`,`body`) AGAINST ('$keyword')
-                        AND (`subject_news`.datetime_published <= CUR_DATE() OR `subject_news`.owner = {$_SESSION['id']})
+                        AND (`subject_news`.datetime_published <= CURDATE() OR `subject_news`.owner = {$_SESSION['id']})
                         AND `deleted` = FALSE
                     ORDER BY `$sort_by` $sort_dir
                     LIMIT $offset, $limit;
@@ -76,7 +76,7 @@ class CategoryNews extends DeprecatedModel {
                             AND `userAccess`.uid = {$_SESSION['id']}
                         WHERE (`perms`.cid OR `userAccess`.sid)
                             AND MATCH(`heading`,`body`) AGAINST ('$keyword')
-                            AND (`subject_news`.datetime_published <= CUR_DATE() OR `subject_news`.owner = {$_SESSION['id']})
+                            AND (`subject_news`.datetime_published <= CURDATE() OR `subject_news`.owner = {$_SESSION['id']})
                             AND `deleted` = FALSE
         ";
 
