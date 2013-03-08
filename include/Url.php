@@ -92,7 +92,7 @@ class Url
             array($hostname,
                 $this->getServerHost(),
                 $this->getSiteHostname(),
-                $this->getSiteHostname().$this->getSiteDomain()
+                $this->getSiteHostname().'.'.$this->getSiteDomain()
             )
         )) {
             return true;
