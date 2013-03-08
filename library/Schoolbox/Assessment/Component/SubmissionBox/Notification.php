@@ -38,9 +38,11 @@ class Notification {
 
 	/**
 	 * @param boolean $enabled
+	 * @return $this
 	 */
 	public function setEnabled($enabled) {
 		$this->enabled = $enabled;
+		return $this;
 	}
 
 	/**
@@ -52,9 +54,11 @@ class Notification {
 
 	/**
 	 * @param boolean $sent
+	 * @return $this
 	 */
 	public function setSent($sent) {
 		$this->sent = $sent;
+		return $this;
 	}
 
 	/**
@@ -66,9 +70,11 @@ class Notification {
 
 	/**
 	 * @param int $submission_box_id
+	 * @return $this
 	 */
 	public function setSubmissionBoxId($submission_box_id) {
 		$this->submission_box_id = $submission_box_id;
+		return $this;
 	}
 
 	/**
@@ -80,9 +86,11 @@ class Notification {
 
 	/**
 	 * @param string $type
+	 * @return $this
 	 */
 	public function setType($type) {
 		$this->type = $type;
+		return $this;
 	}
 
 	/**
