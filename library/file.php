@@ -289,6 +289,7 @@ class File extends DeprecatedModel {
 
 		$this->db->query($query);
 	}
+
 }
 
 ?>
