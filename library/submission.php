@@ -936,28 +936,42 @@ class Submission extends DeprecatedModel {
     public function getSubmissionReminderList($status) {
 
         // "retrieve the Users, their Subjects, and the DueWorks for users that have not submitted any work"
+	    //
+	    // Don't get users, just submission boxes.
+	    // Need to get users as part of another query, becuase they may be in
+	    // Synergetic.
         $stmt = Database::getInstance()->prepare(
             "
             SELECT
-              u.id u_id, u.username u_username, u.firstname u_firstname, u.lastname u_lastname,
-              u.local_email u_local_email, u.alt_email u_alt_email,
-              sb.category c_id, c.name c_name, sb.id sb_id, sb.name sb_name, sb.date sb_date
+--              u.id u_id, u.username u_username, u.firstname u_firstname, u.lastname u_lastname,
+--              u.local_email u_local_email, u.alt_email u_alt_email,
+              sb.category c_id,
+              c.name c_name,
+              GROUP_CONCAT(cc.code) c_code,
+              sb.id sb_id,
+              sb.name sb_name,
+              sb.date sb_date
             FROM submission_box sb
             LEFT JOIN category c ON sb.category = c.id
-            LEFT JOIN userAccess ua ON ua.service = 1 AND ua.sid = sb.category
-            LEFT JOIN `user` u ON ua.uid = u.id
+            LEFT JOIN categoryCode cc ON cc.categoryID = c.id
+--            LEFT JOIN userAccess ua ON ua.service = 1 AND ua.sid = sb.category
+--            LEFT JOIN `user` u ON ua.uid = u.id
             LEFT JOIN submission_notification sn ON sb.id = sn.box_id
-            WHERE u.group_id IN (SELECT id FROM groups WHERE group_type = 'student')
+--            WHERE u.group_id IN (SELECT id FROM groups WHERE group_type = 'student')
             AND sb.deleted = 0
-            AND u.id IS NOT NULL
+--            AND u.id IS NOT NULL
             AND sn.type = :notif_type
             AND sn.enabled = :notif_enabled
             AND sn.sent = :notif_sent
             AND sb.`date` BETWEEN :range_start AND :range_end
-            AND u.id NOT IN (SELECT `owner` FROM student_submission ss WHERE ss.box_id = sb.id)
-            ORDER BY u.id ASC, c.id ASC, sb.date ASC
+--            AND u.id NOT IN (SELECT `owner` FROM student_submission ss WHERE ss.box_id = sb.id)
+            GROUP BY sb.id, c.id
+            ORDER BY
+--            u.id ASC,
+            c.id ASC, sb.date ASC
         "
         );
+
 
         $now = date('Y-m-d H:i:s');
 
@@ -993,41 +1007,102 @@ class Submission extends DeprecatedModel {
         $prevUID = -1;
         $prevCID = -1;
         $emailObj = new Email();
+
+        $synHandler = new External_Class();
+	    $groupHandler = new Group();
+	    $userHandler = new User();
+	    $studentSubHandler = new SubmissionStudent();
+
+	    $students      = array();
+	    $group_members = array();
+
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+	        //
+	        // Get the list of users here.
+	        $members     = array();
+	        $submissions = $studentSubHandler->getByBoxID($row['sb_id']);
 
-            // different user, create user details
-            if ($row['u_id'] != $prevUID) {
-                $user = array(
-                    'username' => $row['u_username'],
-                    'alt_email' => $row['u_alt_email'],
-                    'local_email' => $row['u_local_email']
-                );
-                $output[$row['u_id']] = array(
-                    'id' => $row['u_id'],
-                    'firstname' => $row['u_firstname'],
-                    'lastname' => $row['u_lastname'],
-                    'alt_email' => $emailObj->formatEmailFromArray($user),
-                    'categories' => array()
-                );
-                $prevUID = $row['u_id'];
-                $prevCID = -1;
-            }
+	        if ($row['c_code'] && Cfg::get('external_enable')) {
+		        if (!array_key_exists($row['c_code'], $students)) {
+			        if (!is_array($students[$row['c_code']])) {
+				        continue;
+			        }
+			        $students[$row['c_code']] = $synHandler->getStudents($row['c_code']);
+			        //
+			        // Has only synergy ID. Need Schoolbox ID and alt and local
+			        // email.
+			        foreach ($students[$row['c_code']] as &$student) {
+				        $student_info             = $userHandler->getBySynergy($student['synergy_id']);
+				        $student['uid']           = $student_info['uid'];
+				        $student['u_username']    = $student_info['username'];
+				        $student['u_local_email'] = $student_info['local_email'];
+				        $student['u_alt_email']   = $student_info['alt_email'];
+			        }
+			        unset($student);
+		        }
+		        $members = $students[$row['c_code']];
+	        }
+	        else {
+		        if (!array_key_exists($row['c_id'], $group_members)) {
+			        $group_members[$row['c_id']] = $groupHandler->getMemberList($row['c_id']);
+			        //
+			        // Need local and alt email.
+			        if (!is_array($group_members[$row['c_id']])) {
+				        continue;
+			        }
+			        foreach ($group_members[$row['c_id']] as &$member) {
+				        $member_info             = $userHandler->getByID($member['uid']);
+				        $member['u_username']    = $member_info['username'];
+				        $member['u_local_email'] = $member_info['local_email'];
+				        $member['u_alt_email']   = $member_info['alt_email'];
+			        }
+			        unset($member);
+		        }
+		        $members = $group_members[$row['c_id']];
+	        }
 
-            // different category, create category details
-            if ($row['c_id'] != $prevCID) {
-                $output[$row['u_id']]['categories'][$row['c_id']] = array(
-                    'id' => $row['c_id'],
-                    'name' => $row['c_name'],
-                    'work' => array()
-                );
-                $prevCID = $row['c_id'];
-            }
+	        if (!is_array($members)) {
+		        continue;
+	        }
+	        foreach ($members as $member) {
+		        if (!array_key_exists($member['uid'], $output)) {
+			        $user = array(
+				        'username'    => $member['u_username'],
+				        'alt_email'   => $member['u_alt_email'],
+				        'local_email' => $member['u_local_email']
+			        );
+			        $output[$member['uid']] = array(
+				        'id'         => $member['u_id'],
+				        'firstname'  => $member['u_firstname'],
+				        'lastname'   => $member['u_lastname'],
+				        'alt_email'  => $emailObj->formatEmailFromArray($user),
+				        'categories' => array()
+			        );
+		        }
 
-            $output[$row['u_id']]['categories'][$row['c_id']]['work'][$row['sb_id']] = array(
-                'id' => $row['sb_id'],
-                'name' => $row['sb_name'],
-                'date' => $row['sb_date'],
-            );
+		        //
+		        // Load submissions for this user.
+		        if (!is_array($submissions)) {
+			        continue;
+		        }
+		        foreach ($submissions as $submission) {
+			        if ($submission['uid'] != $member['uid']) {
+				        continue;
+			        }
+			        if (!array_key_exists($row['c_id'], $output[$member['uid']])) {
+				        $output[$member['uid']]['categories'][$row['c_id']] = array(
+					        'id'   => $row['c_id'],
+					        'name' => $row['c_name'],
+					        'work' => array(),
+				        );
+			        }
+			        $output[$member['uid']]['categories'][$row['c_id']]['work'][$row['sb_id']] = array(
+				        'id'   => $row['sb_id'],
+				        'name' => $row['sb_name'],
+				        'date' => $row['sb_date'],
+			        );
+		        }
+	        }
         }
         return $output;
     }
