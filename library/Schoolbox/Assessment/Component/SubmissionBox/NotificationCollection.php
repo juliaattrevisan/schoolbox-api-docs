@@ -27,14 +27,14 @@ class NotificationCollection extends Collection {
 	}
 
 	public function getOverdue() {
-		return $this->getOfType('overdue');
+		return $this->getOfType(Notification::TYPE_OVERDUE);
 	}
 
 	public function getUpcoming() {
-		return $this->getOfType('upcoming');
+		return $this->getOfType(Notification::TYPE_UPCOMING);
 	}
 
 	public function getReturned() {
-		return $this->getOfType('returned');
+		return $this->getOfType(Notification::TYPE_RETURNED);
 	}
 }

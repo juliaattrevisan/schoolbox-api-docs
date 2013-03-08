@@ -11,6 +11,11 @@ namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox;
 
 class Notification {
+
+	const TYPE_OVERDUE  = 'overdue';
+	const TYPE_UPCOMING = 'upcoming';
+	const TYPE_RETURNED = 'returned';
+
 	/**
 	 * @var int
 	 */
