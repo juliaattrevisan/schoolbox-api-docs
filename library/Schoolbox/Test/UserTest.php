@@ -8,30 +8,38 @@
  */
 
 namespace Schoolbox\Test;
-use Schoolbox;
+use Schoolbox\User;
+use Schoolbox\TestCase;
 
-class UserTest extends PHPUnit_Framework_TestCase {
+class UserTest extends TestCase {
 
-    public function testLocalEmailAddress() {
-        $user = new User;
+	/**
+	 * @var User
+	 */
+	protected $object;
 
-        $user->setLocalEmail(true);
-        $user->setUsername('testuser');
+	protected $config_vars = array(
+		array('site_domain', 'localhost')
+	);
 
-        $expected = $user->getUsername().'@'.Cfg::get('site_domain');
+	public function setUp() {
+		parent::setUp();
+		$this->object = new User();
+		$this->object->setConfigLoader($this->mock_config);
+	}
 
-        $this->assertEquals($user->getEmail(), $expected);
-    }
+	public function testLocalEmailAddress() {
+		$this->object->setLocalEmail(true);
+		$this->object->setUsername('testuser');
+		$expected = $this->object->getUsername().'@'.$this->mock_config->get('site_domain');
+		$this->assertEquals($this->object->getEmail(), $expected);
+	}
 
-    public function testAltEmailAddress() {
-        $user = new User;
-
-        $email = 'testuser@gmail.com';
-
-        $user->setLocalEmail(false);
-        $user->setUsername('testuser');
-        $user->setAltEmail($email);
-
-        $this->assertEquals($user->getEmail(), $email);
-    }
+	public function testAltEmailAddress() {
+		$email = 'testuser@gmail.com';
+		$this->object->setLocalEmail(false);
+		$this->object->setUsername('testuser');
+		$this->object->setAltEmail($email);
+		$this->assertEquals($this->object->getEmail(), $email);
+	}
 }
