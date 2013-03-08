@@ -1,6 +1,8 @@
 <?php
 /**
- * Class description here
+ * Unit tests for Schoolbox\Resource\File class.
+ *
+ * Designed to not have any external dependencies on external databases.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd

@@ -1,6 +1,9 @@
 <?php
 /**
- * Class description here
+ * Unit tests for Schoolbox\Resource\FileMapper.
+ *
+ * I'm not going to test any loading methods, at least not without a database
+ * connection or some strategy for mocking one.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
@@ -35,6 +38,7 @@ class FileMapperTest extends PHPUnit_Framework_TestCase {
 			'temp_location' => '/tmp/pngsomewhere'
 		);
 		$file = $this->file_mapper->hydrate($data);
+		$this->assertInstanceOf('Schoolbox\\Resource\\File', $file);
 		$this->assertEquals(4, $file->getId());
 		$this->assertEquals('stuff.png', $file->getFilename());
 		$this->assertEquals(false, $file->getTempLocation());
