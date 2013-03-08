@@ -11,37 +11,30 @@
 
 namespace Schoolbox\Resource\Test;
 use Schoolbox\Resource\File;
-use PHPUnit_Framework_TestCase;
+use Schoolbox\TestCase;
 
-class FileTest extends PHPUnit_Framework_TestCase {
+class FileTest extends TestCase {
 
 	/**
 	 * The file that's being tested.
 	 *
 	 * @var File
 	 */
-	protected $file;
+	protected $object;
+
+	protected $config_vars = array(
+		array('storage_dir', '/tmp')
+	);
 
 	public function setUp() {
-		unset($this->file);
-		$this->file = new File();
+		parent::setUp();
+		$this->object = new File();
 
-		$config = array(
-			array('storage_dir', '/tmp')
-		);
-
-		//
-		// Mock that configuration!
-		$mock_config = $this->getMock(get_class($this->file->getConfigLoader()));
-		$mock_config
-			->expects($this->any())
-			->method('get')
-			->will($this->returnValueMap($config));
-		$this->file->setConfigLoader($mock_config);
+		$this->object->setConfigLoader($this->mock_config);
 
 		//
 		// Mock the mimetype loader too.
-		$mock_mimetype = $this->getMock(get_class($this->file->getMimetypeLoader()));
+		$mock_mimetype = $this->getMock(get_class($this->object->getMimetypeLoader()));
 		$mock_mimetype
 			->expects($this->any())
 			->method('getMimetypeForFilename')
@@ -50,7 +43,7 @@ class FileTest extends PHPUnit_Framework_TestCase {
 			->expects($this->any())
 			->method('getIconForFilename')
 			->will($this->returnCallback(array($this, 'getIconForFilename')));
-		$this->file->setMimetypeLoader($mock_mimetype);
+		$this->object->setMimetypeLoader($mock_mimetype);
 	}
 
 	public function getIconForFilename($filename) {
@@ -99,26 +92,26 @@ class FileTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testLoadHashFromTempLocation() {
-		$this->file->setTempLocation(__FILE__);
-		$this->assertEquals($this->file->getHash(), '');
-		$this->file->loadHashFromTempLocation();
-		$this->assertEquals($this->file->getHash(), sha1_file(__FILE__));
+		$this->object->setTempLocation(__FILE__);
+		$this->assertEquals($this->object->getHash(), '');
+		$this->object->loadHashFromTempLocation();
+		$this->assertEquals($this->object->getHash(), sha1_file(__FILE__));
 	}
 
 	public function testLoadFilesizeFromTempLocation() {
-		$this->file->setTempLocation(__FILE__);
-		$this->assertEquals($this->file->getFilesize(), false);
-		$this->file->loadFilesizeFromTempLocation();
-		$this->assertEquals($this->file->getFilesize(), filesize(__FILE__));
+		$this->object->setTempLocation(__FILE__);
+		$this->assertEquals($this->object->getFilesize(), false);
+		$this->object->loadFilesizeFromTempLocation();
+		$this->assertEquals($this->object->getFilesize(), filesize(__FILE__));
 	}
 
 	public function testGetFileLocation() {
 		//
 		// Consider abstracting the save method into a separate class.
 		// $file->setSaveStrat(new ...);
-		$this->assertEquals($this->file->getFileLocation(), false);
-		$this->file->setId(5);
-		$this->assertEquals($this->file->getFileLocation(), '/tmp/5.dat');
+		$this->assertEquals($this->object->getFileLocation(), false);
+		$this->object->setId(5);
+		$this->assertEquals($this->object->getFileLocation(), '/tmp/5.dat');
 	}
 
 	public function getLoadMimetypeFromFilenameData() {
@@ -135,9 +128,9 @@ class FileTest extends PHPUnit_Framework_TestCase {
 	 * @dataProvider getLoadMimetypeFromFilenameData
 	 */
 	public function testLoadMimetypeFromFilename($filename, $mimetype) {
-		$this->file->setFilename($filename);
-		$this->file->loadMimetypeFromFilename();
-		$this->assertEquals($this->file->getMime(), $mimetype);
+		$this->object->setFilename($filename);
+		$this->object->loadMimetypeFromFilename();
+		$this->assertEquals($this->object->getMime(), $mimetype);
 	}
 
 	public function getIconFromFilenameData() {
@@ -154,7 +147,7 @@ class FileTest extends PHPUnit_Framework_TestCase {
 	 * @dataProvider getIconFromFilenameData
 	 */
 	public function testGetIconFromFilename($filename, $icon) {
-		$this->file->setFilename($filename);
-		$this->assertEquals($this->file->getIconFromFilename(), $icon);
+		$this->object->setFilename($filename);
+		$this->assertEquals($this->object->getIconFromFilename(), $icon);
 	}
 }
