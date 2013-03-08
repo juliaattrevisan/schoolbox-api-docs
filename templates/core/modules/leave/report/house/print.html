@@ -13,16 +13,12 @@
             cssDesc:'descending',
             dateFormat:'uk',
             headers:{ // These seem to be fucking it. Object no have toLowerCase
-                0:{ sorter:false},
-                1:{ sorter:false},
-                2:{ sorter:false},
-                3:{ sorter:false},
-                4:{ sorter:false},
-                5:{ sorter:false},
-                6:{ sorter:false},
-                7:{ sorter:false},
-                10:{ sorter:false},
-                11:{ sorter:false}
+				0:{ sorter:false},
+				1:{ sorter:false},
+				2:{ sorter:false},
+				3:{ sorter:false},
+				4:{ sorter:false},
+				7:{ sorter:false}
             }
         });
 
@@ -223,13 +219,6 @@
         </tr>
         <!-- END empty_request -->
         <!-- END row -->
-        <tr>
-            <td colspan="3">Totals</td>
-            <!-- BEGIN request_period_total -->
-            <td>{PERIOD_TOTAL}</td>
-            <!-- END request_period_total -->
-            <td></td>
-        </tr>
         </tbody>
     </table>
 
@@ -242,6 +231,13 @@
             <col width="15%">
         </colgroup>
         <tbody>
+		<tr>
+			<td colspan="3">Totals</td>
+			<!-- BEGIN request_period_total -->
+			<td>{PERIOD_TOTAL}</td>
+			<!-- END request_period_total -->
+			<td></td>
+		</tr>
         <!-- Signatures and initials -->
         <tr class="signatures">
             <td colspan='3'><strong>Duty Master Initial</strong><br><br></td>
