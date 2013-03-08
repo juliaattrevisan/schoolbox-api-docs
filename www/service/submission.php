@@ -14,6 +14,11 @@ if(isset($this)) {
 
 require_once '../../include/Bootstrap.php';
 
+//
+// FileYear and FileSemester session vars are required by most external database
+// access. Aaarrrgghh.
+session_start();
+
 // don't bother if it's disabled at a school level
 if(!Cfg::get('due_work_notifications_enabled')) {
     die();
