@@ -71,9 +71,17 @@ $j(document).ready(function() {
 	function submitAllResponses() {
 		$j('.questionForm').each(function(index, element) {
 			$j.ajax({
+				type: 'post',
 				url: $j(element).attr('action'),
 				data: $j(element).serialize(),
+
+				/* Ensure all forms submit before redirecting
+				 * Do not upgrade jquery to 1.9 or you'll lose this
+				 */
 				async: false,
+
+				/* Callback on success
+				 */
 				success: function(responseText) {
 					var dataFunction = new Function('return ' + responseText);
 					var result = dataFunction();
