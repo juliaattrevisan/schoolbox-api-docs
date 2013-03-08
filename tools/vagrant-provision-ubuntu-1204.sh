@@ -6,11 +6,11 @@ then
 	cd /home/vagrant;
 	echo "$vag Downloading Schoolbox demo data";
 	rm -vf *latest*;
-	wget -q http://hydra.alrs/boxes/schoolboxdemo-latest.tar.gz
-	wget -q http://hydra.alrs/boxes/schoolboxdemo-latest.sql
-	wget -q http://hydra.alrs/boxes/schoolboxdemo-latest.vhost
-	wget -q http://hydra.alrs/boxes/schoolboxdemo-latest-dav.vhost
-	wget -q http://hydra.alrs/boxes/schoolboxdemo-vagrant-latest.sql
+	wget -q http://vagrant.alaress-dev.com.au/schoolboxdemo-latest.tar.gz
+	wget -q http://vagrant.alaress-dev.com.au/schoolboxdemo-latest.sql
+	wget -q http://vagrant.alaress-dev.com.au/schoolboxdemo-latest.vhost
+	wget -q http://vagrant.alaress-dev.com.au/schoolboxdemo-latest-dav.vhost
+	wget -q http://vagrant.alaress-dev.com.au/schoolboxdemo-vagrant-latest.sql
 	echo "$vag Restarting MySQL";
 	service mysql restart;
 	echo "$vag Stopping Apache";
