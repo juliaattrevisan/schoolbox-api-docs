@@ -41,6 +41,75 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($result, $expected);
 	}
 
+    /*
+     * isLocalURL tests
+     */
+
+    public function testIsLocalURLHostname() {
+        $input = "http://portal/test.php";
+
+        $url = new Url($input, false);
+
+        $url->setServerHost('portal.test.local');
+        $url->setSiteDomain('portal');
+        $url->setSiteHostname('test.local');
+
+        $this->assertTrue($url->isLocalURL());
+
+    }
+
+    public function testIsLocalURLFQDN() {
+        $input = "http://portal.test.local/test.php";
+
+        $url = new Url($input, false);
+
+        $url->setServerHost('portal.test.local');
+        $url->setSiteDomain('portal');
+        $url->setSiteHostname('test.local');
+
+        $this->assertTrue($url->isLocalURL());
+
+    }
+
+    public function testIsLocalURLAnotherDomain() {
+        $input = "http://portal.another.server/test.php";
+
+        $url = new Url($input, false);
+
+        $url->setServerHost('portal.test.local');
+        $url->setSiteDomain('portal');
+        $url->setSiteHostname('test.local');
+
+        $this->assertFalse($url->isLocalURL());
+
+    }
+
+    public function testIsLocalURLAnotherHost() {
+        $input = "http://www.google.com/test.php";
+
+        $url = new Url($input, false);
+
+        $url->setServerHost('portal.test.local');
+        $url->setSiteDomain('portal');
+        $url->setSiteHostname('test.local');
+
+        $this->assertFalse($url->isLocalURL());
+
+    }
+
+    public function testIsLocalURLRelative() {
+        $input = "/test.php";
+
+        $url = new Url($input, false);
+
+        $url->setServerHost('portal.test.local');
+        $url->setSiteDomain('portal');
+        $url->setSiteHostname('test.local');
+
+        $this->assertTrue($url->isLocalURL());
+
+    }
+
 //	public function testRelativeUrl() {
 //		$input = '/ilearn';
 //		$expected = 'http://ilearn.joeys.org';
