@@ -214,7 +214,12 @@ if (!empty($result['user'])) {
         if ($groupHandler->isParent()) {
             unset($email);
         }
-
+        
+        /* If restrict_parent_emails and not a staff member, remove the email address */
+        if ((Cfg::get('restrict_parent_emails') == '1') && $groupHandler->isParent($user['id']) && !$groupHandler->isStaff()) {
+            unset($email);
+        }
+        
         $page->setVar(array(
             'USER_ID' => $user['id'],
             'USER_SYNERGY_ID' => $user['synergy_id'],
