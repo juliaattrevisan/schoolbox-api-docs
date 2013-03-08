@@ -9,7 +9,7 @@
  * @link        http://www.alaress.com.au
  */
 
-namespace Schoolbox;
+namespace Schoolbox\Test;
 use PHPUnit_Framework_TestCase;
 
 abstract class TestCase extends PHPUnit_Framework_TestCase {

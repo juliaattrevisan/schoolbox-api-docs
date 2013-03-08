@@ -11,7 +11,7 @@
 
 namespace Schoolbox\Resource\Test;
 use Schoolbox\Resource\File;
-use Schoolbox\TestCase;
+use Schoolbox\Test\TestCase;
 
 class FileTest extends TestCase {
 

@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Test;
 use Schoolbox\User;
-use Schoolbox\TestCase;
+use Schoolbox\Test\TestCase;
 
 class UserTest extends TestCase {
 
