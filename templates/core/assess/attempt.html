@@ -7,27 +7,6 @@
 $j(document).ready(function() {
 
     $j('.questionForm').submit(function() {
-        $j.post($j(this).attr('action'), $j(this).serialize(), function(responseText) {
-            var dataFunction = new Function('return ' + responseText);
-            var result = dataFunction();
-
-            /* Save successful, so hide form and disable submit butan.
-             * Update section completion value
-             */
-            if (result.response_id != '') {
-
-                for (var i=0; i < result.percentageComplete.length; i++) {
-                    var sectionSelector = $j('#sectionPercentageComplete_' + result.percentageComplete[i].section_id);
-                    var percentage = result.percentageComplete[i].percentageComplete.toString();
-
-                    sectionSelector.find('.percentage-text em').text(percentage);
-                    sectionSelector.find('.percentage-bar').css('width', percentage + '%');
-                }
-            }
-            else {
-                alert ('An error occurred while saving your answer.');
-            }
-        });
 
         return false;
     });
@@ -41,14 +20,6 @@ $j(document).ready(function() {
 		}
 	 });
 
-    /* Submit all the questions before switching between sections
-     */
-    $j('.btn').click(function() {
-		$j('.questionForm').each(function(elem, value) {
-			$j(this).submit();
-		});
-	});
-	
 	$j('.checkboxes input').click(function(e) {		
 		$j(this).closest('form').submit();
 		$j(this).parent().toggleClass('selected');
@@ -93,9 +64,61 @@ $j(document).ready(function() {
 	$j( ".right-answer" ).droppable({ hoverClass: 'drophover' });
 	
 	$j(".match-it").disableSelection();
-	
-	//forces confirmation that a student wants to complete their test.
+
+	/**
+	 * Alias for submitting all responses
+	 */
+	function submitAllResponses() {
+		$j('.questionForm').each(function(index, element) {
+			$j.ajax({
+				url: $j(element).attr('action'),
+				data: $j(element).serialize(),
+				async: false,
+				success: function(responseText) {
+					var dataFunction = new Function('return ' + responseText);
+					var result = dataFunction();
+
+					/* Save successful, so hide form and disable submit butan.
+					 * Update section completion value
+					 */
+					if (result.response_id != '') {
+						for (var i=0; i < result.percentageComplete.length; i++) {
+							var sectionSelector = $j('#sectionPercentageComplete_' + result.percentageComplete[i].section_id);
+							var percentage = result.percentageComplete[i].percentageComplete.toString();
+
+							sectionSelector.find('.percentage-text em').text(percentage);
+							sectionSelector.find('.percentage-bar').css('width', percentage + '%');
+						}
+					}
+					else {
+						alert ('An error occurred while saving your answer.');
+					}
+				}
+			});
+		});
+	}
+
+	/* Submit all the questions before switching between sections
+	 */
+	$j('.go-back,.go-to').click(function() {
+		event.preventDefault();
+
+		submitAllResponses();
+
+		location.href = $j(this).attr('href');
+	});
+
+	/* When someone finishes an assessment, loop through each question
+	 * and submit its values - then redirect. This avoids a wierd timing
+	 * problem which sometimes happens, where it redirects before it
+	 * submits all the questionForm elements. This causes, in particular,
+	 * Matching Pairs to remain untouched resulting in NULL values.
+	 */
 	$j('a.finish-assessment').click(function() {
+		event.preventDefault();
+
+		submitAllResponses();
+
 		location.href = $j(this).attr('href');
 	}).confirm({
 		buttons: {
@@ -103,7 +126,6 @@ $j(document).ready(function() {
 			separator:'  '
   		}
 	});
-
 });
 </script>
 <!-- END custom_head -->
@@ -114,38 +136,37 @@ $j(document).ready(function() {
 	<h3 class="test-details">Test Details:</h3>
 	<p class="pad-it wysywig">{SECTION_DESCRIPTION}</p>
 
-		<!-- BEGIN question -->
-		<form action="/assess/saveResponse/{QUESTION_QUESTION_ID}" method="post" class="questionForm">
-			<div class="wysiwyg no-pad clearfix"> 
-			<h3><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION} <span>({QUESTION_MARKS} marks)</span></h3>
-			</div>
-			<div class="evaluation-answer clearfix">
-				<!-- BEGIN answerInputs --> 
-				<!-- END answerInputs --> 
-			</div>
-		</form>
-		<!-- END question --> 
-		
-		<p class="clearfix text-align-right" >
-			<!-- BEGIN endAssess --> 
-			<a href="/assess/end/{ASSESS_ASSESS_ID}" class="btn tick finish-assessment"><span></span>Finish</a> 
-			<!-- END endAssess --> .
-			
-			<!-- BEGIN prevSection --> 
-			<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}" class="btn go-back float-left"><span></span>Previous Section</a> 
-			<!-- END prevSection --> 
-			
-			<!-- BEGIN nextSection --> 
-			<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}" class="btn go-to"><span></span>Next Section</a> 
-			<!-- END nextSection --> 
-		</p>
+	<!-- BEGIN question -->
+	<form action="/assess/saveResponse/{QUESTION_QUESTION_ID}" method="post" class="questionForm">
+		<div class="wysiwyg no-pad clearfix">
+		<h3><strong>Q{QUESTION_SEQUENCE})</strong> {QUESTION_QUESTION} <span>({QUESTION_MARKS} marks)</span></h3>
+		</div>
+		<div class="evaluation-answer clearfix">
+			<!-- BEGIN answerInputs -->
+			<!-- END answerInputs -->
+		</div>
+	</form>
+	<!-- END question -->
 
+	<p class="clearfix text-align-right" >
+		<!-- BEGIN endAssess -->
+		<a href="/assess/end/{ASSESS_ASSESS_ID}" class="btn tick finish-assessment"><span></span>Finish</a>
+		<!-- END endAssess --> .
+
+		<!-- BEGIN prevSection -->
+		<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{PREV_SECTION_ID}" class="btn go-back float-left"><span></span>Previous Section</a>
+		<!-- END prevSection -->
+
+		<!-- BEGIN nextSection -->
+		<a href="/assess/attempt/{ASSESS_ASSESS_ID}/{NEXT_SECTION_ID}" class="btn go-to"><span></span>Next Section</a>
+		<!-- END nextSection -->
+	</p>
 </div>
 <div class="evaluation-menu">
-	
 	<h2>Assessment Progress</h2>
 	<div class="pad-it">
-		<div class="time-holder"> <strong>Time remaining</strong>
+		<div class="time-holder">
+			<strong>Time remaining</strong>
 			<div id="countdown"></div>
 		</div>
 		
