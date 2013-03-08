@@ -112,23 +112,26 @@ class Bulk_Calendar extends Bulk_Abstract {
 						'campusList' => $campusList,
 						'groupList' => $groupList,
 					);
+
+
+
 					if (empty($event_type)) {
 						$output[] = array(
-							'name' => Scrub::html($name),
+							'name' => Scrub::text($name),
 							'status' => 'Not Added',
 							'error' => 'Event type not set',
 						);
 					}
 					elseif ($calendarHandler->create($event)) {
 						$output[] = array(
-							'name' => Scrub::html($name),
+							'name' => Scrub::text($name),
 							'status' => 'Added',
 							'error' => 'OK',
 						);
 					}
 					else {
 						$output[] = array(
-							'name' => Scrub::html($name),
+							'name' => Scrub::text($name),
 							'status' => 'Not Added',
 							'error' => 'Could not create event',
 						);
@@ -136,11 +139,15 @@ class Bulk_Calendar extends Bulk_Abstract {
 				}
 				else {
 					$output[] = array(
-						'name' => Scrub::html($name),
+						'name' => Scrub::text($name),
 						'status' => 'Not Added',
 						'error' => 'Missing date and/or name',
 					);
 				}
+
+                /* Free memory */
+                unset($publishDate);
+                unset($date);
 			}
 		}
 
