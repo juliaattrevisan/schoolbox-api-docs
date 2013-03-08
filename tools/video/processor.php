@@ -13,3 +13,13 @@
 require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 
 
+$videoStore = '/vagrant/data/video';
+$sourceStore = Cfg::get('file_dir');
+$sourceFile = $sourceStore.'/'.$argv[1].'.dat';
+
+$processString = 'avconv -i '.$sourceFile.' -c:v libx264 -preset slow -b 512k '.$arv[1].'.mp4';
+$thumbnailString = 'avconv -i '.$sourceFile.' -f image2 -ss 10 -s 64x64 -frames:v 1 '.$arv[1].'-64.jpg';
+
+exec($processString);
+exec($thumbnailString);
+

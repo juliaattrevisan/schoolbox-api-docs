@@ -1,0 +1,8 @@
+Notes on setting up video
+
+required packages
+
+sudo aptitude install libav-tools
+sudo apt-get install libavcodec-extra-53
+
+avconv -i news_interview.wmv -c:v libx264 -preset slow -b 512k output.mp4
