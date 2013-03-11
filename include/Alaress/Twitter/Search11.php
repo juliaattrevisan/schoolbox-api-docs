@@ -45,7 +45,15 @@ class Alaress_Twitter_Search11 extends Alaress_Twitter_Search {
 
 		if (!empty($params)) {
 			$cache = new Alaress_Cache_Callable(
-				array(new Alaress_Twitter_Loader_OAuth(), 'load'),
+				array(
+					new Alaress_Twitter_Loader_OAuth(
+						Cfg::get('twitter_api_consumer_key'),
+						Cfg::get('twitter_api_consumer_secret'),
+						Cfg::get('twitter_api_oauth_token'),
+						Cfg::get('twitter_api_oauth_token_secret')
+					),
+					'load'
+				),
 				array($resource, $params,)
 			);
 			$all_tweets = $cache->load();

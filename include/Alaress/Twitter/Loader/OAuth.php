@@ -29,11 +29,9 @@ class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface {
 	 * Load required classes, instantiate a new connection using the four
 	 * variables we obtained by running connect.php
 	 */
-	public function __construct() {
-		require_once('oauth/config.php');
+	public function __construct($consumer_key, $consumer_secret, $oauth_token = null, $oauth_secret = null) {
 		require_once('oauth/twitteroauth.php');
-
-		$this->setConnection(new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET));
+		$this->setConnection(new TwitterOAuth($consumer_key, $consumer_secret, $oauth_token, $oauth_secret));
 	}
 
 	/**
@@ -54,8 +52,6 @@ class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface {
 		if ($code >= 400) {
 			//
 			// Log errors somewhere, and return an empty array?
-//			var_dump($result->errors);
-//			throw new Alaress_Twitter_Loader_Exception($result->errors);
 			return array();
 		}
 		return $result->statuses;
