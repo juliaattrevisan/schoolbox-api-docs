@@ -1073,8 +1073,8 @@ class Submission extends DeprecatedModel {
                 if (!array_key_exists($member_id, $output)) {
                     $output[$member_id] = array(
                         'id'         => $member_id,
-                        'firstname'  => $member['u_firstname'],
-                        'lastname'   => $member['u_lastname'],
+                        'firstname'  => $member['firstname'],
+                        'lastname'   => $member['lastname'],
                         'alt_email'  => $emailObj->formatEmailFromArray(array(
                             'username'    => $member['u_username'],
                             'alt_email'   => $member['u_alt_email'],
