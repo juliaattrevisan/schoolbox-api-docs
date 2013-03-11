@@ -11,9 +11,9 @@
  * @version   SVN: $Id$
  */
 class Alaress_Cache_Callable extends Alaress_Cache_Abstract {
-	protected $callback = null;
-	protected $params   = array();
-//	protected $cacheHours = 1;
+	protected $callback   = null;
+	protected $params     = array();
+	protected $cacheHours = 1;
 
 	/**
 	 * Creates the cache object.
@@ -29,7 +29,7 @@ class Alaress_Cache_Callable extends Alaress_Cache_Abstract {
 		$this->callback = $callback;
 		$this->params   = $params;
 		$this->setCacheFile($this->generateCacheFilename());
-		$this->setCacheTime(60*60/**$this->getCacheHours()*/);
+		$this->setCacheTime(60*60*$this->cacheHours);
 		$this->setup();
 	}
 
