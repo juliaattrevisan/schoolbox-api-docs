@@ -1108,7 +1108,12 @@ class Submission extends DeprecatedModel {
                 }
             }
         }
-        return $output;
+
+        //
+        // Not interested in output rows without any categories.
+        return array_filter($output, function($row) {
+            return !empty($row['categories']);
+        });
     }
 
     public function getAllYearsByUser($userID = 0) {
