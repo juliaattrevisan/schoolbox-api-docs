@@ -11,9 +11,8 @@
  * @version   SVN: $Id$
  */
 class Alaress_Cache_Callable extends Alaress_Cache_Abstract {
-	protected $callback   = null;
-	protected $params     = array();
-	protected $cacheHours = 1;
+	protected $callback = null;
+	protected $params   = array();
 
 	/**
 	 * Creates the cache object.
@@ -21,15 +20,16 @@ class Alaress_Cache_Callable extends Alaress_Cache_Abstract {
 	 * @param callable $callback The callback to cache the result of.
 	 *                           @see http://php.net/manual/en/language.types.callable.php
 	 * @param array    $params   The parameters to pass to $callback
+	 * @param int      $lifetime The time the cache lasts, defaults to 1 hour.
 	 */
-	public function __construct($callback, $params = array()) {
+	public function __construct($callback, $params = array(), $lifetime = 3600) {
 		//
 		// Callback types:
 		// anything passable to call_user_func
 		$this->callback = $callback;
 		$this->params   = $params;
 		$this->setCacheFile($this->generateCacheFilename());
-		$this->setCacheTime(60*60*$this->cacheHours);
+		$this->setCacheTime($lifetime);
 		$this->setup();
 	}
 

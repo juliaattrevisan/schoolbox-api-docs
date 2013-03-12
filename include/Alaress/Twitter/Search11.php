@@ -54,7 +54,8 @@ class Alaress_Twitter_Search11 extends Alaress_Twitter_Search {
 					),
 					'load'
 				),
-				array($resource, $params,)
+				array($resource, $params,),
+				Cfg::get('twitter_api_caching')
 			);
 			$all_tweets = $cache->load();
 
