@@ -13,6 +13,9 @@ class Url
 {
     private $url = '';
     private $useCfg = false;
+    private $siteHostname;
+    private $siteDomain;
+    private $serverHost;
 
     /**
      * @param $url
@@ -71,22 +74,32 @@ class Url
 
     /**
      * Returns true if the url is for a local page
-     * TODO: can the in_array() be absorbed into the regex to increase efficiency?
-     * @return int
+     * @return bool
      */
     public function isLocalURL()
     {
         list($hostname, $domain) = explode('.', $this->getServerHost(), 2);
 
-        // regex to detemine if absolute path is inside current (sub)domain
-        $pattern = '#^(http(s)?://)(' . preg_quote($hostname) . ')|(' . preg_quote($this->getServerHost()) . ')|('
-            . preg_quote($this->getSiteHostname()) . '(.' . preg_quote($this->getSiteDomain()) . '))/(.*)?#i';
-
         // get the first character of the url if it's already a local link
         $lead = substr($this->getUrl(), 0, 1);
+        if(in_array($lead, array("/", "#", "?"))) {
+            return true;
+        }
 
-        // if it's an absolute internal link, or a relative link, anchor or query, return true.
-        return preg_match($pattern, $this->getUrl()) || in_array($lead, array("/", "#", "?"));
+        $urlParts = parse_url($this->getUrl());
+
+        if( in_array($urlParts['host'],
+            array($hostname,
+                $this->getServerHost(),
+                $this->getSiteHostname(),
+                $this->getSiteHostname().'.'.$this->getSiteDomain()
+            )
+        )) {
+            return true;
+        }
+
+
+        return false;
     }
 
     /*
