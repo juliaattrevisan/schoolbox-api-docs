@@ -243,6 +243,7 @@ class External_Synergetic_User implements External_UserInterface {
 				StudentContactTitle, StudentContactPreferred, StudentContactLegalFullName, StudentContactSurname,
 				StudentContactDefaultEmail,
 				StudentContactAddress1, StudentContactAddress2, StudentContactAddress3,
+				StudentContactHomeAddress1, StudentContactHomeAddress2, StudentContactHomeAddress3,
 				StudentContactSuburb, StudentContactPostCode, StudentContactState, StudentContactCountryDesc,
 				StudentContactPhoneActual, StudentContactMobilePhone, StudentContactOccupPhone,
 				StudentContactSpouseID,
