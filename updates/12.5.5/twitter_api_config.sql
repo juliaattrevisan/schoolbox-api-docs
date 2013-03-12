@@ -57,4 +57,16 @@ VALUES (
   'false',
   'false',
   'false'
+),
+(
+  'twitter_api_caching',
+  '1800',
+  'Twitter API update frequency',
+  'The amount of time (in seconds) that tweets should be cached for before being re-queried.',
+  'input',
+  NULL,
+  '3rd Party Services',
+  'false',
+  'false',
+  'false'
 );
