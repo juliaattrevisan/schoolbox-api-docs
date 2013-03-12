@@ -87,15 +87,21 @@ class SitePage extends Page {
         } else {
             if (Cfg::get('site_detect') == 'campus') {
                 //Get site template via users campus
+                // MGS-specific code
                 if (Cfg::get('site_location') == 'mgs') {
-                    if ($_SESSION['campus'][0] == 3) {
+                    // all staff are shown default MGS skin
+                    $group = new Group();
+                    if($group->isStaff()) {
+                        $this->site = 'mgs-staff';
+                    }
+                    elseif ($_SESSION['campus'][0] == 3) {
                         $this->site = 'grimwade';
-                    } else {
-                        if ($_SESSION['campus'][0] == 2) {
-                            $this->site = 'wadhurst';
-                        } else {
-                            $this->site = 'mgs';
-                        }
+                    }
+                    elseif ($_SESSION['campus'][0] == 2) {
+                        $this->site = 'wadhurst';
+                    }
+                    else {
+                        $this->site = 'mgs-senior';
                     }
 
                     return true;
