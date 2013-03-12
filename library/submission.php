@@ -942,8 +942,6 @@ class Submission extends DeprecatedModel {
         $stmt = Database::getInstance()->prepare(
             "
             SELECT
---              u.id u_id, u.username u_username, u.firstname u_firstname, u.lastname u_lastname,
---              u.local_email u_local_email, u.alt_email u_alt_email,
               sb.category c_id,
               c.name c_name,
               GROUP_CONCAT(cc.code) c_code,
@@ -953,21 +951,14 @@ class Submission extends DeprecatedModel {
             FROM submission_box sb
             LEFT JOIN category c ON sb.category = c.id
             LEFT JOIN categoryCode cc ON cc.categoryID = c.id
---            LEFT JOIN userAccess ua ON ua.service = 1 AND ua.sid = sb.category
---            LEFT JOIN `user` u ON ua.uid = u.id
             LEFT JOIN submission_notification sn ON sb.id = sn.box_id
---            WHERE u.group_id IN (SELECT id FROM groups WHERE group_type = 'student')
             AND sb.deleted = 0
---            AND u.id IS NOT NULL
             AND sn.type = :notif_type
             AND sn.enabled = :notif_enabled
             AND sn.sent = :notif_sent
             AND sb.`date` BETWEEN :range_start AND :range_end
---            AND u.id NOT IN (SELECT `owner` FROM student_submission ss WHERE ss.box_id = sb.id)
             GROUP BY sb.id, c.id
-            ORDER BY
---            u.id ASC,
-            c.id ASC, sb.date ASC
+            ORDER BY c.id ASC, sb.date ASC
         "
         );
 
