@@ -29,23 +29,26 @@ class External_Synergetic_Class implements External_ClassInterface
 
     public function getStudents($subCode)
     {
+        $classQuery = '(';
+        $subCodeArray = explode(',', $subCode);
+        foreach ($subCodeArray as $code) {
 
-        if (stristr($subCode, ',')) {
-            $classQuery = 'StudentClasses.ClassCode IN(';
-            $subCodeArray = explode(',', $subCode);
-            foreach ($subCodeArray as $code) {
-                $classQuery .= "'$code',";
+            if(strpos($code, '/') !== FALSE ) {
+                $codeArray = explode('/',$code);
+                $classQuery .= "( StudentClasses.ClassCode = '{$codeArray[1]}' AND StudentClasses.ClassCampus = '{$codeArray[0]}' ) OR ";
             }
-            $classQuery = substr($classQuery, 0, -1) . ')';
-        } else {
-            $classQuery = "StudentClasses.ClassCode = '$subCode'";
+            else {
+                $classQuery .= "StudentClasses.ClassCode = '$code' OR ";
+            }
         }
+
+        $classQuery = substr($classQuery, 0, -3) . ')';
 
         $query = "
 		SELECT DISTINCT StudentSurname as lastname, StudentPreferred as firstname,
                         StudentYearLevelDescription as yearlevel, StudentHouseDescription as house,
                         StudentMedicalAlert, StudentSpecialNeedsFlag,
-                        StudentID as synergy_id
+                        StudentID as synergy_id, ClassCampus
 		FROM    SynergyOne.dbo.StudentClasses StudentClasses
 		JOIN SynergyOne.dbo.vStudents vStudents ON (
 			vStudents.FileYear = StudentClasses.FileYear AND
@@ -66,17 +69,21 @@ class External_Synergetic_Class implements External_ClassInterface
     public function getTeacherName($subCode)
     {
         $teachers = array();
-    
-        if (stristr($subCode, ',')) {
-            $classQuery = 'ClassCode IN(';
-            $subCodeArray = explode(',', $subCode);
-            foreach ($subCodeArray as $code) {
-                $classQuery .= "'$code',";
+
+        $classQuery = '(';
+        $subCodeArray = explode(',', $subCode);
+        foreach ($subCodeArray as $code) {
+
+            if(strpos($code, '/') !== FALSE ) {
+                $codeArray = explode('/',$code);
+                $classQuery .= "( ClassCode = '{$codeArray[1]}' AND ClassCampus = '{$codeArray[0]}' ) OR ";
             }
-            $classQuery = substr($classQuery, 0, -1) . ')';
-        } else {
-            $classQuery = "ClassCode = '$subCode'";
+            else {
+                $classQuery .= "ClassCode = '$code' OR ";
+            }
         }
+
+        $classQuery = substr($classQuery, 0, -3) . ')';
 
         $msQuery = "SELECT DISTINCT StaffID, StaffSeq FROM vSubjectClassesStaff
                     WHERE $classQuery AND FileYear={$_SESSION['FileYear']} AND FileSemester={$_SESSION['FileSemester']}
