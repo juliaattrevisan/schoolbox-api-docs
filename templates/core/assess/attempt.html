@@ -6,12 +6,6 @@
 <script type="text/javascript">
 $j(document).ready(function() {
 
-    $j('.questionForm').submit(function() {
-
-        return false;
-    });
-
-
 	/* Load up all the selected options and selected them (green background)
 	*/
 	$j('input[type=checkbox], input[type=radio]').each(function() {
@@ -65,6 +59,10 @@ $j(document).ready(function() {
 	
 	$j(".match-it").disableSelection();
 
+	$j('.questionForm').submit(function() {
+		return false;
+	});
+
 	/**
 	 * Alias for submitting all responses
 	 */
@@ -79,6 +77,10 @@ $j(document).ready(function() {
 				 * Do not upgrade jquery to 1.9 or you'll lose this
 				 */
 				async: false,
+
+				beforeSend: function() {
+					$j('#assessment-saving').show();
+				},
 
 				/* Callback on success
 				 */
@@ -106,12 +108,24 @@ $j(document).ready(function() {
 		});
 	}
 
+	/* Progress bar for saving online assessment
+	 * Default state is hidden
+	 */
+	$j('#assessment-saving').hide();
+
 	/* Submit all the questions before switching between sections
 	 */
 	$j('.go-back,.go-to').click(function() {
 		event.preventDefault();
 
-		submitAllResponses();
+		$j('#assessment-saving').show();
+
+		/* Allow display of saving indicator before locking browser up
+		 * by using a delayed response
+		 *
+		 * http://stackoverflow.com/questions/4971062/jquery-ajax-synchronous-call-beforesend
+		 */
+		setTimeout(submitAllResponses, 250);
 
 		location.href = $j(this).attr('href');
 	});
@@ -125,7 +139,14 @@ $j(document).ready(function() {
 	$j('a.finish-assessment').click(function() {
 		event.preventDefault();
 
-		submitAllResponses();
+		$j('#assessment-saving').show();
+
+		/* Allow display of saving indicator before locking browser up
+		 * by using a delayed response
+		 *
+		 * http://stackoverflow.com/questions/4971062/jquery-ajax-synchronous-call-beforesend
+		 */
+		setTimeout(submitAllResponses, 250);
 
 		location.href = $j(this).attr('href');
 	}).confirm({
@@ -136,7 +157,28 @@ $j(document).ready(function() {
 	});
 });
 </script>
+<style type='text/css'>
+	#assessment-saving {
+		border:1px solid #aaa;
+		width:280px;
+		height:80px;
+		background-color:#fff;
+		background-image: url('/images/loading-bar.gif');
+		background-repeat: no-repeat;
+		background-position: 50% 40px;
+		margin: 0 auto;
+
+		-webkit-box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
+		box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
+	}
+
+	#assessment-saving p {
+		margin-top: 15px;
+		text-align: center;
+	}
+</style>
 <!-- END custom_head -->
+
 <h1>{ASSESS_TITLE}</h1>
 <div class="evaluation-content take-test">
 	<h2><span>Section {CURRENT_SECTION_SEQUENCE} - </span> {SECTION_TITLE}</h2>
@@ -156,8 +198,12 @@ $j(document).ready(function() {
 	</form>
 	<!-- END question -->
 
+	<div id="assessment-saving">
+		<p><strong>Saving progress...</strong></p>
+	</div>
+
 	<p class="clearfix text-align-right" >
-		<!-- BEGIN endAssess -->
+	<!-- BEGIN endAssess -->
 		<a href="/assess/end/{ASSESS_ASSESS_ID}" class="btn tick finish-assessment"><span></span>Finish</a>
 		<!-- END endAssess --> .
 
