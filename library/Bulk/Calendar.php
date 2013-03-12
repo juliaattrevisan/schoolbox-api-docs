@@ -42,10 +42,10 @@ class Bulk_Calendar extends Bulk_Abstract {
 			/* Set defaults for id and campus if they are not submitted
 			 */
 			if ($_POST['userid'] == '') {
-				$uid = Scrub::text($_SESSION['id']);
+				$uid = $_SESSION['id'];
 			}
 			else {
-				$uid = Scrub::text($_POST['userid']);
+				$uid = $_POST['userid'];
 			}
 
 			/* Set up specified campus list
@@ -55,11 +55,11 @@ class Bulk_Calendar extends Bulk_Abstract {
 			$campusList = array();
 
 			if (is_array($_POST['userGroup'])) {
-				$groupList = array_map(array(Scrub, 'text'), $_POST['userGroup']);
+				$groupList = $_POST['userGroup'];
 			}
 
 			if (is_array($_POST['campusList'])) {
-				$campusList = array_map(array(Scrub, 'text'), $_POST['campusList']);
+				$campusList = $_POST['campusList'];
 			}
 
 			/* Process rows
@@ -76,8 +76,7 @@ class Bulk_Calendar extends Bulk_Abstract {
 				 */
 				$date = new Alaress_Date_Format($thisRow[0], 'd/m/y');
 
-				/* If a publish date is specified, use it; otherwise assume the
-				 * Publish Date is the same as the Event Date
+				/* If a publish date is specified, use it; otherwise use an empty date
 				 */
 				if (strlen(trim($thisRow[7]))) {
 					$publishDate = new Alaress_Date_Format($thisRow[7], 'd/m/y');
@@ -86,8 +85,12 @@ class Bulk_Calendar extends Bulk_Abstract {
 					$publishDate = new Alaress_Date_Format('0000-00-00', 'y-m-d');
 				}
 
-				$name       = $thisRow[3];
-				$event_type = $thisRow[6];
+                //We cannot determine encoding type, so strip everything that is not ascii out
+				$name       = preg_replace('/[\\x80-\\xFF]/', '', $thisRow[3]);
+				$event_type = preg_replace('/[\\x80-\\xFF]/', '', $thisRow[6]);
+                $detail     = preg_replace('/[\\x80-\\xFF]/', '', $thisRow[4]);
+                $location   = preg_replace('/[\\x80-\\xFF]/', '', $thisRow[5]);
+
 				if ((trim($thisRow[0]) != '') && (trim($name) != '')) {
 					$event = array(
 						'owner' => $uid,
@@ -96,8 +99,8 @@ class Bulk_Calendar extends Bulk_Abstract {
 						'startTime' => $thisRow[1],
 						'endTime' => $thisRow[2],
 						'note' => $name,
-						'detail' => $thisRow[4],
-						'location' => $thisRow[5],
+						'detail' => $detail,
+						'location' => $location,
 
 						/* Hard-coded to zero as this is deprecated
 						 */
@@ -109,23 +112,26 @@ class Bulk_Calendar extends Bulk_Abstract {
 						'campusList' => $campusList,
 						'groupList' => $groupList,
 					);
+
+
+
 					if (empty($event_type)) {
 						$output[] = array(
-							'name' => Scrub::html($name),
+							'name' => Scrub::text($name),
 							'status' => 'Not Added',
 							'error' => 'Event type not set',
 						);
 					}
 					elseif ($calendarHandler->create($event)) {
 						$output[] = array(
-							'name' => Scrub::html($name),
+							'name' => Scrub::text($name),
 							'status' => 'Added',
 							'error' => 'OK',
 						);
 					}
 					else {
 						$output[] = array(
-							'name' => Scrub::html($name),
+							'name' => Scrub::text($name),
 							'status' => 'Not Added',
 							'error' => 'Could not create event',
 						);
@@ -133,11 +139,15 @@ class Bulk_Calendar extends Bulk_Abstract {
 				}
 				else {
 					$output[] = array(
-						'name' => Scrub::html($name),
+						'name' => Scrub::text($name),
 						'status' => 'Not Added',
 						'error' => 'Missing date and/or name',
 					);
 				}
+
+                /* Free memory */
+                unset($publishDate);
+                unset($date);
 			}
 		}
 
@@ -152,7 +162,7 @@ class Bulk_Calendar extends Bulk_Abstract {
 	private function addVCalCalendar() {
 		if (is_file($this->getFile())) {
 			if ($_POST['userid'] == '') {
-				$uid = Scrub::text($_SESSION['id']);
+				$uid = $_SESSION['id'];
 			}
 			else {
 				$uid = $_POST['userid'];
@@ -165,11 +175,11 @@ class Bulk_Calendar extends Bulk_Abstract {
 			$campusList = array();
 
 			if (is_array($_POST['userGroup'])) {
-				$groupList = array_map(array(Scrub, 'text'), $_POST['userGroup']);
+				$groupList = $_POST['userGroup'];
 			}
 
 			if (is_array($_POST['campusList'])) {
-				$campusList = array_map(array(Scrub, 'text'), $_POST['campusList']);
+				$campusList = $_POST['campusList'];
 			}
 
 			/* Process vcal events
