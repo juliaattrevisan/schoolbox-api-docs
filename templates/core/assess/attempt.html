@@ -14,19 +14,6 @@ $j(document).ready(function() {
 		}
 	 });
 
-	$j('.checkboxes input').click(function(e) {		
-		$j(this).closest('form').submit();
-		$j(this).parent().toggleClass('selected');
-	});
-
-	$j('.textarea-container textarea').blur(function() {
-        $j(this).closest('form').submit();
-	});
-	
-	$j('form input').blur(function() {
-		$j(this).closest('form').submit();
-	});
-	
     /* Set up countdown
      */
 	 var timeLeft = '{ASSESS_TIME_REMAINING}'
@@ -46,65 +33,87 @@ $j(document).ready(function() {
 		 $j('#countdown').parent().hide();
 	 }
 
-	//for match questions
+	/* Submit each type on change
+	 */
+
+	/* Special stuff for match
+	 */
 	$j(".match-it").swappable({
-		items: '.right-answer', 
+		items: '.right-answer',
 		cursorAt: {top:-1},
 		stop: function() {
-			$j(this).closest('form').submit();
+			submitIndividualResponse($j(this).closest('form'));
 		}
 	});
-	
-	$j( ".right-answer" ).droppable({ hoverClass: 'drophover' });
-	
+
 	$j(".match-it").disableSelection();
 
-	$j('.questionForm').submit(function() {
-		return false;
+	//for match questions
+	$j( ".right-answer" ).droppable({ hoverClass: 'drophover' });
+
+	/* The others
+	 */
+	$j('.checkboxes input').click(function(e) {
+		submitIndividualResponse($j(this).closest('form'));
+
+		$j(this).parent().toggleClass('selected');
 	});
+
+	$j('.textarea-container textarea').blur(function() {
+		submitIndividualResponse($j(this).closest('form'));
+	});
+
+	$j('form input').blur(function() {
+		submitIndividualResponse($j(this).closest('form'));
+	});
+
+	/**
+	 * Send changes to one form
+	 *
+	 * @param element
+	 */
+	function submitIndividualResponse(element) {
+		$j.ajax({
+			type: 'post',
+			url: $j(element).attr('action'),
+			data: $j(element).serialize(),
+
+			/* Ensure all forms submit before redirecting
+			 * Do not upgrade jquery to 1.9 or you'll lose this
+			 */
+			async: false,
+
+			/* Callback on success
+			 */
+			success: function(responseText) {
+				var dataFunction = new Function('return ' + responseText);
+				var result = dataFunction();
+
+				/* Save successful, so hide form and disable submit butan.
+				 * Update section completion value
+				 */
+				if (result.response_id != '') {
+					for (var i=0; i < result.percentageComplete.length; i++) {
+						var sectionSelector = $j('#sectionPercentageComplete_' + result.percentageComplete[i].section_id);
+						var percentage = result.percentageComplete[i].percentageComplete.toString();
+
+						sectionSelector.find('.percentage-text em').text(percentage);
+						sectionSelector.find('.percentage-bar').css('width', percentage + '%');
+					}
+				}
+				else {
+					alert ('An error occurred while saving your answer.');
+				}
+			}
+		});
+	}
 
 	/**
 	 * Alias for submitting all responses
 	 */
 	function submitAllResponses() {
 		$j('.questionForm').each(function(index, element) {
-			$j.ajax({
-				type: 'post',
-				url: $j(element).attr('action'),
-				data: $j(element).serialize(),
-
-				/* Ensure all forms submit before redirecting
-				 * Do not upgrade jquery to 1.9 or you'll lose this
-				 */
-				async: false,
-
-				beforeSend: function() {
-					$j('#assessment-saving').show();
-				},
-
-				/* Callback on success
-				 */
-				success: function(responseText) {
-					var dataFunction = new Function('return ' + responseText);
-					var result = dataFunction();
-
-					/* Save successful, so hide form and disable submit butan.
-					 * Update section completion value
-					 */
-					if (result.response_id != '') {
-						for (var i=0; i < result.percentageComplete.length; i++) {
-							var sectionSelector = $j('#sectionPercentageComplete_' + result.percentageComplete[i].section_id);
-							var percentage = result.percentageComplete[i].percentageComplete.toString();
-
-							sectionSelector.find('.percentage-text em').text(percentage);
-							sectionSelector.find('.percentage-bar').css('width', percentage + '%');
-						}
-					}
-					else {
-						alert ('An error occurred while saving your answer.');
-					}
-				}
-			});
+			submitIndividualResponse(element);
 		});
 	}
 
