@@ -315,16 +315,16 @@ class Report_Parent extends Report_Abstract {
 					/* Combine additional address details
 					 * strlen/trim check in case of whitespace characters coming out
 					 */
-					if (strlen(trim($currentContact['StudentContactAddress1']))) {
-						$address .= $currentContact['StudentContactAddress1'];
+					if (strlen(trim($currentContact['StudentContactHomeAddress1']))) {
+						$address .= $currentContact['StudentContactHomeAddress1'];
 					}
 
-					if (strlen(trim($currentContact['StudentContactAddress2']))) {
-						$address .= '<br />' . $currentContact['StudentContactAddress2'];
+					if (strlen(trim($currentContact['StudentContactHomeAddress2']))) {
+						$address .= '<br />' . $currentContact['StudentContactHomeAddress2'];
 					}
 
-					if (strlen(trim($currentContact['StudentContactAddress3']))) {
-						$address .= '<br />' . $currentContact['StudentContactAddress3'];
+					if (strlen(trim($currentContact['StudentContactHomeAddress3']))) {
+						$address .= '<br />' . $currentContact['StudentContactHomeAddress3'];
 					}
 
 					$address .= '<br />';
