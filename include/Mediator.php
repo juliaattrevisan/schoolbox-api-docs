@@ -216,8 +216,12 @@ class Mediator {
         $r->setCore('methodName', $this->getMethodName());
         $r->setCore('methodArgs', $this->getMethodArgs());
         //
-        // Makes sense to fit session ID in core, I think.
-        $r->setCore('sessionId',  session_id());
+        // Don't set the session ID unless user is actually logged in, because
+        // it only applies to users who are.
+        $auth = new Authenticator();
+        if ($auth->isAuthenticated()) {
+            $r->setCore('sessionId',  session_id());
+        }
 
         // map simple site config variables
         $map = array(
