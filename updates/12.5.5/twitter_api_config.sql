@@ -17,8 +17,8 @@ VALUES (
   'Consumer key for Twitter API.',
   'input',
   NULL,
-  'Modules',
-  'true',
+  '3rd Party Services',
+  'false',
   'false',
   'false'
 ),
@@ -29,8 +29,8 @@ VALUES (
   'Consumer secret for Twitter API.',
   'input',
   NULL,
-  'Modules',
-  'true',
+  '3rd Party Services',
+  'false',
   'false',
   'false'
 ),
@@ -41,8 +41,8 @@ VALUES (
   'OAuth token for Twitter API.',
   'input',
   NULL,
-  'Modules',
-  'true',
+  '3rd Party Services',
+  'false',
   'false',
   'false'
 ),
@@ -53,8 +53,8 @@ VALUES (
   'OAuth token secret for Twitter API.',
   'input',
   NULL,
-  'Modules',
-  'true',
+  '3rd Party Services',
+  'false',
   'false',
   'false'
 );
