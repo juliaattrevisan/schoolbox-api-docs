@@ -73,7 +73,10 @@ abstract class Synchronise_Denbigh_Kings_Abstract extends Synchronise_Denbigh_Ab
         //
         // SB-2035: strip non-ASCII chars from input.
         $newUser = array_map(
-            function($v) { return iconv('UTF-8', 'ASCII//TRANSLIT', $v); },
+            function($v) {
+                if(is_string($v))
+                    iconv('UTF-8', 'ASCII//TRANSLIT', $v);
+            },
             $newUser
         );
 
