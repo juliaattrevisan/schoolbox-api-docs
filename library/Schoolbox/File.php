@@ -7,8 +7,9 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Resource;
+namespace Schoolbox;
 use Schoolbox\ConfigLoader;
+use Schoolbox\File\MimetypeMapper;
 
 class File {
 
@@ -299,6 +300,7 @@ class File {
 		if (file_exists($file_location = $this->getFileLocation())) {
 			return unlink($file_location);
 		}
+		return false;
 	}
 
 	/**
@@ -316,14 +318,14 @@ class File {
 	}
 
 	/**
-	 * @param \Schoolbox\Resource\MimetypeMapper $mimetype_loader
+	 * @param \Schoolbox\File\MimetypeMapper $mimetype_loader
 	 */
 	public function setMimetypeLoader($mimetype_loader) {
 		$this->mimetype_loader = $mimetype_loader;
 	}
 
 	/**
-	 * @return \Schoolbox\Resource\MimetypeMapper
+	 * @return \Schoolbox\File\MimetypeMapper
 	 */
 	public function getMimetypeLoader() {
 		return $this->mimetype_loader;

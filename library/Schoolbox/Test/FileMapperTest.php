@@ -10,8 +10,8 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Resource\Test;
-use Schoolbox\Resource\FileMapper;
+namespace Schoolbox\Test;
+use Schoolbox\FileMapper;
 use Schoolbox\Test\TestCase;
 
 class FileMapperTest extends TestCase {
@@ -36,7 +36,7 @@ class FileMapperTest extends TestCase {
 			'temp_location' => '/tmp/pngsomewhere'
 		);
 		$file = $this->object->hydrate($data);
-		$this->assertInstanceOf('Schoolbox\\Resource\\File', $file);
+		$this->assertInstanceOf('Schoolbox\\File', $file);
 		$this->assertEquals(4, $file->getId());
 		$this->assertEquals('stuff.png', $file->getFilename());
 		$this->assertEquals(false, $file->getTempLocation());

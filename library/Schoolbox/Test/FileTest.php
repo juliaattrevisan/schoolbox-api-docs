@@ -10,7 +10,7 @@
  */
 
 namespace Schoolbox\Resource\Test;
-use Schoolbox\Resource\File;
+use Schoolbox\File;
 use Schoolbox\Test\TestCase;
 
 class FileTest extends TestCase {

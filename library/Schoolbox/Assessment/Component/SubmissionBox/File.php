@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox;
-use Schoolbox\Resource;
 
 class File {
 
@@ -29,12 +28,12 @@ class File {
 	protected $submission_box_id;
 
 	/**
-	 * @var Resource\File
+	 * @var Schoolbox\File
 	 */
 	protected $file;
 
 	public function __construct() {
-		$this->setFile(new Resource\File());
+		$this->setFile(new Schoolbox\File());
 	}
 
 	/**
@@ -80,14 +79,14 @@ class File {
 	}
 
 	/**
-	 * @param Resource\File $file
+	 * @param Schoolbox\File $file
 	 */
-	public function setFile(Resource\File $file) {
+	public function setFile(Schoolbox\File $file) {
 		$this->file = $file;
 	}
 
 	/**
-	 * @return Resource\File
+	 * @return Schoolbox\File
 	 */
 	public function getFile() {
 		return $this->file;

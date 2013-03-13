@@ -7,13 +7,13 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Resource;
+namespace Schoolbox;
 use Schoolbox;
 
 class FileMapper extends Schoolbox\Mapper {
 	protected function mapping () {
 		$this->hasTable('storage');
-		$this->hasModel('\\Schoolbox\\Resource\\File');
+		$this->hasModel('\\Schoolbox\\File');
 		$this->hasMap(array(
 			'column'     => 'storage_id',
 			'property'   => 'id',

@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Resource;
+namespace Schoolbox\File;
 use Schoolbox;
 
 class MimetypeMapper extends Schoolbox\Mapper {
