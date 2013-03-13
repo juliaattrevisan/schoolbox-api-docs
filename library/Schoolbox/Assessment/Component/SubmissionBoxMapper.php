@@ -139,20 +139,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'mapper'    => new NotificationMapper(),
 			'this_key'  => 'id',
 			'other_key' => 'box_id',
-//			'extra'     => "`:other_alias`.`type` = 'overdue'",
 		));
-//		$this->hasJoin('notify_upcoming', array(
-//			'mapper'    => new SubmissionBoxNotificationMapper(),
-//			'this_key'  => 'id',
-//			'other_key' => 'box_id',
-//			'extra'     => "`:other_alias`.`type` = 'upcoming'",
-//		));
-//		$this->hasJoin('notify_returned', array(
-//			'mapper'    => new SubmissionBoxNotificationMapper(),
-//			'this_key'  => 'id',
-//			'other_key' => 'box_id',
-//			'extra'     => "`:other_alias`.`type` = 'returned'",
-//		));
 	}
 
 	/**
@@ -227,8 +214,10 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			// Consider a publish/subscribe event system.
 			foreach ($objects as $this_object) {
 				if ($box_file = $this_object->getFileLink()) {
-					$box_file->setSubmissionBoxId($this_object->getId());
-					$this->getJoinMapper('files')->save($box_file);
+					if ($box_file->hasFile()) {
+						$box_file->setSubmissionBoxId($this_object->getId());
+						$this->getJoinMapper('files')->save($box_file);
+					}
 				}
 				foreach ($this_object->getNotifications() as $notification) {
 					$notification->setSubmissionBoxId($this_object->getId());

@@ -92,4 +92,13 @@ class File {
 	public function getFile() {
 		return $this->file;
 	}
+
+	/**
+	 * Does this submission box file entry have an actual file attached?
+	 *
+	 * @return bool
+	 */
+	public function hasFile() {
+		return strlen($this->file->getFilename()) > 0;
+	}
 }

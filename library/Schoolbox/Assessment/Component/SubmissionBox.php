@@ -136,7 +136,6 @@ class SubmissionBox {
 
 	/**
 	 * Temporary variable for storing category codes for the category.
-	 * TODO create category mapper and load the category into the submission.
 	 *
 	 * @var array
 	 */
