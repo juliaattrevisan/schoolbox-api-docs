@@ -18,7 +18,7 @@ if(Cfg::get('site_location') != 'cathedral') {
     $this->pageNotFound();
 }
 
-$tassID = preg_replace('/[^0-9]/s', '', $_SESSION['sid']);
+$tassID = $_SESSION['sid'];
 $hash = md5('L@goon1917'.$tassID);
 
 $destination = "https://msawebportal.cathedral.qld.edu.au/?id=$tassID&key=$hash";
