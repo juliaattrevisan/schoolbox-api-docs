@@ -216,12 +216,6 @@ class File {
 		if (!isset($id)) {
 			return false;
 		}
-		//
-		// TODO move away from singletons, and move toward some other config.
-		// We have a dilemma - I want this class to require as little
-		// post-construct configuration as possible, but I also want this to be
-		// testable.
-		// Dependiency Injection to the rescue?
 		return $this->config_loader->get('storage_dir') . '/' . $id . '.dat';
 	}
 
