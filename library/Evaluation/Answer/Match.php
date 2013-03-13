@@ -134,15 +134,16 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
 
             if ($existing['response']) {
                 $right = unserialize($existing['response']);
-            } else {
-
-                /* Randomize right-side. Do this multiple times because it's not
-                 * very random after one shuffle for some reason
-                 */
-                shuffle($right);
-                shuffle($right);
-                shuffle($right);
             }
+			else {
+				$originalRight = $right;
+
+                /* Shuffle until they are totally different
+                 */
+				while ($originalRight === $right) {
+					shuffle($right);
+				}
+			}
 
             for ($i = 0; $i < $answerCount; $i++) {
                 $page->setVar(array(
