@@ -52,6 +52,11 @@ class SubmissionBox {
 	/**
 	 * @var string
 	 */
+	protected $work_type_name;
+
+	/**
+	 * @var string
+	 */
 	protected $name;
 
 	/**
@@ -125,6 +130,11 @@ class SubmissionBox {
 	 * @var int
 	 */
 	protected $mark_type;
+
+	/**
+	 * @var string
+	 */
+	protected $mark_type_name;
 
 	/**
 	 * @var int
@@ -404,7 +414,7 @@ class SubmissionBox {
 	}
 
 	/**
-	 * @param Notification
+	 * @param Notification $notification
 	 */
 	public function addNotification(Notification $notification) {
 		$this->notifications->add($notification);
@@ -450,5 +460,33 @@ class SubmissionBox {
 	 */
 	public function getLegacyFileComment() {
 		return $this->legacy_file_comment;
+	}
+
+	/**
+	 * @param string $mark_type_name
+	 */
+	public function setMarkTypeName($mark_type_name) {
+		$this->mark_type_name = $mark_type_name;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getMarkTypeName() {
+		return $this->mark_type_name;
+	}
+
+	/**
+	 * @param string $work_type_name
+	 */
+	public function setWorkTypeName($work_type_name) {
+		$this->work_type_name = $work_type_name;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getWorkTypeName() {
+		return $this->work_type_name;
 	}
 }
