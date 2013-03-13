@@ -90,7 +90,11 @@ $j(function () {
             <div class="close">x</div>
             <div class="js-data clearfix"><h3>${name}</h3>
                 <p class="bubble-name"><span><a href="/homepage/${cid}">${category}</a></span> - <em>${typeName}</em></p>
-                {{if comment}} <p class="comment">${comment}</p> {{/if}}
+				{{if comment}}
+					<p class="comment">${comment}</p>
+				{{else description}}
+					<p class="comment">${description}</p>
+				{{/if}}
                 <p class="details clearfix">
 					{{if file_hash}}
 						<a class="btn down-arrow float-left" href="/storage/fetch.php?hash=${file_hash}&save=1"><span></span>Download</a>
