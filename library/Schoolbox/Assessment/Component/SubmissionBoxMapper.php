@@ -175,6 +175,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$submission_box = false;
 		//
 		// TODO Add work type and mark type models.
+		// TODO get submission history for a user as part of submission (or of user?)
 		// Need some way of setting work type ID without changing the work type.
 		// $submission->setWorkTypeId($id)
 		// $submission->loadWorkType();
