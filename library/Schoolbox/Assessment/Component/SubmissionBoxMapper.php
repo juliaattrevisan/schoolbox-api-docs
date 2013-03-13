@@ -151,16 +151,22 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$box_file_mapper = $this->getJoinMapper('files');
 		$file_mapper     = $box_file_mapper->getJoinMapper('file');
 		$notify_mapper   = $this->getJoinMapper('notify');
+		$worktype_mapper = $this->getJoinMapper('work_type');
+		$marktype_mapper = $this->getJoinMapper('mark_type');
 		$query = "
 			SELECT
 				{$this->getColumnString('sb')},
 				{$box_file_mapper->getColumnString('sm')},
 				{$file_mapper->getColumnString('f')},
-				{$notify_mapper->getColumnString('n')}
+				{$notify_mapper->getColumnString('n')},
+				{$worktype_mapper->getColumnString('wt')},
+				{$marktype_mapper->getColumnString('mt')}
 			FROM {$this->getTable()} sb
 			LEFT JOIN {$this->getJoinSql('files', 'sb', 'sm')}
 			LEFT JOIN {$box_file_mapper->getJoinSql('file', 'sm', 'f')}
 			LEFT JOIN {$this->getJoinSql('notify', 'sb', 'n')}
+			LEFT JOIN {$this->getJoinSql('work_type', 'sb', 'wt')}
+			LEFT JOIN {$this->getJoinSql('mark_type', 'sb', 'mt')}
 			WHERE sb.id=?
 		";
 		$statement = $this->database->prepare($query);
@@ -169,13 +175,18 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$submission_box = false;
 		//
 		// TODO Add work type and mark type models.
+		// Need some way of setting work type ID without changing the work type.
+		// $submission->setWorkTypeId($id)
+		// $submission->loadWorkType();
+		// $submission->setWorkType($id)
 		foreach ($statement as $row) {
 			if (!$submission_box) {
 				$submission_box = $this->hydrate($row, 'sb');
 				$box_file       = $box_file_mapper->hydrate($row, 'sm');
 				$box_file->setFile($file_mapper->hydrate($row, 'f'));
 				$submission_box->setFileLink($box_file);
-				$submission_box->setFileLink($box_file);
+				$submission_box->setWorkTypeName($row['wt.name']);
+				$submission_box->setMarkTypeName($row['mt.name']);
 			}
 			$submission_box->addNotification($notify_mapper->hydrate($row, 'n'));
 		}
