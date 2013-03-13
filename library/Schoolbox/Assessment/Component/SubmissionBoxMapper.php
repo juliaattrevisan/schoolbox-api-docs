@@ -204,7 +204,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 				WHERE c.id = ?
 			";
 			$statement = $this->database->prepare($query);
-			$statement->execute(array($submission_box->getId()));
+			$statement->execute(array($submission_box->getCategory()));
 			$category_name  = '';
 			$category_codes = array();
 			foreach ($statement as $row) {
