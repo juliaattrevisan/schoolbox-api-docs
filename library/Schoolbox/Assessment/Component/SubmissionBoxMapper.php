@@ -179,6 +179,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			}
 			$submission_box->addNotification($notify_mapper->hydrate($row, 'n'));
 		}
+		unset($statement);
+
 		if ($submission_box instanceof SubmissionBox) {
 			//
 			// Get category and codes.
@@ -199,6 +201,18 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			}
 			$submission_box->setCategoryName($category_name);
 			$submission_box->setCategoryCodes($category_codes);
+			unset($statement);
+
+			//
+			// TODO include legacy file mapper.
+			if ($legacy_file_id = $submission_box->getLegacyFileId()) {
+				$query = "SELECT comment FROM file WHERE id=?";
+				$statement = $this->database->prepare($query);
+				$statement->execute(array($legacy_file_id));
+				if ($this_row = $statement->fetch()) {
+					$submission_box->setLegacyFileComment($this_row['comment']);
+				}
+			}
 		}
 		return $submission_box;
 	}
