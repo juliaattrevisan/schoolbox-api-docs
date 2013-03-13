@@ -12,6 +12,7 @@
 
 namespace Schoolbox;
 use Schoolbox;
+use Cfg;
 
 class ConfigLoader {
 	public function get($var) {
