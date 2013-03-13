@@ -243,6 +243,20 @@ abstract class Mapper {
 
 
     /**
+     * @brief calls save(), but forces create by nulling the identifier field.
+     * @param $object
+     * @return array<int>
+     */
+    public function create($object) {
+        $collection = $this->getModelAsCollection($object);
+        foreach ($collection as $model) {
+            $this->setModelProperty($model, $this->identifier['property'], null);
+        }
+        return $this->save($collection);
+    }
+
+
+    /**
      * @brief Saves an object to the database. Updates or inserts
      * @param $object
      * @return array<int>
