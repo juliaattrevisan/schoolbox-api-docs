@@ -33,7 +33,7 @@ class Facade_Component_CurrentPeriod extends Facade_Component_Generic {
             $dayNum = $timetableHandler->getDayNumber($campus);
             $now = time();
 
-            $def = $timetableHandler->getTimetableDefinition($campus, 0);
+            $def = $timetableHandler->getTimetableDefinition($campus, $dayNum);
 
             if(!count($def) || !is_array($def)) {
                 // return an array without title set, which will prevent the article rendering
