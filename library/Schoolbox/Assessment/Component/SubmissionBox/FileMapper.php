@@ -41,15 +41,29 @@ class FileMapper extends Schoolbox\Mapper {
 	public function save($object) {
 		//
 		// Create/save associated file item first if it isn't already saved.
-		$objects = $this->getModelAsCollection($object);
+		$objects     = $this->getModelAsCollection($object);
+		$file_mapper = $this->getJoinMapper('file');
 		foreach ($objects as $this_object) {
 			//
 			// pre-save callback on this object?
 			// subscribe('preSave:SubmissionBoxFileMapper', $this_object)
 			// in mapper->save(): publish('preSave:'.$this->name, true(default))
 			if ($file = $this_object->getFile()) {
-				$this->getJoinMapper('file')->save($file);
-				$this_object->setFileId($file->getId());
+				//
+				// Does this file's hash exist already?
+				// If so, use the existing file instead of the uploaded one.
+				// Otherwise, a file was uploaded - create a new file entry
+				// instead of overwriting the existing one.
+				$existing_files = $file_mapper->findByColumn('hash', $file->getHash());
+				$file_id        = null;
+				if ($existing_files->count() > 0) {
+					$file_id = $existing_files->current()->getId();
+				}
+				else {
+					$file_mapper->create($file);
+					$file_id = $file->getId();
+				}
+				$this_object->setFileId($file_id);
 			}
 		}
 		return parent::save($objects);
