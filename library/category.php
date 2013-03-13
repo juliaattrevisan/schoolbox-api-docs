@@ -138,7 +138,7 @@ class Category extends DeprecatedModel {
                   LEFT JOIN user u on u.id = a.uid
                   LEFT JOIN userGroups g ON g.cid = c.id
                   LEFT JOIN homepage_config cf ON cf.cid = c.id
-                  WHERE (co.code = {$this->db->smartQuote($code)} OR co.code LIKE {$this->db->smartQuote('%/'.$code)}
+                  WHERE (co.code = {$this->db->smartQuote($code)} OR co.code LIKE {$this->db->smartQuote('%/'.$code)})
                   GROUP BY c.id";
 
         return $this->db->getRow($query);
