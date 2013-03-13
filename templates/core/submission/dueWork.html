@@ -92,7 +92,11 @@ $j(function () {
                 <p class="bubble-name"><span><a href="/homepage/${cid}">${category}</a></span> - <em>${typeName}</em></p>
                 {{if comment}} <p class="comment">${comment}</p> {{/if}}
                 <p class="details clearfix">
-                    {{if fid > 0}} <a class="btn down-arrow float-left" href="/send.php?id=${fid}&save=1"><span></span>Download</a> {{/if}}
+					{{if file_hash}}
+						<a class="btn down-arrow float-left" href="/storage/fetch.php?hash=${file_hash}&save=1"><span></span>Download</a>
+					{{else legacy_fid > 0}}
+						<a class="btn down-arrow float-left" href="/send.php?id=${fid}&save=1"><span></span>Download</a>
+					{{/if}}
                    <a class="btn go-to float-left" href="/submission/submissionHistory/${id}"><span></span>${action}</a>
 				</p>
 
