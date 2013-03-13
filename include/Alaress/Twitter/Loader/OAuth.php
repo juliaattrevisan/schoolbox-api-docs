@@ -29,11 +29,9 @@ class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface {
 	 * Load required classes, instantiate a new connection using the four
 	 * variables we obtained by running connect.php
 	 */
-	public function __construct() {
-		require_once('oauth/config.php');
+	public function __construct($consumer_key, $consumer_secret, $oauth_token = null, $oauth_secret = null) {
 		require_once('oauth/twitteroauth.php');
-
-		$this->setConnection(new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET));
+		$this->setConnection(new TwitterOAuth($consumer_key, $consumer_secret, $oauth_token, $oauth_secret));
 	}
 
 	/**
@@ -42,21 +40,21 @@ class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface {
 	 *
 	 * @return array
 	 */
-	public function load() {
-		$allTweets = $this->getConnection()->get($this->getResource());
-
-		$preprocessed = array();
-
-		/* Iterate to set up for Filters and get rid of unwanted stuff
-		 */
-		foreach($allTweets as $currentTweet) {
-			$preprocessed[] = array(
-				'text' => $currentTweet->text,
-				'date' => $currentTweet->created_at,
-			);
+	public function load($resource = null, $params = null) {
+		if (!isset($resource)) {
+			$resource = $this->getResource();
 		}
-
-		return $preprocessed;
+		if (!isset($params)) {
+			$params = $this->getParams();
+		}
+		$result = $this->getConnection()->get($resource, $params);
+		$code   = intval($this->getConnection()->http_code);
+		if ($code >= 400) {
+			//
+			// Log errors somewhere, and return an empty array?
+			return array();
+		}
+		return $result->statuses;
 	}
 
 	/* Getters/Setters
@@ -102,5 +100,24 @@ class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface {
 	 */
 	private function getResource() {
 		return $this->resource;
+	}
+
+	/**
+	 * Gets URL parameters that will be sent to Twitter interface.
+	 *
+	 * @return mixed
+	 */
+	public function getParams() {
+		return $this->params;
+	}
+
+	/**
+	 * Sets URL parameters that are sent to Twitter interface.
+	 *
+	 * @return $this
+	 */
+	public function setParams($params) {
+		$this->params = $params;
+		return $this;
 	}
 }
