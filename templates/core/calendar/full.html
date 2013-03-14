@@ -82,7 +82,7 @@
 
                     // end time
                     if (calEvent.end != null) {
-                        data.date += " &ndash; " + calendarTime(calEvent.end)
+                        data.date += " &ndash; " + calendarDate(calEvent.end)
                     }
 
                     // Links to Modify Screen
@@ -463,26 +463,23 @@
                     <div class="filter-cat groups clearfix"><span class="filter-title">Groups</span>
                         <!-- BEGIN filter_group -->
                         <label title="{GROUP_NAME}">
-                            <input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}"
-                            {GROUP_ID_SELECTED} class="checkbox applyFilters"/>
-                            {GROUP_NAME} </label>
-
+                            <input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}" {GROUP_ID_SELECTED} class="checkbox applyFilters"/>
+                            {GROUP_NAME}
+						</label>
                         <!-- END filter_group -->
                     </div>
                     <div class="filter-cat campus"><span class="filter-title">Campus</span>
                         <!-- BEGIN filter_campus -->
                         <label title="{CAMPUS_NAME}">
-                            <input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED}
-                            value="campus{CAMPUS_ID}" class="checkbox applyFilters"/>
-                            {CAMPUS_NAME} </label>
-
+                            <input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="checkbox applyFilters"/>
+                            {CAMPUS_NAME}
+						</label>
                         <!-- END filter_campus -->
                     </div>
                     <div class="filter-cat events last"><span class="filter-title">Event</span>
                         <!-- BEGIN filter_event_type -->
                         <label title="{EVENT_TYPE_NAME}">
-                            <input type="checkbox" name="events" id="{EVENT_TYPE_ID}" {EVENT_TYPE_ID_SELECTED}
-                            value="type{EVENT_TYPE_ID}" class="checkbox applyFilters"/>
+                            <input type="checkbox" name="events" id="{EVENT_TYPE_ID}" {EVENT_TYPE_ID_SELECTED} value="type{EVENT_TYPE_ID}" class="checkbox applyFilters"/>
                             <span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span>
                         </label>
                         <!-- END filter_event_type -->
@@ -490,8 +487,9 @@
                     </div>
                     <!--/filter-list-->
                 </form>
-                <p class="clearfix"><a href="#" id="applyFilters" class="btn float-right"><span></span>Apply
-                    Filters</a></p>
+                <p class="clearfix">
+					<a href="#" id="applyFilters" class="btn float-right"><span></span>Apply Filters</a>
+				</p>
                 <!--/filter-drop-->
             </div>
         </div>
