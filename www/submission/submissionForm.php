@@ -84,8 +84,14 @@ if (isset($_FILES['file']['name']) && $_FILES['file']['name']) {
 	$file->loadFilesizeFromTempLocation();
 }
 else {
-	$legacy_file_id = $action == 'create' ? $_POST['fileId'] : 0;
+	$legacy_file_id = $action == 'create' ? $_POST['fileId']    : 0;
 	$storage_id     = $action == 'create' ? $_POST['storageId'] : 0;
+
+	//
+	// Multifile handling:
+	// Convert legacy file to new file when uploading any files?
+	// If many files were selected, connect them here.
+
 }
 
 
