@@ -38,7 +38,7 @@ $rubricHandler = new DueWork_Rubric_Handler();
 //
 // Should work types include or not include online assessments?
 // They do for pre-existing items, they don't for new items.
-$work_types = $type_mapper->getAllExcept(SubmissionBox::WORKTYPE_ONLINE_ASSESSMENT);
+$work_types = $type_mapper->getAllExcept(SubmissionBox\WorkType::TYPE_ONLINE_ASSESSMENT);
 $mark_types = $mark_mapper->getAll();
 
 // IF PRE-EXISTING
@@ -66,7 +66,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
 
     // legacy support
 	$mark_type = $submission->getMarkType();
-    if ($mark_type == SubmissionBox::MARKTYPE_FREE) {
+    if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
         $this->setVar('marktype_block', '');
     }
     else {
@@ -79,7 +79,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
 
         // if the rubric creation fails it will throw an exception, in which case just output the empty sets
         try {
-            if($mark_type == SubmissionBox::MARKTYPE_RUBRIC) {
+            if($mark_type == SubmissionBox\MarkType::TYPE_RUBRIC) {
                 $rubric = $rubricHandler->getRubric($submission->getId());
                 $resultSetID = $submission->getRubricResultSet();
 

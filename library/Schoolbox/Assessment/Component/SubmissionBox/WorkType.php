@@ -12,6 +12,18 @@ use Schoolbox;
 use Schoolbox\Resource;
 
 class WorkType {
+
+	const TYPE_ASSESSMENT_TASK   = 1;
+	const TYPE_ASSIGNMENT        = 2;
+	const TYPE_HOMEWORK          = 3;
+	const TYPE_ESSAY             = 5;
+	const TYPE_RESEARCH_PROJECT  = 6;
+	const TYPE_CLASS_WORK        = 7;
+	const TYPE_PRESENTATION      = 8;
+	const TYPE_ORAL              = 9;
+	const TYPE_EXTENSION         = 10;
+	const TYPE_ONLINE_ASSESSMENT = 11;
+
 	/**
 	 * @var int
 	 */

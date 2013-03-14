@@ -12,6 +12,14 @@ use Schoolbox;
 use Schoolbox\Resource;
 
 class MarkType {
+
+	const TYPE_PERCENT = 1;
+	const TYPE_LETTER  = 2;
+	const TYPE_RAW     = 3;
+	const TYPE_FREE    = 4;
+	const TYPE_RUBRIC  = 5;
+	const TYPE_NONE    = 6;
+
 	/**
 	 * @var int
 	 */
