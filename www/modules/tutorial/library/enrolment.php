@@ -54,7 +54,7 @@ class Enrolment extends DeprecatedModel {
 		$eventHandler = new Event;
 		$event = $eventHandler->getByID($data['eventID']);
 
-		$date = new Alaress_Date_Format($event['date'], 'U');
+		$date = new Alaress_Date_Format($event['startDate'], 'y-m-d h:i:s');
 
 		$data['from'] = $date->getDatabaseDate();
 
