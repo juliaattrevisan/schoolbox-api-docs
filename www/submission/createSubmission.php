@@ -298,6 +298,10 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         'LATE_HOUR' => '',
         'LATE_MIN'  => '',
         'LATE_PM'   => 'selected',
+
+        'FILE_MAX_UPLOAD' => Cfg::get('file_upload_count'),
+        'SESSION_NAME'    => session_name(),
+        'SESSION_ID'      => session_id(),
     );
 
     // notifications on by default
