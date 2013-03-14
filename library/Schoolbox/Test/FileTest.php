@@ -9,7 +9,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Resource\Test;
+namespace Schoolbox\Test;
 use Schoolbox\File;
 use Schoolbox\Test\TestCase;
 
