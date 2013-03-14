@@ -164,7 +164,19 @@ else {
 /* Check whether a file is associated with the work
  */
 $legacy_file_id = $submission->getLegacyFileId();
-if($legacy_file_id && is_numeric($legacy_file_id)) {
+if ($file_id = $submission->getFileLink()->getId()) {
+    $file = $submission->getFileLink()->getFile();
+    $this->setVar(array(
+        'FILE_HASH'  => $file->getHash(),
+        'FILE_THUMB' => $file->getIconFromFilename(),
+        'FILE_SIZE'  => Alaress_Byte_Format::bytesToString($file->getFilesize()),
+        'FILE_NAME'  => $file->getFilename(),
+        'FILE_DATE'  => date('jS M Y, g:ia', strtotime($file->getUploadedOn()))
+    ));
+    $this->parse('download_block', 'download');
+    $this->setVar('legacy_download_block', '');
+}
+elseif ($legacy_file_id && is_numeric($legacy_file_id)) {
     $fileHandler = new File;
     $file = $fileHandler->getByID($legacy_file_id);
 
@@ -177,18 +189,6 @@ if($legacy_file_id && is_numeric($legacy_file_id)) {
     ));
     $this->parse('legacy_download_block', 'legacy_download');
     $this->setVar('download_block', '');
-}
-elseif ($file_id = $submission->getFileLink()->getId()) {
-    $file = $submission->getFileLink()->getFile();
-    $this->setVar(array(
-        'FILE_HASH'  => $file->getHash(),
-        'FILE_THUMB' => $file->getIconFromFilename(),
-        'FILE_SIZE'  => Alaress_Byte_Format::bytesToString($file->getFilesize()),
-        'FILE_NAME'  => $file->getFilename(),
-        'FILE_DATE'  => date('jS M Y, g:ia', strtotime($file->getUploadedOn()))
-    ));
-    $this->parse('download_block', 'download');
-    $this->setVar('legacy_download_block', '');
 }
 else {
     $this->setVar('legacy_download_block', '');
