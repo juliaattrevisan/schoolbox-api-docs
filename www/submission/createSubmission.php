@@ -5,7 +5,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 $this->setFile(TEMPLATE_content, 'submission/createSubmission.html');
 $this->setTab('submission');
 $this->setBlock(TEMPLATE_content, 'browse_row', 'browse_block');
-$this->setBlock('browse_row', 'file_overwrite', 'file_overwrite_block');
 $this->setBlock('browse_row', 'existing_file', 'existing_file_block');
 $this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
 $this->setBlock('marktype', 'criterion', 'criterion_block');
@@ -186,7 +185,6 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         $this->setVar('CURRENT_FILE_DATE', date('jS M Y, g:ia', strtotime($file->getUploadedOn())));
 
         $this->parse('existing_file_block','existing_file');
-        $this->parse('file_overwrite_block','file_overwrite');
     }
     elseif ($submission->getLegacyFileId()) {
 
@@ -198,13 +196,9 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         $this->setVar('CURRENT_FILE_DATE', date('jS M Y, g:ia', $file['submitted']));
 
         $this->parse('existing_file_block','existing_file');
-        $this->parse('file_overwrite_block','file_overwrite');
     }
     else {
-        $this->setVar(array(
-            'file_overwrite_block' => '',
-            'existing_file_block' => ''
-        ));
+        $this->setVar('existing_file_block', '');
     }
 
     $this->parse('browse_block', 'browse_row');
@@ -223,7 +217,6 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
     // clear blocks that aren't used in this context
     $this->setVar(array(
-        'file_overwrite_block' => '',
         'existing_file_block' => '',
         'existing_marks_warning_block'
     ));
