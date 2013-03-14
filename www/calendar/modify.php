@@ -26,17 +26,17 @@ if (is_numeric($_GET['eventID'])) {
         error(34);
     }
 
-    if ($event['startTime'] != "12:00AM") {
-        preg_match("/([\d]{1,2}):([\d]{2})(AM|PM)/", $event['startTime'], $startTime);
-    } else {
-        $startTime = array('', '', '', '');
-    }
-
-    if ($event['endTime'] != "12:00AM") {
-        preg_match("/([\d]{1,2}):([\d]{2})(AM|PM)/", $event['endTime'], $endTime);
-    } else {
-        $endTime = array('', '', '', '');
-    }
+//    if ($event['startTime'] != "12:00AM") {
+//        preg_match("/([\d]{1,2}):([\d]{2})(AM|PM)/", $event['startTime'], $startTime);
+//    } else {
+//        $startTime = array('', '', '', '');
+//    }
+//
+//    if ($event['endTime'] != "12:00AM") {
+//        preg_match("/([\d]{1,2}):([\d]{2})(AM|PM)/", $event['endTime'], $endTime);
+//    } else {
+//        $endTime = array('', '', '', '');
+//    }
 
     if ($event['publish_date'] != null && !preg_match('/^0000-00-00/', $event['publish_date'])) {
         $pubDateObject = new Alaress_Date_Format($event['publish_date'], 'y-m-d h:i:s');
@@ -45,18 +45,22 @@ if (is_numeric($_GET['eventID'])) {
         $publishDate = "";
     }
 
+	$startDate = new Alaress_Date_Format($event['startDate'] . ' ' . $event['startTime'], 'y-m-d h:i:s');
+	$endDate = new Alaress_Date_Format($event['endDate'] . ' ' . $event['endTime'], 'y-m-d h:i:s');
+
     $output = array(
         'FUNCTION' => 'Update',
         'EVENT_ID' => $event['id'],
-        'DATE' => date('d/m/Y', strtotime($event['date'])),
-        'HOUR' => $startTime[1],
-        'MIN' => $startTime[2],
-        'AM' => $startTime[3] == 'AM' ? 'selected="selected"' : '',
-        'PM' => $startTime[3] == 'PM' ? 'selected="selected"' : '',
-        'TOHOUR' => $endTime[1],
-        'TOMIN' => $endTime[2],
-        'AMTO' => $endTime[3] == 'AM' ? 'selected="selected"' : '',
-        'PMTO' => $endTime[3] == 'PM' ? 'selected="selected"' : '',
+        'START_DATE' => $startDate->getusingFormat('d/m/y'),
+        'START_HOUR' => $startDate->getUsingFormat('h'),
+        'START_MIN' => $startDate->getUsingFormat('i'),
+        'START_AM' => $startDate->getUsingFormat('z') == 'AM' ? 'selected="selected"' : '',
+        'START_PM' => $startDate->getUsingFormat('z') == 'PM' ? 'selected="selected"' : '',
+		'END_DATE' => $endDate->getusingFormat('d/m/y'),
+        'END_HOUR' => $endDate->getUsingFormat('h'),
+        'END_MIN' => $endDate->getUsingFormat('i'),
+        'END_AM' => $endDate->getUsingFormat('z') == 'AM' ? 'selected="selected"' : '',
+        'END_PM' => $endDate->getUsingFormat('z') == 'PM' ? 'selected="selected"' : '',
         'LEVEL' => '',
         'GROUP' => '',
         'DESCRIPTION' => $event['note'],
@@ -78,7 +82,8 @@ if (is_numeric($_GET['eventID'])) {
 
     if (count($campusList) > 1) {
         $page->checkList('campus_list', $campusList, $calendarHandler->getEventCampus($event['id']));
-    } else {
+    }
+	else {
         $page->setBlock(TEMPLATE_content, 'campus_list', 'campus_list_block');
         $page->setVar('campus_list_block', $campusList[0]['CAMPUS_NAME']);
     }
@@ -88,6 +93,7 @@ if (is_numeric($_GET['eventID'])) {
     $page->dropDown(
         'group_drop', $groupList, $event['sid'], TEMPLATE_content, array('id' => 'UGROUP_ID', 'name' => 'UGROUP_NAME')
     );
+
     $page->checkList('group_list', $calendarHandler->getGroupList(), $calendarHandler->getEventGroup($event['id']));
 
     $levelList[] = array('LEVEL_ID' => 1, 'LEVEL_NAME' => 'Personal');
@@ -95,6 +101,7 @@ if (is_numeric($_GET['eventID'])) {
     if (count($groupList) > 0) {
         $levelList[] = array('LEVEL_ID' => 2, 'LEVEL_NAME' => 'Group');
     }
+
     if (count($campusList) > 0) {
         $levelList[] = array('LEVEL_ID' => 3, 'LEVEL_NAME' => 'Campus');
     }
@@ -106,7 +113,8 @@ if (is_numeric($_GET['eventID'])) {
 
     if ($event['series_id'] == null) {
         $page->setVar('recurring_reminder_block', '');
-    } else {
+    }
+	else {
         $recurrence = $calendarHandler->getSeriesRecurrence($event['series_id']);
         $page->setVar('REC_FREQ', ucfirst($recurrence['freq']));
         $page->setVar('REC_START', $recurrence['start']->getLongDateOnly());
@@ -124,7 +132,8 @@ if (is_numeric($_GET['eventID'])) {
                 'ADV_ON' => ''
             )
         );
-    } else {
+    }
+	else {
         // no data in advanced options, hide them by default
         $page->setVar(
             array(
@@ -165,18 +174,22 @@ else {
         $selectedDate = time();
     }
 
+	$startDate = new Alaress_Date_Format($selectedDate, 'U');
+	$endDate = new Alaress_Date_Format($selectedDate, 'U');
+
     $output = array(
         'FUNCTION' => 'Add',
         'EVENT_ID' => '',
-        'DATE' => date("d/m/Y", $selectedDate),
-        'HOUR' => '',
-        'MIN' => '',
-        'AM' => '',
-        'PM' => '',
-        'TOHOUR' => '',
-        'TOMIN' => '',
-        'AMTO' => '',
-        'PMTO' => '',
+        'START_DATE' => $startDate->getUsingFormat('d/m/y'),
+        'START_HOUR' => '',
+        'START_MIN' => '',
+        'START_AM' => '',
+        'START_PM' => '',
+		'END_DATE' => $startDate->getUsingFormat('d/m/y'),
+        'END_HOUR' => '',
+        'END_MIN' => '',
+        'END_AM' => '',
+        'END_PM' => '',
         'LEVEL' => '',
         'GROUP' => '',
         'DESCRIPTION' => $note,
