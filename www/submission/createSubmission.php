@@ -178,7 +178,17 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $this->setVar($output);
 
     // check for an associated file
-    if($submission->getLegacyFileId()) {
+    if ($file_link_id = $submission->getFileLink()->getId()) {
+        $file = $submission->getFileLink()->getFile();
+
+        $this->setVar('CURRENT_FILE_NAME', $file->getFilename());
+        $this->setVar('CURRENT_FILE_ICON', $file->getIconFromFilename());
+        $this->setVar('CURRENT_FILE_DATE', date('jS M Y, g:ia', strtotime($file->getUploadedOn())));
+
+        $this->parse('existing_file_block','existing_file');
+        $this->parse('file_overwrite_block','file_overwrite');
+    }
+    elseif ($submission->getLegacyFileId()) {
 
         $fileHandler = new File;
         $file = $fileHandler->getByID($submission->getLegacyFileId());
@@ -189,16 +199,6 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
 
         $this->parse('existing_file_block','existing_file');
         $this->parse('file_overwrite_block','file_overwrite');
-    }
-    elseif ($file_link_id = $submission->getFileLink()->getId()) {
-	    $file = $submission->getFileLink()->getFile();
-
-	    $this->setVar('CURRENT_FILE_NAME', $file->getFilename());
-	    $this->setVar('CURRENT_FILE_ICON', $file->getIconFromFilename());
-	    $this->setVar('CURRENT_FILE_DATE', date('jS M Y, g:ia', strtotime($file->getUploadedOn())));
-
-	    $this->parse('existing_file_block','existing_file');
-	    $this->parse('file_overwrite_block','file_overwrite');
     }
     else {
         $this->setVar(array(
