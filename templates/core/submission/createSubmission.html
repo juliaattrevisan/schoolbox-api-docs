@@ -1,6 +1,8 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css"/>
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+<script type="text/javascript" src="/javascript/uploadify/swfobject.js"></script>
+<script type="text/javascript" src="/javascript/uploadify/jquery.uploadify.v2.1.4.js"></script>
 
 <script type="text/javascript">
     // from http://stackoverflow.com/a/5259788
@@ -21,14 +23,6 @@
 
 
     $j(function () {
-
-        // setup file input
-        $j('.prettify').prettyFileInput({
-            additionalButtonClasses:'no-marg float-left',
-            buttonActiveClass:'tick',
-            defaultText:'<span></span>Choose file',
-            defaultFileSelectedText:'<span></span>File selected'
-        });
 
         // setup datepickers
         $j('#open_date, #due_date, #late_date').datepicker({
@@ -226,6 +220,54 @@
                 }
             });
         }
+		//
+		// File uploader
+		// May need custom file to be uploaded.
+		var form        = $j('form');
+		var file_upload = $j('#custom_file_upload');
+		file_upload.uploadify({
+			'uploader':'/javascript/uploadify/uploadify.swf',
+			'script':'/submission/fileForm.php?{SESSION_NAME}={SESSION_ID}&XDEBUG_SESSION=vagrant',
+			'cancelImg':'/javascript/uploadify/cancel.png',
+			'fileDataName':'file',
+			'multi':true,
+			'auto':false
+			,'queueSizeLimit':'{FILE_MAX_UPLOAD}'
+			,'removeCompleted':false
+			,onComplete: function(event, code, file, output, upload) {
+				//
+				// Add hidden element with uploaded file ID.
+				var parsed_output = JSON.parse(output);
+				$j('#custom_file_upload'+code).prepend(
+					$j('<input name="file_ids[]" type="hidden" />').val(parsed_output.file_id)
+				);
+			}
+			,'onAllComplete':function(event, upload) {
+				form.submit();
+			}
+//			,'onSelectOnce':function () {
+//				if (!$j('.uploadifyQueueItem').find('.heading-table').length > 0) {
+//					$j('.uploadifyQueueItem').prepend(
+//						'<table width="100%" class="heading-table"><tr><td width="50%"><h4 style="margin: 0">Local File</h4></td><td width="50%"><h4 style="margin: 0">Title</h4></td></tr></table>'
+//					);
+//				}
+//			}
+		});
+
+		//
+		// Form submit: uploads files first?
+		// Does so synchronously, because the files need to be uploaded before
+		// the submission get saved.
+		$j('form').submit(function(event) {
+			var form = $j('this');
+			if ('originalEvent' in event) {
+				//
+				// Hold submit until the form is processed.
+				// The onAllComplete() method will link the forms.
+				event.preventDefault();
+				file_upload.uploadifyUpload();
+			}
+		})
     });
 </script>
 <!-- END custom_head -->
@@ -250,15 +292,16 @@
     <!-- BEGIN browse_row -->
     <tr>
         <td class="formLabelWidth">
-            <h4>File</h4>
-            <em>This is an optional file that will be related with the due work and made available for download.</em>
+			<h4>Files</h4>
+			<em>When browsing your computer you can select multiple files by holding control and clicking. You can add
+				files from multiple folders by clicking the select files multiple times.</em>
         </td>
         <td>
             <!-- BEGIN existing_file -->
             <p>Current file: <img class="mimetype" src="/images/mime/22x22/{CURRENT_FILE_ICON}"/>{CURRENT_FILE_NAME}
                 (uploaded {CURRENT_FILE_DATE})</p>
             <!-- END existing_file -->
-            <input type="file" name="file" class="prettify"/>
+            <input type="file" name="file" id="custom_file_upload" />
             <input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}"/>
         </td>
     </tr>
