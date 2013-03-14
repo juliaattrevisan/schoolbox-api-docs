@@ -500,7 +500,7 @@ abstract class Mapper {
     /**
      * @param Array $row
      * @param String $alias
-     * @param Function $callback
+     * @param callable $callback
      * @return Model
      */
     public function hydrate($row, $alias = '', $callback = null) {
@@ -514,12 +514,12 @@ abstract class Mapper {
                 $columnName = "$alias.$columnName";
             }
 
-			$columnValue = array_key_exists($columnName, $row) ? $row[$columnName] : null;
+            $columnValue = array_key_exists($columnName, $row) ? $row[$columnName] : null;
             $this->setModelProperty($model, $propertyName, $columnValue);
         }
 
         if (!empty($callback)) {
-            $model = $callback($this, $model, $row);
+            $model = call_user_func($callback, $this, $model, $row);
         }
 
         return $model;
