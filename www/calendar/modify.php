@@ -26,18 +26,6 @@ if (is_numeric($_GET['eventID'])) {
         error(34);
     }
 
-//    if ($event['startTime'] != "12:00AM") {
-//        preg_match("/([\d]{1,2}):([\d]{2})(AM|PM)/", $event['startTime'], $startTime);
-//    } else {
-//        $startTime = array('', '', '', '');
-//    }
-//
-//    if ($event['endTime'] != "12:00AM") {
-//        preg_match("/([\d]{1,2}):([\d]{2})(AM|PM)/", $event['endTime'], $endTime);
-//    } else {
-//        $endTime = array('', '', '', '');
-//    }
-
     if ($event['publish_date'] != null && !preg_match('/^0000-00-00/', $event['publish_date'])) {
         $pubDateObject = new Alaress_Date_Format($event['publish_date'], 'y-m-d h:i:s');
         $publishDate = $pubDateObject->getLocalShort();
