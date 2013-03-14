@@ -672,7 +672,7 @@ class Calendar extends DeprecatedModel {
                 $event->setAuthorId($currentEvent['uid']);
                 $event->setEventId($currentEvent['id']);
                 $event->setStartTime(new Alaress_Date_Format($currentEvent['startDate'] . ' ' . $currentEvent['startTime'], 'y-m-d h:i:s'));
-                $event->setEndTime(new Alaress_Date_Format($currentEvent['startDate'] . ' ' . $currentEvent['endTime'], 'y-m-d h:i:s'));
+                $event->setEndTime(new Alaress_Date_Format($currentEvent['endDate'] . ' ' . $currentEvent['endTime'], 'y-m-d h:i:s'));
                 $event->setType($currentEvent['type']);
                 $event->setNote($currentEvent['note']);
                 $event->setAccess($currentEvent['access']);
