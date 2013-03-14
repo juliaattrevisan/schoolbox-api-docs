@@ -234,13 +234,12 @@ $j(function () {
             </td>
             <td>
 				<input name="startDate" type="text" size="15" maxlength="30" value="{START_DATE}"/>
+				<input name="startHour" type="text" maxlength="2" value="{START_HOUR}" class="timeField"/>:
+				<input name="startMinute" type="text" maxlength="2" value="{START_MIN}" class="timeField"/>
 
-				<input name="hour" type="text" maxlength="2" value="{HOUR}" class="timeField"/>:
-				<input name="minute" type="text" maxlength="2" value="{MIN}" class="timeField"/>
-
-				<select name="period">
-					<option value="am" {AM} >AM</option>
-					<option value="pm" {PM} >PM</option>
+				<select name="startPeriod">
+					<option value="am" {START_AM} >AM</option>
+					<option value="pm" {START_PM} >PM</option>
 				</select>
 			</td>
         </tr>
@@ -251,18 +250,17 @@ $j(function () {
 			</td>
 			<td>
 				<input name="endDate" type="text" size="15" maxlength="30" value="{END_DATE}"/>
+				<input name="endHour" type="text" maxlength="2" value="{END_HOUR}" class="timeField"/>:
+				<input name="endMinute" type="text" maxlength="2" value="{END_MIN}" class="timeField"/>
 
-				<input name="tohour" type="text" maxlength="2" value="{TOHOUR}" class="timeField"/>:
-				<input name="tominute" type="text" maxlength="2" value="{TOMIN}" class="timeField"/>
-
-				<select name="toperiod">
-					<option value="am" {AMTO}>AM</option>
-					<option value="pm" {PMTO}>PM</option>
+				<select name="endPeriod">
+					<option value="am" {END_AM}>AM</option>
+					<option value="pm" {END_PM}>PM</option>
 				</select>
 			</td>
 		</tr>
         <tr class="advanced adv_hide" {SHOW_ADVANCED}>
-        	<td class="formLabelWidth" valign="top" {OPAC_ADVANCED} >
+        	<td class="formLabelWidth" valign="top" {OPAC_ADVANCED}>
 				<h4>Publish Date</h4>
 				<em>
 					This event will only be visible to the public after this date. Leave blank to publish
