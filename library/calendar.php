@@ -331,7 +331,7 @@ class Calendar extends DeprecatedModel {
         }
 
         $query = "SELECT event.id, DATE_FORMAT(startDate, '%a %D %b') as outputDate,
-						date,
+						startDate,
 						DATE_FORMAT(startDate, '%Y') as year, DATE_FORMAT(startDate, '%c') as month, DATE_FORMAT(startDate, '%e') as day,
 						TIME_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') as startTimeString,
 						TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTimeString,
@@ -648,12 +648,22 @@ class Calendar extends DeprecatedModel {
 			LEFT JOIN eventGroup ON event.id = eventGroup.eventID
 			LEFT JOIN category ON event.sid = category.id AND event.sid IS NOT NULL
 			WHERE
-				startDate >= '{$start->getDatabaseDate()}'
-				AND startDate <= '{$end->getDatabaseDate()}'
-				AND ((access = '1' AND owner = '{$_SESSION['id']}')
-					  $groupQuery
-					  OR (access = '3' AND $campusQuery $groupChunk OR owner = '{$_SESSION['id']}')
-					)
+				(
+					(access = '1' AND owner = '{$_SESSION['id']}')
+					$groupQuery
+					OR (access = '3' AND $campusQuery $groupChunk OR owner = '{$_SESSION['id']}')
+				)
+				AND (
+
+					/* Start display in the middle of multi-day events that have already begun at some point
+					 * in the past
+					 */
+					((startDate <= '{$start->getDatabaseDate()}') AND (endDate <= '{$end->getDatabaseDate()}'))
+					OR
+					/* Start display for events that are still coming up within the specified time interval
+					 */
+					((startDate >= '{$start->getDatabaseDate()}') AND (startDate <= '{$end->getDatabaseDate()}'))
+				)
 			GROUP BY id
 			ORDER BY event.startTime, event.endTime
 		";
