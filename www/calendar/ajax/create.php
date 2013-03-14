@@ -13,6 +13,8 @@ $calendarHandler = new Calendar();
 $page = new SitePage();
 
 /* Javascript returns date as milliseconds from 1/1/1970
+ * When creating via the js calendar ui, assume single-day events so
+ * startDate and endDate are the same.
  */
 $dateObj = new Alaress_Date_Format($_POST['date']/1000, 'U');
 
@@ -24,8 +26,9 @@ $event = array(
 	'groupList' => array(),
 	'type' => $_POST['type'],
 	'note' => $_POST['note'],
-	'date' => $dateObj->getDatabaseDate(),
+	'startDate' => $dateObj->getDatabaseDate(),
 	'startTime' => '09:00:00',
+	'endDate' => $dateObj->getDatabaseDate(),
 	'endTime' => '10:00:00',
 	'location' => $_POST['location'],
 	'attendance' => $_POST['attendance'],
