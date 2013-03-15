@@ -2,7 +2,8 @@
 
 //
 // Upload destination for files submitted when creating a submission.
-
+// TODO add authorisation and file check
+// $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 require_once( dirname(__FILE__) . '/../../include/Bootstrap.php' );
 
 //
