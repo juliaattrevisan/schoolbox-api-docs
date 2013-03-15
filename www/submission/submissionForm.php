@@ -88,7 +88,11 @@ else {
 	// Multifile handling:
 	// Convert legacy file to new file when uploading any files?
 	// If many files were selected, connect them here.
-
+	foreach ($_POST['file_ids'] as $file_id) {
+		if (!empty($file_id)) {
+			$submission->getFileLinks()->addFromFileId($file_id);
+		}
+	}
 }
 
 
