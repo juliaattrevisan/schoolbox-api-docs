@@ -229,14 +229,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 
 			//
 			// TODO include legacy file mapper.
-			if ($legacy_file_id = $submission_box->getLegacyFileId()) {
-				$query = "SELECT comment FROM file WHERE id=?";
-				$statement = $this->database->prepare($query);
-				$statement->execute(array($legacy_file_id));
-				if ($this_row = $statement->fetch()) {
-					$submission_box->setLegacyFileComment($this_row['comment']);
-				}
-			}
 		}
 		return $submission_box;
 	}

@@ -53,11 +53,6 @@ class SubmissionBox {
 	protected $legacy_file_id;
 
 	/**
-	 * @var string
-	 */
-	protected $legacy_file_comment;
-
-	/**
 	 * @var FileCollection
 	 */
 	protected $file_links;
@@ -436,20 +431,6 @@ class SubmissionBox {
 	 */
 	public function getCategoryName() {
 		return $this->category_name;
-	}
-
-	/**
-	 * @param string $legacy_file_comment
-	 */
-	public function setLegacyFileComment($legacy_file_comment) {
-		$this->legacy_file_comment = $legacy_file_comment;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getLegacyFileComment() {
-		return $this->legacy_file_comment;
 	}
 
 	/**
