@@ -164,16 +164,19 @@ else {
 /* Check whether a file is associated with the work
  */
 $legacy_file_id = $submission->getLegacyFileId();
-if ($file_id = $submission->getFileLinks()->getId()) {
-    $file = $submission->getFileLinks()->getFile();
-    $this->setVar(array(
-        'FILE_HASH'  => $file->getHash(),
-        'FILE_THUMB' => $file->getIconFromFilename(),
-        'FILE_SIZE'  => Alaress_Byte_Format::bytesToString($file->getFilesize()),
-        'FILE_NAME'  => $file->getFilename(),
-        'FILE_DATE'  => date('jS M Y, g:ia', strtotime($file->getUploadedOn()))
-    ));
-    $this->parse('download_block', 'download');
+$file_links     = $submission->getFileLinks();
+if ($file_links->count() > 0) {
+    foreach ($file_links as $file_link) {
+        $file = $file_link->getFile();
+        $this->setVar(array(
+            'FILE_HASH'  => $file->getHash(),
+            'FILE_THUMB' => $file->getIconFromFilename(),
+            'FILE_SIZE'  => Alaress_Byte_Format::bytesToString($file->getFilesize()),
+            'FILE_NAME'  => $file->getFilename(),
+            'FILE_DATE'  => date('jS M Y, g:ia', strtotime($file->getUploadedOn()))
+        ));
+        $this->parse('download_block', 'download', true);
+    }
     $this->setVar('legacy_download_block', '');
 }
 elseif ($legacy_file_id && is_numeric($legacy_file_id)) {

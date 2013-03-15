@@ -177,14 +177,15 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $this->setVar($output);
 
     // check for an associated file
-    if ($file_link_id = $submission->getFileLinks()->getId()) {
-        $file = $submission->getFileLinks()->getFile();
-
-        $this->setVar('CURRENT_FILE_NAME', $file->getFilename());
-        $this->setVar('CURRENT_FILE_ICON', $file->getIconFromFilename());
-        $this->setVar('CURRENT_FILE_DATE', date('jS M Y, g:ia', strtotime($file->getUploadedOn())));
-
-        $this->parse('existing_file_block','existing_file');
+    $file_links = $submission->getFileLinks();
+    if ($file_links->count() > 0) {
+        foreach ($file_links as $file_link) {
+            $file = $file_link->getFile();
+            $this->setVar('CURRENT_FILE_NAME', $file->getFilename());
+            $this->setVar('CURRENT_FILE_ICON', $file->getIconFromFilename());
+            $this->setVar('CURRENT_FILE_DATE', date('jS M Y, g:ia', strtotime($file->getUploadedOn())));
+            $this->parse('existing_file_block','existing_file', true);
+        }
     }
     elseif ($submission->getLegacyFileId()) {
 
