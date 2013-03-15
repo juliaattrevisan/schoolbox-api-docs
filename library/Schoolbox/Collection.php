@@ -80,8 +80,17 @@ class Collection implements \Iterator {
      *
      * @param $stack
      */
-    private function setStack($stack) {
+    protected function setStack($stack) {
         $this->stack = $stack;
+    }
+
+    /**
+     * Get stack
+     *
+     * @return array
+     */
+    protected function getStack() {
+        return $this->stack;
     }
 
 }
