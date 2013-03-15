@@ -164,6 +164,8 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         'LATE_MIN'  => $late_min,
         'LATE_PM'   => date('a', $late_date) == 'pm' ? 'selected' : '',
 
+        'FILE_MAX_UPLOAD' => Cfg::get('file_upload_count'),
+
     );
 
     foreach(array('UPCOMING' => '1 day', 'OVERDUE' => '1 hour', 'RETURNED' => '1 hour') as $i => $j) {
@@ -182,6 +184,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         foreach ($file_links as $file_link) {
             $file = $file_link->getFile();
             $this->setVar('CURRENT_FILE_NAME', $file->getFilename());
+	        $this->setVar('CURRENT_FILE_ID',   $file->getId());
             $this->setVar('CURRENT_FILE_ICON', $file->getIconFromFilename());
             $this->setVar('CURRENT_FILE_DATE', date('jS M Y, g:ia', strtotime($file->getUploadedOn())));
             $this->parse('existing_file_block','existing_file', true);
@@ -194,6 +197,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
 
         $this->setVar('CURRENT_FILE_NAME', $file['realname']);
         $this->setVar('CURRENT_FILE_ICON', $file['iconFile']);
+	    $this->setVar('CURRENT_FILE_ID',   'old');
         $this->setVar('CURRENT_FILE_DATE', date('jS M Y, g:ia', $file['submitted']));
 
         $this->parse('existing_file_block','existing_file');
