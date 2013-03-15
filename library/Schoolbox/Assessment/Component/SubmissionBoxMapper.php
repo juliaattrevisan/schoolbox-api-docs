@@ -238,6 +238,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			// save methods.
 			// Consider a publish/subscribe event system.
 			foreach ($objects as $this_object) {
+				//
+				// TODO convert legacy files to storage files?
 				if ($box_file = $this_object->getFileLink()) {
 					if ($box_file->hasFile()) {
 						$box_file->setSubmissionBoxId($this_object->getId());
