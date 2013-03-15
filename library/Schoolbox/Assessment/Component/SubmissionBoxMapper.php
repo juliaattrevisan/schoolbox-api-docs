@@ -240,7 +240,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			foreach ($objects as $this_object) {
 				//
 				// TODO convert legacy files to storage files?
-				if ($box_file = $this_object->getFileLink()) {
+				foreach ($this_object->getFileLinks() as $box_file) {
 					if ($box_file->hasFile()) {
 						$box_file->setSubmissionBoxId($this_object->getId());
 						$this->getJoinMapper('files')->save($box_file);
