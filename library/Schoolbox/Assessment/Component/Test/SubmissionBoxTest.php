@@ -47,12 +47,14 @@ class SubmissionBoxTest extends TestCase {
 
 		//
 		// and getting it out again.
-		$this_file = $this->object->getFileLinks()->current();
-		$this->assertInstanceOf(
-			'\\Schoolbox\\Assessment\\Component\\SubmissionBox\\File',
-			$this_file
-		);
-		$this->assertEquals(11, $this_file->getFileId());
+		foreach ($this->object->getFileLinks() as $file_link) {
+			$this->assertInstanceOf(
+				'\\Schoolbox\\Assessment\\Component\\SubmissionBox\\File',
+				$file_link
+			);
+			$this->assertEquals(11, $file_link->getFileId());
+			break;
+		}
 	}
 
 	public function testRubric() {
