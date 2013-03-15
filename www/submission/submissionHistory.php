@@ -164,8 +164,8 @@ else {
 /* Check whether a file is associated with the work
  */
 $legacy_file_id = $submission->getLegacyFileId();
-if ($file_id = $submission->getFileLink()->getId()) {
-    $file = $submission->getFileLink()->getFile();
+if ($file_id = $submission->getFileLinks()->getId()) {
+    $file = $submission->getFileLinks()->getFile();
     $this->setVar(array(
         'FILE_HASH'  => $file->getHash(),
         'FILE_THUMB' => $file->getIconFromFilename(),

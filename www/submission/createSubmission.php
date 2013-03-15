@@ -177,8 +177,8 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $this->setVar($output);
 
     // check for an associated file
-    if ($file_link_id = $submission->getFileLink()->getId()) {
-        $file = $submission->getFileLink()->getFile();
+    if ($file_link_id = $submission->getFileLinks()->getId()) {
+        $file = $submission->getFileLinks()->getFile();
 
         $this->setVar('CURRENT_FILE_NAME', $file->getFilename());
         $this->setVar('CURRENT_FILE_ICON', $file->getIconFromFilename());
