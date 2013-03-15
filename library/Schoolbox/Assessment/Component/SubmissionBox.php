@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Component;
 use Schoolbox;
 
 use Schoolbox\Assessment\Component\SubmissionBox\File;
+use Schoolbox\Assessment\Component\SubmissionBox\FileCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\Notification;
 use Schoolbox\Assessment\Component\SubmissionBox\NotificationCollection;
 
@@ -235,7 +236,7 @@ class SubmissionBox {
 	}
 
 	/**
-	 * @return File
+	 * @return FileCollection
 	 */
 	public function getFileLinks() {
 		return $this->file_links;
