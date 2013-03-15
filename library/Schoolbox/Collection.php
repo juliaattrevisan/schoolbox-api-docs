@@ -1,6 +1,6 @@
 <?php
 /**
- * Description of the file and what its purpose is
+ * Base collection of model objects.
  *
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   2013 Alaress Pty Ltd
@@ -10,7 +10,7 @@
 namespace Schoolbox;
 use Schoolbox;
 
-class Collection implements \Iterator {
+class Collection implements \Iterator, \Countable {
 
     private $stack = array();
     private $position = 0;
@@ -93,4 +93,12 @@ class Collection implements \Iterator {
         return $this->stack;
     }
 
+    /**
+     * Get number of elements in collection.
+     *
+     * @return array
+     */
+    public function count() {
+        return count($this->getStack());
+    }
 }

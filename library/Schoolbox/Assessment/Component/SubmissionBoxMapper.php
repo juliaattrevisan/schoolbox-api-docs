@@ -155,8 +155,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$query = "
 			SELECT
 				{$this->getColumnString('sb')},
-				{$box_file_mapper->getColumnString('sm')},
-				{$file_mapper->getColumnString('f')},
 				{$notify_mapper->getColumnString('n')},
 				{$worktype_mapper->getColumnString('wt')},
 				{$marktype_mapper->getColumnString('mt')}
@@ -182,9 +180,9 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		foreach ($statement as $row) {
 			if (!$submission_box) {
 				$submission_box = $this->hydrate($row, 'sb');
-				$box_file       = $box_file_mapper->hydrate($row, 'sm');
-				$box_file->setFile($file_mapper->hydrate($row, 'f'));
-				$submission_box->setFileLink($box_file);
+//				$box_file       = $box_file_mapper->hydrate($row, 'sm');
+//				$box_file->setFile($file_mapper->hydrate($row, 'f'));
+//				$submission_box->setFileLink($box_file);
 				$submission_box->setWorkTypeName($row['wt.name']);
 				$submission_box->setMarkTypeName($row['mt.name']);
 			}
@@ -193,6 +191,27 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		unset($statement);
 
 		if ($submission_box instanceof SubmissionBox) {
+			//
+			// Get files? (This is more evidence separate file/link mapper isn't
+			// required.)
+			$query = "
+				SELECT
+					{$box_file_mapper->getColumnString('sm')},
+					{$file_mapper->getColumnString('f')}
+				FROM {$box_file_mapper->getTable()} sm
+				LEFT JOIN {$box_file_mapper->getJoinSql('file', 'sm', 'f')}
+				WHERE sm.box_id=?
+			";
+			$statement = $this->database->prepare($query);
+			$statement->execute(array($id));
+			foreach ($statement as $row) {
+				$box_file       = $box_file_mapper->hydrate($row, 'sm');
+				$box_file->setFile($file_mapper->hydrate($row, 'f'));
+				$submission_box->addFileLink($box_file);
+			}
+
+//			$submission_box->setFileLinks($box_file_mapper->findByColumn('box_id', $id));
+
 			//
 			// Get category and codes.
 			// TODO include category and category codes properly as models.
