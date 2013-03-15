@@ -13,21 +13,14 @@ use Schoolbox\Collection;
 use Schoolbox\FileMapper as SchoolboxFileMapper;
 
 class FileCollection extends Collection {
-	public function getFile() {
-		$stack = $this->getStack();
-		$item  = $stack[0];
-		if ($item instanceof File) {
-			return $item->getFile();
-		}
-	}
-	public function getId() {
-		$stack = $this->getStack();
-		$item  = $stack[0];
-		if ($item instanceof File) {
-			return $item->getId();
-		}
-	}
 
+	/**
+	 * Checks whether this file ID is in the collection.
+	 *
+	 * @param $file_id
+	 *
+	 * @return bool
+	 */
 	public function isFileIdInCollection($file_id) {
 		foreach ($this as $file_link) {
 			if ($file_link->getFile()->getId() == $file_id) {
@@ -37,6 +30,13 @@ class FileCollection extends Collection {
 		return false;
 	}
 
+	/**
+	 * Adds the file with this ID to this collection, if it's not there.
+	 *
+	 * @param $file_id
+	 *
+	 * @return bool True if it was added, false if not.
+	 */
 	public function addFromFileId($file_id) {
 		if (!$this->isFileIdInCollection($file_id)) {
 			$file_mapper = new SchoolboxFileMapper();
