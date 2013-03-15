@@ -10,10 +10,14 @@
 class External_Tass_User implements External_UserInterface {
 	const SPLIT_PARENT_TASSID_LENGTH = 8;
 
+	/**
+	 * @var MSSQL
+	 */
 	private $database;
 
 	function __construct () {
 		$this->setDatabase( new MSSQL() );
+		$this->getDatabase()->setConvertEncoding(false);
 
 		$this->groupHandler = new Group;
     }
