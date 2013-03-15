@@ -43,14 +43,17 @@ elseif(isset($_POST['uid']) && isset($_POST['box_id']) && $_POST['markUpdate'] =
 
                     $mark = $marksheet->normaliseMark($_POST['mark'][$k], $subbox);
 
+                    //
+                    // Get last mark and comment, and merge it with this one.
+                    $result = $returnHandler->getByUser($_POST['uid'][$k], $_POST['box_id'], 1);
                     $return = array(
                         'box_id'    => $_POST['box_id'],
                         'owner'     => $_POST['uid'][$k],
-                        'comment'   => $_POST['comment'][$k],
-                        'mark'      => $mark['mark'],
-                        'norm_mark' => $mark['norm_mark']
+                        'comment'   => $result[0]['comment'],
+                        'mark'      => $result[0]['mark'],
+                        'norm_mark' => $result[0]['norm_mark']
                     );
-                    $returnHandler->create($return, $_FILES[$uploadIndex]);
+                    saveReturn($return, null, $_FILES[$uploadIndex]);
                 }
             }
         }
@@ -120,6 +123,56 @@ else {
 }
 
 /**
+ * @param array $return The returned work to save.
+ * @param array $rubric The rubric data to save, if there is one.
+ * @param array $file   The file to add, if there is one.
+ *
+ * @return bool
+ */
+function saveReturn($return, $rubric = null, $file = null) {
+    $rubric_handler = new DueWork_Rubric_Handler();
+    $return_handler = new SubmissionReturn();
+    $box_id         = $return['box_id'];
+    $student_id     = $return['owner'];
+    $result         = $return_handler->getByUser($student_id, $box_id, 1);
+
+    $success = false;
+    if (is_array($result)) {
+        $return_time = new Alaress_Date_Format($result[0]['returned'], 'y-m-d h:i:s');
+        $window_ago  = new Alaress_Date_Format(time() - update_window, 'U');
+
+        // is this submission within the window?
+        if ($return_time->getUnixTimestamp() < $window_ago->getUnixTimestamp()) {
+            // outside window: create new
+            $success = $return_handler->create($return, $file);
+            if ($rubric) {
+                $rubric_handler->saveMarks($rubric, $student_id, $box_id);
+            }
+        }
+        else {
+            // inside window: update exising
+            $return['id'] = $result[0]['id'];
+            //
+            // Is there a file? Update it with the most recent mark.
+            $success = $return_handler->update($return, $file);
+            if ($rubric) {
+                $stamp = $rubric_handler->getLatestMarkTimestamp($_POST['uid'], $_POST['box_id']);
+                // if a valid timestamp is found, update, otherwise, create a new one (selfcontained logic)
+                $rubric_handler->saveMarks($rubric, $student_id, $box_id, $stamp);
+            }
+        }
+    }
+    else {
+        // no previous submission
+        $success = $return_handler->create($return, $file);
+        if ($rubric) {
+            $rubric_handler->saveMarks($rubric, $student_id, $box_id);
+        }
+    }
+    return $success;
+}
+
+/**
  * @param int $mark
  * @param string $comment
  * @param int $studentID
@@ -184,30 +237,7 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID, $year = 0, $semest
         'norm_mark' => $mark['norm_mark'],
         'comment'   => $comment,
     );
-
-    // print_r($return);
-
-    $success = false;
-    // previous submission exists
-    if (is_array($result)) {
-
-        $returnTime = new Alaress_Date_Format($result[0]['returned'], 'y-m-d');
-        $windowAgo = new Alaress_Date_Format(time() - update_window, 'U');
-
-        // is this submission within the window?
-        if($returnTime->getUnixTimestamp() < $windowAgo->getUnixTimestamp()) {
-            // outside window: create new
-            $success = $returnHandler->create($return);
-        } else {
-            // inside window: update exising
-            $return['id'] = $result[0]['id'];
-            $success = $returnHandler->update($return);
-        }
-
-    } else {
-        // no previous submission
-        $success = $returnHandler->create($return);
-    }
+    saveReturn($return);
 
     $marks = $returnHandler->getStudentMarksForCategory($subbox['category'], $studentID, $_SESSION['id'], $year, $semester);
 
@@ -223,5 +253,3 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID, $year = 0, $semest
         UPDATE `student_submission` SET `marked`='1' WHERE 1=1 AND `box_id`= '7' AND `owner`= '17';
      */
 }
-
-?>
