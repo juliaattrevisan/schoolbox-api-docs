@@ -8,11 +8,14 @@
 ************************************************************/
 
 class External_Tass_Class implements External_ClassInterface {
-
+	/**
+	 * @var MSSQL
+	 */
 	private $database;
 
 	function __construct () {
 		$this->setDatabase( new MSSQL() );
+		$this->getDatabase()->setConvertEncoding(false);
 	}
 	
 	function getStudents($subCode) {

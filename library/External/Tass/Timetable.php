@@ -9,12 +9,16 @@
 
 class External_Tass_Timetable implements External_TimetableInterface {
 
+	/**
+	 * @var MSSQL
+	 */
 	private $database;
 
 	function __construct() {
 		define('TASS_tt_id', 13);
 
 		$this->setDatabase(new MSSQL());
+		$this->getDatabase()->setConvertEncoding(false);
 
 		$this->campusCode = unserialize(SYN_CAMPUS_Codes);
 		$this->days = $this->getDays();

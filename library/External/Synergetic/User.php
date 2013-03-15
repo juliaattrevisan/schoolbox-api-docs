@@ -8,6 +8,9 @@
  ************************************************************/
 
 class External_Synergetic_User implements External_UserInterface {
+	/**
+	 * @var MSSQL
+	 */
 	private $database;
 	private $groupHandler;
 
@@ -56,7 +59,12 @@ class External_Synergetic_User implements External_UserInterface {
 					WHERE vPhotos.ID = '{$externalUserId}'
 				";
 
+				//
+				// SB-2063 - Don't try to convert charsets for binary fields.
+				$convert_encoding = $this->getDatabase()->getConvertEncoding();
+				$this->getDatabase()->setConvertEncoding(false);
 				$photo = $this->getDatabase()->getRow($query);
+				$this->getDatabase()->setConvertEncoding($convert_encoding);
 
 				/* Purge all previously transformed copies
 				 */
