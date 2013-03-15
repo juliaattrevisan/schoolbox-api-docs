@@ -8,7 +8,9 @@
  */
 
 namespace Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
+use Schoolbox\FileMapper as SchoolboxFileMapper;
 
 class FileCollection extends Collection {
 	public function getFile() {
@@ -24,5 +26,26 @@ class FileCollection extends Collection {
 		if ($item instanceof File) {
 			return $item->getId();
 		}
+	}
+
+	public function isFileIdInCollection($file_id) {
+		foreach ($this as $file_link) {
+			if ($file_link->getFile()->getId() == $file_id) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public function addFromFileId($file_id) {
+		if (!$this->isFileIdInCollection($file_id)) {
+			$file_mapper = new SchoolboxFileMapper();
+			$file        = $file_mapper->findById($file_id);
+			$file_link   = new SubmissionBox\File();
+			$file_link->setFile($file);
+			$this->add($file_link);
+			return true;
+		}
+		return false;
 	}
 }
