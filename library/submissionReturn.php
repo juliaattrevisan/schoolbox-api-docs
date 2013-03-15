@@ -304,9 +304,8 @@ class SubmissionReturn extends DeprecatedModel {
 
         $fileID = parent::create($return);
 
-        if(is_array($file)) {
-            $newFileName = $fileID . ".dat";
-            move_uploaded_file($file['tmp_name'], Cfg::get('returns_dir') . "/" . $newFileName);
+        if (is_array($file)) {
+            $this->moveFile($fileID, $file);
         }
 
         //Update student submission to be marked
@@ -316,5 +315,20 @@ class SubmissionReturn extends DeprecatedModel {
 
     }
 
+    public function update($return, $file = false) {
+        if (is_array($file)) {
+            $return['filename'] = $file['name'];
+        }
+        if ($result = parent::update($return)) {
+            if (is_array($file)) {
+                $this->moveFile($return['id'], $file);
+            }
+        }
+        return $result;
+    }
+
+    public function moveFile($file_id, $file) {
+        move_uploaded_file($file['tmp_name'], Cfg::get('returns_dir') . "/" . $file_id . ".dat");
+    }
+
 }
-?>
