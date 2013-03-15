@@ -27,6 +27,7 @@ else {
 // create required objects
 $page = new SitePage();
 
+use Schoolbox\File;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Notification;
@@ -65,23 +66,19 @@ if (isset($_FILES['file']['name']) && $_FILES['file']['name']) {
     $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 
 	//
-	// Delete existing file link (if there is one!)
-	$file_link = $submission->getFileLink();
-	if ($file_link_id = $file_link->getId()) {
-		SubmissionBox\FileMapper::getInstance()->delete($file_link);
-		$file_link->setId(null);
-		$file_link->setFileId(null);
-	}
-
-	//
 	// Add the uploaded file to the submission box.
-	$file = $submission->getFileLink()->getFile();
+	$file = new File();
 	$file->setFilename($_FILES['file']['name']);
 	$file->setTempLocation($_FILES['file']['tmp_name']);
 	$file->setUploadedBy($_SESSION['id']);
 	$file->loadHashFromTempLocation();
 	$file->loadMimetypeFromFilename();
 	$file->loadFilesizeFromTempLocation();
+
+	$file_link = new SubmissionBox\File();
+	$file_link->setFile($file);
+
+	$submission->addFileLink($file_link);
 }
 else {
 	$legacy_file_id = $action == 'create' ? $_POST['fileId']    : 0;
