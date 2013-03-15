@@ -8,18 +8,19 @@ $page = new SitePage;
 
 if ($_REQUEST['id']) {
 
-	$subStudHandler = new SubmissionStudent;
-	$groupHandler = new Group;
+    $subStudHandler = new SubmissionStudent;
+    $groupHandler = new Group;
 
-	$submission        = SubmissionBoxMapper::getInstance()->findById($_REQUEST['id']);
-	$submission_id     = $submission->getId();
-	$submission_cat_id = $submission->getCategory();
+    $submission_mapper = new SubmissionBoxMapper();
+    $submission        = $submission_mapper->findById($_REQUEST['id']);
+    $submission_id     = $submission->getId();
+    $submission_cat_id = $submission->getCategory();
 
 
-	/* Check involved in subject */
-	$groupHandler = new Group;
+    /* Check involved in subject */
+    $groupHandler = new Group;
 
-	if (!$groupHandler->involvedInSubject($submission_cat_id) && !$groupHandler->involvedInGroup($_SESSION['id'], $submission_cat_id)) {
+    if (!$groupHandler->involvedInSubject($submission_cat_id) && !$groupHandler->involvedInGroup($_SESSION['id'], $submission_cat_id)) {
         exit();
     }
 
@@ -36,11 +37,25 @@ if ($_REQUEST['id']) {
         $action = 'View Details';
     }
 
+    //
+    // Dump a list of files.
+    $files = array();
+    foreach ($submission->getFileLinks() as $file_link) {
+        $file = $file_link->getFile();
+        $files[] = array(
+            'hash'  => $file->getHash(),
+            'name'  => $file->getFilename(),
+            'thumb' => $file->getIconFromFilename(),
+            'size'  => Alaress_Byte_Format::bytesToString($file->getFilesize()),
+            'date'  => date('jS M Y, g:ia', strtotime($file->getUploadedOn()))
+        );
+    }
+
     $output = array(
         'id'          => $submission_id,
         'cid'         => $submission_cat_id,
         'category'    => Scrub::text($submission->getCategoryName()),
-        'file_hash'   => $submission->getFileLink()->getFile()->getHash(),
+        'files'       => $files,
         'legacy_fid'  => $submission->getLegacyFileId(),
         'typeName'    => Scrub::text($submission->getWorkTypeName()),
         'name'        => Scrub::text($submission->getName()),

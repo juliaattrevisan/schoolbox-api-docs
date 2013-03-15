@@ -92,13 +92,15 @@ $j(function () {
                 <p class="bubble-name"><span><a href="/homepage/${cid}">${category}</a></span> - <em>${typeName}</em></p>
                 {{if comment}}
                     <p class="comment">${comment}</p>
-                {{else file_hash && description}}
-                    <!-- Replicate existing behavior and show comment for legacy files. -->
+                {{else files && description}}
+                <!-- Replicate existing behavior and show comment for legacy files. -->
                     <p class="comment">${description}</p>
                 {{/if}}
                 <p class="details clearfix">
-                    {{if file_hash}}
-                        <a class="btn down-arrow float-left" href="/storage/fetch.php?hash=${file_hash}&save=1"><span></span>Download</a>
+                    {{if files}}
+                        {{each files}}
+                            <a class="btn down-arrow float-left" href="/storage/fetch.php?hash=${$value.hash}&save=1"><span></span>Download ${$value.name}</a>
+                        {{/each}}
                     {{else legacy_fid > 0}}
                         <a class="btn down-arrow float-left" href="/send.php?id=${legacy_fid}&save=1"><span></span>Download</a>
                     {{/if}}

@@ -180,9 +180,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		foreach ($statement as $row) {
 			if (!$submission_box) {
 				$submission_box = $this->hydrate($row, 'sb');
-//				$box_file       = $box_file_mapper->hydrate($row, 'sm');
-//				$box_file->setFile($file_mapper->hydrate($row, 'f'));
-//				$submission_box->setFileLink($box_file);
 				$submission_box->setWorkTypeName($row['wt.name']);
 				$submission_box->setMarkTypeName($row['mt.name']);
 			}
@@ -209,9 +206,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 				$box_file->setFile($file_mapper->hydrate($row, 'f'));
 				$submission_box->addFileLink($box_file);
 			}
-
-//			$submission_box->setFileLinks($box_file_mapper->findByColumn('box_id', $id));
-
 			//
 			// Get category and codes.
 			// TODO include category and category codes properly as models.
