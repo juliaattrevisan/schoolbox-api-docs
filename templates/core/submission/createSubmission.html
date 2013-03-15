@@ -267,7 +267,15 @@
 				event.preventDefault();
 				file_upload.uploadifyUpload();
 			}
-		})
+		});
+
+		$j('a.delete_existing').click(function(event) {
+			event.preventDefault();
+			console.log([$j(this).data('file_id'), $j('form').find('input[name="id"]').val()]);
+			$.post($j(this).attr('href', {file_id: $j(this).data('file_id'), box_id: $j('form').find('input[name="id"]').val()}, function() {
+
+			}));
+		});
     });
 </script>
 <!-- END custom_head -->
@@ -298,8 +306,11 @@
         </td>
         <td>
             <!-- BEGIN existing_file -->
-            <p>Current file: <img class="mimetype" src="/images/mime/22x22/{CURRENT_FILE_ICON}"/>{CURRENT_FILE_NAME}
-                (uploaded {CURRENT_FILE_DATE})</p>
+            <p>
+				<a href="/submission/fileForm.php" class="delete_existing" data-file_id="{CURRENT_FILE_ID}"><img src="/javascript/uploadify/cancel.png" border="0"></a>
+				<img class="mimetype" src="/images/mime/22x22/{CURRENT_FILE_ICON}"/>{CURRENT_FILE_NAME}
+                (uploaded {CURRENT_FILE_DATE})
+			</p>
             <!-- END existing_file -->
             <input type="file" name="file" id="custom_file_upload" />
             <input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}"/>
