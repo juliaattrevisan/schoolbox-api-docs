@@ -77,36 +77,7 @@ elseif(is_array($_POST['rubric']) && count($_POST['rubric'])) {
         'mark'      => $mark['mark'],
         'norm_mark' => $mark['norm_mark']
     );
-
-    $result = $returnHandler->getByUser($_POST['uid'], $_POST['box_id'], 1);
-
-    // if there is a previous submission, update it
-    if(is_array($result)) {
-        $returnTime = new Alaress_Date_Format($result[0]['returned'], 'y-m-d h:i:s');
-        $windowAgo = new Alaress_Date_Format(time() - update_window, 'U');
-
-        // is this submission within the window?
-        if($returnTime->getUnixTimestamp() < $windowAgo->getUnixTimestamp()) {
-            // outside window: create new
-            $returnHandler->create($return);
-            $rubricHandler->saveMarks($_POST['rubric'], $_POST['uid'], $_POST['box_id']);
-        }
-        else {
-            // inside window: update existing
-            $return['id'] = $result[0]['id'];
-            $returnHandler->update($return);
-
-            $stamp = $rubricHandler->getLatestMarkTimestamp($_POST['uid'], $_POST['box_id']);
-
-            // if a valid timestamp is found, update, otherwise, create a new one (selfcontained logic)
-            $rubricHandler->saveMarks($_POST['rubric'], $_POST['uid'], $_POST['box_id'], $stamp);
-        }
-    }
-    else {
-        // no previous submission
-        $returnHandler->create($return);
-        $rubricHandler->saveMarks($_POST['rubric'], $_POST['uid'], $_POST['box_id']);
-    }
+    saveReturn($return, $_POST['rubric']);
 
     // in all possible scenarios, *something* happened above, so redirect the user
     $page->localRedir('/submission/viewSubmission/'.$_POST['box_id']);
