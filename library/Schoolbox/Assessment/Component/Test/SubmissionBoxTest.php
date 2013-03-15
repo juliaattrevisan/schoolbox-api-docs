@@ -30,13 +30,29 @@ class SubmissionBoxTest extends TestCase {
 	// Don't bother testing any getters or setters, unless their value can be
 	// affected by another method.
 
-	public function testFileLink() {
+	public function testFileLinks() {
+		$this->assertInstanceOf(
+			'\\Schoolbox\\Assessment\\Component\\SubmissionBox\\FileCollection',
+			$this->object->getFileLinks()
+		);
+		$this->assertCount(0, $this->object->getFileLinks());
+
+		//
+		// Test adding a file link - they now exist in multiples instead of only
+		// a single one.
+		$file = new SubmissionBox\File();
+		$file->setFileId(11);
+		$this->object->addFileLink($file);
+		$this->assertCount(1, $this->object->getFileLinks());
+
+		//
+		// and getting it out again.
+		$this_file = $this->object->getFileLinks()->current();
 		$this->assertInstanceOf(
 			'\\Schoolbox\\Assessment\\Component\\SubmissionBox\\File',
-			$this->object->getFileLink()
+			$this_file
 		);
-		$this->assertEquals(false, $this->object->getFileLink()->getId());
-		$this->assertEquals(false, $this->object->getFileLink()->getFileId());
+		$this->assertEquals(11, $this_file->getFileId());
 	}
 
 	public function testRubric() {

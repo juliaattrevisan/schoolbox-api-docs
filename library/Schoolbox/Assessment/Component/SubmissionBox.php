@@ -57,9 +57,9 @@ class SubmissionBox {
 	protected $legacy_file_comment;
 
 	/**
-	 * @var File
+	 * @var FileCollection
 	 */
-	protected $file_link;
+	protected $file_links;
 
 	/**
 	 * @var NotificationCollection
@@ -140,7 +140,7 @@ class SubmissionBox {
 
 	public function __construct() {
 		$this->setNotifications(new NotificationCollection(array()));
-		$this->setFileLink(new File());
+		$this->setFileLinks(new SubmissionBox\FileCollection(array()));
 	}
 
 	/**
@@ -228,17 +228,24 @@ class SubmissionBox {
 	}
 
 	/**
-	 * @param File $link
+	 * @param FileCollection $link
 	 */
-	public function setFileLink(File $link) {
-		$this->file_link = $link;
+	public function setFileLinks($link) {
+		$this->file_links = $link;
 	}
 
 	/**
 	 * @return File
 	 */
-	public function getFileLink() {
-		return $this->file_link;
+	public function getFileLinks() {
+		return $this->file_links;
+	}
+
+	/**
+	 * @param File $file
+	 */
+	public function addFileLink(File $file) {
+		$this->file_links->add($file);
 	}
 
 	/**
