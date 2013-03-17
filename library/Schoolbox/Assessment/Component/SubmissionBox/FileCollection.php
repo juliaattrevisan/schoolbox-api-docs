@@ -22,12 +22,7 @@ class FileCollection extends Collection {
 	 * @return bool
 	 */
 	public function isFileIdInCollection($file_id) {
-		foreach ($this as $file_link) {
-			if ($file_link->getFile()->getId() == $file_id) {
-				return true;
-			}
-		}
-		return false;
+		return ($this->getBy('fileId', $file_id) instanceof SubmissionBox\File);
 	}
 
 	/**
