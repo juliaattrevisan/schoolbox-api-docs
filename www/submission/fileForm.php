@@ -23,6 +23,7 @@ session_start();
 // of what was uploaded.
 use Schoolbox\File;
 use Schoolbox\FileMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 //use Schoolbox\Assessment\Component\SubmissionBox\File       as SubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBox\FileMapper as SubmissionFileMapper;
 
@@ -53,17 +54,28 @@ if (isset($_FILES['file'])) {
 	// Spit out the file ID (or hash)
 	echo json_encode(array('file_id' => $file_id, 'hash' => $file->getHash()));
 }
-elseif (isset($_POST['delete'])) {
+elseif (isset($_GET['delete'])) {
 	//
 	// Which file was passed?
-	$delete_id = $_POST['delete'];
-	if (preg_match('/^old-(\\d+)$/', $delete_id, $matches)) {
-		list(, $old_file_id) = $matches;
-		//
-		// Delete old file.
+	$mapper  = new SubmissionBoxMapper();
+	$file_id = $_POST['file_id'];
+	$box_id  = $_POST['box_id'];
+	$result  = false;
+	if (!empty($file_id) && !empty($box_id)) {
+		$submission = $mapper->findById($box_id);
+		if ($submission) {
+			if ($file_id === 'old') {
+				$submission->setLegacyFileId(0);
+				$result = $mapper->save($submission) ? true : false;
+			}
+			else {
+				$file = $submission->getFileLinks()->getBy('fileId', $file_id);
+				if ($file) {
+					$file_mapper = new SubmissionFileMapper();
+					$result = $file_mapper->delete($file);
+				}
+			}
+		}
 	}
-	else {
-		$file_mapper = new SubmissionFileMapper();
-		$file_mapper->delete($file_mapper->findById($delete_id));
-	}
+	echo json_encode(array('file_id' => $file_id, 'box_id' => $box_id, 'deleted' => $result));
 }

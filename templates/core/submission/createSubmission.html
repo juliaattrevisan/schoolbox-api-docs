@@ -227,7 +227,7 @@
 		var file_upload = $j('#custom_file_upload');
 		file_upload.uploadify({
 			'uploader':'/javascript/uploadify/uploadify.swf',
-			'script':'/submission/fileForm.php?{SESSION_NAME}={SESSION_ID}&XDEBUG_SESSION=vagrant',
+			'script':'/submission/fileForm.php?{SESSION_NAME}={SESSION_ID}',
 			'cancelImg':'/javascript/uploadify/cancel.png',
 			'fileDataName':'file',
 			'multi':true,
@@ -245,20 +245,11 @@
 			,'onAllComplete':function(event, upload) {
 				form.submit();
 			}
-//			,'onSelectOnce':function () {
-//				if (!$j('.uploadifyQueueItem').find('.heading-table').length > 0) {
-//					$j('.uploadifyQueueItem').prepend(
-//						'<table width="100%" class="heading-table"><tr><td width="50%"><h4 style="margin: 0">Local File</h4></td><td width="50%"><h4 style="margin: 0">Title</h4></td></tr></table>'
-//					);
-//				}
-//			}
 		});
 
 		//
-		// Form submit: uploads files first?
-		// Does so synchronously, because the files need to be uploaded before
-		// the submission get saved.
-		$j('form').submit(function(event) {
+		// Form submit.
+		form.submit(function(event) {
 			var form = $j('this');
 			if ('originalEvent' in event) {
 				//
@@ -271,10 +262,15 @@
 
 		$j('a.delete_existing').click(function(event) {
 			event.preventDefault();
-			console.log([$j(this).data('file_id'), $j('form').find('input[name="id"]').val()]);
-			$.post($j(this).attr('href', {file_id: $j(this).data('file_id'), box_id: $j('form').find('input[name="id"]').val()}, function() {
-
-			}));
+			var link    = $j(this);
+			var file_id = link.data('file_id');
+			var box_id  = link.data('box_id');
+			var row     = link.closest('.existing_file');
+			$j.post(
+				$j(this).attr('href'),
+				{file_id: file_id, box_id: box_id},
+				function() { row.fadeOut(); }
+			);
 		});
     });
 </script>
@@ -306,8 +302,10 @@
         </td>
         <td>
             <!-- BEGIN existing_file -->
-            <p>
-				<a href="/submission/fileForm.php" class="delete_existing" data-file_id="{CURRENT_FILE_ID}"><img src="/javascript/uploadify/cancel.png" border="0"></a>
+            <p class="existing_file">
+				<a href="/submission/fileForm.php?delete=1" class="delete_existing" data-file_id="{CURRENT_FILE_ID}" data-box_id="{ID}">
+					<img src="/javascript/uploadify/cancel.png" border="0">
+				</a>
 				<img class="mimetype" src="/images/mime/22x22/{CURRENT_FILE_ICON}"/>{CURRENT_FILE_NAME}
                 (uploaded {CURRENT_FILE_DATE})
 			</p>
