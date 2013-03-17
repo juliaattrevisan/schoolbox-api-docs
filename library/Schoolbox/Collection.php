@@ -101,4 +101,23 @@ class Collection implements \Iterator, \Countable {
     public function count() {
         return count($this->getStack());
     }
+
+	/**
+	 * Returns first item in collection whose value of $field is $value.
+	 *
+	 * @param string $field The field name to compare against
+	 * @param mixed  $value T
+	 *
+	 * @return object
+	 */
+	public function getBy($field, $value) {
+		$method_name = 'get'.ucfirst($field);
+		foreach ($this as $item) {
+			$method = array($item, $method_name);
+			if (is_callable($method) && call_user_func($method) == $value) {
+				return $item;
+			}
+		}
+		return null;
+	}
 }
