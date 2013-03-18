@@ -2,10 +2,6 @@
 
 //
 // Upload destination for files submitted when creating a submission.
-// TODO add authorisation and file check
-// Authorisation of saving a submission is done on submissionForm page, so
-// don't do that here.
-// (except for deleting a file, need to change that)
 require_once( dirname(__FILE__) . '/../../include/Bootstrap.php' );
 
 //
@@ -81,25 +77,27 @@ elseif (isset($_GET['delete'])) {
 	$mapper  = new SubmissionBoxMapper();
 
 	//
-	// Permission check - can this user administer this box?
-	if (!$mapper->isOwnedByUser($_SESSION['id'], $box_id)) {
+	// Permission check - can this user change this box?
+	$submission    = $mapper->findById($box_id);
+	$group_handler = new Group();
+	if (!$submission) {
+		$return['message'] = 'Not Found';
+	}
+	elseif ($group_handler->getPermission($submission->getCategory()) < WRITE_ACCESS) {
 		$return['message'] = 'Unauthorised';
 	}
 	else {
 		$result = false;
 		if (!empty($file_id) && !empty($box_id)) {
-			$submission = $mapper->findById($box_id);
-			if ($submission) {
-				if ($file_id === 'old') {
-					$submission->setLegacyFileId(null);
-					$result = $mapper->save($submission);
-				}
-				else {
-					$file = $submission->getFileLinks()->getBy('fileId', $file_id);
-					if ($file) {
-						$file_mapper = new SubmissionFileMapper();
-						$result = $file_mapper->delete($file);
-					}
+			if ($file_id === 'old') {
+				$submission->setLegacyFileId(null);
+				$result = $mapper->save($submission);
+			}
+			else {
+				$file = $submission->getFileLinks()->getBy('fileId', $file_id);
+				if ($file) {
+					$file_mapper = new SubmissionFileMapper();
+					$result = $file_mapper->delete($file);
 				}
 			}
 		}

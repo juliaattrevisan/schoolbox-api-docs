@@ -32,6 +32,7 @@ $mapper      = new SubmissionBoxMapper();
 $type_mapper = new SubmissionBox\WorkTypeMapper();
 $mark_mapper = new SubmissionBox\MarkTypeMapper();
 
+$groupHandler  = new Group;
 $rubricHandler = new DueWork_Rubric_Handler();
 
 //
@@ -46,6 +47,12 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $this->setTitle('Modify Submission Box');
 
     $submission = $mapper->findById($this->arg[1]);
+
+    //
+    // Authorisation: user has write access to group?
+    if ($groupHandler->getPermission($submission->getCategory()) < WRITE_ACCESS) {
+        error(19);
+    }
 
     /* Output category information */
     $cat_name = $submission->getCategoryName();
@@ -215,13 +222,19 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
 
 // IF NEW
 else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+
+    //
+    // Authorisation: user has write access to group.
+    if ($groupHandler->getPermission($this->arg[1]) < WRITE_ACCESS) {
+        error(19);
+    }
+
     //Create submission box
     $this->setTitle('Create Submission Box');
 
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
-    $groupHandler = new Group;
 
     // clear blocks that aren't used in this context
     $this->setVar(array(

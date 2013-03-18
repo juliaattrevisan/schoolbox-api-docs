@@ -43,6 +43,12 @@ if($action == 'delete') {
 // localise important variables
 $submissionBoxID = isset($_POST['id']) && $_POST['id'] ? $_POST['id'] : 0;
 $submission = !empty($submissionBoxID) ? $mapper->findById($submissionBoxID) : new SubmissionBox();
+$groupHandler = new Group();
+//
+// Auth: submission's category must be writable by this user.
+if ($groupHandler->getPermission($submission->getCategory()) < WRITE_ACCESS) {
+    error(19);
+}
 
 $categoryID = $_POST['category'];
 $markTypeID = $_POST['marktype'];
