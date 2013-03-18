@@ -149,11 +149,12 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	}
 
 	/**
-	 * @param int $id
+	 * @param int  $id
+	 * @param bool $include_deleted If true, then include soft-deleted items.
 	 *
 	 * @return SubmissionBox
 	 */
-	public function findById($id) {
+	public function findById($id, $include_deleted = false) {
 		$box_file_mapper = $this->getJoinMapper('files');
 		$file_mapper     = $box_file_mapper->getJoinMapper('file');
 		$notify_mapper   = $this->getJoinMapper('notify');
@@ -173,6 +174,9 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			LEFT JOIN {$this->getJoinSql('mark_type', 'sb', 'mt')}
 			WHERE sb.id=?
 		";
+		if (!$include_deleted) {
+			$query .= ' AND sb.deleted IS FALSE';
+		}
 		$statement = $this->database->prepare($query);
 		$statement->execute(array($id));
 
@@ -277,6 +281,21 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			}
 		}
 		return $result;
+	}
+
+	/**
+	 * @param SubmissionBox $object
+	 * @param bool          $hard_delete
+	 *
+	 * @return bool
+	 */
+	public function delete($object, $hard_delete = false) {
+		if ($hard_delete) {
+			return parent::delete($object);
+		}
+		$query     = "UPDATE {$this->getTable()} SET deleted=TRUE WHERE id=?";
+		$statement = $this->database->prepare($query);
+		return $statement->execute(array($object->getId()));
 	}
 
 	/**
