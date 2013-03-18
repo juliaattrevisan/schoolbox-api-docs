@@ -21,7 +21,7 @@ class File {
 	/**
 	 * @var string
 	 */
-	protected $name;
+	protected $filename;
 
 	/**
 	 * @var int
@@ -80,19 +80,19 @@ class File {
 	}
 
 	/**
-	 * @param  string $name
+	 * @param  string $filename
 	 * @return $this
 	 */
-	public function setName($name) {
-		$this->name = $name;
+	public function setFilename($filename) {
+		$this->filename = $filename;
 		return $this;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getName() {
-		return $this->name;
+	public function getFilename() {
+		return $this->filename;
 	}
 
 	/**

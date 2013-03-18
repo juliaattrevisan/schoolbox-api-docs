@@ -27,7 +27,7 @@ class FileMapper extends Mapper {
 		));
 		$this->hasMap(array(
 			'column'     => 'realname',
-			'property'   => 'name',
+			'property'   => 'filename',
 			'type'       => self::TYPE_STRING,
 		));
 		$this->hasMap(array(
