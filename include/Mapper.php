@@ -165,9 +165,10 @@ abstract class Mapper {
      * @static
      * @param String $columnName
      * @param String $columnValue
-     * @return Collection
+     * @param bool   $one         If true, then get only the first match.
+     * @return Collection|model
      */
-    public function findByColumn($columnName, $columnValue) {
+    public function findByColumn($columnName, $columnValue, $one = false) {
         $statement = $this->database->prepare(
             "
             SELECT {$this->getColumnString()}
@@ -180,9 +181,12 @@ abstract class Mapper {
 
         $statement->execute();
 
-        $rowset = $statement->fetchAll();
-
-        return $this->hydrateList($rowset);
+        if ($one) {
+            return $this->hydrate($statement->fetch());
+        }
+        else {
+            return $this->hydrateList($statement->fetchAll());
+        }
     }
 
     /**
