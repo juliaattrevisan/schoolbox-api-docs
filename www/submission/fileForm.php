@@ -68,7 +68,7 @@ elseif (isset($_GET['delete'])) {
 		$submission = $mapper->findById($box_id);
 		if ($submission) {
 			if ($file_id === 'old') {
-				$submission->setLegacyFileId(0);
+				$submission->setLegacyFileId(null);
 				$result = $mapper->save($submission) ? true : false;
 			}
 			else {
