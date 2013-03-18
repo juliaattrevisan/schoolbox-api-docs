@@ -52,7 +52,7 @@ if (isset($_FILES['file'])) {
 
 	//
 	// Spit out the file ID (or hash)
-	echo json_encode(array('file_id' => $file_id, 'hash' => $file->getHash()));
+	echo json_encode(array('file_id' => $file_id, 'name' => $file->getFilename()));
 }
 elseif (isset($_GET['delete'])) {
 	//
