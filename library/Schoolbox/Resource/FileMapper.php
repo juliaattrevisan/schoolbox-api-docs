@@ -16,7 +16,7 @@ use Schoolbox\File       as Storage;
 use Schoolbox\FileMapper as StorageMapper;
 
 class FileMapper extends Mapper {
-	protected function mapper() {
+	protected function mapping() {
 		$this->hasTable('file');
 		$this->hasModel('\\Schoolbox\\Resource\\File');
 		$this->hasMap(array(
@@ -55,7 +55,7 @@ class FileMapper extends Mapper {
 	 *
 	 * @return Storage The new storage item or existing item.
 	 */
-	protected function copyToStorage(File $file) {
+	public function copyToStorage(File $file) {
 		$mapper  = new StorageMapper();
 
 		$storage = new Storage();
