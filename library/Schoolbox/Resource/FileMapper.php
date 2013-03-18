@@ -72,7 +72,6 @@ class FileMapper extends Mapper {
 			return $existing;
 		}
 		else {
-			$mapper->save($storage);
 			return $storage;
 		}
 	}
