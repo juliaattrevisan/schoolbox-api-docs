@@ -508,7 +508,7 @@ abstract class Mapper {
      * @return Model
      */
     public function hydrate($row, $alias = '', $callback = null) {
-        $model = new $this->model;
+        $model = $this->createModel();
 
         foreach ($this->map as $map) {
             $propertyName = $map['property'];
@@ -518,9 +518,6 @@ abstract class Mapper {
                 $columnName = "$alias.$columnName";
             }
 
-//            if (array_key_exists($columnName, $row)) {
-//                $this->setModelProperty($model, $propertyName, $row[$columnName]);
-//            }
             $columnValue = array_key_exists($columnName, $row) ? $row[$columnName] : null;
             $this->setModelProperty($model, $propertyName, $columnValue);
         }
@@ -530,6 +527,15 @@ abstract class Mapper {
         }
 
         return $model;
+    }
+
+    /**
+     * Creates a new instance of class with name passed in $this->hasModel().
+     *
+     * @return object
+     */
+    public function createModel() {
+        return new $this->model;
     }
 
     /**
