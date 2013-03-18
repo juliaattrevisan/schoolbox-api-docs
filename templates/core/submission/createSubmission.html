@@ -239,6 +239,9 @@
 				//
 				// Add hidden element with uploaded file ID.
 				var parsed_output = JSON.parse(output);
+				if (!parsed_output.success) {
+					alert('Error: '+parsed_output.message);
+				}
 				$j('#custom_file_upload'+code).prepend(
 					$j('<input name="file_ids[]" type="hidden" />').val(parsed_output.file_id)
 				);
@@ -270,7 +273,15 @@
 			$j.post(
 				$j(this).attr('href'),
 				{file_id: file_id, box_id: box_id},
-				function() { row.fadeOut(); }
+				function(data) {
+					if (!data.success) {
+						alert('Error: '+data.message);
+					}
+					else {
+						row.fadeOut();
+					}
+				},
+				'json'
 			);
 		});
     });

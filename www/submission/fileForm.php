@@ -6,7 +6,6 @@
 // Authorisation of saving a submission is done on submissionForm page, so
 // don't do that here.
 // (except for deleting a file, need to change that)
-// $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 require_once( dirname(__FILE__) . '/../../include/Bootstrap.php' );
 
 //
@@ -27,58 +26,84 @@ session_start();
 use Schoolbox\File;
 use Schoolbox\FileMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-//use Schoolbox\Assessment\Component\SubmissionBox\File       as SubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBox\FileMapper as SubmissionFileMapper;
 
+$return = array(
+	'success' => false,
+	'message' => '',
+);
 if (isset($_FILES['file'])) {
-	$file = new File();
-	$file->setFilename($_FILES['file']['name']);
-	$file->setTempLocation($_FILES['file']['tmp_name']);
-	$file->setUploadedBy($_SESSION['id']);
-	$file->loadHashFromTempLocation();
-	$file->loadMimetypeFromFilename();
-	$file->loadFilesizeFromTempLocation();
-
+	$return['action']  = 'upload';
+	$return['name']    = $_FILES['file']['name'];
+	$return['file_id'] = null;
 	//
-	// Does a file with this hash exist already? If so use it, otherwise create a
-	// new one.
-	$file_id     = null;
-	$file_mapper = new FileMapper();
-	$existing    = $file_mapper->findByColumn('hash', $file->getHash());
-	if ($existing->count()) {
-		$file_id = $existing->current()->getId();
+	// TODO move the file security checking out of handlers!
+	// (Though it's not the place of the submission box or file uploader to
+	//  check either.)
+	$allowed_file_handler = new AllowedFile();
+	$allowed_file_check   = $allowed_file_handler->fileSecurityCheck($_FILES['file']);
+	if (!empty($allowed_file_check)) {
+		$return['message'] = $allowed_file_check['message'];
 	}
 	else {
-		$file_mapper->save($file);
-		$file_id = $file->getId();
-	}
+		$file = new File();
+		$file->setFilename($_FILES['file']['name']);
+		$file->setTempLocation($_FILES['file']['tmp_name']);
+		$file->setUploadedBy($_SESSION['id']);
+		$file->loadHashFromTempLocation();
+		$file->loadMimetypeFromFilename();
+		$file->loadFilesizeFromTempLocation();
 
-	//
-	// Spit out the file ID (or hash)
-	echo json_encode(array('file_id' => $file_id, 'name' => $file->getFilename()));
+		//
+		// Does a file with this hash exist already? If so use it, otherwise create a
+		// new one.
+		$file_id     = null;
+		$file_mapper = new FileMapper();
+		$existing    = $file_mapper->findByColumn('hash', $file->getHash());
+		if ($existing->count()) {
+			$file_id = $existing->current()->getId();
+		}
+		else {
+			$file_mapper->save($file);
+			$file_id = $file->getId();
+		}
+		$return['success'] = !empty($file_id);
+		$return['file_id'] = $file_id;
+	}
 }
 elseif (isset($_GET['delete'])) {
-	//
-	// Which file was passed?
-	$mapper  = new SubmissionBoxMapper();
 	$file_id = $_POST['file_id'];
 	$box_id  = $_POST['box_id'];
-	$result  = false;
-	if (!empty($file_id) && !empty($box_id)) {
-		$submission = $mapper->findById($box_id);
-		if ($submission) {
-			if ($file_id === 'old') {
-				$submission->setLegacyFileId(null);
-				$result = $mapper->save($submission) ? true : false;
-			}
-			else {
-				$file = $submission->getFileLinks()->getBy('fileId', $file_id);
-				if ($file) {
-					$file_mapper = new SubmissionFileMapper();
-					$result = $file_mapper->delete($file);
+
+	$return['action']  = 'delete';
+	$return['file_id'] = $file_id;
+	$return['box_id']  = $box_id;
+	$mapper  = new SubmissionBoxMapper();
+
+	//
+	// Permission check - can this user administer this box?
+	if (!$mapper->isOwnedByUser($_SESSION['id'], $box_id)) {
+		$return['message'] = 'Unauthorised';
+	}
+	else {
+		$result = false;
+		if (!empty($file_id) && !empty($box_id)) {
+			$submission = $mapper->findById($box_id);
+			if ($submission) {
+				if ($file_id === 'old') {
+					$submission->setLegacyFileId(null);
+					$result = $mapper->save($submission);
+				}
+				else {
+					$file = $submission->getFileLinks()->getBy('fileId', $file_id);
+					if ($file) {
+						$file_mapper = new SubmissionFileMapper();
+						$result = $file_mapper->delete($file);
+					}
 				}
 			}
 		}
+		$return['success'] = $result ? true : false;
 	}
-	echo json_encode(array('file_id' => $file_id, 'box_id' => $box_id, 'deleted' => $result));
 }
+echo json_encode($return);
