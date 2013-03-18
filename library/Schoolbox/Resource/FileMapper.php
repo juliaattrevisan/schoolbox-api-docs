@@ -48,4 +48,32 @@ class FileMapper extends Mapper {
 			'updated_timestamp' => true,
 		));
 	}
+
+	/**
+	 * Copies this file to the storage engine, or returns the existing copy if
+	 * it's already there.
+	 *
+	 * @return Storage The new storage item or existing item.
+	 */
+	protected function copyToStorage(File $file) {
+		$mapper  = new StorageMapper();
+
+		$storage = new Storage();
+		$storage
+			->setFilename($file->getFilename())
+			->setTempLocation($file->getFileLocation())
+			->setUploadedBy($file->getOwner());
+		$storage->loadHashFromTempLocation();
+		$storage->loadMimetypeFromFilename();
+		$storage->loadFilesizeFromTempLocation();
+
+		$existing = $mapper->findByColumn('hash', $storage->getHash(), true);
+		if ($existing) {
+			return $existing;
+		}
+		else {
+			$mapper->save($storage);
+			return $storage;
+		}
+	}
 }
