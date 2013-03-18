@@ -19,6 +19,11 @@ class File {
 	protected $id;
 
 	/**
+	 * @var string
+	 */
+	protected $name;
+
+	/**
 	 * @var ConfigLoader
 	 */
 	protected $config_loader;
@@ -57,6 +62,22 @@ class File {
 	 */
 	public function getId() {
 		return $this->id;
+	}
+
+	/**
+	 * @param  string $name
+	 * @return $this
+	 */
+	public function setName($name) {
+		$this->name = $name;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getName() {
+		return $this->name;
 	}
 
 	/**
