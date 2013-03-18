@@ -81,10 +81,12 @@ class File {
 	}
 
 	/**
-	 * @param string $filename
+	 * @param  string $filename
+	 * @return $this
 	 */
 	public function setFilename($filename) {
 		$this->filename = $filename;
+		return $this;
 	}
 
 	/**
@@ -95,10 +97,12 @@ class File {
 	}
 
 	/**
-	 * @param string $hash
+	 * @param  string $hash
+	 * @return $this
 	 */
 	public function setHash($hash) {
 		$this->hash = $hash;
+		return $this;
 	}
 
 	/**
@@ -109,10 +113,12 @@ class File {
 	}
 
 	/**
-	 * @param int $id
+	 * @param  int $id
+	 * @return $this
 	 */
 	public function setId($id) {
 		$this->id = $id;
+		return $this;
 	}
 
 	/**
@@ -123,10 +129,12 @@ class File {
 	}
 
 	/**
-	 * @param int $filesize
+	 * @param  int $filesize
+	 * @return $this
 	 */
 	public function setFilesize($filesize) {
 		$this->filesize = $filesize;
+		return $this;
 	}
 
 	/**
@@ -137,10 +145,12 @@ class File {
 	}
 
 	/**
-	 * @param string $last_accessed
+	 * @param  string $last_accessed
+	 * @return $this
 	 */
 	public function setLastAccessed($last_accessed) {
 		$this->last_accessed = $last_accessed;
+		return $this;
 	}
 
 	/**
@@ -151,10 +161,12 @@ class File {
 	}
 
 	/**
-	 * @param string $mime
+	 * @param  string $mime
+	 * @return $this
 	 */
 	public function setMime($mime) {
 		$this->mime = $mime;
+		return $this;
 	}
 
 	/**
@@ -165,10 +177,12 @@ class File {
 	}
 
 	/**
-	 * @param string $temp_location
+	 * @param  string $temp_location
+	 * @return $this
 	 */
 	public function setTempLocation($temp_location) {
 		$this->temp_location = $temp_location;
+		return $this;
 	}
 
 	/**
@@ -179,10 +193,12 @@ class File {
 	}
 
 	/**
-	 * @param int $uploaded_by
+	 * @param  int $uploaded_by
+	 * @return $this
 	 */
 	public function setUploadedBy($uploaded_by) {
 		$this->uploaded_by = $uploaded_by;
+		return $this;
 	}
 
 	/**
@@ -193,10 +209,12 @@ class File {
 	}
 
 	/**
-	 * @param string $uploaded_on
+	 * @param  string $uploaded_on
+	 * @return $this
 	 */
 	public function setUploadedOn($uploaded_on) {
 		$this->uploaded_on = $uploaded_on;
+		return $this;
 	}
 
 	/**
@@ -298,10 +316,12 @@ class File {
 	}
 
 	/**
-	 * @param \Schoolbox\ConfigLoader $config_loader
+	 * @param  \Schoolbox\ConfigLoader $config_loader
+	 * @return $this
 	 */
 	public function setConfigLoader($config_loader) {
 		$this->config_loader = $config_loader;
+		return $this;
 	}
 
 	/**
@@ -312,10 +332,12 @@ class File {
 	}
 
 	/**
-	 * @param \Schoolbox\File\MimetypeMapper $mimetype_loader
+	 * @param  \Schoolbox\File\MimetypeMapper $mimetype_loader
+	 * @return $this
 	 */
 	public function setMimetypeLoader($mimetype_loader) {
 		$this->mimetype_loader = $mimetype_loader;
+		return $this;
 	}
 
 	/**
