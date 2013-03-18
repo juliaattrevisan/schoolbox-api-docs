@@ -248,13 +248,13 @@
 		});
 
 		//
-		// Form submit.
+		// Form submit event.
+		// If this is a browser submission, and the upload queue isn't empty,
+		// trigger Uploadify uploader instead of submitting form. The Uploadify
+		// uploader submits the form once it's done.
 		form.submit(function(event) {
-			var form = $j('this');
-			if ('originalEvent' in event) {
-				//
-				// Hold submit until the form is processed.
-				// The onAllComplete() method will link the forms.
+			var uploads = $j('#custom_file_uploadQueue .uploadifyQueueItem');
+			if (uploads.length > 0 && 'originalEvent' in event) {
 				event.preventDefault();
 				file_upload.uploadifyUpload();
 			}

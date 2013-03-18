@@ -48,13 +48,13 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $submission = $mapper->findById($this->arg[1]);
 
     /* Output category information */
-	$cat_name = $submission->getCategoryName();
-	$codes    = $submission->getCategoryCodes();
+    $cat_name = $submission->getCategoryName();
+    $codes    = $submission->getCategoryCodes();
     if (!empty($codes)) {
-	    $catOutput = "<b>".$cat_name." (".implode(', ', $codes).")</b>";
+        $catOutput = "<b>".$cat_name." (".implode(', ', $codes).")</b>";
     }
     else {
-	    $catOutput = "<b>".$cat_name."</b>";
+        $catOutput = "<b>".$cat_name."</b>";
     }
 
     /* Output submission work_type drop down */
@@ -64,7 +64,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     ));
 
     // legacy support
-	$mark_type = $submission->getMarkType();
+    $mark_type = $submission->getMarkType();
     if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
         $this->setVar('marktype_block', '');
     }
@@ -165,12 +165,15 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         'LATE_PM'   => date('a', $late_date) == 'pm' ? 'selected' : '',
 
         'FILE_MAX_UPLOAD' => Cfg::get('file_upload_count'),
+        'MAX_FILE_SIZE'   => Cfg::get('max_file_size'),
+        'SESSION_NAME'    => session_name(),
+        'SESSION_ID'      => session_id(),
 
     );
 
     foreach(array('UPCOMING' => '1 day', 'OVERDUE' => '1 hour', 'RETURNED' => '1 hour') as $i => $j) {
-	    $notification = $submission->getNotifications()->getOfType(strtolower($i));
-	    $is_enabled   = $notification instanceof SubmissionBox\Notification && $notification->getEnabled();
+        $notification = $submission->getNotifications()->getOfType(strtolower($i));
+        $is_enabled   = $notification instanceof SubmissionBox\Notification && $notification->getEnabled();
         $output["NOTIF_{$i}_ENABLED"] = $is_enabled ? ' checked="checked"' : '';
         $output["{$i}_THRESHHOLD"] = $j;
     }
@@ -184,7 +187,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         foreach ($file_links as $file_link) {
             $file = $file_link->getFile();
             $this->setVar('CURRENT_FILE_NAME', $file->getFilename());
-	        $this->setVar('CURRENT_FILE_ID',   $file->getId());
+            $this->setVar('CURRENT_FILE_ID',   $file->getId());
             $this->setVar('CURRENT_FILE_ICON', $file->getIconFromFilename());
             $this->setVar('CURRENT_FILE_DATE', date('jS M Y, g:ia', strtotime($file->getUploadedOn())));
             $this->parse('existing_file_block','existing_file', true);
@@ -197,7 +200,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
 
         $this->setVar('CURRENT_FILE_NAME', $file['realname']);
         $this->setVar('CURRENT_FILE_ICON', $file['iconFile']);
-	    $this->setVar('CURRENT_FILE_ID',   'old');
+        $this->setVar('CURRENT_FILE_ID',   'old');
         $this->setVar('CURRENT_FILE_DATE', date('jS M Y, g:ia', $file['submitted']));
 
         $this->parse('existing_file_block','existing_file');
@@ -216,9 +219,9 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     $this->setTitle('Create Submission Box');
 
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
-	$groupHandler = new Group;
+    $groupHandler = new Group;
 
     // clear blocks that aren't used in this context
     $this->setVar(array(
@@ -243,18 +246,18 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     }
 
     /* Output category information */
-	$this->setVar('CURRENT_CAT', '');
+    $this->setVar('CURRENT_CAT', '');
 
-	$categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
-	$length = count($categoryList);
-	for ($i = 0; $i < $length; $i++) {
-		if (!empty($categoryList[$i]['code']))
-		$categoryList[$i]['name'] .= ' ('.$categoryList[$i]['code'].')';
-	}
+    $categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
+    $length = count($categoryList);
+    for ($i = 0; $i < $length; $i++) {
+        if (!empty($categoryList[$i]['code']))
+        $categoryList[$i]['name'] .= ' ('.$categoryList[$i]['code'].')';
+    }
 
     // Output submission work_type drop down (exclude online assessment work_type)
 
-	$this->dropDown('type_drop', $work_types, $this->arg[3], TEMPLATE_content, array(
+    $this->dropDown('type_drop', $work_types, $this->arg[3], TEMPLATE_content, array(
         'name' => 'TYPE_TEXT',
         'id'   => 'TYPE_VALUE'
     ));
@@ -280,7 +283,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     $output = array(
         'HEADING'           => 'Create',
         'CATEGORY'          => $this->arg[1],
-		'ID'		        => '',
+        'ID'                => '',
         'NAME'              => $file['name'],
         'DESCRIPTION'       => $file['description'],
         'FILEID'            => $file['id'],
@@ -305,6 +308,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         'LATE_PM'   => 'selected',
 
         'FILE_MAX_UPLOAD' => Cfg::get('file_upload_count'),
+        'MAX_FILE_SIZE'   => Cfg::get('max_file_size'),
         'SESSION_NAME'    => session_name(),
         'SESSION_ID'      => session_id(),
     );
@@ -402,5 +406,3 @@ function outputCriteria(SitePage $page, $catID, $checkedIDs, $descriptors, $desc
         }
     }
 }
-
-?>
