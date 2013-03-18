@@ -231,18 +231,19 @@
 			'cancelImg':'/javascript/uploadify/cancel.png',
 			'fileDataName':'file',
 			'multi':true,
-			'auto':false
-			,'queueSizeLimit':'{FILE_MAX_UPLOAD}'
-			,'removeCompleted':false
-			,onComplete: function(event, code, file, output, upload) {
+			'auto':false,
+			'queueSizeLimit':'{FILE_MAX_UPLOAD}',
+			'descriptionField':false,
+			'removeCompleted':false,
+			onComplete: function(event, code, file, output, upload) {
 				//
 				// Add hidden element with uploaded file ID.
 				var parsed_output = JSON.parse(output);
 				$j('#custom_file_upload'+code).prepend(
 					$j('<input name="file_ids[]" type="hidden" />').val(parsed_output.file_id)
 				);
-			}
-			,'onAllComplete':function(event, upload) {
+			},
+			'onAllComplete':function(event, upload) {
 				form.submit();
 			}
 		});

@@ -46,6 +46,7 @@ if(jQuery)(
 					queueID         : false, // The optional ID of the queue container
 					displayData     : 'percentage', // Set to "speed" to show the upload speed in the default queue item
 					removeCompleted : true, // Set to true if you want the queue items to be removed when a file is done uploading
+					descriptionField: true, // Set to false if you don't want the description field to be shown.
 					onInit          : function() {}, // Function to run when uploadify is initialized
 					onSelect        : function() {}, // Function to run when a file is selected
 					onSelectOnce    : function() {}, // Function to run once when files are added to the queue
@@ -131,19 +132,25 @@ if(jQuery)(
 						if (event.data.queueID) {
 							queue = '#' + event.data.queueID;
 						}
-						jQuery(queue).append('<div id="' + jQuery(this).attr('id') + ID + '" class="uploadifyQueueItem">\
-								<div class="cancel">\
-									<a href="javascript:jQuery(\'#' + jQuery(this).attr('id') + '\').uploadifyCancel(\'' + ID + '\')"><img src="' + settings.cancelImg + '" border="0" /></a>\
-									\
-								</div>\
-								<input name="fullname_' + ID + '" type="hidden" value="' + fileObj.name + '" />\
-								<input name="uploaded_' + ID + '" type="hidden" value="0" />\
-								<div class="uploadifyFileName"><span class="fileName">' + fileName + ' (' + byteSize + suffix + ')</span><span class="percentage"></span></div>\
-								<div class="uploadifyFileDescription"><input name="description_' + jQuery(this).attr('id') + '_' + ID + '" type="text" value=""></div>\
-								<div class="uploadifyProgress">\
-									<div id="' + jQuery(this).attr('id') + ID + 'ProgressBar" class="uploadifyProgressBar"><!--Progress Bar--></div>\
-								</div>\
-							</div>');
+						var template = '<div id="' + jQuery(this).attr('id') + ID + '" class="uploadifyQueueItem">\
+							<div class="cancel">\
+								<a href="javascript:jQuery(\'#' + jQuery(this).attr('id') + '\').uploadifyCancel(\'' + ID + '\')"><img src="' + settings.cancelImg + '" border="0" /></a>\
+								\
+							</div>\
+							<input name="fullname_' + ID + '" type="hidden" value="' + fileObj.name + '" />\
+							<input name="uploaded_' + ID + '" type="hidden" value="0" />\
+							<div class="uploadifyFileName"><span class="fileName">' + fileName + ' (' + byteSize + suffix + ')</span><span class="percentage"></span></div>\
+							<div class="uploadifyFileDescription">\
+						';
+						template += settings.descriptionField ?
+							'<input name="description_' + jQuery(this).attr('id') + '_' + ID + '" type="text" value="">':
+							'&nbsp;';
+						template += '</div>\
+							<div class="uploadifyProgress">\
+								<div id="' + jQuery(this).attr('id') + ID + 'ProgressBar" class="uploadifyProgressBar"><!--Progress Bar--></div>\
+							</div>\
+						</div>';
+						jQuery(queue).append(template);
 					}
 				});
 				jQuery(this).bind("uploadifySelectOnce", {'action': settings.onSelectOnce}, function(event, data) {
