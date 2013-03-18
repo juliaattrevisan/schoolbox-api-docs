@@ -248,13 +248,6 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     /* Output category information */
     $this->setVar('CURRENT_CAT', '');
 
-    $categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
-    $length = count($categoryList);
-    for ($i = 0; $i < $length; $i++) {
-        if (!empty($categoryList[$i]['code']))
-        $categoryList[$i]['name'] .= ' ('.$categoryList[$i]['code'].')';
-    }
-
     // Output submission work_type drop down (exclude online assessment work_type)
 
     $this->dropDown('type_drop', $work_types, $this->arg[3], TEMPLATE_content, array(
