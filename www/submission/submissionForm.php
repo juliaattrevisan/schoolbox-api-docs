@@ -56,38 +56,10 @@ $criteria = $_POST['crit'];
 $useDescriptors = $resultSetID == 0;
 
 //
-// File uploads are now stored in the storage engine. (eventually will support
-// multiple uploads)
-// Legacy file ID: files stored directly on the file system.
-$legacy_file_id = 0;
-$storage_id     = 0;
-if (isset($_FILES['file']['name']) && $_FILES['file']['name']) {
-    $allowedFileHandler = new AllowedFile();
-    $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
-
-	//
-	// Add the uploaded file to the submission box.
-	$file = new File();
-	$file->setFilename($_FILES['file']['name']);
-	$file->setTempLocation($_FILES['file']['tmp_name']);
-	$file->setUploadedBy($_SESSION['id']);
-	$file->loadHashFromTempLocation();
-	$file->loadMimetypeFromFilename();
-	$file->loadFilesizeFromTempLocation();
-
-	$file_link = new SubmissionBox\File();
-	$file_link->setFile($file);
-
-	$submission->addFileLink($file_link);
-}
-else {
-	$legacy_file_id = $action == 'create' ? $_POST['fileId']    : 0;
-	$storage_id     = $action == 'create' ? $_POST['storageId'] : 0;
-
-	//
-	// Multifile handling:
-	// Convert legacy file to new file when uploading any files?
-	// If many files were selected, connect them here.
+// Multifile handling:
+// Convert legacy file to new file when uploading any files?
+// If many files were selected, connect them here.
+if (!empty($_POST['file_ids']) && is_array($_POST['file_ids'])) {
 	foreach ($_POST['file_ids'] as $file_id) {
 		if (!empty($file_id)) {
 			$submission->getFileLinks()->addFromFileId($file_id);
@@ -173,9 +145,9 @@ $submission->setWorkType($_POST['type']);
 $submission->setMarkType($markTypeID);
 $submission->setRubricResultSet($resultSetID);
 $submission->setMaxMark($markMax);
-if ($legacy_file_id) {
-	$submission->setLegacyFileId($legacy_file_id);
-}
+//if ($legacy_file_id) {
+//	$submission->setLegacyFileId($legacy_file_id);
+//}
 
 // append the notification data to be parsed in
 foreach(array('overdue', 'upcoming', 'returned') as $i) {
