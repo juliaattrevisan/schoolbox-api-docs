@@ -244,13 +244,16 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		// Convert legacy files to storage files on saving.
 		foreach ($objects as $this_object) {
 			if ($legacy_file_id = $this_object->getLegacyFileId()) {
-				//
-				// Get the legacy file's location.
-				$old_file = $this->getJoinMapper('legacy_file')->getById($legacy_file_id);
+				$old_file = $this->getJoinMapper('legacy_file')->findById($legacy_file_id);
 				$new_file = $this->getJoinMapper('legacy_file')->copyToStorage($old_file);
+
 				$new_link = $this->getJoinMapper('files')->createModel();
 				$new_link->setFile($new_file);
 				$this_object->getFileLinks()->add($new_link);
+
+				//
+				// Remove legacy file link because it is no longer needed.
+				$this_object->setLegacyFileId(null);
 			}
 		}
 		$result = parent::save($objects);
