@@ -119,6 +119,13 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'other_key' => 'box_id',
 		));
 
+		$this->hasJoin('legacy_file', array(
+			'multiple'  => true,
+			'mapper'    => new Schoolbox\Resource\FileMapper(),
+			'this_key'  => 'fid',
+			'other_key' => 'id',
+		));
+
 		$this->hasJoin('work_type', array(
 			'mapper'    => new SubmissionBox\WorkTypeMapper(),
 			'this_key'  => 'type',
@@ -226,16 +233,27 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			$submission_box->setCategoryName($category_name);
 			$submission_box->setCategoryCodes($category_codes);
 			unset($statement);
-
-			//
-			// TODO include legacy file mapper.
 		}
 		return $submission_box;
 	}
 
 	public function save($object) {
 		$objects = $this->getModelAsCollection($object);
-		$result  = parent::save($objects);
+
+		//
+		// Convert legacy files to storage files on saving.
+		foreach ($objects as $this_object) {
+			if ($legacy_file_id = $this_object->getLegacyFileId()) {
+				//
+				// Get the legacy file's location.
+				$old_file = $this->getJoinMapper('legacy_file')->getById($legacy_file_id);
+				$new_file = $this->getJoinMapper('legacy_file')->copyToStorage($old_file);
+				$new_link = $this->getJoinMapper('files')->createModel();
+				$new_link->setFile($new_file);
+				$this_object->getFileLinks()->add($new_link);
+			}
+		}
+		$result = parent::save($objects);
 		if ($result) {
 			//
 			// TODO: add pre-save, pre-delete, post-save, post-delete hooks.
@@ -243,8 +261,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			// save methods.
 			// Consider a publish/subscribe event system.
 			foreach ($objects as $this_object) {
-				//
-				// TODO convert legacy files to storage files?
 				foreach ($this_object->getFileLinks() as $box_file) {
 					if ($box_file->hasFile()) {
 						$box_file->setSubmissionBoxId($this_object->getId());
