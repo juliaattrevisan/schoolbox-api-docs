@@ -64,6 +64,12 @@ if (!empty($_POST['file_ids']) && is_array($_POST['file_ids'])) {
 		}
 	}
 }
+//
+// Legacy file ID (if passed through createSubmission/new/{catId}/{fileId})
+// submission's save method stores this as a storage file anyway.
+if (!empty($_POST['fileId'])) {
+	$submission->setLegacyFileId($_POST['fileId']);
+}
 
 
 /* Prevent 12pm to 12am-next-day bug by checking that the hour submitted is
