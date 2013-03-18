@@ -24,6 +24,21 @@ class File {
 	protected $name;
 
 	/**
+	 * @var int
+	 */
+	protected $owner;
+
+	/**
+	 * @var string
+	 */
+	protected $submitted;
+
+	/**
+	 * @var string
+	 */
+	protected $modified;
+
+	/**
 	 * @var ConfigLoader
 	 */
 	protected $config_loader;
@@ -81,10 +96,60 @@ class File {
 	}
 
 	/**
-	 * @param \Schoolbox\ConfigLoader $config_loader
+	 * @param  string $modified
+	 * @return $this
+	 */
+	public function setModified($modified) {
+		$this->modified = $modified;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getModified() {
+		return $this->modified;
+	}
+
+	/**
+	 * @param  int $owner
+	 * @return $this
+	 */
+	public function setOwner($owner) {
+		$this->owner = $owner;
+		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getOwner() {
+		return $this->owner;
+	}
+
+	/**
+	 * @param  string $submitted
+	 * @return $this
+	 */
+	public function setSubmitted($submitted) {
+		$this->submitted = $submitted;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getSubmitted() {
+		return $this->submitted;
+	}
+
+	/**
+	 * @param  \Schoolbox\ConfigLoader $config_loader
+	 * @return $this
 	 */
 	public function setConfigLoader($config_loader) {
 		$this->config_loader = $config_loader;
+		return $this;
 	}
 
 	/**
