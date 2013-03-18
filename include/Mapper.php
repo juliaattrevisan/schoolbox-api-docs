@@ -182,7 +182,11 @@ abstract class Mapper {
         $statement->execute();
 
         if ($one) {
-            return $this->hydrate($statement->fetch());
+            $result = $statement->fetch();
+            if ($result) {
+                return $this->hydrate($statement->fetch());
+            }
+            return false;
         }
         else {
             return $this->hydrateList($statement->fetchAll());
