@@ -12,8 +12,8 @@ use Schoolbox;
 
 class Collection implements \Iterator, \Countable {
 
-    private $stack = array();
-    private $position = 0;
+    protected $stack = array();
+	protected $position = 0;
 
     /**
      * @param $element
