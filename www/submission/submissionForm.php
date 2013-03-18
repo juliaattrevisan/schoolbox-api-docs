@@ -56,9 +56,7 @@ $criteria = $_POST['crit'];
 $useDescriptors = $resultSetID == 0;
 
 //
-// Multifile handling:
-// Convert legacy file to new file when uploading any files?
-// If many files were selected, connect them here.
+// Attach any files that were passed (they will have been saved in fileForm)
 if (!empty($_POST['file_ids']) && is_array($_POST['file_ids'])) {
 	foreach ($_POST['file_ids'] as $file_id) {
 		if (!empty($file_id)) {
@@ -145,9 +143,6 @@ $submission->setWorkType($_POST['type']);
 $submission->setMarkType($markTypeID);
 $submission->setRubricResultSet($resultSetID);
 $submission->setMaxMark($markMax);
-//if ($legacy_file_id) {
-//	$submission->setLegacyFileId($legacy_file_id);
-//}
 
 // append the notification data to be parsed in
 foreach(array('overdue', 'upcoming', 'returned') as $i) {

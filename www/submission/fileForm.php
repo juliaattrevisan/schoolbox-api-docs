@@ -3,6 +3,9 @@
 //
 // Upload destination for files submitted when creating a submission.
 // TODO add authorisation and file check
+// Authorisation of saving a submission is done on submissionForm page, so
+// don't do that here.
+// (except for deleting a file, need to change that)
 // $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES['file']));
 require_once( dirname(__FILE__) . '/../../include/Bootstrap.php' );
 
