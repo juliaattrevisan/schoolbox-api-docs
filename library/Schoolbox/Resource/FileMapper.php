@@ -16,6 +16,33 @@ use Schoolbox\File       as Storage;
 use Schoolbox\FileMapper as StorageMapper;
 
 class FileMapper extends Mapper {
+
+	/**
+	 * @var \Schoolbox\FileMapper
+	 */
+	protected $storage_mapper;
+
+	public function __construct() {
+		parent::__construct();
+		$this->storage_mapper = new StorageMapper();
+	}
+
+	/**
+	 * @param  \Schoolbox\FileMapper $storage_mapper
+	 * @return $this
+	 */
+	public function setStorageMapper($storage_mapper) {
+		$this->storage_mapper = $storage_mapper;
+		return $this;
+	}
+
+	/**
+	 * @return \Schoolbox\FileMapper
+	 */
+	public function getStorageMapper() {
+		return $this->storage_mapper;
+	}
+
 	protected function mapping() {
 		$this->hasTable('file');
 		$this->hasModel('\\Schoolbox\\Resource\\File');
@@ -53,12 +80,12 @@ class FileMapper extends Mapper {
 	 * Copies this file to the storage engine, or returns the existing copy if
 	 * it's already there.
 	 *
+	 * @param File $file The file object to copy to storage.
+	 *
 	 * @return Storage The new storage item or existing item.
 	 */
 	public function copyToStorage(File $file) {
-		$mapper  = new StorageMapper();
-
-		$storage = new Storage();
+		$storage = $this->storage_mapper->createModel();
 		$storage
 			->setFilename($file->getFilename())
 			->setTempLocation($file->getFileLocation())
@@ -67,7 +94,7 @@ class FileMapper extends Mapper {
 		$storage->loadMimetypeFromFilename();
 		$storage->loadFilesizeFromTempLocation();
 
-		$existing = $mapper->findByColumn('hash', $storage->getHash(), true);
+		$existing = $this->storage_mapper->findByColumn('hash', $storage->getHash(), true);
 		if ($existing) {
 			return $existing;
 		}
