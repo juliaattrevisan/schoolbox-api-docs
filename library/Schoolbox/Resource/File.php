@@ -11,6 +11,7 @@
  
 namespace Schoolbox\Resource;
 use Schoolbox\ConfigLoader;
+use Schoolbox\IConfigLoader;
 
 class File {
 	/**
@@ -39,7 +40,7 @@ class File {
 	protected $modified;
 
 	/**
-	 * @var ConfigLoader
+	 * @var IConfigLoader
 	 */
 	protected $config_loader;
 
@@ -144,16 +145,16 @@ class File {
 	}
 
 	/**
-	 * @param  \Schoolbox\ConfigLoader $config_loader
+	 * @param  \Schoolbox\IConfigLoader $config_loader
 	 * @return $this
 	 */
-	public function setConfigLoader($config_loader) {
+	public function setConfigLoader(IConfigLoader $config_loader) {
 		$this->config_loader = $config_loader;
 		return $this;
 	}
 
 	/**
-	 * @return \Schoolbox\ConfigLoader
+	 * @return \Schoolbox\IConfigLoader
 	 */
 	public function getConfigLoader() {
 		return $this->config_loader;

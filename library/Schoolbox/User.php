@@ -38,7 +38,7 @@ class User {
     private $calendarView; //Controls default calendar view
 
     /**
-     * @var ConfigLoader
+     * @var IConfigLoader
      */
     protected $config_loader;
 
@@ -254,14 +254,14 @@ class User {
 
 
     /**
-     * @param \Schoolbox\ConfigLoader $config_loader
+     * @param \Schoolbox\IConfigLoader $config_loader
      */
-    public function setConfigLoader($config_loader) {
+    public function setConfigLoader(IConfigLoader $config_loader) {
         $this->config_loader = $config_loader;
     }
 
     /**
-     * @return \Schoolbox\ConfigLoader
+     * @return \Schoolbox\IConfigLoader
      */
     public function getConfigLoader() {
         return $this->config_loader;

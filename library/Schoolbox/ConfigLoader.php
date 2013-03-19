@@ -14,7 +14,7 @@ namespace Schoolbox;
 use Schoolbox;
 use Cfg;
 
-class ConfigLoader {
+class ConfigLoader implements IConfigLoader {
 	public function get($var) {
 		return Cfg::get($var);
 	}
