@@ -1,9 +1,6 @@
 <?php
 /**
- * Non-static configuration loader for Schoolbox models and objects.
- *
- * Uses old static config under the hood, but is not a singleton so it is
- * able to be mocked in unit tests.
+ * Interface for configuration loader classes.
  *
  * @author      Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright   2013 Alaress Pty Ltd
