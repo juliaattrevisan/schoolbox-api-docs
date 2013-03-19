@@ -7,3 +7,4 @@ Vagrantfile
 core.css
 mchrome.css
 *.log
+screen.css
