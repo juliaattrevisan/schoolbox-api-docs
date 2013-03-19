@@ -297,20 +297,4 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$statement = $this->database->prepare($query);
 		return $statement->execute(array($object->getId()));
 	}
-
-	/**
-	 * Is the given submission box editable by the given user?
-	 *
-	 * @param int $id
-	 * @param int $user_id
-	 *
-	 * @return bool
-	 */
-	public function isOwnedByUser($id, $user_id) {
-		$results = $this->findByColumnList(array(
-			'id'    => $id,
-			'owner' => $user_id,
-		));
-		return $results->count() > 0;
-	}
 }
