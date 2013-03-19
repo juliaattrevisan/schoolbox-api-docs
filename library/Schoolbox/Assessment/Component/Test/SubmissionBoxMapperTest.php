@@ -24,10 +24,6 @@ class SubmissionBoxMapperTest extends TestCase {
 		$this->object = new SubmissionBoxMapper();
 	}
 
-	//
-	// Unit test what?
-	// Hydration
-	// Don't test save, but potentially test pre-save callbacks.
 	public function testHydrate() {
 		$data = array(
 			'id'                => 3,
@@ -52,4 +48,17 @@ class SubmissionBoxMapperTest extends TestCase {
 		$this->assertEquals(100,              $box->getMaxMark());
 		$this->assertEquals(false,            $box->getRubricResultSet());
 	}
+
+	public function testFindById() {
+		$this->markTestIncomplete();
+	}
+
+	public function testSave() {
+		$this->markTestIncomplete();
+	}
+
+	public function testDelete() {
+		$this->markTestIncomplete();
+	}
+
 }
