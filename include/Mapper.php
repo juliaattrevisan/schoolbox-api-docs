@@ -35,6 +35,13 @@ abstract class Mapper {
      */
     const TYPE_LOB = 3;
 
+	const TYPE_DATETIME   = 10;
+	const TYPE_DATE       = 11;
+	const TYPE_TIME       = 12;
+	const TYPE_TIMESTAMP  = 13;
+	const TYPE_DECIMAL    = 20;
+	const TYPE_SERIALIZED = 30;
+
 	/**
 	 * @var Database
 	 */
