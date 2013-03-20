@@ -1,195 +1,240 @@
-<h1>School Directory</h1>
-<table id="directory">
-    <tr>
-        <td colspan="6"><h2>Personal Information</h2></td>
-        <td>&nbsp;</td>
-    </tr>
-    <tr>
-        <td><strong>Name</strong></td>
-        <td colspan="2">{NAME}</td>
-        <td colspan="1"><strong>Email</strong></td>
-        <td colspan="2">{EMAIL}</td>
-        <td rowspan="12" style="vertical-align:top; text-align:center;"><!-- BEGIN portrait -->
+<div class="profile">
+    <h1>{NAME}</h1>
+
+    <div class="profile-info">
+        <div class="profile-img">
+            <!-- BEGIN portrait -->
             <img src="/portrait.php?userId={SYNERGY_ID}&size=constrain200"/>
             <!-- END portrait -->
-        </td>
-    </tr>
-    <!-- BEGIN student_synergy_form -->
-    <tr>
-        <td><strong>Student ID</strong></td>
-        <td colspan="2">{SYNERGY_ID}</td>
-        <td><strong>Date of Birth</strong></td>
-        <td colspan="2">{BIRTHDATE}</td>
-    </tr>
-    <tr>
-        <td><strong>Class Teacher</strong></td>
-        <td colspan="2">{FORM_STAFF}</td>
-        <td><strong>Year Level</strong></td>
-        <td colspan="2">{YEAR_LEVEL}</td>
-    </tr>
-    <tr>
-        <td><strong>House</strong></td>
-        <td colspan="2">{HOUSE}</td>
-        <td><strong>Class</strong></td>
-        <td colspan="2">{FORM}</td>
-    </tr>
-    <tr>
-        <td><strong>Student Type</strong></td>
-        <td colspan="2">{STUDENT_TYPE}</td>
-        <td><strong></strong></td>
-        <td colspan="2"></td>
-    </tr>
-    <!-- END student_synergy_form -->
-    <!-- BEGIN student_synergy_tutor -->
-    <tr>
-        <td><strong>Student ID</strong></td>
-        <td colspan="2">{SYNERGY_ID}</td>
-        <td><strong>Date of Birth</strong></td>
-        <td colspan="2">{BIRTHDATE}</td>
-    </tr>
-    <tr>
-        <td><strong>Tutor</strong></td>
-        <td colspan="2">{TUTOR}</td>
-        <td><strong>Year Level</strong></td>
-        <td colspan="2">{YEAR_LEVEL}</td>
-    </tr>
-    <tr>
-        <td><strong>House</strong></td>
-        <td colspan="2">{HOUSE}</td>
-        <td><strong>Tutor Group</strong></td>
-        <td colspan="2">{TUTOR_GROUP}</td>
-    </tr>
-    <tr>
-        <td><strong>Head of House</strong></td>
-        <td colspan="2">{HOH}</td>
-        <td><strong>Student Type<strong></td>
-        <td colspan="2">{STUDENT_TYPE}</td>
-    </tr>
-    <!-- END student_synergy_tutor -->
-    <!-- BEGIN medical -->
-    <tr>
-        <td><strong>Medical Note</strong></td>
-        <td colspan="5"><img src="/images/famicons/exclamation.png" title="important"/> {MEDICAL_NOTE}</td>
-    </tr>
-    <!-- END medical -->
-    <tr>
-        <td colspan="6"><h2>School Information</h2></td>
-    </tr>
-    <tr>
-        <td colspan="6" class="clearfix"><!-- BEGIN school_links --><!-- END school_links -->
+        </div>
+        <div class="profile-detail">
+            <!-- BEGIN student_synergy_form -->
+            <dl>
+                <dt>Email:</dt>
+                <dd>{EMAIL}</dd>
 
-            <!-- BEGIN timetable_link -->
-            <a href="/timetable/{ID}" class="btn report float-left"><span></span>Timetable</a>
-            <!-- END timetable_link -->
-            <!-- BEGIN due_work -->
-            <a href="/submission/dueWork/0/{ID}" class="btn due-work float-left"><span></span>Due Work</a>
-            <!-- END due_work -->
-            <!-- BEGIN helpdesk -->
-            <a href="/modules/helpdesk/{ID}" class="btn help float-left"><span></span>Helpdesk Jobs</a>
-            <!-- END helpdesk -->
-            <!-- BEGIN eportfolio -->
-            <a href="/eportfolio/{ID}" class="btn eportfolio float-left"><span></span>ePortfolio</a>
-            <!-- END eportfolio -->
-            <!-- BEGIN boarder_leave -->
-            <a href="/modules/leave/student/{ID}" class="btn eportfolio float-left"><span></span>Boarder Leave
-                History</a>
-            <!-- END boarder_leave -->
-            <!-- BEGIN modify -->
-            <a href="/adminv2/modify-user/{ID}" class="btn modify float-left"><span></span>Modify User</a>
-            <!-- END modify -->
+                <dt>Student ID:</dt>
+                <dd>{SYNERGY_ID}</dd>
 
-        </td>
-    </tr>
-    <!-- BEGIN subject -->
-    <tr>
-        <td colspan="6"><h2>Subjects</h2></td>
-    </tr>
-    <!-- BEGIN subject_row -->
-    <tr>
-        <!-- BEGIN subject_item -->
-        <td class="clearfix"><img src="/portrait.php?userId={SUBJECT_TEACHER_ID}&size=square64"/></td>
-        <td class="clearfix">{SUBJECT_NAME}<br/>
-            {SUBJECT_TEACHER_NAME}
-        </td>
-        <!-- END subject_item -->
-    </tr>
-    <!-- END subject_row -->
-    <tr>
-        <td colspan="6">
-            <!-- BEGIN subject_mail -->
-            <form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
-                <input type="hidden" name="replyto" value="{REPLYTO}"/>
-                <input type="hidden" name="bcc" value="{EMAILALL}"/>
-                <a href="#" class="btn submit-this float-right up-arrow "><span></span>Email all</a>
-            </form>
-            <!-- END subject_mail -->
+                <dt>Date of Birth:</dt>
+                <dd>{BIRTHDATE}</dd>
 
-        </td>
-    </tr>
-    <!-- END subject -->
+                <dt>Class Teacher:</dt>
+                <dd>{FORM_STAFF}</dd>
+
+                <dt>Year Level:</dt>
+                <dd>{YEAR_LEVEL}</dd>
+
+                <dt>House:</dt>
+                <dd>{HOUSE}</dd>
+
+                <dt>Class:</dt>
+                <dd>{FORM}</dd>
+
+                <dt>Student Type:</dt>
+                <dd>{STUDENT_TYPE}</dd>
+            </dl>
+            <!-- END student_synergy_form -->
+
+            <!-- BEGIN student_synergy_tutor -->
+            <dl>
+                <dt>Student ID:</dt>
+                <dd>{SYNERGY_ID}</dd>
+
+                <dt>Date of Birth:</dt>
+                <dd>{BIRTHDATE}</dd>
+
+                <dt>Class Teacher:</dt>
+                <dd>{FORM_STAFF}</dd>
+
+                <dt>Tutor:</dt>
+                <dd>{TUTOR}</dd>
+
+                <dt>Year Level:</dt>
+                <dd>{YEAR_LEVEL}</dd>
+
+                <dt>House:</dt>
+                <dd>{HOUSE}</dd>
+
+                <dt>Tutor Group:</dt>
+                <dd>{TUTOR_GROUP}</dd>
+
+                <dt>Head of House:</dt>
+                <dd>{HOH}</dd>
+
+                <dt>Student Type:</dt>
+                <dd>{STUDENT_TYPE}</dd>
+            </dl>
+            <!-- END student_synergy_tutor -->
+
+            <!-- BEGIN medical -->
+            <dl>
+                <dt>Medical Note:</dt>
+                <dd><img src="/images/famicons/exclamation.png" title="important"/> {MEDICAL_NOTE}</dd>
+            </dl>
+            <!-- END medical -->
+        </div>
+    </div>
+    <div class="school-info">
+        <!-- BEGIN school_links --><!-- END school_links -->
+
+        <!-- BEGIN timetable_link -->
+        <a href="/timetable/{ID}" class="btn report float-left"><span></span>Timetable</a>
+        <!-- END timetable_link -->
+
+        <!-- BEGIN due_work -->
+        <a href="/submission/dueWork/0/{ID}" class="btn due-work float-left"><span></span>Due Work</a>
+        <!-- END due_work -->
+
+        <!-- BEGIN helpdesk -->
+        <a href="/modules/helpdesk/{ID}" class="btn help float-left"><span></span>Helpdesk Jobs</a>
+        <!-- END helpdesk -->
+
+        <!-- BEGIN eportfolio -->
+        <a href="/eportfolio/{ID}" class="btn eportfolio float-left"><span></span>ePortfolio</a>
+        <!-- END eportfolio -->
+
+        <!-- BEGIN boarder_leave -->
+        <a href="/modules/leave/student/{ID}" class="btn eportfolio float-left"><span></span>Boarder Leave History</a>
+        <!-- END boarder_leave -->
+
+        <!-- BEGIN modify -->
+        <a href="/adminv2/modify-user/{ID}" class="btn modify float-left"><span></span>Modify User</a>
+        <!-- END modify -->
+    </div>
+</div>
+
+<div class="directory">
+
+    <div class="subjects">
+        <!-- BEGIN subject -->
+        <h1>Subjects</h1>
+
+        <!-- BEGIN subject_row -->
+        <ul>
+            <!-- BEGIN subject_item -->
+            <li>
+                <a class="class-subject">{SUBJECT_NAME}</a>
+                <a class="teacher-profile">
+                    <img src="/portrait.php?userId={SUBJECT_TEACHER_ID}&size=square64"/>
+                    {SUBJECT_TEACHER_NAME}
+                    {Teacher}
+                </a>
+
+            </li>
+            <!-- END subject_item -->
+        </ul>
+        <!-- END subject_row -->
+
+        <!-- END subject -->
+    </div>
+
+    <!-- BEGIN subject_mail -->
+    <!-- END subject_mail -->
 
     <!-- BEGIN contact_synergy -->
+    <div class="contact-info">
+        <h1>Contact Information</h1>
+        <!-- BEGIN edit_emergency -->
+        <!-- END edit_emergency -->
 
-    <tr>
-        <td colspan="6"><h2>Contact Information</h2>
-            <!-- BEGIN edit_emergency -->
-            <!-- END edit_emergency -->
-        </td>
-    </tr>
-    <!-- BEGIN contact_alert -->
-    <tr>
-        <td colspan="6"><img src="/images/famicons/exclamation.png" title="important"/><span
-                style="color:red; font-weight:bold;">{CONTACT_ALERT_MESSAGE}</span></td>
-    </tr>
-    <!-- END contact_alert -->
-    <!-- BEGIN contact_details -->
-    <tr>
-        <td colspan="2"><strong>Name</strong><br/>{CONTACT_NAME_EMAIL}</td>
-        <td colspan="2"><strong>Mobile</strong><br/>{CONTACT_MOBILE_PHONE}</td>
-        <td colspan="2"><strong>Work</strong><br/>{CONTACT_OCCUP_PHONE}</td>
-    </tr>
-    <!-- BEGIN spouse_details -->
-    <tr>
-        <td colspan="2"><strong>Name</strong><br/>{SPOUSE_NAME_EMAIL}</td>
-        <td colspan="2"><strong>Mobile</strong><br/>{SPOUSE_MOBILE_PHONE}</td>
-        <td colspan="2"><strong>Work</strong><br/>{SPOUSE_OCCUP_PHONE}</td>
-    </tr>
-    <!-- END spouse_details -->
-    <tr>
-        <td valign="top" colspan="2"><strong>Address</strong><br/>{CONTACT_ADDRESS}</td>
-        <td valign="top" colspan="2"><strong>Home Phone </strong><br/>{CONTACT_HOME_PHONE}</td>
-        <td colspan="2">&nbsp;</td>
-    </tr>
-    <!-- END contact_details -->
-    <tr>
-        <td colspan="6"><h2>Emergency Contact</h2>
-            <!-- BEGIN edit_emergency -->
-            <!-- END edit_emergency -->
-        </td>
-    </tr>
-    <tr>
-        <td><strong>Name</strong></td>
-        <td>{EMERGENCY_NAME}</td>
-        <td><strong>Phone </strong></td>
-        <td>{EMERGENCY_PHONE}</td>
-        <td><strong>Alt. Phone </strong></td>
-        <td>{EMERGENCY_ALT_PHONE}</td>
-    </tr>
-    <tr>
-        <td><strong>Name</strong></td>
-        <td>{EMERGENCY_NAME_2}</td>
-        <td><strong>Phone </strong></td>
-        <td>{EMERGENCY_PHONE_2}</td>
-        <td><strong>Alt. Phone </strong></td>
-        <td>{EMERGENCY_ALT_PHONE_2}</td>
-    </tr>
-    <tr>
-        <td><strong>Name</strong></td>
-        <td>{EMERGENCY_NAME_3}</td>
-        <td><strong>Phone </strong></td>
-        <td>{EMERGENCY_PHONE_3}</td>
-        <td><strong>Alt. Phone </strong></td>
-        <td>{EMERGENCY_ALT_PHONE_3}</td>
-    </tr>
-    <!-- END contact_synergy -->
-</table>
+        <!-- BEGIN contact_alert -->
+        <div>
+            <img src="/images/famicons/exclamation.png" title="important"/><span style="color:red; font-weight:bold;">{CONTACT_ALERT_MESSAGE}</span>
+        </div>
+        <!-- END contact_alert -->
+
+        <!-- BEGIN contact_details -->
+        <ul>
+            <li>
+                <img src="/portrait.php?userId={SUBJECT_TEACHER_ID}&size=square64"/>
+                {CONTACT_NAME_EMAIL}
+                {SUBJECT_TEACHER_NAME}
+            </li>
+            <li>
+                <!--Mobile-->
+                {CONTACT_MOBILE_PHONE}
+            </li>
+            <li>
+                <!--Work-->
+                {CONTACT_OCCUP_PHONE}
+            </li>
+        </ul>
+
+        <!-- BEGIN spouse_details -->
+        <ul>
+            <li>
+                {SPOUSE_NAME_EMAIL}
+                {SPOUSE_MOBILE_PHONE}
+                {SPOUSE_OCCUP_PHONE}
+            </li>
+        </ul>
+        <!-- END spouse_details -->
+
+        <ul>
+            <li>
+                Address: <br />
+                {CONTACT_ADDRESS}
+            </li>
+            <li>
+                Home Phone: <br />
+                {CONTACT_HOME_PHONE}
+            </li>
+        </ul>
+        <!-- END contact_details -->
+
+        <div classs="emergency-contact">
+            <ul>
+                <li>
+                    <h1>Emergency Contact Information</h1>
+                    <!-- BEGIN edit_emergency -->
+                    <!-- END edit_emergency -->
+                </li>
+            </ul>
+
+            <ul>
+                <li>
+                    Name: <br />
+                    {EMERGENCY_NAME}
+                </li>
+                <li>
+                    Phone: <br />
+                    {EMERGENCY_PHONE}
+                </li>
+                <li>
+                    Alt. Phone: <br />
+                    {EMERGENCY_ALT_PHONE}
+                </li>
+            </ul>
+            <ul>
+                <li>
+                    Name: <br />
+                    {EMERGENCY_NAME_2}
+                </li>
+                <li>
+                    Phone: <br />
+                    {EMERGENCY_PHONE_2}
+                </li>
+                <li>
+                    Alt. Phone: <br />
+                    {EMERGENCY_ALT_PHONE_2}
+                </li>
+            </ul>
+            <ul>
+                <li>
+                    Name: <br />
+                    {EMERGENCY_NAME_3}
+                </li>
+                <li>
+                    Phone: <br />
+                    {EMERGENCY_PHONE_3}
+                </li>
+                <li>
+                    Alt. Phone: <br />
+                    {EMERGENCY_ALT_PHONE_3}
+                </li>
+            </ul>
+        </div>
+        <!-- END contact_synergy -->
+    </div>
+</div>
