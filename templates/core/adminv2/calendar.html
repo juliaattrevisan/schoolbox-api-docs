@@ -42,67 +42,6 @@ $j(function() {
 	});
 });
 </script>
-
-<style type='text/css'>
-	div.eventList {
-
-	}
-    .eventList h3 {
-        line-height: 32px;
-        margin-bottom: 0;
-    }
-
-    .connector-active {
-        background: #fff;
-        padding: 8px;
-        border: 1px solid #ddd;
-    }
-
-    .calendar-connector {
-        font-size: 18px;
-        font-weight: bold;
-        height: 49px;
-        line-height: 49px;
-        padding-left: 60px;
-        background: url('/images/core/icons/datasource-vcal.png') no-repeat left center;
-    }
-    .calendar-connector.Schoolbox { background-image: url('/images/core/icons/datasource-schoolbox.png'); }
-    .calendar-connector.Sharepoint { background-image: url('/images/core/icons/datasource-sharepoint.png'); }
-
-    .calendarOptions {
-        border-top: 1px solid #ddd;
-    }
-    .calendarOptions h4 {
-        padding-bottom: 0;
-        padding-top: 5px;
-        border-bottom: 0;
-    }
-
-	div.configList {
-        padding: 0 8px;
-		margin: 0 0 8px;
-		display:block;
-	}
-
-    .admin-contents .settings.heading {
-        margin-top: -32px;
-    }
-
-	fieldset.calendarOptions fieldset {
-		float: left;
-		margin-right: 20px;
-	}
-
-	fieldset.calendarOptions fieldset.medium {
-		width: 300px;
-	}
-
-	fieldset.calendarOptions fieldset.control {
-		width: 20px;
-		margin: 0px;
-		float: right;
-	}
-</style>
 <!-- END custom_head-->
 
 <h1>Schoolbox Administration</h1>
@@ -199,13 +138,11 @@ $j(function() {
     <!-- END import -->
     <!-- BEGIN subscribe -->
     <div class="settings heading">
+        <form method='post' action='/adminv2/calendar/modifyForm'>
         <!-- BEGIN eventType -->
         <div class='eventList'>
             <h3>{EVENTTYPE_NAME}</h3>
-            <form method='post' action='/adminv2/calendar/modifyForm'>
                 <div class="level clearfix">
-                <div class="clearfix"></div>
-
             <!-- BEGIN connector -->
             <div id='configOptions_{EVENTTYPE_NAME}_{CONNECTOR_NAME}' class='configList {CONNECTOR_ACTIVE}'>
                 <label class="calendar-connector {CONNECTOR_NAME}" for="{EVENTTYPE_NAME}_{CONNECTOR_NAME}">

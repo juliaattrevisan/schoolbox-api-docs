@@ -2500,6 +2500,59 @@ ADMIN BODY
     filter: progid:DXImageTransform.Microsoft.gradient(startColorStr = '#edeae3', EndColorStr = '#e0ddd7');
 }
 
+.eventList h3 {
+	line-height: 32px;
+	margin-bottom: 0;
+}
+
+.connector-active {
+	background: #fff;
+	padding: 8px;
+	border: 1px solid #ddd;
+}
+
+.calendar-connector {
+	font-size: 18px;
+	font-weight: bold;
+	height: 49px;
+	line-height: 49px;
+	padding-left: 60px;
+	background: url('/images/core/icons/datasource-vcal.png') no-repeat left center;
+	&.Schoolbox { background-image: url('/images/core/icons/datasource-schoolbox.png'); }
+	&.Sharepoint { background-image: url('/images/core/icons/datasource-sharepoint.png'); }
+}
+
+.calendarOptions {
+	border-top: 1px solid #ddd;
+	h4 {
+		padding-bottom: 0;
+		padding-top: 5px;
+		border-bottom: 0;
+	}
+}
+
+div.configList {
+	padding: 0 8px;
+	margin: 0 0 8px;
+	display:block;
+}
+
+.admin-contents .settings.heading {
+	margin-top: -32px;
+}
+
+fieldset.calendarOptions fieldset {
+	float: left;
+	margin-right: 20px;
+	&.medium {
+		width: 300px;
+	}
+	&.control {
+		width: 20px;
+		margin: 0px;
+		float: right;
+	}
+}
 /***********************************************
 DASHBOARD (to mostly deprecate)
 ************************************************/
