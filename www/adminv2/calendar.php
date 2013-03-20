@@ -130,9 +130,12 @@ if (is_array($typeList)) {
 
 						/* Whether this connector displays at Ticked or not
 						 */
+
+						$connectorActive = 'connector-active';
 						$connectorChecked = 'checked="checked"';
 					}
 					else {
+						$connectorActive = '';
 						$connectorChecked = '';
 					}
 
@@ -140,6 +143,7 @@ if (is_array($typeList)) {
 					 */
 					$this->setVar(array(
 						'CONNECTOR_CHECKED' => $connectorChecked,
+						'CONNECTOR_ACTIVE' => $connectorActive,
 					));
 
 					$this->parse('connector_block', 'connector', true);

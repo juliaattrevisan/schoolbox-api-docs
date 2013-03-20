@@ -45,27 +45,52 @@ $j(function() {
 
 <style type='text/css'>
 	div.eventList {
-		width:100%;
-		display:block;
-		margin:20px 0px;
+
 	}
+    .eventList h3 {
+        line-height: 32px;
+        margin-bottom: 0;
+    }
+
+    .connector-active {
+        background: #fff;
+        padding: 8px;
+        border: 1px solid #ddd;
+    }
+
+    .calendar-connector {
+        font-size: 18px;
+        font-weight: bold;
+        height: 49px;
+        line-height: 49px;
+        padding-left: 60px;
+        background: url('/images/core/icons/datasource-vcal.png') no-repeat left center;
+    }
+    .calendar-connector.Schoolbox { background-image: url('/images/core/icons/datasource-schoolbox.png'); }
+    .calendar-connector.Sharepoint { background-image: url('/images/core/icons/datasource-sharepoint.png'); }
+
+    .calendarOptions {
+        border-top: 1px solid #ddd;
+    }
+    .calendarOptions h4 {
+        padding-bottom: 0;
+        padding-top: 5px;
+        border-bottom: 0;
+    }
 
 	div.configList {
-		border: 1px solid #ddd;
-		width:100%;
-		margin: 8px 0px;
+        padding: 0 8px;
+		margin: 0 0 8px;
 		display:block;
 	}
 
-	a.addConfig, a.removeConfig {
-		font-size: 20px;
-		float: right;
-	}
-</style>
-<style type='text/css'>
+    .admin-contents .settings.heading {
+        margin-top: -32px;
+    }
+
 	fieldset.calendarOptions fieldset {
 		float: left;
-		margin-right: 40px;
+		margin-right: 20px;
 	}
 
 	fieldset.calendarOptions fieldset.medium {
@@ -95,8 +120,8 @@ $j(function() {
 			<!-- END setting_tab -->
 		</ul>
 	</div>
-	<div class="settings">
-		<!-- BEGIN import -->
+    <!-- BEGIN import -->
+    <div class="settings">
 		<div class="level clearfix">
 			<form action="/adminv2/bulkAddCalendar" method="post" enctype="multipart/form-data" name="form" id="importForm" class="clearfix">
 				<div class="clearfix">
@@ -170,39 +195,41 @@ $j(function() {
 				<a class="btn add float-left submit" href="#"><span></span>Save</a>
 			</form>
 		</div>
-		<!-- END import -->
-		<!-- BEGIN subscribe -->
-		<form method='post' action='/adminv2/calendar/modifyForm'>
-			<div class="level clearfix">
-				<div class="clearfix"></div>
+    </div>
+    <!-- END import -->
+    <!-- BEGIN subscribe -->
+    <div class="settings heading">
+        <!-- BEGIN eventType -->
+        <div class='eventList'>
+            <h3>{EVENTTYPE_NAME}</h3>
+            <form method='post' action='/adminv2/calendar/modifyForm'>
+                <div class="level clearfix">
+                <div class="clearfix"></div>
 
-				<!-- BEGIN eventType -->
-				<div class='eventList'>
-					<strong>{EVENTTYPE_NAME}</strong>
+            <!-- BEGIN connector -->
+            <div id='configOptions_{EVENTTYPE_NAME}_{CONNECTOR_NAME}' class='configList {CONNECTOR_ACTIVE}'>
+                <label class="calendar-connector {CONNECTOR_NAME}" for="{EVENTTYPE_NAME}_{CONNECTOR_NAME}">
+                    <input type="checkbox" name="active[]" id="{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='connectorActive' value='{EVENTTYPE_NAME}_{CONNECTOR_NAME}' {CONNECTOR_CHECKED} />
+                {CONNECTOR_NAME}</label>
 
-					<!-- BEGIN connector -->
-					<div id='configOptions_{EVENTTYPE_NAME}_{CONNECTOR_NAME}' class='configList'>
-						<input type="checkbox" name="active[]" class='connectorActive' value='{EVENTTYPE_NAME}_{CONNECTOR_NAME}' {CONNECTOR_CHECKED} />
-						<em>{CONNECTOR_NAME}</em>
+                <div class="clearfix"></div>
 
-						<!-- BEGIN has_multiple_options -->
-						<a id="add_{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='addConfig submit-btn-plain' />+</a>
-						<!-- END has_multiple_options -->
+                <!-- BEGIN connectorConfig -->
+                <!-- END connectorConfig -->
 
-						<div class="clearfix"></div>
+            </div>
+            <!-- BEGIN has_multiple_options -->
+            <a id="add_{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='addConfig btn add' /><span></span>Add another source</a>
+            <!-- END has_multiple_options -->
+            <!-- END connector -->
+        </div>
+        <!-- END eventType -->
 
-						<!-- BEGIN connectorConfig -->
-						<!-- END connectorConfig -->
-					</div>
-					<!-- END connector -->
-				</div>
-				<!-- END eventType -->
-			</div>
-
-			<input type="submit" value='Update' />
-		</form>
-		<!-- END subscribe -->
-	</div>
+            <input type="submit" class="submit-btn-plain" value='Update' />
+            </form>
+        </div>
+    </div>
+    <!-- END subscribe -->
 </div>
 
 <!-- BEGIN custom_javascript -->
