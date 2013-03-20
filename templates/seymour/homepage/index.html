@@ -1,0 +1,185 @@
+<!-- BEGIN custom_head -->
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/homepage/rss/{ID}/{USER_TOKEN}" />
+<!-- BEGIN modify_layout -->
+<script type="text/javascript"> var categoryID = {ID}; </script>
+
+<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<script type="text/javascript" src="/javascript/color-conversion.js"></script>
+<script type="text/javascript" src="/javascript/jquery.component.js"></script>
+<link rel="stylesheet" type="text/css" href="/javascript/farbtastic/farbtastic.css" />
+<script type="text/javascript" src="/javascript/farbtastic/farbtastic.js"></script>
+<script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
+<script type="text/javascript" src="/javascript/jquery.tree.js"></script>
+<script type="text/javascript" src="/javascript/jquery.scrollTo.js"></script>
+<script type="text/javascript">
+    $j(function() {
+        /* Set up variables and urls
+         */
+        setupCustomise.ajaxURL = '/homepage/configForm.php';
+        setupCustomise.key = 'cid';
+        setupCustomise.id = {ID};
+        setupCustomise.leftColumnWidth = '{TEMPLATE_LEFT_COLUMN_WIDTH}';
+
+        /**
+         * Initialise the customisation dropdown and create all its javascript driven elements
+         * ie:
+         */
+        setupCustomise.customisationDropdown.init();
+
+        /* If a column is empty, insert placeholder into the space where you can drag components to.
+         */
+        setupCustomise.emptyColumnCheck([$j('.homepage div.top'), $j('.homepage div.right'), $j('.homepage div.left')]);
+
+        /* setup the ability to sort components, drag them around across columns.
+         */
+        setupCustomise.sortComponents();
+
+        /* The controls for the individual components ie. edit, delete
+         */
+        setupCustomise.activeComponents();
+    });
+</script>
+
+<!-- END modify_layout -->
+
+<style type="text/css">
+
+    .top h2                                              { color: #{top_head_font}; background-color: #{top_head_bg}; }
+    .top p, .top h3, .top .listing p.small               { color: #{top_font}; }
+    .top a, .top .listing p.small a                      { color: #{top_link}; }
+    .top .box a:hover, .top .listing p.small a:hover     { color: #{top_hover};  }
+    .top .text                                           { background: #{top_bg_primary}; }
+    .top .listing                                        { background: #{top_bg_primary}; }
+    .top .listing .dark                                  { background: #{top_bg_secondary}; }
+
+    .left h2                                             { color: #{left_head_font}; background-color: #{left_head_bg};	}
+    .left p, .left h3, .left .listing p.small,.left      { color: #{left_font}; }
+    .left a, .left .listing p.small a                    { color: #{left_link}; }
+    .left .box a:hover, .left .listing p.small a:hover   { color: #{left_hover};  }
+    .left .text                                          { background: #{left_bg_primary}; }
+    .left .listing                                       { background: #{left_bg_primary}; }
+    .left .listing .dark                                 { background: #{left_bg_secondary}; }
+
+    .right h2                                            { color: #{right_head_font}; background-color: #{right_head_bg};	}
+    .right p, .right h3, .right .listing p.small         { color: #{right_font}; }
+    .right a, .right .listing p.small a                  { color: #{right_link}; }
+    .right .box a:hover, .right .listing p.small a:hover { color: #{right_hover};  }
+    .right .text                                         { background: #{right_bg_primary}; }
+    .right .listing                                      { background: #{right_bg_primary}; }
+    .right .listing .dark                                { background: #{right_bg_secondary}; }
+
+        /* wrap mimetypes in classes */
+
+    <!-- BEGIN allowed_files -->
+    a.{NAME} { background-image: url(/images/mime/22x22/{ICON}); }
+    <!-- END allowed_files -->
+
+</style>
+<script type="text/javascript">
+    <!-- BEGIN colour_list -->
+    var {COLOUR_ARRAY} = {
+        'top_head_font'      : '#{top_head_font}',
+        'top_head_bg'        : '#{top_head_bg}',
+        'top_font'           : '#{top_font}',
+        'top_bg_primary'     : '#{top_bg_primary}',
+        'top_bg_secondary'   : '#{top_bg_secondary}',
+        'top_link'           : '#{top_link}',
+        'top_hover'          : '#{top_hover}',
+
+        'left_head_font'     : '#{left_head_font}',
+        'left_head_bg'       : '#{left_head_bg}',
+        'left_font'          : '#{left_font}',
+        'left_bg_primary'    : '#{left_bg_primary}',
+        'left_bg_secondary'  : '#{left_bg_secondary}',
+        'left_link'          : '#{left_link}',
+        'left_hover'         : '#{left_hover}',
+
+        'right_head_font'    : '#{right_head_font}',
+        'right_head_bg'      : '#{right_head_bg}',
+        'right_font'         : '#{right_font}',
+        'right_bg_primary'   : '#{right_bg_primary}',
+        'right_bg_secondary' : '#{right_bg_secondary}',
+        'right_link'         : '#{right_link}',
+        'right_hover'        : '#{right_hover}'
+    };
+    <!-- END colour_list -->
+
+</script>
+<!-- END custom_head -->
+
+<h1> <span>{HEADING}</span>
+    <!-- BEGIN edit_page -->
+    <a class="customise" href="#"><span>Customise Page</span><span style="display:none">Close Customisation</span></a>
+    <!-- END edit_page -->
+</h1>
+<!-- BEGIN customise_page -->
+<div id="tabs-homepage">
+<ul class="clearfix">
+    <li><a href="#tabs-1">Components</a></li>
+    <li><a href="#tabs-3">Column Widths</a></li>
+</ul>
+<div id="tabs-1" class="customise-components">
+    <div id="tabs-sub">
+        <table border="0" cellpadding="0" cellspacing="0">
+            <colgroup>
+                <col width="128" />
+            </colgroup>
+            <tr>
+                <td valign="top"><ul>
+                    <!-- BEGIN homepage_component_tab -->
+                    <li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
+                    <!-- END homepage_component_tab -->
+                </ul></td>
+                <td><div class="components clearfix">
+                    <!-- BEGIN homepage_component_page -->
+                    <div id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
+                        <!-- BEGIN homepage_component -->
+                        <div class="add-component {HOMEPAGE_COMPONENT_CLASS} clearfix">
+                            <h4>{HOMEPAGE_COMPONENT_NAME} <strong>(<em>{HOMEPAGE_COMPONENT_COUNT}</em>)</strong></h4>
+                            <p>{HOMEPAGE_COMPONENT_DESCRIPTION}</p>
+                            <span class="notification"><strong></strong>Added</span>
+                            <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" class="btn add"><span></span>Add</a>
+
+                        </div>
+                        <!-- END homepage_component -->
+                    </div>
+                    <!-- END homepage_component_page -->
+                </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+<!--/tabs-1-->
+<div id="tabs-3" class="customise-components layouts">
+    <form method="POST" action="" >
+        <p class="information-notification pad-it ">In order to adjust the
+            widths of the left and right columns on the page, drag the slider
+            below left and right. </p>
+        <div class="clearfix slide-guide">
+            <h3>Column width slider</h3>
+            <div class="slider-house">
+                <div id="slider"></div>
+            </div>
+        </div>
+        <div class="saved-layout">Saved layout</div>
+
+    </form>
+</div>
+<!--/tabs-3-->
+</div>
+<!-- END customise_page -->
+
+<div class="homepage clearfix">
+    <div class="top clearfix">{component_position_top}</div>
+    <div class="left clearfix" style="width: {TEMPLATE_LEFT_COLUMN_WIDTH}%">{component_position_left}</div>
+    <div class="right clearfix" style="width: {TEMPLATE_RIGHT_COLUMN_WIDTH}%">{component_position_right}</div>
+</div>
+<input type="hidden" id="categoryID" value="{ID}" />
+<div id="resource-browser" class="hide"></div>
+<script type="text/javascript">
+    // all forms should submit without prevention
+    $j(".homepage form").submit(function() {
+        window.check = false;
+    });
+</script>
