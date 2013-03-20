@@ -102,6 +102,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'property'   => 'rubricResultSet',
 			'type'       => self::TYPE_INTEGER,
 		));
+		$this->hasMap(array(
+			'column'     => 'mark_visibility',
+			'property'   => 'markVisibility',
+			'type'       => self::TYPE_INTEGER,
+		));
 
 		//
 		// adds listeners:
