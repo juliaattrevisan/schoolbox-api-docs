@@ -162,6 +162,7 @@ class External_Denbigh_User implements External_UserInterface {
 				stu.tutorGroup, stu.house, stu.academicYear,
 				pe_sta.denbighID AS tutor_denbighID, pe_sta.surname AS tutor_surname, pe_sta.preferred_name AS tutor_preferred_name, pe_sta.title AS tutor_title,
 				pe_pa.denbighID AS parent_denbighID, pe_pa.surname AS parent_surname, pe_pa.preferred_name AS parent_preferred_name, pe_pa.title AS parent_title,
+				fa.EmergencyContact1, fa.EmergencyRelationship1, fa.EmergencyPhone1, fa.EmergencyEmail1,
 				a.telephoneHome AS parent_telephoneHome,
 				stu.boardingStatus
 			FROM People pe
@@ -172,6 +173,7 @@ class External_Denbigh_User implements External_UserInterface {
 			/* Student's parents */
 			LEFT JOIN Parents pa ON pa.familyDenbighID = stu.familyDenbighID
 			LEFT JOIN People pe_pa ON pe_pa.denbighID = pa.peopleDenbighID
+			LEFT JOIN Family fa ON stu.familyDenbighID = fa.familyDenbighID
 			/* Parent's address */
 			LEFT JOIN Addresses a ON a.familyDenbighID = pa.familyDenbighID
 				AND a.telephoneHome IS NOT NULL
@@ -224,8 +226,9 @@ class External_Denbigh_User implements External_UserInterface {
             $adaption['StudentHouseDescription'] = $student['house'];
             $adaption['StudentYearLevel'] = $student['academicYear'];
 
-            $adaption['StudentEmergencyName'] = "{$student['parent_title']} {$student['parent_preferred_name']} {$student['parent_surname']}";
-            $adaption['StudentEmergencyPhone'] = $student['parent_telephoneHome'];
+            $adaption['StudentEmergencyName'] = "{$student['EmergencyContact1']} ({$student['EmergencyRelationship1']})";
+            $adaption['StudentEmergencyPhone'] = $student['EmergencyPhone1'];
+            $adaption['StudentEmergencyPhoneAlt'] = $student['EmergencyEmail1'];
 
             $adaption['StudentBoarder'] = $student['boardingStatus'];
         }
@@ -275,8 +278,8 @@ class External_Denbigh_User implements External_UserInterface {
      * @return mixed
      */
     public function getStudentContactList($externalUserId) {
-        $statement = $this->getExternalDatabase()->query(
-            "
+
+        $query =             "
 			SELECT
 				pe_p.denbighID, pe_p.surname, pe_p.given_names, pe_p.preferred_name, pe_p.title, pe_p.email,
 				pa_p.familyDenbighID,
@@ -285,15 +288,15 @@ class External_Denbigh_User implements External_UserInterface {
 			LEFT JOIN Students s ON s.peopleDenbighID = pe_s.denbighID
 
 			/* Get Parent */
-			LEFT JOIN Parents pa_p ON pa_p.familyDenbighID = s.familyDenbighID
+			LEFT JOIN Parents pa_p ON pa_p.familyDenbighID = s.familyDenbighID AND pa_p.type != 'Non Resident'
 			LEFT JOIN People pe_p ON pe_p.denbighID = pa_p.peopleDenbighID
 
 			/* Address */
 			LEFT JOIN Addresses a ON a.familyDenbighID = s.familyDenbighID
 			WHERE pe_s.denbighID = $externalUserId
-			GROUP BY pe_p.denbighID
-		"
-        );
+			GROUP BY pe_p.denbighID";
+
+        $statement = $this->getExternalDatabase()->query($query);
 
         $contactList = $statement->fetchAll(PDO::FETCH_ASSOC);
 
