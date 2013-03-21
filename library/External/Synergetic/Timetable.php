@@ -288,7 +288,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 				Timetable.FileSemester='".$_SESSION['FileSemester']."' AND 
 				Timetable.FileYear='".$_SESSION['FileYear']."' AND
 				(StudentClasses.ID='$synergy_id' AND
-				Timetable.DayNumber = '$daynumber' AND 
+				Timetable.DayNumber = '$daynumber' AND
+				Timetable.TimetableGroup = '{$this->campusCode[$campus]}' AND
 				StudentClasses.StartDate <= getdate() AND
 				(StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL))
 				ORDER BY Timetable.PeriodNumber";
@@ -306,6 +307,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 				Timetable.FileYear = SubjectClasses.FileYear AND
 				SubjectClasses.FileSemester='".$_SESSION['FileSemester']."' AND 
 				SubjectClasses.FileYear='".$_SESSION['FileYear']."' AND
+				Timetable.TimetableGroup = '{$this->campusCode[$campus]}' AND
 				Timetable.StaffID='$synergy_id' AND 
 				Timetable.DayNumber = '$daynumber'
 				ORDER BY Timetable.PeriodNumber";
@@ -388,7 +390,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 						StudentClasses.FileYear = SubjectClasses.FileYear AND
 						StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
 						StudentClasses.ClassCode = SubjectClasses.ClassCode AND
-						((Timetable.FileSemester=".$_SESSION['FileSemester'].") AND (Timetable.FileYear=".$_SESSION['FileYear'].") AND
+						((Timetable.FileSemester=".$_SESSION['FileSemester'].") AND
+						(Timetable.FileYear=".$_SESSION['FileYear'].") AND
+						Timetable.TimetableGroup = '{$this->campusCode[$campus]}' AND
 						(StudentClasses.ID='$synergy_id'))
 						AND StudentClasses.StartDate <= getdate() AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
 						AND DayNumber > 0 AND DayNumber <= ".$timetabledef['dayCount']." AND PeriodNumber <= ".$timetabledef['periodCount']."
@@ -416,6 +420,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface {
 						Timetable.FileYear = SubjectClasses.FileYear AND
 						SubjectClasses.FileSemester='".$_SESSION['FileSemester']."' AND
 						SubjectClasses.FileYear='".$_SESSION['FileYear']."' AND
+						Timetable.TimetableGroup = '{$this->campusCode[$campus]}' AND
 						Timetable.StaffID='$synergy_id' AND
 						DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . " AND
 						PeriodNumber <= ".$timetabledef['periodCount']."
