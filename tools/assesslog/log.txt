@@ -1,0 +1,664 @@
+13-03-07 04:53:42    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => AMOROSI
+            [1] => MINOGUE
+            [2] => SWIFT
+            [3] => GOODREM
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 04:53:42    Processed: a:4:{i:0;s:7:"AMOROSI";i:1;s:7:"MINOGUE";i:2;s:5:"SWIFT";i:3;s:7:"GOODREM";}
+
+13-03-07 04:53:46    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => AMOROSI
+            [1] => GOODREM
+            [2] => SWIFT
+            [3] => MINOGUE
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 04:53:46    Processed: a:4:{i:0;s:7:"AMOROSI";i:1;s:7:"GOODREM";i:2;s:5:"SWIFT";i:3;s:7:"MINOGUE";}
+
+13-03-07 04:53:46    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => AMOROSI
+            [1] => SWIFT
+            [2] => GOODREM
+            [3] => MINOGUE
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 04:53:46    Processed: a:4:{i:0;s:7:"AMOROSI";i:1;s:5:"SWIFT";i:2;s:7:"GOODREM";i:3;s:7:"MINOGUE";}
+
+13-03-07 04:53:47    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => AMOROSI
+            [1] => GOODREM
+            [2] => SWIFT
+            [3] => MINOGUE
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 04:53:47    Processed: a:4:{i:0;s:7:"AMOROSI";i:1;s:7:"GOODREM";i:2;s:5:"SWIFT";i:3;s:7:"MINOGUE";}
+
+13-03-07 04:53:48    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => SWIFT
+            [1] => GOODREM
+            [2] => AMOROSI
+            [3] => MINOGUE
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 04:53:48    Processed: a:4:{i:0;s:5:"SWIFT";i:1;s:7:"GOODREM";i:2;s:7:"AMOROSI";i:3;s:7:"MINOGUE";}
+
+13-03-07 04:53:48    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => SWIFT
+            [1] => GOODREM
+            [2] => MINOGUE
+            [3] => AMOROSI
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 04:53:48    Processed: a:4:{i:0;s:5:"SWIFT";i:1;s:7:"GOODREM";i:2;s:7:"MINOGUE";i:3;s:7:"AMOROSI";}
+
+13-03-07 04:53:50    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => SWIFT
+            [1] => GOODREM
+            [2] => MINOGUE
+            [3] => AMOROSI
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 04:53:50    Processed: a:4:{i:0;s:5:"SWIFT";i:1;s:7:"GOODREM";i:2;s:7:"MINOGUE";i:3;s:7:"AMOROSI";}
+
+13-03-07 04:54:02    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => SWIFT
+            [1] => MINOGUE
+            [2] => GOODREM
+            [3] => AMOROSI
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 04:54:02    Processed: a:4:{i:0;s:5:"SWIFT";i:1;s:7:"MINOGUE";i:2;s:7:"GOODREM";i:3;s:7:"AMOROSI";}
+
+13-03-07 04:54:05    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => SWIFT
+            [1] => MINOGUE
+            [2] => GOODREM
+            [3] => AMOROSI
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 04:54:05    Processed: a:4:{i:0;s:5:"SWIFT";i:1;s:7:"MINOGUE";i:2;s:7:"GOODREM";i:3;s:7:"AMOROSI";}
+
+13-03-07 04:54:14    Existing: Array
+(
+    [response_id] => 1
+    [attempt_id] => 1
+    [section_id] => 5
+    [question_id] => 27
+    [response] => a:4:{i:0;s:5:"SWIFT";i:1;s:7:"GOODREM";i:2;s:7:"MINOGUE";i:3;s:7:"AMOROSI";}
+    [comment] => 
+    [mark] => 0.00
+    [automarked_already] => true
+    [updated_at] => 2013-03-07 16:53:50
+    [deleted_at] => 
+)
+
+
+13-03-07 04:54:20    Existing: Array
+(
+    [response_id] => 1
+    [attempt_id] => 1
+    [section_id] => 5
+    [question_id] => 27
+    [response] => a:4:{i:0;s:5:"SWIFT";i:1;s:7:"GOODREM";i:2;s:7:"MINOGUE";i:3;s:7:"AMOROSI";}
+    [comment] => 
+    [mark] => 0.00
+    [automarked_already] => true
+    [updated_at] => 2013-03-07 16:53:50
+    [deleted_at] => 
+)
+
+
+13-03-07 04:54:21    Existing: Array
+(
+    [response_id] => 2
+    [attempt_id] => 2
+    [section_id] => 5
+    [question_id] => 27
+    [response] => a:4:{i:0;s:5:"SWIFT";i:1;s:7:"MINOGUE";i:2;s:7:"GOODREM";i:3;s:7:"AMOROSI";}
+    [comment] => 
+    [mark] => 0.00
+    [automarked_already] => true
+    [updated_at] => 2013-03-07 16:54:05
+    [deleted_at] => 
+)
+
+
+13-03-07 04:54:32    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => AMOROSI
+            [1] => MINOGUE
+            [2] => GOODREM
+            [3] => SWIFT
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 04:54:32    Processed: a:4:{i:0;s:7:"AMOROSI";i:1;s:7:"MINOGUE";i:2;s:7:"GOODREM";i:3;s:5:"SWIFT";}
+
+13-03-07 04:54:41    Existing: Array
+(
+    [response_id] => 1
+    [attempt_id] => 1
+    [section_id] => 5
+    [question_id] => 27
+    [response] => a:4:{i:0;s:5:"SWIFT";i:1;s:7:"GOODREM";i:2;s:7:"MINOGUE";i:3;s:7:"AMOROSI";}
+    [comment] => 
+    [mark] => 0.00
+    [automarked_already] => true
+    [updated_at] => 2013-03-07 16:53:50
+    [deleted_at] => 
+)
+
+
+13-03-07 04:54:54    Existing: Array
+(
+    [response_id] => 3
+    [attempt_id] => 3
+    [section_id] => 5
+    [question_id] => 27
+    [response] => a:4:{i:0;s:7:"AMOROSI";i:1;s:7:"MINOGUE";i:2;s:7:"GOODREM";i:3;s:5:"SWIFT";}
+    [comment] => 
+    [mark] => 0.00
+    [automarked_already] => true
+    [updated_at] => 2013-03-07 16:54:32
+    [deleted_at] => 
+)
+
+
+13-03-07 04:54:54    Existing: Array
+(
+    [response_id] => 2
+    [attempt_id] => 2
+    [section_id] => 5
+    [question_id] => 27
+    [response] => a:4:{i:0;s:5:"SWIFT";i:1;s:7:"MINOGUE";i:2;s:7:"GOODREM";i:3;s:7:"AMOROSI";}
+    [comment] => 
+    [mark] => 0.00
+    [automarked_already] => true
+    [updated_at] => 2013-03-07 16:54:05
+    [deleted_at] => 
+)
+
+
+13-03-07 04:54:56    Existing: Array
+(
+    [response_id] => 1
+    [attempt_id] => 1
+    [section_id] => 5
+    [question_id] => 27
+    [response] => a:4:{i:0;s:5:"SWIFT";i:1;s:7:"GOODREM";i:2;s:7:"MINOGUE";i:3;s:7:"AMOROSI";}
+    [comment] => 
+    [mark] => 0.00
+    [automarked_already] => true
+    [updated_at] => 2013-03-07 16:53:50
+    [deleted_at] => 
+)
+
+
+13-03-07 04:55:01    Existing: Array
+(
+    [response_id] => 1
+    [attempt_id] => 1
+    [section_id] => 5
+    [question_id] => 27
+    [response] => a:4:{i:0;s:5:"SWIFT";i:1;s:7:"GOODREM";i:2;s:7:"MINOGUE";i:3;s:7:"AMOROSI";}
+    [comment] => 
+    [mark] => 0.00
+    [automarked_already] => true
+    [updated_at] => 2013-03-07 16:53:50
+    [deleted_at] => 2013-03-07 16:55:00
+)
+
+
+13-03-07 04:55:34    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => MINOGUE
+            [1] => AMOROSI
+            [2] => GOODREM
+            [3] => SWIFT
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 04:55:34    Processed: a:4:{i:0;s:7:"MINOGUE";i:1;s:7:"AMOROSI";i:2;s:7:"GOODREM";i:3;s:5:"SWIFT";}
+
+13-03-07 05:01:35    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => SWIFT
+            [1] => GOODREM
+            [2] => AMOROSI
+            [3] => MINOGUE
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:01:35    Processed: a:4:{i:0;s:5:"SWIFT";i:1;s:7:"GOODREM";i:2;s:7:"AMOROSI";i:3;s:7:"MINOGUE";}
+
+13-03-07 05:02:01    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => MINOGUE
+            [1] => AMOROSI
+            [2] => GOODREM
+            [3] => SWIFT
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:02:01    Processed: a:4:{i:0;s:7:"MINOGUE";i:1;s:7:"AMOROSI";i:2;s:7:"GOODREM";i:3;s:5:"SWIFT";}
+
+13-03-07 05:02:02    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => AMOROSI
+            [1] => MINOGUE
+            [2] => GOODREM
+            [3] => SWIFT
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:02:02    Processed: a:4:{i:0;s:7:"AMOROSI";i:1;s:7:"MINOGUE";i:2;s:7:"GOODREM";i:3;s:5:"SWIFT";}
+
+13-03-07 05:02:04    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => AMOROSI
+            [1] => MINOGUE
+            [2] => GOODREM
+            [3] => SWIFT
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:02:04    Processed: a:4:{i:0;s:7:"AMOROSI";i:1;s:7:"MINOGUE";i:2;s:7:"GOODREM";i:3;s:5:"SWIFT";}
+
+13-03-07 05:02:05    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => MINOGUE
+            [1] => AMOROSI
+            [2] => GOODREM
+            [3] => SWIFT
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:02:05    Processed: a:4:{i:0;s:7:"MINOGUE";i:1;s:7:"AMOROSI";i:2;s:7:"GOODREM";i:3;s:5:"SWIFT";}
+
+13-03-07 05:02:06    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => MINOGUE
+            [1] => AMOROSI
+            [2] => GOODREM
+            [3] => SWIFT
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:02:06    Processed: a:4:{i:0;s:7:"MINOGUE";i:1;s:7:"AMOROSI";i:2;s:7:"GOODREM";i:3;s:5:"SWIFT";}
+
+13-03-07 05:02:08    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => MINOGUE
+            [1] => AMOROSI
+            [2] => SWIFT
+            [3] => GOODREM
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:02:08    Processed: a:4:{i:0;s:7:"MINOGUE";i:1;s:7:"AMOROSI";i:2;s:5:"SWIFT";i:3;s:7:"GOODREM";}
+
+13-03-07 05:02:08    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => MINOGUE
+            [1] => AMOROSI
+            [2] => SWIFT
+            [3] => GOODREM
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:02:08    Processed: a:4:{i:0;s:7:"MINOGUE";i:1;s:7:"AMOROSI";i:2;s:5:"SWIFT";i:3;s:7:"GOODREM";}
+
+13-03-07 05:02:10    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => MINOGUE
+            [1] => GOODREM
+            [2] => SWIFT
+            [3] => AMOROSI
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:02:10    Processed: a:4:{i:0;s:7:"MINOGUE";i:1;s:7:"GOODREM";i:2;s:5:"SWIFT";i:3;s:7:"AMOROSI";}
+
+13-03-07 05:02:11    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => MINOGUE
+            [1] => SWIFT
+            [2] => GOODREM
+            [3] => AMOROSI
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:02:11    Processed: a:4:{i:0;s:7:"MINOGUE";i:1;s:5:"SWIFT";i:2;s:7:"GOODREM";i:3;s:7:"AMOROSI";}
+
+13-03-07 05:02:11    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => SWIFT
+            [1] => MINOGUE
+            [2] => GOODREM
+            [3] => AMOROSI
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:02:11    Processed: a:4:{i:0;s:5:"SWIFT";i:1;s:7:"MINOGUE";i:2;s:7:"GOODREM";i:3;s:7:"AMOROSI";}
+
+13-03-07 05:02:12    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => GOODREM
+            [1] => MINOGUE
+            [2] => SWIFT
+            [3] => AMOROSI
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:02:12    Processed: a:4:{i:0;s:7:"GOODREM";i:1;s:7:"MINOGUE";i:2;s:5:"SWIFT";i:3;s:7:"AMOROSI";}
+
+13-03-07 05:02:12    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => GOODREM
+            [1] => MINOGUE
+            [2] => SWIFT
+            [3] => AMOROSI
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:02:12    Processed: a:4:{i:0;s:7:"GOODREM";i:1;s:7:"MINOGUE";i:2;s:5:"SWIFT";i:3;s:7:"AMOROSI";}
+
+13-03-07 05:02:12    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => GOODREM
+            [1] => MINOGUE
+            [2] => SWIFT
+            [3] => AMOROSI
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:02:12    Processed: a:4:{i:0;s:7:"GOODREM";i:1;s:7:"MINOGUE";i:2;s:5:"SWIFT";i:3;s:7:"AMOROSI";}
+
+13-03-07 05:02:13    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => GOODREM
+            [1] => AMOROSI
+            [2] => SWIFT
+            [3] => MINOGUE
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:02:13    Processed: a:4:{i:0;s:7:"GOODREM";i:1;s:7:"AMOROSI";i:2;s:5:"SWIFT";i:3;s:7:"MINOGUE";}
+
+13-03-07 05:02:13    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => GOODREM
+            [1] => AMOROSI
+            [2] => SWIFT
+            [3] => MINOGUE
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:02:13    Processed: a:4:{i:0;s:7:"GOODREM";i:1;s:7:"AMOROSI";i:2;s:5:"SWIFT";i:3;s:7:"MINOGUE";}
+
+13-03-07 05:02:13    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => GOODREM
+            [1] => AMOROSI
+            [2] => SWIFT
+            [3] => MINOGUE
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:02:13    Processed: a:4:{i:0;s:7:"GOODREM";i:1;s:7:"AMOROSI";i:2;s:5:"SWIFT";i:3;s:7:"MINOGUE";}
+
+13-03-07 05:02:13    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => GOODREM
+            [1] => AMOROSI
+            [2] => SWIFT
+            [3] => MINOGUE
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:02:13    Processed: a:4:{i:0;s:7:"GOODREM";i:1;s:7:"AMOROSI";i:2;s:5:"SWIFT";i:3;s:7:"MINOGUE";}
+
+13-03-07 05:02:16    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => GOODREM
+            [1] => AMOROSI
+            [2] => SWIFT
+            [3] => MINOGUE
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:02:16    Processed: a:4:{i:0;s:7:"GOODREM";i:1;s:7:"AMOROSI";i:2;s:5:"SWIFT";i:3;s:7:"MINOGUE";}
+
+13-03-07 05:25:06    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => AMOROSI
+            [1] => SWIFT
+            [2] => MINOGUE
+            [3] => GOODREM
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:25:06    Processed: a:4:{i:0;s:7:"AMOROSI";i:1;s:5:"SWIFT";i:2;s:7:"MINOGUE";i:3;s:7:"GOODREM";}
+
+13-03-07 05:28:54    saveResponse: Array
+(
+    [answerRight] => Array
+        (
+            [0] => SWIFT
+            [1] => GOODREM
+            [2] => MINOGUE
+            [3] => AMOROSI
+        )
+
+    [section_id] => 5
+    [question_id] => 27
+)
+
+
+13-03-07 05:28:54    Processed: a:4:{i:0;s:5:"SWIFT";i:1;s:7:"GOODREM";i:2;s:7:"MINOGUE";i:3;s:7:"AMOROSI";}
+

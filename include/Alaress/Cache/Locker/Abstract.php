@@ -45,7 +45,7 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 *
 	 * @var int
 	 */
-	private $lockTimeMultiplier = 2;
+	protected $lockTimeMultiplier = 2;
 
 	/**
 	 * Show plain debugging messages
@@ -103,13 +103,17 @@ abstract class Alaress_Cache_Locker_Abstract {
 						->getStreamContents();
 		*/
 
-		/* By default, set the lockTime to be a multiple of cachedTime
-		 *
-		 * You can still override this derivation after instantiation
-		 * as described above
+		/* Allow subclasses to specify their own settings
 		 */
-		$this->setLockTime($this->getLockTimeMultiplier() * $this->getCachedTime());
+		$this->setup();
 	}
+
+	/**
+	 * Allow subclasses to specify their own settings
+	 *
+	 * @return mixed
+	 */
+	abstract protected function setup();
 
 	/**
 	 * Setup method
@@ -407,7 +411,7 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 *
 	 * @return null
 	 */
-	private function getCachedTime() {
+	protected function getCachedTime() {
 		return $this->cachedTime;
 	}
 
@@ -514,7 +518,7 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 *
 	 * @param int $lockTimeMultiplier
 	 */
-	private function setLockTimeMultiplier($lockTimeMultiplier) {
+	protected function setLockTimeMultiplier($lockTimeMultiplier) {
 		$this->lockTimeMultiplier = $lockTimeMultiplier;
 	}
 
@@ -523,7 +527,7 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 *
 	 * @return int
 	 */
-	private function getLockTimeMultiplier() {
+	protected function getLockTimeMultiplier() {
 		return $this->lockTimeMultiplier;
 	}
 
