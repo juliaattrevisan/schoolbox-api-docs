@@ -1,4 +1,7 @@
 <?php
+
+use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -13,7 +16,7 @@ class DueWork_All {
 
     private $userHandler;
     private $groupHandler;
-    private $submissionHandler;
+	private $submissionHandler;
     private $returnHandler;
 
     private $assessHandler;
@@ -29,12 +32,16 @@ class DueWork_All {
 
     private $categories = array();
 
+    protected $submission_mapper;
+
     public function __construct(SitePage $page, $userID = 0) {
 
         $this->userHandler = new User();
         $this->groupHandler = new Group();
         $this->submissionHandler = new Submission();
         $this->returnHandler = new SubmissionReturn();
+
+        $this->submission_mapper = new SubmissionBoxMapper();
 
         $this->assessHandler = new Assess_Main();
         $this->attemptHandler = new Assess_Attempt();
@@ -142,7 +149,8 @@ class DueWork_All {
 
         // Years is trickier, because we first need to find out all the years in which the student in question has submitted work
         // also, merging in thie current year is a tad unfortunate
-        $years = array_unique(array_merge(array($this->currentYear), $this->submissionHandler->getAllYearsByUser($this->user['uid'])));
+//        $years = array_unique(array_merge(array($this->currentYear), $this->submissionHandler->getAllYearsByUser($this->user['uid'])));
+        $years = array_unique(array_merge(array($this->currentYear), $this->submission_mapper->getAllYearsByUser($this->user['uid'])));
         foreach($years as $y) {
             $this->page->setVar(array(
                 'YEAR_SELECTED' => $y == $this->year ? ' selected="selected"' : '',
@@ -158,7 +166,8 @@ class DueWork_All {
             $categoryList = $this->groupHandler->involvedInCategoryList($this->user['uid'], true, READ_ACCESS);
         }
         else {
-            $categoryList = $this->submissionHandler->submittedToCategoryList($this->user['uid'], $this->year, $this->semester);
+//            $categoryList = $this->submissionHandler->submittedToCategoryList($this->user['uid'], $this->year, $this->semester);
+            $categoryList = $this->submission_mapper->submittedToCategoryList($this->user['uid'], $this->year, $this->semester);
         }
 
         if (is_array($categoryList)) {
@@ -176,6 +185,7 @@ class DueWork_All {
         }
 
         $allWork = $this->submissionHandler->getAllDueWork($this->user['uid'], $this->getCategoryIDList(), $this->year, $this->semester);
+//        var_dump($this->submission_mapper->getAllDueWork($this->user['uid'], $this->getCategoryIDList(), $this->year, $this->semester));
 
         if (!is_array($allWork) || !count($allWork)) {
             return false;
@@ -197,6 +207,8 @@ class DueWork_All {
             $dueDate = new Alaress_Date_Format($currentWork['dueDate'], 'U');
             $lateDate = new Alaress_Date_Format($currentWork['lateDate'], 'U');
 
+            //
+            // Only show mark and comment if display isn't blocked.
             $this->page->setVar(array(
                 'WORK_CATEGORYNAME' => Scrub::Text($currentWork['categoryName']),
                 'WORK_DESCRIPTION'  => Scrub::Text($currentWork['name']),
