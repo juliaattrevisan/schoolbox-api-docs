@@ -11,7 +11,7 @@
  */
 
 
-class Component_Homepage_BlankController extends Component_Homepage_ControllerAbstract {
+class Component_Eportfolio_TestController extends Component_Eportfolio_ControllerAbstract {
 
     /**
      * Prepares data for the render function. Business logic.
