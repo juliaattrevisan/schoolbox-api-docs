@@ -1,0 +1,57 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
+<!-- enable the minified version when the time is right
+<script type="text/javascript" src="/min/?b=javascript&f=admin/jquery.component.js,admin/jquery.configurator.js"></script>
+-->
+<script type="text/javascript" src="/javascript/admin/jquery.component.js"></script>
+<script type="text/javascript" src="/javascript/admin/jquery.configurator.js"></script>
+<script type="text/javascript">
+	$j(function() {
+		$j('#definition-palette').configurator({
+            context: 'eportfolio',
+            dropDownSelector: '#template-select',
+            disabledMsg: 'This component can only be used once, and is already active for the template selected.'
+        }).start();
+	});
+</script>
+<!-- END custom_head-->
+
+<h1>Schoolbox Administration</h1>
+<ul class="admin-nav">
+    <!-- BEGIN admin_nav_item -->
+    <li><a href="/adminv2/{ADMNAV_HREF}" class="{ADMNAV_CURRENT}">{ADMNAV_LABEL}</a></li>
+    <!-- END admin_nav_item -->
+</ul>
+<div class="admin-contents homepage clearfix">
+	<h3>ePortfolio Templates<span>?</span>
+    <em>
+        You can drag and reorder the main components of the ePortfolio template here. Grab one from the left column and
+        move it to the right boxes or just reorganise the components that are already active.
+    </em>
+    </h3>
+
+    <div id="definition-palette">
+        <form id="template-action" action="/adminv2/eportfolio/eportfolioForm.php" method="POST">
+        <select id="template-select" name="template">
+            <!-- BEGIN template -->
+            <option value="{template.id}">{template.name}</option>
+            <!-- END template -->
+        </select>
+        <input type="submit" class="btn" name="action" value="Delete" />
+        <input type="text" name="name" />
+        <input type="submit" class="btn" name="action" value="New" />
+        <input type="submit" class="btn" name="action" value="Rename" />
+
+        <div class="clearfix"></div>
+        </form>
+
+        <!-- BEGIN definition -->
+        <div class="component definition-id-{definition.id} {definition.singleton}">{definition.name}</div>
+        <!-- END definition -->
+
+    </div>
+
+    <div id="homepage-layout" class="clearfix">
+        <!-- BEGIN layout --><!-- END layout -->
+    </div>
+</div>
