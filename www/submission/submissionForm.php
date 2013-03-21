@@ -158,10 +158,17 @@ $submission->setMaxMark($markMax);
 
 // append the notification data to be parsed in
 foreach(array('overdue', 'upcoming', 'returned') as $i) {
-	$notification = new Notification();
+	$notification     = $submission->getNotifications()->getOfType($i);
+	$new_notification = false;
+	if (!$notification instanceof Notification) {
+		$notification     = new Notification();
+		$new_notification = true;
+	}
 	$notification->setType($i);
 	$notification->setEnabled(isset($_POST['notif_'.$i]));
-	$submission->addNotification($notification);
+	if ($new_notification) {
+		$submission->addNotification($notification);
+	}
 }
 
 // create new
