@@ -16,6 +16,11 @@
 class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Validator_ValidatableInterface {
 
 	/**
+	 * @var Alaress_Date_Format_Interface
+	 */
+	protected $strategy;
+
+	/**
 	 * Set up datetime data for processing. Choose your strategy here!
 	 * Choose your locale as well; this would probably come from the Config
 	 * table rather than have a concrete instantiation
@@ -25,10 +30,14 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 	 */
 	public function __construct($dateTime = null, $dateFormat) {
 //		$strategy = new Alaress_Date_Strategy_V52($dateTime, $dateFormat);
-		$strategy = new Alaress_Date_Strategy_DateTime($dateTime, $dateFormat);
+		$strategy = new Alaress_Date_Strategy_DateTime();
+		$strategy->setFromFormat($dateTime, $dateFormat);
 		$strategy->setLocale(new Alaress_Date_Locale_Australian());
-
 		$this->setStrategy($strategy);
+	}
+
+	public function setFromFormat($datetime, $format) {
+		$this->getStrategy()->setFromFormat($datetime, $format);
 	}
 
 	/**
@@ -39,7 +48,7 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 	public function addMinutes($val) {
 		$time = $this->getStrategy()->getUnixTimestamp() + (60*$val);
 
-		$this->getStrategy()->__construct($time, 'U');
+		$this->getStrategy()->setFromFormat($time, 'U');
 	}
 
 	/**
@@ -50,7 +59,7 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 	public function addHours($val) {
 		$time = $this->getStrategy()->getUnixTimestamp() + (60*60*$val);
 
-		$this->getStrategy()->__construct($time, 'U');
+		$this->getStrategy()->setFromFormat($time, 'U');
 	}
 
 	/**
@@ -62,7 +71,7 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 	public function addDays($val) {
 		$time = $this->getStrategy()->getUnixTimestamp() + (60*60*24*$val);
 
-		$this->getStrategy()->__construct($time, 'U');
+		$this->getStrategy()->setFromFormat($time, 'U');
 	}
 
 	/**
@@ -205,7 +214,7 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 	/**
 	 * Get strategy object
 	 *
-	 * @return
+	 * @return Alaress_Date_Format_Interface
 	 */
 	private function getStrategy() {
 		return $this->strategy;
@@ -219,6 +228,10 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
      */
     public function isValid()
     {
-        return $this->getStrategy()->isValid();
+        $strategy = $this->getStrategy();
+        if ($strategy instanceof Alaress_Validator_ValidatableInterface) {
+            return $strategy->isValid();
+        }
+        return true;
     }
 }

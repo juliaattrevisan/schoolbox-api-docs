@@ -6,7 +6,7 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-class Alaress_Date_Strategy_DateTime implements Alaress_Date_Format_Interface, Alaress_Validator_ValidatableInterface {
+class Alaress_Date_Strategy_DateTime extends Alaress_Date_Strategy_Abstract {
 
 	/**
 	 * @var DateTime
@@ -18,7 +18,7 @@ class Alaress_Date_Strategy_DateTime implements Alaress_Date_Format_Interface, A
 	 */
 	protected $locale;
 
-	public function __construct($datetime, $format) {
+	public function setFromFormat($datetime, $format) {
 		if ($datetime instanceof DateTime) {
 			$this->datetime = $datetime;
 		}

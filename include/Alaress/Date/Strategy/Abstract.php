@@ -14,7 +14,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-abstract class Alaress_Date_Strategy_Abstract implements Alaress_Validator_ValidatableInterface {
+abstract class Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Interface, Alaress_Validator_ValidatableInterface {
 	private $year = '0000';
 	private $month = '00';
 	private $day = '00';
@@ -24,9 +24,13 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Validator_Valid
 	private $meridiem = '';
 	private $dateSeparator = '-';
 	private $inputDateFormat = 'd/m/y';
+
+	/**
+	 * @var Alaress_Date_Locale_Interface
+	 */
 	private $locale = null;
 
-	public function __construct($dateTime, $inputDateFormat) {
+	public function setFromFormat($dateTime, $inputDateFormat) {
 
 		/* Support for unix timestamp variant by converting it to a db format
 		 */
@@ -92,8 +96,6 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Validator_Valid
 	 * d-m-y h:i:s
 	 *
 	 * @param  $dateComponent
-	 * @param  $dateFormat
-	 * @return
 	 */
 	private function setDateComponents($dateComponent) {
 		preg_match('/([dym])([\-\/])([dm])[\-\/]([dmy])/', $this->getInputDateFormat(), $matches);
@@ -346,7 +348,7 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Validator_Valid
 	/**
 	 * Set Locale configuration object
 	 *
-	 * @param  $val
+	 * @param  Alaress_Date_Locale_Interface $val
 	 * @return void
 	 */
 	public function setLocale($val) {
@@ -356,7 +358,7 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Validator_Valid
 	/**
 	 * Get Locale configuration object
 	 *
-	 * @return
+	 * @return Alaress_Date_Locale_Interface
 	 */
 	protected function getLocale() {
 		return $this->locale;

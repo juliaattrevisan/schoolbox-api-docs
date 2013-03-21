@@ -10,6 +10,14 @@
  * @version     SVN: $Id$
  */
 interface Alaress_Date_Format_Interface {
+	/**
+	 * Creates the date format object from a given datetime and format.
+	 *
+	 * @param $datetime
+	 * @param $format
+	 *
+	 * @return mixed
+	 */
 	public function setFromFormat($datetime, $format);
 
 	public function getUnixTimestamp();
