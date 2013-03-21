@@ -10,10 +10,21 @@
  * @version     SVN: $Id$
  */
 interface Alaress_Date_Format_Interface {
+	public function setFromFormat($datetime, $format);
+
 	public function getUnixTimestamp();
 	public function getDatabase();
 	public function getLong();
 	public function getShort();
 	public function getDateOnly();
     public function getAustralian();
+
+	public function getLocal();
+	public function getLocalShort();
+	public function getLongDateOnly();
+	public function getTimeOnly();
+	public function getDatabaseDate();
+	public function getDatabaseTime();
+	public function getWeekDayNumber();
+	public function getUsingFormat($format);
 }
