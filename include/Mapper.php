@@ -265,7 +265,7 @@ abstract class Mapper {
     public function create($object) {
         $collection = $this->getModelAsCollection($object);
         foreach ($collection as $model) {
-            $this->setModelProperty($model, $this->identifier['property'], null);
+            $this->setModelProperty($model, $this->identifier['property'], null, $this->identifier);
         }
         return $this->save($collection);
     }
@@ -297,14 +297,14 @@ abstract class Mapper {
             foreach ($this->map as $map) {
                 $propertyName = $map['property'];
                 $columnName = $map['column'];
-                $statement->bindParam(":$columnName", $this->getModelProperty($model, $propertyName));
+                $statement->bindParam(":$columnName", $this->getModelProperty($model, $propertyName, $map));
             }
             if ($statement->execute()) {
                 $identifier = $this->identifier['property'];
-                if (!$this->getModelProperty($model, $identifier)) {
-                    $this->setModelProperty($model, $identifier, $this->database->lastInsertId());
+                if (!$this->getModelProperty($model, $identifier, $this->identifier)) {
+                    $this->setModelProperty($model, $identifier, $this->database->lastInsertId(), $this->identifier);
                 }
-                $affectedIDs[] = $this->getModelProperty($model, $identifier);
+                $affectedIDs[] = $this->getModelProperty($model, $identifier, $map);
             }
             else {
                 $this->database->rollBack();
@@ -330,7 +330,7 @@ abstract class Mapper {
         );
 
         foreach ($collection as $model) {
-            $statement->bindParam(':identifierValue', $this->getModelProperty($model, $identifierName));
+            $statement->bindParam(':identifierValue', $this->getModelProperty($model, $identifierName, $this->identifier));
 
             if (!$statement->execute()) {
                 return false;
@@ -530,7 +530,7 @@ abstract class Mapper {
             }
 
             $columnValue = array_key_exists($columnName, $row) ? $row[$columnName] : null;
-            $this->setModelProperty($model, $propertyName, $columnValue);
+            $this->setModelProperty($model, $propertyName, $columnValue, $map);
         }
 
         if (!empty($callback) && is_callable($callback)) {
@@ -554,10 +554,11 @@ abstract class Mapper {
      *
      * @param object $model
      * @param string $property
+     * @param array  $map
      *
      * @return mixed
      */
-    protected function getModelProperty($model, $property) {
+    protected function getModelProperty($model, $property, $map) {
         return $model->$property;
     }
 
@@ -567,10 +568,11 @@ abstract class Mapper {
      * @param object $model
      * @param string $property
      * @param mixed  $value
+     * @param array  $map
      *
      * @return void
      */
-    protected function setModelProperty($model, $property, $value) {
+    protected function setModelProperty($model, $property, $value, $map) {
         $model->$property = $value;
     }
 
