@@ -10,7 +10,7 @@
 namespace Schoolbox\Column;
 use Schoolbox\Mapper;
 
-class Factory {
+class Factory implements IFactory {
 	/**
 	 * @param $type
 	 *
@@ -48,13 +48,13 @@ class Factory {
 				return new Timestamp();
 				break;
 
-			case Mapper::TYPE_SERIALIZED:
-				return new Serialized();
-				break;
-
-			case Mapper::TYPE_DECIMAL:
-				return new Integer();
-				break;
+//			case Mapper::TYPE_SERIALIZED:
+//				return new Serialized();
+//				break;
+//
+//			case Mapper::TYPE_DECIMAL:
+//				return new Integer();
+//				break;
 
 			default:
 				break;
