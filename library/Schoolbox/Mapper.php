@@ -8,11 +8,42 @@
  */
 
 namespace Schoolbox;
-use Schoolbox;
+use Schoolbox\Column\Factory as ColumnFactory;
+use \Mapper as BaseMapper;
+use Schoolbox\Column\IColumnType;
+use Schoolbox\Column\IFactory;
 
-class Mapper extends \Mapper {
-    public function __construct(){
+class Mapper extends BaseMapper {
+
+    /**
+     * Factory for building column hydrators.
+     *
+     * @var IFactory
+     */
+    protected $column_factory;
+
+    public function __construct() {
+        //
+        // Move to setup method?
+        $this->setColumnFactory(new ColumnFactory());
         parent::__construct();
+    }
+
+    /**
+     * @param IFactory $column_factory
+     *
+     * @return $this
+     */
+    public function setColumnFactory(IFactory $column_factory) {
+        $this->column_factory = $column_factory;
+        return $this;
+}
+
+    /**
+     * @return IFactory
+     */
+    public function getColumnFactory() {
+        return $this->column_factory;
     }
 
     /**
@@ -32,29 +63,54 @@ class Mapper extends \Mapper {
     }
 
     /**
-     * Overridden to use getter instead of getting property directly.
+     * Overridden to use getter and hydrator instead of getting property
+     * directly.
      *
      * @param object $model
      * @param string $property
+     * @param array  $map
      *
      * @return mixed
      */
-    protected function getModelProperty($model, $property) {
+    protected function getModelProperty($model, $property, $map) {
         $get_method = 'get'.ucfirst($property);
-        return $model->$get_method();
+        $value = $model->$get_method();
+        if ($map['hydrator'] instanceof IColumnType) {
+            $value = $map['hydrator']->dehydrate($value);
+        }
+        return $value;
     }
 
     /**
-     * Overridden to use setter instead of setting property directly.
+     * Overridden to use setter and hydrator instead of setting property
+     * directly.
      *
      * @param object $model
      * @param string $property
      * @param mixed  $value
+     * @param array  $map
      *
-     * @return void
+     * @return $this
      */
-    protected function setModelProperty($model, $property, $value) {
+    protected function setModelProperty($model, $property, $value, $map) {
         $set_method = 'set'.ucfirst($property);
-        return $model->$set_method($value);
+        if ($map['hydrator'] instanceof IColumnType) {
+            $value = $map['hydrator']->hydrate($value);
+        }
+        $model->$set_method($value);
+        return $this;
+    }
+
+    /**
+     * Overrides parent::hasMap() to set the hydrator based on the field type.
+     *
+     * @param $map
+     * @return bool
+     */
+    protected function hasMap($map) {
+        if (is_array($map) && !isset($map['hydrator'])) {
+            $map['hydrator'] = $this->column_factory->build($map['type']);
+        }
+        return parent::hasMap($map);
     }
 }
