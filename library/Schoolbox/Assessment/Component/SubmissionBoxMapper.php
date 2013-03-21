@@ -296,4 +296,161 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$statement = $this->database->prepare($query);
 		return $statement->execute(array($object->getId()));
 	}
+
+
+	/**
+	 * Conversion of SubmissionBoxHandler->getAllYearsByUser().
+	 *
+	 * @param int $user_id The user ID to retrieve for.
+	 *
+	 * @return array
+	 */
+	public function getAllYearsByUser($user_id) {
+		$query = "
+			SELECT DISTINCT DATE_FORMAT(submitted, '%Y') AS submitted_year
+			FROM student_submission
+			WHERE owner = ?
+			ORDER BY submitted DESC";
+
+		$statement = $this->database->prepare($query);
+		$statement->execute(array($user_id));
+
+		$years = array();
+		foreach ($statement as $row) {
+			$years[] = $row['submitted_year'];
+		}
+		return $years;
+	}
+
+
+	public function getSemesterMonths($semester) {
+		$month_start = 1;
+		$month_end   = 6;
+		if ($semester == 2) {
+			$month_start = 7;
+			$month_end   = 12;
+		}
+		return array('start' => $month_start, 'end' => $month_end);
+	}
+
+
+	/**
+	 * Conversion of SubmissionBoxHandler->getAllYearsByUser().
+	 *
+	 * @todo move to a more appropriate class?
+	 *
+	 * This could get a list of categories which have submissions, and pass to
+	 * CategoryMapper->getByIds()?
+	 *
+	 * @param int $user_id  The user ID to retrieve for.
+	 * @param int $year     The year to fetch for.
+	 * @param int $semester The semester to fetch for.
+	 *
+	 * @return array
+	 */
+	public function submittedToCategoryList($user_id, $year, $semester) {
+		$query = "
+			SELECT category.id, category.name, GROUP_CONCAT(cc.code) AS code
+			FROM category
+			LEFT JOIN categoryCode cc ON category.id = cc.categoryID
+			WHERE category.id IN (
+				SELECT DISTINCT sb.category
+				FROM submission_box sb
+				LEFT JOIN student_submission ss ON ss.box_id = sb.id
+				LEFT JOIN submission_return  sr ON sr.box_id = sb.id
+				WHERE (ss.owner = :user_id OR sr.owner = :user_id)
+				AND (
+					(YEAR(ss.submitted) = :year AND MONTH(ss.submitted) BETWEEN :month_start AND :month_end)
+					OR
+					(YEAR(sr.returned)  = :year AND MONTH(sr.returned)  BETWEEN :month_start AND :month_end)
+				)
+			)
+			GROUP BY category.id
+			ORDER BY category.name";
+
+		$months    = $this->getSemesterMonths($semester);
+		$statement = $this->database->prepare($query);
+		$statement->execute(array(
+			'user_id'     => $user_id,
+			'year'        => $year,
+			'month_start' => $months['start'],
+			'month_end'   => $months['end'],
+		));
+		return $statement->fetchAll();
+	}
+
+
+	/**
+	 * @todo complete this category loader.
+	 *
+	 * Requires: category and category code mapper
+	 *
+	 * @param     $user_id
+	 * @param     $categories
+	 * @param int $year
+	 * @param int $semester
+	 */
+	public function getAllDueWork($user_id, $categories, $year = 0, $semester = 0) {
+		//
+		// Submission box: hydrate with category, student submissions and returns.
+		$months = $this->getSemesterMonths($semester);
+		$params = $this->getArrayParameters($categories, 'category');
+		$params['year']    = $year ?: date('Y');
+		$params['user_id'] = $user_id;
+		$params['month_start'] = $months['start'];
+		$params['month_end']   = $months['end'];
+		//
+		// IN conditions in prepared statements:
+		$query = "
+		    SELECT
+			b.id AS bid,
+			s.id AS sid,
+			r.id AS rid,
+
+			UNIX_TIMESTAMP(b.late_date) AS lateDate,
+			UNIX_TIMESTAMP(b.date) AS dueDate,
+			c.name AS categoryName,
+			b.name,
+			b.description,
+			b.created, s.submitted, r.returned
+			FROM submission_box b
+			LEFT JOIN category c ON c.id = b.category
+			LEFT JOIN student_submission s ON s.box_id = b.id AND (s.owner = :user_id OR s.owner IS NULL)
+			LEFT JOIN submission_return  r ON r.box_id = b.id AND (r.owner = :user_id OR r.owner IS NULL)
+			WHERE b.deleted = 0
+			AND b.category IN {$this->getArrayPlaceholders($categories, 'category')}
+			AND YEAR(b.date) = :year
+			AND MONTH(b.date) BETWEEN :month_start AND :month_end
+            GROUP BY b.id
+			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC";
+
+		//
+		// Def not a fan of jamming everything into a single query which then
+		// hydrates who knows how.
+		// Try this:
+		// select all categories by ID
+		// select all submission boxes by student and category, group by category
+		// select all student submissions, group by submission box
+		// select all returns, group by submission box
+		$statement = $this->database->prepare($query);
+		$statement->execute($params);
+		return $statement->fetchAll();
+
+//		while ($row = $this->db->getNextArray($outerResult)) {
+//			if ($row['rid']) {
+//				$innerQuery = "
+//					SELECT mark, comment
+//					FROM submission_return
+//					WHERE box_id = '{$row['bid']}'
+//					AND owner = '$userID'
+//					ORDER BY returned DESC
+//					LIMIT 1
+//				";
+//				$collection[] = array_merge($row, $this->db->getRow($innerQuery));
+//			} else {
+//				$collection[] = $row;
+//			}
+//		}
+//		return $collection;
+	}
 }
