@@ -22,8 +22,8 @@ class FileMapper extends Mapper {
 	 */
 	protected $storage_mapper;
 
-	public function __construct() {
-		parent::__construct();
+	public function setup() {
+		parent::setup();
 		$this->storage_mapper = new StorageMapper();
 	}
 

@@ -99,9 +99,14 @@ abstract class Mapper {
 
     protected function __construct() {
         $this->database = Database::getInstance();
-
+        $this->setup();
         $this->mapping();
     }
+
+	/**
+	 * Default setup for any other objects which compose the mapper.
+	 */
+	protected function setup() {}
 
 	/**
 	 * @return string

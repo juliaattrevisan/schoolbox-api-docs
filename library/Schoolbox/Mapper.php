@@ -23,10 +23,11 @@ class Mapper extends BaseMapper {
     protected $column_factory;
 
     public function __construct() {
-        //
-        // Move to setup method?
-        $this->setColumnFactory(new ColumnFactory());
         parent::__construct();
+    }
+
+    protected function setup() {
+        $this->setColumnFactory(new ColumnFactory());
     }
 
     /**
