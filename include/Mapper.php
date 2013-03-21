@@ -621,6 +621,44 @@ abstract class Mapper {
         return implode(', ', $placeholderList);
     }
 
+	/**
+	 * Gets a string of placeholders for an array - usually used for creating a
+	 * list of placeholders for an IN condition.
+	 *
+	 * @param array  $input
+	 * @param string $prefix If not supplied, ? will be used as the placeholder
+	 *                       for all values.
+	 *
+	 * @return string Something like "(:id_0, :id_1, :id_2)".
+	 */
+	public function getArrayPlaceholders($input, $prefix = null) {
+		$placeholders = array();
+		foreach ($input as $i => $param) {
+			$placeholders[] = isset($prefix) ? (':'.$prefix.'_'.$i) : '?';
+		}
+		return '('.implode(',', $placeholders).')';
+	}
+
+	/**
+	 * Flattens a list of parameters for an array.
+	 *
+	 * Used in conjunction with getArrayPlaceholders() - calling this with the
+	 * same input and prefix will generate params and placeholders that work
+	 * with each other.
+	 *
+	 * @param array  $input
+	 * @param string $prefix
+	 *
+	 * @return array
+	 */
+	public function getArrayParameters($input, $prefix) {
+		$params = array();
+		foreach ($input as $i => $param) {
+			$params[$prefix.'_'.$i] = $param;
+		}
+		return $params;
+	}
+
     /**
      * @brief Returns an SQL fragment containg the assignment portion of an UPDATE query
      * @return String
