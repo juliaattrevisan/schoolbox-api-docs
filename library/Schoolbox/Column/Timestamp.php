@@ -16,6 +16,9 @@ class Timestamp extends Datetime implements IColumnType {
 	protected $output_format = 'U';
 
 	/**
+	 * Overridden to work with -ve timestamps (DateTime::createFromFormat('U')
+	 * doesn't).
+	 *
 	 * @param string $value
 	 *
 	 * @return \DateTime

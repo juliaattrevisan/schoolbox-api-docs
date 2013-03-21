@@ -9,10 +9,22 @@
  
 namespace Schoolbox\Column;
 use \DateTime as DateObject;
+use \Alaress_Date_Format as DateWrapper;
 
 class Datetime implements IColumnType {
 	protected $input_format  = 'Y-m-d H:i:s';
 	protected $output_format = 'Y-m-d H:i:s';
+
+//	/**
+//	 * @param string $value
+//	 *
+//	 * @return \DateTime
+//	 */
+//	protected function getInputDate($value) {
+//		//
+//		// ! in front of format sets all fields back to Unix epoch until reset.
+//		return DateObject::createFromFormat('!'.$this->input_format, $value);
+//	}
 
 	/**
 	 * @param string $value
@@ -20,8 +32,7 @@ class Datetime implements IColumnType {
 	 * @return \DateTime
 	 */
 	public function hydrate($value) {
-		//
-		// ! in front of format sets all fields back to Unix epoch until reset.
+//		return new DateWrapper($this->getInputDate($value), $this->input_format);
 		return DateObject::createFromFormat('!'.$this->input_format, $value);
 	}
 
