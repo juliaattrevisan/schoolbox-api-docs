@@ -54,19 +54,17 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$this->hasMap(array(
 			'column'     => 'open_date',
 			'property'   => 'openDate',
-			//
-			// Will become DATE or DATETIME type.
-			'type'       => self::TYPE_STRING,
+			'type'       => self::TYPE_DATETIME,
 		));
 		$this->hasMap(array(
 			'column'     => 'date',
 			'property'   => 'dueDate',
-			'type'       => self::TYPE_STRING,
+			'type'       => self::TYPE_DATETIME,
 		));
 		$this->hasMap(array(
 			'column'     => 'late_date',
 			'property'   => 'lateDate',
-			'type'       => self::TYPE_STRING,
+			'type'       => self::TYPE_DATETIME,
 		));
 		$this->hasMap(array(
 			'column'     => 'accept_submission',
@@ -83,7 +81,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$this->hasMap(array(
 			'column'     => 'created',
 			'property'   => 'created',
-			'type'       => self::TYPE_STRING,
+			'type'       => self::TYPE_DATETIME,
 			'created_timestamp' => true,
 		));
 		//
