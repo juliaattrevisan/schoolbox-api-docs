@@ -146,9 +146,9 @@ elseif($markTypeID == SubmissionBox\MarkType::TYPE_RUBRIC) {
 // define submissionBox 'object': elements common to both scenarios
 $submission->setAcceptOnline(!empty($_POST['accept_submission']) ? true : false);
 $submission->setAcceptMultiple(!empty($_POST['multi_submission'])  ? true : false);
-$submission->setOpenDate($openDate->getDatabase());
-$submission->setDueDate($dueDate->getDatabase());
-$submission->setLateDate($lateDate->getDatabase());
+$submission->setOpenDate(new DateTime($openDate->getDatabase()));
+$submission->setDueDate(new DateTime($dueDate->getDatabase()));
+$submission->setLateDate(new DateTime($lateDate->getDatabase()));
 $submission->setName($_POST['name']);
 $submission->setDescription($_POST['description']);
 $submission->setWorkType($_POST['type']);
