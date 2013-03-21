@@ -58,7 +58,7 @@ switch($action) {
 // if we're here, all above is valid
 
 if($action == 'delete') {
-    $sql[0] = "DELETE FROM `component_instance` WHERE `module` = 'eportfolio_template' AND `indentifier` = :templateID";
+    $sql[0] = "DELETE FROM `component_instance` WHERE `module` = 'eportfolio_template' AND `identifier` = :templateID";
     $vars[0] = array('templateID' => $templateID);
 
     $sql[1] = "DELETE FROM `eportfolioTemplate` WHERE `id` = :templateID";
