@@ -4,35 +4,35 @@
     <div class="profile-info">
         <div class="profile-img">
             <!-- BEGIN portrait -->
-            <img src="/portrait.php?userId={SYNERGY_ID}&size=constrain200"/>
+            <img src="/portrait.php?userId={SYNERGY_ID}&size=profile"/>
             <!-- END portrait -->
         </div>
         <div class="profile-detail">
             <!-- BEGIN student_synergy_form -->
             <dl>
                 <dt>Email:</dt>
-                <dd>{EMAIL}</dd>
+                <dd class="mail-profile">{EMAIL}</dd>
 
-                <dt>Student ID:</dt>
-                <dd>{SYNERGY_ID}</dd>
+                <dt class="dark">Student ID:</dt>
+                <dd class="dark">{SYNERGY_ID}</dd>
 
                 <dt>Date of Birth:</dt>
                 <dd>{BIRTHDATE}</dd>
 
-                <dt>Class Teacher:</dt>
-                <dd>{FORM_STAFF}</dd>
+                <dt class="dark">Class Teacher:</dt>
+                <dd class="dark">{FORM_STAFF}</dd>
 
                 <dt>Year Level:</dt>
                 <dd>{YEAR_LEVEL}</dd>
 
-                <dt>House:</dt>
-                <dd>{HOUSE}</dd>
+                <dt class="dark">House:</dt>
+                <dd class="dark">{HOUSE}</dd>
 
                 <dt>Class:</dt>
                 <dd>{FORM}</dd>
 
-                <dt>Student Type:</dt>
-                <dd>{STUDENT_TYPE}</dd>
+                <dt class="dark">Student Type:</dt>
+                <dd class="dark">{STUDENT_TYPE}</dd>
             </dl>
             <!-- END student_synergy_form -->
 
@@ -68,39 +68,39 @@
             <!-- END student_synergy_tutor -->
 
             <!-- BEGIN medical -->
-            <dl>
-                <dt>Medical Note:</dt>
-                <dd><img src="/images/famicons/exclamation.png" title="important"/> {MEDICAL_NOTE}</dd>
+            <dl class="profile-med">
+                <dt><img src="/images/famicons/exclamation.png" title="important"/>Medical Note:</dt>
+                <dd>{MEDICAL_NOTE}</dd>
             </dl>
             <!-- END medical -->
+            <div class="school-info">
+                <!-- BEGIN school_links --><!-- END school_links -->
+
+                <!-- BEGIN timetable_link -->
+                <a href="/timetable/{ID}" class="btn report float-left"><span></span>Timetable</a>
+                <!-- END timetable_link -->
+
+                <!-- BEGIN due_work -->
+                <a href="/submission/dueWork/0/{ID}" class="btn due-work float-left"><span></span>Due Work</a>
+                <!-- END due_work -->
+
+                <!-- BEGIN helpdesk -->
+                <a href="/modules/helpdesk/{ID}" class="btn help float-left"><span></span>Helpdesk Jobs</a>
+                <!-- END helpdesk -->
+
+                <!-- BEGIN eportfolio -->
+                <a href="/eportfolio/{ID}" class="btn eportfolio float-left"><span></span>ePortfolio</a>
+                <!-- END eportfolio -->
+
+                <!-- BEGIN boarder_leave -->
+                <a href="/modules/leave/student/{ID}" class="btn eportfolio float-left"><span></span>Boarder Leave History</a>
+                <!-- END boarder_leave -->
+
+                <!-- BEGIN modify -->
+                <a href="/adminv2/modify-user/{ID}" class="btn modify float-left"><span></span>Modify User</a>
+                <!-- END modify -->
+            </div>
         </div>
-    </div>
-    <div class="school-info">
-        <!-- BEGIN school_links --><!-- END school_links -->
-
-        <!-- BEGIN timetable_link -->
-        <a href="/timetable/{ID}" class="btn report float-left"><span></span>Timetable</a>
-        <!-- END timetable_link -->
-
-        <!-- BEGIN due_work -->
-        <a href="/submission/dueWork/0/{ID}" class="btn due-work float-left"><span></span>Due Work</a>
-        <!-- END due_work -->
-
-        <!-- BEGIN helpdesk -->
-        <a href="/modules/helpdesk/{ID}" class="btn help float-left"><span></span>Helpdesk Jobs</a>
-        <!-- END helpdesk -->
-
-        <!-- BEGIN eportfolio -->
-        <a href="/eportfolio/{ID}" class="btn eportfolio float-left"><span></span>ePortfolio</a>
-        <!-- END eportfolio -->
-
-        <!-- BEGIN boarder_leave -->
-        <a href="/modules/leave/student/{ID}" class="btn eportfolio float-left"><span></span>Boarder Leave History</a>
-        <!-- END boarder_leave -->
-
-        <!-- BEGIN modify -->
-        <a href="/adminv2/modify-user/{ID}" class="btn modify float-left"><span></span>Modify User</a>
-        <!-- END modify -->
     </div>
 </div>
 
@@ -108,54 +108,52 @@
 
     <div class="subjects">
         <!-- BEGIN subject -->
-        <h1>Subjects</h1>
+        <h2>Subjects</h2>
 
         <!-- BEGIN subject_row -->
         <ul>
             <!-- BEGIN subject_item -->
             <li>
-                <a class="class-subject">{SUBJECT_NAME}</a>
-                <a class="teacher-profile">
-                    <img src="/portrait.php?userId={SUBJECT_TEACHER_ID}&size=square64"/>
-                    {SUBJECT_TEACHER_NAME}
-                    {Teacher}
-                </a>
-
+                <div class="subject">{SUBJECT_NAME}<span class="icon"></span></div>
+                <div class="adefe">
+                    <a href="#" class="teacher-profile">
+                        <img src="/portrait.php?userId={SUBJECT_TEACHER_ID}&size=square32" />
+                        {SUBJECT_TEACHER_NAME}
+                        <span class="role">Teacher</span>
+                    </a>
+                    <a class="mail-teacher" href="#">Mail</a>
+                </div>
             </li>
             <!-- END subject_item -->
         </ul>
         <!-- END subject_row -->
 
+        <!-- BEGIN subject_mail -->
+        <form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
+            <input type="hidden" name="replyto" value="{REPLYTO}"/>
+            <input type="hidden" name="bcc" value="{EMAILALL}"/>
+            <a href="#" class="btn submit-this float-right up-arrow "><span></span>Email all</a>
+        </form>
+        <!-- END subject_mail -->
         <!-- END subject -->
     </div>
 
-    <!-- BEGIN subject_mail -->
-    <!-- END subject_mail -->
+
 
     <!-- BEGIN contact_synergy -->
     <div class="contact-info">
-        <h1>Contact Information</h1>
-        <!-- BEGIN edit_emergency -->
-        <!-- END edit_emergency -->
-
-        <!-- BEGIN contact_alert -->
-        <div>
-            <img src="/images/famicons/exclamation.png" title="important"/><span style="color:red; font-weight:bold;">{CONTACT_ALERT_MESSAGE}</span>
-        </div>
-        <!-- END contact_alert -->
+        <h2>Contact Information</h2>
 
         <!-- BEGIN contact_details -->
         <ul>
             <li>
-                <img src="/portrait.php?userId={SUBJECT_TEACHER_ID}&size=square64"/>
+                <img src="/portrait.php?userId={SUBJECT_TEACHER_ID}&size=square32"/>
                 {CONTACT_NAME_EMAIL}
                 {SUBJECT_TEACHER_NAME}
             </li>
             <li>
                 <!--Mobile-->
                 {CONTACT_MOBILE_PHONE}
-            </li>
-            <li>
                 <!--Work-->
                 {CONTACT_OCCUP_PHONE}
             </li>
@@ -183,54 +181,51 @@
         </ul>
         <!-- END contact_details -->
 
-        <div classs="emergency-contact">
-            <ul>
-                <li>
-                    <h1>Emergency Contact Information</h1>
-                    <!-- BEGIN edit_emergency -->
-                    <!-- END edit_emergency -->
-                </li>
-            </ul>
+        <div class="emergency-contact">
+
+            <h2>Emergency Contact Information</h2>
+            <!-- BEGIN edit_emergency -->
+            <!-- END edit_emergency -->
 
             <ul>
-                <li>
-                    Name: <br />
+                <li class="dark">
+                    <b>Name:</b><br />
                     {EMERGENCY_NAME}
                 </li>
                 <li>
-                    Phone: <br />
+                    <b>Phone:</b><br />
                     {EMERGENCY_PHONE}
                 </li>
-                <li>
-                    Alt. Phone: <br />
+                <li class="dark">
+                    <b>Alt. Phone:</b><br />
                     {EMERGENCY_ALT_PHONE}
                 </li>
             </ul>
             <ul>
                 <li>
-                    Name: <br />
+                    <b>Name:</b><br />
                     {EMERGENCY_NAME_2}
                 </li>
-                <li>
-                    Phone: <br />
+                <li class="dark">
+                    <b>Phone:</b><br />
                     {EMERGENCY_PHONE_2}
                 </li>
                 <li>
-                    Alt. Phone: <br />
+                    <b>Alt. Phone:</b><br />
                     {EMERGENCY_ALT_PHONE_2}
                 </li>
             </ul>
             <ul>
-                <li>
-                    Name: <br />
+                <li class="dark">
+                    <b>Name:</b><br />
                     {EMERGENCY_NAME_3}
                 </li>
                 <li>
-                    Phone: <br />
+                    <b>Phone:</b><br />
                     {EMERGENCY_PHONE_3}
                 </li>
-                <li>
-                    Alt. Phone: <br />
+                <li class="dark">
+                    <b>Alt. Phone:</b><br />
                     {EMERGENCY_ALT_PHONE_3}
                 </li>
             </ul>

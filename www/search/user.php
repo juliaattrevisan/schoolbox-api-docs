@@ -319,7 +319,7 @@ if (is_numeric($this->arg[0])) {
                                         $emailAddress = $emailObj->formatEmailFromArray($teacher);
 
                                         if ($emailAddress) {
-                                            $teacherOutput[] = '<a href="' . $_SESSION['mailhandle'] . "$emailAddress\">$teacherName</a>";
+                                            $teacherOutput[] = $teacherName;
                                             $emailAll .= $emailAddress . ",";
                                         } else {
                                             $teacherOutput[] = $teacherName;
@@ -330,7 +330,7 @@ if (is_numeric($this->arg[0])) {
 
                             $output = array(
                                 'SUBJECT_NAME' => is_array($category) && $groupHandler->getPermission( $category['id']  ) >= READ_ACCESS ?
-                                    '<a href="/homepage/' . $subject['code'] . '">' . Scrub::Text($category['name']) . '</a>' : Scrub::Text($subject['name']),
+                                    Scrub::Text($category['name'])  : Scrub::Text($subject['name']),
                                 'SUBJECT_TEACHER_NAME' => implode(', ', $teacherOutput),
                                 'SUBJECT_TEACHER_ID' => $teacherList[0],
                             );

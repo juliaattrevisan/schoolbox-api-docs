@@ -1072,28 +1072,127 @@ Notifications
 
 .profile-img {
   float: left;
-  width: 10%;
 }
 
 .profile-detail{
   float: right;
   margin: 0 0 0 1%;
-  width: 89%;
+  width: 80%;
   dl{
-    dt{ width: 15%; }
-    dd{ width: 85%; }
+    dt{ width: 15%; padding: 5px 0 5px 0; }
+    dd{ width: 85%; padding: 5px 0 5px 0; margin: 0; }
+    .mail-profile a{ background: url('/images/core/icons/mail-profile.png') center right no-repeat;
+                     padding-right: 26px; }
+    .dark{
+      border-top: 1px solid #eee;
+      border-bottom: 1px solid #eee; }
+  }
+}
+
+.profile-med{
+  background: #fff3dd;
+  border: 1px solid #ffe6b5;
+  float: left;
+  display: block;
+  margin: 14px 0;
+  padding: 10px 7px;
+  width: 97%;
+  img{
+    margin: 0 8px 0 0;
+    vertical-align: text-top;
   }
 }
 
 .school-info{
   clear: both;
-  float: right;
+  float: left;
+  margin: 0 0 18px 0;
 }
 
 .directory {
   clear: both;
   display: block;
   width: 100%;
+  .subjects{
+    width: 73%;
+    float: left;
+    ul{
+      width: 50%;
+      float: left;
+    }
+  }
+  .contact-info{
+    width: 25%;
+    float: right;
+    margin: 0 0 0 2%;
+  }
+  /*h1{
+    background: #e5eff7;
+    padding: 8px 5px;
+  }*/
+}
+
+.subjects li{
+  border-bottom: 1px solid @border-color;
+  border-right: 1px solid @border-color;
+  position: relative;
+  a{display: block;
+    padding: 7px 0px;
+    vertical-align: top;
+    &:hover{
+      background-color: #e9f6ff;
+      text-decoration: none;
+    }
+  }
+  .subject{
+      background: url('/images/famicons/house.png') 8px 7px no-repeat;
+      border-bottom: 1px solid @border-color;
+      display: block;
+      padding: 10px 10px 10px 44px;
+    .icon{
+      background-image: url('/images/core/icons/action-icons.png');
+      background-position: 0px 0px;
+      position: absolute;
+      top: 18px;
+      margin-top: -10px;
+      right: 13px;
+      display: block;
+      width: 18px;
+      height: 20px;
+    }
+  }
+}
+
+.mail-teacher{
+  background: url('/images/core/icons/mail-profile.png') 17px 19px no-repeat;
+  border-left: 1px solid #eee;
+  position: absolute;
+  right: 0;
+  top: 35px;
+  height: 35px;
+  width: 50px;
+  font: 0/0 a;
+  text-shadow: none;
+  color: transparent;
+}
+
+.teacher-profile{
+  margin-right: 51px;
+  img{
+    margin: 0 10px 0 0;
+  }
+  .role{
+    position: absolute;
+    left: 45px;
+    top: 63px;
+  }
+}
+
+.emergency-contact{
+  li{
+    border-bottom: 1px solid #eee;
+    padding: 7px 8px;
+  }
 }
 
 /*--------------------------------------------------------------
