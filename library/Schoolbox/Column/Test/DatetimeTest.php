@@ -11,6 +11,7 @@
 namespace Schoolbox\Column\Test;
 use Schoolbox\Column\Datetime;
 use \Datetime as DateObject;
+use \Alaress_Date_Format as DateWrapper;
 
 class DatetimeTest extends TestCase {
 
@@ -61,6 +62,6 @@ class DatetimeTest extends TestCase {
 	 * @dataProvider getTestHydrate
 	 */
 	public function testHydrate($input, $expected_output) {
-		$this->assertEquals($expected_output, ($this->object->hydrate($input) instanceof DateObject));
+		$this->assertEquals($expected_output, ($this->object->hydrate($input) instanceof DateWrapper));
 	}
 }

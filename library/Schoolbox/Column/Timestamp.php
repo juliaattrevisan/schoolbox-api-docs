@@ -23,7 +23,7 @@ class Timestamp extends Datetime implements IColumnType {
 	 *
 	 * @return \DateTime
 	 */
-	public function hydrate($value) {
+	public function getInputDate($value) {
 		if (!is_numeric($value)) {
 			return false;
 		}
