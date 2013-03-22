@@ -45,9 +45,12 @@ class Datetime implements IColumnType {
 	 * @return string
 	 */
 	public function dehydrate($value) {
-		if (!($value instanceof DateObject)) {
-			return null;
+		if ($value instanceof DateWrapper) {
+			return $value->getUsingFormat($this->output_format);
 		}
-		return $value->format($this->output_format);
+		if ($value instanceof DateObject) {
+			return $value->format($this->output_format);
+		}
+		return null;
 	}
 }
