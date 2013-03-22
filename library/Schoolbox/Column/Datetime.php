@@ -29,7 +29,7 @@ class Datetime implements IColumnType {
 	/**
 	 * @param string $value
 	 *
-	 * @return \DateTime
+	 * @return \DateWrapper
 	 */
 	public function hydrate($value) {
 		$input_date = $this->getInputDate($value);
@@ -40,13 +40,24 @@ class Datetime implements IColumnType {
 	}
 
 	/**
-	 * @param \DateTime $value
+	 * Datetime mapper can dehydrate either a DateTime object, an
+	 * Alaress_Date_Format object or a string (used to create DateTime object,
+	 * then formatted).
+	 *
+	 * @param mixed $value
 	 *
 	 * @return string
 	 */
 	public function dehydrate($value) {
 		if ($value instanceof DateWrapper) {
 			return $value->getUsingFormat($this->output_format);
+		}
+		if (is_string($value)) {
+			try {
+				$value = new DateObject($value);
+			}
+			catch (\Exception $e) {
+			}
 		}
 		if ($value instanceof DateObject) {
 			return $value->format($this->output_format);
