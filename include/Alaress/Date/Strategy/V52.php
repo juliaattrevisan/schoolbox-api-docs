@@ -36,14 +36,4 @@ class Alaress_Date_Strategy_V52 extends Alaress_Date_Strategy_Abstract {
 
 		return $result;
 	}
-
-	/**
-	 * Transform the datetime into an arbitrary format
-	 *
-	 * @param  $format
-	 * @return string
-	 */
-	public function getUsingFormat($format) {
-		return date($format, $this->getDateTime());
-	}
 }

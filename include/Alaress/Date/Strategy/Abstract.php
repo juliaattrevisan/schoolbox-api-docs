@@ -26,19 +26,31 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Int
 	private $inputDateFormat = 'd/m/y';
 
 	/**
+	 * @var DateTime
+	 */
+	protected $datetime;
+
+	/**
 	 * @var Alaress_Date_Locale_Interface
 	 */
 	private $locale = null;
 
 	public function setFromFormat($dateTime, $inputDateFormat) {
+		if ($dateTime instanceof DateTime) {
+			$this->setDateTimeObject($dateTime);
+		}
 
 		/* Support for unix timestamp variant by converting it to a db format
 		 */
-		if ($inputDateFormat == 'U') {
+		elseif ($inputDateFormat == 'U') {
             $this->setByTimestamp($dateTime);
 		}
-		else if ($inputDateFormat !== null) {
-			$this->setInputDateFormat($inputDateFormat);
+		elseif ($inputDateFormat !== null) {
+			$date_object = DateTime::createFromFormat($inputDateFormat, $dateTime);
+			if ($date_object instanceof DateTime) {
+				$this->setDateTimeObject($date_object);
+				return;
+			}
 
             /* Snap out all the bits, exit if no separator could be found (this
              * indicates an illegal dateTime format anyway)
@@ -83,6 +95,19 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Int
             return 0;
          }
     }
+
+	/**
+	 * Transform the datetime into an arbitrary format
+	 *
+	 * @param  $format
+	 * @return string
+	 */
+	public function getUsingFormat($format) {
+		if ($this->getDateTimeObject() instanceof DateTime) {
+			return $this->getDateTimeObject()->format($format);
+		}
+		return date($format, $this->getDateTime());
+	}
 
 	/**
 	 * Figure out which date components are located where, based on the
@@ -364,6 +389,13 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Int
 		return $this->locale;
 	}
 
+	protected function getDateTimeObject() {
+		return $this->datetime;
+	}
+
+	protected function setDateTimeObject($val) {
+		$this->datetime = $val;
+	}
 
 	/**
 	 * Validates whether this date is actually valid.

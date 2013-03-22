@@ -24,6 +24,11 @@ class Alaress_Date_Strategy_DateTime extends Alaress_Date_Strategy_Abstract {
 		}
 		else {
 			$this->datetime = DateTime::createFromFormat($format, $datetime);
+			//
+			// Try creating a datetime given the datetime only.
+			if (!($this->datetime instanceof DateTime)) {
+				$this->datetime = new DateTime($datetime);
+			}
 		}
 	}
 
