@@ -30,12 +30,12 @@ class File {
 	protected $owner;
 
 	/**
-	 * @var string
+	 * @var \Alaress_Date_Format
 	 */
 	protected $submitted;
 
 	/**
-	 * @var string
+	 * @var \Alaress_Date_Format
 	 */
 	protected $modified;
 
@@ -97,7 +97,7 @@ class File {
 	}
 
 	/**
-	 * @param  string $modified
+	 * @param  \Alaress_Date_Format $modified
 	 * @return $this
 	 */
 	public function setModified($modified) {
@@ -106,7 +106,7 @@ class File {
 	}
 
 	/**
-	 * @return string
+	 * @return \Alaress_Date_Format
 	 */
 	public function getModified() {
 		return $this->modified;
@@ -129,7 +129,7 @@ class File {
 	}
 
 	/**
-	 * @param  string $submitted
+	 * @param  \Alaress_Date_Format $submitted
 	 * @return $this
 	 */
 	public function setSubmitted($submitted) {
@@ -138,7 +138,7 @@ class File {
 	}
 
 	/**
-	 * @return string
+	 * @return \Alaress_Date_Format
 	 */
 	public function getSubmitted() {
 		return $this->submitted;

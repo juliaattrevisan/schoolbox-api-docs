@@ -76,8 +76,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'property'   => 'acceptMultiple',
 			'type'       => self::TYPE_BOOLEAN,
 		));
-		//
-		// TODO add TYPE_DATETIME
 		$this->hasMap(array(
 			'column'     => 'created',
 			'property'   => 'created',

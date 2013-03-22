@@ -44,12 +44,12 @@ class File {
 	protected $uploaded_by;
 
 	/**
-	 * @var string
+	 * @var \Alaress_Date_Format
 	 */
 	protected $uploaded_on;
 
 	/**
-	 * @var string
+	 * @var \Alaress_Date_Format
 	 */
 	protected $last_accessed;
 

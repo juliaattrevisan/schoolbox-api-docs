@@ -48,13 +48,13 @@ class FileMapper extends Schoolbox\Mapper {
 		$this->hasMap(array(
 			'column'            => 'uploaded_on',
 			'property'          => 'uploadedOn',
-			'type'              => self::TYPE_STRING,
+			'type'              => self::TYPE_DATETIME,
 			'created_timestamp' => true,
 		));
 		$this->hasMap(array(
 			'column'            => 'last_accessed',
 			'property'          => 'lastAccessed',
-			'type'              => self::TYPE_STRING,
+			'type'              => self::TYPE_DATETIME,
 			'created_timestamp' => true,
 		));
 		//

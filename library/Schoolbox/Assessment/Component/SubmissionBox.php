@@ -68,19 +68,17 @@ class SubmissionBox {
 	protected $owner;
 
 	/**
-	 * Eventually, will accept DateTime fields.
-	 *
-	 * @var string
+	 * @var \Alaress_Date_Format
 	 */
 	protected $open_date;
 
 	/**
-	 * @var string
+	 * @var \Alaress_Date_Format
 	 */
 	protected $due_date;
 
 	/**
-	 * @var string
+	 * @var \Alaress_Date_Format
 	 */
 	protected $late_date;
 
@@ -95,7 +93,7 @@ class SubmissionBox {
 	protected $accept_multiple;
 
 	/**
-	 * @var string
+	 * @var \Alaress_Date_Format
 	 */
 	protected $created;
 
@@ -273,42 +271,42 @@ class SubmissionBox {
 	}
 
 	/**
-	 * @param string $created
+	 * @param \Alaress_Date_Format $created
 	 */
 	public function setCreated($created) {
 		$this->created = $created;
 	}
 
 	/**
-	 * @return string
+	 * @return \Alaress_Date_Format
 	 */
 	public function getCreated() {
 		return $this->created;
 	}
 
 	/**
-	 * @param string $due_date
+	 * @param \Alaress_Date_Format $due_date
 	 */
 	public function setDueDate($due_date) {
 		$this->due_date = $due_date;
 	}
 
 	/**
-	 * @return string
+	 * @return \Alaress_Date_Format
 	 */
 	public function getDueDate() {
 		return $this->due_date;
 	}
 
 	/**
-	 * @param string $late_date
+	 * @param \Alaress_Date_Format $late_date
 	 */
 	public function setLateDate($late_date) {
 		$this->late_date = $late_date;
 	}
 
 	/**
-	 * @return string
+	 * @return \Alaress_Date_Format
 	 */
 	public function getLateDate() {
 		return $this->late_date;
@@ -343,14 +341,14 @@ class SubmissionBox {
 	}
 
 	/**
-	 * @param string $open_date
+	 * @param \Alaress_Date_Format $open_date
 	 */
 	public function setOpenDate($open_date) {
 		$this->open_date = $open_date;
 	}
 
 	/**
-	 * @return string
+	 * @return \Alaress_Date_Format
 	 */
 	public function getOpenDate() {
 		return $this->open_date;

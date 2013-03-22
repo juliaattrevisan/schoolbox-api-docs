@@ -65,13 +65,13 @@ class FileMapper extends Mapper {
 		$this->hasMap(array(
 			'column'            => 'submitted',
 			'property'          => 'submitted',
-			'type'              => self::TYPE_STRING,
+			'type'              => self::TYPE_DATETIME,
 			'created_timestamp' => true,
 		));
 		$this->hasMap(array(
 			'column'            => 'modified',
 			'property'          => 'modified',
-			'type'              => self::TYPE_STRING,
+			'type'              => self::TYPE_DATETIME,
 			'updated_timestamp' => true,
 		));
 	}
