@@ -115,32 +115,35 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $this->parse('marktype_block', 'marktype');
 
     /* Convert times */
-    $open_date = strtotime($submission->getOpenDate());
-    $due_date  = strtotime($submission->getDueDate());
-    $late_date = strtotime($submission->getLateDate());
+    $open_date = $submission->getOpenDate();
+    $due_date  = $submission->getDueDate();
+    $late_date = $submission->getLateDate();
 
-    if(date('H:i:s', $open_date) == '00:00:00') {
+    if ($open_date->getUsingFormat('H:i:s') == '00:00:00') {
         $open_hour = '';
-        $open_min = '';
-    } else {
-        $open_hour = date('g',$open_date);
-        $open_min = date('i',$open_date);
+        $open_min  = '';
+    }
+    else {
+        $open_hour = $open_date->getUsingFormat('g');
+        $open_min  = $open_date->getUsingFormat('i');
     }
 
-    if(date('H:i:s', $due_date) == '23:59:59') {
+    if ($due_date->getUsingFormat('H:i:s') == '23:59:59') {
         $due_hour = '';
-        $due_min = '';
-    } else {
-        $due_hour = date('g',$due_date);
-        $due_min = date('i',$due_date);
+        $due_min  = '';
+    }
+    else {
+        $due_hour = $due_date->getUsingFormat('g');
+        $due_min  = $due_date->getUsingFormat('i');
     }
 
-    if(date('H:i:s', $late_date) == '23:59:59') {
+    if ($late_date->getUsingFormat('H:i:s') == '23:59:59') {
         $late_hour = '';
-        $late_min = '';
-    } else {
-        $late_hour = date('g',$late_date);
-        $late_min = date('i',$late_date);
+        $late_min  = '';
+    }
+    else {
+        $late_hour = $late_date->getUsingFormat('g');
+        $late_min  = $late_date->getUsingFormat('i');
     }
 
 
@@ -156,20 +159,20 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
         'MULTI_SUBMISSION'  => $submission->getAcceptMultiple() ? ' checked="checked"' : '',
         'TOTAL_MARK'        => $submission->getMaxMark(),
 
-        'OPEN_DATE' => date('d/m/Y', $open_date),
+        'OPEN_DATE' => $open_date->getUsingFormat('d/m/Y'),
         'OPEN_HOUR' => $open_hour,
         'OPEN_MIN'  => $open_min,
-        'OPEN_PM'   => date('a', $open_date) == 'pm' ? 'selected' : '',
+        'OPEN_PM'   => $open_date->getUsingFormat('a') == 'pm' ? 'selected' : '',
 
-        'DUE_DATE' => date('d/m/Y', $due_date),
+        'DUE_DATE' => $due_date->getUsingFormat('d/m/Y'),
         'DUE_HOUR' => $due_hour,
         'DUE_MIN'  => $due_min,
-        'DUE_PM'   => date('a', $due_date) == 'pm' ? 'selected' : '',
+        'DUE_PM'   => $due_date->getUsingFormat('a') == 'pm' ? 'selected' : '',
 
-        'LATE_DATE' => date('d/m/Y', $late_date),
+        'LATE_DATE' => $late_date->getUsingFormat('d/m/Y'),
         'LATE_HOUR' => $late_hour,
         'LATE_MIN'  => $late_min,
-        'LATE_PM'   => date('a', $late_date) == 'pm' ? 'selected' : '',
+        'LATE_PM'   => $late_date->getUsingFormat('a') == 'pm' ? 'selected' : '',
 
         'FILE_MAX_UPLOAD' => Cfg::get('file_upload_count'),
         'MAX_FILE_SIZE'   => Cfg::get('max_file_size'),
