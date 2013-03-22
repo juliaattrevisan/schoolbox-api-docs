@@ -28,7 +28,7 @@ class FileMapper extends Schoolbox\Mapper {
 		$this->hasMap(array(
 			'column'     => 'hash',
 			'property'   => 'hash',
-			'type'       => self::TYPE_INTEGER,
+			'type'       => self::TYPE_STRING,
 		));
 		$this->hasMap(array(
 			'column'     => 'filesize',
