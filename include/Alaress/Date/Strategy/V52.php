@@ -13,79 +13,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Alaress_Date_Strategy_V52 extends Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Interface {
-
-	/**
-	 * Transform the datetime into a localised version
-	 *
-	 * @return string
-	 */
-	public function getLocal() {
-		return $this->getUsingFormat($this->getLocale()->localFormat());
-	}
-
-	/**
-	 * Transform the datetime into a localised short version
-	 *
-	 * @return string
-	 */
-	public function getLocalShort() {
-		return $this->getUsingFormat($this->getLocale()->localShortFormat());
-	}
-
-	/**
-	 * Transform the datetime into an Australianised version
-	 *
-	 * @return string
-	 */
-	public function getAustralian() {
-		return $this->getLocal();
-	}
-
-	/**
-	 * Use long format
-	 *
-	 * @return string
-	 */
-	public function getLong() {
-		return $this->getUsingFormat($this->getLocale()->longFormat());
-	}
-
-	/**
-	 * Use long format
-	 *
-	 * @return string
-	 */
-	public function getLongDateOnly() {
-		return $this->getUsingFormat($this->getLocale()->longDateOnlyFormat());
-	}
-
-	/**
-	 * Use short format
-	 *
-	 * @return string
-	 */
-	public function getShort() {
-		return $this->getUsingFormat($this->getLocale()->shortFormat());
-	}
-
-	/**
-	 * Get the date only
-	 *
-	 * @return string
-	 */
-	public function getDateOnly() {
-		return $this->getUsingFormat($this->getLocale()->dateOnlyFormat());
-	}
-
-	/**
-	 * Get the date only
-	 *
-	 * @return string
-	 */
-	public function getTimeOnly() {
-		return $this->getUsingFormat($this->getLocale()->timeOnlyFormat());
-	}
+class Alaress_Date_Strategy_V52 extends Alaress_Date_Strategy_Abstract {
 
 	/**
 	 * Transform the datetime into the format specified in the config table
@@ -94,7 +22,7 @@ class Alaress_Date_Strategy_V52 extends Alaress_Date_Strategy_Abstract implement
 	 * @return string
 	 */
 	public function getDatabase() {
-		$result = $this->getUsingFormat($this->getLocale()->databaseFormat());
+		$result = parent::getDatabase();
 
 		$illegal = array(
 			'0000-00-00 00:00:00',
@@ -108,42 +36,6 @@ class Alaress_Date_Strategy_V52 extends Alaress_Date_Strategy_Abstract implement
 
 		return $result;
 	}
-
-	/**
-	 * Transform the datetime into a database date
-	 *
-	 * @return string
-	 */
-	public function getDatabaseDate() {
-		return $this->getUsingFormat($this->getLocale()->databaseDateFormat());
-	}
-
-	/**
-	 * Transform the datetime into a database time
-	 *
-	 * @return string
-	 */
-	public function getDatabaseTime() {
-		return $this->getUsingFormat($this->getLocale()->databaseTimeFormat());
-	}
-
-	/**
-	 * Transform the datetime into a unix timestamp
-	 *
-	 * @return string
-	 */
-	public function getUnixTimeStamp() {
-		return $this->getUsingFormat($this->getLocale()->timestampFormat());
-	}
-
-    /**
-     * Extract the numeric representation of the day of the week
-     *
-     * @return Integer
-     */
-    public function getWeekDayNumber () {
-        return $this->getUsingFormat('N');
-    }
 
 	/**
 	 * Transform the datetime into an arbitrary format

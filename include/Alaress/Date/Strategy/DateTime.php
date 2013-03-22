@@ -36,28 +36,11 @@ class Alaress_Date_Strategy_DateTime extends Alaress_Date_Strategy_Abstract {
 		return $this->locale;
 	}
 
-	public function getUnixTimestamp() {
-		return $this->datetime->getTimestamp();
-	}
-
-	public function getDatabase() {
-		return $this->datetime->format($this->getLocale()->databaseFormat());
-	}
-
-	public function getLong() {
-		return $this->datetime->format($this->getLocale()->longFormat());
-	}
-
-	public function getShort() {
-		return $this->datetime->format($this->getLocale()->shortFormat());
-	}
-
-	public function getDateOnly() {
-		return $this->datetime->format($this->getLocale()->dateOnlyFormat());
-	}
-
-	public function getAustralian() {
-		return $this->datetime->format($this->getLocale()->localFormat());
+	public function getUsingFormat($format) {
+		if ($this->isValid()) {
+			return $this->datetime->format($format);
+		}
+		return null;
 	}
 
 	public function isValid() {
