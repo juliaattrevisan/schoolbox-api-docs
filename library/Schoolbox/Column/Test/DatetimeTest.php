@@ -55,6 +55,9 @@ class DatetimeTest extends TestCase {
 			array(DateObject::createFromFormat('!Y-m-d\\TH:i:sT' ,'2014-01-01T12:34:56-10:00'), '2014-01-01 12:34:56'),
 			array(DateObject::createFromFormat('!Y-m-d\\TH:i:sT' ,'2014-01-01T12:34:56EST'), '2014-01-01 12:34:56'),
 			array(DateObject::createFromFormat('!Y-m-d\\TH:i:sT' ,'2014-01-01T12:34:56Australia/Melbourne'), '2014-01-01 12:34:56'),
+
+			array(new DateWrapper('2012-01-01', '!Y-m-d'), '2012-01-01 00:00:00'),
+			array(new DateWrapper('2014-01-01T12:34:56EST', '!Y-m-d\\TH:i:sT'), '2014-01-01 12:34:56'),
 		);
 	}
 
@@ -63,5 +66,14 @@ class DatetimeTest extends TestCase {
 	 */
 	public function testHydrate($input, $expected_output) {
 		$this->assertEquals($expected_output, ($this->object->hydrate($input) instanceof DateWrapper));
+	}
+
+	/**
+	 * @dataProvider getTestDehydrate
+	 */
+	public function testDehydrate($input, $expected_output) {
+		//
+		// Test these with Alaress_Date_Format objects too.
+		$this->assertEquals($expected_output, $this->object->dehydrate($input));
 	}
 }

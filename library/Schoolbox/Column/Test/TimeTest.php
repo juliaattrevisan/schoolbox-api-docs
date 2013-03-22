@@ -11,6 +11,7 @@
 namespace Schoolbox\Column\Test;
 use Schoolbox\Column\Time;
 use \DateTime as DateObject;
+use \Alaress_Date_Format as DateWrapper;
 
 class TimeTest extends DatetimeTest {
 
@@ -49,6 +50,9 @@ class TimeTest extends DatetimeTest {
 			// DS switch
 			array(DateObject::createFromFormat('!Y-m-d H:i:s','2012-10-07 02:30:00'), '02:30:00'),
 			array(DateObject::createFromFormat('!Y-m-d H:i:s','2013-04-07 02:30:00'), '02:30:00'),
+
+			array(new DateWrapper('1970-01-01 00:00:00', '!Y-m-d H:i:s'), '00:00:00'),
+			array(new DateWrapper('2012-10-07 02:30:00', '!Y-m-d H:i:s'), '02:30:00'),
 		);
 	}
 }

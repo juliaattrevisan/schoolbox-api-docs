@@ -11,6 +11,7 @@
 namespace Schoolbox\Column\Test;
 use Schoolbox\Column\Timestamp;
 use \DateTime as DateObject;
+use \Alaress_Date_Format as DateWrapper;
 
 class TimestampTest extends DatetimeTest {
 
@@ -48,6 +49,9 @@ class TimestampTest extends DatetimeTest {
 			array(DateObject::createFromFormat('!Y-m-dT','1970-01-01Z'), 0),
 			array(DateObject::createFromFormat('!Y-m-d H:i:sT' ,'1970-01-01 00:00:01-0100'), 3601),
 			array(DateObject::createFromFormat('!Y-m-d H:i:sT' ,'1970-01-01 00:00:00+1000'), -36000),
+			array(new DateWrapper('1970-01-01Z', '!Y-m-dT'), 0),
+			array(new DateWrapper('1970-01-01 00:00:01-0100', '!Y-m-d H:i:sT' ), 3601),
+			array(new DateWrapper('1970-01-01 00:00:00+1000', '!Y-m-d H:i:sT' ), -36000),
 		);
 	}
 }
