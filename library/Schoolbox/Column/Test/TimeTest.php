@@ -53,6 +53,9 @@ class TimeTest extends DatetimeTest {
 
 			array(new DateWrapper('1970-01-01 00:00:00', '!Y-m-d H:i:s'), '00:00:00'),
 			array(new DateWrapper('2012-10-07 02:30:00', '!Y-m-d H:i:s'), '02:30:00'),
+
+			array('1970-01-01 00:00:00', '00:00:00'),
+			array('2012-10-07 02:30:00', '02:30:00'),
 		);
 	}
 }

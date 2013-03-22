@@ -51,6 +51,9 @@ class DateTest extends DatetimeTest {
 
 			array(new DateWrapper('2012-01-01', '!Y-m-d'), '2012-01-01'),
 			array(new DateWrapper('2014-01-01T12:34:56EST', '!Y-m-d\\TH:i:sT'), '2014-01-01'),
+
+			array('2012-01-01', '2012-01-01'),
+			array('2014-01-01T12:34:56EST', '2014-01-01'),
 		);
 	}
 
