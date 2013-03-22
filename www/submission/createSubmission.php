@@ -199,7 +199,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
             $this->setVar('CURRENT_FILE_NAME', $file->getFilename());
             $this->setVar('CURRENT_FILE_ID',   $file->getId());
             $this->setVar('CURRENT_FILE_ICON', $file->getIconFromFilename());
-            $this->setVar('CURRENT_FILE_DATE', date('jS M Y, g:ia', strtotime($file->getUploadedOn())));
+            $this->setVar('CURRENT_FILE_DATE', $file->getUploadedOn()->getUsingFormat('jS M Y, g:ia'));
             $this->parse('existing_file_block','existing_file', true);
         }
     }
