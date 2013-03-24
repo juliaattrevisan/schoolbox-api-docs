@@ -25,6 +25,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'column'     => 'category',
 			'property'   => 'category',
 			'type'       => self::TYPE_INTEGER,
+//			'type'       => self::TYPE_MODEL,
 		));
 		$this->hasMap(array(
 			'column'     => 'type',
@@ -106,8 +107,22 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		// undefinedMethod('hardDelete', function() {hard delete})
 		// $this->hasSoftDeleteField('deleted');
 
-		//
-		// $this->hasOne?
+		$this->hasJoin('category', array(
+			'mapper'    => new Schoolbox\Resource\CategoryMapper(),
+			//
+			// Define as mapper fields instead?
+			// this_property:     property for model object
+			// this_key_property: property for key (if there is one) if not, get
+			//                    ID value from this_property
+			// other_property:    property in mapped model in other object that
+			//                    links to this model
+			'this_key'  => 'category',
+			'other_key' => 'id',
+
+			'this_property'  => 'category',
+			'this_property'  => 'category',
+			'other_property' => 'id',
+		));
 		$this->hasJoin('files', array(
 			'multiple'  => true,
 			'mapper'    => new SubmissionBox\FileMapper(),
@@ -216,23 +231,25 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			//
 			// Get category and codes.
 			// TODO include category and category codes properly as models.
-			$query = "
-				SELECT c.name, cc.code
-				FROM category AS c
-				LEFT JOIN categoryCode AS cc ON cc.categoryID = c.id
-				WHERE c.id = ?
-			";
-			$statement = $this->database->prepare($query);
-			$statement->execute(array($submission_box->getCategory()));
-			$category_name  = '';
-			$category_codes = array();
-			foreach ($statement as $row) {
-				$category_name    = $row['name'];
-				$category_codes[] = $row['code'];
-			}
-			$submission_box->setCategoryName($category_name);
-			$submission_box->setCategoryCodes($category_codes);
-			unset($statement);
+			$category = $this->getJoinMapper('category')->findById($submission_box->getCategory());
+//			var_dump($category);
+//			$query = "
+//				SELECT c.name, cc.code
+//				FROM category AS c
+//				LEFT JOIN categoryCode AS cc ON cc.categoryID = c.id
+//				WHERE c.id = ?
+//			";
+//			$statement = $this->database->prepare($query);
+//			$statement->execute(array($submission_box->getCategory()));
+//			$category_name  = '';
+//			$category_codes = array();
+//			foreach ($statement as $row) {
+//				$category_name    = $row['name'];
+//				$category_codes[] = $row['code'];
+//			}
+//			$submission_box->setCategoryName($category_name);
+//			$submission_box->setCategoryCodes($category_codes);
+//			unset($statement);
 		}
 		return $submission_box;
 	}
