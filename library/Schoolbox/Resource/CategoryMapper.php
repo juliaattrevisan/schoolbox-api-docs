@@ -37,7 +37,7 @@ class CategoryMapper extends Mapper {
 		// Joins:
 		$this->hasJoin('codes', array(
 			'multiple'  => true,
-			'mapper'    => new CategoryCodeMapper(),
+			'mapper'    => '\\Schoolbox\\Resource\\CategoryCodeMapper',
 			'this_key'  => 'id',
 			'other_key' => 'categoryID',
 		));

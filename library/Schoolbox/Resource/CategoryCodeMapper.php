@@ -20,12 +20,18 @@ class CategoryCodeMapper extends Mapper {
 		$this->hasMap(array(
 			'column'     => 'categoryID',
 			'property'   => 'categoryId',
-			'type'       => self::TYPE_INTEGER,
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'category',
 		));
 		$this->hasMap(array(
 			'column'     => 'code',
 			'property'   => 'code',
 			'type'       => self::TYPE_STRING,
+		));
+		$this->hasJoin('category', array(
+			'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
+			'this_key'  => 'category',
+			'other_key' => 'id',
 		));
 	}
 }

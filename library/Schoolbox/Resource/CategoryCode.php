@@ -13,9 +13,9 @@ namespace Schoolbox\Resource;
 
 class CategoryCode {
 	/**
-	 * @var int
+	 * @var Category
 	 */
-	protected $category_id;
+	protected $category;
 
 	/**
 	 * @var string
@@ -23,19 +23,19 @@ class CategoryCode {
 	protected $code;
 
 	/**
-	 * @param  int $category_id
+	 * @param  Category $category
 	 * @return $this
 	 */
-	public function setCategoryId($category_id) {
-		$this->category_id = $category_id;
+	public function setCategoryId($category) {
+		$this->category = $category;
 		return $this;
 	}
 
 	/**
-	 * @return int
+	 * @return Category
 	 */
-	public function getCategoryId() {
-		return $this->category_id;
+	public function getCategory() {
+		return $this->category;
 	}
 
 	/**
