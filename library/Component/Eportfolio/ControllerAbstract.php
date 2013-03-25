@@ -8,6 +8,20 @@
  */
 abstract class Component_Eportfolio_ControllerAbstract extends Component_ControllerAbstract {
 
+	/**
+	 * Apply permissions here
+	 *
+	 * @param array $context
+	 * @param array $config
+	 */
+	public function setup(array $context, array $config) {
+		parent::setup($context, $config);
+
+		$g = new Group();
+		$this->permission = $_SESSION['su'] ? FULL_ACCESS : $g->getPermission($context['id']);
+		$this->sitepage->setVar('ID', $context['id']);
+	}
+
     /**
      * @param string $templateName
      * @param string $templatePath
