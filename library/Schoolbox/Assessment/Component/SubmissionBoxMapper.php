@@ -30,7 +30,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$this->hasMap(array(
 			'column'     => 'type',
 			'property'   => 'workType',
-			'type'       => self::TYPE_INTEGER,
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'work_type',
 		));
 		$this->hasMap(array(
 			'column'     => 'name',
@@ -84,11 +85,12 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'created_timestamp' => true,
 		));
 		//
-		// TODO add TYPE_MODEL and TYPE_COLLECTION
+		// TODO add TYPE_COLLECTION
 		$this->hasMap(array(
 			'column'     => 'mark_type',
 			'property'   => 'markType',
-			'type'       => self::TYPE_INTEGER,
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'mark_type',
 		));
 		$this->hasMap(array(
 			'column'     => 'max_mark',
@@ -192,6 +194,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$statement->execute(array($id));
 
 		$submission_box = false;
+
+		if (($row = $statement->fetch()) !== false) {
+			$submission_box = $this->hydrate($row, 'sb');
+		}
+
 		//
 		// TODO Add work type and mark type models.
 		// TODO get submission history for a user as part of submission (or of user?)
@@ -228,26 +235,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 				$box_file->setFile($file_mapper->hydrate($row, 'f'));
 				$submission_box->addFileLink($box_file);
 			}
-//			var_dump($submission_box->getCategory());
-//			$category = $this->getJoinMapper('category')->findById($submission_box->getCategory()->getId());
-//			var_dump($category);
-//			$query = "
-//				SELECT c.name, cc.code
-//				FROM category AS c
-//				LEFT JOIN categoryCode AS cc ON cc.categoryID = c.id
-//				WHERE c.id = ?
-//			";
-//			$statement = $this->database->prepare($query);
-//			$statement->execute(array($submission_box->getCategory()));
-//			$category_name  = '';
-//			$category_codes = array();
-//			foreach ($statement as $row) {
-//				$category_name    = $row['name'];
-//				$category_codes[] = $row['code'];
-//			}
-//			$submission_box->setCategoryName($category_name);
-//			$submission_box->setCategoryCodes($category_codes);
-//			unset($statement);
 		}
 		return $submission_box;
 	}

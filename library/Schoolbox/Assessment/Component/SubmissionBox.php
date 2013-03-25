@@ -14,6 +14,8 @@ use Schoolbox\Assessment\Component\SubmissionBox\File;
 use Schoolbox\Assessment\Component\SubmissionBox\FileCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\Notification;
 use Schoolbox\Assessment\Component\SubmissionBox\NotificationCollection;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 
 class SubmissionBox {
 
@@ -31,11 +33,6 @@ class SubmissionBox {
 	 * @var int
 	 */
 	protected $work_type;
-
-	/**
-	 * @var string
-	 */
-	protected $work_type_name;
 
 	/**
 	 * @var string
@@ -108,11 +105,6 @@ class SubmissionBox {
 	protected $mark_type;
 
 	/**
-	 * @var string
-	 */
-	protected $mark_type_name;
-
-	/**
 	 * @var int
 	 */
 	protected $rubric_result_set;
@@ -120,6 +112,9 @@ class SubmissionBox {
 	public function __construct() {
 		$this->setNotifications(new NotificationCollection(array()));
 		$this->setFileLinks(new SubmissionBox\FileCollection(array()));
+		$this->setCategory(new Category());
+		$this->setWorkType(new WorkType());
+		$this->setMarkType(new MarkType());
 	}
 
 	/**
@@ -193,14 +188,14 @@ class SubmissionBox {
 	}
 
 	/**
-	 * @param int $type
+	 * @param WorkType $type
 	 */
 	public function setWorkType($type) {
 		$this->work_type = $type;
 	}
 
 	/**
-	 * @return int
+	 * @return WorkType
 	 */
 	public function getWorkType() {
 		return $this->work_type;
@@ -298,14 +293,14 @@ class SubmissionBox {
 	}
 
 	/**
-	 * @param int $mark_type
+	 * @param MarkType $mark_type
 	 */
 	public function setMarkType($mark_type) {
 		$this->mark_type = $mark_type;
 	}
 
 	/**
-	 * @return int
+	 * @return MarkType
 	 */
 	public function getMarkType() {
 		return $this->mark_type;
@@ -386,33 +381,5 @@ class SubmissionBox {
 	 */
 	public function addNotification(Notification $notification) {
 		$this->notifications->add($notification);
-	}
-
-	/**
-	 * @param string $mark_type_name
-	 */
-	public function setMarkTypeName($mark_type_name) {
-		$this->mark_type_name = $mark_type_name;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getMarkTypeName() {
-		return $this->mark_type_name;
-	}
-
-	/**
-	 * @param string $work_type_name
-	 */
-	public function setWorkTypeName($work_type_name) {
-		$this->work_type_name = $work_type_name;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getWorkTypeName() {
-		return $this->work_type_name;
 	}
 }
