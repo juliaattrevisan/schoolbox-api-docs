@@ -149,7 +149,7 @@ $this->setVar(array(
     'BOX_NAME' => Scrub::text($submission->getName()),
     'BOX_OWNER' => $userHandler->formatName($user),
     'BOX_DESCRIPTION' => Scrub::text($submission->getDescription()),
-    'BOX_TYPE' => $work_mapper->getNameFromId($submission->getWorkType()),
+    'BOX_TYPE' => $work_mapper->getNameFromId($submission->getWorkType()->getId()),
     'BOX_CREATED' => $createdDate->getRelativeTime()
 ));
 
@@ -252,7 +252,7 @@ if (is_array($allWork) && count($allWork)) {
         $comment = Scrub::Text($currentWork['comment']);
 
         // perform shortening if the marktype is letter, or if the given grade is an error
-        if($submission->getMarkType() == Component\SubmissionBox\MarkType::TYPE_LETTER || in_array($currentWork['mark'], $errors)) {
+        if($submission->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE_LETTER || in_array($currentWork['mark'], $errors)) {
             $mark = $returnHandler->shortenGrade($currentWork['mark']);
         } else {
             $mark = Scrub::Text($currentWork['mark']);
@@ -535,7 +535,7 @@ else {
 }
 
 // do fun rubric things
-if($submission->getMarkType() == Component\SubmissionBox\MarkType::TYPE_RUBRIC) {
+if($submission->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE_RUBRIC) {
     $rb = new DueWork_Rubric_Lightbox($this);
     $rb->render('rubric_block', $submission->getId(), $user['uid']);
 }

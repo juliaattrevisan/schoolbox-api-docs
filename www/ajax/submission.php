@@ -41,7 +41,7 @@ if ($_REQUEST['id']) {
         'id'          => $submission_id,
         'cid'         => $submission_cat_id,
         'category'    => Scrub::text($submission->getCategoryName()),
-        'typeName'    => Scrub::text($submission->getWorkTypeName()),
+        'typeName'    => Scrub::text($submission->getWorkType()->getName()),
         'name'        => Scrub::text($submission->getName()),
         'description' => Scrub::text($submission->getDescription()),
         'action'      => $action,

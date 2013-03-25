@@ -65,13 +65,13 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     }
 
     /* Output submission work_type drop down */
-    $this->dropdown('type_drop', $work_types, $submission->getWorkType(), TEMPLATE_content, array(
+    $this->dropdown('type_drop', $work_types, $submission->getWorkType()->getId(), TEMPLATE_content, array(
         'name' => 'TYPE_TEXT',
         'id'   => 'TYPE_VALUE'
     ));
 
     // legacy support
-    $mark_type = $submission->getMarkType();
+    $mark_type = $submission->getMarkType()->getId();
     if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
         $this->setVar('marktype_block', '');
     }
