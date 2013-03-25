@@ -41,8 +41,12 @@ class LazyModel {
 		$this->id     = $id;
 	}
 
-
-	protected function isModelLoaded() {
+	/**
+	 * Has the actual model been loaded yet?
+	 *
+	 * @return bool
+	 */
+	public function isModelLoaded() {
 		return isset($this->loaded_model);
 	}
 
