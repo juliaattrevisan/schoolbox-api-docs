@@ -103,15 +103,26 @@ class Collection implements \Iterator, \Countable {
     }
 
 	/**
+	 * Gets the name of the get method for this field.
+	 *
+	 * @param string $field The field name to retrieve.
+	 *
+	 * @return string
+	 */
+	protected function getGetMethodName($field) {
+		return 'get'.ucfirst($field);
+	}
+
+	/**
 	 * Returns first item in collection whose value of $field is $value.
 	 *
 	 * @param string $field The field name to compare against
-	 * @param mixed  $value T
+	 * @param mixed  $value The value to compare against
 	 *
 	 * @return object
 	 */
 	public function getBy($field, $value) {
-		$method_name = 'get'.ucfirst($field);
+		$method_name = $this->getGetMethodName($field);
 		foreach ($this as $item) {
 			$method = array($item, $method_name);
 			if (is_callable($method) && call_user_func($method) == $value) {
@@ -119,5 +130,25 @@ class Collection implements \Iterator, \Countable {
 			}
 		}
 		return null;
+	}
+
+
+	/**
+	 * Gets values for the given column in the collection.
+	 *
+	 * @param string $column
+	 *
+	 * @return array
+	 */
+	public function getColumnValues($column) {
+		$parts       = array();
+		$method_name = $this->getGetMethodName($column);
+		foreach ($this as $item) {
+			$method = array($item, $method_name);
+			if (is_callable($method)) {
+				$parts[] = call_user_func($method);
+			}
+		}
+		return $parts;
 	}
 }
