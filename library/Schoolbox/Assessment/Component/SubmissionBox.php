@@ -8,8 +8,8 @@
  */
 
 namespace Schoolbox\Assessment\Component;
-use Schoolbox;
 
+use Schoolbox\Resource\Category;
 use Schoolbox\Assessment\Component\SubmissionBox\File;
 use Schoolbox\Assessment\Component\SubmissionBox\FileCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\Notification;
@@ -23,7 +23,7 @@ class SubmissionBox {
 	protected $id;
 
 	/**
-	 * @var int
+	 * @var Category
 	 */
 	protected $category;
 
@@ -117,35 +117,20 @@ class SubmissionBox {
 	 */
 	protected $rubric_result_set;
 
-	/**
-	 * Temporary variable for storing category name.
-	 * TODO create category mapper and load the category into the submission.
-	 *
-	 * @var string
-	 */
-	protected $category_name;
-
-	/**
-	 * Temporary variable for storing category codes for the category.
-	 *
-	 * @var array
-	 */
-	protected $category_codes;
-
 	public function __construct() {
 		$this->setNotifications(new NotificationCollection(array()));
 		$this->setFileLinks(new SubmissionBox\FileCollection(array()));
 	}
 
 	/**
-	 * @param int $category
+	 * @param Category $category
 	 */
 	public function setCategory($category) {
 		$this->category = $category;
 	}
 
 	/**
-	 * @return int
+	 * @return Category
 	 */
 	public function getCategory() {
 		return $this->category;
@@ -401,34 +386,6 @@ class SubmissionBox {
 	 */
 	public function addNotification(Notification $notification) {
 		$this->notifications->add($notification);
-	}
-
-	/**
-	 * @param array $category_codes
-	 */
-	public function setCategoryCodes($category_codes) {
-		$this->category_codes = $category_codes;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getCategoryCodes() {
-		return $this->category_codes;
-	}
-
-	/**
-	 * @param string $category_name
-	 */
-	public function setCategoryName($category_name) {
-		$this->category_name = $category_name;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getCategoryName() {
-		return $this->category_name;
 	}
 
 	/**

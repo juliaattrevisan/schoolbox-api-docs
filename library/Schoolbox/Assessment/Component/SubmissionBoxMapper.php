@@ -24,8 +24,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$this->hasMap(array(
 			'column'     => 'category',
 			'property'   => 'category',
-			'type'       => self::TYPE_INTEGER,
-//			'type'       => self::TYPE_MODEL,
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'category',
 		));
 		$this->hasMap(array(
 			'column'     => 'type',
@@ -228,10 +228,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 				$box_file->setFile($file_mapper->hydrate($row, 'f'));
 				$submission_box->addFileLink($box_file);
 			}
-			//
-			// Get category and codes.
-			// TODO include category and category codes properly as models.
-			$category = $this->getJoinMapper('category')->findById($submission_box->getCategory());
+//			var_dump($submission_box->getCategory());
+//			$category = $this->getJoinMapper('category')->findById($submission_box->getCategory()->getId());
 //			var_dump($category);
 //			$query = "
 //				SELECT c.name, cc.code
