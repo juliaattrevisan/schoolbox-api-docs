@@ -176,13 +176,9 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$query = "
 			SELECT
 				{$this->getColumnString('sb')},
-				{$notify_mapper->getColumnString('n')},
 				{$worktype_mapper->getColumnString('wt')},
 				{$marktype_mapper->getColumnString('mt')}
 			FROM {$this->getTable()} sb
-			LEFT JOIN {$this->getJoinSql('files', 'sb', 'sm')}
-			LEFT JOIN {$box_file_mapper->getJoinSql('file', 'sm', 'f')}
-			LEFT JOIN {$this->getJoinSql('notify', 'sb', 'n')}
 			LEFT JOIN {$this->getJoinSql('work_type', 'sb', 'wt')}
 			LEFT JOIN {$this->getJoinSql('mark_type', 'sb', 'mt')}
 			WHERE sb.id=?
@@ -197,26 +193,18 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 
 		if (($row = $statement->fetch()) !== false) {
 			$submission_box = $this->hydrate($row, 'sb');
+			$submission_box->setWorkType($worktype_mapper->hydrate($row, 'wt'));
+			$submission_box->setMarkType($marktype_mapper->hydrate($row, 'mt'));
 		}
 
 		//
-		// TODO Add work type and mark type models.
 		// TODO get submission history for a user as part of submission (or of user?)
-		// Need some way of setting work type ID without changing the work type.
-		// $submission->setWorkTypeId($id)
-		// $submission->loadWorkType();
-		// $submission->setWorkType($id)
-		foreach ($statement as $row) {
-			if (!$submission_box) {
-				$submission_box = $this->hydrate($row, 'sb');
-				$submission_box->setWorkTypeName($row['wt.name']);
-				$submission_box->setMarkTypeName($row['mt.name']);
-			}
-			$submission_box->addNotification($notify_mapper->hydrate($row, 'n'));
-		}
-		unset($statement);
 
 		if ($submission_box instanceof SubmissionBox) {
+			foreach ($notify_mapper->findByColumn('box_id', $submission_box->getId()) as $notify) {
+				$submission_box->addNotification($notify);
+			}
+
 			//
 			// Get files? (This is more evidence separate file/link mapper isn't
 			// required.)
