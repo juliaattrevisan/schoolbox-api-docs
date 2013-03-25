@@ -17,6 +17,12 @@ class Model implements IColumnType {
 	}
 
 	public function dehydrate($value, $mapper = null) {
+		//
+		// Did someone set this as a scalar? They probably meant to set an ID.
+		// Might as well allow this.
+		if (is_scalar($value)) {
+			return $value;
+		}
 		$identifier_method = $mapper->getGetIdentifierMethodName();
 		return $value->$identifier_method();
 	}
