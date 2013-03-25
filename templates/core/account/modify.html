@@ -32,7 +32,7 @@ $j(document).ready(function () {
 				msgs.new_password.push('Your new password must have at least one number.');
 			}
 			if (!nonalpha_re.test(password)) {
-				msgs.new_password.push('Your new password must have at least one non-letter or number character.');
+				msgs.new_password.push('Your new password must have at least one punctuation or symbol character.');
 			}
 		}
 		if (password != confirmp) {
@@ -51,7 +51,7 @@ $j(document).ready(function () {
 			$j.each(msgs, function(key) {
 				var slot = $j('#'+key+'_messages');
 				$j.each(this, function(k,text) {
-					slot.append($j('<li></li>').text(text));
+					slot.append($j('<li></li>').text(text).addClass("error-notification"));
 				});
 			});
 			slots.fadeIn('fast');
@@ -81,7 +81,9 @@ $j(document).ready(function () {
 		</tr>
 		<tr>
 			<td><h4>New Password</h4>
-				<em>Your new password must be at least 6 characters in length and contain at least one letter and at least one number.</em><br />
+				<em>Your new password must be at least 6 characters in length and contain at least one letter,
+					one number and one symbol or punctuation character.</em><br />
+				<em>(examples of symbol characters: $, #, _, &amp;)</em>
 			</td>
 			<td>
 				<input type="password" name="new_password" id="new_password" size="35" maxlength="50" />
