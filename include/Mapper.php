@@ -122,6 +122,15 @@ abstract class Mapper {
 		return $this->model;
 	}
 
+	/**
+	 * Retrieves identifier for this mapper.
+	 *
+	 * @return array
+	 */
+	public function getIdentifier() {
+		return $this->identifier;
+	}
+
     /**
      * @brief Retrieves the entire collection unfiltered
      * @return Collection
