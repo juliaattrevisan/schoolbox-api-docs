@@ -52,9 +52,9 @@ class Factory implements IFactory {
 				return new Model();
 				break;
 
-//			case Mapper::TYPE_SERIALIZED:
-//				return new Serialized();
-//				break;
+			case Mapper::TYPE_SERIALIZED:
+				return new Serialized();
+				break;
 //
 //			case Mapper::TYPE_DECIMAL:
 //				return new Integer();

@@ -1,0 +1,33 @@
+<?php
+/**
+ * Serialized value column type.
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2013, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+ 
+namespace Schoolbox\Column;
+
+class Serialized implements IColumnType {
+
+	/**
+	 * @param string            $value
+	 * @param \Schoolbox\Mapper $mapper
+	 *
+	 * @return mixed
+	 */
+	public function hydrate($value, $mapper = null) {
+		return unserialize($value);
+	}
+
+	/**
+	 * @param mixed             $value
+	 * @param \Schoolbox\Mapper $mapper
+	 *
+	 * @return string
+	 */
+	public function dehydrate($value, $mapper = null) {
+		return serialize($value);
+	}
+}
