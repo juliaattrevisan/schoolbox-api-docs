@@ -63,7 +63,8 @@ class LazyModel {
 	 * Magic call method - loads model if it isn't loaded yet, and passes method
 	 * through to loaded model.
 	 *
-	 * If the identifier is being requested, then the
+	 * If the identifier is being requested, then it's loaded from this class
+	 * if possible, instead of unnecessarily loading from the database.
 	 *
 	 * @param string $method
 	 * @param array  $args
@@ -71,8 +72,6 @@ class LazyModel {
 	 * @return mixed
 	 */
 	public function __call($method, $args) {
-		//
-		// Load model, unless this is retrieving the identifier. (How to tell?)
 		$identifier_method = $this->mapper->getGetIdentifierMethodName();
 		if (!$this->isModelLoaded()) {
 			if ($method === $identifier_method) {
