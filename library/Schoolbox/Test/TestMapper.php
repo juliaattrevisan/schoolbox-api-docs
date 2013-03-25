@@ -34,7 +34,15 @@ class TestMapper extends Mapper {
 			'property'   => 'file',
 			'type'       => self::TYPE_LOB,
 		));
-		//
-		// TODO: add date, datetime, collections
+		$this->hasMap(array(
+			'column'     => 'parent',
+			'property'   => 'parent',
+			'type'       => self::TYPE_INTEGER,
+		));
+		$this->hasJoin('parent', array(
+			'mapper'    => '\\Schoolbox\\Test\\TestMapper',
+			'this_key'  => 'category',
+			'other_key' => 'id',
+		));
 	}
 }

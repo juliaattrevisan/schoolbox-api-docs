@@ -31,6 +31,11 @@ class TestModel {
 	protected $file;
 
 	/**
+	 * @var TestModel
+	 */
+	protected $parent;
+
+	/**
 	 * @param string $file
 	 * @return $this;
 	 */
@@ -94,4 +99,20 @@ class TestModel {
 		return $this->is_viewed;
 	}
 
+	/**
+	 * @param  \Schoolbox\Test\TestModel $parent
+	 *
+	 * @return $this
+	 */
+	public function setParent($parent) {
+		$this->parent = $parent;
+		return $this;
+	}
+
+	/**
+	 * @return \Schoolbox\Test\TestModel
+	 */
+	public function getParent() {
+		return $this->parent;
+	}
 }

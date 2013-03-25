@@ -171,4 +171,12 @@ class MapperTest extends TestCase {
 		$this->assertEquals($expected['is_viewed'], $model->getIsViewed());
 		$this->assertEquals($expected['file'],      $model->getFile());
 	}
+
+	/**
+	 * Test for whether getting a join (that has been defined as a class name
+	 * instead of as a class instance) works.
+	 */
+	public function testGetJoin() {
+		$this->assertInstanceOf('Schoolbox\\Test\\TestMapper', $this->object->getJoinMapper('parent'));
+	}
 }
