@@ -31,4 +31,20 @@ class Timestamp extends Datetime implements IColumnType {
 		$date->setTimestamp($value);
 		return $date;
 	}
+
+	/**
+	 * Overridden to cast result to integer.
+	 *
+	 * @param mixed             $value
+	 * @param \Schoolbox\Mapper $mapper
+	 *
+	 * @return int
+	 */
+	public function dehydrate($value, $mapper = null) {
+		$result = parent::dehydrate($value, $mapper);
+		if (isset($result)) {
+			$result = intval($result);
+		}
+		return $result;
+	}
 }
