@@ -64,6 +64,38 @@ class Mapper extends BaseMapper {
     }
 
     /**
+     * Gets name of get method for identifier column.
+     *
+     * @return string
+     */
+    public function getGetIdentifierMethodName() {
+        $identifier = $this->getIdentifier();
+        return $this->getGetMethodName($identifier['method']);
+    }
+
+    /**
+     * Gets name of get method for given property.
+     *
+     * @param string $property
+     *
+     * @return string
+     */
+    protected function getGetMethodName($property) {
+        return 'get'.ucfirst($property);
+    }
+
+    /**
+     * Gets name of set method for given property.
+     *
+     * @param string $property
+     *
+     * @return string
+     */
+    protected function getSetMethodName($property) {
+        return 'set'.ucfirst($property);
+    }
+
+    /**
      * Overridden to use getter and hydrator instead of getting property
      * directly.
      *
@@ -74,7 +106,7 @@ class Mapper extends BaseMapper {
      * @return mixed
      */
     protected function getModelProperty($model, $property, $map) {
-        $get_method  = 'get'.ucfirst($property);
+        $get_method  = $this->getGetMethodName($property);
         $value       = $model->$get_method();
         $join_mapper = isset($map['join']) ? $this->getJoinMapper($map['join']) : null;
         if ($map['hydrator'] instanceof IColumnType) {
@@ -95,7 +127,7 @@ class Mapper extends BaseMapper {
      * @return $this
      */
     protected function setModelProperty($model, $property, $value, $map) {
-        $set_method = 'set'.ucfirst($property);
+        $set_method  = $this->getSetMethodName($property);
         $join_mapper = isset($map['join']) ? $this->getJoinMapper($map['join']) : null;
         if ($map['hydrator'] instanceof IColumnType) {
             $value = $map['hydrator']->hydrate($value, $join_mapper);
