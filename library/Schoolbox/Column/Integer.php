@@ -25,11 +25,11 @@ class Integer implements IColumnType {
 		return null;
 	}
 
-	public function hydrate($value) {
+	public function hydrate($value, $mapper = null) {
 		return $this->convert($value);
 	}
 
-	public function dehydrate($value) {
+	public function dehydrate($value, $mapper = null) {
 		return $this->convert($value);
 	}
 }

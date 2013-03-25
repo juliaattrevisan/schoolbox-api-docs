@@ -27,11 +27,12 @@ class Datetime implements IColumnType {
 	}
 
 	/**
-	 * @param string $value
+	 * @param string            $value
+	 * @param \Schoolbox\Mapper $mapper
 	 *
 	 * @return \DateWrapper
 	 */
-	public function hydrate($value) {
+	public function hydrate($value, $mapper = null) {
 		$input_date = $this->getInputDate($value);
 		if ($input_date instanceof DateObject) {
 			return new DateWrapper($input_date, $this->input_format);
@@ -44,11 +45,12 @@ class Datetime implements IColumnType {
 	 * Alaress_Date_Format object or a string (used to create DateTime object,
 	 * then formatted).
 	 *
-	 * @param mixed $value
+	 * @param mixed             $value
+	 * @param \Schoolbox\Mapper $mapper
 	 *
 	 * @return string
 	 */
-	public function dehydrate($value) {
+	public function dehydrate($value, $mapper = null) {
 		if ($value instanceof DateWrapper) {
 			return $value->getUsingFormat($this->output_format);
 		}

@@ -74,10 +74,11 @@ class Mapper extends BaseMapper {
      * @return mixed
      */
     protected function getModelProperty($model, $property, $map) {
-        $get_method = 'get'.ucfirst($property);
-        $value = $model->$get_method();
+        $get_method  = 'get'.ucfirst($property);
+        $value       = $model->$get_method();
+        $join_mapper = isset($map['join']) ? $this->getJoinMapper($map['join']) : null;
         if ($map['hydrator'] instanceof IColumnType) {
-            $value = $map['hydrator']->dehydrate($value);
+            $value = $map['hydrator']->dehydrate($value, $join_mapper);
         }
         return $value;
     }
@@ -95,8 +96,9 @@ class Mapper extends BaseMapper {
      */
     protected function setModelProperty($model, $property, $value, $map) {
         $set_method = 'set'.ucfirst($property);
+        $join_mapper = isset($map['join']) ? $this->getJoinMapper($map['join']) : null;
         if ($map['hydrator'] instanceof IColumnType) {
-            $value = $map['hydrator']->hydrate($value);
+            $value = $map['hydrator']->hydrate($value, $join_mapper);
         }
         $model->$set_method($value);
         return $this;

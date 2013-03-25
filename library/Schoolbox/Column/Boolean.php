@@ -23,11 +23,11 @@ class Boolean implements IColumnType {
 		return $value ? true : false;
 	}
 
-	public function hydrate($value) {
+	public function hydrate($value, $mapper = null) {
 		return $this->isBoolean($value);
 	}
 
-	public function dehydrate($value) {
+	public function dehydrate($value, $mapper = null) {
 		return $this->isBoolean($value);
 	}
 }

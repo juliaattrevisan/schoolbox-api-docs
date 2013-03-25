@@ -11,11 +11,11 @@
 namespace Schoolbox\Column;
 
 class Base implements IColumnType {
-	public function hydrate($value) {
+	public function hydrate($value, $mapper = null) {
 		return $value;
 	}
 
-	public function dehydrate($value) {
+	public function dehydrate($value, $mapper = null) {
 		return $value;
 	}
 }
