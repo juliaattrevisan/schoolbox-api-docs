@@ -374,6 +374,8 @@ class User extends DeprecatedModel {
 			require_once SITE_root . '/include/Mailer.php';
 			$mailHandler = new Mailer('change-password.html', Cfg::get('title') . ' Password Change', $user['alt_email']);
 			$mailHandler->setVar('NAME', $user['firstname']);
+			$mailHandler->setVar('DATE', date('j F Y', $_SERVER['REQUEST_TIME']));
+			$mailHandler->setVar('TIME', date('g:i a', $_SERVER['REQUEST_TIME']));
 			return $mailHandler->send();
 		}
 		return false;
@@ -411,6 +413,8 @@ class User extends DeprecatedModel {
 			$mailHandler->setVar('NAME',     $user['firstname'].' '.$user['lastname']);
 			$mailHandler->setVar('EMAIL',    $user['alt_email']);
 			$mailHandler->setVar('IP',       $_SERVER['REMOTE_ADDR']);
+			$mailHandler->setVar('DATE',     date('j F Y', $_SERVER['REQUEST_TIME']));
+			$mailHandler->setVar('TIME',     date('g:i a', $_SERVER['REQUEST_TIME']));
 			return $mailHandler->send();
 		}
 		return false;
