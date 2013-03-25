@@ -439,7 +439,8 @@ abstract class Mapper {
      *
      * @param string $name The identifier for this join.
      * @param array  $join A definition for this join, with these keys:
-     *                     mapper:    a Mapper instance for the related table
+     *                     mapper:    a Mapper instance for the related table,
+     *                                or the class name of a mapper
      *                     this_key:  the key for this side of the relation
      *                     other_key: the key for the other side of the relation
      *                     extra:     any extra conditions on the join
@@ -465,6 +466,10 @@ abstract class Mapper {
         if (!array_key_exists($name, $this->joins)) {
             return false;
         }
+        $mapper = $this->joins[$name]['mapper'];
+        if (!($mapper instanceof Mapper) && class_exists($mapper)) {
+            $this->joins[$name]['mapper'] = new $mapper();
+        }
         return $this->joins[$name]['mapper'];
     }
 
@@ -486,7 +491,7 @@ abstract class Mapper {
         $join = $this->joins[$name];
 
         $this_table   = $this->getTable();
-        $other_mapper = $join['mapper'];
+        $other_mapper = $this->getJoinMapper($name);
         $other_table  = $other_mapper->getTable();
 
         if (strlen($this_alias) === 0) {
