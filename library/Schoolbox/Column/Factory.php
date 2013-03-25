@@ -17,52 +17,53 @@ class Factory implements IFactory {
 	 * @return IColumnType
 	 */
 	public function build($type) {
-		$mapper = null;
+		$column = null;
 		switch ($type) {
 			case Mapper::TYPE_BOOLEAN:
-				return new Boolean();
+				$column = new Boolean();
 				break;
 
 			case Mapper::TYPE_STRING:
 			case Mapper::TYPE_LOB:
-				return new Base();
+				$column = new Base();
 				break;
 
 			case Mapper::TYPE_INTEGER:
-				return new Integer();
+				$column = new Integer();
 				break;
 
 			case Mapper::TYPE_DATE:
-				return new Date();
+				$column = new Date();
 				break;
 
 			case Mapper::TYPE_DATETIME:
-				return new Datetime();
+				$column = new Datetime();
 				break;
 
 			case Mapper::TYPE_TIME:
-				return new Time();
+				$column = new Time();
 				break;
 
 			case Mapper::TYPE_TIMESTAMP:
-				return new Timestamp();
+				$column = new Timestamp();
 				break;
 
 			case Mapper::TYPE_MODEL:
-				return new Model();
+				$column = new Model();
 				break;
 
 			case Mapper::TYPE_SERIALIZED:
-				return new Serialized();
+				$column = new Serialized();
 				break;
-//
-//			case Mapper::TYPE_DECIMAL:
-//				return new Integer();
-//				break;
+
+			case Mapper::TYPE_DECIMAL:
+				$column = new Decimal();
+				$column->setPlaces(2);
+				break;
 
 			default:
 				break;
 		}
-		return $mapper;
+		return $column;
 	}
 }
