@@ -48,6 +48,10 @@ class Factory implements IFactory {
 				return new Timestamp();
 				break;
 
+			case Mapper::TYPE_MODEL:
+				return new Model();
+				break;
+
 //			case Mapper::TYPE_SERIALIZED:
 //				return new Serialized();
 //				break;

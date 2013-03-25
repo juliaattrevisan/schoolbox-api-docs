@@ -41,6 +41,7 @@ abstract class Mapper {
 	const TYPE_TIMESTAMP  = 13;
 	const TYPE_DECIMAL    = 20;
 	const TYPE_SERIALIZED = 30;
+	const TYPE_MODEL      = 40;
 
 	/**
 	 * @var Database
