@@ -56,15 +56,4 @@ class DateTest extends DatetimeTest {
 			array('2014-01-01T12:34:56EST', '2014-01-01'),
 		);
 	}
-
-//	/**
-//	 * @dataProvider getTestHydrate
-//	 */
-//	public function testHydrate($input, $expected_output) {
-//		$actual = $this->object->hydrate($input);
-//		if ($actual instanceof DateObject) {
-//			$actual = $actual->format('Y-m-d');
-//		}
-//		$this->assertEquals($expected_output, $actual);
-//	}
 }

@@ -68,7 +68,7 @@ class DatetimeTest extends TestCase {
 	 * @dataProvider getTestHydrate
 	 */
 	public function testHydrate($input, $expected_output) {
-		$this->assertEquals($expected_output, ($this->object->hydrate($input) instanceof DateWrapper));
+		$this->assertSame($expected_output, ($this->object->hydrate($input) instanceof DateWrapper));
 	}
 
 	/**
@@ -77,6 +77,6 @@ class DatetimeTest extends TestCase {
 	public function testDehydrate($input, $expected_output) {
 		//
 		// Test these with Alaress_Date_Format objects too.
-		$this->assertEquals($expected_output, $this->object->dehydrate($input));
+		$this->assertSame($expected_output, $this->object->dehydrate($input));
 	}
 }

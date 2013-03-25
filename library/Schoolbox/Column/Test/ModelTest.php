@@ -55,13 +55,13 @@ class ModelTest extends TestCase {
 
 	public function testHydrate() {
 		$hydrate = $this->object->hydrate(1, $this->test_mapper);
-		$this->assertEquals(1, $hydrate->getId());
+		$this->assertSame(1, $hydrate->getId());
 		$this->assertFalse($hydrate->isModelLoaded());
-		$this->assertEquals('d.txt', $hydrate->getFilename());
+		$this->assertSame('d.txt', $hydrate->getFilename());
 		$this->assertTrue($hydrate->isModelLoaded());
 	}
 
 	public function testDehydrate() {
-		$this->assertEquals(1, $this->object->dehydrate($this->test_model, $this->test_mapper));
+		$this->assertSame(1, $this->object->dehydrate($this->test_model, $this->test_mapper));
 	}
 }
