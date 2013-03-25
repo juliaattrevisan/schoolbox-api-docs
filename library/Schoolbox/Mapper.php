@@ -70,7 +70,7 @@ class Mapper extends BaseMapper {
      */
     public function getGetIdentifierMethodName() {
         $identifier = $this->getIdentifier();
-        return $this->getGetMethodName($identifier['method']);
+        return $this->getGetMethodName($identifier['property']);
     }
 
     /**
