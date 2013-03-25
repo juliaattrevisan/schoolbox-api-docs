@@ -14,7 +14,7 @@ if ($_REQUEST['id']) {
     $submission_mapper = new SubmissionBoxMapper();
     $submission        = $submission_mapper->findById($_REQUEST['id']);
     $submission_id     = $submission->getId();
-    $submission_cat_id = $submission->getCategory();
+    $submission_cat_id = $submission->getCategory()->getId();
 
 
     /* Check involved in subject */

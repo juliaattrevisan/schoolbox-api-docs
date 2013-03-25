@@ -103,7 +103,7 @@ $userHandler = new User();
 $groupHandler = new Group();
 $catHandler = new Category();
 
-$codes = $catHandler->getCodeForCategory($submission->getCategory());
+$codes = $catHandler->getCodeForCategory($submission->getCategory()->getId());
 
 if($codes && count($codes)) {
     $classCode = $codes['codes'];
@@ -139,7 +139,7 @@ $gradient = max(0, min(10, $urgency));
 
 $this->setVar(array(
     'CATEGORY_NAME' => Scrub::text($submission->getCategoryName()),
-    'CATEGORY_ID'   => $submission->getCategory(),
+    'CATEGORY_ID'   => $submission->getCategory()->getId(),
     'CATEGORY_THUMB' => '',
 
     'BOX_DUEDATE' => $dueDate->getRelativeTime(),
@@ -486,7 +486,7 @@ else {
 
 }
 
-if (!in_array($submission->getCategory(), $categoryIDList)) {
+if (!in_array($submission->getCategory()->getId(), $categoryIDList)) {
     $this->setVar(array(
         'action_submit_block' => '',
         'action_resubmit_block' => ''

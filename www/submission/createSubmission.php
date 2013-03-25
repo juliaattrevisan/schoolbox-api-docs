@@ -50,13 +50,13 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
 
     //
     // Authorisation: user has write access to group?
-    if ($groupHandler->getPermission($submission->getCategory()) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission($submission->getCategory()->getId()) < WRITE_ACCESS) {
         error(19);
     }
 
     /* Output category information */
-    $cat_name = $submission->getCategoryName();
-    $codes    = $submission->getCategoryCodes();
+    $cat_name = $submission->getCategory()->getName();
+    $codes    = $submission->getCategory()->getCodes()->getColumnValues('code');
     if (!empty($codes)) {
         $catOutput = "<b>".$cat_name." (".implode(', ', $codes).")</b>";
     }
@@ -97,16 +97,16 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
                 $results = $rubric->getResults();
                 $resultCount = $rubric->getResultCount();
 
-                outputCriteria($this, $submission->getCategory(), $criteria, $results, $resultCount);
+                outputCriteria($this, $submission->getCategory()->getId(), $criteria, $results, $resultCount);
                 outputResultSets($this, $resultSetID, $resultCount);
             }
             else {
                 outputResultSets($this);
-                outputCriteria($this, $submission->getCategory(), array(), array());
+                outputCriteria($this, $submission->getCategory()->getId(), array(), array());
             }
         } catch(Exception $e) {
             outputResultSets($this);
-            outputCriteria($this, $submission->getCategory(), array(), array());
+            outputCriteria($this, $submission->getCategory()->getId(), array(), array());
         }
 
 
@@ -150,7 +150,7 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $output = array(
         'HEADING'           => 'Modify',
         'ID'                => $submission->getId(),
-        'CATEGORY'          => $submission->getCategory(),
+        'CATEGORY'          => $submission->getCategory()->getId(),
         'CURRENT_CAT'       => $catOutput,
         'NAME'              => $submission->getName(),
         'DESCRIPTION'       => $submission->getDescription(),

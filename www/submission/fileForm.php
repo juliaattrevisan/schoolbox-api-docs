@@ -83,7 +83,7 @@ elseif (isset($_GET['delete'])) {
 	if (!$submission) {
 		$return['message'] = 'Not Found';
 	}
-	elseif ($group_handler->getPermission($submission->getCategory()) < WRITE_ACCESS) {
+	elseif ($group_handler->getPermission($submission->getCategory()->getId()) < WRITE_ACCESS) {
 		$return['message'] = 'Unauthorised';
 	}
 	else {
