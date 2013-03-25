@@ -372,7 +372,11 @@ class User extends DeprecatedModel {
 			$this->update(array('id' => $user['id'], 'hash' => $hash));
 
 			require_once SITE_root . '/include/Mailer.php';
-			$mailHandler = new Mailer('change-password.html', Cfg::get('title') . ' Password Change', $user['alt_email']);
+			$mailHandler = new Mailer('change-password.html', Cfg::get('password_change_email_subject'), $user['alt_email']);
+			$from = Cfg::get('password_change_email_from');
+			if ($from) {
+				$mailHandler->setFrom($from);
+			}
 			$mailHandler->setVar('NAME', $user['firstname']);
 			$mailHandler->setVar('DATE', date('j F Y', $_SERVER['REQUEST_TIME']));
 			$mailHandler->setVar('TIME', date('g:i a', $_SERVER['REQUEST_TIME']));
@@ -403,10 +407,9 @@ class User extends DeprecatedModel {
 			// passwords are desynched between Synergetic and Schoolbox.
 			// If that happens, then it's not really the user's fault.
 			$template = 'change-password-failure.html';
-			$subject  = Cfg::get('title') . ' Password Change Failed';
+			$subject  = Cfg::get('password_change_failed_email_subject');
 			if ($is_synergetic_failure) {
 				$template = 'change-password-synergetic-failure.html';
-				$subject  = Cfg::get('title') . ' Password Change Failed (Synergetic)';
 			}
 			$mailHandler = new Mailer($template, $subject, $admin_address);
 			$mailHandler->setVar('USERNAME', $user['username']);
