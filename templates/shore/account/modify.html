@@ -21,22 +21,29 @@ $j(document).ready(function () {
 		if (current == '') {
 			msgs.current_password.push('You must enter your current password.');
 		}
+
+		var new_password_msgs = [];
 		if (password.length < 6) {
-			msgs.new_password.push('Your new password must be at least 6 characters long.');
+			new_password_msgs.push('is at least 6 characters long');
 		}
-		else {
-			if (!letter_re.test(password)) {
-				msgs.new_password.push('Your new password must have at least one letter.');
-			}
-			if (!number_re.test(password)) {
-				msgs.new_password.push('Your new password must have at least one number.');
-			}
-			if (!nonalpha_re.test(password)) {
-				msgs.new_password.push('Your new password must have at least one punctuation or symbol character.');
-			}
+		if (!letter_re.test(password)) {
+			new_password_msgs.push('contains at least one letter');
 		}
+		else if (!number_re.test(password)) {
+			new_password_msgs.push('contains at least one number');
+		}
+		else if (!nonalpha_re.test(password)) {
+			new_password_msgs.push('contains at least one punctuation or symbol character');
+		}
+		if (new_password_msgs.length > 0) {
+			msgs.new_password.push(
+				'Your password couldn’t be changed because the new password you chose isn’t complex enough. Please try again and choose a password that '
+				+ new_password_msgs.join(' and ') + '.'
+			);
+		}
+
 		if (password != confirmp) {
-			msgs.confirm_password.push('The new and confirmation passwords you entered do not match.');
+			msgs.confirm_password.push('Your password couldn’t be changed because you didn’t enter the same password in both the New Password and Confirm New Password boxes.');
 		}
 
 		var slots = $j('#current_password_messages, #new_password_messages, #confirm_password_messages');
