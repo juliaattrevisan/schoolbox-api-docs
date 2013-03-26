@@ -1,5 +1,5 @@
 <!-- BEGIN custom_head -->
-<link rel="alternate" type="application/rss+xml" title="RSS" href="/homepage/rss/{ID}/{USER_TOKEN}" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/eportfolio/rss/{ID}/{USER_TOKEN}" />
 <!-- BEGIN modify_layout -->
 <script type="text/javascript"> var categoryID = {ID}; </script>
 
@@ -16,7 +16,7 @@
         /* Set up variables and urls
          */
         setupCustomise.ajaxURL = '/eportfolio/configForm.php';
-        setupCustomise.key = 'cid';
+        setupCustomise.key = 'uid';
         setupCustomise.id = {ID};
         setupCustomise.leftColumnWidth = '{TEMPLATE_LEFT_COLUMN_WIDTH}';
 
@@ -127,24 +127,24 @@
             </colgroup>
             <tr>
                 <td valign="top"><ul>
-                    <!-- BEGIN homepage_component_tab -->
+                    <!-- BEGIN eportfolio_component_tab -->
                     <li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
-                    <!-- END homepage_component_tab -->
+                    <!-- END eportfolio_component_tab -->
                 </ul></td>
                 <td><div class="components clearfix">
-                    <!-- BEGIN homepage_component_page -->
-                    <div id="tabs-sub-{HOMEPAGE_COMPONENT_CATEGORY_ID}">
-                        <!-- BEGIN homepage_component -->
-                        <div class="add-component {HOMEPAGE_COMPONENT_CLASS} clearfix">
-                            <h4>{HOMEPAGE_COMPONENT_NAME} <strong>(<em>{HOMEPAGE_COMPONENT_COUNT}</em>)</strong></h4>
-                            <p>{HOMEPAGE_COMPONENT_DESCRIPTION}</p>
+                    <!-- BEGIN eportfolio_component_page -->
+                    <div id="tabs-sub-{EPORTFOLIO_COMPONENT_CATEGORY_ID}">
+                        <!-- BEGIN eportfolio_component -->
+                        <div class="add-component {EPORTFOLIO_COMPONENT_CLASS} clearfix">
+                            <h4>{EPORTFOLIO_COMPONENT_NAME} <strong>(<em>{EPORTFOLIO_COMPONENT_COUNT}</em>)</strong></h4>
+                            <p>{EPORTFOLIO_COMPONENT_DESCRIPTION}</p>
                             <span class="notification"><strong></strong>Added</span>
-                            <a href="#" rel="{HOMEPAGE_COMPONENT_ID}" class="btn add"><span></span>Add</a>
+                            <a href="#" rel="{EPORTFOLIO_COMPONENT_ID}" class="btn add"><span></span>Add</a>
 
                         </div>
-                        <!-- END homepage_component -->
+                        <!-- END eportfolio_component -->
                     </div>
-                    <!-- END homepage_component_page -->
+                    <!-- END eportfolio_component_page -->
                 </div>
                 </td>
             </tr>
@@ -331,11 +331,11 @@
     <div class="left clearfix" style="width: {TEMPLATE_LEFT_COLUMN_WIDTH}%">{component_position_left}</div>
     <div class="right clearfix" style="width: {TEMPLATE_RIGHT_COLUMN_WIDTH}%">{component_position_right}</div>
 </div>
-<input type="hidden" id="categoryID" value="{ID}" />
+<input type="hidden" id="userID" value="{ID}" />
 <div id="resource-browser" class="hide"></div>
 <script type="text/javascript">
     // all forms should submit without prevention
-    $j(".homepage form").submit(function() {
+    $j(".eportfolio form").submit(function() {
         window.check = false;
     });
 </script>

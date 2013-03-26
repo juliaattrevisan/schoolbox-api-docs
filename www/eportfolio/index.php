@@ -38,7 +38,6 @@ $userId = $user['uid'];
 /* Setup the eportfolio handler
  */
 $eportfolioHandler = new Eportfolio($userId);
-var_dump($eportfolioHandler->getTemplate());
 
 if($eportfolioHandler->getTemplate() === false) {
 	die('no template');
@@ -58,12 +57,13 @@ $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 /* BUILD COMPONENTRY */
 $componentFactory = new Component_Eportfolio_Factory(new User, $this);
 $componentCollection = $componentFactory->buildComponentList($userID);
+$permission =99;
 
 // User has elevated priviliges: can write to page
 if ($permission >= WRITE_ACCESS) {
     $this->setBlock('customise_page', 'eportfolio_component_tab', 'eportfolio_component_tab_block');
     $this->setBlock('customise_page', 'eportfolio_component_page', 'eportfolio_component_page_block');
-    $this->setBlock('homepage_component_page', 'eportfolio_component', 'eportfolio_component_block');
+    $this->setBlock('eportfolio_component_page', 'eportfolio_component', 'eportfolio_component_block');
     $this->parse('edit_page_block', 'edit_page');
     $this->parse('modify_layout_block', 'modify_layout');
     $this->parse('customise_page_block', 'customise_page');
@@ -161,7 +161,7 @@ if ($permission >= WRITE_ACCESS) {
 
 
     // Colors (original)
-    $listColor = $homepageHandler->getColorList();
+    $listColor = $eportfolioHandler->getColorList();
 
     $this->setVar('COLOUR_ARRAY', 'original');
     $this->setVar($listColor);
@@ -195,7 +195,7 @@ if ($permission >= WRITE_ACCESS) {
     $this->parse('colour_list_block', 'colour_list', true);
 
     // Template control
-    $template = $homepageHandler->getTemplate();
+    $template = $eportfolioHandler->getTemplate();
     for ($x = 1; $x <= 4; $x++) {
         $this->setVar("CURRENT_TEMPLATE_$x", $template == $x ? 'current' : '');
     }
@@ -223,9 +223,8 @@ if ($permission >= WRITE_ACCESS) {
 $allWidths = $eportfolioHandler->getColumnWidths();
 
 $this->setVar(array(
-    'HEADING' => Scrub::text($category['name']) . (isset($code) ? ' (' . $codeString . ')' : ''),
-    'CODE' => urlencode(urlencode($code)),
-    'ID' => $categoryID,
+    'HEADING' => Scrub::text($user['firstname'] . ' ' . $user['lastname']),
+    'ID' => $user['uid'],
     'USER_TOKEN' => $_SESSION['key'],
 ));
 
