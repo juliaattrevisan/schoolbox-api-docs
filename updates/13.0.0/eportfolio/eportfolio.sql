@@ -9,3 +9,22 @@ ALTER TABLE `component_instance` CHANGE `module` `module` ENUM('dashboard','home
 /* A list of component categories
  */
 CREATE TABLE `eportfolioComponentCategory`( `eportfolioComponentCategoryID` INT(10) NOT NULL AUTO_INCREMENT, `name` VARCHAR(255), PRIMARY KEY (`eportfolioComponentCategoryID`) );
+
+/* Remove old tables
+ */
+DROP TABLE eportfolio_blog;
+DROP TABLE eportfolio_blogComment;
+DROP TABLE eportfolio_comp;
+TRUNCATE eportfolio_comp_location;
+TRUNCATE eportfolio_config;
+DROP TABLE eportfolio_link;
+DROP TABLE eportfolio_log;
+DROP TABLE eportfolio_objective_award;
+DROP TABLE eportfolio_objective_coverletter;
+DROP TABLE eportfolio_objective_educationhistory;
+DROP TABLE eportfolio_objective_employmenthistory;
+DROP TABLE eportfolio_objective_goal;
+DROP TABLE eportfolio_objective_interest;
+DROP TABLE eportfolio_objective_skill;
+DROP TABLE eportfolio_privateNotes;
+DROP TABLE eportfolio_textBox;
