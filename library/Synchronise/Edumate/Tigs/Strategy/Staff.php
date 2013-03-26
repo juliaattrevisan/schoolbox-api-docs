@@ -4,7 +4,7 @@
  * @copyright   Copyright 2013, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-class Synchronise_External_Tigs_Strategy_Staff extends Synchronise_Edumate_Tigs_Strategy_Abstract {
+class Synchronise_Edumate_Tigs_Strategy_Staff extends Synchronise_Edumate_Tigs_Strategy_Abstract {
 
 	/**
 	 * Get a list of records to process.
