@@ -26,7 +26,7 @@ class CategoryCode {
 	 * @param  Category $category
 	 * @return $this
 	 */
-	public function setCategoryId($category) {
+	public function setCategory($category) {
 		$this->category = $category;
 		return $this;
 	}

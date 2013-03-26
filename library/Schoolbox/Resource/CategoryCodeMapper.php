@@ -19,7 +19,7 @@ class CategoryCodeMapper extends Mapper {
 		$this->hasTable('categoryCode');
 		$this->hasMap(array(
 			'column'     => 'categoryID',
-			'property'   => 'categoryId',
+			'property'   => 'category',
 			'type'       => self::TYPE_MODEL,
 			'join'       => 'category',
 		));

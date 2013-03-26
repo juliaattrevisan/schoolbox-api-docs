@@ -77,7 +77,7 @@ class CategoryMapper extends Mapper {
 				$category = $this->hydrate($row, 'c');
 			}
 			$code = $code_mapper->hydrate($row, 'cc');
-			if ($code->getCategoryId()) {
+			if ($code->getCategory()->getId()) {
 				$category->addCode($code);
 			}
 		}
