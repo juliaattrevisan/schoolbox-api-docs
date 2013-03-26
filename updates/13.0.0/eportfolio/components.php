@@ -21,5 +21,5 @@ $test = array(
 $allComponents[] = $test;
 
 foreach($allComponents as $currentComponent) {
-	Component_DefinitionMapper::getInstance()->create($currentCOmponent);
+	Component_DefinitionMapper::getInstance()->create($currentComponent);
 }
