@@ -1,8 +1,6 @@
 <!-- BEGIN custom_head -->
 <link rel="alternate" type="application/rss+xml" title="RSS" href="/eportfolio/rss/{ID}/{USER_TOKEN}" />
 <!-- BEGIN modify_layout -->
-<script type="text/javascript"> var categoryID = {ID}; </script>
-
 <script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
 <script type="text/javascript" src="/javascript/color-conversion.js"></script>
 <script type="text/javascript" src="/javascript/jquery.component.js"></script>
@@ -17,7 +15,7 @@
          */
         setupCustomise.ajaxURL = '/eportfolio/configForm.php';
         setupCustomise.key = 'uid';
-        setupCustomise.id = {ID};
+        setupCustomise.id = '{ID}';
         setupCustomise.leftColumnWidth = '{TEMPLATE_LEFT_COLUMN_WIDTH}';
 
         /**
