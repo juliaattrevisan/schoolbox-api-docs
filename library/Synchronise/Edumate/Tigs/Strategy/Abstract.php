@@ -71,4 +71,20 @@ abstract class Synchronise_Edumate_Tigs_Strategy_Abstract extends Synchronise_Ed
 	protected function getGroupIDFromCategory($category) {
 		return 1;
 	}
+
+	/**
+	 * Process the users
+	 *
+	 */
+	public function createIfExists() {
+		$this->getVerboseFilter()->intro();
+
+		foreach ($this->getList() as $currentUser) {
+			// Generate details about the new user
+			$newUser = $this->setupUserDetails($currentUser);
+			$this->executeCreateUpdate($newUser);
+		}
+
+		$this->getVerboseFilter()->summary();
+	}
 }

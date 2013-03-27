@@ -43,21 +43,4 @@ class Synchronise_Edumate_Tigs_Strategy_Staff extends Synchronise_Edumate_Tigs_S
 		$newUser['group_id']      = 1;
 		return $newUser;
 	}
-
-	/**
-	 * Process them
-	 *
-	 */
-	public function createIfExists() {
-		$this->getVerboseFilter()->intro();
-
-		foreach ($this->getList() as $currentUser) {
-			// Generate details about the new user
-			$newUser = $this->setupUserDetails($currentUser);
-			$this->executeCreateUpdate($newUser);
-		}
-
-		$this->getVerboseFilter()->summary();
-	}
-
 }
