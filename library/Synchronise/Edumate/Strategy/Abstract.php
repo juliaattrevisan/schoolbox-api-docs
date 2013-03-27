@@ -111,14 +111,15 @@ abstract class Synchronise_Edumate_Strategy_Abstract extends Synchronise_Synerge
             LEFT JOIN groups ON user.group_id = groups.id
             LEFT JOIN userCampus ON user.id = userCampus.uid
             WHERE user.synergy_id = '{$newUser['synergy_id']}'
+            ORDER BY userCampus.defaultCampus DESC
         ";
-
-		// Only lock user to group if parent account
-		if ($newUser['group_id'] == self::PARENT_GROUP_ID)
-			$query .= " AND groups.id = '{$newUser['group_id']}'";
-
-
-		$query .= " ORDER BY userCampus.defaultCampus DESC";
+//
+//		// Only lock user to group if parent account
+//		if ($newUser['group_id'] == self::PARENT_GROUP_ID)
+//			$query .= " AND groups.id = '{$newUser['group_id']}'";
+//
+//
+//		$query .= " ORDER BY userCampus.defaultCampus DESC";
 
 		return $this->getUserHandler()->db->getRow($query);
 	}
