@@ -359,12 +359,10 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      * Sync Method: Student
      */
     public function getStudentUserAccountInfo() {
-        //
-        // TODO get network login field in view
         $stmt = $this->getDatabase()->prepare('
             SELECT
             STUDENT_NUMBER AS "StudentID",
-            NULL           AS "NetworkLogin",
+            USERNAME       AS "NetworkLogin",
             NULL           AS "StudentTitle",
             FIRSTNAME      AS "StudentPreferred",
             SURNAME        AS "StudentSurname",
