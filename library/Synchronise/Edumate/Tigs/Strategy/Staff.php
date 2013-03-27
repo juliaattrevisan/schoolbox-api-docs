@@ -38,9 +38,9 @@ class Synchronise_Edumate_Tigs_Strategy_Staff extends Synchronise_Edumate_Tigs_S
 
 		// Campus config: needs to map to a campus id
 		$newUser['defaultCampus'] = $this->getCampusFromCode($currentUser['StaffCampus']);
-		$newUser['campus'] = array($this->getCampusFromCode($currentUser['StaffCampus']));
+		$newUser['campus']        = array($this->getCampusFromCode($currentUser['StaffCampus']));
 
-		$newUser['group_id'] =  $this->getGroupIDFromCategory($currentUser['StaffCategoryType']);
+		$newUser['group_id']      = 1;
 		return $newUser;
 	}
 
@@ -54,12 +54,6 @@ class Synchronise_Edumate_Tigs_Strategy_Staff extends Synchronise_Edumate_Tigs_S
 		foreach ($this->getList() as $currentUser) {
 			// Generate details about the new user
 			$newUser = $this->setupUserDetails($currentUser);
-
-//			// Default campus to 1, but only if no campuses were determined (use array filter to remove empty elements)
-//			if (!count(array_filter($newUser['campus']))) {
-//				$newUser['campus'] = array(self::DEFAULT_CAMPUS);
-//			}
-
 			$this->executeCreateUpdate($newUser);
 		}
 
