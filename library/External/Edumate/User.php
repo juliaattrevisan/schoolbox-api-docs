@@ -359,7 +359,24 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      * Sync Method: Student
      */
     public function getStudentUserAccountInfo() {
-        // TODO Student Sync
+        //
+        // TODO get network login field in view
+        $stmt = $this->getDatabase()->prepare('
+            SELECT
+            STUDENT_NUMBER AS "StudentID",
+            NULL           AS "NetworkLogin",
+            NULL           AS "StudentTitle",
+            FIRSTNAME      AS "StudentPreferred",
+            SURNAME        AS "StudentSurname",
+            NULL           AS "StudentEmail",
+            NULL           AS "StudentOccupEmail",
+            YEAR_LEVEL     AS "StudentYearLevel",
+            HOUSE          AS "StudentHouse",
+            NULL           AS "StudentCampus"
+            FROM db2inst1.schoolbox_students
+        ');
+        $stmt->execute();
+        return $stmt->fetchAll(DB2::FETCH_ASSOC);
     }
 
     /**
