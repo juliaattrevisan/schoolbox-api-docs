@@ -56,7 +56,8 @@ $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 
 /* BUILD COMPONENTRY */
 $componentFactory = new Component_Eportfolio_Factory(new User, $this);
-$componentCollection = $componentFactory->buildComponentList($userID);
+$componentCollection = $componentFactory->buildComponentList($userId);
+
 $permission =99;
 
 // User has elevated priviliges: can write to page
@@ -199,7 +200,8 @@ if ($permission >= WRITE_ACCESS) {
     for ($x = 1; $x <= 4; $x++) {
         $this->setVar("CURRENT_TEMPLATE_$x", $template == $x ? 'current' : '');
     }
-} else {
+}
+else {
     $this->setVar(array(
         'edit_page_block' => '',
         'modify_layout_block' => '',
@@ -207,18 +209,6 @@ if ($permission >= WRITE_ACCESS) {
         'colour_list_block' => '',
     ));
 }
-
-////set the page-level parameters in the template
-//$categoryCodes = $catHandler->getCodeForCategory($categoryID);
-//$code = $categoryCodes['codes'];
-//$codeArray = explode(',', $code);
-//
-//if(count($codeArray) > 4) {
-//    $codeString = Scrub::text(implode(',',array_slice($codeArray, 0, 4)).'....');
-//}
-//else {
-//    $codeString = Scrub::text($code);
-//}
 
 $allWidths = $eportfolioHandler->getColumnWidths();
 
@@ -306,11 +296,12 @@ if (is_array($allowedList)) {
 
 /* PARSE COMPONENTRY */
 $occupiedPositionList = array();
+
 foreach ($componentCollection as $component) {
     $templateTarget = "component_position_{$component->position}";
     $templateHandle = "component_{$component->definitionId}";
 
-    $component->setup($category, $component->instance->getConfigArray());
+    $component->setup($user, $component->instance->getConfigArray());
 
     if ($component->execute() !== false) {
         if ($component->renderTemplate($templateHandle) !== false) {
