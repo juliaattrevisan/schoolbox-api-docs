@@ -402,6 +402,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
             	AS ps ON p.CARER_NUMBER = ps.CARER_NUMBER
             INNER JOIN db2inst1.schoolbox_students
             	AS s ON ps.STUDENT_NUMBER = s.STUDENT_NUMBER
+            ORDER BY INTEGER(p.CARER_NUMBER) ASC, INTEGER(s.STUDENT_NUMBER) ASC
         ');
 	    $stmt->execute();
 	    return $stmt->fetchAll(DB2::FETCH_ASSOC);
