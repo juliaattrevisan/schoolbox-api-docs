@@ -120,7 +120,11 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 		}
 	}
 
-	$body = $mime->get();
+	$body = $mime->get(array(
+		'html_charset' => 'utf-8',
+		'text_charset' => 'utf-8',
+		'head_charset' => 'utf-8',
+	));
 
 	if(Cfg::get('mail_smtp_host'))
 		$params['host'] = Cfg::get('mail_smtp_host');
