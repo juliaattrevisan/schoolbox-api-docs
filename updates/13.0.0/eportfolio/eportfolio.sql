@@ -28,3 +28,7 @@ DROP TABLE eportfolio_objective_interest;
 DROP TABLE eportfolio_objective_skill;
 DROP TABLE eportfolio_privateNotes;
 DROP TABLE eportfolio_textBox;
+
+/* Alter component_instance to allow eportfolio_template as an enum value
+ */
+ALTER TABLE `component_instance` CHANGE `module` `module` ENUM('dashboard','homepage','homepage_template','eportfolio','eportfolio_template') CHARSET utf8 COLLATE utf8_general_ci NULL;
