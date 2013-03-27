@@ -14,6 +14,18 @@
 abstract class Synchronise_Edumate_Tigs_Strategy_Abstract extends Synchronise_Edumate_Strategy_Abstract {
 
 	/**
+	 * Constructor
+	 * Instantiate additional classes
+	 */
+	public function __construct() {
+		parent::__construct();
+
+		//
+		// Why bother with separate verbose classes?
+		$this->setVerboseFilter(new Synchronise_Edumate_Tigs_Verbose());
+	}
+
+	/**
 	 * Figure out which campus a student member is in, based on the code provided
 	 *
 	 * Copy-pasted, should be in base class.
@@ -22,8 +34,20 @@ abstract class Synchronise_Edumate_Tigs_Strategy_Abstract extends Synchronise_Ed
 	 * @return bool|string
 	 */
 	protected function getCampusFromCode($code) {
-		// at time of writing, there are 3 campuses listed inside Schoolbox, however everyone is being assigned to BGS(1)
-		return 1;
+		$campus = null;
+		switch (strtolower($code)) {
+			case 'senior school':
+				$campus = 1;
+				break;
+
+			case 'junior school':
+				$campus = 2;
+				break;
+
+			default:
+				break;
+		}
+		return $campus;
 	}
 
 	/**
