@@ -21,18 +21,20 @@ class Component_Eportfolio_TestController extends Component_Eportfolio_Controlle
     public function execute() {
         return true;
     }
-    
-    /**
-    * Outputs HTML template defined by config variable 'template'
-    *
-    * @return bool
-    */ 
-   public function renderTemplate($templateHandle) {
-        if(!parent::loadTemplate($templateHandle, $this->getConfig('template'))) {
-            return false;
-        }
+
+	/**
+	 * Outputs HTML template defined by config variable 'template'
+	 *
+	 * @param String $templateHandle
+	 * @return bool
+	 */
+	public function renderTemplate($templateHandle) {
+		if(!parent::loadTemplate($templateHandle, $this->getConfig('template'))) {
+			return false;
+		}
+
+		$this->parseConfig();
    
         return true;
     }
-    
 }
