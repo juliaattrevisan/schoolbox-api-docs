@@ -383,7 +383,28 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      * Sync Method: Parent
      */
     public function getParentUserAccountInfo() {
-        // TODO Parent Sync
+	    $stmt = $this->getDatabase()->prepare('
+	        SELECT
+			p.CARER_NUMBER        AS "StudentContactID",
+			NULL                  AS "StudentContactTitle",
+			p.FULL_NAME           AS "StudentContactPreferred",
+			NULL                  AS "StudentContactSurname",
+			p.EMAIL               AS "StudentContactDefaultEmail",
+			p.SPOUSE_CARER_NUMBER AS "StudentContactSpouseID",
+			NULL                  AS "StudentContactSpouseTitle",
+			p.SPOUSE_FULL_NAME    AS "StudentContactSpousePreferred",
+			NULL                  AS "StudentContactSpouseSurname",
+			NULL                  AS "StudentContactSpouseDefaultEmail",
+			s.YEAR_LEVEL          AS "StudentYearLevel",
+			s.STUDENT_NUMBER      AS "StudentID"
+            FROM db2inst1.schoolbox_parents AS p
+            INNER JOIN db2inst1.schoolbox_parent_student
+            	AS ps ON p.CARER_NUMBER = ps.CARER_NUMBER
+            INNER JOIN db2inst1.schoolbox_students
+            	AS s ON ps.STUDENT_NUMBER = s.STUDENT_NUMBER
+        ');
+	    $stmt->execute();
+	    return $stmt->fetchAll(DB2::FETCH_ASSOC);
     }
 
     /**
