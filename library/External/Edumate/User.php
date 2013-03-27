@@ -373,7 +373,25 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      * Sync Method: Staff
      */
     public function getStaffUserAccountInfo() {
-        // TODO Staff Sync
+        $stmt = $this->getDatabase()->prepare('
+            SELECT
+                STAFF_NUMBER  AS "StaffID",
+                USERNAME      AS "NetworkLogin",
+                1             AS "ActiveFlag",
+                SALUTATION    AS "StaffTitle",
+                FIRSTNAME     AS "StaffPreferredName",
+                SURNAME       AS "StaffSurname",
+                NULL          AS "DefaultEmailCode",
+                EMAIL_ADDRESS AS "OccupEmail",
+                EMAIL_ADDRESS AS "Email",
+                CAMPUS        AS "StaffCampus",
+                NULL          AS "StaffCategoryType",
+                NULL          AS "StaffCategory"
+             FROM db2inst1.schoolbox_staff
+             WHERE USERNAME IS NOT NULL
+        ');
+        $stmt->execute();
+        return $stmt->fetchAll(DB2::FETCH_ASSOC);
     }
 
 
