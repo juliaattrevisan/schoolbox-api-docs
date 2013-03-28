@@ -375,6 +375,12 @@ abstract class Mapper {
         "
         );
 
+        foreach ($collection as $model) {
+            if (!($this->triggerCallbacks('preDelete', $model))) {
+                return false;
+            }
+        }
+
         $this->database->beginTransaction();
         foreach ($collection as $model) {
             $statement->bindParam(':identifierValue', $this->getModelProperty($model, $identifierName, $this->identifier));
@@ -384,6 +390,10 @@ abstract class Mapper {
             }
         }
         $this->database->commit();
+
+        foreach ($collection as $model) {
+            $this->triggerCallbacks('postDelete', $model);
+        }
 
         return true;
     }
