@@ -78,6 +78,13 @@ abstract class Mapper {
 	protected $identifier;
 
     /**
+	 * Callbacks that are called on certain events within this mapper.
+	 *
+	 * @var array
+	 */
+	protected $callback_queue = array();
+
+    /**
      * Stores the singleton instance of the mapper
      *
      * @var Mapper
@@ -313,10 +320,19 @@ abstract class Mapper {
             VALUES ($plcString)
             ON DUPLICATE KEY UPDATE $updString;
         ");
-        $this->database->beginTransaction();
 
         $affectedIDs = array();
 
+        //
+        // Trigger all on collection before attempting to run?
+        // Must for now, because otherwise transactions would be nested.
+        foreach ($collection as $model) {
+            if (!($this->triggerCallbacks('preSave', $model))) {
+                return false;
+            }
+        }
+
+        $this->database->beginTransaction();
         foreach ($collection as $model) {
             foreach ($this->map as $map) {
                 $propertyName = $map['property'];
@@ -336,8 +352,13 @@ abstract class Mapper {
                 return false;
             }
         }
-
         $this->database->commit();
+
+        foreach ($collection as $model) {
+            if ($this->getModelProperty($model, $identifier, $this->identifier)) {
+                $this->triggerCallbacks('postSave', $model);
+            }
+        }
 
         return $affectedIDs;
     }
@@ -744,6 +765,35 @@ abstract class Mapper {
         $segmentList = preg_split('/(?=[A-Z])/', $string, -1, PREG_SPLIT_NO_EMPTY);
 
         return strtolower(implode('_', $segmentList));
+    }
+
+    /**
+     * Registers a callback on a point.
+     *
+     * Available points: preSave, postSave, preDelete, postDelete
+     *
+     * @param string   $point
+     * @param callable $method
+     *
+     * @return $this
+     */
+    public function registerCallback($point, $method) {
+        $this->callback_queue[$point][] = $method;
+        return $this;
+    }
+
+    public function triggerCallbacks($point) {
+        $params = array_slice(func_get_args(), 1);
+        if (array_key_exists($point, $this->callback_queue)) {
+            foreach ($this->callback_queue[$point] as $method) {
+                if (call_user_func_array($method, $params) === false) {
+                    //
+                    // Consider providing details on which callback failed.
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 }
