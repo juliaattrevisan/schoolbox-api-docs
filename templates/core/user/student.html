@@ -1,7 +1,7 @@
 <div class="profile">
-    <h1>{NAME}</h1>
 
     <div class="profile-info">
+        <h1>{NAME}</h1>
         <div class="profile-img">
             <!-- BEGIN portrait -->
             <img src="/portrait.php?userId={SYNERGY_ID}&size=profile"/>
@@ -115,10 +115,10 @@
             <!-- BEGIN subject_item -->
             <li>
                 <div class="subject">{SUBJECT_NAME}<span class="icon"></span></div>
-                <div class="adefe">
+                <div class="profile">
                     <a href="#" class="teacher-profile">
                         <img src="/portrait.php?userId={SUBJECT_TEACHER_ID}&size=square32" />
-                        {SUBJECT_TEACHER_NAME}
+                        <span class="name">{SUBJECT_TEACHER_NAME}</span>
                         <span class="role">Teacher</span>
                     </a>
                     <a class="mail-teacher" href="#">Mail</a>
@@ -142,44 +142,55 @@
 
     <!-- BEGIN contact_synergy -->
     <div class="contact-info">
-        <h2>Contact Information</h2>
+        <div class="contact-information">
+            <h2>Contact Information</h2>
 
-        <!-- BEGIN contact_details -->
-        <ul>
-            <li>
-                <img src="/portrait.php?userId={SUBJECT_TEACHER_ID}&size=square32"/>
-                {CONTACT_NAME_EMAIL}
-                {SUBJECT_TEACHER_NAME}
-            </li>
-            <li>
-                <!--Mobile-->
-                {CONTACT_MOBILE_PHONE}
-                <!--Work-->
-                {CONTACT_OCCUP_PHONE}
-            </li>
-        </ul>
+            <!-- BEGIN contact_alert -->
+            <ul class="contact-alert">
+                <li><img src="/images/famicons/exclamation.png" title="important"/><span>{CONTACT_ALERT_MESSAGE}</span></li>
+            </ul>
+            <!-- END contact_alert -->
 
-        <!-- BEGIN spouse_details -->
-        <ul>
-            <li>
-                {SPOUSE_NAME_EMAIL}
-                {SPOUSE_MOBILE_PHONE}
-                {SPOUSE_OCCUP_PHONE}
-            </li>
-        </ul>
-        <!-- END spouse_details -->
+            <!-- BEGIN contact_details -->
+            <ul>
+                <li>
+                    <div class="profile">
+                        <a href="#" id="spouse" class="teacher-profile">
+                            <span class="name">{CONTACT_NAME}</span>
+                            <span class="role">{CONTACT_ROLE}</span>
+                            <span class="icon"></span>
+                        </a>
+                        <a class="mail-teacher" href="{CONTACT_EMAIL}">Mail</a>
+                        <!--Mobile-->
+                        <span class="mobile">{CONTACT_MOBILE_PHONE}</span>
+                        <!--Work-->
+                        <span class="phone">{CONTACT_OCCUP_PHONE}</span>
+                    </div>
+                </li>
+            </ul>
 
-        <ul>
-            <li>
-                Address: <br />
-                {CONTACT_ADDRESS}
-            </li>
-            <li>
-                Home Phone: <br />
-                {CONTACT_HOME_PHONE}
-            </li>
-        </ul>
-        <!-- END contact_details -->
+            <!-- BEGIN spouse_details -->
+            <ul class="contact-phone">
+                <li>
+                    {SPOUSE_NAME_EMAIL}
+                    <span class="mobile">{SPOUSE_MOBILE_PHONE}</span>
+                    <span class="phone">{SPOUSE_OCCUP_PHONE}</span>
+                </li>
+            </ul>
+            <!-- END spouse_details -->
+
+            <ul class="contact-details">
+                <li>
+                    <b>Address:</b> <br />
+                    {CONTACT_ADDRESS}
+                </li>
+                <li>
+                    <b>Home Phone:</b> <br />
+                    {CONTACT_HOME_PHONE}
+                </li>
+            </ul>
+            <!-- END contact_details -->
+        </div>
 
         <div class="emergency-contact">
 
@@ -229,6 +240,7 @@
                     {EMERGENCY_ALT_PHONE_3}
                 </li>
             </ul>
+
         </div>
         <!-- END contact_synergy -->
     </div>
