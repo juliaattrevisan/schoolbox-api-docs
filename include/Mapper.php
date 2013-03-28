@@ -375,6 +375,7 @@ abstract class Mapper {
         "
         );
 
+        $this->database->beginTransaction();
         foreach ($collection as $model) {
             $statement->bindParam(':identifierValue', $this->getModelProperty($model, $identifierName, $this->identifier));
 
@@ -382,6 +383,7 @@ abstract class Mapper {
                 return false;
             }
         }
+        $this->database->commit();
 
         return true;
     }
