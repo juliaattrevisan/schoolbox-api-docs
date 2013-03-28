@@ -38,7 +38,7 @@ $pageId = $this->arg[1];
 
 /* Setup the eportfolio handler
  */
-$eportfolioHandler = new Eportfolio($userId);
+$eportfolioHandler = new Eportfolio($userId, $pageId);
 
 if ($eportfolioHandler->getTemplate() === false) {
 	die('no template');
@@ -214,8 +214,6 @@ else {
     ));
 }
 
-/* Figure out column widths
- */
 $this->setVar(array(
     'HEADING' => Scrub::text($user['firstname'] . ' ' . $user['lastname']),
     'ID' => $user['uid'],
@@ -258,7 +256,8 @@ $this->setVar('COLOUR_ARRAY', 'pickers');
 $this->setVar($colours);
 $this->parse('colour_list_block', 'colour_list', true);
 
-// Widths
+/* Figure out column widths
+ */
 $allWidths = $eportfolioHandler->getColumnWidths();
 
 $this->setVar(array(
