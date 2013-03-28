@@ -1,11 +1,11 @@
 <?php
 /**
- *
- * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
- * @copyright   2011 Alaress Pty Ltd
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   2013 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  *
+ * Originally cloned from bugalugs
  */
 $this->setFile(TEMPLATE_content, 'eportfolio/index.html');
 
@@ -26,6 +26,7 @@ if (!isset($user['uid'])) {
 }
 
 $userId = $user['uid'];
+$pageId = $this->arg[1];
 
 /* confirm that the user has permission to view this page
  */
@@ -39,14 +40,26 @@ $userId = $user['uid'];
  */
 $eportfolioHandler = new Eportfolio($userId);
 
-if($eportfolioHandler->getTemplate() === false) {
+if ($eportfolioHandler->getTemplate() === false) {
 	die('no template');
 }
 
-//// moving forward! log the pageview
-//$catHandler->logPageView($categoryID);
+/* Assemble list of components
+ */
+$componentFactory = new Component_Eportfolio_Factory(new User, $this);
+$componentCollection = $componentFactory->buildComponentList($userId);
 
-/* BUILD PAGE */
+/* Determine access permissions
+ * TODO: Currently hardcoded
+ */
+$permission = 99;
+
+/* Page colours
+ */
+$colours = $eportfolioHandler->getColorList($pageId);
+
+/* Set up blocks and stuff
+ */
 $this->setTitle($category['name']);
 $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
@@ -54,13 +67,8 @@ $this->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
 $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
 $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 
-/* BUILD COMPONENTRY */
-$componentFactory = new Component_Eportfolio_Factory(new User, $this);
-$componentCollection = $componentFactory->buildComponentList($userId);
-
-$permission =99;
-
-// User has elevated priviliges: can write to page
+/* Customise page settings if you are the page owner or superuser
+ */
 if ($permission >= WRITE_ACCESS) {
     $this->setBlock('customise_page', 'eportfolio_component_tab', 'eportfolio_component_tab_block');
     $this->setBlock('customise_page', 'eportfolio_component_page', 'eportfolio_component_page_block');
@@ -73,6 +81,7 @@ if ($permission >= WRITE_ACCESS) {
 
     foreach ($definitionCollection as $definition) {
         $definition->instanceCount = 0;
+
         foreach ($componentCollection as $inst) {
             if ($inst->definitionId == $definition->id) {
                 ++$definition->instanceCount;
@@ -98,16 +107,14 @@ if ($permission >= WRITE_ACCESS) {
 
             $class = trim($class);
 
-            $output = array(
-                'EPORTFOLIO_COMPONENT_ID' => Scrub::text($component->id),
-                'EPORTFOLIO_COMPONENT_NAME' => Scrub::text($component->name),
-                'EPORTFOLIO_COMPONENT_COUNT' => $component->instanceCount,
-                'EPORTFOLIO_COMPONENT_DESCRIPTION' => Scrub::text($component->description),
-                'EPORTFOLIO_COMPONENT_CLASS' => $class,
-                'EPORTFOLIO_COMPONENT_CATEGORY_ID' => $previous->componentCategory,
-            );
-
-            $this->setVar($output);
+            $this->setVar(array(
+				'EPORTFOLIO_COMPONENT_ID' => Scrub::text($component->id),
+				'EPORTFOLIO_COMPONENT_NAME' => Scrub::text($component->name),
+				'EPORTFOLIO_COMPONENT_COUNT' => $component->instanceCount,
+				'EPORTFOLIO_COMPONENT_DESCRIPTION' => Scrub::text($component->description),
+				'EPORTFOLIO_COMPONENT_CLASS' => $class,
+				'EPORTFOLIO_COMPONENT_CATEGORY_ID' => $previous->componentCategory,
+			));
 
             if ($component->componentCategory != $previous->componentCategory && $i > 1) {
                 $this->parse('eportfolio_component_page_block', 'eportfolio_component_page', true);
@@ -148,29 +155,24 @@ if ($permission >= WRITE_ACCESS) {
 
     if (isset($tabList) && count($tabList)) {
         foreach ($tabList as $id => $tab) {
+            $this->setVar(array(
+				'COMPONENT_CATEGORY_ID' => $id,
+				'COMPONENT_CATEGORY_NAME' => $tab['name'],
+				'COMPONENT_CATEGORY_COUNT' => $tab['count']
+			));
 
-            $output = array(
-                'COMPONENT_CATEGORY_ID' => $id,
-                'COMPONENT_CATEGORY_NAME' => $tab['name'],
-                'COMPONENT_CATEGORY_COUNT' => $tab['count']
-            );
-
-            $this->setVar($output);
             $this->parse('eportfolio_component_tab_block', 'eportfolio_component_tab', true);
         }
     }
 
-
     // Colors (original)
-    $listColor = $eportfolioHandler->getColorList($this->arg[1]);
-
     $this->setVar('COLOUR_ARRAY', 'original');
-    $this->setVar($listColor);
+    $this->setVar($colours);
     $this->parse('colour_list_block', 'colour_list', true);
 
     // Colors (picker)
     $this->setVar('COLOUR_ARRAY', 'pickers');
-    $this->setVar($listColor);
+    $this->setVar($colours);
     $this->parse('colour_list_block', 'colour_list', true);
 
     // Defaults
@@ -196,10 +198,12 @@ if ($permission >= WRITE_ACCESS) {
     $this->parse('colour_list_block', 'colour_list', true);
 
     // Template control
-    $template = $eportfolioHandler->getTemplate();
-    for ($x = 1; $x <= 4; $x++) {
-        $this->setVar("CURRENT_TEMPLATE_$x", $template == $x ? 'current' : '');
-    }
+	/* What does this even do?
+	 */
+//    $template = $eportfolioHandler->getTemplate();
+//    for ($x = 1; $x <= 4; $x++) {
+//        $this->setVar("CURRENT_TEMPLATE_$x", $template == $x ? 'current' : '');
+//    }
 }
 else {
     $this->setVar(array(
@@ -210,51 +214,49 @@ else {
     ));
 }
 
-$allWidths = $eportfolioHandler->getColumnWidths();
-
+/* Figure out column widths
+ */
 $this->setVar(array(
     'HEADING' => Scrub::text($user['firstname'] . ' ' . $user['lastname']),
     'ID' => $user['uid'],
     'USER_TOKEN' => $_SESSION['key'],
 ));
 
-// Colors (original)
-
-$listColor = $eportfolioHandler->getColorList($this->arg[1]);
-
-$this->setVar('COLOUR_ARRAY', 'original');
-$this->setVar($listColor);
-$this->parse('colour_list_block', 'colour_list', true);
-
-
-// Colors (picker)
-$this->setVar('COLOUR_ARRAY', 'pickers');
-$this->setVar($listColor);
-$this->parse('colour_list_block', 'colour_list', true);
-
-
-// Defaults
+/* Apply default colours to everything
+ */
 $defaultColour = array(
-    'head_font' => Cfg::get('homepage_colour_head_font'),
-    'head_bg' => Cfg::get('homepage_colour_head_bg'),
-    'font' => Cfg::get('homepage_colour_font'),
-    'bg_primary' => Cfg::get('homepage_colour_bg_primary'),
-    'bg_secondary' => Cfg::get('homepage_colour_bg_secondary'),
-    'link' => Cfg::get('homepage_colour_link'),
-    'hover' => Cfg::get('homepage_colour_hover')
+	'head_font' => Cfg::get('homepage_colour_head_font'),
+	'head_bg' => Cfg::get('homepage_colour_head_bg'),
+	'font' => Cfg::get('homepage_colour_font'),
+	'bg_primary' => Cfg::get('homepage_colour_bg_primary'),
+	'bg_secondary' => Cfg::get('homepage_colour_bg_secondary'),
+	'link' => Cfg::get('homepage_colour_link'),
+	'hover' => Cfg::get('homepage_colour_hover')
 );
 
-$columns = array('top', 'left', 'right');
-
 $this->setVar('COLOUR_ARRAY', 'defaults');
+
+$columns = array('top', 'left', 'right');
 
 foreach ($columns as $col) {
     foreach ($defaultColour as $field => $colour) {
         $this->setVar($col . '_' . $field, $colour);
     }
 }
+
 $this->parse('colour_list_block', 'colour_list', true);
 
+/* Javascript colour values for the original
+ */
+$this->setVar('COLOUR_ARRAY', 'original');
+$this->setVar($colours);
+$this->parse('colour_list_block', 'colour_list', true);
+
+/* Javascript colour values for the picker
+ */
+$this->setVar('COLOUR_ARRAY', 'pickers');
+$this->setVar($colours);
+$this->parse('colour_list_block', 'colour_list', true);
 
 // Widths
 $allWidths = $eportfolioHandler->getColumnWidths();
@@ -264,10 +266,8 @@ $this->setVar(array(
     'TEMPLATE_RIGHT_COLUMN_WIDTH' => $allWidths['right_column_width'],
 ));
 
-$colours = $eportfolioHandler->getColorList($this->arg[1]);
-$this->setVar($colours);
-
-// output MIMEs
+/* CSS classes for mime types
+ */
 $allowedFiles = new AllowedFile;
 $allowedList = $allowedFiles->getAll();
 
@@ -279,21 +279,19 @@ if (is_array($allowedList)) {
 
     foreach ($allowedList as $allowed) {
         if ($last != $allowed["iconFile"]) {
-            $output = array(
-                "NAME" => $allowedFiles->getClass($allowed["iconFile"]),
-                "ICON" => $allowed["iconFile"],
-            );
-
-            $this->setVar($output);
+            $this->setVar(array(
+				"NAME" => $allowedFiles->getClass($allowed["iconFile"]),
+				"ICON" => $allowed["iconFile"],
+			));
             $this->parse("allowed_files_block", "allowed_files", true);
 
             $last = $allowed["iconFile"];
         }
     }
-} else {
+}
+else {
     $this->setVar('allowed_files_block', '');
 }
-
 
 /* PARSE COMPONENTRY */
 $occupiedPositionList = array();
