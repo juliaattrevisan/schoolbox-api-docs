@@ -665,7 +665,7 @@ class Eportfolio {
 		}
 
 		$query = substr($query, 0, -2);
-		$query .= " WHERE uid = '$this->getUserId()}'";
+		$query .= " WHERE uid = '{$this->getUserId()}'";
 
 		return $this->db->query($query);
 	}
