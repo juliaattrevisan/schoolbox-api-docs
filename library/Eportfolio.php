@@ -125,6 +125,24 @@ class Eportfolio {
 	}
 
 	/**
+	 * Update a page title
+	 *
+	 * @param $value
+	 */
+	public function updatePageTitle($value) {
+		$query = "
+			UPDATE {$this->getContext()}_config
+			SET page_title = \"{$value}\"
+			WHERE page_id = '{$this->getPageId()}'
+			AND uid = '{$this->getUserId()}'
+			LIMIT 1
+		";
+
+		$this->getDb()->query($query);
+	}
+
+
+	/**
 	 * @deprecated
 	 * @param null $type
 	 * @param null $userId

@@ -3,6 +3,11 @@ require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
 $page = new SitePage();
 $groupHandler = new Group(HOMEPAGE_SERVICE);
+var_dump(isset($_POST['page_id']));
+var_dump(is_numeric($_POST['page_id']));
+var_dump(isset($_POST['user_id']));
+var_dump(is_numeric($_POST['user_id']));
+var_dump(strlen(trim($_POST['pageTitle'])));
 
 /* Ajax save page colours. When instantiating the Eportfolio object, assume page owner
  * is currently logged in. The colourpicker is built to only send one primary name/key'
@@ -18,6 +23,13 @@ if (is_array($_POST['colors']) && isset($_POST['page_id']) && is_numeric($_POST[
 	$eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
 	$eportfolioHandler->saveDisplayProperties($color);
 }
+/* Save page title
+ */
+else if (isset($_POST['page_id']) && is_numeric($_POST['page_id']) && isset($_POST['user_id']) && is_numeric($_POST['user_id']) && strlen(trim($_POST['pageTitle']))) {
+	$eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
+	$eportfolioHandler->updatePageTitle(trim($_POST['pageTitle']));
+}
+
 else if (is_numeric($_REQUEST['uid'])) {
 //	if ($groupHandler->getPermission($_REQUEST['uid']) < WRITE_ACCESS) {
 //		error(19);
@@ -192,5 +204,6 @@ else if (is_numeric($_REQUEST['uid'])) {
 
 // no uid provided
 else {
+
 	error(2);
 }
