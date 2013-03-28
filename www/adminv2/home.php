@@ -59,14 +59,8 @@ else {
 
 /* External system checks */
 if(Cfg::get('external_enable')) {
-	if ( Cfg::get('external_type') == 'denbigh') {
-		$dbf = @mysql_connect(Cfg::get('external_db_host'), Cfg::get('external_db_user'),  Cfg::get('external_db_passwd'));
-	}
-	else {
-    	$dbf = @mssql_connect(Cfg::get('external_db_host'), Cfg::get('external_db_user'),  Cfg::get('external_db_passwd'));
-	}
-	
-    if($dbf) {
+	$external_ping = new External_Ping();
+    if ($external_ping->isResponsive()) {
         $db = array('EXTERNAL_DB'   => ucfirst(Cfg::get('external_type')),
                     'EXTERNAL_DB_LIGHT' => 'on',
                     'EXTERNAL_DB_STATUS' => 'Online',);
