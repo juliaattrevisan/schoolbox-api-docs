@@ -114,9 +114,11 @@
 <div id="tabs-homepage">
 <ul class="clearfix">
     <li><a href="#tabs-1">Components</a></li>
-    <li><a href="#tabs-2">Colours</a></li>
-    <li><a href="#tabs-3">Column Widths</a></li>
+	<li><a href='#tabs-2'>Page Settings</a></li>
+    <li><a href="#tabs-3">Colours</a></li>
+    <li><a href="#tabs-4">Column Widths</a></li>
 </ul>
+
 <div id="tabs-1" class="customise-components">
     <div id="tabs-sub">
         <table border="0" cellpadding="0" cellspacing="0">
@@ -124,33 +126,65 @@
                 <col width="128" />
             </colgroup>
             <tr>
-                <td valign="top"><ul>
-                    <!-- BEGIN eportfolio_component_tab -->
-                    <li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
-                    <!-- END eportfolio_component_tab -->
-                </ul></td>
-                <td><div class="components clearfix">
-                    <!-- BEGIN eportfolio_component_page -->
-                    <div id="tabs-sub-{EPORTFOLIO_COMPONENT_CATEGORY_ID}">
-                        <!-- BEGIN eportfolio_component -->
-                        <div class="add-component {EPORTFOLIO_COMPONENT_CLASS} clearfix">
-                            <h4>{EPORTFOLIO_COMPONENT_NAME} <strong>(<em>{EPORTFOLIO_COMPONENT_COUNT}</em>)</strong></h4>
-                            <p>{EPORTFOLIO_COMPONENT_DESCRIPTION}</p>
-                            <span class="notification"><strong></strong>Added</span>
-                            <a href="#" rel="{EPORTFOLIO_COMPONENT_ID}" class="btn add"><span></span>Add</a>
-
-                        </div>
-                        <!-- END eportfolio_component -->
-                    </div>
-                    <!-- END eportfolio_component_page -->
-                </div>
+                <td valign="top">
+					<ul>
+						<!-- BEGIN eportfolio_component_tab -->
+						<li><a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">{COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})</a></li>
+						<!-- END eportfolio_component_tab -->
+                	</ul>
+				</td>
+                <td>
+					<div class="components clearfix">
+						<!-- BEGIN eportfolio_component_page -->
+						<div id="tabs-sub-{EPORTFOLIO_COMPONENT_CATEGORY_ID}">
+							<!-- BEGIN eportfolio_component -->
+							<div class="add-component {EPORTFOLIO_COMPONENT_CLASS} clearfix">
+								<h4>{EPORTFOLIO_COMPONENT_NAME} <strong>(<em>{EPORTFOLIO_COMPONENT_COUNT}</em>)</strong></h4>
+								<p>{EPORTFOLIO_COMPONENT_DESCRIPTION}</p>
+								<span class="notification"><strong></strong>Added</span>
+								<a href="#" rel="{EPORTFOLIO_COMPONENT_ID}" class="btn add"><span></span>Add</a>
+							</div>
+							<!-- END eportfolio_component -->
+						</div>
+						<!-- END eportfolio_component_page -->
+	                </div>
                 </td>
             </tr>
         </table>
     </div>
 </div>
 <!--/tabs-1-->
-<div id="tabs-2" class="customise-components clearfix">
+
+<div id="tabs-2" class="customise-components">
+	<div class="clearfix">
+		<form method='post' action='/eportfolio/configForm.php'>
+			<label>
+				Page Title:
+				<input type='text' name='pageTitle' value="{PAGE_TITLE}" />
+			</label>
+			<input type='hidden' name='userId' value='{USER_ID}' />
+			<input type='hidden' name='pageId' value='{PAGE_ID}' />
+			<input type='submit' value='submit' />
+		</form>
+
+		<form method="post" action="">
+			<p class="information-notification pad-it">
+				In order to adjust the widths of the left and right columns on the page, drag the slider
+				below left and right.
+			</p>
+			<div class="clearfix slide-guide">
+				<h3>Column width slider</h3>
+				<div class="slider-house">
+					<div id="slider"></div>
+				</div>
+			</div>
+			<div class="saved-layout">Saved layout</div>
+		</form>
+	</div>
+</div>
+
+
+<div id="tabs-3" class="customise-components clearfix">
     <div class="clearfix">
         <div class="colours topColumn clearfix">
             <h3>Top Column</h3>
@@ -293,34 +327,16 @@
 
     <div class="colours-buttons clearfix">
         <form method="POST" class="clearfix" action="" name="saveColours">
-
             <button class="submit-btn-plain save-colours" type="button" id="saveColour">Save colour set</button>
             <button class="submit-btn-plain" type="button" id="leftRight" >Copy top colours &gt; left &amp; right</button>
             <button class="submit-btn-plain" type="button" id="restore" >Reset Colours</button>
             <button class="submit-btn-plain" type="button" id="cancel" >Cancel</button>
-
         </form>
 
         <div class="saved-colours">Saved colour set!</div>
     </div>
 </div>
 <!--/tabs-2-->
-<div id="tabs-3" class="customise-components layouts">
-    <form method="POST" action="" >
-        <p class="information-notification pad-it ">In order to adjust the
-            widths of the left and right columns on the page, drag the slider
-            below left and right. </p>
-        <div class="clearfix slide-guide">
-            <h3>Column width slider</h3>
-            <div class="slider-house">
-                <div id="slider"></div>
-            </div>
-        </div>
-        <div class="saved-layout">Saved layout</div>
-
-    </form>
-</div>
-<!--/tabs-3-->
 </div>
 <!-- END customise_page -->
 
