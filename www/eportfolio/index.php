@@ -73,7 +73,8 @@ $this->setVar(array(
 	'HEADING' => Scrub::text($user['firstname'] . ' ' . $user['lastname']),
 	'ID' => $user['uid'],
 	'USER_TOKEN' => $_SESSION['key'],
-	'PAGE_TITLE' => $eportfolioHandler->getPageTitle()
+	'PAGE_TITLE' => $eportfolioHandler->getPageTitle(),
+	'PAGE_ID' => $eportfolioHandler->getPageId(),
 ));
 
 /* Customise page settings if you are the page owner or superuser

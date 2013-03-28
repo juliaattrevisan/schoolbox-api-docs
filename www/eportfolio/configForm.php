@@ -4,7 +4,21 @@ require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 $page = new SitePage();
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
-if (is_numeric($_REQUEST['uid'])) {
+/* Ajax save page colours. When instantiating the Eportfolio object, assume page owner
+ * is currently logged in. The colourpicker is built to only send one primary name/key'
+ * pair, rather than two, which is what would be nice.
+ */
+if (is_array($_POST['colors']) && isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
+	$color = array();
+
+	foreach ($_POST['colors'] as $key => $value) {
+		$color[$key] = substr($value, 1);
+	}
+
+	$eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
+	$eportfolioHandler->saveDisplayProperties($color);
+}
+else if (is_numeric($_REQUEST['uid'])) {
 //	if ($groupHandler->getPermission($_REQUEST['uid']) < WRITE_ACCESS) {
 //		error(19);
 //	}
@@ -107,19 +121,6 @@ if (is_numeric($_REQUEST['uid'])) {
 
         $component->getPageTemplate()->pparse($templateTarget, $templateHandle);
 	}
-
-	// AJAX Save eportfolio colours
-	else if ($_POST['uid'] && is_array($_POST['colors'])) {
-        $eportfolioHandler = new Eportfolio($_POST['uid']);
-        $color = array();
-
-        foreach ($_POST['colors'] as $key => $value) {
-			$color[$key] = substr($value, 1);
-		}
-
-		$eportfolioHandler->saveDisplayProperties($color);
-	}
-
 
 	// GET config options from homepage
 	else if ($_GET['uid'] && $_GET['type'] == 'config' && $_GET['component']) {

@@ -107,6 +107,15 @@ class Eportfolio {
 	}
 
 	/**
+	 * Get the page id
+	 *
+	 * @return bool
+	 */
+	public function getPageId() {
+		return $this->getSettingsKey('page_id');
+	}
+
+	/**
 	 * Returns the current template id
 	 *
 	 * @return mixed
@@ -727,18 +736,32 @@ class Eportfolio {
 	}
 
 	/**
+	 * Save colours for individual pages
+	 *
 	 * @param $listColor
 	 * @return resource
 	 */
 	public function saveDisplayProperties($listColor) {
-		$query = "UPDATE {$this->getContext()}_config SET ";
+		$query = "
+			UPDATE {$this->getContext()}_config
+			SET
+		";
+
+		$stack = array();
 
 		foreach($listColor as $key => $color) {
-			$query .= "`".mysql_real_escape_string($key)."` = '".mysql_real_escape_string($color)."', ";
+			$field = mysql_real_escape_string($key);
+			$value = mysql_real_escape_string($color);
+
+			$stack[] = "`{$field}` = '{$value}'";
 		}
 
-		$query = substr($query, 0, -2);
-		$query .= " WHERE uid = '{$this->getUserId()}'";
+		$query .= implode(',', $stack);
+
+		$query .= "
+			WHERE uid = '{$this->getUserId()}'
+			AND page_id = {$this->getPageId()}
+		";
 
 		return $this->db->query($query);
 	}
@@ -862,15 +885,6 @@ class Eportfolio {
 	 */
 	private function setPageId($pageId) {
 		$this->pageId = $pageId;
-	}
-
-	/**
-	 * Get page id
-	 *
-	 * @return int
-	 */
-	private function getPageId() {
-		return $this->pageId;
 	}
 
 	/**
