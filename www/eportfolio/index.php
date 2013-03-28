@@ -67,6 +67,15 @@ $this->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
 $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
 $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 
+/* Set meta data
+ */
+$this->setVar(array(
+	'HEADING' => Scrub::text($user['firstname'] . ' ' . $user['lastname']),
+	'ID' => $user['uid'],
+	'USER_TOKEN' => $_SESSION['key'],
+	'PAGE_TITLE' => $eportfolioHandler->getPageTitle()
+));
+
 /* Customise page settings if you are the page owner or superuser
  */
 if ($permission >= WRITE_ACCESS) {
@@ -213,12 +222,6 @@ else {
         'colour_list_block' => '',
     ));
 }
-
-$this->setVar(array(
-    'HEADING' => Scrub::text($user['firstname'] . ' ' . $user['lastname']),
-    'ID' => $user['uid'],
-    'USER_TOKEN' => $_SESSION['key'],
-));
 
 /* Apply default colours to everything
  */

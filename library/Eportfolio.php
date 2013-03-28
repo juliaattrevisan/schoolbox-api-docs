@@ -98,6 +98,15 @@ class Eportfolio {
 	}
 
 	/**
+	 * Get the page title
+	 *
+	 * @return bool
+	 */
+	public function getPageTitle() {
+		return $this->getSettingsKey('page_title');
+	}
+
+	/**
 	 * Returns the current template id
 	 *
 	 * @return mixed
