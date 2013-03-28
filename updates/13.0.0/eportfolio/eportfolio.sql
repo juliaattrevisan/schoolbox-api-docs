@@ -32,3 +32,7 @@ DROP TABLE eportfolio_textBox;
 /* Alter component_instance to allow eportfolio_template as an enum value
  */
 ALTER TABLE `component_instance` CHANGE `module` `module` ENUM('dashboard','homepage','homepage_template','eportfolio','eportfolio_template') CHARSET utf8 COLLATE utf8_general_ci NULL;
+
+/* Repurpose eportfolio_config to contain information about pages
+ */
+ALTER TABLE `eportfolio_config` ADD COLUMN `page_id` INT(11) NOT NULL AUTO_INCREMENT FIRST, ADD COLUMN `page_title` VARCHAR(255) NULL AFTER `page_id`, CHANGE `uid` `uid` INT(6) DEFAULT 0 NOT NULL, CHANGE `template` `template` TINYINT(1) DEFAULT 0 NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`page_id`);

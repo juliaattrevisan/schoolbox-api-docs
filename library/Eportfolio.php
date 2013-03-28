@@ -169,12 +169,23 @@ class Eportfolio {
 	}
 
 
-	function getColorList()
-	{
-		$query = "SELECT left_head_font, left_head_bg, left_font, left_bg_primary, left_bg_secondary, left_link, left_hover,
-						right_head_font, right_head_bg, right_font, right_bg_primary, right_bg_secondary, right_link, right_hover,
-						top_head_font, top_head_bg, top_font, top_bg_primary, top_bg_secondary, top_link, top_hover
-						FROM {$this->getContext()}_config WHERE uid = '{$this->getUserId()}'";
+	/**
+	 * Get a list of colours for a particular page
+	 *
+	 * @param $pageId
+	 * @return array|bool
+	 */
+	public function getColorList($pageId) {
+		$query = "
+			SELECT
+				left_head_font, left_head_bg, left_font, left_bg_primary, left_bg_secondary, left_link, left_hover,
+				right_head_font, right_head_bg, right_font, right_bg_primary, right_bg_secondary, right_link, right_hover,
+				top_head_font, top_head_bg, top_font, top_bg_primary, top_bg_secondary, top_link, top_hover
+			FROM {$this->getContext()}_config
+			WHERE uid = '{$this->getUserId()}'
+			AND page_id = '{$pageId}'
+		";
+
 		$colourList = $this->db->getRow($query);
 
 		// use defaults for missing colours

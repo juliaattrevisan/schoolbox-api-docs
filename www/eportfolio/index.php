@@ -162,7 +162,7 @@ if ($permission >= WRITE_ACCESS) {
 
 
     // Colors (original)
-    $listColor = $eportfolioHandler->getColorList();
+    $listColor = $eportfolioHandler->getColorList($this->arg[1]);
 
     $this->setVar('COLOUR_ARRAY', 'original');
     $this->setVar($listColor);
@@ -219,7 +219,8 @@ $this->setVar(array(
 ));
 
 // Colors (original)
-$listColor = $eportfolioHandler->getColorList();
+
+$listColor = $eportfolioHandler->getColorList($this->arg[1]);
 
 $this->setVar('COLOUR_ARRAY', 'original');
 $this->setVar($listColor);
@@ -263,7 +264,7 @@ $this->setVar(array(
     'TEMPLATE_RIGHT_COLUMN_WIDTH' => $allWidths['right_column_width'],
 ));
 
-$colours = $eportfolioHandler->getColorList();
+$colours = $eportfolioHandler->getColorList($this->arg[1]);
 $this->setVar($colours);
 
 // output MIMEs
