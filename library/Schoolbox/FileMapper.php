@@ -8,9 +8,10 @@
  */
 
 namespace Schoolbox;
-use Schoolbox;
+use Schoolbox\Mapper;
+use Schoolbox\File;
 
-class FileMapper extends Schoolbox\Mapper {
+class FileMapper extends Mapper {
 	protected function mapping () {
 		$this->hasTable('storage');
 		$this->hasModel('\\Schoolbox\\File');
@@ -57,34 +58,27 @@ class FileMapper extends Schoolbox\Mapper {
 			'type'              => self::TYPE_DATETIME,
 			'created_timestamp' => true,
 		));
-		//
-		// Location is NOT a mapped property, though it has a getter/setter.
+		$this
+			->registerCallback('postSave', array($this, 'postSave'))
+			->registerCallback('postDelete', array($this, 'postDelete'))
+		;
 	}
 
-
-	public function save($object) {
-		$objects = $this->getModelAsCollection($object);
-		$result  = parent::save($objects);
-		if ($result) {
-			foreach ($objects as $this_object) {
-				//
-				// If the object has a temp location: copy it from there.
-				// Update the filesize with the temp location.
-				$this_object->copyFromTempLocation();
-			}
-		}
-		return $result;
+	/**
+	 * Copies file from temp location into a location accessible by this model.
+	 *
+	 * @param File $object
+	 */
+	public function postSave(File $object) {
+		$object->copyFromTempLocation();
 	}
 
-
-	public function delete($object) {
-		//
-		// We really need preDelete/postDelete callbacks instead of overriding
-		// delete method.
-		$objects = $this->getModelAsCollection($object);
-		foreach ($objects as $this_object) {
-			$this_object->deleteFile();
-		}
-		parent::delete($objects);
+	/**
+	 * Deletes this model's file.
+	 *
+	 * @param File $object
+	 */
+	public function postDelete(File $object) {
+		$object->deleteFile();
 	}
 }
