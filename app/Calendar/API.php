@@ -83,7 +83,7 @@ class Calendar_API extends Generic_API {
         );
 
         $calendar = array(
-            'title'   => date('M Y', $currentDay),
+            'title'   => date('M Y', $month['start']),
             'aside'   => $aside,
             'class'   => 'wide',
             'icon'    => '',
