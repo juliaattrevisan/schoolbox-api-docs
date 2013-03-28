@@ -30,6 +30,20 @@ class Eportfolio {
 	private $userId = -1;
 
 	/**
+	 * PageId of the current page.
+	 *
+	 * @var int
+	 */
+	private $pageId = -1;
+
+	/**
+	 * All settings for the current page
+	 *
+	 * @var array
+	 */
+	private $settings = array();
+
+	/**
 	 * This is the prefix used for all the cloned sql queries
 	 *
 	 * @var string
@@ -40,25 +54,56 @@ class Eportfolio {
 	 * Constructor
 	 *
 	 * @param $userId
+	 * @param $pageId
 	 */
-	public function __construct($userId) {
+	public function __construct($userId, $pageId) {
 		$this->setDb(new DeprecatedDatabase(SQL_db));
 		$this->setUserId($userId);
+		$this->setPageId($pageId);
+
+		/* Preload settings
+		 */
+		$this->setSettings($this->getPageSettings($pageId));
 	}
 
 	/**
-	 * Returns the current template
+	 * Get all the page settings for a particular page
+	 *
+	 * @param $pageId
+	 * @return mixed
+	 */
+	private function getPageSettings($pageId) {
+		$query = "
+			SELECT *
+			FROM {$this->getContext()}_config
+			WHERE uid = '{$this->getUseriD()}'
+			AND page_id = '{$pageId}'
+		";
+
+		return $this->getDb()->getRow($query);
+	}
+
+	/**
+	 * Get a particular key from settings array
+	 *
+	 * @param $key
+	 * @return bool
+	 */
+	private function getSettingsKey($key) {
+		if (array_key_exists($key, $this->getSettings())) {
+			return $this->settings[$key];
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns the current template id
 	 *
 	 * @return mixed
 	 */
 	public function getTemplate() {
-		$query = "
-			SELECT template
-			FROM {$this->getContext()}_config
-			WHERE uid = '{$this->getUserId()}'
-		";
-
-		return $this->getDb()->getOne($query);
+		return $this->getSettingsKey('template');
 	}
 
 	/**
@@ -139,16 +184,13 @@ class Eportfolio {
 	/**
 	 * Gets the column widths for a particular homepage
 	 *
-	 * @return array|bool
+	 * @return array
 	 */
 	public function getColumnWidths() {
-		$query = "
-			SELECT left_column_width, right_column_width
-			FROM {$this->getContext()}_config
-			WHERE uid = '{$this->getUserId()}'
-		";
-
-		return $this->db->getRow($query);
+		return array(
+			'left_column_width' => $this->getSettingsKey('left_column_width'),
+			'right_column_width' => $this->getSettingsKey('right_column_width'),
+		);
 	}
 
 	/**
@@ -168,7 +210,6 @@ class Eportfolio {
 		$this->db->update($this->getContext() . '_config', 'uid', $columnWidths);
 	}
 
-
 	/**
 	 * Get a list of colours for a particular page
 	 *
@@ -176,17 +217,29 @@ class Eportfolio {
 	 * @return array|bool
 	 */
 	public function getColorList($pageId) {
-		$query = "
-			SELECT
-				left_head_font, left_head_bg, left_font, left_bg_primary, left_bg_secondary, left_link, left_hover,
-				right_head_font, right_head_bg, right_font, right_bg_primary, right_bg_secondary, right_link, right_hover,
-				top_head_font, top_head_bg, top_font, top_bg_primary, top_bg_secondary, top_link, top_hover
-			FROM {$this->getContext()}_config
-			WHERE uid = '{$this->getUserId()}'
-			AND page_id = '{$pageId}'
-		";
-
-		$colourList = $this->db->getRow($query);
+		$colourList = array(
+			'left_head_font' => $this->getSettingsKey('left_head_font'),
+			'left_head_bg' => $this->getSettingsKey('left_head_bg'),
+			'left_font' => $this->getSettingsKey('left_font'),
+			'left_bg_primary' => $this->getSettingsKey('left_bg_primary'),
+			'left_bg_secondary' => $this->getSettingsKey('left_bg_secondary'),
+			'left_link' => $this->getSettingsKey('left_link'),
+			'left_hover' => $this->getSettingsKey('left_hover'),
+			'right_head_font' => $this->getSettingsKey('right_head_font'),
+			'right_head_bg' => $this->getSettingsKey('right_head_bg'),
+			'right_font' => $this->getSettingsKey('right_font'),
+			'right_bg_primary' => $this->getSettingsKey('right_bg_primary'),
+			'right_bg_secondary' => $this->getSettingsKey('right_bg_secondary'),
+			'right_link' => $this->getSettingsKey('right_link'),
+			'right_hover' => $this->getSettingsKey('right_hover'),
+			'top_head_font' => $this->getSettingsKey('top_head_font'),
+			'top_head_bg' => $this->getSettingsKey('top_head_bg'),
+			'top_font' => $this->getSettingsKey('top_font'),
+			'top_bg_primary' => $this->getSettingsKey('top_bg_primary'),
+			'top_bg_secondary' => $this->getSettingsKey('top_bg_secondary'),
+			'top_link' => $this->getSettingsKey('top_link'),
+			'top_hover' => $this->getSettingsKey('top_hover'),
+		);
 
 		// use defaults for missing colours
 		$defaultColours = unserialize(HOMEPAGE_colors);
@@ -767,6 +820,8 @@ class Eportfolio {
 	}
 
 	/**
+	 * Set user id
+	 *
 	 * @param int $userId
 	 */
 	private function setUserId($userId) {
@@ -774,6 +829,8 @@ class Eportfolio {
 	}
 
 	/**
+	 * Get user id
+	 *
 	 * @return int
 	 */
 	private function getUserId() {
@@ -781,9 +838,47 @@ class Eportfolio {
 	}
 
 	/**
+	 * Get context
+	 *
 	 * @return string
 	 */
 	private function getContext() {
 		return $this->context;
+	}
+
+	/**
+	 * Set page id
+	 *
+	 * @param int $pageId
+	 */
+	private function setPageId($pageId) {
+		$this->pageId = $pageId;
+	}
+
+	/**
+	 * Get page id
+	 *
+	 * @return int
+	 */
+	private function getPageId() {
+		return $this->pageId;
+	}
+
+	/**
+	 * Set settings array
+	 *
+	 * @param array $settings
+	 */
+	private function setSettings($settings) {
+		$this->settings = $settings;
+	}
+
+	/**
+	 * Get settings array
+	 *
+	 * @return array
+	 */
+	private function getSettings() {
+		return $this->settings;
 	}
 }
