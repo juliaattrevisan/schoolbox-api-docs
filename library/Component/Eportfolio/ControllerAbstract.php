@@ -18,17 +18,21 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
 		parent::setup($context, $config);
 
 		$g = new Group();
-		$this->permission = $_SESSION['su'] ? FULL_ACCESS : $g->getPermission($context['id']);
-		$this->sitepage->setVar('ID', $context['id']);
+		$this->permission = $_SESSION['su'] ? FULL_ACCESS : $g->getPermission($context['uid']);
+
+		/* Check primary key is being used correctly!
+		 */
+		$this->sitepage->setVar('ID', $context['uid']);
 	}
 
     /**
+	 * Get template
+	 *
      * @param string $templateName
      * @param string $templatePath
      * @return string
      */
     protected function getTemplate ($templateName = '', $templatePath = '') {
-
         if ( empty($templatePath) ) {
             $templatePath = "component/eportfolio";
         }
