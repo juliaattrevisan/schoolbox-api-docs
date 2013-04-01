@@ -40,7 +40,7 @@ if ($_REQUEST['id']) {
     $output = array(
         'id'          => $submission_id,
         'cid'         => $submission_cat_id,
-        'category'    => Scrub::text($submission->getCategoryName()),
+        'category'    => Scrub::text($submission->getCategory()->getName()),
         'typeName'    => Scrub::text($submission->getWorkType()->getName()),
         'name'        => Scrub::text($submission->getName()),
         'description' => Scrub::text($submission->getDescription()),

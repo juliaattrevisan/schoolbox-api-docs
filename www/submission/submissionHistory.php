@@ -138,7 +138,7 @@ $urgency = ($dueDate->getUnixTimestamp() - time()) / 86400;
 $gradient = max(0, min(10, $urgency));
 
 $this->setVar(array(
-    'CATEGORY_NAME' => Scrub::text($submission->getCategoryName()),
+    'CATEGORY_NAME' => Scrub::text($submission->getCategory()->getName()),
     'CATEGORY_ID'   => $submission->getCategory()->getId(),
     'CATEGORY_THUMB' => '',
 
