@@ -21,7 +21,7 @@ INSERT INTO `config`(
 )
 VALUES (
   'submission_access',
-  'Students and Parents',
+  '2',
   'Default Submission Mark Visibility',
   'Who should marks for submissions be visible for by default? (This can be overridden on a per-submission level.)',
   'selectKey',
