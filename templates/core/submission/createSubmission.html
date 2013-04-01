@@ -356,6 +356,17 @@
             </select>
         </td>
     </tr>
+    <tr>
+        <td><h4>Mark Visibility</h4>
+            <em>Who will be able to view marks for this assessment?</em></td>
+        <td>
+            <select name="mark_visibility" class="formfield">
+                <!-- BEGIN mark_visibility_drop -->
+                <option value="{MARK_VISIBILITY_VALUE}" {MARK_VISIBILITY_VALUE_SELECTED}>{MARK_VISIBILITY_TEXT}</option>
+                <!-- END mark_visibility_drop -->
+            </select>
+        </td>
+    </tr>
     <tr id="marktype-total" class="marks-hide dark">
         <td>
             <h4>Total Mark</h4>
