@@ -21,7 +21,7 @@ INSERT INTO `config`(
 )
 VALUES (
   'submission_access',
-  '2',
+  '1',
   'Default Submission Mark Visibility',
   'Who should marks for submissions be visible for by default? (This can be overridden on a per-submission level.)',
   'selectKey',
@@ -33,4 +33,4 @@ VALUES (
 );
 
 -- Add publish setting for submission boxes.
-ALTER TABLE `submission_box` ADD `mark_visibility` INT DEFAULT 2;
+ALTER TABLE `submission_box` ADD `mark_visibility` INT DEFAULT 1;
