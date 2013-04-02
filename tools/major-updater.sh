@@ -3,7 +3,6 @@ clear;
 ### Schoolbox Major Release Updater V1.1 by Alaress
 ## Will only run 1 update from current version to next version (w/o any input, so can be looped until Version is current)
 # Basic Dependencies Check
-dependencies=( "dos2unix" );
 ##### PHP MINIMUM REQUIREMENTS
 desired_major="5"; ### MAJOR Version, IE 5 in PHP V5.3
 desired_minor="3"; ### MINOR Version, IE 3 in PHP v5.3
@@ -147,11 +146,6 @@ cur_ver=`echo -e "SELECT value FROM config WHERE NAME = 'site_version'"|mysql -u
 cur_ver=`echo $cur_ver|cut -d " " -f2`;
 echo -e "Schoolbox v$cur_ver Detected.\n";
 }
-setNewVersion() {
-echo -e "Setting New Version to v$new_ver.\c";
-`echo -e "UPDATE config SET value = '$new_ver' where name = 'site_version'"|mysql -u $sqluser --password=$sqlpass $sqldb`;
-errorCheck;
-}
 phpVersionCheck() {
 echo -e "Beginning PHP Version Check:\n";
 php_major=`php -v|grep built|cut -d "-" -f1|cut -d " " -f2|cut -d "." -f1` &> /dev/null;
@@ -175,7 +169,7 @@ cd $working_dir;
 echo -e "Processing Versions and Locating new Update:\n";
 grabIndex;
 getCurrentVersion;
-cur_ver_id=`cat $index|grep $cur_ver|cut -d ":" -f1`
+cur_ver_id=`grep $cur_ver $index|cut -d ":" -f1`
 if [[ -z "$cur_ver_id" ]]; then
 echo -e "Detected Version is $cur_ver and is not supported by this updater.\nPlease Contact support@schoolbox.com.au for further assistance.\n";
 exit;
@@ -184,10 +178,9 @@ echo -e "Detected version, v$cur_ver is supported.\nYour identifier for this upd
 fi;
 echo -e "Locating new Version (if available):\n"
 new_ver_id=`expr $cur_ver_id + 1`;
-new_ver=`cat $index|grep "$new_ver_id:"|cut -d ":" -f2`;
+new_ver=`grep "^$new_ver_id:" $index|cut -d ":" -f2`;
 echo -e "Verifying new version name:\n";
 echo $new_ver >> $working_dir/tmpversion;
-dos2unix $working_dir/tmpversion;
 errorCheck;
 new_ver=`cat -v $working_dir/tmpversion`;
 rm -Rf $working_dir/tmpversion;
@@ -210,7 +203,7 @@ echo -e "Moving Data Directory out of Installation Directory:\c";
 mv $schoolbox_dir/data $schoolbox_dir/../data_$dbname
 errorCheck 1;
 echo -e "Backing up Installation Directory:\c";
-tar -cvzf /tmp/schoolbox_$sqldb$cur_ver.tgz $schoolbox_dir >> /dev/null;
+tar -czf /tmp/schoolbox_$sqldb$cur_ver.tgz $schoolbox_dir;
 errorCheck;
 echo -e "Backing up Config File:\c";
 cp $schoolbox_dir/www/conf/conf.php /tmp/schoolbox_config.php >> /dev/null;
@@ -225,7 +218,7 @@ echo -e "Restoring Data Directory:\c";
 mv $schoolbox_dir/../data_$dbname $schoolbox_dir/data;
 errorCheck;
 echo -e "Restoring Configuration File:\c";
-mv /tmp/schoolbox_config.php $schoolbox_dir/www/conf/conf.php;
+cp /tmp/schoolbox_config.php $schoolbox_dir/www/conf/conf.php;
 errorCheck;
 echo -e "Ensuring .htaccess file does not exist:\c";
 rm -f $schoolbox_dir/www/.htaccess;
@@ -262,41 +255,11 @@ errorCheck 1;
 echo -e "Removing Template HTACCESS File:\c";
 rm -Rf $schoolbox_dir/www/.htaccess;
 errorCheck 1;
-echo -e "Removing Template Data Directory:\c";
-rm -Rf $schoolbox_dir/data;
-errorCheck 1;
 }
 runCustomScripts() {
-echo -e "Custom Script Processing:\n";
-if [ -d $schoolbox_dir/updates/$new_ver ]; then
-cd $schoolbox_dir/updates/$new_ver/;
-if [ -s ./scripts_list ]; then
-echo -e "Reading Script Processing List:\n";
-for script in `grep -v "#" scripts_list`; do
-file=`echo $script`;
-if [[ `echo $file|grep .sh` ]]; then
-echo -e "Running Shell Script: $file\c" &> /tmp/update_$dbname$new_ver.errlog;
-./$file >> /dev/null;
-errorCheck;
-fi;
-if [[ `echo $file|grep .php` ]]; then
-echo -e "Running PHP Script: $file\c";
-php -f ./$file >> /dev/null &> /tmp/update_$dbname$new_ver.errlog;
-errorCheck;
-fi;
-if [[ `echo $file|grep .sql` ]]; then
-echo -e "Running SQL Script: $file\c";
-mysql -f -u $sqluser --password=$sqlpass $sqldb < ./$file  >> /dev/null &> /tmp/update_$dbname$new_ver.errlog;
-errorCheck;
-fi;
-done;
-echo -e "Custom Script Processing Complete.\n";
-else
-echo -e "No scripts processing list found for v$new_ver, Ignoring any scripts that exist.\n ";
-fi;
-else
-echo -e "No custom script directory found.\n";
-fi;
+$schoolbox_dir/tools/create-data-dirs.sh $schoolbox_dir/data;
+$schoolbox_dir/tools/update-sql.sh;
+$schoolbox_dir/tools/clean-cache-dir.sh;
 }
 cleanup(){
 echo -e "Cleanup after update:\n";
@@ -332,6 +295,6 @@ updateFiles;
 restoreAfterBackup;
 runCustomScripts;
 confirmPermissions;
-setNewVersion;
 isErrors;
 cleanup;
+
