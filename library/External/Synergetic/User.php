@@ -234,7 +234,11 @@ class External_Synergetic_User implements External_UserInterface {
 	/**
 	 * Gets a list of Contacts for all Students in a particular year level. The
 	 * year level is stored in Synergetic.
+	 *
 	 * Used in reporting.
+	 *
+	 * Note that there is no StudentContactHomeCountryDesc in the Synergetic views
+	 * so I changed it to use CountryCode instead.
 	 *
 	 * @param $yearlevel
 	 * @param $name
@@ -251,8 +255,9 @@ class External_Synergetic_User implements External_UserInterface {
 				StudentContactTitle, StudentContactPreferred, StudentContactLegalFullName, StudentContactSurname,
 				StudentContactDefaultEmail,
 				StudentContactAddress1, StudentContactAddress2, StudentContactAddress3,
+				StudentContactSuburb, StudentContactPostCode, StudentContactState, StudentContactCountryCode,
 				StudentContactHomeAddress1, StudentContactHomeAddress2, StudentContactHomeAddress3,
-				StudentContactSuburb, StudentContactPostCode, StudentContactState, StudentContactCountryDesc,
+				StudentContactHomeSuburb, StudentContactHomePostCode, StudentContactHomeState, StudentContactHomeCountryCode,
 				StudentContactPhoneActual, StudentContactMobilePhone, StudentContactOccupPhone,
 				StudentContactSpouseID,
 				StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseLegalFullName,StudentContactSpouseSurname,
@@ -321,6 +326,8 @@ class External_Synergetic_User implements External_UserInterface {
 		$query .= "
 			ORDER BY StudentSurname, StudentID, StudentContactType
 		";
+
+
 		return $this->getDatabase()->getAll($query);
 	}
 
