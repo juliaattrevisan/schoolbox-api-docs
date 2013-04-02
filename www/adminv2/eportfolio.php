@@ -21,6 +21,10 @@ $this->setTitle('Admin - ePortfolio Templates');
 /* Group Selector */
 $this->setBlock(TEMPLATE_content, 'template', 'template_block');
 
+/* Empty default list of components
+ */
+$this->setVar('definition_block', '');
+
 // include the admin navigation
 $nav = new AdminV2_Nav();
 $nav->parse($this, 'eportfolio');
