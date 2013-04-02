@@ -90,6 +90,13 @@ if (is_array($categoryList)) {
 /* Submission Box Details
  */
 $submission = $mapper->findById($this->arg[0]);
+$is_mark_shown = true;
+if ($groupHandler->isStudent() && !$submission->isMarkShownToStudents()) {
+	$is_mark_shown = false;
+}
+elseif ($parentOnly && !$submission->isMarkShownToParents()) {
+	$is_mark_shown = false;
+}
 $owner = $userHandler->getByID($submission->getOwner());
 
 $this->setVar(array(
@@ -133,6 +140,14 @@ $dueDate = new Alaress_Date_Relative($submission->getDueDate(),'y-m-d');
 $createdDate = new Alaress_Date_Relative($submission->getCreated(), 'y-m-d');
 
 $allWork = $submissionHandler->getSubmissionHistory($userID, $this->arg[0]);
+if (!$is_mark_shown) {
+	//
+	// Filter out any items with a work ID
+	$allWork = array_filter(
+		$allWork,
+		function($work) { return !(isset($work['rid']) && empty($work['filename'])); }
+	);
+}
 
 $urgency = ($dueDate->getUnixTimestamp() - time()) / 86400;
 $gradient = max(0, min(10, $urgency));
@@ -251,10 +266,17 @@ if (is_array($allWork) && count($allWork)) {
 
         $comment = Scrub::Text($currentWork['comment']);
 
+        //
+        // Don't show the grade if it isn't meant to be shown to the user yet.
         // perform shortening if the marktype is letter, or if the given grade is an error
-        if($submission->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE_LETTER || in_array($currentWork['mark'], $errors)) {
+		if (!$is_mark_shown) {
+			$mark = '';
+			$currentWork['norm_mark'] = 0;
+		}
+        elseif ($submission->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE_LETTER || in_array($currentWork['mark'], $errors)) {
             $mark = $returnHandler->shortenGrade($currentWork['mark']);
-        } else {
+        }
+        else {
             $mark = Scrub::Text($currentWork['mark']);
         }
 
