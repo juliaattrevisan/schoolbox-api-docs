@@ -34,7 +34,7 @@ else if (is_numeric($_POST['page_id'])) {
     $componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
 
 	// AJAX request for drag and drop of components
-	if ($_POST['uid'] && $_POST['type'] == 'components') {
+	if ($_POST['page_id'] && $_POST['type'] == 'components') {
 		$columns = array(
             'left'  => $_POST['column1'],
             'right' => $_POST['column2'],
