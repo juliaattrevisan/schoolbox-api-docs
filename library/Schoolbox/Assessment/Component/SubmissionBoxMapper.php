@@ -164,6 +164,18 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'this_key'  => 'id',
 			'other_key' => 'box_id',
 		));
+		$this->hasJoin('submission', array(
+			'multiple'  => true,
+			'mapper'    => new SubmissionBox\SubmissionMapper(),
+			'this_key'  => 'id',
+			'other_key' => 'box_id',
+		));
+		$this->hasJoin('return', array(
+			'multiple'  => true,
+			'mapper'    => new SubmissionBox\ReturnedWorkMapper(),
+			'this_key'  => 'id',
+			'other_key' => 'box_id',
+		));
 
 		$this
 			->registerCallback('preSave',  array($this, 'preSave'))
@@ -237,49 +249,46 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		return $submission_box;
 	}
 
-	/**
-	 * Pre-save method for submission boxes - converts legacy file to a new
-	 * storage file.
-	 *
-	 * @param SubmissionBox $object
-	 *
-	 * @return bool
-	 */
-	public function preSave(SubmissionBox $object) {
-		if ($legacy_file_id = $object->getLegacyFileId()) {
-			$old_file = $this->getJoinMapper('legacy_file')->findById($legacy_file_id);
-			$new_file = $this->getJoinMapper('legacy_file')->copyToStorage($old_file);
+	public function save($object) {
+		$objects = $this->getModelAsCollection($object);
 
-			$new_link = $this->getJoinMapper('files')->createModel();
-			$new_link->setFile($new_file);
-			$object->getFileLinks()->add($new_link);
+		//
+		// Convert legacy files to storage files on saving.
+		foreach ($objects as $this_object) {
+			if ($legacy_file_id = $this_object->getLegacyFileId()) {
+				$old_file = $this->getJoinMapper('legacy_file')->findById($legacy_file_id);
+				$new_file = $this->getJoinMapper('legacy_file')->copyToStorage($old_file);
 
-			//
-			// Remove legacy file link because it is no longer needed.
-			$object->setLegacyFileId(null);
-		}
-		return true;
-	}
+				$new_link = $this->getJoinMapper('files')->createModel();
+				$new_link->setFile($new_file);
+				$this_object->getFileLinks()->add($new_link);
 
-	/**
-	 * Post-save method for submission boxes - saves new submission box files
-	 * and notifications.
-	 *
-	 * @param SubmissionBox $object
-	 *
-	 * @return void
-	 */
-	public function postSave(SubmissionBox $object) {
-		foreach ($object->getFileLinks() as $box_file) {
-			if ($box_file->hasFile()) {
-				$box_file->setSubmissionBoxId($object->getId());
-				$this->getJoinMapper('files')->save($box_file);
+				//
+				// Remove legacy file link because it is no longer needed.
+				$this_object->setLegacyFileId(null);
 			}
 		}
-		foreach ($object->getNotifications() as $notification) {
-			$notification->setSubmissionBoxId($object->getId());
-			$this->getJoinMapper('notify')->save($notification);
+		$result = parent::save($objects);
+		if ($result) {
+			//
+			// TODO: add pre-save, pre-delete, post-save, post-delete hooks.
+			// Implement this sort of logic in those instead of in extended
+			// save methods.
+			// Consider a publish/subscribe event system.
+			foreach ($objects as $this_object) {
+				foreach ($this_object->getFileLinks() as $box_file) {
+					if ($box_file->hasFile()) {
+						$box_file->setSubmissionBoxId($this_object->getId());
+						$this->getJoinMapper('files')->save($box_file);
+					}
+				}
+				foreach ($this_object->getNotifications() as $notification) {
+					$notification->setSubmissionBoxId($this_object->getId());
+					$this->getJoinMapper('notify')->save($notification);
+				}
+			}
 		}
+		return $result;
 	}
 
 	/**
