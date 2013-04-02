@@ -148,7 +148,11 @@ class Mailer {
         $this->email->setHTMLBody($this->composeHTML());
 
         //retrieve email
-        $body = $this->email->get();
+        $body = $this->email->get(array(
+            'html_charset' => 'utf-8',
+            'text_charset' => 'utf-8',
+            'head_charset' => 'utf-8',
+        ));
         $this->email->_headers['To'] = $this->to; //	mime_mail doe not overwrite its headers with the ones you send
         $hdrs = $this->email->headers($this->headers);
 
