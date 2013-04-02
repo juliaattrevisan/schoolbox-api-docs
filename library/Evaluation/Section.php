@@ -111,7 +111,7 @@ abstract class Evaluation_Section extends DeprecatedModel
                          assess_section.sequence AS sectionSequence,
                          assess_question.*
                   FROM {$this->_table}
-                  LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
+                  INNER JOIN assess_question ON assess_section.section_id = assess_question.section_id
                   WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
                   AND assess_section.deleted_at IS NULL
                   AND assess_question.deleted_at IS NULL

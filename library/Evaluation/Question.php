@@ -146,8 +146,8 @@ abstract class Evaluation_Question extends DeprecatedModel
 				assess_question.marks AS question_marks,
 				assess_question.question AS question
 			FROM assess
-			LEFT JOIN assess_section ON assess.assess_id = assess_section.assess_id
-			LEFT JOIN assess_question ON assess_section.section_id = assess_question.section_id
+			INNER JOIN assess_section ON assess.assess_id = assess_section.assess_id
+			INNER JOIN assess_question ON assess_section.section_id = assess_question.section_id
 			WHERE assess.assess_id = " . $this->db->smartQuote($assess_id) . "
 			ORDER BY assess_section.sequence, assess_question.sequence
 		";
