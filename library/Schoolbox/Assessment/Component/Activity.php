@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment\Component;
 use \Alaress_Date_Format;
 use Schoolbox\User;
 use Schoolbox\Resource\Category;
+use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
@@ -37,6 +38,11 @@ class Activity {
 	 * @var SubmissionBox
 	 */
 	protected $submission_box;
+
+	/**
+	 * @var OnlineAssessment
+	 */
+	protected $assessment;
 
 	/**
 	 * @var Submission
@@ -196,4 +202,22 @@ class Activity {
 	public function getCategory() {
 		return $this->category;
 	}
+
+	/**
+	 * @param  \Schoolbox\Assessment\Component\OnlineAssessment $assessment
+	 *
+	 * @return $this
+	 */
+	public function setAssessment($assessment) {
+		$this->assessment = $assessment;
+		return $this;
+	}
+
+	/**
+	 * @return \Schoolbox\Assessment\Component\OnlineAssessment
+	 */
+	public function getAssessment() {
+		return $this->assessment;
+	}
+
 }
