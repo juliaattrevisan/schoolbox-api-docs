@@ -10,11 +10,16 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Evaluation_Export_CSV {
+abstract class Evaluation_Export_CSV {
 
 	/* Include html in export output
 	 */
 	protected $legendHTML = false;
+
+	/* Include synergy_id in export output
+	 * Use in hook method
+	 */
+	protected $includeExternalId = true;
 
 	/* These are additional subheadings that appear in the export.
 
@@ -39,6 +44,7 @@ class Evaluation_Export_CSV {
 	/* These always appear in the export
 	 */
 	private $mandatoryColumns = array(
+		'External ID',
 		'User ID',
 		'Name',
 		'Start',
@@ -68,7 +74,16 @@ class Evaluation_Export_CSV {
 		$this->setFactory($factory);
 		$this->setAttemptHandler($attemptHandler);
 		$this->setQuestionHandler($questionHandler);
+
+		$this->setup();
 	}
+
+	/**
+	 * Hook method
+	 * 
+	 * @return mixed
+	 */
+	abstract protected function setup();
 
 	/**
 	 * Facade method
@@ -156,6 +171,12 @@ class Evaluation_Export_CSV {
 	private function collateHeadings() {
 		$allColumns = $this->getMandatoryColumns();
 
+		/* Optionally include external_id
+		 */
+		if (!$this->getIncludeExternalId()) {
+			array_shift($allColumns);
+		}
+
 		foreach($this->getAllQuestions() as $currentQuestion) {
 			if (!$this->useQuestionFilter() || $this->isQuestionFiltered($currentQuestion['question_id'])) {
 				$prefix = "S{$currentQuestion['section_sequence']}. Q{$currentQuestion['question_sequence']}. ";
@@ -206,13 +227,19 @@ class Evaluation_Export_CSV {
 			}
 
 			/* Collect mandatory columns
+			 * Optionally include synergy_id
 			 */
 			$thisResponse = array(
+				$currentAttempt['synergy_id'],
 				$currentAttempt['user_id'],
 				$user['firstname'] . ' ' . $user['lastname'],
 				$start->getShort(),
 				$finishTime,
 			);
+
+			if (!$this->getIncludeExternalId()) {
+				array_shift($thisResponse);
+			}
 
 			/* Construct horizontally for this attempt
 			 */
@@ -518,5 +545,23 @@ class Evaluation_Export_CSV {
 	 */
 	private function getAdditionalColumns() {
 		return $this->additionalColumns;
+	}
+
+	/**
+	 * Set includeExternalId
+	 *
+	 * @param $includeExternalId
+	 */
+	protected function setIncludeExternalId($includeExternalId) {
+		$this->includeExternalId = $includeExternalId;
+	}
+
+	/**
+	 * Get includeExternalId
+	 *
+	 * @return bool
+	 */
+	protected function getIncludeExternalId() {
+		return $this->includeExternalId;
 	}
 }

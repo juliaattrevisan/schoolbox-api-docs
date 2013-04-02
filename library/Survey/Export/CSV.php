@@ -11,6 +11,14 @@ class Survey_Export_CSV extends Evaluation_Export_CSV {
 	protected $additionalColumns = array();
 
 	/**
+	 * Hook method
+	 *
+	 * @return mixed|void
+	 */
+	protected function setup() {
+	}
+
+	/**
 	 * Filter out anonymous results
 	 *
 	 * Normally should be done in a more meaningful way at collation

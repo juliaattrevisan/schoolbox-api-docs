@@ -9,4 +9,11 @@
  */
 class Assess_Export_CSV extends Evaluation_Export_CSV {
 
+	/**
+	 * Hook method
+	 *
+	 * @return mixed|void
+	 */
+	protected function setup() {
+	}
 }
