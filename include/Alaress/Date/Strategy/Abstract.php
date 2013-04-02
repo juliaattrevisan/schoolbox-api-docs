@@ -46,6 +46,7 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Int
             $this->setByTimestamp($dateTime);
 		}
 		elseif ($inputDateFormat !== null) {
+			$this->setInputDateFormat($inputDateFormat);
 			$date_object = DateTime::createFromFormat($inputDateFormat, $dateTime);
 			if ($date_object instanceof DateTime) {
 				$this->setDateTimeObject($date_object);
