@@ -146,11 +146,6 @@ cur_ver=`echo -e "SELECT value FROM config WHERE NAME = 'site_version'"|mysql -u
 cur_ver=`echo $cur_ver|cut -d " " -f2`;
 echo -e "Schoolbox v$cur_ver Detected.\n";
 }
-setNewVersion() {
-echo -e "Setting New Version to v$new_ver.\c";
-`echo -e "UPDATE config SET value = '$new_ver' where name = 'site_version'"|mysql -u $sqluser --password=$sqlpass $sqldb`;
-errorCheck;
-}
 phpVersionCheck() {
 echo -e "Beginning PHP Version Check:\n";
 php_major=`php -v|grep built|cut -d "-" -f1|cut -d " " -f2|cut -d "." -f1` &> /dev/null;
@@ -253,40 +248,13 @@ echo -e "Removing Template Config File:\c";
 rm -Rf $schoolbox_dir/www/conf/conf.php;
 errorCheck 1;
 echo -e "Removing Template HTACCESS File:\c";
-rm -Rf $schoolbox_dir/www/.htacess;
+rm -Rf $schoolbox_dir/www/.htaccess;
 errorCheck 1;
 }
 runCustomScripts() {
-echo -e "Custom Script Processing:\n";
-if [ -d $schoolbox_dir/updates/$new_ver ]; then
-cd $schoolbox_dir/updates/$new_ver/;
-if [ -s ./scripts_list ]; then
-echo -e "Reading Script Processing List:\n";
-for script in `grep -v "#" scripts_list`; do
-file=`echo $script`;
-if [[ `echo $file|grep .sh` ]]; then
-echo -e "Running Shell Script: $file\c" &> /tmp/update_$dbname$new_ver.errlog;
-./$file >> /dev/null;
-errorCheck;
-fi;
-if [[ `echo $file|grep .php` ]]; then
-echo -e "Running PHP Script: $file\c";
-php -f ./$file >> /dev/null &> /tmp/update_$dbname$new_ver.errlog;
-errorCheck;
-fi;
-if [[ `echo $file|grep .sql` ]]; then
-echo -e "Running SQL Script: $file\c";
-mysql -f -u $sqluser --password=$sqlpass $sqldb < ./$file  >> /dev/null &> /tmp/update_$dbname$new_ver.errlog;
-errorCheck;
-fi;
-done;
-echo -e "Custom Script Processing Complete.\n";
-else
-echo -e "No scripts processing list found for v$new_ver, Ignoring any scripts that exist.\n ";
-fi;
-else
-echo -e "No custom script directory found.\n";
-fi;
+$schoolbox_dir/tools/create-data-dirs.sh $schoolbox_dir/data;
+$schoolbox_dir/tools/update-sql.sh;
+$schoolbox_dir/tools/clean-cache-dir.sh;
 }
 cleanup(){
 echo -e "Cleanup after update:\n";
@@ -322,7 +290,6 @@ updateFiles;
 restoreAfterBackup;
 runCustomScripts;
 confirmPermissions;
-setNewVersion;
 isErrors;
 cleanup;
 

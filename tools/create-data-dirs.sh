@@ -1,7 +1,7 @@
 #!/bin/bash
 # Create Data Directories Script
 # Description:
-#	Performs a soft creation of each data directory, and sets permissions
+#	Performs a soft creation of each data directory
 #	Only to be used by packaging post install
 # Usage:
 #	create-data-dirs.sh [base data directory] (optional)
@@ -11,7 +11,7 @@
 # @link        http://www.alaress.com.au
 #
 
-echo "Updating data directory permissions";
+echo "Updating data directories";
 
 datadir='/var/lib/schoolbox';
 
@@ -28,9 +28,5 @@ mkdir -p $datadir/{dropbox,files,myFiles,returns,storage,submissions,thumbnails}
 
 # Cache dirs
 mkdir -p $datadir/cache/{minify,myfiles,portrait,purifier,stream,weather,xml,zip,logs}
-
-# Fix permissions
-chown -R www-data:www-data $datadir
-chmod -R 775 $datadir
 
 # End of script

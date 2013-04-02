@@ -33,6 +33,7 @@ case "$1" in
         fi
         chown -R alaress:alaress /usr/share/schoolbox
         /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox;
+        /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox;
         /usr/share/schoolbox/tools/update-sql.sh;
         /usr/share/schoolbox/tools/clean-cache-dir.sh;
         rm -f /usr/share/schoolbox/www/.htaccess;
