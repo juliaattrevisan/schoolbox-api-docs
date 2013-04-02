@@ -481,7 +481,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	 * @return ActivityCollection
 	 */
 	public function getActivities($user_id, $limit, $categories) {
-		$collection = new ActivityCollection(array());
+		$collection = new ActivityCollection();
 		$queries = array(
 			array(
 				'event' => 'new',
@@ -493,6 +493,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 					LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
 					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 					AND sb.open_date < NOW()
+					ORDER BY sb.open_date DESC
 					LIMIT :limit
 				",
 				'date_field' => 'openDate',
@@ -513,6 +514,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 					AND sm.id IS NULL
 					AND sb.date < NOW()
+					ORDER BY sb.date DESC
 					LIMIT :limit
 				",
 				'date_field' => 'dueDate',
@@ -529,6 +531,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 					LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
 					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 					AND sb.late_date < NOW()
+					ORDER BY sb.late_date DESC
 					LIMIT :limit
 				",
 				'date_field' => 'lateDate',
@@ -551,8 +554,9 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			$statement->execute();
 
 			$get_method = $this->getGetMethodName($query['date_field']);
-			foreach ($statement->fetchAll() as $row) {
+			foreach ($statement as $row) {
 				$box = $this->hydrate($row, 'sb');
+				$box->setCategory($this->getJoinMapper('category')->hydrate($row, 'c'));
 				$activity = new Activity();
 				$activity
 					->setEvent($query['event'])
