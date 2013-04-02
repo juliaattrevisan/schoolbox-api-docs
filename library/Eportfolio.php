@@ -125,6 +125,15 @@ class Eportfolio {
 	}
 
 	/**
+	 * Returns the owner id of a given page
+	 *
+	 * @return bool
+	 */
+	public function getPageOwner() {
+		return $this->getSettingsKey('uid');
+	}
+
+	/**
 	 * Update a page title
 	 *
 	 * @param $value

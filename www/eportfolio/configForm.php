@@ -3,11 +3,6 @@ require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
 $page = new SitePage();
 $groupHandler = new Group(HOMEPAGE_SERVICE);
-var_dump(isset($_POST['page_id']));
-var_dump(is_numeric($_POST['page_id']));
-var_dump(isset($_POST['user_id']));
-var_dump(is_numeric($_POST['user_id']));
-var_dump(strlen(trim($_POST['pageTitle'])));
 
 /* Ajax save page colours. When instantiating the Eportfolio object, assume page owner
  * is currently logged in. The colourpicker is built to only send one primary name/key'
@@ -30,7 +25,7 @@ else if (isset($_POST['page_id']) && is_numeric($_POST['page_id']) && isset($_PO
 	$eportfolioHandler->updatePageTitle(trim($_POST['pageTitle']));
 }
 
-else if (is_numeric($_REQUEST['uid'])) {
+else if (is_numeric($_POST['page_id'])) {
 //	if ($groupHandler->getPermission($_REQUEST['uid']) < WRITE_ACCESS) {
 //		error(19);
 //	}
@@ -81,25 +76,36 @@ else if (is_numeric($_REQUEST['uid'])) {
         $componentInstanceMapper->delete($instance);
 	}
 
-	// POST new component to page and output render of component
-	else if (is_numeric($_POST['uid']) && is_numeric($_POST['add'])) {
-        $newComp = new Component_Instance();
-        $newComp->definitionId = $_POST['add'];
-        $newComp->identifier = $_POST['uid'];
-        $newComp->module = 'eportfolio';
-        $newComp->sequence = 0;
-        $newComp->position = 'left';
+	/* POST new component to page and output render of component
+	 */
+	else if (is_numeric($_POST['page_id']) && is_numeric($_POST['add'])) {
+		$eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
+		$uid = $eportfolioHandler->getPageOwner();
 
-        // check perms
+		/* Find out who owns the page and check permissions first
+		 */
+		$userHandler = new User();
+		$user = $userHandler->getByID($uid);
+
+		/* Check permissions
+		 */
+		// check perms
 //        if (($permission = $groupHandler->getPermission($_POST['uid'])) < WRITE_ACCESS) {
 //            exit;
 //        }
+
+		$newComp = new Component_Instance();
+        $newComp->definitionId = $_POST['add'];
+        $newComp->identifier = $_POST['page_id'];
+        $newComp->module = 'eportfolio';
+        $newComp->sequence = 0;
+        $newComp->position = 'left';
 
         $ids = $componentInstanceMapper->save($newComp);
 
         $instanceID = $ids[0];
 
-        $componentInstanceMapper->cascadeSequence($_POST['uid']);
+        $componentInstanceMapper->cascadeSequence($user['uid']);
 
         // get the Instance's Definition's Controller
         $factory = new Component_Eportfolio_Factory(new User(), new SitePage(false));
@@ -113,9 +119,6 @@ else if (is_numeric($_REQUEST['uid'])) {
         if(!($component instanceof Component_ControllerAbstract)) {
             die("<h2>Error adding component</h2><p>Could not find component to instantiate.</p>");
         }
-
-        $userHandler = new User();
-        $user = $userHandler->getByID($_POST['uid']);
 
         $templateTarget = "component_position_{$component->instance->position}";
         $templateHandle = "component_{$component->instance->id}";
