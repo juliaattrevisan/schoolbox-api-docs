@@ -373,7 +373,7 @@ if($recentSubmission['sid']) {
     // override the due gradient because we have submitted
     $this->setVar('BOX_DUEDATE_GRADIENT', 'black');
 
-    if ($recentSubmission['date'] > date('U', strtotime($submission->getDueDate()))) {
+    if ($recentSubmission['date'] > $submission->getDueDate()->getUnixTimestamp()) {
         $this->setVar('OVERDUE', 'overdue');
         $this->parse('overdue_block', 'overdue');
     }
@@ -452,8 +452,8 @@ if($recentSubmission['sid']) {
     // only allow a resubmission if the current user is the owner, if the submission box is accepting submissions, and if the current time is between open and late
     if(
         $userID == $_SESSION['id'] &&
-        mktime() > strtotime($submission->getOpenDate()) &&
-        mktime() < strtotime($submission->getLateDate()) &&
+        (mktime() > $submission->getOpenDate()->getUnixTimestamp()) &&
+        (mktime() < $submission->getLateDate()->getUnixTimestamp()) &&
         $submission->getAcceptOnline() &&
         $submission->getAcceptMultiple()
     ) {
