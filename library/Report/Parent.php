@@ -310,33 +310,48 @@ class Report_Parent extends Report_Abstract {
 				}
 
 				if ($currentContact['PrimaryDirectoryIncludeFlag'] == 1) {
-					$address = '';
+					$postalAddress = '';
+					$homeAddress = '';
 
 					/* Combine additional address details
 					 * strlen/trim check in case of whitespace characters coming out
+					 *
+					 * Do it for both home and postal addresses
+					 */
+
+					/* Postal Address
+					 */
+					if (strlen(trim($currentContact['StudentContactAddress1']))) {
+						$postalAddress .= $currentContact['StudentContactAddress1'];
+					}
+
+					if (strlen(trim($currentContact['StudentContactAddress2']))) {
+						$postalAddress .= '<br />' . $currentContact['StudentContactAddress2'];
+					}
+
+					if (strlen(trim($currentContact['StudentContactAddress3']))) {
+						$postalAddress .= '<br />' . $currentContact['StudentContactAddress3'];
+					}
+
+					$postalAddress .= '<br />';
+					$postalCountry = $currentContact['StudentContactCountryCode'];
+
+					/* Home Address
 					 */
 					if (strlen(trim($currentContact['StudentContactHomeAddress1']))) {
-						$address .= $currentContact['StudentContactHomeAddress1'];
+						$homeAddress .= $currentContact['StudentContactHomeAddress1'];
 					}
 
 					if (strlen(trim($currentContact['StudentContactHomeAddress2']))) {
-						$address .= '<br />' . $currentContact['StudentContactHomeAddress2'];
+						$homeAddress .= '<br />' . $currentContact['StudentContactHomeAddress2'];
 					}
 
 					if (strlen(trim($currentContact['StudentContactHomeAddress3']))) {
-						$address .= '<br />' . $currentContact['StudentContactHomeAddress3'];
+						$homeAddress .= '<br />' . $currentContact['StudentContactHomeAddress3'];
 					}
 
-					$address .= '<br />';
-
-					/* Check if Country was specified
-					 */
-					if ($currentContact['StudentContactCountryDesc'] == 'Not Selected') {
-						$country = '';
-					}
-					else {
-						$country = $currentContact['StudentContactCountryDesc'];
-					}
+					$homeAddress .= '<br />';
+					$homeCountry = $currentContact['StudentContactHomeCountryCode'];
 
 					/* Figure out whether to use the Preferred or the Given (LegalFullName) field
 					 * for this contact
@@ -355,12 +370,19 @@ class Report_Parent extends Report_Abstract {
 						'CONTACT_SURNAME' => $currentContact['StudentContactSurname'],
 						'CONTACT_PHONE' => $currentContact['StudentContactSilentPhoneFlag']?'':$currentContact['StudentContactPhoneActual'],
 						'CONTACT_MOBILE' => $currentContact['StudentContactMobilePhone'],
-						'CONTACT_STREET' => $address,
-						'CONTACT_SUBURB' => $currentContact['StudentContactSuburb'],
-						'CONTACT_STATE' => $currentContact['StudentContactState'],
-						'CONTACT_POSTCODE' => $currentContact['StudentContactPostCode'],
-						'CONTACT_COUNTRY' => $country,
 						'CONTACT_EMAIL' => $currentContact['StudentContactDefaultEmail'],
+
+						'CONTACT_POSTAL_STREET' => $postalAddress,
+						'CONTACT_POSTAL_SUBURB' => $currentContact['StudentContactSuburb'],
+						'CONTACT_POSTAL_STATE' => $currentContact['StudentContactState'],
+						'CONTACT_POSTAL_POSTCODE' => $currentContact['StudentContactPostCode'],
+						'CONTACT_POSTAL_COUNTRY' => $postalCountry,
+
+						'CONTACT_HOME_STREET' => $homeAddress,
+						'CONTACT_HOME_SUBURB' => $currentContact['StudentContactHomeSuburb'],
+						'CONTACT_HOME_STATE' => $currentContact['StudentContactHomeState'],
+						'CONTACT_HOME_POSTCODE' => $currentContact['StudentContactHomePostCode'],
+						'CONTACT_HOME_COUNTRY' => $homeCountry,
 					));
 
 					$showContact = true;
