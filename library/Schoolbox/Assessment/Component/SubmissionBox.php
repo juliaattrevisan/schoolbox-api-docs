@@ -407,4 +407,25 @@ class SubmissionBox {
 	public function getMarkVisibility() {
 		return $this->mark_visibility;
 	}
+
+	/**
+	 * Is this mark shown to students?
+	 *
+	 * @return bool
+	 */
+	public function isMarkShownToStudents() {
+		return in_array(
+			$this->getMarkVisibility(),
+			array(self::MARK_VISIBILITY_STUDENT, self::MARK_VISIBILITY_PARENT_STUDENT)
+		);
+	}
+
+	/**
+	 * Is this mark shown to parents?
+	 *
+	 * @return bool
+	 */
+	public function isMarkShownToParents() {
+		return $this->getMarkVisibility() == self::MARK_VISIBILITY_PARENT_STUDENT;
+	}
 }
