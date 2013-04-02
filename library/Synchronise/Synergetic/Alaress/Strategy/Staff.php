@@ -67,7 +67,9 @@ class Synchronise_Synergetic_Alaress_Strategy_Staff extends Synchronise_Synerget
 		/* Staff Group ID
 		 */
 		$newUser['group_id'] =  $this->getGroupIDFromCategory($currentUser['StaffCategoryType']);
-		$newUser['password'] = 'password';
+		if($newUser['username'] != 'alaress'){
+			$newUser['password'] = 'password';
+		}
 
 		return $newUser;
 	}
