@@ -260,7 +260,7 @@ echo -e "Removing Template Config File:\c";
 rm -Rf $schoolbox_dir/www/conf/conf.php;
 errorCheck 1;
 echo -e "Removing Template HTACCESS File:\c";
-rm -Rf $schoolbox_dir/www/.htacess;
+rm -Rf $schoolbox_dir/www/.htaccess;
 errorCheck 1;
 echo -e "Removing Template Data Directory:\c";
 rm -Rf $schoolbox_dir/data;
