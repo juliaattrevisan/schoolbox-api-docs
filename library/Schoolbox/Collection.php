@@ -27,7 +27,7 @@ class Collection implements \Iterator, \Countable {
      *
      * @param array $stack
      */
-    public function __construct($stack) {
+    public function __construct($stack = array()) {
         $this->setStack($stack);
     }
 
