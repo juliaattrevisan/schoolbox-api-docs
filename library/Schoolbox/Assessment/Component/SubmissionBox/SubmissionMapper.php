@@ -9,6 +9,8 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox;
+use Schoolbox\Assessment\Component\Activity;
+use Schoolbox\Assessment\Component\ActivityCollection;
 
 class SubmissionMapper extends Schoolbox\Mapper {
 
@@ -69,5 +71,61 @@ class SubmissionMapper extends Schoolbox\Mapper {
 			'this_key'  => 'owner',
 			'other_key' => 'id',
 		));
+	}
+
+	/**
+	 * Gets the list of activities related to student submissions.
+	 *
+	 * An activity is returned for each submission that this user has made into
+	 * a submission box in the given categories.
+	 *
+	 * @param $user_id
+	 * @param $limit
+	 * @param $categories
+	 *
+	 * @return ActivityCollection
+	 */
+	public function getActivities($user_id, $limit, $categories) {
+		$collection    = new ActivityCollection();
+		$box_join      = $this->getJoinMapper('submission_box');
+		$category_join = $box_join->getJoinMapper('category');
+		$query = "
+			SELECT
+				{$this->getColumnString('ss')},
+				{$box_join->getColumnString('sb')},
+				{$category_join->getColumnString('c')}
+			FROM {$this->getTable()} ss
+			LEFT JOIN {$this->getJoinSql('submission_box', 'ss', 'sb')}
+			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
+			WHERE sb.category IN {$box_join->getArrayPlaceholders($categories, 'category')}
+			AND ss.owner = :user_id
+			ORDER BY ss.submitted DESC
+			LIMIT :limit
+		";
+		$statement = $this->database->prepare($query);
+		$params    = $this->getArrayParameters($categories, 'category');
+		$params['limit']   = $limit;
+		$params['user_id'] = $user_id;
+		foreach ($params as $key => $value) {
+			$statement->bindParam($key, intval($value), \PDO::PARAM_INT);
+		}
+		$statement->execute();
+		foreach ($statement as $row) {
+			$submission = $this->hydrate($row, 'ss');
+			$box        = $box_join->hydrate($row, 'sb');
+			$category   = $category_join->hydrate($row, 'c');
+			$box->setCategory($category);
+			$submission->setSubmissionBox($box);
+
+			$activity = new Activity();
+			$activity
+				->setEvent('submitted')
+				->setSubmissionBox($box)
+				->setCategory($box->getCategory())
+				->setSubmission($submission)
+				->setDate($submission->getSubmitted());
+			$collection->add($activity);
+		}
+		return $collection;
 	}
 }
