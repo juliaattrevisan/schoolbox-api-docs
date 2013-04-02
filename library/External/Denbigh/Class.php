@@ -36,6 +36,7 @@ class External_Denbigh_Class implements External_ClassInterface {
 			LEFT JOIN Students s ON s.peopleDenbighID = e.studentID
 			LEFT JOIN People p ON p.denbighID = s.peopleDenbighID
 			WHERE c.classCode = '$classCode'
+			ORDER BY p.surname ASC
 		");
 
 		$studentList = $statement->fetchAll(PDO::FETCH_ASSOC);
