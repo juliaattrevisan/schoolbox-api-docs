@@ -390,6 +390,17 @@ if (is_array($activityLog)) {
         ) . '</a>';
 
         $boxUrl = "<a href=\"/submission/submissionHistory/{$activity['box_id']}/$userID\">$taskName</a>";
+        if ($activity['type'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) {
+            //
+            // Link to page for assessment - there's no equivalent of submission
+            // history page for assessments, so bounce to intro page
+            if ($activity['new'] == 'closed') {
+                $boxUrl = $taskName;
+            }
+            else {
+                $boxUrl = "<a href=\"/assess/intro/{$activity['box_id']}\">$taskName</a>";
+            }
+        }
 
         switch ($activity['new']) {
             case 'new':
