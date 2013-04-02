@@ -462,4 +462,108 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 //		}
 //		return $collection;
 	}
+
+	/**
+	 * Gets the list of activities related to submission boxes.
+	 *
+	 * The following activities are retrieved:
+	 *
+	 * * New submission boxes
+	 * * Overdue submission boxes, which the user hasn't submitted work for
+	 *   (The implementation in Submission->getActivityLog() appears to fetch
+	 *    submission boxes which the user has submitted work for)
+	 * * Closed submission boxes
+	 *
+	 * @param int   $user_id    The user for who activities are fetched for.
+	 * @param int   $limit      The max number of activities to be fetched.
+	 * @param array $categories The categories to fetch activities for.
+	 *
+	 * @return ActivityCollection
+	 */
+	public function getActivities($user_id, $limit, $categories) {
+		$collection = new ActivityCollection(array());
+		$queries = array(
+			array(
+				'event' => 'new',
+				'query' => "
+					SELECT
+						{$this->getColumnString('sb')},
+						{$this->getJoinMapper('category')->getColumnString('c')}
+					FROM {$this->getTable()} sb
+					LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
+					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
+					AND sb.open_date < NOW()
+					LIMIT :limit
+				",
+				'date_field' => 'openDate',
+				'limit'      => $limit,
+			),
+			array(
+				//
+				// Overdue: shouldn't this be for items which a student hasn't
+				// submitted, instead of one which they have?
+				'event' => 'overdue',
+				'query' => "
+					SELECT
+						{$this->getColumnString('sb')},
+						{$this->getJoinMapper('category')->getColumnString('c')}
+					FROM {$this->getTable()} sb
+					LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
+					LEFT JOIN {$this->getJoinSql('submission', 'sb', 'sm')} AND sm.owner = :user_id
+					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
+					AND sm.id IS NULL
+					AND sb.date < NOW()
+					LIMIT :limit
+				",
+				'date_field' => 'dueDate',
+				'limit'      => $limit,
+				'user_id'    => $user_id,
+			),
+			array(
+				'event' => 'closed',
+				'query' => "
+					SELECT
+						{$this->getColumnString('sb')},
+						{$this->getJoinMapper('category')->getColumnString('c')}
+					FROM {$this->getTable()} sb
+					LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
+					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
+					AND sb.late_date < NOW()
+					LIMIT :limit
+				",
+				'date_field' => 'lateDate',
+				'limit'      => $limit,
+			),
+		);
+
+		foreach ($queries as $query) {
+			$statement = $this->database->prepare($query['query']);
+			$params    = $this->getArrayParameters($categories, 'category');
+			if (!empty($query['limit'])) {
+				$params['limit'] = $query['limit'];
+			}
+			if (!empty($query['user_id'])) {
+				$params['user_id'] = $query['user_id'];
+			}
+			foreach ($params as $key => $value) {
+				$statement->bindParam($key, intval($value), \PDO::PARAM_INT);
+			}
+			$statement->execute();
+
+			$get_method = $this->getGetMethodName($query['date_field']);
+			foreach ($statement->fetchAll() as $row) {
+				$box = $this->hydrate($row, 'sb');
+				$activity = new Activity();
+				$activity
+					->setEvent($query['event'])
+					->setSubmissionBox($box)
+					->setCategory($box->getCategory())
+					->setDate($box->$get_method());
+				$collection->add($activity);
+			}
+		}
+
+		return $collection;
+	}
+
 }
