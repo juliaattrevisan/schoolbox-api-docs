@@ -47,7 +47,7 @@ if ($eportfolioHandler->getTemplate() === false) {
 /* Assemble list of components
  */
 $componentFactory = new Component_Eportfolio_Factory(new User, $this);
-$componentCollection = $componentFactory->buildComponentList($userId);
+$componentCollection = $componentFactory->buildComponentList($pageId);
 
 /* Determine access permissions
  * TODO: Currently hardcoded
