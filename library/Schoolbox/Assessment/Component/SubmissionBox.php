@@ -30,7 +30,7 @@ class SubmissionBox {
 	protected $category;
 
 	/**
-	 * @var int
+	 * @var WorkType
 	 */
 	protected $work_type;
 

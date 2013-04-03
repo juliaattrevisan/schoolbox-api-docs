@@ -34,7 +34,7 @@ class FileMapper extends Schoolbox\Mapper {
 		$this->hasJoin('file', array(
 			'mapper'    => new Schoolbox\FileMapper(),
 			'this_key'  => 'storage_id',
-			'other_key' => 'storage_id',
+			'other_key' => 'id',
 		));
 	}
 
