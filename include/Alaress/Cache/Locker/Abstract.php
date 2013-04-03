@@ -126,7 +126,7 @@ abstract class Alaress_Cache_Locker_Abstract {
 
 		/* Logging class handles verbosity and any logging
 		 */
-		$this->registerObserver('Alaress_Cache_Locker_Log');
+		// $this->registerObserver('Alaress_Cache_Locker_Log');
 
 		/* Determine the filenames of files that could be used
 		 */
@@ -348,8 +348,10 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 * @param $text
 	 */
 	private function notifyObservers($text) {
-		foreach ($this->getObserverRegistry() as $key => $instance) {
-			$instance->report($text);
+		if (count($this->getObserverRegistry())) {
+			foreach ($this->getObserverRegistry() as $key => $instance) {
+				$instance->report($text);
+			}
 		}
 	}
 
