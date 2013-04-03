@@ -150,7 +150,7 @@ abstract class Alaress_Cache_Locker_Abstract {
 		if (file_exists($this->getCachedFile())) {
 			if ($this->isExpired($this->getCachedFile(), $this->getCachedTime())) {
 				if (file_exists($this->getLockFile())) {
-					if ($this->isExpired($this->getLockFile(), $this->getCachedTime())) {
+					if ($this->isExpired($this->getLockFile(), $this->getLockTime())) {
 
 						/* Update cached version
 						 */
