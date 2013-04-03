@@ -234,4 +234,18 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
         }
         return true;
     }
+
+	/**
+	 * Compare function for comparing with another date object.
+	 *
+	 * @param Alaress_Date_Format $other
+	 *
+	 * @return int
+	 */
+	public function compare($other) {
+		if (!($other instanceof Alaress_Date_Format)) {
+			return 0;
+		}
+		return $this->getStrategy()->compare($other->getStrategy());
+	}
 }

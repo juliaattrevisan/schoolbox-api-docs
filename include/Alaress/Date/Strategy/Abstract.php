@@ -535,4 +535,23 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Int
 	public function getWeekDayNumber () {
 		return $this->getUsingFormat('N');
 	}
+
+	/**
+	 * Compare function for comparing with another date object.
+	 *
+	 * @param Alaress_Date_Format_Interface $other
+	 *
+	 * @return int
+	 */
+	public function compare($other) {
+		if (!($other instanceof Alaress_Date_Format_Interface)) {
+			return 0;
+		}
+		$this_timestamp  = $this->getUsingFormat('U');
+		$other_timestamp = $other->getUsingFormat('U');
+		if (!($this_timestamp === $other_timestamp)) {
+			return $this_timestamp < $other_timestamp ? -1 : 1;
+		}
+		return 0;
+	}
 }

@@ -9,7 +9,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-interface Alaress_Date_Format_Interface {
+interface Alaress_Date_Format_Interface extends IComparable {
 	/**
 	 * Creates the date format object from a given datetime and format.
 	 *
