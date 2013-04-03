@@ -78,7 +78,7 @@ cd $thistempdir/schoolbox-$tag;
 tools/build-less-css.sh
 
 echo "Building directory sql updates";
-tools/generate-dir-sql.sh /var/www/schoolbox /var/www/schoolbox > sql/schoolbox-package-config.sql
+tools/generate-dir-sql.sh /var/www/schoolbox/data /var/www/schoolbox > sql/schoolbox-package-config.sql
 
 echo "Removing unrequired files and directories";
 rm -rf {debian,phpunit.xml,README.md,test,.git*,Vagrantfile,tools/vagrant*,tools/pkg-*}
