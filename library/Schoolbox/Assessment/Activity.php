@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Component;
+namespace Schoolbox\Assessment;
 
 use \Alaress_Date_Format;
 use Schoolbox\User;

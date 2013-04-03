@@ -9,8 +9,8 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox;
-use Schoolbox\Assessment\Component\Activity;
-use Schoolbox\Assessment\Component\ActivityCollection;
+use Schoolbox\Assessment\Activity;
+use Schoolbox\Assessment\ActivityCollection;
 
 class ReturnedWorkMapper extends Schoolbox\Mapper {
 
