@@ -44,14 +44,14 @@ class Autoloader {
      */
     public static function load ($className) {
 
-        /* Try loading old style first as it is most used */
-        if ( $deprecatedClassFile = self::getDeprecatedClassFile($className) ) {
-            self::includeFile($deprecatedClassFile);
+        /* Try standardized style first, because it's much faster */
+        if ( $classFile = self::getClassFile($className) ) {
+            self::includeFile($classFile);
         }
 
-        /* Try standardized style */
-        else if ( $classFile = self::getClassFile($className) ) {
-            self::includeFile($classFile);
+        /* Try old style */
+        else if ( $deprecatedClassFile = self::getDeprecatedClassFile($className) ) {
+            self::includeFile($deprecatedClassFile);
         }
     }
 
@@ -61,6 +61,15 @@ class Autoloader {
      */
     private static function getClassFile ($className) {
         $classSegments = preg_split('/[_\\\\]/', $className);
+
+        //
+        // For efficiency - attempt to load this filename with the PEAR standard
+        // class name first.
+        $ideal_filename = implode('/', $classSegments).'.php';
+        if (self::fileExists($ideal_filename)) {
+            return $ideal_filename;
+        }
+
         $unqualClassName = $classSegments[count($classSegments) - 1];
         $pathSegments = $classSegments;
 
