@@ -208,4 +208,17 @@ class Collection implements \Iterator, \Countable {
 		$this->setStack(array_slice($this->getStack(), $offset, $count));
 		return $this;
 	}
+
+	/**
+	 * Merges contents of another collection with this one - appends all
+	 * elements in the other collection to this one.
+	 *
+	 * @param Collection $other
+	 *
+	 * @return $this
+	 */
+	public function merge(Collection $other) {
+		$this->setStack(array_merge($this->getStack(), $other->getStack()));
+		return $this;
+	}
 }

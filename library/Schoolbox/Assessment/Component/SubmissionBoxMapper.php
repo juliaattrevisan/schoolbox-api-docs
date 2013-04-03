@@ -117,7 +117,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		// $this->hasSoftDeleteField('deleted');
 
 		$this->hasJoin('category', array(
-			'mapper'    => new Schoolbox\Resource\CategoryMapper(),
+			'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
 			//
 			// Define as mapper fields instead?
 			// this_property:     property for model object
@@ -134,26 +134,26 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		));
 		$this->hasJoin('files', array(
 			'multiple'  => true,
-			'mapper'    => new SubmissionBox\FileMapper(),
+			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\FileMapper',
 			'this_key'  => 'id',
 			'other_key' => 'box_id',
 		));
 
 		$this->hasJoin('legacy_file', array(
 			'multiple'  => true,
-			'mapper'    => new Schoolbox\Resource\FileMapper(),
+			'mapper'    => '\\Schoolbox\\Resource\\FileMapper',
 			'this_key'  => 'fid',
 			'other_key' => 'id',
 		));
 
 		$this->hasJoin('work_type', array(
-			'mapper'    => new SubmissionBox\WorkTypeMapper(),
+			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\WorkTypeMapper',
 			'this_key'  => 'type',
 			'other_key' => 'id',
 		));
 
 		$this->hasJoin('mark_type', array(
-			'mapper'    => new SubmissionBox\MarkTypeMapper(),
+			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\MarkTypeMapper',
 			'this_key'  => 'mark_type',
 			'other_key' => 'mark_type_id',
 		));
@@ -162,19 +162,19 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		// TODO add Mapper->hasCollection?
 		$this->hasJoin('notify', array(
 			'multiple'  => true,
-			'mapper'    => new SubmissionBox\NotificationMapper(),
+			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\NotificationMapper',
 			'this_key'  => 'id',
 			'other_key' => 'box_id',
 		));
 		$this->hasJoin('submission', array(
 			'multiple'  => true,
-			'mapper'    => new SubmissionBox\SubmissionMapper(),
+			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\SubmissionMapper',
 			'this_key'  => 'id',
 			'other_key' => 'box_id',
 		));
 		$this->hasJoin('return', array(
 			'multiple'  => true,
-			'mapper'    => new SubmissionBox\ReturnedWorkMapper(),
+			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\ReturnedWorkMapper',
 			'this_key'  => 'id',
 			'other_key' => 'box_id',
 		));

@@ -43,7 +43,7 @@ class CategoryMapper extends Mapper {
 		));
 		$this->hasJoin('files', array(
 			'multiple'  => true,
-			'mapper'    => new FileMapper(),
+			'mapper'    => '\\Schoolbox\\Resource\\FileMapper',
 			'this_key'  => 'id',
 			'other_key' => 'category',
 		));
