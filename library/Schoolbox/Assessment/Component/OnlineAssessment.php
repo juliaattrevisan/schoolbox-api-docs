@@ -14,6 +14,7 @@ namespace Schoolbox\Assessment\Component;
 use \Alaress_Date_Format;
 use Schoolbox\Resource\Category;
 use Schoolbox\User;
+use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 
 class OnlineAssessment {
 
@@ -35,9 +36,12 @@ class OnlineAssessment {
 	 */
 	protected $user;
 
-	//
-	// Type isn't needed, as it's always '11' and defaults to that value
-	// protected $type;
+	/**
+	 * Not strictly required, because it's always WorkType::TYPE_ONLINE_ASSESSMENT.
+	 *
+	 * @var WorkType
+	 */
+	protected $work_type;
 
 	/**
 	 * @var string
@@ -308,5 +312,22 @@ class OnlineAssessment {
 	 */
 	public function getUser() {
 		return $this->user;
+	}
+
+	/**
+	 * @param  \Schoolbox\Assessment\Component\SubmissionBox\WorkType $work_type
+	 *
+	 * @return $this
+	 */
+	public function setWorkType($work_type) {
+		$this->work_type = $work_type;
+		return $this;
+	}
+
+	/**
+	 * @return \Schoolbox\Assessment\Component\SubmissionBox\WorkType
+	 */
+	public function getWorkType() {
+		return $this->work_type;
 	}
 }

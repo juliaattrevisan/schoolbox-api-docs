@@ -36,6 +36,12 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			'join'       => 'user',
 		));
 		$this->hasMap(array(
+			'column'     => 'type',
+			'property'   => 'workType',
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'work_type',
+		));
+		$this->hasMap(array(
 			'column'     => 'title',
 			'property'   => 'title',
 			'type'       => self::TYPE_STRING,
@@ -91,6 +97,11 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 		$this->hasJoin('user', array(
 			'mapper'    => 'Schoolbox\\UserMapper',
 			'this_key'  => 'user_id',
+			'other_key' => 'id',
+		));
+		$this->hasJoin('work_type', array(
+			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\WorkTypeMapper',
+			'this_key'  => 'type',
 			'other_key' => 'id',
 		));
 	}
