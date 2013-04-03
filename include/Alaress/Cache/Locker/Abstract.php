@@ -191,7 +191,7 @@ abstract class Alaress_Cache_Locker_Abstract {
 	/**
 	 * Sam's new cache update :P
 	 *
-	 * @return Alaress_Cache_Abstract2
+	 * @return Alaress_Cache_Abstract
 	 */
 	private function newCacheUpdate() {
 
@@ -258,7 +258,7 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 * Remove the cached file
 	 *
 	 * @param $file
-	 * @return Alaress_Cache_Abstract2
+	 * @return Alaress_Cache_Abstract
 	 */
 	private function remove($file) {
 		@unlink($file);
@@ -396,7 +396,7 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 * Set cached time
 	 *
 	 * @param null $cachedTime
-	 * @return \Alaress_Cache_Abstract2
+	 * @return \Alaress_Cache_Abstract
 	 */
 	public function setCachedTime($cachedTime) {
 		$this->notifyObservers("Setting cached duration to $cachedTime");
