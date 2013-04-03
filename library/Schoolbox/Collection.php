@@ -151,4 +151,61 @@ class Collection implements \Iterator, \Countable {
 		}
 		return $parts;
 	}
+
+	/**
+	 * Sorts the collection by a field and a direction. If the field values are
+	 * IComparable objects, then the object's compare method is used, otherwise
+	 * standard comparison is used.
+	 *
+	 * Special case of $this->sortByCallback().
+	 *
+	 * @param string $field     The name of the field to sort by.
+	 * @param string $direction The order to sort by - 'asc' or 'desc'
+	 *
+	 * @return $this
+	 */
+	public function sortBy($field, $direction) {
+		$get_method = $this->getGetMethodName($field);
+		$is_asc     = (strtolower($direction) === 'asc');
+		$callback   = function($a, $b) use ($get_method, $is_asc) {
+			$result  = 0;
+			$a_value = $a->$get_method();
+			$b_value = $b->$get_method();
+			if ($a_value instanceof \IComparable && $b_value instanceof \IComparable) {
+				$result = $a_value->compare($b_value);
+			}
+			elseif ($a_value !== $b_value) {
+				$result = $a_value < $b_value ? -1 : 1;
+			}
+			return $is_asc ? $result : -$result;
+		};
+		return $this->sortByCallback($callback);
+	}
+
+	/**
+	 * Sorts the collection by a callback. @see usort()
+	 *
+	 * @param callable $callback
+	 *
+	 * @return $this
+	 */
+	public function sortByCallback($callback) {
+		$stack = $this->getStack();
+		usort($stack, $callback);
+		$this->setStack($stack);
+		return $this;
+	}
+
+	/**
+	 * Limits the collection by count and offset. @see array_slice()
+	 *
+	 * @param int $offset
+	 * @param int $count
+	 *
+	 * @return $this
+	 */
+	public function limit($offset = 0, $count = null) {
+		$this->setStack(array_slice($this->getStack(), $offset, $count));
+		return $this;
+	}
 }
