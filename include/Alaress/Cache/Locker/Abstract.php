@@ -274,7 +274,7 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 * @return bool
 	 */
 	private function isExpired($file, $duration) {
-		$now = time();
+		$now = $_SERVER['REQUEST_TIME'];
 
 		/* Difference between now and when file was created
 		 */
