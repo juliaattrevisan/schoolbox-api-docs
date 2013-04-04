@@ -213,6 +213,14 @@ class Activity {
 		return ($this->getAssessment()) ? true : false;
 	}
 
+	public function isSubmission() {
+		return ($this->getSubmission()) ? true : false;
+	}
+
+	public function isReturn() {
+		return ($this->getReturnedWork()) ? true : false;
+	}
+
 	/**
 	 * Gets the object ID for this activity object.
 	 *
@@ -232,5 +240,17 @@ class Activity {
 
 	public function getTypeName() {
 		return $this->isAssessment() ? $this->getAssessment()->getWorkType()->getName() : $this->getSubmissionBox()->getWorkType()->getName();
+	}
+
+	public function getReturnedFileId() {
+		return $this->isReturn() ? $this->getReturnedWork()->getId() : null;
+	}
+
+	public function getReturnedMark() {
+		return $this->isReturn() ? $this->getReturnedWork()->getMark() : null;
+	}
+
+	public function getReturnedNormalizedMark() {
+		return $this->isReturn() ? $this->getReturnedWork()->getNormalizedMark() : null;
 	}
 }
