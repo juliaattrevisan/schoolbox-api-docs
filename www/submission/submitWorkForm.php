@@ -32,8 +32,6 @@ if ( isset( $_FILES['file']['name'] ) && $_FILES['file']['name'] && is_numeric($
                 'file' => $submitDir . "$submissionId.dat"
             );
 
-            print_r($document);
-
             // argument[1] ('true') here sends the redirect header and closes the connection, but allows us to continue processing
             $page->localRedir('/submission/submissionHistory/'.$_POST['box_id'].'/'.$_SESSION['id'], true);
 

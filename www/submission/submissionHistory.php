@@ -18,6 +18,7 @@ $this->setBlock(TEMPLATE_content, 'returned_work', 'returned_work_block');
 $this->setBlock(TEMPLATE_content, 'teacher', 'teacher_block');
 $this->setBlock(TEMPLATE_content, 'rubric', 'rubric_block');
 $this->setBlock('returned_work', 'return_file','return_file_block');
+$this->setBlock('recent_submission', 'plag_score', 'plag_score_block');
 $this->setBlock('recent_submission', 'overdue', 'overdue_block');
 $this->setBlock('recent_submission', 'action_resubmit', 'action_resubmit_block');
 $this->setBlock('recent_submission', 'recent_submission_download', 'recent_submission_download_block');
@@ -372,6 +373,7 @@ if($recentSubmission['sid']) {
         $size = '0 KB';
     }
 
+	// populate details into page
     $this->setVar(array(
         'MOST_RECENT_SUBMISSION_FILE_NAME' => $recentSubmission['sfname'],
         'MOST_RECENT_SUBMISSION_FILE_SIZE' => $size,
@@ -379,6 +381,47 @@ if($recentSubmission['sid']) {
         'MOST_RECENT_SUBMISSION_FILE_DATE' => $recentSubmissionDate->getRelativeTime(),
         'MOST_RECENT_SUBMISSION_FILE_ID' => $recentSubmission['sid'],
     ));
+
+
+	// if we are the owning student, display plagiarism details if they are available
+	if($userID == $_SESSION['id'] && Config::get('plagscan_student_visible')) {
+
+		// retrieve plagiarism score, if available
+		$docMapper = Plagscan_DocumentMapper::getInstance();
+		$plagDoc = $docMapper->findByColumn('file_id', $recentSubmission['sid'])->current();
+		// test: $plagDoc = $docMapper->findByColumn('file_id', 9)->current();
+
+		// if we retrieved a plag document, use it and display to the student
+		if($plagDoc->id && $plagDoc->status == Plagscan_Document::STATUS_COMPLETE) {
+
+			// what colour should the plagiarism text be, and what should the tooltip say?
+			if($plagDoc->score > 60) {
+				$status = 'critical';
+				$tooltip = 'Your submission is extremely similar to other documents scanned.';
+			}
+			elseif($plagDoc->score > 20) {
+				$status = 'warn';
+				$tooltip = 'Your submission is somewhat similar to other documents scanned.';
+			}
+			else {
+				$status = 'ok';
+				$tooltip = 'Your submission is quite different to other documents scanned.';
+			}
+
+			$this->setVar(array(
+				'MOST_RECENT_SUBMISSION_FILE_PLAG_CLASS' => $status,
+				'MOST_RECENT_SUBMISSION_FILE_PLAGSCORE' => $plagDoc->score,
+				'MOST_RECENT_SUBMISSION_FILE_PLAG_TITLE' => $tooltip,
+			));
+			$this->parse('plag_score_block', 'plag_score');
+		}
+		else {
+			$this->setVar('plag_score_block', '');
+		}
+	}
+	else {
+		$this->setVar('plag_score_block', '');
+	}
 
     // only allow a resubmission if the current user is the owner, if the submission box is accepting submissions, and if the current time is between open and late
     if(
