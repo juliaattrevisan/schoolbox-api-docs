@@ -110,10 +110,10 @@ if ($permission >= WRITE_ACCESS) {
             ++$i;
             $class = '';
 
-            if ($component->multiple == 'false') {
+            if ($component->definition->multiple == 'false') {
                 $class = 'one-only ';
 
-                if ($component->multiple == 'false' && $component->instanceCount > 0) {
+                if ($component->definition->multiple == 'false' && $component->instanceCount > 0) {
                     $class .= 'disabled ';
                 }
             }
