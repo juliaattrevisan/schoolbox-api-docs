@@ -324,11 +324,12 @@ abstract class Mapper {
                 $statement->bindParam(":$columnName", $this->getModelProperty($model, $propertyName, $map));
             }
             if ($statement->execute()) {
-                $identifier = $this->identifier['property'];
-                if (!$this->getModelProperty($model, $identifier, $this->identifier)) {
-                    $this->setModelProperty($model, $identifier, $this->database->lastInsertId(), $this->identifier);
+                $identifier  = $this->getIdentifier();
+                $id_property = $identifier['property'];
+                if (!$this->getModelProperty($model, $id_property, $identifier)) {
+                    $this->setModelProperty($model, $id_property, $this->database->lastInsertId(), $identifier);
                 }
-                $affectedIDs[] = $this->getModelProperty($model, $identifier, $map);
+                $affectedIDs[] = $this->getModelProperty($model, $id_property, $identifier);
             }
             else {
                 $this->database->rollBack();
