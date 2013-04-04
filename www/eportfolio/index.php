@@ -87,26 +87,26 @@ if ($permission >= WRITE_ACCESS) {
     $this->parse('modify_layout_block', 'modify_layout');
     $this->parse('customise_page_block', 'customise_page');
 
-    $definitionCollection = $componentFactory->getDefinitionList('eportfolio_template');
+    $instanceCollection = $componentFactory->getDefinitionList('eportfolio_template');
 
-    foreach ($definitionCollection as $definition) {
-        $definition->instanceCount = 0;
+    foreach ($instanceCollection as $instance) {
+		$instance->instanceCount = 0;
 
-		$definition->definition->componentCategory = $definition->identifier;
-		$definition->definition->componentCategoryName = $eportfolioHandler->getTemplateNameById($definition->identifier);
+		$instance->definition->componentCategory = $instance->identifier;
+		$instance->definition->componentCategoryName = $eportfolioHandler->getTemplateNameById($instance->identifier);
 
         foreach ($componentCollection as $inst) {
-            if ($inst->definitionId == $definition->id) {
-                ++$definition->instanceCount;
+            if ($inst->definitionId == $instance->definitionId) {
+                ++$instance->instanceCount;
             }
         }
     }
 
-    if ($total = $definitionCollection->count()) {
+    if ($total = $instanceCollection->count()) {
         $i = 0;
         $previous = null;
 
-        foreach ($definitionCollection as $component) {
+        foreach ($instanceCollection as $component) {
             ++$i;
             $class = '';
 
@@ -121,7 +121,7 @@ if ($permission >= WRITE_ACCESS) {
             $class = trim($class);
 
             $this->setVar(array(
-				'EPORTFOLIO_COMPONENT_ID' => Scrub::text($component->id),
+				'EPORTFOLIO_COMPONENT_ID' => Scrub::text($component->definitionId),
 				'EPORTFOLIO_COMPONENT_NAME' => Scrub::text($component->definition->name),
 				'EPORTFOLIO_COMPONENT_COUNT' => $component->instanceCount,
 				'EPORTFOLIO_COMPONENT_DESCRIPTION' => Scrub::text($component->definition->description),
