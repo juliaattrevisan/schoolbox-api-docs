@@ -291,12 +291,12 @@ class Eportfolio {
 	 */
 	public function updateColumnWidths($left, $right) {
 		$columnWidths = array(
-			'uid' => $this->getUserId(),
+			'page_id' => $this->getPageId(),
 			'left_column_width' => $left,
 			'right_column_width' => $right,
 		);
 
-		$this->db->update($this->getContext() . '_config', 'uid', $columnWidths);
+		$this->db->update($this->getContext() . '_config', 'page_id', $columnWidths);
 	}
 
 	/**

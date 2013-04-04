@@ -198,10 +198,11 @@ else if (is_numeric($_POST['page_id'])) {
 	}
 
 
-    // AJAX new column widths
-	else if ($_POST['uid'] && is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
-        $homepage = new Homepage($_POST['uid']);
-		$homepage->updateColumnWidths(Scrub::text($_POST['leftColWidth']), Scrub::text($_POST['rightColWidth']));
+    /* AJAX new column widths
+     */
+	else if ($_POST['page_id'] && is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
+        $eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
+		$eportfolioHandler->updateColumnWidths(Scrub::text($_POST['leftColWidth']), Scrub::text($_POST['rightColWidth']));
 	}
 }
 
