@@ -51,6 +51,13 @@ class Eportfolio {
 	private $context = 'eportfolio';
 
 	/**
+	 * All eportfolio_template records
+	 *
+	 * @var array
+	 */
+	private $allTemplates = array();
+
+	/**
 	 * Constructor
 	 *
 	 * @param $userId
@@ -63,7 +70,8 @@ class Eportfolio {
 
 		/* Preload settings
 		 */
-		$this->setSettings($this->getPageSettings($pageId));
+		$this->setSettings($this->fetchPageSettings($pageId));
+		$this->setAllTemplates($this->fetchAllTemplates());
 	}
 
 	/**
@@ -72,7 +80,7 @@ class Eportfolio {
 	 * @param $pageId
 	 * @return mixed
 	 */
-	private function getPageSettings($pageId) {
+	private function fetchPageSettings($pageId) {
 		$query = "
 			SELECT *
 			FROM {$this->getContext()}_config
@@ -148,6 +156,42 @@ class Eportfolio {
 		";
 
 		$this->getDb()->query($query);
+	}
+
+	/**
+	 * Get all eportfolio_template records
+	 *
+	 * @return resource
+	 */
+	private function fetchAllTemplates() {
+		$allTemplates = array();
+
+		$query = "
+			SELECT id, name
+			FROM {$this->getContext()}Template
+			ORDER BY id
+		";
+
+		$result = $this->getDb()->getAll($query);
+
+		/* Do some transpositionary reflex
+		 */
+		if (is_array($result) && count($result)) {
+			foreach($result as $currentTemplate) {
+				$allTemplates[$currentTemplate['id']] = $currentTemplate['name'];
+			}
+		}
+
+		return $allTemplates;
+	}
+
+	/**
+	 * Get a template name by its id, from the entire set
+	 *
+	 * @param $id
+	 */
+	public function getTemplateNameById($id) {
+		return $this->allTemplates[$id];
 	}
 
 
@@ -931,4 +975,20 @@ class Eportfolio {
 	private function getSettings() {
 		return $this->settings;
 	}
+
+	/**
+	 * @param array $allTemplates
+	 */
+	private function setAllTemplates($allTemplates) {
+		$this->allTemplates = $allTemplates;
+	}
+
+	/**
+	 * @return array
+	 */
+	private function getAllTemplates() {
+		return $this->allTemplates;
+	}
+
+
 }
