@@ -57,23 +57,8 @@ override_dh_install:
 	dh_install
 	# Auto build the sql update scripts
 	debian/schoolbox/usr/share/schoolbox/tools/build-sql-update.sh package schoolbox
-	# Set default config paths for packaged install
-	echo "UPDATE config SET value='/usr/share/schoolbox/templates' WHERE name='template_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/files' WHERE name='file_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/myFiles' WHERE name='myfile_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/submissions' WHERE name='submission_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/returns' WHERE name='returns_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/dropbox' WHERE name='dropbox_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/cache/zip' WHERE name='zip_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/thumbnails' WHERE name='thumbnail_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/cache/xml' WHERE name='xml_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/cache/stream' WHERE name='stream_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/cache/portrait' WHERE name='portrait_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/cache/weather' WHERE name='weather_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/cache/minify' WHERE name='minify_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/cache/myfiles' WHERE name='myfiles_cache_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/cache/logs' WHERE name='logs_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
-	echo "UPDATE config SET value='/var/lib/schoolbox/storage' WHERE name='storage_dir';" >> debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
+	# Build default config paths for packaged install
+	debian/schoolbox/usr/share/schoolbox/tools/generate-dir-sql.sh /var/lib/schoolbox /usr/share/schoolbox > debian/schoolbox/usr/share/schoolbox/sql/schoolbox-package-config.sql
 	# Remove moved files
 	rm -rf debian/schoolbox/usr/share/schoolbox/www/conf
 	# Build css files from less
