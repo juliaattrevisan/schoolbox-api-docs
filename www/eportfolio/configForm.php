@@ -62,8 +62,9 @@ else if (is_numeric($_POST['page_id'])) {
 		}
 	}
 
-	// AJAX request to delete component from eportfolio
-	else if ($_POST['uid'] && is_numeric($_POST['delete'])) {
+	/* AJAX request to delete component from eportfolio
+	 */
+	else if ($_POST['page_id'] && is_numeric($_POST['delete'])) {
 
         // locate the instance, locate its config instances, then blast them away
         $instance = $componentInstanceMapper->findById($_POST['delete']);
