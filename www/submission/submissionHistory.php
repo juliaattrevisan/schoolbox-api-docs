@@ -140,6 +140,10 @@ $dueDate = new Alaress_Date_Relative($submission->getDueDate(),'y-m-d');
 $createdDate = new Alaress_Date_Relative($submission->getCreated(), 'y-m-d');
 
 $allWork = $submissionHandler->getSubmissionHistory($userID, $this->arg[0]);
+$submit_mapper = new Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
+$submit_mapper->getActivities($userID, null);
+$return_mapper = new Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
+
 if (!$is_mark_shown && is_array($allWork)) {
 	//
 	// Filter out any items with a work ID

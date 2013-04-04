@@ -540,6 +540,10 @@ function getActivities($user, $limit, $categories, $visibilities) {
 	$assess_mapper = new \Schoolbox\Assessment\Component\OnlineAssessmentMapper();
 	$submit_mapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
 	$return_mapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
+	$params        = array(
+		'categories'   => $categories,
+		'visibilities' => $visibilities,
+	);
 	$activities    = $box_mapper
 		->getActivities($user, $limit, $categories)
 		->merge($assess_mapper->getActivities($user, $limit, $categories))
