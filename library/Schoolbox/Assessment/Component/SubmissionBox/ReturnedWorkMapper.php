@@ -142,4 +142,76 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 		}
 		return $collection;
 	}
+
+	/**
+	 * Builds list of student's marks for all returns in the given category.
+	 *
+	 * @param int   $category_id
+	 * @param int   $student_id
+	 * @param array $extra_params Any extra filters:
+	 *                            * year
+	 *                            * semester
+	 *                            * owner - the creator of the submission box
+	 *                            * visibility - a list containing the allowed
+	 *                              submission box mark visibility values.
+	 *
+	 * @return array
+	 */
+	public function getStudentMarks($category_id, $student_id, $extra_params = array()) {
+		$submission_box_mapper = $this->getJoinMapper('submission_box');
+
+		//
+		// Build filters for query
+		$params = array(
+			'category' => $category_id,
+			'student'  => $student_id,
+		);
+		$filters = array(
+			'sb.category = :category',
+			'sr.owner = :student',
+			'sb.deleted IS FALSE',
+		);
+		if (!empty($extra_params['year'])) {
+			$params['year'] = $extra_params['year'];
+			$filters[]      = 'YEAR(sb.date) = :year';
+		}
+		if (!empty($extra_params['semester'])) {
+			$semester_params       = $submission_box_mapper->getSemesterMonths($extra_params['semester']);
+			$params['month_start'] = $semester_params['start'];
+			$params['month_end']   = $semester_params['end'];
+			$filters[]             = 'MONTH(sb.date) BETWEEN :month_start AND :month_end';
+		}
+		if (!empty($extra_params['owner'])) {
+			$params['owner'] = $extra_params['owner'];
+			$filters[]       = 'sb.owner = :owner';
+		}
+		if (!empty($extra_params['visibility'])) {
+			$params    = array_merge($params,  $this->getArrayParameters($extra_params['visibility'], 'vis'));
+			$filters[] = 'sb.mark_visibility IN '.$this->getArrayPlaceholders($extra_params['visibility'], 'vis');
+		}
+		$filters = implode(' AND ', $filters);
+
+
+		$query = "
+			SELECT sb.id AS box_id, sr.norm_mark
+			FROM {$this->getTable()} sr
+			LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
+			WHERE $filters
+			ORDER BY sr.returned DESC
+		";
+		$statement = $this->database->prepare($query);
+		$statement->execute($params);
+
+		//
+		// Ignore all but the most recent mark for each submission box.
+		$marks = array();
+		foreach ($statement as $row) {
+			$box_id = $row['box_id'];
+			$mark   = $row['norm_mark'];
+			if (!array_key_exists($box_id, $marks)) {
+				$marks[$box_id] = $mark;
+			}
+		}
+		return $marks;
+	}
 }
