@@ -148,6 +148,7 @@ search = {
 		/* Hide all divs, and only show the current one
 		 */
 		search.hideTabs();
+
 	},
 
 	/**
@@ -277,5 +278,6 @@ search = {
 	 */
 	getSection: function() {
 		return this.section;
-	}
+	},
+
 }

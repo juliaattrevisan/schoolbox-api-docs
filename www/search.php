@@ -98,6 +98,7 @@ if (empty($type) || $type == 'all') {
     $page->setBlock(TEMPLATE_content, 'type', 'type_block');
     $page->setBlock(TEMPLATE_content, 'result', 'result_block');
     $page->setBlock(TEMPLATE_content, 'no_result', 'no_result_block');
+	$page->setBlock(TEMPLATE_content, 'see_more', 'see_more_block');
     // escape any quotes in the keyword string, or the javascript will explode.
 
     // setup default values
@@ -107,6 +108,7 @@ if (empty($type) || $type == 'all') {
         'UNESCAPED_KEYWORD' => $keyword,
         'FOR' => ' for ',
         'NO_RESULTS_BECAUSE' => '',
+        'see_more_block' => '',
         'type_block' => '',
         'result_block' => '',
         'no_result_block' => ''
@@ -186,6 +188,7 @@ if (!empty($result['user'])) {
     $page->setBlock('user', 'eportfolio', 'eportfolio_block');
     $page->setBlock('user', 'modify', 'modify_block');
     $page->setBlock('user', 'boarder_leave', 'boarder_leave_block');
+
     $page->setVar(array(
         'USER_DISP_COUNT' => count($result['user']),
         'USER_COUNT' => $count['user'],
@@ -281,6 +284,8 @@ if (!empty($result['user'])) {
         $page->parse('user_block', 'user', true);
     }
 
+	outputSeeMore($page, $type, $count, 'user');
+
     $page->parse('RESULT', 'user_t', true);
 }
 
@@ -324,6 +329,8 @@ if (!empty($result['file'])) {
         $page->parse('file_block', 'file', true);
     }
 
+	outputSeeMore($page, $type, $count, 'file');
+
     $page->parse('RESULT', 'file_t', true);
 }
 
@@ -356,6 +363,8 @@ if (!empty($result['category'])) {
 
         $page->parse('category_block', 'category', true);
     }
+
+	outputSeeMore($page, $type, $count, 'category');
 
     $page->parse('RESULT', 'category_t', true);
 }
@@ -404,6 +413,8 @@ if (!empty($result['link'])) {
         $page->parse('link_block', 'link', true);
     }
 
+	outputSeeMore($page, $type, $count, 'link');
+
     $page->parse('RESULT', 'link_t', true);
 }
 
@@ -446,6 +457,8 @@ if (!empty($result['news'])) {
         $page->parse('news_block', 'news', true);
     }
 
+	outputSeeMore($page, $type, $count, 'news');
+
     $page->parse('RESULT', 'news_t', true);
 }
 
@@ -485,6 +498,8 @@ if (!empty($result['sitenews'])) {
         $page->parse('sitenews_block', 'sitenews', true);
     }
 
+	outputSeeMore($page, $type, $count, 'sitenews');
+
     $page->parse('RESULT', 'sitenews_t', true);
 }
 
@@ -520,6 +535,8 @@ if (!empty($result['blog'])) {
 
         $page->parse('blog_block', 'blog', true);
     }
+
+	outputSeeMore($page, $type, $count, 'blog');
 
     $page->parse('RESULT', 'blog_t', true);
 }
@@ -558,6 +575,8 @@ if (!empty($result['wiki'])) {
         $page->parse('wiki_block', 'wiki', true);
     }
 
+	outputSeeMore($page, $type, $count, 'wiki');
+
     $page->parse('RESULT', 'wiki_t', true);
 }
 
@@ -592,6 +611,8 @@ if (!empty($result['forum'])) {
 
         $page->parse('forum_block', 'forum', true);
     }
+
+	outputSeeMore($page, $type, $count, 'forum');
 
     $page->parse('RESULT', 'forum_t', true);
 }
@@ -631,6 +652,8 @@ if (!empty($result['event'])) {
 
         $page->parse('event_block', 'event', true);
     }
+
+	outputSeeMore($page, $type, $count, 'event');
 
     $page->parse('RESULT', 'event_t', true);
 }
@@ -717,4 +740,26 @@ else if ($result[$type] || $type == 'all') {
     $page->outputPage(true);
 }
 
+
+/**
+ * @param SitePage $page
+ * @param string $type
+ * @param array $count
+ * @param string $handle
+ *
+ * @return void
+ */
+function outputSeeMore($page, $type, $count, $handle) {
+
+	$page->setBlock($handle . '_t', 'see_more', 'see_more_block');
+
+    if($type == 'all' && $count[$handle] > Cfg::get('search_all_limit')) {
+	    $page->setVar('MORE_COUNT', $count[$handle]);
+	    $page->parse('see_more_block', 'see_more');
+    }
+	else {
+		$page->setVar('see_more_block', '');
+	}
+
+}
 ?>
