@@ -171,28 +171,19 @@ laber.error,
     border-radius: 16px;
 }
 /* Rounded-corners end */
-html, body{
-    padding: 0;
-    margin: 0;
-    min-height: 100%;
+html {
+	background: #66a1c0 url('/images/tigs/wrap-top-2.png') -213px 0px no-repeat;
+	background: url('/images/tigs/wrap-top-2.png') -213px 0px no-repeat, #66a1c0  -webkit-gradient(linear, 0% 0%, 0% 100%, from(#121c2d), to(#66a1c0)) no-repeat;
+	background: url('/images/tigs/wrap-top-2.png') -213px 0px no-repeat, #66a1c0 -webkit-linear-gradient(top, #121c2d, #66a1c0) no-repeat;
+	background: url('/images/tigs/wrap-top-2.png') -213px 0px no-repeat, #66a1c0    -moz-linear-gradient(top, #121c2d, #66a1c0) no-repeat;
+	background: url('/images/tigs/wrap-top-2.png') -213px 0px no-repeat, #66a1c0     -ms-linear-gradient(top, #121c2d, #66a1c0) no-repeat;
+	background: url('/images/tigs/wrap-top-2.png') -213px 0px no-repeat, #66a1c0      -o-linear-gradient(top, #121c2d, #66a1c0) no-repeat;
 }
 body{
-    background-image: url(images/fallback-gradient.png);
-    background-image: url('/images/tigs/body-bottom-3.png'), -webkit-gradient(linear, 0% 0%, 0% 100%, from(#121c2d), to(#66a1c0));
-    background-image: url('/images/tigs/body-bottom-3.png'), -webkit-linear-gradient(top, #121c2d, #66a1c0);
-    background-image: url('/images/tigs/body-bottom-3.png'),    -moz-linear-gradient(top, #121c2d, #66a1c0);
-    background-image: url('/images/tigs/body-bottom-3.png'),     -ms-linear-gradient(top, #121c2d, #66a1c0);
-    background-image: url('/images/tigs/body-bottom-3.png'),      -o-linear-gradient(top, #121c2d, #66a1c0);
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#121c2d, endColorstr=#66a1c0);
-    background-color: #6ca4c2;
-    background-repeat: no-repeat;
-    background-position: left bottom;
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient (GradientType=0, startColorstr=#121c2d, endColorstr=#66a1c0)";
+	background: url('/images/tigs/body-bottom-3.png') no-repeat left bottom;
 }
 #wrap{
-    background: url('/images/tigs/wrap-top-2.png') -213px 0px no-repeat;
-    height: auto;
-    min-height: 100%;
+	background: transparent;
 }
 
 /* When Wrap has no content, the image gets cut off, this hides the image when screen height under 300px */
@@ -205,7 +196,6 @@ body{
 #wrap-inner{
     background: url('/images/tigs/logo-large.png') 40px 100% no-repeat;
     padding: 0;
-    min-height: 100%;
 }
 
 h1,h2,h3{ color: #000000; }
