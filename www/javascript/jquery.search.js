@@ -149,9 +149,6 @@ search = {
 		 */
 		search.hideTabs();
 
-        /* Add listeners to any "see all" links present
-         */
-        search.addSeeMoreListeners();
 	},
 
 	/**
@@ -283,10 +280,4 @@ search = {
 		return this.section;
 	},
 
-    /**
-     * Add listeners to the "see all" links
-     */
-    addSeeMoreListeners: function() {
-
-    }
 }
