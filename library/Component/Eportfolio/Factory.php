@@ -14,9 +14,26 @@ class Component_Eportfolio_Factory extends Component_FactoryAbstract {
      */
     protected $module = 'eportfolio';
 
+	/**
+	 * Constructor
+	 *
+	 * @param User $user
+	 * @param SitePage $sitepage
+	 * @param bool $template
+	 */
 	public function __construct(User $user, SitePage $sitepage, $template = false) {
 		$this->module = $template ? 'eportfolio_template' : 'eportfolio';
 
 		parent::__construct($user, $sitepage);
+	}
+
+	/**
+	 * Return a collection of components used in any eportfolio template setup
+	 *
+	 * @param string $module
+	 * @return Collection
+	 */
+	public function getDefinitionList($module) {
+		return new Collection(Component_InstanceMapper::getInstance()->findByModule($module));
 	}
 }
