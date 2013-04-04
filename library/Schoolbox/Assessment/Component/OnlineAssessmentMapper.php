@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Assessment\Component;
 use Schoolbox;
-use Schoolbox\Assessment\Activity;
+use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 
 class OnlineAssessmentMapper extends Schoolbox\Mapper {
@@ -122,6 +122,7 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 	 * @return ActivityCollection
 	 */
 	public function getActivities($user_id, $limit, $categories) {
+		$factory    = new ActivityFactory();
 		$collection = new ActivityCollection();
 		$queries = array(
 			array(
@@ -169,17 +170,14 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			}
 			$statement->execute();
 
+			//
+			// Pass to activity collection instead? createFromOnlineAssessment?
+
 			$get_method = $this->getGetMethodName($query['date_field']);
 			foreach ($statement as $row) {
 				$assess = $this->hydrate($row, 'a');
 				$assess->setCategory($this->getJoinMapper('category')->hydrate($row, 'c'));
-				$activity = new Activity();
-				$activity
-					->setEvent($query['event'])
-					->setAssessment($assess)
-					->setCategory($assess->getCategory())
-					->setDate($assess->$get_method());
-				$collection->add($activity);
+				$collection->add($factory->buildFromOnlineAssessment($assess, $query['event']));
 			}
 		}
 

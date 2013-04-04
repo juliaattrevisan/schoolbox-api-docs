@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Assessment\Component;
 use Schoolbox;
-use Schoolbox\Assessment\Activity;
+use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 
 class SubmissionBoxMapper extends Schoolbox\Mapper {
@@ -483,6 +483,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	 * @return ActivityCollection
 	 */
 	public function getActivities($user_id, $limit, $categories) {
+		$factory    = new ActivityFactory();
 		$collection = new ActivityCollection();
 		$queries = array(
 			array(
@@ -555,21 +556,17 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			}
 			$statement->execute();
 
-			$get_method = $this->getGetMethodName($query['date_field']);
 			foreach ($statement as $row) {
 				$box = $this->hydrate($row, 'sb');
 				$box->setCategory($this->getJoinMapper('category')->hydrate($row, 'c'));
-				$activity = new Activity();
-				$activity
-					->setEvent($query['event'])
-					->setSubmissionBox($box)
-					->setCategory($box->getCategory())
-					->setDate($box->$get_method());
-				$collection->add($activity);
+				$collection->add($factory->buildFromSubmissionBox($box, $query['event']));
 			}
 		}
 
 		return $collection;
 	}
 
+//	public function getSubmissionHistory() {
+//
+//	}
 }

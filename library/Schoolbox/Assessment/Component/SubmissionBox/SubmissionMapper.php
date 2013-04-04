@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox;
-use Schoolbox\Assessment\Activity;
+use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 
 class SubmissionMapper extends Schoolbox\Mapper {
@@ -86,6 +86,7 @@ class SubmissionMapper extends Schoolbox\Mapper {
 	 * @return ActivityCollection
 	 */
 	public function getActivities($user_id, $limit, $categories) {
+		$factory       = new ActivityFactory();
 		$collection    = new ActivityCollection();
 		$box_join      = $this->getJoinMapper('submission_box');
 		$category_join = $box_join->getJoinMapper('category');
@@ -116,15 +117,7 @@ class SubmissionMapper extends Schoolbox\Mapper {
 			$category   = $category_join->hydrate($row, 'c');
 			$box->setCategory($category);
 			$submission->setSubmissionBox($box);
-
-			$activity = new Activity();
-			$activity
-				->setEvent('submitted')
-				->setSubmissionBox($box)
-				->setCategory($box->getCategory())
-				->setSubmission($submission)
-				->setDate($submission->getSubmitted());
-			$collection->add($activity);
+			$collection->add($factory->buildFromStudentSubmission($submission));
 		}
 		return $collection;
 	}

@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox;
-use Schoolbox\Assessment\Activity;
+use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 
 class ReturnedWorkMapper extends Schoolbox\Mapper {
@@ -100,6 +100,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 		// Student: sb.visibility IN (ALL, STUDENTS)
 
 		$collection    = new ActivityCollection();
+		$factory       = new ActivityFactory();
 		$box_join      = $this->getJoinMapper('submission_box');
 		$category_join = $box_join->getJoinMapper('category');
 		$query = "
@@ -130,15 +131,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 			$category = $category_join->hydrate($row, 'c');
 			$box->setCategory($category);
 			$return->setSubmissionBox($box);
-
-			$activity = new Activity();
-			$activity
-				->setEvent('returned')
-				->setSubmissionBox($box)
-				->setCategory($box->getCategory())
-				->setReturnedWork($return)
-				->setDate($return->getReturned());
-			$collection->add($activity);
+			$collection->add($factory->buildFromReturnedWork($return));
 		}
 		return $collection;
 	}
