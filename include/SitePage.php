@@ -863,7 +863,7 @@ class SitePage extends Page {
                     // array access.
                     foreach ($mapping as $property => $template_var) {
                         $get_method = 'get'.ucfirst($property);
-                        $value      = call_user_func(array($row, $get_method));
+                        $value      = $row->$get_method();
                         $this->setVar($template_var, $value);
                         if (in_array($value, $selected)) {
                             $this->setVar($template_var . '_SELECTED', 'selected="selected"');
