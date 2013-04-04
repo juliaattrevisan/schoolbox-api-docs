@@ -384,7 +384,7 @@ if($recentSubmission['sid']) {
 
 
 	// if we are the owning student, display plagiarism details if they are available
-	if($userID == $_SESSION['id']) {
+	if($userID == $_SESSION['id'] && Config::get('plagscan_student_visible')) {
 
 		// retrieve plagiarism score, if available
 		$docMapper = Plagscan_DocumentMapper::getInstance();
