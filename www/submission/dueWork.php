@@ -28,6 +28,21 @@ $userHandler = new User();
 $returnHandler = new SubmissionReturn();
 $submissionHandler = new Submission();
 
+//
+// Default visibility: parent/student
+// If student: allow student
+// If staff or superuser: allow private
+$visibilities = array(
+	\Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
+);
+if ($groupHandler->isStudent()) {
+	$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
+}
+elseif ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
+	$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE;
+	$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
+}
+
 /* Instantiate for current date time
  */
 $current_time = new DateTime();
@@ -254,6 +269,9 @@ $dueWorkController->renderTemplate('UPCOMING_WORK');
 $j = 0;
 $synClass = new External_Class;
 
+$return_mapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
+$assess_mapper = new \Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper();
+
 foreach ($categoryList as $category) {
     $categoryID = $category['id'];
 
@@ -295,14 +313,20 @@ foreach ($categoryList as $category) {
     $categoryCode = $category['code'] ? '(' . $category['code'] . ')' : '';
 
     // retrieve subject grades
-    $studentGrades = $returnHandler->getStudentMarksForCategory($category['id'], $userID);
-    $gradeAvg = $studentGrades['avg'];
-    unset($studentGrades['avg']);
+    $studentGrades = array_merge(
+        $return_mapper->getStudentMarks($category['id'], $userID, array('visibility' => $visibilities)),
+        $assess_mapper->getStudentMarks($category['id'], $userID)
+    );
+    $gradeAvg    = -1;
+    $grade_count = count($studentGrades);
+    if ($grade_count > 0) {
+        $gradeAvg = array_sum($studentGrades) / count($studentGrades);
+    }
 
     $trendDir = '';
     $trendAmt = '';
     // if more than 1 assessment, can calculate trending
-    if (count($studentGrades) > 1) {
+    if ($grade_count > 1) {
         // get previous average
         array_pop($studentGrades);
         $prevAvg = array_sum($studentGrades) / count($studentGrades);
@@ -375,20 +399,6 @@ foreach ($categoryList as $category) {
 
 $feedItems = array();
 
-//
-// Default visibility: parent/student
-// If student: allow student
-// If staff or superuser: allow private
-$visibilities = array(
-	\Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
-);
-if ($groupHandler->isStudent()) {
-	$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
-}
-elseif ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
-	$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE;
-	$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
-}
 $restrict_submissions = Cfg::get('restrict_student_submissions') && $groupHandler->isParent();
 
 foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities) as $activity) {
