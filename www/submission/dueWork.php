@@ -373,112 +373,172 @@ foreach ($categoryList as $category) {
     $this->parse('SUBJECT_LIST', 'subjectTpl', true);
 }
 
-// activities feed
-$activityLog = $submissionHandler->getActivityLog($user['uid'], 15, $categoryIDList);
+$feedItems = array();
 
-if (is_array($activityLog)) {
-    // wrap all the activity up into a list so it can be pumped out by ActivityList
-    $feedItems = array();
+//
+// Default visibility: parent/student
+// If student: allow student
+// If staff or superuser: allow private
+$visibilities = array(
+	\Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
+);
+if ($groupHandler->isStudent()) {
+	$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
+}
+elseif ($groupHandler->isStaff() || $groupHandler->isSuperuser()) {
+	$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_PRIVATE;
+	$visibilities[] = \Schoolbox\Assessment\Component\SubmissionBox::MARK_VISIBILITY_STUDENT;
+}
+$restrict_submissions = Cfg::get('restrict_student_submissions') && $groupHandler->isParent();
 
-    foreach ($activityLog as $activity) {
-        $mark = null;
-        $numericMark = null;
-        $taskName = $activity['name'];
+foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities) as $activity) {
+    $mark = null;
+    $numericMark = null;
 
-        $categoryName = '<a href="/homepage/' . $activity['category'] . '">' . Scrub::text(
-            $activity['categoryName']
-        ) . '</a>';
+    $categoryName = '<a href="/homepage/' . $activity->getCategory()->getId() . '">' . Scrub::text(
+        $activity->getCategory()->getName()
+    ) . '</a>';
 
-        $boxUrl = "<a href=\"/submission/submissionHistory/{$activity['box_id']}/$userID\">$taskName</a>";
-        if ($activity['type'] == Assess_Main::ONLINE_ASSESSMENT_TYPE_ID) {
-            //
-            // Link to page for assessment - there's no equivalent of submission
-            // history page for assessments, so bounce to intro page
-            if ($activity['new'] == 'closed') {
-                $boxUrl = $taskName;
-            }
-            else {
-                $boxUrl = "<a href=\"/assess/intro/{$activity['box_id']}\">$taskName</a>";
-            }
+    //
+    // box URL depends on whether this is an assessment or submission
+    $boxUrl = $taskName;
+    if ($activity->getType() == \Schoolbox\Assessment\Component\SubmissionBox\WorkType::TYPE_ASSESSMENT_TASK) {
+        if ($activity->getEvent() == 'closed') {
+            $boxUrl = $activity->getName();
         }
-
-        switch ($activity['new']) {
-            case 'new':
-                $stringDesc = sprintf(
-                    'New %s %s added in %s', strtolower($activity['typeName']), $boxUrl, $categoryName
-                );
-                break;
-
-            case 'overdue':
-                $stringDesc = sprintf(
-                    '<span class="overdue">"%s" in %s is now overdue</span>', $boxUrl, $categoryName
-                );
-                break;
-
-            case 'submitted':
-                $stringDesc = sprintf(
-                    '%s submitted work for %s in %s', $user['person_label'], $boxUrl, $categoryName
-                );
-                break;
-
-            case 'returned':
-                if (!(Cfg::get('restrict_student_submissions') && $groupHandler->isParent())) {
-                    if ($activity['typeName']) {
-                        // format for output
-                        $rtn = $returnHandler->getByUserAndTime($user['uid'], $activity['activity_date']);
-                        $marksheet = Marksheet_Factory::build($rtn['slug']);
-
-                        // legacy support
-                        if ($rtn['slug'] == 'free') {
-                            $numericMark = $rtn['mark'];
-                        } else {
-                            $numericMark = $marksheet->convertRawMark($rtn['norm_mark'], $rtn['max_mark'], true, false);
-                        }
-
-                        $mark = sprintf(
-                            '<a href="/submission/submissionHistory/%s/%s">%s</a>', $rtn['box_id'], $rtn['owner'], $numericMark
-                        );
-
-                        $beginning = $user['person_label'] . ' received ' . $mark;
-                    } else {
-                        if ($activity['fid']) {
-                            $beginning = '<a href="/submission/send.php?id=' . $activity['fid'] . '&return=1">Work returned</a>';
-                        } else {
-                            $beginning = 'Work returned';
-                        }
-                    }
-
-                    $stringDesc = sprintf('%s for %s in %s', $beginning, $boxUrl, $categoryName);
-
-                }
-                break;
-
-            default:
-                $stringDesc = sprintf('Submissions for %s in %s are now closed', $boxUrl, $categoryName);
-                break;
+        else {
+            $boxUrl = sprintf(
+                '<a href="/assess/intro/%d">%s</a>',
+                $activity->getId(),
+                $activity->getName()
+            );
         }
-
-        $activityTime = new Alaress_Date_Relative($activity['activity_date']);
-        $activityTime->setPrefix('');
-
-        $mark = $returnHandler->shortenGrade($numericMark);
-
-        $feedItems[] = array(
-            'content' => $stringDesc,
-            'time' => $activityTime->getRelativeTime(),
-            'icon' => $activity['new'],
-            'grade' => isset($mark) ? $mark : null,
-            'gradeiant' => isset($mark) ? (int)($rtn['norm_mark'] / 10) : '',
-            'has_grade' => isset($mark) ? 'grade' : 'no-grade',
+    }
+    else {
+        $boxUrl = sprintf(
+            '<a href="/submission/submissionHistory/%d/%d">%s</a>',
+            $activity->getId(),
+            $userID,
+            $activity->getName()
         );
     }
 
-    $activityList = new Activity_ListArray($feedItems);
-    $activityList->setTarget($this, 'ACTIVITY_LIST');
-    foreach ($activityList as $a) {
-        // iterates across and pumps out the list
+    switch ($activity->getEvent()) {
+        case 'new':
+            $stringDesc = sprintf(
+                'New %s %s added in %s', strtolower($activity->getTypeName()), $boxUrl, $categoryName
+            );
+            break;
+
+        case 'overdue':
+            $stringDesc = sprintf(
+                '<span class="overdue">"%s" in %s is now overdue</span>', $boxUrl, $categoryName
+            );
+            break;
+
+        case 'submitted':
+            $stringDesc = sprintf(
+                '%s submitted work for %s in %s', $user['person_label'], $boxUrl, $categoryName
+            );
+            break;
+
+        case 'returned':
+            if (!$restrict_submissions) {
+                //
+                // Showing returned work:
+                // Always show a link back to submission history
+                // If there's a mark, then show that.
+                // Otherwise, if there's a file attached, show that.
+                $base_mark = $activity->getReturnedNormalizedMark();
+                if (isset($base_mark)) {
+                    // format for output
+                    $rtn = $returnHandler->getByUserAndTime($user['uid'], $activity->getDate()->getDatabase());
+                    $marksheet = Marksheet_Factory::build($rtn['slug']);
+
+                    // legacy support
+                    if ($rtn['slug'] == 'free') {
+                        $numericMark = $rtn['mark'];
+                    }
+                    else {
+                        $numericMark = $marksheet->convertRawMark($rtn['norm_mark'], $rtn['max_mark'], true, false);
+                    }
+
+                    $mark = sprintf(
+                        '<a href="/submission/submissionHistory/%s/%s">%s</a>', $rtn['box_id'], $rtn['owner'], $numericMark
+                    );
+
+                    $beginning = $user['person_label'] . ' received ' . $mark;
+                }
+                else {
+                    $file_id   = $activity->getReturnedFileId();
+                    $file_name = $activity->getReturnedWork()->getFilename();
+                    if ($file_id && $file_name) {
+                        $beginning = '<a href="/submission/send.php?id=' . $file_id . '&return=1">Work returned</a>';
+                    }
+                    else {
+                        $beginning = 'Work returned';
+                    }
+                }
+
+                $stringDesc = sprintf('%s for %s in %s', $beginning, $boxUrl, $categoryName);
+
+            }
+            break;
+
+        default:
+            $stringDesc = sprintf('Submissions for %s in %s are now closed', $boxUrl, $categoryName);
+            break;
     }
+
+    $activityTime = new Alaress_Date_Relative($activity->getDate());
+    $activityTime->setPrefix('');
+
+    $mark = $returnHandler->shortenGrade($numericMark);
+
+    $feedItems[] = array(
+        'content' => $stringDesc,
+        'time' => $activityTime->getRelativeTime(),
+        'icon' => $activity->getEvent(),
+        'grade' => isset($mark) ? $mark : null,
+        'gradeiant' => isset($mark) ? (int)($rtn['norm_mark'] / 10) : '',
+        'has_grade' => isset($mark) ? 'grade' : 'no-grade',
+    );
+}
+
+$activityList = new Activity_ListArray($feedItems);
+$activityList->setTarget($this, 'ACTIVITY_LIST');
+foreach ($activityList as $a) {
+    // iterates across and pumps out the list
 }
 
 // subject drop down
 $this->dropDown('subject', $categoryList, '', TEMPLATE_content, array('id' => 'SUBJECT_ID', 'name' => 'SUBJECT_NAME'));
+
+
+/**
+ * Gets activities from new mapper classes.
+ *
+ * @param int   $user
+ * @param int   $limit
+ * @param array $categories
+ * @param array $visibilities Which submission box visibilities are viewable?
+ *
+ * @return \Schoolbox\Assessment\ActivityCollection
+ */
+function getActivities($user, $limit, $categories, $visibilities) {
+	$box_mapper    = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+	$assess_mapper = new \Schoolbox\Assessment\Component\OnlineAssessmentMapper();
+	$submit_mapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
+	$return_mapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
+	$activities    = $box_mapper
+		->getActivities($user, $limit, $categories)
+		->merge($assess_mapper->getActivities($user, $limit, $categories))
+		->merge($submit_mapper->getActivities($user, $limit, $categories))
+		->merge($return_mapper->getActivities($user, $limit, $categories, $visibilities))
+	;
+	$activities
+		->sortBy('date', 'desc')
+		->limit(0, 15)
+	;
+	return $activities;
+}
