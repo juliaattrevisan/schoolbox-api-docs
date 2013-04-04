@@ -210,14 +210,19 @@ body{
 
 h1,h2,h3{ color: #000000; }
 h3.my-links a{ color: #fff; }
-h2,.calendar-controls{color:#fff; background:#002b5c;}
+h2,.calendar-controls{color:#fff; background:#002b5c;min-height: 22px;line-height: 22px;}
 .calendar-controls h3{color:#fff;}
 a, h2 a{color:#006bbd;}
 .box h2 a{color:#fff;}
 a:hover, h2 a:hover{color:#006bbd;}
+
+.box a.close-delete { top: 1px; right: 1px; }
+.box a.edit { top: 1px; right: 22px; }
+
 #header, .login #header{
     height:120px;
 }
+
 #header .logo{
     padding: 0;
     width: 228px;
@@ -229,7 +234,7 @@ a:hover, h2 a:hover{color:#006bbd;}
     position: absolute;
     float: right;
     top: 25px;
-    right: 320px;
+    right: 400px;
 }
 
 #tabs{
@@ -397,7 +402,7 @@ ADMIN!
 #search, #search-field{ height: 27px; }
 .admin-contents .level{background:#eee; border-color:#ddd;}
 .admin-contents h4{border-color:#ddd;}
-
+#search { margin-right: 96px; }
 #search-field{
     color:#797979;
     font-style: italic;
@@ -406,9 +411,12 @@ ADMIN!
     font-weight: normal;
     line-height: 20px;
 }
-#infoPanel {margin-top:15px;}
+#infoPanel {margin-top:15px; margin-right: 96px; }
 #infoPanel li{color:#b2c5d6;}
 #infoPanel li a{color:#ffffff; text-decoration: underline;}
+#infoPanel .portrait { position: absolute; right: 16px; top: 8px; height: 96px; width: 64px; }
+#infoPanel .portrait img { width: auto; max-width: 100%; height: auto; max-height: 100%; }
+
 
 #footer{
     background: transparent;
