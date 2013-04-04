@@ -11,6 +11,14 @@ class Survey_Export_CSV extends Evaluation_Export_CSV {
 	protected $additionalColumns = array();
 
 	/**
+	 * Hook method
+	 *
+	 * @return mixed|void
+	 */
+	protected function setup() {
+	}
+
+	/**
 	 * Filter out anonymous results
 	 *
 	 * Normally should be done in a more meaningful way at collation
@@ -36,6 +44,12 @@ class Survey_Export_CSV extends Evaluation_Export_CSV {
 		array_shift($allHeadings);
 		array_shift($allHeadings);
 
+		/* One more time if external_id is included
+		 */
+		if ($this->getIncludeExternalId()) {
+			array_shift($allHeadings);
+		}
+
 		$this->setHeadings($allHeadings);
 	}
 
@@ -52,6 +66,12 @@ class Survey_Export_CSV extends Evaluation_Export_CSV {
 		foreach($allResponses as $currentResponse) {
 			array_shift($currentResponse);
 			array_shift($currentResponse);
+
+			/* One more time if external_id is included
+			 */
+			if ($this->getIncludeExternalId()) {
+				array_shift($currentResponse);
+			}
 
 			$collection[] = $currentResponse;
 		}
