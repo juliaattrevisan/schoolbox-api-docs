@@ -15,13 +15,22 @@ $j(function() {
 		var params = search.fetchHash();
 
 		if (params.length) {
-			var section = params[0];
+			section = params[0];
 		}
 
 		if (params.length > 1) {
-			var pageNumber = params[1];
+			pageNumber = params[1];
 		}
 	}
+
+    $j(document).ready(function() {
+        $j('#content div.results').delegate('h5.more a', 'click', function() {
+            var type = $j(this).attr('title');
+            var selector = '#type a[title='+type+']';
+            $j(selector).trigger('click');
+            event.preventDefault();
+        });
+    });
 
 	search.runOnce(keyword, section, $j('#type a[title=' + section + ']'), pageNumber);
 
@@ -32,6 +41,8 @@ $j(function() {
 
 		search.runOnce(keyword, $j(this).attr('title'), $j(this), 1);
 	});
+
+
 });
 </script>
 <!-- END custom_head -->

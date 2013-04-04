@@ -148,6 +148,10 @@ search = {
 		/* Hide all divs, and only show the current one
 		 */
 		search.hideTabs();
+
+        /* Add listeners to any "see all" links present
+         */
+        search.addSeeMoreListeners();
 	},
 
 	/**
@@ -277,5 +281,12 @@ search = {
 	 */
 	getSection: function() {
 		return this.section;
-	}
+	},
+
+    /**
+     * Add listeners to the "see all" links
+     */
+    addSeeMoreListeners: function() {
+
+    }
 }
