@@ -92,7 +92,8 @@ if ($permission >= WRITE_ACCESS) {
     foreach ($definitionCollection as $definition) {
         $definition->instanceCount = 0;
 
-		$definition->definition->componentCategory = $eportfolioHandler->getTemplateNameById($definition->identifier);
+		$definition->definition->componentCategory = $definition->identifier;
+		$definition->definition->componentCategoryName = $eportfolioHandler->getTemplateNameById($definition->identifier);
 
         foreach ($componentCollection as $inst) {
             if ($inst->definitionId == $definition->id) {
@@ -125,7 +126,7 @@ if ($permission >= WRITE_ACCESS) {
 				'EPORTFOLIO_COMPONENT_COUNT' => $component->instanceCount,
 				'EPORTFOLIO_COMPONENT_DESCRIPTION' => Scrub::text($component->definition->description),
 				'EPORTFOLIO_COMPONENT_CLASS' => $class,
-				'EPORTFOLIO_COMPONENT_CATEGORY_ID' => $previous->definition->componentCategory,
+				'EPORTFOLIO_COMPONENT_CATEGORY_ID' => $previous->identifier,
 			));
 
             if ($component->definition->componentCategory != $previous->definition->componentCategory && $i > 1) {
@@ -153,7 +154,7 @@ if ($permission >= WRITE_ACCESS) {
 
             $previous = $component;
 
-            $tabList[$component->definition->componentCategory]['name'] = $component->definition->componentCategory;
+            $tabList[$component->definition->componentCategory]['name'] = $component->definition->componentCategoryName;
 			$tabList[$component->definition->componentCategory]['count']++;
         }
     }
