@@ -87,10 +87,12 @@ if ($permission >= WRITE_ACCESS) {
     $this->parse('modify_layout_block', 'modify_layout');
     $this->parse('customise_page_block', 'customise_page');
 
-    $definitionCollection = $componentFactory->getDefinitionList('component_category');
+    $definitionCollection = $componentFactory->getDefinitionList('eportfolio_template');
 
     foreach ($definitionCollection as $definition) {
         $definition->instanceCount = 0;
+
+		$definition->definition->componentCategory = $eportfolioHandler->getTemplateNameById($definition->identifier);
 
         foreach ($componentCollection as $inst) {
             if ($inst->definitionId == $definition->id) {
@@ -119,21 +121,21 @@ if ($permission >= WRITE_ACCESS) {
 
             $this->setVar(array(
 				'EPORTFOLIO_COMPONENT_ID' => Scrub::text($component->id),
-				'EPORTFOLIO_COMPONENT_NAME' => Scrub::text($component->name),
+				'EPORTFOLIO_COMPONENT_NAME' => Scrub::text($component->definition->name),
 				'EPORTFOLIO_COMPONENT_COUNT' => $component->instanceCount,
-				'EPORTFOLIO_COMPONENT_DESCRIPTION' => Scrub::text($component->description),
+				'EPORTFOLIO_COMPONENT_DESCRIPTION' => Scrub::text($component->definition->description),
 				'EPORTFOLIO_COMPONENT_CLASS' => $class,
-				'EPORTFOLIO_COMPONENT_CATEGORY_ID' => $previous->componentCategory,
+				'EPORTFOLIO_COMPONENT_CATEGORY_ID' => $previous->definition->componentCategory,
 			));
 
-            if ($component->componentCategory != $previous->componentCategory && $i > 1) {
+            if ($component->definition->componentCategory != $previous->definition->componentCategory && $i > 1) {
                 $this->parse('eportfolio_component_page_block', 'eportfolio_component_page', true);
                 $this->setVar('eportfolio_component_block', '');
                 $this->parse('eportfolio_component_block', 'eportfolio_component', true);
 
                 // last rotation
                 if ($total == $i) {
-                    $this->setVar('EPORTFOLIO_COMPONENT_CATEGORY_ID', $component->componentCategory);
+                    $this->setVar('EPORTFOLIO_COMPONENT_CATEGORY_ID', $component->definition->componentCategory);
                     $this->parse('eportfolio_component_page_block', 'eportfolio_component_page', true);
                 }
             }
@@ -141,7 +143,7 @@ if ($permission >= WRITE_ACCESS) {
                 // last rotation
                 if ($total == $i) {
                     $this->parse('eportfolio_component_block', 'eportfolio_component', true);
-                    $this->setVar('EPORTFOLIO_COMPONENT_CATEGORY_ID', $component->componentCategory);
+                    $this->setVar('EPORTFOLIO_COMPONENT_CATEGORY_ID', $component->definition->componentCategory);
                     $this->parse('eportfolio_component_page_block', 'eportfolio_component_page', true);
                 }
 				else {
@@ -151,8 +153,8 @@ if ($permission >= WRITE_ACCESS) {
 
             $previous = $component;
 
-            $tabList[$component->componentCategory]['name'] = $component->componentCategoryName;
-            $tabList[$component->componentCategory]['count']++;
+            $tabList[$component->definition->componentCategory]['name'] = $component->definition->componentCategory;
+			$tabList[$component->definition->componentCategory]['count']++;
         }
     }
     else {
