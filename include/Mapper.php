@@ -184,35 +184,44 @@ abstract class Mapper {
     /**
      * Returns a collection with models filtered by column/property
      *
-     * @static
      * @param String $columnName
      * @param String $columnValue
-     * @param bool   $one         If true, then get only the first match.
-     * @return Collection|model
+     *
+     * @return Collection
      */
     public function findByColumn($columnName, $columnValue, $one = false) {
-        $statement = $this->database->prepare(
-            "
+        $statement = $this->database->prepare("
             SELECT {$this->getColumnString()}
             FROM `{$this->table}`
             WHERE `{$columnName}` = :$columnName
-        "
-        );
-
+        ");
         $statement->bindParam(":$columnName", $columnValue);
-
         $statement->execute();
+        return $this->hydrateList($statement->fetchAll());
+    }
 
-        if ($one) {
-            $result = $statement->fetch();
-            if ($result) {
-                return $this->hydrate($statement->fetch());
-            }
-            return false;
+    /**
+     * Returns first model whose $columnName = $columnValue.
+     *
+     * @param String $columnName
+     * @param String $columnValue
+     *
+     * @return object or false if not found.
+     */
+    public function findOneByColumn($columnName, $columnValue) {
+        $statement = $this->database->prepare("
+            SELECT {$this->getColumnString()}
+            FROM `{$this->table}`
+            WHERE `{$columnName}` = :$columnName
+            LIMIT 1
+        ");
+        $statement->bindParam(":$columnName", $columnValue);
+        $statement->execute();
+        $result = $statement->fetch();
+        if ($result) {
+            return $this->hydrate($result);
         }
-        else {
-            return $this->hydrateList($statement->fetchAll());
-        }
+        return false;
     }
 
     /**
