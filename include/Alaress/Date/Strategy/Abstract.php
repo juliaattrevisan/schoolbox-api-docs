@@ -14,7 +14,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-abstract class Alaress_Date_Strategy_Abstract implements Alaress_Validator_ValidatableInterface {
+abstract class Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Interface, Alaress_Validator_ValidatableInterface {
 	private $year = '0000';
 	private $month = '00';
 	private $day = '00';
@@ -24,17 +24,34 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Validator_Valid
 	private $meridiem = '';
 	private $dateSeparator = '-';
 	private $inputDateFormat = 'd/m/y';
+
+	/**
+	 * @var DateTime
+	 */
+	protected $datetime;
+
+	/**
+	 * @var Alaress_Date_Locale_Interface
+	 */
 	private $locale = null;
 
-	public function __construct($dateTime, $inputDateFormat) {
+	public function setFromFormat($dateTime, $inputDateFormat) {
+		if ($dateTime instanceof DateTime) {
+			$this->setDateTimeObject($dateTime);
+		}
 
 		/* Support for unix timestamp variant by converting it to a db format
 		 */
-		if ($inputDateFormat == 'U') {
+		elseif ($inputDateFormat == 'U') {
             $this->setByTimestamp($dateTime);
 		}
-		else if ($inputDateFormat !== null) {
+		elseif ($inputDateFormat !== null) {
 			$this->setInputDateFormat($inputDateFormat);
+			$date_object = DateTime::createFromFormat($inputDateFormat, $dateTime);
+			if ($date_object instanceof DateTime) {
+				$this->setDateTimeObject($date_object);
+				return;
+			}
 
             /* Snap out all the bits, exit if no separator could be found (this
              * indicates an illegal dateTime format anyway)
@@ -81,6 +98,19 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Validator_Valid
     }
 
 	/**
+	 * Transform the datetime into an arbitrary format
+	 *
+	 * @param  $format
+	 * @return string
+	 */
+	public function getUsingFormat($format) {
+		if ($this->getDateTimeObject() instanceof DateTime) {
+			return $this->getDateTimeObject()->format($format);
+		}
+		return date($format, $this->getDateTime());
+	}
+
+	/**
 	 * Figure out which date components are located where, based on the
 	 * input dateFormat specified. The separator is always $matches[2]
 	 *
@@ -92,8 +122,6 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Validator_Valid
 	 * d-m-y h:i:s
 	 *
 	 * @param  $dateComponent
-	 * @param  $dateFormat
-	 * @return
 	 */
 	private function setDateComponents($dateComponent) {
 		preg_match('/([dym])([\-\/])([dm])[\-\/]([dmy])/', $this->getInputDateFormat(), $matches);
@@ -346,7 +374,7 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Validator_Valid
 	/**
 	 * Set Locale configuration object
 	 *
-	 * @param  $val
+	 * @param  Alaress_Date_Locale_Interface $val
 	 * @return void
 	 */
 	public function setLocale($val) {
@@ -356,12 +384,19 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Validator_Valid
 	/**
 	 * Get Locale configuration object
 	 *
-	 * @return
+	 * @return Alaress_Date_Locale_Interface
 	 */
 	protected function getLocale() {
 		return $this->locale;
 	}
 
+	protected function getDateTimeObject() {
+		return $this->datetime;
+	}
+
+	protected function setDateTimeObject($val) {
+		$this->datetime = $val;
+	}
 
 	/**
 	 * Validates whether this date is actually valid.
@@ -380,5 +415,143 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Validator_Valid
 				 'second' => $this->getSecond(),
 			)
 		);
+	}
+
+
+	/**
+	 * Transform the datetime into a localised version
+	 *
+	 * @return string
+	 */
+	public function getLocal() {
+		return $this->getUsingFormat($this->getLocale()->localFormat());
+	}
+
+	/**
+	 * Transform the datetime into a localised short version
+	 *
+	 * @return string
+	 */
+	public function getLocalShort() {
+		return $this->getUsingFormat($this->getLocale()->localShortFormat());
+	}
+
+	/**
+	 * Transform the datetime into an Australianised version
+	 *
+	 * @return string
+	 */
+	public function getAustralian() {
+		return $this->getLocal();
+	}
+
+	/**
+	 * Use long format
+	 *
+	 * @return string
+	 */
+	public function getLong() {
+		return $this->getUsingFormat($this->getLocale()->longFormat());
+	}
+
+	/**
+	 * Use long format
+	 *
+	 * @return string
+	 */
+	public function getLongDateOnly() {
+		return $this->getUsingFormat($this->getLocale()->longDateOnlyFormat());
+	}
+
+	/**
+	 * Use short format
+	 *
+	 * @return string
+	 */
+	public function getShort() {
+		return $this->getUsingFormat($this->getLocale()->shortFormat());
+	}
+
+	/**
+	 * Get the date only
+	 *
+	 * @return string
+	 */
+	public function getDateOnly() {
+		return $this->getUsingFormat($this->getLocale()->dateOnlyFormat());
+	}
+
+	/**
+	 * Get the date only
+	 *
+	 * @return string
+	 */
+	public function getTimeOnly() {
+		return $this->getUsingFormat($this->getLocale()->timeOnlyFormat());
+	}
+
+	/**
+	 * Transform the datetime into the format specified in the config table
+	 * Do some error checking
+	 *
+	 * @return string
+	 */
+	public function getDatabase() {
+		return $this->getUsingFormat($this->getLocale()->databaseFormat());
+	}
+
+	/**
+	 * Transform the datetime into a database date
+	 *
+	 * @return string
+	 */
+	public function getDatabaseDate() {
+		return $this->getUsingFormat($this->getLocale()->databaseDateFormat());
+	}
+
+	/**
+	 * Transform the datetime into a database time
+	 *
+	 * @return string
+	 */
+	public function getDatabaseTime() {
+		return $this->getUsingFormat($this->getLocale()->databaseTimeFormat());
+	}
+
+	/**
+	 * Transform the datetime into a unix timestamp
+	 *
+	 * @return string
+	 */
+	public function getUnixTimeStamp() {
+		return $this->getUsingFormat($this->getLocale()->timestampFormat());
+	}
+
+	/**
+	 * Extract the numeric representation of the day of the week
+	 *
+	 * @return Integer
+	 */
+	public function getWeekDayNumber () {
+		return $this->getUsingFormat('N');
+	}
+
+	/**
+	 * Compare function for comparing with another date object.
+	 *
+	 * @param Alaress_Date_Format_Interface $other
+	 *
+	 * @return int
+	 */
+	public function compare($other) {
+		if (!($other instanceof Alaress_Date_Format_Interface)) {
+			return 0;
+		}
+		$this_timestamp  = $this->getUsingFormat('U');
+		$other_timestamp = $other->getUsingFormat('U');
+		if (!($this_timestamp === $other_timestamp)) {
+			return $this_timestamp < $other_timestamp ? -1 : 1;
+		}
+		return 0;
 	}
 }

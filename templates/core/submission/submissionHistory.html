@@ -55,16 +55,26 @@
 
             <p>{BOX_DESCRIPTION}</p>
             <ul class="file-list">
-                <!-- BEGIN download -->
-                <li>
-                    <a href="/send.php?id={FILE_ID}&save=1">
-                        <img width="32" height="32" src="/images/mime/60x60/{FILE_THUMB}"/>
-                        <span class="name">{FILE_NAME}</span> ({FILE_SIZE})
-                        <span class="time">{FILE_DATE}</span>
-                        <span class="icon"></span>
-                    </a>
-                </li>
-                <!-- END download -->
+				<!-- BEGIN legacy_download -->
+				<li>
+					<a href="/send.php?id={FILE_ID}&save=1">
+						<img width="32" height="32" src="/images/mime/60x60/{FILE_THUMB}"/>
+						<span class="name">{FILE_NAME}</span> ({FILE_SIZE})
+						<span class="time">{FILE_DATE}</span>
+						<span class="icon"></span>
+					</a>
+				</li>
+				<!-- END legacy_download -->
+				<!-- BEGIN download -->
+				<li>
+					<a href="/storage/fetch.php?hash={FILE_HASH}&save=1">
+						<img width="32" height="32" src="/images/mime/60x60/{FILE_THUMB}"/>
+						<span class="name">{FILE_NAME}</span> ({FILE_SIZE})
+						<span class="time">{FILE_DATE}</span>
+						<span class="icon"></span>
+					</a>
+				</li>
+				<!-- END download -->
             </ul>
 
             <h3>Subject</h3>

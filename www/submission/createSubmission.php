@@ -5,7 +5,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/submission.php';
 $this->setFile(TEMPLATE_content, 'submission/createSubmission.html');
 $this->setTab('submission');
 $this->setBlock(TEMPLATE_content, 'browse_row', 'browse_block');
-$this->setBlock('browse_row', 'file_overwrite', 'file_overwrite_block');
 $this->setBlock('browse_row', 'existing_file', 'existing_file_block');
 $this->setBlock(TEMPLATE_content, 'marktype', 'marktype_block');
 $this->setBlock('marktype', 'criterion', 'criterion_block');
@@ -26,47 +25,71 @@ else {
 $this->setVar('category_select_block', '');
 $this->setVar('existing_marks_warning_block', '');
 
-$subBoxHandler = new Submission();
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+
+$mapper      = new SubmissionBoxMapper();
+$type_mapper = new SubmissionBox\WorkTypeMapper();
+$mark_mapper = new SubmissionBox\MarkTypeMapper();
+
+$groupHandler  = new Group;
 $rubricHandler = new DueWork_Rubric_Handler();
+
+//
+// Should work types include or not include online assessments?
+// They do for pre-existing items, they don't for new items.
+$work_types = $type_mapper->getAllExcept(SubmissionBox\WorkType::TYPE_ONLINE_ASSESSMENT);
+$mark_types = $mark_mapper->getAll();
 
 // IF PRE-EXISTING
 if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     //Modify submission box
     $this->setTitle('Modify Submission Box');
 
-    $subbox = $subBoxHandler->getByID($this->arg[1]);
+    $submission = $mapper->findById($this->arg[1]);
+
+    //
+    // Authorisation: user has write access to group?
+    if ($groupHandler->getPermission($submission->getCategory()->getId()) < WRITE_ACCESS) {
+        error(19);
+    }
 
     /* Output category information */
-    if($subbox['code'])
-        $catOutput = "<b>".$subbox['categoryName']." (".$subbox['code'].")</b>";
-    else
-        $catOutput = "<b>".$subbox['categoryName']."</b>";
+    $cat_name = $submission->getCategory()->getName();
+    $codes    = $submission->getCategory()->getCodes()->getColumnValues('code');
+    if (!empty($codes)) {
+        $catOutput = "<b>".$cat_name." (".implode(', ', $codes).")</b>";
+    }
+    else {
+        $catOutput = "<b>".$cat_name."</b>";
+    }
 
-    /* Output submission type drop down */
-    $this->dropdown('type_drop', $subBoxHandler->getTypes(), $subbox['type'], TEMPLATE_content, array(
+    /* Output submission work_type drop down */
+    $this->dropdown('type_drop', $work_types, $submission->getWorkType()->getId(), TEMPLATE_content, array(
         'name' => 'TYPE_TEXT',
         'id'   => 'TYPE_VALUE'
     ));
 
     // legacy support
-    if($subbox['mark_type_slug'] == 'free') {
+    $mark_type = $submission->getMarkType()->getId();
+    if ($mark_type == SubmissionBox\MarkType::TYPE_FREE) {
         $this->setVar('marktype_block', '');
     }
     else {
         // Output marktype drop down
-        $this->dropdown('marktype_drop', $subBoxHandler->getMarkTypes(), $subbox['mark_type'], 'marktype', array(
-            'hr_name'       => 'MARKTYPE_TEXT',
-            'mark_type_id'  => 'MARKTYPE_VALUE',
-            'slug'          => 'MARKTYPE_SLUG'
+        $this->dropdown('marktype_drop', $mark_types, $mark_type, 'marktype', array(
+            'name' => 'MARKTYPE_TEXT',
+            'id'   => 'MARKTYPE_VALUE',
+            'slug' => 'MARKTYPE_SLUG'
         ));
 
         // if the rubric creation fails it will throw an exception, in which case just output the empty sets
         try {
-            if($subbox['mark_type_slug'] == 'rubric') {
-                $rubric = $rubricHandler->getRubric($subbox['id']);
-                $resultSetID = $subbox['rubric_result_set'];
+            if($mark_type == SubmissionBox\MarkType::TYPE_RUBRIC) {
+                $rubric = $rubricHandler->getRubric($submission->getId());
+                $resultSetID = $submission->getRubricResultSet();
 
-                if($rubricHandler->marksAlreadyGiven($subbox['id'])) {
+                if($rubricHandler->marksAlreadyGiven($submission->getId())) {
                     $this->parse('existing_marks_warning_block', 'existing_marks_warning');
                 }
 
@@ -74,16 +97,16 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
                 $results = $rubric->getResults();
                 $resultCount = $rubric->getResultCount();
 
-                outputCriteria($this, $subbox['category'], $criteria, $results, $resultCount);
+                outputCriteria($this, $submission->getCategory()->getId(), $criteria, $results, $resultCount);
                 outputResultSets($this, $resultSetID, $resultCount);
             }
             else {
                 outputResultSets($this);
-                outputCriteria($this, $subbox['category'], array(), array());
+                outputCriteria($this, $submission->getCategory()->getId(), array(), array());
             }
         } catch(Exception $e) {
             outputResultSets($this);
-            outputCriteria($this, $subbox['category'], array(), array());
+            outputCriteria($this, $submission->getCategory()->getId(), array(), array());
         }
 
 
@@ -92,66 +115,76 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $this->parse('marktype_block', 'marktype');
 
     /* Convert times */
-    $open_date = strtotime($subbox['open_date']);
-    $due_date  = strtotime($subbox['date']);
-    $late_date = strtotime($subbox['late_date']);
+    $open_date = $submission->getOpenDate();
+    $due_date  = $submission->getDueDate();
+    $late_date = $submission->getLateDate();
 
-    if(date('H:i:s', $open_date) == '00:00:00') {
+    if ($open_date->getUsingFormat('H:i:s') == '00:00:00') {
         $open_hour = '';
-        $open_min = '';
-    } else {
-        $open_hour = date('g',$open_date);
-        $open_min = date('i',$open_date);
+        $open_min  = '';
+    }
+    else {
+        $open_hour = $open_date->getUsingFormat('g');
+        $open_min  = $open_date->getUsingFormat('i');
     }
 
-    if(date('H:i:s', $due_date) == '23:59:59') {
+    if ($due_date->getUsingFormat('H:i:s') == '23:59:59') {
         $due_hour = '';
-        $due_min = '';
-    } else {
-        $due_hour = date('g',$due_date);
-        $due_min = date('i',$due_date);
+        $due_min  = '';
+    }
+    else {
+        $due_hour = $due_date->getUsingFormat('g');
+        $due_min  = $due_date->getUsingFormat('i');
     }
 
-    if(date('H:i:s', $late_date) == '23:59:59') {
+    if ($late_date->getUsingFormat('H:i:s') == '23:59:59') {
         $late_hour = '';
-        $late_min = '';
-    } else {
-        $late_hour = date('g',$late_date);
-        $late_min = date('i',$late_date);
+        $late_min  = '';
+    }
+    else {
+        $late_hour = $late_date->getUsingFormat('g');
+        $late_min  = $late_date->getUsingFormat('i');
     }
 
 
     $output = array(
         'HEADING'           => 'Modify',
-        'ID'                => $subbox['id'],
-        'CATEGORY'          => $subbox['category'],
+        'ID'                => $submission->getId(),
+        'CATEGORY'          => $submission->getCategory()->getId(),
         'CURRENT_CAT'       => $catOutput,
-        'NAME'              => $subbox['name'],
-        'DESCRIPTION'       => $subbox['description'],
-        'FILEID'            => $subbox['fid'],
-        'ACCEPT_SUBMISSION' => $subbox['accept_submission'] ? ' checked="checked"' : '',
-        'MULTI_SUBMISSION'  => $subbox['multi_submission'] ? ' checked="checked"' : '',
-        'TOTAL_MARK'        => $subbox['max_mark'],
+        'NAME'              => $submission->getName(),
+        'DESCRIPTION'       => $submission->getDescription(),
+        'FILEID'            => $submission->getLegacyFileId(),
+        'ACCEPT_SUBMISSION' => $submission->getAcceptOnline() ? ' checked="checked"' : '',
+        'MULTI_SUBMISSION'  => $submission->getAcceptMultiple() ? ' checked="checked"' : '',
+        'TOTAL_MARK'        => $submission->getMaxMark(),
 
-        'OPEN_DATE' => date('d/m/Y', $open_date),
+        'OPEN_DATE' => $open_date->getUsingFormat('d/m/Y'),
         'OPEN_HOUR' => $open_hour,
         'OPEN_MIN'  => $open_min,
-        'OPEN_PM'   => date('a', $open_date) == 'pm' ? 'selected' : '',
+        'OPEN_PM'   => $open_date->getUsingFormat('a') == 'pm' ? 'selected' : '',
 
-        'DUE_DATE' => date('d/m/Y', $due_date),
+        'DUE_DATE' => $due_date->getUsingFormat('d/m/Y'),
         'DUE_HOUR' => $due_hour,
         'DUE_MIN'  => $due_min,
-        'DUE_PM'   => date('a', $due_date) == 'pm' ? 'selected' : '',
+        'DUE_PM'   => $due_date->getUsingFormat('a') == 'pm' ? 'selected' : '',
 
-        'LATE_DATE' => date('d/m/Y', $late_date),
+        'LATE_DATE' => $late_date->getUsingFormat('d/m/Y'),
         'LATE_HOUR' => $late_hour,
         'LATE_MIN'  => $late_min,
-        'LATE_PM'   => date('a', $late_date) == 'pm' ? 'selected' : '',
+        'LATE_PM'   => $late_date->getUsingFormat('a') == 'pm' ? 'selected' : '',
+
+        'FILE_MAX_UPLOAD' => Cfg::get('file_upload_count'),
+        'MAX_FILE_SIZE'   => Cfg::get('max_file_size'),
+        'SESSION_NAME'    => session_name(),
+        'SESSION_ID'      => session_id(),
 
     );
 
     foreach(array('UPCOMING' => '1 day', 'OVERDUE' => '1 hour', 'RETURNED' => '1 hour') as $i => $j) {
-        $output["NOTIF_{$i}_ENABLED"] = $subbox['notifications'][strtolower($i)]['enabled'] ? ' checked="checked"' : '';
+        $notification = $submission->getNotifications()->getOfType(strtolower($i));
+        $is_enabled   = $notification instanceof SubmissionBox\Notification && $notification->getEnabled();
+        $output["NOTIF_{$i}_ENABLED"] = $is_enabled ? ' checked="checked"' : '';
         $output["{$i}_THRESHHOLD"] = $j;
     }
 
@@ -159,24 +192,31 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
     $this->setVar($output);
 
     // check for an associated file
-    if($subbox['fid']) {
+    $file_links = $submission->getFileLinks();
+    if ($file_links->count() > 0) {
+        foreach ($file_links as $file_link) {
+            $file = $file_link->getFile();
+            $this->setVar('CURRENT_FILE_NAME', $file->getFilename());
+            $this->setVar('CURRENT_FILE_ID',   $file->getId());
+            $this->setVar('CURRENT_FILE_ICON', $file->getIconFromFilename());
+            $this->setVar('CURRENT_FILE_DATE', $file->getUploadedOn()->getUsingFormat('jS M Y, g:ia'));
+            $this->parse('existing_file_block','existing_file', true);
+        }
+    }
+    elseif ($submission->getLegacyFileId()) {
 
         $fileHandler = new File;
-        $file = $fileHandler->getByID($subbox['fid']);
+        $file = $fileHandler->getByID($submission->getLegacyFileId());
 
         $this->setVar('CURRENT_FILE_NAME', $file['realname']);
         $this->setVar('CURRENT_FILE_ICON', $file['iconFile']);
+        $this->setVar('CURRENT_FILE_ID',   'old');
         $this->setVar('CURRENT_FILE_DATE', date('jS M Y, g:ia', $file['submitted']));
 
         $this->parse('existing_file_block','existing_file');
-        $this->parse('file_overwrite_block','file_overwrite');
     }
-    // no file found, clear the blocks
     else {
-        $this->setVar(array(
-            'file_overwrite_block' => '',
-            'existing_file_block' => ''
-        ));
+        $this->setVar('existing_file_block', '');
     }
 
     $this->parse('browse_block', 'browse_row');
@@ -185,19 +225,22 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
 
 // IF NEW
 else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+
+    //
+    // Authorisation: user has write access to group.
+    if ($groupHandler->getPermission($this->arg[1]) < WRITE_ACCESS) {
+        error(19);
+    }
+
     //Create submission box
     $this->setTitle('Create Submission Box');
 
-    $subbox = $subBoxHandler->getByID($this->arg[1]);
-
     require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/category.php';
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 
-	$groupHandler = new Group;
 
     // clear blocks that aren't used in this context
     $this->setVar(array(
-        'file_overwrite_block' => '',
         'existing_file_block' => '',
         'existing_marks_warning_block'
     ));
@@ -219,28 +262,20 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     }
 
     /* Output category information */
-	$this->setVar('CURRENT_CAT', '');
+    $this->setVar('CURRENT_CAT', '');
 
-	$categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
-	$length = count($categoryList);
-	for ($i = 0; $i < $length; $i++) {
-		if (!empty($categoryList[$i]['code']))
-		$categoryList[$i]['name'] .= ' ('.$categoryList[$i]['code'].')';
-	}
+    // Output submission work_type drop down (exclude online assessment work_type)
 
-    // Output submission type drop down (exclude online assessment type)
-
-	$types = $subBoxHandler->getTypesExcept(array(Assess_Main::ONLINE_ASSESSMENT_TYPE_ID));
-	$this->dropDown('type_drop', $types, $this->arg[3],TEMPLATE_content, array(
+    $this->dropDown('type_drop', $work_types, $this->arg[3], TEMPLATE_content, array(
         'name' => 'TYPE_TEXT',
         'id'   => 'TYPE_VALUE'
     ));
 
     // Output marktype drop down
-    $this->dropdown('marktype_drop', $subBoxHandler->getMarkTypes(), $subbox['mark_type'], 'marktype', array(
-        'hr_name'      => 'MARKTYPE_TEXT',
-        'mark_type_id' => 'MARKTYPE_VALUE',
-        'slug'         => 'MARKTYPE_SLUG'
+    $this->dropdown('marktype_drop', $mark_types, null, 'marktype', array(
+        'name' => 'MARKTYPE_TEXT',
+        'id'   => 'MARKTYPE_VALUE',
+        'slug' => 'MARKTYPE_SLUG'
     ));
 
     outputResultSets($this);
@@ -257,7 +292,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     $output = array(
         'HEADING'           => 'Create',
         'CATEGORY'          => $this->arg[1],
-		'ID'		        => '',
+        'ID'                => '',
         'NAME'              => $file['name'],
         'DESCRIPTION'       => $file['description'],
         'FILEID'            => $file['id'],
@@ -280,6 +315,11 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         'LATE_HOUR' => '',
         'LATE_MIN'  => '',
         'LATE_PM'   => 'selected',
+
+        'FILE_MAX_UPLOAD' => Cfg::get('file_upload_count'),
+        'MAX_FILE_SIZE'   => Cfg::get('max_file_size'),
+        'SESSION_NAME'    => session_name(),
+        'SESSION_ID'      => session_id(),
     );
 
     // notifications on by default
@@ -375,5 +415,3 @@ function outputCriteria(SitePage $page, $catID, $checkedIDs, $descriptors, $desc
         }
     }
 }
-
-?>

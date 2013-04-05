@@ -2,27 +2,32 @@
 
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+
 $page = new SitePage;
 
 if ($_REQUEST['id']) {
 
-	$submissionHandler = new Submission;
-	$subStudHandler = new SubmissionStudent;
-	$groupHandler = new Group;
+    $subStudHandler = new SubmissionStudent;
+    $groupHandler = new Group;
 
-	$subBox = $submissionHandler->getByID($_REQUEST['id']);
+    $submission_mapper = new SubmissionBoxMapper();
+    $submission        = $submission_mapper->findById($_REQUEST['id']);
+    $submission_id     = $submission->getId();
+    $submission_cat_id = $submission->getCategory()->getId();
 
-	/* Check involved in subject */
-	$groupHandler = new Group;
 
-	if (!$groupHandler->involvedInSubject($subBox['cid']) && !$groupHandler->involvedInGroup($_SESSION['id'], $subBox['cid'])) {
+    /* Check involved in subject */
+    $groupHandler = new Group;
+
+    if (!$groupHandler->involvedInSubject($submission_cat_id) && !$groupHandler->involvedInGroup($_SESSION['id'], $submission_cat_id)) {
         exit();
     }
 
     $current_time = new DateTime();
 
     /* Get status to set action */
-    $student_submission = $subStudHandler->getStatus($_SESSION['id'], $subBox['id']);
+    $student_submission = $subStudHandler->getStatus($_SESSION['id'], $submission_id);
 
     if ($student_submission['accept_submission']) {
         $action = 'View Details';
@@ -32,22 +37,17 @@ if ($_REQUEST['id']) {
         $action = 'View Details';
     }
 
-	$output = array(
-        'id'			=> $subBox['id'],
-        'cid'			=> $subBox['cid'],
-        'category'		=> Scrub::text($subBox['categoryName']),
-        'fid'			=> $subBox['fid'],
-        'typeName'		=> Scrub::text($subBox['typeName']),
-        'name'	        => Scrub::text($subBox['name']),
-        'description'	=> Scrub::text($subBox['description']),
-        'comment'		=> Scrub::text($subBox['comment']),
-        'action'		=> $action,
+    $output = array(
+        'id'          => $submission_id,
+        'cid'         => $submission_cat_id,
+        'category'    => Scrub::text($submission->getCategory()->getName()),
+        'typeName'    => Scrub::text($submission->getWorkType()->getName()),
+        'name'        => Scrub::text($submission->getName()),
+        'description' => Scrub::text($submission->getDescription()),
+        'action'      => $action,
     );
 
 }
 
 header("Content-type: application/json");
 print json_encode($output);
-
-
-?>

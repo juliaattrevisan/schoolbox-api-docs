@@ -8,39 +8,144 @@
  */
 
 namespace Schoolbox;
-use Schoolbox;
+use Schoolbox\Column\Factory as ColumnFactory;
+use \Mapper as BaseMapper;
+use Schoolbox\Column\IColumnType;
+use Schoolbox\Column\IFactory;
 
-class Mapper extends \Mapper {
-    public function __construct(){
+class Mapper extends BaseMapper {
+
+    /**
+     * Factory for building column hydrators.
+     *
+     * @var IFactory
+     */
+    protected $column_factory;
+
+    public function __construct() {
         parent::__construct();
     }
 
+    protected function setup() {
+        $this->setColumnFactory(new ColumnFactory());
+    }
+
     /**
-     * @param Array $row
-     * @param String $alias
-     * @param Function $callback
-     * @return Model
+     * @param IFactory $column_factory
+     *
+     * @return $this
      */
-    public function hydrate($row, $alias = '', $callback = null) {
-        $model = new $this->model;
+    public function setColumnFactory(IFactory $column_factory) {
+        $this->column_factory = $column_factory;
+        return $this;
+}
 
-        foreach ($this->map as $map) {
-            $propertyName = 'set'.ucfirst($map['property']);
-            $columnName = $map['column'];
+    /**
+     * @return IFactory
+     */
+    public function getColumnFactory() {
+        return $this->column_factory;
+    }
 
-            if (!empty($alias)) {
-                $columnName = "$alias.$columnName";
-            }
-
-
-
-            $model->$propertyName($row[$columnName]);
+    /**
+     * Updated because hydrated objects won't usually belong to the Model class.
+     * Collections will always be \Schoolbox\Collection instances for these
+     * classes, though.
+     *
+     * @param mixed $object
+     *
+     * @return Collection
+     */
+    public function getModelAsCollection($object) {
+        if ($object instanceof Collection) {
+            return $object;
         }
+        return new Collection(array($object));
+    }
 
-        if (!empty($callback)) {
-            $model = $callback($this, $model, $row);
+    /**
+     * Gets name of get method for identifier column.
+     *
+     * @return string
+     */
+    public function getGetIdentifierMethodName() {
+        $identifier = $this->getIdentifier();
+        return $this->getGetMethodName($identifier['property']);
+    }
+
+    /**
+     * Gets name of get method for given property.
+     *
+     * @param string $property
+     *
+     * @return string
+     */
+    protected function getGetMethodName($property) {
+        return 'get'.ucfirst($property);
+    }
+
+    /**
+     * Gets name of set method for given property.
+     *
+     * @param string $property
+     *
+     * @return string
+     */
+    protected function getSetMethodName($property) {
+        return 'set'.ucfirst($property);
+    }
+
+    /**
+     * Overridden to use getter and hydrator instead of getting property
+     * directly.
+     *
+     * @param object $model
+     * @param string $property
+     * @param array  $map
+     *
+     * @return mixed
+     */
+    protected function getModelProperty($model, $property, $map) {
+        $get_method  = $this->getGetMethodName($property);
+        $value       = $model->$get_method();
+        $join_mapper = isset($map['join']) ? $this->getJoinMapper($map['join']) : null;
+        if ($map['hydrator'] instanceof IColumnType) {
+            $value = $map['hydrator']->dehydrate($value, $join_mapper);
         }
+        return $value;
+    }
 
-        return $model;
+    /**
+     * Overridden to use setter and hydrator instead of setting property
+     * directly.
+     *
+     * @param object $model
+     * @param string $property
+     * @param mixed  $value
+     * @param array  $map
+     *
+     * @return $this
+     */
+    protected function setModelProperty($model, $property, $value, $map) {
+        $set_method  = $this->getSetMethodName($property);
+        $join_mapper = isset($map['join']) ? $this->getJoinMapper($map['join']) : null;
+        if ($map['hydrator'] instanceof IColumnType) {
+            $value = $map['hydrator']->hydrate($value, $join_mapper);
+        }
+        $model->$set_method($value);
+        return $this;
+    }
+
+    /**
+     * Overrides parent::hasMap() to set the hydrator based on the field type.
+     *
+     * @param $map
+     * @return bool
+     */
+    protected function hasMap($map) {
+        if (is_array($map) && !isset($map['hydrator'])) {
+            $map['hydrator'] = $this->column_factory->build($map['type']);
+        }
+        return parent::hasMap($map);
     }
 }

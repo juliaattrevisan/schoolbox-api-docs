@@ -1,6 +1,8 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css"/>
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
+<script type="text/javascript" src="/javascript/uploadify/swfobject.js"></script>
+<script type="text/javascript" src="/javascript/uploadify/jquery.uploadify.v2.1.4.js"></script>
 
 <script type="text/javascript">
     // from http://stackoverflow.com/a/5259788
@@ -21,14 +23,6 @@
 
 
     $j(function () {
-
-        // setup file input
-        $j('.prettify').prettyFileInput({
-            additionalButtonClasses:'no-marg float-left',
-            buttonActiveClass:'tick',
-            defaultText:'<span></span>Choose file',
-            defaultFileSelectedText:'<span></span>File selected'
-        });
 
         // setup datepickers
         $j('#open_date, #due_date, #late_date').datepicker({
@@ -226,6 +220,70 @@
                 }
             });
         }
+		//
+		// File uploader
+		// May need custom file to be uploaded.
+		var form        = $j('form');
+		var file_upload = $j('#custom_file_upload');
+		file_upload.uploadify({
+			'uploader':'/javascript/uploadify/uploadify.swf',
+			'script':'/submission/fileForm.php?{SESSION_NAME}={SESSION_ID}',
+			'cancelImg':'/javascript/uploadify/cancel.png',
+			'fileDataName':'file',
+			'multi':true,
+			'auto':false,
+			'queueSizeLimit':'{FILE_MAX_UPLOAD}',
+			'descriptionField':false,
+			'removeCompleted':false,
+			onComplete: function(event, code, file, output, upload) {
+				//
+				// Add hidden element with uploaded file ID.
+				var parsed_output = JSON.parse(output);
+				if (!parsed_output.success) {
+					alert('Error: '+parsed_output.message);
+				}
+				$j('#custom_file_upload'+code).prepend(
+					$j('<input name="file_ids[]" type="hidden" />').val(parsed_output.file_id)
+				);
+			},
+			'onAllComplete':function(event, upload) {
+				form.submit();
+			}
+		});
+
+		//
+		// Form submit event.
+		// If this is a browser submission, and the upload queue isn't empty,
+		// trigger Uploadify uploader instead of submitting form. The Uploadify
+		// uploader submits the form once it's done.
+		form.submit(function(event) {
+			var uploads = $j('#custom_file_uploadQueue .uploadifyQueueItem');
+			if (uploads.length > 0 && 'originalEvent' in event) {
+				event.preventDefault();
+				file_upload.uploadifyUpload();
+			}
+		});
+
+		$j('a.delete_existing').click(function(event) {
+			event.preventDefault();
+			var link    = $j(this);
+			var file_id = link.data('file_id');
+			var box_id  = link.data('box_id');
+			var row     = link.closest('.existing_file');
+			$j.post(
+				$j(this).attr('href'),
+				{file_id: file_id, box_id: box_id},
+				function(data) {
+					if (!data.success) {
+						alert('Error: '+data.message);
+					}
+					else {
+						row.fadeOut();
+					}
+				},
+				'json'
+			);
+		});
     });
 </script>
 <!-- END custom_head -->
@@ -250,19 +308,23 @@
     <!-- BEGIN browse_row -->
     <tr>
         <td class="formLabelWidth">
-            <h4>File</h4>
-            <em>This is an optional file that will be related with the due work and made available for download.</em>
-            <!-- BEGIN file_overwrite -->
-            <em class="warning">Warning: uploading a new file will overwrite the existing file associated with this Due
-                Work.</em>
-            <!-- END file_overwrite -->
+			<h4>Files</h4>
+			<em>When browsing your computer you can select multiple files by holding control and clicking. You can add
+				files from multiple folders by clicking the select files multiple times.</em>
         </td>
         <td>
             <!-- BEGIN existing_file -->
-            <p>Current file: <img class="mimetype" src="/images/mime/22x22/{CURRENT_FILE_ICON}"/>{CURRENT_FILE_NAME}
-                (uploaded {CURRENT_FILE_DATE})</p>
+            <p class="existing_file">
+				<a href="/submission/fileForm.php?delete=1"
+				   class="delete_existing"
+				   data-file_id="{CURRENT_FILE_ID}"
+				   data-box_id="{ID}"
+				><img src="/javascript/uploadify/cancel.png" border="0"></a>
+				<img class="mimetype" src="/images/mime/22x22/{CURRENT_FILE_ICON}"/>{CURRENT_FILE_NAME}
+                (uploaded {CURRENT_FILE_DATE})
+			</p>
             <!-- END existing_file -->
-            <input type="file" name="file" class="prettify"/>
+            <input type="file" name="file" id="custom_file_upload" />
             <input type="hidden" name="MAX_FILE_SIZE" value="{MAX_FILE_SIZE}"/>
         </td>
     </tr>

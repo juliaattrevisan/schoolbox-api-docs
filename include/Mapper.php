@@ -35,16 +35,47 @@ abstract class Mapper {
      */
     const TYPE_LOB = 3;
 
+	const TYPE_DATETIME   = 10;
+	const TYPE_DATE       = 11;
+	const TYPE_TIME       = 12;
+	const TYPE_TIMESTAMP  = 13;
+	const TYPE_DECIMAL    = 20;
+	const TYPE_SERIALIZED = 30;
+	const TYPE_MODEL      = 40;
 
-    protected $database;
+	/**
+	 * @var Database
+	 */
+	protected $database;
 
-    protected $table;
+	/**
+	 * @var string
+	 */
+	protected $table;
 
-    protected $model;
+	/**
+	 * Class name of the model to associate with this mapper.
+	 *
+	 * @var string
+	 */
+	protected $model;
 
-    protected $map;
+	/**
+	 * @var array
+	 */
+	protected $map;
 
-    protected $identifier;
+	/**
+	 * A list of joins that this mapper has had defined.
+	 *
+	 * @var array
+	 */
+	protected $joins;
+
+	/**
+	 * @var array
+	 */
+	protected $identifier;
 
     /**
      * Stores the singleton instance of the mapper
@@ -69,9 +100,37 @@ abstract class Mapper {
 
     protected function __construct() {
         $this->database = Database::getInstance();
-
+        $this->setup();
         $this->mapping();
     }
+
+	/**
+	 * Default setup for any other objects which compose the mapper.
+	 */
+	protected function setup() {}
+
+	/**
+	 * @return string
+	 */
+	public function getTable() {
+		return $this->table;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getModel() {
+		return $this->model;
+	}
+
+	/**
+	 * Retrieves identifier for this mapper.
+	 *
+	 * @return array
+	 */
+	public function getIdentifier() {
+		return $this->identifier;
+	}
 
     /**
      * @brief Retrieves the entire collection unfiltered
@@ -125,27 +184,44 @@ abstract class Mapper {
     /**
      * Returns a collection with models filtered by column/property
      *
-     * @static
      * @param String $columnName
      * @param String $columnValue
+     *
      * @return Collection
      */
-    public function findByColumn($columnName, $columnValue) {
-        $statement = $this->database->prepare(
-            "
+    public function findByColumn($columnName, $columnValue, $one = false) {
+        $statement = $this->database->prepare("
             SELECT {$this->getColumnString()}
             FROM `{$this->table}`
             WHERE `{$columnName}` = :$columnName
-        "
-        );
-
+        ");
         $statement->bindParam(":$columnName", $columnValue);
-
         $statement->execute();
+        return $this->hydrateList($statement->fetchAll());
+    }
 
-        $rowset = $statement->fetchAll();
-
-        return $this->hydrateList($rowset);
+    /**
+     * Returns first model whose $columnName = $columnValue.
+     *
+     * @param String $columnName
+     * @param String $columnValue
+     *
+     * @return object or false if not found.
+     */
+    public function findOneByColumn($columnName, $columnValue) {
+        $statement = $this->database->prepare("
+            SELECT {$this->getColumnString()}
+            FROM `{$this->table}`
+            WHERE `{$columnName}` = :$columnName
+            LIMIT 1
+        ");
+        $statement->bindParam(":$columnName", $columnValue);
+        $statement->execute();
+        $result = $statement->fetch();
+        if ($result) {
+            return $this->hydrate($result);
+        }
+        return false;
     }
 
     /**
@@ -185,18 +261,47 @@ abstract class Mapper {
         return $this->hydrateList($rowset);
     }
 
+
+    /**
+     * Gets a single object as a collection, if it isn't one already.
+     *
+     * @param mixed $object
+     *
+     * @return Collection
+     */
+    public function getModelAsCollection($object) {
+        if (is_subclass_of($object, 'Model')) {
+            $collection = new Collection;
+            $collection[] = $object;
+        }
+        else {
+            $collection = $object;
+        }
+        return $collection;
+    }
+
+
+    /**
+     * @brief calls save(), but forces create by nulling the identifier field.
+     * @param $object
+     * @return array<int>
+     */
+    public function create($object) {
+        $collection = $this->getModelAsCollection($object);
+        foreach ($collection as $model) {
+            $this->setModelProperty($model, $this->identifier['property'], null, $this->identifier);
+        }
+        return $this->save($collection);
+    }
+
+
     /**
      * @brief Saves an object to the database. Updates or inserts
      * @param $object
      * @return array<int>
      */
     public function save($object) {
-        if (is_subclass_of($object, 'Model')) {
-            $collection = new Collection;
-            $collection[] = $object;
-        } else {
-            $collection = $object;
-        }
+        $collection = $this->getModelAsCollection($object);
 
         $tbl = $this->table;
         $colString = $this->getColumnString();
@@ -216,14 +321,15 @@ abstract class Mapper {
             foreach ($this->map as $map) {
                 $propertyName = $map['property'];
                 $columnName = $map['column'];
-                $statement->bindParam(":$columnName", $model->$propertyName);
+                $statement->bindParam(":$columnName", $this->getModelProperty($model, $propertyName, $map));
             }
             if ($statement->execute()) {
-                $identifier = $this->identifier['property'];
-                if (!$model->$identifier) {
-                    $model->$identifier = $this->database->lastInsertId();
+                $identifier  = $this->getIdentifier();
+                $id_property = $identifier['property'];
+                if (!$this->getModelProperty($model, $id_property, $identifier)) {
+                    $this->setModelProperty($model, $id_property, $this->database->lastInsertId(), $identifier);
                 }
-                $affectedIDs[] = $model->$identifier;
+                $affectedIDs[] = $this->getModelProperty($model, $id_property, $identifier);
             }
             else {
                 $this->database->rollBack();
@@ -239,12 +345,7 @@ abstract class Mapper {
     public function delete($object) {
         $identifierName = $this->identifier['column'];
 
-        if (is_subclass_of($object, 'Model')) {
-            $collection = new Collection;
-            $collection[] = $object;
-        } else {
-            $collection = $object;
-        }
+        $collection = $this->getModelAsCollection($object);
 
         $statement = $this->database->prepare(
             "
@@ -254,7 +355,7 @@ abstract class Mapper {
         );
 
         foreach ($collection as $model) {
-            $statement->bindParam(':identifierValue', $model->id);
+            $statement->bindParam(':identifierValue', $this->getModelProperty($model, $identifierName, $this->identifier));
 
             if (!$statement->execute()) {
                 return false;
@@ -344,6 +445,88 @@ abstract class Mapper {
     }
 
     /**
+     * Adds a join to this mapper.
+     *
+     * @param string $name The identifier for this join.
+     * @param array  $join A definition for this join, with these keys:
+     *                     mapper:    a Mapper instance for the related table,
+     *                                or the class name of a mapper
+     *                     this_key:  the key for this side of the relation
+     *                     other_key: the key for the other side of the relation
+     *                     extra:     any extra conditions on the join
+     *
+     * @return bool
+     */
+    protected function hasJoin($name, $join) {
+        if (!is_array($join)) {
+            return false;
+        }
+        $this->joins[$name] = $join;
+        return true;
+    }
+
+    /**
+     * Retrieves the mapper that this join uses.
+     *
+     * @param string $name The identifier for this join.
+     *
+     * @return Mapper
+     */
+    public function getJoinMapper($name) {
+        if (!array_key_exists($name, $this->joins)) {
+            return false;
+        }
+        $mapper = $this->joins[$name]['mapper'];
+        if (!($mapper instanceof Mapper) && class_exists($mapper)) {
+            $this->joins[$name]['mapper'] = new $mapper();
+        }
+        return $this->joins[$name]['mapper'];
+    }
+
+    /**
+     * Retrieves SQL for building a join that has been defined in hasJoin().
+     *
+     * @param string $name        The join's identifier as passed in hasJoin().
+     * @param string $this_alias  The alias to use for this side of the join,
+     *                            defaults to this mapper's table name.
+     * @param string $other_alias The alias to use for the other side of the
+     *                            join, defaults to other mapper's table name.
+     *
+     * @return string
+     */
+    public function getJoinSql($name, $this_alias = '', $other_alias = '') {
+        if (!array_key_exists($name, $this->joins)) {
+            return false;
+        }
+        $join = $this->joins[$name];
+
+        $this_table   = $this->getTable();
+        $other_mapper = $this->getJoinMapper($name);
+        $other_table  = $other_mapper->getTable();
+
+        if (strlen($this_alias) === 0) {
+            $this_alias = $this_table;
+        }
+        if (strlen($other_alias) === 0) {
+            $other_alias = $other_table;
+        }
+        $join_sql = '`:other_table` AS `:other_alias` ON `:this_alias`.`:this_key` = `:other_alias`.`:other_key`';
+        if (strlen($join['extra']) > 0) {
+            $join_sql .= ' AND ' . $join['extra'];
+        }
+        return strtr(
+            $join_sql,
+            array(
+                ':this_alias'  => $this_alias,
+                ':this_key'    => $join['this_key'],
+                ':other_table' => $other_table,
+                ':other_alias' => $other_alias,
+                ':other_key'   => $join['other_key'],
+            )
+        );
+    }
+
+    /**
      * @param Array $rowList
      * @param String $alias
      * @param Callback $callback
@@ -362,11 +545,11 @@ abstract class Mapper {
     /**
      * @param Array $row
      * @param String $alias
-     * @param Function $callback
+     * @param callable $callback
      * @return Model
      */
     public function hydrate($row, $alias = '', $callback = null) {
-        $model = new $this->model;
+        $model = $this->createModel();
 
         foreach ($this->map as $map) {
             $propertyName = $map['property'];
@@ -376,27 +559,67 @@ abstract class Mapper {
                 $columnName = "$alias.$columnName";
             }
 
-            $model->$propertyName = $row[$columnName];
+            $columnValue = array_key_exists($columnName, $row) ? $row[$columnName] : null;
+            $this->setModelProperty($model, $propertyName, $columnValue, $map);
         }
 
-        if (!empty($callback)) {
-            $model = $callback($this, $model, $row);
+        if (!empty($callback) && is_callable($callback)) {
+            $model = call_user_func($callback, $this, $model, $row);
         }
 
         return $model;
     }
 
     /**
+     * Creates a new instance of class with name passed in $this->hasModel().
+     *
+     * @return object
+     */
+    public function createModel() {
+        return new $this->model;
+    }
+
+    /**
+     * Overridable method for getting a model's property.
+     *
+     * @param object $model
+     * @param string $property
+     * @param array  $map
+     *
+     * @return mixed
+     */
+    protected function getModelProperty($model, $property, $map) {
+        return $model->$property;
+    }
+
+    /**
+     * Overridable method for setting a model's property.
+     *
+     * @param object $model
+     * @param string $property
+     * @param mixed  $value
+     * @param array  $map
+     *
+     * @return void
+     */
+    protected function setModelProperty($model, $property, $value, $map) {
+        $model->$property = $value;
+    }
+
+    /**
      * @brief Returns an SQL fragement containing a comma separated list of column names possibly aliased
      * @param String $alias
+     * @param array  $whitelist If not empty, a whitelist of column names to use
      * @return String
      */
-    public function getColumnString($alias = '') {
+    public function getColumnString($alias = '', $whitelist = array()) {
 
         $columnList = array();
 
         foreach ($this->map as $map) {
-
+			if (!empty($whitelist) && !in_array($map['column'], $whitelist)) {
+				continue;
+			}
             if (!empty($alias)) {
                 $columnString = "`$alias`.`{$map['column']}` AS `$alias.{$map['column']}`";
             } else {
@@ -417,11 +640,56 @@ abstract class Mapper {
         $placeholderList = array();
 
         foreach ($this->map as $map) {
-            $placeholderList[] = ":{$map['column']}";
+            //
+            // Is this a create or update timestamp field?
+            // Update with now() instead of a placeholder.
+            $placeholder = ":{$map['column']}";
+            if ($map['created_timestamp'] || $map['updated_timestamp']) {
+                $placeholder = 'NOW()';
+            }
+            $placeholderList[] = $placeholder;
         }
 
         return implode(', ', $placeholderList);
     }
+
+	/**
+	 * Gets a string of placeholders for an array - usually used for creating a
+	 * list of placeholders for an IN condition.
+	 *
+	 * @param array  $input
+	 * @param string $prefix If not supplied, ? will be used as the placeholder
+	 *                       for all values.
+	 *
+	 * @return string Something like "(:id_0, :id_1, :id_2)".
+	 */
+	public function getArrayPlaceholders($input, $prefix = null) {
+		$placeholders = array();
+		foreach ($input as $i => $param) {
+			$placeholders[] = isset($prefix) ? (':'.$prefix.'_'.$i) : '?';
+		}
+		return '('.implode(',', $placeholders).')';
+	}
+
+	/**
+	 * Flattens a list of parameters for an array.
+	 *
+	 * Used in conjunction with getArrayPlaceholders() - calling this with the
+	 * same input and prefix will generate params and placeholders that work
+	 * with each other.
+	 *
+	 * @param array  $input
+	 * @param string $prefix
+	 *
+	 * @return array
+	 */
+	public function getArrayParameters($input, $prefix) {
+		$params = array();
+		foreach ($input as $i => $param) {
+			$params[$prefix.'_'.$i] = $param;
+		}
+		return $params;
+	}
 
     /**
      * @brief Returns an SQL fragment containg the assignment portion of an UPDATE query
@@ -432,11 +700,19 @@ abstract class Mapper {
 
         foreach ($this->map as $map) {
             //
-            // Don't update the identifier column.
+            // Don't update the identifier column, or the created timestamp.
             if (!empty($map['identifier'])) {
                 continue;
             }
-            $assignmentList[] = "`{$this->table}`.`{$map['column']}` = :{$map['column']}";
+            if ($map['created_timestamp']) {
+                continue;
+            }
+            $assignment  = "`{$this->table}`.`{$map['column']}`";
+            $placeholder = ":{$map['column']}";
+            if ($map['updated_timestamp']) {
+                $placeholder = 'NOW()';
+            }
+            $assignmentList[] = "$assignment = $placeholder";
         }
 
         return implode(', ', $assignmentList);
