@@ -22,7 +22,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 	/**
 	 * Render page
 	 */
-	public function render() {
+	protected function render() {
 		echo "showcase shenanigans goes here";
 	}
 }

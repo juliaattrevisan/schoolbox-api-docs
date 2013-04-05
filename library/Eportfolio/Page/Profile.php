@@ -46,7 +46,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	/**
 	 * Render page
 	 */
-	public function render() {
+	protected function render() {
 		$this->renderPersonal();
 
 		$this->renderShowcasedWork();

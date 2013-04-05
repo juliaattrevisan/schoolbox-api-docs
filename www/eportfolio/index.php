@@ -9,4 +9,4 @@ $userId = $this->arg[0];
 $pageId = $this->arg[1];
 
 $factory = new Eportfolio_Page_Factory($this, $userId, $pageId);
-$factory->getPage()->render();
+$factory->getPage()->renderPage();

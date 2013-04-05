@@ -102,7 +102,17 @@ abstract class Eportfolio_Page_Abstract {
 
 	abstract protected function initialise();
 	abstract protected function setup();
-	abstract public function render();
+	abstract protected function render();
+
+	/**
+	 * Common elements rendered on all pages can be established here
+	 */
+	public function renderPage() {
+
+		/* A rendering hook method
+		 */
+		$this->render();
+	}
 
 	/* Getters/Setters
 	 */
