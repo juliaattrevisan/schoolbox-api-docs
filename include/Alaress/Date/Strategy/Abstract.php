@@ -35,13 +35,24 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Int
 	 */
 	private $locale = null;
 
+	/**
+	 * Sets this date strategy's time from the given datetime object or string
+	 * and the given format.
+	 *
+	 * @param string|object $dateTime        An Alaress_Date_Format_Interface or
+	 *                                       DateTime object, or a string
+	 *                                       representing a time.
+	 * @param string        $inputDateFormat A format recognisable by date().
+	 *
+	 * @return mixed|void
+	 */
 	public function setFromFormat($dateTime, $inputDateFormat) {
 		if ($dateTime instanceof DateTime) {
 			$this->setDateTimeObject($dateTime);
 		}
-
-		/* Support for unix timestamp variant by converting it to a db format
-		 */
+		elseif ($dateTime instanceof Alaress_Date_Format_Interface) {
+			$this->setFromFormat($dateTime->getUnixTimestamp(), 'U');
+		}
 		elseif ($inputDateFormat == 'U') {
             $this->setByTimestamp($dateTime);
 		}

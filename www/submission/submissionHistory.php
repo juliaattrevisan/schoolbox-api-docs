@@ -173,7 +173,7 @@ if ($file_links->count() > 0) {
             'FILE_THUMB' => $file->getIconFromFilename(),
             'FILE_SIZE'  => Alaress_Byte_Format::bytesToString($file->getFilesize()),
             'FILE_NAME'  => $file->getFilename(),
-            'FILE_DATE'  => date('jS M Y, g:ia', strtotime($file->getUploadedOn()))
+            'FILE_DATE'  => $file->getUploadedOn()->getUsingFormat('jS M Y, g:ia')
         ));
         $this->parse('download_block', 'download', true);
     }
@@ -472,16 +472,22 @@ if($recentSubmission['sid']) {
 
 }
 else {
-	/* Hide most recent submission
-	 * Show Submit form
-	 * Hide the Resubmit form
-	 */
-    if($userID == $_SESSION['id'] && mktime() > strtotime($submission->getOpenDate()) && mktime() < strtotime($submission->getLateDate()) && $submission->getAcceptOnline())
-	    $this->parse('action_submit_block', 'action_submit');
-    else
+    /* Hide most recent submission
+     * Show Submit form
+     * Hide the Resubmit form
+     */
+    if ($userID == $_SESSION['id']
+        && mktime() > $submission->getOpenDate()->getUnixTimestamp()
+        && mktime() < $submission->getLateDate()->getUnixTimestamp()
+        && $submission->getAcceptOnline())
+    {
+        $this->parse('action_submit_block', 'action_submit');
+    }
+    else {
         $this->setVar('action_submit_block','');
+    }
 
-	$this->setVar('recent_submission_block', '');
+    $this->setVar('recent_submission_block', '');
     $this->setVar('action_resubmit_block', '');
 
 }
