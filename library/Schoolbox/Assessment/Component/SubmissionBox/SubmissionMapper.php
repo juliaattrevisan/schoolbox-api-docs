@@ -112,13 +112,84 @@ class SubmissionMapper extends Schoolbox\Mapper {
 		}
 		$statement->execute();
 		foreach ($statement as $row) {
-			$submission = $this->hydrate($row, 'ss');
-			$box        = $box_join->hydrate($row, 'sb');
-			$category   = $category_join->hydrate($row, 'c');
-			$box->setCategory($category);
-			$submission->setSubmissionBox($box);
-			$collection->add($factory->buildFromStudentSubmission($submission));
+			$collection->add(
+				$factory->buildFromStudentSubmission(
+					$this->hydrateForActivityList($row)
+				)
+			);
 		}
 		return $collection;
+	}
+
+	/**
+	 * Returns an activity collection for the given user and submission box.
+	 *
+	 * @param $user_id
+	 * @param $box_id
+	 *
+	 * @return ActivityCollection
+	 */
+	public function getSubmissionHistory($user_id, $box_id) {
+		//
+		// Needs filter on submission box number.
+		// getActivities($user_id, array('box' => $box_id)
+		$factory       = new ActivityFactory();
+		$collection    = new ActivityCollection();
+		$box_join      = $this->getJoinMapper('submission_box');
+		$category_join = $box_join->getJoinMapper('category');
+		$query = "
+			SELECT
+				{$this->getColumnString('ss')},
+				{$box_join->getColumnString('sb')},
+				{$category_join->getColumnString('c')}
+			FROM {$this->getTable()} ss
+			LEFT JOIN {$this->getJoinSql('submission_box', 'ss', 'sb')}
+			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
+			WHERE sb.id = :box_id
+			AND ss.owner = :user_id
+			ORDER BY ss.submitted DESC
+		";
+		$params = array(
+			'user_id' => $user_id,
+			'box_id'  => $box_id,
+		);
+		$statement = $this->database->prepare($query);
+		foreach ($params as $key => $value) {
+			$statement->bindParam($key, intval($value), \PDO::PARAM_INT);
+		}
+		$statement->execute();
+		foreach ($statement as $row) {
+			$collection->add(
+				$factory->buildFromStudentSubmission(
+					$this->hydrateForActivityList($row)
+				)
+			);
+		}
+		return $collection;
+	}
+
+	/**
+	 * Custom hydration method used by methods that get an activity list.
+	 *
+	 * This expects the following aliases:
+	 * * ss: this submission
+	 * * sb: submission box
+	 * * c:  category
+	 *
+	 * @param array $row
+	 *
+	 * @return Submission
+	 */
+	protected function hydrateForActivityList($row) {
+
+		$box_join      = $this->getJoinMapper('submission_box');
+		$category_join = $box_join->getJoinMapper('category');
+
+		$submission = $this->hydrate($row, 'ss');
+		$box        = $box_join->hydrate($row, 'sb');
+		$category   = $category_join->hydrate($row, 'c');
+		$box->setCategory($category);
+		$submission->setSubmissionBox($box);
+		return $submission;
 	}
 }
