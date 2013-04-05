@@ -27,3 +27,69 @@
 </div>
 
 <div class='clearfix'></div>
+
+<h1>Create new ePortfolio page</h1>
+<form action="/cms/categoryForm.php" method="post" id="folderForm" class="clearfix">
+	<table class="standardForm">
+		<tr>
+			<td class="formLabelWidth"><h4>Page Name</h4></td>
+			<td>
+				<label>
+					<input type="text" id="name" class="required" name="pageTitle" maxlength="250" size="40" value='' />
+				</label>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<h4>ePortfolio Template</h4>
+				<em>If you would like a homepage associated with this folder select a basic layout to get started with.</em>
+			</td>
+			<td>
+				<select name="pageTemplate">
+					<!-- BEGIN page_template_list -->
+					<option value="{PAGE_TEMPLATE_ID}" {PAGE_TEMPLATE_ID_SELECTED}>{PAGE_TEMPLATE_NAME}</option>
+					<!-- END page_template_list -->
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<h4>Allow Parents</h4>
+				<em>Allow your parents to view your ePortfolio page.</em>
+			</td>
+			<td>
+				<input type="hidden" name="parents" value="0" />
+				<input type="checkbox" name="parents" value="1" />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<h4>Group Permissions</h4>
+				<em>Allow predefined groups to view your ePortfolio page.</em>
+			</td>
+			<td>
+				<ul>
+					<!-- BEGIN group_permission -->
+					<li><input type="checkbox" name="group[{GROUP_PERMISSION_GROUP_ID}]" value="{GROUP_PERMISSION_GROUP_ID}" /> {GROUP_NAME}</li>
+					<!-- END group_permission -->
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<h4>Student Permissions</h4>
+				<em>Allow certain students to view your ePortfolio page.</em></td>
+			<td>
+				<p>
+					<input type='text' name='search_individual' value='' />Add
+				</p>
+				<ul>
+					<!-- BEGIN individual_permission -->
+					<li><input type="checkbox" name="individual[{INDIVIDUAL_PERMISSION_USER_ID}]" value="{INDIVIDUAL_PERMISSION_USER_ID}" /> {INDIVIDUAL_PERMISSION_USER_NAME}</li>
+					<!-- END individual_permission -->
+				</ul>
+			</td>
+		</tr>
+	</table>
+	<input type="submit" label="Submit" name="submit" value="Create Page" class="submit-btn-plain"/>
+</form>
