@@ -450,9 +450,6 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		return $this->componentFactory;
 	}
 
-
-
-
 	/**
 	 * Set tab list
 	 *
