@@ -173,7 +173,7 @@ if ($file_links->count() > 0) {
             'FILE_THUMB' => $file->getIconFromFilename(),
             'FILE_SIZE'  => Alaress_Byte_Format::bytesToString($file->getFilesize()),
             'FILE_NAME'  => $file->getFilename(),
-            'FILE_DATE'  => date('jS M Y, g:ia', strtotime($file->getUploadedOn()))
+            'FILE_DATE'  => $file->getUploadedOn()->getUsingFormat('jS M Y, g:ia')
         ));
         $this->parse('download_block', 'download', true);
     }
