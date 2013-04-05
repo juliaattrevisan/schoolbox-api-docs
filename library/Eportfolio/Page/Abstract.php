@@ -79,7 +79,15 @@ abstract class Eportfolio_Page_Abstract {
 		/* Setup template and stuff
 		 */
 		$this->setup();
+
+		/* Set up page list
+		 */
+		$this->setupPageList();
 	}
+
+	abstract protected function initialise();
+	abstract protected function setup();
+	abstract protected function render();
 
 	/**
 	 * Validate the user id to check that the user exists
@@ -104,17 +112,40 @@ abstract class Eportfolio_Page_Abstract {
 		$this->setUser($user);
 	}
 
-	abstract protected function initialise();
-	abstract protected function setup();
-	abstract protected function render();
+	/**
+	 * Set up blocks for the list of pages
+	 */
+	private function setupPageList() {
+		$this->getPage()->setBlock(TEMPLATE_content, 'eportfolio_page', 'eportfolio_page_block');
+	}
 
+	/**
+	 * Render a list of pages
+	 */
 	private function renderPageList() {
+		$allPages = $this->getEportfolioHandler()->fetchAllPages();
+
+		if (is_array($allPages) && count($allPages)) {
+			foreach($allPages as $currentPage) {
+				$this->getPage()->setVar(array(
+					'USER_ID' => $this->getUserId(),
+					'EPORTFOLIO_PAGE_ID' => $currentPage['page_id'],
+					'EPORTFOLIO_PAGE_NAME' => $currentPage['page_title'],
+				));
+
+				$this->getPage()->parse('eportfolio_page_block', 'eportfolio_page', true);
+			}
+		}
+		else {
+			$this->getPage()->setVar('eportfolio_page_block', '');
+		}
 	}
 
 	/**
 	 * Common elements rendered on all pages can be established here
 	 */
 	public function renderPage() {
+		$this->renderPageList();
 
 		/* A rendering hook method
 		 */
