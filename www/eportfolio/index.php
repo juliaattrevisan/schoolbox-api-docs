@@ -11,5 +11,5 @@
 $userId = $this->arg[0];
 $pageId = $this->arg[1];
 
-$eportfolioPage = new Eportfolio_Page($this, $userId, $pageId);
+$eportfolioPage = new Eportfolio_Page_Instance($this, $userId, $pageId);
 $eportfolioPage->render();

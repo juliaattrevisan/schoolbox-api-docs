@@ -8,35 +8,7 @@
  * @version     SVN: $Id$
  */
 
-class Eportfolio_Page {
-
-	/**
-	 * An instance of sitepage
-	 *
-	 * @var null
-	 */
-	protected $page = null;
-
-	/**
-	 * The user record for the owner of the page being viewed
-	 *
-	 * @var array
-	 */
-	protected $user = array();
-
-	/**
-	 * An instance of userHandler
-	 *
-	 * @var null
-	 */
-	protected $userHandler = null;
-
-	/**
-	 * An instance of eportfolioHandler
-	 *
-	 * @var null
-	 */
-	protected $eportfolioHandler = null;
+class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 
 	/**
 	 * The template file to use
@@ -44,13 +16,6 @@ class Eportfolio_Page {
 	 * @var string
 	 */
 	protected $templateFile = 'eportfolio/index.html';
-
-	/**
-	 * The id of the page being viewed
-	 *
-	 * @var int
-	 */
-	private $pageId = -1;
 
 	/**
 	 * An instance of Component_FactoryAbstract
@@ -81,20 +46,9 @@ class Eportfolio_Page {
 	private $tabList = array();
 
 	/**
-	 * Constructor
-	 *
-	 * @param $page
-	 * @param $userId
-	 * @param $pageId
+	 * Set up classes and collections beyond the basic norms
 	 */
-	public function __construct($page, $userId, $pageId) {
-		$this->setPage($page);
-		$this->setPageId($pageId);
-		$this->setUserHandler(new User());
-
-		/* Check that the user exists
-		 */
-		$this->validateUser($userId);
+	protected function initialise() {
 
 		/* If the user is valid, initiate everything
 		 */
@@ -110,42 +64,6 @@ class Eportfolio_Page {
 		/* Page colours
  		 */
 		$this->setColours($this->getEportfolioHandler()->getColorList($this->getPageId()));
-
-		/* Setup template and stuff
-		 */
-		$this->setup();
-	}
-
-	/**
-	 * Validate the user id to check that the user exists
-	 * If he does, remember his info
-	 *
-	 * @param $userId
-	 */
-	protected function validateUser($userId) {
-
-		/* Retrieve the user ID from the URI, must be an integer and at least 1 character long
-		 */
-		if (preg_match('/^\d+$/', $userId)) {
-			$user = $this->getUserHandler()->getByID($userId);
-		}
-
-		/* if we still have no user, advise that these are not the droids you're looking for
-		 */
-		if (!isset($user['uid'])) {
-			error(18);
-		}
-
-		$this->setUser($user);
-	}
-
-	/**
-	 * Check that the page being viewed has a template
-	 */
-	private function validatePageTemplate() {
-		if ($this->getEportfolioHandler()->getTemplate() === false) {
-			die('no template');
-		}
 	}
 
 	/**
@@ -211,6 +129,15 @@ class Eportfolio_Page {
 		$this->renderDefaultColours();
 		$this->renderColumnWidths();
 		$this->renderAllowedFileTypes();
+	}
+
+	/**
+	 * Check that the page being viewed has a template
+	 */
+	private function validatePageTemplate() {
+		if ($this->getEportfolioHandler()->getTemplate() === false) {
+			die('no template');
+		}
 	}
 
 	/**
@@ -471,26 +398,6 @@ class Eportfolio_Page {
 		return 99;
 	}
 
-	/**
-	 * Get the user id for a person who exists
-	 *
-	 * @return mixed
-	 */
-	protected function getUserId() {
-		return $this->user['uid'];
-	}
-
-	/**
-	 * Get the page owner's name
-	 *
-	 * @return string
-	 */
-	protected function getUserName() {
-		$user = $this->getUser();
-
-		return Scrub::text($user['firstname'] . ' ' . $user['lastname']);
-	}
-
 	/* Getters/Setters
 	 */
 
@@ -562,39 +469,14 @@ class Eportfolio_Page {
 	 *
 	 * @return null
 	 */
-	public function getEportfolioHandler() {
+	private function getEportfolioHandler() {
 		return $this->eportfolioHandler;
 	}
 
-	/**
-	 * @param null $page
-	 */
-	private function setPage($page) {
-		$this->page = $page;
-	}
 
 	/**
-	 * @return null
-	 */
-	private function getPage() {
-		return $this->page;
-	}
-
-	/**
-	 * @param int $pageId
-	 */
-	private function setPageId($pageId) {
-		$this->pageId = $pageId;
-	}
-
-	/**
-	 * @return int
-	 */
-	private function getPageId() {
-		return $this->pageId;
-	}
-
-	/**
+	 * Set tab list
+	 *
 	 * @param array $tabList
 	 */
 	private function setTabList($tabList) {
@@ -602,51 +484,11 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get tab list
+	 *
 	 * @return array
 	 */
 	private function getTabList() {
 		return $this->tabList;
-	}
-
-	/**
-	 * @param string $templateFile
-	 */
-	private function setTemplateFile($templateFile) {
-		$this->templateFile = $templateFile;
-	}
-
-	/**
-	 * @return string
-	 */
-	private function getTemplateFile() {
-		return $this->templateFile;
-	}
-
-	/**
-	 * @param array $user
-	 */
-	private function setUser($user) {
-		$this->user = $user;
-	}
-
-	/**
-	 * @return array
-	 */
-	private function getUser() {
-		return $this->user;
-	}
-
-	/**
-	 * @param null $userHandler
-	 */
-	private function setUserHandler($userHandler) {
-		$this->userHandler = $userHandler;
-	}
-
-	/**
-	 * @return null
-	 */
-	private function getUserHandler() {
-		return $this->userHandler;
 	}
 }
