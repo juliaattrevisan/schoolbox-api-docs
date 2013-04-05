@@ -126,12 +126,11 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 		}
 		$statement->execute();
 		foreach ($statement as $row) {
-			$return   = $this->hydrate($row, 'sr');
-			$box      = $box_join->hydrate($row, 'sb');
-			$category = $category_join->hydrate($row, 'c');
-			$box->setCategory($category);
-			$return->setSubmissionBox($box);
-			$collection->add($factory->buildFromReturnedWork($return));
+			$collection->add(
+				$factory->buildFromReturnedWork(
+					$this->hydrateForActivityList($row)
+				)
+			);
 		}
 		return $collection;
 	}
@@ -206,5 +205,74 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 			}
 		}
 		return $marks;
+	}
+
+	/**
+	 * Retrieves activity list for the student's submission history.
+	 *
+	 * @param $user_id
+	 * @param $box_id
+	 *
+	 * @return ActivityCollection
+	 */
+	public function getSubmissionHistory($user_id, $box_id) {
+		$collection    = new ActivityCollection();
+		$factory       = new ActivityFactory();
+		$box_join      = $this->getJoinMapper('submission_box');
+		$category_join = $box_join->getJoinMapper('category');
+		//
+		// Have hydrateFromRow() in ActivityFactory
+		$query = "
+			SELECT
+				{$this->getColumnString('sr')},
+				{$box_join->getColumnString('sb')},
+				{$category_join->getColumnString('c')}
+			FROM {$this->getTable()} sr
+			LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
+			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
+			AND sr.owner = :user_id
+			AND sb.id = :box_id
+			ORDER BY sr.returned DESC
+		";
+		$statement = $this->database->prepare($query);
+		$params['user_id'] = $user_id;
+		$params['box_id']  = $box_id;
+		foreach ($params as $key => $value) {
+			$statement->bindParam($key, intval($value), \PDO::PARAM_INT);
+		}
+		$statement->execute();
+		foreach ($statement as $row) {
+			$collection->add(
+				$factory->buildFromReturnedWork(
+					$this->hydrateForActivityList($row)
+				)
+			);
+		}
+		return $collection;
+	}
+
+	/**
+	 * Custom hydration method used by methods that get an activity list.
+	 *
+	 * This expects the following aliases:
+	 * * sr: this return
+	 * * sb: submission box
+	 * * c:  category
+	 *
+	 * @param array $row
+	 *
+	 * @return ReturnedWork
+	 */
+	protected function hydrateForActivityList($row) {
+
+		$box_join      = $this->getJoinMapper('submission_box');
+		$category_join = $box_join->getJoinMapper('category');
+
+		$return   = $this->hydrate($row, 'sr');
+		$box      = $box_join->hydrate($row, 'sb');
+		$category   = $category_join->hydrate($row, 'c');
+		$box->setCategory($category);
+		$return->setSubmissionBox($box);
+		return $return;
 	}
 }
