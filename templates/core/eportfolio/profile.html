@@ -1,3 +1,16 @@
+<style type='text/css'>
+	div.horizontalList li {
+		background-color: #eee;
+		padding: 20px;
+		margin-bottom: 20px;
+		float: left;
+		display: inline;
+	}
+
+	div.horizontalList {
+		width: 100%;
+	}
+</style>
 <div class='horizontalList'>
 	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}'>Profile</a></li>
 	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
@@ -5,6 +18,8 @@
 	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
 	<!-- END eportfolio_page -->
 </div>
+
+<div class='clearfix'></div>
 
 <img src='/portrait.php?userId={USER_ID}&size=constrain200' />
 

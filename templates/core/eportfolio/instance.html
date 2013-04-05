@@ -105,13 +105,28 @@
 </script>
 <!-- END custom_head -->
 
+<style type='text/css'>
+	div.horizontalList li {
+		background-color: #eee;
+		padding: 20px;
+		margin-bottom: 20px;
+		float: left;
+		display: inline;
+	}
+
+	div.horizontalList {
+		width: 100%;
+	}
+</style>
 <div class='horizontalList'>
-	<li><a href='/eportfolio/{USER_ID}'>Profile</a></li>
-	<li><a href='/eportfolio/{USER_ID}/showcase'>Showcased Work</a></li>
+	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}'>Profile</a></li>
+	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
 	<!-- BEGIN eportfolio_page -->
-	<li><a href='/eportfolio/{USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
+	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
 	<!-- END eportfolio_page -->
 </div>
+
+<div class='clearfix'></div>
 
 <h1>
 	<span>{HEADING}</span> - {PAGE_TITLE}
