@@ -7,7 +7,6 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-
 class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 
 	/**
