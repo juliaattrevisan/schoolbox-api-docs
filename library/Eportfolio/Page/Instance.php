@@ -15,7 +15,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 	 *
 	 * @var string
 	 */
-	protected $templateFile = 'eportfolio/index.html';
+	protected $templateFile = 'eportfolio/instance.html';
 
 	/**
 	 * An instance of Component_FactoryAbstract
