@@ -21,13 +21,18 @@ then
 		basedir=`readlink -f debian/$2/usr/share/$2`;
 	fi
 else
-	basedir=`readlink -f ../`;
+	if [ -d '../updates' ];
+	then
+		basedir=`readlink -f ../`;
+	else
+		basedir=`readlink -f .`;
+	fi
 fi
 baselength=`echo $basedir/updates/ | wc -m`;
 echo "$basedir";
 
 # Auto create scripts_list and sql_updates.sql for each folder in updates
-for release in `find $basedir/updates -maxdepth 1 -type d | sort -V | cut -c$baselength-1000`;
+for release in `find $basedir/updates/ -maxdepth 1 -type d | sort -V | cut -c$baselength-1000`;
 do
 	echo "Release: $release";
 	echo "- Building scripts_list";
