@@ -88,8 +88,41 @@ class Eportfolio_Page {
 	 * @param $pageId
 	 */
 	public function __construct($page, $userId, $pageId) {
+		$this->setPage($page);
+		$this->setPageId($pageId);
 		$this->setUserHandler(new User());
 
+		/* Check that the user exists
+		 */
+		$this->validateUser($userId);
+
+		/* If the user is valid, initiate everything
+		 */
+		$this->setEportfolioHandler(new Eportfolio($this->getUserId(), $this->getPageId()));
+
+		$this->validatePageTemplate();
+
+		/* Assemble list of components
+		 */
+		$this->setComponentFactory(new Component_Eportfolio_Factory($this->getUserHandler(), $this->getPage()));
+		$this->setComponentCollection($this->getComponentFactory()->buildComponentList($this->getPageId()));
+
+		/* Page colours
+ 		 */
+		$this->setColours($this->getEportfolioHandler()->getColorList($this->getPageId()));
+
+		/* Setup template and stuff
+		 */
+		$this->setup();
+	}
+
+	/**
+	 * Validate the user id to check that the user exists
+	 * If he does, remember his info
+	 *
+	 * @param $userId
+	 */
+	private function validateUser($userId) {
 		/* Retrieve the user ID from the URI, must be an integer and at least 1 character long
 		 */
 		if (preg_match('/^\d+$/', $userId)) {
@@ -103,36 +136,15 @@ class Eportfolio_Page {
 		}
 
 		$this->setUser($user);
+	}
 
-		/* If the user is valid, initiate everything
-		 */
-		$this->setPage($page);
-		$this->setPageId($pageId);
-		$this->setEportfolioHandler(new Eportfolio($this->getUserId(), $this->getPageId()));
-
+	/**
+	 * Check that the page being viewed has a template
+	 */
+	private function validatePageTemplate() {
 		if ($this->getEportfolioHandler()->getTemplate() === false) {
 			die('no template');
 		}
-
-		/* Assemble list of components
-		 */
-		$componentFactory = new Component_Eportfolio_Factory($this->getUserHandler(), $this->getPage());
-
-		$this->setComponentFactory($componentFactory);
-
-		$componentCollection = $this->getComponentFactory()->buildComponentList($this->getPageId());
-
-		$this->setComponentCollection($componentCollection);
-
-		/* Page colours
- 		 */
-		$colours = $this->getEportfolioHandler()->getColorList($this->getPageId());
-
-		$this->setColours($colours);
-
-		/* Setup
-		 */
-		$this->setup();
 	}
 
 	/**
@@ -177,6 +189,9 @@ class Eportfolio_Page {
 		}
 	}
 
+	/**
+	 * Render everything
+	 */
 	public function render() {
 		if ($this->getPermission() > WRITE_ACCESS) {
 			$this->renderComponents();
