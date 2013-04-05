@@ -10,6 +10,14 @@
 class Calendar_Api_Submission_Vcal_Default implements Calendar_Api_Interface {
 
 	/**
+	 * Constructor
+	 *
+	 * @param $config
+	 */
+	public function __construct($config) {
+	}
+
+	/**
 	 * Get day events from this data source
 	 *
 	 * @param $currentDay

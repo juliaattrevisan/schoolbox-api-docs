@@ -18,8 +18,10 @@ class Calendar_Api_StudentBirthday_Schoolbox_Default implements Calendar_Api_Int
 
 	/**
 	 * Constructor
+	 *
+	 * @param $config
 	 */
-	public function __construct() {
+	public function __construct($config) {
 		$this->setCalendarHandler(new Calendar());
 	}
 

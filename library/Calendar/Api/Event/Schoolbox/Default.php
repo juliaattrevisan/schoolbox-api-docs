@@ -18,8 +18,10 @@ class Calendar_Api_Event_Schoolbox_Default implements Calendar_Api_Interface {
 
 	/**
 	 * Constructor
+	 *
+	 * @param $config
 	 */
-	public function __construct() {
+	public function __construct($config) {
 		$this->setCalendarHandler(new Calendar());
 	}
 

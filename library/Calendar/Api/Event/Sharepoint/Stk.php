@@ -96,7 +96,7 @@ class Calendar_Api_Event_Sharepoint_Stk implements Calendar_Api_Interface {
     /**
      * Constructor
      */
-    public function __construct() {
+	public function __construct($config) {
 
         /* Create soap client
          */
@@ -247,38 +247,6 @@ class Calendar_Api_Event_Sharepoint_Stk implements Calendar_Api_Interface {
 				$collection->add($event);
 			}
 		}
-
-        return $collection;
-    }
-
-    /**
-     * Get student birthdays from this data source
-     *
-     * @param $currentDay
-     *
-     * @return Calendar_Event_Collection
-     */
-    public function getStudentBirthdays($currentDay) {
-        $collection = new Calendar_Event_Collection();
-
-        /* Fill in your query result set here and populate $collection
-         */
-
-        return $collection;
-    }
-
-    /**
-     * Get submission events from this data source
-     *
-     * @param $currentDay
-     *
-     * @return Calendar_Event_Collection
-     */
-    public function getSubmissionEvents($currentDay) {
-        $collection = new Calendar_Event_Collection();
-
-        /* Fill in your query result set here and populate $collection
-         */
 
         return $collection;
     }
