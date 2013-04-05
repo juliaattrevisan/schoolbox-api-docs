@@ -1,0 +1,29 @@
+<style type='text/css'>
+	div.horizontalList li {
+		background-color: #eee;
+		margin-bottom: 20px;
+		margin-right: 2px;
+		float: left;
+		display: inline;
+	}
+
+	div.horizontalList li a {
+		text-align: center;
+		padding: 20px;
+		display: block;
+	}
+
+	div.horizontalList {
+		width: 100%;
+	}
+</style>
+<div class='horizontalList'>
+	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}'>Profile</a></li>
+	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
+	<!-- BEGIN eportfolio_page -->
+	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
+	<!-- END eportfolio_page -->
+	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create'>+</a></li>
+</div>
+
+<div class='clearfix'></div>
