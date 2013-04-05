@@ -89,6 +89,7 @@ class Eportfolio {
 			SELECT *
 			FROM {$this->getContext()}_config
 			WHERE uid = '{$this->getUserId()}'
+			ORDER BY page_id
 		";
 
 		return $this->getDb()->getAll($query);
