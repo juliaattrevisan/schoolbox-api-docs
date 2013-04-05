@@ -68,6 +68,10 @@ abstract class Eportfolio_Page_Abstract {
 		 */
 		$this->validateUser($userId);
 
+		/* If the user is valid, initiate everything
+		 */
+		$this->setEportfolioHandler(new Eportfolio($this->getUserId(), $this->getPageId()));
+
 		/* Initialise classes and collections
 		 */
 		$this->initialise();
@@ -103,6 +107,9 @@ abstract class Eportfolio_Page_Abstract {
 	abstract protected function initialise();
 	abstract protected function setup();
 	abstract protected function render();
+
+	private function renderPageList() {
+	}
 
 	/**
 	 * Common elements rendered on all pages can be established here
@@ -227,4 +234,21 @@ abstract class Eportfolio_Page_Abstract {
 		return $this->userHandler;
 	}
 
+	/**
+	 * Set eportfolio handler
+	 *
+	 * @param null $eportfolioHandler
+	 */
+	protected function setEportfolioHandler($eportfolioHandler) {
+		$this->eportfolioHandler = $eportfolioHandler;
+	}
+
+	/**
+	 * Get eportfolio handler
+	 *
+	 * @return null
+	 */
+	protected function getEportfolioHandler() {
+		return $this->eportfolioHandler;
+	}
 }

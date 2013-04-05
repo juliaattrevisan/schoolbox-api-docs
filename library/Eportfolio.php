@@ -68,10 +68,15 @@ class Eportfolio {
 		$this->setUserId($userId);
 		$this->setPageId($pageId);
 
-		/* Preload settings
+		/* Preload settings for user-built pages
+		 *
+		 * Otherwise they are hardcoded pages and we don't need
+		 * this extra information
 		 */
-		$this->setSettings($this->fetchPageSettings($pageId));
-		$this->setAllTemplates($this->fetchAllTemplates());
+		if (is_numeric($pageId)) {
+			$this->setSettings($this->fetchPageSettings($pageId));
+			$this->setAllTemplates($this->fetchAllTemplates());
+		}
 	}
 
 	/**

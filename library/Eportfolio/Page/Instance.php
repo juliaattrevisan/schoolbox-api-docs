@@ -49,11 +49,6 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 	 * Set up classes and collections beyond the basic norms
 	 */
 	protected function initialise() {
-
-		/* If the user is valid, initiate everything
-		 */
-		$this->setEportfolioHandler(new Eportfolio($this->getUserId(), $this->getPageId()));
-
 		$this->validatePageTemplate();
 
 		/* Assemble list of components
@@ -455,23 +450,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		return $this->componentFactory;
 	}
 
-	/**
-	 * Set eportfolio handler
-	 *
-	 * @param null $eportfolioHandler
-	 */
-	private function setEportfolioHandler($eportfolioHandler) {
-		$this->eportfolioHandler = $eportfolioHandler;
-	}
 
-	/**
-	 * Get eportfolio handler
-	 *
-	 * @return null
-	 */
-	private function getEportfolioHandler() {
-		return $this->eportfolioHandler;
-	}
 
 
 	/**
