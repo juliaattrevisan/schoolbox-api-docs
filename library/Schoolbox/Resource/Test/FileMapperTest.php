@@ -78,7 +78,7 @@ class FileMapperTest extends TestCase {
 		// createModel(): returns a new (mocked) storage item.
 		// findByColumn(): First call returns no matches, second returns a
 		// storage item.
-		$storage_mapper = $this->getMock('\\Schoolbox\\FileMapper', array('createModel', 'findByColumn'));
+		$storage_mapper = $this->getMock('\\Schoolbox\\FileMapper', array('createModel', 'findOneByColumn'));
 		$storage_mapper
 			->expects($this->any())
 			->method('createModel')
@@ -87,7 +87,7 @@ class FileMapperTest extends TestCase {
 			}));
 		$storage_mapper
 			->expects($this->any())
-			->method('findByColumn')
+			->method('findOneByColumn')
 			->will($this->onConsecutiveCalls(false, $saved_storage));
 		$this->object->setStorageMapper($storage_mapper);
 
