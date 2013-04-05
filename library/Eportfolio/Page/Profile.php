@@ -61,11 +61,14 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 * Render personal details
 	 */
 	private function renderPersonal() {
+		$house = HouseMapper::getInstance()->findById($this->getUserHouse());
+
 		$this->getPage()->setVar(array(
 			'USER_ID' => $this->getExternalUserId(),
 			'USER_FULLNAME' => $this->getUserName(),
 			'USER_CAMPUS' => $this->getUserCampusName(),
 			'USER_YEAR' => $this->getUserYear(),
+			'USER_HOUSE' => $house->getHouse(),
 		));
 	}
 
@@ -131,6 +134,15 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 		else {
 			$this->getPage()->setVar('has_subjects_block', '');
 		}
+	}
+
+	/**
+	 * Get a user's house id
+	 *
+	 * @return mixed
+	 */
+	private function getUserHouse() {
+		return $this->user['house'];
 	}
 
 	/**
