@@ -1,0 +1,49 @@
+<input type="hidden" name="record[{CONNECTOR_ID}][eventType]" value='{EVENTTYPE_NAME}' />
+<input type="hidden" name="record[{CONNECTOR_ID}][connectorClass]" value='{CONNECTOR_CLASS}' />
+
+<fieldset class='calendarOptions'>
+	<fieldset class='medium'>
+		<h4>URL</h4>
+		<p>
+			<input type='text' id='update_{CONNECTOR_ID}' class='updateConfig' name="record[{CONNECTOR_ID}][url]" value='{URL}' />
+		</p>
+	</fieldset>
+
+	<fieldset>
+		<h4>Event Type</h4>
+		<p>
+			<select name="record[{CONNECTOR_ID}][luEventType]">
+				<!-- BEGIN luEventType -->
+				<option value='{LUEVENTTYPE_VALUE}' {LUEVENTTYPE_SELECTED}>{LUEVENTTYPE_NAME}</option>
+				<!-- END luEventType -->
+			</select>
+		</p>
+	</fieldset>
+
+	<fieldset>
+		<h4>Campus</h4>
+		<p>
+			<!-- BEGIN campus_list -->
+			<label>
+				<input type="checkbox" class="campusCheck" name="record[{CONNECTOR_ID}][campus][]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} /> {CAMPUS_NAME}
+			</label>
+			<!-- END campus_list -->
+		</p>
+	</fieldset>
+
+	<fieldset>
+		<h4>Group</h4>
+		<p>
+			<!-- BEGIN group_list -->
+			<label>
+				<input type="checkbox" name="record[{CONNECTOR_ID}][groupCheck][]" value="{GROUP_ID}" {GROUP_ID_SELECTED} /> {GROUP_NAME}<br />
+			</label>
+			<!-- END group_list -->
+		</p>
+	</fieldset>
+
+	<fieldset class='control'>
+		<a id="remove_{CONNECTOR_ID}" class='removeConfig btn delete no-text' title="Remove source" /><span></span></a>
+	</fieldset>
+</fieldset>
+

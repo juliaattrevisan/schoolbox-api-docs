@@ -12,52 +12,28 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Api_Composite implements Calendar_Api_Interface {
+class Calendar_Api_Composite implements Calendar_Api_EventType_Interface {
+
+	/**
+	 * A list of all the api classes which produce Collections to combine
+	 *
+	 * @var array
+	 */
 	private $api = array();
 
 	/**
 	 * Get day events
 	 *
-	 * @param $currentDay
+	 * @param $startTimestamp
+	 * @param $endTimestamp
+	 * @internal param $currentDay
 	 * @return Calendar_Event_Collection
 	 */
-	public function getDayEvents($currentDay) {
+	public function getEvents($startTimestamp, $endTimestamp) {
 		$result = new Calendar_Event_Collection();
 
 		foreach($this->getApi() as $currentApi) {
-			$result->merge($currentApi->getDayEvents($currentDay));
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Get student birthdays
-	 *
-	 * @param $currentDay
-	 * @return Calendar_Event_Collection
-	 */
-	public function getStudentBirthdays($currentDay) {
-		$result = new Calendar_Event_Collection();
-
-		foreach($this->getApi() as $currentApi) {
-			$result->merge($currentApi->getStudentBirthdays($currentDay));
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Get submission events
-	 *
-	 * @param $currentDay
-	 * @return Calendar_Event_Collection
-	 */
-	public function getSubmissionEvents($currentDay) {
-		$result = new Calendar_Event_Collection();
-
-		foreach($this->getApi() as $currentApi) {
-			$result->merge($currentApi->getSubmissionEvents($currentDay));
+			$result->merge($currentApi->getEvents($startTimestamp, $endTimestamp));
 		}
 
 		return $result;

@@ -14,7 +14,27 @@
  * @version	 SVN: $Id$
  */
 class Calendar_Api_Factory {
-	private $allSources = array('Sharepoint', 'Schoolbox');
+
+	/**
+	 * A list of all the possible event types to display
+	 * 
+	 * @var array
+	 */
+	protected $allTypes = array();
+
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		$allConfigs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
+
+		/* These configs are base64-encode()'d to get around a weird issue with unserialize
+		 * http://stackoverflow.com/questions/4264270/unserialize-sometimes-returns-false
+		 */
+		for ($allConfigs->rewind(); $allConfigs->valid(); $allConfigs->next()) {
+			$this->addConfig($allConfigs->current()->decodeConfig());
+		}
+	}
 
 	/**
 	 * Produce an API Composite
@@ -24,20 +44,20 @@ class Calendar_Api_Factory {
 	public function produce() {
 		$compositeApi = new Calendar_Api_Composite();
 
-		/* Alternative data sources
-		 */
-		foreach ($this->getAllSources() as $currentSource) {
-			$defaultImplementation = 'Calendar_Api_' . $currentSource . '_Default';
-			$uniqueImplementation = 'Calendar_Api_' . $currentSource . '_' . ucwords(Cfg::get('site_location'));
+		foreach($this->getAllTypes() as $config) {
+			$defaultImplementation = 'Calendar_Api_EventType_' . $config->getEventType() . '_' . $config->getConnectorClass() . '_Default';
+			$uniqueImplementation = 'Calendar_Api_EventType_' . $config->getEventType() . '_' . $config->getConnectorClass() . '_' . ucwords(Cfg::get('site_location'));
 
 			/* Decide which to use (unique or default)
 			 * Or create no class, if neither exists
+			 *
+			 * Inject config settings
 			 */
 			if (class_exists($uniqueImplementation)) {
-				$compositeApi->add(new $uniqueImplementation);
+				$compositeApi->add(new $uniqueImplementation($config));
 			}
 			else if (class_exists($defaultImplementation)) {
-				$compositeApi->add(new $defaultImplementation);
+				$compositeApi->add(new $defaultImplementation($config));
 			}
 		}
 
@@ -50,15 +70,37 @@ class Calendar_Api_Factory {
 		return $compositeApi;
 	}
 
+	/**
+	 * Empty list of configs
+	 */
+	public function resetConfigs() {
+		$this->allTypes = array();
+
+		return $this;
+	}
+
+	/**
+	 * Use only preselected configs
+	 *
+	 * @param $config
+	 *
+	 * @return \Calendar_Api_Factory
+	 */
+	public function addConfig($config) {
+		$this->allTypes[] = $config;
+
+		return $this;
+	}
+
 	/* Getters/Setters
 	 */
 
 	/**
-	 * Get all sources
+	 * Get all types
 	 *
 	 * @return array
 	 */
-	public function getAllSources() {
-		return $this->allSources;
+	protected function getAllTypes() {
+		return $this->allTypes;
 	}
 }

@@ -24,17 +24,26 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
     }
 
     public function execute() {
-        $currDay = time();
+        $today = new Alaress_Date_Format(date('y-m-d', time()), 'y-m-d');
 
         $this->setVar("DATE", date("l jS F"));
 
-        $factory = new Calendar_Api_Factory();
-        $api = $factory->produce();
+		/* A list of submissions
+		 */
+		$submissionFactory = new Calendar_Api_DashboardFactory("Submission");
 
-        $this->submissionList = $api->getSubmissionEvents($currDay);
-        $this->submissionList->sort();
+		$api = $submissionFactory->produce();
 
-        $this->eventList = $api->getDayEvents($currDay);
+		$this->submissionList = $api->getEvents($today->getDatabase(), $today->addDays(1)->getDatabase());
+		$this->submissionList->sort();
+
+		/* A list of events
+		 */
+		$eventFactory = new Calendar_Api_DashboardFactory("Event");
+
+		$api = $eventFactory->produce();
+
+        $this->eventList = $api->getEvents($today->getDatabase(), $today->addDays(1)->getDatabase());
         $this->eventList->sort();
 
         return true;

@@ -8,5 +8,5 @@
  * @version	 SVN: $Id$
  */
 
-$calendar = new Calendar_Full_Ajax_JSON($this, $this->arg[0]);
+$calendar = new Calendar_Layout_Full_Ajax_JSON($this, $this->arg[0]);
 $calendar->render();

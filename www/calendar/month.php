@@ -7,5 +7,5 @@
 
 SitePage::localRedir('/calendar/full');
 
-//$calendar = new Calendar_Month_Grid_Default($this, $this->arg[0]);
+//$calendar = new Calendar_Layout_Month_Grid_Default($this, $this->arg[0]);
 //$calendar->render();

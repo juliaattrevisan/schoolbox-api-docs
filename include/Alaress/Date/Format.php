@@ -30,9 +30,9 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 	 */
 	public function __construct($dateTime = null, $dateFormat) {
 		$strategy = new Alaress_Date_Strategy_V52();
-//		$strategy = new Alaress_Date_Strategy_DateTime();
 		$strategy->setFromFormat($dateTime, $dateFormat);
 		$strategy->setLocale(new Alaress_Date_Locale_Australian());
+		
 		$this->setStrategy($strategy);
 	}
 
@@ -44,34 +44,42 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 	 * Add/subtract minutes and reinitialise
 	 *
 	 * @param $val
+	 * @return \Alaress_Date_Format
 	 */
 	public function addMinutes($val) {
 		$time = $this->getStrategy()->getUnixTimestamp() + (60*$val);
 
 		$this->getStrategy()->setFromFormat($time, 'U');
+		
+		return $this;
 	}
 
 	/**
 	 * Add/subtract hours and reinitialise
 	 *
 	 * @param $val
+	 * @return \Alaress_Date_Format
 	 */
 	public function addHours($val) {
 		$time = $this->getStrategy()->getUnixTimestamp() + (60*60*$val);
 
 		$this->getStrategy()->setFromFormat($time, 'U');
+		
+		return $this;
 	}
 
 	/**
 	 * Add/subtract days and reinitialise
 	 *
 	 * @param  $val
-	 * @return void
+	 * @return \Alaress_Date_Format
 	 */
 	public function addDays($val) {
 		$time = $this->getStrategy()->getUnixTimestamp() + (60*60*24*$val);
 
 		$this->getStrategy()->setFromFormat($time, 'U');
+		
+		return $this;
 	}
 
 	/**
@@ -220,18 +228,18 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 		return $this->strategy;
 	}
 
-
     /**
      * Returns whether this date is valid, according to the strategy that this date was set up with.
      *
      * @return bool
      */
-    public function isValid()
-    {
+    public function isValid() {
         $strategy = $this->getStrategy();
+		
         if ($strategy instanceof Alaress_Validator_ValidatableInterface) {
             return $strategy->isValid();
         }
+		
         return true;
     }
 
@@ -246,6 +254,7 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 		if (!($other instanceof Alaress_Date_Format)) {
 			return 0;
 		}
+		
 		return $this->getStrategy()->compare($other->getStrategy());
 	}
 }

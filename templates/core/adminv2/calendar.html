@@ -29,22 +29,19 @@ $j(function() {
 	
 	$j('h3 span').each(function() {
 		activeContent = $j(this).siblings('em').html();
+
 		$j(this).qtip({
 			content: activeContent,
 			api: {
-					// Retrieve the content when tooltip is first rendered
-					 onRender: function()
-					 {
-						var self = this;
-					 }
-				 }
+				// Retrieve the content when tooltip is first rendered
+				onRender: function() {
+					var self = this;
+				}
+			}
 		});
 	});
-	
-})
-
+});
 </script>
-
 <!-- END custom_head-->
 
 <h1>Schoolbox Administration</h1>
@@ -55,77 +52,128 @@ $j(function() {
 </ul>
 <div class="admin-contents ">
 	<h2>Calendar</h2>
-	<form action="/adminv2/bulkAddCalendar" method="post" enctype="multipart/form-data" name="form" id="form" class="clearfix">
+	<div class="settings-nav-holder">
+		<ul class="settings-nav">
+			<!-- BEGIN setting_tab -->
+			<li><a href="/adminv2/calendar/{SETTING_TAB_URL}" class="{SETTING_TAB_CURRENT}">{SETTING_TAB_NAME}<span></span></a></li>
+			<!-- END setting_tab -->
+		</ul>
+	</div>
+    <!-- BEGIN import -->
+    <div class="settings">
 		<div class="level clearfix">
-			<div class="clearfix">
-				<div class="one-third">
-					<h3>Bulk<span>?</span><em>Upload some calendar entries.</em></h3>
-					<p>The File that contains the Calendar Infomation can either be a Comma Seperated Text File containing
-                        the following:<br>
-                        Date, Start Time, Finish Time, Name, Detail, Location, Priority, Type<br>
-                        <strong>ie.</strong>  21/12/2004,15:30,18:30,First Event, This is a Calendar Note, 4, 1<br>
-                        <strong>or</strong><br> a Microsoft Outlook ICS file.</p>
+			<form action="/adminv2/bulkAddCalendar" method="post" enctype="multipart/form-data" name="form" id="importForm" class="clearfix">
+				<div class="clearfix">
+					<div class="one-third">
+						<h3>Bulk<span>?</span><em>Upload some calendar entries.</em></h3>
+						<p>The File that contains the Calendar Infomation can either be a Comma Seperated Text File containing
+							the following:<br>
+							Date, Start Time, Finish Time, Name, Detail, Location, Priority, Type<br>
+							<strong>ie.</strong>  21/12/2004,15:30,18:30,First Event, This is a Calendar Note, 4, 1<br>
+							<strong>or</strong><br> a Microsoft Outlook ICS file.</p>
 
-					<h4>CSV template</h4>
-					<p class="clearfix">
-					<a href="/adminv2/csv/calendarBulkAdd.csv" class="btn report float-left" ><span></span>Download</a>
+						<h4>CSV template</h4>
+						<p class="clearfix">
+							<a href="/adminv2/csv/calendarBulkAdd.csv" class="btn report float-left" ><span></span>Download</a>
+						</p>
+						<ol>
+							<li>Download the template file using the above button</li>
+							<li>Edit the file in Microsoft Excel or equivalent editor</li>
+							<li>Save the file</li>
+							<li>Upload by clicking 'choose file' under "Upload new calendar entries"</li>
+						</ol>
+						<br />
+
+						<h4>Microsoft Outlook ICS</h4>
+						<ol>
+							<li>In Outlook, Click Calendar in the bottom left</li>
+							<li>Go to File, Save As</li>
+							<li>Choose iCalendar format (*.ics)</li>
+							<li>Click More Options</li>
+							<li>Change Detail from Availability Only to Full Details</li>
+							<li>Click OK</li>
+							<li>Save it</li>
+							<li>Upload by clicking 'choose file' under "Upload new calendar entries"</li>
+						</ol>
+						<br />
+
+						<h4>Upload new calendar entries (CSV or ICS)</h4>
+						<input type="file" name="bulkadd" />
+					</div>
+					<div class="one-third">
+						<h3>Campus<span>?</span><em>Select the campus' which will be able to view these events</em></h3>
+						<!-- BEGIN campus_check_list -->
+						<label>
+							<input type="checkbox" name="campusList[]" value="{CAMPUSID}" />
+							{CAMPUSNAME}</label>
+						<br />
+						<!-- END campus_check_list -->
+					</div>
+					<div class="one-third last clearfix">
+						<h3>Groups<span>?</span><em>Select the Groups which will be able to view these events</em></h3>
+						<!-- BEGIN user_group_check_list -->
+						<label>
+							<input type="checkbox" name="userGroup[]" value="{USERGROUPID}" />
+							{USERGROUPNAME}</label>
+						<br />
+						<!-- END user_group_check_list -->
+					</div>
+				</div>
+				<div class="one-third clearfix"><br />
+					<br />
+					<h3>Schoolbox ID of Owner<span>?</span><em>The field is optional.  If left the current users ID will be used</em></h3>
+
+					<p>
+						Type in the name of the owner of the calendar.
 					</p>
-					<ol>
-						<li>Download the template file using the above button</li>
-						<li>Edit the file in Microsoft Excel or equivalent editor</li>
-						<li>Save the file</li>
-						<li>Upload by clicking 'choose file' under "Upload new calendar entries"</li>
-					</ol>
-					<br />
-					
-					<h4>Microsoft Outlook ICS</h4>
-					<ol>
-						<li>In Outlook, Click Calendar in the bottom left</li>
-						<li>Go to File, Save As</li>
-						<li>Choose iCalendar format (*.ics)</li>
-						<li>Click More Options</li>
-						<li>Change Detail from Availability Only to Full Details</li>
-						<li>Click OK</li>
-						<li>Save it</li>
-						<li>Upload by clicking 'choose file' under "Upload new calendar entries"</li>
-					</ol>
-					<br />
-					
-					<h4>Upload new calendar entries (CSV or ICS)</h4>
-					<input type="file" name="bulkadd" />
-					
+
+					<label><input name="name" id="name" type="text"  /></label>
+					<input name="userid" type="hidden" id="userid" size="6" maxlength="6" />
 				</div>
-				<div class="one-third">
-					<h3>Campus<span>?</span><em>Select the campus' which will be able to view these events</em></h3>
-					<!-- BEGIN campus_check_list -->
-					<label>
-						<input type="checkbox" name="campusList[]" value="{CAMPUSID}" />
-						{CAMPUSNAME}</label>
-					<br />
-					<!-- END campus_check_list --> 
-				</div>
-				<div class="one-third last clearfix">
-					<h3>Groups<span>?</span><em>Select the Groups which will be able to view these events</em></h3>
-					<!-- BEGIN user_group_check_list -->
-					<label>
-						<input type="checkbox" name="userGroup[]" value="{USERGROUPID}" />
-						{USERGROUPNAME}</label>
-					<br />
-					<!-- END user_group_check_list --> 
-				</div>
-			</div>
-			<div class="one-third clearfix"><br />
-				<br />
-				<h3>Schoolbox ID of Owner<span>?</span><em>The field is optional.  If left the current users ID will be used</em></h3>
-				
-				<p>
-					Type in the name of the owner of the calendar.
-				</p>
-				
-				<label><input name="name" id="name" type="text"  /></label>
-				<input name="userid" type="hidden" id="userid" size="6" maxlength="6" />
-			</div>
+
+				<a class="btn add float-left submit" href="#"><span></span>Save</a>
+			</form>
 		</div>
-		<a class="btn add float-left submit" href="#"><span></span>Save</a>
-	</form>
+    </div>
+    <!-- END import -->
+    <!-- BEGIN subscribe -->
+    <div class="settings heading">
+        <form method='post' action='/adminv2/calendar/modifyForm'>
+        <!-- BEGIN eventType -->
+        <div class='eventList'>
+            <h3>{EVENTTYPE_NAME}</h3>
+                <div class="level clearfix">
+            <!-- BEGIN connector -->
+            <div id='configOptions_{EVENTTYPE_NAME}_{CONNECTOR_NAME}' class='configList {CONNECTOR_ACTIVE}'>
+                <label class="calendar-connector {CONNECTOR_NAME}" for="{EVENTTYPE_NAME}_{CONNECTOR_NAME}">
+                    <input type="checkbox" name="active[]" id="{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='connectorActive' value='{EVENTTYPE_NAME}_{CONNECTOR_NAME}' {CONNECTOR_CHECKED} />
+                {CONNECTOR_NAME}</label>
+
+                <div class="clearfix"></div>
+
+                <!-- BEGIN connectorConfig -->
+                <!-- END connectorConfig -->
+
+            </div>
+            <!-- BEGIN has_multiple_options -->
+            <a id="add_{EVENTTYPE_NAME}_{CONNECTOR_NAME}" class='addConfig btn add' /><span></span>Add another source</a>
+            <!-- END has_multiple_options -->
+            <!-- END connector -->
+        </div>
+        <!-- END eventType -->
+
+            <input type="submit" class="submit-btn-plain" value='Update' />
+            </form>
+        </div>
+    </div>
+    <!-- END subscribe -->
 </div>
+
+<!-- BEGIN custom_javascript -->
+<script type='text/javascript' src='/javascript/admin/calendar.js'></script>
+<script type='text/javascript'>
+	$j(function() {
+		calendar.init();
+	});
+</script>
+<!-- END custom_javascript -->

@@ -201,12 +201,27 @@
                  * @param view
                  */
                 loading: function(isLoading, view) {
-                    // has finished loading
-                    if(isLoading === false) {
-                        // console.log('finished loading')
+
+					/* Show loading div right in the middle
+					 */
+					if (isLoading === true) {
+						$j('#calendar-loading').css({
+							top: ($j('#calendar').height() - $j('#calendar-loading').height())/2,
+							left: ($j('#calendar').width() - $j('#calendar-loading').width())/2
+						}).show();
+					}
+					/* Has finished loading
+					 */
+					else {
+
+						/* Hide loading div
+						 */
+						$j('#calendar-loading').hide();
+
                         // update any tasks that have been completed by strikethrough-ing them
                         $j(this).find('input[type=checkbox]').each(function() {
                             var self = $j(this)
+
                             if(self.prop('checked')) {
                                 self.siblings('.fc-event-title').addClass('strike')
                             }
@@ -217,9 +232,8 @@
 
                         // update datepicker
                         var d = c.dom.fullCalendar('getDate')
-                        $j('#datepicker').datepicker('setDate', d)
-//                        console.log(d)
 
+                        $j('#datepicker').datepicker('setDate', d)
                     }
                 },
 
@@ -335,7 +349,34 @@
 
     })
 </script>
+<style type='text/css'>
+	#calendar-loading {
+		border:1px solid #aaa;
+		width:280px;
+		height:80px;
+		background-color:#fff;
+		background-image: url('/images/loading-bar.gif');
+		background-repeat: no-repeat;
+		background-position: 50% 40px;
+		position:absolute;
+		top:100px;
+		left:100px;
+		z-index:1;
+
+		-webkit-box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
+		box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.04);
+	}
+
+	#calendar-loading p {
+		margin-top: 15px;
+		text-align: center;
+	}
+</style>
 <!-- END custom_head -->
+
+<div id="calendar-loading">
+	<p><strong>Loading events...</strong></p>
+</div>
 
 <div id="calendar-bubble" class="cal-bubble">
     <div class="middle">
