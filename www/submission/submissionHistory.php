@@ -472,16 +472,22 @@ if($recentSubmission['sid']) {
 
 }
 else {
-	/* Hide most recent submission
-	 * Show Submit form
-	 * Hide the Resubmit form
-	 */
-    if($userID == $_SESSION['id'] && mktime() > strtotime($submission->getOpenDate()) && mktime() < strtotime($submission->getLateDate()) && $submission->getAcceptOnline())
-	    $this->parse('action_submit_block', 'action_submit');
-    else
+    /* Hide most recent submission
+     * Show Submit form
+     * Hide the Resubmit form
+     */
+    if ($userID == $_SESSION['id']
+        && mktime() > $submission->getOpenDate()->getUnixTimestamp()
+        && mktime() < $submission->getLateDate()->getUnixTimestamp()
+        && $submission->getAcceptOnline())
+    {
+        $this->parse('action_submit_block', 'action_submit');
+    }
+    else {
         $this->setVar('action_submit_block','');
+    }
 
-	$this->setVar('recent_submission_block', '');
+    $this->setVar('recent_submission_block', '');
     $this->setVar('action_resubmit_block', '');
 
 }
