@@ -10,6 +10,13 @@
 class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 
 	/**
+	 * An instance of groupHandler
+	 *
+	 * @var null
+	 */
+	private $groupHandler = null;
+
+	/**
 	 * The template file to use
 	 *
 	 * @var string
@@ -19,7 +26,9 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	/**
 	 * Initialise classes and collections
 	 */
-	protected function initialise() {}
+	protected function initialise() {
+		$this->setGroupHandler(new Group());
+	}
 
 	/**
 	 * Set up blocks and stuff
@@ -32,12 +41,28 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 * Render page
 	 */
 	public function render() {
+		$this->renderPersonal();
+		$this->renderSubjects();
+
+
+	}
+
+	/**
+	 * Render personal details
+	 */
+	private function renderPersonal() {
 		$this->getPage()->setVar(array(
 			'USER_ID' => $this->getExternalUserId(),
 			'USER_FULLNAME' => $this->getUserName(),
 			'USER_CAMPUS' => $this->getUserCampusName(),
 			'USER_YEAR' => $this->getUserYear(),
 		));
+	}
+
+	private function renderSubjects() {
+		$catList = $this->getGroupHandler()->involvedInCategoryList($this->getUserId());
+
+		print_r($catList);
 	}
 
 	/**
@@ -65,5 +90,26 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 */
 	private function getUserCampusName() {
 		return $this->user['campusName'];
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set group handler
+	 *
+	 * @param null $groupHandler
+	 */
+	private function setGroupHandler($groupHandler) {
+		$this->groupHandler = $groupHandler;
+	}
+
+	/**
+	 * Get group handler
+	 *
+	 * @return null
+	 */
+	private function getGroupHandler() {
+		return $this->groupHandler;
 	}
 }
