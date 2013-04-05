@@ -24,12 +24,13 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 	/**
 	 * Set up blocks and stuff
 	 */
-	protected function setup() {}
+	protected function setup() {
+		$this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
+	}
 
 	/**
 	 * Render page
 	 */
 	protected function render() {
-		echo "showcase shenanigans goes here";
 	}
 }
