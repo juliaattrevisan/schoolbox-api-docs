@@ -18,6 +18,13 @@ class Eportfolio_Page {
 	protected $page = null;
 
 	/**
+	 * The user record for the owner of the page being viewed
+	 *
+	 * @var array
+	 */
+	protected $user = array();
+
+	/**
 	 * An instance of userHandler
 	 *
 	 * @var null
@@ -32,13 +39,6 @@ class Eportfolio_Page {
 	protected $eportfolioHandler = null;
 
 	/**
-	 * The id of the page being viewed
-	 *
-	 * @var int
-	 */
-	protected $pageId = -1;
-
-	/**
 	 * The template file to use
 	 *
 	 * @var string
@@ -46,39 +46,39 @@ class Eportfolio_Page {
 	protected $templateFile = 'eportfolio/index.html';
 
 	/**
+	 * The id of the page being viewed
+	 *
+	 * @var int
+	 */
+	private $pageId = -1;
+
+	/**
 	 * An instance of Component_FactoryAbstract
 	 *
 	 * @var null
 	 */
-	protected $componentFactory = null;
+	private $componentFactory = null;
 
 	/**
 	 * An instance of Collection
 	 *
 	 * @var null
 	 */
-	protected $componentCollection = null;
+	private $componentCollection = null;
 
 	/**
 	 * A list of colours to use
 	 *
 	 * @var null
 	 */
-	protected $colours = null;
-
-	/**
-	 * The user record for the owner of the page being viewed
-	 *
-	 * @var array
-	 */
-	protected $user = array();
+	private $colours = null;
 
 	/**
 	 * A list of component tab categories
 	 *
 	 * @var array
 	 */
-	protected $tabList = array();
+	private $tabList = array();
 
 	/**
 	 * Constructor
@@ -122,7 +122,8 @@ class Eportfolio_Page {
 	 *
 	 * @param $userId
 	 */
-	private function validateUser($userId) {
+	protected function validateUser($userId) {
+
 		/* Retrieve the user ID from the URI, must be an integer and at least 1 character long
 		 */
 		if (preg_match('/^\d+$/', $userId)) {
@@ -475,7 +476,7 @@ class Eportfolio_Page {
 	 *
 	 * @return mixed
 	 */
-	private function getUserId() {
+	protected function getUserId() {
 		return $this->user['uid'];
 	}
 
@@ -484,7 +485,7 @@ class Eportfolio_Page {
 	 *
 	 * @return string
 	 */
-	private function getUserName() {
+	protected function getUserName() {
 		$user = $this->getUser();
 
 		return Scrub::text($user['firstname'] . ' ' . $user['lastname']);
@@ -494,6 +495,8 @@ class Eportfolio_Page {
 	 */
 
 	/**
+	 * Set colours
+	 *
 	 * @param null $colours
 	 */
 	private function setColours($colours) {
@@ -501,6 +504,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colours
+	 *
 	 * @return null
 	 */
 	private function getColours() {
@@ -508,6 +513,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set component collection
+	 *
 	 * @param null $componentCollection
 	 */
 	private function setComponentCollection($componentCollection) {
@@ -515,6 +522,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get component collection
+	 *
 	 * @return null
 	 */
 	private function getComponentCollection() {
@@ -522,6 +531,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set component factory
+	 *
 	 * @param null $componentFactory
 	 */
 	private function setComponentFactory($componentFactory) {
@@ -529,6 +540,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get component factory
+	 *
 	 * @return null
 	 */
 	private function getComponentFactory() {
@@ -536,6 +549,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set eportfolio handler
+	 *
 	 * @param null $eportfolioHandler
 	 */
 	private function setEportfolioHandler($eportfolioHandler) {
@@ -543,6 +558,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get eportfolio handler
+	 *
 	 * @return null
 	 */
 	public function getEportfolioHandler() {
