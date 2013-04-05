@@ -250,7 +250,7 @@ abstract class Alaress_Cache_Locker_Abstract {
 	 * Create an empty file to indicate that a stream retrieval is in progress
 	 */
 	private function createLockFile() {
-		$filehandle = @fopen($this->generateLockFilename(), 'w');
+		$filehandle = @fopen($this->getLockFile(), 'w');
 		fclose($filehandle);
 	}
 
