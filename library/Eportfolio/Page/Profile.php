@@ -48,8 +48,13 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 */
 	public function render() {
 		$this->renderPersonal();
-		$this->renderGroups();
+
+		$this->renderShowcasedWork();
+		$this->renderRecentPhotos();
+		$this->renderRecentJournals();
+
 		$this->renderSubjects();
+		$this->renderGroups();
 	}
 
 	/**
@@ -62,6 +67,24 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 			'USER_CAMPUS' => $this->getUserCampusName(),
 			'USER_YEAR' => $this->getUserYear(),
 		));
+	}
+
+	/**
+	 * Render recent showcased work
+	 */
+	private function renderShowcasedWork() {
+	}
+
+	/**
+	 * Render recent photos
+	 */
+	private function renderRecentPhotos() {
+	}
+
+	/**
+	 * Render recent journal posts
+	 */
+	private function renderRecentJournals() {
 	}
 
 	/**
