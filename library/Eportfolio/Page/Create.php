@@ -27,11 +27,31 @@ class Eportfolio_Page_Create extends Eportfolio_Page_Abstract {
 	 */
 	protected function setup() {
 		$this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
+		$this->getPage()->setBlock(TEMPLATE_content, 'page_template_list', 'page_template_list_block');
 	}
 
 	/**
 	 * Render page
 	 */
 	protected function render() {
+		$this->renderTemplateList();
+	}
+
+	private function renderTemplateList() {
+		$allTemplates = $this->getEportfolioHandler()->fetchAllTemplates();
+
+		if (is_array($allTemplates) && count($allTemplates)) {
+			foreach($allTemplates as $id => $name) {
+				$this->getPage()->setVar(array(
+					'PAGE_TEMPLATE_ID' => $id,
+					'PAGE_TEMPLATE_NAME' => $name,
+				));
+
+				$this->getPage()->parse('page_template_list_block', 'page_template_list', true);
+			}
+		}
+		else {
+			$this->getPage()->setVar('page_template_list_block', '');
+		}
 	}
 }

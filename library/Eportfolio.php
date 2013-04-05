@@ -184,7 +184,7 @@ class Eportfolio {
 	 *
 	 * @return resource
 	 */
-	private function fetchAllTemplates() {
+	public function fetchAllTemplates() {
 		$allTemplates = array();
 
 		$query = "
