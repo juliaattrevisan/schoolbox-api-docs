@@ -63,12 +63,16 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	private function renderPersonal() {
 		$house = HouseMapper::getInstance()->findById($this->getUserHouse());
 
+		if ($house) {
+			$houseName = $house->getHouse();
+		}
+
 		$this->getPage()->setVar(array(
 			'USER_ID' => $this->getExternalUserId(),
 			'USER_FULLNAME' => $this->getUserName(),
 			'USER_CAMPUS' => $this->getUserCampusName(),
 			'USER_YEAR' => $this->getUserYear(),
-			'USER_HOUSE' => $house->getHouse(),
+			'USER_HOUSE' => $houseName,
 		));
 	}
 
