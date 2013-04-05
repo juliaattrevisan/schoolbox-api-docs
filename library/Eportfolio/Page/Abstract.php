@@ -128,7 +128,7 @@ abstract class Eportfolio_Page_Abstract {
 		if (is_array($allPages) && count($allPages)) {
 			foreach($allPages as $currentPage) {
 				$this->getPage()->setVar(array(
-					'USER_ID' => $this->getUserId(),
+					'EPORTFOLIO_PAGE_USER_ID' => $this->getUserId(),
 					'EPORTFOLIO_PAGE_ID' => $currentPage['page_id'],
 					'EPORTFOLIO_PAGE_NAME' => $currentPage['page_title'],
 				));
@@ -139,12 +139,21 @@ abstract class Eportfolio_Page_Abstract {
 		else {
 			$this->getPage()->setVar('eportfolio_page_block', '');
 		}
+
+		/* For the hardcoded pages
+		 */
+		$this->getPage()->setVar(array(
+			'EPORTFOLIO_PAGE_USER_ID' => $this->getUserId(),
+		));
 	}
 
 	/**
 	 * Common elements rendered on all pages can be established here
 	 */
 	public function renderPage() {
+
+		/* Render page list
+		 */
 		$this->renderPageList();
 
 		/* A rendering hook method

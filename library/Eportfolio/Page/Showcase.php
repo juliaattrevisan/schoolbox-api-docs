@@ -10,6 +10,13 @@
 class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 
 	/**
+	 * The template file to use
+	 *
+	 * @var string
+	 */
+	protected $templateFile = 'eportfolio/showcase.html';
+
+	/**
 	 * Initialise classes and collections
 	 */
 	protected function initialise() {}
