@@ -176,7 +176,7 @@ then
 
 	# Backup $data_dir directory
 	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup of $data_dir" >> $logfile;
-	tar -cz $data_dir | split -b 10G -d --verbose - $targetdir/schoolboxdata-$DAY0.tar.gz_ >> $logfile 2>&1;
+	tar -cz $data_dir 2>>$logfile | split -b 10G -d --verbose - $targetdir/schoolboxdata-$DAY0.tar.gz_ >> $logfile 2>&1;
 
 	# Remove old backup
 	if [ -d $backup_dir/$DAYX ]
