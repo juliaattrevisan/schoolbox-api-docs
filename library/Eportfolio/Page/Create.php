@@ -10,7 +10,13 @@
 class Eportfolio_Page_Create extends Eportfolio_Page_Abstract {
 
 	/**
-	 * The template file to use
+	 * An instance of groupHandler
+	 *
+	 * @var null
+	 */
+	private $groupHandler = null;
+
+	/*** The template file to use
 	 *
 	 * @var string
 	 */
@@ -20,6 +26,7 @@ class Eportfolio_Page_Create extends Eportfolio_Page_Abstract {
 	 * Initialise classes and collections
 	 */
 	protected function initialise() {
+		$this->setGroupHandler(new Group());
 	}
 
 	/**
@@ -28,6 +35,9 @@ class Eportfolio_Page_Create extends Eportfolio_Page_Abstract {
 	protected function setup() {
 		$this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
 		$this->getPage()->setBlock(TEMPLATE_content, 'page_template_list', 'page_template_list_block');
+
+		$this->getPage()->setBlock(TEMPLATE_content, 'has_group_permissions', 'has_group_permissions_block');
+		$this->getPage()->setBlock('has_group_permissions', 'group_permission', 'group_permission_block');
 	}
 
 	/**
@@ -35,8 +45,12 @@ class Eportfolio_Page_Create extends Eportfolio_Page_Abstract {
 	 */
 	protected function render() {
 		$this->renderTemplateList();
+		$this->renderGroupList();
 	}
 
+	/**
+	 * Render template list
+	 */
 	private function renderTemplateList() {
 		$allTemplates = $this->getEportfolioHandler()->fetchAllTemplates();
 
@@ -53,5 +67,49 @@ class Eportfolio_Page_Create extends Eportfolio_Page_Abstract {
 		else {
 			$this->getPage()->setVar('page_template_list_block', '');
 		}
+	}
+
+	/**
+	 * Render group list
+	 */
+	private function renderGroupList() {
+		$allGroups = $this->getGroupHandler()->involvedInCategoryList($this->getUserId(), false);
+
+		if (is_array($allGroups) && count($allGroups)) {
+			foreach ($allGroups as $currentGroup) {
+				$this->getPage()->setVar(array(
+					'GROUP_PERMISSION_GROUP_ID' => $currentGroup['id'],
+					'GROUP_PERMISSION_NAME' => $currentGroup['name'],
+				));
+
+				$this->getPage()->parse('group_permission_block', 'group_permission', true);
+			}
+
+			$this->getPage()->parse('has_group_permissions_block', 'has_group_permissions');
+		}
+		else {
+			$this->getPage()->setVar('has_group_permissions_block', '');
+		}
+	}
+
+	/* Getters/Setters
+	 */
+
+	/**
+	 * Set group handler
+	 *
+	 * @param null $groupHandler
+	 */
+	private function setGroupHandler($groupHandler) {
+		$this->groupHandler = $groupHandler;
+	}
+
+	/**
+	 * Get group handler
+	 *
+	 * @return null
+	 */
+	private function getGroupHandler() {
+		return $this->groupHandler;
 	}
 }

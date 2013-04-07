@@ -1,4 +1,17 @@
 <style type='text/css'>
+	#individualPermissionTemplate {
+		display: none;
+	}
+</style>
+
+<script type='text/javascript'>
+	$j(function() {
+		$j('#addIndividualPermission').change(function() {
+		});
+	});
+</script>
+
+<style type='text/css'>
 	div.horizontalList li {
 		background-color: #eee;
 		margin-bottom: 20px;
@@ -68,11 +81,13 @@
 				<em>Allow predefined groups to view your ePortfolio page.</em>
 			</td>
 			<td>
+				<!-- BEGIN has_group_permissions -->
 				<ul>
 					<!-- BEGIN group_permission -->
-					<li><input type="checkbox" name="group[{GROUP_PERMISSION_GROUP_ID}]" value="{GROUP_PERMISSION_GROUP_ID}" /> {GROUP_NAME}</li>
+					<li><input type="checkbox" name="group[{GROUP_PERMISSION_GROUP_ID}]" value="{GROUP_PERMISSION_GROUP_ID}" /> {GROUP_PERMISSION_NAME}</li>
 					<!-- END group_permission -->
 				</ul>
+				<!-- END has_group_permissions -->
 			</td>
 		</tr>
 		<tr>
@@ -81,15 +96,17 @@
 				<em>Allow certain students to view your ePortfolio page.</em></td>
 			<td>
 				<p>
-					<input type='text' name='search_individual' value='' />Add
+					<input id='addIndividualPermission' type='text' name='search_individual' value='' />Add
 				</p>
 				<ul>
-					<!-- BEGIN individual_permission -->
-					<li><input type="checkbox" name="individual[{INDIVIDUAL_PERMISSION_USER_ID}]" value="{INDIVIDUAL_PERMISSION_USER_ID}" /> {INDIVIDUAL_PERMISSION_USER_NAME}</li>
-					<!-- END individual_permission -->
+
 				</ul>
 			</td>
 		</tr>
 	</table>
 	<input type="submit" label="Submit" name="submit" value="Create Page" class="submit-btn-plain"/>
 </form>
+
+<ul id='individualPermissionTemplate'>
+	<li><input type="checkbox" name="individual[{INDIVIDUAL_PERMISSION_USER_ID}]" value="{INDIVIDUAL_PERMISSION_USER_ID}" /> {INDIVIDUAL_PERMISSION_USER_NAME}</li>
+</ul>
