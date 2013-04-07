@@ -230,7 +230,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 			FROM {$this->getTable()} sr
 			LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
 			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
-			AND sr.owner = :user_id
+			WHERE sr.owner = :user_id
 			AND sb.id = :box_id
 			ORDER BY sr.returned DESC
 		";
