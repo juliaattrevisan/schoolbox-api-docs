@@ -53,7 +53,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$this->hasMap(array(
 			'column'     => 'owner',
 			'property'   => 'owner',
-			'type'       => self::TYPE_INTEGER,
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'owner',
 		));
 		$this->hasMap(array(
 			'column'     => 'open_date',
@@ -156,6 +157,12 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\MarkTypeMapper',
 			'this_key'  => 'mark_type',
 			'other_key' => 'mark_type_id',
+		));
+
+		$this->hasJoin('owner', array(
+			'mapper'    => '\\Schoolbox\\UserMapper',
+			'this_key'  => 'owner',
+			'other_key' => 'id',
 		));
 
 		//

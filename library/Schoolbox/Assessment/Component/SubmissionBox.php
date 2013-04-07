@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Notification;
 use Schoolbox\Assessment\Component\SubmissionBox\NotificationCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
+use Schoolbox\User;
 
 class SubmissionBox {
 
@@ -64,7 +65,7 @@ class SubmissionBox {
 	protected $notifications;
 
 	/**
-	 * @var int
+	 * @var User
 	 */
 	protected $owner;
 
@@ -344,14 +345,14 @@ class SubmissionBox {
 	}
 
 	/**
-	 * @param int $owner
+	 * @param User $owner
 	 */
 	public function setOwner($owner) {
 		$this->owner = $owner;
 	}
 
 	/**
-	 * @return int
+	 * @return User
 	 */
 	public function getOwner() {
 		return $this->owner;
