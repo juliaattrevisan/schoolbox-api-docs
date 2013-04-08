@@ -25,6 +25,11 @@ class File {
 	protected $filename;
 
 	/**
+	 * @var string
+	 */
+	protected $mimeType;
+
+	/**
 	 * @var int
 	 */
 	protected $owner;
@@ -96,6 +101,19 @@ class File {
 		return $this->filename;
 	}
 
+	/**
+	 * @param string $mimeType
+	 */
+	public function setMimeType($mimeType) {
+		$this->mimeType = $mimeType;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getMimeType() {
+		return $this->mimeType;
+	}
 	/**
 	 * @param  \Alaress_Date_Format $modified
 	 * @return $this

@@ -58,6 +58,11 @@ class FileMapper extends Mapper {
 			'type'       => self::TYPE_STRING,
 		));
 		$this->hasMap(array(
+			'column'     => 'mime_type',
+			'property'   => 'mimeType',
+			'type'       => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
 			'column'     => 'owner',
 			'property'   => 'owner',
 			'type'       => self::TYPE_INTEGER,
