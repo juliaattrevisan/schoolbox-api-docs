@@ -287,8 +287,8 @@ if (count($submission_history)) {
 
 	        //
 	        // submission file ID, submission file name
-	        $history['HISTORY_SUBMISSION_FILE_ID']   = $this->getSubmission()->getId();
-	        $history['HISTORY_SUBMISSION_FILE_NAME'] = $this->getSubmission()->getFilename();
+	        $history['HISTORY_SUBMISSION_FILE_ID']   = $activity_item->getSubmission()->getId();
+	        $history['HISTORY_SUBMISSION_FILE_NAME'] = $activity_item->getSubmission()->getFilename();
 
 	        //
 	        // Name, icon and ID of user: use student's
