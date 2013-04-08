@@ -155,23 +155,35 @@ class Eportfolio_PermissionMapper extends Mapper {
 		));
 	}
 
+	/**
+	 * TODO: PDO Array support for using WHERE IN
+	 *
+	 * http://stackoverflow.com/questions/14767530/php-using-pdo-with-in-clause-array
+	 * http://stackoverflow.com/questions/920353/php-pdo-can-i-bind-an-array-to-an-in-condition
+	 *
+	 * @param $pageId
+	 * @param $type
+	 * @param $permittedValues
+	 * @return Collection
+	 */
 	public function findValues($pageId, $type, $permittedValues) {
+		$permittedValuesSql = implode(',', $permittedValues);
+
 		$statement = $this->database->prepare("
             SELECT {$this->getColumnString()}
             FROM `{$this->table}`
             WHERE `page_id` = :pageId
-			AND `type` = 'group'
-			AND `value` IN (:permittedValuesSql)
+			AND `type` = :type
+			AND `value` IN ({$permittedValuesSql})
 
         ");
 
 		$statement->bindParam(':pageId', $pageId);
-		$statement->bindParam(':permittedValuesSql', implode(',', $permittedValues));
+		$statement->bindParam(':type', $type);
 		$statement->execute();
 
 		$rowset = $statement->fetchAll();
 
-		print_r($rowset);
 		return $this->hydrateList($rowset);
 	}
 }
