@@ -431,15 +431,15 @@ function outputVisibilityDropdown(SitePage $page, $value) {
         array(
             array(
                 'id'   => SubmissionBox::MARK_VISIBILITY_PRIVATE,
-                'name' => 'Private',
+                'name' => 'Staff Only',
             ),
             array(
                 'id'   => SubmissionBox::MARK_VISIBILITY_STUDENT,
-                'name' => 'Students',
+                'name' => 'Staff and Students',
             ),
             array(
                 'id'   => SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
-                'name' => 'Students and Parents',
+                'name' => 'Staff, Students and their Parents',
             ),
         ),
         $value,
