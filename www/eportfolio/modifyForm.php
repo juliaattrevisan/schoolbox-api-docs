@@ -42,9 +42,6 @@ else if (isset($_POST['page_title']) && strlen(trim($_POST['page_title'])) && is
 	 */
 	Eportfolio_PermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'], $_POST['individual_permission']);
 
-	/* Add new permissions
-	 */
-
 	/* Redirect to newly created page
 	 */
 }

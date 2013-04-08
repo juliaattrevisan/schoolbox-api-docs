@@ -72,6 +72,13 @@ class Eportfolio_PermissionMapper extends Mapper {
 	 * @param $pageId
 	 */
 	private function removeAllPermissions($pageId) {
+		$statement = $this->database->prepare("
+            DELETE FROM  `{$this->table}`
+            WHERE page_id = :identifierValue
+        ");
+
+		$statement->bindParam(':identifierValue', $pageId);
+		$statement->execute();
 	}
 
 	/**
