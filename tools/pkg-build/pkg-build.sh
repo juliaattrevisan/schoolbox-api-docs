@@ -43,12 +43,11 @@ then
 		rm ~/{tarballs,build-area}/* -fR;
 		cd ~/schoolbox;
 		git checkout master;
-		# Reset back to known pre-git point in history
-		git reset --hard 5c4e8abdc184fac1126f3b9148ee66740e64076a;
-		# Update the respository
-		git pull origin master --force;
-		# Reset back to specified commit/tag
-		git reset --hard $1;
+		git config --add remote.origin.fetch "+refs/pull/*/head:refs/remotes/origin/pr/*"
+		git fetch origin;
+		git checkout $1;
+		git branch -D master;
+		git checkout -b master;
 		git branch -D upstream;
 		git branch upstream;
 		commitdate=`git log -n 1 | grep "Date:" | cut -c9-32`
