@@ -591,8 +591,8 @@ else {
 //        $this->setVar('action_submit_block','');
 //    }
 //
-//    $this->setVar('recent_submission_block', '');
-//    $this->setVar('action_resubmit_block', '');
+    $this->setVar('recent_submission_block', '');
+    $this->setVar('action_resubmit_block', '');
 //
 //}
 
@@ -641,7 +641,7 @@ if (!in_array($submission->getCategory()->getId(), $categoryIDList)) {
 //	$this->parse('returned_work_block', 'returned_work');
 //}
 //else {
-//	$this->setVar('returned_work_block', '');
+	$this->setVar('returned_work_block', '');
 //}
 
 // do fun rubric things
