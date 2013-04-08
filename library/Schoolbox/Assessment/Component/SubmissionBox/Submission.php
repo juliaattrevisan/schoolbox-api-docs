@@ -10,7 +10,9 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\IConfigLoader;
 use Schoolbox\User;
+use Schoolbox\ConfigLoader;
 
 class Submission {
 
@@ -54,11 +56,52 @@ class Submission {
 	 */
 	protected $mimetype;
 
+	/**
+	 * @var IConfigLoader
+	 */
+	protected $config_loader;
 
+	/**
+	 * Creates object and sets up related objects.
+	 */
 	public function __construct() {
 		$this->setSubmissionBox(new SubmissionBox());
 		$this->setOwner(new User());
+		$this->setConfigLoader(new ConfigLoader());
 	}
+
+	/**
+	 * Gets the location at which this file would be stored.
+	 *
+	 * @return string
+	 */
+	public function getFileLocation() {
+		$id = $this->getId();
+		if (!isset($id)) {
+			return false;
+		}
+		return $this->config_loader->get('submission_dir') . '/' . $id . '.dat';
+	}
+
+	/**
+	 * Gets the size of this file (from where it's stored on the file system),
+	 * or false if it doesn't exist.
+	 *
+	 * @return bool|int
+	 */
+	public function getFilesize() {
+		if (($location = $this->getFileLocation()) !== false) {
+			if (file_exists($location)) {
+				return filesize($location);
+			}
+		}
+		return false;
+	}
+
+
+	/**
+	 * Auto-generated methods
+	 */
 
 
 	/**
@@ -197,4 +240,20 @@ class Submission {
 		return $this->submitted;
 	}
 
+	/**
+	 * @param  IConfigLoader $config_loader
+	 *
+	 * @return $this
+	 */
+	public function setConfigLoader($config_loader) {
+		$this->config_loader = $config_loader;
+		return $this;
+	}
+
+	/**
+	 * @return IConfigLoader
+	 */
+	public function getConfigLoader() {
+		return $this->config_loader;
+	}
 }

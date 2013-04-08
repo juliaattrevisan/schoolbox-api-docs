@@ -10,7 +10,9 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\IConfigLoader;
 use Schoolbox\User;
+use Schoolbox\ConfigLoader;
 
 class ReturnedWork {
 
@@ -59,11 +61,19 @@ class ReturnedWork {
 	 */
 	protected $returned;
 
+	/**
+	 * @var IConfigLoader
+	 */
+	protected $config_loader;
+
+	/**
+	 * Creates object and sets up related objects.
+	 */
 	public function __construct() {
 		$this->setSubmissionBox(new SubmissionBox());
 		$this->setOwner(new User());
+		$this->setConfigLoader(new ConfigLoader());
 	}
-
 
 	/**
 	 * Calculates a gradient (from 0 to 10) from the normalized mark for this
@@ -73,6 +83,34 @@ class ReturnedWork {
 	 */
 	public function getGradientFromNormalizedMark() {
 		return max(0, min(10, (int)($this->getNormalizedMark() / 10)));
+	}
+
+	/**
+	 * Gets the location at which this file would be stored.
+	 *
+	 * @return string
+	 */
+	public function getFileLocation() {
+		$id = $this->getId();
+		if (!isset($id)) {
+			return false;
+		}
+		return $this->config_loader->get('returns_dir') . '/' . $id . '.dat';
+	}
+
+	/**
+	 * Gets the size of this file (from where it's stored on the file system),
+	 * or false if it doesn't exist.
+	 *
+	 * @return bool|int
+	 */
+	public function getFilesize() {
+		if (($location = $this->getFileLocation()) !== false) {
+			if (file_exists($location)) {
+				return filesize($location);
+			}
+		}
+		return false;
 	}
 
 
@@ -234,4 +272,20 @@ class ReturnedWork {
 		return $this->returned;
 	}
 
+	/**
+	 * @param $config_loader
+	 *
+	 * @return $this
+	 */
+	public function setConfigLoader($config_loader) {
+		$this->config_loader = $config_loader;
+		return $this;
+	}
+
+	/**
+	 * @return IConfigLoader
+	 */
+	public function getConfigLoader() {
+		return $this->config_loader;
+	}
 }
