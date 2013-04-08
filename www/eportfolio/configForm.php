@@ -11,17 +11,14 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 	/* Check permissions
 	 */
 	$eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
-	$uid = $eportfolioHandler->getSettingsPageOwner();
 
-	/* Find out who owns the page and check permissions first
-	 */
 	$userHandler = new User();
-	$user = $userHandler->getByID($uid);
+	$user = $userHandler->getByID($eportfolioHandler->getSettingsPageOwner());
 
 	/* If $user can modify page, continue; otherwise die
 	 * Superusers, staff and page owners can modify contents/settings.
 	 */
-	if ($groupHandler->isSuperuser() || $groupHandler->isStaff() || $uid == $_SESSION['id']) {
+	if ($groupHandler->isSuperuser() || $groupHandler->isStaff() || $user['id'] == $_SESSION['id']) {
 		$componentInstanceMapper = Component_InstanceMapper::getInstance();
 		$componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
 
