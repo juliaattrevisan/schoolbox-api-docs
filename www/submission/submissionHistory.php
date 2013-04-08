@@ -327,6 +327,7 @@ if (count($submission_history)) {
 		        $mark = Scrub::Text($mark);
 	        }
 	        $history['HISTORY_MARK']     = $mark;
+	        $history['HAS_GRADE']        = ($mark || $mark === 0) ? 'grade' : '';
 	        $history['HISTORY_COMMENT']  = Scrub::text($activity_item->getReturnedWork()->getComment());
 	        $history['HISTORY_GRADIENT'] = max(0, min(10, (int)($norm_mark / 10)));
 
