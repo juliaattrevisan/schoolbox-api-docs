@@ -344,6 +344,15 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	}
 
 
+	/**
+	 * Gets the months that are a part of this semester.
+	 *
+	 * @todo move this somewhere where other semester reliant code can use it
+	 *
+	 * @param $semester
+	 *
+	 * @return array
+	 */
 	public function getSemesterMonths($semester) {
 		$month_start = 1;
 		$month_end   = 6;
@@ -416,23 +425,23 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		// Submission box: hydrate with category, student submissions and returns.
 		$months = $this->getSemesterMonths($semester);
 		$params = $this->getArrayParameters($categories, 'category');
-		$params['year']    = $year ?: date('Y');
-		$params['user_id'] = $user_id;
+		$params['year']        = $year ?: date('Y');
+		$params['user_id']     = $user_id;
 		$params['month_start'] = $months['start'];
 		$params['month_end']   = $months['end'];
-		//
-		// IN conditions in prepared statements:
 		$query = "
 		    SELECT
 			b.id AS bid,
 			s.id AS sid,
 			r.id AS rid,
-
 			UNIX_TIMESTAMP(b.late_date) AS lateDate,
 			UNIX_TIMESTAMP(b.date) AS dueDate,
 			c.name AS categoryName,
 			b.name,
 			b.description,
+			r.mark,
+			r.comment,
+			b.mark_visibility,
 			b.created, s.submitted, r.returned
 			FROM submission_box b
 			LEFT JOIN category c ON c.id = b.category
@@ -443,7 +452,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			AND YEAR(b.date) = :year
 			AND MONTH(b.date) BETWEEN :month_start AND :month_end
             GROUP BY b.id
-			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC";
+			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC
+		";
 
 		//
 		// Def not a fan of jamming everything into a single query which then
