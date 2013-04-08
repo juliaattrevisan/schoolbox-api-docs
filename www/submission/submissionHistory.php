@@ -139,7 +139,6 @@ if($codes && count($codes)) {
 $dueDate = new Alaress_Date_Relative($submission->getDueDate(),'y-m-d');
 $createdDate = new Alaress_Date_Relative($submission->getCreated(), 'y-m-d');
 
-$allWork = $submissionHandler->getSubmissionHistory($userID, $this->arg[0]);
 $submit_mapper = new Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
 $submission_history = $submit_mapper->getSubmissionHistory($userID, $this->arg[0]);
 if ($is_mark_shown) {
@@ -150,16 +149,6 @@ if ($is_mark_shown) {
 	$submission_history->merge($return_mapper->getSubmissionHistory($userID, $this->arg[0]));
 }
 $submission_history->sortBy('date', 'desc');
-
-
-if (!$is_mark_shown && is_array($allWork)) {
-	//
-	// Filter out any items with a work ID
-	$allWork = array_filter(
-		$allWork,
-		function($work) { return !(isset($work['rid']) && empty($work['filename'])); }
-	);
-}
 
 $urgency = ($dueDate->getUnixTimestamp() - time()) / 86400;
 $gradient = max(0, min(10, $urgency));
