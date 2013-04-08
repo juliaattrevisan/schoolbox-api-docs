@@ -1,0 +1,1 @@
+INSERT INTO `config` (`name`, `value`, `title`, `description`, `type`, `required`) VALUES ('video_dir', '/vagrant/data/video', 'Video Storage Location', 'Location that all transcoded videos are stored', 'Paths', 'true');

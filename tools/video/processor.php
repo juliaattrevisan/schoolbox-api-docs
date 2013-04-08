@@ -9,17 +9,32 @@
  * @copyright   2013 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
  */
+namespace Schoolbox\Video;
 
-require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
+
+use Schoolbox\Video\QueueMapper;
+
+require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 
-$videoStore = '/vagrant/data/video';
-$sourceStore = Cfg::get('file_dir');
-$sourceFile = $sourceStore.'/'.$argv[1].'.dat';
+$mapper = new QueueMapper();
 
-$processString = 'avconv -i '.$sourceFile.' -c:v libx264 -preset slow -b 512k '.$arv[1].'.mp4';
-$thumbnailString = 'avconv -i '.$sourceFile.' -f image2 -ss 10 -s 64x64 -frames:v 1 '.$arv[1].'-64.jpg';
+$pendingQueue = $mapper->getPending();
 
-exec($processString);
-exec($thumbnailString);
+foreach($pendingQueue as $vid) {
 
+	/* Update video to indicate processing has begun */
+	$vid->setStatus(QueueMapper::STATUS_PROCESSING);
+	$mapper->save($vid);
+
+	/* Process video */
+	if($vid->processVideo() == true) {
+		$vid->setStatus(QueueMapper::STATUS_COMPLETED);
+	}
+	else {
+		$vid->setStatus(QueueMapper::STATUS_FAILED);
+	}
+
+	$mapper->save($vid);
+
+}

@@ -24,7 +24,7 @@ then
 fi
 
 # First level dirs
-mkdir -p $datadir/{dropbox,files,myFiles,returns,storage,submissions,thumbnails}
+mkdir -p $datadir/{dropbox,files,myFiles,returns,storage,submissions,thumbnails,video}
 
 # Cache dirs
 mkdir -p $datadir/cache/{minify,myfiles,portrait,purifier,stream,weather,xml,zip,logs}
