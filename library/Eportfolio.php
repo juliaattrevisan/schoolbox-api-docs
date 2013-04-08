@@ -215,6 +215,167 @@ class Eportfolio {
 		return $this->allTemplates[$id];
 	}
 
+	/**
+	 * Gets the column widths for a particular homepage
+	 *
+	 * @return array
+	 */
+	public function getColumnWidths() {
+		return array(
+			'left_column_width' => $this->getSettingsKey('left_column_width'),
+			'right_column_width' => $this->getSettingsKey('right_column_width'),
+		);
+	}
+
+	/**
+	 * Update column widths
+	 *
+	 * @param  $left
+	 * @param  $right
+	 * @return void
+	 */
+	public function updateColumnWidths($left, $right) {
+		$columnWidths = array(
+			'page_id' => $this->getPageId(),
+			'left_column_width' => $left,
+			'right_column_width' => $right,
+		);
+
+		$this->db->update($this->getContext() . '_config', 'page_id', $columnWidths);
+	}
+
+	/**
+	 * Get a list of colours for a particular page
+	 *
+	 * @param $pageId
+	 * @return array|bool
+	 */
+	public function getColorList($pageId) {
+		$colourList = array(
+			'left_head_font' => $this->getSettingsKey('left_head_font'),
+			'left_head_bg' => $this->getSettingsKey('left_head_bg'),
+			'left_font' => $this->getSettingsKey('left_font'),
+			'left_bg_primary' => $this->getSettingsKey('left_bg_primary'),
+			'left_bg_secondary' => $this->getSettingsKey('left_bg_secondary'),
+			'left_link' => $this->getSettingsKey('left_link'),
+			'left_hover' => $this->getSettingsKey('left_hover'),
+			'right_head_font' => $this->getSettingsKey('right_head_font'),
+			'right_head_bg' => $this->getSettingsKey('right_head_bg'),
+			'right_font' => $this->getSettingsKey('right_font'),
+			'right_bg_primary' => $this->getSettingsKey('right_bg_primary'),
+			'right_bg_secondary' => $this->getSettingsKey('right_bg_secondary'),
+			'right_link' => $this->getSettingsKey('right_link'),
+			'right_hover' => $this->getSettingsKey('right_hover'),
+			'top_head_font' => $this->getSettingsKey('top_head_font'),
+			'top_head_bg' => $this->getSettingsKey('top_head_bg'),
+			'top_font' => $this->getSettingsKey('top_font'),
+			'top_bg_primary' => $this->getSettingsKey('top_bg_primary'),
+			'top_bg_secondary' => $this->getSettingsKey('top_bg_secondary'),
+			'top_link' => $this->getSettingsKey('top_link'),
+			'top_hover' => $this->getSettingsKey('top_hover'),
+		);
+
+		// use defaults for missing colours
+		$defaultColours = unserialize(HOMEPAGE_colors);
+
+		if (is_array($colourList)) {
+			foreach ($colourList as $key => $value) {
+				if (empty($value)) $colourList[$key] = $defaultColours[$key];
+			}
+		}
+
+		return $colourList;
+	}
+
+	/**
+	 * This simply copies a bunch of rows, changing 'eportfolio_template' to 'eportfolio'...quite simple, really.
+	 *
+	 * @param $templateID
+	 */
+	public function createEportfolioFromTemplate($templateID) {
+		// locate all the component instances associated with this homepage (if they exist), and clear them out
+		$cim = Component_InstanceMapper::getInstance();
+		$collection = $cim->findByColumnList(array('module' => $this->getContext(), 'identifier' => $this->getUserId()));
+		$cim->delete($collection);
+
+		$userId = mysql_real_escape_string($this->getUserId(), $this->db->dbf);
+		$templateID = mysql_real_escape_string($templateID, $this->db->dbf);
+
+		$sql = "
+            SELECT id AS template, left_column_width, right_column_width
+            FROM {$this->getContext()}Template
+            WHERE id = '{$templateID}'
+        ";
+
+		$x[] = array($sql);
+
+		// retrieve template data
+		$tpl = $this->db->getRow($sql);
+
+		// insert eportfolio instance into eportfolio_config
+		$eportfolioConfig = array(
+			'uid' => $userId,
+			'template' => $templateID,
+			'left_column_width' => $tpl['left_column_width'],
+			'right_column_width' => $tpl['right_column_width'],
+		);
+
+		foreach(array('top','left','right') as $position) {
+			$eportfolioConfig = array_merge($eportfolioConfig, array(
+				$position . '_head_font' => Cfg::get('homepage_colour_head_font'),
+				$position . '_head_bg' => Cfg::get('homepage_colour_head_bg'),
+				$position . '_font' => Cfg::get('homepage_colour_font'),
+				$position . '_bg_primary' => Cfg::get('homepage_colour_bg_primary'),
+				$position . '_bg_secondary' => Cfg::get('homepage_colour_bg_secondary'),
+				$position . '_link' => Cfg::get('homepage_colour_link'),
+				$position . '_hover' => Cfg::get('homepage_colour_hover')
+			));
+		}
+
+		// remove (if exists) and replace the homepage config with the new template details
+		$this->db->delete($this->getContext() .'_config', 'uid', $userId);
+		$this->db->insert($this->getContext() .'_config', $eportfolioConfig);
+
+		// retrieve, rearrange and reinsert the componentry
+		$cim = Component_InstanceMapper::getInstance();
+		$ccm = Component_ConfigMapper::getInstance();
+		$instances = $cim->findByContext($this->getContext() . '_template', $templateID);
+
+		if(count($instances)) {
+			foreach($instances as $inst) {
+				// preserve the config
+				$configs = $inst->config;
+
+				unset($inst->id);
+				unset($inst->config);
+
+				$inst->module = $this->getContext();
+				$inst->identifier = $userId;
+
+				$ids = $cim->save($inst);
+				$id = $ids[0];
+
+				if(count($configs)) {
+					foreach($configs as $c) {
+						if($c->id) {
+							$conf = new Component_Config();
+							$conf->instanceId = $id;
+							$conf->value = $c->value;
+							$conf->configDefinitionId = $c->id;
+							$ccm->save($conf);
+						}
+					}
+				}
+			}
+		}
+	}
+
+
+
+
+
+
+
 
 	/**
 	 * @deprecated
@@ -291,77 +452,6 @@ class Eportfolio {
 		}
 	}
 
-	/**
-	 * Gets the column widths for a particular homepage
-	 *
-	 * @return array
-	 */
-	public function getColumnWidths() {
-		return array(
-			'left_column_width' => $this->getSettingsKey('left_column_width'),
-			'right_column_width' => $this->getSettingsKey('right_column_width'),
-		);
-	}
-
-	/**
-	 * Update column widths
-	 *
-	 * @param  $left
-	 * @param  $right
-	 * @return void
-	 */
-	public function updateColumnWidths($left, $right) {
-		$columnWidths = array(
-			'page_id' => $this->getPageId(),
-			'left_column_width' => $left,
-			'right_column_width' => $right,
-		);
-
-		$this->db->update($this->getContext() . '_config', 'page_id', $columnWidths);
-	}
-
-	/**
-	 * Get a list of colours for a particular page
-	 *
-	 * @param $pageId
-	 * @return array|bool
-	 */
-	public function getColorList($pageId) {
-		$colourList = array(
-			'left_head_font' => $this->getSettingsKey('left_head_font'),
-			'left_head_bg' => $this->getSettingsKey('left_head_bg'),
-			'left_font' => $this->getSettingsKey('left_font'),
-			'left_bg_primary' => $this->getSettingsKey('left_bg_primary'),
-			'left_bg_secondary' => $this->getSettingsKey('left_bg_secondary'),
-			'left_link' => $this->getSettingsKey('left_link'),
-			'left_hover' => $this->getSettingsKey('left_hover'),
-			'right_head_font' => $this->getSettingsKey('right_head_font'),
-			'right_head_bg' => $this->getSettingsKey('right_head_bg'),
-			'right_font' => $this->getSettingsKey('right_font'),
-			'right_bg_primary' => $this->getSettingsKey('right_bg_primary'),
-			'right_bg_secondary' => $this->getSettingsKey('right_bg_secondary'),
-			'right_link' => $this->getSettingsKey('right_link'),
-			'right_hover' => $this->getSettingsKey('right_hover'),
-			'top_head_font' => $this->getSettingsKey('top_head_font'),
-			'top_head_bg' => $this->getSettingsKey('top_head_bg'),
-			'top_font' => $this->getSettingsKey('top_font'),
-			'top_bg_primary' => $this->getSettingsKey('top_bg_primary'),
-			'top_bg_secondary' => $this->getSettingsKey('top_bg_secondary'),
-			'top_link' => $this->getSettingsKey('top_link'),
-			'top_hover' => $this->getSettingsKey('top_hover'),
-		);
-
-		// use defaults for missing colours
-		$defaultColours = unserialize(HOMEPAGE_colors);
-
-		if (is_array($colourList)) {
-			foreach ($colourList as $key => $value) {
-				if (empty($value)) $colourList[$key] = $defaultColours[$key];
-			}
-		}
-
-		return $colourList;
-	}
 
 	/**
 	 * Create/Update a page template
@@ -465,88 +555,6 @@ class Eportfolio {
 		return $templateID;
 	}
 
-	/**
-	 * This simply copies a bunch of rows, changing 'eportfolio_template' to 'eportfolio'...quite simple, really.
-	 *
-	 * @param $templateID
-	 */
-	public function createEportfolioFromTemplate($templateID) {
-		// locate all the component instances associated with this homepage (if they exist), and clear them out
-		$cim = Component_InstanceMapper::getInstance();
-		$collection = $cim->findByColumnList(array('module' => $this->getContext(), 'identifier' => $this->getUserId()));
-		$cim->delete($collection);
-
-		$userId = mysql_real_escape_string($this->getUserId(), $this->db->dbf);
-		$templateID = mysql_real_escape_string($templateID, $this->db->dbf);
-
-		$sql = "
-            SELECT id AS template, left_column_width, right_column_width
-            FROM {$this->getContext()}Template
-            WHERE id = '{$templateID}'
-        ";
-
-		$x[] = array($sql);
-
-		// retrieve template data
-		$tpl = $this->db->getRow($sql);
-
-		// insert homepage instance into homepage_config
-		$eportfolioConfig = array(
-			'uid' => $userId,
-			'template' => $templateID,
-			'left_column_width' => $tpl['left_column_width'],
-			'right_column_width' => $tpl['right_column_width'],
-		);
-
-		foreach(array('top','left','right') as $position) {
-			$eportfolioConfig = array_merge($eportfolioConfig, array(
-				$position . '_head_font' => Cfg::get('homepage_colour_head_font'),
-				$position . '_head_bg' => Cfg::get('homepage_colour_head_bg'),
-				$position . '_font' => Cfg::get('homepage_colour_font'),
-				$position . '_bg_primary' => Cfg::get('homepage_colour_bg_primary'),
-				$position . '_bg_secondary' => Cfg::get('homepage_colour_bg_secondary'),
-				$position . '_link' => Cfg::get('homepage_colour_link'),
-				$position . '_hover' => Cfg::get('homepage_colour_hover')
-			));
-		}
-
-		// remove (if exists) and replace the homepage config with the new template details
-		$this->db->delete($this->getContext() .'_config', 'uid', $userId);
-		$this->db->insert($this->getContext() .'_config', $eportfolioConfig);
-
-		// retrieve, rearrange and reinsert the componentry
-		$cim = Component_InstanceMapper::getInstance();
-		$ccm = Component_ConfigMapper::getInstance();
-		$instances = $cim->findByContext($this->getContext() . '_template', $templateID);
-
-		if(count($instances)) {
-			foreach($instances as $inst) {
-				// preserve the config
-				$configs = $inst->config;
-
-				unset($inst->id);
-				unset($inst->config);
-
-				$inst->module = $this->getContext();
-				$inst->identifier = $userId;
-
-				$ids = $cim->save($inst);
-				$id = $ids[0];
-
-				if(count($configs)) {
-					foreach($configs as $c) {
-						if($c->id) {
-							$conf = new Component_Config();
-							$conf->instanceId = $id;
-							$conf->value = $c->value;
-							$conf->configDefinitionId = $c->id;
-							$ccm->save($conf);
-						}
-					}
-				}
-			}
-		}
-	}
 
 
 	/**
