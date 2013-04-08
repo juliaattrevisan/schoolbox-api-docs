@@ -8,9 +8,18 @@ $groupHandler = new Group(HOMEPAGE_SERVICE);
  */
 if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 
-//	if ($groupHandler->getPermission($_REQUEST['uid']) < WRITE_ACCESS) {
-//		error(19);
-//	}
+	/* Check permissions
+	 */
+	$eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
+	$uid = $eportfolioHandler->getSettingsPageOwner();
+
+	/* Find out who owns the page and check permissions first
+	 */
+	$userHandler = new User();
+	$user = $userHandler->getByID($uid);
+
+	/* TODO: If $user can modify page, continue; otherwise die
+	 */
 
 	$componentInstanceMapper = Component_InstanceMapper::getInstance();
 	$componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
@@ -26,13 +35,11 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 			$color[$key] = substr($value, 1);
 		}
 
-		$eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
 		$eportfolioHandler->saveDisplayProperties($color);
 	}
 	/* Save page title
 	 */
 	else if (isset($_POST['user_id']) && is_numeric($_POST['user_id']) && strlen(trim($_POST['pageTitle']))) {
-		$eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
 		$eportfolioHandler->updatePageTitle(trim($_POST['pageTitle']));
 	}
 	/* Ajax request for drag and drop of components
@@ -81,21 +88,6 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 	/* POST new component to page and output render of component
 	 */
 	else if (is_numeric($_POST['add'])) {
-		$eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
-		$uid = $eportfolioHandler->getSettingsPageOwner();
-
-		/* Find out who owns the page and check permissions first
-		 */
-		$userHandler = new User();
-		$user = $userHandler->getByID($uid);
-
-		/* Check permissions
-		 */
-		// check perms
-//        if (($permission = $groupHandler->getPermission($_POST['uid'])) < WRITE_ACCESS) {
-//            exit;
-//        }
-
 		$newComp = new Component_Instance();
 		$newComp->definitionId = $_POST['add'];
 		$newComp->identifier = $_POST['page_id'];
@@ -141,26 +133,11 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 	/* AJAX new column widths
 	 */
 	else if (is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
-		$eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
-		$uid = $eportfolioHandler->getSettingsPageOwner();
-
-		/* Find out who owns the page and check permissions first
-		 */
-		$userHandler = new User();
-		$user = $userHandler->getByID($uid);
-
-		/* Check permissions
-		 */
-		// check perms
-//        if (($permission = $groupHandler->getPermission($_POST['uid'])) < WRITE_ACCESS) {
-//            exit;
-//        }
-
 		$eportfolioHandler->updateColumnWidths(Scrub::text($_POST['leftColWidth']), Scrub::text($_POST['rightColWidth']));
 	}
 	/* GET config options from homepage
 	 */
-	else if ($_GET['uid'] && $_GET['type'] == 'config' && $_GET['component']) {
+	else if ($_GET['uid'] && ($_GET['type'] == 'config') && $_GET['component']) {
 		$config = $_GET;
 
 		$instance = reset($componentInstanceMapper->findByInstanceId($config['component']));
@@ -216,6 +193,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 
 			}
 		}
+
 		SitePage::localRedir("/eportfolio/" . $_GET['uid']);
 	}
 }
