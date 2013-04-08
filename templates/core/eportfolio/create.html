@@ -1,3 +1,7 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/jquery.autocomplete.css" />
+
 <style type='text/css'>
 	#individualPermissionTemplate {
 		display: none;
@@ -6,10 +10,49 @@
 
 <script type='text/javascript'>
 	$j(function() {
-		$j('#addIndividualPermission').change(function() {
+		$j('#addIndividualPermission').autocomplete({
+			serviceUrl: '/ajax/user.php?groupID={STUDENT_GROUP_IDS}',
+			minChars: 2,
+			maxHeight: 300,
+			width: 275,
+			noCache: true,
+
+			/* When selected, append to a list
+			 */
+			onSelect: function (value, data) {
+				var individualPermission = $j('#individualPermissionTemplate').clone();
+				individualPermission.find('input').attr('name', 'individualPermission[]');
+				individualPermission.find('input').val(data);
+
+				/* Snap out the group from the list
+				 */
+				var hyphenIndex = value.indexOf('-');
+
+				if (hyphenIndex > -1) {
+					individualPermission.find('li').append(value.substr(0, hyphenIndex));
+				}
+				else {
+					individualPermission.find('li').append(value);
+				}
+
+				/* Push it in
+				 */
+				$j('#individualPermissionList').append(individualPermission.html());
+
+				/* Clear and lock
+				 */
+				$j('#addIndividualPermission').val('');
+			}
+		});
+
+		/* Remove someone from list
+		 */
+		$j('.individualPermissionRemove').live('click', function(event) {
+			$j(this).closest('li').remove();
 		});
 	});
 </script>
+<!-- END custom_head -->
 
 <style type='text/css'>
 	div.horizontalList li {
@@ -98,7 +141,7 @@
 				<p>
 					<input id='addIndividualPermission' type='text' name='search_individual' value='' />Add
 				</p>
-				<ul>
+				<ul id='individualPermissionList'>
 
 				</ul>
 			</td>
@@ -108,5 +151,8 @@
 </form>
 
 <ul id='individualPermissionTemplate'>
-	<li><input type="checkbox" name="individual[{INDIVIDUAL_PERMISSION_USER_ID}]" value="{INDIVIDUAL_PERMISSION_USER_ID}" /> {INDIVIDUAL_PERMISSION_USER_NAME}</li>
+	<li>
+		<a h class='individualPermissionRemove'>X</span>
+		<input type="hidden" name="individualPermission[]" value="{INDIVIDUAL_PERMISSION_USER_ID}" />
+	</li>
 </ul>

@@ -46,6 +46,7 @@ class Eportfolio_Page_Create extends Eportfolio_Page_Abstract {
 	protected function render() {
 		$this->renderTemplateList();
 		$this->renderGroupList();
+		$this->renderIndividualPermissions();
 	}
 
 	/**
@@ -90,6 +91,15 @@ class Eportfolio_Page_Create extends Eportfolio_Page_Abstract {
 		else {
 			$this->getPage()->setVar('has_group_permissions_block', '');
 		}
+	}
+
+	/**
+	 * Render individual permissions
+	 */
+	private function renderIndividualPermissions() {
+		$this->getPage()->setVar(array(
+			'STUDENT_GROUP_IDS' => implode(',', $this->getGroupHandler()->getStudentGroupTypeIds())
+		));
 	}
 
 	/* Getters/Setters
