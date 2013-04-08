@@ -109,7 +109,13 @@ class Eportfolio {
 			AND page_id = '{$pageId}'
 		";
 
-		return $this->getDb()->getRow($query);
+		$result = $this->getDb()->getRow($query);
+
+		if (is_array($result)) {
+			return $result;
+		}
+
+		return array();
 	}
 
 	/**
