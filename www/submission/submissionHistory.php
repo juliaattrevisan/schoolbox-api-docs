@@ -492,7 +492,7 @@ if (isset($recent_submission)) {
         'MOST_RECENT_SUBMISSION_FILE_NAME'  => $recent_submission->getSubmission()->getFilename(),
         'MOST_RECENT_SUBMISSION_FILE_SIZE'  => $size,
         'MOST_RECENT_SUBMISSION_FILE_THUMB' => $ftype['iconFile'],
-        'MOST_RECENT_SUBMISSION_FILE_DATE ' => $recentSubmissionDate->getRelativeTime(),
+        'MOST_RECENT_SUBMISSION_FILE_DATE'  => $recentSubmissionDate->getRelativeTime(),
         'MOST_RECENT_SUBMISSION_FILE_ID'    => $recent_submission->getSubmission()->getId(),
     ));
 
