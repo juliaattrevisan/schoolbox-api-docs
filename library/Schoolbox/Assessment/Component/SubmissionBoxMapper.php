@@ -411,14 +411,16 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 
 
 	/**
-	 * @todo complete this category loader.
+	 * Conversion of SubmissionBoxHandler->getAllDueWork().
 	 *
-	 * Requires: category and category code mapper
+	 * @todo look at implementing as an activity list
 	 *
-	 * @param     $user_id
-	 * @param     $categories
-	 * @param int $year
-	 * @param int $semester
+	 * @param int   $user_id    The user ID to retrieve for.
+	 * @param array $categories The categories to search for.
+	 * @param int   $year       The year to fetch for.
+	 * @param int   $semester   The semester to fetch for.
+	 *
+	 * @return array
 	 */
 	public function getAllDueWork($user_id, $categories, $year = 0, $semester = 0) {
 		//
@@ -454,35 +456,9 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
             GROUP BY b.id
 			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC
 		";
-
-		//
-		// Def not a fan of jamming everything into a single query which then
-		// hydrates who knows how.
-		// Try this:
-		// select all categories by ID
-		// select all submission boxes by student and category, group by category
-		// select all student submissions, group by submission box
-		// select all returns, group by submission box
 		$statement = $this->database->prepare($query);
 		$statement->execute($params);
 		return $statement->fetchAll();
-
-//		while ($row = $this->db->getNextArray($outerResult)) {
-//			if ($row['rid']) {
-//				$innerQuery = "
-//					SELECT mark, comment
-//					FROM submission_return
-//					WHERE box_id = '{$row['bid']}'
-//					AND owner = '$userID'
-//					ORDER BY returned DESC
-//					LIMIT 1
-//				";
-//				$collection[] = array_merge($row, $this->db->getRow($innerQuery));
-//			} else {
-//				$collection[] = $row;
-//			}
-//		}
-//		return $collection;
 	}
 
 	/**
