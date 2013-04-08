@@ -562,4 +562,25 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 
 		return $collection;
 	}
+
+	/**
+	 * Retrieves all submission boxes which take online submissions within a
+	 * given category.
+	 *
+	 * @param int $category_id The category to
+	 *
+	 * @return \Collection
+	 */
+	public function getSubmittable($category_id) {
+		$query = "
+			SELECT {$this->getColumnString('sb')}
+			FROM {$this->getTable()} sb
+			WHERE sb.category=?
+			AND sb.late_date < NOW()
+			AND sb.accept_submission IS TRUE
+		";
+		$statement = $this->database->prepare($query);
+		$statement->execute(array($category_id));
+		return $this->hydrateList($statement, 'sb');
+	}
 }
