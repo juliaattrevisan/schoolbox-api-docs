@@ -131,7 +131,7 @@ class Eportfolio {
 	 *
 	 * @return bool
 	 */
-	public function getPageTitle() {
+	public function getSettingsPageTitle() {
 		return $this->getSettingsKey('page_title');
 	}
 
@@ -140,7 +140,7 @@ class Eportfolio {
 	 *
 	 * @return bool
 	 */
-	public function getPageId() {
+	public function getSettingsPageId() {
 		return $this->getSettingsKey('page_id');
 	}
 
@@ -149,7 +149,7 @@ class Eportfolio {
 	 *
 	 * @return mixed
 	 */
-	public function getTemplate() {
+	public function getSettingsTemplate() {
 		return $this->getSettingsKey('template');
 	}
 
@@ -158,7 +158,7 @@ class Eportfolio {
 	 *
 	 * @return bool
 	 */
-	public function getPageOwner() {
+	public function getSettingsPageOwner() {
 		return $this->getSettingsKey('uid');
 	}
 
@@ -288,33 +288,32 @@ class Eportfolio {
 	}
 
 	/**
-	 * This simply copies a bunch of rows, changing 'eportfolio_template' to 'eportfolio'...quite simple, really.
+	 * Create a new ePortfolio page with title and template
 	 *
+	 * "This simply copies a bunch of rows, changing 'eportfolio_template' to 'eportfolio'...quite simple, really."
+	 *
+	 * @param $pageTitle
 	 * @param $templateID
 	 */
-	public function createEportfolioFromTemplate($templateID) {
-		// locate all the component instances associated with this homepage (if they exist), and clear them out
-		$cim = Component_InstanceMapper::getInstance();
-		$collection = $cim->findByColumnList(array('module' => $this->getContext(), 'identifier' => $this->getUserId()));
-		$cim->delete($collection);
-
+	public function createEportfolioFromTemplate($pageTitle, $templateID) {
 		$userId = mysql_real_escape_string($this->getUserId(), $this->db->dbf);
 		$templateID = mysql_real_escape_string($templateID, $this->db->dbf);
 
-		$sql = "
+		/* Retrieve template data
+		 */
+		$query = "
             SELECT id AS template, left_column_width, right_column_width
             FROM {$this->getContext()}Template
             WHERE id = '{$templateID}'
         ";
 
-		$x[] = array($sql);
+		$tpl = $this->db->getRow($query);
 
-		// retrieve template data
-		$tpl = $this->db->getRow($sql);
-
-		// insert eportfolio instance into eportfolio_config
+		/* Compile an eportfolioConfig record
+		 */
 		$eportfolioConfig = array(
 			'uid' => $userId,
+			'page_title' => $pageTitle,
 			'template' => $templateID,
 			'left_column_width' => $tpl['left_column_width'],
 			'right_column_width' => $tpl['right_column_width'],
@@ -332,9 +331,14 @@ class Eportfolio {
 			));
 		}
 
-		// remove (if exists) and replace the homepage config with the new template details
-		$this->db->delete($this->getContext() .'_config', 'uid', $userId);
+		/* Insert it
+		 */
 		$this->db->insert($this->getContext() .'_config', $eportfolioConfig);
+
+		/* Remember the page that was just created, because we'll apply
+		 * permissions to it after it gets created
+		 */
+		$this->setPageId($this->db->insertID());
 
 		// retrieve, rearrange and reinsert the componentry
 		$cim = Component_InstanceMapper::getInstance();
@@ -350,7 +354,7 @@ class Eportfolio {
 				unset($inst->config);
 
 				$inst->module = $this->getContext();
-				$inst->identifier = $userId;
+				$inst->identifier = $this->getPageId();
 
 				$ids = $cim->save($inst);
 				$id = $ids[0];
@@ -985,6 +989,15 @@ class Eportfolio {
 	 */
 	private function setPageId($pageId) {
 		$this->pageId = $pageId;
+	}
+
+	/**
+	 * Get page id
+	 *
+	 * @return int
+	 */
+	private function getPageId() {
+		return $this->pageId;
 	}
 
 	/**

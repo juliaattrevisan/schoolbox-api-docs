@@ -82,8 +82,8 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 			'HEADING' => $this->getUserName(),
 			'ID' => $this->getUserId(),
 			'USER_TOKEN' => $_SESSION['key'],
-			'PAGE_TITLE' => $this->getEportfolioHandler()->getPageTitle(),
-			'PAGE_ID' => $this->getEportfolioHandler()->getPageId(),
+			'PAGE_TITLE' => $this->getEportfolioHandler()->getSettingsPageTitle(),
+			'PAGE_ID' => $this->getEportfolioHandler()->getSettingsPageId(),
 		));
 
 		$this->getPage()->setVar(array(
@@ -130,7 +130,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 	 * Check that the page being viewed has a template
 	 */
 	private function validatePageTemplate() {
-		if ($this->getEportfolioHandler()->getTemplate() === false) {
+		if ($this->getEportfolioHandler()->getSettingsTemplate() === false) {
 			die('no template');
 		}
 	}
