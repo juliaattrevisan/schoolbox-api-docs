@@ -81,7 +81,7 @@ else if (is_numeric($_POST['page_id'])) {
 	 */
 	else if (is_numeric($_POST['page_id']) && is_numeric($_POST['add'])) {
 		$eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
-		$uid = $eportfolioHandler->getPageOwner();
+		$uid = $eportfolioHandler->getSettingsPageOwner();
 
 		/* Find out who owns the page and check permissions first
 		 */
@@ -203,7 +203,7 @@ else if (is_numeric($_POST['page_id'])) {
 	else if ($_POST['page_id'] && is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
 
 		$eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
-		$uid = $eportfolioHandler->getPageOwner();
+		$uid = $eportfolioHandler->getSettingsPageOwner();
 
 		/* Find out who owns the page and check permissions first
 		 */

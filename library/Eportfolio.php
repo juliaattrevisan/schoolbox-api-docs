@@ -996,7 +996,7 @@ class Eportfolio {
 	 *
 	 * @return int
 	 */
-	private function getPageId() {
+	public function getPageId() {
 		return $this->pageId;
 	}
 

@@ -9,6 +9,10 @@
  */
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
+/* -_-
+ */
+$page = new SitePage();
+
 new Alaress_Probe($_POST);
 
 /* Check create/update permissions
@@ -20,15 +24,23 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 }
 /* Create page
  */
-else if (isset($_POST['page_title']) && strlen(trim($_POST['page_title']))) {
-	/* Create page
-	 */
+else if (isset($_POST['page_title']) && strlen(trim($_POST['page_title'])) && isset($_POST['page_template']) && is_numeric($_POST['page_template'])) {
 
-	/* Apply components?
+	/* Create page for the currently logged-in user
 	 */
+	$userId = $_SESSION['id'];
+	$pageId = null;
+	$pageTitle = Scrub::text($_POST['page_title']);
+	$templateId = Scrub::text($_POST['page_template']);
 
-	/* Delete all previous permissions
+	/* Create page and apply components (a page_id is generated)
 	 */
+	$eportfolioHandler = new Eportfolio($userId, $pageId);
+	$eportfolioHandler->createEportfolioFromTemplate($pageTitle, $templateId);
+
+	/* Apply permissions to the newly-created page
+	 */
+	Eportfolio_PermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'], $_POST['individual_permission']);
 
 	/* Add new permissions
 	 */
