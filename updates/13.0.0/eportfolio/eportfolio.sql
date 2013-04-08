@@ -36,3 +36,7 @@ ALTER TABLE `component_instance` CHANGE `module` `module` ENUM('dashboard','home
 /* Repurpose eportfolio_config to contain information about pages
  */
 ALTER TABLE `eportfolio_config` ADD COLUMN `page_id` INT(11) NOT NULL AUTO_INCREMENT FIRST, ADD COLUMN `page_title` VARCHAR(255) NULL AFTER `page_id`, CHANGE `uid` `uid` INT(6) DEFAULT 0 NOT NULL, CHANGE `template` `template` TINYINT(1) DEFAULT 0 NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`page_id`);
+
+/* Add permissions relation table
+ */
+CREATE TABLE `eportfolio_permission`( `id` INT(11) NOT NULL AUTO_INCREMENT, `page_id` INT(11) NOT NULL, `type` ENUM('parent','group','student') NOT NULL DEFAULT 'student', `value` INT(11) NOT NULL, PRIMARY KEY (`id`) );
