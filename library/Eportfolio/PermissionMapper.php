@@ -149,12 +149,10 @@ class Eportfolio_PermissionMapper extends Mapper {
 	 * @return Bool|Collection
 	 */
 	public function findParentSetting($pageId) {
-		$x = array(
+		return $this->findByColumnList(array(
 			'page_id' => $pageId,
 			'type' => 'parent',
-		);
-
-		return $this->findByColumnList($x);
+		));
 	}
 
 	public function findValues($pageId, $type, $permittedValues) {
