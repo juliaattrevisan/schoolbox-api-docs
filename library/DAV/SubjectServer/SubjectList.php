@@ -23,7 +23,10 @@ class DAV_SubjectServer_SubjectList extends Sabre_DAV_SimpleCollection {
 			return $this->children;
 		}
 		foreach ($this->getSubjects() as $subject) {
-			$this->children[] = new DAV_SubjectServer_Subject($subject);
+			$name  = sprintf('%s (%s)', $subject->getName(), $subject->getCode());
+			$child = new DAV_SubjectServer_Subject($name);
+			$child->setSubject($subject);
+			$this->children[$name] = $child;
 		}
 		return $this->children;
 	}
@@ -40,7 +43,7 @@ class DAV_SubjectServer_SubjectList extends Sabre_DAV_SimpleCollection {
 	 */
 	public function getChild($name) {
 		foreach ($this->getChildren() as $child) {
-			if ($name === $child->getSubject()->getName()) {
+			if ($name === $child->getName()) {
 				return $child;
 			}
 		}
