@@ -46,6 +46,8 @@ class Eportfolio_PermissionMapper extends Mapper {
 			'property'   => 'value',
 			'type'       => Mapper::TYPE_INTEGER,
 		));
+
+		parent::mapping();
 	}
 
 	/**
@@ -138,5 +140,40 @@ class Eportfolio_PermissionMapper extends Mapper {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Find the Parent permission settings for a particular page
+	 *
+	 * @param $pageId
+	 * @return Bool|Collection
+	 */
+	public function findParentSetting($pageId) {
+		$x = array(
+			'page_id' => $pageId,
+			'type' => 'parent',
+		);
+
+		return $this->findByColumnList($x);
+	}
+
+	public function findValues($pageId, $type, $permittedValues) {
+		$statement = $this->database->prepare("
+            SELECT {$this->getColumnString()}
+            FROM `{$this->table}`
+            WHERE `page_id` = :pageId
+			AND `type` = 'group'
+			AND `value` IN (:permittedValuesSql)
+
+        ");
+
+		$statement->bindParam(':pageId', $pageId);
+		$statement->bindParam(':permittedValuesSql', implode(',', $permittedValues));
+		$statement->execute();
+
+		$rowset = $statement->fetchAll();
+
+		print_r($rowset);
+		return $this->hydrateList($rowset);
 	}
 }
