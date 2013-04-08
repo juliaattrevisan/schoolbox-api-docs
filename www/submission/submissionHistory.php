@@ -236,6 +236,9 @@ $this->setVar($teacher_details);
 
 $usersList = array();
 
+
+$recent_submission = null;
+$recent_return     = null;
 if (count($submission_history)) {
 	$j = 0;
 
@@ -402,10 +405,10 @@ if (count($submission_history)) {
                 $this->parse('history_submitted_block', 'history_submitted');
             }
 
-//            // Remember most recent submission
-//            if(!is_numeric($recentSubmission['sid'])) {
-//                $recentSubmission = $currentWork;
-//            }
+            // Remember most recent submission
+            if (!isset($recent_submission)) {
+	            $recent_submission = $activity_item;
+            }
 
         }
         // return by teacher
@@ -429,12 +432,12 @@ if (count($submission_history)) {
                 $this->parse('work_grade_block', 'work_grade');
             }
 
-//            /* Remember the most recent returned work, because we need it
-//             * later on
-//             */
-//            if (!is_numeric($returnedWork['rid'])) {
-//                $returnedWork = $currentWork;
-//            }
+            /* Remember the most recent returned work, because we need it
+             * later on
+             */
+			if (!isset($recent_return)) {
+				$recent_return = $activity_item;
+			}
         }
 
 		/* Alternating row color
@@ -607,43 +610,49 @@ if (!in_array($submission->getCategory()->getId(), $categoryIDList)) {
 /* Detect returned work
  */
 
-//if (is_numeric($returnedWork['rid'])) {
-//
-//    // get filetype details
-//    $ext = substr($returnedWork['filename'], strrpos($returnedWork['filename'], '.') + 1);
-//    $mime = $allowedHandler->getMime($ext);
-//    $ftype = $allowedHandler->getByField('mime', $mime);
-//
-//    $filename = Cfg::get('returns_dir') . '/' . $returnedWork['rid'] . '.dat';
-//    if(file_exists($filename)) {
-//        $size = Alaress_Byte_Format::bytesToString(filesize($filename));
-//    } else {
-//        $size = '0 KB';
-//    }
-//
-//    $returnDate = new Alaress_Date_Relative($submission->getDueDate(),'y-m-d');
-//
-//	$this->setVar(array(
-//		'RETURNED_WORK_COMMENT' => Scrub::Text($returnedWork['comment']),
-//		'RETURNED_WORK_MARK' => Scrub::Text($returnedWork['mark']),
-//		'RETURNED_WORK_FILE_ID' => $returnedWork['rid'],
-//        'RETURNED_WORK_GRADIENT' => max(0, min(10, (int)($returnedWork['norm_mark'] / 10))),
-//        'RETURNED_WORK_FILE_SIZE' => $size,
-//        'RETURNED_WORK_FILE_NAME' => Scrub::Text($returnedWork['filename']),
-//        'RETURNED_WORK_FILE_DATE' => $returnDate->getLongDateOnly(),
-//        'RETURNED_WORK_FILE_THUMB'=> $ftype['iconFile'],
-//	));
-//
-//    if($returnedWork['filename'] && !$parentOnly)
-//        $this->parse('return_file_block', 'return_file');
-//    else
-//        $this->setVar('return_file_block','');
-//
-//	$this->parse('returned_work_block', 'returned_work');
-//}
-//else {
+if (isset($recent_return)) {
+
+    // get filetype details
+	$return = $recent_return->getReturnedWork();
+    $ext   = pathinfo($return->getFilename(), PATHINFO_EXTENSION);
+    $mime  = $allowedHandler->getMime($ext);
+    $ftype = $allowedHandler->getByField('mime', $mime);
+
+	//
+	// Should be loadable from return object.
+    $filename = Cfg::get('returns_dir') . '/' . $return->getId() . '.dat';
+    if(file_exists($filename)) {
+        $size = Alaress_Byte_Format::bytesToString(filesize($filename));
+    }
+    else {
+        $size = '0 KB';
+    }
+
+    $returnDate = new Alaress_Date_Relative($submission->getDueDate(),'y-m-d');
+
+	$this->setVar(array(
+		'RETURNED_WORK_COMMENT'    => Scrub::Text($return->getComment()),
+		'RETURNED_WORK_MARK'       => Scrub::Text($return->getMark()),
+		'RETURNED_WORK_FILE_ID'    => $return->getId(),
+        'RETURNED_WORK_GRADIENT'   => max(0, min(10, (int)($return->getNormalizedMark() / 10))),
+        'RETURNED_WORK_FILE_SIZE'  => $size,
+        'RETURNED_WORK_FILE_NAME'  => Scrub::Text($return->getFilename()),
+        'RETURNED_WORK_FILE_DATE'  => $returnDate->getLongDateOnly(),
+        'RETURNED_WORK_FILE_THUMB' => $ftype['iconFile'],
+	));
+
+    if ($return->getFilename() && !$parentOnly) {
+	    $this->parse('return_file_block', 'return_file');
+    }
+    else {
+	    $this->setVar('return_file_block','');
+    }
+
+	$this->parse('returned_work_block', 'returned_work');
+}
+else {
 	$this->setVar('returned_work_block', '');
-//}
+}
 
 // do fun rubric things
 if($submission->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE_RUBRIC) {
