@@ -198,8 +198,8 @@ class DueWork_All {
         foreach($allWork as $currentWork) {
 
             // Start a new subject heading?
-            if (($prevSubject != $currentWork['categoryName']) && (!$first)){
-                $prevSubject = $currentWork['categoryName'];
+            $prevSubject = $currentWork['categoryName'];
+            if (($prevSubject != $currentWork['categoryName']) && (!$first)) {
                 $this->page->parse('subject_block', 'subject', true);
                 $this->page->setVar('work_block', '');
             }
