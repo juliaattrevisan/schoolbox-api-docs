@@ -8,5 +8,14 @@
 $userId = $this->arg[0];
 $pageId = $this->arg[1];
 
-$factory = new Eportfolio_Page_Factory($this, $userId, $pageId);
-$factory->getPage()->renderPage();
+$authenticator = new Eportfolio_Authenticator($userId, $pageId);
+
+if ($authenticator->canView()) {
+	$factory = new Eportfolio_Page_Factory($this, $userId, $pageId);
+	$factory->getPage()->renderPage();
+}
+else {
+	error(19);
+}
+
+
