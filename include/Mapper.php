@@ -332,6 +332,8 @@ abstract class Mapper {
             }
         }
 
+        $identifier  = $this->getIdentifier();
+        $id_property = $identifier['property'];
         $this->database->beginTransaction();
         foreach ($collection as $model) {
             foreach ($this->map as $map) {
@@ -340,8 +342,6 @@ abstract class Mapper {
                 $statement->bindParam(":$columnName", $this->getModelProperty($model, $propertyName, $map));
             }
             if ($statement->execute()) {
-                $identifier  = $this->getIdentifier();
-                $id_property = $identifier['property'];
                 if (!$this->getModelProperty($model, $id_property, $identifier)) {
                     $this->setModelProperty($model, $id_property, $this->database->lastInsertId(), $identifier);
                 }
@@ -355,7 +355,7 @@ abstract class Mapper {
         $this->database->commit();
 
         foreach ($collection as $model) {
-            if ($this->getModelProperty($model, $identifier, $this->identifier)) {
+            if ($this->getModelProperty($model, $id_property, $identifier)) {
                 $this->triggerCallbacks('postSave', $model);
             }
         }
