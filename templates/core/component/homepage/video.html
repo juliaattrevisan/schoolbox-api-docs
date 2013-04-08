@@ -1,12 +1,31 @@
 <link href="/javascript/video-js/video-js.css" rel="stylesheet">
 <script src="/javascript/video-js/video.js"></script>
 
+
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
-
-<video id="my_video_1" class="video-js vjs-default-skin" controls
-  preload="auto" width="640" height="264" poster="my_video_poster.png"
-  data-setup="{}">
-  <source src="/output.mpg" type='video/mp4'>
+<!-- BEGIN default_video -->
+<video id="schoolbox_video{COMPONENT_INSTANCE_ID}" class="video-js vjs-default-skin" controls
+  preload="auto" width="640" height="264"  data-setup="{}">
+  <source src="/cms/sendVideo.php?id={DEFAULT_VIDEO_ID}" type='video/mp4'>
 </video>
+<!-- END default_video -->
+<ul>
+    <!-- BEGIN video_list -->
+    <li class="{VIDEO_LIST_HIDDEN}"><a class="video-link" href="#" rel="{VIDEO_LIST_ID}"><img src="/cms/videoThumb.php?id={VIDEO_LIST_ID}" title="{VIDEO_LIST_TITLE}"></a></li>
+    <!-- END video_list -->
+</ul>
+    </div>
+    <script type="text/javascript">
+        $j('a.video-link').click(function() {
+            var $target = "/cms/sendVideo.php?id="+$j(this).attr("rel");
+            var $video = _V_("schoolbox_video{COMPONENT_INSTANCE_ID}");
+
+            $video.ready(function(){
+                this.paused();
+                this.src({type: "video/mp4", src: $target});
+            });
+            return false;
+        });
+    </script>
