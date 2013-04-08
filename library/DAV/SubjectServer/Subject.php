@@ -16,33 +16,15 @@ class DAV_SubjectServer_Subject extends Sabre_DAV_SimpleCollection
 	 */
 	protected $subject;
 
-
-	/**
-	 * Retrieves the collection of assessments for this subject.
-	 *
-	 * @return array
-	 */
-	public function getChildren() {
-		if (!empty($this->children)) {
-			return $this->children;
-		}
-		foreach ($this->getAssessments() as $assessment) {
-			$name  = $assessment->getName();
-			$child = new DAV_SubjectServer_Assessment($name);
-			$child->setAssessment($assessment);
-			$this->children[$name] = $child;
-		}
-		return $this->children;
-	}
-
-
 	/**
 	 * @param \Schoolbox\External\Subject $subject
+	 *
+	 * @return $this
 	 */
 	public function setSubject($subject) {
 		$this->subject = $subject;
+		return $this;
 	}
-
 
 	/**
 	 * @return \Schoolbox\External\Subject
@@ -51,14 +33,19 @@ class DAV_SubjectServer_Subject extends Sabre_DAV_SimpleCollection
 		return $this->subject;
 	}
 
-
 	/**
-	 * Retrieves list of assessments for this subject.
+	 * Loads children from the subject set in $this->setSubject().
 	 *
-	 * @return Collection
+	 * @return $this
 	 */
-	public function getAssessments() {
+	public function loadChildrenFromSubject() {
 		$mapper = new SubmissionBoxMapper();
-		return $mapper->getSubmittable($this->subject->getId());
+		foreach ($mapper->getSubmittable($this->subject->getId()) as $assessment) {
+			$name  = $assessment->getName();
+			$child = new DAV_SubjectServer_Assessment($name);
+			$child->setAssessment($assessment);
+			$this->addChild($child);
+		}
+		return $this;
 	}
 }

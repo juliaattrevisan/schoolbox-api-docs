@@ -6,50 +6,16 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+
+use Schoolbox\User;
+use Schoolbox\External\SubjectMapper;
+
 class DAV_SubjectServer_SubjectList extends Sabre_DAV_SimpleCollection {
-	/**
-	 * @var \Schoolbox\External\SubjectCollection
-	 */
-	protected $subjects;
-
 
 	/**
-	 * Retrieves the collection of subjects for the current user.
-	 *
-	 * @return array
+	 * @var User
 	 */
-	public function getChildren() {
-		if (!empty($this->children)) {
-			return $this->children;
-		}
-		foreach ($this->getSubjects() as $subject) {
-			$name  = sprintf('%s (%s)', $subject->getName(), $subject->getCode());
-			$child = new DAV_SubjectServer_Subject($name);
-			$child->setSubject($subject);
-			$this->children[$name] = $child;
-		}
-		return $this->children;
-	}
-
-
-	/**
-	 * Retrieves the subject with this name for the given user.
-	 *
-	 * @param string $name
-	 *
-	 * @throws Sabre_DAV_Exception_NotFound if subject doesn't exist for user.
-	 *
-	 * @return DAV_SubjectServer_Subject
-	 */
-	public function getChild($name) {
-		foreach ($this->getChildren() as $child) {
-			if ($name === $child->getName()) {
-				return $child;
-			}
-		}
-		throw new Sabre_DAV_Exception_NotFound('The subject : ' . $name . ' could not be found');
-	}
-
+	protected $user;
 
 	/**
 	 * Is the subject list shown for the given path?
@@ -63,7 +29,6 @@ class DAV_SubjectServer_SubjectList extends Sabre_DAV_SimpleCollection {
 	public function isSubjectListShown($path) {
 		return !empty($_SESSION['subjects']) && $this->isThisDirectChildOfPath($path);
 	}
-
 
 	/**
 	 * Is this subject list a direct descendant of the given path?
@@ -79,7 +44,6 @@ class DAV_SubjectServer_SubjectList extends Sabre_DAV_SimpleCollection {
 		return $this_path_parts === $path_parts;
 }
 
-
 	/**
 	 * Gets the parts of the given path, used by isThisDirectChildOfPath() to
 	 * determine whether this item is in another path.
@@ -92,18 +56,36 @@ class DAV_SubjectServer_SubjectList extends Sabre_DAV_SimpleCollection {
 		return preg_split('/[\\\\\/]+/', $path, -1, PREG_SPLIT_NO_EMPTY);
 	}
 
+	/**
+	 * Loads list of child nodes from the given user's subjects.
+	 *
+	 * @return $this
+	 */
+	public function loadChildrenFromUser() {
+		$subject_mapper = new SubjectMapper();
+		foreach ($subject_mapper->findAllForStudent($this->getUser()) as $subject) {
+			$name  = sprintf('%s (%s)', $subject->getName(), $subject->getCode());
+			$child = new DAV_SubjectServer_Subject($name);
+			$child->setSubject($subject)->loadChildrenFromSubject();
+			$this->addChild($child);
+		}
+		return $this;
+	}
 
 	/**
-	 * Retrieves list of subjects, loading the list if required.
+	 * @param  \Schoolbox\User $user
 	 *
-	 * @return \Schoolbox\External\SubjectCollection
+	 * @return $this
 	 */
-	public function getSubjects() {
-		if (!empty($this->subjects)) {
-			return $this->subjects;
-		}
-		$mapper = new \Schoolbox\UserMapper();
-		$this->subjects = $mapper->findWithSubjects($_SESSION['id'])->getSubjectCollection();
-		return $this->subjects;
+	public function setUser($user) {
+		$this->user = $user;
+		return $this;
+	}
+
+	/**
+	 * @return \Schoolbox\User
+	 */
+	public function getUser() {
+		return $this->user;
 	}
 }

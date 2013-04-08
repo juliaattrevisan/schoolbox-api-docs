@@ -14,21 +14,14 @@ class DAV_SubjectServer_Assessment extends Sabre_DAV_SimpleCollection
 	protected $assessment;
 
 	/**
-	 * Retrieves the collection of assessments for this subject.
-	 *
-	 * @return array
-	 */
-	public function getChildren() {
-		return array();
-	}
-
-	/**
 	 * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
+	 *
+	 * @return $this
 	 */
 	public function setAssessment($assessment) {
 		$this->assessment = $assessment;
+		return $this;
 	}
-
 
 	/**
 	 * @return \Schoolbox\Assessment\Component\SubmissionBox
@@ -36,5 +29,4 @@ class DAV_SubjectServer_Assessment extends Sabre_DAV_SimpleCollection
 	public function getAssessment() {
 		return $this->assessment;
 	}
-
 }

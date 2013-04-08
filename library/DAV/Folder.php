@@ -7,6 +7,8 @@
  * Time: 9:27 PM
  */
 
+use Schoolbox\UserMapper;
+
 class DAV_Folder extends Sabre_DAV_Collection {
 
     private $folder;
@@ -90,7 +92,11 @@ class DAV_Folder extends Sabre_DAV_Collection {
 
 		$this_folder = $this->myPath.'/'.$name;
 		if ($this_folder === $this->subject_list->getName()) {
-			return new DAV_SubjectServer_SubjectList('My Subjects');
+			$user_mapper = new UserMapper();
+			$this->subject_list
+				->setUser($user_mapper->findById($_SESSION['id']))
+				->loadChildrenFromUser();
+			return $this->subject_list;
 		}
         if($this->isFolder($name, $this->getFolderID())) {
             return new DAV_Folder($this_folder);
