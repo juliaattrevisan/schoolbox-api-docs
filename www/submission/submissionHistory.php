@@ -496,14 +496,7 @@ if (isset($recent_submission)) {
     $ext   = pathinfo($recent_submission->getSubmission()->getFilename(), PATHINFO_EXTENSION);
     $mime  = $allowedHandler->getMime($ext);
     $ftype = $allowedHandler->getByField('mime', $mime);
-
-    // get filesize (isn't cached on db table, unfortunately)
-    $filename = Cfg::get('submission_dir') . '/' . $recent_submission->getSubmission()->getId() . '.dat';
-    if(file_exists($filename)) {
-        $size = Alaress_Byte_Format::bytesToString(filesize($filename));
-    } else {
-        $size = '0 KB';
-    }
+	$size  = Alaress_Byte_Format::bytesToString($recent_submission->getSubmission()->getFilesize());
 
 	// populate details into page
     $this->setVar(array(
@@ -617,16 +610,7 @@ if (isset($recent_return)) {
     $ext   = pathinfo($return->getFilename(), PATHINFO_EXTENSION);
     $mime  = $allowedHandler->getMime($ext);
     $ftype = $allowedHandler->getByField('mime', $mime);
-
-	//
-	// Should be loadable from return object.
-    $filename = Cfg::get('returns_dir') . '/' . $return->getId() . '.dat';
-    if(file_exists($filename)) {
-        $size = Alaress_Byte_Format::bytesToString(filesize($filename));
-    }
-    else {
-        $size = '0 KB';
-    }
+	$size  = Alaress_Byte_Format::bytesToString($return->getFilesize());
 
     $returnDate = new Alaress_Date_Relative($submission->getDueDate(),'y-m-d');
 
