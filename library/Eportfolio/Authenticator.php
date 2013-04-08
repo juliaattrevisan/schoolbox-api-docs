@@ -143,9 +143,18 @@ class Eportfolio_Authenticator {
 	 * @return bool
 	 */
 	public function canModify() {
-//		if ($userId can modify $pageId) {
-//			return true;
-//		}
+		/* If $user can modify page, continue; otherwise die
+		 * Superusers, staff and page owners can view contents.
+		 * Selected parents, groups and individuals can view contents.
+		 */
+		$youAreAdmin = $this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff();
+		$youArePageOwner = ($this->getEportfolioHandler()->getSettingsPageOwner() == $this->getCurrentUserId());
+
+		/* And now...the conclusion.
+		 */
+		if ($youAreAdmin || $youArePageOwner) {
+			return true;
+		}
 
 		return false;
 	}
