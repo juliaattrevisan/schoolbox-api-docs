@@ -21,7 +21,7 @@
 			 */
 			onSelect: function (value, data) {
 				var individualPermission = $j('#individualPermissionTemplate').clone();
-				individualPermission.find('input').attr('name', 'individualPermission[]');
+				individualPermission.find('input').attr('name', 'individual_permission[]');
 				individualPermission.find('input').val(data);
 
 				/* Snap out the group from the list
@@ -91,7 +91,7 @@
 			<td class="formLabelWidth"><h4>Page Name</h4></td>
 			<td>
 				<label>
-					<input type="text" id="name" class="required" name="pageTitle" maxlength="250" size="40" value='' />
+					<input type="text" id="name" class="required" name="page_title" maxlength="250" size="40" value='' />
 				</label>
 			</td>
 		</tr>
@@ -101,7 +101,7 @@
 				<em>If you would like a homepage associated with this folder select a basic layout to get started with.</em>
 			</td>
 			<td>
-				<select name="pageTemplate">
+				<select name="page_template">
 					<!-- BEGIN page_template_list -->
 					<option value="{PAGE_TEMPLATE_ID}">{PAGE_TEMPLATE_NAME}</option>
 					<!-- END page_template_list -->
@@ -114,8 +114,8 @@
 				<em>Allow your parents to view your ePortfolio page.</em>
 			</td>
 			<td>
-				<input type="hidden" name="parents" value="0" />
-				<input type="checkbox" name="parents" value="1" />
+				<input type="hidden" name="parent_permission" value="0" />
+				<input type="checkbox" name="parent_permission" value="1" />
 			</td>
 		</tr>
 		<tr>
@@ -127,7 +127,7 @@
 				<!-- BEGIN has_group_permissions -->
 				<ul>
 					<!-- BEGIN group_permission -->
-					<li><input type="checkbox" name="group[{GROUP_PERMISSION_GROUP_ID}]" value="{GROUP_PERMISSION_GROUP_ID}" /> {GROUP_PERMISSION_NAME}</li>
+					<li><input type="checkbox" name="group_permission[]" value="{GROUP_PERMISSION_GROUP_ID}" /> {GROUP_PERMISSION_NAME}</li>
 					<!-- END group_permission -->
 				</ul>
 				<!-- END has_group_permissions -->
@@ -136,10 +136,11 @@
 		<tr>
 			<td>
 				<h4>Student Permissions</h4>
-				<em>Allow certain students to view your ePortfolio page.</em></td>
+				<em>Allow certain students to view your ePortfolio page.</em>
+			</td>
 			<td>
 				<p>
-					<input id='addIndividualPermission' type='text' name='search_individual' value='' />Add
+					<input id='addIndividualPermission' type='text' value='' />Add
 				</p>
 				<ul id='individualPermissionList'>
 
@@ -147,12 +148,12 @@
 			</td>
 		</tr>
 	</table>
-	<input type="submit" label="Submit" name="submit" value="Create Page" class="submit-btn-plain"/>
+	<input type="submit" label="Submit" value="Create Page" class="submit-btn-plain"/>
 </form>
 
 <ul id='individualPermissionTemplate'>
 	<li>
 		<a class='individualPermissionRemove'>X</a>
-		<input type="hidden" name="individualPermission[]" value="{INDIVIDUAL_PERMISSION_USER_ID}" />
+		<input type="hidden" name="individual_permission[]" value="{INDIVIDUAL_PERMISSION_USER_ID}" />
 	</li>
 </ul>
