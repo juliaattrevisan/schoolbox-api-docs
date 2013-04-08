@@ -332,7 +332,7 @@ if (count($submission_history)) {
 	        $history['HISTORY_MARK']     = $mark;
 	        $history['HAS_GRADE']        = ($mark || $mark === 0) ? 'grade' : '';
 	        $history['HISTORY_COMMENT']  = Scrub::text($activity_item->getReturnedWork()->getComment());
-	        $history['HISTORY_GRADIENT'] = max(0, min(10, (int)($norm_mark / 10)));
+	        $history['HISTORY_GRADIENT'] = $activity_item->getReturnedWork()->getGradientFromNormalizedMark();
 
 	        //
 	        // submission file ID, submission file name
@@ -634,7 +634,7 @@ if (isset($recent_return)) {
 		'RETURNED_WORK_COMMENT'    => Scrub::Text($return->getComment()),
 		'RETURNED_WORK_MARK'       => Scrub::Text($return->getMark()),
 		'RETURNED_WORK_FILE_ID'    => $return->getId(),
-        'RETURNED_WORK_GRADIENT'   => max(0, min(10, (int)($return->getNormalizedMark() / 10))),
+        'RETURNED_WORK_GRADIENT'   => $return->getGradientFromNormalizedMark(),
         'RETURNED_WORK_FILE_SIZE'  => $size,
         'RETURNED_WORK_FILE_NAME'  => Scrub::Text($return->getFilename()),
         'RETURNED_WORK_FILE_DATE'  => $returnDate->getLongDateOnly(),

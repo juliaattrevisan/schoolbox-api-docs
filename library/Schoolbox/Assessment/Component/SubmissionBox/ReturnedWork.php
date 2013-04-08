@@ -64,6 +64,23 @@ class ReturnedWork {
 		$this->setOwner(new User());
 	}
 
+
+	/**
+	 * Calculates a gradient (from 0 to 10) from the normalized mark for this
+	 * return.
+	 *
+	 * @return int
+	 */
+	public function getGradientFromNormalizedMark() {
+		return max(0, min(10, (int)($this->getNormalizedMark() / 10)));
+	}
+
+
+	/**
+	 * Auto-generated methods
+	 */
+
+
 	/**
 	 * @param  string $filename
 	 *
