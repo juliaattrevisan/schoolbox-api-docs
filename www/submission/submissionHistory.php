@@ -470,135 +470,135 @@ else {
 //    'TEACHER_THUMB' => "/portrait?userId={$teacher['synergy_id']}&size=square32",
 //));
 
-//if($recentSubmission['sid']) {
-//
-//   /* Show most recent submission
-//    * Hide Submit form
-//    * If multi-submit is enabled, show the Resubmit form
-//    * Find out whether the latest submission was overdue
-//    */
-//
-//    // override the due gradient because we have submitted
-//    $this->setVar('BOX_DUEDATE_GRADIENT', 'black');
-//
-//    if ($recentSubmission['date'] > $submission->getDueDate()->getUnixTimestamp()) {
-//        $this->setVar('OVERDUE', 'overdue');
-//        $this->parse('overdue_block', 'overdue');
-//    }
-//    else {
-//        $this->setVar('OVERDUE','');
-//        $this->setVar('overdue_block', '');
-//    }
-//
-//    $recentSubmissionDate = new Alaress_Date_Relative($recentSubmission['date'], 'U');
-//
-//    // get filetype details
-//    $ext = substr($recentSubmission['sfname'], strrpos($recentSubmission['sfname'], '.') + 1);
-//    $mime = $allowedHandler->getMime($ext);
-//    $ftype = $allowedHandler->getByField('mime', $mime);
-//
-//    // get filesize (isn't cached on db table, unfortunately)
-//    $filename = Cfg::get('submission_dir') . '/' . $recentSubmission['sid'] . '.dat';
-//    if(file_exists($filename)) {
-//        $size = Alaress_Byte_Format::bytesToString(filesize($filename));
-//    } else {
-//        $size = '0 KB';
-//    }
-//
-//	// populate details into page
-//    $this->setVar(array(
-//        'MOST_RECENT_SUBMISSION_FILE_NAME' => $recentSubmission['sfname'],
-//        'MOST_RECENT_SUBMISSION_FILE_SIZE' => $size,
-//        'MOST_RECENT_SUBMISSION_FILE_THUMB' => $ftype['iconFile'],
-//        'MOST_RECENT_SUBMISSION_FILE_DATE' => $recentSubmissionDate->getRelativeTime(),
-//        'MOST_RECENT_SUBMISSION_FILE_ID' => $recentSubmission['sid'],
-//    ));
-//
-//
-//	// if we are the owning student, display plagiarism details if they are available
-//	if($userID == $_SESSION['id'] && Config::get('plagscan_student_visible')) {
-//
-//		// retrieve plagiarism score, if available
-//		$docMapper = Plagscan_DocumentMapper::getInstance();
-//		$plagDoc = $docMapper->findByColumn('file_id', $recentSubmission['sid'])->current();
-//		// test: $plagDoc = $docMapper->findByColumn('file_id', 9)->current();
-//
-//		// if we retrieved a plag document, use it and display to the student
-//		if($plagDoc->id && $plagDoc->status == Plagscan_Document::STATUS_COMPLETE) {
-//
-//			// what colour should the plagiarism text be, and what should the tooltip say?
-//			if($plagDoc->score > 60) {
-//				$status = 'critical';
-//				$tooltip = 'Your submission is extremely similar to other documents scanned.';
-//			}
-//			elseif($plagDoc->score > 20) {
-//				$status = 'warn';
-//				$tooltip = 'Your submission is somewhat similar to other documents scanned.';
-//			}
-//			else {
-//				$status = 'ok';
-//				$tooltip = 'Your submission is quite different to other documents scanned.';
-//			}
-//
-//			$this->setVar(array(
-//				'MOST_RECENT_SUBMISSION_FILE_PLAG_CLASS' => $status,
-//				'MOST_RECENT_SUBMISSION_FILE_PLAGSCORE' => $plagDoc->score,
-//				'MOST_RECENT_SUBMISSION_FILE_PLAG_TITLE' => $tooltip,
-//			));
-//			$this->parse('plag_score_block', 'plag_score');
-//		}
-//		else {
-//			$this->setVar('plag_score_block', '');
-//		}
-//	}
-//	else {
-//		$this->setVar('plag_score_block', '');
-//	}
-//
-//	$submission->getOpenDate();
-//	$submission->getAcceptMultiple();
-//    // only allow a resubmission if the current user is the owner, if the submission box is accepting submissions, and if the current time is between open and late
-//    if(
-//        $userID == $_SESSION['id'] &&
-//        (mktime() > $submission->getOpenDate()->getUnixTimestamp()) &&
-//        (mktime() < $submission->getLateDate()->getUnixTimestamp()) &&
-//        $submission->getAcceptOnline() &&
-//        $submission->getAcceptMultiple()
-//    ) {
-//        $this->parse('action_resubmit_block', 'action_resubmit');
-//    } else {
-//        $this->setVar('action_resubmit_block', '');
-//    }
-//
-//    // if parent, hide the "view submitted work" button
-//    if($parentOnly) {
-//        $this->setVar('recent_submission_block', '');
-//    } else {
-//        $this->parse('recent_submission_download_block', 'recent_submission_download');
-//        $this->parse('recent_submission_block', 'recent_submission');
-//    }
-//
-//}
-//else {
-//    /* Hide most recent submission
-//     * Show Submit form
-//     * Hide the Resubmit form
-//     */
-//    if ($userID == $_SESSION['id']
-//        && mktime() > $submission->getOpenDate()->getUnixTimestamp()
-//        && mktime() < $submission->getLateDate()->getUnixTimestamp()
-//        && $submission->getAcceptOnline())
-//    {
-//        $this->parse('action_submit_block', 'action_submit');
-//    }
-//    else {
-//        $this->setVar('action_submit_block','');
-//    }
-//
+if (isset($recent_submission)) {
+
+   /* Show most recent submission
+    * Hide Submit form
+    * If multi-submit is enabled, show the Resubmit form
+    * Find out whether the latest submission was overdue
+    */
+
+    // override the due gradient because we have submitted
+    $this->setVar('BOX_DUEDATE_GRADIENT', 'black');
+
+    if ($recent_submission->getDate()->getUnixTimestamp() > $submission->getDueDate()->getUnixTimestamp()) {
+        $this->setVar('OVERDUE', 'overdue');
+        $this->parse('overdue_block', 'overdue');
+    }
+    else {
+        $this->setVar('OVERDUE','');
+        $this->setVar('overdue_block', '');
+    }
+
+    $recentSubmissionDate = new Alaress_Date_Relative($recent_submission->getDate(), 'U');
+
+    // get filetype details
+    $ext   = pathinfo($recent_submission->getSubmission()->getFilename(), PATHINFO_EXTENSION);
+    $mime  = $allowedHandler->getMime($ext);
+    $ftype = $allowedHandler->getByField('mime', $mime);
+
+    // get filesize (isn't cached on db table, unfortunately)
+    $filename = Cfg::get('submission_dir') . '/' . $recent_submission->getSubmission()->getId() . '.dat';
+    if(file_exists($filename)) {
+        $size = Alaress_Byte_Format::bytesToString(filesize($filename));
+    } else {
+        $size = '0 KB';
+    }
+
+	// populate details into page
+    $this->setVar(array(
+        'MOST_RECENT_SUBMISSION_FILE_NAME'  => $recent_submission->getSubmission()->getFilename(),
+        'MOST_RECENT_SUBMISSION_FILE_SIZE'  => $size,
+        'MOST_RECENT_SUBMISSION_FILE_THUMB' => $ftype['iconFile'],
+        'MOST_RECENT_SUBMISSION_FILE_DATE ' => $recentSubmissionDate->getRelativeTime(),
+        'MOST_RECENT_SUBMISSION_FILE_ID'    => $recent_submission->getSubmission()->getId(),
+    ));
+
+
+	// if we are the owning student, display plagiarism details if they are available
+	if($userID == $_SESSION['id'] && Config::get('plagscan_student_visible')) {
+
+		// retrieve plagiarism score, if available
+		$docMapper = Plagscan_DocumentMapper::getInstance();
+		$plagDoc = $docMapper->findByColumn('file_id', $recent_submission->getSubmission()->getId())->current();
+		// test: $plagDoc = $docMapper->findByColumn('file_id', 9)->current();
+
+		// if we retrieved a plag document, use it and display to the student
+		if($plagDoc->id && $plagDoc->status == Plagscan_Document::STATUS_COMPLETE) {
+
+			// what colour should the plagiarism text be, and what should the tooltip say?
+			if($plagDoc->score > 60) {
+				$status = 'critical';
+				$tooltip = 'Your submission is extremely similar to other documents scanned.';
+			}
+			elseif($plagDoc->score > 20) {
+				$status = 'warn';
+				$tooltip = 'Your submission is somewhat similar to other documents scanned.';
+			}
+			else {
+				$status = 'ok';
+				$tooltip = 'Your submission is quite different to other documents scanned.';
+			}
+
+			$this->setVar(array(
+				'MOST_RECENT_SUBMISSION_FILE_PLAG_CLASS' => $status,
+				'MOST_RECENT_SUBMISSION_FILE_PLAGSCORE' => $plagDoc->score,
+				'MOST_RECENT_SUBMISSION_FILE_PLAG_TITLE' => $tooltip,
+			));
+			$this->parse('plag_score_block', 'plag_score');
+		}
+		else {
+			$this->setVar('plag_score_block', '');
+		}
+	}
+	else {
+		$this->setVar('plag_score_block', '');
+	}
+
+	$submission->getOpenDate();
+	$submission->getAcceptMultiple();
+    // only allow a resubmission if the current user is the owner, if the submission box is accepting submissions, and if the current time is between open and late
+    if(
+        $userID == $_SESSION['id'] &&
+        (mktime() > $submission->getOpenDate()->getUnixTimestamp()) &&
+        (mktime() < $submission->getLateDate()->getUnixTimestamp()) &&
+        $submission->getAcceptOnline() &&
+        $submission->getAcceptMultiple()
+    ) {
+        $this->parse('action_resubmit_block', 'action_resubmit');
+    } else {
+        $this->setVar('action_resubmit_block', '');
+    }
+
+    // if parent, hide the "view submitted work" button
+    if($parentOnly) {
+        $this->setVar('recent_submission_block', '');
+    } else {
+        $this->parse('recent_submission_download_block', 'recent_submission_download');
+        $this->parse('recent_submission_block', 'recent_submission');
+    }
+
+}
+else {
+    /* Hide most recent submission
+     * Show Submit form
+     * Hide the Resubmit form
+     */
+    if ($userID == $_SESSION['id']
+        && mktime() > $submission->getOpenDate()->getUnixTimestamp()
+        && mktime() < $submission->getLateDate()->getUnixTimestamp()
+        && $submission->getAcceptOnline())
+    {
+        $this->parse('action_submit_block', 'action_submit');
+    }
+    else {
+        $this->setVar('action_submit_block','');
+    }
+
     $this->setVar('recent_submission_block', '');
     $this->setVar('action_resubmit_block', '');
-//
-//}
+
+}
 
 if (!in_array($submission->getCategory()->getId(), $categoryIDList)) {
     $this->setVar(array(
