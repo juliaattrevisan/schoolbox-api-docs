@@ -15,7 +15,14 @@ class Eportfolio_Authenticator {
 	 *
 	 * @var int
 	 */
-	private $userId = -1;
+	private $currentUserId = -1;
+
+	/**
+	 * The owner id for the page being viewed
+	 *
+	 * @var int
+	 */
+	private $ownerId = -1;
 
 	/**
 	 * The eportfolio page currently being viewed
@@ -48,16 +55,18 @@ class Eportfolio_Authenticator {
 	/**
 	 * Constructor
 	 *
-	 * @param $userId
+	 * @param $currentUserId
+	 * @param $ownerId
 	 * @param $pageId
 	 */
-	public function __construct($userId, $pageId) {
-		$this->setUserId($userId);
+	public function __construct($currentUserId, $ownerId, $pageId) {
+		$this->setCurrentUserId($currentUserId);
+		$this->setOwnerId($ownerId);
 		$this->setPageId($pageId);
 
 		$this->setUserHandler(new User());
 		$this->setGroupHandler(new Group(HOMEPAGE_SERVICE));
-		$this->setEportfolioHandler(new Eportfolio($this->getUserId(), $this->getPageId()));
+		$this->setEportfolioHandler(new Eportfolio($this->getOwnerId(), $this->getPageId()));
 	}
 
 	/**
@@ -66,14 +75,13 @@ class Eportfolio_Authenticator {
 	 * @return bool
 	 */
 	public function canView() {
-		$owner = $this->getUserHandler()->getByID($this->getEportfolioHandler()->getSettingsPageOwner());
 
 		/* If $user can modify page, continue; otherwise die
 		 * Superusers, staff and page owners can view contents.
 		 * Selected parents, groups and individuals can view contents.
 		 */
 		$youAreAdmin = $this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff();
-		$youArePageOwner = ($owner['uid'] == $this->getUserId());
+		$youArePageOwner = ($this->getEportfolioHandler()->getSettingsPageOwner() == $this->getCurrentUserId());
 
 		/* The current user can either be in a group, be a parent, or be an individual (or all three)
 		 * who has/have been given View access to a particular page.
@@ -88,7 +96,7 @@ class Eportfolio_Authenticator {
 			$current = $parentSettingCollection->current();
 
 			if (($current['value'] == 1) && $this->getGroupHandler()->isParentOfChild($this->getEportfolioHandler()->getSettingsPageOwner())) {
-				return true;
+				$youCanView = true;
 			}
 		}
 
@@ -96,7 +104,7 @@ class Eportfolio_Authenticator {
 		 */
 		$permittedGroups = array();
 
-		$allGroups = $this->getGroupHandler()->involvedInCategoryList($this->getUserId());
+		$allGroups = $this->getGroupHandler()->involvedInCategoryList($this->getCurrentUserId());
 
 		if (is_array($allGroups) && count($allGroups)) {
 			foreach($allGroups as $currentGroup) {
@@ -105,10 +113,23 @@ class Eportfolio_Authenticator {
 
 			$groupSettingCollection = Eportfolio_PermissionMapper::getInstance()->findValues($this->getPageId(), 'group', $permittedGroups);
 
-			print_r($groupSettingCollection);
-
+			if (count($groupSettingCollection)) {
+				$youCanView = true;
+			}
 		}
 
+		/* And now check individual permissions
+		 */
+		$permittedIndividuals = array($this->getCurrentUserId());
+
+		$individualSettingCollection = Eportfolio_PermissionMapper::getInstance()->findValues($this->getPageId(), 'student', $permittedIndividuals);
+
+		if (count($individualSettingCollection)) {
+			$youCanView = true;
+		}
+
+		/* And now...the conclusion.
+		 */
 		if ($youAreAdmin || $youArePageOwner || $youCanView) {
 			return true;
 		}
@@ -187,21 +208,21 @@ class Eportfolio_Authenticator {
 	}
 
 	/**
-	 * Set user id
+	 * Set owner id
 	 *
-	 * @param int $userId
+	 * @param int $ownerId
 	 */
-	private function setUserId($userId) {
-		$this->userId = $userId;
+	private function setOwnerId($ownerId) {
+		$this->ownerId = $ownerId;
 	}
 
 	/**
-	 * Get user id
+	 * Get owner id
 	 *
 	 * @return int
 	 */
-	private function getUserId() {
-		return $this->userId;
+	private function getOwnerId() {
+		return $this->ownerId;
 	}
 
 	/**
@@ -220,5 +241,23 @@ class Eportfolio_Authenticator {
 	 */
 	private function getEportfolioHandler() {
 		return $this->eportfolioHandler;
+	}
+
+	/**
+	 * Set current user id
+	 *
+	 * @param int $currentUserId
+	 */
+	private function setCurrentUserId($currentUserId) {
+		$this->currentUserId = $currentUserId;
+	}
+
+	/**
+	 * Get current user id
+	 *
+	 * @return int
+	 */
+	private function getCurrentUserId() {
+		return $this->currentUserId;
 	}
 }
