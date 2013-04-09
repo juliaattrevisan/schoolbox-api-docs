@@ -975,7 +975,7 @@ class Eportfolio {
 	 *
 	 * @return int
 	 */
-	private function getUserId() {
+	public function getUserId() {
 		return $this->userId;
 	}
 
