@@ -38,8 +38,6 @@ override_dh_install:
 	rm -fR www/modules/leave.php
 	cp -a --parents library/Leave $(CURDIR)/leave
 	rm -fR library/Leave
-	cp -a --parents sql/*leave.sql $(CURDIR)/leave
-	rm -fR sql/*leave.sql
 	cp -a --parents sql/modules/leave $(CURDIR)/leave
 	rm -fR sql/modules/leave
 	## End Leave Module
