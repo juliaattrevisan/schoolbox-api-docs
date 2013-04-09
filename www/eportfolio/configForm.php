@@ -137,6 +137,8 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 		 */
 		else if (isset($_POST['update']) && ($_POST['update'] == 'permissions')) {
 			Eportfolio_PermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'], $_POST['individual_permission']);
+
+			SitePage::localRedir("/eportfolio/{$eportfolioHandler->getUserId()}/{$eportfolioHandler->getPageId()}");
 		}
 		/* GET config options from homepage
 		 */
