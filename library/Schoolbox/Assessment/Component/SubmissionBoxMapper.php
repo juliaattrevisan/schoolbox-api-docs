@@ -595,6 +595,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			FROM {$this->getTable()} sb
 			INNER JOIN {$this->getJoinSql('category', 'sb', 'c')}
 			WHERE $where
+			ORDER BY c.name ASC
 		";
 		$statement = $this->database->prepare($query);
 		$statement->execute($params);
