@@ -59,10 +59,11 @@ class File extends DeprecatedModel {
 
             $filter_sql = array(
                 'document' => " OR ( f.mime_type LIKE '%pdf%' OR f.mime_type LIKE '%msword' OR f.mime_type LIKE '%officedoc%' OR f.mime_type LIKE '%rtf' OR f.mime_type LIKE 'text%' OR f.mime_type LIKE '%document%' OR f.mime_type LIKE '%powerpoint%') ",
-                'image' => " OR ( f.mime_type LIKE '%image%' ) ", 'audio' => " OR ( f.mime_type LIKE '%audio%' ) ",
+                'image' => " OR ( f.mime_type LIKE '%image%' ) ",
+                'audio' => " OR ( f.mime_type LIKE '%audio%' ) ",
                 'video' => " OR ( f.mime_type LIKE '%video%' OR f.mime_type LIKE '%flash%' OR f.mime_type LIKE '%realmedia%' ) ",
-                'other' => " OR ( f.mime_type LIKE 'application%' AND f.mime_type NOT LIKE '%pdf' AND f.mime_type NOT LIKE '%msword' AND f.mime_type NOT LIKE '%rtf' AND f.mime_type NOT LIKE 'text%' AND f.mime_type NOT LIKE '%document%' AND f.mime_type NOT LIKE '%powerpoint%') "
             );
+            $filter_sql['other'] = ' OR NOT (1=2 '.$filter_sql['document'].$filter_sql['image'].$filter_sql['audio'].$filter_sql['video'].')';
 
             foreach ( $config['filter'] as $filter ) {
                 if ( array_key_exists($filter, $filter_sql) ) {
