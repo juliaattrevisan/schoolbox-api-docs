@@ -9,7 +9,6 @@
 
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox;
-//use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 class DAV_SubjectServer_Assessment extends Sabre_DAV_SimpleCollection
 {
@@ -58,11 +57,28 @@ class DAV_SubjectServer_Assessment extends Sabre_DAV_SimpleCollection
 	}
 
 	/**
-	 * Loads the child student submissions from this assessment.
+	 * Currently, assessment items have no displayed children. Later, the
+	 * assessment box could include the student's submissions.
 	 *
 	 * @return $this
 	 */
 	public function loadChildren() {
 		return $this;
+	}
+
+	/**
+	 * Uploads a student submission to the assessment.
+	 *
+	 * @todo implement once student submission mapper is merged.
+	 *
+	 * @param string          $name
+	 * @param string|resource $data
+	 *
+	 * @return null ETags aren't relevant because the file isn't viewable after
+	 *              being uploaded.
+	 */
+	public function createFile($name, $data = null) {
+		parent::createDirectory($name, $data);
+		return null;
 	}
 }
