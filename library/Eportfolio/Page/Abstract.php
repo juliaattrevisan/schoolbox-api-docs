@@ -39,6 +39,13 @@ abstract class Eportfolio_Page_Abstract {
 	protected $userHandler = null;
 
 	/**
+	 * An instance of groupHandler
+	 *
+	 * @var null
+	 */
+	protected $groupHandler = null;
+
+	/**
 	 * An instance of eportfolioHandler
 	 *
 	 * @var null
@@ -63,6 +70,7 @@ abstract class Eportfolio_Page_Abstract {
 		$this->setPage($page);
 		$this->setPageId($pageId);
 		$this->setUserHandler(new User());
+		$this->setGroupHandler(new Group());
 
 		/* Check that the user exists
 		 */
@@ -290,5 +298,23 @@ abstract class Eportfolio_Page_Abstract {
 	 */
 	protected function getEportfolioHandler() {
 		return $this->eportfolioHandler;
+	}
+
+	/**
+	 * Set group handler
+	 *
+	 * @param null $groupHandler
+	 */
+	protected function setGroupHandler($groupHandler) {
+		$this->groupHandler = $groupHandler;
+	}
+
+	/**
+	 * Get group handler
+	 *
+	 * @return null
+	 */
+	protected function getGroupHandler() {
+		return $this->groupHandler;
 	}
 }
