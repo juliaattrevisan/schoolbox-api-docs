@@ -13,11 +13,10 @@ class File extends DeprecatedModel {
     function getByID ($fileID) {
         $query = "SELECT f.*, concat(substring(u.firstname,1,1),' ',u.lastname) ownerName,
 						UNIX_TIMESTAMP(f.submitted) submitted, UNIX_TIMESTAMP(f.modified) modified,
-						ft.name typeName, c.name categoryName, c.id cid, af.description as mimeDescription, iconFile, af.inline
+						c.name categoryName, c.id cid, af.description as mimeDescription, iconFile, af.inline
 				  FROM file f
 				  LEFT JOIN user u ON u.id = f.owner
 				  LEFT JOIN category c ON c.id = f.category
-				  LEFT JOIN file_type ft ON ft.id = f.type
 				  LEFT JOIN allowedFileTypes af ON f.mime_type = af.mime
 				  WHERE f.id = '$fileID' AND deleted = 0";
         return $this->db->getRow($query);
@@ -38,11 +37,10 @@ class File extends DeprecatedModel {
 
         $query = "SELECT f.*, u.firstname, u.lastname, u.title,
 						UNIX_TIMESTAMP(f.submitted) submitted, UNIX_TIMESTAMP(f.modified) modified,
-						ft.name typeName, c.name categoryName, af.description as mimeDescription, iconFile, af.inline
+						c.name categoryName, af.description as mimeDescription, iconFile, af.inline
 				  FROM file f
 				  LEFT JOIN user u ON u.id = f.owner
 				  LEFT JOIN category c ON c.id = f.category
-				  LEFT JOIN file_type ft ON ft.id = f.type
 				  LEFT JOIN allowedFileTypes af ON f.mime_type = af.mime
 				  LEFT JOIN submission_box sb on sb.fid = f.id
 				  WHERE f.category $cats AND f.deleted = '0' ";
