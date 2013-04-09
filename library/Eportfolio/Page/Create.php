@@ -9,13 +9,6 @@
  */
 class Eportfolio_Page_Create extends Eportfolio_Page_Abstract {
 
-	/**
-	 * An instance of groupHandler
-	 *
-	 * @var null
-	 */
-	private $groupHandler = null;
-
 	/*** The template file to use
 	 *
 	 * @var string
@@ -100,26 +93,5 @@ class Eportfolio_Page_Create extends Eportfolio_Page_Abstract {
 		$this->getPage()->setVar(array(
 			'STUDENT_GROUP_IDS' => implode(',', $this->getGroupHandler()->getStudentGroupTypeIds())
 		));
-	}
-
-	/* Getters/Setters
-	 */
-
-	/**
-	 * Set group handler
-	 *
-	 * @param null $groupHandler
-	 */
-	private function setGroupHandler($groupHandler) {
-		$this->groupHandler = $groupHandler;
-	}
-
-	/**
-	 * Get group handler
-	 *
-	 * @return null
-	 */
-	private function getGroupHandler() {
-		return $this->groupHandler;
 	}
 }
