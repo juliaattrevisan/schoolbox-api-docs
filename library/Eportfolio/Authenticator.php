@@ -53,6 +53,13 @@ class Eportfolio_Authenticator {
 	private $eportfolioHandler = null;
 
 	/**
+	 * These pages are always visible to everyone
+	 *
+	 * @var array
+	 */
+	private $publicPages = array('profile', 'showcase');
+
+	/**
 	 * Constructor
 	 *
 	 * @param $currentUserId
@@ -128,6 +135,12 @@ class Eportfolio_Authenticator {
 			$youCanView = true;
 		}
 
+		/* These pages are always public
+		 */
+		if (in_array($this->getPageId(), $this->getPublicPages())) {
+			$youCanView = true;
+		}
+
 		/* And now...the conclusion.
 		 */
 		if ($youAreAdmin || $youArePageOwner || $youCanView) {
@@ -143,6 +156,7 @@ class Eportfolio_Authenticator {
 	 * @return bool
 	 */
 	public function canModify() {
+
 		/* If $user can modify page, continue; otherwise die
 		 * Superusers, staff and page owners can view contents.
 		 * Selected parents, groups and individuals can view contents.
@@ -150,9 +164,15 @@ class Eportfolio_Authenticator {
 		$youAreAdmin = $this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff();
 		$youArePageOwner = ($this->getEportfolioHandler()->getSettingsPageOwner() == $this->getCurrentUserId());
 
+		/* These pages are always public
+		 */
+		if (in_array($this->getPageId(), $this->getPublicPages())) {
+			$youCanView = true;
+		}
+
 		/* And now...the conclusion.
 		 */
-		if ($youAreAdmin || $youArePageOwner) {
+		if ($youAreAdmin || $youArePageOwner || $youCanView) {
 			return true;
 		}
 
@@ -268,5 +288,23 @@ class Eportfolio_Authenticator {
 	 */
 	private function getCurrentUserId() {
 		return $this->currentUserId;
+	}
+
+	/**
+	 * Set public pages
+	 *
+	 * @param array $publicPages
+	 */
+	private function setPublicPages($publicPages) {
+		$this->publicPages = $publicPages;
+	}
+
+	/**
+	 * Get public pages
+	 *
+	 * @return array
+	 */
+	private function getPublicPages() {
+		return $this->publicPages;
 	}
 }

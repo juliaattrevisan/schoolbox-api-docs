@@ -48,7 +48,7 @@ class Eportfolio_Page_Factory {
 		else if ($pageId == 'create') {
 			$eportfolioPage = new Eportfolio_Page_Create($page, $userId, $pageId, $permissionValue);
 		}
-		else {
+		else if ($pageId == 'profile') {
 			$eportfolioPage = new Eportfolio_Page_Profile($page, $userId, $pageId, $permissionValue);
 		}
 
