@@ -121,13 +121,6 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		if ($this->getPermission() > WRITE_ACCESS) {
 			$this->renderTabList();
 			$this->renderColours();
-
-			$this->getPage()->setVar(array(
-				'edit_page_block' => '',
-				'modify_layout_block' => '',
-				'customise_page_block' => '',
-				'colour_list_block' => '',
-			));
 		}
 
 		$this->renderDefaultColours();
