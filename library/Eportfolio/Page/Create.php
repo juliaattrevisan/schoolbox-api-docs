@@ -37,7 +37,7 @@ class Eportfolio_Page_Create extends Eportfolio_Page_Abstract {
 	 */
 	protected function render() {
 		$this->renderTemplateList();
-		$this->renderGroupList();
+		$this->renderGroupPermissions();
 		$this->renderIndividualPermissions();
 	}
 
@@ -63,9 +63,9 @@ class Eportfolio_Page_Create extends Eportfolio_Page_Abstract {
 	}
 
 	/**
-	 * Render group list
+	 * Render group permissions
 	 */
-	private function renderGroupList() {
+	private function renderGroupPermissions() {
 		$allGroups = $this->getGroupHandler()->involvedInCategoryList($this->getUserId(), false);
 
 		if (is_array($allGroups) && count($allGroups)) {
