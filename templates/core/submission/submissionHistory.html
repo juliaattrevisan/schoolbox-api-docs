@@ -147,8 +147,7 @@
             <h3>Resubmit work</h3>
 
             <form method="post" action="/submission/submitWorkForm.php" class="clearfix" enctype="multipart/form-data">
-                <p>You may resubmit your work by locating the file on your drive.
-                    Make sure the file is saved and closed before submitting the form.</p>
+                <p>You may resubmit your work by locating the file on your drive, or by entering it online.</p>
                 <input type="file" class="prettify" name="file"/>
                 <label class="clearfix">
                     <input type="hidden" name="box_id" value="{BOX_ID}"/>
@@ -157,6 +156,7 @@
                     <input type="submit" name="Submit2" value="Submit" class="submit-btn-plain"/>
                 </label>
             </form>
+            <a href="/submission/submitOnline/{BOX_ID}" class="submit-btn-plain edit-online">Edit Online</a>
             <!-- END action_resubmit -->
             <!-- END recent_submission -->
             <!-- BEGIN action_submit -->
