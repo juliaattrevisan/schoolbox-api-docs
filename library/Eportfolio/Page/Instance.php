@@ -394,12 +394,18 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		}
 	}
 
+	/**
+	 * Render all permissions for a page
+	 */
 	private function renderPermissions() {
 		$this->renderParentPermissions();
 		$this->renderGroupPermissions();
 		$this->renderIndividualPermissions();
 	}
 
+	/**
+	 * Render parent permissions
+	 */
 	private function renderParentPermissions() {
 	}
 
