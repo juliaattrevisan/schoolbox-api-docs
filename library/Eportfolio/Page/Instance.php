@@ -118,7 +118,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 	protected function render() {
 		$this->renderComponents();
 
-		if ($this->getPermission() < WRITE_ACCESS) {
+		if ($this->getPermission() > WRITE_ACCESS) {
 			$this->renderTabList();
 			$this->renderColours();
 
