@@ -12,13 +12,12 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 	 */
 	$eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
 
-	$userHandler = new User();
-	$user = $userHandler->getByID($eportfolioHandler->getSettingsPageOwner());
+	$authenticator = new Eportfolio_Authenticator($_SESSION['id'], $eportfolioHandler->getSettingsPageOwner(), $_POST['page_id']);
 
 	/* If $user can modify page, continue; otherwise die
 	 * Superusers, staff and page owners can modify contents/settings.
 	 */
-	if ($groupHandler->isSuperuser() || $groupHandler->isStaff() || $user['id'] == $_SESSION['id']) {
+	if ($authenticator->canModify()) {
 		$componentInstanceMapper = Component_InstanceMapper::getInstance();
 		$componentConfigInstanceMapper = Component_ConfigMapper::getInstance();
 
@@ -97,7 +96,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 
 			$instanceID = $ids[0];
 
-			$componentInstanceMapper->cascadeSequence($user['uid']);
+			$componentInstanceMapper->cascadeSequence($eportfolioHandler->getSettingsPageOwner());
 
 			// get the Instance's Definition's Controller
 			$factory = new Component_Eportfolio_Factory(new User(), new SitePage(false));
