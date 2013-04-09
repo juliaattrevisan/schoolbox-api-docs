@@ -116,12 +116,12 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 	 * Render everything
 	 */
 	protected function render() {
-		if ($this->getPermission() > WRITE_ACCESS) {
-			$this->renderComponents();
+		$this->renderComponents();
+
+		if ($this->getPermission() < WRITE_ACCESS) {
 			$this->renderTabList();
 			$this->renderColours();
-		}
-		else {
+
 			$this->getPage()->setVar(array(
 				'edit_page_block' => '',
 				'modify_layout_block' => '',
