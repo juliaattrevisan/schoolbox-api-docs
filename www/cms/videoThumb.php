@@ -14,16 +14,17 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
 if (is_numeric($_GET['id'])) {
 	$page = new SitePage;
 	$groupHandler = new Group;
-	$fileHandler = new File;
 
-	$file = $fileHandler->getByID($_GET['id']);
-	if (!is_array($file))
+	$videoQueueMapper = new \Schoolbox\Video\ResourceVideoMapper();
+	$video = $videoQueueMapper->findById($_GET['id']);
+
+	if (!is_object($video))
 		error(41);
 
-	if ($groupHandler->getPermission($file['category']) < READ_ACCESS)
+	if ($groupHandler->getPermission($video->getFile()->getFolder()) < READ_ACCESS)
 		error(5);
 
-	$filename = Cfg::get('video_dir') . '/' . $_GET['id'] . '-64.jpg';
+	$filename = $video->getThumbnailLocation();
 
 	if(is_readable($filename) ) {
 		$filesize = filesize($filename);

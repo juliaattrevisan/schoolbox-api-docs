@@ -12,12 +12,13 @@
  * @link        http://www.alaress.com.au
  */
 
-use \Schoolbox\Video;
+use \Schoolbox\Video\QueueMapper;
+use \Schoolbox\Video\Queue;
 
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 
-$mapper = new \Schoolbox\Video\QueueMapper();
+$mapper = new QueueMapper();
 
 $database = Database::getInstance();
 
@@ -33,11 +34,11 @@ while($pendingFile = $stmt->fetch() ){
 
 	print_r($pendingFile);
 
-	$videoQ = new \Schoolbox\Video\Queue();
+	$videoQ = new Queue();
 
 	$videoQ->setFileID($pendingFile['id']);
-	$videoQ->setStatus( \Schoolbox\Video\QueueMapper::STATUS_PENDING );
-	$videoQ->setType( \Schoolbox\Video\QueueMapper::FILE_TYPE_SBFS);
+	$videoQ->setStatus( QueueMapper::STATUS_PENDING );
+	$videoQ->setType( QueueMapper::FILE_TYPE_SBFS);
 
 	$mapper->save($videoQ);
 
