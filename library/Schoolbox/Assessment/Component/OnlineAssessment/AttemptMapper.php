@@ -117,7 +117,10 @@ class AttemptMapper extends Mapper {
 		$attempts = array();
 		foreach ($statement as $row) {
 			if (!array_key_exists($row['assess_id'], $attempts) && $row['max_mark'] != 0) {
-				$attempts[$row['assess_id']] = ($row['mark'] / $row['max_mark']) * 100;
+				$attempts[$row['assess_id']] = array(
+					'mark' => ($row['mark'] / $row['max_mark']) * 100,
+					'date' => $row['start'],
+				);
 			}
 		}
 		return $attempts;

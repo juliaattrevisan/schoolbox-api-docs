@@ -413,7 +413,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	/**
 	 * Conversion of SubmissionBoxHandler->getAllDueWork().
 	 *
-	 * @todo look at implementing as an activity list
+	 * @todo Implement this as an activity list instead of an array return
 	 *
 	 * @param int   $user_id    The user ID to retrieve for.
 	 * @param array $categories The categories to search for.
@@ -431,6 +431,28 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$params['user_id']     = $user_id;
 		$params['month_start'] = $months['start'];
 		$params['month_end']   = $months['end'];
+
+//		//
+//		// Get dumbed down activity feed from due work page instead.
+//		// Get all items which $user_id owns?
+//
+//		$query = "
+//			SELECT
+//				{$this->getColumnString('sb')},
+//				{$this->getJoinMapper('category')->getColumnString('c')}
+//			FROM {$this->getTable()} sb
+//			LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
+//			WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
+//			AND YEAR(sb.date) = :year
+//			AND MONTH(sb.date) BETWEEN :month_start AND :month_end
+//			ORDER BY c.name ASC, sb.created DESC
+//		";
+//
+//		//
+//		// For each of these: load most recent submission and return. Attach
+//		// whatever the most recent one is.
+//
+
 		$query = "
 		    SELECT
 			b.id AS bid,
@@ -561,8 +583,4 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 
 		return $collection;
 	}
-
-//	public function getSubmissionHistory() {
-//
-//	}
 }

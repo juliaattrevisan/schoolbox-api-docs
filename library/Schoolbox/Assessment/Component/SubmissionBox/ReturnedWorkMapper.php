@@ -185,7 +185,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 
 
 		$query = "
-			SELECT sb.id AS box_id, sr.norm_mark
+			SELECT sb.id AS box_id, sr.norm_mark, sr.returned
 			FROM {$this->getTable()} sr
 			LEFT JOIN {$this->getJoinSql('submission_box', 'sr', 'sb')}
 			WHERE $filters
@@ -201,7 +201,10 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 			$box_id = $row['box_id'];
 			$mark   = $row['norm_mark'];
 			if (!array_key_exists($box_id, $marks)) {
-				$marks[$box_id] = $mark;
+				$marks[$box_id] = array(
+					'mark' => $mark,
+					'date' => $row['returned'],
+				);
 			}
 		}
 		return $marks;

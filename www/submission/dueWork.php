@@ -312,11 +312,16 @@ foreach ($categoryList as $category) {
     $categoryIDs[] = $categoryID;
     $categoryCode = $category['code'] ? '(' . $category['code'] . ')' : '';
 
-    // retrieve subject grades
+    //
+    // retrieve subject grades.
+    // Ensure that grades are properly ordered by date.
     $studentGrades = array_merge(
         $return_mapper->getStudentMarks($category['id'], $userID, array('visibility' => $visibilities)),
         $assess_mapper->getStudentMarks($category['id'], $userID)
     );
+    usort($studentGrades, function($a, $b) { return $a['date'] > $b['date'] ? -1 : 1; });
+    $studentGrades = array_map(function($row) { return $row['mark']; }, $studentGrades);
+
     $gradeAvg    = -1;
     $grade_count = count($studentGrades);
     if ($grade_count > 0) {
