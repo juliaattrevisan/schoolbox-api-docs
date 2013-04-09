@@ -567,25 +567,66 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	 * Retrieves all submission boxes which take online submissions within a
 	 * given category.
 	 *
-	 * @param int $category_id The category to search
 	 * @param int $user_id     The user to filter submissions for
+	 * @param int $category_id If set, restrict results to this category.
 	 *
 	 * @return \Collection
 	 */
-	public function getSubmittable($category_id, $user_id) {
-		$query = "
-			SELECT {$this->getColumnString('sb')}
-			FROM {$this->getTable()} sb
-			WHERE sb.category=?
-			AND sb.late_date < NOW()
-			AND sb.accept_submission IS TRUE
-			AND (
+	public function getSubmittable($user_id, $category_id = null) {
+		//
+		// TODO update this query when student submission model is merged
+		$cat_mapper  = $this->getJoinMapper('category');
+		$params      = array($user_id);
+		$where_parts = array(
+			'sb.late_date < NOW()',
+			'sb.accept_submission IS TRUE',
+			'(
 				sb.multi_submission IS TRUE
 				OR (SELECT count(*) FROM student_submission ss WHERE sb.id=ss.box_id AND ss.owner=?) = 0
-			)
+			)'
+		);
+		if ($category_id) {
+			$params[]      = $category_id;
+			$where_parts[] = 'sb.category=?';
+		}
+		$where = implode(' AND ', $where_parts);
+		$query = "
+			SELECT {$this->getColumnString('sb')}, {$cat_mapper->getColumnString('c')}
+			FROM {$this->getTable()} sb
+			INNER JOIN {$this->getJoinSql('category', 'sb', 'c')}
+			WHERE $where
 		";
 		$statement = $this->database->prepare($query);
-		$statement->execute(array($category_id, $user_id));
-		return $this->hydrateList($statement, 'sb');
+		$statement->execute($params);
+
+		//
+		// Load categories.
+		$collection = $this->hydrateList($statement, 'sb', function($mapper, $model, $row) use ($cat_mapper) {
+			$model->setCategory($cat_mapper->hydrate($row, 'c'));
+			return $model;
+		});
+
+		//
+		// Load category codes too.
+		$category_ids = array();
+		foreach ($collection as $submission) {
+			$category_ids[] = $submission->getCategory()->getId();
+		}
+
+		$cat_code_mapper = $cat_mapper->getJoinMapper('codes');
+		$grouped_codes   = array();
+		foreach ($cat_code_mapper->findForCategories(array_unique($category_ids)) as $code) {
+			$grouped_codes[$code->getCategory()->getId()][] = $code;
+		}
+		foreach ($collection as $submission) {
+			$cat_id = $submission->getCategory()->getId();
+			if (!empty($grouped_codes[$cat_id])) {
+				foreach ($grouped_codes[$cat_id] as $code) {
+					$submission->getCategory()->addCode($code);
+				}
+			}
+		}
+
+		return $collection;
 	}
 }

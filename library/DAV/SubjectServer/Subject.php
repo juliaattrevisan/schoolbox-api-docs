@@ -64,7 +64,7 @@ class DAV_SubjectServer_Subject extends Sabre_DAV_SimpleCollection
 	 */
 	public function loadChildren() {
 		$mapper = new SubmissionBoxMapper();
-		foreach ($mapper->getSubmittable($this->getSubject()->getId(), $this->getUser()->getId()) as $assessment) {
+		foreach ($mapper->getSubmittable($this->getUser()->getId(), $this->getSubject()->getId()) as $assessment) {
 			$child = new DAV_SubjectServer_Assessment($assessment->getName());
 			$child
 				->setAssessment($assessment)
