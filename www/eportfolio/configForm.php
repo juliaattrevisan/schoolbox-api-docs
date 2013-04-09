@@ -38,6 +38,8 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 		 */
 		else if (isset($_POST['user_id']) && is_numeric($_POST['user_id']) && strlen(trim($_POST['pageTitle']))) {
 			$eportfolioHandler->updatePageTitle(trim($_POST['pageTitle']));
+
+			SitePage::localRedir("/eportfolio/{$eportfolioHandler->getUserId()}/{$eportfolioHandler->getPageId()}");
 		}
 		/* Ajax request for drag and drop of components
 		 */
@@ -229,6 +231,7 @@ else {
 
 		/* Redirect to newly created page
 		 */
+		SitePage::localRedir("/eportfolio/{$eportfolioHandler->getUserId()}/{$eportfolioHandler->getPageId()}");
 	}
 	else {
 		error(2);
