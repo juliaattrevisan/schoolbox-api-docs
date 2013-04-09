@@ -27,8 +27,9 @@ class Autoloader {
         /* Set root path */
         self::$rootPath = realpath( dirname(__FILE__) . '/..' );
 
-        /* Register with PHP */
-        spl_autoload_register( array('Autoloader', 'load') );
+        /* Register autoloaders with PHP */
+        spl_autoload_register(array('Autoloader', 'load'));
+        spl_autoload_register(array('Autoloader', 'deprecatedLoad'));
 
         /* Add include paths */
         if ( is_array(self::$includePathArray) && !empty(self::$includePathArray) ) {
@@ -39,19 +40,32 @@ class Autoloader {
     }
 
     /**
-     * @param String $className The name of the class to be included
+     * New-style autoloader - attempts to load the class using the more
+     * efficient method in getClassFile().
+     *
+     * This method is used in preference to deprecatedLoad().
+     *
+     * @param string $class_name The name of the class to be included
+     *
      * @return void
      */
-    public static function load ($className) {
-
-        /* Try loading old style first as it is most used */
-        if ( $deprecatedClassFile = self::getDeprecatedClassFile($className) ) {
-            self::includeFile($deprecatedClassFile);
+    public static function load($class_name) {
+        if ($class_file = self::getClassFile($class_name)) {
+            self::includeFile($class_file);
         }
+    }
 
-        /* Try standardized style */
-        else if ( $classFile = self::getClassFile($className) ) {
-            self::includeFile($classFile);
+    /**
+     * Old-style autoloader - attempts to load the class using the much less
+     * efficient method in getDeprecatedClassFile().
+     *
+     * @param string $class_name The name of the class to be included
+     *
+     * @return void
+     */
+    public static function deprecatedLoad($class_name) {
+        if ($class_file = self::getDeprecatedClassFile($class_name)) {
+            self::includeFile($class_file);
         }
     }
 
@@ -61,6 +75,15 @@ class Autoloader {
      */
     private static function getClassFile ($className) {
         $classSegments = preg_split('/[_\\\\]/', $className);
+
+        //
+        // For efficiency - attempt to load this filename with the PEAR standard
+        // class name first.
+        $ideal_filename = implode('/', $classSegments).'.php';
+        if (self::fileExists($ideal_filename)) {
+            return $ideal_filename;
+        }
+
         $unqualClassName = $classSegments[count($classSegments) - 1];
         $pathSegments = $classSegments;
 
