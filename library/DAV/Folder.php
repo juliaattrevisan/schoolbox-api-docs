@@ -95,7 +95,7 @@ class DAV_Folder extends Sabre_DAV_Collection {
 			$user_mapper = new UserMapper();
 			$this->subject_list
 				->setUser($user_mapper->findById($_SESSION['id']))
-				->loadChildrenFromUser();
+				->loadChildren();
 			return $this->subject_list;
 		}
         if($this->isFolder($name, $this->getFolderID())) {

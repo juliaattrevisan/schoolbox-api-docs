@@ -61,12 +61,14 @@ class DAV_SubjectServer_SubjectList extends Sabre_DAV_SimpleCollection {
 	 *
 	 * @return $this
 	 */
-	public function loadChildrenFromUser() {
+	public function loadChildren() {
 		$subject_mapper = new SubjectMapper();
 		foreach ($subject_mapper->findAllForStudent($this->getUser()) as $subject) {
-			$name  = sprintf('%s (%s)', $subject->getName(), $subject->getCode());
-			$child = new DAV_SubjectServer_Subject($name);
-			$child->setSubject($subject)->loadChildrenFromSubject();
+			$child = new DAV_SubjectServer_Subject(sprintf('%s (%s)', $subject->getName(), $subject->getCode()));
+			$child
+				->setSubject($subject)
+				->setUser($this->getUser())
+				->loadChildren();
 			$this->addChild($child);
 		}
 		return $this;

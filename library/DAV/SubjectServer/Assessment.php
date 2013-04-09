@@ -6,15 +6,25 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+
+use Schoolbox\User;
+use Schoolbox\Assessment\Component\SubmissionBox;
+//use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+
 class DAV_SubjectServer_Assessment extends Sabre_DAV_SimpleCollection
 {
 	/**
-	 * @var \Schoolbox\Assessment\Component\SubmissionBox
+	 * @var SubmissionBox
 	 */
 	protected $assessment;
 
 	/**
-	 * @param \Schoolbox\Assessment\Component\SubmissionBox $assessment
+	 * @var User
+	 */
+	protected $user;
+
+	/**
+	 * @param SubmissionBox $assessment
 	 *
 	 * @return $this
 	 */
@@ -24,9 +34,35 @@ class DAV_SubjectServer_Assessment extends Sabre_DAV_SimpleCollection
 	}
 
 	/**
-	 * @return \Schoolbox\Assessment\Component\SubmissionBox
+	 * @return SubmissionBox
 	 */
 	public function getAssessment() {
 		return $this->assessment;
+	}
+
+	/**
+	 * @param  User $user
+	 *
+	 * @return $this
+	 */
+	public function setUser($user) {
+		$this->user = $user;
+		return $this;
+	}
+
+	/**
+	 * @return User
+	 */
+	public function getUser() {
+		return $this->user;
+	}
+
+	/**
+	 * Loads the child student submissions from this assessment.
+	 *
+	 * @return $this
+	 */
+	public function loadChildren() {
+		return $this;
 	}
 }

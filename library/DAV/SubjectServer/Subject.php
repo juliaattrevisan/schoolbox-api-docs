@@ -7,17 +7,24 @@
  * @link      http://www.alaress.com.au/
  */
 
+use Schoolbox\User;
+use Schoolbox\External\Subject;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 class DAV_SubjectServer_Subject extends Sabre_DAV_SimpleCollection
 {
 	/**
-	 * @var \Schoolbox\External\Subject
+	 * @var Subject
 	 */
 	protected $subject;
 
 	/**
-	 * @param \Schoolbox\External\Subject $subject
+	 * @var User
+	 */
+	protected $user;
+
+	/**
+	 * @param Subject $subject
 	 *
 	 * @return $this
 	 */
@@ -27,23 +34,42 @@ class DAV_SubjectServer_Subject extends Sabre_DAV_SimpleCollection
 	}
 
 	/**
-	 * @return \Schoolbox\External\Subject
+	 * @return Subject
 	 */
 	public function getSubject() {
 		return $this->subject;
 	}
 
 	/**
-	 * Loads children from the subject set in $this->setSubject().
+	 * @param  User $user
 	 *
 	 * @return $this
 	 */
-	public function loadChildrenFromSubject() {
+	public function setUser($user) {
+		$this->user = $user;
+		return $this;
+	}
+
+	/**
+	 * @return User
+	 */
+	public function getUser() {
+		return $this->user;
+	}
+
+	/**
+	 * Loads children from the subject and user set in $this->setSubject().
+	 *
+	 * @return $this
+	 */
+	public function loadChildren() {
 		$mapper = new SubmissionBoxMapper();
 		foreach ($mapper->getSubmittable($this->subject->getId()) as $assessment) {
-			$name  = $assessment->getName();
-			$child = new DAV_SubjectServer_Assessment($name);
-			$child->setAssessment($assessment);
+			$child = new DAV_SubjectServer_Assessment($assessment->getName());
+			$child
+				->setAssessment($assessment)
+				->setUser($this->getUser())
+				->loadChildren();
 			$this->addChild($child);
 		}
 		return $this;
