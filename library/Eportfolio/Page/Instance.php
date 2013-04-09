@@ -76,6 +76,15 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		$this->getPage()->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
 		$this->getPage()->setBlock('custom_head', 'colour_list', 'colour_list_block');
 
+		/* Permissions list for groups
+		 */
+		$this->getPage()->setBlock('customise_page', 'has_group_permissions', 'has_group_permissions_block');
+		$this->getPage()->setBlock('has_group_permissions', 'group_permission', 'group_permission_block');
+
+		/* Permissions list for individuals
+		 */
+		$this->getPage()->setBlock('customise_page', 'individual_permission', 'individual_permission_block');
+
 		/* Set meta data
 		 */
 		$this->getPage()->setVar(array(
@@ -124,6 +133,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		$this->renderDefaultColours();
 		$this->renderColumnWidths();
 		$this->renderAllowedFileTypes();
+		$this->renderPermissions();
 	}
 
 	/**
@@ -382,6 +392,64 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		else {
 			$this->getPage()->setVar('allowed_files_block', '');
 		}
+	}
+
+	private function renderPermissions() {
+		$this->renderParentPermissions();
+		$this->renderGroupPermissions();
+		$this->renderIndividualPermissions();
+	}
+
+	private function renderParentPermissions() {
+	}
+
+	/**
+	 * Render group permissions
+	 */
+	private function renderGroupPermissions() {
+		$allGroups = $this->getGroupHandler()->involvedInCategoryList($this->getUserId(), false);
+
+		$selectedGroups = Eportfolio_PermissionMapper::getInstance()->findByColumnList(array(
+			'page_id' => $this->getPageId(),
+			'type' => 'group'
+		));
+
+		for ($selectedGroupIds = array(), $selectedGroups->rewind(); $selectedGroups->valid(); $selectedGroups->next()) {
+			$selectedGroupIds[] = $selectedGroups->current()->value;
+		}
+
+		if (is_array($allGroups) && count($allGroups)) {
+			foreach ($allGroups as $currentGroup) {
+				if (in_array($currentGroup['id'], $selectedGroupIds)) {
+					$selected = 'checked="checked"';
+				}
+				else {
+					$selected = '';
+				}
+
+				$this->getPage()->setVar(array(
+					'GROUP_PERMISSION_GROUP_ID' => $currentGroup['id'],
+					'GROUP_PERMISSION_NAME' => $currentGroup['name'],
+					'GROUP_PERMISSION_SELECTED' => $selected,
+				));
+
+				$this->getPage()->parse('group_permission_block', 'group_permission', true);
+			}
+
+			$this->getPage()->parse('has_group_permissions_block', 'has_group_permissions');
+		}
+		else {
+			$this->getPage()->setVar('has_group_permissions_block', '');
+		}
+	}
+
+	/**
+	 * Render individual permissions
+	 */
+	private function renderIndividualPermissions() {
+		$this->getPage()->setVar(array(
+			'STUDENT_GROUP_IDS' => implode(',', $this->getGroupHandler()->getStudentGroupTypeIds())
+		));
 	}
 
 	/**
