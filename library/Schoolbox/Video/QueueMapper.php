@@ -52,7 +52,12 @@ class QueueMapper extends Mapper {
 				'column'     => 'message',
 				'property'   => 'message',
 				'type'       => self::TYPE_STRING,
-		));
+			));
+	    $this->hasMap(array(
+	             'column'     => 'duration',
+	             'property'   => 'duration',
+	             'type'       => self::TYPE_INTEGER,
+	        ));
         $this->hasMap(array(
                 'column'            => 'createdOn',
                 'property'          => 'created',

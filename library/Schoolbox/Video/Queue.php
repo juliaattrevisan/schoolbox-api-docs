@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Video;
 use Schoolbox\ConfigLoader;
+use Schoolbox\Video\QueueMapper;
 
 class Queue {
 
@@ -17,6 +18,7 @@ class Queue {
 	private $type;
 	private $status;
 	private $message;
+	private $duration;
 	private $created;
 	private $modified;
 
@@ -37,24 +39,37 @@ class Queue {
 
 	public function processVideo() {
 
-		$videoStore = $this->config->get('video_dir');
-		$sourceStore = $this->config->get('file_dir');
 
-		if ($this->type == QueueMapper::FILE_TYPE_SBFS)
+		if ($this->getType() == QueueMapper::FILE_TYPE_SBFS) {
+			$sourceStore = $this->config->get('file_dir');
 			$sourceFile = $sourceStore . '/' . $this->fileID . '.dat';
-		else
-				{
-					throw new \Exception_Schoolbox();
-				}
+		}
+		else {
+			throw new \Exception_Schoolbox();
+		}
 
-		$processString = 'avconv -i ' . escapeshellarg($sourceFile) . ' -c:v libx264 -preset slow -b 512k ' . escapeshellarg($videoStore.'/'.$this->fileID . '.mp4').' 2>&1';
-		$thumbnailString = 'avconv -i ' . escapeshellarg($sourceFile) . ' -f image2 -ss 10 -s 64x64 -frames:v 1 ' . escapeshellarg($videoStore.'/'.$this->fileID . '-64.jpg').' 2>&1';
-		print $processString;
+		/* Process video to 512kb in libx264 format for mobile and html5 streaming */
+		$processString = 'nice avconv -y -i ' . escapeshellarg($sourceFile) . ' -c:v libx264 -preset slow -b 512k -ac 2 ' . escapeshellarg($this->getVideoLocation() ).' 2>&1';
+
 		exec($processString, $message, $return);
 		$this->setMessage(implode( "\n", $message));
-		print $this->message;
+
+		preg_match('/Duration: ([0-9\:]+)/',$this->getMessage(), $match);
+
+		if(isset($match[1])) {
+			sscanf($match[1], "%d:%d:%d", $hours, $minutes, $seconds);
+			$duration = isset($seconds) ? $hours * 3600 + $minutes * 60 + $seconds : $hours * 60 + $minutes;
+			$this->setDuration($duration);
+		}
+
+		/* Generate thumbnail of video 64x64 pixels, 1/3rd of the video in */
+		$thumbnailSeconds = $this->getDuration() > 0 ? round(($this->getDuration() / 3), 2) : 10;
+
+		$thumbnailString = 'nice avconv -y -i ' . escapeshellarg($sourceFile) . ' -f image2 -ss '.$thumbnailSeconds.' -vf scale=-1:64,crop=64:64 -frames:v 1 ' . escapeshellarg($this->getThumbnailLocation()).' 2>&1';
+
 		if($return == 0){
 			exec($thumbnailString, $output, $return);
+			print_r($output);
 			if($return == 0)
 				return true;
 			else
@@ -69,6 +84,15 @@ class Queue {
 	private function setConfig($config) {
 		$this->config = $config;
 	}
+
+	public function isComplete() {
+		if($this->getStatus() == QueueMapper::STATUS_COMPLETED)
+			return true;
+		else
+			return false;
+	}
+
+
 
 	public function setCreated($created) {
 		$this->created = $created;
@@ -124,6 +148,14 @@ class Queue {
 
 	public function getType() {
 		return $this->type;
+	}
+
+	public function setDuration($duration) {
+		$this->duration = $duration;
+	}
+
+	public function getDuration() {
+		return $this->duration;
 	}
 
 

@@ -7,6 +7,10 @@
  */
 class Component_Homepage_VideoController extends Component_Homepage_ControllerAbstract {
 
+	/**
+	 * @var \Schoolbox\Collection
+	 */
+	protected $outputList;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -14,26 +18,21 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
      * @return void
      */
     public function execute() {
+	    $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
-	    $fileHandler = new File;
-	    $fileList = $fileHandler->getAllInCategory($this->getContext('id'),
-		    array(
-	        //'size' => $this->getConfig('size'),
-            'filter' => 'video',
-            //'sort'  => $this->getConfig('sort'),
-            //'sortdir' => $this->getConfig('sortdir'
-		    ));
 
-	    $this->outputList = array();
-	    if(is_array($fileList)) {
 
-		    foreach($fileList as $file) {
-			    if(is_readable(Cfg::get('video_dir').'/'.$file['id'].'.mp4')) {
-				    $this->outputList[] = $file;
-			    }
-		    }
-	    }
+		if($this->getConfig('size') > 1)
+	        $this->outputList = $videoResourceMapper->findByCategory($this->getContext('id'), $this->getConfig('size')-1);
+		else if($this->getConfig('size') == 0)
+			$this->outputList = $videoResourceMapper->findByCategory($this->getContext('id'));
+		else
+			$this->outputList = new \Schoolbox\Collection(array());
 
+	    if($this->getConfig('video'))
+	        $this->defaultVideo = $videoResourceMapper->findById($this->getConfig('video'));
+	    else
+		    $this->defaultVideo = $this->outputList->current();
 
     }
 
@@ -55,17 +54,18 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 
 	    $this->setBlock($templateHandle, 'default_video', 'default_video_block');
 	    $this->setBlock($templateHandle, 'video_list', 'video_list_block');
-
+	    $this->setVar('DEFAULT_VIDEO_ID', $this->defaultVideo->getFile()->getId());
+	    $this->parse('default_video_block','default_video');
 
 	    if(count($this->outputList)) {
 
-		    $this->setVar('DEFAULT_VIDEO_ID', $this->outputList[0]['id']);
-		    $this->parse('default_video_block','default_video');
+
 
 		    foreach($this->outputList as $video ) {
-			    $this->setVar( array('VIDEO_LIST_ID'     => $video['id'],
-				                     'VIDEO_LIST_TITLE'  => Scrub::text($video['description']),
-				                     'VIDEO_LIST_HIDDEN' => $video['hidden'] ? 'hidden' : '',
+			    $this->setVar( array('VIDEO_LIST_ID'     => $video->getFile()->getId(),
+				                     'VIDEO_LIST_TITLE'  => Scrub::text($video->getFile()->getDescription()),
+				                     'VIDEO_LIST_DURATION'=> gmdate('H:i:s',$video->getDuration()),
+				                     'VIDEO_LIST_HIDDEN' => $video->getFile()->getHidden() ? 'hidden' : '',
 			                   ));
 				$this->parse('video_list_block','video_list',true);
 		    }
