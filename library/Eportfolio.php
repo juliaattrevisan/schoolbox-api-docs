@@ -23,7 +23,7 @@ class Eportfolio {
 	private $db = null;
 
 	/**
-	 * The owner/creator of the current eportfolio
+	 * The current user id
 	 *
 	 * @var int
 	 */
