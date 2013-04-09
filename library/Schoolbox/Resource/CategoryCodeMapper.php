@@ -49,7 +49,7 @@ class CategoryCodeMapper extends Mapper {
 	/**
 	 * Retrieves category codes for a given set of categories.
 	 *
-	 * @param array $category_id
+	 * @param array $category_ids
 	 *
 	 * @return \Collection
 	 */
