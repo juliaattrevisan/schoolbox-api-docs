@@ -75,6 +75,9 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		$this->getPage()->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
 		$this->getPage()->setBlock('custom_head', 'colour_list', 'colour_list_block');
+		$this->getPage()->setBlock('customise_page', 'eportfolio_component_tab', 'eportfolio_component_tab_block');
+		$this->getPage()->setBlock('customise_page', 'eportfolio_component_page', 'eportfolio_component_page_block');
+		$this->getPage()->setBlock('eportfolio_component_page', 'eportfolio_component', 'eportfolio_component_block');
 
 		/* Permissions list for groups
 		 */
@@ -103,9 +106,6 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		));
 
 		if ($this->getPermission() > WRITE_ACCESS) {
-			$this->getPage()->setBlock('customise_page', 'eportfolio_component_tab', 'eportfolio_component_tab_block');
-			$this->getPage()->setBlock('customise_page', 'eportfolio_component_page', 'eportfolio_component_page_block');
-			$this->getPage()->setBlock('eportfolio_component_page', 'eportfolio_component', 'eportfolio_component_block');
 			$this->getPage()->parse('edit_page_block', 'edit_page');
 			$this->getPage()->parse('modify_layout_block', 'modify_layout');
 			$this->getPage()->parse('customise_page_block', 'customise_page');
@@ -507,15 +507,6 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		else {
 			$this->getPage()->setVar('individual_permission_block', '');
 		}
-	}
-
-	/**
-	 * Get permission level
-	 *
-	 * @return int
-	 */
-	private function getPermission() {
-		return 99;
 	}
 
 	/* Getters/Setters

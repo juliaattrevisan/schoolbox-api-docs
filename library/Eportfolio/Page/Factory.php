@@ -23,9 +23,10 @@ class Eportfolio_Page_Factory {
 	 * @param $page
 	 * @param $userId
 	 * @param $pageId
+	 * @param $permissionValue
 	 */
-	public function __construct($page, $userId, $pageId) {
-		$this->setPage($this->produce($page, $userId, $pageId));
+	public function __construct($page, $userId, $pageId, $permissionValue) {
+		$this->setPage($this->produce($page, $userId, $pageId, $permissionValue));
 	}
 
 	/**
@@ -34,20 +35,21 @@ class Eportfolio_Page_Factory {
 	 * @param $page
 	 * @param $userId
 	 * @param $pageId
+	 * @param $permissionValue
 	 * @return \Eportfolio_Page_Create|\Eportfolio_Page_Instance|\Eportfolio_Page_Profile|\Eportfolio_Page_Showcase
 	 */
-	private function produce($page, $userId, $pageId) {
+	private function produce($page, $userId, $pageId, $permissionValue) {
 		if (is_numeric($pageId)) {
-			$eportfolioPage = new Eportfolio_Page_Instance($page, $userId, $pageId);
+			$eportfolioPage = new Eportfolio_Page_Instance($page, $userId, $pageId, $permissionValue);
 		}
 		else if ($pageId == 'showcase') {
-			$eportfolioPage = new Eportfolio_Page_Showcase($page, $userId, $pageId);
+			$eportfolioPage = new Eportfolio_Page_Showcase($page, $userId, $pageId, $permissionValue);
 		}
 		else if ($pageId == 'create') {
-			$eportfolioPage = new Eportfolio_Page_Create($page, $userId, $pageId);
+			$eportfolioPage = new Eportfolio_Page_Create($page, $userId, $pageId, $permissionValue);
 		}
 		else {
-			$eportfolioPage = new Eportfolio_Page_Profile($page, $userId, $pageId);
+			$eportfolioPage = new Eportfolio_Page_Profile($page, $userId, $pageId, $permissionValue);
 		}
 
 		return $eportfolioPage;

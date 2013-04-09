@@ -60,17 +60,29 @@ abstract class Eportfolio_Page_Abstract {
 	protected $templateFile = '';
 
 	/**
+	 * A const equivalent corresponding to READ_ACCESS or WRITE_ACCESS etc.
+	 *
+	 * This value is set in the factory, where a different class determines
+	 * the actual value.
+	 *
+	 * @var int
+	 */
+	private $permission = -1;
+
+	/**
 	 * Constructor
 	 *
 	 * @param $page
 	 * @param $userId
 	 * @param $pageId
+	 * @param $permission
 	 */
-	final public function __construct($page, $userId, $pageId) {
+	final public function __construct($page, $userId, $pageId, $permission) {
 		$this->setPage($page);
 		$this->setPageId($pageId);
 		$this->setUserHandler(new User());
 		$this->setGroupHandler(new Group());
+		$this->setPermission($permission);
 
 		/* Check that the user exists
 		 */
@@ -316,5 +328,23 @@ abstract class Eportfolio_Page_Abstract {
 	 */
 	protected function getGroupHandler() {
 		return $this->groupHandler;
+	}
+
+	/**
+	 * Set permission value
+	 *
+	 * @param int $permission
+	 */
+	public function setPermission($permission) {
+		$this->permission = $permission;
+	}
+
+	/**
+	 * Get permission value
+	 *
+	 * @return int
+	 */
+	public function getPermission() {
+		return $this->permission;
 	}
 }

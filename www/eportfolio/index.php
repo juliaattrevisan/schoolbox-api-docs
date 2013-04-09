@@ -11,8 +11,12 @@ $pageId = $this->arg[1];
 
 $authenticator = new Eportfolio_Authenticator($currentUserId, $ownerId, $pageId);
 
-if ($authenticator->canView()) {
-	$factory = new Eportfolio_Page_Factory($this, $ownerId, $pageId);
+if ($authenticator->canModify()) {
+	$factory = new Eportfolio_Page_Factory($this, $ownerId, $pageId, FULL_ACCESS);
+	$factory->getPage()->renderPage();
+}
+else if ($authenticator->canView()) {
+	$factory = new Eportfolio_Page_Factory($this, $ownerId, $pageId, READ_ACCESS);
 	$factory->getPage()->renderPage();
 }
 else {
