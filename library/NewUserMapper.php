@@ -129,4 +129,29 @@ class NewUserMapper extends Mapper {
 
         parent::mapping();
     }
+
+	/**
+	 * TODO: PDO Array support for using WHERE IN
+	 *
+	 * http://stackoverflow.com/questions/14767530/php-using-pdo-with-in-clause-array
+	 * http://stackoverflow.com/questions/920353/php-pdo-can-i-bind-an-array-to-an-in-condition
+	 *
+	 * @param $permittedValues
+	 * @return Collection
+	 */
+	public function findIn($permittedValues) {
+		$permittedValuesSql = implode(',', $permittedValues);
+
+		$statement = $this->database->prepare("
+            SELECT {$this->getColumnString()}
+            FROM `{$this->table}`
+            WHERE `id` IN ({$permittedValuesSql})
+        ");
+
+		$statement->execute();
+
+		$rowset = $statement->fetchAll();
+
+		return $this->hydrateList($rowset);
+	}
 }
