@@ -19,7 +19,6 @@ class Eportfolio_Page_Create extends Eportfolio_Page_Abstract {
 	 * Initialise classes and collections
 	 */
 	protected function initialise() {
-		$this->setGroupHandler(new Group());
 	}
 
 	/**
