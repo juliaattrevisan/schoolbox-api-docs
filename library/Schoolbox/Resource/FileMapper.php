@@ -63,6 +63,28 @@ class FileMapper extends Mapper {
 			'type'       => self::TYPE_STRING,
 		));
 		$this->hasMap(array(
+			              'column'     => 'comment',
+			              'property'   => 'comment',
+			              'type'       => self::TYPE_STRING,
+		              ));
+		$this->hasMap(array(
+			              'column'     => 'description',
+			              'property'   => 'description',
+			              'type'       => self::TYPE_STRING,
+		              ));
+
+		$this->hasMap(array(
+			              'column'     => 'hidden',
+			              'property'   => 'hidden',
+			              'type'       => self::TYPE_STRING,
+		              ));
+
+		$this->hasMap(array(
+			              'column'     => 'category',
+			              'property'   => 'folder',
+			              'type'       => self::TYPE_INTEGER,
+		              ));
+		$this->hasMap(array(
 			'column'     => 'owner',
 			'property'   => 'owner',
 			'type'       => self::TYPE_INTEGER,

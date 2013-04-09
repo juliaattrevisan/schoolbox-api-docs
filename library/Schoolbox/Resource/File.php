@@ -45,6 +45,20 @@ class File {
 	protected $modified;
 
 	/**
+	 * @var string
+	 */
+	protected $description;
+
+	/**
+	 * @var string
+	 */
+	protected $comment;
+
+	protected $hidden;
+
+	protected $folder;
+
+	/**
 	 * @var IConfigLoader
 	 */
 	protected $config_loader;
@@ -177,4 +191,51 @@ class File {
 	public function getConfigLoader() {
 		return $this->config_loader;
 	}
+
+	/**
+	 * @param string $comment
+	 */
+	public function setComment($comment) {
+		$this->comment = $comment;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getComment() {
+		return $this->comment;
+	}
+
+	/**
+	 * @param string $description
+	 */
+	public function setDescription($description) {
+		$this->description = $description;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDescription() {
+		return $this->description;
+	}
+
+	public function setHidden($hidden) {
+		$this->hidden = $hidden;
+	}
+
+	public function getHidden() {
+		return $this->hidden;
+	}
+
+	public function setFolder($folder) {
+		$this->folder = $folder;
+	}
+
+	public function getFolder() {
+		return $this->folder;
+	}
+
+
+
 }
