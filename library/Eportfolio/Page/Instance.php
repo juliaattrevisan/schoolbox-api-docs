@@ -407,6 +407,23 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 	 * Render parent permissions
 	 */
 	private function renderParentPermissions() {
+		$selectedParents = Eportfolio_PermissionMapper::getInstance()->findByColumnList(array(
+			'page_id' => $this->getPageId(),
+			'type' => 'parent',
+			'value' => 1
+
+		));
+
+		if ($selectedParents->count()) {
+			$selected = 'checked="checked"';
+		}
+		else {
+			$selected = '';
+		}
+
+		$this->getPage()->setVar(array(
+			'PARENT_PERMISSION_SELECTED' => $selected
+		));
 	}
 
 	/**
