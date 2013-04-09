@@ -137,6 +137,18 @@ abstract class Eportfolio_Page_Abstract {
 	 */
 	private function setupPageList() {
 		$this->getPage()->setBlock(TEMPLATE_content, 'eportfolio_page', 'eportfolio_page_block');
+
+		/* Optional add-page butonye
+		 */
+		$this->getPage()->setBlock(TEMPLATE_content, 'can_add_page', 'can_add_page_block');
+
+		$this->getPage()->setVar(array(
+			'can_add_page_block' => '',
+		));
+
+		if ($this->getPermission() > WRITE_ACCESS) {
+			$this->getPage()->parse('can_add_page_block', 'can_add_page');
+		}
 	}
 
 	/**
