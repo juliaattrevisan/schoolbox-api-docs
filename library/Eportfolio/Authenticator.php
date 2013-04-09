@@ -164,15 +164,9 @@ class Eportfolio_Authenticator {
 		$youAreAdmin = $this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff();
 		$youArePageOwner = ($this->getEportfolioHandler()->getSettingsPageOwner() == $this->getCurrentUserId());
 
-		/* These pages are always public
-		 */
-		if (in_array($this->getPageId(), $this->getPublicPages())) {
-			$youCanView = true;
-		}
-
 		/* And now...the conclusion.
 		 */
-		if ($youAreAdmin || $youArePageOwner || $youCanView) {
+		if ($youAreAdmin || $youArePageOwner) {
 			return true;
 		}
 
