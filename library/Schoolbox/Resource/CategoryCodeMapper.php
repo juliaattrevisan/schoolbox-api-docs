@@ -34,4 +34,39 @@ class CategoryCodeMapper extends Mapper {
 			'other_key' => 'id',
 		));
 	}
+
+	/**
+	 * Retrieves category codes for a given category.
+	 *
+	 * @param int $category_id
+	 *
+	 * @return \Collection
+	 */
+	public function findForCategory($category_id) {
+		return $this->findForCategories(array($category_id));
+	}
+
+	/**
+	 * Retrieves category codes for a given set of categories.
+	 *
+	 * @param array $category_id
+	 *
+	 * @return \Collection
+	 */
+	public function findForCategories($category_ids) {
+		//
+		// no IDs? return early so no invalid query is called.
+		if (empty($category_ids)) {
+			return $this->hydrateList(array());
+		}
+		$params    = $this->getArrayParameters($category_ids, 'id');
+		$statement = $this->database->prepare("
+            SELECT {$this->getColumnString()}
+            FROM {$this->table}
+            WHERE categoryID IN {$this->getArrayPlaceholders($category_ids, 'id')}
+            ORDER BY code ASC
+        ");
+		$statement->execute($params);
+		return $this->hydrateList($statement);
+	}
 }
