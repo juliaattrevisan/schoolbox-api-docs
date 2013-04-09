@@ -103,6 +103,60 @@
     <!-- END colour_list -->
 
 </script>
+
+<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/jquery.autocomplete.css" />
+
+<style type='text/css'>
+	#individualPermissionTemplate {
+		display: none;
+	}
+</style>
+
+<script type='text/javascript'>
+	$j(function() {
+		$j('#addIndividualPermission').autocomplete({
+			serviceUrl: '/ajax/user.php?groupID={STUDENT_GROUP_IDS}',
+			minChars: 2,
+			maxHeight: 300,
+			width: 275,
+			noCache: true,
+
+			/* When selected, append to a list
+			 */
+			onSelect: function (value, data) {
+				var individualPermission = $j('#individualPermissionTemplate').clone();
+				individualPermission.find('input').attr('name', 'individual_permission[]');
+				individualPermission.find('input').val(data);
+
+				/* Snap out the group from the list
+				 */
+				var hyphenIndex = value.indexOf('-');
+
+				if (hyphenIndex > -1) {
+					individualPermission.find('li').append(value.substr(0, hyphenIndex));
+				}
+				else {
+					individualPermission.find('li').append(value);
+				}
+
+				/* Push it in
+				 */
+				$j('#individualPermissionList').append(individualPermission.html());
+
+				/* Clear and lock
+				 */
+				$j('#addIndividualPermission').val('');
+			}
+		});
+
+		/* Remove someone from list
+		 */
+		$j('.individualPermissionRemove').live('click', function(event) {
+			$j(this).closest('li').remove();
+		});
+	});
+</script>
 <!-- END custom_head -->
 
 <style type='text/css'>
@@ -370,6 +424,8 @@
 	<div id="tabs-4" class="clearfix">
 		<div class="clearfix">
 			<form action="/eportfolio/configForm.php" method="post" id="folderForm" class="clearfix">
+				<input type='hidden' name='page_id' value='{PAGE_ID}' />
+				<input type='hidden' name='update' value='permissions' />
 				<table class="standardForm">
 					<tr>
 						<td>
@@ -410,13 +466,14 @@
 								<li>
 									<a class='individualPermissionRemove'>X</a>
 									<input type="hidden" name="individual_permission[]" value="{INDIVIDUAL_PERMISSION_USER_ID}" />
+									{INDIVDIUAL_PERMISSION_USER_FIRSTNAME} {INDIVDIUAL_PERMISSION_USER_LASTNAME}
 								</li>
 								<!-- END individual_permission -->
 							</ul>
 						</td>
 					</tr>
 				</table>
-				<input type="submit" label="Submit" value="Create Page" class="submit-btn-plain"/>
+				<input type="submit" label="Submit" value="Update Page" class="submit-btn-plain"/>
 			</form>
 		</div>
 	</div>
@@ -436,3 +493,11 @@
         window.check = false;
     });
 </script>
+
+
+<ul id='individualPermissionTemplate'>
+	<li>
+		<a class='individualPermissionRemove'>X</a>
+		<input type="hidden" name="individual_permission[]" value="{INDIVIDUAL_PERMISSION_USER_ID}" />
+	</li>
+</ul>

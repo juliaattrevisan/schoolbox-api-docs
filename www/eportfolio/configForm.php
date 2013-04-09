@@ -133,6 +133,11 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 		else if (is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
 			$eportfolioHandler->updateColumnWidths(Scrub::text($_POST['leftColWidth']), Scrub::text($_POST['rightColWidth']));
 		}
+		/* Update permissions
+		 */
+		else if (isset($_POST['update']) && ($_POST['update'] == 'permissions')) {
+			Eportfolio_PermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'], $_POST['individual_permission']);
+		}
 		/* GET config options from homepage
 		 */
 		else if ($_GET['uid'] && ($_GET['type'] == 'config') && $_GET['component']) {

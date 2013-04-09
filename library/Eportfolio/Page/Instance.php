@@ -450,6 +450,40 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		$this->getPage()->setVar(array(
 			'STUDENT_GROUP_IDS' => implode(',', $this->getGroupHandler()->getStudentGroupTypeIds())
 		));
+
+		/* Find all the guys who were allowed to see this page
+		 */
+		$selectedIndividuals = Eportfolio_PermissionMapper::getInstance()->findByColumnList(array(
+			'page_id' => $this->getPageId(),
+			'type' => 'student'
+		));
+
+		/* Just list their ids...
+		 */
+		for ($selectedIndividualIds = array(), $selectedIndividuals->rewind(); $selectedIndividuals->valid(); $selectedIndividuals->next()) {
+			$selectedIndividualIds[] = $selectedIndividuals->current()->value;
+		}
+
+		/* ...and get their records with phenomenal cheese factor in findIn()
+		 */
+		if (count($selectedIndividualIds)) {
+			$allIndividuals = NewUserMapper::getInstance()->findIn($selectedIndividualIds);
+
+			for ($allIndividuals->rewind(); $allIndividuals->valid(); $allIndividuals->next()) {
+				$currentIndividual = $allIndividuals->current();
+
+				$this->getPage()->setVar(array(
+					'INDIVIDUAL_PERMISSION_USER_ID' => $currentIndividual->getId(),
+					'INDIVDIUAL_PERMISSION_USER_FIRSTNAME' => $currentIndividual->getFirstname(),
+					'INDIVDIUAL_PERMISSION_USER_LASTNAME' => $currentIndividual->getLastname(),
+				));
+
+				$this->getPage()->parse('individual_permission_block', 'individual_permission', true);
+			}
+		}
+		else {
+			$this->getPage()->setVar('individual_permission_block', '');
+		}
 	}
 
 	/**
