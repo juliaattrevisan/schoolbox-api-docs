@@ -10,12 +10,7 @@ $classList = array(
             'class' => 'Component_Homepage_VideoController',
             'description' => 'Upload and play videos directly in your homepage',
             'multiple' => 'true',
-            'config' => array(
-	            'componentname' => array('default_value'=>'Video','label'=>'Heading'),
-	            'size' => array('default_value'=>10, 'label'=>'Limit'),
-	            'src' => array('default_value'=>'', 'label'=>'Source'),
-	            'video' => array('default_value'=>'', 'label'=>'Video'),
-                ),
+            'config' => array(),
             );
 
 
