@@ -9,6 +9,7 @@
 
 use Schoolbox\User;
 use Schoolbox\External\SubjectMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 class DAV_SubjectServer_SubjectList extends Sabre_DAV_SimpleCollection {
 
@@ -62,11 +63,26 @@ class DAV_SubjectServer_SubjectList extends Sabre_DAV_SimpleCollection {
 	 * @return $this
 	 */
 	public function loadChildren() {
-		$subject_mapper = new SubjectMapper();
-		foreach ($subject_mapper->findAllForStudent($this->getUser()) as $subject) {
-			$child = new DAV_SubjectServer_Subject(sprintf('%s (%s)', $subject->getName(), $subject->getCode()));
+		$mapper = new SubmissionBoxMapper();
+		$categories = array();
+		foreach ($mapper->getSubmittable($this->getUser()->getId()) as $box) {
+			$category = $box->getCategory();
+			if (array_key_exists($category->getId(), $categories)) {
+				continue;
+			}
+			$categories[$category->getId()] = true;
+
+			$codes = array();
+			foreach ($category->getCodes() as $code) {
+				$codes[] = $code->getCode();
+			}
+			$name = $category->getName();
+			if (!empty($codes)) {
+				$name .= ' ('.implode(', ', $codes).')';
+			}
+			$child = new DAV_SubjectServer_Subject($name);
 			$child
-				->setSubject($subject)
+				->setSubject($category)
 				->setUser($this->getUser())
 				->loadChildren();
 			$this->addChild($child);
