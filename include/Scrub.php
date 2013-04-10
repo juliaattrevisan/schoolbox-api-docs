@@ -117,6 +117,8 @@ class Scrub {
             'www.tiki-toki.com/timeline/embed/',
             'www.thinglink.com/card/',
 	        'www.facebook.com/plugins/',
+	        'padlet.com/embed/',
+	        'linoit.com/users/linoit-com/canvases/',
         );
 
 
