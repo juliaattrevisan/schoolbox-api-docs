@@ -81,6 +81,14 @@ class Queue {
 
 	}
 
+	public function getVideoLocation() {
+		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '.mp4';
+	}
+
+	public function getThumbnailLocation() {
+		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '-64.jpg';
+	}
+
 	private function setConfig($config) {
 		$this->config = $config;
 	}
