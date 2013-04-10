@@ -69,7 +69,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 
 		/* Set up blocks and stuff
 		 */
-		$this->getPage()->setTitle('page name goes here');
+		$this->getPage()->setTitle($this->getEportfolioHandler()->getSettingsPageTitle());
 		$this->getPage()->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 		$this->getPage()->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
