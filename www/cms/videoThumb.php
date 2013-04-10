@@ -31,10 +31,9 @@ if (is_numeric($_GET['id'])) {
 		if ($filesize == FALSE) //if we cannot find the file (something is wrong dont link to it)
 			error(41);
 
-
-		//header("Content-Type: image/jpeg");
-		header("Pragma: ");
-		header("Cache-control: ");
+		header('Cache-Control: max-age=10800, private');
+		header('Expires: ' . date(DATE_RFC822, strtotime(' 2 day')));
+		header('Pragma: private');
 		header('Content-Type: image/jpeg');
 		header("Content-Length: $filesize");
 		readfile($filename);
