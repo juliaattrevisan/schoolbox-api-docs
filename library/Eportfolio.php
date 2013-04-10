@@ -402,30 +402,41 @@ class Eportfolio {
 			 */
 			$allInstanceIds[] = $currentComponent->id;
 
-			//Component_InstanceMapper::getInstance()->delete($currentComponent);
+			Component_InstanceMapper::getInstance()->delete($currentComponent);
 		}
 
 		/* Remove all the components' configs
 		 */
 		if (count($allInstanceIds)) {
-			$allConfigs = Component_ConfigMapper::getInstance()->findIn($allInstanceIds);
+			$allConfigs = Component_ConfigMapper::getInstance()->findIn('component_instance_id', $allInstanceIds);
 
 			for ($allConfigs->rewind(); $allConfigs->valid(); $allConfigs->next()) {
 				$currentConfig = $allConfigs->current();
 
-				//Component_ConfigMapper::getInstance()->delete($currentConfig);
+				Component_ConfigMapper::getInstance()->delete($currentConfig);
 			}
+		}
+
+		/* Remove the page's permissions
+		 */
+		$allPermissions = Eportfolio_PermissionMapper::getInstance()->findByColumnList(array(
+			'page_id' => $this->getPageId()
+		));
+
+		for ($allPermissions->rewind(); $allPermissions->valid(); $allPermissions->next()) {
+			$currentPermission = $allPermissions->current();
+
+			Eportfolio_PermissionMapper::getInstance()->delete($currentPermission);
 		}
 
 		/* Remove the page itself
 		 */
 		$pageInstance = Eportfolio_PageMapper::getInstance()->findById($this->getPageId());
+		Eportfolio_PageMapper::getInstance()->delete($pageInstance);
 
-
-//		$this->emptyHomepage();
-//
-//		$this->db->delete($this->getContext() . '_config', 'page_id', $this->getPageId());
-//		$this->deleteComponentPositions();
+		/* Redirect back to the profile
+		 */
+		SitePage::localRedir('/eportfolio/' . $this->getUserId() . '/profile');
 	}
 
 
