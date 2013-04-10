@@ -119,6 +119,11 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 			$templateHandle = "component_{$component->instance->id}";
 			$templateHandle = TEMPLATE_content;
 
+			/* -_-
+			 */
+			$userHandler = new User();
+			$user = $userHandler->getById($eportfolioHandler->getSettingsPageOwner());
+
 			$component->setup($user, $component->instance->getConfigArray() );
 
 			if ($component->execute() !== false) {
