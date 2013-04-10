@@ -1015,10 +1015,10 @@ class Submission extends DeprecatedModel {
             // students from group list.
             if ($subject_code && Cfg::get('external_enable')) {
                 if (!array_key_exists($subject_code, $students)) {
+                    $students[$subject_code] = $synHandler->getStudents($subject_code);
                     if (!is_array($students[$subject_code])) {
                         continue;
                     }
-                    $students[$subject_code] = $synHandler->getStudents($subject_code);
                     //
                     // Has only synergy ID. Need Schoolbox ID and alt and local
                     // email.
