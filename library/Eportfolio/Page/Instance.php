@@ -483,7 +483,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		/* ...and get their records with phenomenal cheese factor in findIn()
 		 */
 		if (count($selectedIndividualIds)) {
-			$allIndividuals = NewUserMapper::getInstance()->findIn($selectedIndividualIds);
+			$allIndividuals = NewUserMapper::getInstance()->findIn('uid', $selectedIndividualIds);
 
 			for ($allIndividuals->rewind(); $allIndividuals->valid(); $allIndividuals->next()) {
 				$currentIndividual = $allIndividuals->current();
