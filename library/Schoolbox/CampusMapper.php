@@ -29,6 +29,16 @@ class CampusMapper extends Mapper {
                 'property'   => 'name',
                 'type'       => Mapper::TYPE_STRING,
             ));
+	    $this->hasMap(array(
+		                  'column'     => 'ext_timetable_code',
+		                  'property'   => 'extTimetableCode',
+		                  'type'       => Mapper::TYPE_STRING,
+	                  ));
+	    $this->hasMap(array(
+		                  'column'     => 'timetable_day',
+		                  'property'   => 'timetableDay',
+		                  'type'       => Mapper::TYPE_STRING,
+	                  ));
     }
 
 }

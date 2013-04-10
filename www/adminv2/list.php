@@ -55,6 +55,8 @@ $tableList = array(
         'fields' => array(
             'id' => array('readonly' => '1'),
             'name' => array('caption' => 'Name'),
+	        'ext_timetable_code' => array('caption'=>'External Timetable Code'),
+	        'timetable_day' => array('caption'=>'Timetable Days'),
         )
     ),
     array(
