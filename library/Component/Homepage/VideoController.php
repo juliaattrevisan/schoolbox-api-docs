@@ -69,10 +69,11 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 		    foreach($this->outputList as $video ) {
 			    $this->setVar( array('VIDEO_LIST_ID'     => $video->getFile()->getId(),
 				                     'VIDEO_LIST_TITLE'  => Scrub::text($video->getFile()->getDescription()),
-				                     'VIDEO_LIST_DURATION'=> gmdate('H:i:s',$video->getDuration()),
+				                     'VIDEO_LIST_DURATION'=> $video->getDuration()>=3600?gmdate('H:i:s',$video->getDuration()):gmdate('i:s',$video->getDuration()),
 				                     'VIDEO_LIST_COMMENT' => Scrub::text($video->getFile()->getComment()),
 				                     'VIDEO_LIST_HIDDEN' => $video->getFile()->getHidden() ? 'hidden' : '',
-				                     //'VIDEO_LIST_POSTER' => $video->getFile()->getPoster()->getHTMLName();
+				                     'VIDEO_LIST_POSTER_ID'=> $video->getFile()->getOwner()->getId(),
+				                     'VIDEO_LIST_POSTER' => $video->getFile()->getOwner()->getFullName(),
 			                   ));
 				$this->parse('video_list_block','video_list',true);
 		    }

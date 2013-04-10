@@ -36,6 +36,12 @@ class ResourceVideoMapper extends Mapper {
 			              'property'   => 'duration',
 			              'type'       => self::TYPE_INTEGER,
 		              ));
+
+		$this->hasJoin('file', array(
+                         'mapper'    => '\\Schoolbox\\Resource\\FileMapper',
+                         'this_key'  => 'file_id',
+                         'other_key' => 'id',
+                     ));
 	}
 
 	public function findByCategory($category, $limit = false) {
@@ -44,9 +50,10 @@ class ResourceVideoMapper extends Mapper {
 		$fileMapper = new FileMapper;
 
 		$query = "
-            SELECT {$fileMapper->getColumnString('f')}, {$this->getColumnString('vq')}
-                    FROM file f
-                    LEFT JOIN video_queue vq ON id = vq.file_id
+            SELECT {$this->getJoinMapper('file')->getColumnString('f')}, {$this->getColumnString('vq')}, {$fileMapper->getJoinMapper('user')->getColumnString('u')}
+                    FROM `{$this->getTable()}` vq
+                    JOIN {$this->getJoinSQL('file','vq','f')}
+                    JOIN {$fileMapper->getJoinSQL('user','f','u')}
             WHERE category = :cat AND vq.status = 'completed'
             ";
 
@@ -64,6 +71,8 @@ class ResourceVideoMapper extends Mapper {
 		foreach($statement as $row) {
 			$video = $this->hydrate($row, 'vq');
 			$video->setFile($fileMapper->hydrate($row,'f'));
+			$video->getFile()->setOwner($fileMapper->getJoinMapper('user')->hydrate($row,'u'));
+
 			$videoList->add($video);
 		}
 		return $videoList;
@@ -75,8 +84,8 @@ class ResourceVideoMapper extends Mapper {
 
 		$statement = $this->database->prepare( "
             SELECT {$fileMapper->getColumnString('f')}, {$this->getColumnString('vq')}
-                    FROM file f
-                    LEFT JOIN video_queue vq ON id = vq.file_id
+                     FROM `{$this->getTable()}` vq
+                    JOIN {$this->getJoinSQL('file','vq','f')}
             WHERE f.id = ? AND vq.status = 'completed'
             " );
 

@@ -87,7 +87,8 @@ class FileMapper extends Mapper {
 		$this->hasMap(array(
 			'column'     => 'owner',
 			'property'   => 'owner',
-			'type'       => self::TYPE_INTEGER,
+			'type'       => self::TYPE_MODEL,
+            'join'       => 'user',
 		));
 		$this->hasMap(array(
 			'column'            => 'submitted',
@@ -100,6 +101,12 @@ class FileMapper extends Mapper {
 			'property'          => 'modified',
 			'type'              => self::TYPE_DATETIME,
 			'updated_timestamp' => true,
+		));
+
+		$this->hasJoin('user', array(
+             'mapper'    => '\\Schoolbox\\UserMapper',
+             'this_key'  => 'owner',
+             'other_key' => 'id',
 		));
 	}
 
