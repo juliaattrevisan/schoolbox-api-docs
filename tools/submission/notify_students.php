@@ -7,9 +7,10 @@ $run_upcoming = isset($options['upcoming']);
 $run_overdue  = isset($options['overdue']);
 
 if ($help) {
+	$filename = basename(__FILE__);
 	echo
 <<<HELP
-submission.php [--send] [--upcoming] [--overdue]
+$filename [--send] [--upcoming] [--overdue]
 
 -h, --help: view this help message
 --send:     actually send notifications. If not set, a diagnostic run will be
