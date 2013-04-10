@@ -86,20 +86,7 @@ class Eportfolio {
 	 * @return mixed
 	 */
 	private function fetchPageSettings($pageId) {
-		$query = "
-			SELECT *
-			FROM {$this->getContext()}_config
-			WHERE uid = '{$this->getUserId()}'
-			AND page_id = '{$pageId}'
-		";
-
-		$result = $this->getDb()->getRow($query);
-
-		if (is_array($result)) {
-			return $result;
-		}
-
-		return array();
+		return Eportfolio_PageMapper::getInstance()->findById($pageId);
 	}
 
 	/**
@@ -109,8 +96,8 @@ class Eportfolio {
 	 * @return bool
 	 */
 	private function getSettingsKey($key) {
-		if (array_key_exists($key, $this->getSettings())) {
-			return $this->settings[$key];
+		if (property_exists($this->getSettings(), $key)) {
+			return $this->getSettings()->$key;
 		}
 
 		return false;
@@ -122,7 +109,7 @@ class Eportfolio {
 	 * @return bool
 	 */
 	public function getSettingsPageTitle() {
-		return $this->getSettingsKey('page_title');
+		return $this->getSettings()->getPageTitle();
 	}
 
 	/**
@@ -131,7 +118,7 @@ class Eportfolio {
 	 * @return bool
 	 */
 	public function getSettingsPageId() {
-		return $this->getSettingsKey('page_id');
+		return $this->getSettings()->getPageId();
 	}
 
 	/**
@@ -140,7 +127,7 @@ class Eportfolio {
 	 * @return mixed
 	 */
 	public function getSettingsTemplate() {
-		return $this->getSettingsKey('template');
+		return $this->getSettings()->getTemplate();
 	}
 
 	/**
@@ -149,7 +136,7 @@ class Eportfolio {
 	 * @return bool
 	 */
 	public function getSettingsPageOwner() {
-		return $this->getSettingsKey('uid');
+		return $this->getSettings()->getUid();
 	}
 
 	/**
