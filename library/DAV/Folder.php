@@ -78,7 +78,8 @@ class DAV_Folder extends Sabre\DAV\Collection {
      * Checks if name refers to a folder it then returns a folder object otherwise searches for a file in the current path
      *
      * @param string $name
-     * @throws Sabre\DAV\Exception_NotFound
+     * @throws Sabre\DAV\Exception\Forbidden
+     * @throws Sabre\DAV\Exception\NotFound
      * @return Sabre\DAV\INode
      */
     public function getChild($name) {
