@@ -37,11 +37,11 @@ class Eportfolio {
 	private $pageId = -1;
 
 	/**
-	 * All settings for the current page
+	 * An instance of Eportfolio_Page
 	 *
 	 * @var array
 	 */
-	private $settings = array();
+	private $pageInstance = null;
 
 	/**
 	 * This is the prefix used for all the cloned sql queries
@@ -74,69 +74,55 @@ class Eportfolio {
 		 * this extra information
 		 */
 		if (is_numeric($pageId)) {
-			$this->setSettings($this->fetchPageSettings($pageId));
+			$pageInstance = Eportfolio_PageMapper::getInstance()->findById($pageId);
+
+			$this->setPageInstance($pageInstance);
 			$this->setAllTemplates($this->fetchAllTemplates());
 		}
 	}
 
 	/**
-	 * Get all the page settings for a particular page
-	 *
-	 * @param $pageId
-	 * @return mixed
-	 */
-	private function fetchPageSettings($pageId) {
-		return Eportfolio_PageMapper::getInstance()->findById($pageId);
-	}
-
-	/**
-	 * Get a particular key from settings array
-	 *
-	 * @param $key
-	 * @return bool
-	 */
-	private function getSettingsKey($key) {
-		if (property_exists($this->getSettings(), $key)) {
-			return $this->getSettings()->$key;
-		}
-
-		return false;
-	}
-
-	/**
+	 * Delegate method
+	 * 
 	 * Get the page title
 	 *
 	 * @return bool
 	 */
 	public function getSettingsPageTitle() {
-		return $this->getSettings()->getPageTitle();
+		return $this->getPageInstance()->getPageTitle();
 	}
 
 	/**
+	 * Delegate method
+	 *
 	 * Get the page id
 	 *
 	 * @return bool
 	 */
 	public function getSettingsPageId() {
-		return $this->getSettings()->getPageId();
+		return $this->getPageInstance()->getPageId();
 	}
 
 	/**
+	 * Delegate method
+	 *
 	 * Returns the current template id
 	 *
 	 * @return mixed
 	 */
 	public function getSettingsTemplate() {
-		return $this->getSettings()->getTemplate();
+		return $this->getPageInstance()->getTemplate();
 	}
 
 	/**
+	 * Delegate method
+	 *
 	 * Returns the owner id of a given page
 	 *
 	 * @return bool
 	 */
 	public function getSettingsPageOwner() {
-		return $this->getSettings()->getUid();
+		return $this->getPageInstance()->getUid();
 	}
 
 	/**
@@ -199,8 +185,8 @@ class Eportfolio {
 	 */
 	public function getColumnWidths() {
 		return array(
-			'left_column_width' => $this->getSettingsKey('left_column_width'),
-			'right_column_width' => $this->getSettingsKey('right_column_width'),
+			'left_column_width' => $this->getPageInstance()->getLeftColumnWidth(),
+			'right_column_width' => $this->getPageInstance()->getRightColumnWidth(),
 		);
 	}
 
@@ -229,27 +215,29 @@ class Eportfolio {
 	 */
 	public function getColorList($pageId) {
 		$colourList = array(
-			'left_head_font' => $this->getSettingsKey('left_head_font'),
-			'left_head_bg' => $this->getSettingsKey('left_head_bg'),
-			'left_font' => $this->getSettingsKey('left_font'),
-			'left_bg_primary' => $this->getSettingsKey('left_bg_primary'),
-			'left_bg_secondary' => $this->getSettingsKey('left_bg_secondary'),
-			'left_link' => $this->getSettingsKey('left_link'),
-			'left_hover' => $this->getSettingsKey('left_hover'),
-			'right_head_font' => $this->getSettingsKey('right_head_font'),
-			'right_head_bg' => $this->getSettingsKey('right_head_bg'),
-			'right_font' => $this->getSettingsKey('right_font'),
-			'right_bg_primary' => $this->getSettingsKey('right_bg_primary'),
-			'right_bg_secondary' => $this->getSettingsKey('right_bg_secondary'),
-			'right_link' => $this->getSettingsKey('right_link'),
-			'right_hover' => $this->getSettingsKey('right_hover'),
-			'top_head_font' => $this->getSettingsKey('top_head_font'),
-			'top_head_bg' => $this->getSettingsKey('top_head_bg'),
-			'top_font' => $this->getSettingsKey('top_font'),
-			'top_bg_primary' => $this->getSettingsKey('top_bg_primary'),
-			'top_bg_secondary' => $this->getSettingsKey('top_bg_secondary'),
-			'top_link' => $this->getSettingsKey('top_link'),
-			'top_hover' => $this->getSettingsKey('top_hover'),
+			'left_head_font' => $this->getPageInstance()->getLeftHeadFont(),
+			'left_head_bg' => $this->getPageInstance()->getLeftHeadBg(),
+			'left_font' => $this->getPageInstance()->getLeftFont(),
+			'left_bg_primary' => $this->getPageInstance()->getLeftBgPrimary(),
+			'left_bg_secondary' => $this->getPageInstance()->getLeftBgSecondary(),
+			'left_link' => $this->getPageInstance()->getLeftLink(),
+			'left_hover' => $this->getPageInstance()->getLeftHover(),
+
+			'right_head_font' => $this->getPageInstance()->getRightHeadFont(),
+			'right_head_bg' => $this->getPageInstance()->getRightHeadBg(),
+			'right_font' => $this->getPageInstance()->getRightFont(),
+			'right_bg_primary' => $this->getPageInstance()->getRightBgPrimary(),
+			'right_bg_secondary' => $this->getPageInstance()->getRightBgSecondary(),
+			'right_link' => $this->getPageInstance()->getRightLink(),
+			'right_hover' => $this->getPageInstance()->getRightHover(),
+
+			'top_head_font' => $this->getPageInstance()->getTopHeadFont(),
+			'top_head_bg' => $this->getPageInstance()->getTopHeadBg(),
+			'top_font' => $this->getPageInstance()->getTopFont(),
+			'top_bg_primary' => $this->getPageInstance()->getTopBgPrimary(),
+			'top_bg_secondary' => $this->getPageInstance()->getTopBgSecondary(),
+			'top_link' => $this->getPageInstance()->getTopLink(),
+			'top_hover' => $this->getPageInstance()->getTopHover(),
 		);
 
 		// use defaults for missing colours
@@ -1001,21 +989,21 @@ class Eportfolio {
 	}
 
 	/**
-	 * Set settings array
+	 * Set page instance
 	 *
-	 * @param array $settings
+	 * @param array $pageInstance
 	 */
-	private function setSettings($settings) {
-		$this->settings = $settings;
+	private function setPageInstance($pageInstance) {
+		$this->pageInstance = $pageInstance;
 	}
 
 	/**
-	 * Get settings array
+	 * Get page instance
 	 *
 	 * @return array
 	 */
-	private function getSettings() {
-		return $this->settings;
+	private function getPageInstance() {
+		return $this->pageInstance;
 	}
 
 	/**
@@ -1031,6 +1019,4 @@ class Eportfolio {
 	private function getAllTemplates() {
 		return $this->allTemplates;
 	}
-
-
 }
