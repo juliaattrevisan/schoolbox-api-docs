@@ -33,9 +33,11 @@
     <div class="wysiwig">
         <a name="go-to{COMPONENT_INSTANCE_ID}"></a>
         <form action="/homepage/textBoxForm.php" method="post" id="textBoxForm" >
-            <input type="text"  style="width: 100%" name="textBoxHeading" value="{TEXTBOX_HEADING}" />
-            <br/>
-            <br/>
+            <label style="font-weight:bold;margin:4px 0 0 0;" for="textBoxHeading">Textbox Heading</label>
+            <input type="text" style="width:98%" maxlength="255" name="textBoxHeading" id="textBoxHeading" value="{TEXTBOX_HEADING}" />
+            <br />
+            <br />
+            <label style="font-weight:bold;float:left;margin:4px 0 0 0;" for="textBoxBody">Textbox Content</label>
             <textarea rows="20" style="width: 100%;" name="textBoxBody" id="textBoxBody">{TEXTBOX_BODY}</textarea>
             <input type="hidden" name="categoryID" value="{ID}" />
             <input type="hidden" name="textBoxID" value="{TEXTBOX_ID}" />
