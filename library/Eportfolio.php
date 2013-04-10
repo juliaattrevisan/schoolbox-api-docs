@@ -380,7 +380,82 @@ class Eportfolio {
 		}
 	}
 
+	/**
+	 * Delete an eportfolio
+	 *
+	 * Contents storted in other tables are retained
+	 */
+	public function delete() {
+		$allComponents = Component_InstanceMapper::getInstance()->findByColumnList(array(
+			'module' => 'eportfolio',
+			'identifier' => $this->getPageId(),
+		));
 
+		/* Remove all the components
+		 */
+		$allInstanceIds = array();
+
+		for ($allComponents->rewind(); $allComponents->valid(); $allComponents->next()) {
+			$currentComponent = $allComponents->current();
+
+			/* Remember this id so we can get their configs again later
+			 */
+			$allInstanceIds[] = $currentComponent->id;
+
+			//Component_InstanceMapper::getInstance()->delete($currentComponent);
+		}
+
+		/* Remove all the components' configs
+		 */
+		if (count($allInstanceIds)) {
+			$allConfigs = Component_ConfigMapper::getInstance()->findIn($allInstanceIds);
+
+			for ($allConfigs->rewind(); $allConfigs->valid(); $allConfigs->next()) {
+				$currentConfig = $allConfigs->current();
+
+				//Component_ConfigMapper::getInstance()->delete($currentConfig);
+			}
+		}
+
+		/* Remove the page itself
+		 */
+		$pageInstance = Eportfolio_PageMapper::getInstance()->findById($this->getPageId());
+
+
+//		$this->emptyHomepage();
+//
+//		$this->db->delete($this->getContext() . '_config', 'page_id', $this->getPageId());
+//		$this->deleteComponentPositions();
+	}
+
+
+//	/**
+//	 * Removes componentry from eportfolio and resets to the template that was used to create it.
+//	 * Also soft-deletes eportfolio content where applicable
+//	 *
+//	 * @return void
+//	 */
+//	public function emptyHomepage() {
+//		// TODO for 13.0.0: refactor this to call iterate across Component_Homepage_*Controllers instead, and call deleteData() if available
+//		// soft delete the data using handlers
+//		$allComponents = array(
+//			'Assess_Main', 'Blog', 'Calendar', 'CategoryNews', 'Chat', 'Dropbox', 'File', 'Forum',
+//			'Poll', 'Submission', 'Survey_Main', 'TextBox', 'Wiki'
+//		);
+//
+//		if (is_array($allComponents) && count($allComponents)) {
+//			foreach ($allComponents as $currentComponent) {
+//				$handler = new $currentComponent();
+//				$handler->homepageClean($this->cid);
+//			}
+//		}
+//
+//		// reset the homepage
+//		$categoryHandler = new Category();
+//		$category = $categoryHandler->getByID($this->cid);
+//		$this->resetHomepageToTemplate($category['template']);
+//
+//	}
 
 
 
@@ -487,48 +562,7 @@ class Eportfolio {
 		$this->db->query($query);
 	}
 
-//	/**
-//	 * Delete an eportfolio
-//	 */
-//	public function deleteEportfolio() {
-//		require_once dirname(__FILE__) . '/group.php';
-//		$groupHandler = new Group;
-//		$groupHandler->disbandGroup($this->getUserId());
-//
-//		$this->emptyHomepage();
-//
-//		$this->db->delete($this->getContext() . '_config', 'uid', $this->getUserId());
-//		$this->deleteComponentPositions();
-//	}
 
-
-//	/**
-//	 * Removes componentry from eportfolio and resets to the template that was used to create it.
-//	 * Also soft-deletes eportfolio content where applicable
-//	 *
-//	 * @return void
-//	 */
-//	public function emptyHomepage() {
-//		// TODO for 13.0.0: refactor this to call iterate across Component_Homepage_*Controllers instead, and call deleteData() if available
-//		// soft delete the data using handlers
-//		$allComponents = array(
-//			'Assess_Main', 'Blog', 'Calendar', 'CategoryNews', 'Chat', 'Dropbox', 'File', 'Forum',
-//			'Poll', 'Submission', 'Survey_Main', 'TextBox', 'Wiki'
-//		);
-//
-//		if (is_array($allComponents) && count($allComponents)) {
-//			foreach ($allComponents as $currentComponent) {
-//				$handler = new $currentComponent();
-//				$handler->homepageClean($this->cid);
-//			}
-//		}
-//
-//		// reset the homepage
-//		$categoryHandler = new Category();
-//		$category = $categoryHandler->getByID($this->cid);
-//		$this->resetHomepageToTemplate($category['template']);
-//
-//	}
 
 
 	/**
