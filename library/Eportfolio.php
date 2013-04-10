@@ -80,22 +80,6 @@ class Eportfolio {
 	}
 
 	/**
-	 * Get all the pages owned by a particular user
-	 *
-	 * @return array|bool
-	 */
-	public function fetchAllPages() {
-		$query = "
-			SELECT *
-			FROM {$this->getContext()}_config
-			WHERE uid = '{$this->getUserId()}'
-			ORDER BY page_id
-		";
-
-		return $this->getDb()->getAll($query);
-	}
-
-	/**
 	 * Get all the page settings for a particular page
 	 *
 	 * @param $pageId

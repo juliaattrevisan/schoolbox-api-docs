@@ -155,14 +155,16 @@ abstract class Eportfolio_Page_Abstract {
 	 * Render a list of pages
 	 */
 	private function renderPageList() {
-		$allPages = $this->getEportfolioHandler()->fetchAllPages();
+		$allPages = Eportfolio_PageMapper::getInstance()->findByColumn('uid', $this->getUserId());
 
-		if (is_array($allPages) && count($allPages)) {
-			foreach($allPages as $currentPage) {
+		if ($allPages->count()) {
+			for ($allPages->rewind(); $allPages->valid(); $allPages->next()) {
+				$currentPage = $allPages->current();
+
 				$this->getPage()->setVar(array(
-					'EPORTFOLIO_PAGE_USER_ID' => $this->getUserId(),
-					'EPORTFOLIO_PAGE_ID' => $currentPage['page_id'],
-					'EPORTFOLIO_PAGE_NAME' => $currentPage['page_title'],
+					'EPORTFOLIO_PAGE_USER_ID' => $currentPage->getUid(),
+					'EPORTFOLIO_PAGE_ID' => $currentPage->getPageId(),
+					'EPORTFOLIO_PAGE_NAME' => $currentPage->getPageTitle(),
 				));
 
 				$this->getPage()->parse('eportfolio_page_block', 'eportfolio_page', true);
