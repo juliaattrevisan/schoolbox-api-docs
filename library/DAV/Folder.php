@@ -16,10 +16,10 @@ class DAV_Folder extends Sabre\DAV\Collection {
     private $fileHandler;
     private $groupHandler;
 
-	/**
-	 * @var DAV_SubjectServer_SubjectList
-	 */
-	protected $subject_list;
+    /**
+     * @var DAV_SubjectServer_SubjectList
+     */
+    protected $subject_list;
 
     public function __construct($path) {
 
@@ -31,9 +31,9 @@ class DAV_Folder extends Sabre\DAV\Collection {
 
         $this->setFolderID($path);
 
-		//
-		// Name may be configurable later on.
-		$this->subject_list = new DAV_SubjectServer_SubjectList('/My Subjects');
+        //
+        // Name may be configurable later on.
+        $this->subject_list = new DAV_SubjectServer_SubjectList('/My Subjects');
     }
 
     public function getChildren() {
@@ -63,11 +63,11 @@ class DAV_Folder extends Sabre\DAV\Collection {
             }
         }
 
-		//
-		// Students: get a "My Subjects" folder. (Add to plugin)
-		if ($this->subject_list->isSubjectListShown($this->myPath)) {
-			$children[] = $this->subject_list;
-		}
+        //
+        // Students: get a "My Subjects" folder. (Add to plugin)
+        if ($this->subject_list->isSubjectListShown($this->myPath)) {
+            $children[] = $this->subject_list;
+        }
 
         return $children;
     }
@@ -91,14 +91,14 @@ class DAV_Folder extends Sabre\DAV\Collection {
             }
         }
 
-		$this_folder = $this->myPath.'/'.$name;
-		if ($this_folder === $this->subject_list->getName()) {
-			$user_mapper = new UserMapper();
-			$this->subject_list
-				->setUser($user_mapper->findById($_SESSION['id']))
-				->loadChildren();
-			return $this->subject_list;
-		}
+        $this_folder = $this->myPath.'/'.$name;
+        if ($this_folder === $this->subject_list->getName()) {
+            $user_mapper = new UserMapper();
+            $this->subject_list
+                ->setUser($user_mapper->findById($_SESSION['id']))
+                ->loadChildren();
+            return $this->subject_list;
+        }
         if($this->isFolder($name, $this->getFolderID())) {
             return new DAV_Folder($this_folder);
         }
@@ -108,9 +108,9 @@ class DAV_Folder extends Sabre\DAV\Collection {
             if(is_array($file) && is_readable(Cfg::get('file_dir') .'/'. $file['id'] . '.dat') ) {
                 return new DAV_File($this->myPath.'/'.$file['realname']);
             }
-			else {
-				throw new Sabre\DAV\Exception\NotFound('The file with name: ' . $file['realname'] . ' could not be found');
-			}
+            else {
+                throw new Sabre\DAV\Exception\NotFound('The file with name: ' . $file['realname'] . ' could not be found');
+            }
         }
 
     }
