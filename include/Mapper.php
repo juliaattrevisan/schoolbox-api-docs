@@ -302,17 +302,17 @@ abstract class Mapper {
      *
      * @return Collection
      */
-    public function getModelAsCollection($object) {
-        if (is_subclass_of($object, 'Model')) {
-            $collection = new Collection;
-            $collection[] = $object;
-        }
-        else {
-            $collection = $object;
-        }
-        return $collection;
-    }
+	public function getModelAsCollection($object) {
+		if (is_subclass_of($object, 'Collection')) {
+			return $object;
+		}
+		else {
+			$collection = new Collection;
+			$collection[] = $object;
 
+			return $collection;
+		}
+	}
 
     /**
      * @brief calls save(), but forces create by nulling the identifier field.
@@ -346,7 +346,6 @@ abstract class Mapper {
             VALUES ($plcString)
             ON DUPLICATE KEY UPDATE $updString;
         ");
-        $this->database->beginTransaction();
 
         $affectedIDs = array();
 
@@ -409,10 +408,15 @@ abstract class Mapper {
         }
 
         $this->database->beginTransaction();
+
         foreach ($collection as $model) {
+			print_r("$model");
+			var_dump($this->getModelProperty($model, $identifierName, $this->identifier));
+
             $statement->bindParam(':identifierValue', $this->getModelProperty($model, $identifierName, $this->identifier));
 
             if (!$statement->execute()) {
+
                 return false;
             }
         }
