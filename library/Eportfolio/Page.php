@@ -11,136 +11,189 @@
 class Eportfolio_Page {
 
 	/**
+	 * The id of the page currently being viewed
+	 *
 	 * @var
 	 */
 	public $page_id;
 
 	/**
+	 * The page title (appears in window drag bar)
+	 *
 	 * @var
 	 */
 	public $page_title;
 
 	/**
+	 * The owner of the page
+	 *
 	 * @var
 	 */
 	public $uid;
 
 	/**
+	 * The template the page is using
+	 *
 	 * @var
 	 */
 	public $template;
 
 	/**
+	 * Width of the left column as a percentage
+	 *
 	 * @var
 	 */
 	public $left_column_width;
 
 	/**
+	 * Font colour
+	 *
 	 * @var
 	 */
 	public $left_head_font;
 
 	/**
+	 * Background colour
+	 *
 	 * @var
 	 */
 	public $left_head_bg;
 
 	/**
+	 * Font color
 	 * @var
 	 */
 	public $left_font;
 
 	/**
+	 * Background colour
+	 *
 	 * @var
 	 */
 	public $left_bg_primary;
 
 	/**
+	 * Background colour
+	 *
 	 * @var
 	 */
 	public $left_bg_secondary;
 
 	/**
+	 * Link colour
+	 *
 	 * @var
 	 */
 	public $left_link;
 
 	/**
+	 * Hover colour
+	 *
 	 * @var
 	 */
 	public $left_hover;
 
 	/**
+	 * Width of the right column as a percentage
+	 *
 	 * @var
 	 */
 	public $right_column_width;
 
 	/**
+	 * Font colour
+	 *
 	 * @var
 	 */
 	public $right_head_font;
 
 	/**
+	 * Background colour
+	 *
 	 * @var
 	 */
 	public $right_head_bg;
 
 	/**
+	 * Font color
+	 *
 	 * @var
 	 */
 	public $right_font;
 
 	/**
+	 * Background colour
+	 *
 	 * @var
 	 */
 	public $right_bg_primary;
 
 	/**
+	 * Background colour
+	 *
 	 * @var
 	 */
 	public $right_bg_secondary;
 
 	/**
+	 * Link colour
+	 *
 	 * @var
 	 */
 	public $right_link;
 
 	/**
+	 * Hover colour
+	 *
 	 * @var
 	 */
 	public $right_hover;
 
 	/**
+	 * Font colour
+	 *
 	 * @var
 	 */
 	public $top_head_font;
 
 	/**
+	 * Background colour
+	 *
 	 * @var
 	 */
 	public $top_head_bg;
 
 	/**
+	 * Font color
+	 *
 	 * @var
 	 */
 	public $top_font;
 
 	/**
+	 * Background colour
+	 *
 	 * @var
 	 */
 	public $top_bg_primary;
 
 	/**
+	 * Background colour
+	 *
 	 * @var
 	 */
 	public $top_bg_secondary;
 
 	/**
+	 * Link colour
+	 *
 	 * @var
 	 */
 	public $top_link;
 
 	/**
+	 * Hover colour
+	 *
 	 * @var
 	 */
 	public $top_hover;
@@ -149,6 +202,8 @@ class Eportfolio_Page {
 	 */
 
 	/**
+	 * Set colour
+	 *
 	 * @param $left_bg_primary
 	 */
 	public function setLeftBgPrimary($left_bg_primary) {
@@ -156,6 +211,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getLeftBgPrimary() {
@@ -163,6 +220,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $left_bg_secondary
 	 */
 	public function setLeftBgSecondary($left_bg_secondary) {
@@ -170,6 +229,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getLeftBgSecondary() {
@@ -177,6 +238,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $left_column_width
 	 */
 	public function setLeftColumnWidth($left_column_width) {
@@ -184,6 +247,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getLeftColumnWidth() {
@@ -191,6 +256,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $left_font
 	 */
 	public function setLeftFont($left_font) {
@@ -198,6 +265,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getLeftFont() {
@@ -205,6 +274,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $left_head_bg
 	 */
 	public function setLeftHeadBg($left_head_bg) {
@@ -212,6 +283,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getLeftHeadBg() {
@@ -219,6 +292,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $left_head_font
 	 */
 	public function setLeftHeadFont($left_head_font) {
@@ -226,6 +301,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getLeftHeadFont() {
@@ -233,6 +310,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $left_hover
 	 */
 	public function setLeftHover($left_hover) {
@@ -240,6 +319,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getLeftHover() {
@@ -247,6 +328,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $left_link
 	 */
 	public function setLeftLink($left_link) {
@@ -254,6 +337,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getLeftLink() {
@@ -261,6 +346,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set page id
+	 *
 	 * @param $page_id
 	 */
 	public function setPageId($page_id) {
@@ -268,6 +355,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get page id
+	 *
 	 * @return mixed
 	 */
 	public function getPageId() {
@@ -275,6 +364,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set page title
+	 *
 	 * @param $page_title
 	 */
 	public function setPageTitle($page_title) {
@@ -282,6 +373,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get page title
+	 *
 	 * @return mixed
 	 */
 	public function getPageTitle() {
@@ -289,6 +382,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $right_bg_primary
 	 */
 	public function setRightBgPrimary($right_bg_primary) {
@@ -296,6 +391,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getRightBgPrimary() {
@@ -303,6 +400,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $right_bg_secondary
 	 */
 	public function setRightBgSecondary($right_bg_secondary) {
@@ -310,6 +409,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getRightBgSecondary() {
@@ -317,6 +418,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $right_column_width
 	 */
 	public function setRightColumnWidth($right_column_width) {
@@ -324,6 +427,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getRightColumnWidth() {
@@ -331,6 +436,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $right_font
 	 */
 	public function setRightFont($right_font) {
@@ -338,6 +445,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getRightFont() {
@@ -345,6 +454,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $right_head_bg
 	 */
 	public function setRightHeadBg($right_head_bg) {
@@ -352,6 +463,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getRightHeadBg() {
@@ -359,6 +472,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $right_head_font
 	 */
 	public function setRightHeadFont($right_head_font) {
@@ -366,6 +481,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getRightHeadFont() {
@@ -373,6 +490,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $right_hover
 	 */
 	public function setRightHover($right_hover) {
@@ -380,6 +499,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getRightHover() {
@@ -387,6 +508,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $right_link
 	 */
 	public function setRightLink($right_link) {
@@ -394,6 +517,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getRightLink() {
@@ -401,6 +526,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $template
 	 */
 	public function setTemplate($template) {
@@ -408,6 +535,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getTemplate() {
@@ -415,6 +544,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $top_bg_primary
 	 */
 	public function setTopBgPrimary($top_bg_primary) {
@@ -422,6 +553,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getTopBgPrimary() {
@@ -429,6 +562,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $top_bg_secondary
 	 */
 	public function setTopBgSecondary($top_bg_secondary) {
@@ -436,6 +571,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getTopBgSecondary() {
@@ -443,6 +580,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $top_font
 	 */
 	public function setTopFont($top_font) {
@@ -450,6 +589,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getTopFont() {
@@ -457,6 +598,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $top_head_bg
 	 */
 	public function setTopHeadBg($top_head_bg) {
@@ -464,6 +607,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getTopHeadBg() {
@@ -471,6 +616,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $top_head_font
 	 */
 	public function setTopHeadFont($top_head_font) {
@@ -478,6 +625,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getTopHeadFont() {
@@ -485,6 +634,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $top_hover
 	 */
 	public function setTopHover($top_hover) {
@@ -492,6 +643,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getTopHover() {
@@ -499,6 +652,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set colour
+	 *
 	 * @param $top_link
 	 */
 	public function setTopLink($top_link) {
@@ -506,6 +661,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get colour
+	 *
 	 * @return mixed
 	 */
 	public function getTopLink() {
@@ -513,6 +670,8 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Set uid
+	 *
 	 * @param $uid
 	 */
 	public function setUid($uid) {
@@ -520,12 +679,11 @@ class Eportfolio_Page {
 	}
 
 	/**
+	 * Get uid
+	 *
 	 * @return mixed
 	 */
 	public function getUid() {
 		return $this->uid;
 	}
-
-
-
 }
