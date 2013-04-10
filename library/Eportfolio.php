@@ -83,7 +83,7 @@ class Eportfolio {
 
 	/**
 	 * Delegate method
-	 * 
+	 *
 	 * Get the page title
 	 *
 	 * @return bool
@@ -128,18 +128,15 @@ class Eportfolio {
 	/**
 	 * Update a page title
 	 *
+	 * Storm will always complain about $this->getPageInstance() being cloned
+	 *
 	 * @param $value
 	 */
 	public function updatePageTitle($value) {
-		$query = "
-			UPDATE {$this->getContext()}_config
-			SET page_title = \"{$value}\"
-			WHERE page_id = '{$this->getPageId()}'
-			AND uid = '{$this->getUserId()}'
-			LIMIT 1
-		";
+		$updatedPageInstance = clone $this->getPageInstance();
+		$updatedPageInstance->setPageTitle($value);
 
-		$this->getDb()->query($query);
+		Eportfolio_PageMapper::getInstance()->save($updatedPageInstance);
 	}
 
 	/**
