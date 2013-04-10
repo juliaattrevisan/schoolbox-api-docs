@@ -128,15 +128,12 @@ class Eportfolio {
 	/**
 	 * Update a page title
 	 *
-	 * Storm will always complain about $this->getPageInstance() being cloned
-	 *
 	 * @param $value
 	 */
 	public function updatePageTitle($value) {
-		$updatedPageInstance = clone $this->getPageInstance();
-		$updatedPageInstance->setPageTitle($value);
+		$this->getPageInstance()->setPageTitle($value);
 
-		Eportfolio_PageMapper::getInstance()->save($updatedPageInstance);
+		Eportfolio_PageMapper::getInstance()->save($this->getPageInstance());
 	}
 
 	/**
