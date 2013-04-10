@@ -54,9 +54,14 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 
 	    $this->setBlock($templateHandle, 'default_video', 'default_video_block');
 	    $this->setBlock($templateHandle, 'video_list', 'video_list_block');
-	    $this->setVar('DEFAULT_VIDEO_ID', $this->defaultVideo->getFile()->getId());
-	    $this->parse('default_video_block','default_video');
 
+	    if(is_object($this->defaultVideo)) {
+	        $this->setVar('DEFAULT_VIDEO_ID', $this->defaultVideo->getFile()->getId());
+	        $this->parse('default_video_block','default_video');
+        }
+	    else {
+		    $this->setVar('default_video_block','');
+	    }
 	    if(count($this->outputList)) {
 
 
@@ -65,7 +70,9 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 			    $this->setVar( array('VIDEO_LIST_ID'     => $video->getFile()->getId(),
 				                     'VIDEO_LIST_TITLE'  => Scrub::text($video->getFile()->getDescription()),
 				                     'VIDEO_LIST_DURATION'=> gmdate('H:i:s',$video->getDuration()),
+				                     'VIDEO_LIST_COMMENT' => Scrub::text($video->getFile()->getComment()),
 				                     'VIDEO_LIST_HIDDEN' => $video->getFile()->getHidden() ? 'hidden' : '',
+				                     //'VIDEO_LIST_POSTER' => $video->getFile()->getPoster()->getHTMLName();
 			                   ));
 				$this->parse('video_list_block','video_list',true);
 		    }

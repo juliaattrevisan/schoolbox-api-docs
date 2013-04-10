@@ -11,9 +11,14 @@
     </video>
 </div>
 <!-- END default_video -->
-<ul>
+<ul class="news-list">
     <!-- BEGIN video_list -->
-    <li class="{VIDEO_LIST_HIDDEN}"><a class="video-link" href="#" rel="{VIDEO_LIST_ID}"><img src="/cms/videoThumb.php?id={VIDEO_LIST_ID}" title="{VIDEO_LIST_TITLE}"></a>{VIDEO_LIST_TITLE} {VIDEO_LIST_DURATION}</li>
+    <li>
+        <a class="video-link" href="#" rel="{VIDEO_LIST_ID}"><img width=64 height=64 src="/cms/videoThumb.php?id={VIDEO_LIST_ID}" title="{VIDEO_LIST_TITLE}"><a/>
+        <h3><a class="video-link" href="#" rel="{VIDEO_LIST_ID}">{VIDEO_LIST_TITLE}</a></h3>
+        <span class="time">{VIDEO_LIST_DURATION} | Posted by {VIDEO_LIST_POSTER}</span>
+        <p>{VIDEO_LIST_COMMENT}</p>
+    </li>
     <!-- END video_list -->
 </ul>
 <script type="text/javascript">
