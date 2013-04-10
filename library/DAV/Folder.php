@@ -38,26 +38,26 @@ class DAV_Folder extends Sabre\DAV\Collection {
 
     public function getChildren() {
 
-        $children = array();
-
         $categoryList = $this->getFolderHandler()->getSimpleCategoryList($this->getFolderID());
 
         // Loop through the directory, and create objects for each node that the user has permission to access
+        $folders = array();
         if(is_array($categoryList)){
             foreach($categoryList as $folder) {
                 if($this->getGroupHandler()->getPermission($folder['id']) >= READ_ACCESS) {
-                    $children[] = new DAV_Folder($this->myPath.'/'.$folder['name']);
+                    $folders[] = new DAV_Folder($this->myPath.'/'.$folder['name']);
                 }
             }
         }
 
         //Loop through all the files and output them if the user has access
+        $files = array();
         if($this->getGroupHandler()->getPermission($this->getFolderID()) >= READ_ACCESS ) {
             $fileList = $this->getFileHandler()->getAllInCategory($this->getFolderID());
             if(is_array($fileList)){
                 foreach($fileList as $file) {
                     if(is_array($file) && is_readable(Cfg::get('file_dir') .'/'. $file['id'] . '.dat') ) {
-                        $children[] = new DAV_File($this->myPath.'/'.$file['realname']);
+                        $files[] = new DAV_File($this->myPath.'/'.$file['realname']);
                     }
                 }
             }
@@ -66,10 +66,27 @@ class DAV_Folder extends Sabre\DAV\Collection {
         //
         // Students: get a "My Subjects" folder. (Add to plugin)
         if ($this->subject_list->isSubjectListShown($this->myPath)) {
-            $children[] = $this->subject_list;
+            $folders[] = $this->subject_list;
         }
 
-        return $children;
+        //
+        // Sort by type and name
+        usort($folders, array($this, 'compareChildren'));
+        usort($files,   array($this, 'compareChildren'));
+
+        return array_merge($folders, $files);
+    }
+
+    /**
+     * Sort callback for children.
+     *
+     * @param \Sabre\Dav\INode $child1
+     * @param \Sabre\Dav\INode $child2
+     *
+     * @return int
+     */
+    public function compareChildren(Sabre\Dav\INode $child1, Sabre\Dav\INode $child2) {
+        return strcmp($child1->getName(), $child2->getName());
     }
 
     /**
