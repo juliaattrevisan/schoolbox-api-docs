@@ -1,0 +1,7 @@
+
+Will be sent to {NAME} {SURNAME} ({USER_EMAIL}):
+---
+Hi {NAME},
+You have work that is now overdue.
+{DUEWORK_NAME}, in {CATEGORY_NAME} was due {DUEWORK_DATE}.
+---

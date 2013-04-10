@@ -1,0 +1,12 @@
+
+Will be sent to {NAME} {SURNAME} ({USER_EMAIL}):
+---
+Hi {NAME},
+The following work is due within the next 24 hours:
+<!-- BEGIN subject -->
+In {CATEGORY_NAME}
+<!-- BEGIN due_work -->
+{DUEWORK_NAME} is due {DUEWORK_DATE}.
+<!-- END due_work -->
+<!-- END subject -->
+---
