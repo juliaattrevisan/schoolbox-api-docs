@@ -119,6 +119,8 @@ class Scrub {
 	        'www.facebook.com/plugins/',
 	        'padlet.com/embed/',
 	        'linoit.com/users/linoit-com/canvases/',
+	        'www.showme.com/sma/embed',
+
         );
 
 
