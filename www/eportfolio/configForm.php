@@ -45,29 +45,31 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 		 */
 		else if ($_POST['type'] == 'components') {
 			$columns = array(
-				'left'  => $_POST['column1'],
+				'left' => $_POST['column1'],
 				'right' => $_POST['column2'],
-				'top'   => $_POST['column3']
+				'top' => $_POST['column3']
 			);
 
 			foreach ($columns as $position => $componentString) {
 				// Explode the columns
 				$components[$position] = explode(',', $componentString);
 
-				$instanceList = array();
+				$instanceCollection = new Collection();
 
 				// Update the db
 				foreach ($components[$position] as $sequence => $componentID) {
-					if($componentID) {
+					if ($componentID) {
 						$inst = Component_InstanceMapper::getInstance()->findById($componentID);
-						$inst->sequence = $sequence + 1; // because we prefer to not have 0s in the database///
+						$inst->sequence = $sequence + 1; // because we prefer to not have 0s in the database
 						$inst->position = $position;
 
-						$instanceList[] = $inst;
+						$instanceCollection[] = $inst;
 					}
 				}
 
-				Component_InstanceMapper::getInstance()->save($instanceList);
+				if ($instanceCollection->count()) {
+					Component_InstanceMapper::getInstance()->save($instanceCollection);
+				}
 			}
 		}
 		/* AJAX request to delete component from eportfolio
