@@ -361,7 +361,6 @@ class Eportfolio {
 
 				$inst->module = $this->getContext();
 				$inst->identifier = $this->getPageId();
-
 				$ids = $cim->save($inst);
 				$id = $ids[0];
 
@@ -395,25 +394,29 @@ class Eportfolio {
 		 */
 		$allInstanceIds = array();
 
-		for ($allComponents->rewind(); $allComponents->valid(); $allComponents->next()) {
-			$currentComponent = $allComponents->current();
+		if ($allComponents->count()) {
+			for ($allComponents->rewind(); $allComponents->valid(); $allComponents->next()) {
+				$currentComponent = $allComponents->current();
 
-			/* Remember this id so we can get their configs again later
+				/* Remember this id so we can get their configs again later
+				 */
+				$allInstanceIds[] = $currentComponent->id;
+
+				Component_InstanceMapper::getInstance()->delete($currentComponent);
+			}
+
+			/* Remove all the components' configs
 			 */
-			$allInstanceIds[] = $currentComponent->id;
+			if (count($allInstanceIds)) {
+				$allConfigs = Component_ConfigMapper::getInstance()->findIn('component_instance_id', $allInstanceIds);
 
-			Component_InstanceMapper::getInstance()->delete($currentComponent);
-		}
+				if ($allConfigs->count()) {
+					for ($allConfigs->rewind(); $allConfigs->valid(); $allConfigs->next()) {
+						$currentConfig = $allConfigs->current();
 
-		/* Remove all the components' configs
-		 */
-		if (count($allInstanceIds)) {
-			$allConfigs = Component_ConfigMapper::getInstance()->findIn('component_instance_id', $allInstanceIds);
-
-			for ($allConfigs->rewind(); $allConfigs->valid(); $allConfigs->next()) {
-				$currentConfig = $allConfigs->current();
-
-				Component_ConfigMapper::getInstance()->delete($currentConfig);
+						Component_ConfigMapper::getInstance()->delete($currentConfig);
+					}
+				}
 			}
 		}
 
@@ -423,10 +426,12 @@ class Eportfolio {
 			'page_id' => $this->getPageId()
 		));
 
-		for ($allPermissions->rewind(); $allPermissions->valid(); $allPermissions->next()) {
-			$currentPermission = $allPermissions->current();
+		if ($allPermissions->count()) {
+			for ($allPermissions->rewind(); $allPermissions->valid(); $allPermissions->next()) {
+				$currentPermission = $allPermissions->current();
 
-			Eportfolio_PermissionMapper::getInstance()->delete($currentPermission);
+				Eportfolio_PermissionMapper::getInstance()->delete($currentPermission);
+			}
 		}
 
 		/* Remove the page itself
@@ -436,7 +441,7 @@ class Eportfolio {
 
 		/* Redirect back to the profile
 		 */
-		SitePage::localRedir('/eportfolio/' . $this->getUserId() . '/profile');
+//		SitePage::localRedir('/eportfolio/' . $this->getUserId() . '/profile');
 	}
 
 
