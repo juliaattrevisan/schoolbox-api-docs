@@ -192,13 +192,10 @@ class Eportfolio {
 	 * @return void
 	 */
 	public function updateColumnWidths($left, $right) {
-		$columnWidths = array(
-			'page_id' => $this->getPageId(),
-			'left_column_width' => $left,
-			'right_column_width' => $right,
-		);
+		$this->getPageInstance()->setLeftColumnWidth($left);
+		$this->getPageInstance()->setRightColumnWidth($right);
 
-		$this->db->update($this->getContext() . '_config', 'page_id', $columnWidths);
+		Eportfolio_PageMapper::getInstance()->save($this->getPageInstance());
 	}
 
 	/**
