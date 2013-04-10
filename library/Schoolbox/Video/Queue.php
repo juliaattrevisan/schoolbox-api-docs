@@ -45,7 +45,7 @@ class Queue {
 			$sourceFile = $sourceStore . '/' . $this->fileID . '.dat';
 		}
 		else {
-			throw new \Exception_Schoolbox();
+			throw new \Exception_Schoolbox('Processing of this type of video is not implemented');
 		}
 
 		/* Process video to 512kb in libx264 format for mobile and html5 streaming */
