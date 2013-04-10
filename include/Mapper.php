@@ -410,9 +410,6 @@ abstract class Mapper {
         $this->database->beginTransaction();
 
         foreach ($collection as $model) {
-			print_r("$model");
-			var_dump($this->getModelProperty($model, $identifierName, $this->identifier));
-
             $statement->bindParam(':identifierValue', $this->getModelProperty($model, $identifierName, $this->identifier));
 
             if (!$statement->execute()) {
