@@ -21,16 +21,6 @@ define("SQL_db", "schoolbox");
 define("SQL_dsn", "mysql:host=".SQL_host.";dbname=".SQL_db);
 
 
-//Synergy campus code lookup table
-define('SYN_CAMPUS_Codes', serialize(array(
-		1=>'SEN',
-		2=>'WAD',
-		3=>'GRIM',
-)));
-
-//Timetable days as this is not found in synergetic and it can be a bit hard to calculate pre-timetable
-define('TIMETABLE_day_count',serialize(array(1=>7,7,5)));
-define('TIMETABLE_day_offset', 0);
 
 //module config options
 define('HELPDESK_enable', false);

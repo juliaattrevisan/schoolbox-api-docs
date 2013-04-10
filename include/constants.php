@@ -28,16 +28,6 @@ define('GROUP_TYPE_FREE',       3);
 define('DEBUG_SQL_ENABLED', false);
 
 
-/* TO DEPRECATE */
-define('SYN_CAMPUS_Codes', serialize(array(
-    1=>'SEN',
-    2=>'WAD',
-    3=>'GRIM',
-)));
-
-define('TIMETABLE_day_count',serialize(array(1=>7,7,5)));
-define('TIMETABLE_day_offset', 0);
-
 /**
  * http://stackoverflow.com/questions/173400/php-arrays-a-good-way-to-check-if-an-array-is-associative-or-sequential
  * Use sparingly: it's expensive.
