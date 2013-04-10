@@ -1,5 +1,5 @@
 <?php
-class Sabre_DAV_Client_Extended extends Sabre_DAV_Client
+class Sabre_DAV_Client_Extended extends Sabre\DAV\Client
 {
 
     /**
@@ -352,7 +352,7 @@ class PortfolioWebDAV
                 1);
         } /* Handle Sabre_DAV_Exception specifically
          */
-        catch (Sabre_DAV_Exception $e) {
+        catch (Sabre\DAV\Exception $e) {
             error(141, DAV_Error::getMeaning($e->getMessage()));
         }
 

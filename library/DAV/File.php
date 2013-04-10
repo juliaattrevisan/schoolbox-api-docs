@@ -7,7 +7,7 @@
  */
 
 
-class DAV_File extends Sabre_DAV_File {
+class DAV_File extends Sabre\DAV\File {
 
     private $folderID;
     private $fileName;

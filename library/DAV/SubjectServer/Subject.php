@@ -11,7 +11,7 @@ use Schoolbox\User;
 use Schoolbox\External\Subject;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
-class DAV_SubjectServer_Subject extends Sabre_DAV_SimpleCollection
+class DAV_SubjectServer_Subject extends Sabre\DAV\SimpleCollection
 {
 	/**
 	 * @var Subject

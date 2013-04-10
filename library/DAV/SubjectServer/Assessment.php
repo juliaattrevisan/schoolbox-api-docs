@@ -10,7 +10,7 @@
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox;
 
-class DAV_SubjectServer_Assessment extends Sabre_DAV_SimpleCollection
+class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
 {
 	/**
 	 * @var SubmissionBox

@@ -9,7 +9,7 @@
 
 use Schoolbox\UserMapper;
 
-class DAV_Folder extends Sabre_DAV_Collection {
+class DAV_Folder extends Sabre\DAV\Collection {
 
     private $folder;
     private $folderHandler;
@@ -78,15 +78,15 @@ class DAV_Folder extends Sabre_DAV_Collection {
      * Checks if name refers to a folder it then returns a folder object otherwise searches for a file in the current path
      *
      * @param string $name
-     * @throws Sabre_DAV_Exception_NotFound
-     * @return Sabre_DAV_INode
+     * @throws Sabre\DAV\Exception_NotFound
+     * @return Sabre\DAV\INode
      */
     public function getChild($name) {
 
         //Prevent queries if permission is not allowed
         if($this->getFolderID() > 0) {
             if($this->getGroupHandler()->getPermission($this->getFolderID()) < READ_ACCESS) {
-                throw new Sabre_DAV_Exception_Forbidden('Permission denied');
+                throw new Sabre\DAV\Exception\Forbidden('Permission denied');
             }
         }
 
@@ -108,7 +108,7 @@ class DAV_Folder extends Sabre_DAV_Collection {
                 return new DAV_File($this->myPath.'/'.$file['realname']);
             }
 			else {
-				throw new Sabre_DAV_Exception_NotFound('The file with name: ' . $file['realname'] . ' could not be found');
+				throw new Sabre\DAV\Exception\NotFound('The file with name: ' . $file['realname'] . ' could not be found');
 			}
         }
 
@@ -156,12 +156,12 @@ class DAV_Folder extends Sabre_DAV_Collection {
             unlink($tmpLoc);
         }
         else {
-            throw new Sabre_DAV_Exception_Forbidden('Permission denied to create file');
+            throw new Sabre\DAV\Exception\Forbidden('Permission denied to create file');
         }
     }
 
     public function createDirectory($name) {
-        throw new Sabre_DAV_Exception_Forbidden('Permission denied to create directory');
+        throw new Sabre\DAV\Exception\Forbidden('Permission denied to create directory');
     }
 
 
