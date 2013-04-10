@@ -303,7 +303,7 @@ abstract class Mapper {
      * @return Collection
      */
 	public function getModelAsCollection($object) {
-		if (is_subclass_of($object, 'Collection')) {
+		if (is_a($object, 'Collection')) {
 			return $object;
 		}
 		else {
