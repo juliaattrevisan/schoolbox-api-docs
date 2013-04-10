@@ -9,8 +9,6 @@
  * @copyright   2013 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
  */
-namespace Schoolbox\Video;
-
 
 use Schoolbox\Video\QueueMapper;
 

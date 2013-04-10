@@ -41,5 +41,6 @@ echo "UPDATE config SET value='$datadir/cache/minify' WHERE name='minify_dir';"
 echo "UPDATE config SET value='$datadir/cache/myfiles' WHERE name='myfiles_cache_dir';"
 echo "UPDATE config SET value='$datadir/cache/logs' WHERE name='logs_dir';"
 echo "UPDATE config SET value='$datadir/storage' WHERE name='storage_dir';"
+echo "UPDATE config SET value='$datadir/video' WHERE name='video_dir';"
 
 # End of script
