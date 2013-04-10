@@ -38,6 +38,7 @@ class Eportfolio {
 
 	/**
 	 * An instance of Eportfolio_Page
+	 * This is the page currently being viewed
 	 *
 	 * @var array
 	 */
