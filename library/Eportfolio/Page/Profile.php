@@ -35,6 +35,12 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 */
 	protected function setup() {
 		$this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
+
+		$this->getPage()->setBlock(TEMPLATE_content, 'has_subjects', 'has_subjects_block');
+		$this->getPage()->setBlock('has_subjects', 'subject', 'subject_block');
+
+		$this->getPage()->setBlock(TEMPLATE_content, 'has_groups', 'has_groups_block');
+		$this->getPage()->setBlock('has_groups', 'group', 'group_block');
 	}
 
 	/**
@@ -42,9 +48,8 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 */
 	public function render() {
 		$this->renderPersonal();
+		$this->renderGroups();
 		$this->renderSubjects();
-
-
 	}
 
 	/**
@@ -59,10 +64,50 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 		));
 	}
 
-	private function renderSubjects() {
-		$catList = $this->getGroupHandler()->involvedInCategoryList($this->getUserId());
+	/**
+	 * Render groups
+	 */
+	private function renderGroups() {
+		$allGroups = $this->getGroupHandler()->involvedInCategoryList($this->getUserId(), false);
 
-		print_r($catList);
+		if (is_array($allGroups) && count($allGroups)) {
+			foreach ($allGroups as $currentGroup) {
+				$this->getPage()->setVar(array(
+					'GROUP_ID' => $currentGroup['id'],
+					'GROUP_NAME' => $currentGroup['name'],
+				));
+
+				$this->getPage()->parse('group_block', 'group', true);
+			}
+
+			$this->getPage()->parse('has_groups_block', 'has_groups');
+		}
+		else {
+			$this->getPage()->setVar('has_groups_block', '');
+		}
+	}
+
+	/**
+	 * Render subjects
+	 */
+	private function renderSubjects() {
+		$allSubjects = $this->getGroupHandler()->involvedInSubjects($this->getUserId());
+
+		if (is_array($allSubjects) && count($allSubjects)) {
+			foreach ($allSubjects as $currentSubject) {
+				$this->getPage()->setVar(array(
+					'SUBJECT_ID' => $currentSubject['id'],
+					'SUBJECT_NAME' => $currentSubject['name'],
+				));
+
+				$this->getPage()->parse('subject_block', 'subject', true);
+			}
+
+			$this->getPage()->parse('has_subjects_block', 'has_subjects');
+		}
+		else {
+			$this->getPage()->setVar('has_subjects_block', '');
+		}
 	}
 
 	/**
@@ -112,4 +157,5 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	private function getGroupHandler() {
 		return $this->groupHandler;
 	}
+
 }

@@ -10,3 +10,26 @@
 	<dd>{USER_CAMPUS}</dd>
 </dl>
 
+<div class='clearfix'></div>
+
+<div style='padding-top:20px;'>
+	<h2>My Current Subjects</h2>
+	<!-- BEGIN has_subjects -->
+	<ul>
+		<!-- BEGIN subject -->
+		<li><a href='/homepage/{SUBJECT_ID}'>{SUBJECT_NAME}</a></li>
+		<!-- END subject -->
+	</ul>
+	<!-- END has_subjects -->
+</div>
+
+<div style='padding-top:20px;'>
+	<h2>My Current Groups</h2>
+	<!-- BEGIN has_groups -->
+	<ul>
+		<!-- BEGIN group -->
+		<li><a href='/homepage/{GROUP_ID}'>{GROUP_NAME}</a></li>
+		<!-- END group -->
+	</ul>
+	<!-- END has_groups -->
+</div>
