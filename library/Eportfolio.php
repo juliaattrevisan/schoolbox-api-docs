@@ -139,7 +139,7 @@ class Eportfolio {
 	/**
 	 * Get all eportfolio_template records
 	 *
-	 * @return resource
+	 * @return array
 	 */
 	public function fetchAllTemplates() {
 		$allTemplates = array();
@@ -982,7 +982,7 @@ class Eportfolio {
 	/**
 	 * Set page instance
 	 *
-	 * @param array $pageInstance
+	 * @param $pageInstance
 	 */
 	private function setPageInstance($pageInstance) {
 		$this->pageInstance = $pageInstance;
