@@ -71,6 +71,7 @@ class SubmissionMapper extends Schoolbox\Mapper {
 			'this_key'  => 'owner',
 			'other_key' => 'id',
 		));
+		$this->registerCallback('postSave', array($this, 'postSave'));
 	}
 
 	/**
@@ -192,4 +193,15 @@ class SubmissionMapper extends Schoolbox\Mapper {
 		$submission->setSubmissionBox($box);
 		return $submission;
 	}
+
+
+	/**
+	 * Copies file from temp location into a location accessible by this model.
+	 *
+	 * @param Submission $object
+	 */
+	public function postSave(Submission $object) {
+		$object->copyFromTempLocation();
+	}
 }
+
