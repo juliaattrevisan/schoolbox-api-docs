@@ -576,14 +576,10 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		//
 		// TODO update this query when student submission model is merged
 		$cat_mapper  = $this->getJoinMapper('category');
-		$params      = array($user_id);
+		$params      = array();
 		$where_parts = array(
 			'sb.late_date > NOW()',
 			'sb.accept_submission IS TRUE',
-			'(
-				sb.multi_submission IS TRUE
-				OR (SELECT count(*) FROM student_submission ss WHERE sb.id=ss.box_id AND ss.owner=?) = 0
-			)'
 		);
 		if ($category_id) {
 			$params[]      = $category_id;
