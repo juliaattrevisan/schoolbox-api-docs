@@ -3,22 +3,22 @@ require_once('../../../include/Bootstrap.php');
 
 $allComponents = array();
 
-$test = array(
-	'name' => 'Test ePortfolio Component',
+$basicList = array(
+	'name' => 'Basic List',
 	'module' => 'eportfolio',
 	'component_category' => null,
-	'class' => 'Component_Eportfolio_TestController',
-	'description' => 'A test component manufactured by script',
+	'class' => 'Component_Eportfolio_BasicListController',
+	'description' => 'A list component',
 	'multiple' => 'false',
 	'config' => array(
-		'pixel' => array(
-			'default_value' => 100,
-			'label' => 'Pixels and stuff'
+		'title' => array(
+			'default_value' => 'My List',
+			'label' => 'List Title'
 		)
 	)
 );
 
-$allComponents[] = $test;
+$allComponents[] = $basicList;
 
 foreach($allComponents as $currentComponent) {
 	Component_DefinitionMapper::getInstance()->create($currentComponent);
