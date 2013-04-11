@@ -83,40 +83,64 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
 	/**
 	 * Uploads a student submission to the assessment.
 	 *
+	 * @throws Sabre\DAV\Exception\Forbidden if the file cannot be uploaded
+	 *
 	 * @param string          $name
 	 * @param string|resource $data
 	 *
-	 * @return null ETags aren't relevant because the file isn't viewable after
-	 *              being uploaded (for now at least)
+	 * @return null ETags aren't being returned for now.
 	 */
 	public function createFile($name, $data = null) {
 
-		$temp_file = null;
+		//
+		// If a resource is supplied, its file could be deleted before it can
+		// be copied to its destination.
+		// Copy it to a temp file before this happens.
+		$temp_file = tempnam(sys_get_temp_dir(), 'dav');
+		$fp        = fopen($temp_file, 'wb');
 		if (!is_resource($data)) {
-			$temp_file = tempnam(sys_get_temp_dir(), 'dav');
-			file_put_contents($temp_file, $data);
+			fwrite($fp, $data);
 		}
 		else {
-			$metadata  = stream_get_meta_data($data);
-			$temp_file = $metadata['uri'];
+			stream_copy_to_stream($data, $fp, -1, 0);
 		}
+		fclose($fp);
 
 		$late_timestamp = $this->getAssessment()->getDueDate()->getUnixTimestamp();
 		$submit_date    = new DateTime('now');
 		$is_late        = ($late_timestamp < $submit_date->getTimestamp());
 
-		$mapper     = new SubmissionMapper();
 		$submission = new Submission();
 		$submission
 			->setSubmissionBox($this->getAssessment())
 			->setOwner($this->getUser())
 			->setFilename($name)
 			->setTempLocation($temp_file)
-			->setSubmitted(new Alaress_Date_Format($submit_date))
+			->setSubmitted($submit_date)
 			->setLate($is_late)
 		;
 
+		//
+		// Reasons a student couldn't submit a file:
+		// * They aren't in this subject
+		// * The subject doesn't take submissions online
+		// * The submission is late
+		// * They've already submitted and it's not a multi-submission assess
+		// All of these are covered in SubmissionMapper->checkUploadability
+		$mapper = new SubmissionMapper();
+		try {
+			$mapper->checkUploadability($submission, array());
+		}
+		catch (Schoolbox\Resource\Exception $e) {
+			throw new Sabre\DAV\Exception\Forbidden($e->getMessage(), $e->getCode(), $e);
+		}
 		$mapper->save($submission);
 		return null;
+
+//		$dav_file = new Sabre\DAV\SimpleFile(
+//			$submission->getFilename(),
+//			file_get_contents($submission->getFileLocation())
+//		);
+//		return $dav_file->getETag();
 	}
 }
