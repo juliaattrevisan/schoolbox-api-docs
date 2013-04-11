@@ -17,6 +17,7 @@ Depends: apache2,
  freetds-common,
  wget,
  cifs-utils,
+ libav-tools, libavcodec-extra-53,
  ${misc:Depends}
 Conflicts: javascript-common
 Description: Schoolbox LMS by Alaress Pty. Ltd.

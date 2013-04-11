@@ -1,5 +1,6 @@
 # Directories.
 www/conf/* /etc/schoolbox/examples
+tools/cron/* /etc/cron.d
 app /usr/share/schoolbox
 dav /usr/share/schoolbox
 include /usr/share/schoolbox

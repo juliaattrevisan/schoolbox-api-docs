@@ -25,6 +25,11 @@ class File {
 	protected $filename;
 
 	/**
+	 * @var string
+	 */
+	protected $mimeType;
+
+	/**
 	 * @var int
 	 */
 	protected $owner;
@@ -38,6 +43,20 @@ class File {
 	 * @var \Alaress_Date_Format
 	 */
 	protected $modified;
+
+	/**
+	 * @var string
+	 */
+	protected $description;
+
+	/**
+	 * @var string
+	 */
+	protected $comment;
+
+	protected $hidden;
+
+	protected $folder;
 
 	/**
 	 * @var IConfigLoader
@@ -96,6 +115,19 @@ class File {
 		return $this->filename;
 	}
 
+	/**
+	 * @param string $mimeType
+	 */
+	public function setMimeType($mimeType) {
+		$this->mimeType = $mimeType;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getMimeType() {
+		return $this->mimeType;
+	}
 	/**
 	 * @param  \Alaress_Date_Format $modified
 	 * @return $this
@@ -159,4 +191,51 @@ class File {
 	public function getConfigLoader() {
 		return $this->config_loader;
 	}
+
+	/**
+	 * @param string $comment
+	 */
+	public function setComment($comment) {
+		$this->comment = $comment;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getComment() {
+		return $this->comment;
+	}
+
+	/**
+	 * @param string $description
+	 */
+	public function setDescription($description) {
+		$this->description = $description;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDescription() {
+		return $this->description;
+	}
+
+	public function setHidden($hidden) {
+		$this->hidden = $hidden;
+	}
+
+	public function getHidden() {
+		return $this->hidden;
+	}
+
+	public function setFolder($folder) {
+		$this->folder = $folder;
+	}
+
+	public function getFolder() {
+		return $this->folder;
+	}
+
+
+
 }
