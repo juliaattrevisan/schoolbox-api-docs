@@ -581,11 +581,11 @@ class SitePage extends Page {
             FROM userAccess AS ua
             INNER JOIN category AS cat ON ua.sid=cat.id
             INNER JOIN homepage_config AS hc ON cat.id=hc.cid
-            WHERE ua.uid = %d
+            WHERE ua.uid = %d AND service = %d
             AND ua.type > 0
             ORDER BY cat.name
         ";
-        $this->db->query(sprintf($query, $_SESSION['id']));
+        $this->db->query(sprintf($query, $_SESSION['id'], HOMEPAGE_SERVICE));
         if ($this->db->countRows() > 0) {
 
             while ($group = $this->db->getNextArray()) {
