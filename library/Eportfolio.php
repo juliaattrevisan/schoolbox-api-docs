@@ -80,6 +80,12 @@ class Eportfolio {
 			$this->setPageInstance($pageInstance);
 			$this->setAllTemplates($this->fetchAllTemplates());
 		}
+		/* Spawn a stub one to make the interfaces happy
+		 * (was easier, but dirtier, to use an empty array)
+		 */
+		else {
+			$this->setPageInstance(new Eportfolio_Page());
+		}
 	}
 
 	/**
