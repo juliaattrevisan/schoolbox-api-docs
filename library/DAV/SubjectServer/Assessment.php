@@ -59,12 +59,24 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
 	}
 
 	/**
-	 * Currently, assessment items have no displayed children. Later, the
-	 * assessment box could include the student's submissions.
+	 * Loads this student's submissions (and later on, returns).
 	 *
 	 * @return $this
 	 */
 	public function loadChildren() {
+		$mapper = new SubmissionMapper();
+		$files  = $mapper->findByColumnList(array(
+			'owner'  => $this->getUser()->getId(),
+			'box_id' => $this->getAssessment()->getId(),
+		));
+		foreach ($files as $file) {
+			$file_location = $file->getFileLocation();
+			if (file_exists($file_location)) {
+				$this->addChild(
+					new Sabre\DAV\SimpleFile($file->getFilename(), file_get_contents($file_location))
+				);
+			}
+		}
 		return $this;
 	}
 
