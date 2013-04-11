@@ -8,7 +8,6 @@
  *
  */
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/../include/Bootstrap.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
