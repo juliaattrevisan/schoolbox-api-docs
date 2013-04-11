@@ -254,7 +254,6 @@ if (count($submission_history)) {
         $workDate = new Alaress_Date_Relative($activity_item->getDate(), 'U');
 
         // if submission item
-//		$comment   = null;
 		$mark      = '';
 		$norm_mark = 0;
 		$gradient  = 0;
@@ -275,11 +274,6 @@ if (count($submission_history)) {
 			'HISTORY_SUBMISSION_FILE_NAME' => null,
 			'HISTORY_RETURN_FILE_ID'       => null,
 			'HAS_GRADE'                    => '',
-//			//
-//			// Could be owner's, not teacher's
-//			'HISTORY_USER_ID'    => $teacher_details['TEACHER_ID'],
-//			'HISTORY_USER_NAME'  => $teacher_details['TEACHER_NAME'],
-//			'HISTORY_USER_THUMB' => $teacher_details['TEACHER_THUMB'],
 		);
         if ($activity_item->isSubmission()) {
 	        $history['HISTORY_CLASS'] = 'submit';
@@ -335,41 +329,7 @@ if (count($submission_history)) {
 	        $history['HISTORY_CLASS'] = 'extend';
 	        $history['HISTORY_ICON']  = 'clock';
         }
-
-//        $comment = Scrub::Text($currentWork['comment']);
-
-        //
-        // Don't show the grade if it isn't meant to be shown to the user yet.
-        // perform shortening if the marktype is letter, or if the given grade is an error
-//		if (!$is_mark_shown) {
-//			$mark = '';
-//			$currentWork['norm_mark'] = 0;
-//		}
-//        elseif ($submission->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE_LETTER || in_array($currentWork['mark'], $errors)) {
-//            $mark = $returnHandler->shortenGrade($currentWork['mark']);
-//        }
-//        else {
-//            $mark = Scrub::Text($currentWork['mark']);
-//        }
-//
-//        $gradient = max(0, min(10, (int)($currentWork['norm_mark'] / 10)));
 		$this->setVar($history);
-//		$this->setVar(array(
-//            'HISTORY_CLASS' => $historyClass,
-//            'HISTORY_ICON' => $historyIcon,
-//            'HISTORY_GRADIENT' => $gradient,
-//			'HISTORY_DATETIME' => $workDate->getRelativeTime(),
-//			'HISTORY_MARK' => $mark,
-//			'HISTORY_COMMENT' => $comment,
-//			//
-//			// HISTORY_FILE_ID is the legacy file ID, don't use it
-//			'HISTORY_FILE_ID' => $submission->getLegacyFileId(),
-//			'HISTORY_SUBMISSION_FILE_ID' => $currentWork['sid'],
-//			'HISTORY_SUBMISSION_FILE_NAME' => $currentWork['sfname'],
-//			'HISTORY_RETURN_FILE_ID' => $currentWork['rid'],
-//
-//            'HAS_GRADE' => $mark || $mark === 0 ? 'grade' : '',
-//		));
 
          // if the user in question has not previously been seen, retrieve
         if(!isset($usersList[$owner])) {
@@ -402,8 +362,6 @@ if (count($submission_history)) {
         }
         // return by teacher
 		if ($activity_item->isReturn()) {
-
-//            $this->setVar('HISTORY_RETURN_FILE_NAME', Scrub::text($currentWork['filename']));
 
             // file return rather than mark
             if($history['HISTORY_RETURN_FILE_NAME']) {
@@ -450,14 +408,6 @@ else {
     $this->setVar('work_block','');
     $this->parse('subject_block', 'subject');
 }
-
-//// set the teacher details
-//$teacher = $userHandler->getByID($submission->getOwner()->getId());
-//$this->setVar(array(
-//    'TEACHER_ID' => $teacher['uid'],
-//    'TEACHER_NAME' => $userHandler->formatName($teacher),
-//    'TEACHER_THUMB' => "/portrait?userId={$teacher['synergy_id']}&size=square32",
-//));
 
 if (isset($recent_submission)) {
 
