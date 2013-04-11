@@ -578,7 +578,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$cat_mapper  = $this->getJoinMapper('category');
 		$params      = array($user_id);
 		$where_parts = array(
-			'sb.late_date < NOW()',
+			'sb.late_date > NOW()',
 			'sb.accept_submission IS TRUE',
 			'(
 				sb.multi_submission IS TRUE
