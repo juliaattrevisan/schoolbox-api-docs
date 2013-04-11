@@ -8,7 +8,7 @@
  *
  */
 
-
+require_once $_SERVER['DOCUMENT_ROOT'].'/../include/Bootstrap.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/group.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/file.php';
@@ -26,6 +26,12 @@ if (is_numeric($_GET['id'])) {
 	if ($groupHandler->getPermission($video->getFile()->getFolder()) < READ_ACCESS)
 		exit;
 
+	/*Close session so streaming does not prevent other requests to session due to locking
+	 *http://konrness.com/php5/how-to-prevent-blocking-php-requests/
+	 */
+	session_write_close();
+
+	/* Prevent multibyte encoding as it might mess with video stream */
 	mb_http_output("pass");
 
 
