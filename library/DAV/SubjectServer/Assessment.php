@@ -72,9 +72,12 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
 		foreach ($files as $file) {
 			$file_location = $file->getFileLocation();
 			if (file_exists($file_location)) {
-				$this->addChild(
-					new Sabre\DAV\SimpleFile($file->getFilename(), file_get_contents($file_location))
-				);
+				$child = new DAV_SubjectServer_Submission($file->getFilename(), file_get_contents($file_location));
+				$child
+					->setUser($this->getUser())
+					->setSubmission($file)
+				;
+				$this->addChild($child);
 			}
 		}
 		return $this;
