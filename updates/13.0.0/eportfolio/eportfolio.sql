@@ -40,3 +40,9 @@ ALTER TABLE `eportfolio_config` ADD COLUMN `page_id` INT(11) NOT NULL AUTO_INCRE
 /* Add permissions relation table
  */
 CREATE TABLE `eportfolio_permission`( `id` INT(11) NOT NULL AUTO_INCREMENT, `page_id` INT(11) NOT NULL, `type` ENUM('parent','group','student') NOT NULL DEFAULT 'student', `value` INT(11) NOT NULL, PRIMARY KEY (`id`) );
+
+/* Components tables
+ */
+/* Add list item table
+ */
+CREATE TABLE `eportfolio_component_list_item`( `list_item_id` INT(11) NOT NULL AUTO_INCREMENT, `component_instance_id` INT(11) NOT NULL, `content` TEXT, `sequence` INT(11), PRIMARY KEY (`list_item_id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
