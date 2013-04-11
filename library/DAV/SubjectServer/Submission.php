@@ -77,7 +77,14 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
 	/**
 	 * Updates a file that has been created already.
 	 *
-	 * This is required for some WebDAV clients -
+	 * This is required for some WebDAV clients - the iPad Pages client sends an
+	 * initial PUT request to create the file, and then sends another with the
+	 * actual file contents.
+	 *
+	 * We'll need to have some sort of filtering on this, so that if you're
+	 * trying to override a file you submitted previously it should fail.
+	 *
+	 * @throws Sabre\DAV\Exception\Forbidden if the file can't be updated
 	 *
 	 * @param resource $data
 	 *
@@ -90,6 +97,15 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
 		$fp = fopen($temp_file, 'wb');
 		stream_copy_to_stream($data, $fp, -1, 0);
 		fclose($fp);
+
+		//
+		// If the file was updated less than, say, 5 minutes ago, accept the
+		// request - otherwise, reject it.
+		$submit_time  = $this->getSubmission()->getSubmitted()->getUnixTimestamp();
+		$current_time = $_SERVER['REQUEST_TIME'];
+		if (($current_time - $submit_time) > 300) {
+			throw new Sabre\DAV\Exception\Forbidden('Cannot overwrite an existing file with the same name');
+		}
 
 		//
 		// And put it in the submission object.
