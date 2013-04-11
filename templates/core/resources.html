@@ -200,6 +200,8 @@ $j(function() {
 		var relationID = $j(this).attr('id').substring(5);
 		var files = $j('tr.category-' + relationID);
 
+    getMeta(relationID);
+
 		if (files.length > 0) {
 			/* files exist, show them */
 			files.show();
@@ -327,6 +329,8 @@ $j(function() {
 			$j('#file-list tr.current').removeClass('current');
 			$j(this).addClass('current');
 
+      getMeta(relationID, $j('#file-list tr.selected'))
+
 		});
 
 		/* drag files */
@@ -430,11 +434,179 @@ $j(function() {
 	if (window.location.href.indexOf('debug') != -1)
 		alert((date2.getTime() - date1.getTime()) / 1000);
 
-	$j('#category-window, #file-window').height($j(window).height()-$j('#header').height()-$j('#footer').height()-50);
+  // set up resizing
+  resizePanels()
+	$j(window).resize(resizePanels());
 
-	$j(window).resize(function() {
-		$j('#category-window, #file-window').height($j(window).height()-$j('#header').height()-$j('#footer').height()-50)
-	});
+  var detailsContainer = $j('#detail-window')
+  var folderDetail = $j('#folder-detail')
+  var fileDetail = $j('#file-detail')
+  var multiFileDetail = $j('#multi-file-detail')
+
+  // initially hide these
+  fileDetail.hide()
+  multiFileDetail.hide()
+  folderDetail.hide()
+
+  var accessLevels = ['None', 'Read', 'Write']
+
+
+  function resizePanels() {
+    $j('#category-window, #file-window, #detail-window').height(
+        $j(window).height() - $j('#header').height() - $j('#footer').height() - 50
+    )
+  }
+
+  function getMeta(folderId, fileArray) {
+
+    // commence loading!
+    detailsContainer.find('.loading').show()
+
+    // retrieve folder
+    if(fileArray === undefined) {
+
+      $j.post("/ajax/resource/meta.php", {folderId: folderId}, function(response) {
+
+        var meta = JSON.parse(response)
+
+        folderDetail.find('.name').html(meta.name)
+        folderDetail.find('.template').html(meta.template)
+        folderDetail.find('img').attr('src', '/images/icons/128x128/folder.png').attr('alt', meta.name)
+
+        if(meta.type) {
+          folderDetail.find('p.type').show()
+          folderDetail.find('span.type').html(meta.type + ' Group')
+
+          if(meta.joinable == 1) {
+            folderDetail.find('.join-btn').show()
+          }
+          else {
+            folderDetail.find('.join-btn').hide()
+          }
+        }
+        else {
+          folderDetail.find('p.type').hide()
+        }
+
+        // create the list of permission to display
+        var permsUL = folderDetail.find('ul.perms')
+        permsUL.html('')
+
+        $j.each(meta.permissions, function(k, perm) {
+          permsUL.append('<li><b>' + perm.group + '</b>: ' + accessLevels[perm.access] + '</li>')
+        })
+
+        if(meta.permissions.length == 0) {
+          folderDetail.find('h4.perms').hide();
+        }
+        else {
+          folderDetail.find('h4.perms').show();
+        }
+
+        // list of actions to display
+        var actionButtons = folderDetail.find('.actions a')
+        actionButtons.hide()
+        $j.each(meta.actions, function(k, v) {
+          actionButtons.filter('.r'+v).show()
+        })
+
+        if(meta.actions.length == 0) {
+          folderDetail.find('h4.actions').hide();
+        }
+        else {
+          folderDetail.find('h4.actions').show();
+        }
+
+        fileDetail.hide()
+        multiFileDetail.hide()
+        folderDetail.show()
+
+      })
+    }
+
+    // retrieve file
+    else if(fileArray instanceof Object) {
+
+      var idList = {}, i = 0, j = 0
+      $j(fileArray).each(function() {
+        var type = $j(this).attr('id').substring(0,4);
+        if(typeof(idList[type]) == 'undefined') {
+          idList[type] = []
+        }
+        idList[type].push($j(this).attr('id').substring(5))
+      })
+
+//      console.log('Following files are selected: ')
+//      console.log(idList)
+
+      $j.post("/ajax/resource/meta.php", {folderId: folderId, files: idList}, function(response) {
+
+        var meta = JSON.parse(response)
+
+        // show multi
+        if(typeof(meta.name) == 'undefined') {
+
+          multiFileDetail.find('.count').html($j('#file-list tr.selected').length + ' files selected')
+
+          fileDetail.hide()
+          folderDetail.hide()
+          multiFileDetail.show()
+        }
+
+        // show single
+        else {
+
+          fileDetail.find('.name').html(meta.name)
+          fileDetail.find('.description').html(meta.description)
+          fileDetail.find('.meta-who').html(meta.posted_by)
+          fileDetail.find('.meta-when').html(meta.posted_date)
+
+          // link, display link icon
+          if(meta.kind == 'link') {
+            fileDetail.find('img').attr('src', '/images/mime/128x128/html_alt1.png')
+                .attr('alt', meta.name)
+          }
+          // mime not defined, bummer
+          else if(typeof(meta.mime) == 'undefined') {
+            fileDetail.find('img').attr('src', '/images/mime/128x128/mime.png')
+                .attr('alt', meta.name)
+          }
+          // file, display appropriate mime icon
+          else {
+            fileDetail.find('img').attr('src', '/images/mime/128x128/'+'.png')
+                .attr('alt', meta.name)
+          }
+
+
+          if(typeof(meta.filesize) == 'undefined') {
+            fileDetail.find('.filesize').html('');
+          }
+          else {
+            fileDetail.find('.filesize').html('('+meta.filesize+')')
+          }
+
+          if(meta.hidden == 1) {
+            fileDetail.find('.hidden-warning').show()
+            fileDetail.find('img').css('opacity', '0.4');
+          }
+          else {
+            fileDetail.find('.hidden-warning').hide()
+            fileDetail.find('img').css('opacity', '1');
+          }
+
+          multiFileDetail.hide()
+          folderDetail.hide()
+          fileDetail.show()
+        }
+      })
+    }
+
+    // loading complete!
+    detailsContainer.find('.loading').hide()
+
+  }
+
+
 
 
 });
@@ -458,7 +630,7 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); } <!-- E
 </style>
 <![endif]-->
 <!-- END custom_head -->
-<div class="template2">
+<div class="template3">
   <div class="left">
     <div id="category-window">
     <div class="loading"></div>
@@ -489,7 +661,7 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); } <!-- E
     </div>
   </div>
 
-  <div class="right">
+  <div class="center">
     <div id="file-window">
       <div class="loading"></div>
       <table id="file-head">
@@ -526,6 +698,68 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); } <!-- E
          </tfoot>
       </table>
       </div>
+    </div>
+  </div>
+  <div class="right">
+    <div id="detail-window">
+      <div class="loading">
+        <img src="/images/resources/ajax.gif" />
+      </div>
+
+      <!-- BEGIN folder_detail -->
+      <div class="rfolder detail" id="folder-detail">
+        <img src="{{FOLDER_MIME_IMG}}" alt="{{FOLDER_NAME}}" />
+        <h3 class="rfolder name">{{FOLDER_NAME}}</h3>
+        <p class="rfolder template">{{FOLDER_TEMPLATE}}</p>
+        <p class="rfolder type"><span class="rfolder type">{{FOLDER_TYPE}}</span><a class="rfolder join-btn btn groups"><span></span>Join</a></p>
+        <h4 class="rfolder perms">Permissions</h4>
+        <ul class="rfolder perms">
+        <!-- BEGIN folder_detail_perms -->
+          <li>{{FOLDER_PERM_GROUP}}: {{FOLDER_PERM_ACCESS}}</li>
+        <!-- END folder_detail_perms -->
+        </ul>
+        <div class="rfolder actions">
+          <h4 class="rfolder actions">Actions</h4>
+          <a class="btn modify rmodify"><span></span>Modify</a>
+          <a class="btn delete rdelete"><span></span>Delete</a>
+          <a class="btn download rdownload"><span></span>Download</a>
+          <a class="btn add rfolder"><span></span>Add Folder</a>
+          <a class="btn create rfile"><span></span>Post File</a>
+          <a class="btn up-arrow rzip"><span></span>Upload ZIP</a>
+        </div>
+      </div>
+      <!-- END folder_detail -->
+
+      <!-- BEGIN file_detail -->
+      <div class="rfile detail" id="file-detail">
+        <img src="{{FILE_MIME_IMG}}" alt="{{FILE_NAME}}" />
+        <h3 class="rfile name">{{FILE_NAME}}</h3>
+        <p class="rfile filesize">({{FILE_SIZE}})</p>
+        <p class="rfile hidden-warning"><span class="i" title="This file cannot be seen by users who do not have write permissions in this folder"></span>(Hidden)</p>
+        <p class="rfile description">{{FILE_DESCRIPTION}}</p>
+        <p class="rfile meta">Posted by <span class="meta-who">{{FILE_POSTED_BY}}</span> on <span class="meta-when">{{FILE_POSTED_DATE}}</span></p>
+        <div class="rfile actions">
+          <h4 class="rfile actions">Actions</h4>
+          <a class="btn ropen"><span></span>Open</a>
+          <a class="btn download rdownload"><span></span>Download</a>
+          <a class="btn modify rmodify"><span></span>Modify</a>
+          <a class="btn delete rdelete"><span></span>Delete</a>
+          <a class="btn report rproperties"><span></span>Properties</a>
+        </div>
+      </div>
+      <!-- END file_detail -->
+
+      <!-- BEGIN multi_file_detail -->
+      <div class="rmultifile detail" id="multi-file-detail">
+        <img src="{{MULTIFILE_MIME_IMG}}" alt="Multiple files selected" />
+        <h3 class="rmultifile count">{{MULTIFILE_COUNT}}</h3>
+        <div class="rmultifile actions">
+          <h4 class="rmultifile actions">Actions</h4>
+          <a class="btn delete rdelete"><span></span>Delete</a>
+        </div>
+      </div>
+      <!-- END multi_file_detail -->
+
     </div>
   </div>
 
