@@ -9,7 +9,7 @@
  */
 
 require_once('../../../include/Bootstrap.php');
-
+use Schoolbox\Resource\FileMapper;
 
 // kickstart a session
 new SitePage();
@@ -184,18 +184,16 @@ function getFolderMeta($folderId) {
 function getSingleFileMeta($folderId, $fileId) {
 
 	$groupHandler = new Group();
-	$fileHandler = new File();
-//	$mimeHandler = new FileType(null);
 	$userHandler = new User();
 
-	$file = $fileHandler->getByID($fileId);
+	$fmap = new FileMapper();
+	$file = $fmap->findByColumnList(array('id' => $fileId, 'deleted' => 0))->current();
 
-	if(!$file || $file['deleted'] == 1) {
+	if(!$file) {
 		sendError('No file with the specified ID exists');
 	}
 
 	$userAccess = $groupHandler->getPermission($folderId);
-	$adf = new Alaress_Date_Format($file['submitted'], 'y-m-d');
 
 	// write access provides actions
 	$actions = array();
@@ -214,13 +212,13 @@ function getSingleFileMeta($folderId, $fileId) {
 
 	$file = array(
 		'kind' => 'file',
-		'name' => $file['description'],
+		'name' => $file->getFilename(),
 //		'mime' => $mimeHandler->getIconFile($file['mime_type']),
-		'filesize' => Alaress_Byte_Format::bytesToString($file['file_size']),
-		'hidden' => $file['hidden'],
-		'description' => $file['comment'],
-		'posted_by' => $userHandler->formatName($userHandler->getByID($file['owner'])),
-		'posted_date' => $adf->getDateOnly(),
+		'filesize' => Alaress_Byte_Format::bytesToString($file->getFilesize()),
+		'hidden' => $file->getHidden ? 1 : 0,
+		'description' => $file->getComment(),
+		'posted_by' => $userHandler->formatName($userHandler->getByID($file->getOwner())),
+		'posted_date' => $file->getSubmitted()->getDateOnly(),
 		'actions' => $actions
 	);
 
