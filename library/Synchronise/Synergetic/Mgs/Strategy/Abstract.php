@@ -211,6 +211,10 @@ abstract class Synchronise_Synergetic_Mgs_Strategy_Abstract extends Synchronise_
                     unset($newUser['defaultCampus']);
                 }
 
+	            /* Use parents existing username */
+	            if($newUser['group_id'] == self::PARENT_GROUP_ID)
+		            $newUser['username'] = $existing['username'];
+
                 /* Perform action; report what happened
                      */
                 if ($this->getPerformUpdate() === true) {
