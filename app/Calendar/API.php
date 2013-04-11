@@ -14,8 +14,6 @@ class Calendar_API extends Generic_API {
         $calFactory = new Calendar_Api_Factory();
         $calendarHandler = $calFactory->produce();
 
-        $now = time();
-
         $week['day']    = date("w", mktime(0, 0, 0, $selected['month'], $selected['day'], $selected['year']));
         $week['start']  = mktime(0, 0, 0, $selected['month'], ($selected['day'] - $week['day']), $selected['year']);
         $week['end']    = strtotime("+6 days", $week['start']);
@@ -33,49 +31,107 @@ class Calendar_API extends Generic_API {
         $nextMonthName = date('F', $nextMonth);
         $prevMonthName = date('F', $prevMonth);
 
-        $calData = array();
-
+		/* $eventMap is an array of empty event containers
+		 * Each array element maps to a day of the month
+		 */
+		$eventMap = array();
         $currentDay = strtotime("-1 day", $month['start']);
 
-        // insert blank days to offset day of week of first day of month
-        for($i = 0; $i < $month['first']; $i++) {
-            $calData[] = '_blank';
-        }
+		/* Insert blank days to offset day of week of first day of month
+		 */
+		$blankStart = array();
 
-        for($i = $month['start']; $i < $month['end']; $i += 24 * 3600) {
+		for ($i = 0; $i < $month['first']; $i++) {
+			$blankStart[] = '_blank';
+		}
+
+		/* Prefill containers for each day of the month
+		 */
+		for($i = $month['start']; $i < $month['end']; $i += 24 * 3600) {
             $currentDay = strtotime("+1 day", $currentDay);
 
-            $dayData = array();
-            $collection = $calendarHandler->getDayEvents($currentDay);
-            $collection->sort();
-
-            if($collection->getCount()) {
-                foreach($collection->getStack() as $c) {
-                    if($c->getStartTime()->getTimeOnly() == '12:00am') {
-                        $c->setStartTime('');
-                    }
-                    $dayData[] = $c;
-                }
-            }
-
             $day = array(
-                'dayOfMonth' => date('j', $currentDay),
-                'niceDay'    => date('jS', $currentDay),
-                'events'     => $dayData
+				'dayOfMonth' => date('j', $currentDay),
+				'niceDay' => date('jS', $currentDay),
+				'events' => array(),
             );
 
-            if(date('d-m-Y', $currentDay) == date('d-m-Y',$now)) {
+            if (date('d-m-Y', $currentDay) == date('d-m-Y', $_SERVER['REQUEST_TIME'])) {
                 $day['isToday'] = '1';
             }
 
-            $calData[] = $day;
+			$eventMap[] = $day;
+		}
 
-        }
+		/* Get all the events for this month and fill them into the containers
+		 */
+		$allEvents = $calendarHandler->getEvents($month['start'], $month['end']);
+		$allEvents->sort();
 
-        // pad out the final line
-        for($i = 0; $i < count($calData) % 7; $i++) {
-            $calData[] = '_blank';
-        }
+		$iterator = $allEvents->createIterator();
+
+		$previousEventDay = -1;
+		$dayData = array();
+
+		for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
+			$current = $iterator->current();
+
+			$currentEventDay = (int)$current->getStartTime()->getUsingFormat('d');
+
+			/* While it's the same day, or the first cycle,
+			 * push the current event onto a $dayData stack
+			 */
+			if (($previousEventDay == -1) || ($currentEventDay == $previousEventDay)) {
+				if ($current->getStartTime()->getTimeOnly() == '12:00am') {
+					$current->setStartTime('');
+				}
+
+				$dayData[] = $current;
+
+				/* Set up for next cycle
+				 */
+				$previousEventDay = $currentEventDay;
+			}
+			/* Otherwise inject the current $dayData stack into the calendar at the day's index and
+			 * start a new $dayData stack
+			 */
+			else {
+				$eventMap[$currentEventDay]['events'] = $dayData;
+
+				$dayData = array();
+
+				if ($current->getStartTime()->getTimeOnly() == '12:00am') {
+					$current->setStartTime('');
+				}
+
+				$dayData[] = $current;
+			}
+		}
+
+		/* Push last $dayData into stack
+ 		 */
+		$eventMap[$currentEventDay]['events'] = $dayData;
+
+		/* Pad out the final line
+		 */
+		$blankEnd = array();
+
+		/* Find the next multiple of seven, to create the correct number of blankies
+		 * at the end of the calendar map list
+		 */
+		$numBlanks = 7 - ((count($blankStart) + count($eventMap)) % 7);
+
+		/* Don't pad out a whole new empty week if the blank start + month ends cleanly
+		 */
+		if ($numBlanks < 7 ) {
+			for ($i = 0; $i < $numBlanks; $i++) {
+				$blankEnd[] = '_blank';
+			}
+		}
+
+		/* Manufacture $calData into the original structure
+		 */
+		$calData = array_merge($blankStart, $eventMap, $blankEnd);
 
         $aside = sprintf('<a href="%s" data-icon="back">%s</a><a href="%s" data-icon="next">%s</a>',
             "/m/calendar/month/$prevMonthSlug", '',

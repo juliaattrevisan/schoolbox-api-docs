@@ -8,20 +8,23 @@
  */
 class Facade_Component_SchoolEvents extends Facade_Component_Generic {
 
-    /**
-     * This should return an array of [title, aside, content]
-     * @abstract
-     * @param User $user
-     */
-    public function render(GizaUser $user) {
+	/**
+	 * This should return an array of [title, aside, content]
+	 *
+	 * @param GizaUser $user
+	 * @return array
+	 */
+	public function render(GizaUser $user) {
 
         $calFactory = new Calendar_Api_Factory();
         $calendarHandler = $calFactory->produce();
 
-        $now = time();
+		$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+		$start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d h:i:s');
+		$end = new Alaress_Date_Format($now->getDatabaseDate() . ' 23:59:59', 'y-m-d h:i:s');
+
         $cList = array(
-            'submissions' => $calendarHandler->getSubmissionEvents($now)->getStack(),
-            'events' => $calendarHandler->getDayEvents($now)->getStack()
+            'events' => $calendarHandler->getEvents($start->getUnixTimestamp(), $end->getUnixTimestamp())->getStack()
         );
 
         // check that there aren't events with Alaress_Date_Formats as their date fields (which is a 50:50)
