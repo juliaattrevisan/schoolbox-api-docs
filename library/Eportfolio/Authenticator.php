@@ -77,6 +77,25 @@ class Eportfolio_Authenticator {
 	}
 
 	/**
+	 * Determine whether the $userId can create a new page
+	 */
+	public function canCreate() {
+
+		/* If $user can modify page, continue; otherwise die
+		 * Superusers, staff and page owners can view contents.
+		 * Selected parents, groups and individuals can view contents.
+		 */
+		$youAreAdmin = $this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff();
+		$youArePageOwner = ($this->getOwnerId() == $this->getCurrentUserId());
+
+		if ($youAreAdmin || $youArePageOwner) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Determine whether the $userId can view $pageId
 	 *
 	 * @return bool
