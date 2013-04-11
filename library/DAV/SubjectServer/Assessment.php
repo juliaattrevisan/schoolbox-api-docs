@@ -9,6 +9,8 @@
 
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
 
 class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
 {
@@ -69,16 +71,40 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
 	/**
 	 * Uploads a student submission to the assessment.
 	 *
-	 * @todo implement once student submission mapper is merged.
-	 *
 	 * @param string          $name
 	 * @param string|resource $data
 	 *
 	 * @return null ETags aren't relevant because the file isn't viewable after
-	 *              being uploaded.
+	 *              being uploaded (for now at least)
 	 */
 	public function createFile($name, $data = null) {
-		parent::createDirectory($name, $data);
+
+		$temp_file = null;
+		if (!is_resource($data)) {
+			$temp_file = tempnam(sys_get_temp_dir(), 'dav');
+			file_put_contents($temp_file, $data);
+		}
+		else {
+			$metadata  = stream_get_meta_data($data);
+			$temp_file = $metadata['uri'];
+		}
+
+		$late_timestamp = $this->getAssessment()->getDueDate()->getUnixTimestamp();
+		$submit_date    = new DateTime('now');
+		$is_late        = ($late_timestamp < $submit_date->getTimestamp());
+
+		$mapper     = new SubmissionMapper();
+		$submission = new Submission();
+		$submission
+			->setSubmissionBox($this->getAssessment())
+			->setOwner($this->getUser())
+			->setFilename($name)
+			->setTempLocation($temp_file)
+			->setSubmitted(new Alaress_Date_Format($submit_date))
+			->setLate($is_late)
+		;
+
+		$mapper->save($submission);
 		return null;
 	}
 }
