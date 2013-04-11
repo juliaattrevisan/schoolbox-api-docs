@@ -100,14 +100,14 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
 		// be copied to its destination.
 		// Copy it to a temp file before this happens.
 		$temp_file = tempnam(sys_get_temp_dir(), 'dav');
-		$fp        = fopen($temp_file, 'wb');
 		if (!is_resource($data)) {
-			fwrite($fp, $data);
+			file_put_contents($temp_file, $data);
 		}
 		else {
+			$fp = fopen($temp_file, 'wb');
 			stream_copy_to_stream($data, $fp, -1, 0);
+			fclose($fp);
 		}
-		fclose($fp);
 
 		$late_timestamp = $this->getAssessment()->getDueDate()->getUnixTimestamp();
 		$submit_date    = new DateTime('now');
