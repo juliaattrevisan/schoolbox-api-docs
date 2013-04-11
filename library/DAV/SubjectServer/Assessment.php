@@ -146,4 +146,14 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
 //		);
 //		return $dav_file->getETag();
 	}
+
+	/**
+	 * Gets the time which this assessment was uploaded.
+	 *
+	 * @return int
+	 */
+	public function getLastModified() {
+		$submission = $this->getAssessment();
+		return $submission->getOpenDate()->getUnixTimestamp();
+	}
 }
