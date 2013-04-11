@@ -9,15 +9,19 @@
 </a>
 <!-- BEGIN settings_panel -->
 <div class="editPanel settings hide">
-  <form action="/eportfolio/configForm.php" method="GET">
-    <input type="hidden" name="uid" value="{ID}" />
-    <input type="hidden" name="type" value="config" />
-    <input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}" />
-    <!-- BEGIN config_element -->
-    <div class="{CONFIG_ELEMENT_CLASS}" {CONFIG_DISPLAY}><span>{CONFIG_ELEMENT_LABEL}: </span>{CONFIG_ELEMENT_CONTENT}</div>
-    <!-- END config_element -->
-    <input type="submit" value="Update" class="submit-btn update" />
-  </form>
+	<form action="/eportfolio/configForm.php" method="post">
+		<input type="hidden" name="user_id" value="{USER_ID}"/>
+		<input type="hidden" name="page_id" value="{PAGE_ID}"/>
+		<input type="hidden" name="type" value="config"/>
+		<input type="hidden" name="component" value="{COMPONENT_INSTANCE_ID}"/>
+		<!-- BEGIN config_element -->
+		<div class="{CONFIG_ELEMENT_CLASS}" {CONFIG_DISPLAY}>
+			<span>{CONFIG_ELEMENT_LABEL}: </span>
+			{CONFIG_ELEMENT_CONTENT}
+		</div>
+	<!-- END config_element -->
+	<input type="submit" value="Update" class="submit-btn update"/>
+	</form>
 </div>
 <!-- END settings_panel -->
 <div class="editPanel delete-it hide clearfix">

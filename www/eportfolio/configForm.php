@@ -148,17 +148,19 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 
 			SitePage::localRedir("/eportfolio/{$eportfolioHandler->getUserId()}/{$eportfolioHandler->getPageId()}");
 		}
-		/* GET config options from homepage
+		/* Update config options from homepage
 		 */
-		else if ($_GET['uid'] && ($_GET['type'] == 'config') && $_GET['component']) {
-			$config = $_GET;
+		else if (($_POST['type'] == 'config') && $_POST['component']) {
+			$config = $_POST;
 
 			$instance = reset($componentInstanceMapper->findByInstanceId($config['component']));
 			$componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
 
 			$configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn('component_definition_id', $instance->definitionId);
 
-			unset($config['uid'], $config['type'], $config['component']);
+			$pageId = $config['page_id'];
+
+			unset($config['page_id'], $config['type'], $config['component']);
 
 			// much as I hate exceptional cases, there are exceptional cases...
 
@@ -185,7 +187,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 			}
 
 			foreach($configDefinitionCollection as $confD) {
-				if(isset($config[$confD->key])) {
+				if (isset($config[$confD->key])) {
 
 					// this should be 1:1 relation, so return only the first instance of this definition
 					$confI = $componentConfigInstanceMapper->findByColumnList(array(
@@ -207,7 +209,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 				}
 			}
 
-			SitePage::localRedir("/eportfolio/" . $_GET['uid']);
+			SitePage::localRedir("/eportfolio/{$eportfolioHandler->getUserId()}/{$eportfolioHandler->getPageId()}");
 		}
 	}
 	else {

@@ -11,7 +11,7 @@ $basicList = array(
 	'description' => 'A list component',
 	'multiple' => 'false',
 	'config' => array(
-		'title' => array(
+		'componentname' => array(
 			'default_value' => 'My List',
 			'label' => 'List Title'
 		)
