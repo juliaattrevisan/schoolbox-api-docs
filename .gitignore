@@ -8,3 +8,4 @@ core.css
 mchrome.css
 *.log
 screen.css
+vendor/
