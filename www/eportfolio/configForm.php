@@ -134,6 +134,13 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 				}
 			}
 
+			/* These aren't normally parsed so have to do it explicitly
+			 */
+			$component->getPageTemplate()->setVar(array(
+				'USER_ID' => $eportfolioHandler->getUserId(),
+				'PAGE_ID' => $eportfolioHandler->getPageId(),
+			));
+
 			$component->getPageTemplate()->pparse($templateTarget, $templateHandle);
 		}
 		/* AJAX new column widths
