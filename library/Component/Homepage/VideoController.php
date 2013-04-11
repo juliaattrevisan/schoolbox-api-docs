@@ -50,6 +50,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         // Set up component name
         $this->setVar(array(
             'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Video',
+	        'FILE_CAT_ID'   => $this->getContext('id'),
         ));
 
 	    $this->setBlock($templateHandle, 'default_video', 'default_video_block');
