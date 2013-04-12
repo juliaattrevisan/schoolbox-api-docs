@@ -58,9 +58,10 @@ class Report_Parent extends Report_Abstract {
 			error(155);
 		}
 
+
 		//
 		// Parents may only search in their student's year level
-		if ($this->isYearsRestricted() && !in_array($yearLevel, $this->getChildrensYears())) {
+		if ($this->isYearsRestricted() && !( in_array($yearLevel, $this->getChildrensYears()) || $yearLevel == '')) {
 			error(155);
 		}
 
