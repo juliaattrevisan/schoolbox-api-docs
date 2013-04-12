@@ -60,7 +60,7 @@ if (is_numeric($_GET['eventID'])) {
 	list($tohour, $tominute) = explode(":", $event['finish']);
 	list($tominute, $toperiod) = explode(" ", $tominute);
 
-	$date = new Alaress_Date_Format($event['date'], 'U');
+	$date = new Alaress_Date_Format($event['startDate'], 'y-m-d');
 	$startDate = new Alaress_Date_Format($sequence['start_date'], 'U');
 	$endDate = new Alaress_Date_Format($sequence['end_date'], 'U');
 

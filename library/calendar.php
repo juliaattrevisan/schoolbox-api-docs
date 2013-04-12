@@ -35,8 +35,9 @@ class Calendar extends DeprecatedModel {
 			SELECT
 				event.id,
 				event.note,
-				event.date,
+				event.startDate,
 				event.startTime,
+				event.endDate,
 				event.endTime,
 				event.location,
 				event.owner,
@@ -50,7 +51,7 @@ class Calendar extends DeprecatedModel {
 			WHERE attendance = 1
 			AND publish_date < NOW()
 			GROUP BY event.id
-			ORDER BY CONCAT(event.date, ' ', event.startTime) DESC
+			ORDER BY CONCAT(event.startDate, ' ', event.startTime) DESC
 		";
 
         return $this->db->getAll($query);
@@ -307,7 +308,8 @@ class Calendar extends DeprecatedModel {
     public function getByID($eventID) {
         $query = "
 			SELECT
-				e.id, e.series_id, e.owner, e.access, e.sid, e.type, e.note, e.date, e.location, e.attendance, e.detail, e.publish_date,
+				e.id, e.series_id, e.owner, e.access, e.sid, e.type, e.note, e.startDate, e.endDate,
+				e.location, e.attendance, e.detail, e.publish_date,
 				DATE_FORMAT(e.startTime, '" . Cfg::get('calendar_time_format') . "') startTime,
 				DATE_FORMAT(e.endTime, '" . Cfg::get('calendar_time_format') . "') endTime,
 				u.title, u.firstname, u.lastname
@@ -328,9 +330,9 @@ class Calendar extends DeprecatedModel {
             $where = "";
         }
 
-        $query = "SELECT event.id, DATE_FORMAT(date, '%a %D %b') as outputDate,
-						date,
-						DATE_FORMAT(date, '%Y') as year, DATE_FORMAT(date, '%c') as month, DATE_FORMAT(date, '%e') as day,
+        $query = "SELECT event.id, DATE_FORMAT(startDate, '%a %D %b') as outputDate,
+						startDate,
+						DATE_FORMAT(startDate, '%Y') as year, DATE_FORMAT(startDate, '%c') as month, DATE_FORMAT(startDate, '%e') as day,
 						TIME_FORMAT(startTime, '" . Cfg::get('calendar_time_format') . "') as startTimeString,
 						TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTimeString,
 						type, note, location, detail,
@@ -340,7 +342,7 @@ class Calendar extends DeprecatedModel {
 				  FROM event
 				  LEFT JOIN user ON owner = user.id
 				  LEFT JOIN luEventType ON type = eventTypeID
-				  WHERE access = '2' AND sid = '" . $categoryID . "' AND( date >= CURRENT_DATE() $where) ORDER BY date, startTime";
+				  WHERE access = '2' AND sid = '" . $categoryID . "' AND( startDate >= CURRENT_DATE() $where) ORDER BY startDate, startTime";
 
         return $this->db->getAll($query);
     }
@@ -365,7 +367,7 @@ class Calendar extends DeprecatedModel {
         $query = "SELECT *
                   FROM `event`
                   WHERE `series_id` = '$seriesID'
-                  ORDER BY `date` ASC";
+                  ORDER BY `startDate` ASC";
         return $this->db->getAll($query);
     }
 
@@ -382,9 +384,9 @@ class Calendar extends DeprecatedModel {
         $next = 1;
         $last = count($series) - 1;
 
-        $dateFirst = new Alaress_Date_Format($series[$first]['date'], 'y-m-d');
-        $dateNext = new Alaress_Date_Format($series[$next]['date'], 'y-m-d');
-        $dateLast = new Alaress_Date_Format($series[$last]['date'], 'y-m-d');
+        $dateFirst = new Alaress_Date_Format($series[$first]['startDate'], 'y-m-d');
+        $dateNext = new Alaress_Date_Format($series[$next]['startDate'], 'y-m-d');
+        $dateLast = new Alaress_Date_Format($series[$last]['startDate'], 'y-m-d');
 
         $diff = (int)(($dateNext->getUnixTimestamp() - $dateFirst->getUnixTimestamp()) / 86400);
 
@@ -536,7 +538,8 @@ class Calendar extends DeprecatedModel {
                             TIME_FORMAT(endTime, '" . Cfg::get('calendar_time_format') . "') as endTime,
                             TIME_TO_SEC(startTime) as startTimestamp,
                             TIME_TO_SEC(endTime) as endTimestamp,
-                            date, type, note, access, sid, location, detail,
+                            startDate, endDate,
+                            type, note, access, sid, location, detail,
                             user.id as uid, title, firstname, lastname,
                             eventType, eventColour,
                             MATCH (`note`, `detail`, `location`) AGAINST ('$keyword') AS `score`
@@ -630,10 +633,8 @@ class Calendar extends DeprecatedModel {
         $query = "
 			SELECT DISTINCT event.id, owner,
 				GROUP_CONCAT(DISTINCT eventCampus.campusID) as campusList,
-				startTime, endTime, date AS eventDate,
-				TIME_TO_SEC(startTime) as startTimestamp,
-				TIME_TO_SEC(endTime) as endTimestamp,
-				SUBSTR(event.date, 1, 4) AS year,
+				startDate, startTime, endDate, endTime,
+				SUBSTR(event.startDate, 1, 4) AS year,
 				type, note, access, sid, location, detail, attendance,
 				user.id as uid, title, firstname, lastname,
 				eventType, eventColour,
@@ -647,12 +648,22 @@ class Calendar extends DeprecatedModel {
 			LEFT JOIN eventGroup ON event.id = eventGroup.eventID
 			LEFT JOIN category ON event.sid = category.id AND event.sid IS NOT NULL
 			WHERE
-				date >= '{$start->getDatabaseDate()}'
-				AND date <= '{$end->getDatabaseDate()}'
-				AND ((access = '1' AND owner = '{$_SESSION['id']}')
-					  $groupQuery
-					  OR (access = '3' AND $campusQuery $groupChunk OR owner = '{$_SESSION['id']}')
-					)
+				(
+					(access = '1' AND owner = '{$_SESSION['id']}')
+					$groupQuery
+					OR (access = '3' AND $campusQuery $groupChunk OR owner = '{$_SESSION['id']}')
+				)
+				AND (
+
+					/* Start display in the middle of multi-day events that have already begun at some point
+					 * in the past
+					 */
+					((startDate <= '{$start->getDatabaseDate()}') AND (endDate <= '{$end->getDatabaseDate()}'))
+					OR
+					/* Start display for events that are still coming up within the specified time interval
+					 */
+					((startDate >= '{$start->getDatabaseDate()}') AND (startDate <= '{$end->getDatabaseDate()}'))
+				)
 			GROUP BY id
 			ORDER BY event.startTime, event.endTime
 		";
@@ -670,12 +681,8 @@ class Calendar extends DeprecatedModel {
                 $event->setAuthorName($currentEvent['firstname'] . ' ' . $currentEvent['lastname']);
                 $event->setAuthorId($currentEvent['uid']);
                 $event->setEventId($currentEvent['id']);
-                $event->setStartTime(
-                    new Alaress_Date_Format($currentEvent['eventDate'] . ' ' . $currentEvent['startTime'], 'y-m-d h:i:s')
-                );
-                $event->setEndTime(
-                    new Alaress_Date_Format($currentEvent['eventDate'] . ' ' . $currentEvent['endTime'], 'y-m-d h:i:s')
-                );
+                $event->setStartTime(new Alaress_Date_Format($currentEvent['startDate'] . ' ' . $currentEvent['startTime'], 'y-m-d h:i:s'));
+                $event->setEndTime(new Alaress_Date_Format($currentEvent['endDate'] . ' ' . $currentEvent['endTime'], 'y-m-d h:i:s'));
                 $event->setType($currentEvent['type']);
                 $event->setNote($currentEvent['note']);
                 $event->setAccess($currentEvent['access']);
@@ -686,9 +693,11 @@ class Calendar extends DeprecatedModel {
                 $event->setLocation($currentEvent['location']);
                 $event->setPublishDate($currentEvent['publish_date']);
                 $event->setSid($currentEvent['sid']);
-                if ($this->getPerm($currentEvent) > 1) {
+
+				if ($this->getPerm($currentEvent) > 1) {
                     $event->setIsEditable(true);
-                } else {
+                }
+				else {
                     $event->setIsEditable(false);
                 }
 
@@ -715,7 +724,7 @@ class Calendar extends DeprecatedModel {
 						FROM event
 						LEFT JOIN eventCampus ON event.id = eventCampus.eventID
 						LEFT JOIN eventGroup ON event.id = eventGroup.eventID
-						WHERE date = '" . date("Y-m-d", $currentDay) . "'
+						WHERE startDate = '" . date("Y-m-d", $currentDay) . "'
 							AND (
 								  (access = '3' AND eventCampus.campusID IN(" . implode(
             ',', $campusList

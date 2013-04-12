@@ -86,7 +86,7 @@ if (isset($_POST['typeID'])) {
 				$page->error(19);
 
 			$event['eventID'] = $_POST['eventID'];
-			$event['date'] = date("Y-m-d", $date);
+			$event['startDate'] = $date->getDatabaseDate();
 			$eventHandler->update($event);
 
 			$page->backToTheFuture(2);
@@ -106,11 +106,11 @@ if (isset($_POST['typeID'])) {
 				for ($date; $date <= $until; $date = strtotime($validRepeat[$_POST['repeat']], $date)) {
 					if ($i++ > 100) break;
 
-					$dateArray[] = date("Y-m-d", $date);
+					$dateArray[] = $date->getDatabaseDate();
 				}
 
 			} else {
-				$dateArray[] = date("Y-m-d", $date);
+				$dateArray[] = $date->getDatabaseDate();
 			}
 
 			// check user is one of the tutors
@@ -121,7 +121,7 @@ if (isset($_POST['typeID'])) {
 			$event['sequenceID'] = $eventHandler->getNewSequenceID();
 
 			for ($i = 0; $i < count($dateArray); $i++) {
-				$event['date'] = $dateArray[$i];
+				$event['startDate'] = $dateArray[$i];
 				$eventID = $eventHandler->create($event);
 			}
 
