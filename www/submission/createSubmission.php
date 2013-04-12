@@ -83,6 +83,8 @@ if($this->arg[0] == 'modify' && is_numeric($this->arg[1])) {
             'slug' => 'MARKTYPE_SLUG'
         ));
 
+        outputVisibilityDropdown($this, $submission->getMarkVisibility());
+
         // if the rubric creation fails it will throw an exception, in which case just output the empty sets
         try {
             if($mark_type == SubmissionBox\MarkType::TYPE_RUBRIC) {
@@ -278,6 +280,7 @@ else if($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         'slug' => 'MARKTYPE_SLUG'
     ));
 
+    outputVisibilityDropdown($this, Cfg::get('submission_access'));
     outputResultSets($this);
     outputCriteria($this, $this->arg[1], array(), array());
 
@@ -414,4 +417,36 @@ function outputCriteria(SitePage $page, $catID, $checkedIDs, $descriptors, $desc
             $page->parse('criterion_block','criterion', true);
         }
     }
+}
+
+/**
+ * Outputs the visibility dropdown for this page.
+ *
+ * @param SitePage $page
+ * @param int      $value The value of the dropdown to show.
+ */
+function outputVisibilityDropdown(SitePage $page, $value) {
+    $page->dropDown(
+        'mark_visibility_drop',
+        array(
+            array(
+                'id'   => SubmissionBox::MARK_VISIBILITY_PRIVATE,
+                'name' => 'Staff Only',
+            ),
+            array(
+                'id'   => SubmissionBox::MARK_VISIBILITY_STUDENT,
+                'name' => 'Staff and Students',
+            ),
+            array(
+                'id'   => SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
+                'name' => 'Staff, Students and their Parents',
+            ),
+        ),
+        $value,
+        'marktype',
+        array(
+            'name' => 'MARK_VISIBILITY_TEXT',
+            'id'   => 'MARK_VISIBILITY_VALUE'
+        )
+    );
 }

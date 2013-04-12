@@ -9,6 +9,8 @@
 
 namespace Schoolbox\Assessment\Component;
 use Schoolbox;
+use Schoolbox\Assessment\ActivityFactory;
+use Schoolbox\Assessment\ActivityCollection;
 
 class SubmissionBoxMapper extends Schoolbox\Mapper {
 
@@ -51,7 +53,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$this->hasMap(array(
 			'column'     => 'owner',
 			'property'   => 'owner',
-			'type'       => self::TYPE_INTEGER,
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'owner',
 		));
 		$this->hasMap(array(
 			'column'     => 'open_date',
@@ -102,6 +105,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'property'   => 'rubricResultSet',
 			'type'       => self::TYPE_INTEGER,
 		));
+		$this->hasMap(array(
+			'column'     => 'mark_visibility',
+			'property'   => 'markVisibility',
+			'type'       => self::TYPE_INTEGER,
+		));
 
 		//
 		// adds listeners:
@@ -110,7 +118,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		// $this->hasSoftDeleteField('deleted');
 
 		$this->hasJoin('category', array(
-			'mapper'    => new Schoolbox\Resource\CategoryMapper(),
+			'mapper'    => '\\Schoolbox\\Resource\\CategoryMapper',
 			//
 			// Define as mapper fields instead?
 			// this_property:     property for model object
@@ -127,35 +135,53 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		));
 		$this->hasJoin('files', array(
 			'multiple'  => true,
-			'mapper'    => new SubmissionBox\FileMapper(),
+			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\FileMapper',
 			'this_key'  => 'id',
 			'other_key' => 'box_id',
 		));
 
 		$this->hasJoin('legacy_file', array(
 			'multiple'  => true,
-			'mapper'    => new Schoolbox\Resource\FileMapper(),
+			'mapper'    => '\\Schoolbox\\Resource\\FileMapper',
 			'this_key'  => 'fid',
 			'other_key' => 'id',
 		));
 
 		$this->hasJoin('work_type', array(
-			'mapper'    => new SubmissionBox\WorkTypeMapper(),
+			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\WorkTypeMapper',
 			'this_key'  => 'type',
 			'other_key' => 'id',
 		));
 
 		$this->hasJoin('mark_type', array(
-			'mapper'    => new SubmissionBox\MarkTypeMapper(),
+			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\MarkTypeMapper',
 			'this_key'  => 'mark_type',
 			'other_key' => 'mark_type_id',
+		));
+
+		$this->hasJoin('owner', array(
+			'mapper'    => '\\Schoolbox\\UserMapper',
+			'this_key'  => 'owner',
+			'other_key' => 'id',
 		));
 
 		//
 		// TODO add Mapper->hasCollection?
 		$this->hasJoin('notify', array(
 			'multiple'  => true,
-			'mapper'    => new SubmissionBox\NotificationMapper(),
+			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\NotificationMapper',
+			'this_key'  => 'id',
+			'other_key' => 'box_id',
+		));
+		$this->hasJoin('submission', array(
+			'multiple'  => true,
+			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\SubmissionMapper',
+			'this_key'  => 'id',
+			'other_key' => 'box_id',
+		));
+		$this->hasJoin('return', array(
+			'multiple'  => true,
+			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\ReturnedWorkMapper',
 			'this_key'  => 'id',
 			'other_key' => 'box_id',
 		));
@@ -290,5 +316,250 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$query     = "UPDATE {$this->getTable()} SET deleted=TRUE WHERE id=?";
 		$statement = $this->database->prepare($query);
 		return $statement->execute(array($object->getId()));
+	}
+
+
+	/**
+	 * Conversion of SubmissionBoxHandler->getAllYearsByUser().
+	 *
+	 * @param int $user_id The user ID to retrieve for.
+	 *
+	 * @return array
+	 */
+	public function getAllYearsByUser($user_id) {
+		$query = "
+			SELECT DISTINCT DATE_FORMAT(submitted, '%Y') AS submitted_year
+			FROM student_submission
+			WHERE owner = ?
+			ORDER BY submitted DESC";
+
+		$statement = $this->database->prepare($query);
+		$statement->execute(array($user_id));
+
+		$years = array();
+		foreach ($statement as $row) {
+			$years[] = $row['submitted_year'];
+		}
+		return $years;
+	}
+
+
+	/**
+	 * Gets the months that are a part of this semester.
+	 *
+	 * @todo move this somewhere where other semester reliant code can use it
+	 *
+	 * @param $semester
+	 *
+	 * @return array
+	 */
+	public function getSemesterMonths($semester) {
+		$month_start = 1;
+		$month_end   = 6;
+		if ($semester == 2) {
+			$month_start = 7;
+			$month_end   = 12;
+		}
+		return array('start' => $month_start, 'end' => $month_end);
+	}
+
+
+	/**
+	 * Conversion of SubmissionBoxHandler->getAllYearsByUser().
+	 *
+	 * @todo move to a more appropriate class?
+	 *
+	 * This could get a list of categories which have submissions, and pass to
+	 * CategoryMapper->getByIds()?
+	 *
+	 * @param int $user_id  The user ID to retrieve for.
+	 * @param int $year     The year to fetch for.
+	 * @param int $semester The semester to fetch for.
+	 *
+	 * @return array
+	 */
+	public function submittedToCategoryList($user_id, $year, $semester) {
+		$query = "
+			SELECT category.id, category.name, GROUP_CONCAT(cc.code) AS code
+			FROM category
+			LEFT JOIN categoryCode cc ON category.id = cc.categoryID
+			WHERE category.id IN (
+				SELECT DISTINCT sb.category
+				FROM submission_box sb
+				LEFT JOIN student_submission ss ON ss.box_id = sb.id
+				LEFT JOIN submission_return  sr ON sr.box_id = sb.id
+				WHERE (ss.owner = :user_id OR sr.owner = :user_id)
+				AND (
+					(YEAR(ss.submitted) = :year AND MONTH(ss.submitted) BETWEEN :month_start AND :month_end)
+					OR
+					(YEAR(sr.returned)  = :year AND MONTH(sr.returned)  BETWEEN :month_start AND :month_end)
+				)
+			)
+			GROUP BY category.id
+			ORDER BY category.name";
+
+		$months    = $this->getSemesterMonths($semester);
+		$statement = $this->database->prepare($query);
+		$statement->execute(array(
+			'user_id'     => $user_id,
+			'year'        => $year,
+			'month_start' => $months['start'],
+			'month_end'   => $months['end'],
+		));
+		return $statement->fetchAll();
+	}
+
+
+	/**
+	 * Conversion of SubmissionBoxHandler->getAllDueWork().
+	 *
+	 * @todo Implement this as an activity list instead of an array return
+	 *
+	 * @param int   $user_id    The user ID to retrieve for.
+	 * @param array $categories The categories to search for.
+	 * @param int   $year       The year to fetch for.
+	 * @param int   $semester   The semester to fetch for.
+	 *
+	 * @return array
+	 */
+	public function getAllDueWork($user_id, $categories, $year = 0, $semester = 0) {
+		//
+		// Submission box: hydrate with category, student submissions and returns.
+		$months = $this->getSemesterMonths($semester);
+		$params = $this->getArrayParameters($categories, 'category');
+		$params['year']        = $year ?: date('Y');
+		$params['user_id']     = $user_id;
+		$params['month_start'] = $months['start'];
+		$params['month_end']   = $months['end'];
+
+		$query = "
+		    SELECT
+			b.id AS bid,
+			s.id AS sid,
+			r.id AS rid,
+			UNIX_TIMESTAMP(b.late_date) AS lateDate,
+			UNIX_TIMESTAMP(b.date) AS dueDate,
+			c.name AS categoryName,
+			b.name,
+			b.description,
+			r.mark,
+			r.comment,
+			b.mark_visibility,
+			b.created, s.submitted, r.returned
+			FROM submission_box b
+			LEFT JOIN category c ON c.id = b.category
+			LEFT JOIN student_submission s ON s.box_id = b.id AND (s.owner = :user_id OR s.owner IS NULL)
+			LEFT JOIN submission_return  r ON r.box_id = b.id AND (r.owner = :user_id OR r.owner IS NULL)
+			WHERE b.deleted = 0
+			AND b.category IN {$this->getArrayPlaceholders($categories, 'category')}
+			AND YEAR(b.date) = :year
+			AND MONTH(b.date) BETWEEN :month_start AND :month_end
+            GROUP BY b.id
+			ORDER BY categoryName, b.created DESC, s.submitted DESC, r.returned DESC
+		";
+		$statement = $this->database->prepare($query);
+		$statement->execute($params);
+		return $statement->fetchAll();
+	}
+
+	/**
+	 * Gets the list of activities related to submission boxes.
+	 *
+	 * The following activities are retrieved:
+	 *
+	 * * New submission boxes
+	 * * Overdue submission boxes, which the user hasn't submitted work for
+	 *   (The implementation in Submission->getActivityLog() appears to fetch
+	 *    submission boxes which the user has submitted work for)
+	 * * Closed submission boxes
+	 *
+	 * @param int   $user_id    The user for who activities are fetched for.
+	 * @param int   $limit      The max number of activities to be fetched.
+	 * @param array $categories The categories to fetch activities for.
+	 *
+	 * @return ActivityCollection
+	 */
+	public function getActivities($user_id, $limit, $categories) {
+		$factory    = new ActivityFactory();
+		$collection = new ActivityCollection();
+		$queries = array(
+			array(
+				'event' => 'new',
+				'query' => "
+					SELECT
+						{$this->getColumnString('sb')},
+						{$this->getJoinMapper('category')->getColumnString('c')}
+					FROM {$this->getTable()} sb
+					LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
+					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
+					AND sb.open_date < NOW()
+					ORDER BY sb.open_date DESC
+					LIMIT :limit
+				",
+				'date_field' => 'openDate',
+				'limit'      => $limit,
+			),
+			array(
+				//
+				// Overdue: shouldn't this be for items which a student hasn't
+				// submitted, instead of one which they have?
+				'event' => 'overdue',
+				'query' => "
+					SELECT
+						{$this->getColumnString('sb')},
+						{$this->getJoinMapper('category')->getColumnString('c')}
+					FROM {$this->getTable()} sb
+					LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
+					LEFT JOIN {$this->getJoinSql('submission', 'sb', 'sm')} AND sm.owner = :user_id
+					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
+					AND sm.id IS NULL
+					AND sb.date < NOW()
+					ORDER BY sb.date DESC
+					LIMIT :limit
+				",
+				'date_field' => 'dueDate',
+				'limit'      => $limit,
+				'user_id'    => $user_id,
+			),
+			array(
+				'event' => 'closed',
+				'query' => "
+					SELECT
+						{$this->getColumnString('sb')},
+						{$this->getJoinMapper('category')->getColumnString('c')}
+					FROM {$this->getTable()} sb
+					LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
+					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
+					AND sb.late_date < NOW()
+					ORDER BY sb.late_date DESC
+					LIMIT :limit
+				",
+				'date_field' => 'lateDate',
+				'limit'      => $limit,
+			),
+		);
+
+		foreach ($queries as $query) {
+			$statement = $this->database->prepare($query['query']);
+			$params    = $this->getArrayParameters($categories, 'category');
+			if (!empty($query['limit'])) {
+				$params['limit'] = $query['limit'];
+			}
+			if (!empty($query['user_id'])) {
+				$params['user_id'] = $query['user_id'];
+			}
+			foreach ($params as $key => $value) {
+				$statement->bindParam($key, intval($value), \PDO::PARAM_INT);
+			}
+			$statement->execute();
+
+			foreach ($statement as $row) {
+				$box = $this->hydrate($row, 'sb');
+				$box->setCategory($this->getJoinMapper('category')->hydrate($row, 'c'));
+				$collection->add($factory->buildFromSubmissionBox($box, $query['event']));
+			}
+		}
+
+		return $collection;
 	}
 }

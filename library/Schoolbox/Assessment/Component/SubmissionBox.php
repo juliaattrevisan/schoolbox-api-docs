@@ -16,8 +16,13 @@ use Schoolbox\Assessment\Component\SubmissionBox\Notification;
 use Schoolbox\Assessment\Component\SubmissionBox\NotificationCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
+use Schoolbox\User;
 
 class SubmissionBox {
+
+	const MARK_VISIBILITY_PRIVATE        = 0;
+	const MARK_VISIBILITY_STUDENT        = 1;
+	const MARK_VISIBILITY_PARENT_STUDENT = 2;
 
 	/**
 	 * @var int
@@ -60,7 +65,7 @@ class SubmissionBox {
 	protected $notifications;
 
 	/**
-	 * @var int
+	 * @var User
 	 */
 	protected $owner;
 
@@ -108,6 +113,11 @@ class SubmissionBox {
 	 * @var int
 	 */
 	protected $rubric_result_set;
+
+	/**
+	 * @var int
+	 */
+	protected $mark_visibility;
 
 	public function __construct() {
 		$this->setNotifications(new NotificationCollection(array()));
@@ -335,14 +345,14 @@ class SubmissionBox {
 	}
 
 	/**
-	 * @param int $owner
+	 * @param User $owner
 	 */
 	public function setOwner($owner) {
 		$this->owner = $owner;
 	}
 
 	/**
-	 * @return int
+	 * @return User
 	 */
 	public function getOwner() {
 		return $this->owner;
@@ -381,5 +391,42 @@ class SubmissionBox {
 	 */
 	public function addNotification(Notification $notification) {
 		$this->notifications->add($notification);
+	}
+
+	/**
+	 * @param  int $mark_visibility
+	 * @return $this
+	 */
+	public function setMarkVisibility($mark_visibility) {
+		$this->mark_visibility = $mark_visibility;
+		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getMarkVisibility() {
+		return $this->mark_visibility;
+	}
+
+	/**
+	 * Is this mark shown to students?
+	 *
+	 * @return bool
+	 */
+	public function isMarkShownToStudents() {
+		return in_array(
+			$this->getMarkVisibility(),
+			array(self::MARK_VISIBILITY_STUDENT, self::MARK_VISIBILITY_PARENT_STUDENT)
+		);
+	}
+
+	/**
+	 * Is this mark shown to parents?
+	 *
+	 * @return bool
+	 */
+	public function isMarkShownToParents() {
+		return $this->getMarkVisibility() == self::MARK_VISIBILITY_PARENT_STUDENT;
 	}
 }

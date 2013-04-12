@@ -90,7 +90,14 @@ if (is_array($categoryList)) {
 /* Submission Box Details
  */
 $submission = $mapper->findById($this->arg[0]);
-$owner = $userHandler->getByID($submission->getOwner());
+$is_mark_shown = true;
+if ($groupHandler->isStudent() && !$submission->isMarkShownToStudents()) {
+	$is_mark_shown = false;
+}
+elseif ($parentOnly && !$submission->isMarkShownToParents()) {
+	$is_mark_shown = false;
+}
+$owner = $userHandler->getByID($submission->getOwner()->getId());
 
 $this->setVar(array(
     'OWNER_ID' => $owner['uid'],
@@ -132,7 +139,16 @@ if($codes && count($codes)) {
 $dueDate = new Alaress_Date_Relative($submission->getDueDate(),'y-m-d');
 $createdDate = new Alaress_Date_Relative($submission->getCreated(), 'y-m-d');
 
-$allWork = $submissionHandler->getSubmissionHistory($userID, $this->arg[0]);
+$submit_mapper = new Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
+$submission_history = $submit_mapper->getSubmissionHistory($userID, $this->arg[0]);
+if ($is_mark_shown) {
+	$return_mapper = new Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
+	//
+	// Filter out items with a mark, instead of showing this way?
+	// Returns probably should not show at all if marks aren't shown?
+	$submission_history->merge($return_mapper->getSubmissionHistory($userID, $this->arg[0]));
+}
+$submission_history->sortBy('date', 'desc');
 
 $urgency = ($dueDate->getUnixTimestamp() - time()) / 86400;
 $gradient = max(0, min(10, $urgency));
@@ -198,9 +214,21 @@ else {
     $this->setVar('download_block', '');
 }
 
+// set the teacher details
+$teacher = $userHandler->getByID($submission->getOwner()->getId());
+$teacher_details = array(
+	'TEACHER_ID'    => $teacher['uid'],
+	'TEACHER_NAME'  => $userHandler->formatName($teacher),
+	'TEACHER_THUMB' => "/portrait?userId={$teacher['synergy_id']}&size=square32",
+);
+$this->setVar($teacher_details);
+
 $usersList = array();
 
-if (is_array($allWork) && count($allWork)) {
+
+$recent_submission = null;
+$recent_return     = null;
+if (count($submission_history)) {
 	$j = 0;
 
 	/* Make submit button available/unavailable depending on submissions and
@@ -211,7 +239,7 @@ if (is_array($allWork) && count($allWork)) {
     $dem = DueWork_ErrorMapper::getInstance();
     $errors = $dem->listDisplayValues();
 
-	foreach($allWork as $currentWork) {
+	foreach ($submission_history as $activity_item) {
 
         // reset blocks
         foreach($historyActivityTypes as $historyType) {
@@ -223,93 +251,120 @@ if (is_array($allWork) && count($allWork)) {
             'work_grade_block' => ''
         ));
 
-        $workDate = new Alaress_Date_Relative($currentWork['date'], 'U');
+        $workDate = new Alaress_Date_Relative($activity_item->getDate(), 'U');
 
         // if submission item
-        if($currentWork['sid'] != null) {
-            $historyClass = 'submit';
-            $historyIcon = 'up-arrow';
+		$mark      = '';
+		$norm_mark = 0;
+		$gradient  = 0;
+		$file_id   = 0;
+
+		//
+		// User details: default to teacher.
+		$owner   = $teacher_details['TEACHER_ID'];
+		$history = array(
+			'HISTORY_CLASS'    => null,
+			'HISTORY_ICON'     => null,
+			'HISTORY_GRADIENT' => 0,
+			'HISTORY_DATETIME' => $workDate->getRelativeTime(),
+			'HISTORY_MARK'     => '',
+			'HISTORY_COMMENT'  => null,
+			'HISTORY_FILE_ID'  => $submission->getLegacyFileId(),
+			'HISTORY_SUBMISSION_FILE_ID'   => null,
+			'HISTORY_SUBMISSION_FILE_NAME' => null,
+			'HISTORY_RETURN_FILE_ID'       => null,
+			'HAS_GRADE'                    => '',
+		);
+        if ($activity_item->isSubmission()) {
+	        $history['HISTORY_CLASS'] = 'submit';
+	        $history['HISTORY_ICON']  = 'up-arrow';
+
+	        //
+	        // submission file ID, submission file name
+	        $history['HISTORY_SUBMISSION_FILE_ID']   = $activity_item->getSubmission()->getId();
+	        $history['HISTORY_SUBMISSION_FILE_NAME'] = $activity_item->getSubmission()->getFilename();
+
+	        //
+	        // Name, icon and ID of user: use student's
+	        $owner = $activity_item->getSubmission()->getOwner()->getId();
         }
         // if return item
-        elseif($currentWork['rid'] != null) {
+        elseif ($activity_item->isReturn()) {
             // work returned
-            if($currentWork['filename']) {
-                $historyClass = 'return';
-                $historyIcon = 'submitted';
+            if ($activity_item->getReturnedWork()->getFilename()) {
+	            $history['HISTORY_CLASS'] = 'return';
+	            $history['HISTORY_ICON']  = 'submitted';
             }
             // mark given
             else {
-                $historyClass = 'mark';
-                $historyIcon = 'tick';
+	            $history['HISTORY_CLASS'] = 'mark';
+	            $history['HISTORY_ICON']  = 'tick';
             }
+
+	        $mark      = $activity_item->getReturnedWork()->getMark();
+	        $norm_mark = $activity_item->getReturnedWork()->getNormalizedMark();
+
+	        if ($submission->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE_LETTER
+		        || in_array($mark, $errors)
+	        ) {
+		        $mark = $returnHandler->shortenGrade($mark);
+	        }
+	        else {
+		        $mark = Scrub::Text($mark);
+	        }
+	        $history['HISTORY_MARK']     = $mark;
+	        $history['HAS_GRADE']        = ($mark || $mark === 0) ? 'grade' : '';
+	        $history['HISTORY_COMMENT']  = Scrub::text($activity_item->getReturnedWork()->getComment());
+	        $history['HISTORY_GRADIENT'] = $activity_item->getReturnedWork()->getGradientFromNormalizedMark();
+
+	        //
+	        // submission file ID, submission file name
+	        $history['HISTORY_RETURN_FILE_ID']   = $activity_item->getReturnedWork()->getId();
+	        $history['HISTORY_RETURN_FILE_NAME'] = Scrub::text($activity_item->getReturnedWork()->getFilename());
+
+	        $owner = $activity_item->getSubmissionBox()->getOwner()->getId();
         }
         // otherwise extension
         else {
-            $historyClass = 'extend';
-            $historyIcon = 'clock';
+	        $history['HISTORY_CLASS'] = 'extend';
+	        $history['HISTORY_ICON']  = 'clock';
         }
-
-        $comment = Scrub::Text($currentWork['comment']);
-
-        // perform shortening if the marktype is letter, or if the given grade is an error
-        if($submission->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE_LETTER || in_array($currentWork['mark'], $errors)) {
-            $mark = $returnHandler->shortenGrade($currentWork['mark']);
-        } else {
-            $mark = Scrub::Text($currentWork['mark']);
-        }
-
-        $gradient = max(0, min(10, (int)($currentWork['norm_mark'] / 10)));
-
-		$this->setVar(array(
-            'HISTORY_CLASS' => $historyClass,
-            'HISTORY_ICON' => $historyIcon,
-            'HISTORY_GRADIENT' => $gradient,
-			'HISTORY_DATETIME' => $workDate->getRelativeTime(),
-			'HISTORY_MARK' => $mark,
-			'HISTORY_COMMENT' => $comment,
-			'HISTORY_FILE_ID' => $currentWork['fid'],
-			'HISTORY_SUBMISSION_FILE_ID' => $currentWork['sid'],
-			'HISTORY_SUBMISSION_FILE_NAME' => $currentWork['sfname'],
-			'HISTORY_RETURN_FILE_ID' => $currentWork['rid'],
-
-            'HAS_GRADE' => $mark || $mark === 0 ? 'grade' : '',
-		));
+		$this->setVar($history);
 
          // if the user in question has not previously been seen, retrieve
-        if(!isset($usersList[$currentWork['owner']])) {
-            $usersList[$currentWork['owner']] = $userHandler->getByID($currentWork['owner']);
+        if(!isset($usersList[$owner])) {
+            $usersList[$owner] = $userHandler->getByID($owner);
         }
 
         // [owner] is contextually set to either the student or teacher, depending on whether it's submit or return
         $this->setVar(array(
-            'HISTORY_USER_ID' => $currentWork['owner'],
-            'HISTORY_USER_NAME' => $userHandler->formatName($usersList[$currentWork['owner']]),
-            'HISTORY_USER_THUMB' => "/portrait?userId={$usersList[$currentWork['owner']]['synergy_id']}&size=square32"
+            'HISTORY_USER_ID' => $owner,
+            'HISTORY_USER_NAME' => $userHandler->formatName($usersList[$owner]),
+            'HISTORY_USER_THUMB' => "/portrait?userId={$usersList[$owner]['synergy_id']}&size=square32"
         ));
 
         // submission by student
-        if ($currentWork['sid'] != null) {
+		if ($activity_item->isSubmission()) {
 
             // if you are a parent (and only a parent), you can only see plaintext, not a link
-            if($parentOnly) {
+            if ($parentOnly) {
                 $this->setVar('history_submitted_block', 'submitted work');
-            } else {
+            }
+            else {
                 $this->parse('history_submitted_block', 'history_submitted');
             }
 
             // Remember most recent submission
-            if(!is_numeric($recentSubmission['sid'])) {
-                $recentSubmission = $currentWork;
+            if (!isset($recent_submission)) {
+	            $recent_submission = $activity_item;
             }
 
         }
         // return by teacher
-		else if ($currentWork['rid'] != null) {
-
-            $this->setVar('HISTORY_RETURN_FILE_NAME', Scrub::text($currentWork['filename']));
+		if ($activity_item->isReturn()) {
 
             // file return rather than mark
-            if($currentWork['filename']) {
+            if($history['HISTORY_RETURN_FILE_NAME']) {
                 if($parentOnly) {
                     $this->setVar('history_returned_block', 'returned work');
                 } else {
@@ -317,7 +372,7 @@ if (is_array($allWork) && count($allWork)) {
                 }
             }
             else {
-                if($comment) {
+                if ($history['HISTORY_COMMENT']) {
                     $this->parse('history_marked_hascomment_block', 'history_marked_hascomment');
                 }
                 $this->parse('history_marked_block', 'history_marked');
@@ -327,9 +382,9 @@ if (is_array($allWork) && count($allWork)) {
             /* Remember the most recent returned work, because we need it
              * later on
              */
-            if (!is_numeric($returnedWork['rid'])) {
-                $returnedWork = $currentWork;
-            }
+			if (!isset($recent_return)) {
+				$recent_return = $activity_item;
+			}
         }
 
 		/* Alternating row color
@@ -354,15 +409,7 @@ else {
     $this->parse('subject_block', 'subject');
 }
 
-// set the teacher details
-$teacher = $userHandler->getByID($submission->getOwner());
-$this->setVar(array(
-    'TEACHER_ID' => $teacher['uid'],
-    'TEACHER_NAME' => $userHandler->formatName($teacher),
-    'TEACHER_THUMB' => "/portrait?userId={$teacher['synergy_id']}&size=square32",
-));
-
-if($recentSubmission['sid']) {
+if (isset($recent_submission)) {
 
    /* Show most recent submission
     * Hide Submit form
@@ -373,7 +420,7 @@ if($recentSubmission['sid']) {
     // override the due gradient because we have submitted
     $this->setVar('BOX_DUEDATE_GRADIENT', 'black');
 
-    if ($recentSubmission['date'] > $submission->getDueDate()->getUnixTimestamp()) {
+    if ($recent_submission->getDate()->getUnixTimestamp() > $submission->getDueDate()->getUnixTimestamp()) {
         $this->setVar('OVERDUE', 'overdue');
         $this->parse('overdue_block', 'overdue');
     }
@@ -382,28 +429,21 @@ if($recentSubmission['sid']) {
         $this->setVar('overdue_block', '');
     }
 
-    $recentSubmissionDate = new Alaress_Date_Relative($recentSubmission['date'], 'U');
+    $recentSubmissionDate = new Alaress_Date_Relative($recent_submission->getDate(), 'U');
 
     // get filetype details
-    $ext = substr($recentSubmission['sfname'], strrpos($recentSubmission['sfname'], '.') + 1);
-    $mime = $allowedHandler->getMime($ext);
+    $ext   = pathinfo($recent_submission->getSubmission()->getFilename(), PATHINFO_EXTENSION);
+    $mime  = $allowedHandler->getMime($ext);
     $ftype = $allowedHandler->getByField('mime', $mime);
-
-    // get filesize (isn't cached on db table, unfortunately)
-    $filename = Cfg::get('submission_dir') . '/' . $recentSubmission['sid'] . '.dat';
-    if(file_exists($filename)) {
-        $size = Alaress_Byte_Format::bytesToString(filesize($filename));
-    } else {
-        $size = '0 KB';
-    }
+	$size  = Alaress_Byte_Format::bytesToString($recent_submission->getSubmission()->getFilesize());
 
 	// populate details into page
     $this->setVar(array(
-        'MOST_RECENT_SUBMISSION_FILE_NAME' => $recentSubmission['sfname'],
-        'MOST_RECENT_SUBMISSION_FILE_SIZE' => $size,
+        'MOST_RECENT_SUBMISSION_FILE_NAME'  => $recent_submission->getSubmission()->getFilename(),
+        'MOST_RECENT_SUBMISSION_FILE_SIZE'  => $size,
         'MOST_RECENT_SUBMISSION_FILE_THUMB' => $ftype['iconFile'],
-        'MOST_RECENT_SUBMISSION_FILE_DATE' => $recentSubmissionDate->getRelativeTime(),
-        'MOST_RECENT_SUBMISSION_FILE_ID' => $recentSubmission['sid'],
+        'MOST_RECENT_SUBMISSION_FILE_DATE'  => $recentSubmissionDate->getRelativeTime(),
+        'MOST_RECENT_SUBMISSION_FILE_ID'    => $recent_submission->getSubmission()->getId(),
     ));
 
 
@@ -412,7 +452,7 @@ if($recentSubmission['sid']) {
 
 		// retrieve plagiarism score, if available
 		$docMapper = Plagscan_DocumentMapper::getInstance();
-		$plagDoc = $docMapper->findByColumn('file_id', $recentSubmission['sid'])->current();
+		$plagDoc = $docMapper->findByColumn('file_id', $recent_submission->getSubmission()->getId())->current();
 		// test: $plagDoc = $docMapper->findByColumn('file_id', 9)->current();
 
 		// if we retrieved a plag document, use it and display to the student
@@ -502,37 +542,34 @@ if (!in_array($submission->getCategory()->getId(), $categoryIDList)) {
 /* Detect returned work
  */
 
-if (is_numeric($returnedWork['rid'])) {
+if (isset($recent_return)) {
 
     // get filetype details
-    $ext = substr($returnedWork['filename'], strrpos($returnedWork['filename'], '.') + 1);
-    $mime = $allowedHandler->getMime($ext);
+	$return = $recent_return->getReturnedWork();
+    $ext   = pathinfo($return->getFilename(), PATHINFO_EXTENSION);
+    $mime  = $allowedHandler->getMime($ext);
     $ftype = $allowedHandler->getByField('mime', $mime);
-
-    $filename = Cfg::get('returns_dir') . '/' . $returnedWork['rid'] . '.dat';
-    if(file_exists($filename)) {
-        $size = Alaress_Byte_Format::bytesToString(filesize($filename));
-    } else {
-        $size = '0 KB';
-    }
+	$size  = Alaress_Byte_Format::bytesToString($return->getFilesize());
 
     $returnDate = new Alaress_Date_Relative($submission->getDueDate(),'y-m-d');
 
 	$this->setVar(array(
-		'RETURNED_WORK_COMMENT' => Scrub::Text($returnedWork['comment']),
-		'RETURNED_WORK_MARK' => Scrub::Text($returnedWork['mark']),
-		'RETURNED_WORK_FILE_ID' => $returnedWork['rid'],
-        'RETURNED_WORK_GRADIENT' => max(0, min(10, (int)($returnedWork['norm_mark'] / 10))),
-        'RETURNED_WORK_FILE_SIZE' => $size,
-        'RETURNED_WORK_FILE_NAME' => Scrub::Text($returnedWork['filename']),
-        'RETURNED_WORK_FILE_DATE' => $returnDate->getLongDateOnly(),
-        'RETURNED_WORK_FILE_THUMB'=> $ftype['iconFile'],
+		'RETURNED_WORK_COMMENT'    => Scrub::Text($return->getComment()),
+		'RETURNED_WORK_MARK'       => Scrub::Text($return->getMark()),
+		'RETURNED_WORK_FILE_ID'    => $return->getId(),
+        'RETURNED_WORK_GRADIENT'   => $return->getGradientFromNormalizedMark(),
+        'RETURNED_WORK_FILE_SIZE'  => $size,
+        'RETURNED_WORK_FILE_NAME'  => Scrub::Text($return->getFilename()),
+        'RETURNED_WORK_FILE_DATE'  => $returnDate->getLongDateOnly(),
+        'RETURNED_WORK_FILE_THUMB' => $ftype['iconFile'],
 	));
 
-    if($returnedWork['filename'] && !$parentOnly)
-        $this->parse('return_file_block', 'return_file');
-    else
-        $this->setVar('return_file_block','');
+    if ($return->getFilename() && !$parentOnly) {
+	    $this->parse('return_file_block', 'return_file');
+    }
+    else {
+	    $this->setVar('return_file_block','');
+    }
 
 	$this->parse('returned_work_block', 'returned_work');
 }
@@ -548,5 +585,3 @@ if($submission->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE
 else {
     $this->setVar('rubric_block', '');
 }
-
-?>

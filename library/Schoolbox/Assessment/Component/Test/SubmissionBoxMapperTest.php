@@ -42,7 +42,7 @@ class SubmissionBoxMapperTest extends TestCase {
 		$this->assertEquals(11,               $box->getCategory()->getId());
 		$this->assertEquals('Some test',      $box->getName());
 		$this->assertEquals('no description', $box->getDescription());
-		$this->assertEquals(15,               $box->getOwner());
+		$this->assertEquals(15,               $box->getOwner()->getId());
 		$this->assertEquals(true,             $box->getAcceptOnline());
 		$this->assertEquals(false,            $box->getAcceptMultiple());
 		$this->assertEquals(100,              $box->getMaxMark());

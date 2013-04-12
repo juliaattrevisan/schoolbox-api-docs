@@ -27,7 +27,7 @@ class Collection implements \Iterator, \Countable {
      *
      * @param array $stack
      */
-    public function __construct($stack) {
+    public function __construct($stack = array()) {
         $this->setStack($stack);
     }
 
@@ -206,6 +206,19 @@ class Collection implements \Iterator, \Countable {
 	 */
 	public function limit($offset = 0, $count = null) {
 		$this->setStack(array_slice($this->getStack(), $offset, $count));
+		return $this;
+	}
+
+	/**
+	 * Merges contents of another collection with this one - appends all
+	 * elements in the other collection to this one.
+	 *
+	 * @param Collection $other
+	 *
+	 * @return $this
+	 */
+	public function merge(Collection $other) {
+		$this->setStack(array_merge($this->getStack(), $other->getStack()));
 		return $this;
 	}
 }

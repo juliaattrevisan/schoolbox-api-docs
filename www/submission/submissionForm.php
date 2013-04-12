@@ -155,6 +155,7 @@ $submission->getWorkType()->setId($_POST['type']);
 $submission->getMarkType()->setId($markTypeID);
 $submission->setRubricResultSet($resultSetID);
 $submission->setMaxMark($markMax);
+$submission->setMarkVisibility($_POST['mark_visibility']);
 
 // append the notification data to be parsed in
 foreach(array('overdue', 'upcoming', 'returned') as $i) {

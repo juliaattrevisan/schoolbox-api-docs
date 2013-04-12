@@ -123,8 +123,22 @@ if(is_array($optionList)) {
                     $optionList = explode(':', $option['options']);
                     $this->setVar('setting_select_block', '');
                     foreach ($optionList as $opt) {
+                        $this->setVar('SELECT_VALUE', $opt);
                         $this->setVar('SELECT_OPTION', $opt);
                         $this->setVar('SETTING_OPTION_SELECTED', $option['value'] == $opt ? 'selected="selected"' : '');
+                        $this->parse('setting_select_block', 'setting_select', true);
+                    }
+                    $this->parse('setting_type_input_block', 'setting_type_select', true);
+                    break;
+
+                case 'selectKey':
+                    $optionList = explode(':', $option['options']);
+                    $this->setVar('setting_select_block', '');
+                    foreach ($optionList as $opt) {
+                        list($key, $value) = explode(';', $opt);
+                        $this->setVar('SELECT_VALUE', $key);
+                        $this->setVar('SELECT_OPTION', $value);
+                        $this->setVar('SETTING_OPTION_SELECTED', $option['value'] == $key ? 'selected="selected"' : '');
                         $this->parse('setting_select_block', 'setting_select', true);
                     }
                     $this->parse('setting_type_input_block', 'setting_type_select', true);

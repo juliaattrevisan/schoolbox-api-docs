@@ -1,4 +1,8 @@
 <?php
+
+use \Schoolbox\Assessment\Component\SubmissionBox;
+use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -13,7 +17,7 @@ class DueWork_All {
 
     private $userHandler;
     private $groupHandler;
-    private $submissionHandler;
+	private $submissionHandler;
     private $returnHandler;
 
     private $assessHandler;
@@ -29,12 +33,18 @@ class DueWork_All {
 
     private $categories = array();
 
+	protected $submission_mapper;
+
+	protected $valid_visibilities = array();
+
     public function __construct(SitePage $page, $userID = 0) {
 
         $this->userHandler = new User();
         $this->groupHandler = new Group();
         $this->submissionHandler = new Submission();
         $this->returnHandler = new SubmissionReturn();
+
+        $this->submission_mapper = new SubmissionBoxMapper();
 
         $this->assessHandler = new Assess_Main();
         $this->attemptHandler = new Assess_Attempt();
@@ -47,6 +57,19 @@ class DueWork_All {
             $userID = $_SESSION['id'];
         }
         $this->user = $this->userHandler->getByID($userID);
+
+        //
+        // Visibility:
+        // if a parent, can only view public
+        // if student, can view public and students
+        $this->valid_visibilities[] = SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;
+        if ($this->groupHandler->isStaff() || $this->groupHandler->isSuperuser()) {
+            $this->valid_visibilities[] = SubmissionBox::MARK_VISIBILITY_PRIVATE;
+            $this->valid_visibilities[] = SubmissionBox::MARK_VISIBILITY_STUDENT;
+        }
+        elseif ($this->groupHandler->isStudent()) {
+            $this->valid_visibilities[] = SubmissionBox::MARK_VISIBILITY_STUDENT;
+        }
 
         // do some permission checking
         if (!isset($this->user['uid'])) {
@@ -142,7 +165,12 @@ class DueWork_All {
 
         // Years is trickier, because we first need to find out all the years in which the student in question has submitted work
         // also, merging in thie current year is a tad unfortunate
-        $years = array_unique(array_merge(array($this->currentYear), $this->submissionHandler->getAllYearsByUser($this->user['uid'])));
+        $years = array_unique(
+            array_merge(
+                array($this->currentYear),
+                $this->submission_mapper->getAllYearsByUser($this->user['uid'])
+            )
+        );
         foreach($years as $y) {
             $this->page->setVar(array(
                 'YEAR_SELECTED' => $y == $this->year ? ' selected="selected"' : '',
@@ -158,7 +186,11 @@ class DueWork_All {
             $categoryList = $this->groupHandler->involvedInCategoryList($this->user['uid'], true, READ_ACCESS);
         }
         else {
-            $categoryList = $this->submissionHandler->submittedToCategoryList($this->user['uid'], $this->year, $this->semester);
+            $categoryList = $this->submission_mapper->submittedToCategoryList(
+                $this->user['uid'],
+                $this->year,
+                $this->semester
+            );
         }
 
         if (is_array($categoryList)) {
@@ -175,7 +207,12 @@ class DueWork_All {
             return false;
         }
 
-        $allWork = $this->submissionHandler->getAllDueWork($this->user['uid'], $this->getCategoryIDList(), $this->year, $this->semester);
+        $allWork = $this->submission_mapper->getAllDueWork(
+            $this->user['uid'],
+            $this->getCategoryIDList(),
+            $this->year,
+            $this->semester
+        );
 
         if (!is_array($allWork) || !count($allWork)) {
             return false;
@@ -188,8 +225,8 @@ class DueWork_All {
         foreach($allWork as $currentWork) {
 
             // Start a new subject heading?
-            if (($prevSubject != $currentWork['categoryName']) && (!$first)){
-                $prevSubject = $currentWork['categoryName'];
+            $prevSubject = $currentWork['categoryName'];
+            if (($prevSubject != $currentWork['categoryName']) && (!$first)) {
                 $this->page->parse('subject_block', 'subject', true);
                 $this->page->setVar('work_block', '');
             }
@@ -197,12 +234,15 @@ class DueWork_All {
             $dueDate = new Alaress_Date_Format($currentWork['dueDate'], 'U');
             $lateDate = new Alaress_Date_Format($currentWork['lateDate'], 'U');
 
+            //
+            // Only show mark and comment if display isn't blocked.
+            $is_mark_visible = in_array($currentWork['mark_visibility'], $this->valid_visibilities);
             $this->page->setVar(array(
                 'WORK_CATEGORYNAME' => Scrub::Text($currentWork['categoryName']),
                 'WORK_DESCRIPTION'  => Scrub::Text($currentWork['name']),
                 'WORK_DUEDATE'      => $dueDate->getDateOnly(),
-                'WORK_MARK'         => $currentWork['mark'],
-                'WORK_COMMENT'      => $currentWork['comment'],
+                'WORK_MARK'         => $is_mark_visible ? $currentWork['mark']    : '',
+                'WORK_COMMENT'      => $is_mark_visible ? $currentWork['comment'] : '',
                 'WORK_BOX_ID'       => $currentWork['bid'],
                 'ROW_COLOR'         => $j % 2 ? 'dark' : ''
             ));
