@@ -30,7 +30,19 @@ class Component_Eportfolio_BasicListController extends Component_Eportfolio_Cont
 		}
 
 		$this->parseConfig();
-   
+
+		$allItems = Component_Eportfolio_BasicListMapper::getInstance()->findByColumn('component_instance_id', 2920);
+
+		if ($allItems->count()) {
+			for ($allItems->rewind(); $allItems->valid(); $allItems->next()) {
+				$currentItem = $allItems->current();
+
+				$this->sitepage->setVar(array(
+					'LIST_ITEM_CONTENT' => $currentItem->getContent()
+				));
+			}
+		}
+
         return true;
     }
 }
