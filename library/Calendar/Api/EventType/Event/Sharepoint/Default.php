@@ -7,7 +7,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Api_EventType_Event_Sharepoint_Default implements Calendar_Api_EventType_Interface {
+class Calendar_Api_EventType_Event_Sharepoint_Default extends Calendar_Api_EventType_Abstract {
 
 	/**
 	 * Constructor

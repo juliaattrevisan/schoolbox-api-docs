@@ -7,7 +7,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Api_EventType_Event_Schoolbox_Default implements Calendar_Api_EventType_Interface {
+class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventType_Abstract {
 
 	/**
 	 * A schoobox event handler instance
@@ -36,6 +36,15 @@ class Calendar_Api_EventType_Event_Schoolbox_Default implements Calendar_Api_Eve
 	 */
 	public function getEvents($startTimestamp, $endTimestamp) {
 		$collection = $this->getCalendarHandler()->getDayEvents($startTimestamp, $endTimestamp);
+
+		$iterator = $collection->createIterator();
+
+		/* Give the calendar_connector id so this event knows where it came from
+		 * This allows you to create an event detail screen in Mobile
+		 */
+		for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
+			$iterator->current()->setConnectorId($this->getConnectorId());
+		}
 
 		return $collection;
 	}

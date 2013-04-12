@@ -7,7 +7,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Api_EventType_Submission_Schoolbox_Default implements Calendar_Api_EventType_Interface {
+class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_EventType_Abstract {
 	private $calendarHandler = null;
 
 	/**

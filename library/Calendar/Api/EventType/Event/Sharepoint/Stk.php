@@ -9,7 +9,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Calendar_Api_EventType_Event_Sharepoint_Stk implements Calendar_Api_EventType_Interface {
+class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType_Abstract {
 
     /* An instance of the built-in php5 soap
      */
@@ -201,6 +201,11 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk implements Calendar_Api_EventT
 				/* Prevent modify link
 				 */
 				$event->setIsEditable(false);
+
+				/* Give the calendar_connector id so this event knows where it came from
+				 * This allows you to create an event detail screen in Mobile
+				 */
+				$event->setConnectorId($this->getConnectorId());
 
 				/* Event inspection
 				 * A nice place to see what's currently being examined
