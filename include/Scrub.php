@@ -116,6 +116,11 @@ class Scrub {
             'docs.google.com(.[a-z]{2})?/',
             'www.tiki-toki.com/timeline/embed/',
             'www.thinglink.com/card/',
+	        'www.facebook.com/plugins/',
+	        'padlet.com/embed/',
+	        'linoit.com/users/linoit-com/canvases/',
+	        'www.showme.com/sma/embed',
+
         );
 
 
