@@ -20,10 +20,17 @@ class External_Tass_Timetable implements External_TimetableInterface {
 		$this->setDatabase(new MSSQL());
 		$this->getDatabase()->setConvertEncoding(false);
 
-		$this->campusCode = unserialize(SYN_CAMPUS_Codes);
 		$this->days = $this->getDays();
 
 		$this->groupHandler = new Group;
+		$this->campusMapper = new \Schoolbox\CampusMapper();
+	}
+
+	function getCampusCode($campus) {
+
+		$campus = $this->campusMapper->findByID($campus);
+		return $campus->getExtTimetableCode();
+
 	}
 
 	function getDays() {
@@ -38,15 +45,16 @@ class External_Tass_Timetable implements External_TimetableInterface {
 
 	function getTimetableDefinition($campus, $day = 0) {
 
+		$campusCode = $this->getCampusCode($campus);
 		/* Fetch the longest day to use as our day template...  */
 		if($day == 0) {
-            $query = "SELECT tt_id, day_code, prd_num FROM ttdays WHERE tt_id = " . TASS_tt_id . " AND cmpy_code = {$this->campusCode[$campus]} ORDER BY prd_num DESC";
+            $query = "SELECT tt_id, day_code, prd_num FROM ttdays WHERE tt_id = " . TASS_tt_id . " AND cmpy_code = '$campusCode' ORDER BY prd_num DESC";
 		    $longestDay = $this->getDatabase()->getRow($query);
             $day = $longestDay['day_code'];
         }
 
 		$query = "SELECT prd_desc, prd_start, prd_end, prd_code, day_code FROM ttperiod
-                WHERE tt_id = " . TASS_tt_id . " AND cmpy_code = '{$this->campusCode[$campus]}' AND day_code='$day'
+                WHERE tt_id = " . TASS_tt_id . " AND cmpy_code = '$campusCode' AND day_code='$day'
                 ORDER BY prd_code";
 
 		$this->getDatabase()->query($query);
@@ -63,7 +71,7 @@ class External_Tass_Timetable implements External_TimetableInterface {
 		}
 
 		$timetableDef['periodCount'] = $longestDay['prd_num'];
-		$timetableDef['dayCount'] = $this->days[$this->campusCode[$campus]];
+		$timetableDef['dayCount'] = $this->days[$campusCode];
 		return $timetableDef;
 
 	}
@@ -75,20 +83,22 @@ class External_Tass_Timetable implements External_TimetableInterface {
 			$date = mktime();
 		}
 
+		$campusCode = $this->getCampusCode($campus);
+
 		if (date('w', $date) == 0 || date('w', $date) == 6) {
 			return false;
 		}
 
 		//get day count
-		if ($this->days[$this->campusCode[$campus]] == 5) {
+		if ($this->days[$campusCode] == 5) {
 			return date("w", $date);
 		}
 		else {
-			if ($this->days[$this->campusCode[$campus]] == 7) {
+			if ($this->days[$campusCode] == 7) {
 				return 0;
 			}
 			else {
-				if ($this->days[$this->campusCode[$campus]] == 10) {
+				if ($this->days[$campusCode] == 10) {
 
 					if ((date('W', $date) % 2) == 0) {
 						return date('w', $date);
@@ -131,7 +141,7 @@ class External_Tass_Timetable implements External_TimetableInterface {
                         FROM ttmast
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE year_num = '{$_SESSION['FileYear']}' AND semester = '{$_SESSION['FileSemester']}'
-                            AND ttmast.cmpy_code = '{$this->campusCode[$campus]}'
+                            AND ttmast.cmpy_code = '{$this->getCampusCode($campus)}'
                             AND tch_code = '$synergy_id'
                             AND day_code = '$daynumber'
                          ORDER BY prd_code";
@@ -198,7 +208,7 @@ class External_Tass_Timetable implements External_TimetableInterface {
                         FROM ttmast
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE year_num = '{$_SESSION['FileYear']}' AND semester = '{$_SESSION['FileSemester']}'
-                            AND ttmast.cmpy_code = '{$this->campusCode[$campus]}'
+                            AND ttmast.cmpy_code = '{$this->getCampusCode($campus)}'
                             AND tch_code = '$synergy_id'
                          ORDER BY prd_code, day_code";
 		}

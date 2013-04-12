@@ -11,6 +11,8 @@ namespace Schoolbox;
 class Campus {
     private $name;
     private $id;
+	private $extTimetableCode;
+	private $timetableDay;
 
     public function setId($id) {
         $this->id = $id;
@@ -27,6 +29,22 @@ class Campus {
     public function getName() {
         return $this->name;
     }
+
+	public function setExtTimetableCode($extTimetableCode) {
+		$this->extTimetableCode = $extTimetableCode;
+	}
+
+	public function getExtTimetableCode() {
+		return $this->extTimetableCode;
+	}
+
+	public function setTimetableDay($timetableDay) {
+		$this->timetableDay = $timetableDay;
+	}
+
+	public function getTimetableDay() {
+		return $this->timetableDay;
+	}
 
 
 }
