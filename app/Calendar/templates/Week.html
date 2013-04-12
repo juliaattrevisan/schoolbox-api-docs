@@ -2,7 +2,7 @@
 {% if content %}
     {% for i in content | keys %}
     <li class="calendar-event {{ content[i].eventType }}">
-        <a href="/m/calendar/event/{{ content[i].id }}">
+        <a href="/m/calendar/event/{{ content[i].id }}/{{content[i].events[j].connectorId}}">
             {% if content[i].startTime %}
             <time>{{ content[i].startTime }}</time>
             {% endif %}
