@@ -24,7 +24,7 @@ $authBackend = new DAV_Digest();
 $authPlugin = new Sabre\DAV\Auth\Plugin($authBackend, Cfg::get('site_location'));
 $server->addPlugin($authPlugin);
 
-//$server->addPlugin(new ExceptionPlugin());
+//$server->addPlugin(new DAV_ExceptionPlugin());
 
 $server->setBaseUri('/');
 $server->exec();

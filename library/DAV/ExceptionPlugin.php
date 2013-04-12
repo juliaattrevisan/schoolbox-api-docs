@@ -12,7 +12,7 @@
 use Sabre\DAV\Server;
 use Sabre\DAV\ServerPlugin;
 
-class ExceptionPlugin extends ServerPlugin {
+class DAV_ExceptionPlugin extends ServerPlugin {
 
 	/**
 	 * Subscribes to "exception" event on server.
