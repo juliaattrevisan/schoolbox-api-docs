@@ -22,7 +22,11 @@ class Router {
      */
     public function parseURL($url) {
 
-        if (preg_match("/[^a-zA-Z0-9\/\-\_\.]+/", $url)) {
+		/* Only allow certain characters to appear in a url
+		 * Any illegal characters resets controller names, method names, method args and view names to empty
+		 * This can eventually land you back at the whale
+		 */
+        if (preg_match("/[^a-zA-Z0-9\/\-\_\.@]+/", $url)) {
             throw new Exception_Schoolbox("Invalid URL");
         }
 
@@ -35,6 +39,7 @@ class Router {
             $dot = strripos($args[count($args) - 1], '.');
 
             if($dot !== false) {
+
                 $this->setViewName(substr($args[count($args) - 1], $dot + 1));
                 $args[count($args) - 1] = substr($args[count($args) - 1], 0, $dot);
             }
@@ -75,6 +80,7 @@ class Router {
             for($i = $mIndex; $i < count($args); $i++) {
                 $mArgs[] = $args[$i];
             }
+
             $this->setMethodArgs($mArgs);
 
         } catch (ErrorException $e) {

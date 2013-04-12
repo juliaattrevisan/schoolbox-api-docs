@@ -292,9 +292,8 @@ class Calendar_API extends Generic_API {
      * @return Response_HTTP
      */
     public function Display($date = '') {
-
-        $auth = new Authenticator();
-        $user = $auth->getSessionUser();
+		$auth = new Authenticator();
+		$user = $auth->getSessionUser();
 
         try {
             list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $date);
@@ -307,7 +306,6 @@ class Calendar_API extends Generic_API {
         if ($selectedDate <= 0) {
             $selectedDate = time();
         }
-
 
         $selected['day'] = date("j", $selectedDate);
         $selected['month'] = date("n", $selectedDate);
@@ -431,44 +429,103 @@ class Calendar_API extends Generic_API {
     }
 
 
-    /**
-     * Return the data for a single event.
-     * @param $event_id
-     * @return Response_HTTP
-     */
-    public function Event($event_id) {
-        $calendarHandler = new Calendar();
-        $event = $calendarHandler->getByID($event_id);
+	/**
+	 * Return the data for a single event.
+	 *
+	 * @param $event_id
+	 * @param $connector_id
+	 *
+	 * @return Response_HTTP
+	 */
+    public function Event($event_id, $connector_id) {
 
-        $adf = new Alaress_Date_Format($event['date'], 'y-m-d');
+		/* Find out from whence this event came
+		 */
+		$configRecord = Calendar_Api_Config_Mapper::getInstance()->findById($connector_id);
 
-        if($event) {
-            $time = array(
-                'title'   => $adf->getDateOnly(),
-                'aside'   => '',
-                'class'   => '',
-                'icon'    => 'clock',
-                'content' => $event
-            );
+		/* If the config was found, continue as normal
+		 */
+		if (is_a($configRecord, 'Calendar_Api_Config_Record')) {
+			$config = $configRecord->decodeConfig();
+			$config->setId($connector_id);
 
-            $detail = array(
-                'title'   => 'Details',
-                'aside'   => '',
-                'class'   => '',
-                'icon'    => 'news',
-                'content' => array(
-                    'detail' => $event['detail']
-                )
-            );
+			$factory = new Calendar_Api_Factory();
+			$factory->resetConfigs();
+			$factory->addConfig($config);
 
-            $response = new Response_HTTP();
-            $response->setPage('title', $event['note']);
-            $response->setResponse('articles', array($time, $detail));
-        }
+			$composite = $factory->produce();
 
+			/* Forgive me, for I have sinned
+			 */
+			$allEvents = $composite->getEvents(0, 999999999999);
+
+			$iterator = $allEvents->createIterator();
+
+			for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
+				$currentEvent = $iterator->current();
+
+				if ($currentEvent->getEventId() == $event_id) {
+					$event = $currentEvent;
+
+					break;
+				}
+			}
+
+			if (is_a($event, 'Calendar_Event_Type_Abstract')) {
+
+				$standardisedEvent = array(
+					'id' => $event->getEventId(),
+					'series_id' => '',
+					'owner' => $event->getAuthorId(),
+					'access' => $event->getAccess(),
+					'sid' => $event->getSid(),
+					'type' => $event->getType(),
+					'note' => $event->getNote(),
+					'date' => $event->getStartTime()->getDatabaseDate(),
+					'location' => $event->getLocation(),
+					'attendance' =>  method_exists($event, 'getAtendance') ? $event->getAttendance() : '',
+					'detail' => $event->getDetail(),
+					'publish_date' => $event->getPublishDate(),
+					'date' => $event->getStartTime()->getDatabaseDate(),
+					'startTime' => $event->getStartTime()->getUsingFormat('h:iA'),
+					'endTime' => $event->getEndTime()->getUsingFormat('h:iA'),
+
+					/* The author's title - mr, mrs, etc.
+					 */
+					'title' => '',
+					'firstname' => $event->getAuthorName(),
+					'lastname' => '',
+				);
+
+				$time = array(
+					'title'   => 'mort',
+					'aside'   => '',
+					'class'   => '',
+					'icon'    => 'clock',
+					'content' => $standardisedEvent
+				);
+
+				$detail = array(
+					'title'   => 'Details',
+					'aside'   => '',
+					'class'   => '',
+					'icon'    => 'news',
+					'content' => array(
+						'detail' => $standardisedEvent['detail']
+					)
+				);
+
+				$response = new Response_HTTP();
+				$response->setPage('title', $standardisedEvent['note']);
+				$response->setResponse('articles', array($time, $detail));
+			}
+	        else {
+	            $response = new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
+	        }
+		}
         else {
-            $response = new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
-        }
+			$response = new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
+		}
 
         return $response;
     }
