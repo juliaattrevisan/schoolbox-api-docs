@@ -8,9 +8,9 @@ if(!isset($this)) {
 $performExport = false;
 if(is_numeric($this->arg[0])) {
     $categoryID = $this->arg[0];
-	if ($this->arg[3] == 'export') {
-		$performExport = true;
-	}
+    if ($this->arg[3] == 'export') {
+        $performExport = true;
+    }
 }
 else {
     error(2); // not enough info submitted ...is there a better error?
@@ -206,9 +206,10 @@ elseif (is_numeric($categoryID)) {
     $this->setTitle('Class Mark Sheet');
     $this->setTab('submission');
 
+    $this->setBlock(TEMPLATE_content, 'sub_type_head', 'sub_type_head_block');
     $this->setBlock(TEMPLATE_content, 'sub_head', 'sub_head_block');
     $this->setBlock(TEMPLATE_content, 'assess_head', 'assess_head_block');
-    $this->setBlock(TEMPLATE_content, 'sub_type_head', 'sub_type_head_block');
+    $this->setBlock(TEMPLATE_content, 'sub_headers', 'sub_headers_block');
     $this->setBlock(TEMPLATE_content, 'assess_type_head', 'assess_type_head_block');
     $this->setBlock(TEMPLATE_content, 'average_type_head', 'average_type_head_block');
     $this->setBlock(TEMPLATE_content, 'student_list', 'student_list_block');
@@ -289,13 +290,13 @@ elseif (is_numeric($categoryID)) {
     $subList = $subHandler->getAllForUserCategory($categoryID, $_SESSION['id'], $year, $semester);
 
     $this->setVar('sub_head_block', '');
+    $this->setVar('sub_headers_block', '');
     $this->setVar('assess_head_block', '');
     $this->setVar('sub_type_head_block', '');
     $this->setVar('assess_type_head_block', '');
 
     $this->setVar('no_submissions_block', '');
     $this->setVar('no_assessments_block', '');
-
     if (is_array($subList)) {
         foreach ($subList as $sub) {
             $this->setVar(array(
@@ -333,21 +334,26 @@ elseif (is_numeric($categoryID)) {
                     $responseHandler->updatedAutomatedMarks($markedResponseIDs);
                 }
 
-                $this->parse('assess_head_block', 'assess_head', true);
-                $this->parse('assess_type_head_block', 'assess_type_head', true);
-            } else {
-                $this->parse('sub_head_block', 'sub_head', true);
-                $this->parse('sub_type_head_block', 'sub_type_head', true);
+                $this->setVar('sub_head_block', '');
+                $this->parse('assess_head_block', 'assess_head');
             }
+            else {
+                $this->setVar('assess_head_block', '');
+                $this->parse('sub_head_block', 'sub_head');
+            }
+            $this->parse('sub_type_head_block', 'sub_type_head', true);
+            $this->parse('sub_headers_block', 'sub_headers', true);
         }
-    } else {
+    }
+    else {
         $this->setVar(array(
             'BOX_ID' => 'x',
             'SUB_NAME' => '',
             'SUB_TYPE' => ''
         ));
-        $this->parse('sub_head_block', 'sub_head');
+        $this->setVar('sub_head_block', '');
         $this->setVar('sub_type_head_block', '');
+        $this->setVar('sub_headers_block', '');
     }
 
     if (is_array($studentList)) {
