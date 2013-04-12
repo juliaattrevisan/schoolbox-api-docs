@@ -3,20 +3,64 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "0f26491dc6c0d4989ccd5c7ebdcd0678",
+    "hash": "cc030531bbe4aee39c3edf87f33cd413",
     "packages": [
         {
-            "name": "sabre/dav",
-            "version": "1.8.4",
+            "name": "ezyang/htmlpurifier",
+            "version": "v4.5.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/evert/SabreDAV.git",
-                "reference": "1.8.4"
+                "url": "https://github.com/ezyang/htmlpurifier.git",
+                "reference": "v4.5.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/evert/SabreDAV/zipball/1.8.4",
-                "reference": "1.8.4",
+                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/v4.5.0",
+                "reference": "v4.5.0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "HTMLPurifier": "library/"
+                },
+                "files": [
+                    "library/HTMLPurifier.composer.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL"
+            ],
+            "authors": [
+                {
+                    "name": "Edward Z. Yang",
+                    "email": "admin@htmlpurifier.org",
+                    "homepage": "http://ezyang.com"
+                }
+            ],
+            "description": "Standards compliant HTML filter written in PHP",
+            "homepage": "http://htmlpurifier.org/",
+            "keywords": [
+                "html"
+            ],
+            "time": "2013-02-18 00:04:08"
+        },
+        {
+            "name": "sabre/dav",
+            "version": "1.8.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/evert/SabreDAV.git",
+                "reference": "1.8.5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/evert/SabreDAV/zipball/1.8.5",
+                "reference": "1.8.5",
                 "shasum": ""
             },
             "require": {
@@ -79,7 +123,7 @@
                 "framework",
                 "iCalendar"
             ],
-            "time": "2013-04-08 22:48:48"
+            "time": "2013-04-11 12:38:03"
         },
         {
             "name": "sabre/vobject",

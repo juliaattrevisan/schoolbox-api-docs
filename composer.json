@@ -1,5 +1,6 @@
 {
     "require": {
-        "sabre/dav": "1.8.*"
+        "sabre/dav": "1.8.*",
+        "ezyang/htmlpurifier": "4.5.*"
     }
 }
