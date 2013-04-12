@@ -353,7 +353,7 @@ elseif (is_numeric($categoryID)) {
         ));
         $this->setVar('sub_head_block', '');
         $this->setVar('sub_type_head_block', '');
-        $this->setVar('sub_headers_block', '');
+        $this->parse('sub_headers_block', 'sub_headers');
     }
 
     if (is_array($studentList)) {
