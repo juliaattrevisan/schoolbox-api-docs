@@ -47,9 +47,9 @@
     </form>
 
 <div class="clearfix"></div>
-	<a href="/submission/markSheet/{CID}/{SELECTED_YEAR}/{SELECTED_SEMESTER}/export" class="btn download"><span></span>Download Spreadsheet</a>
-	<a class="btn add" href="/submission/createSubmission/new/{CID}/"><span></span>Post Due Work</a>
-	<a class="btn add" href="/assess/create/{CID}/"><span></span>Create Assessment</a>
+    <a href="/submission/markSheet/{CID}/{SELECTED_YEAR}/{SELECTED_SEMESTER}/export" class="btn download"><span></span>Download Spreadsheet</a>
+    <a class="btn add" href="/submission/createSubmission/new/{CID}/"><span></span>Post Due Work</a>
+    <a class="btn add" href="/assess/create/{CID}/"><span></span>Create Assessment</a>
 
 </div>
 <div class="mark-sheet wrap">
@@ -57,7 +57,7 @@
     <table>
         <thead>
 
-		<tr>
+        <tr>
             <th>Name</th>
         </tr>
         </thead>
@@ -75,20 +75,18 @@
     <table>
         <thead>
             <tr>
-                <!-- BEGIN sub_head -->
-                <th id="work-{BOX_ID}" class="column-{BOX_ID}">
-                   <div class="height-control">
-                        <a href="/submission/viewSubmission/{BOX_ID}"><strong>{SUB_NAME}</strong></a>
-                    </div>
-                </th>
-                <!-- END sub_head -->
-                <!-- BEGIN assess_head -->
+                <!-- BEGIN sub_headers -->
                 <th id="work-{BOX_ID}" class="column-{BOX_ID}">
                     <div class="height-control">
+                        <!-- BEGIN sub_head -->
+                        <a href="/submission/viewSubmission/{BOX_ID}"><strong>{SUB_NAME}</strong></a>
+                        <!-- END sub_head -->
+                        <!-- BEGIN assess_head -->
                         <a href="/assess/results/{BOX_ID}"><strong>{SUB_NAME}</strong></a>
+                        <!-- END assess_head -->
                     </div>
                 </th>
-                <!-- END assess_head -->
+                <!-- END sub_headers -->
             </tr>
 
             <tr>
@@ -97,12 +95,6 @@
                     <em>{SUB_TYPE}</em>
                 </th>
                 <!-- END sub_type_head -->
-
-                <!-- BEGIN assess_type_head -->
-                <th>
-                    <em>{SUB_TYPE}</em>
-                </th>
-                <!-- END assess_type_head -->
                 <!-- BEGIN average_type_head -->
                 <th>
                     <em>Average</em>
