@@ -359,21 +359,76 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      * Sync Method: Student
      */
     public function getStudentUserAccountInfo() {
-        // TODO Student Sync
+        $stmt = $this->getDatabase()->prepare('
+            SELECT
+            STUDENT_NUMBER AS "StudentID",
+            USERNAME       AS "NetworkLogin",
+            NULL           AS "StudentTitle",
+            FIRSTNAME      AS "StudentPreferred",
+            SURNAME        AS "StudentSurname",
+            NULL           AS "StudentEmail",
+            NULL           AS "StudentOccupEmail",
+            YEAR_LEVEL     AS "StudentYearLevel",
+            HOUSE          AS "StudentHouse",
+            NULL           AS "StudentCampus"
+            FROM db2inst1.schoolbox_students
+        ');
+        $stmt->execute();
+        return $stmt->fetchAll(DB2::FETCH_ASSOC);
     }
 
     /**
      * Sync Method: Parent
      */
     public function getParentUserAccountInfo() {
-        // TODO Parent Sync
+	    $stmt = $this->getDatabase()->prepare('
+	        SELECT
+			p.CARER_NUMBER        AS "StudentContactID",
+			NULL                  AS "StudentContactTitle",
+			p.FULL_NAME           AS "StudentContactPreferred",
+			NULL                  AS "StudentContactSurname",
+			p.EMAIL               AS "StudentContactDefaultEmail",
+			p.SPOUSE_CARER_NUMBER AS "StudentContactSpouseID",
+			NULL                  AS "StudentContactSpouseTitle",
+			p.SPOUSE_FULL_NAME    AS "StudentContactSpousePreferred",
+			NULL                  AS "StudentContactSpouseSurname",
+			NULL                  AS "StudentContactSpouseDefaultEmail",
+			s.YEAR_LEVEL          AS "StudentYearLevel",
+			s.STUDENT_NUMBER      AS "StudentID"
+            FROM db2inst1.schoolbox_parents AS p
+            INNER JOIN db2inst1.schoolbox_parent_student
+            	AS ps ON p.CARER_NUMBER = ps.CARER_NUMBER
+            INNER JOIN db2inst1.schoolbox_students
+            	AS s ON ps.STUDENT_NUMBER = s.STUDENT_NUMBER
+            ORDER BY INTEGER(p.CARER_NUMBER) ASC, INTEGER(s.STUDENT_NUMBER) ASC
+        ');
+	    $stmt->execute();
+	    return $stmt->fetchAll(DB2::FETCH_ASSOC);
     }
 
     /**
      * Sync Method: Staff
      */
     public function getStaffUserAccountInfo() {
-        // TODO Staff Sync
+        $stmt = $this->getDatabase()->prepare('
+            SELECT
+                STAFF_NUMBER  AS "StaffID",
+                USERNAME      AS "NetworkLogin",
+                1             AS "ActiveFlag",
+                SALUTATION    AS "StaffTitle",
+                FIRSTNAME     AS "StaffPreferredName",
+                SURNAME       AS "StaffSurname",
+                NULL          AS "DefaultEmailCode",
+                EMAIL_ADDRESS AS "OccupEmail",
+                EMAIL_ADDRESS AS "Email",
+                CAMPUS        AS "StaffCampus",
+                NULL          AS "StaffCategoryType",
+                NULL          AS "StaffCategory"
+             FROM db2inst1.schoolbox_staff
+             WHERE USERNAME IS NOT NULL
+        ');
+        $stmt->execute();
+        return $stmt->fetchAll(DB2::FETCH_ASSOC);
     }
 
 
