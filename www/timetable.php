@@ -148,7 +148,6 @@ if (is_array($outputList)) {
                                     $period_staff = $userHandler->formatName(
                                         array(
                                             'title' => $period['staffTitle'],
-                                            'firstname' => $period['staffFirstname'],
                                             'lastname' => $period['staffSurname']
                                         )
                                     );
@@ -243,9 +242,3 @@ if (is_array($outputList)) {
     }
 
 }
-
-
-
-
-
-?>
