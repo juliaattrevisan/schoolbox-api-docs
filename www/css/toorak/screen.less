@@ -1,0 +1,316 @@
+@import "../../m/inc/css/mixins.less";
+
+@skin: 							'demo';
+@banner-background: 			#f1f0eb;
+@banner-color:      			#002664;
+@banner-links:      			@banner-color;
+@banner-height:     			72px;
+
+@navigation-background:  		transparent;
+@navigation-color:  			#de403d;
+@navigation-links:  			#002664;
+@navigation-hover-background: 	@navigation-links;
+@navigation-hover-color:  		#FFFFFF;
+@navigation-sub-background:  	@navigation-links;
+@navigation-width:				200px;
+@navigation-padding:			16px;
+
+@header-background:				#E5EFF7;
+@header-color:      			#000000;
+@header-links:					@header-color;
+
+@tab-background:				#0066B0;
+@tab-color:						#FFFFFF;
+@tab-hover-background:			@tab-color;
+@tab-hover-color:				@tab-background;
+
+@background-color:  			#f1f0eb;
+@link-color: 	    			@banner-color;
+@link-hover-color: 				lighten(@banner-color,8%);
+
+@footer-color:					#929292;
+@footer-links:					@footer-color;
+
+@dark: 							#FAFAFA;
+@grey:							#EEEEEE;
+
+html, body { min-height: 100%; }
+body {
+	background: @background-color url('/images/toorak/ivy-bg.png') -1% 144% no-repeat;
+}
+
+#container {
+    border-top: 2px solid #de403d;
+	margin-left: @navigation-width;
+	margin-right: 0px;
+}
+
+h1,h2,h3{ color: @banner-color; }
+h3.my-links a{ color: @banner-color; }
+h2,.calendar-controls{color:#ffffff; background:@banner-color;}
+.calendar-controls h3{color:#ffffff;}
+a, h2 a{color:@link-color;}
+.box h2 a{color:#ffffff;}
+a:hover{color:@link-hover-color;}
+
+/*
+ * Header
+ */
+#header, .login #header{
+	background: @banner-background;
+	height: auto; min-height: @banner-height;
+	width: 100%; min-width: 768px;
+	float: left;
+}
+
+.login #header{ height: 182px; }
+
+#header .logo{
+	padding: 0;
+	width: 154px;
+	height: 148px;
+	left: 17px;
+	top: 15px;
+	z-index: 3;
+	zoom: 1;
+	img {
+		display: block;
+		height: 148px;
+		width: 154px;
+		zoom: 1;
+	}
+}
+
+#container { clear: left; }
+
+@search-width: 256px;
+
+#search { background: transparent; width: @search-width;
+		  position: absolute; z-index: 3; right: 0; margin: 8px;
+	fieldset { width: 100%; }
+}
+#search-field {
+	color:#006272;
+	background: @tab-color;
+	padding: 6px 0 0 31px;
+	width: @search-width - 31px; height: 26px;
+	font-weight: normal;
+	font-size: 13px; line-height: 13px;
+}
+#search-button{
+	background: url('/images/toorak/search-button.png') 10px 12px no-repeat !important;
+	position: absolute;
+	left: 0; right: auto;
+	height: 32px;
+	width: 24px;
+}
+#infoPanel { margin-top: 22px; position: relative; right: @search-width; z-index: 2; height: @banner-height - 22px - 24px;
+	li {	color:@banner-color; min-width: 32px;
+		a {	color: @banner-links; text-decoration: underline; }
+	}
+	img { 	margin-top: -14px; }
+}
+
+/*
+ * Tabs
+ */
+#tabs{		position: static; margin-left: @navigation-width; clear: right;
+	li { 	margin-right: 1px; margin-top: 1px;
+		a {
+			background: transparent;
+			color: @banner-color;
+			font-size: 13px;
+			height: 25px;
+			line-height: 24px;
+			font-weight:normal;
+		}
+		&.navthis a {
+			background: #de403d;
+			color: @navigation-hover-color;
+			font-weight: normal;
+		}
+	}
+}
+#tabs-sub .ui-tabs-nav li a:hover {
+	background-color: @navigation-hover-background;
+	color: @navigation-hover-color;
+}
+
+#tabs-homepage li.ui-state-default a {
+	background: none repeat scroll 0 0 @grey;
+	color: #000;
+}
+
+#tabs-homepage li.ui-tabs-selected a {
+	background: none repeat scroll 0 0 @header-background;
+	color: #000;
+}
+#tabs-homepage #tabs-sub li.ui-tabs-selected a{
+	background:@grey
+}
+#tabs-sub .ui-tabs-nav li a {
+	background: @grey;
+}
+
+/*
+ * Navigation
+ */
+#nav{ 		margin-top: 12px; margin-left: 0; width: @navigation-width; top: 170px;
+	h3, .nav-wrapper {
+			background: @navigation-background;
+	}
+	h3 {	color: @navigation-color;
+			padding-left: @navigation-padding;
+			font-size: 14px; height: 24px;
+	}
+	li a {
+			color: @navigation-links;
+			padding: 4px @navigation-padding;
+			margin: 0;
+			font-size: 13px;
+	}
+	li.hover > a,
+	ul li a:hover,
+	li li a:hover {
+		color: @navigation-hover-color;
+		background: @navigation-hover-background;
+	}
+	ul ul {	background: @navigation-sub-background;
+            color: #ffffff;
+			border: none;
+			width: @navigation-width; padding: 0;
+			left: @navigation-width; top: 0;
+		ul {
+			width: @navigation-width; padding: 0;
+			left: @navigation-width; top: 0;
+		}
+	}
+	ul, li, li a {
+			width: @navigation-width - @navigation-padding * 2;
+	}
+}
+
+#nav ul ul a{
+  color: #fff;
+  &:hover{
+    background: #de403d;
+  }
+}
+
+/*
+ * Borders & Backgrounds
+ */
+#category ul li a:hover,
+.dark,
+.dark td,
+#tree .dark,
+.standardForm,
+#assess .standardForm,
+#assess .additional-details,
+#assess .assess-body,
+.blog-comments .box,
+.post-left,
+#category,
+#tabs-homepage .customise-components,
+.mark-sheet.assessments .dark td,
+.search-item:nth-child(2n){
+	background: none repeat scroll 0 0 @dark;
+}
+#category li a { padding: 4px 16px; }
+#category li a.selected,
+#tabs-sub li.ui-tabs-selected a,
+.topic-list li a.selected{
+	background:#eaab00; color:#ffffff; font-weight: normal;
+}
+.topic-list li a:hover {
+	background: @banner-color;
+	color: #fff;
+}
+
+#category li a:hover{
+	background:@banner-color;
+	color:#ffffff;
+	-moz-border-radius: 0px;
+	-webkit-border-radius: 0px;
+	border-radius: 0px;
+}
+.standardForm td {
+	border-bottom: 1px solid @grey;
+}
+
+.calendar table .dark,
+.otherMonth,
+.past,
+.timetable th,
+.top .listing .dark,
+.right .listing .dark,
+.left .listing .dark
+{
+	background: @dark;
+}
+
+.calendar table thead th,
+.day-block,
+.calendar table,
+.left #calendar table.duedates-calendar td,
+.left #calendar table.duedates-calendar,
+#calendar table th.dark,
+table tr,
+.listing li,
+.listing .subject-list li,
+.listing .subject-list a,
+.listing .subject-list a.teacher,
+ul.activity-list li,
+.timetable td, .timetable th,
+.forum .comments li, .blog .comments li
+{
+	border-color: @grey;
+}
+.calendar table thead th,
+#calendar table th.dark,
+.timetable thead th
+{
+	border-bottom-color: @grey;
+}
+
+.ui-widget {
+	tr { border: 0; }
+	td { background: none; }
+}
+
+/*
+ * Buttons
+ */
+.submit-btn-plain {
+	background-color: @banner-color;
+	background-image: none !important;
+	border: 0;
+	color: #ffffff !important;
+	font-weight:normal;
+	text-shadow:none;
+	filter: none;
+}
+
+.submit-btn-plain:hover {
+	background-color: lighten(@banner-color,4%);
+	border: 0;
+	color: #fff !important;
+	cursor: pointer;
+	text-shadow:none;
+	filter: none;
+}
+
+/*
+ * Footer
+ */
+#footer { margin: 0; margin-left: @navigation-width; }
+#footer ul {float:right;padding-right: 16px;}
+#footer ul li {color:@footer-color; margin-right: 4px; padding-right: 8px;}
+#footer ul li a{color:@footer-links; white-space: nowrap;}
+
+
+.topic-list li a {
+	font-size: 13px;
+	padding: 4px 16px;
+	color: @navigation-links;
+}
