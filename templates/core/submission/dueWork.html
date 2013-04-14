@@ -102,10 +102,10 @@ $j(function () {
                     <p class="comment">${description}</p>
                 {{/if}}
                 <p class="details clearfix">
-                   <a class="btn go-to float-left" href="/submission/submissionHistory/${id}"><span></span>${action}</a>
-				</p>
+                <a class="btn go-to float-left" href="/submission/submissionHistory/${id}"><span></span>${action}</a>
+                </p>
             </div>
-			<div class="bottom"><strong></strong></div>
+            <div class="bottom"><strong></strong></div>
         </div>
     </div>
 </script>
@@ -117,9 +117,10 @@ $j(function () {
             <div class="close">x</div>
             <div class="js-data clearfix"><h3>${name}</h3>
                 <p class="bubble-name"><span><a href="/homepage/${cid}">${category}</a></span> - <em>${typeName}</em></p>
-                {{if comment}} <p class="comment">${comment}</p> {{/if}}
+                {{if description}}
+                    <p class="comment">${description}</p>
+                {{/if}}
                 <p class="details clearfix">
-                    {{if fid > 0}} <a class="btn down-arrow float-left" href="/send.php?id=${fid}&save=1"><span></span>Download</a> {{/if}}
                     <a class="btn go-to float-left" href="/assess/intro/${id}"><span></span>${action}</a>
                 </p>
             </div>
