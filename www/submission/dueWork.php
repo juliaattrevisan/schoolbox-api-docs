@@ -211,8 +211,12 @@ for ($i = 0; $i < $totalDays; $i++) {
 
             $date = new Alaress_Date_Format(strtotime($event['date']), 'U');
 
+            $event_id = $event['id'];
+            if ($event['is_assessment']) {
+                $event_id = 'assess-'.$event_id;
+            }
             $output = array(
-                'EVENT_ID' => $event['id'],
+                'EVENT_ID' => $event_id,
                 'TIME' => $date->getTimeOnly(),
                 'EVENT' => Scrub::text($event['name']),
                 'EVENT_PAST' => !$due ? 'fade' : '',
