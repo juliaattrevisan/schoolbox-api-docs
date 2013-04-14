@@ -39,6 +39,8 @@ then
 	/vagrant/tools/update-sql.sh;
 	rm -f /vagrant/updates/*/scripts_list > /dev/null;
 	rm -vR /var/lib/vagrant > /dev/null;
+	echo "$vag Generating data dir sql fixes";
+	/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /home/vagrant/schoolboxdemo-vagrant-latest.sql;
 	echo "$vag Applying vagrant SQL fixes";
 	mysql -u root -ptnp879 schoolbox < /home/vagrant/schoolboxdemo-vagrant-latest.sql
         echo "$vag Removing existing apache vhosts";
