@@ -31,10 +31,18 @@ $j(function () {
 		var position = $j(this).parent().offset();
 		var node = $j(this).closest('li'), ev = node.attr("id").substring(6);
 
-		$j.post('/ajax/submission.php', { id : ev }, function (data) {
+		var is_assess = 0;
+		if (ev.match(/^assess-/)) {
+			ev = ev.substring(7);
+			is_assess = 1;
+		}
+
+		$j.post('/ajax/submission.php', { id : ev , is_assess: is_assess}, function (data) {
 
             if (data !== null) {
-                $j('#duework-popup-template').tmpl(data).appendTo('body');
+				var template = is_assess ? $j('#assess-popup-template') : $j('#duework-popup-template');
+
+				template.tmpl(data).appendTo('body');
 
                 movePopup(position);
             }
@@ -95,12 +103,31 @@ $j(function () {
                 {{/if}}
                 <p class="details clearfix">
                    <a class="btn go-to float-left" href="/submission/submissionHistory/${id}"><span></span>${action}</a>
+				</p>
+            </div>
+			<div class="bottom"><strong></strong></div>
+        </div>
+    </div>
+</script>
+
+
+<script id="assess-popup-template" type="text/x-jquery-tmpl">
+    <div class="duework-popup cal-bubble">
+        <div class="middle">
+            <div class="close">x</div>
+            <div class="js-data clearfix"><h3>${name}</h3>
+                <p class="bubble-name"><span><a href="/homepage/${cid}">${category}</a></span> - <em>${typeName}</em></p>
+                {{if comment}} <p class="comment">${comment}</p> {{/if}}
+                <p class="details clearfix">
+                    {{if fid > 0}} <a class="btn down-arrow float-left" href="/send.php?id=${fid}&save=1"><span></span>Download</a> {{/if}}
+                    <a class="btn go-to float-left" href="/assess/intro/${id}"><span></span>${action}</a>
                 </p>
             </div>
             <div class="bottom"><strong></strong></div>
         </div>
     </div>
 </script>
+
 
 <h1>{WORK_USER_NAME} Work</h1>
 <div class="left">
