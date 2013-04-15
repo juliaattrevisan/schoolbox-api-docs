@@ -2,5 +2,11 @@
 	<h2>{COMPONENT_NAME}</h2>
 	{CONFIGURATION}
 
+	<form action='/eportfolio/component/basiclist/modifyForm.php' method='post'>
+		<input type='hidden' name='component_instance_id' value='{COMPONENT_INSTANCE_ID}' />
+		<input type='text' name='content' value='' />
+		<input type='submit' value='Add item' />
+	</form>
+
 	{LIST_ITEM_CONTENT}
 </div>
