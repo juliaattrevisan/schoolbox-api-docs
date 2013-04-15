@@ -11,8 +11,6 @@ $this->setFile(TEMPLATE_content, 'resources.html');
 $this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
 $this->setBlock(TEMPLATE_content, 'file_list', 'file_list_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
-$this->setBlock('custom_head', 'delete_all', 'delete_all_block');
-$this->setBlock('custom_head', 'zip_file_upload', 'zip_file_upload_block');
 
 $this->setTitle('Resources');
 $this->setTab('resources');
@@ -127,18 +125,6 @@ if (is_array($categoryList)) {
 	/* If no permission to folders handle blank block */
 	if (!$output['CATEGORY_ID']) {
 		$this->setVar('category_list_block', '');
-	}
-
-	/* Prevent certain options from appearing unless you are a superuser
-	 */
-
-	if ($groupHandler->isSuperuser()) {
-		$this->parse('delete_all_block', 'delete_all');
-		$this->parse('zip_file_upload_block', 'zip_file_upload');
-	}
-	else {
-		$this->setVar('delete_all_block', '');
-		$this->setVar('zip_file_upload_block', '');
 	}
 }
 else {
