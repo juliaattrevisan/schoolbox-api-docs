@@ -9,6 +9,8 @@
 
 namespace Schoolbox\Assessment\Component;
 use Schoolbox;
+use Schoolbox\User;
+use Schoolbox\Resource\Category;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 
@@ -567,23 +569,37 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	 * Retrieves all submission boxes which take online submissions within a
 	 * given category.
 	 *
-	 * @param int $user_id     The user to filter submissions for
-	 * @param int $category_id If set, restrict results to this category.
+	 * @param User     $user     The user to filter submissions for
+	 * @param Category $category If set, restrict results to this category.
 	 *
 	 * @return \Collection
 	 */
-	public function getSubmittable($user_id, $category_id = null) {
-		//
-		// TODO update this query when student submission model is merged
+	public function getSubmittable(User $user, Category $category = null) {
 		$cat_mapper  = $this->getJoinMapper('category');
+
+		//
+		// only use the external user if the external DB is set up.
+		$cat_mapper->setExternalUser(new \External_User());
+		$user_categories = $cat_mapper->findForUser($user, true);
+		$cat_ids         = array();
+		foreach ($user_categories as $cat) {
+			$cat_ids[] = $cat->getId();
+		}
+
+		if ($category) {
+			$cat_ids = array_intersect($cat_ids, array($category->getId()));
+		}
+
+		//
+		// Get list of valid categories for the given user.
 		$params      = array();
 		$where_parts = array(
 			'sb.late_date > NOW()',
 			'sb.accept_submission IS TRUE',
 		);
-		if ($category_id) {
-			$params[]      = $category_id;
-			$where_parts[] = 'sb.category=?';
+		if ($cat_ids) {
+			$params        = $this->getArrayParameters($cat_ids, 'cat');
+			$where_parts[] = 'sb.category IN '.$this->getArrayPlaceholders($cat_ids, 'cat');
 		}
 		$where = implode(' AND ', $where_parts);
 		$query = "
