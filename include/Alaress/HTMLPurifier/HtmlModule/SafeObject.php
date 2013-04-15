@@ -28,7 +28,7 @@ class Alaress_HTMLPurifier_HTMLModule_SafeObject extends HTMLPurifier_HTMLModule
                 'classid' => 'Text',
             )
         );
-        $object->attr_transform_post[] = new HTMLPurifier_AttrTransform_SafeObject();
+        $object->attr_transform_post[] = new Alaress_HTMLPurifier_AttrTransform_SafeObject();
 
         $param = $this->addElement(
             'param', false, 'Empty', false,
@@ -38,8 +38,8 @@ class Alaress_HTMLPurifier_HTMLModule_SafeObject extends HTMLPurifier_HTMLModule
                 'value' => 'Text',
             )
         );
-        $param->attr_transform_post[] = new HTMLPurifier_AttrTransform_SafeParam();
-        $this->info_injector[] = 'SafeObject';
+        $param->attr_transform_post[] = new Alaress_HTMLPurifier_AttrTransform_SafeParam();
+        $this->info_injector[]        = new Alaress_HTMLPurifier_Injector_SafeObject();
 
     }
 

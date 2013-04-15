@@ -22,7 +22,7 @@ class Alaress_HTMLPurifier_HTMLModule_SafeEmbed extends HTMLPurifier_HTMLModule_
                 'name' => 'ID',
             )
         );
-        $embed->attr_transform_post[] = new HTMLPurifier_AttrTransform_SafeEmbed();
+        $embed->attr_transform_post[] = new Alaress_HTMLPurifier_AttrTransform_SafeEmbed();
 
     }
 
