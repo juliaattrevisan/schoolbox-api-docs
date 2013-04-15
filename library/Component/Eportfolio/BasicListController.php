@@ -50,6 +50,9 @@ class Component_Eportfolio_BasicListController extends Component_Eportfolio_Cont
 				$this->parse('list_item_block', 'list_item', true);
 			}
 		}
+		else {
+			$this->setVar('list_item_block', '');
+		}
 
         return true;
     }
