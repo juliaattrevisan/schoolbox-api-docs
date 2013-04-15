@@ -19,8 +19,8 @@ class Component_Eportfolio_BasicListMapper extends Mapper {
 		$this->hasModel('Component_Eportfolio_BasicList');
 
 		$this->hasMap(array(
-			'column'     => 'list_item_id',
-			'property'   => 'list_item_id',
+			'column'     => 'id',
+			'property'   => 'id',
 			'type'       => Mapper::TYPE_INTEGER,
 			'identifier' => true
 		));
