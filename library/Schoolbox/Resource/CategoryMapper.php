@@ -10,9 +10,20 @@
 
 namespace Schoolbox\Resource;
 use Schoolbox\Mapper;
+use Schoolbox\User;
+use Schoolbox\UserAccess;
+use \External_UserInterface;
 
 
 class CategoryMapper extends Mapper {
+
+	/**
+	 * Interface with external user database.
+	 *
+	 * @var External_UserInterface
+	 */
+	protected $external_user;
+
 	protected function mapping() {
 		$this->hasModel('\\Schoolbox\\Resource\\Category');
 		$this->hasTable('category');
@@ -94,4 +105,64 @@ class CategoryMapper extends Mapper {
 		}
 		return $category;
 	}
+
+	/**
+	 * Port of \Group->involvedInCategoryList() method.
+	 *
+	 * @param User $user         The user to search for.
+	 * @param bool $get_subjects If false, subjects aren't retrieved.
+	 * @param int  $access_level Defaults to UserAccess::ACCESS_READ, but may be
+	 *                           any access level.
+	 *
+	 * @return \Collection
+	 */
+	public function findForUser(User $user, $get_subjects = true, $access_level = UserAccess::ACCESS_READ) {
+		$query = "
+			SELECT DISTINCT {$this->getColumnString('c')}
+			FROM {$this->getTable()} c
+			LEFT JOIN userAccess a ON c.id=a.sid AND a.service=:service
+			LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
+			WHERE a.uid=:user
+		";
+		$params = array(
+			'user'    => $user->getId(),
+			'service' => $access_level,
+		);
+
+		//
+		// If getting subjects - get the external user mapper and query that.
+		if ($get_subjects) {
+			$external_user = $this->getExternalUser();
+			if ($external_user instanceof External_UserInterface) {
+				$category_codes = array_map(
+					function($row) { return $row['code']; },
+					$external_user->getSubjectList($user->getExternalId(), $user->getId())
+				);
+				$query .= ' OR cc.code IN '.$this->getArrayPlaceholders($category_codes, 'code');
+				$params = array_merge($params, $this->getArrayParameters($category_codes, 'code'));
+			}
+		}
+
+		$statement = $this->database->prepare($query);
+		$statement->execute($params);
+		return $this->hydrateList($statement, 'c');
+	}
+
+	/**
+	 * @param  \External_UserInterface $external_user
+	 *
+	 * @return $this
+	 */
+	public function setExternalUser($external_user) {
+		$this->external_user = $external_user;
+		return $this;
+	}
+
+	/**
+	 * @return \External_UserInterface
+	 */
+	public function getExternalUser() {
+		return $this->external_user;
+	}
+
 }
