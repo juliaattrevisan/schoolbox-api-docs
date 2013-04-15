@@ -1,0 +1,3 @@
+# Directories.
+app /usr/share/schoolbox
+mobile/* /usr/share/schoolbox

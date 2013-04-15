@@ -44,6 +44,12 @@ Depends: schoolbox,  ${misc:Depends}
 Description: Leave module for the Schoolbox LMS
  Leave module for the Schoolbox LMS
 
+Package: schoolbox-mobile
+Architecture: all
+Depends: schoolbox,  ${misc:Depends}
+Description: Mobile module for the Schoolbox LMS
+ Mobile module for the Schoolbox LMS
+
 Package: schoolbox-mgssport
 Architecture: all
 Depends: schoolbox,  ${misc:Depends}
