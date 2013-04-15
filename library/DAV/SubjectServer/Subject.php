@@ -8,15 +8,15 @@
  */
 
 use Schoolbox\User;
-use Schoolbox\External\Subject;
+use Schoolbox\Resource\Category;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 class DAV_SubjectServer_Subject extends Sabre\DAV\SimpleCollection
 {
 	/**
-	 * @var Subject
+	 * @var Category
 	 */
-	protected $subject;
+	protected $category;
 
 	/**
 	 * @var User
@@ -24,20 +24,20 @@ class DAV_SubjectServer_Subject extends Sabre\DAV\SimpleCollection
 	protected $user;
 
 	/**
-	 * @param Subject $subject
+	 * @param Category $category
 	 *
 	 * @return $this
 	 */
-	public function setSubject($subject) {
-		$this->subject = $subject;
+	public function setCategory($category) {
+		$this->category = $category;
 		return $this;
 	}
 
 	/**
-	 * @return Subject
+	 * @return Category
 	 */
-	public function getSubject() {
-		return $this->subject;
+	public function getCategory() {
+		return $this->category;
 	}
 
 	/**
@@ -64,7 +64,7 @@ class DAV_SubjectServer_Subject extends Sabre\DAV\SimpleCollection
 	 */
 	public function loadChildren() {
 		$mapper = new SubmissionBoxMapper();
-		foreach ($mapper->getSubmittable($this->getUser()->getId(), $this->getSubject()->getId()) as $assessment) {
+		foreach ($mapper->getSubmittable($this->getUser(), $this->getCategory()) as $assessment) {
 			$child = new DAV_SubjectServer_Assessment($assessment->getName());
 			$child
 				->setAssessment($assessment)

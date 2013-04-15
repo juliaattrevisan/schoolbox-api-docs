@@ -65,7 +65,7 @@ class DAV_SubjectServer_SubjectList extends Sabre\DAV\SimpleCollection {
 	public function loadChildren() {
 		$mapper = new SubmissionBoxMapper();
 		$categories = array();
-		foreach ($mapper->getSubmittable($this->getUser()->getId()) as $box) {
+		foreach ($mapper->getSubmittable($this->getUser()) as $box) {
 			$category = $box->getCategory();
 			if (array_key_exists($category->getId(), $categories)) {
 				continue;
@@ -82,7 +82,7 @@ class DAV_SubjectServer_SubjectList extends Sabre\DAV\SimpleCollection {
 			}
 			$child = new DAV_SubjectServer_Subject($name);
 			$child
-				->setSubject($category)
+				->setCategory($category)
 				->setUser($this->getUser())
 				->loadChildren();
 			$this->addChild($child);
