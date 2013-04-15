@@ -160,6 +160,10 @@ function getFolderMeta($folderId) {
 			break;
 	}
 
+	if($template['name']) {
+		$actions[] = 'homepage';
+	}
+
 
 	$folder = array(
 		'name' => $cat['name'],
