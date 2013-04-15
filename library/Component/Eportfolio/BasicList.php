@@ -14,7 +14,7 @@ class Component_Eportfolio_BasicList extends Model {
 	 *
 	 * @var
 	 */
-	public $list_item_id;
+	public $id;
 
 	/**
 	 * List to which this list item belongs
@@ -76,10 +76,10 @@ class Component_Eportfolio_BasicList extends Model {
 	/**
 	 * Set list item id
 	 *
-	 * @param  $list_item_id
+	 * @param  $id
 	 */
-	public function setListItemId($list_item_id) {
-		$this->list_item_id = $list_item_id;
+	public function setListItemId($id) {
+		$this->id = $id;
 	}
 
 	/**
@@ -88,7 +88,7 @@ class Component_Eportfolio_BasicList extends Model {
 	 * @return
 	 */
 	public function getListItemId() {
-		return $this->list_item_id;
+		return $this->id;
 	}
 
 	/**
