@@ -3,14 +3,28 @@
 	{CONFIGURATION}
 
 	<form action='/eportfolio/component/basiclist/modifyForm.php' method='post'>
-		<input type='hidden' name='component_instance_id' value='{COMPONENT_INSTANCE_ID}' />
+		<input type='hidden' name='action' value='addItem' />
+		<input type='hidden' name='userId' value='{USER_ID}' />
+		<input type='hidden' name='pageId' value='{PAGE_ID}' />
+		<input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
+
 		<input type='text' name='content' value='' />
 		<input type='submit' value='Add item' />
 	</form>
 
 	<ol>
 		<!-- BEGIN list_item -->
-		<li>{LIST_ITEM_CONTENT}</li>
+		<li>
+			{LIST_ITEM_CONTENT}
+			<form action='/eportfolio/component/basiclist/modifyForm.php' method='post'>
+				<input type='hidden' name='action' value='removeItem' />
+				<input type='hidden' name='userId' value='{USER_ID}' />
+				<input type='hidden' name='pageId' value='{PAGE_ID}' />
+				<input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
+				<input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
+				<input type='submit' value='Delete' />
+			</form>
+		</li>
 		<!-- END list_item -->
 	</ol>
 </div>

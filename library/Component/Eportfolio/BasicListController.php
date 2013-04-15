@@ -44,6 +44,7 @@ class Component_Eportfolio_BasicListController extends Component_Eportfolio_Cont
 				$currentItem = $allItems->current();
 
 				$this->setVar(array(
+					'LIST_ITEM_ID' => $currentItem->getId(),
 					'LIST_ITEM_CONTENT' => $currentItem->getContent()
 				));
 

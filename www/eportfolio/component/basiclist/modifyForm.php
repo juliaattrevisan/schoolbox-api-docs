@@ -15,18 +15,34 @@ $action = Scrub::text($_POST['action']);
 $ownerId = Scrub::text($_POST['userId']);
 $pageId = Scrub::text($_POST['pageId']);
 $componentInstanceId = Scrub::text($_POST['componentInstanceId']);
-$content = Scrub::text($_POST['content']);
 
 $authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
 
 if ($authenticator->canModify()) {
+
+	/* Add a list item
+	 */
 	if ($action == 'addItem') {
+		$content = Scrub::text($_POST['content']);
+
 		$listItem = new Component_Eportfolio_BasicList();
 		$listItem->setComponentInstanceId($componentInstanceId);
 		$listItem->setContent($content);
 		$listItem->setSequence(1);
 
 		Component_Eportfolio_BasicListMapper::getInstance()->save($listItem);
+	}
+	/* Update a list item
+	 */
+	else if ($action == 'updateItem') {
+	}
+	/* Delete a list item
+	 */
+	else if ($action == 'removeItem') {
+		$listItemId = Scrub::text($_POST['listItemId']);
+
+		$listItem = Component_Eportfolio_BasicListMapper::getInstance()->findById($listItemId);
+		Component_Eportfolio_BasicListMapper::getInstance()->delete($listItem);
 	}
 
 	SitePage::localRedir("/eportfolio/{$ownerId}/{$pageId}");
