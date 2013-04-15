@@ -98,7 +98,6 @@ class Scrub {
 
         $config = HTMLPurifier_Config::createDefault();
 
-        //$config->set('Cache.DefinitionImpl', null);
         $config->set('Cache.SerializerPath', Cfg::get('xml_dir') . '/../purifier/');
 
         $config->set('AutoFormat.Linkify', true);
@@ -116,19 +115,16 @@ class Scrub {
             'docs.google.com(.[a-z]{2})?/',
             'www.tiki-toki.com/timeline/embed/',
             'www.thinglink.com/card/',
-	        'www.facebook.com/plugins/',
-	        'padlet.com/embed/',
-	        'linoit.com/users/linoit-com/canvases/',
-	        'www.showme.com/sma/embed',
+            'www.facebook.com/plugins/',
+            'padlet.com/embed/',
+            'linoit.com/users/linoit-com/canvases/',
+            'www.showme.com/sma/embed',
 
         );
 
 
         $config->set('URI.SafeIframeRegexp', '%^https?://(' . implode('|', $safeIframeSources) . ')%');
 
-        // Allow objects and embeds
-        $config->set('HTML.SafeObject', true);
-        $config->set('HTML.SafeEmbed', true);
         $config->set('Output.FlashCompat', true);
         $config->set('HTML.FlashAllowFullScreen', true);
 
@@ -142,6 +138,62 @@ class Scrub {
             )
         );
 
+        //
+        // Allow embeds and objects, allowing more properties than standard
+        // HTMLPurifier definition allows.
+        // Include modules this way because adding modules doesn't work in a
+        // logical manner.
+        $config->set('HTML.DefinitionID',  'HTML + Extended Embeds + Extended Objects');
+        $config->set('HTML.DefinitionRev', 1);
+        if ($def = $config->maybeGetRawHTMLDefinition()) {
+            $max = $config->get('HTML.MaxImgLength');
+
+            //
+            // Definition of customised elements, copied directly out of modules.
+            $embed = $def->addElement(
+                'embed', 'Inline', 'Empty', 'Common',
+                array(
+                    'src*' => 'URI#embedded',
+                    'type' => 'ContentType',
+                    'width' => 'Pixels#' . $max,
+                    'height' => 'Pixels#' . $max,
+                    'allowscriptaccess' => 'Enum#never',
+                    'allownetworking' => 'Enum#internal',
+                    'flashvars' => 'Text',
+                    'wmode' => 'Enum#window,transparent,opaque',
+                    'name' => 'ID',
+                )
+            );
+            $embed->attr_transform_post[] = new Alaress_HTMLPurifier_AttrTransform_SafeEmbed();
+
+            $object = $def->addElement(
+                'object',
+                'Inline',
+                'Optional: param | Flow | #PCDATA',
+                'Common',
+                array(
+                    // While technically not required by the spec, we're forcing
+                    // it to this value.
+                    'type' => 'ContentType',
+                    'width' => 'Pixels#' . $max,
+                    'height' => 'Pixels#' . $max,
+                    'data' => 'URI#embedded',
+                    'classid' => 'Text',
+                )
+            );
+            $object->attr_transform_post[] = new Alaress_HTMLPurifier_AttrTransform_SafeObject();
+
+            $param = $def->addElement(
+                'param', false, 'Empty', false,
+                array(
+                    'id' => 'ID',
+                    'name*' => 'Text',
+                    'value' => 'Text',
+                )
+            );
+            $param->attr_transform_post[] = new Alaress_HTMLPurifier_AttrTransform_SafeParam();
+            $def->info_injector[]         = new Alaress_HTMLPurifier_Injector_SafeObject();
+        }
 
         $purifier = HTMLPurifier::instance();
 
