@@ -78,7 +78,7 @@ class Component_Eportfolio_BasicList extends Model {
 	 *
 	 * @param  $id
 	 */
-	public function setListItemId($id) {
+	public function setId($id) {
 		$this->id = $id;
 	}
 
@@ -87,7 +87,7 @@ class Component_Eportfolio_BasicList extends Model {
 	 *
 	 * @return
 	 */
-	public function getListItemId() {
+	public function getId() {
 		return $this->id;
 	}
 
