@@ -38,12 +38,12 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
         $this->setVar('IMAGE_TITLE', 'Feature Image');
 
         //get image id
-        $query = "SELECT id, description, comment FROM file WHERE category = '" . $this->getContext('id') . "' AND deleted = '0' AND `type` = 0 AND description LIKE " . $this->db->smartQuote($this->getConfig('image'));
+        $query = "SELECT id, description, comment FROM file WHERE category = '" . $this->getContext('id') . "' AND deleted = '0' AND description LIKE " . $this->db->smartQuote($this->getConfig('image'));
         $image = $this->db->getRow($query);
 
         if(!is_array($image)) {
             //try to find another image if we cant find the configured one
-            $query = "SELECT id, description, comment FROM file WHERE category = " . $this->getContext('id') . " AND deleted = '0' AND `type` = 0 AND INSTR(mime_type, 'image/')";
+            $query = "SELECT id, description, comment FROM file WHERE category = " . $this->getContext('id') . " AND deleted = '0' AND INSTR(mime_type, 'image/')";
             $image = $this->db->getRow($query);
 
             if(!is_array($image)) {

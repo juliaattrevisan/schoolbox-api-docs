@@ -44,7 +44,6 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
                   AND deleted = '0'
                   AND hidden = '0'
                   AND INSTR(mime_type, 'image/')
-                  AND `type` = '0'
                   ORDER BY RAND() LIMIT 1";
 
         $this->db->query($query);
