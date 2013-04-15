@@ -91,12 +91,12 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
 	 * @return null
 	 */
 	public function put($data) {
+
 		//
-		// Load this file's contents.
-		$temp_file = tempnam(sys_get_temp_dir(), 'dav');
-		$fp = fopen($temp_file, 'wb');
-		stream_copy_to_stream($data, $fp, -1, 0);
-		fclose($fp);
+		// Does this file belong to this student?
+		if ($this->getUser()->getId() != $this->getSubmission()->getOwner()->getId()) {
+			throw new Sabre\DAV\Exception\Forbidden('Cannot overwrite another student\'s submission');
+		}
 
 		//
 		// If the file was updated less than, say, 5 minutes ago, accept the
@@ -106,6 +106,13 @@ class DAV_SubjectServer_Submission extends Sabre\DAV\SimpleFile
 		if (($current_time - $submit_time) > 300) {
 			throw new Sabre\DAV\Exception\Forbidden('Cannot overwrite an existing file with the same name');
 		}
+
+		//
+		// Load this file's contents.
+		$temp_file = tempnam(sys_get_temp_dir(), 'dav');
+		$fp = fopen($temp_file, 'wb');
+		stream_copy_to_stream($data, $fp, -1, 0);
+		fclose($fp);
 
 		//
 		// And put it in the submission object.
