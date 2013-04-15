@@ -1,0 +1,52 @@
+<?php
+/**
+ * Extends HTMLPurifier_AttrTransform_SafeParam to:
+ * * allow 'url' attribute, as long as URI is valid
+ * * allow 'autoplay', 'autostart', 'classid' attributes
+ */
+class Alaress_HTMLPurifier_AttrTransform_SafeParam extends HTMLPurifier_AttrTransform_SafeParam {
+    protected $uri;
+    public function transform($attr, $config, $context) {
+        // If we add support for other objects, we'll need to alter the
+        // transforms.
+        switch ($attr['name']) {
+            // application/x-shockwave-flash
+            // Keep this synchronized with Injector/SafeObject.php
+            case 'allowScriptAccess':
+                $attr['value'] = 'never';
+                break;
+            case 'allowNetworking':
+                $attr['value'] = 'internal';
+                break;
+            case 'allowFullScreen':
+                if ($config->get('HTML.FlashAllowFullScreen')) {
+                    $attr['value'] = ($attr['value'] == 'true') ? 'true' : 'false';
+                } else {
+                    $attr['value'] = 'false';
+                }
+                break;
+            case 'wmode':
+                $attr['value'] = $this->wmode->validate($attr['value'], $config, $context);
+                break;
+            case 'movie':
+            case 'url':
+            case 'src':
+                //$attr['name'] = "movie";
+                $attr['value'] = $this->uri->validate($attr['value'], $config, $context);
+                break;
+            case 'flashvars':
+            case 'autoplay':
+            case 'autostart':
+            case 'classid':
+                // we're going to allow arbitrary inputs to the SWF, on
+                // the reasoning that it could only hack the SWF, not us.
+                break;
+            // add other cases to support other param name/value pairs
+            default:
+                $attr['name'] = $attr['value'] = null;
+        }
+        return $attr;
+    }
+}
+
+// vim: et sw=4 sts=4
