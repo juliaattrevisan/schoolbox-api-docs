@@ -40,19 +40,13 @@ class External_Synergetic_User implements External_UserInterface {
 
 			//TODO: delete photos on rollover
 
-			/* If our cached version timestamp is the same as the synergetic
-			 * modified timestamp, the image is still the same
-			 */
-			$portraitModifiedDate = new Alaress_Date_Format(strtotime($photo['ModifiedDate']), 'U');
-			$lastModifiedDate = new Alaress_Date_Format(filemtime($photoPath), 'U');
-
 			/* If the cached file doesn't exist, or the synergetic image is more recent than our
 			 * last known cached version, regenerate cached version.
 			 *
 			 * Separate the queries out, fetching the photo data only if it's newer than the cached
 			 * version, or if the cache version doesn't already exist.
 			 */
-			if (!file_exists($photoPath) || ($portraitModifiedDate->getUnixTimestamp() > $lastModifiedDate->getUnixTimestamp())) {
+			if (!file_exists($photoPath) || (filemtime($photoPath) > strtotime($photo['ModifiedDate']))) {
 				$query = "
 					SELECT vPhotos.Photo, vPhotos.PhotoType
 					FROM SynergyOne.dbo.vPhotos vPhotos
