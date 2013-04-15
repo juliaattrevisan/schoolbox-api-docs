@@ -10,6 +10,7 @@
 
 require_once('../../../include/Bootstrap.php');
 use Schoolbox\Resource\FileMapper;
+use Schoolbox\File\MimetypeMapper;
 
 // kickstart a session
 new SitePage();
@@ -162,6 +163,7 @@ function getFolderMeta($folderId) {
 
 	$folder = array(
 		'name' => $cat['name'],
+		'id' => $cat['id'],
 		'template' => $template['name'],
 		'type' => $type,
 		'joinable' => $joinable,
@@ -210,14 +212,17 @@ function getSingleFileMeta($folderId, $fileId) {
 			break;
 	}
 
+	$mtypeMap = new MimetypeMapper();
+
 	$file = array(
 		'kind' => 'file',
+		'id' => $file->getId(),
 		'name' => $file->getFilename(),
-//		'mime' => $mimeHandler->getIconFile($file['mime_type']),
+		'mime' => $mtypeMap->getIconForFilename($file->getFilename()),
 		'filesize' => Alaress_Byte_Format::bytesToString($file->getFilesize()),
-		'hidden' => $file->getHidden ? 1 : 0,
+		'hidden' => $file->getHidden() ? 1 : 0,
 		'description' => $file->getComment(),
-		'posted_by' => $userHandler->formatName($userHandler->getByID($file->getOwner())),
+		'posted_by' => $file->getOwner()->formatName(),
 		'posted_date' => $file->getSubmitted()->getDateOnly(),
 		'actions' => $actions
 	);
@@ -261,6 +266,7 @@ function getSingleLinkMeta($folderId, $linkId) {
 
 	$file = array(
 		'kind' => 'link',
+		'id' => $link['id'],
 		'name' => $link['description'],
 		'hidden' => $link['hidden'],
 		'description' => $link['comment'],
