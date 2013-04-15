@@ -18,6 +18,7 @@ This file is internal use and is not shipped to clients.
 * updates - per release update files, primarily sql schema changes 
 * www
 * data - client data and caches (client side only)
+* vendor - directory for external libraries loaded via Composer
 
 ## Installation
 
