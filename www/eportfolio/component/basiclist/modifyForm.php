@@ -35,6 +35,13 @@ if ($authenticator->canModify()) {
 	/* Update a list item
 	 */
 	else if ($action == 'updateItem') {
+		$listItemId = Scrub::text($_POST['listItemId']);
+		$content = Scrub::text($_POST['content']);
+
+		$listItem = Component_Eportfolio_BasicListMapper::getInstance()->findById($listItemId);
+		$listItem->setContent($content);
+
+		Component_Eportfolio_BasicListMapper::getInstance()->save($listItem);
 	}
 	/* Delete a list item
 	 */
