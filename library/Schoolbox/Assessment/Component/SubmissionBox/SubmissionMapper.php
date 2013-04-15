@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
+use \External_User;
 
 class SubmissionMapper extends Schoolbox\Mapper {
 
@@ -208,8 +209,6 @@ class SubmissionMapper extends Schoolbox\Mapper {
 	/**
 	 * Port of SubmissionStudent handler's securityCheck() method.
 	 *
-	 * @todo Remove stupid group handler from here
-	 *
 	 * @throws Schoolbox\Resource\Exception
 	 *
 	 * @param Submission $submission
@@ -246,13 +245,13 @@ class SubmissionMapper extends Schoolbox\Mapper {
 		//
 		// Is the student involved in this group?
 		// (Need much better checking than this, this abuses session variables)
-		$group_handler = new \Group;
-		$category_id   = $submission_box->getCategory()->getId();
-		$categories    = array_map(
-			function($row) { return $row['id']; },
-			$group_handler->involvedInCategoryList($user_id)
-		);
-		if (!in_array($category_id, $categories)) {
+		$cat_mapper = $this->getJoinMapper('submission_box')->getJoinMapper('category');
+		$cat_mapper->setExternalUser(new External_User());
+		$categories = array();
+		foreach ($cat_mapper->findForUser($submission->getOwner(), true) as $cat) {
+			$categories[] = $cat->getId();
+		}
+		if (!in_array($submission_box->getCategory()->getId(), $categories)) {
 			//
 			// 403 forbidden error
 			throw new Schoolbox\Resource\Exception('Access denied');
