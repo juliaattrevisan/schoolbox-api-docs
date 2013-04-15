@@ -5,7 +5,21 @@
  * * allow 'autoplay', 'autostart', 'classid' attributes
  */
 class Alaress_HTMLPurifier_AttrTransform_SafeParam extends HTMLPurifier_AttrTransform_SafeParam {
+    /**
+     * Screw you HTMLPurifier for using private variables - it's not for you to
+     * decide whether I'm going to extend your code or not.
+     *
+     * @see steve-yegge.blogspot.com.au/2010/07/wikileaks-to-leak-5000-open-source-java.html
+     *
+     * @var HTMLPurifier_AttrDef_URI
+     */
     protected $uri;
+
+    public function __construct() {
+        $this->uri = new HTMLPurifier_AttrDef_URI(true); // embedded
+        $this->wmode = new HTMLPurifier_AttrDef_Enum(array('window', 'opaque', 'transparent'));
+    }
+
     public function transform($attr, $config, $context) {
         // If we add support for other objects, we'll need to alter the
         // transforms.
