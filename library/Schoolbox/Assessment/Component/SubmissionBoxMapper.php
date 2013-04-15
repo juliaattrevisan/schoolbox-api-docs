@@ -9,12 +9,44 @@
 
 namespace Schoolbox\Assessment\Component;
 use Schoolbox;
+use Schoolbox\ConfigLoader;
+use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\Resource\Category;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 
 class SubmissionBoxMapper extends Schoolbox\Mapper {
+
+	/**
+	 * @var IConfigLoader
+	 */
+	protected $config_loader;
+
+	/**
+	 * @param  IConfigLoader $config_loader
+	 *
+	 * @return $this
+	 */
+	public function setConfigLoader($config_loader) {
+		$this->config_loader = $config_loader;
+		return $this;
+	}
+
+	/**
+	 * @return IConfigLoader
+	 */
+	public function getConfigLoader() {
+		return $this->config_loader;
+	}
+
+	/**
+	 * Sets up the config loader in this object.
+	 */
+	public function setup() {
+		parent::setup();
+		$this->setConfigLoader(new ConfigLoader());
+	}
 
 	protected function mapping () {
 		$this->hasTable('submission_box');
@@ -575,11 +607,13 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	 * @return \Collection
 	 */
 	public function getSubmittable(User $user, Category $category = null) {
-		$cat_mapper  = $this->getJoinMapper('category');
+		$cat_mapper = $this->getJoinMapper('category');
 
 		//
 		// only use the external user if the external DB is set up.
-		$cat_mapper->setExternalUser(new \External_User());
+		if ($this->getConfigLoader()->get('external_enable')) {
+			$cat_mapper->setExternalUser(new \External_User());
+		}
 		$user_categories = $cat_mapper->findForUser($user, true);
 		$cat_ids         = array();
 		foreach ($user_categories as $cat) {
