@@ -7,7 +7,7 @@
 class ZipFolder {
 
     function ZipFolder($folder) {
-        $this->db = new DeprecatedDatabase;
+	    $this->db = DeprecatedDatabase::getInstance();
         $this->folder = $folder;
         $this->tmpName = tempnam(Cfg::get('zip_dir'), 'zip');
         $this->tmpFolder = $this->tmpName . 'dir';

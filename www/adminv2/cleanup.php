@@ -15,7 +15,7 @@ class clean {
 	function clean()
         {
 			//always gonna need the db so lets create one..
-			$this->db = new DeprecatedDatabase();
+			$this->db = DeprecatedDatabase::getInstance();
         }
 
 	function cleanLoginLog()

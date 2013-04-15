@@ -59,7 +59,7 @@ function fileSecurityCheck($error, $file_name, $tmp_name, $size, $type="")
 		else //just trust browser not as good but it works
 			$mime = strtolower($type);
 		
-		$db = new DeprecatedDatabase;
+		$db = DeprecatedDatabase::getInstance();
 		$query = "SELECT t.fileTypeID FROM allowedFileTypes t LEFT JOIN allowedFileExtension e on t.fileTypeID = e.fileTypeID WHERE mime = '$mime' AND extension = '$ext' AND enable = 'true'";
 		if(!$db->getRow($query))
 			error(11, "Your file, ".$_FILES['file']['name']." with the extension '$ext' and type of '$mime'");

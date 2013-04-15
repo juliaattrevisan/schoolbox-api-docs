@@ -14,7 +14,7 @@ class editDuties
 		$this->category = $cat;
 		$this->service = 1;
 
-		$this->db = new DeprecatedDatabase();
+		$this->db = DeprecatedDatabase::getInstance();
 		$this->page = new SitePage();
         $this->checkPerms();
 		if(!$currYear) { $this->currYear = date("Y"); } else { $this->currYear = $currYear; }
