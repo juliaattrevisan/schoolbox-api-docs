@@ -18,7 +18,7 @@ class DeprecatedModel
 
     function DeprecatedModel()
     {
-        $this->db = new DeprecatedDatabase(SQL_db);
+        $this->db = DeprecatedDatabase::getInstance();
     }
 
     function getByID($id)

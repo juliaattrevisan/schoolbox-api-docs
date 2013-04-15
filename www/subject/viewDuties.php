@@ -16,7 +16,7 @@ class editDuties
 		$this->category = $cat;
 		$this->service = 1;
 		$this->checkPerms();
-		$this->db = new DeprecatedDatabase();
+		$this->db = DeprecatedDatabase::getInstance();
 		$this->t_body = new Template(TPL_directory);
 		if(!$currYear) { $this->currYear = date("Y"); } else { $this->currYear = $currYear; }
         	if(!$currMonth) { $this->currMonth = date("n"); } else { $this->currMonth = $currMonth; }

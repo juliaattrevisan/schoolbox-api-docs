@@ -8,7 +8,7 @@
 class Feed {
 
     function Feed() {
-        $this->db = new DeprecatedDatabase(SQL_db);
+	    $this->db = DeprecatedDatabase::getInstance();
     }
 
     function getFeed($cid, $limit) {

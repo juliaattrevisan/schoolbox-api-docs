@@ -14,7 +14,7 @@ require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 $page = new SitePage();
 
 if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
-    $db = new DeprecatedDatabase;
+	$db = DeprecatedDatabase::getInstance();
 
 	$query = "SELECT id, owner, mime_type, deleted FROM myFile WHERE id = {$_GET['id']}";
 	$fileDir = Cfg::get('myfile_dir');

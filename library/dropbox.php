@@ -13,7 +13,7 @@ define('DROPBOX_COMPONENT', 25);
 class Dropbox {
     function Dropbox() {
         //always gonna need the db so lets create one..
-        $this->db = new DeprecatedDatabase();
+	    $this->db = DeprecatedDatabase::getInstance();
         $this->groupHandler = new Group;
     }
 

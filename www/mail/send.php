@@ -21,7 +21,7 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 {
 	//get users email address to use in from field
 
-	$db = new DeprecatedDatabase();
+	$db = DeprecatedDatabase::getInstance();
 	$db->dbConnect();
 
 	$userHandler = new User();

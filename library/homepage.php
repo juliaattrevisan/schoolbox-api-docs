@@ -10,7 +10,7 @@ class Homepage {
     const KEEP_EXISTING_HOMEPAGE = 0;
 
 	function Homepage($cid) {
-		$this->db = new DeprecatedDatabase(SQL_db);
+		$this->db = DeprecatedDatabase::getInstance();
 		$this->cid = $cid;
 	}
 

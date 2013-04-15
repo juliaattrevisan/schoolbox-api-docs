@@ -10,7 +10,7 @@
 class Activity {
     function Activity() {
         //setup db
-        $this->db = new DeprecatedDatabase;
+	    $this->db = DeprecatedDatabase::getInstance();
     }
 
     function submissionDetails($id) {
