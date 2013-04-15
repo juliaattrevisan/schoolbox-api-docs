@@ -94,8 +94,6 @@ class Scrub {
      * @return mixed
      */
     static public function html($html) {
-        require_once dirname(__FILE__) . '/HTMLPurifier/HTMLPurifier.auto.php';
-
         $config = HTMLPurifier_Config::createDefault();
 
         $config->set('Cache.SerializerPath', Cfg::get('xml_dir') . '/../purifier/');

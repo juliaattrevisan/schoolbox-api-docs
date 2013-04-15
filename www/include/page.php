@@ -354,8 +354,6 @@ function bytesToString($size) {
 }
 
 function scrubHTML($html) {
-    require_once dirname(__FILE__) . '/../../include/HTMLPurifier/HTMLPurifier.auto.php';
-
     $config = HTMLPurifier_Config::createDefault();
     $config->set('Filter', 'YouTube', true);
     $config->set(
