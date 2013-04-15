@@ -212,17 +212,13 @@ class Category extends DeprecatedModel {
     }
 
     function getImages($categoryID, $limit = 0, $excludeWork = false) {
-        $query = "SELECT id, file.description, file.type
+        $query = "SELECT id, file.description
 				  FROM file
 				  LEFT JOIN allowedFileTypes ON mime_type = mime
 				  WHERE category = '$categoryID'
 				  AND deleted = '0'
 				  AND INSTR(mime_type, 'image/')
 				  AND inline = 'true'";
-
-        if ($excludeWork) {
-            $query .= " AND file.type = '0'";
-        }
 
         $query .= "ORDER BY submitted";
 
