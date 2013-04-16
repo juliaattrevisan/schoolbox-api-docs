@@ -1,10 +1,10 @@
 <?php
 /**
+ * Enables embedding of wolfram alpha widgets into homepages
  *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @author      James Leckie <james.leckie@alaress.com.au>
+ * @copyright   Copyright 2013, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 class Component_Homepage_WolframController extends Component_Homepage_ControllerAbstract {
 
