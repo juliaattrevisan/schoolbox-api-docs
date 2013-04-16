@@ -11,8 +11,15 @@
 
 use Sabre\DAV\Server;
 use Sabre\DAV\ServerPlugin;
+use Schoolbox\ConfigLoader;
+use Schoolbox\IConfigLoader;
 
 class DAV_ExceptionPlugin extends ServerPlugin {
+
+	/**
+	 * @var IConfigLoader
+	 */
+	protected $config_loader;
 
 	/**
 	 * Subscribes to "exception" event on server.
@@ -20,6 +27,7 @@ class DAV_ExceptionPlugin extends ServerPlugin {
 	 * @param Server $server
 	 */
 	public function initialize(Server $server) {
+		$this->setConfigLoader(new ConfigLoader());
 		$server->subscribeEvent('exception', array($this, 'onException'), 10);
 	}
 
@@ -32,8 +40,26 @@ class DAV_ExceptionPlugin extends ServerPlugin {
 	 * @return bool Always true - doesn't short-circuit other subscribed events.
 	 */
 	public function onException(Exception $exception) {
-		$temp_file = tempnam(sys_get_temp_dir(), 'exc');
-		file_put_contents($temp_file, $exception->getMessage());
+		$fp = fopen($this->getConfigLoader()->get('logs_dir').'/dav.err', 'ab');
+		fwrite($fp, sprintf("[%s] %s\n", date("Y-m-d H:i:s"), $exception->getMessage()));
+		fclose($fp);
 		return true;
+	}
+
+	/**
+	 * @param  \Schoolbox\IConfigLoader $config_loader
+	 *
+	 * @return $this
+	 */
+	public function setConfigLoader($config_loader) {
+		$this->config_loader = $config_loader;
+		return $this;
+	}
+
+	/**
+	 * @return \Schoolbox\IConfigLoader
+	 */
+	public function getConfigLoader() {
+		return $this->config_loader;
 	}
 }
