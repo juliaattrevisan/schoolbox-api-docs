@@ -46,10 +46,6 @@ class View_Site implements View_Interface {
 
         $skin = $response->getPage('skin');
 
-        // register Twig
-        $twigLoadPath = Config::get('siteRoot') . '/include/Twig/Autoloader.php';
-        require_once $twigLoadPath;
-        Twig_Autoloader::register();
 
         // override the template if an error needs to be presented
         if($response->hasError()) {

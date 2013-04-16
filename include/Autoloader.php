@@ -27,6 +27,10 @@ class Autoloader {
         /* Set root path */
         self::$rootPath = realpath( dirname(__FILE__) . '/..' );
 
+        //
+        // Composer autoloader
+        require self::$rootPath.'/vendor/autoload.php';
+
         /* Register autoloaders with PHP */
         spl_autoload_register(array('Autoloader', 'load'));
         spl_autoload_register(array('Autoloader', 'deprecatedLoad'));
