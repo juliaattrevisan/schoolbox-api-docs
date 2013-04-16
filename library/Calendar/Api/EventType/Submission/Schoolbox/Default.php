@@ -34,6 +34,21 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 		return $collection;
 	}
 
+	/**
+	 * Find a particular event from this source
+	 *
+	 * @param $eventId
+	 * @return Collection
+	 */
+	public function getEvent($eventId) {
+		$collection = new Collection();
+
+		/* Fill in your query result set here and populate $collection
+		 */
+
+		return $collection;
+	}
+
 	/* Getters/Setters
 	 */
 
