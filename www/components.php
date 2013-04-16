@@ -13,8 +13,12 @@ $basicList = array(
 	'config' => array(
 		'componentname' => array(
 			'default_value' => 'My List',
-			'label' => 'List Title'
-		)
+			'label' => 'List Title',
+		),
+		'description' => array(
+			'default_value' => '',
+			'label' => 'Purpose',
+		),
 	)
 );
 
