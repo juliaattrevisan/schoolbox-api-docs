@@ -29,7 +29,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 	 * @return Calendar_Event_Collection
 	 */
 	public function getEvents($startTimestamp, $endTimestamp) {
-		$collection = $this->getCalendarHandler()->getSubmissionEvents($currentDay);
+		$collection = $this->getCalendarHandler()->getSubmissionEvents($startTimestamp, $endTimestamp);
 
 		return $collection;
 	}
