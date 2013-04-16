@@ -5,7 +5,7 @@
 				var id = $j(this).attr('rel');
 
 				$j('#modify_' + id).show();
-				$j('#modify_' + id).find('input[name=content]').focus();
+				$j('#modify_' + id).find('.mceEditor').focus();
 
 				$j(this).hide();
 			});
@@ -20,7 +20,7 @@
 		<input type='hidden' name='userId' value='{USER_ID}' />
 		<input type='hidden' name='pageId' value='{PAGE_ID}' />
 		<input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
-		<input type='text' name='content' value='' />
+		<textarea type='text' name='content' class='mceEditor' value='' /></textarea>
 		<input type='submit' value='Add item' />
 	</form>
 
@@ -34,7 +34,7 @@
 				<input type='hidden' name='pageId' value='{PAGE_ID}' />
 				<input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
 				<input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
-				<input type='text' name='content' value='{LIST_ITEM_CONTENT}' />
+				<textarea type='text' name='content' class='mceEditor' value='' />{LIST_ITEM_CONTENT}</textarea>
 				<input type='submit' value='Update' />
 			</form>
 
