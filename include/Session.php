@@ -353,6 +353,13 @@ class Session
         $semester = $synUser->getCurrentSemester();
 
         $synergy_id = $_SESSION['sid'];
+
+        //
+        // Children and subjects should be cleared before attempting to add
+        // them. This prevents re-authentication (for example, from WebDAV) from
+        // adding the same children and subjects again.
+        unset($_SESSION['children'], $_SESSION['subjects']);
+
         if ($synergy_id) {
 
             //if user is parent get information regarding enrolled students

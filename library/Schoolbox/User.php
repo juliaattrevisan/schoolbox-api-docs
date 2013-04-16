@@ -31,6 +31,12 @@ class User {
     private $defaultCampus;     //The users default campus
     private $superuser;         //Bool
 
+	/**
+	 * @var \Schoolbox\External\SubjectCollection
+	 */
+	protected $subject_collection;
+
+
     //User config options
     private $localEmail;  //Controls if user has local domain email username@domain
     private $eportfolioEnable; //Controls if user has eportfolio
@@ -292,6 +298,20 @@ class User {
     public function setDefaultCampus($defaultCampus) {
         $this->defaultCampus = $defaultCampus;
     }
+
+	/**
+	 * @param \Schoolbox\External\SubjectCollection $subject_collection
+	 */
+	public function setSubjectCollection($subject_collection) {
+		$this->subject_collection = $subject_collection;
+	}
+
+	/**
+	 * @return \Schoolbox\External\SubjectCollection
+	 */
+	public function getSubjectCollection() {
+		return $this->subject_collection;
+	}
 
 
     /**

@@ -7,12 +7,19 @@
  * Time: 9:27 PM
  */
 
-class DAV_Folder extends Sabre_DAV_Collection {
+use Schoolbox\UserMapper;
+
+class DAV_Folder extends Sabre\DAV\Collection {
 
     private $folder;
     private $folderHandler;
     private $fileHandler;
     private $groupHandler;
+
+    /**
+     * @var DAV_SubjectServer_SubjectList
+     */
+    protected $subject_list;
 
     public function __construct($path) {
 
@@ -24,37 +31,62 @@ class DAV_Folder extends Sabre_DAV_Collection {
 
         $this->setFolderID($path);
 
-
+        //
+        // Name may be configurable later on.
+        $this->subject_list = new DAV_SubjectServer_SubjectList('/My Subjects');
     }
 
     public function getChildren() {
 
-        $children = array();
-
         $categoryList = $this->getFolderHandler()->getSimpleCategoryList($this->getFolderID());
 
         // Loop through the directory, and create objects for each node that the user has permission to access
+        $folders = array();
         if(is_array($categoryList)){
             foreach($categoryList as $folder) {
                 if($this->getGroupHandler()->getPermission($folder['id']) >= READ_ACCESS) {
-                    $children[] = new DAV_Folder($this->myPath.'/'.$folder['name']);
+                    $folders[] = new DAV_Folder($this->myPath.'/'.$folder['name']);
                 }
             }
         }
 
         //Loop through all the files and output them if the user has access
+        $files = array();
         if($this->getGroupHandler()->getPermission($this->getFolderID()) >= READ_ACCESS ) {
             $fileList = $this->getFileHandler()->getAllInCategory($this->getFolderID());
             if(is_array($fileList)){
                 foreach($fileList as $file) {
                     if(is_array($file) && is_readable(Cfg::get('file_dir') .'/'. $file['id'] . '.dat') ) {
-                        $children[] = new DAV_File($this->myPath.'/'.$file['realname']);
+                        $files[] = new DAV_File($this->myPath.'/'.$file['realname']);
                     }
                 }
             }
         }
 
-        return $children;
+        //
+        // Students: get a "My Subjects" folder. (Add to plugin)
+        if ($this->subject_list->isSubjectListShown($this->myPath)) {
+            $folders[] = $this->subject_list;
+        }
+
+        //
+        // Sort by type and name
+        usort($folders, array($this, 'compareChildren'));
+        usort($files,   array($this, 'compareChildren'));
+
+        return array_merge($folders, $files);
+    }
+
+    /**
+     * Sort callback for children.
+     *
+     * @param \Sabre\Dav\INode $child1
+     * @param \Sabre\Dav\INode $child2
+     *
+     * @return int
+     */
+    public function compareChildren(Sabre\Dav\INode $child1, Sabre\Dav\INode $child2) {
+        return strcmp($child1->getName(), $child2->getName());
     }
 
     /**
@@ -63,20 +95,29 @@ class DAV_Folder extends Sabre_DAV_Collection {
      * Checks if name refers to a folder it then returns a folder object otherwise searches for a file in the current path
      *
      * @param string $name
-     * @throws Sabre_DAV_Exception_NotFound
-     * @return Sabre_DAV_INode
+     * @throws Sabre\DAV\Exception\Forbidden
+     * @throws Sabre\DAV\Exception\NotFound
+     * @return Sabre\DAV\INode
      */
     public function getChild($name) {
 
         //Prevent queries if permission is not allowed
         if($this->getFolderID() > 0) {
             if($this->getGroupHandler()->getPermission($this->getFolderID()) < READ_ACCESS) {
-                throw new Sabre_DAV_Exception_Forbidden('Permission denied');
+                throw new Sabre\DAV\Exception\Forbidden('Permission denied');
             }
         }
 
+        $this_folder = $this->myPath.'/'.$name;
+        if ($this_folder === $this->subject_list->getName()) {
+            $user_mapper = new UserMapper();
+            $this->subject_list
+                ->setUser($user_mapper->findById($_SESSION['id']))
+                ->loadChildren();
+            return $this->subject_list;
+        }
         if($this->isFolder($name, $this->getFolderID())) {
-            return new DAV_Folder($this->myPath.'/'.$name);
+            return new DAV_Folder($this_folder);
         }
         else {
             $result = $this->getFileHandler()->getByArray(array('realname' => $name,'category'=>$this->getFolderID()));
@@ -84,8 +125,9 @@ class DAV_Folder extends Sabre_DAV_Collection {
             if(is_array($file) && is_readable(Cfg::get('file_dir') .'/'. $file['id'] . '.dat') ) {
                 return new DAV_File($this->myPath.'/'.$file['realname']);
             }
-            else
-                throw new Sabre_DAV_Exception_NotFound('The file with name: ' . $file['realname'] . ' could not be found');
+            else {
+                throw new Sabre\DAV\Exception\NotFound('The file with name: ' . $file['realname'] . ' could not be found');
+            }
         }
 
     }
@@ -132,12 +174,12 @@ class DAV_Folder extends Sabre_DAV_Collection {
             unlink($tmpLoc);
         }
         else {
-            throw new Sabre_DAV_Exception_Forbidden('Permission denied to create file');
+            throw new Sabre\DAV\Exception\Forbidden('Permission denied to create file');
         }
     }
 
     public function createDirectory($name) {
-        throw new Sabre_DAV_Exception_Forbidden('Permission denied to create directory');
+        throw new Sabre\DAV\Exception\Forbidden('Permission denied to create directory');
     }
 
 
