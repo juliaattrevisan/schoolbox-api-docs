@@ -15,7 +15,7 @@ class Component_Eportfolio_AdvancedListMapper extends Mapper {
 	 * @return Bool|void
 	 */
 	protected function mapping() {
-		$this->hasTable('eportfolio_component_list_item');
+		$this->hasTable('eportfolio_component_advancedlist_item');
 		$this->hasModel('Component_Eportfolio_AdvancedList');
 
 		$this->hasMap(array(
@@ -32,8 +32,20 @@ class Component_Eportfolio_AdvancedListMapper extends Mapper {
 		));
 
 		$this->hasMap(array(
+			'column'     => 'title',
+			'property'   => 'title',
+			'type'       => Mapper::TYPE_STRING,
+		));
+
+		$this->hasMap(array(
 			'column'     => 'content',
 			'property'   => 'content',
+			'type'       => Mapper::TYPE_STRING,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'imagehash',
+			'property'   => 'imagehash',
 			'type'       => Mapper::TYPE_STRING,
 		));
 
