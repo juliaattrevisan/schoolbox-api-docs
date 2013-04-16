@@ -7,4 +7,9 @@
 
 # Go to parent directory of this file, and run Composer from there.
 cd $(dirname $(dirname $(readlink -f $0)))
-php composer.phar update
+if [ ! -f composer.phar ];
+then
+	curl -s http://getcomposer.org/installer | php;
+	chmod a+x composer.phar;
+fi
+php composer.phar update --no-progress
