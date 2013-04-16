@@ -49,7 +49,7 @@ if ($authenticator->canModify()) {
 		$listItem->setContent($content);
 		$listItem->setImagehash($imagehash);
 
-		Component_Eportfolio_AdvancedList::getInstance()->save($listItem);
+		Component_Eportfolio_AdvancedListMapper::getInstance()->save($listItem);
 	}
 	/* Delete a list item
 	 */
@@ -57,7 +57,7 @@ if ($authenticator->canModify()) {
 		$listItemId = Scrub::text($_POST['listItemId']);
 
 		$listItem = Component_Eportfolio_AdvancedListMapper::getInstance()->findById($listItemId);
-		Component_Eportfolio_AdvancedList::getInstance()->delete($listItem);
+		Component_Eportfolio_AdvancedListMapper::getInstance()->delete($listItem);
 	}
 
 	SitePage::localRedir("/eportfolio/{$ownerId}/{$pageId}");
