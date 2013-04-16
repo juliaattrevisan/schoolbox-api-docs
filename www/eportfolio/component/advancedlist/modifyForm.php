@@ -23,23 +23,31 @@ if ($authenticator->canModify()) {
 	/* Add a list item
 	 */
 	if ($action == 'addItem') {
+		$title = Scrub::text($_POST['title']);
 		$content = Scrub::text($_POST['content']);
+		$imagehash = Scrub::text($_POST['imagehash']);
 
 		$listItem = new Component_Eportfolio_AdvancedList();
 		$listItem->setComponentInstanceId($componentInstanceId);
+		$listItem->setTitle($title);
 		$listItem->setContent($content);
+		$listItem->setImagehash($imagehash);
 		$listItem->setSequence(1);
 
-		Component_Eportfolio_AdvancedList::getInstance()->save($listItem);
+		Component_Eportfolio_AdvancedListMapper::getInstance()->save($listItem);
 	}
 	/* Update a list item
 	 */
 	else if ($action == 'updateItem') {
 		$listItemId = Scrub::text($_POST['listItemId']);
+		$title = Scrub::text($_POST['title']);
 		$content = Scrub::text($_POST['content']);
+		$imagehash = Scrub::text($_POST['imagehash']);
 
-		$listItem = Component_Eportfolio_AdvancedList::getInstance()->findById($listItemId);
+		$listItem = Component_Eportfolio_AdvancedListMapper::getInstance()->findById($listItemId);
+		$listItem->setTitle($title);
 		$listItem->setContent($content);
+		$listItem->setImagehash($imagehash);
 
 		Component_Eportfolio_AdvancedList::getInstance()->save($listItem);
 	}
@@ -48,7 +56,7 @@ if ($authenticator->canModify()) {
 	else if ($action == 'removeItem') {
 		$listItemId = Scrub::text($_POST['listItemId']);
 
-		$listItem = Component_Eportfolio_AdvancedList::getInstance()->findById($listItemId);
+		$listItem = Component_Eportfolio_AdvancedListMapper::getInstance()->findById($listItemId);
 		Component_Eportfolio_AdvancedList::getInstance()->delete($listItem);
 	}
 

@@ -15,7 +15,7 @@
 	<h2>{COMPONENT_NAME}</h2>
 	{CONFIGURATION}
 
-	<form action='/eportfolio/component/basiclist/modifyForm.php' method='post' enctype='multipart/form-data'>
+	<form action='/eportfolio/component/advancedlist/modifyForm.php' method='post' enctype='multipart/form-data'>
 		<input type='hidden' name='action' value='addItem' />
 		<input type='hidden' name='userId' value='{USER_ID}' />
 		<input type='hidden' name='pageId' value='{PAGE_ID}' />
@@ -23,6 +23,7 @@
 
 		<input type='text' name='title' value='' />
 		<textarea type='text' name='content' value='' /></textarea>
+		<input type='text' name='imagehash' value='' />
 		<input type='submit' value='Add item' />
 	</form>
 
@@ -39,6 +40,7 @@
 
 				<input type='text' name='title' value="{LIST_ITEM_TITLE}" />
 				<textarea type='text' name='content' />{LIST_ITEM_CONTENT}</textarea>
+				<input type='text' name='imagehash' value="{LIST_ITEM_IMAGEHASH}" />
 				<input type='submit' value='Update' />
 			</form>
 
