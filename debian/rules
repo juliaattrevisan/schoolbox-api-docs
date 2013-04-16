@@ -53,6 +53,8 @@ override_dh_install:
 	cp -a --parents sql/modules/mobile $(CURDIR)/mobile
 	rm -fR sql/modules/mobile
 	## End Mobile Module
+	# Install submodules using composer
+	tools/composer.sh
 	# Remove non-deployable files and folders
 	rm -fR phpunit.xml
 	rm -fR README.md
@@ -60,6 +62,7 @@ override_dh_install:
 	rm -fR Vagrantfile
 	rm -fR tools/vagrant*
 	rm -fR tools/pkg-*
+	rm -fR composer*
 	# Start install
 	dh_install
 	# Auto build the sql update scripts

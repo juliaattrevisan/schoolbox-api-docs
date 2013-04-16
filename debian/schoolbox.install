@@ -9,3 +9,4 @@ templates /usr/share/schoolbox
 tools /usr/share/schoolbox
 updates /usr/share/schoolbox
 www /usr/share/schoolbox
+vendor /usr/share/schoolbox
