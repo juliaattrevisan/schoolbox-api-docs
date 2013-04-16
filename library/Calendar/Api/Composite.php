@@ -52,7 +52,7 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface {
 			$result->merge($currentApi->getEvent($eventId));
 		}
 
-		return $result;
+		return $result->getFirst();
 	}
 
 	/**
