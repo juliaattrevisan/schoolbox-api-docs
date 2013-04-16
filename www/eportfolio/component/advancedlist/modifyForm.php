@@ -34,6 +34,16 @@ if ($authenticator->canModify()) {
 		$listItem->setImagehash($imagehash);
 		$listItem->setSequence(1);
 
+		$uploadedFilename = $_FILES['imagehash']['name'];
+		$uploadedLocation = $_FILES['imagehash']['tmp_name'];
+		$uploadedUid = $_SESSION['id'];
+
+		if (is_readable($uploadedLocation)) {
+			$imageResource = Storage_ResourceMapper::getInstance()->create($uploadedFilename, $uploadedLocation, $uploadedUid);
+
+			$listItem->setImagehash($imageResource->hash);
+		}
+
 		Component_Eportfolio_AdvancedListMapper::getInstance()->save($listItem);
 	}
 	/* Update a list item
@@ -47,7 +57,16 @@ if ($authenticator->canModify()) {
 		$listItem = Component_Eportfolio_AdvancedListMapper::getInstance()->findById($listItemId);
 		$listItem->setTitle($title);
 		$listItem->setContent($content);
-		$listItem->setImagehash($imagehash);
+
+		$uploadedFilename = $_FILES['imagehash']['name'];
+		$uploadedLocation = $_FILES['imagehash']['tmp_name'];
+		$uploadedUid = $_SESSION['id'];
+
+		if (is_readable($uploadedLocation)) {
+			$imageResource = Storage_ResourceMapper::getInstance()->create($uploadedFilename, $uploadedLocation, $uploadedUid);
+
+			$listItem->setImagehash($imageResource->hash);
+		}
 
 		Component_Eportfolio_AdvancedListMapper::getInstance()->save($listItem);
 	}
