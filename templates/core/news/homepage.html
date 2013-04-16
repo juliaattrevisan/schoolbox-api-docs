@@ -67,12 +67,12 @@ $j(function() {
 <form action="/news/homepageForm.php" method="post" class="clearfix" enctype="multipart/form-data" id="newsForm">
 	<table class="standardForm">
 		<tr>
-			<td class="formLabelWidth"><h4>News heading</h4>
+			<td class="formLabelWidth"><h4>Headline</h4>
 			</td>
-			<td><label><input type="text" class="required" name="heading" size="35" maxlength="50" value="{HEADING}" /></label></td>
+			<td><label><input type="text" class="required" name="heading" size="35" maxlength="100" value="{HEADING}" /></label></td>
 		</tr>
 		<tr>
-			<td valign="top"><h4>News Body</h4>
+			<td valign="top"><h4>Article</h4>
 				<em>This is the main portion of your news.</em>
 				</td>
 			<td><textarea id="body" name="body" style="width:100%;height:350px">{BODY}</textarea></td>
