@@ -49,9 +49,10 @@ $this->setVar(array(
     'BOX_DUEDATE'          => $dueDate->getRelativeTime(),
     'BOX_DUEDATE_GRADIENT' => $gradient,
 
-    'BOX_ID'       => $submission->getId(),
-    'BOX_NAME'     => Scrub::text($submission->getName()),
-    'BOX_TYPE'     => $submission->getWorkType()->getName(),
-    'BOX_CREATED'  => $createdDate->getRelativeTime(),
-    'TEXTBOX_BODY' => '',
+    'BOX_ID'        => $submission->getId(),
+    'SUBMISSION_ID' => null,
+    'BOX_NAME'      => Scrub::text($submission->getName()),
+    'BOX_TYPE'      => $submission->getWorkType()->getName(),
+    'BOX_CREATED'   => $createdDate->getRelativeTime(),
+    'TEXTBOX_BODY'  => '',
 ));
