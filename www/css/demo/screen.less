@@ -25,13 +25,13 @@
 @tab-hover-color:				@tab-background;
 
 @background-color:  			#EEEEEE;
-@link-color: 	    			#237CFF;
+@link-color: 	    			#0066B0;
 @link-hover-color: 				lighten(@link-color,20%);
 
 @footer-color:					#929292;
 @footer-links:					@footer-color;
 
-@dark: 							#FAFAFA;
+@dark: 							#F5F5F5;
 @grey:							#EEEEEE;
 
 html, body { min-height: 100%; }
@@ -185,6 +185,23 @@ a:hover{color:@link-color;}
 			width: @navigation-width - @navigation-padding * 2;
 	}
 }
+
+/*
+ * Admin nav tabs
+ */
+.admin-nav li a {
+	color: @footer-color;
+	background: @dark;
+	border: 1px solid @background-color;
+	font-weight: normal;
+	height: 22px; line-height: 22px;
+	&.current {
+		color: @tab-color;
+		background: @tab-background;
+		border-color: @tab-background;
+	}
+}
+
 
 /*
  * Borders & Backgrounds
