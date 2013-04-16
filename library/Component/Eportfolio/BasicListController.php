@@ -37,7 +37,7 @@ class Component_Eportfolio_BasicListController extends Component_Eportfolio_Cont
 
 		/* Gather everything
 		 */
-		$allItems = Component_Eportfolio_BasicListMapper::getInstance()->findByColumn('component_instance_id', 2920);
+		$allItems = Component_Eportfolio_BasicListMapper::getInstance()->findByColumn('component_instance_id', $this->instance->id);
 
 		if ($allItems->count()) {
 			for ($allItems->rewind(); $allItems->valid(); $allItems->next()) {
