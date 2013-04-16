@@ -46,7 +46,11 @@ $submission = !empty($submissionBoxID) ? $mapper->findById($submissionBoxID) : n
 $groupHandler = new Group();
 //
 // Auth: submission's category must be writable by this user.
-if ($groupHandler->getPermission($submission->getCategory()->getId()) < WRITE_ACCESS) {
+$check_id = $submission->getCategory()->getId();
+if (empty($check_id)) {
+    $check_id = $_POST['category'];
+}
+if (empty($check_id) || $groupHandler->getPermission($check_id) < WRITE_ACCESS) {
     error(19);
 }
 
