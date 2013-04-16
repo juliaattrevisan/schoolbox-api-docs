@@ -77,6 +77,9 @@ echo "Building css files from less";
 cd $thistempdir/schoolbox-$tag;
 tools/build-less-css.sh
 
+echo "Install submodules using composer";
+tools/composer.sh;
+
 echo "Building directory sql updates";
 tools/generate-dir-sql.sh /var/www/schoolbox/data /var/www/schoolbox > sql/schoolbox-package-config.sql
 
