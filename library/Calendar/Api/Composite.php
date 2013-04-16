@@ -40,6 +40,22 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface {
 	}
 
 	/**
+	 * Find a particular event matching an eventId from all registered sources
+	 *
+	 * @param $eventId
+	 * @return Collection
+	 */
+	public function getEvent($eventId) {
+		$result = new Calendar_Event_Collection();
+
+		foreach($this->getApi() as $currentApi) {
+			$result->merge($currentApi->getEvent($eventId));
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Add an api to the stack
 	 *
 	 * @param $api
