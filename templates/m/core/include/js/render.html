@@ -180,15 +180,13 @@
 
         scrollTop();
 
-//        if(push && location.pathname != data && data != '/') {
-//            history.pushState(null, null, data);
-//            debug('pushed '+data);
-//            localStorage.setItem('lastPage', data)
-//        }
-//        else {
-//            debug('suppressed push of '+data);
-//        }
-
+        if(push && location.pathname != data && data != '/') {
+            history.pushState(null, null, data);
+            debug('pushed '+data);
+            localStorage.setItem('lastPage', data)
+        }
+        else {
+            debug('suppressed push of '+data);
+        }
     }
-
 </script>
