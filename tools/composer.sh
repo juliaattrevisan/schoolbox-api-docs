@@ -12,4 +12,4 @@ then
 	curl -s http://getcomposer.org/installer | php;
 	chmod a+x composer.phar;
 fi
-php composer.phar update --no-progress -o
+php composer.phar install --no-progress -o
