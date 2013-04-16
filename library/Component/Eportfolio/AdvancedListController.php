@@ -57,7 +57,9 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_L
 
 				$this->setVar(array(
 					'LIST_ITEM_ID' => $currentItem->getId(),
-					'LIST_ITEM_CONTENT' => $currentItem->getContent()
+					'LIST_ITEM_TITLE' => $currentItem->getTitle(),
+					'LIST_ITEM_CONTENT' => $currentItem->getContent(),
+					'LIST_ITEM_IMAGEHASH' => $currentItem->getImagehash(),
 				));
 
 				$this->parse('list_item_block', 'list_item', true);

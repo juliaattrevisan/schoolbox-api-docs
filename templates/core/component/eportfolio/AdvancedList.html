@@ -30,7 +30,11 @@
 	<ol>
 		<!-- BEGIN list_item -->
 		<li>
-			<a class='modify' rel='{LIST_ITEM_ID}'>{LIST_ITEM_CONTENT}</a>
+			<a class='modify' rel='{LIST_ITEM_ID}'>
+				{LIST_ITEM_TITLE},
+				{LIST_ITEM_CONTENT},
+				{LIST_ITEM_IMAGEHASH}
+			</a>
 			<form id='modify_{LIST_ITEM_ID}' class='hide modifyForm' action='/eportfolio/component/basiclist/modifyForm.php' method='post' enctype='multipart/form-data'>
 				<input type='hidden' name='action' value='updateItem' />
 				<input type='hidden' name='userId' value='{USER_ID}' />
