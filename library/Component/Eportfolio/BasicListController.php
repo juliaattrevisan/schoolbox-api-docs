@@ -7,54 +7,25 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Eportfolio_BasicListController extends Component_Eportfolio_ControllerAbstract {
-
-    /**
-     * Prepares data for the render function. Business logic.
-     *
-     * @return void
-     */
-    public function execute() {
-        return true;
-    }
+class Component_Eportfolio_BasicListController extends Component_Eportfolio_ListController {
 
 	/**
-	 * Outputs HTML template defined by config variable 'template'
+	 * A mapper instance, for polymorphism
 	 *
-	 * @param String $templateHandle
-	 * @return bool
+	 * @var null
 	 */
-	public function renderTemplate($templateHandle) {
-		if (!parent::loadTemplate($templateHandle, $this->getConfig('template'))) {
-			return false;
-		}
+	protected $mapperClass = null;
 
-		$this->parseConfig();
+	/**
+	 * Prepares data for the render function. Business logic.
+	 *
+	 * Override this in subclasses
+	 *
+	 * @return void
+	 */
+	public function execute() {
+		$this->setMapperClass(Component_Eportfolio_BasicListMapper::getInstance());
 
-		/* Set up blocks and stuff
-		 */
-		$this->setBlock($templateHandle, 'list_item', 'list_item_block');
-
-		/* Gather everything
-		 */
-		$allItems = Component_Eportfolio_BasicListMapper::getInstance()->findByColumn('component_instance_id', $this->instance->id);
-
-		if ($allItems->count()) {
-			for ($allItems->rewind(); $allItems->valid(); $allItems->next()) {
-				$currentItem = $allItems->current();
-
-				$this->setVar(array(
-					'LIST_ITEM_ID' => $currentItem->getId(),
-					'LIST_ITEM_CONTENT' => $currentItem->getContent()
-				));
-
-				$this->parse('list_item_block', 'list_item', true);
-			}
-		}
-		else {
-			$this->setVar('list_item_block', '');
-		}
-
-        return true;
-    }
+		return true;
+	}
 }

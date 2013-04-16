@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Eportfolio_BasicList extends Model {
+class Component_Eportfolio_BasicList extends Component_Eportfolio_List {
 
 	/**
 	 * Primary key
