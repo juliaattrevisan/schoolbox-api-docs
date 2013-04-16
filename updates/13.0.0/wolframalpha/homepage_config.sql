@@ -1,0 +1,1 @@
+ALTER TABLE `component_config_instance` CHANGE `value` `value` VARCHAR(255) CHARSET utf8 COLLATE utf8_general_ci NULL;
