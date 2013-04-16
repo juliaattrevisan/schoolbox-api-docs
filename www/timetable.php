@@ -113,8 +113,8 @@ if (is_array($outputList)) {
                         //output day header
                         if ($dayCount == $dayCurrent) {
                             $this->setVar('TIMETABLE_CLASS', 'dayCurrent');
-                        } // compensate for the 'off by 1' scenario that's occurring
-                        elseif ($dayCount == $dayCurrent + 1) {
+                        }
+                        else {
                             $this->setVar('TIMETABLE_CLASS', 'normal');
                         }
                         $this->setVar("DAY_NUMBER", $dayCount);
