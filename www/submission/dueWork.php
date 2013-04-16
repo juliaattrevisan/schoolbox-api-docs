@@ -271,6 +271,7 @@ $synClass = new External_Class;
 
 $return_mapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
 $assess_mapper = new \Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper();
+$restrict_submissions = Cfg::get('restrict_student_submissions') && $groupHandler->isParent();
 
 foreach ($categoryList as $category) {
     $categoryID = $category['id'];
@@ -315,12 +316,17 @@ foreach ($categoryList as $category) {
     //
     // retrieve subject grades.
     // Ensure that grades are properly ordered by date.
-    $studentGrades = array_merge(
-        $return_mapper->getStudentMarks($category['id'], $userID, array('visibility' => $visibilities)),
-        $assess_mapper->getStudentMarks($category['id'], $userID)
-    );
-    usort($studentGrades, function($a, $b) { return $a['date'] > $b['date'] ? -1 : 1; });
-    $studentGrades = array_map(function($row) { return $row['mark']; }, $studentGrades);
+    if (!$restrict_submissions) {
+        $studentGrades = array_merge(
+            $return_mapper->getStudentMarks($category['id'], $userID, array('visibility' => $visibilities)),
+            $assess_mapper->getStudentMarks($category['id'], $userID)
+        );
+        usort($studentGrades, function($a, $b) { return $a['date'] > $b['date'] ? -1 : 1; });
+        $studentGrades = array_map(function($row) { return $row['mark']; }, $studentGrades);
+    }
+    else {
+        $studentGrades = array();
+    }
 
     $gradeAvg    = -1;
     $grade_count = count($studentGrades);
@@ -404,9 +410,7 @@ foreach ($categoryList as $category) {
 
 $feedItems = array();
 
-$restrict_submissions = Cfg::get('restrict_student_submissions') && $groupHandler->isParent();
-
-foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities) as $activity) {
+foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restrict_submissions) as $activity) {
     $mark = null;
     $numericMark = null;
 
@@ -536,11 +540,12 @@ $this->dropDown('subject', $categoryList, '', TEMPLATE_content, array('id' => 'S
  * @param int   $user
  * @param int   $limit
  * @param array $categories
- * @param array $visibilities Which submission box visibilities are viewable?
+ * @param array $visibilities  Which submission box visibilities are viewable?
+ * @param bool  $is_restricted Are student's marks restricted?
  *
  * @return \Schoolbox\Assessment\ActivityCollection
  */
-function getActivities($user, $limit, $categories, $visibilities) {
+function getActivities($user, $limit, $categories, $visibilities, $is_restricted) {
 	$box_mapper    = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
 	$assess_mapper = new \Schoolbox\Assessment\Component\OnlineAssessmentMapper();
 	$submit_mapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
@@ -553,8 +558,10 @@ function getActivities($user, $limit, $categories, $visibilities) {
 		->getActivities($user, $limit, $categories)
 		->merge($assess_mapper->getActivities($user, $limit, $categories))
 		->merge($submit_mapper->getActivities($user, $limit, $categories))
-		->merge($return_mapper->getActivities($user, $limit, $categories, $visibilities))
 	;
+	if (!$is_restricted) {
+		$activities->merge($return_mapper->getActivities($user, $limit, $categories, $visibilities));
+	}
 	$activities
 		->sortBy('date', 'desc')
 		->limit(0, 15)
