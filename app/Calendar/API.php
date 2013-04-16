@@ -457,22 +457,11 @@ class Calendar_API extends Generic_API {
 
 			/* Forgive me, for I have sinned
 			 */
-			$allEvents = $composite->getEvents(0, 999999999999);
+			$event = $composite->getEvent($event_id);
 
-			$iterator = $allEvents->createIterator();
-
-			for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
-				$currentEvent = $iterator->current();
-
-				if ($currentEvent->getEventId() == $event_id) {
-					$event = $currentEvent;
-
-					break;
-				}
-			}
-
+			/* Standardise into some format that mobile expects
+			 */
 			if (is_a($event, 'Calendar_Event_Type_Abstract')) {
-
 				$standardisedEvent = array(
 					'id' => $event->getEventId(),
 					'series_id' => '',
