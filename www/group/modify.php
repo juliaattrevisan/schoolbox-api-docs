@@ -29,7 +29,7 @@ if (is_numeric($this->arg[0])) {
 
 	$output = array('CATEGORY_NAME'		=> Scrub::text($category['name']),
 					'CATEGORY_ID'		=> $category['id'],
-					'GROUP_OWNER'		=> $userHandler->formatName($category),
+					'GROUP_OWNER'		=> $category['owner']?$userHandler->formatName($category):'Unmanaged',
 					'OWNER_ID'			=> $category['owner'],
 					'GROUP_TYPE_1'		=> '',
 					'GROUP_TYPE_2'		=> '',

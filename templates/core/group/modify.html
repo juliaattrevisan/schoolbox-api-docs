@@ -38,33 +38,7 @@ $j(document).ready(function() {
 		}
 	});
 
-	/**
-	 * Add to this group from people in an existing system group
-	 */
-	$j('#addUsersBySystemGroup').autocomplete({
-		serviceUrl: '/ajax/addUserByGroup.php?type=system',
-		minChars: 2,
-		maxHeight: 400,
-		width: 275,
-		onSelect: function (value, data) {
-			$j('#systemGroupID').val(data);
-			return false;
-		}
-	});
 
-	/**
-	 * Add to this group from people in an existing system group
-	 */
-	$j('#addUsersByIndividualGroup').autocomplete({
-		serviceUrl: '/ajax/addUserByGroup.php?type=individual',
-		minChars: 2,
-		maxHeight: 400,
-		width: 275,
-		onSelect: function (value, data) {
-			$j('#individualGroupID').val(data);
-			return false;
-		}
-	});
 
 	$j('#type_form input').each(function () {
 		$j(this).click(function () {
@@ -98,23 +72,9 @@ $j(document).ready(function() {
 			<td class="formLabelWidth"><h4>Group Admin</h4></td>
 			<td><a href="/search/user/{OWNER_ID}">{GROUP_OWNER}</a></td>
 		</tr>
-		<!-- BEGIN mail_all -->
-		<tr>
-			<td class="formLabelWidth"><h4>Mailing List</h4>
-			</td>
-			<td>
-				<!-- BEGIN mail_all -->
-				<form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
-					<input type="hidden" name="replyto" value="&quot;{CATEGORY_NAME}&quot; &lt;{REPLYTO}&gt;"/>
-					<input type="hidden" name="bcc"     value="{EMAILALL}"/>
-					<a href="#" class="btn submit-this float-left up-arrow "><span></span>Email all</a>
-				</form>
-				<!-- END mail_all -->
-			</td>
-		</tr>
 		<tr>
 			<td valign="top"><h4>Add users</h4>
-				<em>You may add users individually by typing their name and selecting from the list.  Alternatively you can add many users via a list of synergetic id's or usernames.</em>
+				<em>You may add users individually by typing their name and selecting from the list.  Alternatively click the bulk link quickly add many members</em>
 				</td>
 			<td>
 				<form action="/group/modifyForm.php?categoryID={CATEGORY_ID}" class="clearfix" method="post">
@@ -122,28 +82,15 @@ $j(document).ready(function() {
 					<input type="hidden" name="userID" id="userID" />
 					<input type="submit" value="Add User" class="submit-btn-plain" />
 				</form>
-				<a href="/group/bulk/{CATEGORY_ID}" class="btn add float-left"><span></span>Add Bulk Members</a>
 
-				<hr style='clear:both;'>
 
-				<form action="/group/addUserByGroup.php?type=system&destinationID={CATEGORY_ID}" class="clearfix" method="post">
-					<input id="addUsersBySystemGroup" type="text" size="30" />
-					<input type="hidden" name="systemGroupID" id="systemGroupID" />
-					<input type="submit" value="Add System Group" class="submit-btn-plain" />
-				</form>
 
-				<hr style='clear:both;'>
-
-				<form action="/group/addUserByGroup.php?type=individual&destinationID={CATEGORY_ID}" class="clearfix" method="post">
-					<input id="addUsersByIndividualGroup" type="text" size="30" />
-					<input type="hidden" name="individualGroupID" id="individualGroupID" />
-					<input type="submit" value="Add Individual Group" class="submit-btn-plain" />
-				</form>
+                <a href="/group/bulk/{CATEGORY_ID}" class="btn add float-left"><span></span>Add Bulk Members</a>
 			</td>
 		</tr>
 		<tr>
 			<td valign="top"><h4>Access Type</h4>
-				<em>Restricted groups are private and only administrated by the group admin. Users may request access to moderated groups but only be granted by the group admin.  Free groups can be joined and left by anyone.  See the <a href="/group/join">group page</a> for available groups.</em>
+				<em>Restricted groups are private. Moderated allows users to join, but only access once approved.  Free groups can be joined and left by anyone.  See the <a href="/group/join">group page</a> for available groups.</em>
 				</td>
 				<td><form action="" method="post" id="type_form">
 					<input name="type" type="radio" value="1" {GROUP_TYPE_1} />
@@ -185,9 +132,18 @@ $j(document).ready(function() {
 						<input type="button" id="deleteButton" value="Delete Selected" class="submit-btn-plain" />
 
 					</p>
+
 				</form>
+                    <!-- BEGIN mail_all -->
+                    <form action="/mail/createMail.php" method="post" class="clearfix" name="form2">
+                        <input type="hidden" name="replyto" value="&quot;{CATEGORY_NAME}&quot; &lt;{REPLYTO}&gt;"/>
+                        <input type="hidden" name="bcc"     value="{EMAILALL}"/>
+                        <a href="#" class="btn submit-this float-left up-arrow "><span></span>Email all</a>
+                    </form>
+                    <!-- END mail_all -->
 				</td>
 		</tr>
+
 		<!-- BEGIN authorisation -->
 		<tr>
 			<td><h4>Awaiting Authorisation</h4>
