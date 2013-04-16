@@ -33,8 +33,24 @@ $advancedList = array(
 	)
 );
 
+$linkList = array(
+	'name' => 'Link List',
+	'module' => 'eportfolio',
+	'component_category' => null,
+	'class' => 'Component_Eportfolio_LinkListController',
+	'description' => 'A link list component',
+	'multiple' => 'true',
+	'config' => array(
+		'componentname' => array(
+			'default_value' => 'My Link List',
+			'label' => 'List Title',
+		),
+	)
+);
+
 $allComponents[] = $basicList;
 $allComponents[] = $advancedList;
+$allComponents[] = $linkList;
 
 foreach($allComponents as $currentComponent) {
 	Component_DefinitionMapper::getInstance()->create($currentComponent);

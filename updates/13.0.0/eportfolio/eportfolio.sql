@@ -52,3 +52,7 @@ ALTER TABLE `eportfolio_component_list_item` CHANGE `list_item_id` `id` INT(11) 
 /* Add advanced list item table
  */
 CREATE TABLE `eportfolio_component_advancedlist_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `component_instance_id` INT(11) NOT NULL, `title` VARCHAR(255), `content` TEXT, `imagehash` VARCHAR(255), `sequence` INT(11), PRIMARY KEY (`id`) );
+
+/* Add link list item table
+ */
+CREATE TABLE `eportfolio_component_linklist_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `component_instance_id` INT(11) NOT NULL, `title` VARCHAR(255), `content` TEXT, `sequence` INT(1), PRIMARY KEY (`id`) );

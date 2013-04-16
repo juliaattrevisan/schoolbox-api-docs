@@ -1,0 +1,74 @@
+<?php
+/**
+ * Component_Eportfolio_LinkListController
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+class Component_Eportfolio_LinkListController extends Component_Eportfolio_ListController {
+
+	/**
+	 * A mapper instance, for polymorphism
+	 *
+	 * @var null
+	 */
+	protected $mapperClass = null;
+
+	/**
+	 * Prepares data for the render function. Business logic.
+	 *
+	 * Override this in subclasses
+	 *
+	 * @return void
+	 */
+	public function execute() {
+		$this->setMapperClass(Component_Eportfolio_LinkListMapper::getInstance());
+
+		return true;
+	}
+
+	/**
+	 * Outputs HTML template defined by config variable 'template'
+	 *
+	 * @param String $templateHandle
+	 * @return bool
+	 */
+	public function renderTemplate($templateHandle) {
+		if (!parent::loadTemplate($templateHandle, $this->getConfig('template'))) {
+			return false;
+		}
+
+		$this->parseConfig();
+
+		/* Set up blocks and stuff
+		 */
+		$this->setBlock($templateHandle, 'list_item', 'list_item_block');
+		$this->setVar('list_item_block', '');
+
+		/* Gather everything
+		 */
+		$allItems = $this->getMapperClass()->findByColumn('component_instance_id', $this->instance->id);
+
+		if ($allItems->count()) {
+			for ($allItems->rewind(); $allItems->valid(); $allItems->next()) {
+				$currentItem = $allItems->current();
+
+				$this->setVar(array(
+					'LIST_ITEM_ID' => $currentItem->getId(),
+					'LIST_ITEM_TITLE' => $currentItem->getTitle(),
+					'LIST_ITEM_CONTENT' => $currentItem->getContent(),
+				));
+
+				$this->parse('list_item_block', 'list_item', true);
+			}
+		}
+		else {
+			$this->setVar('list_item_block', '');
+		}
+
+		return true;
+	}
+
+}
