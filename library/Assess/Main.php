@@ -149,4 +149,15 @@ class Assess_Main extends Evaluation_Main {
 			}
 		}
 	}
+
+	/**
+	 * Retrieves the name of the assessment type for online assessments.
+	 *
+	 * @return mixed
+	 */
+	public function getAssessmentType() {
+		return $this->db->getOne(
+			"SELECT name FROM file_type WHERE id = " . $this->db->smartQuote(self::ONLINE_ASSESSMENT_TYPE_ID)
+		);
+	}
 }

@@ -148,6 +148,7 @@ class Submission extends DeprecatedModel {
      */
     function getByDate($date, $userID, $categoryList) {
         $query = "(SELECT
+                    FALSE as is_assessment,
                     s.id, s.category, s.type, s.owner, s.open_date, s.date, s.late_date, s.fid, s.accept_submission,
                     s.deleted, s.name, s.description, s.created, s.mark_type, s.max_mark,
                     t.realname,
@@ -165,6 +166,7 @@ class Submission extends DeprecatedModel {
                     )
                     UNION
                     (SELECT
+                        TRUE as is_assessment,
                         assess.assess_id as id,
                         true AS accept_submission,
                         assess.category_id as category,

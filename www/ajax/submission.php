@@ -3,6 +3,7 @@
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 
 $page = new SitePage;
 
@@ -11,41 +12,58 @@ if ($_REQUEST['id']) {
     $subStudHandler = new SubmissionStudent;
     $groupHandler = new Group;
 
-    $submission_mapper = new SubmissionBoxMapper();
-    $submission        = $submission_mapper->findById($_REQUEST['id']);
-    $submission_id     = $submission->getId();
-    $submission_cat_id = $submission->getCategory()->getId();
+    $action = '';
+    $output = array();
+    if ($_REQUEST['is_assess']) {
+        $assessment_mapper = new OnlineAssessmentMapper();
+        $assessment        = $assessment_mapper->findById($_REQUEST['id']);
+        $output = array(
+            'id'          => $assessment->getId(),
+            'cid'         => $assessment->getCategory()->getId(),
+            'category'    => Scrub::text($assessment->getCategory()->getName()),
+            'typeName'    => Scrub::text($assessment->getWorkType()->getName()),
+            'name'        => Scrub::text($assessment->getTitle()),
+            'description' => '',
+            'action'      => 'Sit/Resit',
+        );
+    }
+    else {
+        $submission_mapper = new SubmissionBoxMapper();
+        $submission        = $submission_mapper->findById($_REQUEST['id']);
+        $submission_id     = $submission->getId();
+        $submission_cat_id = $submission->getCategory()->getId();
 
+        $current_time = new DateTime();
+
+        /* Get status to set action */
+        $student_submission = $subStudHandler->getStatus($_SESSION['id'], $submission_id);
+
+        if ($student_submission['accept_submission']) {
+            $action = 'View Details';
+        }
+        elseif ($student_submission['status'] == 1 && $current_time > $student_submission['open_date'] && $current_time < $student_submission['late_date']) {
+            $action = 'Submit Work';
+        }
+        else {
+            $action = 'View Details';
+        }
+
+        $output = array(
+            'id'          => $submission_id,
+            'cid'         => $submission_cat_id,
+            'category'    => Scrub::text($submission->getCategory()->getName()),
+            'typeName'    => Scrub::text($submission->getWorkType()->getName()),
+            'name'        => Scrub::text($submission->getName()),
+            'description' => Scrub::text($submission->getDescription()),
+            'action'      => $action,
+        );
+    }
 
     /* Check involved in subject */
     $groupHandler = new Group;
-
-    if (!$groupHandler->involvedInSubject($submission_cat_id) && !$groupHandler->involvedInGroup($_SESSION['id'], $submission_cat_id)) {
+    if (!$groupHandler->involvedInSubject($output['cid']) && !$groupHandler->involvedInGroup($_SESSION['id'], $output['cid'])) {
         exit();
     }
-
-    $current_time = new DateTime();
-
-    /* Get status to set action */
-    $student_submission = $subStudHandler->getStatus($_SESSION['id'], $submission_id);
-
-    if ($student_submission['accept_submission']) {
-        $action = 'View Details';
-    } elseif ($student_submission['status'] == 1 && $current_time > $student_submission['open_date'] && $current_time < $student_submission['late_date']) {
-        $action = 'Submit Work';
-    } else {
-        $action = 'View Details';
-    }
-
-    $output = array(
-        'id'          => $submission_id,
-        'cid'         => $submission_cat_id,
-        'category'    => Scrub::text($submission->getCategory()->getName()),
-        'typeName'    => Scrub::text($submission->getWorkType()->getName()),
-        'name'        => Scrub::text($submission->getName()),
-        'description' => Scrub::text($submission->getDescription()),
-        'action'      => $action,
-    );
 
 }
 
