@@ -9,20 +9,32 @@ $basicList = array(
 	'component_category' => null,
 	'class' => 'Component_Eportfolio_BasicListController',
 	'description' => 'A list component',
-	'multiple' => 'false',
+	'multiple' => 'true',
 	'config' => array(
 		'componentname' => array(
 			'default_value' => 'My List',
 			'label' => 'List Title',
 		),
-		'description' => array(
-			'default_value' => '',
-			'label' => 'Purpose',
+	)
+);
+
+$advancedList = array(
+	'name' => 'Advanced List',
+	'module' => 'eportfolio',
+	'component_category' => null,
+	'class' => 'Component_Eportfolio_AdvancedListController',
+	'description' => 'An advanced list component',
+	'multiple' => 'true',
+	'config' => array(
+		'componentname' => array(
+			'default_value' => 'My Advanced List',
+			'label' => 'List Title',
 		),
 	)
 );
 
 $allComponents[] = $basicList;
+$allComponents[] = $advancedList;
 
 foreach($allComponents as $currentComponent) {
 	Component_DefinitionMapper::getInstance()->create($currentComponent);
