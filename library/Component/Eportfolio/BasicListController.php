@@ -28,4 +28,46 @@ class Component_Eportfolio_BasicListController extends Component_Eportfolio_List
 
 		return true;
 	}
+
+	/**
+	 * Outputs HTML template defined by config variable 'template'
+	 *
+	 * @param String $templateHandle
+	 * @return bool
+	 */
+	public function renderTemplate($templateHandle) {
+		if (!parent::loadTemplate($templateHandle, $this->getConfig('template'))) {
+			return false;
+		}
+
+		$this->parseConfig();
+
+		/* Set up blocks and stuff
+		 */
+		$this->setBlock($templateHandle, 'list_item', 'list_item_block');
+		$this->setVar('list_item_block', '');
+
+		/* Gather everything
+		 */
+		$allItems = $this->getMapperClass()->findByColumn('component_instance_id', $this->instance->id);
+
+		if ($allItems->count()) {
+			for ($allItems->rewind(); $allItems->valid(); $allItems->next()) {
+				$currentItem = $allItems->current();
+
+				$this->setVar(array(
+					'LIST_ITEM_ID' => $currentItem->getId(),
+					'LIST_ITEM_CONTENT' => $currentItem->getContent()
+				));
+
+				$this->parse('list_item_block', 'list_item', true);
+			}
+		}
+		else {
+			$this->setVar('list_item_block', '');
+		}
+
+		return true;
+	}
+
 }
