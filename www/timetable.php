@@ -42,17 +42,17 @@ if ($groupHandler->isParent()) {
         foreach ($_SESSION['children'] as $child) {
             //
             // Was a specific child ID requested? show them only, otherwise
-			// show everyone.
+            // show everyone.
             if (!$child_id || ($child_id == $child['id'])) {
                 $outputList[] = $userHandler->getByID($child['id']);
             }
         }
     }
-	//
-	// Requesting a child that isn't yours? Access Denied
-	if ($child_id && empty($outputList)) {
-		error(19);
-	}
+    //
+    // Requesting a child that isn't yours? Access Denied
+    if ($child_id && empty($outputList)) {
+        error(19);
+    }
 
 }
 else {
@@ -97,11 +97,15 @@ if (is_array($outputList)) {
             $periodCount = 1;
             //for each period
             foreach ($timetable as $row) {
-
+                $is_current_period =
+                    $row['periodNumber'] == $periodCurrent['PeriodNumber']
+                    && $row['periodSequence'] == $periodCurrent['PeriodNumberSeq']
+                ;
                 $outputPeriodDefinition = array(
-                    'PERIOD_NAME' => $row['periodName'],
+                    'PERIOD_NAME'  => $row['periodName'],
                     'PERIOD_START' => $row['periodStart'],
-                    'PERIOD_END' => $row['periodEnd'],
+                    'PERIOD_END'   => $row['periodEnd'],
+                    'PERIOD_CLASS' => ($is_current_period ? 'dayCurrent' : 'normal'),
                 );
                 $this->setVar($outputPeriodDefinition);
 
@@ -190,7 +194,7 @@ if (is_array($outputList)) {
                         );
                     }
 
-                    if ($row['periodNumber'] == $periodCurrent['PeriodNumber'] && $row['periodSequence'] == $periodCurrent['PeriodNumberSeq']) {
+                    if ($is_current_period) {
                         if ($dayCount == $dayCurrent) {
                             // current period, also current day: intersection
                             $outputPeriod['TIMETABLE_CLASS'] = 'dayCurrent current';
