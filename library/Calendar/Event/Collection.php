@@ -83,6 +83,20 @@ class Calendar_Event_Collection {
 		return count($this->getStack());
 	}
 
+	/**
+	 * If the collection has at least one item in it,
+	 * return the first element in the stack
+	 *
+	 * @return mixed
+	 */
+	public function getFirst() {
+		if ($this->getCount()) {
+			$stack = $this->getStack();
+
+			return $stack[0];
+		}
+	}
+
 	/* Getters/Setters
 	 */
 

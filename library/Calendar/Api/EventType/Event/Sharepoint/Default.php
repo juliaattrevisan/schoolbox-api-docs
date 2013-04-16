@@ -7,7 +7,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Api_EventType_Event_Sharepoint_Default implements Calendar_Api_EventType_Interface {
+class Calendar_Api_EventType_Event_Sharepoint_Default extends Calendar_Api_EventType_Abstract {
 
 	/**
 	 * Constructor
@@ -27,6 +27,21 @@ class Calendar_Api_EventType_Event_Sharepoint_Default implements Calendar_Api_Ev
 	 * @return Calendar_Event_Collection
 	 */
 	public function getEvents($startTimestamp, $endTimestamp) {
+		$collection = new Calendar_Event_Collection();
+
+		/* Fill in your query result set here and populate $collection
+		 */
+
+		return $collection;
+	}
+
+	/**
+	 * Find a particular event from this source
+	 *
+	 * @param $eventId
+	 * @return Collection
+	 */
+	public function getEvent($eventId) {
 		$collection = new Calendar_Event_Collection();
 
 		/* Fill in your query result set here and populate $collection

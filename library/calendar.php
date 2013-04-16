@@ -415,13 +415,15 @@ class Calendar extends DeprecatedModel {
         );
     }
 
-    /**
-     * Get all the submission events for the specified day
-     *
-     * @param  $currentDay
-     * @return array|bool
-     */
-    public function getSubmissionEvents($currentDay) {
+	/**
+	 * Get all the submission events for the specified day
+	 *
+	 * @param $startTimestamp
+	 * @param $endTimestamp
+	 *
+	 * @return array|bool
+	 */
+    public function getSubmissionEvents($startTimestamp, $endTimestamp) {
 
         //get a list of all the possible submission box categories
         $this->groupHandler->setService(HOMEPAGE_SERVICE);
@@ -433,29 +435,39 @@ class Calendar extends DeprecatedModel {
                 $catQuery[] = $cat['id'];
             }
 
-            $query = "SELECT DISTINCT category.name AS category, category.id as cid, GROUP_CONCAT(co.code) AS synergyCode, submission_box.name, submission_box.description,
-                        submission_box.owner, submission_box.id, user.firstname, user.lastname, user.title,
-                        DATE_FORMAT(submission_box.date, '%w') as dayIndex,
-					    DATE_FORMAT(submission_box.date, '" . Cfg::get('calendar_time_format') . "') as dueTime,
-                        submission_box.accept_submission, submission_box.open_date, submission_box.date, submission_box.late_date, submission_box.created
-                      FROM (category, submission_box )
-                      LEFT JOIN categoryCode co ON co.categoryID = category.id
-                      LEFT JOIN user ON user.id = submission_box.owner ";
+            $query = "
+				SELECT
+					DISTINCT category.name AS category, category.id as cid, GROUP_CONCAT(co.code) AS synergyCode, submission_box.name, submission_box.description,
+					submission_box.owner, submission_box.id, user.firstname, user.lastname, user.title,
+					DATE_FORMAT(submission_box.date, '%w') as dayIndex,
+					DATE_FORMAT(submission_box.date, '" . Cfg::get('calendar_time_format') . "') as dueTime,
+					submission_box.accept_submission, submission_box.open_date, submission_box.date, submission_box.late_date, submission_box.created
+				FROM (category, submission_box )
+				LEFT JOIN categoryCode co ON co.categoryID = category.id
+				LEFT JOIN user ON user.id = submission_box.owner ";
 
             /* If you aren't part of any categories, don't try to
              * do a whereIn
              */
             if (count($catQuery)) {
-                $query .= "WHERE category.id = submission_box.category
-							AND submission_box.category IN (" . implode(',', $catQuery) . ")
-							AND submission_box.deleted = 0
-							AND	DATE(submission_box.date) = DATE(FROM_UNIXTIME('$currentDay'))
-							GROUP BY submission_box.id, category.id
-							ORDER BY submission_box.date";
-            } else {
-                $query .= "WHERE DATE(submission_box.date) = DATE(FROM_UNIXTIME('$currentDay')) AND submission_box.deleted = 0
-							GROUP BY submission_box.id
-							ORDER BY submission_box.date";
+                $query .= "
+					WHERE category.id = submission_box.category
+					AND submission_box.category IN (" . implode(',', $catQuery) . ")
+					AND submission_box.deleted = 0
+					AND	DATE(submission_box.date) >= DATE(FROM_UNIXTIME('{$startTimestamp}'))
+					AND DATE(submission_box.date) < DATE(FROM_UNIXTIME('{$endTimestamp}'))
+					GROUP BY submission_box.id, category.id
+					ORDER BY submission_box.date
+				";
+            }
+			else {
+                $query .= "
+					WHERE DATE(submission_box.date) >= DATE(FROM_UNIXTIME('{$startTimestamp}'))
+					AND DATE(submission_box.date) < DATE(FROM_UNIXTIME('{$endTimestamp}'))
+					AND submission_box.deleted = 0
+					GROUP BY submission_box.id
+					ORDER BY submission_box.date
+				";
             }
 
             $submissions = $this->db->getAll($query);

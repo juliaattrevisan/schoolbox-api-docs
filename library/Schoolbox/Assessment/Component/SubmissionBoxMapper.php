@@ -9,10 +9,44 @@
 
 namespace Schoolbox\Assessment\Component;
 use Schoolbox;
+use Schoolbox\ConfigLoader;
+use Schoolbox\IConfigLoader;
+use Schoolbox\User;
+use Schoolbox\Resource\Category;
 use Schoolbox\Assessment\ActivityFactory;
 use Schoolbox\Assessment\ActivityCollection;
 
 class SubmissionBoxMapper extends Schoolbox\Mapper {
+
+	/**
+	 * @var IConfigLoader
+	 */
+	protected $config_loader;
+
+	/**
+	 * @param  IConfigLoader $config_loader
+	 *
+	 * @return $this
+	 */
+	public function setConfigLoader($config_loader) {
+		$this->config_loader = $config_loader;
+		return $this;
+	}
+
+	/**
+	 * @return IConfigLoader
+	 */
+	public function getConfigLoader() {
+		return $this->config_loader;
+	}
+
+	/**
+	 * Sets up the config loader in this object.
+	 */
+	public function setup() {
+		parent::setup();
+		$this->setConfigLoader(new ConfigLoader());
+	}
 
 	protected function mapping () {
 		$this->hasTable('submission_box');
@@ -557,6 +591,86 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 				$box = $this->hydrate($row, 'sb');
 				$box->setCategory($this->getJoinMapper('category')->hydrate($row, 'c'));
 				$collection->add($factory->buildFromSubmissionBox($box, $query['event']));
+			}
+		}
+
+		return $collection;
+	}
+
+	/**
+	 * Retrieves all submission boxes which take online submissions within a
+	 * given category.
+	 *
+	 * @param User     $user     The user to filter submissions for
+	 * @param Category $category If set, restrict results to this category.
+	 *
+	 * @return \Collection
+	 */
+	public function getSubmittable(User $user, Category $category = null) {
+		$cat_mapper = $this->getJoinMapper('category');
+
+		//
+		// only use the external user if the external DB is set up.
+		if ($this->getConfigLoader()->get('external_enable')) {
+			$cat_mapper->setExternalUser(new \External_User());
+		}
+		$user_categories = $cat_mapper->findForUser($user, true);
+		$cat_ids         = array();
+		foreach ($user_categories as $cat) {
+			$cat_ids[] = $cat->getId();
+		}
+
+		if ($category) {
+			$cat_ids = array_intersect($cat_ids, array($category->getId()));
+		}
+
+		//
+		// Get list of valid categories for the given user.
+		$params      = array();
+		$where_parts = array(
+			'sb.late_date > NOW()',
+			'sb.accept_submission IS TRUE',
+		);
+		if ($cat_ids) {
+			$params        = $this->getArrayParameters($cat_ids, 'cat');
+			$where_parts[] = 'sb.category IN '.$this->getArrayPlaceholders($cat_ids, 'cat');
+		}
+		$where = implode(' AND ', $where_parts);
+		$query = "
+			SELECT {$this->getColumnString('sb')}, {$cat_mapper->getColumnString('c')}
+			FROM {$this->getTable()} sb
+			INNER JOIN {$this->getJoinSql('category', 'sb', 'c')}
+			WHERE $where
+			ORDER BY c.name ASC
+		";
+		$statement = $this->database->prepare($query);
+		$statement->execute($params);
+
+		//
+		// Load categories.
+		$collection = $this->hydrateList($statement, 'sb', function($mapper, $model, $row) use ($cat_mapper) {
+			$model->setCategory($cat_mapper->hydrate($row, 'c'));
+			return $model;
+		});
+
+		//
+		// Load category codes too.
+		$category_ids = array();
+		foreach ($collection as $submission) {
+			$category_ids[] = $submission->getCategory()->getId();
+		}
+
+		$cat_code_mapper = $cat_mapper->getJoinMapper('codes');
+		$grouped_codes   = array();
+		foreach ($cat_code_mapper->findForCategories(array_unique($category_ids)) as $code) {
+			$grouped_codes[$code->getCategory()->getId()][] = $code;
+		}
+		foreach ($collection as $submission) {
+			$cat_id = $submission->getCategory()->getId();
+			if (!empty($grouped_codes[$cat_id])) {
+				foreach ($grouped_codes[$cat_id] as $code) {
+					$submission->getCategory()->addCode($code);
+				}
 			}
 		}
 
