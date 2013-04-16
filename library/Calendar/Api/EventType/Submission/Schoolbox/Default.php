@@ -7,7 +7,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Api_EventType_Submission_Schoolbox_Default implements Calendar_Api_EventType_Interface {
+class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_EventType_Abstract {
 	private $calendarHandler = null;
 
 	/**
@@ -29,7 +29,22 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default implements Calendar_Ap
 	 * @return Calendar_Event_Collection
 	 */
 	public function getEvents($startTimestamp, $endTimestamp) {
-		$collection = $this->getCalendarHandler()->getSubmissionEvents($currentDay);
+		$collection = $this->getCalendarHandler()->getSubmissionEvents($startTimestamp, $endTimestamp);
+
+		return $collection;
+	}
+
+	/**
+	 * Find a particular event from this source
+	 *
+	 * @param $eventId
+	 * @return Collection
+	 */
+	public function getEvent($eventId) {
+		$collection = new Collection();
+
+		/* Fill in your query result set here and populate $collection
+		 */
 
 		return $collection;
 	}

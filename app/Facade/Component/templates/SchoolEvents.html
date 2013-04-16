@@ -3,7 +3,7 @@
     {% for event in content.events %}
 
     <li class="{{ event.eventType }}">
-        <a href="/m/calendar/event/{{ event.eventId }}" class="aside">
+        <a href="/m/calendar/event/{{ event.eventId }}/{{event.connectorId}}" class="aside">
             {% if event.startTime %}
             <time>{{ event.startTime }}</time>
             {% endif %}

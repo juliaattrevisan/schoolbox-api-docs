@@ -15,4 +15,5 @@
  */
 interface Calendar_Api_EventType_Interface {
     public function getEvents($startTimestamp, $endTimestamp);
+	public function getEvent($eventId);
 }

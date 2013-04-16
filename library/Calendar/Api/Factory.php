@@ -26,13 +26,22 @@ class Calendar_Api_Factory {
 	 * Constructor
 	 */
 	public function __construct() {
-		$allConfigs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
+		$allConfigRecords = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
 
 		/* These configs are base64-encode()'d to get around a weird issue with unserialize
 		 * http://stackoverflow.com/questions/4264270/unserialize-sometimes-returns-false
 		 */
-		for ($allConfigs->rewind(); $allConfigs->valid(); $allConfigs->next()) {
-			$this->addConfig($allConfigs->current()->decodeConfig());
+		for ($allConfigRecords->rewind(); $allConfigRecords->valid(); $allConfigRecords->next()) {
+			$currentConfig = $allConfigRecords->current();
+
+			$config = $currentConfig->decodeConfig();
+
+			/* Update $config so it knows the calendar_connector id from whence it came
+			 * This is used in produce() and passed to each unique/default implementation
+			 */
+			$config->setId($currentConfig->getId());
+
+			$this->addConfig($config);
 		}
 	}
 
@@ -51,13 +60,20 @@ class Calendar_Api_Factory {
 			/* Decide which to use (unique or default)
 			 * Or create no class, if neither exists
 			 *
-			 * Inject config settings
+			 * Inject config settings, including the calendar_connector id
+			 * so it knows from whence it came
 			 */
 			if (class_exists($uniqueImplementation)) {
-				$compositeApi->add(new $uniqueImplementation($config));
+				$implementation = new $uniqueImplementation($config);
+				$implementation->setConnectorId($config->getId());
+
+				$compositeApi->add($implementation);
 			}
 			else if (class_exists($defaultImplementation)) {
-				$compositeApi->add(new $defaultImplementation($config));
+				$implementation = new $defaultImplementation($config);
+				$implementation->setConnectorId($config->getId());
+
+				$compositeApi->add($implementation);
 			}
 		}
 

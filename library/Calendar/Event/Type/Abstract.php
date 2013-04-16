@@ -511,4 +511,22 @@ abstract class Calendar_Event_Type_Abstract {
 	public function getCompleted() {
 		return $this->completed;
 	}
+
+	/**
+	 * Set connector id
+	 *
+	 * @param string $connectorId
+	 */
+	public function setConnectorId($connectorId) {
+		$this->connectorId = $connectorId;
+	}
+
+	/**
+	 * Get connector id
+	 *
+	 * @return string
+	 */
+	public function getConnectorId() {
+		return $this->connectorId;
+	}
 }
