@@ -46,6 +46,7 @@ abstract class Component_Eportfolio_ListController extends Component_Eportfolio_
 		/* Set up blocks and stuff
 		 */
 		$this->setBlock($templateHandle, 'list_item', 'list_item_block');
+		$this->setVar('list_item_block', '');
 
 		/* Gather everything
 		 */
