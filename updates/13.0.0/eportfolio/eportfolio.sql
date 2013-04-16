@@ -43,7 +43,12 @@ CREATE TABLE `eportfolio_permission`( `id` INT(11) NOT NULL AUTO_INCREMENT, `pag
 
 /* Components tables
  */
+
 /* Add list item table
  */
 CREATE TABLE `eportfolio_component_list_item`( `list_item_id` INT(11) NOT NULL AUTO_INCREMENT, `component_instance_id` INT(11) NOT NULL, `content` TEXT, `sequence` INT(11), PRIMARY KEY (`list_item_id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
 ALTER TABLE `eportfolio_component_list_item` CHANGE `list_item_id` `id` INT(11) NOT NULL AUTO_INCREMENT;
+
+/* Add advanced list item table
+ */
+CREATE TABLE `eportfolio_component_advancedlist_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `component_instance_id` INT(11) NOT NULL, `title` VARCHAR(255), `content` TEXT, `imagehash` VARCHAR(255), `sequence` INT(11), PRIMARY KEY (`id`) );
