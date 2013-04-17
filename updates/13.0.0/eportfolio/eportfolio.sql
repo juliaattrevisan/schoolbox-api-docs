@@ -56,3 +56,7 @@ CREATE TABLE `eportfolio_component_advancedlist_item`( `id` INT(11) NOT NULL AUT
 /* Add link list item table
  */
 CREATE TABLE `eportfolio_component_linklist_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `component_instance_id` INT(11) NOT NULL, `title` VARCHAR(255), `content` TEXT, `sequence` INT(1), PRIMARY KEY (`id`) );
+
+/* Add textbox item table
+ */
+CREATE TABLE `eportfolio_component_textbox_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `component_instance_id` INT(11) NOT NULL, `content` TEXT, `sequence` INT(11), PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;

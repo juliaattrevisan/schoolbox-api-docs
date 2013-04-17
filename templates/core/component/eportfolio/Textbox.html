@@ -1,0 +1,69 @@
+<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+	<script type='text/javascript'>
+		$j(function() {
+			$j('a.modify_textbox').click(function() {
+				var id = $j(this).attr('rel');
+
+				/* Show editor form
+				 */
+				$j('#modify_textbox_form_' + id).show();
+				$j('#modify_textbox_form_' + id).find('.firstFocus').focus();
+
+				/* Hide actual content
+				 */
+				$j('#textbox_content_' + id).hide();
+			});
+
+			/* Close button
+			 */
+			$j('a.modify_textbox_close').click(function() {
+				var id = $j(this).attr('rel');
+
+				/* Show actual content
+				 */
+				$j('#textbox_content_' + id).show();
+
+				/* Hide editor form
+				 */
+				$j('#modify_textbox_form_' + id).hide();
+			});
+		});
+	</script>
+	<h2>{COMPONENT_NAME}</h2>
+	{CONFIGURATION}
+
+	<div id='textbox_content_{COMPONENT_INSTANCE_ID}'>
+		<div>
+			{TEXTBOX_CONTENT}
+		</div>
+
+		<p>
+			<a class='modify_textbox' rel='{COMPONENT_INSTANCE_ID}'>Edit</a>
+		</p>
+	</div>
+
+	<form id='modify_textbox_form_{COMPONENT_INSTANCE_ID}' class='hide modifyForm' action='/eportfolio/component/textbox/modifyForm.php' method='post' style='padding:10px;background-color:#fdd'>
+		<input type='hidden' name='action' value='updateItem' />
+		<input type='hidden' name='userId' value='{USER_ID}' />
+		<input type='hidden' name='pageId' value='{PAGE_ID}' />
+		<input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
+		<input type='hidden' name='textboxId' value='{COMPONENT_INSTANCE_ID}' />
+
+		<a class='modify_textbox_close' rel='{COMPONENT_INSTANCE_ID}'>Close</a>
+		<label>
+			<textarea name='content' class='mceEditor'>{TEXTBOX_CONTENT}</textarea>
+		</label>
+
+		<input type='submit' value='Update' />
+	</form>
+
+	<form action='/eportfolio/component/textbox/modifyForm.php' method='post'>
+		<input type='hidden' name='action' value='removeItem' />
+		<input type='hidden' name='userId' value='{USER_ID}' />
+		<input type='hidden' name='pageId' value='{PAGE_ID}' />
+		<input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
+		<input type='hidden' name='textboxId' value='{COMPONENT_INSTANCE_ID}' />
+
+		<input type='submit' value='Delete' />
+	</form>
+</div>

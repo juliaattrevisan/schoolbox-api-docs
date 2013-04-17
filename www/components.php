@@ -48,9 +48,26 @@ $linkList = array(
 	)
 );
 
+
+$textbox = array(
+	'name' => 'Textbox',
+	'module' => 'eportfolio',
+	'component_category' => null,
+	'class' => 'Component_Eportfolio_TextboxController',
+	'description' => 'A textbox component',
+	'multiple' => 'true',
+	'config' => array(
+		'componentname' => array(
+			'default_value' => 'My Textbox',
+			'label' => 'Textbox Title',
+		),
+	)
+);
+
 $allComponents[] = $basicList;
 $allComponents[] = $advancedList;
 $allComponents[] = $linkList;
+$allComponents[] = $textbox;
 
 foreach($allComponents as $currentComponent) {
 	Component_DefinitionMapper::getInstance()->create($currentComponent);
