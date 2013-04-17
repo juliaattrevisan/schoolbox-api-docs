@@ -24,6 +24,13 @@
 		convert_urls : false
 	});
 </script>
+<script type="text/javascript">
+	$j(function() {
+		$j('form#textBoxForm input[name="save"]').click(function() {
+			return confirm('Are you sure you are ready to send this submission for assessment?');
+		})
+	});
+</script>
 <!-- END custom_head -->
 
 <div id="submission-history">
@@ -35,8 +42,10 @@
 				<input type="hidden" name="box_id" value="{BOX_ID}" />
 				<input type="hidden" name="submission_id" value="{SUBMISSION_ID}" />
 				<textarea rows="20" style="width: 100%;" name="body" id="textBoxBody">{TEXTBOX_BODY}</textarea>
+				<br/>
+				<p>You may save this submission as a draft, and come back to work on it later.</p>
 				<input class="submit-btn-plain" type="submit" name="save_draft" value="Save as draft" />
-				<input class="submit-btn-plain" type="submit" name="save" value="Submit" />
+				<input class="submit-btn-plain" type="submit" name="save" value="Submit for assessment" />
 			</form>
 		</div>
 	</div>
