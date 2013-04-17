@@ -252,8 +252,13 @@ class DueWork_Detail {
                     )) ? self::CLASS_LATE : '';
 
                     // needing to do this just to get the icon associated with an extension is slightly ridiculous
-                    $filename = $submission['realname'];
-                    $mime = $allowedHandler->getMime(substr($filename, strripos($filename, '.') + 1));
+                    if ($submission['is_online_submission']) {
+                        $mime = 'text/html';
+                    }
+                    else {
+                        $filename = $submission['realname'];
+                        $mime = $allowedHandler->getMime(substr($filename, strripos($filename, '.') + 1));
+                    }
                     $icon = $fileTypeHandler->getIconFile($mime);
 
                     $plagClass = self::CLASS_PLAG_0;
