@@ -16,6 +16,8 @@ abstract class Synchronise_Synergetic_Mggs_Strategy_Abstract extends Synchronise
 {
     protected $verboseFilter = null;
     const PARENT_GROUP_ID = 4;
+	const STAFF_GROUP_ID = 2;
+	const ADMIN_GROUP_ID = 1;
 
     /**
      * Setup
@@ -46,7 +48,11 @@ abstract class Synchronise_Synergetic_Mggs_Strategy_Abstract extends Synchronise
             /* If the current user exists in Schoolbox, update them
                 */
             if ($existing) {
-
+	            /* dont update staff campuses */
+	            if($newUser['group_id'] == self::STAFF_GROUP_ID || $newUser['group_id'] == self::ADMIN_GROUP_ID){
+		            unset($newUser['campus']);
+		            unset($newUser['defaultCampus']);
+	            }
                 /* Perform action; report what happened
                      */
                 if ($this->getPerformUpdate() === true) {
