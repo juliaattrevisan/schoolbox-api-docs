@@ -676,6 +676,11 @@ class Calendar extends DeprecatedModel {
 					 */
 					((startDate >= '{$start->getDatabaseDate()}') AND (startDate <= '{$end->getDatabaseDate()}'))
 				)
+				/* Don't include events that have already ended
+				 */
+				AND (
+					endDate >= '{$start->getDatabaseDate()}'
+				)
 			GROUP BY id
 			ORDER BY event.startTime, event.endTime
 		";
