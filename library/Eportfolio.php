@@ -208,7 +208,6 @@ class Eportfolio {
 	/**
 	 * Get a list of colours for a particular page
 	 *
-	 * @param $pageId
 	 * @return array|bool
 	 */
 	public function getColorList() {
