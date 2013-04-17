@@ -19,11 +19,11 @@ class SubmissionStudent extends DeprecatedModel {
     // 3 CONVENIENCE WRAPPER METHODS FOR RETRIEVING WITH CERTAIN CONDITIONS
 
     function getBySynergyID($subBoxID, $synergyID) {
-        return $this->getByCondition($subBoxID, array('synergy_id' => $synergyID));
+        return $this->getByCondition($subBoxID, array('synergy_id' => $synergyID, 'draft' => false));
     }
 
     function getByUserID($subBoxID, $userID) {
-        return $this->getByCondition($subBoxID, array('`owner`' => $userID));
+        return $this->getByCondition($subBoxID, array('`owner`' => $userID, 'draft' => false));
     }
 
     function getByBoxID($subBoxID) {
@@ -46,6 +46,7 @@ class SubmissionStudent extends DeprecatedModel {
         $query = "SELECT student_submission.id, user.title, user.firstname, user.lastname, user.id AS uid, username,
                          local_email, alt_email, DATE_FORMAT(submitted, '%a, %D of %b %l:%i%p') AS date,
                          DATE_FORMAT(submitted, '%Y-%m-%d %H:%i') as datestamp, realname, late, marked,
+                         (student_submission.body IS NOT NULL) AS is_online_submission,
                          user.synergy_id as synergy_id, pd.score, pd.status plag_status, pd.plagscan_id plag_doc_id
                   FROM (student_submission, user)
                   LEFT JOIN plagscan_document pd ON student_submission.id = pd.file_id
