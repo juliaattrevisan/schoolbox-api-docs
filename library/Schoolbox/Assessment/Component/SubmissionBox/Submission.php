@@ -121,7 +121,7 @@ class Submission {
 	 */
 	public function loadIsLate() {
 		$late_timestamp = $this->getSubmissionBox()->getDueDate()->getUnixTimestamp();
-		$submit_date    = new DateTime('now');
+		$submit_date    = new \DateTime('now');
 		$this->setLate($late_timestamp < $submit_date->getTimestamp());
 		return $this;
 	}
