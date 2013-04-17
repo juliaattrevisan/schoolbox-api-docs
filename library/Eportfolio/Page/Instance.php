@@ -58,7 +58,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 
 		/* Page colours
  		 */
-		$this->setColours($this->getEportfolioHandler()->getColorList($this->getPageId()));
+		$this->setColours($this->getEportfolioHandler()->getColorList());
 	}
 
 	/**

@@ -211,7 +211,7 @@ class Eportfolio {
 	 * @param $pageId
 	 * @return array|bool
 	 */
-	public function getColorList($pageId) {
+	public function getColorList() {
 		$colourList = array(
 			'left_head_font' => $this->getPageInstance()->getLeftHeadFont(),
 			'left_head_bg' => $this->getPageInstance()->getLeftHeadBg(),
