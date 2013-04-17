@@ -23,6 +23,7 @@ else {
 	$submission     = new Submission();
 	$submission_box = $box_mapper->findById($_POST['box_id']);
 	$submission
+		->setFilename('Online Submission')
 		->setSubmissionBox($submission_box)
 		->setOwner($user)
 	;
@@ -50,9 +51,6 @@ $submission
 	->setBody($_POST['body'])
 	->setDraft($is_draft)
 ;
-//
-// Set file columns to dummy values
-$submission->setFilename('');
 $submission_mapper->save($submission);
 
 //
