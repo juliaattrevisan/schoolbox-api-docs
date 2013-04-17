@@ -134,6 +134,37 @@ class SubmissionMapper extends Schoolbox\Mapper {
 	}
 
 	/**
+	 * Retrieves drafts for this user and box, ordered by most recent first.
+	 *
+	 * @param int $user_id
+	 * @param int $box_id
+	 * @param int $limit
+	 *
+	 * @return Collection
+	 */
+	public function getDrafts($user_id, $box_id, $limit = null) {
+		$query = "
+			SELECT {$this->getColumnString('ss')}
+			FROM {$this->getTable()} ss
+			WHERE ss.box_id = :box_id
+			AND ss.owner = :user_id
+			AND ss.draft IS TRUE
+			ORDER BY ss.submitted DESC
+		";
+		if (isset($limit)) {
+			$query .= ' LIMIT :limit';
+		}
+		$statement = $this->database->prepare($query);
+		$statement->bindValue('user_id', $user_id, \PDO::PARAM_INT);
+		$statement->bindValue('box_id',  $box_id,  \PDO::PARAM_INT);
+		if (isset($limit)) {
+			$statement->bindValue('limit', $limit, \PDO::PARAM_INT);
+		}
+		$statement->execute();
+		return $this->hydrateList($statement, 'ss');
+	}
+
+	/**
 	 * Returns an activity collection for the given user and submission box.
 	 *
 	 * @param $user_id
