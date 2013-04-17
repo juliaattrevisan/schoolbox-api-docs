@@ -42,16 +42,26 @@ $j(document).ready(function () {
 		if (!letter_re.test(password)) {
 			new_password_msgs.push('contains at least one letter');
 		}
-		else if (!number_re.test(password)) {
+		if (!number_re.test(password)) {
 			new_password_msgs.push('contains at least one number');
 		}
-		else if (!nonalpha_re.test(password)) {
+		if (!nonalpha_re.test(password)) {
 			new_password_msgs.push('contains at least one punctuation or symbol character');
 		}
 		if (new_password_msgs.length > 0) {
+			//
+			// join messages - last one with 'and', others with ','.
+			var whole_msg = '';
+			var last_msg  = new_password_msgs.pop();
+			if (new_password_msgs.length > 0) {
+				whole_msg = new_password_msgs.join(', ')+' and '+last_msg;
+			}
+			else {
+				whole_msg = last_msg;
+			}
 			msgs.new_password.push(
 				'Your password couldn’t be changed because the new password you chose isn’t complex enough. Please try again and choose a password that '
-				+ new_password_msgs.join(' and ') + '.'
+				+ whole_msg + '.'
 			);
 		}
 
