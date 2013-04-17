@@ -72,6 +72,15 @@ if (is_numeric($_GET['id'])) {
 			error(44);
 		}
 
+		// filename format to be {lastname-firstname_month-day_hour-minute_{sanitised(filename)}}
+		// eg. Day-Matt_0816-1432_MyAssignment.docx (from 'My Assign!ment.docx')
+		$filename = sprintf("%s-%s_%s_%s",
+			$studentSub->getOwner()->getLastName(),
+			$studentSub->getOwner()->getFirstName(),
+			$studentSub->getSubmitted()->getUsingFormat("md-Hi"),
+			$studentSub->getFilename()
+		);
+
 		//
 		// Load the file (whether an upload or an online submission)
 		$file = $studentSub->getFileLocation();
@@ -81,22 +90,23 @@ if (is_numeric($_GET['id'])) {
 			$size     = $studentSub->getFilesize();
 		}
 		else {
-			$contents = $studentSub->getBody();
+			$contents = <<<HTML
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>%s</title>
+</head>
+<body>%s</body>
+</html>
+HTML
+			;
+			$contents = sprintf($contents, htmlspecialchars($filename), Scrub::html($studentSub->getBody()));
 			$size     = strlen($contents);
 			$mime     = 'text/html';
 			if ($size === 0) {
 				error(9, "the requested file could not be read.<br />Please try again, and if the problem persists contact your system administrator.");
 			}
 		}
-
-		// filename format to be {lastname-firstname_month-day_hour-minute_{sanitised(filename)}}
-		// eg. Day-Matt_0816-1432_MyAssignment.docx (from 'My Assign!ment.docx')
-		$filename = sprintf("%s-%s_%s_%s",
-			$studentSub->getOwner()->getLastName(),
-			$studentSub->getOwner()->getFirstName(),
-			$studentSub->getSubmitted()->getUsingFormat("md-Hi"),
-			$studentSub->getFilename()
-		);
 	}
 
 	// sanitise
