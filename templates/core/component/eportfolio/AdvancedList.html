@@ -4,12 +4,20 @@
 			$j('a.modify_advanced').click(function() {
 				var id = $j(this).attr('rel');
 
-				$j('#modify_advanced_' + id).show();
-				$j('#modify_advanced_' + id).find('.mceEditor').focus();
+				$j('#modify_advanced_form_' + id).show();
+				$j('#modify_advanced_form_' + id).find('.mceEditor').focus();
 
 				$j(this).hide();
 			});
 
+			/* Close button
+			 */
+			$j('a.modify_advanced_close').click(function() {
+				var id = $j(this).attr('rel');
+
+				$j('.modify_advanced[rel=' + id + ']').show();
+				$j('#modify_advanced_form_' + id).hide();
+			});
 		});
 	</script>
 	<h2>{COMPONENT_NAME}</h2>
@@ -36,16 +44,28 @@
 				{LIST_ITEM_CONTENT}
 			</a>
 
-			<form id='modify_advanced_{LIST_ITEM_ID}' class='hide modifyForm' action='/eportfolio/component/advancedlist/modifyForm.php' method='post' enctype='multipart/form-data'>
+			<form id='modify_advanced_form_{LIST_ITEM_ID}' class='hide modifyForm' action='/eportfolio/component/advancedlist/modifyForm.php' method='post' enctype='multipart/form-data' style='padding:10px;background-color:#fdd'>
 				<input type='hidden' name='action' value='updateItem' />
 				<input type='hidden' name='userId' value='{USER_ID}' />
 				<input type='hidden' name='pageId' value='{PAGE_ID}' />
 				<input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
 				<input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
 
-				<input type='text' name='title' value="{LIST_ITEM_TITLE}" />
-				<textarea type='text' name='content' />{LIST_ITEM_CONTENT}</textarea>
-				<input type='file' name='imagehash' value='' />
+				<a class='modify_advanced_close' rel='{LIST_ITEM_ID}'>Close</a>
+				<label>
+					<strong>Title</strong><br />
+					<input type='text' name='title' value="{LIST_ITEM_TITLE}" />
+				</label>
+				<label>
+					<strong>Content</strong><br />
+					<textarea type='text' name='content' />{LIST_ITEM_CONTENT}</textarea>
+				</label>
+				<label>
+					<strong>Image</strong><br />
+					<img src='/storage/image.php?size=square64&hash={LIST_ITEM_IMAGEHASH}' class='floatLeft' /><br />
+					<input type='file' name='imagehash' value='' />
+				</label>
+
 				<input type='submit' value='Update' />
 			</form>
 
