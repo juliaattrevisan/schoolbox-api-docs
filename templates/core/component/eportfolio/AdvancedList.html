@@ -7,7 +7,7 @@
 				/* Show editor form
 				 */
 				$j('#modify_advanced_form_' + id).show();
-				$j('#modify_advanced_form_' + id).find('.mceEditor').focus();
+				$j('#modify_advanced_form_' + id).find('.firstFocus').focus();
 
 				/* Hide actual content
 				 */
@@ -67,7 +67,7 @@
 				<a class='modify_advanced_close' rel='{LIST_ITEM_ID}'>Close</a>
 				<label>
 					<strong>Title</strong><br />
-					<input type='text' name='title' value="{LIST_ITEM_TITLE}" />
+					<input type='text' class='firstFocus' name='title' value="{LIST_ITEM_TITLE}" />
 				</label>
 				<label>
 					<strong>Content</strong><br />

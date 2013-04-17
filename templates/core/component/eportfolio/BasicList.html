@@ -7,7 +7,7 @@
 				/* Show editor form
 				 */
 				$j('#modify_basic_form_' + id).show();
-				$j('#modify_basic_form_' + id).find('input[name=content]').focus();
+				$j('#modify_basic_form_' + id).find('.firstFocus').focus();
 
 				/* Hide actual content
 				 */
@@ -61,7 +61,7 @@
 
 				<a class='modify_basic_close' rel='{LIST_ITEM_ID}'>Close</a>
 				<label>
-					<input type='text' name='content' value='{LIST_ITEM_CONTENT}' />
+					<input type='text' class='firstFocus' name='content' value='{LIST_ITEM_CONTENT}' />
 				</label>
 
 				<input type='submit' value='Update' />

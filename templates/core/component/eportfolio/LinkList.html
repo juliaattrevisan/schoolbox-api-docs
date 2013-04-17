@@ -7,7 +7,7 @@
 				/* Show editor form
 				 */
 				$j('#modify_link_form_' + id).show();
-				$j('#modify_link_form_' + id).find('input[name=title]').focus();
+				$j('#modify_link_form_' + id).find('.firstFocus').focus();
 
 				/* Hide actual content
 				 */
@@ -64,7 +64,7 @@
 
 				<a class='modify_link_close' rel='{LIST_ITEM_ID}'>Close</a>
 				<label>
-					<input type='text' name='title' value='{LIST_ITEM_TITLE}' />
+					<input type='text' class='firstFocus' name='title' value='{LIST_ITEM_TITLE}' />
 				</label>
 				<label>
 					<input type='text' name='content' value='{LIST_ITEM_CONTENT}' />
