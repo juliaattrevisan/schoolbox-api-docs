@@ -23,27 +23,39 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
         $this->setGroup($group);
     }
 
-    public function execute() {
-        $today = new Alaress_Date_Format(date('y-m-d', time()), 'y-m-d');
+	/**
+	 * Get all the events you need to pump into the page
+	 *
+	 * @return bool|void
+	 */
+	public function execute() {
+		$start = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
-        $this->setVar("DATE", date("l jS F"));
+		$end = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+		$end->addDays(1);
+
+		/* Today's date
+		 */
+		$this->setVar(array(
+			'DATE' => $start->getUsingFormat('l jS F')
+		));
 
 		/* A list of submissions
 		 */
 		$submissionFactory = new Calendar_Api_DashboardFactory("Submission");
 
-		$api = $submissionFactory->produce();
+		$composite = $submissionFactory->produce();
 
-		$this->submissionList = $api->getEvents($today->getDatabase(), $today->addDays(1)->getDatabase());
+		$this->submissionList = $composite->getEvents($start->getUnixTimestamp(), $end->getUnixTimestamp());
 		$this->submissionList->sort();
 
 		/* A list of events
 		 */
 		$eventFactory = new Calendar_Api_DashboardFactory("Event");
 
-		$api = $eventFactory->produce();
+		$composite = $eventFactory->produce();
 
-        $this->eventList = $api->getEvents($today->getDatabase(), $today->addDays(1)->getDatabase());
+		$this->eventList = $composite->getEvents($start->getUnixTimestamp(), $end->getUnixTimestamp());
         $this->eventList->sort();
 
         return true;
@@ -78,12 +90,16 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
         $j = 0;
 
-        if (is_array($this->submissionList)) {
-            foreach ($this->submissionList as $currentEvent) {
+        if ($this->submissionList->getCount()) {
+
+			$iterator = $this->submissionList->createIterator();
+
+			for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
+				$currentEvent = $iterator->current();
 
                 /* Get status to set action
                  */
-                if ($this->getGroupHandler()->isStudent($_SESSION['id'])) {
+                if ($this->getGroup()->isStudent($_SESSION['id'])) {
                     $action = 'View Details';
                     $this->setVar(
                         'MODIFY',
@@ -91,7 +107,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
                         ) . '"><span></span>' . $action . '</a>'
                     );
                 } else {
-                    if ($this->getGroupHandler()->isStaff($_SESSION['id'])) {
+                    if ($this->getGroup()->isStaff($_SESSION['id'])) {
                         $this->setVar(
                             'MODIFY',
                             '<a class="btn go-to float-left" href="/submission/viewSubmission/' . $currentEvent->getSubmissionBoxId(
