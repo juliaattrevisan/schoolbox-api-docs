@@ -29,15 +29,15 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 	 * @return bool|void
 	 */
 	public function execute() {
-		$start = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+		$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
-		$end = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-		$end->addDays(1);
+		$start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d h:i:s');
+		$end = new Alaress_Date_Format($now->getDatabaseDate() . ' 23:59:59', 'y-m-d h:i:s');
 
 		/* Today's date
 		 */
 		$this->setVar(array(
-			'DATE' => $start->getUsingFormat('l jS F')
+			'DATE' => $now->getUsingFormat('l jS F')
 		));
 
 		/* A list of submissions
