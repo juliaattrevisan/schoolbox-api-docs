@@ -126,6 +126,18 @@ class Submission {
 		return $this;
 	}
 
+	/**
+	 * Is this an online submission?
+	 *
+	 * This checks this submission's body field. If there's something there, it
+	 * is an online submission.
+	 *
+	 * @return bool
+	 */
+	public function isOnlineSubmission() {
+		return strlen($this->getBody()) > 0;
+	}
+
 
 	/**
 	 * Auto-generated methods
