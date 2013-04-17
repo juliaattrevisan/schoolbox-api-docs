@@ -62,6 +62,16 @@ class Submission {
 	protected $temp_location;
 
 	/**
+	 * @var string
+	 */
+	protected $body;
+
+	/**
+	 * @var bool
+	 */
+	protected $draft = false;
+
+	/**
 	 * @var IConfigLoader
 	 */
 	protected $config_loader;
@@ -101,6 +111,19 @@ class Submission {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Loads whether the submission is late, depending on the submission box's
+	 * due date.
+	 *
+	 * @return $this
+	 */
+	public function loadIsLate() {
+		$late_timestamp = $this->getSubmissionBox()->getDueDate()->getUnixTimestamp();
+		$submit_date    = new DateTime('now');
+		$this->setLate($late_timestamp < $submit_date->getTimestamp());
+		return $this;
 	}
 
 
@@ -243,6 +266,40 @@ class Submission {
 	 */
 	public function getSubmitted() {
 		return $this->submitted;
+	}
+
+	/**
+	 * @param  string $body
+	 *
+	 * @return $this
+	 */
+	public function setBody($body) {
+		$this->body = $body;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getBody() {
+		return $this->body;
+	}
+
+	/**
+	 * @param  boolean $draft
+	 *
+	 * @return $this
+	 */
+	public function setDraft($draft) {
+		$this->draft = $draft;
+		return $this;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getDraft() {
+		return $this->draft;
 	}
 
 	/**

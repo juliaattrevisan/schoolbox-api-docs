@@ -61,6 +61,16 @@ class SubmissionMapper extends Schoolbox\Mapper {
 			'property'   => 'mimetype',
 			'type'       => self::TYPE_STRING,
 		));
+		$this->hasMap(array(
+			'column'     => 'body',
+			'property'   => 'body',
+			'type'       => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column'     => 'draft',
+			'property'   => 'draft',
+			'type'       => self::TYPE_BOOLEAN,
+		));
 
 		$this->hasJoin('submission_box', array(
 			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBoxMapper',
