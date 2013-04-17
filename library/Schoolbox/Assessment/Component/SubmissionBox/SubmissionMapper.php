@@ -190,6 +190,7 @@ class SubmissionMapper extends Schoolbox\Mapper {
 			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
 			WHERE sb.id = :box_id
 			AND ss.owner = :user_id
+			AND ss.draft IS FALSE
 			ORDER BY ss.submitted DESC
 		";
 		$params = array(
@@ -266,10 +267,12 @@ class SubmissionMapper extends Schoolbox\Mapper {
 		}
 
 		//
-		// Does a submission already exist for this student?
+		// Does a (non-draft) submission already exist for this student?
 		$box_id          = $submission->getSubmissionBox()->getId();
 		$user_id         = $submission->getOwner()->getId();
-		$count_statement = $this->database->prepare("SELECT id FROM {$this->getTable()} WHERE box_id=? AND owner=?");
+		$count_statement = $this->database->prepare(
+			"SELECT id FROM {$this->getTable()} WHERE box_id=? AND owner=? AND draft IS FALSE"
+		);
 		$count_statement->execute(array($box_id, $user_id));
 		$submitted = ($count_statement->rowCount() > 0);
 		if ($submitted && !$submission_box->getAcceptMultiple()) {
