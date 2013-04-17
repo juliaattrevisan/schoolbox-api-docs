@@ -38,32 +38,34 @@
 
             <!-- BEGIN student_synergy_tutor -->
             <dl>
-                <dt>Student ID:</dt>
-                <dd>{SYNERGY_ID}</dd>
+                <dt>Email:</dt>
+                <dd class="mail-profile">{EMAIL}</dd>
+                <dt class="dark">Student ID:</dt>
+                <dd class="dark">{SYNERGY_ID}</dd>
 
                 <dt>Date of Birth:</dt>
                 <dd>{BIRTHDATE}</dd>
 
-                <dt>Class Teacher:</dt>
-                <dd>{FORM_STAFF}</dd>
+                <dt class="dark">Class Teacher:</dt>
+                <dd class="dark">{FORM_STAFF}</dd>
 
                 <dt>Tutor:</dt>
                 <dd>{TUTOR}</dd>
 
-                <dt>Year Level:</dt>
-                <dd>{YEAR_LEVEL}</dd>
+                <dt class="dark">Year Level:</dt>
+                <dd class="dark">{YEAR_LEVEL}</dd>
 
                 <dt>House:</dt>
                 <dd>{HOUSE}</dd>
 
-                <dt>Tutor Group:</dt>
-                <dd>{TUTOR_GROUP}</dd>
+                <dt class="dark">Tutor Group:</dt>
+                <dd class="dark">{TUTOR_GROUP}</dd>
 
                 <dt>Head of House:</dt>
                 <dd>{HOH}</dd>
 
-                <dt>Student Type:</dt>
-                <dd>{STUDENT_TYPE}</dd>
+                <dt class="dark">Student Type:</dt>
+                <dd class="dark">{STUDENT_TYPE}</dd>
             </dl>
             <!-- END student_synergy_tutor -->
 
@@ -172,15 +174,32 @@
             <!-- BEGIN spouse_details -->
             <ul class="contact-phone">
                 <li>
-                    {SPOUSE_NAME_EMAIL}
+                    <div class="profile">
+                        <a href="#" id="spouse" class="teacher-profile">
+                            <span class="name">{SPOUSE_NAME_EMAIL}</span>
+                            <span class="role">{CONTACT_ROLE}</span>
+                            <span class="icon"></span>
+                        </a>
+                        <a class="mail-teacher" href="{CONTACT_EMAIL}">Mail</a>
+                        <!--Mobile-->
+                        <span class="mobile">{CONTACT_MOBILE_PHONE}</span>
+                        <!--Work-->
+                        <span class="phone">{CONTACT_OCCUP_PHONE}</span>
+                    </div>
+                    <!--<div class="profile">
+                        <a href="#" id="spouse" class="teacher-profile">
+                            {SPOUSE_NAME_EMAIL}
+                            <span class="role">{CONTACT_ROLE}</span>
+                        </a>
+                    </div>
                     <span class="mobile">{SPOUSE_MOBILE_PHONE}</span>
-                    <span class="phone">{SPOUSE_OCCUP_PHONE}</span>
+                    <span class="phone">{SPOUSE_OCCUP_PHONE}</span>-->
                 </li>
             </ul>
             <!-- END spouse_details -->
 
             <ul class="contact-details">
-                <li>
+                <li class="address">
                     <b>Address:</b> <br />
                     {CONTACT_ADDRESS}
                 </li>
@@ -198,48 +217,36 @@
             <!-- BEGIN edit_emergency -->
             <!-- END edit_emergency -->
 
-            <ul>
-                <li class="dark">
-                    <b>Name:</b><br />
-                    {EMERGENCY_NAME}
-                </li>
-                <li>
-                    <b>Phone:</b><br />
-                    {EMERGENCY_PHONE}
-                </li>
-                <li class="dark">
-                    <b>Alt. Phone:</b><br />
-                    {EMERGENCY_ALT_PHONE}
-                </li>
-            </ul>
-            <ul>
-                <li>
-                    <b>Name:</b><br />
-                    {EMERGENCY_NAME_2}
-                </li>
-                <li class="dark">
-                    <b>Phone:</b><br />
-                    {EMERGENCY_PHONE_2}
-                </li>
-                <li>
-                    <b>Alt. Phone:</b><br />
-                    {EMERGENCY_ALT_PHONE_2}
-                </li>
-            </ul>
-            <ul>
-                <li class="dark">
-                    <b>Name:</b><br />
-                    {EMERGENCY_NAME_3}
-                </li>
-                <li>
-                    <b>Phone:</b><br />
-                    {EMERGENCY_PHONE_3}
-                </li>
-                <li class="dark">
-                    <b>Alt. Phone:</b><br />
-                    {EMERGENCY_ALT_PHONE_3}
-                </li>
-            </ul>
+            <dl>
+                <dt><b>Name:</b></dt>
+                <dd>{EMERGENCY_NAME}</dd>
+
+                <dt class="dark"><b>Phone:</b></dt>
+                <dd class="dark">{EMERGENCY_PHONE}</dd>
+
+                <dt><b>Alt. Phone:</b></dt>
+                <dd>{EMERGENCY_ALT_PHONE}</dd>
+            </dl>
+            <dl>
+                <dt class="dark"><b>Name:</b></dt>
+                <dd class="dark">{EMERGENCY_NAME_2}</dd>
+
+                <dt><b>Phone:</b></dt>
+                <dd>{EMERGENCY_PHONE_2}</dd>
+
+                <dt class="dark"><b>Alt. Phone:</b></dt>
+                <dd class="dark">{EMERGENCY_ALT_PHONE_2}</dd>
+            </dl>
+            <dl>
+                <dt><b>Name:</b></dt>
+                <dd>{EMERGENCY_NAME_3}</dd>
+
+                <dt class="dark"><b>Phone:</b></dt>
+                <dd class="dark">{EMERGENCY_PHONE_3}</dd>
+
+                <dt><b>Alt. Phone:</b></dt>
+                <dd>{EMERGENCY_ALT_PHONE_3}</dd>
+            </dl>
 
         </div>
         <!-- END contact_synergy -->

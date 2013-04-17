@@ -1,41 +1,36 @@
-<h1>School Directory</h1>
-<table id="directory">
-  <tr>
-    <td colspan="6"><h2>Personal Information</h2></td>
-    <td>&nbsp;</td>
-  </tr>
-  <tr>
-    <td><strong>Name</strong></td>
-    <td colspan="2">{NAME}</td>
-    <td colspan="1"><strong>Email</strong></td>
-    <td colspan="2">{EMAIL}</td>
-    <td rowspan="12" style="vertical-align:top; text-align:center;">
-  <!-- BEGIN parent_synergy_form -->
-  <tr>
-    <td><strong>Home Phone</strong></td>
-    <td colspan="2">{HOME_PHONE}</td>
-    <td><strong>Mobile Phone</strong></td>
-    <td colspan="2">{MOBILE_PHONE}</td>
-  </tr>
-  <!-- BEGIN parent_spouse -->
-  <tr>
-    <td colspan="6"><h2>Partners Information</h2></td>
-    <td>&nbsp;</td>
-  </tr>
-  <tr>
-    <td><strong>Name</strong></td>
-    <td colspan="2">{SPOUSE_NAME}</td>
-    <td><strong>Email</strong></td>
-    <td colspan="2">{SPOUSE_EMAIL}</td>
-  </tr>
-  <tr>
-      <td>&nbsp;</td>
-      <td colspan="2">&nbsp;</td>
-     <td><strong>Mobile Phone</strong></td>
-    <td colspan="2">{SPOUSE_MOBILE}</td>
-  </tr>
-  <!-- END parent_spouse -->
-  <!-- END parent_synergy_form -->
-  <!-- BEGIN eportfolio -->
-  <!-- END eportfolio -->
-</table>
+<h1>{NAME}</h1>
+<div class="profile-info">
+    <div class="personal-info">
+        <dl>
+            <dt><strong>Email</strong></dt>
+            <dd class="mail-profile">{EMAIL}</dd>
+        </dl>
+            <!-- BEGIN parent_synergy_form -->
+        <dl>
+            <dt class="dark"><strong>Home Phone</strong></dt>
+            <dd class="dark">{HOME_PHONE}</dd>
+            <dt><strong>Mobile Phone</strong></dt>
+            <dd>{MOBILE_PHONE}</dd>
+        </dl>
+    </div>
+
+    <div class="parent-spouse">
+        <!-- BEGIN parent_spouse -->
+        <h2>Partners Information</h2>
+        &nbsp;
+        <dl>
+            <dt><strong>Name</strong></dt>
+            <dd>{SPOUSE_NAME}</dd>
+            <dt class="dark"><strong>Email</strong></dt>
+            <dd class="dark mail-profile">{SPOUSE_EMAIL}</dd>
+        </dl>
+        <dl>
+            <dt><strong>Mobile Phone</strong></dt>
+            <dd>{SPOUSE_MOBILE}</dd>
+        </dl>
+        <!-- END parent_spouse -->
+        <!-- END parent_synergy_form -->
+        <!-- BEGIN eportfolio -->
+        <!-- END eportfolio -->
+    </div>
+</div>

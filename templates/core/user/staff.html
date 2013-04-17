@@ -1,46 +1,33 @@
-<h1>School Directory</h1>
-<table id="directory">
-    <tr>
-        <td colspan="6"><h2>Personal Information</h2></td>
-        <td>&nbsp;</td>
-    </tr>
-    <tr>
-        <td><strong>Name</strong></td>
-        <td colspan="2">{NAME}</td>
-        <td colspan="1"><strong>Email</strong></td>
-        <td colspan="2">{EMAIL}</td>
-        <td rowspan="13" style="vertical-align:top; text-align:center;"><!-- BEGIN portrait -->
-            <img src="/portrait.php?userId={SYNERGY_ID}&size=constrain200"/>
-            <!-- END portrait -->
-        </td>
-    </tr>
-    <!-- BEGIN staff_synergy -->
-    <tr>
-        <td><strong>Type</strong></td>
-        <td colspan="2">{CATEGORY}</td>
-        <td><strong>Extension</strong></td>
-        <td colspan="2">{EXTENSION}</td>
+<h1>{NAME}</h1>
+<div class="profile-info">
 
-    </tr>
-    <tr>
-        <td><strong>Room</strong></td>
-        <td colspan="2">{ROOM}</td>
-        <td><strong>Building</strong></td>
-        <td colspan="2">{BUILDING}</td>
-
-    </tr>
-    <tr>
-        <td><strong>Department</strong></td>
-        <td colspan="2">{DEPARTMENT}</td>
-        <td><strong>Campus</strong></td>
-        <td colspan="2">{CAMPUS}</td>
-    </tr>
-    <!-- END staff_synergy -->
-    <tr>
-        <td colspan="6"><h2>School Information</h2></td>
-    </tr>
-    <tr>
-        <td colspan="6">
+    <div class="profile-img">
+    <!-- BEGIN portrait -->
+    <img src="/portrait.php?userId={SYNERGY_ID}&size=constrain200"/>
+    <!-- END portrait -->
+    </div>
+    <div class="staff-detail">
+        <dl>
+            <dt><strong>Type</strong></dt>
+            <dd>{CATEGORY}</dd>
+            <dt class="dark"><strong>Room</strong></dt>
+            <dd class="dark">{ROOM}</dd>
+            <dt><strong>Department</strong></dt>
+            <dd>{DEPARTMENT}</dd>
+        </dl>
+        <!-- BEGIN staff_synergy -->
+        <dl>
+            <dt class="dark"><strong>Email</strong></dt>
+            <dd class="dark mail-profile">{EMAIL}</dd>
+            <dt><strong>Extension</strong></dt>
+            <dd>{EXTENSION}</dd>
+            <dt class="dark"><strong>Building</strong></dt>
+            <dd class="dark">{BUILDING}</dd>
+            <dt><strong>Campus</strong></dt>
+            <dd>{CAMPUS}</dd>
+        </dl>
+        <!-- END staff_synergy -->
+        <div class="school-info">
             <!-- BEGIN timetable_link -->
             <a href="/timetable/{ID}" class="btn report float-left"><span></span>Timetable</a>
             <!-- END timetable_link -->
@@ -50,7 +37,6 @@
             <!-- BEGIN modify -->
             <a href="/adminv2/modify-user/{ID}" class="btn modify float-left"><span></span>Modify User</a>
             <!-- END modify -->
-
-        </td>
-    </tr>
-</table>
+        </div>
+    </div>
+</div>
