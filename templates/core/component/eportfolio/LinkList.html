@@ -4,12 +4,30 @@
 			$j('a.modify_link').click(function() {
 				var id = $j(this).attr('rel');
 
-				$j('#modify_link' + id).show();
-				$j('#modify_link' + id).find('input[name=title]').focus();
+				/* Show editor form
+				 */
+				$j('#modify_link_form_' + id).show();
+				$j('#modify_link_form_' + id).find('input[name=title]').focus();
 
-				$j(this).hide();
+				/* Hide actual content
+				 */
+				console.log(id);
+				$j('#list_item_content_' + id).hide();
 			});
 
+			/* Close button
+			 */
+			$j('a.modify_link_close').click(function() {
+				var id = $j(this).attr('rel');
+
+				/* Show actual content
+				 */
+				$j('#list_item_content_' + id).show();
+
+				/* Hide editor form
+				 */
+				$j('#modify_link_form_' + id).hide();
+			});
 		});
 	</script>
 	<h2>{COMPONENT_NAME}</h2>
@@ -30,16 +48,28 @@
 	<ol>
 		<!-- BEGIN list_item -->
 		<li>
-			<a class='modify' rel='{LIST_ITEM_ID}' href='{LIST_ITEM_CONTENT}'>{LIST_ITEM_CONTENT}</a>
-			<form id='modify_{LIST_ITEM_ID}' class='hide modifyForm' action='/eportfolio/component/linklist/modifyForm.php' method='post'>
+			<div id='list_item_content_{LIST_ITEM_ID}'>
+				<a href='{LIST_ITEM_CONTENT}'>{LIST_ITEM_TITLE}</a>
+
+				<p>
+					<a class='modify_link' rel='{LIST_ITEM_ID}'>Edit</a>
+				</p>
+			</div>
+
+			<form id='modify_link_form_{LIST_ITEM_ID}' class='hide modifyForm' action='/eportfolio/component/linklist/modifyForm.php' method='post'>
 				<input type='hidden' name='action' value='updateItem' />
 				<input type='hidden' name='userId' value='{USER_ID}' />
 				<input type='hidden' name='pageId' value='{PAGE_ID}' />
 				<input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
 				<input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
 
-				<input type='text' name='title' value='{LIST_ITEM_TITLE}' />
-				<input type='text' name='content' value='{LIST_ITEM_CONTENT}' />
+				<a class='modify_link_close' rel='{LIST_ITEM_ID}'>Close</a>
+				<label>
+					<input type='text' name='title' value='{LIST_ITEM_TITLE}' />
+				</label>
+				<label>
+					<input type='text' name='content' value='{LIST_ITEM_CONTENT}' />
+				</label>
 
 				<input type='submit' value='Update' />
 			</form>
