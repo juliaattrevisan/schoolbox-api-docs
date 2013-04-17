@@ -4,10 +4,14 @@
 			$j('a.modify_advanced').click(function() {
 				var id = $j(this).attr('rel');
 
+				/* Show editor form
+				 */
 				$j('#modify_advanced_form_' + id).show();
 				$j('#modify_advanced_form_' + id).find('.mceEditor').focus();
 
-				$j(this).hide();
+				/* Hide actual content
+				 */
+				$j('#list_item_content_' + id).hide();
 			});
 
 			/* Close button
@@ -15,7 +19,12 @@
 			$j('a.modify_advanced_close').click(function() {
 				var id = $j(this).attr('rel');
 
-				$j('.modify_advanced[rel=' + id + ']').show();
+				/* Show actual content
+				 */
+				$j('#list_item_content_' + id).show();
+
+				/* Hide editor form
+				 */
 				$j('#modify_advanced_form_' + id).hide();
 			});
 		});
@@ -38,11 +47,15 @@
 	<ol>
 		<!-- BEGIN list_item -->
 		<li>
-			<a class='modify_advanced' rel='{LIST_ITEM_ID}'>
+			<div id='list_item_content_{LIST_ITEM_ID}'>
 				<img src='/storage/image.php?size=square64&hash={LIST_ITEM_IMAGEHASH}' class='floatLeft' /><br />
 				<strong>{LIST_ITEM_TITLE}</strong><br />
 				{LIST_ITEM_CONTENT}
-			</a>
+
+				<p>
+					<a class='modify_advanced' rel='{LIST_ITEM_ID}'>Edit</a>
+				</p>
+			</div>
 
 			<form id='modify_advanced_form_{LIST_ITEM_ID}' class='hide modifyForm' action='/eportfolio/component/advancedlist/modifyForm.php' method='post' enctype='multipart/form-data' style='padding:10px;background-color:#fdd'>
 				<input type='hidden' name='action' value='updateItem' />
