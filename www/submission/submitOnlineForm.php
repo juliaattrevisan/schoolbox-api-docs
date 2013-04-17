@@ -43,40 +43,43 @@ catch (Schoolbox\Resource\Exception $e) {
 	// what's access denied error?
 	error(17);
 }
-
+$body     = $_POST['body'];
 $is_draft = isset($_POST['save_draft']);
 $submission
 	->loadIsLate()
 	->setSubmitted(new Alaress_Date_Format(new DateTime('now'), 'U'))
-	->setBody($_POST['body'])
+	->setBody($body)
 	->setDraft($is_draft)
 ;
 $submission_mapper->save($submission);
 
 //
 // Draft? don't send to Plagscan yet.
-//if (!$is_draft) {
-//
-//	$plagscanApiKey   = Config::get('plagscan_api_key');
-//	$plagscanUsername = Config::get('plagscan_username');
-//
-//	/* Submit to PlagScan for plagiarism check */
-//	if (!empty($plagscanApiKey) && !empty($plagscanUsername)) {
-//		if ( is_numeric($submissionId) ) {
-//			$document = new Plagscan_Document();
-//			$document->fileId = $submissionId;
-//			$document->file = array(
-//				'id' => $submissionId,
-//				'name' => $_FILES['file']['name'],
-//				'file' => $submitDir . "$submissionId.dat"
-//			);
-//			// argument[1] ('true') here sends the redirect header and closes the connection, but allows us to continue processing
-//			$page->localRedir('/submission/submissionHistory/'.$_POST['box_id'].'/'.$_SESSION['id'], true);
-//			Plagscan_DocumentMapper::getInstance()->save($document);
-//			exit;
-//		}
-//	}
-//}
+if (!$is_draft) {
+	$plagscanApiKey   = Config::get('plagscan_api_key');
+	$plagscanUsername = Config::get('plagscan_username');
+	$submission_id    = $submission->getId();
+
+	if (!empty($plagscanApiKey) && !empty($plagscanUsername) && !empty($submission_id)) {
+		$document = new Plagscan_Document();
+		$document->fileId = $submission_id;
+
+		//
+		// Make a temp file for Plagscan to work with.
+		$tempfile = tempnam(sys_get_temp_dir(), 'pgs');
+		file_put_contents($tempfile, $body);
+		$document->file = array(
+			'id'   => $submission_id,
+			'name' => $_FILES['file']['name'],
+			'file' => $submission->getFilename(),
+		);
+
+		// argument[1] ('true') here sends the redirect header and closes the connection, but allows us to continue processing
+		$page->localRedir('/submission/submissionHistory/'.$_POST['box_id'].'/'.$_SESSION['id'], true);
+		Plagscan_DocumentMapper::getInstance()->save($document);
+		exit;
+	}
+}
 
 
 $page->localRedir('/submission/submissionHistory/'.$_POST['box_id'].'/'.$_SESSION['id']);
