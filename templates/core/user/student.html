@@ -157,16 +157,20 @@
             <ul>
                 <li>
                     <div class="profile">
-                        <a href="#" id="spouse" class="teacher-profile">
+                        <a href="#" class="teacher-profile">
                             <span class="name">{CONTACT_NAME}</span>
                             <span class="role">{CONTACT_ROLE}</span>
                             <span class="icon"></span>
                         </a>
+                        <!-- BEGIN contact_email -->
                         <a class="mail-teacher" href="{CONTACT_EMAIL}">Mail</a>
-                        <!--Mobile-->
+                        <!-- END contact_email -->
+                        <!-- BEGIN contact_mobile -->
                         <span class="mobile">{CONTACT_MOBILE_PHONE}</span>
-                        <!--Work-->
+                        <!-- END contact_mobile -->
+                        <!-- BEGIN contact_phone -->
                         <span class="phone">{CONTACT_OCCUP_PHONE}</span>
+                        <!-- END contact_phone -->
                     </div>
                 </li>
             </ul>
@@ -175,25 +179,22 @@
             <ul class="contact-phone">
                 <li>
                     <div class="profile">
-                        <a href="#" id="spouse" class="teacher-profile">
-                            <span class="name">{SPOUSE_NAME_EMAIL}</span>
-                            <span class="role">{CONTACT_ROLE}</span>
+                        <a href="#" class="teacher-profile">
+                            <span class="name">{SPOUSE_NAME}</span>
+                            <span class="role">{SPOUSE_ROLE}</span>
                             <span class="icon"></span>
                         </a>
-                        <a class="mail-teacher" href="{CONTACT_EMAIL}">Mail</a>
-                        <!--Mobile-->
-                        <span class="mobile">{CONTACT_MOBILE_PHONE}</span>
-                        <!--Work-->
-                        <span class="phone">{CONTACT_OCCUP_PHONE}</span>
+
+                        <!-- BEGIN spouse_email -->
+                        <a class="mail-teacher" href="{SPOUSE_EMAIL}">Mail</a>
+                        <!-- END spouse_email -->
+                        <!-- BEGIN spouse_mobile -->
+                        <span class="mobile">{SPOUSE_MOBILE_PHONE}</span>
+                        <!-- END spouse_mobile -->
+                        <!-- BEGIN spouse_phone -->
+                        <span class="phone">{SPOUSE_OCCUP_PHONE}</span>
+                        <!-- END spouse_phone -->
                     </div>
-                    <!--<div class="profile">
-                        <a href="#" id="spouse" class="teacher-profile">
-                            {SPOUSE_NAME_EMAIL}
-                            <span class="role">{CONTACT_ROLE}</span>
-                        </a>
-                    </div>
-                    <span class="mobile">{SPOUSE_MOBILE_PHONE}</span>
-                    <span class="phone">{SPOUSE_OCCUP_PHONE}</span>-->
                 </li>
             </ul>
             <!-- END spouse_details -->
@@ -217,6 +218,7 @@
             <!-- BEGIN edit_emergency -->
             <!-- END edit_emergency -->
 
+            <!-- BEGIN emergency_contact -->
             <dl>
                 <dt><b>Name:</b></dt>
                 <dd>{EMERGENCY_NAME}</dd>
@@ -227,26 +229,7 @@
                 <dt><b>Alt. Phone:</b></dt>
                 <dd>{EMERGENCY_ALT_PHONE}</dd>
             </dl>
-            <dl>
-                <dt class="dark"><b>Name:</b></dt>
-                <dd class="dark">{EMERGENCY_NAME_2}</dd>
-
-                <dt><b>Phone:</b></dt>
-                <dd>{EMERGENCY_PHONE_2}</dd>
-
-                <dt class="dark"><b>Alt. Phone:</b></dt>
-                <dd class="dark">{EMERGENCY_ALT_PHONE_2}</dd>
-            </dl>
-            <dl>
-                <dt><b>Name:</b></dt>
-                <dd>{EMERGENCY_NAME_3}</dd>
-
-                <dt class="dark"><b>Phone:</b></dt>
-                <dd class="dark">{EMERGENCY_PHONE_3}</dd>
-
-                <dt><b>Alt. Phone:</b></dt>
-                <dd>{EMERGENCY_ALT_PHONE_3}</dd>
-            </dl>
+            <!-- END emergency_contact -->
 
         </div>
         <!-- END contact_synergy -->

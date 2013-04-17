@@ -34,7 +34,14 @@ if (is_numeric($this->arg[0])) {
         $this->setBlock('contact_synergy', 'edit_contact', 'edit_contact_block');
         $this->setBlock('contact_synergy', 'contact_details', 'contact_details_block');
         $this->setBlock('contact_synergy', 'contact_alert', 'contact_alert_block');
+	    $this->setBlock('contact_details', 'contact_email', 'contact_email_block');
+	    $this->setBlock('contact_details', 'contact_mobile', 'contact_mobile_block');
+	    $this->setBlock('contact_details', 'contact_phone', 'contact_phone_block');
         $this->setBlock('contact_details', 'spouse_details', 'spouse_details_block');
+	    $this->setBlock('contact_synergy', 'emergency_contact', 'emergency_contact_block');
+	    $this->setBlock('spouse_details', 'spouse_email', 'spouse_email_block');
+	    $this->setBlock('spouse_details', 'spouse_mobile', 'spouse_mobile_block');
+	    $this->setBlock('spouse_details', 'spouse_phone', 'spouse_phone_block');
         $this->setBlock(TEMPLATE_content, 'medical', 'medical_block');
         $this->setBlock(TEMPLATE_content, 'subject', 'subject_block');
         $this->setBlock('subject', 'subject_row', 'subject_row_block');
@@ -271,15 +278,6 @@ if (is_numeric($this->arg[0])) {
                     'YCOORD' => $coordTeacher,
                     'LOCKER' => Scrub::text($synInfo['StudentLockerBook']),
                     'BIRTHDATE' => date('j F Y', $synInfo['StudentBirthDate']),
-                    'EMERGENCY_NAME' => Scrub::text($synInfo['StudentEmergencyName']),
-                    'EMERGENCY_PHONE' => Scrub::text($synInfo['StudentEmergencyPhone']),
-                    'EMERGENCY_ALT_PHONE' => Scrub::text($synInfo['StudentEmergencyPhoneAlt']),
-                    'EMERGENCY_NAME_2' => Scrub::text($synInfo['StudentEmergency2Name']),
-                    'EMERGENCY_PHONE_2' => Scrub::text($synInfo['StudentEmergency2Phone']),
-                    'EMERGENCY_ALT_PHONE_2' => Scrub::text($synInfo['StudentEmergency2PhoneAlt']),
-                    'EMERGENCY_NAME_3' => Scrub::text($synInfo['StudentEmergency3Name']),
-                    'EMERGENCY_PHONE_3' => Scrub::text($synInfo['StudentEmergency3Phone']),
-                    'EMERGENCY_ALT_PHONE_3' => Scrub::text($synInfo['StudentEmergency3PhoneAlt']),
                     'MEDICAL_NOTE' => Scrub::text($synInfo['StudentMedicalAlert']),
                     'CONTACT_ALERT_MESSAGE' => Scrub::text($synInfo['AlertMessage']),
                     'STUDENT_TYPE' => $synUserHandler->determineBoarderType($synInfo['StudentBoarder']),
@@ -369,37 +367,24 @@ if (is_numeric($this->arg[0])) {
                 }
 
                 $studentContactList = $synUserHandler->getStudentContactList($user['synergy_id']);
-
                 if (is_array($studentContactList)) {
                     foreach ($studentContactList as $studentContact) {
-
                         if ((int)$studentContact['StudentContactID'] == (int)$_SESSION['sid'] || $studentContact['StudentContactSpouseID'] == $_SESSION['sid'] || $groupHandler->isStaff() || $_SESSION['su']) {
                             $j++;
 
-                            if ($studentContact['StudentContactDefaultEmail']) {
-                                $contactName = '<a href="' . $_SESSION['mailhandle'] . $studentContact['StudentContactDefaultEmail'] . '">' . Scrub::text(
-                                    $studentContact['StudentContactTitle'] . ' ' . $studentContact['StudentContactPreferred'] . ' ' . $studentContact['StudentContactSurname']
-                                ) . '</a>';
-                            } else {
-                                $contactName = Scrub::text(
-                                    $studentContact['StudentContactTitle'] . ' ' . $studentContact['StudentContactPreferred'] . ' ' . $studentContact['StudentContactSurname']
-                                );
-                            }
+	                        if ($studentContact['StudentContactDefaultEmail']) {
+	                            $contactEmail = $_SESSION['mailhandle'] . $studentContact['StudentContactDefaultEmail'];
+	                        }
 
                             if ($studentContact['StudentContactSpouseDefaultEmail']) {
-                                $spouseName = '<a href="' . $_SESSION['mailhandle'] . $studentContact['StudentContactSpouseDefaultEmail'] . '">' . Scrub::text(
-                                    $studentContact['StudentContactSpouseTitle'] . ' ' . $studentContact['StudentContactSpousePreferred'] . ' ' . $studentContact['StudentContactSpouseSurname']
-                                ) . '</a>';
-                            } else {
-                                $spouseName = Scrub::text(
-                                    $studentContact['StudentContactSpouseTitle'] . ' ' . $studentContact['StudentContactSpousePreferred'] . ' ' . $studentContact['StudentContactSpouseSurname']
-                                );
+                                $spouseEmail = $_SESSION['mailhandle'] . $studentContact['StudentContactSpouseDefaultEmail'];
                             }
 
                             $output = array(
                                 'CONTACT_NAME' => Scrub::text(
                                     $studentContact['StudentContactTitle'] . ' ' . $studentContact['StudentContactPreferred'] . ' ' . $studentContact['StudentContactSurname']
                                 ),
+	                            'CONTACT_ROLE' => Scrub::text($studentContact['StudentContactRelation']),
                                 'CONTACT_ADDRESS' => Scrub::text(
                                     $studentContact['StudentContactAddress1']
                                 ) . '<br>' . Scrub::text(
@@ -408,22 +393,58 @@ if (is_numeric($this->arg[0])) {
                                 'CONTACT_HOME_PHONE' => Scrub::text($studentContact['StudentContactPhoneActual']),
                                 'CONTACT_MOBILE_PHONE' => Scrub::text($studentContact['StudentContactMobilePhone']),
                                 'CONTACT_OCCUP_PHONE' => Scrub::text($studentContact['StudentContactOccupPhone']),
-                                'CONTACT_EMAIL' => $studentContact['StudentContactDefaultEmail'],
+                                'CONTACT_EMAIL' =>  $contactEmail,
                                 'CONTACT_NAME_EMAIL' => $contactName,
                                 'SPOUSE_NAME' => Scrub::text(
                                     $studentContact['StudentContactSpouseTitle'] . ' ' . $studentContact['StudentContactSpousePreferred'] . ' ' . $studentContact['StudentContactSpouseSurname']
                                 ),
+	                            'SPOUSE_ROLE' => Scrub::text($studentContact['StudentContactSpouseRelation']),
                                 'SPOUSE_MOBILE_PHONE' => Scrub::text(
                                     $studentContact['StudentContactSpouseMobilePhone']
                                 ),
                                 'SPOUSE_OCCUP_PHONE' => Scrub::text($studentContact['StudentContactSpouseOccupPhone']),
-                                'SPOUSE_EMAIL' => $studentContact['StudentContactSpouseDefaultEmail'],
-                                'SPOUSE_NAME_EMAIL' => $spouseName,
+                                'SPOUSE_EMAIL' => $spouseEmail,
                             );
 
                             $this->setVar($output);
 
+	                        /* Output each of the block for contact details */
+	                        if($contactEmail)
+		                        $this->parse('contact_email_block','contact_email');
+	                        else
+		                        $this->setVar('contact_email_block','');
+
+							if($studentContact['StudentContactMobilePhone'])
+								$this->parse('contact_mobile_block','contact_mobile');
+							else
+								$this->setVar('contact_mobile_block','');
+
+	                        if($studentContact['StudentContactOccupPhone'])
+		                        $this->parse('contact_phone_block','contact_phone');
+	                        else
+		                        $this->setVar('contact_phone_block','');
+
+
+							/* Has spouse, output spouse */
                             if (trim($studentContact['StudentContactSpouseTitle']) || trim($studentContact['StudentContactSpousePreferred'])) {
+
+	                            /* Output each of the block for contact details */
+	                            if($spouseEmail)
+		                            $this->parse('spouse_email_block','spouse_email');
+	                            else
+		                            $this->setVar('spouse_email_block','');
+
+	                            if($studentContact['StudentContactSpouseMobilePhone'])
+		                            $this->parse('spouse_mobile_block','spouse_mobile');
+	                            else
+		                            $this->setVar('spouse_mobile_block','');
+
+	                            if($studentContact['StudentContactSpouseOccupPhone'])
+		                            $this->parse('spouse_phone_block','spouse_phone');
+	                            else
+		                            $this->setVar('spouse_phone_block','');
+
+
                                 $this->parse('spouse_details_block', 'spouse_details');
                             }
                             else {
@@ -434,6 +455,26 @@ if (is_numeric($this->arg[0])) {
                         }
                     }
                 }
+
+	            /* Output emergency contacts */
+	            if($synInfo['StudentEmergencyName'] ) {
+		            for($x = 1; $x <= 3; $x++) {
+			            $index = $x == 1?'':$x;
+
+			            if($synInfo['StudentEmergency'.$index.'Name']) {
+				            $this->setVar(array(
+		                          'EMERGENCY_NAME' => Scrub::text($synInfo['StudentEmergency'.$index.'Name']),
+		                          'EMERGENCY_PHONE' => Scrub::text($synInfo['StudentEmergency'.$index.'Phone']),
+		                          'EMERGENCY_ALT_PHONE' => Scrub::text($synInfo['StudentEmergency'.$index.'PhoneAlt']),
+				                          ));
+			                $this->parse('emergency_contact_block', 'emergency_contact');
+			            }
+		            }
+	            }
+	            else {
+		            $this->setVar('emergency_contact_block','');
+	            }
+
 
                 if ($groupHandler->isStaff() || (Cfg::get('site_location') != 'mgs' && $groupHandler->isParentOfChild(
                     $user['uid']
