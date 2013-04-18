@@ -264,9 +264,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			$submission_box->setMarkType($marktype_mapper->hydrate($row, 'mt'));
 		}
 
-		//
-		// TODO get submission history for a user as part of submission (or of user?)
-
 		if ($submission_box instanceof SubmissionBox) {
 			foreach ($notify_mapper->findByColumn('box_id', $submission_box->getId()) as $notify) {
 				$submission_box->addNotification($notify);
