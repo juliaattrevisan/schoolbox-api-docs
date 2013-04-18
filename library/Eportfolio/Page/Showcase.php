@@ -26,11 +26,24 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 	 */
 	protected function setup() {
 		$this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
+
+		$this->getPage()->setBlock(TEMPLATE_content, 'showcased_work', 'showcased_work_block');
 	}
 
 	/**
 	 * Render page
 	 */
 	protected function render() {
+		$snapper = new \Eportfolio\ShowcaseMapper();
+
+		$allReturnedWork = $snapper->findShowcasedWork(17);
+
+		foreach($allReturnedWork as $currentReturnedWork) {
+			$this->getPage()->setVar(array(
+				'SHOWCASED_WORK_MARK' => $currentReturnedWork->getSubmissionReturn()->getNormalizedMark(),
+			));
+
+			$this->getPage()->parse('showcased_work_block', 'showcased_work', true);
+		}
 	}
 }
