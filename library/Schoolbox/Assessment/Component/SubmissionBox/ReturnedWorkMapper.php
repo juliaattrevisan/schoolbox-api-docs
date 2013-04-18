@@ -164,6 +164,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 		$filters = array(
 			'sb.category = :category',
 			'sr.owner = :student',
+			'sr.deleted IS FALSE',
 			'sb.deleted IS FALSE',
 		);
 		if (!empty($extra_params['year'])) {
