@@ -53,7 +53,6 @@ class Component_Eportfolio_BasicListController extends Component_Eportfolio_Cont
 			'has_create_form_block' => '',
 			'has_modify_form_block' => '',
 			'has_delete_form_block' => '',
-			'has_image_block' => '',
 			'list_item_block' => '',
 		));
 

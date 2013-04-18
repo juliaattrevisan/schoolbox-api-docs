@@ -53,8 +53,6 @@ class Component_Eportfolio_LinkListController extends Component_Eportfolio_Contr
 			'has_create_form_block' => '',
 			'has_modify_form_block' => '',
 			'has_delete_form_block' => '',
-			'has_item_block' => '',
-			'has_image_block' => '',
 			'list_item_block' => '',
 		));
 
