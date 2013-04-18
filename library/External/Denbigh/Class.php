@@ -71,8 +71,9 @@ class External_Denbigh_Class implements External_ClassInterface {
 			WHERE c.classCode = '$classCode'
 		");
 
-		$teacherList = $statement->fetch(PDO::FETCH_NUM);
-
+		while($teacher = $statement->fetch(PDO::FETCH_NUM)) {
+			$teacherList[] = $teacher[0];
+		}
 		return $teacherList;
 	}
 	
