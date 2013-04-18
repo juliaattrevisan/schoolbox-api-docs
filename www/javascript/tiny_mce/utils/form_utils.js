@@ -69,8 +69,8 @@ function getUploadHTML(id, target_form_element, type, prefix) {
         return "";
 
     html = "";
-    html += '<a id="' + id + '_link" href="javascript:openUploader(\'' + id + '\',\'' + target_form_element + '\', \'' + type + '\',\'' + option + '\');" onmousedown="return false;" class="foo">';
-    html += '<span id="' + id + '" title="' + tinyMCEPopup.getLang('upload') + '">Upload</span></a>';
+    html += '<a id="' + id + '_link" href="javascript:openUploader(\'' + id + '\',\'' + target_form_element + '\', \'' + type + '\',\'' + option + '\');" onmousedown="return false;" class="upload">';
+    html += '<span id="' + id + '" title="' + tinyMCEPopup.getLang('upload') + '">&nbsp;</span></a>';
 
     return html;
 }
