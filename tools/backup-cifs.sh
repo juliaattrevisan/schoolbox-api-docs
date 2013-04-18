@@ -135,7 +135,6 @@ then
 			echo -e "Halting backup." >> $logfile;
 			errorcheck=1;
 		fi
-		exit 1;
 	fi
 	if [ $mount_space -gt 90 ];
 	then
