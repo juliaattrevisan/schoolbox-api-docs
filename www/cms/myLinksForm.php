@@ -1,7 +1,6 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/SitePage.php';
 require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/my-links.php');
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/Eportfolio/Link.php');
 
 $page = new SitePage();
 $myLinksHandler = new MyLinks();
@@ -44,20 +43,6 @@ else {
 		}
 
 		$myLinksHandler->delete($_GET['delete']);
-	}
-	else {
-		if (is_numeric($_GET['share'])) {
-			$ePortfolioHandler = new Eportfolio_Container($_SESSION['id']);
-
-			if ($ePortfolioHandler->isEnabled()) {
-				if (!$myLinksHandler->shareLink($_GET['share'])) {
-					error(52);
-				}
-			}
-			else {
-				error(100);
-			}
-		}
 	}
 }
 

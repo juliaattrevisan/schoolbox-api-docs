@@ -1,14 +1,10 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-links.php';
-require_once($_SERVER['DOCUMENT_ROOT'] . '/../library/Eportfolio/Link.php');
 
 $this->setFile(TEMPLATE_content, 'cms/myLinks.html');
 $this->setBlock(TEMPLATE_content, 'myLink', 'myLink_block');
-$this->setBlock('myLink', 'myLink_exists', 'myLink_exists_block');
-$this->setBlock('myLink', 'myLink_share', 'myLink_share_block');
 
 $myLinksHandler = new MyLinks();
-$ePortfolioLinkHandler = new Eportfolio_Link();
 
 $allLinks = $myLinksHandler->getAllByField('owner', $_SESSION['id']);
 
@@ -20,37 +16,9 @@ if (is_array($allLinks)) {
 			'MYLINK_ID' => $currentLink['id'],
 		));
 
-		/* Indicate whether link is already shared on ePortfolio
-		 */
-		$exists = $ePortfolioLinkHandler->getAllByFields(array(
-			'owner' => $_SESSION['id'],
-			'url' => $currentLink['url'],
-		));
-
-		if ($_SESSION['eportfolio_enabled']) {
-			if ($exists) {
-				$this->parse('myLink_exists_block', 'myLink_exists');
-				$this->setVar('myLink_share_block', '');
-			}
-			else {
-				$this->setVar('myLink_exists_block', '');
-				$this->parse('myLink_share_block', 'myLink_share');
-			}
-		}
-		else {
-			$this->setVar(array(
-				'myLink_exists_block' => '',
-				'myLink_share_block' => '',
-			));
-		}
-
 		$this->parse('myLink_block', 'myLink', true);
-
-		$this->setVar('myLink_exists_block', '');
-		$this->setVar('myLink_share_block', '');
 	}
 }
 else {
 	$this->setVar('myLink_block', '');
 }
-?>
