@@ -190,9 +190,6 @@ class Mapper extends BaseMapper {
 	 * @return $this
 	 */
 	protected function hasSoftDeleteField($column, $deleted_value = true, $undeleted_value = false) {
-		//
-		// TODO implement soft deletes
-		// Consider true_value and false_value - true:false, null:now()
 		$this->soft_delete_column          = $column;
 		$this->soft_delete_deleted_value   = $deleted_value;
 		$this->soft_delete_undeleted_value = $undeleted_value;
