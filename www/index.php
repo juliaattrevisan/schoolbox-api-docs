@@ -28,6 +28,10 @@ else {
 
 $page = new SitePage();
 
+$mapper = new \Schoolbox\Assessment\Component\OnlineAssessmentMapper();
+$models = $mapper->findAll();
+$mapper->delete($models);
+
 $page->loadContent($pageName);
 
 $page->outputPage();

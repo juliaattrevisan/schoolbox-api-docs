@@ -22,6 +22,14 @@ class Mapper extends BaseMapper {
      */
     protected $column_factory;
 
+    /**
+     * Overrides constructor as public, so that new instances can be created
+     * without going through getInstance().
+     */
+    public function __construct() {
+        parent::__construct();
+    }
+
 	/**
 	 * The column that is used for storing if this field has been soft deleted.
 	 *
