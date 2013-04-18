@@ -101,7 +101,7 @@ if ($permission >= WRITE_ACCESS) {
                 'HOMEPAGE_COMPONENT_ID' => Scrub::text($component->id),
                 'HOMEPAGE_COMPONENT_NAME' => Scrub::text($component->name),
                 'HOMEPAGE_COMPONENT_COUNT' => $component->instanceCount,
-                'HOMEPAGE_COMPONENT_DESCRIPTION' => Scrub::text($component->description),
+                'HOMEPAGE_COMPONENT_DESCRIPTION' => Scrub::html($component->description),
                 'HOMEPAGE_COMPONENT_CLASS' => $class,
                 'HOMEPAGE_COMPONENT_CATEGORY_ID' => $previous->componentCategory,
             );

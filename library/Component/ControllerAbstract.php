@@ -298,7 +298,7 @@ abstract class Component_ControllerAbstract {
                 if ($conf = Component_Config_Factory::build($key, $this->context, $fields)) {
                     $templateFile = "component/config/$key.html";
                     $page->setFile($key, $templateFile);
-                    $conf->parse($page, $key, $key, $params['value']);
+                    $conf->parse($page, $key, $key, Scrub::text($params['value']));
                     $page->parse('CONFIG_ELEMENT_CONTENT', $key);
 
                     $page->setVar('CONFIG_DISPLAY', $params['label'] ? '' : ' style="display:none;"');
