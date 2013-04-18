@@ -9,6 +9,13 @@
 abstract class Component_Eportfolio_ControllerAbstract extends Component_ControllerAbstract {
 
 	/**
+	 * A mapper instance, for polymorphism
+	 *
+	 * @var null
+	 */
+	protected $mapperClass = null;
+
+	/**
 	 * Apply permissions here
 	 *
 	 * @param array $context
@@ -40,4 +47,20 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
         return parent::getTemplate($templateName, $templatePath);
     }
 
+	/* Getters/Setters
+	 */
+
+	/**
+	 * @param null $mapperClass
+	 */
+	protected function setMapperClass($mapperClass) {
+		$this->mapperClass = $mapperClass;
+	}
+
+	/**
+	 * @return null
+	 */
+	protected function getMapperClass() {
+		return $this->mapperClass;
+	}
 }

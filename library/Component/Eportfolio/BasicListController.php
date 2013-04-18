@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Eportfolio_BasicListController extends Component_Eportfolio_ListController {
+class Component_Eportfolio_BasicListController extends Component_Eportfolio_ControllerAbstract {
 
 	/**
 	 * A mapper instance, for polymorphism
