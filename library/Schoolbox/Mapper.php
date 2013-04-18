@@ -26,6 +26,27 @@ class Mapper extends BaseMapper {
         parent::__construct();
     }
 
+	/**
+	 * The column that is used for storing if this field has been soft deleted.
+	 *
+	 * @var string
+	 */
+	protected $soft_delete_column = null;
+
+	/**
+	 * The value for the soft delete column when the row is soft deleted.
+	 *
+	 * @var mixed
+	 */
+	protected $soft_delete_deleted_value = null;
+
+	/**
+	 * The value for the soft delete column when the row is not deleted.
+	 *
+	 * @var mixed
+	 */
+	protected $soft_delete_undeleted_value = null;
+
     protected function setup() {
         $this->setColumnFactory(new ColumnFactory());
     }
@@ -180,5 +201,146 @@ class Mapper extends BaseMapper {
 		$this->soft_delete_deleted_value   = $deleted_value;
 		$this->soft_delete_undeleted_value = $undeleted_value;
 		return $this;
+	}
+
+	/**
+	 * Overrides delete() method to call softDelete if a soft delete field was
+	 * set up, or parent's delete() method if it wasn't.
+	 *
+	 * @param $object
+	 *
+	 * @return bool
+	 */
+	public function delete($object) {
+		if (isset($this->soft_delete_column)) {
+			return $this->softDelete($object);
+		}
+		else {
+			return $this->hardDelete($object);
+		}
+	}
+
+	/**
+	 * Soft deletes one or more models.
+	 *
+	 * @param object $object Model or collection of models to delete
+	 *
+	 * @return bool
+	 */
+	public function softDelete($object) {
+		if (!isset($this->soft_delete_column)) {
+			return false;
+		}
+		return $this->updateAll(
+			$object,
+			$this->soft_delete_column,
+			$this->soft_delete_deleted_value,
+			'preSoftDelete',
+			'postSoftDelete'
+		);
+	}
+
+	/**
+	 * Alias for parent's delete() method.
+	 *
+	 * @param object $object Model or collection of models to delete
+	 *
+	 * @return bool
+	 */
+	public function hardDelete($object) {
+		return parent::delete($object);
+	}
+
+	/**
+	 * Restores one or more models that were soft deleted.
+	 *
+	 * @param object $object Model or collection of models to restore
+	 *
+	 * @return bool
+	 */
+	public function restoreSoftDeleted($object) {
+		if (!isset($this->soft_delete_column)) {
+			return false;
+		}
+		return $this->updateAll(
+			$object,
+			$this->soft_delete_column,
+			$this->soft_delete_undeleted_value,
+			'preSoftDeleteRestore',
+			'postSoftDeleteRestore'
+		);
+	}
+
+	/**
+	 * Updates a field on all rows that match a model.
+	 *
+	 * @param object $model        Model or collection of models to update.
+	 * @param string $field        The column name to update.
+	 * @param mixed  $value        The value to set the column to.
+	 * @param string $pre_trigger  Event to trigger callbacks for before
+	 *                             updating, if any.
+	 * @param string $post_trigger Event to trigger callbacks for after
+	 *                             updating, if any.
+	 *
+	 * @return bool
+	 */
+	public function updateAll($model, $field, $value, $pre_trigger = null, $post_trigger = null) {
+
+		//
+		// Trigger the pre-trigger callback, if there is one.
+		if (isset($pre_trigger)) {
+			foreach ($collection as $model) {
+				if (!($this->triggerCallbacks($pre_trigger, $model))) {
+					return false;
+				}
+			}
+		}
+
+		$identifier = $this->getIdentifier();
+		$id_column  = $identifier['column'];
+		$collection = $this->getModelAsCollection($object);
+
+		//
+		// Get the property to set on each model from the column.
+		$property_map = null;
+		foreach ($this->map as $map) {
+			if ($map['column'] === $field) {
+				$property_map = $map;
+				break;
+			}
+		}
+		$id_values = array();
+		foreach ($collection as $model) {
+			if (isset($property_map)) {
+				$this->setModelProperty($model, $property_map['property'], $value, $property_map);
+			}
+			$id_values[] = $this->getModelProperty($model, $id_column, $identifier);
+		}
+		if (empty($id_values)) {
+			return false;
+		}
+
+		$query = "
+			UPDATE `{$this->getTable()}`
+			SET `$field` = :value
+			WHERE `$id_column` IN {$this->getArrayPlaceholders($id_values, 'id')}
+		";
+		$statement = $this->database->prepare($query);
+		$statement->bindValue('value', $value);
+		foreach ($this->getArrayParameters($id_values, 'id') as $key => $id) {
+			$statement->bindValue($key, $id);
+		}
+
+		$this->database->beginTransaction();
+		$result = $statement->execute();
+		$this->database->commit();
+
+		if (isset($post_trigger)) {
+			foreach ($collection as $model) {
+				$this->triggerCallbacks($post_trigger, $model);
+			}
+		}
+
+		return $result;
 	}
 }
