@@ -53,7 +53,6 @@ class Component_Eportfolio_BasicListController extends Component_Eportfolio_Cont
 			'has_create_form_block' => '',
 			'has_modify_form_block' => '',
 			'has_delete_form_block' => '',
-			'has_item_block' => '',
 			'has_image_block' => '',
 			'list_item_block' => '',
 		));
@@ -88,7 +87,6 @@ class Component_Eportfolio_BasicListController extends Component_Eportfolio_Cont
 
 				/* Clear children after parsing out the parent
 				 */
-				$this->setVar('has_image_block', '');
 				$this->setVar('has_modify_form_block', '');
 				$this->setVar('has_delete_form_block', '');
 			}
