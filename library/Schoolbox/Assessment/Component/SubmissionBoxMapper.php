@@ -517,6 +517,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 					LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
 					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 					AND sb.open_date < NOW()
+					AND sb.deleted IS FALSE
 					ORDER BY sb.open_date DESC
 					LIMIT :limit
 				",
@@ -538,6 +539,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 					AND sm.id IS NULL
 					AND sb.date < NOW()
+					AND sb.deleted IS FALSE
 					ORDER BY sb.date DESC
 					LIMIT :limit
 				",
@@ -555,6 +557,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 					LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
 					WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 					AND sb.late_date < NOW()
+					AND sb.deleted IS FALSE
 					ORDER BY sb.late_date DESC
 					LIMIT :limit
 				",
