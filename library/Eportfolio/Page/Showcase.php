@@ -45,7 +45,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 	protected function render() {
 		$snapper = new \Eportfolio\ShowcaseMapper();
 
-		$allReturnedWork = $snapper->findShowcasedWork(17);
+		$allReturnedWork = $snapper->findShowcasedWork($this->getUserId());
 
 		if ($allReturnedWork->count()) {
 			$previousCategory = null;
