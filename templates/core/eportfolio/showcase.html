@@ -17,6 +17,22 @@
 		width: 100%;
 	}
 </style>
+<style type='text/css'>
+	.showcasedWork li {
+		padding: 30px 30px 0px 0px;
+		clear: both;
+	}
+
+	.showcasedWork li span.boxName {
+		font-size: 16px;
+		font-weight: bold;
+	}
+
+	.showcasedWork li span.mark {
+		font-size: 32px;
+		font-family: Garamond,serif;
+	}
+</style>
 <div class='horizontalList'>
 	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Profile</a></li>
 	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
@@ -29,11 +45,19 @@
 </div>
 
 <div class='clearfix'></div>
+<h1>Showcased Work for {USER_FIRSTNAME} {USER_LASTNAME}</h1>
 
-<ul>
+<ul class='showcasedWork'>
 	<!-- BEGIN showcased_work -->
 	<li>
-		{SHOWCASED_WORK_MARK}
+		<div style='width: 80px;float:left'>
+			<span class='mark'>{SHOWCASED_WORK_MARK}</span>
+			<span>{SHOWCASED_WORK_FILESIZE}</span>
+		</div>
+		<div style='width: auto;float:left'>
+			<span class='boxName'>{SHOWCASED_WORK_BOX}</span><br />
+			<span>{SHOWCASED_WORK_CATEGORY}</span><br />
+		</div>
 	</li>
 	<!-- END showcased_work -->
 </ul>
