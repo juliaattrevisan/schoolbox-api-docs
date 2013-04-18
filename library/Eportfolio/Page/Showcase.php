@@ -29,6 +29,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 		$this->getPage()->setBlock(TEMPLATE_content, 'has_showcased_work', 'has_showcased_work_block');
 		$this->getPage()->setBlock('has_showcased_work', 'showcased_work', 'showcased_work_block');
 		$this->getPage()->setBlock('showcased_work', 'showcased_work_category', 'showcased_work_category_block');
+		$this->getPage()->setBlock('showcased_work', 'has_modify_form', 'has_modify_form_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'no_showcased_work', 'no_showcased_work_block');
 
 		$user = $this->getUser();
@@ -69,11 +70,21 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 					$this->getPage()->parse('showcased_work_category_block', 'showcased_work_category');
 				}
 
+				/* Unpublish control
+				 */
+				if ($this->getPermission() >= WRITE_ACCESS) {
+					$this->getPage()->parse('has_modify_form_block', 'has_modify_form');
+				}
+				else {
+					$this->getPage()->setVar('has_modify_form_block', '');
+				}
+
 				$this->getPage()->parse('showcased_work_block', 'showcased_work', true);
 
 				/* Clear children after parsing out the parent
 				 */
 				$this->getPage()->setVar('showcased_work_category_block', '');
+				$this->getPage()->setVar('has_modify_form_block', '');
 			}
 
 			$this->getPage()->parse('has_showcased_work_block', 'has_showcased_work');
