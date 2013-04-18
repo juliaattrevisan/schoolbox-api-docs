@@ -60,3 +60,14 @@ CREATE TABLE `eportfolio_component_linklist_item`( `id` INT(11) NOT NULL AUTO_IN
 /* Add textbox item table
  */
 CREATE TABLE `eportfolio_component_textbox_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `component_instance_id` INT(11) NOT NULL, `content` TEXT, `sequence` INT(11), PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
+
+/* Remove excess tables again
+ */
+DROP TABLE eportfolio_comp_category;
+DROP TABLE eportfolio_comp_location;
+DROP TABLE eportfolioComponentCategory;
+DROP TABLE eportfolioTemplateLayout;
+
+/* Add showcased work table
+ */
+CREATE TABLE `eportfolio_showcase_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `submission_return_id` INT(11), `uid` INT(11), PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
