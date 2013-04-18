@@ -410,6 +410,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 				LEFT JOIN student_submission ss ON ss.box_id = sb.id
 				LEFT JOIN submission_return  sr ON sr.box_id = sb.id
 				WHERE (ss.owner = :user_id OR sr.owner = :user_id)
+				AND sb.deleted IS FALSE
 				AND (
 					(YEAR(ss.submitted) = :year AND MONTH(ss.submitted) BETWEEN :month_start AND :month_end)
 					OR
@@ -677,6 +678,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$where_parts = array(
 			'sb.late_date > NOW()',
 			'sb.accept_submission IS TRUE',
+			'sb.deleted IS FALSE',
 		);
 		if ($cat_ids) {
 			$params        = $this->getArrayParameters($cat_ids, 'cat');
