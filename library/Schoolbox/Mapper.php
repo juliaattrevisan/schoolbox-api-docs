@@ -159,4 +159,21 @@ class Mapper extends BaseMapper {
     public function createCollection($contents = array()) {
         return new Collection($contents);
     }
+
+	/**
+	 * Sets this mapper as implementing soft deletes.
+	 *
+	 * @param string $column The name of the column used for storing whether a
+	 *                       row is soft deleted.
+	 * @param int    $type   The type of the soft delete field - if it's
+	 *                       self::TYPE_DATETIME, it's set to the current date
+	 *                       if deleted, otherwise it's set to true/false.
+	 *
+	 * @return $this
+	 */
+	protected function hasSoftDeleteField($column, $type = self::TYPE_BOOLEAN) {
+		//
+		// TODO implement soft deletes
+		return $this;
+	}
 }
