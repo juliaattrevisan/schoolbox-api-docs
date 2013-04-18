@@ -133,3 +133,19 @@ li.node-template {
 	font-weight: bold;
 	text-transform: uppercase;
 }
+
+#file-uploader-frame p {
+    font-style: italic;
+    font-size: 0.9em;
+}
+#file-uploader-frame span {
+    display: block;
+    margin: 6px 0;
+}
+#file-uploader-frame #description {
+    width: 200px;
+}
+#file-uploader-frame .submit {
+    position: absolute;
+    bottom: 8px;
+}

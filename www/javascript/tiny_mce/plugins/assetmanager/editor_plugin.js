@@ -96,6 +96,22 @@
             });
         },
 
+        fileUploader : function(field_name, url, type, win) {
+            var ed = tinyMCE.activeEditor;
+
+            ed.windowManager.open({
+                url : this.url + '/file_uploader.php',
+                width: 384 + parseInt(ed.getLang('amadeo_draft.delta_width', 0)),
+                height : 192 + parseInt(ed.getLang('amadeo_draft.delta_height', 0)),
+                movable : true,
+                inline : true
+            }, {
+                window	: win,
+                input : field_name
+            });
+        },
+
+
 		/**
 		 * Creates control instances based in the incomming name. This method is normally not
 		 * needed since the addButton method of the tinymce.Editor class is a more easy way of adding buttons

@@ -61,21 +61,7 @@ $(function () {
 	});
 
 
-	/* validate form */
-	$('#upload-form').submit(function (event) {
-		event.stopPropagation();
-			if ($('#description').val() == '') {
-				alert('Please enter a description for the file.');
-				return false;
-			}
 
-			if ($('#file').val() == '') {
-				alert('Please browse for and select a file to upload.');
-				return false;
-			}
-
-		return true;
-	});
 
 	/* select image */
 	$('#file-list li').live('click', function () {
@@ -174,9 +160,11 @@ $(window).load(function () {
 </script>
 <base target="_self" />
 </head>
-<body>
+<body id="file-browser-frame">
 
 <div id="content">
+  <!-- TO BE DELETED -->
+  <!--
   <div class="control">
     <form action="/cms/fileForm.php" method="post" enctype="multipart/form-data" id="upload-form">
 
@@ -187,6 +175,8 @@ $(window).load(function () {
         <input type="submit" class="submit" value="Upload" />
     </form>
   </div>
+  -->
+  <!-- /DELETION -->
   <div class="left">
     <ul id="tree">
       <li id="node-0" class="server"><span class="root">Resources</span></li>
