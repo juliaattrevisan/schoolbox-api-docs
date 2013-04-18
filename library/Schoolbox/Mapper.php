@@ -278,7 +278,7 @@ class Mapper extends BaseMapper {
 	/**
 	 * Updates a field on all rows that match a model.
 	 *
-	 * @param object $model        Model or collection of models to update.
+	 * @param object $object       Model or collection of models to update.
 	 * @param string $field        The column name to update.
 	 * @param mixed  $value        The value to set the column to.
 	 * @param string $pre_trigger  Event to trigger callbacks for before
@@ -288,10 +288,13 @@ class Mapper extends BaseMapper {
 	 *
 	 * @return bool
 	 */
-	public function updateAll($model, $field, $value, $pre_trigger = null, $post_trigger = null) {
+	public function updateAll($object, $field, $value, $pre_trigger = null, $post_trigger = null) {
+
+		$identifier = $this->getIdentifier();
+		$collection = $this->getModelAsCollection($object);
 
 		//
-		// Trigger the pre-trigger callback, if there is one.
+		// Trigger the pre-trigger, if there is one.
 		if (isset($pre_trigger)) {
 			foreach ($collection as $model) {
 				if (!($this->triggerCallbacks($pre_trigger, $model))) {
@@ -300,12 +303,8 @@ class Mapper extends BaseMapper {
 			}
 		}
 
-		$identifier = $this->getIdentifier();
-		$id_column  = $identifier['column'];
-		$collection = $this->getModelAsCollection($object);
-
 		//
-		// Get the property to set on each model from the column.
+		// Get the property to update on each model, if there is one.
 		$property_map = null;
 		foreach ($this->map as $map) {
 			if ($map['column'] === $field) {
@@ -313,32 +312,38 @@ class Mapper extends BaseMapper {
 				break;
 			}
 		}
+
+		//
+		// Get list of IDs to update, and update property on each model
 		$id_values = array();
 		foreach ($collection as $model) {
 			if (isset($property_map)) {
 				$this->setModelProperty($model, $property_map['property'], $value, $property_map);
 			}
-			$id_values[] = $this->getModelProperty($model, $id_column, $identifier);
+			$id_values[] = $this->getModelProperty($model, $identifier['property'], $identifier);
 		}
 		if (empty($id_values)) {
 			return false;
 		}
 
+		//
+		// Run update query
 		$query = "
 			UPDATE `{$this->getTable()}`
 			SET `$field` = :value
-			WHERE `$id_column` IN {$this->getArrayPlaceholders($id_values, 'id')}
+			WHERE `{$identifier['column']}` IN {$this->getArrayPlaceholders($id_values, 'id')}
 		";
 		$statement = $this->database->prepare($query);
 		$statement->bindValue('value', $value);
 		foreach ($this->getArrayParameters($id_values, 'id') as $key => $id) {
 			$statement->bindValue($key, $id);
 		}
-
 		$this->database->beginTransaction();
 		$result = $statement->execute();
 		$this->database->commit();
 
+		//
+		// Trigger the post-trigger, if there is one.
 		if (isset($post_trigger)) {
 			foreach ($collection as $model) {
 				$this->triggerCallbacks($post_trigger, $model);
