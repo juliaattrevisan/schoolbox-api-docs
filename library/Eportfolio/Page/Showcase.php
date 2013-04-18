@@ -26,7 +26,9 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 	 */
 	protected function setup() {
 		$this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
-		$this->getPage()->setBlock(TEMPLATE_content, 'showcased_work', 'showcased_work_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'has_showcased_work', 'has_showcased_work_block');
+		$this->getPage()->setBlock('has_showcased_work', 'showcased_work', 'showcased_work_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'no_showcased_work', 'no_showcased_work_block');
 
 		$user = $this->getUser();
 
@@ -44,16 +46,25 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 
 		$allReturnedWork = $snapper->findShowcasedWork(17);
 
-		foreach($allReturnedWork as $currentReturnedWork) {
-			$this->getPage()->setVar(array(
-				'SHOWCASED_WORK_CATEGORY' => $currentReturnedWork->getSubmissionReturn()->getSubmissionBox()->getCategory()->getName(),
-				'SHOWCASED_WORK_BOX' => $currentReturnedWork->getSubmissionReturn()->getSubmissionBox()->getName(),
-				'SHOWCASED_WORK_MARK' => $currentReturnedWork->getSubmissionReturn()->getMark(),
-				'SHOWCASED_WORK_FILESIZE' => $currentReturnedWork->getSubmissionReturn()->getFilesize(),
-				'SHOWCASED_WORK_ITEM_ID' => $currentReturnedWork->getId(),
-			));
+		if ($allReturnedWork->count()) {
+			foreach($allReturnedWork as $currentReturnedWork) {
+				$this->getPage()->setVar(array(
+					'SHOWCASED_WORK_CATEGORY' => $currentReturnedWork->getSubmissionReturn()->getSubmissionBox()->getCategory()->getName(),
+					'SHOWCASED_WORK_BOX' => $currentReturnedWork->getSubmissionReturn()->getSubmissionBox()->getName(),
+					'SHOWCASED_WORK_MARK' => $currentReturnedWork->getSubmissionReturn()->getMark(),
+					'SHOWCASED_WORK_FILESIZE' => $currentReturnedWork->getSubmissionReturn()->getFilesize(),
+					'SHOWCASED_WORK_ITEM_ID' => $currentReturnedWork->getId(),
+				));
 
-			$this->getPage()->parse('showcased_work_block', 'showcased_work', true);
+				$this->getPage()->parse('showcased_work_block', 'showcased_work', true);
+			}
+
+			$this->getPage()->parse('has_showcased_work_block', 'has_showcased_work');
+			$this->getPage()->setVar('no_showcased_work_block', '');
+		}
+		else {
+			$this->getPage()->parse('no_showcased_work_block', 'no_showcased_work');
+			$this->getPage()->setVar('has_showcased_work_block', '');
 		}
 	}
 }
