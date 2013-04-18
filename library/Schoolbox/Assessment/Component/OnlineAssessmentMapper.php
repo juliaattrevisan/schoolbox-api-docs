@@ -145,6 +145,7 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 					LEFT JOIN {$this->getJoinSql('category', 'a', 'c')}
 					WHERE a.category_id IN {$this->getArrayPlaceholders($categories, 'category')}
 					AND a.start < NOW()
+					AND a.deleted_at IS NULL
 					ORDER BY a.start DESC
 					LIMIT :limit
 				",
@@ -161,6 +162,7 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 					LEFT JOIN {$this->getJoinSql('category', 'a', 'c')}
 					WHERE a.category_id IN {$this->getArrayPlaceholders($categories, 'category')}
 					AND a.finish < NOW()
+					AND a.deleted_at IS NULL
 					ORDER BY a.finish DESC
 					LIMIT :limit
 				",
