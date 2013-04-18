@@ -45,7 +45,9 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 		/* Set up blocks and stuff
 		 */
 		$this->setBlock($templateHandle, 'list_item', 'list_item_block');
+		$this->setBlock('list_item', 'has_image', 'has_image_block');
 		$this->setVar('list_item_block', '');
+		$this->setVar('has_image_block', '');
 
 		/* Gather everything
 		 */
@@ -59,14 +61,24 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 					'LIST_ITEM_ID' => $currentItem->getId(),
 					'LIST_ITEM_TITLE' => $currentItem->getTitle(),
 					'LIST_ITEM_CONTENT' => $currentItem->getContent(),
-					'LIST_ITEM_IMAGEHASH' => $currentItem->getImagehash(),
 				));
 
+				/* Parse out the image if one was assigned
+				 */
+				if (strlen($currentItem->getImagehash())) {
+					$this->setVar(array(
+						'LIST_ITEM_IMAGEHASH' => $currentItem->getImagehash(),
+					));
+
+					$this->parse('has_image_block', 'has_image');
+				}
+
 				$this->parse('list_item_block', 'list_item', true);
+
+				/* Clear children after parsing out the parent
+				 */
+				$this->setVar('has_image_block', '');
 			}
-		}
-		else {
-			$this->setVar('list_item_block', '');
 		}
 
 		return true;
