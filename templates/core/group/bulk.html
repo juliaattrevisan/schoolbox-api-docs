@@ -1,4 +1,61 @@
+<!-- BEGIN custom_head -->
+<link rel="stylesheet" href="/css/jquery.autocomplete.css" type="text/css" />
+<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
+<script type="text/javascript">
+$j(document).ready(function() {
+    /**
+     * Add to this group from people in an existing system group
+     */
+    $j('#addUsersBySystemGroup').autocomplete({
+        serviceUrl: '/ajax/addUserByGroup.php?type=system',
+        minChars: 2,
+        maxHeight: 400,
+        width: 275,
+        onSelect: function (value, data) {
+            $j('#systemGroupID').val(data);
+            return false;
+        }
+    });
+
+    /**
+     * Add to this group from people in an existing system group
+     */
+    $j('#addUsersByIndividualGroup').autocomplete({
+        serviceUrl: '/ajax/addUserByGroup.php?type=individual',
+        minChars: 2,
+        maxHeight: 400,
+        width: 275,
+        onSelect: function (value, data) {
+            $j('#individualGroupID').val(data);
+            return false;
+        }
+    });
+});
+</script>
+<!-- END custom_head -->
+
 <h1>Add Bulk Members - {CATEGORY_NAME}</h1>
+<table class="standardForm">
+    <tr>
+        <td class="formLabelWidth"><h4>User Groups</h4><em>Add all users that belong to another group</em></td><td>
+        <form action="/group/addUserByGroup.php?type=individual&destinationID={CATEGORY_ID}" class="clearfix" method="post">
+            <input id="addUsersByIndividualGroup" type="text" size="30" />
+            <input type="hidden" name="individualGroupID" id="individualGroupID" />
+            <input type="submit" value="Add Individual Group" class="submit-btn-plain" />
+        </form>
+    </td>
+    </tr>
+
+    <tr>
+        <td class="formLabelWidth"><h4>User Roles</h4><em>Add all users of a particular role in the system</em></td><td>
+        <form action="/group/addUserByGroup.php?type=system&destinationID={CATEGORY_ID}" class="clearfix" method="post">
+            <input id="addUsersBySystemGroup" type="text" size="30" />
+            <input type="hidden" name="systemGroupID" id="systemGroupID" />
+            <input type="submit" value="Add System Role" class="submit-btn-plain" />
+        </form>
+    </td>
+    </tr>
+</table>
 <form action="/group/modifyForm.php" method="post" id="form" class="clearfix" >
 	<table class="standardForm">
 		<tr>
@@ -8,8 +65,9 @@
 				You can use the synergetic application to extract a csv of all the users you want then copy them into this box.</em></td>
 			<td><textarea name="bulkAdd" cols="30" rows="20"></textarea></td>
 		</tr>
-		<tr>
-	</table>
-	<input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-	<input type="submit" name="Submit" value="Submit" class="submit-btn-plain" />
+        </table>
+    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
+    <input type="submit" name="Submit" value="Submit" class="submit-btn-plain" />
 </form>
+
+
