@@ -44,8 +44,25 @@ class Component_Eportfolio_LinkListController extends Component_Eportfolio_Contr
 
 		/* Set up blocks and stuff
 		 */
+		$this->setBlock($templateHandle, 'has_create_form', 'has_create_form_block');
 		$this->setBlock($templateHandle, 'list_item', 'list_item_block');
-		$this->setVar('list_item_block', '');
+		$this->setBlock('list_item', 'has_modify_form', 'has_modify_form_block');
+		$this->setBlock('list_item', 'has_delete_form', 'has_delete_form_block');
+
+		$this->setVar(array(
+			'has_create_form_block' => '',
+			'has_modify_form_block' => '',
+			'has_delete_form_block' => '',
+			'has_item_block' => '',
+			'has_image_block' => '',
+			'list_item_block' => '',
+		));
+
+		/* Controls
+		 */
+		if ($this->permission >= WRITE_ACCESS) {
+			$this->parse('has_create_form_block', 'has_create_form');
+		}
 
 		/* Gather everything
 		 */
@@ -61,11 +78,20 @@ class Component_Eportfolio_LinkListController extends Component_Eportfolio_Contr
 					'LIST_ITEM_CONTENT' => $currentItem->getContent(),
 				));
 
+				/* Controls
+				 */
+				if ($this->permission >= WRITE_ACCESS) {
+					$this->parse('has_modify_form_block', 'has_modify_form');
+					$this->parse('has_delete_form_block', 'has_delete_form');
+				}
+
 				$this->parse('list_item_block', 'list_item', true);
+
+				/* Clear children after parsing out the parent
+				 */
+				$this->setVar('has_modify_form_block', '');
+				$this->setVar('has_delete_form_block', '');
 			}
-		}
-		else {
-			$this->setVar('list_item_block', '');
 		}
 
 		return true;
