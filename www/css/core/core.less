@@ -1066,6 +1066,10 @@ Notifications
     border: none;
 }
 
+
+/*--------------------------------------------------------------
+ PROFILES
+--------------------------------------------------------------*/
 .profile-info {
   overflow: auto;
   dl{
@@ -1073,8 +1077,8 @@ Notifications
     dd{ width: 80%; padding: 5px 0 5px 0; margin: 0; min-height: 14px; }
     .mail-profile a{ background: url('/images/core/icons/mail-profile.png') center right no-repeat; padding-right: 26px; }
     .dark{
-      border-top: 1px solid #eee;
-      border-bottom: 1px solid #eee; }
+      border-top: 1px solid @border-color;
+      border-bottom: 1px solid @border-color; }
   }
 }
 
@@ -1088,7 +1092,7 @@ Notifications
 }
 
 .profile-img {
-  background: #eee;
+  background: @border-color;
   float: left;
   width: 22%;
   max-height: 311px;
@@ -1136,79 +1140,94 @@ Notifications
   display: block;
   width: 100%;
   .subjects{
-    border-left: 1px solid #eee;
+    border-left: 1px solid @border-color;
     width: 73%;
     float: left;
     margin: 0 2% 0 0;
     ul{
       width: 50%;
       float: left;
+      li:nth-child(even){ background: #fafafa; }
     }
   }
   .contact-info{
     width: 24%;
     float: left;
   }
-  /*h1{
-    background: #e5eff7;
-    padding: 8px 5px;
-  }*/
-}
-
-.directory li{
-  border-bottom: 1px solid @border-color;
-  border-right: 1px solid @border-color;
-  position: relative;
-  a{display: block;
-    padding: 7px 0px;
-    height: 32px;
-    color: #000;
-    &:hover{
-      background-color: #e9f6ff;
-      text-decoration: none;
+  li{
+    border-bottom: 1px solid @border-color;
+    border-right: 1px solid @border-color;
+    position: relative;
+    a{display: block;
+      padding: 7px 0px;
+      height: 32px;
+      color: #000;
+      &:hover{
+        background-color: #e9f6ff;
+        text-decoration: none;
+      }
     }
-  }
-  .subject{
+    .to-subject{
       background: url('/images/famicons/house.png') 15px 18px no-repeat;
       border-bottom: 1px solid @border-color;
       height: 27px;
       display: block;
       padding: 20px 49px 0 52px;
       font-weight: bold;
-    .icon{
-      background-image: url('/images/core/icons/action-icons.png');
-      background-position: 0px 0px;
-      position: absolute;
-      top: 24px;
-      margin-top: -10px;
-      right: 13px;
-      display: block;
-      width: 18px;
-      height: 20px;
+      .icon{
+        background-image: url('/images/core/icons/action-icons.png');
+        background-position: 0px 0px;
+        position: absolute;
+        top: 24px;
+        margin-top: -10px;
+        right: 13px;
+        display: block;
+        width: 18px;
+        height: 20px;
+      }
     }
   }
-}
-
-.directory .mail-teacher{
-  background: url('/images/core/icons/mail-profile.png') 17px 19px no-repeat;
-  border-left: 1px solid #eee;
-  position: absolute;
-  right: 0;
-  top: 48px;
-  height: 32px;
-  width: 50px;
-  font: 0/0 a;
-  text-shadow: none;
-  color: transparent;
+  .mail-teacher{
+    background: url('/images/core/icons/mail-profile.png') 17px 19px no-repeat;
+    border-left: 1px solid @border-color;
+    position: absolute;
+    right: 0;
+    top: 0px;
+    height: 32px;
+    width: 50px;
+    font: 0/0 a;
+    text-shadow: none;
+    color: transparent;
+  }
 }
 
 .contact-info{
   .mail-teacher{
-    border-bottom: 1px solid #eee;
-    top: 0;
+    background: url('/images/core/icons/mail-profile.png') 17px 19px no-repeat;
+    border-left: 1px solid @border-color;
+    position: absolute;
+    right: 0;
+    top: 0px;
+    height: 32px;
+    width: 35px;
+    font: 0/0 a;
+    text-shadow: none;
+    color: transparent;
   }
   .contact-phone{
     li{ border-bottom: 0; }
+  }
+  ul:nth-child(even){ background: #fafafa; }
+}
+
+.profile{
+  position: relative;
+  .mobile{
+    background: url('/images/famicons/phone.png') 8px 7px no-repeat;
+    border-top: 1px solid @border-color;
+    border-bottom: 1px solid @border-color;
+    display: block;
+    padding: 8px 0 8px 35px;
   }
 }
 
@@ -1224,8 +1243,19 @@ Notifications
   .role{
     position: absolute;
     margin: 0 0 0 4px;
-    top: 72px;
+    top: 26px;
     color: #797979;
+  }
+  .icon{
+    background-image: url('/images/core/icons/action-icons.png');
+    background-position: 0px 0px;
+    position: absolute;
+    top: 24px;
+    margin-top: -10px;
+    right: 13px;
+    display: block;
+    width: 18px;
+    height: 20px;
   }
 }
 
@@ -1241,31 +1271,26 @@ Notifications
 
 .contact-information{
   position: relative;
-  li{border:0; border-bottom: 1px solid #eee;}
+  li{
+    border:0;
+    border-bottom: 1px solid @border-color;
+  }
 }
 
 .emergency-contact{
-  border-left: 1px solid #eee;
+  border-left: 1px solid @border-color;
   margin: 30px 0 0 0;
   li{
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid @border-color;
     padding: 7px 8px;
   }
   dl{
     dt{ width: 29%; padding: 5px 3%; }
     dd{ width: 65%; padding: 5px 0 5px 0; margin: 0; min-height: 14px; }
     .dark{
-      border-top: 1px solid #eee;
-      border-bottom: 1px solid #eee; }
+      border-top: 1px solid @border-color;
+      border-bottom: 1px solid @border-color; }
   }
-}
-
-.mobile{
-  background: url('/images/famicons/phone.png') 8px 7px no-repeat;
-  border-bottom: 1px solid #eee;
-  border-top: 1px solid #eee;
-  display: block;
-  padding: 8px 0 8px 35px;
 }
 
 .phone{
@@ -1300,6 +1325,7 @@ Notifications
 .contact-phone{
   a{
     padding: 7px 8px !important;
+    position: relative;
   }
 }
 
@@ -1307,7 +1333,6 @@ Notifications
   li{
     padding: 7px 8px;
   }
-  .address{ border-top: 1px solid #eee; }
 }
 
 /*--------------------------------------------------------------

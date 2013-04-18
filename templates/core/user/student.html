@@ -116,7 +116,12 @@
         <ul>
             <!-- BEGIN subject_item -->
             <li>
-                <div class="subject">{SUBJECT_NAME}<span class="icon"></span></div>
+                <div class="subject">
+                    <a class="to-subject" href="#">
+                        {SUBJECT_NAME}
+                        <span class="icon"></span>
+                    </a>
+                </div>
                 <div class="profile">
                     <a href="#" class="teacher-profile">
                         <img src="/portrait.php?userId={SUBJECT_TEACHER_ID}&size=square32" />
@@ -154,7 +159,7 @@
             <!-- END contact_alert -->
 
             <!-- BEGIN contact_details -->
-            <ul>
+            <ul class="contact-phone">
                 <li>
                     <div class="profile">
                         <a href="#" class="teacher-profile">
