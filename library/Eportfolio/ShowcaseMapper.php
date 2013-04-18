@@ -65,7 +65,7 @@ class ShowcaseMapper extends Schoolbox\Mapper {
 			LEFT JOIN {$return_join->getJoinSql('submission_box', 'sr', 'sb')}
 			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
 			WHERE showcase.uid = :user_id
-			ORDER BY sr.returned DESC
+			ORDER BY c.name, sr.id DESC
 		";
 
 		$statement = $this->database->prepare($query);
