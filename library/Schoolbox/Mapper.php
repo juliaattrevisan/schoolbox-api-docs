@@ -85,6 +85,9 @@ class Mapper extends BaseMapper {
         if ($object instanceof Collection) {
             return $object;
         }
+        if ($object instanceof \Collection) {
+            return new Collection($object->toArray());
+        }
         return new Collection(array($object));
     }
 
