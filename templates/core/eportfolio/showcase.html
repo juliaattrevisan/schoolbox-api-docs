@@ -18,17 +18,18 @@
 	}
 </style>
 <style type='text/css'>
-	.showcasedWork li {
-		padding: 30px 30px 0px 0px;
+	.showcasedWork {
+		width: 100%;
+		padding: 20px 0px;
 		clear: both;
 	}
 
-	.showcasedWork li span.boxName {
+	.showcasedWork div span.boxName {
 		font-size: 16px;
 		font-weight: bold;
 	}
 
-	.showcasedWork li span.mark {
+	.showcasedWork div span.mark {
 		font-size: 32px;
 		font-family: Garamond,serif;
 	}
@@ -48,17 +49,21 @@
 <h1>Showcased Work for {USER_FIRSTNAME} {USER_LASTNAME}</h1>
 
 <!-- BEGIN has_showcased_work -->
-<ul class='showcasedWork'>
+<div>
 	<!-- BEGIN showcased_work -->
-	<li>
-		<div style='width: 80px;float:left'>
+	<!-- BEGIN showcased_work_category -->
+	<h2>{SHOWCASED_WORK_CATEGORY}</h2>
+	<!-- END showcased_work_category -->
+	<div class='showcasedWork'>
+		<div style='width: 120px;float:left'>
 			<span class='mark'>{SHOWCASED_WORK_MARK}</span>
 			<span>{SHOWCASED_WORK_FILESIZE}</span>
 		</div>
 		<div style='width: auto;float:left'>
 			<span class='boxName'>{SHOWCASED_WORK_BOX}</span><br />
-			<span>{SHOWCASED_WORK_CATEGORY}</span><br />
 		</div>
+
+		<div class='clearfix'></div>
 
 		<!-- BEGIN has_modify_form -->
 		<form action='/eportfolio/showcase/modifyForm.php' method='post'>
@@ -68,9 +73,9 @@
 			<input type='submit' value='Unpublish' />
 		</form>
 		<!-- END has_modify_form -->
-	</li>
+	</div>
 	<!-- END showcased_work -->
-</ul>
+</div>
 <!-- END has_showcased_work -->
 
 <!-- BEGIN no_showcased_work -->

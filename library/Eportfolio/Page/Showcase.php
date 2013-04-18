@@ -28,6 +28,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 		$this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
 		$this->getPage()->setBlock(TEMPLATE_content, 'has_showcased_work', 'has_showcased_work_block');
 		$this->getPage()->setBlock('has_showcased_work', 'showcased_work', 'showcased_work_block');
+		$this->getPage()->setBlock('showcased_work', 'showcased_work_category', 'showcased_work_category_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'no_showcased_work', 'no_showcased_work_block');
 
 		$user = $this->getUser();
@@ -47,7 +48,11 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 		$allReturnedWork = $snapper->findShowcasedWork(17);
 
 		if ($allReturnedWork->count()) {
+			$previousCategory = null;
+
 			foreach($allReturnedWork as $currentReturnedWork) {
+				$currentCategory = $currentReturnedWork->getSubmissionReturn()->getSubmissionBox()->getCategory()->getName();
+
 				$this->getPage()->setVar(array(
 					'SHOWCASED_WORK_CATEGORY' => $currentReturnedWork->getSubmissionReturn()->getSubmissionBox()->getCategory()->getName(),
 					'SHOWCASED_WORK_BOX' => $currentReturnedWork->getSubmissionReturn()->getSubmissionBox()->getName(),
@@ -56,7 +61,19 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 					'SHOWCASED_WORK_ITEM_ID' => $currentReturnedWork->getId(),
 				));
 
+				/* Category name
+				 */
+				if (($previousCategory == null) || ($previousCategory != $currentCategory)) {
+					$previousCategory = $currentCategory;
+
+					$this->getPage()->parse('showcased_work_category_block', 'showcased_work_category');
+				}
+
 				$this->getPage()->parse('showcased_work_block', 'showcased_work', true);
+
+				/* Clear children after parsing out the parent
+				 */
+				$this->getPage()->setVar('showcased_work_category_block', '');
 			}
 
 			$this->getPage()->parse('has_showcased_work_block', 'has_showcased_work');
