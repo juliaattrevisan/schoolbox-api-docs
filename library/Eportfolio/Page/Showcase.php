@@ -50,7 +50,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 				'SHOWCASED_WORK_BOX' => $currentReturnedWork->getSubmissionReturn()->getSubmissionBox()->getName(),
 				'SHOWCASED_WORK_MARK' => $currentReturnedWork->getSubmissionReturn()->getMark(),
 				'SHOWCASED_WORK_FILESIZE' => $currentReturnedWork->getSubmissionReturn()->getFilesize(),
-				'SHOWCASED_WORK_RETURN_ID' => $currentReturnedWork->getSubmissionReturn()->getId(),
+				'SHOWCASED_WORK_ITEM_ID' => $currentReturnedWork->getId(),
 			));
 
 			$this->getPage()->parse('showcased_work_block', 'showcased_work', true);
