@@ -116,6 +116,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 			WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
 			AND sb.mark_visibility IN {$this->getArrayPlaceholders($visibilities, 'vis')}
 			AND sr.owner = :user_id
+			AND sr.deleted IS FALSE
 			ORDER BY sr.returned DESC
 			LIMIT :limit
 		";
@@ -237,6 +238,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
 			WHERE sr.owner = :user_id
 			AND sb.id = :box_id
+			AND sr.deleted IS FALSE
 			ORDER BY sr.returned DESC
 		";
 		$statement = $this->database->prepare($query);
