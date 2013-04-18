@@ -56,6 +56,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 			'has_delete_form_block' => '',
 			'has_item_block' => '',
 			'has_image_block' => '',
+			'list_item_block' => '',
 		));
 
 		/* Controls
