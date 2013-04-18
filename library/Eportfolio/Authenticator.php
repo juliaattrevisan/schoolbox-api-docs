@@ -182,10 +182,11 @@ class Eportfolio_Authenticator {
 		 */
 		$youAreAdmin = $this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff();
 		$youArePageOwner = ($this->getEportfolioHandler()->getSettingsPageOwner() == $this->getCurrentUserId());
+		$youArePublicPageOwner = (in_array($this->getPageId(), $this->getPublicPages()) && ($this->getOwnerId() == $this->getCurrentUserId()));
 
 		/* And now...the conclusion.
 		 */
-		if ($youAreAdmin || $youArePageOwner) {
+		if ($youAreAdmin || $youArePageOwner || $youArePublicPageOwner) {
 			return true;
 		}
 
