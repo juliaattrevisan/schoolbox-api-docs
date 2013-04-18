@@ -58,6 +58,15 @@
 			<span class='boxName'>{SHOWCASED_WORK_BOX}</span><br />
 			<span>{SHOWCASED_WORK_CATEGORY}</span><br />
 		</div>
+
+		<!-- BEGIN has_modify_form -->
+		<form action='/eportfolio/showcase/modifyForm.php' method='post'>
+			<input type='hidden' name='action' value='unpublish' />
+			<input type='hidden' name='userId' value='{USER_ID}' />
+			<input type='hidden' name='showcasedWorkReturnId' value='{SHOWCASED_WORK_RETURN_ID}' />
+			<input type='submit' value='Unpublish' />
+		</form>
+		<!-- END has_modify_form -->
 	</li>
 	<!-- END showcased_work -->
 </ul>
