@@ -67,6 +67,7 @@ elseif (is_numeric($_GET['linkID'])) {
 					 'DESCRIPTION'	=> Scrub::text($link['description']),
 					 'COMMENT'	 => Scrub::text($link['comment']),
 					 'LINK'		=> $link['url'],
+					 'HOST'		 => '',
 					 'HIDDEN'	 => $link['hidden'] > 0 ? 'Yes' : 'No',
 					 );
 

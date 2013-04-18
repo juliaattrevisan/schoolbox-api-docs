@@ -221,7 +221,7 @@ function getSingleFileMeta($folderId, $fileId) {
 	$file = array(
 		'kind' => 'file',
 		'id' => $file->getId(),
-		'name' => $file->getFilename(),
+		'name' => $file->getDescription(),
 		'mime' => $mtypeMap->getIconForFilename($file->getFilename()),
 		'filesize' => Alaress_Byte_Format::bytesToString($file->getFilesize()),
 		'hidden' => $file->getHidden() ? 1 : 0,
@@ -251,7 +251,7 @@ function getSingleLinkMeta($folderId, $linkId) {
 	}
 
 	$userAccess = $groupHandler->getPermission($folderId);
-	$adf = new Alaress_Date_Format($link['submitted'], 'y-m-d');
+	$adf = new Alaress_Date_Format($link['submitted'], 'U');
 
 	// actions based on access
 	$actions = array();
