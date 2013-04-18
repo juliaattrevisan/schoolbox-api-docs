@@ -339,21 +339,6 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		}
 	}
 
-	/**
-	 * @param SubmissionBox $object
-	 * @param bool          $hard_delete
-	 *
-	 * @return bool
-	 */
-	public function delete($object, $hard_delete = false) {
-		if ($hard_delete) {
-			return parent::delete($object);
-		}
-		$query     = "UPDATE {$this->getTable()} SET deleted=TRUE WHERE id=?";
-		$statement = $this->database->prepare($query);
-		return $statement->execute(array($object->getId()));
-	}
-
 
 	/**
 	 * Conversion of SubmissionBoxHandler->getAllYearsByUser().
