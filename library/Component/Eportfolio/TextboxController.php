@@ -26,6 +26,10 @@ class Component_Eportfolio_TextboxController extends Component_Eportfolio_ListCo
 	public function execute() {
 		$this->setMapperClass(Component_Eportfolio_TextboxMapper::getInstance());
 
+		/* Ensure that each instance of textbox has a corresponding textbox_item record
+		 */
+
+
 		return true;
 	}
 
@@ -44,25 +48,62 @@ class Component_Eportfolio_TextboxController extends Component_Eportfolio_ListCo
 
 		$this->parseConfig();
 
+		$this->setBlock($templateHandle, 'has_modify_form', 'has_modify_form_block');
+		$this->setBlock($templateHandle, 'modify_text', 'modify_text_block');
+		$this->setBlock($templateHandle, 'create_text', 'create_text_block');
+
+		$this->setVar(array(
+			'text_editable_block' => '',
+			'modify_text_block' => '',
+			'create_text_block' => '',
+			'text_locked_block' => '',
+			'has_modify_form_block' => '',
+		));
+
 		/* Gather everything
 		 */
 		$allItems = $this->getMapperClass()->findByColumn('component_instance_id', $this->instance->id);
 
+		/* If the component instance has a textbox record, render it with Modify capability
+		 */
 		if ($allItems->count()) {
-			for ($allItems->rewind(); $allItems->valid(); $allItems->next()) {
-				$currentItem = $allItems->current();
+			$currentItem = $allItems->current();
 
-				$this->setVar(array(
-					'TEXTBOX_ITEM_ID' => $this->instance->id,
-					'TEXTBOX_CONTENT' => $currentItem->getContent(),
-				));
+			$this->setVar(array(
+				'TEXTBOX_ITEM_ID' => $this->instance->id,
+				'TEXTBOX_CONTENT' => Scrub::html($currentItem->getContent()),
+			));
+
+			/* If modifying this textbox
+			 */
+			if ($this->permission >= WRITE_ACCESS) {
+				if (($this->sitepage->arg[2] == 'textbox') && ($this->sitepage->arg[4] == $this->instance->id)) {
+					$this->parse('has_modify_form_block', 'has_modify_form');
+				}
+				else {
+					$this->parse('modify_text_block', 'modify_text');
+				}
 			}
 		}
+		/* This component instance doesn't have a textbox record yet
+		 * so render it with Create capability
+		 */
 		else {
 			$this->setVar(array(
 				'TEXTBOX_ITEM_ID' => $this->instance->id,
-				'TEXTBOX_CONTENT' => ''
+				'TEXTBOX_CONTENT' => '',
 			));
+
+			/* If creating this textbox
+			 */
+			if ($this->permission >= WRITE_ACCESS) {
+				if (($this->sitepage->arg[2] == 'textbox') && ($this->sitepage->arg[4] == $this->instance->id)) {
+					$this->parse('has_modify_form_block', 'has_modify_form');
+				}
+				else {
+					$this->parse('create_text_block', 'create_text');
+				}
+			}
 		}
 
 		return true;
