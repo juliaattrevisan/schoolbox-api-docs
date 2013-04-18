@@ -165,15 +165,20 @@ class Mapper extends BaseMapper {
 	 *
 	 * @param string $column The name of the column used for storing whether a
 	 *                       row is soft deleted.
-	 * @param int    $type   The type of the soft delete field - if it's
-	 *                       self::TYPE_DATETIME, it's set to the current date
-	 *                       if deleted, otherwise it's set to true/false.
+	 * @param mixed  $deleted_value   The value to set the column to when a row
+	 *                                is deleted, defaults to true.
+	 * @param mixed  $undeleted_value The value to set the column to when a row
+	 *                                is not deleted, defaults to false.
 	 *
 	 * @return $this
 	 */
-	protected function hasSoftDeleteField($column, $type = self::TYPE_BOOLEAN) {
+	protected function hasSoftDeleteField($column, $deleted_value = true, $undeleted_value = false) {
 		//
 		// TODO implement soft deletes
+		// Consider true_value and false_value - true:false, null:now()
+		$this->soft_delete_column          = $column;
+		$this->soft_delete_deleted_value   = $deleted_value;
+		$this->soft_delete_undeleted_value = $undeleted_value;
 		return $this;
 	}
 }
