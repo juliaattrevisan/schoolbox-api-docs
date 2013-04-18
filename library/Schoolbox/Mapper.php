@@ -22,10 +22,6 @@ class Mapper extends BaseMapper {
      */
     protected $column_factory;
 
-    public function __construct() {
-        parent::__construct();
-    }
-
 	/**
 	 * The column that is used for storing if this field has been soft deleted.
 	 *
