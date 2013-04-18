@@ -26,8 +26,14 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 	 */
 	protected function setup() {
 		$this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
-
 		$this->getPage()->setBlock(TEMPLATE_content, 'showcased_work', 'showcased_work_block');
+
+		$user = $this->getUser();
+
+		$this->getPage()->setVar(array(
+			'USER_FIRSTNAME' => $user['firstname'],
+			'USER_LASTNAME' => $user['lastname'],
+		));
 	}
 
 	/**
@@ -40,7 +46,10 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 
 		foreach($allReturnedWork as $currentReturnedWork) {
 			$this->getPage()->setVar(array(
-				'SHOWCASED_WORK_MARK' => $currentReturnedWork->getSubmissionReturn()->getNormalizedMark(),
+				'SHOWCASED_WORK_CATEGORY' => $currentReturnedWork->getSubmissionReturn()->getSubmissionBox()->getCategory()->getName(),
+				'SHOWCASED_WORK_BOX' => $currentReturnedWork->getSubmissionReturn()->getSubmissionBox()->getName(),
+				'SHOWCASED_WORK_MARK' => $currentReturnedWork->getSubmissionReturn()->getMark(),
+				'SHOWCASED_WORK_FILESIZE' => $currentReturnedWork->getSubmissionReturn()->getFilesize(),
 			));
 
 			$this->getPage()->parse('showcased_work_block', 'showcased_work', true);

@@ -49,13 +49,21 @@ class ShowcaseMapper extends Schoolbox\Mapper {
 	 * @return ActivityCollection
 	 */
 	public function findShowcasedWork($user_id) {
+		$return_join = $this->getJoinMapper('submission_return');
+		$box_join = $return_join->getJoinMapper('submission_box');
+		$category_join = $box_join->getJoinMapper('category');
 
 		// Have hydrateFromRow() in ActivityFactory
 		$query = "
 			SELECT
-				{$this->getColumnString('showcase')}
+				{$this->getColumnString('showcase')},
+				{$return_join->getColumnString('sr')},
+				{$box_join->getColumnString('sb')},
+				{$category_join->getColumnString('c')}
 			FROM {$this->getTable()} showcase
 			LEFT JOIN {$this->getJoinSql('submission_return', 'showcase', 'sr')}
+			LEFT JOIN {$return_join->getJoinSql('submission_box', 'sr', 'sb')}
+			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
 			WHERE showcase.uid = :user_id
 			ORDER BY sr.returned DESC
 		";
