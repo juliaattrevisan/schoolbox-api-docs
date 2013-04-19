@@ -589,9 +589,25 @@ else {
 
 
 /* Only offer a publish button if there is a submission history OR a return history
+ * and if the submission box isn't already published for this user
+ */
+$showcaseMapper = new \Eportfolio\ShowcaseMapper();
+
+$existingShowcasedItem = $showcaseMapper->findByColumnList(array(
+	'uid' => $user['uid'],
+	'submission_box_id' => $submission->getId()
+));
+
+/* If it has either a recent submission or recent return, and hasn't been published,
+ * allow it to be published
  */
 if (isset($recent_submission) || isset($recent_return)) {
-	$this->parse('action_publish_block', 'action_publish');
+	if (!$existingShowcasedItem->count()) {
+		$this->parse('action_publish_block', 'action_publish');
+	}
+	else {
+		$this->setVar('action_publish_block', '');
+	}
 }
 else {
 	$this->setVar('action_publish_block', '');
