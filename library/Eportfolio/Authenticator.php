@@ -77,6 +77,30 @@ class Eportfolio_Authenticator {
 	}
 
 	/**
+	 * Determine if a particular person owns a particular page
+	 * This excludes the hardcoded public pages
+	 *
+	 * @return bool
+	 */
+	public function pageExists() {
+		if (in_array($this->getPageId(), $this->getPublicPages())) {
+			return true;
+		}
+		else {
+			$exists = Eportfolio_PageMapper::getInstance()->findByColumnList(array(
+				'uid' => $this->getOwnerId(),
+				'page_id' => $this->getPageId()
+			));
+
+			if ($exists->count()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Determine whether the $userId can create a new page
 	 */
 	public function canCreate() {
