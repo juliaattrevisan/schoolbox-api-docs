@@ -18,7 +18,7 @@ class Mimetype {
 
 	/**
 	 * Allowed File id
-	 * 
+	 *
 	 * @var
 	 */
 	private $fileTypeID;
@@ -57,6 +57,9 @@ class Mimetype {
 	 * @var
 	 */
 	private $enable;
+
+	/* Getters/Setters
+	 */
 
 	/**
 	 * Set description
