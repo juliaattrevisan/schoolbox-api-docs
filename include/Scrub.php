@@ -112,11 +112,11 @@ class Scrub {
                 'www.youtube.com/embed/',
                 'player.vimeo.com/video/',
                 'www.slideshare.net/slideshow/embed_code/',
-                '(www|edu).glogster.com/glog(/|.php)',
+                '(?:www|edu).glogster.com/glog(?:/|.php)',
                 'wikieducator.org/',
-                'www.google.com(.[a-z]{2})?/maps',
-                'maps.google.com(.[a-z]{2})?/',
-                'docs.google.com(.[a-z]{2})?/',
+                'www.google.com(?:.[a-z]{2})?/maps',
+                'maps.google.com(?:.[a-z]{2})?/',
+                'docs.google.com(?:.[a-z]{2})?/',
                 'www.tiki-toki.com/timeline/embed/',
                 'www.thinglink.com/card/',
                 'www.facebook.com/plugins/',
@@ -125,7 +125,7 @@ class Scrub {
                 'www.showme.com/sma/embed',
             );
 
-            $config->set('URI.SafeIframeRegexp', '%^https?://(' . implode('|', $safeIframeSources) . ')%');
+            $config->set('URI.SafeIframeRegexp', '%^(?:https?:|)//(?:' . implode('|', $safeIframeSources) . ')%');
             $config->set('Output.FlashCompat', true);
             $config->set('HTML.FlashAllowFullScreen', true);
 
