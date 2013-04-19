@@ -26,10 +26,6 @@ class Component_Eportfolio_TextboxController extends Component_Eportfolio_Contro
 	public function execute() {
 		$this->setMapperClass(Component_Eportfolio_TextboxMapper::getInstance());
 
-		/* Ensure that each instance of textbox has a corresponding textbox_item record
-		 */
-
-
 		return true;
 	}
 
