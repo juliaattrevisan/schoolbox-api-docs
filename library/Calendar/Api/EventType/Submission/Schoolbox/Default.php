@@ -38,10 +38,10 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 	 * Find a particular event from this source
 	 *
 	 * @param $eventId
-	 * @return Collection
+	 * @return Calendar_Event_Collection
 	 */
 	public function getEvent($eventId) {
-		$collection = new Collection();
+		$collection = new Calendar_Event_Collection();
 
 		/* Fill in your query result set here and populate $collection
 		 */
