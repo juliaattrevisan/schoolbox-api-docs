@@ -17,31 +17,43 @@ namespace Schoolbox\File;
 class Mimetype {
 
 	/**
+	 * Allowed File id
+	 * 
 	 * @var
 	 */
 	private $fileTypeID;
 
 	/**
+	 * Description for this mime type
+	 *
 	 * @var
 	 */
 	private $description;
 
 	/**
+	 * Mime type
+	 *
 	 * @var
 	 */
 	private $mime;
 
 	/**
+	 * Filename representing this mime type
+	 *
 	 * @var
 	 */
 	private $iconFile;
 
 	/**
+	 * Inline
+	 *
 	 * @var
 	 */
 	private $inline;
 
 	/**
+	 * Enable
+	 *
 	 * @var
 	 */
 	private $enable;
@@ -68,6 +80,7 @@ class Mimetype {
 	 * Set enable
 	 *
 	 * @param $enable
+	 * @return void
 	 */
 	public function setEnable($enable) {
 		$this->enable = $enable;
@@ -86,6 +99,7 @@ class Mimetype {
 	 * Set file type id
 	 *
 	 * @param $fileTypeID
+	 * @return void
 	 */
 	public function setFileTypeID($fileTypeID) {
 		$this->fileTypeID = $fileTypeID;
@@ -100,10 +114,21 @@ class Mimetype {
 		return $this->fileTypeID;
 	}
 
+	/**
+	 * Alias method
+	 *
+	 * @param $id
+	 * @return void
+	 */
 	public function setId($id) {
 		$this->setFileTypeID($id);
 	}
 
+	/**
+	 * Alias method
+	 *
+	 * @return mixed
+	 */
 	public function getId() {
 		return $this->getFileTypeID();
 	}
