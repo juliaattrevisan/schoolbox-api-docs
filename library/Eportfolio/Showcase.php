@@ -20,6 +20,13 @@ class Showcase {
 	public $submissionReturn;
 
 	/**
+	 * An instance of an original submission
+	 *
+	 * @var
+	 */
+	public $submission;
+
+	/**
 	 * The showcase item id
 	 *
 	 * @var int
@@ -65,5 +72,21 @@ class Showcase {
 		return $this->submissionReturn;
 	}
 
+	/**
+	 * Set submission
+	 *
+	 * @param  $submission
+	 */
+	public function setSubmission($submission) {
+		$this->submission = $submission;
+	}
 
+	/**
+	 * Get submission
+	 *
+	 * @return
+	 */
+	public function getSubmission() {
+		return $this->submission;
+	}
 }

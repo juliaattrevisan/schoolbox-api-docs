@@ -71,3 +71,5 @@ DROP TABLE eportfolioTemplateLayout;
 /* Add showcased work table
  */
 CREATE TABLE `eportfolio_showcase_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `submission_return_id` INT(11), `uid` INT(11), PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
+ALTER TABLE `eportfolio_showcase_item` ADD COLUMN `submission_box_id` INT(11) NULL AFTER `id`;
+ALTER TABLE `eportfolio_showcase_item` CHANGE `submission_box_id` `submission_id` INT(11) NULL;

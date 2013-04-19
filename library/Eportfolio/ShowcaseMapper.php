@@ -39,6 +39,19 @@ class ShowcaseMapper extends Schoolbox\Mapper {
 			'this_key'  => 'submission_return_id',
 			'other_key' => 'id',
 		));
+
+		$this->hasMap(array(
+			'column'     => 'submission_id',
+			'property'   => 'submission',
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'student_submission',
+		));
+
+		$this->hasJoin('student_submission', array(
+			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBox\\SubmissionMapper',
+			'this_key'  => 'submission_id',
+			'other_key' => 'id',
+		));
 	}
 
 	/**
@@ -51,6 +64,7 @@ class ShowcaseMapper extends Schoolbox\Mapper {
 	public function findShowcasedWork($user_id) {
 		$return_join = $this->getJoinMapper('submission_return');
 		$box_join = $return_join->getJoinMapper('submission_box');
+		$submission_join = $this->getJoinMapper('student_submission');
 		$category_join = $box_join->getJoinMapper('category');
 
 		// Have hydrateFromRow() in ActivityFactory
@@ -59,10 +73,12 @@ class ShowcaseMapper extends Schoolbox\Mapper {
 				{$this->getColumnString('showcase')},
 				{$return_join->getColumnString('sr')},
 				{$box_join->getColumnString('sb')},
+				{$submission_join->getColumnString('ss')},
 				{$category_join->getColumnString('c')}
 			FROM {$this->getTable()} showcase
 			LEFT JOIN {$this->getJoinSql('submission_return', 'showcase', 'sr')}
 			LEFT JOIN {$return_join->getJoinSql('submission_box', 'sr', 'sb')}
+			LEFT JOIN {$this->getJoinSql('student_submission', 'showcase', 'ss')}
 			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
 			WHERE showcase.uid = :user_id
 			ORDER BY c.name, sr.id DESC
