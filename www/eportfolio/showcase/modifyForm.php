@@ -16,15 +16,25 @@ $page = new \SitePage();
 $action = \Scrub::text($_POST['action']);
 $ownerId = \Scrub::text($_POST['userId']);
 $pageId = 'showcase';
-$showcaseItemId = \Scrub::text($_POST['showcaseItemId']);
 
 $authenticator = new \Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
 
 if ($authenticator->canModify()) {
 	if ($action == 'unpublish') {
-		$test = ShowcaseMapper::getInstance()->findById($showcaseItemId);
+		$showcaseItemId = \Scrub::text($_POST['showcaseItemId']);
 
-		ShowcaseMapper::getInstance()->delete($test);
+		$showcasedItem = ShowcaseMapper::getInstance()->findById($showcaseItemId);
+
+		ShowcaseMapper::getInstance()->delete($showcasedItem);
+	}
+	else if ($action == 'publish') {
+		$boxId = \Scrub::text($_POST['boxId']);
+
+		$showcasedItem = new Showcase();
+		$showcasedItem->setSubmissionBoxId($boxId);
+		$showcasedItem->setUid($ownerId);
+
+		ShowcaseMapper::getInstance()->create($showcasedItem);
 	}
 
 	\SitePage::localRedir("/eportfolio/{$ownerId}/showcase");
