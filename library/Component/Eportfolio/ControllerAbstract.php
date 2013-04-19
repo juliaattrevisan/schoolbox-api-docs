@@ -24,8 +24,7 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
 	public function setup(array $context, array $config) {
 		parent::setup($context, $config);
 
-		$g = new Group();
-		$this->permission = $_SESSION['su'] ? FULL_ACCESS : $g->getPermission($context['uid']);
+		$this->permission = $_SESSION['su'] ? FULL_ACCESS : $context['permission'];
 
 		/* Check primary key is being used correctly!
 		 */

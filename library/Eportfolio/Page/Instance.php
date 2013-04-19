@@ -229,7 +229,12 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 			$templateTarget = "component_position_{$component->position}";
 			$templateHandle = "component_{$component->definitionId}";
 
-			$component->setup($this->getUser(), $component->instance->getConfigArray());
+			/* Assign permissions
+			 */
+			$context = $this->getUser();
+			$context['permission'] = $this->getPermission();
+
+			$component->setup($context, $component->instance->getConfigArray());
 
 			if ($component->execute() !== false) {
 				if ($component->renderTemplate($templateHandle) !== false) {
