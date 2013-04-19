@@ -14,10 +14,6 @@ class Calendar_API extends Generic_API {
         $calFactory = new Calendar_Api_Factory();
         $calendarHandler = $calFactory->produce();
 
-        $week['day']    = date("w", mktime(0, 0, 0, $selected['month'], $selected['day'], $selected['year']));
-        $week['start']  = mktime(0, 0, 0, $selected['month'], ($selected['day'] - $week['day']), $selected['year']);
-        $week['end']    = strtotime("+6 days", $week['start']);
-
         $month['start'] = mktime(0, 0, 0, $selected['month'], 1, $selected['year']);
         $month['first'] = date('w', $month['start']);
         $month['end']   = strtotime("+1 month", $month['start']);
@@ -47,6 +43,7 @@ class Calendar_API extends Generic_API {
 
 		/* Prefill containers for each day of the month
 		 */
+		$day_num = 1;
 		for($i = $month['start']; $i < $month['end']; $i += 24 * 3600) {
             $currentDay = strtotime("+1 day", $currentDay);
 
@@ -60,7 +57,7 @@ class Calendar_API extends Generic_API {
                 $day['isToday'] = '1';
             }
 
-			$eventMap[] = $day;
+			$eventMap[$day_num++] = $day;
 		}
 
 		/* Get all the events for this month and fill them into the containers
@@ -70,47 +67,18 @@ class Calendar_API extends Generic_API {
 
 		$iterator = $allEvents->createIterator();
 
-		$previousEventDay = -1;
-		$dayData = array();
-
 		for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
 			$current = $iterator->current();
 
 			$currentEventDay = (int)$current->getStartTime()->getUsingFormat('d');
-
-			/* While it's the same day, or the first cycle,
-			 * push the current event onto a $dayData stack
-			 */
-			if (($previousEventDay == -1) || ($currentEventDay == $previousEventDay)) {
-				if ($current->getStartTime()->getTimeOnly() == '12:00am') {
-					$current->setStartTime('');
-				}
-
-				$dayData[] = $current;
-
-				/* Set up for next cycle
-				 */
-				$previousEventDay = $currentEventDay;
+			if ($current->getStartTime()->getTimeOnly() == '12:00am') {
+				$current->setStartTime('');
 			}
-			/* Otherwise inject the current $dayData stack into the calendar at the day's index and
-			 * start a new $dayData stack
-			 */
-			else {
-				$eventMap[$currentEventDay]['events'] = $dayData;
-
-				$dayData = array();
-
-				if ($current->getStartTime()->getTimeOnly() == '12:00am') {
-					$current->setStartTime('');
-				}
-
-				$dayData[] = $current;
+			if (empty($eventMap[$currentEventDay]['events'])) {
+				$eventMap[$currentEventDay]['events'] = array();
 			}
+			$eventMap[$currentEventDay]['events'][] = $current;
 		}
-
-		/* Push last $dayData into stack
- 		 */
-		$eventMap[$currentEventDay]['events'] = $dayData;
 
 		/* Pad out the final line
 		 */
