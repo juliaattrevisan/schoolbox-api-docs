@@ -37,4 +37,29 @@ class ShowcaseMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_INTEGER,
 		));
 	}
+
+	/**
+	 * Get all the showcased submission boxes for a particular user,
+	 * ordered alphabetically by their parent category name
+	 *
+	 * @param $userId
+	 * @return bool|\Model
+	 */
+	public function getShowcasedSubmissionBoxes($userId) {
+		$statement = $this->database->prepare("
+            SELECT {$this->getColumnString()}
+            FROM `{$this->table}`
+            LEFT JOIN submission_box ON `{$this->table}`.submission_box_id = submission_box.id
+            LEFT JOIN category ON submission_box.category = category.id
+            WHERE eportfolio_showcase_item.uid = :userId
+            ORDER BY category.name
+        ");
+
+		$statement->bindParam(":userId", $userId);
+		$statement->execute();
+
+		$rowset = $statement->fetchAll();
+
+		return $this->hydrateList($rowset);
+	}
 }

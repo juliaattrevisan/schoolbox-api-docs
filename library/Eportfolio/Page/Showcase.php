@@ -120,7 +120,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 
 		/* Gather around the loop, everyone
 		 */
-		$allShowcasedItems = $showcaseMapper->findByColumn('uid', $this->getUserId());
+		$allShowcasedItems = $showcaseMapper->getShowcasedSubmissionBoxes($this->getUserId());
 
 		if ($allShowcasedItems->count()) {
 			$previousCategory = null;
