@@ -41,36 +41,89 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 	}
 
 	/**
+	 * Get the latest entry for a Submission History or a Returned Work history
+	 *
+	 * @param $userId
+	 * @param $boxId
+	 * @return mixed
+	 */
+	private function getLatestSubmission($userId, $boxId) {
+		$mapper = new \Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper();
+
+		$history = $mapper->getSubmissionHistory($userId, $boxId);
+
+		if ($history->count()) {
+			return $history->current()->getSubmission();
+		}
+	}
+
+	private function getLatestReturn($userId, $boxId) {
+		$mapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
+
+		$history = $mapper->getSubmissionHistory($userId, $boxId);
+
+		if ($history->count()) {
+			return $history->current()->getReturnedWork();
+		}
+	}
+
+	/**
 	 * Render page
 	 */
 	protected function render() {
 		$snapper = new \Eportfolio\ShowcaseMapper();
 
-		$allShowcasedItems = $snapper->findShowcasedWork($this->getUserId());
+		$allShowcasedItems = $snapper->findByColumn('uid', $this->getUserId());
+
+		$boxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
 
 		if ($allShowcasedItems->count()) {
 			$previousCategory = null;
 
 			foreach($allShowcasedItems as $currentShowcasedItem) {
-				$currentCategory = $currentShowcasedItem->getSubmissionReturn()->getSubmissionBox()->getCategory();
-				$currentReturned = $currentShowcasedItem->getSubmissionReturn();
-				$currentSubmission = $currentShowcasedItem->getSubmission();
-				$currentBox = $currentReturned->getSubmissionBox();
+				$latestSubmission = $this->getLatestSubmission($this->getUserId(), $currentShowcasedItem->getSubmissionBoxId());
+				$latestReturn = $this->getLatestReturn($this->getUserId(), $currentShowcasedItem->getSubmissionBoxId());
+				$currentBox = $boxMapper->findById($currentShowcasedItem->getSubmissionBoxId());
 
 				$this->getPage()->setVar(array(
 					'SHOWCASED_WORK_ITEM_ID' => $currentShowcasedItem->getId(),
-					'SHOWCASED_WORK_BOX_CATEGORY_NAME' => $currentCategory->getName(),
+					'SHOWCASED_WORK_BOX_CATEGORY_NAME' => $currentBox->getCategory()->getName(),
 					'SHOWCASED_WORK_BOX_NAME' => $currentBox->getName(),
 					'SHOWCASED_WORK_BOX_TYPE' => $currentBox->getWorkType()->getName(),
-					'SHOWCASED_WORK_SUBMISSION_FILESIZE' => $currentSubmission->getFilesize(),
-					'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $currentSubmission->getSubmitted()->getShort(),
-					'SHOWCASED_WORK_RETURNED_MARK' => $currentReturned->getMark(),
 				));
+
+				/* Show submitted work information (if available)
+				 */
+				if ($latestSubmission) {
+					$this->getPage()->setVar(array(
+						'SHOWCASED_WORK_SUBMISSION_FILESIZE' => $latestSubmission->getFilesize(),
+						'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $latestSubmission->getSubmitted()->getShort(),
+					));
+				}
+				else {
+					$this->getPage()->setVar(array(
+						'SHOWCASED_WORK_SUBMISSION_FILESIZE' => '',
+						'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => '',
+					));
+				}
+
+				/* Show returned work information (if available)
+				 */
+				if ($latestReturn) {
+					$this->getPage()->setVar(array(
+						'SHOWCASED_WORK_RETURNED_MARK' => $latestReturn->getMark(),
+					));
+				}
+				else {
+					$this->getPage()->setVar(array(
+						'SHOWCASED_WORK_RETURNED_MARK' => '',
+					));
+				}
 
 				/* Category name
 				 */
-				if (($previousCategory == null) || ($previousCategory != $currentCategory->getName())) {
-					$previousCategory = $currentCategory->getName();
+				if (($previousCategory == null) || ($previousCategory != $currentBox->getCategory()->getName())) {
+					$previousCategory = $currentBox->getCategory()->getName();
 
 					$this->getPage()->parse('showcased_work_category_block', 'showcased_work_category');
 				}

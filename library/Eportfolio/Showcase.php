@@ -13,25 +13,25 @@ namespace Eportfolio;
 class Showcase {
 
 	/**
-	 * An instance of a returned submission
-	 *
-	 * @var
-	 */
-	public $submissionReturn;
-
-	/**
-	 * An instance of an original submission
-	 *
-	 * @var
-	 */
-	public $submission;
-
-	/**
 	 * The showcase item id
 	 *
 	 * @var int
 	 */
 	public $id = null;
+
+	/**
+	 * The showcased submission box
+	 *
+	 * @var
+	 */
+	public $submissionBoxId;
+
+	/**
+	 * The showcasing user
+	 *
+	 * @var
+	 */
+	public $uid;
 
 	/* Getters/Setters
 	 */
@@ -55,38 +55,38 @@ class Showcase {
 	}
 
 	/**
-	 * Set submission return
+	 * Set submission box id
 	 *
-	 * @param  $submissionReturn
+	 * @param  $submissionBoxId
 	 */
-	public function setSubmissionReturn($submissionReturn) {
-		$this->submissionReturn = $submissionReturn;
+	public function setSubmissionBoxId($submissionBoxId) {
+		$this->submissionBoxId = $submissionBoxId;
 	}
 
 	/**
-	 * Get submission return
+	 * Get submission box id
 	 *
 	 * @return
 	 */
-	public function getSubmissionReturn() {
-		return $this->submissionReturn;
+	public function getSubmissionBoxId() {
+		return $this->submissionBoxId;
 	}
 
 	/**
-	 * Set submission
+	 * Set uid
 	 *
-	 * @param  $submission
+	 * @param  $uid
 	 */
-	public function setSubmission($submission) {
-		$this->submission = $submission;
+	public function setUid($uid) {
+		$this->uid = $uid;
 	}
 
 	/**
-	 * Get submission
+	 * Get uid
 	 *
 	 * @return
 	 */
-	public function getSubmission() {
-		return $this->submission;
+	public function getUid() {
+		return $this->uid;
 	}
 }
