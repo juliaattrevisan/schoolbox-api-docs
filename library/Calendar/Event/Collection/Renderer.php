@@ -69,25 +69,19 @@ class Calendar_Event_Collection_Renderer {
 
 	/**
 	 * Collects all events from everywhere, for the current day
-	 *
-	 * Do this by using ReflectionClass on the API Interface to
-	 * get all the mandatory methods
 	 */
 	protected function collectAllEvents() {
-		$reflection = new ReflectionClass($this->getInterfaceClass());
+		$eventList = $this->getApi()->getEvents($this->getStartTimestamp(), $this->getEndTimestamp());
 
-		foreach ($reflection->getMethods() as $currentMethod) {
-			$methodName = $currentMethod->getName();
-
-			$eventList = $this->getApi()->$methodName($this->getStartTimestamp(), $this->getEndTimestamp());
-
+		/* Only attempt to merge collections
+		 */
+		if (is_a($eventList, 'Calendar_Event_Collection')) {
 			$this->getAllEvents()->merge($eventList);
 		}
 
 		/* Sort all the events in order of time
 		 */
 		$this->getAllEvents()->sort();
-
 	}
 
 	/**
