@@ -58,6 +58,17 @@ class Mimetype {
 	 */
 	private $enable;
 
+	/**
+	 * Get icon class by deriving it from the iconFile
+	 *
+	 * This previously abused the \Url class, but now it's all self-contained here and independent.
+	 *
+	 * @return mixed
+	 */
+	public function getClass() {
+		return preg_replace('/[^a-zA-Z]/', '', substr(strtolower($this->getIconFile()), 0, strrpos($this->getIconFile(), ".")));
+	}
+
 	/* Getters/Setters
 	 */
 

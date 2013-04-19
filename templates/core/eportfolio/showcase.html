@@ -34,6 +34,11 @@
 		font-family: Garamond,serif;
 	}
 </style>
+<style type='text/css'>
+	<!-- BEGIN allowed_files -->
+	a.{NAME}{background-image: url(/images/mime/22x22/{ICON});}
+	<!-- END allowed_files -->
+</style>
 <div class='horizontalList'>
 	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Profile</a></li>
 	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
@@ -57,7 +62,7 @@
 	<div class='showcasedWork'>
 		<div style='width: 120px;float:left'>
 			<span class='mark'>{SHOWCASED_WORK_RETURNED_MARK}</span>
-
+			<a class='icons {SHOWCASED_WORK_MIMETYPE_ICONFILE}'>icon</a>
 		</div>
 		<div style='width: auto;float:left'>
 			<span class='boxName'>{SHOWCASED_WORK_BOX_NAME}</span><br />

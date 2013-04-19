@@ -38,10 +38,47 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 			'USER_FIRSTNAME' => $user['firstname'],
 			'USER_LASTNAME' => $user['lastname'],
 		));
+
+		/* Render mime t ypes
+		 */
+		$this->renderMimeTypes();
 	}
 
 	/**
-	 * Get the latest entry for a Submission History or a Returned Work history
+	 * Render mime types
+	 */
+	private function renderMimeTypes() {
+		$this->getPage()->setBlock(TEMPLATE_content, 'allowed_files', 'allowed_files_block');
+
+		$allowedFiles = new AllowedFile();
+		$allowedList = $allowedFiles->getAll();
+
+		if (is_array($allowedList) && count($allowedList)) {
+
+			// append link icon to results
+			$allowedList[]['iconFile'] = "link.png";
+			$last = '';
+
+			foreach ($allowedList as $allowed) {
+				if ($last != $allowed["iconFile"]) {
+					$this->getPage()->setVar(array(
+						'NAME' => $allowedFiles->getClass($allowed["iconFile"]),
+						'ICON' => $allowed["iconFile"],
+					));
+
+					$this->getPage()->parse("allowed_files_block", "allowed_files", true);
+
+					$last = $allowed["iconFile"];
+				}
+			}
+		}
+		else {
+			$this->getPage()->setVar('allowed_files_block', '');
+		}
+	}
+
+	/**
+	 * Get the latest entry for a Submission History
 	 *
 	 * @param $userId
 	 * @param $boxId
@@ -57,6 +94,13 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 		}
 	}
 
+	/**
+	 * Get the latest entry for a Returned Work history
+	 *
+	 * @param $userId
+	 * @param $boxId
+	 * @return mixed
+	 */
 	private function getLatestReturn($userId, $boxId) {
 		$mapper = new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper();
 
@@ -71,11 +115,12 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 	 * Render page
 	 */
 	protected function render() {
-		$snapper = new \Eportfolio\ShowcaseMapper();
-
-		$allShowcasedItems = $snapper->findByColumn('uid', $this->getUserId());
-
+		$showcaseMapper = new \Eportfolio\ShowcaseMapper();
 		$boxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+
+		/* Gather around the loop, everyone
+		 */
+		$allShowcasedItems = $showcaseMapper->findByColumn('uid', $this->getUserId());
 
 		if ($allShowcasedItems->count()) {
 			$previousCategory = null;
@@ -96,8 +141,9 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 				 */
 				if ($latestSubmission) {
 					$this->getPage()->setVar(array(
-						'SHOWCASED_WORK_SUBMISSION_FILESIZE' => $latestSubmission->getFilesize(),
+						'SHOWCASED_WORK_SUBMISSION_FILESIZE' => Alaress_Byte_Format::bytesToString($latestSubmission->getFilesize()),
 						'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $latestSubmission->getSubmitted()->getShort(),
+						'SHOWCASED_WORK_MIMETYPE_ICONFILE' => $latestSubmission->getMimetype()->getClass(),
 					));
 				}
 				else {
