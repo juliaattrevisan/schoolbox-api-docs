@@ -54,9 +54,20 @@ class File {
 	 */
 	protected $comment;
 
+	/**
+	 * @var boolean
+	 */
 	protected $hidden;
 
+	/**
+	 * @var string
+	 */
 	protected $folder;
+
+	/**
+	 * @var int
+	 */
+	protected $filesize;
 
 	/**
 	 * @var IConfigLoader
@@ -234,6 +245,14 @@ class File {
 
 	public function getFolder() {
 		return $this->folder;
+	}
+
+	public function setFilesize($filesize) {
+		$this->filesize = $filesize;
+	}
+
+	public function getFilesize() {
+		return $this->filesize;
 	}
 
 
