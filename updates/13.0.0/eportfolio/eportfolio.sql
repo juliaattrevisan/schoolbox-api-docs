@@ -74,3 +74,7 @@ CREATE TABLE `eportfolio_showcase_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `
 ALTER TABLE `eportfolio_showcase_item` ADD COLUMN `submission_box_id` INT(11) NULL AFTER `id`;
 ALTER TABLE `eportfolio_showcase_item` CHANGE `submission_box_id` `submission_id` INT(11) NULL;
 ALTER TABLE `schoolbox`.`eportfolio_showcase_item` DROP COLUMN `submission_return_id`, CHANGE `submission_id` `submission_box_id` INT(11) NULL;
+
+/* Add error for nonexisting eportfolio pages
+ */
+INSERT INTO `schoolbox`.`error` (`id`, `message`) VALUES ('156', 'This page does not exist.');
