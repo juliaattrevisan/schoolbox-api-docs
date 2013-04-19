@@ -72,6 +72,22 @@ class SubmissionMapper extends Schoolbox\Mapper {
 			'this_key'  => 'owner',
 			'other_key' => 'id',
 		));
+
+		/* Relation to Allowed Files
+		 */
+		$this->hasMap(array(
+			'column'     => 'mime_type',
+			'property'   => 'mimetype',
+			'type'       => self::TYPE_MODEL,
+			'join'       => 'allowedFileType',
+		));
+
+		$this->hasJoin('allowedFileType', array(
+			'mapper'    => '\\Schoolbox\\File\\MimetypeMapper',
+			'this_key'  => 'mime_type',
+			'other_key' => 'mime',
+		));
+
 		$this->registerCallback('postSave', array($this, 'postSave'));
 	}
 
@@ -99,6 +115,7 @@ class SubmissionMapper extends Schoolbox\Mapper {
 				{$category_join->getColumnString('c')}
 			FROM {$this->getTable()} ss
 			LEFT JOIN {$this->getJoinSql('submission_box', 'ss', 'sb')}
+			LEFT JOIN {$this->getJoinSql('allowedFileType', 'ss', 'af')}
 			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
 			WHERE sb.category IN {$box_join->getArrayPlaceholders($categories, 'category')}
 			AND ss.owner = :user_id
@@ -139,13 +156,16 @@ class SubmissionMapper extends Schoolbox\Mapper {
 		$collection    = new ActivityCollection();
 		$box_join      = $this->getJoinMapper('submission_box');
 		$category_join = $box_join->getJoinMapper('category');
+		$mime_join     = $this->getJoinMapper('allowedFileType');
 		$query = "
 			SELECT
 				{$this->getColumnString('ss')},
 				{$box_join->getColumnString('sb')},
-				{$category_join->getColumnString('c')}
+				{$category_join->getColumnString('c')},
+				{$mime_join->getColumnString('af')}
 			FROM {$this->getTable()} ss
 			LEFT JOIN {$this->getJoinSql('submission_box', 'ss', 'sb')}
+			LEFT JOIN {$this->getJoinSql('allowedFileType', 'ss', 'af')}
 			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
 			WHERE sb.id = :box_id
 			AND ss.owner = :user_id
@@ -183,15 +203,19 @@ class SubmissionMapper extends Schoolbox\Mapper {
 	 * @return Submission
 	 */
 	protected function hydrateForActivityList($row) {
-
-		$box_join      = $this->getJoinMapper('submission_box');
+		$box_join = $this->getJoinMapper('submission_box');
 		$category_join = $box_join->getJoinMapper('category');
+		$mime_join = $this->getJoinMapper('allowedFileType');
 
 		$submission = $this->hydrate($row, 'ss');
-		$box        = $box_join->hydrate($row, 'sb');
-		$category   = $category_join->hydrate($row, 'c');
+		$box = $box_join->hydrate($row, 'sb');
+		$category = $category_join->hydrate($row, 'c');
+		$mime = $mime_join->hydrate($row, 'af');
+
 		$box->setCategory($category);
 		$submission->setSubmissionBox($box);
+		$submission->setMimetype($mime);
+
 		return $submission;
 	}
 
