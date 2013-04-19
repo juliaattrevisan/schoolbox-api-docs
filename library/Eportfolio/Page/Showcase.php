@@ -46,26 +46,31 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 	protected function render() {
 		$snapper = new \Eportfolio\ShowcaseMapper();
 
-		$allReturnedWork = $snapper->findShowcasedWork($this->getUserId());
+		$allShowcasedItems = $snapper->findShowcasedWork($this->getUserId());
 
-		if ($allReturnedWork->count()) {
+		if ($allShowcasedItems->count()) {
 			$previousCategory = null;
 
-			foreach($allReturnedWork as $currentReturnedWork) {
-				$currentCategory = $currentReturnedWork->getSubmissionReturn()->getSubmissionBox()->getCategory()->getName();
+			foreach($allShowcasedItems as $currentShowcasedItem) {
+				$currentCategory = $currentShowcasedItem->getSubmissionReturn()->getSubmissionBox()->getCategory();
+				$currentReturned = $currentShowcasedItem->getSubmissionReturn();
+				$currentSubmission = $currentShowcasedItem->getSubmission();
+				$currentBox = $currentReturned->getSubmissionBox();
 
 				$this->getPage()->setVar(array(
-					'SHOWCASED_WORK_CATEGORY' => $currentReturnedWork->getSubmissionReturn()->getSubmissionBox()->getCategory()->getName(),
-					'SHOWCASED_WORK_BOX' => $currentReturnedWork->getSubmissionReturn()->getSubmissionBox()->getName(),
-					'SHOWCASED_WORK_MARK' => $currentReturnedWork->getSubmissionReturn()->getMark(),
-					'SHOWCASED_WORK_FILESIZE' => $currentReturnedWork->getSubmissionReturn()->getFilesize(),
-					'SHOWCASED_WORK_ITEM_ID' => $currentReturnedWork->getId(),
+					'SHOWCASED_WORK_ITEM_ID' => $currentShowcasedItem->getId(),
+					'SHOWCASED_WORK_BOX_CATEGORY_NAME' => $currentCategory->getName(),
+					'SHOWCASED_WORK_BOX_NAME' => $currentBox->getName(),
+					'SHOWCASED_WORK_BOX_TYPE' => $currentBox->getWorkType()->getName(),
+					'SHOWCASED_WORK_SUBMISSION_FILESIZE' => $currentSubmission->getFilesize(),
+					'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $currentSubmission->getSubmitted()->getShort(),
+					'SHOWCASED_WORK_RETURNED_MARK' => $currentReturned->getMark(),
 				));
 
 				/* Category name
 				 */
-				if (($previousCategory == null) || ($previousCategory != $currentCategory)) {
-					$previousCategory = $currentCategory;
+				if (($previousCategory == null) || ($previousCategory != $currentCategory->getName())) {
+					$previousCategory = $currentCategory->getName();
 
 					$this->getPage()->parse('showcased_work_category_block', 'showcased_work_category');
 				}
