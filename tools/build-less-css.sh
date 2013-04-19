@@ -24,14 +24,8 @@ curdir=`pwd`;
 checknpm=`whereis -b npm | awk '{ print $2}'`;
 if [ -z $checknpm ];
 then
-	checkpuppet=`whereis -b puppet | awk '{ print $2}'`;
-	if [ -z $checkpuppet ];
-	then
-	        echo "NPM is not installed. Please install npm via your package utilities.";
-		exit 1;
-	else
-	        sudo puppet apply -e 'package { "npm": ensure => installed }';
-	fi
+	echo "NPM is not installed. Please install npm via your package utilities.";
+	exit 1;
 fi
 
 # Ensure less is installed
