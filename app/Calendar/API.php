@@ -43,7 +43,6 @@ class Calendar_API extends Generic_API {
 
 		/* Prefill containers for each day of the month
 		 */
-		$day_num = 1;
 		for($i = $month['start']; $i < $month['end']; $i += 24 * 3600) {
             $currentDay = strtotime("+1 day", $currentDay);
 
@@ -57,7 +56,7 @@ class Calendar_API extends Generic_API {
                 $day['isToday'] = '1';
             }
 
-			$eventMap[$day_num++] = $day;
+			$eventMap[$day['dayOfMonth']] = $day;
 		}
 
 		/* Get all the events for this month and fill them into the containers
