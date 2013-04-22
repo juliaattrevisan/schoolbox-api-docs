@@ -80,4 +80,38 @@ class ShowcaseMapper extends Schoolbox\Mapper {
 
 		return $this->hydrateList($rowset);
 	}
+
+	/**
+	 * Get all the showcased submission boxes for a particular user,
+	 * ordered alphabetically by the time they were showcased.
+	 *
+	 * This is used on the profile screen
+	 *
+	 * @param $userId
+	 * @param int $limit
+	 * @return bool|\Model
+	 */
+	public function getRecentShowcasedSubmissionBoxes($userId, $limit = 5) {
+		$statement = $this->database->prepare("
+            SELECT {$this->getColumnString()}
+            FROM `{$this->table}`
+            LEFT JOIN submission_box ON `{$this->table}`.submission_box_id = submission_box.id
+            LEFT JOIN category ON submission_box.category = category.id
+            WHERE eportfolio_showcase_item.uid = :userId
+            ORDER BY eportfolio_showcase_item.created_at DESC
+            LIMIT :limit
+        ");
+
+		$statement->bindParam(":userId", $userId);
+
+		/* Have to do this in a special way, apparently:
+		 * http://stackoverflow.com/questions/2269840/php-pdo-bindvalue-in-limit
+		 */
+		$statement->bindParam(":limit", $limit, \PDO::PARAM_INT);
+		$statement->execute();
+
+		$rowset = $statement->fetchAll();
+
+		return $this->hydrateList($rowset);
+	}
 }
