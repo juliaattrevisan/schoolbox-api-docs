@@ -941,6 +941,16 @@ class Submission extends DeprecatedModel {
         // Don't get users, just submission boxes.
         // Need to get users as part of another query, becuase they may be in
         // Synergetic.
+        // For overdue work - only send the notice if the submission box allows
+        // online submissions, because only they allow late submissions.
+        $where = "sb.deleted = 0
+            AND sn.type = :notif_type
+            AND sn.enabled = :notif_enabled
+            AND sn.sent = :notif_sent
+            AND sb.`date` BETWEEN :range_start AND :range_end";
+        if ($status == OVERDUE_WORK_TYPE) {
+            $where .= ' AND sb.accept_submission IS TRUE';
+        }
         $stmt = Database::getInstance()->prepare(
             "
             SELECT
@@ -954,11 +964,7 @@ class Submission extends DeprecatedModel {
             LEFT JOIN category c ON sb.category = c.id
             LEFT JOIN categoryCode cc ON cc.categoryID = c.id
             INNER JOIN submission_notification sn ON sb.id = sn.box_id
-            WHERE sb.deleted = 0
-            AND sn.type = :notif_type
-            AND sn.enabled = :notif_enabled
-            AND sn.sent = :notif_sent
-            AND sb.`date` BETWEEN :range_start AND :range_end
+            WHERE $where
             GROUP BY sb.id, c.id
             ORDER BY c.id ASC, sb.date ASC
         "
