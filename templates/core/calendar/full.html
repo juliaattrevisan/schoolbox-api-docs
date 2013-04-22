@@ -38,6 +38,10 @@
                  */
                 eventRender: function(calEvent, jsEvent, view) {
 
+					if ('is_rendered' in calEvent && !(calEvent.is_rendered)) {
+						return false;
+					}
+
                     // If appropriate, indicate this event can be attended
                     var span = '<span class="att">(A)</span>';
 

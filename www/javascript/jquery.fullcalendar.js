@@ -97,43 +97,86 @@ function Calendar(id, bubbleId, opts) {
             var flist = {}
             var calendarControls = $j(cal.options.filter.parentSelector)
 
+			//
+			// Go thru filter array
+			var filters = {};
+
             for (var i = 0; i < filterArray.length; i++) {
+				filters[filterArray[i]] = {};
                 var k = 0
                 flist[i] = [filterArray[i], {}]
 
                 calendarControls.find(cal.options.filter.listSelector + ' .' + filterArray[i] + ' input').each(function() {
                     var n = $j(this).attr('value')
                     // show related entries
+					filters[filterArray[i]][n] = this.checked;
                     if(this.checked) {
                         flist[i][1][k++] = n
-                        cal.dom.find('div.fc-event.' + n).show()
+//                        cal.dom.find('div.fc-event.' + n).show()
                     }
-                    // hide related entries
-                    else {
-                        if (cal.dom.find('div.fc-event.' + n).is(':visible')) {
-                            cal.dom.find('div.fc-event.' + n).hide()
-                        }
-                    }
+//                    // hide related entries
+//                    else {
+//                        if (cal.dom.find('div.fc-event.' + n).is(':visible')) {
+//                            cal.dom.find('div.fc-event.' + n).hide()
+//                        }
+//                    }
                 })
             }
 
             k = 0
             flist[filterArray.length] = ['events', {}]
 
+			filters['events'] = {};
+
             calendarControls.find(cal.options.filter.listSelector + ' .events input').each(function() {
                 var n = $j(this).attr('value')
                 // show related entries
+				filters['events'][n] = this.checked;
                 if(this.checked) {
                     flist[i][1][k++] = n
-                    cal.dom.find('div.fc-event.personal.' + n).show()
+//                    cal.dom.find('div.fc-event.personal.' + n).show()
                 }
-                // hide related entries
-                else {
-                    if (cal.dom.find('div.fc-event.' + n).is(':visible')) {
-                        cal.dom.find('div.fc-event.' + n).hide()
-                    }
-                }
+//                // hide related entries
+//                else {
+//                    if (cal.dom.find('div.fc-event.' + n).is(':visible')) {
+//                        cal.dom.find('div.fc-event.' + n).hide()
+//                    }
+//                }
             })
+
+//			console.log(filters);
+
+			//
+			// Get events, put an 'is_rendered' field on them
+			var events = cal.dom.fullCalendar('clientEvents');
+			$j.each(events, function(k,v) {
+				//
+				// Is this rendered?
+				// If it matches any filter that is not selected, then no.
+				var is_rendered = false;
+
+				//
+				// Check event.className for class names
+				$j.each(v.className, function(class_id, classes) {
+					var class_names = classes.trim().split(/\s+/);
+					//
+					// Does class name match what's selected?
+				});
+
+//				$.each(flist, function(f_id, filter) {
+//					var filter_name      = filter[0];
+//					var selected_filters = filter[1];
+//				});
+				v.is_rendered = (k%2 === 0);
+			});
+
+			//
+			// Jam them back in
+			cal.dom.fullCalendar('events', events);
+
+			//
+			// and re-render.
+			cal.dom.fullCalendar('rerenderEvents');
 
             // only send data to the server if we actually need to
             if(performAjax) {
