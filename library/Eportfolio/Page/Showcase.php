@@ -76,6 +76,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 				 */
 				if ($latestSubmission) {
 					$this->getPage()->setVar(array(
+						'SHOWCASED_WORK_SUBMISSION_ID' => $latestSubmission->getId(),
 						'SHOWCASED_WORK_SUBMISSION_FILESIZE' => Alaress_Byte_Format::bytesToString($latestSubmission->getFilesize()),
 						'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $latestSubmission->getSubmitted()->getShort(),
 						'SHOWCASED_WORK_MIMETYPE_ICONFILE' => $latestSubmission->getMimetype()->getClass(),
