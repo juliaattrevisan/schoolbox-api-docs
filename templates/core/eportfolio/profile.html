@@ -21,11 +21,13 @@
         <img src="http://lorempixel.com/1088/452" />
     </div>
     <div class="profile-name clearfix">
-        <img src='/portrait.php?userId={USER_ID}&size=constrain200' />
+        <img src='/portrait.php?userId={USER_EXTERNAL_ID}&size=constrain200' />
         <h1>{USER_FULLNAME}</h1>
-        <p>Year: {USER_YEAR}<br />
+        <p>
+			Year: {USER_YEAR}<br />
             House: {USER_HOUSE}<br />
-            Campus: {USER_CAMPUS}</p>
+            Campus: {USER_CAMPUS}
+		</p>
     </div>
 </div>
 

@@ -85,7 +85,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 		}
 
 		$this->getPage()->setVar(array(
-			'USER_ID' => $this->getExternalUserId(),
+			'USER_EXTERNAL_ID' => $this->getExternalUserId(),
 			'USER_FULLNAME' => $this->getUserName(),
 			'USER_CAMPUS' => $this->getUserCampusName(),
 			'USER_YEAR' => $this->getUserYear(),
