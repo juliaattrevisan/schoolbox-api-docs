@@ -83,7 +83,7 @@ class Eportfolio_Authenticator {
 	 * @return bool
 	 */
 	public function pageExists() {
-		if (in_array($this->getPageId(), $this->getPublicPages())) {
+		if (in_array($this->getPageId(), $this->getPublicPages()) || ($this->getPageId() == 'create')) {
 			return true;
 		}
 		else {
