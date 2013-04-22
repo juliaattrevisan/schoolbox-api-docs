@@ -120,7 +120,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 				/* Show submitted work information (if available)
 				 */
 				if ($latestSubmission) {
-					print_r($latestSubmission->getMimetype());
 					$this->getPage()->setVar(array(
 						'SHOWCASED_WORK_SUBMISSION_FILESIZE' => Alaress_Byte_Format::bytesToString($latestSubmission->getFilesize()),
 						'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $latestSubmission->getSubmitted()->getShort(),
