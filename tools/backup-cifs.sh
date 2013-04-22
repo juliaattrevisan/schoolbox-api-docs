@@ -94,12 +94,13 @@ echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Backup Started" >> $logfile;
 targetdir=$backup_dir/$DAY0;
 
 # Check if script already running
-process=`pgrep backup-cifs.sh | wc -l`;
-if [ $process -gt 2 ];
+processes=`pgrep backup-cifs.sh`;
+process=`echo $processes | wc -w`;
+if [ $process -gt 1 ];
 then
-        echo -e "Error: Script already running\nReported Processses: $process" >> $logfile;
-        echo -e "Error: Script already running\nReported Processses: $process";
-        exit 1;
+	echo -e "Error: Script already running\nReported Processses: $process\n$processes" >> $logfile;
+	echo -e "Error: Script already running\nReported Processses: $process\n$processes";
+	errorcheck=1
 fi
 
 # Check if smb/cifs share is mounted and attempt mount if necessary
@@ -116,7 +117,7 @@ fi
 
 # If share mounted, check available disk space [>90% WARN, >97% FAIL]
 mount_count=`df | grep $backup_dir | wc -l`;
-if [ $mount_count -ne 0 ];
+if [[ $mount_count -ne 0 && $errorcheck -eq 0 ]];
 then
 	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] CIFS remote share ($backup_share) is mounted" >> $logfile;
 	mount_space=`df | grep $backup_dir | awk '{print $5;}' | cut -d'%' -f1`;
@@ -147,8 +148,11 @@ then
 		rm -rf $targetdir >> $logfile 2>&1;
 	fi
 else
-	echo -e "Error: CIFS remote share ($backup_share) is unable to mount.\nHalting backup" >> $logfile;
-	errorcheck=1;
+	if [ $mount_count -eq 0 ];
+	then
+		echo -e "Error: CIFS remote share ($backup_share) is unable to mount.\nHalting backup" >> $logfile;
+		errorcheck=1;
+	fi
 fi
 
 if [ $errorcheck -eq 0 ];
@@ -175,7 +179,7 @@ then
 
 	# Backup $data_dir directory
 	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup of $data_dir" >> $logfile;
-	tar -cz $data_dir 2>>$logfile | split -b 10G -d --verbose - $targetdir/schoolboxdata-$DAY0.tar.gz_ >> $logfile 2>&1;
+	tar -cz `readlink -f $data_dir` 2>>$logfile | split -b 10G -d --verbose - $targetdir/schoolboxdata-$DAY0.tar.gz_ >> $logfile 2>&1;
 
 	# Remove old backup
 	if [ -d $backup_dir/$DAYX ]
