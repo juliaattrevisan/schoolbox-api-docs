@@ -954,7 +954,7 @@ class Submission extends DeprecatedModel {
             LEFT JOIN category c ON sb.category = c.id
             LEFT JOIN categoryCode cc ON cc.categoryID = c.id
             INNER JOIN submission_notification sn ON sb.id = sn.box_id
-            AND sb.deleted = 0
+            WHERE sb.deleted = 0
             AND sn.type = :notif_type
             AND sn.enabled = :notif_enabled
             AND sn.sent = :notif_sent
