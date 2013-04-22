@@ -48,7 +48,6 @@ $linkList = array(
 	)
 );
 
-
 $textbox = array(
 	'name' => 'Textbox',
 	'module' => 'eportfolio',
@@ -64,10 +63,26 @@ $textbox = array(
 	)
 );
 
+$file = array(
+	'name' => 'My Files',
+	'module' => 'eportfolio',
+	'component_category' => null,
+	'class' => 'Component_Eportfolio_FileListController',
+	'description' => 'A files component',
+	'multiple' => 'true',
+	'config' => array(
+		'componentname' => array(
+			'default_value' => 'My Files',
+			'label' => 'Title',
+		),
+	)
+);
+
 $allComponents[] = $basicList;
 $allComponents[] = $advancedList;
 $allComponents[] = $linkList;
 $allComponents[] = $textbox;
+$allComponents[] = $file;
 
 foreach($allComponents as $currentComponent) {
 	Component_DefinitionMapper::getInstance()->create($currentComponent);
