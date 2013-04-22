@@ -1,24 +1,11 @@
 <style type='text/css'>
-	div.horizontalList li {
-		background-color: #eee;
-		margin-bottom: 20px;
-		margin-right: 2px;
-		float: left;
-		display: inline;
-	}
-
-	div.horizontalList li a {
-		text-align: center;
-		padding: 20px;
-		display: block;
-	}
-
-	div.horizontalList {
-		width: 100%;
-	}
+    <!-- BEGIN allowed_files -->
+    a.{NAME}{background-image: url(/images/mime/22x22/{ICON});}
+    <!-- END allowed_files -->
 </style>
-<div class='horizontalList'>
-	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Profile</a></li>
+
+<ul class='admin-nav'>
+	<li><a class="current" href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Home</a></li>
 	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
 	<!-- BEGIN eportfolio_page -->
 	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
@@ -26,110 +13,140 @@
 	<!-- BEGIN can_add_page -->
 	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create'>+</a></li>
 	<!-- END can_add_page -->
-</div>
-<div class='clearfix'></div>
+</ul>
 
-<img src='/portrait.php?userId={USER_ID}&size=constrain200' />
-
-<h1>{USER_FULLNAME}</h1>
-
-<dl>
-	<dt>Year:</dt>
-	<dd>{USER_YEAR}</dd>
-
-	<dt>House:</dt>
-	<dd>{USER_HOUSE}</dd>
-
-	<dt>Campus:</dt>
-	<dd>{USER_CAMPUS}</dd>
-</dl>
-
-<div class='clearfix'></div>
-
-<style type='text/css'>
-	ul.showcasedWork li {
-		clear: both;
-	}
-
-	ul.showcasedWork li ul li {
-		width: 20%;
-		padding: 10px;
-		display:block;
-		float: left;
-		clear: none;
-	}
-</style>
-<style type='text/css'>
-	<!-- BEGIN allowed_files -->
-	a.{NAME}{background-image: url(/images/mime/22x22/{ICON});}
-	<!-- END allowed_files -->
-</style>
-
-<div style='padding-top:20px;'>
-	<h2>Recent Showcased Work</h2>
-	<!-- BEGIN has_showcased_work -->
-	<ul class='showcasedWork'>
-		<!-- BEGIN showcased_work -->
-		<li>
-			<ul>
-				<!-- BEGIN has_submission -->
-				<li>
-					<a class='icons {SHOWCASED_WORK_MIMETYPE_ICONFILE}'>{SHOWCASED_WORK_MIMETYPE_ICONFILE}</a>
-				</li>
-				<li>
-					<a href='/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1'>
-						<span class='boxName'>{SHOWCASED_WORK_BOX_NAME}</span> <span>({SHOWCASED_WORK_SUBMISSION_FILESIZE})</span><br />
-						<span>{SHOWCASED_WORK_BOX_CATEGORY_NAME}</span>
-					</a>
-				</li>
-				<!-- END has_submission -->
-				<!-- BEGIN no_submission -->
-				<li>
-					&nbsp;
-				</li>
-				<li>
-					<span class='boxName'>{SHOWCASED_WORK_BOX_NAME}</span> <span>({SHOWCASED_WORK_SUBMISSION_FILESIZE})</span><br />
-					<span>{SHOWCASED_WORK_BOX_CATEGORY_NAME}</span>
-				</li>
-				<!-- END no_submission -->
-				<li>
-					<span class='mark'>{SHOWCASED_WORK_RETURNED_MARK}</span>
-				</li>
-				<li>
-					<span>{SHOWCASED_WORK_SUBMISSION_SUBMITTED}</span>
-				</li>
-			</ul>
-		</li>
-		<!-- END showcased_work -->
-	</ul>
-	<!-- END has_showcased_work -->
-	<!-- BEGIN no_showcased_work -->
-	<p>{USER_FIRSTNAME} {USER_LASTNAME} has no showcased work.</p>
-	<!-- END no_showcased_work -->
-
-	<div class='clearfix'></div>
+<div class="profile-banner">
+    <div class="background">
+        <!-- TODO: this picture needs a placeholder or to be user-controlled -->
+        <img src="http://lorempixel.com/1088/452" />
+    </div>
+    <div class="profile-name clearfix">
+        <img src='/portrait.php?userId={USER_ID}&size=constrain200' />
+        <h1>{USER_FULLNAME}</h1>
+        <p>Year: {USER_YEAR}<br />
+            House: {USER_HOUSE}<br />
+            Campus: {USER_CAMPUS}</p>
+    </div>
 </div>
 
+<div class="left clearfix" style="width: 69%">
+    <div class="box component">
+        <h2>Recent Showcased Work
+            <a href="/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase" class="btn"><span></span>Showcased work</a>
+        </h2>
+        <div class="listing">
+            <!-- BEGIN has_showcased_work -->
+            <table class="showcased-work">
+                <colgroup>
+                    <col width="46" />
+                    <col />
+                    <col />
+                    <col width="142" />
+                </colgroup>
+                <tbody>
+                <!-- BEGIN showcased_work -->
+                <tr class="">
+                    <!-- TODO: Alternating dark class on line above -->
+                    <!-- BEGIN has_submission -->
+                    <td class="icon"><a class="icons {SHOWCASED_WORK_MIMETYPE_ICONFILE}" href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1"></a></td>
+                    <td><a class="title" href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1">
+                        {SHOWCASED_WORK_BOX_NAME}</a> ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
+                        <a href="">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></td>
+                        <!-- TODO: Link to subject on line above -->
+                    <!-- END has_submission -->
+                    <!-- BEGIN no_submission -->
+                    <td></td>
+                    <td>{SHOWCASED_WORK_BOX_NAME} ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
+                        <a href="">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></td>
+                    <!-- END no_submission -->
+                    <td>{SHOWCASED_WORK_SUBMISSION_SUBMITTED}</td>
+                    <td class="grade"><span class="gradient-">{SHOWCASED_WORK_RETURNED_MARK}</span></td>
+                    <!-- TODO: should be gradient-0 through gradient-10, based on mark -->
+                </tr>
+                <!-- END showcased_work -->
+                </tbody>
+            </table>
+            <!-- END has_showcased_work -->
+            <!-- BEGIN no_showcased_work -->
+            <p>{USER_FIRSTNAME} {USER_LASTNAME} has no showcased work.</p>
+            <!-- END no_showcased_work -->
+        </div>
+    </div>
 
-<div style='padding-top:20px;'>
-	<h2>My Current Subjects</h2>
-	<!-- BEGIN has_subjects -->
-	<ul>
-		<!-- BEGIN subject -->
-		<li><a href='/homepage/{SUBJECT_ID}'>{SUBJECT_NAME}</a></li>
-		<!-- END subject -->
-	</ul>
-	<!-- END has_subjects -->
+    <div class="box component">
+        <!-- TODO: This whole component -->
+        <h2>Recent Journals
+            <a href="" class="btn"><span></span>This should probably be a link to journals?</a>
+        </h2>
+        <div class="listing">
+            <table class="upcoming-work">
+                <tbody>
+                <tr class="">
+                    <td>Today</td>
+                    <td><a class="title" href="">Winter is coming</a></td>
+                </tr>
+                <tr class="dark">
+                    <td>3 weeks ago</td>
+                    <td><a class="title" href="">IPA - a winter or summer brew?</a></td>
+                </tr>
+                <tr class="">
+                    <td>1 month ago</td>
+                    <td><a class="title" href="">The life and death of a gummi bear</a></td>
+                </tr>
+                <tr class="dark">
+                    <td>Today</td>
+                    <td><a class="title" href="">Welsh - an interview with David Jones</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="box component">
+        <!-- TODO: This whole component-->
+        <h2>Recent Photos
+            <a href="" class="btn"><span></span>This should probably be a link to photos?</a>
+        </h2>
+        <div class="listing photos">
+            <a href="" title="Image title">
+                <img alt="Image title" src="http://lorempixel.com/499/499" />
+            </a>
+            <a href="" title="Image title">
+                <img alt="Image title" src="http://lorempixel.com/500/500" />
+            </a>
+            <a href="" title="Image title">
+                <img alt="Image title" src="http://lorempixel.com/501/501" />
+            </a>
+        </div>
+    </div>
 </div>
 
-<div style='padding-top:20px;'>
-	<h2>My Current Groups</h2>
-	<!-- BEGIN has_groups -->
-	<ul>
-		<!-- BEGIN group -->
-		<li><a href='/homepage/{GROUP_ID}'>{GROUP_NAME}</a></li>
-		<!-- END group -->
-	</ul>
-	<!-- END has_groups -->
-</div>
+<div class="right clearfix" style="width: 29%">
+    <div class="box clearfix">
+        <h2>My Current Subjects</h2>
+        <!-- BEGIN has_subjects -->
+        <div class="listing clearfix">
+            <ul>
+                <!-- BEGIN subject -->
+                <li class=""><a href='/homepage/{SUBJECT_ID}'>{SUBJECT_NAME}</a></li>
+                <!-- TODO: Alternating dark class on line above -->
+                <!-- END subject -->
+            </ul>
+        </div>
+        <!-- END has_subjects -->
+    </div>
 
+    <div class="box clearfix">
+        <h2>My Current Groups</h2>
+        <!-- BEGIN has_groups -->
+        <div class="listing clearfix">
+            <ul>
+                <!-- BEGIN group -->
+                <li class=""><a href='/homepage/{GROUP_ID}'>{GROUP_NAME}</a></li>
+                <!-- TODO: Alternating dark class on line above -->
+                <!-- END group -->
+            </ul>
+        </div>
+        <!-- END has_groups -->
+    </div>
+</div>
