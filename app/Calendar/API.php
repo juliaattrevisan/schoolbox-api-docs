@@ -79,6 +79,23 @@ class Calendar_API extends Generic_API {
 			$eventMap[$currentEventDay]['events'][] = $current;
 		}
 
+	    //
+	    // Sort events for each item?
+	    foreach ($eventMap as $event_day => &$map) {
+		    usort($map['events'], function($a, $b) {
+			    $a_time = $a->getStartTime();
+			    $b_time = $b->getStartTime();
+			    if ($a_time === '') {
+				    return -1;
+			    }
+			    if ($b_time === '') {
+				    return 1;
+			    }
+			    return $a->getStartTime()->compare($b->getStartTime());
+		    });
+	    }
+	    unset($map);
+
 		/* Pad out the final line
 		 */
 		$blankEnd = array();
