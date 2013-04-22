@@ -18,20 +18,16 @@
 	}
 </style>
 <style type='text/css'>
-	.showcasedWork {
-		width: 100%;
-		padding: 20px 0px;
+	ul.showcasedWork li {
 		clear: both;
 	}
 
-	.showcasedWork div span.boxName {
-		font-size: 16px;
-		font-weight: bold;
-	}
-
-	.showcasedWork div span.mark {
-		font-size: 32px;
-		font-family: Garamond,serif;
+	ul.showcasedWork li ul li {
+		width: 15%;
+		padding: 10px;
+		display:block;
+		float: left;
+		clear: none;
 	}
 </style>
 <style type='text/css'>
@@ -63,29 +59,51 @@
 	<!-- BEGIN showcased_work_category -->
 	<h2>{SHOWCASED_WORK_BOX_CATEGORY_NAME}</h2>
 	<!-- END showcased_work_category -->
-	<div class='showcasedWork'>
-		<div style='width: 120px;float:left'>
-			<span class='mark'>{SHOWCASED_WORK_RETURNED_MARK}</span>
-			<a class='icons {SHOWCASED_WORK_MIMETYPE_ICONFILE}'>icon</a>
-		</div>
-		<div style='width: auto;float:left'>
-			<span class='boxName'>{SHOWCASED_WORK_BOX_NAME}</span><br />
-			<span>{SHOWCASED_WORK_BOX_TYPE}</span>
-			<span>({SHOWCASED_WORK_SUBMISSION_FILESIZE})</span><br />
-			<span>{SHOWCASED_WORK_SUBMISSION_SUBMITTED}</span>
-		</div>
 
-		<div class='clearfix'></div>
-
-		<!-- BEGIN has_modify_form -->
-		<form action='/eportfolio/showcase/modifyForm.php' method='post'>
-			<input type='hidden' name='action' value='unpublish' />
-			<input type='hidden' name='userId' value='{USER_ID}' />
-			<input type='hidden' name='showcaseItemId' value='{SHOWCASED_WORK_ITEM_ID}' />
-			<input type='submit' value='Unpublish' />
-		</form>
-		<!-- END has_modify_form -->
-	</div>
+	<ul class='showcasedWork'>
+		<li>
+			<ul>
+				<!-- BEGIN has_submission -->
+				<li>
+					<a class='icons {SHOWCASED_WORK_MIMETYPE_ICONFILE}'>{SHOWCASED_WORK_MIMETYPE_ICONFILE}</a>
+				</li>
+				<li>
+					<a href='/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1'>
+						<span class='boxName'>{SHOWCASED_WORK_BOX_NAME}</span> <span>({SHOWCASED_WORK_SUBMISSION_FILESIZE})</span><br />
+						<span>{SHOWCASED_WORK_BOX_CATEGORY_NAME}</span><br />
+						<span>{SHOWCASED_WORK_BOX_TYPE}</span>
+					</a>
+				</li>
+				<!-- END has_submission -->
+				<!-- BEGIN no_submission -->
+				<li>
+					&nbsp;
+				</li>
+				<li>
+					<span class='boxName'>{SHOWCASED_WORK_BOX_NAME}</span> <span>({SHOWCASED_WORK_SUBMISSION_FILESIZE})</span><br />
+					<span>{SHOWCASED_WORK_BOX_CATEGORY_NAME}</span>
+				</li>
+				<!-- END no_submission -->
+				<li>
+					<span class='mark'>{SHOWCASED_WORK_RETURNED_MARK}</span>
+				</li>
+				<li>
+					<span>{SHOWCASED_WORK_SUBMISSION_SUBMITTED}</span>
+				</li>
+				<li>
+					<!-- BEGIN has_modify_form -->
+					<form action='/eportfolio/showcase/modifyForm.php' method='post'>
+						<input type='hidden' name='action' value='unpublish' />
+						<input type='hidden' name='userId' value='{USER_ID}' />
+						<input type='hidden' name='showcaseItemId' value='{SHOWCASED_WORK_ITEM_ID}' />
+						<input type='submit' value='Unpublish' />
+					</form>
+					<!-- END has_modify_form -->
+				</li>
+			</ul>
+		</li>
+	</ul>
+	<div class='clearfix'></div>
 	<!-- END showcased_work -->
 </div>
 <!-- END has_showcased_work -->
