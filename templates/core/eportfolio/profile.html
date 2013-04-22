@@ -17,6 +17,7 @@
 
 <div class="profile-banner">
     <div class="background">
+        <!-- TODO: this picture needs a placeholder or to be user-controlled -->
         <img src="http://lorempixel.com/1088/452" />
     </div>
     <div class="profile-name clearfix">
@@ -45,11 +46,13 @@
                 <tbody>
                 <!-- BEGIN showcased_work -->
                 <tr class="">
+                    <!-- TODO: Alternating dark class on line above -->
                     <!-- BEGIN has_submission -->
                     <td class="icon"><a class="icons {SHOWCASED_WORK_MIMETYPE_ICONFILE}" href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1"></a></td>
                     <td><a class="title" href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1">
                         {SHOWCASED_WORK_BOX_NAME}</a> ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
                         <a href="">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></td>
+                        <!-- TODO: Link to subject on line above -->
                     <!-- END has_submission -->
                     <!-- BEGIN no_submission -->
                     <td></td>
@@ -58,6 +61,7 @@
                     <!-- END no_submission -->
                     <td>{SHOWCASED_WORK_SUBMISSION_SUBMITTED}</td>
                     <td class="grade"><span class="gradient-">{SHOWCASED_WORK_RETURNED_MARK}</span></td>
+                    <!-- TODO: should be gradient-0 through gradient-10, based on mark -->
                 </tr>
                 <!-- END showcased_work -->
                 </tbody>
@@ -70,6 +74,7 @@
     </div>
 
     <div class="box component">
+        <!-- TODO: This whole component -->
         <h2>Recent Journals
             <a href="" class="btn"><span></span>This should probably be a link to journals?</a>
         </h2>
@@ -98,6 +103,7 @@
     </div>
 
     <div class="box component">
+        <!-- TODO: This whole component-->
         <h2>Recent Photos
             <a href="" class="btn"><span></span>This should probably be a link to photos?</a>
         </h2>
@@ -122,7 +128,8 @@
         <div class="listing clearfix">
             <ul>
                 <!-- BEGIN subject -->
-                <li><a href='/homepage/{SUBJECT_ID}'>{SUBJECT_NAME}</a></li>
+                <li class=""><a href='/homepage/{SUBJECT_ID}'>{SUBJECT_NAME}</a></li>
+                <!-- TODO: Alternating dark class on line above -->
                 <!-- END subject -->
             </ul>
         </div>
@@ -135,7 +142,8 @@
         <div class="listing clearfix">
             <ul>
                 <!-- BEGIN group -->
-                <li><a href='/homepage/{GROUP_ID}'>{GROUP_NAME}</a></li>
+                <li class=""><a href='/homepage/{GROUP_ID}'>{GROUP_NAME}</a></li>
+                <!-- TODO: Alternating dark class on line above -->
                 <!-- END group -->
             </ul>
         </div>
