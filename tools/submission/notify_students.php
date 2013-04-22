@@ -166,7 +166,10 @@ function sendOverdueNotifictions($testRun) {
 				$due .= ' on ' . date('D, jS M', $stamp);
 
 				$output = array(
-					'NAME' => trim($user['firstname']),
+					'NAME'        => trim($user['firstname']),
+					'SURNAME'     => trim($user['lastname']),
+					'SITE_DOMAIN' => Cfg::get('site_domain'),
+					'USER_EMAIL'  =>  trim($user['alt_email']),
 
 					'CATEGORY_ID'   => $category['id'],
 					'CATEGORY_NAME' => $category['name'],
