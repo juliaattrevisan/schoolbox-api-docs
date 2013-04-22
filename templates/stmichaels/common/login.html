@@ -37,6 +37,11 @@ function init(){
         <input type="password" name="password" id="password" />
       </fieldset>
         <input type="hidden" name="page" value="{HIDDEN}" />
+
+      <p><label for="tandc" class="tandc">
+          <input class="required" id="tandc" name="tandc" type="checkbox" title="You must agree to the Terms and Conditions before proceeding" />
+          I agree to be legally bound by the <a href="/policy.php">Terms and Conditions</a> of use for this website.</label>
+          </p>
         <input class="login submit-btn-plain" type="submit" name="Submit" value="Login" alt="Login" />
 		<div class="float-fix"></div>
     </form>
@@ -57,6 +62,14 @@ function init(){
 	<li class="last"><a href="/feedback.php" title="Web Designers">Feedback and Support</a></li>
   </ul>
 </div>
+
+<script type="text/javascript" src="/min/index.php?b=javascript&f=jquery-1.7.1.min.js,jquery.validate.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $('#loginForm').validate();
+    })
+</script>
+
 </body>
 </html>
 
