@@ -10,6 +10,13 @@
 class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 
 	/**
+	 * Number of Recent Showcased Items to display
+	 *
+	 * @var int
+	 */
+	protected $numShowcasedItems = -1;
+
+	/**
 	 * The template file to use
 	 *
 	 * @var string
@@ -20,6 +27,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 * Initialise classes and collections
 	 */
 	protected function initialise() {
+		$this->setNumShowcasedItems(3);
 	}
 
 	/**
@@ -33,6 +41,21 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 
 		$this->getPage()->setBlock(TEMPLATE_content, 'has_groups', 'has_groups_block');
 		$this->getPage()->setBlock('has_groups', 'group', 'group_block');
+
+		$this->getPage()->setBlock(TEMPLATE_content, 'no_showcased_work', 'no_showcased_work_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'has_showcased_work', 'has_showcased_work_block');
+		$this->getPage()->setBlock('has_showcased_work', 'showcased_work', 'showcased_work_block');
+
+		$user = $this->getUser();
+
+		$this->getPage()->setVar(array(
+			'USER_FIRSTNAME' => $user['firstname'],
+			'USER_LASTNAME' => $user['lastname'],
+		));
+
+		/* Render mime types
+		 */
+		$this->renderMimeTypes();
 	}
 
 	/**
@@ -72,6 +95,72 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 * Render recent showcased work
 	 */
 	private function renderShowcasedWork() {
+		$showcaseMapper = new \Eportfolio\ShowcaseMapper();
+		$boxMapper = new \Schoolbox\Assessment\Component\SubmissionBoxMapper();
+
+		/* Gather around the loop, everyone
+		 */
+		$allShowcasedItems = $showcaseMapper->getRecentShowcasedSubmissionBoxes($this->getUserId(), $this->getNumShowcasedItems());
+
+		if ($allShowcasedItems->count()) {
+			$previousCategory = null;
+
+			foreach($allShowcasedItems as $currentShowcasedItem) {
+				$latestSubmission = $this->getLatestSubmission($this->getUserId(), $currentShowcasedItem->getSubmissionBoxId());
+				$latestReturn = $this->getLatestReturn($this->getUserId(), $currentShowcasedItem->getSubmissionBoxId());
+				$currentBox = $boxMapper->findById($currentShowcasedItem->getSubmissionBoxId());
+
+				$this->getPage()->setVar(array(
+					'SHOWCASED_WORK_ITEM_ID' => $currentShowcasedItem->getId(),
+					'SHOWCASED_WORK_BOX_CATEGORY_NAME' => $currentBox->getCategory()->getName(),
+					'SHOWCASED_WORK_BOX_NAME' => $currentBox->getName(),
+					'SHOWCASED_WORK_BOX_TYPE' => $currentBox->getWorkType()->getName(),
+				));
+
+				/* Show submitted work information (if available)
+				 */
+				if ($latestSubmission) {
+					print_r($latestSubmission->getMimetype());
+					$this->getPage()->setVar(array(
+						'SHOWCASED_WORK_SUBMISSION_FILESIZE' => Alaress_Byte_Format::bytesToString($latestSubmission->getFilesize()),
+						'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $latestSubmission->getSubmitted()->getShort(),
+						'SHOWCASED_WORK_MIMETYPE_ICONFILE' => $latestSubmission->getMimetype()->getClass(),
+					));
+				}
+				else {
+					$this->getPage()->setVar(array(
+						'SHOWCASED_WORK_SUBMISSION_FILESIZE' => '',
+						'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => '',
+					));
+				}
+
+				/* Show returned work information (if available)
+				 */
+				if ($latestReturn) {
+					$this->getPage()->setVar(array(
+						'SHOWCASED_WORK_RETURNED_MARK' => $latestReturn->getMark(),
+					));
+				}
+				else {
+					$this->getPage()->setVar(array(
+						'SHOWCASED_WORK_RETURNED_MARK' => '',
+					));
+				}
+
+				$this->getPage()->parse('showcased_work_block', 'showcased_work', true);
+
+				/* Clear children after parsing out the parent
+				 */
+				$this->getPage()->setVar('has_modify_form_block', '');
+			}
+
+			$this->getPage()->parse('has_showcased_work_block', 'has_showcased_work');
+			$this->getPage()->setVar('no_showcased_work_block', '');
+		}
+		else {
+			$this->getPage()->parse('no_showcased_work_block', 'no_showcased_work');
+			$this->getPage()->setVar('has_showcased_work_block', '');
+		}
 	}
 
 	/**
@@ -132,6 +221,9 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 		}
 	}
 
+	/* Getters/Setters
+	 */
+
 	/**
 	 * Get a user's house id
 	 *
@@ -168,6 +260,21 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 		return $this->user['campusName'];
 	}
 
-	/* Getters/Setters
+	/**
+	 * Set num showcased items
+	 *
+	 * @param int $numShowcasedItems
 	 */
+	private function setNumShowcasedItems($numShowcasedItems) {
+		$this->numShowcasedItems = $numShowcasedItems;
+	}
+
+	/**
+	 * Get num showcased items
+	 *
+	 * @return int
+	 */
+	private function getNumShowcasedItems() {
+		return $this->numShowcasedItems;
+	}
 }

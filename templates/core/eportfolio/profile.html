@@ -46,6 +46,59 @@
 
 <div class='clearfix'></div>
 
+<style type='text/css'>
+	ul.showcasedWork li {
+		clear: both;
+	}
+
+	ul.showcasedWork li ul li {
+		border: 1px solid #f00;
+		width: 20%;
+		padding: 10px;
+		display:block;
+		float: left;
+		clear: none;
+	}
+</style>
+<style type='text/css'>
+	<!-- BEGIN allowed_files -->
+	a.{NAME}{background-image: url(/images/mime/22x22/{ICON});}
+	<!-- END allowed_files -->
+</style>
+
+<div style='padding-top:20px;'>
+	<h2>Recent Showcased Work</h2>
+	<!-- BEGIN has_showcased_work -->
+	<ul class='showcasedWork'>
+		<!-- BEGIN showcased_work -->
+		<li>
+			<ul>
+				<li>
+					<a class='icons {SHOWCASED_WORK_MIMETYPE_ICONFILE}'>{SHOWCASED_WORK_MIMETYPE_ICONFILE}</a>
+				</li>
+				<li>
+					<span class='boxName'>{SHOWCASED_WORK_BOX_NAME}</span> <span>({SHOWCASED_WORK_SUBMISSION_FILESIZE})</span><br />
+					<span>{SHOWCASED_WORK_BOX_CATEGORY_NAME}</span>
+				</li>
+				<li>
+					<span class='mark'>{SHOWCASED_WORK_RETURNED_MARK}</span>
+				</li>
+				<li>
+					<span>{SHOWCASED_WORK_SUBMISSION_SUBMITTED}</span>
+				</li>
+			</ul>
+		</li>
+		<!-- END showcased_work -->
+	</ul>
+	<!-- END has_showcased_work -->
+	<!-- BEGIN no_showcased_work -->
+	<p>{USER_FIRSTNAME} {USER_LASTNAME} has no showcased work.</p>
+	<!-- END no_showcased_work -->
+
+	<div class='clearfix'></div>
+</div>
+
+
 <div style='padding-top:20px;'>
 	<h2>My Current Subjects</h2>
 	<!-- BEGIN has_subjects -->
