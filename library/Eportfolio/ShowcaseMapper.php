@@ -36,6 +36,24 @@ class ShowcaseMapper extends Schoolbox\Mapper {
 			'property'   => 'uid',
 			'type'       => self::TYPE_INTEGER,
 		));
+
+		$this->hasMap(array(
+			'column'     => 'created_at',
+			'property'   => 'createdAt',
+			'type'       => self::TYPE_DATETIME,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'updated_at',
+			'property'   => 'updatedAt',
+			'type'       => self::TYPE_DATETIME,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'deleted_at',
+			'property'   => 'deletedAt',
+			'type'       => self::TYPE_DATETIME,
+		));
 	}
 
 	/**

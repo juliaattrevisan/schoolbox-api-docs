@@ -29,10 +29,13 @@ if ($authenticator->canModify()) {
 	}
 	else if ($action == 'publish') {
 		$boxId = \Scrub::text($_POST['boxId']);
+		$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
 		$showcasedItem = new Showcase();
 		$showcasedItem->setSubmissionBoxId($boxId);
 		$showcasedItem->setUid($ownerId);
+		$showcasedItem->setCreatedAt($now);
+		$showcasedItem->setUpdatedAt($now);
 
 		ShowcaseMapper::getInstance()->create($showcasedItem);
 	}

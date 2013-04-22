@@ -78,3 +78,7 @@ ALTER TABLE `schoolbox`.`eportfolio_showcase_item` DROP COLUMN `submission_retur
 /* Add error for nonexisting eportfolio pages
  */
 INSERT INTO `schoolbox`.`error` (`id`, `message`) VALUES ('156', 'This page does not exist.');
+
+/* Add a bunch of datetime fields for sorting Showcased Work on profile page
+ */
+ALTER TABLE `eportfolio_showcase_item` ADD COLUMN `created_at` DATETIME NULL AFTER `uid`, ADD COLUMN `updated_at` DATETIME NULL AFTER `created_at`, ADD COLUMN `deleted_at` DATETIME NULL AFTER `updated_at`;
