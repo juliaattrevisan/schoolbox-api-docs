@@ -52,7 +52,6 @@
 	}
 
 	ul.showcasedWork li ul li {
-		border: 1px solid #f00;
 		width: 20%;
 		padding: 10px;
 		display:block;
@@ -73,13 +72,26 @@
 		<!-- BEGIN showcased_work -->
 		<li>
 			<ul>
+				<!-- BEGIN has_submission -->
 				<li>
 					<a class='icons {SHOWCASED_WORK_MIMETYPE_ICONFILE}'>{SHOWCASED_WORK_MIMETYPE_ICONFILE}</a>
+				</li>
+				<li>
+					<a href='/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1'>
+						<span class='boxName'>{SHOWCASED_WORK_BOX_NAME}</span> <span>({SHOWCASED_WORK_SUBMISSION_FILESIZE})</span><br />
+						<span>{SHOWCASED_WORK_BOX_CATEGORY_NAME}</span>
+					</a>
+				</li>
+				<!-- END has_submission -->
+				<!-- BEGIN no_submission -->
+				<li>
+					&nbsp;
 				</li>
 				<li>
 					<span class='boxName'>{SHOWCASED_WORK_BOX_NAME}</span> <span>({SHOWCASED_WORK_SUBMISSION_FILESIZE})</span><br />
 					<span>{SHOWCASED_WORK_BOX_CATEGORY_NAME}</span>
 				</li>
+				<!-- END no_submission -->
 				<li>
 					<span class='mark'>{SHOWCASED_WORK_RETURNED_MARK}</span>
 				</li>

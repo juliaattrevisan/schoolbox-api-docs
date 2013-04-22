@@ -45,6 +45,8 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 		$this->getPage()->setBlock(TEMPLATE_content, 'no_showcased_work', 'no_showcased_work_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'has_showcased_work', 'has_showcased_work_block');
 		$this->getPage()->setBlock('has_showcased_work', 'showcased_work', 'showcased_work_block');
+		$this->getPage()->setBlock('showcased_work', 'has_submission', 'has_submission_block');
+		$this->getPage()->setBlock('showcased_work', 'no_submission', 'no_submission_block');
 
 		$user = $this->getUser();
 
@@ -121,16 +123,23 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 				 */
 				if ($latestSubmission) {
 					$this->getPage()->setVar(array(
+						'SHOWCASED_WORK_SUBMISSION_ID' => $latestSubmission->getId(),
 						'SHOWCASED_WORK_SUBMISSION_FILESIZE' => Alaress_Byte_Format::bytesToString($latestSubmission->getFilesize()),
 						'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $latestSubmission->getSubmitted()->getShort(),
 						'SHOWCASED_WORK_MIMETYPE_ICONFILE' => $latestSubmission->getMimetype()->getClass(),
 					));
+
+					$this->getPage()->parse('has_submission_block', 'has_submission');
+					$this->getPage()->setVar('no_submission_block', '');
 				}
 				else {
 					$this->getPage()->setVar(array(
 						'SHOWCASED_WORK_SUBMISSION_FILESIZE' => '',
 						'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => '',
 					));
+
+					$this->getPage()->parse('no_submission_block', 'no_submission');
+					$this->getPage()->setVar('has_submission_block', '');
 				}
 
 				/* Show returned work information (if available)
@@ -151,6 +160,8 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 				/* Clear children after parsing out the parent
 				 */
 				$this->getPage()->setVar('has_modify_form_block', '');
+				$this->getPage()->setVar('has_submission_block', '');
+				$this->getPage()->setVar('no_submission_block', '');
 			}
 
 			$this->getPage()->parse('has_showcased_work_block', 'has_showcased_work');
