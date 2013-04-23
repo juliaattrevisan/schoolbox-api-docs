@@ -60,11 +60,14 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 				$fileHandler = new MyFile();
 				$file = $fileHandler->getById($currentItem->getFileId());
 
+				$mimeMapper = new \Schoolbox\File\MimetypeMapper();
+
 				$this->setVar(array(
 					'LIST_ITEM_ID' => $currentItem->getId(),
 					'FILE_ITEM_ID' => $currentItem->getFileId(),
 					'FILE_ITEM_TITLE' => $file['description'],
 					'FILE_ITEM_FILENAME' => $file['realname'],
+					'FILE_ITEM_MIMETYPE' => $mimeMapper->findByColumn('mime', $file['mime_type'])->current()->getClass(),
 				));
 
 				/* Controls
