@@ -47,7 +47,7 @@ class Showcase {
 	private $updated_at;
 
 	/**
-	 * When the Showcased Work item was softdelted
+	 * When the Showcased Work item was softdeleted
 	 * @var
 	 */
 	private $deleted_at;
