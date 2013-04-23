@@ -52,6 +52,35 @@ class Component_InstanceMapper extends Mapper {
     }
 
 	/**
+	 * Find all the known instances of a particular kind of component within
+	 * a module context
+	 *
+	 * @param $module
+	 * @param $definitionId
+	 * @return Collection
+	 */
+	public function findByDefinition($module, $definitionId) {
+		$sql = '
+            SELECT '.$this->getColumnString('ci').'
+                 , '.Component_DefinitionMapper::getInstance()->getColumnString('cd').'
+                 , '.Component_ConfigDefinitionMapper::getInstance()->getColumnString('ccd').'
+                 , '.Component_ConfigMapper::getInstance()->getColumnString('cci')."
+            FROM component_instance ci
+            INNER JOIN component_definition cd ON ci.component_definition_id = cd.id
+			LEFT JOIN component_config_definition ccd ON cd.id = ccd.component_definition_id
+			LEFT JOIN component_config_instance cci ON ccd.id = cci.component_config_definition_id AND cci.component_instance_id = ci.id
+            WHERE ci.module = :module
+            AND ci.component_definition_id = :definitionId
+            ORDER BY identifier ASC, `position` ASC, ci.sequence ASC
+        ";
+
+		return $this->findByFields($sql, array(
+			':module' => $module,
+			':definitionId' => $definitionId
+		));
+	}
+
+	/**
 	 * Find component records by a module, but without an identifier
 	 *
 	 * @param $module
