@@ -43,10 +43,10 @@ CREATE TABLE `eportfolio_permission`( `id` INT(11) NOT NULL AUTO_INCREMENT, `pag
 
 /* Remove excess tables again
  */
-DROP TABLE eportfolio_comp_category;
-DROP TABLE eportfolio_comp_location;
-DROP TABLE eportfolioComponentCategory;
-DROP TABLE eportfolioTemplateLayout;
+-- DROP TABLE eportfolio_comp_category;
+-- DROP TABLE eportfolio_comp_location;
+-- DROP TABLE eportfolioComponentCategory;
+-- DROP TABLE eportfolioTemplateLayout;
 
 /* Add error for nonexisting eportfolio pages
  */
