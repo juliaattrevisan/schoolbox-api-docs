@@ -47,6 +47,10 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 		$this->setBlock($templateHandle, 'list_item', 'list_item_block');
 		$this->setBlock('list_item', 'has_unpublish_form', 'has_unpublish_form_block');
 
+		$this->setVar(array(
+			'list_item_block' => ''
+		));
+
 		/* Gather everything
 		 */
 		$allItems = $this->getMapperClass()->findByColumn('component_instance_id', $this->instance->id);
