@@ -188,4 +188,57 @@ class Eportfolio_PageMapper extends Mapper {
 
 		parent::mapping();
 	}
+
+	/**
+	 * Find all the user's pages with a particular component on it
+	 *
+	 * @param $userId
+	 * @param $componentDefinition
+	 *
+	 * @return array
+	 */
+	public function findAvailablePages($userId, $componentDefinition) {
+		$pageData = array();
+		$pageIds = array();
+
+		$allComponents = Component_InstanceMapper::getInstance()->findByDefinition('eportfolio', $componentDefinition->id);
+
+		/* Get a list of pages which have File List components
+		 */
+		if (is_array($allComponents) && count($allComponents)) {
+			foreach($allComponents as $currentComponent) {
+				$pageIds[] = $currentComponent->identifier;
+			}
+
+			$allPages = Eportfolio_PageMapper::getInstance()->findIn('page_id', $pageIds);
+
+			/* Then associate each page with their components
+			 */
+			if ($allPages->count()) {
+				foreach ($allPages as $currentPage) {
+					$componentList = array();
+
+					/* Only get this user's pages
+					 */
+					if ($currentPage->getUid() == $userId) {
+						foreach ($allComponents as $currentComponent) {
+							if ($currentComponent->identifier == $currentPage->getPageId()) {
+								$componentList[] = $currentComponent;
+							}
+
+							/* Throw it all into some arbitrary array
+							 * We're going to do this the poopy way
+							 */
+							$pageData[] = array(
+								'page' => $currentPage,
+								'componentList' => $componentList
+							);
+						}
+					}
+				}
+			}
+		}
+
+		return $pageData;
+	}
 }
