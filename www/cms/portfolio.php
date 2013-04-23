@@ -114,7 +114,7 @@ if (is_array($availablePages) && count($availablePages)) {
 				$pageData = array(
 					'pageId' => $currentPage['page']->getPageId(),
 					'pageTitle' => $currentPage['page']->getPageTitle(),
-					'pageOwner' => $currentPage['page']->getUid(),
+					'pageOwnerId' => $currentPage['page']->getUid(),
 					'componentInstanceId' => $currentComponent->id,
 					'componentName' => $componentName,
 				);
@@ -133,6 +133,7 @@ if (is_array($allPageData) && count($allPageData)) {
 	foreach($allPageData as $currentPageData) {
 		$this->setVar(array(
 			'PUBLISH_PAGE_PAGE_ID' => $currentPageData['pageId'],
+			'PUBLISH_PAGE_PAGE_OWNER_ID' => $currentPageData['pageOwnerId'],
 			'PUBLISH_PAGE_PAGE_NAME' => $currentPageData['pageTitle'],
 			'PUBLISH_PAGE_COMPONENT_INSTANCE_ID' => $currentPageData['componentInstanceId'],
 			'PUBLISH_PAGE_COMPONENT_NAME' => $currentPageData['componentName'],
