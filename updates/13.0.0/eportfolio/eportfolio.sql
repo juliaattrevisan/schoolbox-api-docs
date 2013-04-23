@@ -41,6 +41,17 @@ ALTER TABLE `eportfolio_config` ADD COLUMN `page_id` INT(11) NOT NULL AUTO_INCRE
  */
 CREATE TABLE `eportfolio_permission`( `id` INT(11) NOT NULL AUTO_INCREMENT, `page_id` INT(11) NOT NULL, `type` ENUM('parent','group','student') NOT NULL DEFAULT 'student', `value` INT(11) NOT NULL, PRIMARY KEY (`id`) );
 
+/* Remove excess tables again
+ */
+DROP TABLE eportfolio_comp_category;
+DROP TABLE eportfolio_comp_location;
+DROP TABLE eportfolioComponentCategory;
+DROP TABLE eportfolioTemplateLayout;
+
+/* Add error for nonexisting eportfolio pages
+ */
+INSERT INTO `error` (`id`, `message`) VALUES ('156', 'This page does not exist.');
+
 /* Components tables
  */
 
@@ -61,13 +72,6 @@ CREATE TABLE `eportfolio_component_linklist_item`( `id` INT(11) NOT NULL AUTO_IN
  */
 CREATE TABLE `eportfolio_component_textbox_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `component_instance_id` INT(11) NOT NULL, `content` TEXT, `sequence` INT(11), PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
 
-/* Remove excess tables again
- */
-DROP TABLE eportfolio_comp_category;
-DROP TABLE eportfolio_comp_location;
-DROP TABLE eportfolioComponentCategory;
-DROP TABLE eportfolioTemplateLayout;
-
 /* Add showcased work table
  */
 CREATE TABLE `eportfolio_showcase_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `submission_return_id` INT(11), `uid` INT(11), PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
@@ -75,15 +79,11 @@ ALTER TABLE `eportfolio_showcase_item` ADD COLUMN `submission_box_id` INT(11) NU
 ALTER TABLE `eportfolio_showcase_item` CHANGE `submission_box_id` `submission_id` INT(11) NULL;
 ALTER TABLE `eportfolio_showcase_item` DROP COLUMN `submission_return_id`, CHANGE `submission_id` `submission_box_id` INT(11) NULL;
 
-/* Add error for nonexisting eportfolio pages
- */
-INSERT INTO `error` (`id`, `message`) VALUES ('156', 'This page does not exist.');
-
 /* Add a bunch of datetime fields for sorting Showcased Work on profile page
  */
 ALTER TABLE `eportfolio_showcase_item` ADD COLUMN `created_at` DATETIME NULL AFTER `uid`, ADD COLUMN `updated_at` DATETIME NULL AFTER `created_at`, ADD COLUMN `deleted_at` DATETIME NULL AFTER `updated_at`;
 
-/* Add file list titem table
+/* Add file list item table
  */
 CREATE TABLE `eportfolio_component_filelist_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `component_instance_id` INT(11) NOT NULL, `file_id` INT(11) NOT NULL, PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
 ALTER TABLE `eportfolio_component_filelist_item` ADD COLUMN `created_at` DATETIME NULL AFTER `file_id`, ADD COLUMN `updated_at` DATETIME NULL AFTER `created_at`, ADD COLUMN `deleted_at` DATETIME NULL AFTER `updated_at`;
