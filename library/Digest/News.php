@@ -99,6 +99,23 @@ class Digest_News {
 
 
     /**
+     * Retrieves poster's name from article - used by compileNews() to generate
+     * article for digest.
+     *
+     * @param $article
+     *
+     * @return string
+     */
+    protected function getPosterFromArticle($article) {
+        $poster = sprintf('%s %s', $article['firstname'],  $article['lastname']);
+        if ($article['title']) {
+            $poster = $article['title'].'. '.$poster;
+        }
+        return $poster;
+    }
+
+
+    /**
      * Take the user array by value and populate its news fields
      * @param $u
      * @return array
@@ -114,6 +131,7 @@ class Digest_News {
                     'abstract' => $this->scrub($article['item_body']),
                     'topic'    => $article['topicName'],
                     'date'     => strtotime($article['item_datetime_posted']),
+                    'poster'   => $this->getPosterFromArticle($article),
                 );
             }
 
@@ -134,6 +152,7 @@ class Digest_News {
                                 'abstract' => $this->scrub($art['body']),
                                 'topic'    => $cat['name'],
                                 'date'     => $art['posted'],
+                                'poster'   => $this->getPosterFromArticle($art),
                             );
                         }
                     }
@@ -193,7 +212,8 @@ class Digest_News {
                                 'ARTICLE_ABSTRACT'   => $article['abstract'],
                                 'ARTICLE_TOPIC'      => $article['topic'],
                                 'ARTICLE_DATE'       => date('l, jS \o\f F', $article['date']),
-                                'ARTICLE_BACKGROUND' => ++$i % 2 == 1 ? "none" : "#F4F4F8"
+                                'ARTICLE_BACKGROUND' => ++$i % 2 == 1 ? "none" : "#F4F4F8",
+                                'ARTICLE_POSTER'     => $article['poster'],
                             ));
 
                             $mailer->parse('article_block', 'article', true);
