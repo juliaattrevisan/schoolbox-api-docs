@@ -373,15 +373,21 @@ class News extends DeprecatedModel {
         /* Prevent copies of posts appearing if they are posted to another group.
         */
         if (!$userHandler->isSuperuser($userID)) {
+            //
+            // No campuses: exit out in order to avoid query error
+            $campus_list = trim(implode(',', $campus));
+            if (strlen($campus_list) === 0) {
+                return array();
+            }
             $query = "
-         SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner, news_items.item_body, item_image
+         SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner, news_items.item_body, item_image,
             UNIX_TIMESTAMP(news_items.item_datetime_posted) AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
             UNIX_TIMESTAMP(news_items.item_datetime_expires) AS expire_datetime,
             user.lastname, user.title, user.id as uid, user.firstname, newsTopic.name topicName, newsTopicID
          FROM `" . $this->_table . "`
          LEFT JOIN user ON news_items.item_owner = user.id
          JOIN newsCampus ON newsCampus.id = news_items.item_id
-            AND newsCampus.campus IN(" . implode(',', $campus) . ")
+            AND newsCampus.campus IN(" . $campus_list . ")
          JOIN newsGroup ON newsGroup.id = news_items.item_id
             AND newsGroup.gid = '" . $groupID . "'
          JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
