@@ -55,6 +55,8 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 			for ($allItems->rewind(); $allItems->valid(); $allItems->next()) {
 				$currentItem = $allItems->current();
 
+				/* TODO: Clean this out, convert to mappers
+				 */
 				$fileHandler = new MyFile();
 				$file = $fileHandler->getById($currentItem->getFileId());
 
