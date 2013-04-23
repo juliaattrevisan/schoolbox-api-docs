@@ -21,13 +21,16 @@ if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
 
 	$imageInfo = $db->getRow($query);
 
-	/* See if you can view this image
+	/* TODO: Add permissions later to prevent people from manufacturing
+	 * links to other people's images
 	 */
-	$eportfolioHandler = new Eportfolio_Container($imageInfo['owner']);
-
-	if (!$eportfolioHandler->canEdit($imageInfo['owner'])) {
-		error(5);
-	}
+//	/* See if you can view this image
+//	 */
+//	$eportfolioHandler = new Eportfolio_Container($imageInfo['owner']);
+//
+//	if (!$eportfolioHandler->canEdit($imageInfo['owner'])) {
+//		error(5);
+//	}
 }
 
 /* Choose a caching method to use
