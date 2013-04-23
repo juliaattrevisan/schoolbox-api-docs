@@ -12,6 +12,7 @@ use Schoolbox\Column\Factory as ColumnFactory;
 use \Database;
 use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
+use Schoolbox\Mapper\Exception;
 
 class Mapper {
 	/**
@@ -671,9 +672,8 @@ class Mapper {
 		if ($row != false) {
 			$model = $this->hydrate($row);
 			return $model;
-		} else {
-			return false;
 		}
+		throw new Exception('Instance of mapper not found');
 	}
 
 	/**
@@ -716,7 +716,7 @@ class Mapper {
 		if ($result) {
 			return $this->hydrate($result);
 		}
-		return false;
+		throw new Exception('Instance of mapper not found');
 	}
 
 	/**
