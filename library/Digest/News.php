@@ -30,6 +30,7 @@ class Digest_News {
         $this->debug = $debug;
 
         $this->host = Cfg::get('site_hostname') . '.' . Cfg::get('site_domain');
+	    $this->host = '192.168.1.179';
 
         $this->cli('Link URI base is ' . $this->host);
 
