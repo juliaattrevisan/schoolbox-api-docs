@@ -78,3 +78,7 @@ CREATE TABLE `eportfolio_showcase_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `
 /* Add file list item table
  */
 CREATE TABLE `eportfolio_component_filelist_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `component_instance_id` INT(11), `file_id` INT(11), `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
+
+/* Add image list item table
+ */
+CREATE TABLE `eportfolio_component_imagelist_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `component_instance_id` INT(11), PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
