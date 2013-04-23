@@ -132,6 +132,7 @@ class Digest_News {
                     'topic'    => $article['topicName'],
                     'date'     => strtotime($article['item_datetime_posted']),
                     'poster'   => $this->getPosterFromArticle($article),
+                    'image'    => $article['item_image'],
                 );
             }
 
@@ -153,6 +154,7 @@ class Digest_News {
                                 'topic'    => $cat['name'],
                                 'date'     => $art['posted'],
                                 'poster'   => $this->getPosterFromArticle($art),
+                                'image'    => $art['item_image'],
                             );
                         }
                     }
@@ -214,6 +216,7 @@ class Digest_News {
                                 'ARTICLE_DATE'       => date('l, jS \o\f F', $article['date']),
                                 'ARTICLE_BACKGROUND' => ++$i % 2 == 1 ? "none" : "#F4F4F8",
                                 'ARTICLE_POSTER'     => $article['poster'],
+                                'ARTICLE_IMAGE'      => $article['image'],
                             ));
 
                             $mailer->parse('article_block', 'article', true);
