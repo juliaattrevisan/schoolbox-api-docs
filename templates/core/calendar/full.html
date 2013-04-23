@@ -253,7 +253,20 @@
                 },
 
                 // Stream location
-                events: '/calendar/ajax/full'
+                events: function(start, end, callback) {
+                    $j.ajax({
+                        dataType: 'json',
+                        url:      '/calendar/ajax/full',
+                        data: {
+                            start: Math.round(start.getTime()/1000),
+                            end:   Math.round(end.getTime()/1000),
+                        },
+                        success: function(data) {
+                            callback(data);
+                        },
+                        cache: false
+                    });
+                }
             },
 
             x: false
