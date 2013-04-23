@@ -6,7 +6,7 @@
             {% if content[i].startTime %}
             <time>{{ content[i].startTime }}</time>
             {% endif %}
-            <p class="event-title">{{ content[i].note }}</p>
+            <p class="event-title">{{ content[i].note|raw }}</p>
         </a>
     </li>
     {% endfor %}

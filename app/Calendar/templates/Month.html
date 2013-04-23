@@ -31,11 +31,11 @@
                     {% if content[i].events[j].startTime.timeOnly %}
                         <time>{{ content[i].events[j].startTime.timeOnly }}</time>
                     {% endif %}
-                        {{ content[i].events[j].note }}
+                        {{ content[i].events[j].note|raw }}
                     </a>
                 </li>
                 {% else %}
-                    {{ content[i].events[j].note }}
+                    {{ content[i].events[j].note|raw }}
                 {% endif %}
             {% endfor %}
             </ul>
