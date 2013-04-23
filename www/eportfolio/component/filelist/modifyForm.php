@@ -27,11 +27,22 @@ if ($authenticator->canModify()) {
 	if ($action == 'addItem') {
 		$fileId = Scrub::text($_GET['fileId']);
 
-		$listItem = new Component_Eportfolio_FileList();
-		$listItem->setComponentInstanceId($componentInstanceId);
-		$listItem->setFileId($fileId);
+		/* Prevent dupe publishings
+		 */
+		$existing = Component_Eportfolio_FileListMapper::getInstance()->findByColumnList(array(
+			'component_instance_id' => $componentInstanceId,
+			'file_id' => $fileId
+		));
 
-		Component_Eportfolio_FileListMapper::getInstance()->save($listItem);
+		/* Publish it if it isn't already published
+		 */
+		if (!$existing->count()) {
+			$listItem = new Component_Eportfolio_FileList();
+			$listItem->setComponentInstanceId($componentInstanceId);
+			$listItem->setFileId($fileId);
+
+			Component_Eportfolio_FileListMapper::getInstance()->save($listItem);
+		}
 	}
 	/* Delete a list item
 	 */
