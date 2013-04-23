@@ -139,7 +139,7 @@ class Calendar_Event_Collection {
 	}
 
 	/**
-	 * Comparison
+	 * Comparison - sorts on start time, then end time, then finally name.
 	 *
 	 * @param $a
 	 * @param $b
@@ -154,9 +154,17 @@ class Calendar_Event_Collection {
 		else if ($a_timestamp > $b_timestamp) {
 			return 1;
 		}
-		return strcmp($a->getNote(), $b->getNote());
 
-		return 0;
+		$a_timestamp = $a->getEndTime()->getUnixTimestamp();
+		$b_timestamp = $b->getEndTime()->getUnixTimestamp();
+		if ($a_timestamp < $b_timestamp) {
+			return -1;
+		}
+		else if ($a_timestamp > $b_timestamp) {
+			return 1;
+		}
+
+		return strcmp($a->getNote(), $b->getNote());
 	}
 
 	/**
