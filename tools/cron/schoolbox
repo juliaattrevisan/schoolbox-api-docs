@@ -16,4 +16,4 @@
 */10 * * * *    www-data    php /usr/share/schoolbox/tools/video/processor.php
 
 # Due Work Notifications
-*/15 * * * *    www-data    php /usr/share/schoolbox/tools/submission/notify_students.php --send --upcoming --overdue >> /var/log/schoolbox-duework-`date -I`.log 2>/dev/null
+*/15 * * * *    root    php /usr/share/schoolbox/tools/submission/notify_students.php --send --upcoming --overdue >> /var/log/schoolbox-duework-`date -I`.log 2>/dev/null
