@@ -37,9 +37,13 @@ if ($authenticator->canModify()) {
 		/* Publish it if it isn't already published
 		 */
 		if (!$existing->count()) {
+			$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+
 			$listItem = new Component_Eportfolio_FileList();
 			$listItem->setComponentInstanceId($componentInstanceId);
 			$listItem->setFileId($fileId);
+			$listItem->setCreatedAt($now->getDatabase());
+			$listItem->setUpdatedAt($now->getDatabase());
 
 			Component_Eportfolio_FileListMapper::getInstance()->save($listItem);
 		}

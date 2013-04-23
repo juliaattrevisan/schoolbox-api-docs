@@ -37,6 +37,24 @@ class Component_Eportfolio_FileListMapper extends Mapper {
 			'type'       => Mapper::TYPE_INTEGER,
 		));
 
+		$this->hasMap(array(
+			'column'     => 'created_at',
+			'property'   => 'created_at',
+			'type'       => Mapper::TYPE_DATETIME,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'updated_at',
+			'property'   => 'updated_at',
+			'type'       => Mapper::TYPE_DATETIME,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'deleted_at',
+			'property'   => 'deleted_at',
+			'type'       => Mapper::TYPE_DATETIME,
+		));
+
 		parent::mapping();
 	}
 }

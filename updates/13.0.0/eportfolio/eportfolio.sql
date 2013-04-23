@@ -73,11 +73,11 @@ DROP TABLE eportfolioTemplateLayout;
 CREATE TABLE `eportfolio_showcase_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `submission_return_id` INT(11), `uid` INT(11), PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
 ALTER TABLE `eportfolio_showcase_item` ADD COLUMN `submission_box_id` INT(11) NULL AFTER `id`;
 ALTER TABLE `eportfolio_showcase_item` CHANGE `submission_box_id` `submission_id` INT(11) NULL;
-ALTER TABLE `schoolbox`.`eportfolio_showcase_item` DROP COLUMN `submission_return_id`, CHANGE `submission_id` `submission_box_id` INT(11) NULL;
+ALTER TABLE `eportfolio_showcase_item` DROP COLUMN `submission_return_id`, CHANGE `submission_id` `submission_box_id` INT(11) NULL;
 
 /* Add error for nonexisting eportfolio pages
  */
-INSERT INTO `schoolbox`.`error` (`id`, `message`) VALUES ('156', 'This page does not exist.');
+INSERT INTO `error` (`id`, `message`) VALUES ('156', 'This page does not exist.');
 
 /* Add a bunch of datetime fields for sorting Showcased Work on profile page
  */
@@ -86,3 +86,4 @@ ALTER TABLE `eportfolio_showcase_item` ADD COLUMN `created_at` DATETIME NULL AFT
 /* Add file list titem table
  */
 CREATE TABLE `eportfolio_component_filelist_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `component_instance_id` INT(11) NOT NULL, `file_id` INT(11) NOT NULL, PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
+ALTER TABLE `eportfolio_component_filelist_item` ADD COLUMN `created_at` DATETIME NULL AFTER `file_id`, ADD COLUMN `updated_at` DATETIME NULL AFTER `created_at`, ADD COLUMN `deleted_at` DATETIME NULL AFTER `updated_at`;

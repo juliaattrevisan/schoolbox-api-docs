@@ -31,6 +31,25 @@ class Component_Eportfolio_FileList extends Component_Eportfolio_List {
 	 */
 	public $fileId;
 
+	/**
+	 * When the File List item was created
+	 *
+	 * @var
+	 */
+	public $created_at;
+
+	/**
+	 * When the File List item was updated
+	 * @var
+	 */
+	public $updated_at;
+
+	/**
+	 * When the File List item was softdeleted
+	 * @var
+	 */
+	public $deleted_at;
+
 	/* Getters/Setters
 	 */
 
@@ -86,5 +105,59 @@ class Component_Eportfolio_FileList extends Component_Eportfolio_List {
 	 */
 	public function getFileId() {
 		return $this->fileId;
+	}
+
+	/**
+	 * Set created at
+	 *
+	 * @param  $created_at
+	 */
+	public function setCreatedAt($created_at) {
+		$this->created_at = $created_at;
+	}
+
+	/**
+	 * Get created at
+	 *
+	 * @return
+	 */
+	public function getCreatedAt() {
+		return $this->created_at;
+	}
+
+	/**
+	 * Set deleted at
+	 *
+	 * @param  $deleted_at
+	 */
+	public function setDeletedAt($deleted_at) {
+		$this->deleted_at = $deleted_at;
+	}
+
+	/**
+	 * Get deleted at
+	 *
+	 * @return
+	 */
+	public function getDeletedAt() {
+		return $this->deleted_at;
+	}
+
+	/**
+	 * Set updated at
+	 *
+	 * @param  $updated_at
+	 */
+	public function setUpdatedAt($updated_at) {
+		$this->updated_at = $updated_at;
+	}
+
+	/**
+	 * Get updated at
+	 *
+	 * @return
+	 */
+	public function getUpdatedAt() {
+		return $this->updated_at;
 	}
 }
