@@ -55,12 +55,13 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 			for ($allItems->rewind(); $allItems->valid(); $allItems->next()) {
 				$currentItem = $allItems->current();
 
-				/* TODO: Clean this out, convert to mappers
+				/* TODO: Clean all this out, convert to mappers
 				 */
 				$fileHandler = new MyFile();
 				$file = $fileHandler->getById($currentItem->getFileId());
 
 				$mimeMapper = new \Schoolbox\File\MimetypeMapper();
+				$createdAt = new Alaress_Date_Format($currentItem->getCreatedAt(), 'y-m-d h:i:s');
 
 				$this->setVar(array(
 					'LIST_ITEM_ID' => $currentItem->getId(),
@@ -68,6 +69,7 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 					'FILE_ITEM_TITLE' => $file['description'],
 					'FILE_ITEM_FILENAME' => $file['realname'],
 					'FILE_ITEM_MIMETYPE' => $mimeMapper->findByColumn('mime', $file['mime_type'])->current()->getClass(),
+					'FILE_ITEM_CREATED_AT' => $createdAt->getShort(),
 				));
 
 				/* Controls
