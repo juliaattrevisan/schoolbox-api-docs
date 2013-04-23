@@ -139,7 +139,7 @@ if (is_array($allPageData) && count($allPageData)) {
 			'PUBLISH_PAGE_COMPONENT_NAME' => $currentPageData['componentName'],
 		));
 
-		$this->parse('publish_page_block', 'publish_page');
+		$this->parse('publish_page_block', 'publish_page', true);
 	}
 }
 

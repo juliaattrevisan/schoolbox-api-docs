@@ -225,15 +225,15 @@ class Eportfolio_PageMapper extends Mapper {
 							if ($currentComponent->identifier == $currentPage->getPageId()) {
 								$componentList[] = $currentComponent;
 							}
-
-							/* Throw it all into some arbitrary array
-							 * We're going to do this the poopy way
-							 */
-							$pageData[] = array(
-								'page' => $currentPage,
-								'componentList' => $componentList
-							);
 						}
+
+						/* Throw it all into some arbitrary array
+						 * We're going to do this the poopy way
+						 */
+						$pageData[] = array(
+							'page' => $currentPage,
+							'componentList' => $componentList
+						);
 					}
 				}
 			}
