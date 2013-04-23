@@ -55,9 +55,14 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 			for ($allItems->rewind(); $allItems->valid(); $allItems->next()) {
 				$currentItem = $allItems->current();
 
+				$fileHandler = new MyFile();
+				$file = $fileHandler->getById($currentItem->getFileId());
+
 				$this->setVar(array(
-					'FILE_ITEM_ID' => $currentItem->getId(),
-					'FILE_ITEM_TITLE' => $currentItem->getTitle(),
+					'LIST_ITEM_ID' => $currentItem->getId(),
+					'FILE_ITEM_ID' => $currentItem->getFileId(),
+					'FILE_ITEM_TITLE' => $file['description'],
+					'FILE_ITEM_FILENAME' => $file['realname'],
 				));
 
 				/* Controls
