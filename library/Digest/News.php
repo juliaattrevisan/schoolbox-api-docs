@@ -30,7 +30,9 @@ class Digest_News {
         $this->debug = $debug;
 
         $this->host = Cfg::get('site_hostname') . '.' . Cfg::get('site_domain');
-	    $this->host = '192.168.1.179';
+        //
+        // TODO remove debug host
+        $this->host = '192.168.1.179';
 
         $this->cli('Link URI base is ' . $this->host);
 
@@ -181,6 +183,7 @@ class Digest_News {
         $mailer = new Mailer('news-digest.html', 'News', $u['email'], $this->host);
         $mailer->setBlock('tplBODY', 'newslist', 'newslist_block');
         $mailer->setBlock('newslist', 'article', 'article_block');
+        $mailer->setBlock('article', 'image', 'image_block');
         $mailer->setVar('NAME', $u['firstname']);
 
         $this->cli(sprintf("Email to %s %s (%s)", $u['firstname'], $u['lastname'], $u['email']));
@@ -204,10 +207,12 @@ class Digest_News {
                         break;
                 }
 
+                $is_news_shown = false;
                 foreach($newsList as $catID => $news) {
                     $i = 0;
                     foreach($news as $article) {
                         if($this->withinWindow($article['date'])) {
+                            $is_news_shown = true;
                             $mailer->setVar(array(
                                 'ARTICLE_SLUG'       => $slugBase . ($newsType == 'h' ? $catID : $article['id']),
                                 'ARTICLE_TITLE'      => $article['title'],
@@ -219,12 +224,24 @@ class Digest_News {
                                 'ARTICLE_IMAGE'      => $article['image'],
                             ));
 
+                            if ($article['image']) {
+                                $mailer->parse('image_block', 'image');
+                            }
+                            else {
+                                $mailer->setVar('image_block', '');
+                            }
+
                             $mailer->parse('article_block', 'article', true);
                             $newsFlag = true;
                         }
                     }
                 }
-                $mailer->parse('newslist_block', 'newslist', true);
+                if ($is_news_shown) {
+                    $mailer->parse('newslist_block', 'newslist', true);
+                }
+                else {
+                    $mailer->setVar('newslist_block', '');
+                }
                 $mailer->setVar('article_block', '');
             }
 
