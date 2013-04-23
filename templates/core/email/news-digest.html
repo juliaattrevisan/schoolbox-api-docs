@@ -115,66 +115,33 @@
                             <tr><td valign="top"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="16" width="1" border="0" /></td></tr>
                             <!-- Notices -->
                             <tr><td>
-                                <!-- Notices header -->
+                                <!-- BEGIN newslist -->
                                 <table cellpadding="0" cellspacing="0" border="0" align="center" width="608" bgcolor="#e5eff7">
                                     <tr>
                                         <td valign="middle" width="8"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="0" width="8" border="0" /></td>
-                                        <td valign="middle" height="32" style="font-family:sans-serif;font-weight:bold;font-size:13px;line-height:21px;">Notices</td>
+                                        <td valign="middle" height="32" style="font-family:sans-serif;font-weight:bold;font-size:13px;line-height:21px;">{NEWS_TYPE}</td>
                                         <td valign="middle" width="16"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="16" border="0" /></td>
                                     </tr>
                                 </table>
-                                <!-- End Notices header -->
-                                <!-- Notice row -->
                                 <table cellpadding="5" cellspacing="0" border="0" align="center" width="608">
+                                    <!-- BEGIN article -->
                                     <tr>
                                         <td valign="middle" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
-                                        <td><img valign="bottom" src="http://192.168.1.157/storage/image.php?hash=5ae60cd92d4b13254fc22a12d20949137c87f5da&size=square64" width="64" height="64" border="0" /></td>
+                                        <td>
+                                            <img valign="bottom" src="http://{SITE_DOMAIN}/storage/image.php?hash=5ae60cd92d4b13254fc22a12d20949137c87f5da&size=square64" width="64" height="64" border="0" />
+                                        </td>
                                         <td valign="bottom" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#000000;">
-                                            <a href="" style="color:#0066b0;text-decoration:none;font-weight:bold;">Welcome to Schoolbox Demonstration</a><br />
-                                            <a href="" style="color:#0066b0;text-decoration:none;">English</a>
-                                                <span style="color:#929292">3 minutes ago | Posted by</span>
+                                            <a href="" style="color:#0066b0;text-decoration:none;font-weight:bold;">{ARTICLE_TITLE}</a><br />
+                                            <a href="" style="color:#0066b0;text-decoration:none;">{ARTICLE_TOPIC}</a>
+                                                <span style="color:#929292">{ARTICLE_DATE} | Posted by</span>
                                             <a href="" style="color:#0066b0;text-decoration:none;">Mrs. Celia Glenn</a><br />
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ipsum tellus, suscipit sit amet mollis vitae, molestie a arcu. Aliquam porta faucibus mi&hellip;
+                                            {ARTICLE_ABSTRACT}
                                         </td>
                                         <td valign="middle" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
                                     </tr>
-                                    <tr bgcolor="#fafafa">
-                                        <td valign="middle" width="6" style="border-top:1px solid #eeeeee;border-bottom:1px solid #eeeeee;" ><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
-                                        <td><img valign="bottom" src="http://192.168.1.157/storage/image.php?hash=23611528b829ddb12b61031459da090d4ae77e2a&size=square64" width="64" height="64" border="0" /></td>
-                                        <td valign="bottom" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#000000;border-top:1px solid #eeeeee;border-bottom:1px solid #eeeeee;">
-                                            <a href="" style="color:#0066b0;text-decoration:none;font-weight:bold;">Welcome to Schoolbox Demonstration</a><br />
-                                            <a href="" style="color:#0066b0;text-decoration:none;">English</a>
-                                                <span style="color:#929292">3 minutes ago | Posted by</span>
-                                            <a href="" style="color:#0066b0;text-decoration:none;">Mrs. Celia Glenn</a><br />
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ipsum tellus, suscipit sit amet mollis vitae, molestie a arcu. Aliquam porta faucibus mi&hellip;
-                                        </td>
-                                        <td valign="middle" width="6" style="border-top:1px solid #eeeeee;border-bottom:1px solid #eeeeee;" ><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
-                                    </tr>
-                                    <tr>
-                                        <td valign="middle" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
-                                        <td colspan="2" valign="bottom" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#000000;">
-                                            <a href="" style="color:#0066b0;text-decoration:none;font-weight:bold;">Welcome to Schoolbox Demonstration</a><br />
-                                            <a href="" style="color:#0066b0;text-decoration:none;">English</a>
-                                                <span style="color:#929292">3 minutes ago | Posted by</span>
-                                            <a href="" style="color:#0066b0;text-decoration:none;">Mrs. Celia Glenn</a><br />
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ipsum tellus, suscipit sit amet mollis vitae, molestie a arcu. Aliquam porta faucibus mi&hellip;
-                                        </td>
-                                        <td valign="middle" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
-                                    </tr>
-                                    <tr bgcolor="#fafafa">
-                                        <td valign="middle" width="6" style="border-top:1px solid #eeeeee;border-bottom:1px solid #eeeeee;" ><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
-                                        <td><img valign="bottom" src="http://192.168.1.157/storage/image.php?hash=a6a0cf26c2966cb8b0a06be3348fa5390133b216&size=square64" width="64" height="64" border="0" /></td>
-                                        <td valign="bottom" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#000000;border-top:1px solid #eeeeee;border-bottom:1px solid #eeeeee;">
-                                            <a href="" style="color:#0066b0;text-decoration:none;font-weight:bold;">Welcome to Schoolbox Demonstration</a><br />
-                                            <a href="" style="color:#0066b0;text-decoration:none;">English</a>
-                                                <span style="color:#929292">3 minutes ago | Posted by</span>
-                                            <a href="" style="color:#0066b0;text-decoration:none;">Mrs. Celia Glenn</a><br />
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ipsum tellus, suscipit sit amet mollis vitae, molestie a arcu. Aliquam porta faucibus mi&hellip;
-                                        </td>
-                                        <td valign="middle" width="6" style="border-top:1px solid #eeeeee;border-bottom:1px solid #eeeeee;" ><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
-                                    </tr>
+                                    <!-- END article -->
                                 </table>
-                                <!-- End Notice row -->
+                                <!-- END newslist -->
                             </td></tr>
                             <!-- End Notices -->
                             <tr><td valign="top"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="16" width="1" border="0" /></td></tr>
