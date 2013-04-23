@@ -32,15 +32,17 @@ $j(document).ready(function() {
 			},
 			icon: '/images/famicons/page_delete.png'
 		}},
+		<!-- BEGIN publish_page -->
         $j.contextMenu.separator,
         {
-            "Publish" : {
+            "Publish to ePortfolio/{PUBLISH_PAGE_PAGE_NAME}/{PUBLISH_PAGE_COMPONENT_NAME}" : {
                 onclick: function() {
-                    window.open("/cms/myFileForm.php?publish=" + $j(this).attr('id').substring(5), '_self');
+                    window.open("/eportfolio/component/filelist/modifyForm.php?action=addItem&userId={PUBLISH_PAGE_USER_ID}&pageId={PUBLISH_PAGE_PAGE_ID}&componentInstanceId={PUBLISH_PAGE_COMPONENT_INSTANCE_ID}&fileId=" + $j(this).attr('id').substring(5), '_self');
                 },
                 icon: '/images/famicons/page_edit.png'
             }
         },
+		<!-- END publish_page -->
         {
             "Unpublish" : {
                 onclick: function() {
