@@ -112,6 +112,7 @@ if (is_numeric($_REQUEST['cid'])) {
         // and all) from www/homepage/index.php
         $categoryCodes = $catHandler->getCodeForCategory($_POST['cid']);
         $component->getPageTemplate()->setVar('CODE', urlencode(urlencode($categoryCodes['codes'])));
+        $component->getPageTemplate()->setVar('SITE_LOCATION', Cfg::get('site_location'));
 
         $component->getPageTemplate()->pparse($templateTarget, $templateHandle);
 
