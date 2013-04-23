@@ -146,12 +146,15 @@ class Calendar_Event_Collection {
 	 * @return int
 	 */
 	private function cmp($a, $b) {
-		if ($a->getStartTime()->getUnixTimestamp() < $b->getStartTime()->getUnixTimestamp()) {
+		$a_timestamp = $a->getStartTime()->getUnixTimestamp();
+		$b_timestamp = $b->getStartTime()->getUnixTimestamp();
+		if ($a_timestamp < $b_timestamp) {
 			return -1;
 		}
-		else if ($a->getStartTime()->getUnixTimestamp() > $b->getStartTime()->getUnixTimestamp()) {
+		else if ($a_timestamp > $b_timestamp) {
 			return 1;
 		}
+		return strcmp($a->getNote(), $b->getNote());
 
 		return 0;
 	}
