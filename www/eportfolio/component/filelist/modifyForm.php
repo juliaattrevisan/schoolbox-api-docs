@@ -36,7 +36,7 @@ if ($authenticator->canModify()) {
 	/* Delete a list item
 	 */
 	else if ($action == 'removeItem') {
-		$listItemId = Scrub::text($_POST['listItemId']);
+		$listItemId = Scrub::text($_GET['listItemId']);
 
 		$listItem = Component_Eportfolio_FileListMapper::getInstance()->findById($listItemId);
 		Component_Eportfolio_FileListMapper::getInstance()->delete($listItem);
