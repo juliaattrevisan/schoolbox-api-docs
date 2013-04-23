@@ -16,7 +16,7 @@ class Calendar_API extends Generic_API {
 
         $month['start'] = mktime(0, 0, 0, $selected['month'], 1, $selected['year']);
         $month['first'] = date('w', $month['start']);
-        $month['end']   = strtotime("+1 month", $month['start']);
+        $month['end']   = strtotime("+1 month -1 second", $month['start']);
 
         $nextMonth = mktime(0, 0, 0, $selected['month'] + 1, 1, $selected['year']);
         $prevMonth = mktime(0, 0, 0, $selected['month'] - 1, 1, $selected['year']);
@@ -78,23 +78,6 @@ class Calendar_API extends Generic_API {
 			}
 			$eventMap[$currentEventDay]['events'][] = $current;
 		}
-
-	    //
-	    // Sort events for each item?
-	    foreach ($eventMap as $event_day => &$map) {
-		    usort($map['events'], function($a, $b) {
-			    $a_time = $a->getStartTime();
-			    $b_time = $b->getStartTime();
-			    if ($a_time === '') {
-				    return -1;
-			    }
-			    if ($b_time === '') {
-				    return 1;
-			    }
-			    return $a->getStartTime()->compare($b->getStartTime());
-		    });
-	    }
-	    unset($map);
 
 		/* Pad out the final line
 		 */
