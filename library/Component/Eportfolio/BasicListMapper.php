@@ -15,7 +15,7 @@ class Component_Eportfolio_BasicListMapper extends Mapper {
 	 * @return Bool|void
 	 */
 	protected function mapping() {
-		$this->hasTable('eportfolio_component_list_item');
+		$this->hasTable('eportfolio_component_basiclist_item');
 		$this->hasModel('Component_Eportfolio_BasicList');
 
 		$this->hasMap(array(

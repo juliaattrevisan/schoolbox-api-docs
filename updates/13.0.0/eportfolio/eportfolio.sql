@@ -57,8 +57,7 @@ INSERT INTO `error` (`id`, `message`) VALUES ('156', 'This page does not exist.'
 
 /* Add list item table
  */
-CREATE TABLE `eportfolio_component_list_item`( `list_item_id` INT(11) NOT NULL AUTO_INCREMENT, `component_instance_id` INT(11) NOT NULL, `content` TEXT, `sequence` INT(11), PRIMARY KEY (`list_item_id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
-ALTER TABLE `eportfolio_component_list_item` CHANGE `list_item_id` `id` INT(11) NOT NULL AUTO_INCREMENT;
+CREATE TABLE `eportfolio_component_basiclist_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `component_instance_id` INT(11) NOT NULL, `content` TEXT, `sequence` INT(11), PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
 
 /* Add advanced list item table
  */
