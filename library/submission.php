@@ -941,6 +941,16 @@ class Submission extends DeprecatedModel {
         // Don't get users, just submission boxes.
         // Need to get users as part of another query, becuase they may be in
         // Synergetic.
+        // For overdue work - only send the notice if the submission box allows
+        // online submissions, because only they allow late submissions.
+        $where = "sb.deleted = 0
+            AND sn.type = :notif_type
+            AND sn.enabled = :notif_enabled
+            AND sn.sent = :notif_sent
+            AND sb.`date` BETWEEN :range_start AND :range_end";
+        if ($status == OVERDUE_WORK_TYPE) {
+            $where .= ' AND sb.accept_submission IS TRUE';
+        }
         $stmt = Database::getInstance()->prepare(
             "
             SELECT
@@ -953,12 +963,8 @@ class Submission extends DeprecatedModel {
             FROM submission_box sb
             LEFT JOIN category c ON sb.category = c.id
             LEFT JOIN categoryCode cc ON cc.categoryID = c.id
-            LEFT JOIN submission_notification sn ON sb.id = sn.box_id
-            AND sb.deleted = 0
-            AND sn.type = :notif_type
-            AND sn.enabled = :notif_enabled
-            AND sn.sent = :notif_sent
-            AND sb.`date` BETWEEN :range_start AND :range_end
+            INNER JOIN submission_notification sn ON sb.id = sn.box_id
+            WHERE $where
             GROUP BY sb.id, c.id
             ORDER BY c.id ASC, sb.date ASC
         "
@@ -1078,14 +1084,15 @@ class Submission extends DeprecatedModel {
                 }
 
                 //
-                // Load submissions for this user.
-                if (!is_array($submissions)) {
-                    continue;
+                // Has student submitted at all for this box?
+                // If not, then add them to the list of students who have to.
+                $student_submissions = array();
+                if (is_array($submissions)) {
+                    $student_submissions = array_filter($submissions, function($sub) use($member_id) {
+                        return $sub['uid'] == $member_id;
+                    });
                 }
-                foreach ($submissions as $submission) {
-                    if ($submission['uid'] != $member_id) {
-                        continue;
-                    }
+                if (empty($student_submissions)) {
                     if (!array_key_exists($subject_id, $output[$member_id])) {
                         $output[$member_id]['categories'][$subject_id] = array(
                             'id'   => $subject_id,

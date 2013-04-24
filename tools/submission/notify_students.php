@@ -71,54 +71,64 @@ function sendUpcomingNotifications($testRun) {
 	if (count($list)) {
 		foreach ($list as $user) {
 
-			if ($testRun) {
-				$mailer = new SitePage(false);
-				$mailer->setFile(TEMPLATE_body, 'tools/submission-upcoming.txt');
-				$mailer->setBlock(TEMPLATE_body, 'subject', 'subject_block');
-			}
-			else {
-				$mailer = new Mailer('submission-upcoming.html', 'Upcoming Due Work', $user['alt_email']);
-				$mailer->setBlock('tplBODY', 'subject', 'subject_block');
-			}
+			$dump = new SitePage(false);
+			$dump->setFile(TEMPLATE_body, 'tools/submission-upcoming.txt');
+			$dump->setBlock(TEMPLATE_body, 'subject', 'subject_block');
+			$dump->setBlock('subject', 'due_work', 'due_work_block');
 
+			$mailer = new Mailer('submission-upcoming.html', 'Upcoming Due Work', $user['alt_email']);
+			$mailer->setBlock('tplBODY', 'subject', 'subject_block');
 			$mailer->setBlock('subject', 'due_work', 'due_work_block');
-			$mailer->setVar('USER_EMAIL',  trim($user['alt_email']));
-			$mailer->setVar('NAME',        trim($user['firstname']));
-			$mailer->setVar('SURNAME',     trim($user['lastname']));
-			$mailer->setVar('SITE_DOMAIN', Cfg::get('site_domain'));
 
+			$output = array(
+				'NAME'        => trim($user['firstname']),
+				'SURNAME'     => trim($user['lastname']),
+				'SITE_DOMAIN' => Cfg::get('site_domain'),
+				'USER_EMAIL'  => trim($user['alt_email']),
+			);
+			$dump->setVar($output);
+			$mailer->setVar($output);
 
 			if(count($user['categories'])) {
 				foreach($user['categories'] as $cat) {
+					$dump->setVar('due_work_block', '');
+					$dump->setVar('CATEGORY_ID', $cat['id']);
+					$dump->setVar('CATEGORY_NAME', $cat['name']);
+
 					$mailer->setVar('due_work_block', '');
 					$mailer->setVar('CATEGORY_ID', $cat['id']);
 					$mailer->setVar('CATEGORY_NAME', $cat['name']);
 
 					if(count($cat['work'])) {
 						foreach($cat['work'] as $box) {
-							$mailer->setVar('DUEWORK_ID',   $box['id']);
-							$mailer->setVar('DUEWORK_NAME', $box['name']);
 							$due = '';
 							$stamp = strtotime($box['date']);
 							if(date('Hi', $stamp) != '2359') {
 								$due .= ' at ' . date('g:ia', $stamp);
 							}
 							$due .= ' on ' . date('D, jS M', $stamp);
-							$mailer->setVar('DUEWORK_DATE', $due);
 
+							$dump->setVar('DUEWORK_ID',   $box['id']);
+							$dump->setVar('DUEWORK_NAME', $box['name']);
+							$dump->setVar('DUEWORK_DATE', $due);
+							$dump->parse('due_work_block', 'due_work', true);
+
+							$mailer->setVar('DUEWORK_ID',   $box['id']);
+							$mailer->setVar('DUEWORK_NAME', $box['name']);
+							$mailer->setVar('DUEWORK_DATE', $due);
 							$mailer->parse('due_work_block', 'due_work', true);
+
 							$flagAsSent[] = $box['id'];
 						} // end foreach duework
 					}
 
+					$dump->parse('subject_block', 'subject', true);
 					$mailer->parse('subject_block', 'subject', true);
 				} // end foreach category
 			}
 
-			if($testRun) {
-				$mailer->outputPage(true);
-			}
-			else {
+			$dump->outputPage(true);
+			if (!$testRun) {
 				$mailer->send();
 			}
 		}
@@ -148,15 +158,20 @@ function sendOverdueNotifictions($testRun) {
 	foreach($list as $user) {
 		foreach($user['categories'] as $category) {
 			foreach($category['work'] as $dueWork) {
-				if($testRun) {
-					$mailer = new SitePage(false);
-					$mailer->setFile(TEMPLATE_body, 'tools/submission-overdue.txt');
-					$mailer->setBlock(TEMPLATE_body, 'subject', 'subject_block');
-				}
-				else {
-					$mailer = new Mailer('submission-overdue.html', 'Overdue Work', $user['u_alt_email']);
-					$mailer->setBlock('tplBODY', 'subject', 'subject_block');
-				}
+//				if($testRun) {
+//					$mailer = new SitePage(false);
+//					$mailer->setFile(TEMPLATE_body, 'tools/submission-overdue.txt');
+//					$mailer->setBlock(TEMPLATE_body, 'subject', 'subject_block');
+//				}
+//				else {
+//				}
+
+				$dump = new SitePage(false);
+				$dump->setFile(TEMPLATE_body, 'tools/submission-overdue.txt');
+				$dump->setBlock(TEMPLATE_body, 'subject', 'subject_block');
+
+				$mailer = new Mailer('submission-overdue.html', 'Overdue Work', $user['u_alt_email']);
+				$mailer->setBlock('tplBODY', 'subject', 'subject_block');
 
 				$due = '';
 				$stamp = strtotime($dueWork['date']);
@@ -166,7 +181,10 @@ function sendOverdueNotifictions($testRun) {
 				$due .= ' on ' . date('D, jS M', $stamp);
 
 				$output = array(
-					'NAME' => trim($user['firstname']),
+					'NAME'        => trim($user['firstname']),
+					'SURNAME'     => trim($user['lastname']),
+					'SITE_DOMAIN' => Cfg::get('site_domain'),
+					'USER_EMAIL'  => trim($user['alt_email']),
 
 					'CATEGORY_ID'   => $category['id'],
 					'CATEGORY_NAME' => $category['name'],
@@ -176,12 +194,11 @@ function sendOverdueNotifictions($testRun) {
 					'DUEWORK_DATE' => $due
 				);
 
+				$dump->setVar($output);
 				$mailer->setVar($output);
 
-				if($testRun) {
-					$mailer->outputPage(true);
-				}
-				else {
+				$dump->outputPage(true);
+				if (!$testRun) {
 					$mailer->send();
 					$flagAsSent[] = $dueWork['id'];
 				}
