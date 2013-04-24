@@ -6,6 +6,16 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+use Schoolbox\Resource\CategoryMapper;
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+
 class Digest_News {
 
     protected $host;
@@ -24,6 +34,14 @@ class Digest_News {
     protected $debug;
 
     protected $textFormatter;
+
+    protected $user_mapper;
+    protected $category_mapper;
+    protected $submission_box_mapper;
+    protected $assessment_mapper;
+    protected $submission_mapper;
+    protected $return_mapper;
+    protected $submission_handler;
 
     public function __construct($windowStart, $windowEnd, $debug = false) {
 
@@ -47,6 +65,19 @@ class Digest_News {
 
 
         $this->textFormatter = new TextFormatter();
+
+        $this->user_mapper           = new UserMapper();
+        $this->category_mapper       = new CategoryMapper();
+        $this->submission_box_mapper = new SubmissionBoxMapper();
+        $this->assessment_mapper     = new OnlineAssessmentMapper();
+        $this->submission_mapper     = new SubmissionMapper();
+        $this->return_mapper         = new ReturnedWorkMapper();
+
+        $this->category_mapper->setExternalUser(new External_User());
+
+        //
+        // Old-style submission handler
+        $this->submission_handler    = new Submission();
     }
 
     public function __destruct() {
@@ -164,6 +195,48 @@ class Digest_News {
             }
         }
 
+
+        //
+        // Don't try to shart due work into news through the controller, because
+        // layout is too far from what would be wanted in the email.
+        $user_model = $this->user_mapper->findById($u['id']);
+        if ($user_model instanceof User) {
+            $categories = array();
+            foreach ($this->category_mapper->findForUser($user_model) as $category) {
+                $categories[] = $category->getId();
+            }
+
+            if (!empty($categories)) {
+                $limit      = 15;
+                $activities = $this->submission_box_mapper
+                    ->getActivities($u['id'], $limit, $categories)
+                    ->merge($this->assessment_mapper->getActivities($u['id'], $limit, $categories))
+                    ->merge($this->submission_mapper->getActivities($u['id'], $limit, $categories))
+                    ->merge($this->return_mapper->getActivities(
+                        $u['id'], $limit, $categories,
+                        array(SubmissionBox::MARK_VISIBILITY_STUDENT, SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,)
+                    ))
+                    ->sortBy('date', 'desc')
+                    ->limit(0, $limit);
+                $u['activities'] = array();
+                foreach ($activities as $activity) {
+                    $poster      = $activity->getOwner();
+                    $poster_name = $poster->getFirstName().' '.$poster->getLastName();
+                    if ($title = $poster->getTitle()) {
+                        $poster_name = $title.'. '.$poster_name;
+                    }
+                    $u['activities'][] = array(
+                        'poster'   => $poster_name,
+                        'event'    => $activity->getEvent(),
+                        'category' => $activity->getCategory()->getName(),
+                        'title'    => $activity->getName(),
+                        'type'     => $activity->getTypeName(),
+                        'date'     => $activity->getDate()->getUsingFormat('Y-m-d H:i:s'),
+                    );
+                }
+            }
+        }
+
         return $u;
     }
 
@@ -184,6 +257,10 @@ class Digest_News {
         $mailer->setBlock('tplBODY', 'newslist', 'newslist_block');
         $mailer->setBlock('newslist', 'article', 'article_block');
         $mailer->setBlock('article', 'image', 'image_block');
+
+        $mailer->setBlock('tplBODY', 'activitylist', 'activitylist_block');
+        $mailer->setBlock('activitylist', 'activity', 'activity_block');
+
         $mailer->setVar('NAME', $u['firstname']);
 
         $this->cli(sprintf("Email to %s %s (%s)", $u['firstname'], $u['lastname'], $u['email']));
@@ -222,6 +299,7 @@ class Digest_News {
                                 'ARTICLE_BACKGROUND' => ++$i % 2 == 1 ? "none" : "#F4F4F8",
                                 'ARTICLE_POSTER'     => $article['poster'],
                                 'ARTICLE_IMAGE'      => $article['image'],
+                                'ARTICLE_COLSPAN'    => $article['image'] ? 1 : 2,
                             ));
 
                             if ($article['image']) {
@@ -244,14 +322,31 @@ class Digest_News {
                 }
                 $mailer->setVar('article_block', '');
             }
+        }
 
-            if(!$this->debugging() && $newsFlag) {
-                $success = $mailer->send();
-                if(!$success) {
-                    $this->cli("Failed to send email to {$u['email']}", true);
-                }
-                return $success;
+        if (!empty($u['activities'])) {
+            foreach ($u['activities'] as $activity) {
+                $mailer->setVar(array(
+                    'ACTIVITY_POSTER'   => $activity['poster'],
+                    'ACTIVITY_TYPE'     => $activity['type'],
+                    'ACTIVITY_CATEGORY' => $activity['category'],
+                    'ACTIVITY_TITLE'    => $activity['title'],
+                    'ACTIVITY_DATE'     => $activity['date'],
+                ));
+                $mailer->parse('activity_block', 'activity', true);
             }
+            $mailer->parse('activitylist_block', 'activitylist');
+        }
+        else {
+            $mailer->setVar('activitylist_block', '');
+        }
+
+        if (!$this->debugging() && $newsFlag) {
+            $success = $mailer->send();
+            if(!$success) {
+                $this->cli("Failed to send email to {$u['email']}", true);
+            }
+            return $success;
         }
 
         return true;

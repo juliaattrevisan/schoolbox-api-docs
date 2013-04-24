@@ -114,8 +114,10 @@
                             <!-- End Upcoming due work -->
                             <tr><td valign="top"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="16" width="1" border="0" /></td></tr>
                             <!-- Notices -->
+
+
+                            <!-- BEGIN newslist -->
                             <tr><td>
-                                <!-- BEGIN newslist -->
                                 <table cellpadding="0" cellspacing="0" border="0" align="center" width="608" bgcolor="#e5eff7">
                                     <tr>
                                         <td valign="middle" width="8"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="0" width="8" border="0" /></td>
@@ -127,12 +129,10 @@
                                     <!-- BEGIN article -->
                                     <tr style="background:{ARTICLE_BACKGROUND}">
                                         <td valign="middle" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
-                                        <td>
-                                            <!-- BEGIN image -->
-                                            <img valign="bottom" src="http://{SITE_DOMAIN}/storage/image.php?hash={ARTICLE_IMAGE}&size=square64" width="64" height="64" border="0" />
-                                            <!-- END image -->
-                                        </td>
-                                        <td valign="bottom" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#000000;">
+                                        <!-- BEGIN image -->
+                                        <td><img valign="bottom" src="http://{SITE_DOMAIN}/storage/image.php?hash={ARTICLE_IMAGE}&size=square64" width="64" height="64" border="0" /></td>
+                                        <!-- END image -->
+                                        <td valign="bottom" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#000000;" colspan="{ARTICLE_COLSPAN}">
                                             <a href="http://{SITE_DOMAIN}/{ARTICLE_SLUG}" style="color:#0066b0;text-decoration:none;font-weight:bold;">{ARTICLE_TITLE}</a><br />
                                             <a href="#" style="color:#0066b0;text-decoration:none;">{ARTICLE_TOPIC}</a>
                                                 <span style="color:#929292">{ARTICLE_DATE} | Posted by</span>
@@ -143,13 +143,13 @@
                                     </tr>
                                     <!-- END article -->
                                 </table>
-                                <!-- END newslist -->
                             </td></tr>
-                            <!-- End Notices -->
                             <tr><td valign="top"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="16" width="1" border="0" /></td></tr>
-                            <!-- Activity -->
+                            <!-- END newslist -->
+
+
+                            <!-- BEGIN activitylist -->
                             <tr><td>
-                                <!-- Activity header -->
                                 <table cellpadding="0" cellspacing="0" border="0" align="center" width="608" bgcolor="#e5eff7">
                                     <tr>
                                         <td valign="middle" width="8"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="0" width="8" border="0" /></td>
@@ -157,78 +157,26 @@
                                         <td valign="middle" width="16"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="16" border="0" /></td>
                                     </tr>
                                 </table>
-                                <!-- End Activity header -->
-                                <!-- Activity row -->
+                                <!-- BEGIN activity -->
                                 <table cellpadding="5" cellspacing="0" border="0" align="center" width="608">
                                     <tr>
                                         <td><img valign="bottom" src="http://{SITE_DOMAIN}/images/emails/digest/activity-pin.png" width="24" height="24" border="0" /></td>
-                                        <td><img valign="top" src="http://{SITE_DOMAIN}/portrait.php?userId=8&size=square32" width="32" height="32" border="0" /></td>
                                         <td valign="top" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#000000;">
-                                            <a href="" style="color:#0066b0;text-decoration:none;">Mrs. Celia Glenn</a> posted an essay
-                                            <a href="" style="color:#0066b0;text-decoration:none;">Romeo Discuss</a> in
-                                            <a href="" style="color:#0066b0;text-decoration:none;">English</a>
-                                            <br /><span style="color:#929292">3 minutes ago</span>
+                                            <a href="" style="color:#0066b0;text-decoration:none;">{ACTIVITY_POSTER}</a> posted {ACTIVITY_TYPE}
+                                            <a href="" style="color:#0066b0;text-decoration:none;">{ACTIVITY_TITLE}</a> in
+                                            <a href="" style="color:#0066b0;text-decoration:none;">{ACTIVITY_CATEGORY}</a>
+                                            <br /><span style="color:#929292">{ACTIVITY_DATE}</span>
                                         </td>
                                         <td valign="middle" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
-                                    </tr>
-                                    <tr bgcolor="#fafafa">
-                                        <td style="border-top:1px solid #eeeeee;border-bottom:1px solid #eeeeee;"><img valign="bottom" src="http://{SITE_DOMAIN}/images/emails/digest/activity-clock.png" width="24" height="24" border="0" /></td>
-                                        <td style="border-top:1px solid #eeeeee;border-bottom:1px solid #eeeeee;"><img valign="top" src="http://{SITE_DOMAIN}/portrait.php?userId=2&size=square32" width="32" height="32" border="0" /></td>
-                                        <td valign="top" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#000000;border-top:1px solid #eeeeee;border-bottom:1px solid #eeeeee;">
-                                            <a href="" style="color:#0066b0;text-decoration:none;">Mrs. Celia Glenn</a> posted an essay
-                                            <a href="" style="color:#0066b0;text-decoration:none;">Romeo Discuss</a> in
-                                            <a href="" style="color:#0066b0;text-decoration:none;">English</a>
-                                            <br /><span style="color:#929292">3 minutes ago</span>
-                                        </td>
-                                        <td style="border-top:1px solid #eeeeee;border-bottom:1px solid #eeeeee;" valign="middle" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
-                                    </tr>
-                                    <tr>
-                                        <td><img valign="bottom" src="http://{SITE_DOMAIN}/images/emails/digest/activity-poll.png" width="24" height="24" border="0" /></td>
-                                        <td><img valign="top" src="http://{SITE_DOMAIN}/portrait.php?userId=5&size=square32" width="32" height="32" border="0" /></td>
-                                        <td valign="top" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#000000;">
-                                            <a href="" style="color:#0066b0;text-decoration:none;">Mrs. Celia Glenn</a> posted an essay
-                                            <a href="" style="color:#0066b0;text-decoration:none;">Romeo Discuss</a> in
-                                            <a href="" style="color:#0066b0;text-decoration:none;">English</a>
-                                            <br /><span style="color:#929292">3 minutes ago</span>
-                                        </td>
-                                        <td valign="middle" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
-                                    </tr>
-                                    <tr bgcolor="#fafafa">
-                                        <td style="border-top:1px solid #eeeeee;border-bottom:1px solid #eeeeee;"><img valign="bottom" src="http://{SITE_DOMAIN}/images/emails/digest/activity-upload.png" width="24" height="24" border="0" /></td>
-                                        <td colspan="2" valign="top" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#000000;border-top:1px solid #eeeeee;border-bottom:1px solid #eeeeee;">
-                                            <a href="" style="color:#0066b0;text-decoration:none;">Mrs. Celia Glenn</a> posted an essay
-                                            <a href="" style="color:#0066b0;text-decoration:none;">Romeo Discuss</a> in
-                                            <a href="" style="color:#0066b0;text-decoration:none;">English</a>
-                                            <br /><span style="color:#929292">3 minutes ago</span>
-                                        </td>
-                                        <td style="border-top:1px solid #eeeeee;border-bottom:1px solid #eeeeee;" valign="middle" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
-                                    </tr>
-                                    <tr>
-                                        <td><img valign="bottom" src="http://{SITE_DOMAIN}/images/emails/digest/activity-lightning.png" width="24" height="24" border="0" /></td>
-                                        <td colspan="2" valign="top" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#000000;">
-                                            <a href="" style="color:#0066b0;text-decoration:none;">Mrs. Celia Glenn</a> posted an essay
-                                            <a href="" style="color:#0066b0;text-decoration:none;">Romeo Discuss</a> in
-                                            <a href="" style="color:#0066b0;text-decoration:none;">English</a>
-                                            <br /><span style="color:#929292">3 minutes ago</span>
-                                        </td>
-                                        <td valign="middle" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
-                                    </tr>
-                                    <tr bgcolor="#fafafa">
-                                        <td style="border-top:1px solid #eeeeee;border-bottom:1px solid #eeeeee;"><img valign="bottom" src="http://{SITE_DOMAIN}/images/emails/digest/activity-pin.png" width="24" height="24" border="0" /></td>
-                                        <td style="border-top:1px solid #eeeeee;border-bottom:1px solid #eeeeee;"><img valign="top" src="http://{SITE_DOMAIN}/portrait.php?userId=8&size=square32" width="32" height="32" border="0" /></td>
-                                        <td valign="top" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#000000;border-top:1px solid #eeeeee;border-bottom:1px solid #eeeeee;">
-                                            <a href="" style="color:#0066b0;text-decoration:none;">Mrs. Celia Glenn</a> posted an essay
-                                            <a href="" style="color:#0066b0;text-decoration:none;">Romeo Discuss</a> in
-                                            <a href="" style="color:#0066b0;text-decoration:none;">English</a>
-                                            <br /><span style="color:#929292">3 minutes ago</span>
-                                        </td>
-                                        <td style="border-top:1px solid #eeeeee;border-bottom:1px solid #eeeeee;" valign="middle" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
                                     </tr>
                                 </table>
-                                <!-- End Activity row -->
+                                <!-- END activity -->
                             </td></tr>
-                            <!-- End Activity -->
                             <tr><td valign="top"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="16" width="1" border="0" /></td></tr>
+                            <!-- END activitylist -->
+
+
+
                         </table>
                         <!-- End Main content -->
                     </td>
