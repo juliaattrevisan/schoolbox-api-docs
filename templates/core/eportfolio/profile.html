@@ -47,14 +47,12 @@
                 </colgroup>
                 <tbody>
                 <!-- BEGIN showcased_work -->
-                <tr class="">
-                    <!-- TODO: Alternating dark class on line above -->
+                <tr class="{ON_OFF}">
                     <!-- BEGIN has_submission -->
                     <td class="icon"><a class="icons {SHOWCASED_WORK_MIMETYPE_ICONFILE}" href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1"></a></td>
                     <td><a class="title" href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1">
                         {SHOWCASED_WORK_BOX_NAME}</a> ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
-                        <a href="">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></td>
-                        <!-- TODO: Link to subject on line above -->
+                        <a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></td>
                     <!-- END has_submission -->
                     <!-- BEGIN no_submission -->
                     <td></td>
@@ -62,8 +60,7 @@
                         <a href="">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></td>
                     <!-- END no_submission -->
                     <td>{SHOWCASED_WORK_SUBMISSION_SUBMITTED}</td>
-                    <td class="grade"><span class="gradient-">{SHOWCASED_WORK_RETURNED_MARK}</span></td>
-                    <!-- TODO: should be gradient-0 through gradient-10, based on mark -->
+                    <td class="grade"><span class="gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">{SHOWCASED_WORK_RETURNED_MARK}</span></td>
                 </tr>
                 <!-- END showcased_work -->
                 </tbody>
@@ -124,31 +121,29 @@
 </div>
 
 <div class="right clearfix" style="width: 29%">
+    <!-- BEGIN has_subjects -->
     <div class="box clearfix">
         <h2>My Current Subjects</h2>
-        <!-- BEGIN has_subjects -->
         <div class="listing clearfix">
             <ul>
                 <!-- BEGIN subject -->
-                <li class=""><a href='/homepage/{SUBJECT_ID}'>{SUBJECT_NAME}</a></li>
-                <!-- TODO: Alternating dark class on line above -->
+                <li class="{ON_OFF}"><a href='/homepage/{SUBJECT_ID}'>{SUBJECT_NAME}</a></li>
                 <!-- END subject -->
             </ul>
         </div>
-        <!-- END has_subjects -->
     </div>
+    <!-- END has_subjects -->
 
+    <!-- BEGIN has_groups -->
     <div class="box clearfix">
         <h2>My Current Groups</h2>
-        <!-- BEGIN has_groups -->
         <div class="listing clearfix">
             <ul>
                 <!-- BEGIN group -->
-                <li class=""><a href='/homepage/{GROUP_ID}'>{GROUP_NAME}</a></li>
-                <!-- TODO: Alternating dark class on line above -->
+                <li class="{ON_OFF}"><a href='/homepage/{GROUP_ID}'>{GROUP_NAME}</a></li>
                 <!-- END group -->
             </ul>
         </div>
-        <!-- END has_groups -->
     </div>
+    <!-- END has_groups -->
 </div>

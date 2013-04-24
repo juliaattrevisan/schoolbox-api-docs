@@ -106,6 +106,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 
 		if ($allShowcasedItems->count()) {
 			$previousCategory = null;
+			$j = 0;
 
 			foreach($allShowcasedItems as $currentShowcasedItem) {
 				$latestSubmission = $this->getLatestSubmission($this->getUserId(), $currentShowcasedItem->getSubmissionBoxId());
@@ -115,8 +116,10 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 				$this->getPage()->setVar(array(
 					'SHOWCASED_WORK_ITEM_ID' => $currentShowcasedItem->getId(),
 					'SHOWCASED_WORK_BOX_CATEGORY_NAME' => $currentBox->getCategory()->getName(),
+					'SHOWCASED_WORK_BOX_CATEGORY_ID' => $currentBox->getCategory()->getId(),
 					'SHOWCASED_WORK_BOX_NAME' => $currentBox->getName(),
 					'SHOWCASED_WORK_BOX_TYPE' => $currentBox->getWorkType()->getName(),
+					'ON_OFF' => ++$j % 2 ? '' : 'dark'
 				));
 
 				/* Show submitted work information (if available)
@@ -145,13 +148,16 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 				/* Show returned work information (if available)
 				 */
 				if ($latestReturn) {
+					$mark = $latestReturn->getMark();
 					$this->getPage()->setVar(array(
-						'SHOWCASED_WORK_RETURNED_MARK' => $latestReturn->getMark(),
+						'SHOWCASED_WORK_RETURNED_MARK' => $mark,
+						'SHOWCASED_WORK_RETURNED_GRADIENT' => (int)($mark / 10),
 					));
 				}
 				else {
 					$this->getPage()->setVar(array(
 						'SHOWCASED_WORK_RETURNED_MARK' => '',
+						'SHOWCASED_WORK_RETURNED_GRADIENT' => ''
 					));
 				}
 
@@ -192,10 +198,12 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 		$allGroups = $this->getGroupHandler()->involvedInCategoryList($this->getUserId(), false);
 
 		if (is_array($allGroups) && count($allGroups)) {
+			$j = 0;
 			foreach ($allGroups as $currentGroup) {
 				$this->getPage()->setVar(array(
 					'GROUP_ID' => $currentGroup['id'],
 					'GROUP_NAME' => $currentGroup['name'],
+					'ON_OFF' => ++$j % 2 ? '' : 'dark',
 				));
 
 				$this->getPage()->parse('group_block', 'group', true);
@@ -215,10 +223,12 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 		$allSubjects = $this->getGroupHandler()->involvedInSubjects($this->getUserId());
 
 		if (is_array($allSubjects) && count($allSubjects)) {
+			$j = 0;
 			foreach ($allSubjects as $currentSubject) {
 				$this->getPage()->setVar(array(
 					'SUBJECT_ID' => $currentSubject['id'],
 					'SUBJECT_NAME' => $currentSubject['name'],
+					'ON_OFF' => ++$j % 2 ? '' : 'dark',
 				));
 
 				$this->getPage()->parse('subject_block', 'subject', true);
