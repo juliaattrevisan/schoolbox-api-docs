@@ -86,7 +86,9 @@ if(is_numeric($_GET['id']))
 
     $attach = $_GET['view'] ? '' : 'attachment;';
 
-	//send headers
+	//send headers (cache-control off stops IE8 from failing to download)
+	header ("Pragma: ");
+	header ("Cache-control: ");
 	header ("Content-Type: $mime");
 	header ("Content-Disposition: $attach filename=\"".$filename."\"");
 	header ("Content-Length: ".filesize($file));
