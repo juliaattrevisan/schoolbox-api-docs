@@ -11,6 +11,12 @@
 // this is run from CLI, so explicitly include the bootstrap
 require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
 
+//
+// Start session and set current semester, aaarrrggggh
+session_start();
+$synUser  = new External_User;
+$semester = $synUser->getCurrentSemester();
+
 $debug = (isset($argv[1]) && $argv[1] == 'nomail');
 
 // every user will receive an email that contains the previous week's news
