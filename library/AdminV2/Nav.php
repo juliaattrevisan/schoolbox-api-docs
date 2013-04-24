@@ -14,6 +14,7 @@ class AdminV2_Nav {
         'side-menu' => 'Side Menu',
         'dashboard' => 'Dashboard',
         'homepage' => 'Homepages',
+		'eportfolio' => 'ePortfolios',
         'allowed-file' => 'Allowed Files',
         'setting' => 'Settings',
         'calendar' => 'Calendar',

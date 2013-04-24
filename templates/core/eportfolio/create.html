@@ -1,0 +1,161 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/jquery.autocomplete.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/css/jquery.autocomplete.css" />
+
+<style type='text/css'>
+	#individualPermissionTemplate {
+		display: none;
+	}
+</style>
+
+<script type='text/javascript'>
+	$j(function() {
+		$j('#addIndividualPermission').autocomplete({
+			serviceUrl: '/ajax/user.php?groupID={STUDENT_GROUP_IDS}',
+			minChars: 2,
+			maxHeight: 300,
+			width: 275,
+			noCache: true,
+
+			/* When selected, append to a list
+			 */
+			onSelect: function (value, data) {
+				var individualPermission = $j('#individualPermissionTemplate').clone();
+				individualPermission.find('input').attr('name', 'individual_permission[]');
+				individualPermission.find('input').val(data);
+
+				/* Snap out the group from the list
+				 */
+				var hyphenIndex = value.indexOf('-');
+
+				if (hyphenIndex > -1) {
+					individualPermission.find('li').append(value.substr(0, hyphenIndex));
+				}
+				else {
+					individualPermission.find('li').append(value);
+				}
+
+				/* Push it in
+				 */
+				$j('#individualPermissionList').append(individualPermission.html());
+
+				/* Clear and lock
+				 */
+				$j('#addIndividualPermission').val('');
+			}
+		});
+
+		/* Remove someone from list
+		 */
+		$j('.individualPermissionRemove').live('click', function(event) {
+			$j(this).closest('li').remove();
+		});
+	});
+</script>
+<!-- END custom_head -->
+
+<style type='text/css'>
+	div.horizontalList li {
+		background-color: #eee;
+		margin-bottom: 20px;
+		margin-right: 2px;
+		float: left;
+		display: inline;
+	}
+
+	div.horizontalList li a {
+		text-align: center;
+		padding: 20px;
+		display: block;
+	}
+
+	div.horizontalList {
+		width: 100%;
+	}
+</style>
+<div class='horizontalList'>
+	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Profile</a></li>
+	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
+	<!-- BEGIN eportfolio_page -->
+	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
+	<!-- END eportfolio_page -->
+	<!-- BEGIN can_add_page -->
+	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create'>+</a></li>
+	<!-- END can_add_page -->
+</div>
+
+<div class='clearfix'></div>
+
+<h1>Create new ePortfolio page</h1>
+<form action="/eportfolio/configForm.php" method="post" id="folderForm" class="clearfix">
+	<table class="standardForm">
+		<tr>
+			<td class="formLabelWidth"><h4>Page Name</h4></td>
+			<td>
+				<label>
+					<input type="text" id="name" class="required" name="page_title" maxlength="250" size="40" value='' />
+				</label>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<h4>ePortfolio Template</h4>
+				<em>If you would like a homepage associated with this folder select a basic layout to get started with.</em>
+			</td>
+			<td>
+				<select name="page_template">
+					<!-- BEGIN page_template_list -->
+					<option value="{PAGE_TEMPLATE_ID}">{PAGE_TEMPLATE_NAME}</option>
+					<!-- END page_template_list -->
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<h4>Allow Parents</h4>
+				<em>Allow your parents to view your ePortfolio page.</em>
+			</td>
+			<td>
+				<input type="hidden" name="parent_permission" value="0" />
+				<input type="checkbox" name="parent_permission" value="1" />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<h4>Group Permissions</h4>
+				<em>Allow predefined groups to view your ePortfolio page.</em>
+			</td>
+			<td>
+				<!-- BEGIN has_group_permissions -->
+				<ul>
+					<!-- BEGIN group_permission -->
+					<li><input type="checkbox" name="group_permission[]" value="{GROUP_PERMISSION_GROUP_ID}" /> {GROUP_PERMISSION_NAME}</li>
+					<!-- END group_permission -->
+				</ul>
+				<!-- END has_group_permissions -->
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<h4>Student Permissions</h4>
+				<em>Allow certain students to view your ePortfolio page.</em>
+			</td>
+			<td>
+				<p>
+					<input id='addIndividualPermission' type='text' value='' />Add
+				</p>
+				<ul id='individualPermissionList'>
+
+				</ul>
+			</td>
+		</tr>
+	</table>
+	<input type="submit" label="Submit" value="Create Page" class="submit-btn-plain"/>
+</form>
+
+<ul id='individualPermissionTemplate'>
+	<li>
+		<a class='individualPermissionRemove'>X</a>
+		<input type="hidden" name="individual_permission[]" value="{INDIVIDUAL_PERMISSION_USER_ID}" />
+	</li>
+</ul>

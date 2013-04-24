@@ -175,6 +175,16 @@
                 </label>
             </form>
             <!-- END action_submit -->
+
+			<!-- BEGIN action_publish -->
+			<form action='/eportfolio/showcase/modifyForm.php' method='post'>
+				<input type='hidden' name='action' value='publish' />
+				<input type='hidden' name='userId' value='{USER_ID}' />
+				<input type='hidden' name='boxId' value='{BOX_ID}' />
+
+				<input type='submit' value='Publish in Showcased Work' />
+			</form>
+			<!-- END action_publish -->
         </div>
     </div>
     <!-- BEGIN subject -->

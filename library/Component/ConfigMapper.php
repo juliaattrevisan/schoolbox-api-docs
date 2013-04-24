@@ -41,5 +41,4 @@ class Component_ConfigMapper extends Mapper {
 
         parent::mapping();
     }
-
 }

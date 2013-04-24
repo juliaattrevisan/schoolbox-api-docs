@@ -454,8 +454,20 @@ setupCustomise = {
 			placeholder: 'marker',
 			tolerance: 'pointer',
 			zIndex: 2000,
-			start: function() {
+			start: function() {console.log('mog');
 				$j('.marker').text('This is the new position of your component');
+
+				/* Allow tinys to work in sortable context
+				 */
+				$j(this).find('.mceEditor').each(function(){
+					tinyMCE.execCommand( 'mceRemoveControl', false, $j(this).attr('id') );
+				});
+			},
+			stop: function() {
+				$j(this).find('.mceEditor').each(function(){
+					tinyMCE.execCommand( 'mceAddControl', true, $j(this).attr('id') );
+					$j(this).sortable("refresh");
+				});
 			},
 			update: function () {
 				var left = '';

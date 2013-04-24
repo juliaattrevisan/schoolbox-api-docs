@@ -1,0 +1,113 @@
+<style type='text/css'>
+	div.horizontalList li {
+		background-color: #eee;
+		margin-bottom: 20px;
+		margin-right: 2px;
+		float: left;
+		display: inline;
+	}
+
+	div.horizontalList li a {
+		text-align: center;
+		padding: 20px;
+		display: block;
+	}
+
+	div.horizontalList {
+		width: 100%;
+	}
+</style>
+<style type='text/css'>
+	ul.showcasedWork li {
+		clear: both;
+	}
+
+	ul.showcasedWork li ul li {
+		width: 15%;
+		padding: 10px;
+		display:block;
+		float: left;
+		clear: none;
+	}
+</style>
+<style type='text/css'>
+	<!-- BEGIN allowed_files -->
+	a.{NAME}{background-image: url(/images/mime/22x22/{ICON});}
+	<!-- END allowed_files -->
+</style>
+<div class='horizontalList'>
+	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/profile'>Profile</a></li>
+	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase'>Showcased Work</a></li>
+	<!-- BEGIN eportfolio_page -->
+	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{EPORTFOLIO_PAGE_ID}'>{EPORTFOLIO_PAGE_NAME}</a></li>
+	<!-- END eportfolio_page -->
+	<!-- BEGIN can_add_page -->
+	<li><a href='/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/create'>+</a></li>
+	<!-- END can_add_page -->
+</div>
+
+<div class='clearfix'></div>
+<h1>Showcased Work for {USER_FIRSTNAME} {USER_LASTNAME}</h1>
+
+<p>
+	<a href='/submission/allDueWork/{USER_ID}'>Visit your submission history page</a> to publish items to your Showcase.
+</p>
+
+<!-- BEGIN has_showcased_work -->
+<div>
+	<!-- BEGIN showcased_work -->
+	<!-- BEGIN showcased_work_category -->
+	<h2>{SHOWCASED_WORK_BOX_CATEGORY_NAME}</h2>
+	<!-- END showcased_work_category -->
+
+	<ul class='showcasedWork'>
+		<li>
+			<ul>
+				<!-- BEGIN has_submission -->
+				<li>
+					<a class='icons {SHOWCASED_WORK_MIMETYPE_ICONFILE}'>{SHOWCASED_WORK_MIMETYPE_ICONFILE}</a>
+				</li>
+				<li>
+					<a href='/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1'>
+						<span class='boxName'>{SHOWCASED_WORK_BOX_NAME}</span> <span>({SHOWCASED_WORK_SUBMISSION_FILESIZE})</span><br />
+						<span>{SHOWCASED_WORK_BOX_CATEGORY_NAME}</span><br />
+						<span>{SHOWCASED_WORK_BOX_TYPE}</span>
+					</a>
+				</li>
+				<!-- END has_submission -->
+				<!-- BEGIN no_submission -->
+				<li>
+					&nbsp;
+				</li>
+				<li>
+					<span class='boxName'>{SHOWCASED_WORK_BOX_NAME}</span> <span>({SHOWCASED_WORK_SUBMISSION_FILESIZE})</span><br />
+					<span>{SHOWCASED_WORK_BOX_CATEGORY_NAME}</span>
+				</li>
+				<!-- END no_submission -->
+				<li>
+					<span class='mark'>{SHOWCASED_WORK_RETURNED_MARK}</span>
+				</li>
+				<li>
+					<span>{SHOWCASED_WORK_SUBMISSION_SUBMITTED}</span>
+				</li>
+				<li>
+					<!-- BEGIN has_modify_form -->
+					<form action='/eportfolio/showcase/modifyForm.php' method='post'>
+						<input type='hidden' name='action' value='unpublish' />
+						<input type='hidden' name='userId' value='{USER_ID}' />
+						<input type='hidden' name='showcaseItemId' value='{SHOWCASED_WORK_ITEM_ID}' />
+						<input type='submit' value='Unpublish' />
+					</form>
+					<!-- END has_modify_form -->
+				</li>
+			</ul>
+		</li>
+	</ul>
+	<div class='clearfix'></div>
+	<!-- END showcased_work -->
+</div>
+<!-- END has_showcased_work -->
+
+<!-- BEGIN no_showcased_work -->
+<p>{USER_FIRSTNAME} {USER_LASTNAME} has no showcased work.</p>
+<!-- END no_showcased_work -->

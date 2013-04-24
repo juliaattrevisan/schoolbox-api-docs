@@ -14,6 +14,48 @@ use Schoolbox;
 
 class MimetypeMapper extends Schoolbox\Mapper {
 
+	protected function mapping() {
+		$this->hasTable('allowedFileTypes');
+		$this->hasModel('\\Schoolbox\\File\\Mimetype');
+
+		$this->hasMap(array(
+			'column'     => 'fileTypeId',
+			'property'   => 'id',
+			'type'       => self::TYPE_INTEGER,
+			'identifier' => true,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'description',
+			'property'   => 'description',
+			'type'       => self::TYPE_STRING,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'mime',
+			'property'   => 'mime',
+			'type'       => self::TYPE_STRING,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'iconFile',
+			'property'   => 'iconFile',
+			'type'       => self::TYPE_STRING,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'inline',
+			'property'   => 'inline',
+			'type'       => self::TYPE_STRING,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'enable',
+			'property'   => 'enable',
+			'type'       => self::TYPE_STRING,
+		));
+	}
+
 	protected function getExtensionInfo($filename) {
 		//
 		// Copied from AllowedFile methods getExtension() and getMimetype()

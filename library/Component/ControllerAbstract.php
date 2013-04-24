@@ -264,10 +264,16 @@ abstract class Component_ControllerAbstract {
         // otherwise use the regular one (_wrapper.html)
         if (in_array($this->instance->module, array('dashboard', 'homepage_template', 'eportfolio_template'))) {
             $template = 'component/config/_templatewrapper.html';
-        } else {
-            $template = 'component/config/_wrapper.html';
         }
+		else if (in_array($this->instance->module, array('homepage', 'eportfolio'))) {
 
+			/* eportfolio uses a special version of le wrapier
+			 */
+			$template = 'component/config/' . $this->instance->module . '_wrapper.html';
+		}
+		else {
+			$template = 'component/config/_wrapper.html';
+        }
         $page->setFile('configTpl', $template);
 
         $page->setBlock('configTpl', 'settings_link', 'settings_link_block');

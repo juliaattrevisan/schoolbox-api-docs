@@ -2871,6 +2871,9 @@ HOMEPAGE TEMPLATES
     &.dashboard {
         .template-configurator('dashboard');
     }
+    &.eportfolio {
+      .template-configurator('eportfolio');
+    }
 }
 
 /*--------------------------------------------------------------
@@ -9143,3 +9146,60 @@ table img { max-width: none; }
 }
 
 .ui-widget * { outline: none; }
+
+/* ePortfolio */
+.profile-banner {
+	clear: both;
+	margin-left: -16px;
+	margin-right: -16px;
+	background: red;
+	position: relative;
+	height: 352px;
+	margin-bottom: 40px;
+}
+.profile-name {
+	width: auto;
+	padding-left: 280px;
+	background: rgba(255,255,255,0.7);
+	text-shadow: 0 0 16px #fff;
+	position: absolute; bottom: 0; left: 0; right: 0; top: auto;
+	h1 {
+		margin-top: 16px;
+		margin-bottom: 8px;
+	}
+	img {
+		position: absolute;
+		bottom: -32px; left: 40px;
+		border: 12px solid #fff;
+	}
+}
+.profile-banner .background {
+	overflow: hidden;
+	position: relative;
+	height: 100%; width: 100%;
+	text-align: center;
+}
+.profile-banner .background img {
+	min-width: 100%; min-height: 100%;
+	height: auto; width: auto;
+}
+.showcased-work {
+	width: 100%;
+	.title { font-weight: bold; }
+	td {
+		color: #797979;
+		vertical-align: top;
+	}
+	.grade {
+		font-size: 2em;
+		vertical-align: middle;
+		font-weight: bold;
+		border-left-width: 1px;
+	}
+	.icon {
+		vertical-align: middle;
+		padding: 7px 0 7px 16px;
+		.icons { height: 20px; line-height: 0; }
+	}
+}
+.listing.photos img { width: 33%; height: auto; }

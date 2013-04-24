@@ -13,6 +13,7 @@ $this->setBlock(TEMPLATE_content, 'subject', 'subject_block');
 $this->setBlock(TEMPLATE_content, 'download', 'download_block');
 $this->setBlock(TEMPLATE_content, 'legacy_download', 'legacy_download_block');
 $this->setBlock(TEMPLATE_content, 'action_submit', 'action_submit_block');
+$this->setBlock(TEMPLATE_content, 'action_publish', 'action_publish_block');
 $this->setBlock(TEMPLATE_content, 'recent_submission', 'recent_submission_block');
 $this->setBlock(TEMPLATE_content, 'show_owner', 'show_owner_block');
 $this->setBlock(TEMPLATE_content, 'returned_work', 'returned_work_block');
@@ -584,4 +585,30 @@ if($submission->getMarkType()->getId() == Component\SubmissionBox\MarkType::TYPE
 }
 else {
     $this->setVar('rubric_block', '');
+}
+
+
+/* Only offer a publish button if there is a submission history OR a return history
+ * and if the submission box isn't already published for this user
+ */
+$showcaseMapper = new \Eportfolio\ShowcaseMapper();
+
+$existingShowcasedItem = $showcaseMapper->findByColumnList(array(
+	'uid' => $user['uid'],
+	'submission_box_id' => $submission->getId()
+));
+
+/* If it has either a recent submission or recent return, and hasn't been published,
+ * allow it to be published
+ */
+if (isset($recent_submission) || isset($recent_return)) {
+	if (!$existingShowcasedItem->count()) {
+		$this->parse('action_publish_block', 'action_publish');
+	}
+	else {
+		$this->setVar('action_publish_block', '');
+	}
+}
+else {
+	$this->setVar('action_publish_block', '');
 }
