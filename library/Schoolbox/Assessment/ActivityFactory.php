@@ -40,6 +40,7 @@ class ActivityFactory {
 		$activity
 			->setEvent($event)
 			->setSubmissionBox($box)
+			->setOwner($box->getOwner())
 			->setCategory($box->getCategory())
 			->setDate($date);
 		return $activity;
@@ -65,6 +66,7 @@ class ActivityFactory {
 		$activity
 			->setEvent($event)
 			->setAssessment($assess)
+			->setOwner($assess->getUser())
 			->setCategory($assess->getCategory())
 			->setDate($date);
 		return $activity;
@@ -79,6 +81,7 @@ class ActivityFactory {
 		$activity
 			->setEvent('submitted')
 			->setSubmissionBox($submission->getSubmissionBox())
+			->setOwner($submission->getOwner())
 			->setCategory($submission->getSubmissionBox()->getCategory())
 			->setSubmission($submission)
 			->setDate($submission->getSubmitted());
@@ -94,6 +97,7 @@ class ActivityFactory {
 		$activity
 			->setEvent('returned')
 			->setSubmissionBox($return->getSubmissionBox())
+			->setOwner($return->getOwner())
 			->setCategory($return->getSubmissionBox()->getCategory())
 			->setReturnedWork($return)
 			->setDate($return->getReturned());
