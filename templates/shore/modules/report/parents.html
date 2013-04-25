@@ -1,4 +1,6 @@
-<style type="text/css">@page{size:portrait}</style>
+<style type="text/css">@page{size:portrait}
+ .private{ display:none; }
+</style>
 <script type="text/javascript" src="/javascript/jquery.qtip-1.0.0-rc3.min.js"></script>
 <script type="text/javascript">
 $j(function(){
@@ -63,6 +65,31 @@ $j(function(){
 						<input type='text' name='searchName' value="{SEARCH_NAME}"/>
 					</td>
 				</tr>
+                <tr style="display:none;">
+                    <td>
+                        <h4>Boarder</h4>
+                    </td>
+                    <td>
+                        <select name='searchBoardingStatus'>
+                            <option value='' {SEARCH_BOARDINGSTATUS_NONE} /></option>
+                            <option value='yes' {SEARCH_BOARDINGSTATUS_YES} />Yes</option>
+                            <option value='no' {SEARCH_BOARDINGSTATUS_NO} />No</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr style="display:none;">
+                    <td>
+                        <h4>Form</h4>
+                    </td>
+                    <td>
+                        <select name="searchForm">
+                            <!-- BEGIN search_form_option -->
+                            <option value='{SEARCHFORM_VALUE}' {SEARCHFORM_SELECTED}>{SEARCHFORM_DESCRIPTION}</option>
+                            <!-- END search_form_option -->
+                        </select>
+                    </td>
+                </tr>
+                <tr>
 				<tr>
 					<td>
 						<h4>Year</h4>
@@ -81,13 +108,14 @@ $j(function(){
 						<!-- END has_year_input -->
 					</td>
 				</tr>
+                <tr>
+                    <td></td>
+                    <td><label>
+                            <input class='submit-btn-plain' type='submit' value='Search' />
+                        </label>
+                    </td>
+                </tr>
 			</table>
-
-			<label>
-				<input class='submit-btn-plain' type='submit' value='Search' />
-			</label>
-
-			<div class='float-fix'></div>
 		</form>
 	</div>
 	<!-- BEGIN student -->
