@@ -165,7 +165,6 @@ class External_Synergetic_User implements External_UserInterface {
 
 		$this->getDatabase()->query($query);
 		while ($row = $this->getDatabase()->getNextArray()) {
-			print_r($row);
 			switch($row['UseEmail']) {
 				case 'O': //Use occupation email address
 					$emailList[] = $row['OccupEmail'];
