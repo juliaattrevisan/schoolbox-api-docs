@@ -149,6 +149,23 @@ class Digest_News {
 
 
     /**
+     * Retrieves poster's name from user object - used by compileNews() to
+     * generate activity list for digest.
+     *
+     * @param User $user
+     *
+     * @return string
+     */
+    protected function getPosterFromUser($user) {
+        $poster = $user->getFirstName().' '.$user->getLastName();
+        if ($title = $user->getTitle()) {
+            $poster = $title.'. '.$poster;
+        }
+        return $poster;
+    }
+
+
+    /**
      * Take the user array by value and populate its news fields
      * @param $u
      * @return array
@@ -218,22 +235,11 @@ class Digest_News {
                     ))
                     ->sortBy('date', 'desc')
                     ->limit(0, $limit);
-//                $factory = new Activity_ListFactory();
-//                $u['activities'] = $factory->buildFromActivityCollection($u, $activities);
-//                var_dump($u['activities']);
-//                $u['activities'] = array();
                 foreach ($activities as $activity) {
-                    $poster      = $activity->getOwner();
-                    $poster_name = $poster->getFirstName().' '.$poster->getLastName();
-                    if ($title = $poster->getTitle()) {
-                        $poster_name = $title.'. '.$poster_name;
-                    }
                     $relative_date = new Alaress_Date_Relative($activity->getDate());
-                    //
-                    // What's the link? Also, have a category link
                     $u['activities'][] = array(
                         'object'        => $activity,
-                        'poster'        => $poster_name,
+                        'poster'        => $this->getPosterFromUser($activity->getOwner()),
                         'event'         => $activity->getEvent(),
                         'category_name' => $activity->getCategory()->getName(),
                         'category_id'   => $activity->getCategory()->getId(),
@@ -269,13 +275,12 @@ class Digest_News {
         $mailer->setBlock('tplBODY', 'activitylist', 'activitylist_block');
         $mailer->setBlock('activitylist', 'activity', 'activity_block');
 
-        $mailer->setBlock('activity', 'activity_new_submission', 'activity_new_submission_block');
-        $mailer->setBlock('activity', 'activity_new_assessment', 'activity_new_assessment_block');
-        $mailer->setBlock('activity', 'activity_overdue',        'activity_overdue_block');
-        $mailer->setBlock('activity', 'activity_submitted',      'activity_submitted_block');
-        $mailer->setBlock('activity', 'activity_marked',         'activity_marked_block');
-        $mailer->setBlock('activity', 'activity_returned',       'activity_returned_block');
-        $mailer->setBlock('activity', 'activity_closed',         'activity_closed_block');
+        $mailer->setBlock('activity', 'activity_new',       'activity_new_block');
+        $mailer->setBlock('activity', 'activity_overdue',   'activity_overdue_block');
+        $mailer->setBlock('activity', 'activity_submitted', 'activity_submitted_block');
+        $mailer->setBlock('activity', 'activity_marked',    'activity_marked_block');
+        $mailer->setBlock('activity', 'activity_returned',  'activity_returned_block');
+        $mailer->setBlock('activity', 'activity_closed',    'activity_closed_block');
 
         $mailer->setVar('NAME', $u['firstname']);
 
@@ -342,35 +347,68 @@ class Digest_News {
 
         if (!empty($u['activities'])) {
             foreach ($u['activities'] as $activity) {
-                $mailer->setVar('activity_new_submission_block', '');
-                $mailer->setVar('activity_new_assessment_block', '');
-                $mailer->setVar('activity_overdue_block',        '');
-                $mailer->setVar('activity_submitted_block',      '');
-                $mailer->setVar('activity_marked_block',         '');
-                $mailer->setVar('activity_returned_block',       '');
-                $mailer->setVar('activity_closed_block',         '');
+                $is_assessment = $activity['object']->isAssessment();
+                $activity_id   = $activity['object']->getId();
+                $mailer->setVar('activity_new_block',       '');
+                $mailer->setVar('activity_overdue_block',   '');
+                $mailer->setVar('activity_submitted_block', '');
+                $mailer->setVar('activity_marked_block',    '');
+                $mailer->setVar('activity_returned_block',  '');
+                $mailer->setVar('activity_closed_block',    '');
                 $mailer->setVar(array(
-                    'ACTIVITY_POSTER'   => $activity['poster'],
+                    'ACTIVITY_OWNER'    => $activity['poster'],
                     'ACTIVITY_TYPE'     => $activity['type'],
                     'ACTIVITY_CAT_ID'   => $activity['category_id'],
                     'ACTIVITY_CAT_NAME' => $activity['category_name'],
                     'ACTIVITY_TITLE'    => $activity['title'],
-                    'ACTIVITY_DATE'     => $activity['time'],
-                    'ACTIVITY_URL'      => $activity['object']->isAssessment() ?
-                        ('assess/intro/'.$activity['object']->getId()) :
-                        ('submission/submissionHistory/'.$activity['object']->getId().'/'.$u['id']),
+                    'ACTIVITY_DATE'     => $activity['date'],
+                    'ACTIVITY_URL'      => $is_assessment ?
+                        ('assess/intro/'.$activity_id) :
+                        ('submission/submissionHistory/'.$activity_id.'/'.$u['id']),
                 ));
 
                 //
                 // What sort of block is this?
                 $block = 'closed';
+                $icon  = 'cross';
                 switch ($activity['event']) {
                     case 'new':
+                        $block = 'new';
+                        $icon  = 'dropbox';
+                        break;
+
+                    case 'overdue':
+                        $block = 'overdue';
+                        $icon  = 'notice';
+                        break;
+
+                    case 'submitted':
+                        $block = 'submitted';
+                        $icon  = 'upload';
+                        break;
+
+                    case 'returned':
+                        //
+                        // Is there a mark?
+                        $base_mark = $activity['object']->getReturnedNormalizedMark();
+                        if (isset($base_mark)) {
+                            $block = 'marked';
+                            $mailer->setVar('ACTIVITY_MARK', $activity['object']->getReturnedMark());
+                        }
+                        else {
+                            $block = 'returned';
+                        }
+                        //
+                        // Activity comes from submission box's owner, not user.
+                        $mailer->setVar('ACTIVITY_OWNER', $this->getPosterFromUser($activity['object']->getSubmissionBox()->getOwner()));
+                        $icon = 'refresh';
+                        break;
 
                     case 'closed':
                     default:
                         break;
                 }
+                $mailer->setVar('ACTIVITY_ICON', $icon);
                 $mailer->parse("activity_{$block}_block", "activity_{$block}");
                 $mailer->parse('activity_block', 'activity', true);
             }
