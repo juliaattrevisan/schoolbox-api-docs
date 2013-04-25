@@ -162,9 +162,50 @@
                                     <tr>
                                         <td><img valign="bottom" src="http://{SITE_DOMAIN}/images/emails/digest/activity-pin.png" width="24" height="24" border="0" /></td>
                                         <td valign="top" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#000000;">
-                                            <a href="" style="color:#0066b0;text-decoration:none;">{ACTIVITY_POSTER}</a> posted {ACTIVITY_TYPE}
-                                            <a href="" style="color:#0066b0;text-decoration:none;">{ACTIVITY_TITLE}</a> in
-                                            <a href="" style="color:#0066b0;text-decoration:none;">{ACTIVITY_CATEGORY}</a>
+                                            <!-- BEGIN activity_new_submission -->
+                                                {ACTIVITY_OWNER} posted {ACTIVITY_TYPE}
+                                                <a href="http://{SITE_DOMAIN}/{ACTIVITY_URL}" style="color:#0066b0;text-decoration:none;">{ACTIVITY_TITLE}</a> in
+                                                <a href="http://{SITE_DOMAIN}/homepage/{ACTIVITY_CAT_ID}" style="color:#0066b0;text-decoration:none;">{ACTIVITY_CAT_NAME}</a>
+                                            <!-- END activity_new_submission -->
+
+                                            <!-- BEGIN activity_new_assessment -->
+                                                {ACTIVITY_OWNER} posted {ACTIVITY_TYPE}
+                                                <a href="http://{SITE_DOMAIN}/{ACTIVITY_URL}" style="color:#0066b0;text-decoration:none;">{ACTIVITY_TITLE}</a> in
+                                                <a href="http://{SITE_DOMAIN}/homepage/{ACTIVITY_CAT_ID}" style="color:#0066b0;text-decoration:none;">{ACTIVITY_CAT_NAME}</a>
+                                            <!-- END activity_new_assessment -->
+
+                                            <!-- BEGIN activity_overdue -->
+                                                Submissions for
+                                                <a href="http://{SITE_DOMAIN}/{ACTIVITY_URL}" style="color:#0066b0;text-decoration:none;">{ACTIVITY_TITLE}</a> in
+                                                <a href="http://{SITE_DOMAIN}/homepage/{ACTIVITY_CAT_ID}" style="color:#0066b0;text-decoration:none;">{ACTIVITY_CAT_NAME}</a>
+                                                are now overdue.
+                                            <!-- END activity_overdue -->
+
+                                            <!-- BEGIN activity_submitted -->
+                                                You submitted work for
+                                                <a href="http://{SITE_DOMAIN}/{ACTIVITY_URL}" style="color:#0066b0;text-decoration:none;">{ACTIVITY_TITLE}</a> in
+                                                <a href="http://{SITE_DOMAIN}/homepage/{ACTIVITY_CAT_ID}" style="color:#0066b0;text-decoration:none;">{ACTIVITY_CAT_NAME}</a>
+                                            <!-- END activity_submitted -->
+
+                                            <!-- BEGIN activity_marked -->
+                                                You received {ACTIVITY_MARK} for
+                                                <a href="http://{SITE_DOMAIN}/{ACTIVITY_URL}" style="color:#0066b0;text-decoration:none;">{ACTIVITY_TITLE}</a> in
+                                                <a href="http://{SITE_DOMAIN}/homepage/{ACTIVITY_CAT_ID}" style="color:#0066b0;text-decoration:none;">{ACTIVITY_CAT_NAME}</a> from
+                                                {ACTIVITY_OWNER}
+                                            <!-- END activity_marked -->
+
+                                            <!-- BEGIN activity_returned -->
+                                                {ACTIVITY_OWNER} returned your work for
+                                                <a href="http://{SITE_DOMAIN}/{ACTIVITY_URL}" style="color:#0066b0;text-decoration:none;">{ACTIVITY_TITLE}</a> in
+                                                <a href="http://{SITE_DOMAIN}/homepage/{ACTIVITY_CAT_ID}" style="color:#0066b0;text-decoration:none;">{ACTIVITY_CAT_NAME}</a>
+                                            <!-- END activity_returned -->
+
+                                            <!-- BEGIN activity_closed -->
+                                                Submissions for
+                                                <a href="http://{SITE_DOMAIN}/{ACTIVITY_URL}" style="color:#0066b0;text-decoration:none;">{ACTIVITY_TITLE}</a> in
+                                                <a href="http://{SITE_DOMAIN}/homepage/{ACTIVITY_CAT_ID}" style="color:#0066b0;text-decoration:none;">{ACTIVITY_CAT_NAME}</a>
+                                                are now closed.
+                                            <!-- END activity_closed -->
                                             <br /><span style="color:#929292">{ACTIVITY_DATE}</span>
                                         </td>
                                         <td valign="middle" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>

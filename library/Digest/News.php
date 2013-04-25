@@ -218,20 +218,28 @@ class Digest_News {
                     ))
                     ->sortBy('date', 'desc')
                     ->limit(0, $limit);
-                $u['activities'] = array();
+//                $factory = new Activity_ListFactory();
+//                $u['activities'] = $factory->buildFromActivityCollection($u, $activities);
+//                var_dump($u['activities']);
+//                $u['activities'] = array();
                 foreach ($activities as $activity) {
                     $poster      = $activity->getOwner();
                     $poster_name = $poster->getFirstName().' '.$poster->getLastName();
                     if ($title = $poster->getTitle()) {
                         $poster_name = $title.'. '.$poster_name;
                     }
+                    $relative_date = new Alaress_Date_Relative($activity->getDate());
+                    //
+                    // What's the link? Also, have a category link
                     $u['activities'][] = array(
-                        'poster'   => $poster_name,
-                        'event'    => $activity->getEvent(),
-                        'category' => $activity->getCategory()->getName(),
-                        'title'    => $activity->getName(),
-                        'type'     => $activity->getTypeName(),
-                        'date'     => $activity->getDate()->getUsingFormat('Y-m-d H:i:s'),
+                        'object'        => $activity,
+                        'poster'        => $poster_name,
+                        'event'         => $activity->getEvent(),
+                        'category_name' => $activity->getCategory()->getName(),
+                        'category_id'   => $activity->getCategory()->getId(),
+                        'title'         => $activity->getName(),
+                        'type'          => strtolower($activity->getTypeName()),
+                        'date'          => $relative_date->getRelativeTime(),
                     );
                 }
             }
@@ -260,6 +268,14 @@ class Digest_News {
 
         $mailer->setBlock('tplBODY', 'activitylist', 'activitylist_block');
         $mailer->setBlock('activitylist', 'activity', 'activity_block');
+
+        $mailer->setBlock('activity', 'activity_new_submission', 'activity_new_submission_block');
+        $mailer->setBlock('activity', 'activity_new_assessment', 'activity_new_assessment_block');
+        $mailer->setBlock('activity', 'activity_overdue',        'activity_overdue_block');
+        $mailer->setBlock('activity', 'activity_submitted',      'activity_submitted_block');
+        $mailer->setBlock('activity', 'activity_marked',         'activity_marked_block');
+        $mailer->setBlock('activity', 'activity_returned',       'activity_returned_block');
+        $mailer->setBlock('activity', 'activity_closed',         'activity_closed_block');
 
         $mailer->setVar('NAME', $u['firstname']);
 
@@ -326,13 +342,36 @@ class Digest_News {
 
         if (!empty($u['activities'])) {
             foreach ($u['activities'] as $activity) {
+                $mailer->setVar('activity_new_submission_block', '');
+                $mailer->setVar('activity_new_assessment_block', '');
+                $mailer->setVar('activity_overdue_block',        '');
+                $mailer->setVar('activity_submitted_block',      '');
+                $mailer->setVar('activity_marked_block',         '');
+                $mailer->setVar('activity_returned_block',       '');
+                $mailer->setVar('activity_closed_block',         '');
                 $mailer->setVar(array(
                     'ACTIVITY_POSTER'   => $activity['poster'],
                     'ACTIVITY_TYPE'     => $activity['type'],
-                    'ACTIVITY_CATEGORY' => $activity['category'],
+                    'ACTIVITY_CAT_ID'   => $activity['category_id'],
+                    'ACTIVITY_CAT_NAME' => $activity['category_name'],
                     'ACTIVITY_TITLE'    => $activity['title'],
-                    'ACTIVITY_DATE'     => $activity['date'],
+                    'ACTIVITY_DATE'     => $activity['time'],
+                    'ACTIVITY_URL'      => $activity['object']->isAssessment() ?
+                        ('assess/intro/'.$activity['object']->getId()) :
+                        ('submission/submissionHistory/'.$activity['object']->getId().'/'.$u['id']),
                 ));
+
+                //
+                // What sort of block is this?
+                $block = 'closed';
+                switch ($activity['event']) {
+                    case 'new':
+
+                    case 'closed':
+                    default:
+                        break;
+                }
+                $mailer->parse("activity_{$block}_block", "activity_{$block}");
                 $mailer->parse('activity_block', 'activity', true);
             }
             $mailer->parse('activitylist_block', 'activitylist');
