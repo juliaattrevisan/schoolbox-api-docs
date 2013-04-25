@@ -148,21 +148,11 @@ if ($groupHandler->isStaff()) {
                 $allSynergyIds = implode(',', $synergyIds);
 
                 $externalHandler = new External_User();
-                $allParents = $externalHandler->getParentsOf($allSynergyIds);
+                $allParents = $externalHandler->getParentEmails($allSynergyIds);
 
-                if (is_array($allParents) && count($allParents)) {
-                    foreach ($allParents as $currentParent) {
-                        $email = trim($currentParent['StudentContactDefaultEmail']);
-
-                        if (strlen($email)) {
-                            $allParentEmails[] = $email;
-                        }
-                    }
-
-                    /* Uniquify emails
-                     */
-                    $emailAllParents = implode(', ', array_filter(array_unique($allParentEmails)));
-                }
+                /* Uniquify emails
+                */
+                $emailAllParents = implode(', ', array_filter(array_unique($allParents)));
 
                 $this->setVar(
                     array(

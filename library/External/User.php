@@ -64,13 +64,13 @@ class External_User implements External_UserInterface {
 	}
 
     /**
-     * No usages found
+     * Returns a list of emails for parents of the listed students
      *
      * @param Integer $externalUserId
      * @return Array
      */
-    public function getParentsOf ($externalUserId) {
-        return $this->getDatabase()->getParentsOf($externalUserId);
+    public function getParentEmails($externalUserId) {
+        return $this->getDatabase()->getParentEmails($externalUserId);
     }
 
 

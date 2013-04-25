@@ -12,7 +12,7 @@ interface External_UserInterface {
 
     public function getParentSync($externalUserId);
 
-    public function getParentsOf($externalUserId);
+    public function getParentEmails($externalUserId);
 
     public function getStudent($externalUserId);
 
