@@ -34,7 +34,7 @@ class External_Tass_User implements External_UserInterface {
      *
      * @return array|bool
      */
-    public function getParentsOf($externalUserId) {
+    public function getParentEmails($externalUserId) {
 
     }
 

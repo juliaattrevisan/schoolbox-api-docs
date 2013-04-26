@@ -143,32 +143,21 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             /* Parent bulk email
               */
             if (count($synergyIds) && $this->groupHandler->isStaff() && Cfg::get('email_all_parents') == 1) {
-                $allParentEmails = array();
-                $allSynergyIds = implode(',', $synergyIds);
+	            $allSynergyIds = implode(',', $synergyIds);
 
-                $externalHandler = new External_User();
-                $allParents = $externalHandler->getParentsOf($allSynergyIds);
+	            $externalHandler = new External_User();
+	            $allParents = $externalHandler->getParentEmails($allSynergyIds);
 
-                if (is_array($allParents) && count($allParents)) {
-                    foreach ($allParents as $currentParent) {
-                        $email = trim($currentParent['StudentContactDefaultEmail']);
+	            /* Uniquify emails
+				*/
+	            $emailAllParents = implode(', ', array_filter(array_unique($allParents)));
 
-                        if (strlen($email)) {
-                            $allParentEmails[] = $email;
-                        }
-                    }
-
-                    /* Uniquify emails
-                        */
-                    $emailAllParents = implode(', ', array_filter(array_unique($allParentEmails)));
-                }
-
-                $this->setVar(
-                    array(
-                        'REPLY_TO' => $emailHandler->formatEmailFromArray($_SESSION),
-                        'EMAIL_ALL_PARENTS' => $emailAllParents,
-                    )
-                );
+	            $this->setVar(
+		            array(
+			            'REPLY_TO' => $emailHandler->formatEmailFromArray($_SESSION),
+			            'EMAIL_ALL_PARENTS' => $emailAllParents,
+		            )
+	            );
 
                 $this->parse('parent_email_block', 'parent_email');
             } else {

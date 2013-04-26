@@ -443,7 +443,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      * Duplicate method, use getStudentContactList() instead
      * @deprecated
      */
-    public function getParentsOf($externalUserId) {
+    public function getParentsEmails($externalUserId) {
         return $this->getStudentContactList($externalUserId);
     }
 

@@ -159,7 +159,7 @@ class External_Synergetic_User implements External_UserInterface {
 				RelatedID,UseEmail,OccupEmail,Email,DefaultEmail
 			FROM
 				SynergyOne.dbo.RelationShips r
-				JOIN SynergyOne.dbo.vCommunityAddresses ON RelatedID=vCommunityAddresses.ID
+				JOIN SynegrgyOne.dbo.vCommunityAddresses ON RelatedID=vCommunityAddresses.ID
 			WHERE
 				r.ID IN ($synergyIds)";
 
