@@ -92,7 +92,8 @@ class Digest_News {
     public function compileUserList() {
         $sql = "SELECT u.id, u.username, u.firstname, u.lastname, u.group_id gid, u.local_email, u.alt_email, uc.campus
                 FROM `user` u
-                LEFT JOIN userCampus uc ON uc.uid = u.id";
+                LEFT JOIN userCampus uc ON uc.uid = u.id
+                where u.id=15";
 
         $prevUID = -1;
         $userList = array();
@@ -237,16 +238,20 @@ class Digest_News {
                     ->limit(0, $limit);
                 foreach ($activities as $activity) {
                     $relative_date = new Alaress_Date_Relative($activity->getDate());
-                    $u['activities'][] = array(
-                        'object'        => $activity,
-                        'poster'        => $this->getPosterFromUser($activity->getOwner()),
-                        'event'         => $activity->getEvent(),
-                        'category_name' => $activity->getCategory()->getName(),
-                        'category_id'   => $activity->getCategory()->getId(),
-                        'title'         => $activity->getName(),
-                        'type'          => strtolower($activity->getTypeName()),
-                        'date'          => $relative_date->getRelativeTime(),
-                    );
+                    //
+                    // Filter out items that aren't in window.
+                    if ($this->withinWindow($activity->getDate()->getUnixTimestamp())) {
+                        $u['activities'][] = array(
+                            'object'        => $activity,
+                            'poster'        => $this->getPosterFromUser($activity->getOwner()),
+                            'event'         => $activity->getEvent(),
+                            'category_name' => $activity->getCategory()->getName(),
+                            'category_id'   => $activity->getCategory()->getId(),
+                            'title'         => $activity->getName(),
+                            'type'          => strtolower($activity->getTypeName()),
+                            'date'          => $relative_date->getRelativeTime(),
+                        );
+                    }
                 }
             }
         }
@@ -347,11 +352,6 @@ class Digest_News {
 
         if (!empty($u['activities'])) {
             foreach ($u['activities'] as $activity) {
-                //
-                // Filter out items that aren't in window.
-                if (!($this->withinWindow($activity['object']->getDate()->getUnixTimestamp()))) {
-                    continue;
-                }
                 $newsFlag      = true;
                 $is_assessment = $activity['object']->isAssessment();
                 $activity_id   = $activity['object']->getId();
