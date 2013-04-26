@@ -41,7 +41,6 @@ class Digest_News {
     protected $assessment_mapper;
     protected $submission_mapper;
     protected $return_mapper;
-    protected $submission_handler;
 
     public function __construct($windowStart, $windowEnd, $debug = false) {
 
@@ -73,11 +72,10 @@ class Digest_News {
         $this->submission_mapper     = new SubmissionMapper();
         $this->return_mapper         = new ReturnedWorkMapper();
 
-        $this->category_mapper->setExternalUser(new External_User());
-
         //
-        // Old-style submission handler
-        $this->submission_handler    = new Submission();
+        // Set up category mapper with external user object for querying
+        // external DB.
+        $this->category_mapper->setExternalUser(new External_User());
     }
 
     public function __destruct() {
@@ -93,7 +91,7 @@ class Digest_News {
         $sql = "SELECT u.id, u.username, u.firstname, u.lastname, u.group_id gid, u.local_email, u.alt_email, uc.campus
                 FROM `user` u
                 LEFT JOIN userCampus uc ON uc.uid = u.id
-                where u.id=15";
+                where u.id IN (15, 229)";
 
         $prevUID = -1;
         $userList = array();
@@ -248,10 +246,29 @@ class Digest_News {
                             'category_name' => $activity->getCategory()->getName(),
                             'category_id'   => $activity->getCategory()->getId(),
                             'title'         => $activity->getName(),
-                            'type'          => strtolower($activity->getTypeName()),
+                            'type'          => $activity->getTypeName(),
                             'date'          => $relative_date->getRelativeTime(),
                         );
                     }
+                }
+
+                //
+                // Get upcoming work items here too (as activity list)
+                $due_work_list = $this->submission_box_mapper
+                    ->getUpcomingActivities($u['id'], $limit, $categories)
+                    ->merge($this->assessment_mapper->getUpcomingActivities($u['id'], $limit, $categories))
+                    ->sortBy('date', 'asc')
+                    ->limit(0, $limit);
+                foreach ($due_work_list as $due_work) {
+                    $relative_date = new Alaress_Date_Relative($due_work->getDate());
+                    $u['due_work'][] = array(
+                        'object'        => $due_work,
+                        'category_name' => $due_work->getCategory()->getName(),
+                        'category_id'   => $due_work->getCategory()->getId(),
+                        'title'         => $due_work->getName(),
+                        'type'          => $due_work->getTypeName(),
+                        'date'          => $relative_date->getRelativeTime(),
+                    );
                 }
             }
         }
@@ -273,6 +290,10 @@ class Digest_News {
         }
 
         $mailer = new Mailer('news-digest.html', 'News', $u['email'], $this->host);
+
+        $mailer->setBlock('tplBODY', 'upcominglist', 'upcominglist_block');
+        $mailer->setBlock('upcominglist', 'upcoming', 'upcoming_block');
+
         $mailer->setBlock('tplBODY', 'newslist', 'newslist_block');
         $mailer->setBlock('newslist', 'article', 'article_block');
         $mailer->setBlock('article', 'image', 'image_block');
@@ -351,8 +372,8 @@ class Digest_News {
         }
 
         if (!empty($u['activities'])) {
+            $newsFlag = true;
             foreach ($u['activities'] as $activity) {
-                $newsFlag      = true;
                 $is_assessment = $activity['object']->isAssessment();
                 $activity_id   = $activity['object']->getId();
                 $mailer->setVar('activity_new_block',       '');
@@ -363,7 +384,7 @@ class Digest_News {
                 $mailer->setVar('activity_closed_block',    '');
                 $mailer->setVar(array(
                     'ACTIVITY_OWNER'    => $activity['poster'],
-                    'ACTIVITY_TYPE'     => $activity['type'],
+                    'ACTIVITY_TYPE'     => strtolower($activity['type']),
                     'ACTIVITY_CAT_ID'   => $activity['category_id'],
                     'ACTIVITY_CAT_NAME' => $activity['category_name'],
                     'ACTIVITY_TITLE'    => $activity['title'],
@@ -424,6 +445,31 @@ class Digest_News {
             $mailer->setVar('activitylist_block', '');
         }
 
+        if (!empty($u['due_work'])) {
+            $newsFlag = true;
+            foreach ($u['due_work'] as $due_work) {
+                $is_assessment = $due_work['object']->isAssessment();
+                $due_work_id   = $due_work['object']->getId();
+                $mailer->setVar(array(
+                    'UPCOMING_TYPE'        => $due_work['type'],
+                    'UPCOMING_CAT_ID'      => $due_work['category_id'],
+                    'UPCOMING_CAT_NAME'    => $due_work['category_name'],
+                    'UPCOMING_TITLE'       => $due_work['title'],
+                    'UPCOMING_DATE'        => $due_work['date'],
+                    'UPCOMING_URL'         => $is_assessment ?
+                        ('assess/intro/'.$due_work_id) :
+                        ('submission/submissionHistory/'.$due_work_id.'/'.$u['id']),
+                    'UPCOMING_SUBMIT_ICON' => 'submit',
+                    'UPCOMING_LINK_TEXT'   => 'Submit',
+                ));
+                $mailer->parse('upcoming_block', 'upcoming', true);
+            }
+            $mailer->parse('upcominglist_block', 'upcominglist');
+        }
+        else {
+            $mailer->setVar('upcominglist_block', '');
+        }
+
         if (!$this->debugging() && $newsFlag) {
             $success = $mailer->send();
             if(!$success) {
@@ -441,6 +487,10 @@ class Digest_News {
 
     protected function withinWindow($stamp) {
         return (($stamp > $this->digestStart) && ($stamp < $this->digestEnd));
+    }
+
+    protected function withinFutureWindow($stamp) {
+        return (($stamp >= $this->digestEnd) && ($stamp < ($this->digestEnd + ($this->digestEnd - $this->digestStart))));
     }
 
     protected function cli($output, $err = false) {
