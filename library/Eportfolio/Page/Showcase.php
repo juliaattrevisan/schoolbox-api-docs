@@ -59,6 +59,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 
 		if ($allShowcasedItems->count()) {
 			$previousCategory = null;
+			$j = 0;
 
 			foreach($allShowcasedItems as $currentShowcasedItem) {
 				$latestSubmission = $this->getLatestSubmission($this->getUserId(), $currentShowcasedItem->getSubmissionBoxId());
@@ -70,6 +71,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 					'SHOWCASED_WORK_BOX_CATEGORY_NAME' => $currentBox->getCategory()->getName(),
 					'SHOWCASED_WORK_BOX_NAME' => $currentBox->getName(),
 					'SHOWCASED_WORK_BOX_TYPE' => $currentBox->getWorkType()->getName(),
+					'ON_OFF' => ++$j % 2 ? '' : 'dark'
 				));
 
 				/* Show submitted work information (if available)
@@ -98,13 +100,16 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 				/* Show returned work information (if available)
 				 */
 				if ($latestReturn) {
+					$mark = $latestReturn->getMark();
 					$this->getPage()->setVar(array(
-						'SHOWCASED_WORK_RETURNED_MARK' => $latestReturn->getMark(),
+						'SHOWCASED_WORK_RETURNED_MARK' => $mark,
+						'SHOWCASED_WORK_RETURNED_GRADIENT' => (int)($mark / 10),
 					));
 				}
 				else {
 					$this->getPage()->setVar(array(
 						'SHOWCASED_WORK_RETURNED_MARK' => '',
+						'SHOWCASED_WORK_RETURNED_GRADIENT' => '',
 					));
 				}
 
@@ -112,7 +117,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 				 */
 				if (($previousCategory == null) || ($previousCategory != $currentBox->getCategory()->getName())) {
 					$previousCategory = $currentBox->getCategory()->getName();
-
+					//$j = 0;
 					$this->getPage()->parse('showcased_work_category_block', 'showcased_work_category');
 				}
 
