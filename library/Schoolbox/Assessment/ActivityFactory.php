@@ -18,7 +18,8 @@ class ActivityFactory {
 
 	/**
 	 * @param SubmissionBox $box
-	 * @param string        $event The event type: "new", "overdue" or "closed"
+	 * @param string        $event The event type: "new", "overdue", "closed" or
+	 *                             "upcoming"
 	 *
 	 * @return null|Activity
 	 */
@@ -27,7 +28,7 @@ class ActivityFactory {
 		if ($event === 'new') {
 			$date = $box->getOpenDate();
 		}
-		elseif ($event === 'overdue') {
+		elseif ($event === 'overdue' || $event === 'upcoming') {
 			$date = $box->getDueDate();
 		}
 		elseif ($event === 'closed') {
@@ -48,7 +49,7 @@ class ActivityFactory {
 
 	/**
 	 * @param OnlineAssessment $assess
-	 * @param string           $event  The event type: "new" or "closed"
+	 * @param string        $event The event type: "new", "closed" or "upcoming"
 	 * @return null|Activity
 	 */
 	public function buildFromOnlineAssessment(OnlineAssessment $assess, $event) {
@@ -56,7 +57,7 @@ class ActivityFactory {
 		if ($event === 'new') {
 			$date = $assess->getStart();
 		}
-		elseif ($event === 'closed') {
+		elseif ($event === 'closed' || $event === 'upcoming') {
 			$date = $assess->getFinish();
 		}
 		if (!isset($date)) {
