@@ -43,14 +43,14 @@ class Digest_News {
     protected $return_mapper;
 
     /**
-     * @var Component_ControllerAbstract
+     * @var Component_Instance
      */
-    protected $upcoming_work_controller;
+    protected $upcoming_work_component;
 
     /**
-     * @var Component_ControllerAbstract
+     * @var Component_Instance
      */
-    protected $homepage_activity_controller;
+    protected $homepage_activity_component;
 
     public function __construct($windowStart, $windowEnd, $debug = false) {
 
@@ -87,25 +87,20 @@ class Digest_News {
         // external DB.
         $this->category_mapper->setExternalUser(new External_User());
 
-
-        $chf = new Component_Dashboard_Factory(new \User(), new SitePage(false));
-
         //
         // Setup of components for:
         // Dashboard/Homepage Activity
         // Dashboard/Upcoming Due Work
-        $uwc             = new Component_Instance();
-        $uwc->definition = Component_DefinitionMapper::getInstance()->findOneByColumn(
+        $this->upcoming_work_component             = new Component_Instance();
+        $this->upcoming_work_component->definition = Component_DefinitionMapper::getInstance()->findOneByColumn(
             'class', 'Component_Dashboard_UpcomingWorkController'
         );
-        $this->upcoming_work_controller = $chf->buildComponent($uwc);
 
 
-        $hac             = new Component_Instance();
-        $hac->definition = Component_DefinitionMapper::getInstance()->findOneByColumn(
+        $this->homepage_activity_component             = new Component_Instance();
+        $this->homepage_activity_component->definition = Component_DefinitionMapper::getInstance()->findOneByColumn(
             'class', 'Component_Dashboard_HomepageNewsController'
         );
-        $this->homepage_activity_controller = $chf->buildComponent($hac);
     }
 
     public function __destruct() {
@@ -331,12 +326,12 @@ class Digest_News {
         $mailer->setBlock('tplBODY', 'activitylist', 'activitylist_block');
         $mailer->setBlock('activitylist', 'activity', 'activity_block');
 
-        $mailer->setBlock('activity', 'activity_new',       'activity_new_block');
-        $mailer->setBlock('activity', 'activity_overdue',   'activity_overdue_block');
-        $mailer->setBlock('activity', 'activity_submitted', 'activity_submitted_block');
-        $mailer->setBlock('activity', 'activity_marked',    'activity_marked_block');
-        $mailer->setBlock('activity', 'activity_returned',  'activity_returned_block');
-        $mailer->setBlock('activity', 'activity_closed',    'activity_closed_block');
+//        $mailer->setBlock('activity', 'activity_new',       'activity_new_block');
+//        $mailer->setBlock('activity', 'activity_overdue',   'activity_overdue_block');
+//        $mailer->setBlock('activity', 'activity_submitted', 'activity_submitted_block');
+//        $mailer->setBlock('activity', 'activity_marked',    'activity_marked_block');
+//        $mailer->setBlock('activity', 'activity_returned',  'activity_returned_block');
+//        $mailer->setBlock('activity', 'activity_closed',    'activity_closed_block');
 
         $mailer->setVar('NAME', $u['firstname']);
 
@@ -404,152 +399,74 @@ class Digest_News {
         $component_config = array(
             'actionable'    => array('label' => 'actionable',    'value' => true),
             'allow_parents' => array('label' => 'allow_parents', 'value' => true),
-            'size'          => array('label' => 'size',          'value' => 0),
+            'size'          => array('label' => 'size',          'value' => 10),
             'user'          => array('label' => 'user',          'value' => $u['id']),
         );
 
-        $this->homepage_activity_controller->setup(array(), $component_config);
-        $this->homepage_activity_controller->execute();
-        var_dump($this->homepage_activity_controller->getDataFromExecute());
 
-        $this->upcoming_work_controller->setup(array(), $component_config);
-        $this->upcoming_work_controller->execute();
-        var_dump($this->upcoming_work_controller->getDataFromExecute());
+	    $chf = new Component_Dashboard_Factory(new \User(), new SitePage(false));
 
-        //
-        // Upcoming Work component
-//        $sitepage = new SitePage(false);
-//        $sitepage->setFile(TEMPLATE_body, 'component/bare.html');
-//        $chf = new Component_Dashboard_Factory(new \User(), $sitepage);
-//        $controller = $chf->buildComponent($this->upcoming_work_component);
-//        $controller->setup(array(), $component_config);
-//        $controller->execute();
-//
-//        //
-//        // Don't render anything - just give me that juicy data
-//        $controller->renderTemplate('COMPONENT');
-//
-//        ob_start();
-//        $sitepage->outputPage(true);
-//        $mailer->setVar('upcominglist_block', ob_get_clean());
-//        unset($sitepage, $controller);
+//	    $this->upcoming_work_controller = $chf->buildComponent($uwc);
+        $homepage_activity_controller = $chf->buildComponent($this->homepage_activity_component);
+        $homepage_activity_controller->setup(array(), $component_config);
+        $homepage_activity_controller->execute();
+        $activity_list = $homepage_activity_controller->getDataFromExecute();
+
+        if (!empty($activity_list)) {
+            $newsFlag = true;
+            foreach ($activity_list as $activity) {
+                $mailer->setVar(array(
+                    'ACTIVITY_OWNER'    => $activity['avatar_title'],
+                    'ACTIVITY_CONTENT'  => $activity['content'],
+                    'ACTIVITY_DATE'     => $activity['time'],
+                ));
+
+                //
+                // What sort of block is this?
+                $icon = $activity['icon'];
+                switch ($icon) {
+                    case 'news':
+                        $icon = 'lightning';
+                        break;
+
+                    case 'onlineassessment':
+                        $icon = 'grade';
+                        break;
+
+                    case 'forum':
+                        $icon = 'discuss';
+                        break;
+
+                    case 'survey':
+                        $icon = 'poll';
+                        break;
+
+                    default:
+                        break;
+                }
+                $mailer->setVar('ACTIVITY_ICON', $icon);
+                $mailer->parse('activity_block', 'activity', true);
+            }
+            $mailer->parse('activitylist_block', 'activitylist');
 
 
-//        //
-//        // Homepage News dashboard component
-//        $sitepage = new SitePage(false);
-//        $sitepage->setFile(TEMPLATE_body, 'component/bare.html');
-//        $chf = new Component_Dashboard_Factory(new \User(), $sitepage);
-//        $controller = $chf->buildComponent($this->homepage_activity_component);
-//        $controller->setup(array(), $component_config);
-//        $controller->execute();
-//        $controller->renderTemplate('COMPONENT');
-//
-//        ob_start();
-//        $sitepage->outputPage(true);
-//        $mailer->setVar('activitylist_block', ob_get_clean());
-//        unset($sitepage, $controller);
 
+//		    foreach ($activity_list as $activity) {
+//			    $mailer->setVar(
+//				    array(
+//
+//				    )
+//			    );
+//			    $mailer->parse('activitylist_block', 'activitylist', true);
+//		    }
+        }
+        else {
+            $mailer->setVar('activitylist_block', '');
+        }
 
-
-//        if (!empty($u['activities'])) {
-//            $newsFlag = true;
-//            foreach ($u['activities'] as $activity) {
-//                $is_assessment = $activity['object']->isAssessment();
-//                $activity_id   = $activity['object']->getId();
-//                $mailer->setVar('activity_new_block',       '');
-//                $mailer->setVar('activity_overdue_block',   '');
-//                $mailer->setVar('activity_submitted_block', '');
-//                $mailer->setVar('activity_marked_block',    '');
-//                $mailer->setVar('activity_returned_block',  '');
-//                $mailer->setVar('activity_closed_block',    '');
-//                $mailer->setVar(array(
-//                    'ACTIVITY_OWNER'    => $activity['poster'],
-//                    'ACTIVITY_TYPE'     => strtolower($activity['type']),
-//                    'ACTIVITY_CAT_ID'   => $activity['category_id'],
-//                    'ACTIVITY_CAT_NAME' => $activity['category_name'],
-//                    'ACTIVITY_TITLE'    => $activity['title'],
-//                    'ACTIVITY_DATE'     => $activity['date'],
-//                    'ACTIVITY_URL'      => $is_assessment ?
-//                        ('assess/intro/'.$activity_id) :
-//                        ('submission/submissionHistory/'.$activity_id.'/'.$u['id']),
-//                ));
-//
-//                //
-//                // What sort of block is this?
-//                $block = 'closed';
-//                $icon  = 'cross';
-//                switch ($activity['event']) {
-//                    case 'new':
-//                        $block = 'new';
-//                        $icon  = 'dropbox';
-//                        break;
-//
-//                    case 'overdue':
-//                        $block = 'overdue';
-//                        $icon  = 'notice';
-//                        break;
-//
-//                    case 'submitted':
-//                        $block = 'submitted';
-//                        $icon  = 'upload';
-//                        break;
-//
-//                    case 'returned':
-//                        //
-//                        // Is there a mark?
-//                        $base_mark = $activity['object']->getReturnedNormalizedMark();
-//                        if (isset($base_mark)) {
-//                            $block = 'marked';
-//                            $mailer->setVar('ACTIVITY_MARK', $activity['object']->getReturnedMark());
-//                        }
-//                        else {
-//                            $block = 'returned';
-//                        }
-//                        //
-//                        // Activity comes from submission box's owner, not user.
-//                        $mailer->setVar('ACTIVITY_OWNER', $this->getPosterFromUser($activity['object']->getSubmissionBox()->getOwner()));
-//                        $icon = 'refresh';
-//                        break;
-//
-//                    case 'closed':
-//                    default:
-//                        break;
-//                }
-//                $mailer->setVar('ACTIVITY_ICON', $icon);
-//                $mailer->parse("activity_{$block}_block", "activity_{$block}");
-//                $mailer->parse('activity_block', 'activity', true);
-//            }
-//            $mailer->parse('activitylist_block', 'activitylist');
-//        }
-//        else {
-//            $mailer->setVar('activitylist_block', '');
-//        }
-//
-//        if (!empty($u['due_work'])) {
-//            $newsFlag = true;
-//            foreach ($u['due_work'] as $due_work) {
-//                $is_assessment = $due_work['object']->isAssessment();
-//                $due_work_id   = $due_work['object']->getId();
-//                $mailer->setVar(array(
-//                    'UPCOMING_TYPE'        => $due_work['type'],
-//                    'UPCOMING_CAT_ID'      => $due_work['category_id'],
-//                    'UPCOMING_CAT_NAME'    => $due_work['category_name'],
-//                    'UPCOMING_TITLE'       => $due_work['title'],
-//                    'UPCOMING_DATE'        => $due_work['date'],
-//                    'UPCOMING_URL'         => $is_assessment ?
-//                        ('assess/intro/'.$due_work_id) :
-//                        ('submission/submissionHistory/'.$due_work_id.'/'.$u['id']),
-//                    'UPCOMING_SUBMIT_ICON' => 'submit',
-//                    'UPCOMING_LINK_TEXT'   => 'Submit',
-//                ));
-//                $mailer->parse('upcoming_block', 'upcoming', true);
-//            }
-//            $mailer->parse('upcominglist_block', 'upcominglist');
-//        }
-//        else {
-//            $mailer->setVar('upcominglist_block', '');
-//        }
+//        $this->upcoming_work_controller->setup(array(), $component_config);
+//        $this->upcoming_work_controller->execute();
+//        $work_list = $this->upcoming_work_controller->getDataFromExecute();
 
         if (!$this->debugging() && $newsFlag) {
             $success = $mailer->send();
