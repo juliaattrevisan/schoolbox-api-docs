@@ -396,4 +396,14 @@ abstract class Component_ControllerAbstract {
         return $this->sitepage->template;
     }
 
+    /**
+     * Returns data set for this component as populated by execute(), or null
+     * if not populated yet or this component doesn't support that method.
+     *
+     * @return mixed
+     */
+    public function getDataFromExecute() {
+        return null;
+    }
+
 }

@@ -66,4 +66,13 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
         return true;
     }
 
+    /**
+     * Retrieves feed list as populated by execute().
+     *
+     * @return array
+     */
+    public function getDataFromExecute() {
+        return $this->feedList;
+    }
+
 }
