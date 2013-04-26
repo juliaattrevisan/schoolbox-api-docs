@@ -304,8 +304,8 @@ if (is_numeric($this->arg[0])) {
                         if ((Cfg::get('show_all_subjects') == 1) || $category['id'] ) {
 
                             /* Fetch teacher names */
-	                        if($subject['ClassCampus'])
-		                        $code = $subject['ClassCampus'].'/'.$subject['code'];
+	                        if($subject['campusCode'])
+		                        $code = $subject['campusCode'].'/'.$subject['code'];
 	                        else
 		                        $code = $subject['code'];
 
