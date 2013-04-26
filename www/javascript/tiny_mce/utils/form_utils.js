@@ -60,11 +60,38 @@ function getBrowserHTML(id, target_form_element, type, prefix) {
 	return html;
 }
 
+function getUploadHTML(id, target_form_element, type, prefix) {
+    var option = prefix + "_" + type + "_browser_callback", cb, html;
+
+    cb = tinyMCEPopup.getParam(option, tinyMCEPopup.getParam("file_uploader_callback"));
+
+    if (!cb)
+        return "";
+
+    html = "";
+    html += '<a id="' + id + '_link" href="javascript:openUploader(\'' + id + '\',\'' + target_form_element + '\', \'' + type + '\',\'' + option + '\');" onmousedown="return false;" class="upload">';
+    html += '<span id="' + id + '" title="' + tinyMCEPopup.getLang('upload') + '">&nbsp;</span></a>';
+
+    return html;
+}
+
+
 function openBrowser(img_id, target_form_element, type, option) {
 	var img = document.getElementById(img_id);
 
 	if (img.className != "mceButtonDisabled")
 		tinyMCEPopup.openBrowser(target_form_element, type, option);
+}
+
+function openUploader(img_id, target_form_element, type, option) {
+    var img = document.getElementById(img_id);
+    if(img.className != "mceButtonDisabled") {
+        // unfortunately this line can't be used, have to replicate functionality instead
+        // tinyMCEPopup.openBrowser(target_form_element, type, option);
+
+        tinyMCEPopup.editor.execCallback("file_uploader_callback", target_form_element,
+            document.getElementById(target_form_element).value, option, window)
+    }
 }
 
 function selectByValue(form_obj, field_name, value, add_custom, ignore_case) {

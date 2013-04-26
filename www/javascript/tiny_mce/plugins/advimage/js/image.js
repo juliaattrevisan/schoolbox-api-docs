@@ -62,7 +62,11 @@ var ImageDialog = {
 		// Setup browse button
 		document.getElementById('srcbrowsercontainer').innerHTML = getBrowserHTML('srcbrowser','src','image','theme_advanced_image');
 		if (isVisible('srcbrowser'))
-			document.getElementById('src').style.width = '260px';
+			document.getElementById('src').style.width = '236px';
+
+        // Setup upload image button
+        document.getElementById('fileuploadcontainer').innerHTML = getUploadHTML('fileupload','src','upload','theme_advanced_upload');
+//        document.getElementById('fileuploadcontainer').innerHTML = getBrowserHTML('foo','src','baz','bin');
 
 		// Setup browse button
 		document.getElementById('onmouseoversrccontainer').innerHTML = getBrowserHTML('overbrowser','onmouseoversrc','image','theme_advanced_image');

@@ -1,0 +1,65 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>{#fileuploader.title}</title>
+  <link rel="stylesheet" type="text/css" href="css/screen.css" media="screen" />
+  <link rel="stylesheet" type="text/css" href="css/tree.css" media="screen" />
+  <script type="text/javascript" src="../../tiny_mce_popup.js"></script>
+  <script type="text/javascript" src="/javascript/jquery.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      /* validate form */
+      $('#upload-form').submit(function (event) {
+        event.stopPropagation();
+        if ($('#file').val() == '') {
+          alert('Please browse for and select a file to upload.');
+          return false;
+        }
+        return true;
+      });
+
+      /* auto select uploaded image */
+      $(window).load(function () {
+        var matched;
+
+        if (matched = window.location.href.match(/hash=([a-z0-9]+)/)) {
+          var win = tinyMCEPopup.getWindowArg("window"),
+              input = tinyMCEPopup.getWindowArg("input"),
+              src = win.document.getElementById(input),
+              url = '/storage/fetch.php?hash='+matched[1].toString();
+
+          src.value = url;
+
+          if (win.ImageDialog) {
+
+            if (win.ImageDialog.getImageData) {
+              win.ImageDialog.getImageData();
+            }
+
+            if (win.ImageDialog.showPreviewImage) {
+              win.ImageDialog.showPreviewImage(url);
+            }
+
+          } else if (win.document.getElementById('width')) {
+            win.document.getElementById('width').value = 425;
+            win.document.getElementById('height').value = 350;
+            win.document.getElementById('constrain').checked = true;
+            win.window.Media.preview();
+          }
+
+          tinyMCEPopup.close();
+        }
+      });
+    });
+  </script>
+</head>
+<body id="file-uploader-frame">
+  <div class="control">
+    <form action="/storage/upload.php" method="post" enctype="multipart/form-data" id="upload-form">
+      <span class="bold">Upload new file: <input type="file" name="file" id="file" /></span>
+      <input type="hidden" name="return" id="return" value="{REQUEST_URI}" />
+      <p>Note: this file will only be accessible by its direct URL; it will not appear as a resource.</p>
+      <p>If you wish for this file to be stored in a folder, first upload it there and then locate it in the Asset Manager.</p>
+      <span><input type="submit" class="submit" value="Upload" /></span>
+    </form>
+  </div>
+</body>

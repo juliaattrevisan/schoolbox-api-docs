@@ -16,8 +16,13 @@ $page = new SitePage();
 $fileHandler = new File();
 $groupHandler = new Group();
 
+/* Upload single file to blackhole storage */
+if ( is_string($_POST['description']) && ( !isset($_POST['category']) ) ) {
+
+}
+
 /* Upload single file */
-if ( is_string($_POST['description']) && ( is_numeric($_POST['category']) || is_array($_POST['category']) ) ) {
+elseif ( is_string($_POST['description']) && ( is_numeric($_POST['category']) || is_array($_POST['category']) ) ) {
     $file = array(
         'description' => $_POST['description'], 'comment' => $_POST['comment'], 'hidden' => $_POST['hidden'],
     );
@@ -132,7 +137,7 @@ if ( is_string($_POST['description']) && ( is_numeric($_POST['category']) || is_
 
 
         if ( isset( $_POST['return'] ) ) {
-            SitePage::localRedir($_POST['return'] . '&fileID=' . $fileID);
+            SitePage::localRedir($_POST['return'] . '&hash=' . $hash);
         }
         else {
             $page->backToTheFuture(2);
