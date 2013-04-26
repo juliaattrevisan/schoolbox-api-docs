@@ -14,7 +14,9 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
     public function execute() {
         $feedHandler = new Feed();
         $groupHandler = new Group();
-        $userAccess = $groupHandler->involvedInCategoryList($_SESSION['id']);
+        $userAccess = $groupHandler->involvedInCategoryList(
+            $this->getConfig('user') ? $this->getConfig('user') : $_SESSION['id']
+        );
 
         if (is_array($userAccess)) {
             $categoryIDs = array();
