@@ -318,6 +318,7 @@ class Digest_News {
 
         $mailer->setBlock('tplBODY', 'upcominglist', 'upcominglist_block');
         $mailer->setBlock('upcominglist', 'upcoming', 'upcoming_block');
+        $mailer->setBlock('upcoming', 'upcomingaction', 'upcomingaction_block');
 
         $mailer->setBlock('tplBODY', 'newslist', 'newslist_block');
         $mailer->setBlock('newslist', 'article', 'article_block');
@@ -404,9 +405,8 @@ class Digest_News {
         );
 
 
-	    $chf = new Component_Dashboard_Factory(new \User(), new SitePage(false));
+        $chf = new Component_Dashboard_Factory(new \User(), new SitePage(false));
 
-//	    $this->upcoming_work_controller = $chf->buildComponent($uwc);
         $homepage_activity_controller = $chf->buildComponent($this->homepage_activity_component);
         $homepage_activity_controller->setup(array(), $component_config);
         $homepage_activity_controller->execute();
@@ -448,25 +448,37 @@ class Digest_News {
                 $mailer->parse('activity_block', 'activity', true);
             }
             $mailer->parse('activitylist_block', 'activitylist');
-
-
-
-//		    foreach ($activity_list as $activity) {
-//			    $mailer->setVar(
-//				    array(
-//
-//				    )
-//			    );
-//			    $mailer->parse('activitylist_block', 'activitylist', true);
-//		    }
         }
         else {
             $mailer->setVar('activitylist_block', '');
         }
 
-//        $this->upcoming_work_controller->setup(array(), $component_config);
-//        $this->upcoming_work_controller->execute();
-//        $work_list = $this->upcoming_work_controller->getDataFromExecute();
+        $upcoming_controller = $chf->buildComponent($this->upcoming_work_component);
+        $upcoming_controller->setup(array(), $component_config);
+        $upcoming_controller->execute();
+        $upcoming_list = $upcoming_controller->getDataFromExecute();
+        if (!empty($upcoming_list)) {
+            foreach ($upcoming_list as $upcoming) {
+                switch ($upcoming['UPCOMING_BTN_ICON']) {
+                    case 'modify':
+                        $upcoming['UPCOMING_BTN_ICON'] = 'sit';
+                        break;
+                    case 'up-arrow':
+                        $upcoming['UPCOMING_BTN_ICON'] = 'submit';
+                        break;
+                }
+                $mailer->setVar($upcoming);
+                if (!isset($upcoming['upcoming_work_actionable_block'])) {
+                    $this->parse('upcomingaction_block', 'upcomingaction');
+                }
+                $mailer->parse('upcoming_block', 'upcoming', true);
+            }
+            $mailer->parse('upcominglist_block', 'upcominglist');
+        }
+        else {
+            $mailer->setVar('upcominglist_block', '');
+
+        }
 
         if (!$this->debugging() && $newsFlag) {
             $success = $mailer->send();

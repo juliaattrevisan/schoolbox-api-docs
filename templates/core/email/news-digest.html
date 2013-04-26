@@ -46,35 +46,26 @@
                                 </table>
 
 
-                                <!-- BEGIN upcoming -->
                                 <table cellpadding="5" cellspacing="0" border="0" align="center" width="608">
+                                    <!-- BEGIN upcoming -->
                                     <tr>
                                         <td valign="middle" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="0" width="6" border="0" /></td>
                                         <td valign="bottom" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#929292;">
-                                            <a href="http://{SITE_DOMAIN}/{UPCOMING_URL}" style="color:#0066b0;text-decoration:none;font-weight:bold;">{UPCOMING_TITLE}</a><br />
-                                            <a href="http://{SITE_DOMAIN}/homepage/{UPCOMING_CAT_ID}" style="color:#0066b0;text-decoration:none;">{UPCOMING_CAT_NAME}</a> {UPCOMING_TYPE}
+                                            <a href="http://{SITE_DOMAIN}/{UPCOMING_HREF}{UPCOMING_ID}" style="color:#0066b0;text-decoration:none;font-weight:bold;">{UPCOMING_TITLE}</a><br />
+                                            <a href="http://{SITE_DOMAIN}/homepage/{UPCOMING_SUBJ_ID}" style="color:#0066b0;text-decoration:none;">{UPCOMING_SUBJ_NAME}</a> {UPCOMING_TYPE}
                                         </td>
                                         <td valign="bottom" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#929292;">
-                                            <span style="color:#ff0000;">{UPCOMING_DATE}</span>
+                                            <span style="color:#ff0000;">Due {UPCOMING_DATE} on {UPCOMING_TIME}</span>
                                         </td>
 
-                                        <!--
-                                        Types:
-                                        Submission box: submit/resubmit, no submissions
-                                        Assessments: sit/resit, no submission
-                                        -->
-
                                         <td valign="middle" align="right">
-                                            <!-- BEGIN upcoming_link -->
-                                            <a href="http://{SITE_DOMAIN}/{UPCOMING_URL}" style="background:#f9f9f9;color:#000;font-family:sans-serif;text-decoration:none;border:1px solid #d1d1d1;font-size:13px;line-height:22px; padding:2px 5px 2px 2px;">
-                                                <img style="vertical-align:bottom;" src="http://{SITE_DOMAIN}/images/emails/digest/{UPCOMING_SUBMIT_ICON}-icon.png" border="0" height="22" width="22" />
-                                                {UPCOMING_LINK_TEXT}</a>
-                                            <!-- END upcoming_link -->
+                                            <a href="http://{SITE_DOMAIN}/{UPCOMING_HREF}{UPCOMING_ID}" style="background:#f9f9f9;color:#000;font-family:sans-serif;text-decoration:none;border:1px solid #d1d1d1;font-size:13px;line-height:22px; padding:2px 5px 2px 2px;">
+                                                <img style="vertical-align:bottom;" src="http://{SITE_DOMAIN}/images/emails/digest/{UPCOMING_BTN_ICON}-icon.png" border="0" height="22" width="22" />{UPCOMING_BTN_LABEL}</a>
                                         </td>
                                         <td valign="middle" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
                                     </tr>
+                                    <!-- END upcoming -->
                                 </table>
-                                <!-- END upcoming -->
                             </td></tr>
                             <tr><td valign="top"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="16" width="1" border="0" /></td></tr>
                             <!-- END upcominglist -->
@@ -126,7 +117,7 @@
                                     <tr>
                                         <td><img valign="bottom" src="http://{SITE_DOMAIN}/images/emails/digest/activity-{ACTIVITY_ICON}.png" width="24" height="24" border="0" /></td>
                                         <td valign="top" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#000000;">
-											{ACTIVITY_CONTENT}
+                                            {ACTIVITY_CONTENT}
                                             <br /><span style="color:#929292">{ACTIVITY_DATE}</span>
                                         </td>
                                         <td valign="middle" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
