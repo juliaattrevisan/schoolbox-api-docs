@@ -346,8 +346,13 @@ class Digest_News {
         }
 
         if (!empty($u['activities'])) {
-            $newsFlag = true;
             foreach ($u['activities'] as $activity) {
+                //
+                // Filter out items that aren't in window.
+                if (!($this->withinWindow($activity['object']->getDate()->getUnixTimestamp()))) {
+                    continue;
+                }
+                $newsFlag      = true;
                 $is_assessment = $activity['object']->isAssessment();
                 $activity_id   = $activity['object']->getId();
                 $mailer->setVar('activity_new_block',       '');
