@@ -304,7 +304,12 @@ if (is_numeric($this->arg[0])) {
                         if ((Cfg::get('show_all_subjects') == 1) || $category['id'] ) {
 
                             /* Fetch teacher names */
-                            $teacherList = $synClass->getTeacherName($subject['code']);
+	                        if($subject['ClassCampus'])
+		                        $code = $subject['ClassCampus'].'/'.$subject['code'];
+	                        else
+		                        $code = $subject['code'];
+
+                            $teacherList = $synClass->getTeacherName($code);
                             $teacherOutput = array();
 
                             if (is_array($teacherList)) {

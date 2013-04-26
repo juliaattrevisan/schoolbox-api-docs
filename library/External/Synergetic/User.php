@@ -402,7 +402,7 @@ class External_Synergetic_User implements External_UserInterface {
 		}
 
 		if ($this->getGroup()->isStudent($userID)) {
-			$sql = "SELECT StudentClasses.ClassCode, SubjectClasses.Description as name
+			$sql = "SELECT StudentClasses.ClassCode, SubjectClasses.ClassCampus, SubjectClasses.Description as name
 					FROM StudentClasses, SubjectClasses
 					WHERE
 					StudentClasses.FileType = SubjectClasses.FileType AND
@@ -417,7 +417,7 @@ class External_Synergetic_User implements External_UserInterface {
 					AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)";
 		} else {
 
-			$sql = "SELECT DISTINCT(c1.ClassCode), c2.description as name
+			$sql = "SELECT DISTINCT(c1.ClassCode), c1.ClassCampus, c2.description as name
 					FROM SubjectClassStaff c1, SubjectClasses c2
 					WHERE
 					c1.FileType = c2.FileType AND
