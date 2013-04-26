@@ -346,6 +346,7 @@ class Digest_News {
         }
 
         if (!empty($u['activities'])) {
+            $newsFlag = true;
             foreach ($u['activities'] as $activity) {
                 $is_assessment = $activity['object']->isAssessment();
                 $activity_id   = $activity['object']->getId();
