@@ -163,6 +163,8 @@ class CategoryMapper extends Mapper {
 	/**
 	 * @param  \External_UserInterface $external_user
 	 *
+	 * @todo Have this be set up automatically if at all possible
+	 *
 	 * @return $this
 	 */
 	public function setExternalUser($external_user) {
