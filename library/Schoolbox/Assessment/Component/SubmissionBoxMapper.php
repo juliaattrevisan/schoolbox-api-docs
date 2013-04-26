@@ -616,16 +616,20 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	public function getUpcomingActivities($user_id, $limit, $categories) {
 		//
 		// All submission boxes that are due in the future.
+		$submission_mapper = $this->getJoinMapper('submission');
 		$query = "
 			SELECT
 				{$this->getColumnString('sb')},
-				{$this->getJoinMapper('category')->getColumnString('c')}
+				{$this->getJoinMapper('category')->getColumnString('c')},
+				(SELECT COUNT(*) FROM {$submission_mapper->getTable()} sm
+				 WHERE sb.id=sm.submission_box_id AND sm.owner = :user_id
+				) AS submission_count
 			FROM {$this->getTable()} sb
 			LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
-			LEFT JOIN {$this->getJoinSql('submission', 'sb', 'sm')} AND sm.owner = :user_id
 			WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
-			AND sm.id IS NULL
 			AND sb.date > NOW()
+			AND sb.deleted IS FALSE
+			HAVING (submission_count = 0 OR sb.multi_submission IS TRUE)
 			ORDER BY sb.date ASC
 			LIMIT :limit
 		";

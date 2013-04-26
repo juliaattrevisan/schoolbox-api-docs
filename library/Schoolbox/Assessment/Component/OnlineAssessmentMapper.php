@@ -301,24 +301,22 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 	public function getUpcomingActivities($user_id, $limit, $categories) {
 		//
 		// All submission boxes that are due in the future.
+		$attempt_mapper = $this->getJoinMapper('attempt');
 		$query = "
 			SELECT
 				{$this->getColumnString('a')},
-				{$this->getJoinMapper('category')->getColumnString('c')}
+				{$this->getJoinMapper('category')->getColumnString('c')},
+				(SELECT COUNT(*) FROM {$attempt_mapper->getTable()} am
+				 WHERE a.assess_id=am.assess_id AND am.user_id = :user_id
+				) AS attempt_count
 			FROM {$this->getTable()} a
 			LEFT JOIN {$this->getJoinSql('category', 'a', 'c')}
-			LEFT JOIN {$this->getJoinSql('attempt',  'a', 'at')} AND `at`.`user_id` = :user_id
 			WHERE a.category_id IN {$this->getArrayPlaceholders($categories, 'category')}
 			AND a.start < NOW()
-			AND `at`.`user_id` IS NULL
+			HAVING (attempt_count = 0 OR attempt_count <= a.max_attempts)
 			ORDER BY a.start ASC
 			LIMIT :limit
 		";
-		new \Alaress_Probe($query);
-		new \Alaress_Probe(array_merge(
-			$this->getArrayParameters($categories, 'category'),
-			array('user_id' => $user_id, 'limit' => $limit)
-		));
 		$statement = $this->database->prepare($query);
 		$statement->bindValue('user_id', $user_id, \PDO::PARAM_INT);
 		$statement->bindValue('limit',   $limit,   \PDO::PARAM_INT);
