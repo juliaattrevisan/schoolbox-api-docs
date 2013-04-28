@@ -166,7 +166,7 @@ class Digest_News {
     protected function getPosterFromArticle($article) {
         $poster = sprintf('%s %s', $article['firstname'],  $article['lastname']);
         if ($article['title']) {
-            $poster = $article['title'].'. '.$poster;
+            $poster = $article['title'].' '.$poster;
         }
         return $poster;
     }
@@ -183,7 +183,7 @@ class Digest_News {
     protected function getPosterFromUser($user) {
         $poster = $user->getFirstName().' '.$user->getLastName();
         if ($title = $user->getTitle()) {
-            $poster = $title.'. '.$poster;
+            $poster = $title.' '.$poster;
         }
         return $poster;
     }
