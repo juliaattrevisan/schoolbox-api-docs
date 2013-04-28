@@ -44,6 +44,9 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
                         'has_grade' => 'no-grade',
                         'gradeiant' => '',
                         'grade' => '',
+                        'cat_id' => $f['cat_id'],
+                        'cat_name' => $f['cat_name'],
+                        'external_id' => $f['external_id'],
                     );
                 }
                 return true;
