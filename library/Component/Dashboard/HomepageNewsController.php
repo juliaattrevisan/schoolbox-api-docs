@@ -47,6 +47,10 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
                         'cat_id' => $f['cat_id'],
                         'cat_name' => $f['cat_name'],
                         'external_id' => $f['external_id'],
+                        'link' => $f['link'],
+                        'user_id' => $f['user_id'],
+                        'name'    => $f['name'],
+                        'action'  => $f['action'],
                     );
                 }
                 return true;

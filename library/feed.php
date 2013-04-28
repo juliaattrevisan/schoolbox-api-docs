@@ -77,8 +77,10 @@ class Feed {
         $userHandler = new User();
 
         while ($row = $this->db->getNextArray()) {
+            $link = null;
             if ($row['realname'] != '') {
                 $url = '<a href="/send.php?id=' . $row['id'] . '" rel="external">' . Scrub::text($row['name']) . '</a>';
+                $link = '/send.php?id=' . $row['id'];
             } else {
                 $url = Scrub::text($row['name']);
             }
@@ -94,6 +96,11 @@ class Feed {
                 'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
+
+                'user_id' => $row['uid'],
+                'link'    => $link,
+                'name'    => $row['name'],
+                'action'  => 'uploaded the file',
             );
         }
 
@@ -143,6 +150,11 @@ class Feed {
                 'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
+
+                'user_id' => $row['uid'],
+                'link'    => $linkUrl,
+                'name'    => $row['name'],
+                'action'  => 'submitted the link',
             );
         }
         return $link;
@@ -196,6 +208,10 @@ class Feed {
                 'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
+                'user_id' => $row['uid'],
+                'link'    => '/assess/intro/' . $row['assess_id'],
+                'name'    => $row['heading'],
+                'action'  => 'opened the online assessment',
             );
         }
 
@@ -250,6 +266,10 @@ class Feed {
                 'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
+                'user_id' => $row['uid'],
+                'link'    => '/survey/intro/' . $row['assess_id'],
+                'name'    => $row['heading'],
+                'action'  => 'opened the survey',
             );
         }
 
@@ -288,6 +308,10 @@ class Feed {
                 'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
+                'user_id' => $row['uid'],
+                'link'    => null,
+                'name'    => $row['heading'],
+                'action'  => 'posted the news',
             );
         }
 
@@ -327,6 +351,10 @@ class Feed {
                 'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
+                'user_id' => $row['uid'],
+                'link'    => '/homepage/' . $row['id'],
+                'name'    => $row['name'],
+                'action'  => 'created the folder',
             );
         }
 
@@ -367,6 +395,10 @@ class Feed {
                 'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
+                'user_id' => $row['uid'],
+                'link'    => '/forum/thread/' . $row['threadID'],
+                'name'    => $row['heading'],
+                'action'  => 'started the thread',
             );
         }
 
@@ -411,6 +443,10 @@ class Feed {
                 'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
+                'user_id' => $row['uid'],
+                'link'    => '/wiki/' . $row['categoryID'] . '/' . $row['slug'],
+                'name'    => $row['heading'],
+                'action'  => 'updated the wiki',
             );
         }
 
@@ -459,6 +495,10 @@ class Feed {
                 'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
+                'user_id' => $row['uid'],
+                'link'    => '/blog/' . $row['blogID'],
+                'name'    => $row['heading'],
+                'action'  => 'updated the blog',
             );
         }
 
@@ -507,6 +547,10 @@ class Feed {
                 'user_name' => $userHandler->formatName($row),
                 'cat_name' => $row['cat_name'],
                 'cat_id' => $row['cat_id'],
+                'user_id' => $row['uid'],
+                'link'    => '/blog/' . $row['blogID'],
+                'name'    => $row['heading'],
+                'action'  => 'commented on the blog',
             );
         }
 
