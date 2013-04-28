@@ -55,13 +55,15 @@
                                             <a href="http://{SITE_DOMAIN}/homepage/{UPCOMING_SUBJ_ID}" style="color:#0066b0;text-decoration:none;">{UPCOMING_SUBJ_NAME}</a> {UPCOMING_TYPE}
                                         </td>
                                         <td valign="bottom" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#929292;">
-                                            <span style="color:#ff0000;">Due {UPCOMING_DATE} on {UPCOMING_TIME}</span>
+                                            <span style="color:{UPCOMING_URGENCY_COLOR};">Due {UPCOMING_DATE}</span> on {UPCOMING_TIME}
                                         </td>
 
+                                        <!--
                                         <td valign="middle" align="right">
                                             <a href="http://{SITE_DOMAIN}/{UPCOMING_HREF}{UPCOMING_ID}" style="background:#f9f9f9;color:#000;font-family:sans-serif;text-decoration:none;border:1px solid #d1d1d1;font-size:13px;line-height:22px; padding:2px 5px 2px 2px;">
                                                 <img style="vertical-align:bottom;" src="http://{SITE_DOMAIN}/images/emails/digest/{UPCOMING_BTN_ICON}-icon.png" border="0" height="22" width="22" />{UPCOMING_BTN_LABEL}</a>
                                         </td>
+                                        -->
                                         <td valign="middle" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
                                     </tr>
                                     <!-- END upcoming -->
