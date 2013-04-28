@@ -326,6 +326,8 @@ class Digest_News {
 
         $mailer->setBlock('tplBODY', 'activitylist', 'activitylist_block');
         $mailer->setBlock('activitylist', 'activity', 'activity_block');
+        $mailer->setBlock('activity', 'activity_link', 'activity_link_block');
+        $mailer->setBlock('activity', 'activity_nolink', 'activity_nolink_block');
 
 //        $mailer->setBlock('activity', 'activity_new',       'activity_new_block');
 //        $mailer->setBlock('activity', 'activity_overdue',   'activity_overdue_block');
@@ -419,6 +421,12 @@ class Digest_News {
                     'ACTIVITY_OWNER'    => $activity['avatar_title'],
                     'ACTIVITY_CONTENT'  => $activity['content'],
                     'ACTIVITY_DATE'     => $activity['time'],
+                    'ACTIVITY_NAME'     => Scrub::text($activity['name']),
+                    'ACTIVITY_URL'      => $activity['link'],
+                    'ACTIVITY_USER_ID'  => $activity['user_id'],
+                    'ACTIVITY_CAT_ID'   => $activity['cat_id'],
+                    'ACTIVITY_CAT_NAME' => Scrub::text($activity['cat_name']),
+                    'ACTIVITY_ACTION'   => Scrub::text($activity['action']),
                 ));
 
                 //
@@ -445,6 +453,14 @@ class Digest_News {
                         break;
                 }
                 $mailer->setVar('ACTIVITY_ICON', $icon);
+                if ($activity['link']) {
+                    $mailer->parse('activity_link_block', 'activity_link');
+                    $mailer->setVar('activity_nolink_block', '');
+                }
+                else {
+                    $mailer->parse('activity_nolink_block', 'activity_nolink');
+                    $mailer->setVar('activity_link_block', '');
+                }
                 $mailer->parse('activity_block', 'activity', true);
             }
             $mailer->parse('activitylist_block', 'activitylist');
