@@ -467,6 +467,43 @@ class Digest_News {
                         $upcoming['UPCOMING_BTN_ICON'] = 'submit';
                         break;
                 }
+                $color = 'inherit';
+                switch ($upcoming['UPCOMING_URGENCY']) {
+                    case 10:
+                        $color = "#1fbb00";
+                        break;
+                    case 9:
+                        $color = "#3ebb00";
+                        break;
+                    case 8:
+                        $color = "#5ebb00";
+                        break;
+                    case 7:
+                        $color = "#7dbb00";
+                        break;
+                    case 6:
+                        $color = "#9cbb00";
+                        break;
+                    case 5:
+                        $color = "#bb0";
+                        break;
+                    case 4:
+                        $color = "#bb9c00";
+                        break;
+                    case 3:
+                        $color = "#bb7d00";
+                        break;
+                    case 2:
+                        $color = "#bb5d00";
+                        break;
+                    case 1:
+                        $color = "#bb3e00";
+                        break;
+                    case 0:
+                        $color = "#bb1f00";
+                        break;
+                }
+                $upcoming['UPCOMING_URGENCY_COLOR'] = $color;
                 $mailer->setVar($upcoming);
                 if (!isset($upcoming['upcoming_work_actionable_block'])) {
                     $this->parse('upcomingaction_block', 'upcomingaction');
