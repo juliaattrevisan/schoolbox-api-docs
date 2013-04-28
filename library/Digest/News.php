@@ -329,13 +329,6 @@ class Digest_News {
         $mailer->setBlock('activity', 'activity_link', 'activity_link_block');
         $mailer->setBlock('activity', 'activity_nolink', 'activity_nolink_block');
 
-//        $mailer->setBlock('activity', 'activity_new',       'activity_new_block');
-//        $mailer->setBlock('activity', 'activity_overdue',   'activity_overdue_block');
-//        $mailer->setBlock('activity', 'activity_submitted', 'activity_submitted_block');
-//        $mailer->setBlock('activity', 'activity_marked',    'activity_marked_block');
-//        $mailer->setBlock('activity', 'activity_returned',  'activity_returned_block');
-//        $mailer->setBlock('activity', 'activity_closed',    'activity_closed_block');
-
         $mailer->setVar('NAME', $u['firstname']);
 
         $this->cli(sprintf("Email to %s %s (%s)", $u['firstname'], $u['lastname'], $u['email']));
@@ -453,13 +446,13 @@ class Digest_News {
                         break;
                 }
                 $mailer->setVar('ACTIVITY_ICON', $icon);
+                $mailer->setVar('activity_link_block', '');
+                $mailer->setVar('activity_nolink_block', '');
                 if ($activity['link']) {
                     $mailer->parse('activity_link_block', 'activity_link');
-                    $mailer->setVar('activity_nolink_block', '');
                 }
                 else {
                     $mailer->parse('activity_nolink_block', 'activity_nolink');
-                    $mailer->setVar('activity_link_block', '');
                 }
                 $mailer->parse('activity_block', 'activity', true);
             }
