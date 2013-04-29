@@ -417,17 +417,19 @@ class Digest_News {
 
         if (!empty($activity_list)) {
             $newsFlag = true;
+            $i = 0;
             foreach ($activity_list as $activity) {
                 $mailer->setVar(array(
-                    'ACTIVITY_OWNER'    => $activity['avatar_title'],
-                    'ACTIVITY_CONTENT'  => $activity['content'],
-                    'ACTIVITY_DATE'     => $activity['time'],
-                    'ACTIVITY_NAME'     => Scrub::text($activity['name']),
-                    'ACTIVITY_URL'      => $activity['link'],
-                    'ACTIVITY_USER_ID'  => $activity['user_id'],
-                    'ACTIVITY_CAT_ID'   => $activity['cat_id'],
-                    'ACTIVITY_CAT_NAME' => Scrub::text($activity['cat_name']),
-                    'ACTIVITY_ACTION'   => Scrub::text($activity['action']),
+                    'ACTIVITY_OWNER'      => $activity['avatar_title'],
+                    'ACTIVITY_CONTENT'    => $activity['content'],
+                    'ACTIVITY_DATE'       => $activity['time'],
+                    'ACTIVITY_NAME'       => Scrub::text($activity['name']),
+                    'ACTIVITY_URL'        => $activity['link'],
+                    'ACTIVITY_USER_ID'    => $activity['user_id'],
+                    'ACTIVITY_CAT_ID'     => $activity['cat_id'],
+                    'ACTIVITY_CAT_NAME'   => Scrub::text($activity['cat_name']),
+                    'ACTIVITY_ACTION'     => Scrub::text($activity['action']),
+                    'ACTIVITY_BACKGROUND' => ++$i % 2 == 1 ? "none" : "#F4F4F8",
                 ));
 
                 //
@@ -475,6 +477,8 @@ class Digest_News {
         $upcoming_controller->execute();
         $upcoming_list = $upcoming_controller->getDataFromExecute();
         if (!empty($upcoming_list)) {
+            $i = 0;
+            $newsFlag = true;
             foreach ($upcoming_list as $upcoming) {
                 switch ($upcoming['UPCOMING_BTN_ICON']) {
                     case 'modify':
@@ -521,6 +525,7 @@ class Digest_News {
                         break;
                 }
                 $upcoming['UPCOMING_URGENCY_COLOR'] = $color;
+                $upcoming['UPCOMING_BACKGROUND']    = ++$i % 2 == 1 ? "none" : "#F4F4F8";
                 $mailer->setVar($upcoming);
                 if (!isset($upcoming['upcoming_work_actionable_block'])) {
                     $this->parse('upcomingaction_block', 'upcomingaction');
