@@ -209,14 +209,17 @@ class Digest_News {
         if(is_array($newsList)) {
             foreach($newsList as $article) {
                 $u['articles']['c'][$article['item_id']] = array(
-                    'id'       => $article['item_id'],
-                    'title'    => $article['item_heading'],
-                    'abstract' => $this->scrub($article['item_body']),
-                    'topic'    => $article['topicName'],
-                    'date'     => strtotime($article['item_datetime_posted']),
-                    'poster'   => $this->getPosterFromArticle($article),
-                    'image'    => $article['item_image'],
-                    'slug'     => "news/item/".$article['item_id'],
+                    'id'        => $article['item_id'],
+                    'title'     => $article['item_heading'],
+                    'abstract'  => $this->scrub($article['item_body']),
+                    'topic'     => $article['topicName'],
+                    'topic_url' => 'news/'.strtolower(urlencode($article['topicName'])),
+                    'date'      => strtotime($article['item_datetime_posted']),
+                    'poster'    => $this->getPosterFromArticle($article),
+                    'cat_id'    => 0,
+                    'poster_id' => $article['uid'],
+                    'image'     => $article['item_image'],
+                    'slug'      => "news/item/".$article['item_id'],
                 );
             }
         }
@@ -230,14 +233,17 @@ class Digest_News {
             if($hNews) {
                 foreach($hNews as $art) {
                     $u['articles']['h'][$art['id']] = array(
-                        'id'       => $art['id'],
-                        'title'    => $art['heading'],
-                        'abstract' => $this->scrub($art['body']),
-                        'topic'    => $category->getName(),
-                        'date'     => $art['posted'],
-                        'poster'   => $this->getPosterFromArticle($art),
-                        'image'    => $art['item_image'],
-                        'slug'     => "homepage/".$cat_id,
+                        'id'        => $art['id'],
+                        'title'     => $art['heading'],
+                        'abstract'  => $this->scrub($art['body']),
+                        'topic'     => $category->getName(),
+                        'topic_url' => "homepage/".$cat_id,
+                        'date'      => $art['posted'],
+                        'poster'    => $this->getPosterFromArticle($art),
+                        'cat_id'    => $cat_id,
+                        'poster_id' => $art['uid'],
+                        'image'     => $art['item_image'],
+                        'slug'      => "homepage/".$cat_id,
                     );
                 }
             }
@@ -319,6 +325,9 @@ class Digest_News {
                             'ARTICLE_DATE'       => date('l, jS \o\f F', $article['date']),
                             'ARTICLE_BACKGROUND' => ++$i % 2 == 1 ? "none" : "#F4F4F8",
                             'ARTICLE_POSTER'     => $article['poster'],
+                            'ARTICLE_POSTER_ID'  => $article['poster_id'],
+                            'ARTICLE_CAT_ID'     => $article['cat_id'],
+                            'ARTICLE_TOPIC_URL'  => $article['topic_url'],
                             'ARTICLE_IMAGE'      => $article['image'],
                             'ARTICLE_COLSPAN'    => $article['image'] ? 1 : 2,
                         ));
