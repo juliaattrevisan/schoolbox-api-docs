@@ -45,7 +45,7 @@ class Synchronise_Synergetic_Balcombe_Strategy_Staff extends Synchronise_Synerge
 		$newUser['firstname'] = $currentUser['StaffPreferredName'];
 		$newUser['lastname'] = $currentUser['StaffSurname'];
         $newUser['synergy_id'] = $currentUser['StaffID'];
-		$newUser['alt_email'] = $currentUser['Email'];
+		$newUser['alt_email'] = $currentUser['OccupEmail'];
 
 		// Campus config: needs to map to a campus id
 		$newUser['defaultCampus'] = $this->getCampusFromCode($currentUser['StaffCampus']);
