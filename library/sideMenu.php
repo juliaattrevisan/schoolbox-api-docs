@@ -113,7 +113,6 @@ class sideMenu extends DeprecatedModel {
         $item = $this->getByID($pid);
 
         $query = "UPDATE sideMenu SET sequence = (sequence + 1) WHERE parent = {$item['parent']} AND sequence > ({$item['sequence']} )";
-        print $query;
         $this->db->query($query);
 
         parent::update(array('id'=>$id, 'sequence'=>$item['sequence']+1, 'parent'=>$item['parent']));
