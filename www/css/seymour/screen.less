@@ -194,8 +194,8 @@ a{color:#0054d3;}
 a:hover{color:#002c76;}
 #header,
 body.login #header{
-    height:104px;
-    background: url('/images/seymour/header-bg.png') top left repeat-x;
+    height:108px;
+    background: url('/images/seymour/header-bg.png') top left;
 }
 .login #container {
     padding: 15px 0 0 37px;
@@ -207,9 +207,22 @@ body.login #header{
     left: 22px;
     top: 22px;
 }
+#slogan {
+	position: absolute;
+	right: 320px;
+	top: 50px;
+	color: #fff;
+	text-transform: uppercase;
+	em {
+		font-style: normal;
+		font-size: 1.4em;
+		//font-weight: bold;
+	}
+}
+
 #tabs{
     right: auto !important;
-    left: 245px !important;
+    left: 246px !important;
     min-width: 100% !important;
 }
 #tabs li{
@@ -237,11 +250,8 @@ body.login #header{
 }
 
 #nav{
-	top:147px; /* 152 in original smgs skin */
-	left:-15px; /* Change from 15px in the core */
-	padding-left:5px;
-	padding-right:5px;
-	width:239px; /* core width is 224 */
+	top:114px; /* 152 in original smgs skin */
+	width:212px; /* core width is 224 */
 	}
 	
 #container {
@@ -250,22 +260,67 @@ body.login #header{
 	margin-left:246px;
 	top: 5px;
 	margin-right:0px;
-	padding-top:6px;
-    -webkit-box-shadow:  -1px 0px 0px 0px #d6d6d6;
-    box-shadow:  -1px 0px 0px 0px #d6d6d6;
+	border-left: 1px solid #d6d6d6;
+	border-bottom: 1px solid #d6d6d6;
 }
 	
 #nav h3{
-    background: transparent;
-    color: #484848;
+    background: #fff;
+    color: #006c56;
+	text-transform: uppercase;
+	font-weight: normal;
+	width: auto; height: auto; line-height: 1;
+	padding: 12px 15px;
+	font-size: 15px;
+	border: 1px solid #d6d6d6;
+	border-bottom-color: #fff;
+	margin-bottom: -1px;
+	float: left;
 }
-#nav h3.my-links,
-.my-links{
-    background: #F6F6F6;
+#nav h3.my-links a {
+	right: -110px;
 }
 #nav ul li a{ color: #006c56; }
-#nav .nav-wrapper, #nav ul ul,.colours-buttons, #nav .nav-wrapper.my-links {background:transparent;}
-#nav ul ul{border-color:#006C56; left:200px; background: #fff;left: 208px;}
+#nav .nav-wrapper, #nav ul ul,.colours-buttons, #nav .nav-wrapper.my-links {
+	text-transform: uppercase;
+	border: 1px solid #d6d6d6;
+	padding: 8px 3px;
+	background: #ffffff;
+	background: -moz-linear-gradient(top, #ffffff 0%, #f5f5f5 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#f5f5f5));
+	background: -webkit-linear-gradient(top, #ffffff 0%,#f5f5f5 100%);
+	background: -o-linear-gradient(top, #ffffff 0%,#f5f5f5 100%);
+	background: -ms-linear-gradient(top, #ffffff 0%,#f5f5f5 100%);
+	background: linear-gradient(to bottom, #ffffff 0%,#f5f5f5 100%);
+	margin-bottom: 32px;
+	clear: left;
+}
+#nav ul { margin: 0; margin-bottom: 0 !important; padding: 0; }
+#nav li a {
+	margin: 0;
+	border-top: 1px solid #e3e3e3;
+	width: auto;
+	padding: 4px 0px 3px 14px;
+	width: 190px;
+	background: url(/images/seymour/quickLinksAHoverBg.gif) -10px center no-repeat;
+	-webkit-transition: all 0.6s;
+	   -moz-transition: all 0.6s;
+		-ms-transition: all 0.6s;
+		 -o-transition: all 0.6s;
+			transition: all 0.6s;
+	span strong {
+	}
+	&:hover {
+		padding-left: 24px;
+		width: 180px;
+		background: url(/images/seymour/quickLinksAHoverBg.gif) 10px center no-repeat;
+	}
+}
+#nav li:first-child > a { border-top: 0; }
+
+#nav ul ul{border-color:#d6d6d6; left:203px; width: 203px; top: -9px;
+	ul { left: 200px; }
+}
 
 #tabs-homepage li.ui-state-default a {
     background: none repeat scroll 0 0 #eee;
@@ -282,14 +337,10 @@ body.login #header{
 #tabs-sub .ui-tabs-nav li a {
     background:#fcfbf2;
 }
-
-#nav li a{ border-bottom: 1px solid #e3e3e3;}
 #nav ul li a:hover, #nav li li a:hover, #category ul li a:hover, #tabs-sub .ui-tabs-nav li a:hover{
-    background-color: #006c56;
-    color: #ffffff;
+    background-color: #f1f1f1;
+    color: #006C56;
 }
-
-#nav li.parent {width:200px;} /* attempt to reduce overhang which enables pop-out*/
 
 .dark,
 .dark td,
@@ -322,7 +373,8 @@ body.login #header{
     color: #fff;
 }
 #category li a:hover{
-    background-color: #00775f;
+	color: #fff;
+	background-color: #00775f;
 }
 .submit-btn-plain {
     background-color: #002c76;
@@ -382,6 +434,7 @@ ADMIN!
     -moz-border-radius: 0;
     border-radius: 0;}
 .admin-nav li a.current{background:#F0F7FE;color:#054B93; font-weight:bold;}
+#search { margin-top: 8px; }
 #search, #search-field{background:#ffffff;}
 .admin-contents .level{background:#eee; border-color:#ddd;}
 .admin-contents h4{border-color:#ddd;}
