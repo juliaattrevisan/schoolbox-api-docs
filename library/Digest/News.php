@@ -277,9 +277,10 @@ class Digest_News {
         $newsFlag = false;
 
         $mailer->setVar('newslist_block', '');
-        if(is_array($u['articles'])) {
+        if (is_array($u['articles'])) {
             foreach($u['articles'] as $newsType => $newsList) {
-
+                $i = 0;
+                $mailer->setVar('article_block', '');
                 switch($newsType) {
                     case 'c':
                         $mailer->setVar('NEWS_TYPE', 'School News');
@@ -297,11 +298,7 @@ class Digest_News {
 
                 $is_news_shown = false;
                 foreach($newsList as $catID => $news) {
-                    $i = 0;
                     foreach($news as $article) {
-//                        if ($catID != 0) {
-//                            var_dump($article, $this->withinWindow($article['date']));
-//                        }
                         if($this->withinWindow($article['date'])) {
                             $is_news_shown = true;
                             $mailer->setVar(array(
@@ -326,12 +323,11 @@ class Digest_News {
                             $mailer->parse('article_block', 'article', true);
                         }
                     }
-                    if ($is_news_shown) {
-                        $newsFlag = true;
-                        $mailer->parse('newslist_block', 'newslist', true);
-                    }
                 }
-                $mailer->setVar('article_block', '');
+                if ($is_news_shown) {
+                    $newsFlag = true;
+                    $mailer->parse('newslist_block', 'newslist', true);
+                }
             }
         }
 
