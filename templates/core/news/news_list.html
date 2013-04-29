@@ -9,9 +9,9 @@
         <!-- BEGIN news -->
         <li class="{ON_OFF}">
             <!-- BEGIN news_image -->
-            <img width="64" height="64" src="/storage/image.php?hash={NEWS_IMAGE}&size=square64"/>
+            <a href="/news/item/{NEWS_ID}" title="{NEWS_TITLE}"><img width="64" height="64" src="/storage/image.php?hash={NEWS_IMAGE}&size=square64"/></a>
             <!-- END news_image -->
-            <h3><a href="/news/item/{NEWS_ID}">{NEWS_TITLE}</a></h3>
+            <h3><a href="/news/item/{NEWS_ID}" title="{NEWS_TITLE}">{NEWS_TITLE}</a></h3>
             <span class="time">{DATETIME} | Posted by {POSTER}</span>
             <p>{NEWS_SHORT}</p>
         </li>
