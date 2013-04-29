@@ -37,7 +37,7 @@ else if ($_POST['txt']) {
 }
 /* Ajax drag and drop request
  */
-else if ($_GET['pos'] && $_GET['tid'] && $_GET['oid']) {
+else if ($_GET['pos'] && isset($_GET['tid']) && $_GET['oid']) {
 	switch ($_GET['pos']) {
 		case 'before' :
 			$menuHandler->moveItemBefore($_GET['oid'], $_GET['tid']);
