@@ -206,9 +206,10 @@ class Digest_News {
     protected function compileNews($u) {
         $newsList = $this->newsHandler->getFilteredNews($u['id'], $u['campus'], $u['gid']);
 
+        $u['articles'] = array('c' => array(), 'h' => array());
         if(is_array($newsList)) {
             foreach($newsList as $article) {
-                $u['articles']['c'][0][$article['item_id']] = array(
+                $u['articles']['c'][$article['item_id']] = array(
                     'id'       => $article['item_id'],
                     'title'    => $article['item_heading'],
                     'abstract' => $this->scrub($article['item_body']),
@@ -216,6 +217,7 @@ class Digest_News {
                     'date'     => strtotime($article['item_datetime_posted']),
                     'poster'   => $this->getPosterFromArticle($article),
                     'image'    => $article['item_image'],
+                    'slug'     => "news/item/".$article['item_id'],
                 );
             }
         }
@@ -228,7 +230,7 @@ class Digest_News {
             $hNews = $this->catnewsHandler->getAllForCategory($cat_id, false, false, $u['id']);
             if($hNews) {
                 foreach($hNews as $art) {
-                    $u['articles']['h'][$cat_id][$art['id']] = array(
+                    $u['articles']['h'][$art['id']] = array(
                         'id'       => $art['id'],
                         'title'    => $art['heading'],
                         'abstract' => $this->scrub($art['body']),
@@ -236,10 +238,23 @@ class Digest_News {
                         'date'     => $art['posted'],
                         'poster'   => $this->getPosterFromArticle($art),
                         'image'    => $art['item_image'],
+                        'slug'     => "homepage/".$cat_id,
                     );
                 }
             }
         }
+
+        //
+        // Sort each type of news - most recent first, then by name.
+        foreach ($u['articles'] as &$articles) {
+            usort($articles, function($a, $b) {
+                if ($a['date'] != $b['date']) {
+                    return $a['date'] < $b['date'] ? 1 : -1;
+                }
+                return strcmp($a['title'], $b['title']);
+            });
+        }
+        unset($articles);
         return $u;
     }
 
@@ -284,44 +299,38 @@ class Digest_News {
                 switch($newsType) {
                     case 'c':
                         $mailer->setVar('NEWS_TYPE', 'School News');
-                        $slugBase = "news/item/";
                         break;
                     case 'h':
                         $mailer->setVar('NEWS_TYPE', 'From your homepages');
-                        $slugBase = "homepage/";
                         break;
                     default:
                         $mailer->setVar('NEWS_TYPE', '');
-                        $slugBase = "";
                         break;
                 }
 
                 $is_news_shown = false;
-                foreach($newsList as $catID => $news) {
-                    foreach($news as $article) {
-                        if($this->withinWindow($article['date'])) {
-                            $is_news_shown = true;
-                            $mailer->setVar(array(
-                                'ARTICLE_SLUG'       => $slugBase . ($newsType == 'h' ? $catID : $article['id']),
-                                'ARTICLE_TITLE'      => $article['title'],
-                                'ARTICLE_ABSTRACT'   => $article['abstract'],
-                                'ARTICLE_TOPIC'      => $article['topic'],
-                                'ARTICLE_DATE'       => date('l, jS \o\f F', $article['date']),
-                                'ARTICLE_BACKGROUND' => ++$i % 2 == 1 ? "none" : "#F4F4F8",
-                                'ARTICLE_POSTER'     => $article['poster'],
-                                'ARTICLE_IMAGE'      => $article['image'],
-                                'ARTICLE_COLSPAN'    => $article['image'] ? 1 : 2,
-                            ));
-
-                            if ($article['image']) {
-                                $mailer->parse('image_block', 'image');
-                            }
-                            else {
-                                $mailer->setVar('image_block', '');
-                            }
-
-                            $mailer->parse('article_block', 'article', true);
+                foreach ($newsList as $article) {
+                    if ($this->withinWindow($article['date'])) {
+                        $is_news_shown = true;
+                        $mailer->setVar(array(
+                            'ARTICLE_SLUG'       => $article['slug'],
+                            'ARTICLE_TITLE'      => $article['title'],
+                            'ARTICLE_ABSTRACT'   => $article['abstract'],
+                            'ARTICLE_TOPIC'      => $article['topic'],
+                            'ARTICLE_DATE'       => date('l, jS \o\f F', $article['date']),
+                            'ARTICLE_BACKGROUND' => ++$i % 2 == 1 ? "none" : "#F4F4F8",
+                            'ARTICLE_POSTER'     => $article['poster'],
+                            'ARTICLE_IMAGE'      => $article['image'],
+                            'ARTICLE_COLSPAN'    => $article['image'] ? 1 : 2,
+                        ));
+                        if ($article['image']) {
+                            $mailer->parse('image_block', 'image');
                         }
+                        else {
+                            $mailer->setVar('image_block', '');
+                        }
+
+                        $mailer->parse('article_block', 'article', true);
                     }
                 }
                 if ($is_news_shown) {
@@ -339,6 +348,8 @@ class Digest_News {
         );
 
 
+        //
+        // Give dashboard component factory a user and sitepage to shut it up
         $chf = new Component_Dashboard_Factory(new \User(), new SitePage(false));
 
         $homepage_activity_controller = $chf->buildComponent($this->homepage_activity_component);
@@ -467,7 +478,7 @@ class Digest_News {
                 $upcoming['UPCOMING_BACKGROUND']    = ++$i % 2 == 1 ? "none" : "#F4F4F8";
                 $mailer->setVar($upcoming);
                 if (!isset($upcoming['upcoming_work_actionable_block'])) {
-                    $this->parse('upcomingaction_block', 'upcomingaction');
+                    $mailer->parse('upcomingaction_block', 'upcomingaction');
                 }
                 $mailer->parse('upcoming_block', 'upcoming', true);
             }
@@ -494,10 +505,6 @@ class Digest_News {
 
     protected function withinWindow($stamp) {
         return (($stamp > $this->digestStart) && ($stamp < $this->digestEnd));
-    }
-
-    protected function withinFutureWindow($stamp) {
-        return (($stamp >= $this->digestEnd) && ($stamp < ($this->digestEnd + ($this->digestEnd - $this->digestStart))));
     }
 
     protected function cli($output, $err = false) {
