@@ -405,7 +405,15 @@ class Digest_News {
         $homepage_activity_controller = $chf->buildComponent($this->homepage_activity_component);
         $homepage_activity_controller->setup(array(), $component_config);
         $homepage_activity_controller->execute();
-        $activity_list = $homepage_activity_controller->getDataFromExecute();
+
+        //
+        // Filter out homepage activities that aren't within the date window.
+        $activity_list = array();
+        foreach ($homepage_activity_controller->getDataFromExecute() as $activity) {
+            if ($this->withinWindow($activity['timestamp'])) {
+                $activity_list[] = $activity;
+            }
+        }
 
         if (!empty($activity_list)) {
             $newsFlag = true;
