@@ -49,14 +49,12 @@ $exportToCSV = false;
 if($this->arg[2] == "exportToCSV") {
     $page = 0; //export, so no pagination
     $orderBy = "";
-    $orderDir = "ASC";
     $exportToCSV = true;
 }
 // page number
 elseif(is_numeric($this->arg[2])) {
     $page = $this->arg[2];
     $orderBy = "";
-    $orderDir = "ASC";
 }
 // sortBy
 else {
