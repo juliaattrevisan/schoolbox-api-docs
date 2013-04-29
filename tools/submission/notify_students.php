@@ -86,6 +86,10 @@ function sendUpcomingNotifications($testRun) {
 				'SITE_DOMAIN' => Cfg::get('site_domain'),
 				'USER_EMAIL'  => trim($user['alt_email']),
 			);
+			$hostname = Cfg::get('site_hostname');
+			if (!empty($hostname)) {
+				$output['SITE_DOMAIN'] = $hostname . '.' . $output['SITE_DOMAIN'];
+			}
 			$dump->setVar($output);
 			$mailer->setVar($output);
 
