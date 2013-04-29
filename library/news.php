@@ -410,7 +410,7 @@ class News extends DeprecatedModel {
         }
 
         $query = "
-		SELECT DISTINCT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_body,
+		SELECT DISTINCT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_body, item_image,
 			UNIX_TIMESTAMP(news_items.item_datetime_posted) AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
 			UNIX_TIMESTAMP(news_items.item_datetime_expires) AS expire_datetime,
 			user.lastname, user.title, user.firstname, user.id as uid, newsTopic.name topicName, newsTopicID
