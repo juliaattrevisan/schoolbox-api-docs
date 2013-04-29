@@ -37,9 +37,16 @@
                                         <td valign="middle" width="8"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="0" width="8" border="0" /></td>
                                         <td valign="middle" height="32" style="font-family:sans-serif;font-weight:bold;font-size:13px;line-height:21px;">Upcoming Due Work</td>
                                         <td valign="middle" align="right">
-                                            <a href="http://{SITE_DOMAIN}/submission/dueWork/" style="background:#f9f9f9;color:#000;font-family:sans-serif;text-decoration:none;border:1px solid #d1d1d1;font-size:13px;line-height:22px; padding:2px 5px 2px 2px;">
-                                                <img style="vertical-align:bottom;" src="http://{SITE_DOMAIN}/images/emails/digest/search-icon.png" border="0" height="22" width="22" />
-                                                View all work</a>
+                                            <table cellspacing="0" cellpadding="0" border="0" bgcolor="#f9f9f9" style="border:1px solid #d1d1d1;">
+                                                <tr>
+                                                    <td valign="middle">
+                                                        <a href="http://{SITE_DOMAIN}/submission/dueWork/">
+                                                            <img src="http://{SITE_DOMAIN}/images/emails/digest/search-icon.png" border="0" height="22" width="22" /></a></td>
+                                                    <td valign="middle">
+                                                        <a href="http://{SITE_DOMAIN}/submission/dueWork/" style="color:#000;font-family:sans-serif;text-decoration:none;font-size:13px;line-height:22px;">
+                                                    View all work&nbsp;</a></td>
+                                                </tr>
+                                            </table>
                                         </td>
                                         <td valign="middle" width="16"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="16" border="0" /></td>
                                     </tr>
@@ -60,8 +67,18 @@
 
                                         <!--
                                         <td valign="middle" align="right">
-                                            <a href="http://{SITE_DOMAIN}/{UPCOMING_HREF}{UPCOMING_ID}" style="background:#f9f9f9;color:#000;font-family:sans-serif;text-decoration:none;border:1px solid #d1d1d1;font-size:13px;line-height:22px; padding:2px 5px 2px 2px;">
-                                                <img style="vertical-align:bottom;" src="http://{SITE_DOMAIN}/images/emails/digest/{UPCOMING_BTN_ICON}-icon.png" border="0" height="22" width="22" />{UPCOMING_BTN_LABEL}</a>
+                                            <table cellspacing="0" cellpadding="0" border="0" bgcolor="#f9f9f9" style="border:1px solid #d1d1d1;">
+                                                <tr>
+                                                    <td valign="middle">
+                                                        <a href="http://{SITE_DOMAIN}/{UPCOMING_HREF}{UPCOMING_ID}">
+                                                            <img style="vertical-align:bottom;" src="http://{SITE_DOMAIN}/images/emails/digest/{UPCOMING_BTN_ICON}-icon.png" border="0" height="22" width="22" />
+                                                        </a></td>
+                                                    <td valign="middle">
+                                                        <a href="http://{SITE_DOMAIN}/{UPCOMING_HREF}{UPCOMING_ID}" style="color:#000;font-family:sans-serif;text-decoration:none;font-size:13px;line-height:22px;">
+                                                            {UPCOMING_BTN_LABEL}</a>
+                                                    </td>
+                                                </tr>
+                                            </table>
                                         </td>
                                         -->
                                         <td valign="middle" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
@@ -89,7 +106,7 @@
                                         <!-- BEGIN image -->
                                         <td style="border-bottom:1px solid #eeeeee;"><img valign="bottom" src="http://{SITE_DOMAIN}/storage/image.php?hash={ARTICLE_IMAGE}&size=square64" width="64" height="64" border="0" /></td>
                                         <!-- END image -->
-                                        <td valign="bottom" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#000000;border-bottom:1px solid #eeeeee;" colspan="{ARTICLE_COLSPAN}">
+                                        <td valign="top" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#000000;border-bottom:1px solid #eeeeee;" colspan="{ARTICLE_COLSPAN}">
                                             <a href="http://{SITE_DOMAIN}/{ARTICLE_SLUG}" style="color:#0066b0;text-decoration:none;font-weight:bold;">{ARTICLE_TITLE}</a><br />
                                             <a href="http://{SITE_DOMAIN}/{ARTICLE_TOPIC_URL}" style="color:#0066b0;text-decoration:none;">{ARTICLE_TOPIC}</a>
                                                 <span style="color:#929292">{ARTICLE_DATE} | Posted by</span>
