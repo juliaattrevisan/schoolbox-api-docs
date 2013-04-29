@@ -137,6 +137,15 @@ class Digest_News {
             }
             $userList[$user['id']]['campus'][] = $user['campus'];
         }
+
+        //
+        // Compile category list for users
+        foreach ($userList as &$user) {
+            $user['user_object']   = $this->user_mapper->findById($user['id']);
+            $user['category_list'] = $this->category_mapper->findForUser($user['user_object']);
+        }
+        unset($user);
+
         $this->userList = $userList;
     }
 
@@ -209,95 +218,28 @@ class Digest_News {
                     'image'    => $article['item_image'],
                 );
             }
-
-            $access = $this->groupHandler->getAllUserAccess($u['id']);
-
-            if($access) {
-                foreach($access as $a) {
-                    if($a['name'] != 'Homepage') {
-                        continue;
-                    }
-                    $cat = $this->catHandler->getByID($a['sid']);
-                    $hNews = $this->catnewsHandler->getAllForCategory($a['sid'], false, false, $u['id']);
-                    if($hNews) {
-                        foreach($hNews as $art) {
-                            $u['articles']['h'][$a['sid']][$art['id']] = array(
-                                'id'       => $art['id'],
-                                'title'    => $art['heading'],
-                                'abstract' => $this->scrub($art['body']),
-                                'topic'    => $cat['name'],
-                                'date'     => $art['posted'],
-                                'poster'   => $this->getPosterFromArticle($art),
-                                'image'    => $art['item_image'],
-                            );
-                        }
-                    }
-                }
-            }
         }
 
-
         //
-        // Don't try to shart due work into news through the controller, because
-        // layout is too far from what would be wanted in the email.
-        $user_model = $this->user_mapper->findById($u['id']);
-        if ($user_model instanceof User) {
-            $categories = array();
-            foreach ($this->category_mapper->findForUser($user_model) as $category) {
-                $categories[] = $category->getId();
-            }
-
-            if (!empty($categories)) {
-                $limit      = 15;
-                $activities = $this->submission_box_mapper
-                    ->getActivities($u['id'], $limit, $categories)
-                    ->merge($this->assessment_mapper->getActivities($u['id'], $limit, $categories))
-                    ->merge($this->submission_mapper->getActivities($u['id'], $limit, $categories))
-                    ->merge($this->return_mapper->getActivities(
-                        $u['id'], $limit, $categories,
-                        array(SubmissionBox::MARK_VISIBILITY_STUDENT, SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,)
-                    ))
-                    ->sortBy('date', 'desc')
-                    ->limit(0, $limit);
-                foreach ($activities as $activity) {
-                    $relative_date = new Alaress_Date_Relative($activity->getDate());
-                    //
-                    // Filter out items that aren't in window.
-                    if ($this->withinWindow($activity->getDate()->getUnixTimestamp())) {
-                        $u['activities'][] = array(
-                            'object'        => $activity,
-                            'poster'        => $this->getPosterFromUser($activity->getOwner()),
-                            'event'         => $activity->getEvent(),
-                            'category_name' => $activity->getCategory()->getName(),
-                            'category_id'   => $activity->getCategory()->getId(),
-                            'title'         => $activity->getName(),
-                            'type'          => $activity->getTypeName(),
-                            'date'          => $relative_date->getRelativeTime(),
-                        );
-                    }
-                }
-
-                //
-                // Get upcoming work items here too (as activity list)
-                $due_work_list = $this->submission_box_mapper
-                    ->getUpcomingActivities($u['id'], $limit, $categories)
-                    ->merge($this->assessment_mapper->getUpcomingActivities($u['id'], $limit, $categories))
-                    ->sortBy('date', 'asc')
-                    ->limit(0, $limit);
-                foreach ($due_work_list as $due_work) {
-                    $relative_date = new Alaress_Date_Relative($due_work->getDate());
-                    $u['due_work'][] = array(
-                        'object'        => $due_work,
-                        'category_name' => $due_work->getCategory()->getName(),
-                        'category_id'   => $due_work->getCategory()->getId(),
-                        'title'         => $due_work->getName(),
-                        'type'          => $due_work->getTypeName(),
-                        'date'          => $relative_date->getRelativeTime(),
+        // Use category list (from CategoryMapper->findForUser()) instead of
+        // access list, as it's more complete.
+        foreach ($u['category_list'] as $category) {
+            $cat_id = $category->getId();
+            $hNews = $this->catnewsHandler->getAllForCategory($cat_id, false, false, $u['id']);
+            if($hNews) {
+                foreach($hNews as $art) {
+                    $u['articles']['h'][$cat_id][$art['id']] = array(
+                        'id'       => $art['id'],
+                        'title'    => $art['heading'],
+                        'abstract' => $this->scrub($art['body']),
+                        'topic'    => $category->getName(),
+                        'date'     => $art['posted'],
+                        'poster'   => $this->getPosterFromArticle($art),
+                        'image'    => $art['item_image'],
                     );
                 }
             }
         }
-
         return $u;
     }
 
@@ -334,6 +276,7 @@ class Digest_News {
         $this->cli(sprintf("Email to %s %s (%s)", $u['firstname'], $u['lastname'], $u['email']));
         $newsFlag = false;
 
+        $mailer->setVar('newslist_block', '');
         if(is_array($u['articles'])) {
             foreach($u['articles'] as $newsType => $newsList) {
 
@@ -356,6 +299,9 @@ class Digest_News {
                 foreach($newsList as $catID => $news) {
                     $i = 0;
                     foreach($news as $article) {
+//                        if ($catID != 0) {
+//                            var_dump($article, $this->withinWindow($article['date']));
+//                        }
                         if($this->withinWindow($article['date'])) {
                             $is_news_shown = true;
                             $mailer->setVar(array(
@@ -378,15 +324,12 @@ class Digest_News {
                             }
 
                             $mailer->parse('article_block', 'article', true);
-                            $newsFlag = true;
                         }
                     }
-                }
-                if ($is_news_shown) {
-                    $mailer->parse('newslist_block', 'newslist', true);
-                }
-                else {
-                    $mailer->setVar('newslist_block', '');
+                    if ($is_news_shown) {
+                        $newsFlag = true;
+                        $mailer->parse('newslist_block', 'newslist', true);
+                    }
                 }
                 $mailer->setVar('article_block', '');
             }
@@ -416,9 +359,9 @@ class Digest_News {
         }
 
         if (!empty($activity_list)) {
-            $newsFlag = true;
             $i = 0;
             foreach ($activity_list as $activity) {
+                $newsFlag = true;
                 $mailer->setVar(array(
                     'ACTIVITY_OWNER'      => $activity['avatar_title'],
                     'ACTIVITY_CONTENT'    => $activity['content'],
@@ -478,8 +421,8 @@ class Digest_News {
         $upcoming_list = $upcoming_controller->getDataFromExecute();
         if (!empty($upcoming_list)) {
             $i = 0;
-            $newsFlag = true;
             foreach ($upcoming_list as $upcoming) {
+                $newsFlag = true;
                 switch ($upcoming['UPCOMING_BTN_ICON']) {
                     case 'modify':
                         $upcoming['UPCOMING_BTN_ICON'] = 'sit';
@@ -536,7 +479,6 @@ class Digest_News {
         }
         else {
             $mailer->setVar('upcominglist_block', '');
-
         }
 
         if (!$this->debugging() && $newsFlag) {
