@@ -307,6 +307,47 @@ ul.activity-list li,
 }
 
 /*
+ * Demo Dashboards
+ */
+
+.demo-dash{
+  li{ float: left;
+      padding: 7px 4px !important;
+      height: 135px;
+      list-style: none;
+  }
+  a{  display: block;
+      float: left;
+      text-align: center;
+      padding: 92px 0 0 0;
+      font-weight: bold;
+      width: 88px;
+      -webkit-transition: opacity 0.5s;
+      -moz-transition: opacity 0.5s;
+      -ms-transition: opacity 0.5s;
+      -o-transition: opacity 0.5s;
+      transition: opacity 0.5s;
+    &:hover{
+      cursor: pointer;
+      opacity: 0.8;
+    }
+  }
+  .parents-friends{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
+  .due-work{ background: url('/images/demo/dashboard-icons.png') -88px 0px no-repeat; }
+  .manage-users{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
+  .timetable{ background: url('/images/demo/dashboard-icons.png') -176px 0px no-repeat; }
+  .synergetic{ background: url('/images/demo/dashboard-icons.png') -264px 0px no-repeat; }
+  .admin{ background: url('/images/demo/dashboard-icons.png') -352px 0px no-repeat; }
+  .eportfolio{ background: url('/images/demo/dashboard-icons.png') -440px 0px no-repeat; }
+  .hr{ background: url('/images/demo/dashboard-icons.png') 0px 0px no-repeat; }
+  .services{ background: url('/images/demo/dashboard-icons.png') -616px 0px no-repeat; }
+  .leave{ background: url('/images/demo/dashboard-icons.png') -528px 0px no-repeat; }
+  .parent-dir{ background: url('/images/demo/dashboard-icons.png') -704px 0px no-repeat; }
+  .payments{ background: url('/images/demo/dashboard-icons.png') -792px 0px no-repeat; }
+  .online-forms{ background: url('/images/demo/dashboard-icons.png') -880px 0px no-repeat; }
+}
+
+/*
  * Footer
  */
 #footer { margin: 0; margin-left: @navigation-width; }
