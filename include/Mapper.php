@@ -298,18 +298,33 @@ abstract class Mapper {
     /**
      * Gets a single object as a collection, if it isn't one already.
      *
+     * Different possible actions based on $object:
+     * * instanceof Model: returns Collection with $object as only item
+     * * instanceof Collection or Schoolbox\Collection: returns that Collection
+     * * array: returns a Collection object wrapping that array
+     * * anything else: returns Collection with $object as only item
+     *
      * @param mixed $object
      *
      * @return Collection
      */
 	public function getModelAsCollection($object) {
-		if (is_a($object, 'Collection')) {
+		if ($object instanceof Model) {
+			$collection = new Collection(array($object));
+			return $collection;
+		}
+		if ($object instanceof Collection) {
 			return $object;
 		}
+		if ($object instanceof Schoolbox\Collection) {
+			return $object;
+		}
+		if (is_array($object)) {
+			$collection = new Collection($object);
+			return $collection;
+		}
 		else {
-			$collection = new Collection;
-			$collection[] = $object;
-
+			$collection = new Collection(array($object));
 			return $collection;
 		}
 	}
@@ -346,7 +361,6 @@ abstract class Mapper {
             VALUES ($plcString)
             ON DUPLICATE KEY UPDATE $updString;
         ");
-
         $affectedIDs = array();
 
         //
