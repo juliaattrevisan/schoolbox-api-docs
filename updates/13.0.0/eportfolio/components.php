@@ -1,5 +1,5 @@
 <?php
-require_once('../include/Bootstrap.php');
+require_once('../../../include/Bootstrap.php');
 
 $allComponents = array();
 

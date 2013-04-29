@@ -6,7 +6,7 @@
  * @copyright   2013 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
  */
-require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
+require_once('../../../include/Bootstrap.php');
 
 $timetableCodes = unserialize(SYN_CAMPUS_Codes);
 $dayCode = unserialize(TIMETABLE_day_count);
