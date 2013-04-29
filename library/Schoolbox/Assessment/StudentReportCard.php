@@ -298,11 +298,9 @@ class StudentReportCard {
 			'data'  => $averageSeries
 		);
 
-		// round to nearest days' edge
+		// display the graph for the semester
 		$start = mktime(0,0,0,($this->targetSemester - 1) * 6 + 1,0,$this->targetYear) * 1000;
-		$end = $start + 365 / 2 * 86400 * 1000;
-//		$start = (int)(min(array_keys($data)) / 86.4) * 100000;
-//		$end = (int)(max(array_keys($data)) / 86.4) * 100000;
+		$end = (($start + 365 / 2) - 1) * 86400 * 1000;
 
 		$page->setVar(array(
 			'GRAPH_JSON'    => json_encode($graph),
@@ -383,64 +381,23 @@ class StudentReportCard {
 				elseif($object instanceof OnlineAssessment) {
 					$page->setVar($this->outputOnlineAssessRow($object, $marks));
 				}
-				$page->parse('work_actionable_block', 'work_actionable');
+
+                // marks returned, therefore publishable: is it published?
+                if(/* logic for published */ true) {
+                    $output['WORK_PUBLISH_HREF']      = '/eportfolio/unpublish/this';
+                    $output['WORK_PUBLISH_BTN_ICON']  = 'unpublish';
+                    $output['WORK_PUBLISH_BTN_LABEL'] = 'Unpublish';
+                }
+                else {
+                    $output['WORK_PUBLISH_HREF']      = '/eportfolio/publish/this';
+                    $output['WORK_PUBLISH_BTN_ICON']  = 'publish';
+                    $output['WORK_PUBLISH_BTN_LABEL'] = 'Publish';
+                }
+
+                $page->setVar($output);
+
+                $page->parse('work_actionable_block', 'work_actionable');
 				$page->parse('work_publishable_block', 'work_publishable');
-
-
-//				$page->setVar(array(
-//					'ON_OFF'                 => ++$i % 2 ? '' : 'dark',
-//					'WORK_ID'                => $object->getId(),
-//					'WORK_TYPE'              => $object->getWorkType(),
-//					'WORK_DATE'              => $due->getRelativeTime(),
-//					'WORK_TIME'              => $due->getDateOnly(),
-//				));
-
-//				if($w->isReturn()) {
-
-//					$page->setVar(array(
-//						'WORK_URGENCY'           => $urgency,
-//						'WORK_GRADIENT'          => isset($w['mark']) ? (int)($w['norm_mark'] / 10) : '',
-//						'WORK_GRADE'             => isset($w['mark']) ? $w['mark'] : '',
-//						'WORK_COMMENT'           => isset($w['comment']) ? $w['comment'] : '',
-//					));
-//				}
-//				else {
-//					$page->setVar(array(
-//						'WORK_URGENCY',
-//						'WORK_GRADIENT',
-//						'WORK_GRADE',
-//						'WORK_COMMENT',
-//					));
-
-//				}
-
-//				if($w->isAssessment()) {
-//					$page->setVar(array(
-//						'WORK_HREF'              => 'assess/main/',
-//						'WORK_BTN_ICON'          => '',
-//						'WORK_BTN_LABEL'         => '',
-//
-//						'WORK_PUBLISH_HREF'      => '',
-//						'WORK_PUBLISH_BTN_ICON'  => '',
-//						'WORK_PUBLISH_BTN_LABEL' => ''
-//					));
-
-//				}
-//				elseif($w->isSubmission()) {
-//					$page->setVar(array(
-//						'WORK_HREF'              => 'submission/submissionBox/',
-//						'WORK_BTN_ICON'          => '',
-//						'WORK_BTN_LABEL'         => '',
-//
-//						'WORK_PUBLISH_HREF'      => '',
-//						'WORK_PUBLISH_BTN_ICON'  => '',
-//						'WORK_PUBLISH_BTN_LABEL' => ''
-//					));
-//				}
-
-
-
-
 				$page->parse('work_block', 'work', true);
 			}
 		}
@@ -456,8 +413,6 @@ class StudentReportCard {
 	 * @return array
 	 */
 	protected function outputDueWorkRow(SubmissionBox $box, $marks) {
-		var_dump($marks);
-
 		$due = new \Alaress_Date_Relative($box->getDueDate());
 		$urgency = max(0, min(10, (int)(($due->getUnixTimestamp() - time()) / 86400)));
 		$output = array(
@@ -466,26 +421,49 @@ class StudentReportCard {
 			'WORK_TYPE'              => $box->getWorkType()->getName(),
 			'WORK_DATE'              => $due->getRelativeTime(),
 			'WORK_TIME'              => $due->getDateOnly(),
-
 			'WORK_URGENCY'           => $urgency,
-
 			'WORK_HREF'              => 'submission/submissionHistory/',
-			'WORK_BTN_ICON'          => '',
-			'WORK_BTN_LABEL'         => '',
-
-			'WORK_PUBLISH_HREF'      => '',
-			'WORK_PUBLISH_BTN_ICON'  => '',
-			'WORK_PUBLISH_BTN_LABEL' => ''
 		);
 
+        // marks have been returned
 		if($marks !== false) {
-			$output['WORK_URGENCY']  = 'none';
-			$output['WORK_GRADIENT'] = (int)($marks['mark'] / 10);
-			$output['WORK_GRADE']    = $marks['mark'];
-			$output['WORK_COMMENT']  = $marks['comment'];
+			$output['WORK_URGENCY']           = 'none';
+			$output['WORK_GRADIENT']          = (int)($marks['mark'] / 10);
+			$output['WORK_GRADE']             = $marks['mark'];
+			$output['WORK_COMMENT']           = $marks['comment'];
 		}
 
+        // is the box still open?
+        if($box->getLateDate()->getUnixTimestamp() > time()) {
+            // can potentially submit
 
+            // is work already submitted?
+            if($marks['status'] != 'pending') {
+                // work submitted
+
+                // is this multisubmit?
+                if($box->getAcceptMultiple()) {
+                    // is multi: offer REsubmission
+                    $output['WORK_BTN_ICON']  = 'upload';
+                    $output['WORK_BTN_LABEL'] = 'Resubmit';
+                }
+                else {
+                    // is single-submit: offer no action
+                    $output['WORK_BTN_ICON']  = '';
+                    $output['WORK_BTN_LABEL'] = '';
+                }
+            }
+            else {
+                // work not submitted: offer submission
+                $output['WORK_BTN_ICON']  = 'upload';
+                $output['WORK_BTN_LABEL'] = 'Submit';
+            }
+        }
+        else {
+            // cannot submit: offer no action
+            $output['WORK_BTN_ICON']  = '';
+            $output['WORK_BTN_LABEL'] = '';
+        }
 
 		return $output;
 	}
@@ -499,8 +477,6 @@ class StudentReportCard {
 		// marks are contained inside a single-element array, pull it out of itself
 		$marks = $marks[0];
 
-		var_dump($marks);
-
 		$due = new \Alaress_Date_Relative($oa->getFinish());
 		$urgency = max(0, min(10, (int)(($due->getUnixTimestamp() - time()) / 86400)));
 		$output = array(
@@ -509,26 +485,48 @@ class StudentReportCard {
 			'WORK_TYPE'              => $oa->getWorkType()->getName(),
 			'WORK_DATE'              => $due->getRelativeTime(),
 			'WORK_TIME'              => $due->getDateOnly(),
-
 			'WORK_URGENCY'           => $urgency,
-			'WORK_GRADIENT'          => isset($w['mark']) ? (int)($w['norm_mark'] / 10) : '',
-			'WORK_GRADE'             => isset($w['mark']) ? $w['mark'] : '',
-			'WORK_COMMENT'           => isset($w['comment']) ? $w['comment'] : '',
-
 			'WORK_HREF'              => 'assess/main/',
-			'WORK_BTN_ICON'          => '',
-			'WORK_BTN_LABEL'         => '',
-
-			'WORK_PUBLISH_HREF'      => '',
-			'WORK_PUBLISH_BTN_ICON'  => '',
-			'WORK_PUBLISH_BTN_LABEL' => ''
 		);
+
+        // is the OA still open?
+        if($oa->getFinish()->getUnixTimestamp() > time()) {
+            // still open
+
+            // has the student attempted?
+            if($marks['status'] != 'pending') {
+                // student has attempted at least once
+
+                // does the student have attempts left?
+                if($oa->getMaxAttempts() > $marks['attempts']) {
+                    // attempts remaining: offer REsit action
+                    $output['WORK_BTN_ICON']  = 'edit';
+                    $output['WORK_BTN_LABEL'] = 'Resit';
+                }
+                else {
+                    // no attempts remaining: offer no action
+                    $output['WORK_BTN_ICON']  = '';
+                    $output['WORK_BTN_LABEL'] = '';
+                }
+            }
+            else {
+                // student has not attempted: offer sit action
+                $output['WORK_BTN_ICON']  = 'edit';
+                $output['WORK_BTN_LABEL'] = 'Sit';
+            }
+        }
+        else {
+            // is closed: offer no action
+            $output['WORK_BTN_ICON']  = '';
+            $output['WORK_BTN_LABEL'] = '';
+
+        }
 
 		if($marks !== false) {
 			$output['WORK_URGENCY']  = 'none';
 			$output['WORK_GRADIENT'] = (int)($marks['mark'] / 10);
 			$output['WORK_GRADE']    = $marks['mark'];
-			$output['WORK_COMMENT']  = $marks['comment'];
+			$output['WORK_COMMENT']  = '';
 		}
 
 
