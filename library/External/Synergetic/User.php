@@ -532,7 +532,7 @@ class External_Synergetic_User implements External_UserInterface {
 		$query = "
 			SELECT
 				vStaff.StaffID, vStaff.StaffTitle, vStaff.StaffPreferredName, vStaff.StaffSurname,
-				vStaff.StaffOccupPhone, vStaff.StaffOccupEmail,
+				vStaff.StaffOccupPhone, vStaff.StaffOccupEmail, vStaff.StaffExtension,
 				vStaff.StaffCampusDescription, vStaff.StaffCategoryType,
 				JobPositions.StaffDepartmentDescription AS StaffDepartment, JobPositions.JobPositionDescription
 			FROM SynergyOne.dbo.vStaff vStaff
