@@ -115,8 +115,7 @@ class Digest_News {
     public function compileUserList() {
         $sql = "SELECT u.id, u.username, u.firstname, u.lastname, u.group_id gid, u.local_email, u.alt_email, uc.campus
                 FROM `user` u
-                INNER JOIN userCampus uc ON uc.uid = u.id
-                where u.id IN (15, 229)";
+                INNER JOIN userCampus uc ON uc.uid = u.id";
 
         $prevUID = -1;
         $userList = array();
