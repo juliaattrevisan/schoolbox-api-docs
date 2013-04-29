@@ -598,7 +598,7 @@ class Group extends DeprecatedModel
         $catList = array();
 
         if ($includeSubjectList == true && Cfg::get('external_enable')) {
-			$catList = $this->involvedInSubjects($userID);
+	        $catList = $this->involvedInSubjects($userID);
         }
 
 		//get list of groups involved in
