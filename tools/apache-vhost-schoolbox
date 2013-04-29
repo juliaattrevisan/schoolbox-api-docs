@@ -70,13 +70,13 @@
 	# Force SSL
 	#RewriteCond %{SERVER_PORT} !^443$
 	#RewriteCond %{REQUEST_URI} ^/$
-	#RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R,L]
+	#RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R,L]
 
 	# Force non-secure
 	#RewriteCond %{SERVER_PORT} ^443$
 	#RewriteCond %{REQUEST_URI} !^/$
 	#RewriteCond %{REQUEST_URI} !\.[A-Za-z]{2,4}$
-	#RewriteRule ^(.*)$ http://%{HTTP_HOST}/$1 [R,L]
+	#RewriteRule ^(.*)$ http://%{HTTP_HOST}%{REQUEST_URI} [R,L]
 
 	RewriteCond %{SCRIPT_FILENAME}/ -d
 	RewriteRule [^/]$ %{REQUEST_URI}/ [R=301,L]
