@@ -396,11 +396,17 @@ class Report_Parent extends Report_Abstract {
 					$this->getPage()->setVar(array(
 						'CONTACT_PHONE' => '',
 						'CONTACT_MOBILE' => '',
-						'CONTACT_STREET' => '',
-						'CONTACT_SUBURB' => '',
-						'CONTACT_STATE' => '',
-						'CONTACT_POSTCODE' => '',
-						'CONTACT_COUNTRY' => '',
+						'CONTACT_POSTAL_STREET' => '',
+						'CONTACT_POSTAL_SUBURB' => '',
+						'CONTACT_POSTAL_STATE' => '',
+						'CONTACT_POSTAL_POSTCODE' => '',
+						'CONTACT_POSTAL_COUNTRY' =>'',
+
+						'CONTACT_HOME_STREET' => '',
+						'CONTACT_HOME_SUBURB' => '',
+						'CONTACT_HOME_STATE' => '',
+						'CONTACT_HOME_POSTCODE' => '',
+						'CONTACT_HOME_COUNTRY' => '',
 						'CONTACT_EMAIL' => '',
 					));
 
