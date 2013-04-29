@@ -24,6 +24,9 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
             foreach ($userAccess as $ua) {
                 $categoryIDs[] = $ua['id'];
             }
+            if (empty($categoryIDs)) {
+                return false;
+            }
 
             $feedList = $feedHandler->getFeed(
                 $categoryIDs, $this->getConfig('size') ? $this->getConfig('size') : $this->limit
