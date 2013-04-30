@@ -384,7 +384,6 @@ if (is_numeric($this->arg[0])) {
 		            $emailAll = '';
 		            $i = 1;
 		            $listItems = count($groupList)>1 ? floor(count($groupList)/2) : 1;
-					print_r($listItems);
 		            foreach ($groupList as $group) {
 
 			            $this->setVar('group_teacher_block', '');
