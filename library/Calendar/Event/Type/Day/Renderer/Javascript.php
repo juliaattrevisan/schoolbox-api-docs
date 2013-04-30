@@ -147,6 +147,19 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
                 $allDay = false;
             }
 
+			//
+			// Add campus list to list of classes
+			$classes = array(
+				$currentEvent->getDerivedEventLevel(),
+				'type' . $currentEvent->getType()
+			);
+			$campus_list = explode(',', $currentEvent->getCampusList());
+			foreach ($campus_list as $campus_id) {
+				if ($campus_id) {
+					$classes[] = 'campus'.trim($campus_id);
+				}
+			}
+
 			$event = array(
 				'title' => $currentEvent->getNote(),
 				'start' => "$start",
@@ -170,10 +183,7 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 
 				/* Campus slug so you can filter events
 				 */
-				'className' => array(
-					$currentEvent->getDerivedEventLevel(),
-					'type' . $currentEvent->getType()
-				),
+				'className' => $classes,
 
 				/* Extra data that the Event Object doesn't directly support
 				 */

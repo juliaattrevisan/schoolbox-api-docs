@@ -123,7 +123,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 								$event->setAccess('');
 								$event->setEventType($metaDetails['eventType']);
 								$event->setColour($metaDetails['eventColour']);
-								$event->setCampusList('');
+								$event->setCampusList(implode(',', $decodedConfig->getCampus()));
 								$event->setDetail($currentEvent->DESCRIPTION->value);
 								$event->setLocation($currentEvent->LOCATION->value);
 								$event->setPublishDate('');
