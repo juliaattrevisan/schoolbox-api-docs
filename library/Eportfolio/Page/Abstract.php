@@ -158,13 +158,12 @@ abstract class Eportfolio_Page_Abstract {
 		$allPages = Eportfolio_PageMapper::getInstance()->findByColumn('uid', $this->getUserId());
 
 		if ($allPages->count()) {
-			for ($allPages->rewind(); $allPages->valid(); $allPages->next()) {
-				$currentPage = $allPages->current();
+			foreach($allPages as $currentPage) {
 
 				$this->getPage()->setVar(array(
-					'EPORTFOLIO_PAGE_USER_ID' => $currentPage->getUid(),
 					'EPORTFOLIO_PAGE_ID' => $currentPage->getPageId(),
 					'EPORTFOLIO_PAGE_NAME' => $currentPage->getPageTitle(),
+					'EPORTFOLIO_CURRENT_PAGE' => $currentPage->getPageId()==$this->getPageId()?'class="current"':'',
 				));
 
 				$this->getPage()->parse('eportfolio_page_block', 'eportfolio_page', true);
