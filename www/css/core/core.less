@@ -178,7 +178,7 @@ a {
 
 /*--------------------------------------------------------------
 Text formatting styles
---------------------------------------- -----------------------*/
+---------------------------------------------------------------*/
 p {
     margin: 0 0 16px 0;
     text-align: left;
@@ -1073,6 +1073,275 @@ Notifications
     width: 32px;
     height: 32px;
     border: none;
+}
+
+
+/*--------------------------------------------------------------
+ PROFILES
+--------------------------------------------------------------*/
+.profile-info {
+  overflow: auto;
+  dl{
+    dt{ width: 20%; padding: 5px 0 5px 0; }
+    dd{ width: 80%; padding: 5px 0 5px 0; margin: 0; min-height: 14px; }
+    .mail-profile a{ background: url('/images/core/icons/mail-profile.png') center right no-repeat; padding-right: 26px; }
+    .dark{
+      border-top: 1px solid @border-color;
+      border-bottom: 1px solid @border-color; }
+  }
+}
+
+.personal-info{
+  margin-bottom: 15px;
+  overflow: auto;
+}
+
+.parent-spouse{
+  clear: left;
+}
+
+.profile-img {
+  background: @border-color;
+  float: left;
+  width: 22%;
+  max-height: 311px;
+  text-align: center;
+}
+
+.profile-detail{
+  float: right;
+  margin: 0 0 0 1%;
+  width: 77%;
+}
+
+.staff-detail{
+  float: left;
+  margin-left: 1%;
+  width: 77%;
+}
+
+.school-information{
+  margin: 20px 0 20px 0;
+}
+
+.profile-med{
+  background: #fff3dd;
+  border: 1px solid #ffe6b5;
+  float: left;
+  display: block;
+  margin: 14px 0;
+  padding: 10px 7px;
+  width: 97%;
+  img{
+    margin: 0 8px 0 0;
+    vertical-align: text-top;
+  }
+}
+
+.school-info{
+  clear: both;
+  float: left;
+  margin: 0 0 18px 0;
+}
+
+.directory {
+  clear: both;
+  display: block;
+  width: 100%;
+  .subjects{
+    border-left: 1px solid @border-color;
+    width: 73%;
+    float: left;
+    margin: 0 2% 0 0;
+    ul{
+      width: 50%;
+      float: left;
+      li:nth-child(even){ background: #fafafa; }
+    }
+  }
+  .contact-info{
+    width: 24%;
+    float: left;
+  }
+  li{
+    border-bottom: 1px solid @border-color;
+    border-right: 1px solid @border-color;
+    position: relative;
+    a{display: block;
+      padding: 7px 0px;
+      height: 32px;
+      color: #000;
+      &:hover{
+        background-color: #e9f6ff;
+        text-decoration: none;
+      }
+    }
+    .to-subject{
+      background: url('/images/famicons/house.png') 15px 18px no-repeat;
+      border-bottom: 1px solid @border-color;
+      height: 27px;
+      display: block;
+      padding: 20px 49px 0 52px;
+      font-weight: bold;
+      .icon{
+        background-image: url('/images/core/icons/action-icons.png');
+        background-position: 0px 0px;
+        position: absolute;
+        top: 24px;
+        margin-top: -10px;
+        right: 13px;
+        display: block;
+        width: 18px;
+        height: 20px;
+      }
+    }
+  }
+  .mail-teacher{
+    background: url('/images/core/icons/mail-profile.png') 17px 19px no-repeat;
+    border-left: 1px solid @border-color;
+    position: absolute;
+    right: 0;
+    top: 0px;
+    height: 32px;
+    width: 50px;
+    font: 0/0 a;
+    text-shadow: none;
+    color: transparent;
+  }
+}
+
+.contact-info{
+  .mail-teacher{
+    background: url('/images/core/icons/mail-profile.png') 17px 19px no-repeat;
+    border-left: 1px solid @border-color;
+    position: absolute;
+    right: 0;
+    top: 0px;
+    height: 32px;
+    width: 35px;
+    font: 0/0 a;
+    text-shadow: none;
+    color: transparent;
+  }
+  .contact-phone{
+    li{ border-bottom: 0; }
+  }
+  ul:nth-child(even){ background: #fafafa; }
+}
+
+.profile{
+  position: relative;
+  .mobile{
+    background: url('/images/famicons/phone.png') 8px 7px no-repeat;
+    border-top: 1px solid @border-color;
+    border-bottom: 1px solid @border-color;
+    display: block;
+    padding: 8px 0 8px 35px;
+  }
+}
+
+.teacher-profile{
+  margin-right: 51px;
+  img{
+    margin: 0 8px;
+  }
+  .name{
+    position: absolute;
+    margin: 0 0 0 3px;
+  }
+  .role{
+    position: absolute;
+    margin: 0 0 0 4px;
+    top: 26px;
+    color: #797979;
+  }
+  .icon{
+    background-image: url('/images/core/icons/action-icons.png');
+    background-position: 0px 0px;
+    position: absolute;
+    top: 24px;
+    margin-top: -10px;
+    right: 13px;
+    display: block;
+    width: 18px;
+    height: 20px;
+  }
+}
+
+.contact-alert{
+  background: #fff3dd;
+  padding: 10px;
+  span{
+    padding: 0 0 0 5px;
+    color:red;
+    font-weight:bold;
+  }
+}
+
+.contact-information{
+  position: relative;
+  li{
+    border:0;
+    border-bottom: 1px solid @border-color;
+  }
+}
+
+.emergency-contact{
+  border-left: 1px solid @border-color;
+  margin: 30px 0 0 0;
+  li{
+    border-bottom: 1px solid @border-color;
+    padding: 7px 8px;
+  }
+  dl{
+    dt{ width: 29%; padding: 5px 3%; }
+    dd{ width: 65%; padding: 5px 0 5px 0; margin: 0; min-height: 14px; }
+    .dark{
+      border-top: 1px solid @border-color;
+      border-bottom: 1px solid @border-color; }
+  }
+}
+
+.phone{
+  background: url('/images/famicons/telephone.png') 8px 7px no-repeat;
+  display: block;
+  padding: 8px 0 8px 35px;
+}
+
+#spouse{
+  .name{
+    position: absolute;
+    margin: 0 0 0 10px;
+  }
+  .role{
+    position: absolute;
+    margin: 0 0 0 10px;
+    top: 24px;
+  }
+  .icon{
+    background-image: url('/images/core/icons/action-icons.png');
+    background-position: 0px 0px;
+    position: absolute;
+    top: 24px;
+    margin-top: -10px;
+    right: 64px;
+    display: block;
+    width: 18px;
+    height: 20px;
+  }
+}
+
+.contact-phone{
+  a{
+    padding: 7px 8px !important;
+    position: relative;
+  }
+}
+
+.contact-details{
+  li{
+    padding: 7px 8px;
+  }
 }
 
 /*--------------------------------------------------------------

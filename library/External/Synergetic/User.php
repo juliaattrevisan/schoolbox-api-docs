@@ -383,9 +383,9 @@ class External_Synergetic_User implements External_UserInterface {
 			SELECT
 				StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
 				StudentContactAddress1, StudentContactSuburb, StudentContactPostCode, StudentContactState,
-				StudentContactPhoneActual, StudentContactMobilePhone, StudentContactOccupPhone,
+				StudentContactPhoneActual, StudentContactMobilePhone, StudentContactOccupPhone,StudentContactRelation,
 				StudentContactSpouseID, StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseSurname,
-				StudentContactSpouseMobilePhone, StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail, StudentContactType
+				StudentContactSpouseMobilePhone, StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail, StudentContactType,StudentContactSpouseRelation
 			FROM
 				SynergyOne.dbo.vStudentContactAllAddress
 			WHERE
