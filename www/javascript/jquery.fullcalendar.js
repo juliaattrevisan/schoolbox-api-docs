@@ -94,7 +94,7 @@ function Calendar(id, bubbleId, opts) {
         organise: function(cal, filterArray, performAjax) {
             performAjax = performAjax === undefined ? true : performAjax
 
-            var flist = {}, selected_classes = [];
+            var flist = {}, selected_classes = ['personal'];
             var calendarControls = $j(cal.options.filter.parentSelector)
 
             for (var i = 0; i < filterArray.length; i++) {
