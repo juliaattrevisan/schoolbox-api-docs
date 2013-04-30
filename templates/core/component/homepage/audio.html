@@ -21,12 +21,11 @@ function loadSWF(audioID, url){
 			<!-- BEGIN audio_list -->
 			<li class="{ON_OFF} clearfix">
 				<h4><a class="icons {AUDIO_MIME_IMAGE}" href="{AUDIO_URL}">{AUDIO_DESCRIPTION}</a></h4>
-				<p class="interact">
-				<div class="play-button">
+				<div class="play-button ">
 					<div id="audio-player-{AUDIO_ID}"><a onclick="loadSWF({AUDIO_ID}, '{AUDIO_URL}'); return false;"></a></div>
 				</div>
-				</p>
-				<p class="hide-on-small">{AUDIO_COMMENT}</p>
+                <div class="clearfix"></div>
+				<p class="{COMPONENT_COMPACTMODE}">{AUDIO_COMMENT}</p>
 			</li>
 			<!-- END audio_list -->
 		</ul>
