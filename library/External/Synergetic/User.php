@@ -169,11 +169,12 @@ class External_Synergetic_User implements External_UserInterface {
 				case 'O': //Use occupation email address
 					$emailList[] = $row['OccupEmail'];
 					break;
-				case 'D': //Use default email address
-					$emailList[] = $row['DefaultEmail'];
-					break;
 				case 'P': //Use personal email address
 					$emailList[] = $row['Email'];
+					break;
+				case 'D': //Use default email address
+				default:
+					$emailList[] = $row['DefaultEmail'];
 					break;
 			}
 
