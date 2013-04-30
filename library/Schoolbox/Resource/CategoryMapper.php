@@ -140,6 +140,17 @@ class CategoryMapper extends Mapper {
 				);
 				$query .= ' OR cc.code IN '.$this->getArrayPlaceholders($category_codes, 'code');
 				$params = array_merge($params, $this->getArrayParameters($category_codes, 'code'));
+
+				//
+				// Allow search of codes with a campus prefix.
+				$category_like_codes = array_map(
+					function($code) { return '%/'.$code; },
+					$category_codes
+				);
+				foreach ($category_like_codes as $i => $like_code) {
+					$query .= ' OR cc.code LIKE :like_code_'.$i;
+					$params['like_code_'.$i] = $like_code;
+				}
 			}
 		}
 
