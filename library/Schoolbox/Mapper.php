@@ -189,6 +189,32 @@ class Mapper extends BaseMapper {
     }
 
 	/**
+	 * Sets this mapper as implementing soft deletes, as a time that that row
+	 * was deleted, or null if it hasn't been.
+	 *
+	 * @param string $column The name of the column used for storing whether a
+	 *                       row is soft deleted.
+	 *
+	 * @return $this
+	 */
+	protected function hasSoftDeleteBooleanField($column) {
+		return $this->hasSoftDeleteField($column, true, false);
+	}
+
+	/**
+	 * Sets this mapper as implementing soft deletes, as a time that that row
+	 * was deleted, or null if it hasn't been.
+	 *
+	 * @param string $column The name of the column used for storing whether a
+	 *                       row is soft deleted.
+	 *
+	 * @return $this
+	 */
+	protected function hasSoftDeleteDateField($column) {
+		return $this->hasSoftDeleteField($column, date('Y-m-d H:i:s'), null);
+	}
+
+	/**
 	 * Sets this mapper as implementing soft deletes.
 	 *
 	 * @param string $column The name of the column used for storing whether a

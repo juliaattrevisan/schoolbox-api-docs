@@ -66,7 +66,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_DATETIME,
 		));
 
-		$this->hasSoftDeleteField('deleted');
+		$this->hasSoftDeleteBooleanField('deleted');
 
 		$this->hasJoin('submission_box', array(
 			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBoxMapper',

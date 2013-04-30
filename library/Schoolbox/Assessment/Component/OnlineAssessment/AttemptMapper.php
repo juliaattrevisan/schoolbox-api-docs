@@ -50,7 +50,7 @@ class AttemptMapper extends Mapper {
 			'type'       => self::TYPE_DATETIME,
 		));
 
-		$this->hasSoftDeleteField('deleted_at', date('Y-m-d H:i:s'), null);
+		$this->hasSoftDeleteDateField('deleted_at');
 	}
 
 

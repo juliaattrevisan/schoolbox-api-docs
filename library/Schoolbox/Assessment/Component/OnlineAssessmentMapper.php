@@ -111,7 +111,7 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			'other_key' => 'assess_id',
 		));
 
-		$this->hasSoftDeleteField('deleted_at', date('Y-m-d H:i:s'), null);
+		$this->hasSoftDeleteDateField('deleted_at');
 	}
 
 	/**

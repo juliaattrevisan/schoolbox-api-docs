@@ -220,7 +220,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			'other_key' => 'box_id',
 		));
 
-		$this->hasSoftDeleteField('deleted');
+		$this->hasSoftDeleteBooleanField('deleted');
 
 		$this
 			->registerCallback('preSave',  array($this, 'preSave'))
