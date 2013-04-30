@@ -13,6 +13,12 @@
 class Synchronise_Synergetic_Balcombe_Strategy_Staff extends Synchronise_Synergetic_Balcombe_Strategy_Abstract {
 	protected $strategyTitle = "Update Schoolbox Staff Details Synchronisation";
 
+	const T_GROUP_ID = 4;
+	const IT_GROUP_ID = 28;
+	const LC_GROUP_ID = 30;
+	const LT_GROUP_ID = 27;
+	const N_GROUP_ID = 6;
+	const SC_GROUP_ID = 31;
 
 	/**
 	 * Setup
@@ -52,8 +58,7 @@ class Synchronise_Synergetic_Balcombe_Strategy_Staff extends Synchronise_Synerge
 		$newUser['campus'] = array($this->getCampusFromCode($currentUser['StaffCampus']));
 
 		// Staff Group ID
-        // TODO determine how to map to the 10 different groups, or perhaps not at all
-		$newUser['group_id'] =  $this->getGroupIDFromCategory($currentUser['StaffCategoryType']);
+		$newUser['group_id'] =  $this->getGroupIDFromCategory($currentUser['StaffCategory']);
 
 		$newUser = $this->setMailSettingsOnNewUser($newUser);
 
@@ -90,8 +95,8 @@ class Synchronise_Synergetic_Balcombe_Strategy_Staff extends Synchronise_Synerge
      * @return bool|int
      */
     protected function getGroupIDFromCategory($category) {
-        if($category == 'TEACHER') {
-            return self::TEACH_GROUP_ID;
+        if(defined('self::'.$category.'_GROUP_ID')){
+			return constant('self::'.$category.'_GROUP_ID');
         }
         return false;
     }
