@@ -72,7 +72,7 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                 $j++;
                 $url = new Url($previous['topicName']);
 
-                $newsTime = new Alaress_Date_Relative($item['item_datetime_modified']);
+                $newsTime = new Alaress_Date_Relative($item['item_datetime_posted']);
                 $newsTime->setPrefix('');
 
                 $output = array(
