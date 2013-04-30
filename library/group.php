@@ -569,6 +569,7 @@ class Group extends DeprecatedModel
 		}
 		else {
 			$userHandler = new User;
+			$catHandler = new Category;
 			$user = $userHandler->getByID($userID);
 
 			if($user['synergy_id']) {
@@ -577,10 +578,9 @@ class Group extends DeprecatedModel
 
 				if (is_array($externalSubjectList)) {
 					foreach ($externalSubjectList as $subject) {
-						//convert code to id and get name
-						$query = "SELECT name, id, cc.code FROM category JOIN categoryCode cc ON id = categoryID WHERE cc.code = '" . $subject['code'] . "'";
-						if (is_array($catTmp = $this->db->getRow($query)))
-							$catList[] = $catTmp;
+						$cat = $catHandler->getByCode($subject['code']);
+						if(is_array($cat))
+							$catList[] = $cat;
 					}
 				}
 			}
@@ -598,7 +598,7 @@ class Group extends DeprecatedModel
         $catList = array();
 
         if ($includeSubjectList == true && Cfg::get('external_enable')) {
-			$catList = $this->involvedInSubjects($userID);
+	        $catList = $this->involvedInSubjects($userID);
         }
 
 		//get list of groups involved in
