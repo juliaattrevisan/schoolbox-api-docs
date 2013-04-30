@@ -146,24 +146,30 @@ class Calendar_Event_Collection {
 	 * @return int
 	 */
 	private function cmp($a, $b) {
-		$a_timestamp = $a->getStartTime()->getUnixTimestamp();
-		$b_timestamp = $b->getStartTime()->getUnixTimestamp();
-		if ($a_timestamp < $b_timestamp) {
-			return -1;
+		if ($a->getStartTime() instanceof Alaress_Date_Format_Interface
+			&& $b->getStartTime() instanceof Alaress_Date_Format_Interface
+		) {
+			$a_timestamp = $a->getStartTime()->getUnixTimestamp();
+			$b_timestamp = $b->getStartTime()->getUnixTimestamp();
+			if ($a_timestamp < $b_timestamp) {
+				return -1;
+			}
+			else if ($a_timestamp > $b_timestamp) {
+				return 1;
+			}
 		}
-		else if ($a_timestamp > $b_timestamp) {
-			return 1;
+		if ($a->getEndTime() instanceof Alaress_Date_Format_Interface
+			&& $b->getEndTime() instanceof Alaress_Date_Format_Interface
+		) {
+			$a_timestamp = $a->getEndTime()->getUnixTimestamp();
+			$b_timestamp = $b->getEndTime()->getUnixTimestamp();
+			if ($a_timestamp < $b_timestamp) {
+				return -1;
+			}
+			else if ($a_timestamp > $b_timestamp) {
+				return 1;
+			}
 		}
-
-		$a_timestamp = $a->getEndTime()->getUnixTimestamp();
-		$b_timestamp = $b->getEndTime()->getUnixTimestamp();
-		if ($a_timestamp < $b_timestamp) {
-			return -1;
-		}
-		else if ($a_timestamp > $b_timestamp) {
-			return 1;
-		}
-
 		return strcmp($a->getNote(), $b->getNote());
 	}
 
