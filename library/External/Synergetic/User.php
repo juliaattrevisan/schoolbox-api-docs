@@ -46,7 +46,7 @@ class External_Synergetic_User implements External_UserInterface {
 			 * Separate the queries out, fetching the photo data only if it's newer than the cached
 			 * version, or if the cache version doesn't already exist.
 			 */
-			if (!file_exists($photoPath) || (filemtime($photoPath) > strtotime($photo['ModifiedDate']))) {
+			if (!file_exists($photoPath) || (@filemtime($photoPath) > strtotime($photo['ModifiedDate']))) {
 				$query = "
 					SELECT vPhotos.Photo, vPhotos.PhotoType
 					FROM SynergyOne.dbo.vPhotos vPhotos
