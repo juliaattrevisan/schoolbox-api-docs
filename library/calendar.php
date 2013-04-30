@@ -570,7 +570,7 @@ class Calendar extends DeprecatedModel {
                         LIMIT $offset, $limit";
 
 
-        $count_query = "SELECT COUNT(*)
+        $count_query = "SELECT COUNT(DISTINCT event.id) AS event_count
 						FROM event
 						LEFT JOIN user ON owner = user.id
 						LEFT JOIN luEventType ON type = eventTypeID
