@@ -529,9 +529,14 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
 }
 
 $activityList = new Activity_ListArray($feedItems);
-$activityList->setTarget($this, 'ACTIVITY_LIST');
-foreach ($activityList as $a) {
-    // iterates across and pumps out the list
+if (empty($feedItems)) {
+	$this->setVar('ACTIVITY_LIST', '<li>You have no recent activity.</li>');
+}
+else {
+	$activityList->setTarget($this, 'ACTIVITY_LIST');
+	foreach ($activityList as $a) {
+		// iterates across and pumps out the list
+	}
 }
 
 // subject drop down
