@@ -143,10 +143,8 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             /* Parent bulk email
               */
             if (count($synergyIds) && $this->groupHandler->isStaff() && Cfg::get('email_all_parents') == 1) {
-	            $allSynergyIds = implode(',', $synergyIds);
-
 	            $externalHandler = new External_User();
-	            $allParents = $externalHandler->getParentEmails($allSynergyIds);
+	            $allParents = $externalHandler->getParentEmails($synergyIds);
 
 	            /* Uniquify emails
 				*/

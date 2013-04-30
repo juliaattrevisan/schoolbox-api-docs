@@ -66,11 +66,11 @@ class External_User implements External_UserInterface {
     /**
      * Returns a list of emails for parents of the listed students
      *
-     * @param Integer $externalUserId
-     * @return Array
+     * @param array $synergyIds
+     * @return array
      */
-    public function getParentEmails($externalUserId) {
-        return $this->getDatabase()->getParentEmails($externalUserId);
+    public function getParentEmails($synergyIds) {
+        return $this->getDatabase()->getParentEmails($synergyIds);
     }
 
 

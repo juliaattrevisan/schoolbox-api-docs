@@ -37,20 +37,21 @@ class External_Denbigh_User implements External_UserInterface {
     /**
      * Returns a list of email parent email addresseses for students.  Note this can accept a list of student ids, as per a class list or group
      *
-     * @param $externalUserId
+     * @param array $synergyIds
      *
      * @return array
      */
     public function getParentEmails($synergyIds) {
 
 	    $emailList = array();
+	    $id_list   = implode(',', array_map('intval', $synergyIds));
 
 	    $statement = $this->getExternalDatabase()->query(
             "
 			SELECT Family.email
 			FROM Schoolbox_Students
 			LEFT JOIN Family ON Schoolbox_Students.familyDenbighID = Family.familyDenbighID
-			WHERE Schoolbox_Students.denbighID IN ($synergyIds)
+			WHERE Schoolbox_Students.denbighID IN ($id_list)
 		"
         );
 

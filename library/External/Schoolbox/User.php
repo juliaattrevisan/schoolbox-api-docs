@@ -34,13 +34,14 @@ class External_Schoolbox_User implements External_UserInterface {
 	/**
 	 * Get all the parents of the $synergyIds
 	 *
-	 * @param $externalUserId
+	 * @param array $synergyIds
 	 *
-	 * @return array|bool
+	 * @return array
 	 */
-	public function getParentEmails($externalUserId) {
+	public function getParentEmails($synergyIds) {
 
 		$emailList = array();
+		$id_list   = implode(',', array_map('intval', $synergyIds));
 
 		$statement = $this->getDatabase()->prepare("
 			SELECT
@@ -49,12 +50,10 @@ class External_Schoolbox_User implements External_UserInterface {
 			FROM user
 			INNER JOIN user_relation ON user.id = user_relation.user_id
 			INNER JOIN user parent ON parent.id = user_relation.relation_id
-			WHERE user.synergy_id IN(:externalUserId)
+			WHERE user.synergy_id IN ($id_list)
 		");
 
-		$statement->execute(array(
-			':externalUserId' => $externalUserId
-		));
+		$statement->execute();
 
 		while($row = $statement->fetch(PDO::FETCH_ASSOC) ) {
 			$emailList[] = $row['StudentContactEmail'];

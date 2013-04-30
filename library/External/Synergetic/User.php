@@ -146,13 +146,14 @@ class External_Synergetic_User implements External_UserInterface {
 	/**
 	 * Get all the parents emails for a class, or group of students
 	 *
-	 * @param $synergyIds
+	 * @param array $synergyIds
 	 *
-	 * @return array|bool
+	 * @return array
 	 */
 	public function getParentEmails($synergyIds) {
 
 		$emailList = array();
+		$id_list   = implode(',', array_map('intval', $synergyIds));
 
 		$query = "
 			SELECT
@@ -161,7 +162,7 @@ class External_Synergetic_User implements External_UserInterface {
 				SynergyOne.dbo.RelationShips r
 				JOIN SynergyOne.dbo.vCommunityAddresses ON RelatedID=vCommunityAddresses.ID
 			WHERE
-				r.ID IN ($synergyIds)";
+				r.ID IN ($id_list)";
 
 		$this->getDatabase()->query($query);
 		while ($row = $this->getDatabase()->getNextArray()) {

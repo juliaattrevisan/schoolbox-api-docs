@@ -144,10 +144,8 @@ if ($groupHandler->isStaff()) {
             /* Parent bulk email
              */
             if (count($synergyIds)) {
-                $allSynergyIds = implode(',', $synergyIds);
-
                 $externalHandler = new External_User();
-                $allParents = $externalHandler->getParentEmails($allSynergyIds);
+                $allParents = $externalHandler->getParentEmails($synergyIds);
 
                 /* Uniquify emails
                 */
