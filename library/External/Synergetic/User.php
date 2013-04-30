@@ -144,29 +144,44 @@ class External_Synergetic_User implements External_UserInterface {
 	}
 
 	/**
-	 * Get all the parents of the students id $synergyIds
+	 * Get all the parents emails for a class, or group of students
 	 *
-	 * @param $synergyIds
+	 * @param array $synergyIds
 	 *
-	 * @return array|bool
+	 * @return array
 	 */
-	public function getParentsOf($synergyIds) {
+	public function getParentEmails($synergyIds) {
+
+		$emailList = array();
+		$id_list   = implode(',', array_map('intval', $synergyIds));
+
 		$query = "
 			SELECT
-				StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
-				StudentContactAddress1, StudentContactSuburb, StudentContactPostCode, StudentContactState,
-				StudentContactPhoneActual, StudentContactMobilePhone, StudentContactOccupPhone,
-				StudentContactSpouseID, StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseSurname,
-				StudentContactSpouseMobilePhone, StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail, StudentContactType
+				RelatedID,UseEmail,OccupEmail,Email,DefaultEmail
 			FROM
-				SynergyOne.dbo.vStudentContactAllAddress
+				SynergyOne.dbo.RelationShips r
+				JOIN SynergyOne.dbo.vCommunityAddresses ON RelatedID=vCommunityAddresses.ID
 			WHERE
-				StudentID IN ($synergyIds)
-				AND (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
-				AND FileSemester = " . $_SESSION['FileSemester'] . "
-				AND FileYear = " . $_SESSION['FileYear'];
+				r.ID IN ($id_list)";
 
-		return $this->getDatabase()->getAll($query);
+		$this->getDatabase()->query($query);
+		while ($row = $this->getDatabase()->getNextArray()) {
+			switch($row['UseEmail']) {
+				case 'O': //Use occupation email address
+					$emailList[] = $row['OccupEmail'];
+					break;
+				case 'P': //Use personal email address
+					$emailList[] = $row['Email'];
+					break;
+				case 'D': //Use default email address
+				default:
+					$emailList[] = $row['DefaultEmail'];
+					break;
+			}
+
+		}
+
+		return $emailList;
 	}
 
 	/**

@@ -34,44 +34,31 @@ class External_Schoolbox_User implements External_UserInterface {
 	/**
 	 * Get all the parents of the $synergyIds
 	 *
-	 * @param $externalUserId
+	 * @param array $synergyIds
 	 *
-	 * @return array|bool
+	 * @return array
 	 */
-	public function getParentsOf($externalUserId) {
+	public function getParentEmails($synergyIds) {
+
+		$emailList = array();
+		$id_list   = implode(',', array_map('intval', $synergyIds));
+
 		$statement = $this->getDatabase()->prepare("
 			SELECT
 				parent.synergy_id AS StudentContactID,
-				parent.title AS StudentContactTitle,
-				parent.firstname AS StudentContactPreferred,
-				parent.lastname AS StudentContactSurname,
 				parent.alt_email AS StudentContactEmail,
-				'' AS StudentContactAddress1,
-				'' AS StudentContactSuburb,
-				'' AS StudentContactPostCode,
-				'' AS StudentContactState,
-				'' AS StudentContactPhoneActual,
-				'' AS StudentContactMobilePhone,
-				'' AS StudentContactOccupPhone,
-				'' AS StudentContactSpouseID,
-				'' AS StudentContactSpouseTitle,
-				'' AS StudentContactSpousePreferred,
-				'' AS StudentContactSpouseSurname,
-				'' AS StudentContactSpouseMobilePhone,
-				'' AS StudentContactSpouseOccupPhone,
-				'' AS StudentContactSpouseDefaultEmail,
-				'' AS StudentContactType
 			FROM user
 			INNER JOIN user_relation ON user.id = user_relation.user_id
 			INNER JOIN user parent ON parent.id = user_relation.relation_id
-			WHERE user.synergy_id IN(:externalUserId)
+			WHERE user.synergy_id IN ($id_list)
 		");
 
-		$statement->execute(array(
-			':externalUserId' => $externalUserId
-		));
+		$statement->execute();
 
-		return $statement->fetch(PDO::FETCH_ASSOC);
+		while($row = $statement->fetch(PDO::FETCH_ASSOC) ) {
+			$emailList[] = $row['StudentContactEmail'];
+		}
+		return $emailList;
 	}
 
 	/**

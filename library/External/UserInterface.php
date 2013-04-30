@@ -12,7 +12,14 @@ interface External_UserInterface {
 
     public function getParentSync($externalUserId);
 
-    public function getParentsOf($externalUserId);
+    /**
+     * Returns a list of email parent email addresseses for students.
+     *
+     * @param array $synergyIds
+     *
+     * @return array
+     */
+    public function getParentEmails($synergyIds);
 
     public function getStudent($externalUserId);
 

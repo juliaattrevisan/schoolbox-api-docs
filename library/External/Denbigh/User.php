@@ -35,32 +35,31 @@ class External_Denbigh_User implements External_UserInterface {
     }
 
     /**
-     * Get a comma-separated list of parent emails that notifications should be sent to.
-     * This is a Kings specific method.
+     * Returns a list of email parent email addresseses for students.  Note this can accept a list of student ids, as per a class list or group
      *
-     * @param $externalUserId
+     * @param array $synergyIds
      *
      * @return array
      */
-    public function getParentEmails($externalUserId) {
-        $statement = $this->getExternalDatabase()->query(
+    public function getParentEmails($synergyIds) {
+
+	    $emailList = array();
+	    $id_list   = implode(',', array_map('intval', $synergyIds));
+
+	    $statement = $this->getExternalDatabase()->query(
             "
 			SELECT Family.email
 			FROM Schoolbox_Students
 			LEFT JOIN Family ON Schoolbox_Students.familyDenbighID = Family.familyDenbighID
-			WHERE Schoolbox_Students.denbighID = $externalUserId
+			WHERE Schoolbox_Students.denbighID IN ($id_list)
 		"
         );
 
-        $parentList = $statement->fetch(PDO::FETCH_ASSOC);
-
-        if (is_array($parentList)) {
-            $parentEmails = $parentList['email'];
+        while($parent = $statement->fetch(PDO::FETCH_ASSOC)) {
+	        $emailList = $parent['email'];
         }
 
-        $allEmails = explode(',', $parentEmails);
-
-        return $allEmails;
+        return $emailList;
     }
 
     /**
@@ -140,18 +139,6 @@ class External_Denbigh_User implements External_UserInterface {
     }
 
     public function getParentSync($externalUserId) {
-
-    }
-
-
-    /**
-     * Get all the parents of the students id
-     *
-     * @param $synergyIds
-     *
-     * @return array|bool
-     */
-    public function getParentsOf($externalUserId) {
 
     }
 
