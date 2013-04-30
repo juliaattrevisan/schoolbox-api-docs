@@ -117,19 +117,21 @@
             <!-- BEGIN subject_item -->
             <li>
                 <div class="subject">
-                    <a class="to-subject" href="#">
+                    <a class="to-subject" href="{SUBJECT_URL}">
                         {SUBJECT_NAME}
                         <span class="icon"></span>
                     </a>
                 </div>
+                <!-- BEGIN subject_teacher -->
                 <div class="profile">
-                    <a href="#" class="teacher-profile">
-                        <img src="/portrait.php?userId={SUBJECT_TEACHER_ID}&size=square32" />
+                    <a href="/search/user/{SUBJECT_TEACHER_ID}" class="teacher-profile">
+                        <img src="/portrait.php?userId={SUBJECT_TEACHER_EXTERNAL_ID}&size=square32" />
                         <span class="name">{SUBJECT_TEACHER_NAME}</span>
                         <span class="role">Teacher</span>
                     </a>
-                    <a class="mail-teacher" href="#">Mail</a>
+                    <a class="mail-teacher" href="{SUBJECT_TEACHER_EMAIL}">Mail</a>
                 </div>
+                <!-- END subject_teacher -->
             </li>
             <!-- END subject_item -->
         </ul>
@@ -143,6 +145,35 @@
         </form>
         <!-- END subject_mail -->
         <!-- END subject -->
+
+        <!-- BEGIN group -->
+        <h2>Groups</h2>
+
+        <!-- BEGIN group_row -->
+        <ul>
+            <!-- BEGIN group_item -->
+            <li>
+                <div class="subject">
+                    <a class="to-subject" href="{GROUP_URL}">
+                        {GROUP_NAME}
+                        <span class="icon"></span>
+                    </a>
+                </div>
+                <!-- BEGIN group_teacher -->
+                <div class="profile">
+                    <a href="/search/user/{SUBJECT_TEACHER_ID}" class="teacher-profile">
+                        <img src="/portrait.php?userId={SUBJECT_TEACHER_EXTERNAL_ID}&size=square32" />
+                        <span class="name">{SUBJECT_TEACHER_NAME}</span>
+                        <span class="role">Group Admin</span>
+                    </a>
+                    <a class="mail-teacher" href="{SUBJECT_TEACHER_EMAIL}">Mail</a>
+                </div>
+                <!-- END group_teacher -->
+            </li>
+            <!-- END group_item -->
+        </ul>
+        <!-- END group_row -->
+        <!-- END group -->
     </div>
 
 
@@ -162,7 +193,7 @@
             <ul class="contact-phone">
                 <li>
                     <div class="profile">
-                        <a href="#" class="teacher-profile">
+                        <a href="/search/user/{CONTACT_ID}" class="teacher-profile">
                             <span class="name">{CONTACT_NAME}</span>
                             <span class="role">{CONTACT_ROLE}</span>
                             <span class="icon"></span>
@@ -184,7 +215,7 @@
             <ul class="contact-phone">
                 <li>
                     <div class="profile">
-                        <a href="#" class="teacher-profile">
+                        <a href="/search/user/{SPOUSE_ID}" class="teacher-profile">
                             <span class="name">{SPOUSE_NAME}</span>
                             <span class="role">{SPOUSE_ROLE}</span>
                             <span class="icon"></span>

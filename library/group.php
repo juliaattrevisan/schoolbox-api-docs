@@ -254,9 +254,9 @@ class Group extends DeprecatedModel
 	{
 
 		//get the owner(s) of the group
-		$query = "SELECT title, firstname, lastname, uid
+		$query = "SELECT title, firstname, lastname, uid, alt_email, local_email, username
 				  FROM userAccess, user
-				  WHERE uid = id AND service = " . $this->_service . " AND sid = $relationID AND type = '" . FULL_ACCESS;
+				  WHERE uid = id AND service = " . $this->_service . " AND sid = $relationID AND type = " . FULL_ACCESS;
 		return $this->db->getRow($query); //only one owner at the moment
 	}
 
