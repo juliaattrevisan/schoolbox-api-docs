@@ -43,6 +43,7 @@ switch($_POST['action']) {
 			'groupList' => $_POST['groupCheck'],
 			'type' => $_POST['type'],
 			'note' => $_POST['note'],
+			'allday' => !empty($_POST['allday']),
 			'startDate' => $startDate->getDatabaseDate(),
 			'startTime' => $startDate->getDatabaseTime(),
 			'endDate' => $endDate->getDatabaseDate(),
