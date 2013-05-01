@@ -58,10 +58,7 @@ function Calendar(id, bubbleId, opts) {
             },
             date: null,
             month: null,
-            year: null,
-			eventAfterAllRender: function(view) {
-				//
-			}
+            year: null
         },
         datepickerIcon: "/images/core/calendar/calendar-click.png",
         x: true
@@ -168,8 +165,7 @@ function Calendar(id, bubbleId, opts) {
 
             //
             // Jam them back in, and re-render.
-            cal.dom.fullCalendar('events', events);
-            cal.dom.fullCalendar('rerenderEvents');
+            cal.dom.fullCalendar('events', events).fullCalendar('rerenderEvents');
 
             // only send data to the server if we actually need to
             if(performAjax) {
