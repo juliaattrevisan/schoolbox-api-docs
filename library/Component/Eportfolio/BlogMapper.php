@@ -27,7 +27,7 @@ class Component_Eportfolio_BlogMapper extends Mapper {
 
 		$this->hasMap(array(
 			'column'     => 'page_id',
-			'property'   => 'page_id',
+			'property'   => 'pageId',
 			'type'       => Mapper::TYPE_INTEGER,
 		));
 

@@ -17,6 +17,13 @@ class Component_Eportfolio_Blog extends Model {
 	public $id;
 
 	/**
+	 * The page on which this blog post will be shown
+	 *
+	 * @var
+	 */
+	public $pageId;
+
+	/**
 	 * The owner of the blog post
 	 *
 	 * @var
@@ -183,5 +190,23 @@ class Component_Eportfolio_Blog extends Model {
 	 */
 	public function getUpdatedAt() {
 		return $this->updated_at;
+	}
+
+	/**
+	 * Set page id
+	 *
+	 * @param  $pageId
+	 */
+	public function setPageId($pageId) {
+		$this->pageId = $pageId;
+	}
+
+	/**
+	 * Get page id
+	 *
+	 * @return
+	 */
+	public function getPageId() {
+		return $this->pageId;
 	}
 }
