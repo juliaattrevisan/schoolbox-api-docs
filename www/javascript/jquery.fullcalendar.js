@@ -145,16 +145,24 @@ function Calendar(id, bubbleId, opts) {
                 // (filters are in event.className) to be rendered.
                 $j.each(event.className, function(class_no, classes) {
                     var is_filter_selected = false;
-                    var this_classes       = classes.trim().split(/\s+/);
-                    //
-                    // Check that at least one class in this_classes is in
-                    // selected_classes.
-                    $j.each(selected_classes, function(selected_class_no, selected_class) {
-                        if (this_classes.lastIndexOf(selected_class) >= 0) {
-                            is_filter_selected = true;
-                            return false;
-                        }
-                    });
+                    if (!classes.trim().length) {
+                        //
+                        // No classes in this filter? Let's say this filter is
+                        // selected.
+                        is_filter_selected = true;
+                    }
+                    else {
+                        var this_classes = classes.trim().split(/\s+/);
+                        //
+                        // Check that at least one class in this_classes is in
+                        // selected_classes.
+                        $j.each(selected_classes, function(selected_class_no, selected_class) {
+                            if (this_classes.lastIndexOf(selected_class) >= 0) {
+                                is_filter_selected = true;
+                                return false;
+                            }
+                        });
+                    }
                     if (!is_filter_selected) {
                         is_rendered = false;
                         return false;
