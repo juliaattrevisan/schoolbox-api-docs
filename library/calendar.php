@@ -324,8 +324,8 @@ class Calendar extends DeprecatedModel {
     function getAllInCategory($categoryID, $config = false) {
 
         //event limit changed from posts to days
-        if ($config['size'] != 0 && $config['size'] != '') {
-            $where = " AND date < ADDDATE(CURDATE(), INTERVAL {$config['size']} DAY) ";
+        if ($config['days'] != 0 && $config['days'] != '') {
+            $where = " AND startDate < ADDDATE(CURDATE(), INTERVAL {$config['size']} DAY) ";
         } else {
             $where = "";
         }
@@ -343,7 +343,9 @@ class Calendar extends DeprecatedModel {
 				  LEFT JOIN user ON owner = user.id
 				  LEFT JOIN luEventType ON type = eventTypeID
 				  WHERE access = '2' AND sid = '" . $categoryID . "' AND( startDate >= CURRENT_DATE() $where) ORDER BY startDate, startTime";
-
+		if (!empty($config['size'])) {
+			$query .= ' LIMIT '.$config['size'];
+		}
         return $this->db->getAll($query);
     }
 

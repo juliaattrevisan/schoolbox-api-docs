@@ -47,7 +47,11 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
         $calendarHandler = new Calendar;
         $eventList = $calendarHandler->getAllInCategory(
-            $this->getContext('id'), array('size', $this->getConfig('size'))
+            $this->getContext('id'),
+            array(
+                'size' => $this->getConfig('size'),
+                'days' => $this->getConfig('days'),
+            )
         );
 
         $this->setVar('CALENDAR_TITLE', 'Group Calendar');
