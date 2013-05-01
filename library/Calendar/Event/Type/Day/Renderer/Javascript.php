@@ -138,15 +138,6 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 			$start = $currentEvent->getStartTime()->getDatabaseDate() . ' ' . $currentEvent->getStartTime()->getDatabaseTime();
 			$end = $currentEvent->getEndTime()->getDatabaseDate() . ' ' . $currentEvent->getEndTime()->getDatabaseTime();
 
-            /* Make tasks allDay events by default
-             */
-            if ($this->isTask($currentEvent)) {
-                $allDay = true;
-            }
-            else {
-                $allDay = false;
-            }
-
 			//
 			// Add campus list to list of classes
 			$classes = array(
@@ -158,7 +149,9 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 				$campus = 'campus'.trim($campus);
 			}
 			unset($campus);
-			$classes[] = implode(' ', $campus_list);
+			if (!empty($campus_list)) {
+				$classes[] = implode(' ', $campus_list);
+			}
 
 			$event = array(
 				'title' => $currentEvent->getNote(),
@@ -175,7 +168,7 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 				 * Schoolbox usage would be that all events are not
 				 * allDay events
 				 */
-				'allDay' => $allDay,
+				'allDay' => $currentEvent->getAllDay(),
 
 				/* Colour of the event
 				 */

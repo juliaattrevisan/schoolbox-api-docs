@@ -647,7 +647,7 @@ class Calendar extends DeprecatedModel {
         $query = "
 			SELECT DISTINCT event.id, owner,
 				GROUP_CONCAT(DISTINCT eventCampus.campusID) as campusList,
-				startDate, startTime, endDate, endTime,
+				startDate, startTime, endDate, endTime, allday,
 				SUBSTR(event.startDate, 1, 4) AS year,
 				type, note, access, sid, location, detail, attendance,
 				user.id as uid, title, firstname, lastname,
@@ -712,6 +712,7 @@ class Calendar extends DeprecatedModel {
                 $event->setLocation($currentEvent['location']);
                 $event->setPublishDate($currentEvent['publish_date']);
                 $event->setSid($currentEvent['sid']);
+                $event->setAllDay(!empty($currentEvent['allday']));
 
 				if ($this->getPerm($currentEvent) > 1) {
                     $event->setIsEditable(true);
