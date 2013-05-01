@@ -153,12 +153,12 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 				$currentEvent->getDerivedEventLevel(),
 				'type' . $currentEvent->getType()
 			);
-			$campus_list = explode(',', $currentEvent->getCampusList());
-			foreach ($campus_list as $campus_id) {
-				if ($campus_id) {
-					$classes[] = 'campus'.trim($campus_id);
-				}
+			$campus_list = array_filter(array_map('trim', explode(',', $currentEvent->getCampusList())));
+			foreach ($campus_list as &$campus) {
+				$campus = 'campus'.trim($campus);
 			}
+			unset($campus);
+			$classes[] = implode(' ', $campus_list);
 
 			$event = array(
 				'title' => $currentEvent->getNote(),
