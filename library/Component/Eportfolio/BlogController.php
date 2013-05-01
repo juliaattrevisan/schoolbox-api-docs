@@ -46,8 +46,8 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 		 */
 		$this->setBlock($templateHandle, 'has_create_form', 'has_create_form_block');
 		$this->setBlock($templateHandle, 'list_item', 'list_item_block');
+		$this->setBlock($templateHandle, 'create_text', 'create_text_block');
 		$this->setBlock('list_item', 'modify_text', 'modify_text_block');
-		$this->setBlock('list_item', 'create_text', 'create_text_block');
 		$this->setBlock('list_item', 'has_modify_form', 'has_modify_form_block');
 		$this->setBlock('list_item', 'has_delete_form', 'has_delete_form_block');
 
@@ -106,7 +106,6 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 				$this->setVar('has_modify_form_block', '');
 				$this->setVar('has_delete_form_block', '');
 				$this->setVar('modify_text_block', '');
-				$this->setVar('create_text_block', '');
 			}
 		}
 
