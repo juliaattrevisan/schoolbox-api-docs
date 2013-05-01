@@ -63,7 +63,12 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 		/* Controls
 		 */
 		if ($this->permission >= WRITE_ACCESS) {
-			$this->parse('has_create_form_block', 'has_create_form');
+			if ($this->sitepage->arg[3] == 'create') {
+				$this->parse('has_create_form_block', 'has_create_form');
+			}
+			else {
+				$this->parse('create_text_block', 'create_text');
+			}
 		}
 
 		/* Gather everything
@@ -75,6 +80,7 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 				$updatedAt = new Alaress_Date_Format($currentItem->getUpdatedAt(), 'y-m-d h:i:s');
 
 				$this->setVar(array(
+					'LIST_ITEM_ID' => $currentItem->getId(),
 					'LIST_ITEM_TITLE' => $currentItem->getTitle(),
 					'LIST_ITEM_CONTENT' => $currentItem->getContent(),
 					'LIST_ITEM_UPDATED_AT' => $updatedAt->getShort(),
@@ -83,7 +89,7 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 				/* If modifying this textbox
 				 */
 				if ($this->permission >= WRITE_ACCESS) {
-					if (($this->sitepage->arg[2] == 'blog') && ($this->sitepage->arg[4] == $this->instance->id)) {
+					if (($this->sitepage->arg[2] == 'blog') && ($this->sitepage->arg[3] == 'modify') &&  ($this->sitepage->arg[4] == $this->instance->id)) {
 						$this->parse('has_modify_form_block', 'has_modify_form');
 					}
 					else {

@@ -9,10 +9,14 @@
 		<input type='hidden' name='pageId' value='{PAGE_ID}' />
 
 		<input type='text' name='title' value='' />
-		<textarea type='text' name='content' value='' /></textarea>
+		<textarea type='text' name='content' class='mceEditor' /></textarea>
 		<input type='submit' value='Add item' />
 	</form>
 	<!-- END has_create_form -->
+
+	<!-- BEGIN create_text -->
+	<a href="/eportfolio/{USER_ID}/{PAGE_ID}/blog/create/{COMPONENT_INSTANCE_ID}#modify_blog_form_{COMPONENT_INSTANCE_ID}" class="btn modify"><span></span>Create</a>
+	<!-- END create_text -->
 
 	<ol>
 		<!-- BEGIN list_item -->
@@ -49,10 +53,6 @@
 			<!-- BEGIN modify_text -->
 			<a href="/eportfolio/{USER_ID}/{PAGE_ID}/blog/modify/{COMPONENT_INSTANCE_ID}#modify_blog_form_{COMPONENT_INSTANCE_ID}" class="btn modify"><span></span>Modify</a>
 			<!-- END modify_text -->
-
-			<!-- BEGIN create_text -->
-			<a href="/eportfolio/{USER_ID}/{PAGE_ID}/blog/create/{COMPONENT_INSTANCE_ID}#modify_blog_form_{COMPONENT_INSTANCE_ID}" class="btn modify"><span></span>Create</a>
-			<!-- END create_text -->
 
 			<!-- BEGIN has_delete_form -->
 			<form action='/eportfolio/component/blog/modifyForm.php' method='post'>
