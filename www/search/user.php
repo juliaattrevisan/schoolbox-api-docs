@@ -20,7 +20,6 @@ if (is_numeric($this->arg[0])) {
     if ($groupHandler->isStudent($user['uid'])) {
         $this->setFile(TEMPLATE_content, 'user/student.html');
         $this->setBlock(TEMPLATE_content, "portrait", "portrait_block");
-        $this->setBlock(TEMPLATE_content, "school_links", "school_links_block");
         $this->setBlock(TEMPLATE_content, "timetable_link", "timetable_link_block");
         $this->setBlock(TEMPLATE_content, "due_work", "due_work_block");
         $this->setBlock(TEMPLATE_content, "helpdesk", "helpdesk_block");
@@ -89,7 +88,6 @@ if (is_numeric($this->arg[0])) {
         'contact_synergy_block' => '',
         'due_work_block' => '',
         'helpdesk_block' => '',
-        'school_links_block' => '',
         'parent_synergy_form_block' => '',
         'parent_spouse_block' => '',
         'staff_synergy_block' => '',
@@ -550,10 +548,7 @@ if (is_numeric($this->arg[0])) {
 	            }
 
 
-                if ($groupHandler->isStaff() || (Cfg::get('site_location') != 'mgs' && $groupHandler->isParentOfChild(
-                    $user['uid']
-                ))
-                ) {
+                if ($groupHandler->isStaff() || (Cfg::get('site_location') != 'mgs' && $groupHandler->isParentOfChild($user['uid']))) {
                     if (trim($synInfo['StudentMedicalAlert'])) {
                         $this->parse('medical_block', 'medical');
                     }
@@ -568,7 +563,6 @@ if (is_numeric($this->arg[0])) {
                 }
 
                 if (Cfg::get('site_location') == 'wenona') {
-                    $this->parse('school_links_block', 'school_links');
                     $this->parse('edit_emergency_block', 'edit_emergency');
                     $this->parse('edit_contact_block', 'edit_contact');
                 }
