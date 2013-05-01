@@ -51,9 +51,10 @@ if ($endTime->getDatabaseDate() != $startTime->getDatabaseDate()) {
  */
 $updatedEvent = array();
 $updatedEvent['id'] = $event['id'];
-$updatedEvent['date'] = $startTime->getDatabaseDate();
+$updatedEvent['startDate'] = $startTime->getDatabaseDate();
 $updatedEvent['startTime'] = $startTime->getDatabaseTime();
-$updatedEvent['endTime'] = $endTime->getDatabaseTime();
+$updatedEvent['endDate']   = $endTime->getDatabaseDate();
+$updatedEvent['endTime']   = $endTime->getDatabaseTime();
 
 /* For tasks
  */
