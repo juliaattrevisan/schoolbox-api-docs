@@ -52,6 +52,7 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 		$this->setBlock('list_item', 'has_delete_form', 'has_delete_form_block');
 		$this->setBlock('list_item', 'has_comments', 'has_comments_block');
 		$this->setBlock('has_comments', 'comment', 'comment_block');
+		$this->setBlock('comment', 'has_delete_comment_form', 'has_delete_comment_form_block');
 
 		$this->setVar(array(
 			'has_create_form_block' => '',
@@ -61,11 +62,16 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 			'create_text_block' => '',
 			'has_comments_block' => '',
 			'comment_block' => '',
+			'has_delete_comment_form_block' => '',
 			'list_item_block' => '',
 		));
 
 		/* Controls
 		 */
+		$this->setVar(array(
+			'COMMENT_AUTHOR_ID' => $_SESSION['id'],
+		));
+
 		if ($this->permission >= WRITE_ACCESS) {
 			if ($this->sitepage->arg[3] == 'create') {
 				$this->parse('has_create_form_block', 'has_create_form');
@@ -102,11 +108,21 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 						$commentAuthor = NewUserMapper::getInstance()->findById($currentComment->getUid());
 
 						$this->setVar(array(
+							'COMMENT_ID' => $currentComment->getId(),
 							'COMMENT_EXTERNAL_USER_ID' => $commentAuthor->getSynergyId(),
 							'COMMENT_AUTHOR_FIRSTNAME' => $commentAuthor->getFirstname(),
 							'COMMENT_AUTHOR_LASTNAME' => $commentAuthor->getLastname(),
 							'COMMENT_CONTENT' => $currentComment->getContent(),
 						));
+
+						/* Controls for deleting comments
+						 */
+						if ($this->permission >= WRITE_ACCESS) {
+							$this->parse('has_delete_comment_form_block', 'has_delete_comment_form');
+						}
+						else {
+							$this->setVar('has_delete_comment_form_block', '');
+						}
 
 						$this->parse('comment_block', 'comment', true);
 					}
@@ -116,6 +132,7 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 					/* Clear children after parsing out the parent
 					 */
 					$this->setVar('comment_block', '');
+					$this->setVar('has_delete_comment_form_block', '');
 				}
 
 				/* If modifying this textbox
