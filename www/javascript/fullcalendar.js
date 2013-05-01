@@ -1658,7 +1658,13 @@
 
 
 	function segCmp(a, b) {
-		return (b.msLength - a.msLength) * 100 + (a.event.start - b.event.start);
+		var comp = (b.msLength - a.msLength) * 100 + (a.event.start - b.event.start);
+		//
+		// Hack of compare method to ensure sort by name when comp is otherwise equal
+		if (comp === 0 && (typeof String.prototype.localeCompare === 'function')) {
+			return a.event.title.localeCompare(b.event.title);
+		}
+		return comp;
 	}
 
 
