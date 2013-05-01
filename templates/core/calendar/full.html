@@ -38,9 +38,14 @@
                  */
                 eventRender: function(calEvent, jsEvent, view) {
 
-					if ('is_rendered' in calEvent && !(calEvent.is_rendered)) {
-						return false;
-					}
+                    if ('is_rendered' in calEvent && !(calEvent.is_rendered)) {
+                        return false;
+                    }
+
+                    //
+                    // newer fullCalendar implementations escape event title -
+                    // we've already done this, so reset the title.
+                    jsEvent.find('.fc-event-title').html(calEvent.title);
 
                     // If appropriate, indicate this event can be attended
                     var span = '<span class="att">(A)</span>';
