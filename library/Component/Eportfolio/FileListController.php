@@ -56,6 +56,8 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 		$allItems = $this->getMapperClass()->findByColumn('component_instance_id', $this->instance->id);
 
 		if ($allItems->count()) {
+			$j = 0;
+
 			for ($allItems->rewind(); $allItems->valid(); $allItems->next()) {
 				$currentItem = $allItems->current();
 
@@ -74,6 +76,8 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 					'FILE_ITEM_FILENAME' => $file['realname'],
 					'FILE_ITEM_MIMETYPE' => $mimeMapper->findByColumn('mime', $file['mime_type'])->current()->getClass(),
 					'FILE_ITEM_CREATED_AT' => $createdAt->getShort(),
+					'ON_OFF' => ++$j % 2 ? '' : 'dark',
+					'FILE_ITEM_FILESIZE' => Alaress_Byte_Format::bytesToString($file['file_size']),
 				));
 
 				/* Controls

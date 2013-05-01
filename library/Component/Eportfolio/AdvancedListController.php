@@ -46,6 +46,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 		 */
 		$this->setBlock($templateHandle, 'has_create_form', 'has_create_form_block');
 		$this->setBlock($templateHandle, 'list_item', 'list_item_block');
+		$this->setBlock('list_item', 'has_modify_button', 'has_modify_button_block');
 		$this->setBlock('list_item', 'has_modify_form', 'has_modify_form_block');
 		$this->setBlock('list_item', 'has_delete_form', 'has_delete_form_block');
 		$this->setBlock('list_item', 'has_image', 'has_image_block');
@@ -69,6 +70,8 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 		$allItems = $this->getMapperClass()->findByColumn('component_instance_id', $this->instance->id);
 
 		if ($allItems->count()) {
+			$j = 0;
+
 			for ($allItems->rewind(); $allItems->valid(); $allItems->next()) {
 				$currentItem = $allItems->current();
 
@@ -76,6 +79,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 					'LIST_ITEM_ID' => $currentItem->getId(),
 					'LIST_ITEM_TITLE' => $currentItem->getTitle(),
 					'LIST_ITEM_CONTENT' => $currentItem->getContent(),
+					'ON_OFF' => ++$j % 2 ? '' : 'dark'
 				));
 
 				/* Parse out the image if one was assigned
@@ -91,6 +95,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 				/* Controls
 				 */
 				if ($this->permission >= WRITE_ACCESS) {
+					$this->parse('has_modify_button_block', 'has_modify_button');
 					$this->parse('has_modify_form_block', 'has_modify_form');
 					$this->parse('has_delete_form_block', 'has_delete_form');
 				}
@@ -100,6 +105,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 				/* Clear children after parsing out the parent
 				 */
 				$this->setVar('has_image_block', '');
+				$this->setVar('has_modify_button_block', '');
 				$this->setVar('has_modify_form_block', '');
 				$this->setVar('has_delete_form_block', '');
 			}

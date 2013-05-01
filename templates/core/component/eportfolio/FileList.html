@@ -1,31 +1,27 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
 	<h2>{COMPONENT_NAME}</h2>
 	{CONFIGURATION}
+    <table class="showcased-work">
+        <colgroup>
+            <col width="46">
+            <col>
+            <col width="30">
+        </colgroup>
+        <tbody>
+        <!-- BEGIN list_item -->
+        <tr class="{ON_OFF}">
+            <td class="icon"><a class="icons {FILE_ITEM_MIMETYPE}" href="/cms/sendMyFile.php?id={FILE_ITEM_ID}"></a></td>
+            <td><a class="title" href="/cms/sendMyFile.php?id={FILE_ITEM_ID}">
+                {FILE_ITEM_TITLE}</a> ({FILE_ITEM_FILESIZE})<br />
+                Published on {FILE_ITEM_CREATED_AT}</td>
+            <td>
+                <!-- BEGIN has_unpublish_form -->
+                <a class="btn no-text delete" title="Unpublish file" href='/eportfolio/component/filelist/modifyForm.php&action=removeItem&userId={USER_ID}&pageId={PAGE_ID}&componentInstanceId={COMPONENT_INSTANCE_ID}&listItemId={LIST_ITEM_ID}'><span></span></a>
+                <!-- END has_unpublish_form -->
+            </td>
+        </tr>
+        <!-- END list_item -->
+        </tbody>
+    </table>
 
-	<ol>
-		<!-- BEGIN list_item -->
-		<li>
-			<div id='list_item_link_content_{LIST_ITEM_ID}'>
-				<a class='icons {FILE_ITEM_MIMETYPE}'></a>
-				<a href='/cms/sendMyFile.php?id={FILE_ITEM_ID}'>
-					{FILE_ITEM_TITLE}<br />
-					{FILE_ITEM_FILENAME}<br />
-				</a>
-				Published on {FILE_ITEM_CREATED_AT}
-			</div>
-
-			<!-- BEGIN has_unpublish_form -->
-			<form action='/eportfolio/component/filelist/modifyForm.php' method='get'>
-				<input type='hidden' name='action' value='removeItem' />
-				<input type='hidden' name='userId' value='{USER_ID}' />
-				<input type='hidden' name='pageId' value='{PAGE_ID}' />
-				<input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
-				<input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
-
-				<input type='submit' value='Unpublish' />
-			</form>
-			<!-- END has_unpublish_form -->
-		</li>
-		<!-- END list_item -->
-	</ol>
 </div>

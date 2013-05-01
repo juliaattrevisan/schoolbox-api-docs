@@ -1,34 +1,35 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+
 	<h2>{COMPONENT_NAME}</h2>
 	{CONFIGURATION}
 
-	<div id='textbox_content_{COMPONENT_INSTANCE_ID}'>
-		<div>
-			{TEXTBOX_CONTENT}
-		</div>
+	<div id='textbox_content_{COMPONENT_INSTANCE_ID}' class="wysiwyg clearfix">
+            {TEXTBOX_CONTENT}
 	</div>
 
 	<!-- BEGIN has_modify_form -->
-	<form id='modify_textbox_form_{COMPONENT_INSTANCE_ID}' class='modifyForm' action='/eportfolio/component/textbox/modifyForm.php' method='post' style='padding:10px;background-color:#fdd'>
-		<input type='hidden' name='action' value='updateItem' />
-		<input type='hidden' name='userId' value='{USER_ID}' />
-		<input type='hidden' name='pageId' value='{PAGE_ID}' />
-		<input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
-		<input type='hidden' name='textboxId' value='{COMPONENT_INSTANCE_ID}' />
+    <form id='modify_textbox_form_{COMPONENT_INSTANCE_ID}' class='modifyForm' action='/eportfolio/component/textbox/modifyForm.php' method='post'>
+        <input type='hidden' name='action' value='updateItem' />
+        <input type='hidden' name='userId' value='{USER_ID}' />
+        <input type='hidden' name='pageId' value='{PAGE_ID}' />
+        <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
+        <input type='hidden' name='textboxId' value='{COMPONENT_INSTANCE_ID}' />
 
-		<label>
-			<textarea name='content' class='mceEditor'>{TEXTBOX_CONTENT}</textarea>
-		</label>
+        <textarea name='content' class='mceEditor' rows="20" style="width: 100%;">{TEXTBOX_CONTENT}</textarea>
 
-		<input type='submit' value='Update' />
-	</form>
+
+        <input type='submit' value='Update' />
+    </form>
 	<!-- END has_modify_form -->
 
-	<!-- BEGIN modify_text -->
-	<a href="/eportfolio/{USER_ID}/{PAGE_ID}/textbox/modify/{COMPONENT_INSTANCE_ID}#modify_textbox_form_{COMPONENT_INSTANCE_ID}" class="btn modify"><span></span>Modify</a>
-	<!-- END modify_text -->
+    <p class="interact clearfix">
+        <!-- BEGIN modify_text -->
+        <a href="/eportfolio/{USER_ID}/{PAGE_ID}/textbox/modify/{COMPONENT_INSTANCE_ID}#modify_textbox_form_{COMPONENT_INSTANCE_ID}" class="btn modify"><span></span>Modify</a>
+        <!-- END modify_text -->
 
-	<!-- BEGIN create_text -->
-	<a href="/eportfolio/{USER_ID}/{PAGE_ID}/textbox/create/{COMPONENT_INSTANCE_ID}#modify_textbox_form_{COMPONENT_INSTANCE_ID}" class="btn modify"><span></span>Create</a>
-	<!-- END create_text -->
+        <!-- BEGIN create_text -->
+        <a href="/eportfolio/{USER_ID}/{PAGE_ID}/textbox/create/{COMPONENT_INSTANCE_ID}#modify_textbox_form_{COMPONENT_INSTANCE_ID}" class="btn modify"><span></span>Create</a>
+        <!-- END create_text -->
+    </p>
+
 </div>
