@@ -60,7 +60,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
                 $event['colour'] = $calendarHandler->displayColour($event['type']);
 
-                $calendarDate = new Alaress_Date_Format(strtotime($event['date']), 'U');
+                $calendarDate = new Alaress_Date_Format(strtotime($event['startDate']), 'U');
 
                 $output = array(
                     'CAL_TIME' => rtrim(
