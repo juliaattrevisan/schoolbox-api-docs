@@ -309,7 +309,7 @@ class Calendar extends DeprecatedModel {
         $query = "
 			SELECT
 				e.id, e.series_id, e.owner, e.access, e.sid, e.type, e.note, e.startDate, e.endDate,
-				e.location, e.attendance, e.detail, e.publish_date,
+				e.location, e.attendance, e.detail, e.publish_date, e.allday,
 				DATE_FORMAT(e.startTime, '" . Cfg::get('calendar_time_format') . "') startTime,
 				DATE_FORMAT(e.endTime, '" . Cfg::get('calendar_time_format') . "') endTime,
 				u.title, u.firstname, u.lastname
