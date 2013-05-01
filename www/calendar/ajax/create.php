@@ -16,7 +16,8 @@ $page = new SitePage();
  * When creating via the js calendar ui, assume single-day events so
  * startDate and endDate are the same.
  */
-$dateObj = new Alaress_Date_Format($_POST['date']/1000, 'U');
+$dateObj      = new Alaress_Date_Format($_POST['date']/1000, 'U');
+$publish_date = new Alaress_Date_Format(new DateTime(), 'U');
 
 $event = array(
 	'owner' => $_SESSION['id'],
@@ -33,14 +34,14 @@ $event = array(
 	'location' => $_POST['location'],
 	'attendance' => $_POST['attendance'],
 	'detail' => $_POST['detail'],
-	'publish_date' => 'NULL',
+	'publish_date' => $publish_date->getDatabaseDate(),
 	'completed' => $_POST['completed'],
 );
 
 if ($eventId = $calendarHandler->create($event)) {
 	$json =  array(
 		'title' => $event['note'],
-		'start' => strtotime($event['date'] . ' ' . $event['startTime']),
+		'start' => strtotime($event['startDate'] . ' ' . $event['startTime']),
 
 		/* Whether you can edit this event or not
 		 */
