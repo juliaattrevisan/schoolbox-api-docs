@@ -1,0 +1,81 @@
+<?php
+/**
+ * ${NAME}
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+require_once dirname(__FILE__) . '/../../../../include/Bootstrap.php';
+
+$page = new SitePage();
+
+$action = Scrub::text($_POST['action']);
+$ownerId = Scrub::text($_POST['userId']);
+$pageId = Scrub::text($_POST['pageId']);
+$listItemId = Scrub::text($_POST['listItemId']);
+$content = Scrub::html($_POST['content']);
+
+$authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
+
+if ($authenticator->canModify()) {
+
+	/* Add a comment to pages you can view
+	 */
+	if ($action == 'addComment') {
+		$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+
+		$blogComment = new Component_Eportfolio_BlogComment();
+		$blogComment->setBlogId($listItemId);
+		$blogComment->setUid($ownerId);
+		$blogComment->setContent($content);
+		$blogComment->setCreatedAt($now->getDatabase());
+		$blogComment->setUpdatedAt($now->getDatabase());
+
+		Component_Eportfolio_BlogCommentMapper::getInstance()->save($blogComment);
+	}
+
+//	/* Update a list item
+//	 */
+//	else if ($action == 'updateItem') {
+//		$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+//
+//		$listItem = Component_Eportfolio_BlogMapper::getInstance()->findById($listItemId);
+//		$listItem->setTitle($title);
+//		$listItem->setContent($content);
+//		$listItem->setUpdatedAt($now->getDatabase());
+//
+//		Component_Eportfolio_BlogMapper::getInstance()->save($listItem);
+//	}
+	/* Delete a list item
+	 */
+	else if ($action == 'removeComment') {
+		$commentId = Scrub::text($_POST['commentId']);
+
+		$listItem = Component_Eportfolio_BlogCommentMapper::getInstance()->findById($commentId);
+		Component_Eportfolio_BlogCommentMapper::getInstance()->delete($listItem);
+	}
+
+	SitePage::localRedir("/eportfolio/{$ownerId}/{$pageId}");
+}
+else if ($authenticator->canView()) {
+
+	/* Add a comment to pages you can view
+	 */
+	if ($action == 'addComment') {
+		$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+		$authorId = Scrub::text($_POST['authorId']);
+
+		$blogComment = new Component_Eportfolio_BlogComment();
+		$blogComment->setBlogId($listItemId);
+		$blogComment->setUid($authorId);
+		$blogComment->setContent($content);
+		$blogComment->setCreatedAt($now->getDatabase());
+		$blogComment->setUpdatedAt($now->getDatabase());
+
+		Component_Eportfolio_BlogCommentMapper::getInstance()->save($blogComment);
+	}
+
+	SitePage::localRedir("/eportfolio/{$ownerId}/{$pageId}");
+}
