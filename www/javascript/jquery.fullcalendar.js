@@ -58,7 +58,10 @@ function Calendar(id, bubbleId, opts) {
             },
             date: null,
             month: null,
-            year: null
+            year: null,
+			eventAfterAllRender: function(view) {
+				//
+			}
         },
         datepickerIcon: "/images/core/calendar/calendar-click.png",
         x: true
@@ -206,7 +209,7 @@ Calendar.prototype.init = function() {
         var headerRight = this.dom.find('td.fc-header-right')
         headerRight.prepend(headerRight.children('.fc-button')
             .first().clone().removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
-            .addClass('fc-button-filter').attr('id','fc-button-filter')
+            .addClass('fc-button-filter fc-corner-left fc-corner-right').attr('id','fc-button-filter')
         )
 
         $j(this.options.filter.btnSelector).html('filters')
