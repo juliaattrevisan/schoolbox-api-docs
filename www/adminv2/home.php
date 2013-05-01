@@ -119,7 +119,7 @@ $this->setVar($ldap);
 /* WWW access check */
 if(in_array('nojscript', $this->arg)) {
     // Believe it or not, this is actually really slow!
-    if(@file_get_contents('http://schoolbox.com.au/design/img/favicon.ico')) {
+    if(@file_get_contents('http://schoolbox.com.au/schoolboxinstaller/status.html')) {
        $www = array('WWW_LIGHT'  => 'on',
                     'WWW_STATUS' => 'Available');
     }
