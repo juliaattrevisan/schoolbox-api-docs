@@ -140,12 +140,18 @@ class Calendar_Event_Collection {
 
 	/**
 	 * Comparison - sorts on start time, then end time, then finally name.
+	 * Also, all day events are always before timed events.
 	 *
 	 * @param $a
 	 * @param $b
 	 * @return int
 	 */
 	private function cmp($a, $b) {
+		$a_allday = $a->getAllday();
+		$b_allday = $b->getAllday();
+		if ($a_allday != $b_allday) {
+			return $a_allday ? -1 : 1;
+		}
 		if ($a->getStartTime() instanceof Alaress_Date_Format_Interface
 			&& $b->getStartTime() instanceof Alaress_Date_Format_Interface
 		) {
