@@ -70,7 +70,7 @@ if($eventId = $calendarHandler->update($updatedEvent)) {
 
     $json = array(
         'title' => $event['note'],
-        'start' => strtotime($event['date'] . ' ' . $event['startTime']),
+        'start' => strtotime($event['startDate'] . ' ' . $event['startTime']),
 
         /* Whether you can edit this event or not
            */
