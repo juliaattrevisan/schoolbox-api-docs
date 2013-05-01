@@ -50,6 +50,8 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 		$this->setBlock('list_item', 'modify_text', 'modify_text_block');
 		$this->setBlock('list_item', 'has_modify_form', 'has_modify_form_block');
 		$this->setBlock('list_item', 'has_delete_form', 'has_delete_form_block');
+		$this->setBlock('list_item', 'has_comments', 'has_comments_block');
+		$this->setBlock('has_comments', 'comment', 'comment_block');
 
 		$this->setVar(array(
 			'has_create_form_block' => '',
@@ -57,6 +59,8 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 			'has_delete_form_block' => '',
 			'modify_text_block' => '',
 			'create_text_block' => '',
+			'has_comments_block' => '',
+			'comment_block' => '',
 			'list_item_block' => '',
 		));
 
@@ -91,6 +95,29 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 					'LIST_ITEM_UPDATED_AT' => $updatedAt->getShort(),
 				));
 
+				$allComments = Component_Eportfolio_BlogCommentMapper::getInstance()->findByColumn('blog_id', $currentItem->getId());
+
+				if ($allComments->count()) {
+					foreach($allComments as $currentComment) {
+						$commentAuthor = NewUserMapper::getInstance()->findById($currentComment->getUid());
+
+						$this->setVar(array(
+							'COMMENT_EXTERNAL_USER_ID' => $commentAuthor->getSynergyId(),
+							'COMMENT_AUTHOR_FIRSTNAME' => $commentAuthor->getFirstname(),
+							'COMMENT_AUTHOR_LASTNAME' => $commentAuthor->getLastname(),
+							'COMMENT_CONTENT' => $currentComment->getContent(),
+						));
+
+						$this->parse('comment_block', 'comment', true);
+					}
+
+					$this->parse('has_comments_block', 'has_comments');
+
+					/* Clear children after parsing out the parent
+					 */
+					$this->setVar('comment_block', '');
+				}
+
 				/* If modifying this textbox
 				 */
 				if ($this->permission >= WRITE_ACCESS) {
@@ -111,6 +138,8 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 				$this->setVar('has_modify_form_block', '');
 				$this->setVar('has_delete_form_block', '');
 				$this->setVar('modify_text_block', '');
+				$this->setVar('has_comments_block', '');
+				$this->setVar('comment_block', '');
 			}
 		}
 
