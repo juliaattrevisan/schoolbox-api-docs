@@ -69,4 +69,30 @@ class Component_Eportfolio_BlogMapper extends Mapper {
 
 		parent::mapping();
 	}
+
+	/**
+	 * Retrieves a collection of records ordered by a particular
+	 * column in a particular order
+	 *
+	 * http://stackoverflow.com/questions/2542410/how-do-i-set-order-by-params-using-prepared-pdo-statement
+	 *
+	 * @param $args
+	 * @return bool|Model
+	 */
+	public function findByOrder($args) {
+		$statement = $this->database->prepare("
+            SELECT {$this->getColumnString()}
+            FROM `{$this->table}`
+            WHERE `{$args['identifierName']}` = :identifierValue
+            ORDER BY {$args['column']} {$args['order']}
+        ");
+
+		$statement->bindParam(':identifierValue', $args['identifierValue']);
+
+		$statement->execute();
+
+		$rowset = $statement->fetchAll();
+
+		return $this->hydrateList($rowset);
+	}
 }

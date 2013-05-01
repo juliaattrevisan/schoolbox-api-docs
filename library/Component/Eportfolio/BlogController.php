@@ -73,7 +73,12 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 
 		/* Gather everything
 		 */
-		$allItems = $this->getMapperClass()->findByColumn('page_id', $this->instance->identifier);
+		$allItems = $this->getMapperClass()->findByOrder(array(
+			'identifierName' => 'page_id',
+			'identifierValue' => $this->instance->identifier,
+			'column' => 'updated_at',
+			'order' => 'DESC'
+		));
 
 		if ($allItems->count()) {
 			foreach($allItems as $currentItem) {
