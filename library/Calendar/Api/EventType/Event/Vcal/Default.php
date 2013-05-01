@@ -101,8 +101,20 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 						 * as they seem to be the calendar items themselves
 						 */
 						if ($currentEvent instanceof Sabre\VObject\Component\VEvent) {
+							//
+							// All day event: starts at 12am one day, ends 12am
+							// next.
+							// (are either value: date)
+							$all_day = $currentEvent->DTSTART['value']->value === 'DATE';
 							$eventStartTimestamp = strtotime($currentEvent->DTSTART->value);
-							$eventEndTimestamp = strtotime($currentEvent->DTEND->value);
+							$eventEndTimestamp   = strtotime($currentEvent->DTEND->value);
+
+							//
+							// According to VCAL standard: end of all day event
+							// is 12am next day
+							if ($all_day) {
+								$eventEndTimestamp -= 1;
+							}
 
 							/* Only get events that fit within the range specified
 							 */
@@ -128,6 +140,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 								$event->setLocation($currentEvent->LOCATION->value);
 								$event->setPublishDate('');
 								$event->setSid('');
+								$event->setAllday($all_day);
 
 								$event->setIsEditable(false);
 
