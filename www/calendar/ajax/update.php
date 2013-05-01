@@ -19,7 +19,7 @@ $event = $calendarHandler->getByID($_POST['eventId']);
  */
 if (isset($_POST['resize']) && $_POST['resize']) {
 	$startTime = new Alaress_Date_Format(strtotime($_POST['start']), 'U');
-	$endTime = new Alaress_Date_Format(strtotime($_POST['end']), 'U');
+	$endTime   = new Alaress_Date_Format(strtotime($_POST['end']),   'U');
 }
 /* Otherwise you are moving an event on the Month view, which makes
  * the new datetime transfer as a difference value -_-
@@ -28,23 +28,13 @@ else {
 	$dayDelta = $_POST['dayDelta'];
 	$minuteDelta = $_POST['minuteDelta'];
 
-	$startTime = new Alaress_Date_Format(strtotime($event['date'] . ' ' . $event['startTime']), 'U');
+	$startTime = new Alaress_Date_Format(strtotime($event['startDate'] . ' ' . $event['startTime']), 'U');
 	$startTime->addDays($dayDelta);
 	$startTime->addMinutes($minuteDelta);
 
-	$endTime = new Alaress_Date_Format(strtotime($event['date'] . ' ' . $event['endTime']), 'U');
+	$endTime = new Alaress_Date_Format(strtotime($event['endDate'] . ' ' . $event['endTime']), 'U');
 	$endTime->addDays($dayDelta);
 	$endTime->addMinutes($minuteDelta);
-}
-
-/* Check maximum endtime so that it's always on the same day
- *
- * So if you move an 8 hour event from 10am to 11pm, make it
- * only last till 11:59:59 that day instead of spanning into
- * the next day since schoolbox treats event days individually
- */
-if ($endTime->getDatabaseDate() != $startTime->getDatabaseDate()) {
-	$endTime = new Alaress_Date_Format($event['date'] . ' 23:59:59', 'y-m-d h:i:s');
 }
 
 /* Update that event
