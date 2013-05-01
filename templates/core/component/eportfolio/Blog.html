@@ -1,0 +1,70 @@
+<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+	<h2>{COMPONENT_NAME}</h2>
+	{CONFIGURATION}
+
+	<!-- BEGIN has_create_form -->
+	<form action='/eportfolio/component/blog/modifyForm.php' method='post' enctype='multipart/form-data'>
+		<input type='hidden' name='action' value='addItem' />
+		<input type='hidden' name='userId' value='{USER_ID}' />
+		<input type='hidden' name='pageId' value='{PAGE_ID}' />
+
+		<input type='text' name='title' value='' />
+		<textarea type='text' name='content' value='' /></textarea>
+		<input type='submit' value='Add item' />
+	</form>
+	<!-- END has_create_form -->
+
+	<ol>
+		<!-- BEGIN list_item -->
+		<li>
+			<div>
+				<div>
+					{LIST_ITEM_TITLE}
+				</div>
+				<div>
+					{LIST_ITEM_CONTENT}
+				</div>
+				<div>
+					Last updated on {LIST_ITEM_UPDATED_AT}
+				</div>
+			</div>
+			<!-- BEGIN has_modify_form -->
+			<form id='modify_blog_form_{COMPONENT_INSTANCE_ID}' class='modifyForm' action='/eportfolio/component/blog/modifyForm.php' method='post' style='padding:10px;background-color:#fdd'>
+				<input type='hidden' name='action' value='updateItem' />
+				<input type='hidden' name='userId' value='{USER_ID}' />
+				<input type='hidden' name='pageId' value='{PAGE_ID}' />
+				<input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
+
+				<label>
+					<input type='text' class='firstFocus' name='title' value='{LIST_ITEM_TITLE}' />
+				</label>
+				<label>
+					<textarea name='content' class='mceEditor'>{LIST_ITEM_CONTENT}</textarea>
+				</label>
+
+				<input type='submit' value='Update' />
+			</form>
+			<!-- END has_modify_form -->
+
+			<!-- BEGIN modify_text -->
+			<a href="/eportfolio/{USER_ID}/{PAGE_ID}/blog/modify/{COMPONENT_INSTANCE_ID}#modify_blog_form_{COMPONENT_INSTANCE_ID}" class="btn modify"><span></span>Modify</a>
+			<!-- END modify_text -->
+
+			<!-- BEGIN create_text -->
+			<a href="/eportfolio/{USER_ID}/{PAGE_ID}/blog/create/{COMPONENT_INSTANCE_ID}#modify_blog_form_{COMPONENT_INSTANCE_ID}" class="btn modify"><span></span>Create</a>
+			<!-- END create_text -->
+
+			<!-- BEGIN has_delete_form -->
+			<form action='/eportfolio/component/blog/modifyForm.php' method='post'>
+				<input type='hidden' name='action' value='removeItem' />
+				<input type='hidden' name='userId' value='{USER_ID}' />
+				<input type='hidden' name='pageId' value='{PAGE_ID}' />
+				<input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
+
+				<input type='submit' value='Delete' />
+			</form>
+			<!-- END has_delete_form -->
+		</li>
+		<!-- END list_item -->
+	</ol>
+</div>

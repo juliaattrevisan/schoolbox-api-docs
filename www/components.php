@@ -93,12 +93,29 @@ $imageList = array(
 	)
 );
 
-$allComponents[] = $basicList;
-$allComponents[] = $advancedList;
-$allComponents[] = $linkList;
-$allComponents[] = $textbox;
-$allComponents[] = $fileList;
-$allComponents[] = $imageList;
+
+$blogList = array(
+	'name' => 'Blog',
+	'module' => 'eportfolio',
+	'component_category' => null,
+	'class' => 'Component_Eportfolio_BlogController',
+	'description' => 'A blog component',
+	'multiple' => 'false',
+	'config' => array(
+		'componentname' => array(
+			'default_value' => 'Blog',
+			'label' => 'Title',
+		),
+	)
+);
+
+//$allComponents[] = $basicList;
+//$allComponents[] = $advancedList;
+//$allComponents[] = $linkList;
+//$allComponents[] = $textbox;
+//$allComponents[] = $fileList;
+//$allComponents[] = $imageList;
+$allComponents[] = $blogList;
 
 foreach($allComponents as $currentComponent) {
 	Component_DefinitionMapper::getInstance()->create($currentComponent);

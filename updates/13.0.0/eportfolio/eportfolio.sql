@@ -82,3 +82,9 @@ CREATE TABLE `eportfolio_component_filelist_item`( `id` INT(11) NOT NULL AUTO_IN
 /* Add image list item table
  */
 CREATE TABLE `eportfolio_component_imagelist_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `component_instance_id` INT(11), PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
+
+/* Add blog table
+ */
+CREATE TABLE `eportfolio_component_blog`( `id` INT(11) NOT NULL AUTO_INCREMENT, `page_id` INT(11), `uid` INT(11), `heading` VARCHAR(255), `body` TEXT, `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
+ALTER TABLE `eportfolio_component_blog` CHANGE `heading` `title` VARCHAR(255) CHARSET utf8 COLLATE utf8_general_ci NULL;
+ALTER TABLE `eportfolio_component_blog` CHANGE `body` `content` TEXT CHARSET utf8 COLLATE utf8_general_ci NULL;
