@@ -28,9 +28,13 @@ $event = array(
 	'type' => $_POST['type'],
 	'note' => $_POST['note'],
 	'startDate' => $dateObj->getDatabaseDate(),
-	'startTime' => '09:00:00',
 	'endDate' => $dateObj->getDatabaseDate(),
-	'endTime' => '10:00:00',
+	//
+	// No time is given by default. I'm going to assume any event created here
+	// is an all day one.
+	'startTime' => '00:00:00',
+	'endTime' => '00:00:00',
+	'allday' => true,
 	'location' => $_POST['location'],
 	'attendance' => $_POST['attendance'],
 	'detail' => $_POST['detail'],
@@ -49,11 +53,8 @@ if ($eventId = $calendarHandler->create($event)) {
 
 		/* Whether it's an all-day event or not
 		 * If allDay is true, then you can't resize it
-		 *
-		 * Schoolbox usage would be that all events are not
-		 * allDay events
 		 */
-		'allDay' => false,
+		'allDay' => $event['allday'],
 
 		/* Colour of the event
 		 */
