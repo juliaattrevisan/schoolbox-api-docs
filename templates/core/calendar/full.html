@@ -39,8 +39,11 @@
                  */
                 eventRender: function(calEvent, jsEvent, view) {
 
+                    //
+                    // Would you believe the way this SHOULD work (return false)
+                    // doesn't work, and hiding the event does?
                     if ('is_rendered' in calEvent && !(calEvent.is_rendered)) {
-                        return false;
+                        jsEvent.replaceWith('').hide();
                     }
 
                     //
