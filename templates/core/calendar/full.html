@@ -1,6 +1,7 @@
 <!-- BEGIN custom_head -->
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.css" />
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css"/>
 <script type="text/javascript" src="/javascript/jquery.fullcalendar.js"></script>
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
@@ -37,6 +38,18 @@
                  * @param view
                  */
                 eventRender: function(calEvent, jsEvent, view) {
+
+                    //
+                    // Would you believe the way this SHOULD work (return false)
+                    // doesn't work, and hiding the event does?
+                    if ('is_rendered' in calEvent && !(calEvent.is_rendered)) {
+                        jsEvent.replaceWith('').hide();
+                    }
+
+                    //
+                    // newer fullCalendar implementations escape event title -
+                    // we've already done this, so reset the title.
+                    jsEvent.find('.fc-event-title').html(calEvent.title);
 
                     // If appropriate, indicate this event can be attended
                     var span = '<span class="att">(A)</span>';
@@ -249,7 +262,20 @@
                 },
 
                 // Stream location
-                events: '/calendar/ajax/full'
+                events: function(start, end, callback) {
+                    $j.ajax({
+                        dataType: 'json',
+                        url:      '/calendar/ajax/full',
+                        data: {
+                            start: Math.round(start.getTime()/1000),
+                            end:   Math.round(end.getTime()/1000),
+                        },
+                        success: function(data) {
+                            callback(data);
+                        },
+                        cache: false
+                    });
+                }
             },
 
             x: false

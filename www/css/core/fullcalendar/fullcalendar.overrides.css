@@ -1,0 +1,11 @@
+/*!
+ * FullCalendar CSS customisations
+ */
+
+.fc-event {
+	color: #000;
+}
+
+.fc-agenda-slots td div {
+	height: 31px;
+}

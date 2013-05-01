@@ -135,17 +135,28 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 
 			/* Congeal all that stuff
 			 */
-			$start = $currentEvent->getStartTime()->getDatabaseDate() . ' ' . $currentEvent->getStartTime()->getDatabaseTime();
-			$end = $currentEvent->getEndTime()->getDatabaseDate() . ' ' . $currentEvent->getEndTime()->getDatabaseTime();
+			$start   = $currentEvent->getStartTime()->getDatabaseDate();
+			$end     = $currentEvent->getEndTime()->getDatabaseDate();
+			$all_day = $currentEvent->getAllDay();
+			if (!$all_day) {
+				$start .= ' ' . $currentEvent->getStartTime()->getDatabaseTime();
+				$end   .= ' ' . $currentEvent->getEndTime()->getDatabaseTime();
+			}
 
-            /* Make tasks allDay events by default
-             */
-            if ($this->isTask($currentEvent)) {
-                $allDay = true;
-            }
-            else {
-                $allDay = false;
-            }
+			//
+			// Add campus list to list of classes
+			$classes = array(
+				$currentEvent->getDerivedEventLevel(),
+				'type' . $currentEvent->getType()
+			);
+			$campus_list = array_filter(array_map('trim', explode(',', $currentEvent->getCampusList())));
+			foreach ($campus_list as &$campus) {
+				$campus = 'campus'.trim($campus);
+			}
+			unset($campus);
+			if (!empty($campus_list)) {
+				$classes[] = implode(' ', $campus_list);
+			}
 
 			$event = array(
 				'title' => $currentEvent->getNote(),
@@ -158,11 +169,8 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 
 				/* Whether it's an all-day event or not
 				 * If allDay is true, then you can't resize it
-				 *
-				 * Schoolbox usage would be that all events are not
-				 * allDay events
 				 */
-				'allDay' => $allDay,
+				'allDay' => $all_day,
 
 				/* Colour of the event
 				 */
@@ -170,10 +178,7 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 
 				/* Campus slug so you can filter events
 				 */
-				'className' => array(
-					$currentEvent->getDerivedEventLevel(),
-					'type' . $currentEvent->getType()
-				),
+				'className' => $classes,
 
 				/* Extra data that the Event Object doesn't directly support
 				 */

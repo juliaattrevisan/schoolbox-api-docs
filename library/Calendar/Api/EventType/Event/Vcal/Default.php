@@ -62,13 +62,17 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 			'status' => 1
 		));
 
+		$group_handler = new Group();
+		$is_superuser  = $group_handler->isSuperuser();
+
 		foreach($allConfigs as $currentConfig) {
 			$decodedConfig = $currentConfig->decodeConfig();
 
 			/* Check permissions - if you can view these events according to the Permissions
 			 * settings then accumulate the events. Otherwise ignore them.
+			 * (Superusers can view all events, so skip permissions on those)
 			 */
-			if ($decodedConfig->hasPermissions($_SESSION['campus'], $_SESSION['gid'])) {
+			if ($is_superuser || $decodedConfig->hasPermissions($_SESSION['campus'], $_SESSION['gid'])) {
 
 				/* Load calendar from locker cache
 				 */
@@ -119,7 +123,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 								$event->setAccess('');
 								$event->setEventType($metaDetails['eventType']);
 								$event->setColour($metaDetails['eventColour']);
-								$event->setCampusList('');
+								$event->setCampusList(implode(',', $decodedConfig->getCampus()));
 								$event->setDetail($currentEvent->DESCRIPTION->value);
 								$event->setLocation($currentEvent->LOCATION->value);
 								$event->setPublishDate('');

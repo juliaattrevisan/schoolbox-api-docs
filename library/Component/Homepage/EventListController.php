@@ -47,7 +47,11 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
         $calendarHandler = new Calendar;
         $eventList = $calendarHandler->getAllInCategory(
-            $this->getContext('id'), array('size', $this->getConfig('size'))
+            $this->getContext('id'),
+            array(
+                'size' => $this->getConfig('size'),
+                'days' => $this->getConfig('days'),
+            )
         );
 
         $this->setVar('CALENDAR_TITLE', 'Group Calendar');
@@ -60,7 +64,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
                 $event['colour'] = $calendarHandler->displayColour($event['type']);
 
-                $calendarDate = new Alaress_Date_Format(strtotime($event['date']), 'U');
+                $calendarDate = new Alaress_Date_Format(strtotime($event['startDate']), 'U');
 
                 $output = array(
                     'CAL_TIME' => rtrim(

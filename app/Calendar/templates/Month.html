@@ -26,16 +26,16 @@
             <ul>
             {% for j in content[i].events|keys %}
                 <li class="{{ content[i].events[j].eventType }}{% if j > 2 %} excess{% endif %}">
-                {% if content[i].events[j].eventId %}
+                {% if content[i].events[j].eventId and content[i].events[j].eventId != -1 %}
                     <a href="/m/calendar/event/{{ content[i].events[j].eventId }}/{{content[i].events[j].connectorId}}">
                     {% if content[i].events[j].startTime.timeOnly %}
                         <time>{{ content[i].events[j].startTime.timeOnly }}</time>
                     {% endif %}
-                        {{ content[i].events[j].note }}
+                        {{ content[i].events[j].note|raw }}
                     </a>
                 </li>
                 {% else %}
-                    {{ content[i].events[j].note }}
+                    {{ content[i].events[j].note|raw }}
                 {% endif %}
             {% endfor %}
             </ul>

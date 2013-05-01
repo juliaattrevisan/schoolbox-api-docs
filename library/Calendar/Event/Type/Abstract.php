@@ -74,6 +74,13 @@ abstract class Calendar_Event_Type_Abstract {
     protected $isEditable = true;
 
 	/**
+	 * Is this an all day event?
+	 *
+	 * @var bool
+	 */
+	protected $allday = false;
+
+	/**
 	 * Whether or not this Task has been completed
 	 *
 	 * @var int
@@ -528,5 +535,19 @@ abstract class Calendar_Event_Type_Abstract {
 	 */
 	public function getConnectorId() {
 		return $this->connectorId;
+	}
+
+	/**
+	 * @param bool $allday
+	 */
+	public function setAllday($allday) {
+		$this->allday = $allday;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getAllday() {
+		return $this->allday;
 	}
 }

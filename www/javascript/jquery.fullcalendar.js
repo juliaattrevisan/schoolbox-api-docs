@@ -46,6 +46,16 @@ function Calendar(id, bubbleId, opts) {
                 center: 'title',
                 right: 'month,agendaWeek,agendaDay'
             },
+            buttonText: {
+                prev:     '&nbsp;&#x25C0;&nbsp;', // ◀
+                next:     '&nbsp;&#x25B6;&nbsp;', // ▶
+                prevYear: '&nbsp;&laquo;&nbsp;',  // <<
+                nextYear: '&nbsp;&raquo;&nbsp;',  // >>
+                today:    'today',
+                month:    'month',
+                week:     'week',
+                day:      'day'
+            },
             date: null,
             month: null,
             year: null
@@ -94,7 +104,7 @@ function Calendar(id, bubbleId, opts) {
         organise: function(cal, filterArray, performAjax) {
             performAjax = performAjax === undefined ? true : performAjax
 
-            var flist = {}
+            var flist = {}, selected_classes = ['personal'];
             var calendarControls = $j(cal.options.filter.parentSelector)
 
             for (var i = 0; i < filterArray.length; i++) {
@@ -106,18 +116,12 @@ function Calendar(id, bubbleId, opts) {
                     // show related entries
                     if(this.checked) {
                         flist[i][1][k++] = n
-                        cal.dom.find('div.fc-event.' + n).show()
-                    }
-                    // hide related entries
-                    else {
-                        if (cal.dom.find('div.fc-event.' + n).is(':visible')) {
-                            cal.dom.find('div.fc-event.' + n).hide()
-                        }
+                        selected_classes.push(n);
                     }
                 })
             }
 
-            k = 0
+            var k = 0
             flist[filterArray.length] = ['events', {}]
 
             calendarControls.find(cal.options.filter.listSelector + ' .events input').each(function() {
@@ -125,15 +129,51 @@ function Calendar(id, bubbleId, opts) {
                 // show related entries
                 if(this.checked) {
                     flist[i][1][k++] = n
-                    cal.dom.find('div.fc-event.personal.' + n).show()
-                }
-                // hide related entries
-                else {
-                    if (cal.dom.find('div.fc-event.' + n).is(':visible')) {
-                        cal.dom.find('div.fc-event.' + n).hide()
-                    }
+                    selected_classes.push(n);
                 }
             })
+
+            //
+            // Get events, put an 'is_rendered' field on them.
+            var events = cal.dom.fullCalendar('clientEvents');
+            $j.each(events, function(event_no, event) {
+                var is_rendered = true;
+
+                //
+                // Is this event rendered?
+                // It must match at least one selected filter in each group
+                // (filters are in event.className) to be rendered.
+                $j.each(event.className, function(class_no, classes) {
+                    var is_filter_selected = false;
+                    if (!classes.trim().length) {
+                        //
+                        // No classes in this filter? Let's say this filter is
+                        // selected.
+                        is_filter_selected = true;
+                    }
+                    else {
+                        var this_classes = classes.trim().split(/\s+/);
+                        //
+                        // Check that at least one class in this_classes is in
+                        // selected_classes.
+                        $j.each(selected_classes, function(selected_class_no, selected_class) {
+                            if (this_classes.lastIndexOf(selected_class) >= 0) {
+                                is_filter_selected = true;
+                                return false;
+                            }
+                        });
+                    }
+                    if (!is_filter_selected) {
+                        is_rendered = false;
+                        return false;
+                    }
+                });
+                event.is_rendered = is_rendered;
+            });
+
+            //
+            // Jam them back in, and re-render.
+            cal.dom.fullCalendar('events', events).fullCalendar('rerenderEvents');
 
             // only send data to the server if we actually need to
             if(performAjax) {
@@ -173,10 +213,10 @@ Calendar.prototype.init = function() {
         var headerRight = this.dom.find('td.fc-header-right')
         headerRight.prepend(headerRight.children('.fc-button')
             .first().clone().removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
-            .addClass('fc-button-filter').attr('id','fc-button-filter')
+            .addClass('fc-button-filter fc-corner-left fc-corner-right').attr('id','fc-button-filter')
         )
 
-        $j(this.options.filter.btnSelector).find('.fc-button-content').html('filters')
+        $j(this.options.filter.btnSelector).html('filters')
 
         /*
         // mash the datepicker in
@@ -193,7 +233,7 @@ Calendar.prototype.init = function() {
         header.addClass('calendar-controls')
         header.find('span.fc-button').each(function() {
             var self = $j(this)
-            var text = self.find('span.fc-button-content').html()
+            var text = self.html()
             self.addClass('filter-change '+text).html('<span></span>'+text)
         })
 

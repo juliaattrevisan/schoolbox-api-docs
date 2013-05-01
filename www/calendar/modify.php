@@ -51,6 +51,7 @@ if (is_numeric($_GET['eventID'])) {
         'END_PM' => $endDate->getUsingFormat('z') == 'PM' ? 'selected="selected"' : '',
         'LEVEL' => '',
         'GROUP' => '',
+        'ALLDAY_CHECKED' => ($event['allday'] ? 'checked="checked"' : ''),
         'DESCRIPTION' => $event['note'],
         'LOCATION' => $event['location'],
         'ATTENDANCE' => $event['attendance'] ? 'checked="checked"' : '',

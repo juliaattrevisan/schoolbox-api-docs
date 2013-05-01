@@ -69,13 +69,9 @@ class Calendar_Event_Type_StudentBirthday_Renderer_Javascript extends Calendar_E
 				 */
 				'editable' => $editable,
 
-				/* Whether it's an all-day event or not
-				 * If allDay is true, then you can't resize it
-				 *
-				 * Schoolbox usage would be that all events are not
-				 * allDay events
+				/* Don't tell me that a birthday is not an all day event!
 				 */
-				'allDay' => false,
+				'allDay' => true,
 
 				/* Colour of the event
 				 */

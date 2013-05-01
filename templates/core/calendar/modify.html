@@ -259,6 +259,16 @@ $j(function () {
 				</select>
 			</td>
 		</tr>
+		<tr>
+			<td class="formLabelWidth" valign="top">
+				<h4>All day event?</h4>
+				<em>If this is checked, then the start and end time will be ignored.</em>
+			</td>
+			<td>
+				<input name="allday" type="hidden"   value="0" />
+				<input name="allday" type="checkbox" value="1" {ALLDAY_CHECKED} class="allday" />
+			</td>
+		</tr>
         <tr class="advanced adv_hide" {SHOW_ADVANCED}>
         	<td class="formLabelWidth" valign="top" {OPAC_ADVANCED}>
 				<h4>Publish Date</h4>

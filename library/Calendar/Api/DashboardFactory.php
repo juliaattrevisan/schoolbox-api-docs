@@ -20,7 +20,9 @@ class Calendar_Api_DashboardFactory extends Calendar_Api_Factory {
 	 * @param $type
 	 */
 	public function __construct($type) {
-		$allConfigs = Calendar_Api_Config_Mapper::getInstance()->findByColumn('event_type', $type);
+		$allConfigs = Calendar_Api_Config_Mapper::getInstance()->findByColumnList(
+			array('event_type' => $type, 'status' => true)
+		);
 
 		/* These configs are base64-encode()'d to get around a weird issue with unserialize
 		 * http://stackoverflow.com/questions/4264270/unserialize-sometimes-returns-false

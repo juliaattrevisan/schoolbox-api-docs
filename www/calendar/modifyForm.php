@@ -23,11 +23,11 @@ switch($_POST['action']) {
           */
         if($_POST['publishDate']) {
             $pubDateObject = new Alaress_Date_Format($_POST['publishDate'], 'd/m/y');
-            $publishDate = $pubDateObject->getDatabaseDate();
         }
         else {
-            $publishDate = 'NULL';
+            $pubDateObject = new Alaress_Date_Format(new DateTime('now'));
         }
+        $publishDate = $pubDateObject->getDatabaseDate();
 
 		$start = $_POST['startDate'] . ' ' . $_POST['startHour'] . ':' . $_POST['startMinute'] . ' ' . $_POST['startPeriod'];
 		$end = $_POST['endDate'] . ' ' . $_POST['endHour'] . ':' . $_POST['endMinute'] . ' ' . $_POST['endPeriod'];
@@ -43,6 +43,7 @@ switch($_POST['action']) {
 			'groupList' => $_POST['groupCheck'],
 			'type' => $_POST['type'],
 			'note' => $_POST['note'],
+			'allday' => !empty($_POST['allday']),
 			'startDate' => $startDate->getDatabaseDate(),
 			'startTime' => $startDate->getDatabaseTime(),
 			'endDate' => $endDate->getDatabaseDate(),

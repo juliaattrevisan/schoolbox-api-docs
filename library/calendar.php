@@ -309,7 +309,7 @@ class Calendar extends DeprecatedModel {
         $query = "
 			SELECT
 				e.id, e.series_id, e.owner, e.access, e.sid, e.type, e.note, e.startDate, e.endDate,
-				e.location, e.attendance, e.detail, e.publish_date,
+				e.location, e.attendance, e.detail, e.publish_date, e.allday,
 				DATE_FORMAT(e.startTime, '" . Cfg::get('calendar_time_format') . "') startTime,
 				DATE_FORMAT(e.endTime, '" . Cfg::get('calendar_time_format') . "') endTime,
 				u.title, u.firstname, u.lastname
@@ -324,8 +324,8 @@ class Calendar extends DeprecatedModel {
     function getAllInCategory($categoryID, $config = false) {
 
         //event limit changed from posts to days
-        if ($config['size'] != 0 && $config['size'] != '') {
-            $where = " AND date < ADDDATE(CURDATE(), INTERVAL {$config['size']} DAY) ";
+        if ($config['days'] != 0 && $config['days'] != '') {
+            $where = " AND startDate < ADDDATE(CURDATE(), INTERVAL {$config['days']} DAY) ";
         } else {
             $where = "";
         }
@@ -343,7 +343,9 @@ class Calendar extends DeprecatedModel {
 				  LEFT JOIN user ON owner = user.id
 				  LEFT JOIN luEventType ON type = eventTypeID
 				  WHERE access = '2' AND sid = '" . $categoryID . "' AND( startDate >= CURRENT_DATE() $where) ORDER BY startDate, startTime";
-
+		if (!empty($config['size'])) {
+			$query .= ' LIMIT '.$config['size'];
+		}
         return $this->db->getAll($query);
     }
 
@@ -645,7 +647,7 @@ class Calendar extends DeprecatedModel {
         $query = "
 			SELECT DISTINCT event.id, owner,
 				GROUP_CONCAT(DISTINCT eventCampus.campusID) as campusList,
-				startDate, startTime, endDate, endTime,
+				startDate, startTime, endDate, endTime, allday,
 				SUBSTR(event.startDate, 1, 4) AS year,
 				type, note, access, sid, location, detail, attendance,
 				user.id as uid, title, firstname, lastname,
@@ -710,6 +712,7 @@ class Calendar extends DeprecatedModel {
                 $event->setLocation($currentEvent['location']);
                 $event->setPublishDate($currentEvent['publish_date']);
                 $event->setSid($currentEvent['sid']);
+                $event->setAllDay(!empty($currentEvent['allday']));
 
 				if ($this->getPerm($currentEvent) > 1) {
                     $event->setIsEditable(true);

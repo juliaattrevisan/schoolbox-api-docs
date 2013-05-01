@@ -16,7 +16,8 @@ $page = new SitePage();
  * When creating via the js calendar ui, assume single-day events so
  * startDate and endDate are the same.
  */
-$dateObj = new Alaress_Date_Format($_POST['date']/1000, 'U');
+$dateObj      = new Alaress_Date_Format($_POST['date']/1000, 'U');
+$publish_date = new Alaress_Date_Format(new DateTime(), 'U');
 
 $event = array(
 	'owner' => $_SESSION['id'],
@@ -27,20 +28,24 @@ $event = array(
 	'type' => $_POST['type'],
 	'note' => $_POST['note'],
 	'startDate' => $dateObj->getDatabaseDate(),
-	'startTime' => '09:00:00',
 	'endDate' => $dateObj->getDatabaseDate(),
-	'endTime' => '10:00:00',
+	//
+	// No time is given by default. I'm going to assume any event created here
+	// is an all day one.
+	'startTime' => '00:00:00',
+	'endTime' => '00:00:00',
+	'allday' => true,
 	'location' => $_POST['location'],
 	'attendance' => $_POST['attendance'],
 	'detail' => $_POST['detail'],
-	'publish_date' => 'NULL',
+	'publish_date' => $publish_date->getDatabaseDate(),
 	'completed' => $_POST['completed'],
 );
 
 if ($eventId = $calendarHandler->create($event)) {
 	$json =  array(
 		'title' => $event['note'],
-		'start' => strtotime($event['date'] . ' ' . $event['startTime']),
+		'start' => strtotime($event['startDate'] . ' ' . $event['startTime']),
 
 		/* Whether you can edit this event or not
 		 */
@@ -48,11 +53,8 @@ if ($eventId = $calendarHandler->create($event)) {
 
 		/* Whether it's an all-day event or not
 		 * If allDay is true, then you can't resize it
-		 *
-		 * Schoolbox usage would be that all events are not
-		 * allDay events
 		 */
-		'allDay' => false,
+		'allDay' => $event['allday'],
 
 		/* Colour of the event
 		 */
