@@ -94,7 +94,7 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 				/* If modifying this textbox
 				 */
 				if ($this->permission >= WRITE_ACCESS) {
-					if (($this->sitepage->arg[2] == 'blog') && ($this->sitepage->arg[3] == 'modify') &&  ($this->sitepage->arg[4] == $this->instance->id)) {
+					if (($this->sitepage->arg[2] == 'blog') && ($this->sitepage->arg[3] == 'modify') &&  ($this->sitepage->arg[4] == $currentItem->getId())) {
 						$this->parse('has_modify_form_block', 'has_modify_form');
 					}
 					else {
