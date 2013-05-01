@@ -46,6 +46,16 @@ function Calendar(id, bubbleId, opts) {
                 center: 'title',
                 right: 'month,agendaWeek,agendaDay'
             },
+            buttonText: {
+                prev:     '&nbsp;&#x25C0;&nbsp;', // ◀
+                next:     '&nbsp;&#x25B6;&nbsp;', // ▶
+                prevYear: '&nbsp;&laquo;&nbsp;',  // <<
+                nextYear: '&nbsp;&raquo;&nbsp;',  // >>
+                today:    'today',
+                month:    'month',
+                week:     'week',
+                day:      'day'
+            },
             date: null,
             month: null,
             year: null
@@ -199,7 +209,7 @@ Calendar.prototype.init = function() {
             .addClass('fc-button-filter').attr('id','fc-button-filter')
         )
 
-        $j(this.options.filter.btnSelector).find('.fc-button-content').html('filters')
+        $j(this.options.filter.btnSelector).html('filters')
 
         /*
         // mash the datepicker in
@@ -216,7 +226,7 @@ Calendar.prototype.init = function() {
         header.addClass('calendar-controls')
         header.find('span.fc-button').each(function() {
             var self = $j(this)
-            var text = self.find('span.fc-button-content').html()
+            var text = self.html()
             self.addClass('filter-change '+text).html('<span></span>'+text)
         })
 
