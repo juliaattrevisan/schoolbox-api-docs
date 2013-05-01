@@ -325,7 +325,7 @@ class Calendar extends DeprecatedModel {
 
         //event limit changed from posts to days
         if ($config['days'] != 0 && $config['days'] != '') {
-            $where = " AND startDate < ADDDATE(CURDATE(), INTERVAL {$config['size']} DAY) ";
+            $where = " AND startDate < ADDDATE(CURDATE(), INTERVAL {$config['days']} DAY) ";
         } else {
             $where = "";
         }
