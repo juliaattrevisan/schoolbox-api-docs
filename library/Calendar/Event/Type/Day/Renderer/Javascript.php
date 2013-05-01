@@ -135,8 +135,13 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 
 			/* Congeal all that stuff
 			 */
-			$start = $currentEvent->getStartTime()->getDatabaseDate() . ' ' . $currentEvent->getStartTime()->getDatabaseTime();
-			$end = $currentEvent->getEndTime()->getDatabaseDate() . ' ' . $currentEvent->getEndTime()->getDatabaseTime();
+			$start   = $currentEvent->getStartTime()->getDatabaseDate();
+			$end     = $currentEvent->getEndTime()->getDatabaseDate();
+			$all_day = $currentEvent->getAllDay();
+			if (!$all_day) {
+				$start .= ' ' . $currentEvent->getStartTime()->getDatabaseTime();
+				$end   .= ' ' . $currentEvent->getEndTime()->getDatabaseTime();
+			}
 
 			//
 			// Add campus list to list of classes
@@ -164,11 +169,8 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 
 				/* Whether it's an all-day event or not
 				 * If allDay is true, then you can't resize it
-				 *
-				 * Schoolbox usage would be that all events are not
-				 * allDay events
 				 */
-				'allDay' => $currentEvent->getAllDay(),
+				'allDay' => $all_day,
 
 				/* Colour of the event
 				 */
