@@ -13,10 +13,10 @@ $page = new SitePage();
 
 /* All these are accessed via get from /cms/portfolio (My Files)
  */
-$action = Scrub::text($_GET['action']);
-$ownerId = Scrub::text($_GET['userId']);
-$pageId = Scrub::text($_GET['pageId']);
-$componentInstanceId = Scrub::text($_GET['componentInstanceId']);
+$action = $_GET['action'];
+$ownerId = $_GET['userId'];
+$pageId = $_GET['pageId'];
+$componentInstanceId = $_GET['componentInstanceId'];
 
 $authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
 
@@ -25,7 +25,7 @@ if ($authenticator->canModify()) {
 	/* Add a list item
 	 */
 	if ($action == 'addItem') {
-		$fileId = Scrub::text($_GET['fileId']);
+		$fileId = $_GET['fileId'];
 
 		/* Prevent dupe publishings
 		 */
@@ -51,7 +51,7 @@ if ($authenticator->canModify()) {
 	/* Delete a list item
 	 */
 	else if ($action == 'removeItem') {
-		$listItemId = Scrub::text($_GET['listItemId']);
+		$listItemId =$_GET['listItemId'];
 
 		$listItem = Component_Eportfolio_FileListMapper::getInstance()->findById($listItemId);
 		Component_Eportfolio_FileListMapper::getInstance()->delete($listItem);
