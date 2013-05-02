@@ -96,8 +96,8 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 
 				$this->setVar(array(
 					'LIST_ITEM_ID' => $currentItem->getId(),
-					'LIST_ITEM_TITLE' => $currentItem->getTitle(),
-					'LIST_ITEM_CONTENT' => $currentItem->getContent(),
+					'LIST_ITEM_TITLE' => Scrub::text($currentItem->getTitle()),
+					'LIST_ITEM_CONTENT' => Scrub::html($currentItem->getContent()),
 					'LIST_ITEM_UPDATED_AT' => $updatedAt->getShort(),
 				));
 
@@ -113,7 +113,7 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 							'COMMENT_EXTERNAL_USER_ID' => $commentAuthor->getSynergyId(),
 							'COMMENT_AUTHOR_FIRSTNAME' => $commentAuthor->getFirstname(),
 							'COMMENT_AUTHOR_LASTNAME' => $commentAuthor->getLastname(),
-							'COMMENT_CONTENT' => $currentComment->getContent(),
+							'COMMENT_CONTENT' => Scrub::text($currentComment->getContent()),
 							'COMMENT_CREATED_AT' => $createdAt->getRelativeTime(),
 						));
 
