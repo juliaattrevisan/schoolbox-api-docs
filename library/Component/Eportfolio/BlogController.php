@@ -68,10 +68,6 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 
 		/* Controls
 		 */
-		$this->setVar(array(
-			'COMMENT_AUTHOR_ID' => $_SESSION['id'],
-		));
-
 		if ($this->permission >= WRITE_ACCESS) {
 			if ($this->sitepage->arg[3] == 'create') {
 				$this->parse('has_create_form_block', 'has_create_form');

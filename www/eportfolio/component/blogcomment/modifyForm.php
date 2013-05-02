@@ -65,7 +65,7 @@ else if ($authenticator->canView()) {
 	 */
 	if ($action == 'addComment') {
 		$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-		$authorId = $_POST['authorId'];
+		$authorId = $_SESSION['id'];
 
 		$blogComment = new Component_Eportfolio_BlogComment();
 		$blogComment->setBlogId($listItemId);
