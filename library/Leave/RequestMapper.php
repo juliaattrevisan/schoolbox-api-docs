@@ -431,11 +431,14 @@ class Leave_RequestMapper extends Mapper {
             $date = new Alaress_Date_Format($date, 'd/m/y');
         }
 
-        $morningStart = $date;
+	    $breakfastStart = new Alaress_Date_Format(strtotime( $date->getDatabaseDate() .' '. Cfg::get('boarder_breakfast_start')), 'U');
+        $breakfastEnd = new Alaress_Date_Format(strtotime($date->getDatabaseDate() .' '.  Cfg::get('boarder_breakfast_end')), 'U');
 
-        $dayStart = new Alaress_Date_Format($morningStart->getUnixTimestamp() + 12 * 60 * 60 - 1, 'U');
-        $nightStart = new Alaress_Date_Format($dayStart->getUnixTimestamp() + 5 * 60 * 60, 'U');
-        $nightEnd = new Alaress_Date_Format($nightStart->getUnixTimestamp() + 7 * 60 * 60, 'U');
+	    $lunchStart = new Alaress_Date_Format( strtotime($date->getDatabaseDate() .' '.  Cfg::get('boarder_lunch_start')), 'U');
+	    $lunchEnd = new Alaress_Date_Format(strtotime($date->getDatabaseDate() .' '.  Cfg::get('boarder_lunch_end')), 'U');
+
+        $dinnerStart = new Alaress_Date_Format(strtotime($date->getDatabaseDate() .' '.  Cfg::get('boarder_dinner_start')), 'U');
+        $dinnerEnd = new Alaress_Date_Format( strtotime($date->getDatabaseDate() .' '.  Cfg::get('boarder_dinner_end')), 'U');
 
         /* Mega query
            */
@@ -445,12 +448,12 @@ class Leave_RequestMapper extends Mapper {
 				luResidentialHouse.id AS houseId,
 				luResidentialHouse.name AS name,
 				leave_request.id AS leaveRequestId,
-				SUM(leave_request.id AND ((`start` < :morningStart) AND (`finish` > :dayStart))) AS absent_morning,
-				((SELECT COUNT(*) FROM `user` WHERE user.residential_house_id = houseId) - COALESCE(SUM(leave_request.id AND ((`start` < :morningStart) AND (`finish` > :dayStart))),0)) AS present_morning,
-				SUM(leave_request.id AND ((`start` < :dayStart) AND (`finish` > :nightStart))) AS absent_day,
-				((SELECT COUNT(*) FROM `user` WHERE user.residential_house_id = houseId) - COALESCE(SUM(leave_request.id AND ((`start` < :dayStart) AND (`finish` > :nightStart))),0)) AS present_day,
-				SUM(leave_request.id AND ((`start` < :nightStart) AND (`finish` > :nightEnd))) AS absent_night,
-				((SELECT COUNT(*) FROM `user` WHERE user.residential_house_id = houseId) - COALESCE(SUM(leave_request.id AND ((`start` < :nightStart) AND (`finish` > :nightEnd))),0)) AS present_night
+				SUM(leave_request.id AND ((`start` < :breakfastStart) AND (`finish` > :breakfastEnd))) AS absent_morning,
+				((SELECT COUNT(*) FROM `user` WHERE user.residential_house_id = houseId) - COALESCE(SUM(leave_request.id AND ((`start` < :breakfastStart) AND (`finish` > :breakfastEnd))),0)) AS present_morning,
+				SUM(leave_request.id AND ((`start` < :lunchStart) AND (`finish` > :lunchEnd))) AS absent_day,
+				((SELECT COUNT(*) FROM `user` WHERE user.residential_house_id = houseId) - COALESCE(SUM(leave_request.id AND ((`start` < :lunchStart) AND (`finish` > :lunchEnd))),0)) AS present_day,
+				SUM(leave_request.id AND ((`start` < :dinnerStart) AND (`finish` > :dinnerEnd))) AS absent_night,
+				((SELECT COUNT(*) FROM `user` WHERE user.residential_house_id = houseId) - COALESCE(SUM(leave_request.id AND ((`start` < :dinnerStart) AND (`finish` > :dinnerEnd))),0)) AS present_night
 			FROM luResidentialHouse
 			LEFT JOIN `user` ON user.residential_house_id = luResidentialHouse.id
 			LEFT JOIN leave_request ON leave_request.user_id = `user`.id AND leave_request.authorisation_datetime IS NOT NULL AND leave_request.status != :deleted
@@ -461,10 +464,13 @@ class Leave_RequestMapper extends Mapper {
 
         $statement->execute(
             array(
-                ':morningStart' => $morningStart->getDatabase(),
-                ':dayStart' => $dayStart->getDatabase(),
-                ':nightStart' => $nightStart->getDatabase(),
-                ':nightEnd' => $nightEnd->getDatabase(),
+                ':breakfastStart' => $breakfastStart->getDatabase(),
+	            ':breakfastEnd' => $breakfastEnd->getDatabase(),
+	            ':breakfastEnd' => $breakfastEnd->getDatabase(),
+                ':lunchStart' => $lunchStart->getDatabase(),
+	            ':lunchEnd' => $lunchEnd->getDatabase(),
+                ':dinnerStart' => $dinnerStart->getDatabase(),
+                ':dinnerEnd' => $dinnerEnd->getDatabase(),
                 ':deleted' => Leave_Request::STATUS_DELETED,
             )
         );
