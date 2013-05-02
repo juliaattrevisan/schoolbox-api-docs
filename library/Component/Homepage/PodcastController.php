@@ -63,7 +63,7 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
                             $this->setVar(array(
                                 'PODCAST_URL' => Scrub::text($item->enclosure['url']),
                                 'PODCAST_TITLE' => Scrub::text($item->title),
-                                'PODCAST_DESCRIPTION' => Scrub::text($item->description),
+                                'PODCAST_DESCRIPTION' => Scrub::html($item->description),
                                 'ON_OFF'  => ++$j % 2 ? '' : 'dark',
                                 'PODCAST_ID' => md5($item->title),
                             ));
