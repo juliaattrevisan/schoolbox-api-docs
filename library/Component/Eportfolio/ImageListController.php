@@ -25,8 +25,6 @@ class Component_Eportfolio_ImageListController extends Component_Eportfolio_Cont
 	 * @return void
 	 */
 	public function execute() {
-		$this->setMapperClass(Component_Eportfolio_ImageListMapper::getInstance());
-
 		return true;
 	}
 
