@@ -25,10 +25,16 @@ if ($_POST['heading']) {
     );
 
     if (is_readable($_FILES['file']['tmp_name'])) {
-        $imageResource = Storage_ResourceMapper::getInstance()->create(
-            $_FILES['file']['name'], $_FILES['file']['tmp_name'], $_SESSION['id']
-        );
-        $news['item_image'] = $imageResource->hash;
+
+	    $allowedFiles = new \Schoolbox\File\MimetypeMapper();
+	    $mime = $allowedFiles->getByFilename($_FILES['file']['name']);
+
+	    if(is_object($mime) && $mime->getEnable() == 'true' && stristr($mime->getMime(),'image/')) {
+	        $imageResource = Storage_ResourceMapper::getInstance()->create(
+	            $_FILES['file']['name'], $_FILES['file']['tmp_name'], $_SESSION['id']
+	        );
+	        $news['item_image'] = $imageResource->hash;
+	    }
     }
 
     /* Check user is news owner
