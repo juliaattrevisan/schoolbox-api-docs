@@ -21,7 +21,7 @@ $authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId
 if ($authenticator->canModify()) {
 	$content = $_POST['content'];
 
-	$textboxCollection = Component_Eportfolio_TextboxMapper::getInstance()->findByColumn('component_instance_id', $componentInstanceId);
+	$textboxCollection = \Component\Eportfolio\TextboxMapper::getInstance()->findByColumn('component_instance_id', $componentInstanceId);
 
 	/* Update existing textbox
 	 */
@@ -30,17 +30,17 @@ if ($authenticator->canModify()) {
 		$textboxItem->setContent($content);
 		$textboxItem->setSequence(1);
 
-		Component_Eportfolio_TextboxMapper::getInstance()->save($textboxItem);
+		\Component\Eportfolio\TextboxMapper::getInstance()->save($textboxItem);
 	}
 	/* Create new one
 	 */
 	else {
-		$textboxItem = new Component_Eportfolio_Textbox();
+		$textboxItem = new \Component\Eportfolio\Textbox();
 		$textboxItem->setComponentInstanceId($componentInstanceId);
 		$textboxItem->setContent($content);
 		$textboxItem->setSequence(1);
 
-		Component_Eportfolio_TextboxMapper::getInstance()->save($textboxItem);
+		\Component\Eportfolio\TextboxMapper::getInstance()->save($textboxItem);
 	}
 
 	SitePage::localRedir("/eportfolio/{$ownerId}/{$pageId}");

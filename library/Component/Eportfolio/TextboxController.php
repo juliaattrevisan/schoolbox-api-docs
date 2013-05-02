@@ -24,7 +24,9 @@ class Component_Eportfolio_TextboxController extends Component_Eportfolio_Contro
 	 * @return void
 	 */
 	public function execute() {
-		$this->setMapperClass(Component_Eportfolio_TextboxMapper::getInstance());
+		$mapper = new \Component\Eportfolio\TextboxMapper();
+
+		$this->setMapperClass($mapper);
 
 		return true;
 	}
