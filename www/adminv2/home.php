@@ -118,8 +118,14 @@ $this->setVar($ldap);
 
 /* WWW access check */
 if(in_array('nojscript', $this->arg)) {
-    // Believe it or not, this is actually really slow!
-    if(@file_get_contents('http://schoolbox.com.au/schoolboxinstaller/status.html')) {
+
+	// Believe it or not, this is actually really slow!
+
+	$curl = curl_init('http://schoolbox.com.au/schoolboxinstaller/status.html');
+	curl_setopt($curl, CURLOPT_NOBODY, true);
+	curl_setopt($curl, CURLOPT_TIMEOUT, 2);
+
+    if(curl_exec($curl)) {
        $www = array('WWW_LIGHT'  => 'on',
                     'WWW_STATUS' => 'Available');
     }
@@ -127,6 +133,8 @@ if(in_array('nojscript', $this->arg)) {
        $www = array('WWW_LIGHT'  => '',
                     'WWW_STATUS' => 'Inaccessible');
     }
+	curl_close($curl);
+
 } else {
     $www = array('WWW_LIGHT'  => '',
                  'WWW_STATUS' => 'Not Tested');
