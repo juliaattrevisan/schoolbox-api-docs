@@ -1,4 +1,6 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    <link rel="stylesheet" href="/css/jquery.slimbox.css" type="text/css" media="screen"/>
+    <script type="text/javascript" src="/javascript/jquery.slimbox.js"></script>
 	<script type='text/javascript'>
 		$j(function() {
 			$j('a.modify_advanced').click(function() {
@@ -52,7 +54,10 @@
             <!-- END has_delete_form -->
 
             <!-- BEGIN has_image -->
-            <img src='/storage/image.php?size=square64&hash={LIST_ITEM_IMAGEHASH}' class='floatLeft' /><br />
+            <a href="/storage/image.php?size=maxsize&hash={LIST_ITEM_IMAGEHASH}" rel="lightbox[portal]" style="height:64px;" alt="{LIST_ITEM_TITLE}" title="{LIST_ITEM_TITLE}">
+                <img src="/storage/image.php?size=square64&hash={LIST_ITEM_IMAGEHASH}" alt="{LIST_ITEM_TITLE}" border="0"/>
+            </a>
+            <br />
             <!-- END has_image -->
 
 
