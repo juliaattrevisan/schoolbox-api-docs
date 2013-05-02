@@ -106,6 +106,7 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 				if ($allComments->count()) {
 					foreach($allComments as $currentComment) {
 						$commentAuthor = NewUserMapper::getInstance()->findById($currentComment->getUid());
+						$createdAt = new Alaress_Date_Relative($currentComment->getCreatedAt());
 
 						$this->setVar(array(
 							'COMMENT_ID' => $currentComment->getId(),
@@ -113,6 +114,7 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 							'COMMENT_AUTHOR_FIRSTNAME' => $commentAuthor->getFirstname(),
 							'COMMENT_AUTHOR_LASTNAME' => $commentAuthor->getLastname(),
 							'COMMENT_CONTENT' => $currentComment->getContent(),
+							'COMMENT_CREATED_AT' => $createdAt->getRelativeTime(),
 						));
 
 						/* Controls for deleting comments
