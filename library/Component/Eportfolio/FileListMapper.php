@@ -86,7 +86,7 @@ class FileListMapper extends Schoolbox\Mapper {
 
 		$statement = $this->database->prepare($query);
 
-		$statement->bindParam(':limit', $limit, PDO::PARAM_INT);
+		$statement->bindParam(':limit', $limit, \PDO::PARAM_INT);
 
 		$statement->execute();
 
@@ -113,7 +113,7 @@ class FileListMapper extends Schoolbox\Mapper {
 
 		$statement = $this->database->prepare($query);
 
-		$statement->bindParam(':limit', $limit, PDO::PARAM_INT);
+		$statement->bindParam(':limit', $limit, \PDO::PARAM_INT);
 
 		$statement->execute();
 

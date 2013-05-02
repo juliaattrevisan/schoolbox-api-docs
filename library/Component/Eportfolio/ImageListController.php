@@ -49,7 +49,9 @@ class Component_Eportfolio_ImageListController extends Component_Eportfolio_Cont
 			'list_item_block' => ''
 		));
 
-		$allImages = Component_Eportfolio_FileListMapper::getInstance()->findAll();
+		$mapper = new \Component\Eportfolio\FileListMapper();
+
+		$allImages = $mapper->findAll();
 
 		if ($allImages->count()) {
 			foreach($allImages as $currentImage) {
