@@ -19,23 +19,23 @@ $content = $_POST['content'];
 
 $authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
 
-if ($authenticator->canModify()) {
+if ($authenticator->canView()) {
 
 	/* Add a comment to pages you can view
 	 */
 	if ($action == 'addComment') {
 		$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+		$authorId = $_SESSION['id'];
 
 		$blogComment = new Component_Eportfolio_BlogComment();
 		$blogComment->setBlogId($listItemId);
-		$blogComment->setUid($ownerId);
+		$blogComment->setUid($authorId);
 		$blogComment->setContent($content);
 		$blogComment->setCreatedAt($now->getDatabase());
 		$blogComment->setUpdatedAt($now->getDatabase());
 
 		Component_Eportfolio_BlogCommentMapper::getInstance()->save($blogComment);
 	}
-
 //	/* Update a list item
 //	 */
 //	else if ($action == 'updateItem') {
@@ -54,27 +54,13 @@ if ($authenticator->canModify()) {
 		$commentId = $_POST['commentId'];
 
 		$listItem = Component_Eportfolio_BlogCommentMapper::getInstance()->findById($commentId);
-		Component_Eportfolio_BlogCommentMapper::getInstance()->delete($listItem);
-	}
 
-	SitePage::localRedir("/eportfolio/{$ownerId}/{$pageId}");
-}
-else if ($authenticator->canView()) {
-
-	/* Add a comment to pages you can view
-	 */
-	if ($action == 'addComment') {
-		$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-		$authorId = $_SESSION['id'];
-
-		$blogComment = new Component_Eportfolio_BlogComment();
-		$blogComment->setBlogId($listItemId);
-		$blogComment->setUid($authorId);
-		$blogComment->setContent($content);
-		$blogComment->setCreatedAt($now->getDatabase());
-		$blogComment->setUpdatedAt($now->getDatabase());
-
-		Component_Eportfolio_BlogCommentMapper::getInstance()->save($blogComment);
+		/* Blog authors can delete anyone's comment
+		 * Comment authors are allowed to delete their own comments, but a ui is not provided yet.
+		 */
+		if (($listItem->getUid() == $_SESSION['id']) || ($authenticator->canModify())) {
+			Component_Eportfolio_BlogCommentMapper::getInstance()->delete($listItem);
+		}
 	}
 
 	SitePage::localRedir("/eportfolio/{$ownerId}/{$pageId}");
