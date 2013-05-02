@@ -14,6 +14,14 @@
 				$j('#list_item_basic_content_' + id).hide();
 			});
 
+            /* Create button, swap form in
+             */
+            $j('a.create_basic').click(function() {
+                $j(this).hide();
+                $j(this).next().show();
+
+            });
+
 			/* Close button
 			 */
 			$j('a.modify_basic_close').click(function() {
@@ -32,20 +40,7 @@
 	<h2>{COMPONENT_NAME}</h2>
 	{CONFIGURATION}
 
-	<!-- BEGIN has_create_form -->
-    <div class="editPanel settings">
-        <form action='/eportfolio/component/basiclist/modifyForm.php' method='get'>
-            <input type='hidden' name='action' value='addItem' />
-            <input type='hidden' name='userId' value='{USER_ID}' />
-            <input type='hidden' name='pageId' value='{PAGE_ID}' />
-            <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
-            <div class="content"><span>Content: </span>
-                <input type='text' name='content' value='' />
-            </div>
-            <input type='submit' value='Add item' />
-        </form>
-    </div>
-	<!-- END has_create_form -->
+
     <div class="listing">
         <ul>
 		<!-- BEGIN list_item -->
@@ -61,7 +56,7 @@
 
 			<!-- BEGIN has_modify_form -->
             <div class="editPanel settings hide" id='modify_basic_form_{LIST_ITEM_ID}'>
-                <form class='modifyForm' action='/eportfolio/component/basiclist/modifyForm.php' method='get'>
+                <form class='modifyForm' action='/eportfolio/component/basiclist/modifyForm.php' method='post'>
                     <input type='hidden' name='action' value='updateItem' />
                     <input type='hidden' name='userId' value='{USER_ID}' />
                     <input type='hidden' name='pageId' value='{PAGE_ID}' />
@@ -77,6 +72,23 @@
             </div>
 			<!-- END has_modify_form -->
 		<!-- END list_item -->
+
 	</ul>
     </div>
+    <!-- BEGIN has_create_form -->
+    <a href="#" class="btn add create_basic"><span></span>Add to List</a>
+
+    <div class="editPanel settings hide">
+        <form action='/eportfolio/component/basiclist/modifyForm.php' method='post'>
+            <input type='hidden' name='action' value='addItem' />
+            <input type='hidden' name='userId' value='{USER_ID}' />
+            <input type='hidden' name='pageId' value='{PAGE_ID}' />
+            <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
+            <div class="content"><span>Content: </span>
+                <input type='text' name='content' value='' />
+            </div>
+            <input type='submit' value='Add item' />
+        </form>
+    </div>
+    <!-- END has_create_form -->
 </div>
