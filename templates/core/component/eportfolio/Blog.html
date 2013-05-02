@@ -1,10 +1,17 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
 	<script type='text/javascript'>
 		$j(function() {
-			$j('.closeComment').each(function(index, element) {
-				$j(element).click(function() {
-					$j('#' + $j(element).attr('rel')).toggle();
-				});
+
+			/* When you have $j(function() inside the <body> tags the onclick
+			 * event runs twice. Unbind it and rebind it is a convenient solution.
+			 *
+			 * By Shahbaz Saleem
+			 * http://yuji.wordpress.com/2010/02/22/jquery-click-event-fires-twice/
+			 */
+			$j('.closeComment').unbind('click').click(function() {
+				var id = $j(this).attr('rel');
+
+				$j('#' + id).toggle();
 			});
 		});
 	</script>
@@ -53,6 +60,9 @@
 							</p>
 							<p>
 								{COMMENT_CONTENT}
+							</p>
+							<p>
+								Posted {COMMENT_CREATED_AT}
 							</p>
 							<!-- BEGIN has_delete_comment_form -->
 							<form action='/eportfolio/component/blogcomment/modifyForm.php' method='post'>
