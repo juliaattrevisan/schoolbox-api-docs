@@ -57,4 +57,31 @@ class Component_Eportfolio_FileListMapper extends Mapper {
 
 		parent::mapping();
 	}
+
+	/**
+	 * Retrieves a list of recently-published images
+	 *
+	 * @param $limit
+	 * @return Collection
+	 */
+	public function findRecent($limit) {
+		$query = "
+            SELECT *
+            FROM `{$this->table}`
+            LEFT JOIN myFile ON myFile.id = {$this->table}.file_id
+            WHERE myFile.mime_type LIKE '%image/%'
+            ORDER BY created_at DESC
+            LIMIT :limit
+		";
+
+		$statement = $this->database->prepare($query);
+
+		$statement->bindParam(':limit', $limit, PDO::PARAM_INT);
+
+		$statement->execute();
+
+		$rowset = $statement->fetchAll();
+
+		return $this->hydrateList($rowset);
+	}
 }

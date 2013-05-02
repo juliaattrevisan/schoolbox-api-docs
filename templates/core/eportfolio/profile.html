@@ -94,19 +94,19 @@
     </div>
 
     <div class="box component">
-        <!-- TODO: This whole component-->
         <h2>Recent Photos</h2>
+		<!-- BEGIN has_recent_photo -->
         <div class="listing photos">
+			<!-- BEGIN recent_photo -->
             <a href="" title="Image title">
-                <img alt="Image title" src="http://lorempixel.com/499/499" />
+				<img alt="Image title" src='/cms/myImage.php?id={RECENT_PHOTO_FILE_ID}&width=200&height=200' />
             </a>
-            <a href="" title="Image title">
-                <img alt="Image title" src="http://lorempixel.com/500/500" />
-            </a>
-            <a href="" title="Image title">
-                <img alt="Image title" src="http://lorempixel.com/501/501" />
-            </a>
+			<!-- END recent_photo -->
         </div>
+		<!-- END has_recent_photo -->
+		<!-- BEGIN no_recent_photo -->
+		<p>{USER_FIRSTNAME} {USER_LASTNAME} has no recent photos.</p>
+		<!-- END no_recent_photo -->
     </div>
 </div>
 

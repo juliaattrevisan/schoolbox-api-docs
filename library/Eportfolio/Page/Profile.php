@@ -24,6 +24,13 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	protected $numRecentBlogs = -1;
 
 	/**
+	 * Number of recent photos to display
+	 *
+	 * @var int
+	 */
+	protected $numRecentPhotos = -1;
+
+	/**
 	 * The template file to use
 	 *
 	 * @var string
@@ -36,6 +43,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	protected function initialise() {
 		$this->setNumShowcasedItems(3);
 		$this->setNumRecentBlogs(3);
+		$this->setNumRecentPhotos(3);
 	}
 
 	/**
@@ -60,6 +68,12 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 		$this->getPage()->setBlock(TEMPLATE_content, 'has_recent_blog', 'has_recent_blog_block');
 		$this->getPage()->setBlock('has_recent_blog', 'recent_blog', 'recent_blog_block');
 
+		$this->getPage()->setBlock(TEMPLATE_content, 'no_recent_photo', 'no_recent_photo_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'has_recent_photo', 'has_recent_photo_block');
+		$this->getPage()->setBlock('has_recent_photo', 'recent_photo', 'recent_photo_block');
+
+		/* User details
+		 */
 		$user = $this->getUser();
 
 		$this->getPage()->setVar(array(
@@ -195,6 +209,27 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 * Render recent photos
 	 */
 	private function renderRecentPhotos() {
+
+		/* Gather everything
+		 */
+		$allImages = Component_Eportfolio_FileListMapper::getInstance()->findRecent($this->getNumRecentPhotos());
+
+		if ($allImages->count()) {
+			foreach ($allImages as $currentImage) {
+				$this->getPage()->setVar(array(
+					'RECENT_PHOTO_FILE_ID' => $currentImage->getFileId(),
+				));
+
+				$this->getPage()->parse('recent_photo_block', 'recent_photo', true);
+			}
+
+			$this->getPage()->parse('has_recent_photo_block', 'has_recent_photo');
+			$this->getPage()->setVar('no_recent_photo_block', '');
+		}
+		else {
+			$this->getPage()->parse('no_recent_photo_block', 'no_recent_photo');
+			$this->getPage()->setVar('has_recent_photo_block', '');
+		}
 	}
 
 	/**
@@ -351,5 +386,23 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 */
 	private function getNumRecentBlogs() {
 		return $this->numRecentBlogs;
+	}
+
+	/**
+	 * Set num recent photos
+	 *
+	 * @param int $numRecentPhotos
+	 */
+	private function setNumRecentPhotos($numRecentPhotos) {
+		$this->numRecentPhotos = $numRecentPhotos;
+	}
+
+	/**
+	 * Get num recent photos
+	 *
+	 * @return int
+	 */
+	private function getNumRecentPhotos() {
+		return $this->numRecentPhotos;
 	}
 }
