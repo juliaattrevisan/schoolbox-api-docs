@@ -37,9 +37,14 @@ if ($authenticator->canModify()) {
 		$uploadedUid = $_SESSION['id'];
 
 		if (is_readable($uploadedLocation)) {
-			$imageResource = Storage_ResourceMapper::getInstance()->create($uploadedFilename, $uploadedLocation, $uploadedUid);
 
-			$listItem->setImagehash($imageResource->hash);
+			$allowedFiles = new \Schoolbox\File\MimetypeMapper();
+			$mime = $allowedFiles->getByFilename($_FILES['imagehash']['name']);
+
+			if(is_object($mime) && $mime->getEnable() == 'true' && stristr($mime->getMime(),'image/')) {
+				$imageResource = Storage_ResourceMapper::getInstance()->create($uploadedFilename, $uploadedLocation, $uploadedUid);
+				$listItem->setImagehash($imageResource->hash);
+			}
 		}
 
 		Component_Eportfolio_AdvancedListMapper::getInstance()->save($listItem);
