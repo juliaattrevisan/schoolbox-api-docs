@@ -1,4 +1,4 @@
-Username,Title,Firstname,Lastname,School ID,Group,Campus1,Campus2,Campus3,Year,Password,Webmail,Alt Email
-jerome092,Mr,Jerome,Spartan,1256,Students,Senior,,,,1,
-alice130,Mrs,Alice,Spartan,4562,Staff,Junior,Senior,,,1,
-douglas042,,Douglas,Spartan,2346,Parents,ELC,Senior,,,0,douglasAlt@alaress.com.au
+Username,Title,Firstname,Lastname,School ID,Group,Campus1,Campus2,Campus3,Year,Password,Username as Email,Use Mail Client,Alt Email
+jerome092,Mr,Jerome,Spartan,1256,Students,Senior,,,,1,1,
+alice130,Mrs,Alice,Spartan,4562,Staff,Junior,Senior,,,1,1,
+douglas042,,Douglas,Spartan,2346,Parents,ELC,Senior,,,0,0,douglasAlt@alaress.com.au

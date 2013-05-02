@@ -278,27 +278,34 @@ $j(function() {
 	<form class="admin-form" method="POST" action="/adminv2/userForm.php">
 		<div class="split-container clearfix">
 			<div class="split">
-				<label class="width2 first">Title
-					<select name="title">
+				<label for="title" class="width2 first">Title
+					<select id="title" name="title">
 						<!-- BEGIN title -->
 						<option value="{NAME_TITLE}" {NAME_TITLE_SELECTED}>{NAME_TITLE}</option>
 						<!-- END title -->
 					</select>
 				</label>
-				<label class="width2 first">First Name
-					<input type="text" name="firstname" value="{FIRSTNAME}" class="required" />
+				<label for="firstname" class="width2 first">First Name
+					<input id="firstname" type="text" name="firstname" value="{FIRSTNAME}" class="required" />
 				</label>
 				<label for="lastname">Surname
-					<input type="text" name="lastname" value="{LASTNAME}" class="required"/>
+					<input id="lastname" type="text" name="lastname" value="{LASTNAME}" class="required"/>
 				</label>
-				<label for ="database" class="">{DATABASE_TYPE} ID
-					<input type="text" name="database_id" value="{DATABASE_ID}"/>
+				<label for="database" class="">{DATABASE_TYPE} ID
+					<input id="database" type="text" name="database_id" value="{DATABASE_ID}"/>
 				</label>
 				
 				<label>Schoolbox User ID
 					<input type="text" disabled="disabled" value="{USERID}"/>
 				</label>
-				
+
+                <label for="group">Group
+                    <select id="group" name="group">
+                        <!-- BEGIN system_group -->
+                        <option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{SYSTEM_GROUP_NAME}</option>
+                        <!-- END system_group -->
+                    </select>
+                </label>
 
 				<table cellpadding="0" width="50%" class="float-left">
 					<colgroup>
@@ -328,11 +335,11 @@ $j(function() {
 		<div class="split-container">
 			<div class="split last">
                 <label for ="username" class="width2">Username
-					<input type="text" name="modusername" value="{USERNAME}" class="required" />
+					<input id="username" type="text" name="modusername" value="{USERNAME}" class="required" />
 				</label>
 				<label for="password" class="password-container">
 					<div class="actual-password">Password<br />
-						<input type="password" name="modpassword" class="password" value="{PASSWORD}" />
+						<input id="password" type="password" name="modpassword" class="password" value="{PASSWORD}" />
 					</div>
 					<!-- BEGIN reveal_password -->
 					<div class="reveal-password">
@@ -343,43 +350,39 @@ $j(function() {
                     <!-- END reveal_password -->
 				</label>
                 <label for="alt_email">Alternate Email
-					<input type="text" name="alt_email" value="{ALT_EMAIL}" />
+					<input id="alt_email" type="text" name="alt_email" value="{ALT_EMAIL}" />
 				</label>
-				<label for="group">Group
-					<select name="group">
-						<!-- BEGIN system_group -->
-						<option value="{GROUP_ID}" {GROUP_ID_SELECTED}>{SYSTEM_GROUP_NAME}</option>
-						<!-- END system_group -->
-					</select>
-				</label>
-
-                <label for="house">House</label>
+                <label for="year">Year
+                    <input id="year" type="text" name="year" value="{YEAR}" />
+                </label>
+                <label for="house">House
                 <select id="house" name="house">
                     <option value="">Not Set</option>
                     <!-- BEGIN house -->
                     <option value="{HOUSE_ID}" {HOUSE_ID_SELECTED}>{HOUSE_NAME}</option>
                     <!-- END house -->
-                </select>
+                </select></label>
                 <div class="clearfix"></div>
-                <label for="residential_house">Residential House</label>
+                <label for="residential_house">Residential House
                 <select id="residential_house" name="residential_house">
                     <option value="">Not Set</option>
                     <!-- BEGIN residential_house -->
                     <option value="{RESIDENT_HOUSE_ID}" {RESIDENT_HOUSE_ID_SELECTED}>{RESIDENT_HOUSE_NAME}</option>
                     <!-- END residential_house -->
-                </select>
-				<label for="e-portfolio">E-Portfolio
-					<input type="checkbox" name="eportfolio" value="1" {EPORTFOLIO_CHECKED} />
+                </select></label>
+				<label for="eportfolio">E-Portfolio
+					<input id="eportfolio" type="checkbox" name="eportfolio" value="1" {EPORTFOLIO_CHECKED} />
 				</label>
-				<label for ="superuser" class="width2 ">Superuser
-					<input type="checkbox" name="superuser" value="1" onclick="return(confirm('Change {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME} superuser status?'));" {SUPERUSER_CHECKED} />
-				</label>
-                <label for ="local_email" class="width2 ">Local Email
-						<input type="checkbox" name="local_email" value="1" {LOCAL_EMAIL_CHECKED} />
+                <label for="local_email" class="width2 ">Username as Email
+						<input id="local_email" type="checkbox" name="local_email" value="1" {LOCAL_EMAIL_CHECKED} />
 			    </label>
-				<label for="year">Year
-					<input type="text" name="year" value="{YEAR}" />
-				</label>
+                <label for="mail_handler" class="width2 ">Use Mail Client
+                    <input id="mail_handler" type="checkbox" name="mail_handler" value="1" {MAILHANDLER_CHECKED} />
+                </label>
+                <label for="superuser" class="width2 ">Superuser
+                    <input  id="superuser" type="checkbox" name="superuser" value="1" onclick="return(confirm('Change {ESCAPE_FIRSTNAME} {ESCAPE_LASTNAME} superuser status?'));" {SUPERUSER_CHECKED} />
+                </label>
+
 			</div>
 		</div>
 

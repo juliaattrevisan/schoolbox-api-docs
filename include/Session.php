@@ -69,7 +69,8 @@ class Session
             $_SESSION['campus'] = $userHandler->getUserCampus($user['uid']);
             $_SESSION['calendar_view'] = $user['calendar_view'];
 
-            //if no webmail enabled or user has elected to use external client set mailhandle to mailto:
+            //if no mail enabled or user has elected to use external client set mailhandle to mailto:
+	        //TODO: remove this parent special config, but schools currently rely on it, need to update all parents to mail_handler = 1
             if (Cfg::get('mail_enable') == 0 || $user['mail_handler'] || ($groupHandler->isParent() && !$user['local_email']))
                 $_SESSION['mailhandle'] = "mailto:";
             else
