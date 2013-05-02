@@ -56,6 +56,8 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
         }
         $this->parseConfig();
 
+	    $this->setVar('USER_TOKEN', $_SESSION['key']);
+
         $this->activityList->setShowAvatars(true);
         $this->activityList->setTarget($this->sitepage, 'ACTIVITY_LIST');
         foreach ($this->activityList as $a) {
