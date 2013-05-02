@@ -95,4 +95,29 @@ class Component_Eportfolio_BlogMapper extends Mapper {
 
 		return $this->hydrateList($rowset);
 	}
+
+	/**
+	 * Retrieves a list of recently-created blogs
+	 *
+	 * @param $limit
+	 * @return Collection
+	 */
+	public function findRecent($limit) {
+		$query = "
+            SELECT {$this->getColumnString()}
+            FROM `{$this->table}`
+            ORDER BY created_at DESC
+            LIMIT :limit
+		";
+
+		$statement = $this->database->prepare($query);
+
+		$statement->bindParam(':limit', $limit, PDO::PARAM_INT);
+
+		$statement->execute();
+
+		$rowset = $statement->fetchAll();
+
+		return $this->hydrateList($rowset);
+	}
 }
