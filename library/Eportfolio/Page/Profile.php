@@ -210,6 +210,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 				$createdAt = new Alaress_Date_Relative($currentBlog->getCreatedAt());
 
 				$this->getPage()->setVar(array(
+					'RECENT_BLOG_BLOG_ID' => $currentBlog->getId(),
 					'RECENT_BLOG_TITLE' => $currentBlog->getTitle(),
 					'RECENT_BLOG_CREATED_AT' => $createdAt->getRelativeTime(),
 					'RECENT_BLOG_PAGE_ID' => $currentBlog->getPageId(),
