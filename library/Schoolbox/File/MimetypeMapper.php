@@ -56,12 +56,18 @@ class MimetypeMapper extends Schoolbox\Mapper {
 		));
 	}
 
-	protected function getExtensionInfo($filename) {
-		//
+	/**
+	 * Used to fetch a mime object for a given filename
+	 *
+	 * @param $filename
+	 * @return Mimetype
+	 */
+	public function getByFilename($filename) {
+
 		// Copied from AllowedFile methods getExtension() and getMimetype()
 		$extension = substr(strrchr($filename, "."), 1);
 		$query = "
-			SELECT mime, iconFile
+			SELECT {$this->getColumnString('aft')}
 			FROM allowedFileExtension afe
 			LEFT JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
 			WHERE extension = ?
@@ -70,18 +76,21 @@ class MimetypeMapper extends Schoolbox\Mapper {
 		$statement->execute(array($extension));
 
 		if ($row = $statement->fetch()) {
-			return $row;
+			return $this->hydrate($row, 'aft');
 		}
-		return false;
+
 	}
 
+    /*
+     * TODO: These are silly functions and not in the spirit of the game, please remove!
+     */
 	public function getMimetypeForFilename($filename) {
-		$extension_info = $this->getExtensionInfo($filename);
-		return $extension_info['mime'];
+		$extension_info = $this->getByFilename($filename);
+		return $extension_info->getMime();
 	}
 
 	public function getIconForFilename($filename) {
-		$extension_info = $this->getExtensionInfo($filename);
-		return $extension_info['iconFile'];
+		$extension_info = $this->getByFilename($filename);
+		return $extension_info->getIconFile();
 	}
 }

@@ -46,6 +46,7 @@ class Component_Eportfolio_BasicListController extends Component_Eportfolio_Cont
 		 */
 		$this->setBlock($templateHandle, 'has_create_form', 'has_create_form_block');
 		$this->setBlock($templateHandle, 'list_item', 'list_item_block');
+		$this->setBlock('list_item', 'has_modify_button', 'has_modify_button_block');
 		$this->setBlock('list_item', 'has_modify_form', 'has_modify_form_block');
 		$this->setBlock('list_item', 'has_delete_form', 'has_delete_form_block');
 
@@ -67,17 +68,20 @@ class Component_Eportfolio_BasicListController extends Component_Eportfolio_Cont
 		$allItems = $this->getMapperClass()->findByColumn('component_instance_id', $this->instance->id);
 
 		if ($allItems->count()) {
-			for ($allItems->rewind(); $allItems->valid(); $allItems->next()) {
-				$currentItem = $allItems->current();
+			$j = 0;
+
+			foreach ($allItems as $currentItem ) {
 
 				$this->setVar(array(
 					'LIST_ITEM_ID' => $currentItem->getId(),
-					'LIST_ITEM_CONTENT' => $currentItem->getContent()
+					'LIST_ITEM_CONTENT' => Scrub::text($currentItem->getContent()),
+					'ON_OFF' => ++$j % 2 ? '' : 'dark'
 				));
 
 				/* Controls
 				 */
 				if ($this->permission >= WRITE_ACCESS) {
+					$this->parse('has_modify_button_block', 'has_modify_button');
 					$this->parse('has_modify_form_block', 'has_modify_form');
 					$this->parse('has_delete_form_block', 'has_delete_form');
 				}
@@ -86,6 +90,7 @@ class Component_Eportfolio_BasicListController extends Component_Eportfolio_Cont
 
 				/* Clear children after parsing out the parent
 				 */
+				$this->setVar('has_modify_button_block', '');
 				$this->setVar('has_modify_form_block', '');
 				$this->setVar('has_delete_form_block', '');
 			}

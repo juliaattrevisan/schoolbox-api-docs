@@ -46,6 +46,7 @@ class Component_Eportfolio_LinkListController extends Component_Eportfolio_Contr
 		 */
 		$this->setBlock($templateHandle, 'has_create_form', 'has_create_form_block');
 		$this->setBlock($templateHandle, 'list_item', 'list_item_block');
+		$this->setBlock('list_item', 'has_modify_button', 'has_modify_button_block');
 		$this->setBlock('list_item', 'has_modify_form', 'has_modify_form_block');
 		$this->setBlock('list_item', 'has_delete_form', 'has_delete_form_block');
 
@@ -67,18 +68,33 @@ class Component_Eportfolio_LinkListController extends Component_Eportfolio_Contr
 		$allItems = $this->getMapperClass()->findByColumn('component_instance_id', $this->instance->id);
 
 		if ($allItems->count()) {
-			for ($allItems->rewind(); $allItems->valid(); $allItems->next()) {
-				$currentItem = $allItems->current();
+			$j = 0;
+
+			foreach ($allItems as $currentItem ) {
+
+				$url = new Url($currentItem->getContent());
+
+				if ($url->isLocalUrl()) {
+					$linkUrl = $url->getRelativeURL();
+					$linkTarget = '';
+				} else {
+					$linkUrl = $url->getBase64EncodedRedirect();
+					$linkTarget = 'external';
+				}
+
 
 				$this->setVar(array(
 					'LIST_ITEM_ID' => $currentItem->getId(),
-					'LIST_ITEM_TITLE' => $currentItem->getTitle(),
-					'LIST_ITEM_CONTENT' => $currentItem->getContent(),
+					'LIST_ITEM_TITLE' => Scrub::text($currentItem->getTitle()),
+					'LIST_ITEM_URL' => $linkUrl,
+					'LIST_ITEM_TARGET' => $linkTarget,
+					'ON_OFF' => ++$j % 2 ? '' : 'dark'
 				));
 
 				/* Controls
 				 */
 				if ($this->permission >= WRITE_ACCESS) {
+					$this->parse('has_modify_button_block', 'has_modify_button');
 					$this->parse('has_modify_form_block', 'has_modify_form');
 					$this->parse('has_delete_form_block', 'has_delete_form');
 				}
@@ -87,6 +103,7 @@ class Component_Eportfolio_LinkListController extends Component_Eportfolio_Contr
 
 				/* Clear children after parsing out the parent
 				 */
+				$this->setVar('has_modify_button_block', '');
 				$this->setVar('has_modify_form_block', '');
 				$this->setVar('has_delete_form_block', '');
 			}
