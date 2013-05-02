@@ -80,7 +80,11 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         $this->setBlock('link', 'modify_link', 'modify_link_block');
 
         $linkList = $this->linkHandler->getAllInCategory(
-            $this->source['id'], array('size' => $this->getConfig('size'))
+            $this->source['id'], array(
+	                                    'size' => $this->getConfig('size'),
+                                        'sort'  => $this->getConfig('sort'),
+                                        'sortdir' => $this->getConfig('sortdir'),
+                                       )
         );
 
         $this->setVar('link_block', '');
