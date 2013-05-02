@@ -2,10 +2,11 @@
 
 	<h2>{COMPONENT_NAME}</h2>
 	{CONFIGURATION}
-
+    <!-- BEGIN output_text -->
 	<div id='textbox_content_{COMPONENT_INSTANCE_ID}' class="wysiwyg clearfix">
             {TEXTBOX_CONTENT}
 	</div>
+    <!-- END output_text -->
 
 	<!-- BEGIN has_modify_form -->
     <form id='modify_textbox_form_{COMPONENT_INSTANCE_ID}' class='modifyForm' action='/eportfolio/component/textbox/modifyForm.php' method='post'>
@@ -26,10 +27,6 @@
         <!-- BEGIN modify_text -->
         <a href="/eportfolio/{USER_ID}/{PAGE_ID}/textbox/modify/{COMPONENT_INSTANCE_ID}#modify_textbox_form_{COMPONENT_INSTANCE_ID}" class="btn modify"><span></span>Modify</a>
         <!-- END modify_text -->
-
-        <!-- BEGIN create_text -->
-        <a href="/eportfolio/{USER_ID}/{PAGE_ID}/textbox/create/{COMPONENT_INSTANCE_ID}#modify_textbox_form_{COMPONENT_INSTANCE_ID}" class="btn modify"><span></span>Create</a>
-        <!-- END create_text -->
     </p>
 
 </div>
