@@ -11,10 +11,10 @@ require_once dirname(__FILE__) . '/../../../../include/Bootstrap.php';
 
 $page = new SitePage();
 
-$action = Scrub::text($_GET['action']);
-$ownerId = Scrub::text($_GET['userId']);
-$pageId = Scrub::text($_GET['pageId']);
-$componentInstanceId = Scrub::text($_GET['componentInstanceId']);
+$action = $_REQUEST['action'];
+$ownerId = $_REQUEST['userId'];
+$pageId = $_REQUEST['pageId'];
+$componentInstanceId = $_REQUEST['componentInstanceId'];
 
 $authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
 
@@ -23,8 +23,8 @@ if ($authenticator->canModify()) {
 	/* Add a list item
 	 */
 	if ($action == 'addItem') {
-		$title = Scrub::text($_GET['title']);
-		$content = Scrub::text($_GET['content']);
+		$title = $_POST['title'];
+		$content = $_POST['content'];
 
 		$listItem = new Component_Eportfolio_LinkList();
 		$listItem->setComponentInstanceId($componentInstanceId);
@@ -37,9 +37,9 @@ if ($authenticator->canModify()) {
 	/* Update a list item
 	 */
 	else if ($action == 'updateItem') {
-		$listItemId = Scrub::text($_GET['listItemId']);
-		$title = Scrub::text($_GET['title']);
-		$content = Scrub::text($_GET['content']);
+		$listItemId = $_POST['listItemId'];
+		$title = $_POST['title'];
+		$content = $_POST['content'];
 
 		$listItem = Component_Eportfolio_LinkListMapper::getInstance()->findById($listItemId);
 		$listItem->setTitle($title);
@@ -50,7 +50,7 @@ if ($authenticator->canModify()) {
 	/* Delete a list item
 	 */
 	else if ($action == 'removeItem') {
-		$listItemId = Scrub::text($_GET['listItemId']);
+		$listItemId = $_GET['listItemId'];
 
 		$listItem = Component_Eportfolio_LinkListMapper::getInstance()->findById($listItemId);
 		Component_Eportfolio_LinkListMapper::getInstance()->delete($listItem);

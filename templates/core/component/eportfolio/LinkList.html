@@ -14,6 +14,14 @@
 				$j('#list_item_link_content_' + id).hide();
 			});
 
+            /* Create button, swap form in
+             */
+            $j('a.create_link').click(function() {
+                $j(this).hide();
+                $j(this).next().show();
+
+            });
+
 			/* Close button
 			 */
 			$j('a.modify_link_close').click(function() {
@@ -32,29 +40,12 @@
 	<h2>{COMPONENT_NAME}</h2>
 	{CONFIGURATION}
 
-	<!-- BEGIN has_create_form -->
-    <div class="editPanel settings">
-        <form action='/eportfolio/component/linklist/modifyForm.php' method='get'>
-            <input type='hidden' name='action' value='addItem' />
-            <input type='hidden' name='userId' value='{USER_ID}' />
-            <input type='hidden' name='pageId' value='{PAGE_ID}' />
-            <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
-            <div class="title"><span>Title: </span>
-                <input type='text' name='title' value='' />
-                </div>
-            <div class="content"><span>Link address: </span>
-                <input type='text' name='content' value='' />
-            </div>
 
-            <input type='submit' value='Add item' />
-        </form>
-    </div>
-	<!-- END has_create_form -->
     <div class="listing">
 	<ul>
 		<!-- BEGIN list_item -->
         <li class="clearfix {ON_OFF}" id='list_item_link_content_{LIST_ITEM_ID}'>
-			<h4><a class="icons link" href='{LIST_ITEM_CONTENT}'>{LIST_ITEM_TITLE}</a></h4>
+			<h4><a class="icons link"  rel="{LIST_ITEM_TARGET}" href='{LIST_ITEM_URL}'>{LIST_ITEM_TITLE}</a></h4>
             <!-- BEGIN has_modify_button -->
             <a class='btn modify no-text modify_link' title="Edit link" rel='{LIST_ITEM_ID}'><span></span></a>
             <!-- END has_modify_button -->
@@ -62,10 +53,11 @@
             <a title="Remove link" class="btn delete no-text" href="/eportfolio/component/linklist/modifyForm.php?action=removeItem&userId={USER_ID}&pageId={PAGE_ID}&componentInstanceId={COMPONENT_INSTANCE_ID}&listItemId={LIST_ITEM_ID}"><span></span></a>
             <!-- END has_delete_form -->
 		</li>
+        <!-- END list_item -->
         <!-- BEGIN has_modify_form -->
 
         <div class="editPanel settings hide" id='modify_link_form_{LIST_ITEM_ID}'>
-            <form class='modifyForm' action='/eportfolio/component/linklist/modifyForm.php' method="get">
+            <form class='modifyForm' action='/eportfolio/component/linklist/modifyForm.php' method="post">
                 <input type='hidden' name='action' value='updateItem' />
                 <input type='hidden' name='userId' value='{USER_ID}' />
                 <input type='hidden' name='pageId' value='{PAGE_ID}' />
@@ -83,7 +75,26 @@
             </form>
         </div>
         <!-- END has_modify_form -->
-		<!-- END list_item -->
+
 	</ul>
     </div>
+    <!-- BEGIN has_create_form -->
+    <a href="#" class="btn add create_link"><span></span>Add to List</a>
+    <div class="editPanel settings hide">
+        <form action='/eportfolio/component/linklist/modifyForm.php' method='post'>
+            <input type='hidden' name='action' value='addItem' />
+            <input type='hidden' name='userId' value='{USER_ID}' />
+            <input type='hidden' name='pageId' value='{PAGE_ID}' />
+            <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
+            <div class="title"><span>Title: </span>
+                <input type='text' name='title' value='' />
+            </div>
+            <div class="content"><span>Link address: </span>
+                <input type='text' name='content' value='' />
+            </div>
+
+            <input type='submit' value='Add item' />
+        </form>
+    </div>
+    <!-- END has_create_form -->
 </div>

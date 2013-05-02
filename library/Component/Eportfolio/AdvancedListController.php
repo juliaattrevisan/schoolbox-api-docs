@@ -72,13 +72,12 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 		if ($allItems->count()) {
 			$j = 0;
 
-			for ($allItems->rewind(); $allItems->valid(); $allItems->next()) {
-				$currentItem = $allItems->current();
+			foreach ($allItems as $currentItem ) {
 
 				$this->setVar(array(
 					'LIST_ITEM_ID' => $currentItem->getId(),
-					'LIST_ITEM_TITLE' => $currentItem->getTitle(),
-					'LIST_ITEM_CONTENT' => $currentItem->getContent(),
+					'LIST_ITEM_TITLE' => Scrub::text($currentItem->getTitle()),
+					'LIST_ITEM_CONTENT' => Scrub::text($currentItem->getContent()),
 					'ON_OFF' => ++$j % 2 ? '' : 'dark'
 				));
 

@@ -70,13 +70,24 @@ class Component_Eportfolio_LinkListController extends Component_Eportfolio_Contr
 		if ($allItems->count()) {
 			$j = 0;
 
-			for ($allItems->rewind(); $allItems->valid(); $allItems->next()) {
-				$currentItem = $allItems->current();
+			foreach ($allItems as $currentItem ) {
+
+				$url = new Url($currentItem->getContent());
+
+				if ($url->isLocalUrl()) {
+					$linkUrl = $url->getRelativeURL();
+					$linkTarget = '';
+				} else {
+					$linkUrl = $url->getBase64EncodedRedirect();
+					$linkTarget = 'external';
+				}
+
 
 				$this->setVar(array(
 					'LIST_ITEM_ID' => $currentItem->getId(),
-					'LIST_ITEM_TITLE' => $currentItem->getTitle(),
-					'LIST_ITEM_CONTENT' => $currentItem->getContent(),
+					'LIST_ITEM_TITLE' => Scrub::text($currentItem->getTitle()),
+					'LIST_ITEM_URL' => $linkUrl,
+					'LIST_ITEM_TARGET' => $linkTarget,
 					'ON_OFF' => ++$j % 2 ? '' : 'dark'
 				));
 

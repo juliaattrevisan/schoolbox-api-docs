@@ -58,8 +58,7 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 		if ($allItems->count()) {
 			$j = 0;
 
-			for ($allItems->rewind(); $allItems->valid(); $allItems->next()) {
-				$currentItem = $allItems->current();
+			foreach ($allItems as $currentItem ) {
 
 				/* TODO: Clean all this out, convert to mappers
 				 */
@@ -72,8 +71,8 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 				$this->setVar(array(
 					'LIST_ITEM_ID' => $currentItem->getId(),
 					'FILE_ITEM_ID' => $currentItem->getFileId(),
-					'FILE_ITEM_TITLE' => $file['description'],
-					'FILE_ITEM_FILENAME' => $file['realname'],
+					'FILE_ITEM_TITLE' => Scrub::text($file['description']),
+					'FILE_ITEM_FILENAME' => Scrub::text($file['realname']),
 					'FILE_ITEM_MIMETYPE' => $mimeMapper->findByColumn('mime', $file['mime_type'])->current()->getClass(),
 					'FILE_ITEM_CREATED_AT' => $createdAt->getShort(),
 					'ON_OFF' => ++$j % 2 ? '' : 'dark',
