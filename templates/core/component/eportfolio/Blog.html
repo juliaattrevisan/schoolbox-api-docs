@@ -2,13 +2,25 @@
 	<script type='text/javascript'>
 		$j(function() {
 
-			/* When you have $j(function() inside the <body> tags the onclick
+			/* For viewing comment form
+			 *
+			 * When you have $j(function() inside the <body> tags the onclick
 			 * event runs twice. Unbind it and rebind it is a convenient solution.
 			 *
 			 * By Shahbaz Saleem
 			 * http://yuji.wordpress.com/2010/02/22/jquery-click-event-fires-twice/
 			 */
 			$j('.closeComment').unbind('click').click(function() {
+				var id = $j(this).attr('rel');
+
+				$j('#' + id).toggle();
+			});
+
+			/* For viewing comment thread
+			 */
+			$j('.viewCommentThread').hide();
+			
+			$j('.viewComments').unbind('click').click(function() {
 				var id = $j(this).attr('rel');
 
 				$j('#' + id).toggle();
@@ -49,9 +61,9 @@
 				</div>
 				<div style='background-color:#aaa' id='blogComment_{LIST_ITEM_ID}'>
 					<!-- BEGIN has_comments -->
-					<strong>Comments</strong>
+					<a class='viewComments' rel='viewComments_{LIST_ITEM_ID}'>View Comments</a>
 
-					<ol>
+					<ol id='viewComments_{LIST_ITEM_ID}' class='viewCommentThread'>
 						<!-- BEGIN comment -->
 						<li>
 							<p>
