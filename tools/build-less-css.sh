@@ -12,6 +12,8 @@
 #
 #
 
+lessversion='1.3.0'
+
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};
 
@@ -19,6 +21,15 @@ instdir=`readlink -f $fullpath/../`;
 package=${instdir##*/};
 
 curdir=`pwd`;
+
+verbose=0;
+if [ ! -z $1 ];
+then
+	if [ $1 == '-v' ];
+	then
+		verbose=1;
+	fi
+fi
 
 # Ensure npm is installed
 checknpm=`whereis -b npm | awk '{ print $2}'`;
@@ -29,31 +40,27 @@ then
 fi
 
 # Ensure less is installed
-mkdir -p ~/node_modules;
-cd ~;
-npm install less@1.3.0 ~;
-if [ ! -f ~/node_modules/.bin/lessc ];
+if [ ! `~/node_modules/.bin/lessc -v 2>/dev/null| awk {'print $2'}` == $lessversion ];
 then
-	echo "Error: lessc not installed as expected";
-	exit 1;
+	mkdir -p ~/node_modules;
+	cd ~;
+	npm install less@$lessversion ~;
+	if [ ! -f ~/node_modules/.bin/lessc ];
+	then
+		echo "Error: lessc not installed as expected";
+		exit 1;
+	fi
+	cd $curdir;
 fi
-cd $curdir;
-
-# Build core.css
-echo "Building core.css";
-~/node_modules/.bin/lessc $instdir/www/css/core/core.less > $instdir/www/css/core/core.css;
-echo "/* less (`~/node_modules/.bin/lessc -v | cut -d' ' -f2`) build at `date +%Y-%m-%d\ %H:%M:%S` */" >> $instdir/www/css/core/core.css;
 
 # Build screen.css for each template
 for i in `ls -1 $instdir/www/css/*/screen.less`;
 do
-        filepath=`readlink -f $i`;
-        fullpath=${filepath%/*};
-        template=${fullpath##*/};
-        newfile="$fullpath/screen.css";
-        echo "Building $template screen css";
-        ~/node_modules/.bin/lessc $filepath > $newfile;
-        echo "/* less (`~/node_modules/.bin/lessc -v | cut -d' ' -f2`) build at `date +%Y-%m-%d\ %H:%M:%S` */" >> $newfile;
+	filepath=`readlink -f $i`;
+	fullpath=${filepath%/*};
+	template=${fullpath##*/};
+	newfile="$fullpath/screen.css";
+	~/node_modules/.bin/lessc $filepath > $newfile && echo "/* less ($lessversion) build at `date +%Y-%m-%d\ %H:%M:%S` */" >> $newfile && if [ $verbose -eq 1 ];then echo "$template - screen css";fi &
 done
 
 # Build mchrome.css for each template
@@ -63,9 +70,11 @@ do
 	fullpath=${filepath%/*};
 	template=${fullpath##*/};
 	newfile="$fullpath/mchrome.css";
-	echo "Building $template mobile css";
-	~/node_modules/.bin/lessc $filepath > $newfile;
-	echo "/* less (`~/node_modules/.bin/lessc -v | cut -d' ' -f2`) build at `date +%Y-%m-%d\ %H:%M:%S` */" >> $newfile;
+	~/node_modules/.bin/lessc $filepath > $newfile && echo "/* less ($lessversion) build at `date +%Y-%m-%d\ %H:%M:%S` */" >> $newfile && if [ $verbose -eq 1 ];then echo "$template - mobile css";fi &
 done
 
+# Build core.css
+~/node_modules/.bin/lessc $instdir/www/css/core/core.less > $instdir/www/css/core/core.css
+echo "/* less ($lessversion) build at `date +%Y-%m-%d\ %H:%M:%S` */" >> $instdir/www/css/core/core.css
+if [ $verbose -eq 1 ];then echo "core css";fi
 # End of script
