@@ -109,12 +109,12 @@ $blogList = array(
 	)
 );
 
-//$allComponents[] = $basicList;
-//$allComponents[] = $advancedList;
-//$allComponents[] = $linkList;
-//$allComponents[] = $textbox;
-//$allComponents[] = $fileList;
-//$allComponents[] = $imageList;
+$allComponents[] = $basicList;
+$allComponents[] = $advancedList;
+$allComponents[] = $linkList;
+$allComponents[] = $textbox;
+$allComponents[] = $fileList;
+$allComponents[] = $imageList;
 $allComponents[] = $blogList;
 
 foreach($allComponents as $currentComponent) {
