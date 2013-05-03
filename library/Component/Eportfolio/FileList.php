@@ -7,8 +7,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+namespace Component\Eportfolio;
 
-class Component_Eportfolio_FileList extends Component_Eportfolio_List {
+class FileList extends ListItem {
 
 	/**
 	 * Primary key
@@ -30,6 +31,13 @@ class Component_Eportfolio_FileList extends Component_Eportfolio_List {
 	 * @var
 	 */
 	public $fileId;
+
+	/**
+	 * A Schoolbox\MyFile instance
+	 *
+	 * @var
+	 */
+	public $file;
 
 	/**
 	 * When the File List item was created
@@ -160,4 +168,24 @@ class Component_Eportfolio_FileList extends Component_Eportfolio_List {
 	public function getUpdatedAt() {
 		return $this->updated_at;
 	}
+
+	/**
+	 * Set file
+	 *
+	 * @param  $file
+	 */
+	public function setFile($file) {
+		$this->file = $file;
+	}
+
+	/**
+	 * Get file
+	 *
+	 * @return
+	 */
+	public function getFile() {
+		return $this->file;
+	}
+
+
 }
