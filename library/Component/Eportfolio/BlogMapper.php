@@ -90,25 +90,29 @@ class BlogMapper extends Schoolbox\Mapper {
 	 * @return bool|Model
 	 */
 	public function findByOrder($args) {
-		$collection = new \Schoolbox\Collection();
-
 		$comment_mapper = $this->getJoinMapper('comments');
+		$author_mapper = $comment_mapper->getJoinMapper('author');
 
-		$statement = $this->database->prepare("
+		$query = "
 			SELECT
             	{$this->getColumnString('b')},
-            	{$comment_mapper->getColumnString('c')}
+            	{$comment_mapper->getColumnString('c')},
+            	{$author_mapper->getColumnString('a')}
             FROM `{$this->table}` b
             LEFT JOIN {$this->getJoinSql('comments', 'b', 'c')}
+            LEFT JOIN {$comment_mapper->getJoinSql('author', 'c', 'a')}
             WHERE b.`{$args['identifierName']}` = :identifierValue
             ORDER BY b.{$args['column']} {$args['order']}
-        ");
+        ";
 
+		$statement = $this->database->prepare($query);
 		$statement->bindParam(':identifierValue', $args['identifierValue']);
 		$statement->execute();
 
 		/* Manually construct hierarchy of blog items and their comments
 		 */
+		$collection = new \Schoolbox\Collection();
+
 		foreach ($statement as $row) {
 			$blogItem = $this->hydrate($row, 'b');
 			$commentItem = $comment_mapper->hydrate($row, 'c');
@@ -120,9 +124,12 @@ class BlogMapper extends Schoolbox\Mapper {
 				$collection->setOffset($blogItem->getId(), $blogItem);
 			}
 
-			/* If a comment was parsed from this $row, put it with is parent blog
+			/* If a comment was parsed from this $row, hydrate the author and
+			 * put the comment with its parent blog
 			 */
 			if (is_numeric($commentItem->getId())) {
+				$commentItem->setAuthor($author_mapper->hydrate($row, 'a'));
+
 				$collection->getOffset($commentItem->getBlogId())->getComments()->add($commentItem);
 			}
 		}

@@ -99,14 +99,12 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 
 				if ($currentItem->getComments()->count()) {
 					foreach($currentItem->getComments() as $currentComment) {
-						$commentAuthor = NewUserMapper::getInstance()->findById($currentComment->getUid());
 						$createdAt = new Alaress_Date_Relative($currentComment->getCreatedAt());
 
 						$this->setVar(array(
 							'COMMENT_ID' => $currentComment->getId(),
-							'COMMENT_EXTERNAL_USER_ID' => $commentAuthor->getSynergyId(),
-							'COMMENT_AUTHOR_FIRSTNAME' => $commentAuthor->getFirstname(),
-							'COMMENT_AUTHOR_LASTNAME' => $commentAuthor->getLastname(),
+							'COMMENT_EXTERNAL_USER_ID' => $currentComment->getAuthor()->getExternalId(),
+							'COMMENT_AUTHOR_FULLNAME' => $currentComment->getAuthor()->getFullname(),
 							'COMMENT_CONTENT' => Scrub::text($currentComment->getContent()),
 							'COMMENT_CREATED_AT' => $createdAt->getRelativeTime(),
 						));

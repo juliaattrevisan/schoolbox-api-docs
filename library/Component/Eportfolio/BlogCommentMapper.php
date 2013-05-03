@@ -64,6 +64,12 @@ class BlogCommentMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_DATETIME,
 		));
 
+		$this->hasJoin('author', array(
+			'mapper'    => '\\Schoolbox\\UserMapper',
+			'this_key'  => 'uid',
+			'other_key' => 'id',
+		));
+
 		parent::mapping();
 	}
 }

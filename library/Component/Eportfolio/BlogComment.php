@@ -26,11 +26,18 @@ class BlogComment {
 	public $blogId;
 
 	/**
-	 * The owner of the blog comment
+	 * The owner id of the blog comment
 	 *
 	 * @var
 	 */
 	public $uid;
+
+	/**
+	 * The user object associated with the owner
+	 *
+	 * @var
+	 */
+	public $author;
 
 	/**
 	 * The body content of the blog comment
@@ -185,5 +192,23 @@ class BlogComment {
 	 */
 	public function getBlogId() {
 		return $this->blogId;
+	}
+
+	/**
+	 * Set author
+	 *
+	 * @param $author
+	 */
+	public function setAuthor($author) {
+		$this->author = $author;
+	}
+
+	/**
+	 * Get author
+	 *
+	 * @return mixed
+	 */
+	public function getAuthor() {
+		return $this->author;
 	}
 }
