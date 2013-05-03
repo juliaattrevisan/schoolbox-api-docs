@@ -63,7 +63,7 @@ $textbox = array(
 	)
 );
 
-$file = array(
+$fileList = array(
 	'name' => 'My Files',
 	'module' => 'eportfolio',
 	'component_category' => null,
@@ -78,11 +78,44 @@ $file = array(
 	)
 );
 
+$imageList = array(
+	'name' => 'Image Gallery',
+	'module' => 'eportfolio',
+	'component_category' => null,
+	'class' => 'Component_Eportfolio_ImageListController',
+	'description' => 'An image component',
+	'multiple' => 'false',
+	'config' => array(
+		'componentname' => array(
+			'default_value' => 'Image Gallery',
+			'label' => 'Title',
+		),
+	)
+);
+
+
+$blogList = array(
+	'name' => 'Blog',
+	'module' => 'eportfolio',
+	'component_category' => null,
+	'class' => 'Component_Eportfolio_BlogController',
+	'description' => 'A blog component',
+	'multiple' => 'false',
+	'config' => array(
+		'componentname' => array(
+			'default_value' => 'Blog',
+			'label' => 'Title',
+		),
+	)
+);
+
 $allComponents[] = $basicList;
 $allComponents[] = $advancedList;
 $allComponents[] = $linkList;
 $allComponents[] = $textbox;
-$allComponents[] = $file;
+$allComponents[] = $fileList;
+$allComponents[] = $imageList;
+$allComponents[] = $blogList;
 
 foreach($allComponents as $currentComponent) {
 	Component_DefinitionMapper::getInstance()->create($currentComponent);
