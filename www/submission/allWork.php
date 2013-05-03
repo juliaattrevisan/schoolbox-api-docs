@@ -28,7 +28,7 @@ if(isset($this->arg[0])) {
 	}
 	else {
 		// this is a fail case
-		error(2); // TODO pick a better error
+		$this->localRedir("/submission/allWork/");
 	}
 }
 
@@ -41,7 +41,7 @@ $year = isset($this->arg[1]) ? $this->arg[1] : date('Y');
 if(isset($this->arg[2])) {
 	$semester = $this->arg[2];
 	if($semester > 2) {
-		error(2); // TODO better error, out of bounds
+		error(105, 'Semester can only be 1 or 2.');
 	}
 }
 else {
@@ -77,18 +77,12 @@ elseif($groupHandler->isParentOfChild($userId)) {
 }
 
 if($permission == PERMISSION_DENIED) {
-	error(2); // TODO better error, permission denied
+	error(19);
 }
 /* /PERMISSIONS */
 
 
 // ok. from here we're actually going to show the page, and not redirect
-
-// setup blocks
-//$this->setBlock(TEMPLATE_content, 'subject_selector', 'subject_selector_block');
-//$this->setBlock(TEMPLATE_content, '', '_block');
-
-
 $report = new StudentReportCard($userId);
 $report->setSemester($year, $semester);
 
@@ -99,5 +93,4 @@ if($subject) {
 /* At this point you don't HAVE to render() - if you want it in a different format,
  * the class is structured to accommodate that
  * */
-
 $report->renderPage($this);

@@ -362,6 +362,10 @@ class StudentReportCard {
 			return $a[0] < $b[0] ? $a[0] > $b[0] ? -1 : 1 : 0;
 		});
 
+		usort($userSeries, function($a, $b) {
+			return $a[0] < $b[0] ? $a[0] > $b[0] ? -1 : 1 : 0;
+		});
+
 		$graph = array();
 		$graph[] = array(
 			'label' => 'You',
