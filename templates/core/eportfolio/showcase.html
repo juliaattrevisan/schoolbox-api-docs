@@ -37,59 +37,66 @@
 
 <!-- BEGIN has_showcased_work -->
 <div>
-	<!-- BEGIN showcased_work -->
-	<!-- BEGIN showcased_work_category -->
-	<h2>{SHOWCASED_WORK_BOX_CATEGORY_NAME}</h2>
-	<!-- END showcased_work_category -->
+	<!-- BEGIN showcased_work_subject -->
+		<h2>{SHOWCASED_WORK_BOX_CATEGORY_NAME}</h2>
 
-    <div class="listing box">
-        <table class="showcased-work">
-            <colgroup>
-                <col width="46" />
-                <col />
-                <col width="154" />
-                <col width="142" />
-                <col width="91" />
-            </colgroup>
-            <tbody>
-            <tr>
-                <td>Type</td>
-                <td>Title</td>
-                <td>Submitted</td>
-                <td>Grade</td>
-                <td></td>
-            </tr>
-            <!-- TODO: Need to just output the row for each item, not the whole table -->
-            <tr class="{ON_OFF}">
-                <!-- BEGIN has_submission -->
-                <td class="icon"><a class="icons {SHOWCASED_WORK_MIMETYPE_ICONFILE}" href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1"></a></td>
-                <td><a class="title" href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1">
-                    {SHOWCASED_WORK_BOX_NAME}</a> ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
-                    {SHOWCASED_WORK_BOX_TYPE}</td>
-                <!-- END has_submission -->
-                <!-- BEGIN no_submission -->
-                <td></td>
-                <td>{SHOWCASED_WORK_BOX_NAME} ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
-                    <a href="">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></td>
-                <!-- END no_submission -->
-                <td>{SHOWCASED_WORK_SUBMISSION_SUBMITTED}</td>
-                <td class="grade"><span class="gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">{SHOWCASED_WORK_RETURNED_MARK}</span></td>
-                <td>
-                    <!-- BEGIN has_modify_form -->
-                    <form action='/eportfolio/showcase/modifyForm.php' method='post'>
-                        <input type='hidden' name='action' value='unpublish' />
-                        <input type='hidden' name='userId' value='{USER_ID}' />
-                        <input type='hidden' name='showcaseItemId' value='{SHOWCASED_WORK_ITEM_ID}' />
-                        <input class="btn no-icon" type='submit' value='Unpublish' />
-                    </form>
-                    <!-- END has_modify_form -->
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-    <!-- END showcased_work -->
-
+		<div class="listing box">
+			<table class="showcased-work">
+				<colgroup>
+					<col width="46" />
+					<col />
+					<col width="154" />
+					<col width="142" />
+					<col width="91" />
+				</colgroup>
+				<tbody>
+					<tr>
+						<td>Type</td>
+						<td>Title</td>
+						<td>Submitted</td>
+						<td>Grade</td>
+						<td></td>
+					</tr>
+					<!-- BEGIN showcased_work -->
+					<tr class="{ON_OFF}">
+						<!-- BEGIN has_submission -->
+						<td class="icon">
+							<a class="icons {SHOWCASED_WORK_MIMETYPE_ICONFILE}" href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1"></a>
+						</td>
+						<td>
+							<a class="title" href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1">{SHOWCASED_WORK_BOX_NAME}</a>
+							({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
+							{SHOWCASED_WORK_BOX_TYPE}
+						</td>
+						<!-- END has_submission -->
+						<!-- BEGIN no_submission -->
+						<td></td>
+						<td>
+							{SHOWCASED_WORK_BOX_NAME} ({SHOWCASED_WORK_SUBMISSION_FILESIZE})<br />
+							<a href="">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a>
+						</td>
+						<!-- END no_submission -->
+						<td>
+							{SHOWCASED_WORK_SUBMISSION_SUBMITTED}
+						</td>
+						<td class="grade">
+							<span class="gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">{SHOWCASED_WORK_RETURNED_MARK}</span>
+						</td>
+						<td>
+							<!-- BEGIN has_modify_form -->
+							<form action='/eportfolio/showcase/modifyForm.php' method='post'>
+								<input type='hidden' name='action' value='unpublish' />
+								<input type='hidden' name='userId' value='{USER_ID}' />
+								<input type='hidden' name='showcaseItemId' value='{SHOWCASED_WORK_ITEM_ID}' />
+								<input class="btn no-icon" type='submit' value='Unpublish' />
+							</form>
+							<!-- END has_modify_form -->
+						</td>
+					</tr>
+					<!-- END showcased_work -->
+				</tbody>
+			</table>
+	<!-- END showcased_work_subject -->
 </div>
 <!-- END has_showcased_work -->
 

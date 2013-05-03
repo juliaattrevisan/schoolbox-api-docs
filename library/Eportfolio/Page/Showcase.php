@@ -28,8 +28,8 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 		$this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
 		$this->getPage()->setBlock(TEMPLATE_content, 'no_showcased_work', 'no_showcased_work_block');
 		$this->getPage()->setBlock(TEMPLATE_content, 'has_showcased_work', 'has_showcased_work_block');
-		$this->getPage()->setBlock('has_showcased_work', 'showcased_work', 'showcased_work_block');
-		$this->getPage()->setBlock('showcased_work', 'showcased_work_category', 'showcased_work_category_block');
+		$this->getPage()->setBlock('has_showcased_work', 'showcased_work_subject', 'showcased_work_subject_block');
+		$this->getPage()->setBlock('showcased_work_subject', 'showcased_work', 'showcased_work_block');
 		$this->getPage()->setBlock('showcased_work', 'has_modify_form', 'has_modify_form_block');
 		$this->getPage()->setBlock('showcased_work', 'has_submission', 'has_submission_block');
 		$this->getPage()->setBlock('showcased_work', 'no_submission', 'no_submission_block');
@@ -57,87 +57,118 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 		 */
 		$allShowcasedItems = $showcaseMapper->getShowcasedSubmissionBoxes($this->getUserId());
 
+		/* Avoid that iterative silliness by pre-processing a bit
+		 */
 		if ($allShowcasedItems->count()) {
 			$previousCategory = null;
 			$j = 0;
 
-			foreach($allShowcasedItems as $currentShowcasedItem) {
+			$allSubjects = array();
+
+			foreach ($allShowcasedItems as $currentShowcasedItem) {
 				$latestSubmission = $this->getLatestSubmission($this->getUserId(), $currentShowcasedItem->getSubmissionBoxId());
 				$latestReturn = $this->getLatestReturn($this->getUserId(), $currentShowcasedItem->getSubmissionBoxId());
 				$currentBox = $boxMapper->findById($currentShowcasedItem->getSubmissionBoxId());
 
+				/* Set up subject info
+				 */
+				$allSubjects[$currentBox->getCategory()->getId()]['name'] = $currentBox->getCategory()->getName();
+
+				/* Push individual items into the subject
+				 */
+				$allSubjects[$currentBox->getCategory()->getId()]['items'][] = array(
+					'currentBox' => $currentBox,
+					'currentShowcasedItem' => $currentShowcasedItem,
+					'latestSubmission' => $latestSubmission,
+					'latestReturn' => $latestReturn,
+				);
+			}
+		}
+
+		/* Post-process!
+		 */
+		if (count($allSubjects)) {
+			foreach($allSubjects as $currentSubject) {
+
+				/* Subject name
+				 */
 				$this->getPage()->setVar(array(
-					'SHOWCASED_WORK_ITEM_ID' => $currentShowcasedItem->getId(),
-					'SHOWCASED_WORK_BOX_CATEGORY_NAME' => $currentBox->getCategory()->getName(),
-					'SHOWCASED_WORK_BOX_NAME' => $currentBox->getName(),
-					'SHOWCASED_WORK_BOX_TYPE' => $currentBox->getWorkType()->getName(),
-					'ON_OFF' => ++$j % 2 ? '' : 'dark'
+					'SHOWCASED_WORK_BOX_CATEGORY_NAME' => $currentSubject['name'],
 				));
 
-				/* Show submitted work information (if available)
+				/* Showcased items within the subject
 				 */
-				if ($latestSubmission) {
-					$this->getPage()->setVar(array(
-						'SHOWCASED_WORK_SUBMISSION_ID' => $latestSubmission->getId(),
-						'SHOWCASED_WORK_SUBMISSION_FILESIZE' => Alaress_Byte_Format::bytesToString($latestSubmission->getFilesize()),
-						'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $latestSubmission->getSubmitted()->getShort(),
-						'SHOWCASED_WORK_MIMETYPE_ICONFILE' => $latestSubmission->getMimetype()->getClass(),
-					));
+				if (count($currentSubject['items'])) {
+					foreach($currentSubject['items'] as $currentItem) {
+						$this->getPage()->setVar(array(
+							'SHOWCASED_WORK_ITEM_ID' => $currentItem['currentShowcasedItem']->getId(),
+							'SHOWCASED_WORK_BOX_NAME' => $currentItem['currentBox']->getName(),
+							'SHOWCASED_WORK_BOX_TYPE' => $currentItem['currentBox']->getWorkType()->getName(),
+							'ON_OFF' => ++$j % 2 ? '' : 'dark'
+						));
 
-					$this->getPage()->parse('has_submission_block', 'has_submission');
-					$this->getPage()->setVar('no_submission_block', '');
-				}
-				else {
-					$this->getPage()->setVar(array(
-						'SHOWCASED_WORK_SUBMISSION_FILESIZE' => '',
-						'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => '',
-					));
+						/* Show submitted work information (if available)
+						 */
+						if ($currentItem['latestSubmission']) {
+							$this->getPage()->setVar(array(
+								'SHOWCASED_WORK_SUBMISSION_ID' => $currentItem['latestSubmission']->getId(),
+								'SHOWCASED_WORK_SUBMISSION_FILESIZE' => Alaress_Byte_Format::bytesToString($currentItem['latestSubmission']->getFilesize()),
+								'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => $currentItem['latestSubmission']->getSubmitted()->getShort(),
+								'SHOWCASED_WORK_MIMETYPE_ICONFILE' => $currentItem['latestSubmission']->getMimetype()->getClass(),
+							));
 
-					$this->getPage()->parse('no_submission_block', 'no_submission');
-					$this->getPage()->setVar('has_submission_block', '');
+							$this->getPage()->parse('has_submission_block', 'has_submission');
+							$this->getPage()->setVar('no_submission_block', '');
+						}
+						else {
+							$this->getPage()->setVar(array(
+								'SHOWCASED_WORK_SUBMISSION_FILESIZE' => '',
+								'SHOWCASED_WORK_SUBMISSION_SUBMITTED' => '',
+							));
+
+							$this->getPage()->parse('no_submission_block', 'no_submission');
+							$this->getPage()->setVar('has_submission_block', '');
+						}
+
+						/* Show returned work information (if available)
+						 */
+						if ($currentItem['latestReturn']) {
+							$mark = $currentItem['latestReturn']->getMark();
+
+							$this->getPage()->setVar(array(
+								'SHOWCASED_WORK_RETURNED_MARK' => $mark,
+								'SHOWCASED_WORK_RETURNED_GRADIENT' => (int)($mark / 10),
+							));
+						}
+						else {
+							$this->getPage()->setVar(array(
+								'SHOWCASED_WORK_RETURNED_MARK' => '',
+								'SHOWCASED_WORK_RETURNED_GRADIENT' => '',
+							));
+						}
+
+						/* Unpublish control
+						 */
+						if ($this->getPermission() >= WRITE_ACCESS) {
+							$this->getPage()->parse('has_modify_form_block', 'has_modify_form');
+						}
+						else {
+							$this->getPage()->setVar('has_modify_form_block', '');
+						}
+
+						$this->getPage()->parse('showcased_work_block', 'showcased_work', true);
+
+						/* Clear children after parsing out the parent
+						 */
+						$this->getPage()->setVar('has_modify_form_block', '');
+					}
 				}
 
-				/* Show returned work information (if available)
-				 */
-				if ($latestReturn) {
-					$mark = $latestReturn->getMark();
-					$this->getPage()->setVar(array(
-						'SHOWCASED_WORK_RETURNED_MARK' => $mark,
-						'SHOWCASED_WORK_RETURNED_GRADIENT' => (int)($mark / 10),
-					));
-				}
-				else {
-					$this->getPage()->setVar(array(
-						'SHOWCASED_WORK_RETURNED_MARK' => '',
-						'SHOWCASED_WORK_RETURNED_GRADIENT' => '',
-					));
-				}
-
-				/* Category name
-				 */
-				if (($previousCategory == null) || ($previousCategory != $currentBox->getCategory()->getName())) {
-					$previousCategory = $currentBox->getCategory()->getName();
-					//$j = 0;
-					$this->getPage()->parse('showcased_work_category_block', 'showcased_work_category');
-				}
-
-				/* Unpublish control
-				 */
-				if ($this->getPermission() >= WRITE_ACCESS) {
-					$this->getPage()->parse('has_modify_form_block', 'has_modify_form');
-				}
-				else {
-					$this->getPage()->setVar('has_modify_form_block', '');
-				}
-
-				$this->getPage()->parse('showcased_work_block', 'showcased_work', true);
+				$this->getPage()->parse('showcased_work_subject_block', 'showcased_work_subject', true);
 
 				/* Clear children after parsing out the parent
 				 */
-				$this->getPage()->setVar('showcased_work_category_block', '');
-				$this->getPage()->setVar('has_modify_form_block', '');
-				$this->getPage()->setVar('has_submission_block', '');
-				$this->getPage()->setVar('no_submission_block', '');
+				$this->getPage()->setVar('showcased_work_block', '');
 			}
 
 			$this->getPage()->parse('has_showcased_work_block', 'has_showcased_work');
