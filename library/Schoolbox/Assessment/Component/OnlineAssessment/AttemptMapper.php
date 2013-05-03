@@ -144,6 +144,7 @@ class AttemptMapper extends Mapper {
 				LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
 				RIGHT JOIN assess          a  ON aa.assess_id   = a.assess_id
 			WHERE a.assess_id = :assess_id
+			AND a.availability = 'assess'
 			GROUP BY aa.assess_id, aa.attempt_id
 			ORDER BY aa.start DESC
 		";
@@ -158,22 +159,25 @@ class AttemptMapper extends Mapper {
 		foreach($stmt as $row) {
 			// only include the most recent attempt for each user (ie. first seen)
 			if(!empty($extra_params['most_recent']) && $extra_params['most_recent'] == true) {
-				if(!array_key_exists($row['user_id'], $attempts)) {
-					$mark = ($row['mark'] / $row['max_mark']) * 100;
-					$attempts[$row['user_id']][] = array(
-						'mark' => $mark,
-						'comment' => ''
-					);
-
-					// add to averages vars
-					++$count;
-					$sum += $mark;
+				// if the user is already in the array (ie already seen), just increment the attempt count
+				if(array_key_exists($row['user_id'], $attempts) || $row['max_mark'] == 0) {
+					$attempts[$row['user_id']][0]['attempts']++;
+					continue;
 				}
 			}
-			// include all
-			else {
-				$attempts[$row['user_id']][] = $row;
-			}
+
+			// include
+			$mark = ($row['mark'] / $row['max_mark']) * 100;
+			$attempts[$row['user_id']][] = array(
+				'mark' => $mark,
+				'display_mark' => sprintf("%d / %d", $row['mark'], $row['max_mark']),
+				'comment' => '',
+				'attempts' => 1
+			);
+
+			// add to averages vars
+			++$count;
+			$sum += $mark;
 		}
 		if(!empty($extra_params['calc_average']) && $extra_params['calc_average'] == true) {
 			$attempts['avg'] = $count ? $sum / $count : 0;

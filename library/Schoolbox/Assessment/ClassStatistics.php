@@ -14,6 +14,8 @@ use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\SubmissionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Resource\Category;
 use Schoolbox\User;
@@ -32,6 +34,11 @@ class ClassStatistics {
 
 	/**
 	 * @var SubmissionBoxMapper
+	 */
+	protected $submissionBoxMapper;
+
+	/**
+	 * @var SubmissionMapper
 	 */
 	protected $submissionMapper;
 
@@ -57,19 +64,24 @@ class ClassStatistics {
 		$this->category = $category;
 
 		// compile the due work, assessments, marks returned, et al
-		$this->submissionMapper = new SubmissionBoxMapper();
+		$this->submissionBoxMapper = new SubmissionBoxMapper();
+		$this->submissionMapper = new SubmissionMapper();
 		$this->returnMapper = new SubmissionBox\ReturnedWorkMapper();
 
 		$this->assessMapper = new OnlineAssessmentMapper();
 		$this->attemptMapper = new AttemptMapper();
 
-		// map by due timestamp (manage collisions)
-		$boxCollection = $this->submissionMapper->findByColumn('category', $this->getCategory()->getId());
+		// retrieve ALL the submission boxes for this category
+		$boxCollection = $this->submissionBoxMapper->findByColumn('category', $this->getCategory()->getId());
 		foreach($boxCollection as $box) {
 			$this->addWork($box);
 		}
 
-		$assessCollection = $this->assessMapper->findByColumn('category_id', $this->getCategory()->getId());
+		// retrieve ALL the online assessments (not surveys) for this category
+		$assessCollection = $this->assessMapper->findByColumnList(array(
+			'category_id' => $this->getCategory()->getId(),
+			'availability' => 'assess'
+		));
 		foreach($assessCollection as $assess) {
 			$this->addWork($assess);
 		}
@@ -130,19 +142,44 @@ class ClassStatistics {
 
 		// iterate across returns and index by student id
 		foreach($returnCollection as $return) {
+			/* @var $return \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork */
 			$userId = $return->getOwner()->getId();
 			if(!array_key_exists($userId, $marks)) {
 				$marks[$userId] = array(
 					'mark' => $return->getNormalizedMark(),
-					'comment' => $return->getComment()
+					'display_mark' => $return->getMark(),
+					'comment' => $return->getComment(),
+					'attempts' => 0,
 				);
 				// grab numbers for averages
 				++$count;
 				$sum += $return->getNormalizedMark();
 			}
 		}
+
+		// retrieve submissions and append any user IDs that haven't been marked
+		$submissions = $this->submissionMapper->findByColumnList(array(
+			'box_id' => $box->getId(),
+		));
+
+		foreach($submissions as $submission) {
+			/* @var $submission Submission */
+			$userId = $submission->getOwner()->getId();
+			if(!array_key_exists($userId, $marks)) {
+				$marks[$userId]['attempts'] = 1;
+			}
+			else {
+				$marks[$userId]['attempts']++;
+			}
+		}
+
 		// calculate and insert an average
 		$marks['avg'] = $count ? $sum / $count : 0;
+
+//		echo "<b>MARRRKS</b><br/>\n";
+//		var_dump($marks);
+//		echo "<br/><br/>\n";
+
 		return $marks;
 	}
 
@@ -200,7 +237,8 @@ class ClassStatistics {
 		$works = array();
 
 		foreach($this->workMap as $stamp => $work) {
-			$marks = array_key_exists($id, $work['marks']) ? $work['marks'][$id] : false;
+
+			$marks = array_key_exists($id, $work['marks']) ? $work['marks'][$id] : array('attempts' => 0);
 			$works[$stamp] = array(
 				'object' => $work['object'],
 				'marks' => $marks

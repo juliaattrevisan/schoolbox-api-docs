@@ -16,11 +16,22 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
 class StudentReportCard {
 
+	// available permissions
+	const CAN_SUBMIT = 0;
+	const CAN_PUBLISH = 1;
+	const CAN_EMAIL_TEACHER = 2;
+	const CAN_VIEW_CLASS_AVERAGE = 3;
+	const CAN_VIEW_SHOWCASE = 4;
+
 	// vars that come from user input
-	protected $userId;
+	protected $targetUserId;
 	protected $targetYear;
 	protected $targetSemester;
 	protected $targetCategoryId;
+
+	// 'session' vars
+	protected $viewingUserId;
+	protected $permissionSet = array();
 
 	// helpful vars
 	protected $currentYear;
@@ -40,16 +51,65 @@ class StudentReportCard {
 	// 'andlers
 	protected $groupHandler;
 
-	public function __construct($studentUserId) {
-		$this->userId = $studentUserId;
+	public function __construct($studentUserId, $viewingAs = -1) {
+		// parse arguments
+		$this->viewingUserId = $viewingAs == -1 ? $_SESSION['id'] : $viewingAs;
+		$this->targetUserId = $studentUserId;
 
 		// dependencies
 		$this->submissionMapper = new SubmissionBoxMapper();
 		$this->groupHandler = new \Group();
 
+		// build permissions set
+		$this->establishPermissions();
+
 		// setup helper vars
 		$this->currentYear = date('Y');
 		$this->currentSemester = date('M') > 6 ? 2 : 1;
+	}
+
+	/**
+	 * Establish permissions that the current combination of viewing-as and target user allows
+	 */
+	protected function establishPermissions() {
+
+		// if viewing own, all permissions enabled
+		if($this->viewingUserId == $this->targetUserId) {
+			$this->permissionSet = array(true,true,true,true,true);
+		}
+
+		// if superuser, all permissions enabled
+		elseif($this->groupHandler->isSuperuser($this->viewingUserId)) {
+			$this->permissionSet = array(true,true,true,true,true);
+		}
+
+		// if staff, all READ permissions enabled
+		elseif($this->viewingUserId == $this->targetUserId) {
+			$this->permissionSet = array(false,false,true,true,true);
+		}
+
+		// if parent of child, all READ permissions enabled
+		elseif($this->groupHandler->isParentOfChild($this->targetUserId)) {
+			$this->permissionSet = array(false,false,true,true,true);
+		}
+
+		// all other cases, no permissions granted
+		else {
+			$this->permissionSet = array(false,false,false,false,false);
+		}
+	}
+
+	/**
+	 * Check how a particular permission is set for the viewing user
+	 *
+	 * @param $action
+	 * @return bool
+	 */
+	protected function checkPermission($action) {
+		if(isset($this->permissionSet[$action]) && $this->permissionSet[$action] === true) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -84,7 +144,7 @@ class StudentReportCard {
 		$this->targetCategoryId = $subjectId;
 
 		// populate data for the subject using the category and user
-		$this->subjectData = new SubjectReportCard($subjectId, $this->userId);
+		$this->subjectData = new SubjectReportCard($subjectId, $this->targetUserId);
 	}
 
 	/**
@@ -102,7 +162,7 @@ class StudentReportCard {
 
 		// global vars
 		$page->setVar(array(
-			'WORK_USER_ID' => $this->userId
+			'WORK_USER_ID' => $this->targetUserId
 		));
 
 		$this->renderSemesterSelectors($page);
@@ -141,7 +201,7 @@ class StudentReportCard {
 		$years = array_unique(
 			array_merge(
 				array($this->currentYear),
-				$this->submissionMapper->getAllYearsByUser($this->userId)
+				$this->submissionMapper->getAllYearsByUser($this->targetUserId)
 			)
 		);
 		foreach($years as $y) {
@@ -225,12 +285,14 @@ class StudentReportCard {
 
 		if(count($teachers)) {
 			foreach($teachers as $teacher) {
+				/* @var $teacher \Schoolbox\User */
 				$page->setVar(array(
 					'SUBJ_TCH_ID' => $teacher->getId(),
 					'SUBJ_TCH_EXTID' => $teacher->getExternalId(),
 					'SUBJ_TCH_NAME' => $teacher->formatName(),
-					'SUBJ_TCH_MAILTO' => "mailto:"
+					'SUBJ_TCH_MAILTO' => $this->checkPermission(self::CAN_EMAIL_TEACHER) ? $teacher->getEmail() : ''
 				));
+
 				$page->parse('subject_teacher_block', 'subject_teacher', true);
 			}
 		}
@@ -243,6 +305,15 @@ class StudentReportCard {
 	protected function renderGradeAverage(\SitePage $page) {
 		// output student grade average
 		$gradeAvg = $this->subjectData->getGradeAverage();
+
+		if(is_null($gradeAvg['grade'])) {
+			$page->setVar(array(
+				'SUBJ_GRADEIENT'   => '',
+				'SUBJ_GRADE_AVG'   => 'N/A',
+				'SUBJ_GRADE_TREND' => ''
+			));
+			return;
+		}
 
 		if ($gradeAvg['trend'] > 0) {
 			$trendDir = '&#x25B2;';
@@ -293,14 +364,23 @@ class StudentReportCard {
 			'label' => 'You',
 			'data'  => $userSeries
 		);
-		$graph[] = array(
-			'label' => 'Class',
-			'data'  => $averageSeries
-		);
+
+		// if permission to see class average, include the data series
+		if($this->checkPermission(self::CAN_VIEW_CLASS_AVERAGE)) {
+			$graph[] = array(
+				'label' => 'Class',
+				'data'  => $averageSeries
+			);
+		}
+		// otherwise, remove the colour from the map (so the graph doesn't get confused)
+		else {
+			unset($colours['average']);
+		}
 
 		// display the graph for the semester
-		$start = mktime(0,0,0,($this->targetSemester - 1) * 6 + 1,0,$this->targetYear) * 1000;
-		$end = (($start + 365 / 2) - 1) * 86400 * 1000;
+		$start = mktime(0, 0, 0, ($this->targetSemester - 1) * 6 + 1, 0, $this->targetYear) * 1000;
+		// add 6 months - 1 day
+		$end = $start + ((365 / 2 - 1) * 86400000);
 
 		$page->setVar(array(
 			'GRAPH_JSON'    => json_encode($graph),
@@ -325,7 +405,7 @@ class StudentReportCard {
 			// there are criteria, retrieve the criterion-grouped scores for the student, map, and output
 			$rubricHandler = new \DueWork_Rubric_Handler();
 			$returnHandler = new \SubmissionReturn();
-			$results = $rubricHandler->getStudentMarksByCriteriaInCategory($this->userId, $this->targetCategoryId);
+			$results = $rubricHandler->getStudentMarksByCriteriaInCategory($this->targetUserId, $this->targetCategoryId);
 
 			$page->setVar('subject_crit_group_block', '');
 			foreach($criteria as $group => $items) {
@@ -375,6 +455,8 @@ class StudentReportCard {
 					'work_actionable_block' => '', 'work_publishable_block' => ''
 				));
 
+//				var_dump($marks);
+
 				if($object instanceof SubmissionBox) {
 					$page->setVar($this->outputDueWorkRow($object, $marks));
 				}
@@ -382,22 +464,33 @@ class StudentReportCard {
 					$page->setVar($this->outputOnlineAssessRow($object, $marks));
 				}
 
-                // marks returned, therefore publishable: is it published?
-                if(/* logic for published */ true) {
-                    $output['WORK_PUBLISH_HREF']      = '/eportfolio/unpublish/this';
-                    $output['WORK_PUBLISH_BTN_ICON']  = 'unpublish';
-                    $output['WORK_PUBLISH_BTN_LABEL'] = 'Unpublish';
-                }
-                else {
-                    $output['WORK_PUBLISH_HREF']      = '/eportfolio/publish/this';
-                    $output['WORK_PUBLISH_BTN_ICON']  = 'publish';
-                    $output['WORK_PUBLISH_BTN_LABEL'] = 'Publish';
-                }
+				if($this->checkPermission(self::CAN_PUBLISH)) {
+					// marks returned, therefore publishable: is it published?
+					if(/* logic for published */ false) {
+						$output['WORK_PUBLISH_HREF']      = '/eportfolio/unpublish/this';
+						$output['WORK_PUBLISH_BTN_ICON']  = 'download';
+						$output['WORK_PUBLISH_BTN_LABEL'] = 'Unpublish';
+					}
+					else {
+						$output['WORK_PUBLISH_HREF']      = '/eportfolio/publish/this';
+						$output['WORK_PUBLISH_BTN_ICON']  = 'up-arrow';
+						$output['WORK_PUBLISH_BTN_LABEL'] = 'Publish';
+					}
+					$page->setVar($output);
+				}
+				else {
+					$page->setVar('work_publishable_block', '');
+				}
 
-                $page->setVar($output);
+				// if work actions are available, render the block
+				if($page->getVar('WORK_BTN_ICON')) {
+					$page->parse('work_actionable_block', 'work_actionable');
+				}
+				// otherwise hide it
+				else {
+					$page->setVar('work_actionable_block', '');
+				}
 
-                $page->parse('work_actionable_block', 'work_actionable');
-				$page->parse('work_publishable_block', 'work_publishable');
 				$page->parse('work_block', 'work', true);
 			}
 		}
@@ -416,35 +509,43 @@ class StudentReportCard {
 		$due = new \Alaress_Date_Relative($box->getDueDate());
 		$urgency = max(0, min(10, (int)(($due->getUnixTimestamp() - time()) / 86400)));
 		$output = array(
-			'WORK_TITLE'             => $box->getName(),
-			'WORK_ID'                => $box->getId(),
-			'WORK_TYPE'              => $box->getWorkType()->getName(),
-			'WORK_DATE'              => $due->getRelativeTime(),
-			'WORK_TIME'              => $due->getDateOnly(),
-			'WORK_URGENCY'           => $urgency,
-			'WORK_HREF'              => 'submission/submissionHistory/',
+			'WORK_TITLE'   => $box->getName(),
+			'WORK_ID'      => $box->getId(),
+			'WORK_TYPE'    => $box->getWorkType()->getName(),
+			'WORK_DATE'    => $due->getRelativeTime(),
+			'WORK_TIME'    => $due->getDateOnly(),
+			'WORK_URGENCY' => $urgency,
+			'WORK_HREF'    => 'submission/submissionHistory/',
 		);
 
         // marks have been returned
-		if($marks !== false) {
-			$output['WORK_URGENCY']           = 'none';
-			$output['WORK_GRADIENT']          = (int)($marks['mark'] / 10);
-			$output['WORK_GRADE']             = $marks['mark'];
-			$output['WORK_COMMENT']           = $marks['comment'];
+		if($marks['attempts'] > 0) {
+			$output['WORK_URGENCY']  = 'none';
 		}
 
+		if($marks) {
+			$output['WORK_GRADIENT'] = (int)($marks['mark'] / 10);
+			$output['WORK_GRADE']    = $marks['display_mark'];
+			$output['WORK_COMMENT']  = $marks['comment'];
+		}
+
+		// if the viewing user does not have permission to submit, blank out the actions
+		if(!$this->checkPermission(self::CAN_SUBMIT)) {
+			$output['WORK_BTN_ICON']  = '';
+			$output['WORK_BTN_LABEL'] = '';
+		}
         // is the box still open?
-        if($box->getLateDate()->getUnixTimestamp() > time()) {
+        elseif($box->getLateDate()->getUnixTimestamp() > time()) {
             // can potentially submit
 
             // is work already submitted?
-            if($marks['status'] != 'pending') {
+            if($marks['attempts'] > 0) {
                 // work submitted
 
                 // is this multisubmit?
                 if($box->getAcceptMultiple()) {
                     // is multi: offer REsubmission
-                    $output['WORK_BTN_ICON']  = 'upload';
+                    $output['WORK_BTN_ICON']  = 'up-arrow';
                     $output['WORK_BTN_LABEL'] = 'Resubmit';
                 }
                 else {
@@ -455,7 +556,7 @@ class StudentReportCard {
             }
             else {
                 // work not submitted: offer submission
-                $output['WORK_BTN_ICON']  = 'upload';
+                $output['WORK_BTN_ICON']  = 'up-arrow';
                 $output['WORK_BTN_LABEL'] = 'Submit';
             }
         }
@@ -480,27 +581,32 @@ class StudentReportCard {
 		$due = new \Alaress_Date_Relative($oa->getFinish());
 		$urgency = max(0, min(10, (int)(($due->getUnixTimestamp() - time()) / 86400)));
 		$output = array(
-			'WORK_TITLE'             => $oa->getTitle(),
-			'WORK_ID'                => $oa->getId(),
-			'WORK_TYPE'              => $oa->getWorkType()->getName(),
-			'WORK_DATE'              => $due->getRelativeTime(),
-			'WORK_TIME'              => $due->getDateOnly(),
-			'WORK_URGENCY'           => $urgency,
-			'WORK_HREF'              => 'assess/main/',
+			'WORK_TITLE'   => $oa->getTitle(),
+			'WORK_ID'      => $oa->getId(),
+			'WORK_TYPE'    => $oa->getWorkType()->getName(),
+			'WORK_DATE'    => $due->getRelativeTime(),
+			'WORK_TIME'    => $due->getDateOnly(),
+			'WORK_URGENCY' => $urgency,
+			'WORK_HREF'    => 'assess/intro/',
 		);
 
-        // is the OA still open?
-        if($oa->getFinish()->getUnixTimestamp() > time()) {
+		// if the viewing user does not have permission to submit, blank out the actions
+		if(!$this->checkPermission(self::CAN_SUBMIT)) {
+			$output['WORK_BTN_ICON']  = '';
+			$output['WORK_BTN_LABEL'] = '';
+		}
+		// is the OA still open?
+		elseif($oa->getFinish()->getUnixTimestamp() > time()) {
             // still open
 
             // has the student attempted?
-            if($marks['status'] != 'pending') {
+            if($marks['attempts'] > 0) {
                 // student has attempted at least once
 
                 // does the student have attempts left?
-                if($oa->getMaxAttempts() > $marks['attempts']) {
+                if($oa->getMaxAttempts() == 0 || $oa->getMaxAttempts() > $marks['attempts']) {
                     // attempts remaining: offer REsit action
-                    $output['WORK_BTN_ICON']  = 'edit';
+                    $output['WORK_BTN_ICON']  = 'modify';
                     $output['WORK_BTN_LABEL'] = 'Resit';
                 }
                 else {
@@ -511,7 +617,7 @@ class StudentReportCard {
             }
             else {
                 // student has not attempted: offer sit action
-                $output['WORK_BTN_ICON']  = 'edit';
+                $output['WORK_BTN_ICON']  = 'modify';
                 $output['WORK_BTN_LABEL'] = 'Sit';
             }
         }
@@ -522,15 +628,14 @@ class StudentReportCard {
 
         }
 
-		if($marks !== false) {
+		if($marks['attempts'] > 0) {
 			$output['WORK_URGENCY']  = 'none';
+		}
+		if($marks) {
 			$output['WORK_GRADIENT'] = (int)($marks['mark'] / 10);
-			$output['WORK_GRADE']    = $marks['mark'];
+			$output['WORK_GRADE']    = $marks['display_mark'];
 			$output['WORK_COMMENT']  = '';
 		}
-
-
-
 
 		return $output;
 	}
@@ -552,11 +657,11 @@ class StudentReportCard {
 
 	protected function findSubjectsForSemester() {
 		if($this->targetYear == $this->currentYear && $this->targetSemester == $this->currentSemester) {
-			$categoryList = $this->groupHandler->involvedInCategoryList($this->userId, true, READ_ACCESS);
+			$categoryList = $this->groupHandler->involvedInCategoryList($this->targetUserId, true, READ_ACCESS);
 		}
 		else {
 			$categoryList = $this->submissionMapper->submittedToCategoryList(
-				$this->userId,
+				$this->targetUserId,
 				$this->targetYear,
 				$this->targetSemester
 			);
