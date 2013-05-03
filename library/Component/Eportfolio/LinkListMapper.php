@@ -7,7 +7,10 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Eportfolio_LinkListMapper extends Mapper {
+namespace Component\Eportfolio;
+use Schoolbox;
+
+class LinkListMapper extends Schoolbox\Mapper {
 
 	/**
 	 * Define column/property mapping
@@ -21,32 +24,32 @@ class Component_Eportfolio_LinkListMapper extends Mapper {
 		$this->hasMap(array(
 			'column'     => 'id',
 			'property'   => 'id',
-			'type'       => Mapper::TYPE_INTEGER,
+			'type'       => self::TYPE_INTEGER,
 			'identifier' => true
 		));
 
 		$this->hasMap(array(
 			'column'     => 'component_instance_id',
-			'property'   => 'component_instance_id',
-			'type'       => Mapper::TYPE_INTEGER,
+			'property'   => 'componentInstanceId',
+			'type'       => self::TYPE_INTEGER,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'title',
 			'property'   => 'title',
-			'type'       => Mapper::TYPE_STRING,
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'content',
 			'property'   => 'content',
-			'type'       => Mapper::TYPE_STRING,
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'sequence',
 			'property'   => 'sequence',
-			'type'       => Mapper::TYPE_INTEGER,
+			'type'       => self::TYPE_INTEGER,
 		));
 
 		parent::mapping();
