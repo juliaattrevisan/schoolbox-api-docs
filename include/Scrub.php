@@ -139,6 +139,19 @@ class Scrub {
                 )
             );
 
+
+	        $config->set(
+		        'URI.AllowedSchemes', array (
+                    'http' => true,
+                    'https' => true,
+                    'mailto' => true,
+			        'ftp'   => true,
+                    'ed2k' => true,
+                    'magnet' => true,
+                    'feed' => true,
+			        'dvcplay' => true,
+                )
+	        );
             //
             // Allow embeds and objects, allowing more properties than standard
             // HTMLPurifier definition allows.
