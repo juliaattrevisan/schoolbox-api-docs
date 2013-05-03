@@ -40,7 +40,7 @@ then
 fi
 
 # Ensure less is installed
-if [ `~/node_modules/.bin/lessc -v 2>/dev/null| awk {'print $2'}` != $lessversion ];
+if [ "`~/node_modules/.bin/lessc -v 2>/dev/null| awk {'print $2'}`" != "$lessversion" ];
 then
 	mkdir -p ~/node_modules;
 	cd ~;
