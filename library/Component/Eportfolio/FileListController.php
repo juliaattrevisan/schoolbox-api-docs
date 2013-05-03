@@ -47,6 +47,7 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 		/* Set up blocks and stuff
 		 */
 		$this->setBlock($templateHandle, 'list_item', 'list_item_block');
+		$this->setBlock('list_item', 'has_modify_button', 'has_modify_button_block');
 		$this->setBlock('list_item', 'has_unpublish_form', 'has_unpublish_form_block');
 
 		$this->setVar(array(

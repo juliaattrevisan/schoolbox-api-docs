@@ -66,10 +66,14 @@ class Component_Eportfolio_TextboxController extends Component_Eportfolio_Contro
 
 		$this->setVar('TEXTBOX_ITEM_ID', $this->instance->id);
 
-		if($textBox) {
+		if ($textBox) {
 			$this->setVar('TEXTBOX_CONTENT', Scrub::html($textBox->getContent()));
 		}
-
+		else {
+			$this->setVar(array(
+				'TEXTBOX_CONTENT' => '',
+			));
+		}
 
 		/* If modifying this textbox
 		 */

@@ -48,6 +48,7 @@ class Component_Eportfolio_LinkListController extends Component_Eportfolio_Contr
 		 */
 		$this->setBlock($templateHandle, 'has_create_form', 'has_create_form_block');
 		$this->setBlock($templateHandle, 'list_item', 'list_item_block');
+		$this->setBlock('list_item', 'has_modify_button', 'has_modify_button_block');
 		$this->setBlock('list_item', 'has_modify_form', 'has_modify_form_block');
 		$this->setBlock('list_item', 'has_delete_form', 'has_delete_form_block');
 
