@@ -29,13 +29,19 @@ if ($authenticator->canModify()) {
 		$boxId = $_POST['boxId'];
 		$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
-		$showcasedItem = new \Eportfolio\Showcase();
-		$showcasedItem->setSubmissionBoxId($boxId);
-		$showcasedItem->setUid($ownerId);
-		$showcasedItem->setCreatedAt($now);
-		$showcasedItem->setUpdatedAt($now);
+		/* Check if the submission box is already being showcased; if so, ignore request
+		 */
+		$existing = \Eportfolio\ShowcaseMapper::getInstance()->findByColumn('submission_box_id', $boxId);
 
-		\Eportfolio\ShowcaseMapper::getInstance()->create($showcasedItem);
+		if (!$existing) {
+			$showcasedItem = new \Eportfolio\Showcase();
+			$showcasedItem->setSubmissionBoxId($boxId);
+			$showcasedItem->setUid($ownerId);
+			$showcasedItem->setCreatedAt($now);
+			$showcasedItem->setUpdatedAt($now);
+
+			\Eportfolio\ShowcaseMapper::getInstance()->create($showcasedItem);
+		}
 	}
 
 	SitePage::localRedir("/eportfolio/{$ownerId}/showcase");
