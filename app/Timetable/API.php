@@ -114,7 +114,7 @@ class Timetable_API {
                 'aside'   => '',
                 'class'   => 'timetable wide',
                 'icon'    => '',
-                'content' => $table,
+                'content' => array_values($table),
             );
 
             $response->setPage('title','Timetable');
