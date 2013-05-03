@@ -33,7 +33,7 @@ if ($authenticator->canModify()) {
 		 */
 		$existing = \Eportfolio\ShowcaseMapper::getInstance()->findByColumn('submission_box_id', $boxId);
 
-		if (!$existing) {
+		if (!$existing->count()) {
 			$showcasedItem = new \Eportfolio\Showcase();
 			$showcasedItem->setSubmissionBoxId($boxId);
 			$showcasedItem->setUid($ownerId);
