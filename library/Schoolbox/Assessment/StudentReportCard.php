@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment;
 
 
+use Eportfolio\ShowcaseMapper;
 use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -47,6 +48,7 @@ class StudentReportCard {
 
 	// mappers
 	protected $submissionMapper;
+	protected $showcaseMapper;
 
 	// 'andlers
 	protected $groupHandler;
@@ -58,6 +60,7 @@ class StudentReportCard {
 
 		// dependencies
 		$this->submissionMapper = new SubmissionBoxMapper();
+		$this->showcaseMapper = new ShowcaseMapper();
 		$this->groupHandler = new \Group();
 
 		// build permissions set
@@ -440,6 +443,7 @@ class StudentReportCard {
 
 		$work = $this->subjectData->getAssessments();
 
+
 		if(count($work)) {
 			foreach($work as $w) {
 
@@ -451,32 +455,66 @@ class StudentReportCard {
 					'ON_OFF' => '', 'WORK_ID' => '', 'WORK_TYPE' => '', 'WORK_DATE' => '', 'WORK_TIME' => '',
 					'WORK_TITLE' => '', 'WORK_URGENCY' => '', 'WORK_GRADIENT' => '', 'WORK_GRADE' => '',
 					'WORK_COMMENT' => '', 'WORK_HREF' => '', 'WORK_BTN_ICON' => '', 'WORK_BTN_LABEL' => '',
-					'WORK_PUBLISH_HREF' => '', 'WORK_PUBLISH_BTN_ICON' => '', 'WORK_PUBLISH_BTN_LABEL' => '',
+					'WORK_PUBLISH_ACTION' => '', 'WORK_PUBLISH_BTN_ICON' => '', 'WORK_PUBLISH_BTN_LABEL' => '',
 					'work_actionable_block' => '', 'work_publishable_block' => ''
 				));
 
-//				var_dump($marks);
+				$existingShowcasedItem = null;
 
 				if($object instanceof SubmissionBox) {
 					$page->setVar($this->outputDueWorkRow($object, $marks));
+
+					// is the viewing user allowed to [un]publish?
+					if($this->checkPermission(self::CAN_PUBLISH)) {
+						// allowed to perform publish actions
+
+						// retrieve any publishing of this SB
+						$existingShowcasedItem = $this->showcaseMapper->findByColumnList(array(
+							'uid' => $this->targetUserId,
+							'submission_box_id' => $object->getId()
+						));
+
+						// has this already been published?
+						if(count($existingShowcasedItem)) {
+							// yes: offer unpublish action
+							$output['WORK_PUBLISH_ID']        = $existingShowcasedItem->current()->getId();
+							$output['WORK_PUBLISH_TYPE']      = 'showcaseItemId';
+							$output['WORK_PUBLISH_ACTION']    = 'unpublish';
+							$output['WORK_PUBLISH_BTN_ICON']  = 'download';
+							$output['WORK_PUBLISH_BTN_LABEL'] = 'Unpublish';
+							$page->setVar($output);
+							$page->parse('work_publishable_block', 'work_publishable');
+						}
+						else {
+							// not published
+
+							// has a mark been returned?
+							if(array_key_exists('mark', $marks)) {
+								// mark returned: offer publish action
+								$output['WORK_PUBLISH_ID']        = $page->getVar('WORK_ID');
+								$output['WORK_PUBLISH_TYPE']      = 'boxId';
+								$output['WORK_PUBLISH_ACTION']    = 'publish';
+								$output['WORK_PUBLISH_BTN_ICON']  = 'up-arrow';
+								$output['WORK_PUBLISH_BTN_LABEL'] = 'Publish';
+								$page->setVar($output);
+								$page->parse('work_publishable_block', 'work_publishable');
+							}
+							else {
+								// no mark returned: do not offer any action
+								$page->setVar('action_publish_block', '');
+							}
+						}
+					}
+					else {
+						// not allowed: do not offer actions
+						$page->setVar('action_publish_block', '');
+					}
 				}
 				elseif($object instanceof OnlineAssessment) {
 					$page->setVar($this->outputOnlineAssessRow($object, $marks));
-				}
 
-				if($this->checkPermission(self::CAN_PUBLISH)) {
-					// marks returned, therefore publishable: is it published?
-					if(/* logic for published */ false) {
-						$output['WORK_PUBLISH_HREF']      = '/eportfolio/unpublish/this';
-						$output['WORK_PUBLISH_BTN_ICON']  = 'download';
-						$output['WORK_PUBLISH_BTN_LABEL'] = 'Unpublish';
-					}
-					else {
-						$output['WORK_PUBLISH_HREF']      = '/eportfolio/publish/this';
-						$output['WORK_PUBLISH_BTN_ICON']  = 'up-arrow';
-						$output['WORK_PUBLISH_BTN_LABEL'] = 'Publish';
-					}
-					$page->setVar($output);
+					// OA's cannot be published at the moment, refactor DueWork publish code if they become publishable
+					$page->setVar('action_publish_block', '');
 				}
 				else {
 					$page->setVar('work_publishable_block', '');

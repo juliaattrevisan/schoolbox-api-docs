@@ -158,7 +158,7 @@
     <!-- END subject_crit -->
 
     <div class="subject-assessments">
-      <h2>Assessments<a href="#" class="btn"><span></span>View Showcase</a></h2>
+      <h2>Assessments<a href="/eportfolio/{WORK_USER_ID}/showcase" class="btn"><span></span>View Showcase</a></h2>
       <div class="listing">
         <table class="upcoming-work">
           <thead>
@@ -188,7 +188,15 @@
               <a href="/{WORK_HREF}{WORK_ID}" class="btn {WORK_BTN_ICON}"><span></span> {WORK_BTN_LABEL}</a>
               <!-- END work_actionable -->
               <!-- BEGIN work_publishable -->
-              <a href="/{WORK_PUBLISH_HREF}{WORK_ID}" class="btn {WORK_PUBLISH_BTN_ICON}"><span></span> {WORK_PUBLISH_BTN_LABEL}</a>
+
+              <form action='/eportfolio/showcase/modifyForm.php' method='post'>
+                <input type='hidden' name='action' value='{WORK_PUBLISH_ACTION}' />
+                <input type='hidden' name='userId' value='{WORK_USER_ID}' />
+                <input type='hidden' name='{WORK_PUBLISH_TYPE}' value='{WORK_PUBLISH_ID}' />
+                <input type='submit' class="btn no-icon" value='{WORK_PUBLISH_BTN_LABEL}' />
+              </form>
+
+              <!-- <a href="/{WORK_PUBLISH_HREF}{WORK_ID}" class="btn {WORK_PUBLISH_BTN_ICON}"><span></span> {WORK_PUBLISH_BTN_LABEL}</a> -->
               <!-- END work_publishable -->
             </td>
           </tr>
