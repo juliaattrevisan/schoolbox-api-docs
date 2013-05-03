@@ -11,11 +11,11 @@ require_once dirname(__FILE__) . '/../../../../include/Bootstrap.php';
 
 $page = new SitePage();
 
-$action = Scrub::text($_POST['action']);
-$ownerId = Scrub::text($_POST['userId']);
-$pageId = Scrub::text($_POST['pageId']);
-$listItemId = Scrub::text($_POST['listItemId']);
-$content = Scrub::html($_POST['content']);
+$action = $_POST['action'];
+$ownerId = $_POST['userId'];
+$pageId = $_POST['pageId'];
+$listItemId = $_POST['listItemId'];
+$content = $_POST['content'];
 
 $authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
 
@@ -51,7 +51,7 @@ if ($authenticator->canModify()) {
 	/* Delete a list item
 	 */
 	else if ($action == 'removeComment') {
-		$commentId = Scrub::text($_POST['commentId']);
+		$commentId = $_POST['commentId'];
 
 		$listItem = Component_Eportfolio_BlogCommentMapper::getInstance()->findById($commentId);
 		Component_Eportfolio_BlogCommentMapper::getInstance()->delete($listItem);
@@ -65,7 +65,7 @@ else if ($authenticator->canView()) {
 	 */
 	if ($action == 'addComment') {
 		$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-		$authorId = Scrub::text($_POST['authorId']);
+		$authorId = $_POST['authorId'];
 
 		$blogComment = new Component_Eportfolio_BlogComment();
 		$blogComment->setBlogId($listItemId);

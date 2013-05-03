@@ -11,12 +11,12 @@ require_once dirname(__FILE__) . '/../../../../include/Bootstrap.php';
 
 $page = new SitePage();
 
-$action = Scrub::text($_POST['action']);
-$ownerId = Scrub::text($_POST['userId']);
-$pageId = Scrub::text($_POST['pageId']);
-$listItemId = Scrub::text($_POST['listItemId']);
-$title = Scrub::text($_POST['title']);
-$content = Scrub::html($_POST['content']);
+$action = $_POST['action'];
+$ownerId = $_POST['userId'];
+$pageId = $_POST['pageId'];
+$listItemId = $_POST['listItemId'];
+$title = $_POST['title'];
+$content = $_POST['content'];
 
 $authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
 

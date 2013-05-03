@@ -51,7 +51,7 @@ if ($authenticator->canModify()) {
 	/* Delete a list item
 	 */
 	else if ($action == 'removeItem') {
-		$listItemId =$_GET['listItemId'];
+		$listItemId = $_GET['listItemId'];
 
 		$listItem = Component_Eportfolio_FileListMapper::getInstance()->findById($listItemId);
 		Component_Eportfolio_FileListMapper::getInstance()->delete($listItem);
