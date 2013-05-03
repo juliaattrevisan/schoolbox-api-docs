@@ -7,7 +7,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Eportfolio_Blog extends Model {
+namespace Component\Eportfolio;
+
+class Blog {
 
 	/**
 	 * Primary key
@@ -45,6 +47,13 @@ class Component_Eportfolio_Blog extends Model {
 	public $content;
 
 	/**
+	 * Comments collection gets stored here
+	 *
+	 * @var
+	 */
+	public $comments;
+
+	/**
 	 * When the blog item was created
 	 *
 	 * @var
@@ -62,6 +71,13 @@ class Component_Eportfolio_Blog extends Model {
 	 * @var
 	 */
 	public $deleted_at;
+
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		$this->setComments(new \Schoolbox\Collection());
+	}
 
 	/* Getters/Setters
 	 */
@@ -208,5 +224,23 @@ class Component_Eportfolio_Blog extends Model {
 	 */
 	public function getPageId() {
 		return $this->pageId;
+	}
+
+	/**
+	 * Set comments
+	 *
+	 * @param  $comments
+	 */
+	public function setComments($comments) {
+		$this->comments = $comments;
+	}
+
+	/**
+	 * Get comments
+	 *
+	 * @return
+	 */
+	public function getComments() {
+		return $this->comments;
 	}
 }

@@ -7,7 +7,10 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Eportfolio_BlogCommentMapper extends Mapper {
+namespace Component\Eportfolio;
+use Schoolbox;
+
+class BlogCommentMapper extends Schoolbox\Mapper {
 
 	/**
 	 * Define column/property mapping
@@ -16,49 +19,49 @@ class Component_Eportfolio_BlogCommentMapper extends Mapper {
 	 */
 	protected function mapping() {
 		$this->hasTable('eportfolio_component_blogcomment');
-		$this->hasModel('Component_Eportfolio_BlogComment');
+		$this->hasModel('\\Component\\Eportfolio\\BlogComment');
 
 		$this->hasMap(array(
 			'column'     => 'id',
 			'property'   => 'id',
-			'type'       => Mapper::TYPE_INTEGER,
+			'type'       => self::TYPE_INTEGER,
 			'identifier' => true
 		));
 
 		$this->hasMap(array(
 			'column'     => 'blog_id',
 			'property'   => 'blogId',
-			'type'       => Mapper::TYPE_INTEGER,
+			'type'       => self::TYPE_INTEGER,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'uid',
 			'property'   => 'uid',
-			'type'       => Mapper::TYPE_INTEGER,
+			'type'       => self::TYPE_INTEGER,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'content',
 			'property'   => 'content',
-			'type'       => Mapper::TYPE_STRING,
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'created_at',
-			'property'   => 'created_at',
-			'type'       => Mapper::TYPE_DATETIME,
+			'property'   => 'createdAt',
+			'type'       => self::TYPE_DATETIME,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'updated_at',
-			'property'   => 'updated_at',
-			'type'       => Mapper::TYPE_DATETIME,
+			'property'   => 'updatedAt',
+			'type'       => self::TYPE_DATETIME,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'deleted_at',
-			'property'   => 'deleted_at',
-			'type'       => Mapper::TYPE_DATETIME,
+			'property'   => 'deletedAt',
+			'type'       => self::TYPE_DATETIME,
 		));
 
 		parent::mapping();

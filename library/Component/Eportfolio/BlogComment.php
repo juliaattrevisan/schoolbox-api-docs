@@ -7,8 +7,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+namespace Component\Eportfolio;
 
-class Component_Eportfolio_BlogComment extends Model {
+class BlogComment {
 
 	/**
 	 * Primary key

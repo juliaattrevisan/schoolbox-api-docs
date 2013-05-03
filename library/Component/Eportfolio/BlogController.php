@@ -24,7 +24,9 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 	 * @return void
 	 */
 	public function execute() {
-		$this->setMapperClass(Component_Eportfolio_BlogMapper::getInstance());
+		$mapper = new \Component\Eportfolio\BlogMapper();
+
+		$this->setMapperClass($mapper);
 
 		return true;
 	}
@@ -88,19 +90,15 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 
 		if ($allItems->count()) {
 			foreach($allItems as $currentItem) {
-				$updatedAt = new Alaress_Date_Format($currentItem->getUpdatedAt(), 'y-m-d h:i:s');
-
 				$this->setVar(array(
 					'LIST_ITEM_ID' => $currentItem->getId(),
 					'LIST_ITEM_TITLE' => Scrub::text($currentItem->getTitle()),
 					'LIST_ITEM_CONTENT' => Scrub::html($currentItem->getContent()),
-					'LIST_ITEM_UPDATED_AT' => $updatedAt->getShort(),
+					'LIST_ITEM_UPDATED_AT' => $currentItem->getUpdatedAt()->getShort(),
 				));
 
-				$allComments = Component_Eportfolio_BlogCommentMapper::getInstance()->findByColumn('blog_id', $currentItem->getId());
-
-				if ($allComments->count()) {
-					foreach($allComments as $currentComment) {
+				if ($currentItem->getComments()->count()) {
+					foreach($currentItem->getComments() as $currentComment) {
 						$commentAuthor = NewUserMapper::getInstance()->findById($currentComment->getUid());
 						$createdAt = new Alaress_Date_Relative($currentComment->getCreatedAt());
 

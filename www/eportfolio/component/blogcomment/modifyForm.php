@@ -27,39 +27,39 @@ if ($authenticator->canView()) {
 		$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 		$authorId = $_SESSION['id'];
 
-		$blogComment = new Component_Eportfolio_BlogComment();
+		$blogComment = new \Component\Eportfolio\BlogComment();
 		$blogComment->setBlogId($listItemId);
 		$blogComment->setUid($authorId);
 		$blogComment->setContent($content);
 		$blogComment->setCreatedAt($now->getDatabase());
 		$blogComment->setUpdatedAt($now->getDatabase());
 
-		Component_Eportfolio_BlogCommentMapper::getInstance()->save($blogComment);
+		\Component\Eportfolio\BlogCommentMapper::getInstance()->save($blogComment);
 	}
 //	/* Update a list item
 //	 */
 //	else if ($action == 'updateItem') {
 //		$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 //
-//		$listItem = Component_Eportfolio_BlogMapper::getInstance()->findById($listItemId);
+//		$listItem = \Component\Eportfolio\BlogMapper::getInstance()->findById($listItemId);
 //		$listItem->setTitle($title);
 //		$listItem->setContent($content);
 //		$listItem->setUpdatedAt($now->getDatabase());
 //
-//		Component_Eportfolio_BlogMapper::getInstance()->save($listItem);
+//		\Component\Eportfolio\BlogMapper::getInstance()->save($listItem);
 //	}
 	/* Delete a list item
 	 */
 	else if ($action == 'removeComment') {
 		$commentId = $_POST['commentId'];
 
-		$listItem = Component_Eportfolio_BlogCommentMapper::getInstance()->findById($commentId);
+		$listItem = \Component\Eportfolio\BlogCommentMapper::getInstance()->findById($commentId);
 
 		/* Blog authors can delete anyone's comment
 		 * Comment authors are allowed to delete their own comments, but a ui is not provided yet.
 		 */
 		if (($listItem->getUid() == $_SESSION['id']) || ($authenticator->canModify())) {
-			Component_Eportfolio_BlogCommentMapper::getInstance()->delete($listItem);
+			\Component\Eportfolio\BlogCommentMapper::getInstance()->delete($listItem);
 		}
 	}
 

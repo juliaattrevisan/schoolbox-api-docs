@@ -7,7 +7,10 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Eportfolio_BlogMapper extends Mapper {
+namespace Component\Eportfolio;
+use Schoolbox;
+
+class BlogMapper extends Schoolbox\Mapper {
 
 	/**
 	 * Define column/property mapping
@@ -16,55 +19,62 @@ class Component_Eportfolio_BlogMapper extends Mapper {
 	 */
 	protected function mapping() {
 		$this->hasTable('eportfolio_component_blog');
-		$this->hasModel('Component_Eportfolio_Blog');
+		$this->hasModel('\\Component\\Eportfolio\\Blog');
 
 		$this->hasMap(array(
 			'column'     => 'id',
 			'property'   => 'id',
-			'type'       => Mapper::TYPE_INTEGER,
+			'type'       => self::TYPE_INTEGER,
 			'identifier' => true
 		));
 
 		$this->hasMap(array(
 			'column'     => 'page_id',
 			'property'   => 'pageId',
-			'type'       => Mapper::TYPE_INTEGER,
+			'type'       => self::TYPE_INTEGER,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'uid',
 			'property'   => 'uid',
-			'type'       => Mapper::TYPE_INTEGER,
+			'type'       => self::TYPE_INTEGER,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'title',
 			'property'   => 'title',
-			'type'       => Mapper::TYPE_STRING,
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'content',
 			'property'   => 'content',
-			'type'       => Mapper::TYPE_STRING,
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'created_at',
-			'property'   => 'created_at',
-			'type'       => Mapper::TYPE_DATETIME,
+			'property'   => 'createdAt',
+			'type'       => self::TYPE_DATETIME,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'updated_at',
-			'property'   => 'updated_at',
-			'type'       => Mapper::TYPE_DATETIME,
+			'property'   => 'updatedAt',
+			'type'       => self::TYPE_DATETIME,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'deleted_at',
-			'property'   => 'deleted_at',
-			'type'       => Mapper::TYPE_DATETIME,
+			'property'   => 'deletedAt',
+			'type'       => self::TYPE_DATETIME,
+		));
+
+		$this->hasJoin('comments', array(
+			'multiple'  => true,
+			'mapper'    => '\\Component\\Eportfolio\\BlogCommentMapper',
+			'this_key'  => 'id',
+			'other_key' => 'blog_id',
 		));
 
 		parent::mapping();
@@ -80,20 +90,50 @@ class Component_Eportfolio_BlogMapper extends Mapper {
 	 * @return bool|Model
 	 */
 	public function findByOrder($args) {
+		$collection = new \Schoolbox\Collection();
+
+		$comment_mapper = $this->getJoinMapper('comments');
+
 		$statement = $this->database->prepare("
-            SELECT {$this->getColumnString()}
-            FROM `{$this->table}`
-            WHERE `{$args['identifierName']}` = :identifierValue
-            ORDER BY {$args['column']} {$args['order']}
+			SELECT
+            	{$this->getColumnString('b')},
+            	{$comment_mapper->getColumnString('c')}
+            FROM `{$this->table}` b
+            LEFT JOIN {$this->getJoinSql('comments', 'b', 'c')}
+            WHERE b.`{$args['identifierName']}` = :identifierValue
+            ORDER BY b.{$args['column']} {$args['order']}
         ");
 
 		$statement->bindParam(':identifierValue', $args['identifierValue']);
-
 		$statement->execute();
 
-		$rowset = $statement->fetchAll();
+		/* Manually construct hierarchy of blog items and their comments
+		 */
+		foreach ($statement as $row) {
+			$blogItem = $this->hydrate($row, 'b');
+			$commentItem = $comment_mapper->hydrate($row, 'c');
 
-		return $this->hydrateList($rowset);
+			/* Put it into the collection in the index with the same
+			 * value as the blog id, if it doesn't already live there
+			 */
+			if (!is_a($collection->getOffset($blogItem->getId()), 'Component\Eportfolio\Blog')) {
+				$collection->setOffset($blogItem->getId(), $blogItem);
+			}
+
+			/* If a comment was parsed from this $row, put it with is parent blog
+			 */
+			if (is_numeric($commentItem->getId())) {
+				$collection->getOffset($commentItem->getBlogId())->getComments()->add($commentItem);
+			}
+		}
+
+		/* Reindex everything
+		 *
+		 * foreach() can't understand it when you don't reindex to zero-based array
+		 */
+		$collection->reindex();
+
+		return $collection;
 	}
 
 	/**
