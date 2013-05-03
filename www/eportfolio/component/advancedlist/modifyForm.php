@@ -26,7 +26,7 @@ if ($authenticator->canModify()) {
 		$title = $_POST['title'];
 		$content = $_POST['content'];
 
-		$listItem = new Component_Eportfolio_AdvancedList();
+		$listItem = new \Component\Eportfolio\AdvancedList();
 		$listItem->setComponentInstanceId($componentInstanceId);
 		$listItem->setTitle($title);
 		$listItem->setContent($content);
@@ -37,7 +37,6 @@ if ($authenticator->canModify()) {
 		$uploadedUid = $_SESSION['id'];
 
 		if (is_readable($uploadedLocation)) {
-
 			$allowedFiles = new \Schoolbox\File\MimetypeMapper();
 			$mime = $allowedFiles->getByFilename($_FILES['imagehash']['name']);
 
@@ -47,7 +46,7 @@ if ($authenticator->canModify()) {
 			}
 		}
 
-		Component_Eportfolio_AdvancedListMapper::getInstance()->save($listItem);
+		\Component\Eportfolio\AdvancedListMapper::getInstance()->save($listItem);
 	}
 	/* Update a list item
 	 */
@@ -55,9 +54,8 @@ if ($authenticator->canModify()) {
 		$listItemId = $_POST['listItemId'];
 		$title = $_POST['title'];
 		$content = $_POST['content'];
-		$imagehash = $_POST['imagehash'];
 
-		$listItem = Component_Eportfolio_AdvancedListMapper::getInstance()->findById($listItemId);
+		$listItem = \Component\Eportfolio\AdvancedListMapper::getInstance()->findById($listItemId);
 		$listItem->setTitle($title);
 		$listItem->setContent($content);
 
@@ -66,20 +64,24 @@ if ($authenticator->canModify()) {
 		$uploadedUid = $_SESSION['id'];
 
 		if (is_readable($uploadedLocation)) {
-			$imageResource = Storage_ResourceMapper::getInstance()->create($uploadedFilename, $uploadedLocation, $uploadedUid);
+			$allowedFiles = new \Schoolbox\File\MimetypeMapper();
+			$mime = $allowedFiles->getByFilename($_FILES['imagehash']['name']);
 
-			$listItem->setImagehash($imageResource->hash);
+			if(is_object($mime) && $mime->getEnable() == 'true' && stristr($mime->getMime(),'image/')) {
+				$imageResource = Storage_ResourceMapper::getInstance()->create($uploadedFilename, $uploadedLocation, $uploadedUid);
+				$listItem->setImagehash($imageResource->hash);
+			}
 		}
 
-		Component_Eportfolio_AdvancedListMapper::getInstance()->save($listItem);
+		\Component\Eportfolio\AdvancedListMapper::getInstance()->save($listItem);
 	}
 	/* Delete a list item
 	 */
 	else if ($action == 'removeItem') {
 		$listItemId = $_GET['listItemId'];
 
-		$listItem = Component_Eportfolio_AdvancedListMapper::getInstance()->findById($listItemId);
-		Component_Eportfolio_AdvancedListMapper::getInstance()->delete($listItem);
+		$listItem = Component\Eportfolio\AdvancedListMapper::getInstance()->findById($listItemId);
+		Component\Eportfolio\AdvancedListMapper::getInstance()->delete($listItem);
 	}
 
 	SitePage::localRedir("/eportfolio/{$ownerId}/{$pageId}");

@@ -7,38 +7,42 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Eportfolio;
-
 require_once dirname(__FILE__) . '/../../../include/Bootstrap.php';
 
-$page = new \SitePage();
+$page = new SitePage();
 
-$action = \Scrub::text($_POST['action']);
-$ownerId = \Scrub::text($_POST['userId']);
+$action = $_POST['action'];
+$ownerId = $_POST['userId'];
 $pageId = 'showcase';
 
-$authenticator = new \Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
+$authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
 
 if ($authenticator->canModify()) {
 	if ($action == 'unpublish') {
-		$showcaseItemId = \Scrub::text($_POST['showcaseItemId']);
+		$showcaseItemId = $_POST['showcaseItemId'];
 
-		$showcasedItem = ShowcaseMapper::getInstance()->findById($showcaseItemId);
+		$showcasedItem = \Eportfolio\ShowcaseMapper::getInstance()->findById($showcaseItemId);
 
-		ShowcaseMapper::getInstance()->delete($showcasedItem);
+		\Eportfolio\ShowcaseMapper::getInstance()->delete($showcasedItem);
 	}
 	else if ($action == 'publish') {
-		$boxId = \Scrub::text($_POST['boxId']);
+		$boxId = $_POST['boxId'];
 		$now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
-		$showcasedItem = new Showcase();
-		$showcasedItem->setSubmissionBoxId($boxId);
-		$showcasedItem->setUid($ownerId);
-		$showcasedItem->setCreatedAt($now);
-		$showcasedItem->setUpdatedAt($now);
+		/* Check if the submission box is already being showcased; if so, ignore request
+		 */
+		$existing = \Eportfolio\ShowcaseMapper::getInstance()->findByColumn('submission_box_id', $boxId);
 
-		ShowcaseMapper::getInstance()->create($showcasedItem);
+		if (!$existing->count()) {
+			$showcasedItem = new \Eportfolio\Showcase();
+			$showcasedItem->setSubmissionBoxId($boxId);
+			$showcasedItem->setUid($ownerId);
+			$showcasedItem->setCreatedAt($now);
+			$showcasedItem->setUpdatedAt($now);
+
+			\Eportfolio\ShowcaseMapper::getInstance()->create($showcasedItem);
+		}
 	}
 
-	\SitePage::localRedir("/eportfolio/{$ownerId}/showcase");
+	SitePage::localRedir("/eportfolio/{$ownerId}/showcase");
 }

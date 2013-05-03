@@ -24,7 +24,9 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 	 * @return void
 	 */
 	public function execute() {
-		$this->setMapperClass(Component_Eportfolio_AdvancedListMapper::getInstance());
+		$mapper = new \Component\Eportfolio\AdvancedListMapper();
+
+		$this->setMapperClass($mapper);
 
 		return true;
 	}

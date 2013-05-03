@@ -26,13 +26,13 @@ if ($authenticator->canModify()) {
 		$title = $_POST['title'];
 		$content = $_POST['content'];
 
-		$listItem = new Component_Eportfolio_LinkList();
+		$listItem = new \Component\Eportfolio\LinkList();
 		$listItem->setComponentInstanceId($componentInstanceId);
 		$listItem->setTitle($title);
 		$listItem->setContent($content);
 		$listItem->setSequence(1);
 
-		Component_Eportfolio_LinkListMapper::getInstance()->save($listItem);
+		\Component\Eportfolio\LinkListMapper::getInstance()->save($listItem);
 	}
 	/* Update a list item
 	 */
@@ -41,19 +41,19 @@ if ($authenticator->canModify()) {
 		$title = $_POST['title'];
 		$content = $_POST['content'];
 
-		$listItem = Component_Eportfolio_LinkListMapper::getInstance()->findById($listItemId);
+		$listItem = \Component\Eportfolio\LinkListMapper::getInstance()->findById($listItemId);
 		$listItem->setTitle($title);
 		$listItem->setContent($content);
 
-		Component_Eportfolio_LinkListMapper::getInstance()->save($listItem);
+		\Component\Eportfolio\LinkListMapper::getInstance()->save($listItem);
 	}
 	/* Delete a list item
 	 */
 	else if ($action == 'removeItem') {
 		$listItemId = $_GET['listItemId'];
 
-		$listItem = Component_Eportfolio_LinkListMapper::getInstance()->findById($listItemId);
-		Component_Eportfolio_LinkListMapper::getInstance()->delete($listItem);
+		$listItem = \Component\Eportfolio\LinkListMapper::getInstance()->findById($listItemId);
+		\Component\Eportfolio\LinkListMapper::getInstance()->delete($listItem);
 	}
 
 	SitePage::localRedir("/eportfolio/{$ownerId}/{$pageId}");

@@ -7,6 +7,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Eportfolio_BasicList extends Component_Eportfolio_List {
+namespace Component\Eportfolio;
+
+class BasicList extends ListItem {
 
 }

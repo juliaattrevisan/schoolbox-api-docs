@@ -7,6 +7,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Eportfolio_Textbox extends Component_Eportfolio_List {
+namespace Component\Eportfolio;
+
+class Textbox extends ListItem {
 
 }

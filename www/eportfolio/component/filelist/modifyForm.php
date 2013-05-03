@@ -29,7 +29,7 @@ if ($authenticator->canModify()) {
 
 		/* Prevent dupe publishings
 		 */
-		$existing = Component_Eportfolio_FileListMapper::getInstance()->findByColumnList(array(
+		$existing = \Component\Eportfolio\FileListMapper::getInstance()->findByColumnList(array(
 			'component_instance_id' => $componentInstanceId,
 			'file_id' => $fileId
 		));
@@ -39,22 +39,22 @@ if ($authenticator->canModify()) {
 		if (!$existing->count()) {
 			$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
-			$listItem = new Component_Eportfolio_FileList();
+			$listItem = new \Component\Eportfolio\FileList();
 			$listItem->setComponentInstanceId($componentInstanceId);
 			$listItem->setFileId($fileId);
-			$listItem->setCreatedAt($now->getDatabase());
-			$listItem->setUpdatedAt($now->getDatabase());
+			$listItem->setCreatedAt($now);
+			$listItem->setUpdatedAt($now);
 
-			Component_Eportfolio_FileListMapper::getInstance()->save($listItem);
+			\Component\Eportfolio\FileListMapper::getInstance()->save($listItem);
 		}
 	}
 	/* Delete a list item
 	 */
 	else if ($action == 'removeItem') {
-		$listItemId =$_GET['listItemId'];
+		$listItemId = $_GET['listItemId'];
 
-		$listItem = Component_Eportfolio_FileListMapper::getInstance()->findById($listItemId);
-		Component_Eportfolio_FileListMapper::getInstance()->delete($listItem);
+		$listItem = \Component\Eportfolio\FileListMapper::getInstance()->findById($listItemId);
+		\Component\Eportfolio\FileListMapper::getInstance()->delete($listItem);
 	}
 
 	SitePage::localRedir("/eportfolio/{$ownerId}/{$pageId}");

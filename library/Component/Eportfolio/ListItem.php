@@ -7,8 +7,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+namespace Component\Eportfolio;
 
-abstract class Component_Eportfolio_List extends Model {
+abstract class ListItem {
 
 	/**
 	 * Primary key

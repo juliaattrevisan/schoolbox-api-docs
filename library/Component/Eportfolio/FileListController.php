@@ -24,7 +24,9 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 	 * @return void
 	 */
 	public function execute() {
-		$this->setMapperClass(Component_Eportfolio_FileListMapper::getInstance());
+		$mapper = new \Component\Eportfolio\FileListMapper();
+
+		$this->setMapperClass($mapper);
 
 		return true;
 	}
@@ -45,6 +47,7 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 		/* Set up blocks and stuff
 		 */
 		$this->setBlock($templateHandle, 'list_item', 'list_item_block');
+		$this->setBlock('list_item', 'has_modify_button', 'has_modify_button_block');
 		$this->setBlock('list_item', 'has_unpublish_form', 'has_unpublish_form_block');
 
 		$this->setVar(array(
@@ -53,30 +56,21 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 
 		/* Gather everything
 		 */
-		$allItems = $this->getMapperClass()->findByColumn('component_instance_id', $this->instance->id);
+		$allItems = $this->getMapperClass()->findForInstance($this->instance->id);
 
 		if ($allItems->count()) {
 			$j = 0;
-
-			foreach ($allItems as $currentItem ) {
-
-				/* TODO: Clean all this out, convert to mappers
-				 */
-				$fileHandler = new MyFile();
-				$file = $fileHandler->getById($currentItem->getFileId());
-
-				$mimeMapper = new \Schoolbox\File\MimetypeMapper();
-				$createdAt = new Alaress_Date_Format($currentItem->getCreatedAt(), 'y-m-d h:i:s');
-
+			
+			foreach ($allItems as $currentItem) {
 				$this->setVar(array(
 					'LIST_ITEM_ID' => $currentItem->getId(),
 					'FILE_ITEM_ID' => $currentItem->getFileId(),
-					'FILE_ITEM_TITLE' => Scrub::text($file['description']),
-					'FILE_ITEM_FILENAME' => Scrub::text($file['realname']),
-					'FILE_ITEM_MIMETYPE' => $mimeMapper->findByColumn('mime', $file['mime_type'])->current()->getClass(),
-					'FILE_ITEM_CREATED_AT' => $createdAt->getShort(),
+					'FILE_ITEM_TITLE' => Scrub::text($currentItem->getFile()->getDescription()),
+					'FILE_ITEM_FILENAME' => Scrub::text($currentItem->getFile()->getFilename()),
+					'FILE_ITEM_MIMETYPE' => $currentItem->getFile()->getMime()->getClass(),
+					'FILE_ITEM_CREATED_AT' => $currentItem->getCreatedAt()->getShort(),
 					'ON_OFF' => ++$j % 2 ? '' : 'dark',
-					'FILE_ITEM_FILESIZE' => Alaress_Byte_Format::bytesToString($file['file_size']),
+					'FILE_ITEM_FILESIZE' => Alaress_Byte_Format::bytesToString($currentItem->getFile()->getFilesize()),
 				));
 
 				/* Controls

@@ -7,7 +7,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Component_Eportfolio_LinkList extends Component_Eportfolio_List {
+namespace Component\Eportfolio;
+
+class LinkList extends ListItem {
 
 	/**
 	 * Human readable version of the link

@@ -25,8 +25,6 @@ class Component_Eportfolio_ImageListController extends Component_Eportfolio_Cont
 	 * @return void
 	 */
 	public function execute() {
-		$this->setMapperClass(Component_Eportfolio_ImageListMapper::getInstance());
-
 		return true;
 	}
 
@@ -51,19 +49,14 @@ class Component_Eportfolio_ImageListController extends Component_Eportfolio_Cont
 			'list_item_block' => ''
 		));
 
-		/* TODO: Convert MyFile to mappers
-		 */
-		$myFileHandler = new MyFile();
+		$mapper = new \Component\Eportfolio\FileListMapper();
 
-		$allFiles = $myFileHandler->getByArray(array(
-			'owner' => $this->context['uid'],
-			'mime_type' => 'image/%'
-		));
+		$allImages = $mapper->findAll();
 
-		if (is_array($allFiles) && count($allFiles)) {
-			foreach($allFiles as $currentFile) {
+		if ($allImages->count()) {
+			foreach($allImages as $currentImage) {
 				$this->setVar(array(
-					'IMAGE_ID' => $currentFile['id'],
+					'IMAGE_ID' => $currentImage->getFileId(),
 				));
 
 				$this->parse('list_item_block', 'list_item', true);

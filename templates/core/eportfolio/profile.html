@@ -73,46 +73,40 @@
     </div>
 
     <div class="box component">
-        <!-- TODO: This whole component -->
         <h2>Recent Journals</h2>
         <div class="listing">
+			<!-- BEGIN has_recent_blog -->
             <table class="upcoming-work">
                 <tbody>
-                <tr class="">
-                    <td>Today</td>
-                    <td><a class="title" href="">Winter is coming</a></td>
-                </tr>
-                <tr class="dark">
-                    <td>3 weeks ago</td>
-                    <td><a class="title" href="">IPA - a winter or summer brew?</a></td>
-                </tr>
-                <tr class="">
-                    <td>1 month ago</td>
-                    <td><a class="title" href="">The life and death of a gummi bear</a></td>
-                </tr>
-                <tr class="dark">
-                    <td>Today</td>
-                    <td><a class="title" href="">Welsh - an interview with David Jones</a></td>
-                </tr>
+					<!-- BEGIN recent_blog -->
+					<tr class="{ON_OFF}">
+						<td>{RECENT_BLOG_CREATED_AT}</td>
+						<td><a class="title" href="/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/{RECENT_BLOG_PAGE_ID}#blog_{RECENT_BLOG_BLOG_ID}">{RECENT_BLOG_TITLE}</a></td>
+					</tr>
+					<!-- END recent_blog -->
                 </tbody>
             </table>
+			<!-- END has_recent_blog -->
+			<!-- BEGIN no_recent_blog -->
+			<p>{USER_FIRSTNAME} {USER_LASTNAME} has no recent blogs.</p>
+			<!-- END no_recent_blog -->
         </div>
     </div>
 
     <div class="box component">
-        <!-- TODO: This whole component-->
         <h2>Recent Photos</h2>
+		<!-- BEGIN has_recent_photo -->
         <div class="listing photos">
+			<!-- BEGIN recent_photo -->
             <a href="" title="Image title">
-                <img alt="Image title" src="http://lorempixel.com/499/499" />
+				<img alt="Image title" src='/cms/myImage.php?id={RECENT_PHOTO_FILE_ID}&width=200&height=200' />
             </a>
-            <a href="" title="Image title">
-                <img alt="Image title" src="http://lorempixel.com/500/500" />
-            </a>
-            <a href="" title="Image title">
-                <img alt="Image title" src="http://lorempixel.com/501/501" />
-            </a>
+			<!-- END recent_photo -->
         </div>
+		<!-- END has_recent_photo -->
+		<!-- BEGIN no_recent_photo -->
+		<p>{USER_FIRSTNAME} {USER_LASTNAME} has no recent photos.</p>
+		<!-- END no_recent_photo -->
     </div>
 </div>
 

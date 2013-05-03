@@ -1,0 +1,145 @@
+<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+	<script type='text/javascript'>
+		$j(function() {
+
+			/* For viewing comment form
+			 *
+			 * When you have $j(function() inside the <body> tags the onclick
+			 * event runs twice. Unbind it and rebind it is a convenient solution.
+			 *
+			 * By Shahbaz Saleem
+			 * http://yuji.wordpress.com/2010/02/22/jquery-click-event-fires-twice/
+			 */
+			$j('.closeComment').unbind('click').click(function() {
+				var id = $j(this).attr('rel');
+
+				$j('#' + id).toggle();
+			});
+
+			/* For viewing comment thread
+			 */
+			$j('.viewCommentThread').hide();
+			
+			$j('.viewComments').unbind('click').click(function() {
+				var id = $j(this).attr('rel');
+
+				$j('#' + id).toggle();
+			});
+		});
+	</script>
+	<h2>{COMPONENT_NAME}</h2>
+	{CONFIGURATION}
+
+	<!-- BEGIN has_create_form -->
+	<form id='modify_blog_form_{COMPONENT_INSTANCE_ID}' action='/eportfolio/component/blog/modifyForm.php' method='post' enctype='multipart/form-data'>
+		<input type='hidden' name='action' value='addItem' />
+		<input type='hidden' name='userId' value='{USER_ID}' />
+		<input type='hidden' name='pageId' value='{PAGE_ID}' />
+
+		<input type='text' name='title' value='' />
+		<textarea type='text' name='content' class='mceEditor' /></textarea>
+		<input type='submit' value='Add item' />
+	</form>
+	<!-- END has_create_form -->
+
+	<!-- BEGIN create_text -->
+	<a href="/eportfolio/{USER_ID}/{PAGE_ID}/blog/create/{COMPONENT_INSTANCE_ID}#modify_blog_form_{COMPONENT_INSTANCE_ID}" class="btn modify"><span></span>Create</a>
+	<!-- END create_text -->
+
+	<ol>
+		<!-- BEGIN list_item -->
+		<li style='padding:30px;'>
+			<div id='blog_{LIST_ITEM_ID}'>
+				<div>
+					{LIST_ITEM_TITLE}
+				</div>
+				<div>
+					{LIST_ITEM_CONTENT}
+				</div>
+				<div>
+					Last updated on {LIST_ITEM_UPDATED_AT}
+				</div>
+				<div style='background-color:#aaa' id='blogComment_{LIST_ITEM_ID}'>
+					<!-- BEGIN has_comments -->
+					<a class='viewComments' rel='viewComments_{LIST_ITEM_ID}'>View Comments</a>
+
+					<ol id='viewComments_{LIST_ITEM_ID}' class='viewCommentThread'>
+						<!-- BEGIN comment -->
+						<li>
+							<p>
+								<img src='/portrait.php?userId={COMMENT_EXTERNAL_USER_ID}&size=square32' /><br />
+								{COMMENT_AUTHOR_FULLNAME}
+							</p>
+							<p>
+								{COMMENT_CONTENT}
+							</p>
+							<p>
+								Posted {COMMENT_CREATED_AT}
+							</p>
+							<!-- BEGIN has_delete_comment_form -->
+							<form action='/eportfolio/component/blogcomment/modifyForm.php' method='post'>
+								<input type='hidden' name='action' value='removeComment' />
+								<input type='hidden' name='userId' value='{USER_ID}' />
+								<input type='hidden' name='pageId' value='{PAGE_ID}' />
+								<input type='hidden' name='commentId' value='{COMMENT_ID}' />
+
+								<input type='submit' value='Delete' />
+							</form>
+							<!-- END has_delete_comment_form -->
+						</li>
+						<!-- END comment -->
+					</ol>
+					<!-- END has_comments -->
+				</div>
+			</div>
+
+			<!-- BEGIN has_modify_form -->
+			<form id='modify_blog_form_{LIST_ITEM_ID}' class='modifyForm' action='/eportfolio/component/blog/modifyForm.php' method='post' style='padding:10px;background-color:#fdd'>
+				<input type='hidden' name='action' value='updateItem' />
+				<input type='hidden' name='userId' value='{USER_ID}' />
+				<input type='hidden' name='pageId' value='{PAGE_ID}' />
+				<input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
+
+				<label>
+					<input type='text' class='firstFocus' name='title' value='{LIST_ITEM_TITLE}' />
+				</label>
+				<label>
+					<textarea name='content' class='mceEditor'>{LIST_ITEM_CONTENT}</textarea>
+				</label>
+
+				<input type='submit' value='Update' />
+			</form>
+			<!-- END has_modify_form -->
+
+			<!-- BEGIN modify_text -->
+			<a href="/eportfolio/{USER_ID}/{PAGE_ID}/blog/modify/{LIST_ITEM_ID}#modify_blog_form_{LIST_ITEM_ID}" class="btn modify"><span></span>Modify</a>
+			<!-- END modify_text -->
+
+			<!-- BEGIN has_delete_form -->
+			<form action='/eportfolio/component/blog/modifyForm.php' method='post'>
+				<input type='hidden' name='action' value='removeItem' />
+				<input type='hidden' name='userId' value='{USER_ID}' />
+				<input type='hidden' name='pageId' value='{PAGE_ID}' />
+				<input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
+
+				<input type='submit' value='Delete' />
+			</form>
+			<!-- END has_delete_form -->
+
+			<a rel='modify_blogcomment_form_{LIST_ITEM_ID}' class='closeComment'>Add Comment</a>
+			<form id='modify_blogcomment_form_{LIST_ITEM_ID}' class='modifyForm hide' action='/eportfolio/component/blogcomment/modifyForm.php' method='post' style='padding:10px;background-color:#fdd'>
+				<input type='hidden' name='action' value='addComment' />
+				<input type='hidden' name='userId' value='{ID}' />
+				<input type='hidden' name='pageId' value='{PAGE_ID}' />
+				<input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
+
+				<label>
+					<input name='content' type='text' value='' />
+				</label>
+
+				<input type='submit' value='Add Comment' />
+			</form>
+		</li>
+		<!-- END list_item -->
+	</ol>
+</div>

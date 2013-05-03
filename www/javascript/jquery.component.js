@@ -454,7 +454,7 @@ setupCustomise = {
 			placeholder: 'marker',
 			tolerance: 'pointer',
 			zIndex: 2000,
-			start: function() {console.log('mog');
+			start: function() {
 				$j('.marker').text('This is the new position of your component');
 
 				/* Allow tinys to work in sortable context

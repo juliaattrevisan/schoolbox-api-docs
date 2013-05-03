@@ -25,12 +25,12 @@ if ($authenticator->canModify()) {
 	if ($action == 'addItem' && $_POST['content']) {
 		$content = $_POST['content'];
 
-		$listItem = new Component_Eportfolio_BasicList();
+		$listItem = new \Component\Eportfolio\BasicList();
 		$listItem->setComponentInstanceId($componentInstanceId);
 		$listItem->setContent($content);
 		$listItem->setSequence(1);
 
-		Component_Eportfolio_BasicListMapper::getInstance()->save($listItem);
+		\Component\Eportfolio\BasicListMapper::getInstance()->save($listItem);
 	}
 	/* Update a list item
 	 */
@@ -38,18 +38,18 @@ if ($authenticator->canModify()) {
 		$listItemId = $_POST['listItemId'];
 		$content = $_POST['content'];
 
-		$listItem = Component_Eportfolio_BasicListMapper::getInstance()->findById($listItemId);
+		$listItem = \Component\Eportfolio\BasicListMapper::getInstance()->findById($listItemId);
 		$listItem->setContent($content);
 
-		Component_Eportfolio_BasicListMapper::getInstance()->save($listItem);
+		\Component\Eportfolio\BasicListMapper::getInstance()->save($listItem);
 	}
 	/* Delete a list item
 	 */
 	else if ($action == 'removeItem') {
 		$listItemId = $_GET['listItemId'];
 
-		$listItem = Component_Eportfolio_BasicListMapper::getInstance()->findById($listItemId);
-		Component_Eportfolio_BasicListMapper::getInstance()->delete($listItem);
+		$listItem = Component\Eportfolio\BasicListMapper::getInstance()->findById($listItemId);
+		Component\Eportfolio\BasicListMapper::getInstance()->delete($listItem);
 	}
 
 	SitePage::localRedir("/eportfolio/{$ownerId}/{$pageId}");

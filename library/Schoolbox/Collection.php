@@ -221,4 +221,32 @@ class Collection implements \Iterator, \Countable {
 		$this->setStack(array_merge($this->getStack(), $other->getStack()));
 		return $this;
 	}
+
+	/**
+	 * Put an object in a particular place in the stack
+	 *
+	 * @param $index
+	 * @param $value
+	 */
+	public function setOffset($index, $value) {
+		$this->stack[$index] = $value;
+	}
+
+	/**
+	 * Get the contents of a particular index in the stack
+	 *
+	 * @param $index
+	 * @return mixed
+	 */
+	public function getOffset($index) {
+		return $this->stack[$index];
+	}
+
+	/**
+	 * Reindex the stack (useful when you setOffset() particular indexes and
+	 * want to restore 0-based indexes)
+	 */
+	public function reindex() {
+		$this->setStack(array_values($this->getStack()));
+	}
 }
