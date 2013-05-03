@@ -125,4 +125,64 @@ class AttemptMapper extends Mapper {
 		}
 		return $attempts;
 	}
+
+	public function getAllAttempts($assess_id, $extra_params = array()) {
+		//
+		// Build filters for query
+		$params = array(
+			'assess_id' => $assess_id,
+		);
+
+		$query = "
+			SELECT
+				aa.user_id,
+				aa.attempt_id,
+				SUM(ar.mark)  AS mark,
+				SUM(aq.marks) AS max_mark
+			FROM assess_attempt aa
+				LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
+				LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
+				RIGHT JOIN assess          a  ON aa.assess_id   = a.assess_id
+			WHERE a.assess_id = :assess_id
+			AND a.availability = 'assess'
+			GROUP BY aa.assess_id, aa.attempt_id
+			ORDER BY aa.start DESC
+		";
+		$stmt = $this->database->prepare($query);
+		$stmt->execute($params);
+
+		$attempts = array();
+
+		$sum = 0;
+		$count = 0;
+
+		foreach($stmt as $row) {
+			// only include the most recent attempt for each user (ie. first seen)
+			if(!empty($extra_params['most_recent']) && $extra_params['most_recent'] == true) {
+				// if the user is already in the array (ie already seen), just increment the attempt count
+				if(array_key_exists($row['user_id'], $attempts) || $row['max_mark'] == 0) {
+					$attempts[$row['user_id']][0]['attempts']++;
+					continue;
+				}
+			}
+
+			// include
+			$mark = ($row['mark'] / $row['max_mark']) * 100;
+			$attempts[$row['user_id']][] = array(
+				'mark' => $mark,
+				'display_mark' => sprintf("%d / %d", $row['mark'], $row['max_mark']),
+				'comment' => '',
+				'attempts' => 1
+			);
+
+			// add to averages vars
+			++$count;
+			$sum += $mark;
+		}
+		if(!empty($extra_params['calc_average']) && $extra_params['calc_average'] == true) {
+			$attempts['avg'] = $count ? $sum / $count : 0;
+		}
+
+		return $attempts;
+	}
 }

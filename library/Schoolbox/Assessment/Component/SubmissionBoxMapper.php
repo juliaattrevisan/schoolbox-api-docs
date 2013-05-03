@@ -476,7 +476,9 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			c.name AS categoryName,
 			b.name,
 			b.description,
+			f.name AS type,
 			r.mark,
+			r.norm_mark,
 			r.comment,
 			b.mark_visibility,
 			b.created, s.submitted, r.returned
@@ -484,6 +486,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			LEFT JOIN category c ON c.id = b.category
 			LEFT JOIN student_submission s ON s.box_id = b.id AND (s.owner = :user_id OR s.owner IS NULL)
 			LEFT JOIN submission_return  r ON r.box_id = b.id AND (r.owner = :user_id OR r.owner IS NULL)
+			LEFT JOIN file_type f ON b.type = f.id
 			WHERE b.deleted = 0
 			AND b.category IN {$this->getArrayPlaceholders($categories, 'category')}
 			AND YEAR(b.date) = :year
