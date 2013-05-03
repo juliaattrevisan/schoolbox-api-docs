@@ -9470,3 +9470,68 @@ table img { max-width: none; }
 	}
 }
 .listing.photos img { width: 33%; height: auto; }
+
+/* *
+ * submission/allWork - Report Card
+ * */
+#all-work             {
+  .enrolled-subjects  {
+     a                { padding: 6px;
+                        display: block;
+                        background: @lgrey;
+                        color: @dgrey;
+      &:hover         { background: @link;
+                        color: @lgrey;
+                        text-decoration: none;
+      }
+    }
+    li                { float: left;
+                        margin: 2px 3px;
+    }
+  }
+  #subject-main       { clear: both;
+                        position: relative;
+  }
+  .current-grade-avg  { width: 57%;
+                        position: absolute;
+                        top: 47px;
+                        right: 0;
+                        background: @dark;
+                        padding: 0 1%;
+  }
+  .grade              { font-size: 64px;
+                        font-weight: bold;
+  }
+  .trend              { color: @secondary-text; }
+  h1 .aside           { font-weight: normal;
+                        font-size: 0.7em;
+                        margin-left: 8px;
+                        color: @secondary-text;
+  }
+  .subject-criteria   { margin-bottom: 8px;
+    li li             { padding: 8px 16px;
+                        border-top: solid 1px @border-color;
+    }
+  }
+  .crit-group         { padding: 12px 0 0 0;
+                        border-bottom: solid 1px @border-color;
+                        text-indent: 8px;
+    > span            { font-weight: bold; }
+    ul                { margin: 12px 0 0 0; }
+  }
+  .crit-item .score   { position: absolute;
+                        right: 0;
+                        width: 25%;
+  }
+  .semester-controls  { width: 300px;
+                        float: right;
+                        height: 100px;
+    label             { display: inline; }
+  }
+  .subject-teachers   { width: 40%;
+                        min-height: 75px;
+  }
+  #subject-graph      { height: 250px;
+                        margin: 20px 0;
+  }
+}
