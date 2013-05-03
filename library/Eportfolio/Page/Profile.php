@@ -212,7 +212,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 
 		/* Gather everything
 		 */
-		$allImages = Component_Eportfolio_FileListMapper::getInstance()->findRecent($this->getNumRecentPhotos());
+		$allImages = \Component\Eportfolio\FileListMapper::getInstance()->findRecent($this->getNumRecentPhotos());
 
 		if ($allImages->count()) {
 			foreach ($allImages as $currentImage) {
@@ -236,7 +236,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 * Render recent journal posts
 	 */
 	private function renderRecentBlogs() {
-		$allBlogs = Component_Eportfolio_BlogMapper::getInstance()->findRecent($this->getNumRecentBlogs());
+		$allBlogs = \Component\Eportfolio\BlogMapper::getInstance()->findRecent($this->getNumRecentBlogs());
 
 		if ($allBlogs->count()) {
 			$j = 0;
