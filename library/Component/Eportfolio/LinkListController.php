@@ -71,17 +71,16 @@ class Component_Eportfolio_LinkListController extends Component_Eportfolio_Contr
 			$j = 0;
 
 			foreach ($allItems as $currentItem ) {
-
 				$url = new Url($currentItem->getContent());
 
 				if ($url->isLocalUrl()) {
 					$linkUrl = $url->getRelativeURL();
 					$linkTarget = '';
-				} else {
+				} 
+				else {
 					$linkUrl = $url->getBase64EncodedRedirect();
 					$linkTarget = 'external';
 				}
-
 
 				$this->setVar(array(
 					'LIST_ITEM_ID' => $currentItem->getId(),
