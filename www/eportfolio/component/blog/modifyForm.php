@@ -27,7 +27,7 @@ if ($authenticator->canModify()) {
 	if ($action == 'addItem') {
 		$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
-		$listItem = new Component_Eportfolio_Blog();
+		$listItem = new \Component\Eportfolio\Blog();
 		$listItem->setPageId($pageId);
 		$listItem->setUid($ownerId);
 		$listItem->setTitle($title);
@@ -35,25 +35,25 @@ if ($authenticator->canModify()) {
 		$listItem->setCreatedAt($now->getDatabase());
 		$listItem->setUpdatedAt($now->getDatabase());
 
-		Component_Eportfolio_BlogMapper::getInstance()->save($listItem);
+		\Component\Eportfolio\BlogMapper::getInstance()->save($listItem);
 	}
 	/* Update a list item
 	 */
 	else if ($action == 'updateItem') {
 		$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
-		$listItem = Component_Eportfolio_BlogMapper::getInstance()->findById($listItemId);
+		$listItem = \Component\Eportfolio\BlogMapper::getInstance()->findById($listItemId);
 		$listItem->setTitle($title);
 		$listItem->setContent($content);
 		$listItem->setUpdatedAt($now->getDatabase());
 
-		Component_Eportfolio_BlogMapper::getInstance()->save($listItem);
+		\Component\Eportfolio\BlogMapper::getInstance()->save($listItem);
 	}
 	/* Delete a list item
 	 */
 	else if ($action == 'removeItem') {
-		$listItem = Component_Eportfolio_BlogMapper::getInstance()->findById($listItemId);
-		Component_Eportfolio_BlogMapper::getInstance()->delete($listItem);
+		$listItem = \Component\Eportfolio\BlogMapper::getInstance()->findById($listItemId);
+		\Component\Eportfolio\BlogMapper::getInstance()->delete($listItem);
 	}
 
 	SitePage::localRedir("/eportfolio/{$ownerId}/{$pageId}");
