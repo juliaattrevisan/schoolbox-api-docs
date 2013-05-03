@@ -433,10 +433,18 @@ if (isset($recent_submission)) {
     $recentSubmissionDate = new Alaress_Date_Relative($recent_submission->getDate(), 'U');
 
     // get filetype details
-    $ext   = pathinfo($recent_submission->getSubmission()->getFilename(), PATHINFO_EXTENSION);
-    $mime  = $allowedHandler->getMime($ext);
+    $student_submission = $recent_submission->getSubmission();
+    if ($student_submission->isOnlineSubmission()) {
+        $mime = 'text/html';
+        $size = strlen($student_submission->getBody());
+    }
+    else {
+        $ext  = pathinfo($recent_submission->getSubmission()->getFilename(), PATHINFO_EXTENSION);
+        $mime = $allowedHandler->getMime($ext);
+        $size = $recent_submission->getSubmission()->getFilesize();
+    }
     $ftype = $allowedHandler->getByField('mime', $mime);
-	$size  = Alaress_Byte_Format::bytesToString($recent_submission->getSubmission()->getFilesize());
+    $size  = Alaress_Byte_Format::bytesToString($size);
 
 	// populate details into page
     $this->setVar(array(

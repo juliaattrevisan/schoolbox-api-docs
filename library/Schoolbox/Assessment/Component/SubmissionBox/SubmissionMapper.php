@@ -61,6 +61,16 @@ class SubmissionMapper extends Schoolbox\Mapper {
 			'property'   => 'mimetype',
 			'type'       => self::TYPE_STRING,
 		));
+		$this->hasMap(array(
+			'column'     => 'body',
+			'property'   => 'body',
+			'type'       => self::TYPE_STRING,
+		));
+		$this->hasMap(array(
+			'column'     => 'draft',
+			'property'   => 'draft',
+			'type'       => self::TYPE_BOOLEAN,
+		));
 
 		$this->hasJoin('submission_box', array(
 			'mapper'    => '\\Schoolbox\\Assessment\\Component\\SubmissionBoxMapper',
@@ -119,6 +129,7 @@ class SubmissionMapper extends Schoolbox\Mapper {
 			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
 			WHERE sb.category IN {$box_join->getArrayPlaceholders($categories, 'category')}
 			AND ss.owner = :user_id
+			AND ss.draft IS FALSE
 			ORDER BY ss.submitted DESC
 			LIMIT :limit
 		";
@@ -138,6 +149,37 @@ class SubmissionMapper extends Schoolbox\Mapper {
 			);
 		}
 		return $collection;
+	}
+
+	/**
+	 * Retrieves drafts for this user and box, ordered by most recent first.
+	 *
+	 * @param int $user_id
+	 * @param int $box_id
+	 * @param int $limit
+	 *
+	 * @return Collection
+	 */
+	public function getDrafts($user_id, $box_id, $limit = null) {
+		$query = "
+			SELECT {$this->getColumnString('ss')}
+			FROM {$this->getTable()} ss
+			WHERE ss.box_id = :box_id
+			AND ss.owner = :user_id
+			AND ss.draft IS TRUE
+			ORDER BY ss.submitted DESC
+		";
+		if (isset($limit)) {
+			$query .= ' LIMIT :limit';
+		}
+		$statement = $this->database->prepare($query);
+		$statement->bindValue('user_id', $user_id, \PDO::PARAM_INT);
+		$statement->bindValue('box_id',  $box_id,  \PDO::PARAM_INT);
+		if (isset($limit)) {
+			$statement->bindValue('limit', $limit, \PDO::PARAM_INT);
+		}
+		$statement->execute();
+		return $this->hydrateList($statement, 'ss');
 	}
 
 	/**
@@ -169,6 +211,7 @@ class SubmissionMapper extends Schoolbox\Mapper {
 			LEFT JOIN {$box_join->getJoinSql('category', 'sb', 'c')}
 			WHERE sb.id = :box_id
 			AND ss.owner = :user_id
+			AND ss.draft IS FALSE
 			ORDER BY ss.submitted DESC
 		";
 		$params = array(
@@ -249,10 +292,12 @@ class SubmissionMapper extends Schoolbox\Mapper {
 		}
 
 		//
-		// Does a submission already exist for this student?
+		// Does a (non-draft) submission already exist for this student?
 		$box_id          = $submission->getSubmissionBox()->getId();
 		$user_id         = $submission->getOwner()->getId();
-		$count_statement = $this->database->prepare("SELECT id FROM {$this->getTable()} WHERE box_id=? AND owner=?");
+		$count_statement = $this->database->prepare(
+			"SELECT id FROM {$this->getTable()} WHERE box_id=? AND owner=? AND draft IS FALSE"
+		);
 		$count_statement->execute(array($box_id, $user_id));
 		$submitted = ($count_statement->rowCount() > 0);
 		if ($submitted && !$submission_box->getAcceptMultiple()) {
