@@ -1,0 +1,165 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/excanvas.compiled.js"></script>
+<script type="text/javascript" src="/javascript/flot/jquery.flot.js"></script>
+<!-- END custom_head -->
+<div id="all-work">
+  <div id="semester">
+    <div class="semester-controls">
+      <form action="/submission/allWork/{WORK_USER_ID}" method="GET">
+        <span>
+            <label for="sem">Semester</label>
+            <select id="sem" name="semester">
+              <!-- BEGIN semester_option -->
+              <option{SEMESTER_SELECTED}>{SEMESTER_VALUE}</option>
+              <!-- END semester_option -->
+            </select>
+            <label for="yr">,</label>
+            <select id="yr" name="year">
+              <!-- BEGIN year_option -->
+              <option{YEAR_SELECTED}>{YEAR_VALUE}</option>
+              <!-- END year_option -->
+            </select>
+        </span>
+        <input type="submit" class="btn" value="Update"/>
+      </form>
+    </div>
+    <ul class="enrolled-subjects">
+      <!-- BEGIN subject_selector -->
+      <li data-id="{ENR_SUBJ_ID}" class="{ENR_SUBJ_SELECTED}" title="{ENR_SUBJ_CODE}">
+        <a href="/submission/allWork/{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ENR_SUBJ_ID}">{ENR_SUBJ_NAME}</a>
+      </li>
+      <!-- END subject_selector -->
+    </ul>
+  </div>
+
+  <div id="subject-main">
+    <!-- BEGIN subject -->
+
+    <h1>{SUBJ_NAME}<span class="aside">{SUBJ_SEMESTER}</span></h1>
+    <ul class="subject-teachers">
+      <!-- BEGIN subject_teacher -->
+      <li>
+        <a class="bar button" href="/search/user/{SUBJ_TCH_ID}">
+          <img src="/portrait.php?userId={SUBJ_TCH_EXTID}&amp;size=square32">
+          <span class="name">{SUBJ_TCH_NAME}</span>
+          <span class="group">Teacher</span>
+        </a>
+      </li>
+      <!-- END subject_teacher -->
+    </ul>
+    <div class="current-grade-avg gradient-{SUBJ_GRADEIENT}">
+      <span>Current Grade Average:</span>
+      <span class="grade">{SUBJ_GRADE_AVG}</span>
+      <span class="trend">{SUBJ_GRADE_TREND}</span>
+    </div>
+
+    <div id="subject-graph">&nbsp;</div>
+
+    <!-- BEGIN subject_crit -->
+    <div class="subject-criteria">
+      <h2>Criteria</h2>
+      <ul>
+        <!-- BEGIN subject_crit_group -->
+        <li class="crit-group">
+          <span>{CRIT_GROUP_NAME}</span>
+          <ul>
+            <!-- BEGIN subject_crit_item -->
+            <li class="crit-item">
+              <span class="name">{CRIT_ITEM_NAME}</span>
+              <span class="score">{CRIT_ITEM_SCORE}</span>
+            </li>
+            <!-- END subject_crit_item -->
+          </ul>
+        </li>
+        <!-- END subject_crit_group -->
+      </ul>
+    </div>
+    <!-- END subject_crit -->
+
+    <div class="subject-assessments">
+      <h2>Assessments<a href="/eportfolio/{WORK_USER_ID}/showcase" class="btn"><span></span>View Showcase</a></h2>
+      <div class="listing">
+        <table class="upcoming-work">
+          <thead>
+            <th>Title</th>
+            <th>Grade</th>
+            <th>Date</th>
+            <th>Comments</th>
+            <th></th>
+          </thead>
+          <tbody>
+          <!-- BEGIN work -->
+          <tr class="{ON_OFF}">
+            <td>
+              <a class="title" href="/{WORK_HREF}{WORK_ID}">{WORK_TITLE}</a>
+              <br />
+              <a href="/homepage/{SUBJ_ID}">{SUBJ_NAME}</a> {WORK_TYPE}
+            </td>
+            <td>
+              <span class="gradient-{WORK_GRADIENT}">{WORK_GRADE}</span>
+            </td>
+            <td>
+              <span class="gradient-{WORK_URGENCY}">Due {WORK_DATE}</span> on {WORK_TIME}
+            </td>
+            <td>{WORK_COMMENT}</td>
+            <td class="text-align-right">
+              <!-- BEGIN work_actionable -->
+              <a href="/{WORK_HREF}{WORK_ID}" class="btn {WORK_BTN_ICON}"><span></span> {WORK_BTN_LABEL}</a>
+              <!-- END work_actionable -->
+              <!-- BEGIN work_publishable -->
+
+              <form action='/eportfolio/showcase/modifyForm.php' method='post'>
+                <input type='hidden' name='action' value='{WORK_PUBLISH_ACTION}' />
+                <input type='hidden' name='userId' value='{WORK_USER_ID}' />
+                <input type='hidden' name='{WORK_PUBLISH_TYPE}' value='{WORK_PUBLISH_ID}' />
+                <input type='submit' class="btn no-icon" value='{WORK_PUBLISH_BTN_LABEL}' />
+              </form>
+
+              <!-- <a href="/{WORK_PUBLISH_HREF}{WORK_ID}" class="btn {WORK_PUBLISH_BTN_ICON}"><span></span> {WORK_PUBLISH_BTN_LABEL}</a> -->
+              <!-- END work_publishable -->
+            </td>
+          </tr>
+          <!-- END work -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- END subject -->
+  </div>
+
+</div>
+
+<script type="text/javascript">
+  var data = {GRAPH_JSON};
+  var options = {
+    series: {
+      points: {
+        show: true,
+        fill: true,
+        lineWidth: 6
+      },
+      lines: {
+        show: true,
+        lineWidth: 4
+      }
+    },
+    colors: {GRAPH_COLOURS},
+    xaxis:  {
+      mode: "time",
+      min: {GRAPH_XMIN},
+      max: {GRAPH_XMAX}
+    },
+    yaxis:  {
+      min: 0,
+      max: 100
+    },
+    grid:   {
+      borderWidth: 0,
+      show: true
+    }
+  };
+  $j(function() {
+    $j.plot($j('#subject-graph'), data, options);
+  });
+</script>

@@ -107,7 +107,7 @@ if (!empty($_POST['accept_submission']) && $dueDate->getDatabase() > $lateDate->
 }
 
 $markMax = !$_POST['markvalue'] ? '100' : $_POST['markvalue']; // if not set, default to 100
-$resultSetID = 0;
+
 // if Total Mark selected, mark value must be specified
 if ($markTypeID == SubmissionBox\MarkType::TYPE_RAW && empty($_POST['markvalue'])) {
     error(15);

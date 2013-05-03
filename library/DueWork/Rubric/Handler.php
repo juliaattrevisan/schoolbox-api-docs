@@ -123,6 +123,60 @@ class DueWork_Rubric_Handler {
         return array();
     }
 
+
+	/**
+	 * This function should be renamed to something sensible
+	 * It retrieves a student's marks in a category, broken down by criteria and averaged
+	 *
+	 * @param $studentID
+	 * @param $categoryID
+	 * @return array
+	 */
+	public function getStudentMarksByCriteriaInCategory($studentID, $categoryID) {
+		$stmt = Database::getInstance()->prepare("
+			SELECT rm.criterion_id, rm.mark, MAX(rd.value) AS dmax_mark, MAX(rr.value) AS rmax_mark
+			FROM rubric_mark rm
+			LEFT JOIN submission_box sb ON rm.submission_box_id = sb.id
+			LEFT JOIN rubric_result rr ON sb.rubric_result_set = rr.resultset_id AND sb.rubric_result_set > 0
+			LEFT JOIN rubric_descriptor rd ON rm.criterion_id = rd.criterion_id AND sb.rubric_result_set = 0
+			WHERE rm.valid = 1
+			AND sb.mark_type = :mark_type
+
+			AND rm.student_id = :student_id
+			AND sb.category = :category_id
+
+			GROUP BY rm.criterion_id, sb.id;
+		");
+
+		$stmt->execute(array(
+			'mark_type' => \Schoolbox\Assessment\Component\SubmissionBox\MarkType::TYPE_RUBRIC,
+			'student_id' => $studentID,
+			'category_id' => $categoryID
+		));
+
+		// create a normalised value for each criterion
+		$crits = array();
+		while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+			if($row['dmax_mark']) {
+				$localAvg = $row['mark'] / $row['dmax_mark'];
+			}
+			elseif($row['rmax_mark']) {
+				$localAvg = $row['mark'] / $row['rmax_mark'];
+			}
+			else {
+				continue;
+			}
+			$crits[$row['criterion_id']][] = $localAvg;
+		}
+		$return = array();
+		foreach($crits as $critID => $marks) {
+			$return[$critID] = (array_sum($marks) / count($marks)) * 100;
+		}
+
+		return $return;
+
+	}
+
     /**
      * Gets the total mark for the rubric marking in question
      *
@@ -239,7 +293,10 @@ class DueWork_Rubric_Handler {
 
         $crits = array();
         while($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $val = array('name' => $row[2]);
+            $val = array(
+	            'id'   => $row[1],
+	            'name' => $row[2]
+            );
             if($withUsageCount) {
                 $val['count'] = $row[3];
             }

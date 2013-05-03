@@ -32,7 +32,7 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 		$strategy = new Alaress_Date_Strategy_V52();
 		$strategy->setFromFormat($dateTime, $dateFormat);
 		$strategy->setLocale(new Alaress_Date_Locale_Australian());
-		
+
 		$this->setStrategy($strategy);
 	}
 
