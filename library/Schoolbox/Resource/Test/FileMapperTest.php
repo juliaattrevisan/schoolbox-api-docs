@@ -11,10 +11,12 @@
  */
 
 namespace Schoolbox\Resource\Test;
+use Sabre\CalDAV\Property\ScheduleCalendarTransp;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\FileMapper;
 use Schoolbox\Test\TestCase;
 use Schoolbox\File as Storage;
+use Schoolbox\Column\Factory as ColumnFactory;
 
 class FileMapperTest extends TestCase {
 
@@ -48,7 +50,10 @@ class FileMapperTest extends TestCase {
 		//
 		// Need to mock storage mapper to return a set value, instead of from
 		// database.
-		$mock_mimetype = $this->getMock('\\Schoolbox\\File\\MimetypeMapper');
+		$mock_mimetype = $this->getMock(
+			'\\Schoolbox\\File\\MimetypeMapper',
+			array('getMimetypeForFilename', 'getIconForFilename')
+		);
 		$mock_mimetype
 			->expects($this->any())
 			->method('getMimetypeForFilename')
