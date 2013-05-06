@@ -12,7 +12,7 @@
 #
 #
 
-lessversion='1.3.0'
+lessversion='1.3.3'
 
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};
@@ -40,7 +40,7 @@ then
 fi
 
 # Ensure less is installed
-if [ ! `~/node_modules/.bin/lessc -v 2>/dev/null| awk {'print $2'}` == $lessversion ];
+if [ "`~/node_modules/.bin/lessc -v 2>/dev/null| awk {'print $2'}`" != "$lessversion" ];
 then
 	mkdir -p ~/node_modules;
 	cd ~;
