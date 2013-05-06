@@ -88,6 +88,7 @@ if (is_numeric($_GET['id'])) {
 		if (is_readable($file)) {
 			$contents = file_get_contents($file);
 			$size     = $studentSub->getFilesize();
+			$mime     = $studentSub->getMimetype()->getMime();
 		}
 		else {
 			$contents = <<<HTML
