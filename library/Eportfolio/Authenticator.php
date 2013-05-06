@@ -89,12 +89,9 @@ class Eportfolio_Authenticator {
 		else {
 			$pageMapper = new \Eportfolio\PageMapper();
 
-			$exists = $pageMapper->findByColumnList(array(
-				'uid' => $this->getOwnerId(),
-				'page_id' => $this->getPageId()
-			));
+			$exists = $pageMapper->findById($this->getPageId());
 
-			if ($exists->count()) {
+			if ($exists && ($exists->getDeletedAt() == null)) {
 				return true;
 			}
 		}
