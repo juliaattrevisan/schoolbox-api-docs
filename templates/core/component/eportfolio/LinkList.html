@@ -40,47 +40,43 @@
 	<h2>{COMPONENT_NAME}</h2>
 	{CONFIGURATION}
 
-
     <div class="listing">
-	<ul>
-		<!-- BEGIN list_item -->
-        <li class="clearfix {ON_OFF}" id='list_item_link_content_{LIST_ITEM_ID}'>
-			<h4><a class="icons link"  rel="{LIST_ITEM_TARGET}" href='{LIST_ITEM_URL}'>{LIST_ITEM_TITLE}</a></h4>
-            <!-- BEGIN has_modify_button -->
-            <a class='btn modify no-text modify_link' title="Edit link" rel='{LIST_ITEM_ID}'><span></span></a>
-            <!-- END has_modify_button -->
-            <!-- BEGIN has_delete_form -->
-            <a title="Remove link" class="btn delete no-text" href="/eportfolio/component/linklist/modifyForm.php?action=removeItem&userId={USER_ID}&pageId={PAGE_ID}&componentInstanceId={COMPONENT_INSTANCE_ID}&listItemId={LIST_ITEM_ID}"><span></span></a>
-            <!-- END has_delete_form -->
-		</li>
-        <!-- END list_item -->
-        <!-- BEGIN has_modify_form -->
+		<ul>
+			<!-- BEGIN list_item -->
+			<li class="clearfix {ON_OFF}" id='list_item_link_content_{LIST_ITEM_ID}'>
+				<h4><a class="icons link"  rel="{LIST_ITEM_TARGET}" href='{LIST_ITEM_URL}'>{LIST_ITEM_TITLE}</a></h4>
+				<!-- BEGIN has_modify_button -->
+				<a class='btn modify no-text modify_link' title="Edit link" rel='{LIST_ITEM_ID}'><span></span></a>
+				<!-- END has_modify_button -->
+				<!-- BEGIN has_delete_form -->
+				<a title="Remove link" class="btn delete no-text" href="/eportfolio/component/linklist/modifyForm.php?action=removeItem&userId={USER_ID}&pageId={PAGE_ID}&componentInstanceId={COMPONENT_INSTANCE_ID}&listItemId={LIST_ITEM_ID}"><span></span></a>
+				<!-- END has_delete_form -->
+			</li>
+			<!-- END list_item -->
+			<!-- BEGIN has_modify_form -->
+			<div class="editPanelImitation" id='modify_link_form_{LIST_ITEM_ID}'>
+				<form class='modifyForm' action='/eportfolio/component/linklist/modifyForm.php' method="post">
+					<input type='hidden' name='action' value='updateItem' />
+					<input type='hidden' name='userId' value='{USER_ID}' />
+					<input type='hidden' name='pageId' value='{PAGE_ID}' />
+					<input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
+					<input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
 
-        <div class="editPanel settings hide" id='modify_link_form_{LIST_ITEM_ID}'>
-            <form class='modifyForm' action='/eportfolio/component/linklist/modifyForm.php' method="post">
-                <input type='hidden' name='action' value='updateItem' />
-                <input type='hidden' name='userId' value='{USER_ID}' />
-                <input type='hidden' name='pageId' value='{PAGE_ID}' />
-                <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
-                <input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
+					<div class="title"><span>Title: </span>
+						<input type='text' class="firstFocus" name='title' value='{LIST_ITEM_TITLE}' />
+					</div>
+					<div class="content"><span>Link address: </span>
+						<input type='text' name='content' value='{LIST_ITEM_CONTENT}' />
+					</div>
 
-                <div class="title"><span>Title: </span>
-                    <input type='text' class="firstFocus" name='title' value='{LIST_ITEM_TITLE}' />
-                </div>
-                <div class="content"><span>Link address: </span>
-                    <input type='text' name='content' value='{LIST_ITEM_CONTENT}' />
-                </div>
-
-                <input type='submit' value='Update' />
-            </form>
-        </div>
-        <!-- END has_modify_form -->
-
-	</ul>
+					<input type='submit' value='Update' />
+				</form>
+			</div>
+			<!-- END has_modify_form -->
+		</ul>
     </div>
     <!-- BEGIN has_create_form -->
-    <a href="#" class="btn add create_link"><span></span>Add to List</a>
-    <div class="editPanel settings hide">
+    <div class="editPanelImitation">
         <form action='/eportfolio/component/linklist/modifyForm.php' method='post'>
             <input type='hidden' name='action' value='addItem' />
             <input type='hidden' name='userId' value='{USER_ID}' />

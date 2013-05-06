@@ -55,7 +55,7 @@
             </li>
 
 			<!-- BEGIN has_modify_form -->
-            <div class="editPanel settings hide" id='modify_basic_form_{LIST_ITEM_ID}'>
+            <div class="editPanelImitation settings hide" id='modify_basic_form_{LIST_ITEM_ID}'>
                 <form class='modifyForm' action='/eportfolio/component/basiclist/modifyForm.php' method='post'>
                     <input type='hidden' name='action' value='updateItem' />
                     <input type='hidden' name='userId' value='{USER_ID}' />
@@ -72,13 +72,10 @@
             </div>
 			<!-- END has_modify_form -->
 		<!-- END list_item -->
-
-	</ul>
+		</ul>
     </div>
     <!-- BEGIN has_create_form -->
-    <a href="#" class="btn add create_basic"><span></span>Add to List</a>
-
-    <div class="editPanel settings hide">
+    <div class="editPanelImitation">
         <form action='/eportfolio/component/basiclist/modifyForm.php' method='post'>
             <input type='hidden' name='action' value='addItem' />
             <input type='hidden' name='userId' value='{USER_ID}' />
