@@ -8,14 +8,11 @@
  * @version     SVN: $Id$
  */
 
-class Eportfolio_PageMapper extends Mapper {
+namespace Eportfolio;
+use Eportfolio;
+use Schoolbox;
 
-	/**
-	 * Database table
-	 *
-	 * @var string
-	 */
-	protected $table = 'eportfolio_config';
+class PageMapper extends Schoolbox\Mapper {
 
 	/**
 	 * Define column/property mapping
@@ -23,167 +20,188 @@ class Eportfolio_PageMapper extends Mapper {
 	 * @return Bool|void
 	 */
 	protected function mapping() {
+		$this->hasTable('eportfolio_config');
+		$this->hasModel('\\Eportfolio\\Page');
+
 		$this->hasMap(array(
 			'column'     => 'page_id',
-			'property'   => 'page_id',
-			'type'       => Mapper::TYPE_INTEGER,
+			'property'   => 'pageId',
+			'type'       => self::TYPE_INTEGER,
 			'identifier' => true
 		));
 
 		$this->hasMap(array(
 			'column'     => 'page_title',
-			'property'   => 'page_title',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'pageTitle',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'uid',
 			'property'   => 'uid',
-			'type'       => Mapper::TYPE_INTEGER,
+			'type'       => self::TYPE_INTEGER,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'template',
 			'property'   => 'template',
-			'type'       => Mapper::TYPE_INTEGER,
+			'type'       => self::TYPE_INTEGER,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'left_column_width',
-			'property'   => 'left_column_width',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'leftColumnWidth',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'left_head_font',
-			'property'   => 'left_head_font',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'leftHeadFont',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'left_head_bg',
-			'property'   => 'left_head_bg',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'leftHeadBg',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'left_font',
-			'property'   => 'left_font',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'leftFont',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'left_bg_primary',
-			'property'   => 'left_bg_primary',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'leftBgPrimary',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'left_bg_secondary',
-			'property'   => 'left_bg_secondary',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'leftBgSecondary',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'left_link',
-			'property'   => 'left_link',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'leftLink',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'left_hover',
-			'property'   => 'left_hover',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'leftHover',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'right_column_width',
-			'property'   => 'right_column_width',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'rightColumnWidth',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'right_head_font',
-			'property'   => 'right_head_font',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'rightHeadFont',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'right_head_bg',
-			'property'   => 'right_head_bg',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'rightHeadBg',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'right_font',
-			'property'   => 'right_font',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'rightFont',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'right_bg_primary',
-			'property'   => 'right_bg_primary',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'rightBgPrimary',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'right_bg_secondary',
-			'property'   => 'right_bg_secondary',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'rightBgSecondary',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'right_link',
-			'property'   => 'right_link',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'rightLink',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'right_hover',
-			'property'   => 'right_hover',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'rightHover',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'top_head_font',
-			'property'   => 'top_head_font',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'topHeadFont',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'top_head_bg',
-			'property'   => 'top_head_bg',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'topHeadBg',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'top_font',
-			'property'   => 'top_font',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'topFont',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'top_bg_primary',
-			'property'   => 'top_bg_primary',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'topBgPrimary',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'top_bg_secondary',
-			'property'   => 'top_bg_secondary',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'topBgSecondary',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'top_link',
-			'property'   => 'top_link',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'topLink',
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'top_hover',
-			'property'   => 'top_hover',
-			'type'       => Mapper::TYPE_STRING,
+			'property'   => 'topHover',
+			'type'       => self::TYPE_STRING,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'created_at',
+			'property'   => 'createdAt',
+			'type'       => self::TYPE_DATETIME,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'updated_at',
+			'property'   => 'updatedAt',
+			'type'       => self::TYPE_DATETIME,
+		));
+
+		$this->hasMap(array(
+			'column'     => 'deleted_at',
+			'property'   => 'deletedAt',
+			'type'       => self::TYPE_DATETIME,
 		));
 
 		parent::mapping();

@@ -155,7 +155,9 @@ abstract class Eportfolio_Page_Abstract {
 	 * Render a list of pages
 	 */
 	private function renderPageList() {
-		$allPages = Eportfolio_PageMapper::getInstance()->findByColumn('uid', $this->getUserId());
+		$pageMapper = new Eportfolio\PageMapper();
+
+		$allPages = $pageMapper->findByColumn('uid', $this->getUserId());
 
 		if ($allPages->count()) {
 			foreach($allPages as $currentPage) {
