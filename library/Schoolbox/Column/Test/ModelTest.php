@@ -73,6 +73,10 @@ class ModelTest extends TestCase {
 		$this->assertSame(1, $this->object->dehydrate($this->test_model, $this->test_mapper));
 	}
 
+	public function testDehydrateNull() {
+		$this->assertSame(null, $this->object->dehydrate(null, $this->test_mapper));
+	}
+
 	/**
 	 * Test when dehydrating with an alternate field name.
 	 */

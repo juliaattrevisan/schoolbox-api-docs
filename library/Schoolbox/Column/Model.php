@@ -80,15 +80,17 @@ class Model implements IColumnType {
 	 * @param \Schoolbox\Mapper $mapper
 	 *
 	 * @return mixed
-	 * * If $value is a scalar value, returns $value.
+	 * * If $value is null, returns null (represents a missing foreign key).
+	 * * If $value is a scalar value, returns $value. (user probably meant to
+	 *   set an ID value - might as well allow this)
 	 * * If $this->setDehydrateProperty() was called, returns the value of that
 	 *   field from $value
 	 * * Otherwise, returns ID of $value
 	 */
 	public function dehydrate($value, $mapper = null) {
-		//
-		// Did someone set this as a scalar? They probably meant to set an ID.
-		// Might as well allow this.
+		if (!isset($value)) {
+			return null;
+		}
 		if (is_scalar($value)) {
 			return $value;
 		}
