@@ -64,4 +64,12 @@ class ModelTest extends TestCase {
 	public function testDehydrate() {
 		$this->assertSame(1, $this->object->dehydrate($this->test_model, $this->test_mapper));
 	}
+
+	/**
+	 * Test when dehydrating with an alternate field name.
+	 */
+	public function testDehydrateWithFieldName() {
+		$this->object->setFieldName('filename');
+		$this->assertSame('d.txt', $this->object->dehydrate($this->test_model, $this->test_mapper));
+	}
 }
