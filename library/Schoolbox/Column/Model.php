@@ -14,6 +14,22 @@ use Schoolbox\LazyModel;
 class Model implements IColumnType {
 
 	/**
+	 * The database column name to pull the value from when calling hydrate().
+	 * If not set, then the database's identifier is retrieved.
+	 *
+	 * @var string
+	 */
+	protected $hydrate_column;
+
+	/**
+	 * The model property name to get the value from when calling dehydrate().
+	 * If not set, then the model's ID property is retrieved.
+	 *
+	 * @var string
+	 */
+	protected $dehydrate_property;
+
+	/**
 	 * The field name to get from the associated model when calling dehydrate().
 	 * If not set, then the model's identifier is retrieved.
 	 *
@@ -22,24 +38,41 @@ class Model implements IColumnType {
 	protected $field_name;
 
 	/**
-	 * @param  string $field_name
+	 * @param  string $dehydrate_property
 	 *
 	 * @return $this
 	 */
-	public function setFieldName($field_name) {
-		$this->field_name = $field_name;
+	public function setDehydrateProperty($dehydrate_property) {
+		$this->dehydrate_property = $dehydrate_property;
 		return $this;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getFieldName() {
-		return $this->field_name;
+	public function getDehydrateProperty() {
+		return $this->dehydrate_property;
+	}
+
+	/**
+	 * @param  string $hydrate_column
+	 *
+	 * @return $this
+	 */
+	public function setHydrateColumn($hydrate_column) {
+		$this->hydrate_column = $hydrate_column;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getHydrateColumn() {
+		return $this->hydrate_column;
 	}
 
 	public function hydrate($value, $mapper = null) {
-		return new LazyModel($mapper, $value);
+		return new LazyModel($mapper, $value, $this->getHydrateColumn(), $this->getDehydrateProperty());
 	}
 
 	/**
@@ -48,8 +81,8 @@ class Model implements IColumnType {
 	 *
 	 * @return mixed
 	 * * If $value is a scalar value, returns $value.
-	 * * If $this->setFieldName() was called, returns the value of that field
-	 *   from $value
+	 * * If $this->setDehydrateProperty() was called, returns the value of that
+	 *   field from $value
 	 * * Otherwise, returns ID of $value
 	 */
 	public function dehydrate($value, $mapper = null) {
@@ -59,8 +92,9 @@ class Model implements IColumnType {
 		if (is_scalar($value)) {
 			return $value;
 		}
-		$identifier_method = isset($this->field_name) ?
-			$mapper->getGetMethodName($this->field_name):
+		$dehydrate_property = $this->getDehydrateProperty();
+		$identifier_method  = isset($dehydrate_property) ?
+			$mapper->getGetMethodName($dehydrate_property):
 			$mapper->getGetIdentifierMethodName();
 		return $value->$identifier_method();
 	}
