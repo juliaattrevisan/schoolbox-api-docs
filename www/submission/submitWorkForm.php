@@ -31,8 +31,18 @@ if ( isset( $_FILES['file']['name'] ) && $_FILES['file']['name'] && is_numeric($
         ->loadMimetypeFromFilename()
         ->loadIsLate()
     ;
-    $submission_mapper = SubmissionMapper::getInstance()->save($submission);
-    $submissionId      = $submission->getId();
+
+    //
+    // Check uploadability before saving
+    $submission_mapper = new SubmissionMapper();
+    try {
+        $submission_mapper->checkUploadability($submission);
+    }
+    catch (Schoolbox\Resource\Exception $e) {
+        error(17);
+    }
+    $submission_mapper->save($submission);
+    $submissionId = $submission->getId();
 
     $plagscanApiKey = Config::get('plagscan_api_key');
     $plagscanUsername = Config::get('plagscan_username');
