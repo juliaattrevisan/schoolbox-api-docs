@@ -44,59 +44,59 @@
 
     <div class="listing">
         <ul class="news-list">
-		<!-- BEGIN list_item -->
-		<li class="clearfix {ON_OFF}" id='list_item_advanced_content_{LIST_ITEM_ID}'>
-            <!-- BEGIN has_modify_button -->
-            <a class='btn modify no-text modify_advanced' title="Edit item" rel='{LIST_ITEM_ID}'><span></span></a>
-            <!-- END has_modify_button -->
-            <!-- BEGIN has_delete_form -->
-            <a class="btn no-text delete" title="Delete item" href="/eportfolio/component/advancedlist/modifyForm.php?action=removeItem&userId={USER_ID}&pageId={PAGE_ID}&componentInstanceId={COMPONENT_INSTANCE_ID}&listItemId={LIST_ITEM_ID}"><span></span></a>
-            <!-- END has_delete_form -->
+			<!-- BEGIN list_item -->
+			<li class="clearfix {ON_OFF}">
+				<div id='list_item_advanced_content_{LIST_ITEM_ID}'>
+					<!-- BEGIN has_modify_button -->
+					<a class='btn modify no-text modify_advanced' title="Edit item" rel='{LIST_ITEM_ID}'><span></span></a>
+					<!-- END has_modify_button -->
+					<!-- BEGIN has_delete_form -->
+					<a class="btn no-text delete" title="Delete item" href="/eportfolio/component/advancedlist/modifyForm.php?action=removeItem&userId={USER_ID}&pageId={PAGE_ID}&componentInstanceId={COMPONENT_INSTANCE_ID}&listItemId={LIST_ITEM_ID}"><span></span></a>
+					<!-- END has_delete_form -->
 
-            <!-- BEGIN has_image -->
-            <a href="/storage/image.php?size=maxsize&hash={LIST_ITEM_IMAGEHASH}" rel="lightbox[portal]" style="height:64px;" alt="{LIST_ITEM_TITLE}" title="{LIST_ITEM_TITLE}">
-                <img src="/storage/image.php?size=square64&hash={LIST_ITEM_IMAGEHASH}" alt="{LIST_ITEM_TITLE}" border="0"/>
-            </a>
-            <br />
-            <!-- END has_image -->
+					<!-- BEGIN has_image -->
+					<a href="/storage/image.php?size=maxsize&hash={LIST_ITEM_IMAGEHASH}" rel="lightbox[portal]" style="height:64px;" alt="{LIST_ITEM_TITLE}" title="{LIST_ITEM_TITLE}">
+						<img src="/storage/image.php?size=square64&hash={LIST_ITEM_IMAGEHASH}" alt="{LIST_ITEM_TITLE}" border="0"/>
+					</a>
+					<!-- END has_image -->
 
+					<h3>{LIST_ITEM_TITLE}</h3>
+					<p>{LIST_ITEM_CONTENT}</p>
+				</div>
 
-            <h3>{LIST_ITEM_TITLE}</h3>
-            <p>{LIST_ITEM_CONTENT}</p>
+				<!-- BEGIN has_modify_form -->
+				<div class="editPanelImitation hide" id='modify_advanced_form_{LIST_ITEM_ID}'>
+					<form class='modifyForm' action='/eportfolio/component/advancedlist/modifyForm.php' method='post' enctype='multipart/form-data'>
+						<input type='hidden' name='action' value='updateItem' />
+						<input type='hidden' name='userId' value='{USER_ID}' />
+						<input type='hidden' name='pageId' value='{PAGE_ID}' />
+						<input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
+						<input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
 
+						<div class="title"><span>Title: </span>
+							<input type='text' class='firstFocus' name='title' value="{LIST_ITEM_TITLE}" />
+						</div>
+						<div class="content"><span>Content: </span>
+							<textarea type='text' name='content' />{LIST_ITEM_CONTENT}</textarea>
+						</div>
+						<div class="image"><span>Image: </span>
+							<img src='/storage/image.php?size=square64&hash={LIST_ITEM_IMAGEHASH}' class='floatLeft' /><br />
+							<input type='file' name='imagehash' value='' />
+						</div>
 
-        </li>
-            <!-- BEGIN has_modify_form -->
+						<input type='submit' value='Update' />
+					</form>
+				</div>
+				<!-- END has_modify_form -->
+			</li>
 
-            <div class="editPanel settings hide" id='modify_advanced_form_{LIST_ITEM_ID}'>
-                <form class='modifyForm' action='/eportfolio/component/advancedlist/modifyForm.php' method='post' enctype='multipart/form-data'>
-                    <input type='hidden' name='action' value='updateItem' />
-                    <input type='hidden' name='userId' value='{USER_ID}' />
-                    <input type='hidden' name='pageId' value='{PAGE_ID}' />
-                    <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
-                    <input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
-
-                    <div class="title"><span>Title: </span>
-                        <input type='text' class='firstFocus' name='title' value="{LIST_ITEM_TITLE}" />
-                    </div>
-                    <div class="content"><span>Content: </span>
-                        <textarea type='text' name='content' />{LIST_ITEM_CONTENT}</textarea>
-                    </div>
-                    <div class="image"><span>Image: </span>
-                        <img src='/storage/image.php?size=square64&hash={LIST_ITEM_IMAGEHASH}' class='floatLeft' /><br />
-                        <input type='file' name='imagehash' value='' />
-                    </div>
-
-                    <input type='submit' value='Update' />
-                </form>
-            </div>
-            <!-- END has_modify_form -->
-		<!-- END list_item -->
-	</ul>
-
+			<!-- END list_item -->
+		</ul>
     </div>
     <!-- BEGIN has_create_form -->
-    <div class="editPanelImitation">
+	<a href="#" class="btn add create_advanced"><span></span>Add to List</a>
+
+    <div class="editPanelImitation hide">
         <form action='/eportfolio/component/advancedlist/modifyForm.php' method='post' enctype='multipart/form-data'>
             <input type='hidden' name='action' value='addItem' />
             <input type='hidden' name='userId' value='{USER_ID}' />
