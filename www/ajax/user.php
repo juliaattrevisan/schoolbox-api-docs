@@ -21,7 +21,7 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && strl
 
     // requires session to know which group we're in
     if ($groupHandler->isParent() || $groupHandler->isStudent()) {
-//        $groupID = $groupHandler->getStaffGroupTypeIds();
+        $groupID = $groupHandler->getStaffGroupTypeIds();
     }
 
     $userList = $userHandler->ajaxSearch($keyword, $groupID, 30);

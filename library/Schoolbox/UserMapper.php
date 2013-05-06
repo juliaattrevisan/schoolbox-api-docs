@@ -184,4 +184,40 @@ class UserMapper extends Mapper {
 		return false;
 	}
 
+	/**
+	 * Find all the users which match $name and are in group_id array $permittedValues
+	 *
+	 * @param $name
+	 * @param $permittedValues
+	 * @return bool|\Model
+	 */
+	public function findByNameAndGroup($name, $permittedValues) {
+		$collection = new Schoolbox\Collection();
+		$roleMapper = new RoleMapper();
+
+		$permittedValuesSql = implode(',', $permittedValues);
+
+		$query = "
+			SELECT
+				{$this->getColumnString('u')},
+				{$roleMapper->getColumnString('g')}
+			FROM `{$this->table}` u
+			LEFT JOIN `groups` g ON group_id = g.`id`
+			WHERE (firstname LIKE ? OR lastname LIKE ?)
+			AND group_id IN ({$permittedValuesSql})
+        ";
+
+		$statement = $this->database->prepare($query);
+
+		$statement->execute(array("%$name%", "%$name%"));
+
+		foreach ($statement as $row) {
+			$user = $this->hydrate($row, 'u');
+			$user->setRole($roleMapper->hydrate($row, 'g'));
+
+			$collection->add($user);
+		}
+
+		return $collection;
+	}
 }
