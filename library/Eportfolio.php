@@ -140,7 +140,16 @@ class Eportfolio {
 	public function updatePageTitle($value) {
 		$this->getPageInstance()->setPageTitle($value);
 
-		\EportfolioPageMapper::getInstance()->save($this->getPageInstance());
+		\Eportfolio\PageMapper::getInstance()->save($this->getPageInstance());
+	}
+
+	/**
+	 * Softdelete a page
+	 */
+	public function softdelete() {
+		$this->getPageInstance()->setDeletedAt(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+
+		\Eportfolio\PageMapper::getInstance()->save($this->getPageInstance());
 	}
 
 	/**

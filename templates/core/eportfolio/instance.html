@@ -275,6 +275,12 @@
 				</div>
 				<div class="saved-layout">Saved layout</div>
 			</form>
+
+			<form method='post' action='/eportfolio/configForm.php'>
+				<input type='hidden' name='page_id' value='{PAGE_ID}' />
+				<input type='hidden' name='deletePage' value='true' />
+				<input type='submit' value='Delete page' />
+			</form>
 		</div>
 	</div>
 
@@ -503,7 +509,6 @@
         window.check = false;
     });
 </script>
-
 
 <ul id='individualPermissionTemplate'>
 	<li>
