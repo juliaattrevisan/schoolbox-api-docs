@@ -16,7 +16,6 @@ use Schoolbox\Resource\File;
 use Schoolbox\Resource\FileMapper;
 use Schoolbox\Test\TestCase;
 use Schoolbox\File as Storage;
-use Schoolbox\Column\Factory as ColumnFactory;
 
 class FileMapperTest extends TestCase {
 
