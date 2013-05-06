@@ -85,10 +85,10 @@ if (is_numeric($_GET['id'])) {
 		// Load the file (whether an upload or an online submission)
 		$file = $studentSub->getFileLocation();
 		$name = $studentSub->getFilename();
+		$mime = $studentSub->getMimetype()->getMime();
 		if (is_readable($file)) {
 			$contents = file_get_contents($file);
 			$size     = $studentSub->getFilesize();
-			$mime     = $studentSub->getMimetype()->getMime();
 		}
 		else {
 			$contents = <<<HTML
@@ -103,7 +103,6 @@ HTML
 			;
 			$contents = sprintf($contents, htmlspecialchars($filename), Scrub::html($studentSub->getBody()));
 			$size     = strlen($contents);
-			$mime     = 'text/html';
 			if ($size === 0) {
 				error(9, "the requested file could not be read.<br />Please try again, and if the problem persists contact your system administrator.");
 			}

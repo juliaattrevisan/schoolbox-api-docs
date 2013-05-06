@@ -434,13 +434,12 @@ if (isset($recent_submission)) {
 
     // get filetype details
     $student_submission = $recent_submission->getSubmission();
+    $mime               = $student_submission->getMimetype()->getMime();
     if ($student_submission->isOnlineSubmission()) {
-        $mime = 'text/html';
         $size = strlen($student_submission->getBody());
     }
     else {
         $ext  = pathinfo($recent_submission->getSubmission()->getFilename(), PATHINFO_EXTENSION);
-        $mime = $allowedHandler->getMime($ext);
         $size = $recent_submission->getSubmission()->getFilesize();
     }
     $ftype = $allowedHandler->getByField('mime', $mime);
