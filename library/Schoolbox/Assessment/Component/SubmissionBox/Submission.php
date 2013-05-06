@@ -13,6 +13,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\ConfigLoader;
+use Schoolbox\File\MimetypeMapper;
 
 class Submission {
 
@@ -77,12 +78,18 @@ class Submission {
 	protected $config_loader;
 
 	/**
+	 * @var MimetypeMapper
+	 */
+	protected $mimetype_loader;
+
+	/**
 	 * Creates object and sets up related objects.
 	 */
 	public function __construct() {
 		$this->setSubmissionBox(new SubmissionBox());
 		$this->setOwner(new User());
 		$this->setConfigLoader(new ConfigLoader());
+		$this->setMimetypeLoader(new MimetypeMapper());
 	}
 
 	/**
@@ -363,5 +370,38 @@ class Submission {
 		return false;
 	}
 
+	/**
+	 * @param  \Schoolbox\File\MimetypeMapper $mimetype_loader
+	 *
+	 * @return $this
+	 */
+	public function setMimetypeLoader($mimetype_loader) {
+		$this->mimetype_loader = $mimetype_loader;
+		return $this;
+	}
+
+	/**
+	 * @return \Schoolbox\File\MimetypeMapper
+	 */
+	public function getMimetypeLoader() {
+		return $this->mimetype_loader;
+	}
+
+	/**
+	 * Loads the mime type for this file, based on the filename.
+	 *
+	 * @todo Once Schoolbox starts using PHP 5.4, implement as a trait/mixin
+	 *
+	 * @return $this
+	 */
+	public function loadMimetypeFromFilename() {
+		$filename = $this->getFilename();
+		if (isset($filename)) {
+			if ($mimetype = $this->mimetype_loader->getByFilename($filename)) {
+				$this->setMimetype($mimetype);
+			}
+		}
+		return $this;
+	}
 }
 
