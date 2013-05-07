@@ -13,13 +13,6 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
         'description' => $_POST['description'],
     );
 
-    if($_POST['published'] == 'true'){
-        $file['published'] = 'NOW()';
-    }else {
-        $file['published'] = 'NULL';
-    }
-
-
     if (is_numeric($_POST['fileID'])) {
         // check user owns file
         $current = $fileHandler->getByID($_POST['fileID']);
@@ -38,6 +31,31 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
         $fileID = $fileHandler->create($file, $_FILES['file']);
     }
 
+	/* If any checkboxes were selected, publish to eportfolio My Files components on various pages
+	 */
+	if (isset($_POST['published']) && is_array($_POST['published']) && count($_POST['published'])) {
+		$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+
+		foreach($_POST['published'] as $ownerId => $pageIds) {
+			if (is_array($pageIds) && count($pageIds)) {
+				foreach($pageIds as $currentPageId => $componentInstanceIds) {
+					$authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $currentPageId);
+
+					if (is_array($componentInstanceIds) && count($componentInstanceIds) && $authenticator->canModify()) {
+						foreach($componentInstanceIds as $currentComponentInstanceId => $value) {
+							$publishedFile = new \Component\Eportfolio\FileList();
+							$publishedFile->setComponentInstanceId($currentComponentInstanceId);
+							$publishedFile->setFileId($fileID);
+							$publishedFile->setCreatedAt($now);
+							$publishedFile->setUpdatedAt($now);
+
+							\Component\Eportfolio\FileListMapper::getInstance()->save($publishedFile);
+						}
+					}
+				}
+			}
+		}
+	}
 
     if ( isset( $_POST['return'] ) ) {
         SitePage::localRedir($_POST['return'] . '&fileID=' . $fileID);
@@ -72,48 +90,4 @@ else if (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
     }
 
     $fileHandler->update(array('id' => $_POST['move'], 'parent' => $_POST['categoryID']));
-}
-
-/* Publish this file to the file owner's ePortfolio
-     */
-else {
-    if (is_numeric($_GET['publish'])) {
-        if (!$file = $fileHandler->getByID($_GET['publish'])) {
-            error(2);
-        }
-
-        $eportfolioHandler = new Eportfolio_Container($file['owner']);
-
-        if (!$eportfolioHandler->canEdit($file['owner'])) {
-            error(109);
-        }
-
-        $file['published'] = 'NOW()';
-
-        $fileHandler->update($file);
-
-        SitePage::localRedir('/cms/portfolio/' . $_POST['parent']);
-    }
-
-    /* Un-publish this file from the file owner's ePortfolio
-      */
-    else {
-        if (is_numeric($_GET['unpublish'])) {
-            if (!$file = $fileHandler->getByID($_GET['unpublish'])) {
-                error(2);
-            }
-
-            $eportfolioHandler = new Eportfolio_Container($file['owner']);
-
-            if (!$eportfolioHandler->canEdit($file['owner'])) {
-                error(109);
-            }
-
-            $file['published'] = 'NULL';
-
-            $fileHandler->update($file);
-
-            $page->backToTheFuture(1);
-        }
-    }
 }
