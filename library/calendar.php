@@ -493,7 +493,8 @@ class Calendar extends DeprecatedModel {
                 $event->setSubmissionBoxName($submission['name']);
                 $event->setSubmissionBoxDetail($submission['description']);
                 $event->setColour($this->displayColour(4));
-                $event->setStartTime(new Alaress_Date_Format($submission['date'], 'y-m-d h:i:s'));
+	            $event->setStartTime(new Alaress_Date_Format($submission['date'], 'y-m-d h:i:s'));
+		        $event->setAllDay(stristr($submission['date'], '23:59:59'));
 
                 $stack->add($event);
             }
