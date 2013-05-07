@@ -71,8 +71,8 @@ switch($_POST['action']) {
                 if ($i++ > 100) {
                     break;
                 }
-
-                $dateArray[] = $dateObj->getDatabaseDate();
+                $this_date = new Alaress_Date_Format($date, 'U');
+                $dateArray[] = $this_date->getDatabaseDate();
             }
         }
 
