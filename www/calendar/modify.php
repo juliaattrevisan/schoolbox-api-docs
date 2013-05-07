@@ -33,8 +33,14 @@ if (is_numeric($_GET['eventID'])) {
         $publishDate = "";
     }
 
-	$startDate = new Alaress_Date_Format($event['startDate'] . ' ' . $event['startTime'], 'y-m-d h:i:s');
-	$endDate = new Alaress_Date_Format($event['endDate'] . ' ' . $event['endTime'], 'y-m-d h:i:s');
+    $startDate = new Alaress_Date_Format(
+        new DateTime($event['startDate'].' '.$event['startTime']),
+        'y-m-d h:i:s'
+    );
+    $endDate = new Alaress_Date_Format(
+        new DateTime($event['endDate'].' '.$event['endTime']),
+        'y-m-d h:i:s'
+    );
 
     $output = array(
         'FUNCTION' => 'Update',
@@ -42,13 +48,13 @@ if (is_numeric($_GET['eventID'])) {
         'START_DATE' => $startDate->getusingFormat('d/m/y'),
         'START_HOUR' => $startDate->getUsingFormat('h'),
         'START_MIN' => $startDate->getUsingFormat('i'),
-        'START_AM' => $startDate->getUsingFormat('z') == 'AM' ? 'selected="selected"' : '',
-        'START_PM' => $startDate->getUsingFormat('z') == 'PM' ? 'selected="selected"' : '',
-		'END_DATE' => $endDate->getusingFormat('d/m/y'),
+        'START_AM' => $startDate->getUsingFormat('A') == 'AM' ? 'selected="selected"' : '',
+        'START_PM' => $startDate->getUsingFormat('A') == 'PM' ? 'selected="selected"' : '',
+        'END_DATE' => $endDate->getusingFormat('d/m/y'),
         'END_HOUR' => $endDate->getUsingFormat('h'),
         'END_MIN' => $endDate->getUsingFormat('i'),
-        'END_AM' => $endDate->getUsingFormat('z') == 'AM' ? 'selected="selected"' : '',
-        'END_PM' => $endDate->getUsingFormat('z') == 'PM' ? 'selected="selected"' : '',
+        'END_AM' => $endDate->getUsingFormat('A') == 'AM' ? 'selected="selected"' : '',
+        'END_PM' => $endDate->getUsingFormat('A') == 'PM' ? 'selected="selected"' : '',
         'LEVEL' => '',
         'GROUP' => '',
         'ALLDAY_CHECKED' => ($event['allday'] ? 'checked="checked"' : ''),

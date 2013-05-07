@@ -85,6 +85,9 @@ class Calendar_Event_Type_Day extends Calendar_Event_Type_Abstract {
      * @return string
      */
     public function getTime() {
+        if ($this->getAllday()) {
+            return '';
+        }
         $startFormat = $this->getStartTime()->getUsingFormat('g:iA');
         $endFormat = $this->getEndTime()->getUsingFormat('g:iA');
 
