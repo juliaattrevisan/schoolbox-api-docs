@@ -103,10 +103,11 @@ class FileListMapper extends Schoolbox\Mapper {
 	 */
 	public function findRecent($limit) {
 		$query = "
-            SELECT *
+            SELECT {$this->getColumnString()}
             FROM `{$this->table}`
             LEFT JOIN myFile ON myFile.id = {$this->table}.file_id
             WHERE myFile.mime_type LIKE '%image/%'
+            GROUP BY {$this->table}.file_id
             ORDER BY created_at DESC
             LIMIT :limit
 		";
