@@ -1,4 +1,4 @@
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+<div class="box blog clearfix" id="component{COMPONENT_INSTANCE_ID}">
 	<script type='text/javascript'>
 		$j(function() {
 
@@ -42,104 +42,105 @@
 	</form>
 	<!-- END has_create_form -->
 
+	<div class='listing'>
+		<ul>
+			<!-- BEGIN list_item -->
+			<li>
+				<div id='blog_{LIST_ITEM_ID}' class='listing'>
+					<h3 class="clearfix">
+						{LIST_ITEM_TITLE}
+					</h3>
+					<!-- BEGIN modify_text -->
+					<div class='small-right'>
+						<p class='interact'>
+							<a href="/eportfolio/{USER_ID}/{PAGE_ID}/blog/modify/{LIST_ITEM_ID}#modify_blog_form_{LIST_ITEM_ID}" class="btn no-text modify"><span></span></a>
+							<a href="/eportfolio/component/blog/modifyForm.php?action=removeItem&userId={USER_ID}&pageId={PAGE_ID}&listItemId={LIST_ITEM_ID}" class="btn no-text delete"><span></span></a>
+						</p>
+					</div>
+					<!-- END modify_text -->
+
+					<!-- BEGIN has_delete_form -->
+					<!-- END has_delete_form -->
+
+					<p class='author'>
+						<a href="/search/user/{LIST_ITEM_AUTHOR_ID}" class="author">
+							<img src="/portrait.php?userId={LIST_ITEM_AUTHOR_EXTERNAL_USER_ID}&size=square32">
+							<span class="name">{LIST_ITEM_AUTHOR_FULLNAME}</span>
+						</a>
+						<span class="subtitle">Last updated on {LIST_ITEM_UPDATED_AT}</span>
+					</p>
+					<div class='blog-body'>
+						{LIST_ITEM_CONTENT}
+					</div>
+					<div id='blogComment_{LIST_ITEM_ID}'>
+						<!-- BEGIN has_comments -->
+						<a href="#" class="viewComments btn show-comments" rel='viewComments_{LIST_ITEM_ID}'><span></span>Show comments</a>
+
+						<ul id='viewComments_{LIST_ITEM_ID}' class='comments viewCommentThread'>
+							<!-- BEGIN comment -->
+							<li class='{ON_OFF}'>
+								<p>
+									<img src='/portrait.php?userId={COMMENT_EXTERNAL_USER_ID}&size=square32' /><br />
+									{COMMENT_AUTHOR_FULLNAME}
+								</p>
+								<p class='comment-body'>
+									{COMMENT_CONTENT}
+								</p>
+								<p>
+									<span class="subtitle">Posted {COMMENT_CREATED_AT}</span>
+								</p>
+								<!-- BEGIN has_delete_comment_form -->
+								<a class="delete-comment btn delete no-text" href="/eportfolio/component/blogcomment/modifyForm.php?action=removeComment&userId={USER_ID}&pageId={PAGE_ID}&commentId={COMMENT_ID}"><span></span></a>
+								<!-- END has_delete_comment_form -->
+							</li>
+							<!-- END comment -->
+						</ul>
+						<!-- END has_comments -->
+
+						<div class='clearfix'></div>
+
+						<p class='interact'>
+							<a rel='modify_blogcomment_form_{LIST_ITEM_ID}' class='closeComment btn add'><span></span>Add Comment</a>
+						</p>
+
+						<form id='modify_blogcomment_form_{LIST_ITEM_ID}' class='modifyForm hide' action='/eportfolio/component/blogcomment/modifyForm.php' method='post'>
+							<input type='hidden' name='action' value='addComment' />
+							<input type='hidden' name='userId' value='{ID}' />
+							<input type='hidden' name='pageId' value='{PAGE_ID}' />
+							<input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
+
+							<label>
+								<input name='content' type='text' value='' />
+							</label>
+
+							<input type='submit' class='submit-btn-plain' value='Add Comment' />
+						</form>
+					</div>
+				</div>
+
+				<!-- BEGIN has_modify_form -->
+				<form id='modify_blog_form_{LIST_ITEM_ID}' class='modifyForm' action='/eportfolio/component/blog/modifyForm.php' method='post'>
+					<input type='hidden' name='action' value='updateItem' />
+					<input type='hidden' name='userId' value='{USER_ID}' />
+					<input type='hidden' name='pageId' value='{PAGE_ID}' />
+					<input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
+
+					<label>
+						<input type='text' class='firstFocus' name='title' value='{LIST_ITEM_TITLE}' />
+					</label>
+					<label>
+						<textarea name='content' class='mceEditor'>{LIST_ITEM_CONTENT}</textarea>
+					</label>
+
+					<input type='submit' class='submit-btn-plain' value='Update' />
+				</form>
+				<!-- END has_modify_form -->
+			</li>
+			<!-- END list_item -->
+		</ul>
+	</div>
+
 	<!-- BEGIN create_text -->
-	<a href="/eportfolio/{USER_ID}/{PAGE_ID}/blog/create/{COMPONENT_INSTANCE_ID}#modify_blog_form_{COMPONENT_INSTANCE_ID}" class="btn modify"><span></span>Create</a>
+	<a href="/eportfolio/{USER_ID}/{PAGE_ID}/blog/create/{COMPONENT_INSTANCE_ID}#modify_blog_form_{COMPONENT_INSTANCE_ID}" class="btn modify"><span></span>Post Entry</a>
 	<!-- END create_text -->
-
-	<ol>
-		<!-- BEGIN list_item -->
-		<li style='padding:30px;'>
-			<div id='blog_{LIST_ITEM_ID}'>
-				<div>
-					{LIST_ITEM_TITLE}
-				</div>
-				<div>
-					{LIST_ITEM_CONTENT}
-				</div>
-				<div>
-					Last updated on {LIST_ITEM_UPDATED_AT}
-				</div>
-				<div style='background-color:#aaa' id='blogComment_{LIST_ITEM_ID}'>
-					<!-- BEGIN has_comments -->
-					<a class='viewComments' rel='viewComments_{LIST_ITEM_ID}'>View Comments</a>
-
-					<ol id='viewComments_{LIST_ITEM_ID}' class='viewCommentThread'>
-						<!-- BEGIN comment -->
-						<li>
-							<p>
-								<img src='/portrait.php?userId={COMMENT_EXTERNAL_USER_ID}&size=square32' /><br />
-								{COMMENT_AUTHOR_FULLNAME}
-							</p>
-							<p>
-								{COMMENT_CONTENT}
-							</p>
-							<p>
-								Posted {COMMENT_CREATED_AT}
-							</p>
-							<!-- BEGIN has_delete_comment_form -->
-							<form action='/eportfolio/component/blogcomment/modifyForm.php' method='post'>
-								<input type='hidden' name='action' value='removeComment' />
-								<input type='hidden' name='userId' value='{USER_ID}' />
-								<input type='hidden' name='pageId' value='{PAGE_ID}' />
-								<input type='hidden' name='commentId' value='{COMMENT_ID}' />
-
-								<input type='submit' value='Delete' />
-							</form>
-							<!-- END has_delete_comment_form -->
-						</li>
-						<!-- END comment -->
-					</ol>
-					<!-- END has_comments -->
-				</div>
-			</div>
-
-			<!-- BEGIN has_modify_form -->
-			<form id='modify_blog_form_{LIST_ITEM_ID}' class='modifyForm' action='/eportfolio/component/blog/modifyForm.php' method='post' style='padding:10px;background-color:#fdd'>
-				<input type='hidden' name='action' value='updateItem' />
-				<input type='hidden' name='userId' value='{USER_ID}' />
-				<input type='hidden' name='pageId' value='{PAGE_ID}' />
-				<input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
-
-				<label>
-					<input type='text' class='firstFocus' name='title' value='{LIST_ITEM_TITLE}' />
-				</label>
-				<label>
-					<textarea name='content' class='mceEditor'>{LIST_ITEM_CONTENT}</textarea>
-				</label>
-
-				<input type='submit' value='Update' />
-			</form>
-			<!-- END has_modify_form -->
-
-			<!-- BEGIN modify_text -->
-			<a href="/eportfolio/{USER_ID}/{PAGE_ID}/blog/modify/{LIST_ITEM_ID}#modify_blog_form_{LIST_ITEM_ID}" class="btn modify"><span></span>Modify</a>
-			<!-- END modify_text -->
-
-			<!-- BEGIN has_delete_form -->
-			<form action='/eportfolio/component/blog/modifyForm.php' method='post'>
-				<input type='hidden' name='action' value='removeItem' />
-				<input type='hidden' name='userId' value='{USER_ID}' />
-				<input type='hidden' name='pageId' value='{PAGE_ID}' />
-				<input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
-
-				<input type='submit' value='Delete' />
-			</form>
-			<!-- END has_delete_form -->
-
-			<a rel='modify_blogcomment_form_{LIST_ITEM_ID}' class='closeComment'>Add Comment</a>
-			<form id='modify_blogcomment_form_{LIST_ITEM_ID}' class='modifyForm hide' action='/eportfolio/component/blogcomment/modifyForm.php' method='post' style='padding:10px;background-color:#fdd'>
-				<input type='hidden' name='action' value='addComment' />
-				<input type='hidden' name='userId' value='{ID}' />
-				<input type='hidden' name='pageId' value='{PAGE_ID}' />
-				<input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
-
-				<label>
-					<input name='content' type='text' value='' />
-				</label>
-
-				<input type='submit' value='Add Comment' />
-			</form>
-		</li>
-		<!-- END list_item -->
-	</ol>
 </div>

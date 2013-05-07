@@ -18,10 +18,11 @@
 
             /* Create button, swap form in
              */
-            $j('a.create_advanced').click(function() {
+            $j('a.create_advanced').click(function(event) {
+				event.preventDefault();
+
                 $j(this).hide();
                 $j(this).next().show();
-
             });
 
 			/* Close button

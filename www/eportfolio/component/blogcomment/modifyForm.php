@@ -11,11 +11,11 @@ require_once dirname(__FILE__) . '/../../../../include/Bootstrap.php';
 
 $page = new SitePage();
 
-$action = $_POST['action'];
-$ownerId = $_POST['userId'];
-$pageId = $_POST['pageId'];
-$listItemId = $_POST['listItemId'];
-$content = $_POST['content'];
+$action = $_REQUEST['action'];
+$ownerId = $_REQUEST['userId'];
+$pageId = $_REQUEST['pageId'];
+$listItemId = $_REQUEST['listItemId'];
+$content = $_REQUEST['content'];
 
 $authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
 
@@ -51,7 +51,7 @@ if ($authenticator->canView()) {
 	/* Delete a list item
 	 */
 	else if ($action == 'removeComment') {
-		$commentId = $_POST['commentId'];
+		$commentId = $_REQUEST['commentId'];
 
 		$listItem = \Component\Eportfolio\BlogCommentMapper::getInstance()->findById($commentId);
 

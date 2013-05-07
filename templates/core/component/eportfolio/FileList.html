@@ -16,7 +16,7 @@
                 Published on {FILE_ITEM_CREATED_AT}</td>
             <td>
                 <!-- BEGIN has_unpublish_form -->
-                <a class="btn no-text delete" title="Unpublish file" href='/eportfolio/component/filelist/modifyForm.php&action=removeItem&userId={USER_ID}&pageId={PAGE_ID}&componentInstanceId={COMPONENT_INSTANCE_ID}&listItemId={LIST_ITEM_ID}'><span></span></a>
+                <a class="btn no-text delete" title="Unpublish file" href='/eportfolio/component/filelist/modifyForm.php?action=removeItem&userId={USER_ID}&pageId={PAGE_ID}&componentInstanceId={COMPONENT_INSTANCE_ID}&listItemId={LIST_ITEM_ID}'><span></span></a>
                 <!-- END has_unpublish_form -->
             </td>
         </tr>
@@ -24,4 +24,6 @@
         </tbody>
     </table>
 
+	<a href='/cms/portfolio/' class='btn'>Publish files</a>
+	<a href='/cms/myFile/new/0' class='btn'>Add files</a>
 </div>

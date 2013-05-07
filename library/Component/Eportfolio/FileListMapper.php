@@ -98,21 +98,25 @@ class FileListMapper extends Schoolbox\Mapper {
 	/**
 	 * Retrieves a list of recently-published images
 	 *
+	 * @param $uid
 	 * @param $limit
 	 * @return Collection
 	 */
-	public function findRecent($limit) {
+	public function findRecent($uid, $limit) {
 		$query = "
-            SELECT *
+            SELECT {$this->getColumnString()}
             FROM `{$this->table}`
             LEFT JOIN myFile ON myFile.id = {$this->table}.file_id
             WHERE myFile.mime_type LIKE '%image/%'
+            AND myFile.owner = :uid
+            GROUP BY {$this->table}.file_id
             ORDER BY created_at DESC
             LIMIT :limit
 		";
 
 		$statement = $this->database->prepare($query);
 
+		$statement->bindParam(':uid', $uid, \PDO::PARAM_INT);
 		$statement->bindParam(':limit', $limit, \PDO::PARAM_INT);
 
 		$statement->execute();
