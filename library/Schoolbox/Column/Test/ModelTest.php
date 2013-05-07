@@ -38,10 +38,18 @@ class ModelTest extends TestCase {
 			->setFilename('d.txt')
 			->setIsViewed(false)
 			->setFile('contents');
-		$this->test_mapper = $this->getMock('\\Schoolbox\\Test\\TestMapper', array('findById'));
+		$this->test_mapper = $this->getMock(
+			'\\Schoolbox\\Test\\TestMapper',
+			array('findById', 'findOneByColumn')
+		);
 		$this->test_mapper
 			->expects($this->any())
 			->method('findById')
+			->will($this->returnValue($this->test_model));
+		$this->test_mapper
+			->expects($this->any())
+			->method('findOneByColumn')
+			->with('filename', 'd.txt')
 			->will($this->returnValue($this->test_model));
 	}
 
@@ -63,5 +71,33 @@ class ModelTest extends TestCase {
 
 	public function testDehydrate() {
 		$this->assertSame(1, $this->object->dehydrate($this->test_model, $this->test_mapper));
+	}
+
+	public function testDehydrateNull() {
+		$this->assertSame(null, $this->object->dehydrate(null, $this->test_mapper));
+	}
+
+	/**
+	 * Test when dehydrating with an alternate field name.
+	 */
+	public function testHydrateWithFieldName() {
+		$this->object
+			->setHydrateColumn('filename')
+			->setDehydrateProperty('filename');
+		$hydrate = $this->object->hydrate('d.txt', $this->test_mapper);
+		$this->assertSame('d.txt', $hydrate->getFilename());
+		$this->assertFalse($hydrate->isModelLoaded());
+		$this->assertSame(1, $hydrate->getId());
+		$this->assertTrue($hydrate->isModelLoaded());
+	}
+
+	/**
+	 * Test when dehydrating with an alternate field name.
+	 */
+	public function testDehydrateWithFieldName() {
+		$this->object
+			->setHydrateColumn('filename')
+			->setDehydrateProperty('filename');
+		$this->assertSame('d.txt', $this->object->dehydrate($this->test_model, $this->test_mapper));
 	}
 }

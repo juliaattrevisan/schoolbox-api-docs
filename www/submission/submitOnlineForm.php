@@ -26,6 +26,7 @@ else {
 		->setFilename('Online Submission')
 		->setSubmissionBox($submission_box)
 		->setOwner($user)
+		->setMimetype('text/html')
 	;
 }
 

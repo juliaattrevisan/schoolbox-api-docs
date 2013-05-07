@@ -80,7 +80,7 @@ class Mapper extends BaseMapper {
      *
      * @return string
      */
-    protected function getGetMethodName($property) {
+    public function getGetMethodName($property) {
         return 'get'.ucfirst($property);
     }
 
@@ -91,7 +91,7 @@ class Mapper extends BaseMapper {
      *
      * @return string
      */
-    protected function getSetMethodName($property) {
+    public function getSetMethodName($property) {
         return 'set'.ucfirst($property);
     }
 

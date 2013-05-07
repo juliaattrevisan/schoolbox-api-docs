@@ -57,11 +57,6 @@ class SubmissionMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_BOOLEAN,
 		));
 		$this->hasMap(array(
-			'column'     => 'mime_type',
-			'property'   => 'mimetype',
-			'type'       => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
 			'column'     => 'body',
 			'property'   => 'body',
 			'type'       => self::TYPE_STRING,
@@ -85,10 +80,14 @@ class SubmissionMapper extends Schoolbox\Mapper {
 
 		/* Relation to Allowed Files
 		 */
+		$hydrator = new Schoolbox\Column\Model();
+		$hydrator
+			->setHydrateColumn('mime')
+			->setDehydrateProperty('mime');
 		$this->hasMap(array(
 			'column'     => 'mime_type',
 			'property'   => 'mimetype',
-			'type'       => self::TYPE_MODEL,
+			'hydrator'   => $hydrator,
 			'join'       => 'allowedFileType',
 		));
 
