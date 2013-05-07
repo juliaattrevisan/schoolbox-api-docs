@@ -62,12 +62,16 @@
 					<!-- BEGIN has_delete_form -->
 					<!-- END has_delete_form -->
 
+					<p class='author'>
+						<a href="/search/user/{LIST_ITEM_AUTHOR_ID}" class="author">
+							<img src="/portrait.php?userId={LIST_ITEM_AUTHOR_EXTERNAL_USER_ID}&size=square32">
+							<span class="name">{LIST_ITEM_AUTHOR_FULLNAME}</span>
+						</a>
+						<span class="subtitle">Last updated on {LIST_ITEM_UPDATED_AT}</span>
+					</p>
 					<div class='blog-body'>
 						{LIST_ITEM_CONTENT}
 					</div>
-					<p class="author">
-						<span class="subtitle">Last updated on {LIST_ITEM_UPDATED_AT}</span>
-					</p>
 					<div id='blogComment_{LIST_ITEM_ID}'>
 						<!-- BEGIN has_comments -->
 						<a href="#" class="viewComments btn show-comments" rel='viewComments_{LIST_ITEM_ID}'><span></span>Show comments</a>
@@ -93,7 +97,12 @@
 						</ul>
 						<!-- END has_comments -->
 
-						<a rel='modify_blogcomment_form_{LIST_ITEM_ID}' class='closeComment btn add'><span></span>Add Comment</a>
+						<div class='clearfix'></div>
+
+						<p class='interact'>
+							<a rel='modify_blogcomment_form_{LIST_ITEM_ID}' class='closeComment btn add'><span></span>Add Comment</a>
+						</p>
+
 						<form id='modify_blogcomment_form_{LIST_ITEM_ID}' class='modifyForm hide' action='/eportfolio/component/blogcomment/modifyForm.php' method='post'>
 							<input type='hidden' name='action' value='addComment' />
 							<input type='hidden' name='userId' value='{ID}' />
@@ -104,7 +113,7 @@
 								<input name='content' type='text' value='' />
 							</label>
 
-							<input type='submit' value='Add Comment' />
+							<input type='submit' class='submit-btn-plain' value='Add Comment' />
 						</form>
 					</div>
 				</div>

@@ -90,11 +90,20 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 
 		if ($allItems->count()) {
 			foreach($allItems as $currentItem) {
+
+				/* TODO: Join into mappers
+				 */
+				$userMapper = new \Schoolbox\UserMapper();
+				$author = $userMapper->findById($currentItem->getUid());
+
 				$this->setVar(array(
 					'LIST_ITEM_ID' => $currentItem->getId(),
 					'LIST_ITEM_TITLE' => Scrub::text($currentItem->getTitle()),
 					'LIST_ITEM_CONTENT' => Scrub::html($currentItem->getContent()),
 					'LIST_ITEM_UPDATED_AT' => $currentItem->getUpdatedAt()->getShort(),
+					'LIST_ITEM_AUTHOR_ID' => $author->getId(),
+					'LIST_ITEM_AUTHOR_FULLNAME' => $author->getFullname(),
+					'LIST_ITEM_AUTHOR_EXTERNAL_USER_ID' => $author->getExternalId(),
 				));
 
 				if ($currentItem->getComments()->count()) {
