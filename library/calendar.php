@@ -640,9 +640,6 @@ class Calendar extends DeprecatedModel {
             }
         }
 
-		$start = new Alaress_Date_Format($startTimestamp, 'U');
-		$end = new Alaress_Date_Format($endTimestamp, 'U');
-
         //get single events for the day
         $query = "
 			SELECT DISTINCT event.id, owner,
@@ -672,16 +669,16 @@ class Calendar extends DeprecatedModel {
 					/* Start display in the middle of multi-day events that have already begun at some point
 					 * in the past
 					 */
-					((startDate <= '{$start->getDatabaseDate()}') AND (endDate <= '{$end->getDatabaseDate()}'))
+					((DATE(startDate) <= DATE(FROM_UNIXTIME('{$startTimestamp}'))) AND (DATE(endDate) < DATE(FROM_UNIXTIME('{$endTimestamp}'))))
 					OR
 					/* Start display for events that are still coming up within the specified time interval
 					 */
-					((startDate >= '{$start->getDatabaseDate()}') AND (startDate <= '{$end->getDatabaseDate()}'))
+					((DATE(startDate) >= DATE(FROM_UNIXTIME('{$startTimestamp}'))) AND (DATE(startDate) < DATE(FROM_UNIXTIME('{$endTimestamp}'))))
 				)
 				/* Don't include events that have already ended
 				 */
 				AND (
-					endDate >= '{$start->getDatabaseDate()}'
+					endDate >= FROM_UNIXTIME('{$startTimestamp}')
 				)
 			GROUP BY id
 			ORDER BY event.startTime, event.endTime
