@@ -113,13 +113,21 @@ switch($_POST['action']) {
                 }
             }
             else if($_POST['efficacy'] == 'self') {
+                //
+                // If there's any recurrence: update first only, and create the
+                // rest from scratch.
+                $first_date_set     = array_shift($dateArray);
                 $event['id']        = $_POST['id'];
-                $event['startDate'] = $dateArray[0]['start'];
-                $event['endDate']   = $dateArray[0]['end'];
+                $event['startDate'] = $first_date_set['start'];
+                $event['endDate']   = $first_date_set['end'];
                 $calendarHandler->update($event);
+                foreach ($dateArray as $dates) {
+                    unset($event['id']);
+                    $event['startDate'] = $dates['start'];
+                    $event['endDate']   = $dates['end'];
+                    $calendarHandler->create($event);
+                }
             }
-
-
         }
         else {
             foreach ($dateArray as $dates) {
