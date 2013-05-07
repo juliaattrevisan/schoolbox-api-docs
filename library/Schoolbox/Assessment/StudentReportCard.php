@@ -244,7 +244,7 @@ class StudentReportCard {
 			// <li data-id="{ENR_SUBJ_ID}" class="{ENR_SUBJ_SELECTED}" title="{ENR_SUBJ_CODE}">{ENR_SUBJ_NAME}</li>
 			$page->setVar(array(
 				'ENR_SUBJ_ID'       => $catId,
-				'ENR_SUBJ_SELECTED' => $catId == $this->targetCategoryId ? 'selected' : '',
+				'ENR_SUBJ_SELECTED' => $catId == $this->targetCategoryId ? 'current' : '',
 				'ENR_SUBJ_CODE'     => $cat['code'] ? $cat['code'] : $cat['name'],
 				'ENR_SUBJ_NAME'     => $cat['name'],
 			));
