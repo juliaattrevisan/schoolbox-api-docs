@@ -69,6 +69,18 @@ class Alaress_Image_Transformation_Storage extends Alaress_Image_Transformation_
                     'method' => 'Sharpen'
                 )
             )
-        )
+        ),
+		'eportfolioCoverPhoto' => array(
+			array(
+				'method' => 'Constrain',
+				'args' => array(
+					'width' => 2000,
+					'height' => 452
+				),
+				array(
+					'method' => 'Sharpen'
+				)
+			)
+		),
     );
 }

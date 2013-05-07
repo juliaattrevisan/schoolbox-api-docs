@@ -17,8 +17,12 @@
 
 <div class="profile-banner">
     <div class="background">
-        <!-- TODO: this picture needs a placeholder or to be user-controlled -->
-        <img src="http://lorempixel.com/1088/452" />
+		<!-- BEGIN has_cover_photo -->
+        <img src="/storage/image.php?size=eportfolioCoverPhoto&hash={COVERPHOTO_IMAGEHASH}" />
+		<!-- END has_cover_photo -->
+		<!-- BEGIN no_cover_photo -->
+		<img src="/images/core/eportfolio/coverphotoPlaceholder.jpg" />
+		<!-- END no_cover_photo -->
     </div>
     <div class="profile-name clearfix">
         <img src='/portrait.php?userId={USER_EXTERNAL_ID}&size=constrain200' />
@@ -29,6 +33,15 @@
             Campus: {USER_CAMPUS}
 		</p>
     </div>
+</div>
+
+<div style='border:4px solid #f00;'>
+	<form method='post' action='/eportfolio/coverphoto/modifyForm.php' enctype='multipart/form-data'>
+		<input type='hidden' name='action' value='addCoverPhoto' />
+		<input type='hidden' name='userId' value='{USER_ID}' />
+		<input type='file' name='imagehash' value='' />
+		<input class="btn no-icon" type='submit' value='Add' />
+	</form>
 </div>
 
 <div class="left clearfix" style="width: 69%">

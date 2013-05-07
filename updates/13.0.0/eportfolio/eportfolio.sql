@@ -89,3 +89,7 @@ ALTER TABLE `eportfolio_component_blog` CHANGE `body` `content` TEXT CHARSET utf
 /* Add blog comments table
  */
 CREATE TABLE `eportfolio_component_blogcomment`( `id` INT(11) NOT NULL AUTO_INCREMENT, `blog_id` INT(11), `uid` INT(11), `content` VARCHAR(255), `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
+
+/* Add cover photo table
+ */
+CREATE TABLE `eportfolio_coverphoto`( `id` INT(11) NOT NULL AUTO_INCREMENT, `uid` INT(11), `imagehash` VARCHAR(255), `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
