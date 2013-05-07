@@ -98,7 +98,7 @@ if (is_numeric($_GET['eventID'])) {
     $page->dropDown('level_drop', $levelList, $event['access']);
 
     $page->parse('delete_button_block', 'delete_button', true);
-    $page->setVar('recurring_dates_block', '');
+    $page->parse('recurring_dates_block', 'recurring_dates');
 
     if ($event['series_id'] == null) {
         $page->setVar('recurring_reminder_block', '');
