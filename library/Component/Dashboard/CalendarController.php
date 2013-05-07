@@ -32,7 +32,15 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 		$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
 		$start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d h:i:s');
-		$end = new Alaress_Date_Format($now->getDatabaseDate() . ' 23:59:59', 'y-m-d h:i:s');
+
+		if($this->getConfig('days') > 1) {
+			$end = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d h:i:s');
+			$end->addDays($this->getConfig('days'));
+		}
+		else {
+			$end = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d h:i:s');
+			//$end->addDays(1);
+		}
 
 		/* Today's date
 		 */
@@ -42,21 +50,12 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
 		/* A list of submissions
 		 */
-		$submissionFactory = new Calendar_Api_DashboardFactory("Submission");
-
-		$composite = $submissionFactory->produce();
-
-		$this->submissionList = $composite->getEvents($start->getUnixTimestamp(), $end->getUnixTimestamp());
-		$this->submissionList->sort();
-
-		/* A list of events
-		 */
-		$eventFactory = new Calendar_Api_DashboardFactory("Event");
+		$eventFactory = new Calendar_Api_Factory();
 
 		$composite = $eventFactory->produce();
 
 		$this->eventList = $composite->getEvents($start->getUnixTimestamp(), $end->getUnixTimestamp());
-        $this->eventList->sort();
+		$this->eventList->sort();
 
         return true;
     }
@@ -68,13 +67,15 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
             return false;
         }
 
-        $this->setBlock($templateHandle, "note_block", "note_listing");
+	    $this->setBlock($templateHandle, 'day', 'day_block');
+        $this->setBlock('day', "note_block", "note_listing");
 
         $this->setBlock("note_block", "has_category", "has_category_block");
         $this->setBlock("note_block", "attendance_icon", "attendance_icon_block");
         $this->setBlock("note_block", "attendance_status", "attendance_status_block");
         $this->setBlock("note_block", "attendance_request_button", "attendance_request_button_block");
         $this->setBlock("note_block", "attendance_list_button", "attendance_list_button_block");
+
 
         /* Initialise
          */
@@ -88,150 +89,158 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
             )
         );
 
-        $j = 0;
-
-        if ($this->submissionList->getCount()) {
-
-			$iterator = $this->submissionList->createIterator();
-
-			for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
-				$currentEvent = $iterator->current();
-
-                /* Get status to set action
-                 */
-                if ($this->getGroup()->isStudent($_SESSION['id'])) {
-                    $action = 'View Details';
-                    $this->setVar(
-                        'MODIFY',
-                        '<a class="btn go-to float-left" href="/submission/submissionHistory/' . $currentEvent->getSubmissionBoxId(
-                        ) . '"><span></span>' . $action . '</a>'
-                    );
-                } else {
-                    if ($this->getGroup()->isStaff($_SESSION['id'])) {
-                        $this->setVar(
-                            'MODIFY',
-                            '<a class="btn go-to float-left" href="/submission/viewSubmission/' . $currentEvent->getSubmissionBoxId(
-                            ) . '"><span></span>View Submissions</a>'
-                        );
-                    } else {
-                        $this->setVar('MODIFY', '');
-                    }
-                }
-
-                $this->setVar(
-                    array(
-                        'EVENT_ID' => '',
-                        'TIME' => $currentEvent->getTime(),
-                        'FULL_TIME' => $currentEvent->getFullDate(),
-                        'NOTE' => $currentEvent->getNote(),
-                        'COLOUR' => $currentEvent->getColour(),
-                        'LOCATION' => '',
-                        'HAS_CATEGORY_ID' => $currentEvent->getCategoryId(),
-                        'HAS_CATEGORY_NAME' => Scrub::text($currentEvent->getCategoryName()),
-                        'DETAIL' => Scrub::text($currentEvent->getSubmissionBoxDetail()),
-                        /* Wtf - EVENT_TYPE => 'type' . $event['type']; and TYPE => $event['eventType']
-                         */
-                        'EVENT_TYPE' => 'submission',
-                        'TYPE' => $currentEvent->getEventType(),
-                        'AUTHOR' => $currentEvent->getAuthorName(),
-                        'AUTHOR_ID' => $currentEvent->getAuthorId(),
-                        'EVENT_VISIBLE' => '',
-                        'EVENT_LEVEL' => '',
-                    )
-                );
-                $this->parse('has_category_block', 'has_category');
-                $this->parse("note_listing", "note_block", true);
-            }
-        }
-
         $iterator = $this->eventList->createIterator();
 
-        for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
-            $currentEvent = $iterator->current();
+	    $prevDay = false;
 
-            $this->setVar(
-                array(
-                    'EVENT_ID' => $currentEvent->getEventId(),
-                    'TIME' => $currentEvent->getTime(),
-                    'FULL_TIME' => $currentEvent->getFullDate(),
-                    'NOTE' => $currentEvent->getNote(),
-                    'LOCATION' => $currentEvent->getLocation(),
-                    'DETAIL' => $currentEvent->getDetail(),
-                    'COLOUR' => $currentEvent->getColour(),
-                    'EVENT_TYPE' => 'type' . $currentEvent->getType(),
-                    'TYPE' => $currentEvent->getEventType(),
-                    'AUTHOR' => $currentEvent->getAuthorName(),
-                    'AUTHOR_ID' => $currentEvent->getAuthorId(),
-                    'ON_OFF' => ++$j % 2 ? 'dark' : '',
-                )
-            );
+	    foreach($iterator as $currentEvent) {
 
-            /* Modify link. Should be templated...
-                */
-            if ($currentEvent->getIsEditable()) {
-                $this->setVar(
-                    'MODIFY',
-                    '<a class="btn modify float-left" href="/calendar/modify.php?eventID=' . $currentEvent->getEventId(
-                    ) . '&returnTo=month"><span></span>Modify</a>'
-                );
-            } else {
-                $this->setVar('MODIFY', '');
-            }
 
-            /* Event attendance
-             */
-            if ($currentEvent->canAttend()) {
-                $this->parse('attendance_icon_block', 'attendance_icon');
+		    $currentDay = $currentEvent->getStartTime();
+		    $this->setVar('LIST_DATE', $currentDay->getDateOnly());
 
-                if ($this->getGroup()->isStudent($_SESSION['id'])) {
-                    if ($attendance = $this->getCalendar()->getAttendanceByEventAndUser(
-                        $currentEvent->getEventId(), $_SESSION['id']
-                    )
-                    ) {
+		    if($prevDay != false && $currentDay->getDateOnly() != $prevDay->getDateOnly()){
+			    $this->parse('day_block','day', true);
+			    $this->setVar('note_listing', '');
+		    }
 
-                        /* Attendance Status
-                         */
-                        if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
-                            $this->setVar('ATTENDANCE_STATUS', 'Pending');
-                        } else {
-                            if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
-                                $this->setVar('ATTENDANCE_STATUS', 'Approved');
-                            } else {
-                                if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
-                                    $this->setVar('ATTENDANCE_STATUS', 'Rejected');
-                                }
-                            }
-                        }
+			if($currentEvent instanceof Calendar_Event_Type_Submission) {
 
-                        $this->parse('attendance_status_block', 'attendance_status');
 
-                        $this->setVar('ATTENDANCE_REQUEST_ACTION', 'Unattend');
-                    } else {
-                        $this->setVar('ATTENDANCE_REQUEST_ACTION', 'Attend');
-                    }
 
-                    $this->parse('attendance_request_button_block', 'attendance_request_button');
-                } else {
-                    if ($this->getGroup()->isStaff($_SESSION['id'])) {
-                        $this->parse('attendance_list_button_block', 'attendance_list_button');
-                    }
-                }
-            }
+					if ($this->getGroup()->isStudent($_SESSION['id'])) {
+					$action = 'View Details';
+					$this->setVar(
+					'MODIFY',
+					'<a class="btn go-to float-left" href="/submission/submissionHistory/' . $currentEvent->getSubmissionBoxId(
+					) . '"><span></span>' . $action . '</a>'
+					);
+					} else {
+						if ($this->getGroup()->isStaff($_SESSION['id'])) {
+							$this->setVar(
+								'MODIFY',
+								'<a class="btn go-to float-left" href="/submission/viewSubmission/' . $currentEvent->getSubmissionBoxId(
+								) . '"><span></span>View Submissions</a>'
+							);
+						} else {
+							$this->setVar('MODIFY', '');
+						}
+					}
 
-            /* Show a homepage if appropriate
-             */
-            if ($currentEvent->getCategoryId() > 0) {
-                $this->setVar(
-                    array(
-                        'HAS_CATEGORY_ID' => $currentEvent->getCategoryId(),
-                        'HAS_CATEGORY_NAME' => $currentEvent->getCategoryName(),
-                    )
-                );
+					$this->setVar(
+						array(
+							'EVENT_ID' => '',
+							'TIME' => $currentEvent->getTime(),
+							'FULL_TIME' => $currentEvent->getFullDate(),
+							'NOTE' => $currentEvent->getNote(),
+							'COLOUR' => $currentEvent->getColour(),
+							'LOCATION' => '',
+							'HAS_CATEGORY_ID' => $currentEvent->getCategoryId(),
+							'HAS_CATEGORY_NAME' => Scrub::text($currentEvent->getCategoryName()),
+							'DETAIL' => Scrub::text($currentEvent->getSubmissionBoxDetail()),
+							/* Wtf - EVENT_TYPE => 'type' . $event['type']; and TYPE => $event['eventType']
+							 */
+							'EVENT_TYPE' => 'submission',
+							'TYPE' => $currentEvent->getEventType(),
+							'AUTHOR' => Scrub::text($currentEvent->getAuthorName()),
+							'AUTHOR_ID' => $currentEvent->getAuthorId(),
+							'EVENT_VISIBLE' => '',
+							'EVENT_LEVEL' => '',
+						)
+					);
+					$this->parse('has_category_block', 'has_category');
+			}
+		    else {
 
-                $this->parse('has_category_block', 'has_category');
-            }
-            $this->parse("note_listing", "note_block", true);
-        }
+	            $this->setVar(
+	                array(
+	                    'EVENT_ID' => $currentEvent->getEventId(),
+	                    'TIME' => $currentEvent->getTime(),
+	                    'FULL_TIME' => $currentEvent->getFullDate(),
+	                    'NOTE' => Scrub::text($currentEvent->getNote()),
+	                    'LOCATION' => Scrub::text($currentEvent->getLocation()),
+	                    'DETAIL' => Scrub::text($currentEvent->getDetail()),
+	                    'COLOUR' => $currentEvent->getColour(),
+	                    'EVENT_TYPE' => 'type' . $currentEvent->getType(),
+	                    'TYPE' => $currentEvent->getEventType(),
+	                    'AUTHOR' => Scrub::text($currentEvent->getAuthorName()),
+	                    'AUTHOR_ID' => $currentEvent->getAuthorId(),
+	                    'ON_OFF' => ++$j % 2 ? 'dark' : '',
+	                )
+	            );
+
+	            /* Modify link. Should be templated...
+	                */
+	            if ($currentEvent->getIsEditable()) {
+	                $this->setVar(
+	                    'MODIFY',
+	                    '<a class="btn modify float-left" href="/calendar/modify.php?eventID=' . $currentEvent->getEventId(
+	                    ) . '&returnTo=month"><span></span>Modify</a>'
+	                );
+	            } else {
+	                $this->setVar('MODIFY', '');
+	            }
+
+	            /* Event attendance
+	             */
+	            if ($currentEvent->canAttend()) {
+	                $this->parse('attendance_icon_block', 'attendance_icon');
+
+	                if ($this->getGroup()->isStudent($_SESSION['id'])) {
+	                    if ($attendance = $this->getCalendar()->getAttendanceByEventAndUser(
+	                        $currentEvent->getEventId(), $_SESSION['id']
+	                    )
+	                    ) {
+
+	                        /* Attendance Status
+	                         */
+	                        if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
+	                            $this->setVar('ATTENDANCE_STATUS', 'Pending');
+	                        } else {
+	                            if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
+	                                $this->setVar('ATTENDANCE_STATUS', 'Approved');
+	                            } else {
+	                                if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
+	                                    $this->setVar('ATTENDANCE_STATUS', 'Rejected');
+	                                }
+	                            }
+	                        }
+
+	                        $this->parse('attendance_status_block', 'attendance_status');
+
+	                        $this->setVar('ATTENDANCE_REQUEST_ACTION', 'Unattend');
+	                    } else {
+	                        $this->setVar('ATTENDANCE_REQUEST_ACTION', 'Attend');
+	                    }
+
+	                    $this->parse('attendance_request_button_block', 'attendance_request_button');
+	                } else {
+	                    if ($this->getGroup()->isStaff($_SESSION['id'])) {
+	                        $this->parse('attendance_list_button_block', 'attendance_list_button');
+	                    }
+	                }
+	            }
+
+	            /* Show a homepage if appropriate
+	             */
+	            if ($currentEvent->getCategoryId() > 0) {
+	                $this->setVar(
+	                    array(
+	                        'HAS_CATEGORY_ID' => $currentEvent->getCategoryId(),
+	                        'HAS_CATEGORY_NAME' => $currentEvent->getCategoryName(),
+	                    )
+	                );
+
+	                $this->parse('has_category_block', 'has_category');
+	            }
+
+	        }
+
+
+		    $this->parse("note_listing", "note_block", true);
+
+		    $prevDay = $currentDay;
+	    }
 
         return true;
     }

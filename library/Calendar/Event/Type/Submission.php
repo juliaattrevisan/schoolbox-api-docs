@@ -90,18 +90,16 @@ class Calendar_Event_Type_Submission extends Calendar_Event_Type_Abstract {
     public function getTime() {
 
 	    if($this->getAllDay() )
-            return $this->getStartTime()->getUsingFormat('g:iA');
+		    return false;
 		else
-			return false;
+			return $this->getStartTime()->getUsingFormat('g:iA');
+
     }
 
     public function getFullDate() {
-
-        $formattedTime = $this->getTime();
-
         $startDate = $this->getStartTime()->getUsingFormat('l, jS F');
-        if ($formattedTime) {
-            $formattedTime = $startDate . ', ' . $formattedTime;
+        if (!$this->getAllDay()) {
+            $formattedTime = $startDate . ', ' . $this->getTime();
         } else {
             $formattedTime = $startDate;
         }
