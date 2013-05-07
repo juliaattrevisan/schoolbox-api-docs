@@ -98,17 +98,20 @@ if (is_numeric($_GET['eventID'])) {
     $page->dropDown('level_drop', $levelList, $event['access']);
 
     $page->parse('delete_button_block', 'delete_button', true);
-    $page->setVar('recurring_dates_block', '');
 
+    //
+    // Is there a recurrence? If so don't show the repeat selector.
     if ($event['series_id'] == null) {
         $page->setVar('recurring_reminder_block', '');
+        $page->parse('recurring_dates_block', 'recurring_dates');
     }
-	else {
+    else {
         $recurrence = $calendarHandler->getSeriesRecurrence($event['series_id']);
         $page->setVar('REC_FREQ', ucfirst($recurrence['freq']));
         $page->setVar('REC_START', $recurrence['start']->getLongDateOnly());
         $page->setVar('REC_END', $recurrence['end']->getLongDateOnly());
         $page->parse('recurring_reminder_block', 'recurring_reminder');
+        $page->setVar('recurring_dates_block', '');
     }
 
     if ($event['series_id'] || $event['publish_date']) {
