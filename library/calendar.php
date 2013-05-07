@@ -483,7 +483,6 @@ class Calendar extends DeprecatedModel {
             foreach ($submissions as $submission) {
                 $event = new Calendar_Event_Type_Submission();
 
-                $event->setDate(new Alaress_Date_Format($submission['date'], 'y-m-d h:i:s'));
                 $event->setCategoryId($submission['cid']);
                 $event->setCategoryName($submission['category']);
                 $event->setCategoryCodes($submission['synergyCode']);

@@ -19,7 +19,6 @@ abstract class Calendar_Event_Type_Abstract {
     protected $eventId = -1;
     protected $startTime = null;
     protected $endTime = null;
-    protected $date = '';
 
     /* Unholy selection of field names: eventType and type
      *
@@ -301,24 +300,6 @@ abstract class Calendar_Event_Type_Abstract {
      */
     public function getType() {
         return $this->type;
-    }
-
-    /**
-     * Set date
-     *
-     * @param $date
-     */
-    public function setDate($date) {
-        $this->date = $date;
-    }
-
-    /**
-     * Get date
-     *
-     * @return null
-     */
-    public function getDate() {
-        return $this->date;
     }
 
     /**

@@ -17,9 +17,6 @@ class Calendar_Event_Type_Submission extends Calendar_Event_Type_Abstract {
      */
     protected $rendererClass = 'Calendar_Event_Type_Submission_Renderer_Javascript';
 
-    /* Contextual: The date for submissions
-     */
-    protected $date = null;
 
     /* Contextual: The owner of the submission box
       */
@@ -91,20 +88,18 @@ class Calendar_Event_Type_Submission extends Calendar_Event_Type_Abstract {
      * @return string
      */
     public function getTime() {
-        $formattedTime = $this->getDate()->getUsingFormat('g:iA');
 
-        if ($formattedTime == '11:59PM') {
-            $formattedTime = false;
-        }
-
-        return $formattedTime;
+	    if($this->getAllDay() )
+            return $this->getStartTime()->getUsingFormat('g:iA');
+		else
+			return false;
     }
 
     public function getFullDate() {
 
         $formattedTime = $this->getTime();
 
-        $startDate = $this->getDate()->getUsingFormat('l, jS F');
+        $startDate = $this->getStartTime()->getUsingFormat('l, jS F');
         if ($formattedTime) {
             $formattedTime = $startDate . ', ' . $formattedTime;
         } else {
