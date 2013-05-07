@@ -262,7 +262,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	 * Render recent journal posts
 	 */
 	private function renderRecentBlogs() {
-		$allBlogs = \Component\Eportfolio\BlogMapper::getInstance()->findRecent($this->getNumRecentBlogs());
+		$allBlogs = \Component\Eportfolio\BlogMapper::getInstance()->findRecent($this->getUserId(), $this->getNumRecentBlogs());
 
 		if ($allBlogs->count()) {
 			$j = 0;

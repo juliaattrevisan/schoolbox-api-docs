@@ -146,19 +146,22 @@ class BlogMapper extends Schoolbox\Mapper {
 	/**
 	 * Retrieves a list of recently-created blogs
 	 *
+	 * @param $uid
 	 * @param $limit
 	 * @return Collection
 	 */
-	public function findRecent($limit) {
+	public function findRecent($uid, $limit) {
 		$query = "
             SELECT {$this->getColumnString()}
             FROM `{$this->table}`
+            WHERE uid = :uid
             ORDER BY created_at DESC
             LIMIT :limit
 		";
 
 		$statement = $this->database->prepare($query);
 
+		$statement->bindParam(':uid', $uid, \PDO::PARAM_INT);
 		$statement->bindParam(':limit', $limit, \PDO::PARAM_INT);
 
 		$statement->execute();
