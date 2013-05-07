@@ -54,12 +54,12 @@
             "version": "1.8.5",
             "source": {
                 "type": "git",
-                "url": "https://github.com/evert/SabreDAV.git",
+                "url": "https://github.com/fruux/sabre-dav.git",
                 "reference": "1.8.5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/evert/SabreDAV/zipball/1.8.5",
+                "url": "https://api.github.com/repos/fruux/sabre-dav/zipball/1.8.5",
                 "reference": "1.8.5",
                 "shasum": ""
             },
@@ -110,7 +110,7 @@
                 {
                     "name": "Evert Pot",
                     "email": "evert@rooftopsolutions.nl",
-                    "homepage": "http://www.rooftopsolutions.nl/",
+                    "homepage": "http://evertpot.com/",
                     "role": "Developer"
                 }
             ],
@@ -130,12 +130,12 @@
             "version": "2.0.7",
             "source": {
                 "type": "git",
-                "url": "https://github.com/evert/sabre-vobject.git",
+                "url": "https://github.com/fruux/sabre-vobject.git",
                 "reference": "2.0.7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/evert/sabre-vobject/zipball/2.0.7",
+                "url": "https://api.github.com/repos/fruux/sabre-vobject/zipball/2.0.7",
                 "reference": "2.0.7",
                 "shasum": ""
             },
@@ -159,7 +159,7 @@
                 {
                     "name": "Evert Pot",
                     "email": "evert@rooftopsolutions.nl",
-                    "homepage": "http://www.rooftopsolutions.nl/",
+                    "homepage": "http://evertpot.com/",
                     "role": "Developer"
                 }
             ],

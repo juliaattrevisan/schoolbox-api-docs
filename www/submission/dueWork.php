@@ -425,7 +425,7 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
     //
     // box URL depends on whether this is an assessment or submission
     $boxUrl = $taskName;
-    if ($activity->getType() == \Schoolbox\Assessment\Component\SubmissionBox\WorkType::TYPE_ASSESSMENT_TASK) {
+    if ($activity->getType() == \Schoolbox\Assessment\Component\SubmissionBox\WorkType::TYPE_ONLINE_ASSESSMENT) {
         if ($activity->getEvent() == 'closed') {
             $boxUrl = $activity->getName();
         }

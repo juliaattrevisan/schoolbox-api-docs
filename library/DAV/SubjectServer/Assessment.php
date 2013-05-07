@@ -121,6 +121,7 @@ class DAV_SubjectServer_Assessment extends Sabre\DAV\SimpleCollection
 			->setTempLocation($temp_file)
 			->setSubmitted($submit_date)
 			->setLate($is_late)
+			->loadMimetypeFromFilename()
 		;
 
 		//

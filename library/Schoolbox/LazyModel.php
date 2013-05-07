@@ -20,6 +20,8 @@ class LazyModel {
 	protected $mapper;
 
 	/**
+	 * The identifier that identifies the model to retrieve when called.
+	 *
 	 * @var int
 	 */
 	protected $id;
@@ -30,15 +32,38 @@ class LazyModel {
 	protected $loaded_model;
 
 	/**
+	 * If set, this column is used instead of the identifier when loadModel() is
+	 * called.
+	 *
+	 * @var string
+	 */
+	protected $column = null;
+
+	/**
+	 * If set, this property is identified as the ID instead of the identifier
+	 * when a method call is passed through __call() to the
+	 * called.
+	 *
+	 * @var string
+	 */
+	protected $property = null;
+
+	/**
 	 * Creates lazy loaded model.
 	 *
-	 * @param Mapper $mapper The mapper to fetch the model from. Currently uses
-	 *                       findById() to fetch result.
-	 * @param int    $id     The ID of the model to retrieve.
+	 * @param Mapper $mapper   The mapper to fetch the model from.
+	 * @param int    $id       The identifier of the model to retrieve.
+	 * @param string $column   If set, this column is used instead of the ID to
+	 *                         load the model when loadModel() is called.
+	 * @param string $property If set, this property is used instead of the ID
+	 *                         property when passing through to the model.
+	 *
 	 */
-	public function __construct(Mapper $mapper, $id) {
-		$this->mapper = $mapper;
-		$this->id     = $id;
+	public function __construct(Mapper $mapper, $id, $column = null, $property = null) {
+		$this->mapper   = $mapper;
+		$this->id       = $id;
+		$this->column   = $column;
+		$this->property = $property;
 	}
 
 	/**
@@ -56,7 +81,9 @@ class LazyModel {
 	 * @return void
 	 */
 	protected function loadModel() {
-		$this->loaded_model = $this->mapper->findById($this->id);
+		$this->loaded_model = isset($this->column) ?
+			$this->mapper->findOneByColumn($this->column, $this->id):
+			$this->mapper->findById($this->id);
 	}
 
 	/**
@@ -72,7 +99,9 @@ class LazyModel {
 	 * @return mixed
 	 */
 	public function __call($method, $args) {
-		$identifier_method = $this->mapper->getGetIdentifierMethodName();
+		$identifier_method = isset($this->property) ?
+			$this->mapper->getGetMethodName($this->property):
+			$this->mapper->getGetIdentifierMethodName();
 		if (!$this->isModelLoaded()) {
 			if ($method === $identifier_method) {
 				return $this->id;

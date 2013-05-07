@@ -65,6 +65,12 @@ class Authenticator {
     }
 
     public function appendSession($username) {
+        //
+        // Mobile not enabled? That means GizaUser_DataMapper doesn't exist.
+        // That's not an issue if mobile doesn't exist, so return true.
+        if (!Cfg::get('mobile_enabled')) {
+            return true;
+        }
         $uMap = new GizaUser_DataMapper();
         $user = $uMap->read(array('username' => $username))->get();
 

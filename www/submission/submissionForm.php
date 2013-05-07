@@ -153,7 +153,7 @@ $submission->setName($_POST['name']);
 $submission->setDescription($_POST['description']);
 $submission->getWorkType()->setId($_POST['type']);
 $submission->getMarkType()->setId($markTypeID);
-$submission->setRubricResultSet($resultSetID);
+$submission->setRubricResultSet($resultSetID ?: 0);
 $submission->setMaxMark($markMax);
 $submission->setMarkVisibility($_POST['mark_visibility']);
 
