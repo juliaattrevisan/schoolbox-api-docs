@@ -85,7 +85,7 @@
                     var data = $j.extend(true, {}, calEvent.data.meta)
                     data.note = calEvent.title
 
-                    if(calEvent.data.meta.eventTypeId == c.options.taskTypeId) {
+                    if (calEvent.allDay) {
                         data.date = calendarDateOnly(calEvent.start)
                     }
                     else {
@@ -95,7 +95,13 @@
 
                     // end time
                     if (calEvent.end != null) {
-                        data.date += " &ndash; " + calendarDate(calEvent.end)
+                        data.date += " &ndash; "
+                        if (calEvent.allDay) {
+                            data.date += calendarDateOnly(calEvent.end)
+                        }
+                        else {
+                            data.date += calendarDate(calEvent.end)
+                        }
                     }
 
                     // Links to Modify Screen
