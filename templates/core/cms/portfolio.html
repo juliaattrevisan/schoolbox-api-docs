@@ -1,80 +1,13 @@
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" type="text/css" media="screen" href="/css/jquery.contextmenu.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/css/jquery.contextmenu.css"
+      xmlns="http://www.w3.org/1999/html"/>
 <link rel="stylesheet" type="text/css" media="screen" href="/css/tree.css" />
 <script type="text/javascript" src="/min/index.php?f=javascript/jquery.ui.js,javascript/jquery.simplemodal.js,javascript/jquery.contextmenu.js,javascript/jquery.tree.js,javascript/jquery.scrollTo.js"></script>
+<script type="text/javascript" src="/javascript/jquery.three-panel.js"></script>
 <script type="text/javascript">
 $j(document).ready(function() {
 
-	// define file context menu
-	var fileMenu = [
-		{"Open": {
-			onclick: function () {
-				window.open("/cms/sendMyFile.php?id="+$j(this).attr("id").substring(5),"_blank");
-			},
-			icon: '/images/famicons/page_go.png'
-		}},
-		{"Save As": {
-			onclick: function () { window.open("/cms/sendMyFile.php?save=1&id="+$j(this).attr("id").substring(5),"_self"); },
-			icon: '/images/famicons/disk.png'
-		}},
-		$j.contextMenu.separator,
-		{"Modify": {
-			onclick: function () {
-				window.open("/cms/myFile/"+$j(this).attr("id").substring(5),"_self");
-			},
-			icon: '/images/famicons/page_edit.png'
-		}},
-		{"Delete": {
-			onclick: function () {
-				var _name = $j(this).find(".file").text();
-				if (confirm("Are you sure you want to delete "+_name+"?"))
-					window.open("/cms/myFileForm.php?delete="+$j(this).attr("id").substring(5),"_self");
-			},
-			icon: '/images/famicons/page_delete.png'
-		}},
-		<!-- BEGIN publish_page -->
-        $j.contextMenu.separator,
-        {
-            "Publish to ePortfolio/{PUBLISH_PAGE_PAGE_NAME}/{PUBLISH_PAGE_COMPONENT_NAME}" : {
-                onclick: function() {
-                    window.open("/eportfolio/component/filelist/modifyForm.php?action=addItem&userId={PUBLISH_PAGE_PAGE_OWNER_ID}&pageId={PUBLISH_PAGE_PAGE_ID}&componentInstanceId={PUBLISH_PAGE_COMPONENT_INSTANCE_ID}&fileId=" + $j(this).attr('id').substring(5), '_self');
-                },
-                icon: '/images/famicons/page_edit.png'
-            }
-        },
-		<!-- END publish_page -->
-        {
-            "Unpublish" : {
-                onclick: function() {
-                    window.open("/cms/myFileForm.php?unpublish=" + $j(this).attr('id').substring(5), '_self');
-                },
-                icon: '/images/famicons/page_edit.png'
-            }
-        }
-	];
-
-	// define folder context menu
-	var folderMenu = [
-		{"Modify": {
-			onclick: function () { window.open("/cms/myFolder/"+$j(this).attr("id").substring(5),"_self"); },
-			icon :'/images/famicons/folder_edit.png'
-		}},
-		{"Delete": {
-			onclick: function () {
-				var _name = $j(this).find(".folder").text();
-				if (confirm("Are you sure you want to delete "+_name+"?")) window.open("/cms/myFolderForm.php?delete="+$j(this).attr("id").substring(5),"_self"); },
-			icon: '/images/famicons/folder_delete.png'
-		}},
-		$j.contextMenu.separator,
-		{"New File": {
-			onclick: function () { window.open("/cms/myFile/new/"+$j(this).attr("id").substring(5),"_self"); },
-			icon: '/images/famicons/page_add.png'
-		}},
-		{"New Folder": {
-			onclick: function () { window.open("/cms/myFolder/new/"+$j(this).attr("id").substring(5),"_self"); },
-			icon: '/images/famicons/folder_add.png'
-		}}
-	];
+  var threePanel = new ThreePanelView('/ajax/resource/cmsMeta.php')
 
 	/* left tree navigation */
 	$j('#tree').tree({
@@ -100,6 +33,8 @@ $j(document).ready(function() {
 		var relationID = $j(this).attr('id').substring(5);
 		var files = $j('tr.category-' + relationID + ':not(.empty)');
 
+    threePanel.getMeta(relationID);
+
 		if (files.length > 0) {
 			/* files exist, show them */
 			files.show();
@@ -121,12 +56,13 @@ $j(document).ready(function() {
 				}
 				else if (data.length == 0) {
 					/* display empty message */
-                    var empty = $j('#file-list tr.category-'+relationID+'.empty');
-                    if (empty.length) {
-                        empty.show();
-                    } else {
+          var empty = $j('#file-list tr.category-'+relationID+'.empty');
+          if (empty.length) {
+              empty.show();
+          }
+          else {
 					    $j('<tr class="category-' + relationID + ' empty"><td>No files to display</td></tr>').appendTo($j('#file-list'));
-                    }
+          }
 				}
 				else {
 					var template = $j('#file-template');
@@ -171,23 +107,6 @@ $j(document).ready(function() {
 		$j('#file-list tbody tr').removeClass('dark');
 		$j('#file-list tbody tr:visible:odd:not(.empty)').addClass('dark');
 
-		/* apply file context menus */
-		newChildren.contextMenu(fileMenu, {
-			theme: 'vista',
-			beforeShow: function (event) {
-
-				/* un-select selection if clicked outside */
-				if (!$j(this.target).hasClass('selected')) {
-					$j(this.target).triggerHandler('click', event);
-				}
-
-				var categoryID = $j(this.target)[0].className.match(/category-([\d]+)/), folder = $j('#node-' + categoryID[1].toString())
-
-				/* enable all options */
-				$j(this.menu).find('.context-menu-item').removeClass('context-menu-item-disabled');
-			}
-		});
-
 		/* double click files, default action */
 		newChildren.dblclick(function () {
 			if ($j(this).hasClass("link")) {
@@ -228,6 +147,9 @@ $j(document).ready(function() {
 
 			$j('#file-list tr.current').removeClass('current');
 			$j(this).addClass('current');
+
+      threePanel.getMeta(relationID, $j('#file-list tr.selected'))
+
 		});
 
 		/* drag files */
@@ -290,28 +212,9 @@ $j(document).ready(function() {
 
 			if (maxWidth > scrollerWidth) {
 				table.width(maxWidth);
+      }
 		}
-		}
 
-		/* apply folder context menus
-		 */
-		var newRows = table.find('tbody tr:not(.context)').addClass('context');
-
-		newRows.contextMenu(folderMenu, {
-			theme: 'vista',
-			beforeShow: function () {
-
-				/* enable all options */
-				$j(this.menu).find('.context-menu-item').removeClass('context-menu-item-disabled');
-
-                /* Disable modify and delete for node-0 (Top) and immediate children */
-				if ($j(this.target).hasClass('server')) {
-					for (var i = 0; i <= 1; i++) {
-						$j($j(this.menu).find('.context-menu-item')[i]).toggleClass("context-menu-item-disabled", true);
-                    }
-                }
-			}
-		});
 	});
 
 	$j('#tree').triggerHandler('loaded');
@@ -327,6 +230,91 @@ $j(document).ready(function() {
 	/* auto scroll to open branch
 	 */
 	$j("#category-window div.scroller").scrollTo($j("#node-{OPEN}"), 200);
+
+  // set up resizing
+  threePanel.resizePanels()
+  $j(window).resize(threePanel.resizePanels())
+
+  // bind actions to their buttons
+  $j(document).ready(function() {
+
+    var actions = {
+      cms : {
+        open : function(kind, id) {
+          window.open("/cms/sendMyFile.php?id=" + id, "_blank")
+          return true
+        },
+        download : function(kind, id) {
+          // no download action available for links
+          if(kind == 'link') {
+            return false
+          }
+          window.open("/cms/sendMyFile.php?save=1&id="+id, "_self")
+          return true
+        },
+        modify : function(kind, id) {
+          window.open('/cms/myFile/' + id, "_self")
+          return true
+        },
+        delete : function(kind, id) {
+          if(confirm("Are you sure you want to delete this file?")) {
+            window.open('/cms/myFileForm.php?delete=' + id, "self")
+          }
+        }
+      },
+      folder : {
+        modify : function(id) {
+          window.open("/cms/myFolder/" + id, "_self")
+          return true
+        },
+        delete : function(id) {
+          var name = $j('#folder-detail h3.name').html()
+          if(confirm("Are you sure you want to delete " + name + " and all its contents?")) {
+            window.open("/cms/myFolderForm.php?delete=" + id, "_self")
+          }
+          return true
+        },
+        folder : function(id) {
+          window.open("/cms/myFolder/new/" + id, "_self")
+          return true
+        },
+        file : function(id) {
+          window.open("/cms/myFile/new/" + id, "_self")
+          return true
+        }
+      },
+      multi : {
+        delete : function() {
+          var selected = $j('#file-list tr.selected'), fileList = '', linkList = '', id
+
+          if(selected.length > 1) {
+            selected.each(function() {
+              id = $j(this).attr("id").substring(5) + ','
+
+              if ($j(this).hasClass('link'))
+                linkList += id
+              else
+                fileList += id
+            })
+
+            if (confirm("Are you sure you want to delete this selection?")) {
+              window.open("/cms/fileForm.php?fileList="+fileList+"&linkList="+linkList+"&deleteList=1", "_self")
+            }
+          }
+        }
+      }
+    }
+
+    threePanel.actionBind(actions)
+
+    // intercept the publish submitter and splice out the page/component destination IDs
+    threePanel.fileDetail.find('form.publish').submit(function(event) {
+      window.open($j(this).attr('action') + '?' + $j(this).serialize().replace(/%26/,'&').replace(/%3D/,'='), '_self')
+      return false
+    })
+  })
+
+
 });
 </script>
 <style type="text/css">
@@ -352,7 +340,7 @@ $j(document).ready(function() {
 </style>
 <![endif]-->
 <!-- END custom_head -->
-<div class="template4">
+<div class="template3">
   <div class="left">
     <div id="category-window">
     <div class="loading"></div>
@@ -393,13 +381,13 @@ $j(document).ready(function() {
     </div>
   </div>
 
-  <div class="right">
+  <div class="center">
     <div id="file-window">
       <div class="loading"></div>
 
       <table id="file-head">
-        <col width="55%" />
-        <col width="23%" />
+        <col width="60%" />
+        <col width="40%" />
       	<thead>
           <th>Name</th>
           <th>Modified</th>
@@ -408,8 +396,8 @@ $j(document).ready(function() {
 
       <div class="scroller">
       <table id="file-list">
-      	<col width="55%" />
-        <col width="22%" />
+      	<col width="60%" />
+        <col width="40%" />
 
         <tbody>
           <!-- BEGIN file_list -->
@@ -433,6 +421,83 @@ $j(document).ready(function() {
          </tfoot>
       </table>
       </div>
+    </div>
+  </div>
+  <div class="right">
+    <div id="detail-window">
+      <div class="loading">
+        <img src="/images/resources/ajax.gif" />
+      </div>
+
+      <!-- BEGIN folder_detail -->
+      <div class="rfolder detail" id="folder-detail">
+        <img src="{{FOLDER_MIME_IMG}}" alt="{{FOLDER_NAME}}" />
+        <h3 class="rfolder name">{{FOLDER_NAME}}</h3>
+        <p class="rfolder template">{{FOLDER_TEMPLATE}}</p>
+        <p class="rfolder type"><span class="rfolder type">{{FOLDER_TYPE}}</span><a class="rfolder join-btn btn groups"><span></span>Join</a></p>
+        <h4 class="rfolder perms">Permissions</h4>
+        <ul class="rfolder perms">
+          <!-- BEGIN folder_detail_perms -->
+          <li>{{FOLDER_PERM_GROUP}}: {{FOLDER_PERM_ACCESS}}</li>
+          <!-- END folder_detail_perms -->
+        </ul>
+        <div class="rfolder actions">
+          <h4 class="rfolder actions">Actions</h4>
+          <a class="btn rhomepage" data-action="homepage"><span></span>View Homepage</a>
+          <a class="btn modify rmodify" data-action="modify"><span></span>Modify</a>
+          <a class="btn delete rdelete" data-action="delete"><span></span>Delete</a>
+          <a class="btn download rdownload" data-action="download"><span></span>Download</a>
+          <a class="btn add rfolder" data-action="folder"><span></span>Add Folder</a>
+          <a class="btn create rfile" data-action="file"><span></span>Post File</a>
+          <a class="btn up-arrow rzip" data-action="zip"><span></span>Upload ZIP</a>
+        </div>
+      </div>
+      <!-- END folder_detail -->
+
+      <!-- BEGIN file_detail -->
+      <div class="rfile detail" id="file-detail">
+        <img src="{{FILE_MIME_IMG}}" alt="{{FILE_NAME}}" />
+        <h3 class="rfile name">{{FILE_NAME}}</h3>
+        <p class="rfile filesize">({{FILE_SIZE}})</p>
+        <p class="rfile hidden-warning"><span class="i" title="This file cannot be seen by users who do not have write permissions in this folder"></span>(Hidden)</p>
+        <p class="rfile description">{{FILE_DESCRIPTION}}</p>
+        <p class="rfile meta">Posted by <span class="meta-who">{{FILE_POSTED_BY}}</span> on <span class="meta-when">{{FILE_POSTED_DATE}}</span></p>
+        <div class="rfile actions">
+          <h4 class="rfile actions">Actions</h4>
+          <a class="btn open ropen" data-action="open"><span></span>Open</a>
+          <a class="btn download rdownload" data-action="download"><span></span>Download</a>
+          <a class="btn modify rmodify" data-action="modify"><span></span>Modify</a>
+          <a class="btn delete rdelete" data-action="delete"><span></span>Delete</a>
+          <a class="btn report rproperties" data-action="properties"><span></span>Properties</a>
+          <h4 class="rfile publish">Publishing</h4>
+          <form class="rfile publish" action="{{PUBLISH_PAGE_ACTION}}" method="get">
+            <select name="pageId">
+              <option value="{{PUBLISH_PAGE_PAGE_ID}}-{{PUBLISH_PAGE_COMPONENT_INSTANCE_ID}}">ePortfolio/{{PUBLISH_PAGE_PAGE_NAME}}</option>
+            </select>
+            <input type="hidden" name="fileId" value="{{PUBLISH_PAGE_FILE_ID}}" />
+            <input type="hidden" name="userId" value="{{PUBLISH_PAGE_PAGE_OWNER_ID}}" />
+            <input type="hidden" name="action" value="addItem" />
+            <input type="submit" class="btn no-icon" value="Publish" />
+          </form>
+          <form class="rfile unpublish" action="/cms/myFileForm.php">
+            <input type="hidden" name="fileId" value="{{PUBLISH_PAGE_FILE_ID}}" />
+            <input type="submit" class="btn no-icon unpublish" value="Unpublish" />
+          </form>
+        </div>
+      </div>
+      <!-- END file_detail -->
+
+      <!-- BEGIN multi_file_detail -->
+      <div class="rmultifile detail" id="multi-file-detail">
+        <img src="{{MULTIFILE_MIME_IMG}}" alt="Multiple files selected" />
+        <h3 class="rmultifile count">{{MULTIFILE_COUNT}}</h3>
+        <div class="rmultifile actions">
+          <h4 class="rmultifile actions">Actions</h4>
+          <a class="btn delete rdelete" data-action="delete"><span></span>Delete</a>
+        </div>
+      </div>
+      <!-- END multi_file_detail -->
+
     </div>
   </div>
 </div>
