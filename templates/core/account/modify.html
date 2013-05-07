@@ -2,23 +2,59 @@
 <script type="text/javascript">
 $j(document).ready(function () {
 	$j('#accountForm').submit(function (event) {
-		
+
 		event.stopPropagation();
-		
-		var current = $j('#current_password').val(), password = $j('#new_password').val(), confirmp = $j('#confirm_password').val(), msg = ''; 
-		if (current == '')
-			msg += 'You must enter your current password.\n';
-		
-		if (password.length < 6)
-			msg += 'Your new password must be at least 6 characters long.\n';
-		
-		if (password != confirmp)
-			msg += 'The new and confirmation passwords you entered do not match.';
-		
-		if (msg == '') {
+
+		var current = $j('#current_password').val(),
+			password = $j('#new_password').val(),
+			confirmp = $j('#confirm_password').val(),
+			msgs = {
+				current_password: [],
+				new_password:     [],
+				confirm_password: []
+			},
+			letter_re = /[a-z]/i,
+			number_re = /\d/,
+			nonalpha_re = /[^a-z\d]/i
+		;
+
+		if (current == '') {
+			msgs.current_password.push('You must enter your current password.');
+		}
+		if (password.length < 6) {
+			msgs.new_password.push('Your new password must be at least 6 characters long.');
+		}
+		else {
+			if (!letter_re.test(password)) {
+				msgs.new_password.push('Your new password must have at least one letter.');
+			}
+			if (!number_re.test(password)) {
+				msgs.new_password.push('Your new password must have at least one number.');
+			}
+			if (!nonalpha_re.test(password)) {
+				msgs.new_password.push('Your new password must have at least one punctuation or symbol character.');
+			}
+		}
+		if (password != confirmp) {
+			msgs.confirm_password.push('The new and confirmation passwords you entered do not match.');
+		}
+
+		var slots = $j('#current_password_messages, #new_password_messages, #confirm_password_messages');
+		slots.hide().empty();
+		if (msgs.current_password.length === 0
+			&& msgs.new_password.length === 0
+			&& msgs.confirm_password.length === 0
+		) {
 			return true;
-		} else {
-			alert(msg);
+		}
+		else {
+			$j.each(msgs, function(key) {
+				var slot = $j('#'+key+'_messages');
+				$j.each(this, function(k,text) {
+					slot.append($j('<li></li>').text(text).addClass("error-notification"));
+				});
+			});
+			slots.fadeIn('fast');
 			return false;
 		}
 	});
@@ -33,28 +69,37 @@ $j(document).ready(function () {
 <!-- END success -->
 
 <form id="accountForm"  method="post" class="clearfix" action="/account/modifyForm.php">
-  <table class="standardForm">
-    <tr>
-      <td class="formLabelWidth"><h4>Current Password</h4>
-        <em></em>
-		</td>
-	<td>
-	<input type="password" name="current_password" id="current_password" size="35" maxlength="50" />
-	</td>
-    </tr>
-    <tr>
-      <td><h4>New Password</h4>
-        <em>Your new password must be at least 6 characters in length and contain at least one letter and at least one number.</em><br />
-		</td>
-	<td><input type="password" name="new_password" id="new_password" size="35" maxlength="50" /></td>
-    </tr>
-    <tr>
-      <td><h4>Confirm New Password</h4>
-        <em>Enter your new password again to confirm you typed it correctly.</em><br />
-		</td>
-	<td><input type="password" name="confirm_password" id="confirm_password" size="35" maxlength="50" /></td>
-    </tr>
+	<table class="standardForm">
+		<tr>
+			<td class="formLabelWidth"><h4>Current Password</h4>
+				<em></em>
+			</td>
+			<td>
+				<input type="password" name="current_password" id="current_password" size="35" maxlength="50" />
+				<ul id="current_password_messages"></ul>
+			</td>
+		</tr>
+		<tr>
+			<td><h4>New Password</h4>
+				<em>Your new password must be at least 6 characters in length and contain at least one letter,
+					one number and one symbol or punctuation character.</em><br />
+				<em>(examples of symbol characters: $, #, _, &amp;)</em>
+			</td>
+			<td>
+				<input type="password" name="new_password" id="new_password" size="35" maxlength="50" />
+				<ul id="new_password_messages"></ul>
+			</td>
+		</tr>
+		<tr>
+			<td><h4>Confirm New Password</h4>
+				<em>Enter your new password again to confirm you typed it correctly.</em><br />
+			</td>
+			<td>
+				<input type="password" name="confirm_password" id="confirm_password" size="35" maxlength="50" />
+				<ul id="confirm_password_messages"></ul>
+			</td>
+		</tr>
 
-  </table>
-  <input class="submit-btn-plain" type="submit" name="submit" value="Modify" />
+	</table>
+	<input class="submit-btn-plain" type="submit" name="submit" value="Modify" />
 </form>
