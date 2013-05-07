@@ -155,6 +155,13 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 
 			SitePage::localRedir("/eportfolio/{$eportfolioHandler->getUserId()}/{$eportfolioHandler->getPageId()}");
 		}
+		/* Softdelete this page and redirect back to profile
+		 */
+		else if (isset($_POST['deletePage'])) {
+			$eportfolioHandler->softdelete();
+
+			SitePage::localRedir("/eportfolio/{$eportfolioHandler->getUserId()}/profile");
+		}
 		/* Update config options from homepage
 		 */
 		else if (($_POST['type'] == 'config') && $_POST['component']) {

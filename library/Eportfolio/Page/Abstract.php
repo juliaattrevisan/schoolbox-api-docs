@@ -155,22 +155,24 @@ abstract class Eportfolio_Page_Abstract {
 	 * Render a list of pages
 	 */
 	private function renderPageList() {
-		$allPages = Eportfolio_PageMapper::getInstance()->findByColumn('uid', $this->getUserId());
+		$pageMapper = new Eportfolio\PageMapper();
+
+		$allPages = $pageMapper->findByColumn('uid', $this->getUserId());
+
+		$this->getPage()->setVar('eportfolio_page_block', '');
 
 		if ($allPages->count()) {
 			foreach($allPages as $currentPage) {
+				if ($currentPage->getDeletedAt() == null) {
+					$this->getPage()->setVar(array(
+						'EPORTFOLIO_PAGE_ID' => $currentPage->getPageId(),
+						'EPORTFOLIO_PAGE_NAME' => $currentPage->getPageTitle(),
+						'EPORTFOLIO_CURRENT_PAGE' => $currentPage->getPageId()==$this->getPageId()?'class="current"':'',
+					));
 
-				$this->getPage()->setVar(array(
-					'EPORTFOLIO_PAGE_ID' => $currentPage->getPageId(),
-					'EPORTFOLIO_PAGE_NAME' => $currentPage->getPageTitle(),
-					'EPORTFOLIO_CURRENT_PAGE' => $currentPage->getPageId()==$this->getPageId()?'class="current"':'',
-				));
-
-				$this->getPage()->parse('eportfolio_page_block', 'eportfolio_page', true);
+					$this->getPage()->parse('eportfolio_page_block', 'eportfolio_page', true);
+				}
 			}
-		}
-		else {
-			$this->getPage()->setVar('eportfolio_page_block', '');
 		}
 
 		/* For the hardcoded pages

@@ -72,6 +72,9 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 		$this->getPage()->setBlock(TEMPLATE_content, 'has_recent_photo', 'has_recent_photo_block');
 		$this->getPage()->setBlock('has_recent_photo', 'recent_photo', 'recent_photo_block');
 
+		$this->getPage()->setBlock(TEMPLATE_content, 'has_cover_photo', 'has_cover_photo_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'no_cover_photo', 'no_cover_photo_block');
+
 		/* User details
 		 */
 		$user = $this->getUser();
@@ -92,6 +95,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 	protected function render() {
 		$this->renderPersonal();
 
+		$this->renderCoverPhoto();
 		$this->renderShowcasedWork();
 		$this->renderRecentPhotos();
 		$this->renderRecentBlogs();
@@ -117,6 +121,28 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 			'USER_YEAR' => $this->getUserYear(),
 			'USER_HOUSE' => $houseName,
 		));
+	}
+
+	/**
+	 * Render cover phto
+	 */
+	private function renderCoverPhoto() {
+		$coverPhotoMapper = new \Eportfolio\CoverPhotoMapper();
+
+		$coverPhotoCollection = $coverPhotoMapper->findLatest($this->getUserId());
+
+		if ($coverPhotoCollection->count()) {
+			$this->getPage()->setVar(array(
+				'COVERPHOTO_IMAGEHASH' => $coverPhotoCollection->current()->getImagehash(),
+			));
+
+			$this->getPage()->parse('has_cover_photo_block', 'has_cover_photo');
+			$this->getPage()->setVar('no_cover_photo_block', '');
+		}
+		else {
+			$this->getPage()->parse('no_cover_photo_block', 'no_cover_photo');
+			$this->getPage()->setVar('has_cover_photo_block', '');
+		}
 	}
 
 	/**

@@ -144,7 +144,7 @@
 <script type='text/javascript'>
 	$j(function() {
 		$j('#addIndividualPermission').autocomplete({
-			serviceUrl: '/ajax/user.php?groupID={STUDENT_GROUP_IDS}',
+			serviceUrl: '/eportfolio/search.php?groupID={STUDENT_GROUP_IDS}',
 			minChars: 2,
 			maxHeight: 300,
 			width: 275,
@@ -274,6 +274,12 @@
 					</div>
 				</div>
 				<div class="saved-layout">Saved layout</div>
+			</form>
+
+			<form method='post' action='/eportfolio/configForm.php'>
+				<input type='hidden' name='page_id' value='{PAGE_ID}' />
+				<input type='hidden' name='deletePage' value='true' />
+				<input type='submit' value='Delete page' />
 			</form>
 		</div>
 	</div>
@@ -503,7 +509,6 @@
         window.check = false;
     });
 </script>
-
 
 <ul id='individualPermissionTemplate'>
 	<li>

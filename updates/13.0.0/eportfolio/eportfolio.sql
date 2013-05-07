@@ -36,6 +36,7 @@ ALTER TABLE `component_instance` CHANGE `module` `module` ENUM('dashboard','home
 /* Repurpose eportfolio_config to contain information about pages
  */
 ALTER TABLE `eportfolio_config` ADD COLUMN `page_id` INT(11) NOT NULL AUTO_INCREMENT FIRST, ADD COLUMN `page_title` VARCHAR(255) NULL AFTER `page_id`, CHANGE `uid` `uid` INT(6) DEFAULT 0 NOT NULL, CHANGE `template` `template` TINYINT(1) DEFAULT 0 NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`page_id`);
+ALTER TABLE `eportfolio_config` ADD COLUMN `created_at` DATETIME NULL AFTER `top_hover`, ADD COLUMN `updated_at` DATETIME NULL AFTER `created_at`, ADD COLUMN `deleted_at` DATETIME NULL AFTER `updated_at`;
 
 /* Add permissions relation table
  */
@@ -88,3 +89,7 @@ ALTER TABLE `eportfolio_component_blog` CHANGE `body` `content` TEXT CHARSET utf
 /* Add blog comments table
  */
 CREATE TABLE `eportfolio_component_blogcomment`( `id` INT(11) NOT NULL AUTO_INCREMENT, `blog_id` INT(11), `uid` INT(11), `content` VARCHAR(255), `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
+
+/* Add cover photo table
+ */
+CREATE TABLE `eportfolio_coverphoto`( `id` INT(11) NOT NULL AUTO_INCREMENT, `uid` INT(11), `imagehash` VARCHAR(255), `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;

@@ -7,8 +7,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+namespace Eportfolio;
 
-class Eportfolio_Page {
+class Page {
 
 	/**
 	 * The id of the page currently being viewed
@@ -197,6 +198,12 @@ class Eportfolio_Page {
 	 * @var
 	 */
 	public $top_hover;
+
+	private $created_at;
+
+	private $updated_at;
+
+	private $deleted_at;
 
 	/* Getters/Setters
 	 */
@@ -685,5 +692,59 @@ class Eportfolio_Page {
 	 */
 	public function getUid() {
 		return $this->uid;
+	}
+
+	/**
+	 * Set created at
+	 *
+	 * @param $created_at
+	 */
+	public function setCreatedAt($created_at) {
+		$this->created_at = $created_at;
+	}
+
+	/**
+	 * Get created at
+	 *
+	 * @return mixed
+	 */
+	public function getCreatedAt() {
+		return $this->created_at;
+	}
+
+	/**
+	 * Set deleted at
+	 *
+	 * @param $deleted_at
+	 */
+	public function setDeletedAt($deleted_at) {
+		$this->deleted_at = $deleted_at;
+	}
+
+	/**
+	 * Get deleted at
+	 *
+	 * @return mixed
+	 */
+	public function getDeletedAt() {
+		return $this->deleted_at;
+	}
+
+	/**
+	 * Set updated at
+	 *
+	 * @param $updated_at
+	 */
+	public function setUpdatedAt($updated_at) {
+		$this->updated_at = $updated_at;
+	}
+
+	/**
+	 * Get updated at
+	 *
+	 * @return mixed
+	 */
+	public function getUpdatedAt() {
+		return $this->updated_at;
 	}
 }

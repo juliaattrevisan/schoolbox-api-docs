@@ -75,7 +75,7 @@ class Eportfolio {
 		 * this extra information
 		 */
 		if (is_numeric($pageId)) {
-			$pageInstance = Eportfolio_PageMapper::getInstance()->findById($pageId);
+			$pageInstance = \Eportfolio\PageMapper::getInstance()->findById($pageId);
 
 			$this->setPageInstance($pageInstance);
 			$this->setAllTemplates($this->fetchAllTemplates());
@@ -84,7 +84,7 @@ class Eportfolio {
 		 * (was easier, but dirtier, to use an empty array)
 		 */
 		else {
-			$this->setPageInstance(new Eportfolio_Page());
+			$this->setPageInstance(new \Eportfolio\Page());
 		}
 	}
 
@@ -140,7 +140,16 @@ class Eportfolio {
 	public function updatePageTitle($value) {
 		$this->getPageInstance()->setPageTitle($value);
 
-		Eportfolio_PageMapper::getInstance()->save($this->getPageInstance());
+		\Eportfolio\PageMapper::getInstance()->save($this->getPageInstance());
+	}
+
+	/**
+	 * Softdelete a page
+	 */
+	public function softdelete() {
+		$this->getPageInstance()->setDeletedAt(new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+
+		\Eportfolio\PageMapper::getInstance()->save($this->getPageInstance());
 	}
 
 	/**
@@ -202,7 +211,7 @@ class Eportfolio {
 		$this->getPageInstance()->setLeftColumnWidth($left);
 		$this->getPageInstance()->setRightColumnWidth($right);
 
-		Eportfolio_PageMapper::getInstance()->save($this->getPageInstance());
+		\Eportfolio\PageMapper::getInstance()->save($this->getPageInstance());
 	}
 
 	/**
