@@ -102,6 +102,7 @@ switch($_POST['action']) {
             if ($_POST['efficacy'] == 'series') {
                 // don't override the date or seriesID
                 unset($event['startDate']);
+                unset($event['endDate']);
                 unset($event['series_id']);
 
                 $series = $calendarHandler->getAllInSeriesByEventID($_POST['id']);
@@ -112,7 +113,7 @@ switch($_POST['action']) {
                 }
             }
             else if($_POST['efficacy'] == 'self') {
-                $event['id'] = $_POST['id'];
+                $event['id']        = $_POST['id'];
                 $event['startDate'] = $dateArray[0]['start'];
                 $event['endDate']   = $dateArray[0]['end'];
                 $calendarHandler->update($event);
