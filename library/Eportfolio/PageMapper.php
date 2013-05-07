@@ -238,7 +238,7 @@ class PageMapper extends Schoolbox\Mapper {
 
 					/* Only get this user's pages
 					 */
-					if ($currentPage->getUid() == $userId) {
+					if (($currentPage->getUid() == $userId) && ($currentPage->getDeletedAt() == null)) {
 						foreach ($allComponents as $currentComponent) {
 							if ($currentComponent->identifier == $currentPage->getPageId()) {
 								$componentList[] = $currentComponent;
