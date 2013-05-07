@@ -51,6 +51,9 @@ class Eportfolio_Page_Factory {
 		else if ($pageId == 'profile') {
 			$eportfolioPage = new Eportfolio_Page_Profile($page, $userId, $pageId, $permissionValue);
 		}
+        else {
+            $page->pageNotFound();
+        }
 
 		return $eportfolioPage;
 	}
