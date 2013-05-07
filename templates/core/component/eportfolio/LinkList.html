@@ -16,7 +16,9 @@
 
             /* Create button, swap form in
              */
-            $j('a.create_link').click(function() {
+            $j('a.create_link').click(function(event) {
+				event.preventDefault();
+
                 $j(this).hide();
                 $j(this).next().show();
             });
