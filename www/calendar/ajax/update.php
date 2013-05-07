@@ -13,6 +13,13 @@ $calendarHandler = new Calendar();
 $page = new SitePage();
 
 $event = $calendarHandler->getByID($_POST['eventId']);
+//
+// All day events: assume they start at 12am, and go for 2 hours for movement
+// purposes (because that's what they look like in FullCalendar when dragged)
+if ($event['allday']) {
+	$event['startTime'] = '00:00:00';
+	$event['endTime']   = '02:00:00';
+}
 
 /* If you are resizing an event in the week view the new start
  * and end times are expressed as a date string
@@ -45,6 +52,18 @@ $updatedEvent['startDate'] = $startTime->getDatabaseDate();
 $updatedEvent['startTime'] = $startTime->getDatabaseTime();
 $updatedEvent['endDate']   = $endTime->getDatabaseDate();
 $updatedEvent['endTime']   = $endTime->getDatabaseTime();
+if (isset($_POST['allDay'])) {
+	//
+	// String 'false' is not and never will be a boolean! FFS
+	$updatedEvent['allday'] = ($_POST['allDay'] !== 'false');
+}
+else {
+	$updatedEvent['allday'] = $event['allday'];
+}
+if ($updatedEvent['allday']) {
+	$updatedEvent['startTime'] = '00:00:00';
+	$updatedEvent['endTime']   = '00:00:00';
+}
 
 /* For tasks
  */
@@ -76,13 +95,7 @@ if($eventId = $calendarHandler->update($updatedEvent)) {
            */
         'editable' => true,
 
-        /* Whether it's an all-day event or not
-           * If allDay is true, then you can't resize it
-           *
-           * Schoolbox usage would be that all events are not
-           * allDay events
-           */
-        'allDay' => false,
+        'allDay' => $updatedEvent['allday'],
 
         /* Colour of the event
            */
