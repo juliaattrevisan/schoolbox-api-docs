@@ -238,7 +238,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract {
 
 		/* Gather everything
 		 */
-		$allImages = \Component\Eportfolio\FileListMapper::getInstance()->findRecent($this->getNumRecentPhotos());
+		$allImages = \Component\Eportfolio\FileListMapper::getInstance()->findRecent($this->getUserId(), $this->getNumRecentPhotos());
 
 		if ($allImages->count()) {
 			foreach ($allImages as $currentImage) {
