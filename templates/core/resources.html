@@ -5,8 +5,11 @@
 	var date1 = new Date;
 </script>
 <script type="text/javascript" src="/min/index.php?f=javascript/jquery.ui.js,javascript/jquery.simplemodal.js,javascript/jquery.contextmenu.js,javascript/jquery.tree.js,javascript/jquery.scrollTo.js"></script>
+<script type="text/javascript" src="/javascript/jquery.three-panel.js"></script>
 <script type="text/javascript">
 $j(function() {
+
+  var threePanel = new ThreePanelView('/ajax/resource/meta.php')
 
 	/* left tree navigation */
 	$j('#tree').tree({
@@ -29,7 +32,7 @@ $j(function() {
 		var relationID = $j(this).attr('id').substring(5);
 		var files = $j('tr.category-' + relationID);
 
-    getMeta(relationID);
+    threePanel.getMeta(relationID);
 
 		if (files.length > 0) {
 			/* files exist, show them */
@@ -128,7 +131,7 @@ $j(function() {
 			$j('#file-list tr.current').removeClass('current');
 			$j(this).addClass('current');
 
-      getMeta(relationID, $j('#file-list tr.selected'))
+      threePanel.getMeta(relationID, $j('#file-list tr.selected'))
 
 		});
 
@@ -203,213 +206,8 @@ $j(function() {
 		alert((date2.getTime() - date1.getTime()) / 1000);
 
   // set up resizing
-  resizePanels()
-	$j(window).resize(resizePanels());
-
-  var detailsContainer = $j('#detail-window')
-  var folderDetail = $j('#folder-detail')
-  var fileDetail = $j('#file-detail')
-  var multiFileDetail = $j('#multi-file-detail')
-
-  // initially hide these
-  fileDetail.hide()
-  multiFileDetail.hide()
-  folderDetail.hide()
-
-  var accessLevels = ['None', 'Read', 'Write']
-
-  /**
-   * Resize panels to match viewport height
-   */
-  function resizePanels() {
-    $j('#category-window, #file-window, #detail-window').height(
-        $j(window).height() - $j('#header').height() - $j('#footer').height() - 50
-    )
-  }
-
-  /**
-   * Retrieve metadata of folder or file(s) selected
-   *
-   * @param folderId
-   * @param fileArray
-   */
-  function getMeta(folderId, fileArray) {
-
-    // commence loading!
-    detailsContainer.find('.loading').show()
-
-    // retrieve folder
-    if(fileArray === undefined) {
-
-      $j.post("/ajax/resource/meta.php", {folderId: folderId}, function(response) {
-
-        var meta = JSON.parse(response), mime;
-
-        folderDetail.find('.name').html(meta.name)
-        folderDetail.find('.template').html(meta.template)
-
-
-        if(meta.template) {
-          mime = '/images/icons/128x128/home.png'
-        }
-        else {
-          mime = '/images/icons/128x128/folder.png'
-        }
-        folderDetail.find('img').attr('src', mime).attr('alt', meta.name)
-
-
-        if(meta.type) {
-          folderDetail.find('p.type').show()
-          folderDetail.find('span.type').html(meta.type + ' Group')
-
-          if(meta.joinable == 1) {
-            folderDetail.find('.join-btn').show()
-          }
-          else {
-            folderDetail.find('.join-btn').hide()
-          }
-        }
-        else {
-          folderDetail.find('p.type').hide()
-        }
-
-        // create the list of permission to display
-        var permsUL = folderDetail.find('ul.perms')
-        permsUL.html('')
-
-        $j.each(meta.permissions, function(k, perm) {
-          permsUL.append('<li><b>' + perm.group + '</b>: ' + accessLevels[perm.access] + '</li>')
-        })
-
-        if(meta.permissions.length == 0) {
-          folderDetail.find('h4.perms').hide();
-        }
-        else {
-          folderDetail.find('h4.perms').show();
-        }
-
-        // list of actions to display
-        var actionButtons = folderDetail.find('.actions a')
-        actionButtons.hide()
-        $j.each(meta.actions, function(k, v) {
-          actionButtons.filter('.r'+v).show()
-        })
-
-        if(meta.actions.length == 0) {
-          folderDetail.find('h4.actions').hide();
-        }
-        else {
-          folderDetail.find('h4.actions').show();
-        }
-
-        folderDetail.find('.actions').data('kind', 'folder').data('id', meta.id)
-
-        fileDetail.hide()
-        multiFileDetail.hide()
-        folderDetail.show()
-
-      })
-    }
-
-    // retrieve file
-    else if(fileArray instanceof Object) {
-
-      var idList = {}, i = 0
-      $j(fileArray).each(function() {
-        var type = $j(this).hasClass('link') ? 'link' : 'file';
-        if(typeof(idList[type]) == 'undefined') {
-          idList[type] = []
-        }
-        idList[type].push($j(this).attr('id').substring(5))
-      })
-
-      $j.post("/ajax/resource/meta.php", {folderId: folderId, files: idList}, function(response) {
-
-        var meta = JSON.parse(response)
-
-        // show multi
-        if(typeof(meta.name) == 'undefined') {
-
-          multiFileDetail.find('.count').html($j('#file-list tr.selected').length + ' files selected')
-          multiFileDetail.find('.actions').data('id', idList)
-          multiFileDetail.find('img').attr('src', '/images/mime/128x128/multi.png')
-
-          fileDetail.hide()
-          folderDetail.hide()
-          multiFileDetail.show()
-        }
-
-        // show single
-        else {
-
-          fileDetail.find('.name').html(meta.name)
-          fileDetail.find('.description').html(meta.description)
-          fileDetail.find('.meta-who').html(meta.posted_by)
-          fileDetail.find('.meta-when').html(meta.posted_date)
-
-          // link, display link icon
-          if(meta.kind == 'link') {
-            fileDetail.find('img').attr('src', '/images/mime/128x128/html_alt1.png').attr('alt', meta.name)
-          }
-          // mime not defined, bummer
-          else if(typeof(meta.mime) == 'undefined') {
-            fileDetail.find('img').attr('src', '/images/mime/128x128/mime.png').attr('alt', meta.name)
-          }
-          // image, display a preview
-          else if(meta.mime.match(/image.*/)) {
-            fileDetail.find('img').attr('src', '/cms/image.php?id='+meta.id+'&width=128&height=128').attr('alt', meta.name)
-          }
-          // file, display appropriate mime icon
-          else {
-            fileDetail.find('img').attr('src', '/images/mime/128x128/'+meta.mime).attr('alt', meta.name)
-          }
-
-          // show filesize if available
-          if(typeof(meta.filesize) == 'undefined') {
-            fileDetail.find('.filesize').html('');
-          }
-          else {
-            fileDetail.find('.filesize').html('('+meta.filesize+')')
-          }
-
-          // does the hidden warning show?
-          if(meta.hidden == 1) {
-            fileDetail.find('.hidden-warning').show()
-            fileDetail.find('img').css('opacity', '0.4');
-          }
-          else {
-            fileDetail.find('.hidden-warning').hide()
-            fileDetail.find('img').css('opacity', '1');
-          }
-
-          // list of actions to display
-          var actionButtons = fileDetail.find('.actions a')
-          actionButtons.hide()
-          $j.each(meta.actions, function(k, v) {
-            actionButtons.filter('.r'+v).show()
-          })
-
-          if(meta.actions.length == 0) {
-            fileDetail.find('h4.actions').hide();
-          }
-          else {
-            fileDetail.find('h4.actions').show();
-          }
-
-          fileDetail.find('.actions').data('id', meta.id).data('kind', meta.kind)
-
-          multiFileDetail.hide()
-          folderDetail.hide()
-          fileDetail.show()
-        }
-      })
-    }
-
-    // loading complete!
-    detailsContainer.find('.loading').hide()
-
-  }
-
+  threePanel.resizePanels()
+	$j(window).resize(threePanel.resizePanels());
 
   var actions = {
     cms : {
@@ -497,61 +295,33 @@ $j(function() {
       homepage : function(id) {
         window.open('/homepage/' + id, '_self')
       }
+    },
+    multi : {
+      delete : function() {
+        var selected = $j('#file-list tr.selected'), fileList = '', linkList = '', id
+
+        if(selected.length > 1) {
+          selected.each(function() {
+            id = $j(this).attr("id").substring(5) + ','
+
+            if ($j(this).hasClass('link'))
+              linkList += id
+            else
+              fileList += id
+          })
+
+          if (confirm("Are you sure you want to delete this selection?")) {
+            window.open("/cms/fileForm.php?fileList="+fileList+"&linkList="+linkList+"&deleteList=1", "_self")
+          }
+        }
+      }
     }
   }
 
   // bind actions to buttons
   $j(document).ready(function() {
-
-    // note: if jquery ever gets updated, .delegate() will probably need to be replaced with .on()
-    $j('#detail-window').delegate('a.btn', 'click', function(event) {
-//      console.log(this)
-
-      var a = $j(this);
-      var context = a.parent();
-
-      var kind = context.data('kind')
-      var id = context.data('id')
-      var action = a.data('action')
-
-//      console.log(a.attr('class'), context.attr('class'));
-
-      // is file or link
-      if(context.hasClass('rfile')) {
-        actions.cms[action](kind, id)
-      }
-      // is a folder
-      else if(context.hasClass('rfolder')) {
-        actions.folder[action](id)
-      }
-      // is multifile
-      else {
-        if(action == 'delete') {
-
-          var selected = $j('#file-list tr.selected'), fileList, linkList;
-          if (selected.length > 1) {
-
-            var fileList = '', linkList = '';
-            selected.each(function () {
-              if ($j(this).hasClass('link'))
-                linkList += $j(this).attr("id").substring(5) + ',';
-              else
-                fileList += $j(this).attr("id").substring(5) + ',';
-            });
-
-            if (confirm("Are you sure you want to delete this selection?"))
-              window.open("/cms/fileForm.php?fileList="+fileList+"&linkList="+linkList+"&deleteList=1","_self");
-
-          }
-
-        }
-      }
-
-    });
-
-
+    threePanel.actionBind(actions)
   })
-
 });
 </script>
 

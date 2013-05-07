@@ -127,21 +127,24 @@ if (is_array($availablePages) && count($availablePages)) {
 
 /* Render options
  */
-$this->setBlock('custom_head', 'publish_page', 'publish_page_block');
-
-if (is_array($allPageData) && count($allPageData)) {
-	foreach($allPageData as $currentPageData) {
-		$this->setVar(array(
-			'PUBLISH_PAGE_PAGE_ID' => $currentPageData['pageId'],
-			'PUBLISH_PAGE_PAGE_OWNER_ID' => $currentPageData['pageOwnerId'],
-			'PUBLISH_PAGE_PAGE_NAME' => $currentPageData['pageTitle'],
-			'PUBLISH_PAGE_COMPONENT_INSTANCE_ID' => $currentPageData['componentInstanceId'],
-			'PUBLISH_PAGE_COMPONENT_NAME' => $currentPageData['componentName'],
-		));
-
-		$this->parse('publish_page_block', 'publish_page', true);
-	}
-}
+//$this->setBlock('custom_head', 'publish_page', 'publish_page_block');
+//
+//if (is_array($allPageData) && count($allPageData)) {
+//	foreach($allPageData as $currentPageData) {
+//		$this->setVar(array(
+//			'PUBLISH_PAGE_PAGE_ID' => $currentPageData['pageId'],
+//			'PUBLISH_PAGE_PAGE_OWNER_ID' => $currentPageData['pageOwnerId'],
+//			'PUBLISH_PAGE_PAGE_NAME' => $currentPageData['pageTitle'],
+//			'PUBLISH_PAGE_COMPONENT_INSTANCE_ID' => $currentPageData['componentInstanceId'],
+//			'PUBLISH_PAGE_COMPONENT_NAME' => $currentPageData['componentName'],
+//		));
+//
+//		$this->parse('publish_page_block', 'publish_page', true);
+//	}
+//}
+//else {
+//	$this->setVar('publish_page_block', '');
+//}
 
 
 $fileList = $fileHandler->getAllInFolder($openFolder);
