@@ -13,9 +13,6 @@ $page = new SitePage();
 switch($_POST['action']) {
     case 'Add':
     case 'Update':
-        $dateObj = new Alaress_Date_Format($_POST['startDate'], 'd/m/y');
-        $date = $dateObj->getUnixTimestamp();
-
         $untilObj = new Alaress_Date_Format($_POST['repeat_until'], 'd/m/y');
         $until = $untilObj->getUnixTimestamp();
 
@@ -67,12 +64,24 @@ switch($_POST['action']) {
 
             $event['series_id'] = $calendarHandler->getUpperSeriesIndex() + 1;
 
-            for ($date; $date <= $until; $date = strtotime($validRepeat[$_POST['repeat']], $date)) {
+            //
+            // Repeat of events: repeat until the start date is after the until
+            // date (or x100, whatever is less)
+            for ($start_timestamp = $startDate->getUnixTimestamp(),
+                 $end_timestamp   = $endDate->getUnixTimestamp();
+                 $start_timestamp <= $until;
+                 $start_timestamp = strtotime($validRepeat[$_POST['repeat']], $start_timestamp),
+                 $end_timestamp   = strtotime($validRepeat[$_POST['repeat']], $end_timestamp)
+            ) {
                 if ($i++ > 100) {
                     break;
                 }
-                $this_date = new Alaress_Date_Format($date, 'U');
-                $dateArray[] = $this_date->getDatabaseDate();
+                $this_start_date = new Alaress_Date_Format($start_timestamp, 'U');
+                $this_end_date   = new Alaress_Date_Format($end_timestamp,   'U');
+                $dateArray[] = array(
+                    'start' => $this_start_date->getDatabaseDate(),
+                    'end'   => $this_end_date->getDatabaseDate(),
+                );
             }
         }
 
@@ -83,7 +92,10 @@ switch($_POST['action']) {
 
         // no repeat
         else {
-            $dateArray[] = $dateObj->getDatabaseDate();
+            $dateArray[] = array(
+                'start' => $startDate->getDatabaseDate(),
+                'end'   => $endDate->getDatabaseDate(),
+            );
         }
 
         if (is_numeric($_POST['id'])) {
@@ -94,23 +106,24 @@ switch($_POST['action']) {
 
                 $series = $calendarHandler->getAllInSeriesByEventID($_POST['id']);
 
-				foreach($series as $seriesEvent) {
+                foreach($series as $seriesEvent) {
                     $event['id'] = $seriesEvent['id'];
                     $calendarHandler->update($event);
                 }
             }
             else if($_POST['efficacy'] == 'self') {
                 $event['id'] = $_POST['id'];
-                $event['startDate'] = $dateArray[0];
+                $event['startDate'] = $dateArray[0]['start'];
+                $event['endDate']   = $dateArray[0]['end'];
                 $calendarHandler->update($event);
             }
 
 
         }
         else {
-            for ($i = 0; $i < count($dateArray); $i++) {
-                $event['startDate'] = $dateArray[$i];
-
+            foreach ($dateArray as $dates) {
+                $event['startDate'] = $dates['start'];
+                $event['endDate']   = $dates['end'];
                 $calendarHandler->create($event);
             }
         }
