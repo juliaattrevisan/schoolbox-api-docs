@@ -47,7 +47,7 @@ $j(function () {
 
     /* Datepickers for event date, repeat until and publish date
      */
-    $j('#cal_date, #repeat_until, #publishDate').datepicker({
+    $j('#startDate, #endDate, #repeat_until, #publishDate').datepicker({
         dateFormat:'dd/mm/yy',
         showOn:'both',
         buttonImage:'/images/core/calendar/calendar-click.png',
@@ -203,6 +203,21 @@ $j(function () {
             $j('.adv_hide').queue('fx', []);
         }
     });
+
+    $j('#allday').click(function()  {
+        if($j(this).is(':checked')) {
+            $j('.timeInputs').each(function () {
+                $j(this).hide();
+            });
+
+        }
+        else{
+
+            $j('.timeInputs').each(function () {
+                $j(this).show();
+            });
+        }
+    });
 });
 </script>
 <!-- END custom_head -->
@@ -229,11 +244,12 @@ $j(function () {
         </tr>
         <tr>
             <td class="formLabelWidth" valign="top">
-				<h4>Start Date and Time</h4>
-                <em>The dateon which the event will begin. The date should be formatted like this dd/mm/yyyy. </em>
+				<h4>When</h4>
+                <em>Uncheck all day to enter times aswell.</em>
             </td>
             <td>
-				<input name="startDate" type="text" size="15" maxlength="30" value="{START_DATE}"/>
+				<input id="startDate" name="startDate" type="text" size="15" maxlength="30" value="{START_DATE}"/>
+                <span class="timeInputs {TIME_OFF}">
 				<input name="startHour" type="text" maxlength="2" value="{START_HOUR}" class="timeField"/>:
 				<input name="startMinute" type="text" maxlength="2" value="{START_MIN}" class="timeField"/>
 
@@ -241,34 +257,26 @@ $j(function () {
 					<option value="am" {START_AM} >AM</option>
 					<option value="pm" {START_PM} >PM</option>
 				</select>
+                </span>
+
+                to
+
+                <input id="endDate" name="endDate" type="text" size="15" maxlength="30" value="{END_DATE}"/>
+                <span class="timeInputs {TIME_OFF}">
+                <input name="endHour" type="text" maxlength="2" value="{END_HOUR}" class="timeField"/>:
+                <input name="endMinute" type="text" maxlength="2" value="{END_MIN}" class="timeField"/>
+
+                <select name="endPeriod">
+                    <option value="am" {END_AM}>AM</option>
+                    <option value="pm" {END_PM}>PM</option>
+                </select>
+                </span>
+                <br />
+                <input name="allday" type="hidden"   value="0" />
+                <label for="allday" class="float-left clear">
+                <input name="allday" id="allday" type="checkbox" value="1" {ALLDAY_CHECKED} class="allday" />All Day</label>
 			</td>
         </tr>
-		<tr>
-			<td class="formLabelWidth" valign="top">
-				<h4>End Date and Time</h4>
-				<em>The date on which the event will end. The date should be formatted like this dd/mm/yyyy. </em>
-			</td>
-			<td>
-				<input name="endDate" type="text" size="15" maxlength="30" value="{END_DATE}"/>
-				<input name="endHour" type="text" maxlength="2" value="{END_HOUR}" class="timeField"/>:
-				<input name="endMinute" type="text" maxlength="2" value="{END_MIN}" class="timeField"/>
-
-				<select name="endPeriod">
-					<option value="am" {END_AM}>AM</option>
-					<option value="pm" {END_PM}>PM</option>
-				</select>
-			</td>
-		</tr>
-		<tr>
-			<td class="formLabelWidth" valign="top">
-				<h4>All day event?</h4>
-				<em>If this is checked, then the start and end time will be ignored.</em>
-			</td>
-			<td>
-				<input name="allday" type="hidden"   value="0" />
-				<input name="allday" type="checkbox" value="1" {ALLDAY_CHECKED} class="allday" />
-			</td>
-		</tr>
         <tr class="advanced adv_hide" {SHOW_ADVANCED}>
         	<td class="formLabelWidth" valign="top" {OPAC_ADVANCED}>
 				<h4>Publish Date</h4>
