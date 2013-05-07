@@ -39,7 +39,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 		}
 		else {
 			$end = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d h:i:s');
-			//$end->addDays(1);
+			$end->addDays(1);
 		}
 
 		/* Today's date
@@ -55,7 +55,6 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 		$composite = $eventFactory->produce();
 
 		$this->eventList = $composite->getEvents($start->getUnixTimestamp(), $end->getUnixTimestamp());
-		$this->eventList->sort();
 
         return true;
     }
@@ -95,14 +94,15 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
 	    foreach($iterator as $currentEvent) {
 
-
 		    $currentDay = $currentEvent->getStartTime();
-		    $this->setVar('LIST_DATE', $currentDay->getDateOnly());
-
 		    if($prevDay != false && $currentDay->getDateOnly() != $prevDay->getDateOnly()){
 			    $this->parse('day_block','day', true);
 			    $this->setVar('note_listing', '');
 		    }
+
+		    $this->setVar('LIST_DATE', $currentDay->getDateOnly());
+
+
 
 			if($currentEvent instanceof Calendar_Event_Type_Submission) {
 
@@ -241,6 +241,9 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
 		    $prevDay = $currentDay;
 	    }
+
+
+	    $this->parse('day_block','day',true);
 
         return true;
     }
