@@ -31,8 +31,7 @@ class Calendar_Api_Factory {
 		/* These configs are base64-encode()'d to get around a weird issue with unserialize
 		 * http://stackoverflow.com/questions/4264270/unserialize-sometimes-returns-false
 		 */
-		for ($allConfigRecords->rewind(); $allConfigRecords->valid(); $allConfigRecords->next()) {
-			$currentConfig = $allConfigRecords->current();
+		foreach($allConfigRecords as $currentConfig) {
 
 			$config = $currentConfig->decodeConfig();
 

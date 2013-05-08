@@ -483,7 +483,6 @@ class Calendar extends DeprecatedModel {
             foreach ($submissions as $submission) {
                 $event = new Calendar_Event_Type_Submission();
 
-                $event->setDate(new Alaress_Date_Format($submission['date'], 'y-m-d h:i:s'));
                 $event->setCategoryId($submission['cid']);
                 $event->setCategoryName($submission['category']);
                 $event->setCategoryCodes($submission['synergyCode']);
@@ -493,7 +492,8 @@ class Calendar extends DeprecatedModel {
                 $event->setSubmissionBoxName($submission['name']);
                 $event->setSubmissionBoxDetail($submission['description']);
                 $event->setColour($this->displayColour(4));
-                $event->setStartTime(new Alaress_Date_Format($submission['date'], 'y-m-d h:i:s'));
+	            $event->setStartTime(new Alaress_Date_Format($submission['date'], 'y-m-d h:i:s'));
+		        $event->setAllDay(stristr($submission['date'], '23:59:59'));
 
                 $stack->add($event);
             }
@@ -640,9 +640,6 @@ class Calendar extends DeprecatedModel {
             }
         }
 
-		$start = new Alaress_Date_Format($startTimestamp, 'U');
-		$end = new Alaress_Date_Format($endTimestamp, 'U');
-
         //get single events for the day
         $query = "
 			SELECT DISTINCT event.id, owner,
@@ -672,16 +669,16 @@ class Calendar extends DeprecatedModel {
 					/* Start display in the middle of multi-day events that have already begun at some point
 					 * in the past
 					 */
-					((startDate <= '{$start->getDatabaseDate()}') AND (endDate <= '{$end->getDatabaseDate()}'))
+					((DATE(startDate) <= DATE(FROM_UNIXTIME('{$startTimestamp}'))) AND (DATE(endDate) < DATE(FROM_UNIXTIME('{$endTimestamp}'))))
 					OR
 					/* Start display for events that are still coming up within the specified time interval
 					 */
-					((startDate >= '{$start->getDatabaseDate()}') AND (startDate <= '{$end->getDatabaseDate()}'))
+					((DATE(startDate) >= DATE(FROM_UNIXTIME('{$startTimestamp}'))) AND (DATE(startDate) < DATE(FROM_UNIXTIME('{$endTimestamp}'))))
 				)
 				/* Don't include events that have already ended
 				 */
 				AND (
-					endDate >= '{$start->getDatabaseDate()}'
+					endDate >= FROM_UNIXTIME('{$startTimestamp}')
 				)
 			GROUP BY id
 			ORDER BY event.startTime, event.endTime

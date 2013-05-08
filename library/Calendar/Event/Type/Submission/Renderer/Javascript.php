@@ -57,8 +57,11 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
 
 			/* Congeal all that stuff
 			 */
-			$start = $currentEvent->getStartTime()->getDatabaseDate() . ' ' . $currentEvent->getStartTime()->getDatabaseTime();
-//			$end = $currentEvent->getEndTime()->getDatabaseDate() . ' ' . $currentEvent->getEndTime()->getDatabaseTime();
+			$start   = $currentEvent->getStartTime()->getDatabaseDate();
+			$all_day = $currentEvent->getAllDay();
+			if (!$all_day) {
+				$start .= ' ' . $currentEvent->getStartTime()->getDatabaseTime();
+			}
 
 			$event = array(
 				'title' => $currentEvent->getNote(),
@@ -75,7 +78,7 @@ class Calendar_Event_Type_Submission_Renderer_Javascript extends Calendar_Event_
 				 * Schoolbox usage would be that all events are not
 				 * allDay events
 				 */
-				'allDay' => false,
+				'allDay' => $all_day,
 
 				/* Colour of the event
 				 */
