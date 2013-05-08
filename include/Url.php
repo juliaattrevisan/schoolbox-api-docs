@@ -64,7 +64,7 @@ class Url
     public function isUrl()
     {
         $cmp = @parse_url($this->getUrl());
-print_r($cmp);
+
         if (is_array($cmp) && isset($cmp['host'])) {
             return true;
         }
