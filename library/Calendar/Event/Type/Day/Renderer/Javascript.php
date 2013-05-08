@@ -159,7 +159,7 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 			}
 
 			$event = array(
-				'title' => $currentEvent->getNote(),
+				'title' => Scrub::text($currentEvent->getNote()),
 				'start' => "$start",
 				'end' => "$end",
 
@@ -186,8 +186,8 @@ class Calendar_Event_Type_Day_Renderer_Javascript extends Calendar_Event_Type_Re
 					'meta' => array(
 						'eventId' => $currentEvent->getEventId(),
 						'time' => $currentEvent->getTime(),
-						'detail' => $currentEvent->getDetail(),
-						'location' => $currentEvent->getLocation(),
+						'detail' => Scrub::html(nl2br($currentEvent->getDetail())),
+						'location' => Scrub::text($currentEvent->getLocation()),
 						'eventTypeId' => $currentEvent->getType(),
 						'eventType' => 'type' . $currentEvent->getType(),
 						'type' => $currentEvent->getEventType(),
