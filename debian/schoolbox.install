@@ -1,6 +1,7 @@
 # Directories.
 www/conf/* /etc/schoolbox/examples
 tools/cron/* /etc/cron.d
+tools/logrotate/* /etc/logrotate.d
 dav /usr/share/schoolbox
 include /usr/share/schoolbox
 library /usr/share/schoolbox

@@ -17,4 +17,4 @@
 
 # Due Work Notifications
 # -- Not to be run for dev other can spam emails to users during testing
-#*/15 * * * *    root    php /usr/share/schoolboxdev/tools/submission/notify_students.php --send --upcoming --overdue >> /var/log/schoolboxdev-duework-`date -I`.log 2>/dev/null
+#*/15 * * * *    root    php /usr/share/schoolboxdev/tools/submission/notify_students.php --send --upcoming --overdue >> /var/log/schoolboxdev-duework.log 2>/dev/null
