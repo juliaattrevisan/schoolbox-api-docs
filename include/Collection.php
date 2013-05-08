@@ -9,7 +9,7 @@
  * 
  */
  
-class Collection implements ArrayAccess, Iterator, Countable {
+class Collection implements ArrayAccess, ICollection {
 
     protected $container;
 
@@ -46,6 +46,15 @@ class Collection implements ArrayAccess, Iterator, Countable {
 
     public function toArray () {
         return $this->container;
+    }
+
+    /**
+     * Add item to end of this collection
+     *
+     * @param $value
+     */
+	public function add($value) {
+        $this[] = $value;
     }
 
     /* ArrayAccess interface methods */
