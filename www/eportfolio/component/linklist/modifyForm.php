@@ -29,9 +29,10 @@ if ($authenticator->canModify()) {
 		/* Check if it's a valid url before putting in db
 		 */
 		$url = new Url($content);
-		$url->prependScheme();
 
 		if ($url->isUrl()) {
+			$url->prependScheme();
+
 			$listItem = new \Component\Eportfolio\LinkList();
 			$listItem->setComponentInstanceId($componentInstanceId);
 			$listItem->setTitle($title);
@@ -51,9 +52,10 @@ if ($authenticator->canModify()) {
 		/* Check if it's a valid url before putting in db
 		 */
 		$url = new Url($content);
-		$url->prependScheme();
 
 		if ($url->isUrl()) {
+			$url->prependScheme();
+
 			$listItem = \Component\Eportfolio\LinkListMapper::getInstance()->findById($listItemId);
 			$listItem->setTitle($title);
 			$listItem->setContent($url->getUrl());
