@@ -177,10 +177,22 @@ class Eportfolio_Authenticator {
 			$youCanView = true;
 		}
 
-		/* These pages are always public
+		/* These pages are hardcoded and have special conditions
 		 */
 		if (in_array($this->getPageId(), $this->getPublicPages())) {
-			$youCanView = true;
+
+			/* Parents of the page owner are allowed
+			 */
+			if ($this->getGroupHandler()->isParent()) {
+				if ($this->getGroupHandler()->isParentOfChild($this->getOwnerId())) {
+					$youCanView = true;
+				}
+			}
+			/* All students are allowed
+			 */
+			else {
+				$youCanView = true;
+			}
 		}
 
 		/* And now...the conclusion.
