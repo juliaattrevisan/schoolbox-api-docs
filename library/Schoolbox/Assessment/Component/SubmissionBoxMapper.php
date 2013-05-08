@@ -696,13 +696,14 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		if (empty($category_list)) {
 			return $collection;
 		}
-		$from_date = new \Alaress_Date_Format($from_timestamp, 'U');
-		$to_date   = new \Alaress_Date_Format($to_timestamp,   'U');
+
+		$cat_mapper  = $this->getJoinMapper('category');
+		$user_mapper = $this->getJoinMapper('owner');
 		$query = "
 			SELECT
 				{$this->getColumnString('sb')},
-				{$this->getJoinMapper('category')->getColumnString('c')},
-				{$this->getJoinMapper('owner')->getColumnString('u')}
+				{$cat_mapper->getColumnString('c')},
+				{$user_mapper->getColumnString('u')}
 			FROM {$this->getTable()} sb
 			LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
 			LEFT JOIN {$this->getJoinSql('owner',    'sb', 'u')}
@@ -710,19 +711,29 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			AND sb.date BETWEEN :from_date AND :to_date
 			ORDER BY sb.date ASC
 		";
-		$params = $this->getArrayParameters($category_list, 'category');
+
+		//
+		// Build parameters
+		$from_date = new \Alaress_Date_Format($from_timestamp, 'U');
+		$to_date   = new \Alaress_Date_Format($to_timestamp,   'U');
+		$params    = $this->getArrayParameters($category_list, 'category');
 		$params['from_date'] = $from_date->getDatabaseDate();
 		$params['to_date']   = $to_date->getDatabaseDate();
 		$statement = $this->database->prepare($query);
 		$statement->execute($params);
 
-		$cat_mapper = $this->getJoinMapper('category');
+		//
+		// Hydrate as activity list, then add category codes
 		foreach ($statement as $row) {
 			$box = $this->hydrate($row, 'sb');
-			$box->setOwner($this->getJoinMapper('owner')->hydrate($row, 'u'));
-			$box->setCategory($this->getJoinMapper('category')->hydrate($row, 'c'));
+			$box->setOwner($user_mapper->hydrate($row, 'u'));
+			$box->setCategory($cat_mapper->hydrate($row, 'c'));
 			$collection->add($factory->buildFromSubmissionBox($box, 'overdue'));
 		}
+		$cat_mapper->getJoinMapper('codes')->applyCodesToCategories(
+			$collection,
+			function($item) { return $item->getCategory(); }
+		);
 		return $collection;
 	}
 }
