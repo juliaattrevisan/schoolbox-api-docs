@@ -1081,6 +1081,7 @@ Notifications
 --------------------------------------------------------------*/
 .profile-info {
   overflow: auto;
+  margin: 0 0 30px 0;
   dl{
     dt{ width: 20%; padding: 5px 0 5px 0; }
     dd{ width: 80%; padding: 5px 0 5px 0; margin: 0; min-height: 14px; }
@@ -1129,7 +1130,7 @@ Notifications
   border: 1px solid #ffe6b5;
   float: left;
   display: block;
-  margin: 14px 0;
+  margin: 24px 0 0 0;
   padding: 10px 7px;
   width: 97%;
   img{
@@ -1141,7 +1142,7 @@ Notifications
 .school-info{
   clear: both;
   float: left;
-  margin: 0 0 18px 0;
+  margin: 18px 0 18px 0;
 }
 
 .directory {
@@ -1149,7 +1150,6 @@ Notifications
   display: block;
   width: 100%;
   .subjects{
-    border-left: 1px solid @border-color;
     width: 73%;
     float: left;
     margin: 0 2% 0 0;
@@ -1164,10 +1164,10 @@ Notifications
     float: left;
   }
   li{
-    border-bottom: 1px solid @border-color;
     border-right: 1px solid @border-color;
     position: relative;
     a{display: block;
+      border-bottom: 1px solid @border-color;
       padding: 7px 0px;
       height: 32px;
       color: #000;
@@ -1179,7 +1179,7 @@ Notifications
     .to-subject{
       background: url('/images/famicons/house.png') 15px 18px no-repeat;
       border-bottom: 1px solid @border-color;
-      height: 27px;
+      height: 26px;
       display: block;
       padding: 20px 49px 0 52px;
       font-weight: bold;
@@ -1233,7 +1233,6 @@ Notifications
   position: relative;
   .mobile{
     background: url('/images/famicons/phone.png') 8px 7px no-repeat;
-    border-top: 1px solid @border-color;
     border-bottom: 1px solid @border-color;
     display: block;
     padding: 8px 0 8px 35px;
@@ -1304,6 +1303,7 @@ Notifications
 
 .phone{
   background: url('/images/famicons/telephone.png') 8px 7px no-repeat;
+  border-bottom: 1px solid @border-color;
   display: block;
   padding: 8px 0 8px 35px;
 }
@@ -1344,6 +1344,11 @@ Notifications
   }
 }
 
+.profile-groups{
+  overflow: auto;
+  clear: both;
+  margin: 30px 0 0 0;
+}
 /*--------------------------------------------------------------
  SEARCH
 --------------------------------------------------------------*/
