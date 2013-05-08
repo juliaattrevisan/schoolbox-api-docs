@@ -26,13 +26,20 @@ if ($authenticator->canModify()) {
 		$title = $_POST['title'];
 		$content = $_POST['content'];
 
-		$listItem = new \Component\Eportfolio\LinkList();
-		$listItem->setComponentInstanceId($componentInstanceId);
-		$listItem->setTitle($title);
-		$listItem->setContent($content);
-		$listItem->setSequence(1);
+		/* Check if it's a valid url before putting in db
+		 */
+		$url = new Url($content);
+		$url->prependScheme();
 
-		\Component\Eportfolio\LinkListMapper::getInstance()->save($listItem);
+		if ($url->isUrl()) {
+			$listItem = new \Component\Eportfolio\LinkList();
+			$listItem->setComponentInstanceId($componentInstanceId);
+			$listItem->setTitle($title);
+			$listItem->setContent($url->getUrl());
+			$listItem->setSequence(1);
+
+			\Component\Eportfolio\LinkListMapper::getInstance()->save($listItem);
+		}
 	}
 	/* Update a list item
 	 */
@@ -41,11 +48,18 @@ if ($authenticator->canModify()) {
 		$title = $_POST['title'];
 		$content = $_POST['content'];
 
-		$listItem = \Component\Eportfolio\LinkListMapper::getInstance()->findById($listItemId);
-		$listItem->setTitle($title);
-		$listItem->setContent($content);
+		/* Check if it's a valid url before putting in db
+		 */
+		$url = new Url($content);
+		$url->prependScheme();
 
-		\Component\Eportfolio\LinkListMapper::getInstance()->save($listItem);
+		if ($url->isUrl()) {
+			$listItem = \Component\Eportfolio\LinkListMapper::getInstance()->findById($listItemId);
+			$listItem->setTitle($title);
+			$listItem->setContent($url->getUrl());
+
+			\Component\Eportfolio\LinkListMapper::getInstance()->save($listItem);
+		}
 	}
 	/* Delete a list item
 	 */

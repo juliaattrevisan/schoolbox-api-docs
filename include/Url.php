@@ -64,13 +64,24 @@ class Url
     public function isUrl()
     {
         $cmp = @parse_url($this->getUrl());
-
+print_r($cmp);
         if (is_array($cmp) && isset($cmp['host'])) {
             return true;
         }
 
         return false;
     }
+
+	/**
+	 * Prepend a scheme if one wasn't found
+	 */
+	public function prependScheme() {
+		$scheme = parse_url($this->getUrl(), PHP_URL_SCHEME);
+
+		if (!$scheme) {
+			$this->setUrl('http://' . $this->getUrl());
+		}
+	}
 
     /**
      * Returns true if the url is for a local page
