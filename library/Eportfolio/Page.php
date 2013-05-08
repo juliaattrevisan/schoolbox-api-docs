@@ -199,11 +199,33 @@ class Page {
 	 */
 	public $top_hover;
 
+	/**
+	 * Created at
+	 *
+	 * @var
+	 */
 	private $created_at;
 
+	/**
+	 * Updated at
+	 *
+	 * @var
+	 */
 	private $updated_at;
 
+	/**
+	 * Deleted at
+	 *
+	 * @var
+	 */
 	private $deleted_at;
+
+	/**
+	 * A collection of permissions
+	 *
+	 * @var
+	 */
+	private $permissions;
 
 	/* Getters/Setters
 	 */
@@ -746,5 +768,23 @@ class Page {
 	 */
 	public function getUpdatedAt() {
 		return $this->updated_at;
+	}
+
+	/**
+	 * Set permissions
+	 *
+	 * @param  $permissions
+	 */
+	public function setPermissions($permissions) {
+		$this->permissions = $permissions;
+	}
+
+	/**
+	 * Get permissions
+	 *
+	 * @return
+	 */
+	public function getPermissions() {
+		return $this->permissions;
 	}
 }
