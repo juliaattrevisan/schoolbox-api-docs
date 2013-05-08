@@ -14,18 +14,14 @@ use Schoolbox;
 class PermissionMapper extends Schoolbox\Mapper {
 
 	/**
-	 * Database table
-	 *
-	 * @var string
-	 */
-	protected $table = 'eportfolio_permission';
-
-	/**
 	 * Define column/property mapping
 	 *
 	 * @return Bool|void
 	 */
 	protected function mapping() {
+		$this->hasTable('eportfolio_permission');
+		$this->hasModel('\\Eportfolio\\Permission');
+
 		$this->hasMap(array(
 			'column'     => 'id',
 			'property'   => 'id',

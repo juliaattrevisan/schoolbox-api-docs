@@ -7,8 +7,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+namespace Eportfolio;
 
-class Eportfolio_Permission extends Model {
+class Permission {
 
 	/**
 	 * The permission id
