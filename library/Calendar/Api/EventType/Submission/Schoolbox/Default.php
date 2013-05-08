@@ -46,7 +46,6 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 		foreach ($box_mapper->getDueActivities($category_id_list, $startTimestamp, $endTimestamp) as $activity) {
 			$event = new Calendar_Event_Type_Submission();
 			$submission_box = $activity->getSubmissionBox();
-			$event->setDate($activity->getDate());
 			$event->setCategoryId($activity->getCategory()->getId());
 			$event->setCategoryName($activity->getCategory()->getName());
 //			$event->setCategoryCodes($submission['synergyCode']);
@@ -66,7 +65,6 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 		foreach ($assess_mapper->getDueActivities($category_id_list, $startTimestamp, $endTimestamp) as $activity) {
 			$event = new Calendar_Event_Type_Submission();
 			$assessment = $activity->getAssessment();
-			$event->setDate($activity->getDate());
 			$event->setCategoryId($activity->getCategory()->getId());
 			$event->setCategoryName($activity->getCategory()->getName());
 //			$event->setCategoryCodes($submission['synergyCode']);

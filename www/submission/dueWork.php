@@ -187,7 +187,7 @@ $event_api  = new Calendar_Api_EventType_Submission_Schoolbox_Default(null);
 $event_list = $event_api->getEvents($startDay, strtotime("+$totalDays day", $startDay));
 $event_list_by_day = array();
 foreach ($event_list->createIterator() as $event_object) {
-    $date = $event_object->getDate()->getUsingFormat('dmY');
+    $date = $event_object->getStartTime()->getUsingFormat('dmY');
     $event_list_by_day[$date][] = $event_object;
 }
 
@@ -219,7 +219,7 @@ for ($i = 0; $i < $totalDays; $i++) {
 //        ) && $event['accept_submission']);
 
 //        $date = new Alaress_Date_Format(strtotime($event['date']), 'U');
-        $date = $event->getDate();
+        $date = $event->getStartTime();
 
         $event_id = $event->getSubmissionBoxId();
 //        if ($event['is_assessment']) {
