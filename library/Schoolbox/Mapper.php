@@ -148,4 +148,15 @@ class Mapper extends BaseMapper {
         }
         return parent::hasMap($map);
     }
+
+    /**
+     * Override base mapper to always return new collection object
+     *
+     * @param array $contents
+     *
+     * @return Collection
+     */
+    public function createCollection($contents = array()) {
+        return new Collection($contents);
+    }
 }
