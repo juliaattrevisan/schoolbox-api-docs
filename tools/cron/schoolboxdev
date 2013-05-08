@@ -1,0 +1,20 @@
+# SchoolboxDev Cron Jobs
+# Description:
+#	Lists all automatically install cron jobs for schoolbox
+#	Deployed for running by cron into /etc/cron.d/
+# Usage:
+#	Automatically run by cron from /etc/cron.d/
+#
+# @author      Sam Bailey <sam.bailey@alaress.com.au>
+# @copyright   2013 Alaress Pty Ltd
+# @link        http://www.alaress.com.au
+#
+# m h dom mon dow user command
+
+# Video Processing
+*/5 * * * *     www-data    php /usr/share/schoolboxdev/tools/video/video-scanner.php
+*/10 * * * *    www-data    php /usr/share/schoolboxdev/tools/video/processor.php
+
+# Due Work Notifications
+# -- Not to be run for dev other can spam emails to users during testing
+#*/15 * * * *    root    php /usr/share/schoolboxdev/tools/submission/notify_students.php --send --upcoming --overdue >> /var/log/schoolboxdev-duework-`date -I`.log 2>/dev/null
