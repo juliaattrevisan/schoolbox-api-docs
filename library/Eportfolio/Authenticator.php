@@ -144,7 +144,7 @@ class Eportfolio_Authenticator {
 		for($parentSettingCollection->rewind(); $parentSettingCollection->valid(); $parentSettingCollection->next()) {
 			$current = $parentSettingCollection->current();
 
-			if (($current['value'] == 1) && $this->getGroupHandler()->isParentOfChild($this->getEportfolioHandler()->getSettingsPageOwner())) {
+			if (($current->getValue()) && $this->getGroupHandler()->isParentOfChild($this->getEportfolioHandler()->getSettingsPageOwner())) {
 				$youCanView = true;
 			}
 		}
