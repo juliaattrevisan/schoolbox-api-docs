@@ -91,7 +91,7 @@ class PermissionMapper extends Schoolbox\Mapper {
 	 */
 	private function addParentPermissions($pageId, $parent) {
 		if (is_numeric($parent)) {
-			$permission = new Eportfolio_Permission();
+			$permission = new Permission();
 			$permission->setPageId($pageId);
 			$permission->setType('parent');
 			$permission->setValue($parent);
@@ -110,7 +110,7 @@ class PermissionMapper extends Schoolbox\Mapper {
 		if (is_array($allGroups) && count($allGroups)) {
 			foreach($allGroups as $currentGroup) {
 				if (is_numeric($currentGroup)) {
-					$permission = new Eportfolio_Permission();
+					$permission = new Permission();
 					$permission->setPageId($pageId);
 					$permission->setType('group');
 					$permission->setValue($currentGroup);
@@ -131,7 +131,7 @@ class PermissionMapper extends Schoolbox\Mapper {
 		if (is_array($allIndividuals) && count($allIndividuals)) {
 			foreach($allIndividuals as $currentIndividual) {
 				if (is_numeric($currentIndividual)) {
-					$permission = new Eportfolio_Permission();
+					$permission = new Permission();
 					$permission->setPageId($pageId);
 					$permission->setType('student');
 					$permission->setValue($currentIndividual);
