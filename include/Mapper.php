@@ -300,7 +300,7 @@ abstract class Mapper {
      *
      * Different possible actions based on $object:
      * * instanceof Model: returns Collection with $object as only item
-     * * instanceof Collection or Schoolbox\Collection: returns that Collection
+     * * instanceof ICollection: returns that Collection
      * * array: returns a Collection object wrapping that array
      * * anything else: returns Collection with $object as only item
      *
@@ -310,22 +310,16 @@ abstract class Mapper {
      */
 	public function getModelAsCollection($object) {
 		if ($object instanceof Model) {
-			$collection = new Collection(array($object));
-			return $collection;
+			return $this->createCollection(array($object));
 		}
-		if ($object instanceof Collection) {
-			return $object;
-		}
-		if ($object instanceof Schoolbox\Collection) {
+		if ($object instanceof ICollection) {
 			return $object;
 		}
 		if (is_array($object)) {
-			$collection = new Collection($object);
-			return $collection;
+			return $this->createCollection($object);
 		}
 		else {
-			$collection = new Collection(array($object));
-			return $collection;
+			return $this->createCollection(array($object));
 		}
 	}
 
