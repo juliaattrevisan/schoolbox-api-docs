@@ -232,6 +232,13 @@ class PageMapper extends Schoolbox\Mapper {
 		 */
 		$allCategories = $groupHandler->involvedInCategoryList($viewerId);
 
+		$categoryIds = array();
+
+		if (is_array($allCategories) && count($allCategories)) {
+			foreach($allCategories as $currentCategory) {
+				$categoryIds[] = $currentCategory['id'];
+			}
+		}
 		/* Get all the pages with their permissions
 		 */
 		$allPages = $this->findPagesWithPermissions($ownerId);
@@ -264,7 +271,7 @@ class PageMapper extends Schoolbox\Mapper {
 
 					/* They can be in a group
 					 */
-					$isInGroup = (($currentPermission->getType() == 'group') && in_array($currentPermission->getValue(), $allCategories));
+					$isInGroup = (($currentPermission->getType() == 'group') && in_array($currentPermission->getValue(), $categoryIds));
 
 					/* They can be allowed specifically
 					 */
