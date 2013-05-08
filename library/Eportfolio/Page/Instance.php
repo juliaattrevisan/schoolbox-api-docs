@@ -436,7 +436,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		));
 
 		for ($selectedGroupIds = array(), $selectedGroups->rewind(); $selectedGroups->valid(); $selectedGroups->next()) {
-			$selectedGroupIds[] = $selectedGroups->current()->value;
+			$selectedGroupIds[] = $selectedGroups->current()->getValue();
 		}
 
 		if (is_array($allGroups) && count($allGroups)) {
@@ -482,7 +482,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		/* Just list their ids...
 		 */
 		for ($selectedIndividualIds = array(), $selectedIndividuals->rewind(); $selectedIndividuals->valid(); $selectedIndividuals->next()) {
-			$selectedIndividualIds[] = $selectedIndividuals->current()->value;
+			$selectedIndividualIds[] = $selectedIndividuals->current()->getValue();
 		}
 
 		/* ...and get their records with phenomenal cheese factor in findIn()

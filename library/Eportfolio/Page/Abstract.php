@@ -67,7 +67,7 @@ abstract class Eportfolio_Page_Abstract {
 	 *
 	 * @var int
 	 */
-	private $permission = -1;
+	protected $permission = -1;
 
 	/**
 	 * Constructor

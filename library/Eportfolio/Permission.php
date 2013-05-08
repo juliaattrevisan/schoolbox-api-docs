@@ -16,28 +16,28 @@ class Permission {
 	 *
 	 * @var int
 	 */
-	public $id = null;
+	private $id = null;
 
 	/**
 	 * The page to which the permission applies
 	 *
 	 * @var int
 	 */
-	public $page_id = -1;
+	private $page_id = -1;
 
 	/**
 	 * The type of permission
 	 *
 	 * @var string
 	 */
-	public $type = '';
+	private $type = '';
 
 	/**
 	 * Permission value (usually an id)
 	 *
 	 * @var string
 	 */
-	public $value = '';
+	private $value = '';
 
 	/* Getters/Setters
 	 */
