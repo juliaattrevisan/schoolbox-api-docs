@@ -98,5 +98,35 @@ class Alaress_Image_Transformation_Storage extends Alaress_Image_Transformation_
 				'method' => 'Sharpen'
 			),
 		),
+
+		/* ePortfolio Image Gallery list needs to be a square
+		 */
+		'eportfolioImageGalleryThumbnail' => array(
+			array(
+				'method' => 'Rectangle',
+				'args' => array(
+					'width' => 80,
+					'height' => 80,
+				)
+			),
+			array(
+				'method' => 'Sharpen'
+			),
+		),
+
+		/* ePortfolio Image Gallery can probably be lightboxed
+		 */
+		'eportfolioImageGalleryLarge' => array(
+			array(
+				'method' => 'Constrain',
+				'args' => array(
+					'width' => 800,
+					'height' => 800,
+				)
+			),
+			array(
+				'method' => 'Sharpen'
+			),
+		),
     );
 }
