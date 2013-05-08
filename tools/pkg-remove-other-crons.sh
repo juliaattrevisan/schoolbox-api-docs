@@ -15,8 +15,6 @@
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};
 
-instdir=`readlink -f $fullpath/../`;
-
 helpmsg() {
 	echo "Usage: pkg-remove-other-crons.sh [schoolbox|schoolboxdev]";
 	exit 1;
@@ -27,7 +25,6 @@ then
 	helpmsg;
 fi
 
-cronjob='xx';
 if [ "$1" == 'schoolbox' ];
 then
 	cronjob='schoolboxdev';
