@@ -31,7 +31,7 @@ class PermissionMapper extends Schoolbox\Mapper {
 
 		$this->hasMap(array(
 			'column'     => 'page_id',
-			'property'   => 'page_id',
+			'property'   => 'pageId',
 			'type'       => self::TYPE_INTEGER,
 		));
 
