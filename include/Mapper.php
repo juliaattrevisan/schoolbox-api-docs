@@ -608,10 +608,10 @@ abstract class Mapper {
      * @return Collection
      */
     public function hydrateList($rowList, $alias = '', $callback = null) {
-        $modelList = new Collection();
+        $modelList = $this->createCollection();
 
         foreach ($rowList as $row) {
-            $modelList[] = $this->hydrate($row, $alias, $callback);
+            $modelList->add($this->hydrate($row, $alias, $callback));
         }
 
         return $modelList;
@@ -652,6 +652,17 @@ abstract class Mapper {
      */
     public function createModel() {
         return new $this->model;
+    }
+
+    /**
+     * Creates a new collection as returned by hydrateList().
+     *
+     * @param array $contents If set, init the collection with these elements.
+     *
+     * @return Collection
+     */
+    public function createCollection($contents = array()) {
+        return new Collection($contents);
     }
 
     /**
