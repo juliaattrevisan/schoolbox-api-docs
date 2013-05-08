@@ -227,6 +227,13 @@ class Page {
 	 */
 	private $permissions;
 
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		$this->setPermissions(new \Schoolbox\Collection());
+	}
+
 	/* Getters/Setters
 	 */
 
