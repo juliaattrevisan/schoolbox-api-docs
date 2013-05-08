@@ -16,90 +16,90 @@ class Page {
 	 *
 	 * @var
 	 */
-	public $page_id;
+	private $page_id;
 
 	/**
 	 * The page title (appears in window drag bar)
 	 *
 	 * @var
 	 */
-	public $page_title;
+	private $page_title;
 
 	/**
 	 * The owner of the page
 	 *
 	 * @var
 	 */
-	public $uid;
+	private $uid;
 
 	/**
 	 * The template the page is using
 	 *
 	 * @var
 	 */
-	public $template;
+	private $template;
 
 	/**
 	 * Width of the left column as a percentage
 	 *
 	 * @var
 	 */
-	public $left_column_width;
+	private $left_column_width;
 
 	/**
 	 * Font colour
 	 *
 	 * @var
 	 */
-	public $left_head_font;
+	private $left_head_font;
 
 	/**
 	 * Background colour
 	 *
 	 * @var
 	 */
-	public $left_head_bg;
+	private $left_head_bg;
 
 	/**
 	 * Font color
 	 * @var
 	 */
-	public $left_font;
+	private $left_font;
 
 	/**
 	 * Background colour
 	 *
 	 * @var
 	 */
-	public $left_bg_primary;
+	private $left_bg_primary;
 
 	/**
 	 * Background colour
 	 *
 	 * @var
 	 */
-	public $left_bg_secondary;
+	private $left_bg_secondary;
 
 	/**
 	 * Link colour
 	 *
 	 * @var
 	 */
-	public $left_link;
+	private $left_link;
 
 	/**
 	 * Hover colour
 	 *
 	 * @var
 	 */
-	public $left_hover;
+	private $left_hover;
 
 	/**
 	 * Width of the right column as a percentage
 	 *
 	 * @var
 	 */
-	public $right_column_width;
+	private $right_column_width;
 
 	/**
 	 * Font colour
@@ -113,97 +113,126 @@ class Page {
 	 *
 	 * @var
 	 */
-	public $right_head_bg;
+	private $right_head_bg;
 
 	/**
 	 * Font color
 	 *
 	 * @var
 	 */
-	public $right_font;
+	private $right_font;
 
 	/**
 	 * Background colour
 	 *
 	 * @var
 	 */
-	public $right_bg_primary;
+	private $right_bg_primary;
 
 	/**
 	 * Background colour
 	 *
 	 * @var
 	 */
-	public $right_bg_secondary;
+	private $right_bg_secondary;
 
 	/**
 	 * Link colour
 	 *
 	 * @var
 	 */
-	public $right_link;
+	private $right_link;
 
 	/**
 	 * Hover colour
 	 *
 	 * @var
 	 */
-	public $right_hover;
+	private $right_hover;
 
 	/**
 	 * Font colour
 	 *
 	 * @var
 	 */
-	public $top_head_font;
+	private $top_head_font;
 
 	/**
 	 * Background colour
 	 *
 	 * @var
 	 */
-	public $top_head_bg;
+	private $top_head_bg;
 
 	/**
 	 * Font color
 	 *
 	 * @var
 	 */
-	public $top_font;
+	private $top_font;
 
 	/**
 	 * Background colour
 	 *
 	 * @var
 	 */
-	public $top_bg_primary;
+	private $top_bg_primary;
 
 	/**
 	 * Background colour
 	 *
 	 * @var
 	 */
-	public $top_bg_secondary;
+	private $top_bg_secondary;
 
 	/**
 	 * Link colour
 	 *
 	 * @var
 	 */
-	public $top_link;
+	private $top_link;
 
 	/**
 	 * Hover colour
 	 *
 	 * @var
 	 */
-	public $top_hover;
+	private $top_hover;
 
+	/**
+	 * Created at
+	 *
+	 * @var
+	 */
 	private $created_at;
 
+	/**
+	 * Updated at
+	 *
+	 * @var
+	 */
 	private $updated_at;
 
+	/**
+	 * Deleted at
+	 *
+	 * @var
+	 */
 	private $deleted_at;
+
+	/**
+	 * A collection of permissions
+	 *
+	 * @var
+	 */
+	private $permissions;
+
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		$this->setPermissions(new \Schoolbox\Collection());
+	}
 
 	/* Getters/Setters
 	 */
@@ -746,5 +775,23 @@ class Page {
 	 */
 	public function getUpdatedAt() {
 		return $this->updated_at;
+	}
+
+	/**
+	 * Set permissions
+	 *
+	 * @param  $permissions
+	 */
+	public function setPermissions($permissions) {
+		$this->permissions = $permissions;
+	}
+
+	/**
+	 * Get permissions
+	 *
+	 * @return
+	 */
+	public function getPermissions() {
+		return $this->permissions;
 	}
 }

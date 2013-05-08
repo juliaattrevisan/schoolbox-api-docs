@@ -137,50 +137,71 @@ class Eportfolio_Authenticator {
 		 */
 		$youCanView = false;
 
-		/* First check parental
-		 */
-		$parentSettingCollection = Eportfolio_PermissionMapper::getInstance()->findParentSetting($this->getPageId());
-
-		for($parentSettingCollection->rewind(); $parentSettingCollection->valid(); $parentSettingCollection->next()) {
-			$current = $parentSettingCollection->current();
-
-			if (($current['value'] == 1) && $this->getGroupHandler()->isParentOfChild($this->getEportfolioHandler()->getSettingsPageOwner())) {
-				$youCanView = true;
-			}
-		}
-
-		/* Now check groups
-		 */
-		$permittedGroups = array();
-
-		$allGroups = $this->getGroupHandler()->involvedInCategoryList($this->getCurrentUserId());
-
-		if (is_array($allGroups) && count($allGroups)) {
-			foreach($allGroups as $currentGroup) {
-				$permittedGroups[] = $currentGroup['id'];
-			}
-
-			$groupSettingCollection = Eportfolio_PermissionMapper::getInstance()->findValues($this->getPageId(), 'group', $permittedGroups);
-
-			if (count($groupSettingCollection)) {
-				$youCanView = true;
-			}
-		}
-
-		/* And now check individual permissions
-		 */
-		$permittedIndividuals = array($this->getCurrentUserId());
-
-		$individualSettingCollection = Eportfolio_PermissionMapper::getInstance()->findValues($this->getPageId(), 'student', $permittedIndividuals);
-
-		if (count($individualSettingCollection)) {
-			$youCanView = true;
-		}
-
-		/* These pages are always public
+		/* These pages are hardcoded and have special conditions
 		 */
 		if (in_array($this->getPageId(), $this->getPublicPages())) {
-			$youCanView = true;
+
+			/* Parents of the page owner are allowed
+			 */
+			if ($this->getGroupHandler()->isParent()) {
+				if ($this->getGroupHandler()->isParentOfChild($this->getOwnerId())) {
+					$youCanView = true;
+				}
+			}
+			/* All students are allowed
+			 */
+			else {
+				$youCanView = true;
+			}
+		}
+		/* User-created pages have their own unique permissions
+		 */
+		else {
+			/* First check parental
+			 */
+			$parentSettingCollection = \Eportfolio\PermissionMapper::getInstance()->findParentSetting($this->getPageId());
+
+			for($parentSettingCollection->rewind(); $parentSettingCollection->valid(); $parentSettingCollection->next()) {
+				$current = $parentSettingCollection->current();
+
+				if (($current->getValue()) && $this->getGroupHandler()->isParentOfChild($this->getEportfolioHandler()->getSettingsPageOwner())) {
+					$youCanView = true;
+				}
+			}
+
+			/* Still can't view it?
+			 * Now check groups
+			 */
+			if (!$youCanView) {
+				$permittedGroups = array();
+
+				$allGroups = $this->getGroupHandler()->involvedInCategoryList($this->getCurrentUserId());
+
+				if (is_array($allGroups) && count($allGroups)) {
+					foreach($allGroups as $currentGroup) {
+						$permittedGroups[] = $currentGroup['id'];
+					}
+
+					$groupSettingCollection = \Eportfolio\PermissionMapper::getInstance()->findValues($this->getPageId(), 'group', $permittedGroups);
+
+					if (count($groupSettingCollection)) {
+						$youCanView = true;
+					}
+				}
+			}
+
+			/* Still can't view it?
+			 * Now check individual permissions
+			 */
+			if (!$youCanView) {
+				$permittedIndividuals = array($this->getCurrentUserId());
+
+				$individualSettingCollection = \Eportfolio\PermissionMapper::getInstance()->findValues($this->getPageId(), 'student', $permittedIndividuals);
+
+				if (count($individualSettingCollection)) {
+					$youCanView = true;
+				}
+			}
 		}
 
 		/* And now...the conclusion.

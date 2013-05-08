@@ -17,21 +17,21 @@ class Showcase {
 	 *
 	 * @var int
 	 */
-	public $id = null;
+	private $id = null;
 
 	/**
 	 * The showcased submission box
 	 *
 	 * @var
 	 */
-	public $submissionBoxId;
+	private $submissionBoxId;
 
 	/**
 	 * The showcasing user
 	 *
 	 * @var
 	 */
-	public $uid;
+	private $uid;
 
 	/**
 	 * When the Showcased Work item was created

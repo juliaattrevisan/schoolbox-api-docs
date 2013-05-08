@@ -405,7 +405,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 	 * Render parent permissions
 	 */
 	private function renderParentPermissions() {
-		$selectedParents = Eportfolio_PermissionMapper::getInstance()->findByColumnList(array(
+		$selectedParents = \Eportfolio\PermissionMapper::getInstance()->findByColumnList(array(
 			'page_id' => $this->getPageId(),
 			'type' => 'parent',
 			'value' => 1
@@ -430,13 +430,13 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 	private function renderGroupPermissions() {
 		$allGroups = $this->getGroupHandler()->involvedInCategoryList($this->getUserId(), false);
 
-		$selectedGroups = Eportfolio_PermissionMapper::getInstance()->findByColumnList(array(
+		$selectedGroups = \Eportfolio\PermissionMapper::getInstance()->findByColumnList(array(
 			'page_id' => $this->getPageId(),
 			'type' => 'group'
 		));
 
 		for ($selectedGroupIds = array(), $selectedGroups->rewind(); $selectedGroups->valid(); $selectedGroups->next()) {
-			$selectedGroupIds[] = $selectedGroups->current()->value;
+			$selectedGroupIds[] = $selectedGroups->current()->getValue();
 		}
 
 		if (is_array($allGroups) && count($allGroups)) {
@@ -474,7 +474,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 
 		/* Find all the guys who were allowed to see this page
 		 */
-		$selectedIndividuals = Eportfolio_PermissionMapper::getInstance()->findByColumnList(array(
+		$selectedIndividuals = \Eportfolio\PermissionMapper::getInstance()->findByColumnList(array(
 			'page_id' => $this->getPageId(),
 			'type' => 'student'
 		));
@@ -482,7 +482,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		/* Just list their ids...
 		 */
 		for ($selectedIndividualIds = array(), $selectedIndividuals->rewind(); $selectedIndividuals->valid(); $selectedIndividuals->next()) {
-			$selectedIndividualIds[] = $selectedIndividuals->current()->value;
+			$selectedIndividualIds[] = $selectedIndividuals->current()->getValue();
 		}
 
 		/* ...and get their records with phenomenal cheese factor in findIn()

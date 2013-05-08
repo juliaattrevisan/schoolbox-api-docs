@@ -7,14 +7,11 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Eportfolio_PermissionMapper extends Mapper {
+namespace Eportfolio;
+use Eportfolio;
+use Schoolbox;
 
-	/**
-	 * Database table
-	 *
-	 * @var string
-	 */
-	protected $table = 'eportfolio_permission';
+class PermissionMapper extends Schoolbox\Mapper {
 
 	/**
 	 * Define column/property mapping
@@ -22,29 +19,32 @@ class Eportfolio_PermissionMapper extends Mapper {
 	 * @return Bool|void
 	 */
 	protected function mapping() {
+		$this->hasTable('eportfolio_permission');
+		$this->hasModel('\\Eportfolio\\Permission');
+
 		$this->hasMap(array(
 			'column'     => 'id',
 			'property'   => 'id',
-			'type'       => Mapper::TYPE_INTEGER,
+			'type'       => self::TYPE_INTEGER,
 			'identifier' => true
 		));
 
 		$this->hasMap(array(
 			'column'     => 'page_id',
-			'property'   => 'page_id',
-			'type'       => Mapper::TYPE_INTEGER,
+			'property'   => 'pageId',
+			'type'       => self::TYPE_INTEGER,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'type',
 			'property'   => 'type',
-			'type'       => Mapper::TYPE_STRING,
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'value',
 			'property'   => 'value',
-			'type'       => Mapper::TYPE_INTEGER,
+			'type'       => self::TYPE_INTEGER,
 		));
 
 		parent::mapping();
@@ -91,7 +91,7 @@ class Eportfolio_PermissionMapper extends Mapper {
 	 */
 	private function addParentPermissions($pageId, $parent) {
 		if (is_numeric($parent)) {
-			$permission = new Eportfolio_Permission();
+			$permission = new Permission();
 			$permission->setPageId($pageId);
 			$permission->setType('parent');
 			$permission->setValue($parent);
@@ -110,7 +110,7 @@ class Eportfolio_PermissionMapper extends Mapper {
 		if (is_array($allGroups) && count($allGroups)) {
 			foreach($allGroups as $currentGroup) {
 				if (is_numeric($currentGroup)) {
-					$permission = new Eportfolio_Permission();
+					$permission = new Permission();
 					$permission->setPageId($pageId);
 					$permission->setType('group');
 					$permission->setValue($currentGroup);
@@ -131,7 +131,7 @@ class Eportfolio_PermissionMapper extends Mapper {
 		if (is_array($allIndividuals) && count($allIndividuals)) {
 			foreach($allIndividuals as $currentIndividual) {
 				if (is_numeric($currentIndividual)) {
-					$permission = new Eportfolio_Permission();
+					$permission = new Permission();
 					$permission->setPageId($pageId);
 					$permission->setType('student');
 					$permission->setValue($currentIndividual);

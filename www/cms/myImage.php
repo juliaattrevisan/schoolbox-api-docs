@@ -31,15 +31,23 @@ if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
 //	if (!$eportfolioHandler->canEdit($imageInfo['owner'])) {
 //		error(5);
 //	}
+
+	/* Choose a caching method to use
+	 */
+	$key = $_GET['width'] . 'x' . $_GET['height'];
+
+	$cache = new Alaress_Image_Cache_MyImage($_GET['id'], $key);
+
+	/* Process and stream image
+	 */
+	$imageProcessor = new Alaress_Image_Processor_Freeform($cache, new Alaress_Image_Transformation_MyImage($_GET['width'], $_GET['height']));
+	$imageProcessor->load()->transformAll()->stream();
 }
+else {
+	$cache = new Alaress_Image_Cache_MyImage($_GET['id'], $_GET['key']);
 
-/* Choose a caching method to use
- */
-$key = $_GET['width'] . 'x' . $_GET['height'];
-
-$cache = new Alaress_Image_Cache_MyImage($_GET['id'], $key);
-
-/* Process and stream image
- */
-$imageProcessor = new Alaress_Image_Processor_Freeform($cache, new Alaress_Image_Transformation_MyImage($_GET['width'], $_GET['height']));
-$imageProcessor->load()->transformAll()->stream();
+	/* Process and stream image
+	 */
+	$imageProcessor = new Alaress_Image_Processor_Standard($cache, new Alaress_Image_Transformation_Storage());
+	$imageProcessor->load()->transformAll()->stream();
+}

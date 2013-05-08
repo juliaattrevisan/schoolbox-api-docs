@@ -1,12 +1,15 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+	<link rel="stylesheet" href="/css/jquery.slimbox.css" type="text/css" media="screen"/>
+	<script type="text/javascript" src="/javascript/jquery.slimbox.js"></script>
+
 	<h2>{COMPONENT_NAME}</h2>
 	{CONFIGURATION}
 
-	<ol>
+	<div>
 		<!-- BEGIN list_item -->
-		<li>
-			<img src='/cms/myImage.php?id={IMAGE_ID}&width=200&height=200' />
-		</li>
+		<a href="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryLarge" rel="lightbox[portal]"  alt='' title=''>
+			<img src="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryThumbnail" alt="" border="0"/>
+		</a>
 		<!-- END list_item -->
-	</ol>
+	</div>
 </div>
