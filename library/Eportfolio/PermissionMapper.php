@@ -7,7 +7,11 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Eportfolio_PermissionMapper extends Mapper {
+namespace Eportfolio;
+use Eportfolio;
+use Schoolbox;
+
+class PermissionMapper extends Schoolbox\Mapper {
 
 	/**
 	 * Database table
@@ -25,26 +29,26 @@ class Eportfolio_PermissionMapper extends Mapper {
 		$this->hasMap(array(
 			'column'     => 'id',
 			'property'   => 'id',
-			'type'       => Mapper::TYPE_INTEGER,
+			'type'       => self::TYPE_INTEGER,
 			'identifier' => true
 		));
 
 		$this->hasMap(array(
 			'column'     => 'page_id',
 			'property'   => 'page_id',
-			'type'       => Mapper::TYPE_INTEGER,
+			'type'       => self::TYPE_INTEGER,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'type',
 			'property'   => 'type',
-			'type'       => Mapper::TYPE_STRING,
+			'type'       => self::TYPE_STRING,
 		));
 
 		$this->hasMap(array(
 			'column'     => 'value',
 			'property'   => 'value',
-			'type'       => Mapper::TYPE_INTEGER,
+			'type'       => self::TYPE_INTEGER,
 		));
 
 		parent::mapping();

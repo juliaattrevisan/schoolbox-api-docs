@@ -139,7 +139,7 @@ class Eportfolio_Authenticator {
 
 		/* First check parental
 		 */
-		$parentSettingCollection = Eportfolio_PermissionMapper::getInstance()->findParentSetting($this->getPageId());
+		$parentSettingCollection = \Eportfolio\PermissionMapper::getInstance()->findParentSetting($this->getPageId());
 
 		for($parentSettingCollection->rewind(); $parentSettingCollection->valid(); $parentSettingCollection->next()) {
 			$current = $parentSettingCollection->current();
@@ -160,7 +160,7 @@ class Eportfolio_Authenticator {
 				$permittedGroups[] = $currentGroup['id'];
 			}
 
-			$groupSettingCollection = Eportfolio_PermissionMapper::getInstance()->findValues($this->getPageId(), 'group', $permittedGroups);
+			$groupSettingCollection = \Eportfolio\PermissionMapper::getInstance()->findValues($this->getPageId(), 'group', $permittedGroups);
 
 			if (count($groupSettingCollection)) {
 				$youCanView = true;
@@ -171,7 +171,7 @@ class Eportfolio_Authenticator {
 		 */
 		$permittedIndividuals = array($this->getCurrentUserId());
 
-		$individualSettingCollection = Eportfolio_PermissionMapper::getInstance()->findValues($this->getPageId(), 'student', $permittedIndividuals);
+		$individualSettingCollection = \Eportfolio\PermissionMapper::getInstance()->findValues($this->getPageId(), 'student', $permittedIndividuals);
 
 		if (count($individualSettingCollection)) {
 			$youCanView = true;
