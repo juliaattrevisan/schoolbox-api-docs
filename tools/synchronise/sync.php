@@ -10,6 +10,8 @@
 
 $options = getopt("v", array('perform-update', 'diagnostic'));
 
+echo "[".date('Y-m-d H:i:s')."] Running sync script\n";
+
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 if (Cfg::get('external_sync_data') == 1) {
