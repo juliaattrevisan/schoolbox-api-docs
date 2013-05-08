@@ -701,9 +701,11 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$query = "
 			SELECT
 				{$this->getColumnString('sb')},
-				{$this->getJoinMapper('category')->getColumnString('c')}
+				{$this->getJoinMapper('category')->getColumnString('c')},
+				{$this->getJoinMapper('owner')->getColumnString('u')}
 			FROM {$this->getTable()} sb
 			LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
+			LEFT JOIN {$this->getJoinSql('owner',    'sb', 'u')}
 			WHERE sb.category IN {$this->getArrayPlaceholders($category_list, 'category')}
 			AND sb.date BETWEEN :from_date AND :to_date
 			ORDER BY sb.date ASC
@@ -717,7 +719,8 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 		$cat_mapper = $this->getJoinMapper('category');
 		foreach ($statement as $row) {
 			$box = $this->hydrate($row, 'sb');
-			$box->setCategory($cat_mapper->hydrate($row, 'c'));
+			$box->setOwner($this->getJoinMapper('owner')->hydrate($row, 'u'));
+			$box->setCategory($this->getJoinMapper('category')->hydrate($row, 'c'));
 			$collection->add($factory->buildFromSubmissionBox($box, 'overdue'));
 		}
 		return $collection;
