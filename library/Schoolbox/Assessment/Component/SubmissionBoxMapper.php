@@ -658,26 +658,10 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 
 		//
 		// Load category codes too.
-		// TODO Create a helper for adding codes to categories, because it's so common
-		$category_ids = array();
-		foreach ($collection as $submission) {
-			$category_ids[] = $submission->getCategory()->getId();
-		}
-
-		$cat_code_mapper = $cat_mapper->getJoinMapper('codes');
-		$grouped_codes   = array();
-		foreach ($cat_code_mapper->findForCategories(array_unique($category_ids)) as $code) {
-			$grouped_codes[$code->getCategory()->getId()][] = $code;
-		}
-		foreach ($collection as $submission) {
-			$cat_id = $submission->getCategory()->getId();
-			if (!empty($grouped_codes[$cat_id])) {
-				foreach ($grouped_codes[$cat_id] as $code) {
-					$submission->getCategory()->addCode($code);
-				}
-			}
-		}
-
+		$cat_mapper->getJoinMapper('codes')->applyCodesToCategories(
+			$collection,
+			function($item) { return $item->getCategory(); }
+		);
 		return $collection;
 	}
 
