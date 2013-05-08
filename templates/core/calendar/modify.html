@@ -157,8 +157,8 @@ $j(function () {
                 else if (act == 'Delete') {
                     $j("#dialog-delete").dialog({
                         resizable:false,
-                        height:100,
                         width:400,
+                        height:140,
                         modal:true,
                         draggable:false,
                         buttons:{
@@ -182,8 +182,7 @@ $j(function () {
             }
         }
     });
-
-    $j('#b{FUNCTION}').click(function () {
+        $j('#b{FUNCTION}').click(function () {
         $j('#action').val('{FUNCTION}');
     });
 
@@ -437,7 +436,6 @@ $j(function () {
         <p>
 			<span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
 				Are you sure you want to delete this event?
-			</span>
 		</p>
     </div>
 </form>
