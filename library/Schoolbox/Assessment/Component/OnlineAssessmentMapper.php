@@ -221,4 +221,47 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 
 	}
 
+	/**
+	 * Gets all assessments that are due within the given date span.
+	 *
+	 * @param array $category_list  A list of category IDs to filter on.
+	 * @param int   $from_timestamp A Unix timestamp to search from
+	 * @param int   $to_timestamp   A Unix timestamp to search until
+	 *
+	 * @return ActivityCollection
+	 */
+	public function getDueActivities($category_list, $from_timestamp, $to_timestamp) {
+		$factory    = new ActivityFactory();
+		$collection = new ActivityCollection();
+		if (empty($category_list)) {
+			return $collection;
+		}
+		$from_date = new \Alaress_Date_Format($from_timestamp, 'U');
+		$to_date   = new \Alaress_Date_Format($to_timestamp,   'U');
+		$query = "
+			SELECT
+				{$this->getColumnString('a')},
+				{$this->getJoinMapper('category')->getColumnString('c')},
+				{$this->getJoinMapper('user')->getColumnString('u')}
+			FROM {$this->getTable()} a
+			LEFT JOIN {$this->getJoinSql('category', 'a', 'c')}
+			LEFT JOIN {$this->getJoinSql('user',     'a', 'u')}
+			WHERE a.category_id IN {$this->getArrayPlaceholders($category_list, 'category')}
+			AND a.finish BETWEEN :from_date AND :to_date
+			ORDER BY a.finish ASC
+		";
+		$params = $this->getArrayParameters($category_list, 'category');
+		$params['from_date'] = $from_date->getDatabaseDate();
+		$params['to_date']   = $to_date->getDatabaseDate();
+		$statement = $this->database->prepare($query);
+		$statement->execute($params);
+
+		foreach ($statement as $row) {
+			$box = $this->hydrate($row, 'a');
+			$box->setUser($this->getJoinMapper('user')->hydrate($row, 'u'))
+				->setCategory($this->getJoinMapper('category')->hydrate($row, 'c'));
+			$collection->add($factory->buildFromOnlineAssessment($box, 'closed'));
+		}
+		return $collection;
+	}
 }
