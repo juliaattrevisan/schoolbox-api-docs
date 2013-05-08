@@ -1,16 +1,5 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/excanvas.compiled.js"></script>
-<script type="text/javascript">
-    var is_using_canvastext = false;
-</script>
-<!-- Load canvasText and a typeface for IE < 9 -->
-<!--[if lt IE 9]>
-<script type="text/javascript" src="/javascript/canvas.text.js"></script>
-<script type="text/javascript" src="/javascript/faces/helvetiker-normal-normal.js"></script>
-<script type="text/javascript">
-    var is_using_canvastext = true;
-</script>
-<![endif]-->
+<script type="text/javascript" src="/javascript/excanvas.text-patch.js"></script>
 <script type="text/javascript" src="/javascript/flot/jquery.flot.js"></script>
 <script type="text/javascript" src="/javascript/flot/jquery.flot.highlighter.js"></script>
 <script type="text/javascript" src="/javascript/flot/jquery.flot.spider.js"></script>
@@ -18,11 +7,6 @@
 <script type="text/javascript">
 
     var rubricData = setupRubricChart({GRAPH_DATA}, {GRAPH_LEGS}, {GRAPH_MAX});
-    //
-    // Using canvastext? Force its typeface to be used for all fonts.
-    if (is_using_canvastext) {
-        rubricData.options.series.spider.legs.font = '11px helvetiker';
-    }
 
     $j(function() {
         var radios = $j('#rubric-tbody :radio');
