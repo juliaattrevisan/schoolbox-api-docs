@@ -658,6 +658,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 
 		//
 		// Load category codes too.
+		// TODO Create a helper for adding codes to categories, because it's so common
 		$category_ids = array();
 		foreach ($collection as $submission) {
 			$category_ids[] = $submission->getCategory()->getId();
@@ -677,6 +678,48 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 			}
 		}
 
+		return $collection;
+	}
+
+	/**
+	 * Gets all submission boxes that are due within the given date span.
+	 *
+	 * @param array $category_list  A list of category IDs to filter on.
+	 * @param int   $from_timestamp A Unix timestamp to search from
+	 * @param int   $to_timestamp   A Unix timestamp to search until
+	 *
+	 * @return ActivityCollection
+	 */
+	public function getDueActivities($category_list, $from_timestamp, $to_timestamp) {
+		$factory    = new ActivityFactory();
+		$collection = new ActivityCollection();
+		if (empty($category_list)) {
+			return $collection;
+		}
+		$from_date = new \Alaress_Date_Format($from_timestamp, 'U');
+		$to_date   = new \Alaress_Date_Format($to_timestamp,   'U');
+		$query = "
+			SELECT
+				{$this->getColumnString('sb')},
+				{$this->getJoinMapper('category')->getColumnString('c')}
+			FROM {$this->getTable()} sb
+			LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
+			WHERE sb.category IN {$this->getArrayPlaceholders($category_list, 'category')}
+			AND sb.date BETWEEN :from_date AND :to_date
+			ORDER BY sb.date ASC
+		";
+		$params = $this->getArrayParameters($category_list, 'category');
+		$params['from_date'] = $from_date->getDatabaseDate();
+		$params['to_date']   = $to_date->getDatabaseDate();
+		$statement = $this->database->prepare($query);
+		$statement->execute($params);
+
+		$cat_mapper = $this->getJoinMapper('category');
+		foreach ($statement as $row) {
+			$box = $this->hydrate($row, 'sb');
+			$box->setCategory($cat_mapper->hydrate($row, 'c'));
+			$collection->add($factory->buildFromSubmissionBox($box, 'overdue'));
+		}
 		return $collection;
 	}
 }
