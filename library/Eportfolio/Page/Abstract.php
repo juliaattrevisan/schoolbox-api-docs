@@ -157,7 +157,7 @@ abstract class Eportfolio_Page_Abstract {
 	private function renderPageList() {
 		$pageMapper = new Eportfolio\PageMapper();
 
-		$allPages = $pageMapper->findByColumn('uid', $this->getUserId());
+		$allPages = $pageMapper->findViewablePages($_SESSION['id'], $this->getUserId());
 
 		$this->getPage()->setVar('eportfolio_page_block', '');
 

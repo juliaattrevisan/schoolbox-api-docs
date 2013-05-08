@@ -204,7 +204,139 @@ class PageMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_DATETIME,
 		));
 
+		$this->hasJoin('permissions', array(
+			'multiple'  => true,
+			'mapper'    => '\\Eportfolio\\PermissionMapper',
+			'this_key'  => 'page_id',
+			'other_key' => 'page_id',
+		));
+
 		parent::mapping();
+	}
+
+	/**
+	 * Finds all the pages owned by $ownerId that $viewerId can see
+	 *
+	 * @param $viewerId
+	 * @param $ownerId
+	 * @return \Schoolbox\Collection
+	 */
+	public function findViewablePages($viewerId, $ownerId) {
+		$viewablePages = new \Schoolbox\Collection();
+
+		/* -_-
+		 */
+		$groupHandler = new \Group();
+
+		/* The categories the viewer is involved in
+		 */
+		$allCategories = $groupHandler->involvedInCategoryList($viewerId);
+
+		/* Get all the pages with their permissions
+		 */
+		$allPages = $this->findPagesWithPermissions($ownerId);
+
+		foreach($allPages as $currentPage) {
+
+			/* They can be a superuser
+			 */
+			$isSuperuser = $_SESSION['su'];
+
+			/* They can be a staff member
+			 */
+			$isStaff = $groupHandler->isStaff();
+
+			/* They can be the owner of the page
+			 */
+			$isOwner = ($currentPage->getUid() == $viewerId);
+
+			if ($isSuperuser || $isStaff || $isOwner) {
+				$viewablePages->setOffset($currentPage->getPageId(), $currentPage);
+			}
+			/* If there are any specific permissions, try those too
+			 */
+			else {
+				foreach($currentPage->getPermissions() as $currentPermission) {
+
+					/* They can be a parent (the getValue() here is a binary 1 or 0)
+					 */
+					$isParent = (($currentPermission->getType() == 'parent') && $currentPermission->getValue());
+
+					/* They can be in a group
+					 */
+					$isInGroup = (($currentPermission->getType() == 'group') && in_array($currentPermission->getValue(), $allCategories));
+
+					/* They can be allowed specifically
+					 */
+					$isStudent = (($currentPermission->getType() == 'student') && ($currentPermission->getValue() == $viewerId));
+
+					if ($isParent || $isInGroup || $isStudent) {
+						$viewablePages->setOffset($currentPage->getPageId(), $currentPage);
+					}
+				}
+			}
+		}
+
+		/* Reindex everything
+		 */
+		$viewablePages->reindex();
+
+		return $viewablePages;
+	}
+
+	/**
+	 * Finds all the pages owned by $ownerId with associated permissions
+	 *
+	 * @param $ownerId
+	 * @return \Schoolbox\Collection
+	 */
+	public function findPagesWithPermissions($ownerId) {
+		$permission_mapper = $this->getJoinMapper('permissions');
+
+		$query = "
+            SELECT
+            	{$this->getColumnString('ep')},
+            	{$permission_mapper->getColumnString('p')}
+            FROM `{$this->table}` ep
+            LEFT JOIN {$this->getJoinSql('permissions', 'ep', 'p')}
+            WHERE ep.uid = :ownerId
+            ORDER BY created_at DESC
+		";
+
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(':ownerId', $ownerId);
+		$statement->execute();
+
+		/* Manually construct hierarchy of blog items and their comments
+		 */
+		$collection = new \Schoolbox\Collection();
+
+		foreach ($statement as $row) {
+			$pageItem = $this->hydrate($row, 'ep');
+			$permissionItem = $permission_mapper->hydrate($row, 'p');
+
+			/* Put it into the collection in the index with the same
+			 * value as the page id, if it doesn't already live there
+			 */
+			if (!is_a($collection->getOffset($pageItem->getPageId()), '\Eportfolio\Page')) {
+				$collection->setOffset($pageItem->getPageId(), $pageItem);
+			}
+
+			/* If a permission was parsed from this $row, hydrate
+			 * put the permission with its parent page
+			 */
+			if (is_numeric($permissionItem->getId())) {
+				$collection->getOffset($permissionItem->getPageId())->getPermissions()->add($permissionItem);
+			}
+		}
+
+		/* Reindex everything
+		 *
+		 * foreach() can't understand it when you don't reindex to zero-based array
+		 */
+		$collection->reindex();
+
+		return $collection;
 	}
 
 	/**

@@ -405,7 +405,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 	 * Render parent permissions
 	 */
 	private function renderParentPermissions() {
-		$selectedParents = Eportfolio_PermissionMapper::getInstance()->findByColumnList(array(
+		$selectedParents = \Eportfolio\PermissionMapper::getInstance()->findByColumnList(array(
 			'page_id' => $this->getPageId(),
 			'type' => 'parent',
 			'value' => 1
@@ -430,7 +430,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 	private function renderGroupPermissions() {
 		$allGroups = $this->getGroupHandler()->involvedInCategoryList($this->getUserId(), false);
 
-		$selectedGroups = Eportfolio_PermissionMapper::getInstance()->findByColumnList(array(
+		$selectedGroups = \Eportfolio\PermissionMapper::getInstance()->findByColumnList(array(
 			'page_id' => $this->getPageId(),
 			'type' => 'group'
 		));
@@ -474,7 +474,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 
 		/* Find all the guys who were allowed to see this page
 		 */
-		$selectedIndividuals = Eportfolio_PermissionMapper::getInstance()->findByColumnList(array(
+		$selectedIndividuals = \Eportfolio\PermissionMapper::getInstance()->findByColumnList(array(
 			'page_id' => $this->getPageId(),
 			'type' => 'student'
 		));
