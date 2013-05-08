@@ -7,8 +7,8 @@
 }
 
 /var/log/schoolbox*duework* {
-        weekly
-        missingok
-        rotate 4
-        compress
+	weekly
+	missingok
+	rotate 4
+	compress
 }
