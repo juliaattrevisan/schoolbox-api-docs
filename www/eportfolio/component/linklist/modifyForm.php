@@ -26,10 +26,15 @@ if ($authenticator->canModify()) {
 		$title = $_POST['title'];
 		$content = $_POST['content'];
 
+		/* Check if it's a valid url before putting in db
+		 */
+		$url = new Url($content);
+		$url->prependScheme();
+
 		$listItem = new \Component\Eportfolio\LinkList();
 		$listItem->setComponentInstanceId($componentInstanceId);
 		$listItem->setTitle($title);
-		$listItem->setContent($content);
+		$listItem->setContent($url->getUrl());
 		$listItem->setSequence(1);
 
 		\Component\Eportfolio\LinkListMapper::getInstance()->save($listItem);
@@ -41,9 +46,14 @@ if ($authenticator->canModify()) {
 		$title = $_POST['title'];
 		$content = $_POST['content'];
 
+		/* Check if it's a valid url before putting in db
+		 */
+		$url = new Url($content);
+		$url->prependScheme();
+
 		$listItem = \Component\Eportfolio\LinkListMapper::getInstance()->findById($listItemId);
 		$listItem->setTitle($title);
-		$listItem->setContent($content);
+		$listItem->setContent($url->getUrl());
 
 		\Component\Eportfolio\LinkListMapper::getInstance()->save($listItem);
 	}

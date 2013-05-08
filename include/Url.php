@@ -55,22 +55,31 @@ class Url
         return strtolower(preg_replace($pattern, $replace, $this->getUrl()));
     }
 
-    /**
-     * Is this a valid url?
-     *
-     * @param  $url
-     * @return bool
-     */
-    public function isUrl()
-    {
-        $cmp = @parse_url($this->getUrl());
+	/**
+	 * Is this a valid url?
+	 *
+	 * @return bool
+	 */
+    public function isUrl() {
+		$result = filter_var($this->getUrl(), FILTER_VALIDATE_URL);
 
-        if (is_array($cmp) && isset($cmp['host'])) {
-            return true;
-        }
+		if ($result) {
+			return true;
+		}
 
-        return false;
+		return false;
     }
+
+	/**
+	 * Prepend a scheme if one wasn't found
+	 */
+	public function prependScheme() {
+		$scheme = parse_url($this->getUrl(), PHP_URL_SCHEME);
+
+		if (!$scheme) {
+			$this->setUrl('http://' . $this->getUrl());
+		}
+	}
 
     /**
      * Returns true if the url is for a local page
