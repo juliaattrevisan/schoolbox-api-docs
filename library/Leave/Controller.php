@@ -755,10 +755,17 @@ class Leave_Controller extends Controller {
         /* Only allow students to see their own leave requests
            * Allow staff/superusers to see anyone's
            */
+
+
+
         if ($this->getGroup()->getPermission(null) || $_SESSION['id'] == $data['user']->getId()) {
             $user = $data['user'];
             $house = $data['house'];
             $requestList = $data['requestList'];
+
+	        if(!is_object($user) || !is_object($house)) {
+		        return false;
+	        }
 
             $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/userRequestList.html');
             $this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
