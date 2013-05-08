@@ -236,13 +236,14 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 		if (empty($category_list)) {
 			return $collection;
 		}
-		$from_date = new \Alaress_Date_Format($from_timestamp, 'U');
-		$to_date   = new \Alaress_Date_Format($to_timestamp,   'U');
+
+		$cat_mapper  = $this->getJoinMapper('category');
+		$user_mapper = $this->getJoinMapper('user');
 		$query = "
 			SELECT
 				{$this->getColumnString('a')},
-				{$this->getJoinMapper('category')->getColumnString('c')},
-				{$this->getJoinMapper('user')->getColumnString('u')}
+				{$cat_mapper->getColumnString('c')},
+				{$user_mapper->getColumnString('u')}
 			FROM {$this->getTable()} a
 			LEFT JOIN {$this->getJoinSql('category', 'a', 'c')}
 			LEFT JOIN {$this->getJoinSql('user',     'a', 'u')}
@@ -250,18 +251,29 @@ class OnlineAssessmentMapper extends Schoolbox\Mapper {
 			AND a.finish BETWEEN :from_date AND :to_date
 			ORDER BY a.finish ASC
 		";
-		$params = $this->getArrayParameters($category_list, 'category');
+
+		//
+		// Build parameters
+		$from_date = new \Alaress_Date_Format($from_timestamp, 'U');
+		$to_date   = new \Alaress_Date_Format($to_timestamp,   'U');
+		$params    = $this->getArrayParameters($category_list, 'category');
 		$params['from_date'] = $from_date->getDatabaseDate();
 		$params['to_date']   = $to_date->getDatabaseDate();
 		$statement = $this->database->prepare($query);
 		$statement->execute($params);
 
+		//
+		// Hydrate as activity list, then add category codes
 		foreach ($statement as $row) {
 			$box = $this->hydrate($row, 'a');
-			$box->setUser($this->getJoinMapper('user')->hydrate($row, 'u'))
-				->setCategory($this->getJoinMapper('category')->hydrate($row, 'c'));
+			$box->setUser($user_mapper->hydrate($row, 'u'))
+				->setCategory($cat_mapper->hydrate($row, 'c'));
 			$collection->add($factory->buildFromOnlineAssessment($box, 'closed'));
 		}
+		$cat_mapper->getJoinMapper('codes')->applyCodesToCategories(
+			$collection,
+			function($item) { return $item->getCategory(); }
+		);
 		return $collection;
 	}
 }
