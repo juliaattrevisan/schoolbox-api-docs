@@ -1,3 +1,15 @@
+<script>
+    $j(document).ready(function(){
+        $j('#add-coverphoto').click(function(){
+            $j('#coverphoto-image').show().trigger('click').hide();
+            return false;
+        });
+        $j('#coverphoto-image').change(function(){
+            $j('#coverphoto-form').submit();
+        })
+    });
+</script>
+
 <style type='text/css'>
     <!-- BEGIN allowed_files -->
     a.{NAME}{background-image: url(/images/mime/22x22/{ICON});}
@@ -18,11 +30,19 @@
 <div class="profile-banner">
     <div class="background">
 		<!-- BEGIN has_cover_photo -->
+        <a id="add-coverphoto" class="btn modify no-text" title="Edit your cover picture"><span></span></a>
         <img src="/storage/image.php?size=eportfolioCoverPhoto&hash={COVERPHOTO_IMAGEHASH}" />
-		<!-- END has_cover_photo -->
+        <!-- END has_cover_photo -->
 		<!-- BEGIN no_cover_photo -->
+        <a id="add-coverphoto" class="btn add" title="Add a cover photo"><span></span>Add a cover photo</a>
 		<img src="/images/core/eportfolio/coverphotoPlaceholder.jpg" />
 		<!-- END no_cover_photo -->
+        <form id="coverphoto-form" method='post' action='/eportfolio/coverphoto/modifyForm.php' enctype='multipart/form-data'>
+            <input type='hidden' name='action' value='addCoverPhoto' />
+            <input type='hidden' name='userId' value='{USER_ID}' />
+            <input id="coverphoto-image" type='file' name='imagehash' value='' />
+            <input id="coverphoto-submit" class="btn no-icon" type='submit' value='Add' />
+        </form>
     </div>
     <div class="profile-name clearfix">
         <img src='/portrait.php?userId={USER_EXTERNAL_ID}&size=constrain200' />
@@ -33,15 +53,6 @@
             Campus: {USER_CAMPUS}
 		</p>
     </div>
-</div>
-
-<div style='border:4px solid #f00;'>
-	<form method='post' action='/eportfolio/coverphoto/modifyForm.php' enctype='multipart/form-data'>
-		<input type='hidden' name='action' value='addCoverPhoto' />
-		<input type='hidden' name='userId' value='{USER_ID}' />
-		<input type='file' name='imagehash' value='' />
-		<input class="btn no-icon" type='submit' value='Add' />
-	</form>
 </div>
 
 <div class="left clearfix" style="width: 69%">
