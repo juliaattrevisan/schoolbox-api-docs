@@ -435,8 +435,9 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 			'type' => 'group'
 		));
 
-		for ($selectedGroupIds = array(), $selectedGroups->rewind(); $selectedGroups->valid(); $selectedGroups->next()) {
-			$selectedGroupIds[] = $selectedGroups->current()->getValue();
+		$selectedGroupIds = array();
+		foreach ($selectedGroups as $selectedGroup) {
+			$selectedGroupIds[] = $selectedGroup->getValue();
 		}
 
 		if (is_array($allGroups) && count($allGroups)) {
@@ -481,8 +482,9 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 
 		/* Just list their ids...
 		 */
-		for ($selectedIndividualIds = array(), $selectedIndividuals->rewind(); $selectedIndividuals->valid(); $selectedIndividuals->next()) {
-			$selectedIndividualIds[] = $selectedIndividuals->current()->getValue();
+		$selectedIndividualIds = array();
+		foreach ($selectedIndividuals as $selectedIndividual) {
+			$selectedIndividualIds[] = $selectedIndividual->getValue();
 		}
 
 		/* ...and get their records with phenomenal cheese factor in findIn()
@@ -490,9 +492,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		if (count($selectedIndividualIds)) {
 			$allIndividuals = NewUserMapper::getInstance()->findIn('id', $selectedIndividualIds);
 
-			for ($allIndividuals->rewind(); $allIndividuals->valid(); $allIndividuals->next()) {
-				$currentIndividual = $allIndividuals->current();
-
+			foreach ($allIndividuals as $currentIndividual) {
 				$this->getPage()->setVar(array(
 					'INDIVIDUAL_PERMISSION_USER_ID' => $currentIndividual->getId(),
 					'INDIVDIUAL_PERMISSION_USER_FIRSTNAME' => $currentIndividual->getFirstname(),
