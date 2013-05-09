@@ -9451,6 +9451,11 @@ table img { max-width: none; }
 	position: relative;
 	height: 352px;
 	margin-bottom: 40px;
+	#add-coverphoto {
+		position: absolute; top: 8px; right: 8px;
+		z-index: 99;
+		margin-top: 0;
+	}
 }
 .profile-name {
 	width: auto;
@@ -9498,6 +9503,7 @@ table img { max-width: none; }
 	}
 }
 .listing.photos img { width: 33%; height: auto; }
+#coverphoto-form { display: none; visibility: hidden; }
 
 /* *
  * submission/allWork - Report Card
