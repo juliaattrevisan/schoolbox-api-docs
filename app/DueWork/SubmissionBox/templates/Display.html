@@ -35,7 +35,7 @@
     {% endif %}
 
 {% elseif content.description %}
-    <p>{{ content.description }}</p>
+    <p>{{ content.description | raw }}</p>
 
 {% elseif content.history %}
     {% for item in content.history %}

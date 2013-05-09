@@ -72,17 +72,16 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
             foreach($this->submissionList as $submission) {
 
-                $nameURL = $submission['realname'] != '' ? "/send.php?id=" . $submission['fileID'] : false;
                 $date = new Alaress_Date_Format($submission['date'], 'U');
                 $dateHTML = $date->getDateOnly();
-                $nameHTML = ($nameURL ? '<a href="'.$nameURL.'" rel="external">' : "") . Scrub::text($submission['name']) . ($nameURL ? '</a>' : "");
+
 
                 /* Actions Block */
                 $this->setBlock('duework', 'duework_actions', 'duework_actions_block');
 
                 // what to display if student
                 if($this->groupHandler->isStudent()) {
-                    $this->setVar('DUE_ACTION', '/submission/submissionHistory/' . $submission['id']);
+                    $actionURL = '/submission/submissionHistory/' . $submission['id'];
 
 
                     // if a mark has been given, regardless of all other detail, display "View Mark"
@@ -120,10 +119,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
                 // what to display if staff
                 elseif ($this->groupHandler->isStaff() && $submission['owner'] == $_SESSION['id']) {
-                    $this->setVar('DUE_ACTION', '/submission/viewSubmission/' . $submission['id']);
-                    $this->setVar('DUE_ACTION_NAME', 'View Work');
-
-                    $this->parse('duework_actions_block', 'duework_actions');
+                    $actionURL = '/submission/viewSubmission/' . $submission['id'];
                 }
 
                 // if anybody else, don't display anything
@@ -131,12 +127,15 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                     $this->setVar('duework_actions_block', '');
                 }
 
+	            $nameHTML = ($actionURL ? '<a href="'.$actionURL.'">' : "") . Scrub::text($submission['name']) . ($actionURL ? '</a>' : "");
+
                 $output = array(
                     'DUE_ID'      => $submission['id'],
+	                'DUE_ACTION'  => $actionURL,
                     'DUE_NAME'	  => $nameHTML,
                     'DUE_TYPE'	  => Scrub::text($submission['typeName']),
                     'DUE_DATE'	  => $dateHTML,
-                    'DUE_COMMENT' => nl2br(Scrub::text($submission['description'])),
+                    'DUE_COMMENT' => Scrub::html($submission['description']),
                     'ON_OFF'      => ++$j % 2 ? '' : 'dark',
                 );
 
