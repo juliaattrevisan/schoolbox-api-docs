@@ -59,6 +59,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 
 			$event->setColour($this->calendarHandler->displayColour(4));
 			$event->setStartTime($activity->getDate());
+			$event->setEndTime($activity->getDate());
 
 			//
 			// Will only be all day if the event's date is one second before
