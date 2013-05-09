@@ -55,6 +55,11 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 			$event->setStartTime($activity->getDate());
 
 			//
+			// Will only be all day if the event's date is one second before
+			// midnight.
+			$event->setAllDay($activity->getDate()->getUsingFormat('H:i:s') === '23:59:59');
+
+			//
 			// Populate differently based on whether an assessment or submission
 			if ($activity->isAssessment()) {
 				$assessment = $activity->getAssessment();
