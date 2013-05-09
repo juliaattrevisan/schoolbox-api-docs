@@ -436,7 +436,7 @@ class Calendar_API extends Generic_API {
 					'date' => $event->getStartTime()->getDatabaseDate(),
 					'location' => $event->getLocation(),
 					'attendance' =>  method_exists($event, 'getAtendance') ? $event->getAttendance() : '',
-					'detail' => $event->getDetail(),
+					'detail' => Scrub::html($event->getDetail()),
 					'publish_date' => $event->getPublishDate(),
 					'date' => $event->getStartTime()->getDatabaseDate(),
 					'startTime' => $event->getStartTime()->getUsingFormat('h:iA'),

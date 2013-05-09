@@ -16,7 +16,7 @@
         {% endif %}
     {% else %}
         {% if content.detail %}
-        <li>{{ content.detail }}</li>
+        <li>{{ content.detail | raw }}</li>
         {% else %}
         <li><p>No extra information</p></li>
         {% endif %}

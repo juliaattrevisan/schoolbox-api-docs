@@ -1,0 +1,1 @@
+ALTER TABLE `event` CHANGE `detail` `detail` TEXT NULL;
