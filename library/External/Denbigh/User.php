@@ -74,7 +74,7 @@ class External_Denbigh_User implements External_UserInterface {
             "
 			SELECT Houses.housemaster_id
 			FROM Houses
-			WHERE Houses.id = $houseId
+			WHERE Houses.id = {$this->getExternalDatabase()->quote($houseId)}
 		"
         );
 
@@ -93,8 +93,8 @@ class External_Denbigh_User implements External_UserInterface {
 			LEFT JOIN Parents pa ON pa.familyDenbighID = Parents.familyDenbighID
 			LEFT JOIN People pe ON pe.denbighID = pa.peopleDenbighID
 			LEFT JOIN Addresses a ON a.familyDenbighID = pa.familyDenbighID
-			WHERE People.denbighID = $externalUserId
-			ORDER BY pe.denbighID = $externalUserId DESC
+			WHERE People.denbighID = {$this->getExternalDatabase()->quote($externalUserId)}
+			ORDER BY pe.denbighID = {$this->getExternalDatabase()->quote($externalUserId)} DESC
 		"
         );
 
@@ -164,7 +164,7 @@ class External_Denbigh_User implements External_UserInterface {
 			/* Parent's address */
 			LEFT JOIN Addresses a ON a.familyDenbighID = pa.familyDenbighID
 				AND a.telephoneHome IS NOT NULL
-			WHERE pe.denbighID = $externalUserId
+			WHERE pe.denbighID = {$this->getExternalDatabase()->quote($externalUserId)}
 			LIMIT 1
 		"
         );
@@ -280,7 +280,7 @@ class External_Denbigh_User implements External_UserInterface {
 
 			/* Address */
 			LEFT JOIN Addresses a ON a.familyDenbighID = s.familyDenbighID
-			WHERE pe_s.denbighID = $externalUserId
+			WHERE pe_s.denbighID = {$this->getExternalDatabase()->quote($externalUserId)}
 			GROUP BY pe_p.denbighID";
 
         $statement = $this->getExternalDatabase()->query($query);
@@ -334,7 +334,7 @@ class External_Denbigh_User implements External_UserInterface {
 				RIGHT JOIN Staff s ON s.peopleDenbighID = p.denbighID
 				RIGHT JOIN Classes cl ON cl.staffCode = s.staffCode
 				RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-				WHERE p.denbighID = $externalUserId
+				WHERE p.denbighID = {$this->getExternalDatabase()->quote($externalUserId)}
 			"
             );
         } else {
@@ -345,7 +345,7 @@ class External_Denbigh_User implements External_UserInterface {
 				RIGHT JOIN Enrolments e ON e.studentID = p.denbighID
 				RIGHT JOIN Classes cl ON cl.classCode = e.classCode
 				RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-				WHERE p.denbighID = $externalUserId
+				WHERE p.denbighID = {$this->getExternalDatabase()->quote($externalUserId)}
 			"
             );
         }
@@ -362,7 +362,7 @@ class External_Denbigh_User implements External_UserInterface {
 			FROM People pe
 			LEFT JOIN Parents pa ON pa.peopleDenbighID = pe.denbighID
 			LEFT JOIN Students s ON s.familyDenbighID = pa.familyDenbighID
-			WHERE pe.denbighID = $externalUserId
+			WHERE pe.denbighID = {$this->getExternalDatabase()->quote($externalUserId)}
 		"
         );
 
