@@ -31,6 +31,15 @@ class Calendar_Event_Type_Submission extends Calendar_Event_Type_Abstract {
      */
     protected $eventType = 'Due Work';
 
+    /**
+     * Is this an online assessment or not?
+     *
+     * @todo Debate whether this should be shoehorned into a submission event
+     *
+     * @var bool
+     */
+    protected $is_assessment = false;
+
     /* CSV string of class (category) codes
      */
     private $categoryCodes = array();
@@ -183,5 +192,22 @@ class Calendar_Event_Type_Submission extends Calendar_Event_Type_Abstract {
      */
     public function getSubmissionBoxDetail() {
         return $this->submissionBoxDetail;
+    }
+
+    /**
+     * @param  bool $is_assessment
+     *
+     * @return $this
+     */
+    public function setIsAssessment($is_assessment) {
+        $this->is_assessment = $is_assessment;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsAssessment() {
+        return $this->is_assessment;
     }
 }
