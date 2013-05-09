@@ -64,6 +64,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
         //due output
         $this->setBlock($templateHandle, 'duework', 'duework_block');
+	    $this->setBlock($templateHandle, 'allwork_button', 'allwork_button_block');
 
 
         if (is_array($this->submissionList)) {
@@ -153,6 +154,24 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         else
             $this->parse("submit_dw_block", "submit_dw");
 
+	    // is the current user a member of this category?
+	    $catAccess = $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext('id'));
+	    $subAccess = false;
+	    if($this->getContext('code')) {
+		    $subAccess = $this->groupHandler->involvedInSubject($this->getContext('code'));
+	    }
+
+	    // if the user is SOMEHOW involved in this category...
+	    if($catAccess || $subAccess) {
+		    $this->setVar(array(
+				'WORK_YEAR' => date('Y'),
+				'WORK_SEMESTER' => DueWork_All::getSemester()
+			));
+		    $this->parse('allwork_button_block', 'allwork_button');
+	    }
+	    else {
+		    $this->setVar('allwork_button_block', '');
+	    }
 
         return true;
     }
