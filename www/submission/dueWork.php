@@ -183,6 +183,14 @@ $startDay = mktime(12, 0, 0, $selectedMonth, 1, $selectedYear) - strtotime("+$fi
 // output calendar
 $summary = array();
 
+$event_api  = new Calendar_Api_EventType_Submission_Schoolbox_Default(null);
+$event_list = $event_api->getEvents($startDay, strtotime("+$totalDays day", $startDay));
+$event_list_by_day = array();
+foreach ($event_list->createIterator() as $event_object) {
+    $date = $event_object->getStartTime()->getUsingFormat('dmY');
+    $event_list_by_day[$date][] = $event_object;
+}
+
 for ($i = 0; $i < $totalDays; $i++) {
     $currentDay = strtotime("+$i day", $startDay);
 
@@ -192,48 +200,43 @@ for ($i = 0; $i < $totalDays; $i++) {
         $this->setVar('OTHER_MONTH', '');
     }
 
+    $this_day = date('dmY', $currentDay);
     $output = array(
         'DATE' => date("j", $currentDay),
         'PAST' => $i >= $firstDay && $i < $numDaysinMonth + $firstDay ? '' : 'past',
-        'ACTIVE' => date('dmY', $currentDay) == $targetDate->getUsingFormat('dmY') ? 'active' : '',
-        'TODAY' => date('dmY') == date('dmY', $currentDay) ? 'today' : '',
+        'ACTIVE' => $this_day == $targetDate->getUsingFormat('dmY') ? 'active' : '',
+        'TODAY' => date('dmY') == $this_day ? 'today' : '',
         'RIGHTY' => $day > 3 ? 'righty' : '',
     );
 
     $this->setVar($output);
 
-    $eventList = $submissionHandler->getByDate($currentDay, $user['uid'], $categoryIDList);
+    $eventList = isset($event_list_by_day[$this_day]) ? $event_list_by_day[$this_day] : array();
 
-    if (is_array($eventList)) {
-        foreach ($eventList as $event) {
-            $due = ($event['realname'] && $event['open_date'] < time() && $event['late_date'] > time(
-            ) && $event['accept_submission']);
+    foreach ($eventList as $event) {
+        $date = $event->getStartTime();
 
-            $date = new Alaress_Date_Format(strtotime($event['date']), 'U');
-
-            $event_id = $event['id'];
-            if ($event['is_assessment']) {
-                $event_id = 'assess-'.$event_id;
-            }
-            $output = array(
-                'EVENT_ID' => $event_id,
-                'TIME' => $date->getTimeOnly(),
-                'EVENT' => Scrub::text($event['name']),
-                'EVENT_PAST' => !$due ? 'fade' : '',
-                'EVENT_CAT_ID' => $event['category'],
-            );
-
-            $this->setVar($output);
-            $this->parse('event_block', 'event', true);
-
-            /* record overview for summary box */
-            $summary[$event['category']] = array(
-                'name' => $event['categoryName'],
-                'total' => ++$summary[$event['category']]['total'],
-                'due' => $due ? ++$summary[$event['category']]['due'] : $summary[$event['category']]['due'],
-                'code' => explode(',', $event['categoryCode']),
-            );
+        $event_id = $event->getSubmissionBoxId();
+        if ($event->getIsAssessment()) {
+            $event_id = 'assess-'.$event_id;
         }
+        $category_id = $event->getCategoryId();
+        $output = array(
+            'EVENT_ID' => $event_id,
+            'TIME' => $event->getTime(),
+            'EVENT' => Scrub::text($event->getSubmissionBoxName()),
+            'EVENT_CAT_ID' => $category_id,
+        );
+
+        $this->setVar($output);
+        $this->parse('event_block', 'event', true);
+
+        /* record overview for summary box */
+        $summary[$category_id] = array(
+            'name' => $event->getCategoryName(),
+            'total' => ++$summary[$category_id]['total'],
+            'code' => $event->getCategoryCodes(),
+        );
     }
 
     $this->parse('day_block', 'day', true);
@@ -367,7 +370,6 @@ foreach ($categoryList as $category) {
         'SUBJ_SUBJECT_CODE' => $categoryCode,
         'SUBJ_SUBJECT_URL' => '/homepage/' . $categoryID,
         'SUBJ_TOTAL' => $summary[$category['id']]['total'],
-        'SUBJ_DUE' => $summary[$category['id']]['due'],
         'SUBJ_TREND_DIR' => $trendDir,
         'SUBJ_TREND_AMT' => $trendAmt,
         'SUBJ_HAS_GRADE' => 'grade',

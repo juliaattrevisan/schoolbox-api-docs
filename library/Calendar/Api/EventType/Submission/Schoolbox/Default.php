@@ -29,9 +29,67 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 	 * @return Calendar_Event_Collection
 	 */
 	public function getEvents($startTimestamp, $endTimestamp) {
-		$collection = $this->getCalendarHandler()->getSubmissionEvents($startTimestamp, $endTimestamp);
+		//
+		// Use the mapper classes to get events for this day.
+		// Also, need the categories to filter on.
+		// Don't like using session here but other event types use them, so meh.
+		$cat_mapper = new Schoolbox\Resource\CategoryMapper();
+		$cat_mapper->setExternalUser(new External_User());
+		$user_mapper = new Schoolbox\UserMapper();
+		$category_id_list = array();
+		foreach ($cat_mapper->findForUser($user_mapper->findById($_SESSION['id'])) as $category) {
+			$category_id_list[] = $category->getId();
+		}
 
-		return $collection;
+		$stack         = new Calendar_Event_Collection();
+		$box_mapper    = new Schoolbox\Assessment\Component\SubmissionBoxMapper();
+		$assess_mapper = new Schoolbox\Assessment\Component\OnlineAssessmentMapper();
+		$activities    = $box_mapper->getDueActivities($category_id_list, $startTimestamp, $endTimestamp);
+		$activities->merge($assess_mapper->getDueActivities($category_id_list, $startTimestamp, $endTimestamp));
+		foreach ($activities as $activity) {
+			$event = new Calendar_Event_Type_Submission();
+			$event->setCategoryId($activity->getCategory()->getId());
+			$event->setCategoryName($activity->getCategory()->getName());
+
+			$category_codes = array();
+			foreach ($activity->getCategory()->getCodes() as $code) {
+				$category_codes[] = $code->getCode();
+			}
+			$event->setCategoryCodes($category_codes);
+
+			$event->setColour($this->calendarHandler->displayColour(4));
+			$event->setStartTime($activity->getDate());
+
+			//
+			// Will only be all day if the event's date is one second before
+			// midnight.
+			$event->setAllDay($activity->getDate()->getUsingFormat('H:i:s') === '23:59:59');
+
+			//
+			// Populate differently based on whether an assessment or submission
+			if ($activity->isAssessment()) {
+				$assessment = $activity->getAssessment();
+				$owner      = $assessment->getUser();
+				$event->setIsAssessment(true);
+				$event->setSubmissionBoxId($assessment->getId());
+				$event->setSubmissionBoxName($assessment->getTitle());
+				$event->setSubmissionBoxDetail($assessment->getDescription());
+			}
+			else {
+				$submission_box = $activity->getSubmissionBox();
+				$owner          = $submission_box->getOwner();
+				$event->setIsAssessment(false);
+				$event->setSubmissionBoxId($submission_box->getId());
+				$event->setSubmissionBoxName($submission_box->getName());
+				$event->setSubmissionBoxDetail($submission_box->getDescription());
+			}
+
+			$event->setAuthorId($owner->getId());
+			$event->setAuthorName($owner->getFirstName() . ' ' . $owner->getLastName());
+
+			$stack->add($event);
+		}
+		return $stack;
 	}
 
 	/**

@@ -591,6 +591,9 @@ class Group extends DeprecatedModel
 
     /*
      * New function to make retrieving the list of user subjects easier, is deprecating involvedCategoryList
+     *
+     * @see Schoolbox\Resource\CategoryMapper->getForUser() for an implementation
+     *      that uses the mapper classes.
      */
     function involvedInCategoryList($userID, $includeSubjectList = true, $accessType = READ_ACCESS)
     {
