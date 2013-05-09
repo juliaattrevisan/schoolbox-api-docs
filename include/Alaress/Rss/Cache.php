@@ -8,38 +8,17 @@
  * @version     SVN: $Id$
  */
 class Alaress_Rss_Cache extends Alaress_Cache_Abstract {
-	protected $cacheFile = null;
-	protected $cacheTime = null;
-
-	private $url = '';
 
 	/**
-	 * Constructor
+	 * Hook method
 	 *
-	 * @param  $cache_time
-	 * @param  $url
+	 * @return mixed|void
 	 */
-	public function __construct($cache_time, $url) {
-		$this->setUrl($url);
-
-		$this->setCacheFile($this->generateCacheFilename());
-		$this->setCacheTime($cache_time);
-
-		/* Set up a cached version of the url
-		 */
-		$this->setup($url);
+	protected function setup() {
+		$this->setCachedTime(Cfg::get('xml_cache_timeout'));
+		$this->setLockTime($this->getLockTimeMultiplier() * $this->getCachedTime());
 	}
 
-	/**
-	 * The cache filename to use for this rss feed
-	 *
-	 * @return string
-	 */
-	protected function generateCacheFilename() {
-		$filename = Cfg::get('stream_dir') . '/' . 'rss_' . md5($this->getUrl()) . '.xml';
-
-		return $filename;
-	}
 
 	/**
 	 * Load contents from the cache
@@ -48,28 +27,7 @@ class Alaress_Rss_Cache extends Alaress_Cache_Abstract {
 	 */
 	public function load() {
 		libxml_use_internal_errors(true);
-
-		return new SimpleXMLElement($this->getCacheFile(), null, true);
+		return new SimpleXMLElement($this->getCachedFile(), null, true);
 	}
 
-	/* Getters/Setters
-	 */
-
-	/**
-	 * Set url
-	 *
-	 * @param $url
-	 */
-	private function setUrl($url) {
-		$this->url = $url;
-	}
-
-	/**
-	 * Get url
-	 *
-	 * @return string
-	 */
-	private function getUrl() {
-		return $this->url;
-	}
 }

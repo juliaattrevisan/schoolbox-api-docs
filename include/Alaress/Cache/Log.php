@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-class Alaress_Cache_Locker_Log {
+class Alaress_Cache_Log {
 
 	/**
 	 * Show plain debugging messages
