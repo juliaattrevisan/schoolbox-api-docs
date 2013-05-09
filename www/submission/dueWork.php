@@ -222,9 +222,9 @@ for ($i = 0; $i < $totalDays; $i++) {
         $date = $event->getStartTime();
 
         $event_id = $event->getSubmissionBoxId();
-//        if ($event['is_assessment']) {
-//            $event_id = 'assess-'.$event_id;
-//        }
+        if ($event->getIsAssessment()) {
+            $event_id = 'assess-'.$event_id;
+        }
         $category_id = $event->getCategoryId();
         $output = array(
             'EVENT_ID' => $event_id,
