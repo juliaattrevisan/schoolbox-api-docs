@@ -17,27 +17,11 @@ $j(function() {
 	/* Dropdown inline editor for rows
 	 */
 	$j('.modify').live('click',function() {
-		var trigger = 0;
 
-		level = $j(this).parent().parent();
-
-		$j('.form-holder').each(function() {
-			if ($j(this).is(':visible')) {
-				level.slideUp(function() {
-					level.siblings('.form-holder').slideDown();
-				});
-
-				$j(this).siblings().slideDown();
-				$j(this).slideUp();
-				trigger = 1;
-			}
-		});
-
-		if (trigger == 0) {
-				level.slideUp(function() {
-				level.siblings('.form-holder').slideDown();
-			});
-		}
+        $j(this).closest('.row-holder').siblings('.row-holder').show();
+        $j(this).closest('.row-holder').hide();
+        $j(this).closest('.row-holder').siblings('.form-holder').hide();
+        $j(this).closest('.row-holder').next('.form-holder').show();
 
 		return false;
 	});
@@ -52,8 +36,8 @@ $j(function() {
 	<table>
 		<thead>
 			<tr>
-				<th width="38%" title="e.g. http://www.yahoo.com.au">Hyperlink</th>
-				<th width="38%"title="e.g. Yahoo Search Directory">Name</th>
+				<th width="38%" title="e.g. http://schoolbox.com/">Hyperlink</th>
+				<th width="38%"title="e.g. Schoolbox LMS">Name</th>
 				<th width="24%">Actions</th>
 			</tr>
 		</thead>
@@ -67,48 +51,23 @@ $j(function() {
 	</table>
 </form>
 
-<div class="allowed-files">
-
+<form id='mylinks' class="clearfix" action='/cms/myLinksForm.php' method='post'>
+<table width="100%">
 	<!-- BEGIN myLink -->
-	<div class="row-holder">
-		<div class="row clearfix">
-			<div class='enabled'>
-				<a href="{MYLINK_URL}">{MYLINK_URL}</a>
-			</div>
-			<div class='enabled'>
-				{MYLINK_DESCRIPTION}
-			</div>
-			<div class='enabled'>
-				<a href="#" class="btn modify no-marg"><span></span>Modify</a>
-			</div>
-		</div>
-		<div class="row form-holder">
-			<form id='link{MYLINK_ID}' class="clearfix" action='/cms/myLinksForm.php' method='post'>
-				<input type="hidden" readonly="readonly" name="linkID" value="{MYLINK_ID}" />
-
-				<fieldset class='description'>
-					<fieldset>
-						<!--<em>The internet address for the website, eg. http://www.google.com</em>-->
-						<input class="text-input" type="text" name="url" size="40" maxlength="250" value="{MYLINK_URL}" />
-					</fieldset>
-				</fieldset>
-
-				<fieldset class='description'>
-					<fieldset>
-						<!--<em>One line description of the URL for the title </em>-->
-						<input class="text-input" type="text" name="description" size="40" maxlength="100" value="{MYLINK_DESCRIPTION}" />
-					</fieldset>
-				</fieldset>
-
-				<fieldset class='description'>
-					<fieldset>
-						<a href="#" class="btn tick submit no-marg"><span></span>Save</a>
-						<a href="/cms/myLinksForm.php?delete={MYLINK_ID}" class="btn delete no-marg"><span></span>Delete</a>
-					</fieldset>
-				</fieldset>
-			</form>
-
-		</div>
-	</div>
-	<!-- END myLink -->
-</div>
+	<tr class="row-holder">
+        <td width="38%"><a href="{MYLINK_URL}">{MYLINK_URL}</a></td>
+        <td width="38%">{MYLINK_DESCRIPTION}</td>
+        <td width="24%"><a href="#" class="btn modify no-marg"><span></span>Modify</a></td>
+    </tr>
+    <tr class="row form-holder">
+        <td width="38%"><label><input class="text-input" type="text" name="url" size="40" maxlength="250" value="{MYLINK_URL}" /></label></td>
+        <td width="38%"><label><input class="text-input" type="text" name="description" size="40" maxlength="100" value="{MYLINK_DESCRIPTION}" /></label></td>
+        <td width="24%">
+            <input type="hidden" readonly="readonly" name="linkID" value="{MYLINK_ID}" />
+            <a href="#" class="btn tick submit no-marg"><span></span>Save</a>
+            <a href="/cms/myLinksForm.php?delete={MYLINK_ID}" title="Delete link" class="btn delete no-marg no-text"><span></span></a>
+        </td>
+	</tr>
+    <!-- END myLink -->
+</table>
+</form>
