@@ -1,9 +1,5 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
-    <h2>Due Work
-      <!-- BEGIN allwork_button -->
-      <a href="/submission/allWork/{USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ID}" class="btn"><span></span>View All Work</a>
-      <!-- END allwork_button -->
-    </h2>
+    <h2>Due Work</h2>
     {CONFIGURATION}
     <div class="listing clearfix">
         <ul>
@@ -22,6 +18,9 @@
             <!-- END duework -->
         </ul>
     </div>
+    <!-- BEGIN allwork_button -->
+    <a href="/submission/allWork/{USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ID}" class="btn"><span></span>View All Work</a>
+    <!-- END allwork_button -->
     <!-- BEGIN submit_dw -->
     <p class="interact">
         <a href="/submission/createSubmission/new/{ID}/" class="btn up-arrow"><span></span>Post Due Work</a>
