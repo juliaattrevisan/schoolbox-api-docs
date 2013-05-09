@@ -88,11 +88,9 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
             )
         );
 
-        $iterator = $this->eventList->createIterator();
-
 	    $prevDay = false;
 
-	    foreach($iterator as $currentEvent) {
+	    foreach ($this->eventList as $currentEvent) {
 
 		    $currentDay = $currentEvent->getStartTime();
 		    if($prevDay != false && $currentDay->getDateOnly() != $prevDay->getDateOnly()){
