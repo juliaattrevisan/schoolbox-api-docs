@@ -64,6 +64,7 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
                 $pixel = $this->getConfig('pixel');
             }
 
+            $this->setVar("IMAGE_ALIGN", $this->getConfig('align'));
             $this->setVar("PREVIEW_IMAGE_URL", "/cms/image.php?id={$image['id']}&height=$pixel&width=$pixel");
             $this->setVar("PREVIEW_IMAGE_DESC", Scrub::text($image['comment']));
 
