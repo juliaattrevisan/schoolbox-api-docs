@@ -360,9 +360,7 @@ class Eportfolio {
 		$allInstanceIds = array();
 
 		if ($allComponents->count()) {
-			for ($allComponents->rewind(); $allComponents->valid(); $allComponents->next()) {
-				$currentComponent = $allComponents->current();
-
+			foreach ($allComponents as $currentComponent) {
 				/* Remember this id so we can get their configs again later
 				 */
 				$allInstanceIds[] = $currentComponent->id;
@@ -376,9 +374,7 @@ class Eportfolio {
 				$allConfigs = Component_ConfigMapper::getInstance()->findIn('component_instance_id', $allInstanceIds);
 
 				if ($allConfigs->count()) {
-					for ($allConfigs->rewind(); $allConfigs->valid(); $allConfigs->next()) {
-						$currentConfig = $allConfigs->current();
-
+					foreach ($allConfigs as $currentConfig) {
 						Component_ConfigMapper::getInstance()->delete($currentConfig);
 					}
 				}
@@ -392,9 +388,7 @@ class Eportfolio {
 		));
 
 		if ($allPermissions->count()) {
-			for ($allPermissions->rewind(); $allPermissions->valid(); $allPermissions->next()) {
-				$currentPermission = $allPermissions->current();
-
+			foreach ($allPermissions as $currentPermission) {
 				Eportfolio\PermissionMapper::getInstance()->delete($currentPermission);
 			}
 		}

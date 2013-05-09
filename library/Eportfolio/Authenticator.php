@@ -161,9 +161,7 @@ class Eportfolio_Authenticator {
 			 */
 			$parentSettingCollection = \Eportfolio\PermissionMapper::getInstance()->findParentSetting($this->getPageId());
 
-			for($parentSettingCollection->rewind(); $parentSettingCollection->valid(); $parentSettingCollection->next()) {
-				$current = $parentSettingCollection->current();
-
+			foreach ($parentSettingCollection as $current) {
 				if (($current->getValue()) && $this->getGroupHandler()->isParentOfChild($this->getEportfolioHandler()->getSettingsPageOwner())) {
 					$youCanView = true;
 				}
