@@ -230,7 +230,7 @@ class External_Denbigh_User implements External_UserInterface {
 				s.staffCode
 			FROM People p
 			LEFT JOIN Staff s ON s.peopleDenbighID = p.denbighID
-			WHERE p.denbighID = $externalUserId
+			WHERE p.denbighID = {$this->getExternalDatabase()->quote($externalUserId)}
 		"
         );
 
