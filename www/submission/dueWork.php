@@ -214,11 +214,6 @@ for ($i = 0; $i < $totalDays; $i++) {
     $eventList = isset($event_list_by_day[$this_day]) ? $event_list_by_day[$this_day] : array();
 
     foreach ($eventList as $event) {
-        $due = false;
-//        $due = ($event['realname'] && $event['open_date'] < time() && $event['late_date'] > time(
-//        ) && $event['accept_submission']);
-
-//        $date = new Alaress_Date_Format(strtotime($event['date']), 'U');
         $date = $event->getStartTime();
 
         $event_id = $event->getSubmissionBoxId();
@@ -230,7 +225,6 @@ for ($i = 0; $i < $totalDays; $i++) {
             'EVENT_ID' => $event_id,
             'TIME' => $event->getTime(),
             'EVENT' => Scrub::text($event->getSubmissionBoxName()),
-            'EVENT_PAST' => !$due ? 'fade' : '',
             'EVENT_CAT_ID' => $category_id,
         );
 
@@ -241,7 +235,6 @@ for ($i = 0; $i < $totalDays; $i++) {
         $summary[$category_id] = array(
             'name' => $event->getCategoryName(),
             'total' => ++$summary[$category_id]['total'],
-            'due' => $due ? ++$summary[$category_id]['due'] : $summary[$category_id]['due'],
             'code' => $event->getCategoryCodes(),
         );
     }
@@ -377,7 +370,6 @@ foreach ($categoryList as $category) {
         'SUBJ_SUBJECT_CODE' => $categoryCode,
         'SUBJ_SUBJECT_URL' => '/homepage/' . $categoryID,
         'SUBJ_TOTAL' => $summary[$category['id']]['total'],
-        'SUBJ_DUE' => $summary[$category['id']]['due'],
         'SUBJ_TREND_DIR' => $trendDir,
         'SUBJ_TREND_AMT' => $trendAmt,
         'SUBJ_HAS_GRADE' => 'grade',
