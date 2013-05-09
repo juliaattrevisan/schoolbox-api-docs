@@ -253,14 +253,24 @@
 	<div id="tabs-2" class="customise-components">
 		<div class="clearfix">
 			<form method='post' action='/eportfolio/configForm.php'>
-				<label>
-					Page Title:
-					<input type='text' name='pageTitle' value="{PAGE_TITLE}" />
-				</label>
-				<input type='hidden' name='user_id' value='{USER_ID}' />
-				<input type='hidden' name='page_id' value='{PAGE_ID}' />
-				<input type='submit' value='submit' />
-			</form>
+                <table class="standardForm">
+                <tr>
+                    <td class="formLabelWidth">
+                        <h4>Page Title</h4>
+                        <em>Specify a title for this page</em>
+                    </td>
+                    <td>
+                        <p>
+                            <input type='text' name='pageTitle' value="{PAGE_TITLE}" />
+                            <input type='hidden' name='user_id' value='{USER_ID}' />
+                            <input type='hidden' name='page_id' value='{PAGE_ID}' />
+                            <input type="submit" label="Submit" value="Update Page" class="submit-btn-plain" style="float:none;"/>
+                        </p>
+                    </td>
+                </tr>
+                </table>
+
+            </form>
 
 			<form method="post" action="">
 				<p class="information-notification pad-it">
