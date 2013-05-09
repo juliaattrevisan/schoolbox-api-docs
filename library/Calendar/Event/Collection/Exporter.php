@@ -89,10 +89,9 @@ class Calendar_Event_Collection_Exporter extends Calendar_Event_Collection_Rende
 	public function renderAll() {
 		$v = $this->setupVcal();
 
-		$iterator = $this->getAllEvents()->createIterator();
+		$collection = $this->getAllEvents();
 
-		for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
-			$currentEvent = $iterator->current();
+		foreach ($collection as $currentEvent) {
 			$currentEvent->setRendererClass('Calendar_Event_Type_Exporter');
 
 			//

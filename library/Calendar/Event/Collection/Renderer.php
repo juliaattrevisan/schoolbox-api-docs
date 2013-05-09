@@ -88,12 +88,11 @@ class Calendar_Event_Collection_Renderer {
 	 * Render all events
 	 */
 	public function renderAll() {
-		$iterator = $this->getAllEvents()->createIterator();
+		$collection = $this->getAllEvents();
 
 		$registry = array();
 
-		for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
-			$currentEvent = $iterator->current();
+		foreach($collection as $currentEvent) {
 
 			$rendererClass = $currentEvent->getRendererClass();
 

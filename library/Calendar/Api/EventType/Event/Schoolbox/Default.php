@@ -37,13 +37,11 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	public function getEvents($startTimestamp, $endTimestamp) {
 		$collection = $this->getCalendarHandler()->getDayEvents($startTimestamp, $endTimestamp);
 
-		$iterator = $collection->createIterator();
-
 		/* Give the calendar_connector id so this event knows where it came from
 		 * This allows you to create an event detail screen in Mobile
 		 */
-		for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
-			$iterator->current()->setConnectorId($this->getConnectorId());
+		foreach ($collection as $current) {
+			$current->setConnectorId($this->getConnectorId());
 		}
 
 		return $collection;
