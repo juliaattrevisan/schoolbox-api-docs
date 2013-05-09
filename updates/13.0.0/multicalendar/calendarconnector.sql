@@ -24,7 +24,7 @@ INSERT INTO `config`(
 )
 VALUES (
   'calendar_api_caching',
-  '1800',
+  '600',
   'Calendar API update frequency',
   'The amount of time (in seconds) that external Calendars should be cached for before being re-queried.',
   'input',
