@@ -74,7 +74,7 @@ override_dh_install:
 	# Remove moved files
 	rm -rf debian/schoolbox/usr/share/schoolbox/www/conf
 	# Build css files from less
-	debian/schoolbox/usr/share/schoolbox/tools/build-less-css.sh
+	debian/schoolbox/usr/share/schoolbox/tools/build-less-css.sh -v
 
 override_dh_fixperms:
 	dh_fixperms -X var/lib/schoolbox
