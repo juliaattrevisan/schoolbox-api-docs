@@ -55,7 +55,7 @@ class DueWork_SubmissionBox_API {
             'class'   => '',
             'icon'    => 'subjects',
             'content' => array(
-                'description' => $box['description']
+                'description' => Scrub::html($box['description'])
             )
         );
 
