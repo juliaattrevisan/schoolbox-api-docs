@@ -122,6 +122,18 @@ function getFolderMeta($folderId) {
 	// joinable: is the logged in user not already a member?
 	$joinable = $groupHandler->involvedInGroup($_SESSION['id'], $folderId) ? 0 : 1;
 
+	// joinable: if not a member, check that there isn't a membership pending approval
+	if($joinable) {
+		$wList = $groupHandler->getWaitingList($folderId);
+		if(is_array($wList) && count($wList)) {
+			foreach($wList as $user) {
+				if($user['uid'] == $_SESSION['id']) {
+					$joinable = 2;
+					break;
+				}
+			}
+		}
+	}
 
 	// permissions: must have write access to see it
 	$userAccess = $groupHandler->getPermission($folderId);
@@ -190,9 +202,11 @@ function getFolderMeta($folderId) {
 function getSingleFileMeta($folderId, $fileId) {
 
 	$groupHandler = new Group();
-	$userHandler = new User();
 
 	$fmap = new FileMapper();
+	/**
+	 * @var $file \Schoolbox\Resource\File
+	 */
 	$file = $fmap->findByColumnList(array('id' => $fileId, 'deleted' => 0))->current();
 
 	if(!$file) {

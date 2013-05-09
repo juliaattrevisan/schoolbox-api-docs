@@ -75,12 +75,17 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
             if(meta.type) {
                 threePanel.folderDetail.find('p.type').show()
                 threePanel.folderDetail.find('span.type').html(meta.type + ' Group')
-
-                if(meta.joinable == 1) {
-                    threePanel.folderDetail.find('.join-btn').show()
-                }
-                else {
-                    threePanel.folderDetail.find('.join-btn').hide()
+                switch(meta.joinable) {
+                    case 2: // pending approval
+                        threePanel.folderDetail.find('.pending').show()
+                        // no break
+                    case 0: // not joinable
+                        threePanel.folderDetail.find('.join-btn').hide().parent().data('id','')
+                        break
+                    case 1: // joinable
+                        threePanel.folderDetail.find('.join-btn').show().parent().data('id', meta.id)
+                        threePanel.folderDetail.find('.pending').hide()
+                        break
                 }
             }
             else {
@@ -268,7 +273,7 @@ ThreePanelView.prototype.actionBind = function(actions) {
 
     // note: if jquery ever gets updated, .delegate() will probably need to be replaced with .on()
     this.detailsContainer.delegate('a.btn', 'click', function(event) {
-//      console.log(this)
+      console.log(this)
 
         var a = $j(this)
         var context = a.parent()
@@ -279,12 +284,16 @@ ThreePanelView.prototype.actionBind = function(actions) {
 
         // is file or link
         if(context.hasClass('rfile')) {
-            actions.cms[action](kind, id)
+            if($j.isFunction(actions.cms[action])) {
+                actions.cms[action](kind, id)
+            }
         }
 
         // is a folder
         else if(context.hasClass('rfolder')) {
-            actions.folder[action](id)
+            if($j.isFunction(actions.folder[action])) {
+                actions.folder[action](id)
+            }
         }
 
         // is multifile
