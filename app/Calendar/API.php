@@ -64,11 +64,7 @@ class Calendar_API extends Generic_API {
 		$allEvents = $calendarHandler->getEvents($month['start'], $month['end']);
 		$allEvents->sort();
 
-		$iterator = $allEvents->createIterator();
-
-		for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
-			$current = $iterator->current();
-
+		foreach ($allEvents as $current) {
 			$currentEventDay = (int)$current->getStartTime()->getUsingFormat('d');
 			if ($current->getStartTime()->getTimeOnly() == '12:00am') {
 				$current->setStartTime('');

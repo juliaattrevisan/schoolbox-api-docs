@@ -186,7 +186,7 @@ $summary = array();
 $event_api  = new Calendar_Api_EventType_Submission_Schoolbox_Default(null);
 $event_list = $event_api->getEvents($startDay, strtotime("+$totalDays day", $startDay));
 $event_list_by_day = array();
-foreach ($event_list->createIterator() as $event_object) {
+foreach ($event_list as $event_object) {
     $date = $event_object->getStartTime()->getUsingFormat('dmY');
     $event_list_by_day[$date][] = $event_object;
 }
