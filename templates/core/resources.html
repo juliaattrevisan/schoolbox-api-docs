@@ -297,6 +297,19 @@ $j(function() {
       },
       homepage : function(id) {
         window.open('/homepage/' + id, '_self')
+      },
+      join : function(id) {
+        var target = threePanel.folderDetail.find('a.join-btn')
+        // do this one via ajax
+        $j.get('/group/joinForm.php', {join : id, ajax : 1})
+            .done(function(data) {
+              if(typeof(data.status) !== 'undefined') {
+                target.hide()
+                if(data.status == 'pending') {
+                  target.siblings('.pending').show()
+                }
+              }
+            })
       }
     },
     multi : {
@@ -427,7 +440,13 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); } <!-- E
         <img src="{{FOLDER_MIME_IMG}}" alt="{{FOLDER_NAME}}" />
         <h3 class="rfolder name">{{FOLDER_NAME}}</h3>
         <p class="rfolder template">{{FOLDER_TEMPLATE}}</p>
-        <p class="rfolder type"><span class="rfolder type">{{FOLDER_TYPE}}</span><a class="rfolder join-btn btn groups"><span></span>Join</a></p>
+        <p class="rfolder type">
+          <span class="rfolder type">{{FOLDER_TYPE}}</span>
+          <a data-action="join" class="rfolder join-btn btn groups">
+            <span></span>Join
+          </a>
+          <span class="pending">Membership pending approval</span>
+        </p>
         <h4 class="rfolder perms">Permissions</h4>
         <ul class="rfolder perms">
         <!-- BEGIN folder_detail_perms -->

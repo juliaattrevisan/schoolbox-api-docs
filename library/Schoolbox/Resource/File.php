@@ -12,6 +12,7 @@
 namespace Schoolbox\Resource;
 use Schoolbox\ConfigLoader;
 use Schoolbox\IConfigLoader;
+use Schoolbox\User;
 
 class File {
 	/**
@@ -165,7 +166,7 @@ class File {
 	}
 
 	/**
-	 * @return int
+	 * @return User
 	 */
 	public function getOwner() {
 		return $this->owner;

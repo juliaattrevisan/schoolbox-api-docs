@@ -120,8 +120,17 @@ function getFolderMeta($folderId) {
 	}
 
 	// joinable: is the logged in user not already a member?
-	$joinable = $groupHandler->involvedInGroup($_SESSION['id'], $folderId) ? 0 : 1;
+	$accessType = $groupHandler->involvedInGroup($_SESSION['id'], $folderId);
 
+	if($accessType == DENY_ACCESS && !is_null($type)) {
+		$joinable = 2; // pending approval
+	}
+	elseif($groupHandler->canSubscribe($folderId)) {
+		$joinable = 1; // can join
+	}
+	else {
+		$joinable = 0; // either don't have access, or are already a member
+	}
 
 	// permissions: must have write access to see it
 	$userAccess = $groupHandler->getPermission($folderId);
@@ -172,7 +181,8 @@ function getFolderMeta($folderId) {
 		'type' => $type,
 		'joinable' => $joinable,
 		'permissions' => $permissions,
-		'actions' => $actions
+		'actions' => $actions,
+		'debug' => $debug
 	);
 
 	return $folder;
