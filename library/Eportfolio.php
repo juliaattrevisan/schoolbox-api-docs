@@ -387,7 +387,7 @@ class Eportfolio {
 
 		/* Remove the page's permissions
 		 */
-		$allPermissions = Eportfolio_PermissionMapper::getInstance()->findByColumnList(array(
+		$allPermissions = Eportfolio\PermissionMapper::getInstance()->findByColumnList(array(
 			'page_id' => $this->getPageId()
 		));
 
@@ -395,14 +395,14 @@ class Eportfolio {
 			for ($allPermissions->rewind(); $allPermissions->valid(); $allPermissions->next()) {
 				$currentPermission = $allPermissions->current();
 
-				Eportfolio_PermissionMapper::getInstance()->delete($currentPermission);
+				Eportfolio\PermissionMapper::getInstance()->delete($currentPermission);
 			}
 		}
 
 		/* Remove the page itself
 		 */
-		$pageInstance = Eportfolio_PageMapper::getInstance()->findById($this->getPageId());
-		Eportfolio_PageMapper::getInstance()->delete($pageInstance);
+		$pageInstance = Eportfolio\PageMapper::getInstance()->findById($this->getPageId());
+		Eportfolio\PageMapper::getInstance()->delete($pageInstance);
 
 		/* Redirect back to the profile
 		 */
