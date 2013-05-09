@@ -75,7 +75,7 @@ cd tools
 
 echo "Building css files from less";
 cd $thistempdir/schoolbox-$tag;
-tools/build-less-css.sh
+tools/build-less-css.sh -v
 
 echo "Install submodules using composer";
 tools/composer.sh;
