@@ -122,12 +122,7 @@ function getFolderMeta($folderId) {
 	// joinable: is the logged in user not already a member?
 	$accessType = $groupHandler->involvedInGroup($_SESSION['id'], $folderId);
 
-	// dear loose typing: bite me.
-	if($accessType === '0') {
-		$accessType = 0;
-	}
-
-	if($accessType === DENY_ACCESS && !is_null($type)) {
+	if($accessType == DENY_ACCESS && !is_null($type)) {
 		$joinable = 2; // pending approval
 	}
 	elseif($groupHandler->canSubscribe($folderId)) {
