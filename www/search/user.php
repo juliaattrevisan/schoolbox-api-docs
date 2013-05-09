@@ -366,7 +366,7 @@ if (is_numeric($this->arg[0])) {
                     /*Output email all subject teachers */
                     if ($groupHandler->isStaff()) {
                         $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
-                        $this->setVar("EMAILALL", implode('; ', $emailAll));
+                        $this->setVar("EMAILALL", implode(', ', $emailAll));
                         $this->parse("subject_mail_block", "subject_mail");
                     } else {
                         $this->setVar('subject_mail_block', '');
