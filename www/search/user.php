@@ -299,7 +299,7 @@ if (is_numeric($this->arg[0])) {
 
                 if (is_array($subjectList)) {
 
-                    $emailAll = '';
+                    $emailAll = array();
 	                $listItems = count($subjectList)>1 ? floor(count($subjectList)/2) : 1;
 
                     foreach ($subjectList as $subject) {
@@ -328,6 +328,7 @@ if (is_numeric($this->arg[0])) {
 
                                         $emailObj = new Email();
                                         $emailAddress = $emailObj->formatEmailFromArray($teacher);
+	                                    $emailAll[] = $emailAddress;
 
 	                                    $this->setVar( array( 'SUBJECT_TEACHER_ID' => $teacher['uid'],
 		                                                      'SUBJECT_TEACHER_EXTERNAL_ID' => $teacher['synergy_id'],
@@ -365,7 +366,7 @@ if (is_numeric($this->arg[0])) {
                     /*Output email all subject teachers */
                     if ($groupHandler->isStaff()) {
                         $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
-                        $this->setVar("EMAILALL", $emailAll);
+                        $this->setVar("EMAILALL", implode('; ', $emailAll));
                         $this->parse("subject_mail_block", "subject_mail");
                     } else {
                         $this->setVar('subject_mail_block', '');
@@ -379,7 +380,6 @@ if (is_numeric($this->arg[0])) {
 	            $groupList = $groupHandler->involvedInCategoryList($user['uid'], false);
 	            if (is_array($groupList)) {
 
-		            $emailAll = '';
 		            $i = 1;
 		            $listItems = count($groupList)>1 ? floor(count($groupList)/2) : 1;
 		            foreach ($groupList as $group) {
