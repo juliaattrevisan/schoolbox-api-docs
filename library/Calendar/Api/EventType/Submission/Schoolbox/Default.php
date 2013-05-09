@@ -41,42 +41,41 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 			$category_id_list[] = $category->getId();
 		}
 
-		$stack      = new Calendar_Event_Collection();
-		$box_mapper = new Schoolbox\Assessment\Component\SubmissionBoxMapper();
-		foreach ($box_mapper->getDueActivities($category_id_list, $startTimestamp, $endTimestamp) as $activity) {
-			$event = new Calendar_Event_Type_Submission();
-			$submission_box = $activity->getSubmissionBox();
-			$event->setCategoryId($activity->getCategory()->getId());
-			$event->setCategoryName($activity->getCategory()->getName());
-//			$event->setCategoryCodes($submission['synergyCode']);
-
-			$owner = $submission_box->getOwner();
-			$event->setAuthorId($owner->getId());
-			$event->setAuthorName($owner->getFirstName() . ' ' . $owner->getLastName());
-			$event->setSubmissionBoxId($submission_box->getId());
-			$event->setSubmissionBoxName($submission_box->getName());
-			$event->setSubmissionBoxDetail($submission_box->getDescription());
-			$event->setColour($this->calendarHandler->displayColour(4));
-			$event->setStartTime($activity->getDate());
-			$stack->add($event);
-		}
-
+		$stack         = new Calendar_Event_Collection();
+		$box_mapper    = new Schoolbox\Assessment\Component\SubmissionBoxMapper();
 		$assess_mapper = new Schoolbox\Assessment\Component\OnlineAssessmentMapper();
-		foreach ($assess_mapper->getDueActivities($category_id_list, $startTimestamp, $endTimestamp) as $activity) {
+		$activities    = $box_mapper->getDueActivities($category_id_list, $startTimestamp, $endTimestamp);
+		$activities->merge($assess_mapper->getDueActivities($category_id_list, $startTimestamp, $endTimestamp));
+		foreach ($activities as $activity) {
 			$event = new Calendar_Event_Type_Submission();
-			$assessment = $activity->getAssessment();
 			$event->setCategoryId($activity->getCategory()->getId());
 			$event->setCategoryName($activity->getCategory()->getName());
-//			$event->setCategoryCodes($submission['synergyCode']);
 
-			$owner = $assessment->getUser();
-			$event->setAuthorId($owner->getId());
-			$event->setAuthorName($owner->getFirstName() . ' ' . $owner->getLastName());
-			$event->setSubmissionBoxId($assessment->getId());
-			$event->setSubmissionBoxName($assessment->getTitle());
-			$event->setSubmissionBoxDetail($assessment->getDescription());
 			$event->setColour($this->calendarHandler->displayColour(4));
 			$event->setStartTime($activity->getDate());
+
+			//
+			// Populate differently based on whether an assessment or submission
+			if ($activity->isAssessment()) {
+				$assessment = $activity->getAssessment();
+				$owner      = $assessment->getUser();
+				$event->setIsAssessment(true);
+				$event->setSubmissionBoxId($assessment->getId());
+				$event->setSubmissionBoxName($assessment->getTitle());
+				$event->setSubmissionBoxDetail($assessment->getDescription());
+			}
+			else {
+				$submission_box = $activity->getSubmissionBox();
+				$owner          = $submission_box->getOwner();
+				$event->setIsAssessment(false);
+				$event->setSubmissionBoxId($submission_box->getId());
+				$event->setSubmissionBoxName($submission_box->getName());
+				$event->setSubmissionBoxDetail($submission_box->getDescription());
+			}
+
+			$event->setAuthorId($owner->getId());
+			$event->setAuthorName($owner->getFirstName() . ' ' . $owner->getLastName());
+
 			$stack->add($event);
 		}
 		return $stack;
