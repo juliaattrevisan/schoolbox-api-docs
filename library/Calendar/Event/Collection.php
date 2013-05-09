@@ -16,19 +16,16 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Event_Collection {
+class Calendar_Event_Collection implements Iterator {
 
 	/* A bunch of Calendar_Event_Type_Abstract subclasses
 	 */
 	private $stack = array();
+	private $position = 0;
 
 	/* Cached set of colours
 	 */
 	private $colourSet = array();
-
-	/* Iterator class to manage traversal
-	 */
-	private $iterator = null;
 
 	/**
 	 * Constructor
@@ -61,17 +58,6 @@ class Calendar_Event_Collection {
 //		}
 //
 //		$this->setColourSet($colours);
-	}
-
-	/**
-	 * Instantiate an iterator
-	 *
-	 * @return null
-	 */
-	public function createIterator() {
-		$this->setIterator(new Calendar_Event_Collection_Iterator($this->getStack()));
-
-		return $this->getIterator();
 	}
 
 	/**
@@ -195,16 +181,6 @@ class Calendar_Event_Collection {
 	/* Getters/Setters
 	 */
 
-	/**
-	 * Set iterator
-	 *
-	 * @param $iterator
-	 *
-	 * @return null
-	 */
-	public function setIterator($iterator) {
-		$this->iterator = $iterator;
-	}
 
 	/**
 	 * Get iterator
@@ -212,7 +188,7 @@ class Calendar_Event_Collection {
 	 * @return null
 	 */
 	public function getIterator() {
-		return $this->iterator;
+		return $this;
 	}
 
 	/**
@@ -234,4 +210,49 @@ class Calendar_Event_Collection {
 	public function getStack() {
 		return $this->stack;
 	}
+
+	/**
+	 * Rewind
+	 */
+	public function rewind() {
+		$this->position = 0;
+	}
+
+	/**
+	 * Current
+	 *
+	 * @return mixed
+	 */
+	public function current() {
+		return $this->stack[$this->position];
+	}
+
+	/**
+	 * Key
+	 *
+	 * @return mixed
+	 */
+	public function key() {
+		return $this->position;
+	}
+
+	/**
+	 * Next
+	 */
+	public function next() {
+		++$this->position;
+	}
+
+	/**
+	 * Valid
+	 *
+	 * @return bool
+	 */
+	public function valid() {
+		return isset($this->stack[$this->position]);
+	}
+
+
+
+
 }
