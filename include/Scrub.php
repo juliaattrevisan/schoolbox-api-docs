@@ -123,7 +123,8 @@ class Scrub {
                 'padlet.com/embed/',
                 'linoit.com/users/linoit-com/canvases/',
                 'www.showme.com/sma/embed',
-	            'www.sunsmart.com.au/uvalert/'
+	            'www.sunsmart.com.au/uvalert/',
+	            'skydrive.live.com/embed',
             );
 
             $config->set('URI.SafeIframeRegexp', '%^(?:https?:|)//(?:' . implode('|', $safeIframeSources) . ')%');
