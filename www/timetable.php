@@ -58,14 +58,34 @@ if ($groupHandler->isParent()) {
 else {
     if ($child_id) {
         if ($groupHandler->isStaff()) {
-            $outputList[] = $userHandler->getByID($child_id);
+			//Output a timetable for each campus user is involved in
+	        $user = $userHandler->getByID($child_id);
+	        $campusList = $userHandler->getUserCampus($child_id);
+
+	        foreach($campusList as $campus ) {
+		        $user['campus'] = $campus;
+		        $outputList[] = $user;
+	        }
         }
         else {
             error(19);
         }
     }
     else {
-        $outputList[] = $userHandler->getByID($_SESSION['id']);
+	    //Output a timetable for each campus a staff is involved in
+	    if($groupHandler->isStaff()) {
+	        $user = $userHandler->getByID($_SESSION['id']);
+	        $campusList = $userHandler->getUserCampus($_SESSION['id']);
+		    print_r($campusList);
+
+	        foreach($campusList as $campus ) {
+		        $user['campus'] = $campus;
+		        $outputList[] = $user;
+            }
+	    }
+		else {
+			$outputList[] = $userHandler->getByID($_SESSION['id']);
+		}
     }
 }
 
