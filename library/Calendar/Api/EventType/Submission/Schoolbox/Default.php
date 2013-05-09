@@ -51,6 +51,12 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 			$event->setCategoryId($activity->getCategory()->getId());
 			$event->setCategoryName($activity->getCategory()->getName());
 
+			$category_codes = array();
+			foreach ($activity->getCategory()->getCodes() as $code) {
+				$category_codes[] = $code->getCode();
+			}
+			$event->setCategoryCodes($category_codes);
+
 			$event->setColour($this->calendarHandler->displayColour(4));
 			$event->setStartTime($activity->getDate());
 

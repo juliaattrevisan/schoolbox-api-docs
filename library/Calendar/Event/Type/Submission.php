@@ -125,9 +125,7 @@ class Calendar_Event_Type_Submission extends Calendar_Event_Type_Abstract {
      * @param $categoryCodes
      */
     public function setCategoryCodes($categoryCodes) {
-        if ($categoryCodes) {
-            $this->categoryCodes = explode(',', $categoryCodes);
-        }
+        $this->categoryCodes = $categoryCodes;
     }
 
     /**
