@@ -34,10 +34,12 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
         $this->setBlock('assess', 'resumeLink', 'resumeLink_block');
         $this->setBlock('assess', 'assessLink', 'assessLink_block');
         $this->setBlock('assess', 'assessNoLink', 'assessNoLink_block');
+	    $this->setBlock('assess', 'studentLink', 'studentLink_block');
 
         /* Remove resumeLink by default
         */
         $this->setVar('resumeLink_block', '');
+	    $this->setVar('studentLink_block', '');
 
         $groupHandler = new Group();
         $assessHandler = new Assess_Main();
@@ -133,6 +135,17 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                                 $this->setVar('ASSESS_FINISH_DATE', 'Completed');
                             }
                         }
+
+
+	                    // user has attempted, so show results page
+	                    $firstSection = $sectionHandler->getFirst($currentAssess['assess_id']);
+	                    $this->setVar(array(
+		                    'ASSESS_ASSESS_ID' => $currentAssess['assess_id'],
+		                    'ASSESS_SECTION_ID' => $firstSection['section_id'],
+		                    'ASSESS_ATTEMPT_ID' => $attempt['attempt_id']
+	                    ));
+	                    $this->parse('studentLink_block', 'studentLink');
+
                     } else {
                         /* Do not show link if past finish date */
                         if ($assessHandler->isExpired($currentAssess['assess_id'])) {
