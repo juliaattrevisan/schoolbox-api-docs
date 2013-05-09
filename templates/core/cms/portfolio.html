@@ -7,7 +7,7 @@
 <script type="text/javascript">
 $j(document).ready(function() {
 
-  var threePanel = new ThreePanelView('/ajax/resource/cmsMeta.php')
+  var threePanel = new ThreePanelView('/ajax/resource/cmsMeta.php', 'eportfolio')
 
 	/* left tree navigation */
 	$j('#tree').tree({
@@ -258,7 +258,7 @@ $j(document).ready(function() {
         },
         delete : function(kind, id) {
           if(confirm("Are you sure you want to delete this file?")) {
-            window.open('/cms/myFileForm.php?delete=' + id, "self")
+            window.open('/cms/myFileForm.php?delete=' + id, "_self")
           }
         }
       },
@@ -285,20 +285,15 @@ $j(document).ready(function() {
       },
       multi : {
         delete : function() {
-          var selected = $j('#file-list tr.selected'), fileList = '', linkList = '', id
+          var selected = $j('#file-list tr.selected'), fileList = '', id
 
           if(selected.length > 1) {
             selected.each(function() {
-              id = $j(this).attr("id").substring(5) + ','
-
-              if ($j(this).hasClass('link'))
-                linkList += id
-              else
-                fileList += id
+              fileList += $j(this).attr("id").substring(5) + ','
             })
 
             if (confirm("Are you sure you want to delete this selection?")) {
-              window.open("/cms/fileForm.php?fileList="+fileList+"&linkList="+linkList+"&deleteList=1", "_self")
+              window.open("/cms/myFileForm.php?fileList="+fileList+"&deleteList=1", "_self")
             }
           }
         }
