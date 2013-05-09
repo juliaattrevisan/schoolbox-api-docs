@@ -3,12 +3,29 @@
     <script type="text/javascript" src="/javascript/jquery.imagesloaded.js"></script>
     <script type="text/javascript">
         $j(function () {
-            $j('.slideshow-cycle img').imagesLoaded(function (images) {
-                $j('#galleryCycle-{COMPONENT_INSTANCE_ID}').cycle({
+            var container = $j('#galleryCycle-{COMPONENT_INSTANCE_ID}');
+            container.find('.slideshow-cycle img').imagesLoaded(function (images) {
+                container.cycle({
                     timeout:{COMPONENT_CONFIG_TIMING_VALUE_MS},
                     cleartype:true,
-                    height:'auto'
-                });
+                    height:'auto',
+                    before: function(currSlideElement, nextSlideElement, options, forwardFlag) {
+                        var css = {position: 'relative'};
+                        switch ('{COMPONENT_ALIGN}') {
+                            case 'center':
+                                css.margin = '0 auto';
+                                break;
+                            case 'right':
+                                css.margin = '0 0 0 auto';
+                                break;
+                            case 'left':
+                            default:
+                                css.margin = '0 auto 0 0';
+                                break;
+                        }
+                        $j(currSlideElement).add(nextSlideElement).css(css);
+                    }
+                }).width('100%');
             });
         });
     </script>
