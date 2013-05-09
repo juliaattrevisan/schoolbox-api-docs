@@ -6,6 +6,7 @@ $page = new SitePage();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/my-file.php';
 $fileHandler = new MyFile();
 
+// Upload a new file
 if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
 
     $file = array(
@@ -64,20 +65,40 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
         SitePage::localRedir('/cms/portfolio/' . $_POST['parent']);
     }
 }
+// delete a single file
 elseif (is_numeric($_GET['delete'])) {
-
-    if (!$file = $fileHandler->getByID($_GET['delete'])) {
-        error(2);
-    }
-
-    if ($file['owner'] != $_SESSION['id']) {
-        $page->error(48);
-    }
-
-    $fileHandler->delete($_GET['delete']);
-
-    SitePage::localRedir('/cms/portfolio/' . $file['parent']);
+	$e = deleteMyFile($fileHandler, $_GET['delete']);
+	if(is_numeric($e)) {
+		error($e);
+	}
+    SitePage::localRedir('/cms/portfolio/' . $e['parent']);
 }
+// delete multiple files
+elseif (isset($_GET['fileList']) && is_numeric($_GET['deleteList'])) {
+	$fileList = array_values(array_filter(explode(',', $_GET['fileList'])));
+	$errorList = array();
+	$parent = 0;
+	if(is_array($fileList) && count($fileList)) {
+		foreach($fileList as $file) {
+			$e = deleteMyFile($fileHandler, $file);
+			if(is_numeric($e)) {
+				$errorList[] = $e;
+			}
+			else {
+				// it's fine for this to be overwritten each iteration
+				$parent = $e['parent'];
+			}
+		}
+		if(count($errorList)) {
+			error($errorList[0]);
+		}
+		SitePage::localRedir('/cms/portfolio/' . $parent);
+	}
+	else {
+		error(2);
+	}
+}
+// relocate a file
 else if (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
     /* Move file from one category to another, after checking permission on both from and to categories
       */
@@ -90,4 +111,22 @@ else if (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
     }
 
     $fileHandler->update(array('id' => $_POST['move'], 'parent' => $_POST['categoryID']));
+}
+
+
+/**
+ * @param MyFile $fileHandler
+ * @param int $fileId
+ * @return int errorCode | array file
+ */
+function deleteMyFile($fileHandler, $fileId) {
+	if (!$file = $fileHandler->getByID($fileId)) {
+		return 41; // file does not exist
+	}
+	if ($file['owner'] != $_SESSION['id']) {
+		return 48; // don't have permission
+	}
+	return $fileHandler->delete($fileId)
+		? $file
+		: 2; // not enough info submitted (should theoretically never happen based on above checks)
 }

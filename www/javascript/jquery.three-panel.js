@@ -2,11 +2,14 @@
  * Create a Three Panel View
  *
  * @param callbackURL
+ * @param context
  * @constructor
  */
-function ThreePanelView(callbackURL) {
+function ThreePanelView(callbackURL, context) {
 
     this.callbackURL = callbackURL
+    // default context is 'resources'
+    this.context = typeof(context) === 'undefined' ? 'resources' : context
 
     // cache panels
     this.detailsContainer = $j('#detail-window')
@@ -181,7 +184,14 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
                 }
                 // image, display a preview
                 else if(meta.mime.match(/image.*/)) {
-                    threePanel.fileDetail.find('img').attr('src', '/cms/image.php?id='+meta.id+'&width=128&height=128').attr('alt', meta.name)
+                    var src
+                    if(threePanel.context = 'eportfolio') {
+                        src = '/cms/sendMyFile.php?id='+meta.id+'&width=128&height=128'
+                    }
+                    else {
+                        src = '/cms/image.php?id='+meta.id+'&width=128&height=128'
+                    }
+                    threePanel.fileDetail.find('img').attr('src', src).attr('alt', meta.name)
                 }
                 // file, display appropriate mime icon
                 else {
@@ -279,26 +289,8 @@ ThreePanelView.prototype.actionBind = function(actions) {
 
         // is multifile
         else if(action == 'delete') {
-            var selected = $j('#file-list tr.selected')
-            if (selected.length > 1) {
-                var fileList = '', linkList = ''
-
-                selected.each(function () {
-                    var id = $j(this).attr("id").substring(5) + ','
-
-                    if ($j(this).hasClass('link'))
-                        linkList += id
-                    else
-                        fileList += id
-                })
-
-                if (confirm("Are you sure you want to delete this selection?"))
-                    window.open("/cms/fileForm.php?fileList="+fileList+"&linkList="+linkList+"&deleteList=1","_self")
-
-            }
-
+            actions.multi[action]()
         }
-
 
     })
 
