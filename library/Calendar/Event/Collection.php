@@ -139,42 +139,53 @@ class Calendar_Event_Collection {
 	}
 
 	/**
-	 * Comparison - sorts on start time, then end time, then finally name.
-	 * Also, all day events are always before timed events.
+	 * Comparison - sorts on day of event, start time, end time, then finally name.
+	 * Also, all day events are always before timed events on the same day.
 	 *
 	 * @param $a
 	 * @param $b
 	 * @return int
 	 */
 	private function cmp($a, $b) {
+		//
+		// Sort on day of event only (not time)
+		$a_day = $a->getStartTime()->getUsingFormat('Ymd');
+		$b_day = $b->getStartTime()->getUsingFormat('Ymd');
+		if ($a_day < $b_day) {
+			return -1;
+		}
+		else if ($a_day > $b_day) {
+			return 1;
+		}
+
+		//
+		// Events on same day - all day events always before timed events
 		$a_allday = $a->getAllday();
 		$b_allday = $b->getAllday();
 		if ($a_allday != $b_allday) {
 			return $a_allday ? -1 : 1;
 		}
-		if ($a->getStartTime() instanceof Alaress_Date_Format_Interface
-			&& $b->getStartTime() instanceof Alaress_Date_Format_Interface
-		) {
-			$a_timestamp = $a->getStartTime()->getUnixTimestamp();
-			$b_timestamp = $b->getStartTime()->getUnixTimestamp();
-			if ($a_timestamp < $b_timestamp) {
-				return -1;
-			}
-			else if ($a_timestamp > $b_timestamp) {
-				return 1;
-			}
+
+		//
+		// Sort on start time of event
+		$a_timestamp = $a->getStartTime()->getUnixTimestamp();
+		$b_timestamp = $b->getStartTime()->getUnixTimestamp();
+		if ($a_timestamp < $b_timestamp) {
+			return -1;
 		}
-		if ($a->getEndTime() instanceof Alaress_Date_Format_Interface
-			&& $b->getEndTime() instanceof Alaress_Date_Format_Interface
-		) {
-			$a_timestamp = $a->getEndTime()->getUnixTimestamp();
-			$b_timestamp = $b->getEndTime()->getUnixTimestamp();
-			if ($a_timestamp < $b_timestamp) {
-				return -1;
-			}
-			else if ($a_timestamp > $b_timestamp) {
-				return 1;
-			}
+		else if ($a_timestamp > $b_timestamp) {
+			return 1;
+		}
+
+		//
+		// Sort on end time of event
+		$a_timestamp = $a->getEndTime()->getUnixTimestamp();
+		$b_timestamp = $b->getEndTime()->getUnixTimestamp();
+		if ($a_timestamp < $b_timestamp) {
+			return -1;
+		}
+		else if ($a_timestamp > $b_timestamp) {
+			return 1;
 		}
 		return strcmp($a->getNote(), $b->getNote());
 	}
