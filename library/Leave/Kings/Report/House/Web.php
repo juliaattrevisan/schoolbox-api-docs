@@ -119,16 +119,16 @@ class Leave_Kings_Report_House_Web {
                 *
                 * Render 3 columns each day for 3 days
                 *
-                * AM: 10:00:00 to 18:59:59
-                * PM: 19:00:00 to 21:59:59
-                * Night: 22:00:00 to 9:59:59
+                * AM: 7:00:00 to 11:59:59
+                * PM: 11:00:00 to 20:59:59
+                * Night: 21:00:00 to 6:59:59
                 */
             $data = $this->getData();
 
-            $morningStart = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp() + 10 * 60 * 60, 'U');
-            $dayStart = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp() + 19 * 60 * 60, 'U');
-            $nightStart = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp() + 22 * 60 * 60, 'U');
-            $nightEnd = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp() + 34 * 60 * 60, 'U');
+            $morningStart = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp() + 7 * 60 * 60, 'U');
+            $dayStart = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp() + 11 * 60 * 60, 'U');
+            $nightStart = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp() + 21 * 60 * 60, 'U');
+            $nightEnd = new Alaress_Date_Format($data['reportStart']->getUnixTimestamp() + 31 * 60 * 60, 'U');
 
             $showStartTime = true;
 
