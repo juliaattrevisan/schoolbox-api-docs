@@ -143,6 +143,11 @@
 
 <script type='text/javascript'>
 	$j(function() {
+
+		/* A list of people who've been added specifically
+		 */
+		var added = [];
+
 		$j('#addIndividualPermission').autocomplete({
 			serviceUrl: '/eportfolio/search.php?groupID={STUDENT_GROUP_IDS}',
 			minChars: 2,
@@ -153,25 +158,34 @@
 			/* When selected, append to a list
 			 */
 			onSelect: function (value, data) {
-				var individualPermission = $j('#individualPermissionTemplate').clone();
-				individualPermission.find('input').attr('name', 'individual_permission[]');
-				individualPermission.find('input').val(data);
 
-				/* Snap out the group from the list
+				/* First check if the person has already been added
 				 */
-				var hyphenIndex = value.indexOf('-');
+				if ($j.inArray(data, added) == -1) {
+					var individualPermission = $j('#individualPermissionTemplate').clone();
+					individualPermission.find('input').attr('name', 'individual_permission[]');
+					individualPermission.find('input').val(data);
 
-				if (hyphenIndex > -1) {
-					individualPermission.find('li').append(value.substr(0, hyphenIndex));
+					/* Snap out the group from the list
+					 */
+					var hyphenIndex = value.indexOf('-');
+
+					if (hyphenIndex > -1) {
+						individualPermission.find('li').append(value.substr(0, hyphenIndex));
+					}
+					else {
+						individualPermission.find('li').append(value);
+					}
+
+					/* Push it in
+					 */
+					$j('#individualPermissionList').append(individualPermission.html());
+
+					/* Stack up
+					 */
+					added.push(data);
 				}
-				else {
-					individualPermission.find('li').append(value);
-				}
-
-				/* Push it in
-				 */
-				$j('#individualPermissionList').append(individualPermission.html());
-
+				console.log(added);
 				/* Clear and lock
 				 */
 				$j('#addIndividualPermission').val('');
@@ -181,6 +195,8 @@
 		/* Remove someone from list
 		 */
 		$j('.individualPermissionRemove').live('click', function(event) {
+			added.splice($j.inArray($j(this).closest('li').find('input[name="individual_permission[]"]').val(), added), 1 );
+
 			$j(this).closest('li').remove();
 		});
 	});
@@ -475,7 +491,7 @@
 						</td>
 						<td>
 							<p>
-								<input id='addIndividualPermission' type='text' value='' />Add
+								<input id='addIndividualPermission' type='text' value='' />
 							</p>
 							<ul id='individualPermissionList'>
 								<!-- BEGIN individual_permission -->
