@@ -44,10 +44,19 @@ class Component_Eportfolio_ImageListController extends Component_Eportfolio_Cont
 		/* Set up blocks and stuff
 		 */
 		$this->setBlock($templateHandle, 'list_item', 'list_item_block');
+		$this->setBlock($templateHandle, 'modify_button', 'modify_button_block');
 
 		$this->setVar(array(
 			'list_item_block' => ''
 		));
+
+		/* Show edit buttons
+		*/
+		if($this->permission >= WRITE_ACCESS)
+			$this->parse('modify_button_block','modify_button');
+		else {
+			$this->setVar('modify_button_block','');
+		}
 
 		$mapper = new \Component\Eportfolio\FileListMapper();
 
@@ -57,6 +66,7 @@ class Component_Eportfolio_ImageListController extends Component_Eportfolio_Cont
 			foreach($allImages as $currentImage) {
 				$this->setVar(array(
 					'IMAGE_ID' => $currentImage->getFileId(),
+					'IMAGE_DESCRIPTION' => Scrub::text('')
 				));
 
 				$this->parse('list_item_block', 'list_item', true);

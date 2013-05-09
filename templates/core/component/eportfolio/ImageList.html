@@ -5,11 +5,17 @@
 	<h2>{COMPONENT_NAME}</h2>
 	{CONFIGURATION}
 
-	<div>
+	<div class="clearfix">
 		<!-- BEGIN list_item -->
-		<a href="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryLarge" rel="lightbox[portal]"  alt='' title=''>
-			<img src="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryThumbnail" alt="" border="0"/>
+        <div class="float-left image-thumbnail">
+		<a href="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryLarge" rel="lightbox[portal]"  alt='{IMAGE_DESCRIPTION}' title='{IMAGE_DESCRIPTION}'>
+			<img src="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryThumbnail" alt="{IMAGE_DESCRIPTION}" border="0"/>
 		</a>
+        </div>
 		<!-- END list_item -->
 	</div>
+    <!-- BEGIN modify_button -->
+    <a href='/cms/myFile/new/0' class='btn up-arrow'><span></span>Post Images</a>
+    <a href='/cms/portfolio/' class='btn'><span></span>Browse My Files</a>
+    <!-- END modify_button -->
 </div>
