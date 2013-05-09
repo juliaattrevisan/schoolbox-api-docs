@@ -133,8 +133,7 @@ abstract class Evaluation_Question extends DeprecatedModel
      * @param $assess_id
      * @return array|bool
      */
-    public function getAll($assess_id)
-    {
+    public function getAll($assess_id) {
         $query = "
 			SELECT
 				assess_section.section_id,
@@ -149,6 +148,8 @@ abstract class Evaluation_Question extends DeprecatedModel
 			INNER JOIN assess_section ON assess.assess_id = assess_section.assess_id
 			INNER JOIN assess_question ON assess_section.section_id = assess_question.section_id
 			WHERE assess.assess_id = " . $this->db->smartQuote($assess_id) . "
+			AND assess_question.deleted_at IS NULL
+			AND assess_section.deleted_at IS NULL
 			ORDER BY assess_section.sequence, assess_question.sequence
 		";
 
