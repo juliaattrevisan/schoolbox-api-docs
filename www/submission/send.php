@@ -23,7 +23,7 @@ if (is_numeric($_GET['id'])) {
 	$contents = null;
 	$size     = null;
 	$mime     = null;
-
+	$attach   = $_GET['view'] ? '' : 'attachment;';
 	if(is_numeric($_GET['return'])) {
 		$mapper = new ReturnedWorkMapper();
 		$return = $mapper->findById($_GET['id']);
@@ -91,6 +91,10 @@ if (is_numeric($_GET['id'])) {
 			$size     = $studentSub->getFilesize();
 		}
 		else {
+			//
+			// Always show online submissions as inline - don't offer for
+			// download, because they may include uploaded images.
+			$attach   = '';
 			$contents = <<<HTML
 <html>
 <head>
@@ -117,8 +121,6 @@ HTML
 		$allowedHandler = new AllowedFile();
 		$mime = $allowedHandler->getMime(substr($filename, strripos($filename, '.') + 1));
 	}
-
-	$attach = $_GET['view'] ? '' : 'attachment;';
 
 	//send headers (cache-control off stops IE8 from failing to download)
 	header ("Pragma: ");
