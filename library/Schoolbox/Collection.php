@@ -10,7 +10,7 @@
 namespace Schoolbox;
 use Schoolbox;
 
-class Collection implements \Iterator, \Countable {
+class Collection implements \ICollection {
 
     protected $stack = array();
 	protected $position = 0;
