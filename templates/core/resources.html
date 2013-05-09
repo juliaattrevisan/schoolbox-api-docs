@@ -200,6 +200,9 @@ $j(function() {
 	/* auto scroll to open branch */
 	$j("#category-window").scrollTo($j("#node-{OPEN}"), 200);
 
+  // retrieve meta for open branch
+  threePanel.getMeta({OPEN});
+
 	var date2 = new Date;
 
 	if (window.location.href.indexOf('debug') != -1)
