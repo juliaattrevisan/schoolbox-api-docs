@@ -29,8 +29,8 @@ class FileListMapper extends Schoolbox\Mapper {
 		));
 
 		$this->hasMap(array(
-			'column'     => 'component_instance_id',
-			'property'   => 'componentInstanceId',
+			'column'     => 'page_id',
+			'property'   => 'pageId',
 			'type'       => self::TYPE_INTEGER,
 		));
 
@@ -127,12 +127,12 @@ class FileListMapper extends Schoolbox\Mapper {
 	}
 
 	/**
-	 * Find all the published files that belong to a particular component instance
+	 * Find all the published files that belong to a particular page
 	 *
-	 * @param $componentInstanceId
+	 * @param $pageId
 	 * @return Schoolbox\Collection
 	 */
-	public function findForInstance($componentInstanceId) {
+	public function findForPage($pageId) {
 		$file_mapper = $this->getJoinMapper('files');
 		$mime_mapper = $file_mapper->getJoinMapper('allowedFileType');
 
@@ -144,13 +144,13 @@ class FileListMapper extends Schoolbox\Mapper {
             FROM `{$this->table}` fl
             LEFT JOIN {$this->getJoinSql('files', 'fl', 'f')}
             LEFT JOIN {$file_mapper->getJoinSql('allowedFileType', 'f', 'af')}
-            WHERE fl.component_instance_id = :componentInstanceId
+            WHERE fl.page_id = :pageId
             ORDER BY created_at DESC
 		";
 
 		$statement = $this->database->prepare($query);
 
-		$statement->bindParam(':componentInstanceId', $componentInstanceId, \PDO::PARAM_INT);
+		$statement->bindParam(':pageId', $pageId, \PDO::PARAM_INT);
 
 		$statement->execute();
 

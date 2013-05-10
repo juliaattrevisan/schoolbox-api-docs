@@ -51,19 +51,19 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 		$this->setBlock('list_item', 'has_unpublish_form', 'has_unpublish_form_block');
 		$this->setBlock($templateHandle, 'modify_button', 'modify_button_block');
 
-
 		$this->setVar(array(
 			'list_item_block' => ''
 		));
 
 		/* Gather everything
 		 */
-		$allItems = $this->getMapperClass()->findForInstance($this->instance->id);
+		$allItems = $this->getMapperClass()->findForPage($this->instance->identifier);
 
 		/* Show edit buttons
-		*/
-		if($this->permission >= WRITE_ACCESS)
+		 */
+		if ($this->permission >= WRITE_ACCESS) {
 			$this->parse('modify_button_block','modify_button');
+		}
 		else {
 			$this->setVar('modify_button_block','');
 		}
@@ -99,7 +99,6 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 		else {
 			$this->setVar('list_item_block', '');
 		}
-
 
 		return true;
 	}

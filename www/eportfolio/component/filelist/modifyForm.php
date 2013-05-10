@@ -16,7 +16,6 @@ $page = new SitePage();
 $action = $_GET['action'];
 $ownerId = $_GET['userId'];
 $pageId = $_GET['pageId'];
-$componentInstanceId = $_GET['componentInstanceId'];
 
 $authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
 
@@ -30,7 +29,7 @@ if ($authenticator->canModify()) {
 		/* Prevent dupe publishings
 		 */
 		$existing = \Component\Eportfolio\FileListMapper::getInstance()->findByColumnList(array(
-			'component_instance_id' => $componentInstanceId,
+			'page_id' => $pageId,
 			'file_id' => $fileId
 		));
 
@@ -40,7 +39,7 @@ if ($authenticator->canModify()) {
 			$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
 			$listItem = new \Component\Eportfolio\FileList();
-			$listItem->setComponentInstanceId($componentInstanceId);
+			$listItem->setPageId($pageId);
 			$listItem->setFileId($fileId);
 			$listItem->setCreatedAt($now);
 			$listItem->setUpdatedAt($now);
