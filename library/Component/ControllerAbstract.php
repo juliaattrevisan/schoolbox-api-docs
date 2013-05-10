@@ -217,11 +217,23 @@ abstract class Component_ControllerAbstract {
         }
     }
 
+    /**
+     * Parses configuration for display when rendering a template. Some config
+     * options don't show on templates, but do when an instance of the template
+     * gets shown.
+     *
+     * @param string $targetHandle
+     *
+     * @return bool
+     */
+    public function parseConfigForTemplate($targetHandle = 'CONFIGURATION') {
+        return $this->parseConfig($targetHandle, true);
+    }
 
     /**
      * @return bool
      */
-    public function parseConfig($targetHandle = 'CONFIGURATION') {
+    public function parseConfig($targetHandle = 'CONFIGURATION', $is_for_template = false) {
 
         $page = $this->sitepage;
 
@@ -302,7 +314,9 @@ abstract class Component_ControllerAbstract {
 
                 // attempt to build a configuration instance from the key provided
                 if ($conf = Component_Config_Factory::build($key, $this->context, $fields)) {
-					$this->parseConfigInstance($conf, $key, $page, $params);
+                    if (!($is_for_template && !$conf->isShownOnTemplate())) {
+					    $this->parseConfigInstance($conf, $key, $page, $params);
+                    }
                 }
                 $page->setVar('CONFIG_ELEMENT_CONTENT', '');
             }
@@ -345,7 +359,7 @@ abstract class Component_ControllerAbstract {
 		$page->parse('CONFIG_ELEMENT_CONTENT', $key);
 		$page->setVar('CONFIG_DISPLAY', $params['label'] ? '' : ' style="display:none;"');
 		$page->parse('config_element_block', 'config_element', true);
-	}
+    }
 
     /**
      * @param string $key
@@ -394,16 +408,6 @@ abstract class Component_ControllerAbstract {
 
     public function getPageTemplate() {
         return $this->sitepage->template;
-    }
-
-    /**
-     * Returns data set for this component as populated by execute(), or null
-     * if not populated yet or this component doesn't support that method.
-     *
-     * @return mixed
-     */
-    public function getDataFromExecute() {
-        return null;
     }
 
 }
