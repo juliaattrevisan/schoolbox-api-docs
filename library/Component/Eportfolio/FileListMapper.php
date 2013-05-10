@@ -69,24 +69,23 @@ class FileListMapper extends Schoolbox\Mapper {
 	}
 
 	/**
-	 * Find all published image files
+	 * Find all published image files on a particular page
 	 *
-	 * TODO: This can probably be combined with findRecent() as they are similar
-	 * enough in functionality
-	 *
+	 * @param $pageId
 	 * @return Collection
 	 */
-	public function findAll() {
+	public function findAll($pageId) {
 		$query = "
-            SELECT *
+            SELECT {$this->getColumnString()}
             FROM `{$this->table}`
             LEFT JOIN myFile ON myFile.id = {$this->table}.file_id
             WHERE myFile.mime_type LIKE '%image/%'
+            AND {$this->table}.page_id = :pageId
 		";
 
 		$statement = $this->database->prepare($query);
 
-		$statement->bindParam(':limit', $limit, \PDO::PARAM_INT);
+		$statement->bindParam(':pageId', $pageId, \PDO::PARAM_INT);
 
 		$statement->execute();
 
