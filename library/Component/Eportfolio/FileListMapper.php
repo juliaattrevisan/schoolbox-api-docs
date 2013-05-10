@@ -74,7 +74,7 @@ class FileListMapper extends Schoolbox\Mapper {
 	 * @param $pageId
 	 * @return Collection
 	 */
-	public function findAll($pageId) {
+	public function findAllImagesByPage($pageId) {
 		$query = "
             SELECT {$this->getColumnString()}
             FROM `{$this->table}`
