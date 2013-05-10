@@ -29,14 +29,20 @@
 
 <div class="profile-banner">
     <div class="background">
+		<!-- BEGIN has_cover_photo_control -->
+		<a id="add-coverphoto" class="btn modify no-text" title="Edit your cover picture"><span></span></a>
+		<!-- END has_cover_photo_control -->
 		<!-- BEGIN has_cover_photo -->
-        <a id="add-coverphoto" class="btn modify no-text" title="Edit your cover picture"><span></span></a>
         <img src="/storage/image.php?size=eportfolioCoverPhoto&hash={COVERPHOTO_IMAGEHASH}" />
         <!-- END has_cover_photo -->
+
+		<!-- BEGIN no_cover_photo_control -->
+		<a id="add-coverphoto" class="btn add" title="Add a cover photo"><span></span>Add a cover photo</a>
+		<!-- END no_cover_photo_control -->
 		<!-- BEGIN no_cover_photo -->
-        <a id="add-coverphoto" class="btn add" title="Add a cover photo"><span></span>Add a cover photo</a>
 		<img src="/images/core/eportfolio/coverphotoPlaceholder.jpg" />
 		<!-- END no_cover_photo -->
+
         <form id="coverphoto-form" method='post' action='/eportfolio/coverphoto/modifyForm.php' enctype='multipart/form-data'>
             <input type='hidden' name='action' value='addCoverPhoto' />
             <input type='hidden' name='userId' value='{USER_ID}' />
