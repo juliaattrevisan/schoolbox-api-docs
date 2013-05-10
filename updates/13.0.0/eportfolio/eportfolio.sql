@@ -6,28 +6,28 @@ CREATE TABLE `eportfolioTemplate`( `id` INT(11) NOT NULL AUTO_INCREMENT, `name` 
  */
 ALTER TABLE `component_instance` CHANGE `module` `module` ENUM('dashboard','homepage','homepage_template','eportfolio','eportfolio_template') CHARSET utf8 COLLATE utf8_general_ci NULL;
 
-/* A list of component categories
- */
-CREATE TABLE `eportfolioComponentCategory`( `eportfolioComponentCategoryID` INT(10) NOT NULL AUTO_INCREMENT, `name` VARCHAR(255), PRIMARY KEY (`eportfolioComponentCategoryID`) );
-
 /* Remove old tables
  */
-DROP TABLE eportfolio_blog;
-DROP TABLE eportfolio_blogComment;
-DROP TABLE eportfolio_comp;
-TRUNCATE eportfolio_comp_location;
-TRUNCATE eportfolio_config;
-DROP TABLE eportfolio_link;
-DROP TABLE eportfolio_log;
-DROP TABLE eportfolio_objective_award;
-DROP TABLE eportfolio_objective_coverletter;
-DROP TABLE eportfolio_objective_educationhistory;
-DROP TABLE eportfolio_objective_employmenthistory;
-DROP TABLE eportfolio_objective_goal;
-DROP TABLE eportfolio_objective_interest;
-DROP TABLE eportfolio_objective_skill;
-DROP TABLE eportfolio_privateNotes;
-DROP TABLE eportfolio_textBox;
+-- DROP TABLE eportfolio_blog;
+-- DROP TABLE eportfolio_blogComment;
+-- DROP TABLE eportfolio_comp;
+-- TRUNCATE eportfolio_comp_location;
+-- TRUNCATE eportfolio_config;
+-- DROP TABLE eportfolio_link;
+-- DROP TABLE eportfolio_log;
+-- DROP TABLE eportfolio_objective_award;
+-- DROP TABLE eportfolio_objective_coverletter;
+-- DROP TABLE eportfolio_objective_educationhistory;
+-- DROP TABLE eportfolio_objective_employmenthistory;
+-- DROP TABLE eportfolio_objective_goal;
+-- DROP TABLE eportfolio_objective_interest;
+-- DROP TABLE eportfolio_objective_skill;
+-- DROP TABLE eportfolio_privateNotes;
+-- DROP TABLE eportfolio_textBox;
+-- DROP TABLE eportfolio_comp_category;
+-- DROP TABLE eportfolio_comp_location;
+-- DROP TABLE eportfolioComponentCategory;
+-- DROP TABLE eportfolioTemplateLayout;
 
 /* Alter component_instance to allow eportfolio_template as an enum value
  */
@@ -41,13 +41,6 @@ ALTER TABLE `eportfolio_config` ADD COLUMN `created_at` DATETIME NULL AFTER `top
 /* Add permissions relation table
  */
 CREATE TABLE `eportfolio_permission`( `id` INT(11) NOT NULL AUTO_INCREMENT, `page_id` INT(11) NOT NULL, `type` ENUM('parent','group','student') NOT NULL DEFAULT 'student', `value` INT(11) NOT NULL, PRIMARY KEY (`id`) );
-
-/* Remove excess tables again
- */
--- DROP TABLE eportfolio_comp_category;
--- DROP TABLE eportfolio_comp_location;
--- DROP TABLE eportfolioComponentCategory;
--- DROP TABLE eportfolioTemplateLayout;
 
 /* Add error for nonexisting eportfolio pages
  */
@@ -78,13 +71,11 @@ CREATE TABLE `eportfolio_showcase_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `
 
 /* Add file list item table
  */
-CREATE TABLE `eportfolio_component_filelist_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `component_instance_id` INT(11), `file_id` INT(11), `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
+CREATE TABLE `eportfolio_component_filelist_item`( `id` INT(11) NOT NULL AUTO_INCREMENT, `page_id` INT(11), `file_id` INT(11), `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
 
 /* Add blog table
  */
-CREATE TABLE `eportfolio_component_blog`( `id` INT(11) NOT NULL AUTO_INCREMENT, `page_id` INT(11), `uid` INT(11), `heading` VARCHAR(255), `body` TEXT, `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
-ALTER TABLE `eportfolio_component_blog` CHANGE `heading` `title` VARCHAR(255) CHARSET utf8 COLLATE utf8_general_ci NULL;
-ALTER TABLE `eportfolio_component_blog` CHANGE `body` `content` TEXT CHARSET utf8 COLLATE utf8_general_ci NULL;
+CREATE TABLE `eportfolio_component_blog`( `id` INT(11) NOT NULL AUTO_INCREMENT, `page_id` INT(11), `uid` INT(11), `title` VARCHAR(255), `content` TEXT, `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
 
 /* Add blog comments table
  */
