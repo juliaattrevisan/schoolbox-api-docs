@@ -51,16 +51,17 @@ class Component_Eportfolio_ImageListController extends Component_Eportfolio_Cont
 		));
 
 		/* Show edit buttons
-		*/
-		if($this->permission >= WRITE_ACCESS)
+		 */
+		if ($this->permission >= WRITE_ACCESS) {
 			$this->parse('modify_button_block','modify_button');
+		}
 		else {
 			$this->setVar('modify_button_block','');
 		}
 
 		$mapper = new \Component\Eportfolio\FileListMapper();
 
-		$allImages = $mapper->findAll();
+		$allImages = $mapper->findAllImagesByPage($this->instance->identifier);
 
 		if ($allImages->count()) {
 			foreach($allImages as $currentImage) {
