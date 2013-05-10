@@ -100,7 +100,6 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 			$this->setVar('list_item_block', '');
 		}
 
-
 		return true;
 	}
 }
