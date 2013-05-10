@@ -10,46 +10,64 @@
 
 <script type='text/javascript'>
 	$j(function() {
-		$j('#addIndividualPermission').autocomplete({
-			serviceUrl: '/ajax/user.php?groupID={STUDENT_GROUP_IDS}',
-			minChars: 2,
-			maxHeight: 300,
-			width: 275,
-			noCache: true,
+        
+        /* A list of people who've been added specifically
+         */
+        var added = [];
 
-			/* When selected, append to a list
-			 */
-			onSelect: function (value, data) {
-				var individualPermission = $j('#individualPermissionTemplate').clone();
-				individualPermission.find('input').attr('name', 'individual_permission[]');
-				individualPermission.find('input').val(data);
+        $j('#addIndividualPermission').autocomplete({
+            serviceUrl: '/eportfolio/search.php?groupID={STUDENT_GROUP_IDS}',
+            minChars: 2,
+            maxHeight: 300,
+            width: 275,
+            noCache: true,
 
-				/* Snap out the group from the list
-				 */
-				var hyphenIndex = value.indexOf('-');
+            /* When selected, append to a list
+             */
+            onSelect: function (value, data) {
 
-				if (hyphenIndex > -1) {
-					individualPermission.find('li').append(value.substr(0, hyphenIndex));
-				}
-				else {
-					individualPermission.find('li').append(value);
-				}
+                /* First check if the person has already been added
+                 */
+                if ($j.inArray(data, added) == -1) {
+                    var individualPermission = $j('#individualPermissionTemplate').clone();
+                    individualPermission.find('input').attr('name', 'individual_permission[]');
+                    individualPermission.find('input').val(data);
 
-				/* Push it in
-				 */
-				$j('#individualPermissionList').append(individualPermission.html());
+                    /* Snap out the group from the list
+                     */
+                    var hyphenIndex = value.indexOf('-');
 
-				/* Clear and lock
-				 */
-				$j('#addIndividualPermission').val('');
-			}
-		});
+                    if (hyphenIndex > -1) {
+                        individualPermission.find('li').append(value.substr(0, hyphenIndex));
+                    }
+                    else {
+                        individualPermission.find('li').append(value);
+                    }
 
-		/* Remove someone from list
-		 */
-		$j('.individualPermissionRemove').live('click', function(event) {
-			$j(this).closest('li').remove();
-		});
+                    /* Push it in
+                     */
+                    $j('#individualPermissionList').append(individualPermission.html());
+
+                    /* Stack up
+                     */
+                    added.push(data);
+                }
+
+                /* Clear and lock
+                 */
+                $j('#addIndividualPermission').val('');
+            }
+        });
+
+        /* Remove someone from list
+         */
+        $j('.individualPermissionRemove').live('change', function(event) {
+            added.splice($j.inArray($j(this).closest('li').find('input[name="individual_permission[]"]').val(), added), 1 );
+
+            $j(this).closest('li').fadeOut("slow",function(){
+                $j(this).remove();
+            });
+        });
 	});
 </script>
 <!-- END custom_head -->
@@ -121,10 +139,10 @@
 				<em>Allow certain students to view your ePortfolio page.</em>
 			</td>
 			<td>
-				<p>
-					<input id='addIndividualPermission' type='text' value='' />Add
-				</p>
-				<ul id='individualPermissionList'>
+                <p>
+                    <input id='addIndividualPermission' type='text' value='' />
+                </p>
+                <ul id='individualPermissionList'>
 
 				</ul>
 			</td>
@@ -134,8 +152,8 @@
 </form>
 
 <ul id='individualPermissionTemplate'>
-	<li>
-		<a class='individualPermissionRemove'>X</a>
-		<input type="hidden" name="individual_permission[]" value="{INDIVIDUAL_PERMISSION_USER_ID}" />
-	</li>
+    <li>
+        <input class="individualPermissionRemove" type="checkbox" checked="checked" />
+        <input type="hidden" name="individual_permission[]" value="{INDIVIDUAL_PERMISSION_USER_ID}" />
+    </li>
 </ul>
