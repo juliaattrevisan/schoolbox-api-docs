@@ -12,51 +12,44 @@ namespace Component\Eportfolio;
 class FileList extends ListItem {
 
 	/**
-	 * Primary key
-	 *
-	 * @var
-	 */
-	public $id;
-
-	/**
-	 * List to which this list item belongs
-	 *
-	 * @var
-	 */
-	public $component_instance_id;
-
-	/**
 	 * Id of a published file
 	 *
 	 * @var
 	 */
-	public $fileId;
+	private $fileId;
+
+	/**
+	 * The page to which a file is published
+	 *
+	 * @var
+	 */
+	private $pageId;
 
 	/**
 	 * A Schoolbox\MyFile instance
 	 *
 	 * @var
 	 */
-	public $file;
+	private $file;
 
 	/**
 	 * When the File List item was created
 	 *
 	 * @var
 	 */
-	public $created_at;
+	private $created_at;
 
 	/**
 	 * When the File List item was updated
 	 * @var
 	 */
-	public $updated_at;
+	private $updated_at;
 
 	/**
 	 * When the File List item was softdeleted
 	 * @var
 	 */
-	public $deleted_at;
+	private $deleted_at;
 
 	/* Getters/Setters
 	 */
@@ -187,5 +180,21 @@ class FileList extends ListItem {
 		return $this->file;
 	}
 
+	/**
+	 * Set page id
+	 *
+	 * @param  $pageId
+	 */
+	public function setPageId($pageId) {
+		$this->pageId = $pageId;
+	}
 
+	/**
+	 * Get page id
+	 *
+	 * @return
+	 */
+	public function getPageId() {
+		return $this->pageId;
+	}
 }

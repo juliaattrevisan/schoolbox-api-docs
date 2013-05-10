@@ -45,7 +45,7 @@ if (isset($_POST['description']) || isset($_FILES['file']['tmp_name'])) {
 					if (is_array($componentInstanceIds) && count($componentInstanceIds) && $authenticator->canModify()) {
 						foreach($componentInstanceIds as $currentComponentInstanceId => $value) {
 							$publishedFile = new \Component\Eportfolio\FileList();
-							$publishedFile->setComponentInstanceId($currentComponentInstanceId);
+							$publishedFile->setPageId($currentPageId);
 							$publishedFile->setFileId($fileID);
 							$publishedFile->setCreatedAt($now);
 							$publishedFile->setUpdatedAt($now);
