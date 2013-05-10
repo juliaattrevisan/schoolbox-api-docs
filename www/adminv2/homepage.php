@@ -93,7 +93,7 @@ foreach($componentCollection as $component) {
     ));
 
 
-    $component->parseConfig();
+    $component->parseConfigForTemplate();
 
     $this->parse("{$position}_block", $position, true);
 
