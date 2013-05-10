@@ -194,7 +194,7 @@
 
 		/* Remove someone from list
 		 */
-		$j('.individualPermissionRemove').live('change', function(event) {
+        $j('.individualPermissionRemove').live('change', function(event) {
             added.splice($j.inArray($j(this).closest('li').find('input[name="individual_permission[]"]').val(), added), 1 );
 
             $j(this).closest('li').fadeOut("slow",function(){
@@ -508,9 +508,9 @@
 							<ul id='individualPermissionList'>
 								<!-- BEGIN individual_permission -->
 								<li>
-									<a class='btn delete no-text float-left individualPermissionRemove'><span></span></a>
-									<input type="hidden" name="individual_permission[]" value="{INDIVIDUAL_PERMISSION_USER_ID}" />
-									{INDIVDIUAL_PERMISSION_USER_FIRSTNAME} {INDIVDIUAL_PERMISSION_USER_LASTNAME}
+                                    <input class="individualPermissionRemove" type="checkbox" checked="checked" />
+                                    <input type="hidden" name="individual_permission[]" value="{INDIVIDUAL_PERMISSION_USER_ID}" />
+                                    {INDIVDIUAL_PERMISSION_USER_FIRSTNAME} {INDIVDIUAL_PERMISSION_USER_LASTNAME}
 								</li>
 								<!-- END individual_permission -->
 							</ul>
@@ -540,7 +540,7 @@
 
 <ul id='individualPermissionTemplate'>
 	<li>
-		<a class='individualPermissionRemove'>X</a>
-		<input type="hidden" name="individual_permission[]" value="{INDIVIDUAL_PERMISSION_USER_ID}" />
+        <input class="individualPermissionRemove" type="checkbox" checked="checked" />
+        <input type="hidden" name="individual_permission[]" value="{INDIVIDUAL_PERMISSION_USER_ID}" />
 	</li>
 </ul>
