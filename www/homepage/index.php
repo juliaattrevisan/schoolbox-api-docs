@@ -66,10 +66,21 @@ $componentCollection = $componentFactory->buildComponentList($categoryID);
 if ($permission >= WRITE_ACCESS) {
     $this->setBlock('customise_page', 'homepage_component_tab', 'homepage_component_tab_block');
     $this->setBlock('customise_page', 'homepage_component_page', 'homepage_component_page_block');
+    $this->setBlock('customise_page', 'homepage_color_link', 'homepage_color_link_block');
+    $this->setBlock('customise_page', 'homepage_color_selector', 'homepage_color_selector_block');
     $this->setBlock('homepage_component_page', 'homepage_component', 'homepage_component_block');
     $this->parse('edit_page_block', 'edit_page');
     $this->parse('modify_layout_block', 'modify_layout');
     $this->parse('customise_page_block', 'customise_page');
+
+    if (Cfg::get('homepage_enable_colour')) {
+        $this->parse('homepage_color_link_block',     'homepage_color_link');
+        $this->parse('homepage_color_selector_block', 'homepage_color_selector');
+    }
+    else {
+        $this->setVar('homepage_color_link_block', '');
+        $this->setVar('homepage_color_selector_block', '');
+    }
 
     $definitionCollection = $componentFactory->getDefinitionList('component_category');
 
