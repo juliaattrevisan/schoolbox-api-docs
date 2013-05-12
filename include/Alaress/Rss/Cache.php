@@ -10,6 +10,13 @@
 class Alaress_Rss_Cache extends Alaress_Cache_Abstract {
 
 	/**
+	 * A prefix for cached filenames
+	 *
+	 * @var string
+	 */
+	protected $cacheFilePrefix = 'rss';
+
+	/**
 	 * Hook method
 	 *
 	 * @return mixed|void
@@ -21,7 +28,7 @@ class Alaress_Rss_Cache extends Alaress_Cache_Abstract {
 
 
 	/**
-	 * Load contents from the cache
+	 * Load contents from the cache in SimpleXML object
 	 *
 	 * @return void
 	 */

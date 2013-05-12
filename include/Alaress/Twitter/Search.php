@@ -2,23 +2,12 @@
 /**
  * Alaress_Twitter_Search
  *
- * Wraps up the Twitter Search API which is a get-only request, unlike
- * the rest of the Alaress_Twitter module which would be capable of full
- * REST operations.
- *
- * Notes from https://dev.twitter.com/docs/using-search:
- * The Search API is not complete index of all Tweets, but instead an index
- * of recent Tweets. At the moment that index includes between 6-9 days of Tweets.
+ * Just like Alaress_Twitter_Search, but for the 1.1 API.
  *
  * You cannot use the Search API to find Tweets older than about a week.
- *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
  */
 class Alaress_Twitter_Search {
-	private $searchPrefix = 'http://search.twitter.com/search.json?&q=';
+	private $searchPrefix = 'https://api.twitter.com/1.1/search/tweets.json?q=';
 	private $user = '';
 	private $searchUrl = '';
 	private $keywords = '';
@@ -49,24 +38,22 @@ class Alaress_Twitter_Search {
 	}
 
 	/**
-	 * Generate query string params
+	 * Generate query string params (this function generates them as an array)
 	 *
 	 * @return string
 	 */
 	protected function generateParameters() {
-		$params = '';
-
-		/* Construct query parameters for tweet authors
-		 */
+		$search = '';
 		if (strlen($this->getUser())) {
-			$params .= "from:{$this->getUser()} ";
+			$search .= "from:{$this->getUser()} ";
 		}
 
+		//
+		// No idea how hashtags should work. #tag1 #tag2?
 		if (strlen($this->getKeywords())) {
-			$params .= $this->getKeywords();
+			$search .= '#'.implode(' #', preg_split('/\W+/', $this->getKeywords()));
 		}
-
-		return urlencode(trim($params));
+		return array('q' => trim($search));
 	}
 
 	/**
@@ -74,36 +61,31 @@ class Alaress_Twitter_Search {
 	 */
 	public function load() {
 		$processed = array();
-		$params = $this->generateParameters();
+		$resource  = 'https://api.twitter.com/1.1/search/tweets.json';
+		$params    = $this->generateParameters();
 
-		if (strlen(trim($params))) {
-			$this->setSearchUrl($this->getSearchPrefix() . $params);
+		if (!empty($params)) {
 
-			/* Instantiate a cache and load from it
-			 */
-			$cache = new Alaress_Twitter_Cache($this->getUser(), $this->getKeywords(), $this->getSearchUrl());
+			$cache = new Alaress_Twitter_Cache();
 
-			$allTweets = json_decode($cache->load());
+			$cache->init($resource, $params);
 
-			/* Slice the required number of elements out
-			 * Otherwise return all tweets when a limit is not specified (ie blank)
-			 */
-            if ($this->getMaxTweets() && is_numeric($this->getMaxTweets()) && is_array($allTweets->results)) {
-                $allResults = array_slice($allTweets->results, 0, $this->getMaxTweets());
-			}
-			else {
-				$allResults = $allTweets->results;
-			}
+			$all_tweets = $cache->load();
 
-			/* Iterate and process
-			 */
-			for ($i = 0; $i < count($allResults); $i++) {
-				$processed[] = array(
-					'text' => $this->getFilter()->filterText($allResults[$i]->text),
-					'date' => $allResults[$i]->created_at,
-					'author' => $allResults[$i]->from_user,
-					'avatar' => $allResults[$i]->profile_image_url,
-				);
+			if(is_array($all_tweets)) {
+	            if ($this->getMaxTweets() && is_numeric($this->getMaxTweets())) {
+					$all_tweets = array_slice($all_tweets, 0, $this->getMaxTweets());
+				}
+
+
+				foreach ($all_tweets as $result) {
+					$processed[] = array(
+						'text'   => $this->getFilter()->filterText($result->text),
+						'date'   => $result->created_at,
+						'author' => $result->user->screen_name,
+						'avatar' => $result->user->profile_image_url,
+					);
+				}
 			}
 		}
 
