@@ -289,7 +289,7 @@ abstract class Alaress_Cache_Abstract {
 	 *
 	 * @return string
 	 */
-	private function generateCachedFilename() {
+	protected function generateCachedFilename() {
 		return Cfg::get('stream_dir') . '/' . $this->getCacheFilePrefix() . '_' . $this->encode($this->getUrl()) . '.txt';
 	}
 
@@ -298,7 +298,7 @@ abstract class Alaress_Cache_Abstract {
 	 *
 	 * @return string
 	 */
-	private function generateLockFilename() {
+	protected function generateLockFilename() {
 		return Cfg::get('stream_dir') . '/' . $this->getCacheFilePrefix() . '_' . $this->encode($this->getUrl()) . '_lock.txt';
 	}
 
@@ -336,7 +336,7 @@ abstract class Alaress_Cache_Abstract {
 	 *
 	 * @param $text
 	 */
-	private function notifyObservers($text) {
+	protected function notifyObservers($text) {
 		if (count($this->getObserverRegistry())) {
 			foreach ($this->getObserverRegistry() as $key => $instance) {
 				$instance->report($text);
@@ -352,7 +352,7 @@ abstract class Alaress_Cache_Abstract {
 	 *
 	 * @param string $cacheFilePrefix
 	 */
-	private function setCacheFilePrefix($cacheFilePrefix) {
+	protected function setCacheFilePrefix($cacheFilePrefix) {
 		$this->cacheFilePrefix = $cacheFilePrefix;
 	}
 
@@ -361,7 +361,7 @@ abstract class Alaress_Cache_Abstract {
 	 *
 	 * @return string
 	 */
-	private function getCacheFilePrefix() {
+	protected function getCacheFilePrefix() {
 		return $this->cacheFilePrefix;
 	}
 
@@ -370,7 +370,7 @@ abstract class Alaress_Cache_Abstract {
 	 *
 	 * @param string $cachedFile
 	 */
-	private function setCachedFile($cachedFile) {
+	protected function setCachedFile($cachedFile) {
 		$this->cachedFile = $cachedFile;
 	}
 
