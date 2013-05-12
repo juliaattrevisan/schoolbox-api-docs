@@ -64,6 +64,24 @@ class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
 	}
 
 	/**
+	 * Figger out what the cached filename should be
+	 *
+	 * @return string
+	 */
+	protected function generateCachedFilename() {
+		return Cfg::get('stream_dir') . '/' . $this->getCacheFilePrefix() . '_' . $this->encode($this->getUrl().serialize($this->getParameters())) . '.txt';
+	}
+
+	/**
+	 * Figger out what the lock filename should be
+	 *
+	 * @return string
+	 */
+	protected function generateLockFilename() {
+		return Cfg::get('stream_dir') . '/' . $this->getCacheFilePrefix() . '_' . $this->encode($this->getUrl().serialize($this->getParameters())) . '_lock.txt';
+	}
+
+	/**
 	 * Get for parameters
 	 *
 	 * @return string
