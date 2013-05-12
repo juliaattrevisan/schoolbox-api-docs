@@ -63,7 +63,6 @@ class Alaress_Twitter_Search {
 		$processed = array();
 		$resource  = 'https://api.twitter.com/1.1/search/tweets.json';
 		$params    = $this->generateParameters();
-		print_r($params);
 		if (!empty($params)) {
 
 			$cache = new Alaress_Twitter_Cache();
