@@ -159,6 +159,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                 'PERIOD_ABSENTEES' => '',
                                 'PERIOD_URL' => '#',
                                 'has_attendances_block' => '',
+                                'PERIOD_CLASS' => 'normal',
+                                'PERIOD_TH_CLASS' => 'normal',
                             )
                         );
 
