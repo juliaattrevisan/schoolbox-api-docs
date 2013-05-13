@@ -10,7 +10,7 @@
 
 namespace Component\Eportfolio;
 
-class TextboxMigrator extends MigratorAbstract {
+class ObjectiveMigrator extends MigratorAbstract {
 
 	/**
 	 * All known forms of textbox
