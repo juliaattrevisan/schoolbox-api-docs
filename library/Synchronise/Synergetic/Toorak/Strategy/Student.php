@@ -46,8 +46,8 @@ class Synchronise_Synergetic_Toorak_Strategy_Student extends Synchronise_Synerge
 		$newUser['firstname'] = $currentUser['StudentPreferred'];
 		$newUser['lastname']  = $currentUser['StudentSurname'];
 		//
-		// No alt email
-		$newUser['alt_email']   = '';
+		// Don't touch email address, it's not in Synergetic
+//		$newUser['alt_email']   = '';
 		$newUser['synergy_id']  = $currentUser['StudentID'];
 		$newUser['local_email'] = 0;
 		$newUser['year']        = $currentUser['StudentYearLevel'];
