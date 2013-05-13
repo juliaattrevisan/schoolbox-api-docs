@@ -149,17 +149,40 @@ class Digest_News {
     }
 
     /**
+     * Sends digest emails.
      *
+     * @return array
+     * * total:    number of emails that were sendable
+     * * failures: number of failures
      */
     public function send() {
         $keys = array_keys($this->userList);
 
         $this->cli(sprintf("Memory limit: %s", ini_get('memory_limit')));
 
-        for($i = 0; $i < count($keys); $i++) {
+        $count    = count($keys);
+        $sendable = 0;
+        $failures = 0;
+        for($i = 0; $i < $count; $i++) {
             $this->cli(sprintf("Memory usage at %03d: %s (%s)", $i, $this->convert(memory_get_usage(true)), memory_get_usage(true)));
-            $this->sendEmail($this->compileNews($this->userList[$keys[$i]]));
+            $user   = $this->compileNews($this->userList[$keys[$i]]);
+            $result = $this->sendEmail($user);
+            if ($result['sendable']) {
+                $this->cli(sprintf("Sending digest to %s %s (%s)", $user['firstname'], $user['lastname'], $user['email']));
+                $sendable++;
+            }
+            else {
+                $this->cli(sprintf("No digest to send to %s %s (%s)", $user['firstname'], $user['lastname'], $user['email']));
+            }
+            if ($result['error']) {
+                $this->cli($result['error'], true);
+                $failures++;
+            }
         }
+        return array(
+            'total'    => $sendable,
+            'failures' => $failures,
+        );
     }
 
 
@@ -265,15 +288,26 @@ class Digest_News {
 
 
     /**
+     * Sends digest email to the given user.
      *
-     * @param $u
-     * @return boolean
+     * @param  array $u The user to send to
+     *
+     * @return array
+     * * sendable: was there anything in the digest?
+     * * sent:     whether the email was sent or not. Doesn't always mean error
+     * * error:    if there was an error or not (and what it was if so)
      */
     protected function sendEmail($u) {
 
         // do nothing if there's no email address
         if(!trim($u['email'])) {
-            return false;
+            return array(
+                'sendable' => false,
+                'sent'     => false,
+                'error'    => sprintf("No email address for user %s %s", $u['firstname'], $u['lastname']),
+            );
+//            $this->cli($result['error'], true);
+//            return $result;
         }
 
         $mailer = new Mailer('news-digest.html', 'News', $u['email'], $this->host);
@@ -293,7 +327,6 @@ class Digest_News {
 
         $mailer->setVar('NAME', $u['firstname']);
 
-        $this->cli(sprintf("Email to %s %s (%s)", $u['firstname'], $u['lastname'], $u['email']));
         $newsFlag = false;
 
         $mailer->setVar('newslist_block', '');
@@ -496,15 +529,19 @@ class Digest_News {
             $mailer->setVar('upcominglist_block', '');
         }
 
+        $result = array(
+            'sendable' => false,
+            'sent'     => false,
+            'error'    => '',
+        );
         if (!$this->debugging() && $newsFlag) {
-            $success = $mailer->send();
-            if(!$success) {
-                $this->cli("Failed to send email to {$u['email']}", true);
+            $result['sendable'] = true;
+            $result['sent']     = $mailer->send();
+            if (!$result['sent']) {
+                $result['error'] = "Failed to send email to {$u['email']}";
             }
-            return $success;
         }
-
-        return true;
+        return $result;
     }
 
     protected function debugging() {
