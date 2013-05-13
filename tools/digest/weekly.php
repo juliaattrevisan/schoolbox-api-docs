@@ -30,8 +30,11 @@ $debug = (isset($argv[1]) && $argv[1] == 'nomail');
 $digestStart = strtotime('-8 days');
 $digestEnd = time();
 
+echo strftime("[%F %T] Starting weekly news digest\n");
 $newsDigest = new Digest_News($digestStart, $digestEnd, $debug);
 $newsDigest->compileUserList();
-$newsDigest->send();
+$result = $newsDigest->send();
+echo strftime("[%F %T] Completed weekly news digest: ");
+printf("%d sendable, %d missing emails, %d failures\n", $result['total'], $result['missing'], $result['failures']);
 
 die();
