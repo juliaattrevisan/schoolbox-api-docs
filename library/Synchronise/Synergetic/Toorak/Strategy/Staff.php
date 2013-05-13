@@ -12,9 +12,6 @@
  */
 class Synchronise_Synergetic_Toorak_Strategy_Staff extends Synchronise_Synergetic_Toorak_Strategy_Abstract {
 	protected $strategyTitle = "Update Schoolbox Staff Details Synchronisation";
-	const ADMIN_GROUP_ID = 1;
-    const TEACH_GROUP_ID = 2;
-	const STAFF_DEFAULT_CAMPUS = 1;
 
 	/**
 	 * Setup
@@ -44,12 +41,12 @@ class Synchronise_Synergetic_Toorak_Strategy_Staff extends Synchronise_Synergeti
 		$newUser['title']         = $currentUser['StaffTitle'];
 		$newUser['firstname']     = $currentUser['StaffPreferredName'];
 		$newUser['lastname']      = $currentUser['StaffSurname'];
-        $newUser['synergy_id']    = $currentUser['StaffID'];
+		$newUser['synergy_id']    = $currentUser['StaffID'];
 		$newUser['alt_email']     = $currentUser['OccupEmail'];
-        $newUser['local_email']   = 0;
+		$newUser['local_email']   = 0;
 		$newUser['defaultCampus'] = $this->getCampusFromCode($currentUser['StaffCampus']);
 		$newUser['campus']        = array($newUser['defaultCampus']);
-		$newUser['group_id']      = self::TEACH_GROUP_ID;
+		$newUser['group_id']      = self::STAFF_GROUP_ID;
 		return $newUser;
 	}
 

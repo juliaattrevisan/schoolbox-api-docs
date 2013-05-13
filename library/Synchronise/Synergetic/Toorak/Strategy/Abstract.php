@@ -16,8 +16,10 @@ abstract class Synchronise_Synergetic_Toorak_Strategy_Abstract extends Synchroni
 {
 	protected $verboseFilter = null;
 	const PARENT_GROUP_ID = 4;
-	const STAFF_GROUP_ID = 2;
-	const ADMIN_GROUP_ID = 1;
+	const STAFF_GROUP_ID  = 2;
+	const ADMIN_GROUP_ID  = 1;
+
+	const STAFF_DEFAULT_CAMPUS = 1;
 
 	/**
 	 * Setup
