@@ -59,8 +59,8 @@ class Weather_Wunderground implements Weather_Interface {
 
         $call = sprintf("http://api.wunderground.com/api/%s/%s/q/%s.json%s", $key, $featureString, $this->location, $this->querystring);
 
-	    $cache = new Alaress_Rss_Cache();
-	    $cache->setCachedTime(Cfg::get('weather_api_caching'))->init($call);
+	    $cache = new Weather_Cache();
+	    $cache->init($call);
 
 	    return $cache->getStreamContents();
     }
