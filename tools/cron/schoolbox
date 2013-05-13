@@ -19,4 +19,4 @@
 */15 * * * *    root    php /usr/share/schoolbox/tools/submission/notify_students.php --send --upcoming --overdue >> /var/log/schoolbox-duework.log 2>/dev/null
 
 # Cleanup cache  files (minify,zip,stream) (once a month)
-0 1 1 * *       root    php /usr/share/schoolbox/tools/clean-cache-dir.sh
+0 1 1 * *       root    php /usr/share/schoolbox/tools/clean-cache-dir.sh  >/dev/null 2>&1
