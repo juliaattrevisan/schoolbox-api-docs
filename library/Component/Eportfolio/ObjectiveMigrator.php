@@ -10,7 +10,7 @@
 
 namespace Component\Eportfolio;
 
-class ObjectiveMigrator extends MigratorAbstract {
+class ObjectiveMigrator extends TextboxMigrator {
 
 	/**
 	 * All known forms of textbox
@@ -26,57 +26,6 @@ class ObjectiveMigrator extends MigratorAbstract {
 		'Interest' => 'eportfolio_objective_interest',
 		'Skill' => 'eportfolio_objective_skill',
 	);
-
-	/**
-	 * All textboxes to process
-	 * This changes between the values described in $textboxRegistry
-	 *
-	 * @var array
-	 */
-	private $allTextboxes = array();
-
-	/**
-	 * Config definition shared by all textboxes
-	 *
-	 * @var null
-	 */
-	private $configDefinitionId = null;
-
-	/**
-	 * Definition id
-	 *
-	 * @var null
-	 */
-	private $definitionId = null;
-
-	/**
-	 * Setup
-	 */
-	protected function setup() {
-		$definition = \Component_DefinitionMapper::getInstance()->findByColumn('class', 'Component_Eportfolio_TextboxController');
-
-		$this->setDefinitionId($definition->current()->id);
-
-		/* Set up config definition for this component by spawning one if it doesn't already exist
-		 */
-		$exists = \Component_ConfigDefinitionMapper::getInstance()->findByColumn('component_definition_id', $definition->current()->id);
-
-		if (!$exists->count()) {
-			$configDefinition = new \Component_ConfigDefinition();
-			$configDefinition->id = null;
-			$configDefinition->definitionId = $definition->current()->id;
-			$configDefinition->key = 'componentname';
-			$configDefinition->defaultValue = 'My Textbox';
-			$configDefinition->label = 'Title';
-
-			$configDefinitionIds = \Component_ConfigDefinitionMapper::getInstance()->save($configDefinition);
-
-			$this->setConfigDefinitionId($configDefinitionIds[0]);
-		}
-		else {
-			$this->setConfigDefinitionId($exists->current()->id);
-		}
-	}
 
 	/**
 	 * Migrate this component
@@ -168,59 +117,5 @@ class ObjectiveMigrator extends MigratorAbstract {
 	 */
 	private function getTextboxRegistry() {
 		return $this->textboxRegistry;
-	}
-
-	/**
-	 * Set all items
-	 *
-	 * @param null $allTextboxes
-	 */
-	private function setAllTextboxes($allTextboxes) {
-		$this->allTextboxes = $allTextboxes;
-	}
-
-	/**
-	 * Get all items
-	 *
-	 * @return null
-	 */
-	private function getAllTextboxes() {
-		return $this->allTextboxes;
-	}
-
-	/**
-	 * Set config definition id shared by all textboxes
-	 *
-	 * @param null $configDefinitionId
-	 */
-	private function setConfigDefinitionId($configDefinitionId) {
-		$this->configDefinitionId = $configDefinitionId;
-	}
-
-	/**
-	 * Get config definition id shared by all textboxes
-	 *
-	 * @return null
-	 */
-	private function getConfigDefinitionId() {
-		return $this->configDefinitionId;
-	}
-
-	/**
-	 * Set component definition id
-	 *
-	 * @param null $definitionId
-	 */
-	private function setDefinitionId($definitionId) {
-		$this->definitionId = $definitionId;
-	}
-
-	/**
-	 * Get component definition id
-	 *
-	 * @return null
-	 */
-	private function getDefinitionId() {
-		return $this->definitionId;
 	}
 }
