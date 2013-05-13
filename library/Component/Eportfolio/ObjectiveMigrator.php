@@ -28,6 +28,14 @@ class ObjectiveMigrator extends TextboxMigrator {
 	);
 
 	/**
+	 * Slightly different behaviour
+	 *
+	 * @return mixed|void
+	 */
+	protected function setup() {
+	}
+
+	/**
 	 * Migrate this component
 	 */
 	public function migrate() {

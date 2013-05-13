@@ -13,6 +13,20 @@ namespace Component\Eportfolio;
 class BlogMigrator extends MigratorAbstract {
 
 	/**
+	 * Controller class for this component
+	 *
+	 * @var string
+	 */
+	protected $controllerClass = 'Component_Eportfolio_BlogController';
+
+	/**
+	 * Default name for this component
+	 *
+	 * @var string
+	 */
+	protected $componentDefaultName = 'My Blog';
+
+	/**
 	 * All blogs
 	 *
 	 * @var null
@@ -23,30 +37,6 @@ class BlogMigrator extends MigratorAbstract {
 	 * Setup
 	 */
 	protected function setup() {
-		$definition = \Component_DefinitionMapper::getInstance()->findByColumn('class', 'Component_Eportfolio_BlogController');
-
-		$this->setDefinitionId($definition->current()->id);
-
-		/* Set up config definition for this component by spawning one if it doesn't already exist
-		 */
-		$exists = \Component_ConfigDefinitionMapper::getInstance()->findByColumn('component_definition_id', $definition->current()->id);
-
-		if (!$exists->count()) {
-			$configDefinition = new \Component_ConfigDefinition();
-			$configDefinition->id = null;
-			$configDefinition->definitionId = $definition->current()->id;
-			$configDefinition->key = 'componentname';
-			$configDefinition->defaultValue = 'My Blog';
-			$configDefinition->label = 'Title';
-
-			$configDefinitionIds = \Component_ConfigDefinitionMapper::getInstance()->save($configDefinition);
-
-			$this->setConfigDefinitionId($configDefinitionIds[0]);
-		}
-		else {
-			$this->setConfigDefinitionId($exists->current()->id);
-		}
-
 		$this->fetchAll();
 	}
 

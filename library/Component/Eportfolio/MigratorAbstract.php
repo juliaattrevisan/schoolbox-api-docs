@@ -13,6 +13,20 @@ namespace Component\Eportfolio;
 abstract class MigratorAbstract {
 
 	/**
+	 * Controller class for this component
+	 *
+	 * @var string
+	 */
+	protected $controllerClass = '';
+
+	/**
+	 * Default name for this component
+	 *
+	 * @var string
+	 */
+	protected $componentDefaultName = '';
+
+	/**
 	 * An old db handler
 	 *
 	 * @var null
@@ -56,7 +70,42 @@ abstract class MigratorAbstract {
 		$this->setUserId($userId);
 		$this->setPageId($pageId);
 
+		/* Force first config
+		 */
+		$this->firstConfig();
+
+		/* Hook method
+		 */
 		$this->setup();
+	}
+
+	/**
+	 * Ensures components have a config record for default names etc.
+	 */
+	protected function firstConfig() {
+		$definition = \Component_DefinitionMapper::getInstance()->findByColumn('class', $this->getControllerClass());
+
+		$this->setDefinitionId($definition->current()->id);
+
+		/* Set up config definition for this component by spawning one if it doesn't already exist
+		 */
+		$exists = \Component_ConfigDefinitionMapper::getInstance()->findByColumn('component_definition_id', $definition->current()->id);
+
+		if (!$exists->count()) {
+			$configDefinition = new \Component_ConfigDefinition();
+			$configDefinition->id = null;
+			$configDefinition->definitionId = $definition->current()->id;
+			$configDefinition->key = 'componentname';
+			$configDefinition->defaultValue = $this->getComponentDefaultName();
+			$configDefinition->label = 'Title';
+
+			$configDefinitionIds = \Component_ConfigDefinitionMapper::getInstance()->save($configDefinition);
+
+			$this->setConfigDefinitionId($configDefinitionIds[0]);
+		}
+		else {
+			$this->setConfigDefinitionId($exists->current()->id);
+		}
 	}
 
 	/**
@@ -164,5 +213,41 @@ abstract class MigratorAbstract {
 	 */
 	protected function getDefinitionId() {
 		return $this->definitionId;
+	}
+
+	/**
+	 * Set component default name
+	 *
+	 * @param string $componentDefaultName
+	 */
+	protected function setComponentDefaultName($componentDefaultName) {
+		$this->componentDefaultName = $componentDefaultName;
+	}
+
+	/**
+	 * Get component default name
+	 *
+	 * @return string
+	 */
+	protected function getComponentDefaultName() {
+		return $this->componentDefaultName;
+	}
+
+	/**
+	 * Set controller class
+	 *
+	 * @param string $controllerClass
+	 */
+	protected function setControllerClass($controllerClass) {
+		$this->controllerClass = $controllerClass;
+	}
+
+	/**
+	 * Get controller class
+	 *
+	 * @return string
+	 */
+	protected function getControllerClass() {
+		return $this->controllerClass;
 	}
 }

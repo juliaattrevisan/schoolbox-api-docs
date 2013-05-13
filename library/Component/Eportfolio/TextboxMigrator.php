@@ -13,6 +13,20 @@ namespace Component\Eportfolio;
 class TextboxMigrator extends MigratorAbstract {
 
 	/**
+	 * Controller class for this component
+	 *
+	 * @var string
+	 */
+	protected $controllerClass = 'Component_Eportfolio_TextboxController';
+
+	/**
+	 * Default name for this component
+	 *
+	 * @var string
+	 */
+	protected $componentDefaultName = 'My Textbox';
+
+	/**
 	 * All textboxes to process
 	 *
 	 * @var array
@@ -23,39 +37,13 @@ class TextboxMigrator extends MigratorAbstract {
 	 * Setup
 	 */
 	protected function setup() {
-		$definition = \Component_DefinitionMapper::getInstance()->findByColumn('class', 'Component_Eportfolio_TextboxController');
-
-		$this->setDefinitionId($definition->current()->id);
-
-		/* Set up config definition for this component by spawning one if it doesn't already exist
-		 */
-		$exists = \Component_ConfigDefinitionMapper::getInstance()->findByColumn('component_definition_id', $definition->current()->id);
-
-		if (!$exists->count()) {
-			$configDefinition = new \Component_ConfigDefinition();
-			$configDefinition->id = null;
-			$configDefinition->definitionId = $definition->current()->id;
-			$configDefinition->key = 'componentname';
-			$configDefinition->defaultValue = 'My Textbox';
-			$configDefinition->label = 'Title';
-
-			$configDefinitionIds = \Component_ConfigDefinitionMapper::getInstance()->save($configDefinition);
-
-			$this->setConfigDefinitionId($configDefinitionIds[0]);
-		}
-		else {
-			$this->setConfigDefinitionId($exists->current()->id);
-		}
+		$this->fetchAll('eportfolio_textBox');
 	}
 
 	/**
 	 * Migrate this component
 	 */
 	public function migrate() {
-
-		/* Fetch all the textboxes
-		 */
-		$this->fetchAll('eportfolio_textBox');
 
 		/* And deal with them all
 		 */
