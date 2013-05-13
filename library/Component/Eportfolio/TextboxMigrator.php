@@ -66,6 +66,43 @@ class TextboxMigrator extends MigratorAbstract {
 	 * Migrate this component
 	 */
 	public function migrate() {
+
+		/* Fetch all the textboxes
+		 */
+		$this->fetchAll('eportfolio_textBox');
+
+		/* And deal with them all
+		 */
+		if (count($this->getAllTextboxes())) {
+			foreach($this->getAllTextboxes() as $currentTextbox) {
+
+				/* Insert new component instance record
+				 */
+				$newComp = new \Component_Instance();
+				$newComp->definitionId = $this->getDefinitionId();
+				$newComp->identifier = $this->getPageId();
+				$newComp->module = 'eportfolio';
+				$newComp->sequence = 0;
+				$newComp->position = 'left';
+
+				$newCompIds = \Component_InstanceMapper::getInstance()->save($newComp);
+
+				$componentInstanceID = $newCompIds[0];
+
+				$newTextbox = new Textbox();
+				$newTextbox->setComponentInstanceId($componentInstanceID);
+				$newTextbox->setContent($currentTextbox['body']);
+
+				TextboxMapper::getInstance()->save($newTextbox);
+
+				$configInstance = new \Component_Config();
+				$configInstance->configDefinitionId = $this->getConfigDefinitionId();
+				$configInstance->instanceId = $componentInstanceID;
+				$configInstance->value = $currentTextbox['heading'];
+
+				\Component_ConfigMapper::getInstance()->save($configInstance);
+			}
+		}
 	}
 
 	/**
@@ -80,7 +117,7 @@ class TextboxMigrator extends MigratorAbstract {
 		$query = "
 			SELECT *
 			FROM {$table}
-			WHERE user_id = {$this->getUserId()}
+			WHERE userID = {$this->getUserId()}
 		";
 
 		$result = $this->getDb()->getAll($query);
