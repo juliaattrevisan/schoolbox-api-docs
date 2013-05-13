@@ -39,49 +39,29 @@ class Synchronise_Synergetic_Toorak_Strategy_Student extends Synchronise_Synerge
 	 */
 	public function setupUserDetails($currentUser) {
 		$newUser = array();
-
-		/* Login details
-		 * We don't know how the password is given to us
-		 */
-		$newUser['username'] = $currentUser['NetworkLogin'];
-
-		/* User details
-		 */
-		$newUser['title'] = '';
+		//
+		// Username: always student ID
+		$newUser['username']  = $currentUser['StudentID'];
+		$newUser['title']     = '';
 		$newUser['firstname'] = $currentUser['StudentPreferred'];
-		$newUser['lastname'] = $currentUser['StudentSurname'];
-        $newUser['alt_email'] = $currentUser['StudentOccupEmail'];
-        $newUser['synergy_id'] = $currentUser['StudentID'];
-        $newUser['local_email'] = 0;
-
-		/* Year level
-		 */
-		$newUser['year'] = $this->getYear($currentUser['StudentYearLevel']);
-
-		/* Campus config: needs to map to a campus id
-		 */
-		$newUser['defaultCampus'] = $this->getCampusFromCode($currentUser['StudentCampus']);
-		$newUser['campus'] = array($this->getCampusFromCode($currentUser['StudentCampus']));
-
-		/* Staff Group ID
-		 */
-		$newUser['group_id'] = $this->getGroupIDFromYearLevel($currentUser['StudentYearLevel']);
-
-		/* This person is not a superuser
-		 */
-		//$newUser['su'] = false;
-
+		$newUser['lastname']  = $currentUser['StudentSurname'];
+		//
+		// No alt email
+		$newUser['alt_email']   = '';
+		$newUser['synergy_id']  = $currentUser['StudentID'];
+		$newUser['local_email'] = 0;
+		$newUser['year']        = $currentUser['StudentYearLevel'];
+		//
+		// Campus: depends on year level
+		$newUser['defaultCampus'] = $this->getCampusFromYearLevel($currentUser['StudentYearLevel']);
+		$newUser['campus']        = array($newUser['defaultCampus']);
+		$newUser['group_id']      = $this->getGroupIDFromYearLevel($currentUser['StudentYearLevel']);
+		$newUser['house']         = $this->getHouseFromCode($currentUser['StudentHouse']);
+		$newUser['su']            = false;
+		//
+		// Group/house membership?
 		return $newUser;
 	}
-
-    protected function getYear($year) {
-        if($year == '40')
-            return '4yo Kinder';
-        else if($year == '30')
-            return '3yo Kinder';
-        else
-            return $year;
-    }
 
 	/**
 	 * If the users exist in Synergy but not in Schoolbox, create an account for
@@ -91,14 +71,9 @@ class Synchronise_Synergetic_Toorak_Strategy_Student extends Synchronise_Synerge
 	 */
 	public function createIfExists() {
 		$this->getVerboseFilter()->intro();
-
 		foreach($this->getList() as $currentUser) {
-
-			/* Generate details about the new user
-			 */
 			$this->executeCreateUpdate($this->setupUserDetails($currentUser));
 		}
-
 		$this->getVerboseFilter()->summary();
 	}
 }
