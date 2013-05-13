@@ -304,7 +304,7 @@ class Eportfolio {
 
 		/* Insert it
 		 */
-		$this->db->insert($this->getContext() .'_config', $eportfolioConfig);
+		$this->db->insert($this->getContext() .'_page', $eportfolioConfig);
 
 		/* Remember the page that was just created, because we'll apply
 		 * permissions to it after it gets created
@@ -411,7 +411,7 @@ class Eportfolio {
 	 */
 	public function saveDisplayProperties($listColor) {
 		$query = "
-			UPDATE {$this->getContext()}_config
+			UPDATE {$this->getContext()}_page
 			SET
 		";
 
@@ -442,17 +442,17 @@ class Eportfolio {
 	public function savePageTemplate($template) {
 		$query = "
 			SELECT uid
-			FROM {$this->getContext()}_config
+			FROM {$this->getContext()}_page
 			WHERE uid = '{$this->getUserId()}'
 		";
 
 		$this->db->query($query);
 
 		if ($row = $this->db->getNextArray()) {
-			$query = "UPDATE {$this->getContext()}_config SET template = '$template' WHERE uid = '{$this->getUserId()}'";
+			$query = "UPDATE {$this->getContext()}_page SET template = '$template' WHERE uid = '{$this->getUserId()}'";
 		}
 		else {
-			$query = "INSERT INTO {$this->getContext()}_config (uid, template) VALUES ('{$this->getUserID()}', '$template')";
+			$query = "INSERT INTO {$this->getContext()}_page (uid, template) VALUES ('{$this->getUserID()}', '$template')";
 		}
 
 		$this->db->query($query);
