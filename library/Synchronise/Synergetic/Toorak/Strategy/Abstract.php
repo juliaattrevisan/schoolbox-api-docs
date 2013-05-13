@@ -101,8 +101,12 @@ abstract class Synchronise_Synergetic_Toorak_Strategy_Abstract extends Synchroni
     /**
      * Figure out which campus a student member is in, based on the code provided
      *
+     * * 1: Senior
+     * * 2: Junior
+     * * 3: Pre-school
+     *
      * @param  $code
-     * @return bool|string
+     * @return int
      */
     protected function getCampusFromCode($code)
     {
@@ -114,10 +118,47 @@ abstract class Synchronise_Synergetic_Toorak_Strategy_Abstract extends Synchroni
             case 'S':
                 return 3;
             default:
-                // return 'E';
                 return 1;
         }
     }
+
+
+	/**
+	 * Gets house ID out of Synergetic house.
+	 *
+	 * @todo Can houses and campuses have synergetic codes associated with them?
+	 *
+	 * @param $house
+	 *
+	 * @return bool|int
+	 */
+	protected function getHouseFromCode($house) {
+		//
+		// PYE: Pye (383)
+		// TRI: Tripp (384)
+		// MAY: Mayfield (385)
+		// HAM: Hamilton (386)
+		// CER: Cerutty (387)
+		// DOU: Douglas (388)
+		// RED, BLU, GOL: ?
+		switch ($house) {
+			case 'PYE':
+				return 383;
+			case 'TRI':
+				return 384;
+			case 'MAY':
+				return 385;
+			case 'HAM':
+				return 386;
+			case 'CER':
+				return 387;
+			case 'DOU':
+				return 388;
+			default:
+				return false;
+		}
+	}
+
 
     /**
      * Figure out which Campus belongs to this Student
@@ -133,9 +174,9 @@ abstract class Synchronise_Synergetic_Toorak_Strategy_Abstract extends Synchroni
             case '2':
             case '3':
             case '4':
-                return 2;
             case '5':
             case '6':
+                return 2;
             case '7':
             case '8':
             case '9':
@@ -143,9 +184,9 @@ abstract class Synchronise_Synergetic_Toorak_Strategy_Abstract extends Synchroni
             case '11':
             case '12':
                 return 3;
-            case '40':
-            case '30':
-            case '50':
+            case '32':
+            case '33':
+            case '44':
                 return 1;
             default:
                 return false;
@@ -162,24 +203,40 @@ abstract class Synchronise_Synergetic_Toorak_Strategy_Abstract extends Synchroni
     protected function getGroupIDFromYearLevel($year)
     {
         switch ($year) {
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '30':
-            case '40':
+            //
+            // Year x
+            case 0:
+                return 18;
+            case 1:
+                return 17;
+            case 2:
+                return 16;
+            case 3:
+                return 15;
+            case 4:
+                return 14;
+            case 5:
+                return 13;
+            case 6:
+                return 12;
+            case 7:
+                return 11;
+            case 8:
+                return 10;
+            case 9:
+                return 9;
+            case 10:
+                return 8;
+            case 11:
+                return 7;
+            case 12:
                 return 6;
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-                return 5;
-            case '9':
-            case '10':
-            case '11':
-            case '12':
-                return 3;
+            //
+            // Pre-schools
+            case 32:
+            case 33:
+            case 44:
+                return 19;
             default:
                 return false;
         }
