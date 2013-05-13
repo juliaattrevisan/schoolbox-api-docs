@@ -31,6 +31,15 @@ class BlogMigrator extends MigratorAbstract {
 	 */
 	public function migrate() {
 		if (count($this->getAllBlogs())) {
+			$newComp = new \Component_Instance();
+			$newComp->definitionId = 77;
+			$newComp->identifier = $this->getPageId();
+			$newComp->module = 'eportfolio';
+			$newComp->sequence = 0;
+			$newComp->position = 'left';
+
+			$newCompIds = \Component_InstanceMapper::getInstance()->save($newComp);
+
 			foreach($this->getAllBlogs() as $currentBlog) {
 				$newBlog = new \Component\Eportfolio\Blog();
 				$newBlog->setPageId($this->getPageId());
