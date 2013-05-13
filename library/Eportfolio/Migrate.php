@@ -86,9 +86,9 @@ class Migrate {
 		$allNewComponents = array(
 //			new \Component\Eportfolio\BlogMigrator($eportfolioHandler->getUserId(), $eportfolioHandler->getPageId()),
 //			new \Component\Eportfolio\LinkListMigrator($eportfolioHandler->getUserId(), $eportfolioHandler->getPageId()),
-//			new \Component\Eportfolio\FileListMigrator($eportfolioHandler->getUserId(), $eportfolioHandler->getPageId()),
+			new \Component\Eportfolio\FileListMigrator($eportfolioHandler->getUserId(), $eportfolioHandler->getPageId()),
 //			new \Component\Eportfolio\ObjectiveMigrator($eportfolioHandler->getUserId(), $eportfolioHandler->getPageId()),
-			new \Component\Eportfolio\TextboxMigrator($eportfolioHandler->getUserId(), $eportfolioHandler->getPageId()),
+//			new \Component\Eportfolio\TextboxMigrator($eportfolioHandler->getUserId(), $eportfolioHandler->getPageId()),
 		);
 
 		foreach ($allNewComponents as $migrator) {
