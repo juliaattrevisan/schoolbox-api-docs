@@ -34,6 +34,20 @@ abstract class MigratorAbstract {
 	protected $pageId = null;
 
 	/**
+	 * Config definition shared by all textboxes
+	 *
+	 * @var null
+	 */
+	protected $configDefinitionId = null;
+
+	/**
+	 * Definition id
+	 *
+	 * @var null
+	 */
+	protected $definitionId = null;
+
+	/**
 	 * Constructor
 	 */
 	final public function __construct($userId, $pageId) {
@@ -114,5 +128,41 @@ abstract class MigratorAbstract {
 	 */
 	protected function getUserId() {
 		return $this->userId;
+	}
+
+	/**
+	 * Set config definition id shared by all textboxes
+	 *
+	 * @param null $configDefinitionId
+	 */
+	protected function setConfigDefinitionId($configDefinitionId) {
+		$this->configDefinitionId = $configDefinitionId;
+	}
+
+	/**
+	 * Get config definition id shared by all textboxes
+	 *
+	 * @return null
+	 */
+	protected function getConfigDefinitionId() {
+		return $this->configDefinitionId;
+	}
+
+	/**
+	 * Set component definition id
+	 *
+	 * @param null $definitionId
+	 */
+	protected function setDefinitionId($definitionId) {
+		$this->definitionId = $definitionId;
+	}
+
+	/**
+	 * Get component definition id
+	 *
+	 * @return null
+	 */
+	protected function getDefinitionId() {
+		return $this->definitionId;
 	}
 }
