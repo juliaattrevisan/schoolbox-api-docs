@@ -23,6 +23,30 @@ class LinkListMigrator extends MigratorAbstract {
 	 * Setup
 	 */
 	protected function setup() {
+		$definition = \Component_DefinitionMapper::getInstance()->findByColumn('class', 'Component_Eportfolio_LinkListController');
+
+		$this->setDefinitionId($definition->current()->id);
+
+		/* Set up config definition for this component by spawning one if it doesn't already exist
+		 */
+		$exists = \Component_ConfigDefinitionMapper::getInstance()->findByColumn('component_definition_id', $definition->current()->id);
+
+		if (!$exists->count()) {
+			$configDefinition = new \Component_ConfigDefinition();
+			$configDefinition->id = null;
+			$configDefinition->definitionId = $definition->current()->id;
+			$configDefinition->key = 'componentname';
+			$configDefinition->defaultValue = 'My Links';
+			$configDefinition->label = 'Title';
+
+			$configDefinitionIds = \Component_ConfigDefinitionMapper::getInstance()->save($configDefinition);
+
+			$this->setConfigDefinitionId($configDefinitionIds[0]);
+		}
+		else {
+			$this->setConfigDefinitionId($exists->current()->id);
+		}
+
 		$this->fetchAll();
 	}
 
@@ -32,7 +56,7 @@ class LinkListMigrator extends MigratorAbstract {
 	public function migrate() {
 		if (count($this->getAllLinkLists())) {
 			$newComp = new \Component_Instance();
-			$newComp->definitionId = 73;
+			$newComp->definitionId = $this->getDefinitionId();
 			$newComp->identifier = $this->getPageId();
 			$newComp->module = 'eportfolio';
 			$newComp->sequence = 0;
@@ -46,12 +70,12 @@ class LinkListMigrator extends MigratorAbstract {
 				$url = new \Url($currentLinkList['url']);
 				$url->prependScheme();
 
-				$newLinkList = new \Component\Eportfolio\LinkList();
+				$newLinkList = new LinkList();
 				$newLinkList->setComponentInstanceId($componentInstanceID);
 				$newLinkList->setTitle($currentLinkList['description']);
 				$newLinkList->setContent($url->getUrl());
 
-				\Component\Eportfolio\LinkListMapper::getInstance()->save($newLinkList);
+				LinkListMapper::getInstance()->save($newLinkList);
 			}
 		}
 	}
