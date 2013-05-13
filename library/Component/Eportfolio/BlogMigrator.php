@@ -32,7 +32,36 @@ class BlogMigrator extends MigratorAbstract {
 	public function migrate() {
 		if (count($this->getAllBlogs())) {
 			foreach($this->getAllBlogs() as $currentBlog) {
-				print_r($currentBlog);
+				$newBlog = new \Component\Eportfolio\Blog();
+				$newBlog->setPageId($this->getPageId());
+				$newBlog->setUid($this->getUserId());
+				$newBlog->setTitle($currentBlog['heading']);
+				$newBlog->setContent($currentBlog['body']);
+				$newBlog->setCreatedAt($currentBlog['created']);
+				$newBlog->setUpdatedAt($currentBlog['created']);
+
+				$id = \Component\Eportfolio\BlogMapper::getInstance()->save($newBlog);
+
+				if (is_array($id) && count($id)) {
+					$allComments = $this->fetchAllComments($currentBlog['id']);
+
+					/* Migrate blog comments
+					 */
+					if (count($allComments)) {
+						$blogId = array_pop($id);
+
+						foreach($allComments as $currentComment) {
+							$newComment = new \Component\Eportfolio\BlogComment();
+							$newComment->setBlogId($blogId);
+							$newComment->setUid($currentComment['owner']);
+							$newComment->setContent($currentComment['body']);
+							$newComment->setCreatedAt($currentComment['created']);
+							$newComment->setUpdatedAt($currentComment['created']);
+
+							\Component\Eportfolio\BlogCommentMapper::getInstance()->save($newComment);
+						}
+					}
+				}
 			}
 		}
 	}
@@ -45,6 +74,7 @@ class BlogMigrator extends MigratorAbstract {
 			SELECT *
 			FROM eportfolio_blog
 			WHERE owner = {$this->getUserId()}
+			AND deleted IS NULL
 		";
 
 		$result = $this->getDb()->getAll($query);
@@ -52,6 +82,29 @@ class BlogMigrator extends MigratorAbstract {
 		if ($result) {
 			$this->setAllBlogs($result);
 		}
+	}
+
+	/**
+	 * Fetch all the records for this component
+	 *
+	 * @param $blogId
+	 * @return array
+	 */
+	protected function fetchAllComments($blogId) {
+		$query = "
+			SELECT *
+			FROM eportfolio_blogComment
+			WHERE bid = {$blogId}
+			AND deleted IS NULL
+		";
+
+		$result = $this->getDb()->getAll($query);
+
+		if ($result) {
+			return $result;
+		}
+
+		return array();
 	}
 
 	/* Getters/Setters

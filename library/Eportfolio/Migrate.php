@@ -91,7 +91,7 @@ class Migrate {
 		);
 
 		foreach ($allNewComponents as $migrator) {
-			print_r($migrator);
+			$migrator->migrate();
 		}
 	}
 
