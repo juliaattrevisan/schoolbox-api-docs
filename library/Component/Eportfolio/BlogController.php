@@ -101,10 +101,17 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 					'LIST_ITEM_TITLE' => Scrub::text($currentItem->getTitle()),
 					'LIST_ITEM_CONTENT' => Scrub::html($currentItem->getContent()),
 					'LIST_ITEM_UPDATED_AT' => $currentItem->getUpdatedAt()->getShort(),
-					'LIST_ITEM_AUTHOR_ID' => $author->getId(),
-					'LIST_ITEM_AUTHOR_FULLNAME' => $author->getFullname(),
-					'LIST_ITEM_AUTHOR_EXTERNAL_USER_ID' => $author->getExternalId(),
 				));
+
+				/* If an author exists
+				 */
+				if ($author) {
+					$this->setVar(array(
+						'LIST_ITEM_AUTHOR_ID' => $author->getId(),
+						'LIST_ITEM_AUTHOR_FULLNAME' => $author->getFullname(),
+						'LIST_ITEM_AUTHOR_EXTERNAL_USER_ID' => $author->getExternalId(),
+					));
+				}
 
 				if ($currentItem->getComments()->count()) {
 					$i = 0;
