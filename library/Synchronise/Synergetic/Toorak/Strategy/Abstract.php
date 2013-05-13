@@ -99,7 +99,7 @@ abstract class Synchronise_Synergetic_Toorak_Strategy_Abstract extends Synchroni
     }
 
     /**
-     * Figure out which campus a student member is in, based on the code provided
+     * Figure out which campus a staff member is in, based on the code provided
      *
      * * 1: Senior
      * * 2: Junior
@@ -111,14 +111,14 @@ abstract class Synchronise_Synergetic_Toorak_Strategy_Abstract extends Synchroni
     protected function getCampusFromCode($code)
     {
         switch ($code) {
-            case 'E':
+            case 'S':
                 return 1;
             case 'J':
                 return 2;
-            case 'S':
+            case 'P':
                 return 3;
             default:
-                return 1;
+                return false;
         }
     }
 
@@ -190,7 +190,6 @@ abstract class Synchronise_Synergetic_Toorak_Strategy_Abstract extends Synchroni
                 return 1;
             default:
                 return false;
-                break;
         }
     }
 
