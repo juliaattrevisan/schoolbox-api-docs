@@ -76,7 +76,6 @@ else {
 	    if($groupHandler->isStaff()) {
 	        $user = $userHandler->getByID($_SESSION['id']);
 	        $campusList = $userHandler->getUserCampus($_SESSION['id']);
-		    print_r($campusList);
 
 	        foreach($campusList as $campus ) {
 		        $user['campus'] = $campus;
