@@ -153,6 +153,7 @@ class Digest_News {
      *
      * @return array
      * * total:    number of emails that were sendable
+     * * missing:  number of users with missing emails
      * * failures: number of failures
      */
     public function send() {
@@ -160,29 +161,32 @@ class Digest_News {
 
         $this->cli(sprintf("Memory limit: %s", ini_get('memory_limit')));
 
-        $count    = count($keys);
-        $sendable = 0;
-        $failures = 0;
+        $count   = count($keys);
+        $summary = array(
+            'total'    => 0,
+            'missing'  => 0,
+            'failures' => 0,
+        );
         for($i = 0; $i < $count; $i++) {
             $this->cli(sprintf("Memory usage at %03d: %s (%s)", $i, $this->convert(memory_get_usage(true)), memory_get_usage(true)));
             $user   = $this->compileNews($this->userList[$keys[$i]]);
             $result = $this->sendEmail($user);
             if ($result['sendable']) {
                 $this->cli(sprintf("Sending digest to %s %s (%s)", $user['firstname'], $user['lastname'], $user['email']));
-                $sendable++;
+                $summary['total']++;
             }
             else {
                 $this->cli(sprintf("No digest to send to %s %s (%s)", $user['firstname'], $user['lastname'], $user['email']));
             }
+            if ($result['missing']) {
+                $summary['missing']++;
+            }
             if ($result['error']) {
                 $this->cli($result['error'], true);
-                $failures++;
+                $summary['failures']++;
             }
         }
-        return array(
-            'total'    => $sendable,
-            'failures' => $failures,
-        );
+        return $summary;
     }
 
 
@@ -295,6 +299,7 @@ class Digest_News {
      * @return array
      * * sendable: was there anything in the digest?
      * * sent:     whether the email was sent or not. Doesn't always mean error
+     * * missing:  if email address is missing
      * * error:    if there was an error or not (and what it was if so)
      */
     protected function sendEmail($u) {
@@ -304,7 +309,8 @@ class Digest_News {
             return array(
                 'sendable' => false,
                 'sent'     => false,
-                'error'    => sprintf("No email address for user %s %s", $u['firstname'], $u['lastname']),
+                'missing'  => true,
+                'error'    => false,
             );
 //            $this->cli($result['error'], true);
 //            return $result;
@@ -532,6 +538,7 @@ class Digest_News {
         $result = array(
             'sendable' => false,
             'sent'     => false,
+            'missing'  => false,
             'error'    => '',
         );
         if (!$this->debugging() && $newsFlag) {
