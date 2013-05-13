@@ -70,6 +70,12 @@ class BlogMapper extends Schoolbox\Mapper {
 			'type'       => self::TYPE_DATETIME,
 		));
 
+		$this->hasJoin('blogauthor', array(
+			'mapper'    => '\\Schoolbox\\UserMapper',
+			'this_key'  => 'uid',
+			'other_key' => 'id',
+		));
+
 		$this->hasJoin('comments', array(
 			'multiple'  => true,
 			'mapper'    => '\\Component\\Eportfolio\\BlogCommentMapper',
@@ -91,14 +97,17 @@ class BlogMapper extends Schoolbox\Mapper {
 	 */
 	public function findByOrder($args) {
 		$comment_mapper = $this->getJoinMapper('comments');
+		$blogauthor_mapper = $this->getJoinMapper('blogauthor');
 		$author_mapper = $comment_mapper->getJoinMapper('author');
 
 		$query = "
 			SELECT
             	{$this->getColumnString('b')},
+            	{$blogauthor_mapper->getColumnString('ba')},
             	{$comment_mapper->getColumnString('c')},
             	{$author_mapper->getColumnString('a')}
             FROM `{$this->table}` b
+            LEFT JOIN {$this->getJoinSql('blogauthor', 'b', 'ba')}
             LEFT JOIN {$this->getJoinSql('comments', 'b', 'c')}
             LEFT JOIN {$comment_mapper->getJoinSql('author', 'c', 'a')}
             WHERE b.`{$args['identifierName']}` = :identifierValue
@@ -121,6 +130,10 @@ class BlogMapper extends Schoolbox\Mapper {
 			 * value as the blog id, if it doesn't already live there
 			 */
 			if (!is_a($collection->getOffset($blogItem->getId()), 'Component\Eportfolio\Blog')) {
+				$blogauthorItem = $blogauthor_mapper->hydrate($row, 'ba');
+
+				$blogItem->setAuthor($blogauthorItem);
+
 				$collection->setOffset($blogItem->getId(), $blogItem);
 			}
 

@@ -33,6 +33,13 @@ class Blog {
 	public $uid;
 
 	/**
+	 * The owner of the blog post
+	 *
+	 * @var
+	 */
+	private $author;
+
+	/**
 	 * The heading of the blog post
 	 *
 	 * @var
@@ -242,5 +249,23 @@ class Blog {
 	 */
 	public function getComments() {
 		return $this->comments;
+	}
+
+	/**
+	 * Set author
+	 *
+	 * @param  $author
+	 */
+	public function setAuthor($author) {
+		$this->author = $author;
+	}
+
+	/**
+	 * Get author
+	 *
+	 * @return
+	 */
+	public function getAuthor() {
+		return $this->author;
 	}
 }

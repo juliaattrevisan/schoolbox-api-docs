@@ -90,12 +90,6 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 
 		if ($allItems->count()) {
 			foreach($allItems as $currentItem) {
-
-				/* TODO: Join into mappers
-				 */
-				$userMapper = new \Schoolbox\UserMapper();
-				$author = $userMapper->findById($currentItem->getUid());
-
 				$this->setVar(array(
 					'LIST_ITEM_ID' => $currentItem->getId(),
 					'LIST_ITEM_TITLE' => Scrub::text($currentItem->getTitle()),
@@ -105,14 +99,16 @@ class Component_Eportfolio_BlogController extends Component_Eportfolio_Controlle
 
 				/* If an author exists
 				 */
-				if ($author) {
+				if ($currentItem->getAuthor()) {
 					$this->setVar(array(
-						'LIST_ITEM_AUTHOR_ID' => $author->getId(),
-						'LIST_ITEM_AUTHOR_FULLNAME' => $author->getFullname(),
-						'LIST_ITEM_AUTHOR_EXTERNAL_USER_ID' => $author->getExternalId(),
+						'LIST_ITEM_AUTHOR_ID' => $currentItem->getAuthor()->getId(),
+						'LIST_ITEM_AUTHOR_FULLNAME' => $currentItem->getAuthor()->getFullname(),
+						'LIST_ITEM_AUTHOR_EXTERNAL_USER_ID' => $currentItem->getAuthor()->getExternalId(),
 					));
 				}
 
+				/* Add commentary
+				 */
 				if ($currentItem->getComments()->count()) {
 					$i = 0;
 
