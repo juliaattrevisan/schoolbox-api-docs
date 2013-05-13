@@ -1,0 +1,39 @@
+
+for every user {
+	$pageId = create an eportfolio page;
+
+	/* Migrate each table for this user
+	 */
+
+	/* Migrate blogs
+	 */
+	$allBlogs = select * from eportfolio_blog;
+
+	foreach ($allBlogs as $currentBlog) {
+		$newBlog = new Component_Eportfolio_Blog();
+		$newBlog->setPageId($pageId);
+		$newBlog->setContent($currentBlog['body']);
+		$newBlog->save();
+
+		/* Migrate blog comments
+		 */
+		$allComments = select * from eportfolio_blogComment WHERE bid = $currentBlog['blogId'];
+
+		foreach($allComments as $currentComment) {
+			$newComment = new Component_Eportfolio_BlogComment();
+			$newComment->setBlogId($newBlog->getId());
+			$newComment->setContent($currentComment['body']);
+		}
+	}
+
+	/* Migrate link list
+	 */
+	$allLinks = select * from eportfolio_link;
+
+	foreach ($allLinks as $currentLink) {
+		$newLink = new Component_Eportfolio_LinkList();
+		$newLink->setContent($currentLink['url']);
+	}
+
+
+}
