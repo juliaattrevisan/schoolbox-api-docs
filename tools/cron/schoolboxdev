@@ -25,5 +25,5 @@ MAILTO="support@schoolbox.com.au"
 
 # Digest notifications
 # -- also not to be run for dev
-#00 06 * * 1-4 root    cd /usr/share/schoolboxdev/tools/digest; php daily.php
-#00 11 * * 5   root    cd /usr/share/schoolboxdev/tools/digest; php weekly.php
+#00 06 * * 1-4 root    php /usr/share/schoolboxdev/tools/digest/daily.php  >> /var/log/schoolbox-digest-daily.log 2>/dev/null
+#00 11 * * 5   root    php /usr/share/schoolboxdev/tools/digest/weekly.php >> /var/log/schoolbox-digest-weekly.log 2>/dev/null
