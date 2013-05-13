@@ -65,6 +65,9 @@ override_dh_install:
 	rm -fR tools/vagrant*
 	rm -fR tools/pkg-*
 	rm -fR composer*
+	rm -fR tools/major-updater.sh
+	rm -fR tools/minor-updater.sh
+	rm -fR tools/composer*
 	# Start install
 	dh_install
 	# Auto build the sql update scripts
