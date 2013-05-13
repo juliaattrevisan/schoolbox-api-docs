@@ -52,6 +52,13 @@ abstract class MigratorAbstract {
 	 */
 	abstract protected function setup();
 
+	/**
+	 * Main method
+	 *
+	 * @return mixed
+	 */
+	abstract public function migrate();
+
 	/* Getters/Setters
 	 */
 

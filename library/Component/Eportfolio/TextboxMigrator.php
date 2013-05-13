@@ -62,6 +62,34 @@ class TextboxMigrator extends MigratorAbstract {
 		}
 	}
 
+	/**
+	 * Migrate this component
+	 */
+	public function migrate() {
+	}
+
+	/**
+	 * Fetch all the records for this component
+	 */
+	protected function fetchAll($table) {
+
+		/* Don't forget to reset after each table is processed
+		 */
+		$this->setAllTextboxes(array());
+
+		$query = "
+			SELECT *
+			FROM {$table}
+			WHERE user_id = {$this->getUserId()}
+		";
+
+		$result = $this->getDb()->getAll($query);
+
+		if ($result) {
+			$this->setAllTextboxes($result);
+		}
+	}
+
 	/* Getters/Setters
 	 */
 
