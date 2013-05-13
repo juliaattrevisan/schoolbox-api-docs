@@ -84,14 +84,14 @@ class Migrate {
 		$eportfolioHandler->createEportfolioFromTemplate('Old ePortfolio', $oldTemplateId);
 
 		$allNewComponents = array(
-			'Component_Eportfolio_Blog' => \Component\Eportfolio\BlogMapper::getInstance(),
-			'Component_Eportfolio_LinkList' => \Component\Eportfolio\LinkListMapper::getInstance(),
-			'Component_Eportfolio_FileList' => \Component\Eportfolio\FileListMapper::getInstance(),
-			'Component_Eportfolio_Textbox' => \Component\Eportfolio\TextboxMapper::getInstance(),
+			new \Component\Eportfolio\BlogMigrator($eportfolioHandler->getUserId(), $eportfolioHandler->getPageId()),
+//			new \Component\Eportfolio\LinkListMigrator($eportfolioHandler->getUserId(), $eportfolioHandler->getPageId()),
+//			new \Component\Eportfolio\FileListMigrator($eportfolioHandler->getUserId(), $eportfolioHandler->getPageId()),
+//			new \Component\Eportfolio\TextboxMigrator($eportfolioHandler->getUserId(), $eportfolioHandler->getPageId()),
 		);
 
-		foreach ($allNewComponents as $currentNewComponent => $mapper) {
-			print_r($currentNewComponent);
+		foreach ($allNewComponents as $migrator) {
+			print_r($migrator);
 		}
 	}
 
