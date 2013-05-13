@@ -10,6 +10,10 @@
 
 // this is run from CLI, so explicitly include the bootstrap
 require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
+if (!Cfg::get('digest_send_daily')) {
+	fwrite(STDERR, "Daily digest is not enabled - this script will do nothing.\n");
+	exit(2);
+}
 
 
 //
