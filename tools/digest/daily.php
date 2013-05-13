@@ -9,7 +9,7 @@
  */
 
 // this is run from CLI, so explicitly include the bootstrap
-require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 
 //
