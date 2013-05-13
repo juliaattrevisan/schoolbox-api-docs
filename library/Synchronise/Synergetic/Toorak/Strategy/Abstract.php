@@ -35,63 +35,39 @@ abstract class Synchronise_Synergetic_Toorak_Strategy_Abstract extends Synchroni
      */
     protected function executeCreateUpdate($newUser)
     {
-
-        /* Prepare verbosity
-           */
         $this->getVerboseFilter()->setNewUser($newUser);
 
-        /* Does this person have a username? If not, skip them
-           */
+        //
+        // Does this person have a username? If not, skip them
         if ($this->hasUsername($newUser)) {
             $existing = $this->userExistsBySynergyAndGroup($newUser);
 
-            /* If the current user exists in Schoolbox, update them
-                */
+            //
+            // If the current user exists in Schoolbox, update them
             if ($existing) {
-	            /* dont update staff campuses */
-	            if($newUser['group_id'] == self::STAFF_GROUP_ID || $newUser['group_id'] == self::ADMIN_GROUP_ID){
-		            unset($newUser['campus']);
-		            unset($newUser['defaultCampus']);
-	            }
-                /* Perform action; report what happened
-                     */
                 if ($this->getPerformUpdate() === true) {
                     $newUser['id'] = $existing['uid'];
-
                     $this->getUserHandler()->update($newUser);
                     $this->getVerboseFilter()->performUpdate();
-                    $this->getVerboseFilter()->incrementUpdated();
-                } /* Report intentions
-				 */
+                }
                 else {
                     $this->getVerboseFilter()->planUpdate();
-                    $this->getVerboseFilter()->incrementUpdated();
                 }
-            } /* Otherwise create them
-			 */
-            else {
-                /* Perform action; report what happened
-                     */
-                if ($this->getPerformUpdate() === true) {
-                    // Do not create parents
-                    if ($newUser['group_id'] != self::PARENT_GROUP_ID) {
-                        $this->getUserHandler()->create($newUser);
-
-                        $this->getVerboseFilter()->performCreation();
-                        $this->getVerboseFilter()->incrementCreated();
-                    }
-                } /* Report intentions
-				 */
-                else {
-                    // Do not create parents
-                    if ($newUser['group_id'] != self::PARENT_GROUP_ID) {
-                        $this->getVerboseFilter()->planCreation();
-                        $this->getVerboseFilter()->incrementCreated();
-                    }
-                }
+                $this->getVerboseFilter()->incrementUpdated();
             }
-        } /* Report intentions
-		 */
+            else {
+                //
+                // Perform action; report what happened
+                if ($this->getPerformUpdate() === true) {
+                    $this->getUserHandler()->create($newUser);
+                    $this->getVerboseFilter()->performCreation();
+                }
+                else {
+                    $this->getVerboseFilter()->planCreation();
+                }
+                $this->getVerboseFilter()->incrementCreated();
+            }
+        }
         else {
             $this->getVerboseFilter()->skip();
             $this->getVerboseFilter()->incrementSkipped();
