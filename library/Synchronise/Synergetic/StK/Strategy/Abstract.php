@@ -141,79 +141,58 @@ abstract class Synchronise_Synergetic_StK_Strategy_Abstract extends Synchronise_
 	/**
 	 * Figure out which Campus belongs to this Student
 	 *
-	 * @param  $year
+	 * For St. Kentigern this is always based on the user's campus:
+	 * * 1: Co-ed
+	 * * 2: Girls
+	 * * 3: Boys
+	 * * 4: Pre-school
+	 *
+	 * @param  $user
 	 * @return bool|string
 	 */
-	protected function getCampusFromYearLevel($year)
+	protected function getCampusFromCurrentUser($user)
 	{
-		switch ($year) {
-			case '0';
-			case '1';
-			case '2':
-			case '3':
-			case '4':
-			case '5':
-			case '6':
-				return 2;
-			case '7':
-			case '8':
-			case '9':
-			case '10':
-			case '11':
-			case '12':
-				return 3;
-			case '32':
-			case '33':
-			case '44':
+		switch ($user['StudentCampus']) {
+			case 'C':
 				return 1;
+			case 'G':
+				return 2;
+			case 'B':
+				return 3;
+			case 'P':
+				return 4;
 			default:
 				return false;
 		}
 	}
 
 	/**
-	 * Figure out the Group ID based on a Student's year level
+	 * Figure out the Group ID for a user - year level is based on a user's
+	 * campus and year level.
 	 *
-	 * @param  $year
+	 * @param  $user
 	 * @return bool|int
 	 */
-	protected function getGroupIDFromYearLevel($year)
+	protected function getGroupIDFromCurrentUser($user)
 	{
-		switch ($year) {
-			//
-			// Year x
-			case 0:
-				return 18;
-			case 1:
-				return 17;
-			case 2:
-				return 16;
-			case 3:
-				return 15;
-			case 4:
-				return 14;
-			case 5:
-				return 13;
-			case 6:
-				return 12;
-			case 7:
-				return 11;
-			case 8:
-				return 10;
-			case 9:
-				return 9;
-			case 10:
-				return 8;
-			case 11:
+		switch ($user['StudentCampus']) {
+			case 'P':
+				//
+				// Pre-school: group 7
 				return 7;
-			case 12:
-				return 6;
-			//
-			// Pre-schools
-			case 32:
-			case 33:
-			case 44:
-				return 19;
+			case 'G':
+				//
+				// Girls: year+8 up to year 8
+				// (StK were nice enough to put their groups in order)
+				return $user['StudentYearLevel']+8;
+			case 'B':
+				//
+				// Boys: year+17 up to year 8
+				return $user['StudentYearLevel']+17;
+			case 'C':
+				//
+				// Co-ed: year+19 (year 7 only up, for 7 -> 26 to 13 -> 32)
+				return $user['StudentYearLevel']+19;
 			default:
 				return false;
 		}

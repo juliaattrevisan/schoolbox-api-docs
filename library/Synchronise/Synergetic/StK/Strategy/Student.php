@@ -42,24 +42,29 @@ class Synchronise_Synergetic_StK_Strategy_Student extends Synchronise_Synergetic
 		//
 		// Username: always student ID
 		$newUser['username']  = $currentUser['StudentID'];
-		$newUser['title']     = '';
+		$newUser['title']     = $currentUser['StudentTitle'];
 		$newUser['firstname'] = $currentUser['StudentPreferred'];
 		$newUser['lastname']  = $currentUser['StudentSurname'];
 		//
-		// Don't touch email address, it's not in Synergetic
-//		$newUser['alt_email']   = '';
+		// Don't touch email address, it's not in Synergetic.
+		// Alt lookup from getStudent();
+		if (strlen(trim($currentUser['StudentOccupEmail']))) {
+			$newUser['alt_email'] = $currentUser['StudentOccupEmail'];
+		}
 		$newUser['synergy_id']  = $currentUser['StudentID'];
 		$newUser['local_email'] = 0;
 		$newUser['year']        = $currentUser['StudentYearLevel'];
 		//
-		// Campus: depends on year level
-		$newUser['defaultCampus'] = $this->getCampusFromYearLevel($currentUser['StudentYearLevel']);
+		// Campus: could be C (college), G (girls?), B (boys?), P (parents?)
+		$newUser['defaultCampus'] = $this->getCampusFromCurrentUser($currentUser);
 		$newUser['campus']        = array($newUser['defaultCampus']);
-		$newUser['group_id']      = $this->getGroupIDFromYearLevel($currentUser['StudentYearLevel']);
-		$newUser['house']         = $this->getHouseFromCode($currentUser['StudentHouse']);
-		$newUser['su']            = false;
 		//
-		// Group/house membership?
+		// Group: from both year level and campus
+		$newUser['group_id']      = $this->getGroupIDFromCurrentUser($currentUser);
+		//
+		// No houses have been set up yet, leave alone
+//		$newUser['house']         = $this->getHouseFromCode($currentUser['StudentHouse']);
+		$newUser['su']            = false;
 		return $newUser;
 	}
 
