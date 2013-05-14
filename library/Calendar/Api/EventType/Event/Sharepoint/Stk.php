@@ -129,7 +129,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 
 		/* TODO: Update this for SK
 		 */
-        $now = new Alaress_Date_Format($currentDay, 'U');
+        $now = new Alaress_Date_Format(new DateTime(), 'U');
         $start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d h:i:s');
         $end = new Alaress_Date_Format($now->getDatabaseDate() . ' 23:59:59', 'y-m-d h:i:s');
 
@@ -259,6 +259,21 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 
         return $collection;
     }
+
+	/**
+	 * Find a particular event from this source
+	 *
+	 * Doesn't do anything, probably doesn't matter. If it did matter, I'd
+	 * probably create a new query to GetListItems, with the ID as the only
+	 * parameter.
+	 *
+	 * @param $eventId
+	 * @return Calendar_Event_Collection
+	 */
+	public function getEvent($eventId) {
+		$collection = new Calendar_Event_Collection();
+		return $collection;
+	}
 
 	/**
 	 * Figure out if a particular event should recur today and thus be
