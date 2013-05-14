@@ -17,19 +17,40 @@ if (is_numeric($_GET['id'])) {
 
     $myFileHandler = new MyFile;
     $file = $myFileHandler->getByID($_GET['id']);
-    if (!is_array($file))
-        error(41);
+//
+//	if (!is_array($file)) {
+//        error(41);
+//	}
 
-    if ($file['published']) {
-        $eportfolioHandler = new Eportfolio_Container($file['owner']);
+	/* Check eportfolio permissions
+	 */
+	$mapper = new \Component\Eportfolio\FileListMapper();
 
-        if (!$eportfolioHandler->canEdit($file['owner'])) {
-            error(5);
-        }
-    } else {
-        if ($file['owner'] != $_SESSION['id'])
-            error(5);
-    }
+	$allFiles = $mapper->findByColumn('file_id', $file['id']);
+
+	$isViewable = false;
+
+	if ($allFiles->count()) {
+		foreach ($allFiles as $currentFile) {
+			$authenticator = new Eportfolio_Authenticator($_SESSION['id'], $file['owner'], $currentFile->getPageId());
+
+			/* If you can view one of the pages that this file is shared on,
+			 * break out of here
+			 */
+			if ($authenticator->canView()) {
+				$isViewable = true;
+
+				break;
+			}
+		}
+	}
+
+	/* If the file was never viewable on any eportfolio page and you aren't
+	 * the owner, get out
+	 */
+	if (!$isViewable && ($_SESSION['id'] != $file['owner'])) {
+		error(5);
+	}
 
     $filename = Cfg::get('myfile_dir') . "/" . $file['id'] . ".dat";
 
