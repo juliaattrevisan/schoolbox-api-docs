@@ -10,5 +10,9 @@
 
 require_once('../../../include/Bootstrap.php');
 
+/* For Samuel
+ */
+$_SERVER['HTTP_HOST'] = "";
+
 $migrator = new \Eportfolio\Migrate();
 $migrator->migrateAll();
