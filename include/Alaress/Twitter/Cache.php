@@ -9,117 +9,93 @@
  */
 class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
 
-	/* Chooze the number of hours to cache the tweets.
-	 * This is converted into seconds via $cacheTime
+	/**
+	 * A prefix for cached filenames
+	 *
+	 * @var string
 	 */
-	protected $cacheHours = 1;
-
-	/* 9 seconds for testing
-	 */
-//	protected $cacheHours = 0.0025;
-
-	/* Derived cache settings, don't need to change these
-	 */
-	protected $cacheFile = '';
-	protected $cacheTime = 0;
-
-	private $user = '';
-	private $keywords = '';
+	protected $cacheFilePrefix = 'twitter';
 
 	/**
-	 * Constructor
+	 * Contains specific URL parms for twitter requests
 	 *
-	 * @param $user
-	 * @param $keywords
-	 * @param $url
+	 * @var array
 	 */
-	public function __construct($user, $keywords, $url) {
-		$this->setUser($user);
-		$this->setKeywords($keywords);
+	protected $parameters;
 
-		/* Interpret cache details
-		 */
-		$this->setCacheFile($this->generateCacheFilename());
-		$this->setCacheTime(60*60*$this->getCacheHours());
+	/**
+	 * Hook method
+	 *
+	 * @return mixed|void
+	 */
+	protected function setup() {
+		$this->setCachedTime(Cfg::get('twitter_api_caching'));
+		$this->setLockTime($this->getLockTimeMultiplier() * $this->getCachedTime());
+	}
 
-		/* Set up a cached version of the url
-		 */
-		$this->setup($url);
+	public function init($url, $params) {
+		$this->setParameters($params);
+		parent::init($url);
+		return $this;
 	}
 
 	/**
-	 * Generate the filename that would be associated with this particular
-	 * combination of user (author) and any optional keywords
-	 *
-	 * @internal param $author
-	 * @return string
+	 * Overwrites native cache stream saver with OAuth fetch system
 	 */
-	protected function generateCacheFilename() {
-		$filename = Cfg::get('stream_dir') . '/' . 'twitter_' . md5($this->getUser().$this->getKeywords()) . '.json';
+	protected function saveStreamContents() {
+		$twitterCon = new Alaress_Twitter_Loader_OAuth(
+			Cfg::get('twitter_api_consumer_key'),
+			Cfg::get('twitter_api_consumer_secret'),
+			Cfg::get('twitter_api_oauth_token'),
+			Cfg::get('twitter_api_oauth_token_secret')
+		);
 
-		return $filename;
+		$result = $twitterCon->load($this->getUrl(), $this->getParameters());
+		file_put_contents($this->getCachedFile(), serialize($result));
 	}
 
 	/**
-	 * Load contents from the cache
+	 * Load function for converting cached data into useable data array
 	 *
-	 * @return void
+	 * @return array
 	 */
 	public function load() {
-		$path = $this->getCacheFile();
-
-		if (file_exists($path)) {
-			return file_get_contents($path);
-		}
-
-		return false;
-	}
-
-	/* Getters/Setters
-	 */
-
-	/**
-	 * Set keywords
-	 *
-	 * @param $keywords
-	 */
-	private function setKeywords($keywords) {
-		$this->keywords = $keywords;
+		return unserialize($this->getStreamContents());
 	}
 
 	/**
-	 * Get keywords
+	 * Figger out what the cached filename should be
 	 *
-	 * @return null
+	 * @return string
 	 */
-	private function getKeywords() {
-		return $this->keywords;
+	protected function generateCachedFilename() {
+		return Cfg::get('stream_dir') . '/' . $this->getCacheFilePrefix() . '_' . $this->encode($this->getUrl().serialize($this->getParameters())) . '.txt';
 	}
 
 	/**
-	 * Set user
+	 * Figger out what the lock filename should be
 	 *
-	 * @param $user
+	 * @return string
 	 */
-	private function setUser($user) {
-		$this->user = $user;
+	protected function generateLockFilename() {
+		return Cfg::get('stream_dir') . '/' . $this->getCacheFilePrefix() . '_' . $this->encode($this->getUrl().serialize($this->getParameters())) . '_lock.txt';
 	}
 
 	/**
-	 * Get user
+	 * Get for parameters
 	 *
-	 * @return null
+	 * @return string
 	 */
-	private function getUser() {
-		return $this->user;
+	protected function getParameters() {
+		return $this->parameters;
 	}
 
 	/**
-	 * Get cache hours
+	 * Setter for params
 	 *
-	 * @return int
+	 * @vars string
 	 */
-	private function getCacheHours() {
-		return $this->cacheHours;
+	protected function setParameters($params) {
+		return $this->parameters = $params;
 	}
 }

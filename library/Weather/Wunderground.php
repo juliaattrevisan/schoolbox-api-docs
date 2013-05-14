@@ -22,11 +22,6 @@ class Weather_Wunderground implements Weather_Interface {
 
     private $querystring = '';
 
-    /**
-     * where we will find weather data
-     * @var string
-     */
-    private $cachePattern;
 
     const FORECAST_MIN = 1;
     const FORECAST_MAX = 10;
@@ -34,10 +29,6 @@ class Weather_Wunderground implements Weather_Interface {
     const HOURLY_MIN = 1;
     const HOURLY_MAX = 240; // 10 days of hourly forecasts: crazy.
 
-
-    public function __construct() {
-        $this->cachePattern = Cfg::get('weather_dir') . '/wunderground.%s.cache';
-    }
 
     /**
      * @param array $features
@@ -68,14 +59,10 @@ class Weather_Wunderground implements Weather_Interface {
 
         $call = sprintf("http://api.wunderground.com/api/%s/%s/q/%s.json%s", $key, $featureString, $this->location, $this->querystring);
 
-        $data = file_get_contents($call);
+	    $cache = new Weather_Cache();
+	    $cache->init($call);
 
-        if($data) {
-            return $data;
-        }
-
-        return false;
-
+	    return $cache->getStreamContents();
     }
 
     /**
@@ -165,11 +152,6 @@ class Weather_Wunderground implements Weather_Interface {
                 'logo'          => $data->current_observation->image->url
             ),
         );
-    }
-
-
-    protected function getDefangedLocation() {
-        return strtolower(preg_replace("#[^a-z0-9\-.]#si",'_',$this->location));
     }
 
     public function guessLocation($locationString) {
@@ -274,31 +256,13 @@ class Weather_Wunderground implements Weather_Interface {
      * @return array
      */
     public function getForecast() {
+	        $json = $this->getWundergroundData(array('geolookup', 'forecast10day', 'conditions'));
 
-        $file = sprintf($this->cachePattern, $this->getDefangedLocation());
-
-        // update every half hour: suppress error
-        if(!(file_exists($file) && time() - @filemtime($file) < Cfg::get('weather_api_caching'))) {
-
-            // file is writable, behave as normal
-            if(($json = $this->getWundergroundData(array('geolookup', 'forecast10day', 'conditions'))) === false) {
-                return array();
-            }
-
-            $fp = fopen($file, 'w');
-
-            if($fp === false) {
-                return $this->parseJSON(file_get_contents($file));
-            }
-            else {
-                fwrite($fp, $json);
-                fclose($fp);
-            }
-
-            return $this->parseJSON($json);
-        }
-
-        return $this->parseJSON(file_get_contents($file));
+	        if($json){
+	            return $this->parseJSON($json);
+	        }else{
+		        return false;
+	        }
     }
 
 }

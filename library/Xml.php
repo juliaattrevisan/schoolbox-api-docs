@@ -20,18 +20,17 @@ class Xml {
 	 * @param  $url
 	 * @param int $cache_time
 	 */
-    public function __construct($url, $cache_time = false) {
+    public function __construct($url) {
 		if (empty($url)) {
 			return false;
 		}
 
-		if ($cache_time === false) {
-			$cache_time = Cfg::get('xml_cache_timeout');
-		}	
 
 		/* Set up cached file
 		 */
-		$this->setCache(new Alaress_Rss_Cache($cache_time, $url));
+		$this->setCache(new Alaress_Rss_Cache());
+
+	    $this->getCache()->init($url);
 
 		/* Load from cached file
 		 * Delete the cached file if it can't be loaded correctly
@@ -40,8 +39,6 @@ class Xml {
             $this->setXml($this->getCache()->load());
         }
 		catch (Exception $e) {
-            $this->getCache()->remove();
-
             return false;
         }
     }
