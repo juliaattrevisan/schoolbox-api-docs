@@ -241,8 +241,6 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 					[ows_RecurrenceData] => mo2012-12-20T20:30:00Z
 				 */
 				if ($event->getEndTime()->getDatabaseDate() >= $now->getDatabaseDate()) {
-					$event->setDate($now);
-
 					$startTime = new Alaress_Date_Format((string)$attribs->ows_EventDate, 'y-m-d h:i:s');
 					$event->setStartTime(new Alaress_Date_Format($now->getDatabaseDate() . ' ' . $startTime->getDatabaseTime(), 'y-m-d h:i:s'));
 				}
