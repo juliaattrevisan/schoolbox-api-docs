@@ -38,5 +38,6 @@ else
 fi
 
 rm -vf `readlink -f $fullpath/cron/$cronjob`;
+rm -vf `readlink -f $fullpath/logrotate/$cronjob`;
 
 # End of script

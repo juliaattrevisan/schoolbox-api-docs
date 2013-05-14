@@ -12,8 +12,8 @@
 # m h dom mon dow user command
 
 # Video Processing
-*/5 * * * *     www-data    php /usr/share/schoolbox/tools/video/video-scanner.php
-*/10 * * * *    www-data    php /usr/share/schoolbox/tools/video/processor.php
+*/5 * * * *     www-data    php /usr/share/schoolbox/tools/video/video-scanner.php >> /var/log/schoolbox-video-scanner.log 2>/dev/null
+*/10 * * * *    www-data    php /usr/share/schoolbox/tools/video/processor.php >> /var/log/schoolbox-video-processor.log 2>/dev/null
 
 # Due Work Notifications
 */15 * * * *    root    php /usr/share/schoolbox/tools/submission/notify_students.php --send --upcoming --overdue >> /var/log/schoolbox-duework.log 2>/dev/null

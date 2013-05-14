@@ -1,4 +1,4 @@
-/var/log/schoolbox*sync* {
+/var/log/schoolbox-sync* {
 	daily
 	missingok
 	rotate 30
@@ -6,9 +6,17 @@
 	delaycompress
 }
 
-/var/log/schoolbox*duework* {
+/var/log/schoolbox-duework* {
 	weekly
 	missingok
 	rotate 4
 	compress
+}
+
+/var/log/schoolbox-video* {
+        daily
+        missingok
+        rotate 30
+        compress
+        delaycompress
 }
