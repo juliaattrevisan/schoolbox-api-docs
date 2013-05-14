@@ -64,7 +64,7 @@ fi
 
 if [ -d $zipdir ];
 then
-	rm -f $zipdir/*;
+	rm -rf $zipdir/zip*;
 	echo "Zip cache directory cleaned ($zipdir)";
 else
 	echo "No cache directories cleaned";
