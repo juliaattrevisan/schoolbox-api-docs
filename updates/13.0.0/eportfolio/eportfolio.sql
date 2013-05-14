@@ -33,10 +33,9 @@ ALTER TABLE `component_instance` CHANGE `module` `module` ENUM('dashboard','home
  */
 ALTER TABLE `component_instance` CHANGE `module` `module` ENUM('dashboard','homepage','homepage_template','eportfolio','eportfolio_template') CHARSET utf8 COLLATE utf8_general_ci NULL;
 
-/* Repurpose eportfolio_config to contain information about pages
+/* Add page table
  */
-ALTER TABLE `eportfolio_config` ADD COLUMN `page_id` INT(11) NOT NULL AUTO_INCREMENT FIRST, ADD COLUMN `page_title` VARCHAR(255) NULL AFTER `page_id`, CHANGE `uid` `uid` INT(6) DEFAULT 0 NOT NULL, CHANGE `template` `template` TINYINT(1) DEFAULT 0 NOT NULL, DROP PRIMARY KEY, ADD PRIMARY KEY (`page_id`);
-ALTER TABLE `eportfolio_config` ADD COLUMN `created_at` DATETIME NULL AFTER `top_hover`, ADD COLUMN `updated_at` DATETIME NULL AFTER `created_at`, ADD COLUMN `deleted_at` DATETIME NULL AFTER `updated_at`;
+CREATE TABLE `eportfolio_page`( `page_id` INT(11) NOT NULL AUTO_INCREMENT, `page_title` VARCHAR(255), `uid` INT(11), `template` INT(11), `left_column_width` FLOAT, `right_column_width` FLOAT, `left_head_font` VARCHAR(7), `left_head_bg` VARCHAR(7), `left_font` VARCHAR(7), `left_bg_primary` VARCHAR(7), `left_bg_secondary` VARCHAR(7), `left_link` VARCHAR(7), `left_hover` VARCHAR(7), `right_head_font` VARCHAR(7), `right_head_bg` VARCHAR(7), `right_font` VARCHAR(7), `right_bg_primary` VARCHAR(7), `right_bg_secondary` VARCHAR(7), `right_link` VARCHAR(7), `right_hover` VARCHAR(7), `top_head_font` VARCHAR(7), `top_head_bg` VARCHAR(7), `top_font` VARCHAR(7), `top_bg_primary` VARCHAR(7), `top_bg_secondary` VARCHAR(7), `top_link` VARCHAR(7), `top_hover` VARCHAR(7), `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`page_id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
 
 /* Add permissions relation table
  */
@@ -84,3 +83,4 @@ CREATE TABLE `eportfolio_component_blogcomment`( `id` INT(11) NOT NULL AUTO_INCR
 /* Add cover photo table
  */
 CREATE TABLE `eportfolio_coverphoto`( `id` INT(11) NOT NULL AUTO_INCREMENT, `uid` INT(11), `imagehash` VARCHAR(255), `created_at` DATETIME, `updated_at` DATETIME, `deleted_at` DATETIME, PRIMARY KEY (`id`) ) CHARSET=utf8 COLLATE=utf8_general_ci;
+

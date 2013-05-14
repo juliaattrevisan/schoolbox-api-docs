@@ -20,7 +20,7 @@ class PageMapper extends Schoolbox\Mapper {
 	 * @return Bool|void
 	 */
 	protected function mapping() {
-		$this->hasTable('eportfolio_config');
+		$this->hasTable('eportfolio_page');
 		$this->hasModel('\\Eportfolio\\Page');
 
 		$this->hasMap(array(
