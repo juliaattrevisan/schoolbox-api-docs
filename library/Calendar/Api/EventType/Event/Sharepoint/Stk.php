@@ -129,14 +129,14 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 
 		/* TODO: Update this for SK
 		 */
-        $now = new Alaress_Date_Format($currentDay, 'U');
+        $now = new Alaress_Date_Format(new DateTime(), 'U');
         $start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d h:i:s');
         $end = new Alaress_Date_Format($now->getDatabaseDate() . ' 23:59:59', 'y-m-d h:i:s');
 
 		$startDate = $start->getDatabase();
 		$endDate = $end->getDatabase();
 
-        $xmlPayload = new Calendar_Api_Event_Sharepoint_Stk_Payload($startDate, $endDate);
+        $xmlPayload = new Calendar_Api_EventType_Event_Sharepoint_Stk_Payload($startDate, $endDate);
 
 		/* Fill in your query result set here and populate $collection
 		 */
@@ -241,8 +241,6 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 					[ows_RecurrenceData] => mo2012-12-20T20:30:00Z
 				 */
 				if ($event->getEndTime()->getDatabaseDate() >= $now->getDatabaseDate()) {
-					$event->setDate($now);
-
 					$startTime = new Alaress_Date_Format((string)$attribs->ows_EventDate, 'y-m-d h:i:s');
 					$event->setStartTime(new Alaress_Date_Format($now->getDatabaseDate() . ' ' . $startTime->getDatabaseTime(), 'y-m-d h:i:s'));
 				}
@@ -259,6 +257,21 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 
         return $collection;
     }
+
+	/**
+	 * Find a particular event from this source
+	 *
+	 * Doesn't do anything, probably doesn't matter. If it did matter, I'd
+	 * probably create a new query to GetListItems, with the ID as the only
+	 * parameter.
+	 *
+	 * @param $eventId
+	 * @return Calendar_Event_Collection
+	 */
+	public function getEvent($eventId) {
+		$collection = new Calendar_Event_Collection();
+		return $collection;
+	}
 
 	/**
 	 * Figure out if a particular event should recur today and thus be

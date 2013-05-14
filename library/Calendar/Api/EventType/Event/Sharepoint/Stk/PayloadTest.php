@@ -9,7 +9,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Calendar_Api_Event_Sharepoint_Stk_PayloadTest {
+class Calendar_Api_EventType_Event_Sharepoint_Stk_PayloadTest {
 
 	/* Name or guid of the list
 	 */
