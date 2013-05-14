@@ -9,7 +9,7 @@
 
 $options = getopt("v", array('perform-update', 'diagnostic'));
 require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
-$sync = new Synchronise_Facade('StPatricks', isset($options['v']), isset($options['perform-update']));
+$sync = new Synchronise_Facade('Stpatricks', isset($options['v']), isset($options['perform-update']));
 
 // these should be in order of dependencies (and vertically formatted for easier visual scanning)
 $sync->setStrategies(array( // DEPENDENCIES
