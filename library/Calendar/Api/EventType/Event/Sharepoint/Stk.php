@@ -136,7 +136,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 		$startDate = $start->getDatabase();
 		$endDate = $end->getDatabase();
 
-        $xmlPayload = new Calendar_Api_Event_Sharepoint_Stk_Payload($startDate, $endDate);
+        $xmlPayload = new Calendar_Api_EventType_Event_Sharepoint_Stk_Payload($startDate, $endDate);
 
 		/* Fill in your query result set here and populate $collection
 		 */
