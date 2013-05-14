@@ -7,6 +7,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-$migrator = new \Eportfolio\Migrate();
 
+require_once('../../../include/Bootstrap.php');
+
+$migrator = new \Eportfolio\Migrate();
 $migrator->migrateAll();
