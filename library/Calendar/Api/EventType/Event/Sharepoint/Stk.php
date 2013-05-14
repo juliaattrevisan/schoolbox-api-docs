@@ -129,14 +129,15 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 
 		/* TODO: Update this for SK
 		 */
-        $now = new Alaress_Date_Format(new DateTime(), 'U');
-        $start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d h:i:s');
-        $end = new Alaress_Date_Format($now->getDatabaseDate() . ' 23:59:59', 'y-m-d h:i:s');
+        $now   = new Alaress_Date_Format(new DateTime(), 'U');
+        $start = new Alaress_Date_Format($startTimestamp, 'U');
+        $end   = new Alaress_Date_Format($endTimestamp, 'U');
 
-		$startDate = $start->getDatabase();
-		$endDate = $end->getDatabase();
+		$startDate = $start->getUsingFormat('Y-m-d\\Th:i:s\\Z');
+		$endDate   = $end->getUsingFormat('Y-m-d\\Th:i:s\\Z');
 
         $xmlPayload = new Calendar_Api_EventType_Event_Sharepoint_Stk_Payload($startDate, $endDate);
+//	    new Alaress_Probe($xmlPayload->getPayload());
 
 		/* Fill in your query result set here and populate $collection
 		 */
@@ -149,6 +150,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 			$response = $this->getSoap()->GetListItems(new SoapVar($xmlPayload->getPayload(), XSD_ANYXML));
 
 			$allEvents = $xmlPayload->parseXml($response->GetListItemsResult->any);
+//			new Alaress_Probe($allEvents);
 
 
 			foreach ($allEvents->rsdata->zrow as $currentEvent) {
@@ -207,51 +209,14 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 				 */
 				$event->setConnectorId($this->getConnectorId());
 
-				/* Event inspection
-				 * A nice place to see what's currently being examined
-				 */
-	//			if ((string)$attribs->ows_Title == 'AKSS Junior Boys Volleyball Championships') {
-	//				new Alaress_Probe($currentEvent);
-	//				new Alaress_Probe($now->getDatabaseDate());
-	//			}
+				$event->setAllday((string)$attribs->ows_fAllDayEvent == 1);
 
-				/* Simulate all-day event if appropriate since Sharepoint thinks the end of the
-				 * day is at 11:59pm, whereas Schoolbox makes it 12:00am. "Mangle it", he said.
-				 */
-				$startDate = new Alaress_Date_Format((string)$attribs->ows_EventDate, 'y-m-d h:i:s');
-
-				$event->setStartTime($startDate);
-
-				if ((string)$attribs->ows_fAllDayEvent == 1) {
-					$endDate = substr((string)$attribs->ows_EndDate, 0, 10);
-
-					$event->setEndTime(new Alaress_Date_Format($endDate . ' 00:00:00', 'y-m-d h:i:s'));
-				}
-				else {
-					$event->setEndTime(new Alaress_Date_Format((string)$attribs->ows_EndDate, 'y-m-d h:i:s'));
-				}
-
-				/* If it is recurring today, set the event's start date to Today.
-				 * Sharepoint only knows the start and end PERIOD of a recurring
-				 * event, and does not specify the exact date when a recurrence
-				 * takes place.
-				 *
-					[ows_EventDate] => 2012-09-14 09:15:00
-					[ows_EndDate] => 2012-12-21 09:30:00
-					[ows_RecurrenceData] => mo2012-12-20T20:30:00Z
-				 */
-				if ($event->getEndTime()->getDatabaseDate() >= $now->getDatabaseDate()) {
-					$startTime = new Alaress_Date_Format((string)$attribs->ows_EventDate, 'y-m-d h:i:s');
-					$event->setStartTime(new Alaress_Date_Format($now->getDatabaseDate() . ' ' . $startTime->getDatabaseTime(), 'y-m-d h:i:s'));
-				}
-				/* Sometimes events come out that shouldn't so we manually exclude them
-				 * due to Sharepoint timezones
-				 */
-				else {
-					continue;
-				}
-
-				$collection->add($event);
+				$this->addEventsToCollection(
+					$collection,
+					$event,
+					$attribs,
+					$endTimestamp
+				);
 			}
 		}
 
@@ -271,6 +236,83 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 	public function getEvent($eventId) {
 		$collection = new Calendar_Event_Collection();
 		return $collection;
+	}
+
+
+	/**
+	 * Adds events based on recurrence
+	 *
+	 * @param Calendar_Event_Collection    $collection Collection to add to
+	 * @param Calendar_Event_Type_Abstract $event      Event to add. If it recurs,
+	 *                                                 clones of this are added
+	 *                                                 for each recurrence.
+	 * @param stdclass                     $attributes Attributes from the SOAP call
+	 * @param int                          $until      Timestamp to add recurrences
+	 *                                                 until.
+	 *
+	 * @return void
+	 */
+	protected function addEventsToCollection(
+		Calendar_Event_Collection $collection,
+		Calendar_Event_Type_Abstract $event,
+		$attributes,
+		$until
+	) {
+
+		//
+		// Only start and end time should be set here, everything else should be
+		// set in getEvents()
+		if ($attributes->ows_RecurrenceData) {
+			//
+			// recur weekly/daily/whatever
+//			$recurrence = simplexml_load_string((string)$attributes->ows_RecurrenceData, 'SimpleXMLElement', LIBXML_NOCDATA);
+			$event->setStartTime(new Alaress_Date_Format((string)$attributes->ows_EventDate, 'y-m-d h:i:s'));
+			$event->setEndTime(new Alaress_Date_Format((string)$attributes->ows_EndDate, 'y-m-d h:i:s'));
+			$collection->add($event);
+		}
+		else {
+			//
+			// Recur just once
+			$event->setStartTime(new Alaress_Date_Format((string)$attributes->ows_EventDate, 'y-m-d h:i:s'));
+			$event->setEndTime(new Alaress_Date_Format((string)$attributes->ows_EndDate, 'y-m-d h:i:s'));
+			$collection->add($event);
+		}
+
+//		/* Simulate all-day event if appropriate since Sharepoint thinks the end of the
+//		 * day is at 11:59pm, whereas Schoolbox makes it 12:00am. "Mangle it", he said.
+//		 */
+//		$startDate = new Alaress_Date_Format((string)$attributes->ows_EventDate, 'y-m-d h:i:s');
+//
+//		//
+//		// Is there recurrence? If so, create multiple events
+//		// (within $startTimestamp, $endTimestamp only)
+//		$event->setStartTime($startDate);
+//
+//		if ((string)$attributes->ows_fAllDayEvent == 1) {
+//			$endDate = substr((string)$attributes->ows_EndDate, 0, 10);
+//			$event->setEndTime(new Alaress_Date_Format($endDate . ' 00:00:00', 'y-m-d h:i:s'));
+//		}
+//		else {
+//			$event->setEndTime(new Alaress_Date_Format((string)$attributes->ows_EndDate, 'y-m-d h:i:s'));
+//		}
+
+//		/* If it is recurring today, set the event's start date to Today.
+//		 * Sharepoint only knows the start and end PERIOD of a recurring
+//		 * event, and does not specify the exact date when a recurrence
+//		 * takes place.
+//		 *
+//			[ows_EventDate] => 2012-09-14 09:15:00
+//			[ows_EndDate] => 2012-12-21 09:30:00
+//			[ows_RecurrenceData] => mo2012-12-20T20:30:00Z
+//		 */
+//		if ($event->getEndTime()->getDatabaseDate() >= $now->getDatabaseDate()) {
+//			$startTime = new Alaress_Date_Format((string)$attributes->ows_EventDate, 'y-m-d h:i:s');
+//			$event->setStartTime(new Alaress_Date_Format($now->getDatabaseDate() . ' ' . $startTime->getDatabaseTime(), 'y-m-d h:i:s'));
+//		}
+//		/* Sometimes events come out that shouldn't so we manually exclude them
+//		 * due to Sharepoint timezones
+//		 */
+
 	}
 
 	/**
