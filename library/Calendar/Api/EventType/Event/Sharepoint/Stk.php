@@ -310,40 +310,31 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 						break;
 					}
 					if ($start_time >= $window_start) {
-//						//
-//						// create event
-//						$event->setStartTime(new Alaress_Date_Format($start_time, 'U'));
-//						//
-//						// Need to offset end time too
-//						$end_time = clone $start_time;
-//						$end_time->modify("+$duration second");
-//						$event->setEndTime(new Alaress_Date_Format($end_time, 'U'));
-//						$event->setEndTime(new Alaress_Date_Format((string)$attributes->ows_EndDate, 'y-m-d h:i:s'));
-//						$collection->add($event);
 						$this->addEventAtTime($collection, $event, $start_time, $duration);
 						$instances--;
 					}
 				}
 			}
 			elseif ($rule->repeat->weekly) {
-				//
-				// Repeat on each week.
-				// (First, get working without instance counting)
 				$repeat_attributes = $rule->repeat->weekly->attributes();
 				$weeks             = max((int)$repeat_attributes->weekFrequency, 1);
-				$map               = $this->getWeekMapping();
-				$start_time_part  = $start_time->format('h:i:s');
+				$weekday_map       = $this->getWeekMapping();
+				$days_into_week    = (int)$start_time->format('w');
 				while ($instances != 0 && $start_time < $window_end) {
-					$start_time->modify("+$weeks week");
 					//
-					// Go to start of week, search in each day that event is actually on
-					$week_start = clone $start_time;
-					$week_start->modify('last Sunday 00:00:00');
-					foreach ($map as $day_code => $day_offset) {
-						$day_start = clone $week_start;
-						$day_start->modify("+$day_offset day $start_time_part");
+					// Go through each weekday.
+					// For each weekday, get the start time of the event on this
+					// day by offsetting the start time back/forward to that
+					// day of the week.
+					foreach ($weekday_map as $day_code => $day_no) {
+						$day_offset = ($day_no-$days_into_week);
+						$day_start  = clone $start_time;
+						$day_start->modify("$day_offset day");
+
+						if ($day_start < $window_start) {
+							continue;
+						}
 						if ($day_start > $window_end) {
-							$week_start = $day_start;
 							break;
 						}
 						if ($repeat_attributes->$day_code) {
@@ -356,15 +347,9 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 							break;
 						}
 					}
-					if ($week_start > $window_end) {
-						break;
-					}
+					$start_time->modify("+$weeks week");
 				}
 			}
-
-//			$event->setStartTime(new Alaress_Date_Format((string)$attributes->ows_EventDate, 'y-m-d h:i:s'));
-//			$event->setEndTime(new Alaress_Date_Format((string)$attributes->ows_EndDate, 'y-m-d h:i:s'));
-//			$collection->add($event);
 		}
 		else {
 			//
