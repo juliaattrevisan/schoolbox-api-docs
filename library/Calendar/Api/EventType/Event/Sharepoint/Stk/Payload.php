@@ -92,6 +92,8 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk_Payload {
 					<FieldRef Name="EndDate"/>
 					<FieldRef Name="Created"/>
 					<FieldRef Name="fRecurrence"/>
+					<FieldRef Name="fAllDayEvent"/>
+					<FieldRef Name="Duration"/>
 					<FieldRef Name="RecurrenceData"/>
 				</ViewFields>
 			</viewFields>
