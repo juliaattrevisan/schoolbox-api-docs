@@ -297,6 +297,8 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 			}
 
 			if ($rule->repeat->daily) {
+				//
+				// Daily: not tested, but seems right
 				$days = max((int)$rule->repeat->daily->dayFrequency, 1);
 				while ($instances != 0 && $start_time < $window_end) {
 					$start_time->modify("+$days day");
@@ -310,6 +312,8 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 				}
 			}
 			elseif ($rule->repeat->weekly) {
+				//
+				// Weekly: briefly tested, results make sense
 				$repeat_attributes = $rule->repeat->weekly->attributes();
 				$weeks             = max((int)$repeat_attributes->weekFrequency, 1);
 				$weekday_map       = $this->getWeekMapping();
@@ -324,7 +328,6 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 						$day_offset = ($day_no-$days_into_week);
 						$day_start  = clone $start_time;
 						$day_start->modify("$day_offset day");
-
 						if ($day_start < $window_start) {
 							continue;
 						}
@@ -344,52 +347,15 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 					$start_time->modify("+$weeks week");
 				}
 			}
-			elseif ($rule->repeat->monthly) {
-				//
-				// Monthly:
-			}
+			//
+			// Monthly, yearly: not implemented, not even going to try until I
+			// have a spec of how they should work
 		}
 		else {
 			//
 			// No recurrence
 			$this->addEventAtTime($collection, $event, new DateTime($attributes->ows_EventDate), $duration);
 		}
-
-//		/* Simulate all-day event if appropriate since Sharepoint thinks the end of the
-//		 * day is at 11:59pm, whereas Schoolbox makes it 12:00am. "Mangle it", he said.
-//		 */
-//		$startDate = new Alaress_Date_Format((string)$attributes->ows_EventDate, 'y-m-d h:i:s');
-//
-//		//
-//		// Is there recurrence? If so, create multiple events
-//		// (within $startTimestamp, $endTimestamp only)
-//		$event->setStartTime($startDate);
-//
-//		if ((string)$attributes->ows_fAllDayEvent == 1) {
-//			$endDate = substr((string)$attributes->ows_EndDate, 0, 10);
-//			$event->setEndTime(new Alaress_Date_Format($endDate . ' 00:00:00', 'y-m-d h:i:s'));
-//		}
-//		else {
-//			$event->setEndTime(new Alaress_Date_Format((string)$attributes->ows_EndDate, 'y-m-d h:i:s'));
-//		}
-
-//		/* If it is recurring today, set the event's start date to Today.
-//		 * Sharepoint only knows the start and end PERIOD of a recurring
-//		 * event, and does not specify the exact date when a recurrence
-//		 * takes place.
-//		 *
-//			[ows_EventDate] => 2012-09-14 09:15:00
-//			[ows_EndDate] => 2012-12-21 09:30:00
-//			[ows_RecurrenceData] => mo2012-12-20T20:30:00Z
-//		 */
-//		if ($event->getEndTime()->getDatabaseDate() >= $now->getDatabaseDate()) {
-//			$startTime = new Alaress_Date_Format((string)$attributes->ows_EventDate, 'y-m-d h:i:s');
-//			$event->setStartTime(new Alaress_Date_Format($now->getDatabaseDate() . ' ' . $startTime->getDatabaseTime(), 'y-m-d h:i:s'));
-//		}
-//		/* Sometimes events come out that shouldn't so we manually exclude them
-//		 * due to Sharepoint timezones
-//		 */
-
 	}
 
 	/**
