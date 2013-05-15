@@ -194,14 +194,6 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 					continue;
 				}
 
-				/* Find out if this is a recurring event and if it should be displayed
-				 * on the currently viewed day. If not, ignore it and don't put it on
-				 * the stack at all.
-				 */
-				if (!$this->isRecurringToday($now, $attribs)) {
-					continue;
-				}
-
 				/* An event is meant to display today so let's add it to the stack
 				 */
 				$event = new Calendar_Event_Type_Day();
@@ -456,57 +448,6 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 		}
 
 		$collection->add($new_event);
-		return true;
-	}
-
-	/**
-	 * Figure out if a particular event should recur today and thus be
-	 * displayed in the calendar
-	 *
-	 * @param $now
-	 * @param $attribs
-	 * @return bool
-	 */
-	private function isRecurringToday($now, $attribs) {
-		if ($attribs->ows_RecurrenceData) {
-			$currentDayOfWeek = $now->getUsingFormat('w');
-
-			$recurrenceXml = simplexml_load_string((string)$attribs->ows_RecurrenceData, 'SimpleXMLElement', LIBXML_NOCDATA);
-
-			/* If it repeats weekly
-			 */
-			if ($recurrenceXml->rule->repeat->weekly) {
-				$recurrenceAttribs = $recurrenceXml->rule->repeat->weekly->attributes();
-
-				/* Find out this stupid attribute rubbish to figure out
-				 * when an event recurs
-				 */
-				$index = -1;
-
-				foreach($recurrenceAttribs as $key => $value) {
-					$mapping = $this->getWeekMapping();
-
-					if (array_key_exists($key, $mapping)) {
-						$index = $mapping[$key];
-
-						break;
-					}
-				}
-
-				/* Forget this loop if the recurring event is not meant to
-				 * display today
-				 */
-				if ($currentDayOfWeek != $index) {
-					return false;
-				}
-
-				return true;
-			}
-
-			/* TODO: If it repeats daily
-			 */
-		}
-
 		return true;
 	}
 
