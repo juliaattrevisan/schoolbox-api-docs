@@ -10,6 +10,7 @@
 # @link        http://www.alaress.com.au
 #
 # m h dom mon dow user command
+MAILTO="support@schoolbox.com.au"
 
 # Video Processing
 */5 * * * *     www-data    php /usr/share/schoolboxdev/tools/video/video-scanner.php >> /var/log/schoolboxdev-video-scanner.log 2>/dev/null
@@ -20,4 +21,4 @@
 #*/15 * * * *    root    php /usr/share/schoolboxdev/tools/submission/notify_students.php --send --upcoming --overdue >> /var/log/schoolboxdev-duework.log 2>/dev/null
 
 # Cleanup cache  files (minify,zip,stream) (once a month)
-0 1 1 * *       root    php /usr/share/schoolboxdev/tools/clean-cache-dir.sh  >/dev/null 2>&1
+0 1 1 * *       root    php /usr/share/schoolboxdev/tools/clean-cache-dir.sh >/dev/null 2>&1
