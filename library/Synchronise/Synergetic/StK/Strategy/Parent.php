@@ -9,6 +9,7 @@
  */
 
 class Synchronise_Synergetic_StK_Strategy_Parent extends Synchronise_Synergetic_StK_Strategy_Abstract {
+	protected $strategyTitle = "Update Schoolbox Parent Details Synchronisation";
 
 	/**
 	 * Get a list of users' Synergy IDs to sync
@@ -88,48 +89,36 @@ class Synchronise_Synergetic_StK_Strategy_Parent extends Synchronise_Synergetic_
 
 		$this->getVerboseFilter()->intro();
 
-		foreach($this->getList() as $currentUser) {
-			$newUser = $this->setupUserDetails($currentUser);
-			$newSpouse = $this->setupSpouseDetails($currentUser);
-
-			/* First iteration
-				*/
-			if ($previousUser == null) {
-				if (is_array($newUser['campus'])) {
-					$compiledCampus = $newUser['campus'];
+		//
+		// Pass 1: get a unique list of users
+		$parents = array();
+		foreach ($this->getList() as $currentUser) {
+			//
+			// Get user and their spouse.
+			$users = array(
+				$this->setupUserDetails($currentUser),
+				$this->setupSpouseDetails($currentUser),
+			);
+			foreach ($users as $newUser) {
+				//
+				// Add each user to the list of unique users, merging the campus
+				// list into the new one.
+				$user_id = $newUser['synergy_id'];
+				if (!isset($parents[$user_id])) {
+					$parents[$user_id] = $newUser;
 				}
-
-				$previousUser = $newUser;
-				$previousSpouse = $newSpouse;
+				$parents[$user_id]['campus'] = array_unique(array_merge(
+					$parents[$user_id]['campus'],
+					$newUser['campus']
+				));
 			}
-			/* Previous was different person to Current
-				*/
-			else if ($previousUser['synergy_id'] != $newUser['synergy_id']) {
-				$previousUser['campus'] = $compiledCampus;
-				$previousSpouse['campus'] = $compiledCampus;
+		}
+//		var_dump($parents);
 
-				/* Uniquify campus list
-					 */
-				$previousUser['campus'] = array_unique($previousUser['campus']);
-				$previousSpouse['campus'] = array_unique($previousSpouse['campus']);
-
-				/* Update previous user
-					 */
-				$this->executeCreateUpdate($previousUser);
-				$this->executeCreateUpdate($previousSpouse);
-
-				/* Recompile
-					 */
-				$compiledCampus = $newUser['campus'];
-
-				$previousUser = $newUser;
-				$previousSpouse = $newSpouse;
-			}
-			/* They are the same person
-				*/
-			else {
-				$compiledCampus = array_merge($compiledCampus, $newUser['campus']);
-			}
+		//
+		// Pass 2: insert/update into list of users
+		foreach ($parents as $parent) {
+			$this->executeCreateUpdate($parent);
 		}
 
 		$this->getVerboseFilter()->summary();
