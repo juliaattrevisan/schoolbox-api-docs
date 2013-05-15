@@ -11,6 +11,11 @@
  */
 class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType_Abstract {
 
+	const EVENTTYPE_SINGLE              = 0;
+	const EVENTTYPE_RECURRING           = 1;
+	const EVENTTYPE_RECURRING_EXCEPTION = 3;
+	const EVENTTYPE_RECURRING_DELETED   = 4;
+
     /* An instance of the built-in php5 soap
      */
     private $soap = null;
@@ -186,7 +191,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 				$event = new Calendar_Event_Type_Day();
 				$event->setAuthorName('');
 				$event->setAuthorId('');
-				$event->setEventId(1);
+				$event->setEventId((int)$attribs->ows_ID);
 				$event->setType($eventTypeID);
 				$event->setNote((string)$attribs->ows_Title);
 				$event->setLocation((string)$attribs->ows_School);
@@ -239,6 +244,42 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 		return $collection;
 	}
 
+	/**
+	 * Is this event from the SOAP call a deletion of another event?
+	 *
+	 * @param SimpleXMLElement $event
+	 *
+	 * @return bool
+	 */
+	protected function isDeletedEvent(SimpleXMLElement $event) {
+		$attributes = $event->attributes();
+		$event_code = (int)$attributes->ows_EventType;
+		return in_array($event_code, array(self::EVENTTYPE_RECURRING_EXCEPTION, self::EVENTTYPE_RECURRING_DELETED));
+	}
+
+	/**
+	 * Creates a marker for a deleted event from the SOAP event. Used as a basis
+	 * for checking another recurring event against - if it matches, it's
+	 * deleted.
+	 *
+	 * @param SimpleXMLElement $event
+	 *
+	 * @return array
+	 * * master_id:  The base event - this delete marker deletes an instance of
+	 *   this event
+	 * * event_code: the type of deletion (self::EVENTTYPE_RECURRING_EXCEPTION
+	 *   or self::EVENTTYPE_RECURRING_DELETED)
+	 * * event_date: a DateTime object representing which occurence of the event
+	 *   is deleted
+	 */
+	protected function getDeletedEventMarker(SimpleXMLElement $event) {
+		$attributes = $event->attributes();
+		return array(
+			'master_id'  => (int)$attributes->ows_MasterSeriesItemID,
+			'event_code' => (int)$attributes->ows_EventType,
+			'event_date' => new DateTime((string)$attributes->ows_EventDate),
+		);
+	}
 
 	/**
 	 * Adds events based on recurrence
