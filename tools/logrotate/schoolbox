@@ -12,11 +12,3 @@
 	rotate 4
 	compress
 }
-
-/var/log/schoolbox-video* {
-        daily
-        missingok
-        rotate 30
-        compress
-        delaycompress
-}
