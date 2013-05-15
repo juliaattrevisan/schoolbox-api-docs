@@ -133,8 +133,8 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
         $start = new Alaress_Date_Format($startTimestamp, 'U');
         $end   = new Alaress_Date_Format($endTimestamp, 'U');
 
-		$startDate = $start->getUsingFormat('Y-m-d\\Th:i:s\\Z');
-		$endDate   = $end->getUsingFormat('Y-m-d\\Th:i:s\\Z');
+		$startDate = $start->getUsingFormat('Y-m-d\\TH:i:s\\Z');
+		$endDate   = $end->getUsingFormat('Y-m-d\\TH:i:s\\Z');
 
         $xmlPayload = new Calendar_Api_EventType_Event_Sharepoint_Stk_Payload($startDate, $endDate);
 //	    new Alaress_Probe($xmlPayload->getPayload());
