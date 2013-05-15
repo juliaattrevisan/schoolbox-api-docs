@@ -270,16 +270,14 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 		if ($attributes->ows_RecurrenceData) {
 			//
 			// recur weekly/daily/whatever
-			$recurrence = simplexml_load_string((string)$attributes->ows_RecurrenceData, 'SimpleXMLElement', LIBXML_NOCDATA);
-			$rule = $recurrence->rule;
-//			var_dump($until);
-			$until = Datetime::createFromFormat('U', $until);
-//			var_dump($until);
+			$recurrence   = simplexml_load_string((string)$attributes->ows_RecurrenceData, 'SimpleXMLElement', LIBXML_NOCDATA);
+			$rule         = $recurrence->rule;
+			$window_start = Datetime::createFromFormat('U', $from);
+			$window_end   = Datetime::createFromFormat('U', $until);
 
 			//
-			// How long to repeat for?
-			$window_start = Datetime::createFromFormat('U', $from);
-			$window_end   = $until;
+			// Does the recurrence have an end?
+			// If so use that as the window end if before the actual window end.
 			if ($rule->windowEnd) {
 				$temp_window_end = new DateTime((string)$rule->windowEnd);
 				if ($temp_window_end < $window_end) {
@@ -289,20 +287,16 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 
 			//
 			// How many instances? (-1 = until window end)
-			$instances = -1;
+			// TODO consider bumping $start_time to $window_start if infinite instances
+			// Reason: if infinite instances, then I don't care about instances
+			// before the window start, because I don't have to count them
+			$start_time = new DateTime((string)$attributes->ows_EventDate);
+			$instances  = -1;
 			if ($rule->repeatInstances) {
 				$instances = (int)$rule->repeatInstances;
 			}
 
-			//
-			// If no instances, populate starting from $from: otherwise, from
-			// event date
-
-			$start_time = new DateTime((string)$attributes->ows_EventDate);
 			if ($rule->repeat->daily) {
-				//
-				// Repeat on each day
-				// When do we start?
 				$days = max((int)$rule->repeat->daily->dayFrequency, 1);
 				while ($instances != 0 && $start_time < $window_end) {
 					$start_time->modify("+$days day");
@@ -350,14 +344,15 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 					$start_time->modify("+$weeks week");
 				}
 			}
+			elseif ($rule->repeat->monthly) {
+				//
+				// Monthly:
+			}
 		}
 		else {
 			//
-			// Recur just once
+			// No recurrence
 			$this->addEventAtTime($collection, $event, new DateTime($attributes->ows_EventDate), $duration);
-//			$event->setStartTime(new Alaress_Date_Format((string)$attributes->ows_EventDate, 'y-m-d h:i:s'));
-//			$event->setEndTime(new Alaress_Date_Format((string)$attributes->ows_EndDate, 'y-m-d h:i:s'));
-//			$collection->add($event);
 		}
 
 //		/* Simulate all-day event if appropriate since Sharepoint thinks the end of the
