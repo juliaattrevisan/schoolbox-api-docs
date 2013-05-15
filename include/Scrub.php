@@ -125,6 +125,7 @@ class Scrub {
                 'www.showme.com/sma/embed',
 	            'www.sunsmart.com.au/uvalert/',
 	            'skydrive.live.com/embed',
+                'studyboost.com/',
             );
 
             $config->set('URI.SafeIframeRegexp', '%^(?:https?:|)//(?:' . implode('|', $safeIframeSources) . ')%');
