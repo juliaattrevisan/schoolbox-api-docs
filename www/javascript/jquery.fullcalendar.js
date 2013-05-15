@@ -623,9 +623,21 @@ function calendarDateOnly(datetime) {
  * @return {String}
  */
 function calendarTime(datetime) {
-    var p = datetime.toString().split(/[ :]/)
-    if(p[4] == 0) { return '12:00am' }
-    else if(p[4] > 12) { return (p[4] - 12) + ':' + p[5] + 'pm' }
-    else { return parseInt(p[4], 10) + ':' + p[5] + 'am' }
-
+    var hours   = datetime.getHours();
+    var meridian = '';
+    if (hours <= 12) {
+        meridian = 'am';
+        if (hours === 0) {
+            hours = 12;
+        }
+    }
+    else {
+        hours   -= 12;
+        meridian = 'pm';
+    }
+    var minutes = datetime.getMinutes().toString();
+    if (minutes.length === 1) {
+        minutes = '0'+minutes;
+    }
+    return (hours.toString() + ':' + minutes + meridian);
 }
