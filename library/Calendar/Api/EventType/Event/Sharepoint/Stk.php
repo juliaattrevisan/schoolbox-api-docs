@@ -215,6 +215,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 					$collection,
 					$event,
 					$attribs,
+					$startTimestamp,
 					$endTimestamp
 				);
 			}
@@ -247,6 +248,8 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 	 *                                                 clones of this are added
 	 *                                                 for each recurrence.
 	 * @param stdclass                     $attributes Attributes from the SOAP call
+	 * @param int                          $from       Timestamp to add recurrences
+	 *                                                 from.
 	 * @param int                          $until      Timestamp to add recurrences
 	 *                                                 until.
 	 *
@@ -256,8 +259,10 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 		Calendar_Event_Collection $collection,
 		Calendar_Event_Type_Abstract $event,
 		$attributes,
+		$from,
 		$until
 	) {
+		$duration = (int)$attributes->ows_Duration;
 
 		//
 		// Only start and end time should be set here, everything else should be
@@ -265,17 +270,109 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 		if ($attributes->ows_RecurrenceData) {
 			//
 			// recur weekly/daily/whatever
-//			$recurrence = simplexml_load_string((string)$attributes->ows_RecurrenceData, 'SimpleXMLElement', LIBXML_NOCDATA);
-			$event->setStartTime(new Alaress_Date_Format((string)$attributes->ows_EventDate, 'y-m-d h:i:s'));
-			$event->setEndTime(new Alaress_Date_Format((string)$attributes->ows_EndDate, 'y-m-d h:i:s'));
-			$collection->add($event);
+			$recurrence = simplexml_load_string((string)$attributes->ows_RecurrenceData, 'SimpleXMLElement', LIBXML_NOCDATA);
+			$rule = $recurrence->rule;
+//			var_dump($until);
+			$until = Datetime::createFromFormat('U', $until);
+//			var_dump($until);
+
+			//
+			// How long to repeat for?
+			$window_start = Datetime::createFromFormat('U', $from);
+			$window_end   = $until;
+			if ($rule->windowEnd) {
+				$temp_window_end = new DateTime((string)$rule->windowEnd);
+				if ($temp_window_end < $window_end) {
+					$window_end = $temp_window_end;
+				}
+			}
+
+			//
+			// How many instances? (-1 = until window end)
+			$instances = -1;
+			if ($rule->repeatInstances) {
+				$instances = (int)$rule->repeatInstances;
+			}
+
+			//
+			// If no instances, populate starting from $from: otherwise, from
+			// event date
+
+			$start_time = new DateTime((string)$attributes->ows_EventDate);
+			if ($rule->repeat->daily) {
+				//
+				// Repeat on each day
+				// When do we start?
+				$days = max((int)$rule->repeat->daily->dayFrequency, 1);
+				while ($instances != 0 && $start_time < $window_end) {
+					$start_time->modify("+$days day");
+					if ($start_time > $window_end) {
+						break;
+					}
+					if ($start_time >= $window_start) {
+//						//
+//						// create event
+//						$event->setStartTime(new Alaress_Date_Format($start_time, 'U'));
+//						//
+//						// Need to offset end time too
+//						$end_time = clone $start_time;
+//						$end_time->modify("+$duration second");
+//						$event->setEndTime(new Alaress_Date_Format($end_time, 'U'));
+//						$event->setEndTime(new Alaress_Date_Format((string)$attributes->ows_EndDate, 'y-m-d h:i:s'));
+//						$collection->add($event);
+						$this->addEventAtTime($collection, $event, $start_time, $duration);
+						$instances--;
+					}
+				}
+			}
+			elseif ($rule->repeat->weekly) {
+				//
+				// Repeat on each week.
+				// (First, get working without instance counting)
+				$repeat_attributes = $rule->repeat->weekly->attributes();
+				$weeks             = max((int)$repeat_attributes->weekFrequency, 1);
+				$map               = $this->getWeekMapping();
+				$start_time_part  = $start_time->format('h:i:s');
+				while ($instances != 0 && $start_time < $window_end) {
+					$start_time->modify("+$weeks week");
+					//
+					// Go to start of week, search in each day that event is actually on
+					$week_start = clone $start_time;
+					$week_start->modify('last Sunday 00:00:00');
+					foreach ($map as $day_code => $day_offset) {
+						$day_start = clone $week_start;
+						$day_start->modify("+$day_offset day $start_time_part");
+						if ($day_start > $window_end) {
+							$week_start = $day_start;
+							break;
+						}
+						if ($repeat_attributes->$day_code) {
+							if ($day_start >= $window_start) {
+								$this->addEventAtTime($collection, $event, $day_start, $duration);
+								$instances--;
+							}
+						}
+						if ($instances == 0) {
+							break;
+						}
+					}
+					if ($week_start > $window_end) {
+						break;
+					}
+				}
+			}
+
+//			$event->setStartTime(new Alaress_Date_Format((string)$attributes->ows_EventDate, 'y-m-d h:i:s'));
+//			$event->setEndTime(new Alaress_Date_Format((string)$attributes->ows_EndDate, 'y-m-d h:i:s'));
+//			$collection->add($event);
 		}
 		else {
 			//
 			// Recur just once
-			$event->setStartTime(new Alaress_Date_Format((string)$attributes->ows_EventDate, 'y-m-d h:i:s'));
-			$event->setEndTime(new Alaress_Date_Format((string)$attributes->ows_EndDate, 'y-m-d h:i:s'));
-			$collection->add($event);
+			$this->addEventAtTime($collection, $event, new DateTime($attributes->ows_EventDate), $duration);
+//			$event->setStartTime(new Alaress_Date_Format((string)$attributes->ows_EventDate, 'y-m-d h:i:s'));
+//			$event->setEndTime(new Alaress_Date_Format((string)$attributes->ows_EndDate, 'y-m-d h:i:s'));
+//			$collection->add($event);
 		}
 
 //		/* Simulate all-day event if appropriate since Sharepoint thinks the end of the
@@ -313,6 +410,31 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 //		 * due to Sharepoint timezones
 //		 */
 
+	}
+
+	/**
+	 * Adds a single instance of an event.
+	 *
+	 * @param Calendar_Event_Collection    $collection Collection to add to
+	 * @param Calendar_Event_Type_Abstract $event      Event to add a copy of.
+	 * @param DateTime                     $start_time When the event starts
+	 * @param int                          $duration   Number of seconds the
+	 *                                                 event lasts.
+	 */
+	protected function addEventAtTime(
+		Calendar_Event_Collection $collection,
+		Calendar_Event_Type_Abstract $event,
+		DateTime $start_time,
+		$duration
+	) {
+		$new_event = clone $event;
+		$new_event->setStartTime(new Alaress_Date_Format($start_time, 'U'));
+		//
+		// Need to offset end time too
+		$end_time = clone $start_time;
+		$end_time->modify("+$duration second");
+		$new_event->setEndTime(new Alaress_Date_Format($end_time, 'U'));
+		$collection->add($new_event);
 	}
 
 	/**
