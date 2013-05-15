@@ -95,6 +95,9 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk_Payload {
 					<FieldRef Name="fAllDayEvent"/>
 					<FieldRef Name="Duration"/>
 					<FieldRef Name="RecurrenceData"/>
+					<FieldRef Name="UID"/>
+					<FieldRef Name="EventType"/>
+					<FieldRef Name="MasterSeriesItemID"/>
 				</ViewFields>
 			</viewFields>
 			<queryOptions>
