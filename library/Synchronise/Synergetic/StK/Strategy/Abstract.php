@@ -77,68 +77,6 @@ abstract class Synchronise_Synergetic_StK_Strategy_Abstract extends Synchronise_
 	}
 
 	/**
-	 * Figure out which campus a staff member is in, based on the code provided
-	 *
-	 * * 1: Senior
-	 * * 2: Junior
-	 * * 3: Pre-school
-	 *
-	 * @param  $code
-	 * @return int
-	 */
-	protected function getCampusFromCode($code)
-	{
-		switch ($code) {
-			case 'S':
-				return 1;
-			case 'J':
-				return 2;
-			case 'P':
-				return 3;
-			default:
-				return false;
-		}
-	}
-
-
-	/**
-	 * Gets house ID out of Synergetic house.
-	 *
-	 * @todo Can houses and campuses have synergetic codes associated with them?
-	 *
-	 * @param $house
-	 *
-	 * @return bool|int
-	 */
-	protected function getHouseFromCode($house) {
-		//
-		// PYE: Pye (383)
-		// TRI: Tripp (384)
-		// MAY: Mayfield (385)
-		// HAM: Hamilton (386)
-		// CER: Cerutty (387)
-		// DOU: Douglas (388)
-		// RED, BLU, GOL: ?
-		switch ($house) {
-			case 'PYE':
-				return 383;
-			case 'TRI':
-				return 384;
-			case 'MAY':
-				return 385;
-			case 'HAM':
-				return 386;
-			case 'CER':
-				return 387;
-			case 'DOU':
-				return 388;
-			default:
-				return false;
-		}
-	}
-
-
-	/**
 	 * Figure out which Campus belongs to this Student
 	 *
 	 * For St. Kentigern this is always based on the user's campus:
