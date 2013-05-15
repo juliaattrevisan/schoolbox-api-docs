@@ -146,7 +146,8 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 
 		/* Fill in your query result set here and populate $collection
 		 */
-		$collection = new Calendar_Event_Collection();
+		$collection     = new Calendar_Event_Collection();
+		$deleted_events = array();
 
 		/* If the SOAP connection succeeded, proceed normally
 		 * Otherwise return an empty collection
@@ -155,12 +156,27 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 			$response = $this->getSoap()->GetListItems(new SoapVar($xmlPayload->getPayload(), XSD_ANYXML));
 
 			$allEvents = $xmlPayload->parseXml($response->GetListItemsResult->any);
-//			new Alaress_Probe($allEvents);
 
-
+			//
+			// Collect deleted events first
 			foreach ($allEvents->rsdata->zrow as $currentEvent) {
-				$attribs = $currentEvent->attributes();
+				//
+				// Deleted or exception events: store now and handle later
+				if ($this->isDeletedEvent($currentEvent)) {
+					$deleted_events[] = $this->getDeletedEventMarker($currentEvent);
+				}
+			}
 
+			//
+			// And then check each item
+			foreach ($allEvents->rsdata->zrow as $currentEvent) {
+				//
+				// Deleted or exception events: skip
+				if ($this->isDeletedEvent($currentEvent)) {
+					continue;
+				}
+
+				$attribs = $currentEvent->attributes();
 				$eventTypeID = $this->getTypeIdFromName((string)$attribs->ows_ContentType);
 				$eventCampusID = $this->getCampusIdFromName((string)$attribs->ows_School);
 
@@ -221,11 +237,11 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 					$event,
 					$attribs,
 					$startTimestamp,
-					$endTimestamp
+					$endTimestamp,
+					$deleted_events
 				);
 			}
 		}
-
         return $collection;
     }
 
@@ -293,6 +309,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 	 *                                                 from.
 	 * @param int                          $until      Timestamp to add recurrences
 	 *                                                 until.
+	 * @param array                        $deleted_events Events that have been deleted.
 	 *
 	 * @return void
 	 */
@@ -301,7 +318,8 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 		Calendar_Event_Type_Abstract $event,
 		$attributes,
 		$from,
-		$until
+		$until,
+		$deleted_events
 	) {
 		$duration = (int)$attributes->ows_Duration;
 
@@ -347,7 +365,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 						break;
 					}
 					if ($start_time >= $window_start) {
-						$this->addEventAtTime($collection, $event, $start_time, $duration);
+						$this->addEventAtTime($collection, $event, $start_time, $duration, $deleted_events);
 						$instances--;
 					}
 				}
@@ -377,7 +395,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 						}
 						if ($repeat_attributes->$day_code) {
 							if ($day_start >= $window_start) {
-								$this->addEventAtTime($collection, $event, $day_start, $duration);
+								$this->addEventAtTime($collection, $event, $day_start, $duration, $deleted_events);
 								$instances--;
 							}
 						}
@@ -395,7 +413,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 		else {
 			//
 			// No recurrence
-			$this->addEventAtTime($collection, $event, new DateTime($attributes->ows_EventDate), $duration);
+			$this->addEventAtTime($collection, $event, new DateTime($attributes->ows_EventDate), $duration, array());
 		}
 	}
 
@@ -407,12 +425,16 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 	 * @param DateTime                     $start_time When the event starts
 	 * @param int                          $duration   Number of seconds the
 	 *                                                 event lasts.
+	 * @param array                        $deleted_events Events that have been deleted
+	 *
+	 * @return bool
 	 */
 	protected function addEventAtTime(
 		Calendar_Event_Collection $collection,
 		Calendar_Event_Type_Abstract $event,
 		DateTime $start_time,
-		$duration
+		$duration,
+		$deleted_events
 	) {
 		$new_event = clone $event;
 		$new_event->setStartTime(new Alaress_Date_Format($start_time, 'U'));
@@ -421,7 +443,20 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 		$end_time = clone $start_time;
 		$end_time->modify("+$duration second");
 		$new_event->setEndTime(new Alaress_Date_Format($end_time, 'U'));
+
+		//
+		// Is this event a deleted one? If so don't add it.
+		$event_id = $event->getEventId();
+		foreach ($deleted_events as $deleted_event) {
+			//
+			// Event holds: start datetime, UID, type of deletion (delete or exception)
+			if ($deleted_event['master_id'] == $event_id && $deleted_event['event_date'] == $start_time) {
+				return false;
+			}
+		}
+
 		$collection->add($new_event);
+		return true;
 	}
 
 	/**
