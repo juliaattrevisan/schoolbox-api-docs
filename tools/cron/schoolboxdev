@@ -13,8 +13,8 @@
 MAILTO="support@schoolbox.com.au"
 
 # Video Processing
-*/5 * * * *     www-data    php /usr/share/schoolboxdev/tools/video/video-scanner.php >> /var/log/schoolboxdev-video-scanner.log 2>/dev/null
-*/10 * * * *    www-data    php /usr/share/schoolboxdev/tools/video/processor.php >> /var/log/schoolboxdev-video-processor.log 2>/dev/null
+*/5 * * * *     www-data    php /usr/share/schoolboxdev/tools/video/video-scanner.php >/dev/null 2>&1
+*/10 * * * *    www-data    php /usr/share/schoolboxdev/tools/video/processor.php >/dev/null 2>&1
 
 # Due Work Notifications
 # -- Not to be run for dev other can spam emails to users during testing
