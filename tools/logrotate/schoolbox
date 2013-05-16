@@ -19,3 +19,10 @@
 	rotate 4
 	compress
 }
+
+/var/log/schoolbox-plagscan* {
+	monthly
+	missingok
+	rotate 2
+	compress
+}
