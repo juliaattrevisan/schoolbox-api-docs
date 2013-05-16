@@ -25,6 +25,7 @@ function init() {
     }
 
     // Install-a-bubble
+    env.fullscreen = (window.navigator.standalone) ? window.navigator.standalone : localStorage.getItem('pinned');
     if(!env.fullscreen && (env.ios || env.wp )) {
         var style,
             instruction = '';
@@ -58,6 +59,8 @@ function init() {
         setTimeout(function() {
             $('#bubble').addClass('active');
         }, 5000);
+    } else if (env.fullscreen) {
+        localStorage.setItem('pinned', true);
     }
 
     // clear any kind of message timeout that might be lurking around
