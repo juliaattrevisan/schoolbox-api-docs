@@ -137,27 +137,30 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
 
 		/* Fill timetable */
 		if ( $this->getGroup()->isStaff($userId) ) {
-			$statement = $this->getExternalDatabase()->query("
+			$statement = $this->getExternalDatabase()->prepare("
 				SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
 				FROM People p
 				RIGHT JOIN Staff s ON s.peopleDenbighID = p.denbighID
 				RIGHT JOIN Lessons l ON l.staffCode = s.staffCode
 				RIGHT JOIN Classes cl ON cl.classCode = l.classCode
 				RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-				WHERE p.denbighID = $externalUserId
+				WHERE p.denbighID = :externalUserId
 			");
 		}
 		else {
-			$statement = $this->getExternalDatabase()->query("
+			$statement = $this->getExternalDatabase()->prepare("
 				SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
 				FROM People p
 				RIGHT JOIN Enrolments e ON e.studentID = p.denbighID
 				RIGHT JOIN Lessons l ON l.classCode = e.classCode
 				RIGHT JOIN Classes cl ON cl.classCode = l.classCode
 				RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-				WHERE p.denbighID = $externalUserId
+				WHERE p.denbighID = :externalUserId
 			");
 		}
+
+		$statement->bindParam(':externalUserId', $externalUserId, PDO::PARAM_INT);
+		$statement->execute();
 
 		$lessonList = $statement->fetchAll(PDO::FETCH_ASSOC);
 
@@ -202,29 +205,33 @@ class External_Denbigh_Timetable implements External_TimetableInterface {
 
 		/* Fill timetable */
 		if ( $this->getGroup()->isStaff($userId) ) {
-			$statement = $this->getExternalDatabase()->query("
+			$statement = $this->getExternalDatabase()->prepare("
 				SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
 				FROM People p
 				RIGHT JOIN Staff s ON s.peopleDenbighID = p.denbighID
 				RIGHT JOIN Lessons l ON l.staffCode = s.staffCode
 				RIGHT JOIN Classes cl ON cl.classCode = l.classCode
 				RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-				WHERE p.denbighID = $externalUserId
-					AND l.day = $dayNumber
+				WHERE p.denbighID = :externalUserId
+					AND l.day = :dayNumber
 			");
 		}
 		else {
-			$statement = $this->getExternalDatabase()->query("
+			$statement = $this->getExternalDatabase()->prepare("
 				SELECT l.day, l.period, l.classCode, l.staffCode, l.room, co.subjectName
 				FROM People p
 				RIGHT JOIN Enrolments e ON e.studentID = p.denbighID
 				RIGHT JOIN Lessons l ON l.classCode = e.classCode
 				RIGHT JOIN Classes cl ON cl.classCode = l.classCode
 				RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
-				WHERE p.denbighID = $externalUserId
-					AND l.day = $dayNumber
+				WHERE p.denbighID = :externalUserId
+					AND l.day = :dayNumber
 			");
 		}
+
+		$statement->bindParam(':externalUserId', $dayNumber);
+		$statement->bindParam(':dayNumber', $dayNumber, PDO::PARAM_INT);
+		$statement->execute();
 
 		$lessonList = $statement->fetchAll(PDO::FETCH_ASSOC);
 
