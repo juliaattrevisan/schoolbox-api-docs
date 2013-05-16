@@ -80,10 +80,10 @@ abstract class Synchronise_Synergetic_StK_Strategy_Abstract extends Synchronise_
 	 * Figure out which Campus belongs to this Student
 	 *
 	 * For St. Kentigern this is always based on the user's campus:
-	 * * 1: Co-ed
-	 * * 2: Girls
-	 * * 3: Boys
-	 * * 4: Pre-school
+	 * * 1: Co-ed (C)
+	 * * 2: Girls (G)
+	 * * 3: Boys (B or S)
+	 * * 4: Pre-school (P)
 	 *
 	 * @param  $user
 	 * @return bool|string
@@ -96,6 +96,7 @@ abstract class Synchronise_Synergetic_StK_Strategy_Abstract extends Synchronise_
 			case 'G':
 				return 2;
 			case 'B':
+			case 'S':
 				return 3;
 			case 'P':
 				return 4;
@@ -124,6 +125,7 @@ abstract class Synchronise_Synergetic_StK_Strategy_Abstract extends Synchronise_
 				// (StK were nice enough to put their groups in order)
 				return $user['StudentYearLevel']+8;
 			case 'B':
+			case 'S':
 				//
 				// Boys: year+17 up to year 8
 				return $user['StudentYearLevel']+17;
