@@ -11,7 +11,7 @@
  * @idea_stolen_from Matt Day <matt.day@alaress.com.au>
  */
 
-require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
 
 
 $mapper = Plagscan_DocumentMapper::getInstance();
@@ -28,10 +28,10 @@ if (empty($username) || empty($key)) {
 
 
 echo strftime("[%F %T] Plagscan scan started\n");
-$gateway      = new Plagscan_Gateway($key, $username);
+$gateway      = new Plagscan_Gateway($username, $key);
 $updated_docs = 0;
 foreach ($docs as $doc) {
-	$doc_id = $doc->plagscan_id;
+	$doc_id = $doc->plagscanId;
 	$stats  = $gateway->retrieve($doc_id, Plagscan_Gateway::MODE_RETRIEVE_STATISTICS_ONLY);
 	if (!$stats) {
 		echo strftime("[%F %T] Plagscan scan failed - check API key and username?\n");
@@ -44,8 +44,8 @@ foreach ($docs as $doc) {
 	if (strlen($level) > 0) {
 		$doc->score  = $level / 10;
 		$doc->status = Plagscan_Document::STATUS_COMPLETE;
-		$document->html =  $gateway->retrieve($doc_id, Plagscan_Gateway::MODE_RETRIEVE_HTML_INTERACTIVE);
-		Plagscan_DocumentMapper::getInstance()->save($document);
+		$doc->html =  $gateway->retrieve($doc_id, Plagscan_Gateway::MODE_RETRIEVE_HTML_INTERACTIVE);
+		Plagscan_DocumentMapper::getInstance()->save($doc);
 		$updated_docs++;
 	}
 }
