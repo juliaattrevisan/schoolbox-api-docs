@@ -78,9 +78,15 @@ class DAV_File extends Sabre\DAV\File {
     function setPath($path) {
         $folderList = explode('/',$path);
         $this->fileName = array_pop($folderList);
-        $this->folderName = array_pop($folderList);
-        $folder =  $this->getFolderHandler()->searchByName($this->folderName);
-        $this->folderID = $folder[0]['id'];
+
+        //array_shift($folderList);
+        $parent = 0;
+        foreach($folderList as $folderName) {
+            $folder =  $this->getFolderHandler()->searchByName($folderName, $parent);
+            $parent = $folder[0]['id'];
+        }
+
+        $this->folderID = $parent;
 
     }
 
