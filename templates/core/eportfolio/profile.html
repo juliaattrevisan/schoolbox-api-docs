@@ -1,9 +1,11 @@
 <script>
     $j(document).ready(function(){
-        $j('#add-coverphoto').click(function(){
-            $j('#coverphoto-image').show().trigger('click').hide();
-            return false;
-        });
+        if($j.browser.mozilla){
+            $j('#add-coverphoto').click(function(){
+                $j('#coverphoto-image').show().trigger('click').hide();
+                return false;
+            });
+        }
         $j('#coverphoto-image').change(function(){
             $j('#coverphoto-form').submit();
         })
@@ -30,14 +32,14 @@
 <div class="profile-banner">
     <div class="background">
 		<!-- BEGIN has_cover_photo_control -->
-		<a id="add-coverphoto" class="btn modify no-text" title="Edit your cover picture"><span></span></a>
+		<label id="add-coverphoto" for="coverphoto-image" class="btn modify no-text" title="Edit your cover picture"><span></span></label>
 		<!-- END has_cover_photo_control -->
 		<!-- BEGIN has_cover_photo -->
         <img src="/storage/image.php?size=eportfolioCoverPhoto&hash={COVERPHOTO_IMAGEHASH}" />
         <!-- END has_cover_photo -->
 
 		<!-- BEGIN no_cover_photo_control -->
-		<a id="add-coverphoto" class="btn add" title="Add a cover photo"><span></span>Add a cover photo</a>
+		<label id="add-coverphoto" for="coverphoto-image" class="btn add" title="Add a cover photo"><span></span>Add a cover photo</label>
 		<!-- END no_cover_photo_control -->
 		<!-- BEGIN no_cover_photo -->
 		<img src="/images/core/eportfolio/coverphotoPlaceholder.jpg" />
