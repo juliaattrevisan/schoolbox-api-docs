@@ -38,6 +38,13 @@ class Synchronise_Synergetic_StK_Strategy_Student extends Synchronise_Synergetic
 	 * @return array
 	 */
 	public function setupUserDetails($currentUser) {
+//		$existing = array();
+//		if ($currentUser['StudentID']) {
+//			$existing = $this->getExternalUserHandler()->getStudent($currentUser['StudentID']);
+//			if (!$existing) {
+//				$existing = array();
+//			}
+//		}
 		$newUser = array();
 		//
 		// Username: always student ID

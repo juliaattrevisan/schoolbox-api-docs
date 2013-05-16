@@ -84,9 +84,6 @@ class Synchronise_Synergetic_StK_Strategy_Parent extends Synchronise_Synergetic_
 	 * @return void
 	 */
 	public function createIfExists() {
-		$previousUser = null;
-		$compiledCampus = array();
-
 		$this->getVerboseFilter()->intro();
 
 		//
@@ -113,7 +110,6 @@ class Synchronise_Synergetic_StK_Strategy_Parent extends Synchronise_Synergetic_
 				));
 			}
 		}
-//		var_dump($parents);
 
 		//
 		// Pass 2: insert/update into list of users
