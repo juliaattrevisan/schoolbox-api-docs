@@ -208,9 +208,6 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 				$this->getPage()->setVar(array(
 					'EPORTFOLIO_COMPONENT_NAME' => Scrub::text($componentName),
 					'EPORTFOLIO_COMPONENT_DESCRIPTION' => Scrub::text($componentDescription),
-				));
-
-				$this->getPage()->setVar(array(
 					'EPORTFOLIO_COMPONENT_ID' => Scrub::text($component->definitionId),
 					'EPORTFOLIO_COMPONENT_COUNT' => $component->instanceCount,
 					'EPORTFOLIO_COMPONENT_CLASS' => $class,
