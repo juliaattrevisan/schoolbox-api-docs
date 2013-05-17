@@ -55,9 +55,17 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
 	 * @param $params
 	 */
 	protected function parseConfigInstance($conf, $key, $page, $params) {
-		$exclusions = array('description');
 
-		/* Hide Purpose
+		/* Hide Purpose when not in admin
+		 */
+		if (preg_match('#^/adminv2/#', $_SERVER['REQUEST_URI'])) {
+			$exclusions = array();
+		}
+		else {
+			$exclusions = array('description');
+		}
+
+		/* Render config instance
 		 */
 		if (!in_array($key, $exclusions)) {
 			$templateFile = "component/config/$key.html";
