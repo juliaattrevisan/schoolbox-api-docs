@@ -108,6 +108,9 @@ rm -rf www/conf
 # Remove cron and logrotate files not for this package
 tools/pkg-remove-other-crons.sh %{name}
 
+# Change apache user in cronjobs
+sed -i 's/www-data/apache/g' tools/cron/schoolbox*
+
 mkdir -p %{buildroot}%{_sysconfdir}/cron.d
 cp -a tools/cron/* %{buildroot}%{_sysconfdir}/cron.d
 rm -rf tools/cron
