@@ -13,22 +13,53 @@ $templateMapper = new \Eportfolio\TemplateMapper();
 
 $allTemplates = array(
 	'template' => array(
-		'name' => 'Mortimer',
-		'leftColumnWidth' => 17.4,
-		'rightColumnWidth' => 80,
+		'name' => 'About Me',
+		'leftColumnWidth' => 69.9,
+		'rightColumnWidth' => 29.9,
 		'components' => array(
 			array(
 				'class' => 'Component_Eportfolio_BasicListController',
 				'keys' => array(
-					'componentname' => 'The most basic of lists',
-					'description' => 'A purpose for the most basic of lists',
-					'position' => 'top',
+					'componentname' => 'Values and Beliefs',
+					'description' => 'Values and Beliefs',
+					'position' => 'left',
+				),
+			),
+			array(
+				'class' => 'Component_Eportfolio_BasicListController',
+				'keys' => array(
+					'componentname' => 'Leadership Initiatives',
+					'description' => 'Leadership Initiatives',
+					'position' => 'left',
+				),
+			),
+			array(
+				'class' => 'Component_Eportfolio_BasicListController',
+				'keys' => array(
+					'componentname' => 'Holiday Destinations',
+					'description' => 'Holiday Destinations',
+					'position' => 'right',
+				),
+			),
+			array(
+				'class' => 'Component_Eportfolio_BasicListController',
+				'keys' => array(
+					'componentname' => 'Co-curricular Activities',
+					'description' => 'Co-curricular Activities',
+					'position' => 'right',
+				),
+			),
+			array(
+				'class' => 'Component_Eportfolio_BasicListController',
+				'keys' => array(
+					'componentname' => 'My Hobbies',
+					'description' => 'My Hobbies',
+					'position' => 'right',
 				),
 			),
 		),
 	),
 );
-
 
 
 foreach($allTemplates as $currentTemplate) {
