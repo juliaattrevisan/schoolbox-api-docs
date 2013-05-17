@@ -46,6 +46,29 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
         return parent::getTemplate($templateName, $templatePath);
     }
 
+	/**
+	 * Split this out so in ePortfolio you can determine which config elements get rendered
+	 *
+	 * @param $conf
+	 * @param $key
+	 * @param $page
+	 * @param $params
+	 */
+	protected function parseConfigInstance($conf, $key, $page, $params) {
+		$exclusions = array('description');
+
+		/* Hide Purpose
+		 */
+		if (!in_array($key, $exclusions)) {
+			$templateFile = "component/config/$key.html";
+			$page->setFile($key, $templateFile);
+			$conf->parse($page, $key, $key, Scrub::text($params['value']));
+			$page->parse('CONFIG_ELEMENT_CONTENT', $key);
+			$page->setVar('CONFIG_DISPLAY', $params['label'] ? '' : ' style="display:none;"');
+			$page->parse('config_element_block', 'config_element', true);
+		}
+	}
+
 	/* Getters/Setters
 	 */
 
