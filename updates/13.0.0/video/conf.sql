@@ -1,1 +1,1 @@
-INSERT INTO `config` (`name`, `value`, `title`, `description`, `type`, `required`) VALUES ('video_dir', '/var/lib/schoolbox/data/video', 'Video Storage Location', 'Location that all transcoded videos are stored', 'Paths', 'true');
+INSERT INTO `config` (`name`, `value`, `title`, `description`, `type`, `required`) VALUES ('video_dir', '/var/lib/schoolbox/video', 'Video Storage Location', 'Location that all transcoded videos are stored', 'Paths', 'true');
