@@ -127,9 +127,44 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 			$component->setup($user, $component->instance->getConfigArray() );
 
 			if ($component->execute() !== false) {
+
+				/* Insert with config'd name
+				 */
+				foreach ($component->instance->config as $currentConfig) {
+					if ($currentConfig->key == 'componentname') {
+						$configInstance = Component_ConfigMapper::getInstance()->findByColumnList(array(
+							'component_config_definition_id' => $currentConfig->id,
+							'component_instance_id' => $_POST['from'],
+						));
+
+						if ($configInstance->count()) {
+							$componentName = $configInstance->current()->value;
+
+							/* Presave a config for this newly added component
+							 * so it always has the name we gave it
+							 */
+							$newConfigInstance = new Component_Config();
+							$newConfigInstance->id = null;
+							$newConfigInstance->configDefinitionId = $currentConfig->id;
+							$newConfigInstance->instanceId = $component->instance->id;
+							$newConfigInstance->value = $configInstance->current()->value;
+
+							Component_ConfigMapper::getInstance()->save($newConfigInstance);
+
+							/* Force inherited name
+							 */
+							$component->instance->config[$currentConfig->id]->defaultValue = $configInstance->current()->value;
+						}
+					}
+				}
+
 				$component->parseConfig();
 
 				if ($component->renderTemplate($templateHandle) !== false) {
+					$component->setVar(array(
+						'COMPONENT_NAME' => $componentName,
+					));
+
 					$component->parse($templateTarget, $templateHandle, true);
 				}
 			}

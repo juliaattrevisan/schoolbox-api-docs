@@ -46,6 +46,55 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
         return parent::getTemplate($templateName, $templatePath);
     }
 
+	/**
+	 * Split this out so in ePortfolio you can determine which config elements get rendered
+	 *
+	 * @param $conf
+	 * @param $key
+	 * @param $page
+	 * @param $params
+	 */
+	protected function parseConfigInstance($conf, $key, $page, $params) {
+
+		/* Hide Purpose when not in admin
+		 */
+		if (preg_match('#^/adminv2/#', $_SERVER['REQUEST_URI'])) {
+			$exclusions = array();
+		}
+		else {
+			$exclusions = array('description');
+		}
+
+		/* Render config instance
+		 */
+		if (!in_array($key, $exclusions)) {
+			$templateFile = "component/config/$key.html";
+			$page->setFile($key, $templateFile);
+			$conf->parse($page, $key, $key, Scrub::text($params['value']));
+
+			if ($key == 'componentname') {
+
+				/* Get the config so we have the name
+				 */
+				$configInstance = Component_ConfigMapper::getInstance()->findByColumnList(array(
+					'component_instance_id' => $this->instance->id,
+					'component_config_definition_id' => $this->instance->definition->id
+				));
+
+				if ($configInstance->count()) {
+					$this->setVar(array(
+						'COMPONENT_NAME' => $configInstance->current()->value,
+						'COMPONENT_CONFIG_NAME' => $configInstance->current()->value,
+					));
+				}
+			}
+
+			$page->parse('CONFIG_ELEMENT_CONTENT', $key);
+			$page->setVar('CONFIG_DISPLAY', $params['label'] ? '' : ' style="display:none;"');
+			$page->parse('config_element_block', 'config_element', true);
+		}
+	}
+
 	/* Getters/Setters
 	 */
 
