@@ -125,7 +125,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 			$user = $userHandler->getById($eportfolioHandler->getSettingsPageOwner());
 
 			$component->setup($user, $component->instance->getConfigArray() );
-//print_r($_POST);
+
 			if ($component->execute() !== false) {
 				$component->parseConfig();
 
@@ -133,21 +133,22 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 
 					/* Insert with config'd name
 					 */
-//					print_r($component->instance);
-//					$instance = reset($componentInstanceMapper->findByInstanceId($component->instance->id));
-//
-//					$configDefinitionCollection = Component_ConfigMapper::getInstance()->findByColumn('component_definition_id', $instance->definitionId);
-//
-//					print_r($configDefinitionCollection);
-
-					foreach ($component->instance->getConfigArray() as $currentConfig) {
+					foreach ($component->instance->config as $currentConfig) {
 						if ($currentConfig->key == 'componentname') {
-							$id = $currentConfig->id; //93
+
+							$configInstance = Component_ConfigMapper::getInstance()->findByColumnList(array(
+								'component_config_definition_id' => $currentConfig->id,
+								'component_instance_id' => $_POST['from'],
+							));
+
+							if ($configInstance->count()) {
+								$componentName = $configInstance->current()->value;
+							}
 						}
 					}
 
 					$component->setVar(array(
-						'COMPONENT_NAME' => 'mort'
+						'COMPONENT_NAME' => $componentName
 					));
 
 					$component->parse($templateTarget, $templateHandle, true);
