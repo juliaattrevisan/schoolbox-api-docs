@@ -64,7 +64,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 		    $this->setVar('default_video_block','');
 	    }
 	    if(count($this->outputList)) {
-
+			$j = 0;
 
 
 		    foreach($this->outputList as $video ) {
@@ -75,6 +75,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 				                     'VIDEO_LIST_HIDDEN' => $video->getFile()->getHidden() ? 'hidden' : '',
 				                     'VIDEO_LIST_POSTER_ID'=> $video->getFile()->getOwner()->getId(),
 				                     'VIDEO_LIST_POSTER' => $video->getFile()->getOwner()->getFullName(),
+									 'ON_OFF' => ++$j % 2 ? '' : 'dark'
 			                   ));
 				$this->parse('video_list_block','video_list',true);
 		    }
