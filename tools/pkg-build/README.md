@@ -39,3 +39,10 @@
 ```
     ~/build-area/
 ```
+
+# Schoolbox RPM Packaging Tools
+
+## Setup
+
+This is still a work in progress.
+The spec file has been provided, but the process for downloading and building is still currently manual.
