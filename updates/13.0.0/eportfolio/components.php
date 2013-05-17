@@ -15,6 +15,10 @@ $basicList = array(
 			'default_value' => 'My List',
 			'label' => 'List Title',
 		),
+		'description' => array(
+			'default_value' => 'A list component',
+			'label' => 'Purpose'
+		),
 	)
 );
 
@@ -29,6 +33,10 @@ $advancedList = array(
 		'componentname' => array(
 			'default_value' => 'My Advanced List',
 			'label' => 'List Title',
+		),
+		'description' => array(
+			'default_value' => 'An advanced list component',
+			'label' => 'Purpose'
 		),
 	)
 );
@@ -45,6 +53,10 @@ $linkList = array(
 			'default_value' => 'My Link List',
 			'label' => 'List Title',
 		),
+		'description' => array(
+			'default_value' => 'A link list component',
+			'label' => 'Purpose'
+		),
 	)
 );
 
@@ -59,6 +71,10 @@ $textbox = array(
 		'componentname' => array(
 			'default_value' => 'My Textbox',
 			'label' => 'Textbox Title',
+		),
+		'description' => array(
+			'default_value' => 'An textbox component',
+			'label' => 'Purpose'
 		),
 	)
 );
@@ -75,6 +91,10 @@ $fileList = array(
 			'default_value' => 'My Files',
 			'label' => 'Title',
 		),
+		'description' => array(
+			'default_value' => 'A myFiles component',
+			'label' => 'Purpose'
+		),
 	)
 );
 
@@ -90,9 +110,12 @@ $imageList = array(
 			'default_value' => 'Image Gallery',
 			'label' => 'Title',
 		),
+		'description' => array(
+			'default_value' => 'An image gallery component',
+			'label' => 'Purpose'
+		),
 	)
 );
-
 
 $blogList = array(
 	'name' => 'Blog',
@@ -105,6 +128,10 @@ $blogList = array(
 		'componentname' => array(
 			'default_value' => 'Blog',
 			'label' => 'Title',
+		),
+		'description' => array(
+			'default_value' => 'An blog component',
+			'label' => 'Purpose'
 		),
 	)
 );

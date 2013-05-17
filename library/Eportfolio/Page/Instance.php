@@ -175,11 +175,44 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 
 				$class = trim($class);
 
+				/* Draw the name and description from the config, instead of the definition
+				 */
+				if (count($component->config)) {
+					foreach($component->config as $currentConfig) {
+						if ($currentConfig->key == 'componentname') {
+							$componentName = $currentConfig['value'];
+						}
+						else if ($currentConfig->key == 'description') {
+							$componentDescription = $currentConfig['value'];
+						}
+					}
+
+					/* If a component exists but hasn't had its name/purpose customised,
+					 * use the defaults from component definition
+					 */
+					if (!strlen($componentName)) {
+						$componentName = $component->definition->name;
+					}
+
+					if (!strlen($componentDescription)) {
+						$componentDescription = $component->definition->description;
+					}
+				}
+				/* If there aren't any configs, use a default pair from definition
+				 */
+				else {
+					$componentName = $component->definition->name;
+					$componentDescription = $component->definition->description;
+				}
+
+				$this->getPage()->setVar(array(
+					'EPORTFOLIO_COMPONENT_NAME' => Scrub::text($componentName),
+					'EPORTFOLIO_COMPONENT_DESCRIPTION' => Scrub::text($componentDescription),
+				));
+
 				$this->getPage()->setVar(array(
 					'EPORTFOLIO_COMPONENT_ID' => Scrub::text($component->definitionId),
-					'EPORTFOLIO_COMPONENT_NAME' => Scrub::text($component->definition->name),
 					'EPORTFOLIO_COMPONENT_COUNT' => $component->instanceCount,
-					'EPORTFOLIO_COMPONENT_DESCRIPTION' => Scrub::text($component->definition->description),
 					'EPORTFOLIO_COMPONENT_CLASS' => $class,
 					'EPORTFOLIO_COMPONENT_CATEGORY_ID' => $previous->identifier,
 				));
