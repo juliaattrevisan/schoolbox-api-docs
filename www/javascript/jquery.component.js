@@ -98,9 +98,21 @@ setupCustomise = {
 
 				/* Polymorphic key
 				 */
-				var data = {
-					add : $j(this).attr('rel')
-				};
+				var rel = $j(this).attr('rel').split(' ');
+
+				/* In eportfolio it sends as a pair: definitionId and componentInstanceId
+				 */
+				if (rel.length > 1) {
+					var data = {
+						add : rel[0],
+						from: rel[1]
+					};
+				}
+				else {
+					var data = {
+						add : rel[0]
+					};
+				}
 
 				data[setupCustomise.key] = setupCustomise.id;
 
