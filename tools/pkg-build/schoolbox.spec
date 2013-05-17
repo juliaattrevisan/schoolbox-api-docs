@@ -108,8 +108,10 @@ rm -rf www/conf
 # Remove cron and logrotate files not for this package
 tools/pkg-remove-other-crons.sh %{name}
 
+mkdir -p %{buildroot}%{_sysconfdir}/cron.d
 cp -a tools/cron/* %{buildroot}%{_sysconfdir}/cron.d
 rm -rf tools/cron
+mkdir -p %{buildroot}%{_sysconfdir}/logrotate.d
 cp -a tools/logrotate/* %{buildroot}%{_sysconfdir}/logrotate.d
 rm -rf tools/logrotate
 
@@ -165,8 +167,8 @@ rm -f /usr/share/%{name}/www/.htaccess;
 %files
 %{_datadir}/%{name}
 %{_sysconfdir}/%{name}
-%{_sysconfdir}/cron.d
-%{_sysconfdir}/logrotate.d
+%{_sysconfdir}/cron.d/*
+%{_sysconfdir}/logrotate.d/*
 %attr(755,apache,apache) %{_localstatedir}/lib/%{name}
 %exclude %{_datadir}/%{name}/tools/apache-vhost-*-sso
 %exclude %{_datadir}/%{name}/templates/*/modules/leave
