@@ -67,7 +67,7 @@ foreach($allTemplates as $currentTemplate) {
 
 				foreach($currentComponent['keys'] as $currentKey => $currentValue) {
 					$componentConfigDefinition = Component_ConfigDefinitionMapper::getInstance()->findByColumnList(array(
-						'component_definition_id' => $componentDefinition->id,
+						'component_definition_id' => $componentDefinition->current()->id,
 						'key' => $currentKey,
 					));
 
@@ -79,7 +79,8 @@ foreach($allTemplates as $currentTemplate) {
 						$componentConfigInstance = new Component_Config();
 						$componentConfigInstance->configDefinitionId = $componentConfigDefinition->current()->id;
 						$componentConfigInstance->instanceId = $instanceId;
-echo "Saving"; print_r($componentConfigInstance);
+						$componentConfigInstance->value = $currentValue;
+
 						Component_ConfigMapper::getInstance()->save($componentConfigInstance);
 					}
 				}
