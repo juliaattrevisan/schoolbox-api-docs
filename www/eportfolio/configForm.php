@@ -135,14 +135,25 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 					 */
 					foreach ($component->instance->config as $currentConfig) {
 						if ($currentConfig->key == 'componentname') {
-
 							$configInstance = Component_ConfigMapper::getInstance()->findByColumnList(array(
 								'component_config_definition_id' => $currentConfig->id,
 								'component_instance_id' => $_POST['from'],
 							));
 
+							print_r($currentConfig);
 							if ($configInstance->count()) {
 								$componentName = $configInstance->current()->value;
+
+								/* Presave a config for this newly added component
+								 * so it always has the name we gave it
+								 */
+								$newConfigInstance = new Component_Config();
+								$newConfigInstance->id = null;
+								$newConfigInstance->configDefinitionId = $currentConfig->id;
+								$newConfigInstance->instanceId = $component->instance->id;
+								$newConfigInstance->value = $configInstance->current()->value;
+
+								Component_ConfigMapper::getInstance()->save($newConfigInstance);
 							}
 						}
 					}
