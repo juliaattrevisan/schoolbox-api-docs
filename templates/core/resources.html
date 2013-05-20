@@ -429,11 +429,11 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); } <!-- E
 
       <!-- BEGIN folder_detail -->
       <div class="rfolder detail" id="folder-detail">
-        <img src="{{FOLDER_MIME_IMG}}" alt="{{FOLDER_NAME}}" />
-        <h3 class="rfolder name">{{FOLDER_NAME}}</h3>
-        <p class="rfolder template">{{FOLDER_TEMPLATE}}</p>
+        <img src="{FOLDER_MIME_IMG}" alt="{FOLDER_NAME}" />
+        <h3 class="rfolder name">{FOLDER_NAME}</h3>
+        <p class="rfolder template">{FOLDER_TEMPLATE}</p>
         <p class="rfolder type">
-          <span class="rfolder type">{{FOLDER_TYPE}}</span>
+          <span class="rfolder type">{FOLDER_TYPE}</span>
           <a data-action="join" class="rfolder join-btn btn groups">
             <span></span>Join
           </a>
@@ -442,7 +442,7 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); } <!-- E
         <h4 class="rfolder perms">Permissions</h4>
         <ul class="rfolder perms">
         <!-- BEGIN folder_detail_perms -->
-          <li>{{FOLDER_PERM_GROUP}}: {{FOLDER_PERM_ACCESS}}</li>
+          <li>{FOLDER_PERM_GROUP}: {FOLDER_PERM_ACCESS}</li>
         <!-- END folder_detail_perms -->
         </ul>
         <div class="rfolder actions">
@@ -460,12 +460,12 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); } <!-- E
 
       <!-- BEGIN file_detail -->
       <div class="rfile detail" id="file-detail">
-        <img src="{{FILE_MIME_IMG}}" alt="{{FILE_NAME}}" />
-        <h3 class="rfile name">{{FILE_NAME}}</h3>
-        <p class="rfile filesize">({{FILE_SIZE}})</p>
+        <img src="{FILE_MIME_IMG}" alt="{FILE_NAME}" />
+        <h3 class="rfile name">{FILE_NAME}</h3>
+        <p class="rfile filesize">({FILE_SIZE})</p>
         <p class="rfile hidden-warning"><span class="i" title="This file cannot be seen by users who do not have write permissions in this folder"></span>(Hidden)</p>
-        <p class="rfile description">{{FILE_DESCRIPTION}}</p>
-        <p class="rfile meta">Posted by <span class="meta-who">{{FILE_POSTED_BY}}</span> on <span class="meta-when">{{FILE_POSTED_DATE}}</span></p>
+        <p class="rfile description">{FILE_DESCRIPTION}</p>
+        <p class="rfile meta">Posted by <span class="meta-who">{FILE_POSTED_BY}</span> on <span class="meta-when">{FILE_POSTED_DATE}</span></p>
         <div class="rfile actions">
           <h4 class="rfile actions">Actions</h4>
           <a class="btn open ropen" data-action="open"><span></span>Open</a>
@@ -479,8 +479,8 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); } <!-- E
 
       <!-- BEGIN multi_file_detail -->
       <div class="rmultifile detail" id="multi-file-detail">
-        <img src="{{MULTIFILE_MIME_IMG}}" alt="Multiple files selected" />
-        <h3 class="rmultifile count">{{MULTIFILE_COUNT}}</h3>
+        <img src="{MULTIFILE_MIME_IMG}" alt="Multiple files selected" />
+        <h3 class="rmultifile count">{MULTIFILE_COUNT}</h3>
         <div class="rmultifile actions">
           <h4 class="rmultifile actions">Actions</h4>
           <a class="btn delete rdelete" data-action="delete"><span></span>Delete</a>
