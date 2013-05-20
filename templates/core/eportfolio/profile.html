@@ -64,12 +64,12 @@
 </div>
 
 <div class="left clearfix" style="width: 69%">
+	<!-- BEGIN has_showcased_work -->
     <div class="box component">
         <h2>Recent Showcased Work
             <a href="/eportfolio/{EPORTFOLIO_PAGE_USER_ID}/showcase" class="btn"><span></span>Showcased work</a>
         </h2>
         <div class="listing">
-            <!-- BEGIN has_showcased_work -->
             <table class="showcased-work">
                 <colgroup>
                     <col width="46" />
@@ -97,17 +97,19 @@
                 <!-- END showcased_work -->
                 </tbody>
             </table>
-            <!-- END has_showcased_work -->
-            <!-- BEGIN no_showcased_work -->
-            <p>{USER_FIRSTNAME} {USER_LASTNAME} has no showcased work.</p>
-            <!-- END no_showcased_work -->
+
         </div>
     </div>
+	<!-- END has_showcased_work -->
+	<!-- BEGIN no_showcased_work -->
+	<!--<p>{USER_FIRSTNAME} {USER_LASTNAME} has no showcased work.</p>-->
+	<!-- END no_showcased_work -->
 
+	<!-- BEGIN has_recent_blog -->
     <div class="box component">
         <h2>Recent Journals</h2>
         <div class="listing">
-			<!-- BEGIN has_recent_blog -->
+
             <table class="upcoming-work">
                 <tbody>
 					<!-- BEGIN recent_blog -->
@@ -118,16 +120,17 @@
 					<!-- END recent_blog -->
                 </tbody>
             </table>
-			<!-- END has_recent_blog -->
-			<!-- BEGIN no_recent_blog -->
-			<p>{USER_FIRSTNAME} {USER_LASTNAME} has no recent blogs.</p>
-			<!-- END no_recent_blog -->
+
         </div>
     </div>
+	<!-- END has_recent_blog -->
+	<!-- BEGIN no_recent_blog -->
+	<!--<p>{USER_FIRSTNAME} {USER_LASTNAME} has no recent blogs.</p>-->
+	<!-- END no_recent_blog -->
 
+	<!-- BEGIN has_recent_photo -->
     <div class="box component">
         <h2>Recent Photos</h2>
-		<!-- BEGIN has_recent_photo -->
         <div class="listing photos">
 			<!-- BEGIN recent_photo -->
             <a href="" title="Image title">
@@ -135,11 +138,11 @@
             </a>
 			<!-- END recent_photo -->
         </div>
-		<!-- END has_recent_photo -->
-		<!-- BEGIN no_recent_photo -->
-		<p>{USER_FIRSTNAME} {USER_LASTNAME} has no recent photos.</p>
-		<!-- END no_recent_photo -->
     </div>
+	<!-- END has_recent_photo -->
+	<!-- BEGIN no_recent_photo -->
+	<!--<p>{USER_FIRSTNAME} {USER_LASTNAME} has no recent photos.</p>-->
+	<!-- END no_recent_photo -->
 </div>
 
 <div class="right clearfix" style="width: 29%">
