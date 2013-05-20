@@ -18,7 +18,8 @@ class ActivityFactory {
 
 	/**
 	 * @param SubmissionBox $box
-	 * @param string        $event The event type: "new", "overdue" or "closed"
+	 * @param string        $event The event type: "new", "overdue", "closed" or
+	 *                             "upcoming"
 	 *
 	 * @return null|Activity
 	 */
@@ -27,7 +28,7 @@ class ActivityFactory {
 		if ($event === 'new') {
 			$date = $box->getOpenDate();
 		}
-		elseif ($event === 'overdue') {
+		elseif ($event === 'overdue' || $event === 'upcoming') {
 			$date = $box->getDueDate();
 		}
 		elseif ($event === 'closed') {
@@ -40,6 +41,7 @@ class ActivityFactory {
 		$activity
 			->setEvent($event)
 			->setSubmissionBox($box)
+			->setOwner($box->getOwner())
 			->setCategory($box->getCategory())
 			->setDate($date);
 		return $activity;
@@ -47,7 +49,7 @@ class ActivityFactory {
 
 	/**
 	 * @param OnlineAssessment $assess
-	 * @param string           $event  The event type: "new" or "closed"
+	 * @param string        $event The event type: "new", "closed" or "upcoming"
 	 * @return null|Activity
 	 */
 	public function buildFromOnlineAssessment(OnlineAssessment $assess, $event) {
@@ -55,7 +57,7 @@ class ActivityFactory {
 		if ($event === 'new') {
 			$date = $assess->getStart();
 		}
-		elseif ($event === 'closed') {
+		elseif ($event === 'closed' || $event === 'upcoming') {
 			$date = $assess->getFinish();
 		}
 		if (!isset($date)) {
@@ -65,6 +67,7 @@ class ActivityFactory {
 		$activity
 			->setEvent($event)
 			->setAssessment($assess)
+			->setOwner($assess->getUser())
 			->setCategory($assess->getCategory())
 			->setDate($date);
 		return $activity;
@@ -79,6 +82,7 @@ class ActivityFactory {
 		$activity
 			->setEvent('submitted')
 			->setSubmissionBox($submission->getSubmissionBox())
+			->setOwner($submission->getOwner())
 			->setCategory($submission->getSubmissionBox()->getCategory())
 			->setSubmission($submission)
 			->setDate($submission->getSubmitted());
@@ -94,6 +98,7 @@ class ActivityFactory {
 		$activity
 			->setEvent('returned')
 			->setSubmissionBox($return->getSubmissionBox())
+			->setOwner($return->getOwner())
 			->setCategory($return->getSubmissionBox()->getCategory())
 			->setReturnedWork($return)
 			->setDate($return->getReturned());

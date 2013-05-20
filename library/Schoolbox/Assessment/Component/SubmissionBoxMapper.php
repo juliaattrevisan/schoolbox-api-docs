@@ -601,6 +601,60 @@ class SubmissionBoxMapper extends Schoolbox\Mapper {
 	}
 
 	/**
+	 * Gets the list of upcoming activities for submission boxes.
+	 *
+	 * The following activities are retrieved:
+	 *
+	 * * Upcoming submission boxes, which the user hasn't submitted work for
+	 *
+	 * @param int   $user_id    The user for who activities are fetched for.
+	 * @param int   $limit      The max number of activities to be fetched.
+	 * @param array $categories The categories to fetch activities for.
+	 *
+	 * @return ActivityCollection
+	 */
+	public function getUpcomingActivities($user_id, $limit, $categories) {
+		//
+		// All submission boxes that are due in the future.
+		$submission_mapper = $this->getJoinMapper('submission');
+		$query = "
+			SELECT
+				{$this->getColumnString('sb')},
+				{$this->getJoinMapper('category')->getColumnString('c')},
+				(SELECT COUNT(*) FROM {$submission_mapper->getTable()} sm
+				 WHERE sb.id=sm.submission_box_id AND sm.owner = :user_id
+				) AS submission_count
+			FROM {$this->getTable()} sb
+			LEFT JOIN {$this->getJoinSql('category', 'sb', 'c')}
+			WHERE sb.category IN {$this->getArrayPlaceholders($categories, 'category')}
+			AND sb.date > NOW()
+			AND sb.deleted IS FALSE
+			HAVING (submission_count = 0 OR sb.multi_submission IS TRUE)
+			ORDER BY sb.date ASC
+			LIMIT :limit
+		";
+		$statement = $this->database->prepare($query);
+		$statement->bindValue('user_id', $user_id, \PDO::PARAM_INT);
+		$statement->bindValue('limit',   $limit,   \PDO::PARAM_INT);
+		foreach ($this->getArrayParameters($categories, 'category') as $param => $value) {
+			$statement->bindValue($param, $value, \PDO::PARAM_INT);
+		}
+		$statement->execute();
+		$boxes = $this->hydrateList($statement, 'sb', function($mapper, $model, $row) {
+			$model->setCategory($mapper->getJoinMapper('category')->hydrate($row, 'c'));
+			return $model;
+		});
+
+		$factory    = new ActivityFactory();
+		$collection = new ActivityCollection();
+		foreach ($boxes as $box) {
+			$collection->add($factory->buildFromSubmissionBox($box, 'upcoming'));
+		}
+		return $collection;
+	}
+
+
+	/**
 	 * Retrieves all submission boxes which take online submissions within a
 	 * given category.
 	 *

@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>{SITENAME} email digest</title>
+    <style type="text/css">
+    </style>
+</head>
+<body style="margin:0;">
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+        <td>
+            <table cellpadding="0" cellspacing="0" border="0" align="center" width="640">
+                <!-- Header row -->
+                <tr bgcolor="0066b0">
+                    <td colspan="2" valign="middle">
+                        <img src="http://{SITE_DOMAIN}/images/demo/logo.png" border="0" />
+                    </td>
+                    <td width="16"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="56" width="1" border="0" />
+                   </td>
+                </tr>
+                <!-- End Header row -->
+                <tr>
+                    <td width="16" valign="top"></td>
+                    <td width="608" valign="top">
+                        <!-- Main content -->
+                        <table cellpadding="0" cellspacing="0" border="0" align="center" width="608">
+                            <tr><td valign="top"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="16" width="1" border="0" /></td></tr>
+
+
+                            <!-- BEGIN upcominglist -->
+                            <tr><td>
+                                <table cellpadding="0" cellspacing="0" border="0" align="center" width="608" bgcolor="#e5eff7">
+                                    <tr>
+                                        <td valign="middle" width="8"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="0" width="8" border="0" /></td>
+                                        <td valign="middle" height="32" style="font-family:sans-serif;font-weight:bold;font-size:13px;line-height:21px;">Upcoming Due Work</td>
+                                        <td valign="middle" align="right">
+                                            <table cellspacing="0" cellpadding="0" border="0" bgcolor="#f9f9f9" style="border:1px solid #d1d1d1;">
+                                                <tr>
+                                                    <td valign="middle">
+                                                        <a href="http://{SITE_DOMAIN}/submission/dueWork/">
+                                                            <img src="http://{SITE_DOMAIN}/images/emails/digest/search-icon.png" border="0" height="22" width="22" /></a></td>
+                                                    <td valign="middle">
+                                                        <a href="http://{SITE_DOMAIN}/submission/dueWork/" style="color:#000;font-family:sans-serif;text-decoration:none;font-size:13px;line-height:22px;">
+                                                    View all work&nbsp;</a></td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td valign="middle" width="16"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="16" border="0" /></td>
+                                    </tr>
+                                </table>
+
+
+                                <table cellpadding="5" cellspacing="0" border="0" align="center" width="608">
+                                    <!-- BEGIN upcoming -->
+                                    <tr style="background:{UPCOMING_BACKGROUND}">
+                                        <td valign="middle" style="border-bottom:1px solid #eeeeee;" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="0" width="6" border="0" /></td>
+                                        <td valign="bottom" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#929292;border-bottom:1px solid #eeeeee;">
+                                            <a href="http://{SITE_DOMAIN}/{UPCOMING_HREF}{UPCOMING_ID}" style="color:#0066b0;text-decoration:none;font-weight:bold;">{UPCOMING_TITLE}</a><br />
+                                            <a href="http://{SITE_DOMAIN}/homepage/{UPCOMING_SUBJ_ID}" style="color:#0066b0;text-decoration:none;">{UPCOMING_SUBJ_NAME}</a> {UPCOMING_TYPE}
+                                        </td>
+                                        <td valign="bottom" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#929292;border-bottom:1px solid #eeeeee;">
+                                            <span style="color:{UPCOMING_URGENCY_COLOR};">Due {UPCOMING_DATE}</span> on {UPCOMING_TIME}
+                                        </td>
+
+                                        <!--
+                                        <td valign="middle" align="right" style="border-bottom:1px solid #eeeeee;">
+                                            <table cellspacing="0" cellpadding="0" border="0" bgcolor="#f9f9f9" style="border:1px solid #d1d1d1;">
+                                                <tr>
+                                                    <td valign="middle">
+                                                        <a href="http://{SITE_DOMAIN}/{UPCOMING_HREF}{UPCOMING_ID}">
+                                                            <img style="vertical-align:bottom;" src="http://{SITE_DOMAIN}/images/emails/digest/{UPCOMING_BTN_ICON}-icon.png" border="0" height="22" width="22" />
+                                                        </a></td>
+                                                    <td valign="middle">
+                                                        <a href="http://{SITE_DOMAIN}/{UPCOMING_HREF}{UPCOMING_ID}" style="color:#000;font-family:sans-serif;text-decoration:none;font-size:13px;line-height:22px;">
+                                                            {UPCOMING_BTN_LABEL}</a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        -->
+                                        <td valign="middle" width="6" style="border-bottom:1px solid #eeeeee;"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
+                                    </tr>
+                                    <!-- END upcoming -->
+                                </table>
+                            </td></tr>
+                            <tr><td valign="top"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="16" width="1" border="0" /></td></tr>
+                            <!-- END upcominglist -->
+
+
+                            <!-- BEGIN newslist -->
+                            <tr><td>
+                                <table cellpadding="0" cellspacing="0" border="0" align="center" width="608" bgcolor="#e5eff7">
+                                    <tr>
+                                        <td valign="middle" width="8"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="0" width="8" border="0" /></td>
+                                        <td valign="middle" height="32" style="font-family:sans-serif;font-weight:bold;font-size:13px;line-height:21px;">{NEWS_TYPE}</td>
+                                        <td valign="middle" width="16"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="16" border="0" /></td>
+                                    </tr>
+                                </table>
+                                <table cellpadding="5" cellspacing="0" border="0" align="center" width="608">
+                                    <!-- BEGIN article -->
+                                    <tr style="background:{ARTICLE_BACKGROUND}">
+                                        <td style="border-bottom:1px solid #eeeeee;" valign="middle" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
+                                        <!-- BEGIN image -->
+                                        <td style="border-bottom:1px solid #eeeeee;"><img valign="bottom" src="http://{SITE_DOMAIN}/storage/image.php?hash={ARTICLE_IMAGE}&size=square64" width="64" height="64" border="0" /></td>
+                                        <!-- END image -->
+                                        <td valign="top" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#000000;border-bottom:1px solid #eeeeee;" colspan="{ARTICLE_COLSPAN}">
+                                            <a href="http://{SITE_DOMAIN}/{ARTICLE_SLUG}" style="color:#0066b0;text-decoration:none;font-weight:bold;">{ARTICLE_TITLE}</a><br />
+                                            <a href="http://{SITE_DOMAIN}/{ARTICLE_TOPIC_URL}" style="color:#0066b0;text-decoration:none;">{ARTICLE_TOPIC}</a>
+                                                <span style="color:#929292">{ARTICLE_DATE} | Posted by</span>
+                                            <a href="http://{SITE_DOMAIN}/search/user/{ARTICLE_POSTER_ID}" style="color:#0066b0;text-decoration:none;">{ARTICLE_POSTER}</a><br />
+                                            {ARTICLE_ABSTRACT}
+                                        </td>
+                                        <td style="border-bottom:1px solid #eeeeee;" valign="middle" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
+                                    </tr>
+                                    <!-- END article -->
+                                </table>
+                            </td></tr>
+                            <tr><td valign="top"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="16" width="1" border="0" /></td></tr>
+                            <!-- END newslist -->
+
+
+                            <!-- BEGIN activitylist -->
+                            <tr><td>
+                                <table cellpadding="0" cellspacing="0" border="0" align="center" width="608" bgcolor="#e5eff7">
+                                    <tr>
+                                        <td valign="middle" width="8"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="0" width="8" border="0" /></td>
+                                        <td valign="middle" height="32" style="font-family:sans-serif;font-weight:bold;font-size:13px;line-height:21px;">Activity</td>
+                                        <td valign="middle" width="16"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="16" border="0" /></td>
+                                    </tr>
+                                </table>
+                                <table cellpadding="5" cellspacing="0" border="0" align="center" width="608">
+                                    <!-- BEGIN activity -->
+                                    <tr style="background:{ACTIVITY_BACKGROUND}">
+                                        <td style="border-bottom:1px solid #eeeeee;"><img valign="bottom" src="http://{SITE_DOMAIN}/images/emails/digest/activity-{ACTIVITY_ICON}.png" width="24" height="24" border="0" /></td>
+                                        <td valign="top" style="font-family:sans-serif;font-size:13px;line-height:16px;color:#000000;border-bottom:1px solid #eeeeee;">
+                                            <a style="color:#0066b0;text-decoration:none;" href="http://{SITE_DOMAIN}/search/user/{ACTIVITY_USER_ID}">{ACTIVITY_OWNER}</a>
+                                            {ACTIVITY_ACTION}
+                                            <!-- BEGIN activity_link -->
+                                            <a style="color:#0066b0;text-decoration:none;" href="http://{SITE_DOMAIN}{ACTIVITY_URL}">{ACTIVITY_NAME}</a>
+                                            <!-- END activity_link -->
+                                            <!-- BEGIN activity_nolink -->
+                                            {ACTIVITY_NAME}
+                                            <!-- END activity_nolink -->
+                                            in
+                                            <a style="color:#0066b0;text-decoration:none;" href="http://{SITE_DOMAIN}/homepage/{ACTIVITY_CAT_ID}">{ACTIVITY_CAT_NAME}</a>
+                                            <br /><span style="color:#929292">{ACTIVITY_DATE}</span>
+                                        </td>
+                                        <td style="border-bottom:1px solid #eeeeee;" valign="middle" width="6"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="6" border="0" /></td>
+                                    </tr>
+                                    <!-- END activity -->
+                                </table>
+                            </td></tr>
+                            <tr><td valign="top"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="16" width="1" border="0" /></td></tr>
+                            <!-- END activitylist -->
+
+
+
+                        </table>
+                        <!-- End Main content -->
+                    </td>
+                    <td width="16" valign="top"></td>
+                </tr>
+                <!-- Footer -->
+                <tr bgcolor="#eeeeee">
+                    <td colspan="3" valign="top" height="16"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="16" width="1" border="0" /></td>
+                </tr>
+                <tr bgcolor="#eeeeee">
+                    <td width="16" valign="top"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="16" border="0" /></td>
+                    <td width="608" valign="top">
+                        <p style="font-family:sans-serif;font-size:13px;line-height:16px;color:#929292;margin:0">
+                            &copy; 2013 Schoolbox
+                            <a href="http://alaress.com.au" style="color:#929292;text-decoration:underline;">Alaress Pty Ltd</a> |
+                            <a href="http://{SITE_DOMAIN}/policy.php" style="color:#929292;text-decoration:underline;">Guidelines of use and Privacy Policy</a> |
+                            <a href="http://{SITE_DOMAIN}/feedback.php" style="color:#929292;text-decoration:underline;">Support and Feeback</a>
+                        </p>
+                        <p style="font-family:sans-serif;font-size:13px;line-height:16px;color:#929292;margin:0;font-weight:bold;">21st March 2013</p>
+                    </td>
+                    <td width="16" valign="top"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="1" width="16" border="0" /></td>
+                </tr>
+                <tr bgcolor="#eeeeee">
+                    <td colspan="3" valign="top" height="8"><img src="http://{SITE_DOMAIN}/images/emails/spacer.gif" height="8" width="1" border="0" /></td>
+                </tr>
+                <!-- End Footer -->
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

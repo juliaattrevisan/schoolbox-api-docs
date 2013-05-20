@@ -22,3 +22,8 @@ MAILTO="support@schoolbox.com.au"
 
 # Cleanup cache  files (minify,zip,stream) (once a month)
 0 1 1 * *       root    php /usr/share/schoolboxdev/tools/clean-cache-dir.sh >/dev/null 2>&1
+
+# Digest notifications
+# -- also not to be run for dev
+#00 06 * * 1-4 root    php /usr/share/schoolboxdev/tools/digest/daily.php  >> /var/log/schoolbox-digest-daily.log 2>/dev/null
+#00 11 * * 5   root    php /usr/share/schoolboxdev/tools/digest/weekly.php >> /var/log/schoolbox-digest-weekly.log 2>/dev/null

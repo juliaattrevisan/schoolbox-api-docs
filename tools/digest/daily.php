@@ -9,7 +9,17 @@
  */
 
 // this is run from CLI, so explicitly include the bootstrap
-require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
+if (!Cfg::get('digest_send_daily')) {
+	fwrite(STDERR, "Daily digest is not enabled - this script will do nothing.\n");
+	exit(2);
+}
+
+//
+// Start session and set current semester, aaarrrggggh
+session_start();
+$synUser  = new External_User;
+$semester = $synUser->getCurrentSemester();
 
 $debug = (isset($argv[1]) && $argv[1] == 'nomail');
 
@@ -20,8 +30,11 @@ $debug = (isset($argv[1]) && $argv[1] == 'nomail');
 $digestStart = strtotime('-2 days');
 $digestEnd = time();
 
+echo strftime("[%F %T] Starting daily news digest\n");
 $newsDigest = new Digest_News($digestStart, $digestEnd, $debug);
 $newsDigest->compileUserList();
-$newsDigest->send();
+$result = $newsDigest->send();
+echo strftime("[%F %T] Completed daily news digest: ");
+printf("%d sendable, %d missing emails, %d failures\n", $result['total'], $result['missing'], $result['failures']);
 
 die();

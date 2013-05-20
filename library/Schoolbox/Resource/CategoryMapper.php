@@ -137,17 +137,19 @@ class CategoryMapper extends Mapper {
 				$subject_list = $external_user->getSubjectList($user->getExternalId(), $user->getId());
 				if (is_array($subject_list) && !empty($subject_list)) {
 					$category_codes = array_map(function($row) { return $row['code']; }, $subject_list);
-					$query .= ' OR cc.code IN '.$this->getArrayPlaceholders($category_codes, 'code');
-					$params = array_merge($params, $this->getArrayParameters($category_codes, 'code'));
-					//
-					// Allow search of codes with a campus prefix.
-					$category_like_codes = array_map(
-						function($code) { return '%/'.$code; },
-						$category_codes
-					);
-					foreach ($category_like_codes as $i => $like_code) {
-						$query .= ' OR cc.code LIKE :like_code_'.$i;
-						$params['like_code_'.$i] = $like_code;
+					if (!empty($category_codes)) {
+						$query .= ' OR cc.code IN '.$this->getArrayPlaceholders($category_codes, 'code');
+						$params = array_merge($params, $this->getArrayParameters($category_codes, 'code'));
+						//
+						// Allow search of codes with a campus prefix.
+						$category_like_codes = array_map(
+							function($code) { return '%/'.$code; },
+							$category_codes
+						);
+						foreach ($category_like_codes as $i => $like_code) {
+							$query .= ' OR cc.code LIKE :like_code_'.$i;
+							$params['like_code_'.$i] = $like_code;
+						}
 					}
 				}
 			}
@@ -160,6 +162,8 @@ class CategoryMapper extends Mapper {
 
 	/**
 	 * @param  \External_UserInterface $external_user
+	 *
+	 * @todo Have this be set up automatically if at all possible
 	 *
 	 * @return $this
 	 */

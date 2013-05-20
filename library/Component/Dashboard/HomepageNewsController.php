@@ -14,13 +14,18 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
     public function execute() {
         $feedHandler = new Feed();
         $groupHandler = new Group();
-        $userAccess = $groupHandler->involvedInCategoryList($_SESSION['id']);
+        $userAccess = $groupHandler->involvedInCategoryList(
+            $this->getConfig('user') ? $this->getConfig('user') : $_SESSION['id']
+        );
 
         if (is_array($userAccess)) {
             $categoryIDs = array();
 
             foreach ($userAccess as $ua) {
                 $categoryIDs[] = $ua['id'];
+            }
+            if (empty($categoryIDs)) {
+                return false;
             }
 
             $feedList = $feedHandler->getFeed(
@@ -42,6 +47,14 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
                         'has_grade' => 'no-grade',
                         'gradeiant' => '',
                         'grade' => '',
+                        'cat_id' => $f['cat_id'],
+                        'cat_name' => $f['cat_name'],
+                        'external_id' => $f['external_id'],
+                        'link' => $f['link'],
+                        'user_id' => $f['user_id'],
+                        'name'    => $f['name'],
+                        'action'  => $f['action'],
+                        'timestamp' => $feedTime->getUnixTimestamp(),
                     );
                 }
                 return true;
@@ -64,6 +77,15 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
             // iterates the set
         }
         return true;
+    }
+
+    /**
+     * Retrieves feed list as populated by execute().
+     *
+     * @return array
+     */
+    public function getDataFromExecute() {
+        return $this->feedList;
     }
 
 }

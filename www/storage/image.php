@@ -8,7 +8,9 @@
  */
 
 require_once '../../include/Bootstrap.php';
-$sitePage = new SitePage;
+//
+// Don't need to be logged in to view image.
+$sitePage = new SitePage(false);
 
 if (isset($_GET['hash']) && $_GET['hash']) {
     $resource = Storage_ResourceMapper::getInstance()->getByHash($_GET['hash']);

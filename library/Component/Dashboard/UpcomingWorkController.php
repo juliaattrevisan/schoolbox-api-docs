@@ -258,6 +258,15 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
 
         return true;
     }
+
+    /**
+     * Retrieves upcoming work as populated by execute().
+     *
+     * @return array
+     */
+    public function getDataFromExecute() {
+        return $this->upcomingWork;
+    }
 }
 
 /**
