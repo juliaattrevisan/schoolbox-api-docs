@@ -109,7 +109,7 @@ class Eportfolio_Authenticator {
 		 * Selected parents, groups and individuals can view contents.
 		 */
 		$youAreAdmin = $this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff();
-		$youArePageOwner = ($this->getOwnerId() == $this->getCurrentUserId());
+		$youArePageOwner = ($this->getEportfolioHandler()->getSettingsPageOwner() == $this->getCurrentUserId());
 
 		if ($youAreAdmin || $youArePageOwner) {
 			return true;
