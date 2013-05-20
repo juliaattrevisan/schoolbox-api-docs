@@ -121,8 +121,8 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                 // what to display if staff
                 elseif ($this->groupHandler->isStaff() && $submission['owner'] == $_SESSION['id']) {
                     $actionURL = '/submission/viewSubmission/' . $submission['id'];
+                    $this->setVar('duework_actions_block', '<a href="/submission/createSubmission/modify/'.$submission['id'].'">Modify</a>');
                 }
-
                 // if anybody else, don't display anything
                 else {
                     $this->setVar('duework_actions_block', '');
@@ -153,24 +153,26 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         else
             $this->parse("submit_dw_block", "submit_dw");
 
-	    // is the current user a member of this category?
-	    $catAccess = $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext('id'));
-	    $subAccess = false;
-	    if($this->getContext('code')) {
-		    $subAccess = $this->groupHandler->involvedInSubject($this->getContext('code'));
-	    }
-
 	    // if the user is SOMEHOW involved in this category...
-	    if($catAccess || $subAccess) {
-		    $this->setVar(array(
-				'WORK_YEAR' => date('Y'),
-				'WORK_SEMESTER' => DueWork_All::getSemester()
-			));
-		    $this->parse('allwork_button_block', 'allwork_button');
-	    }
-	    else {
-		    $this->setVar('allwork_button_block', '');
-	    }
+	    $this->setVar('allwork_button_block', '');
+
+	    if($this->groupHandler->isStudent()) {
+
+            // is the current user a member of this category?
+            $catAccess = $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext('id'));
+            $subAccess = false;
+            if($this->getContext('code')) {
+                $subAccess = $this->groupHandler->involvedInSubject($this->getContext('code'));
+            }
+
+            if($catAccess || $subAccess ) {
+                $this->setVar(array(
+                    'WORK_YEAR' => date('Y'),
+                    'WORK_SEMESTER' => DueWork_All::getSemester()
+                ));
+                $this->parse('allwork_button_block', 'allwork_button');
+            }
+        }
 
         return true;
     }
