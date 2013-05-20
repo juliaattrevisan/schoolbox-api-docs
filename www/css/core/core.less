@@ -7924,7 +7924,8 @@ label {
     }
 }
 
-ul.activity-list {
+ul.activity-list,
+ul.submission-list {
     li {
         padding: 8px 4px;
         position: relative;
@@ -7932,9 +7933,9 @@ ul.activity-list {
         overflow: hidden;
         min-height: 32px;
         border-bottom: 1px solid @border-color;
-        &:hover {
-            background-color: @pcard-hover
-        }
+		&:hover {
+			background-color: @pcard-hover
+		}
         .icon {
             .inline-block;
             width: 32px;
@@ -7943,6 +7944,7 @@ ul.activity-list {
             top: 50%;
             margin-top: -11px;
             left: 4px;
+			font-size: 2em;
             &.pin               { .activity-icon(0, 0) }
             &.file              { .activity-icon(0, 1) }
             &.clock             { .activity-icon(0, 2) }

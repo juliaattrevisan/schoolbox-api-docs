@@ -1,31 +1,22 @@
 <div class="box listing clearfix">
     <h2>Most Recent Submissions</h2>
 
-    <table class="due-dates">
-        <thead>
-        <tr>
-            <th width="18%">Subject</th>
-            <th>Assessment Title</th>
-            <th width="15%">Submissions</th>
-            <th width="20%">Last</th>
-        </tr>
-        </thead>
-        <tbody>
+    <ul class="submission-list">
         <!-- BEGIN work -->
-        <tr class="{ROW_COLOR}">
-            <td><a href="/homepage/{WORK_SUBJECT_ID}">{WORK_SUBJECT}</a></td>
-            <td>
+        <li class="{ROW_COLOR}">
+            <span class="icon">{WORK_COUNT}</span>
+            <p>
                 <!-- BEGIN submission -->
                 <a href="/submission/viewSubmission/{WORK_BOX_ID}">{WORK_DESCRIPTION}</a>
                 <!-- END submission -->
                 <!-- BEGIN assess -->
                 <a href="/assess/results/{WORK_BOX_ID}">{WORK_DESCRIPTION}</a>
                 <!-- END assess -->
-            </td>
-            <td nowrap="nowrap">{WORK_COUNT}</td>
-            <td>{WORK_DATE}</td>
-        </tr>
+                <br /><a href="/homepage/{WORK_SUBJECT_ID}">{WORK_SUBJECT}</a>
+
+                <span class="time">{WORK_DATE}</span>
+            </p>
+        </li>
         <!-- END work -->
-        </tbody>
-    </table>
+    </ul>
 </div>
