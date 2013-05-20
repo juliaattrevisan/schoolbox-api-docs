@@ -173,8 +173,6 @@ if (is_array($fileList) && count($fileList) > 0) {
 			'FILE_ID' => $file['id'],
 			'TYPE' => $file['url'] ? 'link' : 'file',
 			'FILE_NAME' => TextFormatter::cutString(Scrub::text($file['description']), 32),
-//			'FILE_MODIFIED' => $fileModifiedTime->setPrefix('')->getRelativeTime(),
-//			'FILE_OWNER' => $userHandler->formatName($file),
 			'FILE_SIZE' => $file['file_size'] > 0 ? Alaress_Byte_Format::bytesToString($file['file_size']) : "--",
 			'CATEGORY_ID' => $file['category'],
 			'CLASS' => implode(" ", $class),
