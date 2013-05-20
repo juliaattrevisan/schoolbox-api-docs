@@ -45,15 +45,21 @@ then
 	/vagrant/tools/generate-dir-sql.sh /vagrant/data /vagrant >> /home/vagrant/schoolboxdemo-vagrant-latest.sql;
 	echo "$vag Applying vagrant SQL fixes";
 	mysql -u root -ptnp879 schoolbox < /home/vagrant/schoolboxdemo-vagrant-latest.sql
-        echo "$vag Removing existing apache vhosts";
-        rm -f /etc/apache2/sites-enabled/*;
-        echo "$vag Enabling Schoolbox apache vhost";
-        cp /home/vagrant/schoolboxdemo-latest.vhost /etc/apache2/sites-available/schoolbox.vhost
-        a2ensite schoolbox.vhost
+	echo "$vag Removing existing apache vhosts";
+	rm -f /etc/apache2/sites-enabled/*;
+	echo "$vag Enabling Schoolbox apache vhost";
+	cp /home/vagrant/schoolboxdemo-latest.vhost /etc/apache2/sites-available/schoolbox.vhost
+	a2ensite schoolbox.vhost
 	cp /home/vagrant/schoolboxdemo-latest-dav.vhost /etc/apache2/sites-available/schoolbox-dav.vhost
 	a2ensite schoolbox-dav.vhost
 	puppet apply -e 'package { "javascript-common": ensure => absent }' > /dev/null;
-        service apache2 restart
+	service apache2 restart
+	echo "$vag Set up video cronjobs"
+	cp -f /vagrant/tools/cron/schoolboxdev /home/vagrant/schoolboxdemo-latest-cron
+	sed -i 's/usr\/share\/schoolboxdev/vagrant/g' /home/vagrant/schoolboxdemo-latest-cron
+	sed -i 's/var\/log/vagrant\/data/g' /home/vagrant/schoolboxdemo-latest-cron
+	sed -i 's/schoolboxdev/vagrant/g' /home/vagrant/schoolboxdemo-latest-cron
+	cp -f /home/vagrant/schoolboxdemo-latest-cron /etc/cron.d/vagrant
 	echo "$vag Loading all demo data complete";
 fi
 echo "$vag Ensure all services are running";
