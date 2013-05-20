@@ -177,6 +177,12 @@ class Eportfolio_Authenticator {
 		$youAreAdmin = $this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff();
 		$youArePageOwner = ($this->getEportfolioHandler()->getSettingsPageOwner() == $this->getCurrentUserId());
 
+		/* Skip all that individual permissions stuff if possible
+		 */
+		if ($youAreAdmin || $youArePageOwner) {
+			return true;
+		}
+
 		/* The current user can either be in a group, be a parent, or be an individual (or all three)
 		 * who has/have been given View access to a particular page.
 		 */
@@ -249,7 +255,7 @@ class Eportfolio_Authenticator {
 
 		/* And now...the conclusion.
 		 */
-		if ($youAreAdmin || $youArePageOwner || $youCanView) {
+		if ($youCanView) {
 			return true;
 		}
 
