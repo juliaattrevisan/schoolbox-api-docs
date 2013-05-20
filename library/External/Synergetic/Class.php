@@ -29,8 +29,14 @@ class External_Synergetic_Class implements External_ClassInterface
 
     public function getStudents($subCode)
     {
+	    if(!$subCode) {
+		    /* Dont bother if you got no code */
+		    return false;
+	    }
+
         $classQuery = '(';
-        $subCodeArray = explode(',', $subCode);
+
+	    $subCodeArray = explode(',', $subCode);
         foreach ($subCodeArray as $code) {
 
             if(strpos($code, '/') !== FALSE ) {
