@@ -1,0 +1,137 @@
+<?php
+/**
+ * Synchronise_Synergetic_Toorak_Strategy_Parent
+ *
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2013, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ * @shamelessly_pilfered_from <steve.chan@alaress.com.au>, <matt.day@alaress.com.au>
+ */
+
+class Synchronise_Synergetic_Toorak_Strategy_Parent extends Synchronise_Synergetic_Toorak_Strategy_Abstract {
+
+	/**
+	 * Get a list of users' Synergy IDs to sync
+	 *
+	 * @return void
+	 */
+	public function generateList() {
+		$this->collateList($this->getExternalUserHandler()->getParentUserAccountInfo());
+	}
+
+	/**
+	 * Set up the new user's details
+	 *
+	 * @param  $currentUser
+	 * @return array
+	 */
+	public function setupUserDetails($currentUser) {
+		$newUser = array();
+
+		$parent = $this->getExternalUserHandler()->getParent($currentUser['StudentContactID']);
+
+		// User details
+		$newUser['username']   = $currentUser['StudentContactID'];
+		$newUser['synergy_id'] = $currentUser['StudentContactID'];
+		$newUser['title']      = $currentUser['StudentContactTitle'];
+		$newUser['firstname']  = $currentUser['StudentContactPreferred'];
+		$newUser['lastname']   = $currentUser['StudentContactSurname'];
+		$newUser['alt_email']  = $parent['DirectoryIncludeFlag'] ? $currentUser['StudentContactDefaultEmail'] : '';
+
+		// get campuses of attached children
+		$newUser['campus']        = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
+		$newUser['defaultCampus'] = $newUser['campus'][0];
+		$newUser['group_id']      = self::PARENT_GROUP_ID;
+		$newUser['su']            = false;
+
+		return $newUser;
+	}
+
+	/**
+	 * Set up the new user's spouse's details
+	 *
+	 * @param $currentUser
+	 * @return array
+	 */
+	public function setupSpouseDetails($currentUser) {
+		$newUser = array();
+
+		$parent = $this->getExternalUserHandler()->getParent($currentUser['StudentContactSpouseID']);
+
+		// User details
+		$newUser['username']   = $currentUser['StudentContactSpouseID'];
+		$newUser['synergy_id'] = $currentUser['StudentContactSpouseID'];
+		$newUser['title']      = $currentUser['StudentContactSpouseTitle'];
+		$newUser['firstname']  = $currentUser['StudentContactSpousePreferred'];
+		$newUser['lastname']   = $currentUser['StudentContactSpouseSurname'];
+		$newUser['alt_email']  = $parent['DirectoryIncludeFlag'] ? $currentUser['StudentContactSpouseDefaultEmail'] : '';
+
+		// get campuses of kids
+		$newUser['campus']        = array($this->getCampusFromYearLevel($currentUser['StudentYearLevel']));
+		$newUser['defaultCampus'] = $newUser['campus'][0];
+		$newUser['group_id']      = self::PARENT_GROUP_ID;
+		$newUser['su']            = false;
+
+		return $newUser;
+	}
+
+
+	/**
+	 * If the users exist in Synergy but not in Schoolbox, create an account for
+	 * them
+	 *
+	 * @return void
+	 */
+	public function createIfExists() {
+		$previousUser = null;
+		$compiledCampus = array();
+
+		$this->getVerboseFilter()->intro();
+
+		foreach($this->getList() as $currentUser) {
+			$newUser = $this->setupUserDetails($currentUser);
+			$newSpouse = $this->setupSpouseDetails($currentUser);
+
+			/* First iteration
+				*/
+			if ($previousUser == null) {
+				if (is_array($newUser['campus'])) {
+					$compiledCampus = $newUser['campus'];
+				}
+
+				$previousUser = $newUser;
+				$previousSpouse = $newSpouse;
+			}
+			/* Previous was different person to Current
+				*/
+			else if ($previousUser['synergy_id'] != $newUser['synergy_id']) {
+				$previousUser['campus'] = $compiledCampus;
+				$previousSpouse['campus'] = $compiledCampus;
+
+				/* Uniquify campus list
+					 */
+				$previousUser['campus'] = array_unique($previousUser['campus']);
+				$previousSpouse['campus'] = array_unique($previousSpouse['campus']);
+
+				/* Update previous user
+					 */
+				$this->executeCreateUpdate($previousUser);
+				$this->executeCreateUpdate($previousSpouse);
+
+				/* Recompile
+					 */
+				$compiledCampus = $newUser['campus'];
+
+				$previousUser = $newUser;
+				$previousSpouse = $newSpouse;
+			}
+			/* They are the same person
+				*/
+			else {
+				$compiledCampus = array_merge($compiledCampus, $newUser['campus']);
+			}
+		}
+
+		$this->getVerboseFilter()->summary();
+	}
+}
