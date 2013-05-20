@@ -183,9 +183,8 @@ if (is_numeric($this->arg[0])) {
             if ($groupHandler->isStudent($user['uid'])) {
 
 	            //If student photo protected don't show other students
-	            if(Cfg::get('protect_student_photo')) {
-                    $this->parse("portrait_block", "portrait");
-	            }
+                $this->parse("portrait_block", "portrait");
+
 
 	            if($groupHandler->isStaff() || $groupHandler->isParentOfChild( $user['uid']) || $_SESSION['id'] == $user['uid']) {
 					//only allow staff to see student information or parent
