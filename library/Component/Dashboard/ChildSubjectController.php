@@ -31,6 +31,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
         $this->setBlock($templateHandle, "student_block", "student_subjects");
         $this->setBlock("student_block", "subject_block", "subject_item");
+		$this->setBlock('student_block', 'eportfolio', 'eportfolio_block');
 
         $i = 0;
 
@@ -52,11 +53,19 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                     }
                 }
 
+				/* ePortfolio link
+				 */
+				$authenticator = new \Eportfolio_Authenticator($_SESSION['id'], $child['id'], 'profile');
+
+				if ($authenticator->canView()) {
+					$this->parse('eportfolio_block', 'eportfolio');
+				}
+
                 $this->parse("student_subjects", "student_block", true);
                 $this->setVar('subject_item', '');
             }
-
         }
+
 
         if ( $i > 0 ) {
             return true;
