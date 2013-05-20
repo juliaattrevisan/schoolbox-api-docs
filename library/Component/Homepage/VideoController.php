@@ -76,7 +76,6 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 				$totalcompleted++;
 			}
 		    }
-		}
 		if($this->permission < WRITE_ACCESS) {
 		    $totalpending = 0;
 		}
