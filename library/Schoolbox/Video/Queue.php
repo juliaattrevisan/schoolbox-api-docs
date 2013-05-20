@@ -56,7 +56,11 @@ class Queue {
 
 		preg_match('/Duration: ([0-9\:]+)/',$this->getMessage(), $match);
 
+
+
+
 		if(isset($match[1])) {
+			$hours = $minutes = $seconds = 0;
 			sscanf($match[1], "%d:%d:%d", $hours, $minutes, $seconds);
 			$duration = isset($seconds) ? $hours * 3600 + $minutes * 60 + $seconds : $hours * 60 + $minutes;
 			$this->setDuration($duration);
@@ -69,7 +73,6 @@ class Queue {
 
 		if($return == 0){
 			exec($thumbnailString, $output, $return);
-			print_r($output);
 			if($return == 0)
 				return true;
 			else

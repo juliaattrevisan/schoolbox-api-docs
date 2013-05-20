@@ -179,6 +179,17 @@ class File extends DeprecatedModel {
         /* Insert log entry */
         $this->logAction($fileID, 'create');
 
+	    /* If video add to video processing queue */
+	    if(stristr($data['mime_type'],'video/')) {
+		    $mapper = new Schoolbox\Video\QueueMapper();
+	        $videoQ = new Schoolbox\Video\Queue();
+		    $videoQ->setFileID($fileID);
+		    $videoQ->setStatus( Schoolbox\Video\QueueMapper::STATUS_PENDING );
+		    $videoQ->setType( Schoolbox\Video\QueueMapper::FILE_TYPE_SBFS);
+
+		    $mapper->save($videoQ);
+	    }
+
         return $fileID;
     }
 
@@ -223,6 +234,14 @@ class File extends DeprecatedModel {
             parent::delete($id);
             $filename = Cfg::get('file_dir') . '/' . $id . '.dat';
             @unlink($filename);
+
+	        /* unlink video files */
+			$videoMapper = new Schoolbox\Video\ResourceVideoMapper();
+	        if($video = $videoMapper->findById($id)) {
+		        @unlink($video->getVideoLocation());
+		        @unlink($video->getThumbnailLocation());
+	        }
+
         }
         else {
             /* We just mark files as deleted */
