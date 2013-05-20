@@ -46,7 +46,7 @@ then
 	echo "$vag Applying vagrant SQL fixes";
 	mysql -u root -ptnp879 schoolbox < /home/vagrant/schoolboxdemo-vagrant-latest.sql
 	echo "$vag Removing existing apache vhosts";
-	rm -f /etc/apache2/sites-enabled/*;
+	rm -f /etc/apache2/sites-enabled/10*;
 	echo "$vag Enabling Schoolbox apache vhost";
 	cp /home/vagrant/schoolboxdemo-latest.vhost /etc/apache2/sites-available/schoolbox.vhost
 	a2ensite schoolbox.vhost
