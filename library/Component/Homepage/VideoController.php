@@ -72,28 +72,32 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 				                     'VIDEO_LIST_POSTER' => $video->getFile()->getOwner()->getFullName(),
 									 'ON_OFF' => ++$j % 2 ? '' : 'dark'
 			                   ));
-				));
 				$this->parse('video_list_block','video_list',true);
 				$totalcompleted++;
 			}
 		    }
-		    
+		}
+		if($this->permission < WRITE_ACCESS) {
+		    $totalpending = 0;
+		}
+		else{
 		    foreach($this->outputList as $video ) {
 			if($video->getStatus() != "completed"){
 				$this->setVar( array('VIDEO_LIST_ID'     => $video->getFile()->getId(),
-				                     'VIDEO_LIST_TITLE'  => Scrub::text($video->getFile()->getDescription()),
-				                     'VIDEO_LIST_DURATION'=> $video->getDuration()>=3600?gmdate('H:i:s',$video->getDuration()):gmdate('i:s',$video->getDuration()),
-				                     'VIDEO_LIST_COMMENT' => Scrub::text($video->getFile()->getComment()),
-				                     'VIDEO_LIST_HIDDEN' => $video->getFile()->getHidden() ? 'hidden' : '',
-				                     'VIDEO_LIST_POSTER_ID'=> $video->getFile()->getOwner()->getId(),
-				                     'VIDEO_LIST_POSTER' => $video->getFile()->getOwner()->getFullName(),
-				                     'VIDEO_LIST_STATUS' => $video->getStatus(),
-				                     'VIDEO_LIST_STATUSIMG' => "/images/core/component/video-thumbnail-".strtolower($video->getStatus()).".jpg",
+						    'VIDEO_LIST_TITLE'  => Scrub::text($video->getFile()->getDescription()),
+						    'VIDEO_LIST_DURATION'=> $video->getDuration()>=3600?gmdate('H:i:s',$video->getDuration()):gmdate('i:s',$video->getDuration()),
+						    'VIDEO_LIST_COMMENT' => Scrub::text($video->getFile()->getComment()),
+						    'VIDEO_LIST_HIDDEN' => $video->getFile()->getHidden() ? 'hidden' : '',
+						    'VIDEO_LIST_POSTER_ID'=> $video->getFile()->getOwner()->getId(),
+						    'VIDEO_LIST_POSTER' => $video->getFile()->getOwner()->getFullName(),
+						    'VIDEO_LIST_STATUS' => $video->getStatus(),
+						    'VIDEO_LIST_STATUSIMG' => "/images/core/component/video-thumbnail-".strtolower($video->getStatus()).".jpg",
 				));
 				$this->parse('video_pending_list_block','video_pending_list',true);
 				$totalpending++;
 			}
 		    }
+		}
 		    
 		    if($totalcompleted == 0){ $this->setVar('video_list_block',''); }
 		    if($totalpending == 0){ $this->setVar('video_pending_list_block',''); }
