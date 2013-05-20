@@ -5,25 +5,28 @@
 		<ul>
 			<!-- BEGIN assess -->
 			<li class="wysiwyg {ON_OFF} clearfix">
-                <!-- BEGIN assessLink -->
+        <!-- BEGIN assessLink -->
 				<h4><a href="/assess/intro/{ASSESS_ASSESS_ID}">{ASSESS_TITLE}</a></h4>
-                <!-- END assessLink -->
-                <!-- BEGIN resumeLink -->
-                <h4><a href="/assess/attempt/{ASSESS_ASSESS_ID}/{ASSESS_SECTION_ID}">{ASSESS_TITLE}</a></h4>
-                <!-- END resumeLink -->
-                <!-- BEGIN assessNoLink -->
-                <h4>{ASSESS_TITLE}</h4>
-                <!-- END assessNoLink -->
+        <!-- END assessLink -->
+        <!-- BEGIN resumeLink -->
+        <h4><a href="/assess/attempt/{ASSESS_ASSESS_ID}/{ASSESS_SECTION_ID}">{ASSESS_TITLE}</a></h4>
+        <!-- END resumeLink -->
+        <!-- BEGIN assessNoLink -->
+        <h4>{ASSESS_TITLE}</h4>
+        <!-- END assessNoLink -->
 				<div class="small-right">
-                    <p>
-                    {ASSESS_FINISH_DATE}
-					<!-- BEGIN teacherLink -->
-					<a href="/assess/results/{ASSESS_ASSESS_ID}">View Results</a><br />
-					<a href="/assess/modify/{ASSESS_ASSESS_ID}">Modify</a><br />
-					<!-- END teacherLink -->
-                    </p>
-				</div>
-                <div class="summ {COMPONENT_COMPACTMODE} ">{ASSESS_DESCRIPTION}</div>
+          <p>
+          {ASSESS_FINISH_DATE}
+            <!-- BEGIN teacherLink -->
+            <a href="/assess/results/{ASSESS_ASSESS_ID}">View Results</a><br />
+            <a href="/assess/modify/{ASSESS_ASSESS_ID}">Modify</a><br />
+            <!-- END teacherLink -->
+            <!-- BEGIN studentLink -->
+            <a href="/assess/studentReview/{ASSESS_ASSESS_ID}/{ASSESS_SECTION_ID}/{ASSESS_ATTEMPT_ID}">View Results</a><br />
+            <!-- END studentLink -->
+          </p>
+        </div>
+        <div class="summ {COMPONENT_COMPACTMODE} ">{ASSESS_DESCRIPTION}</div>
 				<p class="interact {COMPONENT_COMPACTMODE}">Created by <a href='/search/user/{ASSESS_USER_ID}'>{ASSESS_USER_FIRSTNAME} {ASSESS_USER_LASTNAME}</a> {ASSESS_CREATED}</p>
 			</li>
 			<!-- END assess -->
