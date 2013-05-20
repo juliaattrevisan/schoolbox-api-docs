@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once('../include/Bootstrap.php');
+require_once('../../../include/Bootstrap.php');
 
 $allTemplates = new \Schoolbox\Collection();
 
