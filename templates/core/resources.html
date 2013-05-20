@@ -92,6 +92,15 @@ $j(function() {
 
 	});
 
+  // explicit case for server node
+  $j('#tree tr.server').live('click', function () {
+    threePanel.getMeta(0);
+    $j('#tree .selected').removeClass('selected');
+    $j(this).addClass('selected');
+    $j('#file-list tbody tr').hide();
+
+  });
+
 	var initialiseFiles = function (relationID) {
 
 		var newChildren = $j('tr.category-' + relationID + ':not(.empty)'), categoryNode = $j('#node-' + relationID);
