@@ -77,22 +77,45 @@ class Eportfolio_Authenticator {
 	}
 
 	/**
+	 * Determine whether the owner's eportfolio is actually enabled
+	 *
+	 * @return bool
+	 */
+	private function isEportfolioEnabled() {
+		$user = $this->getUserHandler()->getById($this->getOwnerId());
+
+		if (is_array($user) && ($user['eportfolio_enabled'] == 1)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Determine if a particular person owns a particular page
 	 * This excludes the hardcoded public pages
 	 *
 	 * @return bool
 	 */
 	public function pageExists() {
-		if (in_array($this->getPageId(), $this->getPublicPages()) || ($this->getPageId() == 'create')) {
-			return true;
+
+		/* Check whether eportfolio is even enabled in the first place
+		 */
+		if (!$this->isEportfolioEnabled()) {
+			error(100);
 		}
 		else {
-			$pageMapper = new \Eportfolio\PageMapper();
-
-			$exists = $pageMapper->findById($this->getPageId());
-
-			if ($exists && ($exists->getDeletedAt() == null)) {
+			if (in_array($this->getPageId(), $this->getPublicPages()) || ($this->getPageId() == 'create')) {
 				return true;
+			}
+			else {
+				$pageMapper = new \Eportfolio\PageMapper();
+
+				$exists = $pageMapper->findById($this->getPageId());
+
+				if ($exists && ($exists->getDeletedAt() == null)) {
+					return true;
+				}
 			}
 		}
 
@@ -103,6 +126,12 @@ class Eportfolio_Authenticator {
 	 * Determine whether the $userId can create a new page
 	 */
 	public function canCreate() {
+
+		/* Check whether eportfolio is even enabled in the first place
+		 */
+		if (!$this->isEportfolioEnabled()) {
+			error(100);
+		}
 
 		/* If $user can modify page, continue; otherwise die
 		 * Superusers, staff and page owners can view contents.
@@ -124,6 +153,12 @@ class Eportfolio_Authenticator {
 	 * @return bool
 	 */
 	public function canView() {
+
+		/* Check whether eportfolio is even enabled in the first place
+		 */
+		if (!$this->isEportfolioEnabled()) {
+			error(100);
+		}
 
 		/* If $user can modify page, continue; otherwise die
 		 * Superusers, staff and page owners can view contents.
@@ -217,6 +252,12 @@ class Eportfolio_Authenticator {
 	 * @return bool
 	 */
 	public function canModify() {
+
+		/* Check whether eportfolio is even enabled in the first place
+		 */
+		if (!$this->isEportfolioEnabled()) {
+			error(100);
+		}
 
 		/* If $user can modify page, continue; otherwise die
 		 * Superusers, staff and page owners can view contents.
