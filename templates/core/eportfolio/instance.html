@@ -272,23 +272,40 @@
 		<div class="clearfix">
 			<form method='post' action='/eportfolio/configForm.php'>
                 <table class="standardForm">
-                <tr>
-                    <td class="formLabelWidth">
-                        <h4>Page Title</h4>
-                        <em>Specify a title for this page</em>
-                    </td>
-                    <td>
-                        <p>
-                            <input type='text' name='pageTitle' value="{PAGE_TITLE}" />
-                            <input type='hidden' name='user_id' value='{USER_ID}' />
-                            <input type='hidden' name='page_id' value='{PAGE_ID}' />
-                            <input type="submit" label="Submit" value="Update Page" class="submit-btn-plain" style="float:none;"/>
-                        </p>
-                    </td>
-                </tr>
+					<tr>
+						<td class="formLabelWidth">
+							<h4>Page Title</h4>
+							<em>Specify a title for this page</em>
+						</td>
+						<td>
+							<p>
+								<input type='text' name='pageTitle' value="{PAGE_TITLE}" />
+								<input type='hidden' name='user_id' value='{USER_ID}' />
+								<input type='hidden' name='page_id' value='{PAGE_ID}' />
+								<input type="submit" label="Submit" value="Update Page" class="submit-btn-plain" style="float:none;"/>
+							</p>
+						</td>
+					</tr>
                 </table>
-
             </form>
+
+			<form method='post' action='/eportfolio/configForm.php'>
+				<table class="standardForm">
+					<tr>
+						<td class="formLabelWidth">
+							<h4>Delete Page</h4>
+							<em>Remove this page from your ePortfolio</em>
+						</td>
+						<td>
+							<p>
+								<input type='hidden' name='page_id' value='{PAGE_ID}' />
+								<input type='hidden' name='deletePage' value='true' />
+								<input type='submit' label="Submit" value='Delete page' class="submit-btn-plain" style="float:none;"/>
+							</p>
+						</td>
+					</tr>
+				</table>
+			</form>
 
 			<form method="post" action="">
 				<p class="information-notification pad-it">
@@ -302,12 +319,6 @@
 					</div>
 				</div>
 				<div class="saved-layout">Saved layout</div>
-			</form>
-
-			<form method='post' action='/eportfolio/configForm.php'>
-				<input type='hidden' name='page_id' value='{PAGE_ID}' />
-				<input type='hidden' name='deletePage' value='true' />
-				<input type='submit' value='Delete page' />
 			</form>
 		</div>
 	</div>
