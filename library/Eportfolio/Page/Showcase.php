@@ -33,13 +33,25 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract {
 		$this->getPage()->setBlock('showcased_work', 'has_modify_form', 'has_modify_form_block');
 		$this->getPage()->setBlock('showcased_work', 'has_submission', 'has_submission_block');
 		$this->getPage()->setBlock('showcased_work', 'no_submission', 'no_submission_block');
+		$this->getPage()->setBlock(TEMPLATE_content, 'has_intro', 'has_intro_block');
 
+		/* User details
+		 */
 		$user = $this->getUser();
 
 		$this->getPage()->setVar(array(
 			'USER_FIRSTNAME' => $user['firstname'],
 			'USER_LASTNAME' => $user['lastname'],
 		));
+
+		/* Intro text
+		 */
+		if ($this->getEportfolioHandler()->getUserId() == $_SESSION['id']) {
+			$this->getPage()->parse('has_intro_block', 'has_intro');
+		}
+		else {
+			$this->getPage()->setVar('has_intro_block', '');
+		}
 
 		/* Render mime types
 		 */
