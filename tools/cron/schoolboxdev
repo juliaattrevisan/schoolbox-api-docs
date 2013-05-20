@@ -29,5 +29,4 @@ MAILTO="support@schoolbox.com.au"
 #00 11 * * 5   root    php /usr/share/schoolboxdev/tools/digest/weekly.php >> /var/log/schoolbox-digest-weekly.log 2>/dev/null
 
 # Plagscan callback - every hour
-# -- Disabled in dev because the Plagscan API may not be set up
-#0 * * * *    root    php /usr/share/schoolbox/tools/plagscan/scan.php >> /var/log/schoolbox-plagscan.log 2>/dev/null
+0 * * * *    root    php /usr/share/schoolboxdev/tools/plagscan/scan.php >> /var/log/schoolbox-plagscan.log 2>/dev/null
