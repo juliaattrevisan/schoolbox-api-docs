@@ -226,12 +226,12 @@ $("#header").on(clickEvent, '#currentPage', scrollTop)
 
 $("#bubble").on(clickEvent, '.close', function(e){
     $('#bubble').remove();
-    localStorage.setItem('pinned',true)
+    localStorage.setItem('pinned', true);
     return false;
 });
 
 $("#bubble").on(clickEvent, '.wp', function(e){
-    localStorage.setItem('pinned','true');
+    localStorage.setItem('pinned', true);
     $('body').load('/m/ie.html');
     return false;
 });
