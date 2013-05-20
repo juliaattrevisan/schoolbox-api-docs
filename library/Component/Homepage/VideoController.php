@@ -55,20 +55,15 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 
 	    $this->setBlock($templateHandle, 'default_video', 'default_video_block');
 	    $this->setBlock($templateHandle, 'video_list', 'video_list_block');
+	    $this->setBlock($templateHandle, 'video_pending_list', 'video_pending_list_block');
 
-	    if(is_object($this->defaultVideo)) {
-	        $this->setVar('DEFAULT_VIDEO_ID', $this->defaultVideo->getFile()->getId());
-	        $this->parse('default_video_block','default_video');
-        }
-	    else {
-		    $this->setVar('default_video_block','');
-	    }
 	    if(count($this->outputList)) {
 			$j = 0;
-
-
+		$totalcompleted = 0;
+		$totalpending = 0;
 		    foreach($this->outputList as $video ) {
-			    $this->setVar( array('VIDEO_LIST_ID'     => $video->getFile()->getId(),
+			if($video->getStatus() == "completed"){
+				$this->setVar( array('VIDEO_LIST_ID'     => $video->getFile()->getId(),
 				                     'VIDEO_LIST_TITLE'  => Scrub::text($video->getFile()->getDescription()),
 				                     'VIDEO_LIST_DURATION'=> $video->getDuration()>=3600?gmdate('H:i:s',$video->getDuration()):gmdate('i:s',$video->getDuration()),
 				                     'VIDEO_LIST_COMMENT' => Scrub::text($video->getFile()->getComment()),
@@ -77,11 +72,44 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 				                     'VIDEO_LIST_POSTER' => $video->getFile()->getOwner()->getFullName(),
 									 'ON_OFF' => ++$j % 2 ? '' : 'dark'
 			                   ));
+				));
 				$this->parse('video_list_block','video_list',true);
+				$totalcompleted++;
+			}
 		    }
+		    
+		    foreach($this->outputList as $video ) {
+			if($video->getStatus() != "completed"){
+				$this->setVar( array('VIDEO_LIST_ID'     => $video->getFile()->getId(),
+				                     'VIDEO_LIST_TITLE'  => Scrub::text($video->getFile()->getDescription()),
+				                     'VIDEO_LIST_DURATION'=> $video->getDuration()>=3600?gmdate('H:i:s',$video->getDuration()):gmdate('i:s',$video->getDuration()),
+				                     'VIDEO_LIST_COMMENT' => Scrub::text($video->getFile()->getComment()),
+				                     'VIDEO_LIST_HIDDEN' => $video->getFile()->getHidden() ? 'hidden' : '',
+				                     'VIDEO_LIST_POSTER_ID'=> $video->getFile()->getOwner()->getId(),
+				                     'VIDEO_LIST_POSTER' => $video->getFile()->getOwner()->getFullName(),
+				                     'VIDEO_LIST_STATUS' => $video->getStatus(),
+				                     'VIDEO_LIST_STATUSIMG' => "/images/core/component/video-thumbnail-".strtolower($video->getStatus()).".jpg",
+				));
+				$this->parse('video_pending_list_block','video_pending_list',true);
+				$totalpending++;
+			}
+		    }
+		    
+		    if($totalcompleted == 0){ $this->setVar('video_list_block',''); }
+		    if($totalpending == 0){ $this->setVar('video_pending_list_block',''); }
 	    }
 	    else {
 		    $this->setVar('video_list_block','');
+		    $this->setVar('video_pending_list_block','');
+	    }
+
+
+	    if(is_object($this->defaultVideo) AND $totalcompleted != 0) {
+		$this->setVar('DEFAULT_VIDEO_ID', $this->defaultVideo->getFile()->getId());
+		$this->parse('default_video_block','default_video');
+	    }
+	    else {
+		$this->setVar('default_video_block','');
 	    }
 
         return true; // everything went according to plan
