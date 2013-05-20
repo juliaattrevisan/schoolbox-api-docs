@@ -60,6 +60,7 @@ else {
 	$response = getMultiFileMeta($folderId);
 }
 
+header('Content-Type: application/json');
 die(json_encode($response));
 
 
@@ -72,6 +73,7 @@ die(json_encode($response));
  */
 function sendError($errString) {
 	header('HTTP/1.1 400 Bad Request');
+	header('Content-Type: application/json');
 	die(json_encode(array('error', $errString)));
 }
 

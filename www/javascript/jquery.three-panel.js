@@ -53,7 +53,18 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
 
         $j.post(this.callbackURL, {folderId: folderId}, function(response) {
 
-            var meta = JSON.parse(response), mime
+            var meta, mime, responseType = (typeof(response)).toLowerCase()
+
+            if(responseType === 'object') {
+                meta = response;
+            }
+            else if(responseType === 'string') {
+                meta = JSON.parse(response);
+            }
+            else {
+                // something went wrong and we can't parse metadata
+                return
+            }
 
             threePanel.folderDetail.find('.name').html(meta.name)
 
@@ -149,7 +160,18 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
 
         $j.post(this.callbackURL, {folderId: folderId, files: idList}, function(response) {
 
-            var meta = JSON.parse(response)
+            var meta, responseType = (typeof(response)).toLowerCase()
+
+            if(responseType === 'object') {
+                meta = response;
+            }
+            else if(responseType === 'string') {
+                meta = JSON.parse(response);
+            }
+            else {
+                // something went wrong and we can't parse metadata
+                return
+            }
 
             // show multi
             if(typeof(meta.name) == 'undefined') {
@@ -190,8 +212,8 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
                 // image, display a preview
                 else if(meta.mime.match(/image.*/)) {
                     var src
-                    if(threePanel.context = 'eportfolio') {
-                        src = '/cms/sendMyFile.php?id='+meta.id+'&width=128&height=128'
+                    if(threePanel.context == 'eportfolio') {
+                        src = '/cms/myImage.php?id='+meta.id+'&width=128&height=128'
                     }
                     else {
                         src = '/cms/image.php?id='+meta.id+'&width=128&height=128'
