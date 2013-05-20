@@ -13,7 +13,7 @@
 	compress
 }
 
-/var/log/schoolbox*digest* {
+/var/log/schoolbox-digest* {
 	weekly
 	missingok
 	rotate 4
