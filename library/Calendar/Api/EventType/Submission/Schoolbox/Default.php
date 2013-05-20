@@ -29,19 +29,24 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 	 * @return Calendar_Event_Collection
 	 */
 	public function getEvents($startTimestamp, $endTimestamp) {
+		$stack       = new Calendar_Event_Collection();
+		$user_mapper = new Schoolbox\UserMapper();
+		$user        = $user_mapper->findById($_SESSION['id']);
+		if (!$user instanceof Schoolbox\User) {
+			return $stack;
+		}
+
 		//
 		// Use the mapper classes to get events for this day.
 		// Also, need the categories to filter on.
 		// Don't like using session here but other event types use them, so meh.
 		$cat_mapper = new Schoolbox\Resource\CategoryMapper();
 		$cat_mapper->setExternalUser(new External_User());
-		$user_mapper = new Schoolbox\UserMapper();
 		$category_id_list = array();
-		foreach ($cat_mapper->findForUser($user_mapper->findById($_SESSION['id'])) as $category) {
+		foreach ($cat_mapper->findForUser($user) as $category) {
 			$category_id_list[] = $category->getId();
 		}
 
-		$stack         = new Calendar_Event_Collection();
 		$box_mapper    = new Schoolbox\Assessment\Component\SubmissionBoxMapper();
 		$assess_mapper = new Schoolbox\Assessment\Component\OnlineAssessmentMapper();
 		$activities    = $box_mapper->getDueActivities($category_id_list, $startTimestamp, $endTimestamp);
