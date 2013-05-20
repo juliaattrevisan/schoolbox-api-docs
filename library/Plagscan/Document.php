@@ -16,6 +16,11 @@ class Plagscan_Document extends Model {
 
     const STATUS_COMPLETE = 3;
 
+    /**
+     * Status of the document, if it's returned as unscannable?
+     */
+    const STATUS_UNSCANNABLE = -1;
+
     public $id;
 
     public $file;

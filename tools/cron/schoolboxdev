@@ -27,3 +27,6 @@ MAILTO="support@schoolbox.com.au"
 # -- also not to be run for dev
 #00 06 * * 1-4 root    php /usr/share/schoolboxdev/tools/digest/daily.php  >> /var/log/schoolbox-digest-daily.log 2>/dev/null
 #00 11 * * 5   root    php /usr/share/schoolboxdev/tools/digest/weekly.php >> /var/log/schoolbox-digest-weekly.log 2>/dev/null
+
+# Plagscan callback - every hour
+0 * * * *    root    php /usr/share/schoolboxdev/tools/plagscan/scan.php >> /var/log/schoolbox-plagscan.log 2>/dev/null

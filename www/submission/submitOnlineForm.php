@@ -67,12 +67,14 @@ if (!$is_draft) {
 
 		//
 		// Make a temp file for Plagscan to work with.
+		// Molest the filename so that Plagscan always accepts the document as
+		// scannable.
 		$tempfile = tempnam(sys_get_temp_dir(), 'pgs');
 		file_put_contents($tempfile, $body);
 		$document->file = array(
 			'id'   => $submission_id,
-			'name' => $_FILES['file']['name'],
-			'file' => $submission->getFilename(),
+			'name' => $submission->getFilename().'.html',
+			'file' => $tempfile,
 		);
 
 		// argument[1] ('true') here sends the redirect header and closes the connection, but allows us to continue processing
