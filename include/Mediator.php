@@ -39,6 +39,7 @@ class Mediator {
     public function __construct($url = '') {
         // general config
         set_error_handler('Core_Mediator_ErrorHandler');
+	    session_set_cookie_params(MOBILE_SESSION_TIMEOUT);
         session_start();
 
         $regex = "#^/m/(.*)$#si";
