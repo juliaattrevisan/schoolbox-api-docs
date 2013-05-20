@@ -277,7 +277,7 @@ if (!empty($result['user'])) {
             $page->parse('modify_block', 'modify');
 
 		/* ePortfolio link
-		*/
+		 */
 		$authenticator = new \Eportfolio_Authenticator($_SESSION['id'], $user['id'], 'profile');
 
 		if ($authenticator->canView()) {
