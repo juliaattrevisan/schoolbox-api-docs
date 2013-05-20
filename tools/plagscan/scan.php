@@ -39,16 +39,24 @@ foreach ($docs as $doc) {
 	}
 
 	//
+	// Is this document scannable? If not, mark as such and don't scan again.
+	if ((string)$stats->MSG === 'ERR') {
+		$doc->status = Plagscan_Document::STATUS_UNSCANNABLE;
+		Plagscan_DocumentMapper::getInstance()->save($doc);
+		continue;
+	}
+
+	//
 	// Has a level been retrieved yet? How can I tell?
 	$level = (string)$stats->LEVEL;
 	if (strlen($level) > 0) {
 		$doc->score  = $level / 10;
 		$doc->status = Plagscan_Document::STATUS_COMPLETE;
-		$doc->html =  $gateway->retrieve($doc_id, Plagscan_Gateway::MODE_RETRIEVE_HTML_INTERACTIVE);
+		$doc->html   = $gateway->retrieve($doc_id, Plagscan_Gateway::MODE_RETRIEVE_HTML_INTERACTIVE);
 		Plagscan_DocumentMapper::getInstance()->save($doc);
 		$updated_docs++;
 	}
 }
 
 echo strftime("[%F %T] Plagscan scan completed: ");
-printf("%d documents marked as completed.\n", $updated_docs);
+printf("%d documents marked as scanned.\n", $updated_docs);
