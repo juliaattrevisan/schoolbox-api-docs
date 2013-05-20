@@ -39,6 +39,13 @@ class Eportfolio_Authenticator {
 	private $userHandler = null;
 
 	/**
+	 * A user record from handler
+	 *
+	 * @var array
+	 */
+	private $owner = array();
+
+	/**
 	 * An instance of group handler
 	 *
 	 * @var null
@@ -74,6 +81,24 @@ class Eportfolio_Authenticator {
 		$this->setUserHandler(new User());
 		$this->setGroupHandler(new Group(HOMEPAGE_SERVICE));
 		$this->setEportfolioHandler(new Eportfolio($this->getOwnerId(), $this->getPageId()));
+
+		/* The ePortfolio owner
+		 */
+		$this->setOwner($this->getUserHandler()->getById($this->getOwnerId()));
+	}
+
+	/**
+	 * Determine whether the owner's eportfolio is actually enabled
+	 *
+	 * @param $user
+	 * @return bool
+	 */
+	private function isEportfolioEnabled($user) {
+		if (is_array($user) && ($user['eportfolio_enabled'] == 1)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -83,16 +108,24 @@ class Eportfolio_Authenticator {
 	 * @return bool
 	 */
 	public function pageExists() {
-		if (in_array($this->getPageId(), $this->getPublicPages()) || ($this->getPageId() == 'create')) {
-			return true;
+
+		/* Check whether eportfolio is even enabled in the first place
+		 */
+		if (!$this->isEportfolioEnabled($this->getOwner())) {
+			return false;
 		}
 		else {
-			$pageMapper = new \Eportfolio\PageMapper();
-
-			$exists = $pageMapper->findById($this->getPageId());
-
-			if ($exists && ($exists->getDeletedAt() == null)) {
+			if (in_array($this->getPageId(), $this->getPublicPages()) || ($this->getPageId() == 'create')) {
 				return true;
+			}
+			else {
+				$pageMapper = new \Eportfolio\PageMapper();
+
+				$exists = $pageMapper->findById($this->getPageId());
+
+				if ($exists && ($exists->getDeletedAt() == null)) {
+					return true;
+				}
 			}
 		}
 
@@ -103,6 +136,12 @@ class Eportfolio_Authenticator {
 	 * Determine whether the $userId can create a new page
 	 */
 	public function canCreate() {
+
+		/* Check whether eportfolio is even enabled in the first place
+		 */
+		if (!$this->isEportfolioEnabled($this->getOwner())) {
+			return false;
+		}
 
 		/* If $user can modify page, continue; otherwise die
 		 * Superusers, staff and page owners can view contents.
@@ -125,12 +164,24 @@ class Eportfolio_Authenticator {
 	 */
 	public function canView() {
 
+		/* Check whether eportfolio is even enabled in the first place
+		 */
+		if (!$this->isEportfolioEnabled($this->getOwner())) {
+			return false;
+		}
+
 		/* If $user can modify page, continue; otherwise die
 		 * Superusers, staff and page owners can view contents.
 		 * Selected parents, groups and individuals can view contents.
 		 */
 		$youAreAdmin = $this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff();
 		$youArePageOwner = ($this->getEportfolioHandler()->getSettingsPageOwner() == $this->getCurrentUserId());
+
+		/* Skip all that individual permissions stuff if possible
+		 */
+		if ($youAreAdmin || $youArePageOwner) {
+			return true;
+		}
 
 		/* The current user can either be in a group, be a parent, or be an individual (or all three)
 		 * who has/have been given View access to a particular page.
@@ -204,7 +255,7 @@ class Eportfolio_Authenticator {
 
 		/* And now...the conclusion.
 		 */
-		if ($youAreAdmin || $youArePageOwner || $youCanView) {
+		if ($youCanView) {
 			return true;
 		}
 
@@ -217,6 +268,12 @@ class Eportfolio_Authenticator {
 	 * @return bool
 	 */
 	public function canModify() {
+
+		/* Check whether eportfolio is even enabled in the first place
+		 */
+		if (!$this->isEportfolioEnabled($this->getOwner())) {
+			return false;
+		}
 
 		/* If $user can modify page, continue; otherwise die
 		 * Superusers, staff and page owners can view contents.
@@ -362,5 +419,23 @@ class Eportfolio_Authenticator {
 	 */
 	private function getPublicPages() {
 		return $this->publicPages;
+	}
+
+	/**
+	 * Set owner
+	 *
+	 * @param array $owner
+	 */
+	private function setOwner($owner) {
+		$this->owner = $owner;
+	}
+
+	/**
+	 * Get owner
+	 *
+	 * @return array
+	 */
+	private function getOwner() {
+		return $this->owner;
 	}
 }

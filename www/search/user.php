@@ -613,11 +613,14 @@ if (is_numeric($this->arg[0])) {
         }
     }
 
-    /* Display eportfolio link only if it's enabled
-      */
-    if ($user['eportfolio_enabled']) {
-        $this->parse('eportfolio_block', 'eportfolio');
-    } else {
+	/* ePortfolio link
+	*/
+	$authenticator = new \Eportfolio_Authenticator($_SESSION['id'], $user['uid'], 'profile');
+
+	if ($authenticator->canView()) {
+		$this->parse('eportfolio_block', 'eportfolio');
+	}
+	else {
         $this->setVar('eportfolio_block', '');
     }
 

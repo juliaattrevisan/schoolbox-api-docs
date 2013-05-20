@@ -258,11 +258,6 @@ if (!empty($result['user'])) {
 
                 if (HELPDESK_enable)
                     $page->parse('helpdesk_block', 'helpdesk');
-
-                //Show link to users eportfolio
-                if ($user['eportfolio_enabled'])
-                    $page->parse('eportfolio_block', 'eportfolio');
-
             }
             if (Cfg::get('boarder_leave_enabled') == '1') {
                 if ($group->isStaff()) {
@@ -281,7 +276,15 @@ if (!empty($result['user'])) {
         else
             $page->parse('modify_block', 'modify');
 
-        $page->parse('user_block', 'user', true);
+		/* ePortfolio link
+		 */
+		$authenticator = new \Eportfolio_Authenticator($_SESSION['id'], $user['id'], 'profile');
+
+		if ($authenticator->canView()) {
+			$page->parse('eportfolio_block', 'eportfolio');
+		}
+
+		$page->parse('user_block', 'user', true);
     }
 
 	outputSeeMore($page, $type, $count, 'user');
