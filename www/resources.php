@@ -12,6 +12,38 @@ $this->setBlock(TEMPLATE_content, 'category_list', 'category_list_block');
 $this->setBlock(TEMPLATE_content, 'file_list', 'file_list_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 
+// 3rd-panel blocks
+$this->setBlock(TEMPLATE_content, 'folder_detail', 'folder_detail_block');
+$this->setBlock('folder_detail', 'folder_detail_perms', 'folder_detail_perms_block');
+$this->setBlock(TEMPLATE_content, 'file_detail', 'file_detail_block');
+$this->setBlock(TEMPLATE_content, 'multi_file_detail', 'multi_file_detail_block');
+
+// presently, the 3rd-panel blocks are being AJAX'd, so just blank their vars and render them as-is
+// that way you know what's meant to be in the template, rather than just gues
+$this->setVar(array(
+	'FOLDER_MIME_IMG' => '',
+	'FOLDER_NAME' => '',
+	'FOLDER_TEMPLATE' => '',
+	'FOLDER_TYPE' => '',
+	'FOLDER_PERM_GROUP' => '',
+	'FOLDER_PERM_ACCESS' => '',
+
+	'FILE_MIME_IMG' => '',
+	'FILE_NAME' => '',
+	'FILE_DESCRIPTION' => '',
+	'FILE_POSTED_BY' => '',
+	'FILE_POSTED_DATE' => '',
+
+	'MULTIFILE_MIME_IMG' => '',
+	'MULTIFILE_COUNT' => '',
+
+));
+$this->parse('folder_detail_block', 'folder_detail', false);
+$this->parse('folder_detail_perms_block', 'folder_detail_perms', false);
+$this->parse('file_detail_block', 'file_detail', false);
+$this->parse('multi_file_detail_block', 'multi_file_detail', false);
+
+
 $this->setTitle('Resources');
 $this->setTab('resources');
 
