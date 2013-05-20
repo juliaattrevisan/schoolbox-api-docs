@@ -154,6 +154,8 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             $this->parse("submit_dw_block", "submit_dw");
 
 	    // if the user is SOMEHOW involved in this category...
+	    $this->setVar('allwork_button_block', '');
+
 	    if($this->groupHandler->isStudent()) {
 
             // is the current user a member of this category?
@@ -171,9 +173,6 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                 $this->parse('allwork_button_block', 'allwork_button');
             }
         }
-	    else {
-		    $this->setVar('allwork_button_block', '');
-	    }
 
         return true;
     }
