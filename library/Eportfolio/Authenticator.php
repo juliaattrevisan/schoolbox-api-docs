@@ -39,6 +39,13 @@ class Eportfolio_Authenticator {
 	private $userHandler = null;
 
 	/**
+	 * A user record from handler
+	 *
+	 * @var array
+	 */
+	private $owner = array();
+
+	/**
 	 * An instance of group handler
 	 *
 	 * @var null
@@ -74,16 +81,19 @@ class Eportfolio_Authenticator {
 		$this->setUserHandler(new User());
 		$this->setGroupHandler(new Group(HOMEPAGE_SERVICE));
 		$this->setEportfolioHandler(new Eportfolio($this->getOwnerId(), $this->getPageId()));
+
+		/* The ePortfolio owner
+		 */
+		$this->setOwner($this->getUserHandler()->getById($this->getOwnerId()));
 	}
 
 	/**
 	 * Determine whether the owner's eportfolio is actually enabled
 	 *
+	 * @param $user
 	 * @return bool
 	 */
-	private function isEportfolioEnabled() {
-		$user = $this->getUserHandler()->getById($this->getOwnerId());
-
+	private function isEportfolioEnabled($user) {
 		if (is_array($user) && ($user['eportfolio_enabled'] == 1)) {
 			return true;
 		}
@@ -101,8 +111,8 @@ class Eportfolio_Authenticator {
 
 		/* Check whether eportfolio is even enabled in the first place
 		 */
-		if (!$this->isEportfolioEnabled()) {
-			error(100);
+		if (!$this->isEportfolioEnabled($this->getOwner())) {
+			return false;
 		}
 		else {
 			if (in_array($this->getPageId(), $this->getPublicPages()) || ($this->getPageId() == 'create')) {
@@ -129,8 +139,8 @@ class Eportfolio_Authenticator {
 
 		/* Check whether eportfolio is even enabled in the first place
 		 */
-		if (!$this->isEportfolioEnabled()) {
-			error(100);
+		if (!$this->isEportfolioEnabled($this->getOwner())) {
+			return false;
 		}
 
 		/* If $user can modify page, continue; otherwise die
@@ -156,8 +166,8 @@ class Eportfolio_Authenticator {
 
 		/* Check whether eportfolio is even enabled in the first place
 		 */
-		if (!$this->isEportfolioEnabled()) {
-			error(100);
+		if (!$this->isEportfolioEnabled($this->getOwner())) {
+			return false;
 		}
 
 		/* If $user can modify page, continue; otherwise die
@@ -255,8 +265,8 @@ class Eportfolio_Authenticator {
 
 		/* Check whether eportfolio is even enabled in the first place
 		 */
-		if (!$this->isEportfolioEnabled()) {
-			error(100);
+		if (!$this->isEportfolioEnabled($this->getOwner())) {
+			return false;
 		}
 
 		/* If $user can modify page, continue; otherwise die
@@ -403,5 +413,23 @@ class Eportfolio_Authenticator {
 	 */
 	private function getPublicPages() {
 		return $this->publicPages;
+	}
+
+	/**
+	 * Set owner
+	 *
+	 * @param array $owner
+	 */
+	private function setOwner($owner) {
+		$this->owner = $owner;
+	}
+
+	/**
+	 * Get owner
+	 *
+	 * @return array
+	 */
+	private function getOwner() {
+		return $this->owner;
 	}
 }
