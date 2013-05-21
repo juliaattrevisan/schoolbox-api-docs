@@ -54,7 +54,7 @@ class ResourceVideoMapper extends Mapper {
                     FROM `{$this->getTable()}` vq
                     JOIN {$this->getJoinSQL('file','vq','f')}
                     JOIN {$fileMapper->getJoinSQL('user','f','u')}
-            WHERE category = :cat AND vq.status = 'completed' AND f.deleted='0'
+            WHERE category = :cat AND vq.status != 'failed' AND f.deleted='0'
             ";
 
 		if($limit != false) {

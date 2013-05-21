@@ -21,6 +21,14 @@
         <p>{VIDEO_LIST_COMMENT}</p>
     </li>
     <!-- END video_list -->
+    <!-- BEGIN video_pending_list -->
+    <li>
+        <img width=64 height=64 src="{VIDEO_LIST_STATUSIMG}" title="{VIDEO_LIST_TITLE}">
+        <h3>{VIDEO_LIST_TITLE}</h3>
+        <span class="time">Posted by <a href="/user/search/{VIDEO_LIST_POSTER_ID}">{VIDEO_LIST_POSTER}</a></span>
+        <p>{VIDEO_LIST_COMMENT}</p>
+    </li>
+    <!-- END video_pending_list -->
 </ul>
 <script type="text/javascript">
     $j('a.video-link').click(function() {
