@@ -57,7 +57,7 @@ if ($groupHandler->isParent()) {
 }
 else {
     if ($child_id) {
-        if ($groupHandler->isStaff() || $child_id = $_SESSION['id']) {
+        if ($groupHandler->isStaff() || $child_id == $_SESSION['id']) {
 			//Output a timetable for each campus user is involved in
 	        $user = $userHandler->getByID($child_id);
 	        $campusList = $userHandler->getUserCampus($child_id);
