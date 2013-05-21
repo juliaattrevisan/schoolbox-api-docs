@@ -24,7 +24,7 @@ $database = Database::getInstance();
 
 $stmt= $database->prepare("SELECT file.id FROM file
 					LEFT JOIN video_queue ON file.id = video_queue.file_id
-					WHERE ( file.mime_type LIKE '%video%' OR file.mime_type LIKE '%flash%' OR file.mime_type LIKE '%realmedia%')
+					WHERE ( file.mime_type LIKE 'video/%')
 					AND video_queue.video_queue_id IS NULL"
 );
 
