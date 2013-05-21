@@ -59,6 +59,7 @@ then
 	sed -i 's/usr\/share\/schoolboxdev/vagrant/g' /home/vagrant/schoolboxdemo-latest-cron
 	sed -i 's/var\/log/vagrant\/data/g' /home/vagrant/schoolboxdemo-latest-cron
 	sed -i 's/schoolboxdev/vagrant/g' /home/vagrant/schoolboxdemo-latest-cron
+	sed -i 's/www-data/root/g' /home/vagrant/schoolboxdemo-latest-cron
 	cp -f /home/vagrant/schoolboxdemo-latest-cron /etc/cron.d/vagrant
 	echo "$vag Loading all demo data complete";
 fi
