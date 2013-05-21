@@ -121,67 +121,45 @@ setupCustomise = {
 					url: setupCustomise.ajaxURL,
 					data: data,
 					success: function(data){
-						var target = $j('.left')[0];
-						if (target) {
-							//
-							// This laborious method of adding new compoents is
-							// sadly necessary to get adding of comps with JS
-							// in Firefox.
-							var new_item = $j(data);
-							new_item.hide().css('opacity','0');
+						$j(data).hide().prependTo('.left').css('opacity','0').slideDown(400,function(){
+							setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left')]);
+							$j(this).animate({opacity:1}, 300);
+							/*
+							* When a new component is added in we need it to
+							* be able to get the colours that have been changed before
+							* the component is added.
+							* 1. Colour is changed
+							* 2. "add" is clicked on any component
+							* 3. Apply the colour change to this new component's DOM elements.
+							* */
+							var newComponent = $j(this);
 
-							//
-							// Get an ID to add - search on this ID later
-							var new_id = new_item.filter('.box.clearfix').attr('id');
-
-							//
-							// Parse HTML for component out of existing item,
-							// and slam it into the target
-							var new_html = $j('<div/>').append(new_item.clone()).html();
-							target.innerHTML = new_html + target.innerHTML;
-
-							//
-							// And do all the same show/hide stuff the old one did.
-							$j('.left').find('#'+new_id).slideDown(400, function() {
-								setupCustomise.emptyColumnCheck([$j('div.top'), $j('div.right'), $j('div.left')]);
-								$j(this).animate({opacity:1}, 300);
-								/*
-								* When a new component is added in we need it to
-								* be able to get the colours that have been changed before
-								* the component is added.
-								* 1. Colour is changed
-								* 2. "add" is clicked on any component
-								* 3. Apply the colour change to this new component's DOM elements.
-								* */
-								var newComponent = $j(this);
-
-								newComponent.find('h2').css({
-									'background-color': $j('#left_head_bg').css('background-color'),
-									'color': $j('#left_head_font').css('background-color')
-								});
-
-								newComponent.find('.text, .listing').css({
-									'background-color': $j('#left_bg_primary').css('background-color')
-								});
-
-								newComponent.css({
-									'color': $j('#left_font').css('background-color')
-								});
-
-								newComponent.find('p').css({
-									'color': $j('#left_font').css('background-color')
-								});
-
-								newComponent.find('.dark').css({
-									'background-color' : $j('#left_bg_secondary').css('background-color')
-								});
-
-								newComponent.find('a').css({
-									'color' : $j('#left_link').css('background-color')
-								});
-
+							newComponent.find('h2').css({
+								'background-color': $j('#left_head_bg').css('background-color'),
+								'color': $j('#left_head_font').css('background-color')
 							});
-						}
+
+							newComponent.find('.text, .listing').css({
+								'background-color': $j('#left_bg_primary').css('background-color')
+							});
+
+							newComponent.css({
+								'color': $j('#left_font').css('background-color')
+							});
+
+							newComponent.find('p').css({
+								'color': $j('#left_font').css('background-color')
+							});
+
+							newComponent.find('.dark').css({
+								'background-color' : $j('#left_bg_secondary').css('background-color')
+							});
+
+							newComponent.find('a').css({
+								'color' : $j('#left_link').css('background-color')
+							});
+
+						});
 					},
 					dataType: "html"
 				});
