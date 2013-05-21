@@ -59,6 +59,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 
 	    $this->setVar('video_list_block','');
 	    $this->setVar('video_pending_list_block','');
+	    $this->setVar('default_video_block','');
 
 	    if(count($this->outputList)) {
 			$j = 0;
@@ -77,7 +78,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 				if($video->getStatus() == "completed"){
 					$this->parse('video_list_block','video_list',true);
 				}
-				else if($this->permission < WRITE_ACCESS) {
+				else if($this->permission = WRITE_ACCESS) {
 			        $this->setVar( array(
 				                        'VIDEO_LIST_STATUS' => $video->getStatus(),
 					                    'VIDEO_LIST_STATUSIMG' => "/images/core/component/video-thumbnail-".strtolower($video->getStatus()).".jpg",
@@ -87,7 +88,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 			}
 	    }
 
-	    if(is_object($this->defaultVideo) AND $totalcompleted != 0) {
+	    if(is_object($this->defaultVideo) AND $this->defaultVideo->getStatus() == 'completed' ) {
 			$this->setVar('DEFAULT_VIDEO_ID', $this->defaultVideo->getFile()->getId());
 			$this->parse('default_video_block','default_video');
 	    }
