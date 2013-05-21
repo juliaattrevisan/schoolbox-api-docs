@@ -32,7 +32,8 @@ if (is_numeric($_GET['id'])) {
 
 	/* Prevent multibyte encoding as it might mess with video stream */
 	mb_http_output("pass");
-
+	ini_set('zlib.output_compression', 0);
+	apache_setenv('no-gzip', 1);
 
 	$filename = $video->getVideoLocation();
 
@@ -78,10 +79,16 @@ if (is_numeric($_GET['id'])) {
 
 			header('Content-Length: '.$byteRange, true);
 
-			if($handle = fopen($filename, 'r')) {
+			if($handle = fopen($filename, 'rb')) {
 				fseek($handle, $byteOffset, SEEK_SET);
 				while( ftell($handle) < $byteLength && !feof($handle)) {
-					echo fread($handle, ($byteLength - ftell($handle)));
+					if(ftell($handle) + 8024 < $byteLength) {
+						echo fread($handle, 8024); /* output 8kb buffer to avoid memory issues with large files */
+					} else {
+						echo fread($handle, ($byteLength - ftell($handle)));
+
+					}
+					flush();
 				}
 			}
 		}
