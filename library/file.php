@@ -231,13 +231,15 @@ class File extends DeprecatedModel {
     function delete ($id, $clean = false) {
 
         if ( $clean ) {
+	        $videoMapper = new Schoolbox\Video\ResourceVideoMapper();
+	        $video = $videoMapper->findById($id);
+
             parent::delete($id);
             $filename = Cfg::get('file_dir') . '/' . $id . '.dat';
             @unlink($filename);
 
 	        /* unlink video files */
-			$videoMapper = new Schoolbox\Video\ResourceVideoMapper();
-	        if($video = $videoMapper->findById($id)) {
+	        if(is_object($video)) {
 		        @unlink($video->getVideoLocation());
 		        @unlink($video->getThumbnailLocation());
 	        }
