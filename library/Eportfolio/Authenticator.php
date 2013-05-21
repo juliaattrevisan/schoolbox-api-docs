@@ -148,7 +148,22 @@ class Eportfolio_Authenticator {
 		 * Selected parents, groups and individuals can view contents.
 		 */
 		$youAreAdmin = $this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff();
-		$youArePageOwner = ($this->getEportfolioHandler()->getSettingsPageOwner() == $this->getCurrentUserId());
+
+		/* If a pageId was numeric, you are trying to access a particular page.
+		 *
+		 * Prevent url tampering by changing the user id to your own, while
+		 * retaining someone else's pageId as this allowed you to view other
+		 * people's pages as if they were your own.
+		 *
+		 * If it wasn't numeric, then you're viewing one of the hardcoded pages
+		 * which have no pageId.
+		 */
+		if (is_numeric($this->getPageId())) {
+			$youArePageOwner = ($this->getEportfolioHandler()->getSettingsPageOwner() == $this->getCurrentUserId());
+		}
+		else {
+			$youArePageOwner = ($this->getOwnerId() == $this->getCurrentUserId());
+		}
 
 		if ($youAreAdmin || $youArePageOwner) {
 			return true;
@@ -208,47 +223,55 @@ class Eportfolio_Authenticator {
 		/* User-created pages have their own unique permissions
 		 */
 		else {
-			/* First check parental
+
+			/* Prevent your id allowing you to view other people's pages by checking whether
+			 * the url's user id is the same as the page owner's. This prevents you substituting
+			 * your id into the url to view someone else's page
 			 */
-			$parentSettingCollection = \Eportfolio\PermissionMapper::getInstance()->findParentSetting($this->getPageId());
+			if ($this->getOwnerId() == $this->getEportfolioHandler()->getSettingsPageOwner()) {
 
-			foreach ($parentSettingCollection as $current) {
-				if (($current->getValue()) && $this->getGroupHandler()->isParentOfChild($this->getEportfolioHandler()->getSettingsPageOwner())) {
-					$youCanView = true;
-				}
-			}
+				/* First check parental
+				 */
+				$parentSettingCollection = \Eportfolio\PermissionMapper::getInstance()->findParentSetting($this->getPageId());
 
-			/* Still can't view it?
-			 * Now check groups
-			 */
-			if (!$youCanView) {
-				$permittedGroups = array();
-
-				$allGroups = $this->getGroupHandler()->involvedInCategoryList($this->getCurrentUserId());
-
-				if (is_array($allGroups) && count($allGroups)) {
-					foreach($allGroups as $currentGroup) {
-						$permittedGroups[] = $currentGroup['id'];
-					}
-
-					$groupSettingCollection = \Eportfolio\PermissionMapper::getInstance()->findValues($this->getPageId(), 'group', $permittedGroups);
-
-					if (count($groupSettingCollection)) {
+				foreach ($parentSettingCollection as $current) {
+					if (($current->getValue()) && $this->getGroupHandler()->isParentOfChild($this->getEportfolioHandler()->getSettingsPageOwner())) {
 						$youCanView = true;
 					}
 				}
-			}
 
-			/* Still can't view it?
-			 * Now check individual permissions
-			 */
-			if (!$youCanView) {
-				$permittedIndividuals = array($this->getCurrentUserId());
+				/* Still can't view it?
+				 * Now check groups
+				 */
+				if (!$youCanView) {
+					$permittedGroups = array();
 
-				$individualSettingCollection = \Eportfolio\PermissionMapper::getInstance()->findValues($this->getPageId(), 'student', $permittedIndividuals);
+					$allGroups = $this->getGroupHandler()->involvedInCategoryList($this->getCurrentUserId());
 
-				if (count($individualSettingCollection)) {
-					$youCanView = true;
+					if (is_array($allGroups) && count($allGroups)) {
+						foreach($allGroups as $currentGroup) {
+							$permittedGroups[] = $currentGroup['id'];
+						}
+
+						$groupSettingCollection = \Eportfolio\PermissionMapper::getInstance()->findValues($this->getPageId(), 'group', $permittedGroups);
+
+						if (count($groupSettingCollection)) {
+							$youCanView = true;
+						}
+					}
+				}
+
+				/* Still can't view it?
+				 * Now check individual permissions
+				 */
+				if (!$youCanView) {
+					$permittedIndividuals = array($this->getCurrentUserId());
+
+					$individualSettingCollection = \Eportfolio\PermissionMapper::getInstance()->findValues($this->getPageId(), 'student', $permittedIndividuals);
+
+					if (count($individualSettingCollection)) {
+						$youCanView = true;
+					}
 				}
 			}
 		}
