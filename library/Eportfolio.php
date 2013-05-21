@@ -321,7 +321,11 @@ class Eportfolio {
 				// preserve the config
 				$configs = $inst->config;
 
-				unset($inst->id);
+				/* unset($inst->id);
+				 * This throws notices in provisioning because $inst->id is expected to exist
+				 * but here, has been unset.
+				 */
+				$inst->id = null;
 				unset($inst->config);
 
 				$inst->module = $this->getContext();
