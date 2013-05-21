@@ -1,17 +1,16 @@
-<script type="text/javascript" src="/javascript/jquery.cycle.js"></script>
-<script type="text/javascript" src="/javascript/jquery.imagesloaded.js"></script>
-<script type="text/javascript">
-    $j(function () {
-        $j('.slideshow-cycle img').imagesLoaded(function (images) {
-            $j('#galleryCycle-{COMPONENT_INSTANCE_ID}').cycle({
-                timeout:{COMPONENT_CONFIG_TIMING_VALUE_MS},
-                cleartype:true,
-                height:'auto'
+<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}"><script type="text/javascript" src="/javascript/jquery.cycle.js"></script>
+    <script type="text/javascript" src="/javascript/jquery.imagesloaded.js"></script>
+    <script type="text/javascript">
+        $j(function () {
+            $j('.slideshow-cycle img').imagesLoaded(function (images) {
+                $j('#galleryCycle-{COMPONENT_INSTANCE_ID}').cycle({
+                    timeout:{COMPONENT_CONFIG_TIMING_VALUE_MS},
+                    cleartype:true,
+                    height:'auto'
+                });
             });
         });
-    });
-</script>
-<div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+    </script>
     <h2>{COMPONENT_NAME}</h2>
     {CONFIGURATION}
     <div id="galleryCycle-{COMPONENT_INSTANCE_ID}" class="scroller box clearfix" style="padding:0;border:0;margin:0;">
