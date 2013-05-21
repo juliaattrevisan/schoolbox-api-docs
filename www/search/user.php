@@ -180,413 +180,419 @@ if (is_numeric($this->arg[0])) {
                 $this->setVar('parent_synergy_form_block');
             }
         } else {
-            if ($groupHandler->isStudent($user['uid']) && ($groupHandler->isStaff() || $groupHandler->isParentOfChild( $user['uid']) || $_SESSION['id'] == $user['uid']) ) {
-                ////only allow staff to see student information or parent
+            if ($groupHandler->isStudent($user['uid'])) {
+
+	            //If student photo protected don't show other students
                 $this->parse("portrait_block", "portrait");
 
-                $this->parse("timetable_link_block", "timetable_link");
 
-                /* Allow students, staff and parents of the student to see information about
-                * due work. Also allow the current user if they view themselves in the
-                * search results.
-                */
-                if ($groupHandler->isParent() && Cfg::get('site_location') == 'shore') {
-                    $this->setVar('due_work_block', '');
-                } else {
-                    $this->parse('due_work_block', 'due_work');
-                }
+	            if($groupHandler->isStaff() || $groupHandler->isParentOfChild( $user['uid']) || $_SESSION['id'] == $user['uid']) {
+					//only allow staff to see student information or parent
+		            $this->parse("portrait_block", "portrait");
+		            $this->parse("timetable_link_block", "timetable_link");
 
-                if (HELPDESK_enable == true) {
-                    $this->parse('helpdesk_block', 'helpdesk');
-                } else {
-                    $this->setVar('helpdesk_block', '');
-                }
+	                /* Allow students, staff and parents of the student to see information about
+	                * due work. Also allow the current user if they view themselves in the
+	                * search results.
+	                */
+	                if ($groupHandler->isParent() && Cfg::get('site_location') == 'shore') {
+	                    $this->setVar('due_work_block', '');
+	                } else {
+	                    $this->parse('due_work_block', 'due_work');
+	                }
 
-                $synInfo = $synUserHandler->getStudent($user['synergy_id']);
+	                if (HELPDESK_enable == true) {
+	                    $this->parse('helpdesk_block', 'helpdesk');
+	                } else {
+	                    $this->setVar('helpdesk_block', '');
+	                }
 
-                if ($synInfo['StudentFormStaffName'] && $synInfo['TeacherFormID']) {
-                    $form = $userHandler->getBySynergy($synInfo['TeacherFormID']);
+	                $synInfo = $synUserHandler->getStudent($user['synergy_id']);
 
-                    $emailObj = new Email();
-                    $formEmail = $emailObj->formatEmailFromArray($form);
+	                if ($synInfo['StudentFormStaffName'] && $synInfo['TeacherFormID']) {
+	                    $form = $userHandler->getBySynergy($synInfo['TeacherFormID']);
 
-                    if ($formEmail) {
-                        $formTeacher = '<a href="' . $_SESSION['mailhandle'] . $formEmail . '">' . Scrub::text(
-                            $synInfo['StudentFormStaffName']
-                        ) . '</a>';
-                    } else {
-                        $formTeacher = Scrub::text($synInfo['StudentFormStaffName']);
-                    }
-                } else {
-                    $formTeacher = $synInfo['StudentFormStaffName'];
-                }
+	                    $emailObj = new Email();
+	                    $formEmail = $emailObj->formatEmailFromArray($form);
 
-                if ($synInfo['StudentTutorName'] && $synInfo['TeacherTutorID']) {
-                    $tutor = $userHandler->getBySynergy($synInfo['TeacherTutorID']);
-                    $emailObj = new Email();
-                    $tutorEmail = $emailObj->formatEmailFromArray($tutor);
+	                    if ($formEmail) {
+	                        $formTeacher = '<a href="' . $_SESSION['mailhandle'] . $formEmail . '">' . Scrub::text(
+	                            $synInfo['StudentFormStaffName']
+	                        ) . '</a>';
+	                    } else {
+	                        $formTeacher = Scrub::text($synInfo['StudentFormStaffName']);
+	                    }
+	                } else {
+	                    $formTeacher = $synInfo['StudentFormStaffName'];
+	                }
 
-                    if ($tutorEmail) {
-                        $tutorTeacher = '<a href="' . $_SESSION['mailhandle'] . $tutorEmail . '">' . Scrub::text(
-                            $synInfo['StudentTutorName']
-                        ) . '</a>';
-                    } else {
-                        $tutorTeacher = Scrub::text($synInfo['StudentTutorName']);
-                    }
-                } else {
-                    $tutorTeacher = $synInfo['StudentTutorName'];
-                }
+	                if ($synInfo['StudentTutorName'] && $synInfo['TeacherTutorID']) {
+	                    $tutor = $userHandler->getBySynergy($synInfo['TeacherTutorID']);
+	                    $emailObj = new Email();
+	                    $tutorEmail = $emailObj->formatEmailFromArray($tutor);
 
-                if ($synInfo['StudentHeadOfHouse'] && $synInfo['HeadOfHouseID']) {
-                    $hoh = $userHandler->getBySynergy($synInfo['HeadOfHouseID']);
+	                    if ($tutorEmail) {
+	                        $tutorTeacher = '<a href="' . $_SESSION['mailhandle'] . $tutorEmail . '">' . Scrub::text(
+	                            $synInfo['StudentTutorName']
+	                        ) . '</a>';
+	                    } else {
+	                        $tutorTeacher = Scrub::text($synInfo['StudentTutorName']);
+	                    }
+	                } else {
+	                    $tutorTeacher = $synInfo['StudentTutorName'];
+	                }
 
-                    $emailObj = new Email();
-                    $hohEmail = $emailObj->formatEmailFromArray($hoh);
+	                if ($synInfo['StudentHeadOfHouse'] && $synInfo['HeadOfHouseID']) {
+	                    $hoh = $userHandler->getBySynergy($synInfo['HeadOfHouseID']);
 
-                    if ($hohEmail) {
-                        $hohTeacher = '<a href="' . $_SESSION['mailhandle'] . $hohEmail . '">' . Scrub::text(
-                            $synInfo['StudentHeadOfHouse']
-                        ) . '</a>';
-                    } else {
-                        $hohTeacher = Scrub::text($synInfo['StudentHeadOfHouse']);
-                    }
-                } else {
-                    $hohTeacher = $synInfo['StudentHeadOfHouse'];
-                }
+	                    $emailObj = new Email();
+	                    $hohEmail = $emailObj->formatEmailFromArray($hoh);
 
-                if ($synInfo['StudentYearLevelCoordinator'] && $synInfo['YearLevelCoordID']) {
-                    $coord = $userHandler->getBySynergy($synInfo['YearLevelCoordID']);
+	                    if ($hohEmail) {
+	                        $hohTeacher = '<a href="' . $_SESSION['mailhandle'] . $hohEmail . '">' . Scrub::text(
+	                            $synInfo['StudentHeadOfHouse']
+	                        ) . '</a>';
+	                    } else {
+	                        $hohTeacher = Scrub::text($synInfo['StudentHeadOfHouse']);
+	                    }
+	                } else {
+	                    $hohTeacher = $synInfo['StudentHeadOfHouse'];
+	                }
 
-                    $emailObj = new Email();
-                    $coordEmail = $emailObj->formatEmailFromArray($coord);
+	                if ($synInfo['StudentYearLevelCoordinator'] && $synInfo['YearLevelCoordID']) {
+	                    $coord = $userHandler->getBySynergy($synInfo['YearLevelCoordID']);
 
-                    if ($coordEmail) {
-                        $coordTeacher = '<a href="' . $_SESSION['mailhandle'] . $coordEmail . '">' . Scrub::text(
-                            $synInfo['StudentYearLevelCoordinator']
-                        ) . '</a>';
-                    } else {
-                        $coordTeacher = Scrub::text($synInfo['StudentYearLevelCoordinator']);
-                    }
-                } else {
-                    $coordTeacher = $synInfo['StudentYearLevelCoordinator'];
-                }
+	                    $emailObj = new Email();
+	                    $coordEmail = $emailObj->formatEmailFromArray($coord);
 
-
-                $output = array(
-                    'TUTOR_GROUP' => Scrub::text($synInfo['StudentTutorDescription']),
-                    'TUTOR' => $tutorTeacher,
-                    'YEAR_LEVEL' => Scrub::text($synInfo['StudentYearLevel']),
-                    'HOUSE' => Scrub::text($synInfo['StudentHouseDescription']),
-                    'HOH' => $hohTeacher,
-                    'FORM' => Scrub::text($synInfo['StudentForm']),
-                    'FORM_DESCRIPTION' => Scrub::text($synInfo['FormDescription']),
-                    'FORM_STAFF' => $formTeacher,
-                    'YCOORD' => $coordTeacher,
-                    'LOCKER' => Scrub::text($synInfo['StudentLockerBook']),
-                    'BIRTHDATE' => date('j F Y', $synInfo['StudentBirthDate']),
-                    'MEDICAL_NOTE' => Scrub::text($synInfo['StudentMedicalAlert']),
-                    'CONTACT_ALERT_MESSAGE' => Scrub::text($synInfo['AlertMessage']),
-                    'STUDENT_TYPE' => $synUserHandler->determineBoarderType($synInfo['StudentBoarder']),
-                );
-
-                $this->setVar($output);
-                $synClass = new External_Class;
-                $catHandler = new Category;
-                $i = 1;
-
-                /*Output subject list */
-                $subjectList = $synUserHandler->getSubjectList($user['synergy_id'], $user['uid']);
-
-                if (is_array($subjectList)) {
-
-                    $emailAll = array();
-	                $listItems = count($subjectList)>1 ? floor(count($subjectList)/2) : 1;
-
-                    foreach ($subjectList as $subject) {
-
-                        $category = $catHandler->getByCode($subject['code']);
-						$this->setVar('subject_teacher_block', '');
-
-                        if ((Cfg::get('show_all_subjects') == 1) || $category['id'] ) {
-
-                            /* Fetch teacher names */
-	                        if($subject['campusCode'])
-		                        $code = $subject['campusCode'].'/'.$subject['code'];
-	                        else
-		                        $code = $subject['code'];
-
-                            $teacherList = $synClass->getTeacherName($code);
-                            $teacherOutput = array();
-
-                            if (is_array($teacherList)) {
-                                foreach ($teacherList as $teacherSynID) {
-                                    $teacher = $userHandler->getBySynergyAndGroup(
-                                        $teacherSynID, $groupHandler->getStaffGroupTypeIds()
-                                    );
-                                    if (is_array($teacher)) {
-                                        $teacherName = $userHandler->formatName($teacher);
-
-                                        $emailObj = new Email();
-                                        $emailAddress = $emailObj->formatEmailFromArray($teacher);
-	                                    $emailAll[] = $emailAddress;
-
-	                                    $this->setVar( array( 'SUBJECT_TEACHER_ID' => $teacher['uid'],
-		                                                      'SUBJECT_TEACHER_EXTERNAL_ID' => $teacher['synergy_id'],
-	                                                          'SUBJECT_TEACHER_NAME' => $teacherName,
-	                                                          'SUBJECT_TEACHER_EMAIL' => $_SESSION['mailhandle'] . $emailAddress,
-	                                                   ));
-	                                    $this->parse('subject_teacher_block', 'subject_teacher',true);
-
-                                    }
-                                }
-                            }
-
-                            $output = array(
-                                'SUBJECT_NAME' => Scrub::Text($category['name']),
-	                            'SUBJECT_URL' => is_array($category) && $groupHandler->getPermission( $category['id']  ) >= READ_ACCESS ? "/homepage/{$subject['code']}": '#',
-                            );
+	                    if ($coordEmail) {
+	                        $coordTeacher = '<a href="' . $_SESSION['mailhandle'] . $coordEmail . '">' . Scrub::text(
+	                            $synInfo['StudentYearLevelCoordinator']
+	                        ) . '</a>';
+	                    } else {
+	                        $coordTeacher = Scrub::text($synInfo['StudentYearLevelCoordinator']);
+	                    }
+	                } else {
+	                    $coordTeacher = $synInfo['StudentYearLevelCoordinator'];
+	                }
 
 
+	                $output = array(
+	                    'TUTOR_GROUP' => Scrub::text($synInfo['StudentTutorDescription']),
+	                    'TUTOR' => $tutorTeacher,
+	                    'YEAR_LEVEL' => Scrub::text($synInfo['StudentYearLevel']),
+	                    'HOUSE' => Scrub::text($synInfo['StudentHouseDescription']),
+	                    'HOH' => $hohTeacher,
+	                    'FORM' => Scrub::text($synInfo['StudentForm']),
+	                    'FORM_DESCRIPTION' => Scrub::text($synInfo['FormDescription']),
+	                    'FORM_STAFF' => $formTeacher,
+	                    'YCOORD' => $coordTeacher,
+	                    'LOCKER' => Scrub::text($synInfo['StudentLockerBook']),
+	                    'BIRTHDATE' => date('j F Y', $synInfo['StudentBirthDate']),
+	                    'MEDICAL_NOTE' => Scrub::text($synInfo['StudentMedicalAlert']),
+	                    'CONTACT_ALERT_MESSAGE' => Scrub::text($synInfo['AlertMessage']),
+	                    'STUDENT_TYPE' => $synUserHandler->determineBoarderType($synInfo['StudentBoarder']),
+	                );
 
-                            $this->setVar($output);
-                            $this->parse('subject_item_block', 'subject_item', true);
+	                $this->setVar($output);
+	                $synClass = new External_Class;
+	                $catHandler = new Category;
+	                $i = 1;
 
-                            if ($i % $listItems == 0) {
-                                $this->parse('subject_row_block', 'subject_row', true);
-                                $this->setVar('subject_item_block', '');
-                            }
-                            $i++;
-                        }
-                    }
+	                /*Output subject list */
+	                $subjectList = $synUserHandler->getSubjectList($user['synergy_id'], $user['uid']);
 
-                    if (($i - 1) % $listItems != 0) {
-                        $this->parse('subject_row_block', 'subject_row', true);
-                    }
+	                if (is_array($subjectList)) {
 
-                    /*Output email all subject teachers */
-                    if ($groupHandler->isStaff()) {
-                        $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
-                        $this->setVar("EMAILALL", implode(',', $emailAll));
-                        $this->parse("subject_mail_block", "subject_mail");
-                    } else {
-                        $this->setVar('subject_mail_block', '');
-                    }
+	                    $emailAll = array();
+		                $listItems = count($subjectList)>1 ? floor(count($subjectList)/2) : 1;
 
-                    $this->parse('subject_block', 'subject');
+	                    foreach ($subjectList as $subject) {
 
-                }
+	                        $category = $catHandler->getByCode($subject['code']);
+							$this->setVar('subject_teacher_block', '');
 
-	            /* Output group list */
-	            $groupList = $groupHandler->involvedInCategoryList($user['uid'], false);
-	            if (is_array($groupList)) {
+	                        if ((Cfg::get('show_all_subjects') == 1) || $category['id'] ) {
 
-		            $i = 1;
-		            $listItems = count($groupList)>1 ? floor(count($groupList)/2) : 1;
-		            foreach ($groupList as $group) {
+	                            /* Fetch teacher names */
+		                        if($subject['campusCode'])
+			                        $code = $subject['campusCode'].'/'.$subject['code'];
+		                        else
+			                        $code = $subject['code'];
 
-			            $this->setVar('group_teacher_block', '');
+	                            $teacherList = $synClass->getTeacherName($code);
+	                            $teacherOutput = array();
 
-			            /* Fetch admin names */
-		                $owner = $groupHandler->getOwner($group['id']);
+	                            if (is_array($teacherList)) {
+	                                foreach ($teacherList as $teacherSynID) {
+	                                    $teacher = $userHandler->getBySynergyAndGroup(
+	                                        $teacherSynID, $groupHandler->getStaffGroupTypeIds()
+	                                    );
+	                                    if (is_array($teacher)) {
+	                                        $teacherName = $userHandler->formatName($teacher);
+
+	                                        $emailObj = new Email();
+	                                        $emailAddress = $emailObj->formatEmailFromArray($teacher);
+		                                    $emailAll[] = $emailAddress;
+
+		                                    $this->setVar( array( 'SUBJECT_TEACHER_ID' => $teacher['uid'],
+			                                                      'SUBJECT_TEACHER_EXTERNAL_ID' => $teacher['synergy_id'],
+		                                                          'SUBJECT_TEACHER_NAME' => $teacherName,
+		                                                          'SUBJECT_TEACHER_EMAIL' => $_SESSION['mailhandle'] . $emailAddress,
+		                                                   ));
+		                                    $this->parse('subject_teacher_block', 'subject_teacher',true);
+
+	                                    }
+	                                }
+	                            }
+
+	                            $output = array(
+	                                'SUBJECT_NAME' => Scrub::Text($category['name']),
+		                            'SUBJECT_URL' => is_array($category) && $groupHandler->getPermission( $category['id']  ) >= READ_ACCESS ? "/homepage/{$subject['code']}": '#',
+	                            );
 
 
 
-			            if (is_array($owner)) {
-				            $ownerName = $userHandler->formatName($owner);
+	                            $this->setVar($output);
+	                            $this->parse('subject_item_block', 'subject_item', true);
 
-				            $emailObj = new Email();
-				            $emailAddress = $emailObj->formatEmailFromArray($owner);
-
-				            $this->setVar( array( 'SUBJECT_TEACHER_ID' => $owner['uid'],
-					                           'SUBJECT_TEACHER_EXTERNAL_ID' => $owner['synergy_id'],
-					                           'SUBJECT_TEACHER_NAME' => $ownerName,
-					                           'SUBJECT_TEACHER_EMAIL' => $_SESSION['mailhandle'] . $emailAddress,
-				                           ));
-				            $this->parse('group_teacher_block', 'group_teacher',true);
-
-			            }
-
-
-			            $output = array(
-				            'GROUP_NAME' => Scrub::Text($group['name']),
-				            'GROUP_URL' => is_array($group) && $groupHandler->getPermission( $group['id']  ) >= READ_ACCESS ? "/homepage/{$group['id']}": '#',
-			            );
-
-
-
-			            $this->setVar($output);
-			            $this->parse('group_item_block', 'group_item', true);
-
-			            if ($i % $listItems == 0) {
-				            $this->parse('group_row_block', 'group_row', true);
-				            $this->setVar('group_item_block', '');
-			            }
-			            $i++;
-		            }
-
-		            if (($i - 1) % $listItems != 0) {
-
-			            $this->parse('group_row_block', 'group_row', true);
-		            }
-		            $this->parse('group_block', 'group');
-	            }
-
-                $studentContactList = $synUserHandler->getStudentContactList($user['synergy_id']);
-                if (is_array($studentContactList)) {
-                    foreach ($studentContactList as $studentContact) {
-                        if ($prevContact['StudentContactID'] != $studentContact['StudentContactSpouseID'] && ( (int)$studentContact['StudentContactID'] == (int)$_SESSION['sid'] || $studentContact['StudentContactSpouseID'] == $_SESSION['sid'] || $groupHandler->isStaff() || $_SESSION['su'])) {
-                            $j++;
-
-	                        if ($studentContact['StudentContactDefaultEmail']) {
-	                            $contactEmail = $_SESSION['mailhandle'] . $studentContact['StudentContactDefaultEmail'];
+	                            if ($i % $listItems == 0) {
+	                                $this->parse('subject_row_block', 'subject_row', true);
+	                                $this->setVar('subject_item_block', '');
+	                            }
+	                            $i++;
 	                        }
+	                    }
 
-                            if ($studentContact['StudentContactSpouseDefaultEmail']) {
-                                $spouseEmail = $_SESSION['mailhandle'] . $studentContact['StudentContactSpouseDefaultEmail'];
-                            }
+	                    if (($i - 1) % $listItems != 0) {
+	                        $this->parse('subject_row_block', 'subject_row', true);
+	                    }
 
-	                        $parent = $userHandler->getBySynergy($studentContact['StudentContactID']);
-	                        $spouse = $userHandler->getBySynergy($studentContact['StudentContactSpouseID']);
+	                    /*Output email all subject teachers */
+	                    if ($groupHandler->isStaff()) {
+	                        $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
+	                        $this->setVar("EMAILALL", implode(',', $emailAll));
+	                        $this->parse("subject_mail_block", "subject_mail");
+	                    } else {
+	                        $this->setVar('subject_mail_block', '');
+	                    }
 
-                            $output = array(
-                                'CONTACT_NAME' => Scrub::text(
-                                    $studentContact['StudentContactTitle'] . ' ' . $studentContact['StudentContactPreferred'] . ' ' . $studentContact['StudentContactSurname']
-                                ),
-	                            'CONTACT_ID' => $parent['uid'],
-	                            'CONTACT_ROLE' => Scrub::text($studentContact['StudentContactRelation']),
-                                'CONTACT_ADDRESS' => Scrub::text(
-                                    $studentContact['StudentContactAddress1']
-                                ) . '<br>' . Scrub::text(
-                                    $studentContact['StudentContactSuburb'] . ', ' . $studentContact['StudentContactState'] . ' ' . $studentContact['StudentContactPostCode']
-                                ),
-                                'CONTACT_HOME_PHONE' => Scrub::text($studentContact['StudentContactPhoneActual']),
-                                'CONTACT_MOBILE_PHONE' => Scrub::text($studentContact['StudentContactMobilePhone']),
-                                'CONTACT_OCCUP_PHONE' => Scrub::text($studentContact['StudentContactOccupPhone']),
-                                'CONTACT_EMAIL' =>  $contactEmail,
-                                'CONTACT_NAME_EMAIL' => $contactName,
-                                'SPOUSE_NAME' => Scrub::text(
-                                    $studentContact['StudentContactSpouseTitle'] . ' ' . $studentContact['StudentContactSpousePreferred'] . ' ' . $studentContact['StudentContactSpouseSurname']
-                                ),
-	                            'SPOUSE_ID' => $spouse['uid'],
-	                            'SPOUSE_ROLE' => Scrub::text($studentContact['StudentContactSpouseRelation']),
-                                'SPOUSE_MOBILE_PHONE' => Scrub::text(
-                                    $studentContact['StudentContactSpouseMobilePhone']
-                                ),
-                                'SPOUSE_OCCUP_PHONE' => Scrub::text($studentContact['StudentContactSpouseOccupPhone']),
-                                'SPOUSE_EMAIL' => $spouseEmail,
-                            );
+	                    $this->parse('subject_block', 'subject');
 
-                            $this->setVar($output);
+	                }
 
-	                        /* Output each of the block for contact details */
-	                        if($contactEmail)
-		                        $this->parse('contact_email_block','contact_email');
-	                        else
-		                        $this->setVar('contact_email_block','');
+		            /* Output group list */
+		            $groupList = $groupHandler->involvedInCategoryList($user['uid'], false);
+		            if (is_array($groupList)) {
 
-							if($studentContact['StudentContactMobilePhone'])
-								$this->parse('contact_mobile_block','contact_mobile');
-							else
-								$this->setVar('contact_mobile_block','');
+			            $i = 1;
+			            $listItems = count($groupList)>1 ? floor(count($groupList)/2) : 1;
+			            foreach ($groupList as $group) {
 
-	                        if($studentContact['StudentContactOccupPhone'])
-		                        $this->parse('contact_phone_block','contact_phone');
-	                        else
-		                        $this->setVar('contact_phone_block','');
+				            $this->setVar('group_teacher_block', '');
+
+				            /* Fetch admin names */
+			                $owner = $groupHandler->getOwner($group['id']);
 
 
-							/* Has spouse, output spouse */
-                            if (trim($studentContact['StudentContactSpouseTitle']) || trim($studentContact['StudentContactSpousePreferred'])) {
 
-	                            /* Output each of the block for contact details */
-	                            if($spouseEmail)
-		                            $this->parse('spouse_email_block','spouse_email');
-	                            else
-		                            $this->setVar('spouse_email_block','');
+				            if (is_array($owner)) {
+					            $ownerName = $userHandler->formatName($owner);
 
-	                            if($studentContact['StudentContactSpouseMobilePhone'])
-		                            $this->parse('spouse_mobile_block','spouse_mobile');
-	                            else
-		                            $this->setVar('spouse_mobile_block','');
+					            $emailObj = new Email();
+					            $emailAddress = $emailObj->formatEmailFromArray($owner);
 
-	                            if($studentContact['StudentContactSpouseOccupPhone'])
-		                            $this->parse('spouse_phone_block','spouse_phone');
-	                            else
-		                            $this->setVar('spouse_phone_block','');
+					            $this->setVar( array( 'SUBJECT_TEACHER_ID' => $owner['uid'],
+						                           'SUBJECT_TEACHER_EXTERNAL_ID' => $owner['synergy_id'],
+						                           'SUBJECT_TEACHER_NAME' => $ownerName,
+						                           'SUBJECT_TEACHER_EMAIL' => $_SESSION['mailhandle'] . $emailAddress,
+					                           ));
+					            $this->parse('group_teacher_block', 'group_teacher',true);
+
+				            }
 
 
-                                $this->parse('spouse_details_block', 'spouse_details');
-                            }
-                            else {
-                                $this->setVar('spouse_details_block','');
-                            }
+				            $output = array(
+					            'GROUP_NAME' => Scrub::Text($group['name']),
+					            'GROUP_URL' => is_array($group) && $groupHandler->getPermission( $group['id']  ) >= READ_ACCESS ? "/homepage/{$group['id']}": '#',
+				            );
 
-                            $this->parse('contact_details_block', 'contact_details', true);
 
-	                        $prevContact = $studentContact;
-                        }
-                    }
-                }
 
-	            /* Output emergency contacts */
-	            if($synInfo['StudentEmergencyName'] ) {
-		            for($x = 1; $x <= 3; $x++) {
-			            $index = $x == 1?'':$x;
+				            $this->setVar($output);
+				            $this->parse('group_item_block', 'group_item', true);
 
-			            if($synInfo['StudentEmergency'.$index.'Name']) {
-				            $this->setVar(array(
-		                          'EMERGENCY_NAME' => Scrub::text($synInfo['StudentEmergency'.$index.'Name']),
-		                          'EMERGENCY_PHONE' => Scrub::text($synInfo['StudentEmergency'.$index.'Phone']),
-		                          'EMERGENCY_ALT_PHONE' => Scrub::text($synInfo['StudentEmergency'.$index.'PhoneAlt']),
-				                          ));
-			                $this->parse('emergency_contact_block', 'emergency_contact');
+				            if ($i % $listItems == 0) {
+					            $this->parse('group_row_block', 'group_row', true);
+					            $this->setVar('group_item_block', '');
+				            }
+				            $i++;
+			            }
+
+			            if (($i - 1) % $listItems != 0) {
+
+				            $this->parse('group_row_block', 'group_row', true);
+			            }
+			            $this->parse('group_block', 'group');
+		            }
+
+	                $studentContactList = $synUserHandler->getStudentContactList($user['synergy_id']);
+	                if (is_array($studentContactList)) {
+	                    foreach ($studentContactList as $studentContact) {
+	                        if ($prevContact['StudentContactID'] != $studentContact['StudentContactSpouseID'] && ( (int)$studentContact['StudentContactID'] == (int)$_SESSION['sid'] || $studentContact['StudentContactSpouseID'] == $_SESSION['sid'] || $groupHandler->isStaff() || $_SESSION['su'])) {
+	                            $j++;
+
+		                        if ($studentContact['StudentContactDefaultEmail']) {
+		                            $contactEmail = $_SESSION['mailhandle'] . $studentContact['StudentContactDefaultEmail'];
+		                        }
+
+	                            if ($studentContact['StudentContactSpouseDefaultEmail']) {
+	                                $spouseEmail = $_SESSION['mailhandle'] . $studentContact['StudentContactSpouseDefaultEmail'];
+	                            }
+
+		                        $parent = $userHandler->getBySynergy($studentContact['StudentContactID']);
+		                        $spouse = $userHandler->getBySynergy($studentContact['StudentContactSpouseID']);
+
+	                            $output = array(
+	                                'CONTACT_NAME' => Scrub::text(
+	                                    $studentContact['StudentContactTitle'] . ' ' . $studentContact['StudentContactPreferred'] . ' ' . $studentContact['StudentContactSurname']
+	                                ),
+		                            'CONTACT_ID' => $parent['uid'],
+		                            'CONTACT_ROLE' => Scrub::text($studentContact['StudentContactRelation']),
+	                                'CONTACT_ADDRESS' => Scrub::text(
+	                                    $studentContact['StudentContactAddress1']
+	                                ) . '<br>' . Scrub::text(
+	                                    $studentContact['StudentContactSuburb'] . ', ' . $studentContact['StudentContactState'] . ' ' . $studentContact['StudentContactPostCode']
+	                                ),
+	                                'CONTACT_HOME_PHONE' => Scrub::text($studentContact['StudentContactPhoneActual']),
+	                                'CONTACT_MOBILE_PHONE' => Scrub::text($studentContact['StudentContactMobilePhone']),
+	                                'CONTACT_OCCUP_PHONE' => Scrub::text($studentContact['StudentContactOccupPhone']),
+	                                'CONTACT_EMAIL' =>  $contactEmail,
+	                                'CONTACT_NAME_EMAIL' => $contactName,
+	                                'SPOUSE_NAME' => Scrub::text(
+	                                    $studentContact['StudentContactSpouseTitle'] . ' ' . $studentContact['StudentContactSpousePreferred'] . ' ' . $studentContact['StudentContactSpouseSurname']
+	                                ),
+		                            'SPOUSE_ID' => $spouse['uid'],
+		                            'SPOUSE_ROLE' => Scrub::text($studentContact['StudentContactSpouseRelation']),
+	                                'SPOUSE_MOBILE_PHONE' => Scrub::text(
+	                                    $studentContact['StudentContactSpouseMobilePhone']
+	                                ),
+	                                'SPOUSE_OCCUP_PHONE' => Scrub::text($studentContact['StudentContactSpouseOccupPhone']),
+	                                'SPOUSE_EMAIL' => $spouseEmail,
+	                            );
+
+	                            $this->setVar($output);
+
+		                        /* Output each of the block for contact details */
+		                        if($contactEmail)
+			                        $this->parse('contact_email_block','contact_email');
+		                        else
+			                        $this->setVar('contact_email_block','');
+
+								if($studentContact['StudentContactMobilePhone'])
+									$this->parse('contact_mobile_block','contact_mobile');
+								else
+									$this->setVar('contact_mobile_block','');
+
+		                        if($studentContact['StudentContactOccupPhone'])
+			                        $this->parse('contact_phone_block','contact_phone');
+		                        else
+			                        $this->setVar('contact_phone_block','');
+
+
+								/* Has spouse, output spouse */
+	                            if (trim($studentContact['StudentContactSpouseTitle']) || trim($studentContact['StudentContactSpousePreferred'])) {
+
+		                            /* Output each of the block for contact details */
+		                            if($spouseEmail)
+			                            $this->parse('spouse_email_block','spouse_email');
+		                            else
+			                            $this->setVar('spouse_email_block','');
+
+		                            if($studentContact['StudentContactSpouseMobilePhone'])
+			                            $this->parse('spouse_mobile_block','spouse_mobile');
+		                            else
+			                            $this->setVar('spouse_mobile_block','');
+
+		                            if($studentContact['StudentContactSpouseOccupPhone'])
+			                            $this->parse('spouse_phone_block','spouse_phone');
+		                            else
+			                            $this->setVar('spouse_phone_block','');
+
+
+	                                $this->parse('spouse_details_block', 'spouse_details');
+	                            }
+	                            else {
+	                                $this->setVar('spouse_details_block','');
+	                            }
+
+	                            $this->parse('contact_details_block', 'contact_details', true);
+
+		                        $prevContact = $studentContact;
+	                        }
+	                    }
+	                }
+
+		            /* Output emergency contacts */
+		            if($synInfo['StudentEmergencyName'] ) {
+			            for($x = 1; $x <= 3; $x++) {
+				            $index = $x == 1?'':$x;
+
+				            if($synInfo['StudentEmergency'.$index.'Name']) {
+					            $this->setVar(array(
+			                          'EMERGENCY_NAME' => Scrub::text($synInfo['StudentEmergency'.$index.'Name']),
+			                          'EMERGENCY_PHONE' => Scrub::text($synInfo['StudentEmergency'.$index.'Phone']),
+			                          'EMERGENCY_ALT_PHONE' => Scrub::text($synInfo['StudentEmergency'.$index.'PhoneAlt']),
+					                          ));
+				                $this->parse('emergency_contact_block', 'emergency_contact');
+				            }
 			            }
 		            }
+		            else {
+			            $this->setVar('emergency_contact_block','');
+		            }
+
+
+	                if ($groupHandler->isStaff() || (Cfg::get('site_location') != 'mgs' && $groupHandler->isParentOfChild($user['uid']))) {
+	                    if (trim($synInfo['StudentMedicalAlert'])) {
+	                        $this->parse('medical_block', 'medical');
+	                    }
+
+	                    if (trim($synInfo['AlertMessage'])) {
+	                        $this->parse('contact_alert_block', 'contact_alert');
+	                    }
+	                }
+
+	                if (!$j) {
+	                    $this->setVar('contact_details_block', '');
+	                }
+
+	                if (Cfg::get('site_location') == 'wenona') {
+	                    $this->parse('edit_emergency_block', 'edit_emergency');
+	                    $this->parse('edit_contact_block', 'edit_contact');
+	                }
+
+	                /* Display boarder leave for kings */
+	                if (Cfg::get('boarder_leave_enabled') == '1') {
+	                    if ($groupHandler->isStaff() || $_SESSION['id'] == $user['uid']) {
+	                        $this->parse('boarder_leave_block', 'boarder_leave');
+	                    }
+	                }
+
+	                if ($_SESSION['su']) {
+	                    $this->parse('modify_block', 'modify');
+	                }
+
+	                $this->parse('contact_synergy_block', 'contact_synergy');
+
+	                if (trim($synInfo['StudentForm'])) {
+	                    $this->parse('student_synergy_form_block', 'student_synergy_form');
+	                    $this->setVar('student_synergy_tutor_block', '');
+	                } else {
+	                    $this->parse('student_synergy_tutor_block', 'student_synergy_tutor');
+	                    $this->setVar('student_synergy_form_block', '');
+	                }
 	            }
-	            else {
-		            $this->setVar('emergency_contact_block','');
-	            }
-
-
-                if ($groupHandler->isStaff() || (Cfg::get('site_location') != 'mgs' && $groupHandler->isParentOfChild($user['uid']))) {
-                    if (trim($synInfo['StudentMedicalAlert'])) {
-                        $this->parse('medical_block', 'medical');
-                    }
-
-                    if (trim($synInfo['AlertMessage'])) {
-                        $this->parse('contact_alert_block', 'contact_alert');
-                    }
-                }
-
-                if (!$j) {
-                    $this->setVar('contact_details_block', '');
-                }
-
-                if (Cfg::get('site_location') == 'wenona') {
-                    $this->parse('edit_emergency_block', 'edit_emergency');
-                    $this->parse('edit_contact_block', 'edit_contact');
-                }
-
-                /* Display boarder leave for kings */
-                if (Cfg::get('boarder_leave_enabled') == '1') {
-                    if ($groupHandler->isStaff() || $_SESSION['id'] == $user['uid']) {
-                        $this->parse('boarder_leave_block', 'boarder_leave');
-                    }
-                }
-                
-                if ($_SESSION['su']) {
-                    $this->parse('modify_block', 'modify');
-                }
-
-                $this->parse('contact_synergy_block', 'contact_synergy');
-
-                if (trim($synInfo['StudentForm'])) {
-                    $this->parse('student_synergy_form_block', 'student_synergy_form');
-                    $this->setVar('student_synergy_tutor_block', '');
-                } else {
-                    $this->parse('student_synergy_tutor_block', 'student_synergy_tutor');
-                    $this->setVar('student_synergy_form_block', '');
-                }
             } else {
                 if ($groupHandler->isStaff($user['uid']) && $groupHandler->isStaff()) {
 
