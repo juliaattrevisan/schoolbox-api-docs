@@ -48,6 +48,10 @@ switch ($export_type) {
 		}
 		break;
 
+	case 'work':
+		$api = new Calendar_Api_EventType_Submission_Schoolbox_Default(array());
+		break;
+
 	case 'all':
 		$factory = new Calendar_Api_Factory();
 		$api     = $factory->produce();
