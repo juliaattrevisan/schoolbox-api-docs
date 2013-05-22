@@ -104,6 +104,9 @@ class Synchronise_Synergetic_StK_Strategy_Parent extends Synchronise_Synergetic_
 				if (!isset($parents[$user_id])) {
 					$parents[$user_id] = $newUser;
 				}
+				//
+				// Overwrite default campus
+				$parents[$user_id]['defaultCampus'] = $newUser['campus'];
 				$parents[$user_id]['campus'] = array_unique(array_merge(
 					$parents[$user_id]['campus'],
 					$newUser['campus']
