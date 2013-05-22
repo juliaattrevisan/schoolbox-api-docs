@@ -597,18 +597,26 @@ class Calendar extends DeprecatedModel {
     }
 
 	/**
-	 * Get all events occurring on the specified date
+	 * Get all events occurring across the specified date span.
 	 *
-	 * @param $startTimestamp
-	 * @param $endTimestamp
+	 * @param int   $startTimestamp
+	 * @param int   $endTimestamp
+	 * @param array $filter         A filter to put on the list of results.
+	 *                              * campus: if set, event set is restricted to
+	 *                                events in this campus.
+	 *                              * group: if set, event set is restricted to
+	 *                                events for this group.
+	 *                              * personal: if set, only personal events for
+	 *                                current user are set.
+	 *                              If empty, all events for user are retrieved.
+	 *
 	 * @return Calendar_Event_Collection
 	 */
-	public function getDayEvents($startTimestamp, $endTimestamp) {
+	public function getDayEvents($startTimestamp, $endTimestamp, $filter = array()) {
         if (is_array($_SESSION['campus'])) {
             $campusList = $_SESSION['campus'];
             $campusQuery = "eventCampus.campusID IN(" . implode(',', $campusList) . ")";
         } else {
-            $campusList = array(1);
             $campusQuery = '1 = 1';
         }
 
@@ -643,6 +651,26 @@ class Calendar extends DeprecatedModel {
                 $groupChunk = "AND eventGroup.groupID = {$_SESSION['gid']}";
             }
         }
+
+		//
+		// Filters - some of these are covered by main query anyway, so no need
+		// for extra filters.
+		$filter_query = array();
+		if ($filter['campus']) {
+			$filter_query[] = 'access = '.self::ACCESS_CAMPUS;
+			$filter_query[] = 'eventCampus.campusID = '.intval($filter['campus']);
+		}
+		if ($filter['group']) {
+			$filter_query[] = 'access = '.self::ACCESS_GROUP;
+			$filter_query[] = 'eventGroup.groupID = '.intval($filter['group']);
+		}
+		if ($filter['personal']) {
+			$filter_query[] = 'access = '.self::ACCESS_PERSONAL;
+		}
+		$filter_query = implode(' AND ', $filter_query);
+		if (strlen($filter_query) > 0) {
+			$filter_query = " AND ($filter_query)";
+		}
 
         //get single events for the day
         $query = "
@@ -684,6 +712,7 @@ class Calendar extends DeprecatedModel {
 				AND (
 					endDate >= FROM_UNIXTIME('{$startTimestamp}')
 				)
+				$filter_query
 			GROUP BY id
 			ORDER BY event.startTime, event.endTime
 		";

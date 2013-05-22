@@ -19,26 +19,19 @@ class Calendar_Api_EventType_Event_Schoolbox_Group extends Calendar_Api_EventTyp
 	protected $group_id;
 
 	/**
-	 * Overridden to filter out events not for this group.
-	 * TODO stop being lazy - implement proper filtering at the query level
+	 * Overridden to get events only for this group.
 	 *
 	 * @param int $startTimestamp
 	 * @param int $endTimestamp
 	 *
 	 * @return Calendar_Event_Collection
 	 */
-	public function getEvents($startTimestamp, $endTimestamp) {
-		$event_list = parent::getEvents($startTimestamp, $endTimestamp);
-		$new_list   = array();
-		foreach ($event_list as $event) {
-			if ($event->getAccess() == Calendar::ACCESS_GROUP) {
-				if ($event->getCategoryId() == $this->getGroupId()) {
-					$new_list[] = $event;
-				}
-			}
-		}
-		$event_list->setStack($new_list);
-		return $event_list;
+	protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp) {
+		return $this->getCalendarHandler()->getDayEvents(
+			$startTimestamp,
+			$endTimestamp,
+			array('group' => $this->getGroupId())
+		);
 	}
 
 	/**

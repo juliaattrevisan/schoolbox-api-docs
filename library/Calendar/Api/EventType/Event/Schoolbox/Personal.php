@@ -12,23 +12,21 @@
 class Calendar_Api_EventType_Event_Schoolbox_Personal extends Calendar_Api_EventType_Event_Schoolbox_Default {
 
 	/**
-	 * Overridden to filter out non-personal events.
-	 * TODO stop being lazy - implement proper filtering at the query level
+	 * Overridden to get personal events only.
+	 *
+	 * User filtering is done in query - this may change, as admins may want to
+	 * fetch personal events from other calendars.
 	 *
 	 * @param int $startTimestamp
 	 * @param int $endTimestamp
 	 *
 	 * @return Calendar_Event_Collection
 	 */
-	public function getEvents($startTimestamp, $endTimestamp) {
-		$event_list = parent::getEvents($startTimestamp, $endTimestamp);
-		$new_list   = array();
-		foreach ($event_list as $event) {
-			if ($event->getAccess() == Calendar::ACCESS_PERSONAL) {
-				$new_list[] = $event;
-			}
-		}
-		$event_list->setStack($new_list);
-		return $event_list;
+	protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp) {
+		return $this->getCalendarHandler()->getDayEvents(
+			$startTimestamp,
+			$endTimestamp,
+			array('personal' => true)
+		);
 	}
 }

@@ -34,7 +34,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	 * @return Calendar_Event_Collection
 	 */
 	public function getEvents($startTimestamp, $endTimestamp) {
-		$collection = $this->getCalendarHandler()->getDayEvents($startTimestamp, $endTimestamp);
+		$collection = $this->getEventsFromCalendarHandler($startTimestamp, $endTimestamp);
 
 		/* Give the calendar_connector id so this event knows where it came from
 		 * This allows you to create an event detail screen in Mobile
@@ -44,6 +44,21 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 		}
 
 		return $collection;
+	}
+
+	/**
+	 * Gets events out of the calendar handler.
+	 *
+	 * Can be overridden in subclasses - a filter can be set on
+	 * Calendar->getDayEvents().
+	 *
+	 * @param int $startTimestamp
+	 * @param int $endTimestamp
+	 *
+	 * @return Calendar_Event_Collection
+	 */
+	protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp) {
+		return $this->getCalendarHandler()->getDayEvents($startTimestamp, $endTimestamp);
 	}
 
 	/**

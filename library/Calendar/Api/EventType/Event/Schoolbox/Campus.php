@@ -19,26 +19,19 @@ class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventTy
 	protected $campus_id;
 
 	/**
-	 * Overridden to filter out events not for this group.
-	 * TODO stop being lazy - implement proper filtering at the query level
+	 * Overridden to get events only for this campus.
 	 *
 	 * @param int $startTimestamp
 	 * @param int $endTimestamp
 	 *
 	 * @return Calendar_Event_Collection
 	 */
-	public function getEvents($startTimestamp, $endTimestamp) {
-		$event_list = parent::getEvents($startTimestamp, $endTimestamp);
-		$new_list   = array();
-		foreach ($event_list as $event) {
-			if ($event->getAccess() == Calendar::ACCESS_CAMPUS) {
-				if (in_array($this->getCampusId(), explode(',', $event->getCampusList()))) {
-					$new_list[] = $event;
-				}
-			}
-		}
-		$event_list->setStack($new_list);
-		return $event_list;
+	protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp) {
+		return $this->getCalendarHandler()->getDayEvents(
+			$startTimestamp,
+			$endTimestamp,
+			array('campus' => $this->getCampusId())
+		);
 	}
 
 	/**
