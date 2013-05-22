@@ -18,10 +18,18 @@ $page = new SitePage(false);
 $factory = new Calendar_Api_Factory();
 $api = $factory->produce();
 
+//
+// API produced:
+// all: composite
+// campus/x: event/schoolbox/default
+// group/x: event/schoolbox/default
+// personal: event/schoolbox/default?
+// work: submission/schholbox/defualt?
+
 $exporter = new Calendar_Event_Collection_Exporter(
 	$api,
-	strtotime('this year Jan 01 00:00:00'),
-	strtotime('this year Dec 31 23:59:59'),
+	$_SERVER['REQUEST_TIME'],
+	strtotime('+1 year', $_SERVER['REQUEST_TIME']),
 	$page
 );
 $exporter->renderAll();
