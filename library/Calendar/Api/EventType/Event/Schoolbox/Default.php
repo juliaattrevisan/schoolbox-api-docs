@@ -12,9 +12,9 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	/**
 	 * A schoobox event handler instance
 	 *
-	 * @var null
+	 * @var Calendar
 	 */
-	private $calendarHandler = null;
+	private $calendarHandler;
 
 	/**
 	 * Constructor
@@ -106,7 +106,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	/**
 	 * Set calendar handler
 	 *
-	 * @param $calendarHandler
+	 * @param Calendar $calendarHandler
 	 */
 	public function setCalendarHandler($calendarHandler) {
 		$this->calendarHandler = $calendarHandler;
@@ -115,7 +115,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	/**
 	 * Get calendar handler
 	 *
-	 * @return null
+	 * @return Calendar
 	 */
 	public function getCalendarHandler() {
 		return $this->calendarHandler;
