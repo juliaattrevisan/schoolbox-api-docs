@@ -58,28 +58,7 @@ class Calendar_Event_Collection_Exporter extends Calendar_Event_Collection_Rende
 	 * get all the mandatory methods
 	 */
 	protected function collectAllEvents() {
-		$reflection = new ReflectionClass($this->getInterfaceClass());
-
-		$year = date('Y');
-
-		/* For each day of the year
-		 */
-		for ($x=1; $x < 364; $x++) {
-			$this->setCurrentDay(mktime(5,0,0,1,$x,$year));
-
-			/* Grab all the events for the day
-			 */
-			foreach ($reflection->getMethods() as $currentMethod) {
-				$methodName = $currentMethod->getName();
-
-				$eventList = $this->getApi()->$methodName($this->getCurrentDay());
-
-				$this->getAllEvents()->merge($eventList);
-			}
-		}
-
-		/* Sort all the events in order of time
-		 */
+		$this->setAllEvents($this->getApi()->getEvents($this->getStartTimestamp(), $this->getEndTimestamp()));
 		$this->getAllEvents()->sort();
 	}
 
