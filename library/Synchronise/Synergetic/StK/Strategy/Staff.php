@@ -46,7 +46,7 @@ class Synchronise_Synergetic_StK_Strategy_Staff extends Synchronise_Synergetic_S
 		$newUser['local_email']   = 0;
 		$newUser['defaultCampus'] = $this->getCampusFromCurrentUser($currentUser);
 		$newUser['campus']        = array($newUser['defaultCampus']);
-		$newUser['group_id']      = self::STAFF_GROUP_ID;
+		$newUser['group_id']      = $this->getStaffGroupIdFromCurrentUser($currentUser);
 		return $newUser;
 	}
 

@@ -139,6 +139,39 @@ abstract class Synchronise_Synergetic_StK_Strategy_Abstract extends Synchronise_
 	}
 
 	/**
+	 * Figure out the Group ID for a staff user. It's based on the staff
+	 * category field.
+	 *
+	 * @param  $user
+	 * @return bool|int
+	 */
+	protected function getStaffGroupIdFromCurrentUser($user) {
+		switch (strtolower($user['StaffCategory'])) {
+			case 'p/t admin':
+			case 'administration':
+			case 'relief admin':
+			case 'admin supp':
+			case 'maintenance':
+			case 'misc':
+				//
+				// admin group
+				return self::ADMIN_GROUP_ID;
+
+			case 'maternity':
+			case '':
+				//
+				// on mat leave - could be either type. blank - probably former
+				// staff member. Leave group blank.
+				return false;
+
+			default:
+				//
+				// teacher by default
+				return self::STAFF_GROUP_ID;
+		}
+	}
+
+	/**
 	 * Determine if this person has a username
 	 *
 	 * @param  $currentUser
