@@ -80,6 +80,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 				$event->setSubmissionBoxId($assessment->getId());
 				$event->setSubmissionBoxName($assessment->getTitle());
 				$event->setSubmissionBoxDetail($assessment->getDescription());
+				$event->setPublishDate($assessment->getStart());
 			}
 			else {
 				$submission_box = $activity->getSubmissionBox();
@@ -88,6 +89,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 				$event->setSubmissionBoxId($submission_box->getId());
 				$event->setSubmissionBoxName($submission_box->getName());
 				$event->setSubmissionBoxDetail($submission_box->getDescription());
+				$event->setPublishDate($submission_box->getOpenDate());
 			}
 
 			$event->setAuthorId($owner->getId());
