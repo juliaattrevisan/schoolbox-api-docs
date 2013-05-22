@@ -78,7 +78,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 				if($video->getStatus() == "completed"){
 					$this->parse('video_list_block','video_list',true);
 				}
-				else if($this->permission = WRITE_ACCESS) {
+				else if($this->permission >= WRITE_ACCESS) {
 			        $this->setVar( array(
 				                        'VIDEO_LIST_STATUS' => $video->getStatus(),
 					                    'VIDEO_LIST_STATUSIMG' => "/images/core/component/video-thumbnail-".strtolower($video->getStatus()).".jpg",
