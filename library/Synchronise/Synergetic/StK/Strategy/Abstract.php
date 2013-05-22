@@ -77,20 +77,19 @@ abstract class Synchronise_Synergetic_StK_Strategy_Abstract extends Synchronise_
 	}
 
 	/**
-	 * Figure out which Campus belongs to this Student
+	 * Calculate Schoolbox campus from Synergetic campus.
 	 *
-	 * For St. Kentigern this is always based on the user's campus:
 	 * * 1: Co-ed (C)
 	 * * 2: Girls (G)
 	 * * 3: Boys (B or S)
 	 * * 4: Pre-school (P)
 	 *
-	 * @param  $user
-	 * @return bool|string
+	 * @param $campus
+	 *
+	 * @return bool|int
 	 */
-	protected function getCampusFromCurrentUser($user)
-	{
-		switch ($user['StudentCampus']) {
+	protected function getCampusFromSynergeticCampus($campus) {
+		switch ($campus) {
 			case 'C':
 				return 1;
 			case 'G':
@@ -103,6 +102,26 @@ abstract class Synchronise_Synergetic_StK_Strategy_Abstract extends Synchronise_
 			default:
 				return false;
 		}
+	}
+
+	/**
+	 * Figure out which Campus belongs to this Student
+	 *
+	 * @param  $user
+	 * @return bool|string
+	 */
+	protected function getCampusFromCurrentUser($user) {
+		return $this->getCampusFromSynergeticCampus($user['StudentCampus']);
+	}
+
+	/**
+	 * Figure out which Campus belongs to this staff member.
+	 *
+	 * @param  $user
+	 * @return bool|string
+	 */
+	protected function getStaffCampusFromCurrentUser($user) {
+		return $this->getCampusFromSynergeticCampus($user['StaffCampus']);
 	}
 
 	/**
