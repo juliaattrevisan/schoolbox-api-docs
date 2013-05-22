@@ -81,7 +81,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 				else if($this->permission >= WRITE_ACCESS) {
 			        $this->setVar( array(
 				                        'VIDEO_LIST_STATUS' => $video->getStatus(),
-					                    'VIDEO_LIST_STATUSIMG' => "/images/core/component/video-thumbnail-".strtolower($video->getStatus()).".jpg",
+					                    'VIDEO_LIST_STATUSIMG' => "/images/core/component/video-thumbnail-".strtolower($video->getStatus()).".gif",
 			        ));
 					$this->parse('video_pending_list_block','video_pending_list',true);
 				}
