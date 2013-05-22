@@ -110,7 +110,7 @@ class Calendar_Event_Collection_Renderer {
 	/**
 	 * Set api
 	 *
-	 * @param $api
+	 * @param Calendar_Api_EventType_Interface $api
 	 */
 	protected function setApi($api) {
 		$this->api = $api;
@@ -119,7 +119,7 @@ class Calendar_Event_Collection_Renderer {
 	/**
 	 * Get api
 	 *
-	 * @return null
+	 * @return Calendar_Api_EventType_Interface
 	 */
 	protected function getApi() {
 		return $this->api;
