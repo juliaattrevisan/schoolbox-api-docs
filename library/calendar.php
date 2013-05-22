@@ -14,6 +14,10 @@ class Calendar extends DeprecatedModel {
 
     const ATTENDANCE_INTENTION_ABSENT = 3;
 
+    const ACCESS_PERSONAL = 1;
+    const ACCESS_GROUP    = 2;
+    const ACCESS_CAMPUS   = 3;
+
     function Calendar() {
 
         $this->_table = "event";
@@ -192,16 +196,16 @@ class Calendar extends DeprecatedModel {
 
         switch ($event['access']) {
 
-            case 1: // personal
+            case self::ACCESS_PERSONAL:
                 return $event['owner'] == $_SESSION['id'] ? 2 : 0;
 
-            case 2: // single group
+            case self::ACCESS_GROUP:
                 $this->groupHandler->setService(HOMEPAGE_SERVICE);
                 $permission = $this->groupHandler->getPermission($event['sid']);
                 $this->groupHandler->setService(CALENDAR_SERVICE);
                 return $permission;
 
-            case 3: // campus
+            case self::ACCESS_CAMPUS:
 
                 if (is_array($event['campusList'])) {
                     $campusList = $event['campusList'];
