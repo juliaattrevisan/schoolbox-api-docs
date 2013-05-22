@@ -9,17 +9,30 @@
 *                                                           *
 /************************************************************/
 
-require_once '../../include/SitePage.php';
-require_once '../include/iCalcreator.class.php';
-require_once '../../library/calendar.php';
+require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
+require_once dirname(__FILE__) . '/../include/iCalcreator.class.php';
 
-//
-// TODO pull user ID from token, and set into session
-session_start();
-
+$session     = new Session();
+$token       = $_GET['token'];
 $export_type = $_GET['export'];
 $export_id   = intval($_GET['id']);
 $api         = null;
+
+//
+// TODO pull user ID from token, and set into session
+// Really dumb token: username.
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+$user = Schoolbox\UserMapper::getInstance()->findOneByColumn('username', $token);
+if (!$user instanceof User) {
+	//
+	// exit with error (auth reqd)
+}
+else {
+	$session->destroy();
+	$session->create($user->getUsername());
+}
+
 switch ($export_type) {
 
 	case 'personal':
@@ -75,4 +88,5 @@ else {
 	// Exit with error (bad request?)
 }
 
+$session->destroy();
 exit();
