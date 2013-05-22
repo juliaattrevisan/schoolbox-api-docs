@@ -28,9 +28,8 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	/**
 	 * Get day events from this data source
 	 *
-	 * @param $startTimestamp
-	 * @param $endTimestamp
-	 * @internal param $currentDay
+	 * @param int $startTimestamp
+	 * @param int $endTimestamp
 	 *
 	 * @return Calendar_Event_Collection
 	 */
