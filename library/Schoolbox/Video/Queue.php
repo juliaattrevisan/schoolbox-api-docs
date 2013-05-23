@@ -56,9 +56,6 @@ class Queue {
 
 		preg_match('/Duration: ([0-9\:]+)/',$this->getMessage(), $match);
 
-
-
-
 		if(isset($match[1])) {
 			$hours = $minutes = $seconds = 0;
 			sscanf($match[1], "%d:%d:%d", $hours, $minutes, $seconds);
@@ -72,12 +69,11 @@ class Queue {
 		$thumbnailString = 'nice avconv -y -i ' . escapeshellarg($sourceFile) . ' -f image2 -ss '.$thumbnailSeconds.' -vf scale=-1:64,crop=64:64 -frames:v 1 ' . escapeshellarg($this->getThumbnailLocation()).' 2>&1';
 
 		$posterString = 'nice avconv -y -i ' . escapeshellarg($sourceFile) . ' -f image2 -ss '.$thumbnailSeconds.' -frames:v 1 ' . escapeshellarg($this->getPosterLocation()).' 2>&1';
-		print $posterString;
 
 		if($return == 0){
 			exec($thumbnailString, $output, $return);
 			exec($posterString, $output, $return);
-			print_r($output);
+
 			if($return == 0)
 				return true;
 			else

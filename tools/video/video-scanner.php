@@ -32,8 +32,6 @@ $stmt->execute();
 
 while($pendingFile = $stmt->fetch() ){
 
-	print_r($pendingFile);
-
 	$videoQ = new Queue();
 
 	$videoQ->setFileID($pendingFile['id']);
