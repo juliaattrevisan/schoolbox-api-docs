@@ -3,6 +3,7 @@
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.print.css" media="print" />
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css"/>
+<script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
 <script type="text/javascript" src="/javascript/jquery.fullcalendar.js"></script>
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
 <script type="text/javascript">
@@ -379,7 +380,18 @@
             return false
         })
 
-
+        //
+        // Form listener for exporter - brings up a dialog box that offers a URL
+		// to click.
+        $j('#calendar-export form').submit(function(event) {
+            event.preventDefault();
+            var form = $j(this);
+            //
+            // Make some sort of popup window here.
+            if ('exportCalendarLink' in $j) {
+                console.log($j.getExportCalendarLink('b', form.serializeArray()));
+            }
+        });
     })
 </script>
 <style type='text/css'>
@@ -539,21 +551,21 @@
 		<div class="filter-drop clearfix">
 			<div class="filter-list">
 				<form class="clearfix">
-					<div class="filter-cat">
+					<div class="export-cat all-events">
 						<label title="All events" for="export-all">
 							<input type="radio" name="export" value="all" id="export-all" checked />
 							All events
 						</label>
 					</div>
-					<div class="filter-cat">
+					<div class="export-cat personal-events">
 						<label title="Personal events only" for="export-personal">
-							<input type="radio" name="export" value="all" id="export-personal" />
+							<input type="radio" name="export" value="personal" id="export-personal" />
 							Personal events only
 						</label>
 					</div>
-					<div class="filter-cat">
+					<div class="export-cat group-events">
 						<label title="Events for group" for="export-group">
-							<input type="radio" name="export" value="all" id="export-group" />
+							<input type="radio" name="export" value="group" id="export-group" />
 							Events for group:
 							<select name="group">
 								<option value="">-- select --</option>
@@ -563,9 +575,9 @@
 							</select>
 						</label>
 					</div>
-					<div class="filter-cat">
+					<div class="export-cat campus-events">
 						<label title="Events for campus" for="export-campus">
-							<input type="radio" name="export" value="all" id="export-campus" />
+							<input type="radio" name="export" value="campus" id="export-campus" />
 							Events for campus:
 							<select name="campus">
 								<option value="">-- select --</option>
@@ -575,7 +587,7 @@
 							</select>
 						</label>
 					</div>
-					<input type="submit" value="Generate URL" />
+					<input type="submit" value="Generate URL" class="btn float-right" />
 				</form>
 			</div>
 		</div>
