@@ -363,10 +363,6 @@
         $j('#calendar-export form').submit(function(event) {
             event.preventDefault();
             var form = $j(this);
-            //
-            // Make some sort of popup window here.
-            var dialog = $j('#calendar-export-dialog');
-            dialog.find('text')
             $j('#calendar-export-dialog').dialog({
                 open: function(event, ui) {
                     $j(event.target).find('#calendar-export-dialog-url')
@@ -427,18 +423,6 @@
 	#ui-datepicker-div {
 		z-index: 1000;
 	}
-
-	#calendar-export-dialog {
-		display: none;
-	}
-	#calendar-export-dialog-url {
-		font-family: monospace;
-		background-color: #eeeeee;
-		padding: 5px;
-		border: 1px solid black;
-		width: 100%;
-	}
-
 </style>
 <!-- END custom_head -->
 
