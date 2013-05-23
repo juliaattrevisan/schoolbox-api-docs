@@ -456,6 +456,17 @@ Bubble.prototype.display = function(method, eventData, mouseEvent, targetElement
     else {
         id += 'Event'
     }
+
+	/* Hide "Posted By" if there is no author
+	 * (This happens on subscribed vcals for example)
+	 */
+	if (eventData.authorId == -1) {
+		$j('dd.post-by').hide();
+	}
+	else {
+		$j('dd.post-by').show();
+	}
+
     var xPos = mouseEvent.pageX
     var yPos = $j(targetElement).offset().top + 5
     this.fillForm(id, eventData)
