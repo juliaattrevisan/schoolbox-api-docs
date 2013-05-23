@@ -357,6 +357,26 @@
             return false
         })
 
+        //
+        // Form listener for exporter - brings up a dialog box that offers a URL
+        // to click.
+        $j('#calendar-export form').submit(function(event) {
+            event.preventDefault();
+            var form = $j(this);
+            //
+            // Make some sort of popup window here.
+            var dialog = $j('#calendar-export-dialog');
+            dialog.find('text')
+            $j('#calendar-export-dialog').dialog({
+                open: function(event, ui) {
+                    $j(event.target).find('#calendar-export-dialog-url')
+                        .text($j.getExportCalendarLink('b', form.serializeArray()));
+                },
+                minWidth: 400,
+                modal: true
+            });
+        });
+
         // if a checkbox on the calendar is interacted, ajax
         c.dom.delegate('input[type=checkbox]', 'change', function(e) {
 
@@ -379,17 +399,6 @@
             e.preventDefault()
             return false
         })
-
-        //
-        // Form listener for exporter - brings up a dialog box that offers a URL
-        // to click.
-        $j('#calendar-export form').submit(function(event) {
-            event.preventDefault();
-            var form = $j(this);
-            //
-            // Make some sort of popup window here.
-            console.log($j.getExportCalendarLink('b', form.serializeArray()));
-        });
     })
 </script>
 <style type='text/css'>
@@ -417,6 +426,17 @@
 
 	#ui-datepicker-div {
 		z-index: 1000;
+	}
+
+	#calendar-export-dialog {
+		display: none;
+	}
+	#calendar-export-dialog-url {
+		font-family: monospace;
+		background-color: #eeeeee;
+		padding: 5px;
+		border: 1px solid black;
+		width: 100%;
 	}
 
 </style>
@@ -592,4 +612,9 @@
 	</div>
 </div>
 <div id="calendar"></div>
-
+<div id="calendar-export-dialog">
+	<div id="calendar-export-dialog-text">
+		Use the following URL as the source for your feed.
+	</div>
+	<textarea readonly id="calendar-export-dialog-url"></textarea>
+</div>
