@@ -33,11 +33,14 @@
 <script type="text/javascript">
     $j('a.video-link').click(function() {
         var $target = "/cms/sendVideo.php?id="+$j(this).attr("rel");
+        var $poster = "/cms/videoThumb.php?id="+$j(this).attr("rel")+"&type=poster";
         var $video = _V_("schoolbox_video{COMPONENT_INSTANCE_ID}");
 
         $video.ready(function(){
             this.pause();
-            this.src({type: "video/mp4", src: $target});
+            $j("#schoolbox_video{COMPONENT_INSTANCE_ID}_html5_api").attr('poster', $poster);
+            $j(".vjs-poster").css( { "background-image": "url("+$poster+")"});
+            this.src({ type: "video/mp4", src: $target});
             this.bigPlayButton.show();
         });
         return false;
