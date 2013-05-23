@@ -46,27 +46,32 @@ if (is_numeric($_GET['id'])) {
 			$byteOffset = 0;
 			$byteLength = $filesize;
 
-
 			/* Determine range of request for streaming protocol */
 			if( $_SERVER['HTTP_RANGE'] )
 			{
 				$ranges = explode(',', substr($_SERVER['HTTP_RANGE'], 6));
 				$parts = explode('-', $ranges[0]);
 
-				header('HTTP/1.1 206 Partial content');
 
 				// Offset signifies where we should begin to read the file
 				$byteOffset = (int)$parts[0];
 
 				// Length is for how long we should read the file according to the browser, and can never go beyond the file size
-				if( isset($parts[1]) && $parts[1] ) {
-					$byteLength = min( (int)$parts[1], $byteLength - $byteOffset);
+				if( isset($parts[1]) && $parts[1] != '' && $parts[1] < $filesize ) {
+					$byteLength = (int)$parts[1];
 				}
 				else {
-					$byteLength = $filesize;
+					$byteLength = $filesize-1;
 				}
 
-				header(sprintf('Content-Range: bytes %d-%d/%d', $byteOffset, $byteLength - 1, $filesize));  // Decrease by 1 on byte-length since this definition is zero-based index of bytes being sent
+				if($byteOffset > $byteLength) {
+					header('HTTP/1.1 416 Requested Range Not Satisfiable');
+					header('Content-Range: bytes */' . $filesize); // Required in 416.
+					exit;
+				}
+
+				header('HTTP/1.1 206 Partial content');
+				header(sprintf('Content-Range: bytes %d-%d/%d', $byteOffset, $byteLength, $filesize));  // Decrease by 1 on byte-length since this definition is zero-based index of bytes being sent
 			}
 
 			/* Set initial basic headers */
@@ -75,20 +80,15 @@ if (is_numeric($_GET['id'])) {
 			header_remove('Pragma');
 			header('Accept-Ranges: bytes', true);
 
-			$byteRange = $byteLength - $byteOffset;
-
+			$byteRange = $byteLength - $byteOffset + 1;
 			header('Content-Length: '.$byteRange, true);
 
 			if($handle = fopen($filename, 'rb')) {
 				fseek($handle, $byteOffset, SEEK_SET);
-				while( ftell($handle) < $byteLength && !feof($handle)) {
-					if(ftell($handle) + 8024 < $byteLength) {
-						echo fread($handle, 8024); /* output 8kb buffer to avoid memory issues with large files */
-					} else {
-						echo fread($handle, ($byteLength - ftell($handle)));
-
-					}
+				while( !feof($handle)) {
+					echo fread($handle, 8192);
 					flush();
+					ob_flush();
 				}
 			}
 		}
