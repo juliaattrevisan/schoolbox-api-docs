@@ -370,7 +370,7 @@
             $j('#calendar-export-dialog').dialog({
                 open: function(event, ui) {
                     $j(event.target).find('#calendar-export-dialog-url')
-                        .text($j.getExportCalendarLink('b', form.serializeArray()));
+                        .text($j.getExportCalendarLink('{USER_TOKEN}', form.serializeArray()));
                 },
                 minWidth: 400,
                 modal: true
