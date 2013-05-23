@@ -32,8 +32,16 @@ function Calendar(id, bubbleId, opts) {
         filter: {
             ajax: '.',
             enabled: true,
+            //
+            // Selectors for filter control
             parentSelector: '#calendar-controls',
             btnSelector: '#fc-button-filter',
+            //
+            // Selectors for export control
+            exportSelector: '#calendar-export',
+            exportButtonSelector: '#fc-button-export',
+            //
+            // Selectors within filter and export items
             checkboxSelector: '.applyFilters',
             applyFiltersSelector: '#applyFilters',
             boxSelector: '.filter-drop',
@@ -67,13 +75,30 @@ function Calendar(id, bubbleId, opts) {
 
         interaction: function(cal) {
 
+            var calendarButtons = $j(cal.options.filter.btnSelector)
+            var exportButtons   = $j(cal.options.filter.exportButtonSelector)
+
             var calendarControls = $j(cal.options.filter.parentSelector)
+            var exportControls   = $j(cal.options.filter.exportSelector)
 
             // show the filter 'dialog' when the button is clicked
             cal.dom.delegate(cal.options.filter.btnSelector, 'click', function() {
                 cal.bubble.hide()
                 calendarControls.find(cal.options.filter.boxSelector).toggle()
-                $j(cal.options.filter.btnSelector).toggleClass('engaged')
+                exportControls.find(cal.options.filter.boxSelector).hide()
+                exportButtons.removeClass('engaged')
+                calendarButtons.toggleClass('engaged')
+                return false
+            })
+
+            //
+            // Show the export filter
+            cal.dom.delegate(cal.options.filter.exportButtonSelector, 'click', function() {
+                cal.bubble.hide()
+                calendarControls.find(cal.options.filter.boxSelector).hide()
+                exportControls.find(cal.options.filter.boxSelector).toggle()
+                calendarButtons.removeClass('engaged')
+                exportButtons.toggleClass('engaged')
                 return false
             })
 
