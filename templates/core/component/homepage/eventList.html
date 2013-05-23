@@ -1,4 +1,5 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
+	<script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
     <script type='text/javascript'>
         $j(function () {
             $j('a.{CALENDAR_PREFIX}-attendance-request').live('click', function (event) {
@@ -18,6 +19,24 @@
                             button.html('<span></span>Attend');
                         }
                     }
+                });
+            });
+            //
+            // Form listener for exporter - brings up a dialog box that offers a URL
+            // to click.
+            $j('#calendar-export').click(function(event) {
+                event.preventDefault();
+                $j('#calendar-export-dialog').dialog({
+                    open: function(event, ui) {
+                        $j(event.target).find('#calendar-export-dialog-url')
+                            .text($j.getExportCalendarLink(
+                                '{USER_TOKEN}',
+                                {'export': 'group', 'group': '{ID}'}
+                            )
+                        );
+                    },
+                    minWidth: 400,
+                    modal: true
                 });
             });
         });
@@ -63,7 +82,20 @@
             <!-- END group_events -->
         </ul>
     </div>
-    <!-- BEGIN submit_event -->
-    <p class="interact"><a href="/calendar/modify.php?level=2&sid={ID}" class="btn add"><span></span>Add Event</a></p>
-    <!-- END submit_event -->
+    <p class="interact">
+        <!-- BEGIN submit_event -->
+        <a href="/calendar/modify.php?level=2&sid={ID}" class="btn add"><span></span>Add Event</a>
+        <!-- END submit_event -->
+        <a id="calendar-export" href="#" class="btn translate"><span></span>Export Events</a>
+    </p>
+    <!--
+    Dialog for export. There's only one calendar component per homepage, so it's
+    okay to add item with ID here?
+    -->
+    <div id="calendar-export-dialog">
+        <div id="calendar-export-dialog-text">
+            Use the following URL as the source for your feed.
+        </div>
+        <textarea readonly id="calendar-export-dialog-url"></textarea>
+    </div>
 </div>
