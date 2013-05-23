@@ -382,15 +382,13 @@
 
         //
         // Form listener for exporter - brings up a dialog box that offers a URL
-		// to click.
+        // to click.
         $j('#calendar-export form').submit(function(event) {
             event.preventDefault();
             var form = $j(this);
             //
             // Make some sort of popup window here.
-            if ('exportCalendarLink' in $j) {
-                console.log($j.getExportCalendarLink('b', form.serializeArray()));
-            }
+            console.log($j.getExportCalendarLink('b', form.serializeArray()));
         });
     })
 </script>
