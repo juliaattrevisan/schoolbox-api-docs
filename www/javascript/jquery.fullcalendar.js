@@ -210,23 +210,22 @@ Calendar.prototype.init = function() {
 
     if(this.options.filter.enabled) {
         // mash the filters in
-        var headerRight = this.dom.find('td.fc-header-right')
-        headerRight.prepend(headerRight.children('.fc-button')
-            .first().clone().removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
-            .addClass('fc-button-filter fc-corner-left fc-corner-right').attr('id','fc-button-filter')
-        )
-
-        $j(this.options.filter.btnSelector).html('filters')
-
-        /*
-        // mash the datepicker in
-        var headerCenter = this.dom.find('td.fc-header-center')
-        headerCenter.prepend(headerRight.children('.fc-button-month').clone().removeClass('fc-button-month')
-            .addClass('fc-button-datepick month no-text').attr('id','fc-button-datepick')
-        )
-
-        $j('#fc-button-datepick').find('.fc-button-content').html('')
-        */
+        var headerRight = this.dom.find('td.fc-header-right');
+        var baseButton  = headerRight.children('.fc-button').first();
+        headerRight.prepend(
+            baseButton.clone()
+                .html('filters')
+                .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
+                .addClass('fc-button-filter fc-corner-left fc-corner-right')
+                .attr('id','fc-button-filter')
+        );
+        headerRight.append(
+            baseButton.clone()
+                .html('export')
+                .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
+                .addClass('fc-button-filter fc-corner-left fc-corner-right')
+                .attr('id','fc-button-export')
+        );
 
         // and now make all the buttons on the header look the way they're meant to
         var header = this.dom.children('.fc-header')
