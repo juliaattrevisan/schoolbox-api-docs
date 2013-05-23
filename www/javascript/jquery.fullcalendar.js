@@ -119,7 +119,7 @@ function Calendar(id, bubbleId, opts) {
                 $j(cal.options.filter.btnSelector).removeClass('engaged')
             })
 
-            calendarControls.delegate(cal.options.filter.boxSelector, 'click', function(e) {
+            calendarControls.add(exportControls).delegate(cal.options.filter.boxSelector, 'click', function(e) {
                 e.stopPropagation()
             })
 
