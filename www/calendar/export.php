@@ -21,6 +21,7 @@ try {
 	$export_type = $_GET['export'];
 	$export_id   = intval($_GET['id']);
 	$api         = null;
+	$filename    = 'calendar.ics';
 	if (empty($token)) {
 		throw new Exception_Schoolbox('No token provided', 401);
 	}
@@ -45,7 +46,8 @@ try {
 
 	switch ($export_type) {
 		case 'personal':
-			$api = new Calendar_Api_EventType_Event_Schoolbox_Personal(array());
+			$api      = new Calendar_Api_EventType_Event_Schoolbox_Personal(array());
+			$filename = 'personal.ics';
 			break;
 
 		case 'group':
@@ -56,6 +58,7 @@ try {
 			else {
 				throw new Exception_Schoolbox('A group ID must be provided', 400);
 			}
+			$filename = sprintf('group%d.ics', $export_id);
 			break;
 
 		case 'campus':
@@ -66,10 +69,12 @@ try {
 			else {
 				throw new Exception_Schoolbox('A campus ID must be provided', 400);
 			}
+			$filename = sprintf('campus%d.ics', $export_id);
 			break;
 
-		case 'work':
-			$api = new Calendar_Api_EventType_Submission_Schoolbox_Default(array());
+		case 'duework':
+			$api      = new Calendar_Api_EventType_Submission_Schoolbox_Default(array());
+			$filename = 'duework.ics';
 			break;
 
 		case 'all':
@@ -95,6 +100,8 @@ try {
 		strtotime('+1 year', $_SERVER['REQUEST_TIME']),
 		new SitePage(false)
 	);
+	header('Content-Type: text/calendar; charset=utf-8');
+	header('Content-Disposition: inline; filename='.$filename);
 	$exporter->renderAll();
 }
 catch (Exception_Schoolbox $e) {
