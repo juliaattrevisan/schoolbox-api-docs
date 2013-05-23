@@ -5,7 +5,8 @@
     {CONFIGURATION}
 <!-- BEGIN default_video -->
 <div class="videoWrapper">
-    <video id="schoolbox_video{COMPONENT_INSTANCE_ID}" class="video-js vjs-default-skin" controls="true" preload="auto" width="100%" height="400">
+    <video id="schoolbox_video{COMPONENT_INSTANCE_ID}" class="video-js vjs-default-skin" controls="true" preload="auto" width="100%" height="400"
+           poster="/cms/videoThumb.php?id={DEFAULT_VIDEO_ID}&type=poster">
       <source src="/cms/sendVideo.php?id={DEFAULT_VIDEO_ID}" type='video/mp4'>
     </video>
     <script> var video = _V_("schoolbox_video{COMPONENT_INSTANCE_ID}"); </script>

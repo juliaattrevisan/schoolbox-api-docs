@@ -24,7 +24,12 @@ if (is_numeric($_GET['id'])) {
 	if ($groupHandler->getPermission($video->getFile()->getFolder()) < READ_ACCESS)
 		error(5);
 
-	$filename = $video->getThumbnailLocation();
+	if($_GET['type'] == 'poster') {
+		$filename = $video->getPosterLocation();
+	}
+	else {
+		$filename = $video->getThumbnailLocation();
+	}
 
 	if(is_readable($filename) ) {
 		$filesize = filesize($filename);
