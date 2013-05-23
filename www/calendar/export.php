@@ -27,8 +27,9 @@ try {
 	}
 
 	//
-	// TODO use a proper token instead of username
-	$user = Schoolbox\UserMapper::getInstance()->findOneByColumn('username', $token);
+	// Not 100% happy with this token but meh, it's what's being used in other
+	// places that need a token.
+	$user = Schoolbox\UserMapper::getInstance()->findOneByColumn('key', $token);
 	if (!$user instanceof User) {
 		throw new Exception_Schoolbox('Invalid token', 401);
 	}
