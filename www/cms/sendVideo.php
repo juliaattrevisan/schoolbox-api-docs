@@ -85,7 +85,9 @@ if (is_numeric($_GET['id'])) {
 
 			if($handle = fopen($filename, 'rb')) {
 				fseek($handle, $byteOffset, SEEK_SET);
-				while( !feof($handle)) {
+				$readTill = $byteLength;
+
+				while( !feof($handle) && ftell($handle) <= $byteLength) {
 					echo fread($handle, 8192);
 					flush();
 					ob_flush();
