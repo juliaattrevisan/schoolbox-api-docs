@@ -36,26 +36,29 @@ elseif(isset($_POST['uid']) && isset($_POST['box_id']) && $_POST['markUpdate'] =
         foreach ($_POST['uid'] as $k => $id) {
             $uploadIndex = "file-return-$id";
 
-            if(isset($_FILES[$uploadIndex])) {
-                if($_FILES[$uploadIndex]['name']) {
+            //
+            // Get last mark and comment, and merge it with this one.
+            $result = $returnHandler->getByUser($_POST['uid'][$k], $_POST['box_id'], 1);
+            $return = array(
+                'box_id'    => $_POST['box_id'],
+                'owner'     => $_POST['uid'][$k],
+                'comment'   => $_POST['comment'][$k],
+                'mark'      => (!empty($result[0]) ? $result[0]['mark']      : null),
+                'norm_mark' => (!empty($result[0]) ? $result[0]['norm_mark'] : null),
+            );
+            $uploaded_file = null;
+
+            //
+            // Add file, if there was one.
+            if (isset($_FILES[$uploadIndex])) {
+                if ($_FILES[$uploadIndex]['name']) {
                     $returnHandler->securityCheck($_POST['box_id'], 0);
                     $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES[$uploadIndex]));
-
                     $mark = $marksheet->normaliseMark($_POST['mark'][$k], $subbox);
-
-                    //
-                    // Get last mark and comment, and merge it with this one.
-                    $result = $returnHandler->getByUser($_POST['uid'][$k], $_POST['box_id'], 1);
-                    $return = array(
-                        'box_id'    => $_POST['box_id'],
-                        'owner'     => $_POST['uid'][$k],
-                        'comment'   => $result[0]['comment'],
-                        'mark'      => $result[0]['mark'],
-                        'norm_mark' => $result[0]['norm_mark']
-                    );
-                    saveReturn($return, null, $_FILES[$uploadIndex]);
+                    $uploaded_file = $_FILES[$uploadIndex];
                 }
             }
+            saveReturn($return, null, $uploaded_file);
         }
     }
     $page->localRedir('/submission/viewSubmission/' . $_POST['box_id']);
