@@ -28,8 +28,12 @@
             };
 
             var container = $j('#galleryCycle-{COMPONENT_INSTANCE_ID}');
-            container.find('.slideshow-cycle').hide().css(slide_position);
-            container.find('.slideshow-cycle img').imagesLoaded(function (images) {
+            var slideshow = container.find('.slideshow-cycle');
+            if (slideshow.length > 1) {
+                slideshow.hide();
+            }
+            slideshow.css('text-align', slide_position);
+            slideshow.imagesLoaded(function (images) {
 
                 //
                 // Set width to widest slide.
