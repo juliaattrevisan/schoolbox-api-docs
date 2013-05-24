@@ -145,6 +145,7 @@ class AttemptMapper extends Mapper {
 				RIGHT JOIN assess          a  ON aa.assess_id   = a.assess_id
 			WHERE a.assess_id = :assess_id
 			AND a.availability = 'assess'
+			AND aa.deleted_at IS NULL
 			GROUP BY aa.assess_id, aa.attempt_id
 			ORDER BY aa.start DESC
 		";
