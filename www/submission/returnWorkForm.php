@@ -183,8 +183,14 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID, $year = 0, $semest
         $errors[$e->displayAs] = $e;
     }
 
-    // error given
-    if(isset($errors[$givenMark])) {
+    //
+    // Empty mark (not zero) - treat as null
+    if (trim($givenMark) === '') {
+        $mark['mark']      = null;
+        $mark['norm_mark'] = 'NULL';
+    }
+    elseif (isset($errors[$givenMark])) {
+        // error given
         $mark['mark'] = $errors[$givenMark]->displayAs;
         $mark['norm_mark'] = $errors[$givenMark]->normaliseAs === NULL ? 'NULL' : $errors[$givenMark]->normaliseAs;
     }
@@ -195,7 +201,6 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID, $year = 0, $semest
         $marksheet = Marksheet_Factory::build('raw');
         $mark = $marksheet->normaliseMark($mark['mark'], $subbox);
     }
-    // treat as numeric
     else {
         // normalise the new mark given, ready to be inserted
         $mark = $marksheet->normaliseMark($givenMark, $subbox);
