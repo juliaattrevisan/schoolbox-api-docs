@@ -6,6 +6,7 @@
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css" />
 <script type="text/javascript" src="/javascript/jquery.progressbar.js"></script>
 <script type="text/javascript" src="/javascript/jquery.tmpl.min.js"></script>
+<script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
 <script type="text/javascript">
 $j(function () {
     /* Subject Filter */
@@ -88,6 +89,25 @@ $j(function () {
             window.open(url, "_self");
         }
     });
+
+    //
+    // Form listener for exporter - brings up a dialog box that offers a URL
+    // to click.
+    $j('#calendar-export').click(function(event) {
+        event.preventDefault();
+        $j('#calendar-export-dialog').dialog({
+            open: function(event, ui) {
+                $j(event.target).find('#calendar-export-dialog-url')
+                    .text($j.getExportCalendarLink(
+                        '{USER_TOKEN}',
+                        {'export': 'duework'}
+                    )
+                );
+            },
+            minWidth: 400,
+            modal: true
+        });
+    });
 });
 </script>
 <!-- END custom_head -->
@@ -160,6 +180,7 @@ $j(function () {
 				</select>
 
 				<!-- END is_parent -->
+				<a id="calendar-export" href="#" class="btn translate"><span></span>Export Events</a>
             </div>
         </div>
 		<table class="month-view duedates-calendar calendarTable">
@@ -215,4 +236,12 @@ $j(function () {
 			</ul>
 		</div>
 	</div>
+</div>
+
+<!-- Dialog for export -->
+<div id="calendar-export-dialog">
+    <div id="calendar-export-dialog-text">
+        Use the following URL as the source for your feed.
+    </div>
+    <textarea readonly id="calendar-export-dialog-url"></textarea>
 </div>

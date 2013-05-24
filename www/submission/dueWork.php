@@ -164,6 +164,7 @@ $output = array(
     'SELECTED_DATE' => $targetDate->getLocalShort(),
     'WORK_USER_ID' => $userID,
     'WORK_USER_NAME' => $userID == $_SESSION['id'] ? 'My' : $userHandler->formatName($user) . "'s",
+    'USER_TOKEN' => ($userID == $_SESSION['id'] ? $_SESSION['key'] : $user['key']),
 );
 
 $this->setVar($output);
