@@ -11,7 +11,7 @@
  */
 
 require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
-require_once dirname(__FILE__) . '/../include/iCalcreator.class.php';
+require_once dirname(__FILE__) . '/../../include/ICal/iCalcreator.class.php';
 
 use Schoolbox\User;
 use Schoolbox\UserMapper;
