@@ -56,6 +56,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 	    $this->setBlock($templateHandle, 'default_video', 'default_video_block');
 	    $this->setBlock($templateHandle, 'video_list', 'video_list_block');
 	    $this->setBlock($templateHandle, 'video_pending_list', 'video_pending_list_block');
+	    $this->setBlock($templateHandle, 'submit_video', 'submit_video_block');
 
 	    $this->setVar('video_list_block','');
 	    $this->setVar('video_pending_list_block','');
@@ -94,6 +95,13 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 	    }
 	    else {
 			$this->setVar('default_video_block','');
+	    }
+
+	    if($this->permission >= WRITE_ACCESS) {
+		    $this->parse('submit_video_block','submit_video');
+	    }
+	    else {
+		    $this->setVar('submit_video_block','');
 	    }
 
         return true; // everything went according to plan

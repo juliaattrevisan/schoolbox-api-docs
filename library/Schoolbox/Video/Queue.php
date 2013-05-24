@@ -56,9 +56,6 @@ class Queue {
 
 		preg_match('/Duration: ([0-9\:]+)/',$this->getMessage(), $match);
 
-
-
-
 		if(isset($match[1])) {
 			$hours = $minutes = $seconds = 0;
 			sscanf($match[1], "%d:%d:%d", $hours, $minutes, $seconds);
@@ -71,8 +68,12 @@ class Queue {
 
 		$thumbnailString = 'nice avconv -y -i ' . escapeshellarg($sourceFile) . ' -f image2 -ss '.$thumbnailSeconds.' -vf scale=-1:64,crop=64:64 -frames:v 1 ' . escapeshellarg($this->getThumbnailLocation()).' 2>&1';
 
+		$posterString = 'nice avconv -y -i ' . escapeshellarg($sourceFile) . ' -f image2 -ss '.$thumbnailSeconds.' -frames:v 1 ' . escapeshellarg($this->getPosterLocation()).' 2>&1';
+
 		if($return == 0){
 			exec($thumbnailString, $output, $return);
+			exec($posterString, $output, $return);
+
 			if($return == 0)
 				return true;
 			else
@@ -90,6 +91,10 @@ class Queue {
 
 	public function getThumbnailLocation() {
 		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '-64.jpg';
+	}
+
+	public function getPosterLocation() {
+		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFileID() . '-poster.jpg';
 	}
 
 	private function setConfig($config) {

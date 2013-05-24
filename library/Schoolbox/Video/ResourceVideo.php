@@ -34,6 +34,11 @@ class ResourceVideo {
 		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFile()->getId() . '-64.jpg';
 	}
 
+	public function getPosterLocation() {
+		return $this->config->get('video_dir').'/'.$this->getType().'-'.$this->getFile()->getId() . '-poster.jpg';
+	}
+
+
 	private function setConfig($config) {
 		$this->config = $config;
 	}
