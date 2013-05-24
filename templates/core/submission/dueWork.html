@@ -110,6 +110,12 @@ $j(function () {
     });
 });
 </script>
+<style type="text/css">
+#calendar-export {
+	display: inline;
+	float: none;
+}
+</style>
 <!-- END custom_head -->
 
 <script id="duework-popup-template" type="text/x-jquery-tmpl">
@@ -180,7 +186,8 @@ $j(function () {
 				</select>
 
 				<!-- END is_parent -->
-				<a id="calendar-export" href="#" class="btn translate"><span></span>Export Events</a>
+
+				<button id="calendar-export" class="btn translate"><span></span>Export</button>
             </div>
         </div>
 		<table class="month-view duedates-calendar calendarTable">
