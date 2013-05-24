@@ -448,13 +448,8 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); } <!-- E
           </a>
           <span class="pending">Membership pending approval</span>
         </p>
-        <h4 class="rfolder perms">Permissions</h4>
-        <ul class="rfolder perms">
-        <!-- BEGIN folder_detail_perms -->
-          <li>{FOLDER_PERM_GROUP}: {FOLDER_PERM_ACCESS}</li>
-        <!-- END folder_detail_perms -->
-        </ul>
-        <div class="rfolder actions">
+
+        <div class="rfolder actions clearfix">
           <h4 class="rfolder actions">Actions</h4>
           <a class="btn rhomepage" data-action="homepage"><span></span>View Homepage</a>
           <a class="btn modify rmodify" data-action="modify"><span></span>Modify</a>
@@ -464,6 +459,15 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); } <!-- E
           <a class="btn create rfile" data-action="file"><span></span>Post File</a>
           <a class="btn up-arrow rzip" data-action="zip"><span></span>Upload ZIP</a>
         </div>
+
+          <h4 class="rfolder perms">Permissions</h4>
+          <table class="rfolder perms">
+              <!-- BEGIN folder_detail_perms -->
+              <tr class="{ON_OFF}">
+                  <th scope="row">{FOLDER_PERM_GROUP}:</th><td>{FOLDER_PERM_ACCESS}</td>
+              </tr>
+              <!-- END folder_detail_perms -->
+          </table>
       </div>
       <!-- END folder_detail -->
 

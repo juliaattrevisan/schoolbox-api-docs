@@ -155,12 +155,15 @@ function getFolderMeta($folderId) {
 		$permissions = array();
 		$permsList = $catHandler->getGroupPerms($folderId);
 		if(is_array($permsList)) {
+			$j = 0;
+
 			foreach($permsList as $group) {
 				$groupAccess = (int)$group['type'];
 				if($groupAccess > 0) {
 					$permissions[] = array(
 						'group' => $group['name'],
-						'access' => $groupAccess
+						'access' => $groupAccess,
+						'on_off' => ++$j % 2 ? '' : 'dark',
 					);
 				}
 			}
