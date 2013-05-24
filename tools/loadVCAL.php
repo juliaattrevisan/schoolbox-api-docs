@@ -2,8 +2,8 @@
 
 
 require_once dirname(__FILE__) . '/../www/conf/conf.php';
-require_once dirname(__FILE__) .'/../www/include/iCalcreator.class.php';
-require_once dirname(__FILE__) .'/../library/calendar.php';
+require_once dirname(__FILE__) . '/../include/ICal/iCalcreator.class.php';
+require_once dirname(__FILE__) . '/../library/calendar.php';
 
 $v = new vcalendar();
 $cal = new Calendar;
