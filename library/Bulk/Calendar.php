@@ -95,7 +95,8 @@ class Bulk_Calendar extends Bulk_Abstract {
 					$event = array(
 						'owner' => $uid,
 						'access' => 3,
-						'date' => $date->getDatabase(),
+						'startDate' => $date->getDatabase(),
+						'endDate' => $date->getDatabase(),
 						'startTime' => $thisRow[1],
 						'endTime' => $thisRow[2],
 						'note' => $name,

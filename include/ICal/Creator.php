@@ -173,7 +173,8 @@ class ICal_Creator {
 							'location' => $location,
 							'startTime' => $start->getDatabaseTime(),
 							'endTime' => $end->getDatabaseTime(),
-							'date' => $start->getDatabaseDate(),
+							'startDate' => $start->getDatabaseDate(),
+							'endDate' => $end->getDatabaseDate(),
 							'publish_date' => $start->getDatabaseDate(),
 						);
 
