@@ -14,7 +14,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk_Payload {
 	/* Name or guid of the list
 	 */
 	private $listName = 'Master Calendar';
-	private $rowLimit = 100;
+	private $rowLimit = 1000;
 
 	/* Should be in database date format yyyy-mm-dd hh:ii:ss
 	 */
@@ -34,7 +34,7 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk_Payload {
 			<listName>%s</listName>
 			<rowLimit>%s</rowLimit>
 			<query>
-				<Query xmlns="">
+				<Query xmlns="http://schemas.microsoft.com/sharepoint/soap/">
 					<Where>
 						<And>
 							<Or>
@@ -91,11 +91,18 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk_Payload {
 					<FieldRef Name="EventDate"/>
 					<FieldRef Name="EndDate"/>
 					<FieldRef Name="Created"/>
+					<FieldRef Name="fRecurrence"/>
+					<FieldRef Name="fAllDayEvent"/>
+					<FieldRef Name="Duration"/>
 					<FieldRef Name="RecurrenceData"/>
+					<FieldRef Name="UID"/>
+					<FieldRef Name="EventType"/>
+					<FieldRef Name="MasterSeriesItemID"/>
 				</ViewFields>
 			</viewFields>
 			<queryOptions>
 				<QueryOptions xmlns="">
+					<CalendarDate>%s</CalendarDate>
 					<ExpandRecurrence>TRUE</ExpandRecurrence>
 					<IncludeMandatoryColumns>FALSE</IncludeMandatoryColumns>
 					<ViewAttributes Scope="RecursiveAll" />
@@ -136,7 +143,8 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk_Payload {
 			$this->getEndDate(),
 			$this->getStartDate(),
 			$this->getStartDate(),
-			$this->getEndDate()
+			$this->getEndDate(),
+			$this->getStartDate()
 		);
 
 		$this->setPayload($payload);

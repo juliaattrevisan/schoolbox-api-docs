@@ -11,6 +11,11 @@
  */
 class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType_Abstract {
 
+	const EVENTTYPE_SINGLE              = 0;
+	const EVENTTYPE_RECURRING           = 1;
+	const EVENTTYPE_RECURRING_EXCEPTION = 3;
+	const EVENTTYPE_RECURRING_DELETED   = 4;
+
     /* An instance of the built-in php5 soap
      */
     private $soap = null;
@@ -129,18 +134,20 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 
 		/* TODO: Update this for SK
 		 */
-        $now = new Alaress_Date_Format(new DateTime(), 'U');
-        $start = new Alaress_Date_Format($now->getDatabaseDate() . ' 00:00:00', 'y-m-d h:i:s');
-        $end = new Alaress_Date_Format($now->getDatabaseDate() . ' 23:59:59', 'y-m-d h:i:s');
+        $now   = new Alaress_Date_Format(new DateTime(), 'U');
+        $start = new Alaress_Date_Format($startTimestamp, 'U');
+        $end   = new Alaress_Date_Format($endTimestamp, 'U');
 
-		$startDate = $start->getDatabase();
-		$endDate = $end->getDatabase();
+		$startDate = $start->getUsingFormat('Y-m-d\\TH:i:s\\Z');
+		$endDate   = $end->getUsingFormat('Y-m-d\\TH:i:s\\Z');
 
         $xmlPayload = new Calendar_Api_EventType_Event_Sharepoint_Stk_Payload($startDate, $endDate);
+//	    new Alaress_Probe($xmlPayload->getPayload());
 
 		/* Fill in your query result set here and populate $collection
 		 */
-		$collection = new Calendar_Event_Collection();
+		$collection     = new Calendar_Event_Collection();
+		$deleted_events = array();
 
 		/* If the SOAP connection succeeded, proceed normally
 		 * Otherwise return an empty collection
@@ -150,10 +157,26 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 
 			$allEvents = $xmlPayload->parseXml($response->GetListItemsResult->any);
 
-
+			//
+			// Collect deleted events first
 			foreach ($allEvents->rsdata->zrow as $currentEvent) {
-				$attribs = $currentEvent->attributes();
+				//
+				// Deleted or exception events: store now and handle later
+				if ($this->isDeletedEvent($currentEvent)) {
+					$deleted_events[] = $this->getDeletedEventMarker($currentEvent);
+				}
+			}
 
+			//
+			// And then check each item
+			foreach ($allEvents->rsdata->zrow as $currentEvent) {
+				//
+				// Deleted or exception events: skip
+				if ($this->isDeletedEvent($currentEvent)) {
+					continue;
+				}
+
+				$attribs = $currentEvent->attributes();
 				$eventTypeID = $this->getTypeIdFromName((string)$attribs->ows_ContentType);
 				$eventCampusID = $this->getCampusIdFromName((string)$attribs->ows_School);
 
@@ -171,20 +194,12 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 					continue;
 				}
 
-				/* Find out if this is a recurring event and if it should be displayed
-				 * on the currently viewed day. If not, ignore it and don't put it on
-				 * the stack at all.
-				 */
-				if (!$this->isRecurringToday($now, $attribs)) {
-					continue;
-				}
-
 				/* An event is meant to display today so let's add it to the stack
 				 */
 				$event = new Calendar_Event_Type_Day();
 				$event->setAuthorName('');
 				$event->setAuthorId('');
-				$event->setEventId(1);
+				$event->setEventId((int)$attribs->ows_ID);
 				$event->setType($eventTypeID);
 				$event->setNote((string)$attribs->ows_Title);
 				$event->setLocation((string)$attribs->ows_School);
@@ -207,54 +222,18 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 				 */
 				$event->setConnectorId($this->getConnectorId());
 
-				/* Event inspection
-				 * A nice place to see what's currently being examined
-				 */
-	//			if ((string)$attribs->ows_Title == 'AKSS Junior Boys Volleyball Championships') {
-	//				new Alaress_Probe($currentEvent);
-	//				new Alaress_Probe($now->getDatabaseDate());
-	//			}
+				$event->setAllday((string)$attribs->ows_fAllDayEvent == 1);
 
-				/* Simulate all-day event if appropriate since Sharepoint thinks the end of the
-				 * day is at 11:59pm, whereas Schoolbox makes it 12:00am. "Mangle it", he said.
-				 */
-				$startDate = new Alaress_Date_Format((string)$attribs->ows_EventDate, 'y-m-d h:i:s');
-
-				$event->setStartTime($startDate);
-
-				if ((string)$attribs->ows_fAllDayEvent == 1) {
-					$endDate = substr((string)$attribs->ows_EndDate, 0, 10);
-
-					$event->setEndTime(new Alaress_Date_Format($endDate . ' 00:00:00', 'y-m-d h:i:s'));
-				}
-				else {
-					$event->setEndTime(new Alaress_Date_Format((string)$attribs->ows_EndDate, 'y-m-d h:i:s'));
-				}
-
-				/* If it is recurring today, set the event's start date to Today.
-				 * Sharepoint only knows the start and end PERIOD of a recurring
-				 * event, and does not specify the exact date when a recurrence
-				 * takes place.
-				 *
-					[ows_EventDate] => 2012-09-14 09:15:00
-					[ows_EndDate] => 2012-12-21 09:30:00
-					[ows_RecurrenceData] => mo2012-12-20T20:30:00Z
-				 */
-				if ($event->getEndTime()->getDatabaseDate() >= $now->getDatabaseDate()) {
-					$startTime = new Alaress_Date_Format((string)$attribs->ows_EventDate, 'y-m-d h:i:s');
-					$event->setStartTime(new Alaress_Date_Format($now->getDatabaseDate() . ' ' . $startTime->getDatabaseTime(), 'y-m-d h:i:s'));
-				}
-				/* Sometimes events come out that shouldn't so we manually exclude them
-				 * due to Sharepoint timezones
-				 */
-				else {
-					continue;
-				}
-
-				$collection->add($event);
+				$this->addEventsToCollection(
+					$collection,
+					$event,
+					$attribs,
+					$startTimestamp,
+					$endTimestamp,
+					$deleted_events
+				);
 			}
 		}
-
         return $collection;
     }
 
@@ -274,53 +253,201 @@ class Calendar_Api_EventType_Event_Sharepoint_Stk extends Calendar_Api_EventType
 	}
 
 	/**
-	 * Figure out if a particular event should recur today and thus be
-	 * displayed in the calendar
+	 * Is this event from the SOAP call a deletion of another event?
 	 *
-	 * @param $now
-	 * @param $attribs
+	 * @param SimpleXMLElement $event
+	 *
 	 * @return bool
 	 */
-	private function isRecurringToday($now, $attribs) {
-		if ($attribs->ows_RecurrenceData) {
-			$currentDayOfWeek = $now->getUsingFormat('w');
+	protected function isDeletedEvent(SimpleXMLElement $event) {
+		$attributes = $event->attributes();
+		$event_code = (int)$attributes->ows_EventType;
+		return in_array($event_code, array(self::EVENTTYPE_RECURRING_EXCEPTION, self::EVENTTYPE_RECURRING_DELETED));
+	}
 
-			$recurrenceXml = simplexml_load_string((string)$attribs->ows_RecurrenceData, 'SimpleXMLElement', LIBXML_NOCDATA);
+	/**
+	 * Creates a marker for a deleted event from the SOAP event. Used as a basis
+	 * for checking another recurring event against - if it matches, it's
+	 * deleted.
+	 *
+	 * @param SimpleXMLElement $event
+	 *
+	 * @return array
+	 * * master_id:  The base event - this delete marker deletes an instance of
+	 *   this event
+	 * * event_code: the type of deletion (self::EVENTTYPE_RECURRING_EXCEPTION
+	 *   or self::EVENTTYPE_RECURRING_DELETED)
+	 * * event_date: a DateTime object representing which occurence of the event
+	 *   is deleted
+	 */
+	protected function getDeletedEventMarker(SimpleXMLElement $event) {
+		$attributes = $event->attributes();
+		return array(
+			'master_id'  => (int)$attributes->ows_MasterSeriesItemID,
+			'event_code' => (int)$attributes->ows_EventType,
+			'event_date' => new DateTime((string)$attributes->ows_EventDate),
+		);
+	}
 
-			/* If it repeats weekly
-			 */
-			if ($recurrenceXml->rule->repeat->weekly) {
-				$recurrenceAttribs = $recurrenceXml->rule->repeat->weekly->attributes();
+	/**
+	 * Adds events based on recurrence
+	 *
+	 * @param Calendar_Event_Collection    $collection Collection to add to
+	 * @param Calendar_Event_Type_Abstract $event      Event to add. If it recurs,
+	 *                                                 clones of this are added
+	 *                                                 for each recurrence.
+	 * @param stdclass                     $attributes Attributes from the SOAP call
+	 * @param int                          $from       Timestamp to add recurrences
+	 *                                                 from.
+	 * @param int                          $until      Timestamp to add recurrences
+	 *                                                 until.
+	 * @param array                        $deleted_events Events that have been deleted.
+	 *
+	 * @return void
+	 */
+	protected function addEventsToCollection(
+		Calendar_Event_Collection $collection,
+		Calendar_Event_Type_Abstract $event,
+		$attributes,
+		$from,
+		$until,
+		$deleted_events
+	) {
+		$duration = (int)$attributes->ows_Duration;
 
-				/* Find out this stupid attribute rubbish to figure out
-				 * when an event recurs
-				 */
-				$index = -1;
+		//
+		// Only start and end time should be set here, everything else should be
+		// set in getEvents()
+		if ($attributes->ows_RecurrenceData) {
+			//
+			// recur weekly/daily/whatever
+			$recurrence   = simplexml_load_string((string)$attributes->ows_RecurrenceData, 'SimpleXMLElement', LIBXML_NOCDATA);
+			$rule         = $recurrence->rule;
+			$window_start = Datetime::createFromFormat('U', $from);
+			$window_end   = Datetime::createFromFormat('U', $until);
 
-				foreach($recurrenceAttribs as $key => $value) {
-					$mapping = $this->getWeekMapping();
-
-					if (array_key_exists($key, $mapping)) {
-						$index = $mapping[$key];
-
-						break;
-					}
+			//
+			// Does the recurrence have an end?
+			// If so use that as the window end if before the actual window end.
+			if ($rule->windowEnd) {
+				$temp_window_end = new DateTime((string)$rule->windowEnd);
+				if ($temp_window_end < $window_end) {
+					$window_end = $temp_window_end;
 				}
-
-				/* Forget this loop if the recurring event is not meant to
-				 * display today
-				 */
-				if ($currentDayOfWeek != $index) {
-					return false;
-				}
-
-				return true;
 			}
 
-			/* TODO: If it repeats daily
-			 */
+			//
+			// How many instances? (-1 = until window end)
+			// TODO consider bumping $start_time to $window_start if infinite instances
+			// Reason: if infinite instances, then I don't care about instances
+			// before the window start, because I don't have to count them
+			$start_time = new DateTime((string)$attributes->ows_EventDate);
+			$instances  = -1;
+			if ($rule->repeatInstances) {
+				$instances = (int)$rule->repeatInstances;
+			}
+
+			if ($rule->repeat->daily) {
+				//
+				// Daily: not tested, but seems right
+				$days = max((int)$rule->repeat->daily->dayFrequency, 1);
+				while ($instances != 0 && $start_time < $window_end) {
+					$start_time->modify("+$days day");
+					if ($start_time > $window_end) {
+						break;
+					}
+					if ($start_time >= $window_start) {
+						$this->addEventAtTime($collection, $event, $start_time, $duration, $deleted_events);
+						$instances--;
+					}
+				}
+			}
+			elseif ($rule->repeat->weekly) {
+				//
+				// Weekly: briefly tested, results make sense
+				$repeat_attributes = $rule->repeat->weekly->attributes();
+				$weeks             = max((int)$repeat_attributes->weekFrequency, 1);
+				$weekday_map       = $this->getWeekMapping();
+				$days_into_week    = (int)$start_time->format('w');
+				while ($instances != 0 && $start_time < $window_end) {
+					//
+					// Go through each weekday.
+					// For each weekday, get the start time of the event on this
+					// day by offsetting the start time back/forward to that
+					// day of the week.
+					foreach ($weekday_map as $day_code => $day_no) {
+						$day_offset = ($day_no-$days_into_week);
+						$day_start  = clone $start_time;
+						$day_start->modify("$day_offset day");
+						if ($day_start < $window_start) {
+							continue;
+						}
+						if ($day_start > $window_end) {
+							break;
+						}
+						if ($repeat_attributes->$day_code) {
+							if ($day_start >= $window_start) {
+								$this->addEventAtTime($collection, $event, $day_start, $duration, $deleted_events);
+								$instances--;
+							}
+						}
+						if ($instances == 0) {
+							break;
+						}
+					}
+					$start_time->modify("+$weeks week");
+				}
+			}
+			//
+			// Monthly, yearly: not implemented, not even going to try until I
+			// have a spec of how they should work
+		}
+		else {
+			//
+			// No recurrence
+			$this->addEventAtTime($collection, $event, new DateTime($attributes->ows_EventDate), $duration, array());
+		}
+	}
+
+	/**
+	 * Adds a single instance of an event.
+	 *
+	 * @param Calendar_Event_Collection    $collection Collection to add to
+	 * @param Calendar_Event_Type_Abstract $event      Event to add a copy of.
+	 * @param DateTime                     $start_time When the event starts
+	 * @param int                          $duration   Number of seconds the
+	 *                                                 event lasts.
+	 * @param array                        $deleted_events Events that have been deleted
+	 *
+	 * @return bool
+	 */
+	protected function addEventAtTime(
+		Calendar_Event_Collection $collection,
+		Calendar_Event_Type_Abstract $event,
+		DateTime $start_time,
+		$duration,
+		$deleted_events
+	) {
+		$new_event = clone $event;
+		$new_event->setStartTime(new Alaress_Date_Format($start_time, 'U'));
+		//
+		// Need to offset end time too
+		$end_time = clone $start_time;
+		$end_time->modify("+$duration second");
+		$new_event->setEndTime(new Alaress_Date_Format($end_time, 'U'));
+
+		//
+		// Is this event a deleted one? If so don't add it.
+		$event_id = $event->getEventId();
+		foreach ($deleted_events as $deleted_event) {
+			//
+			// Event holds: start datetime, UID, type of deletion (delete or exception)
+			if ($deleted_event['master_id'] == $event_id && $deleted_event['event_date'] == $start_time) {
+				return false;
+			}
 		}
 
+		$collection->add($new_event);
 		return true;
 	}
 
