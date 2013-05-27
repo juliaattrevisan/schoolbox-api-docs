@@ -65,51 +65,83 @@ class Bulk_Calendar extends Bulk_Abstract {
 			/* Process rows
 			 */
 			$handle = fopen($this->getFile(), 'r');
-			$headerRow = fgetcsv($handle, 1000, ",");
+			$headerRow = fgetcsv($handle, 0, ",");
 
-			while (($thisRow = fgetcsv($handle, 1000, ",")) !== false) {
+			while (($thisRow = fgetcsv($handle, 0, ",")) !== false) {
+				//
+				// We cannot determine encoding, so strip everything not ascii
+				$thisRow = array_map(
+					function($field) { return preg_replace('/[\\x80-\\xFF]/', '', $field); },
+					$thisRow
+				);
+				list(
+					$start_date,
+					$start_time,
+					$finish_date,
+					$finish_time,
+					$all_day,
+					$name,
+					$detail,
+					$location,
+					$event_type,
+					$publish_date,
+					$attendance
+				) = $thisRow;
 
 				/* Skip empty comments and no dates
 				 *
 				 * If access is 3, then the sid corresponds to campus id's
 				 * If access is 2, then the sid corresponds to group id's
 				 */
-				$date = new Alaress_Date_Format($thisRow[0], 'd/m/y');
+				$start = new Alaress_Date_Format($start_date, 'd/m/y');
+				//
+				// Finish empty? Use start date as the finish.
+				$finish = (strlen(trim($finish_date))) ?
+					new Alaress_Date_Format($finish_date, 'd/m/y'):
+					clone $start;
+
+				//
+				// Start or finish time empty? Default to start and end of day.
+				$start_time  = strlen(trim($start_time))  ? $start_time  : '00:00:00';
+				$finish_time = strlen(trim($finish_time)) ? $finish_time : '23:59:59';
 
 				/* If a publish date is specified, use it; otherwise use an empty date
 				 */
-				if (strlen(trim($thisRow[7]))) {
-					$publishDate = new Alaress_Date_Format($thisRow[7], 'd/m/y');
+				if (strlen(trim($publish_date))) {
+					$publish_date = new Alaress_Date_Format($publish_date, 'd/m/y');
 				}
 				else {
-					$publishDate = new Alaress_Date_Format('0000-00-00', 'y-m-d');
+					$publish_date = new Alaress_Date_Format('0000-00-00', 'y-m-d');
 				}
 
-                //We cannot determine encoding type, so strip everything that is not ascii out
-				$name       = preg_replace('/[\\x80-\\xFF]/', '', $thisRow[3]);
-				$event_type = preg_replace('/[\\x80-\\xFF]/', '', $thisRow[6]);
-                $detail     = preg_replace('/[\\x80-\\xFF]/', '', $thisRow[4]);
-                $location   = preg_replace('/[\\x80-\\xFF]/', '', $thisRow[5]);
+				//
+				// All day? if "all day" flag is set.
+				// (maybe if start_time = 00:00:00 and end_time = 23:59:59 too?)
+				$all_day =
+					in_array(trim(strtolower($all_day)), array('y', 'yes', '1'))
+					|| ($start_time === '00:00:00' && $finish_time === '23:59:59')
+				;
 
 				if ((trim($thisRow[0]) != '') && (trim($name) != '')) {
 					$event = array(
 						'owner' => $uid,
-						'access' => 3,
-						'startDate' => $date->getDatabase(),
-						'endDate' => $date->getDatabase(),
-						'startTime' => $thisRow[1],
-						'endTime' => $thisRow[2],
+						'access' => Calendar::ACCESS_CAMPUS,
+						'startDate' => $start->getDatabase(),
+						'endDate' => $finish->getDatabase(),
+						'startTime' => $start_time,
+						'endTime' => $finish_time,
 						'note' => $name,
 						'detail' => $detail,
 						'location' => $location,
+						'allday' => $all_day,
 
 						/* Hard-coded to zero as this is deprecated
 						 */
 						'priority' => 0,
 
 						'type' => $event_type,
-						'attendance' => $thisRow[8],
-						'publish_date' => $publishDate->getDatabase(),
+						'attendance' => $attendance,
+						'publish_date' => $publish_date->getDatabase(),
 						'campusList' => $campusList,
 						'groupList' => $groupList,
 					);
@@ -147,7 +179,7 @@ class Bulk_Calendar extends Bulk_Abstract {
 				}
 
                 /* Free memory */
-                unset($publishDate);
+                unset($publish_date);
                 unset($date);
 			}
 		}
