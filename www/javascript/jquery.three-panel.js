@@ -104,12 +104,12 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
             }
 
             // create the list of permission to display
-            var permsUL = threePanel.folderDetail.find('ul.perms')
-            permsUL.html('')
+            var parmsTable = threePanel.folderDetail.find('table.perms')
+            parmsTable.html('')
 
             if(typeof(meta.permissions) == "object") {
                 $j.each(meta.permissions, function(k, perm) {
-                    permsUL.append('<li><b>' + perm.group + '</b>: ' + threePanel.accessLevels[perm.access] + '</li>')
+                    parmsTable.append('<tr class="' + perm.on_off + '"><th scope="row">' + perm.group + ':</th><td>' + threePanel.accessLevels[perm.access] + '</td></tr>')
                 })
 
                 if(meta.permissions.length == 0) {
