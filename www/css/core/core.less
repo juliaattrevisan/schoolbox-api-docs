@@ -4796,6 +4796,19 @@ CALENDAR
             background-color: #e6f6f9;
         }
     }
+    .export {
+        z-index: 5000;
+        position: relative;
+        background: #fffde9 url(/images/core/calendar/export.png) 11px 6px no-repeat;
+        padding: 0 12px 0 39px;
+        color: #797979;
+        &:hover {
+            background: #e6f6f9 url(/images/core/calendar/export.png) 11px 6px no-repeat;
+        }
+        &.active {
+            background-color: #e6f6f9;
+        }
+    }
     .link-case {
         position: relative;
         z-index: 10;
@@ -4870,6 +4883,18 @@ CALENDAR
             }
         }
     }
+}
+
+/* Styles for export dialog box */
+#calendar-export-dialog {
+    display: none;
+}
+#calendar-export-dialog-url {
+    font-family: monospace;
+    background-color: #eeeeee;
+    padding: 5px;
+    border: 1px solid black;
+    width: 100%;
 }
 
 /*day specific styles*/

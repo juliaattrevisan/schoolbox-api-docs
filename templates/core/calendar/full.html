@@ -3,6 +3,7 @@
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.print.css" media="print" />
 <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="/css/{SITE_LOCATION}/jquery-ui.css"/>
+<script type="text/javascript" src="/javascript/jquery.calendar_export.js"></script>
 <script type="text/javascript" src="/javascript/jquery.fullcalendar.js"></script>
 <script type="text/javascript" src="/javascript/jquery.datepicker.js"></script>
 <script type="text/javascript">
@@ -356,6 +357,22 @@
             return false
         })
 
+        //
+        // Form listener for exporter - brings up a dialog box that offers a URL
+        // to click.
+        $j('#calendar-export form').submit(function(event) {
+            event.preventDefault();
+            var form = $j(this);
+            $j('#calendar-export-dialog').dialog({
+                open: function(event, ui) {
+                    $j(event.target).find('#calendar-export-dialog-url')
+                        .text($j.getExportCalendarLink('{USER_TOKEN}', form.serializeArray()));
+                },
+                minWidth: 400,
+                modal: true
+            });
+        });
+
         // if a checkbox on the calendar is interacted, ajax
         c.dom.delegate('input[type=checkbox]', 'change', function(e) {
 
@@ -378,8 +395,6 @@
             e.preventDefault()
             return false
         })
-
-
     })
 </script>
 <style type='text/css'>
@@ -408,7 +423,6 @@
 	#ui-datepicker-div {
 		z-index: 1000;
 	}
-
 </style>
 <!-- END custom_head -->
 
@@ -504,7 +518,7 @@
                         <label title="{GROUP_NAME}">
                             <input type="checkbox" name="group" id="{GROUP_ID}" value="group{GROUP_ID}" {GROUP_ID_SELECTED} class="checkbox applyFilters"/>
                             {GROUP_NAME}
-						</label>
+                        </label>
                         <!-- END filter_group -->
                     </div>
                     <div class="filter-cat campus"><span class="filter-title">Campus</span>
@@ -512,7 +526,7 @@
                         <label title="{CAMPUS_NAME}">
                             <input type="checkbox" name="campus" id="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="checkbox applyFilters"/>
                             {CAMPUS_NAME}
-						</label>
+                        </label>
                         <!-- END filter_campus -->
                     </div>
                     <div class="filter-cat events last"><span class="filter-title">Event</span>
@@ -527,12 +541,64 @@
                     <!--/filter-list-->
                 </form>
                 <p class="clearfix">
-					<a href="#" id="applyFilters" class="btn float-right"><span></span>Apply Filters</a>
-				</p>
+                    <a href="#" id="applyFilters" class="btn float-right"><span></span>Apply Filters</a>
+                </p>
                 <!--/filter-drop-->
             </div>
         </div>
     </div>
 </div>
+<div id="calendar-export" class="calendar-controls no-height clearfix">
+	<div class="link-case">
+		<div class="filter-drop clearfix">
+			<div class="filter-list">
+				<form class="clearfix">
+					<div class="export-cat all-events">
+						<label title="All events" for="export-all">
+							<input type="radio" name="export" value="all" id="export-all" checked />
+							All events
+						</label>
+					</div>
+					<div class="export-cat personal-events">
+						<label title="Personal events only" for="export-personal">
+							<input type="radio" name="export" value="personal" id="export-personal" />
+							Personal events only
+						</label>
+					</div>
+					<div class="export-cat group-events">
+						<label title="Events for group" for="export-group">
+							<input type="radio" name="export" value="group" id="export-group" />
+							Events for group:
+							<select name="group">
+								<option value="">-- select --</option>
+								<!-- BEGIN export_group -->
+								<option label="{EXPORT_GROUP_NAME}" value="{EXPORT_GROUP_ID}">{EXPORT_GROUP_NAME}</option>
+								<!-- END export_group -->
+							</select>
+						</label>
+					</div>
+					<div class="export-cat campus-events">
+						<label title="Events for campus" for="export-campus">
+							<input type="radio" name="export" value="campus" id="export-campus" />
+							Events for campus:
+							<select name="campus">
+								<option value="">-- select --</option>
+								<!-- BEGIN export_campus -->
+								<option label="{EXPORT_CAMPUS_NAME}" value="{EXPORT_CAMPUS_ID}">{EXPORT_CAMPUS_NAME}</option>
+								<!-- END export_campus -->
+							</select>
+						</label>
+					</div>
+					<input type="submit" value="Generate URL" class="btn float-right" />
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
 <div id="calendar"></div>
-
+<div id="calendar-export-dialog">
+	<div id="calendar-export-dialog-text">
+		Use the following URL as the source for your feed.
+	</div>
+	<textarea readonly id="calendar-export-dialog-url"></textarea>
+</div>

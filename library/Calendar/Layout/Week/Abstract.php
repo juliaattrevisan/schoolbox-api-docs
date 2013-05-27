@@ -130,9 +130,47 @@ abstract class Calendar_Layout_Week_Abstract {
 
 		$this->setSelected($selected);
 
-		$this->getPage()->checkList('filter_group', $this->getCategoryList(), $selected['group'], TEMPLATE_content, array('name' => 'GROUP_NAME', 'id' => 'GROUP_ID'));
-		$this->getPage()->checkList('filter_campus', $this->getCalendarHandler()->getFilterCampusList($_SESSION['id']), $selected['campus']);
-		$this->getPage()->checkList('filter_event_type', $this->getCalendarHandler()->getTypeList(), $selected['event_type'], TEMPLATE_content, array('eventType' => 'EVENT_TYPE_NAME', 'eventTypeID' => 'EVENT_TYPE_ID', 'eventColour' => 'EVENT_TYPE_COLOUR'));
+		$category_list = $this->getCategoryList();
+		$campus_list   = $this->getCalendarHandler()->getFilterCampusList($_SESSION['id']);
+		$this->getPage()->dropDown(
+			'export_group',
+			$category_list,
+			array(),
+			TEMPLATE_content,
+			array('name' => 'EXPORT_GROUP_NAME', 'id' => 'EXPORT_GROUP_ID')
+		);
+		$this->getPage()->dropDown(
+			'export_campus',
+			$campus_list,
+			array(),
+			TEMPLATE_content,
+			array('CAMPUS_NAME' => 'EXPORT_CAMPUS_NAME', 'CAMPUS_ID' => 'EXPORT_CAMPUS_ID')
+		);
+		$this->getPage()->checkList(
+			'filter_group',
+			$category_list,
+			$selected['group'],
+			TEMPLATE_content,
+			array('name' => 'GROUP_NAME', 'id' => 'GROUP_ID')
+		);
+		$this->getPage()->checkList(
+			'filter_campus',
+			$campus_list,
+			$selected['campus'],
+			TEMPLATE_content,
+			array('name' => 'CAMPUS_NAME', 'id' => 'CAMPUS_ID')
+		);
+		$this->getPage()->checkList(
+			'filter_event_type',
+			$this->getCalendarHandler()->getTypeList(),
+			$selected['event_type'],
+			TEMPLATE_content,
+			array(
+				'eventType'   => 'EVENT_TYPE_NAME',
+				'eventTypeID' => 'EVENT_TYPE_ID',
+				'eventColour' => 'EVENT_TYPE_COLOUR'
+			)
+		);
 		$this->getPage()->setVar('BACK', date("j-n-Y", strtotime("-1 week", $this->getSelectedDate())));
 		$this->getPage()->setVar('FORWARD', date("j-n-Y", strtotime("+1 week", $this->getSelectedDate())));
 	}

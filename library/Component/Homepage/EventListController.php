@@ -41,7 +41,8 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
         $this->setVar(
             array(
-                'CALENDAR_PREFIX' => 'group'
+                'CALENDAR_PREFIX' => 'group',
+                'USER_TOKEN'      => $_SESSION['key'],
             )
         );
 

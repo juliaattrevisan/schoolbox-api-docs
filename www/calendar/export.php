@@ -19,7 +19,6 @@ try {
 	$session     = new Session();
 	$token       = $_GET['token'];
 	$export_type = $_GET['export'];
-	$export_id   = intval($_GET['id']);
 	$api         = null;
 	$filename    = 'calendar.ics';
 	if (empty($token)) {
@@ -52,7 +51,8 @@ try {
 			break;
 
 		case 'group':
-			$api = new Calendar_Api_EventType_Event_Schoolbox_Group(array());
+			$api       = new Calendar_Api_EventType_Event_Schoolbox_Group(array());
+			$export_id = intval($_GET['group']);
 			if ($export_id > 0) {
 				$api->setGroupId($export_id);
 			}
@@ -63,7 +63,8 @@ try {
 			break;
 
 		case 'campus':
-			$api = new Calendar_Api_EventType_Event_Schoolbox_Campus(array());
+			$api       = new Calendar_Api_EventType_Event_Schoolbox_Campus(array());
+			$export_id = intval($_GET['campus']);
 			if ($export_id > 0) {
 				$api->setCampusId($export_id);
 			}

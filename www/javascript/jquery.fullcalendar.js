@@ -32,8 +32,16 @@ function Calendar(id, bubbleId, opts) {
         filter: {
             ajax: '.',
             enabled: true,
+            //
+            // Selectors for filter control
             parentSelector: '#calendar-controls',
             btnSelector: '#fc-button-filter',
+            //
+            // Selectors for export control
+            exportSelector: '#calendar-export',
+            exportButtonSelector: '#fc-button-export',
+            //
+            // Selectors within filter and export items
             checkboxSelector: '.applyFilters',
             applyFiltersSelector: '#applyFilters',
             boxSelector: '.filter-drop',
@@ -67,13 +75,30 @@ function Calendar(id, bubbleId, opts) {
 
         interaction: function(cal) {
 
+            var calendarButtons = $j(cal.options.filter.btnSelector)
+            var exportButtons   = $j(cal.options.filter.exportButtonSelector)
+
             var calendarControls = $j(cal.options.filter.parentSelector)
+            var exportControls   = $j(cal.options.filter.exportSelector)
 
             // show the filter 'dialog' when the button is clicked
             cal.dom.delegate(cal.options.filter.btnSelector, 'click', function() {
                 cal.bubble.hide()
                 calendarControls.find(cal.options.filter.boxSelector).toggle()
-                $j(cal.options.filter.btnSelector).toggleClass('engaged')
+                exportControls.find(cal.options.filter.boxSelector).hide()
+                exportButtons.removeClass('engaged')
+                calendarButtons.toggleClass('engaged')
+                return false
+            })
+
+            //
+            // Show the export filter
+            cal.dom.delegate(cal.options.filter.exportButtonSelector, 'click', function() {
+                cal.bubble.hide()
+                calendarControls.find(cal.options.filter.boxSelector).hide()
+                exportControls.find(cal.options.filter.boxSelector).toggle()
+                calendarButtons.removeClass('engaged')
+                exportButtons.toggleClass('engaged')
                 return false
             })
 
@@ -94,7 +119,7 @@ function Calendar(id, bubbleId, opts) {
                 $j(cal.options.filter.btnSelector).removeClass('engaged')
             })
 
-            calendarControls.delegate(cal.options.filter.boxSelector, 'click', function(e) {
+            calendarControls.add(exportControls).delegate(cal.options.filter.boxSelector, 'click', function(e) {
                 e.stopPropagation()
             })
 
@@ -210,23 +235,22 @@ Calendar.prototype.init = function() {
 
     if(this.options.filter.enabled) {
         // mash the filters in
-        var headerRight = this.dom.find('td.fc-header-right')
-        headerRight.prepend(headerRight.children('.fc-button')
-            .first().clone().removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
-            .addClass('fc-button-filter fc-corner-left fc-corner-right').attr('id','fc-button-filter')
-        )
-
-        $j(this.options.filter.btnSelector).html('filters')
-
-        /*
-        // mash the datepicker in
-        var headerCenter = this.dom.find('td.fc-header-center')
-        headerCenter.prepend(headerRight.children('.fc-button-month').clone().removeClass('fc-button-month')
-            .addClass('fc-button-datepick month no-text').attr('id','fc-button-datepick')
-        )
-
-        $j('#fc-button-datepick').find('.fc-button-content').html('')
-        */
+        var headerRight = this.dom.find('td.fc-header-right');
+        var baseButton  = headerRight.children('.fc-button').first();
+        headerRight.prepend(
+            baseButton.clone()
+                .html('filters')
+                .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
+                .addClass('fc-button-filter fc-corner-left fc-corner-right')
+                .attr('id','fc-button-filter')
+        );
+        headerRight.append(
+            baseButton.clone()
+                .html('export')
+                .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
+                .addClass('fc-button-filter fc-corner-left fc-corner-right')
+                .attr('id','fc-button-export')
+        );
 
         // and now make all the buttons on the header look the way they're meant to
         var header = this.dom.children('.fc-header')
