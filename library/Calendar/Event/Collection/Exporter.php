@@ -20,33 +20,8 @@ class Calendar_Event_Collection_Exporter extends Calendar_Event_Collection_Rende
 		$v->setProperty('calscale', 'GREGORIAN');
 		$v->setProperty('method', 'PUBLISH');
 
-		$v->setProperty('X-WR-CALNAME', 'Calendar export'); // set some X-properties, name, content.. .
+		$v->setProperty('X-WR-CALNAME', 'Calendar export');
 		$v->setProperty('X-WR-CALDESC', 'The portal school calendar');
-		$v->setProperty('X-WR-TIMEZONE', Cfg::get('date_timezone'));
-
-		$t = new vtimezone();
-		$t->setProperty('tzid', Cfg::get('date_timezone'));
-//		$t->setProperty('last-modified', 1987, 1, 1);
-
-//		$ts = new vtimezone('standard');
-//		$ts->setProperty('dtstart', 1997, 10, 26, 2);
-//		$rdate1 = array('year' => 1997, 'month' => 10, 'day' => 26, 'hour' => 02, 'min' => 0, 'sec' => 0);
-//		$ts->setProperty('rdate', array($rdate1));
-//		$ts->setProperty('tzoffsetfrom', '+1100');
-//		$ts->setProperty('tzoffsetto', '+1000');
-//		$ts->setProperty('tzname', 'EST');
-//		$t->setComponent($ts);
-//
-//		$td = new vtimezone('daylight');
-//		$td->setProperty('dtstart', 1997, 10, 26, 2);
-//		$rdate1 = array('year' => 1997, 'month' => 4, 'day' => 6, 'hour' => 02, 'min' => 0, 'sec' => 0);
-//		$td->setProperty('rdate', array($rdate1));
-//		$td->setProperty('tzoffsetfrom', '+1000');
-//		$td->setProperty('tzoffsetto', '+1100');
-//		$td->setProperty('tzname', 'EST');
-//		$t->setComponent($td);
-//
-//		$v->setComponent($t);
 
 		return $v;
 	}
@@ -82,6 +57,10 @@ class Calendar_Event_Collection_Exporter extends Calendar_Event_Collection_Rende
 			}
 		}
 
+		//
+		// Add timezone AFTER adding all events. Hooray, IcalCreator is smart
+		// enough to add them for me!
+		iCalUtilityFunctions::createTimezone($v, Cfg::get('date_timezone'));
 		$str = $v->createCalendar();
 		echo $str;
 	}
