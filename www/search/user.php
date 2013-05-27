@@ -492,9 +492,6 @@ if (is_numeric($this->arg[0])) {
 	                                'SPOUSE_OCCUP_PHONE' => Scrub::text($studentContact['StudentContactSpouseOccupPhone']),
 	                                'SPOUSE_EMAIL' => $spouseEmail,
 	                            );
-//		                        new Alaress_Probe($studentContact);
-//		                        new Alaress_Probe($output);
-
 	                            $this->setVar($output);
 
 		                        /* Output each of the block for contact details */
