@@ -26,7 +26,7 @@ if ($_REQUEST['id']) {
         $action = 'View Results';
         if ($_SERVER['REQUEST_TIME'] <= $assessment->getFinish()->getUnixTimestamp()) {
             $max_attempts = $assessment->getMaxAttempts();
-            $attempts     = $attempt_mapper->getAttemptCountForStudent(4, $_SESSION['id']);
+            $attempts     = $attempt_mapper->getAttemptCountForStudent($assessment->getId(), $_SESSION['id']);
             if ($max_attempts <= 0 || $attempts < $max_attempts) {
                 $action = ($attempts === 0) ? 'Sit' : 'Resit';
             }
