@@ -56,11 +56,15 @@ class Calendar_Event_Type_Exporter extends Calendar_Event_Type_Renderer_Abstract
 					false,
 					array('VALUE' => 'DATE')
 				);
+				//
+				// Schoolbox stores all day end time as the same day.
+				// VCAL expects it as start of next, so add a day to SB value.
+				$end_time = $currentEvent->getEndTime()->addDays(1);
 				$e->setProperty(
 					'dtend',
-					$currentEvent->getEndTime()->getUsingFormat('Y'),
-					$currentEvent->getEndTime()->getUsingFormat('m'),
-					$currentEvent->getEndTime()->getUsingFormat('d'),
+					$end_time->getUsingFormat('Y'),
+					$end_time->getUsingFormat('m'),
+					$end_time->getUsingFormat('d'),
 					false,
 					false,
 					false,
