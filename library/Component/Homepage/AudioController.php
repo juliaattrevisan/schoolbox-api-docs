@@ -40,7 +40,14 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
         require_once SITE_root. '/library/file.php';
         $fileHandler = new File;
 
-        $config['filter'] = array('audio/mpeg', 'audio/mpa', 'audio/aac', 'audio/mp4', 'audio/wav', 'audio/wave', 'audio/x-wav');
+        //
+        // WAV: no longer supported because Flash no longer supports WAV
+        // playback. Long term fix - add a transcoder.
+        $config['filter'] = array(
+            'audio/mpeg', 'audio/mpa',
+            'audio/aac', 'audio/mp4',
+//            'audio/wav', 'audio/wave', 'audio/x-wav'
+        );
 
         $fileList = $fileHandler->getAllInCategory($this->getContext('id'), $config);
         if (is_array($fileList)) {
