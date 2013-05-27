@@ -338,24 +338,27 @@ foreach ($categoryList as $category) {
 
     $gradeAvg    = -1;
     $grade_count = count($studentGrades);
-    if ($grade_count > 0) {
-        $gradeAvg = array_sum($studentGrades) / count($studentGrades);
-    }
-
+    $show_grades = Cfg::get('show_overall_grade');
     $trendDir = '';
     $trendAmt = '';
-    // if more than 1 assessment, can calculate trending
-    if ($grade_count > 1) {
-        // get previous average
-        array_pop($studentGrades);
-        $prevAvg = array_sum($studentGrades) / count($studentGrades);
-        if ($gradeAvg > $prevAvg) {
-            $trendDir = '&#x25B2;';
-        } elseif ($gradeAvg < $prevAvg) {
-            $trendDir = '&#x25BC;';
+    if ($show_grades) {
+        if ($grade_count > 0) {
+            $gradeAvg = array_sum($studentGrades) / count($studentGrades);
         }
-        if($prevAvg != 0) {
-            $trendAmt = sprintf('%0.1f', ($gradeAvg - $prevAvg) / $prevAvg * 100) . '%';
+
+        // if more than 1 assessment, can calculate trending
+        if ($grade_count > 1) {
+            // get previous average
+            array_pop($studentGrades);
+            $prevAvg = array_sum($studentGrades) / count($studentGrades);
+            if ($gradeAvg > $prevAvg) {
+                $trendDir = '&#x25B2;';
+            } elseif ($gradeAvg < $prevAvg) {
+                $trendDir = '&#x25BC;';
+            }
+            if($prevAvg != 0) {
+                $trendAmt = sprintf('%0.1f', ($gradeAvg - $prevAvg) / $prevAvg * 100) . '%';
+            }
         }
     }
 
@@ -373,7 +376,7 @@ foreach ($categoryList as $category) {
         'SUBJ_TOTAL' => $summary[$category['id']]['total'],
         'SUBJ_TREND_DIR' => $trendDir,
         'SUBJ_TREND_AMT' => $trendAmt,
-        'SUBJ_HAS_GRADE' => 'grade',
+        'SUBJ_HAS_GRADE' => $show_grades ? 'grade' : '',
         'DARK' => ++$j % 2 ? '' : 'dark'
     );
     $this->setVar($output);
