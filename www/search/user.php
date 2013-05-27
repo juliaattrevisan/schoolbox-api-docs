@@ -453,6 +453,18 @@ if (is_numeric($this->arg[0])) {
 		                        $parent = $userHandler->getBySynergy($studentContact['StudentContactID']);
 		                        $spouse = $userHandler->getBySynergy($studentContact['StudentContactSpouseID']);
 
+		                        $address_fields = array_filter(
+			                        array_map(
+				                        'trim',
+				                        array(
+					                        $studentContact['StudentContactAddress1'],
+					                        $studentContact['StudentContactAddress2'],
+					                        $studentContact['StudentContactAddress3'],
+				                        )
+			                        ),
+			                        'strlen'
+		                        );
+
 	                            $output = array(
 	                                'CONTACT_NAME' => Scrub::text(
 	                                    $studentContact['StudentContactTitle'] . ' ' . $studentContact['StudentContactPreferred'] . ' ' . $studentContact['StudentContactSurname']
@@ -460,7 +472,7 @@ if (is_numeric($this->arg[0])) {
 		                            'CONTACT_ID' => $parent['uid'],
 		                            'CONTACT_ROLE' => Scrub::text($studentContact['StudentContactRelation']),
 	                                'CONTACT_ADDRESS' => Scrub::text(
-	                                    $studentContact['StudentContactAddress1']
+	                                    implode(' ', $address_fields)
 	                                ) . '<br>' . Scrub::text(
 	                                    $studentContact['StudentContactSuburb'] . ', ' . $studentContact['StudentContactState'] . ' ' . $studentContact['StudentContactPostCode']
 	                                ),
@@ -480,7 +492,6 @@ if (is_numeric($this->arg[0])) {
 	                                'SPOUSE_OCCUP_PHONE' => Scrub::text($studentContact['StudentContactSpouseOccupPhone']),
 	                                'SPOUSE_EMAIL' => $spouseEmail,
 	                            );
-
 	                            $this->setVar($output);
 
 		                        /* Output each of the block for contact details */

@@ -405,7 +405,7 @@ class External_Synergetic_User implements External_UserInterface {
 		$query = "
 			SELECT
 				StudentContactID, StudentContactTitle, StudentContactPreferred, StudentContactSurname, StudentContactDefaultEmail,
-				StudentContactAddress1, StudentContactSuburb, StudentContactPostCode, StudentContactState,
+				StudentContactAddress1, StudentContactAddress2, StudentContactAddress3, StudentContactSuburb, StudentContactPostCode, StudentContactState,
 				StudentContactPhoneActual, StudentContactMobilePhone, StudentContactOccupPhone,StudentContactRelation,
 				StudentContactSpouseID, StudentContactSpouseTitle, StudentContactSpousePreferred, StudentContactSpouseSurname,
 				StudentContactSpouseMobilePhone, StudentContactSpouseOccupPhone,StudentContactSpouseDefaultEmail, StudentContactType,StudentContactSpouseRelation
