@@ -21,34 +21,52 @@ class Calendar_Event_Type_Exporter extends Calendar_Event_Type_Renderer_Abstract
 		 */
 		if ($this->isVisible($currentEvent)) {
 
-			/* Manufacture month and day values
-			 */
-			$currentDay = strtotime($currentEvent->getStartTime()->getDatabase());
-			$month = date('n', $currentDay);
-			$day = date('j', $currentDay);
-
 			$e = new vevent();
 			$e->setProperty('categories', 'SCHOOL' );
 
-			if ($currentEvent->getStartTime()->getUnixTimestamp()) {
-				$startHour = floor($currentEvent->getStartTime()->getUnixTimestamp() / 60 / 60);
-				$startMinute = ($currentEvent->getStartTime()->getUnixTimestamp() /60) % 60;
-
-                if($currentEvent->getEndTime()->getUnixTimestamp()){
-                    $duration = $currentEvent->getEndTime()->getUnixTimestamp() - $currentEvent->getStartTime()->getUnixTimestamp();
-                    $durHour = floor($duration / 60 / 60);
-                    $durMinute = ($duration /60) % 60;
-                }
-                else {
-                    $durHour = 1;
-                    $durMinute = 0;
-                }
-
-                $e->setProperty('dtstart', $currentEvent->getStartTime()->getUsingFormat('Y'), $month, $day, $startHour, $startMinute, array('VALUE' => 'DATE-TIME'));
-				$e->setProperty('duration', 0, 0, $durHour, $durMinute );
+			if (!$currentEvent->getAllday()) {
+				$e->setProperty(
+					'dtstart',
+					$currentEvent->getStartTime()->getUsingFormat('Y'),
+					$currentEvent->getStartTime()->getUsingFormat('m'),
+					$currentEvent->getStartTime()->getUsingFormat('d'),
+					$currentEvent->getStartTime()->getUsingFormat('H'),
+					$currentEvent->getStartTime()->getUsingFormat('i'),
+					$currentEvent->getStartTime()->getUsingFormat('s')
+				);
+				$e->setProperty(
+					'dtend',
+					$currentEvent->getEndTime()->getUsingFormat('Y'),
+					$currentEvent->getEndTime()->getUsingFormat('m'),
+					$currentEvent->getEndTime()->getUsingFormat('d'),
+					$currentEvent->getEndTime()->getUsingFormat('H'),
+					$currentEvent->getEndTime()->getUsingFormat('i'),
+					$currentEvent->getEndTime()->getUsingFormat('s')
+				);
 			}
 			else {
-				$e->setProperty('dtstart', $currentEvent->getStartTime()->getUsingFormat('Y'), $month, $day, FALSE, FALSE, array('VALUE' => 'DATE'));
+				$e->setProperty(
+					'dtstart',
+					$currentEvent->getStartTime()->getUsingFormat('Y'),
+					$currentEvent->getStartTime()->getUsingFormat('m'),
+					$currentEvent->getStartTime()->getUsingFormat('d'),
+					false,
+					false,
+					false,
+					false,
+					array('VALUE' => 'DATE')
+				);
+				$e->setProperty(
+					'dtend',
+					$currentEvent->getEndTime()->getUsingFormat('Y'),
+					$currentEvent->getEndTime()->getUsingFormat('m'),
+					$currentEvent->getEndTime()->getUsingFormat('d'),
+					false,
+					false,
+					false,
+					false,
+					array('VALUE' => 'DATE')
+				);
 			}
 
 			$e->setProperty('summary', $currentEvent->getNote());
