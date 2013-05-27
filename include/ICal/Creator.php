@@ -9,7 +9,7 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-require_once('iCalcreator.class.v2.12.php');
+require_once('iCalcreator.class.php');
 
 class ICal_Creator {
 
@@ -56,23 +56,11 @@ class ICal_Creator {
 	}
 
 	/**
-	 * Instantiates ver. 2.4.3 of vcalendar
+	 * Instantiates a calendar object.
 	 *
 	 * @return vcalendar
 	 */
-	private function v243() {
-		$v = new vcalendar();
-		$v->setConfig('unique_id', 'scoolbox');
-
-		return $v;
-	}
-
-	/**
-	 * Instantiates ver. 2.12 of vcalendar
-	 *
-	 * @return vcalendar
-	 */
-	private function v212() {
+	private function getVcalendar() {
 		$init = array(
 			'unique_id' => 'scoolbox',
 		);
@@ -95,9 +83,7 @@ class ICal_Creator {
 	 */
 	private function getEvents() {
 
-		/* Use the latest version
-		 */
-		$v = $this->v212();
+		$v = $this->getVcalendar();
 
 		$v->setProperty('calscale', 'GREGORIAN');
 		$v->setProperty('method', 'PUBLISH');
