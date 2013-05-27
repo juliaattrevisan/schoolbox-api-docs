@@ -24,10 +24,13 @@ abstract class Exception_Abstract extends Exception {
 	 * Remember error message
 	 * Localise this via the Config table
 	 *
-	 * @param  $errorMessage
+	 * @param string    $message
+	 * @param int       $code
+	 * @param Exception $previous
 	 */
-	public function __construct($errorMessage) {
-		$this->setErrorMessage($errorMessage);
+	public function __construct($message = "", $code = 0, Exception $previous = null) {
+		parent::__construct($message, $code, $previous);
+		$this->setErrorMessage($message);
 		$this->setLocalisation('Wenona');
 	}
 

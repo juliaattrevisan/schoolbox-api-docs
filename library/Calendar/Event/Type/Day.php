@@ -21,11 +21,6 @@ class Calendar_Event_Type_Day extends Calendar_Event_Type_Abstract {
      */
     private $attendance = 0;
 
-    /* The date when the event was published (made visible to users)
-     * Stored always as an Alaress_Date_Format() instance
-     */
-    private $publishDate = null;
-
 	/**
 	 * Render via external class
 	 *
@@ -116,24 +111,6 @@ class Calendar_Event_Type_Day extends Calendar_Event_Type_Abstract {
 
     /* Getters/Setters
      */
-
-    /**
-     * Set publish date object
-     *
-     * @param $publishDate
-     */
-    public function setPublishDate($publishDate) {
-        $this->publishDate = new Alaress_Date_Format($publishDate, 'y-m-d h:i:s');
-    }
-
-    /**
-     * Get publish date
-     *
-     * @return null
-     */
-    public function getPublishDate() {
-        return $this->publishDate;
-    }
 
     /**
      * Set attendance

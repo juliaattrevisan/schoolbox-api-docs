@@ -44,7 +44,7 @@ class ICal_Creator {
 	 * @param $file
 	 */
 	public function __construct($uid, $groupList, $campusList, $file) {
-		date_default_timezone_set('Australia/Melbourne');
+//		date_default_timezone_set('Australia/Melbourne');
 
 		$this->setUid($uid);
 		$this->setGroupList($groupList);

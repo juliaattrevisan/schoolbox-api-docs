@@ -12,9 +12,9 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	/**
 	 * A schoobox event handler instance
 	 *
-	 * @var null
+	 * @var Calendar
 	 */
-	private $calendarHandler = null;
+	private $calendarHandler;
 
 	/**
 	 * Constructor
@@ -28,14 +28,13 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	/**
 	 * Get day events from this data source
 	 *
-	 * @param $startTimestamp
-	 * @param $endTimestamp
-	 * @internal param $currentDay
+	 * @param int $startTimestamp
+	 * @param int $endTimestamp
 	 *
 	 * @return Calendar_Event_Collection
 	 */
 	public function getEvents($startTimestamp, $endTimestamp) {
-		$collection = $this->getCalendarHandler()->getDayEvents($startTimestamp, $endTimestamp);
+		$collection = $this->getEventsFromCalendarHandler($startTimestamp, $endTimestamp);
 
 		/* Give the calendar_connector id so this event knows where it came from
 		 * This allows you to create an event detail screen in Mobile
@@ -45,6 +44,21 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 		}
 
 		return $collection;
+	}
+
+	/**
+	 * Gets events out of the calendar handler.
+	 *
+	 * Can be overridden in subclasses - a filter can be set on
+	 * Calendar->getDayEvents().
+	 *
+	 * @param int $startTimestamp
+	 * @param int $endTimestamp
+	 *
+	 * @return Calendar_Event_Collection
+	 */
+	protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp) {
+		return $this->getCalendarHandler()->getDayEvents($startTimestamp, $endTimestamp);
 	}
 
 	/**
@@ -106,7 +120,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	/**
 	 * Set calendar handler
 	 *
-	 * @param $calendarHandler
+	 * @param Calendar $calendarHandler
 	 */
 	public function setCalendarHandler($calendarHandler) {
 		$this->calendarHandler = $calendarHandler;
@@ -115,7 +129,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
 	/**
 	 * Get calendar handler
 	 *
-	 * @return null
+	 * @return Calendar
 	 */
 	public function getCalendarHandler() {
 		return $this->calendarHandler;
