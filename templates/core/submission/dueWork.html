@@ -41,9 +41,9 @@ $j(function () {
 
             if (data !== null) {
 				var template = is_assess ? $j('#assess-popup-template') : $j('#duework-popup-template');
-
-				template.tmpl(data).appendTo('body');
-
+				var output = template.tmpl(data);
+				output.find('.comment').html(data.description);
+				output.appendTo('body');
                 movePopup(position);
             }
 

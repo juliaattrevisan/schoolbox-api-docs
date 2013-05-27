@@ -69,7 +69,7 @@ if ($_REQUEST['id']) {
             'category'    => Scrub::text($submission->getCategory()->getName()),
             'typeName'    => Scrub::text($submission->getWorkType()->getName()),
             'name'        => Scrub::text($submission->getName()),
-            'description' => Scrub::text($submission->getDescription()),
+            'description' => Scrub::html($submission->getDescription()),
             'action'      => $action,
         );
     }
