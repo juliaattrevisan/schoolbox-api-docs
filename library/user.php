@@ -429,23 +429,25 @@ class User extends DeprecatedModel {
 			return false;
 		}
 		$groupHandler = new Group();
-		$user = $this->getByField('alt_email', $email);
-		if (isset($user['id'])) {
-			if ($groupHandler->isParent($user['id']) || Cfg::get('site_name') != 'shore') {
-				require_once SITE_root . '/include/Mailer.php';
-				$mailHandler = new Mailer('new-password.html', Cfg::get(
-					'title'
-				) . ' Password Reminder', $user['alt_email']);
-				$mailHandler->setVar('NAME', $user['firstname']);
-				$mailHandler->setVar('USERNAME', $user['username']);
-				$mailHandler->setVar('PASSWORD', $user['email_pass']);
-				$mailHandler->send();
-
-				return true;
+		$user_list    = $this->getAllByField('alt_email', $email);
+		if (!empty($user_list)) {
+			foreach ($user_list as $user) {
+				if ($groupHandler->isParent($user['id'])) {
+					require_once SITE_root . '/include/Mailer.php';
+					$mailHandler = new Mailer(
+						'new-password.html',
+						Cfg::get('title') . ' Password Reminder',
+						$user['alt_email']
+					);
+					$mailHandler->setVar('NAME',     $user['firstname']);
+					$mailHandler->setVar('USERNAME', $user['username']);
+					$mailHandler->setVar('PASSWORD', $user['email_pass']);
+					$mailHandler->send();
+					return true;
+				}
 			}
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	function getCampusList() {
