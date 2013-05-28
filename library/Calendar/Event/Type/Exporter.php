@@ -24,32 +24,49 @@ class Calendar_Event_Type_Exporter extends Calendar_Event_Type_Renderer_Abstract
 			$e = new vevent();
 			$e->setProperty('categories', 'SCHOOL' );
 
+			$start_time = $currentEvent->getStartTime()->getDateTimeObject();
+			if (!($start_time instanceof DateTime)) {
+				$start_time = new DateTime($currentEvent->getStartTime()->getDatabase());
+			}
+			$end_time = $currentEvent->getEndTime()->getDateTimeObject();
+			if (!($end_time instanceof DateTime)) {
+				$end_time = new DateTime($currentEvent->getEndTime()->getDatabase());
+			}
 			if (!$currentEvent->getAllday()) {
+
+				//
+				// Assume that start/end are set up with current timezone.
+				// Convert them to UTC.
+				$utc_timezone = new DateTimeZone('UTC');
+				$start_time->setTimezone($utc_timezone);
+				$end_time->setTimezone($utc_timezone);
 				$e->setProperty(
 					'dtstart',
-					$currentEvent->getStartTime()->getUsingFormat('Y'),
-					$currentEvent->getStartTime()->getUsingFormat('m'),
-					$currentEvent->getStartTime()->getUsingFormat('d'),
-					$currentEvent->getStartTime()->getUsingFormat('H'),
-					$currentEvent->getStartTime()->getUsingFormat('i'),
-					$currentEvent->getStartTime()->getUsingFormat('s')
+					$start_time->format('Y'),
+					$start_time->format('m'),
+					$start_time->format('d'),
+					$start_time->format('H'),
+					$start_time->format('i'),
+					$start_time->format('s'),
+					'Z'
 				);
 				$e->setProperty(
 					'dtend',
-					$currentEvent->getEndTime()->getUsingFormat('Y'),
-					$currentEvent->getEndTime()->getUsingFormat('m'),
-					$currentEvent->getEndTime()->getUsingFormat('d'),
-					$currentEvent->getEndTime()->getUsingFormat('H'),
-					$currentEvent->getEndTime()->getUsingFormat('i'),
-					$currentEvent->getEndTime()->getUsingFormat('s')
+					$end_time->format('Y'),
+					$end_time->format('m'),
+					$end_time->format('d'),
+					$end_time->format('H'),
+					$end_time->format('i'),
+					$end_time->format('s'),
+					'Z'
 				);
 			}
 			else {
 				$e->setProperty(
 					'dtstart',
-					$currentEvent->getStartTime()->getUsingFormat('Y'),
-					$currentEvent->getStartTime()->getUsingFormat('m'),
-					$currentEvent->getStartTime()->getUsingFormat('d'),
+					$start_time->format('Y'),
+					$start_time->format('m'),
+					$start_time->format('d'),
 					false,
 					false,
 					false,
@@ -59,12 +76,12 @@ class Calendar_Event_Type_Exporter extends Calendar_Event_Type_Renderer_Abstract
 				//
 				// Schoolbox stores all day end time as the same day.
 				// VCAL expects it as start of next, so add a day to SB value.
-				$end_time = $currentEvent->getEndTime()->addDays(1);
+				$end_time->add(new DateInterval('P1D'));
 				$e->setProperty(
 					'dtend',
-					$end_time->getUsingFormat('Y'),
-					$end_time->getUsingFormat('m'),
-					$end_time->getUsingFormat('d'),
+					$end_time->format('Y'),
+					$end_time->format('m'),
+					$end_time->format('d'),
 					false,
 					false,
 					false,
