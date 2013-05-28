@@ -248,7 +248,7 @@ Calendar.prototype.init = function() {
             baseButton.clone()
                 .html('export')
                 .removeClass('fc-button-month fc-button-agendaWeek fc-button-agendaDay fc-state-active')
-                .addClass('fc-button-filter fc-corner-left fc-corner-right')
+                .addClass('fc-button-filter fc-corner-left fc-corner-right btn reply')
                 .attr('id','fc-button-export')
         );
 
