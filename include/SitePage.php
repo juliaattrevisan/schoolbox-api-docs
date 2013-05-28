@@ -90,8 +90,9 @@ class SitePage extends Page {
                 // MGS-specific code
                 if (Cfg::get('site_location') == 'mgs') {
                     // all staff are shown default MGS skin
+                    // exception: teachers (gid 1), who get their campus skin.
                     $group = new Group();
-                    if($group->isStaff()) {
+                    if ($_SESSION['gid'] != 1 && $group->isStaff()) {
                         $this->site = 'mgs-staff';
                     }
                     elseif ($_SESSION['campus'][0] == 3) {
