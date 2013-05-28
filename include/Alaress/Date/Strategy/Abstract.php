@@ -401,7 +401,12 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Int
 		return $this->locale;
 	}
 
-	protected function getDateTimeObject() {
+	/**
+	 * Gets datetime object out of this object
+	 *
+	 * @return DateTime
+	 */
+	public function getDateTimeObject() {
 		return $this->datetime;
 	}
 
