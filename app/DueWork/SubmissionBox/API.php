@@ -27,7 +27,8 @@ class DueWork_SubmissionBox_API {
             $catDetailsContent['file'] = $fileHandler->getByID($box['fid']);
             $catDetailsContent['canDownload'] = (in_array(
                 $_SESSION['env']['device'],
-                array(ClientDevice::DEV_IPAD, ClientDevice::DEV_IPHONE)
+                array(ClientDevice::DEV_IPAD, ClientDevice::DEV_IPHONE),
+                true
             )) ? 'false' : 'true';
         }
 
