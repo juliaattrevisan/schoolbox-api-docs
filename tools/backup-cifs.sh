@@ -52,9 +52,15 @@ backup_usage_override=0;
 ############## End of Config Options ##############
 ########### DO NOT EDIT past this line! ###########
 
-if [ -f /etc/schoolbox-backup-cifs.conf ];
+filepath=`readlink -f $0`;
+fullpath=${filepath%/*};
+
+instdir=`readlink -f $fullpath/../`;
+package=${instdir##*/};
+
+if [ -f /etc/$package-backup-cifs.conf ];
 then
-	source /etc/schoolbox-backup-cifs.conf;
+	source /etc/$package-backup-cifs.conf;
 else
 	echo -e "Please set the configuration options for this script in /etc/schoolbox-backup-cifs.sh";
 	exit 1;
@@ -85,7 +91,8 @@ DAY0=`date -I`;
 #$copies days ago in ISO-8601 format
 DAYX=`date -I -d "$copies days ago"`;
 
-logfile="/var/log/schoolboxbackup_$DAY0.log";
+logfileprefix="/var/log/$package-backup";
+logfile="$logfileprefix-$DAY0.log";
 
 errorcheck=0;
 
@@ -191,8 +198,8 @@ then
 	# Remove old backup logfile
 	if [ -f "/var/log/schoolboxbackup_$DAYX.log" ]
 	then
-		echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting removal of old backup logfile: /var/log/schoolboxbackup_$DAYX.log" >> $logfile;
-		rm -f "/var/log/schoolboxbackup_$DAYX.log" >> $logfile 2>&1;
+		echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting removal of old backup logfile: $logfileprefix-$DAYX.log" >> $logfile;
+		rm -f "$logfileprefix-$DAYX.log" >> $logfile 2>&1;
 	fi
 
 	# Unmount
