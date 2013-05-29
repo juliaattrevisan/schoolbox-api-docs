@@ -780,24 +780,27 @@ class SitePage extends Page {
         $this->setFile(TEMPLATE_body, 'common/login.html');
         $this->setVar('TITLE', Cfg::get('title') . " - Login");
         if ($page && preg_match('#^[\w_=\-\/.\&\?]+$#i', $page)) {
-
             $this->setVar('HIDDEN', rawurldecode($page));
-        } else if (preg_match('#^[\w_=\-\/.\&\?]+$#i', $_SERVER['REQUEST_URI'])) {
-            $this->setVar('HIDDEN', $_SERVER['REQUEST_URI']);
-        } else {
+        }
+        elseif (preg_match('#^[\w_=\-\/.\&\?]+$#i', $_GET['page'])) {
+            $this->setVar('HIDDEN', urlencode($_GET['page']));
+        }
+        else {
             $this->setVar('HIDDEN', '');
         }
 
         if ($error) {
             $this->setVar('ERROR', $error);
         } else {
-            if (!$page && $_SERVER['REQUEST_URI'] != '/login/' && $_SERVER['REQUEST_URI'] != '/') {
-                $this->setVar(
-                    'ERROR',
-                    'You are currently not logged in.  Your session has either expired or you are beginning a new session.  Please log in below to continue browsing the portal.'
-                );
-            } else {
-                $this->setVar('ERROR', 'To begin a new session please login with your username and password.');
+            $parts = parse_url($_SERVER['REQUEST_URI']);
+            if (!$page && $parts['path'] != '/login/' && $parts['path'] != '/') {
+                $this->localRedir('/?page='.urlencode($_SERVER['REQUEST_URI']));
+            }
+            else {
+                $error = isset($_GET['page']) ?
+                    'You are currently not logged in.  Your session has either expired or you are beginning a new session.  Please log in below to continue browsing the portal.':
+                    'To begin a new session please login with your username and password.';
+                $this->setVar('ERROR', $error);
             }
         }
 
