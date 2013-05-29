@@ -31,6 +31,7 @@ if (is_array($fileList)) {
 			'FILE_MIME'				=> $file['mime'],
 			'FILE_EXTENSION'		=> $file['extension'],
 			'FILE_ICON'				=> $file['iconFile'],
+			'FILE_MAXSIZE'			=> $file['max_file_size'] ?: 'default',
 			'FILE_INLINE'			=> $file['inline'] == 'true' ? 'Inline' : 'External',
             'FILE_EXTERN_CHECKED'   => $file['inline'] == 'true' ? '' : 'selected="selected"',
 		);

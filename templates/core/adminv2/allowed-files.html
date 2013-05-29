@@ -32,6 +32,9 @@
         $j('.allowed-files tr:first td:nth-child(5)').qtip({
             content:'Determines if file will be opened in the browser or by a third party application'});
 
+		$j('.allowed-files tr:first td:nth-child(6)').qtip({
+			content:'The maximum file size when uploading a file of this type - defaults to system-wide max file size'});
+
 
         $j('.modify').live('click', function () {
             var trigger = 0;
@@ -123,10 +126,11 @@
         <table cellpadding="0" cellspacing="0" class="allowed-files">
             <colgroup>
                 <col width="14%"/>
-                <col width="19%"/>
+                <col width="16%"/>
                 <col width="20%"/>
                 <col width="20%"/>
-                <col width="26%"/>
+                <col width="20%"/>
+				<col width="10%"/>
             </colgroup>
             <thead>
             <tr>
@@ -135,6 +139,7 @@
                 <td><h3>Mime<span>?</span></h3></td>
                 <td><h3>Extensions<span>?</span></h3></td>
                 <td><h3>Inline<span>?</span></h3></td>
+                <td><h3>Max Size<span>?</span></h3></td>
             </tr>
             <tr class="add-new">
                 <td><input type="checkbox" name="enable" checked="checked" value="true"/>
@@ -150,6 +155,7 @@
                     <option value="false">External</option>
                 </select>
                     <a href="#" class="btn add submit no-marg"><span></span>Add new file type</a></td>
+				<td><input type="text" class="text-input" name="max_size" value=""/></td>
             </tr>
             </thead>
         </table>
@@ -170,6 +176,9 @@
                 <div class="extensions">
                     <p>{FILE_EXTENSION}</p>
                 </div>
+				<div class="extensions">
+					<p>{FILE_MAXSIZE}</p>
+				</div>
                 <div class="inline clearfix">
                     <p>{FILE_INLINE}</p>
                     <a href="#" class="btn modify no-marg"><span></span>Modify</a></div>
@@ -203,6 +212,11 @@
                             <input type="text" class="text-input" name="extension" value="{FILE_EXTENSION}"/>
                         </fieldset>
                     </fieldset>
+					<fieldset class="extensions">
+						<fieldset>
+							<input type="text" class="text-input" name="max_file_size" value="{FILE_MAXSIZE}"/>
+						</fieldset>
+					</fieldset>
                     <fieldset class="inline">
                         <fieldset>
                             <select name="inline" id="inline">
