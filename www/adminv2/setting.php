@@ -78,7 +78,10 @@ if(is_array($optionList)) {
 
         $this->setVar($output);
 
-        if ($option['editable'] == 'false') {
+        if ($option['hidden'] == 'true') {
+            continue;
+        }
+        elseif ($option['editable'] == 'false') {
             $this->parse('setting_type_noneditable_block', 'setting_type_noneditable', true);
         }
         else {
