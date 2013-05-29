@@ -258,7 +258,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 
 		foreach ($this->getComponentCollection() as $component) {
 			$templateTarget = "component_position_{$component->position}";
-			$templateHandle = "component_{$component->definitionId}";
+			$templateHandle = "component_{$component->instance->id}";
 
 			/* Assign permissions
 			 */
