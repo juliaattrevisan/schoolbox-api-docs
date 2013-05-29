@@ -71,8 +71,18 @@ class Authenticator {
         if (!Cfg::get('mobile_enabled')) {
             return true;
         }
+
+        //
+        // Avoid SQL injection weakness in Giza mapper by getting ID of user
+        // (always an int) and querying Giza on that.
+        // Not a long term fix of course, but should result in less backward
+        // compatibility issues than changing the old mapper.
+        $uid  = Schoolbox\UserMapper::getInstance()->getIdForUsername($username);
+        if (!$uid) {
+            return false;
+        }
         $uMap = new GizaUser_DataMapper();
-        $user = $uMap->read(array('username' => $username))->get();
+        $user = $uMap->read(array('user.id' => $uid))->get();
 
         if(count($user)) {
             $this->setSessionUser($user);
