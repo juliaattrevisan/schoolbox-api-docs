@@ -16,7 +16,12 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage) {
         parent::__construct($instance, $user, $sitepage);
 
-        $this->rss = new Xml($this->getConfig('url'), Cfg::get('xml_cache_timeout'));
+
+	    $this->rss = new Alaress_Rss_Stream($this->getConfig('url'));
+	    $this->rss->setLimit(Cfg::get('welcome_rss_limit'));
+	    $this->rss->stream();
+
+	    //$this->rss = new Xml($this->getConfig('url'), Cfg::get('xml_cache_timeout'));
     }
 
     public function execute() {
@@ -35,14 +40,17 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
         $this->setVar('RSS_NAME', $this->rss->channel->title);
         $this->setVar('RSS_LINK', base64_encode($this->rss->channel->link));
 
-        if ($this->rss->channel) {
-            foreach ($this->rss->channel->item as $i => $item) {
+	    $allRss = $this->rss->getOutput();
+
+	    if (count($allRss)) {
+		    foreach($allRss as $item) {
+	            //$content = $item->children('http://purl.org/rss/1.0/modules/content/');
                 $this->setVar(
                     array(
                         'ON_OFF' => ++$j % 2 ? '' : 'dark',
-                        'RSS_TITLE' => Scrub::text($item->title),
-                        'RSS_URL' => base64_encode($item->link),
-                        'RSS_BRIEF' => Scrub::html($item->description),
+                        'RSS_TITLE' => Scrub::text($item['title']),
+                        'RSS_URL' => base64_encode($item['link']),
+                        'RSS_BRIEF' => Scrub::html($item['content']),
                     )
                 );
                 if (strlen($item->pubDate)) {

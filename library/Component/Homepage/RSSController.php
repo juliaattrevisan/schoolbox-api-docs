@@ -56,7 +56,7 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
                     'ON_OFF'    => ++$j % 2 ? '' : 'dark',
                     'RSS_TITLE' => Scrub::text($currentRss['title']),
                     'RSS_URL'   => base64_encode($currentRss['link']),
-                    'RSS_BRIEF' => Scrub::html($currentRss['description']),
+                    'RSS_BRIEF' => Scrub::html($currentRss['content']),
                 ));
 
                 // If the item has a pubDate
