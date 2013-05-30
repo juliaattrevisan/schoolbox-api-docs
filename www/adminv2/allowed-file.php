@@ -21,21 +21,23 @@ $allowedFile = new AllowedFile;
 
 $fileList = $allowedFile->getAll('mime');
 
+$default_size = Alaress_Byte_Format::bytesToString(Config::get('max_file_size'));
 if (is_array($fileList)) {
-    foreach($fileList as $file) {
+    foreach ($fileList as $file) {
+        $max_size_output = Alaress_Byte_Format::bytesToString($file['max_file_size']);
         $output = array(
-			'FILE_ID'				=> $file['fileTypeID'],
-			'FILE_ENABLED'			=> $file['enable'] == 'true' ? 'Yes' : 'No',
-			'FILE_ENABLED_CHECKED'  => $file['enable'] == 'true' ? 'checked="checked"' : '',
-			'FILE_DESC'				=> Scrub::text($file['description']),
-			'FILE_MIME'				=> $file['mime'],
-			'FILE_EXTENSION'		=> $file['extension'],
-			'FILE_ICON'				=> $file['iconFile'],
-			'FILE_MAXSIZE'			=> $file['max_file_size'] ?: 'default',
-			'FILE_INLINE'			=> $file['inline'] == 'true' ? 'Inline' : 'External',
-            'FILE_EXTERN_CHECKED'   => $file['inline'] == 'true' ? '' : 'selected="selected"',
-		);
-
+            'FILE_ID'              => $file['fileTypeID'],
+            'FILE_ENABLED'         => $file['enable'] == 'true' ? 'Yes' : 'No',
+            'FILE_ENABLED_CHECKED' => $file['enable'] == 'true' ? 'checked="checked"' : '',
+            'FILE_DESC'            => Scrub::text($file['description']),
+            'FILE_MIME'            => $file['mime'],
+            'FILE_EXTENSION'       => $file['extension'],
+            'FILE_ICON'            => $file['iconFile'],
+            'FILE_MAXSIZE'         => $file['max_file_size'] ? $max_size_output : "<em>default ($default_size)</em>",
+            'FILE_MAXSIZE_INPUT'   => $file['max_file_size'] ? $max_size_output : '',
+            'FILE_INLINE'          => $file['inline'] == 'true' ? 'Inline' : 'External',
+            'FILE_EXTERN_CHECKED'  => $file['inline'] == 'true' ? '' : 'selected="selected"',
+        );
         $this->setVar($output);
         $this->parse('file_block','file',true);
     }
@@ -50,4 +52,3 @@ if (is_array($iconList)) {
         $this->parse('image_block','image',true);
     }
 }
-?>
