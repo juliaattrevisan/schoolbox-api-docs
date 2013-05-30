@@ -30,6 +30,7 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
         }
 
         $this->setBlock($templateHandle, "rss_stories", "rss_block");
+        $this->setBlock('rss_stories', 'rss_date', 'rss_date_block');
 
         $this->setVar('RSS_NAME', $this->rss->channel->title);
         $this->setVar('RSS_LINK', base64_encode($this->rss->channel->link));
@@ -41,8 +42,17 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
                         'ON_OFF' => ++$j % 2 ? '' : 'dark',
                         'RSS_TITLE' => Scrub::text($item->title),
                         'RSS_URL' => base64_encode($item->link),
+                        'RSS_BRIEF' => Scrub::html($item->description),
                     )
                 );
+                if (strlen($item->pubDate)) {
+                    $postedDate = new Alaress_Date_Relative(new DateTime($item->pubDate), 'U');
+                    $this->setVar('RSS_POSTED_DATE', $postedDate->getRelativeTime());
+                    $this->parse('rss_date_block', 'rss_date');
+                }
+                else {
+                    $this->setVar('rss_date_block', '');
+                }
 
                 $this->parse("rss_block", "rss_stories", true);
 
