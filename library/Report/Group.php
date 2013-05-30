@@ -110,7 +110,16 @@ class Report_Group extends Report_Abstract implements Report_IReport {
         $filterString = $this->getIndexID();
 
         // bypass handlers because I need access to the mysql pointer resource
-        $query = "SELECT * FROM `user` WHERE `group_id` = '$filterString' ORDER BY $orderBy $orderDir";
+        $query = "
+            SELECT `u`.*,
+            GROUP_CONCAT(`c`.`name` ORDER BY `uc`.`defaultCampus` DESC, `c`.`name` ASC SEPARATOR ', ') AS `campus_name`
+            FROM `user` `u`
+            LEFT JOIN `userCampus` `uc` ON `u`.`id`=`uc`.`uid`
+            LEFT JOIN `luCampus` `c` ON `uc`.`campus`=`c`.`id`
+            WHERE `u`.`group_id` = '$filterString'
+            GROUP BY `u`.`id`
+            ORDER BY $orderBy $orderDir
+        ";
 
         $handler = DeprecatedDatabase::getInstance();
 
