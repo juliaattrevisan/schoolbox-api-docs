@@ -624,12 +624,12 @@ class StudentReportCard {
 		$urgency = max(0, min(10, (int)(($due->getUnixTimestamp() - time()) / 86400)));
 		$output = array(
 			'WORK_TITLE'   => $oa->getTitle(),
-			'WORK_ID'      => $oa->getId(),
+			'WORK_ID'      => $marks ? "{$oa->getId()}/{$marks['section_id']}/{$marks['attempt_id']}" : $oa->getId(),
 			'WORK_TYPE'    => $oa->getWorkType()->getName(),
 			'WORK_DATE'    => $due->getRelativeTime(),
 			'WORK_TIME'    => $due->getDateOnly(),
 			'WORK_URGENCY' => $urgency,
-			'WORK_HREF'    => 'assess/intro/',
+			'WORK_HREF'    => $marks ? "assess/studentReview/" : 'assess/intro/',
 		);
 
 		// if the viewing user does not have permission to submit, blank out the actions
