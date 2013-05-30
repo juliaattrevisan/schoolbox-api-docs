@@ -32,8 +32,12 @@ if ($groupHandler->isSuperuser()) {
                 */
             if ($currentColumn == 'extension') {
                 $allExtensions = explode(',', $_POST[$currentColumn]);
-            } else {
+            }
+            else {
                 $data[$currentColumn] = Scrub::text($_POST[$currentColumn]);
+            }
+            if ($currentColumn === 'max_file_size') {
+                $data[$currentColumn] =  Alaress_Byte_Format::stringToBytes($data[$currentColumn]);
             }
         }
 
