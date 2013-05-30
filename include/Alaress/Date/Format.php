@@ -210,6 +210,15 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 	}
 
 	/**
+	 * Gets datetime object out of this wrapper
+	 *
+	 * @return DateTime
+	 */
+	public function getDateTimeObject() {
+		return $this->getStrategy()->getDateTimeObject();
+	}
+
+	/**
 	 * Set strategy object
 	 *
 	 * @param  $val
