@@ -54,7 +54,7 @@ class AllowedFile extends DeprecatedModel {
         if ( !$this->db->getOne($query) ) {
             return array(
                 'code' => 11,
-                'message' => "Your file, $filename with the extension '$extension'"
+                'message' => "Your file, with the extension '$extension'"
             );
         }
     }
