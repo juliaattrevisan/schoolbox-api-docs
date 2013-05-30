@@ -10,7 +10,7 @@
 require_once dirname(__FILE__) . '/../include/Bootstrap.php';
 
 // initialise session
-new SitePage();
+session_start();
 
 // set a cookie to force a particular view
 $agent = new HttpUserAgent();
