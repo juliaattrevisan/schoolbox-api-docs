@@ -178,9 +178,8 @@ class Bulk_Calendar extends Bulk_Abstract {
 					);
 				}
 
-                /* Free memory */
-                unset($publish_date);
-                unset($date);
+				/* Free memory */
+				unset($publish_date, $start, $finish);
 			}
 		}
 
