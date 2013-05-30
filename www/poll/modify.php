@@ -41,7 +41,7 @@ if (is_numeric($this->arg[0])) {
         'OPTION_7' => $poll['option_7'],
         'OPTION_8' => $poll['option_8'],
         'OPTION_9' => $poll['option_9'],
-        'CLOSE' => $closeDate->getDateOnly(),
+        'CLOSE' => $closeDate->getLocalShort(),
         'FREQUENCY_ONCE_SELECTED' => '',
         'FREQUENCY_HOURLY_SELECTED' => '',
         'FREQUENCY_DAILY_SELECTED' => '',
