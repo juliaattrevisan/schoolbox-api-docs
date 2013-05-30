@@ -25,12 +25,13 @@ if (is_numeric($this->arg[0])) {
 
     $previousRevision = $wikiHandler->getPreviousRevision($wiki['wikiID'], $wiki['latestRevision']);
 
-	$output = array('ACTION'		=> 'Modify',
-					'WIKI_ID'		=> $previousRevision['wikiID'],
-					'CATEGORY_ID'	=> $previousRevision['categoryID'],
-					'HEADING'		=> Scrub::text($previousRevision['heading']),
-					'BODY'          => $previousRevision['body'],
-                    'REVISION'      => $wiki['latestRevision'],
+	$output = array('ACTION'      => 'Modify',
+					'WIKI_ID'     => $previousRevision['wikiID'],
+					'SLUG'        => $previousRevision['slug'],
+					'CATEGORY_ID' => $previousRevision['categoryID'],
+					'HEADING'     => Scrub::text($previousRevision['heading']),
+					'BODY'        => $previousRevision['body'],
+					'REVISION'    => $wiki['latestRevision'],
 					);
 	$this->setVar($output);
 
