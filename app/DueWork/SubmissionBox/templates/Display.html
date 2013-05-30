@@ -25,11 +25,11 @@
         <a href="/m/file/view/{{ content.file.id }}/save">{{ content.file.realname }}
             <p>({{ content.file.mimeDescription }})</p>
         </a>
-        <a href="#"><img src="{{ content.file.iconFile }}"/></a>
+        <a href="#"><img src="/images/mime/60x60/{{ content.file.iconFile }}"/></a>
     </li>
         {% else %}
     <p>{{ content.file.realname }} <span class="same-as-p">({{ content.file.mimeDescription }})</span></p>
-    <a href="#"><img src="{{ content.file.iconFile }}"/></a>
+    <a href="#"><img src="/images/mime/60x60/{{ content.file.iconFile }}"/></a>
     <p class="bytheway">Visit Schoolbox on your computer to download this file.</p>
         {% endif %}
     {% endif %}
