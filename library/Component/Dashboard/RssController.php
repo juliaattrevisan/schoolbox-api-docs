@@ -21,7 +21,6 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
 	    $this->rss->setLimit(Cfg::get('welcome_rss_limit'));
 	    $this->rss->stream();
 
-	    //$this->rss = new Xml($this->getConfig('url'), Cfg::get('xml_cache_timeout'));
     }
 
     public function execute() {
@@ -37,24 +36,24 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
         $this->setBlock($templateHandle, "rss_stories", "rss_block");
         $this->setBlock('rss_stories', 'rss_date', 'rss_date_block');
 
-        $this->setVar('RSS_NAME', $this->rss->channel->title);
-        $this->setVar('RSS_LINK', base64_encode($this->rss->channel->link));
+        $this->setVar('RSS_NAME', Scrub::text($this->rss->getTitle()));
+        $this->setVar('RSS_LINK', base64_encode($this->rss->getLink()));
 
 	    $allRss = $this->rss->getOutput();
 
 	    if (count($allRss)) {
 		    foreach($allRss as $item) {
-	            //$content = $item->children('http://purl.org/rss/1.0/modules/content/');
+
                 $this->setVar(
                     array(
                         'ON_OFF' => ++$j % 2 ? '' : 'dark',
                         'RSS_TITLE' => Scrub::text($item['title']),
                         'RSS_URL' => base64_encode($item['link']),
-                        'RSS_BRIEF' => Scrub::html($item['content']),
+                        'RSS_BRIEF' => Scrub::html($item['content']?$item['content']:$item['description']),
                     )
                 );
-                if (strlen($item->pubDate)) {
-                    $postedDate = new Alaress_Date_Relative(new DateTime($item->pubDate), 'U');
+                if (strlen($item['pubDate'])) {
+                    $postedDate = new Alaress_Date_Relative(new DateTime($item['pubDate']), 'U');
                     $this->setVar('RSS_POSTED_DATE', $postedDate->getRelativeTime());
                     $this->parse('rss_date_block', 'rss_date');
                 }
