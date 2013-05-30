@@ -314,19 +314,22 @@ class Leave_Controller extends Controller {
      *
      * @param Integer $requestId
      * @return Array
+     * @throws Exception_Schoolbox_NotFound if the request doesn't exist.
      */
     public function executeModifyRequest($requestId) {
-        return array(
-            'request' => $this->getRequestMapper()->findById($requestId)
-        );
+        $request = $this->getRequestMapper()->findById($requestId);
+        if (!$request instanceof Leave_Request) {
+            throw new Exception_Schoolbox_NotFound('Request not found');
+        }
+        return array('request' => $request);
     }
 
     /**
      * Renders a modify request form
      *
      * @param Array $data
-     *
      * @return void
+     * @throws Exception_Schoolbox_NotFound if the requester's house doesn't exist.
      */
     public function renderModifyRequest($data) {
 
@@ -335,7 +338,13 @@ class Leave_Controller extends Controller {
         if ($this->getGroup()->getPermission(null)) {
             $request = $data['request'];
             $user = $request->getUser();
+            if (!$user instanceof NewUser) {
+                throw new Exception_Schoolbox_NotFound('User not found');
+            }
             $house = $this->getHouseMapper()->findById($user->getResidentialHouseId());
+            if (!$house instanceof HouseResidential) {
+                throw new Exception_Schoolbox_NotFound('User\'s house not found');
+            }
 
             $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/modifyRequest.html');
             $this->getPage()->setBlock(TEMPLATE_content, 'next_pending', 'next_pending_block');
@@ -409,8 +418,8 @@ class Leave_Controller extends Controller {
      * Renders a view leave request form
      *
      * @param Array $data
-     *
      * @return void
+     * @throws Exception_Schoolbox_NotFound if the user or their house doesn't exist.
      */
     public function renderViewRequest($data) {
 
@@ -419,8 +428,13 @@ class Leave_Controller extends Controller {
 
         $request = $data['request'];
         $user = $request->getUser();
-
+        if (!$user instanceof NewUser) {
+            throw new Exception_Schoolbox_NotFound('User not found');
+        }
         $house = $this->getHouseMapper()->findById($user->getResidentialHouseId());
+        if (!$house instanceof HouseResidential) {
+            throw new Exception_Schoolbox_NotFound('User\'s house not found');
+        }
 
         if ($this->getGroup()->getPermission(null) || $_SESSION['id'] == $user->getId()) {
 
@@ -458,9 +472,13 @@ class Leave_Controller extends Controller {
      *
      * @param Array $data
      * @return void
+     * @throws Exception_Schoolbox_NotFound if request isn't found.
      */
     public function processModifyRequest($data) {
         $request = $this->getRequestMapper()->findById($data['request']['id']);
+        if (!$request instanceof Leave_Request) {
+            throw new Exception_Schoolbox_NotFound('Request not found');
+        }
 
         $start = new Alaress_Date_Format("{$data['request']['start']['date']} {$data['request']['start']['time']}", 'd/m/y h:i:s');
         $finish = new Alaress_Date_Format("{$data['request']['finish']['date']} {$data['request']['finish']['time']}", 'd/m/y h:i:s');
@@ -510,10 +528,17 @@ class Leave_Controller extends Controller {
      *
      * @param Integer $houseId
      *
-     * @return Array
+     * @return Array contains these keys:
+     *               * house: the HouseResidential object
+     *               * requestList: the requests for this house
+     *
+     * @throws Exception_Schoolbox_NotFound if the house $houseID doesn't exist.
      */
     public function executeHouseRequestList($houseId) {
         $house = $this->getHouseMapper()->findById($houseId);
+        if (!$house instanceof HouseResidential) {
+            throw new Exception_Schoolbox_NotFound('House not found');
+        }
         $requestList = $this->getRequestMapper()->findAllByHouseId($house->getId());
 
         return array(
@@ -681,10 +706,17 @@ class Leave_Controller extends Controller {
      *
      * @param $userId
      * @return Collection
+     * @throws Exception_Schoolbox_NotFound if user or their house isn't found.
      */
     public function executeUserRequestList($userId) {
         $user = $this->getUserMapper()->findById($userId);
+        if (!$user instanceof NewUser) {
+            throw new Exception_Schoolbox_NotFound('User not found');
+        }
         $house = $this->getHouseMapper()->findById($user->getResidentialHouseId());
+        if (!$house instanceof HouseResidential) {
+            throw new Exception_Schoolbox_NotFound('User\'s house not found');
+        }
         $requestList = $this->getRequestMapper()->findAllByUserId($user->getId());
 
         return array(
@@ -868,6 +900,7 @@ class Leave_Controller extends Controller {
      *
      * @param Array $data
      * @return void
+     * @throws Exception_Schoolbox_NotFound if request isn't found
      */
     public function processModifyRequestList($data) {
 
@@ -880,6 +913,9 @@ class Leave_Controller extends Controller {
             if (!empty($requestList)) {
                 foreach ($requestList as $request) {
                     $request = $this->getRequestMapper()->findById($request['id']);
+                    if (!$request instanceof Leave_Request) {
+                        throw new Exception_Schoolbox_NotFound('Request not found');
+                    }
 
                     if (isset($data['approve']) || isset($data['reject'])) {
                         $authorisationDatetime = new Alaress_Date_Format(time(), 'U');
@@ -951,10 +987,12 @@ class Leave_Controller extends Controller {
      * @param $houseId
      * @param $date
      * @return array
+     * @throws Exception_Schoolbox_NotFound if house isn't found
      */
     public function executeHouseReport($houseId, $date) {
-        if (!$house = $this->getHouseMapper()->findById($houseId)) {
-            $this->getPage()->error(2);
+        $house = $this->getHouseMapper()->findById($houseId);
+        if (!$house instanceof HouseResidential) {
+            throw new Exception_Schoolbox_NotFound('House not found');
         }
 
         /* Mess with these two magic numbers to change the range, in conjunction
