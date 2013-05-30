@@ -49,12 +49,12 @@ class AllowedFile extends DeprecatedModel {
 
         $query = "SELECT mime FROM allowedFileExtension afe
                         JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
-                        WHERE extension = '$extension' AND enable = 'true'";
+                        WHERE extension = {$this->db->smartQuote($extension)} AND enable = 'true'";
 
         if ( !$this->db->getOne($query) ) {
             return array(
                 'code' => 11,
-                'message' => "Your file, " . $file['name'] . " with the extension '$extension'"
+                'message' => "Your file, $filename with the extension '$extension'"
             );
         }
     }
@@ -88,7 +88,7 @@ class AllowedFile extends DeprecatedModel {
 			SELECT mime
 			FROM allowedFileExtension afe
 			LEFT JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
-			WHERE extension = '$extension'
+			WHERE extension = {$this->db->smartQuote($extension)}
 		";
 
 		$mime = $this->db->getOne($query);
