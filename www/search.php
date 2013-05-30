@@ -260,7 +260,7 @@ if (!empty($result['user'])) {
                     $page->parse('helpdesk_block', 'helpdesk');
             }
             if (Cfg::get('boarder_leave_enabled') == '1') {
-                if ($group->isStaff()) {
+                if ($group->isStaff() AND $user['residential_house_id']!='') {
                     $page->parse('boarder_leave_block', 'boarder_leave');
                 }
             }
