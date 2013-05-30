@@ -676,7 +676,7 @@ class StudentReportCard {
 		if($marks) {
 			$output['WORK_GRADIENT'] = (int)($marks['mark'] / 10);
 			$output['WORK_GRADE']    = $marks['display_mark'];
-			$output['WORK_COMMENT']  = '';
+			$output['WORK_COMMENT']  = $marks['comment'];
 		}
 
 		return $output;
