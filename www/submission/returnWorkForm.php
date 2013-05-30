@@ -29,6 +29,7 @@ if(isset($_POST['uid']) && isset($_POST['comment']) /* && isset($_POST['mark']) 
 // inline upload of files
 elseif(isset($_POST['uid']) && isset($_POST['box_id']) && $_POST['markUpdate'] == 'false') {
     if(is_array($_POST['uid'])) {
+        $returnHandler->securityCheck($_POST['box_id'], 0);
         $allowedFileHandler = new AllowedFile;
         $subbox = $subHandler->getByID($_POST['box_id']);
         $marksheet = Marksheet_Factory::build($subbox['mark_type_slug']);
@@ -52,7 +53,6 @@ elseif(isset($_POST['uid']) && isset($_POST['box_id']) && $_POST['markUpdate'] =
             // Add file, if there was one.
             if (isset($_FILES[$uploadIndex])) {
                 if ($_FILES[$uploadIndex]['name']) {
-                    $returnHandler->securityCheck($_POST['box_id'], 0);
                     $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES[$uploadIndex]));
                     $mark = $marksheet->normaliseMark($_POST['mark'][$k], $subbox);
                     $uploaded_file = $_FILES[$uploadIndex];
