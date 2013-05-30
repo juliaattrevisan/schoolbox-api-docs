@@ -300,7 +300,7 @@ ThreePanelView.prototype.actionBind = function(actions) {
 
         var kind = context.data('kind')
         var id = context.data('id')
-        var action = a.data('action')
+        var action = 'f_' + a.data('action')
 
         // is file or link
         if(context.hasClass('rfile')) {
