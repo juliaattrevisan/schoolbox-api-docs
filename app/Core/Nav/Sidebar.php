@@ -82,7 +82,13 @@ class Core_Nav_Sidebar {
             if($subjects->count()) {
                 // GENERATE SUBJECT LIST
                 foreach($subjects as $cat) {
-                    $list[] = $this->createSubject($cat);
+	                /**
+	                 * Don't include categories that don't have a homepage (ie. template == 0)
+	                 * @var $cat GizaCategory
+	                 */
+	                if($cat->get('homepage')->get('template')) {
+	                    $list[] = $this->createSubject($cat);
+	                }
                 }
             }
 
@@ -143,7 +149,13 @@ class Core_Nav_Sidebar {
             if($groups->count()) {
                 // GENERATE GROUP LIST
                 foreach($groups as $cat) {
-                    $list[] = $this->createGroup($cat);
+	                /**
+	                 * Don't include categories that don't have a homepage (ie. template == 0)
+	                 * @var $cat GizaCategory
+	                 */
+	                if($cat->get('homepage')->get('template')) {
+		                $list[] = $this->createGroup($cat);
+	                }
                 }
             }
             $this->subjects = array_merge($this->subjects, $list);
