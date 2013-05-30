@@ -33,6 +33,11 @@ class External_User_DataMapper extends Generic_DataMapper implements External_Us
     // so much for dynamic data retrieval... -_-
     public function getSubjectList($externalUserId, GizaUser $user) {
 
+	    // only bother to check if the current user is a student or staff; parents don't have subjects
+		if(!in_array($user->getGroupType(), array(Group::STAFF_GROUP_TYPE, Group::STUDENT_GROUP_TYPE))) {
+			return new GizaCollection();
+		}
+
         $list = $this->getExternalUser()->getSubjectList($externalUserId, $user->get('uid'));
 
         $codes = array();
