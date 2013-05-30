@@ -138,7 +138,6 @@ class AttemptMapper extends Mapper {
 				aa.user_id,
 				aa.attempt_id,
 				aq.section_id,
-				GROUP_CONCAT(ar.comment SEPARATOR ';') AS `comment`,
 				SUM(ar.mark)  AS mark,
 				SUM(aq.marks) AS max_mark
 			FROM assess_attempt aa
@@ -175,7 +174,7 @@ class AttemptMapper extends Mapper {
 				'attempt_id' => $row['attempt_id'],
 				'mark' => $mark,
 				'display_mark' => sprintf("%d / %d", $row['mark'], $row['max_mark']),
-				'comment' => trim(preg_replace('`;;*`','; ', $row['comment']), '; '),
+				'comment' => '',
 				'attempts' => 1
 			);
 
