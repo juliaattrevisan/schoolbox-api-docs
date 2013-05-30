@@ -223,13 +223,13 @@ $j(function() {
 
   var actions = {
     cms : {
-      open : function(kind, id) {
+      f_open : function(kind, id) {
         var path = kind == 'link' ? 'redir' : 'send'
         path = '/' + path + '.php?id=' + id
         window.open(path, "_blank")
         return true
       },
-      download : function(kind, id) {
+      f_download : function(kind, id) {
         // no download action available for links
         if(kind == 'link') {
           return false
@@ -237,18 +237,18 @@ $j(function() {
         window.open("/send.php?save=1&id="+id, "_self")
         return true
       },
-      modify : function(kind, id) {
+      f_modify : function(kind, id) {
         var path = '/cms/' + kind + '/' + id
         window.open(path, "_self")
         return true
       },
-      delete : function(kind, id) {
+      f_delete : function(kind, id) {
         if(confirm("Are you sure you want to delete this file?")) {
           var path = '/cms/' + kind + 'Form.php?delete=' + id
           window.open(path, "self")
         }
       },
-      properties : function(kind, id) {
+      f_properties : function(kind, id) {
         var path = '/cms/properties.php?' + kind + 'ID=' + id
         $j.get(path, function(data) {
 
@@ -277,37 +277,37 @@ $j(function() {
       }
     },
     folder : {
-      modify : function(id) {
+      f_modify : function(id) {
         window.open("/cms/category/" + id, "_self")
         return true
       },
-      delete : function(id) {
+      f_delete : function(id) {
         var name = $j('#folder-detail h3.name').html()
         if(confirm("Are you sure you want to delete " + name + " and all its contents?")) {
           window.open("/cms/categoryForm.php?delete=" + id, "_self")
         }
         return true
       },
-      download : function(id) {
+      f_download : function(id) {
         window.open("/cms/fetchFolder.php?folder=" + id, "_self")
         return true
       },
-      folder : function(id) {
+      f_folder : function(id) {
         window.open("/cms/category/new/" + id, "_self")
         return true
       },
-      file : function(id) {
+      f_file : function(id) {
         window.open("/cms/file/new/" + id, "_self")
         return true
       },
-      zip : function(id) {
+      f_zip : function(id) {
         window.open('/cms/zipFile/' + id, '_self')
         return true
       },
-      homepage : function(id) {
+      f_homepage : function(id) {
         window.open('/homepage/' + id, '_self')
       },
-      join : function(id) {
+      f_join : function(id) {
         var target = threePanel.folderDetail.find('a.join-btn')
         // do this one via ajax
         $j.get('/group/joinForm.php', {join : id, ajax : 1})
@@ -322,7 +322,7 @@ $j(function() {
       }
     },
     multi : {
-      delete : function() {
+      f_delete : function() {
         var selected = $j('#file-list tr.selected'), fileList = '', linkList = '', id
 
         if(selected.length > 1) {
