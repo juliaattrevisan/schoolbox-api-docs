@@ -220,4 +220,22 @@ class UserMapper extends Mapper {
 
 		return $collection;
 	}
+
+	/**
+	 * Fetches a single user ID, for use by GizaUser_DataMapper.
+	 *
+	 * This is to be @deprecated when the whole User object is stored in the
+	 * session, but has been added for now because it's injection safe (unlike
+	 * the Giza mappers)
+	 *
+	 * @param string $username
+	 * @return int
+	 */
+	public function getIdForUsername($username) {
+		$query = "SELECT `id` FROM `{$this->getTable()}` WHERE `username` = :username";
+		$statement = $this->database->prepare($query);
+		$statement->bindValue('username', $username, \PDO::PARAM_STR);
+		$statement->execute();
+		return $statement->fetchColumn();
+	}
 }
