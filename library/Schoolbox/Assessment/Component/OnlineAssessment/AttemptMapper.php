@@ -145,6 +145,7 @@ class AttemptMapper extends Mapper {
 				RIGHT JOIN assess          a  ON aa.assess_id   = a.assess_id
 			WHERE a.assess_id = :assess_id
 			AND a.availability = 'assess'
+			AND aa.deleted_at IS NULL
 			GROUP BY aa.assess_id, aa.attempt_id
 			ORDER BY aa.start DESC
 		";
@@ -184,5 +185,32 @@ class AttemptMapper extends Mapper {
 		}
 
 		return $attempts;
+	}
+
+	/**
+	 * Gets number of attempts this student has made on this assessment. Doesn't
+	 * include deleted assessments.
+	 *
+	 * @param int $assess_id  The assessment to check.
+	 * @param int $student_id The student to check.
+	 *
+	 * @return int
+	 */
+	public function getAttemptCountForStudent($assess_id, $student_id) {
+		$query = "
+			SELECT COUNT(*) AS attempts
+			FROM {$this->getTable()} AS aa
+			WHERE aa.assess_id = :assess_id
+			AND aa.user_id = :student_id
+			AND aa.deleted_at IS NULL
+		";
+		$statement = $this->database->prepare($query);
+		$statement->bindValue('assess_id',  $assess_id,  \PDO::PARAM_INT);
+		$statement->bindValue('student_id', $student_id, \PDO::PARAM_INT);
+		$statement->execute();
+		if ($row = $statement->fetch()) {
+			return intval($row['attempts']);
+		}
+		return 0;
 	}
 }

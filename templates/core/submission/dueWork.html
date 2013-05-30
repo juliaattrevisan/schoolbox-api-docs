@@ -42,9 +42,9 @@ $j(function () {
 
             if (data !== null) {
 				var template = is_assess ? $j('#assess-popup-template') : $j('#duework-popup-template');
-
-				template.tmpl(data).appendTo('body');
-
+				var output = template.tmpl(data);
+				output.find('.comment').html(data.description);
+				output.appendTo('body');
                 movePopup(position);
             }
 
@@ -128,7 +128,7 @@ $j(function () {
                     <p class="comment">${description}</p>
                 {{/if}}
                 <p class="details clearfix">
-                <a class="btn go-to float-left" href="/submission/submissionHistory/${id}"><span></span>${action}</a>
+                <a class="btn modify float-left" href="/submission/submissionHistory/${id}"><span></span>${action}</a>
                 </p>
             </div>
             <div class="bottom"><strong></strong></div>
@@ -147,7 +147,7 @@ $j(function () {
                     <p class="comment">${description}</p>
                 {{/if}}
                 <p class="details clearfix">
-                    <a class="btn go-to float-left" href="/assess/intro/${id}"><span></span>${action}</a>
+                    <a class="btn up-arrow float-left" href="/assess/intro/${id}"><span></span>${action}</a>
                 </p>
             </div>
             <div class="bottom"><strong></strong></div>

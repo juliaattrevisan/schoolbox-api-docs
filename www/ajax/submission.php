@@ -4,6 +4,7 @@ require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
 
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 
 $page = new SitePage;
 
@@ -15,8 +16,22 @@ if ($_REQUEST['id']) {
     $action = '';
     $output = array();
     if ($_REQUEST['is_assess']) {
+        $attempt_mapper    = new AttemptMapper();
         $assessment_mapper = new OnlineAssessmentMapper();
         $assessment        = $assessment_mapper->findById($_REQUEST['id']);
+
+        //
+        // Has this student submitted for this assessment yet?
+        // Adjust the message accordingly.
+        $action = 'View Results';
+        if ($_SERVER['REQUEST_TIME'] <= $assessment->getFinish()->getUnixTimestamp()) {
+            $max_attempts = $assessment->getMaxAttempts();
+            $attempts     = $attempt_mapper->getAttemptCountForStudent($assessment->getId(), $_SESSION['id']);
+            if ($max_attempts <= 0 || $attempts < $max_attempts) {
+                $action = ($attempts === 0) ? 'Sit' : 'Resit';
+            }
+        }
+
         $output = array(
             'id'          => $assessment->getId(),
             'cid'         => $assessment->getCategory()->getId(),
@@ -24,7 +39,7 @@ if ($_REQUEST['id']) {
             'typeName'    => Scrub::text($assessment->getWorkType()->getName()),
             'name'        => Scrub::text($assessment->getTitle()),
             'description' => '',
-            'action'      => 'Sit/Resit',
+            'action'      => $action,
         );
     }
     else {
@@ -54,7 +69,7 @@ if ($_REQUEST['id']) {
             'category'    => Scrub::text($submission->getCategory()->getName()),
             'typeName'    => Scrub::text($submission->getWorkType()->getName()),
             'name'        => Scrub::text($submission->getName()),
-            'description' => Scrub::text($submission->getDescription()),
+            'description' => Scrub::html($submission->getDescription()),
             'action'      => $action,
         );
     }
