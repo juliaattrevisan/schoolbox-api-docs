@@ -29,6 +29,7 @@ if(isset($_POST['uid']) && isset($_POST['comment']) /* && isset($_POST['mark']) 
 // inline upload of files
 elseif(isset($_POST['uid']) && isset($_POST['box_id']) && $_POST['markUpdate'] == 'false') {
     if(is_array($_POST['uid'])) {
+        $returnHandler->securityCheck($_POST['box_id'], 0);
         $allowedFileHandler = new AllowedFile;
         $subbox = $subHandler->getByID($_POST['box_id']);
         $marksheet = Marksheet_Factory::build($subbox['mark_type_slug']);
@@ -36,26 +37,28 @@ elseif(isset($_POST['uid']) && isset($_POST['box_id']) && $_POST['markUpdate'] =
         foreach ($_POST['uid'] as $k => $id) {
             $uploadIndex = "file-return-$id";
 
-            if(isset($_FILES[$uploadIndex])) {
-                if($_FILES[$uploadIndex]['name']) {
-                    $returnHandler->securityCheck($_POST['box_id'], 0);
+            //
+            // Get last mark and comment, and merge it with this one.
+            $result = $returnHandler->getByUser($_POST['uid'][$k], $_POST['box_id'], 1);
+            $return = array(
+                'box_id'    => $_POST['box_id'],
+                'owner'     => $_POST['uid'][$k],
+                'comment'   => $_POST['comment'][$k],
+                'mark'      => (!empty($result[0]) ? $result[0]['mark']      : null),
+                'norm_mark' => (!empty($result[0]) ? $result[0]['norm_mark'] : null),
+            );
+            $uploaded_file = null;
+
+            //
+            // Add file, if there was one.
+            if (isset($_FILES[$uploadIndex])) {
+                if ($_FILES[$uploadIndex]['name']) {
                     $allowedFileHandler->handleError($allowedFileHandler->fileSecurityCheck($_FILES[$uploadIndex]));
-
                     $mark = $marksheet->normaliseMark($_POST['mark'][$k], $subbox);
-
-                    //
-                    // Get last mark and comment, and merge it with this one.
-                    $result = $returnHandler->getByUser($_POST['uid'][$k], $_POST['box_id'], 1);
-                    $return = array(
-                        'box_id'    => $_POST['box_id'],
-                        'owner'     => $_POST['uid'][$k],
-                        'comment'   => $result[0]['comment'],
-                        'mark'      => $result[0]['mark'],
-                        'norm_mark' => $result[0]['norm_mark']
-                    );
-                    saveReturn($return, null, $_FILES[$uploadIndex]);
+                    $uploaded_file = $_FILES[$uploadIndex];
                 }
             }
+            saveReturn($return, null, $uploaded_file);
         }
     }
     $page->localRedir('/submission/viewSubmission/' . $_POST['box_id']);
@@ -180,8 +183,14 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID, $year = 0, $semest
         $errors[$e->displayAs] = $e;
     }
 
-    // error given
-    if(isset($errors[$givenMark])) {
+    //
+    // Empty mark (not zero) - treat as null
+    if (trim($givenMark) === '') {
+        $mark['mark']      = null;
+        $mark['norm_mark'] = 'NULL';
+    }
+    elseif (isset($errors[$givenMark])) {
+        // error given
         $mark['mark'] = $errors[$givenMark]->displayAs;
         $mark['norm_mark'] = $errors[$givenMark]->normaliseAs === NULL ? 'NULL' : $errors[$givenMark]->normaliseAs;
     }
@@ -192,7 +201,6 @@ function ajaxUpdate($givenMark, $comment, $studentID, $boxID, $year = 0, $semest
         $marksheet = Marksheet_Factory::build('raw');
         $mark = $marksheet->normaliseMark($mark['mark'], $subbox);
     }
-    // treat as numeric
     else {
         // normalise the new mark given, ready to be inserted
         $mark = $marksheet->normaliseMark($givenMark, $subbox);
