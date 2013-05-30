@@ -60,6 +60,24 @@ class AllowedFile extends DeprecatedModel {
     }
 
 	/**
+	 * Gets the maximum file size for this file's type, or the default max file
+	 * size if that isn't set.
+	 *
+	 * @param string $filename
+	 *
+	 * @return int
+	 */
+	public function getMaxFileSize($filename) {
+		$query = "
+			SELECT max_file_size
+			FROM allowedFileExtension afe
+			INNER JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
+			WHERE extension = {$this->db->smartQuote($this->getExtension($filename))} AND enable = 'true'";
+		$size = $this->db->getOne($query);
+		return ($size > 0) ? $size : Config::get('max_file_size');
+	}
+
+	/**
 	 * Get mime type for a particular file extension
 	 *
 	 * @param $extension
@@ -90,7 +108,7 @@ class AllowedFile extends DeprecatedModel {
 		}
 
 		//file size test
-		if ($file['size'] <= 0 || $file['size'] > Config::get('max_file_size')) {
+		if ($file['size'] <= 0 || $file['size'] > $this->getMaxFileSize($file['name'])) {
 			return array('code' => 10, 'message' => 'The size of the uploaded file exceeds the file size restrictions.');
 		}
 
