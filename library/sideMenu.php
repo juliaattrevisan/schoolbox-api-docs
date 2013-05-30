@@ -93,8 +93,8 @@ class sideMenu extends DeprecatedModel {
     }
 
     function getLastItemSequence($parent) {
-        $query = "SELECT sequence FROM sideMenu WHERE parent = $parent ORDER BY sequence DESC";
-
+        $query = "SELECT sequence FROM sideMenu
+            WHERE parent = {$this->db->smartQuote($parent)} ORDER BY sequence DESC";
         return $this->db->getOne($query) + 1;
     }
 
@@ -112,7 +112,9 @@ class sideMenu extends DeprecatedModel {
         /* Place item after $pid in sequence */
         $item = $this->getByID($pid);
 
-        $query = "UPDATE sideMenu SET sequence = (sequence + 1) WHERE parent = {$item['parent']} AND sequence > ({$item['sequence']} )";
+        $query = "UPDATE sideMenu SET sequence = (sequence + 1)
+            WHERE parent = {$this->db->smartQuote($item['parent'])}
+            AND sequence > {$this->db->smartQuote($item['sequence'])}";
         $this->db->query($query);
 
         parent::update(array('id'=>$id, 'sequence'=>$item['sequence']+1, 'parent'=>$item['parent']));
@@ -122,7 +124,9 @@ class sideMenu extends DeprecatedModel {
         /* Place item after $pid in sequence */
         $item = $this->getByID($pid);
 
-        $query = "UPDATE sideMenu SET sequence = (sequence + 1) WHERE parent = {$item['parent']} AND sequence > ({$item['sequence']} - 1 )";
+        $query = "UPDATE sideMenu SET sequence = (sequence + 1)
+	        WHERE parent = {$this->db->smartQuote($item['parent'])}
+	        AND sequence > ({$this->db->smartQuote($item['sequence'])} - 1 )";
         $this->db->query($query);
 
         parent::update(array('id'=>$id, 'sequence'=>$item['sequence'], 'parent'=>$item['parent']));
@@ -142,7 +146,8 @@ class sideMenu extends DeprecatedModel {
         $result = $this->db->query($query);
 
         for ($i = 0; $item = $this->db->getNextArray($result); $i++) {
-            $seqquery = "UPDATE sideMenu SET sequence = $i WHERE id = {$item['id']}";
+            $seqquery = "UPDATE sideMenu SET sequence = {$this->db->smartQuote($i)}
+                WHERE id = {$this->db->smartQuote($item['id'])}";
             $this->db->query($seqquery);
         }
     }
@@ -155,7 +160,7 @@ class sideMenu extends DeprecatedModel {
     }
 
     function getMenuItemCampusList($id) {
-        $query = "SELECT campus FROM sideMenuCampus WHERE id = '$id'";
+        $query = "SELECT campus FROM sideMenuCampus WHERE id = {$this->db->smartQuote($id)}";
         $this->db->query($query);
         while($row = $this->db->getNextArray()) {
                 $result[] = $row['campus'];
@@ -164,7 +169,7 @@ class sideMenu extends DeprecatedModel {
     }
 
     function getMenuItemGroupList($id) {
-        $query = "SELECT gid FROM sideMenuGroup WHERE id = '$id'";
+        $query = "SELECT gid FROM sideMenuGroup WHERE id = {$this->db->smartQuote($id)}";
        $this->db->query($query);
         while($row = $this->db->getNextArray()) {
                 $result[] = $row['gid'];
