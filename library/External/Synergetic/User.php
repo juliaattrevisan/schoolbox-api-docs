@@ -435,6 +435,9 @@ class External_Synergetic_User implements External_UserInterface {
 	}
 
 	function getSubjectList($synergyID, $userID) {
+		if (empty($synergyID)) {
+			return false;
+		}
 		if (!isset($_SESSION['FileSemester']) || !isset($_SESSION['FileYear'])) {
 			return false;
 		}
