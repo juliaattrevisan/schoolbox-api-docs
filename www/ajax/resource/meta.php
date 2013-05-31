@@ -247,7 +247,7 @@ function getSingleFileMeta($folderId, $fileId) {
 	}
 
 	$mtypeMap = new MimetypeMapper();
-
+	$modified = new Alaress_Date_Relative($file->getModified());
 	$file = array(
 		'kind' => 'file',
 		'id' => $file->getId(),
@@ -258,6 +258,7 @@ function getSingleFileMeta($folderId, $fileId) {
 		'description' => $file->getComment(),
 		'posted_by' => $file->getOwner()->formatName(),
 		'posted_date' => $file->getSubmitted()->getDateOnly(),
+		'modified' => $modified->getRelativeTime(),
 		'actions' => $actions
 	);
 
