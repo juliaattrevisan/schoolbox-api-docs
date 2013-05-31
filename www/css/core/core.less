@@ -139,7 +139,6 @@ body {
 }
 
 body {
-    font: 12px;
     *font-size: small;
     font-size: 12px;
     background: @body-background;
@@ -825,7 +824,6 @@ Notifications
         color: #ccc !important;
         font-weight: bold;
         text-shadow: 0 1px 1px @white;
-        z-index: -4px;
         margin: 0;
         line-height: 50px;
 
@@ -1785,7 +1783,7 @@ input.timeField {
     &:hover {
         color: #ff5a00 !important;
         border-color: #ffc5a6;
-        text-shadow: 0;
+        text-shadow: none;
         background-color: #fff4ee;
         background-image: -webkit-gradient(linear, left top, left bottom, from(#fff4ee), to(#ffe9dd));
         background-image: -webkit-linear-gradient(top, #fff4ee, #ffe9dd);
@@ -2204,7 +2202,7 @@ ADMIN BODY
     position: relative;
     h2 {
         background: none;
-        text-indent: none;
+        text-indent: 0;
         padding: 0;
         font-size: 18px;
         color: #000;
@@ -5986,13 +5984,6 @@ Dropbox
     }
 }
 
-.left #calendar table.duedates-calendar h3 {
-    background: url(/images/cal-plus.gif) no-repeat right 7px 2px;
-    padding: 5px;
-    font-size: 11px;
-    margin-bottom: 2px;
-}
-
 .left #calendar table.duedates-calendar span.wrapper {
     background: none repeat scroll 0 0 #717171;
     color: #FFFFFF;
@@ -6066,7 +6057,6 @@ span.wrapper a {
     top: -100px;
     color: @black;
     font-size: 11px;
-    left: 2;
     position: absolute;
     width: 250px;
     z-index: 100;
@@ -6302,7 +6292,7 @@ FORUM
 }
 
 .post-content cite {
-    font-style: none;
+    font-style: normal;
     margin: 0 0 4px 16px;
     display: block;
 }
@@ -7341,7 +7331,7 @@ dd {
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
-        word-break: all;
+        word-break: break-all;
         .class {
         }
     }
@@ -8233,7 +8223,7 @@ ul.submission-list {
 
 td.name {
     padding: 7px 16px 7px 49px;
-    overflow: none;
+    overflow: hidden;
     img {
         float: left;
         margin: 0 7px 0 -39px;
