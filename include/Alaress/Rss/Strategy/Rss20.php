@@ -35,13 +35,23 @@ class Alaress_Rss_Strategy_Rss20 implements Alaress_Rss_Strategy_Interface {
 			}
 			else {
 				$currentRss = $allRss[$i];
+				$content = $currentRss->children('http://purl.org/rss/1.0/modules/content/');
+				$dc = $currentRss->children('http://purl.org/dc/elements/1.1/');
 
-				$data[] = array(
+				$article = array(
 					'title' => (string)$currentRss->title,
 					'link' => (string)$currentRss->link,
 					'description' => (string)$currentRss->description,
+					'content'       => (string)$content->encoded,
 					'pubDate' => (string)$currentRss->pubDate,
+					'creator'   => (string)$dc->creator,
 				);
+
+				foreach ($dc->subject as $subject) {
+                    $article['subject'][] = (string)$subject;
+				}
+
+				$data[] = $article;
 			}
 		}
 

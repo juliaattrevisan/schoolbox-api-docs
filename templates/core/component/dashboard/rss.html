@@ -1,21 +1,15 @@
 <div class="box">
     <h2><a href="/redir.php?url={RSS_LINK}">{RSS_NAME}</a></h2>
 
-    <div class="listing">
-        <ul>
+    <div>
+        <ul class="news-list">
             <!-- BEGIN rss_stories -->
             <li class=" clearfix {ON_OFF}">
-                <div class="clearfix">
-                    <h4><a href="/redir.php?url={RSS_URL}">{RSS_TITLE}</a></h4>
-                    <div class="{COMPONENT_COMPACTMODE} small-right">
-                        <!-- BEGIN rss_date -->
-                        <p class="small summ">Posted {RSS_POSTED_DATE}</p>
-                        <!-- END rss_date -->
-                    </div>
-                </div>
-                <div class='wysiwyg {COMPONENT_COMPACTMODE}'>
+                    <h3><a href="/redir.php?url={RSS_URL}">{RSS_TITLE}</a></h3>
+                    <!-- BEGIN rss_date --> <span class="time">{RSS_POSTED_DATE}</span> <!-- END rss_date -->
+                <span class='wysiwyg {COMPONENT_COMPACTMODE}'>
                     {RSS_BRIEF}
-                </div>
+                </span>
             </li>
             <!-- END rss_stories -->
         </ul>

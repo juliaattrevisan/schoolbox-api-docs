@@ -38,7 +38,7 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
 
         // Set up feed info
         $this->setVar(array(
-            'RSS_NAME' => $rss->getTitle(),
+            'RSS_NAME' => Scrub::text($rss->getTitle()),
             'RSS_LINK' => $rss->getLink(),
         ));
 
@@ -56,7 +56,7 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
                     'ON_OFF'    => ++$j % 2 ? '' : 'dark',
                     'RSS_TITLE' => Scrub::text($currentRss['title']),
                     'RSS_URL'   => base64_encode($currentRss['link']),
-                    'RSS_BRIEF' => Scrub::html($currentRss['description']),
+                    'RSS_BRIEF' => Scrub::html( $currentRss['content'] ? $currentRss['content'] : $currentRss['description']),
                 ));
 
                 // If the item has a pubDate
