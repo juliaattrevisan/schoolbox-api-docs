@@ -156,7 +156,7 @@ class Url
      */
     public function getBase64EncodedRedirect()
     {
-        return '/redir.php?url=' . base64_encode($this->getUrl());
+        return '/redir.php?url=' . urlencode(base64_encode($this->getUrl()));
     }
 
     /* Getters/Setters
