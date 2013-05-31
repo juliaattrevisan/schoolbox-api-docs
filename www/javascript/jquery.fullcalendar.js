@@ -182,9 +182,11 @@ function Calendar(id, bubbleId, opts) {
                         // Check that at least one class in this_classes is in
                         // selected_classes.
                         $j.each(selected_classes, function(selected_class_no, selected_class) {
-                            if (this_classes.lastIndexOf(selected_class) >= 0) {
-                                is_filter_selected = true;
-                                return false;
+                            for (var i in this_classes) {
+                                if (this_classes[i] == selected_class) {
+                                    is_filter_selected = true;
+                                    return false;
+                                }
                             }
                         });
                     }
