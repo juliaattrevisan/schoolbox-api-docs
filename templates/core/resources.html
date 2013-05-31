@@ -478,7 +478,10 @@ tr.{NAME} span.file { background-image: url(/images/mime/22x22/{ICON}); } <!-- E
         <p class="rfile filesize">({FILE_SIZE})</p>
         <p class="rfile hidden-warning"><span class="i" title="This file cannot be seen by users who do not have write permissions in this folder"></span>(Hidden)</p>
         <p class="rfile description">{FILE_DESCRIPTION}</p>
-        <p class="rfile meta">Posted by <span class="meta-who">{FILE_POSTED_BY}</span> on <span class="meta-when">{FILE_POSTED_DATE}</span></p>
+        <p class="rfile meta">
+			Posted by <span class="meta-who">{FILE_POSTED_BY}</span> on <span class="meta-when">{FILE_POSTED_DATE}</span>,
+			last modified <span class="meta-modified-when">{FILE_MODIFIED_DATE}</span>
+		</p>
         <div class="rfile actions">
           <h4 class="rfile actions">Actions</h4>
           <a class="btn open ropen" data-action="open"><span></span>Open</a>

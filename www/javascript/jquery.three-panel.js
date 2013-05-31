@@ -200,6 +200,7 @@ ThreePanelView.prototype.getMeta = function(folderId, fileArray) {
 
                 threePanel.fileDetail.find('.meta-who').html(meta.posted_by)
                 threePanel.fileDetail.find('.meta-when').html(meta.posted_date)
+                threePanel.fileDetail.find('.meta-modified-when').html(meta.modified)
 
                 // link, display link icon
                 if(meta.kind == 'link') {
