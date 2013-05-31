@@ -33,6 +33,7 @@ $this->setVar(array(
 	'FILE_DESCRIPTION' => '',
 	'FILE_POSTED_BY' => '',
 	'FILE_POSTED_DATE' => '',
+	'FILE_MODIFIED_DATE' => '',
 
 	'MULTIFILE_MIME_IMG' => '',
 	'MULTIFILE_COUNT' => '',
