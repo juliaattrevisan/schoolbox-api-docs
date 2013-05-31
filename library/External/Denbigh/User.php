@@ -326,6 +326,9 @@ class External_Denbigh_User implements External_UserInterface {
     }
 
     function getSubjectList($externalUserId, $userId) {
+        if (empty($externalUserId)) {
+            return false;
+        }
         if ($this->getGroup()->isStaff($userId)) {
             $statement = $this->getExternalDatabase()->query(
                 "

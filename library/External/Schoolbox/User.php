@@ -222,6 +222,9 @@ class External_Schoolbox_User implements External_UserInterface {
 	}
 
 	function getSubjectList ($externalUserId, $userId) {
+		if (empty($externalUserId)) {
+			return false;
+		}
 		$statement = $this->getDatabase()->prepare("
 			SELECT c.name, c.code
 			FROM user u

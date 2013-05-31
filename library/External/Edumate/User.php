@@ -265,6 +265,9 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      * @return array|bool
      */
     public function getSubjectList($externalUserId, $userId) {
+        if (empty($externalUserId)) {
+            return false;
+        }
         if($this->getGroupHandler()->isStaff($userId)) {
             $sql = "
                 SELECT c.class_code AS code, class AS name
