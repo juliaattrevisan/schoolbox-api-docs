@@ -29,10 +29,10 @@
 
 		//
 		// remove unused fields
-		if (values.export !== 'group') {
+		if (values['export'] !== 'group') {
 			delete values.group;
 		}
-		if (values.export !== 'campus') {
+		if (values['export'] !== 'campus') {
 			delete values.campus;
 		}
 		return window.location.protocol+'//'+window.location.host+'/calendar/export.php?'+$.param(values);
