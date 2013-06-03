@@ -167,10 +167,13 @@ function insert($table, $array)
 
 	foreach($array as $key => $value)
 	{
-		$names .= '`'.$key.'`' . ',';
-		if (!is_array($value) ) {
+		$name = '`'.$key.'`' . ',';
+		if (!is_array($value)) {
+			$names  .= $name;
 			$values .= $this->smartQuote($value) . ',';
-		} else if (isset($value['function'])) {
+		}
+		elseif (isset($value['function'])) {
+			$names  .= $name;
 			$values .= $value['function']. '('. $this->smartQuote($value['value']). '),';
 		}
 	}
