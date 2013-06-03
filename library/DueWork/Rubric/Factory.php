@@ -51,14 +51,16 @@ class DueWork_Rubric_Factory {
                 throw new Exception("Specification is of unknown type");
             }
 
-	        // insert results into rubric
-	        foreach($specification as $critID => $descs) {
-	            if($this->criteria[$critID]) {
-	                foreach($descs as $result) {
-	                    $rubric->addResult($critID, $result);
-	                }
-	            }
-	        }
+            // insert results into rubric
+            if (is_array($specification)) {
+                foreach($specification as $critID => $descs) {
+                    if($this->criteria[$critID]) {
+                        foreach($descs as $result) {
+                            $rubric->addResult($critID, $result);
+                        }
+                    }
+                }
+            }
         }
 
         $rubricHandler = new DueWork_Rubric_Handler();
