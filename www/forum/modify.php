@@ -35,6 +35,9 @@ if (is_numeric($this->arg[0])) {
 	if ($groupHandler->getPermission($category['id']) < READ_ACCESS) {
 		error(19);
 	}
+	if ($groupHandler->hasChildAccessOnly($category['id'])) {
+		error(19);
+	}
 
 	$this->setTitle(Scrub::text($category['name'] . ' Forum'));
 
