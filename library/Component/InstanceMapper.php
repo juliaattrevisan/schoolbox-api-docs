@@ -304,7 +304,7 @@ class Component_InstanceMapper extends Mapper {
             parent::save($sourceInstanceCollection);
         }
 
-        if(parent::delete($instanceCollection)) {
+        if(parent::delete($instanceCollection) && !empty($instanceIDs)) {
             // delete associated configs
             $deleteIDs = implode(',', $instanceIDs);
             $this->database->query("
