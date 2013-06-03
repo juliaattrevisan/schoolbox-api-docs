@@ -157,6 +157,12 @@ if (is_numeric($this->arg[0])) {
                 'QUOTE_USER' => $quote->getOwner()->formatName($user),
                 'QUOTE_BODY' => Scrub::html($quote->getBody()),
             );
+            if (!isset($post['body'])) {
+                $output['BODY'] =
+                    '<cite>'.$output['QUOTE_USER'].'</cite>'.
+                    '<blockquote><p>'.$output['QUOTE_BODY'].'</p></blockquote>'.
+                    '<p></p>';
+            }
 
             $this->setVar($output);
             $this->parse('quote_block', 'quote', true);
