@@ -331,6 +331,29 @@ class Group extends DeprecatedModel
 		return $this->db->query($query);
 	}
 
+	/**
+	 * Does this user have access to this category ONLY through their children?
+	 *
+	 * If the user has read permission, are a parent and aren't directly
+	 * involved, then they have permission only through their children.
+	 *
+	 * @param int $category_id The category ID to check
+	 * @param int $user_id     The user to check, or logged in user if not set
+	 *
+	 * @return bool
+	 */
+	public function hasChildAccessOnly($category_id, $user_id = 0) {
+		if (!$user_id) {
+			$user_id = $_SESSION['id'];
+		}
+		if (!$user_id) {
+			return false;
+		}
+		return $this->getPermission($category_id, $user_id) >= READ_ACCESS
+			&& $this->isParent($user_id)
+			&& !$this->involvedInGroup($user_id, $category_id);
+	}
+
 	function setUserPermission($relationID, $userID, $type = READ_ACCESS)
 	{
 		$this->deleteUser($relationID, $userID);
