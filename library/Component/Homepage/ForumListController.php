@@ -53,15 +53,19 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
             return false;
         }
 
-        // don't show forums to parents if they not a direct member of group
-        if ($this->groupHandler->isParent() && !$this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext('id'))) {
-            return false;
-        }
-
         $this->parseConfig();
 
         $this->setBlock($templateHandle, 'forum', 'forum_block');
+        $this->setBlock($templateHandle, 'forum_post', 'forum_post_block');
         $this->setBlock('forum', 'forum_reply', 'forum_reply_block');
+
+        // don't show forums to parents if they not a direct member of group
+        // (Allow parents to read, but not post, if a child is in group)
+        $is_post_allowed = !$this->groupHandler->hasChildAccessOnly($this->getContext('id'));
+        $this->setVar('forum_post_block', '');
+        if ($is_post_allowed) {
+            $this->parse('forum_post_block', 'forum_post');
+        }
 
         // Set up component name
         $this->setVar(array(
@@ -109,7 +113,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 
                 $this->setVar('forum_reply_block', '');
 
-                if ($thread['locked'] != 'true' || $this->permission >= FULL_ACCESS) {
+                if ($is_post_allowed && ($thread['locked'] != 'true' || $this->permission >= FULL_ACCESS)) {
                     $this->parse('forum_reply_block', 'forum_reply');
                 }
 
