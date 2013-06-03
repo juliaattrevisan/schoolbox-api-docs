@@ -11,17 +11,15 @@
         $j('#forumForm').validate({ignore:false});
 
         $j('#quote').click(function(){
-            if(getSelectedText()) {
-                $j('#body').html(getSelectedText());
-                var quote = '', byline = '';
-                if ($j('#byline').prop('checked') == true)
-                    byline = '{QUOTE_USER}';
-
-                quote = '<cite>'+byline+'</cite><blockquote><p>'+getSelectedText()+'</p></blockquote>';
-                tinyMCE.execCommand('mceInsertContent',false,quote);
-                return false;
-            } else
-                alert('Please highlight the passage you wish to quote and try again.');
+            var quoted_text = getSelectedText() || $j('.cite-it p').html();
+            $j('#body').html(quoted_text);
+            var quote = '', byline = '';
+            if ($j('#byline').prop('checked') == true) {
+                byline = '{QUOTE_USER}';
+            }
+            quote = '<cite>'+byline+'</cite><blockquote><p>'+quoted_text+'</p></blockquote><p></p>';
+            tinyMCE.execCommand('mceInsertContent',false,quote);
+            event.preventDefault();
         });
 
         function getSelectedText(){
