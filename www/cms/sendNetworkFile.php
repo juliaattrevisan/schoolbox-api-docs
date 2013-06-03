@@ -16,7 +16,12 @@ if (is_numeric($_GET['id']) && Cfg::get('webdav_enable')) {
     $page = new SitePage;
     $groupHandler = new Group;
     $fileHandler = PortfolioWebDAV::factory();
-    $filename = $fileHandler->getFile($_GET['id']);
+    try {
+        $filename = $fileHandler->getFile($_GET['id']);
+    }
+    catch (Sabre\DAV\Exception $ex) {
+        error(41);
+    }
     $file['realname'] = substr($_SESSION['portfolioIdPathMap'][$_GET['id']], strrpos($_SESSION['portfolioIdPathMap'][$_GET['id']], '/') + 1);
 
     if ($_GET['save'])
