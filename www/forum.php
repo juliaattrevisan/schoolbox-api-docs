@@ -16,6 +16,7 @@ $this->setBlock('thread', 'modify_thread', 'modify_thread_block');
 $this->setBlock('thread', 'modified', 'modified_block');
 $this->setBlock(TEMPLATE_content, 'delete_button', 'delete_button_block');
 
+$this->setBlock(TEMPLATE_content, 'forum_post', 'forum_post_block');
 $this->setBlock(TEMPLATE_content, 'modify_heading', 'modify_heading_block');
 $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
 $this->setBlock(TEMPLATE_content, 'next_button', 'next_button_block');
@@ -38,6 +39,15 @@ if (!$forumHandler->hasForum($category['id'])) {
 // check permissions
 if (($perm = $groupHandler->getPermission($category['id'])) < READ_ACCESS) {
 	error(19);
+}
+//
+// Parent's permissions:
+// If they aren't directly involved in the forum's category, they can read but
+// not write.
+$is_post_allowed = !$groupHandler->hasChildAccessOnly($category['id']);
+$this->setVar('forum_post_block', '');
+if ($is_post_allowed) {
+	$this->parse('forum_post_block', 'forum_post');
 }
 
 $this->setTitle(Scrub::text($category['name']) . ' Forum');
