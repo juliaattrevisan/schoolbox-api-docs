@@ -10,29 +10,6 @@
 
         $j('#forumForm').validate({ignore:false});
 
-        $j('#quote').click(function(){
-            var quoted_text = getSelectedText() || $j('.cite-it p').html();
-            $j('#body').html(quoted_text);
-            var quote = '', byline = '';
-            if ($j('#byline').prop('checked') == true) {
-                byline = '{QUOTE_USER}';
-            }
-            quote = '<cite>'+byline+'</cite><blockquote><p>'+quoted_text+'</p></blockquote><p></p>';
-            tinyMCE.execCommand('mceInsertContent',false,quote);
-            event.preventDefault();
-        });
-
-        function getSelectedText(){
-            if(window.getSelection){
-                return window.getSelection().toString();
-            }
-            else if(document.getSelection){
-                return document.getSelection();
-            }
-            else if(document.selection){
-                return document.selection.createRange().text;
-            }
-        }
     });
 </script>
 <!-- END custom_head -->
@@ -56,14 +33,6 @@
 		</tr>
 		<!-- END title --> 
 		<!-- BEGIN quote -->
-		<tr>
-			<td class="formLabelWidth"><h4>Quote</h4>
-				<em>{QUOTE_USER}'s post.</em></td>
-			<td><div class="cite-it">{QUOTE_BODY}</div>
-				<input type="button" id="quote" class="submit-btn-plain" value="Quote" />
-				<input type="checkbox" value="1" name="byline" id="byline" />
-				With byline</td>
-		</tr>
 		<!-- END quote -->
 		<tr>
 			<td class="formLabelWidth"><h4>Post</h4></td>
