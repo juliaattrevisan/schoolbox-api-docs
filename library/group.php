@@ -347,7 +347,7 @@ class Group extends DeprecatedModel
 			$user_id = $_SESSION['id'];
 		}
 		if (!$user_id) {
-			return false;
+			return true;
 		}
 		return $this->getPermission($category_id, $user_id) >= READ_ACCESS
 			&& $this->isParent($user_id)
