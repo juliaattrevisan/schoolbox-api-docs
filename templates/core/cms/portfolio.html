@@ -240,11 +240,11 @@ $j(document).ready(function() {
 
     var actions = {
       cms : {
-        open : function(kind, id) {
+        f_open : function(kind, id) {
           window.open("/cms/sendMyFile.php?id=" + id, "_blank")
           return true
         },
-        download : function(kind, id) {
+        f_download : function(kind, id) {
           // no download action available for links
           if(kind == 'link') {
             return false
@@ -252,39 +252,39 @@ $j(document).ready(function() {
           window.open("/cms/sendMyFile.php?save=1&id="+id, "_self")
           return true
         },
-        modify : function(kind, id) {
+        f_modify : function(kind, id) {
           window.open('/cms/myFile/' + id, "_self")
           return true
         },
-        delete : function(kind, id) {
+        f_delete : function(kind, id) {
           if(confirm("Are you sure you want to delete this file?")) {
             window.open('/cms/myFileForm.php?delete=' + id, "_self")
           }
         }
       },
       folder : {
-        modify : function(id) {
+        f_modify : function(id) {
           window.open("/cms/myFolder/" + id, "_self")
           return true
         },
-        delete : function(id) {
+        f_delete : function(id) {
           var name = $j('#folder-detail h3.name').html()
           if(confirm("Are you sure you want to delete " + name + " and all its contents?")) {
             window.open("/cms/myFolderForm.php?delete=" + id, "_self")
           }
           return true
         },
-        folder : function(id) {
+        f_folder : function(id) {
           window.open("/cms/myFolder/new/" + id, "_self")
           return true
         },
-        file : function(id) {
+        f_file : function(id) {
           window.open("/cms/myFile/new/" + id, "_self")
           return true
         }
       },
       multi : {
-        delete : function() {
+        f_delete : function() {
           var selected = $j('#file-list tr.selected'), fileList = '', id
 
           if(selected.length > 1) {
