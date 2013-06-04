@@ -45,6 +45,9 @@ if (($perm = $groupHandler->getPermission($category['id'])) < READ_ACCESS) {
 // If they aren't directly involved in the forum's category, they can read but
 // not write.
 $is_post_allowed = !$groupHandler->hasChildAccessOnly($category['id']);
+if (!$is_post_allowed && Cfg::get('restrict_parent_forum_access')) {
+	error(19);
+}
 $this->setVar('forum_post_block', '');
 if ($is_post_allowed) {
 	$this->parse('forum_post_block', 'forum_post');
