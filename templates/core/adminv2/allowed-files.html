@@ -92,6 +92,22 @@
 
         });
 
+        //
+        // Some sort of form validation - check for no duplicate mimetypes.
+        var create_form  = $j('form#newAllowedFile');
+        var update_forms = $j('form[id^="allowed-file"]');
+        create_form.add(update_forms).submit(function(event) {
+            var this_mimetype = $j(this).find(':input[name="mime"]').val();
+            var mimetype_list = $j.map(
+                update_forms.not(this).find(':input[name="mime"]'),
+                function(element) { return $j(element).val(); }
+            );
+            if ($j.inArray(this_mimetype, mimetype_list) >= 0) {
+                alert('The mime type you have chosen for this file type is already in use.')
+                event.preventDefault();
+            }
+        });
+
         $j('.delete').click(function (event) {
 
 
