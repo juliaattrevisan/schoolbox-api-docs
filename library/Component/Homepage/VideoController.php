@@ -20,12 +20,15 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
     public function execute() {
 	    $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
-
-
+		$this->parseConfig();
+		$source = $this->getConfig('src');
+		if (empty($source)) {
+			$source = $this->getContext('id');
+		}
 		if($this->getConfig('size') > 1)
-	        $this->outputList = $videoResourceMapper->findByCategory($this->getContext('id'), $this->getConfig('size')-1);
+			$this->outputList = $videoResourceMapper->findByCategory($source, $this->getConfig('size')-1);
 		else if($this->getConfig('size') == 0)
-			$this->outputList = $videoResourceMapper->findByCategory($this->getContext('id'));
+			$this->outputList = $videoResourceMapper->findByCategory($source);
 		else
 			$this->outputList = new \Schoolbox\Collection(array());
 
@@ -45,7 +48,6 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         if(!parent::loadTemplate($templateHandle, 'video')) {
             return false;
         }
-        $this->parseConfig();
 
         // Set up component name
         $this->setVar(array(
