@@ -50,16 +50,14 @@ abstract class Evaluation_Factory extends DeprecatedModel
     {
         if (is_numeric($type_id)) {
             $classname = $this->getQuestionClass($type_id);
-
             if ($classname) {
                 $object = $this->factoryName . '_' . $prefix . '_' . $classname;
-                return new $object;
-            } else {
-                error(133);
+                if (class_exists($object)) {
+                    return new $object;
+                }
             }
-        } else {
-            error(133);
         }
+        error(133);
 
         return false;
     }
