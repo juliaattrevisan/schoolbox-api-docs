@@ -260,4 +260,16 @@ class MSSQL {
 	{
 		return $this->previous_encoding;
 	}
+
+	/**
+	 * Escapes a value for safe usage in a query. The only escape needed is a
+	 * single apostrophe for two ("'" => "''")
+	 *
+	 * @param string $value The string to escape.
+	 *
+	 * @return string
+	 */
+	public function quote($value) {
+		return str_replace("'", "''", $value);
+	}
 }
