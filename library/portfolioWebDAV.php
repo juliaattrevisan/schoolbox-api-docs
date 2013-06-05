@@ -497,7 +497,7 @@ class PortfolioWebDAV
         $temp       = tempnam(sys_get_temp_dir(), uniqid());
         if ($file_size <= $chunk_size) {
             $response = $this->client->request('GET', $_SESSION['portfolioIdPathMap'][$id]);
-            file_put_contents($temp, $response['body']);
+            file_put_contents($temp, $response['body'], LOCK_EX);
         }
         else {
             //
@@ -511,6 +511,13 @@ class PortfolioWebDAV
                     null,
                     array('Range' => 'bytes='.$start.'-'.$end)
                 );
+                //
+                // After all this, does the server not accept range requests?
+                // Just dump the whole file out if it doesn't.
+                if ($response['headers']['accept-ranges'] == 'none') {
+                    file_put_contents($temp, $response['body'], LOCK_EX);
+                    break;
+                }
                 file_put_contents($temp, $response['body'], LOCK_EX|FILE_APPEND);
                 unset($response);
             }
