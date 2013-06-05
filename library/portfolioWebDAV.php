@@ -485,11 +485,36 @@ class PortfolioWebDAV
 
     public function getFile($id)
     {
-
-        $response = $this->client->request('GET', $_SESSION['portfolioIdPathMap'][$id]);
-
-        $temp = tempnam(sys_get_temp_dir(), uniqid());
-        file_put_contents($temp, $response['body']);
+        //
+        // The file may be larger than the memory limit - workaround this by
+        // requesting 10MB chunks at a time.
+        $chunk_size = 10000000;
+        $properties = $this->client->propFind(
+            $_SESSION['portfolioIdPathMap'][$id],
+            array('{DAV:}getcontentlength',)
+        );
+        $file_size  = $properties['{DAV:}getcontentlength'];
+        $temp       = tempnam(sys_get_temp_dir(), uniqid());
+        if ($file_size <= $chunk_size) {
+            $response = $this->client->request('GET', $_SESSION['portfolioIdPathMap'][$id]);
+            file_put_contents($temp, $response['body']);
+        }
+        else {
+            //
+            // Request each chunk and append to the response
+            for ($i = 0; $i < $file_size; $i += $chunk_size) {
+                $start = $i;
+                $end   = min($i+$chunk_size, $file_size) - 1;
+                $response = $this->client->request(
+                    'GET',
+                    $_SESSION['portfolioIdPathMap'][$id],
+                    null,
+                    array('Range' => 'bytes='.$start.'-'.$end)
+                );
+                file_put_contents($temp, $response['body'], LOCK_EX|FILE_APPEND);
+                unset($response);
+            }
+        }
         return $temp;
     }
 
