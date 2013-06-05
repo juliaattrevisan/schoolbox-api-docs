@@ -296,7 +296,7 @@ class PortfolioWebDAV
             );
             $paths = array('/oneNet/NetStorage/');
         }
-        else if ($site_location == 'core') {
+        else if (in_array($site_location, array('core', 'demo'))) {
             $settings = array(
                 'baseUri' => 'http://webdave.alaress-dev.com.au/',
                 'userName' => 'webdave',
