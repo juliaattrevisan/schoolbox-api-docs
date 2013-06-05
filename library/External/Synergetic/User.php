@@ -319,7 +319,7 @@ class External_Synergetic_User implements External_UserInterface {
 			// if year is NOT numeric, don't attempt to compare StudentYearLevel (will bug out)
 			else {
 				$query .= "
-				AND Year.Description = '{$yearlevel}'";
+				AND Year.Description = '{$this->getDatabase()->quote($yearlevel)}'";
 			}
 
 		}
@@ -327,6 +327,7 @@ class External_Synergetic_User implements External_UserInterface {
 		/* Search for a student name
 		 */
 		if (strlen($name)) {
+			$name = $this->getDatabase()->quote($name);
 			$query .= "
 				AND (
 					(StudentSurname LIKE '%{$name}%')
@@ -362,6 +363,7 @@ class External_Synergetic_User implements External_UserInterface {
 		/* Search for a particular form
 		 */
 		if ($form) {
+			$form = $this->getDatabase()->quote($form);
 			$query .= "
 				AND StudentForm = '{$form}'
 			";
