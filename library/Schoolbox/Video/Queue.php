@@ -48,8 +48,22 @@ class Queue {
 			throw new \Exception_Schoolbox('Processing of this type of video is not implemented');
 		}
 
+		//
+		// Choose whether to use AVconv or FFMpeg, depending on whether AVconv
+		// exists or not.
+		// FFMpeg needs strict flag, as MP4 is technically experimental
+		$executable = 'avconv';
+		$strict     = false;
+		exec('which avconv', $unused, $errorcode);
+		if ($errorcode) {
+			$executable = 'ffmpeg';
+			$strict     = true;
+		}
 		/* Process video to 512kb in libx264 format for mobile and html5 streaming */
-		$processString = 'nice avconv -y -i ' . escapeshellarg($sourceFile) . ' -c:v libx264 -preset slow -b 512k -ac 2 ' . escapeshellarg($this->getVideoLocation() ).' 2>&1';
+		$processString = "nice $executable -y -i " . escapeshellarg($sourceFile) .
+			' -c:v libx264 -preset slow -b 512k ' .
+			($strict ? '-strict -2 ' : '').
+			'-ac 2 ' . escapeshellarg($this->getVideoLocation()).' 2>&1';
 
 		exec($processString, $message, $return);
 		$this->setMessage(implode( "\n", $message));
@@ -65,10 +79,8 @@ class Queue {
 
 		/* Generate thumbnail of video 64x64 pixels, 1/3rd of the video in */
 		$thumbnailSeconds = $this->getDuration() > 0 ? round(($this->getDuration() / 3), 2) : 10;
-
-		$thumbnailString = 'nice avconv -y -i ' . escapeshellarg($sourceFile) . ' -f image2 -ss '.$thumbnailSeconds.' -vf scale=-1:64,crop=64:64 -frames:v 1 ' . escapeshellarg($this->getThumbnailLocation()).' 2>&1';
-
-		$posterString = 'nice avconv -y -i ' . escapeshellarg($sourceFile) . ' -f image2 -ss '.$thumbnailSeconds.' -frames:v 1 ' . escapeshellarg($this->getPosterLocation()).' 2>&1';
+		$thumbnailString  = "nice $executable -y -i " . escapeshellarg($sourceFile) . ' -f image2 -ss '.$thumbnailSeconds.' -vf scale=-1:64,crop=64:64 -frames:v 1 ' . escapeshellarg($this->getThumbnailLocation()).' 2>&1';
+		$posterString     = "nice $executable -y -i " . escapeshellarg($sourceFile) . ' -f image2 -ss '.$thumbnailSeconds.' -frames:v 1 ' . escapeshellarg($this->getPosterLocation()).' 2>&1';
 
 		if($return == 0){
 			exec($thumbnailString, $output, $return);
