@@ -305,16 +305,31 @@ class News extends DeprecatedModel {
 		FROM `" . $this->_table . "`
 		LEFT JOIN user ON news_items.item_owner = user.id
         LEFT JOIN newsUser ON newsUser.newsID = news_items.item_id
+        LEFT JOIN newsCampus ON newsCampus.id = news_items.item_id
 		JOIN newsTopic ON newsTopic.newsTopicID = news_items.item_topic_id
         WHERE news_items.item_deleted = 0";
 
         /* If the current user is a superuser, do not filter their results.
-        * Otherwise, restrict news post selection by ownership.
-        */
+         * Otherwise, restrict news post selection by ownership
+         * (or group moderation)
+         */
         if (!$userHandler->isSuperuser()) {
-            $query .= " AND (news_items.item_owner = '" . $_SESSION['id'] . "'
-                        OR (newsUser.userID = '" . $_SESSION['id'] . "'
-                        AND item_datetime_published <= CURDATE() )) ";
+            $parts = array(
+                "news_items.item_owner = '" . $_SESSION['id'] ."'",
+                "(newsUser.userID = '" . $_SESSION['id'] . "' AND item_datetime_published <= CURDATE())",
+            );
+            //
+            // Check if this user can moderate any groups, add them to this list
+            $campus_list = array();
+            foreach ($userHandler->getAllUserAccess($_SESSION['id']) as $access) {
+                if ($access['service'] == NEWS_SERVICE && $access['type'] >= FULL_ACCESS) {
+                    $campus_list[] = $access['sid'];
+                }
+            }
+            if (!empty($campus_list)) {
+                $parts[] = 'newsCampus.campus IN ('.implode(',', $campus_list).')';
+            }
+            $query .= ' AND ('.implode(' OR ', $parts).')';
         }
 
         $query .= " AND news_items.item_datetime_expires $beforeOrAfter CURDATE()
