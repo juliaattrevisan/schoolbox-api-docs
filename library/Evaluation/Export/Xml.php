@@ -58,7 +58,7 @@ abstract class Evaluation_Export_Xml {
 		$assess = $this->getAssess();
 
 		$this->getPage()->setVar(array(
-			'ASSESS_TITLE' => Scrub::Text($assess['title']),
+			'ASSESS_TITLE' => htmlspecialchars($assess['title'], ENT_QUOTES),
 			'ASSESS_DESCRIPTION' => Scrub::HTML($assess['description']),
 			'ASSESS_START' => $assess['start'],
 			'ASSESS_FINISH' => $assess['finish'],
@@ -71,8 +71,8 @@ abstract class Evaluation_Export_Xml {
 			foreach($this->getAllSections() as $currentSection) {
 				$this->getPage()->setVar(array(
 					'SECTION_SECTION_ID' => $currentSection['section_id'],
-					'SECTION_TITLE' => Scrub::Text($currentSection['title']),
-					'SECTION_DESCRIPTION' => Scrub::Text($currentSection['description']),
+					'SECTION_TITLE' => htmlspecialchars($currentSection['title'], ENT_QUOTES),
+					'SECTION_DESCRIPTION' => htmlspecialchars($currentSection['description'], ENT_QUOTES),
 					'SECTION_RANDOM' => $currentSection['random'],
 					'SECTION_POOL' => $currentSection['pool'],
 				));
