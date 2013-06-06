@@ -52,7 +52,16 @@ class Evaluation_Import_Xml {
 	 * @return SimpleXMLElement
 	 */
 	private function loadData() {
-		return simplexml_load_string($this->getData());
+		//
+		// Try once to load this.
+		// If that fails - decode then load.
+		$use_errors = libxml_use_internal_errors(true);
+		$result = simplexml_load_string($this->getData());
+		if (!($result instanceof SimpleXMLElement)) {
+			$result = simplexml_load_string(html_entity_decode($this->getData(), ENT_QUOTES, 'UTF-8'));
+		}
+		libxml_use_internal_errors($use_errors);
+		return $result;
 	}
 
 	/**
