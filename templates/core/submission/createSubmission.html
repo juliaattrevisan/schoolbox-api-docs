@@ -7,7 +7,8 @@
 
 <script type="text/javascript">
         tinyMCE.init({
-            mode:"textareas",
+            mode:"exact",
+			elements:'description-box',
             theme:"advanced",
             skin:"cirkuit",
             plugins:"pdw,table,tabfocus,media,inlinepopups,advimage,assetmanager,directionality,paste,spellchecker",
@@ -235,7 +236,7 @@
         }
 
         function descriptor(action, element, timeout) {
-            $j(element).find('input:not(:checkbox)').parent('li').each(function () {
+            $j(element).find(':input:not(:checkbox)').parent('li').each(function () {
                 if (action == 'show') {
                     $j(this).slideDown(timeout);
                     $j(element).addClass('highlight');
@@ -328,7 +329,7 @@
     <tr>
         <td class="formLabelWidth"><h4>Description</h4></td>
         <td><label>
-            <textarea name="description" style="width:100%;height:350px">{DESCRIPTION}</textarea>
+            <textarea id="description-box" name="description" style="width:100%;height:350px">{DESCRIPTION}</textarea>
         </label></td>
     </tr>
     <!-- BEGIN browse_row -->
@@ -458,8 +459,10 @@
                     <label for="c-{CRIT_ID}">{CRIT_LABEL}</label>
                     <ul class="descs">
                         <!-- BEGIN crit_input -->
-                        <li style="display:none;"><span></span><input name="des[{CRIT_ID}][]" type="text"
-                                                                      value="{CRIT_INPUT_VALUE}"/></li>
+                        <li style="display:none;">
+                            <span></span>
+							<textarea name="des[{CRIT_ID}][]">{CRIT_INPUT_VALUE}</textarea>
+                        </li>
                         <!-- END crit_input -->
                     </ul>
                 </div>
