@@ -76,7 +76,7 @@
 	#RewriteCond %{SERVER_PORT} ^443$
 	#RewriteCond %{REQUEST_URI} !^/$
 	#RewriteCond %{REQUEST_URI} !\.[A-Za-z]{2,4}$
-	#RewriteRule ^(.*)$ http://%{HTTP_HOST}%{REQUEST_URI} [R,L]
+	#RewriteRule ^(.*)$ http://%{HTTP_HOST}%{REQUEST_URI} [R,NE,L]
 
 	RewriteCond %{SCRIPT_FILENAME}/ -d
 	RewriteRule [^/]$ %{REQUEST_URI}/ [R=301,L]
