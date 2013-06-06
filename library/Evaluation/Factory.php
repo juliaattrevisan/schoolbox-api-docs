@@ -49,17 +49,57 @@ abstract class Evaluation_Factory extends DeprecatedModel
     public function spawn($type_id, $prefix)
     {
         if (is_numeric($type_id)) {
-            $classname = $this->getQuestionClass($type_id);
-            if ($classname) {
-                $object = $this->factoryName . '_' . $prefix . '_' . $classname;
-                if (class_exists($object)) {
-                    return new $object;
-                }
+            $object = $this->getFullClassName($type_id, $prefix);
+            if ($object && class_exists($object)) {
+                return new $object;
             }
         }
         error(133);
 
         return false;
+    }
+
+
+    /**
+     * Gets the class name given this question's type and the prefix (question
+     * or answer).
+     *
+     * @param $type_id
+     * @param $prefix
+     *
+     * @return bool|string
+     */
+    protected function getFullClassName($type_id, $prefix) {
+        $classname = $this->getQuestionClass($type_id);
+        if ($classname) {
+            $object = $this->factoryName . '_' . $prefix . '_' . $classname;
+            if (class_exists($object)) {
+                return $object;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Gets the question class name for this question's type.
+     *
+     * @param $type_id
+     *
+     * @return bool|string
+     */
+    public function getFullQuestionClassName($type_id) {
+        return $this->getFullClassName($type_id, $this->questionPrefix);
+    }
+
+    /**
+     * Gets the answer class name for this question's type.
+     *
+     * @param $type_id
+     *
+     * @return bool|string
+     */
+    public function getFullAnswerClassName($type_id) {
+        return $this->getFullClassName($type_id, $this->answerPrefix);
     }
 
     /**
