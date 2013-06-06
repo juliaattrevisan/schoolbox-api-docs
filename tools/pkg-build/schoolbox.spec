@@ -1,6 +1,6 @@
-%define rel		rc1
-%define beta		1
-%define tag		13.0.0RC1
+%define rel		1
+%define beta		0
+%define tag		13.0.0
 %if %beta
 %define release		0.%beta.%rel
 %define distname	%version-%beta.tar.gz
@@ -40,6 +40,7 @@ Requires:	php-pear
 Requires:	php-soap
 Requires:	php-xml
 Requires:	php-xmlrpc
+Requires:	php-mbstring
 Requires:	mysql
 Requires:	mysql-server
 Requires:	wget
