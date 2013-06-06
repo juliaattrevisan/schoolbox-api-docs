@@ -81,25 +81,16 @@ abstract class Evaluation_Factory extends DeprecatedModel
     }
 
     /**
-     * Gets the question class name for this question's type.
+     * Gets whether this question type is available - it is if its question and
+     * answer classes both exist.
      *
      * @param $type_id
      *
-     * @return bool|string
+     * @return bool
      */
-    public function getFullQuestionClassName($type_id) {
-        return $this->getFullClassName($type_id, $this->questionPrefix);
-    }
-
-    /**
-     * Gets the answer class name for this question's type.
-     *
-     * @param $type_id
-     *
-     * @return bool|string
-     */
-    public function getFullAnswerClassName($type_id) {
-        return $this->getFullClassName($type_id, $this->answerPrefix);
+    public function isQuestionTypeAvailable($type_id) {
+        return $this->getFullClassName($type_id, $this->answerPrefix)
+            && $this->getFullClassName($type_id, $this->questionPrefix);
     }
 
     /**
