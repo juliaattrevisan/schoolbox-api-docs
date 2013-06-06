@@ -322,7 +322,9 @@ class News extends DeprecatedModel {
             // Check if this user can moderate any groups, add them to this list
             $campus_list = array();
             foreach ($userHandler->getAllUserAccess($_SESSION['id']) as $access) {
-                if ($access['service'] == NEWS_SERVICE && $access['type'] >= FULL_ACCESS) {
+                if ($access['service'] == \Schoolbox\UserAccess::SERVICE_NEWS
+                    && $access['type'] >= \Schoolbox\UserAccess::ACCESS_FULL)
+                {
                     $campus_list[] = $access['sid'];
                 }
             }
