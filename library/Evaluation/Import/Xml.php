@@ -80,11 +80,23 @@ class Evaluation_Import_Xml {
 			$allow_resit = Scrub::text($xml->allowresit);
 			$max_attempts = ($allow_resit || strlen($allow_resit) === 0) ? 0 : 1;
 		}
+
+		//
+		// Build description out of the nodes which might be part of it.
+		// Description should just be a single node, but maybe it wasn't wrapped
+		// in <![CDATA[ ]]> tags.
+		$description  = trim("{$xml->description}");
+		if (!$xml->description) {
+			foreach ($xml->xpath('/quiz/description/*') as $desc_node) {
+				$description .= $desc_node->asXML();
+			};
+		}
+
 		$assess_id = $this->getAssessHandler()->create(array(
 			'category_id' => Scrub::text($this->getCategoryId()),
 			'user_id' => $_SESSION['id'],
 			'title' => html_entity_decode(Scrub::text($xml->title)),
-			'description' => html_entity_decode(Scrub::text($xml->description)),
+			'description' => html_entity_decode(Scrub::text($description)),
 			'start' => Scrub::text($xml->start),
 			'finish' => Scrub::text($xml->finish),
 			'duration' => Scrub::text($xml->duration),
