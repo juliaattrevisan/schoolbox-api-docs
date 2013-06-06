@@ -137,6 +137,7 @@ class AttemptMapper extends Mapper {
 			SELECT
 				aa.user_id,
 				aa.attempt_id,
+				aq.section_id,
 				SUM(ar.mark)  AS mark,
 				SUM(aq.marks) AS max_mark
 			FROM assess_attempt aa
@@ -170,6 +171,8 @@ class AttemptMapper extends Mapper {
 			// include
 			$mark = ($row['mark'] / $row['max_mark']) * 100;
 			$attempts[$row['user_id']][] = array(
+				'section_id' => $row['section_id'],
+				'attempt_id' => $row['attempt_id'],
 				'mark' => $mark,
 				'display_mark' => sprintf("%d / %d", $row['mark'], $row['max_mark']),
 				'comment' => '',
