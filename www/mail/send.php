@@ -114,9 +114,11 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 
 	$mime->setHTMLBody($message);
 
-	foreach ($_FILES["file"]["error"] as $key => $error) {
-   		if ($error == UPLOAD_ERR_OK) {
-			$mime->addAttachment($_FILES['file']['tmp_name'][$key], $_FILES['file']['type'][$key], $_FILES['file']['name'][$key]);
+	if (is_array($_FILES)) {
+		foreach ($_FILES["file"]["error"] as $key => $error) {
+			if ($error == UPLOAD_ERR_OK) {
+				$mime->addAttachment($_FILES['file']['tmp_name'][$key], $_FILES['file']['type'][$key], $_FILES['file']['name'][$key]);
+			}
 		}
 	}
 

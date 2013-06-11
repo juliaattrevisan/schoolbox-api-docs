@@ -16,7 +16,7 @@ $page = new SitePage();
 if ($_GET['id'] && $_GET['width'] && $_GET['height']) {
     $db = DeprecatedDatabase::getInstance();
 
-	$query = "SELECT id, mime_type, category, deleted FROM file WHERE id = {$_GET['id']}";
+	$query = "SELECT id, mime_type, category, deleted FROM file WHERE id = {$db->smartQuote($_GET['id'])}";
 	$fileDir = Cfg::get('file_dir');
 
 	$imageInfo = $db->getRow($query);

@@ -161,7 +161,7 @@ class PortfolioWebDAV
 
     }
 
-    public function factory()
+    public static function factory()
     {
         require_once SITE_root . '/library/group.php';
         $groupHandler = new Group;
