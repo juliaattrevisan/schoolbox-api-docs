@@ -200,7 +200,18 @@ function Calendar(id, bubbleId, opts) {
 
             //
             // Jam them back in, and re-render.
-            cal.dom.fullCalendar('events', events).fullCalendar('rerenderEvents');
+            // The call to the base full calendar's reportEvents() method with
+            // the filtered event list is to get the event renderer to draw
+            // events at the right size when filtering.
+            var cal_object = cal.dom.data('fullCalendar');
+            if (cal_object && 'reportEvents' in cal_object) {
+                cal_object.reportEvents(
+                    $j.grep(events, function(event) { return event.is_rendered; })
+                );
+            }
+            else {
+                cal.dom.fullCalendar('rerenderEvents');
+            }
 
             // only send data to the server if we actually need to
             if(performAjax) {
