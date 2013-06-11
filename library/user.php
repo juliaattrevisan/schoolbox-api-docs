@@ -274,8 +274,13 @@ class User extends DeprecatedModel {
 		if ($this->checkPassword($userID, $oldPassword)
 			&& $this->setPasswordInternal($userID, $newPassword)
 		) {
+			$groupHandler   = new Group();
 			$webServicesUrl = Cfg::get('external_web_services_url');
-			if (Cfg::get('external_enable') && Cfg::get('external_type') === 'synergetic' && !empty($webServicesUrl)) {
+			if ($groupHandler->isParent($userID)
+				&& Cfg::get('external_enable')
+				&& Cfg::get('external_type') === 'synergetic'
+				&& !empty($webServicesUrl)
+			) {
 				//
 				// Attempt to set with Synergetic.
 				// If that is set up and fails, then revert their password.
