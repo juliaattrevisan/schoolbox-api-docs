@@ -74,12 +74,13 @@ if ($article['item_image']) {
 }
 
 // does the current user have permission to modify this news article?
+$this->setVar('add_news_block', '');
+$this->setVar('modify_news_block', '');
 if (($permission = $groupHandler->getPermission(0)) >= WRITE_ACCESS) {
-    $this->parse('modify_news_block', 'modify_news');
     $this->parse('add_news_block', 'add_news');
-} else {
-    $this->setVar('add_news_block', '');
-    $this->setVar('modify_news_block', '');
+    if ($article['item_owner'] == $_SESSION['id'] || $permission == FULL_ACCESS) {
+        $this->parse('modify_news_block', 'modify_news');
+    }
 }
 
 $now = new Alaress_Date_Format(time(), 'U');
