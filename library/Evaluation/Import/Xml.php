@@ -52,7 +52,16 @@ class Evaluation_Import_Xml {
 	 * @return SimpleXMLElement
 	 */
 	private function loadData() {
-		return simplexml_load_string($this->getData());
+		//
+		// Try once to load this.
+		// If that fails - decode then load.
+		$use_errors = libxml_use_internal_errors(true);
+		$result = simplexml_load_string($this->getData());
+		if (!($result instanceof SimpleXMLElement)) {
+			$result = simplexml_load_string(html_entity_decode($this->getData(), ENT_QUOTES, 'UTF-8'));
+		}
+		libxml_use_internal_errors($use_errors);
+		return $result;
 	}
 
 	/**
@@ -71,11 +80,23 @@ class Evaluation_Import_Xml {
 			$allow_resit = Scrub::text($xml->allowresit);
 			$max_attempts = ($allow_resit || strlen($allow_resit) === 0) ? 0 : 1;
 		}
+
+		//
+		// Build description out of the nodes which might be part of it.
+		// Description should just be a single node, but maybe it wasn't wrapped
+		// in <![CDATA[ ]]> tags.
+		$description  = trim("{$xml->description}");
+		if (!$xml->description) {
+			foreach ($xml->xpath('/quiz/description/*') as $desc_node) {
+				$description .= $desc_node->asXML();
+			};
+		}
+
 		$assess_id = $this->getAssessHandler()->create(array(
 			'category_id' => Scrub::text($this->getCategoryId()),
 			'user_id' => $_SESSION['id'],
 			'title' => html_entity_decode(Scrub::text($xml->title)),
-			'description' => html_entity_decode(Scrub::text($xml->description)),
+			'description' => html_entity_decode(Scrub::text($description)),
 			'start' => Scrub::text($xml->start),
 			'finish' => Scrub::text($xml->finish),
 			'duration' => Scrub::text($xml->duration),
