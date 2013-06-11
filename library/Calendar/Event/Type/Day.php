@@ -80,7 +80,13 @@ class Calendar_Event_Type_Day extends Calendar_Event_Type_Abstract {
      * @return string
      */
     public function getTime() {
+        //
+        // All day event, or does it start and end on a different day?
+        // Show a blank string.
         if ($this->getAllday()) {
+            return '';
+        }
+        if ($this->getStartTime()->getDatabaseDate() != $this->getEndTime()->getDatabaseDate()) {
             return '';
         }
         $startFormat = $this->getStartTime()->getUsingFormat('g:iA');
