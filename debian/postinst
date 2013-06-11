@@ -37,6 +37,7 @@ case "$1" in
         /usr/share/schoolbox/tools/update-sql.sh;
         /usr/share/schoolbox/tools/clean-cache-dir.sh;
         rm -f /usr/share/schoolbox/www/.htaccess;
+        service apache2 restart;
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

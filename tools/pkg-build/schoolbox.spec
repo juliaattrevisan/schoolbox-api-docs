@@ -161,6 +161,7 @@ chown -R alaress:alaress %{_datadir}/%{name}
 /usr/share/%{name}/tools/update-sql.sh;
 /usr/share/%{name}/tools/clean-cache-dir.sh;
 rm -f /usr/share/%{name}/www/.htaccess;
+service httpd restart;
 
 %post leave
 /usr/share/%{name}/tools/module.sh install leave;
