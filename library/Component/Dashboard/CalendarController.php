@@ -11,32 +11,32 @@
 
 class Component_Dashboard_CalendarController extends Component_Dashboard_ControllerAbstract {
 
-    protected $calendar;
+	protected $calendar;
 
-    protected $group;
+	protected $group;
 
-    /**
-     * @var Alaress_Date_Format
-     */
-    protected $start;
+	/**
+	 * @var Alaress_Date_Format
+	 */
+	protected $start;
 
-    /**
-     * @var Alaress_Date_Format
-     */
-    protected $end;
+	/**
+	 * @var Alaress_Date_Format
+	 */
+	protected $end;
 
-    /**
-     * @var Calendar_Event_Collection
-     */
-    protected $eventList;
+	/**
+	 * @var Calendar_Event_Collection
+	 */
+	protected $eventList;
 
-    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage, Calendar $calendar, Group $group) {
-        parent::__construct($instance, $user, $sitepage);
+	public function __construct(Component_Instance $instance, User $user, SitePage $sitepage, Calendar $calendar, Group $group) {
+		parent::__construct($instance, $user, $sitepage);
 
-        $this->setCalendar($calendar);
+		$this->setCalendar($calendar);
 
-        $this->setGroup($group);
-    }
+		$this->setGroup($group);
+	}
 
 	/**
 	 * Get all the events you need to pump into the page
@@ -61,55 +61,55 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
 		$this->eventList = $composite->getEvents($this->start->getUnixTimestamp(), $this->end->getUnixTimestamp());
 
-        return true;
-    }
+		return true;
+	}
 
-    public function renderTemplate($templateHandle) {
-        $this->setVar("note_listing", "");
+	public function renderTemplate($templateHandle) {
+		$this->setVar("note_listing", "");
 
-        if (!$this->loadTemplate($templateHandle, 'calendar')) {
-            return false;
-        }
+		if (!$this->loadTemplate($templateHandle, 'calendar')) {
+			return false;
+		}
 
-	    $this->setBlock($templateHandle, 'day', 'day_block');
-        $this->setBlock('day', "note_block", "note_listing");
+		$this->setBlock($templateHandle, 'day', 'day_block');
+		$this->setBlock('day', "note_block", "note_listing");
 
-        $this->setBlock("note_block", "has_category", "has_category_block");
-        $this->setBlock("note_block", "attendance_icon", "attendance_icon_block");
-        $this->setBlock("note_block", "attendance_status", "attendance_status_block");
-        $this->setBlock("note_block", "attendance_request_button", "attendance_request_button_block");
-        $this->setBlock("note_block", "attendance_list_button", "attendance_list_button_block");
+		$this->setBlock("note_block", "has_category", "has_category_block");
+		$this->setBlock("note_block", "attendance_icon", "attendance_icon_block");
+		$this->setBlock("note_block", "attendance_status", "attendance_status_block");
+		$this->setBlock("note_block", "attendance_request_button", "attendance_request_button_block");
+		$this->setBlock("note_block", "attendance_list_button", "attendance_list_button_block");
 
 
-        /* Initialise
-         */
-        $this->setVar(
-            array(
-                'attendance_icon_block' => '',
-                'attendance_status_block' => '',
-                'attendance_request_button_block' => '',
-                'attendance_list_button_block' => '',
-                'has_category_block' => '',
-            )
-        );
+		/* Initialise
+		 */
+		$this->setVar(
+			array(
+				'attendance_icon_block' => '',
+				'attendance_status_block' => '',
+				'attendance_request_button_block' => '',
+				'attendance_list_button_block' => '',
+				'has_category_block' => '',
+			)
+		);
 
-	    $prevDay = false;
+		$prevDay = false;
 
-	    $j = 0;
-	    foreach ($this->eventList as $currentEvent) {
+		$j = 0;
+		foreach ($this->eventList as $currentEvent) {
 
-		    //
-		    // Current day: will never be before the start time
-		    $currentDay = $currentEvent->getStartTime();
-		    if ($this->start->compare($currentDay) > 0) {
-			    $currentDay = $this->start;
-		    }
-		    if($prevDay != false && $currentDay->getDateOnly() != $prevDay->getDateOnly()){
-			    $this->parse('day_block','day', true);
-			    $this->setVar('note_listing', '');
-		    }
+			//
+			// Current day: will never be before the start time
+			$currentDay = $currentEvent->getStartTime();
+			if ($this->start->compare($currentDay) > 0) {
+				$currentDay = $this->start;
+			}
+			if($prevDay != false && $currentDay->getDateOnly() != $prevDay->getDateOnly()){
+				$this->parse('day_block','day', true);
+				$this->setVar('note_listing', '');
+			}
 
-		    $this->setVar('LIST_DATE', $currentDay->getDateOnly());
+			$this->setVar('LIST_DATE', $currentDay->getDateOnly());
 
 
 
@@ -160,118 +160,118 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 				);
 				$this->parse('has_category_block', 'has_category');
 			}
-		    else {
-	            $this->setVar(
-	                array(
-		                'DATE' => $currentDay->getUsingFormat('l jS F'),
-	                    'EVENT_ID' => $currentEvent->getEventId(),
-	                    'TIME' => $currentEvent->getTime(),
-	                    'FULL_TIME' => $currentEvent->getFullDate(),
-	                    'NOTE' => Scrub::text($currentEvent->getNote()),
-	                    'LOCATION' => Scrub::text($currentEvent->getLocation()),
-	                    'DETAIL' => Scrub::text($currentEvent->getDetail()),
-	                    'COLOUR' => $currentEvent->getColour(),
-	                    'EVENT_TYPE' => 'type' . $currentEvent->getType(),
-	                    'TYPE' => $currentEvent->getEventType(),
-	                    'AUTHOR' => Scrub::text($currentEvent->getAuthorName()),
-	                    'AUTHOR_ID' => $currentEvent->getAuthorId(),
-	                    'ON_OFF' => ++$j % 2 ? 'dark' : '',
-	                )
-	            );
+			else {
+				$this->setVar(
+					array(
+						'DATE' => $currentDay->getUsingFormat('l jS F'),
+						'EVENT_ID' => $currentEvent->getEventId(),
+						'TIME' => $currentEvent->getTime(),
+						'FULL_TIME' => $currentEvent->getFullDate(),
+						'NOTE' => Scrub::text($currentEvent->getNote()),
+						'LOCATION' => Scrub::text($currentEvent->getLocation()),
+						'DETAIL' => Scrub::text($currentEvent->getDetail()),
+						'COLOUR' => $currentEvent->getColour(),
+						'EVENT_TYPE' => 'type' . $currentEvent->getType(),
+						'TYPE' => $currentEvent->getEventType(),
+						'AUTHOR' => Scrub::text($currentEvent->getAuthorName()),
+						'AUTHOR_ID' => $currentEvent->getAuthorId(),
+						'ON_OFF' => ++$j % 2 ? 'dark' : '',
+					)
+				);
 
-	            /* Modify link. Should be templated...
-	                */
-	            if ($currentEvent->getIsEditable()) {
-	                $this->setVar(
-	                    'MODIFY',
-	                    '<a class="btn modify float-left" href="/calendar/modify.php?eventID=' . $currentEvent->getEventId(
-	                    ) . '&returnTo=month"><span></span>Modify</a>'
-	                );
-	            } else {
-	                $this->setVar('MODIFY', '');
-	            }
+				/* Modify link. Should be templated...
+					*/
+				if ($currentEvent->getIsEditable()) {
+					$this->setVar(
+						'MODIFY',
+						'<a class="btn modify float-left" href="/calendar/modify.php?eventID=' . $currentEvent->getEventId(
+						) . '&returnTo=month"><span></span>Modify</a>'
+					);
+				} else {
+					$this->setVar('MODIFY', '');
+				}
 
-	            /* Event attendance
-	             */
-	            if ($currentEvent->canAttend()) {
-	                $this->parse('attendance_icon_block', 'attendance_icon');
+				/* Event attendance
+				 */
+				if ($currentEvent->canAttend()) {
+					$this->parse('attendance_icon_block', 'attendance_icon');
 
-	                if ($this->getGroup()->isStudent($_SESSION['id'])) {
-	                    if ($attendance = $this->getCalendar()->getAttendanceByEventAndUser(
-	                        $currentEvent->getEventId(), $_SESSION['id']
-	                    )) {
+					if ($this->getGroup()->isStudent($_SESSION['id'])) {
+						if ($attendance = $this->getCalendar()->getAttendanceByEventAndUser(
+							$currentEvent->getEventId(), $_SESSION['id']
+						)) {
 
-	                        /* Attendance Status
-	                         */
-	                        if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
-	                            $this->setVar('ATTENDANCE_STATUS', 'Pending');
-	                        }
-	                        elseif ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
-                                $this->setVar('ATTENDANCE_STATUS', 'Approved');
-                            }
-                            elseif ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
-                                $this->setVar('ATTENDANCE_STATUS', 'Rejected');
-                            }
-		                    else {
-			                    $this->setVar('ATTENDANCE_STATUS', '');
-		                    }
+							/* Attendance Status
+							 */
+							if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
+								$this->setVar('ATTENDANCE_STATUS', 'Pending');
+							}
+							elseif ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
+								$this->setVar('ATTENDANCE_STATUS', 'Approved');
+							}
+							elseif ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
+								$this->setVar('ATTENDANCE_STATUS', 'Rejected');
+							}
+							else {
+								$this->setVar('ATTENDANCE_STATUS', '');
+							}
 
-	                        $this->parse('attendance_status_block', 'attendance_status');
+							$this->parse('attendance_status_block', 'attendance_status');
 
-	                        $this->setVar('ATTENDANCE_REQUEST_ACTION', 'Unattend');
-	                    }
-	                    else {
-	                        $this->setVar('ATTENDANCE_REQUEST_ACTION', 'Attend');
-	                    }
+							$this->setVar('ATTENDANCE_REQUEST_ACTION', 'Unattend');
+						}
+						else {
+							$this->setVar('ATTENDANCE_REQUEST_ACTION', 'Attend');
+						}
 
-	                    $this->parse('attendance_request_button_block', 'attendance_request_button');
-	                }
-	                elseif ($this->getGroup()->isStaff($_SESSION['id'])) {
-                        $this->parse('attendance_list_button_block', 'attendance_list_button');
-                    }
-	            }
+						$this->parse('attendance_request_button_block', 'attendance_request_button');
+					}
+					elseif ($this->getGroup()->isStaff($_SESSION['id'])) {
+						$this->parse('attendance_list_button_block', 'attendance_list_button');
+					}
+				}
 
-	            /* Show a homepage if appropriate
-	             */
-	            if ($currentEvent->getCategoryId() > 0) {
-	                $this->setVar(
-	                    array(
-	                        'HAS_CATEGORY_ID' => $currentEvent->getCategoryId(),
-	                        'HAS_CATEGORY_NAME' => $currentEvent->getCategoryName(),
-	                    )
-	                );
+				/* Show a homepage if appropriate
+				 */
+				if ($currentEvent->getCategoryId() > 0) {
+					$this->setVar(
+						array(
+							'HAS_CATEGORY_ID' => $currentEvent->getCategoryId(),
+							'HAS_CATEGORY_NAME' => $currentEvent->getCategoryName(),
+						)
+					);
 
-	                $this->parse('has_category_block', 'has_category');
-	            }
+					$this->parse('has_category_block', 'has_category');
+				}
 
-	        }
-
-
-		    $this->parse("note_listing", "note_block", true);
-
-		    $prevDay = $currentDay;
-	    }
+			}
 
 
-	    $this->parse('day_block','day',true);
+			$this->parse("note_listing", "note_block", true);
 
-        return true;
-    }
+			$prevDay = $currentDay;
+		}
 
-    public function setCalendar($calendar) {
-        $this->calendar = $calendar;
-    }
 
-    public function getCalendar() {
-        return $this->calendar;
-    }
+		$this->parse('day_block','day',true);
 
-    public function setGroup($group) {
-        $this->group = $group;
-    }
+		return true;
+	}
 
-    public function getGroup() {
-        return $this->group;
-    }
+	public function setCalendar($calendar) {
+		$this->calendar = $calendar;
+	}
+
+	public function getCalendar() {
+		return $this->calendar;
+	}
+
+	public function setGroup($group) {
+		$this->group = $group;
+	}
+
+	public function getGroup() {
+		return $this->group;
+	}
 
 }
