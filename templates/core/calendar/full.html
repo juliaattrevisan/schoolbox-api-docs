@@ -276,7 +276,7 @@
                         url:      '/calendar/ajax/full',
                         data: {
                             start: Math.round(start.getTime()/1000),
-                            end:   Math.round(end.getTime()/1000),
+                            end:   Math.round(end.getTime()/1000)
                         },
                         success: function(data) {
                             callback(data);
