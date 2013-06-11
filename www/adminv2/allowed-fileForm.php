@@ -54,25 +54,33 @@ if ($groupHandler->isSuperuser()) {
             $allowedFileExtensionHandler->delete($data['fileTypeID']);
 
             $fileTypeID = $data['fileTypeID'];
-        } else {
-
-            $fileTypeID = $allowedFileTypesHandler->create($data);
+        }
+        else {
+            //
+            // Check if mimetype is being used. If it is, don't save anything
+            if (!$allowedFileTypesHandler->getByField('mime', $data['mime'])) {
+                $fileTypeID = $allowedFileTypesHandler->create($data);
+            }
+            else {
+                error(105, 'The mime type you have chosen for this file type is already in use.');
+            }
         }
 
         /* Create/update valid file extensions table too
            */
-        foreach ($allExtensions as $currentExtension) {
-            $data = array(
-                'fileTypeID' => $fileTypeID,
-                'extension' => Scrub::text(trim($currentExtension))
-            );
-
-            $allowedFileExtensionHandler->create($data);
+        if ($fileTypeID) {
+            foreach ($allExtensions as $currentExtension) {
+                $data = array(
+                    'fileTypeID' => $fileTypeID,
+                    'extension' => Scrub::text(trim($currentExtension))
+                );
+                $allowedFileExtensionHandler->create($data);
+            }
         }
     }
 
     $page->backToTheFuture(1);
-} else {
+}
+else {
     error(19);
 }
-?>
