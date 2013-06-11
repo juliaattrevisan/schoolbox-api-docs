@@ -7,6 +7,8 @@ $this->setBlock('category_selected', 'show_delete', 'show_delete_block');
 $this->setBlock('category_selected', 'no_questions', 'no_questions_block');
 $this->setBlock('category_selected', 'question', 'question_block');
 $this->setBlock('question', 'answers', 'answers_block');
+$this->setBlock('question', 'select_question', 'select_question_block');
+$this->setBlock('question', 'missing_class', 'missing_class_block');
 
 /* TODO FIXME... XSS attack */
 $this->setVar(array(
@@ -39,7 +41,7 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
      */
     if (is_array($allQuestions) && count($allQuestions)) {
         $previousCategory = false;
-
+        $factory = new Assess_Factory();
         foreach ($allQuestions as $currentQuestion) {
             $this->setVar(array(
                 'QUESTION_BANK_ID' => $currentQuestion['question_bank_id'],
@@ -48,6 +50,18 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
                 'MARKS' => $currentQuestion['marks'],
                 'answers_block' => '',
             ));
+
+            //
+            // Need to be able to create a question and answer for this question
+            // Otherwise, it can't be added to the survey.
+            if ($factory->isQuestionTypeAvailable($currentQuestion['type_id'])) {
+                $this->parse('select_question_block', 'select_question');
+                $this->setVar('missing_class_block', '');
+            }
+            else {
+                $this->setVar('select_question_block', '');
+                $this->parse('missing_class_block', 'missing_class');
+            }
 
             if ($currentQuestion['answer']) {
                 $answerList = unserialize($currentQuestion['answer']);

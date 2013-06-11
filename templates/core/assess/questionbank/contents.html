@@ -96,11 +96,20 @@
         <!-- BEGIN question -->
         <div class="add-to-evaluation">
             <label class="question clearfix">
+				<!-- BEGIN select_question -->
                 <div class="question-checkbox">
                     <input name='question_bank_id[]' type='checkbox' value='{QUESTION_BANK_ID}'/>
                 </div>
+				<!-- END select_question -->
                 <span class="question-content">{QUESTION}</span>
             </label>
+
+			<!-- BEGIN missing_class -->
+			<p class="error-notification">
+				This question type no longer exists - it cannot be copied to the
+				survey, and should be removed from the question bank.
+			</p>
+			<!-- END missing_class -->
 
             <a href="#" class="show-answers">Show Answers</a>
 
