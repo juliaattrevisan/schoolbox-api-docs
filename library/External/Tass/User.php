@@ -118,6 +118,9 @@ class External_Tass_User implements External_UserInterface {
 
 	function getSubjectList($tassCode, $userID)
 	{
+		if (empty($tassCode)) {
+			return false;
+		}
 		if( $this->groupHandler->isStudent($userID) )
 		{
 			$sql ="SELECT class, studsub.cmpy_code, sub_code, year_grp
