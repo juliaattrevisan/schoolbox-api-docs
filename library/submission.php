@@ -74,17 +74,18 @@ class Submission extends DeprecatedModel {
      */
     function getByField($field, $value) {
 
-        // securitae
+        // "securitae"
         $field = mysql_real_escape_string($field);
 
-        if (is_array($value)) {
+        if (is_array($value) && !empty($value)) {
             foreach ($value as &$v) {
-                $v = mysql_real_escape_string($v);
+                $v = "'".mysql_real_escape_string($v)."'";
             }
+            unset($v);
             $conditional = 'IN (' . implode(',', $value) . ')';
-
-        } else {
-            $conditional = "= $value";
+        }
+        else {
+            $conditional = "= '".mysql_real_escape_string($value)."'";
         }
 
         // general extraction query for submission boxes
