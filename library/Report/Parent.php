@@ -52,14 +52,9 @@ class Report_Parent extends Report_Abstract {
 	public function __construct($page, $yearLevel, $searchName, $searchBoardingStatus, $searchForm) {
 		$this->setGroupHandler(new Group());
 
-		/* Must provide an int or be empty
-		 */
-		if (strlen($yearLevel) && !preg_match('/^(\d*)$/', $yearLevel)) {
-			error(155);
-		}
+		// Must provide an int or be empty
+		$yearLevel = trim($yearLevel);
 
-
-		//
 		// Parents may only search in their student's year level
 		if ($this->isYearsRestricted() && !( in_array($yearLevel, $this->getChildrensYears()) || $yearLevel == '')) {
 			error(155);
@@ -85,8 +80,21 @@ class Report_Parent extends Report_Abstract {
 			 * all results (default is empty array)
 			 */
 			if (strlen($this->getYearLevel().$this->getSearchName().$this->getSearchForm().$this->getSearchBoardingStatus())) {
-				$this->setAllRecords($this->getExternalUserHandler()->getStudentContactListExtended($this->getYearLevel(), $this->getSearchName(), $this->getSearchBoardingStatus(), $this->getSearchForm()));
+				$this->setAllRecords(
+					$this->getExternalUserHandler()->getStudentContactListExtended(
+						$this->getYearLevel(),
+						$this->getSearchName(),
+						$this->getSearchBoardingStatus(),
+						$this->getSearchForm()
+					)
+				);
 			}
+
+			// check that something came back, otherwise inform the user that it was an invalid request
+			if($this->getAllRecords() === false) {
+				error(155);
+			}
+
 		}
 	}
 

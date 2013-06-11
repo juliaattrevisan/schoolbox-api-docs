@@ -300,6 +300,7 @@ class External_Synergetic_User implements External_UserInterface {
 			LEFT JOIN SynergyOne.dbo.Community Contact ON StudentContactID = Contact.ID
 			LEFT JOIN SynergyOne.dbo.Community Spouse ON StudentContactSpouseID = Spouse.ID
 			LEFT JOIN SynergyOne.dbo.luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
+			LEFT JOIN SynergyOne.dbo.luYearLevel Year ON StudentYearLevel = Year.Code
 			WHERE (StudentContactType = 'SC1' OR StudentContactType = 'SC2')
 			AND FileSemester = " . $_SESSION['FileSemester'] . "
 			AND FileYear = " . $_SESSION['FileYear'];
@@ -307,14 +308,26 @@ class External_Synergetic_User implements External_UserInterface {
 		/* Search for a particular year level
 		 */
 		if (strlen($yearlevel)) {
-			$query .= "
-				AND StudentYearLevel = '{$yearlevel}'
+			if(is_numeric($yearlevel)) {
+				// forcibly cast to int in case it's a something non-int that's still numeric
+				$yearlevel = (int)$yearlevel;
+				$query .= "
+				AND (StudentYearLevel = '{$yearlevel}' OR Year.Description = '{$yearlevel}')
 			";
+
+			}
+			// if year is NOT numeric, don't attempt to compare StudentYearLevel (will bug out)
+			else {
+				$query .= "
+				AND Year.Description = '{$this->getDatabase()->quote($yearlevel)}'";
+			}
+
 		}
 
 		/* Search for a student name
 		 */
 		if (strlen($name)) {
+			$name = $this->getDatabase()->quote($name);
 			$query .= "
 				AND (
 					(StudentSurname LIKE '%{$name}%')
@@ -350,6 +363,7 @@ class External_Synergetic_User implements External_UserInterface {
 		/* Search for a particular form
 		 */
 		if ($form) {
+			$form = $this->getDatabase()->quote($form);
 			$query .= "
 				AND StudentForm = '{$form}'
 			";
