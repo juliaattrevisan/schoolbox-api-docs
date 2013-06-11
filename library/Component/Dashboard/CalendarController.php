@@ -25,6 +25,11 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
      */
     protected $end;
 
+    /**
+     * @var Calendar_Event_Collection
+     */
+    protected $eventList;
+
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage, Calendar $calendar, Group $group) {
         parent::__construct($instance, $user, $sitepage);
 
@@ -194,36 +199,36 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 	                if ($this->getGroup()->isStudent($_SESSION['id'])) {
 	                    if ($attendance = $this->getCalendar()->getAttendanceByEventAndUser(
 	                        $currentEvent->getEventId(), $_SESSION['id']
-	                    )
-	                    ) {
+	                    )) {
 
 	                        /* Attendance Status
 	                         */
 	                        if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_PENDING) {
 	                            $this->setVar('ATTENDANCE_STATUS', 'Pending');
-	                        } else {
-	                            if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
-	                                $this->setVar('ATTENDANCE_STATUS', 'Approved');
-	                            } else {
-	                                if ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
-	                                    $this->setVar('ATTENDANCE_STATUS', 'Rejected');
-	                                }
-	                            }
 	                        }
+	                        elseif ($attendance['status'] == Calendar::ATTENDANCE_STATUS_APPROVED) {
+                                $this->setVar('ATTENDANCE_STATUS', 'Approved');
+                            }
+                            elseif ($attendance['status'] == Calendar::ATTENDANCE_STATUS_REJECTED) {
+                                $this->setVar('ATTENDANCE_STATUS', 'Rejected');
+                            }
+		                    else {
+			                    $this->setVar('ATTENDANCE_STATUS', '');
+		                    }
 
 	                        $this->parse('attendance_status_block', 'attendance_status');
 
 	                        $this->setVar('ATTENDANCE_REQUEST_ACTION', 'Unattend');
-	                    } else {
+	                    }
+	                    else {
 	                        $this->setVar('ATTENDANCE_REQUEST_ACTION', 'Attend');
 	                    }
 
 	                    $this->parse('attendance_request_button_block', 'attendance_request_button');
-	                } else {
-	                    if ($this->getGroup()->isStaff($_SESSION['id'])) {
-	                        $this->parse('attendance_list_button_block', 'attendance_list_button');
-	                    }
 	                }
+	                elseif ($this->getGroup()->isStaff($_SESSION['id'])) {
+                        $this->parse('attendance_list_button_block', 'attendance_list_button');
+                    }
 	            }
 
 	            /* Show a homepage if appropriate
