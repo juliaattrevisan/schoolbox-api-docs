@@ -52,26 +52,19 @@ class Scrub {
      * @return string
      */
     static public function html2text($html) {
-
-        $text = html_entity_decode( // 4: unconvert entities (3 -> 4 is just for normalising any rogue characters)
-            htmlentities( // 3: convert all entites, including quotes, into UTF-8
-                preg_replace( // 2: all recurring whitespaces (including &nbsp;) to be trimmed
-                    '/(\s|&nbsp;)+/i',
-                    ' ',
-                    strip_tags( // 1: remove all remaining tags from input
-                        preg_replace( // 0: replace all text-style block-level elements with newlines
-                            '#</(p|h[1-5]|br)>#i',
-                            "\n",
-                            $html
-                        )
-                    )
-                ),
-                ENT_QUOTES,
-                "UTF-8"
-            )
-        );
-
-        return $text;
+        // 0: replace all text-style block-level elements with newlines
+        $text = preg_replace('#</(p|h[1-5]|br)>#i', "\n", $html);
+        // 1: remove all remaining tags from input
+        $text = strip_tags($text);
+        // 2: all recurring whitespaces (including &nbsp;) to be trimmed
+        $text = preg_replace('/(\s|&nbsp;)+/i', ' ', $text);
+        // 3: convert all entites, including quotes, into UTF-8
+        // Apparently ENT_IGNORE can be unsafe
+        // (@see http://unicode.org/reports/tr36/#Deletion_of_Noncharacters)
+        // but tags have already been stripped, so this should be fine.
+        $text = htmlentities($text, ENT_IGNORE|ENT_QUOTES, "UTF-8");
+        // 4: unconvert entities (3 -> 4 is just for normalising any rogue characters)
+        return html_entity_decode($text);
     }
 
     /**

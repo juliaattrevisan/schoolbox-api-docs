@@ -50,7 +50,7 @@ class TextFormatter {
 	 * @param  $chars
 	 * @return string
 	 */
-	public function cutSentence($content, $chars) {
+	public static function cutSentence($content, $chars) {
 
         $content = strip_tags($content);
 
