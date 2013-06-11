@@ -120,7 +120,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 							 * Event's end time is before start time of span: ignore
 							 * Event's start time is before end time of span: ignore
 							 */
-							if (!($eventEndTimestamp < $startTimestamp || $eventStartTimestamp > $endTimestamp)) {
+							if (!($eventEndTimestamp < $startTimestamp || $eventStartTimestamp >= $endTimestamp)) {
 								$metaDetails = $this->findLuEventType($decodedConfig->getLuEventType());
 
 								$event = new Calendar_Event_Type_Day();
