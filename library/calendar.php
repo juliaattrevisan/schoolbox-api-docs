@@ -697,20 +697,13 @@ class Calendar extends DeprecatedModel {
 					OR (access = '3' AND $campusQuery $groupChunk OR owner = '{$_SESSION['id']}')
 				)
 				AND (
-
-					/* Start display in the middle of multi-day events that have already begun at some point
-					 * in the past
-					 */
-					((DATE(startDate) <= DATE(FROM_UNIXTIME('{$startTimestamp}'))) AND (DATE(endDate) < DATE(FROM_UNIXTIME('{$endTimestamp}'))))
-					OR
-					/* Start display for events that are still coming up within the specified time interval
-					 */
-					((DATE(startDate) >= DATE(FROM_UNIXTIME('{$startTimestamp}'))) AND (DATE(startDate) < DATE(FROM_UNIXTIME('{$endTimestamp}'))))
-				)
-				/* Don't include events that have already ended
-				 */
-				AND (
-					endDate >= FROM_UNIXTIME('{$startTimestamp}')
+					-- Get any events which overlap timespan.
+					-- NOT (event.end BEFORE startTimestamp OR event.start AFTER endTimestamp)
+					NOT (
+						DATE(endDate)   <  DATE(FROM_UNIXTIME('{$startTimestamp}'))
+						OR
+						DATE(startDate) >= DATE(FROM_UNIXTIME('{$endTimestamp}'))
+					)
 				)
 				$filter_query
 			GROUP BY id
