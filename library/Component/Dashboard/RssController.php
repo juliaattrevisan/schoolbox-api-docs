@@ -37,7 +37,7 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
         $this->setBlock('rss_stories', 'rss_date', 'rss_date_block');
 
         $this->setVar('RSS_NAME', Scrub::text($this->rss->getTitle()));
-        $this->setVar('RSS_LINK', base64_encode($this->rss->getLink()));
+        $this->setVar('RSS_LINK', urlencode(base64_encode($this->rss->getLink())));
 
 	    $allRss = $this->rss->getOutput();
 
@@ -48,7 +48,7 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
                     array(
                         'ON_OFF' => ++$j % 2 ? '' : 'dark',
                         'RSS_TITLE' => Scrub::text($item['title']),
-                        'RSS_URL' => base64_encode($item['link']),
+                        'RSS_URL' => urlencode(base64_encode($item['link'])),
                         'RSS_BRIEF' => Scrub::html($item['content']?$item['content']:$item['description']),
                     )
                 );

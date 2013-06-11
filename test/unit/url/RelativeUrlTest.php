@@ -32,7 +32,7 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase {
 
 	public function testRedirectUrl() {
 		$input = 'http://www.google.com';
-		$expected = '/redir.php?url=' . base64_encode($input);
+		$expected = '/redir.php?url=' . urlencode(base64_encode($input));
 
 		$url = new Url($input, false);
 

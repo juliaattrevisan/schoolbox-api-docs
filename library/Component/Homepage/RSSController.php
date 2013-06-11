@@ -55,7 +55,7 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
                 $this->setVar(array(
                     'ON_OFF'    => ++$j % 2 ? '' : 'dark',
                     'RSS_TITLE' => Scrub::text($currentRss['title']),
-                    'RSS_URL'   => base64_encode($currentRss['link']),
+                    'RSS_URL'   => urlencode(base64_encode($currentRss['link'])),
                     'RSS_BRIEF' => Scrub::html( $currentRss['content'] ? $currentRss['content'] : $currentRss['description']),
                 ));
 
