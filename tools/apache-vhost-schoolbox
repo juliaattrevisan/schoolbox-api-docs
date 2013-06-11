@@ -21,12 +21,6 @@
 		php_flag apc.enabled off
 	</Directory>
 
-	# Mobile Edition - Comment out this section to enable
-	<Location /m>
-	       RewriteEngine on
-	       RewriteRule ^/*(.*)$ /index.php?page=common/404
-	</Location>
-
 	# Force IE to not use compatibility mode
 	<IfModule mod_headers.c>
   		Header set X-UA-Compatible "IE=Edge,chrome=1"
