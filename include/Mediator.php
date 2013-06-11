@@ -140,13 +140,18 @@ class Mediator {
         // try to instantiate the class specified
         try {
 
-            // avoid a fatal error by checking the class is registered
-            if(!class_exists($this->getClassName())) {
+            $classname  = $this->getClassName();
+            $methodname = $this->getMethodName();
+            $this->nameTransaction('/m/'.$classname.'->'.$methodname);
+
+            // avoid fatal error by checking the class and method are registered
+            if (!class_exists($classname)) {
                 throw new Exception_Schoolbox("Class does not exist");
             }
-
-            $classname = $this->getClassName();
             $class = new $classname($this->getResponseCode());
+//            if (!is_callable(array($class, $methodname))) {
+//                throw new Exception_Schoolbox("Method does not exist in class");
+//            }
 
             // try to dynamically call the method specified with the args specified
             try {
@@ -159,7 +164,7 @@ class Mediator {
                 }
 
                 // THE FUNKY CALL THAT MAKES EVERYTHING GO!
-                $this->setResponse(call_user_func_array(array($class, $this->getMethodName()), $this->getMethodArgs()));
+                $this->setResponse(call_user_func_array(array($class, $methodname), $this->getMethodArgs()));
 
                 /* this is for debugging, and only if the SQL server supports it anyway
                 $db = DeprecatedDatabase::getInstance();
@@ -276,6 +281,22 @@ class Mediator {
     }
 
     /**
+     * Sets the name of this page load for New Relic reporting.
+     *
+     * @todo This exact function is in SitePage, which means it can be moved
+     *
+     * For this class, this will usually be the name of the controller class,
+     * joined with the method that is being called on that controller.
+     *
+     * @param string $name
+     */
+    protected function nameTransaction($name) {
+        if (extension_loaded('newrelic')) {
+            newrelic_name_transaction($name);
+        }
+    }
+
+	/**
      * Conveyerbelt methodology.
      * Return the response to the client in the format requested
      */
