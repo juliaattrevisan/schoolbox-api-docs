@@ -159,16 +159,9 @@ class News extends DeprecatedModel {
             foreach ($campusList as $campus) {
                 $this->db->insert('newsCampus', array('id' => $news['item_id'], 'campus' => $campus));
             }
-        } else {
-            $this->db->delete('newsUser', 'newsID', $news['item_id']);
-            if (is_numeric($campusList)) {
-                $this->db->insert('newsCampus', array('id' => $news['item_id'], 'campus' => $campusList));
-            } else {
-                $this->db->insert('newsCampus', array('id' => $news['item_id'], 'campus' => 1));
-            }
         }
-
         if (is_array($userList)) {
+            $this->db->delete('newsUser', 'newsID', $news['item_id']);
             foreach ($userList as $user) {
                 $this->db->insert('newsUser', array('newsID' => $news['item_id'], 'userID' => $user));
             }
