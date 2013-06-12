@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment;
 
 use Eportfolio\ShowcaseMapper;
 use Schoolbox\Assessment\Component\OnlineAssessment;
+use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
@@ -49,6 +50,7 @@ class StudentReportCard {
 	// mappers
 	protected $submissionMapper;
 	protected $showcaseMapper;
+	protected $assessMapper;
 
 	// 'andlers
 	protected $groupHandler;
@@ -61,6 +63,7 @@ class StudentReportCard {
 		// dependencies
 		$this->submissionMapper = new SubmissionBoxMapper();
 		$this->showcaseMapper = new ShowcaseMapper();
+		$this->assessMapper = new OnlineAssessmentMapper();
 		$this->groupHandler = new \Group();
 
 		// build permissions set
@@ -700,6 +703,17 @@ class StudentReportCard {
 	protected function findSubjectsForSemester() {
 		if($this->targetYear == $this->currentYear && $this->targetSemester == $this->currentSemester) {
 			$categoryList = $this->groupHandler->involvedInCategoryList($this->targetUserId, true, READ_ACCESS);
+
+			// filter this list, so that it only contains categories in which contain results
+			foreach($categoryList as $k => $cat) {
+				$count = 0;
+				// is there any other way to do this? such that count(db_calls) < 2n
+				$count += $this->submissionMapper->findByColumn('category', $cat['id'])->count();
+				$count += $this->assessMapper->findByColumn('category_id', $cat['id'])->count();
+				if(!$count) {
+					unset($categoryList[$k]);
+				}
+			}
 		}
 		else {
 			$categoryList = $this->submissionMapper->submittedToCategoryList(
