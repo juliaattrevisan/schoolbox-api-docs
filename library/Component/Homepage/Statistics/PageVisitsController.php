@@ -74,7 +74,7 @@ class Component_Homepage_Statistics_PageVisitsController extends Component_Homep
             $k = array_keys($series);
             for($i = 0; $i < count($series); ++$i) {
                 if($series[$k[$i]] || $series[$k[$i+1]] || $series[$k[$i-1]]) {
-                    $groupdata[] = array($k[$i] * 86400000, $series[$k[$i]]);
+                    $groupdata[] = array(($k[$i]+1) * 86400000, $series[$k[$i]]);
                 }
             }
 
