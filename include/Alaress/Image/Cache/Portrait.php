@@ -72,7 +72,7 @@ class Alaress_Image_Cache_Portrait {
         $this->setGroupHandler(new Group());
 
         $this->setPlaceholder(WEB_root . '/images/core/placeholder.png');
-        $this->setCacheLocation(Cfg::get('portrait_dir'));
+        $this->setCacheLocation(Cfg::get('stream_dir').'/portrait');
 
         $this->decidePlaceholder();
     }
