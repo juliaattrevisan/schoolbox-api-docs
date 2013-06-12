@@ -52,10 +52,12 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 		$this->setBlock('list_item', 'has_modify_form', 'has_modify_form_block');
 		$this->setBlock('list_item', 'has_delete_form', 'has_delete_form_block');
 		$this->setBlock('list_item', 'has_image', 'has_image_block');
-		
+		$this->setBlock('has_modify_form', 'has_image_modify', 'has_image_modify_block');
+
 		$this->setVar(array(
 			'has_create_form_block' => '',
 			'has_modify_form_block' => '',
+			'has_image_modify_block' => '',
 			'has_delete_form_block' => '',
 			'has_image_block' => '',
 			'list_item_block' => '',
@@ -75,7 +77,6 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 			$j = 0;
 
 			foreach ($allItems as $currentItem ) {
-
 				$this->setVar(array(
 					'LIST_ITEM_ID' => $currentItem->getId(),
 					'LIST_ITEM_TITLE' => Scrub::text($currentItem->getTitle()),
@@ -91,6 +92,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 					));
 
 					$this->parse('has_image_block', 'has_image');
+					$this->parse('has_image_modify_block', 'has_image_modify');
 				}
 
 				/* Controls
@@ -109,10 +111,10 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 				$this->setVar('has_modify_button_block', '');
 				$this->setVar('has_modify_form_block', '');
 				$this->setVar('has_delete_form_block', '');
+				$this->setVar('has_image_modify_block', '');
 			}
 		}
 
 		return true;
 	}
-
 }
