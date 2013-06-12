@@ -53,15 +53,43 @@ class Queue {
 		// exists or not.
 		// FFMpeg needs strict flag, as MP4 is technically experimental
 		$executable = 'avconv';
+		$info_exec  = 'avprobe';
 		$strict     = false;
 		exec('which avconv', $unused, $errorcode);
 		if ($errorcode) {
 			$executable = 'ffmpeg';
+			$info_exec  = 'ffprobe';
 			$strict     = true;
 		}
+
+		//
+		// Get information about width and height of video file
+		exec("$info_exec -show_streams ".escapeshellarg($sourceFile).' 2>&1', $info_message, $info_return);
+		$info_message = implode("\n", $info_message);
+		if (!($info_return == 0)) {
+			return false;
+		}
+		$width  = 0;
+		$height = 0;
+		$scale  = '';
+		if ($info_return == 0) {
+			if (preg_match('/width=(\\d+)/', $info_message, $matches)) {
+				list(, $width) = $matches;
+			}
+			if (preg_match('/height=(\\d+)/', $info_message, $matches)) {
+				list(, $height) = $matches;
+			}
+		}
+
+		//
+		// Get a scale factor for this video (rounding down to nearest even #)
+		if ($width && $height) {
+			$scale = sprintf('-vf scale=%d:%d', intval($width/2)*2, intval($height/2)*2);
+		}
+
 		/* Process video to 512kb in libx264 format for mobile and html5 streaming */
 		$processString = "nice $executable -y -i " . escapeshellarg($sourceFile) .
-			' -c:v libx264 -preset slow -b 512k ' .
+			" -c:v libx264 $scale -preset slow -b 512k " .
 			($strict ? '-strict -2 ' : '').
 			'-ac 2 ' . escapeshellarg($this->getVideoLocation()).' 2>&1';
 
