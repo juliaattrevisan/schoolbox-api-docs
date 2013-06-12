@@ -9,7 +9,11 @@
 class Component_Config_CaptionState extends Component_Config_Abstract {
 
     public function parse(SitePage $page, $key, $keyblock, $configValue) {
-
+        //
+        // Anything other than "active" gets set to "inactive" directly
+        if (!($configValue == 'Active')) {
+            $configValue = 'Inactive';
+        }
         // has an internal block for the select element
         $page->setBlock($keyblock, 'caption_state', 'caption_state_block');
         $page->setVar('caption_state_block', '');
