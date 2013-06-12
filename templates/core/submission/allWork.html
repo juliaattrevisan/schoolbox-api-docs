@@ -5,7 +5,7 @@
 <div id="all-work">
   <div id="semester">
     <div class="semester-controls">
-      <form action="/submission/allWork/{WORK_USER_ID}" method="GET">
+      <form class="fade" action="/submission/allWork/{WORK_USER_ID}" method="GET">
         <span>
             <label for="sem">Semester</label>
             <select id="sem" name="semester">
@@ -23,19 +23,20 @@
         <input type="submit" class="btn" value="Update"/>
       </form>
     </div>
-    <ul class="enrolled-subjects admin-nav">
-      <!-- BEGIN subject_selector -->
-      <li data-id="{ENR_SUBJ_ID}" title="{ENR_SUBJ_CODE}">
-        <a class="{ENR_SUBJ_SELECTED}" href="/submission/allWork/{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ENR_SUBJ_ID}">{ENR_SUBJ_NAME}</a>
-      </li>
-      <!-- END subject_selector -->
-    </ul>
+    <form action="/submission/allWork/" method="get" class="fade enrolled-subjects">
+        <select id="enrolled-subjects">
+          <!-- BEGIN subject_selector -->
+          <option data-id="{ENR_SUBJ_ID}" title="{ENR_SUBJ_CODE}" value="{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ENR_SUBJ_ID}" {ENR_SUBJ_SELECTED}>
+            {ENR_SUBJ_NAME}
+          </option>
+          <!-- END subject_selector -->
+        </select>
+    </form>
   </div>
 
   <div id="subject-main">
     <!-- BEGIN subject -->
-
-    <h1>{SUBJ_NAME}<span class="aside">{SUBJ_SEMESTER}</span></h1>
+    <div class="current-grade-avg gradient-{SUBJ_GRADEIENT} clearfix">
     <ul class="subject-teachers">
       <!-- BEGIN subject_teacher -->
       <li>
@@ -47,7 +48,7 @@
       </li>
       <!-- END subject_teacher -->
     </ul>
-    <div class="current-grade-avg gradient-{SUBJ_GRADEIENT}">
+
       <span>Current Grade Average:</span>
       <span class="grade">{SUBJ_GRADE_AVG}</span>
       <span class="trend">{SUBJ_GRADE_TREND}</span>
@@ -84,7 +85,7 @@
             <th>Title</th>
             <th>Grade</th>
             <th>Date</th>
-            <th>Comments</th>
+            <!--<th>Comments</th>-->
             <th></th>
           </thead>
           <tbody>
@@ -96,12 +97,12 @@
               <a href="/homepage/{SUBJ_ID}">{SUBJ_NAME}</a> {WORK_TYPE}
             </td>
             <td>
-              <span class="gradient-{WORK_GRADIENT}">{WORK_GRADE}</span>
+              <span class="gradient-{WORK_GRADIENT} grade">{WORK_GRADE}</span>
             </td>
             <td>
               <span class="gradient-{WORK_URGENCY}">Due {WORK_DATE}</span> on {WORK_TIME}
             </td>
-            <td>{WORK_COMMENT}</td>
+            <!--<td>{WORK_COMMENT}</td>-->
             <td class="text-align-right">
               <!-- BEGIN work_actionable -->
               <a href="/{WORK_HREF}{WORK_ID}" class="btn {WORK_BTN_ICON}"><span></span> {WORK_BTN_LABEL}</a>
@@ -161,5 +162,13 @@
   };
   $j(function() {
     $j.plot($j('#subject-graph'), data, options);
+
+    $j('#enrolled-subjects').bind('change', function () {
+        var url = $j(this).val();
+        if (url) {
+        window.location = '/submission/allWork/' + url;
+    }
+    return false;
+    });
   });
 </script>
