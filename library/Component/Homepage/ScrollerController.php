@@ -78,7 +78,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         // Set up component name
         $this->setVar(
             'COMPONENT_NAME',
-            strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Image Scroller'
+            strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : 'Image Slideshow'
         );
 
         /* Prevent multiple galleries from other categories stacking up in the wrong place
