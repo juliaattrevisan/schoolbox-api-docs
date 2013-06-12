@@ -43,7 +43,14 @@ class Synchronise_Synergetic_StMichaels_Strategy_Student extends Synchronise_Syn
 		/* Login details
 		 * We don't know how the password is given to us
 		 */
-		$newUser['username'] = $currentUser['NetworkLogin'];
+
+		// if the student is in year 30 or 40, use the synergetic ID as the username
+		if(in_array($currentUser['StudentYearLevel'], array(30, 40))) {
+			$newUser['username'] = $currentUser['StudentID'];
+		}
+		else {
+			$newUser['username'] = $currentUser['NetworkLogin'];
+		}
 
 		/* User details
 		 */
