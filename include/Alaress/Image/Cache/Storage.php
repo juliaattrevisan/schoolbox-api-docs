@@ -51,7 +51,7 @@ class Alaress_Image_Cache_Storage {
         $this->resource = $resource;
         $this->setImageId($resource->id);
         $this->setKey($key);
-        $this->setCacheLocation(Cfg::get('storage_dir'));
+        $this->setCacheLocation(Cfg::get('stream_dir').'/storage');
     }
 
     /**

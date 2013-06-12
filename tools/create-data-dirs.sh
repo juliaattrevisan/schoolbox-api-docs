@@ -28,5 +28,7 @@ mkdir -p $datadir/{dropbox,files,myFiles,returns,storage,submissions,thumbnails,
 
 # Cache dirs
 mkdir -p $datadir/cache/{minify,myfiles,portrait,purifier,stream,weather,xml,zip,logs}
+# Cache subdirs for portrait and storage images
+mkdir -p $datadir/cache/stream/{portrait,storage}
 
 # End of script
