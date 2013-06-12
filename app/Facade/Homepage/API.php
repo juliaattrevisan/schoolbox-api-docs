@@ -54,28 +54,44 @@ class Facade_Homepage_API extends Generic_API {
      */
     private function getModule($categoryID, $method) {
         $response = new Response_HTTP();
-        list($user, $cat, $page) = $this->getHomepage($categoryID);
-
-        $method = sprintf("Component_Homepage_%sController", $method);
-        foreach($page->get('components') as $comp) {
-            if($comp->get('controller') == $method) {
-                list($catTitle, $articles) = $this->renderComponents($user, $cat, array($comp));
+        try {
+            list($user, $cat, $page) = $this->getHomepage($categoryID);
+            $method = sprintf("Component_Homepage_%sController", $method);
+            foreach($page->get('components') as $comp) {
+                if($comp->get('controller') == $method) {
+                    list($catTitle, $articles) = $this->renderComponents($user, $cat, array($comp));
+                }
+            }
+            if(isset($catTitle)) {
+                $response->setPage('title', $catTitle);
+                $response->setResponse('articles', $articles);
+            }
+            // i strongly dislike special cases, but grades needs to be overridden since it doesn't exist in desktop yet
+            elseif(in_array($method, $this->custom)) {
+                list($catTitle, $articles) = $this->renderComponents($user, $cat, $method);
+                $response->setPage('title', $catTitle);
+                $response->setResponse('articles', $articles);
+            }
+            else {
+                $response->setPage('title', '');
             }
         }
-        if(isset($catTitle)) {
-            $response->setPage('title', $catTitle);
-            $response->setResponse('articles', $articles);
+        catch (Exception_Schoolbox $e) {
+            //
+            // Exception causes:
+            // * Category was not found
+            // * Category was found but isn't a homepage
+            $response->setStatusCode(Response_HTTP::HTTP_NOT_FOUND);
+            $response->setPage('title', 'Homepage Not Found');
+            $response->setResponse('articles', array('Error' => array(
+                'title' => 'Homepage Not Found',
+                'icon' => '',
+                'class' => 'wide no-title',
+                'content' => array(
+                    'reason' => 'Sorry, the homepage requested could not be found.'
+                )
+            )));
         }
-        // i strongly dislike special cases, but grades needs to be overridden since it doesn't exist in desktop yet
-        elseif(in_array($method, $this->custom)) {
-            list($catTitle, $articles) = $this->renderComponents($user, $cat, $method);
-            $response->setPage('title', $catTitle);
-            $response->setResponse('articles', $articles);
-        }
-        else {
-            $response->setPage('title', '');
-        }
-
         return $response;
     }
 

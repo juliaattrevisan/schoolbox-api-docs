@@ -14,6 +14,7 @@ class DueWork_SubmissionBox_API {
         $boxHandler = new Submission();
         $box = $boxHandler->getByID($dueWorkID);
         if (!$box) {
+            $response->setStatusCode(Response_HTTP::HTTP_NOT_FOUND);
             $response->setPage('title', 'Submission Not Found');
             $response->setResponse('articles', array('Error' => array(
                 'title' => 'Submission Not Found',
