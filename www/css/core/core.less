@@ -8476,6 +8476,10 @@ td.name {
         height: 28px;
         margin-top: 0;
     }
+	&.enrolled-subjects {
+		position: static;
+		padding-left: 0;
+	}
 }
 
 .header_option .fade {
@@ -9573,16 +9577,13 @@ table img { max-width: none; }
   #subject-main       { clear: both;
                         position: relative;
   }
-  .current-grade-avg  { width: 57%;
-                        position: absolute;
-                        top: 47px;
-                        right: 0;
-                        background: @dark;
-                        padding: 0 1%;
+  .current-grade-avg  { background: @dark;
+                        padding: 0;
   }
   .grade              { font-size: 64px;
                         font-weight: bold;
   }
+  td .grade 		  { font-size: 2em; }
   .trend              { color: @secondary-text; }
   h1 .aside           { font-weight: normal;
                         font-size: 0.7em;
@@ -9610,7 +9611,9 @@ table img { max-width: none; }
     label             { display: inline; }
   }
   .subject-teachers   { width: 40%;
+	  					float: left;
                         min-height: 75px;
+	  					margin-right: 16px;
   }
   #subject-graph      { height: 250px;
                         margin: 20px 0;
