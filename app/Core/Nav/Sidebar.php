@@ -11,7 +11,7 @@ class Core_Nav_Sidebar {
     private $user;
     private $agenda;
     private $email;
-    private $subjects;
+    private $subjects = array();
     private $groups;
     private $work;
     private $more;
@@ -76,23 +76,13 @@ class Core_Nav_Sidebar {
     public function createSubjectList() {
         try {
             $subjects = $this->user->getSubjects();
-
-            $list = array(array('type' => '__SEPARATOR__', 'value' => 'Your Subjects'));
-
-            if($subjects->count()) {
-                // GENERATE SUBJECT LIST
-                foreach($subjects as $cat) {
-	                /**
-	                 * Don't include categories that don't have a homepage (ie. template == 0)
-	                 * @var $cat GizaCategory
-	                 */
-	                if($cat->get('homepage')->get('template')) {
-	                    $list[] = $this->createSubject($cat);
-	                }
-                }
+            if ($subjects->count()) {
+                $this->subjects = array_merge(
+                    $this->subjects,
+                    array(array('type' => '__SEPARATOR__', 'value' => 'Your Subjects')),
+                    $this->getSubjectsForPopulation($subjects)
+                );
             }
-
-            $this->subjects = $list;
         }
         catch(ErrorException $e) {
             // TODO log this somewhere, it will likely mean synergy is down
@@ -143,26 +133,43 @@ class Core_Nav_Sidebar {
     public function createGroupList() {
         try {
             $groups = $this->user->getGroups();
-
-            $list = array(array('type' => '__SEPARATOR__', 'value' => 'Your Groups'));
-
-            if($groups->count()) {
-                // GENERATE GROUP LIST
-                foreach($groups as $cat) {
-	                /**
-	                 * Don't include categories that don't have a homepage (ie. template == 0)
-	                 * @var $cat GizaCategory
-	                 */
-	                if($cat->get('homepage')->get('template')) {
-		                $list[] = $this->createGroup($cat);
-	                }
-                }
+            if ($groups->count()) {
+                $this->subjects = array_merge(
+                    $this->subjects,
+                    array(array('type' => '__SEPARATOR__', 'value' => 'Your Groups')),
+                    $this->getSubjectsForPopulation($groups)
+                );
             }
-            $this->subjects = array_merge($this->subjects, $list);
         }
         catch(Exception_Schoolbox $e) {
             // TODO log this somewhere, it will likely mean synergy is down
         }
+    }
+
+    /**
+     * Gets list of subjects for population into this object's list of subjects.
+     *
+     * @param GizaCollection $subject_list
+     *
+     * @return array
+     */
+    protected function getSubjectsForPopulation($subject_list) {
+        $list = array();
+        foreach ($subject_list as $cat) {
+            /**
+             * Don't include categories that don't have a homepage (ie. template == 0)
+             * @var $cat GizaCategory
+             */
+            try {
+                $homepage = $cat->get('homepage');
+                $homepage->get('template');
+            }
+            catch (Exception_Schoolbox $ex) {
+                continue;
+            }
+            $list[] = $this->createSubject($cat);
+        }
+        return $list;
     }
 
     public function createGroup(GizaCategory $cat, $items = 'all') {
