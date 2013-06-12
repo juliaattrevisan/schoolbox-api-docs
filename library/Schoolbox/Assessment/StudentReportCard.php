@@ -91,9 +91,10 @@ class StudentReportCard {
 			$this->permissionSet = array(false,false,true,true,true);
 		}
 
-		// if parent of child, all READ permissions enabled
+		// if parent of child, use Cfg::get('restrict_student_submissions') for READ permissions (no WRITE)
 		elseif($this->groupHandler->isParentOfChild($this->targetUserId)) {
-			$this->permissionSet = array(false,false,true,true,true);
+			$allow = \Cfg::get('restrict_student_submissions') ? true : false;
+			$this->permissionSet = array(false,false,$allow,$allow,$allow);
 		}
 
 		// all other cases, no permissions granted

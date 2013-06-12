@@ -52,9 +52,41 @@ $subject = isset($this->arg[3]) ? $this->arg[3] : false;
 
 /* DEFINE HANDLERS - TODO DELETE THIS SECTION */
 $groupHandler = new Group();
+$boxHandler = new Submission();
 
 /* PERMISSIONS CHECKS GO HERE */
 $permission = PERMISSION_DENIED;
+
+// don't run this check if there is no subject selected
+if($subject) {
+	// check student and subject combination matches
+	$subjectArray = $groupHandler->involvedInSubjects($userId);
+	$subjectIdArray = array();
+	foreach($subjectArray as $s) {
+		$subjectIdArray[] = $s['id'];
+	}
+
+	// if the student is enrolled, access is granted
+	if(in_array($subject, $subjectIdArray)) {
+		$permission = PERMISSION_GRANTED;
+	}
+	// if the student is not enrolled, check if they have submitted to the subject
+	else {
+		$catArray = $boxHandler->submittedToCategoryList($userId, $year, $semester);
+		$catIdArray = array();
+		foreach($catArray as $c) {
+			$catIdArray[] = $c['id'];
+		}
+
+		if(in_array($subject, $catIdArray)) {
+			$permission = PERMISSION_GRANTED;
+		}
+	}
+
+	if($permission == PERMISSION_DENIED) {
+		error(19);
+	}
+}
 
 // P0: if you're viewing your own, permission granted
 if($userId == $_SESSION['id']) {
