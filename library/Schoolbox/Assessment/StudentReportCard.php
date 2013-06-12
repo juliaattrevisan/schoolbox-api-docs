@@ -79,9 +79,11 @@ class StudentReportCard {
 	 */
 	protected function establishPermissions() {
 
+		$allowClassAverage = \Cfg::get('display_grade_average');
+
 		// if viewing own, all permissions enabled
 		if($this->viewingUserId == $this->targetUserId) {
-			$this->permissionSet = array(true,true,true,true,true);
+			$this->permissionSet = array(true,true,true,$allowClassAverage,true);
 		}
 
 		// if superuser, all permissions enabled
@@ -91,13 +93,13 @@ class StudentReportCard {
 
 		// if staff, all READ permissions enabled
 		elseif($this->viewingUserId == $this->targetUserId) {
-			$this->permissionSet = array(false,false,true,true,true);
+			$this->permissionSet = array(false,false,true,$allowClassAverage,true);
 		}
 
 		// if parent of child, use Cfg::get('restrict_student_submissions') for READ permissions (no WRITE)
 		elseif($this->groupHandler->isParentOfChild($this->targetUserId)) {
-			$allow = \Cfg::get('restrict_student_submissions') ? true : false;
-			$this->permissionSet = array(false,false,$allow,$allow,$allow);
+			$allowParent = \Cfg::get('restrict_student_submissions') ? false : true;
+			$this->permissionSet = array(false,false,$allowParent,$allowParent && $allowClassAverage,$allowParent);
 		}
 
 		// all other cases, no permissions granted
