@@ -273,23 +273,30 @@ else {
 
 		/* Create page for the currently logged-in user
 		 */
-		$userId = $_SESSION['id'];
+		$userId = $_POST['userId'];
 		$pageId = null;
-		$pageTitle = Scrub::text($_POST['page_title']);
-		$templateId = Scrub::text($_POST['page_template']);
+		$pageTitle = $_POST['page_title'];
+		$templateId = $_POST['page_template'];
 
-		/* Create page and apply components (a page_id is generated)
-		 */
-		$eportfolioHandler = new Eportfolio($userId, $pageId);
-		$eportfolioHandler->createEportfolioFromTemplate($pageTitle, $templateId);
+		$authenticator = new Eportfolio_Authenticator($_SESSION['id'], $userId, null);
 
-		/* Apply permissions to the newly-created page
-		 */
-		Eportfolio\PermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'], $_POST['individual_permission']);
+		if ($authenticator->canCreate()) {
+			/* Create page and apply components (a page_id is generated)
+			 */
+			$eportfolioHandler = new Eportfolio($userId, $pageId);
+			$eportfolioHandler->createEportfolioFromTemplate($pageTitle, $templateId);
 
-		/* Redirect to newly created page
-		 */
-		SitePage::localRedir("/eportfolio/{$eportfolioHandler->getUserId()}/{$eportfolioHandler->getPageId()}");
+			/* Apply permissions to the newly-created page
+			 */
+			Eportfolio\PermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'], $_POST['individual_permission']);
+
+			/* Redirect to newly created page
+			 */
+			SitePage::localRedir("/eportfolio/{$eportfolioHandler->getUserId()}/{$eportfolioHandler->getPageId()}");
+		}
+		else {
+			error(19);
+		}
 	}
 	else {
 		error(2);
