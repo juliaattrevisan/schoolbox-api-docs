@@ -26,6 +26,9 @@ if (is_numeric($_POST['categoryID'])) {
 	if (($permission = $groupHandler->getPermission($_POST['categoryID'])) < READ_ACCESS) {
 		error(19);
 	}
+	if ($groupHandler->hasChildAccessOnly($_POST['categoryID'])) {
+		error(19);
+	}
 
 	$post = array(
 		'userID' => $_SESSION['id'],
@@ -127,6 +130,9 @@ else if (is_numeric($_GET['toggleLock'])) {
 	if ($groupHandler->getPermission($thread['categoryID']) < WRITE_ACCESS) {
 		error(19);
 	}
+	if ($groupHandler->hasChildAccessOnly($thread['categoryID'])) {
+		error(19);
+	}
 
 	$data = array(
 		'threadID' => $thread['threadID'],
@@ -157,6 +163,9 @@ else if (is_numeric($_GET['deleteThread'])) {
 	if ($groupHandler->getPermission($thread['categoryID']) < WRITE_ACCESS) {
 		error(19);
 	}
+	if ($groupHandler->hasChildAccessOnly($thread['categoryID'])) {
+		error(19);
+	}
 
 	$forumHandler->delete($thread['threadID']);
 
@@ -172,6 +181,9 @@ else if (is_array($_POST['deleteThreads'])) {
 			/* check permissions
 			 */
 			if ($groupHandler->getPermission($thread['categoryID']) < WRITE_ACCESS) {
+				error(19);
+			}
+			if ($groupHandler->hasChildAccessOnly($thread['categoryID'])) {
 				error(19);
 			}
 
@@ -204,6 +216,9 @@ else if (is_numeric($_GET['deletePost'])) {
 	if ($post['userID'] != $_SESSION['id'] && $groupHandler->getPermission($thread['categoryID']) < WRITE_ACCESS) {
 		error(19);
 	}
+	if ($groupHandler->hasChildAccessOnly($thread['categoryID'])) {
+		error(19);
+	}
 
 	$pageNumber = $forumHandler->getPageNumber($post['postID']);
 
@@ -211,6 +226,6 @@ else if (is_numeric($_GET['deletePost'])) {
 
 	SitePage::localRedir('/forum/thread/' . $post['threadID'] . '/' . $pageNumber);
 }
-
-print_r($_POST);
-
+else {
+	error(2);
+}

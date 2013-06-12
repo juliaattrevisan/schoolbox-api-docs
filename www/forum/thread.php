@@ -73,8 +73,14 @@ if ($groupHandler->getPermission($category['id']) >= WRITE_ACCESS) {
  */
 $this->setVar('reply_block', '');
 
+$is_post_allowed = !$groupHandler->hasChildAccessOnly($category['id']);
+if (!$is_post_allowed && Cfg::get('restrict_parent_forum_access')) {
+	error(19);
+}
 if (!$threadLocked || $groupHandler->getPermission($category['id']) >= WRITE_ACCESS) {
-	$this->parse('reply_block', 'reply');
+	if ($is_post_allowed) {
+		$this->parse('reply_block', 'reply');
+	}
 }
 
 /* record view
@@ -180,7 +186,9 @@ if (is_array($postList)) {
 		// reply to this post
 		$this->setVar('reply_post_block', '');
 		if (!$threadLocked || $groupHandler->getPermission($category['id']) >= WRITE_ACCESS) {
-			$this->parse('reply_post_block', 'reply_post');
+			if ($is_post_allowed) {
+				$this->parse('reply_post_block', 'reply_post');
+			}
 		}
 
 		$this->parse('post_block', 'post', true);
