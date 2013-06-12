@@ -314,11 +314,14 @@ class News extends DeprecatedModel {
             //
             // Check if this user can moderate any groups, add them to this list
             $campus_list = array();
-            foreach ($userHandler->getAllUserAccess($_SESSION['id']) as $access) {
-                if ($access['service'] == \Schoolbox\UserAccess::SERVICE_NEWS
-                    && $access['type'] >= \Schoolbox\UserAccess::ACCESS_FULL)
-                {
-                    $campus_list[] = $access['sid'];
+            $user_access = $userHandler->getAllUserAccess($_SESSION['id']);
+            if (is_array($user_access)) {
+                foreach ($user_access as $access) {
+                    if ($access['service'] == \Schoolbox\UserAccess::SERVICE_NEWS
+                        && $access['type'] >= \Schoolbox\UserAccess::ACCESS_FULL
+                    ) {
+                        $campus_list[] = $access['sid'];
+                    }
                 }
             }
             if (!empty($campus_list)) {
