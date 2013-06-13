@@ -66,7 +66,7 @@ function readConfig($vars, SitePage $page) {
 
     $component->setup(array('id' => '-1', 'code' => '', 'name' => ''), $component->instance->getConfigArray());
     $component->execute();
-    $component->parseConfig();
+    $component->parseConfigForTemplate();
 
     $page->setVar(array(
         'ID'                        => $vars['cid'],

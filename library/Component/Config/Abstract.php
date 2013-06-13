@@ -13,6 +13,14 @@ abstract class Component_Config_Abstract {
     protected $filterFields = null;
     protected $sortFields = null;
 
+    /**
+     * Does this config option show on templates? Most do, but some don't (e.g.
+     * the source selector)
+     *
+     * @var bool
+     */
+    protected $is_shown_on_template = true;
+
     public function __construct($category = array(), $fields = null) {
         $this->cat = $category;
 
@@ -36,6 +44,15 @@ abstract class Component_Config_Abstract {
             return false;
         }
         return $this->cat;
+    }
+
+    /**
+     * Is this config option shown on templates?
+     *
+     * @return bool
+     */
+    public function isShownOnTemplate() {
+        return $this->is_shown_on_template;
     }
 
     public abstract function parse(SitePage $page, $key, $keyblock, $configValue);
