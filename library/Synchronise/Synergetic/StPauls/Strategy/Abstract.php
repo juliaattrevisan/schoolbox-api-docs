@@ -84,18 +84,11 @@ abstract class Synchronise_Synergetic_StPauls_Strategy_Abstract extends Synchron
 	 */
 	protected function getCampusFromCode($code) {
 
-		/* Not sure what MTH is, or how it comes out via Synergetic.
-		 * I assume it comes out as an M. I've only seen J and S so far.
-		 */
 		switch($code) {
-			case 'F':
-				return 3;
 			case 'J':
 				return 2;
 			case 'S':
-				return 1;
 			default:
-				// return 'S';
 				return 1;
 		}
 	}
