@@ -47,6 +47,9 @@ elseif(isset($_POST['uid']) && isset($_POST['box_id']) && $_POST['markUpdate'] =
                 'mark'      => (!empty($result[0]) ? $result[0]['mark']      : null),
                 'norm_mark' => (!empty($result[0]) ? $result[0]['norm_mark'] : null),
             );
+            if (!isset($return['norm_mark'])) {
+                unset($return['mark'], $return['norm_mark']);
+            }
             $uploaded_file = null;
 
             //
