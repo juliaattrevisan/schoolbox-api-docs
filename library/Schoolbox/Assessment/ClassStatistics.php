@@ -191,9 +191,11 @@ class ClassStatistics {
 
 			if($work['object'] instanceof SubmissionBox) {
 				$title = $work['object']->getName();
+				$visibility = $work['object']->getMarkVisibility();
 			}
 			elseif($work['object'] instanceof OnlineAssessment) {
 				$title = $work['object']->getTitle();
+				$visibility = 2;
 			}
 			else {
 				continue;
@@ -219,7 +221,8 @@ class ClassStatistics {
 				'timestamp' => $stamp * 1000, // millis, for jsgraph
 				'title' => $title,
 				'user_mark' => $mark['mark'],
-				'average_mark' => $avg
+				'average_mark' => $avg,
+				'visibility' => $visibility
 			);
 		}
 

@@ -34,6 +34,7 @@ class StudentReportCard {
 	// 'session' vars
 	protected $viewingUserId;
 	protected $permissionSet = array();
+	protected $minimumVisibility = 3;
 
 	// helpful vars
 	protected $currentYear;
@@ -84,27 +85,32 @@ class StudentReportCard {
 		// if viewing own, all permissions enabled
 		if($this->viewingUserId == $this->targetUserId) {
 			$this->permissionSet = array(true,true,true,$allowClassAverage,true);
+			$this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_STUDENT;
 		}
 
 		// if superuser, all permissions enabled
 		elseif($this->groupHandler->isSuperuser($this->viewingUserId)) {
 			$this->permissionSet = array(true,true,true,true,true);
+			$this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_PRIVATE;
 		}
 
 		// if staff, all READ permissions enabled
-		elseif($this->viewingUserId == $this->targetUserId) {
-			$this->permissionSet = array(false,false,true,$allowClassAverage,true);
+		elseif($this->groupHandler->isStaff($this->viewingUserId)) {
+			$this->permissionSet = array(false,false,true,true,true);
+			$this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_PRIVATE;
 		}
 
 		// if parent of child, use Cfg::get('restrict_student_submissions') for READ permissions (no WRITE)
 		elseif($this->groupHandler->isParentOfChild($this->targetUserId)) {
 			$allowParent = \Cfg::get('restrict_student_submissions') ? false : true;
 			$this->permissionSet = array(false,false,$allowParent,$allowParent && $allowClassAverage,$allowParent);
+			$this->minimumVisibility = SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT;
 		}
 
 		// all other cases, no permissions granted
 		else {
 			$this->permissionSet = array(false,false,false,false,false);
+			$this->minimumVisibility = 3; // max visibility is 2, so this will never be seen
 		}
 	}
 
@@ -357,10 +363,12 @@ class StudentReportCard {
 
 		// split into separate series, and mess around with php's loose typing
 		foreach($data as $stamp => $d) {
-			$averageSeries[] = array($stamp * 1000, sprintf("%0.2f", $d['average_mark']) * 1);
+			if($this->canViewMark($d['visibility'])) {
+				$averageSeries[] = array($stamp * 1000, sprintf("%0.2f", $d['average_mark']) * 1);
 
-			if(!is_null($d['user_mark'])) {
-				$userSeries[] = array($stamp * 1000, sprintf("%0.2f", $d['user_mark']) * 1);
+				if(!is_null($d['user_mark'])) {
+					$userSeries[] = array($stamp * 1000, sprintf("%0.2f", $d['user_mark']) * 1);
+				}
 			}
 		}
 
@@ -571,7 +579,7 @@ class StudentReportCard {
 			$output['WORK_URGENCY']  = 'none';
 		}
 
-		if($marks) {
+		if($marks && $this->canViewMark($box)) {
 			$output['WORK_GRADIENT'] = (int)($marks['mark'] / 10);
 			$output['WORK_GRADE']    = $marks['display_mark'];
 			$output['WORK_COMMENT']  = $marks['comment'];
@@ -730,6 +738,19 @@ class StudentReportCard {
 			foreach($categoryList as $category) {
 				$this->categoriesInSemester[$category['id']] = $category;
 			}
+		}
+	}
+
+	/**
+	 * @param SubmissionBox|int $var
+	 * @return bool
+	 */
+	protected function canViewMark($var) {
+		if($var instanceof SubmissionBox) {
+			return $var->getMarkVisibility() >= $this->minimumVisibility;
+		}
+		else {
+			return $var >= $this->minimumVisibility;
 		}
 	}
 
