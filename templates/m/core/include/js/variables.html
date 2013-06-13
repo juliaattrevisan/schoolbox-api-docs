@@ -78,6 +78,7 @@
     var touchEvent = 'click';
     var clickEnded = 'mouseup';
     if(isEventSupported('touchstart', document)) {
+        clickEvent = 'tap';
         touchEvent = 'touchstart';
     }
 

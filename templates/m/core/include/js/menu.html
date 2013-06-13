@@ -18,10 +18,19 @@
     });
 */
 
-    nav.on(touchEvent, 'a', function(e) {
+    nav.on(clickEvent, 'a', function(e) {
         e.preventDefault();
-        return navigate(this);
+        e.stopImmediatePropagation();
+        navigate(this);
     });
+    //
+    // Listening on tap events? Ignore click events
+    if (clickEvent !== 'click') {
+        nav.on('click', 'a', function(e) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+        });
+    }
 
     /**
      * Explore the navigation
@@ -105,6 +114,9 @@
     // Menu events
     menu.on(clickEvent,'a',function(e){
 
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
         // Get index of clicked link
         mi = $(this).parent().index()
 
@@ -144,7 +156,14 @@
                 renderPage('/m/'+href, true)
             }
         }
-        return false
     });
+    //
+    // Listening on tap events? Ignore click events
+    if (clickEvent !== 'click') {
+        menu.on('click', 'a', function(e) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+        });
+    }
 
 </script>
