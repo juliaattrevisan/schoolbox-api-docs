@@ -176,7 +176,7 @@ localCache.get = function(url) {
 // Browser chrome removal
 function scrollTop(){
     var i = (env.android) ? 1 : 0;
-    setTimeout(scrollTo(0,i),100)
+    setTimeout(function() { scrollTo(0,i) },100)
 }
 
 </script>
