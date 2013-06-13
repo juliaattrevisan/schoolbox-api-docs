@@ -25,6 +25,7 @@
     </div>
     <form action="/submission/allWork/" method="get" class="fade enrolled-subjects">
         <select id="enrolled-subjects">
+          <option disabled="disabled" selected="selected">Subjects</option>
           <!-- BEGIN subject_selector -->
           <option data-id="{ENR_SUBJ_ID}" title="{ENR_SUBJ_CODE}" value="{WORK_USER_ID}/{WORK_YEAR}/{WORK_SEMESTER}/{ENR_SUBJ_ID}" {ENR_SUBJ_SELECTED}>
             {ENR_SUBJ_NAME}
@@ -160,15 +161,21 @@
       show: true
     }
   };
+
   $j(function() {
-    $j.plot($j('#subject-graph'), data, options);
+
+    // ensure there's a graph to plot
+    if($j('#subject-graph').length) {
+      $j.plot($j('#subject-graph'), data, options);
+    }
 
     $j('#enrolled-subjects').bind('change', function () {
-        var url = $j(this).val();
-        if (url) {
+      var url = $j(this).val();
+      if (url) {
         window.location = '/submission/allWork/' + url;
-    }
-    return false;
+      }
+      return false;
     });
+
   });
 </script>

@@ -60,7 +60,7 @@ $permission = PERMISSION_DENIED;
 // don't run this check if there is no subject selected
 if($subject) {
 	// check student and subject combination matches
-	$subjectArray = $groupHandler->involvedInSubjects($userId);
+	$subjectArray = $groupHandler->involvedInCategoryList($userId);
 	$subjectIdArray = array();
 	foreach($subjectArray as $s) {
 		$subjectIdArray[] = $s['id'];
@@ -120,6 +120,14 @@ $report->setSemester($year, $semester);
 
 if($subject) {
 	$report->setSubject($subject);
+}
+else {
+	$this->setVar(array(
+		'GRAPH_JSON' => '{}',
+		'GRAPH_COLOURS' => '{}',
+		'GRAPH_XMIN' => '0',
+		'GRAPH_XMAX' => '0'
+	));
 }
 
 /* At this point you don't HAVE to render() - if you want it in a different format,
