@@ -35,9 +35,6 @@ class Facade_Component_SchoolEvents extends Facade_Component_Generic {
             if($e->getStartTime() instanceof Alaress_Date_Format) {
                 $e->setStartTime($e->getStartTime()->getTimeOnly());
             }
-            if($e->getDate() instanceof Alaress_Date_Format) {
-                $e->setDate($e->getDate()->getDateOnly());
-            }
         }
 
         return array(
