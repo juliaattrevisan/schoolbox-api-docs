@@ -105,6 +105,9 @@
     // Menu events
     menu.on(clickEvent,'a',function(e){
 
+        event.preventDefault();
+        event.stopPropagation();
+
         // Get index of clicked link
         mi = $(this).parent().index()
 
