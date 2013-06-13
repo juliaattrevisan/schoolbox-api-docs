@@ -60,7 +60,7 @@ $permission = PERMISSION_DENIED;
 // don't run this check if there is no subject selected
 if($subject) {
 	// check student and subject combination matches
-	$subjectArray = $groupHandler->involvedInSubjects($userId);
+	$subjectArray = $groupHandler->involvedInCategoryList($userId);
 	$subjectIdArray = array();
 	foreach($subjectArray as $s) {
 		$subjectIdArray[] = $s['id'];
