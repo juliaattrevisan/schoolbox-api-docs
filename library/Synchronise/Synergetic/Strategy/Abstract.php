@@ -21,7 +21,7 @@ abstract class Synchronise_Synergetic_Strategy_Abstract implements Synchronise_S
 	protected $performUpdate = false;
 	protected $list = null;
 	protected $strategyTitle = '';
-	protected $verbose = true;
+	protected $verboseFilter = true;
 
 	/**
 	 * Constructor
@@ -131,7 +131,7 @@ abstract class Synchronise_Synergetic_Strategy_Abstract implements Synchronise_S
 	/**
 	 * Get the Group handler
 	 *
-	 * @return
+	 * @return Group
 	 */
 	protected function getGroupHandler() {
 		return $this->groupHandler;

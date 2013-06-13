@@ -50,12 +50,13 @@ class Synchronise_Synergetic_StPauls_Strategy_Student extends Synchronise_Synerg
 		$newUser['title'] = '';
 		$newUser['firstname'] = $currentUser['StudentPreferred'];
 		$newUser['lastname'] = $currentUser['StudentSurname'];
-	        $newUser['alt_email'] = $currentUser['StudentEmail'];
-	        $newUser['synergy_id'] = $currentUser['StudentID'];
-	        $newUser['local_email'] = 1;
-	        $newUser['eportfolio_enabled'] = 1;
+		$newUser['alt_email'] = $currentUser['StudentEmail'];
+		$newUser['synergy_id'] = $currentUser['StudentID'];
+		$newUser['local_email'] = 1;
+		$newUser['eportfolio_enabled'] = 1;
 		$findArray = array(' ', '-');
 		$replaceArray = array('', '');
+
 		if(strlen(trim($newUser['username']))==0){
 			$newUser['username'] = strtolower(substr($newUser['firstname'],0,1).str_replace($findArray,$replaceArray,$newUser['lastname']));
 		}
