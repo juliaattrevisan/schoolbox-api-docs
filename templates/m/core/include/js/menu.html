@@ -18,10 +18,19 @@
     });
 */
 
-    nav.on(touchEvent, 'a', function(e) {
+    nav.on(clickEvent, 'a', function(e) {
         e.preventDefault();
-        return navigate(this);
+        e.stopImmediatePropagation();
+        navigate(this);
     });
+    //
+    // Listening on tap events? Ignore click events
+    if (clickEvent !== 'click') {
+        nav.on('click', 'a', function(e) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+        });
+    }
 
     /**
      * Explore the navigation
@@ -148,5 +157,13 @@
             }
         }
     });
+    //
+    // Listening on tap events? Ignore click events
+    if (clickEvent !== 'click') {
+        menu.on('click', 'a', function(e) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+        });
+    }
 
 </script>
