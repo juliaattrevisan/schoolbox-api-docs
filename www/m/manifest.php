@@ -23,7 +23,9 @@ $includes = array(
     '/../templates/core/include/js/variables.html'
 );
 foreach($includes as $file){
-    $hashes .= md5_file('.'.$file);
+    if (is_readable('.'.$file)) {
+        $hashes .= md5_file('.'.$file);
+    }
 }
 
 $files = array(
@@ -44,8 +46,10 @@ $files = array(
 
 echo "\nCACHE:\n";
 foreach($files as $file){
-    echo $file . "\n";
-    $hashes .= md5_file('.'.$file);
+    if (is_readable('.'.$file)) {
+        echo $file . "\n";
+        $hashes .= md5_file('.'.$file);
+    }
 }
 
 echo "\nFALLBACK:\n";
@@ -58,4 +62,3 @@ echo "\n# " . md5($hashes) . "\n";
 
 // FOR TESTING. Ensures we'll get an appcache update (every minute).
 //echo '# ' . date("n/j/Y h:i");
-?>
