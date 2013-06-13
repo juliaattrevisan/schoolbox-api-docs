@@ -90,7 +90,7 @@ class Synchronise_Synergetic_StPauls_Strategy_Parent extends Synchronise_Synerge
 			if (($user['title'] != $currentParent['Title']) || ($user['firstname'] != $currentParent['Preferred']) || ($user['lastname'] != $currentParent['Surname']) || ($user['alt_email'] != $preferredEmail)) {
 
 				$updatedUser['id'] = $user['uid'];
-		                $updatedUser['username'] = $user['username'];
+				$updatedUser['username'] = $user['username'];
 				$updatedUser['title'] = trim($currentParent['Title']);
 				$updatedUser['firstname'] = trim($currentParent['Preferred']);
 				$updatedUser['lastname'] = trim($currentParent['Surname']);

@@ -51,14 +51,17 @@ class Synchronise_Synergetic_StPauls_Strategy_Staff extends Synchronise_Synerget
 		$newUser['title'] = $currentUser['StaffTitle'];
 		$newUser['firstname'] = $currentUser['StaffPreferredName'];
 		$newUser['lastname'] = $currentUser['StaffSurname'];
-	        $newUser['synergy_id'] = $currentUser['StaffID'];
+		$newUser['synergy_id'] = $currentUser['StaffID'];
 		$newUser['alt_email'] = '';
-	        $newUser['local_email'] = 1;
+		$newUser['local_email'] = 1;
+
 		$findArray = array(' ', '-');
-                $replaceArray = array('', '');
-                if(strlen(trim($newUser['username']))==0){
-                        $newUser['username'] = strtolower(substr($newUser['firstname'],0,1).str_replace($findArray,$replaceArray,$newUser['lastname']));
-                }
+		$replaceArray = array('', '');
+
+		if(strlen(trim($newUser['username'])) == 0) {
+			$newUser['username'] = strtolower(substr($newUser['firstname'],0,1).str_replace($findArray,$replaceArray,$newUser['lastname']));
+		}
+
 		/* Campus config: needs to map to a campus id
 		 */
 		$newUser['defaultCampus'] = $this->getCampusFromCode($currentUser['StaffCampus']);
@@ -85,7 +88,6 @@ class Synchronise_Synergetic_StPauls_Strategy_Staff extends Synchronise_Synerget
 
 		foreach($this->getList() as $currentUser) {
 
-
 			/* Generate details about the new user
 			 */
 			$newUser = $this->setupUserDetails($currentUser);
@@ -106,7 +108,6 @@ class Synchronise_Synergetic_StPauls_Strategy_Staff extends Synchronise_Synerget
 
     //Converts Synergetic StaffCategoryType to admin or teacher group
     protected function getGroupIDFromCategory($category) {
-
         if($category == 'TEACHER')
             return self::TEACH_GROUP_ID;
         else
