@@ -303,7 +303,6 @@ class Digest_News {
      * * error:    if there was an error or not (and what it was if so)
      */
     protected function sendEmail($u) {
-
         // do nothing if there's no email address
         if(!trim($u['email'])) {
             return array(
@@ -332,6 +331,8 @@ class Digest_News {
         $mailer->setBlock('activity', 'activity_nolink', 'activity_nolink_block');
 
         $mailer->setVar('NAME', $u['firstname']);
+		$mailer->setVar('SITE_NAME',  Cfg::get('school_name'));
+		$mailer->setVar('TEMPLATE_YEAR',  date('Y'));
 
         $newsFlag = false;
 
