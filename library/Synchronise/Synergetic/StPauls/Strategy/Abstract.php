@@ -131,18 +131,7 @@ abstract class Synchronise_Synergetic_StPauls_Strategy_Abstract extends Synchron
 	*/
 
 	protected function getHouseFromCode($house) {
-		switch ($house) {
-			case 'Da':
-				return 1;
-			case 'Fo':
-				return 2;
-			case 'Oa':
-				return 3;
-			case 'Th':
-				return 4;
-			default:
-				return false;
-                }
+		return false; // StPauls does not have houses registered
 	}
 
 	/**
