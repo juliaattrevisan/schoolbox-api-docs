@@ -101,6 +101,8 @@ abstract class Synchronise_Synergetic_StPauls_Strategy_Abstract extends Synchron
 	 */
 	protected function getGroupIDFromYearLevel($year) {
 		switch ($year) {
+			case '30':
+			case '40':
 			case '0':
 			case '1':
 			case '2':
@@ -108,14 +110,14 @@ abstract class Synchronise_Synergetic_StPauls_Strategy_Abstract extends Synchron
 			case '4':
 			case '5':
 			case '6':
-				return 5;
+				return 3;
 			case '7':
 			case '8':
 			case '9':
 			case '10':
 			case '11':
 			case '12':
-				return 3;
+				return 6;
 			default:
 				return false;
 		}
