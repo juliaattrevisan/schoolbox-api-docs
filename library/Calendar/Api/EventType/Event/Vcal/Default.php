@@ -199,7 +199,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 				/* Parse it all
 				 */
 				try {
-					$allEvents = Sabre_VObject_Reader::read($source);
+					$allEvents = Sabre\VObject\Reader::read($source);
 				}
 				catch(Exception $e) {
 
@@ -217,7 +217,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 						 * We only want to deal with Sabre_VObject_Component_VEvent objects
 						 * as they seem to be the calendar items themselves
 						 */
-						if ($currentEvent instanceof Sabre_VObject_Component_VEvent) {
+						if ($currentEvent instanceof Sabre\VObject\Component\VEvent) {
 							$eventStartTimestamp = strtotime($currentEvent->DTSTART->value);
 							$eventEndTimestamp = strtotime($currentEvent->DTEND->value);
 
