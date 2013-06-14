@@ -1160,7 +1160,7 @@ Notifications
     ul{
       width: 49.99%;
       float: left;
-      li:nth-child(even){ background: #fafafa; }
+      li:nth-child(even){ background: @dark; }
     }
   }
   .contact-info{
@@ -1174,9 +1174,10 @@ Notifications
       border-bottom: 1px solid @border-color;
       padding: 7px 0px;
       height: 32px;
-      color: #000;
+      color: @body-text;
       &:hover{
-        background-color: #e9f6ff;
+        background-color: @button-hov;
+        color: @link;
         text-decoration: none;
       }
     }
