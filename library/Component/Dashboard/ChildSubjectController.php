@@ -60,6 +60,9 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 				if ($authenticator->canView()) {
 					$this->parse('eportfolio_block', 'eportfolio');
 				}
+				else {
+					$this->setVar('eportfolio_block', '');
+				}
 
                 $this->parse("student_subjects", "student_block", true);
                 $this->setVar('subject_item', '');
