@@ -8079,6 +8079,7 @@ ul.submission-list {
         }
     }
     li {
+        overflow: hidden;
         position: relative;
         padding: 0 !important;
         vertical-align: middle;
@@ -8128,7 +8129,10 @@ ul.submission-list {
         max-width: 32px;
         max-height: 32px;
     }
-    span.grade {
+    span.grade, .grade a.grade {
+        margin-right: 0;
+        border: none;
+        z-index: 2;
         position: absolute;
         top: 0;
         right: 0;
@@ -8138,7 +8142,7 @@ ul.submission-list {
         font-size: 0.8em;
         span {
             display: block;
-            font-size: 1.6em;
+            font-size: 3.5em;
             line-height: 1;
             font-weight: bold;
         }
@@ -8260,17 +8264,22 @@ td.name {
 // Brace yourself - loop for the index of colorX, outputting a the class 'gradient-index' each time, adding the rules for 'color'
 .colorX (@index) when (@index > 0) {
     (~".gradient-@{index}") { .color(@index); }
+    (~".gradient-@{index}-bg") { .colorbg(@index); }
     .colorX(@index - 1);
 }
 // final iteration
 .colorX (0) {
   (~".gradient-0") { .color(0); }
+  (~".gradient-0-bg") { .colorbg(0); }
 }
 
 .color (@index) {
     color: spin(#BB0000, @index * 10);
+}
+.colorbg (@index) {
     background: spin(#FFEEEE, @index * 10);
 }
+
 .colorX(10);
 
 .no-bg {

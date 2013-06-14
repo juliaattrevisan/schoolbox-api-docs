@@ -1,11 +1,11 @@
 <li class="{DARK} {SUBJ_HAS_GRADE}">
-    <span class="grade">
+    <a class="grade" href="/submission/allWork/">
         <span class="gradient-{SUBJ_GRADEIANT}">{SUBJ_GRADE}</span>
         <!-- BEGIN trend -->
         {SUBJ_TREND_AMT} {SUBJ_TREND_DIR}
         <!-- END trend -->
-    </span>
-    <a class="subject to-subject left-bar" href="{SUBJ_SUBJECT_URL}">
+    </a>
+    <a class="listlink subject to-subject left-bar" href="{SUBJ_SUBJECT_URL}">
         <!-- BEGIN icon -->
 <!--
         <span class="avatar">
@@ -18,12 +18,12 @@
     </a>
     <!-- BEGIN teacher -->
     <div class="profile teacher left-bar">
-      <a href="/search/user/{SUBJ_TEACHER_ID}" class="teacher-profile">
+      <a href="/search/user/{SUBJ_TEACHER_ID}" class="listlink teacher-profile">
         <img src="{SUBJ_TEACHER_AVATAR}" title="{SUBJ_TEACHER_AVATAR_TITLE}" alt="{SUBJ_TEACHER_AVATAR_TITLE}" />
         <span class="name">{SUBJ_TEACHER_NAME}</span>
         <span class="role">Teacher</span>
       </a>
-      <a class="mail-teacher" href="{SUBJ_TEACHER_URL}">Mail</a>
+      <a class="listlink mail-teacher" href="{SUBJ_TEACHER_URL}">Mail</a>
     </div>
     <!-- END teacher -->
 </li>
