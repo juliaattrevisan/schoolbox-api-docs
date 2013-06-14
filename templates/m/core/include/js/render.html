@@ -39,11 +39,15 @@
                     if (v.items){ menu += ' class="parent"' }
                     menu += '>'
                     if (v.href) {
+                        var rel = '';
+                        if (v.rel) {
+                            rel = ' rel="'+ v.rel+'"';
+                        }
                         if(v.id) {
-                            menu += '<a id="' + v.id + '" href="' + v.href + '">';
+                            menu += '<a id="' + v.id + '" href="' + v.href + '"'+rel+'>';
                         }
                         else {
-                            menu += '<a href="'+ v.href +'">'
+                            menu += '<a href="'+ v.href +'"'+rel+'>';
                         }
 
                     } else { menu += '<h3>' }
