@@ -308,7 +308,7 @@ foreach ($categoryList as $category) {
                     $emailAddress = $emailObj->formatEmailFromArray($teacher);
 
                     $teacherOutput[] = array(
-                        'id' => 0,
+                        'id' => $teacher['uid'],
                         'name' => $teacherName,
                         'email' => $_SESSION['mailhandle'] . $emailAddress,
                         'synid' => $teacherSynID,
@@ -401,6 +401,7 @@ foreach ($categoryList as $category) {
         if (isset($teacherOutput) && count($teacherOutput)) {
             foreach ($teacherOutput as $teacher) {
                 $tOutput = array(
+	                'SUBJ_TEACHER_ID' => $teacher['id'],
                     'SUBJ_TEACHER_NAME' => $teacher['name'],
                     'SUBJ_TEACHER_URL' => $teacher['email'],
                     'SUBJ_TEACHER_ROLE' => 'Teacher',
