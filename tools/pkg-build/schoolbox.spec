@@ -120,7 +120,7 @@ cp -a tools/logrotate/* %{buildroot}%{_sysconfdir}/logrotate.d
 rm -rf tools/logrotate
 
 # Install submodules using composer
-tools/composer.sh
+tools/composer.sh --no-dev
 
 cp -a tools %{buildroot}%{_datadir}/%{name}
 
