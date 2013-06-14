@@ -337,12 +337,14 @@ class Core_Nav_Sidebar {
             array(
                 'id'    => 'switch',
                 'value' => 'Switch to Desktop',
-                'href'  => '/switch.php?v=desktop'
+                'href'  => '/switch.php?v=desktop',
+                'rel'   => 'alternate',
             ),
             array(
                 'id'    => 'logout',
                 'value' => 'Logout',
-                'href'  => 'core/auth/logout'
+                'href'  => 'core/auth/logout',
+                'rel'   => 'alternate',
             ),
         );
     }
