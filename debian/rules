@@ -54,7 +54,7 @@ override_dh_install:
 	rm -fR sql/modules/mobile
 	## End Mobile Module
 	# Install submodules using composer
-	tools/composer.sh
+	tools/composer.sh --no-dev
 	# Only package the cronjobs for this package
 	tools/pkg-remove-other-crons.sh schoolbox
 	# Remove non-deployable files and folders
