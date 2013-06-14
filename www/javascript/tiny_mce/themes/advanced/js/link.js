@@ -13,8 +13,10 @@ var LinkDialog = {
 
 		// Setup browse button
 		document.getElementById('hrefbrowsercontainer').innerHTML = getBrowserHTML('hrefbrowser', 'href', 'file', 'theme_advanced_link');
-		if (isVisible('hrefbrowser'))
-			document.getElementById('href').style.width = '180px';
+        document.getElementById('fileuploadcontainer').innerHTML = getUploadHTML('fileupload','href','upload','theme_advanced_upload');
+
+        if (isVisible('hrefbrowser'))
+			document.getElementById('href').style.width = '154px';
 
 		this.fillClassList('class_list');
 		this.fillFileList('link_list', 'tinyMCELinkList');
