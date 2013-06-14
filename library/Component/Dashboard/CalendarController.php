@@ -61,6 +61,12 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
 
 		$this->eventList = $composite->getEvents($this->start->getUnixTimestamp(), $this->end->getUnixTimestamp());
 
+		/* Today's date (default set so no {VARIABLES} show when there's no events)
+		 */
+		$this->setVar(array(
+			'DATE' => $now->getUsingFormat('l jS F')
+		));
+
 		return true;
 	}
 
