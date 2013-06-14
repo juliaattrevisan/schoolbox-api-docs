@@ -25,25 +25,27 @@
           var win = tinyMCEPopup.getWindowArg("window"),
               input = tinyMCEPopup.getWindowArg("input"),
               src = win.document.getElementById(input),
-              url = '/storage/image.php?size=maxsize&hash='+matched[1].toString();
+              url = '/storage/'+(input=='href'?'fetch':'image')+'.php?size=maxsize&hash='+matched[1].toString();
 
           src.value = url;
 
-          if (win.ImageDialog) {
+          if(input = 'src') {
+            if (win.ImageDialog) {
 
-            if (win.ImageDialog.getImageData) {
-              win.ImageDialog.getImageData();
+              if (win.ImageDialog.getImageData) {
+                win.ImageDialog.getImageData();
+              }
+
+              if (win.ImageDialog.showPreviewImage) {
+                win.ImageDialog.showPreviewImage(url);
+              }
+
+            } else if (win.document.getElementById('width')) {
+              win.document.getElementById('width').value = 425;
+              win.document.getElementById('height').value = 350;
+              win.document.getElementById('constrain').checked = true;
+              win.window.Media.preview();
             }
-
-            if (win.ImageDialog.showPreviewImage) {
-              win.ImageDialog.showPreviewImage(url);
-            }
-
-          } else if (win.document.getElementById('width')) {
-            win.document.getElementById('width').value = 425;
-            win.document.getElementById('height').value = 350;
-            win.document.getElementById('constrain').checked = true;
-            win.window.Media.preview();
           }
 
           tinyMCEPopup.close();
