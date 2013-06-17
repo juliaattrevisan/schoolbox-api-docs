@@ -19,7 +19,7 @@ require_once('constants.php');
 register_shutdown_function('shutdown_safely');
 
 /* Set include path */
-set_include_path('.' . PATH_SEPARATOR . SITE_root . PATH_SEPARATOR . SITE_root . '/include/PEAR' . PATH_SEPARATOR . get_include_path());
+set_include_path('.' . PATH_SEPARATOR . SITE_root . PATH_SEPARATOR . get_include_path());
 
 /* Load the Autoloader */
 require_once dirname(__FILE__) . '/Autoloader.php';
