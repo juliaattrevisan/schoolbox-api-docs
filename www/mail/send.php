@@ -61,24 +61,29 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 		$query = "SELECT username, local_email, alt_email FROM user WHERE id = $to";
 		$toemail = $db->dbGetSingleRow($query);
 
-		if($toemail['alt_email'])
-			$to = $toemail['alt_email'];
-		else if($user['local_email'] || Cfg::get('site_location') == 'wenona')
-			$to = $toemail['username']."@".Cfg::get('mail_address');
-		else
+		if ($toemail['alt_email']) {
+			$mail->addTo($toemail['alt_email']);
+		}
+		elseif ($user['local_email'] || Cfg::get('site_location') == 'wenona') {
+			$mail->addTo($toemail['username']."@".Cfg::get('mail_address'));
+		}
+		else {
 			error(43);
+		}
 	}
-
-	//if emails have ; seperator account for it
-	$to = str_replace(";",",",$to);
-
+	else {
+		//if emails have ; seperator account for it
+		$to = str_replace(";",",",$to);
+		foreach (Mailer::parseAddressString($to) as $address => $name) {
+			$mail->addTo($address, $name);
+		}
+	}
 
 	//check if its got no to address but has either cc or bcc
 	//put the users email in the to field
 	if (!stristr($to,'@') && ($bcc || $cc)) {
-		$to = '"'.$to.'" <'.$user['username'].'@'.Cfg::get('mail_address').'>';
+		$mail->addTo($user['username'].'@'.Cfg::get('mail_address'), $to);
 	}
-	$mail->addTo($to);
 
 	//fix qoute escapes
 	if (get_magic_quotes_gpc())
@@ -92,12 +97,16 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 
 	if (strrchr($cc, '@')) {
 		$cc = str_replace(";",",",$cc);
-		$mail->addCc($cc);
+		foreach (Mailer::parseAddressString($cc) as $address => $name) {
+			$mail->addCc($address, $name);
+		}
 	}
 
 	if (strrchr($bcc, '@')) {
 		$bcc = str_replace(";",",",$bcc);
-		$mail->addBcc($bcc);
+		foreach (Mailer::parseAddressString($bcc) as $address => $name) {
+			$mail->addBcc($address, $name);
+		}
 	}
 
 	$mail->setBody(strip_tags($message), null, 'utf-8');
