@@ -34,13 +34,6 @@ class Mailer {
     public $t_label = 'tplBODY';
 
     /**
-     * Recipient of email
-     *
-     * @var string
-     */
-    public $to = '';
-
-    /**
      * Instance of mail transporter.
      *
      * @var Swift_Transport
@@ -84,13 +77,12 @@ class Mailer {
 
     function setTo ($to) {
         if ( is_array($to) ) {
-
             if ( $to['email'] ) {
                 if ( $to['name'] ) {
-                    $this->to = $to['name'] . ' <' . $to['email'] . '>';
+                    $this->email->addTo($to['email'], $to['name']);
                 }
                 else {
-                    $this->to = $to['email'];
+                    $this->email->addTo($to['email']);
                 }
             }
             else {
@@ -98,20 +90,17 @@ class Mailer {
                 $this->to = '';
                 foreach ( $to as $email ) {
                     if ( $email['name'] ) {
-                        $this->to .= $email['name'] . ' <' . $email['email'] . '>,';
+                        $this->email->addTo($email['email'], $email['name']);
                     }
                     else {
-                        $this->to .= $email['email'] . ',';
+                        $this->email->addTo($email['email']);
                     }
                 }
-                $this->to = substr($this->to, 0, -1); //remove trailing ,
             }
         }
         else {
-            $this->to = $to;
+            $this->email->setTo(self::parseAddressString($to));
         }
-
-        $this->headers['To'] = $to;
     }
 
     function setSubject ($subject) {
