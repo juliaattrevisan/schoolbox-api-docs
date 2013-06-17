@@ -42,6 +42,8 @@ class Mailer {
 
     function Mailer ($template, $subject = "", $to = "", $host = '') {
 
+	    $this->email = new Swift_Message();
+
         //setup header
         $this->setFrom(Cfg::get('mail_from_address'), Cfg::get('mail_from_name'));
         $this->headers['MessageID'] = '<' . md5(mktime()) . '@lektecmailer>';
@@ -60,8 +62,6 @@ class Mailer {
         else {
             $this->template->set_var('SITE_DOMAIN', $_SERVER['HTTP_HOST']);
         }
-
-        $this->email = Swift_Message::newInstance();
     }
 
     function setFrom ($email, $name = "") {
@@ -104,7 +104,7 @@ class Mailer {
     }
 
     function setSubject ($subject) {
-        $this->headers['Subject'] = $subject;
+        $this->email->setSubject($subject);
     }
 
     function loadTemplate ($file) {
