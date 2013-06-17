@@ -42,7 +42,7 @@ class Mailer {
 
     function Mailer ($template, $subject = "", $to = "", $host = '') {
 
-	    $this->email = new Swift_Message();
+        $this->email = new Swift_Message();
 
         //setup header
         $this->setFrom(Cfg::get('mail_from_address'), Cfg::get('mail_from_name'));
@@ -64,15 +64,14 @@ class Mailer {
         }
     }
 
-    function setFrom ($email, $name = "") {
-        if ( $name ) {
-            $this->headers['From'] = $name . ' <' . $email . '>';
-            $this->headers['Return-Path'] = $email;
+    function setFrom($email, $name = "") {
+        if ($name) {
+            $this->email->setFrom($email, $name);
         }
         else {
-            $this->headers['From'] = $email;
-            $this->headers['Return-Path'] = $email;
+            $this->email->setFrom($email);
         }
+        $this->email->setReturnPath($email);
     }
 
     function setTo ($to) {
