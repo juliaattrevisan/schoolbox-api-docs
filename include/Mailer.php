@@ -40,6 +40,13 @@ class Mailer {
      */
     public $to = '';
 
+    /**
+     * Instance of mail transporter.
+     *
+     * @var Swift_Transport
+     */
+    protected static $transport;
+
     function Mailer ($template, $subject = "", $to = "", $host = '') {
 
         //setup header
@@ -185,20 +192,40 @@ class Mailer {
 
         //
         // create transport and send email
-        if(Cfg::get('mail_smtp_host') && Cfg::get('mail_smtp_port') ){
-            $transport = new Swift_SmtpTransport(Cfg::get('mail_smtp_host'), Cfg::get('mail_smtp_port'));
-            $transport->setLocalDomain(Cfg::get('site_hostname').'.'.Cfg::get('site_domain'));
+        try {
+            Swift_Mailer::newInstance(self::getSwiftTransport())->send($this->email);
         }
-        else {
-            $transport = new Swift_MailTransport();
+        catch (Exception $ex) {
+            return false;
         }
-        $mail   = new Swift_Mailer($transport);
-        $return = $mail->send($this->email);
+        return true;
+    }
 
-        // prevent memory leak
-        unset($mail);
-
-        return $return;
+    /**
+     * Creates a Swift mailer transport instance, or gets last one created if it
+     * has already been created.
+     *
+     * The exact transport used depends on configuration settings - if a SMTP
+     * host and port are configured, it returns a Swift_SmtpTransport, otherwise
+     * a Swift_MailTransport object.
+     *
+     * @return Swift_Transport
+     */
+    public static function getSwiftTransport() {
+        if (!(self::$transport instanceof Swift_Transport)) {
+            if (Cfg::get('mail_smtp_host') && Cfg::get('mail_smtp_port') ){
+                self::$transport = new Swift_SmtpTransport(
+                    Cfg::get('mail_smtp_host'), Cfg::get('mail_smtp_port')
+                );
+                self::$transport->setLocalDomain(
+                    Cfg::get('site_hostname').'.'.Cfg::get('site_domain')
+                );
+            }
+            else {
+                self::$transport = new Swift_MailTransport();
+            }
+        }
+        return self::$transport;
     }
 
 }
