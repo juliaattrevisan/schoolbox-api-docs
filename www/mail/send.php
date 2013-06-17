@@ -6,12 +6,7 @@
 ************************************************************/
 //outputs form to get users mail details and processes the information
 
-//require_once("../include/session.php");
-//require_once("../include/include.php");
-
-require_once("../../include/SitePage.php");
-require_once('Mail.php');
-require_once('Mail/mime.php');
+require_once __DIR__."/../../include/Bootstrap.php";
 
 $page = new SitePage();
 
@@ -31,13 +26,16 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 
 	$name = $userHandler->formatName($user);
 
+	$mail = new Swift_Message();
+
 	/* Validate From email address
 	 */
 	if (strlen($user['alt_email'])) {
 		$email = new Email($user['alt_email']);
 
 		if ($email->isValid()) {
-			$from_email = $name.'<'.$user['alt_email'].'>';
+			$mail->addFrom($user['alt_email'], $name);
+			$mail->addReplyTo($user['alt_email'], $name);
 		}
 		else {
 			error(42);
@@ -47,7 +45,8 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 		$email = new Email($user['username'] . '@' . Cfg::get('mail_address'));
 
 		if ($email->isValid()) {
-			$from_email = $name . '<' . $email->getEmail() . '>';
+			$mail->addFrom($email->getEmail(), $name);
+			$mail->addReplyTo($email->getEmail(), $name);
 		}
 		else {
 			error(42);
@@ -76,10 +75,10 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 
 	//check if its got no to address but has either cc or bcc
 	//put the users email in the to field
-	if( !stristr($to,'@') && ( $bcc || $cc) )
-	{
+	if (!stristr($to,'@') && ($bcc || $cc)) {
 		$to = '"'.$to.'" <'.$user['username'].'@'.Cfg::get('mail_address').'>';
 	}
+	$mail->addTo($to);
 
 	//fix qoute escapes
 	if (get_magic_quotes_gpc())
@@ -89,28 +88,20 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 	}
 
 	//create email header
-	$headers = 	array(	'To' 		=> $to,
-						'From' 		=> $from_email,
-						'Subject'   => $subject,
-						'Reply-To'	=> $from_email,
-						);
-
-	$message = new Swift_Message();
-	$message->addTo($to);
+	$mail->setSubject($subject);
 
 	if (strrchr($cc, '@')) {
 		$cc = str_replace(";",",",$cc);
-		$message->addCc($cc);
-		$headers['Cc'] = $cc;
+		$mail->addCc($cc);
 	}
 
 	if (strrchr($bcc, '@')) {
 		$bcc = str_replace(";",",",$bcc);
-		$message->addBcc($bcc);
+		$mail->addBcc($bcc);
 	}
 
-	$message->setBody(strip_tags($message), null, 'utf-8');
-	$message->addPart($message, 'text/html', 'utf-8');
+	$mail->setBody(strip_tags($message), null, 'utf-8');
+	$mail->addPart($message, 'text/html', 'utf-8');
 
 	if (is_array($_FILES)) {
 		foreach ($_FILES["file"]["error"] as $key => $error) {
@@ -118,17 +109,13 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 				$attach = Swift_Attachment::fromPath($_FILES['file']['tmp_name'][$key]);
 				$attach->setFilename($_FILES['file']['name'][$key]);
 				$attach->setContentType($_FILES['file']['type'][$key]);
-				$message->attach($attach);
+				$mail->attach($attach);
 			}
 		}
 	}
 
-	foreach ($headers as $name => $value) {
-		$message->getHeaders()->addTextHeader($name, $value);
-	}
-
 	try {
-		Swift_Mailer::newInstance(Mailer::getSwiftTransport())->send($message);
+		Swift_Mailer::newInstance(Mailer::getSwiftTransport())->send($mail);
 	}
 	catch (Exception $ex) {
 		error(9, $ex->getMessage());
