@@ -1,23 +1,49 @@
 <?php
 
-/************************************************************
- *                                                           *
- *         Copyright (c) 2006 Lektec Consulting                *
- *                                                           *
- ************************************************************/
+/**
+ * Wrapper for a PHPLib template object and a mailer class.
+ */
 
-require_once( 'Mail.php' );
-require_once( 'Mail/mail.php' );
-require_once( 'Mail/mime.php' );
-require_once( dirname(__FILE__) . '/Template.php' );
-require_once( dirname(__FILE__) . '/Config.php' );
+//require_once( 'Mail.php' );
+//require_once( 'Mail/mail.php' );
+//require_once( 'Mail/mime.php' );
+//require_once( dirname(__FILE__) . '/Template.php' );
+//require_once( dirname(__FILE__) . '/Config.php' );
 
 class Mailer {
+
+	/**
+	 * Template object which is used to render the page
+	 *
+	 * @var Template
+	 */
+	protected $template;
+
+	/**
+	 * List of headers that are added to the email that is sent.
+	 *
+	 * @var array
+	 */
+	protected $headers = array();
+
+	/**
+	 * The mailer object
+	 *
+	 * @var Mail_mime
+	 */
+	protected $email;
+
+	/**
+	 * Template label
+	 *
+	 * @var string
+	 */
+	public $t_label = 'tplBODY';
 
     function Mailer ($template, $subject = "", $to = "", $host = '') {
 
         //setup header
-        $this->headers = '';
+//        $this->headers = '';
         $this->setFrom(Cfg::get('mail_from_address'), Cfg::get('mail_from_name'));
         $this->headers['MessageID'] = '<' . md5(mktime()) . '@lektecmailer>';
 
@@ -26,7 +52,6 @@ class Mailer {
 
         //setup HTML template
         $this->template = new Template( Config::get('template_dir') );
-        $this->t_label = "tplBODY";
         $this->loadTemplate($template);
 
         //setup defaults
