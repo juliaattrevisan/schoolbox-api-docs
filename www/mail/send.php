@@ -95,49 +95,44 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 						'Reply-To'	=> $from_email,
 						);
 
-	$recipients['To'] = $to;
+	$message = new Swift_Message();
+	$message->addTo($to);
 
-	if(strrchr($cc, '@'))
-	{
+	if (strrchr($cc, '@')) {
 		$cc = str_replace(";",",",$cc);
+		$message->addCc($cc);
 		$headers['Cc'] = $cc;
-		$recipients['Cc'] = $cc;
 	}
 
-	if(strrchr($bcc, '@'))
-	{
+	if (strrchr($bcc, '@')) {
 		$bcc = str_replace(";",",",$bcc);
-		$recipients['Bcc'] = $bcc;
+		$message->addBcc($bcc);
 	}
 
-	$mime = new Mail_mime("\r\n");
-
-	$mime->setHTMLBody($message);
+	$message->setBody(strip_tags($message), null, 'utf-8');
+	$message->addPart($message, 'text/html', 'utf-8');
 
 	if (is_array($_FILES)) {
 		foreach ($_FILES["file"]["error"] as $key => $error) {
 			if ($error == UPLOAD_ERR_OK) {
-				$mime->addAttachment($_FILES['file']['tmp_name'][$key], $_FILES['file']['type'][$key], $_FILES['file']['name'][$key]);
+				$attach = Swift_Attachment::fromPath($_FILES['file']['tmp_name'][$key]);
+				$attach->setFilename($_FILES['file']['name'][$key]);
+				$attach->setContentType($_FILES['file']['type'][$key]);
+				$message->attach($attach);
 			}
 		}
 	}
 
-	$body = $mime->get(array(
-		'html_charset' => 'utf-8',
-		'text_charset' => 'utf-8',
-		'head_charset' => 'utf-8',
-	));
+	foreach ($headers as $name => $value) {
+		$message->getHeaders()->addTextHeader($name, $value);
+	}
 
-	if(Cfg::get('mail_smtp_host'))
-		$params['host'] = Cfg::get('mail_smtp_host');
-
-	$mail =& Mail::factory('smtp', $params);
-
-	$hdrs = $mime->headers($headers);
-
-	$return = $mail->send($recipients, $hdrs, $body);
-	if (PEAR::isError($return))
-		error(9, $return->getMessage());
+	try {
+		Swift_Mailer::newInstance(Mailer::getSwiftTransport())->send($message);
+	}
+	catch (Exception $ex) {
+		error(9, $ex->getMessage());
+	}
 }
 
 
