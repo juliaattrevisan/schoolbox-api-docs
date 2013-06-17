@@ -228,4 +228,25 @@ class Mailer {
         return self::$transport;
     }
 
+    /**
+     * Parses a list of email addresses out of a string, into a format that can
+     * be passed directly to Swift_Message->setTo().
+     *
+     * @param string $string
+     *
+     * @return array
+     */
+    public static function parseAddressString($string) {
+        $address_list = imap_rfc822_parse_adrlist($string, Cfg::get('site_hostname').'.'.Cfg::get('site_domain'));
+        $return_list  = array();
+        foreach ($address_list as $address) {
+            if ($address->host !== '.SYNTAX-ERROR.') {
+                $to    = $address->mailbox.'@'.$address->host;
+                $alias = property_exists($address, 'personal') ? $address->personal : null;
+                $return_list[$to] = $alias;
+            }
+        }
+        return $return_list;
+    }
+
 }
