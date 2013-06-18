@@ -375,6 +375,15 @@ class External_Denbigh_User implements External_UserInterface {
     }
 
     public function getPortrait($externalUserId) {
+        //
+        // Copied from External_Schoolbox_User strategy
+        $portraitPath = realpath( Config::get('portrait_dir') ) . "/$externalUserId.jpg";
+        if ( is_readable($portraitPath) ) {
+            return $portraitPath;
+        }
+        else {
+            return false;
+        }
     }
 
     public function getEmail($externalUserId) {
