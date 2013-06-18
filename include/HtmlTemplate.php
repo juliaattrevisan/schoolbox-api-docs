@@ -702,43 +702,18 @@ class HtmlTemplate
 
         switch ($this->haltOnError) {
             case 'yes':
-                return $this->haltMsg(
-                    $msg, PEAR_ERROR_TRIGGER, E_USER_ERROR
-                );
-
-            case 'report':
-                $this->haltMsg(
-                    $msg, PEAR_ERROR_PRINT
-                );
+                trigger_error($msg, E_USER_ERROR);
                 return false;
 
             case 'return':
-                return $this->haltMsg(
-                    $msg, PEAR_ERROR_RETURN
-                );
+            case 'report':
+                trigger_error($msg, E_USER_WARNING);
+                return false;
 
             case 'no':
             default:
                 return false;
         }
-    }
-
-    /**
-     * printf error message to show
-     *
-     * @param string $msg message to show
-     *
-     * @return object PEAR error object
-     * @access public
-     */
-    function haltMsg($msg, $mode = null, $level = null)
-    {
-        require_once 'PEAR.php';
-        return PEAR::raiseError(
-            '<b>Template Error:</b> ' . $msg . '<br/>'. "\n",
-            null,
-            $mode, $level
-        );
     }
 
     /**
