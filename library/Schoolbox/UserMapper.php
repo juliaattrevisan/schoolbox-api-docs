@@ -59,7 +59,7 @@ class UserMapper extends Mapper {
 		$this->hasMap(array(
 				'column'     => 'synergy_id',
 				'property'   => 'externalId',
-				'type'       => Mapper::TYPE_INTEGER,
+				'type'       => Mapper::TYPE_STRING,
 			));
 
 		$this->hasMap(array(
