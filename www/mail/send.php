@@ -6,12 +6,7 @@
 ************************************************************/
 //outputs form to get users mail details and processes the information
 
-//require_once("../include/session.php");
-//require_once("../include/include.php");
-
-require_once("../../include/SitePage.php");
-require_once('Mail.php');
-require_once('Mail/mime.php');
+require_once __DIR__."/../../include/Bootstrap.php";
 
 $page = new SitePage();
 
@@ -31,13 +26,16 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 
 	$name = $userHandler->formatName($user);
 
+	$mail = new Swift_Message();
+
 	/* Validate From email address
 	 */
 	if (strlen($user['alt_email'])) {
 		$email = new Email($user['alt_email']);
 
 		if ($email->isValid()) {
-			$from_email = $name.'<'.$user['alt_email'].'>';
+			$mail->addFrom($user['alt_email'], $name);
+			$mail->addReplyTo($user['alt_email'], $name);
 		}
 		else {
 			error(42);
@@ -47,7 +45,8 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 		$email = new Email($user['username'] . '@' . Cfg::get('mail_address'));
 
 		if ($email->isValid()) {
-			$from_email = $name . '<' . $email->getEmail() . '>';
+			$mail->addFrom($email->getEmail(), $name);
+			$mail->addReplyTo($email->getEmail(), $name);
 		}
 		else {
 			error(42);
@@ -62,23 +61,28 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 		$query = "SELECT username, local_email, alt_email FROM user WHERE id = $to";
 		$toemail = $db->dbGetSingleRow($query);
 
-		if($toemail['alt_email'])
-			$to = $toemail['alt_email'];
-		else if($user['local_email'] || Cfg::get('site_location') == 'wenona')
-			$to = $toemail['username']."@".Cfg::get('mail_address');
-		else
+		if ($toemail['alt_email']) {
+			$mail->addTo($toemail['alt_email']);
+		}
+		elseif ($user['local_email'] || Cfg::get('site_location') == 'wenona') {
+			$mail->addTo($toemail['username']."@".Cfg::get('mail_address'));
+		}
+		else {
 			error(43);
+		}
 	}
-
-	//if emails have ; seperator account for it
-	$to = str_replace(";",",",$to);
-
+	else {
+		//if emails have ; seperator account for it
+		$to = str_replace(";",",",$to);
+		foreach (Mailer::parseAddressString($to) as $address => $name) {
+			$mail->addTo($address, $name);
+		}
+	}
 
 	//check if its got no to address but has either cc or bcc
 	//put the users email in the to field
-	if( !stristr($to,'@') && ( $bcc || $cc) )
-	{
-		$to = '"'.$to.'" <'.$user['username'].'@'.Cfg::get('mail_address').'>';
+	if (!stristr($to,'@') && ($bcc || $cc)) {
+		$mail->addTo($user['username'].'@'.Cfg::get('mail_address'), $to);
 	}
 
 	//fix qoute escapes
@@ -89,55 +93,42 @@ function sendMail($to, $cc, $bcc, $subject, $message)
 	}
 
 	//create email header
-	$headers = 	array(	'To' 		=> $to,
-						'From' 		=> $from_email,
-						'Subject'   => $subject,
-						'Reply-To'	=> $from_email,
-						);
+	$mail->setSubject($subject);
 
-	$recipients['To'] = $to;
-
-	if(strrchr($cc, '@'))
-	{
+	if (strrchr($cc, '@')) {
 		$cc = str_replace(";",",",$cc);
-		$headers['Cc'] = $cc;
-		$recipients['Cc'] = $cc;
+		foreach (Mailer::parseAddressString($cc) as $address => $name) {
+			$mail->addCc($address, $name);
+		}
 	}
 
-	if(strrchr($bcc, '@'))
-	{
+	if (strrchr($bcc, '@')) {
 		$bcc = str_replace(";",",",$bcc);
-		$recipients['Bcc'] = $bcc;
+		foreach (Mailer::parseAddressString($bcc) as $address => $name) {
+			$mail->addBcc($address, $name);
+		}
 	}
 
-	$mime = new Mail_mime("\r\n");
-
-	$mime->setHTMLBody($message);
+	$mail->setBody(strip_tags($message), null, 'utf-8');
+	$mail->addPart($message, 'text/html', 'utf-8');
 
 	if (is_array($_FILES)) {
 		foreach ($_FILES["file"]["error"] as $key => $error) {
 			if ($error == UPLOAD_ERR_OK) {
-				$mime->addAttachment($_FILES['file']['tmp_name'][$key], $_FILES['file']['type'][$key], $_FILES['file']['name'][$key]);
+				$attach = Swift_Attachment::fromPath($_FILES['file']['tmp_name'][$key]);
+				$attach->setFilename($_FILES['file']['name'][$key]);
+				$attach->setContentType($_FILES['file']['type'][$key]);
+				$mail->attach($attach);
 			}
 		}
 	}
 
-	$body = $mime->get(array(
-		'html_charset' => 'utf-8',
-		'text_charset' => 'utf-8',
-		'head_charset' => 'utf-8',
-	));
-
-	if(Cfg::get('mail_smtp_host'))
-		$params['host'] = Cfg::get('mail_smtp_host');
-
-	$mail =& Mail::factory('smtp', $params);
-
-	$hdrs = $mime->headers($headers);
-
-	$return = $mail->send($recipients, $hdrs, $body);
-	if (PEAR::isError($return))
-		error(9, $return->getMessage());
+	try {
+		Swift_Mailer::newInstance(Mailer::getSwiftTransport())->send($mail);
+	}
+	catch (Exception $ex) {
+		error(9, $ex->getMessage());
+	}
 }
 
 

@@ -1,23 +1,50 @@
 <?php
-
-/************************************************************
- *                                                           *
- *         Copyright (c) 2006 Lektec Consulting                *
- *                                                           *
- ************************************************************/
-
-require_once( 'Mail.php' );
-require_once( 'Mail/mail.php' );
-require_once( 'Mail/mime.php' );
-require_once( dirname(__FILE__) . '/Template.php' );
-require_once( dirname(__FILE__) . '/Config.php' );
+/**
+ * Wrapper for a PHPLib template object and a mailer class.
+ */
 
 class Mailer {
 
+    /**
+     * Template object which is used to render the page
+     *
+     * @var Template
+     */
+    protected $template;
+
+    /**
+     * List of headers that are added to the email that is sent.
+     *
+     * @var array
+     */
+    protected $headers = array();
+
+    /**
+     * The mailer object
+     *
+     * @var Swift_Message
+     */
+    protected $email;
+
+    /**
+     * Template label
+     *
+     * @var string
+     */
+    public $t_label = 'tplBODY';
+
+    /**
+     * Instance of mail transporter.
+     *
+     * @var Swift_Transport
+     */
+    protected static $transport;
+
     function Mailer ($template, $subject = "", $to = "", $host = '') {
 
+        $this->email = new Swift_Message();
+
         //setup header
-        $this->headers = '';
         $this->setFrom(Cfg::get('mail_from_address'), Cfg::get('mail_from_name'));
         $this->headers['MessageID'] = '<' . md5(mktime()) . '@lektecmailer>';
 
@@ -26,7 +53,6 @@ class Mailer {
 
         //setup HTML template
         $this->template = new Template( Config::get('template_dir') );
-        $this->t_label = "tplBODY";
         $this->loadTemplate($template);
 
         //setup defaults
@@ -36,22 +62,16 @@ class Mailer {
         else {
             $this->template->set_var('SITE_DOMAIN', $_SERVER['HTTP_HOST']);
         }
-
-        //setup MIME email
-        $this->email = new Mail_mime( "\n" );
-
-        //$this->text = "Please view this email in a HTML capable client.";
     }
 
-    function setFrom ($email, $name = "") {
-        if ( $name ) {
-            $this->headers['From'] = $name . ' <' . $email . '>';
-            $this->headers['Return-Path'] = $email;
+    function setFrom($email, $name = "") {
+        if ($name) {
+            $this->email->setFrom($email, $name);
         }
         else {
-            $this->headers['From'] = $email;
-            $this->headers['Return-Path'] = $email;
+            $this->email->setFrom($email);
         }
+        $this->email->setReturnPath($email);
     }
 
     /**
@@ -71,13 +91,12 @@ class Mailer {
 
     function setTo ($to) {
         if ( is_array($to) ) {
-
             if ( $to['email'] ) {
                 if ( $to['name'] ) {
-                    $this->to = $to['name'] . ' <' . $to['email'] . '>';
+                    $this->email->addTo($to['email'], $to['name']);
                 }
                 else {
-                    $this->to = $to['email'];
+                    $this->email->addTo($to['email']);
                 }
             }
             else {
@@ -85,24 +104,21 @@ class Mailer {
                 $this->to = '';
                 foreach ( $to as $email ) {
                     if ( $email['name'] ) {
-                        $this->to .= $email['name'] . ' <' . $email['email'] . '>,';
+                        $this->email->addTo($email['email'], $email['name']);
                     }
                     else {
-                        $this->to .= $email['email'] . ',';
+                        $this->email->addTo($email['email']);
                     }
                 }
-                $this->to = substr($this->to, 0, -1); //remove trailing ,
             }
         }
         else {
-            $this->to = $to;
+            $this->email->setTo(self::parseAddressString($to));
         }
-
-        $this->headers['To'] = $to;
     }
 
     function setSubject ($subject) {
-        $this->headers['Subject'] = $subject;
+        $this->email->setSubject($subject);
     }
 
     function loadTemplate ($file) {
@@ -135,12 +151,22 @@ class Mailer {
 
     function addFile ($file, $type = 'text/plain', $filename = '', $isFile = true) {
         //add attachment to email
-        $this->email->addAttachment($file, $type, $filename, $isFile);
+        if ($isFile) {
+            $attachment = Swift_Attachment::fromPath($file, $type);
+        }
+        else {
+            $attachment = Swift_Attachment::newInstance($file, null, $type);
+        }
+        if ($filename) {
+            $attachment->setFilename($filename);
+        }
+        $this->email->attach($attachment);
     }
 
     function addImage ($file, $type = 'application/octet') {
         //add inline image to email
-        $this->email->addHTMLImage($file, $type);
+        // Returns a string so its source can be used later
+        return $this->email->embed(Swift_EmbeddedFile::fromPath($file)->setContentType($type));
     }
 
     function composeHTML () {
@@ -158,39 +184,72 @@ class Mailer {
             $this->setTo($to);
         }
 
-        //construct body
-        //$this->email->setTXTBody($this->text);
-        $this->email->setHTMLBody($this->composeHTML());
-
-        //retrieve email
-        $body = $this->email->get(array(
-            'html_charset' => 'utf-8',
-            'text_charset' => 'utf-8',
-            'head_charset' => 'utf-8',
-        ));
-        $this->email->_headers['To'] = $this->to; //	mime_mail doe not overwrite its headers with the ones you send
-        $hdrs = $this->email->headers($this->headers);
-
-        //send email
-
-        if(Cfg::get('mail_smtp_host') && Cfg::get('mail_smtp_port') ){
-            $smtpSettings = array(
-                    'host' => Cfg::get('mail_smtp_host'),
-                    'port' => Cfg::get('mail_smtp_port'),
-                    'localhost' => Cfg::get('site_hostname').'.'.Cfg::get('site_domain')
-            );
-
-            $mail =& Mail::factory('smtp', $smtpSettings);
+        //
+        // construct body and set headers
+        $body = $this->composeHTML();
+        $this->email->setBody(strip_tags($body), null, 'utf-8');
+        $this->email->addPart($body, 'text/html', 'utf-8');
+        foreach ($this->headers as $name => $value) {
+            $this->email->getHeaders()->addTextHeader($name, $value);
         }
-        else {
-            $mail =& Mail::factory('mail');
+
+        //
+        // create transport and send email
+        try {
+            Swift_Mailer::newInstance(self::getSwiftTransport())->send($this->email);
         }
-        $return = $mail->send($this->to, $hdrs, $body);
+        catch (Exception $ex) {
+            return false;
+        }
+        return true;
+    }
 
-        // prevent memory leak
-        unset($mail);
+    /**
+     * Creates a Swift mailer transport instance, or gets last one created if it
+     * has already been created.
+     *
+     * The exact transport used depends on configuration settings - if a SMTP
+     * host and port are configured, it returns a Swift_SmtpTransport, otherwise
+     * a Swift_MailTransport object.
+     *
+     * @return Swift_Transport
+     */
+    public static function getSwiftTransport() {
+        if (!(self::$transport instanceof Swift_Transport)) {
+            if (Cfg::get('mail_smtp_host') && Cfg::get('mail_smtp_port') ){
+                self::$transport = new Swift_SmtpTransport(
+                    Cfg::get('mail_smtp_host'), Cfg::get('mail_smtp_port')
+                );
+                self::$transport->setLocalDomain(
+                    Cfg::get('site_hostname').'.'.Cfg::get('site_domain')
+                );
+            }
+            else {
+                self::$transport = new Swift_MailTransport();
+            }
+        }
+        return self::$transport;
+    }
 
-        return $return;
+    /**
+     * Parses a list of email addresses out of a string, into a format that can
+     * be passed directly to Swift_Message->setTo().
+     *
+     * @param string $string
+     *
+     * @return array
+     */
+    public static function parseAddressString($string) {
+        $address_list = imap_rfc822_parse_adrlist($string, Cfg::get('site_hostname').'.'.Cfg::get('site_domain'));
+        $return_list  = array();
+        foreach ($address_list as $address) {
+            if ($address->host !== '.SYNTAX-ERROR.') {
+                $to    = $address->mailbox.'@'.$address->host;
+                $alias = property_exists($address, 'personal') ? $address->personal : null;
+                $return_list[$to] = $alias;
+            }
+        }
+        return $return_list;
     }
 
 }
