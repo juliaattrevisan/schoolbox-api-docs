@@ -24,23 +24,12 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
            */
         $this->setExternalUser(new External_User());
 
-        $housemasterInitials = $this->getExternalUser()->getHousemasterByHouseId(
-            $this->getRequest()->getUser()->getResidentialHouseId()
-        );
-
-        $userHandler = new User();
-        $housemaster = $userHandler->getByUsername($housemasterInitials);
-
-        $housemasterName = $housemaster['firstname'] . ' ' . $housemaster['lastname'];
-        $housemasterEmail = $housemaster['alt_email'];
-
         $subject = '(Parent) Leave Request Status Update for ' . $this->getRequest()->getUser()->getName();
 
         /* Set destination email address in loop in send()
            */
         $email = new Mailer($this->getEmailTemplateFile(), $subject, '');
-
-        $email->setFrom($housemasterEmail, $housemasterName);
+        $email->setFromAsCurrentUser();
 
         $email->setBlock($email->t_label, 'submitted_by', 'submitted_by_block');
         $email->setBlock($email->t_label, 'authorised_by', 'authorised_by_block');
