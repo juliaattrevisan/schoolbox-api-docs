@@ -3,5 +3,8 @@
         "sabre/dav": "1.8.*",
         "ezyang/htmlpurifier": "4.5.*",
         "twig/twig": "1.12.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*"
     }
 }
