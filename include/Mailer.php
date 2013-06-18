@@ -54,6 +54,21 @@ class Mailer {
         }
     }
 
+    /**
+     * Convenience method for setting this mailer's From address as the
+     * currently logged in user.
+     *
+     * @todo dependency inject session instead of direct reference
+     *
+     * @return $this
+     */
+    public function setFromAsCurrentUser() {
+        $email_object  = new Email();
+        $email_address = $email_object->formatEmailFromArray($_SESSION);
+        $this->setFrom($email_address, trim($_SESSION['firstname'].' '.$_SESSION['lastname']));
+        return $this;
+    }
+
     function setTo ($to) {
         if ( is_array($to) ) {
 
