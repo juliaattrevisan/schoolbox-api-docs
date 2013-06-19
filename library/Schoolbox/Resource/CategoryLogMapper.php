@@ -64,10 +64,10 @@ class CategoryLogMapper extends Mapper {
 	/**
 	 * Increments hit count for this user and category.
 	 *
-	 * @param User     $user
-	 * @param Category $category
+	 * @param int|User     $user     A User object or user ID
+	 * @param int|Category $category A Category object or ID
 	 */
-	public function incrementHitcount(User $user, Category $category) {
+	public function incrementHitcount($user, $category) {
 		$item = new CategoryLog();
 		$item->setUser($user)->setCategory($category)->setHitcount(1);
 		$this->save($item);
