@@ -223,8 +223,8 @@ class Facade_Homepage_API extends Generic_API {
      * @return void
      */
     protected function logVisit($user_id, $category_id) {
-        $cat_handler = new Category();
-        $cat_handler->logPageView($category_id);
+        $mapper = new Schoolbox\Resource\CategoryLogMapper();
+        $mapper->incrementHitcount($user_id, $category_id);
     }
 
 }
