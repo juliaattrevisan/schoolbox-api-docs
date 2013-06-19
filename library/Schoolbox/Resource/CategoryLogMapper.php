@@ -69,7 +69,7 @@ class CategoryLogMapper extends Mapper {
 	 */
 	public function incrementHitcount(User $user, Category $category) {
 		$item = new CategoryLog();
-		$item->setUser($user)->setCategory($category);
+		$item->setUser($user)->setCategory($category)->setHitcount(1);
 		$this->save($item);
 	}
 }
