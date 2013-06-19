@@ -383,8 +383,8 @@ abstract class Component_ControllerAbstract {
 
         $return = array();
 
-        foreach ($this->config as $item) {
-            $return[$item['label']] = $item['value'];
+        foreach ($this->config as $key => $item) {
+            $return[$key] = $item['value'];
         }
 
         return $return;
