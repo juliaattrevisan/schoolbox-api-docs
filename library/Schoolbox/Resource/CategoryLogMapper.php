@@ -30,10 +30,10 @@ class CategoryLogMapper extends Mapper {
 			'join'     => 'user',
 		));
 		$this->hasMap(array(
-			'column'             => 'datetime',
-			'property'           => 'lastAccessTime',
-			'type'               => self::TYPE_DATETIME,
-			'modified_timestamp' => true,
+			'column'            => 'datetime',
+			'property'          => 'lastAccessTime',
+			'type'              => self::TYPE_DATETIME,
+			'updated_timestamp' => true,
 		));
 		$this->hasMap(array(
 			'column'   => 'hitcount',
