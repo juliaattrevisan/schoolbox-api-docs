@@ -370,11 +370,7 @@ abstract class Mapper {
         $id_property = $identifier['property'];
         $this->database->beginTransaction();
         foreach ($collection as $model) {
-            foreach ($this->map as $map) {
-                $propertyName = $map['property'];
-                $columnName   = $map['column'];
-                $statement->bindParam(":$columnName", $this->getModelProperty($model, $propertyName, $map));
-            }
+            $this->bindParamsForSave($model, $statement);
             if ($statement->execute()) {
                 if ($id_property) {
                     if (!$this->getModelProperty($model, $id_property, $identifier)) {
@@ -798,6 +794,26 @@ abstract class Mapper {
         }
 
         return implode(', ', $assignmentList);
+    }
+
+    /**
+     * Binds values from the model into the statement.
+     *
+     * @param object       $model     The model to get values from
+     * @param PDOStatement $statement The statement for inserting/updating model
+     *
+     * @return void
+     */
+    protected function bindParamsForSave($model, PDOStatement $statement) {
+        foreach ($this->map as $map) {
+            $propertyName = $map['property'];
+            $columnName   = $map['column'];
+            //
+            // Timestamp fields will never be bound.
+            if (!(isset($map['updated_timestamp']) || isset($map['created_timestamp']))) {
+                $statement->bindParam(":$columnName", $this->getModelProperty($model, $propertyName, $map));
+            }
+        }
     }
 
     /**
