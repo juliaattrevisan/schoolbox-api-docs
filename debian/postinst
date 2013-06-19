@@ -28,10 +28,10 @@ case "$1" in
         fi
         # Fix ownership and permissions of existing configuration.
         if [ -f /etc/schoolbox/conf.php ]; then
-            chown root:www-data /etc/schoolbox/conf.php
-            chmod 0644 /etc/schoolbox/conf.php
+            chown root:www-data /etc/schoolbox/conf.php;
+            chmod 0644 /etc/schoolbox/conf.php;
         fi
-        chown -R alaress:alaress /usr/share/schoolbox
+        chown -R alaress:alaress /usr/share/schoolbox;
         /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox;
         /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox;
         /usr/share/schoolbox/tools/update-sql.sh;

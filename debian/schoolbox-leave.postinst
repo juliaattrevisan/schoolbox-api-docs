@@ -19,6 +19,7 @@ set -e
 
 case "$1" in
     configure)
+        chown -R alaress:alaress /usr/share/schoolbox;
         /usr/share/schoolbox/tools/module.sh install leave;
     ;;
 

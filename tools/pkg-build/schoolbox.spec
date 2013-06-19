@@ -152,10 +152,10 @@ rm -fR %{buildroot}%{_datadir}/%{name}/tools/minor-updater.sh
 %post
 # Fix ownership and permissions of existing configuration.
 if [ -f %{_sysconfdir}/%{name}/conf.php ]; then
-	chown root:apache %{_sysconfdir}/%{name}/conf.php
-	chmod 0644 %{_sysconfdir}/%{name}/conf.php
+	chown root:apache %{_sysconfdir}/%{name}/conf.php;
+	chmod 0644 %{_sysconfdir}/%{name}/conf.php;
 fi
-chown -R alaress:alaress %{_datadir}/%{name}
+chown -R alaress:alaress %{_datadir}/%{name};
 /usr/share/%{name}/tools/create-data-dirs.sh /%{_localstatedir}/lib/%{name};
 /usr/share/%{name}/tools/set-data-dir-perms.sh /%{_localstatedir}/lib/%{name} apache;
 /usr/share/%{name}/tools/update-sql.sh;
@@ -164,9 +164,11 @@ rm -f /usr/share/%{name}/www/.htaccess;
 service httpd restart;
 
 %post leave
+chown -R alaress:alaress %{_datadir}/%{name};
 /usr/share/%{name}/tools/module.sh install leave;
 
 %post mobile
+chown -R alaress:alaress %{_datadir}/%{name};
 /usr/share/%{name}/tools/module.sh install mobile;
 
 %files
