@@ -284,13 +284,20 @@ class User extends DeprecatedModel {
 				//
 				// Attempt to set with Synergetic.
 				// If that is set up and fails, then revert their password.
-				$user = $this->getByID($userID);
-				$api  = new External_Synergetic_Gateway(
-					$webServicesUrl,
-					Cfg::get('external_vendor_token_guid'),
-					Cfg::get('external_vendor_password')
-				);
-				if (!$api->changeCommunityLoginPassword($user['synergy_id'], $oldPassword, $newPassword)) {
+				$user       = $this->getByID($userID);
+				$is_changed = false;
+				try {
+					$api = new External_Synergetic_Gateway(
+						$webServicesUrl,
+						Cfg::get('external_vendor_token_guid'),
+						Cfg::get('external_vendor_password')
+					);
+					$is_changed = $api->changeCommunityLoginPassword($user['synergy_id'], $oldPassword, $newPassword);
+				}
+				catch (SoapFault $ex) {
+					$this->logUserPasswordChange($username, 'change_pwd_syn_broken', 'warn');
+				}
+				if (!$is_changed) {
 					//
 					// Should throw a different error message if the remote pwd doesn't get changed.
 					$this->setPasswordInternal($userID, $oldPassword);
