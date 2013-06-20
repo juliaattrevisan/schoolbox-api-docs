@@ -369,7 +369,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
             NULL           AS "StudentTitle",
             FIRSTNAME      AS "StudentPreferred",
             SURNAME        AS "StudentSurname",
-            NULL           AS "StudentEmail",
+            EMAIL_ADDRESS  AS "StudentEmail",
             NULL           AS "StudentOccupEmail",
             YEAR_LEVEL     AS "StudentYearLevel",
             HOUSE          AS "StudentHouse",
