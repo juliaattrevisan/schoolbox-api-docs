@@ -18,16 +18,14 @@ $j(function() {
         },
 
         cellValidation: function() {
-            $j('.mark-input, .comment').blur(function(){
-                if ($j(this).val() !== '') {
-                    var inlinefrm = $j(this).closest('.inlineform');
-                    // remove '.inline-submit' from all inline forms, then apply it to this one so the form
-                    // knows to only submit this row
-                    $j("#returnWorkForm div.inlineform").removeClass('inline-submit');
-                    inlinefrm.addClass('inline-submit');
-                    // this will submit the whole form, unfortunately
-                    inlinefrm.submit();
-                }
+            $j('.mark-input, .comment').change(function(){
+                var inlinefrm = $j(this).closest('.inlineform');
+                // remove '.inline-submit' from all inline forms, then apply it to this one so the form
+                // knows to only submit this row
+                $j("#returnWorkForm div.inlineform").removeClass('inline-submit');
+                inlinefrm.addClass('inline-submit');
+                // this will submit the whole form, unfortunately
+                inlinefrm.submit();
             });
 
             /*
