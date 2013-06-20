@@ -43,6 +43,10 @@ abstract class Alaress_Date_Strategy_Abstract implements Alaress_Date_Format_Int
 	 *                                       DateTime object, or a string
 	 *                                       representing a time.
 	 * @param string        $inputDateFormat A format recognisable by date().
+	 *                                       If $dateTime instanceof DateTime
+	 *                                       or Alaress_Date_Format_Interface,
+	 *                                       this is ignored - this is only for
+	 *                                       parsing a string $dateTime.
 	 *
 	 * @return mixed|void
 	 */
