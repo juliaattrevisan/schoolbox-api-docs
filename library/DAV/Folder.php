@@ -198,10 +198,7 @@ class DAV_Folder extends Sabre\DAV\Collection {
     }
 
     private function isFolder($name, $parent = false) {
-        if( is_array( $this->getFolderHandler()->searchByName($name, $parent) )  )
-            return true;
-        else
-            return false;
+        return is_array($this->getFolderHandler()->getByArray(array('name' => $name, 'parent' => $parent,)));
     }
 
     private function getFolderID(){
@@ -217,13 +214,17 @@ class DAV_Folder extends Sabre\DAV\Collection {
             $this->folder['id'] = 0;
         }
         else {
-
-            $folderList = explode('/',$path);
-            array_shift($folderList);
+            //
+            // Path list - strip any blank parts
+            $folderList = array_filter(explode('/',$path), 'strlen');
             $parent = 0;
-            foreach($folderList as $folderName) {
-
-                $folder =  $this->getFolderHandler()->searchByName($folderName, $parent);
+            foreach ($folderList as $folderName) {
+                $folder = $this->getFolderHandler()->getByArray(
+                    array(
+                        'name'   => $folderName,
+                        'parent' => $parent,
+                    )
+                );
                 $parent = $folder[0]['id'];
             }
 
@@ -235,6 +236,9 @@ class DAV_Folder extends Sabre\DAV\Collection {
       }
     }
 
+    /**
+     * @return Category
+     */
     private function getFolderHandler() {
         return $this->folderHandler;
     }
@@ -243,6 +247,9 @@ class DAV_Folder extends Sabre\DAV\Collection {
         $this->folderHandler = new Category();
     }
 
+    /**
+     * @return File
+     */
     private function getFileHandler() {
         return $this->fileHandler;
     }

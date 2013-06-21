@@ -12,6 +12,7 @@ class DAV_File extends Sabre\DAV\File {
     private $folderID;
     private $fileName;
     private $fileHandler;
+    private $folderHandler;
     private $file;
 
     function __construct($path) {
@@ -62,7 +63,7 @@ class DAV_File extends Sabre\DAV\File {
     }
 
     function delete() {
-        $this->fileHandler->delete($this->getFileID());
+        $this->getFileHandler()->delete($this->getFileID());
     }
 
     function getLastModified() {
@@ -76,13 +77,19 @@ class DAV_File extends Sabre\DAV\File {
     }
 
     function setPath($path) {
-        $folderList = explode('/',$path);
+        //
+        // Path list - strip any blank parts
+        $folderList = array_filter(explode('/',$path), 'strlen');
         $this->fileName = array_pop($folderList);
 
-        //array_shift($folderList);
         $parent = 0;
-        foreach($folderList as $folderName) {
-            $folder =  $this->getFolderHandler()->searchByName($folderName, $parent);
+        foreach ($folderList as $folderName) {
+            $folder = $this->getFolderHandler()->getByArray(
+                array(
+                    'name'   => $folderName,
+                    'parent' => $parent,
+                )
+            );
             $parent = $folder[0]['id'];
         }
 
@@ -101,10 +108,17 @@ class DAV_File extends Sabre\DAV\File {
     function setFileHandler() {
         $this->fileHandler = new File;
     }
+
+    /**
+     * @return File
+     */
     function getFileHandler() {
         return $this->fileHandler;
     }
 
+    /**
+     * @return Category
+     */
     private function getFolderHandler() {
         return $this->folderHandler;
     }
@@ -114,7 +128,12 @@ class DAV_File extends Sabre\DAV\File {
     }
 
     function setFile() {
-        $result = $this->getFileHandler()->getByArray(array('realname' => $this->getFileName(),'category'=>$this->getParentFolder()));
+        $result = $this->getFileHandler()->getByArray(
+            array(
+                'realname' => $this->getFileName(),
+                'category' => $this->getParentFolder(),
+            )
+        );
         $this->file = $result[0];
     }
 
