@@ -198,10 +198,7 @@ class DAV_Folder extends Sabre\DAV\Collection {
     }
 
     private function isFolder($name, $parent = false) {
-        if( is_array( $this->getFolderHandler()->searchByName($name, $parent) )  )
-            return true;
-        else
-            return false;
+        return is_array($this->getFolderHandler()->getByArray(array('name' => $name, 'parent' => $parent,)));
     }
 
     private function getFolderID(){
@@ -239,6 +236,9 @@ class DAV_Folder extends Sabre\DAV\Collection {
       }
     }
 
+    /**
+     * @return Category
+     */
     private function getFolderHandler() {
         return $this->folderHandler;
     }
@@ -247,6 +247,9 @@ class DAV_Folder extends Sabre\DAV\Collection {
         $this->folderHandler = new Category();
     }
 
+    /**
+     * @return File
+     */
     private function getFileHandler() {
         return $this->fileHandler;
     }
