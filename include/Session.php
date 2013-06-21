@@ -286,12 +286,13 @@ class Session
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 2);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array("username" => $username, "password" => $password)));
         $result = curl_exec($ch);
+        $code   = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
         unset($ch);
         //
         // Edumate always returns a string - "You have not been authenticated"
         // or a session ID which i'm guessing is either an int or hex number.
-        return ($result != "You have not been authenticated");
+        return ($code < 400 && preg_match('/^[0-9]+$/', $result));
     }
 
 
