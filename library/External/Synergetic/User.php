@@ -498,12 +498,19 @@ class External_Synergetic_User implements External_UserInterface {
 	}
 
 	function getEnrolledStudents($synergyID) {
+		//
+		// Valid Relations:
+		// SN/DR:       Son/Daughter
+		// STSN/STDR:   Stepson/Stepdaugter
+		// WD:          Ward
+		// GRASN/GRADR: Grandson/Granddaughter
+		// FOCD:        Foster child
 		$query = "SELECT Relationships.RelatedID
 				FROM SynergyOne.dbo.Constituencies Constituencies, SynergyOne.dbo.Relationships Relationships
 				WHERE Relationships.RelatedID = Constituencies.ID AND
 				Relationships.ID = $synergyID AND
 				Constituencies.ConstitCode='@SC'
-				AND Relationships.Relationship IN ('SN','STSN','DR','STDR','WD')";
+				AND Relationships.Relationship IN ('SN','STSN','DR','STDR','WD','GRASN','GRADR','FOCD')";
 
 
 		return $this->getDatabase()->getAll($query);
