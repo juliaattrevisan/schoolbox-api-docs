@@ -1,6 +1,6 @@
 <div class="box clearfix" id="component{COMPONENT_INSTANCE_ID}">
     <script type="text/javascript" src="/javascript/jquery.cycle.js"></script>
-    <script type="text/javascript" src="/javascript/jquery.imagesloaded.js"></script>
+    <script type="text/javascript" src="/javascript/imagesloaded.pkgd.min.js"></script>
     <script type="text/javascript">
         $j(function () {
             //
@@ -33,28 +33,30 @@
                 slideshow.hide();
             }
             slideshow.css('text-align', slide_position);
-            slideshow.imagesLoaded(function (images) {
+            if (slideshow.length > 1) {
+                imagesLoaded(slideshow[0], function() {
 
-                //
-                // Set width to widest slide.
-                var width = 0;
-                container.find('.slideshow-cycle').each(function() {
-                    var this_width = $j(this).width();
-                    if (this_width > width) {
-                        width = this_width;
-                    }
+                    //
+                    // Set width to widest slide.
+                    var width = 0;
+                    container.find('.slideshow-cycle').each(function() {
+                        var this_width = $j(this).width();
+                        if (this_width > width) {
+                            width = this_width;
+                        }
+                    });
+
+                    container.cycle({
+                        timeout:{COMPONENT_CONFIG_TIMING_VALUE_MS},
+                        cleartype:true,
+                        height:'auto',
+                        width: width,
+                        fit: true,
+                        before: slideCallback,
+                        after: slideCallback
+                    }).css('margin', margin);
                 });
-
-                container.cycle({
-                    timeout:{COMPONENT_CONFIG_TIMING_VALUE_MS},
-                    cleartype:true,
-                    height:'auto',
-                    width: width,
-                    fit: true,
-                    before: slideCallback,
-                    after: slideCallback
-                }).css('margin', margin);
-            });
+            }
         });
     </script>
     <h2>{COMPONENT_NAME}</h2>
