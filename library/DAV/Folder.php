@@ -217,13 +217,17 @@ class DAV_Folder extends Sabre\DAV\Collection {
             $this->folder['id'] = 0;
         }
         else {
-
-            $folderList = explode('/',$path);
-            array_shift($folderList);
+            //
+            // Path list - strip any blank parts
+            $folderList = array_filter(explode('/',$path), 'strlen');
             $parent = 0;
-            foreach($folderList as $folderName) {
-
-                $folder =  $this->getFolderHandler()->searchByName($folderName, $parent);
+            foreach ($folderList as $folderName) {
+                $folder = $this->getFolderHandler()->getByArray(
+                    array(
+                        'name'   => $folderName,
+                        'parent' => $parent,
+                    )
+                );
                 $parent = $folder[0]['id'];
             }
 
