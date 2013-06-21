@@ -25,10 +25,12 @@ class Alaress_Date_Format implements Alaress_Date_Format_Interface, Alaress_Vali
 	 * Choose your locale as well; this would probably come from the Config
 	 * table rather than have a concrete instantiation
 	 *
-	 * @param  $dateTime
-	 * @param $dateFormat
+	 * @see Alaress_Date_Strategy_Abstract->setFromFormat() for param description
+	 *
+	 * @param string|object $dateTime
+	 * @param string        $dateFormat
 	 */
-	public function __construct($dateTime = null, $dateFormat) {
+	public function __construct($dateTime = null, $dateFormat = null) {
 		$strategy = new Alaress_Date_Strategy_V52();
 		$strategy->setFromFormat($dateTime, $dateFormat);
 		$strategy->setLocale(new Alaress_Date_Locale_Australian());
