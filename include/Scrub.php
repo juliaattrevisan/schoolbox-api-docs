@@ -114,7 +114,7 @@ class Scrub {
                 'www.thinglink.com/card/',
                 'www.facebook.com/plugins/',
                 'padlet.com/embed/',
-                'linoit.com/users/linoit-com/canvases/',
+                'linoit.com/users/',
                 'www.showme.com/sma/embed',
                 'www.sunsmart.com.au/uvalert/',
                 'skydrive.live.com/embed',
