@@ -1,6 +1,6 @@
 %define rel		1
-%define beta		0
-%define tag		13.0.0
+%define beta		beta1
+%define tag		13.5.0
 %if %beta
 %define release		0.%beta.%rel
 %define distname	%version-%beta.tar.gz
@@ -16,7 +16,7 @@
 %define	_requires_exceptions	pear(Archive/Tar.php)\\|pear(/home/ryan/xhprof-0.9.2/xhprof_lib/utils/xhprof_lib.php)\\|pear(/home/ryan/xhprof-0.9.2/xhprof_lib/utils/xhprof_runs.php)\\|pear(Net/LDAP2.php)\\|pear(OS/Guess.php)\\|pear(PEAR/Command/Packaging.php)\\|pear(PEAR/FTP.php)\\|pear(PHPUnit/Framework/TestCase.php)\\|pear(Structures/Graph/Manipulator/TopologicalSorter.php)\\|pear(Structures/Graph/Node.php)\\|pear(Structures/Graph.php)\\|pear(System.php)\\|pear(XML/RPC.php)
 
 Name:		schoolbox
-Version:	13.0.0
+Version:	13.5.0
 Release:	%{release}
 Summary:	Schoolbox LMS by Alaress Pty. Ltd.
 Group:		Applications/Internet
