@@ -366,9 +366,9 @@ function outputResultSets(SitePage $page, $checkedIndex = -1, $descriptorCount =
         }
     }
 
-    // Output descriptor count drop down from 2-6
+    // Output descriptor count drop down from 2-11.
     $desCounts = array();
-    for($i = 2; $i < 7; ++$i) {
+    for ($i = 2; $i <= 11; ++$i) {
         $desCounts[] = array('value' => $i);
     }
     $page->dropdown('des_count', $desCounts, $descriptorCount, 'marktype', array(
