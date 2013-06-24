@@ -202,7 +202,7 @@ elseif ($legacy_file_id && is_numeric($legacy_file_id)) {
 
     $this->setVar(array(
         'FILE_ID'    => $legacy_file_id,
-        'FILE_THUMB' => $file['iconFile'],
+        'FILE_THUMB' => $file['iconFile'] ?: 'txt.png',
         'FILE_SIZE'  => Alaress_Byte_Format::bytesToString($file['file_size']),
         'FILE_NAME'  => $file['realname'],
         'FILE_DATE'  => date('jS M Y, g:ia', $file['submitted'])
@@ -449,7 +449,7 @@ if (isset($recent_submission)) {
     $this->setVar(array(
         'MOST_RECENT_SUBMISSION_FILE_NAME'  => $recent_submission->getSubmission()->getFilename(),
         'MOST_RECENT_SUBMISSION_FILE_SIZE'  => $size,
-        'MOST_RECENT_SUBMISSION_FILE_THUMB' => $ftype['iconFile'],
+        'MOST_RECENT_SUBMISSION_FILE_THUMB' => $ftype['iconFile'] ?: 'txt.png',
         'MOST_RECENT_SUBMISSION_FILE_DATE'  => $recentSubmissionDate->getRelativeTime(),
         'MOST_RECENT_SUBMISSION_FILE_ID'    => $recent_submission->getSubmission()->getId(),
     ));
@@ -569,7 +569,7 @@ if (isset($recent_return)) {
         'RETURNED_WORK_FILE_SIZE'  => $size,
         'RETURNED_WORK_FILE_NAME'  => Scrub::Text($return->getFilename()),
         'RETURNED_WORK_FILE_DATE'  => $returnDate->getLongDateOnly(),
-        'RETURNED_WORK_FILE_THUMB' => $ftype['iconFile'],
+        'RETURNED_WORK_FILE_THUMB' => $ftype['iconFile'] ?: 'txt.png',
 	));
 
     if ($return->getFilename() && !$parentOnly) {
