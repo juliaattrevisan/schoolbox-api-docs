@@ -86,7 +86,7 @@ elseif(is_array($_POST['rubric']) && count($_POST['rubric'])) {
     saveReturn($return, $_POST['rubric']);
 
     // in all possible scenarios, *something* happened above, so redirect the user
-    $page->localRedir('/submission/viewSubmission/'.$_POST['box_id']);
+	$page->backToTheFuture(2);
 }
 
 
