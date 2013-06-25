@@ -93,8 +93,10 @@ if ($performExport && $categoryID) {
                 */
             if (!$user) {
                 unset($studentList[$x]);
-            } else {
-                $studentList[$x]['uid'] = $user['uid'];
+            }
+            else {
+                $studentList[$x]['uid']        = $user['uid'];
+                $studentList[$x]['synergy_id'] = $user['synergy_id'];
             }
         }
     } else {
@@ -157,7 +159,7 @@ if ($performExport && $categoryID) {
     if (is_array($studentList)) {
         foreach ($studentList as $student) {
             $csv = array();
-            $csv[] = $student['uid'];
+            $csv[] = $student['synergy_id'];
             $csv[] = $student['lastname'];
             $csv[] = $student['firstname'];
 
