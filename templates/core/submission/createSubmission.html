@@ -171,16 +171,23 @@
             return (getNormalizedDate(element) >= getNormalizedDate(other_date_field, form));
         }, 'Please enter a date that is after');
 
+        var isAcceptSubmit  = function() { return acceptSubmit.is(':checked'); }
         var submission_form = $j('#createSubmissionForm');
         var open_date_valid = { dateValid: true };
-        var due_date_valid  = { dateValid: true, dateNotBefore: 'open' };
+        var due_date_valid  = {
+            dateValid: true,
+            dateNotBefore: {
+                message: 'Please enter a date that is not before the open date.',
+                param:   'open',
+                depends: isAcceptSubmit
+            }
+        };
         var late_date_valid = {
             dateValid: true,
             dateNotBefore: {
-                param: 'due',
-                depends: function(element) {
-                    return $j(element).closest('form').find(':input[name="accept_submission"]:checked');
-                }
+                message: 'Please enter a date that is not before the due date.',
+                param:   'due',
+                depends: isAcceptSubmit
             }
         };
         submission_form.validate({
@@ -207,6 +214,16 @@
                 late_hour:   late_date_valid,
                 late_minute: late_date_valid,
                 late_period: late_date_valid
+            },
+            messages: {
+                due_date:    {dateNotBefore: due_date_valid.dateNotBefore.message},
+                due_hour:    {dateNotBefore: due_date_valid.dateNotBefore.message},
+                due_minute:  {dateNotBefore: due_date_valid.dateNotBefore.message},
+                due_period:  {dateNotBefore: due_date_valid.dateNotBefore.message},
+                late_date:   {dateNotBefore: late_date_valid.dateNotBefore.message},
+                late_hour:   {dateNotBefore: late_date_valid.dateNotBefore.message},
+                late_minute: {dateNotBefore: late_date_valid.dateNotBefore.message},
+                late_period: {dateNotBefore: late_date_valid.dateNotBefore.message}
             },
             groups: {
                 open_date: 'open_date open_hour open_minute open_period',
