@@ -4,6 +4,7 @@
 <script type="text/javascript" src="/javascript/jquery.prettyFileInput.js"></script>
 <script type="text/javascript" src="/javascript/uploadify/swfobject.js"></script>
 <script type="text/javascript" src="/javascript/uploadify/jquery.uploadify.v2.1.4.js"></script>
+<script type="text/javascript" src="/javascript/jquery.validate.js"></script>
 
 <script type="text/javascript">
         tinyMCE.init({
@@ -170,7 +171,8 @@
 			return (getNormalizedDate(element) >= getNormalizedDate(other_date_field, form));
 		}, 'Please enter a date that is after');
 
-        $j('#createSubmissionForm').validate({
+		var submission_form = $j('#createSubmissionForm');
+        submission_form.validate({
             rules: {
                 markvalue: {
                     markTypeTotalCheck: true,
@@ -182,10 +184,6 @@
                 criteria: {
                     markTypeRubricCriteriaCheck: true
                 },
-                open_date:   { dateValid: true },
-                open_hour:   { dateValid: true },
-                open_minute: { dateValid: true },
-                open_period: { dateValid: true },
                 due_date: {
                     //
                     // Must not be less than open_date
@@ -200,9 +198,22 @@
                             return $j(element).closest('form').find(':input[name="accept_submission"]:checked');
                         }
                     }
-                }
+				}
             }
         });
+
+		submission_form.find(':input[name^="open_"]').each(function() {
+			$j(this).rules('add', {
+				dateValid: true,
+				groups: {
+					open_date: 'open_date open_hour open_minute open_period'
+				}
+//				,
+//				errorPlacement: function(error, element) {
+//					submission_form.find(':input[name="open_period"]').after(error);
+//				}
+			});
+		});
 
         // trigger show or hide of descriptors when radio off
         $j('#rubric-results input').change(function () {
