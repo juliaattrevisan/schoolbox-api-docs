@@ -135,43 +135,54 @@
             }
         }, 'Please select a result set');
 
-		var getNormalizedDate = function(date_field, form) {
-			var field_name = date_field;
-			var element    = null;
-			if (typeof date_field === 'object') {
-				field_name = $j(date_field).attr('name').replace(/_\w+$/, '');
-				element    = $j(date_field).closest('form');
-			}
-			else {
-				element = $j(form);
-			}
-			var date     = element.find(':input[name="'+field_name+'_date"]').val();
-			var hour     = element.find(':input[name="'+field_name+'_hour"]').val();
-			var minute   = element.find(':input[name="'+field_name+'_minute"]').val();
-			var meridian = element.find(':input[name="'+field_name+'_period"]').val();
+        var getNormalizedDate = function(date_field, form) {
+            var field_name = date_field;
+            var element    = null;
+            if (typeof date_field === 'object') {
+                field_name = $j(date_field).attr('name').replace(/_\w+$/, '');
+                element    = $j(date_field).closest('form');
+            }
+            else {
+                element = $j(form);
+            }
+            var date     = element.find(':input[name="'+field_name+'_date"]').val();
+            var hour     = element.find(':input[name="'+field_name+'_hour"]').val();
+            var minute   = element.find(':input[name="'+field_name+'_minute"]').val();
+            var meridian = element.find(':input[name="'+field_name+'_period"]').val();
 
-			var default_time = field_name === 'open' ? '00:00:00' : '23:59:59';
-			var date_parts   = date.match(/(\d+)\/(\d+)\/(\d+)/);
-			var time         = hour.length ? (hour+':'+minute+' '+meridian) : default_time;
+            var default_time = field_name === 'open' ? '00:00:00' : '23:59:59';
+            var date_parts   = date.match(/^(\d+)\/(\d+)\/(\d+)$/);
+            var time         = hour.length ? (hour+':'+minute+' '+meridian) : default_time;
 
-			if (!date_parts) {
-				return false;
-			}
-			return new Date(date_parts[3]+'-'+date_parts[2]+'-'+date_parts[1]+' '+time);
-		}
+            if (!date_parts) {
+                return false;
+            }
+            return new Date(date_parts[3]+'-'+date_parts[2]+'-'+date_parts[1]+' '+time);
+        }
 
-		jQuery.validator.addMethod('dateValid', function(value, element) {
-			var date = getNormalizedDate(element);
-			return date && date.getTime && !isNaN(date.getTime());
-		}, 'Please enter a valid date');
+        jQuery.validator.addMethod('dateValid', function(value, element) {
+            var date = getNormalizedDate(element);
+            return date && date.getTime && !isNaN(date.getTime());
+        }, 'Please enter a valid date');
 
-		jQuery.validator.addMethod('dateNotBefore', function(value, element, other_date_field) {
-			var item = $j(element);
-			var form = item.closest('form');
-			return (getNormalizedDate(element) >= getNormalizedDate(other_date_field, form));
-		}, 'Please enter a date that is after');
+        jQuery.validator.addMethod('dateNotBefore', function(value, element, other_date_field) {
+            var item = $j(element);
+            var form = item.closest('form');
+            return (getNormalizedDate(element) >= getNormalizedDate(other_date_field, form));
+        }, 'Please enter a date that is after');
 
-		var submission_form = $j('#createSubmissionForm');
+        var submission_form = $j('#createSubmissionForm');
+        var open_date_valid = { dateValid: true };
+        var due_date_valid  = { dateValid: true, dateNotBefore: 'open' };
+        var late_date_valid = {
+            dateValid: true,
+            dateNotBefore: {
+                param: 'due',
+                depends: function(element) {
+                    return $j(element).closest('form').find(':input[name="accept_submission"]:checked');
+                }
+            }
+        };
         submission_form.validate({
             rules: {
                 markvalue: {
@@ -184,36 +195,39 @@
                 criteria: {
                     markTypeRubricCriteriaCheck: true
                 },
-                due_date: {
-                    //
-                    // Must not be less than open_date
-                    dateNotBefore: 'open'
-                },
-                late_date: {
-                    //
-                    // Must not be less than due_date (if accepting submissions)
-                    dateNotBefore: {
-                        param: 'late',
-                        depends: function(element) {
-                            return $j(element).closest('form').find(':input[name="accept_submission"]:checked');
-                        }
-                    }
-				}
+                open_date:   open_date_valid,
+                open_hour:   open_date_valid,
+                open_minute: open_date_valid,
+                open_period: open_date_valid,
+                due_date:    due_date_valid,
+                due_hour:    due_date_valid,
+                due_minute:  due_date_valid,
+                due_period:  due_date_valid,
+                late_date:   late_date_valid,
+                late_hour:   late_date_valid,
+                late_minute: late_date_valid,
+                late_period: late_date_valid
+            },
+            groups: {
+                open_date: 'open_date open_hour open_minute open_period',
+                due_date:  'due_date due_hour due_minute due_period',
+                late_date: 'late_date late_hour late_minute late_period'
+            },
+            errorPlacement: function(label, element) {
+                if (element.is('[name^="open_"]')) {
+                    label.insertAfter(submission_form.find(':input[name="open_period"]'));
+                }
+                else if (element.is('[name^="due_"]')) {
+                    label.insertAfter(submission_form.find(':input[name="due_period"]'));
+                }
+                else if (element.is('[name^="late_"]')) {
+                    label.insertAfter(submission_form.find(':input[name="late_period"]'));
+                }
+                else {
+                    label.insertAfter(element);
+                }
             }
         });
-
-		submission_form.find(':input[name^="open_"]').each(function() {
-			$j(this).rules('add', {
-				dateValid: true,
-				groups: {
-					open_date: 'open_date open_hour open_minute open_period'
-				}
-//				,
-//				errorPlacement: function(error, element) {
-//					submission_form.find(':input[name="open_period"]').after(error);
-//				}
-			});
-		});
 
         // trigger show or hide of descriptors when radio off
         $j('#rubric-results input').change(function () {
