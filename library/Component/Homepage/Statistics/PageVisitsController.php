@@ -69,6 +69,7 @@ class Component_Homepage_Statistics_PageVisitsController extends Component_Homep
             }
         }
 
+        $colors = $this->colours;
         foreach($data as $groupname => $series) {
             $groupdata = array();
             $k = array_keys($series);
@@ -78,6 +79,7 @@ class Component_Homepage_Statistics_PageVisitsController extends Component_Homep
                 }
             }
 
+            $this->colours[] = $colors[$groupname];
             $this->graphData[] = array(
                 'label' => ucfirst($groupname),
                 'data' => $groupdata
@@ -96,7 +98,7 @@ class Component_Homepage_Statistics_PageVisitsController extends Component_Homep
             'GRAPH_XMIN'    => $this->dateRange[0] * 1000,
             'GRAPH_XMAX'    => $this->dateRange[1] * 1000,
             'GRAPH_JSON'    => json_encode($this->graphData),
-            'GRAPH_COLOURS' => json_encode(array_values($this->colours))
+            'GRAPH_COLOURS' => json_encode($this->colours)
         ));
 
         return true;
