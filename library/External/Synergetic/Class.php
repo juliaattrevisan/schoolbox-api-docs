@@ -61,7 +61,7 @@ class External_Synergetic_Class implements External_ClassInterface
 			vStudents.FileSemester = StudentClasses.FileSemester AND
 			vStudents.ID = StudentClasses.ID)
 		WHERE 
-			StudentStatus IN ('N','NOR','NEW','RET','LV','LEA','RPT','FUL','CUR','REN','PAT')
+			StudentStatus IN ('N','NOR','NEW','RET','LV','LEA','RPT','FUL','CUR','REN','PAT', 'EXC')
 			AND $classQuery
 			AND (StudentClasses.FileYear='" . $_SESSION['FileYear'] . "')
 			AND (StudentClasses.FileSemester='" . $_SESSION['FileSemester'] . "')
