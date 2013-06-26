@@ -9,46 +9,54 @@
 class News_Article_API {
 
     public function School($newsID) {
-        $response = new Response_HTTP();
-
         $newsHandler = new News();
         $news = $newsHandler->getByID($newsID);
-        $topic = $newsHandler->getTopicByID($news['item_topic_id']);
+	    if(is_array($news) ) {
+		    $response = new Response_HTTP();
+	        $topic = $newsHandler->getTopicByID($news['item_topic_id']);
 
-        $article = array(
-            'title'   => $news['item_heading'],
-            'aside'   => '',
-            'class'   => 'news wide',
-            'icon'    => 'news',
-            'content' => array(
-                'body' => $news['item_body'],
-                'image' => $news['item_image']
-            )
-        );
+	        $article = array(
+	            'title'   => $news['item_heading'],
+	            'aside'   => '',
+	            'class'   => 'news wide',
+	            'icon'    => 'news',
+	            'content' => array(
+	                'body' => $news['item_body'],
+	                'image' => $news['item_image']
+	            )
+	        );
 
-        $response->setPage('title', 'School News &rsaquo; ' . $topic['name']);
-        $response->setResponse('articles',array($article));
+	        $response->setPage('title', 'School News &rsaquo; ' . $topic['name']);
+	        $response->setResponse('articles',array($article));
+		    return $response;
+	    }
+	    else {
+		    return new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
+	    }
 
-        return $response;
     }
 
     public function Category($newsID) {
-        $response = new Response_HTTP();
-
+	    
         $newsHandler = new CategoryNews();
         $news = $newsHandler->getByID($newsID);
+	    if(is_array($news)) {
+		    $response = new Response_HTTP();
+	        $article = array(
+	            'title'   => $news['heading'],
+	            'aside'   => '',
+	            'class'   => 'news wide',
+	            'icon'    => 'news',
+	            'content' => $news['body']
+	        );
 
-        $article = array(
-            'title'   => $news['heading'],
-            'aside'   => '',
-            'class'   => 'news wide',
-            'icon'    => 'news',
-            'content' => $news['body']
-        );
+	        $response->setPage('title', 'News');
+	        $response->setResponse('articles',array($article));
 
-        $response->setPage('title', 'News');
-        $response->setResponse('articles',array($article));
-
-        return $response;
+	        return $response;
+	    }
+	    else {
+		    return new Response_HTTP(Response_HTTP::HTTP_NOT_FOUND);
+	    }
     }
 }
