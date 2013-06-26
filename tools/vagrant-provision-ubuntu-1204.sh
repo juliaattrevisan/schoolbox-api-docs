@@ -1,6 +1,5 @@
 #!/bin/bash
 vag="[schoolbox]";
-bridgeip=`ifconfig | grep "eth1" -C2 | grep "inet addr" | awk '{ print $2; }' | cut -d':' -f2`;
 if [ ! -d /vagrant/data ];
 then
 	cd /home/vagrant;
@@ -12,9 +11,9 @@ then
 	wget -q http://vagrant.alaress-dev.com.au/schoolboxdemo-latest-dav.vhost
 	wget -q http://vagrant.alaress-dev.com.au/schoolboxdemo-vagrant-latest.sql
 	echo "$vag Restarting MySQL";
-	service mysql restart;
+	service mysql restart > /dev/null;
 	echo "$vag Stopping Apache";
-	service apache2 stop;
+	service apache2 stop > /dev/null;
 	echo "$vag Removing current Schoolbox MySQL database";
 	mysql -u root -ptnp879 -e "drop database if exists schoolbox";
 	echo "$vag Loading Schoolbox MySQL Demo data";
@@ -48,12 +47,12 @@ then
 	echo "$vag Removing existing apache vhosts";
 	rm -f /etc/apache2/sites-enabled/10*;
 	echo "$vag Enabling Schoolbox apache vhost";
+	sed -i 's/vagrant\/vagrant-xhdebug/vagrant\/data\/vagrant-xhdebug/g' /etc/apache2/sites-enabled/*xhdebug*
 	cp /home/vagrant/schoolboxdemo-latest.vhost /etc/apache2/sites-available/schoolbox.vhost
 	a2ensite schoolbox.vhost
 	cp /home/vagrant/schoolboxdemo-latest-dav.vhost /etc/apache2/sites-available/schoolbox-dav.vhost
 	a2ensite schoolbox-dav.vhost
 	puppet apply -e 'package { "javascript-common": ensure => absent }' > /dev/null;
-	service apache2 restart
 	echo "$vag Set up video cronjobs"
 	cp -f /vagrant/tools/cron/schoolboxdev /home/vagrant/schoolboxdemo-latest-cron
 	sed -i 's/usr\/share\/schoolboxdev/vagrant/g' /home/vagrant/schoolboxdemo-latest-cron
@@ -64,8 +63,10 @@ then
 	echo "$vag Loading all demo data complete";
 fi
 echo "$vag Ensure all services are running";
-service mysql restart;
-service apache2 restart;
-echo "$vag Bridged Network Address => $bridgeip";
-echo "$vag WebDav URL => http://$bridgeip:8000/";
-echo "$vag Website URL => http://$bridgeip/";
+service mysql restart > /dev/null;
+service apache2 restart > /dev/null;
+for eth in `ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk {'print $2'} | cut -d/ -f1`;
+do
+	echo "$vag Website URL => http://$eth/";
+	echo "$vag WebDav URL => http://$eth:8000/";
+done
