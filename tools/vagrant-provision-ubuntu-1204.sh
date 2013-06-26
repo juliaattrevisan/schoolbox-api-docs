@@ -11,9 +11,9 @@ then
 	wget -q http://vagrant.alaress-dev.com.au/schoolboxdemo-latest-dav.vhost
 	wget -q http://vagrant.alaress-dev.com.au/schoolboxdemo-vagrant-latest.sql
 	echo "$vag Restarting MySQL";
-	service mysql restart;
+	service mysql restart > /dev/null;
 	echo "$vag Stopping Apache";
-	service apache2 stop;
+	service apache2 stop > /dev/null;
 	echo "$vag Removing current Schoolbox MySQL database";
 	mysql -u root -ptnp879 -e "drop database if exists schoolbox";
 	echo "$vag Loading Schoolbox MySQL Demo data";
@@ -53,7 +53,6 @@ then
 	cp /home/vagrant/schoolboxdemo-latest-dav.vhost /etc/apache2/sites-available/schoolbox-dav.vhost
 	a2ensite schoolbox-dav.vhost
 	puppet apply -e 'package { "javascript-common": ensure => absent }' > /dev/null;
-	service apache2 restart
 	echo "$vag Set up video cronjobs"
 	cp -f /vagrant/tools/cron/schoolboxdev /home/vagrant/schoolboxdemo-latest-cron
 	sed -i 's/usr\/share\/schoolboxdev/vagrant/g' /home/vagrant/schoolboxdemo-latest-cron
@@ -64,8 +63,8 @@ then
 	echo "$vag Loading all demo data complete";
 fi
 echo "$vag Ensure all services are running";
-service mysql restart;
-service apache2 restart;
+service mysql restart > /dev/null;
+service apache2 restart > /dev/null;
 for eth in `ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk {'print $2'} | cut -d/ -f1`;
 do
 	echo "$vag Network Address => $eth";
