@@ -98,8 +98,14 @@ class SubjectReportCard {
 
 				if (is_array($listSyns)) {
 					foreach($listSyns as $synid) {
+						/* TODO this is horrible, we need to move this into the usermapper */
 						$teacher = $userHandler->getBySynergyAndGroup($synid, $staffGroups);
-						$this->_teachers[] = $userMapper->findById($teacher['uid']);
+						if($teacher['uid']) {
+							$teacherObj = $userMapper->findById($teacher['uid']);
+							if($teacherObj != false) {
+								$this->_teachers[] = $teacherObj;
+							}
+						}
 					}
 				}
 			}
