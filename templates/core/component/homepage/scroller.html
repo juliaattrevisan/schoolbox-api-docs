@@ -50,7 +50,7 @@
                         timeout:{COMPONENT_CONFIG_TIMING_VALUE_MS},
                         cleartype:true,
                         height:'auto',
-                        width: width,
+                        width: Math.min(width, container.width()),
                         fit: true,
                         before: slideCallback,
                         after: slideCallback
