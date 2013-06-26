@@ -67,7 +67,6 @@ service mysql restart > /dev/null;
 service apache2 restart > /dev/null;
 for eth in `ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk {'print $2'} | cut -d/ -f1`;
 do
-	echo "$vag Network Address => $eth";
-	echo "$vag WebDav URL => http://$eth:8000/";
 	echo "$vag Website URL => http://$eth/";
+	echo "$vag WebDav URL => http://$eth:8000/";
 done
