@@ -103,19 +103,21 @@ foreach ($topicList as $sidebarTopic) {
     $this->parse('topic_list_block', 'topic_list', true);
 }
 
-$allNews = $newsHandler->getNewsListing($expired, $topic['name']);
 // parse previous and next articles
 $prevNext = array();
 $current = -1;
-foreach ($allNews as $newsItem) {
-    $prevNext[] = array(
-        $newsItem['item_id'],
-        $newsItem['item_heading']
-    );
-    // current article in the list?
-    if ($newsItem['item_id'] == $article['item_id']) {
-        $current = count($prevNext) - 1;
-    }
+$allNews = $newsHandler->getNewsListing($expired, $topic['name']);
+if($allNews != false) {
+	foreach ($allNews as $newsItem) {
+	    $prevNext[] = array(
+	        $newsItem['item_id'],
+	        $newsItem['item_heading']
+	    );
+	    // current article in the list?
+	    if ($newsItem['item_id'] == $article['item_id']) {
+	        $current = count($prevNext) - 1;
+	    }
+	}
 }
 
 // setup "objects" for output
