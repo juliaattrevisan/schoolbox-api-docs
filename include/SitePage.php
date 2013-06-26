@@ -800,7 +800,6 @@ class SitePage extends Page {
         $this->setSite();
         $this->setFile(TEMPLATE_body, 'common/login.html');
         $this->setVar('TITLE', Cfg::get('title') . " - Login");
-	    print $_GET['page'];
         if ($page && preg_match('#^[\w_=\-:\/.\&\?]+$#i', $page)) {
             $this->setVar('HIDDEN', htmlspecialchars($page, ENT_QUOTES));
         }
