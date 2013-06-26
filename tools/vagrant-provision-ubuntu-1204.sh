@@ -1,6 +1,5 @@
 #!/bin/bash
 vag="[schoolbox]";
-bridgeip=`ifconfig | grep "eth1" -C2 | grep "inet addr" | awk '{ print $2; }' | cut -d':' -f2`;
 if [ ! -d /vagrant/data ];
 then
 	cd /home/vagrant;
@@ -66,6 +65,9 @@ fi
 echo "$vag Ensure all services are running";
 service mysql restart;
 service apache2 restart;
-echo "$vag Bridged Network Address => $bridgeip";
-echo "$vag WebDav URL => http://$bridgeip:8000/";
-echo "$vag Website URL => http://$bridgeip/";
+for eth in `ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk {'print $2'} | cut -d/ -f1`;
+do
+	echo "$vag Network Address => $eth";
+	echo "$vag WebDav URL => http://$eth:8000/";
+	echo "$vag Website URL => http://$eth/";
+done
