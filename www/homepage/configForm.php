@@ -31,10 +31,12 @@ if (is_numeric($_REQUEST['cid'])) {
 			foreach ($components[$position] as $sequence => $componentID) {
                 if($componentID) {
                     $inst = Component_InstanceMapper::getInstance()->findById($componentID);
-                    $inst->sequence = $sequence + 1; // because we prefer to not have 0s in the database///
-                    $inst->position = $position;
+	                if($inst !== false) {
+	                    $inst->sequence = $sequence + 1; // because we prefer to not have 0s in the database///
+	                    $inst->position = $position;
 
-                    $instanceList[] = $inst;
+	                    $instanceList[] = $inst;
+	                }
                 }
 			}
 
@@ -48,12 +50,15 @@ if (is_numeric($_REQUEST['cid'])) {
 
         // locate the instance, locate its config instances, then blast them away
         $instance = $componentInstanceMapper->findById($_POST['delete']);
-        $configs = $componentConfigInstanceMapper->findByColumn('component_instance_id', $instance->id);
 
-        foreach ($configs as $c) {
-            $componentConfigInstanceMapper->delete($c);
-        }
-        $componentInstanceMapper->delete($instance);
+		if($instance !== false ) {
+	        $configs = $componentConfigInstanceMapper->findByColumn('component_instance_id', $instance->id);
+
+	        foreach ($configs as $c) {
+	            $componentConfigInstanceMapper->delete($c);
+	        }
+	        $componentInstanceMapper->delete($instance);
+		}
 
 	}
 
