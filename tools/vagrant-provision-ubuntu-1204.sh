@@ -47,6 +47,7 @@ then
 	echo "$vag Removing existing apache vhosts";
 	rm -f /etc/apache2/sites-enabled/10*;
 	echo "$vag Enabling Schoolbox apache vhost";
+	sed -i 's/vagrant\/vagrant-xhdebug/vagrant\/data\/vagrant-xhdebug/g' /etc/apache2/sites-available/*
 	cp /home/vagrant/schoolboxdemo-latest.vhost /etc/apache2/sites-available/schoolbox.vhost
 	a2ensite schoolbox.vhost
 	cp /home/vagrant/schoolboxdemo-latest-dav.vhost /etc/apache2/sites-available/schoolbox-dav.vhost
