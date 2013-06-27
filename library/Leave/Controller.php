@@ -99,7 +99,7 @@ class Leave_Controller extends Controller {
     public function __construct($page = null) {
         parent::__construct($page);
 
-        $this->setUserMapper(NewUserMapper::getInstance());
+        $this->setUserMapper(\Schoolbox\UserMapper::getInstance());
         $this->setRequestMapper(Leave_RequestMapper::getInstance());
         $this->setHouseMapper(HouseResidentialMapper::getInstance());
         $this->setExternalUser(new External_User());
@@ -338,10 +338,10 @@ class Leave_Controller extends Controller {
         if ($this->getGroup()->getPermission(null)) {
             $request = $data['request'];
             $user = $request->getUser();
-            if (!$user instanceof NewUser) {
+            if (!$user instanceof \Schoolbox\User) {
                 throw new Exception_Schoolbox_NotFound('User not found');
             }
-            $house = $this->getHouseMapper()->findById($user->getResidentialHouseId());
+            $house = $this->getHouseMapper()->findById($user->getResidentialHouse());
             if (!$house instanceof HouseResidential) {
                 throw new Exception_Schoolbox_NotFound('User\'s house not found');
             }
@@ -361,8 +361,8 @@ class Leave_Controller extends Controller {
                 array(
                     'REQUEST_ID' => $request->getId(),
                     'REQUEST_STATUS' => $request->getStatus(true),
-                    'USER_NAME' => $user->getName(),
-                    'USER_EXTERNAL_ID' => $user->getSynergyId(),
+                    'USER_NAME' => $user->formatName(),
+                    'USER_EXTERNAL_ID' => $user->getExternalId(),
                     'USER_YEAR' => $user->getYear(),
                     'USER_HOUSE' => $house->getHouse(),
                     'USER_HOUSE_ID' => $house->getId(),
@@ -379,7 +379,7 @@ class Leave_Controller extends Controller {
             /* What is the next/previous pending request?
                 */
             $nextRequest = $this->getRequestMapper()->findNextPendingByHouseId(
-                $request['id'], $user->getResidentialHouseId()
+                $request['id'], $user->getResidentialHouse()
             );
 
             if ($nextRequest) {
@@ -395,7 +395,7 @@ class Leave_Controller extends Controller {
             }
 
             $previousRequest = $this->getRequestMapper()->findPreviousPendingByHouseId(
-                $request['id'], $user->getResidentialHouseId()
+                $request['id'], $user->getResidentialHouse()
             );
 
             if ($previousRequest) {
@@ -428,10 +428,10 @@ class Leave_Controller extends Controller {
 
         $request = $data['request'];
         $user = $request->getUser();
-        if (!$user instanceof NewUser) {
+        if (!$user instanceof \Schoolbox\User) {
             throw new Exception_Schoolbox_NotFound('User not found');
         }
-        $house = $this->getHouseMapper()->findById($user->getResidentialHouseId());
+        $house = $this->getHouseMapper()->findById($user->getResidentialHouse());
         if (!$house instanceof HouseResidential) {
             throw new Exception_Schoolbox_NotFound('User\'s house not found');
         }
@@ -445,8 +445,8 @@ class Leave_Controller extends Controller {
                 array(
                     'REQUEST_ID' => $request->getId(),
                     'REQUEST_STATUS' => $request->getStatus(true),
-                    'USER_NAME' => $user->getName(),
-                    'USER_EXTERNAL_ID' => $user->getSynergyId(),
+                    'USER_NAME' => $user->formatName(),
+                    'USER_EXTERNAL_ID' => $user->getExternalId(),
                     'USER_YEAR' => $user->getYear(),
                     'USER_HOUSE' => $house->getHouse(),
                     'USER_HOUSE_ID' => $house->getId(),
@@ -710,10 +710,10 @@ class Leave_Controller extends Controller {
      */
     public function executeUserRequestList($userId) {
         $user = $this->getUserMapper()->findById($userId);
-        if (!$user instanceof NewUser) {
+        if (!$user instanceof \Schoolbox\User) {
             throw new Exception_Schoolbox_NotFound('User not found');
         }
-        $house = $this->getHouseMapper()->findById($user->getResidentialHouseId());
+        $house = $this->getHouseMapper()->findById($user->getResidentialHouse());
         if (!$house instanceof HouseResidential) {
             throw new Exception_Schoolbox_NotFound('User\'s house not found');
         }
@@ -1221,7 +1221,7 @@ class Leave_Controller extends Controller {
     /**
      * Setter for $userMapper
      *
-     * @param NewUserMapper $userMapper
+     * @param \Schoolbox\UserMapper $userMapper
      *
      * @return void
      */
@@ -1232,7 +1232,7 @@ class Leave_Controller extends Controller {
     /**
      * Getter for $userMapper
      *
-     * @return NewUserMapper
+     * @return \Schoolbox\UserMapper
      */
     public function getUserMapper() {
         return $this->userMapper;
