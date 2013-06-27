@@ -23,6 +23,13 @@ class Mapper extends BaseMapper {
     protected $column_factory;
 
     /**
+     * Factory for configuration loading.
+     *
+     * @var IConfigLoader
+     */
+    protected $config_loader;
+
+    /**
      * Overrides constructor as public, so that new instances can be created
      * without going through getInstance().
      */
@@ -52,6 +59,7 @@ class Mapper extends BaseMapper {
 	protected $soft_delete_undeleted_value = null;
 
     protected function setup() {
+        $this->setConfigLoader(new ConfigLoader());
         $this->setColumnFactory(new ColumnFactory());
     }
 
@@ -70,6 +78,23 @@ class Mapper extends BaseMapper {
      */
     public function getColumnFactory() {
         return $this->column_factory;
+    }
+
+    /**
+     * @param  \Schoolbox\IConfigLoader $config_loader
+     *
+     * @return $this
+     */
+    public function setConfigLoader($config_loader) {
+        $this->config_loader = $config_loader;
+        return $this;
+    }
+
+    /**
+     * @return \Schoolbox\IConfigLoader
+     */
+    public function getConfigLoader() {
+        return $this->config_loader;
     }
 
     /**
