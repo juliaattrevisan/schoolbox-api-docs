@@ -50,7 +50,7 @@ if (is_numeric($_GET['eventID'])) {
         'START_MIN' => $event['allday'] ? '' :$startDate->getUsingFormat('i'),
         'START_AM' => $startDate->getUsingFormat('A') == 'AM' ? 'selected="selected"' : '',
         'START_PM' => $startDate->getUsingFormat('A') == 'PM' ? 'selected="selected"' : '',
-	    'TIME_OFF' => $event['allday'] ? 'hide' : '',
+        'TIME_OFF' => $event['allday'] ? 'hide' : '',
         'END_DATE' => $endDate->getusingFormat('d/m/Y'),
         'END_HOUR' => $event['allday'] ? '' :$endDate->getUsingFormat('h'),
         'END_MIN' => $event['allday'] ? '' :$endDate->getUsingFormat('i'),
@@ -79,12 +79,13 @@ if (is_numeric($_GET['eventID'])) {
     if (count($campusList) > 1) {
         $page->checkList('campus_list', $campusList, $calendarHandler->getEventCampus($event['id']));
     }
-	else {
+    else {
         $page->setBlock(TEMPLATE_content, 'campus_list', 'campus_list_block');
         $page->setVar('campus_list_block', $campusList[0]['CAMPUS_NAME']);
     }
 
     $groupList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
+    array_unshift($groupList, array('id' => $event['sid'], 'name' => '-- unchanged --'));
 
     $page->dropDown(
         'group_drop', $groupList, $event['sid'], TEMPLATE_content, array('id' => 'UGROUP_ID', 'name' => 'UGROUP_NAME')
@@ -132,7 +133,7 @@ if (is_numeric($_GET['eventID'])) {
             )
         );
     }
-	else {
+    else {
         // no data in advanced options, hide them by default
         $page->setVar(
             array(
@@ -173,8 +174,8 @@ else {
         $selectedDate = time();
     }
 
-	$startDate = new Alaress_Date_Format($selectedDate, 'U');
-	$endDate = new Alaress_Date_Format($selectedDate, 'U');
+    $startDate = new Alaress_Date_Format($selectedDate, 'U');
+    $endDate = new Alaress_Date_Format($selectedDate, 'U');
 
     $output = array(
         'FUNCTION' => 'Add',
@@ -184,13 +185,13 @@ else {
         'START_MIN' => '',
         'START_AM' => '',
         'START_PM' => '',
-	    'TIME_OFF' => 'hide',
-		'END_DATE' => $startDate->getUsingFormat('d/m/Y'),
+        'TIME_OFF' => 'hide',
+        'END_DATE' => $startDate->getUsingFormat('d/m/Y'),
         'END_HOUR' => '',
         'END_MIN' => '',
         'END_AM' => '',
         'END_PM' => '',
-	    'ALLDAY_CHECKED' => 'checked="checked"',
+        'ALLDAY_CHECKED' => 'checked="checked"',
         'LEVEL' => '',
         'GROUP' => '',
         'DESCRIPTION' => $note,
@@ -222,6 +223,20 @@ else {
     $groupList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
 
     if ($_GET['level'] == 2) {
+        //
+        // Is current category not it group list? Put it there (as first)
+        if (!in_array($_GET['sid'], array_map(function($b) { return $b['id']; }, $groupList))) {
+            $this_category = Schoolbox\Resource\CategoryMapper::getInstance()->findById($_GET['sid']);
+            if ($this_category) {
+                array_unshift(
+                    $groupList,
+                    array(
+                        'id'   => $_GET['sid'],
+                        'name' => $this_category->getName(),
+                    )
+                );
+            }
+        }
         $page->dropDown(
             'group_drop', $groupList, $_GET['sid'], TEMPLATE_content,
             array('id' => 'UGROUP_ID', 'name' => 'UGROUP_NAME')
