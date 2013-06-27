@@ -20,6 +20,41 @@ class Synchronise_Synergetic_StPauls_Strategy_Student extends Synchronise_Synerg
 	 */
 	protected function setup() {
 		$this->setVerboseFilter(new Synchronise_Synergetic_StPauls_Verbose_Student());
+
+		// default housing mapping
+		$insertions = array(
+			'Castlereagh' => array(1, 'CA'),
+			'Claremont'   => array(2, 'CL'),
+			'Cornwallis'  => array(3, 'CO'),
+			'Melville'    => array(4, 'MEL'),
+			'Strathdon'   => array(5, 'STR'),
+			'Wilberforce' => array(6, 'WIL'),
+		);
+
+		// verify that houses exist in schoolbox; retrieve their IDs if they do, insert them if they don't
+		$hMap = HouseMapper::getInstance();
+
+		$hColl = $hMap->findAll();
+
+		if($hColl->count() == 0) {
+			foreach($insertions as $name => $lookup) {
+				$h = new House();
+				$h->house = $name;
+				$hMap->create($h);
+			}
+		}
+
+		// do another find to get the houses as SQL inserted them (auto-incremented IDs could be anything)
+		$hColl = $hMap->findAll();
+
+		foreach($hColl as $house) {
+			/**
+			 * @var $house House
+			 */
+			if(isset($insertions[$house->house])) {
+				$this->houseMap[$insertions[$house->house][1]] = $house->id;
+			}
+		}
 	}
 
 	/**
