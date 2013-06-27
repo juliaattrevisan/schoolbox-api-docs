@@ -521,7 +521,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract {
 		/* ...and get their records with phenomenal cheese factor in findIn()
 		 */
 		if (count($selectedIndividualIds)) {
-			$allIndividuals = NewUserMapper::getInstance()->findIn('id', $selectedIndividualIds);
+			$allIndividuals = \Schoolbox\UserMapper::getInstance()->findIn('id', $selectedIndividualIds);
 
 			foreach ($allIndividuals as $currentIndividual) {
 				$this->getPage()->setVar(array(
